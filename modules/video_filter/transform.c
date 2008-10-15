@@ -324,7 +324,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, p_outpic, p_pic->date );
+    p_outpic->date = p_pic->date;
     vout_LinkPicture( p_vout->p_sys->p_vout, p_outpic );
 
     p_vout->p_sys->pf_filter( p_vout, p_pic, p_outpic );

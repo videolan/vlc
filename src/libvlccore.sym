@@ -519,7 +519,6 @@ vout_Close
 vout_ControlWindow
 __vout_Create
 vout_CreatePicture
-vout_DatePicture
 vout_DestroyPicture
 vout_DisplayPicture
 vout_EnableFilter

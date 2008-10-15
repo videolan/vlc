@@ -43,56 +43,20 @@
  * Display a picture
  *
  * Remove the reservation flag of a picture, which will cause it to be ready
- * for display. The picture won't be displayed until vout_DatePicture has been
- * called.
+ * for display.
  */
 void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
-    switch( p_pic->i_status )
+
+    if( p_pic->i_status == RESERVED_PICTURE )
     {
-    case RESERVED_PICTURE:
-        p_pic->i_status = RESERVED_DISP_PICTURE;
-        break;
-    case RESERVED_DATED_PICTURE:
         p_pic->i_status = READY_PICTURE;
-        break;
-    default:
+    }
+    else
+    {
         msg_Err( p_vout, "picture to display %p has invalid status %d",
                          p_pic, p_pic->i_status );
-        break;
-    }
-
-    vlc_mutex_unlock( &p_vout->picture_lock );
-}
-
-/**
- * Date a picture
- *
- * Remove the reservation flag of a picture, which will cause it to be ready
- * for display. The picture won't be displayed until vout_DisplayPicture has
- * been called.
- * \param p_vout The vout in question
- * \param p_pic The picture to date
- * \param date The date to display the picture
- */
-void vout_DatePicture( vout_thread_t *p_vout,
-                       picture_t *p_pic, mtime_t date )
-{
-    vlc_mutex_lock( &p_vout->picture_lock );
-    p_pic->date = date;
-    switch( p_pic->i_status )
-    {
-    case RESERVED_PICTURE:
-        p_pic->i_status = RESERVED_DATED_PICTURE;
-        break;
-    case RESERVED_DISP_PICTURE:
-        p_pic->i_status = READY_PICTURE;
-        break;
-    default:
-        msg_Err( p_vout, "picture to date %p has invalid status %d",
-                         p_pic, p_pic->i_status );
-        break;
     }
 
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -252,9 +216,7 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 #ifndef NDEBUG
     /* Check if picture status is valid */
-    if( (p_pic->i_status != RESERVED_PICTURE) &&
-        (p_pic->i_status != RESERVED_DATED_PICTURE) &&
-        (p_pic->i_status != RESERVED_DISP_PICTURE) )
+    if( p_pic->i_status != RESERVED_PICTURE )
     {
         msg_Err( p_vout, "picture to destroy %p has invalid status %d",
                          p_pic, p_pic->i_status );

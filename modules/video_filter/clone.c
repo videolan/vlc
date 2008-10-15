@@ -337,8 +337,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
             msleep( VOUT_OUTMEM_SLEEP );
         }
 
-        vout_DatePicture( p_vout->p_sys->pp_vout[ i_vout ],
-                          p_outpic, p_pic->date );
+        p_outpic->date = p_pic->date;
         vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ], p_outpic );
 
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )

@@ -256,8 +256,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    vout_DatePicture( p_sys->p_vout, p_outpic, p_pic->date );
-
+    p_outpic->date = p_pic->date;
 
     vlc_mutex_lock( &p_sys->lock );
     const bool b_visible = p_sys->b_visible;

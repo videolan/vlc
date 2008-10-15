@@ -245,34 +245,45 @@ struct picture_heap_t
  * Flags used to describe the status of a picture
  *****************************************************************************/
 
-/* Picture type */
-#define EMPTY_PICTURE           0                            /* empty buffer */
-#define MEMORY_PICTURE          100                 /* heap-allocated buffer */
-#define DIRECT_PICTURE          200                         /* direct buffer */
+/* Picture type
+ * FIXME are the values meaningfull ? */
+enum
+{
+    EMPTY_PICTURE = 0,                             /* empty buffer */
+    MEMORY_PICTURE = 100,                 /* heap-allocated buffer */
+    DIRECT_PICTURE = 200,                         /* direct buffer */
+};
 
 /* Picture status */
-#define FREE_PICTURE            0                  /* free and not allocated */
-#define RESERVED_PICTURE        1                  /* allocated and reserved */
-#define RESERVED_DATED_PICTURE  2              /* waiting for DisplayPicture */
-#define RESERVED_DISP_PICTURE   3               /* waiting for a DatePicture */
-#define READY_PICTURE           4                       /* ready for display */
-#define DISPLAYED_PICTURE       5            /* been displayed but is linked */
-#define DESTROYED_PICTURE       6              /* allocated but no more used */
+enum
+{
+    FREE_PICTURE,                              /* free and not allocated */
+    RESERVED_PICTURE,                          /* allocated and reserved */
+    READY_PICTURE,                                  /* ready for display */
+    DISPLAYED_PICTURE,                   /* been displayed but is linked */
+    DESTROYED_PICTURE,                     /* allocated but no more used */
+};
 
 /* Quantification type */
-#define QTYPE_MPEG1            0
-#define QTYPE_MPEG2            1
-#define QTYPE_H264             2
+enum
+{
+    QTYPE_MPEG1,
+    QTYPE_MPEG2,
+    QTYPE_H264,
+};
 
 /*****************************************************************************
  * Shortcuts to access image components
  *****************************************************************************/
 
 /* Plane indices */
-#define Y_PLANE      0
-#define U_PLANE      1
-#define V_PLANE      2
-#define A_PLANE      3
+enum
+{
+    Y_PLANE = 0,
+    U_PLANE = 1,
+    V_PLANE = 2,
+    A_PLANE = 3,
+};
 
 /* Shortcuts */
 #define Y_PIXELS     p[Y_PLANE].p_pixels
@@ -655,7 +666,6 @@ VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, bool, bool,
 VLC_EXPORT( void,            vout_InitFormat,     ( video_frame_format_t *, uint32_t, int, int, int ) );
 VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
-VLC_EXPORT( void,            vout_DatePicture,    ( vout_thread_t *, picture_t *, mtime_t ) );
 VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );

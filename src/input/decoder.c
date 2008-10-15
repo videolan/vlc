@@ -1260,8 +1260,6 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                 p_owner->i_last_rate = i_rate;
             }
 
-            vout_DatePicture( p_vout, p_picture, p_picture->date );
-
             vout_DisplayPicture( p_vout, p_picture );
         }
         else

@@ -370,8 +370,8 @@ static void* Thread( vlc_object_t *p_this )
         if( p_pic == NULL ) break;
 
         memcpy( p_pic->p[0].p_pixels, plane, width.i_int * height.i_int * 4 );
-        vout_DatePicture( p_thread->p_vout, p_pic,
-                          aout_DateGet( &i_pts ) + GOOM_DELAY );
+
+        p_pic->date = aout_DateGet( &i_pts ) + GOOM_DELAY;
         vout_DisplayPicture( p_thread->p_vout, p_pic );
     }
 

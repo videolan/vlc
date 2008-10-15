@@ -511,7 +511,7 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    vout_DatePicture( p_vout->p_sys->p_vout, pp_outpic[0], p_pic->date );
+    pp_outpic[0]->date = p_pic->date;
 
     /* If we are using double rate, get an additional new picture */
     if( p_vout->p_sys->b_double_rate )
@@ -531,15 +531,9 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
 
         /* 20ms is a bit arbitrary, but it's only for the first image we get */
         if( !p_vout->p_sys->last_date )
-        {
-            vout_DatePicture( p_vout->p_sys->p_vout, pp_outpic[1],
-                              p_pic->date + 20000 );
-        }
+            pp_outpic[1]->date = p_pic->date + 20000;
         else
-        {
-            vout_DatePicture( p_vout->p_sys->p_vout, pp_outpic[1],
-                      (3 * p_pic->date - p_vout->p_sys->last_date) / 2 );
-        }
+            pp_outpic[1]->date = (3 * p_pic->date - p_vout->p_sys->last_date) / 2;
         p_vout->p_sys->last_date = p_pic->date;
     }
 
