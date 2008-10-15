@@ -740,6 +740,9 @@ static void MainLoop( input_thread_t *p_input )
         /* Demux data */
         b_force_update = false;
         i_wakeup = 0;
+        /* FIXME if p_input->i_state == PAUSE_S the access/access_demux
+         * is paused -> this may cause problem with some of them
+         * The same problem can be seen when seeking while paused */
         b_paused = p_input->i_state == PAUSE_S &&
                    !input_EsOutIsBuffering( p_input->p->p_es_out );
 
