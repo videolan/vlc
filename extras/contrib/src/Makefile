@@ -84,14 +84,9 @@ else
 HOSTCC2=$(HOSTCC)
 endif
 
-# For ffmpeg if not cross compiling
-ifneq ($(CC),)
-  FFMPEGCONF=--cc="$(CC)"
-endif
+FFMPEGCONF=
 
-#
 # cross compiling
-#
 #This should be inside the if block but some config scripts are buggy
 HOSTCONF=--target=$(HOST) --host=$(HOST) --build=$(BUILD) --program-prefix=""
 ifneq ($(BUILD),$(HOST))
@@ -101,7 +96,7 @@ ifneq ($(BUILD),$(HOST))
     #
     ifndef HAVE_CYGWIN
         # We are REALLY cross compiling
-        FFMPEGCONF=--cross-prefix=$(HOST)- --enable-cross-compile
+        FFMPEGCONF+=--cross-prefix=$(HOST)- --enable-cross-compile
         X264CONF=--host=$(HOST)
         PTHREADSCONF="CROSS=$(HOST)-"
     else
