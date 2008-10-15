@@ -91,7 +91,7 @@ int OpenIntf ( vlc_object_t *p_this )
 
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+//    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
 
@@ -105,7 +105,7 @@ void CloseIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+//    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     [p_intf->p_sys->o_pool release];
 
@@ -2360,7 +2360,7 @@ end:
 - (void)updateMessageArray
 {
     int i_start, i_stop;
-
+#if 0
     vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
     i_stop = *p_intf->p_sys->p_sub->pi_stop;
     vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
@@ -2418,6 +2418,7 @@ end:
         p_intf->p_sys->p_sub->i_start = i_start;
         vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
     }
+#endif
 }
 
 #pragma mark -
