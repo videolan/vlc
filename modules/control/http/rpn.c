@@ -1014,6 +1014,54 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 {
                     psz_val = input_item_GetGenre( p_item );
                 }
+                else if( !strcmp( psz_meta, "COPYRIGHT" ) )
+                {
+                     psz_val = input_item_GetCopyright( p_item );
+                }
+                else if( !strcmp( psz_meta, "TRACK_NUMBER" ) )
+                {
+                    psz_val = input_item_GetTrackNum( p_item );
+                }
+                else if( !strcmp( psz_meta, "DESCRIPTION" ) )
+                {
+                    psz_val = input_item_GetDescription( p_item );
+                }
+                else if( !strcmp( psz_meta, "RATING" ) )
+                {
+                    psz_val = input_item_GetRating( p_item );
+                }
+                else if( !strcmp( psz_meta, "DATE" ) )
+                {
+                    psz_val = input_item_GetDate( p_item );
+                }
+                else if( !strcmp( psz_meta, "URL" ) )
+                {
+                    psz_val = input_item_GetURL( p_item );
+                }
+                else if( !strcmp( psz_meta, "LANGUAGE" ) )
+                {
+                    psz_val = input_item_GetLanguage( p_item );
+                }
+                else if( !strcmp( psz_meta, "NOW_PLAYING" ) )
+                {
+                    psz_val = input_item_GetNowPlaying( p_item );
+                }
+                else if( !strcmp( psz_meta, "PUBLISHER" ) )
+                {
+                    psz_val = input_item_GetPublisher( p_item );
+                }
+                else if( !strcmp( psz_meta, "ENCODED_BY" ) )
+                {
+                    psz_val = input_item_GetEncodedBy( p_item );
+                }
+                else if( !strcmp( psz_meta, "ART_URL" ) )
+                {
+                    psz_val = input_item_GetEncodedBy( p_item );
+                }
+                else if( !strcmp( psz_meta, "TRACK_ID" ) )
+                {
+                    psz_val = input_item_GetTrackID( p_item );
+                }
 #undef p_item
             }
             if( psz_val == NULL ) psz_val = strdup( "" );

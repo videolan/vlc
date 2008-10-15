@@ -35,7 +35,24 @@
   <vlc id="end" />
   <vlc id="if" param1="pl.type value 'Node' strcmp" />
     <vlc id="rpn" param1="1 +" />
-    <leaf id="<vlc id="value" param1="pl.index" />" <vlc id="if" param1="pl.current" /> current="current" <vlc id="end" /> uri="<vlc id="value" param1="pl.uri xml_encode" />" name="<vlc id="value" param1="pl.name xml_encode" />" ro="<vlc id="value" param1="pl.ro" />" duration="<vlc id="value" param1="pl.duration" />" />
+    <leaf id="<vlc id="value" param1="pl.index" />" <vlc id="if" param1="pl.current" /> current="current" <vlc id="end" /> uri="<vlc id="value" param1="pl.uri xml_encode" />" name="<vlc id="value" param1="pl.name xml_encode" />" ro="<vlc id="value" param1="pl.ro" />" duration="<vlc id="value" param1="pl.duration" />">
+		<title><![CDATA[<vlc id="value" param1="pl.title xml_encode" />]]></title>
+		<artist><![CDATA[<vlc id="value" param1="pl.artist" xml_encode />]]></artist>
+		<genre><![CDATA[<vlc id="value" param1="pl.genre xml_encode" />]]></genre>
+		<copyright><![CDATA[<vlc id="value" param1="pl.copyright xml_encode" />]]></copyright>
+		<album><![CDATA[<vlc id="value" param1="pl.album xml_encode" />]]></album>
+		<track><![CDATA[<vlc id="value" param1="pl.track xml_encode" />]]></track>
+		<description><![CDATA[<vlc id="value" param1="pl.description xml_encode" />]]></description>
+		<rating><![CDATA[<vlc id="value" param1="pl.rating xml_encode" />]]></rating>
+		<date><![CDATA[<vlc id="value" param1="pl.date xml_encode" />]]></date>
+		<url><![CDATA[<vlc id="value" param1="pl.url xml_encode" />]]></url>
+		<language><![CDATA[<vlc id="value" param1="pl.language xml_encode" />]]></language>
+		<now_playing><![CDATA[<vlc id="value" param1="pl.now_playing xml_encode" />]]></now_playing>
+		<publisher><![CDATA[<vlc id="value" param1="pl.publisher xml_encode" />]]></publisher>
+		<encoded_by><![CDATA[<vlc id="value" param1="pl.encoded_by xml_encode" />]]></encoded_by>
+		<art_url><![CDATA[<vlc id="value" param1="pl.art_url xml_encode" />]]></art_url>
+		<track_id><![CDATA[<vlc id="value" param1="pl.track_id xml_encode" />]]></track_id>
+	</leaf>
   <vlc id="else" />
     <node id="<vlc id="value" param1="pl.index" />" name="<vlc id="value" param1="pl.name xml_encode" />" ro="<vlc id="value" param1="pl.ro" />" >
     <vlc id="if" param1="first_item value 0 ="/>

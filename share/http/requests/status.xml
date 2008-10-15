@@ -123,7 +123,25 @@
         <vlc id="end" />
       </category>
     <vlc id="end" />
-  </information>
+	   <meta-information>
+		    <title><![CDATA[<vlc id="value" param1="'TITLE' vlc_get_meta xml_encode" />]]></title>
+		    <artist><![CDATA[<vlc id="value" param1="'ARTIST' vlc_get_meta xml_encode" />]]></artist>
+		    <genre><![CDATA[<vlc id="value" param1="'GENRE' vlc_get_meta xml_encode" />]]></genre>
+		    <copyright><![CDATA[<vlc id="value" param1="'COPYRIGHT' vlc_get_meta xml_encode" />]]></copyright>
+		    <album><![CDATA[<vlc id="value" param1="'ALBUM' vlc_get_meta xml_encode" />]]></album>
+		    <track><![CDATA[<vlc id="value" param1="'TRACK_NUMBER' vlc_get_meta xml_encode" />]]></track>
+		    <description><![CDATA[<vlc id="value" param1="'DESCRIPTION' vlc_get_meta xml_encode" />]]></description>
+		    <rating><![CDATA[<vlc id="value" param1="'RATING' vlc_get_meta xml_encode" />]]></rating>
+		    <date><![CDATA[<vlc id="value" param1="'DATE' vlc_get_meta xml_encode" />]]></date>
+		    <url><![CDATA[<vlc id="value" param1="'URL' vlc_get_meta xml_encode" />]]></url>
+		    <language><![CDATA[<vlc id="value" param1="'LANGUAGE' vlc_get_meta xml_encode" />]]></language>
+		    <now_playing><![CDATA[<vlc id="value" param1="'NOW_PLAYING' vlc_get_meta xml_encode" />]]></now_playing>
+		    <publisher><![CDATA[<vlc id="value" param1="'PUBLISHER' vlc_get_meta xml_encode" />]]></publisher>
+		    <encoded_by><![CDATA[<vlc id="value" param1="'ENCODED_BY' vlc_get_meta xml_encode" />]]></encoded_by>
+		    <art_url><![CDATA[<vlc id="value" param1="'ART_URL' vlc_get_meta xml_encode" />]]></art_url>
+		    <track_id><![CDATA[<vlc id="value" param1="'TRACK_ID' vlc_get_meta xml_encode" />]]></track_id>
+		    </meta-information>
+	   </information>
   <stats>
     <readbytes><vlc id="value" param1="read_bytes" /></readbytes>
     <inputbitrate><vlc id="value" param1="input_bitrate" /></inputbitrate>
