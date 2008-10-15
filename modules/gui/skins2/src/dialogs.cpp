@@ -161,10 +161,7 @@ bool Dialogs::init()
     m_pProvider = (intf_thread_t *)vlc_object_create( getIntf(),
                                                     sizeof( intf_thread_t ) );
     if( m_pProvider == NULL )
-    {
-        msg_Err( getIntf(), "out of memory" );
         return false;
-    }
 
     m_pModule = module_need( m_pProvider, "dialogs provider", NULL, 0 );
     if( m_pModule == NULL )

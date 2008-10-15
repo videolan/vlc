@@ -87,11 +87,7 @@ bool FT2Font::init()
     // Allocate the buffer
     m_buffer = malloc( size );
     if( !m_buffer )
-    {
-        msg_Err( getIntf(), "not enough memory for the font %s",
-                 m_name.c_str() );
         return false;
-    }
     // Read the font data
     fread( m_buffer, size, 1, file );
     fclose( file );

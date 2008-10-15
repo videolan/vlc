@@ -217,10 +217,7 @@ bool ThemeLoader::extractFileInZip( unzFile file, const string &rootDir )
     // Allocate the buffer
     void *pBuffer = malloc( ZIP_BUFFER_SIZE );
     if( !pBuffer )
-    {
-        msg_Err( getIntf(), "failed to allocate memory" );
         return false;
-    }
 
     // Get the path of the file
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
