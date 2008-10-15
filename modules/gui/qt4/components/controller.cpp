@@ -819,11 +819,11 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     adjustSize ();  /* need to get real width and height for moving */
 
     /* center down */
-    QWidget * p_desktop = QApplication::desktop()->screen(
-                QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi ) );
+    QRect desktopRect = QApplication::desktop()->
+        screenGeometry( p_intf->p_sys->p_mi );
 
-    QPoint pos = QPoint( p_desktop->width() / 2 - width() / 2,
-          p_desktop->height() - height() );
+    QPoint pos = QPoint( desktopRect.width() / 2 - width() / 2,
+          desktopRect.height() - height() );
 
     getSettings()->beginGroup( "FullScreen" );
     move( getSettings()->value( "pos", pos ).toPoint() );
