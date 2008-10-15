@@ -39,108 +39,185 @@
 
 #include <QWidget>
 #include <QFrame>
+#include <QToolButton>
 
 class QPixmap;
 class QLabel;
-class QHBoxLayout;
-
-/* Advanced Button Bar */
-class QPushButton;
-class AdvControlsWidget : public QFrame
-{
-    Q_OBJECT
-public:
-    AdvControlsWidget( intf_thread_t *, bool );
-    virtual ~AdvControlsWidget();
-
-    void enableInput( bool );
-    void enableVideo( bool );
-
-private:
-    intf_thread_t *p_intf;
-    QPushButton *recordButton, *ABButton;
-    QPushButton *snapshotButton, *frameButton;
-
-    static mtime_t timeA, timeB;
-    int i_last_input_id;
-
-private slots:
-    void snapshot();
-#if 0
-    void frame();
-#endif
-    void fromAtoB();
-    void record();
-    void AtoBLoop( float, int, int );
-    void setIcon();
-
-signals:
-    void timeChanged();
-};
-
-/* Button Bar */
-class InputSlider;
-class QSlider;
 class QGridLayout;
-class VolumeClickHandler;
-class SoundSlider;
-class QAbstractSlider;
-class QToolButton;
 
-class ControlsWidget : public QFrame
+class InputSlider;
+class QAbstractSlider;
+
+class QAbstractButton;
+
+class VolumeClickHandler;
+class QSignalMapper;
+
+typedef enum buttonType_e
+{
+    PLAY_BUTTON,
+    PAUSE_BUTTON,
+    STOP_BUTTON,
+    OPEN_BUTTON,
+    PREVIOUS_BUTTON,
+    NEXT_BUTTON,
+    SLOWER_BUTTON,
+    FASTER_BUTTON,
+    FULLSCREEN_BUTTON,
+    EXTENDED_BUTTON,
+    PLAYLIST_BUTTON,
+    SNAPSHOT_BUTTON,
+    RECORD_BUTTON,
+    ATOB_BUTTON,
+#if 0
+    FRAME_BUTTON,
+#endif
+    INPUT_SLIDER,
+    VOLUME_SLIDER,
+    MENU_BUTTONS,
+    TELETEXT_BUTTONS,
+    VOLUME,
+} buttonType_e;
+
+typedef enum actionType_e
+{
+    PLAY_ACTION,
+    PAUSE_ACTION,
+    STOP_ACTION,
+    PREVIOUS_ACTION,
+    NEXT_ACTION,
+    SLOWER_ACTION,
+    FASTER_ACTION,
+    FULLSCREEN_ACTION,
+    EXTENDED_ACTION,
+    PLAYLIST_ACTION,
+    SNAPSHOT_ACTION,
+    RECORD_ACTION,
+    ATOB_ACTION
+} actionType_e;
+
+class AbstractController : public QFrame
 {
     Q_OBJECT
 public:
-    /* p_intf, advanced control visible or not, blingbling or not */
-    ControlsWidget( intf_thread_t *_p_i, MainInterface *_p_mi,
-        bool b_advControls, bool b_shiny, bool b_fsCreation = false);
-    virtual ~ControlsWidget();
+    AbstractController( intf_thread_t  *_p_i );
+    virtual ~AbstractController()  {};
 
-    QPushButton *playlistButton;
-    void setStatus( int );
-    void enableInput( bool );
-public slots:
-    void setNavigation( int );
-protected:
-    friend class MainInterface;
-    friend class VolumeClickHandler;
 protected:
     intf_thread_t       *p_intf;
-    QWidget             *discFrame;
-    QWidget             *telexFrame;
-    QGridLayout         *controlLayout;
-    InputSlider         *slider;
-    QPushButton         *prevSectionButton, *nextSectionButton, *menuButton;
-    QPushButton         *playButton, *fullscreenButton, *extSettingsButton;
-    QPushButton         *telexTransparent, *telexOn;
-    QSpinBox            *telexPage;
-    QToolButton         *slowerButton, *fasterButton;
-    QHBoxLayout         *controlButLayout;
-    AdvControlsWidget   *advControls;
-    QLabel              *volMuteLabel;
-    QAbstractSlider     *volumeSlider;
-    VolumeClickHandler  *hVolLabel;
 
-    bool                 b_advancedVisible;
-    bool                 b_telexTransparent;
-    bool                 b_telexEnabled;
+    QSignalMapper       *toolbarActionsMapper;
+    QGridLayout         *controlLayout;
+
+    QWidget *createWidget( buttonType_e, bool b_flat = false,
+                           bool b_big = false, bool b_shiny = false );
+    void setupButton( QAbstractButton * );
+
+private:
+    QWidget *discFrame();
+    QWidget *telexFrame();
+
+private slots:
+    void doAction( int );
+
 protected slots:
     void play();
     void stop();
     void prev();
     void next();
-    void updateVolume( int );
-    void updateVolume( void );
-    void updateInput();
     void fullscreen();
     void extSettings();
     void faster();
     void slower();
+    void playlist();
+    void snapshot();
+    void record();
+#if 0
+    void frame();
+#endif
+
+    virtual void setStatus( int );
+
+signals:
+    void inputExists( bool ); /// This might be usefull in the IM ?
+    void inputPlaying( bool ); /// This might be usefull in the IM ?
+    void inputIsRecordable( bool ); /// same ?
+};
+
+class PlayButton : public QToolButton
+{
+    Q_OBJECT
+private slots:
+    void updateButton( bool );
+};
+
+class AtoB_Button : public QToolButton
+{
+    Q_OBJECT
+private slots:
+    void setIcons( bool, bool );
+};
+
+class TeletextController : public QWidget
+{
+    Q_OBJECT
+    friend class AbstractController;
+private:
+    QToolButton         *telexTransparent, *telexOn;
+    QSpinBox            *telexPage;
+
+private slots:
+    void enableTeletextButtons( bool );
+    void toggleTeletextTransparency( bool );
+};
+
+class SoundWidget : public QWidget
+{
+    Q_OBJECT
+    friend class VolumeClickHandler;
+
+public:
+    SoundWidget( intf_thread_t  *_p_i, bool );
+
+private:
+    intf_thread_t       *p_intf;
+    QLabel              *volMuteLabel;
+    QAbstractSlider     *volumeSlider;
+    VolumeClickHandler  *hVolLabel;
+    bool                 b_my_volume;
+
+protected slots:
+    void updateVolume( int );
+    void updateVolume( void );
+};
+
+/* Advanced Button Bar */
+class AdvControlsWidget : public AbstractController
+{
+    Q_OBJECT
+public:
+    AdvControlsWidget( intf_thread_t * );
+    virtual ~AdvControlsWidget();
+};
+
+/* Button Bar */
+class ControlsWidget : public AbstractController
+{
+    Q_OBJECT
+public:
+    /* p_intf, advanced control visible or not, blingbling or not */
+    ControlsWidget( intf_thread_t *_p_i, bool b_advControls );
+    virtual ~ControlsWidget();
+
+protected:
+    friend class MainInterface;
+
+    AdvControlsWidget   *advControls;
+    bool                 b_advancedVisible;
+
+protected slots:
     void toggleAdvanced();
-    void toggleTeletext();
-    void toggleTeletextTransparency();
-    void enableTeletext( bool );
-    void enableVideo( bool );
+
 signals:
     void advancedControlsToggled( bool );
 };
@@ -166,25 +243,24 @@ signals:
 /***********************************
  * Fullscreen controller
  ***********************************/
-class FullscreenControllerWidget : public ControlsWidget
+class FullscreenControllerWidget : public AbstractController
 {
     Q_OBJECT
 public:
-    FullscreenControllerWidget( intf_thread_t *, MainInterface*, bool, bool );
+    FullscreenControllerWidget( intf_thread_t * );
     virtual ~FullscreenControllerWidget();
 
-    /* */
+    /* Vout */
+    vout_thread_t *p_vout;
     void attachVout( vout_thread_t *p_vout );
     void detachVout();
     void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
-    vout_thread_t *p_vout;
 
     int i_mouse_last_move_x;
     int i_mouse_last_move_y;
 
 protected:
     friend class MainInterface;
-    friend class VolumeClickHandler;
 
     virtual void mouseMoveEvent( QMouseEvent *event );
     virtual void mousePressEvent( QMouseEvent *event );
@@ -196,30 +272,24 @@ private slots:
     void showFSC();
     void planHideFSC();
     void hideFSC();
-
     void slowHideFSC();
 
-
 private:
+    virtual void customEvent( QEvent *event );
+
     QTimer *p_hideTimer;
 #if HAVE_TRANSPARENCY
     QTimer *p_slowHideTimer;
-#endif
-
-    int i_mouse_last_x;
-    int i_mouse_last_y;
-
-    bool b_mouse_over;
-
     bool b_slow_hide_begin;
     int  i_slow_hide_timeout;
+#endif
+
+    int i_mouse_last_x, i_mouse_last_y;
+    bool b_mouse_over;
 
 #ifdef WIN32TRICK
     bool b_fscHidden;
 #endif
-
-    virtual void customEvent( QEvent *event );
-
 
     /* Shared variable between FSC and VLC (protected by a lock) */
     vlc_mutex_t lock;

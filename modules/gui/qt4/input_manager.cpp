@@ -72,7 +72,9 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     i_rate       = 0;
     i_input_id   = 0;
     b_video      = false;
-    b_transparentTelextext = false;
+    timeA        = 0;
+    timeB        = 0;
+
 }
 
 InputManager::~InputManager()
@@ -121,6 +123,8 @@ void InputManager::delInput()
         old_name   = "";
         artUrl     = "";
         b_video    = false;
+        timeA      = 0;
+        timeB      = 0;
         emit positionUpdated( -1.0, 0 ,0 );
         emit statusChanged( END_S );
         emit nameChanged( "" );
@@ -278,18 +282,19 @@ void InputManager::UpdateNavigation()
 {
     /* Update navigation status */
     vlc_value_t val; val.i_int = 0;
+
     if( hasInput() )
         var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+
     if( val.i_int > 0 )
     {
+        emit titleChanged( true );
         val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
-        emit navigationChanged( (val.i_int > 0) ? 1 : 2 );
+        emit chapterChanged( (val.i_int > 0) );
     }
     else
-    {
-        emit navigationChanged( 0 );
-    }
+        emit titleChanged( false );
 }
 
 void InputManager::UpdateStatus()
@@ -386,9 +391,9 @@ void InputManager::UpdateSPU()
 void InputManager::UpdateTeletext()
 {
     if( hasInput() )
-        telexToggle( var_GetInteger( p_input, "teletext-es" ) >= 0 );
+        telexActivation( var_GetInteger( p_input, "teletext-es" ) >= 0 );
     else
-        telexToggle( false );
+        telexActivation( false );
 }
 
 void InputManager::UpdateVout()
@@ -474,7 +479,12 @@ void InputManager::sectionMenu()
     }
 }
 
-void InputManager::telexGotoPage( int page )
+/*
+ *  Teletext Functions
+ */
+
+/* Set a new Teletext Page */
+void InputManager::telexSetPage( int page )
 {
     if( hasInput() )
     {
@@ -483,80 +493,78 @@ void InputManager::telexGotoPage( int page )
 
         if( i_teletext_es >= 0 && i_teletext_es == i_spu_es )
         {
-            vlc_object_t *p_vbi;
-            p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+            vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
                         "zvbi", FIND_ANYWHERE );
             if( p_vbi )
             {
                 var_SetInteger( p_vbi, "vbi-page", page );
                 vlc_object_release( p_vbi );
+                emit newTelexPageSet( page );
             }
         }
     }
-    emit setNewTelexPage( page );
 }
 
-void InputManager::telexToggle( bool b_enabled )
+/* Set the transparency on teletext */
+void InputManager::telexSetTransparency( bool b_transparentTelextext )
+{
+    if( hasInput() )
+    {
+        vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
+                    "zvbi", FIND_ANYWHERE );
+        if( p_vbi )
+        {
+            var_SetBool( p_vbi, "vbi-opaque", b_transparentTelextext );
+            vlc_object_release( p_vbi );
+            emit teletextTransparencyActivated( b_transparentTelextext );
+        }
+    }
+}
+
+void InputManager::telexActivation( bool b_enabled )
 {
     if( hasInput() )
     {
         const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
         const int i_spu_es = var_GetInteger( p_input, "spu-es" );
 
+        /* Teletext is possible. Show the buttons */
         b_enabled = (i_teletext_es >= 0);
-        emit teletextEnabled( b_enabled );
-        if( b_enabled && (i_teletext_es == i_spu_es) )
+        emit teletextPossible( b_enabled );
+        if( !b_enabled ) return;
+
+        /* If Teletext is selected */
+        if( i_teletext_es == i_spu_es )
         {
-            vlc_object_t *p_vbi;
+            /* Activate the buttons */
+            teletextActivated( true );
+
+            /* Then, find the current page */
             int i_page = 100;
-            p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                        "zvbi", FIND_ANYWHERE );
+            vlc_object_t *p_vbi = (vlc_object_t *)
+                vlc_object_find_name( p_input, "zvbi", FIND_ANYWHERE );
             if( p_vbi )
             {
                 i_page = var_GetInteger( p_vbi, "vbi-page" );
                 vlc_object_release( p_vbi );
-                i_page = b_enabled ? i_page : 0;
-                telexGotoPage( i_page );
+                emit newTelexPageSet( i_page );
             }
         }
     }
-    else emit teletextEnabled( b_enabled );
+    else
+        emit teletextPossible( b_enabled );
 }
 
-void InputManager::telexToggleButtons()
+void InputManager::activateTeletext( bool b_enable )
 {
     if( hasInput() )
     {
         const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
         if( i_teletext_es >= 0 )
         {
-            const int i_spu_es = var_GetInteger( p_input, "spu-es" );
-
-            if( i_teletext_es == i_spu_es )
-                var_SetInteger( p_input, "spu-es", -1 );
-            else
-                var_SetInteger( p_input, "spu-es", i_teletext_es );
-
-            emit toggleTelexButtons();
+            var_SetInteger( p_input, "spu-es", b_enable ? i_teletext_es : -1 );
         }
     }
-}
-
-void InputManager::telexSetTransparency()
-{
-    if( hasInput() )
-    {
-        vlc_object_t *p_vbi;
-        p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                    "zvbi", FIND_ANYWHERE );
-        if( p_vbi )
-        {
-            var_SetBool( p_vbi, "vbi-opaque", b_transparentTelextext );
-            b_transparentTelextext = !b_transparentTelextext;
-            vlc_object_release( p_vbi );
-        }
-    }
-    emit toggleTelexTransparency();
 }
 
 void InputManager::slower()
@@ -581,6 +589,36 @@ void InputManager::setRate( int new_rate )
 {
     if( hasInput() )
         var_SetInteger( p_input, "rate", new_rate );
+}
+
+void InputManager::setAtoB()
+{
+    if( !timeA )
+    {
+        timeA = var_GetTime( THEMIM->getInput(), "time"  );
+    }
+    else if( !timeB )
+    {
+        timeB = var_GetTime( THEMIM->getInput(), "time"  );
+        var_SetTime( THEMIM->getInput(), "time" , timeA );
+    }
+    else
+    {
+        timeA = 0;
+        timeB = 0;
+    }
+    emit AtoBchanged( (timeA != 0 ), (timeB != 0 ) );
+}
+
+/* Function called regularly when in an AtoB loop */
+void InputManager::AtoBLoop( int i_time )
+{
+    if( timeB )
+    {
+        if( ( i_time >= (int)( timeB/1000000 ) )
+            || ( i_time < (int)( timeA/1000000 ) ) )
+            var_SetTime( THEMIM->getInput(), "time" , timeA );
+    }
 }
 
 /**********************************************************************

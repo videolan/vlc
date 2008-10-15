@@ -127,12 +127,12 @@ private slots:
 class VolumeClickHandler : public QObject
 {
 public:
-    VolumeClickHandler( intf_thread_t *_p_intf, ControlsWidget *_m ) : QObject(_m)
+    VolumeClickHandler( intf_thread_t *_p_intf, SoundWidget *_m ) : QObject(_m)
     {m = _m; p_intf = _p_intf; }
     virtual ~VolumeClickHandler() {};
     virtual bool eventFilter( QObject *obj, QEvent *e );
 private:
-    ControlsWidget *m;
+    SoundWidget *m;
     intf_thread_t *p_intf;
 };
 

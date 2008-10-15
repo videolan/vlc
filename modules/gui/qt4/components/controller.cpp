@@ -1,7 +1,7 @@
 /*****************************************************************************
- * interface_widgets.cpp : Custom widgets for the main interface
+ * Controller.cpp : Controller for the main interface
  ****************************************************************************
- * Copyright ( C ) 2006 the VideoLAN team
+ * Copyright ( C ) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -41,13 +41,14 @@
 #include <QLabel>
 #include <QSpacerItem>
 #include <QCursor>
-#include <QPushButton>
+#include <QToolButton>
 #include <QToolButton>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QPalette>
 #include <QResizeEvent>
 #include <QDate>
+#include <QSignalMapper>
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
@@ -55,108 +56,555 @@
  * TEH controls
  **********************************************************************/
 
-static void setupSmallButton( QPushButton *aButton )
+/******
+  * This is an abstract Toolbar/Controller
+  * This has helper to create any toolbar, any buttons and to manage the actions
+  *
+  *****/
+AbstractController::AbstractController( intf_thread_t * _p_i ) : QFrame( NULL )
 {
-    aButton->setMaximumSize( QSize( 26, 26 ) );
-    aButton->setMinimumSize( QSize( 26, 26 ) );
+    p_intf = _p_i;
+
+    /* We need one layout. An controller without layout is stupid with 
+       current architecture */
+    controlLayout = new QGridLayout( this );
+
+    /* Main action provider */
+    toolbarActionsMapper = new QSignalMapper();
+    CONNECT( toolbarActionsMapper, mapped( int ),
+             this, doAction( int ) );
+    CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
+}
+
+void AbstractController::setStatus( int status )
+{
+    bool b_hasInput = THEMIM->getIM()->hasInput();
+    /* Activate the interface buttons according to the presence of the input */
+    emit inputExists( b_hasInput );
+
+    emit inputPlaying( status == PLAYING_S );
+
+    emit inputIsRecordable( b_hasInput &&
+                            var_GetBool( THEMIM->getInput(), "can-record" ) );
+}
+
+void AbstractController::setupButton( QAbstractButton *aButton )
+{
+    static QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+    sizePolicy.setHorizontalStretch( 0 );
+    sizePolicy.setVerticalStretch( 0 );
+
+    aButton->setSizePolicy( sizePolicy );
+    aButton->setFixedSize( QSize( 26, 26 ) );
     aButton->setIconSize( QSize( 20, 20 ) );
     aButton->setFocusPolicy( Qt::NoFocus );
 }
 
-/* init static variables in advanced controls */
-mtime_t AdvControlsWidget::timeA = 0;
-mtime_t AdvControlsWidget::timeB = 0;
+#define CONNECT_MAP( a ) CONNECT( a, clicked(),  toolbarActionsMapper, map() )
+#define SET_MAPPING( a, b ) toolbarActionsMapper->setMapping( a , b )
+#define CONNECT_MAP_SET( a, b ) \
+    CONNECT_MAP( a ); \
+    SET_MAPPING( a, b );
+#define BUTTON_SET_BAR( button, image, tooltip ) \
+    button->setToolTip( tooltip );          \
+    button->setIcon( QIcon( ":/"#image ) );
 
-AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, bool b_fsCreation = false ) :
-                                           QFrame( NULL ), p_intf( _p_i )
+#define ENABLE_ON_VIDEO( a ) \
+    CONNECT( THEMIM->getIM(), voutChanged( bool ), a, setEnabled( bool ) ); \
+    a->setEnabled( THEMIM->getIM()->hasVideo() ); /* TODO: is this necessary? when input is started before the interface? */
+
+#define ENABLE_ON_INPUT( a ) \
+    CONNECT( this, inputExists( bool ), a, setEnabled( bool ) ); \
+    a->setEnabled( THEMIM->getIM()->hasInput() ); /* TODO: is this necessary? when input is started before the interface? */
+
+QWidget *AbstractController::createWidget( buttonType_e button, bool b_flat,
+        bool b_big, bool b_shiny )
 {
-    QHBoxLayout *advLayout = new QHBoxLayout( this );
-    advLayout->setMargin( 0 );
-    advLayout->setSpacing( 0 );
-    advLayout->setAlignment( Qt::AlignBottom );
-
-    /* A to B Button */
-    ABButton = new QPushButton;
-    setupSmallButton( ABButton );
-    advLayout->addWidget( ABButton );
-    BUTTON_SET_ACT_I( ABButton, "", atob_nob,
-      qtr( "Loop from point A to point B continuously.\nClick to set point A" ),
-      fromAtoB() );
-    timeA = timeB = 0;
-    i_last_input_id = 0;
-    /* in FS controller we skip this, because we dont want to have it double
-       controlled */
-    if( !b_fsCreation )
-        CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-                 this, AtoBLoop( float, int, int ) );
-    /* set up synchronization between main controller and fs controller */
-    CONNECT( THEMIM->getIM(), advControlsSetIcon(), this, setIcon() );
-    connect( this, SIGNAL( timeChanged() ),
-        THEMIM->getIM(), SIGNAL( advControlsSetIcon()));
+    QWidget *widget = NULL;
+    switch( button )
+    {
+    case PLAY_BUTTON: {
+        PlayButton *playButton = new PlayButton;
+        setupButton( playButton );
+        BUTTON_SET_BAR( playButton, play_b, qtr( I_PLAY_TOOLTIP ) );
+        CONNECT_MAP_SET( playButton, PLAY_ACTION );
+        CONNECT( this, inputPlaying( bool ),
+                 playButton, updateButton( bool ));
+        widget = playButton;
+        }
+        break;
+    case STOP_BUTTON:{
+        QToolButton *stopButton = new QToolButton;
+        setupButton( stopButton );
+        CONNECT_MAP_SET( stopButton, STOP_ACTION );
+        BUTTON_SET_BAR( stopButton, stop_b, qtr( "Stop playback" ) );
+        widget = stopButton;
+        }
+        break;
+    case PREVIOUS_BUTTON:{
+        QToolButton *prevButton = new QToolButton;
+        setupButton( prevButton );
+        CONNECT_MAP_SET( prevButton, PREVIOUS_ACTION );
+        BUTTON_SET_BAR( prevButton, previous_b,
+                  qtr( "Previous media in the playlist" ) );
+        widget = prevButton;
+        }
+        break;
+    case NEXT_BUTTON:
+        {
+        QToolButton *nextButton = new QToolButton;
+        setupButton( nextButton );
+        CONNECT_MAP_SET( nextButton, NEXT_ACTION );
+        BUTTON_SET_BAR( nextButton, next_b,
+                qtr( "Next media in the playlist" ) );
+        widget = nextButton;
+        }
+        break;
+    case SLOWER_BUTTON:{
+        QToolButton *slowerButton = new QToolButton;
+        setupButton( slowerButton );
+        CONNECT_MAP_SET( slowerButton, SLOWER_ACTION );
+        BUTTON_SET_BAR( slowerButton, slower, qtr( "Slower" ) );
+        ENABLE_ON_INPUT( slowerButton );
+        widget = slowerButton;
+        }
+        break;
+    case FASTER_BUTTON:{
+        QToolButton *fasterButton = new QToolButton;
+        setupButton( fasterButton );
+        CONNECT_MAP_SET( fasterButton, SLOWER_ACTION );
+        BUTTON_SET_BAR( fasterButton, faster, qtr( "Faster" ) );
+        ENABLE_ON_INPUT( fasterButton );
+        widget = fasterButton;
+        }
+        break;
 #if 0
-    frameButton = new QPushButton( "Fr" );
-    frameButton->setMaximumSize( QSize( 26, 26 ) );
-    frameButton->setIconSize( QSize( 20, 20 ) );
-    advLayout->addWidget( frameButton );
-    BUTTON_SET_ACT( frameButton, "Fr", qtr( "Frame by frame" ), frame() );
+    case FRAME_BUTTON: {
+        QToolButton *frameButton = new QToolButton( "Fr" );
+        setupButton( frameButton );
+        BUTTON_SET_BAR( frameButton, "", qtr( "Frame by frame" ) );
+        ENABLE_ON_INPUT( frameButton );
+        widget = frameButton;
+        }
+        break;
 #endif
+    case FULLSCREEN_BUTTON:{
+        QToolButton *fullscreenButton = new QToolButton;
+        setupButton( fullscreenButton );
+        CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
+        BUTTON_SET_BAR( fullscreenButton, fullscreen,
+                qtr( "Toggle the video in fullscreen" ) );
+        ENABLE_ON_VIDEO( fullscreenButton );
+        widget = fullscreenButton;
+        }
+        break;
+    case EXTENDED_BUTTON:{
+        QToolButton *extSettingsButton = new QToolButton;
+        setupButton( extSettingsButton );
+        CONNECT_MAP_SET( extSettingsButton, EXTENDED_ACTION );
+        BUTTON_SET_BAR( extSettingsButton, extended,
+                qtr( "Show extended settings" ) );
+        widget = extSettingsButton;
+        }
+        break;
+    case PLAYLIST_BUTTON:{
+        QToolButton *playlistButton = new QToolButton;
+        setupButton( playlistButton );
+        CONNECT_MAP_SET( playlistButton, PLAYLIST_ACTION );
+        BUTTON_SET_BAR( playlistButton, playlist,
+                qtr( "Show playlist" ) );
+        widget = playlistButton;
+        }
+        break;
+    case SNAPSHOT_BUTTON:{
+        QToolButton *snapshotButton = new QToolButton;
+        setupButton( snapshotButton );
+        CONNECT_MAP_SET( snapshotButton, SNAPSHOT_ACTION );
+        BUTTON_SET_BAR( snapshotButton, snapshot, qtr( "Take a snapshot" ) );
+        ENABLE_ON_VIDEO( snapshotButton );
+        widget = snapshotButton;
+        }
+        break;
+    case RECORD_BUTTON:{
+        QToolButton *recordButton = new QToolButton;
+        setupButton( recordButton );
+        CONNECT_MAP_SET( recordButton, RECORD_ACTION );
+        BUTTON_SET_BAR( recordButton, record, qtr( "Record" ) );
+        ENABLE_ON_INPUT( recordButton );
+        widget = recordButton;
+        }
+        break;
+    case ATOB_BUTTON: {
+        AtoB_Button *ABButton = new AtoB_Button;
+        setupButton( ABButton );
+        BUTTON_SET_BAR( ABButton, atob_nob, qtr( "Loop from point A to point "
+                    "B continuously.\nClick to set point A" ) );
+        ENABLE_ON_INPUT( ABButton );
+        CONNECT_MAP_SET( ABButton, ATOB_ACTION );
+        CONNECT( THEMIM->getIM(), AtoBchanged( bool, bool),
+                 ABButton, setIcons( bool, bool ) );
+        widget = ABButton;
+        }
+        break;
+    case INPUT_SLIDER: {
+        InputSlider *slider = new InputSlider( Qt::Horizontal, NULL );
+        /* Update the position when the IM has changed */
+        CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
+                slider, setPosition( float, int, int ) );
+        /* And update the IM, when the position has changed */
+        CONNECT( slider, sliderDragged( float ),
+                THEMIM->getIM(), sliderUpdate( float ) );
+        widget = slider;
+        }
+        break;
+    case MENU_BUTTONS:
+        widget = discFrame();
+        widget->hide();
+        break;
+    case TELETEXT_BUTTONS:
+        widget = telexFrame();
+        widget->hide();
+        break;
+    case VOLUME:
+        {
+            SoundWidget *snd = new SoundWidget( p_intf, b_shiny );
+            widget = snd;
+        }
+        break;
+    default:
+        msg_Warn( p_intf, "This should not happen" );
+        break;
+    }
 
-    /* Record Button */
-    recordButton = new QPushButton;
-    setupSmallButton( recordButton );
-    advLayout->addWidget( recordButton );
-    BUTTON_SET_ACT_I( recordButton, "", record,
-            qtr( "Record" ), record() );
-
-    /* Snapshot Button */
-    snapshotButton = new QPushButton;
-    setupSmallButton( snapshotButton );
-    advLayout->addWidget( snapshotButton );
-    BUTTON_SET_ACT_I( snapshotButton, "", snapshot,
-            qtr( "Take a snapshot" ), snapshot() );
+    /* Customize Buttons */
+    if( b_flat || b_big )
+    {
+        QToolButton *tmpButton = qobject_cast<QToolButton *>(widget);
+        if( tmpButton )
+        {
+            if( b_flat )
+                tmpButton->setAutoRaise( b_flat );
+            if( b_big )
+            {
+                tmpButton->setFixedSize( QSize( 32, 32 ) );
+                tmpButton->setIconSize( QSize( 26, 26 ) );
+            }
+        }
+    }
+    return widget;
 }
 
-AdvControlsWidget::~AdvControlsWidget()
-{}
-
-void AdvControlsWidget::enableInput( bool enable )
+QWidget *AbstractController::discFrame()
 {
-    int i_input_id = 0;
-    if( THEMIM->getInput() != NULL )
-    {
-        input_item_t *p_item = input_GetItem( THEMIM->getInput() );
-        i_input_id = p_item->i_id;
+    /** Disc and Menus handling */
+    QWidget *discFrame = new QWidget( this );
 
-        recordButton->setVisible( var_GetBool( THEMIM->getInput(), "can-record" ) );
+    QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
+    discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
+
+    QToolButton *prevSectionButton = new QToolButton( discFrame );
+    setupButton( prevSectionButton );
+    BUTTON_SET_BAR( prevSectionButton, dvd_prev,
+            qtr("Previous Chapter/Title" ) );
+    discLayout->addWidget( prevSectionButton );
+
+    QToolButton *menuButton = new QToolButton( discFrame );
+    setupButton( menuButton );
+    discLayout->addWidget( menuButton );
+    BUTTON_SET_BAR( menuButton, dvd_menu, qtr( "Menu" ) );
+
+    QToolButton *nextSectionButton = new QToolButton( discFrame );
+    setupButton( nextSectionButton );
+    discLayout->addWidget( nextSectionButton );
+    BUTTON_SET_BAR( nextSectionButton, dvd_next,
+            qtr("Next Chapter/Title" ) );
+
+
+    /* Change the navigation button display when the IM
+       navigation changes */
+    CONNECT( THEMIM->getIM(), titleChanged( bool ),
+            discFrame, setVisible( bool ) );
+    CONNECT( THEMIM->getIM(), chapterChanged( bool ),
+            menuButton, setVisible( bool ) );
+    /* Changes the IM navigation when triggered on the nav buttons */
+    CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
+            sectionPrev() );
+    CONNECT( nextSectionButton, clicked(), THEMIM->getIM(),
+            sectionNext() );
+    CONNECT( menuButton, clicked(), THEMIM->getIM(),
+            sectionMenu() );
+
+    return discFrame;
+}
+
+QWidget *AbstractController::telexFrame()
+{
+    /**
+     * Telextext QFrame
+     **/
+    TeletextController *telexFrame = new TeletextController;
+    QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
+    telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
+    CONNECT( THEMIM->getIM(), teletextPossible( bool ),
+             telexFrame, setVisible( bool ) );
+
+    /* On/Off button */
+    QToolButton *telexOn = new QToolButton;
+    telexFrame->telexOn = telexOn;
+    setupButton( telexOn );
+    BUTTON_SET_BAR( telexOn, tv, qtr( "Teletext Activation" ) );
+    telexLayout->addWidget( telexOn );
+
+    /* Teletext Activation and set */
+    CONNECT( telexOn, clicked( bool ),
+             THEMIM->getIM(), activateTeletext( bool ) );
+    CONNECT( THEMIM->getIM(), teletextActivated( bool ),
+             telexFrame, enableTeletextButtons( bool ) );
+
+
+    /* Transparency button */
+    QToolButton *telexTransparent = new QToolButton;
+    telexFrame->telexTransparent = telexTransparent;
+    setupButton( telexTransparent );
+    BUTTON_SET_BAR( telexTransparent, tvtelx,
+            qtr( "Toggle Transparency " ) );
+    telexTransparent->setEnabled( false );
+    telexLayout->addWidget( telexTransparent );
+
+    /* Transparency change and set */
+    CONNECT( telexTransparent, clicked( bool ),
+            THEMIM->getIM(), telexSetTransparency( bool ) );
+    CONNECT( THEMIM->getIM(), teletextTransparencyActivated( bool ),
+            telexFrame, toggleTeletextTransparency( bool ) );
+
+
+    /* Page setting */
+    QSpinBox *telexPage = new QSpinBox;
+    telexFrame->telexPage = telexPage;
+    telexPage->setRange( 0, 999 );
+    telexPage->setValue( 100 );
+    telexPage->setAccelerated( true );
+    telexPage->setWrapping( true );
+    telexPage->setAlignment( Qt::AlignRight );
+    telexPage->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
+    telexPage->setEnabled( false );
+    telexLayout->addWidget( telexPage );
+
+    /* Page change and set */
+    CONNECT( telexPage, valueChanged( int ),
+            THEMIM->getIM(), telexSetPage( int ) );
+    CONNECT( THEMIM->getIM(), newTelexPageSet( int ),
+            telexPage, setValue( int ) );
+
+    return telexFrame;
+}
+#undef CONNECT_MAP
+#undef SET_MAPPING
+#undef BUTTON_SET_BAR
+
+SoundWidget::SoundWidget( intf_thread_t * _p_intf, bool b_shiny )
+                         : b_my_volume( false )
+{
+    p_intf = _p_intf;
+    QHBoxLayout *layout = new QHBoxLayout( this );
+    layout->setSpacing( 0 ); layout->setMargin( 0 );
+    hVolLabel = new VolumeClickHandler( p_intf, this );
+
+    volMuteLabel = new QLabel;
+    volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
+    volMuteLabel->installEventFilter( hVolLabel );
+    layout->addWidget( volMuteLabel );
+
+    if( b_shiny )
+    {
+        volumeSlider = new SoundSlider( this,
+            config_GetInt( p_intf, "volume-step" ),
+            config_GetInt( p_intf, "qt-volume-complete" ),
+            config_GetPsz( p_intf, "qt-slider-colours" ) );
     }
     else
     {
-        recordButton->setVisible( false );
+        volumeSlider = new QSlider( this );
+        volumeSlider->setOrientation( Qt::Horizontal );
     }
+    volumeSlider->setMaximumSize( QSize( 200, 40 ) );
+    volumeSlider->setMinimumSize( QSize( 85, 30 ) );
+    volumeSlider->setFocusPolicy( Qt::NoFocus );
+    layout->addWidget( volumeSlider );
 
-    ABButton->setEnabled( enable );
-    recordButton->setEnabled( enable );
+    /* Set the volume from the config */
+    volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
+                              VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
 
-    if( enable && ( i_last_input_id != i_input_id ) )
-    {
-        timeA = timeB = 0;
-        i_last_input_id = i_input_id;
-        emit timeChanged();
-    }
+    /* Force the update at build time in order to have a muted icon if needed */
+    updateVolume( volumeSlider->value() );
+
+    /* Volume control connection */
+    CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
+    CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
 }
 
-void AdvControlsWidget::enableVideo( bool enable )
+void SoundWidget::updateVolume( int i_sliderVolume )
 {
-    snapshotButton->setEnabled( enable );
-#if 0
-    frameButton->setEnabled( enable );
-#endif
+    if( !b_my_volume )
+    {
+        int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
+        aout_VolumeSet( p_intf, i_res );
+    }
+    if( i_sliderVolume == 0 )
+    {
+        volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
+        volMuteLabel->setToolTip( qtr( "Unmute" ) );
+        return;
+    }
+
+    if( i_sliderVolume < VOLUME_MAX / 3 )
+        volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
+    else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
+        volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
+    volMuteLabel->setToolTip( qtr( "Mute" ) );
 }
 
-void AdvControlsWidget::snapshot()
+void SoundWidget::updateVolume()
+{
+    /* Audio part */
+    audio_volume_t i_volume;
+    aout_VolumeGet( p_intf, &i_volume );
+    i_volume = ( i_volume *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
+    int i_gauge = volumeSlider->value();
+    b_my_volume = false;
+    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
+    {
+        b_my_volume = true;
+        volumeSlider->setValue( i_volume );
+        b_my_volume = false;
+    }
+}
+
+void TeletextController::toggleTeletextTransparency( bool b_transparent )
+{
+    telexTransparent->setIcon( b_transparent ? QIcon( ":/tvtelx" )
+                                             : QIcon( ":/tvtelx-trans" ) );
+}
+
+void TeletextController::enableTeletextButtons( bool b_enabled )
+{
+    telexOn->setChecked( b_enabled );
+    telexTransparent->setEnabled( b_enabled );
+    telexPage->setEnabled( b_enabled );
+}
+
+void PlayButton::updateButton( bool b_playing )
+{
+    setIcon( b_playing ? QIcon( ":/pause_b" ) : QIcon( ":/play_b" ) );
+    setToolTip( b_playing ? qtr( "Pause the playback" )
+                          : qtr( I_PLAY_TOOLTIP ) );
+}
+
+void AtoB_Button::setIcons( bool timeA, bool timeB )
+{
+    if( !timeA && !timeB)
+    {
+        setIcon( QIcon( ":/atob_nob" ) );
+        setToolTip( qtr( "Loop from point A to point B continuously\n"
+                         "Click to set point A" ) );
+    }
+    else if( timeA && !timeB )
+    {
+        setIcon( QIcon( ":/atob_noa" ) );
+        setToolTip( qtr( "Click to set point B" ) );
+    }
+    else if( timeA && timeB )
+    {
+        setIcon( QIcon( ":/atob" ) );
+        setToolTip( qtr( "Stop the A to B loop" ) );
+    }
+}
+
+
+//* Actions */
+void AbstractController::doAction( int id_action )
+{
+    switch( id_action )
+    {
+        case PLAY_ACTION:
+            play(); break;
+        case PREVIOUS_ACTION:
+            prev(); break;
+        case NEXT_ACTION:
+            next(); break;
+        case STOP_ACTION:
+            stop(); break;
+        case SLOWER_ACTION:
+            slower(); break;
+        case FASTER_ACTION:
+            faster(); break;
+        case FULLSCREEN_ACTION:
+            fullscreen(); break;
+        case EXTENDED_ACTION:
+            extSettings(); break;
+        case PLAYLIST_ACTION:
+            playlist(); break;
+        case SNAPSHOT_ACTION:
+            snapshot(); break;
+        case RECORD_ACTION:
+            record(); break;
+        case ATOB_ACTION:
+            THEMIM->getIM()->setAtoB(); break;
+        default:
+            msg_Dbg( p_intf, "Action: %i", id_action );
+            break;
+    }
+}
+
+void AbstractController::stop()
+{
+    THEMIM->stop();
+}
+
+void AbstractController::play()
+{
+    if( THEPL->current.i_size == 0 )
+    {
+        /* The playlist is empty, open a file requester */
+        THEDP->openFileDialog();
+        return;
+    }
+    THEMIM->togglePlayPause();
+}
+
+void AbstractController::prev()
+{
+    THEMIM->prev();
+}
+
+void AbstractController::next()
+{
+    THEMIM->next();
+}
+
+/**
+  * TODO
+ * This functions toggle the fullscreen mode
+ * If there is no video, it should first activate Visualisations...
+ *  This has also to be fixed in enableVideo()
+ */
+void AbstractController::fullscreen()
 {
     vout_thread_t *p_vout =
-        (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+      (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    if( p_vout)
+    {
+        var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
+        vlc_object_release( p_vout );
+    }
+}
+
+void AbstractController::snapshot()
+{
+    vout_thread_t *p_vout =
+      (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout )
     {
         vout_Control( p_vout, VOUT_SNAPSHOT );
@@ -164,59 +612,28 @@ void AdvControlsWidget::snapshot()
     }
 }
 
-/* Function called when the button is clicked() */
-void AdvControlsWidget::fromAtoB()
+
+void AbstractController::extSettings()
 {
-    if( !timeA )
-    {
-        timeA = var_GetTime( THEMIM->getInput(), "time"  );
-        emit timeChanged();
-        return;
-    }
-    if( !timeB )
-    {
-        timeB = var_GetTime( THEMIM->getInput(), "time"  );
-        var_SetTime( THEMIM->getInput(), "time" , timeA );
-        emit timeChanged();
-        return;
-    }
-    timeA = 0;
-    timeB = 0;
-    emit timeChanged();
+    THEDP->extendedDialog();
 }
 
-/* setting/synchro icons after click on main or fs controller */
-void AdvControlsWidget::setIcon()
+void AbstractController::slower()
 {
-    if( !timeA && !timeB)
-    {
-        ABButton->setIcon( QIcon( ":/atob_nob" ) );
-        ABButton->setToolTip( qtr( "Loop from point A to point B continuously\nClick to set point A" ) );
-    }
-    else if( timeA && !timeB )
-    {
-        ABButton->setIcon( QIcon( ":/atob_noa" ) );
-        ABButton->setToolTip( qtr( "Click to set point B" ) );
-    }
-    else if( timeA && timeB )
-    {
-        ABButton->setIcon( QIcon( ":/atob" ) );
-        ABButton->setToolTip( qtr( "Stop the A to B loop" ) );
-    }
+    THEMIM->getIM()->slower();
 }
 
-/* Function called regularly when in an AtoB loop */
-void AdvControlsWidget::AtoBLoop( float f_pos, int i_time, int i_length )
+void AbstractController::faster()
 {
-    if( timeB )
-    {
-        if( ( i_time >= (int)( timeB/1000000 ) )
-            || ( i_time < (int)( timeA/1000000 ) ) )
-            var_SetTime( THEMIM->getInput(), "time" , timeA );
-    }
+    THEMIM->getIM()->faster();
 }
 
-void AdvControlsWidget::record()
+void AbstractController::playlist()
+{
+    if( p_intf->p_sys->p_mi ) p_intf->p_sys->p_mi->togglePlaylist();
+}
+
+void AbstractController::record()
 {
     input_thread_t *p_input = THEMIM->getInput();
     if( p_input )
@@ -241,501 +658,68 @@ void AdvControlsWidget::record()
 }
 
 #if 0
-//FIXME Frame by frame function
-void AdvControlsWidget::frame(){}
+//TODO Frame by frame function
+void AbstractController::frame(){}
 #endif
+
 
 /*****************************
  * DA Control Widget !
  *****************************/
 ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
-                                MainInterface *_p_mi,
-                                bool b_advControls,
-                                bool b_shiny,
-                                bool b_fsCreation) :
-                                QFrame( _p_mi ), p_intf( _p_i )
+                                bool b_advControls ) :
+                                AbstractController( _p_i )
 {
     setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
-
-    /** The main Slider **/
-    slider = new InputSlider( Qt::Horizontal, NULL );
-    /* Update the position when the IM has changed */
-    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             slider, setPosition( float, int, int ) );
-    /* And update the IM, when the position has changed */
-    CONNECT( slider, sliderDragged( float ),
-             THEMIM->getIM(), sliderUpdate( float ) );
-
-    /** Slower and faster Buttons **/
-    slowerButton = new QToolButton;
-    slowerButton->setAutoRaise( true );
-    slowerButton->setMaximumSize( QSize( 26, 20 ) );
-    slowerButton->setFocusPolicy( Qt::NoFocus );
-
-    BUTTON_SET_ACT_I( slowerButton, "", slower, qtr( "Slower" ), slower() );
-
-    fasterButton = new QToolButton;
-    fasterButton->setAutoRaise( true );
-    fasterButton->setMaximumSize( QSize( 26, 20 ) );
-    fasterButton->setFocusPolicy( Qt::NoFocus );
-
-    BUTTON_SET_ACT_I( fasterButton, "", faster, qtr( "Faster" ), faster() );
 
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 
-    advControls = new AdvControlsWidget( p_intf, b_fsCreation );
+    advControls = new AdvControlsWidget( p_intf );
     if( !b_advancedVisible ) advControls->hide();
 
-    /** Disc and Menus handling */
-    discFrame = new QWidget( this );
+    controlLayout->setSpacing( 0 );
+    controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
 
-    QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
-    discLayout->setSpacing( 0 );
-    discLayout->setMargin( 0 );
+    controlLayout->addWidget( createWidget( INPUT_SLIDER ), 0, 1, 1, 18 );
+    controlLayout->addWidget( createWidget( SLOWER_BUTTON, true ), 0, 0 );
+    controlLayout->addWidget( createWidget( FASTER_BUTTON, true ), 0, 19 );
 
-    prevSectionButton = new QPushButton( discFrame );
-    setupSmallButton( prevSectionButton );
-    discLayout->addWidget( prevSectionButton );
+    controlLayout->addWidget( createWidget( MENU_BUTTONS ), 1, 8, 2, 3 );
+    controlLayout->addWidget( createWidget( TELETEXT_BUTTONS ), 1, 8, 2, 5, Qt::AlignBottom );
 
-    menuButton = new QPushButton( discFrame );
-    setupSmallButton( menuButton );
-    discLayout->addWidget( menuButton );
+    controlLayout->addWidget( createWidget( PLAY_BUTTON, false, true ), 2, 0, 2, 2, Qt::AlignBottom );
+    controlLayout->setColumnMinimumWidth( 2, 10 );
+    controlLayout->setColumnStretch( 2, 0 );
 
-    nextSectionButton = new QPushButton( discFrame );
-    setupSmallButton( nextSectionButton );
-    discLayout->addWidget( nextSectionButton );
+    controlLayout->addWidget( createWidget( PREVIOUS_BUTTON ), 3, 3, Qt::AlignBottom );
+    controlLayout->addWidget( createWidget( STOP_BUTTON ), 3, 4, Qt::AlignBottom  );
+    controlLayout->addWidget( createWidget( NEXT_BUTTON ), 3, 5, Qt::AlignBottom  );
 
-    BUTTON_SET_IMG( prevSectionButton, "", dvd_prev, "" );
-    BUTTON_SET_IMG( nextSectionButton, "", dvd_next, "" );
-    BUTTON_SET_IMG( menuButton, "", dvd_menu, qtr( "Menu" ) );
+    /* Column 6 is unused */
+    controlLayout->setColumnStretch( 6, 0 );
+    controlLayout->setColumnStretch( 7, 0 );
+    controlLayout->setColumnMinimumWidth( 7, 10 );
 
-    discFrame->hide();
+    controlLayout->addWidget( createWidget( FULLSCREEN_BUTTON ), 3, 8, Qt::AlignBottom );
+    controlLayout->addWidget( createWidget( PLAYLIST_BUTTON ), 3, 9, Qt::AlignBottom );
+    controlLayout->addWidget( createWidget( EXTENDED_BUTTON ), 3, 10, Qt::AlignBottom );
+    controlLayout->setColumnStretch( 11, 0 ); /* telex alignment */
 
-    /* Change the navigation button display when the IM navigation changes */
-    CONNECT( THEMIM->getIM(), navigationChanged( int ),
-             this, setNavigation( int ) );
-    /* Changes the IM navigation when triggered on the nav buttons */
-    CONNECT( prevSectionButton, clicked(), THEMIM->getIM(),
-             sectionPrev() );
-    CONNECT( nextSectionButton, clicked(), THEMIM->getIM(),
-             sectionNext() );
-    CONNECT( menuButton, clicked(), THEMIM->getIM(),
-             sectionMenu() );
+    controlLayout->setColumnStretch( 12, 0 );
+    controlLayout->setColumnMinimumWidth( 12, 10 );
 
-    /**
-     * Telextext QFrame
-     * TODO: Merge with upper menu in a StackLayout
-     **/
-    telexFrame = new QWidget( this );
-    QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
-    telexLayout->setSpacing( 0 );
-    telexLayout->setMargin( 0 );
+    controlLayout->addWidget( advControls, 3, 13, 1, 3, Qt::AlignBottom );
 
-    telexOn = new QPushButton;
-    setupSmallButton( telexOn );
-    telexLayout->addWidget( telexOn );
+    controlLayout->setColumnStretch( 16, 10 );
+    controlLayout->setColumnMinimumWidth( 16, 10 );
 
-    telexTransparent = new QPushButton;
-    setupSmallButton( telexTransparent );
-    telexLayout->addWidget( telexTransparent );
-    b_telexTransparent = false;
-
-    telexPage = new QSpinBox;
-    telexPage->setRange( 0, 999 );
-    telexPage->setValue( 100 );
-    telexPage->setAccelerated( true );
-    telexPage->setWrapping( true );
-    telexPage->setAlignment( Qt::AlignRight );
-    telexPage->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum );
-    telexLayout->addWidget( telexPage );
-
-    telexFrame->hide(); /* default hidden */
-
-    CONNECT( telexPage, valueChanged( int ), THEMIM->getIM(),
-             telexGotoPage( int ) );
-    CONNECT( THEMIM->getIM(), setNewTelexPage( int ),
-              telexPage, setValue( int ) );
-
-    BUTTON_SET_IMG( telexOn, "", tv, qtr( "Teletext on" ) );
-
-    CONNECT( telexOn, clicked(), THEMIM->getIM(),
-             telexToggleButtons() );
-    CONNECT( telexOn, clicked( bool ), THEMIM->getIM(),
-             telexToggle( bool ) );
-    CONNECT( THEMIM->getIM(), toggleTelexButtons(),
-              this, toggleTeletext() );
-    b_telexEnabled = false;
-    telexTransparent->setEnabled( false );
-    telexPage->setEnabled( false );
-
-    BUTTON_SET_IMG( telexTransparent, "", tvtelx, qtr( "Teletext" ) );
-    CONNECT( telexTransparent, clicked( bool ),
-             THEMIM->getIM(), telexSetTransparency() );
-    CONNECT( THEMIM->getIM(), toggleTelexTransparency(),
-              this, toggleTeletextTransparency() );
-    CONNECT( THEMIM->getIM(), teletextEnabled( bool ),
-             this, enableTeletext( bool ) );
-
-    /** Play Buttons **/
-    QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
-    sizePolicy.setHorizontalStretch( 0 );
-    sizePolicy.setVerticalStretch( 0 );
-
-    /* Play */
-    playButton = new QPushButton;
-    playButton->setSizePolicy( sizePolicy );
-    playButton->setMaximumSize( QSize( 32, 32 ) );
-    playButton->setMinimumSize( QSize( 32, 32 ) );
-    playButton->setIconSize( QSize( 26, 26 ) );
-    playButton->setFocusPolicy( Qt::NoFocus );
-
-    /** Prev + Stop + Next Block **/
-    controlButLayout = new QHBoxLayout;
-    controlButLayout->setSpacing( 0 ); /* Don't remove that, will be useful */
-
-    /* Prev */
-    QPushButton *prevButton = new QPushButton;
-    prevButton->setSizePolicy( sizePolicy );
-    setupSmallButton( prevButton );
-
-    controlButLayout->addWidget( prevButton );
-
-    /* Stop */
-    QPushButton *stopButton = new QPushButton;
-    stopButton->setSizePolicy( sizePolicy );
-    setupSmallButton( stopButton );
-
-    controlButLayout->addWidget( stopButton );
-
-    /* next */
-    QPushButton *nextButton = new QPushButton;
-    nextButton->setSizePolicy( sizePolicy );
-    setupSmallButton( nextButton );
-
-    controlButLayout->addWidget( nextButton );
-
-    /* Add this block to the main layout */
-
-    BUTTON_SET_ACT_I( playButton, "", play_b, qtr( I_PLAY_TOOLTIP ), play() );
-    BUTTON_SET_ACT_I( prevButton, "" , previous_b,
-                      qtr( "Previous media in the playlist" ), prev() );
-    BUTTON_SET_ACT_I( nextButton, "", next_b,
-                      qtr( "Next media in the playlist" ), next() );
-    BUTTON_SET_ACT_I( stopButton, "", stop_b, qtr( "Stop playback" ), stop() );
-
-    /*
-     * Other first Line buttons
-     */
-    /* */
-    CONNECT( THEMIM->getIM(), voutChanged(bool), this, enableVideo(bool) );
-
-    /** Fullscreen/Visualisation **/
-    fullscreenButton = new QPushButton;
-    BUTTON_SET_ACT_I( fullscreenButton, "", fullscreen,
-            qtr( "Toggle the video in fullscreen" ), fullscreen() );
-    setupSmallButton( fullscreenButton );
-
-    if( !b_fsCreation )
-    {
-        /** Playlist Button **/
-        playlistButton = new QPushButton;
-        setupSmallButton( playlistButton );
-        BUTTON_SET_IMG( playlistButton, "" , playlist, qtr( "Show playlist" ) );
-        CONNECT( playlistButton, clicked(), _p_mi, togglePlaylist() );
-
-        /** extended Settings **/
-        extSettingsButton = new QPushButton;
-        BUTTON_SET_ACT_I( extSettingsButton, "", extended,
-                qtr( "Show extended settings" ), extSettings() );
-        setupSmallButton( extSettingsButton );
-    }
-
-    /* Volume */
-    hVolLabel = new VolumeClickHandler( p_intf, this );
-
-    volMuteLabel = new QLabel;
-    volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
-    volMuteLabel->installEventFilter( hVolLabel );
-
-    if( b_shiny )
-    {
-        volumeSlider = new SoundSlider( this,
-            config_GetInt( p_intf, "volume-step" ),
-            config_GetInt( p_intf, "qt-volume-complete" ),
-            config_GetPsz( p_intf, "qt-slider-colours" ) );
-    }
-    else
-    {
-        volumeSlider = new QSlider( this );
-        volumeSlider->setOrientation( Qt::Horizontal );
-    }
-    volumeSlider->setMaximumSize( QSize( 200, 40 ) );
-    volumeSlider->setMinimumSize( QSize( 85, 30 ) );
-    volumeSlider->setFocusPolicy( Qt::NoFocus );
-
-    /* Set the volume from the config */
-    volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
-                              VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
-
-    /* Force the update at build time in order to have a muted icon if needed */
-    updateVolume( volumeSlider->value() );
-
-    /* Volume control connection */
-    CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
-    CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
-
-    if( !b_fsCreation )
-    {
-        controlLayout = new QGridLayout( this );
-
-        controlLayout->setSpacing( 0 );
-        controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
-
-        controlLayout->addWidget( slider, 0, 1, 1, 18 );
-        controlLayout->addWidget( slowerButton, 0, 0 );
-        controlLayout->addWidget( fasterButton, 0, 19 );
-
-        controlLayout->addWidget( discFrame, 1, 8, 2, 3, Qt::AlignBottom );
-        controlLayout->addWidget( telexFrame, 1, 8, 2, 5, Qt::AlignBottom );
-
-        controlLayout->addWidget( playButton, 2, 0, 2, 2, Qt::AlignBottom );
-        controlLayout->setColumnMinimumWidth( 2, 10 );
-        controlLayout->setColumnStretch( 2, 0 );
-
-        controlLayout->addLayout( controlButLayout, 3, 3, 1, 3, Qt::AlignBottom );
-        /* Column 6 is unused */
-        controlLayout->setColumnStretch( 6, 0 );
-        controlLayout->setColumnStretch( 7, 0 );
-        controlLayout->setColumnMinimumWidth( 7, 10 );
-
-        controlLayout->addWidget( fullscreenButton, 3, 8, Qt::AlignBottom );
-        controlLayout->addWidget( playlistButton, 3, 9, Qt::AlignBottom );
-        controlLayout->addWidget( extSettingsButton, 3, 10, Qt::AlignBottom );
-        controlLayout->setColumnStretch( 11, 0 ); /* telex alignment */
-
-        controlLayout->setColumnStretch( 12, 0 );
-        controlLayout->setColumnMinimumWidth( 12, 10 );
-
-        controlLayout->addWidget( advControls, 3, 13, 1, 3, Qt::AlignBottom );
-
-        controlLayout->setColumnStretch( 16, 10 );
-        controlLayout->setColumnMinimumWidth( 16, 10 );
-
-        controlLayout->addWidget( volMuteLabel, 3, 17, Qt::AlignBottom );
-        controlLayout->addWidget( volumeSlider, 3, 18, 1 , 2, Qt::AlignBottom );
-    }
-
-    updateInput();
+    controlLayout->addWidget( createWidget( VOLUME, false, false, true ),
+            3, 17, 1, 3, Qt::AlignBottom );
 }
 
 ControlsWidget::~ControlsWidget()
 {}
-
-void ControlsWidget::toggleTeletext()
-{
-    bool b_enabled = THEMIM->teletextState();
-    if( b_telexEnabled )
-    {
-        telexTransparent->setEnabled( false );
-        telexPage->setEnabled( false );
-        b_telexEnabled = false;
-    }
-    else if( b_enabled )
-    {
-        telexTransparent->setEnabled( true );
-        telexPage->setEnabled( true );
-        b_telexEnabled = true;
-    }
-}
-
-void ControlsWidget::enableTeletext( bool b_enable )
-{
-    telexFrame->setVisible( b_enable );
-    bool b_on = THEMIM->teletextState();
-
-    telexOn->setChecked( b_on );
-    telexTransparent->setEnabled( b_on );
-    telexPage->setEnabled( b_on );
-    b_telexEnabled = b_on;
-}
-
-void ControlsWidget::toggleTeletextTransparency()
-{
-    if( b_telexTransparent )
-    {
-        telexTransparent->setIcon( QIcon( ":/tvtelx" ) );
-        telexTransparent->setToolTip( qtr( "Teletext" ) );
-        b_telexTransparent = false;
-    }
-    else
-    {
-        telexTransparent->setIcon( QIcon( ":/tvtelx-trans" ) );
-        telexTransparent->setToolTip( qtr( "Transparent" ) );
-        b_telexTransparent = true;
-    }
-}
-
-void ControlsWidget::stop()
-{
-    THEMIM->stop();
-}
-
-void ControlsWidget::play()
-{
-    if( THEPL->current.i_size == 0 )
-    {
-        /* The playlist is empty, open a file requester */
-        THEDP->openFileDialog();
-        setStatus( 0 );
-        return;
-    }
-    THEMIM->togglePlayPause();
-}
-
-void ControlsWidget::prev()
-{
-    THEMIM->prev();
-}
-
-void ControlsWidget::next()
-{
-    THEMIM->next();
-}
-
-void ControlsWidget::setNavigation( int navigation )
-{
-#define HELP_PCH N_( "Previous chapter" )
-#define HELP_NCH N_( "Next chapter" )
-
-    // 1 = chapter, 2 = title, 0 = no
-    if( navigation == 0 )
-    {
-        discFrame->hide();
-    } else if( navigation == 1 ) {
-        prevSectionButton->setToolTip( qtr( HELP_PCH ) );
-        nextSectionButton->setToolTip( qtr( HELP_NCH ) );
-        menuButton->show();
-        discFrame->show();
-    } else {
-        prevSectionButton->setToolTip( qtr( HELP_PCH ) );
-        nextSectionButton->setToolTip( qtr( HELP_NCH ) );
-        menuButton->hide();
-        discFrame->show();
-    }
-}
-
-static bool b_my_volume;
-void ControlsWidget::updateVolume( int i_sliderVolume )
-{
-    if( !b_my_volume )
-    {
-        int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
-        aout_VolumeSet( p_intf, i_res );
-    }
-    if( i_sliderVolume == 0 )
-    {
-        volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
-        volMuteLabel->setToolTip( qtr( "Unmute" ) );
-        return;
-    }
-
-    if( i_sliderVolume < VOLUME_MAX / 3 )
-        volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
-    else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
-        volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
-    else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
-    volMuteLabel->setToolTip( qtr( "Mute" ) );
-}
-
-void ControlsWidget::updateVolume()
-{
-    /* Audio part */
-    audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
-    i_volume = ( i_volume *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
-    int i_gauge = volumeSlider->value();
-    b_my_volume = false;
-    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
-    {
-        b_my_volume = true;
-        volumeSlider->setValue( i_volume );
-        b_my_volume = false;
-    }
-}
-
-void ControlsWidget::updateInput()
-{
-    /* Activate the interface buttons according to the presence of the input */
-    enableInput( THEMIM->getIM()->hasInput() );
-    enableVideo( THEMIM->getIM()->hasVideo() );
-}
-
-void ControlsWidget::setStatus( int status )
-{
-    if( status == PLAYING_S ) /* Playing */
-    {
-        playButton->setIcon( QIcon( ":/pause_b" ) );
-        playButton->setToolTip( qtr( "Pause the playback" ) );
-    }
-    else
-    {
-        playButton->setIcon( QIcon( ":/play_b" ) );
-        playButton->setToolTip( qtr( I_PLAY_TOOLTIP ) );
-    }
-}
-
-/**
- * TODO
- * This functions toggle the fullscreen mode
- * If there is no video, it should first activate Visualisations...
- *  This has also to be fixed in enableVideo()
- */
-void ControlsWidget::fullscreen()
-{
-    vout_thread_t *p_vout =
-        (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout)
-    {
-        var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
-        vlc_object_release( p_vout );
-    }
-}
-
-void ControlsWidget::extSettings()
-{
-    THEDP->extendedDialog();
-}
-
-void ControlsWidget::slower()
-{
-    THEMIM->getIM()->slower();
-}
-
-void ControlsWidget::faster()
-{
-    THEMIM->getIM()->faster();
-}
-
-void ControlsWidget::enableInput( bool enable )
-{
-    slowerButton->setEnabled( enable );
-    slider->setEnabled( enable );
-    slider->setSliderPosition ( 0 );
-    fasterButton->setEnabled( enable );
-
-    /* Advanced Buttons too */
-    advControls->enableInput( enable );
-}
-
-void ControlsWidget::enableVideo( bool enable )
-{
-    // TODO Later make the fullscreenButton toggle Visualisation and so on.
-    fullscreenButton->setEnabled( enable );
-
-    /* Advanced Buttons too */
-    advControls->enableVideo( enable );
-}
 
 void ControlsWidget::toggleAdvanced()
 {
@@ -752,18 +736,39 @@ void ControlsWidget::toggleAdvanced()
     emit advancedControlsToggled( b_advancedVisible );
 }
 
+AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
+                                     AbstractController( _p_i )
+{
+    controlLayout->setMargin( 0 );
+    controlLayout->setSpacing( 0 );
+
+    controlLayout->addWidget( createWidget( RECORD_BUTTON ), 0, 0 );
+    controlLayout->addWidget( createWidget( SNAPSHOT_BUTTON ), 0, 1 );
+    controlLayout->addWidget( createWidget( ATOB_BUTTON ), 0, 2 );
+}
+
+AdvControlsWidget::~AdvControlsWidget()
+{}
+
+
 /**********************************************************************
  * Fullscrenn control widget
  **********************************************************************/
-FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
-        MainInterface *_p_mi, bool b_advControls, bool b_shiny )
-        : ControlsWidget( _p_i, _p_mi, b_advControls, b_shiny, true ),
-          i_mouse_last_x( -1 ), i_mouse_last_y( -1 ), b_mouse_over(false),
-          b_slow_hide_begin(false), i_slow_hide_timeout(1),
-          b_fullscreen( false ), i_hide_timeout( 1 ), p_vout(NULL)
+FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
+                           : AbstractController( _p_i )
 {
+    i_mouse_last_x      = -1;
+    i_mouse_last_y      = -1;
+    b_mouse_over        = false;
     i_mouse_last_move_x = -1;
     i_mouse_last_move_y = -1;
+#if HAVE_TRANSPARENCY
+    b_slow_hide_begin   = false;
+    i_slow_hide_timeout = 1;
+#endif
+    b_fullscreen        = false;
+    i_hide_timeout      = 1;
+    p_vout              = NULL;
 
     setWindowFlags( Qt::ToolTip );
     setMinimumWidth( 600 );
@@ -772,31 +777,33 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     setFrameStyle( QFrame::Sunken );
     setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
-    QGridLayout *fsLayout = new QGridLayout( this );
-    fsLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
+    controlLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
 
     /* First line */
-    slider->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Minimum);
-    fsLayout->addWidget( slowerButton, 0, 0 );
-    fsLayout->addWidget( slider, 0, 1, 1, 11 );
-    fsLayout->addWidget( fasterButton, 0, 12 );
+    controlLayout->addWidget( createWidget( SLOWER_BUTTON ), 0, 0 );
+    controlLayout->addWidget( createWidget( INPUT_SLIDER ), 0, 1, 1, 13 );
+    controlLayout->addWidget( createWidget( FASTER_BUTTON ), 0, 14 );
 
     /* Second line */
-    fsLayout->addWidget( playButton, 1, 0, 1, 2 );
-    fsLayout->addLayout( controlButLayout, 1, 2 );
+    controlLayout->addWidget( createWidget( PLAY_BUTTON, false, true ), 1, 0, 1, 2 );
+    controlLayout->addWidget( createWidget( PREVIOUS_BUTTON ), 1, 2 );
+    controlLayout->addWidget( createWidget( STOP_BUTTON ), 1, 3 );
+    controlLayout->addWidget( createWidget( NEXT_BUTTON ), 1, 4 );
 
-    fsLayout->addWidget( discFrame, 1, 3 );
-    fsLayout->addWidget( telexFrame, 1, 4 );
-    fsLayout->addWidget( fullscreenButton, 1, 5 );
-    fsLayout->addWidget( advControls, 1, 6, Qt::AlignVCenter );
+    controlLayout->addWidget( createWidget( MENU_BUTTONS ), 1, 5 );
+    controlLayout->addWidget( createWidget( TELETEXT_BUTTONS ), 1, 6 );
+    QToolButton *fullscreenButton =
+         qobject_cast<QToolButton *>(createWidget( FULLSCREEN_BUTTON ) );
+    fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
+    controlLayout->addWidget( fullscreenButton, 1, 7 );
 
-    fsLayout->setColumnStretch( 7, 10 );
+    controlLayout->setColumnStretch( 9, 10 );
 
     TimeLabel *timeLabel = new TimeLabel( p_intf );
 
-    fsLayout->addWidget( timeLabel, 1, 8 );
-    fsLayout->addWidget( volMuteLabel, 1, 9 );
-    fsLayout->addWidget( volumeSlider, 1, 10, 1, 2 );
+    controlLayout->addWidget( timeLabel, 1, 10 );
+    controlLayout->addWidget( createWidget( VOLUME, false, false, true ),
+            1, 11, 1, 3 );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
@@ -813,7 +820,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
 
     /* center down */
     QWidget * p_desktop = QApplication::desktop()->screen(
-                QApplication::desktop()->screenNumber( _p_mi ) );
+                QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi ) );
 
     QPoint pos = QPoint( p_desktop->width() / 2 - width() / 2,
           p_desktop->height() - height() );
@@ -828,8 +835,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i,
     adjustSize();
     show();
 #endif
-
-    fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
 
     vlc_mutex_init_recursive( &lock );
 }
@@ -970,9 +975,9 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             vlc_mutex_unlock( &lock );
 
 #ifdef WIN32TRICK
-            if( b_fs && b_fscHidden )  // FIXME I am not sure about that one
+            if( b_fs && b_fscHidden )
 #else
-            if( b_fs && !isVisible() )  // FIXME I am not sure about that one
+            if( b_fs && !isVisible() )
 #endif
                 showFSC();
             break;

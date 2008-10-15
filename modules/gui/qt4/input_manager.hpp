@@ -70,7 +70,8 @@ public:
     virtual ~InputManager();
 
     void delInput();
-    bool hasInput() { return p_input && !p_input->b_dead && vlc_object_alive (p_input); }
+    bool hasInput() { return p_input && !p_input->b_dead
+                            && vlc_object_alive (p_input); }
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
 
@@ -84,8 +85,8 @@ private:
     QString         old_name;
     QString         artUrl;
     int             i_rate;
-    bool            b_transparentTelextext;
     bool            b_video;
+    mtime_t         timeA, timeB;
 
     void customEvent( QEvent * );
     void addCallbacks();
@@ -99,23 +100,31 @@ private:
     void UpdateTeletext();
     void UpdateArt();
     void UpdateVout();
-    void UpdateStats();
+    void UpdateStats(); // FIXME, remove from this file.
+
+    void AtoBLoop( int );
 
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
     void togglePlayPause();
+    /* SpeedRate Rate Management */
     void slower();
     void faster();
     void normalRate();
     void setRate( int );
+    /* Menus */
     void sectionNext();
     void sectionPrev();
     void sectionMenu();
-    void telexGotoPage( int ); ///< Goto teletext page
-    void telexToggle( bool );  ///< Enable disable teletext buttons
-    void telexToggleButtons(); ///< Toggle buttons after click
-    void telexSetTransparency(); ///< Set transparency on teletext background
+    /* Teletext */
+    void telexSetPage( int );          ///< Goto teletext page
+    void telexSetTransparency( bool ); ///< Transparency on teletext background
+    void telexActivation( bool );      ///< Enable disable teletext buttons
+    void activateTeletext( bool );     ///< Toggle buttons after click
+    /* A to B Loop */
+    void setAtoB();
+
 
 signals:
     /// Send new position, new time and new length
@@ -123,19 +132,20 @@ signals:
     void rateChanged( int );
     void nameChanged( QString );
     /// Used to signal whether we should show navigation buttons
-    void navigationChanged( int );
+    void titleChanged( bool );
+    void chapterChanged( bool );
     /// Statistics are updated
     void statisticsUpdated( input_item_t* );
     /// Play/pause status
     void statusChanged( int );
     void artChanged( input_item_t* );
     /// Teletext
-    void teletextEnabled( bool );
-    void toggleTelexButtons();
-    void toggleTelexTransparency();
-    void setNewTelexPage( int );
+    void teletextPossible( bool );
+    void teletextActivated( bool );
+    void teletextTransparencyActivated( bool );
+    void newTelexPageSet( int );
     /// Advanced buttons
-    void advControlsSetIcon();
+    void AtoBchanged( bool, bool );
     /// Vout
     void voutChanged( bool );
 };

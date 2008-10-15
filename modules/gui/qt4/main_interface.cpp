@@ -374,10 +374,8 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->setMargin( 0 );
 
     /* Create the CONTROLS Widget */
-    bool b_shiny = config_GetInt( p_intf, "qt-blingbling" );
-    controls = new ControlsWidget( p_intf, this,
-                   settings->value( "adv-controls", false ).toBool(),
-                   b_shiny );
+    controls = new ControlsWidget( p_intf,
+                   settings->value( "adv-controls", false ).toBool() );
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
 
@@ -431,11 +429,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     /* Create the FULLSCREEN CONTROLS Widget */
     if( config_GetInt( p_intf, "qt-fs-controller" ) )
     {
-        fullscreenControls = new FullscreenControllerWidget( p_intf, this,
-                settings->value( "adv-controls", false ).toBool(),
-                b_shiny );
-        CONNECT( fullscreenControls, advancedControlsToggled( bool ),
-                this, doComponentsUpdate() );
+        fullscreenControls = new FullscreenControllerWidget( p_intf );
     }
 }
 
@@ -817,7 +811,7 @@ void MainInterface::doComponentsUpdate()
 void MainInterface::toggleAdvanced()
 {
     controls->toggleAdvanced();
-    if( fullscreenControls ) fullscreenControls->toggleAdvanced();
+//    if( fullscreenControls ) fullscreenControls->toggleAdvanced();
 }
 
 /* Get the visibility status of the controls (hidden or not, advanced or not) */
@@ -864,16 +858,6 @@ void MainInterface::setName( QString name )
 void MainInterface::setStatus( int status )
 {
     msg_Dbg( p_intf, "Updating the stream status: %i", status );
-
-    /* Forward the status to the controls to toggle Play/Pause */
-    controls->setStatus( status );
-    controls->updateInput();
-
-    if( fullscreenControls )
-    {
-        fullscreenControls->setStatus( status );
-        fullscreenControls->updateInput();
-    }
 
     speedControl->setEnable( THEMIM->getIM()->hasInput() );
 
