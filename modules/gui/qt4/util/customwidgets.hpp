@@ -82,6 +82,7 @@ public:
             emit rightClicked( indexAt( QPoint( e->x(), e->y() ) ),
                                QCursor::pos() );
         }
+        QTreeView::mouseReleaseEvent( e );
     }
 signals:
     void rightClicked( QModelIndex, QPoint  );
