@@ -781,9 +781,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     controlLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
 
     /* First line */
-    controlLayout->addWidget( createWidget( SLOWER_BUTTON ), 0, 0 );
+    controlLayout->addWidget( createWidget( SLOWER_BUTTON, true ), 0, 0 );
     controlLayout->addWidget( createWidget( INPUT_SLIDER ), 0, 1, 1, 13 );
-    controlLayout->addWidget( createWidget( FASTER_BUTTON ), 0, 14 );
+    controlLayout->addWidget( createWidget( FASTER_BUTTON, true ), 0, 14 );
 
     /* Second line */
     controlLayout->addWidget( createWidget( PLAY_BUTTON, false, true ), 1, 0, 1, 2 );
