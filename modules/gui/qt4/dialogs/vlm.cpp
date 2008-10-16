@@ -530,12 +530,12 @@ VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
     b_looped = _looped;
 
     playButton = new QToolButton;
-    playButton->setIcon( QIcon( QPixmap( ":/play_16px" ) ) );
+    playButton->setIcon( QIcon( QPixmap( ":/play" ) ) );
     objLayout->addWidget( playButton, 1, 0 );
     b_playing = true;
 
     QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( QPixmap( ":/stop_16px" ) ) );
+    stopButton->setIcon( QIcon( QPixmap( ":/stop_b" ) ) );
     objLayout->addWidget( stopButton, 1, 1 );
 
     loopButton = new QToolButton;
