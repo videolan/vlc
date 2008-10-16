@@ -529,16 +529,6 @@ AC_CHECK_FUNCS(send,,[
   ])
 ])
 
-AC_CHECK_FUNCS(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,[
-    VLC_ADD_LIBS([cdda cddax libvlc],[-lnsl])
-  ],[
-    AC_CHECK_LIB(bind,gethostbyname,[
-      VLC_ADD_LIBS([access_mms],[-lbind])
-    ])
-  ])
-])
-
 AC_CHECK_HEADERS(zlib.h, [
   VLC_ADD_LIBS([access_http],[-lz])
 ])
