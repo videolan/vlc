@@ -62,8 +62,8 @@ static int  UnlockPicture ( vout_thread_t *, picture_t * );
 
 #define T_LOCK N_( "Lock function" )
 #define LT_LOCK N_( "Address of the locking callback function. This " \
-                    "function must return a valid memory address for use " \
-                    "by the video renderer." )
+                    "function must fill in valid plane memory address " \
+                    "information for use by the video renderer." )
 
 #define T_UNLOCK N_( "Unlock function" )
 #define LT_UNLOCK N_( "Address of the unlocking callback function" )
@@ -97,7 +97,7 @@ struct vout_sys_t
 {
     int i_width, i_height, i_pitch;
 
-    void * (*pf_lock) (void *);
+    void (*pf_lock) (void *, void **);
     void (*pf_unlock) (void *);
     void *p_data;
 };
@@ -280,7 +280,15 @@ static void Destroy( vlc_object_t *p_this )
  *****************************************************************************/
 static int LockPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    p_pic->p->p_pixels = p_vout->p_sys->pf_lock( p_vout->p_sys->p_data );
+    int i_index;
+    void *planes[p_pic->i_planes];
+
+    p_vout->p_sys->pf_lock( p_vout->p_sys->p_data, planes );
+
+    for( i_index = 0; i_index < p_pic->i_planes; i_index++ )
+    {
+        p_pic->p[i_index].p_pixels = planes[i_index];
+    }
 
     return VLC_SUCCESS;
 }
