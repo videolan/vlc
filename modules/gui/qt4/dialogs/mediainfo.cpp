@@ -112,7 +112,8 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
         update( p_item, true, true );
 
     if( stats )
-        ON_TIMEOUT( updateOnTimeOut() );
+        CONNECT( THEMIM->getIM(), statisticsUpdated( input_item_t*),
+                this, updateStats( input_item_t*));
 
     readSettings( "Mediainfo", QSize( 600 , 480 ) );
 }
@@ -160,21 +161,9 @@ void MediaInfoDialog::update( input_thread_t *p_input )
     vlc_object_release( p_input );
 }
 
-void MediaInfoDialog::updateOnTimeOut()
+void MediaInfoDialog::updateStats( input_item_t *p_input)
 {
-    /* Timer runs at 150 ms, dont' update more than 2 times per second
-    i_runs++;
-    if( i_runs % 4 != 0 ) return;*/
-
-    /* Get Input and clear if non-existant */
-    input_thread_t *p_input = THEMIM->getInput();
-
-    if( p_input && !p_input->b_dead )
-    {
-        vlc_object_hold( p_input );
-        update( input_GetItem(p_input), false, false);
-        vlc_object_release( p_input );
-    }
+    update( p_input, false, false);
 }
 
 void MediaInfoDialog::update( input_item_t *p_item,

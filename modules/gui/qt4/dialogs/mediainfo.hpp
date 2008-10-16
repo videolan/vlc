@@ -86,7 +86,7 @@ public slots:
     void update( input_item_t *, bool, bool );
 
 private slots:
-    void updateOnTimeOut();
+    void updateStats( input_item_t *);
     void close();
     void clear();
     void saveMeta();
