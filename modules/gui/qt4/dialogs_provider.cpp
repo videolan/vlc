@@ -58,8 +58,6 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
                                   QObject( NULL ), p_intf( _p_intf )
 {
     b_isDying = false;
-    fixed_timer = new QTimer( this );
-    fixed_timer->start( 150 /* milliseconds */ );
 
     menusMapper = new QSignalMapper();
     CONNECT( menusMapper, mapped(QObject *), this, menuAction( QObject *) );
@@ -85,7 +83,6 @@ DialogsProvider::~DialogsProvider()
     UpdateDialog::killInstance();
 #endif
 
-    fixed_timer->stop();
     delete menusMapper;
     delete menusUpdateMapper;
     delete SDMapper;

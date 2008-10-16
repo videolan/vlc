@@ -546,6 +546,7 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     StatsTree->setColumnWidth( 1 , 200 );
 
     layout->addWidget(StatsTree, 1, 0 );
+
     CONNECT( THEMIM->getIM() , statisticsUpdated( input_item_t* ),
             this, update( input_item_t* ) );
 }

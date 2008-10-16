@@ -64,7 +64,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     msgLayout->addWidget( messages, 0, 0, 1, 0 );
     mainTab->addTab( msgWidget, qtr( "Messages" ) );
-    ON_TIMEOUT( updateLog() );
+    //    ON_TIMEOUT( updateLog() );
 
 
     /* Modules tree */

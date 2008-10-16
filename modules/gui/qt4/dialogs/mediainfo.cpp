@@ -111,10 +111,6 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     if( p_item )
         update( p_item, true, true );
 
-    if( stats )
-        CONNECT( THEMIM->getIM(), statisticsUpdated( input_item_t*),
-                this, updateStats( input_item_t*));
-
     readSettings( "Mediainfo", QSize( 600 , 480 ) );
 }
 
@@ -159,11 +155,6 @@ void MediaInfoDialog::update( input_thread_t *p_input )
     update( input_GetItem(p_input), true, true);
 
     vlc_object_release( p_input );
-}
-
-void MediaInfoDialog::updateStats( input_item_t *p_input)
-{
-    update( p_input, false, false);
 }
 
 void MediaInfoDialog::update( input_item_t *p_item,

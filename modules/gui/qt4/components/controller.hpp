@@ -53,6 +53,8 @@ class QAbstractButton;
 class VolumeClickHandler;
 class QSignalMapper;
 
+class QTimer;
+
 typedef enum buttonType_e
 {
     PLAY_BUTTON,

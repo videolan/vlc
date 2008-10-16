@@ -49,6 +49,7 @@
 #include <QResizeEvent>
 #include <QDate>
 #include <QSignalMapper>
+#include <QTimer>
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 

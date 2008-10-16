@@ -38,7 +38,6 @@
 #include "dialogs/open.hpp"
 
 #include <QObject>
-#include <QTimer>
 #include <QApplication>
 
 #define ADD_FILTER_MEDIA( string )     \
@@ -109,7 +108,6 @@ public:
         return ( instance != NULL );
     }
     virtual ~DialogsProvider();
-    QTimer *fixed_timer;
 
     QStringList showSimpleOpen( QString help = QString(),
                                 int filters = EXT_FILTER_MEDIA |

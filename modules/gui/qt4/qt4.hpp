@@ -94,7 +94,6 @@ struct intf_sys_t
 
 #define CONNECT( a, b, c, d ) connect( a, SIGNAL( b ), c, SLOT(d) )
 #define BUTTONACT( b, a ) connect( b, SIGNAL( clicked() ), this, SLOT(a) )
-#define ON_TIMEOUT( act ) CONNECT( THEDP->fixed_timer, timeout(), this, act )
 
 #define BUTTON_SET( button, text, tooltip )  \
     button->setText( text );                 \
