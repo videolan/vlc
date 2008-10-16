@@ -65,7 +65,7 @@ nodist_SOURCES_qt4 = \
 		ui/streampanel.h \
 		ui/sout.h
 
-res_DEPENDENCIES = \
+DEPS_res = \
 	pixmaps/prefs/advprefs_audio.png \
 	pixmaps/prefs/advprefs_codec.png \
 	pixmaps/prefs/advprefs_extended.png \
@@ -152,7 +152,7 @@ res_DEPENDENCIES = \
 
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 
-resources.cpp: vlc.qrc $(res_DEPENDENCIES)
+resources.cpp: vlc.qrc $(DEPS_res)
 	$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
@@ -259,6 +259,6 @@ EXTRA_DIST += \
 	ui/sprefs_video.ui \
 	ui/streampanel.ui \
 	ui/sout.ui \
-	ui/vlm.ui 
-EXTRA_DIST += $(res_DEPENDENCIES)
+	ui/vlm.ui \
+	$(DEPS_res)
 
