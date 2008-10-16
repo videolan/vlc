@@ -1161,6 +1161,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     vout_thread_t  *p_vout = p_owner->p_vout;
+    bool b_first_buffered;
 
     if( p_picture->date <= 0 )
     {
@@ -1188,8 +1189,9 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             vlc_cond_signal( &p_owner->wait );
         }
     }
+    b_first_buffered = p_owner->buffer.p_picture != NULL;
 
-    for( ;; )
+    for( ;; b_first_buffered = false )
     {
         bool b_has_more = false;
 
@@ -1248,7 +1250,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
 
         if( !b_reject )
         {
-            if( i_rate != p_owner->i_last_rate  )
+            if( i_rate != p_owner->i_last_rate || b_first_buffered )
             {
                 /* Be sure to not display old picture after our own */
                 vout_Flush( p_vout, p_picture->date );
