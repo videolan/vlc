@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>434</width>
-    <height>410</height>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -27,11 +27,12 @@
         <property name="text" >
          <string>_("Enable OSD")</string>
         </property>
-        <property name="checked" >
-         <bool>true</bool>
-        </property>
-        <property name="tristate" >
-         <bool>false</bool>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="OSDTitleBox" >
+        <property name="text" >
+         <string>_("Show media title on video")</string>
         </property>
        </widget>
       </item>

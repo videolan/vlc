@@ -515,6 +515,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         START_SPREFS_CAT( Subtitles, qtr("Subtitles & On Screen Display Settings") );
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
+            CONFIG_GENERIC( "video-title-show", Bool, NULL, OSDTitleBox);
+
 
             CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
             CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
