@@ -30,6 +30,8 @@
 #ifndef _VOUT_INTERNAL_H
 #define _VOUT_INTERNAL_H 1
 
+#include "vout_control.h"
+
 struct vout_thread_sys_t
 {
     /* */
@@ -78,44 +80,6 @@ struct vout_thread_sys_t
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
 picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
                                subpicture_t *, bool b_paused );
-
-/* DO NOT use vout_CountPictureAvailable unless your are in src/input/decoder.c (no exception) */
-int vout_CountPictureAvailable( vout_thread_t * );
-
-/**
- * This function will (un)pause the display of pictures.
- * It is thread safe
- */
-void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
-
-/**
- * This function will apply an offset on subtitle subpicture.
- */
-void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
-
-/**
- * This function will return and reset internal statistics.
- */
-void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost );
-
-/**
- * This function will ensure that all ready/displayed pciture have at most
- * the provided dat
- */
-void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
-
-/**
- * This function will try to detect if pictures are being leaked. If so it
- * will release them.
- *
- * XXX This function is there to workaround bugs in decoder
- */
-void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced );
-
-/**
- * This functions will drop a picture retreived by vout_CreatePicture.
- */
-void vout_DropPicture( vout_thread_t *p_vout, picture_t * );
 
 #endif
 

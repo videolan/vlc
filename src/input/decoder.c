@@ -47,7 +47,7 @@
 #include "clock.h"
 #include "decoder.h"
 
-#include "../video_output/vout_internal.h"
+#include "../video_output/vout_control.h"
 
 static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, int, sout_instance_t *p_sout );
 static void       DeleteDecoder( decoder_t * );

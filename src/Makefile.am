@@ -331,6 +331,7 @@ SOURCES_libvlc_common = \
 	video_output/vout_subpictures.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
+	video_output/vout_control.h \
 	audio_output/aout_internal.h \
 	audio_output/common.c \
 	audio_output/dec.c \
