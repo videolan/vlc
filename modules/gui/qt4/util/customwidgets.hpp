@@ -75,7 +75,7 @@ public:
     };
     virtual ~QVLCTreeView()   {};
 
-    void mouseReleaseEvent(QMouseEvent* e )
+    void mouseReleaseEvent( QMouseEvent* e )
     {
         if( e->button() & Qt::RightButton )
         {
@@ -83,6 +83,16 @@ public:
                                QCursor::pos() );
         }
         QTreeView::mouseReleaseEvent( e );
+    }
+
+    void mousePressEvent( QMouseEvent* e )
+    {
+        if( e->button() & Qt::LeftButton )
+        {
+            if( !indexAt( QPoint( e->x(), e->y() ) ).isValid() )
+                clearSelection();
+        }
+        QTreeView::mousePressEvent( e );
     }
 signals:
     void rightClicked( QModelIndex, QPoint  );
