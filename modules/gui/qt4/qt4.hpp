@@ -48,6 +48,7 @@ class DialogsProvider;
 class VideoWidget;
 class QSettings;
 
+
 #if defined(Q_WS_WIN)
 #include <QApplication>
 
@@ -158,6 +159,7 @@ static const int DialogEvent_Type = QEvent::User + DialogEventType + 1;
 //static const int PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
 //static const int PLDockEvent_Type = QEvent::User + DialogEventType + 3;
 static const int SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4;
+static const int MainInterfaceClose_Type  = QEvent::User + 404;
 
 class DialogEvent : public QEvent
 {

@@ -315,14 +315,19 @@ static void Run( intf_thread_t *p_intf )
     }
     else
     {
-        int canc = vlc_savecancel ();
         Init( VLC_OBJECT(p_intf) );
-        vlc_restorecancel( canc );
     }
 }
 
 static QMutex windowLock;
 static QWaitCondition windowWait;
+
+static void ThreadCleanup( void *param)
+{
+    intf_thread_t *p_intf = (intf_thread_t *)param;
+    QEvent *event = new QEvent((QEvent::Type)(MainInterfaceClose_Type) );
+    QApplication::postEvent( p_intf->p_sys->p_mi, event );
+}
 
 static void *Init( vlc_object_t *obj )
 {
@@ -333,6 +338,8 @@ static void *Init( vlc_object_t *obj )
     int argc = 1;
     int canc = vlc_savecancel ();
 
+    msg_Dbg( p_intf, "Setting ThreadCleanup");
+    vlc_cleanup_push( ThreadCleanup, (void*)p_intf );
     Q_INIT_RESOURCE( vlc );
 
 #if !defined(WIN32) && !defined(__APPLE__)
@@ -447,10 +454,12 @@ static void *Init( vlc_object_t *obj )
     p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? config_GetHomeDir()
                                                         : psz_path;
 
+    vlc_restorecancel (canc);
     /* Launch */
     app->exec();
 
     /* And quit */
+    canc = vlc_savecancel ();
     msg_Dbg( p_intf, "Quitting the Qt4 Interface" );
 
     if (miP)
@@ -490,6 +499,7 @@ static void *Init( vlc_object_t *obj )
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
     vlc_restorecancel (canc);
+    vlc_cleanup_pop();
     return NULL;
 }
 

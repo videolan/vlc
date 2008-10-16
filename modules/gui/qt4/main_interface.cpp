@@ -186,11 +186,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* END CONNECTS ON IM */
 
 
-    /** OnTimeOut **/
-    /* TODO Remove this function, but so far, there is no choice because there
-       is no intf-should-die variable #1365 */
-    ON_TIMEOUT( updateOnTimer() );
-
     /************
      * Callbacks
      ************/
@@ -876,16 +871,6 @@ void MainInterface::setRate( int rate )
     speedControl->updateControls( rate );
 }
 
-void MainInterface::updateOnTimer()
-{
-    /* No event for dying */
-    if( !vlc_object_alive( p_intf ) )
-    {
-        QApplication::closeAllWindows();
-        QApplication::quit();
-    }
-}
-
 /*****************************************************************************
  * Systray Icon and Systray Menu
  *****************************************************************************/
@@ -1102,6 +1087,11 @@ void MainInterface::customEvent( QEvent *event )
         else
             setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
         show(); /* necessary to apply window flags?? */
+    }
+    if ( event->type() == MainInterfaceClose_Type )
+    {
+        QApplication::closeAllWindows();
+        QApplication::quit();
     }
 }
 

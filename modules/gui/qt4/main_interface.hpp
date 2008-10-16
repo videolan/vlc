@@ -164,7 +164,6 @@ public slots:
 
 private slots:
     void debug();
-    void updateOnTimer();
     void doComponentsUpdate();
     void setStatus( int );
     void setRate( int );
