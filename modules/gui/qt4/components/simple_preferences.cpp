@@ -286,7 +286,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC( "spdif", Bool, NULL, spdifBox );
             CONFIG_GENERIC( "qt-autosave-volume", Bool, NULL, saveVolBox );
-            CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
+            CONFIG_GENERIC( "force-dolby-digital" , IntegerList , NULL,
                             detectionDolby );
 
             CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );

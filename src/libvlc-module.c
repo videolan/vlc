@@ -283,11 +283,11 @@ static const char *const ppsz_snap_formats[] =
     "S/PDIF can be used by default when " \
     "your hardware supports it as well as the audio stream being played.")
 
-#define FORCE_DOLBY_TEXT N_("Force detection of Dolby Surround")
+#define FORCE_DOLBY_TEXT N_("Force detection of Dolby Digital")
 #define FORCE_DOLBY_LONGTEXT N_( \
     "Use this when you know your stream is (or is not) encoded with Dolby "\
-    "Surround but fails to be detected as such. Even if the stream is "\
-    "not actually encoded with Dolby Surround, turning on this option might "\
+    "Digital but fails to be detected as such. Even if the stream is "\
+    "not actually encoded with Dolby Digital, turning on this option might "\
     "enhance your experience, especially when combined with the Headphone "\
     "Channel Mixer." )
 static const int pi_force_dolby_values[] = { 0, 1, 2 };
@@ -1462,7 +1462,7 @@ vlc_module_begin();
               AOUT_RESAMP_LONGTEXT, true );
 #endif
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, false );
-    add_integer( "force-dolby-surround", 0, NULL, FORCE_DOLBY_TEXT,
+    add_integer( "force-dolby-digital", 0, NULL, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false );
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, NULL );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
