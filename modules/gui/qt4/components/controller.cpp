@@ -850,29 +850,11 @@ void FullscreenControllerWidget::showFSC()
     {
         msg_Dbg( p_intf, "Calculation fullscreen controllers center");
         /* screen has changed, calculate new position */
-        i_screennumber = number;
-        int totalCount = QApplication::desktop()->numScreens();
         QRect screenRes = QApplication::desktop()->screenGeometry(number);
-        int offset_x = 0;
-        int offset_y = 0;
-        /* Loop all screens to get needed offset_x/y for
-         * physical screen center.
-         */
-        for(int i=0; i <= totalCount ; i++)
-        {
-             QRect displayRect = QApplication::desktop()->screenGeometry(i);
-             if (displayRect.width()+offset_x <= screenRes.x())
-             {
-                  offset_x += displayRect.width();
-             }
-             if ( displayRect.height()+offset_y <= screenRes.y())
-             {
-                  offset_y += displayRect.height();
-             }
-        }
-        QPoint pos = QPoint( offset_x + (screenRes.width() / 2) - (width() / 2),
-                             offset_y + screenRes.height() - height());
+        QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
+                             screenRes.y() + screenRes.height() - height());
         move( pos );
+        i_screennumber = number;
     }
 #ifdef WIN32TRICK
     // after quiting and going to fs, we need to call show()
