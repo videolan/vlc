@@ -35,22 +35,25 @@
 struct vout_thread_sys_t
 {
     /* */
-    vlc_mutex_t         vfilter_lock;         /**< video filter2 change lock */
+    picture_t       *p_picture_displayed;
 
     /* */
-    uint32_t            render_time;           /**< last picture render time */
-    unsigned int        i_par_num;           /**< monitor pixel aspect-ratio */
-    unsigned int        i_par_den;           /**< monitor pixel aspect-ratio */
+    vlc_mutex_t     vfilter_lock;         /**< video filter2 change lock */
 
     /* */
-    bool                b_direct;            /**< rendered are like direct ? */
-    filter_t           *p_chroma;
+    uint32_t        render_time;           /**< last picture render time */
+    unsigned int    i_par_num;           /**< monitor pixel aspect-ratio */
+    unsigned int    i_par_den;           /**< monitor pixel aspect-ratio */
+
+    /* */
+    bool            b_direct;            /**< rendered are like direct ? */
+    filter_t        *p_chroma;
 
     /**
      * These numbers are not supposed to be accurate, but are a
      * good indication of the thread status */
-    count_t       c_fps_samples;                         /**< picture counts */
-    mtime_t       p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
+    count_t         c_fps_samples;                         /**< picture counts */
+    mtime_t         p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
 
     /* Statistics */
     int             i_picture_lost;

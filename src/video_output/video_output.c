@@ -373,6 +373,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p_window = NULL;
     p_vout->p->i_par_num =
     p_vout->p->i_par_den = 1;
+    p_vout->p->p_picture_displayed = NULL;
 
     /* Initialize locks */
     vlc_mutex_init_recursive( &p_vout->picture_lock );
@@ -716,6 +717,8 @@ static int InitThread( vout_thread_t *p_vout )
     if( p_vout->pf_init( p_vout ) )
         return VLC_EGENERIC;
 
+    p_vout->p->p_picture_displayed = NULL;
+
     if( !I_OUTPUTPICTURES )
     {
         msg_Err( p_vout, "plugin was unable to allocate at least "
@@ -886,8 +889,6 @@ static void* RunThread( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     int             i_idle_loops = 0;  /* loops without displaying a picture */
 
-    picture_t *     p_last_picture = NULL;                   /* last picture */
-
     subpicture_t *  p_subpic = NULL;                   /* subpicture pointer */
 
     bool            b_drop_late;
@@ -946,10 +947,10 @@ static void* RunThread( vlc_object_t *p_this )
                 display_date = p_picture->date;
             }
         }
-        if( p_vout->p->b_paused && p_last_picture != NULL )
+        if( p_vout->p->b_paused && p_vout->p->p_picture_displayed != NULL )
         {
             p_picture = NULL;
-            if( p_last_picture->date == 1 )
+            if( p_vout->p->p_picture_displayed->date == 1 )
             {
                 for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
                 {
@@ -957,11 +958,11 @@ static void* RunThread( vlc_object_t *p_this )
 
                     if( p_pic->i_status != READY_PICTURE )
                         continue;
-                    if( p_pic->date <= p_last_picture->date && p_pic != p_last_picture )
+                    if( p_pic->date <= p_vout->p->p_picture_displayed->date && p_pic != p_vout->p->p_picture_displayed )
                     {
                         DropPicture( p_vout, p_pic );
                     }
-                    else if( p_pic->date > p_last_picture->date && ( p_picture == NULL || p_pic->date < display_date ) )
+                    else if( p_pic->date > p_vout->p->p_picture_displayed->date && ( p_picture == NULL || p_pic->date < display_date ) )
                     {
                         p_picture = p_pic;
                         display_date = p_picture->date;
@@ -969,22 +970,22 @@ static void* RunThread( vlc_object_t *p_this )
                 }
             }
             if( !p_picture )
-                p_picture = p_last_picture;
+                p_picture = p_vout->p->p_picture_displayed;
         }
 
         if( p_picture )
         {
             /* If we met the last picture, parse again to see whether there is
              * a more appropriate one. */
-            if( p_picture == p_last_picture && !p_vout->p->b_paused )
+            if( p_picture == p_vout->p->p_picture_displayed && !p_vout->p->b_paused )
             {
                 for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
                 {
                     picture_t *p_pic = PP_RENDERPICTURE[i_index];
 
                     if( p_pic->i_status == READY_PICTURE &&
-                        p_pic != p_last_picture &&
-                        ( p_picture == p_last_picture || p_pic->date < display_date ) )
+                        p_pic != p_vout->p->p_picture_displayed &&
+                        ( p_picture == p_vout->p->p_picture_displayed || p_pic->date < display_date ) )
                     {
                         p_picture = p_pic;
                         display_date = p_picture->date;
@@ -993,10 +994,10 @@ static void* RunThread( vlc_object_t *p_this )
             }
 
             /* If we found better than the last picture, destroy it */
-            if( p_last_picture && p_picture != p_last_picture )
+            if( p_vout->p->p_picture_displayed && p_picture != p_vout->p->p_picture_displayed )
             {
-                DropPicture( p_vout, p_last_picture );
-                p_last_picture = NULL;
+                DropPicture( p_vout, p_vout->p->p_picture_displayed );
+                p_vout->p->p_picture_displayed = NULL;
             }
 
             /* Compute FPS rate */
@@ -1004,7 +1005,7 @@ static void* RunThread( vlc_object_t *p_this )
                 = display_date;
 
             if( !p_picture->b_force &&
-                p_picture != p_last_picture &&
+                p_picture != p_vout->p->p_picture_displayed &&
                 display_date < current_date + p_vout->p->render_time &&
                 b_drop_late )
             {
@@ -1027,7 +1028,7 @@ static void* RunThread( vlc_object_t *p_this )
                 p_picture    = NULL;
                 display_date = 0;
             }
-            else if( p_picture == p_last_picture )
+            else if( p_picture == p_vout->p->p_picture_displayed )
             {
                 /* We are asked to repeat the previous picture, but we first
                  * wait for a couple of idle loops */
@@ -1044,6 +1045,8 @@ static void* RunThread( vlc_object_t *p_this )
                 }
             }
         }
+        if( p_picture )
+            p_vout->p->p_picture_displayed = p_picture;
         vlc_mutex_unlock( &p_vout->picture_lock );
 
         if( p_picture == NULL )
@@ -1145,8 +1148,7 @@ static void* RunThread( vlc_object_t *p_this )
 
             /* Tell the vout this was the last picture and that it does not
              * need to be forced anymore. */
-            p_last_picture = p_picture;
-            p_last_picture->b_force = false;
+            p_picture->b_force = false;
         }
 
         /* Drop the filtered picture if created by video filters */
@@ -1190,6 +1192,7 @@ static void* RunThread( vlc_object_t *p_this )
 
             p_vout->pf_end( p_vout );
 
+            p_vout->p->p_picture_displayed = NULL;
             for( i = 0; i < I_OUTPUTPICTURES; i++ )
                  p_vout->p_picture[ i ].i_status = FREE_PICTURE;
 
