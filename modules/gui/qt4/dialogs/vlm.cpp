@@ -264,7 +264,7 @@ bool VLMDialog::exportVLMConf()
     QString saveVLMConfFileName = QFileDialog::getSaveFileName(
             this, qtr( "Save VLM configuration as..." ),
             qfu( config_GetHomeDir() ),
-            qtr( "VLM conf (*.vlm) ;; All (*.*)" ) );
+            qtr( "VLM conf (*.vlm);;All (*.*)" ) );
 
     if( !saveVLMConfFileName.isEmpty() )
     {
