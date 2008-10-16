@@ -220,9 +220,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
     decoder_t *p_dec = NULL;
     int i_priority;
 
-#ifndef ENABLE_SOUT
-    (void)b_force_decoder;
-#else
+#ifdef ENABLE_SOUT
     /* If we are in sout mode, search for packetizer module */
     if( p_sout )
     {
