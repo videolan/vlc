@@ -889,8 +889,6 @@ static void* RunThread( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     int             i_idle_loops = 0;  /* loops without displaying a picture */
 
-    subpicture_t *  p_subpic = NULL;                   /* subpicture pointer */
-
     bool            b_drop_late;
 
     int canc = vlc_savecancel();
@@ -927,85 +925,58 @@ static void* RunThread( vlc_object_t *p_this )
     {
         /* Initialize loop variables */
         const mtime_t current_date = mdate();
-        picture_t *p_picture = NULL;
+        picture_t *p_picture;
         picture_t *p_filtered_picture;
-        mtime_t display_date = 0;
+        mtime_t display_date;
         picture_t *p_directbuffer;
         int i_index;
 
-        /* Find the picture to display (the one with the earliest date). */
         vlc_mutex_lock( &p_vout->picture_lock );
 
+        /* Look for the earliest picture but after the last displayed one */
+        picture_t *p_last = p_vout->p->p_picture_displayed;;
+
+        p_picture = NULL;
+        display_date = 0;
         for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             picture_t *p_pic = PP_RENDERPICTURE[i_index];
 
-            if( p_pic->i_status == READY_PICTURE &&
-                ( p_picture == NULL || p_pic->date < display_date ) )
+            if( p_pic->i_status != READY_PICTURE )
+                continue;
+
+            if( p_vout->p->b_paused && p_last && p_last->date > 1 )
+                continue;
+
+            if( p_last && p_pic != p_last && p_pic->date <= p_last->date )
+            {
+                /* Drop old picture */
+                DropPicture( p_vout, p_pic );
+            }
+            else if( ( !p_last || p_last->date < p_pic->date ) &&
+                     ( p_picture == NULL || p_pic->date < p_picture->date ) )
             {
                 p_picture = p_pic;
-                display_date = p_picture->date;
             }
         }
-        if( p_vout->p->b_paused && p_vout->p->p_picture_displayed != NULL )
-        {
-            p_picture = NULL;
-            if( p_vout->p->p_picture_displayed->date == 1 )
-            {
-                for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
-                {
-                    picture_t *p_pic = PP_RENDERPICTURE[i_index];
-
-                    if( p_pic->i_status != READY_PICTURE )
-                        continue;
-                    if( p_pic->date <= p_vout->p->p_picture_displayed->date && p_pic != p_vout->p->p_picture_displayed )
-                    {
-                        DropPicture( p_vout, p_pic );
-                    }
-                    else if( p_pic->date > p_vout->p->p_picture_displayed->date && ( p_picture == NULL || p_pic->date < display_date ) )
-                    {
-                        p_picture = p_pic;
-                        display_date = p_picture->date;
-                    }
-                }
-            }
-            if( !p_picture )
-                p_picture = p_vout->p->p_picture_displayed;
-        }
+        if( !p_picture )
+            p_picture = p_last;
 
         if( p_picture )
         {
-            /* If we met the last picture, parse again to see whether there is
-             * a more appropriate one. */
-            if( p_picture == p_vout->p->p_picture_displayed && !p_vout->p->b_paused )
-            {
-                for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
-                {
-                    picture_t *p_pic = PP_RENDERPICTURE[i_index];
-
-                    if( p_pic->i_status == READY_PICTURE &&
-                        p_pic != p_vout->p->p_picture_displayed &&
-                        ( p_picture == p_vout->p->p_picture_displayed || p_pic->date < display_date ) )
-                    {
-                        p_picture = p_pic;
-                        display_date = p_picture->date;
-                    }
-                }
-            }
+            display_date = p_picture->date;
 
             /* If we found better than the last picture, destroy it */
-            if( p_vout->p->p_picture_displayed && p_picture != p_vout->p->p_picture_displayed )
+            if( p_last && p_picture != p_last )
             {
-                DropPicture( p_vout, p_vout->p->p_picture_displayed );
-                p_vout->p->p_picture_displayed = NULL;
+                DropPicture( p_vout, p_last );
+                p_vout->p->p_picture_displayed = p_last = NULL;
             }
 
             /* Compute FPS rate */
-            p_vout->p->p_fps_sample[ p_vout->p->c_fps_samples++ % VOUT_FPS_SAMPLES ]
-                = display_date;
+            p_vout->p->p_fps_sample[ p_vout->p->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 
-            if( !p_picture->b_force &&
-                p_picture != p_vout->p->p_picture_displayed &&
+            if( !p_picture->b_force && p_picture != p_last &&
                 display_date < current_date + p_vout->p->render_time &&
                 b_drop_late )
             {
@@ -1028,7 +999,7 @@ static void* RunThread( vlc_object_t *p_this )
                 p_picture    = NULL;
                 display_date = 0;
             }
-            else if( p_picture == p_vout->p->p_picture_displayed )
+            else if( p_picture == p_last )
             {
                 /* We are asked to repeat the previous picture, but we first
                  * wait for a couple of idle loops */
@@ -1044,9 +1015,10 @@ static void* RunThread( vlc_object_t *p_this )
                     display_date = current_date + p_vout->p->render_time;
                 }
             }
+
+            if( p_picture )
+                p_vout->p->p_picture_displayed = p_picture;
         }
-        if( p_picture )
-            p_vout->p->p_picture_displayed = p_picture;
         vlc_mutex_unlock( &p_vout->picture_lock );
 
         if( p_picture == NULL )
@@ -1066,6 +1038,7 @@ static void* RunThread( vlc_object_t *p_this )
         /*
          * Check for subpictures to display
          */
+        subpicture_t *p_subpic = NULL;
         if( display_date > 0 )
             p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date,
                                             p_vout->p->b_paused, b_snapshot );
