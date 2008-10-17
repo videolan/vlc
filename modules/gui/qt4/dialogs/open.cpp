@@ -30,7 +30,6 @@
 
 #include <QTabWidget>
 #include <QGridLayout>
-#include <QFileDialog>
 #include <QRegExp>
 #include <QMenu>
 

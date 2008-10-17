@@ -471,8 +471,13 @@ void NetOpenPanel::updateProtocol( int idx_proto ) {
     {
         if( idx_proto != UDP_PROTO && idx_proto != RTP_PROTO )
             addr.replace( QRegExp("^.*://@*"), proto + "://");
-        else
+        else if ( ( addr.contains(QRegExp("://((22[4-9])|(23\\d)|(\\[?[fF]{2}[0-9a-fA-F]{2}:))"))) ||
+                ( !addr.contains(QRegExp("^\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}")) &&
+                !addr.contains(QRegExp(":[a-fA-F0-9]{1,4}:")) ) )
              addr.replace( QRegExp("^.*://"), proto + "://@");
+    else
+             addr.replace( QRegExp("^.*://"), proto + "://");
+        addr.replace( QRegExp("@+"), "@");
         ui.addressText->setText( addr );
     }
     updateMRL();
@@ -483,15 +488,16 @@ void NetOpenPanel::updateMRL() {
     QString addr = ui.addressText->text();
     addr = QUrl::toPercentEncoding( addr, ":/?#@!$&'()*+,;=" );
     int idx_proto = ui.protocolCombo->currentIndex();
-
+    int addr_is_multicast = addr.contains(QRegExp("^(22[4-9])|(23\\d)|(\\[?[fF]{2}[0-9a-fA-F]{2}:)"))?1:0;
+    int addr_is_ipv4 = addr.contains(QRegExp("^\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}"))?1:0;
+    int addr_is_ipv6 = addr.contains(QRegExp(":[a-fA-F0-9]{1,4}:"))?1:0;
+    int addr_has_port = addr.contains(QRegExp("[^:]{5}:\\d{1,5}$"))?1:0;
     if( addr.contains( "://"))
     {
         /* Match the correct item in the comboBox */
         ui.protocolCombo->setCurrentIndex(
                 ui.protocolCombo->findData( addr.section( ':', 0, 0 ) ) );
-
-        if( idx_proto != UDP_PROTO || idx_proto != RTP_PROTO )
-            mrl = addr;
+        mrl = addr;
     }
     else
     {
@@ -517,23 +523,31 @@ void NetOpenPanel::updateMRL() {
             emit methodChanged("rtsp-caching");
             break;
         case UDP_PROTO:
-            mrl = "udp://@";
+            if(( addr_is_multicast ) || ( !addr_is_ipv4 && !addr_is_ipv6 ))
+                mrl = "udp://@";
+        else
+                    mrl = "udp://";
             /* Add [] to IPv6 */
-            if ( addr.contains(':') && !addr.contains('[') )
+            if ( addr_is_ipv6  && !addr.contains('[') )
             {
                 mrl += "[" + addr + "]";
             }
             else mrl += addr;
-            mrl += QString(":%1").arg( ui.portSpin->value() );
+            if(!addr_has_port)
+                mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("udp-caching");
             break;
         case RTP_PROTO:
-            mrl = "rtp://@";
-            if ( addr.contains(':') && !addr.contains('[') )
+            if(( addr_is_multicast ) || ( !addr_is_ipv4 && !addr_is_ipv6 ))
+                    mrl = "rtp://@";
+            else
+                    mrl = "rtp://";
+            if ( addr_is_ipv6 && !addr.contains('[') )
                 mrl += "[" + addr + "]"; /* Add [] to IPv6 */
             else
                 mrl += addr;
-            mrl += QString(":%1").arg( ui.portSpin->value() );
+            if(!addr_has_port)
+                mrl += QString(":%1").arg( ui.portSpin->value() );
             emit methodChanged("rtp-caching");
             break;
         case RTMP_PROTO:
