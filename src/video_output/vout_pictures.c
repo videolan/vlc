@@ -29,15 +29,15 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
+#include <libvlc.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_filter.h>
 #include "vout_pictures.h"
 #include "vout_internal.h"
-
-#include <assert.h>
 
 /**
  * Display a picture
@@ -52,6 +52,7 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     if( p_pic->i_status == RESERVED_PICTURE )
     {
         p_pic->i_status = READY_PICTURE;
+        vlc_cond_signal( &p_vout->p->picture_wait );
     }
     else
     {
@@ -201,31 +202,58 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
     return( NULL );
 }
 
+/* */
+static void DestroyPicture( vout_thread_t *p_vout, picture_t *p_picture )
+{
+    vlc_assert_locked( &p_vout->picture_lock );
+
+    p_picture->i_status = DESTROYED_PICTURE;
+    p_vout->i_heap_size--;
+    picture_CleanupQuant( p_picture );
+
+    vlc_cond_signal( &p_vout->p->picture_wait );
+}
+
 /**
  * Remove a permanent or reserved picture from the heap
  *
  * This function frees a previously reserved picture or a permanent
  * picture. It is meant to be used when the construction of a picture aborted.
  * Note that the picture will be destroyed even if it is linked !
+ *
+ * TODO remove it, vout_DropPicture should be used instead
  */
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    vlc_mutex_lock( &p_vout->picture_lock );
-
 #ifndef NDEBUG
     /* Check if picture status is valid */
+    vlc_mutex_lock( &p_vout->picture_lock );
     if( p_pic->i_status != RESERVED_PICTURE )
     {
         msg_Err( p_vout, "picture to destroy %p has invalid status %d",
                          p_pic, p_pic->i_status );
     }
+    vlc_mutex_unlock( &p_vout->picture_lock );
 #endif
 
-    p_pic->i_status = DESTROYED_PICTURE;
-    p_vout->i_heap_size--;
-    picture_CleanupQuant( p_pic );
+    vout_DropPicture( p_vout, p_pic );
+}
 
-    vlc_mutex_unlock( &p_vout->picture_lock );
+/* */
+void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_picture )
+{
+    vlc_assert_locked( &p_vout->picture_lock );
+    if( p_picture->i_refcount > 0 )
+    {
+        /* Pretend we displayed the picture, but don't destroy
+         * it since the decoder might still need it. */
+        p_picture->i_status = DISPLAYED_PICTURE;
+    }
+    else
+    {
+        /* Destroy the picture without displaying it */
+        DestroyPicture( p_vout, p_picture );
+    }
 }
 
 /* */
@@ -237,16 +265,11 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t *p_pic  )
     {
         /* Grr cannot destroy ready picture by myself so be sure vout won't like it */
         p_pic->date = 1;
-    }
-    else if( p_pic->i_refcount > 0 )
-    {
-        p_pic->i_status = DISPLAYED_PICTURE;
+        vlc_cond_signal( &p_vout->p->picture_wait );
     }
     else
     {
-        p_pic->i_status = DESTROYED_PICTURE;
-        p_vout->i_heap_size--;
-        picture_CleanupQuant( p_pic );
+        vout_UsePictureLocked( p_vout, p_pic );
     }
 
     vlc_mutex_unlock( &p_vout->picture_lock );
@@ -273,15 +296,15 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
-    p_pic->i_refcount--;
 
-    if( ( p_pic->i_refcount == 0 ) &&
-        ( p_pic->i_status == DISPLAYED_PICTURE ) )
-    {
-        p_pic->i_status = DESTROYED_PICTURE;
-        p_vout->i_heap_size--;
-        picture_CleanupQuant( p_pic );
-    }
+    if( p_pic->i_refcount > 0 )
+        p_pic->i_refcount--;
+    else
+        msg_Err( p_vout, "Invalid picture reference count (%p, %d)",
+                 p_pic, p_pic->i_refcount );
+
+    if( p_pic->i_refcount == 0 && p_pic->i_status == DISPLAYED_PICTURE )
+        DestroyPicture( p_vout, p_pic );
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }

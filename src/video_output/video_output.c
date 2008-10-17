@@ -92,9 +92,6 @@ int vout_Snapshot( vout_thread_t *, picture_t * );
 /* Display media title in OSD */
 static void DisplayTitleOnOSD( vout_thread_t *p_vout );
 
-/* */
-static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture );
-
 /*****************************************************************************
  * Video Filter2 functions
  *****************************************************************************/
@@ -112,7 +109,9 @@ static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 {
     vout_thread_t *p_vout = (vout_thread_t*)p_filter->p_owner;
 
-    DropPicture( p_vout, p_pic );
+    vlc_mutex_lock( &p_vout->picture_lock );
+    vout_UsePictureLocked( p_vout, p_pic );
+    vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
 static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data )
@@ -376,7 +375,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->p_picture_displayed = NULL;
 
     /* Initialize locks */
-    vlc_mutex_init_recursive( &p_vout->picture_lock );
+    vlc_mutex_init( &p_vout->picture_lock );
+    vlc_cond_init( &p_vout->p->picture_wait );
     vlc_mutex_init( &p_vout->change_lock );
     vlc_mutex_init( &p_vout->p->vfilter_lock );
 
@@ -548,6 +548,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     spu_Destroy( p_vout->p_spu );
 
     /* Destroy the locks */
+    vlc_cond_destroy( &p_vout->p->picture_wait );
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
     vlc_mutex_destroy( &p_vout->p->vfilter_lock );
@@ -585,6 +586,7 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
     {
         const mtime_t i_duration = i_date - p_vout->p->i_pause_date;
 
+        vlc_mutex_lock( &p_vout->picture_lock );
         for( int i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             picture_t *p_pic = PP_RENDERPICTURE[i_index];
@@ -592,6 +594,9 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
             if( p_pic->i_status == READY_PICTURE )
                 p_pic->date += i_duration;
         }
+        vlc_cond_signal( &p_vout->p->picture_wait );
+        vlc_mutex_unlock( &p_vout->picture_lock );
+
         spu_OffsetSubtitleDate( p_vout->p_spu, i_duration );
     }
     p_vout->p->b_paused = b_paused;
@@ -627,6 +632,7 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
                 p_pic->date = i_date;
         }
     }
+    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced )
@@ -673,12 +679,10 @@ void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced )
     for( i_pic = 0; i_pic < p_vout->render.i_pictures; i_pic++ )
     {
         picture_t *p_pic = p_vout->render.pp_picture[i_pic];
-
-        if( p_pic->i_status == RESERVED_PICTURE )
-            vout_DestroyPicture( p_vout, p_pic );
-        if( p_pic->i_refcount > 0 )
-            vout_UnlinkPicture( p_vout, p_pic );
+        p_pic->i_refcount = 0;
+        vout_UsePictureLocked( p_vout, p_pic );
     }
+    vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -937,7 +941,6 @@ static void* RunThread( vlc_object_t *p_this )
         picture_t *p_last = p_vout->p->p_picture_displayed;;
 
         p_picture = NULL;
-        display_date = 0;
         for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             picture_t *p_pic = PP_RENDERPICTURE[i_index];
@@ -951,7 +954,19 @@ static void* RunThread( vlc_object_t *p_this )
             if( p_last && p_pic != p_last && p_pic->date <= p_last->date )
             {
                 /* Drop old picture */
-                DropPicture( p_vout, p_pic );
+                vout_UsePictureLocked( p_vout, p_pic );
+            }
+            else if( !p_vout->p->b_paused && !p_pic->b_force && p_pic != p_last &&
+                     p_pic->date < current_date + p_vout->p->render_time &&
+                     b_drop_late )
+            {
+                /* Picture is late: it will be destroyed and the thread
+                 * will directly choose the next picture */
+                vout_UsePictureLocked( p_vout, p_pic );
+                p_vout->p->i_picture_lost++;
+
+                msg_Warn( p_vout, "late picture skipped (%"PRId64")",
+                                  current_date - p_pic->date );
             }
             else if( ( !p_last || p_last->date < p_pic->date ) &&
                      ( p_picture == NULL || p_pic->date < p_picture->date ) )
@@ -962,6 +977,7 @@ static void* RunThread( vlc_object_t *p_this )
         if( !p_picture )
             p_picture = p_last;
 
+        display_date = 0;
         if( p_picture )
         {
             display_date = p_picture->date;
@@ -969,26 +985,12 @@ static void* RunThread( vlc_object_t *p_this )
             /* If we found better than the last picture, destroy it */
             if( p_last && p_picture != p_last )
             {
-                DropPicture( p_vout, p_last );
+                vout_UsePictureLocked( p_vout, p_last );
                 p_vout->p->p_picture_displayed = p_last = NULL;
             }
 
             /* Compute FPS rate */
             p_vout->p->p_fps_sample[ p_vout->p->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
-
-            if( !p_picture->b_force && p_picture != p_last &&
-                display_date < current_date + p_vout->p->render_time &&
-                b_drop_late )
-            {
-                /* Picture is late: it will be destroyed and the thread
-                 * will directly choose the next picture */
-                DropPicture( p_vout, p_picture );
-                p_vout->p->i_picture_lost++;
-                msg_Warn( p_vout, "late picture skipped (%"PRId64")",
-                                  current_date - display_date );
-                vlc_mutex_unlock( &p_vout->picture_lock );
-                continue;
-            }
 
             if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
@@ -1015,7 +1017,6 @@ static void* RunThread( vlc_object_t *p_this )
                     display_date = current_date + p_vout->p->render_time;
                 }
             }
-
             if( p_picture )
                 p_vout->p->p_picture_displayed = p_picture;
         }
@@ -1091,7 +1092,7 @@ static void* RunThread( vlc_object_t *p_this )
         /* Sleep a while or until a given date */
         if( display_date != 0 )
         {
-            /* If there are filters in the chain, better give them the picture
+            /* If there are *vout* filters in the chain, better give them the picture
              * in advance */
             if( !p_vout->p->psz_filter_chain || !*p_vout->p->psz_filter_chain )
             {
@@ -1100,7 +1101,10 @@ static void* RunThread( vlc_object_t *p_this )
         }
         else
         {
-            msleep( VOUT_IDLE_SLEEP );
+            /* Wait until a frame is being sent or a supurious wakeup (not a problem here) */
+            vlc_mutex_lock( &p_vout->picture_lock );
+            vlc_cond_timedwait( &p_vout->p->picture_wait, &p_vout->picture_lock, current_date + VOUT_IDLE_SLEEP );
+            vlc_mutex_unlock( &p_vout->picture_lock );
         }
 
         /* On awakening, take back lock and send immediately picture
@@ -1126,7 +1130,11 @@ static void* RunThread( vlc_object_t *p_this )
 
         /* Drop the filtered picture if created by video filters */
         if( p_filtered_picture != NULL && p_filtered_picture != p_picture )
-            DropPicture( p_vout, p_filtered_picture );
+        {
+            vlc_mutex_lock( &p_vout->picture_lock );
+            vout_UsePictureLocked( p_vout, p_filtered_picture );
+            vlc_mutex_unlock( &p_vout->picture_lock );
+        }
 
         if( p_picture != NULL )
         {
@@ -1168,6 +1176,7 @@ static void* RunThread( vlc_object_t *p_this )
             p_vout->p->p_picture_displayed = NULL;
             for( i = 0; i < I_OUTPUTPICTURES; i++ )
                  p_vout->p_picture[ i ].i_status = FREE_PICTURE;
+            vlc_cond_signal( &p_vout->p->picture_wait );
 
             I_OUTPUTPICTURES = 0;
 
@@ -1215,6 +1224,7 @@ static void* RunThread( vlc_object_t *p_this )
             if( p_vout->b_error )
                 msg_Err( p_vout, "InitThread after VOUT_PICTURE_BUFFERS_CHANGE failed\n" );
 
+            vlc_cond_signal( &p_vout->p->picture_wait );
             vlc_mutex_unlock( &p_vout->picture_lock );
 
             if( p_vout->b_error )
@@ -1385,29 +1395,7 @@ static void ChromaDestroy( vout_thread_t *p_vout )
     p_vout->p->p_chroma = NULL;
 }
 
-static void DropPicture( vout_thread_t *p_vout, picture_t *p_picture )
-{
-    vlc_mutex_lock( &p_vout->picture_lock );
-    if( p_picture->i_refcount )
-    {
-        /* Pretend we displayed the picture, but don't destroy
-         * it since the decoder might still need it. */
-        p_picture->i_status = DISPLAYED_PICTURE;
-    }
-    else
-    {
-        /* Destroy the picture without displaying it */
-        p_picture->i_status = DESTROYED_PICTURE;
-        p_vout->i_heap_size--;
-        picture_CleanupQuant( p_picture );
-    }
-    vlc_mutex_unlock( &p_vout->picture_lock );
-}
-
-
-
 /* following functions are local */
-
 static int ReduceHeight( int i_ratio )
 {
     int i_dummy = VOUT_ASPECT_FACTOR;

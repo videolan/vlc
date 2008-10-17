@@ -36,6 +36,7 @@ struct vout_thread_sys_t
 {
     /* */
     picture_t       *p_picture_displayed;
+    vlc_cond_t      picture_wait;
 
     /* */
     vlc_mutex_t     vfilter_lock;         /**< video filter2 change lock */
@@ -83,6 +84,12 @@ struct vout_thread_sys_t
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
 picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
                                subpicture_t *, bool b_paused );
+
+/* DO NOT use vout_UsePictureLocked unless you are in src/video_ouput
+ *
+ * This function supposes that you call it with picture_lock taken.
+ */
+void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_pic  );
 
 #endif
 
