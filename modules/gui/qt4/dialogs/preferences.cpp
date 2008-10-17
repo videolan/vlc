@@ -359,9 +359,10 @@ void PrefsDialog::reset()
     {
         config_ResetAll( p_intf );
         config_SaveConfigFile( p_intf, NULL );
+        getSettings()->clear();
 
-        instance = NULL;
         close();
+        instance = NULL;
         PrefsDialog::getInstance( p_intf )->show();
     }
 }
