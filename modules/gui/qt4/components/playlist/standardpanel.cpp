@@ -89,10 +89,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
         /* Configure the size of the header */
         view->header()->resizeSection( 0, 200 );
         view->header()->resizeSection( 1, 80 );
-        view->header()->setSortIndicatorShown( true );
-        view->header()->setClickable( true );
-        view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
     }
+    view->header()->setSortIndicatorShown( true );
+    view->header()->setClickable( true );
+    view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
     getSettings()->endGroup();
 
     /* Connections for the TreeView */
