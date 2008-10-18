@@ -442,7 +442,7 @@ static int Open ( vlc_object_t *p_this )
     /* Quit on unknown subtitles */
     if( p_sys->i_type == SUB_TYPE_UNKNOWN )
     {
-        msg_Err( p_demux, "failed to recognize subtitle type" );
+        msg_Warn( p_demux, "failed to recognize subtitle type" );
         free( p_sys );
         return VLC_EGENERIC;
     }
