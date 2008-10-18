@@ -132,7 +132,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
         {
             val.i_int = AOUT_VAR_CHAN_DOLBYS;
-            text.psz_string = _("Dolby Digital");
+            text.psz_string = _("Dolby Surround");
         }
         else
         {

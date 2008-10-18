@@ -217,7 +217,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 - (void)initStrings
 {
     /* audio */
-    [o_audio_dolby_txt setStringValue: _NS("Force detection of Dolby Digital")];
+    [o_audio_dolby_txt setStringValue: _NS("Force detection of Dolby Surround")];
     [o_audio_effects_box setTitle: _NS("Effects")];
     [o_audio_enable_ckb setTitle: _NS("Enable Audio")];
     [o_audio_general_box setTitle: _NS("General Audio")];
@@ -419,7 +419,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 
     [o_audio_spdif_ckb setState: config_GetInt( p_intf, "spdif" )];
 
-    [self setupButton: o_audio_dolby_pop forIntList: "force-dolby-digital"];
+    [self setupButton: o_audio_dolby_pop forIntList: "force-dolby-surround"];
 
     [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" ) ?: ""]];
 
@@ -748,7 +748,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutInt( p_intf, "volume", [o_audio_vol_sld intValue] );
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
-        SaveIntList( o_audio_dolby_pop, "force-dolby-digital" );
+        SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );
 
         config_PutPsz( p_intf, "audio-language", [[o_audio_lang_fld stringValue] UTF8String] );
         config_PutInt( p_intf, "headphone-dolby", [o_audio_headphone_ckb state] );
