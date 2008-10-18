@@ -325,7 +325,7 @@ static QWaitCondition windowWait;
 static void ThreadCleanup( void *param)
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    QEvent *event = new QEvent((QEvent::Type)(MainInterfaceClose_Type) );
+    QCloseEvent *event = new QCloseEvent();
     QApplication::postEvent( p_intf->p_sys->p_mi, event );
 }
 

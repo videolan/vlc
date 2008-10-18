@@ -1088,11 +1088,6 @@ void MainInterface::customEvent( QEvent *event )
             setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
         show(); /* necessary to apply window flags?? */
     }
-    if ( event->type() == MainInterfaceClose_Type )
-    {
-        QApplication::closeAllWindows();
-        QApplication::quit();
-    }
 }
 
 void MainInterface::keyPressEvent( QKeyEvent *e )
