@@ -1464,7 +1464,6 @@ vlc_module_begin();
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, false );
     add_integer( "force-dolby-digital", 0, NULL, FORCE_DOLBY_TEXT,
                  FORCE_DOLBY_LONGTEXT, false );
-        add_deprecated_alias( "force-dolby-surround" ); //deprecated since 1.0.0
         change_integer_list( pi_force_dolby_values, ppsz_force_dolby_descriptions, NULL );
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT,
                  DESYNC_LONGTEXT, true );
