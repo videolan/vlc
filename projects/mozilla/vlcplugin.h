@@ -188,9 +188,12 @@ private:
     "video/x-mpeg:mpg,mpeg,mpe:MPEG video;" \
     "video/mpeg-system:mpg,mpeg,mpe,vob:MPEG video;" \
     "video/x-mpeg-system:mpg,mpeg,mpe,vob:MPEG video;" \
+    /* M3U */ \
+    "audio/x-mpegurl:m3u:MPEG audio;" \
     /* MPEG-4 */ \
     "video/mp4:mp4,mpg4:MPEG-4 video;" \
     "audio/mp4:mp4,mpg4:MPEG-4 audio;" \
+    "audio/x-m4a:m4a:MPEG-4 audio;" \
     "application/mpeg4-iod:mp4,mpg4:MPEG-4 video;" \
     "application/mpeg4-muxcodetable:mp4,mpg4:MPEG-4 video;" \
     /* AVI */ \
@@ -208,6 +211,7 @@ private:
     "application/x-mplayer2::Windows Media;" \
     "video/x-ms-wmv:wmv:Windows Media;" \
     "video/x-ms-wvx:wvx:Windows Media Video;" \
+    "audio/x-ms-wma:wma:Windows Media Audio;" \
     /* Google VLC */ \
     "application/x-google-vlc-plugin::Google VLC plug-in;" \
     /* WAV audio */ \
