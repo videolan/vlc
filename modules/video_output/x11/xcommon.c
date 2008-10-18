@@ -2215,12 +2215,10 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
  * the focus should go there or not, so let the wm decided */
 #define APPFOCUS 0
         /* Make sure the change is effective */
-#if BADFS // RASTER: why do this? you already mapped the window in CreateWindow?
         XReparentWindow( p_vout->p_sys->p_display,
                          p_vout->p_sys->p_win->base_window,
                          DefaultRootWindow( p_vout->p_sys->p_display ),
-                         -2, -2 );
-#endif
+                         0, 0 );
 
 #ifdef HAVE_XINERAMA
         if( XineramaQueryExtension( p_vout->p_sys->p_display, &i_d1, &i_d2 ) &&
