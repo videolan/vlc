@@ -663,7 +663,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         /* Send decoded frame to vout */
         if( p_sys->i_pts )
         {
-            int i;
             p_pic->date = p_sys->i_pts;
 
             ffmpeg_NextPts( p_dec );
