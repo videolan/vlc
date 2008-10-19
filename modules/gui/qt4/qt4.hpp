@@ -37,9 +37,24 @@
 
 #define HAS_QT43 ( QT_VERSION >= 0x040300 )
 
-#define QT_NORMAL_MODE 0
-#define QT_ALWAYS_VIDEO_MODE 1
-#define QT_MINIMAL_MODE 2
+enum {
+    QT_NORMAL_MODE = 0,
+    QT_ALWAYS_VIDEO_MODE,
+    QT_MINIMAL_MODE
+};
+
+enum {
+    DialogEventType = 0,
+    IMEventType     = 100,
+    PLEventType     = 200
+};
+
+enum {
+    DialogEvent_Type = QEvent::User + DialogEventType + 1,
+    //PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
+    //PLDockEvent_Type = QEvent::User + DialogEventType + 3;
+    SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4,
+};
 
 class QApplication;
 class QMenu;
@@ -123,12 +138,6 @@ struct intf_sys_t
 
 #define getSettings() p_intf->p_sys->mainSettings
 
-enum {
-    DialogEventType = 0,
-    IMEventType     = 100,
-    PLEventType     = 200
-};
-
 
 #include <QString>
 /* Replace separators on Windows because Qt is always using / */
@@ -152,11 +161,6 @@ static inline QString removeTrailingSlash( QString s )
 }
 
 #define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
-
-static const int DialogEvent_Type = QEvent::User + DialogEventType + 1;
-//static const int PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
-//static const int PLDockEvent_Type = QEvent::User + DialogEventType + 3;
-static const int SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4;
 
 class DialogEvent : public QEvent
 {

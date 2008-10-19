@@ -37,7 +37,6 @@
 #include "ui/video_effects.h"
 #include "ui/v4l2.h"
 
-
 #include <QTabWidget>
 
 #define BANDS EQZ_BANDS_MAX

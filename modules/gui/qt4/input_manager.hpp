@@ -36,21 +36,23 @@
 #include <QObject>
 #include <QEvent>
 
-static int const PositionUpdate_Type     = QEvent::User + IMEventType + 1;
-static int const ItemChanged_Type        = QEvent::User + IMEventType + 2;
-static int const ItemStateChanged_Type   = QEvent::User + IMEventType + 3;
-static int const ItemTitleChanged_Type   = QEvent::User + IMEventType + 4;
-static int const ItemRateChanged_Type    = QEvent::User + IMEventType + 5;
-static int const VolumeChanged_Type      = QEvent::User + IMEventType + 6;
-static int const ItemSpuChanged_Type     = QEvent::User + IMEventType + 7;
-static int const ItemTeletextChanged_Type= QEvent::User + IMEventType + 8;
-static int const InterfaceVoutUpdate_Type= QEvent::User + IMEventType + 9;
-static int const StatisticsUpdate_Type   = QEvent::User + IMEventType + 10;
+enum {
+    PositionUpdate_Type = QEvent::User + IMEventType + 1,
+    ItemChanged_Type,
+    ItemStateChanged_Type,
+    ItemTitleChanged_Type,
+    ItemRateChanged_Type,
+    VolumeChanged_Type,
+    ItemSpuChanged_Type,
+    ItemTeletextChanged_Type,
+    InterfaceVoutUpdate_Type,
+    StatisticsUpdate_Type,
 
-static int const FullscreenControlToggle_Type = QEvent::User + IMEventType + 11;
-static int const FullscreenControlShow_Type = QEvent::User + IMEventType + 12;
-static int const FullscreenControlHide_Type = QEvent::User + IMEventType + 13;
-static int const FullscreenControlPlanHide_Type = QEvent::User + IMEventType + 14;
+    FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
+    FullscreenControlShow_Type,
+    FullscreenControlHide_Type,
+    FullscreenControlPlanHide_Type,
+};
 
 class IMEvent : public QEvent
 {
@@ -102,7 +104,7 @@ private:
     void UpdateTeletext();
     void UpdateArt();
     void UpdateVout();
-    void UpdateStats(); // FIXME, remove from this file.
+    void UpdateStats();
 
     void AtoBLoop( int );
 

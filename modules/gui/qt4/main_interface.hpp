@@ -49,7 +49,6 @@ class FullscreenControllerWidget;
 class SpeedControlWidget;
 class QMenu;
 class QSize;
-//class QDockWidet;
 
 enum {
     CONTROLS_HIDDEN = 0x0,
