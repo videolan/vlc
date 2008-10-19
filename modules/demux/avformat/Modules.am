@@ -2,6 +2,8 @@ SOURCES_avformat = \
     avformat.c \
     avformat.h \
     demux.c \
+    ../../codec/avcodec/fourcc.c \
+    ../../codec/avcodec/chroma.c \
     $(NULL)
 if ENABLE_SOUT
 SOURCES_avformat += mux.c
