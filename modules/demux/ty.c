@@ -241,8 +241,8 @@ struct demux_sys_t
   //mtime_t         l_last_ty_pts_sync; /* audio PTS at time of last TY PTS */
   uint64_t        l_first_ty_pts;     /* first TY PTS in this master chunk */
   uint64_t        l_final_ty_pts;     /* final TY PTS in this master chunk */
-  int             i_seq_table_size;   /* number of entries in SEQ table */
-  int             i_bits_per_seq_entry; /* # of bits in SEQ table bitmask */
+  unsigned        i_seq_table_size;   /* number of entries in SEQ table */
+  unsigned        i_bits_per_seq_entry; /* # of bits in SEQ table bitmask */
 
   mtime_t         firstAudioPTS;
   mtime_t         lastAudioPTS;
@@ -1051,8 +1051,9 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t seek_pos = p_sys->i_stream_size * seek_pct;
-    int i, i_cur_part;
     long l_skip_amt;
+    int i;
+    unsigned i_cur_part;
 
     /* if we're not seekable, there's nothing to do */
     if (!p_sys->b_seekable)
@@ -1472,10 +1473,11 @@ static void DemuxDecodeXds( demux_t *p_demux, uint8_t d1, uint8_t d2 )
 static int ty_stream_seek_time(demux_t *p_demux, uint64_t l_seek_time)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i, i_seq_entry = 0;
+    int i_seq_entry = 0;
     int i_skip_cnt;
+    unsigned i;
     long l_cur_pos = stream_Tell(p_demux->s);
-    int i_cur_part = l_cur_pos / TIVO_PART_LENGTH;
+    unsigned i_cur_part = l_cur_pos / TIVO_PART_LENGTH;
     long l_seek_secs = l_seek_time / 1000000000;
     uint64_t l_fwd_stamp = 1;
 
@@ -1598,8 +1600,8 @@ static int ty_stream_seek_time(demux_t *p_demux, uint64_t l_seek_time)
        so we need to skip past any stream data prior to the seq_rec
        in this chunk */
     i_skip_cnt = 0;
-    for (i=0; i<p_sys->i_seq_rec; i++)
-        i_skip_cnt += p_sys->rec_hdrs[i].l_rec_size;
+    for (int j=0; j<p_sys->i_seq_rec; j++)
+        i_skip_cnt += p_sys->rec_hdrs[j].l_rec_size;
     stream_Read(p_demux->s, NULL, i_skip_cnt);
     p_sys->i_cur_rec = p_sys->i_seq_rec;
     //p_sys->l_last_ty_pts = p_sys->rec_hdrs[p_sys->i_seq_rec].l_ty_pts;
@@ -1616,7 +1618,7 @@ static void parse_master(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t mst_buf[32];
-    int i, i_map_size;
+    uint32_t i, i_map_size;
     int64_t i_save_pos = stream_Tell(p_demux->s);
     int64_t i_pts_secs;
 
@@ -1637,14 +1639,18 @@ static void parse_master(demux_t *p_demux)
     p_sys->i_seq_table_size = i / (8 + i_map_size);
 
     /* parse all the entries */
-    p_sys->seq_table = malloc(p_sys->i_seq_table_size * sizeof(ty_seq_table_t));
-    for (i=0; i<p_sys->i_seq_table_size; i++) {
+    p_sys->seq_table = calloc(p_sys->i_seq_table_size, sizeof(ty_seq_table_t));
+    if (p_sys->seq_table == NULL)
+    {
+        p_sys->i_seq_table_size = 0;
+        return;
+    }
+    for (unsigned i=0; i<p_sys->i_seq_table_size; i++) {
         stream_Read(p_demux->s, mst_buf, 8);
         p_sys->seq_table[i].l_timestamp = U64_AT(&mst_buf[0]);
         if (i_map_size > 8) {
             msg_Err(p_demux, "Unsupported SEQ bitmap size in master chunk");
             stream_Read(p_demux->s, NULL, i_map_size);
-            memset(p_sys->seq_table[i].chunk_bitmask, i_map_size, 0);
         } else {
             stream_Read(p_demux->s, mst_buf + 8, i_map_size);
             memcpy(p_sys->seq_table[i].chunk_bitmask, &mst_buf[8], i_map_size);
