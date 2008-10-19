@@ -25,7 +25,7 @@
 /*****************************************************************************
  * Export libavutil messages to the VLC message system
  *****************************************************************************/
-void LibavutilCallback( void *p_opaque, int i_level,
+static inline void LibavutilCallback( void *p_opaque, int i_level,
                         const char *psz_format, va_list va )
 {
     int i_vlc_level;
