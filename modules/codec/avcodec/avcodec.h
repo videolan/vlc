@@ -21,6 +21,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
+                    int *pi_ffmpeg_codec, const char **ppsz_name );
+int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
+                  vlc_fourcc_t *pi_fourcc, const char **ppsz_name );
+
 picture_t * DecodeVideo    ( decoder_t *, block_t ** );
 aout_buffer_t * DecodeAudio( decoder_t *, block_t ** );
 

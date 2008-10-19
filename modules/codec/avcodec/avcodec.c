@@ -48,7 +48,6 @@
 #endif
 
 #include "avcodec.h"
-#include "fourcc.h"
 #include "avutil.h"
 
 /*****************************************************************************

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * fourcc.h: libavcodec <-> libvlc conversion routines
+ * fourcc.c: libavcodec <-> libvlc conversion routines
  *****************************************************************************
  * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
@@ -22,6 +22,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <vlc_common.h>
+#include <vlc_codec.h>
+
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#   include <libavcodec/avcodec.h>
+#elif defined(HAVE_FFMPEG_AVCODEC_H)
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
+#include "avcodec.h"
+
 /*****************************************************************************
  * Codec fourcc -> ffmpeg_id mapping
  *****************************************************************************/
@@ -30,7 +46,7 @@ static const struct
     vlc_fourcc_t  i_fourcc;
     int  i_codec;
     int  i_cat;
-    const char *psz_name;
+    const char psz_name[40];
 
 } codecs_table[] =
 {
@@ -1049,15 +1065,13 @@ static const struct
       SPU_ES, "SubStation Alpha subtitles" },
 #endif
 
-    { 0, 0, 0, 0 }
+    { 0, 0, 0, "" }
 };
 
-static int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
-                           int *pi_ffmpeg_codec, const char **ppsz_name )
+int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
+                    int *pi_ffmpeg_codec, const char **ppsz_name )
 {
-    int i;
-
-    for( i = 0; codecs_table[i].i_fourcc != 0; i++ )
+    for( unsigned i = 0; codecs_table[i].i_fourcc != 0; i++ )
     {
         if( codecs_table[i].i_fourcc == i_fourcc )
         {
@@ -1071,12 +1085,10 @@ static int GetFfmpegCodec( vlc_fourcc_t i_fourcc, int *pi_cat,
     return false;
 }
 
-static int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
-                         vlc_fourcc_t *pi_fourcc, const char **ppsz_name )
+int GetVlcFourcc( int i_ffmpeg_codec, int *pi_cat,
+                  vlc_fourcc_t *pi_fourcc, const char **ppsz_name )
 {
-    int i;
-
-    for( i = 0; codecs_table[i].i_codec != 0; i++ )
+    for( unsigned i = 0; codecs_table[i].i_codec != 0; i++ )
     {
         if( codecs_table[i].i_codec == i_ffmpeg_codec )
         {

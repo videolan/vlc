@@ -5,7 +5,7 @@ SOURCES_avcodec = \
 	audio.c \
 	deinterlace.c \
 	avutil.h \
-	fourcc.h \
+	fourcc.c \
 	chroma.h \
 	$(NULL)
 
