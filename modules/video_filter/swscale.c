@@ -145,10 +145,6 @@ static int OpenScaler( vlc_object_t *p_this )
 
     int i_sws_mode;
 
-    float sws_lum_gblur = 0.0, sws_chr_gblur = 0.0;
-    int sws_chr_vshift = 0, sws_chr_hshift = 0;
-    float sws_chr_sharpen = 0.0, sws_lum_sharpen = 0.0;
-
     if( GetParameters( NULL,
                        &p_filter->fmt_in.video,
                        &p_filter->fmt_out.video, 0 ) )
