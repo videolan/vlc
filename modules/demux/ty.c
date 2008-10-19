@@ -1658,11 +1658,13 @@ static void parse_master(demux_t *p_demux)
     p_sys->b_have_master = true;
 
     i_pts_secs = p_sys->l_first_ty_pts / 1000000000;
-    msg_Dbg( p_demux, "first TY pts in master is %02d:%02d:%02d",
-             (int)(i_pts_secs / 3600), (int)((i_pts_secs / 60) % 60), (int)(i_pts_secs % 60) );
+    msg_Dbg( p_demux,
+             "first TY pts in master is %02"PRId64":%02"PRId64":%02"PRId64,
+             i_pts_secs / 3600, (i_pts_secs / 60) % 60, i_pts_secs % 60 );
     i_pts_secs = p_sys->l_final_ty_pts / 1000000000;
-    msg_Dbg( p_demux, "final TY pts in master is %02d:%02d:%02d",
-             (int)(i_pts_secs / 3600), (int)((i_pts_secs / 60) % 60), (int)(i_pts_secs % 60) );
+    msg_Dbg( p_demux,
+             "final TY pts in master is %02"PRId64":%02"PRId64":%02"PRId64,
+             i_pts_secs / 3600, (i_pts_secs / 60) % 60, i_pts_secs % 60 );
 
     /* seek past this chunk */
     stream_Seek(p_demux->s, i_save_pos + CHUNK_SIZE);
