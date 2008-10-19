@@ -1,5 +1,5 @@
 /*****************************************************************************
- * chroma.h: libavutil <-> libvlc conversion routines
+ * chroma.c: libavutil <-> libvlc conversion routines
  *****************************************************************************
  * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
@@ -21,6 +21,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 021100301, USA.
  *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#include <vlc_common.h>
+#include <vlc_codec.h>
+
+#ifdef HAVE_LIBAVCODEC_AVCODEC_H
+#   include <libavcodec/avcodec.h>
+#elif defined(HAVE_FFMPEG_AVCODEC_H)
+#   include <ffmpeg/avcodec.h>
+#else
+#   include <avcodec.h>
+#endif
+#include "avcodec.h"
 
 /*****************************************************************************
  * Chroma fourcc -> ffmpeg_id mapping
@@ -101,7 +117,7 @@ static const struct
     { 0, 0, 0, 0, 0 }
 };
 
-static inline int TestFfmpegChroma( const int i_ffmpeg_id, const vlc_fourcc_t i_vlc_fourcc )
+int TestFfmpegChroma( const int i_ffmpeg_id, const vlc_fourcc_t i_vlc_fourcc )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
@@ -112,7 +128,7 @@ static inline int TestFfmpegChroma( const int i_ffmpeg_id, const vlc_fourcc_t i_
 }
 
 /* FIXME special case the RGB formats */
-static inline int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fmt )
+int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fmt )
 {
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
@@ -130,7 +146,7 @@ static inline int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fm
     return VLC_EGENERIC;
 }
 
-static inline int GetVlcChroma( video_format_t *fmt, const int i_ffmpeg_chroma )
+int GetVlcChroma( video_format_t *fmt, const int i_ffmpeg_chroma )
 {
     /* TODO FIXME for rgb format we HAVE to set rgb mask/shift */
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )

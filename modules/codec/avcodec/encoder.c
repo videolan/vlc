@@ -50,7 +50,6 @@
 #endif
 
 #include "avcodec.h"
-#include "chroma.h"
 
 #define HURRY_UP_GUARD1 (450000)
 #define HURRY_UP_GUARD2 (300000)

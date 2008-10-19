@@ -44,7 +44,6 @@
 #endif
 
 #include "avcodec.h"
-#include "chroma.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
