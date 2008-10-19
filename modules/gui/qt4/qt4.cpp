@@ -263,8 +263,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Access to the playlist */
     p_intf->p_sys->p_playlist = pl_Hold( p_intf );
-    /* Listen to the messages */
-    //p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, NULL, NULL );
     /* one settings to rule them all */
 
     var_Create( p_this, "window_widget", VLC_VAR_ADDRESS );
@@ -298,7 +296,6 @@ static void Close( vlc_object_t *p_this )
     }
 
     vlc_object_release( p_intf->p_sys->p_playlist );
-    //msg_Unsubscribe( p_intf->p_sys->p_sub );
     free( p_intf->p_sys );
 }
 

@@ -51,7 +51,7 @@ public:
         instance = NULL;
     }
 
-    virtual ~MessagesDialog(){ writeSettings( "messages" ); };
+    virtual ~MessagesDialog();
 
 private:
     MessagesDialog( intf_thread_t * );
@@ -63,10 +63,13 @@ private:
     QTreeWidget *modulesTree;
     QPushButton *clearUpdateButton;
     QPushButton *saveLogButton;
+    msg_subscription_t *sub;
+    msg_cb_data_t *cb_data;
+    static void sinkMessage (msg_cb_data_t *, msg_item_t *, unsigned);
+    void sinkMessage (msg_item_t *item, unsigned);
 
 private slots:
     void updateTab( int );
-    void updateLog();
     void clearOrUpdate();
     bool save();
 private:

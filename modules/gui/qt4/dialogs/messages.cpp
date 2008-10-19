@@ -39,8 +39,15 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QHeaderView>
+#include <QMutex>
 
 MessagesDialog *MessagesDialog::instance = NULL;
+
+struct msg_cb_data_t
+{
+    MessagesDialog *self;
+    QMutex          lock; /**< protects MessagesDialog::messages */
+};
 
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                : QVLCFrame( _p_intf )
@@ -64,7 +71,6 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     msgLayout->addWidget( messages, 0, 0, 1, 0 );
     mainTab->addTab( msgWidget, qtr( "Messages" ) );
-    //    ON_TIMEOUT( updateLog() );
 
 
     /* Modules tree */
@@ -109,7 +115,20 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     /* General action */
     readSettings( "Messages", QSize( 600, 450 ) );
+
+
+    /* Hook up to LibVLC messaging */
+    cb_data = new msg_cb_data_t;
+    cb_data->self = this;
+    sub = msg_Subscribe (_p_intf->p_libvlc, sinkMessage, cb_data);
 }
+
+MessagesDialog::~MessagesDialog ()
+{
+    writeSettings( "messages" );
+    msg_Unsubscribe (sub);
+    delete cb_data;
+};
 
 void MessagesDialog::updateTab( int index )
 {
@@ -132,72 +151,53 @@ void MessagesDialog::updateTab( int index )
     }
 }
 
-void MessagesDialog::updateLog()
+void MessagesDialog::sinkMessage (msg_cb_data_t *data, msg_item_t *item,
+                                  unsigned overruns)
 {
-#if 0
-    msg_subscription_t *p_sub = p_intf->p_sys->p_sub;
-    int i_start;
+    MessagesDialog *self = data->self;
+    QMutexLocker locker (&data->lock);
 
-    vlc_mutex_lock( p_sub->p_lock );
-    int i_stop = *p_sub->pi_stop;
-    vlc_mutex_unlock( p_sub->p_lock );
+    self->sinkMessage (item, overruns);
+}
 
-    if( p_sub->i_start != i_stop )
+void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
+{
+    if ((item->i_type == VLC_MSG_WARN && verbosityBox->value() < 1)
+     || (item->i_type == VLC_MSG_DBG && verbosityBox->value() < 2 ))
+        return;
+
+    messages->textCursor().movePosition( QTextCursor::End );
+    messages->setFontItalic( true );
+    messages->setTextColor( "darkBlue" );
+    messages->insertPlainText( qfu( item->psz_module ) );
+
+    switch (item->i_type)
     {
-        messages->textCursor().movePosition( QTextCursor::End );
-
-        for( i_start = p_sub->i_start;
-                i_start != i_stop;
-                i_start = (i_start+1) % VLC_MSG_QSIZE )
-        {
-            if( p_sub->p_msg[i_start].i_type == VLC_MSG_INFO ||
-                p_sub->p_msg[i_start].i_type == VLC_MSG_ERR ||
-                p_sub->p_msg[i_start].i_type == VLC_MSG_WARN &&
-                    verbosityBox->value() >= 1 ||
-                p_sub->p_msg[i_start].i_type == VLC_MSG_DBG &&
-                    verbosityBox->value() >= 2 )
-            {
-                messages->setFontItalic( true );
-                messages->setTextColor( "darkBlue" );
-                messages->insertPlainText( qfu( p_sub->p_msg[i_start].psz_module ) );
-            }
-            else
-                continue;
-
-            switch( p_sub->p_msg[i_start].i_type )
-            {
-                case VLC_MSG_INFO:
-                    messages->setTextColor( "blue" );
-                    messages->insertPlainText( " info: " );
-                    break;
-                case VLC_MSG_ERR:
-                    messages->setTextColor( "red" );
-                    messages->insertPlainText( " error: " );
-                    break;
-                case VLC_MSG_WARN:
-                    messages->setTextColor( "green" );
-                    messages->insertPlainText( " warning: " );
-                    break;
-                case VLC_MSG_DBG:
-                default:
-                    messages->setTextColor( "grey" );
-                    messages->insertPlainText( " debug: " );
-                    break;
-            }
-
-            /* Add message Regular black Font */
-            messages->setFontItalic( false );
-            messages->setTextColor( "black" );
-            messages->insertPlainText( qfu(p_sub->p_msg[i_start].psz_msg) );
-            messages->insertPlainText( "\n" );
-        }
-        messages->ensureCursorVisible();
-
-        vlc_mutex_lock( p_sub->p_lock );
-        p_sub->i_start = i_start;
-        vlc_mutex_unlock( p_sub->p_lock );
+        case VLC_MSG_INFO:
+            messages->setTextColor( "blue" );
+            messages->insertPlainText( " info: " );
+            break;
+        case VLC_MSG_ERR:
+            messages->setTextColor( "red" );
+            messages->insertPlainText( " error: " );
+            break;
+        case VLC_MSG_WARN:
+            messages->setTextColor( "green" );
+            messages->insertPlainText( " warning: " );
+            break;
+        case VLC_MSG_DBG:
+        default:
+            messages->setTextColor( "grey" );
+            messages->insertPlainText( " debug: " );
+            break;
     }
-#endif
+
+    /* Add message Regular black Font */
+    messages->setFontItalic( false );
+    messages->setTextColor( "black" );
+    messages->insertPlainText( qfu(item->psz_msg) );
+    messages->insertPlainText( "\n" );
+    messages->ensureCursorVisible();
 }
 
 void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
@@ -242,6 +242,7 @@ void MessagesDialog::updateTree()
 
 void MessagesDialog::clear()
 {
+    QMutexLocker locker (&cb_data->lock);
     messages->clear();
 }
 
@@ -264,6 +265,7 @@ bool MessagesDialog::save()
         }
 
         QTextStream out( &file );
+        QMutexLocker locker (&cb_data->lock);
         out << messages->toPlainText() << "\n";
 
         return true;
