@@ -39,6 +39,7 @@
 #include "dialogs/extended.hpp"
 #include "dialogs/playlist.hpp"
 #include "menus.hpp"
+#include "recents.hpp"
 
 #include <QMenuBar>
 #include <QCloseEvent>
@@ -132,9 +133,12 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Menu Bar and Status Bar
      **************************/
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
+    
     /* StatusBar Creation */
     createStatusBar();
 
+    /* Recents menu updates */
+    CONNECT( RecentsMRL::getInstance( p_intf ), updated(), this, updateRecentsMenu() ); 
 
     /********************
      * Input Manager    *
@@ -1046,6 +1050,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: 0),
                           PLAYLIST_END, true, false );
             first = false;
+            RecentsMRL::getInstance( p_intf )->addRecent( s );
         }
      }
      event->acceptProposedAction();
@@ -1177,4 +1182,13 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
 
     /* Show event */
      return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * updateRecentsMenu: event called by RecentsMRL
+ *****************************************************************************/
+
+void MainInterface::updateRecentsMenu()
+{
+    QVLCMenu::updateRecents( p_intf );
 }

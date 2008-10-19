@@ -28,6 +28,8 @@
 
 #include "dialogs/open.hpp"
 
+#include "recents.hpp"
+
 #include <QTabWidget>
 #include <QGridLayout>
 #include <QRegExp>
@@ -337,6 +339,9 @@ void OpenDialog::finish( bool b_enqueue = false )
                 PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
                 PLAYLIST_END, b_pl ? true : false, pl_Unlocked );
             vlc_gc_decref( p_input );
+
+            /* Do not add the current MRL if playlist_AddInput fail */
+            RecentsMRL::getInstance( p_intf )->addRecent( tempMRL[i] );
         }
     }
     else

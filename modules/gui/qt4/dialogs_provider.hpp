@@ -133,6 +133,7 @@ public slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject * );
     void SDMenuAction( QString );
+    void playMRL( const QString & );
 
     void playlistDialog();
     void bookmarksDialog();

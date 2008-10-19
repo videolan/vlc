@@ -37,6 +37,7 @@
 #include "menus.hpp"
 #include <vlc_intf_strings.h>
 #include "input_manager.hpp"
+#include "recents.hpp"
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
@@ -389,6 +390,8 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
                          : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
                       PLAYLIST_END,
                       pl ? true : false, false );
+        RecentsMRL::getInstance( p_intf )->addRecent(
+                toNativeSeparators( file ) );
         i++;
     }
 }
@@ -420,17 +423,17 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 
     if (!dir.isEmpty() )
     {
+        QString mrl = dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive )
+            ? "dvd://" : "directory://" + toNativeSeparators( dir );
         msg_Dbg( p_intf, "Directory opening: %s", qtu( dir ) );
-        input_item_t *p_input = input_item_NewExt( THEPL, qtu(
-                dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive ) ? "dvd://"
-                                                                :"directory://"
-                                          + toNativeSeparators(dir) ),
+        input_item_t *p_input = input_item_NewExt( THEPL, qtu( mrl ),
                               NULL, 0, NULL, -1 );
 
         /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( THEPL, p_input,
                        go ? ( PLAYLIST_APPEND | PLAYLIST_GO ) : PLAYLIST_APPEND,
                        PLAYLIST_END, pl, pl_Unlocked );
+        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
         if( !go )
             input_Read( THEPL, p_input, true );
         vlc_gc_decref( p_input );
@@ -529,6 +532,7 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
                         -1, &psz_option, 1, true, pl_Unlocked );
+        RecentsMRL::getInstance( p_intf )->addRecent( mrl );
     }
 }
 
@@ -640,4 +644,18 @@ void DialogsProvider::loadSubtitlesFile()
             msg_Warn( p_intf, "unable to load subtitles from '%s'",
                       qtu( qsFile ) );
     }
+}
+
+/**
+ * Play the MRL contained in the Recently played menu.
+ **/
+void DialogsProvider::playMRL( const QString &mrl )
+{
+    input_item_t *p_input = input_item_New( p_intf, 
+            qtu( mrl ), NULL );
+    playlist_AddInput( THEPL, p_input, PLAYLIST_GO,
+            PLAYLIST_END, true, pl_Unlocked );
+    vlc_gc_decref( p_input );
+
+    RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 }

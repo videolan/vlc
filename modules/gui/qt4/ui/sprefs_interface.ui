@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>629</width>
-    <height>576</height>
+    <width>654</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="sizePolicy" >
@@ -276,9 +276,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="QComboBox" name="artFetcher" />
-      </item>
       <item row="1" column="0" >
        <widget class="QCheckBox" name="updatesBox" >
         <property name="text" >
@@ -295,6 +292,43 @@
          <string> days</string>
         </property>
        </widget>
+      </item>
+      <item row="2" column="0" >
+       <widget class="QCheckBox" name="saveRecentlyPlayed" >
+        <property name="text" >
+         <string>_("Save recently played items")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2" >
+       <widget class="QComboBox" name="artFetcher" />
+      </item>
+      <item row="2" column="1" colspan="2" >
+       <layout class="QHBoxLayout" name="horizontalLayout" >
+        <item>
+         <widget class="QLabel" name="label_2" >
+          <property name="text" >
+           <string>_("Filter")</string>
+          </property>
+          <property name="alignment" >
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="recentlyPlayedFilters" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="toolTip" >
+           <string>_("Separate words by | (without space)")</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

@@ -38,6 +38,7 @@
 #include <QToolButton>
 #include <QButtonGroup>
 #include <QVBoxLayout>
+#include <QSettings>
 
 #include <QtAlgorithms>
 
@@ -511,6 +512,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #else
             ui.OneInterfaceBox->hide();
 #endif
+            /* RECENTLY PLAYED options */
+            CONNECT( ui.saveRecentlyPlayed, toggled( bool ),
+                     ui.recentlyPlayedFilters, setEnabled( bool ) );
+            ui.recentlyPlayedFilters->setEnabled( false );
+            CONFIG_GENERIC( "qt-recentplay", Bool, NULL, saveRecentlyPlayed );
+            CONFIG_GENERIC( "qt-recentplay-filter", String, NULL,
+                    recentlyPlayedFilters );
+
         END_SPREFS_CAT;
 
         START_SPREFS_CAT( Subtitles, qtr("Subtitles & On Screen Display Settings") );

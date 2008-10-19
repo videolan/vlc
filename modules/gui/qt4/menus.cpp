@@ -39,6 +39,7 @@
 #include "menus.hpp"
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
+#include "recents.hpp"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -46,6 +47,7 @@
 #include <QActionGroup>
 #include <QSignalMapper>
 #include <QSystemTrayIcon>
+#include <QList>
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
@@ -75,6 +77,8 @@ static QActionGroup *currentGroup;
 /* HACK for minimalView to go around a Qt bug/feature
  * that doesn't update the QAction checked state when QMenu is hidden */
 QAction *QVLCMenu::minimalViewAction = NULL;
+
+QMenu *QVLCMenu::recentsMenu = NULL;
 
 // Add static entries to menus
 void addDPStaticEntry( QMenu *menu,
@@ -273,7 +277,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
        gives the QProcess::destroyed timeout issue on Cleanlooks style with
        setDesktopAware set to false */
     QMenuBar *bar = mi->menuBar();
-    BAR_ADD( FileMenu(), qtr( "&Media" ) );
+    BAR_ADD( FileMenu( p_intf ), qtr( "&Media" ) );
 
     BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
@@ -292,7 +296,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *QVLCMenu::FileMenu()
+QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
 
@@ -313,6 +317,9 @@ QMenu *QVLCMenu::FileMenu()
     addDPStaticEntry( menu, qtr( "Open &Capture Device..." ), "",
         ":/capture-card", SLOT( openCaptureDialog() ),
         "Ctrl+C" );
+    recentsMenu = new QMenu( qtr( "Recently played" ), menu );
+    updateRecents( p_intf );
+    menu->addMenu( recentsMenu );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "", "",
@@ -1290,3 +1297,37 @@ void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
     var_Set( p_object, itemData->psz_var, itemData->val );
 }
 
+void QVLCMenu::updateRecents( intf_thread_t *p_intf )
+{
+    if (recentsMenu)
+    {
+        QAction* action;
+        RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
+        QList<QString> l = rmrl->recents();
+
+        recentsMenu->clear();
+        if( !l.size() )
+        {
+            action = recentsMenu->addAction( " - Empty - " );
+            action->setEnabled( false );
+        }
+        else
+        {
+            for( int i = 0; i < l.size(); ++i )
+            {
+                action = recentsMenu->addAction( l.at( i ),
+                        rmrl->signalMapper,
+                        SLOT( map() ) );
+                rmrl->signalMapper->setMapping( action, l.at( i ) );
+            }
+
+            CONNECT( rmrl->signalMapper,
+                     mapped(const QString & ),
+                     DialogsProvider::getInstance( p_intf ),
+                     playMRL( const QString & ) );
+
+            recentsMenu->addSeparator();
+            recentsMenu->addAction( "Clear", rmrl, SLOT( clear() ) );
+        }
+    }
+}

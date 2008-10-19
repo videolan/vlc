@@ -76,7 +76,7 @@ public:
     static void createMenuBar( MainInterface *mi, intf_thread_t *, bool );
 
     /* Menus */
-    static QMenu *FileMenu();
+    static QMenu *FileMenu( intf_thread_t * );
     static QMenu *SDMenu( intf_thread_t * );
     static QMenu *PlaylistMenu( intf_thread_t *, MainInterface * );
     static QMenu *ToolsMenu( intf_thread_t *, QMenu *, MainInterface *,
@@ -115,6 +115,9 @@ private:
     static void UpdateItem( intf_thread_t *, QMenu *, const char *,
                             vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
+    static QMenu *recentsMenu;
+public slots:
+    static void updateRecents( intf_thread_t * ); 
 };
 
 class MenuFunc : public QObject

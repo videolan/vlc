@@ -175,6 +175,7 @@ private slots:
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
     void showSpeedMenu( QPoint );
+    void updateRecentsMenu();
 signals:
     void askReleaseVideo( void * );
     void askVideoToResize( unsigned int, unsigned int );
