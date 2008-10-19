@@ -46,8 +46,7 @@ static const struct
     vlc_fourcc_t  i_fourcc;
     int  i_codec;
     int  i_cat;
-    const char psz_name[40];
-
+    const char psz_name[36];
 } codecs_table[] =
 {
     /*
@@ -591,9 +590,9 @@ static const struct
 
     /* Screen Capture Video Codecs */
     { VLC_FOURCC('t','s','c','c'), CODEC_ID_TSCC,
-      VIDEO_ES, "TechSmith Camtasia Screen Capture Video" },
+      VIDEO_ES, "TechSmith Camtasia Screen Capture" },
     { VLC_FOURCC('T','S','C','C'), CODEC_ID_TSCC,
-      VIDEO_ES, "TechSmith Camtasia Screen Capture Video" },
+      VIDEO_ES, "TechSmith Camtasia Screen Capture" },
 
     { VLC_FOURCC('C','S','C','D'), CODEC_ID_CSCD,
       VIDEO_ES, "CamStudio Screen Codec" },
