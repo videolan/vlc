@@ -505,7 +505,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         if( ( i64 = p_sys->i_stream_size ) > 0 )
         {
             pf = (double*) va_arg( args, double* );
-            *pf = (double)stream_Tell( p_demux->s ) / (double) i64;
+            *pf = ((double)1.0) * stream_Tell( p_demux->s ) / (double) i64;
             return VLC_SUCCESS;
         }
         return VLC_EGENERIC;
