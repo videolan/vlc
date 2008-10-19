@@ -13,4 +13,5 @@ Cflags: -I${includedir} -I${includedir}/vlc/plugins \
 	@DEFS_BIGENDIAN@ \
 	-D_REENTRANT \
 	-D_THREAD_SAFE
-Libs: -L${libdir} -lvlccore
+# Plugins should link against an _already_ loaded LibVLC.
+#Libs: -L${libdir} -lvlccore
