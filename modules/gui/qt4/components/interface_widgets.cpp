@@ -106,13 +106,10 @@ void VideoWidget::paintEvent(QPaintEvent *ev)
 #endif
 }
 
-/* Kill the vout at Destruction */
 VideoWidget::~VideoWidget()
 {
-    if( !p_vout )
-        return;
-    if( vout_Control( p_vout, VOUT_CLOSE ) != VLC_SUCCESS )
-        vout_Control( p_vout, VOUT_REPARENT );
+    /* Ensure we are not leaking the video output. This would crash. */
+    assert( !p_vout );
 }
 
 /**
