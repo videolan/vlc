@@ -352,11 +352,7 @@ static void *Init( vlc_object_t *obj )
 #endif
 
     /* Start the QApplication here */
-#ifdef WIN32
-    WinQtApp *app = new WinQtApp( argc, argv , true );
-#else
-    QApplication *app = new QApplication( argc, argv , true );
-#endif
+    QVLCApp *app = new QVLCApp( argc, argv , true );
     p_intf->p_sys->p_app = app;
 
     p_intf->p_sys->mainSettings = new QSettings(

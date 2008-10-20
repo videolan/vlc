@@ -30,6 +30,10 @@
 
 class QVLCApp : public QApplication
 {
+public:
+    QVLCApp( int & argc, char ** argv, bool GUIenabled ) : QApplication( argc,
+            argv, GUIenabled ) {}
+
 #if defined(Q_WS_WIN)
 protected:
     virtual bool winEventFilter( MSG *msg, long *result )
