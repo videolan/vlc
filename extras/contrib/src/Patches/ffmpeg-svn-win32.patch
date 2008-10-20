@@ -1,13 +1,13 @@
 Index: configure
 ===================================================================
---- configure	(revision 15611)
+--- configure	(revision 15654)
 +++ configure	(working copy)
-@@ -1149,7 +1149,7 @@
+@@ -1141,7 +1141,7 @@
+ TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
  TMPSH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.sh"
  
- check_cflags -fasm
 -check_cflags -std=c99
-+# check_cflags -std=c99
++#check_cflags -std=c99
  
  case "$arch" in
      i386|i486|i586|i686|i86pc|BePC)
