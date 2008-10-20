@@ -61,8 +61,6 @@
 
   A QSignalMapper decides when to rebuild those menus cf MenuFunc in the .hpp
   Just before one of those menus are aboutToShow(), they are rebuild.
-
-
   */
 
 enum
@@ -80,7 +78,11 @@ QAction *QVLCMenu::minimalViewAction = NULL;
 
 QMenu *QVLCMenu::recentsMenu = NULL;
 
-// Add static entries to menus
+/****************************************************************************
+ * Menu code helpers:
+ ****************************************************************************
+ * Add static entries to DP in menus
+ ***************************************************************************/
 void addDPStaticEntry( QMenu *menu,
                        const QString text,
                        const char *help,
@@ -107,28 +109,9 @@ void addDPStaticEntry( QMenu *menu,
     action->setData( "_static_" );
 }
 
-void addMIMStaticEntry( intf_thread_t *p_intf,
-                        QMenu *menu,
-                        const QString text,
-                        const char *help,
-                        const char *icon,
-                        const char *member )
-{
-    if( strlen( icon ) > 0 )
-    {
-        QAction *action = menu->addAction( text, THEMIM,  member );
-        action->setIcon( QIcon( icon ) );
-    }
-    else
-    {
-        menu->addAction( text, THEMIM, member );
-    }
-}
-
 void EnableDPStaticEntries( QMenu *menu, bool enable = true )
 {
-    if( !menu )
-        return;
+    if( !menu ) return;
 
     QAction *action;
     foreach( action, menu->actions() )
@@ -153,6 +136,27 @@ int DeleteNonStaticEntries( QMenu *menu )
             delete action;
         else
             i_ret++;
+    }
+}
+
+/***
+ * Same for MIM
+ ***/
+void addMIMStaticEntry( intf_thread_t *p_intf,
+                        QMenu *menu,
+                        const QString text,
+                        const char *help,
+                        const char *icon,
+                        const char *member )
+{
+    if( strlen( icon ) > 0 )
+    {
+        QAction *action = menu->addAction( text, THEMIM,  member );
+        action->setIcon( QIcon( icon ) );
+    }
+    else
+    {
+        menu->addAction( text, THEMIM, member );
     }
 }
 
@@ -200,6 +204,7 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
 #endif
     PUSH_VAR( "video-snapshot" );
 
+    /* Special case for postproc */
     if( p_object )
     {
         /* p_object is the vout, so the decoder is our parent and the
@@ -283,9 +288,9 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "P&layback" ), 3 );
 
-    BAR_ADD( PlaylistMenu( p_intf, mi ), qtr( "&Playlist" ) );
-    BAR_ADD( ToolsMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
-             qtr( "&Tools" ) );
+    BAR_ADD( ToolsMenu( p_intf ), qtr( "&Tools" ) );
+    BAR_ADD( ViewMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
+             qtr( "V&iew" ) );
 
     BAR_ADD( HelpMenu( NULL ), qtr( "&Help" ) );
 }
@@ -317,15 +322,16 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
     addDPStaticEntry( menu, qtr( "Open &Capture Device..." ), "",
         ":/capture-card", SLOT( openCaptureDialog() ),
         "Ctrl+C" );
+
     recentsMenu = new QMenu( qtr( "Recently played" ), menu );
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "", "",
-        SLOT( openThenTranscodingDialogs() ), "Ctrl+R" );
+        SLOT( openAndTranscodingDialogs() ), "Ctrl+R" );
     addDPStaticEntry( menu, qtr( "&Streaming..." ), "",
-        ":/stream", SLOT( openThenStreamingDialogs() ),
+        ":/stream", SLOT( openAndStreamingDialogs() ),
         "Ctrl+S" );
     menu->addSeparator();
 
@@ -335,21 +341,30 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 }
 
 /* Playlist/MediaLibrary Control */
-QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
+QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf )
 {
     QMenu *menu = new QMenu();
-    menu->addMenu( SDMenu( p_intf ) );
-    menu->addAction( QIcon( ":/playlist_menu" ),
-                     qtr( "Show P&laylist" ), mi, SLOT( togglePlaylist() ) );
+
+    addDPStaticEntry( menu, qtr( I_MENU_EXT ), "", ":/settings",
+            SLOT( extendedDialog() ), "Ctrl+E" );
+    addDPStaticEntry( menu, qtr( I_MENU_MSG ), "",
+        ":/messages", SLOT( messagesDialog() ),
+        "Ctrl+M" );
+    addDPStaticEntry( menu, qtr( I_MENU_INFO ) , "", ":/info",
+        SLOT( mediaInfoDialog() ), "Ctrl+I" );
+    addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) , "",
+        ":/info", SLOT( mediaCodecDialog() ), "Ctrl+J" );
+    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","",
+                      SLOT( bookmarksDialog() ), "Ctrl+B" );
+#ifdef ENABLE_VLM
+    addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", "", SLOT( vlmDialog() ),
+        "Ctrl+W" );
+#endif
     menu->addSeparator();
 
-    addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", "", SLOT( openAPlaylist() ),
-        "Ctrl+X" );
-    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", "", SLOT( saveAPlaylist() ),
-        "Ctrl+Y" );
-    /*menu->addSeparator();
-    menu->addAction( qtr( "Undock from Interface" ), mi,
-                     SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
+    addDPStaticEntry( menu, qtr( "&Preferences..." ), "",
+        ":/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
+
     return menu;
 }
 
@@ -359,7 +374,7 @@ QMenu *QVLCMenu::PlaylistMenu( intf_thread_t *p_intf, MainInterface *mi )
  * longer.
  * This menu can be an interface menu but also a right click menu.
  **/
-QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
+QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                             QMenu *current,
                             MainInterface *mi,
                             bool visual_selector_enabled,
@@ -373,8 +388,17 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
                     mi, SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
         act->setData( "_static_" );
     }
-    addDPStaticEntry( menu, qtr( I_MENU_EXT ), "", ":/settings",
-            SLOT( extendedDialog() ), "Ctrl+E" );
+    menu->addMenu( SDMenu( p_intf ) );
+    menu->addSeparator();
+
+    addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", "", SLOT( openAPlaylist() ),
+        "Ctrl+X" );
+    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", "", SLOT( saveAPlaylist() ),
+        "Ctrl+Y" );
+    /*menu->addSeparator();
+    menu->addAction( qtr( "Undock from Interface" ), mi,
+                     SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
+
 
     menu->addSeparator();
 
@@ -420,23 +444,6 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf,
 
     menu->addSeparator();
 
-    addDPStaticEntry( menu, qtr( I_MENU_MSG ), "",
-        ":/messages", SLOT( messagesDialog() ),
-        "Ctrl+M" );
-    addDPStaticEntry( menu, qtr( I_MENU_INFO ) , "", ":/info",
-        SLOT( mediaInfoDialog() ), "Ctrl+I" );
-    addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) , "",
-        ":/info", SLOT( mediaCodecDialog() ), "Ctrl+J" );
-    addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ), "","",
-                      SLOT( bookmarksDialog() ), "Ctrl+B" );
-#ifdef ENABLE_VLM
-    addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", "", SLOT( vlmDialog() ),
-        "Ctrl+W" );
-#endif
-
-    menu->addSeparator();
-    addDPStaticEntry( menu, qtr( "&Preferences..." ), "",
-        ":/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
     return menu;
 }
 

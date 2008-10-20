@@ -78,8 +78,8 @@ public:
     /* Menus */
     static QMenu *FileMenu( intf_thread_t * );
     static QMenu *SDMenu( intf_thread_t * );
-    static QMenu *PlaylistMenu( intf_thread_t *, MainInterface * );
-    static QMenu *ToolsMenu( intf_thread_t *, QMenu *, MainInterface *,
+    static QMenu *ToolsMenu( intf_thread_t * );
+    static QMenu *ViewMenu( intf_thread_t *, QMenu *, MainInterface *,
                              bool, bool with = true );
     static QMenu *NavigMenu( intf_thread_t *, QMenu * );
     static QMenu *VideoMenu( intf_thread_t *, QMenu * );
