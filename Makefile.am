@@ -886,10 +886,8 @@ endif
 
 #strip exe and main dll
 package-win-common-strip: package-win32-base-debug
-	$(STRIP) "vlc-$(VERSION)/vlc$(EXEEXT)"
-	$(STRIP) "vlc-$(VERSION)/libvlccore$(LIBEXT)"
-	$(STRIP) "vlc-$(VERSION)/libvlc$(LIBEXT)"
-	$(STRIP) "vlc-$(VERSION)/pthreadGC2$(LIBEXT)"
+	for i in "" vlc-$(VERSION)/*$(LIBEXT) ; \
+	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi; done
 if BUILD_MOZILLA
 	$(STRIP) "vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)"
 endif
