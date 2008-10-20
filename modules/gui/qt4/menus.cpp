@@ -1328,11 +1328,6 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
                 rmrl->signalMapper->setMapping( action, l.at( i ) );
             }
 
-            CONNECT( rmrl->signalMapper,
-                     mapped(const QString & ),
-                     DialogsProvider::getInstance( p_intf ),
-                     playMRL( const QString & ) );
-
             recentsMenu->addSeparator();
             recentsMenu->addAction( "Clear", rmrl, SLOT( clear() ) );
         }

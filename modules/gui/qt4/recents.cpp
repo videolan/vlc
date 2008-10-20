@@ -23,6 +23,7 @@
 
 
 #include "recents.hpp"
+#include "dialogs_provider.hpp"
 
 #include <QList>
 #include <QString>
@@ -37,6 +38,10 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 {
     stack = new QList<QString>;
     signalMapper = new QSignalMapper(this);
+    CONNECT( signalMapper,
+            mapped(const QString & ),
+            DialogsProvider::getInstance( p_intf ),
+            playMRL( const QString & ) );
 
     isActive = config_GetInt( p_intf, "qt-recentplay" );
     filter = new QRegExp(
