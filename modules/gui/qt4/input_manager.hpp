@@ -56,11 +56,13 @@ enum {
 
 class IMEvent : public QEvent
 {
-public:
+friend class InputManager;
+    public:
     IMEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
     { i_id = id ; } ;
     virtual ~IMEvent() {};
 
+private:
     int i_id;
 };
 
@@ -79,22 +81,24 @@ public:
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
 
-    QString getName() { return old_name; }
+    QString getName() { return oldName; }
 
 private:
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
     int             i_input_id;
     int             i_old_playing_status;
-    QString         old_name;
+    QString         oldName;
     QString         artUrl;
     int             i_rate;
     bool            b_video;
     mtime_t         timeA, timeB;
 
     void customEvent( QEvent * );
+
     void addCallbacks();
     void delCallbacks();
+
     void UpdateRate();
     void UpdateMeta();
     void UpdateStatus();
@@ -176,19 +180,20 @@ public:
 
 private:
     MainInputManager( intf_thread_t * );
+    static MainInputManager *instance;
+
     void customEvent( QEvent * );
 
     InputManager            *im;
     input_thread_t          *p_input;
-
     intf_thread_t           *p_intf;
-    static MainInputManager *instance;
+
 public slots:
-    bool teletextState();
     void togglePlayPause();
     void stop();
     void next();
     void prev();
+
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();

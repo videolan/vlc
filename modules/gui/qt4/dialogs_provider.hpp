@@ -37,9 +37,6 @@
 #include "dialogs/interaction.hpp"
 #include "dialogs/open.hpp"
 
-#include <QObject>
-#include <QApplication>
-
 #define ADD_FILTER_MEDIA( string )     \
     string += qtr( "Media Files" );    \
     string += " ( ";                   \
@@ -125,14 +122,13 @@ private:
     DialogsProvider( intf_thread_t *);
     intf_thread_t *p_intf;
     static DialogsProvider *instance;
-    void addFromSimple( bool, bool );
     bool b_isDying;
+
+    void openDialog( int );
+    void addFromSimple( bool, bool );
 
 public slots:
     void doInteraction( intf_dialog_args_t * );
-    void menuAction( QObject *);
-    void menuUpdateAction( QObject * );
-    void SDMenuAction( QString );
     void playMRL( const QString & );
 
     void playlistDialog();
@@ -153,13 +149,13 @@ public slots:
     void gotoTimeDialog();
     void podcastConfigureDialog();
 
+    void openFileGenericDialog( intf_dialog_args_t * );
+
     void simpleOpenDialog();
     void simplePLAppendDialog();
     void simpleMLAppendDialog();
 
     void openDialog();
-    void openDialog( int );
-    void openFileGenericDialog( intf_dialog_args_t * );
     void openDiscDialog();
     void openFileDialog();
     void openNetDialog();
@@ -167,14 +163,15 @@ public slots:
 
     void PLAppendDialog();
     void MLAppendDialog();
+
     void PLOpenDir();
     void PLAppendDir();
     void MLAppendDir();
 
     void streamingDialog( QWidget *parent, QString mrl = "",
             bool b_stream = true );
-    void openThenStreamingDialogs();
-    void openThenTranscodingDialogs();
+    void openAndStreamingDialogs();
+    void openAndTranscodingDialogs();
 
     void openAPlaylist();
     void saveAPlaylist();
@@ -182,6 +179,10 @@ public slots:
     void loadSubtitlesFile();
 
     void quit();
+private slots:
+    void menuAction( QObject *);
+    void menuUpdateAction( QObject * );
+    void SDMenuAction( QString );
 };
 
 #endif

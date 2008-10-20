@@ -1085,7 +1085,7 @@ void MainInterface::customEvent( QEvent *event )
     }
 #endif
     /*else */
-    if ( event->type() == SetVideoOnTopEvent_Type )
+    if ( event->type() == (int)SetVideoOnTopEvent_Type )
     {
         SetVideoOnTopQtEvent* p_event = (SetVideoOnTopQtEvent*)event;
         if( p_event->OnTop() )

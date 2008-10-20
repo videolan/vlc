@@ -64,8 +64,8 @@ class VideoWidget;
 class QSettings;
 
 
-#if defined(Q_WS_WIN)
 #include <QApplication>
+#if defined(Q_WS_WIN)
 
 class WinQtApp : public QApplication
 {

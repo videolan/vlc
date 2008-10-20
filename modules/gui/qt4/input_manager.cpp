@@ -66,7 +66,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
                            QObject( parent ), p_intf( _p_intf )
 {
     i_old_playing_status = END_S;
-    old_name     = "";
+    oldName      = "";
     artUrl       = "";
     p_input      = NULL;
     i_rate       = 0;
@@ -95,7 +95,6 @@ void InputManager::setInput( input_thread_t *_p_input )
         emit statusChanged( PLAYING_S );
         UpdateMeta();
         UpdateArt();
-        UpdateSPU();
         UpdateTeletext();
         UpdateNavigation();
         UpdateVout();
@@ -120,7 +119,7 @@ void InputManager::delInput()
         delCallbacks();
         i_old_playing_status = END_S;
         i_input_id = 0;
-        old_name   = "";
+        oldName    = "";
         artUrl     = "";
         b_video    = false;
         timeA      = 0;
@@ -133,7 +132,6 @@ void InputManager::delInput()
         emit voutChanged( false );
         vlc_object_release( p_input );
         p_input = NULL;
-        UpdateSPU();
         UpdateTeletext();
     }
 }
@@ -187,21 +185,21 @@ void InputManager::delCallbacks()
 /* Convert the event from the callbacks in actions */
 void InputManager::customEvent( QEvent *event )
 {
-    int type = event->type();
+    int i_type = event->type();
     IMEvent *ple = static_cast<IMEvent *>(event);
 
-    if ( type != PositionUpdate_Type &&
-         type != ItemChanged_Type &&
-         type != ItemRateChanged_Type &&
-         type != ItemTitleChanged_Type &&
-         type != ItemSpuChanged_Type &&
-         type != ItemTeletextChanged_Type &&
-         type != ItemStateChanged_Type &&
-         type != StatisticsUpdate_Type &&
-         type != InterfaceVoutUpdate_Type )
+    if ( i_type != PositionUpdate_Type &&
+         i_type != ItemChanged_Type &&
+         i_type != ItemRateChanged_Type &&
+         i_type != ItemTitleChanged_Type &&
+         i_type != ItemSpuChanged_Type &&
+         i_type != ItemTeletextChanged_Type &&
+         i_type != ItemStateChanged_Type &&
+         i_type != StatisticsUpdate_Type &&
+         i_type != InterfaceVoutUpdate_Type )
         return;
 
-    if( type == ItemStateChanged_Type )
+    if( i_type == ItemStateChanged_Type )
     {
         UpdateNavigation();
         UpdateTeletext();
@@ -209,23 +207,23 @@ void InputManager::customEvent( QEvent *event )
 
     if( !hasInput() ) return;
 
-    if( ( type != PositionUpdate_Type  &&
-          type != ItemRateChanged_Type &&
-          type != ItemSpuChanged_Type &&
-          type != ItemTeletextChanged_Type &&
-          type != ItemStateChanged_Type &&
-          type != StatisticsUpdate_Type &&
-          type != InterfaceVoutUpdate_Type
+    if( ( i_type != PositionUpdate_Type  &&
+          i_type != ItemRateChanged_Type &&
+          i_type != ItemSpuChanged_Type &&
+          i_type != ItemTeletextChanged_Type &&
+          i_type != ItemStateChanged_Type &&
+          i_type != StatisticsUpdate_Type &&
+          i_type != InterfaceVoutUpdate_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
 
-    if( type != PositionUpdate_Type &&
-        type != StatisticsUpdate_Type )
-        msg_Dbg( p_intf, "New Event: type %i", type );
+    if( i_type != PositionUpdate_Type &&
+        i_type != StatisticsUpdate_Type )
+        msg_Dbg( p_intf, "New Event: type %i", i_type );
 
     /* Actions */
-    switch( type )
+    switch( i_type )
     {
     case PositionUpdate_Type:
         UpdatePosition();
@@ -259,6 +257,8 @@ void InputManager::customEvent( QEvent *event )
     case InterfaceVoutUpdate_Type:
         UpdateVout();
         break;
+    default:
+        msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
     }
 }
 
@@ -289,6 +289,7 @@ void InputManager::UpdateNavigation()
     if( val.i_int > 0 )
     {
         emit titleChanged( true );
+        /* p_input != NULL since val.i_int != 0 */
         val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
         emit chapterChanged( (val.i_int > 0) );
@@ -365,10 +366,10 @@ void InputManager::UpdateMeta()
         free( psz_name );
     }
 
-    if( old_name != text )
+    if( oldName != text )
     {
         emit nameChanged( text );
-        old_name=text;
+        oldName=text;
     }
 }
 
@@ -402,7 +403,8 @@ void InputManager::UpdateVout()
     {
         bool b_old_video = b_video;
 
-        vlc_object_t *p_vout = (vlc_object_t*)vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+        vlc_object_t *p_vout = (vlc_object_t*)vlc_object_find( p_input,
+                                         VLC_OBJECT_VOUT, FIND_CHILD );
         b_video = p_vout != NULL;
         if( p_vout )
             vlc_object_release( p_vout );
@@ -637,7 +639,6 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     p_input = NULL;
     im = new InputManager( this, p_intf );
 
-//    var_AddCallback( THEPL, "item-change", PLItemChanged, this );
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
     var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
@@ -669,7 +670,6 @@ MainInputManager::~MainInputManager()
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
-//    var_DelCallback( THEPL, "item-change", PLItemChanged, this );
 
     var_DelCallback( THEPL, "playlist-current", PLItemChanged, this );
 }
@@ -688,7 +688,7 @@ void MainInputManager::customEvent( QEvent *event )
     }
 
     /* Should be PLItemChanged Event */
-    if( VLC_OBJECT_INTF == p_intf->i_object_type ) /* FIXME: don't use object type */
+    if( !p_intf->p_sys->b_isDialogProvider )
     {
         vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || !vlc_object_alive (p_input) ) )
@@ -751,18 +751,6 @@ void MainInputManager::togglePlayPause()
         getIM()->togglePlayPause();
 }
 
-bool MainInputManager::teletextState()
-{
-    if( getIM()->hasInput() )
-    {
-        const int i_teletext_es = var_GetInteger( getInput(), "teletext-es" );
-        const int i_spu_es = var_GetInteger( getInput(), "spu-es" );
-
-        return i_teletext_es >= 0 && i_teletext_es == i_spu_es;
-    }
-    return false;
-}
-
 /* Static callbacks */
 
 /* IM */
@@ -771,11 +759,12 @@ static int InterfaceChanged( vlc_object_t *p_this, const char *psz_var,
 {
     /* FIXME remove that static variable */
     static int counter = 0;
+
     InputManager *im = (InputManager*)param;
 
     counter = ++counter % 4;
-    if(!counter)
-        return VLC_SUCCESS;
+    if(!counter) return VLC_SUCCESS;
+
     IMEvent *event = new IMEvent( PositionUpdate_Type, 0 );
     QApplication::postEvent( im, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
