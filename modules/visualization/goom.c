@@ -234,7 +234,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_block = block_New( p_sys->p_thread, p_in_buf->i_nb_bytes );
-    if( !p_block ) return;
+    if( !p_block )
+    {
+        vlc_mutex_unlock( &p_sys->p_thread->lock );
+        return;
+    }
     memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
     p_block->i_pts = p_in_buf->start_date;
 
