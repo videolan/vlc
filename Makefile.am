@@ -753,7 +753,7 @@ package-win32-base-debug: package-win-common
 	  fi ; done
 
 # Contrib *.dll's
-	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/"
+	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/" || true
 
 # Copy the lua scripts (HTTP)
 if BUILD_LUA
