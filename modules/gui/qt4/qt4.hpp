@@ -65,6 +65,7 @@ class QSettings;
 
 struct intf_sys_t
 {
+    vlc_thread_t thread;
     QApplication *p_app;
     MainInterface *p_mi;
 
