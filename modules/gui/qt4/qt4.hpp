@@ -1,7 +1,7 @@
 /*****************************************************************************
  * qt4.hpp : QT4 interface
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -62,20 +62,6 @@ class MainInterface;
 class DialogsProvider;
 class VideoWidget;
 class QSettings;
-
-
-#include <QApplication>
-#if defined(Q_WS_WIN)
-
-class WinQtApp : public QApplication
-{
-public:
-    WinQtApp ( int & argc, char ** argv, bool GUIenabled ) : QApplication( argc, argv, GUIenabled ) {}
-    ~WinQtApp() {}
-protected:
-    bool winEventFilter(MSG *msg, long *result);
-};
-#endif /* Q_WS_WIN */
 
 struct intf_sys_t
 {
@@ -161,21 +147,5 @@ static inline QString removeTrailingSlash( QString s )
 }
 
 #define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
-
-class DialogEvent : public QEvent
-{
-public:
-    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
-                 QEvent( (QEvent::Type)(DialogEvent_Type) )
-    {
-        i_dialog = _i_dialog;
-        i_arg = _i_arg;
-        p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() {};
-
-    int i_arg, i_dialog;
-    intf_dialog_args_t *p_arg;
-};
 
 #endif

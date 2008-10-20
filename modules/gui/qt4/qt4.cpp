@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -40,6 +41,7 @@
 #include "main_interface.hpp"
 #include "dialogs/help.hpp" /* update */
 #include "recents.hpp"
+#include "util/qvlcapp.hpp"
 
 #ifdef HAVE_X11_XLIB_H
 #include <X11/Xlib.h>
@@ -231,19 +233,6 @@ vlc_module_begin();
         set_callbacks( WindowOpen, WindowClose );
 #endif
 vlc_module_end();
-
-#if defined(Q_WS_WIN)
-bool WinQtApp::winEventFilter( MSG *msg, long *result )
-{
-    switch( msg->message )
-    {
-        case 0x0319: /* WM_APPCOMMAND 0x0319 */
-        DefWindowProc( msg->hwnd, msg->message, msg->wParam, msg->lParam );
-        break;
-    }
-    return false;
-}
-#endif /* Q_WS_WIN */
 
 /*****************************************************************************
  * Module callbacks

@@ -35,6 +35,7 @@
 #include "menus.hpp"
 #include "input_manager.hpp"
 #include "recents.hpp"
+#include "util/qvlcapp.hpp"
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
