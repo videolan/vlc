@@ -50,7 +50,6 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 RecentsMRL::~RecentsMRL()
 {
     delete stack;
-    delete signalMapper;
 }
 
 void RecentsMRL::addRecent( const QString &mrl )
@@ -58,6 +57,7 @@ void RecentsMRL::addRecent( const QString &mrl )
     if ( !isActive || filter->indexIn( mrl ) >= 0 )
         return;
 
+    msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
     if( stack->contains( mrl ) )
     {
         stack->removeOne( mrl );
@@ -89,11 +89,7 @@ QList<QString> RecentsMRL::recents()
 
 void RecentsMRL::load()
 {
-    QStringList list;
-
-    getSettings()->beginGroup( "RecentsMRL" );
-    list = getSettings()->value( "list" ).toStringList();
-    getSettings()->endGroup();
+    QStringList list = getSettings()->value( "RecentsMRL/list" ).toStringList();
 
     for( int i = 0; i < list.size(); ++i )
     {
@@ -109,7 +105,6 @@ void RecentsMRL::save()
     for( int i = 0; i < stack->size(); ++i )
         list << stack->at(i);
 
-    getSettings()->beginGroup( "RecentsMRL" );
-    getSettings()->setValue( "list", list );
-    getSettings()->endGroup();
+    getSettings()->setValue( "RecentsMRL/list", list );
 }
+
