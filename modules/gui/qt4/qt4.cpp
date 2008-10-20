@@ -445,19 +445,16 @@ static void *Thread( void *obj )
 
     if (p_mi != NULL)
     {
-        msg_Err(p_intf, "locking");
         QMutexLocker locker (&iface.lock);
         p_intf->p_sys->p_mi = NULL;
 
         /* We need to warn to detach from any vout before
          * deleting miP (WindowClose will not be called after it) */
-        msg_Err(p_intf, "releasing");
         p_mi->releaseVideo( NULL );
 
         /* Destroy first the main interface because it is connected to some
            slots in the MainInputManager */
         /* Destroy under the iface lock to sync vout QPointer */
-        msg_Err(p_intf, "destroying");
         delete p_mi;
     }
 
