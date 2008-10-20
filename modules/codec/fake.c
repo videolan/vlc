@@ -169,6 +169,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->p_sys->i_reload = (mtime_t)(val.i_int * 1000000);
         p_dec->p_sys->i_next   = (mtime_t)(p_dec->p_sys->i_reload + mdate());
     }
+    var_AddCallback( p_dec, "fake-file-reload", FakeCallback , p_dec );
 
     psz_chroma = var_CreateGetString( p_dec, "fake-chroma" );
     if( strlen( psz_chroma ) != 4 )
