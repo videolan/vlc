@@ -224,11 +224,9 @@ vlc_module_begin();
 
         set_callbacks( OpenDialogs, Close );
 
-#if !defined (Q_WS_X11) /*|| HAS_QT43*/
     add_submodule();
         set_capability( "vout window", 50 );
         set_callbacks( WindowOpen, WindowClose );
-#endif
 vlc_module_end();
 
 /* Ugly, but the Qt4 interface assumes single instance anyway */
