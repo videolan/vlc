@@ -455,9 +455,8 @@ static void *Thread( void *obj )
         /* Destroy first the main interface because it is connected to some
            slots in the MainInputManager */
         /* Destroy under the iface lock to sync vout QPointer */
-    }
-    msleep( CLOCK_FREQ );
         delete p_mi;
+    }
 
     /* Destroy all remaining windows,
        because some are connected to some slots
@@ -519,9 +518,7 @@ static int WindowOpen (vlc_object_t *obj)
     vout_window_t *wnd = (vout_window_t *)obj;
     QPointer<MainInterface> *miP;
 
-#if 1
     if (config_GetInt (obj, "embedded-video") <= 0)
-#endif
         return VLC_EGENERIC;
 
     intf_thread_t *intf = (intf_thread_t *)
