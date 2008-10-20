@@ -651,7 +651,7 @@ void DialogsProvider::loadSubtitlesFile()
  **/
 void DialogsProvider::playMRL( const QString &mrl )
 {
-    input_item_t *p_input = input_item_New( p_intf, 
+    input_item_t *p_input = input_item_New( p_intf,
             qtu( mrl ), NULL );
     playlist_AddInput( THEPL, p_input, PLAYLIST_GO,
             PLAYLIST_END, true, pl_Unlocked );

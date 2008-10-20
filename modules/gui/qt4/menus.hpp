@@ -117,7 +117,7 @@ private:
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
     static QMenu *recentsMenu;
 public slots:
-    static void updateRecents( intf_thread_t * ); 
+    static void updateRecents( intf_thread_t * );
 };
 
 class MenuFunc : public QObject

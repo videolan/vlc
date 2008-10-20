@@ -37,7 +37,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 {
     stack = new QList<QString>;
     signalMapper = new QSignalMapper(this);
-    
+
     isActive = config_GetInt( p_intf, "qt-recentplay" );
     filter = new QRegExp(
             qfu( config_GetPsz( p_intf, "qt-recentplay-filter" ) ),
@@ -57,7 +57,7 @@ void RecentsMRL::addRecent( const QString &mrl )
 {
     if ( !isActive || filter->indexIn( mrl ) >= 0 )
         return;
-    
+
     if( stack->contains( mrl ) )
     {
         stack->removeOne( mrl );
@@ -90,7 +90,7 @@ QList<QString> RecentsMRL::recents()
 void RecentsMRL::load()
 {
     QStringList list;
-    
+
     getSettings()->beginGroup( "RecentsMRL" );
     list = getSettings()->value( "list" ).toStringList();
     getSettings()->endGroup();

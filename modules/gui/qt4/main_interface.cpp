@@ -133,12 +133,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Menu Bar and Status Bar
      **************************/
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
-    
+
     /* StatusBar Creation */
     createStatusBar();
 
     /* Recents menu updates */
-    CONNECT( RecentsMRL::getInstance( p_intf ), updated(), this, updateRecentsMenu() ); 
+    CONNECT( RecentsMRL::getInstance( p_intf ), updated(),
+             this, updateRecentsMenu() );
 
     /********************
      * Input Manager    *

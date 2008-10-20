@@ -153,7 +153,7 @@ void InputManager::addCallbacks()
     var_AddCallback( p_input, "state", ItemStateChanged, this );
     /* src/input/es-out.c:552 */
     var_AddCallback( p_input, "spu-es", ChangeSPU, this );
-    /* emit UpdateStatus so that main_interface updates controls 
+    /* emit UpdateStatus so that main_interface updates controls
      * if there is new videotracks (mpeg-ts)*/
     var_AddCallback( p_input, "video-es", ItemStateChanged, this );
     /* src/input/es-out.c: */

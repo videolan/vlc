@@ -125,7 +125,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
 
 #define RECENTPLAY_TEXT N_( "Save the recently played items in the menu" )
+
 #define RECENTPLAY_FILTER_TEXT N_( "List of words separated by | to filter" )
+#define RECENTPLAY_FILTER_LONGTEXT N_( "Regular expression used to filter " \
+        "the recent items played in the player" )
 
 #define SLIDERCOL_TEXT N_( "Define the colors of the volume slider " )
 #define SLIDERCOL_LONGTEXT N_( "Define the colors of the volume slider\n" \
@@ -195,6 +198,11 @@ vlc_module_begin();
             change_autosave();
             change_internal();
 
+        add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
+                RECENTPLAY_TEXT, false );
+        add_string( "qt-recentplay-filter", "xxx|porn", NULL,
+                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false );
+
         add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
                   ADVANCED_OPTIONS_LONGTEXT, true );
         add_bool( "qt-advanced-pref", false, NULL, ADVANCED_PREFS_TEXT,
@@ -213,10 +221,6 @@ vlc_module_begin();
 
         add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
                 false );
-        add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
-                RECENTPLAY_TEXT, false );
-        add_string( "qt-recentplay-filter", NULL, NULL,
-                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_TEXT, false );
             change_internal();
 
         set_callbacks( OpenDialogs, Close );

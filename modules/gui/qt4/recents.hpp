@@ -56,7 +56,7 @@ public:
     virtual ~RecentsMRL();
 
     void addRecent( const QString & );
-    QList<QString> recents(); 
+    QList<QString> recents();
     QSignalMapper *signalMapper;
 
 private:

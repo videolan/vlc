@@ -38,7 +38,6 @@
 #include <QToolButton>
 #include <QButtonGroup>
 #include <QVBoxLayout>
-#include <QSettings>
 
 #include <QtAlgorithms>
 
