@@ -225,7 +225,7 @@ vlc_module_begin();
 
         set_callbacks( OpenDialogs, Close );
 
-#if !defined (Q_WS_X11) || HAS_QT43
+#if !defined (Q_WS_X11) /*|| HAS_QT43*/
     add_submodule();
         set_capability( "vout window", 50 );
         set_callbacks( WindowOpen, WindowClose );
@@ -455,8 +455,9 @@ static void *Thread( void *obj )
         /* Destroy first the main interface because it is connected to some
            slots in the MainInputManager */
         /* Destroy under the iface lock to sync vout QPointer */
-        delete p_mi;
     }
+    msleep( CLOCK_FREQ );
+        delete p_mi;
 
     /* Destroy all remaining windows,
        because some are connected to some slots
@@ -518,7 +519,9 @@ static int WindowOpen (vlc_object_t *obj)
     vout_window_t *wnd = (vout_window_t *)obj;
     QPointer<MainInterface> *miP;
 
+#if 1
     if (config_GetInt (obj, "embedded-video") <= 0)
+#endif
         return VLC_EGENERIC;
 
     intf_thread_t *intf = (intf_thread_t *)
