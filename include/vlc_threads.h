@@ -448,4 +448,27 @@ static inline void barrier (void)
 #define vlc_thread_join( P_THIS )                                           \
     __vlc_thread_join( VLC_OBJECT(P_THIS) )
 
+#ifdef __cplusplus
+/**
+ * Helper C++ class to lock a mutex.
+ * The mutex is locked when the object is created, and unlocked when the object
+ * is destroyed.
+ */
+class vlc_mutex_locker
+{
+    private:
+        vlc_mutex_t *lock;
+    public:
+        vlc_mutex_locker (vlc_mutex_t *m) : lock (m)
+        {
+            vlc_mutex_lock (lock);
+        }
+
+        ~vlc_mutex_locker (void)
+        {
+            vlc_mutex_unlock (lock);
+        }
+};
+#endif
+
 #endif /* !_VLC_THREADS_H */
