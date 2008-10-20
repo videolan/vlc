@@ -35,6 +35,9 @@
 struct vout_thread_sys_t
 {
     /* */
+    bool            b_picture_displayed;
+    bool            b_picture_empty;
+    mtime_t         i_picture_displayed_date;
     picture_t       *p_picture_displayed;
     vlc_cond_t      picture_wait;
 

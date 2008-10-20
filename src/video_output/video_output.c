@@ -373,6 +373,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->i_par_num =
     p_vout->p->i_par_den = 1;
     p_vout->p->p_picture_displayed = NULL;
+    p_vout->p->i_picture_displayed_date = 0;
+    p_vout->p->b_picture_displayed = false;
+    p_vout->p->b_picture_empty = false;
 
     /* Initialize locks */
     vlc_mutex_init( &p_vout->picture_lock );
@@ -582,11 +585,15 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
     vlc_object_lock( p_vout );
 
     assert( !p_vout->p->b_paused || !b_paused );
+
+    vlc_mutex_lock( &p_vout->picture_lock );
+
+    p_vout->p->i_picture_displayed_date = 0;
+
     if( p_vout->p->b_paused )
     {
         const mtime_t i_duration = i_date - p_vout->p->i_pause_date;
 
-        vlc_mutex_lock( &p_vout->picture_lock );
         for( int i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             picture_t *p_pic = PP_RENDERPICTURE[i_index];
@@ -598,6 +605,10 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
         vlc_mutex_unlock( &p_vout->picture_lock );
 
         spu_OffsetSubtitleDate( p_vout->p_spu, i_duration );
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_vout->picture_lock );
     }
     p_vout->p->b_paused = b_paused;
     p_vout->p->i_pause_date = i_date;
@@ -619,6 +630,7 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_l
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
+    p_vout->p->i_picture_displayed_date = 0;
     for( int i = 0; i < p_vout->render.i_pictures; i++ )
     {
         picture_t *p_pic = p_vout->render.pp_picture[i];
@@ -679,10 +691,35 @@ void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced )
     for( i_pic = 0; i_pic < p_vout->render.i_pictures; i_pic++ )
     {
         picture_t *p_pic = p_vout->render.pp_picture[i_pic];
+
+        msg_Dbg( p_vout, "[%d] %d %d", i_pic, p_pic->i_status, p_pic->i_refcount );
         p_pic->i_refcount = 0;
         vout_UsePictureLocked( p_vout, p_pic );
     }
     vlc_cond_signal( &p_vout->p->picture_wait );
+    vlc_mutex_unlock( &p_vout->picture_lock );
+}
+void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration )
+{
+    vlc_mutex_lock( &p_vout->picture_lock );
+
+    const mtime_t i_displayed_date = p_vout->p->i_picture_displayed_date;
+
+    p_vout->p->b_picture_displayed = false;
+    p_vout->p->b_picture_empty = false;
+    if( p_vout->p->p_picture_displayed )
+    {
+        p_vout->p->p_picture_displayed->date = 1;
+        vlc_cond_signal( &p_vout->p->picture_wait );
+    }
+
+    while( !p_vout->p->b_picture_displayed && !p_vout->p->b_picture_empty )
+        vlc_cond_wait( &p_vout->p->picture_wait, &p_vout->picture_lock );
+
+    *pi_duration = __MAX( p_vout->p->i_picture_displayed_date - i_displayed_date, 0 );
+
+    /* TODO advance subpicture by the duration ... */
+
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
@@ -975,7 +1012,15 @@ static void* RunThread( vlc_object_t *p_this )
             }
         }
         if( !p_picture )
+        {
             p_picture = p_last;
+
+            if( !p_vout->p->b_picture_empty )
+            {
+                p_vout->p->b_picture_empty = true;
+                vlc_cond_signal( &p_vout->p->picture_wait );
+            }
+        }
 
         display_date = 0;
         if( p_picture )
@@ -992,7 +1037,7 @@ static void* RunThread( vlc_object_t *p_this )
             /* Compute FPS rate */
             p_vout->p->p_fps_sample[ p_vout->p->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 
-            if( display_date > current_date + VOUT_DISPLAY_DELAY )
+            if( display_date > current_date + VOUT_DISPLAY_DELAY && !p_vout->p->b_paused )
             {
                 /* A picture is ready to be rendered, but its rendering date
                  * is far from the current one so the thread will perform an
@@ -1018,7 +1063,18 @@ static void* RunThread( vlc_object_t *p_this )
                 }
             }
             if( p_picture )
+            {
+                if( p_picture->date > 1 )
+                {
+                    p_vout->p->i_picture_displayed_date = p_picture->date;
+                    if( p_picture != p_last && !p_vout->p->b_picture_displayed )
+                    {
+                        p_vout->p->b_picture_displayed = true;
+                        vlc_cond_signal( &p_vout->p->picture_wait );
+                    }
+                }
                 p_vout->p->p_picture_displayed = p_picture;
+            }
         }
         vlc_mutex_unlock( &p_vout->picture_lock );
 

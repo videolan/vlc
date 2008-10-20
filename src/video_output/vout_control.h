@@ -68,5 +68,10 @@ void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced );
  */
 void vout_DropPicture( vout_thread_t *p_vout, picture_t * );
 
+/**
+ * This function will force to display the next picture while paused
+ */
+void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
+
 #endif
 
