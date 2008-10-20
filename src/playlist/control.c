@@ -61,8 +61,9 @@ void __pl_Release( vlc_object_t *p_this )
     playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
     assert( pl != NULL );
 
-    assert( VLC_OBJECT(pl) != p_this /* The rule is that pl_Release() should act on
-    the same object than pl_Hold() */ );
+    /* The rule is that pl_Release() should act on
+       the same object than pl_Hold() */
+    assert( VLC_OBJECT(pl) != p_this);
 
     vlc_object_release( pl );
 }
