@@ -83,4 +83,10 @@ int input_DecoderGetCcState( decoder_t *, bool *pb_decode, int i_channel );
  */
 void input_DecoderIsCcPresent( decoder_t *, bool pb_present[4] );
 
+/**
+ * This function force the display of the next picture and fills the stream
+ * time consumed.
+ */
+void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration );
+
 #endif
