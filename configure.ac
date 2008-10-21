@@ -2362,6 +2362,20 @@ then
   CPPFLAGS="${CPPFLAGS_save}"
 fi
 
+dnl
+dnl libv4l2 support for video4linux.
+dnl
+AC_ARG_ENABLE( libv4l2,
+  [  --enable-libv4l2        Libv4l2 Video4Linux2 support (default enabled)])
+if test "${enable_libv4l2}" != "no" -a "${enable_v4l2}" != "no"
+then
+    PKG_CHECK_MODULES( LIBV4L2, libv4l2, [
+      VLC_ADD_LDFLAGS([v4l2],[${LIBV4L2_LIBS}])
+      VLC_ADD_CFLAGS([v4l2],[${LIBV4L2_CFLAGS}])
+      AC_DEFINE(HAVE_LIBV4L2, 1, Define if libv4l is available)],
+      AC_MSG_WARN([LibV4L2 support disabled because libv4l2 development headers were not found])
+    )
+fi
 
 dnl
 dnl  special access module for Hauppauge PVR cards

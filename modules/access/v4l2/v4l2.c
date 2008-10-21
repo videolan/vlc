@@ -67,6 +67,18 @@
 
 #include <poll.h>
 
+#ifdef HAVE_LIBV4L2
+#   include <libv4l2.h>
+#else
+#   define v4l2_fd_open(fd, flags) (fd)
+#   define v4l2_close close
+#   define v4l2_dup dup
+#   define v4l2_ioctl ioctl
+#   define v4l2_read read
+#   define v4l2_mmap mmap
+#   define v4l2_munmap munmap
+#endif
+
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
@@ -1108,11 +1120,11 @@ static void DemuxClose( vlc_object_t *p_this )
                 buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                 buf.memory = ( p_sys->io == IO_METHOD_USERPTR ) ?
                     V4L2_MEMORY_USERPTR : V4L2_MEMORY_MMAP;
-                ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ); /* ignore result */
+                v4l2_ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ); /* ignore result */
             }
 
             buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            if( ioctl( p_sys->i_fd_video, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
+            if( v4l2_ioctl( p_sys->i_fd_video, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
                 msg_Err( p_this, "VIDIOC_STREAMOFF failed" );
             }
 
@@ -1131,7 +1143,7 @@ static void DemuxClose( vlc_object_t *p_this )
         case IO_METHOD_MMAP:
             for( i = 0; i < p_sys->i_nbuffers; ++i )
             {
-                if( munmap( p_sys->p_buffers[i].start, p_sys->p_buffers[i].length ) )
+                if( v4l2_munmap( p_sys->p_buffers[i].start, p_sys->p_buffers[i].length ) )
                 {
                     msg_Err( p_this, "munmap failed" );
                 }
@@ -1155,7 +1167,7 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
 {
     (void)p_this;
     /* Close */
-    if( p_sys->i_fd_video >= 0 ) close( p_sys->i_fd_video );
+    if( p_sys->i_fd_video >= 0 ) v4l2_close( p_sys->i_fd_video );
 #ifdef HAVE_ALSA
     if( p_sys->p_alsa_pcm )
     {
@@ -1350,7 +1362,7 @@ static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len
         return -1;
     }
 
-    i_ret = read( p_sys->i_fd_video, p_buffer, i_len );
+    i_ret = v4l2_read( p_sys->i_fd_video, p_buffer, i_len );
     if( i_ret == 0 )
     {
         p_access->info.b_eof = true;
@@ -1419,7 +1431,7 @@ static block_t* GrabVideo( demux_t *p_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        i_ret = read( p_sys->i_fd_video, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length );
+        i_ret = v4l2_read( p_sys->i_fd_video, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length );
         if( i_ret == -1 )
         {
             switch( errno )
@@ -1446,7 +1458,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         buf.memory = V4L2_MEMORY_MMAP;
 
         /* Wait for next frame */
-        if (ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
+        if (v4l2_ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
         {
             switch( errno )
             {
@@ -1470,7 +1482,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         if( !p_block ) return 0;
 
         /* Unlock */
-        if( ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
+        if( v4l2_ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
             block_Release( p_block );
@@ -1485,7 +1497,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         buf.memory = V4L2_MEMORY_USERPTR;
 
         /* Wait for next frame */
-        if (ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
+        if (v4l2_ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
         {
             switch( errno )
             {
@@ -1518,7 +1530,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         if( !p_block ) return 0;
 
         /* Unlock */
-        if( ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
+        if( v4l2_ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
             block_Release( p_block );
@@ -1703,7 +1715,7 @@ static int InitMmap( demux_t *p_demux, int i_fd )
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_MMAP;
 
-    if( ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
         msg_Err( p_demux, "device does not support mmap i/o" );
         goto open_failed;
@@ -1728,7 +1740,7 @@ static int InitMmap( demux_t *p_demux, int i_fd )
         buf.memory = V4L2_MEMORY_MMAP;
         buf.index = p_sys->i_nbuffers;
 
-        if( ioctl( i_fd, VIDIOC_QUERYBUF, &buf ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_QUERYBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "VIDIOC_QUERYBUF" );
             goto open_failed;
@@ -1736,7 +1748,7 @@ static int InitMmap( demux_t *p_demux, int i_fd )
 
         p_sys->p_buffers[p_sys->i_nbuffers].length = buf.length;
         p_sys->p_buffers[p_sys->i_nbuffers].start =
-            mmap( NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, buf.m.offset );
+            v4l2_mmap( NULL, buf.length, PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, buf.m.offset );
 
         if( p_sys->p_buffers[p_sys->i_nbuffers].start == MAP_FAILED )
         {
@@ -1769,7 +1781,7 @@ static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
     req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     req.memory = V4L2_MEMORY_USERPTR;
 
-    if( ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_REQBUFS, &req ) < 0 )
     {
         msg_Err( p_demux, "device does not support user pointer i/o" );
         return VLC_EGENERIC;
@@ -1825,12 +1837,23 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     enum v4l2_buf_type buf_type;
     char *psz_device = p_sys->psz_vdev;
     es_format_t es_fmt;
+    int libv4l2_fd;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_obj, "cannot open device (%m)" );
         goto open_failed;
     }
+
+    /* Note the v4l2_xxx functions are designed so that if they get passed an
+       unknown fd, the will behave exactly as their regular xxx counterparts,
+       so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
+       custom cam format to normal formats conversion). Chances are big we will
+       still fail then though, as normally v4l2_fd_open only fails if the
+       device is not a v4l2 device. */
+    libv4l2_fd = v4l2_fd_open(i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION);
+    if (libv4l2_fd != -1)
+        i_fd = libv4l2_fd;
 
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
@@ -1845,7 +1868,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         frequency.tuner = p_sys->i_cur_tuner;
         frequency.type = p_sys->p_tuners[p_sys->i_cur_tuner].type;
         frequency.frequency = p_sys->i_frequency / 62.5;
-        if( ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_FREQUENCY, &frequency ) < 0 )
         {
             msg_Err( p_obj, "cannot set tuner frequency (%m)" );
             goto open_failed;
@@ -1865,7 +1888,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         memset( &tuner, 0, sizeof( tuner ) );
         tuner.index = p_sys->i_cur_tuner;
         tuner.audmode = p_sys->i_audio_mode;
-        if( ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_TUNER, &tuner ) < 0 )
         {
             msg_Err( p_obj, "cannot set tuner audio mode (%m)" );
             goto open_failed;
@@ -1877,7 +1900,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     if( p_sys->i_selected_standard_id != V4L2_STD_UNKNOWN )
     {
-        if( ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_STD, &p_sys->i_selected_standard_id ) < 0 )
         {
             msg_Err( p_obj, "cannot set standard (%m)" );
             goto open_failed;
@@ -1893,7 +1916,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         p_sys->i_selected_input = 0;
     }
 
-    if( ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_S_INPUT, &p_sys->i_selected_input ) < 0 )
     {
         msg_Err( p_obj, "cannot set input (%m)" );
         goto open_failed;
@@ -1910,7 +1933,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             p_sys->i_selected_audio_input = 0;
         }
 
-        if( ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_selected_audio_input] ) < 0 )
         {
             msg_Err( p_obj, "cannot set audio input (%m)" );
             goto open_failed;
@@ -1959,11 +1982,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Reset Cropping */
     memset( &cropcap, 0, sizeof(cropcap) );
     cropcap.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if( ioctl( i_fd, VIDIOC_CROPCAP, &cropcap ) >= 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_CROPCAP, &cropcap ) >= 0 )
     {
         crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         crop.c = cropcap.defrect; /* reset to default */
-        if( ioctl( i_fd, VIDIOC_S_CROP, &crop ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_CROP, &crop ) < 0 )
         {
             switch( errno )
             {
@@ -1983,7 +2006,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     if( p_sys->i_width <= 0 || p_sys->i_height <= 0 )
     {
-        if( ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
             msg_Err( p_demux, "Cannot get default width and height." );
             goto open_failed;
@@ -2026,7 +2049,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             }
         }
         /* Try and set user chroma */
-        if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
+        if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
         {
             msg_Warn( p_demux, "Driver is unable to use specified chroma %s. Trying defaults.", p_sys->psz_requested_chroma );
             fmt.fmt.pix.pixelformat = 0;
@@ -2042,7 +2065,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         {
             fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
             if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat )
-             && ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
+             && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
                 break;
         }
         if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
@@ -2087,7 +2110,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     frmival.pixel_format = fmt.fmt.pix.pixelformat;
     frmival.width = p_sys->i_width;
     frmival.height = p_sys->i_height;
-    if( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
     {
         char psz_fourcc[5];
         memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
@@ -2103,7 +2126,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                              frmival.discrete.numerator,
                              frmival.discrete.denominator );
                     frmival.index++;
-                } while( ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 );
+                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 );
                 break;
             case V4L2_FRMIVAL_TYPE_STEPWISE:
                 msg_Dbg( p_demux, "    supported frame intervals: %d/%d to "
@@ -2170,7 +2193,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             buf.memory = V4L2_MEMORY_MMAP;
             buf.index = i;
 
-            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
@@ -2178,7 +2201,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         }
 
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
@@ -2198,7 +2221,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             buf.m.userptr = (unsigned long)p_sys->p_buffers[i].start;
             buf.length = p_sys->p_buffers[i].length;
 
-            if( ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
                 msg_Err( p_demux, "VIDIOC_QBUF failed" );
                 goto open_failed;
@@ -2206,7 +2229,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         }
 
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        if( ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
             msg_Err( p_demux, "VIDIOC_STREAMON failed" );
             goto open_failed;
@@ -2224,7 +2247,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     return i_fd;
 
 open_failed:
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 ) v4l2_close( i_fd );
     return -1;
 
 }
@@ -2543,6 +2566,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     int i_standard;
 
     int i_fd;
+    int libv4l2_fd;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
@@ -2550,9 +2574,19 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         goto open_failed;
     }
 
+    /* Note the v4l2_xxx functions are designed so that if they get passed an
+       unknown fd, the will behave exactly as their regular xxx counterparts,
+       so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
+       custom cam format to normal formats conversion). Chances are big we will
+       still fail then though, as normally v4l2_fd_open only fails if the
+       device is not a v4l2 device. */
+    libv4l2_fd = v4l2_fd_open(i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION);
+    if (libv4l2_fd != -1)
+        i_fd = libv4l2_fd;
+
     /* Get device capabilites */
 
-    if( ioctl( i_fd, VIDIOC_QUERYCAP, &p_sys->dev_cap ) < 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCAP, &p_sys->dev_cap ) < 0 )
     {
         msg_Err( p_obj, "cannot get video capabilities (%m)" );
         goto open_failed;
@@ -2588,7 +2622,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_input t_input;
         t_input.index = 0;
-        while( ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
         {
             p_sys->i_input++;
             t_input.index = p_sys->i_input;
@@ -2601,7 +2635,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         {
             p_sys->p_inputs[i_index].index = i_index;
 
-            if( ioctl( i_fd, VIDIOC_ENUMINPUT, &p_sys->p_inputs[i_index] ) )
+            if( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &p_sys->p_inputs[i_index] ) )
             {
                 msg_Err( p_obj, "cannot get video input characteristics (%m)" );
                 goto open_failed;
@@ -2622,7 +2656,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_standard t_standards;
         t_standards.index = 0;
-        while( ioctl( i_fd, VIDIOC_ENUMSTD, &t_standards ) >=0 )
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &t_standards ) >=0 )
         {
             p_sys->i_standard++;
             t_standards.index = p_sys->i_standard;
@@ -2635,7 +2669,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         {
             p_sys->p_standards[i_standard].index = i_standard;
 
-            if( ioctl( i_fd, VIDIOC_ENUMSTD, &p_sys->p_standards[i_standard] ) )
+            if( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &p_sys->p_standards[i_standard] ) )
             {
                 msg_Err( p_obj, "cannot get video input standards (%m)" );
                 goto open_failed;
@@ -2657,9 +2691,9 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     if( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO )
     {
         while( p_sys->i_audio < 32 &&
-               ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_audio] ) >= 0 )
+               v4l2_ioctl( i_fd, VIDIOC_S_AUDIO, &p_sys->p_audios[p_sys->i_audio] ) >= 0 )
         {
-            if( ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_G_AUDIO, &p_sys->p_audios[ p_sys->i_audio] ) < 0 )
             {
                 msg_Err( p_obj, "cannot get audio input characteristics (%m)" );
                 goto open_failed;
@@ -2685,7 +2719,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_tuner tuner;
         memset( &tuner, 0, sizeof(tuner) );
-        while( ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
+        while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
         {
             p_sys->i_tuner++;
             memset( &tuner, 0, sizeof(tuner) );
@@ -2699,7 +2733,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         {
             p_sys->p_tuners[i_index].index = i_index;
 
-            if( ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
+            if( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &p_sys->p_tuners[i_index] ) )
             {
                 msg_Err( p_obj, "cannot get tuner characteristics (%m)" );
                 goto open_failed;
@@ -2722,7 +2756,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
             struct v4l2_frequency frequency;
             memset( &frequency, 0, sizeof( frequency ) );
-            if( ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_G_FREQUENCY, &frequency ) < 0 )
             {
                 msg_Err( p_obj, "cannot get tuner frequency (%m)" );
                 goto open_failed;
@@ -2747,7 +2781,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         codec.index = i_index;
         codec.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-        while( ioctl( i_fd, VIDIOC_ENUM_FMT, &codec ) >= 0 )
+        while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &codec ) >= 0 )
         {
             i_index++;
             codec.index = i_index;
@@ -2762,7 +2796,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             p_sys->p_codecs[i_index].index = i_index;
             p_sys->p_codecs[i_index].type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-            if( ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FMT, &p_sys->p_codecs[i_index] ) < 0 )
             {
                 msg_Err( p_obj, "cannot get codec description (%m)" );
                 goto open_failed;
@@ -2795,7 +2829,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                     struct v4l2_frmsizeenum frmsize;
                     frmsize.index = 0;
                     frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
-                    if( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
+                    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
                     {
                         /* Not all devices support this ioctl */
                         msg_Warn( p_obj, "Unable to query for frame sizes" );
@@ -2811,7 +2845,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 "    device supports size %dx%d",
                 frmsize.discrete.width, frmsize.discrete.height );
                                     frmsize.index++;
-                                } while( ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
+                                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 );
                                 break;
                             case V4L2_FRMSIZE_TYPE_STEPWISE:
                                 msg_Dbg( p_obj,
@@ -2843,12 +2877,12 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     }
 
 
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 ) v4l2_close( i_fd );
     return true;
 
 open_failed:
 
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 ) v4l2_close( i_fd );
     return false;
 
 }
@@ -3014,7 +3048,7 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
             {
                 querymenu.index = i_mid;
                 querymenu.id = queryctrl.id;
-                if( ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
+                if( v4l2_ioctl( i_fd, VIDIOC_QUERYMENU, &querymenu ) >= 0 )
                 {
                     msg_Dbg( p_obj, "        %d: %s",
                              querymenu.index, querymenu.name );
@@ -3051,7 +3085,7 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
                          queryctrl.default_value );
                 memset( &control, 0, sizeof( control ) );
                 control.id = queryctrl.id;
-                if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
+                if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0 )
                 {
                     msg_Dbg( p_obj, "    current value: %d", control.value );
                 }
@@ -3148,13 +3182,13 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
         var_AddCallback( p_obj, "controls-reset", AccessControlResetCallback, NULL );
 
     queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-    if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
     {
         msg_Dbg( p_obj, "Extended control API supported by v4l2 driver" );
 
         /* List extended controls */
         queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-        while( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+        while( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
             if( queryctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS )
             {
@@ -3192,7 +3226,7 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
              i_cid ++ )
         {
             queryctrl.id = i_cid;
-            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
             {
                 if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                     continue;
@@ -3208,7 +3242,7 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
              i_cid ++ )
         {
             queryctrl.id = i_cid;
-            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
             {
                 if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                     continue;
@@ -3307,11 +3341,11 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
     memset( &queryctrl, 0, sizeof( queryctrl ) );
 
     queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-    if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
     {
         /* Extended control API supported */
         queryctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
-        while( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+        while( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
         {
             if( queryctrl.type == V4L2_CTRL_TYPE_CTRL_CLASS
              || V4L2_CTRL_ID2CLASS( queryctrl.id ) == V4L2_CTRL_CLASS_MPEG )
@@ -3322,7 +3356,7 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
             struct v4l2_control control;
             memset( &control, 0, sizeof( control ) );
             control.id = queryctrl.id;
-            if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+            if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
              && queryctrl.default_value != control.value )
             {
                 int i;
@@ -3345,14 +3379,14 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
              i_cid ++ )
         {
             queryctrl.id = i_cid;
-            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
             {
                 struct v4l2_control control;
                 if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                     continue;
                 memset( &control, 0, sizeof( control ) );
                 control.id = queryctrl.id;
-                if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+                if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
                  && queryctrl.default_value != control.value )
                 {
                     int i;
@@ -3372,14 +3406,14 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
              i_cid ++ )
         {
             queryctrl.id = i_cid;
-            if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) >= 0 )
             {
                 struct v4l2_control control;
                 if( queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
                     continue;
                 memset( &control, 0, sizeof( control ) );
                 control.id = queryctrl.id;
-                if( ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
+                if( v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control ) >= 0
                  && queryctrl.default_value != control.value )
                 {
                     name2var( queryctrl.name );
@@ -3412,7 +3446,7 @@ static int Control( vlc_object_t *p_obj, int i_fd,
 
     queryctrl.id = i_cid;
 
-    if( ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
+    if( v4l2_ioctl( i_fd, VIDIOC_QUERYCTRL, &queryctrl ) < 0
         || queryctrl.flags & V4L2_CTRL_FLAG_DISABLED )
     {
         msg_Dbg( p_obj, "%s (%x) control is not supported.", psz_name, i_cid );
@@ -3433,20 +3467,20 @@ static int Control( vlc_object_t *p_obj, int i_fd,
     if( i_value >= 0 )
     {
         ext_control.value = i_value;
-        if( ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
+        if( v4l2_ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
         {
             control.value = i_value;
-            if( ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
+            if( v4l2_ioctl( i_fd, VIDIOC_S_CTRL, &control ) < 0 )
             {
                 msg_Err( p_obj, "unable to set %s (%x) to %d (%m)",
                          psz_name, i_cid, i_value );
                 return VLC_EGENERIC;
             }
-            i_ret = ioctl( i_fd, VIDIOC_G_CTRL, &control );
+            i_ret = v4l2_ioctl( i_fd, VIDIOC_G_CTRL, &control );
         }
         else
         {
-            i_ret = ioctl( i_fd, VIDIOC_G_EXT_CTRLS, &ext_controls );
+            i_ret = v4l2_ioctl( i_fd, VIDIOC_G_EXT_CTRLS, &ext_controls );
             control.value = ext_control.value;
         }
     }
