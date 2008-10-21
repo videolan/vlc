@@ -268,7 +268,10 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
 
     /* Move the reference point */
     if( cl->b_has_reference )
+    {
+        cl->last.i_system = ClockStreamToSystem( cl, cl->last.i_stream );
         cl->ref = cl->last;
+    }
 
     cl->i_rate = i_rate;
 
