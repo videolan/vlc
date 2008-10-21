@@ -538,15 +538,21 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     *pi_duration = 0;
-    if( p_dec->fmt_in.i_cat != VIDEO_ES )
-        return;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->b_paused && p_owner->p_vout )
+    if( p_dec->fmt_in.i_cat == VIDEO_ES )
     {
-        vout_NextPicture( p_owner->p_vout, pi_duration );
-        p_owner->pause.i_ignore++;
-        vlc_cond_signal( &p_owner->wait );
+        if( p_owner->b_paused && p_owner->p_vout )
+        {
+            vout_NextPicture( p_owner->p_vout, pi_duration );
+            p_owner->pause.i_ignore++;
+            vlc_cond_signal( &p_owner->wait );
+        }
+    }
+    else
+    {
+        /* TODO subtitle should not be flushed */
+        DecoderFlush( p_dec );
     }
     vlc_mutex_unlock( &p_owner->lock );
 }
