@@ -761,7 +761,9 @@ static void *DecoderThread( vlc_object_t *p_this )
                 block_Release( p_block );
             }
             else if( DecoderProcess( p_dec, p_block ) != VLC_SUCCESS )
+            {
                 break;
+            }
         }
     }
 

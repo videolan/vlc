@@ -818,6 +818,7 @@ static int FrameNextCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    VLC_UNUSED(newval);
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_FRAME_NEXT, NULL );
 
