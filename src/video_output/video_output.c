@@ -1557,13 +1557,21 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         psz_filter = realloc( psz_filter, strlen( psz_filter ) +
                               sizeof(":deinterlace") );
-        if( psz_filter && *psz_filter ) strcat( psz_filter, ":" );
-        strcat( psz_filter, "deinterlace" );
+        if( psz_filter )
+        {
+            if( *psz_filter )
+                strcat( psz_filter, ":" );
+            strcat( psz_filter, "deinterlace" );
+        }
     }
 
     p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
                                                  FIND_PARENT );
-    if( !p_input ) return VLC_EGENERIC;
+    if( !p_input )
+    {
+        free( psz_filter );
+        return VLC_EGENERIC;
+    }
 
     if( psz_mode && *psz_mode )
     {
