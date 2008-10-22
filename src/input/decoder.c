@@ -722,26 +722,23 @@ static void *DecoderThread( vlc_object_t *p_this )
     int canc = vlc_savecancel();
 
     /* The decoder's main loop */
-    while( vlc_object_alive( p_dec ) && !p_dec->b_error )
-    {
-        block_t *p_block = block_FifoGet( p_owner->p_fifo );
-
-        DecoderSignalBuffering( p_dec, p_block == NULL );
-
-        if( p_block && DecoderProcess( p_dec, p_block ) != VLC_SUCCESS )
-            break;
-    }
-
     while( vlc_object_alive( p_dec ) )
     {
         block_t *p_block = block_FifoGet( p_owner->p_fifo );
 
         DecoderSignalBuffering( p_dec, p_block == NULL );
 
-        /* Trash all received PES packets */
         if( p_block )
-            block_Release( p_block );
+        {
+            if( p_dec->b_error )
+            {   /* Trash all received PES packets */
+                block_Release( p_block );
+            }
+            else if( DecoderProcess( p_dec, p_block ) != VLC_SUCCESS )
+                break;
+        }
     }
+
     DecoderSignalBuffering( p_dec, true );
 
     /* We do it here because of the dll loader that wants close() in the
