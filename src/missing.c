@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <assert.h>
 
 #ifndef ENABLE_HTTPD
 # include <vlc_httpd.h>
@@ -168,6 +169,128 @@ httpd_url_t *httpd_UrlNewUnique (httpd_host_t *host, const char *url,
 #endif /* !ENABLE_HTTPD */
 
 #ifndef ENABLE_SOUT
+# include <vlc_sout.h>
+
+char *sdp_AddMedia (char **sdp, const char *type, const char *protocol,
+                    int dport, unsigned pt, bool bw_indep, unsigned bw,
+                    const char *ptname, unsigned clockrate, unsigned channels,
+                    const char *fmtp)
+{
+    assert (*sdp == NULL);
+    return NULL;
+}
+
+char *sdp_AddAttribute (char **sdp, const char *name, const char *fmt, ...)
+{
+    assert (*sdp == NULL);
+    return NULL;
+}
+
+int sout_AccessOutControl (sout_access_out_t *out, int query, ...)
+{
+    assert (0);
+}
+
+void sout_AccessOutDelete (sout_access_out_t *out)
+{
+    assert (0);
+}
+
+#undef sout_AccessOutNew
+sout_access_out_t *sout_AccessOutNew (vlc_object_t *obj,
+                                      const char *access, const char *name)
+{
+    msg_Err (obj, "Output support not compiled-in!");
+    return NULL;
+}
+
+ssize_t sout_AccessOutRead (sout_access_out_t *out, block_t *block)
+{
+    assert (0);
+}
+
+int sout_AccessOutSeek (sout_access_out_t *out, off_t offset)
+{
+    assert (0);
+}
+
+ssize_t sout_AccessOutWrite (sout_access_out_t *out, block_t *block)
+{
+    assert (0);
+}
+
+session_descriptor_t *sout_AnnounceRegisterSDP (sout_instance_t *instance,
+                                                const char *sdp,
+                                                const char *dst,
+                                                announce_method_t *method)
+{
+    assert (method == NULL);
+    return NULL;
+}
+
+sout_AnnounceUnRegister (sout_instance_t *instance, session_descriptor_t *d)
+{
+    assert (0);
+}
+
+void sout_MethodRelease (announce_method_t *method)
+{
+    (void)method;
+}
+
+sout_input_t *sout_MuxAddStream (sout_mux_t *mux, es_format_t *fmt)
+{
+    assert (0);
+}
+
+void sout_MuxDelete (sout_mux_t *mux)
+{
+    assert (0);
+}
+
+void sout_MuxDeleteStream (sout_mux_t *mux, sout_input_t *input)
+{
+    assert (0);
+}
+
+sout_mux_t *sout_MuxNew (sout_instance_t *instance, char *mux,
+                         sout_access_out_t *out)
+{
+    assert (0);
+}
+
+void sout_MuxSendBuffer (sout_mux_t *mux, sout_input_t *input, block_t *block)
+{
+    assert (0);
+}
+
+announce_method_t *sout_SAPMethod (void)
+{
+    return NULL;
+}
+
+void sout_StreamDelete (sout_stream_t *stream)
+{
+    assert (0);
+}
+
+sout_stream_t *sout_StreamNew (sout_instance_t *instance, char *chain)
+{
+    assert (0);
+}
+
+void sout_UpdateStatistic (sout_instance_t *instance, sout_statistic_t stat,
+                           int value)
+{
+    assert (0);
+}
+
+char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
+                     const struct sockaddr *src, size_t srclen,
+                     const struct sockaddr *addr, size_t addrlen)
+{
+    return NULL;
+}
 
 # ifndef ENABLE_VLM
 #  include <vlc_vlm.h>
