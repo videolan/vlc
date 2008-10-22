@@ -242,9 +242,23 @@ int OpenEncoder( vlc_object_t *p_this )
     p_codec = avcodec_find_encoder( i_codec_id );
     if( !p_codec )
     {
-        msg_Err( p_enc, "cannot find encoder %s", psz_namecodec );
-        intf_UserFatal( p_enc, false, _("Streaming / Transcoding failed"),
-                        _("VLC could not find encoder \"%s\"."), psz_namecodec );
+        msg_Err( p_enc, "cannot find encoder %s\n"
+"*** Your FFMPEG installation is crippled.   ***\n"
+"*** Please check with your FFMPEG packager. ***\n"
+"*** This is NOT a VLC media player issue.   ***\n", psz_namecodec );
+
+        intf_UserFatal( p_enc, false, _("Streaming / Transcoding failed"), _(
+/* I have had enough of all these MPEG-3 transcoding bug reports.
+ * Downstream packager, you had better not patch this out, or I will be really
+ * annoyed. Think about it - you don't want to fork the VLC translation files,
+ * do you? -- Courmisch, 2008-10-22 */
+"It seems your FFMPEG (libavcodec) installation lacks the following encoder:\n"
+"%s.\n"
+"If you don't know how to fix this, ask for support from your distribution.\n"
+"\n"
+"This is not an error inside VLC media player.\n"
+"Do not contact the VideoLAN project about this issue.\n"),
+            psz_namecodec );
         return VLC_EGENERIC;
     }
 
