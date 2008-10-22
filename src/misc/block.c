@@ -401,12 +401,17 @@ void block_FifoEmpty( block_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
 }
 
+/**
+ * Immediately queue one block at the end of a FIFO.
+ * @param fifo queue
+ * @param block head of a block list to queue (may be NULL)
+ */
 size_t block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
 {
     size_t i_size = 0;
     vlc_mutex_lock( &p_fifo->lock );
 
-    do
+    while (p_block != NULL)
     {
         i_size += p_block->i_buffer;
 
@@ -416,10 +421,9 @@ size_t block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
         p_fifo->i_size += p_block->i_buffer;
 
         p_block = p_block->p_next;
+    }
 
-    } while( p_block );
-
-    /* warn there is data in this fifo */
+    /* We queued one block: wake up one read-waiting thread */
     vlc_cond_signal( &p_fifo->wait );
     vlc_mutex_unlock( &p_fifo->lock );
 
