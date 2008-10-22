@@ -43,7 +43,7 @@
 #   include <avcodec.h>
 #endif
 
-#include "../codec/avcodec/chroma.h"
+#include "../codec/avcodec/avcodec.h"
 
 /*****************************************************************************
  * Local prototypes
