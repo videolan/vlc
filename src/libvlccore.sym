@@ -130,9 +130,7 @@ httpd_HandlerNew
 httpd_HostDelete
 httpd_HostNew
 httpd_MsgAdd
-httpd_MsgClean
 httpd_MsgGet
-httpd_MsgInit
 httpd_RedirectDelete
 httpd_RedirectNew
 httpd_ServerIP

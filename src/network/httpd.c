@@ -1308,7 +1308,7 @@ void httpd_UrlDelete( httpd_url_t *url )
     vlc_mutex_unlock( &host->lock );
 }
 
-void httpd_MsgInit( httpd_message_t *msg )
+static void httpd_MsgInit( httpd_message_t *msg )
 {
     msg->cl         = NULL;
     msg->i_type     = HTTPD_MSG_NONE;
@@ -1332,7 +1332,7 @@ void httpd_MsgInit( httpd_message_t *msg )
     msg->p_body        = NULL;
 }
 
-void httpd_MsgClean( httpd_message_t *msg )
+static void httpd_MsgClean( httpd_message_t *msg )
 {
     int i;
 
@@ -2700,10 +2700,6 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
     return NULL;
 }
 
-void httpd_MsgInit ( httpd_message_t *a )
-{
-}
-
 void httpd_MsgAdd  ( httpd_message_t *a, const char *b, const char *c, ... )
 {
 }
@@ -2711,10 +2707,6 @@ void httpd_MsgAdd  ( httpd_message_t *a, const char *b, const char *c, ... )
 const char *httpd_MsgGet( const httpd_message_t *msg, const char *name )
 {
     return "";
-}
-
-void httpd_MsgClean( httpd_message_t *a )
-{
 }
 
 #endif /* ENABLE_HTTPD */
