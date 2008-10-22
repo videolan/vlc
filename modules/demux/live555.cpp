@@ -528,10 +528,10 @@ createnew:
         return VLC_EGENERIC;
     }
 
-    /* Kasenna enables KeepAlive by analysing the User-Agent string. 
-     * Appending _KA to the string should be enough to enable this feature, 
-     * however, there is a bug where the _KA doesn't get parsed from the 
-     * default User-Agent as created by VLC/Live555 code. This is probably due 
+    /* Kasenna enables KeepAlive by analysing the User-Agent string.
+     * Appending _KA to the string should be enough to enable this feature,
+     * however, there is a bug where the _KA doesn't get parsed from the
+     * default User-Agent as created by VLC/Live555 code. This is probably due
      * to spaces in the string or the string being too long. Here we override
      * the default string with a more compact version.
      */
@@ -1380,8 +1380,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             /* When we Pause, we'll need the TimeoutPrevention thread to
-             * handle sending the "Keep Alive" message to the server. 
-             * Unfortunately Live555 isn't thread safe and so can't 
+             * handle sending the "Keep Alive" message to the server.
+             * Unfortunately Live555 isn't thread safe and so can't
              * do this normally while the main Demux thread is handling
              * a live stream. We end up with the Timeout thread blocking
              * waiting for a response from the server. So when we PAUSE
@@ -1389,7 +1389,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * and if it's set, it will trigger the GET_PARAMETER message */
             if( b_bool && p_sys->p_timeout != NULL )
                 p_sys->p_timeout->b_handle_keep_alive = true;
-            else if( !b_bool && p_sys->p_timeout != NULL ) 
+            else if( !b_bool && p_sys->p_timeout != NULL )
                 p_sys->p_timeout->b_handle_keep_alive = false;
 
             for( i = 0; !b_bool && i < p_sys->i_track; i++ )
@@ -1659,7 +1659,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     /* Update our global npt value */
     if( tk->i_npt > 0 && tk->i_npt > p_sys->i_npt && tk->i_npt < p_sys->i_npt_length)
-        p_sys->i_npt = tk->i_npt; 
+        p_sys->i_npt = tk->i_npt;
 
     if( !tk->b_muxed )
     {
