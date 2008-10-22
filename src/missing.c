@@ -219,16 +219,19 @@ ssize_t sout_AccessOutWrite (sout_access_out_t *out, block_t *block)
     assert (0);
 }
 
-session_descriptor_t *sout_AnnounceRegisterSDP (sout_instance_t *instance,
+#undef sout_AnnounceRegisterSDP
+session_descriptor_t *sout_AnnounceRegisterSDP (vlc_object_t *obj,
                                                 const char *sdp,
                                                 const char *dst,
                                                 announce_method_t *method)
 {
+    msg_Err (obj, "SDP export not compiled-in!");
     assert (method == NULL);
     return NULL;
 }
 
-sout_AnnounceUnRegister (sout_instance_t *instance, session_descriptor_t *d)
+#undef sout_AnnounceUnRegister
+sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *d)
 {
     assert (0);
 }
