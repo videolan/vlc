@@ -481,7 +481,7 @@ static int Connect( demux_t *p_demux )
     char *p_sdp       = NULL;
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
-    int i_lefttries;
+    int timeout;
 
     if( p_sys->url.i_port == 0 ) p_sys->url.i_port = 554;
     if( p_sys->url.psz_username || p_sys->url.psz_password )
@@ -504,9 +504,7 @@ static int Connect( demux_t *p_demux )
         psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
     }
 
-    i_lefttries = 3;
 createnew:
-    i_lefttries--;
     if( !vlc_object_alive (p_demux) || p_demux->b_error )
     {
         free( psz_user );
@@ -546,14 +544,30 @@ describe:
     authenticator.setUsernameAndPassword( (const char*)psz_user,
                                           (const char*)psz_pwd );
 
+    timeout = var_CreateGetInteger(p_demux, "ipv4-timeout");
+    timeout /= 1000;
+
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
+    psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
+                                               &authenticator, timeout );
+#else
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
+#endif
     if( psz_options )
+    {
         p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
+        p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
+                                          var_GetBool( p_demux, "rtsp-kasenna" ), timeout );
+#else
+        p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
+                                          var_GetBool( p_demux, "rtsp-kasenna" ) );
+#endif
+
+    }
     delete [] psz_options;
 
-    p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
-                         var_GetBool( p_demux, "rtsp-kasenna" ) );
     if( p_sdp == NULL )
     {
         /* failure occurred */
@@ -616,8 +630,6 @@ describe:
             msg_Dbg( p_demux, "connection timeout, retrying" );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
-            if( i_lefttries > 0 )
-                goto createnew;
         }
         i_ret = VLC_EGENERIC;
     }
