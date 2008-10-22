@@ -212,6 +212,7 @@ EXTRA_libvlccore_la_SOURCES = \
 	$(SOURCES_libvlc_other) \
 	$(SOURCES_libvlc_dirent) \
 	$(SOURCES_libvlc_getopt) \
+	$(SOURCES_libvlc_httpd) \
 	$(SOURCES_libvlc_sout) \
 	$(SOURCES_libvlc_vlm) \
 	$(NULL)
@@ -241,6 +242,9 @@ libvlccore_la_SOURCES += $(SOURCES_libvlc_dirent)
 endif
 if BUILD_GETOPT
 libvlccore_la_SOURCES += $(SOURCES_libvlc_getopt)
+endif
+if BUILD_HTTPD
+libvlccore_la_SOURCES += $(SOURCES_libvlc_httpd)
 endif
 if ENABLE_SOUT
 libvlccore_la_SOURCES += $(SOURCES_libvlc_sout)
@@ -281,6 +285,7 @@ SOURCES_libvlc_common = \
 	libvlc.c \
 	libvlc.h \
 	libvlc-module.c \
+	missing.c \
 	version.c \
 	interface/interface.h \
 	interface/interface.c \
@@ -342,7 +347,6 @@ SOURCES_libvlc_common = \
 	network/io.c \
 	network/tcp.c \
 	network/udp.c \
-	network/httpd.c \
 	network/rootbind.c \
 	network/tls.c \
 	network/poll.c \
@@ -386,6 +390,10 @@ SOURCES_libvlc_common = \
 	misc/devices.c \
 	extras/libc.c \
 	misc/filter_chain.c \
+	$(NULL)
+
+SOURCES_libvlc_httpd = \
+	network/httpd.c \
 	$(NULL)
 
 SOURCES_libvlc_sout = \
