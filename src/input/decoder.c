@@ -306,6 +306,7 @@ void input_DecoderDelete( decoder_t *p_dec )
 
 /**
  * Put a block_t in the decoder's fifo.
+ * Thread-safe w.r.t. the decoder. May be a cancellation point.
  *
  * \param p_dec the decoder object
  * \param p_block the data block
@@ -316,17 +317,12 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
     if( p_owner->p_input->p->b_out_pace_control )
     {
-        /* FIXME !!!!! */
-        while( vlc_object_alive( p_dec ) &&
-               block_FifoCount( p_owner->p_fifo ) > 10 )
-        {
-            msleep( 1000 );
-        }
+        block_FifoPace( p_owner->p_fifo, 10, SIZE_MAX );
     }
     else if( block_FifoSize( p_owner->p_fifo ) > 50000000 /* 50 MB */ )
     {
         /* FIXME: ideally we would check the time amount of data
-         * in the fifo instead of its size. */
+         * in the FIFO instead of its size. */
         msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
                   "consumed quickly enough), resetting fifo!" );
         block_FifoEmpty( p_owner->p_fifo );
