@@ -51,6 +51,7 @@
 #endif
 #ifdef WIN32
 # include <io.h>
+# include <direct.h>
 #else
 # include <unistd.h>
 #endif
@@ -59,19 +60,21 @@
 # define lstat( a, b ) stat(a, b)
 #endif
 
-#ifdef __APPLE__
-/* Define this if the OS always use UTF-8 internally */
-# define ASSUME_UTF8 1
-#endif
-
-#if defined (ASSUME_UTF8)
-/* Cool */
-#elif defined (WIN32) || defined (UNDER_CE)
-# define USE_MB2MB 1
-#elif defined (HAVE_ICONV)
-# define USE_ICONV 1
-#else
-# error No UTF8 charset conversion implemented on this platform!
+#ifdef WIN32
+static int convert_path (const char *restrict path, wchar_t *restrict wpath)
+{
+    if (!MultiByteToWideChar (CP_UTF8, 0, path, -1, wpath, MAX_PATH))
+    {
+        errno = ENOENT;
+        return -1;
+    }
+    wpath[MAX_PATH] = L'\0';
+    return 0;
+}
+# define CONVERT_PATH(path, wpath, err) \
+  wchar_t wpath[MAX_PATH+1]; \
+  if (convert_path (path, wpath)) \
+      return (err)
 #endif
 
 /**
@@ -88,20 +91,11 @@ int utf8_open (const char *filename, int flags, mode_t mode)
     /*_open translates to wchar internally on WinCE*/
     return _open (filename, flags, mode);
 #elif defined (WIN32)
-    /* for Windows NT and above */
-    wchar_t wpath[MAX_PATH + 1];
-
-    if (!MultiByteToWideChar (CP_UTF8, 0, filename, -1, wpath, MAX_PATH))
-    {
-        errno = ENOENT;
-        return -1;
-    }
-    wpath[MAX_PATH] = L'\0';
-
     /*
-        * open() cannot open files with non-“ANSI” characters on Windows.
-        * We use _wopen() instead. Same thing for mkdir() and stat().
-        */
+     * open() cannot open files with non-“ANSI” characters on Windows.
+     * We use _wopen() instead. Same thing for mkdir() and stat().
+     */
+    CONVERT_PATH(filename, wpath, -1);
     return _wopen (wpath, flags, mode);
 
 #endif
@@ -188,43 +182,10 @@ FILE *utf8_fopen (const char *filename, const char *mode)
 int utf8_mkdir( const char *dirname, mode_t mode )
 {
 #if defined (UNDER_CE) || defined (WIN32)
-    VLC_UNUSED( mode );
+    (void) mode;
+    CONVERT_PATH (dirname, wpath, -1);
+    return _wmkdir (wpath);
 
-    wchar_t wname[MAX_PATH + 1];
-    char mod[MAX_PATH + 1];
-    int i;
-
-    /* Convert '/' into '\' */
-    for( i = 0; *dirname; i++ )
-    {
-        if( i == MAX_PATH )
-            return -1; /* overflow */
-
-        if( *dirname == '/' )
-            mod[i] = '\\';
-        else
-            mod[i] = *dirname;
-        dirname++;
-
-    }
-    mod[i] = 0;
-
-    if( MultiByteToWideChar( CP_UTF8, 0, mod, -1, wname, MAX_PATH ) == 0 )
-    {
-        errno = ENOENT;
-        return -1;
-    }
-    wname[MAX_PATH] = L'\0';
-
-    if( CreateDirectoryW( wname, NULL ) == 0 )
-    {
-        if( GetLastError( ) == ERROR_ALREADY_EXISTS )
-            errno = EEXIST;
-        else
-            errno = ENOENT;
-        return -1;
-    }
-    return 0;
 #else
     char *locname = ToLocale( dirname );
     int res;
@@ -251,13 +212,9 @@ int utf8_mkdir( const char *dirname, mode_t mode )
 DIR *utf8_opendir( const char *dirname )
 {
 #ifdef WIN32
-    wchar_t wname[MAX_PATH + 1];
+    CONVERT_PATH (dirname, wpath, NULL);
+    return (DIR *)vlc_wopendir (wpath);
 
-    if (MultiByteToWideChar (CP_UTF8, 0, dirname, -1, wname, MAX_PATH))
-    {
-        wname[MAX_PATH] = L'\0';
-        return (DIR *)vlc_wopendir (wname);
-    }
 #else
     const char *local_name = ToLocale( dirname );
 
@@ -399,17 +356,8 @@ static int utf8_statEx( const char *filename, struct stat *buf,
     /*_stat translates to wchar internally on WinCE*/
     return _stat( filename, buf );
 #elif defined (WIN32)
-    /* for Windows NT and above */
-    wchar_t wpath[MAX_PATH + 1];
-
-    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
-    {
-        errno = ENOENT;
-        return -1;
-    }
-    wpath[MAX_PATH] = L'\0';
-
-    return _wstati64( wpath, buf );
+    CONVERT_PATH (filename, wpath, -1);
+    return _wstati64 (wpath, buf);
 
 #endif
 #ifdef HAVE_SYS_STAT_H
@@ -462,21 +410,9 @@ int utf8_unlink( const char *filename )
     /*_open translates to wchar internally on WinCE*/
     return _unlink( filename );
 #elif defined (WIN32)
-    /* for Windows NT and above */
-    wchar_t wpath[MAX_PATH + 1];
+    CONVERT_PATH (filename, wpath, -1);
+    return _wunlink (wpath);
 
-    if( !MultiByteToWideChar( CP_UTF8, 0, filename, -1, wpath, MAX_PATH ) )
-    {
-        errno = ENOENT;
-        return -1;
-    }
-    wpath[MAX_PATH] = L'\0';
-
-    /*
-        * unlink() cannot open files with non-“ANSI” characters on Windows.
-        * We use _wunlink() instead.
-        */
-    return _wunlink( wpath );
 #endif
     const char *local_name = ToLocale( filename );
 
