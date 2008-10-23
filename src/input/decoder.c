@@ -162,50 +162,34 @@ struct decoder_owner_sys_t
  * Public functions
  *****************************************************************************/
 
-/* decoder_GetInputAttachment:
- */
-input_attachment_t *decoder_GetInputAttachment( decoder_t *p_dec,
-                                                const char *psz_name )
-{
-    input_attachment_t *p_attachment;
-    if( input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENT, &p_attachment, psz_name ) )
-        return NULL;
-    return p_attachment;
-}
 /* decoder_GetInputAttachments:
  */
 int decoder_GetInputAttachments( decoder_t *p_dec,
                                  input_attachment_t ***ppp_attachment,
                                  int *pi_attachment )
 {
-    return input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENTS,
-                          ppp_attachment, pi_attachment );
+    if( !p_dec->pf_get_attachments )
+        return VLC_EGENERIC;
+
+    return p_dec->pf_get_attachments( p_dec, ppp_attachment, pi_attachment );
 }
 /* decoder_GetDisplayDate:
  */
 mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    if( !p_dec->pf_get_display_date )
+        return 0;
 
-    vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->b_buffering || p_owner->b_paused )
-        i_ts = 0;
-    vlc_mutex_unlock( &p_owner->lock );
-
-    if( !p_owner->p_clock || !i_ts )
-        return i_ts;
-
-    return input_clock_GetTS( p_owner->p_clock, NULL, p_owner->p_input->i_pts_delay, i_ts );
+    return p_dec->pf_get_display_date( p_dec, i_ts );
 }
 /* decoder_GetDisplayRate:
  */
 int decoder_GetDisplayRate( decoder_t *p_dec )
 {
-    decoder_owner_sys_t *p_owner = p_dec->p_owner;
-
-    if( !p_owner->p_clock )
+    if( !p_dec->pf_get_display_rate )
         return INPUT_RATE_DEFAULT;
-    return input_clock_GetRate( p_owner->p_clock );
+
+    return p_dec->pf_get_display_rate( p_dec );
 }
 
 /**
@@ -560,6 +544,35 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
 /*****************************************************************************
  * Internal functions
  *****************************************************************************/
+static int DecoderGetInputAttachments( decoder_t *p_dec,
+                                       input_attachment_t ***ppp_attachment,
+                                       int *pi_attachment )
+{
+    return input_Control( p_dec->p_owner->p_input, INPUT_GET_ATTACHMENTS,
+                          ppp_attachment, pi_attachment );
+}
+static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_owner->b_buffering || p_owner->b_paused )
+        i_ts = 0;
+    vlc_mutex_unlock( &p_owner->lock );
+
+    if( !p_owner->p_clock || !i_ts )
+        return i_ts;
+
+    return input_clock_GetTS( p_owner->p_clock, NULL, p_owner->p_input->i_pts_delay, i_ts );
+}
+static int DecoderGetDisplayRate( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    if( !p_owner->p_clock )
+        return INPUT_RATE_DEFAULT;
+    return input_clock_GetRate( p_owner->p_clock );
+}
 
 /* */
 static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
@@ -642,6 +655,10 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->pf_picture_unlink  = vout_unlink_picture;
     p_dec->pf_spu_buffer_new  = spu_new_buffer;
     p_dec->pf_spu_buffer_del  = spu_del_buffer;
+    /* */
+    p_dec->pf_get_attachments  = DecoderGetInputAttachments;
+    p_dec->pf_get_display_date = DecoderGetDisplayDate;
+    p_dec->pf_get_display_rate = DecoderGetDisplayRate;
 
     vlc_object_attach( p_dec, p_input );
 

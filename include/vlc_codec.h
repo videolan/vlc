@@ -99,6 +99,22 @@ struct decoder_t
     subpicture_t *  ( * pf_spu_buffer_new) ( decoder_t * );
     void            ( * pf_spu_buffer_del) ( decoder_t *, subpicture_t * );
 
+    /*
+     * Owner fields
+     */
+
+    /* Input attachments
+     * XXX use decoder_GetInputAttachments */
+    int             (*pf_get_attachments)( decoder_t *p_dec, input_attachment_t ***ppp_attachment, int *pi_attachment );
+
+    /* Display date
+     * XXX use decoder_GetDisplayDate */
+    mtime_t         (*pf_get_display_date)( decoder_t *, mtime_t );
+
+    /* Display rate
+     * XXX use decoder_GetDisplayRate */
+    int             (*pf_get_display_rate)( decoder_t * );
+
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
 };
@@ -146,13 +162,6 @@ struct encoder_t
 /**
  * @}
  */
-
-/**
- * This function returns a specific input attachment (using its name).
- *
- * You MUST release the returned value.
- */
-VLC_EXPORT( input_attachment_t *, decoder_GetInputAttachment, ( decoder_t *, const char *psz_name ) LIBVLC_USED );
 
 /**
  * This function gives all input attachments at once.

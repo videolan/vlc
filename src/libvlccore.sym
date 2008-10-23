@@ -79,7 +79,6 @@ date_Move
 date_Set
 decoder_GetDisplayDate
 decoder_GetDisplayRate
-decoder_GetInputAttachment
 decoder_GetInputAttachments
 decoder_SynchroChoose
 decoder_SynchroDate
