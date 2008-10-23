@@ -303,7 +303,7 @@ void input_DecoderDelete( decoder_t *p_dec )
     vlc_thread_join( p_dec );
 
     /* Don't module_unneed() here because of the dll loader that wants
-     * close() in the same thread than open()/decode() */
+     * close() in the same thread than decode() */
 
     /* */
     if( p_dec->p_owner->cc.b_supported )
@@ -794,7 +794,7 @@ static void *DecoderThread( vlc_object_t *p_this )
     DecoderSignalBuffering( p_dec, true );
 
     /* We do it here because of the dll loader that wants close() in the
-     * same thread than open()/decode() */
+     * same thread than decode() */
     module_unneed( p_dec, p_dec->p_module );
     vlc_restorecancel( canc );
     return NULL;
