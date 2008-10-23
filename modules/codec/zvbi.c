@@ -441,7 +441,7 @@ error:
     vbi_unref_page( &p_page );
     if( p_spu != NULL )
     {
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         p_spu = NULL;
     }
 
@@ -459,7 +459,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
 
     /* If there is a page or sub to render, then we do that here */
     /* Create the subpicture unit */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
@@ -487,7 +487,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     if( p_spu->p_region == NULL )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         return NULL;
     }
 

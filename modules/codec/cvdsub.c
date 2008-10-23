@@ -502,7 +502,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     int i;
 
     /* Allocate the subpicture internal data. */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu ) return NULL;
 
     p_spu->i_start = p_data->i_pts;
@@ -530,7 +530,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     if( !p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         return NULL;
     }
 

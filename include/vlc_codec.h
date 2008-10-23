@@ -95,13 +95,14 @@ struct decoder_t
     void            ( * pf_picture_link)    ( decoder_t *, picture_t * );
     void            ( * pf_picture_unlink)  ( decoder_t *, picture_t * );
 
-    /* SPU output callbacks */
-    subpicture_t *  ( * pf_spu_buffer_new) ( decoder_t * );
-    void            ( * pf_spu_buffer_del) ( decoder_t *, subpicture_t * );
-
     /*
      * Owner fields
      */
+
+    /* SPU output callbacks
+     * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
+    subpicture_t   *(*pf_spu_buffer_new) ( decoder_t * );
+    void            (*pf_spu_buffer_del) ( decoder_t *, subpicture_t * );
 
     /* Input attachments
      * XXX use decoder_GetInputAttachments */
@@ -164,11 +165,23 @@ struct encoder_t
  */
 
 /**
+ * This function will return a new subpicture usable by a decoder as an output
+ * buffer. You have to release it using decoder_DeleteSubpicture or by returning
+ * it to the caller as a pf_decode_sub return value.
+ */
+VLC_EXPORT( subpicture_t *, decoder_NewSubpicture, ( decoder_t * ) );
+
+/**
+ * This function will release a subpicture create by decoder_NewSubicture.
+ */
+VLC_EXPORT( void, decoder_DeleteSubpicture, ( decoder_t *, subpicture_t *p_subpicture ) );
+
+/**
  * This function gives all input attachments at once.
  *
  * You MUST release the returned values
  */
-VLC_EXPORT( int, decoder_GetInputAttachments, ( decoder_t *p_dec, input_attachment_t ***ppp_attachment, int *pi_attachment ) );
+VLC_EXPORT( int, decoder_GetInputAttachments, ( decoder_t *, input_attachment_t ***ppp_attachment, int *pi_attachment ) );
 
 /**
  * This function converts a decoder timestamp into a display date comparable

@@ -1449,7 +1449,7 @@ static subpicture_t *render( decoder_t *p_dec )
     int i_base_y;
 
     /* Allocate the subpicture internal data. */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu )
         return NULL;
 

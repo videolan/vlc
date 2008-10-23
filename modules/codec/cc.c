@@ -329,7 +329,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
         EnsureUTF8( psz_html );
 
     /* Create the subpicture unit */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
@@ -350,7 +350,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
         msg_Err( p_dec, "cannot allocate SPU region" );
         free( psz_subtitle );
         free( psz_html );
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         return NULL;
     }
 

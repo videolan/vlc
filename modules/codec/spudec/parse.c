@@ -85,7 +85,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     spu_properties_t spu_properties;
 
     /* Allocate the subpicture internal data. */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu ) return NULL;
 
     /* Rationale for the "p_spudec->i_rle_size * 4": we are going to
@@ -118,7 +118,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     if( ParseControlSeq( p_dec, p_spu, p_spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         return NULL;
     }
 
@@ -126,7 +126,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     if( ParseRLE( p_dec, p_spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         return NULL;
     }
 

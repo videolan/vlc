@@ -159,7 +159,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
      * displaying is done in the DisplayAnchor function in intf.c (called from
      * DisplayPendingAnchor, which in turn is called from the main RunIntf
      * loop). */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu )
     {
         msg_Dbg( p_dec, "couldn't allocate new subpicture" );

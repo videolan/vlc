@@ -578,7 +578,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     /* we have an event */
 
     /* Get a new spu */
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu )
     {
         msg_Err( p_dec, "Failed to allocate spu buffer" );
@@ -636,7 +636,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
         if( !p_bitmap_region )
         {
             msg_Err( p_dec, "cannot allocate SPU region" );
-            p_dec->pf_spu_buffer_del( p_dec, p_spu );
+            decoder_DeleteSubpicture( p_dec, p_spu );
             return NULL;
         }
 
@@ -656,7 +656,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     if( !p_spu->p_region )
     {
         msg_Err( p_dec, "cannot allocate SPU region" );
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         return NULL;
     }
 

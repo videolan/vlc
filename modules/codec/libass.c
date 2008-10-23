@@ -231,7 +231,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    p_spu = p_dec->pf_spu_buffer_new( p_dec );
+    p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu )
     {
         msg_Warn( p_dec, "can't get spu buffer" );
@@ -242,7 +242,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_sys = malloc( sizeof( subpicture_sys_t ));
     if( !p_spu->p_sys )
     {
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         block_Release( p_block );
         return NULL;
     }
@@ -252,7 +252,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !p_spu->p_sys->p_subs_data )
     {
         free( p_spu->p_sys );
-        p_dec->pf_spu_buffer_del( p_dec, p_spu );
+        decoder_DeleteSubpicture( p_dec, p_spu );
         block_Release( p_block );
         return NULL;
     }
