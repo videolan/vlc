@@ -294,9 +294,10 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
 {
     return NULL;
 }
+#endif /* !ENABLE_SOUT */
 
-# ifndef ENABLE_VLM
-#  include <vlc_vlm.h>
+#ifndef ENABLE_VLM
+# include <vlc_vlm.h>
 
 int vlm_Control (vlm_t *vlm, int query, ...)
 {
@@ -333,6 +334,4 @@ vlm_t *__vlm_New (vlc_object_t *obj)
      msg_Err (obj, "VLM not compiled-in!");
      return NULL;
 }
-
-# endif /* !ENABLE_VLM */
-#endif /* !ENABLE_SOUT */
+#endif /* !ENABLE_VLM */
