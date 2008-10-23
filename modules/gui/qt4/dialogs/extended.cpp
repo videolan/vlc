@@ -88,17 +88,19 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->addWidget( closeButton, 1, 4, 1, 1 );
     CONNECT( closeButton, clicked(), this, close() );
 
-    QPoint startPoint( 450, 0 );
-    MainInterface *p_mi = p_intf->p_sys->p_mi;
-    if( p_mi )
+    /* Restore geometry or move this dialog on the left pane of the MI */
+    if( !restoreGeometry(getSettings()->value("EPanel/geometry").toByteArray()))
     {
-        startPoint.setX( p_mi->x() );
-        startPoint.setY( p_mi->y() + p_mi->frameGeometry().height() );
+        resize( QSize( 400, 280 ) );
+        
+        MainInterface *p_mi = p_intf->p_sys->p_mi;
+        if( p_mi )
+            move( ( p_mi->x() - frameGeometry().width() - 10 ), p_mi->y() );
+        else
+            move ( 450 , 0 );
     }
-    readSettings( "EPanel", QSize( 400, 280 ), startPoint );
 
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, changedItem( int ) );
-
 }
 
 ExtendedDialog::~ExtendedDialog()

@@ -427,9 +427,8 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 
     if (!dir.isEmpty() )
     {
-        QString mrl = dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive )
-            ? "dvd://" : "directory://" + toNativeSeparators( dir );
-        msg_Dbg( p_intf, "Directory opening: %s", qtu( dir ) );
+        QString mrl = dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive ) ?
+            "dvd://" : "directory://" + toNativeSeparators( dir );
         input_item_t *p_input = input_item_NewExt( THEPL, qtu( mrl ),
                               NULL, 0, NULL, -1 );
 
