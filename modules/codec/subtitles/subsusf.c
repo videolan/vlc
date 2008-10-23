@@ -643,7 +643,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                     if( ! p_style )
                     {
                         free( psz_node );
-                        return VLC_ENOMEM;
+                        return;
                     }
                     /* All styles are supposed to default to Default, and then
                      * one or more settings are over-ridden.
