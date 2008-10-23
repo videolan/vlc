@@ -286,13 +286,8 @@ void input_DecoderDelete( decoder_t *p_dec )
     }
     vlc_mutex_unlock( &p_owner->lock );
 
-    /* Make sure the thread leaves the function */
-    block_FifoWake( p_owner->p_fifo );
-
     vlc_thread_join( p_dec );
-
-    /* Don't module_unneed() here because of the dll loader that wants
-     * close() in the same thread than open()/decode() */
+    module_unneed( p_dec, p_dec->p_module );
 
     /* */
     if( p_dec->p_owner->cc.b_supported )
@@ -762,13 +757,12 @@ static void *DecoderThread( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    int canc = vlc_savecancel();
-
     /* The decoder's main loop */
-    while( vlc_object_alive( p_dec ) )
+    for (;;)
     {
         block_t *p_block = block_FifoGet( p_owner->p_fifo );
-
+        /* Make sure there is no cancellation point other than this one^^.
+         * If you need one, be sure to push cleanup of p_block. */
         DecoderSignalBuffering( p_dec, p_block == NULL );
 
         if( p_block )
@@ -785,11 +779,6 @@ static void *DecoderThread( vlc_object_t *p_this )
     }
 
     DecoderSignalBuffering( p_dec, true );
-
-    /* We do it here because of the dll loader that wants close() in the
-     * same thread than open()/decode() */
-    module_unneed( p_dec, p_dec->p_module );
-    vlc_restorecancel( canc );
     return NULL;
 }
 
@@ -1774,6 +1763,7 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
         return VLC_SUCCESS;
     }
 
+    int canc = vlc_savecancel ();
 #ifdef ENABLE_SOUT
     if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
     {
@@ -1825,6 +1815,7 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
 
         DecoderSignalFlushed( p_dec );
     }
+    vlc_restorecancel(canc);
 
     return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
