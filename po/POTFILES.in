@@ -169,6 +169,7 @@ src/misc/variables.c
 src/misc/variables.h
 src/misc/win32_specific.c
 src/misc/xml.c
+src/missing.c
 src/modules/cache.c
 src/modules/entry.c
 src/modules/modules.c
@@ -202,16 +203,11 @@ src/stream_output/sap.c
 src/stream_output/sdp.c
 src/stream_output/stream_output.c
 src/stream_output/stream_output.h
-src/text/charset.c
-src/text/iso-639_def.h
-src/text/iso_lang.c
-src/text/strings.c
-src/text/unicode.c
-src/text/wincp.c
 src/version.c
 src/video_output/video_output.c
 src/video_output/video_text.c
 src/video_output/video_widgets.c
+src/video_output/vout_control.h
 src/video_output/vout_internal.h
 src/video_output/vout_intf.c
 src/video_output/vout_pictures.c
@@ -377,10 +373,10 @@ modules/codec/avcodec/audio.c
 modules/codec/avcodec/avcodec.c
 modules/codec/avcodec/avcodec.h
 modules/codec/avcodec/avutil.h
-modules/codec/avcodec/chroma.h
+modules/codec/avcodec/chroma.c
 modules/codec/avcodec/deinterlace.c
 modules/codec/avcodec/encoder.c
-modules/codec/avcodec/fourcc.h
+modules/codec/avcodec/fourcc.c
 modules/codec/avcodec/video.c
 modules/codec/cc.c
 modules/codec/cc.h
@@ -736,6 +732,8 @@ modules/gui/qt4/menus.cpp
 modules/gui/qt4/menus.hpp
 modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
+modules/gui/qt4/recents.cpp
+modules/gui/qt4/recents.hpp
 modules/gui/qt4/ui/equalizer.ui
 modules/gui/qt4/ui/open_capture.ui
 modules/gui/qt4/ui/open_disk.ui
@@ -757,6 +755,7 @@ modules/gui/qt4/util/customwidgets.cpp
 modules/gui/qt4/util/customwidgets.hpp
 modules/gui/qt4/util/input_slider.cpp
 modules/gui/qt4/util/input_slider.hpp
+modules/gui/qt4/util/qvlcapp.hpp
 modules/gui/qt4/util/qvlcframe.hpp
 modules/gui/qt4/util/registry.cpp
 modules/gui/qt4/util/registry.hpp
