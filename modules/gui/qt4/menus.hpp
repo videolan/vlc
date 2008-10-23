@@ -46,13 +46,13 @@ class QSystemTrayIcon;
 
 class MenuItemData : public QObject
 {
-
-Q_OBJECT
+    Q_OBJECT
 
 public:
-    MenuItemData( QObject* parent, vlc_object_t *p, int _i_type, vlc_value_t _val, const char *_var ) : QObject( parent )
+    MenuItemData( QObject* parent, vlc_object_t *_p_obj, int _i_type,
+                  vlc_value_t _val, const char *_var ) : QObject( parent )
     {
-        p_obj = p;
+        p_obj = _p_obj;
         i_val_type = _i_type;
         val = _val;
         psz_var = strdup( _var );
@@ -63,19 +63,42 @@ public:
         if( ( i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING )
             free( val.psz_string );
     }
+
     vlc_object_t *p_obj;
-    int i_val_type;
     vlc_value_t val;
     char *psz_var;
+
+private:
+    int i_val_type;
 };
 
 class QVLCMenu : public QObject
 {
     Q_OBJECT;
+    friend class MenuFunc;
+
 public:
+    /* Main bar creation */
     static void createMenuBar( MainInterface *mi, intf_thread_t *, bool );
 
-    /* Menus */
+    /* Popups Menus */
+    static void PopupMenu( intf_thread_t *, bool );
+    static void AudioPopupMenu( intf_thread_t * );
+    static void VideoPopupMenu( intf_thread_t * );
+    static void MiscPopupMenu( intf_thread_t * );
+
+    /* Systray */
+    static void updateSystrayMenu( MainInterface *,intf_thread_t  *,
+                                   bool b_force_visible = false);
+
+    /* Actions */
+    static void DoAction( intf_thread_t *, QObject * );
+
+    /* HACK for minimalView */
+    static QAction *minimalViewAction;
+
+private:
+    /* All main Menus */
     static QMenu *FileMenu( intf_thread_t * );
     static QMenu *SDMenu( intf_thread_t * );
     static QMenu *ToolsMenu( intf_thread_t * );
@@ -88,23 +111,9 @@ public:
     static QMenu *HelpMenu( QMenu * );
 
     /* Popups Menus */
-    static void AudioPopupMenu( intf_thread_t * );
-    static void VideoPopupMenu( intf_thread_t * );
-    static void MiscPopupMenu( intf_thread_t * );
-    static void PopupMenu( intf_thread_t *, bool );
     static void PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu );
     static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                          input_thread_t *p_input );
-    /* Systray */
-    static void updateSystrayMenu( MainInterface *,intf_thread_t  *,
-                                   bool b_force_visible = false);
-
-    /* Actions */
-    static void DoAction( intf_thread_t *, QObject * );
-
-    /* HACK for minimalView */
-    static QAction *minimalViewAction;
-private:
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
                              vector<const char*>&, vector<vlc_object_t *>&,
@@ -115,7 +124,10 @@ private:
     static void UpdateItem( intf_thread_t *, QMenu *, const char *,
                             vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
+
+    /* recentMRL menu */
     static QMenu *recentsMenu;
+
 public slots:
     static void updateRecents( intf_thread_t * );
 };
@@ -130,12 +142,13 @@ public:
     {
         switch( id )
         {
-        case 1: QVLCMenu::AudioMenu( p_intf, menu ); break;
-        case 2: QVLCMenu::VideoMenu( p_intf, menu ); break;
-        case 3: QVLCMenu::NavigMenu( p_intf, menu ); break;
-        case 4: QVLCMenu::InterfacesMenu( p_intf, menu ); break;
+            case 1: QVLCMenu::AudioMenu( p_intf, menu ); break;
+            case 2: QVLCMenu::VideoMenu( p_intf, menu ); break;
+            case 3: QVLCMenu::NavigMenu( p_intf, menu ); break;
+            case 4: QVLCMenu::InterfacesMenu( p_intf, menu ); break;
         }
     };
+private:
     int id;
     QMenu *menu;
 };
