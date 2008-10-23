@@ -378,7 +378,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
 
                 p_pic->date = 0;
-                p_dec->pf_picture_link( p_dec, p_pic );
+                decoder_LinkPicture( p_dec, p_pic );
 
                 if( p_sys->p_synchro )
                 {
@@ -531,7 +531,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( p_sys->p_info->discard_fbuf &&
                     p_sys->p_info->discard_fbuf->id )
                 {
-                    p_dec->pf_picture_unlink( p_dec, p_sys->p_info->discard_fbuf->id );
+                    decoder_UnlinkPicture( p_dec, p_sys->p_info->discard_fbuf->id );
                 }
                 /* For still frames */
                 //if( state == STATE_END && p_pic ) p_pic->b_force = true;
@@ -703,7 +703,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
         fflush(p_sys->f_wd_nb);
     }
 #endif
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     if( p_pic == NULL ) return NULL;
 
@@ -716,7 +716,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     p_pic->format.i_frame_rate = p_dec->fmt_out.video.i_frame_rate;
     p_pic->format.i_frame_rate_base = p_dec->fmt_out.video.i_frame_rate_base;
 
-    p_dec->pf_picture_link( p_dec, p_pic );
+    decoder_LinkPicture( p_dec, p_pic );
 
     pp_buf[0] = p_pic->p[0].p_pixels;
     pp_buf[1] = p_pic->p[1].p_pixels;

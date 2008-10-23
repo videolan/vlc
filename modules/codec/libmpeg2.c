@@ -341,7 +341,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* For some reason, libmpeg2 will put this pic twice in
              * discard_picture. This can be considered a bug in libmpeg2. */
-            p_dec->pf_picture_link( p_dec, p_pic );
+            decoder_LinkPicture( p_dec, p_pic );
 
             if( p_sys->p_synchro )
             {
@@ -509,8 +509,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->p_info->discard_fbuf &&
                 p_sys->p_info->discard_fbuf->id )
             {
-                p_dec->pf_picture_unlink( p_dec,
-                                          p_sys->p_info->discard_fbuf->id );
+                decoder_UnlinkPicture( p_dec,
+                                       p_sys->p_info->discard_fbuf->id );
             }
 
             /* For still frames */
@@ -639,7 +639,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
         VLC_FOURCC('I','4','2','0') : VLC_FOURCC('I','4','2','2');
 
     /* Get a new picture */
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     if( p_pic == NULL ) return NULL;
 
@@ -650,7 +650,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     p_pic->i_nb_fields = p_sys->p_info->current_picture != NULL ?
         p_sys->p_info->current_picture->nb_fields : 2;
 
-    p_dec->pf_picture_link( p_dec, p_pic );
+    decoder_LinkPicture( p_dec, p_pic );
 
     pp_buf[0] = p_pic->p[0].p_pixels;
     pp_buf[1] = p_pic->p[1].p_pixels;

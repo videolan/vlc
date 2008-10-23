@@ -206,7 +206,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Get a new picture */
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) goto error;
 
     /* Decode picture */

@@ -924,7 +924,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
  
     vlc_mutex_lock( &qt_mutex );
 
-    if( ( p_pic = p_dec->pf_vout_buffer_new( p_dec ) ) )
+    if( ( p_pic = decoder_NewPicture( p_dec ) ) )
     {
         p_sys->decpar.data                  = (Ptr)p_block->p_buffer;
         p_sys->decpar.bufferSize            = p_block->i_buffer;

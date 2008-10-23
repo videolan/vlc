@@ -165,7 +165,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_frame_rate_base = p_context->time_base.num;
     }
 
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     return p_pic;
 }
@@ -609,7 +609,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             /* Do not display the picture */
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
             if( !b_drawpicture && p_pic )
-                p_dec->pf_vout_buffer_del( p_dec, p_pic );
+                decoder_DeletePicture( p_dec, p_pic );
 
             ffmpeg_NextPts( p_dec );
             continue;
@@ -699,7 +699,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
         else
         {
-            p_dec->pf_vout_buffer_del( p_dec, p_pic );
+            decoder_DeletePicture( p_dec, p_pic );
         }
     }
 
@@ -914,7 +914,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_ff_pic->reference != 0 )
     {
-        p_dec->pf_picture_link( p_dec, p_pic );
+        decoder_LinkPicture( p_dec, p_pic );
     }
 
     /* FIXME what is that, should give good value */
@@ -996,7 +996,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 
     if( p_ff_pic->reference != 0 )
     {
-        p_dec->pf_picture_unlink( p_dec, p_pic );
+        decoder_UnlinkPicture( p_dec, p_pic );
     }
 }
 

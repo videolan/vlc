@@ -168,7 +168,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
         p_sys->p_dirac->src_params.frame_rate.denominator;
 
     /* Get a new picture */
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     if( p_pic == NULL ) return NULL;
     p_pic->b_progressive = !p_sys->p_dirac->src_params.source_sampling;

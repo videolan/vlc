@@ -463,7 +463,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     vlc_mutex_lock( &rm_mutex );
 
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     if ( p_pic )
     {

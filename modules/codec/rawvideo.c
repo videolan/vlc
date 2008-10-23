@@ -289,7 +289,7 @@ static picture_t *DecodeFrame( decoder_t *p_dec, block_t *p_block )
     picture_t *p_pic;
 
     /* Get a new picture */
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
     if( !p_pic )
     {
         block_Release( p_block );

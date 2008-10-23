@@ -953,7 +953,7 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
         /* Get a new picture */
-        picture_t *p_pic = p_dec->pf_vout_buffer_new( p_dec );
+        picture_t *p_pic = decoder_NewPicture( p_dec );
         if( !p_pic ) return NULL;
 
         CopyPicture( p_pic, block_out.p_buffer );

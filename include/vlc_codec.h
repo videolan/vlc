@@ -82,28 +82,27 @@ struct decoder_t
     block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4] );
 
     /*
-     * Buffers allocation
-     */
-
-    /* Video output callbacks */
-    picture_t     * ( * pf_vout_buffer_new) ( decoder_t * );
-    void            ( * pf_vout_buffer_del) ( decoder_t *, picture_t * );
-    void            ( * pf_picture_link)    ( decoder_t *, picture_t * );
-    void            ( * pf_picture_unlink)  ( decoder_t *, picture_t * );
-
-    /*
      * Owner fields
+     * XXX You MUST not use them directly.
      */
+
+    /* Video output callbacks
+     * XXX use decoder_NewPicture/decoder_DeletePicture
+     * and decoder_LinkPicture/decoder_UnlinkPicture */
+    picture_t      *(*pf_vout_buffer_new)( decoder_t * );
+    void            (*pf_vout_buffer_del)( decoder_t *, picture_t * );
+    void            (*pf_picture_link)   ( decoder_t *, picture_t * );
+    void            (*pf_picture_unlink) ( decoder_t *, picture_t * );
 
     /* Audio output callbacks
      * XXX use decoder_NewAudioBuffer/decoder_DeleteAudioBuffer */
-    aout_buffer_t * ( * pf_aout_buffer_new) ( decoder_t *, int );
-    void            ( * pf_aout_buffer_del) ( decoder_t *, aout_buffer_t * );
+    aout_buffer_t  *(*pf_aout_buffer_new)( decoder_t *, int );
+    void            (*pf_aout_buffer_del)( decoder_t *, aout_buffer_t * );
 
     /* SPU output callbacks
      * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
-    subpicture_t   *(*pf_spu_buffer_new) ( decoder_t * );
-    void            (*pf_spu_buffer_del) ( decoder_t *, subpicture_t * );
+    subpicture_t   *(*pf_spu_buffer_new)( decoder_t * );
+    void            (*pf_spu_buffer_del)( decoder_t *, subpicture_t * );
 
     /* Input attachments
      * XXX use decoder_GetInputAttachments */
@@ -165,6 +164,30 @@ struct encoder_t
  * @}
  */
 
+
+/**
+ * This function will return a new picture usable by a decoder as an output
+ * buffer. You have to release it using decoder_DeletePicture or by returning
+ * it to the caller as a pf_decode_video return value.
+ */
+VLC_EXPORT( picture_t *, decoder_NewPicture, ( decoder_t * ) );
+
+/**
+ * This function will release a picture create by decoder_NewPicture.
+ */
+VLC_EXPORT( void, decoder_DeletePicture, ( decoder_t *, picture_t *p_picture ) );
+
+/**
+ * This function will increase the picture reference count.
+ * (picture_Hold is not usable.)
+ */
+VLC_EXPORT( void, decoder_LinkPicture, ( decoder_t *, picture_t * ) );
+
+/**
+ * This function will decrease the picture reference count.
+ * (picture_Release is not usable.)
+ */
+VLC_EXPORT( void, decoder_UnlinkPicture, ( decoder_t *, picture_t * ) );
 
 /**
  * This function will return a new audio buffer usable by a decoder as an

@@ -256,7 +256,7 @@ static void SchroFrameFree( SchroFrame *frame, void *priv)
     if( !p_free )
         return;
 
-    p_free->p_dec->pf_vout_buffer_del( p_free->p_dec, p_free->p_pic );
+    decoder_DeletePicture( p_free->p_dec, p_free->p_pic );
     free(p_free);
     (void)frame;
 }
@@ -274,7 +274,7 @@ static SchroFrame *CreateSchroFrameFromPic( decoder_t *p_dec )
     if( !p_schroframe )
         return NULL;
 
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     if( !p_pic )
         return NULL;

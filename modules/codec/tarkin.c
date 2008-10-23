@@ -266,7 +266,7 @@ static picture_t *DecodePacket( decoder_t *p_dec, block_t **pp_block,
         p_dec->fmt_out.i_codec = i_chroma;
 
         /* Get a new picture */
-        if( (p_pic = p_dec->pf_vout_buffer_new( p_dec )) )
+        if( (p_pic = decoder_NewPicture( p_dec )) )
         {
             tarkin_CopyPicture( p_dec, p_pic, rgb, i_stride );
 

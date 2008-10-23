@@ -161,6 +161,26 @@ struct decoder_owner_sys_t
 /*****************************************************************************
  * Public functions
  *****************************************************************************/
+picture_t *decoder_NewPicture( decoder_t *p_decoder )
+{
+    picture_t *p_picture = p_decoder->pf_vout_buffer_new( p_decoder );
+    if( !p_picture )
+        msg_Warn( p_decoder, "can't get output picture" );
+    return p_picture;
+}
+void decoder_DeletePicture( decoder_t *p_decoder, picture_t *p_picture )
+{
+    p_decoder->pf_vout_buffer_del( p_decoder, p_picture );
+}
+void decoder_LinkPicture( decoder_t *p_decoder, picture_t *p_picture )
+{
+    p_decoder->pf_picture_link( p_decoder, p_picture );
+}
+void decoder_UnlinkPicture( decoder_t *p_decoder, picture_t *p_picture )
+{
+    p_decoder->pf_picture_unlink( p_decoder, p_picture );
+}
+
 aout_buffer_t *decoder_NewAudioBuffer( decoder_t *p_decoder, int i_size )
 {
     if( !p_decoder->pf_aout_buffer_new )
@@ -169,8 +189,6 @@ aout_buffer_t *decoder_NewAudioBuffer( decoder_t *p_decoder, int i_size )
 }
 void decoder_DeleteAudioBuffer( decoder_t *p_decoder, aout_buffer_t *p_buffer )
 {
-    if( !p_decoder->pf_aout_buffer_del )
-        return;
     p_decoder->pf_aout_buffer_del( p_decoder, p_buffer );
 }
 

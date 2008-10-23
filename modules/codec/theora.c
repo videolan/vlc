@@ -495,7 +495,7 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         return NULL;
 
     /* Get a new picture */
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) return NULL;
 
     theora_CopyPicture( p_dec, p_pic, &yuv );

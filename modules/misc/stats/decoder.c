@@ -72,7 +72,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
     p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
 
-    p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_pic = decoder_NewPicture( p_dec );
 
     if( p_block->i_buffer == kBufferSize )
     {

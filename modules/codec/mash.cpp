@@ -202,7 +202,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 //    p_sys->p_decoder->sync();
     if( p_block->i_flags & BLOCK_FLAG_END_OF_FRAME )
     {
-        p_pic = p_dec->pf_vout_buffer_new( p_dec );
+        p_pic = decoder_NewPicture( p_dec );
         if( !p_pic )
         {
             block_Release( p_block );

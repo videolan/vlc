@@ -78,11 +78,14 @@ date_Init
 date_Move
 date_Set
 decoder_DeleteAudioBuffer
+decoder_DeletePicture
 decoder_DeleteSubpicture
 decoder_GetDisplayDate
 decoder_GetDisplayRate
 decoder_GetInputAttachments
+decoder_LinkPicture
 decoder_NewAudioBuffer
+decoder_NewPicture
 decoder_NewSubpicture
 decoder_SynchroChoose
 decoder_SynchroDate
@@ -93,6 +96,7 @@ decoder_SynchroNewPicture
 decoder_SynchroRelease
 decoder_SynchroReset
 decoder_SynchroTrash
+decoder_UnlinkPicture
 decode_URI
 decode_URI_duplicate
 demux_PacketizerDestroy
