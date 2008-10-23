@@ -385,7 +385,7 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
 
     /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time
      * (plus a few header bytes) */
-    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length * 4 );
+    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length * 4 );
     if( p_buf == NULL ) return NULL;
     p_buf->i_nb_samples = p_sys->i_frame_length;
     p_buf->i_nb_bytes = p_sys->i_frame_size;

@@ -292,7 +292,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         aout_buffer_t *p_out;
 
-        p_out = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_samplesperblock );
+        p_out = decoder_NewAudioBuffer( p_dec, p_sys->i_samplesperblock );
         if( p_out == NULL )
         {
             block_Release( p_block );

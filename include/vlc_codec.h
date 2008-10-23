@@ -85,10 +85,6 @@ struct decoder_t
      * Buffers allocation
      */
 
-    /* Audio output callbacks */
-    aout_buffer_t * ( * pf_aout_buffer_new) ( decoder_t *, int );
-    void            ( * pf_aout_buffer_del) ( decoder_t *, aout_buffer_t * );
-
     /* Video output callbacks */
     picture_t     * ( * pf_vout_buffer_new) ( decoder_t * );
     void            ( * pf_vout_buffer_del) ( decoder_t *, picture_t * );
@@ -98,6 +94,11 @@ struct decoder_t
     /*
      * Owner fields
      */
+
+    /* Audio output callbacks
+     * XXX use decoder_NewAudioBuffer/decoder_DeleteAudioBuffer */
+    aout_buffer_t * ( * pf_aout_buffer_new) ( decoder_t *, int );
+    void            ( * pf_aout_buffer_del) ( decoder_t *, aout_buffer_t * );
 
     /* SPU output callbacks
      * XXX use decoder_NewSubpicture and decoder_DeleteSubpicture */
@@ -164,6 +165,19 @@ struct encoder_t
  * @}
  */
 
+
+/**
+ * This function will return a new audio buffer usable by a decoder as an
+ * output buffer. You have to release it using decoder_DeleteAudioBuffer
+ * or by returning it to the caller as a pf_decode_audio return value.
+ */
+VLC_EXPORT( aout_buffer_t *, decoder_NewAudioBuffer, ( decoder_t *, int i_size ) );
+
+/**
+ * This function will release a audio buffer created by decoder_NewAudioBuffer.
+ */
+VLC_EXPORT( void, decoder_DeleteAudioBuffer, ( decoder_t *, aout_buffer_t *p_buffer ) );
+
 /**
  * This function will return a new subpicture usable by a decoder as an output
  * buffer. You have to release it using decoder_DeleteSubpicture or by returning
@@ -172,7 +186,7 @@ struct encoder_t
 VLC_EXPORT( subpicture_t *, decoder_NewSubpicture, ( decoder_t * ) );
 
 /**
- * This function will release a subpicture create by decoder_NewSubicture.
+ * This function will release a subpicture created by decoder_NewSubicture.
  */
 VLC_EXPORT( void, decoder_DeleteSubpicture, ( decoder_t *, subpicture_t *p_subpicture ) );
 

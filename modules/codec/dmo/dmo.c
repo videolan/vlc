@@ -928,15 +928,16 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             ( p_dec->fmt_out.audio.i_bitspersample *
               p_dec->fmt_out.audio.i_channels / 8 );
 
-        p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples );
-        memcpy( p_aout_buffer->p_buffer,
-                block_out.p_buffer, block_out.i_buffer );
-
-        /* Date management */
-        p_aout_buffer->start_date = date_Get( &p_sys->end_date );
-        p_aout_buffer->end_date =
-            date_Increment( &p_sys->end_date, i_samples );
-
+        p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_samples );
+        if( p_aout_buffer )
+        {
+            memcpy( p_aout_buffer->p_buffer,
+                    block_out.p_buffer, block_out.i_buffer );
+            /* Date management */
+            p_aout_buffer->start_date = date_Get( &p_sys->end_date );
+            p_aout_buffer->end_date =
+                date_Increment( &p_sys->end_date, i_samples );
+        }
         p_out->vt->Release( (IUnknown *)p_out );
 
         return p_aout_buffer;

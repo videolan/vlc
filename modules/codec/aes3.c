@@ -130,7 +130,7 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( !p_block )
         return NULL;
 
-    p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_frame_length );
+    p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length );
     if( p_aout_buffer == NULL )
         goto exit;
 

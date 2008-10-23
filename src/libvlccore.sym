@@ -77,10 +77,12 @@ date_Increment
 date_Init
 date_Move
 date_Set
+decoder_DeleteAudioBuffer
 decoder_DeleteSubpicture
 decoder_GetDisplayDate
 decoder_GetDisplayRate
 decoder_GetInputAttachments
+decoder_NewAudioBuffer
 decoder_NewSubpicture
 decoder_SynchroChoose
 decoder_SynchroDate

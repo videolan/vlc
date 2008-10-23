@@ -311,7 +311,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     else
     {
         aout_buffer_t *p_aout_buffer;
-        p_aout_buffer = p_dec->pf_aout_buffer_new( p_dec, i_frame_length );
+        p_aout_buffer = decoder_NewAudioBuffer( p_dec, i_frame_length );
         if( p_aout_buffer == NULL ) return NULL;
 
         p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );

@@ -161,6 +161,19 @@ struct decoder_owner_sys_t
 /*****************************************************************************
  * Public functions
  *****************************************************************************/
+aout_buffer_t *decoder_NewAudioBuffer( decoder_t *p_decoder, int i_size )
+{
+    if( !p_decoder->pf_aout_buffer_new )
+        return NULL;
+    return p_decoder->pf_aout_buffer_new( p_decoder, i_size );
+}
+void decoder_DeleteAudioBuffer( decoder_t *p_decoder, aout_buffer_t *p_buffer )
+{
+    if( !p_decoder->pf_aout_buffer_del )
+        return;
+    p_decoder->pf_aout_buffer_del( p_decoder, p_buffer );
+}
+
 subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder )
 {
     subpicture_t *p_subpicture = p_decoder->pf_spu_buffer_new( p_decoder );

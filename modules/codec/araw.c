@@ -455,7 +455,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     /* Create chunks of max 1024 samples */
     i_samples = __MIN( i_samples, 1024 );
 
-    p_out = p_dec->pf_aout_buffer_new( p_dec, i_samples );
+    p_out = decoder_NewAudioBuffer( p_dec, i_samples );
     if( p_out == NULL )
     {
         block_Release( p_block );

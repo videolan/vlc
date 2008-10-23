@@ -621,7 +621,7 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_sys->p_aout_buffer =
-        p_dec->pf_aout_buffer_new( p_dec, frame->header.blocksize );
+        decoder_NewAudioBuffer( p_dec, frame->header.blocksize );
 
     if( p_sys->p_aout_buffer == NULL )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;

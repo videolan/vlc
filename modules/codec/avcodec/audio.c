@@ -223,11 +223,8 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
 
     if( i_samples == 0 ) return NULL;
 
-    if( ( p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples ) ) == NULL )
-    {
-        msg_Err( p_dec, "cannot get aout buffer" );
+    if( ( p_buffer = decoder_NewAudioBuffer( p_dec, i_samples ) ) == NULL )
         return NULL;
-    }
 
     p_buffer->start_date = aout_DateGet( &p_sys->end_date );
     p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );

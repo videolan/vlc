@@ -533,7 +533,7 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     aout_buffer_t *p_buf;
 
-    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length );
+    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
     if( p_buf == NULL ) return NULL;
 
     p_buf->start_date = aout_DateGet( &p_sys->end_date );

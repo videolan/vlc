@@ -706,7 +706,7 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_out.audio.i_bitspersample /p_dec->fmt_out.audio.i_channels;
 
     p_aout_buffer =
-        p_dec->pf_aout_buffer_new( p_dec, i_samples );
+        decoder_NewAudioBuffer( p_dec, i_samples );
     if( p_aout_buffer )
     {
         memcpy( p_aout_buffer->p_buffer, p_sys->p_out, p_sys->i_out );

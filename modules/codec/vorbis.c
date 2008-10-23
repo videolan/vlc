@@ -549,7 +549,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         aout_buffer_t *p_aout_buffer;
 
         p_aout_buffer =
-            p_dec->pf_aout_buffer_new( p_dec, i_samples );
+            decoder_NewAudioBuffer( p_dec, i_samples );
 
         if( p_aout_buffer == NULL ) return NULL;
 

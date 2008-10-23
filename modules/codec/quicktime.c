@@ -649,7 +649,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         aout_buffer_t *p_out;
         int  i_frames = __MIN( p_sys->i_out_frames - p_sys->i_out, 1000 );
 
-        p_out = p_dec->pf_aout_buffer_new( p_dec, i_frames );
+        p_out = decoder_NewAudioBuffer( p_dec, i_frames );
 
         if( p_out )
         {
