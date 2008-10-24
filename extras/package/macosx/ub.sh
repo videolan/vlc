@@ -1,7 +1,11 @@
 #!/bin/bash
 
+# INTELROOT == path to VLC.app with intel build.
 INTELROOT=/Applications/VLC.app
+# PPCROOT   == path to VLC.app with powerpc build.
 PPCROOT=/Volumes/vlc-0.9.0-test3/VLC.app
+# UBROOT    == path to copied INTEL VLC.app
+# which will contain Universal Binary.
 UBROOT=/Users/fpk/VLC-release.app
 
 for i in `ls $INTELROOT/Contents/MacOS/lib/`
@@ -19,3 +23,6 @@ cp $INTELROOT/Contents/MacOS/modules/*mmx* $UBROOT/Contents/MacOS/modules/
 cp $INTELROOT/Contents/MacOS/modules/*sse* $UBROOT/Contents/MacOS/modules/
 cp $INTELROOT/Contents/MacOS/modules/*3dn* $UBROOT/Contents/MacOS/modules/
 cp $PPCROOT/Contents/MacOS/modules/*altivec* $UBROOT/Contents/MacOS/modules/
+
+# now you should copy resulting UBROOT dir into vlc build directory
+# and run 'make package-macosx'
