@@ -1633,8 +1633,10 @@ dnl
 AC_ARG_ENABLE(libproxy,
   [  --enable-libproxy       libproxy support (default auto)])
 AS_IF([test "${enable_libproxy}" != "no"], [
-  AC_CHECK_HEADERS(proxy.h, [
-    VLC_ADD_LIBS([access_http],[-lproxy])
+  PKG_CHECK_MODULES(LIBPROXY, libproxy-1.0, [
+    AC_DEFINE(HAVE_LIBPROXY, 1, [Define if libproxy is available])
+    VLC_ADD_CFLAGS([access_http],[$LIBPROXY_CFLAGS])
+    VLC_ADD_LIBS([access_http],[$LIBPROXY_LIBS])
   ], [
     AS_IF([test "x${enable_libproxy}" != "x"], [
       AC_MSG_ERROR([libproxy could not be found on your system])

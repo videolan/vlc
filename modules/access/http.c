@@ -53,8 +53,8 @@
 
 #include <assert.h>
 
-#ifdef HAVE_PROXY_H
-#    include "proxy.h"
+#ifdef HAVE_LIBPROXY
+#    include <proxy.h>
 #endif
 /*****************************************************************************
  * Module descriptor
@@ -326,7 +326,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
         vlc_UrlParse( &p_sys->proxy, psz, 0 );
         free( psz );
     }
-#ifdef HAVE_PROXY_H
+#ifdef HAVE_LIBPROXY
     else
     {
         pxProxyFactory *pf = px_proxy_factory_new();
