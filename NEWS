@@ -1,4 +1,4 @@
-Changes between 0.9.4 and 1.0.0-git:
+Changes between 0.9.5 and 1.0.0-git:
 ------------------------------------
 
 Inputs:
@@ -17,6 +17,34 @@ Stream output:
 
 Mac OS X Interface:
  * Reveal-in-Finder functionality for locally stored items
+
+Changes between 0.9.4 and 0.9.5:
+--------------------------------
+Security updates:
+ * Fixed buffer overflow in TiVo demuxer (SA-0809, CVE-2008-4686, CVE-2008-4654)
+ * Fixed libpng CVE-2008-3964 in Win32 and MacOS builds
+
+Features:
+ * Closed Caption EIA 608/708 parsing enabled for libmpeg2
+
+Various bugfixes:
+ * Fixed various potential crashes and memleaks
+ * Fixed issues with reading from files (especially non-local)
+
+Windows port:
+ * Fix bug where interface was "eating" some media keys
+ * Fix some crashes in DirectShow access
+
+Qt Interface:
+ * Fix bug when the resetting of preferences didn't reset the dialog states
+ * Right-click menu to select playlist columns reenabled
+ * Various fixed in playlist
+
+Access:
+ * MMAP module is now deactivated by default
+
+Translations:
+ * Update of Brazillian, Swedish translation
 
 Changes between 0.9.3 and 0.9.4:
 ------------------------------------
