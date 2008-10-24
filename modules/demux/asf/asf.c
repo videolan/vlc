@@ -675,7 +675,7 @@ static int DemuxInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     bool b_seekable;
-    unsigned int i_stream, i;
+    unsigned int i_stream;
     asf_object_content_description_t *p_cd;
     asf_object_index_t *p_index;
     bool b_index;
@@ -688,7 +688,7 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->p_fp     = NULL;
     p_sys->b_index  = 0;
     p_sys->i_track  = 0;
-    for( i = 0; i < 128; i++ )
+    for( int i = 0; i < 128; i++ )
     {
         p_sys->track[i] = NULL;
     }
@@ -764,7 +764,7 @@ static int DemuxInit( demux_t *p_demux )
         {
             int i_ext_stream = ASF_CountObject( p_hdr_ext,
                                                 &asf_object_extended_stream_properties );
-            for( i = 0; i < i_ext_stream; i++ )
+            for( int i = 0; i < i_ext_stream; i++ )
             {
                 asf_object_t *p_tmp =
                     ASF_FindObject( p_hdr_ext,
