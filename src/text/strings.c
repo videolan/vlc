@@ -641,22 +641,38 @@ char *vlc_b64_decode( const char *psz_src )
     return p_dst;
 }
 
-/****************************************************************************
- * String formating functions
- ****************************************************************************/
+/**
+ * Formats current time into a heap-allocated string.
+ * @param tformat time format (as with C strftime())
+ * @return an allocated string (must be free()'d), or NULL on memory error.
+ */
 char *str_format_time( const char *tformat )
 {
-    char buffer[255];
     time_t curtime;
     struct tm loctime;
 
+    if (strcmp (tformat, "") == 0)
+        return strdup (""); /* corner case w.r.t. strftime() return value */
+
     /* Get the current time.  */
-    curtime = time( NULL );
+    time( &curtime );
 
     /* Convert it to local time representation.  */
     localtime_r( &curtime, &loctime );
-    strftime( buffer, 255, tformat, &loctime );
-    return strdup( buffer );
+    for (size_t buflen = strlen (tformat) + 32;; buflen += 32)
+    {
+        char *str = malloc (buflen);
+        if (str == NULL)
+            return NULL;
+
+        size_t len = strftime (str, buflen, tformat, &loctime);
+        if (len > 0)
+        {
+            char *ret = realloc (str, len + 1);
+            return ret ? ret : str; /* <- this cannot fail */
+        }
+    }
+    assert (0);
 }
 
 #define INSERT_STRING( string )                                     \
