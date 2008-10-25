@@ -1685,7 +1685,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 /*****************************************************************************
  * Helper function to initalise video IO using the Read method
  *****************************************************************************/
-static int InitRead( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
+static int InitRead( demux_t *p_demux, unsigned int i_buffer_size )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2156,7 +2156,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( InitRead( p_demux, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
+        if( InitRead( p_demux, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
 
     case IO_METHOD_MMAP:
@@ -2274,8 +2274,7 @@ static char *ResolveALSADeviceName( const char *psz_device )
  * OpenAudioDev: open and set up the audio device and probe for capabilities
  *****************************************************************************/
 #ifdef HAVE_ALSA
-static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
-                             bool b_demux )
+static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys )
 {
     char *psz_device = p_sys->psz_adev;
     p_sys->p_alsa_pcm = NULL;
@@ -2463,8 +2462,7 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
 }
 #endif
 
-static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
-                            bool b_demux )
+static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys )
 {
     int i_fd = 0;
     int i_format;
@@ -2523,11 +2521,11 @@ static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
 
 #ifdef HAVE_ALSA
     if( ( p_sys->i_audio_method & AUDIO_METHOD_ALSA ) && i_fd < 0 )
-        i_fd  = OpenAudioDevAlsa( p_this, p_sys, b_demux );
+        i_fd  = OpenAudioDevAlsa( p_this, p_sys );
 #endif
 
     if( ( p_sys->i_audio_method & AUDIO_METHOD_OSS ) && i_fd < 0 )
-        i_fd = OpenAudioDevOss( p_this, p_sys, b_demux );
+        i_fd = OpenAudioDevOss( p_this, p_sys );
 
     if( i_fd < 0 )
         return i_fd;
@@ -2898,8 +2896,7 @@ open_failed:
  * ProbeAudioDev: probe audio for capabilities
  *****************************************************************************/
 #ifdef HAVE_ALSA
-static bool ProbeAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
-                                     char *psz_device )
+static bool ProbeAudioDevAlsa( vlc_object_t *p_this, char *psz_device )
 {
     int i_err;
     snd_pcm_t *p_alsa_pcm;
@@ -2919,8 +2916,7 @@ static bool ProbeAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys,
 }
 #endif
 
-static bool ProbeAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys,
-                                    char *psz_device )
+static bool ProbeAudioDevOss( vlc_object_t *p_this, char *psz_device )
 {
     int i_fd = 0;
     int i_caps;
@@ -2955,7 +2951,7 @@ static bool ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
 {
 #ifdef HAVE_ALSA
     if( ( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
-     && ProbeAudioDevAlsa( p_this, p_sys, psz_device ) )
+     && ProbeAudioDevAlsa( p_this, psz_device ) )
     {
         p_sys->i_audio_method = AUDIO_METHOD_ALSA;
         return true;
@@ -2963,7 +2959,7 @@ static bool ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
 #endif
 
     if( ( p_sys->i_audio_method & AUDIO_METHOD_OSS )
-     && ProbeAudioDevOss( p_this, p_sys, psz_device ) )
+     && ProbeAudioDevOss( p_this, psz_device ) )
     {
         p_sys->i_audio_method = AUDIO_METHOD_OSS;
         return true;
