@@ -3519,7 +3519,7 @@ static int DemuxControlCallback( vlc_object_t *p_this,
     (void)oldval;
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_cid = (int)p_data;
+    int i_cid = (long int)p_data;
 
     int i_fd = p_sys->i_fd_video;
 
@@ -3555,7 +3555,7 @@ static int AccessControlCallback( vlc_object_t *p_this,
     (void)oldval;
     access_t *p_access = (access_t *)p_this;
     demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
-    int i_cid = (int)p_data;
+    int i_cid = (long int)p_data;
 
     int i_fd = p_sys->i_fd_video;
 
