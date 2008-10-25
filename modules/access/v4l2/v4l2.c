@@ -70,7 +70,6 @@
 #ifdef HAVE_LIBV4L2
 #   include <libv4l2.h>
 #else
-#   define v4l2_fd_open(fd, flags) (fd)
 #   define v4l2_close close
 #   define v4l2_dup dup
 #   define v4l2_ioctl ioctl
@@ -1845,15 +1844,19 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         goto open_failed;
     }
 
+#ifdef HAVE_LIBV4L2
     /* Note the v4l2_xxx functions are designed so that if they get passed an
        unknown fd, the will behave exactly as their regular xxx counterparts,
        so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
        custom cam format to normal formats conversion). Chances are big we will
        still fail then though, as normally v4l2_fd_open only fails if the
        device is not a v4l2 device. */
-    libv4l2_fd = v4l2_fd_open(i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION);
-    if (libv4l2_fd != -1)
+    libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
+    if( libv4l2_fd != -1 )
         i_fd = libv4l2_fd;
+#else
+    libv4l2_fd = i_fd;
+#endif
 
     /* Tune the tuner */
     if( p_sys->i_frequency >= 0 )
@@ -2574,15 +2577,19 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
         goto open_failed;
     }
 
+#ifdef HAVE_LIBV4L2
     /* Note the v4l2_xxx functions are designed so that if they get passed an
        unknown fd, the will behave exactly as their regular xxx counterparts,
        so if v4l2_fd_open fails, we continue as normal (missing the libv4l2
        custom cam format to normal formats conversion). Chances are big we will
        still fail then though, as normally v4l2_fd_open only fails if the
        device is not a v4l2 device. */
-    libv4l2_fd = v4l2_fd_open(i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION);
-    if (libv4l2_fd != -1)
+    libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
+    if( libv4l2_fd != -1 )
         i_fd = libv4l2_fd;
+#else
+    libv4l2_fd = i_fd;
+#endif
 
     /* Get device capabilites */
 
