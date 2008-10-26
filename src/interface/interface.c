@@ -271,13 +271,14 @@ static void * MonitorLibVLCDeath( vlc_object_t * p_this )
 static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    intf_thread_t *p_intf;
-    char *psz_intf = malloc( strlen(newval.psz_string) + sizeof(",none") );
-
     (void)psz_cmd; (void)oldval; (void)p_data;
+    intf_thread_t *p_intf;
+    char* psz_intf;
 
     /* Try to create the interface */
-    sprintf( psz_intf, "%s,none", newval.psz_string );
+    if( asprintf( &psz_intf, "%s,none", newval.psz_string ) == -1 )
+        return VLC_ENOMEM;
+
     p_intf = intf_Create( p_this->p_libvlc, psz_intf );
     free( psz_intf );
     if( p_intf == NULL )
