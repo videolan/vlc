@@ -236,7 +236,7 @@ static const struct xml_entity_s
 {
     char    psz_entity[8];
     char    psz_char[4];
-} p_xml_entities[] = {
+} xml_entities[] = {
     /* Important: this list has to be in alphabetical order (psz_entity-wise) */
     { "AElig;",  "Æ" },
     { "Aacute;", "Á" },
@@ -277,6 +277,8 @@ static const struct xml_entity_s
     { "acute;",  "´" },
     { "aelig;",  "æ" },
     { "agrave;", "à" },
+    { "amp;",    "&" },
+    { "apos;"    "'" },
     { "aring;",  "å" },
     { "atilde;", "ã" },
     { "auml;",   "ä" },
@@ -300,6 +302,7 @@ static const struct xml_entity_s
     { "frac12;", "½" },
     { "frac14;", "¼" },
     { "frac34;", "¾" },
+    { "gt;",     ">" },
     { "hellip;", "…" },
     { "iacute;", "í" },
     { "icirc;",  "î" },
@@ -311,6 +314,7 @@ static const struct xml_entity_s
     { "ldquo;",  "“" },
     { "lsaquo;", "‹" },
     { "lsquo;",  "‘" },
+    { "lt;"      "<" },
     { "macr;",   "¯" },
     { "mdash;",  "—" },
     { "micro;",  "µ" },
@@ -332,6 +336,7 @@ static const struct xml_entity_s
     { "permil;", "‰" },
     { "plusmn;", "±" },
     { "pound;",  "£" },
+    { "quot;",   "\"" },
     { "raquo;",  "»" },
     { "rdquo;",  "”" },
     { "reg;",    "®" },
@@ -359,6 +364,14 @@ static const struct xml_entity_s
     { "yuml;",   "ÿ" },
 };
 
+static int cmp_entity (const void *key, const void *elem)
+{
+    const struct xml_entity_s *ent = elem;
+    const char *name = key;
+
+    return strncmp (name, ent->psz_entity, strlen (ent->psz_entity));
+}
+
 /**
  * Converts "&lt;", "&gt;" and "&amp;" to "<", ">" and "&"
  * \param string to convert
@@ -371,20 +384,8 @@ void resolve_xml_special_chars( char *psz_value )
     {
         if( *psz_value == '&' )
         {
-            char *psz_value1 = psz_value + 1;
-#define TRY_CHAR( src, dst )                          \
-            if( !strncmp( psz_value1, src";", strlen( src";" ) ) )   \
-            {                                         \
-                *p_pos = dst;                         \
-                psz_value += strlen( src ) + 2;       \
-            }
-            TRY_CHAR( "lt", '<' )
-            else TRY_CHAR( "amp", '&' )
-            else TRY_CHAR( "apos", '\'' )
-            else TRY_CHAR( "gt", '>' )
-            else TRY_CHAR( "quot", '"' )
-#undef TRY_CHAR
-            else if( *psz_value1 == '#' )
+            const char *psz_value1 = psz_value + 1;
+            if( *psz_value1 == '#' )
             {
                 char *psz_end;
                 int i = strtol( psz_value+2, &psz_end, 10 );
@@ -411,37 +412,20 @@ void resolve_xml_special_chars( char *psz_value )
             }
             else
             {
-                const size_t i_entities = sizeof( p_xml_entities ) /
-                                          sizeof( p_xml_entities[0] );
-                assert( i_entities < 128 );
-                size_t step = 128>>1;
-                size_t i = step-1;
-                int cmp = -1;
-                while( step )
+                const struct xml_entity_s *ent;
+
+                ent = bsearch (psz_value1, xml_entities,
+                               sizeof (xml_entities) / sizeof (*ent),
+                               sizeof (*ent), cmp_entity);
+                if (ent != NULL)
                 {
-                    size_t ilen = strlen( p_xml_entities[i].psz_entity );
-                    step >>= 1;
-                    if( i >= i_entities )
-                        cmp = -1;
-                    else
-                        cmp = strncmp( psz_value1, /* Skip the & */
-                                       p_xml_entities[i].psz_entity,
-                                       strlen( p_xml_entities[i].psz_entity ) );
-                    if( cmp == 0 )
-                    {
-                        size_t olen = strlen( p_xml_entities[i].psz_char );
-                        memcpy( p_pos, p_xml_entities[i].psz_char, olen );
-                        p_pos += olen - 1;
-                        psz_value += ilen+1;
-                        break;
-                    }
-                    else if( cmp < 0 )
-                        i -= step;
-                    else
-                        i += step;
+                    size_t olen = strlen (ent->psz_char);
+                    memcpy (p_pos, ent->psz_char, olen);
+                    p_pos += olen - 1;
+                    psz_value += strlen (ent->psz_entity) + 1;
                 }
-                if( cmp != 0 )
-                {
+                else
+                {   /* No match */
                     *p_pos = *psz_value;
                     psz_value++;
                 }
