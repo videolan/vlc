@@ -158,6 +158,14 @@ struct decoder_owner_sys_t
 #define DECODER_MAX_BUFFERING_AUDIO_DURATION (AOUT_MAX_PREPARE_TIME)
 #define DECODER_MAX_BUFFERING_VIDEO_DURATION (1*CLOCK_FREQ)
 
+/* Pictures which are DECODER_BOGUS_VIDEO_DELAY or more in advance probably have
+ * a bogus PTS and won't be displayed */
+#define DECODER_BOGUS_VIDEO_DELAY                ((mtime_t)(DEFAULT_PTS_DELAY * 30))
+
+/* */
+#define DECODER_SPU_VOUT_WAIT_DURATION ((int)(0.200*CLOCK_FREQ))
+
+
 /*****************************************************************************
  * Public functions
  *****************************************************************************/
@@ -796,7 +804,7 @@ static void *DecoderThread( vlc_object_t *p_this )
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     /* The decoder's main loop */
-    for (;;)
+    for( ;; )
     {
         block_t *p_block = block_FifoGet( p_owner->p_fifo );
         /* Make sure there is no cancellation point other than this one^^.
@@ -1321,7 +1329,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         vlc_mutex_unlock( &p_owner->lock );
 
         /* */
-        const mtime_t i_max_date = mdate() + i_delay + VOUT_BOGUS_DELAY;
+        const mtime_t i_max_date = mdate() + i_delay + DECODER_BOGUS_VIDEO_DELAY;
 
         if( !p_picture->b_force && ( p_picture->date <= 0 || p_picture->date >= i_max_date ) )
             b_reject = true;
@@ -1801,7 +1809,7 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
         return VLC_SUCCESS;
     }
 
-    int canc = vlc_savecancel ();
+    int canc = vlc_savecancel();
 #ifdef ENABLE_SOUT
     if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
     {
@@ -1853,7 +1861,7 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
 
         DecoderSignalFlushed( p_dec );
     }
-    vlc_restorecancel(canc);
+    vlc_restorecancel( canc );
 
     return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
@@ -1980,10 +1988,11 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         p_owner->audio = p_dec->fmt_out.audio;
 
         memcpy( &format, &p_owner->audio, sizeof( audio_sample_format_t ) );
-        if ( i_force_dolby && (format.i_original_channels&AOUT_CHAN_PHYSMASK)
-                                    == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
+        if( i_force_dolby &&
+            (format.i_original_channels&AOUT_CHAN_PHYSMASK) ==
+                (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
         {
-            if ( i_force_dolby == 1 )
+            if( i_force_dolby == 1 )
             {
                 format.i_original_channels = format.i_original_channels |
                                              AOUT_CHAN_DOLBYSTEREO;
@@ -2192,7 +2201,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
         if( p_vout )
             break;
 
-        msleep( VOUT_DISPLAY_DELAY );
+        msleep( DECODER_SPU_VOUT_WAIT_DURATION );
     }
 
     if( !p_vout )

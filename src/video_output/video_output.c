@@ -92,6 +92,20 @@ int vout_Snapshot( vout_thread_t *, picture_t * );
 /* Display media title in OSD */
 static void DisplayTitleOnOSD( vout_thread_t *p_vout );
 
+/* Time during which the thread will sleep if it has nothing to
+ * display (in micro-seconds) */
+#define VOUT_IDLE_SLEEP                 ((int)(0.020*CLOCK_FREQ))
+
+/* Maximum lap of time allowed between the beginning of rendering and
+ * display. If, compared to the current date, the next image is too
+ * late, the thread will perform an idle loop. This time should be
+ * at least VOUT_IDLE_SLEEP plus the time required to render a few
+ * images, to avoid trashing of decoded images */
+#define VOUT_DISPLAY_DELAY              ((int)(0.200*CLOCK_FREQ))
+
+/* Better be in advance when awakening than late... */
+#define VOUT_MWAIT_TOLERANCE            ((mtime_t)(0.020*CLOCK_FREQ))
+
 /*****************************************************************************
  * Video Filter2 functions
  *****************************************************************************/
