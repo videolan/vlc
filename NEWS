@@ -18,6 +18,9 @@ Stream output:
 Mac OS X Interface:
  * Reveal-in-Finder functionality for locally stored items
 
+Playlist:
+ * export the playlist in HTML
+
 Changes between 0.9.4 and 0.9.5:
 --------------------------------
 Security updates:
