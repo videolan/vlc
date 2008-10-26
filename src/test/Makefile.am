@@ -6,6 +6,7 @@ check_PROGRAMS = \
 	test_i18n_atof \
 	test_url \
 	test_utf8 \
+	test_xmlent \
 	test_headers
 
 TESTS = $(check_PROGRAMS)
@@ -19,5 +20,5 @@ test_dictionary_SOURCES = dictionary.c
 test_i18n_atof_SOURCES = i18n_atof.c
 test_url_SOURCES = url.c
 test_utf8_SOURCES = utf8.c
+test_xmlent_SOURCES = xmlent.c
 test_headers_SOURCES = headers.c
-
