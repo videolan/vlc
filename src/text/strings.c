@@ -316,6 +316,7 @@ static const struct xml_entity_s
     { "mdash;", 6, "—" },
     { "micro;", 6, "µ" },
     { "middot;", 7, "·" },
+    { "nbsp;", 5, "\xc2\xa0" },
     { "ndash;", 6, "–" },
     { "not;", 4, "¬" },
     { "ntilde;", 7, "ñ" },
