@@ -63,10 +63,11 @@ void RecentsMRL::addRecent( const QString &mrl )
         return;
 
     msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
-    if( stack->contains( mrl ) )
+    int i_index = stack->indexOf( mrl );
+    if( 0 <= i_index )
     {
-        stack->removeOne( mrl );
-        stack->prepend( mrl );
+        /* move to the front */
+        stack->move( i_index, 0 );
     }
     else
     {
