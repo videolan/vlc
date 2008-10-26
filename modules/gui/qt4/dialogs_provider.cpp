@@ -478,7 +478,9 @@ void DialogsProvider::saveAPlaylist()
                                    qtr( "Save playlist as..." ),
                                    qfu( p_intf->p_sys->psz_filepath ),
                                    qtr( "XSPF playlist (*.xspf);; " ) +
-                                   qtr( "M3U playlist (*.m3u);; Any (*.*) " ) );
+                                   qtr( "M3U playlist (*.m3u);; " ) +
+                                   qtr( "HTML playlist (*.html);;" ) +
+                                   qtr( "Any (*.*) " ) );
     qfd->setFileMode( QFileDialog::AnyFile );
     qfd->setAcceptMode( QFileDialog::AcceptSave );
     qfd->setConfirmOverwrite( true );
@@ -488,24 +490,37 @@ void DialogsProvider::saveAPlaylist()
         if( qfd->selectedFiles().count() > 0 )
         {
             static const char psz_xspf[] = "export-xspf",
-                              psz_m3u[] = "export-m3u";
+                              psz_m3u[] = "export-m3u",
+                              psz_html[] = "export-html";
             const char *psz_module;
 
             QString file = qfd->selectedFiles().first();
             QString filter = qfd->selectedFilter();
+            const char* filt = filter.toAscii();
 
-            if( file.contains( ".xsp" ) ||
-                ( filter.contains( ".xspf" ) && !file.contains( ".m3u" ) ) )
+            if( file.contains( ".xsp" ) || filter.contains( "XSPF" ) )
             {
                 psz_module = psz_xspf;
                 if( !file.contains( ".xsp" ) )
                     file.append( ".xspf" );
             }
-            else
+            else if( file.contains( ".m3u" )  || filter.contains( "M3U" ) )
             {
                 psz_module = psz_m3u;
                 if( !file.contains( ".m3u" ) )
                     file.append( ".m3u" );
+            }
+            else if( file.contains(".html" ) || filter.contains( "HTML" ) )
+            {
+                psz_module = psz_html;
+                if( !file.contains( "html" ) )
+                    file.append( ".html" );
+            }
+            else
+            {
+                msg_Err( p_intf, "Impossible to recognise the file type" );
+                delete qfd;
+                return;
             }
 
             playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
