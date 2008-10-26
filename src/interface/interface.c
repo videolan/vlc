@@ -56,10 +56,9 @@ static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
 /**
- * \brief Destroy the interface after the main loop endeed.
+ * Destroy the interface after the main loop endeed.
  *
- * \param p_intf the interface thread
- * \return nothing
+ * @param p_obj: the interface thread
  */
 static void intf_Destroy( vlc_object_t *obj )
 {
@@ -73,18 +72,14 @@ static void intf_Destroy( vlc_object_t *obj )
     vlc_mutex_destroy( &p_intf->change_lock );
 }
 
-/*****************************************************************************
- * intf_Create: prepare interface before main loop
- *****************************************************************************
- * This function opens output devices and creates specific interfaces. It sends
- * its own error messages.
- *****************************************************************************/
+
 /**
- * Create the interface, and prepare it for main loop.
+ * Create the interface, and prepare it for main loop. It opens ouput device
+ * and creates specific interfaces. Sends its own error messages.
  *
- * \param p_this the calling vlc_object_t
- * \param psz_module a preferred interface module
- * \return a pointer to the created interface thread, NULL on error
+ * @param p_this the calling vlc_object_t
+ * @param psz_module a preferred interface module
+ * @return a pointer to the created interface thread, NULL on error
  */
 intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
@@ -125,16 +120,12 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     return p_intf;
 }
 
-/*****************************************************************************
- * intf_RunThread: launch the interface thread
- *****************************************************************************
- * This function either creates a new thread and runs the interface in it.
- *****************************************************************************/
+
 /**
  * Starts and runs the interface thread.
  *
- * \param p_intf the interface thread
- * \return VLC_SUCCESS on success, an error number else
+ * @param p_intf the interface thread
+ * @return VLC_SUCCESS on success, an error number else
  */
 int intf_RunThread( intf_thread_t *p_intf )
 {
@@ -173,12 +164,12 @@ int intf_RunThread( intf_thread_t *p_intf )
     return VLC_SUCCESS;
 }
 
+
 /**
  * Stops the interface thread
  *
  * This function asks the interface thread to stop
- * \param p_intf the interface thread
- * \return nothing
+ * @param p_intf the interface thread
  */
 void intf_StopThread( intf_thread_t *p_intf )
 {
@@ -187,11 +178,15 @@ void intf_StopThread( intf_thread_t *p_intf )
     vlc_thread_join( p_intf );
 }
 
+
+
 /* Following functions are local */
 
-/*****************************************************************************
+/**
  * RunInterface: setups necessary data and give control to the interface
- *****************************************************************************/
+ *
+ * @param p_this: interface object
+ */
 static void* RunInterface( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
@@ -231,9 +226,11 @@ static void* RunInterface( vlc_object_t *p_this )
 }
 
 #if defined( __APPLE__ ) || defined( WIN32 )
-/*****************************************************************************
+/**
  * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
- *****************************************************************************/
+ *
+ * @param p_this: the interface object
+ */
 static void * MonitorLibVLCDeath( vlc_object_t * p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
