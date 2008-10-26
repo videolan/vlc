@@ -235,129 +235,128 @@ char *encode_URI_component( const char *psz_uri )
 static const struct xml_entity_s
 {
     char    psz_entity[8];
-    uint8_t i_length;
     char    psz_char[4];
 } p_xml_entities[] = {
     /* Important: this list has to be in alphabetical order (psz_entity-wise) */
-    { "AElig;", 6, "Æ" },
-    { "Aacute;", 7, "Á" },
-    { "Acirc;", 6, "Â" },
-    { "Agrave;", 7, "À" },
-    { "Aring;", 6, "Å" },
-    { "Atilde;", 7, "Ã" },
-    { "Auml;", 5, "Ä" },
-    { "Ccedil;", 7, "Ç" },
-    { "Dagger;", 7, "‡" },
-    { "ETH;", 4, "Ð" },
-    { "Eacute;", 7, "É" },
-    { "Ecirc;", 6, "Ê" },
-    { "Egrave;", 7, "È" },
-    { "Euml;", 5, "Ë" },
-    { "Iacute;", 7, "Í" },
-    { "Icirc;", 6, "Î" },
-    { "Igrave;", 7, "Ì" },
-    { "Iuml;", 5, "Ï" },
-    { "Ntilde;", 7, "Ñ" },
-    { "OElig;", 6, "Œ" },
-    { "Oacute;", 7, "Ó" },
-    { "Ocirc;", 6, "Ô" },
-    { "Ograve;", 7, "Ò" },
-    { "Oslash;", 7, "Ø" },
-    { "Otilde;", 7, "Õ" },
-    { "Ouml;", 5, "Ö" },
-    { "Scaron;", 7, "Š" },
-    { "THORN;", 6, "Þ" },
-    { "Uacute;", 7, "Ú" },
-    { "Ucirc;", 6, "Û" },
-    { "Ugrave;", 7, "Ù" },
-    { "Uuml;", 5, "Ü" },
-    { "Yacute;", 7, "Ý" },
-    { "Yuml;", 5, "Ÿ" },
-    { "aacute;", 7, "á" },
-    { "acirc;", 6, "â" },
-    { "acute;", 6, "´" },
-    { "aelig;", 6, "æ" },
-    { "agrave;", 7, "à" },
-    { "aring;", 6, "å" },
-    { "atilde;", 7, "ã" },
-    { "auml;", 5, "ä" },
-    { "bdquo;", 6, "„" },
-    { "brvbar;", 7, "¦" },
-    { "ccedil;", 7, "ç" },
-    { "cedil;", 6, "¸" },
-    { "cent;", 5, "¢" },
-    { "circ;", 5, "ˆ" },
-    { "copy;", 5, "©" },
-    { "curren;", 7, "¤" },
-    { "dagger;", 7, "†" },
-    { "deg;", 4, "°" },
-    { "divide;", 7, "÷" },
-    { "eacute;", 7, "é" },
-    { "ecirc;", 6, "ê" },
-    { "egrave;", 7, "è" },
-    { "eth;", 4, "ð" },
-    { "euml;", 5, "ë" },
-    { "euro;", 5, "€" },
-    { "frac12;", 7, "½" },
-    { "frac14;", 7, "¼" },
-    { "frac34;", 7, "¾" },
-    { "hellip;", 7, "…" },
-    { "iacute;", 7, "í" },
-    { "icirc;", 6, "î" },
-    { "iexcl;", 6, "¡" },
-    { "igrave;", 7, "ì" },
-    { "iquest;", 7, "¿" },
-    { "iuml;", 5, "ï" },
-    { "laquo;", 6, "«" },
-    { "ldquo;", 6, "“" },
-    { "lsaquo;", 7, "‹" },
-    { "lsquo;", 6, "‘" },
-    { "macr;", 5, "¯" },
-    { "mdash;", 6, "—" },
-    { "micro;", 6, "µ" },
-    { "middot;", 7, "·" },
-    { "nbsp;", 5, "\xc2\xa0" },
-    { "ndash;", 6, "–" },
-    { "not;", 4, "¬" },
-    { "ntilde;", 7, "ñ" },
-    { "oacute;", 7, "ó" },
-    { "ocirc;", 6, "ô" },
-    { "oelig;", 6, "œ" },
-    { "ograve;", 7, "ò" },
-    { "ordf;", 5, "ª" },
-    { "ordm;", 5, "º" },
-    { "oslash;", 7, "ø" },
-    { "otilde;", 7, "õ" },
-    { "ouml;", 5, "ö" },
-    { "para;", 5, "¶" },
-    { "permil;", 7, "‰" },
-    { "plusmn;", 7, "±" },
-    { "pound;", 6, "£" },
-    { "raquo;", 6, "»" },
-    { "rdquo;", 6, "”" },
-    { "reg;", 4, "®" },
-    { "rsaquo;", 7, "›" },
-    { "rsquo;", 6, "’" },
-    { "sbquo;", 6, "‚" },
-    { "scaron;", 7, "š" },
-    { "sect;", 5, "§" },
-    { "shy;", 4, "­" },
-    { "sup1;", 5, "¹" },
-    { "sup2;", 5, "²" },
-    { "sup3;", 5, "³" },
-    { "szlig;", 6, "ß" },
-    { "thorn;", 6, "þ" },
-    { "tilde;", 6, "˜" },
-    { "times;", 6, "×" },
-    { "trade;", 6, "™" },
-    { "uacute;", 7, "ú" },
-    { "ucirc;", 6, "û" },
-    { "ugrave;", 7, "ù" },
-    { "uml;", 4, "¨" },
-    { "uuml;", 5, "ü" },
-    { "yacute;", 7, "ý" },
-    { "yen;", 4, "¥" },
-    { "yuml;", 5, "ÿ" },
+    { "AElig;",  "Æ" },
+    { "Aacute;", "Á" },
+    { "Acirc;",  "Â" },
+    { "Agrave;", "À" },
+    { "Aring;",  "Å" },
+    { "Atilde;", "Ã" },
+    { "Auml;",   "Ä" },
+    { "Ccedil;", "Ç" },
+    { "Dagger;", "‡" },
+    { "ETH;",    "Ð" },
+    { "Eacute;", "É" },
+    { "Ecirc;",  "Ê" },
+    { "Egrave;", "È" },
+    { "Euml;",   "Ë" },
+    { "Iacute;", "Í" },
+    { "Icirc;",  "Î" },
+    { "Igrave;", "Ì" },
+    { "Iuml;",   "Ï" },
+    { "Ntilde;", "Ñ" },
+    { "OElig;",  "Œ" },
+    { "Oacute;", "Ó" },
+    { "Ocirc;",  "Ô" },
+    { "Ograve;", "Ò" },
+    { "Oslash;", "Ø" },
+    { "Otilde;", "Õ" },
+    { "Ouml;",   "Ö" },
+    { "Scaron;", "Š" },
+    { "THORN;",  "Þ" },
+    { "Uacute;", "Ú" },
+    { "Ucirc;",  "Û" },
+    { "Ugrave;", "Ù" },
+    { "Uuml;",   "Ü" },
+    { "Yacute;", "Ý" },
+    { "Yuml;",   "Ÿ" },
+    { "aacute;", "á" },
+    { "acirc;",  "â" },
+    { "acute;",  "´" },
+    { "aelig;",  "æ" },
+    { "agrave;", "à" },
+    { "aring;",  "å" },
+    { "atilde;", "ã" },
+    { "auml;",   "ä" },
+    { "bdquo;",  "„" },
+    { "brvbar;", "¦" },
+    { "ccedil;", "ç" },
+    { "cedil;",  "¸" },
+    { "cent;",   "¢" },
+    { "circ;",   "ˆ" },
+    { "copy;",   "©" },
+    { "curren;", "¤" },
+    { "dagger;", "†" },
+    { "deg;",    "°" },
+    { "divide;", "÷" },
+    { "eacute;", "é" },
+    { "ecirc;",  "ê" },
+    { "egrave;", "è" },
+    { "eth;",    "ð" },
+    { "euml;",   "ë" },
+    { "euro;",   "€" },
+    { "frac12;", "½" },
+    { "frac14;", "¼" },
+    { "frac34;", "¾" },
+    { "hellip;", "…" },
+    { "iacute;", "í" },
+    { "icirc;",  "î" },
+    { "iexcl;",  "¡" },
+    { "igrave;", "ì" },
+    { "iquest;", "¿" },
+    { "iuml;",   "ï" },
+    { "laquo;",  "«" },
+    { "ldquo;",  "“" },
+    { "lsaquo;", "‹" },
+    { "lsquo;",  "‘" },
+    { "macr;",   "¯" },
+    { "mdash;",  "—" },
+    { "micro;",  "µ" },
+    { "middot;", "·" },
+    { "nbsp;",   "\xc2\xa0" },
+    { "ndash;",  "–" },
+    { "not;",    "¬" },
+    { "ntilde;", "ñ" },
+    { "oacute;", "ó" },
+    { "ocirc;",  "ô" },
+    { "oelig;",  "œ" },
+    { "ograve;", "ò" },
+    { "ordf;",   "ª" },
+    { "ordm;",   "º" },
+    { "oslash;", "ø" },
+    { "otilde;", "õ" },
+    { "ouml;",   "ö" },
+    { "para;",   "¶" },
+    { "permil;", "‰" },
+    { "plusmn;", "±" },
+    { "pound;",  "£" },
+    { "raquo;",  "»" },
+    { "rdquo;",  "”" },
+    { "reg;",    "®" },
+    { "rsaquo;", "›" },
+    { "rsquo;",  "’" },
+    { "sbquo;",  "‚" },
+    { "scaron;", "š" },
+    { "sect;",   "§" },
+    { "shy;",    "­" },
+    { "sup1;",   "¹" },
+    { "sup2;",   "²" },
+    { "sup3;",   "³" },
+    { "szlig;",  "ß" },
+    { "thorn;",  "þ" },
+    { "tilde;",  "˜" },
+    { "times;",  "×" },
+    { "trade;",  "™" },
+    { "uacute;", "ú" },
+    { "ucirc;",  "û" },
+    { "ugrave;", "ù" },
+    { "uml;",    "¨" },
+    { "uuml;",   "ü" },
+    { "yacute;", "ý" },
+    { "yen;",    "¥" },
+    { "yuml;",   "ÿ" },
 };
 
 /**
@@ -373,17 +372,17 @@ void resolve_xml_special_chars( char *psz_value )
         if( *psz_value == '&' )
         {
             char *psz_value1 = psz_value + 1;
-#define TRY_CHAR( src, len, dst )                     \
-            if( !strncmp( psz_value1, src, len ) )   \
+#define TRY_CHAR( src, dst )                          \
+            if( !strncmp( psz_value1, src";", strlen( src";" ) ) )   \
             {                                         \
                 *p_pos = dst;                         \
-                psz_value += len + 1;                 \
+                psz_value += strlen( src ) + 2;       \
             }
-            TRY_CHAR( "lt;", 3, '<' )
-            else TRY_CHAR( "amp;", 4, '&' )
-            else TRY_CHAR( "apos;", 5, '\'' )
-            else TRY_CHAR( "gt;", 3, '>' )
-            else TRY_CHAR( "quot;", 5, '"' )
+            TRY_CHAR( "lt", '<' )
+            else TRY_CHAR( "amp", '&' )
+            else TRY_CHAR( "apos", '\'' )
+            else TRY_CHAR( "gt", '>' )
+            else TRY_CHAR( "quot", '"' )
 #undef TRY_CHAR
             else if( *psz_value1 == '#' )
             {
@@ -420,19 +419,20 @@ void resolve_xml_special_chars( char *psz_value )
                 int cmp = -1;
                 while( step )
                 {
+                    size_t ilen = strlen( p_xml_entities[i].psz_entity );
                     step >>= 1;
                     if( i >= i_entities )
                         cmp = -1;
                     else
                         cmp = strncmp( psz_value1, /* Skip the & */
                                        p_xml_entities[i].psz_entity,
-                                       p_xml_entities[i].i_length );
+                                       strlen( p_xml_entities[i].psz_entity ) );
                     if( cmp == 0 )
                     {
-                        size_t i_len = strlen( p_xml_entities[i].psz_char );
-                        strncpy( p_pos, p_xml_entities[i].psz_char, i_len );
-                        p_pos += i_len - 1;
-                        psz_value += p_xml_entities[i].i_length+1;
+                        size_t olen = strlen( p_xml_entities[i].psz_char );
+                        memcpy( p_pos, p_xml_entities[i].psz_char, olen );
+                        p_pos += olen - 1;
+                        psz_value += ilen+1;
                         break;
                     }
                     else if( cmp < 0 )
