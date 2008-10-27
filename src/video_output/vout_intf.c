@@ -650,7 +650,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             image_HandlerDelete( p_image );
             vlc_object_signal_unlocked( p_dest );
 	    vlc_object_unlock( p_dest );
-            vlc_object_release( p_dest );
             return VLC_EGENERIC;
         }
 
@@ -663,7 +662,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             image_HandlerDelete( p_image );
             vlc_object_signal_unlocked( p_dest );
 	    vlc_object_unlock( p_dest );
-            vlc_object_release( p_dest );
             return VLC_ENOMEM;
         }
 
@@ -681,7 +679,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             image_HandlerDelete( p_image );
             vlc_object_signal_unlocked( p_dest );
 	    vlc_object_unlock( p_dest );
-            vlc_object_release( p_dest );
             return VLC_ENOMEM;
         }
         memcpy( p_snapshot->p_data, p_block->p_buffer, p_block->i_buffer );
@@ -693,7 +690,6 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         /* Unlock the object */
         vlc_object_signal_unlocked( p_dest );
 	vlc_object_unlock( p_dest );
-        vlc_object_release( p_dest );
 
         image_HandlerDelete( p_image );
         return VLC_SUCCESS;
