@@ -390,6 +390,8 @@ int OpenEncoder( vlc_object_t *p_this )
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     var_Get( p_enc, ENC_CFG_PREFIX "aac-profile", &val );
+    /* ffmpeg uses faac encoder atm, and it has issues with
+     * other than low-complexity profile, so default to that */
     p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
     if( val.psz_string && *val.psz_string )
     {
@@ -594,8 +596,8 @@ int OpenEncoder( vlc_object_t *p_this )
              * to the desired value (-R option of the faac frontend)
             p_enc->fmt_in.audio.i_rate = p_context->sample_rate;*/
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
-        /* Ignore FF_PROFILE_UNKNOWN */
-        if( p_sys->i_aac_profile >= FF_PROFILE_AAC_MAIN )
+            /* vlc should default to low-complexity profile, faac encoder
+             * has bug and aac audio has issues otherwise atm */
             p_context->profile = p_sys->i_aac_profile;
 #endif
         }
