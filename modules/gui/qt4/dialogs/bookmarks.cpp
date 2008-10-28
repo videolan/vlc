@@ -130,8 +130,9 @@ void BookmarksDialog::update()
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEditable |
                         Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         bookmarksList->insertTopLevelItem( i, item );
+        vlc_seekpoint_Delete( pp_bookmarks[i] );
     }
-
+    free( pp_bookmarks );
 }
 
 void BookmarksDialog::add()
