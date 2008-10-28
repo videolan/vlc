@@ -33,6 +33,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <vlc_common.h>
 
 #if !defined (__STDC__) || !__STDC__
 /* This is a separate conditional since some stdc systems
