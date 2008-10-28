@@ -1383,24 +1383,53 @@ static int Demux( demux_t *p_demux )
     es_out_id_t *p_es = p_sys->p_es_audio;
     block_t *p_block = NULL;
 
-    /* Try grabbing audio frames first */
-    if( p_sys->i_fd_audio < 0 || !( p_block = GrabAudio( p_demux ) ) )
+    struct pollfd p_fd[2];
+    int i_fd = 0;
+    memset( p_fd, 0, 2 * sizeof( struct pollfd ) );
+    if( p_sys->i_fd_video )
     {
-        /* Try grabbing video frame */
-        p_es = p_sys->p_es_video;
-        if( p_sys->i_fd_video > 0 ) p_block = GrabVideo( p_demux );
+        p_fd[i_fd].fd = p_sys->i_fd_video;
+        p_fd[i_fd].events = POLLIN|POLLPRI;
+        i_fd ++;
+    }
+    if( p_sys->i_fd_audio )
+    {
+        p_fd[i_fd].fd = p_sys->i_fd_audio;
+        p_fd[i_fd].events = POLLIN|POLLPRI;
+        i_fd ++;
+    }
+
+    /* Wait for data */
+    if( poll( p_fd, i_fd, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+    {
+        for( i_fd --; i_fd >= 0; i_fd -- )
+        {
+            if( p_fd[i_fd].revents & (POLLIN|POLLPRI) )
+            {
+                if( p_fd[i_fd].fd == p_sys->i_fd_video )
+                {
+                    p_block = GrabVideo( p_demux );
+                    p_es = p_sys->p_es_video;
+                }
+                else /* audio */
+                {
+                    p_block = GrabAudio( p_demux );
+                    p_es = p_sys->p_es_audio;
+                }
+                break;
+            }
+        }
     }
 
     if( !p_block )
     {
-        /* Sleep so we do not consume all the cpu, 10ms seems
-         * like a good value (100fps) */
-        /* Yeah, nevermind this was sleeping 10 microseconds! This is
-         * completely brain damaged anyway. Use poll() or mwait() FIXME. */
-        msleep(10000);
+        /* Looks like poll timed out ...
+         * ... or returned an error on one of the fds.
+         * TODO: process */
         return 1;
     }
 
+    assert( p_es );
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_es, p_block );
 
