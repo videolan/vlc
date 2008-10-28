@@ -151,10 +151,10 @@ void *vlc_hold (gc_object_t * p_gc)
 
 #if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
     refs = __sync_add_and_fetch (&p_gc->refs, 1);
-#elif defined (WIN32) && defined (__GNUC__)
-    refs = InterlockedIncrement (&p_gc->refs);
-#elif defined (WIN64) && defined (__GNUC__)
+#elif defined (WIN64)
     refs = InterlockedIncrement64 (&p_gc->refs);
+#elif defined (WIN32)
+    refs = InterlockedIncrement (&p_gc->refs);
 #elif defined(__APPLE__)
     refs = OSAtomicIncrement32Barrier((int*)&p_gc->refs);
 #else
@@ -178,10 +178,10 @@ void vlc_release (gc_object_t *p_gc)
 
 #if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
     refs = __sync_sub_and_fetch (&p_gc->refs, 1);
-#elif defined (WIN32) && defined (__GNUC__)
-    refs = InterlockedDecrement (&p_gc->refs);
-#elif defined (WIN64) && defined (__GNUC__)
+#elif defined (WIN64)
     refs = InterlockedDecrement64 (&p_gc->refs);
+#elif defined (WIN32)
+    refs = InterlockedDecrement (&p_gc->refs);
 #elif defined(__APPLE__)
     refs = OSAtomicDecrement32Barrier((int*)&p_gc->refs);
 #else
