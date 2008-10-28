@@ -37,6 +37,7 @@ SOURCES_cdda = \
         vcd/cdrom_internals.h \
         $(NULL)
 SOURCES_access_jack = jack.c
+SOURCES_access_alsa = alsa.c
 
 libvlc_LTLIBRARIES += \
 	libaccess_file_plugin.la \

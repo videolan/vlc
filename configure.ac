@@ -4642,6 +4642,8 @@ then
         AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
     VLC_ADD_PLUGIN([alsa])
     VLC_ADD_LIBS([alsa],[-lasound -lm -ldl])
+    VLC_ADD_PLUGIN([access_alsa])
+    VLC_ADD_LIBS([access_alsa],[-lasound -lm -ldl])
   else
     if test "${enable_alsa}" = "yes"; then
       AC_MSG_ERROR([Could not find ALSA development headers])
