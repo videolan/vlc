@@ -60,7 +60,7 @@ public:
         i_arg = _i_arg;
         p_arg = _p_arg;
     };
-    virtual ~DialogEvent() {};
+    virtual ~DialogEvent() { delete p_arg; };
 
     int i_arg, i_dialog;
     intf_dialog_args_t *p_arg;
