@@ -71,7 +71,7 @@ AbstractController::AbstractController( intf_thread_t * _p_i ) : QFrame( NULL )
     controlLayout = new QGridLayout( this );
 
     /* Main action provider */
-    toolbarActionsMapper = new QSignalMapper();
+    toolbarActionsMapper = new QSignalMapper( this );
     CONNECT( toolbarActionsMapper, mapped( int ),
              this, doAction( int ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
