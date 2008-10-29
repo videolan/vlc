@@ -29,6 +29,99 @@
  * This file implements plugin (module) macros used to define a vlc module.
  */
 
+VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
+VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
+VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, ...) );
+VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int type) );
+VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
+
+enum vlc_module_properties
+{
+    /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
+     * Append new items at the end ONLY. */
+    VLC_MODULE_CPU_REQUIREMENT,
+    VLC_MODULE_SHORTCUT,
+    VLC_MODULE_SHORTNAME_NODOMAIN,
+    VLC_MODULE_DESCRIPTION_NODOMAIN,
+    VLC_MODULE_HELP_NODOMAIN,
+    VLC_MODULE_CAPABILITY,
+    VLC_MODULE_SCORE,
+    VLC_MODULE_PROGRAM, /* obsoleted */
+    VLC_MODULE_CB_OPEN,
+    VLC_MODULE_CB_CLOSE,
+    VLC_MODULE_NO_UNLOAD,
+    VLC_MODULE_NAME,
+    VLC_MODULE_SHORTNAME,
+    VLC_MODULE_DESCRIPTION,
+    VLC_MODULE_HELP,
+};
+
+enum vlc_config_properties
+{
+    /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
+     * Append new items at the end ONLY. */
+
+    VLC_CONFIG_NAME,
+    /* command line name (args=const char *, vlc_callback_t) */
+
+    VLC_CONFIG_DESC_NODOMAIN,
+    /* description (args=const char *, const char *) */
+
+    VLC_CONFIG_VALUE,
+    /* actual value (args=int/double/const char *) */
+
+    VLC_CONFIG_RANGE,
+    /* minimum value (args=int/double/const char * twice) */
+
+    VLC_CONFIG_ADVANCED,
+    /* enable advanced flag (args=none) */
+
+    VLC_CONFIG_VOLATILE,
+    /* don't write variable to storage (args=none) */
+
+    VLC_CONFIG_PERSISTENT,
+    /* always write variable to storage (args=none) */
+
+    VLC_CONFIG_RESTART,
+    /* restart required to apply value change (args=none) */
+
+    VLC_CONFIG_PRIVATE,
+    /* hide from user (args=none) */
+
+    VLC_CONFIG_REMOVED,
+    /* tag as no longer supported (args=none) */
+
+    VLC_CONFIG_CAPABILITY,
+    /* capability for a module or list thereof (args=const char*) */
+
+    VLC_CONFIG_SHORTCUT,
+    /* one-character (short) command line option name (args=char) */
+
+    VLC_CONFIG_LIST_NODOMAIN,
+    /* possible values list
+     * (args=size_t, const <type> *, const char *const *) */
+
+    VLC_CONFIG_ADD_ACTION_NODOMAIN,
+    /* add value change callback (args=vlc_callback_t, const char *) */
+
+    VLC_CONFIG_OLDNAME,
+    /* former option name (args=const char *) */
+
+    VLC_CONFIG_SAFE,
+    /* tag as modifiable by untrusted input item "sources" (args=none) */
+
+    VLC_CONFIG_DESC,
+    /* description (args=const char *, const char *, const char *) */
+
+    VLC_CONFIG_LIST,
+    /* possible values list
+     * (args=const char *, size_t, const <type> *, const char *const *) */
+
+    VLC_CONFIG_ADD_ACTION,
+    /* add value change callback
+     * (args=const char *, vlc_callback_t, const char *) */
+};
+
 /*****************************************************************************
  * If we are not within a module, assume we're in the vlc core.
  *****************************************************************************/
@@ -155,99 +248,6 @@
         goto error;
 
 #define set_text_domain( dom ) domain = (dom);
-
-VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
-VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
-VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, ...) );
-VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int type) );
-VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
-
-enum vlc_module_properties
-{
-    /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
-     * Append new items at the end ONLY. */
-    VLC_MODULE_CPU_REQUIREMENT,
-    VLC_MODULE_SHORTCUT,
-    VLC_MODULE_SHORTNAME_NODOMAIN,
-    VLC_MODULE_DESCRIPTION_NODOMAIN,
-    VLC_MODULE_HELP_NODOMAIN,
-    VLC_MODULE_CAPABILITY,
-    VLC_MODULE_SCORE,
-    VLC_MODULE_PROGRAM, /* obsoleted */
-    VLC_MODULE_CB_OPEN,
-    VLC_MODULE_CB_CLOSE,
-    VLC_MODULE_NO_UNLOAD,
-    VLC_MODULE_NAME,
-    VLC_MODULE_SHORTNAME,
-    VLC_MODULE_DESCRIPTION,
-    VLC_MODULE_HELP,
-};
-
-enum vlc_config_properties
-{
-    /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
-     * Append new items at the end ONLY. */
-
-    VLC_CONFIG_NAME,
-    /* command line name (args=const char *, vlc_callback_t) */
-
-    VLC_CONFIG_DESC_NODOMAIN,
-    /* description (args=const char *, const char *) */
-
-    VLC_CONFIG_VALUE,
-    /* actual value (args=int/double/const char *) */
-
-    VLC_CONFIG_RANGE,
-    /* minimum value (args=int/double/const char * twice) */
-
-    VLC_CONFIG_ADVANCED,
-    /* enable advanced flag (args=none) */
-
-    VLC_CONFIG_VOLATILE,
-    /* don't write variable to storage (args=none) */
-
-    VLC_CONFIG_PERSISTENT,
-    /* always write variable to storage (args=none) */
-
-    VLC_CONFIG_RESTART,
-    /* restart required to apply value change (args=none) */
-
-    VLC_CONFIG_PRIVATE,
-    /* hide from user (args=none) */
-
-    VLC_CONFIG_REMOVED,
-    /* tag as no longer supported (args=none) */
-
-    VLC_CONFIG_CAPABILITY,
-    /* capability for a module or list thereof (args=const char*) */
-
-    VLC_CONFIG_SHORTCUT,
-    /* one-character (short) command line option name (args=char) */
-
-    VLC_CONFIG_LIST_NODOMAIN,
-    /* possible values list
-     * (args=size_t, const <type> *, const char *const *) */
-
-    VLC_CONFIG_ADD_ACTION_NODOMAIN,
-    /* add value change callback (args=vlc_callback_t, const char *) */
-
-    VLC_CONFIG_OLDNAME,
-    /* former option name (args=const char *) */
-
-    VLC_CONFIG_SAFE,
-    /* tag as modifiable by untrusted input item "sources" (args=none) */
-
-    VLC_CONFIG_DESC,
-    /* description (args=const char *, const char *, const char *) */
-
-    VLC_CONFIG_LIST,
-    /* possible values list
-     * (args=const char *, size_t, const <type> *, const char *const *) */
-
-    VLC_CONFIG_ADD_ACTION,
-    /* add value change callback
-     * (args=const char *, vlc_callback_t, const char *) */
-};
 
 /*****************************************************************************
  * Macros used to build the configuration structure.
