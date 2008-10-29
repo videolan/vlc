@@ -275,7 +275,10 @@ static int Init( vout_thread_t *p_vout )
         p_snapshot->date = 0;
         p_snapshot->p_data = ( char* ) malloc( i_datasize );
         if( p_snapshot->p_data == NULL )
+        {
+            free( p_snapshort );
             return VLC_ENOMEM;
+        }
         p_vout->p_sys->p_list[i_index] = p_snapshot;
     }
 
