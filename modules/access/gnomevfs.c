@@ -81,6 +81,9 @@ struct access_sys_t
     bool b_pace_control;
 };
 
+/* NOTE: we do not handle memory errors in this plugin.
+ * Underlying glib does not, so there is no point in doing it here either. */
+
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -116,9 +119,7 @@ static int Open( vlc_object_t *p_this )
     if( strcmp( "gnomevfs", p_access->psz_access ) &&
                                             *(p_access->psz_access) != '\0')
     {
-        psz_name = malloc( strlen( p_access->psz_access ) +
-                                            strlen( p_access->psz_path ) + 4 );
-        sprintf( psz_name, "%s://%s", p_access->psz_access,
+        asprintf( &psz_name, "%s://%s", p_access->psz_access,
                                                     p_access->psz_path );
     }
     else
@@ -156,9 +157,7 @@ static int Open( vlc_object_t *p_this )
             psz_path_begin = psz_unescaped + strlen( psz_unescaped )
                                            - strlen( url.psz_path );
             *psz_path_begin = '\0';
-            psz_uri = malloc( strlen( psz_unescaped ) +
-                                        strlen( psz_escaped_path ) + 1 );
-            sprintf( psz_uri, "%s%s",psz_unescaped, psz_escaped_path );
+            asprintf( &psz_uri, "%s%s", psz_unescaped, psz_escaped_path );
 
             g_free( psz_escaped_path );
             g_free( psz_unescaped );
@@ -188,7 +187,7 @@ static int Open( vlc_object_t *p_this )
             gnome_vfs_file_info_unref( p_sys->p_file_info );
             gnome_vfs_uri_unref( p_uri);
             free( p_sys );
-            g_free( psz_uri );
+            free( psz_uri );
             free( psz_name );
             return VLC_EGENERIC;
         }
@@ -196,7 +195,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         msg_Warn( p_access, "cannot parse MRL %s or unsupported protocol", psz_name );
-        g_free( psz_uri );
+        free( psz_uri );
         free( p_sys );
         free( psz_name );
         return VLC_EGENERIC;
@@ -210,7 +209,7 @@ static int Open( vlc_object_t *p_this )
                                 gnome_vfs_result_to_string( i_ret ) );
 
         gnome_vfs_uri_unref( p_uri);
-        g_free( psz_uri );
+        free( psz_uri );
         free( p_sys );
         free( psz_name );
         return VLC_EGENERIC;
@@ -246,7 +245,7 @@ static int Open( vlc_object_t *p_this )
         gnome_vfs_file_info_unref( p_sys->p_file_info );
         gnome_vfs_uri_unref( p_uri);
         free( p_sys );
-        g_free( psz_uri );
+        free( psz_uri );
         free( psz_name );
         return VLC_EGENERIC;
     }
@@ -255,7 +254,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_access, "gnomevfs-caching",
                                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    g_free( psz_uri );
+    free( psz_uri );
     p_sys->psz_name = psz_name;
     gnome_vfs_uri_unref( p_uri);
     return VLC_SUCCESS;
