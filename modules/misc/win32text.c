@@ -301,8 +301,10 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Sanity check */
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
-#ifdef UNICODE
     psz_string = malloc( (strlen( p_region_in->psz_text )+1) * sizeof(TCHAR) );
+    if( !psz_string )
+        return VLC_ENOMEM;
+#ifdef UNICODE
     if( mbstowcs( psz_string, p_region_in->psz_text,
                   strlen( p_region_in->psz_text ) * sizeof(TCHAR) ) < 0 )
     {
@@ -310,9 +312,13 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         return VLC_EGENERIC;
     }
 #else
-    psz_string = strdup( p_region_in->psz_text );
+    strcpy( psz_string, p_region_in->psz_text );
 #endif
-    if( !psz_string || !*psz_string ) return VLC_EGENERIC;
+    if( !*psz_string )
+    {
+        free( psz_strin );
+        return VLC_EGENERIC;
+    }
 
     if( p_region_in->p_style )
     {
