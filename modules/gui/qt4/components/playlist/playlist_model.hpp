@@ -63,10 +63,10 @@ public:
     PLEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
     { i_id = id; p_add = NULL; };
 
-    PLEvent(  playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
+    PLEvent( playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
     { p_add = a; };
 
-    virtual ~PLEvent() {};
+    virtual ~PLEvent() { free( p_add ); };
 
     int i_id;
     playlist_add_t *p_add;

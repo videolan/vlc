@@ -993,7 +993,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
     playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t));
     memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
 
-    PLEvent *event = new PLEvent(  p_add );
+    PLEvent *event = new PLEvent( p_add );
     QApplication::postEvent( p_model, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
