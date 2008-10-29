@@ -44,9 +44,9 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
             playMRL( const QString & ) );
 
     isActive = config_GetInt( p_intf, "qt-recentplay" );
-    filter = new QRegExp(
-            qfu( config_GetPsz( p_intf, "qt-recentplay-filter" ) ),
-            Qt::CaseInsensitive );
+    char* psz_tmp = config_GetPsz( p_intf, "qt-recentplay-filter" );
+    filter = new QRegExp( psz_tmp, Qt::CaseInsensitive );
+    free( psz_tmp );
 
     load();
     if ( !isActive ) clear();
@@ -54,6 +54,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 
 RecentsMRL::~RecentsMRL()
 {
+    delete filter;
     delete stack;
 }
 
