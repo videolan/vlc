@@ -883,10 +883,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             *psz_parser = '\0';
             psz_parser++;
         }
-        psz_temp = (char *)malloc( strlen(psz_module) + sizeof(",none") );
-        if( psz_temp )
+        if( asprintf( &psz_temp, "%s,none", psz_module ) != -1)
         {
-            sprintf( psz_temp, "%s,none", psz_module );
             libvlc_InternalAddIntf( p_libvlc, psz_temp );
             free( psz_temp );
         }

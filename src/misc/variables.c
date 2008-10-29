@@ -1577,9 +1577,9 @@ int __var_Command( vlc_object_t *p_this, const char *psz_name,
 
     if( psz_msg )
     {
-        *psz_msg = (char*)malloc( 80 );
-        sprintf( *psz_msg, "%s on object %s returned %i (%s)",
-                 psz_cmd, psz_name, i_ret, vlc_error( i_ret ) );
+        if( asprintf( psz_msg, "%s on object %s returned %i (%s)",
+                  psz_cmd, psz_name, i_ret, vlc_error( i_ret ) ) == -1)
+            *psz_msg = NULL;
     }
 
     return i_ret;
