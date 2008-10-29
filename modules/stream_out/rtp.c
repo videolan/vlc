@@ -157,13 +157,13 @@ static void Close( vlc_object_t * );
 #define SOUT_CFG_PREFIX "sout-rtp-"
 #define MAX_EMPTY_BLOCKS 200
 
-vlc_module_begin();
-    set_shortname( N_("RTP"));
-    set_description( N_("RTP stream output") );
-    set_capability( "sout stream", 0 );
-    add_shortcut( "rtp" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
+vlc_module_begin ()
+    set_shortname( N_("RTP"))
+    set_description( N_("RTP stream output") )
+    set_capability( "sout stream", 0 )
+    add_shortcut( "rtp" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
                 DEST_LONGTEXT, true );
@@ -208,8 +208,8 @@ vlc_module_begin();
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
                  RFC3016_LONGTEXT, false );
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

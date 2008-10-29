@@ -71,24 +71,24 @@ static int  UnlockPicture ( vout_thread_t *, picture_t * );
 #define T_DATA N_( "Callback data" )
 #define LT_DATA N_( "Data for the locking and unlocking functions" )
 
-vlc_module_begin( );
-    set_description( N_( "Video memory module" ) );
-    set_shortname( N_("Video memory") );
+vlc_module_begin ()
+    set_description( N_( "Video memory module" ) )
+    set_shortname( N_("Video memory") )
 
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_capability( "video output", 0 );
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_capability( "video output", 0 )
 
-    add_integer( "vmem-width", 320, NULL, T_WIDTH, LT_WIDTH, false );
-    add_integer( "vmem-height", 200, NULL, T_HEIGHT, LT_HEIGHT, false );
-    add_integer( "vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, false );
-    add_string( "vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true );
-    add_string( "vmem-lock", "0", NULL, T_LOCK, LT_LOCK, true );
-    add_string( "vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true );
-    add_string( "vmem-data", "0", NULL, T_DATA, LT_DATA, true );
+    add_integer( "vmem-width", 320, NULL, T_WIDTH, LT_WIDTH, false )
+    add_integer( "vmem-height", 200, NULL, T_HEIGHT, LT_HEIGHT, false )
+    add_integer( "vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, false )
+    add_string( "vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true )
+    add_string( "vmem-lock", "0", NULL, T_LOCK, LT_LOCK, true )
+    add_string( "vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true )
+    add_string( "vmem-data", "0", NULL, T_DATA, LT_DATA, true )
 
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output descriptor

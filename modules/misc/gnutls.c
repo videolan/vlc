@@ -85,30 +85,30 @@ static void CloseServer (vlc_object_t *);
     "This is the maximum number of resumed TLS sessions that " \
     "the cache will hold." )
 
-vlc_module_begin();
-    set_shortname( "GnuTLS" );
-    set_description( N_("GnuTLS transport layer security") );
-    set_capability( "tls client", 1 );
-    set_callbacks( OpenClient, CloseClient );
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_MISC );
+vlc_module_begin ()
+    set_shortname( "GnuTLS" )
+    set_description( N_("GnuTLS transport layer security") )
+    set_capability( "tls client", 1 )
+    set_callbacks( OpenClient, CloseClient )
+    set_category( CAT_ADVANCED )
+    set_subcategory( SUBCAT_ADVANCED_MISC )
 
-    add_obsolete_bool( "tls-check-cert" );
-    add_obsolete_bool( "tls-check-hostname" );
+    add_obsolete_bool( "tls-check-cert" )
+    add_obsolete_bool( "tls-check-hostname" )
 
-    add_submodule();
-        set_description( N_("GnuTLS server") );
-        set_capability( "tls server", 1 );
-        set_category( CAT_ADVANCED );
-        set_subcategory( SUBCAT_ADVANCED_MISC );
-        set_callbacks( OpenServer, CloseServer );
+    add_submodule ()
+        set_description( N_("GnuTLS server") )
+        set_capability( "tls server", 1 )
+        set_category( CAT_ADVANCED )
+        set_subcategory( SUBCAT_ADVANCED_MISC )
+        set_callbacks( OpenServer, CloseServer )
 
-        add_obsolete_integer( "gnutls-dh-bits" );
+        add_obsolete_integer( "gnutls-dh-bits" )
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT, NULL,
                     CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true );
         add_integer( "gnutls-cache-size", CACHE_SIZE, NULL, CACHE_SIZE_TEXT,
                     CACHE_SIZE_LONGTEXT, true );
-vlc_module_end();
+vlc_module_end ()
 
 static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;
 

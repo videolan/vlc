@@ -45,16 +45,16 @@ static void Destroy   ( vlc_object_t * );
 
 #define FILTER_PREFIX "motiondetect-"
 
-vlc_module_begin();
-    set_description( N_("Motion detect video filter") );
-    set_shortname( N_( "Motion Detect" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter2", 0 );
+vlc_module_begin ()
+    set_description( N_("Motion detect video filter") )
+    set_shortname( N_( "Motion Detect" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "video filter2", 0 )
 
-    add_shortcut( "motion" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "motion" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 
 /*****************************************************************************

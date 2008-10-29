@@ -147,11 +147,11 @@ static const int i_norm_list[] =
 static const char *const psz_norm_list_text[] =
     { N_("Automatic"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
 
-vlc_module_begin();
-    set_shortname( N_("Video4Linux") );
-    set_description( N_("Video4Linux input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("Video4Linux") )
+    set_description( N_("Video4Linux input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "v4l-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
@@ -161,28 +161,28 @@ vlc_module_begin();
                 false );
     add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true );
-    add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
+    add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( "v4l-samplerate", 44100, NULL, SAMPLERATE_TEXT,
                 SAMPLERATE_LONGTEXT, true );
     add_integer( "v4l-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
                 true );
-    add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, true );
+    add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, true )
     add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
                 false );
         change_integer_list( i_norm_list, psz_norm_list_text, NULL );
     add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
                 false );
-    add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, true );
+    add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, true )
     add_bool( "v4l-stereo", true, NULL, STEREO_TEXT, STEREO_LONGTEXT,
             true );
-    add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
+    add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( "v4l-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                 true );
     add_integer( "v4l-brightness", -1, NULL, BRIGHTNESS_TEXT,
                 BRIGHTNESS_LONGTEXT, true );
     add_integer( "v4l-colour", -1, NULL, COLOUR_TEXT, COLOUR_LONGTEXT,
                 true );
-    add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, true );
+    add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, true )
     add_integer( "v4l-contrast", -1, NULL, CONTRAST_TEXT, CONTRAST_LONGTEXT,
                 true );
     add_bool( "v4l-mjpeg", false, NULL, MJPEG_TEXT, MJPEG_LONGTEXT,
@@ -192,10 +192,10 @@ vlc_module_begin();
     add_integer( "v4l-quality", 100, NULL, QUALITY_TEXT, QUALITY_LONGTEXT,
             true );
 
-    add_shortcut( "v4l" );
-    set_capability( "access_demux", 10 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    add_shortcut( "v4l" )
+    set_capability( "access_demux", 10 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Access: local prototypes

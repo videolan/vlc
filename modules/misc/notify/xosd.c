@@ -83,13 +83,13 @@ static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
 #define COLOUR_TEXT N_("Color")
 #define COLOUR_LONGTEXT N_("Color used to display text in the XOSD output.")
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_description( N_("XOSD interface") );
-    set_shortname( "XOSD" );
-    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, true );
-    add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_description( N_("XOSD interface") )
+    set_shortname( "XOSD" )
+    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, true )
+    add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true )
     add_integer( "xosd-shadow-offset", 2, NULL,
                  SHD_OFS_TEXT, SHD_OFS_LONGTEXT, true );
     add_string( "xosd-font",
@@ -97,9 +97,9 @@ vlc_module_begin();
                 NULL, FONT_TEXT, FONT_LONGTEXT, true );
     add_string( "xosd-colour", "LawnGreen",
                     NULL, COLOUR_TEXT, COLOUR_LONGTEXT, true );
-    set_capability( "interface", 10 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 10 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

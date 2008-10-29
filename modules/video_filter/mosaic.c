@@ -174,13 +174,13 @@ static const char *const ppsz_align_descriptions[] =
 
 #define CFG_PREFIX "mosaic-"
 
-vlc_module_begin();
-    set_description( N_("Mosaic video sub filter") );
-    set_shortname( N_("Mosaic") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC);
-    set_capability( "sub filter", 0 );
-    set_callbacks( CreateFilter, DestroyFilter );
+vlc_module_begin ()
+    set_description( N_("Mosaic video sub filter") )
+    set_shortname( N_("Mosaic") )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC)
+    set_capability( "sub filter", 0 )
+    set_callbacks( CreateFilter, DestroyFilter )
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false );
@@ -201,10 +201,10 @@ vlc_module_begin();
 
     add_integer( CFG_PREFIX "borderw", 0, NULL,
                  BORDERW_TEXT, BORDERW_LONGTEXT, true );
-        add_deprecated_alias( CFG_PREFIX "vborder" );
+        add_deprecated_alias( CFG_PREFIX "vborder" )
     add_integer( CFG_PREFIX "borderh", 0, NULL,
                  BORDERH_TEXT, BORDERH_LONGTEXT, true );
-        add_deprecated_alias( CFG_PREFIX "hborder" );
+        add_deprecated_alias( CFG_PREFIX "hborder" )
 
     add_integer( CFG_PREFIX "position", 0, NULL,
                  POS_TEXT, POS_LONGTEXT, false );
@@ -227,7 +227,7 @@ vlc_module_begin();
 
     add_integer( CFG_PREFIX "delay", 0, NULL, DELAY_TEXT, DELAY_LONGTEXT,
                  false );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "alpha", "height", "width", "align", "xoffset", "yoffset",

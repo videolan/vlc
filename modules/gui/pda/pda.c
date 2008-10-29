@@ -66,15 +66,15 @@ gint GtkModeManage   ( intf_thread_t * p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("PDA Linux Gtk2+ interface") );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
-//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, true );
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-    add_shortcut( "pda" );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("PDA Linux Gtk2+ interface") )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
+//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, true )
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+    add_shortcut( "pda" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create window

@@ -56,23 +56,23 @@ static void Close( vlc_object_t * );
     "Duration of the fake streaming before faking an " \
     "end-of-file (default is 0, meaning that the stream is unlimited).")
 
-vlc_module_begin();
-    set_shortname( N_("Fake") );
-    set_description( N_("Fake input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("Fake") )
+    set_description( N_("Fake input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "fake-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
-    add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
-    add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, true );
+    add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
+    add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, true )
     add_integer( "fake-duration", 0, NULL, DURATION_TEXT, DURATION_LONGTEXT,
                  true );
 
-    add_shortcut( "fake" );
-    set_capability( "access_demux", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    add_shortcut( "fake" )
+    set_capability( "access_demux", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Access: local prototypes

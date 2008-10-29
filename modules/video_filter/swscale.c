@@ -64,15 +64,15 @@ const char *const ppsz_mode_descriptions[] =
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
   N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
 
-vlc_module_begin();
-    set_description( N_("Video scaling filter") );
-    set_capability( "video filter2", 150 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_callbacks( OpenScaler, CloseScaler );
-    add_integer( "swscale-mode", 2, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true );
+vlc_module_begin ()
+    set_description( N_("Video scaling filter") )
+    set_capability( "video filter2", 150 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_callbacks( OpenScaler, CloseScaler )
+    add_integer( "swscale-mode", 2, NULL, SCALEMODE_TEXT, SCALEMODE_LONGTEXT, true )
         change_integer_list( pi_mode_values, ppsz_mode_descriptions, NULL );
-vlc_module_end();
+vlc_module_end ()
 
 /* Version checking */
 #if LIBSWSCALE_VERSION_INT >= ((0<<16)+(5<<8)+0)

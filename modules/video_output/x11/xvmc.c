@@ -133,25 +133,25 @@ extern void Deactivate ( vlc_object_t * );
 #define CROP_TEXT N_("Crop")
 #define CROP_LONGTEXT N_("You can choose the crop style to apply.")
 
-vlc_module_begin();
-    set_shortname( "XVMC" );
-    add_string( "xvmc-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
-    add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true );
-    add_bool( "xvmc-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true );
-    add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true );
+vlc_module_begin ()
+    set_shortname( "XVMC" )
+    add_string( "xvmc-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
+    add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true )
+    add_bool( "xvmc-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true )
+    add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
+    add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "xvmc-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
+    add_integer ( "xvmc-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
-    add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false );
-    add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false );
+    add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false )
+    add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false )
 
-    set_description( N_("XVMC extension video output") );
-    set_capability( "video output", 10 );
-    set_callbacks( Activate, Deactivate );
-vlc_module_end();
+    set_description( N_("XVMC extension video output") )
+    set_capability( "video output", 10 )
+    set_callbacks( Activate, Deactivate )
+vlc_module_end ()
 
 /* following functions are local */
 

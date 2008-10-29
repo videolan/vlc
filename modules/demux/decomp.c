@@ -43,18 +43,18 @@ static int  OpenGzip (vlc_object_t *);
 static int  OpenBzip2 (vlc_object_t *);
 static void Close (vlc_object_t *);
 
-vlc_module_begin ();
-    set_description (N_("Decompression"));
-    set_category (CAT_INPUT);
-    set_subcategory (SUBCAT_INPUT_DEMUX);
-    set_capability ("demux", 20);
-    set_callbacks (OpenBzip2, Close);
+vlc_module_begin ()
+    set_description (N_("Decompression"))
+    set_category (CAT_INPUT)
+    set_subcategory (SUBCAT_INPUT_DEMUX)
+    set_capability ("demux", 20)
+    set_callbacks (OpenBzip2, Close)
     /* TODO: shortnames */
     /* --demux support */
 
-    add_submodule ();
-    set_callbacks (OpenGzip, Close);
-vlc_module_end ();
+    add_submodule ()
+    set_callbacks (OpenGzip, Close)
+vlc_module_end ()
 
 static int Demux   (demux_t *);
 static int Control (demux_t *, int i_query, va_list args);

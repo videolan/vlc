@@ -45,14 +45,14 @@
 static int        OpenDecoder  ( vlc_object_t * );
 static void       CloseDecoder ( vlc_object_t * );
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_description( N_("Schroedinger video decoder") );
-    set_capability( "decoder", 200 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "schroedinger" );
-vlc_module_end();
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_description( N_("Schroedinger video decoder") )
+    set_capability( "decoder", 200 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "schroedinger" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

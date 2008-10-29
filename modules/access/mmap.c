@@ -50,17 +50,17 @@
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
-vlc_module_begin();
-    set_shortname (N_("MMap"));
-    set_description (N_("Memory-mapped file input"));
-    set_category (CAT_INPUT);
-    set_subcategory (SUBCAT_INPUT_ACCESS);
-    set_capability ("access", 52);
-    add_shortcut ("file");
-    set_callbacks (Open, Close);
+vlc_module_begin ()
+    set_shortname (N_("MMap"))
+    set_description (N_("Memory-mapped file input"))
+    set_category (CAT_INPUT)
+    set_subcategory (SUBCAT_INPUT_ACCESS)
+    set_capability ("access", 52)
+    add_shortcut ("file")
+    set_callbacks (Open, Close)
     add_bool ("file-mmap", false, NULL,
               FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true);
-vlc_module_end();
+vlc_module_end ()
 
 static block_t *Block (access_t *);
 static int Seek (access_t *, int64_t);

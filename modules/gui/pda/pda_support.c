@@ -136,7 +136,7 @@ glade_set_atk_action_description       (AtkAction       *action,
   for (i = 0; i < n_actions; i++)
     {
       if (!strcmp (atk_action_get_name (action, i), action_name))
-        atk_action_set_description (action, i, description);
+        atk_action_set_description (action, i, description)
     }
 }
 

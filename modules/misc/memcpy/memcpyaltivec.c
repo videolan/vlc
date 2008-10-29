@@ -55,15 +55,15 @@ static int Activate ( vlc_object_t *p_this )
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("AltiVec memcpy") );
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_MISC );
-    add_requirement( ALTIVEC );
-    set_capability( "memcpy", 100 );
-    set_callbacks( Activate, NULL );
-    add_shortcut( "altivec" );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("AltiVec memcpy") )
+    set_category( CAT_ADVANCED )
+    set_subcategory( SUBCAT_ADVANCED_MISC )
+    add_requirement( ALTIVEC )
+    set_capability( "memcpy", 100 )
+    set_callbacks( Activate, NULL )
+    add_shortcut( "altivec" )
+vlc_module_end ()
 
 #else
 typedef unsigned long size_t;

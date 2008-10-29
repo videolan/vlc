@@ -124,13 +124,13 @@ static const char *const psz_bitrates_list_text[] = { N_("vbr"), N_("cbr") };
 
 static const int pi_radio_range[2] = { 65000, 108000 };
 
-vlc_module_begin();
-    set_shortname( N_("PVR") );
-    set_description( N_("IVTV MPEG Encoding cards input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    set_capability( "access", 0 );
-    add_shortcut( "pvr" );
+vlc_module_begin ()
+    set_shortname( N_("PVR") )
+    set_description( N_("IVTV MPEG Encoding cards input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_capability( "access", 0 )
+    add_shortcut( "pvr" )
 
     add_integer( "pvr-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
@@ -141,7 +141,7 @@ vlc_module_begin();
     add_integer( "pvr-norm", V4L2_STD_UNKNOWN , NULL, NORM_TEXT,
                  NORM_LONGTEXT, false );
        change_integer_list( i_norm_list, psz_norm_list_text, NULL );
-    add_integer( "pvr-width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
+    add_integer( "pvr-width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( "pvr-height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  true );
     add_integer( "pvr-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
@@ -163,10 +163,10 @@ vlc_module_begin();
                  BITMASK_LONGTEXT, true );
     add_integer( "pvr-audio-volume", -1, NULL, VOLUME_TEXT,
                  VOLUME_LONGTEXT, true );
-    add_integer( "pvr-channel", -1, NULL, CHAN_TEXT, CHAN_LONGTEXT, true );
+    add_integer( "pvr-channel", -1, NULL, CHAN_TEXT, CHAN_LONGTEXT, true )
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Prototypes

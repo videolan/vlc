@@ -62,12 +62,12 @@ static void Display   ( vout_thread_t *, picture_t * );
 
 #define CFG_PREFIX "yuv-"
 
-vlc_module_begin( );
-    set_shortname( N_( "YUV output" ) );
-    set_description( N_( "YUV video output" ) );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_capability( "video output", 0 );
+vlc_module_begin ()
+    set_shortname( N_( "YUV output" ) )
+    set_description( N_( "YUV video output" ) )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_capability( "video output", 0 )
 
     add_string( CFG_PREFIX "file", "stream.yuv", NULL,
                 YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false );
@@ -76,8 +76,8 @@ vlc_module_begin( );
     add_bool  ( CFG_PREFIX "yuv4mpeg2", false, NULL,
                 YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true );
 
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_vout_options[] = {
     "file", "chroma", "yuv4mpeg2", NULL

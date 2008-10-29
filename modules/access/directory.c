@@ -78,22 +78,22 @@ static const char *const psz_recursive_list_text[] = {
         "This is useful if you add directories that contain playlist files " \
         "for instance. Use a comma-separated list of extensions." )
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_shortname( N_("Directory" ) );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    set_description( N_("Standard filesystem directory input") );
-    set_capability( "access", 55 );
-    add_shortcut( "directory" );
-    add_shortcut( "dir" );
-    add_shortcut( "file" );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_shortname( N_("Directory" ) )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_description( N_("Standard filesystem directory input") )
+    set_capability( "access", 55 )
+    add_shortcut( "directory" )
+    add_shortcut( "dir" )
+    add_shortcut( "file" )
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, false );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
     add_string( "ignore-filetypes", "m3u,db,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
                 NULL, IGNORE_TEXT, IGNORE_LONGTEXT, false );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

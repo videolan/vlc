@@ -45,14 +45,14 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Simple decoder for Dolby Surround encoded streams") );
-    set_shortname( N_("Dolby Surround decoder") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_capability( "audio filter", 5 );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Simple decoder for Dolby Surround encoded streams") )
+    set_shortname( N_("Dolby Surround decoder") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_capability( "audio filter", 5 )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * Internal data structures

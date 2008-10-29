@@ -160,10 +160,10 @@ static int WallpaperCallback( vlc_object_t *, char const *,
 static const char *const ppsz_dev[] = { "" };
 static const char *const ppsz_dev_text[] = { N_("Default") };
 
-vlc_module_begin();
-    set_shortname( "DirectX" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
+vlc_module_begin ()
+    set_shortname( "DirectX" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
               true );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
@@ -174,19 +174,19 @@ vlc_module_begin();
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                 true );
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
-        change_action_add( FindDevicesCallback, N_("Refresh list") );
+        change_action_add( FindDevicesCallback, N_("Refresh list") )
 
     add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
               true );
 
-    set_description( N_("DirectX video output") );
-    set_capability( "video output", 100 );
-    add_shortcut( "directx" );
-    set_callbacks( OpenVideo, CloseVideo );
+    set_description( N_("DirectX video output") )
+    set_capability( "video output", 100 )
+    add_shortcut( "directx" )
+    set_callbacks( OpenVideo, CloseVideo )
 
     /* FIXME: Hack to avoid unregistering our window class */
-    linked_with_a_crap_library_which_uses_atexit( );
-vlc_module_end();
+    linked_with_a_crap_library_which_uses_atexit ()
+vlc_module_end ()
 
 #if 0 /* FIXME */
     /* check if we registered a window class because we need to

@@ -75,32 +75,32 @@ static int Activate ( vlc_object_t *p_this )
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_MISC );
+vlc_module_begin ()
+    set_category( CAT_ADVANCED )
+    set_subcategory( SUBCAT_ADVANCED_MISC )
 #ifdef MODULE_NAME_IS_memcpy
-    set_description( N_("libc memcpy") );
-    add_shortcut( "c" );
-    add_shortcut( "libc" );
+    set_description( N_("libc memcpy") )
+    add_shortcut( "c" )
+    add_shortcut( "libc" )
 #elif defined( MODULE_NAME_IS_memcpy3dn )
-    set_description( N_("3D Now! memcpy") );
-    add_requirement( 3DNOW );
-    add_shortcut( "3dn" );
-    add_shortcut( "3dnow" );
-    add_shortcut( "memcpy3dn" );
-    add_shortcut( "memcpy3dnow" );
+    set_description( N_("3D Now! memcpy") )
+    add_requirement( 3DNOW )
+    add_shortcut( "3dn" )
+    add_shortcut( "3dnow" )
+    add_shortcut( "memcpy3dn" )
+    add_shortcut( "memcpy3dnow" )
 #elif defined( MODULE_NAME_IS_memcpymmx )
-    set_description( N_("MMX memcpy") );
-    add_requirement( MMX );
-    add_shortcut( "mmx" );
-    add_shortcut( "memcpymmx" );
+    set_description( N_("MMX memcpy") )
+    add_requirement( MMX )
+    add_shortcut( "mmx" )
+    add_shortcut( "memcpymmx" )
 #elif defined( MODULE_NAME_IS_memcpymmxext )
-    set_description( N_("MMX EXT memcpy") );
-    add_requirement( MMXEXT );
-    add_shortcut( "mmxext" );
-    add_shortcut( "memcpymmxext" );
+    set_description( N_("MMX EXT memcpy") )
+    add_requirement( MMXEXT )
+    add_shortcut( "mmxext" )
+    add_shortcut( "memcpymmxext" )
 #endif
-    set_capability( "memcpy", PRIORITY );
-    set_callbacks( Activate, NULL );
-vlc_module_end();
+    set_capability( "memcpy", PRIORITY )
+    set_callbacks( Activate, NULL )
+vlc_module_end ()
 

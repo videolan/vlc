@@ -42,16 +42,16 @@ static void Close  ( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-mpjpeg-"
 
-vlc_module_begin();
-    set_shortname( "MPJPEG" );
-    set_description( N_("Multipart JPEG muxer") );
-    set_capability( "sout mux", 5 );
-    add_obsolete_string( SOUT_CFG_PREFIX "separator" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_MUX );
-    set_callbacks( Open, Close );
-    add_shortcut( "mpjpeg" );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "MPJPEG" )
+    set_description( N_("Multipart JPEG muxer") )
+    set_capability( "sout mux", 5 )
+    add_obsolete_string( SOUT_CFG_PREFIX "separator" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_MUX )
+    set_callbacks( Open, Close )
+    add_shortcut( "mpjpeg" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

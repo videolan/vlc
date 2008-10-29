@@ -51,17 +51,17 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-rtmp-"
 
-vlc_module_begin();
-    set_description( N_("RTMP stream output") );
-    set_shortname( N_("RTMP" ) );
-    set_capability( "sout access", 50 );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
-    add_shortcut( "rtmp" );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_description( N_("RTMP stream output") )
+    set_shortname( N_("RTMP" ) )
+    set_capability( "sout access", 50 )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
+    add_shortcut( "rtmp" )
+    set_callbacks( Open, Close )
     add_bool( "rtmp-connect", false, NULL, RTMP_CONNECT_TEXT,
               RTMP_CONNECT_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

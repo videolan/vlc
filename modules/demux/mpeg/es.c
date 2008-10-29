@@ -42,27 +42,27 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( N_("MPEG-I/II/4 / A52 / DTS audio" ) );
-    set_capability( "demux", 155 );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_description( N_("MPEG-I/II/4 / A52 / DTS audio" ) )
+    set_capability( "demux", 155 )
+    set_callbacks( Open, Close )
 
-    add_shortcut( "mpga" );
-    add_shortcut( "mp3" );
+    add_shortcut( "mpga" )
+    add_shortcut( "mp3" )
 
-    add_shortcut( "m4a" );
-    add_shortcut( "mp4a" );
-    add_shortcut( "aac" );
+    add_shortcut( "m4a" )
+    add_shortcut( "mp4a" )
+    add_shortcut( "aac" )
 
-    add_shortcut( "ac3" );
-    add_shortcut( "a52" );
+    add_shortcut( "ac3" )
+    add_shortcut( "a52" )
 
-    add_shortcut( "eac3" );
+    add_shortcut( "eac3" )
 
-    add_shortcut( "dts" );
-vlc_module_end();
+    add_shortcut( "dts" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

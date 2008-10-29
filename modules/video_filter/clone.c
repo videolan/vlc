@@ -65,19 +65,19 @@ static int  SendEvents( vlc_object_t *, char const *,
 
 #define CFG_PREFIX "clone-"
 
-vlc_module_begin();
-    set_description( N_("Clone video filter") );
-    set_capability( "video filter", 0 );
-    set_shortname( N_("Clone" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Clone video filter") )
+    set_capability( "video filter", 0 )
+    set_shortname( N_("Clone" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_integer( CFG_PREFIX "count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, false );
-    add_string ( CFG_PREFIX "vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, true );
+    add_integer( CFG_PREFIX "count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, false )
+    add_string ( CFG_PREFIX "vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, true )
 
-    add_shortcut( "clone" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "clone" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "count", "vout-list", NULL

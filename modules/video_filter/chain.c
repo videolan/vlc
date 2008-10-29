@@ -39,11 +39,11 @@
 static int       Activate   ( vlc_object_t * );
 static void      Destroy    ( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("Video filtering using a chain of video filter modules") );
-    set_capability( "video filter2", 1 );
-    set_callbacks( Activate, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Video filtering using a chain of video filter modules") )
+    set_capability( "video filter2", 1 )
+    set_callbacks( Activate, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes.

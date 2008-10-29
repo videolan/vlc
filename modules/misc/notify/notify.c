@@ -64,18 +64,18 @@ struct intf_sys_t
 #define TIMEOUT_TEXT N_("Timeout (ms)")
 #define TIMEOUT_LONGTEXT N_("How long the notification will be displayed ")
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( N_( "Notify" ) );
-    set_description( N_("LibNotify Notification Plugin") );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_shortname( N_( "Notify" ) )
+    set_description( N_("LibNotify Notification Plugin") )
 
     add_integer( "notify-timeout", 4000,NULL,
                 TIMEOUT_TEXT, TIMEOUT_LONGTEXT, true );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

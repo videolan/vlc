@@ -44,18 +44,18 @@ static int  OpenDecoder   ( vlc_object_t * );
 static int  OpenPacketizer( vlc_object_t * );
 static void CloseCommon   ( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("A/52 parser") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseCommon );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
+vlc_module_begin ()
+    set_description( N_("A/52 parser") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseCommon )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
 
-    add_submodule();
-    set_description( N_("A/52 audio packetizer") );
-    set_capability( "packetizer", 10 );
-    set_callbacks( OpenPacketizer, CloseCommon );
-vlc_module_end();
+    add_submodule ()
+    set_description( N_("A/52 audio packetizer") )
+    set_capability( "packetizer", 10 )
+    set_callbacks( OpenPacketizer, CloseCommon )
+vlc_module_end ()
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor

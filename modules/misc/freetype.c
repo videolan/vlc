@@ -130,11 +130,11 @@ static const char *const ppsz_color_descriptions[] = {
   N_("Red"), N_("Fuchsia"), N_("Yellow"), N_("Olive"), N_("Green"), N_("Teal"),
   N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"), N_("Aqua") };
 
-vlc_module_begin();
-    set_shortname( N_("Text renderer"));
-    set_description( N_("Freetype2 font renderer") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC );
+vlc_module_begin ()
+    set_shortname( N_("Text renderer"))
+    set_description( N_("Freetype2 font renderer") )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
               false );
@@ -160,10 +160,10 @@ vlc_module_begin();
 
     add_bool( "freetype-yuvp", 0, NULL, YUVP_TEXT,
               YUVP_LONGTEXT, true );
-    set_capability( "text renderer", 100 );
-    add_shortcut( "text" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_capability( "text renderer", 100 )
+    add_shortcut( "text" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 
 

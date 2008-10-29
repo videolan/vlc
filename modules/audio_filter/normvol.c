@@ -79,19 +79,19 @@ typedef struct aout_filter_sys_t
                "This value is a positive floating point number. A value " \
                "between 0.5 and 10 seems sensible." )
 
-vlc_module_begin();
-    set_description( N_("Volume normalizer") );
-    set_shortname( N_("Volume normalizer") );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AFILTER );
-    add_shortcut( "volnorm" );
+vlc_module_begin ()
+    set_description( N_("Volume normalizer") )
+    set_shortname( N_("Volume normalizer") )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AFILTER )
+    add_shortcut( "volnorm" )
     add_integer( "norm-buff-size", 20 ,NULL ,BUFF_TEXT, BUFF_LONGTEXT,
                  true);
     add_float( "norm-max-level", 2.0, NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, true );
-    set_capability( "audio filter", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "audio filter", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

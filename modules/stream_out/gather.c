@@ -40,12 +40,12 @@
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("Gathering stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "gather" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Gathering stream output") )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "gather" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

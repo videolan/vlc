@@ -98,36 +98,36 @@ static void Do_U8ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Floating-point audio format conversions") );
-    add_submodule();
-        set_capability( "audio filter", 10 );
-        set_callbacks( Create_F32ToFL32, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_FL32ToS16, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_FL32ToS8, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_FL32ToU16, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_FL32ToU8, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_S16ToFL32, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_S16ToFL32_SW, NULL ); /* Endianness conversion*/
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_S8ToFL32, NULL );
-    add_submodule();
-        set_capability( "audio filter", 1 );
-        set_callbacks( Create_U8ToFL32, NULL );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Floating-point audio format conversions") )
+    add_submodule ()
+        set_capability( "audio filter", 10 )
+        set_callbacks( Create_F32ToFL32, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_FL32ToS16, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_FL32ToS8, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_FL32ToU16, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_FL32ToU8, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_S16ToFL32, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_S16ToFL32_SW, NULL ) /* Endianness conversion*/
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_S8ToFL32, NULL )
+    add_submodule ()
+        set_capability( "audio filter", 1 )
+        set_callbacks( Create_U8ToFL32, NULL )
+vlc_module_end ()
 
 /*****************************************************************************
  * Fixed 32 to Float 32 and backwards

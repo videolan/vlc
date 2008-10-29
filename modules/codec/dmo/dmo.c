@@ -98,21 +98,21 @@ static int LoadDMO( vlc_object_t *, HINSTANCE *, IMediaObject **,
                     es_format_t *, bool );
 static void CopyPicture( picture_t *, uint8_t * );
 
-vlc_module_begin();
-    set_description( N_("DirectMedia Object decoder") );
-    add_shortcut( "dmo" );
-    set_capability( "decoder", 1 );
-    set_callbacks( DecoderOpen, DecoderClose );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
+vlc_module_begin ()
+    set_description( N_("DirectMedia Object decoder") )
+    add_shortcut( "dmo" )
+    set_capability( "decoder", 1 )
+    set_callbacks( DecoderOpen, DecoderClose )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
 
 #   define ENC_CFG_PREFIX "sout-dmo-"
-    add_submodule();
-    set_description( N_("DirectMedia Object encoder") );
-    set_capability( "encoder", 10 );
-    set_callbacks( EncoderOpen, EncoderClose );
+    add_submodule ()
+    set_description( N_("DirectMedia Object encoder") )
+    set_capability( "encoder", 10 )
+    set_callbacks( EncoderOpen, EncoderClose )
 
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

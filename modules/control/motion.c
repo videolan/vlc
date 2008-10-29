@@ -74,19 +74,19 @@ static int GetOrientation( intf_thread_t *p_intf );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_shortname( N_("motion"));
-    set_category( CAT_INTERFACE );
-    set_description( N_("motion control interface") );
+vlc_module_begin ()
+    set_shortname( N_("motion"))
+    set_category( CAT_INTERFACE )
+    set_description( N_("motion control interface") )
     set_help( N_("Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors " \
                  "to rotate the video") )
 
     add_bool( "motion-use-rotate", 0, NULL,
               USE_ROTATE_TEXT, USE_ROTATE_TEXT, false );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenIntf: initialise interface

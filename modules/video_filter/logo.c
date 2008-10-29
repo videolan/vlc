@@ -100,32 +100,32 @@ static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
-vlc_module_begin();
-    set_capability( "sub filter", 0 );
-    set_callbacks( CreateFilter, DestroyFilter );
-    set_description( N_("Logo sub filter") );
-    set_shortname( N_("Logo overlay") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC );
-    add_shortcut( "logo" );
+vlc_module_begin ()
+    set_capability( "sub filter", 0 )
+    set_callbacks( CreateFilter, DestroyFilter )
+    set_description( N_("Logo sub filter") )
+    set_shortname( N_("Logo overlay") )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC )
+    add_shortcut( "logo" )
 
-    add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, false );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true );
+    add_file( CFG_PREFIX "file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, false )
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
     /* default to 1000 ms per image, continuously cycle through them */
-    add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, true );
-    add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, true );
+    add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, true )
+    add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
         TRANS_TEXT, TRANS_LONGTEXT, false );
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false );
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
 
     /* video output filter submodule */
-    add_submodule();
-    set_capability( "video filter", 0 );
-    set_callbacks( Create, Destroy );
-    set_description( N_("Logo video filter") );
-vlc_module_end();
+    add_submodule ()
+    set_capability( "video filter", 0 )
+    set_callbacks( Create, Destroy )
+    set_description( N_("Logo video filter") )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "file", "x", "y", "delay", "repeat", "transparency", "position", NULL

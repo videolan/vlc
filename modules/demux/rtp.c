@@ -78,39 +78,39 @@ static void Close (vlc_object_t *);
 /*
  * Module descriptor
  */
-vlc_module_begin ();
-    set_shortname (_("RTP"));
-    set_description (_("(Experimental) Real-Time Protocol demuxer"));
-    set_category (CAT_INPUT);
-    set_subcategory (SUBCAT_INPUT_DEMUX);
-    set_capability ("access_demux", 0);
-    set_callbacks (Open, Close);
+vlc_module_begin ()
+    set_shortname (_("RTP"))
+    set_description (_("(Experimental) Real-Time Protocol demuxer"))
+    set_category (CAT_INPUT)
+    set_subcategory (SUBCAT_INPUT_DEMUX)
+    set_capability ("access_demux", 0)
+    set_callbacks (Open, Close)
 
     add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
                  RTP_CACHING_LONGTEXT, true);
-        change_integer_range (0, 65535);
+        change_integer_range (0, 65535)
     add_string ("srtp-key", "", NULL,
                 SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false);
     add_string ("srtp-salt", "", NULL,
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false);
     add_integer ("rtp-max-src", 1, NULL, RTP_MAX_SRC_TEXT,
                  RTP_MAX_SRC_LONGTEXT, true);
-        change_integer_range (1, 255);
+        change_integer_range (1, 255)
     add_integer ("rtp-timeout", 5, NULL, RTP_TIMEOUT_TEXT,
                  RTP_TIMEOUT_LONGTEXT, true);
     add_integer ("rtp-max-dropout", 3000, NULL, RTP_MAX_DROPOUT_TEXT,
                  RTP_MAX_DROPOUT_LONGTEXT, true);
-        change_integer_range (0, 32767);
+        change_integer_range (0, 32767)
     add_integer ("rtp-max-misorder", 100, NULL, RTP_MAX_MISORDER_TEXT,
                  RTP_MAX_MISORDER_LONGTEXT, true);
-        change_integer_range (0, 32767);
+        change_integer_range (0, 32767)
 
-    add_shortcut ("dccp");
-    /*add_shortcut ("sctp");*/
-    add_shortcut ("rtptcp"); /* "tcp" is already taken :( */
-    add_shortcut ("rtp");
-    add_shortcut ("udplite");
-vlc_module_end ();
+    add_shortcut ("dccp")
+    /*add_shortcut ("sctp")*/
+    add_shortcut ("rtptcp") /* "tcp" is already taken :( */
+    add_shortcut ("rtp")
+    add_shortcut ("udplite")
+vlc_module_end ()
 
 /*
  * TODO: so much stuff

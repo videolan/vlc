@@ -41,11 +41,11 @@
 static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("Video pictures blending") );
-    set_capability( "video blending", 100 );
-    set_callbacks( OpenFilter, CloseFilter );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Video pictures blending") )
+    set_capability( "video blending", 100 )
+    set_callbacks( OpenFilter, CloseFilter )
+vlc_module_end ()
 
 
 /*****************************************************************************

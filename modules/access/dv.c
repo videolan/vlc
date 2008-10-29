@@ -73,18 +73,18 @@ static int Control( access_t *, int, va_list );
     "Caching value for DV streams. This " \
     "value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_description( N_("Digital Video (Firewire/ieee1394)  input") );
-    set_shortname( N_("dv") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_integer( "dv-caching", 60000 / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
-    set_capability( "access", 0 );
-    add_shortcut( "dv" );
-    add_shortcut( "dv1394" );
-    add_shortcut( "raw1394" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Digital Video (Firewire/ieee1394)  input") )
+    set_shortname( N_("dv") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    add_integer( "dv-caching", 60000 / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true )
+    set_capability( "access", 0 )
+    add_shortcut( "dv" )
+    add_shortcut( "dv1394" )
+    add_shortcut( "raw1394" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 typedef struct
 {

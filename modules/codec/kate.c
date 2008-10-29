@@ -108,28 +108,28 @@ static void ParseKateComments( decoder_t * );
 #endif
 
 
-vlc_module_begin();
-    set_shortname( N_("Kate"));
-    set_description( N_("Kate text subtitles decoder") );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
-    add_shortcut( "kate" );
+vlc_module_begin ()
+    set_shortname( N_("Kate"))
+    set_description( N_("Kate text subtitles decoder") )
+    set_capability( "decoder", 50 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    add_shortcut( "kate" )
 
 #ifdef ENABLE_PACKETIZER
-    add_submodule();
-    set_description( N_("Kate text subtitles packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
-    add_shortcut( "kate" );
+    add_submodule ()
+    set_description( N_("Kate text subtitles packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
+    add_shortcut( "kate" )
 #endif
 
 #ifdef ENABLE_FORMATTING
     add_bool( "kate-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
               true );
 #endif
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

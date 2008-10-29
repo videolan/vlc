@@ -68,18 +68,18 @@ static int SendToMSN( const char * psz_msg );
 #define FORMAT_LONGTEXT N_("Format of the string to send to MSN " \
 "{0} Artist, {1} Title, {2} Album. Defaults to \"Artist - Title\" ({0} - {1}).")
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( "MSN" );
-    set_description( N_("MSN Now-Playing") );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_shortname( "MSN" )
+    set_description( N_("MSN Now-Playing") )
 
     add_string( "msn-format", FORMAT_DEFAULT, NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, false );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

@@ -74,15 +74,15 @@ static void     Close   ( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-es-"
 
-vlc_module_begin();
-    set_shortname( "ES" );
-    set_description( N_("Elementary stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "es" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
+vlc_module_begin ()
+    set_shortname( "ES" )
+    set_description( N_("Elementary stream output") )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "es" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
 
-    set_section( N_("Generic"), NULL );
+    set_section( N_("Generic"), NULL )
     add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
                 ACCESS_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
@@ -90,7 +90,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
                 DEST_LONGTEXT, true );
 
-    set_section( N_("Audio"), NULL );
+    set_section( N_("Audio"), NULL )
     add_string( SOUT_CFG_PREFIX "access-audio", "", NULL, ACCESSA_TEXT,
                 ACCESSA_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux-audio", "", NULL, MUXA_TEXT,
@@ -98,7 +98,7 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "dst-audio", "", NULL, DESTA_TEXT,
                 DESTA_LONGTEXT, true );
 
-    set_section( N_("Video"), NULL );
+    set_section( N_("Video"), NULL )
     add_string( SOUT_CFG_PREFIX "access-video", "", NULL, ACCESSV_TEXT,
                 ACCESSV_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "mux-video", "", NULL, MUXV_TEXT,
@@ -106,8 +106,8 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "dst-video", "", NULL, DESTV_TEXT,
                 DESTV_LONGTEXT, true );
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

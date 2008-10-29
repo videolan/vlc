@@ -462,16 +462,16 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
 #define SKINS2_PLAYLIST N_("Use a skinned playlist")
 #define SKINS2_PLAYLIST_LONG N_("Use a skinned playlist")
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_file( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
               true );
-        change_autosave();
+        change_autosave ()
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 true );
-        change_autosave();
-        change_internal();
+        change_autosave ()
+        change_internal ()
 #ifdef WIN32
     add_bool( "skins2-systray", false, onSystrayChange, SKINS2_SYSTRAY,
               SKINS2_SYSTRAY_LONG, false );
@@ -483,19 +483,19 @@ vlc_module_begin();
 
     add_bool( "skinned-playlist", true, NULL, SKINS2_PLAYLIST,
               SKINS2_PLAYLIST_LONG, false );
-    set_shortname( N_("Skins"));
-    set_description( N_("Skinnable Interface") );
-    set_capability( "interface", 30 );
-    set_callbacks( Open, Close );
-    add_shortcut( "skins" );
+    set_shortname( N_("Skins"))
+    set_description( N_("Skinnable Interface") )
+    set_capability( "interface", 30 )
+    set_callbacks( Open, Close )
+    add_shortcut( "skins" )
 
-    add_submodule();
-        set_capability( "vout window", 51 );
-        set_callbacks( WindowOpen, WindowClose );
+    add_submodule ()
+        set_capability( "vout window", 51 )
+        set_callbacks( WindowOpen, WindowClose )
 
-    add_submodule();
-        set_description( N_("Skins loader demux") );
-        set_capability( "demux", 5 );
-        set_callbacks( DemuxOpen, NULL );
+    add_submodule ()
+        set_description( N_("Skins loader demux") )
+        set_capability( "demux", 5 )
+        set_callbacks( DemuxOpen, NULL )
 
-vlc_module_end();
+vlc_module_end ()

@@ -95,12 +95,12 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 #define BOOKMARK10_TEXT   N_("Playlist bookmark 10")
 #define BOOKMARK_LONGTEXT N_("Define playlist bookmarks.")
 
-vlc_module_begin();
-    set_shortname( N_("Hotkeys") );
-    set_description( N_("Hotkeys management interface") );
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( N_("Hotkeys") )
+    set_description( N_("Hotkeys management interface") )
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize interface

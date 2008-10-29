@@ -78,14 +78,14 @@ static const char *const verbosity_list[] = { "error", "warning", "debug"};
 static const char *const verbosity_list_text[] = { N_("Show only errors"),
   N_("Show errors and warnings"), N_("Show everything including debug messages")};
 
-vlc_module_begin();
-    set_description( N_("OpenCV video filter wrapper") );
-    set_shortname( N_("OpenCV" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter", 0 );
-    add_shortcut( "opencv_wrapper" );
-    set_callbacks( Create, Destroy );
+vlc_module_begin ()
+    set_description( N_("OpenCV video filter wrapper") )
+    set_shortname( N_("OpenCV" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "video filter", 0 )
+    add_shortcut( "opencv_wrapper" )
+    set_callbacks( Create, Destroy )
     add_float_with_range( "opencv-scale", 1.0, 0.1, 2.0, NULL,
                           N_("Scale factor (0.1-2.0)"),
                           N_("Ammount by which to scale the picture before sending it to the internal OpenCV filter"),
@@ -105,7 +105,7 @@ vlc_module_begin();
     add_string( "opencv-filter-name", "none", NULL,
                           N_("OpenCV internal filter name"),
                           N_("Name of internal OpenCV plugin filter to use"), false);
-vlc_module_end();
+vlc_module_end ()
 
 
 /*****************************************************************************

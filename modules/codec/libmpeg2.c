@@ -99,14 +99,14 @@ static void GetAR( decoder_t *p_dec );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("MPEG I/II video decoder (using libmpeg2)") );
-    set_capability( "decoder", 150 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "libmpeg2" );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("MPEG I/II video decoder (using libmpeg2)") )
+    set_capability( "decoder", 150 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "libmpeg2" )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

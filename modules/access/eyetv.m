@@ -63,21 +63,21 @@ static void Close( vlc_object_t * );
     "Caching value for EyeTV captures. This " \
     "value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_shortname( "EyeTV" );
-    set_description( N_("EyeTV access module") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( "EyeTV" )
+    set_description( N_("EyeTV access module") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "eyetv-channel", 0, NULL,
                  CHANNEL_TEXT, CHANNEL_LONGTEXT, false );
 
-    set_capability( "access", 0 );
-    add_shortcut( "eyetv" );
-    set_callbacks( Open, Close );
+    set_capability( "access", 0 )
+    add_shortcut( "eyetv" )
+    set_callbacks( Open, Close )
     add_integer( "eyetv-caching", DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true);
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Access: local prototypes

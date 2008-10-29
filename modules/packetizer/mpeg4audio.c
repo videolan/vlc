@@ -176,13 +176,13 @@ static block_t *PacketizeStreamBlock( decoder_t *, block_t ** );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_PACKETIZER );
-    set_description( N_("MPEG4 audio packetizer") );
-    set_capability( "packetizer", 50 );
-    set_callbacks( OpenPacketizer, ClosePacketizer );
-vlc_module_end();
+vlc_module_begin ()
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_PACKETIZER )
+    set_description( N_("MPEG4 audio packetizer") )
+    set_capability( "packetizer", 50 )
+    set_callbacks( OpenPacketizer, ClosePacketizer )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenPacketizer: probe the packetizer and return score

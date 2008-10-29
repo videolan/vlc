@@ -69,16 +69,16 @@ void CloseIntf ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("CMML annotations decoder") );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "cmml" );
+vlc_module_begin ()
+    set_description( N_("CMML annotations decoder") )
+    set_capability( "decoder", 50 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "cmml" )
 
-    add_submodule();
-        set_capability( "interface", 0 );
-        set_callbacks( OpenIntf, CloseIntf );
-vlc_module_end();
+    add_submodule ()
+        set_capability( "interface", 0 )
+        set_callbacks( OpenIntf, CloseIntf )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

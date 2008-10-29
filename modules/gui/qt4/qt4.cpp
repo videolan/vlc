@@ -155,15 +155,15 @@ static const int i_mode_list[] =
 static const char *const psz_mode_list_text[] =
     { QT_NORMAL_MODE_TEXT, QT_ALWAYS_VIDEO_MODE_TEXT, QT_MINIMAL_MODE_TEXT };
 
-vlc_module_begin();
-    set_shortname( "Qt" );
-    set_description( N_("Qt interface") );
-    set_category( CAT_INTERFACE ) ;
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_capability( "interface", 151 );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_shortname( "Qt" )
+    set_description( N_("Qt interface") )
+    set_category( CAT_INTERFACE ) 
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
+    set_capability( "interface", 151 )
+    set_callbacks( Open, Close )
 
-    add_shortcut("qt");
+    add_shortcut("qt")
     add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
                  QT_MODE_TEXT, QT_MODE_LONGTEXT, false );
         change_integer_list( i_mode_list, psz_mode_list_text, NULL );
@@ -173,7 +173,7 @@ vlc_module_begin();
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
                           OPACITY_LONGTEXT, false );
-    add_bool( "qt-blingbling", true, NULL, BLING_TEXT, BLING_TEXT, false );
+    add_bool( "qt-blingbling", true, NULL, BLING_TEXT, BLING_TEXT, false )
 
     add_bool( "qt-system-tray", true, NULL, SYSTRAY_TEXT,
               SYSTRAY_LONGTEXT, false);
@@ -190,8 +190,8 @@ vlc_module_begin();
               SAVEVOL_TEXT, true );
     add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
                 FILEDIALOG_PATH_TEXT, true );
-        change_autosave();
-        change_internal();
+        change_autosave ()
+        change_internal ()
 
     add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
               RECENTPLAY_TEXT, false );
@@ -216,18 +216,18 @@ vlc_module_begin();
 
     add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
               false );
-        change_internal();
+        change_internal ()
 
-    add_submodule();
-        set_description( "Dialogs provider" );
-        set_capability( "dialogs provider", 51 );
+    add_submodule ()
+        set_description( "Dialogs provider" )
+        set_capability( "dialogs provider", 51 )
 
-        set_callbacks( OpenDialogs, Close );
+        set_callbacks( OpenDialogs, Close )
 
-    add_submodule();
-        set_capability( "vout window", 50 );
-        set_callbacks( WindowOpen, WindowClose );
-vlc_module_end();
+    add_submodule ()
+        set_capability( "vout window", 50 )
+        set_callbacks( WindowOpen, WindowClose )
+vlc_module_end ()
 
 /* Ugly, but the Qt4 interface assumes single instance anyway */
 static struct

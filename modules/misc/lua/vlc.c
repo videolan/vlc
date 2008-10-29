@@ -57,39 +57,39 @@
 #define CONFIG_TEXT N_("Lua interface configuration")
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
 
-vlc_module_begin();
-        set_shortname( N_( "Lua Art" ) );
-        set_description( N_("Fetch artwork using lua scripts") );
-        set_capability( "art finder", 10 );
-        set_callbacks( FindArt, NULL );
+vlc_module_begin ()
+        set_shortname( N_( "Lua Art" ) )
+        set_description( N_("Fetch artwork using lua scripts") )
+        set_capability( "art finder", 10 )
+        set_callbacks( FindArt, NULL )
 
-    add_submodule();
-        add_shortcut( "luaplaylist" );
-        set_category( CAT_INPUT );
-        set_subcategory( SUBCAT_INPUT_DEMUX );
-        set_shortname( N_("Lua Playlist") );
-        set_description( N_("Lua Playlist Parser Interface") );
-        set_capability( "demux", 2 );
-        set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist );
+    add_submodule ()
+        add_shortcut( "luaplaylist" )
+        set_category( CAT_INPUT )
+        set_subcategory( SUBCAT_INPUT_DEMUX )
+        set_shortname( N_("Lua Playlist") )
+        set_description( N_("Lua Playlist Parser Interface") )
+        set_capability( "demux", 2 )
+        set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
 
-    add_submodule();
-        add_shortcut( "luaintf" );
-        add_shortcut( "luarc" );
-        /* add_shortcut( "rc" ); */
-        add_shortcut( "luahotkeys" );
-        /* add_shortcut( "hotkeys" ); */
-        add_shortcut( "luatelnet" );
-        /* add_shortcut( "telnet" ); */
-        add_shortcut( "luahttp" );
-        /* add_shortcut( "http" ); */
-        set_description( N_("Lua Interface Module") );
-        set_capability( "interface", 0 );
+    add_submodule ()
+        add_shortcut( "luaintf" )
+        add_shortcut( "luarc" )
+        /* add_shortcut( "rc" ) */
+        add_shortcut( "luahotkeys" )
+        /* add_shortcut( "hotkeys" ) */
+        add_shortcut( "luatelnet" )
+        /* add_shortcut( "telnet" ) */
+        add_shortcut( "luahttp" )
+        /* add_shortcut( "http" ) */
+        set_description( N_("Lua Interface Module") )
+        set_capability( "interface", 0 )
         add_string( "lua-intf", "dummy", NULL,
                     INTF_TEXT, INTF_LONGTEXT, false );
         add_string( "lua-config", "", NULL,
                     CONFIG_TEXT, CONFIG_LONGTEXT, false );
-        set_callbacks( Open_LuaIntf, Close_LuaIntf );
-vlc_module_end();
+        set_callbacks( Open_LuaIntf, Close_LuaIntf )
+vlc_module_end ()
 
 /*****************************************************************************
  *

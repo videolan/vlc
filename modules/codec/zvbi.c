@@ -79,23 +79,23 @@ static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
-vlc_module_begin();
-    set_description( N_("VBI and Teletext decoder") );
-    set_shortname( N_("VBI & Teletext") );
-    set_capability( "decoder", 51 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_description( N_("VBI and Teletext decoder") )
+    set_shortname( N_("VBI & Teletext") )
+    set_capability( "decoder", 51 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_callbacks( Open, Close )
 
     add_integer( "vbi-page", 100, NULL,
                  PAGE_TEXT, PAGE_LONGTEXT, false );
     add_bool( "vbi-opaque", true, NULL,
                  OPAQUE_TEXT, OPAQUE_LONGTEXT, false );
-    add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, false );
+    add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
     add_bool( "vbi-text", false, NULL,
               TELX_TEXT, TELX_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 /****************************************************************************
  * Local structures

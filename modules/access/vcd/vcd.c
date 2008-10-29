@@ -48,20 +48,20 @@ static void Close( vlc_object_t * );
     "Caching value for VCDs. This " \
     "value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_shortname( N_("VCD"));
-    set_description( N_("VCD input") );
-    set_capability( "access", 60 );
-    set_callbacks( Open, Close );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("VCD"))
+    set_description( N_("VCD input") )
+    set_capability( "access", 60 )
+    set_callbacks( Open, Close )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") );
+    add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") )
     add_integer( "vcd-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
-    add_shortcut( "vcd" );
-    add_shortcut( "svcd" );
-vlc_module_end();
+    add_shortcut( "vcd" )
+    add_shortcut( "svcd" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

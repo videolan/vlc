@@ -182,17 +182,17 @@ static const char *const ppsz_effects_text[] = {
         N_("None"), N_("Cube"), N_("Transparent Cube") };
 #endif
 
-vlc_module_begin();
-    set_shortname( "OpenGL" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("OpenGL video output") );
+vlc_module_begin ()
+    set_shortname( "OpenGL" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("OpenGL video output") )
 #ifdef __APPLE__
-    set_capability( "video output", 200 );
+    set_capability( "video output", 200 )
 #else
-    set_capability( "video output", 20 );
+    set_capability( "video output", 20 )
 #endif
-    add_shortcut( "opengl" );
+    add_shortcut( "opengl" )
     add_float( "opengl-cube-speed", 2.0, NULL, SPEED_TEXT,
                     SPEED_LONGTEXT, true );
 #ifdef OPENGL_MORE_EFFECT
@@ -211,11 +211,11 @@ vlc_module_begin();
     /* Allow opengl provider plugin selection */
     add_string( "opengl-provider", "default", NULL, PROVIDER_TEXT, 
                     PROVIDER_LONGTEXT, true );
-    set_callbacks( CreateVout, DestroyVout );
+    set_callbacks( CreateVout, DestroyVout )
     add_string( "opengl-effect", "none", NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, false );
         change_string_list( ppsz_effects, ppsz_effects_text, 0 );
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output method descriptor

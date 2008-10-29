@@ -48,15 +48,15 @@
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("Ogg/OGM muxer") );
-    set_capability( "sout mux", 10 );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_MUX );
-    add_shortcut( "ogg" );
-    add_shortcut( "ogm" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Ogg/OGM muxer") )
+    set_capability( "sout mux", 10 )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_MUX )
+    add_shortcut( "ogg" )
+    add_shortcut( "ogm" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

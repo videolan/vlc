@@ -62,11 +62,11 @@ struct intf_sys_t
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Power Management Inhibitor") );
-    set_capability( "interface", 0 );
-    set_callbacks( Activate, Deactivate );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Power Management Inhibitor") )
+    set_capability( "interface", 0 )
+    set_callbacks( Activate, Deactivate )
+vlc_module_end ()
 
 /*****************************************************************************
  * Activate: initialize and create stuff

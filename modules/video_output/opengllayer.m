@@ -89,15 +89,15 @@ static int  Control      ( vout_thread_t *, int, va_list );
 
 static int InitTextures  ( vout_thread_t * );
 
-vlc_module_begin();
-    set_shortname( "OpenGLLayer" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("Core Animation OpenGL Layer (Mac OS X)") );
-    set_capability( "video output", 20 );
-    add_shortcut( "opengllayer" );
-    set_callbacks( CreateVout, DestroyVout );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "OpenGLLayer" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("Core Animation OpenGL Layer (Mac OS X)") )
+    set_capability( "video output", 20 )
+    add_shortcut( "opengllayer" )
+    set_callbacks( CreateVout, DestroyVout )
+vlc_module_end ()
 
 @interface VLCVoutLayer : CAOpenGLLayer {
     vout_thread_t * p_vout;

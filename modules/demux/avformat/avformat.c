@@ -45,21 +45,21 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    add_shortcut( "ffmpeg" );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
-    set_description( N_("FFmpeg demuxer" ) );
-    set_capability( "demux", 2 );
-    set_callbacks( OpenDemux, CloseDemux );
+vlc_module_begin ()
+    add_shortcut( "ffmpeg" )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_description( N_("FFmpeg demuxer" ) )
+    set_capability( "demux", 2 )
+    set_callbacks( OpenDemux, CloseDemux )
 
 #ifdef ENABLE_SOUT
     /* mux submodule */
-    add_submodule();
-    set_description( N_("FFmpeg muxer" ) );
-    set_capability( "sout mux", 2 );
+    add_submodule ()
+    set_description( N_("FFmpeg muxer" ) )
+    set_capability( "sout mux", 2 )
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
                 MUX_LONGTEXT, true );
-    set_callbacks( OpenMux, CloseMux );
+    set_callbacks( OpenMux, CloseMux )
 #endif
-vlc_module_end();
+vlc_module_end ()

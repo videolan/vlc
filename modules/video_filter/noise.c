@@ -49,16 +49,16 @@ static picture_t *Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Noise video filter") );
-    set_shortname( N_( "Noise" ));
-    set_capability( "video filter2", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Noise video filter") )
+    set_shortname( N_( "Noise" ))
+    set_capability( "video filter2", 0 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_shortcut( "noise" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "noise" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: Distort video output method descriptor

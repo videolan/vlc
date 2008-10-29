@@ -50,23 +50,23 @@ void CloseVideoGL ( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 
-vlc_module_begin();
+vlc_module_begin ()
     /* Minimal interface. see intf.m */
-    set_shortname( "Minimal Macosx" );
-    add_shortcut( "minimal_macosx" );
-    add_shortcut( "miosx" );
-    set_description( N_("Minimal Mac OS X interface") );
-    set_capability( "interface", 50 );
-    set_callbacks( OpenIntf, CloseIntf );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
+    set_shortname( "Minimal Macosx" )
+    add_shortcut( "minimal_macosx" )
+    add_shortcut( "miosx" )
+    set_description( N_("Minimal Mac OS X interface") )
+    set_capability( "interface", 50 )
+    set_callbacks( OpenIntf, CloseIntf )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
 
-    add_submodule();
+    add_submodule ()
         /* Will be loaded even without interface module. see voutgl.m */
-        set_description( N_("Minimal Mac OS X OpenGL video output (opens a borderless window)") );
-        set_capability( "opengl provider", 50 );
-        set_category( CAT_VIDEO);
-        set_subcategory( SUBCAT_VIDEO_VOUT );
-        set_callbacks( OpenVideoGL, CloseVideoGL );
-vlc_module_end();
+        set_description( N_("Minimal Mac OS X OpenGL video output (opens a borderless window)") )
+        set_capability( "opengl provider", 50 )
+        set_category( CAT_VIDEO)
+        set_subcategory( SUBCAT_VIDEO_VOUT )
+        set_callbacks( OpenVideoGL, CloseVideoGL )
+vlc_module_end ()
 

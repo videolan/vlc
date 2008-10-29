@@ -42,18 +42,18 @@ static int  DecoderOpen   ( vlc_object_t * );
 static int  PacketizerOpen( vlc_object_t * );
 static void Close         ( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("DVD subtitles decoder") );
-    set_capability( "decoder", 50 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
-    set_callbacks( DecoderOpen, Close );
+vlc_module_begin ()
+    set_description( N_("DVD subtitles decoder") )
+    set_capability( "decoder", 50 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_callbacks( DecoderOpen, Close )
 
-    add_submodule();
-    set_description( N_("DVD subtitles packetizer") );
-    set_capability( "packetizer", 50 );
-    set_callbacks( PacketizerOpen, Close );
-vlc_module_end();
+    add_submodule ()
+    set_description( N_("DVD subtitles packetizer") )
+    set_capability( "packetizer", 50 )
+    set_callbacks( PacketizerOpen, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

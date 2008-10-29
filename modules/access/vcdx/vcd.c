@@ -97,15 +97,15 @@ int  BlocksPerReadCallback ( vlc_object_t *p_this, const char *psz_name,
  * Module descriptor
  *****************************************************************************/
 
-vlc_module_begin();
-    set_shortname( N_("(Super) Video CD"));
-    set_description( N_("Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input") );
-    add_usage_hint( N_("vcdx://[device-or-file][@{P,S,T}num]") );
-    add_shortcut( "vcdx" );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    set_capability( "access", 55 /* slightly lower than vcd */ );
-    set_callbacks( VCDOpen, VCDClose );
+vlc_module_begin ()
+    set_shortname( N_("(Super) Video CD"))
+    set_description( N_("Video CD (VCD 1.0, 1.1, 2.0, SVCD, HQVCD) input") )
+    add_usage_hint( N_("vcdx://[device-or-file][@{P,S,T}num]") )
+    add_shortcut( "vcdx" )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_capability( "access", 55 /* slightly lower than vcd */ )
+    set_callbacks( VCDOpen, VCDClose )
 
     /* Configuration options */
     add_integer ( MODULE_STRING "-debug", 0, NULL,
@@ -149,5 +149,5 @@ vlc_module_begin();
                 N_("Format to use in the playlist's \"title\" field."),
                 VCD_TITLE_FMT_LONGTEXT, false );
 
-vlc_module_end();
+vlc_module_end ()
 

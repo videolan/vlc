@@ -53,11 +53,11 @@ static picture_t *I422_YUVA_Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) );
-    set_capability( "video filter2", 60 );
-    set_callbacks( Activate, NULL );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
+    set_capability( "video filter2", 60 )
+    set_callbacks( Activate, NULL )
+vlc_module_end ()
 
 /*****************************************************************************
  * Activate: allocate a chroma function

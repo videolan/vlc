@@ -51,15 +51,15 @@ static int Control( demux_t *, int, va_list );
 /*****************************************************************************
 * Module descriptor
 *****************************************************************************/
-vlc_module_begin();
-   set_shortname( N_("Quicktime Capture") );
-   set_description( N_("Quicktime Capture") );
-   set_category( CAT_INPUT );
-   set_subcategory( SUBCAT_INPUT_ACCESS );
-   add_shortcut( "qtcapture" );
-   set_capability( "access_demux", 10 );
-   set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+   set_shortname( N_("Quicktime Capture") )
+   set_description( N_("Quicktime Capture") )
+   set_category( CAT_INPUT )
+   set_subcategory( SUBCAT_INPUT_ACCESS )
+   add_shortcut( "qtcapture" )
+   set_capability( "access_demux", 10 )
+   set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

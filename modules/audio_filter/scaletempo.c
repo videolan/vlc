@@ -43,12 +43,12 @@ static void Close( vlc_object_t * );
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
-vlc_module_begin();
-    set_description( N_("Scale audio tempo in sync with playback rate") );
-    set_shortname( N_("Scaletempo") );
-    set_capability( "audio filter", 0 );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AFILTER );
+vlc_module_begin ()
+    set_description( N_("Scale audio tempo in sync with playback rate") )
+    set_shortname( N_("Scaletempo") )
+    set_capability( "audio filter", 0 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_integer_with_range( "scaletempo-stride", 30, 1, 2000, NULL,
         N_("Stride Length"), N_("Length in milliseconds to output each stride"), true );
@@ -57,8 +57,8 @@ vlc_module_begin();
     add_integer_with_range( "scaletempo-search", 14, 0, 200, NULL,
         N_("Search Length"), N_("Length in milliseconds to search for best overlap position"), true );
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*
  * Scaletempo works by producing audio in constant sized chunks (a "stride") but

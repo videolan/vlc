@@ -76,21 +76,21 @@ static void Display   ( vout_thread_t *, picture_t * );
 #define CACHE_LONGTEXT N_( "Snapshot cache size (number of images to keep)." )
 
 
-vlc_module_begin( );
-    set_description( N_( "Snapshot module" ) );
-    set_shortname( N_("Snapshot") );
+vlc_module_begin ()
+    set_description( N_( "Snapshot module" ) )
+    set_shortname( N_("Snapshot") )
 
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_capability( "video output", 1 );
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_capability( "video output", 1 )
 
-    add_integer( "snapshot-width", 320, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, false );
-    add_integer( "snapshot-height", 200, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, false );
-    add_string( "snapshot-chroma", "RV32", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true );
-    add_integer( "snapshot-cache-size", 50, NULL, CACHE_TEXT, CACHE_LONGTEXT, true );
+    add_integer( "snapshot-width", 320, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, false )
+    add_integer( "snapshot-height", 200, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
+    add_string( "snapshot-chroma", "RV32", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+    add_integer( "snapshot-cache-size", 50, NULL, CACHE_TEXT, CACHE_LONGTEXT, true )
 
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output descriptor

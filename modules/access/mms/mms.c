@@ -69,12 +69,12 @@ static void Close( vlc_object_t * );
 #define TIMEOUT_TEXT N_("TCP/UDP timeout (ms)")
 #define TIMEOUT_LONGTEXT N_("Amount of time (in ms) to wait before aborting network reception of data. Note that there will be 10 retries before completely giving up.")
 
-vlc_module_begin();
-    set_shortname( "MMS" );
-    set_description( N_("Microsoft Media Server (MMS) input") );
-    set_capability( "access", -1 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( "MMS" )
+    set_description( N_("Microsoft Media Server (MMS) input") )
+    set_capability( "access", -1 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "mms-caching", 19 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
@@ -82,19 +82,19 @@ vlc_module_begin();
     add_integer( "mms-timeout", 5000, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  true );
 
-    add_bool( "mms-all", 0, NULL, ALL_TEXT, ALL_LONGTEXT, true );
+    add_bool( "mms-all", 0, NULL, ALL_TEXT, ALL_LONGTEXT, true )
     add_integer( "mms-maxbitrate", 0, NULL, BITRATE_TEXT, BITRATE_LONGTEXT ,
                  false );
     add_string( "mmsh-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                     false );
 
-    add_shortcut( "mms" );
-    add_shortcut( "mmsu" );
-    add_shortcut( "mmst" );
-    add_shortcut( "mmsh" );
-    add_shortcut( "http" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    add_shortcut( "mms" )
+    add_shortcut( "mmsu" )
+    add_shortcut( "mmst" )
+    add_shortcut( "mmsh" )
+    add_shortcut( "http" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

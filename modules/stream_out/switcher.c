@@ -108,11 +108,11 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
 #define AUDIO_LONGTEXT N_( \
     "Mute audio when command is not 0." )
 
-vlc_module_begin();
-    set_description( N_("MPEG2 video switcher stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "switcher" );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_description( N_("MPEG2 video switcher stream output") )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "switcher" )
+    set_callbacks( Open, Close )
 
     add_string( SOUT_CFG_PREFIX "files", "", NULL, FILES_TEXT,
                 FILES_LONGTEXT, false );
@@ -130,7 +130,7 @@ vlc_module_begin();
                  QSCALE_TEXT, QSCALE_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "mute-audio", 1, NULL,
               AUDIO_TEXT, AUDIO_LONGTEXT, true );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
     "files", "sizes", "aspect-ratio", "port", "command", "gop", "qscale",

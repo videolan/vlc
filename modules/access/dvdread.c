@@ -101,11 +101,11 @@ static const char *const psz_css_list_text[] = { N_("title"), N_("Disc"), N_("Ke
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( N_("DVD without menus") );
-    set_description( N_("DVDRead Input (DVD without menu support)") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("DVD without menus") )
+    set_description( N_("DVDRead Input (DVD without menu support)") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
         ANGLE_LONGTEXT, false );
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
@@ -113,12 +113,12 @@ vlc_module_begin();
     add_string( "dvdread-css-method", NULL, NULL, CSSMETHOD_TEXT,
                 CSSMETHOD_LONGTEXT, true );
         change_string_list( psz_css_list, psz_css_list_text, 0 );
-    set_capability( "access_demux", 0 );
-    add_shortcut( "dvd" );
-    add_shortcut( "dvdread" );
-    add_shortcut( "dvdsimple" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "access_demux", 0 )
+    add_shortcut( "dvd" )
+    add_shortcut( "dvdread" )
+    add_shortcut( "dvdsimple" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 4

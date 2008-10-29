@@ -106,21 +106,21 @@ static mtime_t BufferDuration( aout_instance_t * p_aout );
     "are completely filled (the sound gets heavily hashed). If you have one " \
     "of these drivers, then you need to enable this option." )
 
-vlc_module_begin();
-    set_shortname( "OSS" );
-    set_description( N_("UNIX OSS audio output") );
+vlc_module_begin ()
+    set_shortname( "OSS" )
+    set_description( N_("UNIX OSS audio output") )
 
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
     add_file( "oss-audio-device", "/dev/dsp", aout_FindAndRestart,
               N_("OSS DSP device"), NULL, false );
-        add_deprecated_alias( "dspdev" );   /* deprecated since 0.9.3 */
-    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, true );
+        add_deprecated_alias( "dspdev" )   /* deprecated since 0.9.3 */
+    add_bool( "oss-buggy", 0, NULL, BUGGY_TEXT, BUGGY_LONGTEXT, true )
 
-    set_capability( "audio output", 100 );
-    add_shortcut( "oss" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "audio output", 100 )
+    add_shortcut( "oss" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels

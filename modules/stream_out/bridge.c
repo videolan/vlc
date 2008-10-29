@@ -88,28 +88,28 @@ static void CloseIn ( vlc_object_t * );
 #define SOUT_CFG_PREFIX_OUT "sout-bridge-out-"
 #define SOUT_CFG_PREFIX_IN "sout-bridge-in-"
 
-vlc_module_begin();
-    set_shortname( N_("Bridge"));
-    set_description( N_("Bridge stream output"));
-    add_submodule();
-    set_section( N_("Bridge out"), NULL );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "bridge-out" );
+vlc_module_begin ()
+    set_shortname( N_("Bridge"))
+    set_description( N_("Bridge stream output"))
+    add_submodule ()
+    set_section( N_("Bridge out"), NULL )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "bridge-out" )
     /* Only usable with VLM. No category so not in gui preferences
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );*/
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )*/
     add_integer( SOUT_CFG_PREFIX_OUT "id", 0, NULL, ID_TEXT, ID_LONGTEXT,
                  false );
     add_string( SOUT_CFG_PREFIX_OUT "in-name", "default", NULL,
                 DEST_TEXT, DEST_LONGTEXT, false );
-    set_callbacks( OpenOut, CloseOut );
+    set_callbacks( OpenOut, CloseOut )
 
-    add_submodule();
-    set_section( N_("Bridge in"), NULL );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "bridge-in" );
-    /*set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );*/
+    add_submodule ()
+    set_section( N_("Bridge in"), NULL )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "bridge-in" )
+    /*set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )*/
     add_integer( SOUT_CFG_PREFIX_IN "delay", 0, NULL, DELAY_TEXT,
                  DELAY_LONGTEXT, false );
     add_integer( SOUT_CFG_PREFIX_IN "id-offset", 8192, NULL, ID_OFFSET_TEXT,
@@ -122,9 +122,9 @@ vlc_module_begin();
                  PLACEHOLDER_DELAY_TEXT, PLACEHOLDER_DELAY_LONGTEXT, false );
     add_bool( SOUT_CFG_PREFIX_IN "placeholder-switch-on-iframe", true, NULL,
               PLACEHOLDER_IFRAME_TEXT, PLACEHOLDER_IFRAME_LONGTEXT, false );
-    set_callbacks( OpenIn, CloseIn );
+    set_callbacks( OpenIn, CloseIn )
 
-vlc_module_end();
+vlc_module_end ()
 
 
 /*****************************************************************************

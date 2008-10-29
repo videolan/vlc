@@ -47,15 +47,15 @@ static picture_t *Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Invert video filter") );
-    set_shortname( N_("Color inversion" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter2", 0 );
-    add_shortcut( "invert" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Invert video filter") )
+    set_shortname( N_("Color inversion" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "video filter2", 0 )
+    add_shortcut( "invert" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: Invert video output method descriptor

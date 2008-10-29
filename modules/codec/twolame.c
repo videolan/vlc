@@ -71,13 +71,13 @@ static const char *const ppsz_stereo_descriptions[] =
 { N_("Stereo"), N_("Dual mono"), N_("Joint stereo") };
 
 
-vlc_module_begin();
-    set_shortname( "Twolame");
-    set_description( N_("Libtwolame audio encoder") );
-    set_capability( "encoder", 50 );
-    set_callbacks( OpenEncoder, CloseEncoder );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
+vlc_module_begin ()
+    set_shortname( "Twolame")
+    set_description( N_("Libtwolame audio encoder") )
+    set_capability( "encoder", 50 )
+    set_callbacks( OpenEncoder, CloseEncoder )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
 
     add_float( ENC_CFG_PREFIX "quality", 0.0, NULL, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, false );
@@ -88,7 +88,7 @@ vlc_module_begin();
               ENC_VBR_LONGTEXT, false );
     add_integer( ENC_CFG_PREFIX "psy", 3, NULL, ENC_PSY_TEXT,
                  ENC_PSY_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {
     "quality", "mode", "vbr", "psy", NULL

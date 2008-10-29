@@ -73,13 +73,13 @@ static int  transrate_video_process( sout_stream_t *, sout_stream_id_t *, block_
 
 #define SOUT_CFG_PREFIX "sout-transrate-"
 
-vlc_module_begin();
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
-    set_description( N_("MPEG2 video transrating stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "transrate" );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
+    set_description( N_("MPEG2 video transrating stream output") )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "transrate" )
+    set_callbacks( Open, Close )
 
     add_integer( SOUT_CFG_PREFIX "vb", 3 * 100 * 1000, NULL,
                  VB_TEXT, VB_LONGTEXT, false );
@@ -87,7 +87,7 @@ vlc_module_begin();
                  SHAPING_TEXT, SHAPING_LONGTEXT, false );
     add_bool( SOUT_CFG_PREFIX "mpeg4-matrix", false, NULL,
               MPEG4_MATRIX_TEXT, MPEG4_MATRIX_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
     "vb", "shaping", "mpeg4-matrix", NULL

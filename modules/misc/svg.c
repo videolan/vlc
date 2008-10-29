@@ -71,14 +71,14 @@ static char *svg_GetTemplate( vlc_object_t *p_this );
 #define TEMPLATE_LONGTEXT N_( "Location of a file holding a SVG template "\
         "for automatic string conversion" )
 
-vlc_module_begin();
- set_category( CAT_INPUT);
- set_category( SUBCAT_INPUT_SCODEC );
- set_capability( "text renderer", 99 );
- add_shortcut( "svg" );
- add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true );
- set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+ set_category( CAT_INPUT)
+ set_category( SUBCAT_INPUT_SCODEC )
+ set_capability( "text renderer", 99 )
+ add_shortcut( "svg" )
+ add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
+ set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /**
    Describes a SVG string to be displayed on the video

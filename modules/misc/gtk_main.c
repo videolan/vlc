@@ -59,28 +59,28 @@ static vlc_object_t * p_gtk_main = NULL;
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
+vlc_module_begin ()
     int i_cap;
-    set_description( N_("Gtk+ GUI helper") );
+    set_description( N_("Gtk+ GUI helper") )
 #if defined(MODULE_NAME_IS_gtk_main)
     i_cap = 90;
-    add_shortcut( "gtk" );
+    add_shortcut( "gtk" )
 #elif defined(MODULE_NAME_IS_gnome_main)
     i_cap = 100;
-    add_shortcut( "gtk" );
-    add_shortcut( "gnome" );
+    add_shortcut( "gtk" )
+    add_shortcut( "gnome" )
 #elif defined(MODULE_NAME_IS_gtk2_main)
     i_cap = 95;
-    add_shortcut( "gtk2" );
+    add_shortcut( "gtk2" )
 #elif defined(MODULE_NAME_IS_gnome2_main)
     i_cap = 105;
-    add_shortcut( "gtk2" );
-    add_shortcut( "gnome2" );
+    add_shortcut( "gtk2" )
+    add_shortcut( "gnome2" )
 #endif
-    set_capability( "gui-helper", i_cap );
-    set_callbacks( Open, Close );
-    linked_with_a_crap_library_which_uses_atexit();
-vlc_module_end();
+    set_capability( "gui-helper", i_cap )
+    set_callbacks( Open, Close )
+    linked_with_a_crap_library_which_uses_atexit ()
+vlc_module_end ()
 
 static vlc_mutex_t gtk_lock = VLC_STATIC_MUTEX;
 

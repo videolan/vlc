@@ -63,10 +63,10 @@ static int alloc_init( filter_t *, void * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Automatically resize and padd a video") );
-    set_capability( "video filter2", 0 );
-    set_callbacks( Activate, Destroy );
+vlc_module_begin ()
+    set_description( N_("Automatically resize and padd a video") )
+    set_capability( "video filter2", 0 )
+    set_callbacks( Activate, Destroy )
 
     add_integer_with_range( CFG_PREFIX "width", 0, 0, INT_MAX, NULL,
                             WIDTH_TEXT, WIDTH_LONGTEXT, false );
@@ -78,7 +78,7 @@ vlc_module_begin();
 
     add_bool( CFG_PREFIX "padd", true, NULL,
               PADD_TEXT, PADD_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "width", "height", "aspect", "padd", NULL

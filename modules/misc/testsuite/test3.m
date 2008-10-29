@@ -52,8 +52,8 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_([Desc ription]) );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_([Desc ription]) )
+vlc_module_end ()
 
 

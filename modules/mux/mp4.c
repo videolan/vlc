@@ -56,21 +56,21 @@ static void Close  ( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-mp4-"
 
-vlc_module_begin();
-    set_description( N_("MP4/MOV muxer") );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_MUX );
-    set_shortname( "MP4" );
+vlc_module_begin ()
+    set_description( N_("MP4/MOV muxer") )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_MUX )
+    set_shortname( "MP4" )
 
     add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL,
               FASTSTART_TEXT, FASTSTART_LONGTEXT,
               true );
-    set_capability( "sout mux", 5 );
-    add_shortcut( "mp4" );
-    add_shortcut( "mov" );
-    add_shortcut( "3gp" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "sout mux", 5 )
+    add_shortcut( "mp4" )
+    add_shortcut( "mov" )
+    add_shortcut( "3gp" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

@@ -61,21 +61,21 @@ static void Close( vlc_object_t * );
 #define DAMP_TEXT ""
 #define DAMP_LONGTEXT ""
 
-vlc_module_begin();
-    set_description( N_("spatializer") );
-    set_shortname( N_("spatializer" ) );
-    set_capability( "audio filter", 0 );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AFILTER );
+vlc_module_begin ()
+    set_description( N_("spatializer") )
+    set_shortname( N_("spatializer" ) )
+    set_capability( "audio filter", 0 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AFILTER )
 
-    set_callbacks( Open, Close );
-    add_shortcut( "spatializer" );
-    add_float( "Roomsize", 1.05, NULL, ROOMSIZE_TEXT,ROOMSIZE_LONGTEXT, true);
-    add_float( "Width", 10.0, NULL, WIDTH_TEXT,WIDTH_LONGTEXT, true);
-    add_float( "Wet", 3.0, NULL, WET_TEXT,WET_LONGTEXT, true);
-    add_float( "Dry", 2.0, NULL, DRY_TEXT,DRY_LONGTEXT, true);
-    add_float( "Damp", 1.0, NULL, DAMP_TEXT,DAMP_LONGTEXT, true);
-vlc_module_end();
+    set_callbacks( Open, Close )
+    add_shortcut( "spatializer" )
+    add_float( "Roomsize", 1.05, NULL, ROOMSIZE_TEXT,ROOMSIZE_LONGTEXT, true)
+    add_float( "Width", 10.0, NULL, WIDTH_TEXT,WIDTH_LONGTEXT, true)
+    add_float( "Wet", 3.0, NULL, WET_TEXT,WET_LONGTEXT, true)
+    add_float( "Dry", 2.0, NULL, DRY_TEXT,DRY_LONGTEXT, true)
+    add_float( "Damp", 1.0, NULL, DAMP_TEXT,DAMP_LONGTEXT, true)
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

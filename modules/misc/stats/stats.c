@@ -44,26 +44,26 @@
  * Module descriptor
  *****************************************************************************/
 
-vlc_module_begin();
-    set_shortname( _("Stats"));
-    set_description( _("Stats encoder function") );
-    set_capability( "encoder", 0 );
-    add_shortcut( "stats" );
-    set_callbacks( OpenEncoder, CloseEncoder );
-    add_submodule();
-        set_section( N_( "Stats decoder" ), NULL );
-        set_description( _("Stats decoder function") );
-        set_capability( "decoder", 0 );
-        set_callbacks( OpenDecoder, CloseDecoder );
-    add_submodule();
-        set_section( N_( "Stats demux" ), NULL );
-        set_description( _("Stats demux function") );
-        set_capability( "demux", 0 );
-        set_callbacks( OpenDemux, CloseDemux );
-    add_submodule();
-        set_section( N_( "Stats video output" ), NULL );
-        set_description( _("Stats video output function") );
-        set_capability( "video output", 0 );
-        set_callbacks( OpenVideo, NULL );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( _("Stats"))
+    set_description( _("Stats encoder function") )
+    set_capability( "encoder", 0 )
+    add_shortcut( "stats" )
+    set_callbacks( OpenEncoder, CloseEncoder )
+    add_submodule ()
+        set_section( N_( "Stats decoder" ), NULL )
+        set_description( _("Stats decoder function") )
+        set_capability( "decoder", 0 )
+        set_callbacks( OpenDecoder, CloseDecoder )
+    add_submodule ()
+        set_section( N_( "Stats demux" ), NULL )
+        set_description( _("Stats demux function") )
+        set_capability( "demux", 0 )
+        set_callbacks( OpenDemux, CloseDemux )
+    add_submodule ()
+        set_section( N_( "Stats video output" ), NULL )
+        set_description( _("Stats video output function") )
+        set_capability( "video output", 0 )
+        set_callbacks( OpenVideo, NULL )
+vlc_module_end ()
 

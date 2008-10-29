@@ -75,12 +75,12 @@ static void Close( vlc_object_t * );
 #define DOMAIN_LONGTEXT N_("Domain/Workgroup that " \
     "will be used for the connection.")
 
-vlc_module_begin();
-    set_shortname( "SMB" );
-    set_description( N_("SMB input") );
-    set_capability( "access", 0 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( "SMB" )
+    set_description( N_("SMB input") )
+    set_capability( "access", 0 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "smb-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "smb-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
@@ -89,9 +89,9 @@ vlc_module_begin();
                 PASS_LONGTEXT, false );
     add_string( "smb-domain", NULL, NULL, DOMAIN_TEXT,
                 DOMAIN_LONGTEXT, false );
-    add_shortcut( "smb" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    add_shortcut( "smb" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

@@ -62,21 +62,21 @@ static int EraseCallback( vlc_object_t *, char const *,
 
 #define CFG_PREFIX "erase-"
 
-vlc_module_begin();
-    set_description( N_("Erase video filter") );
-    set_shortname( N_( "Erase" ));
-    set_capability( "video filter2", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Erase video filter") )
+    set_shortname( N_( "Erase" ))
+    set_capability( "video filter2", 0 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_file( CFG_PREFIX "mask", NULL, NULL,
               MASK_TEXT, MASK_LONGTEXT, false );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, false );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, false );
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, false )
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, false )
 
-    add_shortcut( "erase" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "erase" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "mask", "x", "y", NULL

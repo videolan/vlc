@@ -283,14 +283,14 @@ static const char *const ppsz_channel_assignment_descriptions[] = {
 /*****************************************************************************
 * Module descriptor
 *****************************************************************************/
-vlc_module_begin();
-set_description( N_("AtmoLight Filter") );
-set_help( MODULE_DESCRIPTION );
-set_shortname( N_( "AtmoLight" ));
-set_capability( "video filter2", 0 );
+vlc_module_begin ()
+set_description( N_("AtmoLight Filter") )
+set_help( MODULE_DESCRIPTION )
+set_shortname( N_( "AtmoLight" ))
+set_capability( "video filter2", 0 )
 
-set_category( CAT_VIDEO );
-set_subcategory( SUBCAT_VIDEO_VFILTER );
+set_category( CAT_VIDEO )
+set_subcategory( SUBCAT_VIDEO_VFILTER )
 
 #if defined(WIN32)
 set_section( N_("Choose between the built-in AtmoLight "\
@@ -312,7 +312,7 @@ add_string(CFG_PREFIX "serialdev", "COM1", NULL,
 add_file(CFG_PREFIX "atmowinexe", NULL, NULL,
          ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false );
 #else
-set_section( N_("Enter the connection of your AtmoLight hardware" ), 0 );
+set_section( N_("Enter the connection of your AtmoLight hardware" ), 0 )
 add_string(CFG_PREFIX "serialdev", "/dev/ttyS01", NULL,
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false );
 #endif
@@ -321,7 +321,7 @@ add_string(CFG_PREFIX "serialdev", "/dev/ttyS01", NULL,
     color which is showed if you want durring pausing
     your movie ... used for both buildin / external
 */
-set_section( N_("Illuminate the room with this color on pause" ), 0 );
+set_section( N_("Illuminate the room with this color on pause" ), 0 )
 add_bool(CFG_PREFIX "usepausecolor", false, NULL,
          PCOLOR_TEXT, PCOLOR_LONGTEXT, false);
 add_integer_with_range(CFG_PREFIX "pcolor-red",   0, 0, 255, NULL,
@@ -337,7 +337,7 @@ add_integer_with_range(CFG_PREFIX "fadesteps", 50, 1, 250, NULL,
     color which is showed if you finished watching your movie ...
     used for both buildin / external
 */
-set_section( N_("Illuminate the room with this color on shutdown" ), 0 );
+set_section( N_("Illuminate the room with this color on shutdown" ), 0 )
 add_integer_with_range(CFG_PREFIX "ecolor-red",   192, 0, 255, NULL,
                        ECOLOR_RED_TEXT,   ECOLOR_RED_LONGTEXT,   false);
 add_integer_with_range(CFG_PREFIX "ecolor-green", 192, 0, 255, NULL,
@@ -353,7 +353,7 @@ add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250, NULL,
 
  definition of parameters for the buildin filter ...
 */
-set_section( N_("Settings for the built-in Live Video Processor only" ), 0 );
+set_section( N_("Settings for the built-in Live Video Processor only" ), 0 )
 
 add_integer_with_range(CFG_PREFIX "EdgeWeightning",   8, 1, 30, NULL,
                        EDGE_TEXT, EDGE_LONGTEXT, false);
@@ -390,7 +390,7 @@ add_integer_with_range(CFG_PREFIX "FrameDelay", 18, 0, 35, NULL,
 /*
   output channel reordering
 */
-set_section( N_("Change channel assignment (fixes wrong wiring)" ), 0 );
+set_section( N_("Change channel assignment (fixes wrong wiring)" ), 0 )
 add_integer( CFG_PREFIX "channel_0", 0, NULL,
             CHANNEL_0_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false );
 change_integer_list( pi_channel_assignment_values,
@@ -419,7 +419,7 @@ change_integer_list( pi_channel_assignment_values,
 /*
   LED color white calibration
 */
-set_section( N_("Adjust the white light to your LED stripes" ), 0 );
+set_section( N_("Adjust the white light to your LED stripes" ), 0 )
 add_bool(CFG_PREFIX "whiteadj", true, NULL,
          USEWHITEADJ_TEXT, USEWHITEADJ_LONGTEXT, false);
 add_integer_with_range(CFG_PREFIX "white-red",   255, 0, 255, NULL,
@@ -441,7 +441,7 @@ Pixel BMP files - which contain your own grayscale... (you can produce funny
 effects with this...) the images MUST not compressed, should have 24-bit per
 pixel, or a simple 256 color grayscale palette
 */
-set_section( N_("Change gradients" ), 0 );
+set_section( N_("Change gradients" ), 0 )
 add_file(CFG_PREFIX "gradient_zone_0", NULL, NULL,
          ZONE_0_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true );
 add_file(CFG_PREFIX "gradient_zone_1", NULL, NULL,
@@ -469,9 +469,9 @@ add_integer_with_range(CFG_PREFIX "width",  64, 64, 512, NULL,
 add_integer_with_range(CFG_PREFIX "height", 48, 48, 384, NULL,
                        HEIGHT_TEXT,  HEIGHT_LONGTEXT, true);
 
-add_shortcut( "atmo" );
-set_callbacks( CreateFilter, DestroyFilter  );
-vlc_module_end();
+add_shortcut( "atmo" )
+set_callbacks( CreateFilter, DestroyFilter  )
+vlc_module_end ()
 
 
 static const char *const ppsz_filter_options[] = {

@@ -52,14 +52,14 @@
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
 
-vlc_module_begin();
-    set_shortname( "UPnP" );
-    set_description( N_( "Universal Plug'n'Play discovery ( Intel SDK )" ) );
-    set_category( CAT_PLAYLIST );
-    set_subcategory( SUBCAT_PLAYLIST_SD );
-    set_capability( "services_discovery", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "UPnP" )
+    set_description( N_( "Universal Plug'n'Play discovery ( Intel SDK )" ) )
+    set_category( CAT_PLAYLIST )
+    set_subcategory( SUBCAT_PLAYLIST_SD )
+    set_capability( "services_discovery", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

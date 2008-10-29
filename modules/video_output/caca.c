@@ -76,14 +76,14 @@ static void Display   ( vout_thread_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_shortname( "Caca" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("Color ASCII art video output") );
-    set_capability( "video output", 12 );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "Caca" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("Color ASCII art video output") )
+    set_capability( "video output", 12 )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: libcaca video output method descriptor

@@ -89,22 +89,22 @@ static void Close( vlc_object_t * );
 #define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
     "used for the connection.")
 
-vlc_module_begin();
-    set_description( N_("RTP/RTSP/SDP demuxer (using Live555)" ) );
-    set_capability( "demux", 50 );
-    set_shortname( "RTP/RTSP");
-    set_callbacks( Open, Close );
-    add_shortcut( "live" );
-    add_shortcut( "livedotcom" );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
+vlc_module_begin ()
+    set_description( N_("RTP/RTSP/SDP demuxer (using Live555)" ) )
+    set_capability( "demux", 50 )
+    set_shortname( "RTP/RTSP")
+    set_callbacks( Open, Close )
+    add_shortcut( "live" )
+    add_shortcut( "livedotcom" )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
 
-    add_submodule();
-        set_description( N_("RTSP/RTP access and demux") );
-        add_shortcut( "rtsp" );
-        add_shortcut( "sdp" );
-        set_capability( "access_demux", 0 );
-        set_callbacks( Open, Close );
+    add_submodule ()
+        set_description( N_("RTSP/RTP access and demux") )
+        add_shortcut( "rtsp" )
+        add_shortcut( "sdp" )
+        set_capability( "access_demux", 0 )
+        set_callbacks( Open, Close )
         add_bool( "rtsp-tcp", 0, NULL,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), true );
@@ -129,7 +129,7 @@ vlc_module_begin();
                     USER_LONGTEXT, true );
         add_string( "rtsp-pwd", NULL, NULL, PASS_TEXT,
                     PASS_LONGTEXT, true );
-vlc_module_end();
+vlc_module_end ()
 
 
 /*****************************************************************************

@@ -54,15 +54,15 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_shortname( N_("ASCII Art"));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("ASCII-art video output") );
-    set_capability( "video output", 10 );
-    add_shortcut( "aalib" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( N_("ASCII Art"))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("ASCII-art video output") )
+    set_capability( "video output", 10 )
+    add_shortcut( "aalib" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: aa video output method descriptor

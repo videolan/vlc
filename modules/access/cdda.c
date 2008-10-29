@@ -68,24 +68,24 @@ static void Close( vlc_object_t * );
     "Default caching value for Audio CDs. This " \
     "value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_shortname( N_("Audio CD"));
-    set_description( N_("Audio CD input") );
-    set_capability( "access", 10 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_shortname( N_("Audio CD"))
+    set_description( N_("Audio CD input") )
+    set_capability( "access", 10 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_callbacks( Open, Close )
 
-    add_usage_hint( N_("[cdda:][device][@[track]]") );
+    add_usage_hint( N_("[cdda:][device][@[track]]") )
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
 
-    add_integer( "cdda-track", -1 , NULL, NULL, NULL, true );
-        change_internal();
-    add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, true );
-        change_internal();
-    add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, true );
-        change_internal();
+    add_integer( "cdda-track", -1 , NULL, NULL, NULL, true )
+        change_internal ()
+    add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, true )
+        change_internal ()
+    add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, true )
+        change_internal ()
 
     add_string( "cddb-server", "freedb.freedb.org", NULL,
                 N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
@@ -93,9 +93,9 @@ vlc_module_begin();
     add_integer( "cddb-port", 8880, NULL,
                 N_( "CDDB port" ), N_( "CDDB Server port to use." ),
                 true );
-    add_shortcut( "cdda" );
-    add_shortcut( "cddasimple" );
-vlc_module_end();
+    add_shortcut( "cdda" )
+    add_shortcut( "cddasimple" )
+vlc_module_end ()
 
 
 /* how many blocks VCDRead will read in each loop */

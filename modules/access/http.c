@@ -95,12 +95,12 @@ static void Close( vlc_object_t * );
 #define FORWARD_COOKIES_TEXT N_("Forward Cookies")
 #define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections ")
 
-vlc_module_begin();
-    set_description( N_("HTTP input") );
-    set_capability( "access", 0 );
-    set_shortname( N_( "HTTP(S)" ) );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_description( N_("HTTP input") )
+    set_capability( "access", 0 )
+    set_shortname( N_( "HTTP(S)" ) )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
                 false );
@@ -116,14 +116,14 @@ vlc_module_begin();
               CONTINUOUS_LONGTEXT, true );
     add_bool( "http-forward-cookies", true, NULL, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true );
-    add_obsolete_string("http-user");
-    add_obsolete_string("http-pwd");
-    add_shortcut( "http" );
-    add_shortcut( "https" );
-    add_shortcut( "unsv" );
-    add_shortcut( "itpc" ); /* iTunes Podcast */
-    set_callbacks( Open, Close );
-vlc_module_end();
+    add_obsolete_string("http-user")
+    add_obsolete_string("http-pwd")
+    add_shortcut( "http" )
+    add_shortcut( "https" )
+    add_shortcut( "unsv" )
+    add_shortcut( "itpc" ) /* iTunes Podcast */
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

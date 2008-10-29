@@ -68,12 +68,12 @@ static void OutClose( vlc_object_t * );
 #define ACCOUNT_LONGTEXT N_("Account that will be " \
     "used for the connection.")
 
-vlc_module_begin();
-    set_shortname( "FTP" );
-    set_description( N_("FTP input") );
-    set_capability( "access", 0 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( "FTP" )
+    set_description( N_("FTP input") )
+    set_capability( "access", 0 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
@@ -82,17 +82,17 @@ vlc_module_begin();
                 PASS_LONGTEXT, false );
     add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
                 ACCOUNT_LONGTEXT, false );
-    add_shortcut( "ftp" );
-    set_callbacks( InOpen, InClose );
+    add_shortcut( "ftp" )
+    set_callbacks( InOpen, InClose )
 
-    add_submodule();
-    set_shortname( "FTP" );
-    set_description( N_("FTP upload output") );
-    set_capability( "sout access", 0 );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_ACO );
-    set_callbacks( OutOpen, OutClose );
-vlc_module_end();
+    add_submodule ()
+    set_shortname( "FTP" )
+    set_description( N_("FTP upload output") )
+    set_capability( "sout access", 0 )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_ACO )
+    set_callbacks( OutOpen, OutClose )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

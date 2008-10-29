@@ -69,12 +69,12 @@ static void Close( vlc_object_t * );
 #define PREAMP_TEXT N_("Global gain" )
 #define PREAMP_LONGTEXT N_("Set the global gain in dB (-20 ... 20)." )
 
-vlc_module_begin();
-    set_description( N_("Equalizer with 10 bands") );
-    set_shortname( N_("Equalizer" ) );
-    set_capability( "audio filter", 0 );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AFILTER );
+vlc_module_begin ()
+    set_description( N_("Equalizer with 10 bands") )
+    set_shortname( N_("Equalizer" ) )
+    set_capability( "audio filter", 0 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AFILTER )
 
     add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
                 PRESET_LONGTEXT, false );
@@ -85,9 +85,9 @@ vlc_module_begin();
               TWOPASS_LONGTEXT, true );
     add_float( "equalizer-preamp", 12.0, NULL, PREAMP_TEXT,
                PREAMP_LONGTEXT, true );
-    set_callbacks( Open, Close );
-    add_shortcut( "equalizer" );
-vlc_module_end();
+    set_callbacks( Open, Close )
+    add_shortcut( "equalizer" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

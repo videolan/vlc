@@ -81,20 +81,20 @@ static void *DecodeFrame  ( decoder_t *, block_t ** );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
+vlc_module_begin ()
 
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_description( N_("Linear PCM audio decoder") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_description( N_("Linear PCM audio decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("Linear PCM audio packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
+    add_submodule ()
+    set_description( N_("Linear PCM audio packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
 
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

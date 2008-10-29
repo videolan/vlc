@@ -89,21 +89,21 @@ static void Close( vlc_object_t * );
     "to protect this interface. The default value is \"admin\"." )
 #define TELNETPWD_DEFAULT "admin"
 
-vlc_module_begin();
-    set_shortname( "Telnet" );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+vlc_module_begin ()
+    set_shortname( "Telnet" )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_string( "telnet-host", "", NULL, TELNETHOST_TEXT,
                  TELNETHOST_LONGTEXT, true );
     add_integer( "telnet-port", TELNETPORT_DEFAULT, NULL, TELNETPORT_TEXT,
                  TELNETPORT_LONGTEXT, true );
     add_password( "telnet-password", TELNETPWD_DEFAULT, NULL, TELNETPWD_TEXT,
                 TELNETPWD_LONGTEXT, true );
-    set_description( N_("VLM remote control interface") );
-    add_category_hint( "VLM", NULL, false );
-    set_capability( "interface", 0 );
-    set_callbacks( Open , Close );
-vlc_module_end();
+    set_description( N_("VLM remote control interface") )
+    add_category_hint( "VLM", NULL, false )
+    set_capability( "interface", 0 )
+    set_callbacks( Open , Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes.

@@ -53,17 +53,17 @@
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( N_("Infrared") );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_description( N_("Infrared remote control interface") );
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_shortname( N_("Infrared") )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_description( N_("Infrared remote control interface") )
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
 
     add_string( "lirc-file", NULL, NULL,
                 LIRC_TEXT, LIRC_LONGTEXT, true );
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface

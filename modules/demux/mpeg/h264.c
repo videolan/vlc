@@ -44,16 +44,16 @@ static void Close( vlc_object_t * );
 #define FPS_LONGTEXT N_("Desired frame rate for the H264 stream.")
 
 
-vlc_module_begin();
-    set_shortname( "H264");
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( N_("H264 video demuxer" ) );
-    set_capability( "demux", 0 );
-    add_float( "h264-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
-    set_callbacks( Open, Close );
-    add_shortcut( "h264" );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "H264")
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_description( N_("H264 video demuxer" ) )
+    set_capability( "demux", 0 )
+    add_float( "h264-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
+    set_callbacks( Open, Close )
+    add_shortcut( "h264" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

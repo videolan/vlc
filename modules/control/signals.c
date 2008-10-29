@@ -33,14 +33,14 @@ static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 static void *SigThread (void *);
 
-vlc_module_begin ();
-    set_shortname (N_("Signals"));
-    set_category (CAT_INTERFACE);
-    set_subcategory (SUBCAT_INTERFACE_CONTROL);
-    set_description (N_("POSIX signals handling interface"));
-    set_capability ("interface", 0);
-    set_callbacks (Open, Close);
-vlc_module_end ();
+vlc_module_begin ()
+    set_shortname (N_("Signals"))
+    set_category (CAT_INTERFACE)
+    set_subcategory (SUBCAT_INTERFACE_CONTROL)
+    set_description (N_("POSIX signals handling interface"))
+    set_capability ("interface", 0)
+    set_callbacks (Open, Close)
+vlc_module_end ()
 
 struct intf_sys_t
 {

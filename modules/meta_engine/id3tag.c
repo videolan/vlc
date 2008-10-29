@@ -53,11 +53,11 @@ static int  ParseTags ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("ID3v1/2 and APEv1/2 tags parser" ) );
-    set_capability( "meta reader", 70 );
-    set_callbacks( ParseTags, NULL );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("ID3v1/2 and APEv1/2 tags parser" ) )
+    set_capability( "meta reader", 70 )
+    set_callbacks( ParseTags, NULL )
+vlc_module_end ()
 
 /*****************************************************************************
  * ParseID3Tag : parse an id3tag into the info structures

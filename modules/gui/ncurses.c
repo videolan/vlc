@@ -121,16 +121,16 @@ static void start_color_and_pairs ( intf_thread_t * );
     "This option allows you to specify the directory the ncurses filebrowser " \
     "will show you initially.")
 
-vlc_module_begin();
-    set_shortname( "Ncurses" );
-    set_description( N_("Ncurses interface") );
-    set_capability( "interface", 10 );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_callbacks( Open, Close );
-    add_shortcut( "curses" );
-    add_directory( "browse-dir", NULL, NULL, BROWSE_TEXT, BROWSE_LONGTEXT, false );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "Ncurses" )
+    set_description( N_("Ncurses interface") )
+    set_capability( "interface", 10 )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
+    set_callbacks( Open, Close )
+    add_shortcut( "curses" )
+    add_directory( "browse-dir", NULL, NULL, BROWSE_TEXT, BROWSE_LONGTEXT, false )
+vlc_module_end ()
 
 /*****************************************************************************
  * intf_sys_t: description and status of ncurses interface

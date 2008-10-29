@@ -62,16 +62,16 @@ static int  ReadMeta    ( vlc_object_t * );
 static int  DownloadArt ( vlc_object_t * );
 static int  WriteMeta   ( vlc_object_t * );
 
-vlc_module_begin();
-    set_capability( "meta reader", 1000 );
-    set_callbacks( ReadMeta, NULL );
-    add_submodule();
-        set_capability( "art downloader", 50 );
-        set_callbacks( DownloadArt, NULL );
-    add_submodule();
-        set_capability( "meta writer", 50 );
-        set_callbacks( WriteMeta, NULL );
-vlc_module_end();
+vlc_module_begin ()
+    set_capability( "meta reader", 1000 )
+    set_callbacks( ReadMeta, NULL )
+    add_submodule ()
+        set_capability( "art downloader", 50 )
+        set_callbacks( DownloadArt, NULL )
+    add_submodule ()
+        set_capability( "meta writer", 50 )
+        set_callbacks( WriteMeta, NULL )
+vlc_module_end ()
 
 using namespace TagLib;
 

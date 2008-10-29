@@ -61,21 +61,21 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
 #define OUTPUT_TEXT N_("Output FIFO")
 #define OUTPUT_LONGTEXT N_("FIFO which will be written to for responses")
 
-vlc_module_begin();
-    set_description( N_("Dynamic video overlay") );
-    set_shortname( N_("Overlay" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "sub filter", 0 );
+vlc_module_begin ()
+    set_description( N_("Dynamic video overlay") )
+    set_shortname( N_("Overlay" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "sub filter", 0 )
 
     add_file( "overlay-input", NULL, NULL, INPUT_TEXT, INPUT_LONGTEXT,
               false );
     add_file( "overlay-output", NULL, NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT,
               false );
 
-    add_shortcut( "overlay" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "overlay" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "input", "output", NULL

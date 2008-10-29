@@ -96,14 +96,14 @@ static void     Close   ( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-standard-"
 
-vlc_module_begin();
-    set_shortname( N_("Standard"));
-    set_description( N_("Standard stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "standard" );
-    add_shortcut( "std" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
+vlc_module_begin ()
+    set_shortname( N_("Standard"))
+    set_description( N_("Standard stream output") )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "standard" )
+    add_shortcut( "std" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
 
     add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
                 ACCESS_LONGTEXT, false );
@@ -130,10 +130,10 @@ vlc_module_begin();
                                         true );
     add_string( SOUT_CFG_PREFIX "phone", "", NULL, PHONE_TEXT, PHONE_LONGTEXT,
                                         true );
-    add_obsolete_bool( SOUT_CFG_PREFIX "sap-ipv6" );
+    add_obsolete_bool( SOUT_CFG_PREFIX "sap-ipv6" )
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

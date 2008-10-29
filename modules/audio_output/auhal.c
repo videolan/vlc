@@ -133,15 +133,15 @@ static int      AudioDeviceCallback     ( vlc_object_t *, const char *,
     "audio device, as listed in your 'Audio Device' menu. This device will " \
     "then be used by default for audio playback.")
 
-vlc_module_begin();
-    set_shortname( "auhal" );
-    set_description( N_("HAL AudioUnit output") );
-    set_capability( "audio output", 101 );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
-    set_callbacks( Open, Close );
-    add_integer( "macosx-audio-device", 0, NULL, ADEV_TEXT, ADEV_LONGTEXT, false );
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "auhal" )
+    set_description( N_("HAL AudioUnit output") )
+    set_capability( "audio output", 101 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
+    set_callbacks( Open, Close )
+    add_integer( "macosx-audio-device", 0, NULL, ADEV_TEXT, ADEV_LONGTEXT, false )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: open macosx audio output

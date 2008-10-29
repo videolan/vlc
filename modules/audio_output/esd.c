@@ -66,16 +66,16 @@ static void Play         ( aout_instance_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("EsounD audio output") );
-    set_shortname( "EsounD" );
-    set_capability( "audio output", 50 );
-    add_string( "esdserver", "", NULL, N_("Esound server"), NULL, false );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
-    set_callbacks( Open, Close );
-    add_shortcut( "esound" );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("EsounD audio output") )
+    set_shortname( "EsounD" )
+    set_capability( "audio output", 50 )
+    add_string( "esdserver", "", NULL, N_("Esound server"), NULL, false )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
+    set_callbacks( Open, Close )
+    add_shortcut( "esound" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: open an esd socket

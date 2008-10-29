@@ -34,7 +34,7 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("C module that does nothing") );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("C module that does nothing") )
+vlc_module_end ()
 

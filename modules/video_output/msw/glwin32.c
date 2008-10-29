@@ -62,18 +62,18 @@ static void FirstSwap( vout_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_shortname( "OpenGL" );
-    set_description( N_("OpenGL video output") );
-    set_capability( "opengl provider", 100 );
-    add_shortcut( "glwin32" );
-    set_callbacks( OpenVideo, CloseVideo );
+vlc_module_begin ()
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_shortname( "OpenGL" )
+    set_description( N_("OpenGL video output") )
+    set_capability( "opengl provider", 100 )
+    add_shortcut( "glwin32" )
+    set_callbacks( OpenVideo, CloseVideo )
 
     /* FIXME: Hack to avoid unregistering our window class */
-    linked_with_a_crap_library_which_uses_atexit( );
-vlc_module_end();
+    linked_with_a_crap_library_which_uses_atexit ()
+vlc_module_end ()
 
 #if 0 /* FIXME */
     /* check if we registered a window class because we need to

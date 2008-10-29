@@ -63,26 +63,26 @@ static void Close( vlc_object_t * );
 #define CRL_TEXT N_( "CRL file" )
 #define CRL_LONGTEXT N_( "HTTP interace Certificates Revocation List file." )
 
-vlc_module_begin();
-    set_shortname( N_("HTTP"));
-    set_description( N_("HTTP remote control interface") );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
-        add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true );
-        add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true );
-        add_obsolete_string ( "http-charset" );
+vlc_module_begin ()
+    set_shortname( N_("HTTP"))
+    set_description( N_("HTTP remote control interface") )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
+        add_string ( "http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
+        add_string ( "http-src",  NULL, NULL, SRC_TEXT,  SRC_LONGTEXT,  true )
+        add_obsolete_string ( "http-charset" )
 #if defined( HAVE_FORK ) || defined( WIN32 )
-        add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, true );
+        add_string ( "http-handlers", NULL, NULL, HANDLERS_TEXT, HANDLERS_LONGTEXT, true )
 #endif
-        add_bool   ( "http-album-art", false, NULL, ART_TEXT, ART_LONGTEXT, true );
-        set_section( N_("HTTP SSL" ), 0 );
-        add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, true );
-        add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  true );
-        add_string ( "http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   true );
-        add_string ( "http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  true );
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+        add_bool   ( "http-album-art", false, NULL, ART_TEXT, ART_LONGTEXT, true )
+        set_section( N_("HTTP SSL" ), 0 )
+        add_string ( "http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT, true )
+        add_string ( "http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,  true )
+        add_string ( "http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,   true )
+        add_string ( "http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,  true )
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

@@ -39,13 +39,13 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( "Matroska" );
-    set_description( N_("Matroska stream demuxer" ) );
-    set_capability( "demux", 0 );
-    set_callbacks( Open, Close );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
+vlc_module_begin ()
+    set_shortname( "Matroska" )
+    set_description( N_("Matroska stream demuxer" ) )
+    set_capability( "demux", 0 )
+    set_callbacks( Open, Close )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "mkv-use-ordered-chapters", 1, NULL,
             N_("Ordered chapters"),
@@ -67,9 +67,9 @@ vlc_module_begin();
             N_("Dummy Elements"),
             N_("Read and discard unknown EBML elements (not good for broken files)."), true );
 
-    add_shortcut( "mka" );
-    add_shortcut( "mkv" );
-vlc_module_end();
+    add_shortcut( "mka" )
+    add_shortcut( "mkv" )
+vlc_module_end ()
 
 class demux_sys_t;
 

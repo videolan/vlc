@@ -162,24 +162,24 @@ static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
                        "to apply.")
 #define DEFAULT_AUDIO_DEVICE N_("Default Audio Device")
 
-vlc_module_begin();
-    set_shortname( "WaveOut" );
-    set_description( N_("Win32 waveOut extension output") );
-    set_capability( "audio output", 50 );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, true );
+vlc_module_begin ()
+    set_shortname( "WaveOut" )
+    set_description( N_("Win32 waveOut extension output") )
+    set_capability( "audio output", 50 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
+    add_bool( "waveout-float32", 1, 0, FLOAT_TEXT, FLOAT_LONGTEXT, true )
 
     add_string( "waveout-audio-device", "wavemapper", NULL,
                  DEVICE_TEXT, DEVICE_LONG, false );
-       add_deprecated_alias( "waveout-dev" );   /* deprecated since 0.9.3 */
+       add_deprecated_alias( "waveout-dev" )   /* deprecated since 0.9.3 */
        change_string_list( ppsz_adev, ppsz_adev_text, ReloadWaveoutDevices );
-       change_need_restart();
-       change_action_add( ReloadWaveoutDevices, N_("Refresh list") );
+       change_need_restart ()
+       change_action_add( ReloadWaveoutDevices, N_("Refresh list") )
 
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * aout_sys_t: waveOut audio output method descriptor

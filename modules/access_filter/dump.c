@@ -50,20 +50,20 @@
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
-vlc_module_begin ();
-    set_shortname (N_("Dump"));
-    set_description (N_("Dump"));
-    set_category (CAT_INPUT);
-    set_subcategory (SUBCAT_INPUT_ACCESS_FILTER);
-    set_capability ("access_filter", 0);
-    add_shortcut ("dump");
-    set_callbacks (Open, Close);
+vlc_module_begin ()
+    set_shortname (N_("Dump"))
+    set_description (N_("Dump"))
+    set_category (CAT_INPUT)
+    set_subcategory (SUBCAT_INPUT_ACCESS_FILTER)
+    set_capability ("access_filter", 0)
+    add_shortcut ("dump")
+    set_callbacks (Open, Close)
 
     add_bool ("dump-force", false, NULL, FORCE_TEXT,
               FORCE_LONGTEXT, false);
     add_integer ("dump-margin", DEFAULT_MARGIN, NULL, MARGIN_TEXT,
                  MARGIN_LONGTEXT, false);
-vlc_module_end();
+vlc_module_end ()
 
 static ssize_t Read (access_t *access, uint8_t *buffer, size_t len);
 static block_t *Block (access_t *access);

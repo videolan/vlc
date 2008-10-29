@@ -116,35 +116,35 @@ static const int pi_playlist_views[] = { 0,1,2 };
 static const char *const psz_playlist_views[] = {
     N_("Normal" ), N_("Embedded" ), N_("Both") };
 
-vlc_module_begin();
-    set_shortname( "wxWidgets" );
-    set_description( N_("wxWidgets interface module") );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_capability( "interface", 150 );
-    set_callbacks( Open, Close );
-    add_shortcut( "wxwindows" );
-    add_shortcut( "wxwin" );
-    add_shortcut( "wx" );
-    add_shortcut( "wxwidgets" );
+vlc_module_begin ()
+    set_shortname( "wxWidgets" )
+    set_description( N_("wxWidgets interface module") )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
+    set_capability( "interface", 150 )
+    set_callbacks( Open, Close )
+    add_shortcut( "wxwindows" )
+    add_shortcut( "wxwin" )
+    add_shortcut( "wx" )
+    add_shortcut( "wxwidgets" )
 
     add_bool( "wx-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, false );
-        add_deprecated_alias( "wxwin-enbed" ); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-enbed" ) /*Deprecated since 0.8.4*/
     add_bool( "wx-bookmarks", 0, NULL,
               BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, false );
-        add_deprecated_alias( "wxwin-bookmarks" ); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-bookmarks" ) /*Deprecated since 0.8.4*/
     add_bool( "wx-taskbar", 1, NULL,
               TASKBAR_TEXT, TASKBAR_LONGTEXT, false );
-        add_deprecated_alias( "wxwin-taskbar" ); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-taskbar" ) /*Deprecated since 0.8.4*/
     add_bool( "wx-extended", 0, NULL,
               EXTENDED_TEXT, EXTENDED_LONGTEXT, false );
     add_bool( "wx-minimal", 0, NULL,
               MINIMAL_TEXT, MINIMAL_LONGTEXT, true );
-        add_deprecated_alias( "wxwin-minimal" ); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-minimal" ) /*Deprecated since 0.8.4*/
     add_bool( "wx-autosize", 1, NULL,
               SIZE_TO_VIDEO_TEXT, SIZE_TO_VIDEO_LONGTEXT, true );
-        add_deprecated_alias( "wxwin-autosize" ); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-autosize" ) /*Deprecated since 0.8.4*/
     add_integer( "wx-playlist-view", 0, NULL, PLAYLIST_TEXT, PLAYLIST_LONGTEXT,
              false );
         change_integer_list( pi_playlist_views, psz_playlist_views, NULL );
@@ -153,25 +153,25 @@ vlc_module_begin();
 #ifdef wxHAS_TASK_BAR_ICON
     add_bool( "wx-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, false );
-        add_deprecated_alias( "wxwin-systray" ); /*Deprecated since 0.8.4*/
+        add_deprecated_alias( "wxwin-systray" ) /*Deprecated since 0.8.4*/
 #endif
 #endif
-    add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, true);
+    add_bool( "wx-labels", 0, NULL, LABEL_TEXT, LABEL_LONGTEXT, true)
     add_string( "wx-config-last", NULL, NULL,
                 N_("last config"), N_("last config"), true );
-        change_autosave();
-        change_internal();
-        add_deprecated_alias( "wxwin-config-last" ); /*Deprecated since 0.8.4*/
+        change_autosave ()
+        change_internal ()
+        add_deprecated_alias( "wxwin-config-last" ) /*Deprecated since 0.8.4*/
 
-    add_submodule();
-    set_description( N_("wxWidgets dialogs provider") );
-    set_capability( "dialogs provider", 50 );
-    set_callbacks( OpenDialogs, Close );
+    add_submodule ()
+    set_description( N_("wxWidgets dialogs provider") )
+    set_capability( "dialogs provider", 50 )
+    set_callbacks( OpenDialogs, Close )
 
 #if !defined(WIN32)
-    linked_with_a_crap_library_which_uses_atexit();
+    linked_with_a_crap_library_which_uses_atexit ()
 #endif
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create window

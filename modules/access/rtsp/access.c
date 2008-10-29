@@ -48,19 +48,19 @@ static void Close( vlc_object_t * );
     "Caching value for RTSP streams. This " \
     "value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_description( N_("Real RTSP") );
-    set_shortname( N_("Real RTSP") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_description( N_("Real RTSP") )
+    set_shortname( N_("Real RTSP") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "realrtsp-caching", 3000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
-    set_capability( "access", 10 );
-    set_callbacks( Open, Close );
-    add_shortcut( "realrtsp" );
-    add_shortcut( "rtsp" );
-    add_shortcut( "pnm" );
-vlc_module_end();
+    set_capability( "access", 10 )
+    set_callbacks( Open, Close )
+    add_shortcut( "realrtsp" )
+    add_shortcut( "rtsp" )
+    add_shortcut( "pnm" )
+vlc_module_end ()
 
 
 /*****************************************************************************

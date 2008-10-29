@@ -79,18 +79,18 @@ static void Close( vlc_object_t * );
     "Caching value for files. This " \
     "value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_description( N_("File input") );
-    set_shortname( N_("File") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
-    add_obsolete_string( "file-cat" );
-    set_capability( "access", 50 );
-    add_shortcut( "file" );
-    add_shortcut( "stream" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("File input") )
+    set_shortname( N_("File") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true )
+    add_obsolete_string( "file-cat" )
+    set_capability( "access", 50 )
+    add_shortcut( "file" )
+    add_shortcut( "stream" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

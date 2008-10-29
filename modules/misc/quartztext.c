@@ -108,11 +108,11 @@ static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
 static const char *const ppsz_sizes_text[] = {
     N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
 
-vlc_module_begin();
-    set_shortname( N_("Mac Text renderer"));
-    set_description( N_("Quartz font renderer") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC );
+vlc_module_begin ()
+    set_shortname( N_("Mac Text renderer"))
+    set_description( N_("Quartz font renderer") )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
     add_string( "quartztext-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
               false );
@@ -122,10 +122,10 @@ vlc_module_begin();
     add_integer( "quartztext-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
-    set_capability( "text renderer", 150 );
-    add_shortcut( "text" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_capability( "text renderer", 150 )
+    add_shortcut( "text" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 typedef struct offscreen_bitmap_t offscreen_bitmap_t;
 struct offscreen_bitmap_t

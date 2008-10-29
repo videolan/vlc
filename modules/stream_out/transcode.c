@@ -157,15 +157,15 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-transcode-"
 
-vlc_module_begin();
-    set_shortname( N_("Transcode"));
-    set_description( N_("Transcode stream output") );
-    set_capability( "sout stream", 50 );
-    add_shortcut( "transcode" );
-    set_callbacks( Open, Close );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
-    set_section( N_("Video"), NULL );
+vlc_module_begin ()
+    set_shortname( N_("Transcode"))
+    set_description( N_("Transcode stream output") )
+    set_capability( "sout stream", 50 )
+    add_shortcut( "transcode" )
+    set_callbacks( Open, Close )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
+    set_section( N_("Video"), NULL )
     add_string( SOUT_CFG_PREFIX "venc", NULL, NULL, VENC_TEXT,
                 VENC_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
@@ -196,7 +196,7 @@ vlc_module_begin();
                      NULL, NULL,
                      VFILTER_TEXT, VFILTER_LONGTEXT, false );
 
-    set_section( N_("Audio"), NULL );
+    set_section( N_("Audio"), NULL )
     add_string( SOUT_CFG_PREFIX "aenc", NULL, NULL, AENC_TEXT,
                 AENC_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
@@ -213,7 +213,7 @@ vlc_module_begin();
                      NULL, NULL,
                      AFILTER_TEXT, AFILTER_LONGTEXT, false );
 
-    set_section( N_("Overlays/Subtitles"), NULL );
+    set_section( N_("Overlays/Subtitles"), NULL )
     add_string( SOUT_CFG_PREFIX "senc", NULL, NULL, SENC_TEXT,
                 SENC_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "scodec", NULL, NULL, SCODEC_TEXT,
@@ -224,17 +224,17 @@ vlc_module_begin();
                      NULL, NULL,
                      SFILTER_TEXT, SFILTER_LONGTEXT, false );
 
-    set_section( N_("On Screen Display"), NULL );
+    set_section( N_("On Screen Display"), NULL )
     add_bool( SOUT_CFG_PREFIX "osd", 0, NULL, OSD_TEXT,
               OSD_LONGTEXT, false );
 
-    set_section( N_("Miscellaneous"), NULL );
+    set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "high-priority", 0, NULL, HP_TEXT, HP_LONGTEXT,
               true );
 
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
     "venc", "vcodec", "vb",

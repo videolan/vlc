@@ -44,22 +44,22 @@ static int  EncoderOpen ( vlc_object_t * );
 static void EncoderClose( vlc_object_t * );
 #endif
 
-vlc_module_begin();
+vlc_module_begin ()
     /* audio decoder module */
-    set_description( N_("Raw/Log Audio decoder") );
-    set_capability( "decoder", 100 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_callbacks( DecoderOpen, DecoderClose );
+    set_description( N_("Raw/Log Audio decoder") )
+    set_capability( "decoder", 100 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_callbacks( DecoderOpen, DecoderClose )
 
 #ifdef ENABLE_SOUT
     /* audio encoder submodule */
-    add_submodule();
-    set_description( N_("Raw audio encoder") );
-    set_capability( "encoder", 150 );
-    set_callbacks( EncoderOpen, EncoderClose );
+    add_submodule ()
+    set_description( N_("Raw audio encoder") )
+    set_capability( "encoder", 150 )
+    set_callbacks( EncoderOpen, EncoderClose )
 #endif
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

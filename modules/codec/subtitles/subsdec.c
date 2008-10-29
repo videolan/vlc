@@ -113,13 +113,13 @@ static const char *const ppsz_justification_text[] = {
  "VLC partly implements this, but you can choose to disable all formatting.")
 
 
-vlc_module_begin();
-    set_shortname( N_("Subtitles"));
-    set_description( N_("Text subtitles decoder") );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
+vlc_module_begin ()
+    set_shortname( N_("Subtitles"))
+    set_description( N_("Text subtitles decoder") )
+    set_capability( "decoder", 50 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  false );
@@ -131,7 +131,7 @@ vlc_module_begin();
               AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false );
     add_bool( "subsdec-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
                  false );
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

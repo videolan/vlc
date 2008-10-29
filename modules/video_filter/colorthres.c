@@ -64,12 +64,12 @@ static const char *const ppsz_color_descriptions[] = {
 
 #define CFG_PREFIX "colorthres-"
 
-vlc_module_begin();
-    set_description( N_("Color threshold filter") );
-    set_shortname( N_("Color threshold" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter2", 0 );
+vlc_module_begin ()
+    set_description( N_("Color threshold filter") )
+    set_shortname( N_("Color threshold" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "video filter2", 0 )
     add_integer( CFG_PREFIX "color", 0x00FF0000, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, false );
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
@@ -77,8 +77,8 @@ vlc_module_begin();
                  _("Saturaton threshold"), "", false );
     add_integer( CFG_PREFIX "similaritythres", 15, NULL,
                  _("Similarity threshold"), "", false );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "color", "saturationthes", "similaritythres", NULL

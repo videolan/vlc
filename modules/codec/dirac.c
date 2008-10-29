@@ -73,22 +73,22 @@ static const char *const ppsz_enc_options[] = {
 #define ENC_QUALITY_LONGTEXT N_( \
   "Quality of the encoding between 1.0 (low) and 10.0 (high)." )
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_description( N_("Dirac video decoder") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "dirac" );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_description( N_("Dirac video decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "dirac" )
 
-    add_submodule();
-    set_description( N_("Dirac video encoder") );
-    set_capability( "encoder", 100 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+    add_submodule ()
+    set_description( N_("Dirac video encoder") )
+    set_capability( "encoder", 100 )
+    set_callbacks( OpenEncoder, CloseEncoder )
     add_float( ENC_CFG_PREFIX "quality", 7.0, NULL, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, false );
 
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

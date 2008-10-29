@@ -115,14 +115,14 @@
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("Remote-OSD over VNC") );
-    set_capability( "sub filter", 100 );
-    set_shortname( N_("Remote-OSD") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC );
-    add_shortcut( "rmtosd" );
-    set_callbacks( CreateFilter, DestroyFilter );
+vlc_module_begin ()
+    set_description( N_("Remote-OSD over VNC") )
+    set_capability( "sub filter", 100 )
+    set_shortname( N_("Remote-OSD") )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC )
+    add_shortcut( "rmtosd" )
+    set_callbacks( CreateFilter, DestroyFilter )
 
     add_string( RMTOSD_CFG "host", "myvdr", NULL, RMTOSD_HOST_TEXT,
         RMTOSD_HOST_LONGTEXT, false );
@@ -142,7 +142,7 @@ vlc_module_begin();
     add_integer_with_range( RMTOSD_CFG "alpha", 255, 0, 255, NULL,
         RMTOSD_ALPHA_TEXT, RMTOSD_ALPHA_LONGTEXT, true );
 
-vlc_module_end();
+vlc_module_end ()
 
 
 /*****************************************************************************

@@ -41,15 +41,15 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("CDG demuxer") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux", 3 );
-    set_callbacks( Open, Close );
-    add_shortcut( "cdg" );
-    add_shortcut( "subtitle" );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("CDG demuxer") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_capability( "demux", 3 )
+    set_callbacks( Open, Close )
+    add_shortcut( "cdg" )
+    add_shortcut( "subtitle" )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

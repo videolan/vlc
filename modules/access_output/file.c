@@ -65,18 +65,18 @@ static void Close( vlc_object_t * );
 #define APPEND_LONGTEXT N_( "Append to file if it exists instead " \
                             "of replacing it.")
 
-vlc_module_begin();
-    set_description( N_("File stream output") );
-    set_shortname( N_("File" ));
-    set_capability( "sout access", 50 );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_ACO );
-    add_shortcut( "file" );
-    add_shortcut( "stream" );
+vlc_module_begin ()
+    set_description( N_("File stream output") )
+    set_shortname( N_("File" ))
+    set_capability( "sout access", 50 )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_ACO )
+    add_shortcut( "file" )
+    add_shortcut( "stream" )
     add_bool( SOUT_CFG_PREFIX "append", 0, NULL, APPEND_TEXT,APPEND_LONGTEXT,
               true );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

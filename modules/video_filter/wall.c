@@ -71,22 +71,22 @@ static int  SendEvents( vlc_object_t *, char const *,
 
 #define CFG_PREFIX "wall-"
 
-vlc_module_begin();
-    set_description( N_("Wall video filter") );
-    set_shortname( N_("Image wall" ));
-    set_capability( "video filter", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Wall video filter") )
+    set_shortname( N_("Image wall" ))
+    set_capability( "video filter", 0 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_integer( CFG_PREFIX "cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, false );
-    add_integer( CFG_PREFIX "rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, false );
+    add_integer( CFG_PREFIX "cols", 3, NULL, COLS_TEXT, COLS_LONGTEXT, false )
+    add_integer( CFG_PREFIX "rows", 3, NULL, ROWS_TEXT, ROWS_LONGTEXT, false )
     add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT,
                  true );
-    add_string( CFG_PREFIX "element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false );
+    add_string( CFG_PREFIX "element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false )
 
-    add_shortcut( "wall" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "wall" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "cols", "rows", "active", "element-aspect", NULL

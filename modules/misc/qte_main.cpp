@@ -72,13 +72,13 @@ static qte_thread_t * p_qte_main = NULL;
     "Qt/Embedded GUI Server. This option is equivalent to the -qws option " \
     "from normal Qt.")
 
-vlc_module_begin();
-    set_description( N_("Qt Embedded GUI helper") );
-    set_capability( "gui-helper", 90 );
-    add_bool( "qte-guiserver", 0, NULL, STANDALONE_TEXT, STANDALONE_LONGTEXT, false );
-    add_shortcut( "qte" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Qt Embedded GUI helper") )
+    set_capability( "gui-helper", 90 )
+    add_bool( "qte-guiserver", 0, NULL, STANDALONE_TEXT, STANDALONE_LONGTEXT, false )
+    add_shortcut( "qte" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 } /* extern "C" */
 

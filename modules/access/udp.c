@@ -54,25 +54,25 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( N_("UDP" ) );
-    set_description( N_("UDP input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("UDP" ) )
+    set_description( N_("UDP input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
-    add_obsolete_integer( "rtp-late" );
-    add_obsolete_bool( "udp-auto-mtu" );
+    add_obsolete_integer( "rtp-late" )
+    add_obsolete_bool( "udp-auto-mtu" )
 
-    set_capability( "access", 0 );
-    add_shortcut( "udp" );
-    add_shortcut( "udpstream" );
-    add_shortcut( "udp4" );
-    add_shortcut( "udp6" );
+    set_capability( "access", 0 )
+    add_shortcut( "udp" )
+    add_shortcut( "udpstream" )
+    add_shortcut( "udp4" )
+    add_shortcut( "udp6" )
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

@@ -53,18 +53,18 @@ static void Do_U8ToF32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Fixed point audio format conversions") );
-    add_submodule();
-        set_callbacks( Create_F32ToS16, NULL );
-        set_capability( "audio filter", 10 );
-    add_submodule();
-        set_callbacks( Create_S16ToF32, NULL );
-        set_capability( "audio filter", 15 );
-    add_submodule();
-        set_callbacks( Create_U8ToF32, NULL );
-        set_capability( "audio filter", 1 );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("Fixed point audio format conversions") )
+    add_submodule ()
+        set_callbacks( Create_F32ToS16, NULL )
+        set_capability( "audio filter", 10 )
+    add_submodule ()
+        set_callbacks( Create_S16ToF32, NULL )
+        set_capability( "audio filter", 15 )
+    add_submodule ()
+        set_callbacks( Create_U8ToF32, NULL )
+        set_capability( "audio filter", 1 )
+vlc_module_end ()
 
 /*****************************************************************************
  * F32 to S16

@@ -106,13 +106,13 @@ static void Close( vlc_object_t * );
                            "website. Requires the bitrate information specified for " \
                            "shoutcast. Requires Ogg streaming for icecast." )
 
-vlc_module_begin();
-    set_description( N_("IceCAST output") );
-    set_shortname( "Shoutcast" );
-    set_capability( "sout access", 50 );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_ACO );
-    add_shortcut( "shout" );
+vlc_module_begin ()
+    set_description( N_("IceCAST output") )
+    set_shortname( "Shoutcast" )
+    set_capability( "sout access", 50 )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_ACO )
+    add_shortcut( "shout" )
     add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream", NULL,
                 NAME_TEXT, NAME_LONGTEXT, false );
     add_string( SOUT_CFG_PREFIX "description",
@@ -134,8 +134,8 @@ vlc_module_begin();
                 QUALITY_TEXT, QUALITY_LONGTEXT, false );
     add_bool(   SOUT_CFG_PREFIX "public", false, NULL,
                 PUBLIC_TEXT, PUBLIC_LONGTEXT, true );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

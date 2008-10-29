@@ -91,15 +91,15 @@ static void Close( vlc_object_t * );
 #define BONJOUR_LONGTEXT N_( "Advertise the stream with the Bonjour protocol." )
 
 
-vlc_module_begin();
-    set_description( N_("HTTP stream output") );
-    set_capability( "sout access", 0 );
-    set_shortname( "HTTP" );
-    add_shortcut( "http" );
-    add_shortcut( "https" );
-    add_shortcut( "mmsh" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_ACO );
+vlc_module_begin ()
+    set_description( N_("HTTP stream output") )
+    set_capability( "sout access", 0 )
+    set_shortname( "HTTP" )
+    add_shortcut( "http" )
+    add_shortcut( "https" )
+    add_shortcut( "mmsh" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_ACO )
     add_string( SOUT_CFG_PREFIX "user", "", NULL,
                 USER_TEXT, USER_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "pwd", "", NULL,
@@ -116,8 +116,8 @@ vlc_module_begin();
                 CRL_TEXT, CRL_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "bonjour", false, NULL,
               BONJOUR_TEXT, BONJOUR_LONGTEXT, true);
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

@@ -282,13 +282,13 @@ static const char *const psz_tuner_audio_modes_list_text[] =
 #define ALSA_DEFAULT "hw"
 #define CFG_PREFIX "v4l2-"
 
-vlc_module_begin();
-    set_shortname( N_("Video4Linux2") );
-    set_description( N_("Video4Linux2 input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("Video4Linux2") )
+    set_description( N_("Video4Linux2 input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
-    set_section( N_( "Video input" ), NULL );
+    set_section( N_( "Video input" ), NULL )
     add_string( CFG_PREFIX "dev", "/dev/video0", 0, DEV_TEXT, DEV_LONGTEXT,
                 false );
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
@@ -307,9 +307,9 @@ vlc_module_begin();
                 WIDTH_LONGTEXT, true );
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true );
-    add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true );
+    add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
 
-    set_section( N_( "Audio input" ), NULL );
+    set_section( N_( "Audio input" ), NULL )
     add_string( CFG_PREFIX "adev", NULL, 0, ADEV_TEXT, ADEV_LONGTEXT,
                 false );
     add_integer( CFG_PREFIX "audio-method", AUDIO_METHOD_OSS|AUDIO_METHOD_ALSA,
@@ -321,7 +321,7 @@ vlc_module_begin();
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, true );
 
-    set_section( N_( "Tuner" ), NULL );
+    set_section( N_( "Tuner" ), NULL )
     add_integer( CFG_PREFIX "tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT,
                  true );
     add_integer( CFG_PREFIX "tuner-frequency", -1, NULL, FREQUENCY_TEXT,
@@ -384,18 +384,18 @@ vlc_module_begin();
     add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true );
 
-    add_shortcut( "v4l2" );
-    set_capability( "access_demux", 10 );
-    set_callbacks( DemuxOpen, DemuxClose );
+    add_shortcut( "v4l2" )
+    set_capability( "access_demux", 10 )
+    set_callbacks( DemuxOpen, DemuxClose )
 
-    add_submodule();
-    add_shortcut( "v4l2c" );
-    set_description( N_("Video4Linux2 Compressed A/V") );
-    set_capability( "access", 0 );
+    add_submodule ()
+    add_shortcut( "v4l2c" )
+    set_description( N_("Video4Linux2 Compressed A/V") )
+    set_capability( "access", 0 )
     /* use these when open as access_demux fails; VLC will use another demux */
-    set_callbacks( AccessOpen, AccessClose );
+    set_callbacks( AccessOpen, AccessClose )
 
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Access: local prototypes

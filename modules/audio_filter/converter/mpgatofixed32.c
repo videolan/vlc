@@ -66,18 +66,18 @@ struct filter_sys_t
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_description( N_("MPEG audio decoder") );
-    set_capability( "audio filter", 100 );
-    set_callbacks( Create, Destroy );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_description( N_("MPEG audio decoder") )
+    set_capability( "audio filter", 100 )
+    set_callbacks( Create, Destroy )
 
-    add_submodule();
-    set_description( N_("MPEG audio decoder") );
-    set_capability( "audio filter2", 100 );
-    set_callbacks( OpenFilter, CloseFilter );
-vlc_module_end();
+    add_submodule ()
+    set_description( N_("MPEG audio decoder") )
+    set_capability( "audio filter2", 100 )
+    set_callbacks( OpenFilter, CloseFilter )
+vlc_module_end ()
 
 /*****************************************************************************
  * Create:

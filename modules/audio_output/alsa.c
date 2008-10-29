@@ -103,20 +103,20 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
  *****************************************************************************/
 static const char *const ppsz_devices[] = { "default" };
 static const char *const ppsz_devices_text[] = { N_("Default") };
-vlc_module_begin();
-    set_shortname( "ALSA" );
-    set_description( N_("ALSA audio output") );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
+vlc_module_begin ()
+    set_shortname( "ALSA" )
+    set_description( N_("ALSA audio output") )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
     add_string( "alsa-audio-device", DEFAULT_ALSA_DEVICE, aout_FindAndRestart,
                 N_("ALSA Device Name"), NULL, false );
-        add_deprecated_alias( "alsadev" );   /* deprecated since 0.9.3 */
+        add_deprecated_alias( "alsadev" )   /* deprecated since 0.9.3 */
         change_string_list( ppsz_devices, ppsz_devices_text, FindDevicesCallback );
-        change_action_add( FindDevicesCallback, N_("Refresh list") );
+        change_action_add( FindDevicesCallback, N_("Refresh list") )
 
-    set_capability( "audio output", 150 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "audio output", 150 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Probe: probe the audio device for available formats and channels

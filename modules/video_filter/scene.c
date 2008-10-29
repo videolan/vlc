@@ -91,12 +91,12 @@ static const char *const psz_format_list_text[] = { "PNG", "JPEG" };
 
 #define CFG_PREFIX "scene-"
 
-vlc_module_begin( );
-    set_shortname( N_( "Scene filter" ) );
-    set_description( N_( "Scene video filter" ) );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_capability( "video filter2", 0 );
+vlc_module_begin ()
+    set_shortname( N_( "Scene filter" ) )
+    set_description( N_( "Scene video filter" ) )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_capability( "video filter2", 0 )
 
     /* General options */
     add_string(  CFG_PREFIX "format", "png", NULL,
@@ -117,8 +117,8 @@ vlc_module_begin( );
     add_integer( CFG_PREFIX "ratio", 50, NULL,
                  RATIO_TEXT, RATIO_LONGTEXT, false );
 
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_vfilter_options[] = {
     "format", "width", "height", "ratio", "prefix", "path", "replace", NULL

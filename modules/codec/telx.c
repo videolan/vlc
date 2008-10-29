@@ -68,13 +68,13 @@ static subpicture_t *Decode( decoder_t *, block_t ** );
         "interpretation mistake. Try using this wrong interpretation if " \
         "your subtitles don't appear.")
 
-vlc_module_begin();
-    set_description( N_("Teletext subtitles decoder") );
-    set_shortname( "Teletext" );
-    set_capability( "decoder", 50 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_description( N_("Teletext subtitles decoder") )
+    set_shortname( "Teletext" )
+    set_capability( "decoder", 50 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_callbacks( Open, Close )
 
     add_integer( "telx-override-page", -1, NULL,
                  OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, true );
@@ -83,7 +83,7 @@ vlc_module_begin();
     add_bool( "telx-french-workaround", 0, NULL,
               FRENCH_WORKAROUND_TEXT, FRENCH_WORKAROUND_LONGTEXT, true );
 
-vlc_module_end();
+vlc_module_end ()
 
 /****************************************************************************
  * Local structures

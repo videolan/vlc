@@ -154,18 +154,18 @@ static void HandleInterval  ( mtime_t *, unsigned int * );
                         "%s\r\n"                                            \
                         "\r\n"
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( N_( "Audioscrobbler" ) );
-    set_description( N_("Submission of played songs to last.fm") );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_shortname( N_( "Audioscrobbler" ) )
+    set_description( N_("Submission of played songs to last.fm") )
     add_string( "lastfm-username", "", NULL,
                 USERNAME_TEXT, USERNAME_LONGTEXT, false );
     add_password( "lastfm-password", "", NULL,
                 PASSWORD_TEXT, PASSWORD_LONGTEXT, false );
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

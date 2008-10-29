@@ -97,29 +97,29 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
   "Enforce a quality between 1 (low) and 10 (high), instead " \
   "of specifying a particular bitrate. This will produce a VBR stream." )
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_shortname( "Theora" );
-    set_description( N_("Theora video decoder") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "theora" );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_shortname( "Theora" )
+    set_description( N_("Theora video decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "theora" )
 
-    add_submodule();
-    set_description( N_("Theora video packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
+    add_submodule ()
+    set_description( N_("Theora video packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("Theora video encoder") );
-    set_capability( "encoder", 150 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+    add_submodule ()
+    set_description( N_("Theora video encoder") )
+    set_capability( "encoder", 150 )
+    set_callbacks( OpenEncoder, CloseEncoder )
 
 #   define ENC_CFG_PREFIX "sout-theora-"
     add_integer( ENC_CFG_PREFIX "quality", 2, NULL, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {
     "quality", NULL

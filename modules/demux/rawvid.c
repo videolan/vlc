@@ -60,22 +60,22 @@ static void Close( vlc_object_t * );
 #define ASPECT_RATIO_LONGTEXT N_( \
     "Aspect ratio (4:3, 16:9). Default is square pixels." )
 
-vlc_module_begin();
-    set_shortname( "Raw Video" );
-    set_description( N_("Raw video demuxer") );
-    set_capability( "demux", 10 );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_callbacks( Open, Close );
-    add_shortcut( "rawvideo" );
-    add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, false );
-    add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 );
-    add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 );
+vlc_module_begin ()
+    set_shortname( "Raw Video" )
+    set_description( N_("Raw video demuxer") )
+    set_capability( "demux", 10 )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_callbacks( Open, Close )
+    add_shortcut( "rawvideo" )
+    add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, false )
+    add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 )
+    add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 )
     add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true );
     add_string( "rawvid-aspect-ratio", NULL, NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true );
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Definitions of structures used by this plugin

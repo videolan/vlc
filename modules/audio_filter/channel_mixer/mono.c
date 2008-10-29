@@ -110,9 +110,9 @@ static const uint32_t pi_channels_out[] =
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Audio filter for stereo to mono conversion") );
-    set_capability( "audio filter2", 2 );
+vlc_module_begin ()
+    set_description( N_("Audio filter for stereo to mono conversion") )
+    set_capability( "audio filter2", 2 )
 
     add_bool( MONO_CFG "downmix", true, NULL, MONO_DOWNMIX_TEXT,
               MONO_DOWNMIX_LONGTEXT, false );
@@ -120,11 +120,11 @@ vlc_module_begin();
         MONO_CHANNEL_LONGTEXT, false );
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
 
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_MISC );
-    set_callbacks( OpenFilter, CloseFilter );
-    set_shortname( "Mono" );
-vlc_module_end();
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_MISC )
+    set_callbacks( OpenFilter, CloseFilter )
+    set_shortname( "Mono" )
+vlc_module_end ()
 
 /* Init() and ComputeChannelOperations() -
  * Code taken from modules/audio_filter/channel_mixer/headphone.c

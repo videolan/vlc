@@ -49,19 +49,19 @@
 static int  Open( vlc_object_t * );
 static void Close ( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname("Dump");
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_description( N_("File dumper") );
-    set_capability( "demux", 0 );
+vlc_module_begin ()
+    set_shortname("Dump")
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_description( N_("File dumper") )
+    set_capability( "demux", 0 )
     add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT,
               FILE_LONGTEXT, false );
     add_bool( "demuxdump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT,
               false );
-    set_callbacks( Open, Close );
-    add_shortcut( "dump" );
-vlc_module_end();
+    set_callbacks( Open, Close )
+    add_shortcut( "dump" )
+vlc_module_end ()
 
 
 /*****************************************************************************

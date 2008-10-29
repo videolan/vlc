@@ -62,17 +62,17 @@ static int SharpenCallback( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Augment contrast between contours.") );
-    set_shortname( N_("Sharpen video filter") );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter2", 0 );
+vlc_module_begin ()
+    set_description( N_("Augment contrast between contours.") )
+    set_shortname( N_("Sharpen video filter") )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "video filter2", 0 )
     add_float_with_range( "sharpen-sigma", 0.05, 0.0, 2.0, NULL,
         SIG_TEXT, SIG_LONGTEXT, false );
-    add_shortcut( "sharpen" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "sharpen" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "sigma", NULL

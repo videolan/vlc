@@ -226,19 +226,19 @@ static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
     "The option allows you to enable or disable the high-quality float32 " \
     "audio output mode (which is not well supported by some soundcards)." )
 
-vlc_module_begin();
-    set_description( N_("DirectX audio output") );
-    set_shortname( "DirectX" );
-    set_capability( "audio output", 100 );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
-    add_shortcut( "directx" );
+vlc_module_begin ()
+    set_description( N_("DirectX audio output") )
+    set_shortname( "DirectX" )
+    set_capability( "audio output", 100 )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
+    add_shortcut( "directx" )
     add_integer( "directx-audio-device", 0, NULL, DEVICE_TEXT,
                  DEVICE_LONGTEXT, true );
     add_bool( "directx-audio-float32", 0, 0, FLOAT_TEXT,
               FLOAT_LONGTEXT, true );
-    set_callbacks( OpenAudio, CloseAudio );
-vlc_module_end();
+    set_callbacks( OpenAudio, CloseAudio )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenAudio: open the audio device

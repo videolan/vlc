@@ -109,16 +109,16 @@ static const char *const psz_paranoia_list_text[] = { N_("none"), N_("overlap"),
  * Module descriptor
  *****************************************************************************/
 
-vlc_module_begin();
-    add_usage_hint( N_("cddax://[device-or-file][@[T]track]") );
-    set_description( N_("Compact Disc Digital Audio (CD-DA) input") );
-    set_capability( "access", 10 /* compare with priority of cdda */ );
-    set_shortname( N_("Audio Compact Disc"));
-    set_callbacks( CDDAOpen, CDDAClose );
-    add_shortcut( "cddax" );
-    add_shortcut( "cd" );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    add_usage_hint( N_("cddax://[device-or-file][@[T]track]") )
+    set_description( N_("Compact Disc Digital Audio (CD-DA) input") )
+    set_capability( "access", 10 /* compare with priority of cdda */ )
+    set_shortname( N_("Audio Compact Disc"))
+    set_callbacks( CDDAOpen, CDDAClose )
+    add_shortcut( "cddax" )
+    add_shortcut( "cd" )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     /* Configuration options */
     add_integer ( MODULE_STRING "-debug", 0, CDDADebugCB,
@@ -172,7 +172,7 @@ vlc_module_begin();
 #endif /* LIBCDIO_VERSION_NUM >= 72 */
 
 #ifdef HAVE_LIBCDDB
-    set_section( N_("CDDB" ), 0 );
+    set_section( N_("CDDB" ), 0 )
     add_string( MODULE_STRING "-cddb-title-format",
                 "Track %T. %t - %p %A", NULL,
                 N_("Format to use in playlist \"title\" field when using CDDB"),
@@ -228,4 +228,4 @@ vlc_module_begin();
               false );
 #endif /*HAVE_LIBCDDB*/
 
-vlc_module_end();
+vlc_module_end ()

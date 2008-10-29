@@ -83,22 +83,22 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( N_("DVD with menus") );
-    set_description( N_("DVDnav Input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("DVD with menus") )
+    set_description( N_("DVDnav Input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dvdnav-angle", 1, NULL, ANGLE_TEXT,
         ANGLE_LONGTEXT, false );
     add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, true );
     add_bool( "dvdnav-menu", true, NULL,
         MENU_TEXT, MENU_LONGTEXT, false );
-    set_capability( "access_demux", 5 );
-    add_shortcut( "dvd" );
-    add_shortcut( "dvdnav" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "access_demux", 5 )
+    add_shortcut( "dvd" )
+    add_shortcut( "dvdnav" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /* Shall we use libdvdnav's read ahead cache? */
 #define DVD_READ_CACHE 1

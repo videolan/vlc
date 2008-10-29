@@ -396,7 +396,7 @@ enum vlc_config_properties
 /* Modifier macros for the config options (used for fine tuning) */
 
 #define add_deprecated_alias( name ) \
-    vlc_config_set (p_config, VLC_CONFIG_OLDNAME, (const char *)(name))
+    vlc_config_set (p_config, VLC_CONFIG_OLDNAME, (const char *)(name));
 
 #define change_short( ch ) \
     vlc_config_set (p_config, VLC_CONFIG_SHORTCUT, (int)(ch));

@@ -100,40 +100,40 @@ OPEN( ShoutTV )
 OPEN( Freebox )
 OPEN( FrenchTV )
 
-vlc_module_begin();
-    set_category( CAT_PLAYLIST );
-    set_subcategory( SUBCAT_PLAYLIST_SD );
+vlc_module_begin ()
+    set_category( CAT_PLAYLIST )
+    set_subcategory( SUBCAT_PLAYLIST_SD )
 
-    add_obsolete_integer( "shoutcast-limit" );
+    add_obsolete_integer( "shoutcast-limit" )
 
-        set_shortname( "Shoutcast");
-        set_description( N_("Shoutcast radio listings") );
-        set_capability( "services_discovery", 0 );
-        set_callbacks( OpenShoutRadio, Close );
-        add_shortcut( "shoutcast" );
+        set_shortname( "Shoutcast")
+        set_description( N_("Shoutcast radio listings") )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( OpenShoutRadio, Close )
+        add_shortcut( "shoutcast" )
 
-    add_submodule();
-        set_shortname( "ShoutcastTV" );
-        set_description( N_("Shoutcast TV listings") );
-        set_capability( "services_discovery", 0 );
-        set_callbacks( OpenShoutTV, Close );
-        add_shortcut( "shoutcasttv" );
+    add_submodule ()
+        set_shortname( "ShoutcastTV" )
+        set_description( N_("Shoutcast TV listings") )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( OpenShoutTV, Close )
+        add_shortcut( "shoutcasttv" )
 
-    add_submodule();
-        set_shortname( "frenchtv");
-        set_description( N_("French TV") );
-        set_capability( "services_discovery", 0 );
-        set_callbacks( OpenFrenchTV, Close );
-        add_shortcut( "frenchtv" );
+    add_submodule ()
+        set_shortname( "frenchtv")
+        set_description( N_("French TV") )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( OpenFrenchTV, Close )
+        add_shortcut( "frenchtv" )
 
-    add_submodule();
-        set_shortname( "Freebox");
-        set_description( N_("Freebox TV listing (French ISP free.fr services)") );
-        set_capability( "services_discovery", 0 );
-        set_callbacks( OpenFreebox, Close );
-        add_shortcut( "freebox" );
+    add_submodule ()
+        set_shortname( "Freebox")
+        set_description( N_("Freebox TV listing (French ISP free.fr services)") )
+        set_capability( "services_discovery", 0 )
+        set_callbacks( OpenFreebox, Close )
+        add_shortcut( "freebox" )
 
-vlc_module_end();
+vlc_module_end ()
 
 
 /*****************************************************************************

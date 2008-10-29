@@ -177,30 +177,30 @@ static block_t *Encode   ( encoder_t *, aout_buffer_t * );
 #define ENC_CBR_LONGTEXT N_( \
   "Force a constant bitrate encoding (CBR)." )
 
-vlc_module_begin();
-    set_shortname( "Vorbis" );
-    set_description( N_("Vorbis audio decoder") );
+vlc_module_begin ()
+    set_shortname( "Vorbis" )
+    set_description( N_("Vorbis audio decoder") )
 #ifdef MODULE_NAME_IS_tremor
-    set_capability( "decoder", 90 );
+    set_capability( "decoder", 90 )
 #else
-    set_capability( "decoder", 100 );
+    set_capability( "decoder", 100 )
 #endif
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    set_callbacks( OpenDecoder, CloseDecoder );
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_callbacks( OpenDecoder, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("Vorbis audio packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
+    add_submodule ()
+    set_description( N_("Vorbis audio packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
 
 #ifndef MODULE_NAME_IS_tremor
 #   define ENC_CFG_PREFIX "sout-vorbis-"
-    add_submodule();
-    set_description( N_("Vorbis audio encoder") );
-    set_capability( "encoder", 100 );
+    add_submodule ()
+    set_description( N_("Vorbis audio encoder") )
+    set_capability( "encoder", 100 )
 #if defined(HAVE_VORBIS_VORBISENC_H)
-    set_callbacks( OpenEncoder, CloseEncoder );
+    set_callbacks( OpenEncoder, CloseEncoder )
 #endif
 
     add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
@@ -213,7 +213,7 @@ vlc_module_begin();
                  ENC_CBR_LONGTEXT, false );
 #endif
 
-vlc_module_end();
+vlc_module_end ()
 
 #ifndef MODULE_NAME_IS_tremor
 static const char *const ppsz_enc_options[] = {

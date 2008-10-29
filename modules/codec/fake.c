@@ -83,14 +83,14 @@ static const char *const ppsz_deinterlace_type[] =
     "deinterlace", "ffmpeg-deinterlace"
 };
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_shortname( N_("Fake") );
-    set_description( N_("Fake video decoder") );
-    set_capability( "decoder", 1000 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "fake" );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_shortname( N_("Fake") )
+    set_description( N_("Fake video decoder") )
+    set_capability( "decoder", 1000 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "fake" )
 
     add_file( "fake-file", "", NULL, FILE_TEXT,
                 FILE_LONGTEXT, false );
@@ -112,7 +112,7 @@ vlc_module_begin();
         change_string_list( ppsz_deinterlace_type, 0, 0 );
     add_string( "fake-chroma", "I420", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true );
-vlc_module_end();
+vlc_module_end ()
 
 struct decoder_sys_t
 {

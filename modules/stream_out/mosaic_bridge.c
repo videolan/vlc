@@ -168,11 +168,11 @@ static int yCallback( vlc_object_t *, char const *,
 
 #define CFG_PREFIX "sout-mosaic-bridge-"
 
-vlc_module_begin();
-    set_shortname( N_( "Mosaic bridge" ) );
-    set_description(N_("Mosaic bridge stream output") );
-    set_capability( "sout stream", 0 );
-    add_shortcut( "mosaic-bridge" );
+vlc_module_begin ()
+    set_shortname( N_( "Mosaic bridge" ) )
+    set_description(N_("Mosaic bridge stream output") )
+    set_capability( "sout stream", 0 )
+    add_shortcut( "mosaic-bridge" )
 
     add_string( CFG_PREFIX "id", "Id", NULL, ID_TEXT, ID_LONGTEXT,
                 false );
@@ -190,11 +190,11 @@ vlc_module_begin();
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
                             ALPHA_TEXT, ALPHA_LONGTEXT, false );
-    add_integer( CFG_PREFIX "x", -1, NULL, X_TEXT, X_LONGTEXT, false );
-    add_integer( CFG_PREFIX "y", -1, NULL, Y_TEXT, Y_LONGTEXT, false );
+    add_integer( CFG_PREFIX "x", -1, NULL, X_TEXT, X_LONGTEXT, false )
+    add_integer( CFG_PREFIX "y", -1, NULL, Y_TEXT, Y_LONGTEXT, false )
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {
     "id", "width", "height", "sar", "vfilter", "chroma", "alpha", "x", "y", NULL

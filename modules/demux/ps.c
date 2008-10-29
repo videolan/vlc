@@ -52,22 +52,22 @@ static int  OpenForce( vlc_object_t * );
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
-vlc_module_begin();
-    set_description( N_("MPEG-PS demuxer") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_DEMUX );
-    set_capability( "demux", 1 );
-    set_callbacks( OpenForce, Close );
-    add_shortcut( "ps" );
+vlc_module_begin ()
+    set_description( N_("MPEG-PS demuxer") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
+    set_capability( "demux", 1 )
+    set_callbacks( OpenForce, Close )
+    add_shortcut( "ps" )
 
     add_bool( "ps-trust-timestamps", true, NULL, TIME_TEXT,
                  TIME_LONGTEXT, true );
 
-    add_submodule();
-    set_description( N_("MPEG-PS demuxer") );
-    set_capability( "demux", 8 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    add_submodule ()
+    set_description( N_("MPEG-PS demuxer") )
+    set_capability( "demux", 8 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

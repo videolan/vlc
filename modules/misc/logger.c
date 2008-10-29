@@ -137,12 +137,12 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
   "\"text\" (default) and \"html\".")
 #endif
 
-vlc_module_begin();
-    set_shortname( N_( "Logging" ) );
-    set_description( N_("File logging") );
+vlc_module_begin ()
+    set_shortname( N_( "Logging" ) )
+    set_description( N_("File logging") )
 
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_MISC );
+    set_category( CAT_ADVANCED )
+    set_subcategory( SUBCAT_ADVANCED_MISC )
 
     add_file( "logfile", NULL, NULL,
              N_("Log filename"), N_("Specify the log filename."), false );
@@ -153,9 +153,9 @@ vlc_module_begin();
     add_file( "rrd-file", NULL, NULL, N_("RRD output file") ,
                     N_("Output data for RRDTool in this file." ), true );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

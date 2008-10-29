@@ -61,21 +61,21 @@ static void Close( vlc_object_t * );
 #define FORCE_LONGTEXT N_("Force use of the timeshift module even if the " \
   "access declares that it can control pace or pause." )
 
-vlc_module_begin();
-    set_shortname( N_("Timeshift") );
-    set_description( N_("Timeshift") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS_FILTER );
-    set_capability( "access_filter", 0 );
-    add_shortcut( "timeshift" );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_shortname( N_("Timeshift") )
+    set_description( N_("Timeshift") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS_FILTER )
+    set_capability( "access_filter", 0 )
+    add_shortcut( "timeshift" )
+    set_callbacks( Open, Close )
 
     add_integer( "timeshift-granularity", 50, NULL, GRANULARITY_TEXT,
                  GRANULARITY_LONGTEXT, true );
-    add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, false );
+    add_directory( "timeshift-dir", 0, 0, DIR_TEXT, DIR_LONGTEXT, false )
     add_bool( "timeshift-force", false, NULL, FORCE_TEXT, FORCE_LONGTEXT,
               false );
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

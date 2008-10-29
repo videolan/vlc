@@ -122,29 +122,29 @@ static const char *const mode_list[] = {
 static const char *const mode_list_text[] = {
     N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"), N_("Linear"), "X" };
 
-vlc_module_begin();
-    set_description( N_("Deinterlacing video filter") );
-    set_shortname( N_("Deinterlace" ));
-    set_capability( "video filter", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Deinterlacing video filter") )
+    set_shortname( N_("Deinterlace" ))
+    set_capability( "video filter", 0 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_section( N_("Display"),NULL);
+    set_section( N_("Display"),NULL)
     add_string( "deinterlace-mode", "discard", NULL, MODE_TEXT,
                 MODE_LONGTEXT, false );
         change_string_list( mode_list, mode_list_text, 0 );
 
-    add_shortcut( "deinterlace" );
-    set_callbacks( Create, Destroy );
+    add_shortcut( "deinterlace" )
+    set_callbacks( Create, Destroy )
 
-    add_submodule();
-    set_capability( "video filter2", 0 );
-    set_section( N_("Streaming"),NULL);
+    add_submodule ()
+    set_capability( "video filter2", 0 )
+    set_section( N_("Streaming"),NULL)
     add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, SOUT_MODE_TEXT,
                 SOUT_MODE_LONGTEXT, false );
         change_string_list( mode_list, mode_list_text, 0 );
-    set_callbacks( OpenFilter, CloseFilter );
-vlc_module_end();
+    set_callbacks( OpenFilter, CloseFilter )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "mode", NULL

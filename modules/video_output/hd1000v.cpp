@@ -56,12 +56,12 @@ static void FreePicture( vout_thread_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("HD1000 video output") );
-    set_capability( "video output", 100 );
-    add_shortcut( "hd1000v" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("HD1000 video output") )
+    set_capability( "video output", 100 )
+    add_shortcut( "hd1000v" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output method descriptor

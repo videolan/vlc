@@ -109,22 +109,22 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("MPEG audio layer I/II/III decoder") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
+vlc_module_begin ()
+    set_description( N_("MPEG audio layer I/II/III decoder") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
 #if defined(UNDER_CE)
-   set_capability( "decoder", 5 );
+   set_capability( "decoder", 5 )
 #else
-    set_capability( "decoder", 100 );
+    set_capability( "decoder", 100 )
 #endif
-    set_callbacks( OpenDecoder, CloseDecoder );
+    set_callbacks( OpenDecoder, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("MPEG audio layer I/II/III packetizer") );
-    set_capability( "packetizer", 10 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
-vlc_module_end();
+    add_submodule ()
+    set_description( N_("MPEG audio layer I/II/III packetizer") )
+    set_capability( "packetizer", 10 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

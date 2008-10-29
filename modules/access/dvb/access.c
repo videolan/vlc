@@ -189,11 +189,11 @@ static void Close( vlc_object_t *p_this );
 #define CRL_TEXT N_( "CRL file" )
 #define CRL_LONGTEXT N_( "HTTP interface Certificates Revocation List file" )
 
-vlc_module_begin();
-    set_shortname( N_("DVB") );
-    set_description( N_("DVB input with v4l2 support") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("DVB") )
+    set_description( N_("DVB input with v4l2 support") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
@@ -205,7 +205,7 @@ vlc_module_begin();
                  false );
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
                  true );
-    add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true );
+    add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
     add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
               true );
     /* DVB-S (satellite) */
@@ -217,7 +217,7 @@ vlc_module_begin();
               HIGH_VOLTAGE_LONGTEXT, true );
     add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
                  true );
-    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true );
+    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
                  false );
     add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
@@ -236,14 +236,14 @@ vlc_module_begin();
                  CODE_RATE_LP_LONGTEXT, true );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
                  true );
-    add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, true );
+    add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
     add_integer( "dvb-transmission", 0, NULL, TRANSMISSION_TEXT,
                  TRANSMISSION_LONGTEXT, true );
     add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
                  true );
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */
-    set_section( N_("HTTP server" ), 0 );
+    set_section( N_("HTTP server" ), 0 )
     add_string( "dvb-http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT,
                 true );
     add_string( "dvb-http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
@@ -262,25 +262,25 @@ vlc_module_begin();
                 true );
 #endif
 
-    set_capability( "access", 0 );
-    add_shortcut( "dvb" );      /* Generic name */
+    set_capability( "access", 0 )
+    add_shortcut( "dvb" )      /* Generic name */
 
-    add_shortcut( "dvb-s" );    /* Satellite */
-    add_shortcut( "qpsk" );
-    add_shortcut( "satellite" );
+    add_shortcut( "dvb-s" )    /* Satellite */
+    add_shortcut( "qpsk" )
+    add_shortcut( "satellite" )
 
-    add_shortcut( "dvb-c" );    /* Cable */
-    add_shortcut( "cable" );
+    add_shortcut( "dvb-c" )    /* Cable */
+    add_shortcut( "cable" )
 
-    add_shortcut( "dvb-t" );    /* Terrestrial */
-    add_shortcut( "terrestrial" );
+    add_shortcut( "dvb-t" )    /* Terrestrial */
+    add_shortcut( "terrestrial" )
 
-    add_shortcut( "atsc" );     /* Atsc */
-    add_shortcut( "usdigital" );
+    add_shortcut( "atsc" )     /* Atsc */
+    add_shortcut( "usdigital" )
 
-    set_callbacks( Open, Close );
+    set_callbacks( Open, Close )
 
-vlc_module_end();
+vlc_module_end ()
 
 
 /*****************************************************************************

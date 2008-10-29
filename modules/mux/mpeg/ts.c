@@ -188,13 +188,13 @@ static void    Close  ( vlc_object_t * );
 #endif
 #define MAX_PMT_PID 64       /* Maximum pids in each pmt.  FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
 
-vlc_module_begin();
-    set_description( N_("TS muxer (libdvbpsi)") );
-    set_shortname( "MPEG-TS");
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_MUX );
-    set_capability( "sout mux", 120 );
-    add_shortcut( "ts" );
+vlc_module_begin ()
+    set_description( N_("TS muxer (libdvbpsi)") )
+    set_shortname( "MPEG-TS")
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_MUX )
+    set_capability( "sout mux", 120 )
+    add_shortcut( "ts" )
 
     add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL,VPID_TEXT, VPID_LONGTEXT,
                                   true );
@@ -214,9 +214,9 @@ vlc_module_begin();
                 PMTPROG_LONGTEXT, true );
     add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
               true );
-    add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true );
+    add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT
-    add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true );
+    add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true )
 #endif
     add_bool( SOUT_CFG_PREFIX "alignment", true, NULL, ALIGNMENT_TEXT,
               ALIGNMENT_LONGTEXT, true );
@@ -246,10 +246,10 @@ vlc_module_begin();
                 true );
     add_string( SOUT_CFG_PREFIX "csa-use", "1", NULL, CU_TEXT, CU_LONGTEXT,
                 true );
-    add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true );
+    add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true )
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local data structures

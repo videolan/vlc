@@ -36,10 +36,10 @@
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-vlc_module_begin();
+vlc_module_begin ()
     /* Minimal C++ usage */
     std::string description = "C++ module that does nothing";
-    set_description( (char*)_( description.c_str() ) );
-vlc_module_end();
+    set_description( (char*)_( description.c_str() ) )
+vlc_module_end ()
 
 

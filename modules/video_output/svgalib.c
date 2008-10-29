@@ -53,15 +53,15 @@ static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_shortname( "SVGAlib" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("SVGAlib video output") );
-    set_capability( "video output", 0 );
-    set_callbacks( Create, Destroy );
-    linked_with_a_crap_library_which_uses_atexit();
-vlc_module_end();
+vlc_module_begin ()
+    set_shortname( "SVGAlib" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("SVGAlib video output") )
+    set_capability( "video output", 0 )
+    set_callbacks( Create, Destroy )
+    linked_with_a_crap_library_which_uses_atexit ()
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output descriptor

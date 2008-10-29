@@ -168,11 +168,11 @@ static const char *const ppsz_polar_text[] = {
     N_("Horizontal"), N_("Vertical"),
     N_("Circular Left"), N_("Circular Right") };
 
-vlc_module_begin();
-    set_shortname( N_("DVB") );
-    set_description( N_("DirectShow DVB input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("DVB") )
+    set_description( N_("DirectShow DVB input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
@@ -184,7 +184,7 @@ vlc_module_begin();
                      false );
         add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                      true );
-        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true );
+        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
         add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
                   true );
 #   endif
@@ -223,7 +223,7 @@ vlc_module_begin();
     add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
         LNB_SLOF_LONGTEXT, true );
 
-    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true );
+    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
         false );
 
@@ -242,7 +242,7 @@ vlc_module_begin();
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
         true );
         change_integer_list( i_band_list, ppsz_band_text, NULL );
-    add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true );
+    add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
         change_integer_list( i_guard_list, ppsz_guard_text, NULL );
     add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
         TRANSMISSION_LONGTEXT, true );
@@ -251,29 +251,29 @@ vlc_module_begin();
         true );
         change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, NULL );
 
-    set_capability( "access", 0 );
-    add_shortcut( "dvb" );      /* Generic name */
+    set_capability( "access", 0 )
+    add_shortcut( "dvb" )      /* Generic name */
 
-    add_shortcut( "dvb-s" );    /* Satellite */
-    add_shortcut( "dvbs" );
-    add_shortcut( "qpsk" );
-    add_shortcut( "satellite" );
+    add_shortcut( "dvb-s" )    /* Satellite */
+    add_shortcut( "dvbs" )
+    add_shortcut( "qpsk" )
+    add_shortcut( "satellite" )
 
-    add_shortcut( "dvb-c" );    /* Cable */
-    add_shortcut( "dvbc" );
-    add_shortcut( "qam" );
-    add_shortcut( "cable" );
+    add_shortcut( "dvb-c" )    /* Cable */
+    add_shortcut( "dvbc" )
+    add_shortcut( "qam" )
+    add_shortcut( "cable" )
 
-    add_shortcut( "dvbt" );    /* Terrestrial */
-    add_shortcut( "dvb-t" );
-    add_shortcut( "ofdm" );
-    add_shortcut( "terrestrial" );
+    add_shortcut( "dvbt" )    /* Terrestrial */
+    add_shortcut( "dvb-t" )
+    add_shortcut( "ofdm" )
+    add_shortcut( "terrestrial" )
 
-    add_shortcut( "atsc" );     /* Atsc */
-    add_shortcut( "usdigital" );
+    add_shortcut( "atsc" )     /* Atsc */
+    add_shortcut( "usdigital" )
 
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

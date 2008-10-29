@@ -87,12 +87,12 @@ void CloseVideoGL ( vlc_object_t * );
 #define EQ_KEEP_LONGTEXT N_("By default, VLC keeps the last equalizer settings before " \
                             "termination. This feature can be disabled here.")
 
-vlc_module_begin();
-    set_description( N_("Mac OS X interface") );
-    set_capability( "interface", 200 );
-    set_callbacks( OpenIntf, CloseIntf );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
+vlc_module_begin ()
+    set_description( N_("Mac OS X interface") )
+    set_capability( "interface", 200 )
+    set_callbacks( OpenIntf, CloseIntf )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
               false );
     add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
@@ -102,12 +102,12 @@ vlc_module_begin();
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
               false );
 
-    add_submodule();
-        set_description( "Mac OS X OpenGL" );
-        set_capability( "opengl provider", 100 );
-        set_category( CAT_VIDEO);
-        set_subcategory( SUBCAT_VIDEO_VOUT );
-        set_callbacks( OpenVideoGL, CloseVideoGL );
+    add_submodule ()
+        set_description( "Mac OS X OpenGL" )
+        set_capability( "opengl provider", 100 )
+        set_category( CAT_VIDEO)
+        set_subcategory( SUBCAT_VIDEO_VOUT )
+        set_callbacks( OpenVideoGL, CloseVideoGL )
 
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
                      false );
@@ -119,5 +119,5 @@ vlc_module_begin();
                   false );
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                   false );
-vlc_module_end();
+vlc_module_end ()
 

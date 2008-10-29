@@ -47,15 +47,15 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p
  * Module descriptor.
  *****************************************************************************/
 
-vlc_module_begin();
-    set_capability( "decoder", 40 );
-    set_shortname( N_("USFSubs"));
-    set_description( N_("USF subtitles decoder") );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
+vlc_module_begin ()
+    set_capability( "decoder", 40 )
+    set_shortname( N_("USFSubs"))
+    set_description( N_("USF subtitles decoder") )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
     /* We inherit subsdec-align and subsdec-formatted from subsdec.c */
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

@@ -105,17 +105,17 @@ static int PAOpenStream( aout_instance_t * );
 #define DEVICE_TEXT N_("Output device")
 #define DEVICE_LONGTEXT N_("Portaudio identifier for the output device")
 
-vlc_module_begin();
-    set_shortname( "PortAudio" );
-    set_description( N_("PORTAUDIO audio output") );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
+vlc_module_begin ()
+    set_shortname( "PortAudio" )
+    set_description( N_("PORTAUDIO audio output") )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
     add_integer( "portaudio-audio-device", 0, NULL,
                  DEVICE_TEXT, DEVICE_LONGTEXT, false );
-        add_deprecated_alias( "portaudio-device" );   /* deprecated since 0.9.3 */
-    set_capability( "audio output", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+        add_deprecated_alias( "portaudio-device" )   /* deprecated since 0.9.3 */
+    set_capability( "audio output", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /* This routine will be called by the PortAudio engine when audio is needed.
  * It may called at interrupt level on some machines so don't do anything

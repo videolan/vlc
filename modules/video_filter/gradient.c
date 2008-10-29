@@ -76,12 +76,12 @@ static const char *const mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Ho
 
 #define FILTER_PREFIX "gradient-"
 
-vlc_module_begin();
-    set_description( N_("Gradient video filter") );
-    set_shortname( N_( "Gradient" ));
-    set_capability( "video filter2", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Gradient video filter") )
+    set_shortname( N_( "Gradient" ))
+    set_capability( "video filter2", 0 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_string( FILTER_PREFIX "mode", "gradient", NULL,
                 MODE_TEXT, MODE_LONGTEXT, false );
@@ -92,9 +92,9 @@ vlc_module_begin();
     add_bool( FILTER_PREFIX "cartoon", 1, NULL,
                 CARTOON_TEXT, CARTOON_LONGTEXT, false );
 
-    add_shortcut( "gradient" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "gradient" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "mode", "type", "cartoon", NULL

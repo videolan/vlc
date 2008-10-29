@@ -123,11 +123,11 @@
     static int  OpenDemux ( vlc_object_t * );
     static void CloseDemux ( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( N_("SAP"));
-    set_description( N_("SAP Announcements") );
-    set_category( CAT_PLAYLIST );
-    set_subcategory( SUBCAT_PLAYLIST_SD );
+vlc_module_begin ()
+    set_shortname( N_("SAP"))
+    set_description( N_("SAP Announcements") )
+    set_category( CAT_PLAYLIST )
+    set_subcategory( SUBCAT_PLAYLIST_SD )
 
     add_string( "sap-addr", NULL, NULL,
                 SAP_ADDR_TEXT, SAP_ADDR_LONGTEXT, true );
@@ -148,15 +148,15 @@ vlc_module_begin();
     add_bool( "sap-timeshift", 0 , NULL,
               SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, true );
 
-    set_capability( "services_discovery", 0 );
-    set_callbacks( Open, Close );
+    set_capability( "services_discovery", 0 )
+    set_callbacks( Open, Close )
 
-    add_submodule();
-        set_description( N_("SDP Descriptions parser") );
-        add_shortcut( "sdp" );
-        set_capability( "demux", 51 );
-        set_callbacks( OpenDemux, CloseDemux );
-vlc_module_end();
+    add_submodule ()
+        set_description( N_("SDP Descriptions parser") )
+        add_shortcut( "sdp" )
+        set_capability( "demux", 51 )
+        set_callbacks( OpenDemux, CloseDemux )
+vlc_module_end ()
 
 
 /*****************************************************************************

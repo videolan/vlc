@@ -105,18 +105,18 @@ static int get_capability_for_osversion(void)
     return 50;
 }
 
-vlc_module_begin();
-    set_shortname( "Direct3D" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("DirectX 3D video output") );
-    set_capability( "video output", get_capability_for_osversion() );
-    add_shortcut( "direct3d" );
-    set_callbacks( OpenVideo, CloseVideo );
+vlc_module_begin ()
+    set_shortname( "Direct3D" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("DirectX 3D video output") )
+    set_capability( "video output", get_capability_for_osversion() )
+    add_shortcut( "direct3d" )
+    set_callbacks( OpenVideo, CloseVideo )
 
     /* FIXME: Hack to avoid unregistering our window class */
-    linked_with_a_crap_library_which_uses_atexit( );
-vlc_module_end();
+    linked_with_a_crap_library_which_uses_atexit ()
+vlc_module_end ()
 
 #if 0 /* FIXME */
     /* check if we registered a window class because we need to

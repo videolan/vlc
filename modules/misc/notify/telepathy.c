@@ -74,18 +74,18 @@ static int SendToTelepathy( intf_thread_t *, const char * );
 "$I Video Title, $L Time Remaining, $N Name, $O Audio language, $P Position, " \
 "$R Rate, $S Sample rate, $T Time elapsed, $U Publisher, $V Volume")
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( "Telepathy" );
-    set_description( N_("Telepathy \"Now Playing\" using MissionControl") );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_shortname( "Telepathy" )
+    set_description( N_("Telepathy \"Now Playing\" using MissionControl") )
 
     add_string( "telepathy-format", FORMAT_DEFAULT, NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, false );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

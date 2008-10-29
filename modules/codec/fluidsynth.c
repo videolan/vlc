@@ -37,15 +37,15 @@
 static int  Open  (vlc_object_t *);
 static void Close (vlc_object_t *);
 
-vlc_module_begin();
-    set_description (N_("FluidSynth MIDI synthetizer"));
-    set_capability ("decoder", 100);
-    set_category (CAT_INPUT);
-    set_subcategory (SUBCAT_INPUT_ACODEC);
-    set_callbacks (Open, Close);
+vlc_module_begin ()
+    set_description (N_("FluidSynth MIDI synthetizer"))
+    set_capability ("decoder", 100)
+    set_category (CAT_INPUT)
+    set_subcategory (SUBCAT_INPUT_ACODEC)
+    set_callbacks (Open, Close)
     add_file ("soundfont", "", NULL,
               SOUNDFONT_TEXT, SOUNDFONT_LONGTEXT, false);
-vlc_module_end();
+vlc_module_end ()
 
 
 struct decoder_sys_t

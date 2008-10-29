@@ -100,12 +100,12 @@ static int FilterCallback ( vlc_object_t *, char const *,
 #define LUM_LONGTEXT N_("Maximum luminance to consider a pixel as black (0-255).")
 #endif
 
-vlc_module_begin();
-    set_description( N_("Crop video filter") );
-    set_shortname( N_("Crop" ));
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
-    set_capability( "video filter", 0 );
+vlc_module_begin ()
+    set_description( N_("Crop video filter") )
+    set_shortname( N_("Crop" ))
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
+    set_capability( "video filter", 0 )
 
     add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
                                              GEOMETRY_LONGTEXT, false );
@@ -133,9 +133,9 @@ vlc_module_begin();
                             LUM_TEXT, LUM_LONGTEXT, true );
 #endif //BEST_AUTOCROP
 
-    add_shortcut( "crop" );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    add_shortcut( "crop" )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: Crop video output method descriptor

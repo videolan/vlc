@@ -57,11 +57,11 @@ static picture_t *Conversion_Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_capability( "video filter2", 50 );
-    set_callbacks( OpenFilter, CloseFilter );
-    set_description( N_("FFmpeg video filter") );
-vlc_module_end();
+vlc_module_begin ()
+    set_capability( "video filter2", 50 )
+    set_callbacks( OpenFilter, CloseFilter )
+    set_description( N_("FFmpeg video filter") )
+vlc_module_end ()
 
 /*****************************************************************************
  * chroma_sys_t: chroma method descriptor

@@ -49,16 +49,16 @@ static void Close( vlc_object_t * );
     "Caching value for GnomeVFS streams."\
     "This value should be set in milliseconds." )
 
-vlc_module_begin();
-    set_description( N_("GnomeVFS input") );
-    set_shortname( "GnomeVFS" );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
-    add_integer( "gnomevfs-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
-    set_capability( "access", 10 );
-    add_shortcut( "gnomevfs" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("GnomeVFS input") )
+    set_shortname( "GnomeVFS" )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
+    add_integer( "gnomevfs-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true )
+    set_capability( "access", 10 )
+    add_shortcut( "gnomevfs" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

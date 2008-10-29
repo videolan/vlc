@@ -66,20 +66,20 @@ extern void Deactivate ( vlc_object_t * );
     "Screen to use in fullscreen mode. For instance " \
     "set it to 0 for first screen, 1 for the second.")
 
-vlc_module_begin();
-    set_shortname( "X11" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    add_string( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
-    add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true );
+vlc_module_begin ()
+    set_shortname( "X11" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    add_string( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
+    add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
+    add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "x11-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
+    add_integer ( "x11-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
-    set_description( N_("X11 video output") );
-    set_capability( "video output", 70 );
-    set_callbacks( Activate, Deactivate );
-vlc_module_end();
+    set_description( N_("X11 video output") )
+    set_capability( "video output", 70 )
+    set_callbacks( Activate, Deactivate )
+vlc_module_end ()
 

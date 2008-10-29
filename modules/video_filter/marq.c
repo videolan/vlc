@@ -141,22 +141,22 @@ static const char *const ppsz_pos_descriptions[] =
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_capability( "sub filter", 0 );
-    set_shortname( N_("Marquee" ));
-    set_callbacks( CreateFilter, DestroyFilter );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_SUBPIC );
+vlc_module_begin ()
+    set_capability( "sub filter", 0 )
+    set_shortname( N_("Marquee" ))
+    set_callbacks( CreateFilter, DestroyFilter )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC )
     add_string( CFG_PREFIX "marquee", "VLC", NULL, MSG_TEXT, MSG_LONGTEXT,
                 false );
 
-    set_section( N_("Position"), NULL );
-    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true );
-    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true );
-    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false );
+    set_section( N_("Position"), NULL )
+    add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
+    add_integer( CFG_PREFIX "y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, true )
+    add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
 
-    set_section( N_("Font"), NULL );
+    set_section( N_("Font"), NULL )
     /* 5 sets the default to top [1] left [4] */
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, false );
@@ -166,22 +166,22 @@ vlc_module_begin();
     add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT,
                  false );
 
-    set_section( N_("Misc"), NULL );
+    set_section( N_("Misc"), NULL )
     add_integer( CFG_PREFIX "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  false );
     add_integer( CFG_PREFIX "refresh", 1000, NULL, REFRESH_TEXT,
                  REFRESH_LONGTEXT, false );
 
-    set_description( N_("Marquee display") );
-    add_shortcut( "time" );
-    add_obsolete_string( "time-format" );
-    add_obsolete_string( "time-x" );
-    add_obsolete_string( "time-y" );
-    add_obsolete_string( "time-position" );
-    add_obsolete_string( "time-opacity" );
-    add_obsolete_string( "time-color" );
-    add_obsolete_string( "time-size" );
-vlc_module_end();
+    set_description( N_("Marquee display") )
+    add_shortcut( "time" )
+    add_obsolete_string( "time-format" )
+    add_obsolete_string( "time-x" )
+    add_obsolete_string( "time-y" )
+    add_obsolete_string( "time-position" )
+    add_obsolete_string( "time-opacity" )
+    add_obsolete_string( "time-color" )
+    add_obsolete_string( "time-size" )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "marquee", "x", "y", "position", "color", "size", "timeout", "refresh",

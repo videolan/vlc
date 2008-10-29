@@ -72,20 +72,20 @@ static mtime_t GetClockRef( intf_thread_t *, mtime_t );
 #define MIP_LONGTEXT N_( "IP address of " \
   "the master client used for the network synchronisation." )
 
-vlc_module_begin();
-    set_shortname( N_("Network Sync"));
-    set_description( N_("Network synchronisation") );
-    set_category( CAT_ADVANCED );
-    set_subcategory( SUBCAT_ADVANCED_MISC );
+vlc_module_begin ()
+    set_shortname( N_("Network Sync"))
+    set_description( N_("Network synchronisation") )
+    set_category( CAT_ADVANCED )
+    set_subcategory( SUBCAT_ADVANCED_MISC )
 
     add_bool( "netsync-master", 0, NULL,
               NETSYNC_TEXT, NETSYNC_LONGTEXT, true );
     add_string( "netsync-master-ip", NULL, NULL, MIP_TEXT, MIP_LONGTEXT,
                 true );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Activate, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Activate, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

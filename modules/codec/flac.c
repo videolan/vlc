@@ -176,29 +176,29 @@ static uint8_t flac_crc8( const uint8_t *data, unsigned len );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
+vlc_module_begin ()
 
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
-    add_shortcut( "flac" );
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    add_shortcut( "flac" )
 
 #ifdef USE_LIBFLAC
-    set_description( N_("Flac audio decoder") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
+    set_description( N_("Flac audio decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("Flac audio encoder") );
-    set_capability( "encoder", 100 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+    add_submodule ()
+    set_description( N_("Flac audio encoder") )
+    set_capability( "encoder", 100 )
+    set_callbacks( OpenEncoder, CloseEncoder )
 
-    add_submodule();
+    add_submodule ()
 #endif
-    set_description( N_("Flac audio packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
+    set_description( N_("Flac audio packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
 
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

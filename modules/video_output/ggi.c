@@ -62,12 +62,12 @@ static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t *
             "By default, VLC will use the value of the DISPLAY " \
             "environment variable.")
 
-vlc_module_begin();
-    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
-    set_description( "General Graphics Interface video output" );
-    set_capability( "video output", 30 );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+vlc_module_begin ()
+    add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
+    set_description( "General Graphics Interface video output" )
+    set_capability( "video output", 30 )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output GGI method descriptor

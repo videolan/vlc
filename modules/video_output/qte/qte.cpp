@@ -112,16 +112,16 @@ static void* RunQtThread( vlc_object_t *p_this );
 extern "C"
 {
 
-vlc_module_begin();
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-//    add_category_hint( N_("QT Embedded"), NULL );
-//    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT);
-    set_description( N_("QT Embedded video output") );
-    set_capability( "video output", 70 );
-    add_shortcut( "qte" );
-    set_callbacks( Open, Close);
-vlc_module_end();
+vlc_module_begin ()
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+//    add_category_hint( N_("QT Embedded"), NULL )
+//    add_string( "qte-display", "landscape", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT)
+    set_description( N_("QT Embedded video output") )
+    set_capability( "video output", 70 )
+    add_shortcut( "qte" )
+    set_callbacks( Open, Close)
+vlc_module_end ()
 
 } /* extern "C" */
 

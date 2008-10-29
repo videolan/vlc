@@ -89,14 +89,14 @@ static CFDataRef readFile(const char *);
  * Module descriptor
  ****************************************************************************/
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( "Growl" );
-    set_description( N_("Growl Notification Plugin") );
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_shortname( "Growl" )
+    set_description( N_("Growl Notification Plugin") )
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

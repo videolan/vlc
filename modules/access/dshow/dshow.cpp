@@ -182,25 +182,25 @@ static void AccessClose( vlc_object_t * );
 static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
 
-vlc_module_begin();
-    set_shortname( N_("DirectShow") );
-    set_description( N_("DirectShow input") );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_shortname( N_("DirectShow") )
+    set_description( N_("DirectShow input") )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true );
 
-    add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false);
+    add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
         change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback );
-        change_action_add( FindDevicesCallback, N_("Refresh list") );
-        change_action_add( ConfigDevicesCallback, N_("Configure") );
+        change_action_add( FindDevicesCallback, N_("Refresh list") )
+        change_action_add( ConfigDevicesCallback, N_("Configure") )
 
-    add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false);
+    add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
         change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback );
-        change_action_add( FindDevicesCallback, N_("Refresh list") );
-        change_action_add( ConfigDevicesCallback, N_("Configure") );
+        change_action_add( FindDevicesCallback, N_("Refresh list") )
+        change_action_add( ConfigDevicesCallback, N_("Configure") )
 
-    add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false);
+    add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
 
     add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true );
@@ -247,16 +247,16 @@ vlc_module_begin();
     add_integer( "dshow-audio-bitspersample", 0, NULL, AUDIO_BITSPERSAMPLE_TEXT,
                  AUDIO_BITSPERSAMPLE_LONGTEXT, true );
 
-    add_shortcut( "dshow" );
-    set_capability( "access_demux", 0 );
-    set_callbacks( DemuxOpen, DemuxClose );
+    add_shortcut( "dshow" )
+    set_capability( "access_demux", 0 )
+    set_callbacks( DemuxOpen, DemuxClose )
 
-    add_submodule();
-    set_description( N_("DirectShow input") );
-    set_capability( "access", 0 );
-    set_callbacks( AccessOpen, AccessClose );
+    add_submodule ()
+    set_description( N_("DirectShow input") )
+    set_capability( "access", 0 )
+    set_callbacks( AccessOpen, AccessClose )
 
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * DirectShow elementary stream descriptor

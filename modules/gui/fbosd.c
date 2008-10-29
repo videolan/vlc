@@ -174,10 +174,10 @@ static const char *const ppsz_color_descriptions[] = {
                N_("Teal"), N_("Lime"), N_("Purple"), N_("Navy"), N_("Blue"),
                N_("Aqua") };
 
-vlc_module_begin();
-    set_shortname( "fbosd" );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
+vlc_module_begin ()
+    set_shortname( "fbosd" )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
 
     add_file( "fbosd-dev", "/dev/fb1", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               false );
@@ -192,15 +192,15 @@ vlc_module_begin();
     add_integer_with_range( "fbosd-alpha", 255, 0, 255, NULL, ALPHA_TEXT,
                             ALPHA_LONGTEXT, true );
 
-    set_section( N_("Position"), NULL );
+    set_section( N_("Position"), NULL )
     add_integer( "fbosd-x", 0, NULL, POSX_TEXT,
                  POSX_LONGTEXT, false );
     add_integer( "fbosd-y", 0, NULL, POSY_TEXT,
                  POSY_LONGTEXT, false );
-    add_integer( "fbosd-position", 8, NULL, POS_TEXT, POS_LONGTEXT, true );
+    add_integer( "fbosd-position", 8, NULL, POS_TEXT, POS_LONGTEXT, true )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
 
-    set_section( N_("Font"), NULL );
+    set_section( N_("Font"), NULL )
     add_integer_with_range( "fbosd-font-opacity", 255, 0, 255, NULL,
         OPACITY_TEXT, OPACITY_LONGTEXT, false );
     add_integer( "fbosd-font-color", 0x00FFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
@@ -209,15 +209,15 @@ vlc_module_begin();
     add_integer( "fbosd-font-size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT,
                  false );
 
-    set_section( N_("Commands"), NULL );
-    add_bool( "fbosd-clear", false, NULL, CLEAR_TEXT, CLEAR_LONGTEXT, true );
-    add_bool( "fbosd-render", false, NULL, RENDER_TEXT, RENDER_LONGTEXT, true );
-    add_bool( "fbosd-display", false, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
+    set_section( N_("Commands"), NULL )
+    add_bool( "fbosd-clear", false, NULL, CLEAR_TEXT, CLEAR_LONGTEXT, true )
+    add_bool( "fbosd-render", false, NULL, RENDER_TEXT, RENDER_LONGTEXT, true )
+    add_bool( "fbosd-display", false, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
 
-    set_description( N_("GNU/Linux osd/overlay framebuffer interface") );
-    set_capability( "interface", 10 );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_description( N_("GNU/Linux osd/overlay framebuffer interface") )
+    set_capability( "interface", 10 )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * fbosd_render_t: render descriptor

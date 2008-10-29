@@ -66,11 +66,11 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset );
 #define PORT_TEXT N_("UDP port")
 #define PORT_LONGTEXT N_("Growl UDP port on the Growl server.")
 
-vlc_module_begin();
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
-    set_shortname( "Growl-UDP" );
-    set_description( N_("Growl UDP Notification Plugin") );
+vlc_module_begin ()
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+    set_shortname( "Growl-UDP" )
+    set_description( N_("Growl UDP Notification Plugin") )
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,
                 SERVER_TEXT, SERVER_LONGTEXT, false );
@@ -79,9 +79,9 @@ vlc_module_begin();
     add_integer( "growl-port", 9887, NULL,
                 PORT_TEXT, PORT_LONGTEXT, true );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize and create stuff

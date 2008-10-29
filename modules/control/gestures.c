@@ -91,20 +91,20 @@ static const char *const button_list[] = { "left", "middle", "right" };
 static const char *const button_list_text[] =
                                    { N_("Left"), N_("Middle"), N_("Right") };
 
-vlc_module_begin();
-    set_shortname( N_("Gestures"));
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+vlc_module_begin ()
+    set_shortname( N_("Gestures"))
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_integer( "gestures-threshold", 30, NULL,
                  THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true );
     add_string( "gestures-button", "right", NULL,
                 BUTTON_TEXT, BUTTON_LONGTEXT, false );
         change_string_list( button_list, button_list_text, 0 );
-    set_description( N_("Mouse gestures control interface") );
+    set_description( N_("Mouse gestures control interface") )
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenIntf: initialize interface

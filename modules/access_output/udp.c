@@ -76,21 +76,21 @@ static void Close( vlc_object_t * );
                           "helps reducing the scheduling load on " \
                           "heavily-loaded systems." )
 
-vlc_module_begin();
-    set_description( N_("UDP stream output") );
-    set_shortname( "UDP" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_ACO );
-    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true );
+vlc_module_begin ()
+    set_description( N_("UDP stream output") )
+    set_shortname( "UDP" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_ACO )
+    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
                                  true );
-    add_obsolete_integer( SOUT_CFG_PREFIX "late" );
-    add_obsolete_bool( SOUT_CFG_PREFIX "raw" );
+    add_obsolete_integer( SOUT_CFG_PREFIX "late" )
+    add_obsolete_bool( SOUT_CFG_PREFIX "raw" )
 
-    set_capability( "sout access", 100 );
-    add_shortcut( "udp" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "sout access", 100 )
+    add_shortcut( "udp" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Exported prototypes

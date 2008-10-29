@@ -120,20 +120,20 @@ static int ConvertKey( SDLKey );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_shortname( "SDL" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    set_description( N_("Simple DirectMedia Layer video output") );
-    set_capability( "video output", 60 );
-    add_shortcut( "sdl" );
-    add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true );
-    set_callbacks( Open, Close );
+vlc_module_begin ()
+    set_shortname( "SDL" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    set_description( N_("Simple DirectMedia Layer video output") )
+    set_capability( "video output", 60 )
+    add_shortcut( "sdl" )
+    add_string( "sdl-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
+    set_callbacks( Open, Close )
 #if defined( __i386__ ) || defined( __x86_64__ )
     /* On i386, SDL is linked against svgalib */
-    linked_with_a_crap_library_which_uses_atexit();
+    linked_with_a_crap_library_which_uses_atexit ()
 #endif
-vlc_module_end();
+vlc_module_end ()
 
 static vlc_mutex_t sdl_lock = VLC_STATIC_MUTEX;
 

@@ -56,20 +56,20 @@ static int MotionBlurCallback( vlc_object_t *, char const *,
 
 #define FILTER_PREFIX "blur-"
 
-vlc_module_begin();
-    set_shortname( N_("Motion blur") );
-    set_description( N_("Motion blur filter") );
-    set_capability( "video filter2", 0 );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_shortname( N_("Motion blur") )
+    set_description( N_("Motion blur filter") )
+    set_capability( "video filter2", 0 )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( FILTER_PREFIX "factor", 80, 1, 127, NULL,
                             FACTOR_TEXT, FACTOR_LONGTEXT, false );
 
-    add_shortcut( "blur" );
+    add_shortcut( "blur" )
 
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "factor", NULL

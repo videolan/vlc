@@ -77,25 +77,25 @@ extern void Deactivate ( vlc_object_t * );
     "Screen to use in fullscreen mode. For instance " \
     "set it to 0 for first screen, 1 for the second.")
 
-vlc_module_begin();
-    set_shortname( "XVideo" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
-    add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true );
-    add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true );
-    add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true );
-    add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true );
+vlc_module_begin ()
+    set_shortname( "XVideo" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
+    add_string( "xvideo-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
+    add_integer( "xvideo-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true )
+    add_bool( "xvideo-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true )
+    add_string( "xvideo-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true );
+    add_bool( "xvideo-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
 #endif
 #ifdef HAVE_XINERAMA
-    add_integer ( "xvideo-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true );
+    add_integer ( "xvideo-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
 
-    set_description( N_("XVideo extension video output") );
-    set_capability( "video output", 150 );
-    set_callbacks( Activate, Deactivate );
-vlc_module_end();
+    set_description( N_("XVideo extension video output") )
+    set_capability( "video output", 150 )
+    set_callbacks( Activate, Deactivate )
+vlc_module_end ()
 
 /* following functions are local */
 

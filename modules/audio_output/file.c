@@ -109,11 +109,11 @@ static const int format_int[] = { VLC_FOURCC('u','8',' ',' '),
 #define FILE_TEXT N_("Output file")
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")
 
-vlc_module_begin();
-    set_description( N_("File audio output") );
-    set_shortname( N_("File") );
-    set_category( CAT_AUDIO );
-    set_subcategory( SUBCAT_AUDIO_AOUT );
+vlc_module_begin ()
+    set_description( N_("File audio output") )
+    set_shortname( N_("File") )
+    set_category( CAT_AUDIO )
+    set_subcategory( SUBCAT_AUDIO_AOUT )
 
     add_string( "audiofile-format", "s16", NULL,
                 FORMAT_TEXT, FORMAT_LONGTEXT, true );
@@ -122,13 +122,13 @@ vlc_module_begin();
                  CHANNELS_TEXT, CHANNELS_LONGTEXT, true );
     add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
               FILE_LONGTEXT, false );
-    add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, true );
+    add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, true )
 
-    set_capability( "audio output", 0 );
-    add_shortcut( "file" );
-    add_shortcut( "audiofile" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "audio output", 0 )
+    add_shortcut( "file" )
+    add_shortcut( "audiofile" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: open a dummy audio device

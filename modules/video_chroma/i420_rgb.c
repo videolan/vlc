@@ -68,24 +68,24 @@ static void Set8bppPalette      ( filter_t *, uint8_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-vlc_module_begin();
+vlc_module_begin ()
 #if defined (MODULE_NAME_IS_i420_rgb)
     set_description( N_("I420,IYUV,YV12 to "
                        "RGB2,RV15,RV16,RV24,RV32 conversions") );
-    set_capability( "video filter2", 80 );
+    set_capability( "video filter2", 80 )
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
     set_description( N_( "MMX I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") );
-    set_capability( "video filter2", 100 );
-    add_requirement( MMX );
+    set_capability( "video filter2", 100 )
+    add_requirement( MMX )
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") );
-    set_capability( "video filter2", 120 );
-    add_requirement( SSE2 );
+    set_capability( "video filter2", 120 )
+    add_requirement( SSE2 )
 #endif
-    set_callbacks( Activate, Deactivate );
-vlc_module_end();
+    set_callbacks( Activate, Deactivate )
+vlc_module_end ()
 
 /*****************************************************************************
  * Activate: allocate a chroma function

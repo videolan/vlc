@@ -61,11 +61,11 @@ static void Close   ( vlc_object_t * );
     "properly configured. Use a comma separated list of interface modules. " \
     "(common values are: logger, sap, rc, http)")
 
-vlc_module_begin();
-    set_shortname( N_("NT Service"));
-    set_description( N_("Windows Service interface") );
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_CONTROL );
+vlc_module_begin ()
+    set_shortname( N_("NT Service"))
+    set_description( N_("Windows Service interface") )
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_bool( "ntservice-install", 0, NULL,
               INSTALL_TEXT, INSTALL_LONGTEXT, true );
     add_bool( "ntservice-uninstall", 0, NULL,
@@ -77,9 +77,9 @@ vlc_module_begin();
     add_string ( "ntservice-extraintf", NULL, NULL,
                  EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, true );
 
-    set_capability( "interface", 0 );
-    set_callbacks( Activate, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Activate, Close )
+vlc_module_end ()
 
 struct intf_sys_t
 {

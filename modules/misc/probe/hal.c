@@ -54,11 +54,11 @@ static device_t * ParseDisc( device_probe_t *p_probe,  char *psz_device );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("HAL devices detection") );
-    set_capability( "devices probe", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+vlc_module_begin ()
+    set_description( N_("HAL devices detection") )
+    set_capability( "devices probe", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 
 /*****************************************************************************

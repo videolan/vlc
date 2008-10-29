@@ -63,20 +63,20 @@ static picture_t *Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("OpenCV face detection example filter") );
-    set_shortname( N_( "OpenCV example" ));
-    set_capability( "opencv example", 1 );
-    add_shortcut( "opencv_example" );
+vlc_module_begin ()
+    set_description( N_("OpenCV face detection example filter") )
+    set_shortname( N_( "OpenCV example" ))
+    set_capability( "opencv example", 1 )
+    add_shortcut( "opencv_example" )
 
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 );
-    set_callbacks( OpenFilter, CloseFilter );
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER2 )
+    set_callbacks( OpenFilter, CloseFilter )
 
     add_string( "opencv-haarcascade-file", "c:\\haarcascade_frontalface_alt.xml", NULL,
                           N_("Haar cascade filename"),
                           N_("Name of XML file containing Haar cascade description"), false);
-vlc_module_end();
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenFilter: probe the filter and return score

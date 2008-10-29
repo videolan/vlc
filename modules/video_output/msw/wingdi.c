@@ -132,20 +132,20 @@ static void InitBuffers        ( vout_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
+vlc_module_begin ()
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
 #ifdef MODULE_NAME_IS_wingapi
-    set_shortname( "Windows GAPI" );
-    set_description( N_("Windows GAPI video output") );
-    set_capability( "video output", 20 );
+    set_shortname( "Windows GAPI" )
+    set_description( N_("Windows GAPI video output") )
+    set_capability( "video output", 20 )
 #else
-    set_shortname( "Windows GDI" );
-    set_description( N_("Windows GDI video output") );
-    set_capability( "video output", 10 );
+    set_shortname( "Windows GDI" )
+    set_description( N_("Windows GDI video output") )
+    set_capability( "video output", 10 )
 #endif
-    set_callbacks( OpenVideo, CloseVideo );
-vlc_module_end();
+    set_callbacks( OpenVideo, CloseVideo )
+vlc_module_end ()
 
 /*****************************************************************************
  * OpenVideo: activate GDI video thread output method

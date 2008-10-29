@@ -103,13 +103,13 @@ static void GfxMode        ( int i_tty );
     "in hardware then you must disable this option. It then does double buffering " \
     "in software." )
 
-vlc_module_begin();
-    set_shortname( "Framebuffer" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VOUT );
+vlc_module_begin ()
+    set_shortname( "Framebuffer" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VOUT )
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               false );
-    add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, true );
+    add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, true )
     add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 true );
     add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
@@ -118,10 +118,10 @@ vlc_module_begin();
                  true );
     add_bool( "fb-hw-accel", true, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
               true );
-    set_description( N_("GNU/Linux console framebuffer video output") );
-    set_capability( "video output", 30 );
-    set_callbacks( Create, Destroy );
-vlc_module_end();
+    set_description( N_("GNU/Linux console framebuffer video output") )
+    set_capability( "video output", 30 )
+    set_callbacks( Create, Destroy )
+vlc_module_end ()
 
 /*****************************************************************************
  * vout_sys_t: video output framebuffer method descriptor

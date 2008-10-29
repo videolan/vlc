@@ -88,23 +88,23 @@ static const char * const ppsz_enc_mode_descriptions[] = {
     N_("Narrow-band (8kHz)"), N_("Wide-band (16kHz)"), N_("Ultra-wideband (32kHz)"), NULL
 };
 
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACODEC );
+vlc_module_begin ()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
 
-    set_description( N_("Speex audio decoder") );
-    set_capability( "decoder", 100 );
-    set_callbacks( OpenDecoder, CloseDecoder );
+    set_description( N_("Speex audio decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("Speex audio packetizer") );
-    set_capability( "packetizer", 100 );
-    set_callbacks( OpenPacketizer, CloseDecoder );
+    add_submodule ()
+    set_description( N_("Speex audio packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseDecoder )
 
-    add_submodule();
-    set_description( N_("Speex audio encoder") );
-    set_capability( "encoder", 100 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+    add_submodule ()
+    set_description( N_("Speex audio encoder") )
+    set_capability( "encoder", 100 )
+    set_callbacks( OpenEncoder, CloseEncoder )
 
     add_integer( ENC_CFG_PREFIX "mode", 0, NULL, ENC_MODE_TEXT,
                  ENC_MODE_LONGTEXT, false );
@@ -112,14 +112,14 @@ vlc_module_begin();
 
     add_integer( ENC_CFG_PREFIX "complexity", 3, NULL, ENC_COMPLEXITY_TEXT,
                  ENC_COMPLEXITY_LONGTEXT, false );
-        change_integer_range( 1, 10 );
+        change_integer_range( 1, 10 )
 
     add_bool( ENC_CFG_PREFIX "cbr", false, NULL, ENC_CBR_TEXT,
                  ENC_CBR_LONGTEXT, false );
 
     add_float( ENC_CFG_PREFIX "quality", 8.0, NULL, ENC_QUALITY_TEXT,
                ENC_QUALITY_LONGTEXT, false );
-        change_float_range( 0.0, 10.0 );
+        change_float_range( 0.0, 10.0 )
 
     add_integer( ENC_CFG_PREFIX "max-bitrate", 0, NULL, ENC_MAXBITRATE_TEXT,
                  ENC_MAXBITRATE_LONGTEXT, false );
@@ -132,7 +132,7 @@ vlc_module_begin();
 
     /* TODO agc, noise suppression, */
 
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {
     "mode", "complexity", "cbr", "quality", "max-bitrate", "vad", "dtx", NULL

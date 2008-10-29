@@ -90,21 +90,21 @@ static void Close( vlc_object_t * );
 #   define SCREEN_FPS 5
 #endif
 
-vlc_module_begin();
-    set_description( N_("Screen Input") );
-    set_shortname( N_("Screen" ));
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+    set_description( N_("Screen Input") )
+    set_shortname( N_("Screen" ))
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, true );
-    add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, true );
+    add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, true )
 
 #ifdef SCREEN_SUBSCREEN
-    add_integer( "screen-top", 0, NULL, TOP_TEXT, TOP_LONGTEXT, true );
-    add_integer( "screen-left", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true );
-    add_integer( "screen-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true );
-    add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
+    add_integer( "screen-top", 0, NULL, TOP_TEXT, TOP_LONGTEXT, true )
+    add_integer( "screen-left", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true )
+    add_integer( "screen-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
+    add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
     add_bool( "screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
               FOLLOW_MOUSE_LONGTEXT, true );
 #endif
@@ -119,10 +119,10 @@ vlc_module_begin();
         FRAGS_LONGTEXT, true );
 #endif
 
-    set_capability( "access_demux", 0 );
-    add_shortcut( "screen" );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "access_demux", 0 )
+    add_shortcut( "screen" )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

@@ -62,23 +62,23 @@ static void ShowDialog( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define EMBED_LONGTEXT N_("Embed the video inside the interface instead " \
     "of having it in a separate window.")
 
-vlc_module_begin();
-    set_shortname( "WinCE" );
-    set_description( (char *) _("WinCE interface module") );
-    set_capability( "interface", 100 );
-    set_callbacks( Open, Close );
-    add_shortcut( "wince" );
+vlc_module_begin ()
+    set_shortname( "WinCE" )
+    set_description( (char *) _("WinCE interface module") )
+    set_capability( "interface", 100 )
+    set_callbacks( Open, Close )
+    add_shortcut( "wince" )
 
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_bool( "wince-embed", 1, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, false );
 
-    add_submodule();
-    set_description( N_("WinCE dialogs provider") );
-    set_capability( "dialogs provider", 10 );
-    set_callbacks( OpenDialogs, Close );
-vlc_module_end();
+    add_submodule ()
+    set_description( N_("WinCE dialogs provider") )
+    set_capability( "dialogs provider", 10 )
+    set_callbacks( OpenDialogs, Close )
+vlc_module_end ()
 
 HINSTANCE hInstance = 0;
 

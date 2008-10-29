@@ -75,12 +75,12 @@ static picture_t *Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Video scaling filter") );
-    set_capability( "video filter2", 0 );
-    set_callbacks( OpenFilter, CloseFilter );
+vlc_module_begin ()
+    set_description( N_("Video scaling filter") )
+    set_capability( "video filter2", 0 )
+    set_callbacks( OpenFilter, CloseFilter )
 
-    set_section( N_("Crop"), NULL );
+    set_section( N_("Crop"), NULL )
         add_integer_with_range( CFG_PREFIX "croptop", 0, 0, INT_MAX, NULL,
                                 CROPTOP_TEXT, CROPTOP_LONGTEXT, false );
         add_integer_with_range( CFG_PREFIX "cropbottom", 0, 0, INT_MAX, NULL,
@@ -90,7 +90,7 @@ vlc_module_begin();
         add_integer_with_range( CFG_PREFIX "cropright", 0, 0, INT_MAX, NULL,
                                 CROPRIGHT_TEXT, CROPRIGHT_LONGTEXT, false );
 
-    set_section( N_("Padd"), NULL );
+    set_section( N_("Padd"), NULL )
         add_integer_with_range( CFG_PREFIX "paddtop", 0, 0, INT_MAX, NULL,
                                 PADDTOP_TEXT, PADDTOP_LONGTEXT, false );
         add_integer_with_range( CFG_PREFIX "paddbottom", 0, 0, INT_MAX, NULL,
@@ -99,7 +99,7 @@ vlc_module_begin();
                                 PADDLEFT_TEXT, PADDLEFT_LONGTEXT, false );
         add_integer_with_range( CFG_PREFIX "paddright", 0, 0, INT_MAX, NULL,
                                 PADDRIGHT_TEXT, PADDRIGHT_LONGTEXT, false );
-vlc_module_end();
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "croptop", "cropbottom", "cropleft", "cropright",

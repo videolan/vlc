@@ -71,24 +71,24 @@ static int PPNameCallback( vlc_object_t *, char const *,
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();
-    set_description( N_("Video post processing filter") );
-    add_shortcut( "postprocess" ); /* name is "postproc" */
-    add_shortcut( "pp" );
-    set_category( CAT_VIDEO );
-    set_subcategory( SUBCAT_VIDEO_VFILTER );
+vlc_module_begin ()
+    set_description( N_("Video post processing filter") )
+    add_shortcut( "postprocess" ) /* name is "postproc" */
+    add_shortcut( "pp" )
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    set_capability( "video filter2", 0 );
+    set_capability( "video filter2", 0 )
 
-    set_callbacks( OpenPostproc, ClosePostproc );
+    set_callbacks( OpenPostproc, ClosePostproc )
 
     add_integer_with_range( FILTER_PREFIX "q", PP_QUALITY_MAX, 0,
                             PP_QUALITY_MAX, NULL, Q_TEXT, Q_LONGTEXT, false );
-        add_deprecated_alias( "ffmpeg-pp-q" );
+        add_deprecated_alias( "ffmpeg-pp-q" )
     add_string( FILTER_PREFIX "name", "default", NULL, NAME_TEXT,
                 NAME_LONGTEXT, true );
-        add_deprecated_alias( "ffmpeg-pp-name" );
-vlc_module_end();
+        add_deprecated_alias( "ffmpeg-pp-name" )
+vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
     "q", "name", NULL

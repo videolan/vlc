@@ -82,27 +82,27 @@ static const char *const enc_hq_list_text[] = {
         "delivered by the FFmpeg library. This includes (MS)MPEG4, DivX, SV1,"\
         "H261, H263, H264, WMV, WMA, AAC, AMR, DV, MJPEG and other codecs")
 
-vlc_module_begin();
-    set_shortname( "FFmpeg");
-    add_shortcut( "ffmpeg" );
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_SCODEC );
+vlc_module_begin ()
+    set_shortname( "FFmpeg")
+    add_shortcut( "ffmpeg" )
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_SCODEC )
     /* decoder main module */
 #if defined(MODULE_NAME_is_ffmpegaltivec) \
      || (defined(CAN_COMPILE_ALTIVEC) && !defined(NO_ALTIVEC_IN_FFMPEG))
-    set_description( N_("AltiVec FFmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") );
-    /*add_requirement( ALTIVEC );*/
-    set_capability( "decoder", 71 );
+    set_description( N_("AltiVec FFmpeg audio/video decoder ((MS)MPEG4,SVQ1,H263,WMV,WMA)") )
+    /*add_requirement( ALTIVEC )*/
+    set_capability( "decoder", 71 )
 #else
-    set_description( N_("FFmpeg audio/video decoder") );
-    set_help( MODULE_DESCRIPTION );
-    set_capability( "decoder", 70 );
+    set_description( N_("FFmpeg audio/video decoder") )
+    set_help( MODULE_DESCRIPTION )
+    set_capability( "decoder", 70 )
 #endif
-    set_section( N_("Decoding") , NULL );
-    set_callbacks( OpenDecoder, CloseDecoder );
+    set_section( N_("Decoding") , NULL )
+    set_callbacks( OpenDecoder, CloseDecoder )
 
 
-    add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, true );
+    add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, true )
     add_integer ( "ffmpeg-error-resilience", 1, NULL, ERROR_TEXT,
         ERROR_LONGTEXT, true );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, BUGS_TEXT, BUGS_LONGTEXT,
@@ -111,15 +111,15 @@ vlc_module_begin();
         false );
     add_integer( "ffmpeg-skip-frame", 0, NULL, SKIP_FRAME_TEXT,
         SKIP_FRAME_LONGTEXT, true );
-        change_integer_range( -1, 4 );
+        change_integer_range( -1, 4 )
     add_integer( "ffmpeg-skip-idct", 0, NULL, SKIP_IDCT_TEXT,
         SKIP_IDCT_LONGTEXT, true );
-        change_integer_range( -1, 4 );
+        change_integer_range( -1, 4 )
     add_integer ( "ffmpeg-vismv", 0, NULL, VISMV_TEXT, VISMV_LONGTEXT,
         true );
     add_integer ( "ffmpeg-lowres", 0, NULL, LOWRES_TEXT, LOWRES_LONGTEXT,
         true );
-        change_integer_range( 0, 2 );
+        change_integer_range( 0, 2 )
     add_integer ( "ffmpeg-skiploopfilter", 0, NULL, SKIPLOOPF_TEXT,
                   SKIPLOOPF_LONGTEXT, true );
         change_integer_list( nloopf_list, nloopf_list_text, NULL );
@@ -129,11 +129,11 @@ vlc_module_begin();
 
 #ifdef ENABLE_SOUT
     /* encoder submodule */
-    add_submodule();
-    set_section( N_("Encoding") , NULL );
-    set_description( N_("FFmpeg audio/video encoder") );
-    set_capability( "encoder", 100 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+    add_submodule ()
+    set_section( N_("Encoding") , NULL )
+    set_description( N_("FFmpeg audio/video encoder") )
+    set_capability( "encoder", 100 )
+    set_callbacks( OpenEncoder, CloseEncoder )
 
     add_string( ENC_CFG_PREFIX "hq", "simple", NULL, ENC_HQ_TEXT,
                 ENC_HQ_LONGTEXT, false );
@@ -193,13 +193,13 @@ vlc_module_begin();
 #endif /* ENABLE_SOUT */
 
     /* video filter submodule */
-    add_submodule();
-    set_capability( "video filter2", 0 );
-    set_callbacks( OpenDeinterlace, CloseDeinterlace );
-    set_description( N_("FFmpeg deinterlace video filter") );
-    add_shortcut( "ffmpeg-deinterlace" );
+    add_submodule ()
+    set_capability( "video filter2", 0 )
+    set_callbacks( OpenDeinterlace, CloseDeinterlace )
+    set_description( N_("FFmpeg deinterlace video filter") )
+    add_shortcut( "ffmpeg-deinterlace" )
 
-vlc_module_end();
+vlc_module_end ()
 
 vlc_mutex_t avcodec_lock = VLC_STATIC_MUTEX;
 

@@ -70,12 +70,12 @@ static void Close( vlc_object_t * );
 #define AUTO_CONNECT_LONGTEXT N_( \
     "Automatically connect VLC input ports to available output ports." )
 
-vlc_module_begin();
-     set_description( N_("JACK audio input") );
-     set_capability( "access_demux", 0 );
-     set_shortname( N_( "JACK Input" ) );
-     set_category( CAT_INPUT );
-     set_subcategory( SUBCAT_INPUT_ACCESS );
+vlc_module_begin ()
+     set_description( N_("JACK audio input") )
+     set_capability( "access_demux", 0 )
+     set_shortname( N_( "JACK Input" ) )
+     set_category( CAT_INPUT )
+     set_subcategory( SUBCAT_INPUT_ACCESS )
 
      add_integer( "jack-input-caching", DEFAULT_PTS_DELAY / 1000, NULL,
          CACHING_TEXT, CACHING_LONGTEXT, true );
@@ -84,9 +84,9 @@ vlc_module_begin();
      add_bool( "jack-input-auto-connect", false, NULL,
          AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT, true );
 
-     add_shortcut( "jack" );
-     set_callbacks( Open, Close );
-vlc_module_end();
+     add_shortcut( "jack" )
+     set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Local prototypes

@@ -66,14 +66,14 @@ static int  MouseEvent( vlc_object_t *, char const *,
 #define THRESHOLD_TEXT N_( "Threshold" )
 #define THRESHOLD_LONGTEXT N_( "Height of the zone triggering the interface." )
 
-vlc_module_begin();
-    set_shortname( "Showintf" );
-    add_integer( "showintf-threshold", 10, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true );
-    set_description( N_("Show interface with mouse") );
+vlc_module_begin ()
+    set_shortname( "Showintf" )
+    add_integer( "showintf-threshold", 10, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
+    set_description( N_("Show interface with mouse") )
 
-    set_capability( "interface", 0 );
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_capability( "interface", 0 )
+    set_callbacks( Open, Close )
+vlc_module_end ()
 
 /*****************************************************************************
  * Open: initialize interface

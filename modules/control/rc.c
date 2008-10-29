@@ -189,27 +189,27 @@ static void __msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
     "open." )
 #endif
 
-vlc_module_begin();
-    set_shortname( N_("RC"));
-    set_category( CAT_INTERFACE );
-    set_subcategory( SUBCAT_INTERFACE_MAIN );
-    set_description( N_("Remote control interface") );
-    add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, true );
+vlc_module_begin ()
+    set_shortname( N_("RC"))
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_MAIN )
+    set_description( N_("Remote control interface") )
+    add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, true )
 
 #ifdef WIN32
-    add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, false );
+    add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, false )
 #else
 #if defined (HAVE_ISATTY)
-    add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, true );
+    add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, true )
 #endif
-    add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, true );
+    add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, true )
 #endif
-    add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, true );
+    add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, true )
 
-    set_capability( "interface", 20 );
+    set_capability( "interface", 20 )
 
-    set_callbacks( Activate, Deactivate );
-vlc_module_end();
+    set_callbacks( Activate, Deactivate )
+vlc_module_end ()
 
 /*****************************************************************************
  * Activate: initialize and create stuff
