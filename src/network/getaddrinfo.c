@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 
 #include <stddef.h> /* size_t */
 #include <string.h> /* strlen(), memcpy(), memset(), strchr() */
@@ -567,7 +568,7 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
                      struct addrinfo **res )
 {
     struct addrinfo hints;
-    char psz_buf[NI_MAXHOST], *psz_node, psz_service[6];
+    char psz_buf[NI_MAXHOST], psz_service[6];
 
     /*
      * In VLC, we always use port number as integer rather than strings
@@ -631,29 +632,25 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
      * - accept "" as NULL
      * - ignore square brackets
      */
-    if( ( node == NULL ) || (node[0] == '\0' ) )
+    if (node != NULL)
     {
-        psz_node = NULL;
-    }
-    else
-    {
-        strlcpy( psz_buf, node, NI_MAXHOST );
-
-        psz_node = psz_buf;
-
-        if( psz_buf[0] == '[' )
+        if (node[0] == '[')
         {
-            char *ptr;
-
-            ptr = strrchr( psz_buf, ']' );
-            if( ( ptr != NULL ) && (ptr[1] == '\0' ) )
+            size_t len = strlen (node + 1);
+            if ((len <= sizeof (psz_buf)) && (node[len] == ']'))
             {
-                *ptr = '\0';
-                psz_node++;
+                assert (len > 0);
+                memcpy (psz_buf, node + 1, len - 1);
+                psz_buf[len - 1] = '\0';
+                node = psz_buf;
             }
         }
+        if (node[0] == '\0')
+            node = NULL;
     }
 
+    int ret;
+    node = ToLocale (node);
 #ifdef WIN32
     /*
      * Winsock tries to resolve numerical IPv4 addresses as AAAA
@@ -662,24 +659,26 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
     if ((hints.ai_flags & AI_NUMERICHOST) == 0)
     {
         hints.ai_flags |= AI_NUMERICHOST;
-
-        if (getaddrinfo (psz_node, psz_service, &hints, res) == 0)
-            return 0;
-
+        ret = getaddrinfo (node, psz_service, &hints, res);
+        if (ret == 0)
+            goto out;
         hints.ai_flags &= ~AI_NUMERICHOST;
     }
 #endif
 #ifdef AI_IDN
     /* Run-time I18n Domain Names support */
     hints.ai_flags |= AI_IDN;
-    int ret = getaddrinfo (psz_node, psz_service, &hints, res);
+    ret = getaddrinfo (node, psz_service, &hints, res);
     if (ret != EAI_BADFLAGS)
-        return ret;
-
+        goto out;
     /* IDN not available: disable and retry without it */
     hints.ai_flags &= ~AI_IDN;
 #endif
-    return getaddrinfo (psz_node, psz_service, &hints, res);
+    ret = getaddrinfo (node, psz_service, &hints, res);
+
+out:
+    LocaleFree (node);
+    return ret;
 }
 
 
