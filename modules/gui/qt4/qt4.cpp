@@ -273,9 +273,13 @@ static int Open( vlc_object_t *p_this )
     else
     {
         QMutexLocker locker (&iface.lock);
+        vlc_value_t val;
 
         while (p_sys->p_mi == NULL)
             iface.ready.wait (&iface.lock);
+        var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
+        val.p_address = p_this;
+        var_Set (p_this->p_libvlc, "qt4-iface", val);
     }
     return VLC_SUCCESS;
 }
@@ -297,6 +301,7 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
+    var_Destroy (p_this->p_libvlc, "qt4-iface");
     QApplication::postEvent (p_sys->p_mi, new QCloseEvent());
 
     if( p_intf->p_sys->b_isDialogProvider )
@@ -510,24 +515,23 @@ static int WindowControl (vout_window_t *, int, va_list);
 static int WindowOpen (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    MainInterface *p_mi;
+    intf_thread_t *intf = NULL;
+    vlc_value_t val;
 
     if (config_GetInt (obj, "embedded-video") <= 0)
         return VLC_EGENERIC;
 
-    intf_thread_t *intf = (intf_thread_t *)
-        vlc_object_find_name (obj, "qt4", FIND_ANYWHERE);
-    if (intf == NULL)
-        return VLC_EGENERIC; /* Qt4 not in use */
-    assert (intf->i_object_type == VLC_OBJECT_INTF);
-
     QMutexLocker (&iface.lock);
-    msg_Dbg (obj, "waiting for interface...");
-    while ((p_mi = intf->p_sys->p_mi) == NULL)
-        iface.ready.wait (&iface.lock);
+    if (var_Get (obj->p_libvlc, "qt4-iface", &val) == 0)
+        intf = (intf_thread_t *)val.p_address;
+    if (intf == NULL)
+    {   /* If another interface is used, this plugin cannot work */
+        msg_Dbg (obj, "Qt4 interface not found");
+        return VLC_EGENERIC;
+    }
 
+    MainInterface *p_mi = intf->p_sys->p_mi;
     msg_Dbg (obj, "requesting video...");
-    vlc_object_release (intf);
 
     wnd->handle = p_mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
                                       &wnd->width, &wnd->height);
