@@ -793,6 +793,14 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
     vout_OSDMessage( VLC_OBJECT( p_vout ), DEFAULT_CHAN,
                      "%s", psz_filename );
+
+    /* Generate a media player event  - Right now just trigger a global libvlc var
+        CHECK: Could not find a more local object. The goal is to communicate
+        vout_thread with libvlc_media_player or its input_thread*/
+    val.psz_string =  psz_filename  ;
+
+    var_Set( p_vout->p_libvlc, "vout-snapshottaken", val );
+    /* var_Set duplicates data for transport so we can free*/
     free( psz_filename );
 
     /* */

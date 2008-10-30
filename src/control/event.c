@@ -269,7 +269,9 @@ static const char event_type_to_name[][35] =
     EVENT(libvlc_MediaListPlayerStopped),
 
     EVENT(libvlc_MediaDiscovererStarted),
-    EVENT(libvlc_MediaDiscovererEnded)
+    EVENT(libvlc_MediaDiscovererEnded),
+
+    EVENT(libvlc_MediaPlayerSnapshotTaken),
 #undef EVENT
 };
 

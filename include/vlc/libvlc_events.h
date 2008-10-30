@@ -84,7 +84,8 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaDiscovererStarted,
     libvlc_MediaDiscovererEnded,
 
-    libvlc_MediaPlayerTitleChanged
+    libvlc_MediaPlayerTitleChanged,
+    libvlc_MediaPlayerSnapshotTaken
 
 } libvlc_event_type_t;
 
@@ -202,6 +203,12 @@ typedef struct libvlc_event_t
         {
             void * unused;
         } media_media_discoverer_ended;
+
+        /* snapshot taken */
+        struct
+        {
+             char* psz_filename ;
+        } media_player_snapshot_taken ;
 
     } u;
 } libvlc_event_t;

@@ -45,6 +45,9 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata );
 
+static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
 static const libvlc_state_t vlc_to_libvlc_state_array[] =
 {
     [INIT_S]        = libvlc_NothingSpecial,
@@ -320,6 +323,16 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerPausableChanged, p_e );
 
+    /* Snapshot initialization */
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+           libvlc_MediaPlayerSnapshotTaken, p_e );
+    /* Attach a var callback to the global object to provide the glue between
+        vout_thread that generates the event and media_player that re-emits it
+        with its own event manager
+    */
+    var_Create( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken", SnapshotTakenCallback, p_mi );
+
     return p_mi;
 }
 
@@ -397,6 +410,9 @@ void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     if( !p_mi )
         return;
+
+	/* Detach Callback from the main libvlc object */
+    var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int, "vout-snapshottaken", SnapshotTakenCallback, p_mi );
 
     p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
 
@@ -523,6 +539,28 @@ libvlc_media_player_event_manager(
     VLC_UNUSED(p_e);
 
     return p_mi->p_event_manager;
+}
+
+/**************************************************************************
+ * Trigger a snapshot Taken Event
+ *************************************************************************/
+static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this) ;
+
+    libvlc_media_player_t* p_mi = (libvlc_media_player_t*) p_data ;
+    libvlc_event_t event ;
+    event.type = libvlc_MediaPlayerSnapshotTaken ;
+    event.u.media_player_snapshot_taken.psz_filename = newval.psz_string ;
+    /* Snapshot psz data is a vlc_variable owned by libvlc object .
+         Its memmory management is taken care by the obj*/
+    msg_Dbg( p_this, "about to emit libvlc_snapshot_taken.make psz_str=0x%x (%s)",
+          event.u.media_player_snapshot_taken.psz_filename ,event.u.media_player_snapshot_taken.psz_filename );
+    libvlc_event_send( p_mi->p_event_manager, &event );
+
+    return VLC_SUCCESS;
 }
 
 /**************************************************************************
