@@ -4554,22 +4554,6 @@ then
 fi
 
 dnl
-dnl  Esound module
-dnl
-AC_ARG_ENABLE(esd,
-  [  --enable-esd            Esound library support (default disabled)],
-  [if test "${enable_esd}" = "yes"
-   then
-     AC_PATH_PROG(ESD_CONFIG, esd-config, no)
-     if test "${ESD_CONFIG}" != "no"
-     then
-       VLC_ADD_PLUGIN([esd])
-       VLC_ADD_CFLAGS([esd],[`${ESD_CONFIG} --cflags`])
-       VLC_ADD_LIBS([esd],[`${ESD_CONFIG} --libs`])
-     fi
-   fi])
-
-dnl
 dnl  Pulseaudio module
 dnl
 AC_ARG_ENABLE(pulse,
