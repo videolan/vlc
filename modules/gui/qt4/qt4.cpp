@@ -259,7 +259,6 @@ static int Open( vlc_object_t *p_this )
     /* Allocations */
     p_sys = p_intf->p_sys = new intf_sys_t;
     p_sys->b_isDialogProvider = false;
-    p_sys->p_video = NULL; /* ??? */
     p_sys->p_popup_menu = NULL; /* ??? */
     p_sys->p_playlist = pl_Hold( p_intf );
     p_sys->p_mi = NULL;

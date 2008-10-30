@@ -75,8 +75,6 @@ struct intf_sys_t
 
     playlist_t *p_playlist;
 
-    VideoWidget *p_video;
-
     const char *psz_filepath;
     QMenu * p_popup_menu;
 };
