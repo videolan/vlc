@@ -189,13 +189,15 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
         return;
 
     input_thread_t *p_input = THEMIM->getInput();
-    if( !p_input ) return;
+    if( !p_input )
+        return;
 
     // We get the row number of the item
     int i_edit = bookmarksList->indexOfTopLevelItem( item );
 
     // We get the bookmarks list
-    seekpoint_t **pp_bookmarks;
+    seekpoint_t** pp_bookmarks;
+    seekpoint_t*  p_seekpoint;
     int i_bookmarks;
 
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
@@ -206,20 +208,30 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
         return;
 
     // We modify the seekpoint
-    seekpoint_t *p_seekpoint = pp_bookmarks[i_edit];
+    p_seekpoint = pp_bookmarks[i_edit];
     if( column == 0 )
+    {
+        free( p_seekpoint->psz_name );
         p_seekpoint->psz_name = strdup( qtu( item->text( column ) ) );
+    }
     else if( column == 1 )
         p_seekpoint->i_byte_offset = atoi( qtu( item->text( column ) ) );
     else if( column == 2 )
         p_seekpoint->i_time_offset = 1000000 * atoll( qtu( item->text( column ) ) );
 
+    // Send the modification
     if( input_Control( p_input, INPUT_CHANGE_BOOKMARK, p_seekpoint, i_edit ) !=
         VLC_SUCCESS )
-        return;
+        goto clear;
 
+    // Everything goes fine : update
     update();
 
+// Clear the bookmark list
+clear:
+    for( int i = 0; i < i_bookmarks; i++)
+        vlc_seekpoint_Delete( pp_bookmarks[i] );
+    free( pp_bookmarks );
 }
 
 void BookmarksDialog::extract()
