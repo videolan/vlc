@@ -157,9 +157,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
 
     picture_t *p_outpic;
 
-    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
-    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
-
     uint8_t *p_oldpix   = p_sys->p_old->p[Y_PLANE].p_pixels;
     const int i_old_pitch = p_sys->p_old->p[Y_PLANE].i_pitch;
     uint32_t *p_buf = p_sys->p_buf;
@@ -169,6 +166,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_inpic )
 
     if( !p_inpic )
         return NULL;
+
+    const uint8_t *p_inpix = p_inpic->p[Y_PLANE].p_pixels;
+    const int i_src_pitch = p_inpic->p[Y_PLANE].i_pitch;
 
     if( !p_sys->b_old )
     {
