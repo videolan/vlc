@@ -369,6 +369,7 @@ static int Open( vlc_object_t * p_this )
         if( p_strl == NULL || p_strh == NULL || p_auds == NULL || p_vids == NULL )
         {
             msg_Warn( p_demux, "stream[%d] incomplete", i );
+            free( tk );
             continue;
         }
 
