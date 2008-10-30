@@ -343,8 +343,8 @@ static block_t *Block (access_t *p_access)
         return NULL;
     }
 
-    /* Skip current and parent directories */
-    if (entry[0] == '.' )
+    /* Skip current, parent and hidden directories */
+    if (entry[0] == '.')
         return NULL;
     /* Handle recursion */
     if (p_sys->mode != MODE_COLLAPSE)
@@ -360,7 +360,12 @@ static block_t *Block (access_t *p_access)
         {
             sub->parent = current;
             sub->handle = handle;
-            sub->uri = encode_path (sub->path);
+
+            char *encoded = encode_URI_component (entry);
+            if ((encoded == NULL)
+             || (asprintf (&sub->uri, "%s/%s", current->uri, encoded) == -1))
+                 sub->uri = NULL;
+            free (encoded);
 
             if ((p_sys->mode == MODE_NONE)
              || fstat (dirfd (handle), &sub->st)
