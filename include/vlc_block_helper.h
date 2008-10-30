@@ -439,7 +439,7 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
 
 static inline int block_FindStartcodeFromOffset(
     block_bytestream_t *p_bytestream, size_t *pi_offset,
-    uint8_t *p_startcode, int i_startcode_length )
+    const uint8_t *p_startcode, int i_startcode_length )
 {
     block_t *p_block, *p_block_backup = 0;
     int i_size = 0;
