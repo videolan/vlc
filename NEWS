@@ -21,6 +21,9 @@ Mac OS X Interface:
 Playlist:
  * export the playlist in HTML
 
+Audio output:
+ * Removed obsolete Esound and aRts plugins
+
 Changes between 0.9.4 and 0.9.5:
 --------------------------------
 Security updates:
