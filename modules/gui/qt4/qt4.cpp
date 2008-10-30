@@ -223,10 +223,11 @@ vlc_module_begin ()
         set_capability( "dialogs provider", 51 )
 
         set_callbacks( OpenDialogs, Close )
-
+#if 0 /* this is totally broken */
     add_submodule ()
         set_capability( "vout window", 50 )
         set_callbacks( WindowOpen, WindowClose )
+#endif
 vlc_module_end ()
 
 /* Ugly, but the Qt4 interface assumes single instance anyway */
