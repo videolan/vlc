@@ -4600,23 +4600,6 @@ AC_ARG_ENABLE(portaudio,
    fi])
 
 dnl
-dnl  aRts module
-dnl  broken? (froze wxWidgets back then)
-dnl
-AC_ARG_ENABLE(arts,
- [  --enable-arts           aRts sound server (default disabled)],
- [if test "${enable_arts}" = "yes"
-  then
-    AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
-    if test "${ARTS_CONFIG}" != "no"
-    then
-      VLC_ADD_PLUGIN([arts])
-      VLC_ADD_CFLAGS([arts],[`${ARTS_CONFIG} --cflags`])
-      VLC_ADD_LIBS([arts],[`${ARTS_CONFIG} --libs `])
-    fi
-  fi])
-
-dnl
 dnl  ALSA module
 dnl
 AC_ARG_ENABLE(alsa,
