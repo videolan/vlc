@@ -563,6 +563,18 @@ int vlc_getnameinfo( const struct sockaddr *sa, int salen,
 }
 
 
+/**
+ * Resolves a host name to a list of socket addresses (like getaddrinfo()).
+ *
+ * @param p_this a VLC object
+ * @param node host name to resolve (encoded as UTF-8), or NULL
+ * @param i_port port number for the socket addresses
+ * @param p_hints parameters (see getaddrinfo() manual page)
+ * @param res pointer set to the resulting chained list.
+ * @return 0 on success, a getaddrinfo() error otherwise.
+ * On failure, *res is undefined. On success, it must be freed with
+ * vlc_freeaddrinfo().
+ */
 int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
                      int i_port, const struct addrinfo *p_hints,
                      struct addrinfo **res )
