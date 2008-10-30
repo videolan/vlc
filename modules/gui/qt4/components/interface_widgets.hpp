@@ -60,7 +60,7 @@ public:
 
     void *request( vout_thread_t *, int *, int *,
                    unsigned int *, unsigned int * );
-    void  release( void * );
+    void  release( void );
     int   control( void *, int, va_list );
 
     virtual QSize sizeHint() const;

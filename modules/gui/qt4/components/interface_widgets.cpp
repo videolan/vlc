@@ -144,7 +144,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     updateGeometry(); // Needed for deinterlace
 }
 
-void VideoWidget::release( void *p_win )
+void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
     p_vout = NULL;

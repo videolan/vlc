@@ -557,5 +557,5 @@ static void WindowClose (vlc_object_t *obj)
     QMutexLocker locker (&iface.lock);
 
     msg_Dbg (obj, "releasing video...");
-    p_mi->releaseVideo (wnd->handle);
+    p_mi->releaseVideo ();
 }

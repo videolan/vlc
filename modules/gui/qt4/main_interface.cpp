@@ -206,8 +206,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 
     /* VideoWidget connects to avoid different threads speaking to each other */
-    CONNECT( this, askReleaseVideo( void * ),
-             this, releaseVideoSlot( void * ) );
+    CONNECT( this, askReleaseVideo( void ),
+             this, releaseVideoSlot( void ) );
     if( videoWidget )
         CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
@@ -650,17 +650,16 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 }
 
 /* Call from the WindowClose function */
-void MainInterface::releaseVideo( void *p_win )
+void MainInterface::releaseVideo( void )
 {
     if( fullscreenControls ) fullscreenControls->detachVout();
-    if( p_win )
-        emit askReleaseVideo( p_win );
+    emit askReleaseVideo( );
 }
 
 /* Function that is CONNECTED to the previous emit */
-void MainInterface::releaseVideoSlot( void *p_win )
+void MainInterface::releaseVideoSlot( void )
 {
-    videoWidget->release( p_win );
+    videoWidget->release( );
 
     if( bgWasVisible )
     {
