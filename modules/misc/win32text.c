@@ -316,7 +316,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #endif
     if( !*psz_string )
     {
-        free( psz_strin );
+        free( psz_string );
         return VLC_EGENERIC;
     }
 
