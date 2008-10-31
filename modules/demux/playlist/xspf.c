@@ -553,34 +553,32 @@ static bool parse_track_node COMPLEX_INTERFACE
                     }
                     psz_uri = decode_URI_duplicate( psz_value );
 
-                    if( psz_uri )
-                    {
-                        if( p_demux->p_sys->psz_base &&
-                            !strstr( psz_uri, "://" ) )
-                        {
-                           char* psz_tmp = malloc(
-                                   strlen(p_demux->p_sys->psz_base) +
-                                   strlen(psz_uri) +1 );
-                           if( !psz_tmp )
-                               return false;
-                           sprintf( psz_tmp, "%s%s",
-                                    p_demux->p_sys->psz_base, psz_uri );
-                           free( psz_uri );
-                           psz_uri = psz_tmp;
-                        }
-                        p_new_input = input_item_NewExt( p_demux, psz_uri,
-                                                        NULL, 0, NULL, -1 );
-                        free( psz_uri );
-                        input_item_CopyOptions( p_input_item, p_new_input );
-                        psz_uri = NULL;
-                        FREE_ATT();
-                        p_handler = NULL;
-                    }
-                    else
+                    if( !psz_uri )
                     {
                         FREE_ATT();
                         return false;
                     }
+
+                    if( p_demux->p_sys->psz_base && !strstr( psz_uri, "://" ) )
+                    {
+                        char* psz_tmp;
+                        if( asprintf( &psz_tmp, "%s%s", p_demux->p_sys->psz_base,
+                                      psz_uri ) == -1 )
+                        {
+                            free( psz_uri );
+                            FREE_ATT();
+                            return NULL;
+                        }
+                        free( psz_uri );
+                        psz_uri = psz_tmp;
+                    }
+                    p_new_input = input_item_NewExt( p_demux, psz_uri,
+                                                        NULL, 0, NULL, -1 );
+                    free( psz_uri );
+                    input_item_CopyOptions( p_input_item, p_new_input );
+                    psz_uri = NULL;
+                    FREE_ATT();
+                    p_handler = NULL;
                 }
                 else
                 {
