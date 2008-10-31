@@ -305,27 +305,22 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_need_update = false;
 
     /* Initialize search chain */
-    p_sys->psz_search_chain = (char *)malloc( SEARCH_CHAIN_SIZE + 1 );
+    p_sys->psz_search_chain = malloc( SEARCH_CHAIN_SIZE + 1 );
     p_sys->psz_old_search = NULL;
     p_sys->i_before_search = 0;
 
     /* Initialize open chain */
-    p_sys->psz_open_chain = (char *)malloc( OPEN_CHAIN_SIZE + 1 );
+    p_sys->psz_open_chain = malloc( OPEN_CHAIN_SIZE + 1 );
 
     /* Initialize browser options */
-    var_Create( p_intf, "browse-dir", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_intf, "browse-dir", &val);
-
-    if( val.psz_string && *val.psz_string )
-    {
-        p_sys->psz_current_dir = strdup( val.psz_string );
-    }
+    char* psz_tmp = var_CreateGetString( p_intf, "browse-dir" );
+    if( psz_tmp && *psz_tmp )
+        p_sys->psz_current_dir = psz_tmp;
     else
     {
         p_sys->psz_current_dir = strdup( config_GetHomeDir() );
+        free( psz_tmp );
     }
-
-    free( val.psz_string );
 
     p_sys->i_dir_entries = 0;
     p_sys->pp_dir_entries = NULL;
