@@ -1087,9 +1087,9 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             while( strcmp( psz_elt = SSPop( st ), "" )
                    && strcmp( psz_elt, ";" ) )
             {
-                char *psz_buf =
-                    (char *)malloc( strlen( psz_cmd ) + strlen( psz_elt ) + 2 );
-                sprintf( psz_buf, "%s %s", psz_cmd, psz_elt );
+                char* psz_buf;
+                if( asprintf( &psz_buf, "%s %s", psz_cmd, psz_elt ) == -1 )
+                    psz_buf = NULL;
                 free( psz_cmd );
                 free( psz_elt );
                 psz_cmd = psz_buf;
@@ -1104,11 +1104,9 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             }
             else
             {
-                psz_error = malloc( strlen(vlm_answer->psz_name) +
-                                    strlen(vlm_answer->psz_value) +
-                                    strlen( " : ") + 1 );
-                sprintf( psz_error , "%s : %s" , vlm_answer->psz_name,
-                                                 vlm_answer->psz_value );
+                if( asprintf( &psz_error , "%s : %s" , vlm_answer->psz_name,
+                              vlm_answer->psz_value ) == -1 )
+                    psz_error = NULL;
             }
 
             mvar_AppendNewVar( vars, "vlm_error", psz_error );

@@ -178,9 +178,8 @@ static int Demux( demux_t *p_demux )
             else
             {
                 /* handle multi-line descriptions */
-                buf = malloc( strlen( psz_description )
-                            + strlen( psz_attrvalue ) + 2 );
-                sprintf( buf, "%s\n%s", psz_description, psz_attrvalue );
+                if( asprintf( &buf, "%s\n%s", psz_description, psz_attrvalue ) == -1 )
+                    buf = NULL;
                 free( psz_description );
                 psz_description = buf;
             }

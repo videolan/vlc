@@ -846,8 +846,8 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
         }
         else
         {
-            psz_cuefile = malloc( strlen(psz_dev) + 5 /* ".cue" */ );
-            sprintf( psz_cuefile, "%s.cue", psz_dev );
+            if( asprintf( &psz_cuefile, "%s.cue", psz_dev ) == -1 )
+                psz_cuefile = NULL;
         }
         /* If we need to look up the .cue file, then we don't have to look for the vcd */
         psz_vcdfile = strdup( psz_dev );

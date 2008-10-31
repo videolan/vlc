@@ -587,11 +587,10 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     }
                     else
                     {
-                        vlm_error = malloc( strlen(vlm_answer->psz_name) +
-                                            strlen(vlm_answer->psz_value) +
-                                            strlen( " : ") + 1 );
-                        sprintf( vlm_error , "%s : %s" , vlm_answer->psz_name,
-                                                         vlm_answer->psz_value );
+                        if( asprintf( &vlm_error , "%s : %s" ,
+                                      vlm_answer->psz_name,
+                                      vlm_answer->psz_value ) == -1 )
+                            vlm_error = NULL;
                     }
 
                     mvar_AppendNewVar( p_args->vars, "vlm_error", vlm_error );

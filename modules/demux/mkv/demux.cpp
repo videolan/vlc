@@ -604,7 +604,6 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
         p_seg = used_segments[i];
         if ( p_seg->p_editions != NULL )
         {
-            std::string sz_name;
             input_title_t *p_title = vlc_input_title_New();
             p_seg->i_sys_title = i;
             int i_chapters;
@@ -614,9 +613,9 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             {
                 if ( p_title->psz_name == NULL )
                 {
-                    sz_name = (*p_seg->p_editions)[j]->GetMainName();
-                    if ( sz_name != "" )
-                        p_title->psz_name = strdup( sz_name.c_str() );
+                    const char* psz_tmp = (*p_seg->p_editions)[j]->GetMainName().c_str();
+                    if( *psz_tmp != '\0' )
+                        p_title->psz_name = strdup( psz_tmp );
                 }
 
                 chapter_edition_c *p_edition = (*p_seg->p_editions)[j];
@@ -628,11 +627,8 @@ void demux_sys_t::PreloadLinked( matroska_segment_c *p_segment )
             // create a name if there is none
             if ( p_title->psz_name == NULL )
             {
-                sz_name = N_("Segment");
-                char psz_str[6];
-                sprintf( psz_str, " %d", (int)i );
-                sz_name += psz_str;
-                p_title->psz_name = strdup( sz_name.c_str() );
+                if( asprintf(&(p_title->psz_name), "%s %d", N_("Segment"), (int)i) == -1 )
+                    p_title->psz_name = NULL;
             }
 
             titles.push_back( p_title );

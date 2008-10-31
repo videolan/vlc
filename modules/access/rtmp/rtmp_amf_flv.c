@@ -429,14 +429,12 @@ rtmp_connect_active( rtmp_control_thread_t *p_thread )
         AMF_DATATYPE_SIZE_STRING + strlen( "file:///mac.flv" ) );
     free( tmp_buffer );
 
-    tmp_url = (char *) malloc( strlen( "rtmp://") + strlen( p_thread->url.psz_buffer ) + 1 );
-    if( !tmp_url )
+    if( asprintf( &tmp_url, "rtmp://%s", p_thread->url.psz_buffer ) == -1 )
     {
         free( rtmp_body->body );
         free( rtmp_body );
         return -1;
     }
-    sprintf( tmp_url, "rtmp://%s", p_thread->url.psz_buffer );
     tmp_buffer = amf_encode_object_variable( "tcUrl",
         AMF_DATATYPE_STRING, tmp_url );
     rtmp_body_append( rtmp_body, tmp_buffer,
@@ -1858,14 +1856,12 @@ rtmp_encode_NetStream_play_reset_onStatus( rtmp_control_thread_t *p_thread, char
         AMF_DATATYPE_SIZE_STRING + strlen( "NetStream.Play.Reset" ) );
     free( tmp_buffer );
 
-    description = (char *) malloc( strlen( "Playing and resetting ") + strlen( psz_media ) + strlen( "." ) + 1 );
-    if( !description )
+    if( asprintf( &description, "Playing and resetting %s.", psz_media ) == -1 )
     {
         free( rtmp_body->body );
         free( rtmp_body );
         return NULL;
     }
-    sprintf( description, "Playing and resetting %s.", psz_media );
     tmp_buffer = amf_encode_object_variable( "description",
         AMF_DATATYPE_STRING, description );
     rtmp_body_append( rtmp_body, tmp_buffer,
@@ -1944,15 +1940,13 @@ rtmp_encode_NetStream_play_start_onStatus( rtmp_control_thread_t *p_thread, char
         AMF_DATATYPE_SIZE_STRING + strlen( "NetStream.Play.Start" ) );
     free( tmp_buffer );
 
-    description = (char *) malloc( strlen( "Started playing ") + strlen( psz_media ) + strlen( "." ) + 1 );
-    if( !description )
+    if( asprintf( &description, "Started playing %s.", psz_media ) == -1 )
     {
         free( rtmp_body->body );
         free( rtmp_body );
         return NULL;
     }
 
-    sprintf( description, "Started playing %s.", psz_media );
     tmp_buffer = amf_encode_object_variable( "description",
         AMF_DATATYPE_STRING, description );
     rtmp_body_append( rtmp_body, tmp_buffer,

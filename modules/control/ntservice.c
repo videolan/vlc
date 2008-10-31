@@ -315,11 +315,10 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
             *psz_parser = '\0';
             psz_parser++;
         }
-        psz_temp = (char *)malloc( strlen(psz_module) + sizeof(",none") );
-        if( psz_temp )
+
+        if( asprintf( &psz_temp, "%s,none", psz_module ) != -1 )
         {
             intf_thread_t *p_new_intf;
-            sprintf( psz_temp, "%s,none", psz_module );
 
             /* Try to create the interface */
             p_new_intf = intf_Create( p_intf, psz_temp );

@@ -388,19 +388,16 @@ static int DemuxStation( demux_t *p_demux )
                     if( psz_rt || psz_load )
                     {
                         /* tv */
-                        psz_mrl = malloc( strlen( SHOUTCAST_TV_TUNEIN_URL )
-                                          + strlen( psz_id ) + 1 );
-                        sprintf( psz_mrl, SHOUTCAST_TV_TUNEIN_URL "%s",
-                                 psz_id );
+                        if( asprintf( &psz_mrl, SHOUTCAST_TV_TUNEIN_URL "%s",
+                                 psz_id ) == -1)
+                            psz_mrl = NULL;
                     }
                     else
                     {
                         /* radio */
-                        psz_mrl = malloc( strlen( SHOUTCAST_TUNEIN_BASE_URL )
-                            + strlen( psz_base ) + strlen( "?id=" )
-                            + strlen( psz_id ) + 1 );
-                        sprintf( psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
-                             psz_base, psz_id );
+                        if( asprintf( &psz_mrl, SHOUTCAST_TUNEIN_BASE_URL "%s?id=%s",
+                             psz_base, psz_id ) == -1 )
+                            psz_mrl = NULL;
                     }
                     p_input = input_item_NewExt( p_demux, psz_mrl,
                                                 psz_name , 0, NULL, -1 );
