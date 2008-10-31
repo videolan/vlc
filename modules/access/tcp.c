@@ -102,10 +102,14 @@ static int Open( vlc_object_t *p_this )
     *psz_parser++ = '\0';
 
     /* Init p_access */
-    access_InitFields( p_access ); \
-    ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL ); \
-    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
-    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL );
+    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );
+    if( !p_sys )
+    {
+        free( psz_dup );
+        return VLC_ENOMEM;
+    }
 
     p_sys->fd = net_ConnectTCP( p_access, psz_dup, atoi( psz_parser ) );
     free( psz_dup );
