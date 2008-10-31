@@ -558,10 +558,10 @@ describe:
     {
         p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
-        p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
+        p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
                                           var_GetBool( p_demux, "rtsp-kasenna" ), timeout );
 #else
-        p_sdp = p_sys->rtsp->describeURL( psz_url, &authenticator,
+        p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
                                           var_GetBool( p_demux, "rtsp-kasenna" ) );
 #endif
 
