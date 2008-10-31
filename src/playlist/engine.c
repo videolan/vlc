@@ -760,11 +760,11 @@ static void VariablesInit( playlist_t *p_playlist )
     var_SetInteger( p_playlist, "activity", 0 );
 
     /* Variables to control playback */
-    var_CreateGetBool( p_playlist, "play-and-stop" );
-    var_CreateGetBool( p_playlist, "play-and-exit" );
-    var_CreateGetBool( p_playlist, "random" );
-    var_CreateGetBool( p_playlist, "repeat" );
-    var_CreateGetBool( p_playlist, "loop" );
+    var_Create( p_playlist, "play-and-stop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "play-and-exit", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "random", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "repeat", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_AddCallback( p_playlist, "random", RandomCallback, NULL );
 }
