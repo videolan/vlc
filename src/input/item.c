@@ -496,7 +496,9 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
 {
     libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
 
-    DECMALLOC_NULL( p_input, input_item_t );
+    input_item_t* p_input = malloc( sizeof(input_item_t ) );
+    if( !p_input )
+        return NULL;
 
     input_item_Init( p_obj, p_input );
     vlc_gc_init( p_input, input_item_Destroy );

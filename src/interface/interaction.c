@@ -56,13 +56,13 @@ static void                     DialogDestroy( interaction_dialog_t * );
 static int DialogSend( vlc_object_t *, interaction_dialog_t * );
 
 #define DIALOG_INIT( type ) \
-        DECMALLOC_ERR( p_new, interaction_dialog_t );       \
-        memset( p_new, 0, sizeof( interaction_dialog_t ) ); \
+        interaction_dialog_t* p_new = calloc( 1, sizeof( interaction_dialog_t ) ); \
+        if( !p_new ) return VLC_EGENERIC;               \
         p_new->b_cancelled = false;                     \
-        p_new->i_status = NEW_DIALOG;                       \
-        p_new->i_flags = 0;                                 \
-        p_new->i_type = INTERACT_DIALOG_##type;             \
-        p_new->psz_returned[0] = NULL;                      \
+        p_new->i_status = NEW_DIALOG;                   \
+        p_new->i_flags = 0;                             \
+        p_new->i_type = INTERACT_DIALOG_##type;         \
+        p_new->psz_returned[0] = NULL;                  \
         p_new->psz_returned[1] = NULL
 
 #define FORMAT_DESC \

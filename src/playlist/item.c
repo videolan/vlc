@@ -161,7 +161,9 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
 playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
                                               input_item_t *p_input )
 {
-    DECMALLOC_NULL( p_item, playlist_item_t );
+    playlist_item_t* p_item = malloc( sizeof( playlist_item_t ) );
+    if( !p_item )
+        return NULL;
 
     assert( p_input );
 
