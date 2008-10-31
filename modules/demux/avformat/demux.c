@@ -320,7 +320,7 @@ int OpenDemux( vlc_object_t *p_this )
              ( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE ) ?
              p_sys->ic->duration * 1000000 / AV_TIME_BASE : -1 );
 
-#if HAVE_FFMPEG_CHAPTERS
+#ifdef HAVE_FFMPEG_CHAPTERS
     p_sys->p_title = vlc_input_title_New();
     for( i = 0; i < p_sys->ic->nb_chapters; i++ )
     {
