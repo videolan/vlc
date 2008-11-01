@@ -1023,6 +1023,135 @@ VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, const libvlc
  */
 
 /**
+ * Audio device types
+ */
+typedef enum libvlc_audio_output_device_types_t {
+    libvlc_AudioOutputDevice_Error  = -1,
+    libvlc_AudioOutputDevice_Mono   =  1,
+    libvlc_AudioOutputDevice_Stereo =  2,
+    libvlc_AudioOutputDevice_2F2R   =  4,
+    libvlc_AudioOutputDevice_3F2R   =  5,
+    libvlc_AudioOutputDevice_5_1    =  6,
+    libvlc_AudioOutputDevice_6_1    =  7,
+    libvlc_AudioOutputDevice_7_1    =  8,
+    libvlc_AudioOutputDevice_SPDIF  = 10
+} libvlc_audio_output_device_types_t;
+
+/**
+ * Audio channels
+ */
+typedef enum libvlc_audio_output_channel_t {
+    libvlc_AudioChannel_Error   = -1,
+    libvlc_AudioChannel_Stereo  =  1,
+    libvlc_AudioChannel_RStereo =  2,
+    libvlc_AudioChannel_Left    =  3,
+    libvlc_AudioChannel_Right   =  4,
+    libvlc_AudioChannel_Dolbys  =  5
+} libvlc_audio_output_channel_t;
+
+
+/**
+ * Get the list of available audio outputs
+ *
+ * \param p_instance libvlc instance
+ * \param p_e an initialized exception pointer
+ * \return list of available audio outputs, at the end free it with
+*          \see libvlc_audio_output_list_release \see libvlc_audio_output_t
+ */
+VLC_PUBLIC_API libvlc_audio_output_t *
+        libvlc_audio_output_list_get( libvlc_instance_t *,
+                                      libvlc_exception_t * );
+
+/**
+ * Free the list of available audio outputs
+ *
+ * \param p_list list with audio outputs for release
+ */
+VLC_PUBLIC_API void libvlc_audio_output_list_release( libvlc_audio_output_t * );
+
+/**
+ * Set the audio output.
+ * Change will be applied after stop and play.
+ *
+ * \param p_instance libvlc instance
+ * \param psz_name name of audio output,
+ *               use psz_name of \see libvlc_audio_output_t
+ * \return true if function succeded
+ */
+VLC_PUBLIC_API int libvlc_audio_output_set( libvlc_instance_t *,
+                                            const char * );
+
+/**
+ * Get count of devices for audio output, these devices are hardware oriented
+ * like analor or digital output of sound card
+ *
+ * \param p_instance libvlc instance
+ * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
+ * \return number of devices
+ */
+VLC_PUBLIC_API int libvlc_audio_output_device_count( libvlc_instance_t *,
+                                                     const char * );
+
+/**
+ * Get long name of device, if not available short name given
+ *
+ * \param p_instance libvlc instance
+ * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
+ * \param i_device device index
+ * \return long name of device
+ */
+VLC_PUBLIC_API char * libvlc_audio_output_device_longname( libvlc_instance_t *,
+                                                           const char *,
+                                                           int );
+
+/**
+ * Get id name of device
+ *
+ * \param p_instance libvlc instance
+ * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
+ * \param i_device device index
+ * \return id name of device, use for setting device, need to be free after use
+ */
+VLC_PUBLIC_API char * libvlc_audio_output_device_id( libvlc_instance_t *,
+                                                     const char *,
+                                                     int );
+
+/**
+ * Set device for using
+ *
+ * \param p_instance libvlc instance
+ * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
+ * \param psz_device_id device
+ */
+VLC_PUBLIC_API void libvlc_audio_output_device_set( libvlc_instance_t *,
+                                                    const char *,
+                                                    const char * );
+
+/**
+ * Get current audio device type. Device type describes something like
+ * character of output sound - stereo sound, 2.1, 5.1 etc
+ *
+ * \param p_instance vlc instance
+ * \param p_e an initialized exception pointer
+ * \return the audio devices type \see libvlc_audio_output_device_types_t
+ */
+VLC_PUBLIC_API int libvlc_audio_output_get_device_type(
+        libvlc_instance_t *, libvlc_exception_t * );
+
+/**
+ * Set current audio device type.
+ *
+ * \param p_instance vlc instance
+ * \param device_type the audio device type,
+          according to \see libvlc_audio_output_device_types_t
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_audio_output_set_device_type( libvlc_instance_t *,
+                                                         int,
+                                                         libvlc_exception_t * );
+
+
+/**
  * Toggle mute status.
  *
  * \param p_instance libvlc instance
@@ -1075,6 +1204,16 @@ VLC_PUBLIC_API void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_ex
  */
 VLC_PUBLIC_API int libvlc_audio_get_track_count( libvlc_media_player_t *,  libvlc_exception_t * );
 
+ /**
+ * Get the description of available audio tracks.
+ *
+ * \param p_mi media player
+ * \param p_e an initialized exception
+ * \return list with description of available audio tracks
+ */
+VLC_PUBLIC_API libvlc_track_description_t *
+        libvlc_audio_get_track_description( libvlc_media_player_t *,  libvlc_exception_t * );
+
 /**
  * Get current audio track.
  *
@@ -1098,18 +1237,21 @@ VLC_PUBLIC_API void libvlc_audio_set_track( libvlc_media_player_t *, int, libvlc
  *
  * \param p_instance vlc instance
  * \param p_e an initialized exception pointer
- * \return the audio channel (int)
+ * \return the audio channel \see libvlc_audio_output_channel_t
  */
-VLC_PUBLIC_API int libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int
+    libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
  * Set current audio channel.
  *
  * \param p_instance vlc instance
- * \param i_channel the audio channel (int)
+ * \param channel the audio channel, \see libvlc_audio_output_channel_t
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *,
+                                              int,
+                                              libvlc_exception_t * );
 
 /** @} audio */
 

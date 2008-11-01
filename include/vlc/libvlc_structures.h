@@ -233,6 +233,29 @@ typedef struct libvlc_track_description_t
 
 /**@} */
 
+/*****************************************************************************
+ * Audio
+ *****************************************************************************/
+/** \defgroup libvlc_audio libvlc_audio
+ * \ingroup libvlc_media_player
+ * LibVLC Audio handling
+ * @{
+ */
+
+/**
+ * Description for audio output. It contains
+ * name, description and pointer to next record.
+ */
+typedef struct libvlc_audio_output_t
+{
+    char *psz_name;
+    char *psz_description;
+    struct libvlc_audio_output_t *p_next;
+
+} libvlc_audio_output_t;
+
+/**@} */
+
 
 /*****************************************************************************
  * Video
