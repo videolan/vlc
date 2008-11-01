@@ -81,6 +81,7 @@ static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
 class QWidget;
 class QLineEdit;
 class QString;
+class QStringListModel;
 
 class OpenPanel: public QWidget
 {
@@ -143,10 +144,12 @@ public:
     virtual void clear() ;
 private:
     Ui::OpenNetwork ui;
+    QStringListModel *mrlList;
 public slots:
     virtual void updateMRL();
 private slots:
     void updateProtocol( int );
+    void updateCompleter();
 };
 
 class DiscOpenPanel: public OpenPanel

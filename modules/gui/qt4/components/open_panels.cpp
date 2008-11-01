@@ -44,6 +44,7 @@
 #include <QDirModel>
 #include <QScrollArea>
 #include <QUrl>
+#include <QStringListModel>
 
 #define I_DEVICE_TOOLTIP N_("Select the device or the VIDEO_TS directory")
 
@@ -447,10 +448,29 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
 
     updateProtocol( ui.protocolCombo->currentIndex() );
+
+    if( config_GetInt( p_intf, "qt-recentplay" ) )
+    {
+        mrlList = new QStringListModel(
+                getSettings()->value( "Open/netMRL" ).toStringList() );
+        QCompleter *completer = new QCompleter( mrlList, this );
+        ui.addressText->setCompleter( completer );
+
+        CONNECT( ui.addressText, editingFinished(), this, updateCompleter() );
+    }
+    else
+        mrlList = NULL;
 }
 
 NetOpenPanel::~NetOpenPanel()
-{}
+{
+    if( !mrlList ) return;
+
+    QStringList tempL = mrlList->stringList();
+    while( tempL.size() > 8 ) tempL.removeFirst();
+
+    getSettings()->setValue( "Open/netMRL", tempL );
+}
 
 void NetOpenPanel::clear()
 {}
@@ -557,12 +577,18 @@ void NetOpenPanel::updateMRL() {
         }
     }
 
-    // Encode the boring stuffs
-
     if( ui.timeShift->isEnabled() && ui.timeShift->isChecked() ) {
         mrl += " :access-filter=timeshift";
     }
     emit mrlUpdated( mrl );
+}
+
+void NetOpenPanel::updateCompleter()
+{
+    assert( mrlList );
+    QStringList tempL = mrlList->stringList();
+    tempL.append( ui.addressText->text() );
+    mrlList->setStringList( tempL );
 }
 
 /**************************************************************************
