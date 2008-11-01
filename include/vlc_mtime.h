@@ -68,13 +68,9 @@ VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 
-#ifdef __GNUC__
-# ifdef __linux__
-#  define VLC_HARD_MIN_SLEEP 1000 /* Linux has 100, 250, 300 or 1000Hz */
-# else
-#  define VLC_HARD_MIN_SLEEP 0
-# endif
-#define VLC_SOFT_MIN_SLEEP 9000000
+#if defined (__GNUC__) && defined (__linux__)
+# define VLC_HARD_MIN_SLEEP 1000 /* Linux has 100, 250, 300 or 1000Hz */
+# define VLC_SOFT_MIN_SLEEP 9000000
 
 static
 __attribute__((unused))
