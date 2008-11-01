@@ -988,7 +988,11 @@ static int OpenEncoder( vlc_object_t *p_this )
 
         i_tmp = var_GetInteger( p_enc, ENC_CFG_PREFIX "max-bitrate" );
         if( i_tmp > 0 )
+#ifdef SPEEX_SET_VBR_MAX_BITRATE
             speex_encoder_ctl( p_sys->p_state, SPEEX_SET_VBR_MAX_BITRATE, &i_tmp );
+#else
+            msg_Dbg( p_enc, "max-bitrate cannot be set in this version of libspeex");
+#endif
     }
 
     i_tmp = var_GetBool( p_enc, ENC_CFG_PREFIX "dtx" ) ? 1 : 0;
