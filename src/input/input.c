@@ -743,13 +743,18 @@ static void MainLoop( input_thread_t *p_input )
         /* FIXME if p_input->i_state == PAUSE_S the access/access_demux
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
+        input_EsOutLock( p_input->p->p_es_out );
         b_paused = p_input->i_state == PAUSE_S &&
                    !input_EsOutIsBuffering( p_input->p->p_es_out );
+        input_EsOutUnlock( p_input->p->p_es_out );
 
         if( !b_paused )
         {
             MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
+
+            input_EsOutLock( p_input->p->p_es_out );
             i_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
+            input_EsOutUnlock( p_input->p->p_es_out );
         }
 
         /* */
@@ -764,6 +769,7 @@ static void MainLoop( input_thread_t *p_input )
             while( !ControlPopNoLock( p_input, &i_type, &val, i_deadline ) )
             {
                 msg_Dbg( p_input, "control type=%d", i_type );
+
                 if( Control( p_input, i_type, val ) )
                     b_force_update = true;
             }
@@ -786,9 +792,11 @@ static void MainLoop( input_thread_t *p_input )
             /* Check if i_wakeup is still valid */
             if( i_wakeup != 0 )
             {
+                input_EsOutLock( p_input->p->p_es_out );
                 mtime_t i_new_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
                 if( !i_new_wakeup )
                     i_wakeup = 0;
+                input_EsOutUnlock( p_input->p->p_es_out );
             }
         } while( i_current < i_wakeup );
     }
@@ -798,7 +806,11 @@ static void MainLoop( input_thread_t *p_input )
         /* We have finish to demux data but not to play them */
         while( vlc_object_alive( p_input ) )
         {
-            if( input_EsOutDecodersIsEmpty( p_input->p->p_es_out ) )
+            input_EsOutLock( p_input->p->p_es_out );
+            bool b_empty = input_EsOutDecodersIsEmpty( p_input->p->p_es_out );
+            input_EsOutUnlock( p_input->p->p_es_out );
+
+            if( b_empty )
                 break;
 
             msg_Dbg( p_input, "waiting decoder fifos to empty" );
@@ -1547,6 +1559,8 @@ static bool Control( input_thread_t *p_input, int i_type,
     if( !p_input )
         return b_force_update;
 
+    input_EsOutLock( p_input->p->p_es_out );
+
     switch( i_type )
     {
         case INPUT_CONTROL_SET_DIE:
@@ -2062,6 +2076,8 @@ static bool Control( input_thread_t *p_input, int i_type,
             msg_Err( p_input, "not yet implemented" );
             break;
     }
+
+    input_EsOutUnlock( p_input->p->p_es_out );
 
     return b_force_update;
 }
@@ -3094,10 +3110,13 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
         if( count.i_int < list.p_list->i_count )
         {
             int i_id = list.p_list->p_values[count.i_int].i_int;
+
+            input_EsOutLock( p_input->p->p_es_out );
             es_out_id_t *p_es = input_EsOutGetFromID( p_input->p->p_es_out, i_id );
 
             es_out_Control( p_input->p->p_es_out, ES_OUT_SET_DEFAULT, p_es );
             es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES, p_es );
+            input_EsOutUnlock( p_input->p->p_es_out );
         }
         var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
     }

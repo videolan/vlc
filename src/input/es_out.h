@@ -44,4 +44,7 @@ bool       input_EsOutDecodersIsEmpty( es_out_t * );
 bool       input_EsOutIsBuffering( es_out_t * );
 void       input_EsOutFrameNext( es_out_t * );
 
+void       input_EsOutLock( es_out_t * );
+void       input_EsOutUnlock( es_out_t * );
+
 #endif

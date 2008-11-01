@@ -99,6 +99,9 @@ struct es_out_sys_t
 {
     input_thread_t *p_input;
 
+    /* */
+    vlc_mutex_t   lock;
+
     /* all programs */
     int           i_pgrm;
     es_out_pgrm_t **pgrm;
@@ -203,10 +206,11 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     vlc_value_t  val;
     int i;
 
-    es_out_t     *out = malloc( sizeof( es_out_t ) );
-    if( !out ) return NULL;
+    es_out_t     *out = malloc( sizeof( *out ) );
+    if( !out )
+        return NULL;
 
-    es_out_sys_t *p_sys = malloc( sizeof( es_out_sys_t ) );
+    es_out_sys_t *p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
     {
         free( out );
@@ -220,6 +224,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     out->p_sys      = p_sys;
     out->b_sout     = p_input->p->p_sout != NULL;
 
+
+    vlc_mutex_init_recursive( &p_sys->lock );
     p_sys->p_input = p_input;
 
     p_sys->b_active = false;
@@ -352,6 +358,7 @@ void input_EsOutDelete( es_out_t *out )
         free( p_pgrm );
     }
     TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
+    vlc_mutex_destroy( &p_sys->lock );
 
     free( p_sys );
     free( out );
@@ -362,7 +369,7 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
     int i;
     if( i_id < 0 )
     {
-        /* Special HACK, -i_id is tha cat of the stream */
+        /* Special HACK, -i_id is the cat of the stream */
         return (es_out_id_t*)((uint8_t*)NULL-i_id);
     }
 
@@ -650,6 +657,15 @@ void input_EsOutFrameNext( es_out_t *out )
                                                 INPUT_RATE_DEFAULT / i_rate;
 
     p_sys->i_preroll_end = -1;
+}
+
+void input_EsOutLock( es_out_t *out )
+{
+    vlc_mutex_lock( &out->p_sys->lock );
+}
+void input_EsOutUnlock( es_out_t *out )
+{
+    vlc_mutex_unlock( &out->p_sys->lock );
 }
 
 /*****************************************************************************
@@ -1275,18 +1291,20 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
 
-    es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
-    es_out_pgrm_t     *p_pgrm = NULL;
-    int i;
-
-    if( !es ) return NULL;
-
     if( fmt->i_group < 0 )
     {
         msg_Err( p_input, "invalid group number" );
-        free( es );
         return NULL;
     }
+
+    es_out_id_t       *es = malloc( sizeof( *es ) );
+    es_out_pgrm_t     *p_pgrm = NULL;
+    int i;
+
+    if( !es )
+        return NULL;
+
+    vlc_mutex_lock( &p_sys->lock );
 
     /* Search the program */
     for( i = 0; i < p_sys->i_pgrm; i++ )
@@ -1390,6 +1408,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     }
 
     EsOutAddInfo( out, es );
+
+    vlc_mutex_unlock( &p_sys->lock );
 
     return es;
 }
@@ -1790,6 +1810,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
 
+    vlc_mutex_lock( &p_sys->lock );
+
     /* Mark preroll blocks */
     if( p_sys->i_preroll_end >= 0 )
     {
@@ -1806,6 +1828,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     if( !es->p_dec )
     {
         block_Release( p_block );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -1853,6 +1876,8 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     if( b_cc_new )
         var_SetBool( p_sys->p_input, "intf-change", true );
 
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 
@@ -1864,6 +1889,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     es_out_sys_t *p_sys = out->p_sys;
     bool b_reselect = false;
     int i;
+
+    vlc_mutex_lock( &p_sys->lock );
 
     /* We don't try to reselect */
     if( es->p_dec )
@@ -1911,16 +1938,20 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     /* Re-select another track when needed */
     if( b_reselect )
+    {
         for( i = 0; i < p_sys->i_es; i++ )
         {
             if( es->fmt.i_cat == p_sys->es[i]->fmt.i_cat )
                 EsOutSelect( out, p_sys->es[i], false );
         }
+    }
 
     free( es->psz_language );
     free( es->psz_language_code );
 
     es_format_Clean( &es->fmt );
+
+    vlc_mutex_unlock( &p_sys->lock );
 
     free( es );
 }
@@ -1933,7 +1964,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
  * \param args a variable list of arguments for the query
  * \return VLC_SUCCESS or an error code
  */
-static int EsOutControl( es_out_t *out, int i_query, va_list args )
+static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;
     bool  b, *pb;
@@ -2256,6 +2287,17 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
             return VLC_EGENERIC;
     }
+}
+static int EsOutControl( es_out_t *out, int i_query, va_list args )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+    int i_ret;
+
+    vlc_mutex_lock( &p_sys->lock );
+    i_ret = EsOutControlLocked( out, i_query, args );
+    vlc_mutex_unlock( &p_sys->lock );
+
+    return i_ret;
 }
 
 /****************************************************************************
