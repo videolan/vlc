@@ -33,6 +33,7 @@
 #include <string.h> /* strlen(), memcpy(), memset(), strchr() */
 #include <stdlib.h> /* malloc(), free(), strtoul() */
 #include <errno.h>
+#include <assert.h>
 
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
