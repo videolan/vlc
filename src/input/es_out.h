@@ -34,12 +34,15 @@
 enum es_out_query_private_e
 {
     /* Get date to wait before demuxing more data */
-    ES_OUT_GET_WAKE_UP = ES_OUT_PRIVATE_START,   /* arg1=mtime_t*            res=cannot fail */
+    ES_OUT_GET_WAKE_UP = ES_OUT_PRIVATE_START,      /* arg1=mtime_t*            res=cannot fail */
 
     /* Wrapper for some ES command to work with id */
     ES_OUT_SET_ES_BY_ID,
     ES_OUT_RESTART_ES_BY_ID,
     ES_OUT_SET_ES_DEFAULT_BY_ID,
+
+    /* Get buffering state */
+    ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -50,6 +53,15 @@ static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
     assert( !i_ret );
     return i_wu;
 }
+static inline bool es_out_GetBuffering( es_out_t *p_out )
+{
+    bool b;
+    int i_ret = es_out_Control( p_out, ES_OUT_GET_BUFFERING, &b );
+
+    assert( !i_ret );
+    return b;
+}
+
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 
@@ -59,7 +71,6 @@ void       input_EsOutChangeRate( es_out_t *, int );
 void       input_EsOutChangePause( es_out_t *, bool b_paused, mtime_t i_date );
 void       input_EsOutChangePosition( es_out_t * );
 bool       input_EsOutDecodersIsEmpty( es_out_t * );
-bool       input_EsOutIsBuffering( es_out_t * );
 void       input_EsOutFrameNext( es_out_t * );
 
 void       input_EsOutLock( es_out_t * );

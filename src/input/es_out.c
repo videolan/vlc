@@ -495,10 +495,6 @@ bool input_EsOutDecodersIsEmpty( es_out_t *out )
     return true;
 }
 
-bool input_EsOutIsBuffering( es_out_t *out )
-{
-    return out->p_sys->b_buffering;
-}
 void input_EsOutFrameNext( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -2308,6 +2304,11 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             /* TODO if the lock is made non recursive it should be changed */
             return es_out_Control( out, i_new_query, p_es );
         }
+
+        case ES_OUT_GET_BUFFERING:
+            pb = (bool *)va_arg( args, bool* );
+            *pb = p_sys->b_buffering;
+            return VLC_SUCCESS;
 
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
