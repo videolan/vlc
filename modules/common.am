@@ -28,6 +28,11 @@ if HAVE_WIN32
 AM_LDFLAGS += -no-undefined
 AM_LIBADD += $(LTLIBVLCCORE)
 endif
+if HAVE_WINCE
+# Same for Windows CE
+AM_LDFLAGS += -no-undefined
+AM_LIBADD += $(LTLIBVLCCORE)
+endif
 
 include $(srcdir)/Modules.am
 
