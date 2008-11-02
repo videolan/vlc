@@ -43,6 +43,9 @@ enum es_out_query_private_e
 
     /* Get buffering state */
     ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
+
+    /* Check if es_out has still data to play */
+    ES_OUT_GET_EMPTY,                               /* arg1=bool*               res=cannot fail */
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -61,7 +64,14 @@ static inline bool es_out_GetBuffering( es_out_t *p_out )
     assert( !i_ret );
     return b;
 }
+static inline bool es_out_GetEmpty( es_out_t *p_out )
+{
+    bool b;
+    int i_ret = es_out_Control( p_out, ES_OUT_GET_EMPTY, &b );
 
+    assert( !i_ret );
+    return b;
+}
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 
@@ -70,7 +80,6 @@ int        input_EsOutSetRecord( es_out_t *, bool b_record );
 void       input_EsOutChangeRate( es_out_t *, int );
 void       input_EsOutChangePause( es_out_t *, bool b_paused, mtime_t i_date );
 void       input_EsOutChangePosition( es_out_t * );
-bool       input_EsOutDecodersIsEmpty( es_out_t * );
 void       input_EsOutFrameNext( es_out_t * );
 
 void       input_EsOutLock( es_out_t * );

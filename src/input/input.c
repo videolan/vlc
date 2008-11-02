@@ -729,7 +729,7 @@ static void MainLoop( input_thread_t *p_input )
     /* Start the timer */
     stats_TimerStop( p_input, STATS_TIMER_INPUT_LAUNCHING );
 
-    while( !p_input->b_die && !p_input->b_error && !p_input->p->input.b_eof )
+    while( vlc_object_alive( p_input ) && !p_input->b_error )
     {
         bool b_force_update;
         int i_type;
@@ -750,9 +750,21 @@ static void MainLoop( input_thread_t *p_input )
 
         if( !b_paused )
         {
-            MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
+            if( !p_input->p->input.b_eof )
+            {
+                MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
 
-            i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
+                i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
+            }
+            else if( !p_input->b_eof && !es_out_GetEmpty( p_input->p->p_es_out ) )
+            {
+                msg_Dbg( p_input, "waiting decoder fifos to empty" );
+                i_wakeup = mdate() + INPUT_IDLE_SLEEP;
+            }
+            else
+            {
+                break;
+            }
         }
 
         /* */
@@ -797,26 +809,8 @@ static void MainLoop( input_thread_t *p_input )
         } while( i_current < i_wakeup );
     }
 
-    if( !p_input->b_eof && !p_input->b_error && p_input->p->input.b_eof )
-    {
-        /* We have finish to demux data but not to play them */
-        while( vlc_object_alive( p_input ) )
-        {
-            input_EsOutLock( p_input->p->p_es_out );
-            bool b_empty = input_EsOutDecodersIsEmpty( p_input->p->p_es_out );
-            input_EsOutUnlock( p_input->p->p_es_out );
-
-            if( b_empty )
-                break;
-
-            msg_Dbg( p_input, "waiting decoder fifos to empty" );
-
-            msleep( INPUT_IDLE_SLEEP );
-        }
-
-        /* We have finished */
+    if( !p_input->b_error )
         input_ChangeState( p_input, END_S );
-    }
 }
 
 static void InitStatistics( input_thread_t * p_input )
@@ -1601,6 +1595,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             {
                 if( p_input->p->i_slave > 0 )
                     SlaveSeek( p_input );
+                p_input->p->input.b_eof = false;
 
                 b_force_update = true;
             }
@@ -1660,6 +1655,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             {
                 if( p_input->p->i_slave > 0 )
                     SlaveSeek( p_input );
+                p_input->p->input.b_eof = false;
 
                 b_force_update = true;
             }

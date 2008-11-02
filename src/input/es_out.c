@@ -471,30 +471,6 @@ void input_EsOutChangePosition( es_out_t *out )
     p_sys->i_preroll_end = -1;
 }
 
-bool input_EsOutDecodersIsEmpty( es_out_t *out )
-{
-    es_out_sys_t      *p_sys = out->p_sys;
-    int i;
-
-    if( p_sys->b_buffering && p_sys->p_pgrm )
-    {
-        EsOutDecodersStopBuffering( out, true );
-        if( p_sys->b_buffering )
-            return true;
-    }
-
-    for( i = 0; i < p_sys->i_es; i++ )
-    {
-        es_out_id_t *es = p_sys->es[i];
-
-        if( es->p_dec && !input_DecoderIsEmpty( es->p_dec ) )
-            return false;
-        if( es->p_dec_record && !input_DecoderIsEmpty( es->p_dec_record ) )
-            return false;
-    }
-    return true;
-}
-
 void input_EsOutFrameNext( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -665,6 +641,31 @@ static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
     }
     return NULL;
 }
+
+static bool EsOutDecodersIsEmpty( es_out_t *out )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+    int i;
+
+    if( p_sys->b_buffering && p_sys->p_pgrm )
+    {
+        EsOutDecodersStopBuffering( out, true );
+        if( p_sys->b_buffering )
+            return true;
+    }
+
+    for( i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *es = p_sys->es[i];
+
+        if( es->p_dec && !input_DecoderIsEmpty( es->p_dec ) )
+            return false;
+        if( es->p_dec_record && !input_DecoderIsEmpty( es->p_dec_record ) )
+            return false;
+    }
+    return true;
+}
+
 
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
@@ -2308,6 +2309,11 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_GET_BUFFERING:
             pb = (bool *)va_arg( args, bool* );
             *pb = p_sys->b_buffering;
+            return VLC_SUCCESS;
+
+        case ES_OUT_GET_EMPTY:
+            pb = (bool *)va_arg( args, bool* );
+            *pb = EsOutDecodersIsEmpty( out );
             return VLC_SUCCESS;
 
         default:
