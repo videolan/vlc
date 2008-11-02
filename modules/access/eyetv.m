@@ -160,23 +160,21 @@ static int Open( vlc_object_t *p_this )
     struct sockaddr_un publicAddr, peerAddr;
     int publicSock;
  
-    vlc_value_t val;
-
     /* Init p_access */
-    access_InitFields( p_access ); \
-    ACCESS_SET_CALLBACKS( NULL, BlockRead, Control, NULL ); \
-    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( NULL, BlockRead, Control, NULL );
     p_access->info.b_prebuffered = false;
+    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
-    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
     p_sys->i_pts_delay = var_CreateGetInteger( p_access, "eyetv-caching" );
 
-    var_Create( p_access, "eyetv-channel", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "eyetv-channel", &val);
+    int val = var_CreateGetInteger( p_access, "eyetv-channel" );
 
     msg_Dbg( p_access, "coming up" );
 
-    selectChannel(p_this, val.i_int);
+    selectChannel( p_this, val );
 
     /* socket */
     memset(&publicAddr, 0, sizeof(publicAddr));
