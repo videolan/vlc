@@ -603,10 +603,7 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
     else           return a;
 }
 
-/* Malloc with automatic error */
-#define MALLOC_NULL( var, type ) do { var = (type*)malloc( sizeof( type) ); \
-                                   if( !var ) return NULL; } while(0)
-
+/* Free and set set the variable to NULL */
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
 
 #define EMPTY_STR(str) (!str || !*str)

@@ -595,7 +595,9 @@ static msg_context_t* GetContext(void)
     msg_context_t *p_ctx = vlc_threadvar_get( &msg_context );
     if( p_ctx == NULL )
     {
-        MALLOC_NULL( p_ctx, msg_context_t );
+        p_ctx = malloc( sizeof( msg_context_t ) );
+        if( !p_ctx )
+            return NULL;
         p_ctx->psz_message = NULL;
         vlc_threadvar_set( &msg_context, p_ctx );
     }

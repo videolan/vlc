@@ -161,8 +161,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     stats_TimerStart( p_input, psz_timer_name,
         STATS_TIMER_INPUT_LAUNCHING );
 
-    MALLOC_NULL( p_input->p, input_thread_private_t );
-    memset( p_input->p, 0, sizeof( input_thread_private_t ) );
+    p_input->p = calloc( 1, sizeof( input_thread_private_t ) );
+    if( !p_input->p )
+        return NULL;
 
     /* One "randomly" selected input thread is responsible for computing
      * the global stats. Check if there is already someone doing this */
