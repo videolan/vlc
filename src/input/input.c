@@ -1811,13 +1811,11 @@ static bool Control( input_thread_t *p_input, int i_type,
 
         case INPUT_CONTROL_SET_ES:
             /* No need to force update, es_out does it if needed */
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES,
-                            input_EsOutGetFromID( p_input->p->p_es_out, val.i_int ) );
+            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_BY_ID, val.i_int );
             break;
 
         case INPUT_CONTROL_RESTART_ES:
-            es_out_Control( p_input->p->p_es_out, ES_OUT_RESTART_ES,
-                            input_EsOutGetFromID( p_input->p->p_es_out, val.i_int ) );
+            es_out_Control( p_input->p->p_es_out, ES_OUT_RESTART_ES_BY_ID, val.i_int );
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
@@ -3107,14 +3105,10 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
 
         if( count.i_int < list.p_list->i_count )
         {
-            int i_id = list.p_list->p_values[count.i_int].i_int;
+            const int i_id = list.p_list->p_values[count.i_int].i_int;
 
-            input_EsOutLock( p_input->p->p_es_out );
-            es_out_id_t *p_es = input_EsOutGetFromID( p_input->p->p_es_out, i_id );
-
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_DEFAULT, p_es );
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES, p_es );
-            input_EsOutUnlock( p_input->p->p_es_out );
+            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
+            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_BY_ID, i_id );
         }
         var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
     }

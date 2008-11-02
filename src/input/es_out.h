@@ -36,6 +36,10 @@ enum es_out_query_private_e
     /* Get date to wait before demuxing more data */
     ES_OUT_GET_WAKE_UP = ES_OUT_PRIVATE_START,   /* arg1=mtime_t*            res=cannot fail */
 
+    /* Wrapper for some ES command to work with id */
+    ES_OUT_SET_ES_BY_ID,
+    ES_OUT_RESTART_ES_BY_ID,
+    ES_OUT_SET_ES_DEFAULT_BY_ID,
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -49,7 +53,6 @@ static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 
-es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
 int        input_EsOutSetRecord( es_out_t *, bool b_record );
 void       input_EsOutChangeRate( es_out_t *, int );

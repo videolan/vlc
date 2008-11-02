@@ -310,23 +310,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     return out;
 }
 
-es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
-{
-    int i;
-    if( i_id < 0 )
-    {
-        /* Special HACK, -i_id is the cat of the stream */
-        return (es_out_id_t*)((uint8_t*)NULL-i_id);
-    }
-
-    for( i = 0; i < out->p_sys->i_es; i++ )
-    {
-        if( out->p_sys->es[i]->i_id == i_id )
-            return out->p_sys->es[i];
-    }
-    return NULL;
-}
-
 void input_EsOutChangeRate( es_out_t *out, int i_rate )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -670,6 +653,22 @@ static mtime_t EsOutGetWakeup( es_out_t *out )
     return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
 }
 
+static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
+{
+    int i;
+    if( i_id < 0 )
+    {
+        /* Special HACK, -i_id is the cat of the stream */
+        return (es_out_id_t*)((uint8_t*)NULL-i_id);
+    }
+
+    for( i = 0; i < out->p_sys->i_es; i++ )
+    {
+        if( out->p_sys->es[i]->i_id == i_id )
+            return out->p_sys->es[i];
+    }
+    return NULL;
+}
 
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
@@ -2288,6 +2287,26 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             mtime_t *pi_wakeup = (mtime_t*)va_arg( args, mtime_t* );
             *pi_wakeup = EsOutGetWakeup( out );
             return VLC_SUCCESS;
+        }
+
+        case ES_OUT_SET_ES_BY_ID:
+        case ES_OUT_RESTART_ES_BY_ID:
+        case ES_OUT_SET_ES_DEFAULT_BY_ID:
+        {
+            const int i_id = (int)va_arg( args, int );
+            es_out_id_t *p_es = EsOutGetFromID( out, i_id );
+            int i_new_query;
+
+            switch( i_query )
+            {
+            case ES_OUT_SET_ES_BY_ID:         i_new_query = ES_OUT_SET_ES; break;
+            case ES_OUT_RESTART_ES_BY_ID:     i_new_query = ES_OUT_RESTART_ES; break;
+            case ES_OUT_SET_ES_DEFAULT_BY_ID: i_new_query = ES_OUT_SET_ES_DEFAULT; break;
+            default:
+              assert(0);
+            }
+            /* TODO if the lock is made non recursive it should be changed */
+            return es_out_Control( out, i_new_query, p_es );
         }
 
         default:
