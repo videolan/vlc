@@ -106,6 +106,14 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout );
 /* Better be in advance when awakening than late... */
 #define VOUT_MWAIT_TOLERANCE            ((mtime_t)(0.020*CLOCK_FREQ))
 
+/* Minimum number of direct pictures the video output will accept without
+ * creating additional pictures in system memory */
+#ifdef OPTIMIZE_MEMORY
+#   define VOUT_MIN_DIRECT_PICTURES        (VOUT_MAX_PICTURES/2)
+#else
+#   define VOUT_MIN_DIRECT_PICTURES        (3*VOUT_MAX_PICTURES/4)
+#endif
+
 /*****************************************************************************
  * Video Filter2 functions
  *****************************************************************************/

@@ -150,10 +150,6 @@
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES              16
 
-/* Minimum number of direct pictures the video output will accept without
- * creating additional pictures in system memory */
-#define VOUT_MIN_DIRECT_PICTURES        12
-
 /* Statistics are displayed every n loops (=~ pictures) */
 #define VOUT_STATS_NB_LOOPS             100
 
