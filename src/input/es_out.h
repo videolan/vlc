@@ -46,6 +46,12 @@ enum es_out_query_private_e
 
     /* Check if es_out has still data to play */
     ES_OUT_GET_EMPTY,                               /* arg1=bool*               res=cannot fail */
+
+    /* */
+    ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=can fail */
+
+    /* */
+    ES_OUT_SET_RECORD_STATE,                        /* arg1=bool                res=can fail */
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -72,11 +78,17 @@ static inline bool es_out_GetEmpty( es_out_t *p_out )
     assert( !i_ret );
     return b;
 }
+static inline int es_out_SetDelay( es_out_t *p_out, int i_cat, mtime_t i_delay )
+{
+    return es_out_Control( p_out, ES_OUT_SET_DELAY, i_cat, i_delay );
+}
+static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record )
+{
+    return es_out_Control( p_out, ES_OUT_SET_RECORD_STATE, b_record );
+}
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
 
-void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
-int        input_EsOutSetRecord( es_out_t *, bool b_record );
 void       input_EsOutChangeRate( es_out_t *, int );
 void       input_EsOutChangePause( es_out_t *, bool b_paused, mtime_t i_date );
 void       input_EsOutChangePosition( es_out_t * );

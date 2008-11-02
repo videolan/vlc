@@ -1813,15 +1813,13 @@ static bool Control( input_thread_t *p_input, int i_type,
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            input_EsOutSetDelay( p_input->p->p_es_out,
-                                 AUDIO_ES, val.i_time );
-            var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
+            if( !es_out_SetDelay( p_input->p->p_es_out, AUDIO_ES, val.i_time ) )
+                var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            input_EsOutSetDelay( p_input->p->p_es_out,
-                                 SPU_ES, val.i_time );
-            var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
+            if( !es_out_SetDelay( p_input->p->p_es_out, SPU_ES, val.i_time ) )
+                var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
             break;
 
         case INPUT_CONTROL_SET_TITLE:
@@ -2031,7 +2029,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
                 else
                 {
-                    if( input_EsOutSetRecord( p_input->p->p_es_out, val.b_bool ) )
+                    if( es_out_SetRecordState( p_input->p->p_es_out, val.b_bool ) )
                         val.b_bool = false;
                 }
                 p_input->p->b_recording = val.b_bool;

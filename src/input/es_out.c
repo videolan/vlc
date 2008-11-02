@@ -161,10 +161,11 @@ static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
-static void         EsOutDelete ( es_out_t *out );
+static void         EsOutDelete ( es_out_t * );
 
-static void         EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force );
+static void         EsOutSelect( es_out_t *, es_out_id_t *es, bool b_force );
 static void         EsOutAddInfo( es_out_t *, es_out_id_t *es );
+static int          EsOutSetRecord(  es_out_t *, bool b_record );
 
 static bool EsIsSelected( es_out_id_t *es );
 static void EsSelect( es_out_t *out, es_out_id_t *es );
@@ -320,91 +321,6 @@ void input_EsOutChangeRate( es_out_t *out, int i_rate )
         EsOutProgramsChangeRate( out );
 }
 
-int input_EsOutSetRecord(  es_out_t *out, bool b_record )
-{
-    es_out_sys_t   *p_sys = out->p_sys;
-    input_thread_t *p_input = p_sys->p_input;
-
-    assert( ( b_record && !p_sys->p_sout_record ) || ( !b_record && p_sys->p_sout_record ) );
-
-    if( b_record )
-    {
-        char *psz_path = var_CreateGetString( p_input, "input-record-path" );
-        if( !psz_path || *psz_path == '\0' )
-        {
-            free( psz_path );
-            psz_path = strdup( config_GetHomeDir() );
-        }
-
-        char *psz_sout = NULL;  // TODO conf
-
-        if( !psz_sout && psz_path )
-        {
-            char *psz_file = input_CreateFilename( VLC_OBJECT(p_input), psz_path, INPUT_RECORD_PREFIX, NULL );
-            if( psz_file )
-            {
-                if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file ) < 0 )
-                    psz_sout = NULL;
-                free( psz_file );
-            }
-        }
-        free( psz_path );
-
-        if( !psz_sout )
-            return VLC_EGENERIC;
-
-#ifdef ENABLE_SOUT
-        p_sys->p_sout_record = sout_NewInstance( p_input, psz_sout );
-#endif
-        free( psz_sout );
-
-        if( !p_sys->p_sout_record )
-            return VLC_EGENERIC;
-
-        for( int i = 0; i < p_sys->i_es; i++ )
-        {
-            es_out_id_t *p_es = p_sys->es[i];
-
-            if( !p_es->p_dec || p_es->p_master )
-                continue;
-
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
-            if( p_es->p_dec_record && p_sys->b_buffering )
-                input_DecoderStartBuffering( p_es->p_dec_record );
-        }
-    }
-    else
-    {
-        for( int i = 0; i < p_sys->i_es; i++ )
-        {
-            es_out_id_t *p_es = p_sys->es[i];
-
-            if( !p_es->p_dec_record )
-                continue;
-
-            input_DecoderDelete( p_es->p_dec_record );
-            p_es->p_dec_record = NULL;
-        }
-#ifdef ENABLE_SOUT
-        sout_DeleteInstance( p_sys->p_sout_record );
-#endif
-        p_sys->p_sout_record = NULL;
-    }
-
-    return VLC_SUCCESS;
-}
-void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-
-    if( i_cat == AUDIO_ES )
-        p_sys->i_audio_delay = i_delay;
-    else if( i_cat == SPU_ES )
-        p_sys->i_spu_delay = i_delay;
-
-    for( int i = 0; i < p_sys->i_es; i++ )
-        EsOutDecoderChangeDelay( out, p_sys->es[i] );
-}
 void input_EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -558,7 +474,7 @@ static void EsOutDelete( es_out_t *out )
     int i;
 
     if( p_sys->p_sout_record )
-        input_EsOutSetRecord( out, false );
+        EsOutSetRecord( out, false );
 
     for( i = 0; i < p_sys->i_es; i++ )
     {
@@ -664,6 +580,93 @@ static bool EsOutDecodersIsEmpty( es_out_t *out )
             return false;
     }
     return true;
+}
+
+static void EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    if( i_cat == AUDIO_ES )
+        p_sys->i_audio_delay = i_delay;
+    else if( i_cat == SPU_ES )
+        p_sys->i_spu_delay = i_delay;
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+        EsOutDecoderChangeDelay( out, p_sys->es[i] );
+}
+
+static int EsOutSetRecord(  es_out_t *out, bool b_record )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+
+    assert( ( b_record && !p_sys->p_sout_record ) || ( !b_record && p_sys->p_sout_record ) );
+
+    if( b_record )
+    {
+        char *psz_path = var_CreateGetString( p_input, "input-record-path" );
+        if( !psz_path || *psz_path == '\0' )
+        {
+            free( psz_path );
+            psz_path = strdup( config_GetHomeDir() );
+        }
+
+        char *psz_sout = NULL;  // TODO conf
+
+        if( !psz_sout && psz_path )
+        {
+            char *psz_file = input_CreateFilename( VLC_OBJECT(p_input), psz_path, INPUT_RECORD_PREFIX, NULL );
+            if( psz_file )
+            {
+                if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file ) < 0 )
+                    psz_sout = NULL;
+                free( psz_file );
+            }
+        }
+        free( psz_path );
+
+        if( !psz_sout )
+            return VLC_EGENERIC;
+
+#ifdef ENABLE_SOUT
+        p_sys->p_sout_record = sout_NewInstance( p_input, psz_sout );
+#endif
+        free( psz_sout );
+
+        if( !p_sys->p_sout_record )
+            return VLC_EGENERIC;
+
+        for( int i = 0; i < p_sys->i_es; i++ )
+        {
+            es_out_id_t *p_es = p_sys->es[i];
+
+            if( !p_es->p_dec || p_es->p_master )
+                continue;
+
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+            if( p_es->p_dec_record && p_sys->b_buffering )
+                input_DecoderStartBuffering( p_es->p_dec_record );
+        }
+    }
+    else
+    {
+        for( int i = 0; i < p_sys->i_es; i++ )
+        {
+            es_out_id_t *p_es = p_sys->es[i];
+
+            if( !p_es->p_dec_record )
+                continue;
+
+            input_DecoderDelete( p_es->p_dec_record );
+            p_es->p_dec_record = NULL;
+        }
+#ifdef ENABLE_SOUT
+        sout_DeleteInstance( p_sys->p_sout_record );
+#endif
+        p_sys->p_sout_record = NULL;
+    }
+
+    return VLC_SUCCESS;
 }
 
 
@@ -2315,6 +2318,18 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             pb = (bool *)va_arg( args, bool* );
             *pb = EsOutDecodersIsEmpty( out );
             return VLC_SUCCESS;
+
+        case ES_OUT_SET_DELAY:
+        {
+            const int i_cat = (int)va_arg( args, int );
+            const mtime_t i_delay = (mtime_t)va_arg( args, mtime_t );
+            EsOutSetDelay( out, i_cat, i_delay );
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_SET_RECORD_STATE:
+            b = (bool) va_arg( args, int );
+            return EsOutSetRecord( out, b );
 
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
