@@ -192,7 +192,8 @@ VLC_EXPORT( void, demux_PacketizerDestroy, ( decoder_t *p_packetizer ) );
 #define DEMUX_INIT_COMMON() do {            \
     p_demux->pf_control = Control;          \
     p_demux->pf_demux = Demux;              \
-    MALLOC_ERR( p_demux->p_sys, demux_sys_t ); \
+    p_demux->p_sys = malloc( sizeof( demux_sys_t ) ); \
+    if( !p_demux->p_sys ) return VLC_ENOMEM;\
     memset( p_demux->p_sys, 0, sizeof( demux_sys_t ) ); } while(0)
 
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \

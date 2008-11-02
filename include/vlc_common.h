@@ -604,12 +604,8 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
 }
 
 /* Malloc with automatic error */
-#define MALLOC_VOID( var, type ) do { var = (type*)malloc( sizeof( type) ); \
-                                   if( !var ) return; } while(0)
 #define MALLOC_NULL( var, type ) do { var = (type*)malloc( sizeof( type) ); \
                                    if( !var ) return NULL; } while(0)
-#define MALLOC_ERR( var, type ) do { var = (type*)malloc( sizeof( type) ); \
-                                   if( !var ) return VLC_ENOMEM; } while(0)
 
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
 

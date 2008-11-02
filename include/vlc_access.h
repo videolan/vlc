@@ -149,22 +149,22 @@ static inline void access_InitFields( access_t *p_a )
     p_a->info.i_seekpoint = 0;
 }
 
-#define ACCESS_SET_CALLBACKS( read, block, control, seek ) \
-    p_access->pf_read = read;  \
-    p_access->pf_block = block; \
-    p_access->pf_control = control; \
-    p_access->pf_seek = seek; \
+#define ACCESS_SET_CALLBACKS( read, block, control, seek )              \
+    p_access->pf_read = read;                                           \
+    p_access->pf_block = block;                                         \
+    p_access->pf_control = control;                                     \
+    p_access->pf_seek = seek;
 
-#define STANDARD_READ_ACCESS_INIT \
-    access_InitFields( p_access ); \
-    ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek ); \
-    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
-    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
+#define STANDARD_READ_ACCESS_INIT                                       \
+    access_InitFields( p_access );                                      \
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, Seek );                  \
+    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ));       \
+    if( !p_sys ) return VLC_ENOMEM;
 
-#define STANDARD_BLOCK_ACCESS_INIT \
-    access_InitFields( p_access ); \
-    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek ); \
-    MALLOC_ERR( p_access->p_sys, access_sys_t ); \
-    p_sys = p_access->p_sys; memset( p_sys, 0, sizeof( access_sys_t ) );
+#define STANDARD_BLOCK_ACCESS_INIT                                      \
+    access_InitFields( p_access );                                      \
+    ACCESS_SET_CALLBACKS( NULL, Block, Control, Seek );                 \
+    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );      \
+    if( !p_sys ) return VLC_ENOMEM;
 
 #endif

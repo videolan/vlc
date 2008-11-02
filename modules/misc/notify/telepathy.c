@@ -97,7 +97,9 @@ static int Open( vlc_object_t *p_this )
     DBusConnection  *p_conn;
     DBusError       error;
 
-    MALLOC_ERR( p_intf->p_sys, intf_sys_t );
+    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_intf->p_sys )
+        return VLC_ENOMEM;
 
     /* connect to the session bus */
     dbus_error_init( &error );

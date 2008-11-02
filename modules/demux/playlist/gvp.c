@@ -96,7 +96,9 @@ int Import_GVP( vlc_object_t *p_this )
     STANDARD_DEMUX_INIT_MSG(  "using Google Video Playlist (gvp) import" );
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
-    MALLOC_ERR( p_demux->p_sys, demux_sys_t );
+    p_demux->p_sys = malloc( sizeof( demux_sys_t ) );
+    if( !p_demux->p_sys )
+        return VLC_ENOMEM;
 
     return VLC_SUCCESS;
 }

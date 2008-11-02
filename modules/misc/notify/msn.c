@@ -89,7 +89,9 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist;
 
-    MALLOC_ERR( p_intf->p_sys, intf_sys_t );
+    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_intf->p_sys )
+        return VLC_ENOMEM;
 
     p_intf->p_sys->psz_format = config_GetPsz( p_intf, "msn-format" );
     if( !p_intf->p_sys->psz_format )

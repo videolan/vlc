@@ -109,7 +109,9 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
-    MALLOC_ERR( p_sys, intf_sys_t );
+    p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_intf->p_sys = p_sys;
     p_intf->pf_run = Run;
