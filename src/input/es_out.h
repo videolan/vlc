@@ -31,9 +31,25 @@
 
 #include <vlc_common.h>
 
+enum es_out_query_private_e
+{
+    /* Get date to wait before demuxing more data */
+    ES_OUT_GET_WAKE_UP = ES_OUT_PRIVATE_START,   /* arg1=mtime_t*            res=cannot fail */
+
+};
+
+static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
+{
+    mtime_t i_wu;
+    int i_ret = es_out_Control( p_out, ES_OUT_GET_WAKE_UP, &i_wu );
+
+    assert( !i_ret );
+    return i_wu;
+}
+
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
+
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
-mtime_t    input_EsOutGetWakeup( es_out_t * );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );
 int        input_EsOutSetRecord( es_out_t *, bool b_record );
 void       input_EsOutChangeRate( es_out_t *, int );

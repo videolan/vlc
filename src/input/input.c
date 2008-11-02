@@ -754,9 +754,7 @@ static void MainLoop( input_thread_t *p_input )
         {
             MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
 
-            input_EsOutLock( p_input->p->p_es_out );
-            i_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
-            input_EsOutUnlock( p_input->p->p_es_out );
+            i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
         }
 
         /* */
@@ -794,11 +792,9 @@ static void MainLoop( input_thread_t *p_input )
             /* Check if i_wakeup is still valid */
             if( i_wakeup != 0 )
             {
-                input_EsOutLock( p_input->p->p_es_out );
-                mtime_t i_new_wakeup = input_EsOutGetWakeup( p_input->p->p_es_out );
+                mtime_t i_new_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
                 if( !i_new_wakeup )
                     i_wakeup = 0;
-                input_EsOutUnlock( p_input->p->p_es_out );
             }
         } while( i_current < i_wakeup );
     }

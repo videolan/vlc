@@ -327,26 +327,6 @@ es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
     return NULL;
 }
 
-mtime_t input_EsOutGetWakeup( es_out_t *out )
-{
-    es_out_sys_t   *p_sys = out->p_sys;
-    input_thread_t *p_input = p_sys->p_input;
-
-    if( !p_sys->p_pgrm )
-        return 0;
-
-    /* We do not have a wake up date if the input cannot have its speed
-     * controlled or sout is imposing its own or while buffering
-     *
-     * FIXME for !p_input->b_can_pace_control a wkeup time is still needed to avoid too strong buffering */
-    if( !p_input->b_can_pace_control ||
-        p_input->p->b_out_pace_control ||
-        p_sys->b_buffering )
-        return 0;
-
-    return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
-}
-
 void input_EsOutChangeRate( es_out_t *out, int i_rate )
 {
     es_out_sys_t      *p_sys = out->p_sys;
@@ -668,6 +648,26 @@ static void EsOutDelete( es_out_t *out )
 
     free( p_sys );
     free( out );
+}
+
+static mtime_t EsOutGetWakeup( es_out_t *out )
+{
+    es_out_sys_t   *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
+
+    if( !p_sys->p_pgrm )
+        return 0;
+
+    /* We do not have a wake up date if the input cannot have its speed
+     * controlled or sout is imposing its own or while buffering
+     *
+     * FIXME for !p_input->b_can_pace_control a wkeup time is still needed to avoid too strong buffering */
+    if( !p_input->b_can_pace_control ||
+        p_input->p->b_out_pace_control ||
+        p_sys->b_buffering )
+        return 0;
+
+    return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
 }
 
 
@@ -2281,6 +2281,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             int i_group = (int)va_arg( args, int );
 
             return EsOutProgramDel( out, i_group );
+        }
+
+        case ES_OUT_GET_WAKE_UP:
+        {
+            mtime_t *pi_wakeup = (mtime_t*)va_arg( args, mtime_t* );
+            *pi_wakeup = EsOutGetWakeup( out );
+            return VLC_SUCCESS;
         }
 
         default:
