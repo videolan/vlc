@@ -148,26 +148,11 @@
 
 /* Video heap size - remember that a decompressed picture is big
  * (~1 Mbyte) before using huge values */
-#ifdef OPTIMIZE_MEMORY
-#   define VOUT_MAX_PICTURES               8
-#else
-#   define VOUT_MAX_PICTURES              16
-#endif
+#define VOUT_MAX_PICTURES              16
 
 /* Minimum number of direct pictures the video output will accept without
  * creating additional pictures in system memory */
-#ifdef OPTIMIZE_MEMORY
-#   define VOUT_MIN_DIRECT_PICTURES        6
-#else
-#   define VOUT_MIN_DIRECT_PICTURES        12
-#endif
-
-/* Number of simultaneous subpictures */
-#ifdef OPTIMIZE_MEMORY
-#   define VOUT_MAX_SUBPICTURES            8
-#else
-#   define VOUT_MAX_SUBPICTURES            16
-#endif
+#define VOUT_MIN_DIRECT_PICTURES        12
 
 /* Statistics are displayed every n loops (=~ pictures) */
 #define VOUT_STATS_NB_LOOPS             100

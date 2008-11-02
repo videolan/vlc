@@ -44,6 +44,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+/* Number of simultaneous subpictures */
+#define VOUT_MAX_SUBPICTURES (VOUT_MAX_PICTURES)
+
 #define VLC_FOURCC_YUVP VLC_FOURCC('Y','U','V','P')
 #define VLC_FOURCC_YUVA VLC_FOURCC('Y','U','V','A')
 #define VLC_FOURCC_RGBA VLC_FOURCC('R','G','B','A')
