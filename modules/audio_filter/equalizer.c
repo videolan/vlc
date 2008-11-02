@@ -363,7 +363,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
 
     p_sys->b_2eqz = var_CreateGetBool( p_aout, "equalizer-2pass" );
 
-    var_CreateGetFloat( p_aout, "equalizer-preamp" );
+    var_Create( p_aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
 
     /* Get initial values */
     var_Get( p_aout, "equalizer-preset", &val1 );

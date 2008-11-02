@@ -209,9 +209,8 @@ static int SpatInit( aout_filter_t *p_filter )
     aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
 
     for( i = 0; i < 5 ; i ++ )
-    {
-        var_CreateGetFloatCommand( p_aout, psz_control_names[i] );
-    }
+        var_Create( p_aout, psz_control_names[i], VLC_VAR_FLOAT
+                            | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 
     /* Get initial values */
     var_Get( p_aout, psz_control_names[0], &val1 );
