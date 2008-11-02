@@ -125,7 +125,12 @@ void BookmarksDialog::update()
         QStringList row;
         row << QString( pp_bookmarks[i]->psz_name );
         row << QString( "%1" ).arg( pp_bookmarks[i]->i_byte_offset );
-        row << QString( "%1" ).arg( pp_bookmarks[i]->i_time_offset / 1000000 );
+        int total = pp_bookmarks[i]->i_time_offset/ 1000000;
+        int hour = total / (60*60);
+        int min = (total - hour*60*60) / 60;
+        int sec = total - hour*60*60 - min*60;
+        QString str;
+        row << str.sprintf("%02d:%02d:%02d", hour, min, sec );
         QTreeWidgetItem *item = new QTreeWidgetItem( bookmarksList, row );
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEditable |
                         Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
@@ -183,6 +188,7 @@ void BookmarksDialog::clear()
 
 void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
 {
+    QStringList fields;
     // We can only edit a item if it is the last item selected
     if( bookmarksList->selectedItems().isEmpty() ||
         bookmarksList->selectedItems().last() != item )
@@ -205,7 +211,7 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
         return;
 
     if( i_edit >= i_bookmarks )
-        return;
+        goto clear;
 
     // We modify the seekpoint
     p_seekpoint = pp_bookmarks[i_edit];
@@ -217,7 +223,20 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     else if( column == 1 )
         p_seekpoint->i_byte_offset = atoi( qtu( item->text( column ) ) );
     else if( column == 2 )
-        p_seekpoint->i_time_offset = 1000000 * atoll( qtu( item->text( column ) ) );
+    {
+        fields = item->text( column ).split( ":", QString::SkipEmptyParts );
+        if( fields.size() == 1 )
+            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() );
+        else if( fields.size() == 2 )
+            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 60 + fields[1].toInt() );
+        else if( fields.size() == 3 )
+            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toInt() );
+        else
+        {
+            msg_Err( p_intf, "Invalid string format for time" );
+            goto clear;
+        }
+    }
 
     // Send the modification
     if( input_Control( p_input, INPUT_CHANGE_BOOKMARK, p_seekpoint, i_edit ) !=
@@ -230,7 +249,10 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
 // Clear the bookmark list
 clear:
     for( int i = 0; i < i_bookmarks; i++)
-        vlc_seekpoint_Delete( pp_bookmarks[i] );
+    {
+        if( p_seekpoint != pp_bookmarks[i] )
+            vlc_seekpoint_Delete( pp_bookmarks[i] );
+    }
     free( pp_bookmarks );
 }
 
