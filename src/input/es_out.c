@@ -2100,7 +2100,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
         }
  
-        case ES_OUT_SET_DEFAULT:
+        case ES_OUT_SET_ES_DEFAULT:
         {
             es = (es_out_id_t*) va_arg( args, es_out_id_t * );
 

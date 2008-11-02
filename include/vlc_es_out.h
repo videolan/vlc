@@ -58,7 +58,7 @@ enum es_out_query_e
     ES_OUT_RESTART_ES,  /* arg1= es_out_id_t*                   */
 
     /* set 'default' tag on ES (copied across from container) */
-    ES_OUT_SET_DEFAULT, /* arg1= es_out_id_t*                   */
+    ES_OUT_SET_ES_DEFAULT, /* arg1= es_out_id_t*                */
 
     /* force selection/unselection of the ES (bypass current mode) */
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=bool   */

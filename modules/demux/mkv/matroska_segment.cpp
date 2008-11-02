@@ -1094,7 +1094,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         if( tracks[i_track]->b_default )
         {
             es_out_Control( sys.demuxer.out,
-                            ES_OUT_SET_DEFAULT,
+                            ES_OUT_SET_ES_DEFAULT,
                             tracks[i_track]->p_es );
         }
     }

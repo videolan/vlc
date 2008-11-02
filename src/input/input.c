@@ -3112,7 +3112,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
             input_EsOutLock( p_input->p->p_es_out );
             es_out_id_t *p_es = input_EsOutGetFromID( p_input->p->p_es_out, i_id );
 
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_DEFAULT, p_es );
+            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_DEFAULT, p_es );
             es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES, p_es );
             input_EsOutUnlock( p_input->p->p_es_out );
         }
