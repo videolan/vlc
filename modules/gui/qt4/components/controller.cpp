@@ -42,7 +42,6 @@
 #include <QSpacerItem>
 #include <QCursor>
 #include <QToolButton>
-#include <QToolButton>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QPalette>
@@ -77,6 +76,7 @@ AbstractController::AbstractController( intf_thread_t * _p_i ) : QFrame( NULL )
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
 }
 
+/* Reemit some signals on status Change to activate some buttons */
 void AbstractController::setStatus( int status )
 {
     bool b_hasInput = THEMIM->getIM()->hasInput();
@@ -89,6 +89,7 @@ void AbstractController::setStatus( int status )
                             var_GetBool( THEMIM->getInput(), "can-record" ) );
 }
 
+/* Generic button setup */
 void AbstractController::setupButton( QAbstractButton *aButton )
 {
     static QSizePolicy sizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
@@ -99,6 +100,69 @@ void AbstractController::setupButton( QAbstractButton *aButton )
     aButton->setFixedSize( QSize( 26, 26 ) );
     aButton->setIconSize( QSize( 20, 20 ) );
     aButton->setFocusPolicy( Qt::NoFocus );
+}
+
+/* Open the generic config line for the toolbar, parse it
+ * and create the widgets accordingly */
+void AbstractController::parseAndCreateLine( QString config, int i_line )
+{
+    int i_column = 0;
+    QStringList list = config.split( ";" ) ;
+    for( int i = 0; i < list.size(); i++ )
+    {
+         QStringList list2 = list.at( i ).split( "-" );
+         if( list2.size() < 1 )
+         {
+             msg_Warn( p_intf, "Parsing error. Report this" );
+             continue;
+         }
+
+         bool ok;
+         int i_option = WIDGET_NORMAL;
+         buttonType_e i_type = (buttonType_e)list2.at( 0 ).toInt( &ok );
+         if( !ok )
+         {
+             msg_Warn( p_intf, "Parsing error 0. Please report this" );
+             continue;
+         }
+         /* Special case for SPACERS, who aren't QWidgets */
+         if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
+         {
+             controlLayout->setColumnMinimumWidth( i, 10 );
+             i_column++;
+             controlLayout->setColumnStretch( i,
+                     ( i_type == WIDGET_SPACER ) ? 0 : 10 );
+             continue;
+         }
+
+         if( list2.size() > 1 )
+         {
+             i_option = list2.at( 1 ).toInt( &ok );
+             if( !ok )
+             {
+                 msg_Warn( p_intf, "Parsing error 1. Please report this" );
+                 continue;
+             }
+         }
+
+         int i_size;
+         QWidget *widg = createWidget( i_type, &i_size, i_option );
+         if( !widg ) continue;
+
+         if( list2.size() > 2 )
+         {
+             i_size = list.at( 2 ).toInt( &ok );
+
+             if( !ok )
+             {
+                 msg_Warn( p_intf, "Parsing error 2. Please report this" );
+                 continue;
+             }
+         }
+
+         controlLayout->addWidget( widg, i_line, i_column, 1, i_size );
+         i_column += i_size;
+    }
 }
 
 #define CONNECT_MAP( a ) CONNECT( a, clicked(),  toolbarActionsMapper, map() )
@@ -118,9 +182,16 @@ void AbstractController::setupButton( QAbstractButton *aButton )
     CONNECT( this, inputExists( bool ), a, setEnabled( bool ) ); \
     a->setEnabled( THEMIM->getIM()->hasInput() ); /* TODO: is this necessary? when input is started before the interface? */
 
-QWidget *AbstractController::createWidget( buttonType_e button, bool b_flat,
-        bool b_big, bool b_shiny )
+QWidget *AbstractController::createWidget( buttonType_e button, int* i_size,
+        int options )
 {
+    assert( i_size );
+
+    bool b_flat = options & WIDGET_FLAT;
+    bool b_big = options & WIDGET_BIG;
+    bool b_shiny = options & WIDGET_SHINY;
+    *i_size = 1; 
+
     QWidget *widget = NULL;
     switch( button )
     {
@@ -179,21 +250,30 @@ QWidget *AbstractController::createWidget( buttonType_e button, bool b_flat,
         widget = fasterButton;
         }
         break;
-#if 0
     case FRAME_BUTTON: {
-        QToolButton *frameButton = new QToolButton( "Fr" );
+        QToolButton *frameButton = new QToolButton;
         setupButton( frameButton );
+        CONNECT_MAP_SET( frameButton, FRAME_ACTION );
         BUTTON_SET_BAR( frameButton, "", qtr( "Frame by frame" ) );
         ENABLE_ON_INPUT( frameButton );
         widget = frameButton;
         }
         break;
-#endif
     case FULLSCREEN_BUTTON:{
         QToolButton *fullscreenButton = new QToolButton;
         setupButton( fullscreenButton );
         CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
         BUTTON_SET_BAR( fullscreenButton, fullscreen,
+                qtr( "Toggle the video in fullscreen" ) );
+        ENABLE_ON_VIDEO( fullscreenButton );
+        widget = fullscreenButton;
+        }
+        break;
+    case DEFULLSCREEN_BUTTON:{
+        QToolButton *fullscreenButton = new QToolButton;
+        setupButton( fullscreenButton );
+        CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
+        BUTTON_SET_BAR( fullscreenButton, defullscreen,
                 qtr( "Toggle the video in fullscreen" ) );
         ENABLE_ON_VIDEO( fullscreenButton );
         widget = fullscreenButton;
@@ -255,23 +335,49 @@ QWidget *AbstractController::createWidget( buttonType_e button, bool b_flat,
         /* And update the IM, when the position has changed */
         CONNECT( slider, sliderDragged( float ),
                 THEMIM->getIM(), sliderUpdate( float ) );
+        /* *i_size = -1; */
         widget = slider;
         }
         break;
     case MENU_BUTTONS:
         widget = discFrame();
         widget->hide();
+        *i_size = 3;
         break;
     case TELETEXT_BUTTONS:
         widget = telexFrame();
         widget->hide();
+        *i_size = 4;
         break;
     case VOLUME:
         {
             SoundWidget *snd = new SoundWidget( p_intf, b_shiny );
             widget = snd;
+            *i_size = 4;
         }
         break;
+    case TIME_LABEL:
+        {
+            TimeLabel *timeLabel = new TimeLabel( p_intf );
+            widget = timeLabel;
+        }
+        break;
+    case SPLITTER:
+        {
+            QFrame *line = new QFrame;
+            line->setFrameShape( QFrame::VLine );
+            line->setFrameShadow( QFrame::Raised );
+            line->setLineWidth( 0 );
+            line->setMidLineWidth( 1 );
+            widget = line;
+        }
+        break;
+    case ADVANCED_CONTROLLER:
+        {
+            advControls = new AdvControlsWidget( p_intf );
+            widget = advControls;
+            *i_size = advControls->getWidth();
+        }
     default:
         msg_Warn( p_intf, "This should not happen" );
         break;
@@ -289,6 +395,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, bool b_flat,
             {
                 tmpButton->setFixedSize( QSize( 32, 32 ) );
                 tmpButton->setIconSize( QSize( 26, 26 ) );
+                *i_size = 2;
             }
         }
     }
@@ -401,7 +508,10 @@ QWidget *AbstractController::telexFrame()
 }
 #undef CONNECT_MAP
 #undef SET_MAPPING
+#undef CONNECT_MAP_SET
 #undef BUTTON_SET_BAR
+#undef ENABLE_ON_VIDEO
+#undef ENABLE_ON_INPUT
 
 SoundWidget::SoundWidget( intf_thread_t * _p_intf, bool b_shiny )
                          : b_my_volume( false )
@@ -553,6 +663,8 @@ void AbstractController::doAction( int id_action )
             record(); break;
         case ATOB_ACTION:
             THEMIM->getIM()->setAtoB(); break;
+        case FRAME_ACTION:
+            frame(); break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;
@@ -613,7 +725,6 @@ void AbstractController::snapshot()
     }
 }
 
-
 void AbstractController::extSettings()
 {
     THEDP->extendedDialog();
@@ -658,11 +769,12 @@ void AbstractController::record()
     }
 }
 
-#if 0
-//TODO Frame by frame function
-void AbstractController::frame(){}
-#endif
-
+void AbstractController::frame()
+{
+    input_thread_t *p_input = THEMIM->getInput();
+    if( p_input )
+        var_SetVoid( p_input, "frame-next" );
+}
 
 /*****************************
  * DA Control Widget !
@@ -675,48 +787,28 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
-
-    advControls = new AdvControlsWidget( p_intf );
-    if( !b_advancedVisible ) advControls->hide();
+    advControls = NULL;
 
     controlLayout->setSpacing( 0 );
-    controlLayout->setLayoutMargins( 7, 5, 7, 3, 6 );
+    controlLayout->setLayoutMargins( 6, 4, 6, 2, 5 );
 
-    controlLayout->addWidget( createWidget( INPUT_SLIDER ), 0, 1, 1, 18 );
-    controlLayout->addWidget( createWidget( SLOWER_BUTTON, true ), 0, 0 );
-    controlLayout->addWidget( createWidget( FASTER_BUTTON, true ), 0, 19 );
+    QString line1 = getSettings()->value( "MainWindow/Controls2",
+            "18;19;25" ).toString();
+    parseAndCreateLine( line1, 0 );
 
-    controlLayout->addWidget( createWidget( MENU_BUTTONS ), 1, 8, 2, 3 );
-    controlLayout->addWidget( createWidget( TELETEXT_BUTTONS ), 1, 8, 2, 5, Qt::AlignBottom );
+/*    QString line2 = QString( "%1-2;%2;%3;%4;%5;%6;%6;%7;%8;%9;%6;%10;%11-4")
+        .arg( PLAY_BUTTON )         .arg( WIDGET_SPACER )
+        .arg( PREVIOUS_BUTTON )         .arg( STOP_BUTTON )
+        .arg( NEXT_BUTTON )        .arg( WIDGET_SPACER )
+        .arg( FULLSCREEN_BUTTON )        .arg( PLAYLIST_BUTTON )
+        .arg( EXTENDED_BUTTON )        .arg( WIDGET_SPACER_EXTEND )
+        .arg( VOLUME ); */
 
-    controlLayout->addWidget( createWidget( PLAY_BUTTON, false, true ), 2, 0, 2, 2, Qt::AlignBottom );
-    controlLayout->setColumnMinimumWidth( 2, 10 );
-    controlLayout->setColumnStretch( 2, 0 );
+    QString line2 = getSettings()->value( "MainWindow/Controls2",
+            "0-2;21;21;4;2;5;21;21;8;11;10;21;22;20-4" ).toString();
+    parseAndCreateLine( line2, 1 );
 
-    controlLayout->addWidget( createWidget( PREVIOUS_BUTTON ), 3, 3, Qt::AlignBottom );
-    controlLayout->addWidget( createWidget( STOP_BUTTON ), 3, 4, Qt::AlignBottom  );
-    controlLayout->addWidget( createWidget( NEXT_BUTTON ), 3, 5, Qt::AlignBottom  );
-
-    /* Column 6 is unused */
-    controlLayout->setColumnStretch( 6, 0 );
-    controlLayout->setColumnStretch( 7, 0 );
-    controlLayout->setColumnMinimumWidth( 7, 10 );
-
-    controlLayout->addWidget( createWidget( FULLSCREEN_BUTTON ), 3, 8, Qt::AlignBottom );
-    controlLayout->addWidget( createWidget( PLAYLIST_BUTTON ), 3, 9, Qt::AlignBottom );
-    controlLayout->addWidget( createWidget( EXTENDED_BUTTON ), 3, 10, Qt::AlignBottom );
-    controlLayout->setColumnStretch( 11, 0 ); /* telex alignment */
-
-    controlLayout->setColumnStretch( 12, 0 );
-    controlLayout->setColumnMinimumWidth( 12, 10 );
-
-    controlLayout->addWidget( advControls, 3, 13, 1, 3, Qt::AlignBottom );
-
-    controlLayout->setColumnStretch( 16, 10 );
-    controlLayout->setColumnMinimumWidth( 16, 10 );
-
-    controlLayout->addWidget( createWidget( VOLUME, false, false, true ),
-            3, 17, 1, 3, Qt::AlignBottom );
+    if( !b_advancedVisible && advControls ) advControls->hide();
 }
 
 ControlsWidget::~ControlsWidget()
@@ -724,7 +816,9 @@ ControlsWidget::~ControlsWidget()
 
 void ControlsWidget::toggleAdvanced()
 {
-    if( advControls && !b_advancedVisible )
+    if( !advControls ) return;
+
+    if( !b_advancedVisible )
     {
         advControls->show();
         b_advancedVisible = true;
@@ -743,15 +837,30 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 
-    controlLayout->addWidget( createWidget( RECORD_BUTTON ), 0, 0 );
-    controlLayout->addWidget( createWidget( SNAPSHOT_BUTTON ), 0, 1 );
-    controlLayout->addWidget( createWidget( ATOB_BUTTON ), 0, 2 );
+    /* QString line = QString( "%1;%2;%3").arg( RECORD_BUTTON )
+        .arg( SNAPSHOT_BUTTON )
+        .arg( ATOB_BUTTON )
+        .arg( FRAME_BUTTON ); */
+
+    QString line = getSettings()->value( "MainWindow/AdvControl",
+            "12;13;14;15" ).toString();
+    parseAndCreateLine( line, 0 );
 }
 
-AdvControlsWidget::~AdvControlsWidget()
-{}
+InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i ) :
+                                     AbstractController( _p_i )
+{
+    controlLayout->setMargin( 0 );
+    controlLayout->setSpacing( 0 );
 
-
+    /*    QString line = QString( "%1-%2;%3;%4-%2")
+        .arg( SLOWER_BUTTON ).arg( WIDGET_FLAT )
+        .arg( INPUT_SLIDER )
+        .arg( FASTER_BUTTON ); */
+    QString line = getSettings()->value( "MainWindow/InputControl",
+                   "6-1;16;7-1" ).toString();
+    parseAndCreateLine( line, 0 );
+}
 /**********************************************************************
  * Fullscrenn control widget
  **********************************************************************/
@@ -782,30 +891,26 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     controlLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
 
     /* First line */
-    controlLayout->addWidget( createWidget( SLOWER_BUTTON, true ), 0, 0 );
-    controlLayout->addWidget( createWidget( INPUT_SLIDER ), 0, 1, 1, 13 );
-    controlLayout->addWidget( createWidget( FASTER_BUTTON, true ), 0, 14 );
+    InputControlsWidget *inputC = new InputControlsWidget( p_intf );
+    controlLayout->addWidget( inputC, 0, 0, 1, -1 );
 
     /* Second line */
-    controlLayout->addWidget( createWidget( PLAY_BUTTON, false, true ), 1, 0, 1, 2 );
-    controlLayout->addWidget( createWidget( PREVIOUS_BUTTON ), 1, 2 );
-    controlLayout->addWidget( createWidget( STOP_BUTTON ), 1, 3 );
-    controlLayout->addWidget( createWidget( NEXT_BUTTON ), 1, 4 );
+    /* QString line2 = QString( "%1-2;%2;%3;%4;%5;%2;%6;%2;%7;%2;%8;%9;%10-4")
+        .arg( PLAY_BUTTON )
+        .arg( WIDGET_SPACER )
+        .arg( PREVIOUS_BUTTON )
+        .arg( STOP_BUTTON )
+        .arg( NEXT_BUTTON )
+        .arg( MENU_BUTTONS )
+        .arg( TELETEXT_BUTTONS )
+        .arg( DEFULLSCREEN_BUTTON )
+        .arg( WIDGET_SPACER_EXTEND )
+        .arg( TIME_LABEL )
+        .arg( VOLUME ); */
 
-    controlLayout->addWidget( createWidget( MENU_BUTTONS ), 1, 5 );
-    controlLayout->addWidget( createWidget( TELETEXT_BUTTONS ), 1, 6 );
-    QToolButton *fullscreenButton =
-         qobject_cast<QToolButton *>(createWidget( FULLSCREEN_BUTTON ) );
-    fullscreenButton->setIcon( QIcon( ":/defullscreen" ) );
-    controlLayout->addWidget( fullscreenButton, 1, 7 );
-
-    controlLayout->setColumnStretch( 9, 10 );
-
-    TimeLabel *timeLabel = new TimeLabel( p_intf );
-
-    controlLayout->addWidget( timeLabel, 1, 10 );
-    controlLayout->addWidget( createWidget( VOLUME, false, false, true ),
-            1, 11, 1, 3 );
+    QString line = getSettings()->value( "MainWindow/FSCline",
+            "0-2;21;4;2;5;21;18;21;19;21;9;22;23-4" ).toString();
+    parseAndCreateLine( line, 1 );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
@@ -832,9 +937,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
-    getSettings()->beginGroup( "FullScreen" );
-    getSettings()->setValue( "pos", pos() );
-    getSettings()->endGroup();
+    getSettings()->setValue( "FullScreen/pos", pos() );
     detachVout();
     vlc_mutex_destroy( &lock );
 }

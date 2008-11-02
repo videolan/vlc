@@ -152,8 +152,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **************************/
     /* Connect the input manager to the GUI elements it manages */
 
-    /* It is also connected to the control->slider, see the ControlsWidget */
-    /* Change the SpeedRate in the Status */
+    /* Change the SpeedRate in the Status Bar */
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
     /**
@@ -379,9 +378,11 @@ void MainInterface::handleMainUi( QSettings *settings )
                    settings->value( "adv-controls", false ).toBool() );
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
+    InputControlsWidget *inputC = new InputControlsWidget( p_intf );
 
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
+    mainLayout->insertWidget( 0, inputC, 0, Qt::AlignBottom );
 
     /* Create the Speed Control Widget */
     speedControl = new SpeedControlWidget( p_intf );

@@ -66,19 +66,23 @@ typedef enum buttonType_e
     SLOWER_BUTTON,
     FASTER_BUTTON,
     FULLSCREEN_BUTTON,
+    DEFULLSCREEN_BUTTON,
     EXTENDED_BUTTON,
     PLAYLIST_BUTTON,
     SNAPSHOT_BUTTON,
     RECORD_BUTTON,
     ATOB_BUTTON,
-#if 0
     FRAME_BUTTON,
-#endif
     INPUT_SLIDER,
     VOLUME_SLIDER,
     MENU_BUTTONS,
     TELETEXT_BUTTONS,
     VOLUME,
+    WIDGET_SPACER,
+    WIDGET_SPACER_EXTEND,
+    TIME_LABEL,
+    SPLITTER,
+    ADVANCED_CONTROLLER,
 } buttonType_e;
 
 typedef enum actionType_e
@@ -95,15 +99,24 @@ typedef enum actionType_e
     PLAYLIST_ACTION,
     SNAPSHOT_ACTION,
     RECORD_ACTION,
+    FRAME_ACTION,
     ATOB_ACTION
 } actionType_e;
+
+enum
+{
+   WIDGET_NORMAL = 0x0,
+   WIDGET_FLAT   = 0x1,
+   WIDGET_BIG    = 0x2,
+   WIDGET_SHINY  = 0x4,
+};
 
 class AbstractController : public QFrame
 {
     Q_OBJECT
 public:
     AbstractController( intf_thread_t  *_p_i );
-    virtual ~AbstractController()  {};
+    int getWidth() { return controlLayout->columnCount(); }
 
 protected:
     intf_thread_t       *p_intf;
@@ -111,11 +124,14 @@ protected:
     QSignalMapper       *toolbarActionsMapper;
     QGridLayout         *controlLayout;
 
-    QWidget *createWidget( buttonType_e, bool b_flat = false,
-                           bool b_big = false, bool b_shiny = false );
-    void setupButton( QAbstractButton * );
+    AdvControlsWidget   *advControls;
+
+    void parseAndCreateLine( QString config, int i_line );
 
 private:
+    QWidget *createWidget( buttonType_e, int *i_size,
+                           int options = WIDGET_NORMAL );
+    void setupButton( QAbstractButton * );
     QWidget *discFrame();
     QWidget *telexFrame();
 
@@ -134,9 +150,7 @@ protected slots:
     void playlist();
     void snapshot();
     void record();
-#if 0
     void frame();
-#endif
 
     virtual void setStatus( int );
 
@@ -146,6 +160,14 @@ signals:
     void inputIsRecordable( bool ); /// same ?
 };
 
+/**
+ * SPECIAL Widgets that are a bit more than just a ToolButton
+ * and have an icon/behaviour that changes depending on the context:
+ * - playButton
+ * - A->B Button
+ * - Teletext group buttons
+ * - Sound Widget group
+ **/
 class PlayButton : public QToolButton
 {
     Q_OBJECT
@@ -199,7 +221,14 @@ class AdvControlsWidget : public AbstractController
     Q_OBJECT
 public:
     AdvControlsWidget( intf_thread_t * );
-    virtual ~AdvControlsWidget();
+};
+
+/* Slider Bar */
+class InputControlsWidget : public AbstractController
+{
+    Q_OBJECT
+public:
+    InputControlsWidget( intf_thread_t * );
 };
 
 /* Button Bar */
@@ -214,7 +243,6 @@ public:
 protected:
     friend class MainInterface;
 
-    AdvControlsWidget   *advControls;
     bool                 b_advancedVisible;
 
 protected slots:
