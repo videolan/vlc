@@ -181,7 +181,11 @@ FILE *utf8_fopen (const char *filename, const char *mode)
  */
 int utf8_mkdir( const char *dirname, mode_t mode )
 {
-#if defined (UNDER_CE) || defined (WIN32)
+#if defined (UNDER_CE)
+    (void) mode;
+    /* mkdir converts internally to wchar */
+    return _mkdir(dirname);
+#elif defined (WIN32)
     (void) mode;
     CONVERT_PATH (dirname, wpath, -1);
     return _wmkdir (wpath);
