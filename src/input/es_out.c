@@ -160,9 +160,10 @@ struct es_out_sys_t
 static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
-static void         EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
+static void         EsOutDelete ( es_out_t *out );
 
+static void         EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force );
 static void         EsOutAddInfo( es_out_t *, es_out_id_t *es );
 
 static bool EsIsSelected( es_out_id_t *es );
@@ -221,6 +222,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     out->pf_send    = EsOutSend;
     out->pf_del     = EsOutDel;
     out->pf_control = EsOutControl;
+    out->pf_destroy = EsOutDelete;
     out->p_sys      = p_sys;
     out->b_sout     = p_input->p->p_sout != NULL;
 
@@ -306,62 +308,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->p_sout_record = NULL;
 
     return out;
-}
-
-/*****************************************************************************
- * input_EsOutDelete:
- *****************************************************************************/
-void input_EsOutDelete( es_out_t *out )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-    int i;
-
-    if( p_sys->p_sout_record )
-        input_EsOutSetRecord( out, false );
-
-    for( i = 0; i < p_sys->i_es; i++ )
-    {
-        if( p_sys->es[i]->p_dec )
-            input_DecoderDelete( p_sys->es[i]->p_dec );
-
-        free( p_sys->es[i]->psz_language );
-        free( p_sys->es[i]->psz_language_code );
-        es_format_Clean( &p_sys->es[i]->fmt );
-
-        free( p_sys->es[i] );
-    }
-    if( p_sys->ppsz_audio_language )
-    {
-        for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
-            free( p_sys->ppsz_audio_language[i] );
-        free( p_sys->ppsz_audio_language );
-    }
-    if( p_sys->ppsz_sub_language )
-    {
-        for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
-            free( p_sys->ppsz_sub_language[i] );
-        free( p_sys->ppsz_sub_language );
-    }
-    free( p_sys->es );
-
-    /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
-    for( i = 0; i < p_sys->i_pgrm; i++ )
-    {
-        es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
-        input_clock_Delete( p_pgrm->p_clock );
-        free( p_pgrm->psz_now_playing );
-        free( p_pgrm->psz_publisher );
-        free( p_pgrm->psz_name );
-        if( p_pgrm->p_epg )
-            vlc_epg_Delete( p_pgrm->p_epg );
-
-        free( p_pgrm );
-    }
-    TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
-    vlc_mutex_destroy( &p_sys->lock );
-
-    free( p_sys );
-    free( out );
 }
 
 es_out_id_t *input_EsOutGetFromID( es_out_t *out, int i_id )
@@ -671,6 +617,60 @@ void input_EsOutUnlock( es_out_t *out )
 /*****************************************************************************
  *
  *****************************************************************************/
+static void EsOutDelete( es_out_t *out )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+    int i;
+
+    if( p_sys->p_sout_record )
+        input_EsOutSetRecord( out, false );
+
+    for( i = 0; i < p_sys->i_es; i++ )
+    {
+        if( p_sys->es[i]->p_dec )
+            input_DecoderDelete( p_sys->es[i]->p_dec );
+
+        free( p_sys->es[i]->psz_language );
+        free( p_sys->es[i]->psz_language_code );
+        es_format_Clean( &p_sys->es[i]->fmt );
+
+        free( p_sys->es[i] );
+    }
+    if( p_sys->ppsz_audio_language )
+    {
+        for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
+            free( p_sys->ppsz_audio_language[i] );
+        free( p_sys->ppsz_audio_language );
+    }
+    if( p_sys->ppsz_sub_language )
+    {
+        for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
+            free( p_sys->ppsz_sub_language[i] );
+        free( p_sys->ppsz_sub_language );
+    }
+    free( p_sys->es );
+
+    /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
+    for( i = 0; i < p_sys->i_pgrm; i++ )
+    {
+        es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
+        input_clock_Delete( p_pgrm->p_clock );
+        free( p_pgrm->psz_now_playing );
+        free( p_pgrm->psz_publisher );
+        free( p_pgrm->psz_name );
+        if( p_pgrm->p_epg )
+            vlc_epg_Delete( p_pgrm->p_epg );
+
+        free( p_pgrm );
+    }
+    TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
+    vlc_mutex_destroy( &p_sys->lock );
+
+    free( p_sys );
+    free( out );
+}
+
+
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 {
     es_out_sys_t *p_sys = out->p_sys;

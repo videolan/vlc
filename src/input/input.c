@@ -1275,7 +1275,7 @@ error:
     input_ChangeState( p_input, ERROR_S );
 
     if( p_input->p->p_es_out )
-        input_EsOutDelete( p_input->p->p_es_out );
+        es_out_Delete( p_input->p->p_es_out );
 #ifdef ENABLE_SOUT
     if( p_input->p->p_sout )
     {
@@ -1363,7 +1363,7 @@ static void End( input_thread_t * p_input )
 
     /* Unload all modules */
     if( p_input->p->p_es_out )
-        input_EsOutDelete( p_input->p->p_es_out );
+        es_out_Delete( p_input->p->p_es_out );
 
     if( !p_input->b_preparsing )
     {

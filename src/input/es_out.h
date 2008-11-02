@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
-void       input_EsOutDelete( es_out_t * );
 es_out_id_t *input_EsOutGetFromID( es_out_t *, int i_id );
 mtime_t    input_EsOutGetWakeup( es_out_t * );
 void       input_EsOutSetDelay( es_out_t *, int i_cat, int64_t );

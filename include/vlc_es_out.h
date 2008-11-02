@@ -71,7 +71,7 @@ enum es_out_query_e
     /* PCR handling, DTS/PTS will be automatically computed using thoses PCR
      * XXX: SET_PCR(_GROUP) are in charge of the pace control. They will wait
      * to slow down the demuxer so that it reads at the right speed.
-     * XXX: if you want PREROLL just call ES_OUT_SET_NEXT_DISPLAY_TIME and send$
+     * XXX: if you want PREROLL just call ES_OUT_SET_NEXT_DISPLAY_TIME and send
      * as you would normally do.
      */
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
@@ -92,7 +92,10 @@ enum es_out_query_e
     /* Set epg for group (dynamic) */
     ES_OUT_SET_GROUP_EPG,   /* arg1=int i_group arg2=vlc_epg_t */
     /* */
-    ES_OUT_DEL_GROUP        /* arg1=int i_group */
+    ES_OUT_DEL_GROUP,       /* arg1=int i_group */
+
+    /* First value usable for private control */
+    ES_OUT_PRIVATE_START = 0x10000,
 };
 
 struct es_out_t
@@ -101,7 +104,9 @@ struct es_out_t
     int          (*pf_send)   ( es_out_t *, es_out_id_t *, block_t * );
     void         (*pf_del)    ( es_out_t *, es_out_id_t * );
     int          (*pf_control)( es_out_t *, int i_query, va_list );
-    bool      b_sout;
+    void         (*pf_destroy)( es_out_t * );
+
+    bool         b_sout;
 
     es_out_sys_t    *p_sys;
 };
@@ -137,6 +142,11 @@ static inline int es_out_Control( es_out_t *out, int i_query, ... )
     i_result = es_out_vaControl( out, i_query, args );
     va_end( args );
     return i_result;
+}
+
+static inline void es_out_Delete( es_out_t *p_out )
+{
+    p_out->pf_destroy( p_out );
 }
 
 /**
