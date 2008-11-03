@@ -200,7 +200,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->b_recording = false;
     TAB_INIT( p_input->p->i_bookmark, p_input->p->bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
-    p_input->p->p_es_out = NULL;
+    p_input->p->p_es_out_display =
+    p_input->p->p_es_out         = NULL;
     p_input->p->p_sout  = NULL;
     p_input->p->b_out_pace_control = false;
     p_input->i_pts_delay = 0;
@@ -1182,7 +1183,8 @@ static int Init( input_thread_t * p_input )
 #endif
 
     /* Create es out */
-    p_input->p->p_es_out = input_EsOutNew( p_input, p_input->p->i_rate );
+    p_input->p->p_es_out         =
+    p_input->p->p_es_out_display = input_EsOutNew( p_input, p_input->p->i_rate );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
@@ -1262,6 +1264,10 @@ static int Init( input_thread_t * p_input )
 error:
     input_ChangeState( p_input, ERROR_S );
 
+    if( p_input->p->p_es_out_display )
+    {
+        //TODO
+    }
     if( p_input->p->p_es_out )
         es_out_Delete( p_input->p->p_es_out );
 #ifdef ENABLE_SOUT
@@ -1304,6 +1310,7 @@ error:
     p_input->p->input.p_stream = NULL;
     p_input->p->input.p_access = NULL;
     p_input->p->p_es_out = NULL;
+    p_input->p->p_es_out_display = NULL;
     p_input->p->p_sout = NULL;
 
     return VLC_EGENERIC;
@@ -1350,6 +1357,10 @@ static void End( input_thread_t * p_input )
     free( p_input->p->slave );
 
     /* Unload all modules */
+    if( p_input->p->p_es_out_display )
+    {
+        //TODO
+    }
     if( p_input->p->p_es_out )
         es_out_Delete( p_input->p->p_es_out );
 
@@ -1511,7 +1522,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 
     /* */
     if( !i_ret )
-        es_out_SetPauseState( p_input->p->p_es_out, true, i_control_date );
+        es_out_SetPauseState( p_input->p->p_es_out, true, true, i_control_date );
 }
 static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 {
@@ -1537,7 +1548,7 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 
     /* */
     if( !i_ret )
-        es_out_SetPauseState( p_input->p->p_es_out, false, i_control_date );
+        es_out_SetPauseState( p_input->p->p_es_out, false, false, i_control_date );
 }
 
 static bool Control( input_thread_t *p_input, int i_type,
@@ -1787,7 +1798,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 /* FIXME do we need a RESET_PCR when !p_input->p->input.b_rescale_ts ? */
                 if( p_input->p->input.b_rescale_ts )
-                    es_out_SetRate( p_input->p->p_es_out, i_rate );
+                    es_out_SetRate( p_input->p->p_es_out, i_rate, i_rate );
 
                 b_force_update = true;
             }
@@ -1805,20 +1816,20 @@ static bool Control( input_thread_t *p_input, int i_type,
 
         case INPUT_CONTROL_SET_ES:
             /* No need to force update, es_out does it if needed */
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_BY_ID, val.i_int );
+            es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_BY_ID, val.i_int );
             break;
 
         case INPUT_CONTROL_RESTART_ES:
-            es_out_Control( p_input->p->p_es_out, ES_OUT_RESTART_ES_BY_ID, val.i_int );
+            es_out_Control( p_input->p->p_es_out_display, ES_OUT_RESTART_ES_BY_ID, val.i_int );
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            if( !es_out_SetDelay( p_input->p->p_es_out, AUDIO_ES, val.i_time ) )
+            if( !es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, val.i_time ) )
                 var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            if( !es_out_SetDelay( p_input->p->p_es_out, SPU_ES, val.i_time ) )
+            if( !es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, val.i_time ) )
                 var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
             break;
 
@@ -2029,7 +2040,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
                 else
                 {
-                    if( es_out_SetRecordState( p_input->p->p_es_out, val.b_bool ) )
+                    if( es_out_SetRecordState( p_input->p->p_es_out_display, val.b_bool ) )
                         val.b_bool = false;
                 }
                 p_input->p->b_recording = val.b_bool;
@@ -3099,8 +3110,8 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
         {
             const int i_id = list.p_list->p_values[count.i_int].i_int;
 
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
-            es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ES_BY_ID, i_id );
+            es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
+            es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
         }
         var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
     }

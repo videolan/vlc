@@ -54,10 +54,10 @@ enum es_out_query_private_e
     ES_OUT_SET_RECORD_STATE,                        /* arg1=bool                res=can fail */
 
     /* Set pause state */
-    ES_OUT_SET_PAUSE_STATE,                         /* arg1=bool arg2=mtime_t   res=can fail */
+    ES_OUT_SET_PAUSE_STATE,                         /* arg1=bool b_source_paused, bool b_paused arg2=mtime_t   res=can fail */
 
     /* Set rate */
-    ES_OUT_SET_RATE,                                /* arg1=int i_rate          res=can fail */
+    ES_OUT_SET_RATE,                                /* arg1=int i_source_rate arg2=int i_rate                  res=can fail */
 
     /* Set a new time */
     ES_OUT_SET_TIME,                                /* arg1=mtime_t             res=can fail */
@@ -104,13 +104,13 @@ static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record )
 {
     return es_out_Control( p_out, ES_OUT_SET_RECORD_STATE, b_record );
 }
-static inline int es_out_SetPauseState( es_out_t *p_out, bool b_paused, mtime_t i_date )
+static inline int es_out_SetPauseState( es_out_t *p_out, bool b_source_paused, bool b_paused, mtime_t i_date )
 {
-    return es_out_Control( p_out, ES_OUT_SET_PAUSE_STATE, b_paused, i_date );
+    return es_out_Control( p_out, ES_OUT_SET_PAUSE_STATE, b_source_paused, b_paused, i_date );
 }
-static inline int es_out_SetRate( es_out_t *p_out, int i_rate )
+static inline int es_out_SetRate( es_out_t *p_out, int i_source_rate, int i_rate )
 {
-    return es_out_Control( p_out, ES_OUT_SET_RATE, i_rate );
+    return es_out_Control( p_out, ES_OUT_SET_RATE, i_source_rate, i_rate );
 }
 static inline int es_out_SetTime( es_out_t *p_out, mtime_t i_date )
 {

@@ -2329,16 +2329,22 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_SET_PAUSE_STATE:
         {
-            const bool b = (bool)va_arg( args, int );
+            const bool b_source_paused = (bool)va_arg( args, int );
+            const bool b_paused = (bool)va_arg( args, int );
             const mtime_t i_date = (mtime_t) va_arg( args, mtime_t );
-            EsOutChangePause( out, b, i_date );
+
+            assert( !b_source_paused == !b_paused );
+            EsOutChangePause( out, b_paused, i_date );
 
             return VLC_SUCCESS;
         }
 
         case ES_OUT_SET_RATE:
         {
+            const int i_src_rate = (int)va_arg( args, int );
             const int i_rate = (int)va_arg( args, int );
+
+            assert( i_src_rate == i_rate );
             EsOutChangeRate( out, i_rate );
 
             return VLC_SUCCESS;
@@ -2347,6 +2353,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_TIME:
         {
             const mtime_t i_date = (mtime_t)va_arg( args, mtime_t );
+
             assert( i_date == -1 );
             EsOutChangePosition( out );
 
