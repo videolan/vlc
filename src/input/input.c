@@ -1511,7 +1511,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 
     /* */
     if( !i_ret )
-        input_EsOutChangePause( p_input->p->p_es_out, true, i_control_date );
+        es_out_SetPauseState( p_input->p->p_es_out, true, i_control_date );
 }
 static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 {
@@ -1537,7 +1537,7 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 
     /* */
     if( !i_ret )
-        input_EsOutChangePause( p_input->p->p_es_out, false, i_control_date );
+        es_out_SetPauseState( p_input->p->p_es_out, false, i_control_date );
 }
 
 static bool Control( input_thread_t *p_input, int i_type,
@@ -1549,7 +1549,7 @@ static bool Control( input_thread_t *p_input, int i_type,
     if( !p_input )
         return b_force_update;
 
-    input_EsOutLock( p_input->p->p_es_out );
+    es_out_Lock( p_input->p->p_es_out );
 
     switch( i_type )
     {
@@ -1584,7 +1584,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             if( f_pos < 0.0 ) f_pos = 0.0;
             if( f_pos > 1.0 ) f_pos = 1.0;
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            input_EsOutChangePosition( p_input->p->p_es_out );
+            es_out_SetTime( p_input->p->p_es_out, -1 );
             if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
                                 f_pos ) )
             {
@@ -1628,7 +1628,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             if( i_time < 0 ) i_time = 0;
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            input_EsOutChangePosition( p_input->p->p_es_out );
+            es_out_SetTime( p_input->p->p_es_out, -1 );
 
             i_ret = demux_Control( p_input->p->input.p_demux,
                                     DEMUX_SET_TIME, i_time );
@@ -1787,7 +1787,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 /* FIXME do we need a RESET_PCR when !p_input->p->input.b_rescale_ts ? */
                 if( p_input->p->input.b_rescale_ts )
-                    input_EsOutChangeRate( p_input->p->p_es_out, i_rate );
+                    es_out_SetRate( p_input->p->p_es_out, i_rate );
 
                 b_force_update = true;
             }
@@ -1847,7 +1847,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->p->input.i_title )
                 {
-                    input_EsOutChangePosition( p_input->p->p_es_out );
+                    es_out_SetTime( p_input->p->p_es_out, -1 );
 
                     demux_Control( p_demux, DEMUX_SET_TITLE, i_title );
                     input_ControlVarTitle( p_input, i_title );
@@ -1867,7 +1867,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 if( i_title >= 0 && i_title < p_input->p->input.i_title )
                 {
-                    input_EsOutChangePosition( p_input->p->p_es_out );
+                    es_out_SetTime( p_input->p->p_es_out, -1 );
 
                     access_Control( p_access, ACCESS_SET_TITLE, i_title );
                     stream_AccessReset( p_input->p->input.p_stream );
@@ -1914,7 +1914,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     p_input->p->input.title[p_demux->info.i_title]->i_seekpoint )
                 {
 
-                    input_EsOutChangePosition( p_input->p->p_es_out );
+                    es_out_SetTime( p_input->p->p_es_out, -1 );
 
                     demux_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
                 }
@@ -1949,7 +1949,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 if( i_seekpoint >= 0 && i_seekpoint <
                     p_input->p->input.title[p_access->info.i_title]->i_seekpoint )
                 {
-                    input_EsOutChangePosition( p_input->p->p_es_out );
+                    es_out_SetTime( p_input->p->p_es_out, -1 );
 
                     access_Control( p_access, ACCESS_SET_SEEKPOINT,
                                     i_seekpoint );
@@ -2046,7 +2046,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
             if( p_input->i_state == PAUSE_S )
             {
-                input_EsOutFrameNext( p_input->p->p_es_out );
+                es_out_SetFrameNext( p_input->p->p_es_out );
             }
             else if( p_input->i_state == PLAYING_S )
             {
@@ -2065,7 +2065,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             break;
     }
 
-    input_EsOutUnlock( p_input->p->p_es_out );
+    es_out_Unlock( p_input->p->p_es_out );
 
     return b_force_update;
 }

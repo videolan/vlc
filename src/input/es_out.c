@@ -311,160 +311,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     return out;
 }
 
-void input_EsOutChangeRate( es_out_t *out, int i_rate )
-{
-    es_out_sys_t      *p_sys = out->p_sys;
-
-    p_sys->i_rate = i_rate;
-
-    if( !p_sys->b_paused )
-        EsOutProgramsChangeRate( out );
-}
-
-void input_EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-
-    /* XXX the order is important */
-    if( b_paused )
-    {
-        EsOutDecodersChangePause( out, true, i_date );
-        EsOutProgramChangePause( out, true, i_date );
-    }
-    else
-    {
-        if( p_sys->i_buffering_extra_initial > 0 )
-        {
-            mtime_t i_stream_start;
-            mtime_t i_system_start;
-            mtime_t i_stream_duration;
-            mtime_t i_system_duration;
-            int i_ret;
-            i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
-                                          &i_stream_start, &i_system_start,
-                                          &i_stream_duration, &i_system_duration );
-            if( !i_ret )
-            {
-                /* FIXME pcr != exactly what wanted */
-                const mtime_t i_used = /*(i_stream_duration - p_sys->p_input->i_pts_delay)*/ p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
-                i_date -= i_used;
-            }
-            p_sys->i_buffering_extra_initial = 0;
-            p_sys->i_buffering_extra_stream = 0;
-            p_sys->i_buffering_extra_system = 0;
-        }
-        EsOutProgramChangePause( out, false, i_date );
-        EsOutDecodersChangePause( out, false, i_date );
-
-        EsOutProgramsChangeRate( out );
-    }
-    p_sys->b_paused = b_paused;
-}
-void input_EsOutChangePosition( es_out_t *out )
-{
-    es_out_sys_t      *p_sys = out->p_sys;
-
-    for( int i = 0; i < p_sys->i_es; i++ )
-    {
-        es_out_id_t *p_es = p_sys->es[i];
-
-        if( !p_es->p_dec )
-            continue;
-
-        input_DecoderStartBuffering( p_es->p_dec );
-
-        if( p_es->p_dec_record )
-            input_DecoderStartBuffering( p_es->p_dec );
-    }
-
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_Reset( p_sys->pgrm[i]->p_clock );
-
-    p_sys->b_buffering = true;
-    p_sys->i_buffering_extra_initial = 0;
-    p_sys->i_buffering_extra_stream = 0;
-    p_sys->i_buffering_extra_system = 0;
-    p_sys->i_preroll_end = -1;
-}
-
-void input_EsOutFrameNext( es_out_t *out )
-{
-    es_out_sys_t *p_sys = out->p_sys;
-    es_out_id_t *p_es_video = NULL;
-
-    if( p_sys->b_buffering )
-    {
-        msg_Warn( p_sys->p_input, "buffering, ignoring 'frame next'" );
-        return;
-    }
-
-    assert( p_sys->b_paused );
-
-    for( int i = 0; i < p_sys->i_es; i++ )
-    {
-        es_out_id_t *p_es = p_sys->es[i];
-
-        if( p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec )
-        {
-            p_es_video = p_es;
-            break;
-        }
-    }
-
-    if( !p_es_video )
-    {
-        msg_Warn( p_sys->p_input, "No video track selected, ignoring 'frame next'" );
-        return;
-    }
-
-    mtime_t i_duration;
-    input_DecoderFrameNext( p_es_video->p_dec, &i_duration );
-
-    msg_Dbg( out->p_sys->p_input, "input_EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
-
-    if( i_duration <= 0 )
-        i_duration = 40*1000;
-
-    /* FIXME it is not a clean way ? */
-    if( p_sys->i_buffering_extra_initial <= 0 )
-    {
-        mtime_t i_stream_start;
-        mtime_t i_system_start;
-        mtime_t i_stream_duration;
-        mtime_t i_system_duration;
-        int i_ret;
-
-        i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
-                                      &i_stream_start, &i_system_start,
-                                      &i_stream_duration, &i_system_duration );
-        if( i_ret )
-            return;
-
-        p_sys->i_buffering_extra_initial = 1 + i_stream_duration - p_sys->p_input->i_pts_delay; /* FIXME < 0 ? */
-        p_sys->i_buffering_extra_system =
-        p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
-    }
-
-    const int i_rate = input_clock_GetRate( p_sys->p_pgrm->p_clock );
-
-    p_sys->b_buffering = true;
-    p_sys->i_buffering_extra_system += i_duration;
-    p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial +
-                                      ( p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial ) *
-                                                INPUT_RATE_DEFAULT / i_rate;
-
-    p_sys->i_preroll_end = -1;
-}
-
-void input_EsOutLock( es_out_t *out )
-{
-    vlc_mutex_lock( &out->p_sys->lock );
-}
-void input_EsOutUnlock( es_out_t *out )
-{
-    vlc_mutex_unlock( &out->p_sys->lock );
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -668,6 +514,83 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
 
     return VLC_SUCCESS;
 }
+static void EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    /* XXX the order is important */
+    if( b_paused )
+    {
+        EsOutDecodersChangePause( out, true, i_date );
+        EsOutProgramChangePause( out, true, i_date );
+    }
+    else
+    {
+        if( p_sys->i_buffering_extra_initial > 0 )
+        {
+            mtime_t i_stream_start;
+            mtime_t i_system_start;
+            mtime_t i_stream_duration;
+            mtime_t i_system_duration;
+            int i_ret;
+            i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+                                          &i_stream_start, &i_system_start,
+                                          &i_stream_duration, &i_system_duration );
+            if( !i_ret )
+            {
+                /* FIXME pcr != exactly what wanted */
+                const mtime_t i_used = /*(i_stream_duration - p_sys->p_input->i_pts_delay)*/ p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
+                i_date -= i_used;
+            }
+            p_sys->i_buffering_extra_initial = 0;
+            p_sys->i_buffering_extra_stream = 0;
+            p_sys->i_buffering_extra_system = 0;
+        }
+        EsOutProgramChangePause( out, false, i_date );
+        EsOutDecodersChangePause( out, false, i_date );
+
+        EsOutProgramsChangeRate( out );
+    }
+    p_sys->b_paused = b_paused;
+}
+
+static void EsOutChangeRate( es_out_t *out, int i_rate )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+
+    p_sys->i_rate = i_rate;
+
+    if( !p_sys->b_paused )
+        EsOutProgramsChangeRate( out );
+}
+
+static void EsOutChangePosition( es_out_t *out )
+{
+    es_out_sys_t      *p_sys = out->p_sys;
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( !p_es->p_dec )
+            continue;
+
+        input_DecoderStartBuffering( p_es->p_dec );
+
+        if( p_es->p_dec_record )
+            input_DecoderStartBuffering( p_es->p_dec );
+    }
+
+    for( int i = 0; i < p_sys->i_pgrm; i++ )
+        input_clock_Reset( p_sys->pgrm[i]->p_clock );
+
+    p_sys->b_buffering = true;
+    p_sys->i_buffering_extra_initial = 0;
+    p_sys->i_buffering_extra_stream = 0;
+    p_sys->i_buffering_extra_system = 0;
+    p_sys->i_preroll_end = -1;
+}
+
 
 
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
@@ -794,6 +717,77 @@ static void EsOutProgramsChangeRate( es_out_t *out )
     for( int i = 0; i < p_sys->i_pgrm; i++ )
         input_clock_ChangeRate( p_sys->pgrm[i]->p_clock, p_sys->i_rate );
 }
+
+static void EsOutFrameNext( es_out_t *out )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+    es_out_id_t *p_es_video = NULL;
+
+    if( p_sys->b_buffering )
+    {
+        msg_Warn( p_sys->p_input, "buffering, ignoring 'frame next'" );
+        return;
+    }
+
+    assert( p_sys->b_paused );
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( p_es->fmt.i_cat == VIDEO_ES && p_es->p_dec )
+        {
+            p_es_video = p_es;
+            break;
+        }
+    }
+
+    if( !p_es_video )
+    {
+        msg_Warn( p_sys->p_input, "No video track selected, ignoring 'frame next'" );
+        return;
+    }
+
+    mtime_t i_duration;
+    input_DecoderFrameNext( p_es_video->p_dec, &i_duration );
+
+    msg_Dbg( out->p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
+
+    if( i_duration <= 0 )
+        i_duration = 40*1000;
+
+    /* FIXME it is not a clean way ? */
+    if( p_sys->i_buffering_extra_initial <= 0 )
+    {
+        mtime_t i_stream_start;
+        mtime_t i_system_start;
+        mtime_t i_stream_duration;
+        mtime_t i_system_duration;
+        int i_ret;
+
+        i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+                                      &i_stream_start, &i_system_start,
+                                      &i_stream_duration, &i_system_duration );
+        if( i_ret )
+            return;
+
+        p_sys->i_buffering_extra_initial = 1 + i_stream_duration - p_sys->p_input->i_pts_delay; /* FIXME < 0 ? */
+        p_sys->i_buffering_extra_system =
+        p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
+    }
+
+    const int i_rate = input_clock_GetRate( p_sys->p_pgrm->p_clock );
+
+    p_sys->b_buffering = true;
+    p_sys->i_buffering_extra_system += i_duration;
+    p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial +
+                                      ( p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial ) *
+                                                INPUT_RATE_DEFAULT / i_rate;
+
+    p_sys->i_preroll_end = -1;
+}
+
+
 
 static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, const char *psz_language,
                                      bool b_delete )
@@ -1899,6 +1893,8 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
             if( input_DecoderIsEmpty( es->p_dec ) &&
                 ( !es->p_dec_record || input_DecoderIsEmpty( es->p_dec_record ) ))
                 break;
+            /* FIXME there should be a way to have auto deleted es, but there will be
+             * a problem when another codec of the same type is created (mainly video) */
             msleep( 20*1000 );
         }
         EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
@@ -2176,7 +2172,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_RESET_PCR:
             msg_Err( p_sys->p_input, "ES_OUT_RESET_PCR called" );
-            input_EsOutChangePosition( out );
+            EsOutChangePosition( out );
             return VLC_SUCCESS;
 
         case ES_OUT_GET_TS:
@@ -2330,6 +2326,44 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_RECORD_STATE:
             b = (bool) va_arg( args, int );
             return EsOutSetRecord( out, b );
+
+        case ES_OUT_SET_PAUSE_STATE:
+        {
+            const bool b = (bool)va_arg( args, int );
+            const mtime_t i_date = (mtime_t) va_arg( args, mtime_t );
+            EsOutChangePause( out, b, i_date );
+
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_SET_RATE:
+        {
+            const int i_rate = (int)va_arg( args, int );
+            EsOutChangeRate( out, i_rate );
+
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_SET_TIME:
+        {
+            const mtime_t i_date = (mtime_t)va_arg( args, mtime_t );
+            assert( i_date == -1 );
+            EsOutChangePosition( out );
+
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_SET_FRAME_NEXT:
+            EsOutFrameNext( out );
+            return VLC_SUCCESS;
+
+        case ES_OUT_LOCK:
+            vlc_mutex_lock( &p_sys->lock );
+            return VLC_SUCCESS;
+
+        case ES_OUT_UNLOCK:
+            vlc_mutex_unlock( &p_sys->lock );
+            return VLC_SUCCESS;
 
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );

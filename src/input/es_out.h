@@ -47,11 +47,29 @@ enum es_out_query_private_e
     /* Check if es_out has still data to play */
     ES_OUT_GET_EMPTY,                               /* arg1=bool*               res=cannot fail */
 
-    /* */
+    /* Set delay for a ES category */
     ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=can fail */
 
-    /* */
+    /* Set record state */
     ES_OUT_SET_RECORD_STATE,                        /* arg1=bool                res=can fail */
+
+    /* Set pause state */
+    ES_OUT_SET_PAUSE_STATE,                         /* arg1=bool arg2=mtime_t   res=can fail */
+
+    /* Set rate */
+    ES_OUT_SET_RATE,                                /* arg1=int i_rate          res=can fail */
+
+    /* Set a new time */
+    ES_OUT_SET_TIME,                                /* arg1=mtime_t             res=can fail */
+
+    /* Set next frame */
+    ES_OUT_SET_FRAME_NEXT,                          /*                          res=can fail */
+
+    /* Lock/Unlock es_out
+     * XXX es_out is safe without them, but they ensure coherency between
+     * calls if needed (if es_out is called outside of the main thread) */
+    ES_OUT_LOCK,                                    /*                          res=cannot fail */
+    ES_OUT_UNLOCK,                                  /*                          res=cannot fail */
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -86,15 +104,33 @@ static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record )
 {
     return es_out_Control( p_out, ES_OUT_SET_RECORD_STATE, b_record );
 }
+static inline int es_out_SetPauseState( es_out_t *p_out, bool b_paused, mtime_t i_date )
+{
+    return es_out_Control( p_out, ES_OUT_SET_PAUSE_STATE, b_paused, i_date );
+}
+static inline int es_out_SetRate( es_out_t *p_out, int i_rate )
+{
+    return es_out_Control( p_out, ES_OUT_SET_RATE, i_rate );
+}
+static inline int es_out_SetTime( es_out_t *p_out, mtime_t i_date )
+{
+    return es_out_Control( p_out, ES_OUT_SET_TIME, i_date );
+}
+static inline int es_out_SetFrameNext( es_out_t *p_out )
+{
+    return es_out_Control( p_out, ES_OUT_SET_FRAME_NEXT );
+}
+static inline void es_out_Lock( es_out_t *p_out )
+{
+    int i_ret = es_out_Control( p_out, ES_OUT_LOCK );
+    assert( !i_ret );
+}
+static inline void es_out_Unlock( es_out_t *p_out )
+{
+    int i_ret = es_out_Control( p_out, ES_OUT_UNLOCK );
+    assert( !i_ret );
+}
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
-
-void       input_EsOutChangeRate( es_out_t *, int );
-void       input_EsOutChangePause( es_out_t *, bool b_paused, mtime_t i_date );
-void       input_EsOutChangePosition( es_out_t * );
-void       input_EsOutFrameNext( es_out_t * );
-
-void       input_EsOutLock( es_out_t * );
-void       input_EsOutUnlock( es_out_t * );
 
 #endif
