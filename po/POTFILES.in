@@ -353,10 +353,8 @@ modules/audio_mixer/float32.c
 modules/audio_mixer/spdif.c
 modules/audio_mixer/trivial.c
 modules/audio_output/alsa.c
-modules/audio_output/arts.c
 modules/audio_output/auhal.c
 modules/audio_output/directx.c
-modules/audio_output/esd.c
 modules/audio_output/file.c
 modules/audio_output/hd1000a.cpp
 modules/audio_output/jack.c
