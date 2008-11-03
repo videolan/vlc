@@ -206,7 +206,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 msg_Warn( p_demux, "unsupported XSPF version" );
         }
         /* attribute: xmlns */
-        else if( !strcmp( psz_name, "xmlns" ) )
+        else if( !strcmp( psz_name, "xmlns" ) || !strcmp( psz_name, "xmlns:vlc" ) )
             ;
         else if( !strcmp( psz_name, "xml:base" ) )
         {
