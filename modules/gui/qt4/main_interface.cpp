@@ -927,12 +927,15 @@ void MainInterface::toggleUpdateSystrayMenu()
         /* Visible */
 #ifdef WIN32
         /* check if any visible window is above vlc in the z-order,
-         * but ignore the ones always on top */
+         * but ignore the ones always on top
+         * and the ones which can't be activated */
         WINDOWINFO wi;
         HWND hwnd;
         wi.cbSize = sizeof( WINDOWINFO );
         for( hwnd = GetNextWindow( internalWinId(), GW_HWNDPREV );
-                hwnd && !IsWindowVisible( hwnd );
+                hwnd && ( !IsWindowVisible( hwnd ) ||
+                    ( GetWindowInfo( hwnd, &wi ) &&
+                      (wi.dwExStyle&WS_EX_NOACTIVATE) ) );
                 hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) );
         if( !hwnd || !GetWindowInfo( hwnd, &wi ) ||
                 (wi.dwExStyle&WS_EX_TOPMOST) )
