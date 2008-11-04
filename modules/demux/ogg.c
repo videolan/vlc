@@ -1738,10 +1738,9 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     if (dirac_bool( &bs )) {
         dirac_uint( &bs ); /* chroma_format */
     }
+
     if (dirac_bool( &bs )) {
-        if (dirac_bool( &bs )) { /* interlaced */
-            dirac_bool( &bs ); /* top_field_first */
-        }
+        dirac_uint( &bs ); /* scan_format */
     }
 
     static const struct {
