@@ -180,6 +180,9 @@
 #define FOURCC_iviv VLC_FOURCC( 'i', 'v', 'i', 'v' )
 #define FOURCC_name VLC_FOURCC( 'n', 'a', 'm', 'e' )
 #define FOURCC_priv VLC_FOURCC( 'p', 'r', 'i', 'v' )
+#define FOURCC_drmi VLC_FOURCC( 'd', 'r', 'm', 'i' )
+#define FOURCC_frma VLC_FOURCC( 'f', 'r', 'm', 'a' )
+#define FOURCC_skcr VLC_FOURCC( 's', 'k', 'c', 'r' )
 
 #define FOURCC_text VLC_FOURCC( 't', 'e', 'x', 't' )
 #define FOURCC_tx3g VLC_FOURCC( 't', 'x', '3', 'g' )
@@ -468,6 +471,8 @@ typedef struct MP4_Box_data_sample_vide_s
     int     i_qt_image_description;
     uint8_t *p_qt_image_description;
 
+    void    *p_drms;
+
 } MP4_Box_data_sample_vide_t;
 
 #define MP4_TEXT_DISPLAY_FLAG_DONT_DISPLAY       (1<<0)
@@ -746,6 +751,18 @@ typedef struct MP4_Box_data_cmov_s
 
 typedef struct
 {
+    uint32_t i_type;
+} MP4_Box_data_frma_t;
+
+typedef struct
+{
+    uint32_t i_init;
+    uint32_t i_encr;
+    uint32_t i_decr;
+} MP4_Box_data_skcr_t;
+
+typedef struct
+{
     uint8_t  i_version;
     uint32_t i_flags;
 
@@ -891,6 +908,9 @@ typedef union MP4_Box_data_s
     MP4_Box_data_cmov_t *p_cmov;
 
     MP4_Box_data_moviehintinformation_rtp_t p_moviehintinformation_rtp;
+
+    MP4_Box_data_frma_t *p_frma;
+    MP4_Box_data_skcr_t *p_skcr;
 
     MP4_Box_data_rdrf_t *p_rdrf;
     MP4_Box_data_rmdr_t *p_rmdr;
