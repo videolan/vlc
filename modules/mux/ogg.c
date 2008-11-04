@@ -320,7 +320,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "adding input" );
 
-    p_input->p_sys = p_stream = malloc( sizeof( ogg_stream_t ) );
+    p_input->p_sys = p_stream = calloc( 1, sizeof( ogg_stream_t ) );
     if( !p_stream )
         return VLC_ENOMEM;
 
