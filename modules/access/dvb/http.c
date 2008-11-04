@@ -58,7 +58,7 @@
 #   include "descriptors/dr.h"
 #   include "psi.h"
 #   include "demux.h"
-#   include "sdt.h"
+#   include "tables/sdt.h"
 #endif
 
 #ifdef ENABLE_HTTPD
