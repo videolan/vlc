@@ -468,9 +468,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         p_obj = p_obj->p_parent;
     }
 
-    msg_bank_t *p_queue = &QUEUE;
-    vlc_mutex_lock( &p_queue->lock );
-
     /* Fill message information fields */
     p_item->i_type =        i_type;
     p_item->i_object_id =   (uintptr_t)p_this;
@@ -480,6 +477,9 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     p_item->psz_header =    psz_header;
 
     PrintMsg( p_this, p_item );
+
+    msg_bank_t *p_queue = &QUEUE;
+    vlc_mutex_lock( &p_queue->lock );
 #define bank p_queue
     for (int i = 0; i < bank->i_sub; i++)
     {
