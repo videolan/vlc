@@ -2224,31 +2224,20 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
         i = 0;
     }
 
-    p_pic = malloc( sizeof(picture_t) );
+    p_pic = picture_New( p_dec->fmt_out.video.i_chroma,
+                         p_dec->fmt_out.video.i_width,
+                         p_dec->fmt_out.video.i_height,
+                         p_dec->fmt_out.video.i_aspect );
     if( !p_pic ) return NULL;
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    vout_AllocatePicture( VLC_OBJECT(p_dec), p_pic,
-                          p_dec->fmt_out.video.i_chroma,
-                          p_dec->fmt_out.video.i_width,
-                          p_dec->fmt_out.video.i_height,
-                          p_dec->fmt_out.video.i_aspect );
-
-    if( !p_pic->i_planes )
-    {
-        free( p_pic );
-        return NULL;
-    }
-
-    p_pic->pf_release = video_release_buffer;
-    p_pic->p_sys = malloc( sizeof(picture_sys_t) );
+    p_pic->p_sys = calloc( 1, sizeof(picture_sys_t) );
     if( !p_pic->p_sys )
     {
-        free( p_pic );
+        picture_Release( p_pic );
         return NULL;
     }
-
-    p_pic->p_sys->p_owner = p_this;
-    p_pic->i_status = RESERVED_PICTURE;
+    p_pic->pf_release = video_release_buffer;
+    p_pic->i_refcount = 0;
 
     pp_ring[i] = p_pic;
     return p_pic;
