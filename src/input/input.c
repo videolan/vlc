@@ -490,6 +490,7 @@ void input_StopThread( input_thread_t *p_input )
 
 sout_instance_t * input_DetachSout( input_thread_t *p_input )
 {
+    assert( p_input->b_dead );
     sout_instance_t *p_sout = p_input->p->p_sout;
     vlc_object_detach( p_sout );
     p_input->p->p_sout = NULL;

@@ -768,8 +768,8 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
     if( p_input )
     {
         input_StopThread( p_input );
-        p_instance->p_sout = input_DetachSout( p_input );
         vlc_thread_join( p_input );
+        p_instance->p_sout = input_DetachSout( p_input );
         vlc_object_release( p_input );
     }
     if( p_instance->p_sout )
@@ -846,8 +846,8 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         }
 
         input_StopThread( p_input );
-        p_instance->p_sout = input_DetachSout( p_input );
         vlc_thread_join( p_input );
+        p_instance->p_sout = input_DetachSout( p_input );
         vlc_object_release( p_input );
         if( !p_instance->b_sout_keep && p_instance->p_sout )
         {
