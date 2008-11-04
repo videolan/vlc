@@ -778,8 +778,9 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
                      p_frag->i_buffer - 5 );
 
     bs_init( &s, pb_dec, i_dec );
-    /* Skip profile(8), constraint_set012, reserver(5), level(8) */
-    bs_skip( &s, 8 + 1+1+1 + 5 + 8 );
+    int i_profile_idc = bs_read( &s, 8 );
+    /* Skip constraint_set0123, reserved(4), level(8) */
+    bs_skip( &s, 1+1+1+1 + 4 + 8 );
     /* sps id */
     i_sps_id = bs_read_ue( &s );
     if( i_sps_id >= SPS_MAX )
@@ -788,6 +789,49 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         free( pb_dec );
         block_Release( p_frag );
         return;
+    }
+
+    if( 100 == i_profile_idc || 110 == i_profile_idc ||
+        122 == i_profile_idc || 244 == i_profile_idc ||
+         44 == i_profile_idc ||  83 == i_profile_idc ||
+         86 == i_profile_idc )
+    {
+        /* chroma_format_idc */
+        int i_chroma_format_idc = bs_read_ue( &s );
+        if( 3 == i_chroma_format_idc )
+            /* seperate_colour_plane_flag */
+            bs_skip( &s, 1 );
+        /* bit_depth_luma_minus8 */
+        bs_read_ue( &s );
+        /* bit_depth_chroma_minus8 */
+        bs_read_ue( &s );
+        /* qpprime_y_zero_transform_bypass_flag */
+        bs_skip( &s, 1 );
+        /* seq_scaling_matrix_present_flag */
+        i_tmp = bs_read( &s, 1 );
+        if( i_tmp )
+        {
+            for( int i = 0; i < ((3 != i_chroma_format_idc) ? 8 : 12); i++ ) {
+                /* seq_scaling_list_present_flag[i] */
+                i_tmp = bs_read( &s, 1 );
+                if( !i_tmp )
+                    continue;
+                int i_size_of_scaling_list = (i < 6 ) ? 16 : 64;
+                /* scaling_list (...) */
+                int i_lastscale = 8;
+                int i_nextscale = 8;
+                for( int j = 0; j < i_size_of_scaling_list; j++ ) {
+                    if( i_nextscale != 0 ) {
+                        /* delta_scale */
+                        i_tmp = bs_read( &s, 1 );
+                        i_nextscale = ( i_lastscale + i_tmp + 256 ) % 256;
+                        /* useDefaultScalingMatrixFlag = ... */
+                    }
+                    /* scalinglist[j] */
+                    i_lastscale = ( i_nextscale == 0 ) ? i_lastscale : i_nextscale;
+                }
+            }
+        }
     }
 
     /* Skip i_log2_max_frame_num */
@@ -858,7 +902,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
     i_tmp = bs_read( &s, 1 );
     if( i_tmp )
     {
-        /* read the aspect ratio part if any FIXME check it */
+        /* read the aspect ratio part if any */
         i_tmp = bs_read( &s, 1 );
         if( i_tmp )
         {
