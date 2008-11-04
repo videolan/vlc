@@ -791,16 +791,15 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         return;
     }
 
-    if( 100 == i_profile_idc || 110 == i_profile_idc ||
-        122 == i_profile_idc || 244 == i_profile_idc ||
-         44 == i_profile_idc ||  83 == i_profile_idc ||
-         86 == i_profile_idc )
+    if( i_profile_idc == 100 || i_profile_idc == 110 ||
+        i_profile_idc == 122 || i_profile_idc == 244 ||
+        i_profile_idc ==  44 || i_profile_idc ==  83 ||
+        i_profile_idc ==  86 )
     {
         /* chroma_format_idc */
-        int i_chroma_format_idc = bs_read_ue( &s );
-        if( 3 == i_chroma_format_idc )
-            /* seperate_colour_plane_flag */
-            bs_skip( &s, 1 );
+        const int i_chroma_format_idc = bs_read_ue( &s );
+        if( i_chroma_format_idc == 3 )
+            bs_skip( &s, 1 ); /* seperate_colour_plane_flag */
         /* bit_depth_luma_minus8 */
         bs_read_ue( &s );
         /* bit_depth_chroma_minus8 */
@@ -811,17 +810,20 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
         i_tmp = bs_read( &s, 1 );
         if( i_tmp )
         {
-            for( int i = 0; i < ((3 != i_chroma_format_idc) ? 8 : 12); i++ ) {
+            for( int i = 0; i < ((3 != i_chroma_format_idc) ? 8 : 12); i++ )
+            {
                 /* seq_scaling_list_present_flag[i] */
                 i_tmp = bs_read( &s, 1 );
                 if( !i_tmp )
                     continue;
-                int i_size_of_scaling_list = (i < 6 ) ? 16 : 64;
+                const int i_size_of_scaling_list = (i < 6 ) ? 16 : 64;
                 /* scaling_list (...) */
                 int i_lastscale = 8;
                 int i_nextscale = 8;
-                for( int j = 0; j < i_size_of_scaling_list; j++ ) {
-                    if( i_nextscale != 0 ) {
+                for( int j = 0; j < i_size_of_scaling_list; j++ )
+                {
+                    if( i_nextscale != 0 )
+                    {
                         /* delta_scale */
                         i_tmp = bs_read( &s, 1 );
                         i_nextscale = ( i_lastscale + i_tmp + 256 ) % 256;
