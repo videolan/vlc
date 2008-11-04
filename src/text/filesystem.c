@@ -51,7 +51,9 @@
 #endif
 #ifdef WIN32
 # include <io.h>
-# include <direct.h>
+# ifndef UNDER_CE
+#  include <direct.h>
+# endif
 #else
 # include <unistd.h>
 #endif
