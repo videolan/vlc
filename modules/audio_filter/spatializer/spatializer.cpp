@@ -80,12 +80,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-typedef struct aout_filter_sys_t
+struct aout_filter_sys_t
 {
     vlc_mutex_t lock;
     revmodel *p_reverbm;
 
-} aout_filter_sys_t;
+};
 
 class CLocker
 {
