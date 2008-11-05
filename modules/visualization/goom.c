@@ -173,7 +173,7 @@ static int Open( vlc_object_t *p_this )
     fmt.i_aspect = VOUT_ASPECT_FACTOR * width.i_int/height.i_int;
     fmt.i_sar_num = fmt.i_sar_den = 1;
 
-    p_thread->p_vout = vout_Request( p_filter, NULL, &fmt );
+    p_thread->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );
     if( p_thread->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
@@ -402,7 +402,7 @@ static void Close( vlc_object_t *p_this )
     vlc_thread_join( p_sys->p_thread );
 
     /* Free data */
-    vout_Request( p_filter, p_sys->p_thread->p_vout, 0 );
+    aout_filter_RequestVout( p_filter, p_sys->p_thread->p_vout, 0 );
     vlc_mutex_destroy( &p_sys->p_thread->lock );
     vlc_cond_destroy( &p_sys->p_thread->wait );
     vlc_object_detach( p_sys->p_thread );

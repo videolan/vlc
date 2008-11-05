@@ -92,7 +92,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-typedef struct aout_filter_sys_t
+struct aout_filter_sys_t
 {
     /* Filter static config */
     int i_band;
@@ -117,7 +117,7 @@ typedef struct aout_filter_sys_t
     float x2[32][2];
     float y2[32][128][2];
 
-} aout_filter_sys_t;
+};
 
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );

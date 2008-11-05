@@ -57,12 +57,12 @@ static void Close    ( vlc_object_t * );
 static void DoWork   ( aout_instance_t * , aout_filter_t *,
                 aout_buffer_t * , aout_buffer_t *);
 
-typedef struct aout_filter_sys_t
+struct aout_filter_sys_t
 {
     int i_nb;
     float *p_last;
     float f_max;
-} aout_filter_sys_t;
+};
 
 /*****************************************************************************
  * Module descriptor

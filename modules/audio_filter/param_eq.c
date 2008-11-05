@@ -82,7 +82,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-typedef struct aout_filter_sys_t
+struct aout_filter_sys_t
 {
     /* Filter static config */
     float   f_lowf, f_lowgain;
@@ -95,7 +95,7 @@ typedef struct aout_filter_sys_t
     /* State */
     float  *p_state;
  
-} aout_filter_sys_t;
+};
 
 
 

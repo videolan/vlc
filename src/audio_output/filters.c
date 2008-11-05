@@ -275,9 +275,12 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
 
     for ( i = 0; i < i_nb_filters; i++ )
     {
-        module_unneed( pp_filters[i], pp_filters[i]->p_module );
-        vlc_object_detach( pp_filters[i] );
-        vlc_object_release( pp_filters[i] );
+        aout_filter_t *p_filter = pp_filters[i];
+
+        module_unneed( p_filter, p_filter->p_module );
+        free( p_filter->p_owner );
+        vlc_object_detach( p_filter );
+        vlc_object_release( p_filter );
     }
 }
 
@@ -370,5 +373,16 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
     }
 
     assert( (*pp_input_buffer) == NULL || (*pp_input_buffer)->i_alloc_type != AOUT_ALLOC_STACK );
+}
+
+/*****************************************************************************
+ * aout_filter_RequestVout
+ *****************************************************************************/
+vout_thread_t *aout_filter_RequestVout( aout_filter_t *p_filter,
+                                        vout_thread_t *p_vout, video_format_t *p_fmt )
+{
+    if( !p_filter->pf_request_vout )
+        return NULL;
+    return p_filter->pf_request_vout( p_filter, p_vout, p_fmt );
 }
 

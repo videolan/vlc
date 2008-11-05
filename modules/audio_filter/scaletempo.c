@@ -76,7 +76,7 @@ vlc_module_end ()
  * frame: a single set of samples, one for each channel
  * VLC uses these terms differently
  */
-typedef struct aout_filter_sys_t
+struct aout_filter_sys_t
 {
     /* Filter static config */
     double    scale;
@@ -114,7 +114,7 @@ typedef struct aout_filter_sys_t
     /* for "audio filter" only, manage own buffers */
     int       i_buf;
     uint8_t  *p_buffers[2];
-} aout_filter_sys_t;
+};
 
 /*****************************************************************************
  * best_overlap_offset: calculate best offset for overlap

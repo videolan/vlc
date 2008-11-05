@@ -37,6 +37,7 @@
 #include <assert.h>
 
 #include <vlc_input.h>                 /* for input_thread_t and i_pts_delay */
+#include <vlc_vout.h>                  /* for vout_Request */
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
@@ -60,6 +61,9 @@ static int EqualizerCallback( vlc_object_t *, char const *,
 static int ReplayGainCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static void ReplayGainSelect( aout_instance_t *, aout_input_t * );
+
+static vout_thread_t *RequestVout( aout_filter_t *,
+                                   vout_thread_t *, video_format_t * );
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
@@ -269,6 +273,11 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
             vlc_object_attach( p_filter , p_aout );
 
+            p_filter->pf_request_vout = RequestVout;
+            p_filter->p_owner = malloc( sizeof(*p_filter->p_owner) );
+            p_filter->p_owner->p_aout  = p_aout;
+            p_filter->p_owner->p_input = p_input;
+
             /* try to find the requested filter */
             if( i_visual == 2 ) /* this can only be a visualization module */
             {
@@ -326,6 +335,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 msg_Err( p_aout, "cannot add user filter %s (skipped)",
                          psz_parser );
 
+                free( p_filter->p_owner );
                 vlc_object_detach( p_filter );
                 vlc_object_release( p_filter );
 
@@ -345,6 +355,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                              psz_parser );
 
                     module_unneed( p_filter, p_filter->p_module );
+                    free( p_filter->p_owner );
                     vlc_object_detach( p_filter );
                     vlc_object_release( p_filter );
 
@@ -780,6 +791,13 @@ static void inputResamplingStop( aout_input_t *p_input )
             : p_input->input.i_rate;
         p_input->pp_resamplers[0]->b_continuity = false;
     }
+}
+
+static vout_thread_t *RequestVout( aout_filter_t *p_filter,
+                                   vout_thread_t *p_vout, video_format_t *p_fmt )
+{
+    /* TODO */
+    return vout_Request( p_filter, p_vout, p_fmt );
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,

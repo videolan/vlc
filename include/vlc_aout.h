@@ -223,6 +223,8 @@ struct aout_fifo_t
 };
 
 /** audio output filter */
+typedef struct aout_filter_owner_sys_t aout_filter_owner_sys_t;
+typedef struct aout_filter_sys_t aout_filter_sys_t;
 struct aout_filter_t
 {
     VLC_COMMON_MEMBERS
@@ -232,13 +234,24 @@ struct aout_filter_t
     aout_alloc_t            output_alloc;
 
     module_t *              p_module;
-    struct aout_filter_sys_t * p_sys;
-    void                 (* pf_do_work)( struct aout_instance_t *,
-                                         struct aout_filter_t *,
-                                         struct aout_buffer_t *,
-                                         struct aout_buffer_t * );
-    bool              b_in_place;
-    bool              b_continuity;
+    aout_filter_sys_t       *p_sys;
+
+    bool                    b_in_place;
+    bool                    b_continuity;
+
+    void                    (*pf_do_work)( aout_instance_t *, aout_filter_t *,
+                                           aout_buffer_t *, aout_buffer_t * );
+
+    /* Owner fieldS
+     * XXX You MUST not use them directly */
+
+    /* Vout callback
+     * XXX use aout_filter_RequestVout */
+    vout_thread_t          *(*pf_request_vout)( aout_filter_t *,
+                                                vout_thread_t *, video_format_t * );
+
+    /* Private structure for the owner of the filter */
+    aout_filter_owner_sys_t *p_owner;
 };
 
 #define AOUT_RESAMPLING_NONE     0
@@ -421,6 +434,9 @@ VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
 #define aout_VisualPrev(a) aout_VisualChange( VLC_OBJECT(a),-1 )
 
 VLC_EXPORT( char *, aout_VisualChange, (vlc_object_t *, int ) );
+
+/* */
+VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( aout_filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) );
 
 # ifdef __cplusplus
 }
