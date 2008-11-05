@@ -112,11 +112,11 @@ typedef struct
 
 } goom_thread_t;
 
-typedef struct aout_filter_sys_t
+struct aout_filter_sys_t
 {
     goom_thread_t *p_thread;
 
-} aout_filter_sys_t;
+};
 
 static void DoWork   ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                        aout_buffer_t * );
