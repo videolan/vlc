@@ -1529,12 +1529,22 @@ static int ManageVideo( vout_thread_t *p_vout )
                            i_x, i_y, i_width, i_height );
     }
 
+    /* cursor hiding depending on --x11-event option
+     *      activated if:
+     *            value = 1 (Fullsupport) (default value)
+     *         or value = 2 (Fullscreen-Only) and condition met
+     */
+    int i_x11_event = var_CreateGetInteger( p_vout, "x11-event" );
+    bool b_x11_event = (    ( i_x11_event == 1 )
+                         || ( i_x11_event == 2 && p_vout->b_fullscreen )
+                       );
+
     /* Autohide Cursour */
     if( mdate() - p_vout->p_sys->i_time_mouse_last_moved >
         p_vout->p_sys->i_mouse_hide_timeout )
     {
         /* Hide the mouse automatically */
-        if( p_vout->p_sys->b_mouse_pointer_visible )
+        if( b_x11_event && p_vout->p_sys->b_mouse_pointer_visible )
         {
             ToggleCursor( p_vout );
         }
@@ -1790,10 +1800,21 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         }
     } while( !( b_expose && b_configure_notify && b_map_notify ) );
 
-    XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                  StructureNotifyMask | KeyPressMask |
-                  ButtonPressMask | ButtonReleaseMask |
-                  PointerMotionMask );
+    /* key and mouse events handling depending on --x11-event option
+     *      activated if:
+     *            value = 1 (Fullsupport) (default value)
+     *         or value = 2 (Fullscreen-Only) and condition met
+     */
+    int i_x11_event = var_CreateGetInteger( p_vout, "x11-event" );
+    bool b_x11_event = (    ( i_x11_event == 1 )
+                         || ( i_x11_event == 2 && p_vout->b_fullscreen )
+                       );
+
+    if ( b_x11_event )
+        XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
+                      StructureNotifyMask | KeyPressMask |
+                      ButtonPressMask | ButtonReleaseMask |
+                      PointerMotionMask );
 
 #ifdef MODULE_NAME_IS_x11
     if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
