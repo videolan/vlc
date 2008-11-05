@@ -1846,7 +1846,6 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
     demux_sys_t *p_sys = p_demux->p_sys;
     text_t      *txt = &p_sys->txt;
     char *psz_text = NULL;
-    char psz_end[12]= "", psz_begin[12] = "";
 
     for( ;; )
     {
@@ -1867,13 +1866,14 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         char *psz_temp = strcasestr( s, "<time");
         if( psz_temp != NULL )
         {
+            char psz_end[12], psz_begin[12];
             /* Line has begin and end */
             if( ( sscanf( psz_temp,
-                  "<%*[t|T]ime %*[b|B]egin=\"%[^\"]\" %*[e|E]nd=\"%[^\"]%*[^>]%[^\n\r]",
+                  "<%*[t|T]ime %*[b|B]egin=\"%11[^\"]\" %*[e|E]nd=\"%11[^\"]%*[^>]%[^\n\r]",
                             psz_begin, psz_end, psz_text) != 3 ) &&
                     /* Line has begin and no end */
                     ( sscanf( psz_temp,
-                              "<%*[t|T]ime %*[b|B]egin=\"%[^\"]\"%*[^>]%[^\n\r]",
+                              "<%*[t|T]ime %*[b|B]egin=\"%11[^\"]\"%*[^>]%[^\n\r]",
                               psz_begin, psz_text ) != 2) )
                 /* Line is not recognized */
             {
