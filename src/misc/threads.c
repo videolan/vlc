@@ -805,9 +805,8 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     i_ret = vlc_clone( &p_priv->thread_id, thread_entry, boot, i_priority );
     if( i_ret == 0 )
     {
-        msg_Dbg( p_this, "thread %lu (%s) created at priority %d (%s:%d)",
-                 (unsigned long)p_priv->thread_id, psz_name, i_priority,
-                 psz_file, i_line );
+        msg_Dbg( p_this, "thread (%s) created at priority %d (%s:%d)",
+                 psz_name, i_priority, psz_file, i_line );
         if( b_wait )
         {
             msg_Dbg( p_this, "waiting for thread initialization" );
