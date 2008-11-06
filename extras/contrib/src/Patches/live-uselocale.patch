@@ -102,15 +102,15 @@ diff -ru live.old/liveMedia/RTSPClient.cpp live/liveMedia/RTSPClient.cpp
  }
  
 diff -ru live.old/liveMedia/RTSPCommon.cpp live/liveMedia/RTSPCommon.cpp
---- live.old/liveMedia/RTSPCommon.cpp	2008-07-06 04:10:57.000000000 +0300
-+++ live/liveMedia/RTSPCommon.cpp	2008-07-13 12:53:20.000000000 +0300
+--- live.old/liveMedia/RTSPCommon.cpp      2008-11-03 23:28:14.000000000 -1000
++++ live/liveMedia/RTSPCommon.cpp  2008-11-06 09:05:19.000000000 -1000
 @@ -146,7 +146,7 @@
    char const* fields = buf + 7;
    while (*fields == ' ') ++fields;
-   float start, end;
+   double start, end;
 -  Locale("C", LC_NUMERIC);
 +  Locale("C", LC_NUMERIC_MASK);
-   if (sscanf(fields, "npt = %f - %f", &start, &end) == 2) {
+   if (sscanf(fields, "npt = %lf - %lf", &start, &end) == 2) {
      rangeStart = start;
      rangeEnd = end;
 --- live/config.mingw.old	2008-07-27 17:13:52.000000000 +0100
