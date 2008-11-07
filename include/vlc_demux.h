@@ -151,7 +151,7 @@ enum demux_query_e
     DEMUX_CAN_SEEK,            /* arg1= bool*    can fail (assume false)*/
 };
 
-VLC_EXPORT( int,       demux_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int i_bitrate, int i_align, int i_query, va_list args ) );
+VLC_EXPORT( int,       demux_vaControlHelper, ( stream_t *, int64_t i_start, int64_t i_end, int64_t i_bitrate, int i_align, int i_query, va_list args ) );
 
 /*************************************************************************
  * Miscellaneous helpers for demuxers

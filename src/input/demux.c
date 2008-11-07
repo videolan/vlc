@@ -206,7 +206,7 @@ void demux_Delete( demux_t *p_demux )
  *****************************************************************************/
 int demux_vaControlHelper( stream_t *s,
                             int64_t i_start, int64_t i_end,
-                            int i_bitrate, int i_align,
+                            int64_t i_bitrate, int i_align,
                             int i_query, va_list args )
 {
     int64_t i_tell;
