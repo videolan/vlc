@@ -43,7 +43,7 @@ static void Close( vlc_object_t * );
 
 #define FPS_TEXT N_("Frames per Second")
 #define FPS_LONGTEXT N_("This is the desired frame rate when " \
-    "playing raw video streams.")
+    "playing raw video streams.  In the form 30000/1001 or 29.97")
 
 #define WIDTH_TEXT N_("Width")
 #define WIDTH_LONGTEXT N_("This specifies the width in pixels of the raw " \
@@ -58,7 +58,7 @@ static void Close( vlc_object_t * );
 
 #define ASPECT_RATIO_TEXT N_("Aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
-    "Aspect ratio (4:3, 16:9). Default is square pixels." )
+    "Aspect ratio (4:3, 16:9). Default assumes square pixels." )
 
 vlc_module_begin ()
     set_shortname( "Raw Video" )
@@ -68,7 +68,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
     add_shortcut( "rawvideo" )
-    add_float( "rawvid-fps", 0, 0, FPS_TEXT, FPS_LONGTEXT, false )
+    add_string( "rawvid-fps", NULL, NULL, FPS_TEXT, FPS_LONGTEXT, false )
     add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 )
     add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 )
     add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
@@ -83,12 +83,11 @@ vlc_module_end ()
 struct demux_sys_t
 {
     int    frame_size;
-    float  f_fps;
 
     es_out_id_t *p_es_video;
     es_format_t  fmt_video;
 
-    mtime_t i_pcr;
+    date_t pcr;
 
     bool b_y4m;
 };
@@ -104,20 +103,22 @@ struct preset_t
     const char *psz_ext;
     int i_width;
     int i_height;
-    double f_fps;
-    const char *psz_aspect_ratio;
-    const char *psz_chroma;
+    unsigned u_fps_num;
+    unsigned u_fps_den;
+    unsigned u_ar_num;
+    unsigned u_ar_den;
+    int i_chroma;
 };
 
 static const struct preset_t p_presets[] =
 {
-    { "sqcif", 128, 96, 29.97, "4:3", "YV12" },
-    { "qcif", 176, 144, 29.97, "4:3", "YV12" },
-    { "cif", 352, 288, 29.97, "4:3", "YV12" },
-    { "4cif", 704, 576, 29.97, "4:3", "YV12" },
-    { "16cif", 1408, 1152, 29.97, "4:3", "YV12" },
-    { "yuv", 176, 144, 25, "4:3", "YV12" },
-    { "", 0, 0, 0., "", "" }
+    { "sqcif", 128, 96, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { "qcif", 176, 144, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { "cif", 352, 288, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { "4cif", 704, 576, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { "16cif", 1408, 1152, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { "yuv", 176, 144, 25, 1, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { NULL, 0, 0, 0, 0, 0,0, 0 }
 };
 
 /*****************************************************************************
@@ -127,11 +128,10 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    int i_width, i_height;
+    int i_width=-1, i_height=-1;
+    unsigned u_fps_num=0, u_fps_den=1;
     char *psz_ext;
-    char *psz_chroma;
     uint32_t i_chroma;
-    char *psz_aspect_ratio;
     unsigned int i_aspect = 0;
     const struct preset_t *p_preset = NULL;
     const uint8_t *p_peek;
@@ -148,16 +148,20 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
+    /* guess preset based on file extension */
     psz_ext = strrchr( p_demux->psz_path, '.' );
     if( psz_ext )
     {
         psz_ext++;
-        for( p_preset = p_presets; *p_preset->psz_ext; p_preset++ )
-            if( !strcasecmp( psz_ext, p_preset->psz_ext ) )
+        for( int i = 0; p_presets[i].psz_ext ; i++ )
+        {
+            if( !strcasecmp( psz_ext, p_presets[i].psz_ext ) )
             {
+                p_preset = &p_presets[i];
                 b_valid = true;
                 break;
             }
+        }
     }
     if( !b_valid && !p_demux->b_force )
         return VLC_EGENERIC;
@@ -169,15 +173,20 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_pcr = 1;
-
     p_sys->b_y4m = b_y4m;
-    p_sys->f_fps = var_CreateGetFloat( p_demux, "rawvid-fps" );
-    i_width = var_CreateGetInteger( p_demux, "rawvid-width" );
-    i_height = var_CreateGetInteger( p_demux, "rawvid-height" );
-    psz_chroma = var_CreateGetString( p_demux, "rawvid-chroma" );
-    psz_aspect_ratio = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
 
+    /* guess the parameters based on the preset */
+    if( p_preset )
+    {
+        i_width = p_preset->i_width;
+        i_height = p_preset->i_height;
+        u_fps_num = p_preset->u_fps_num;
+        u_fps_den = p_preset->u_fps_den;
+        i_aspect = VOUT_ASPECT_FACTOR * p_preset->u_ar_num / p_preset->u_ar_den;
+        i_chroma = p_preset->i_chroma;
+    }
+
+    /* override presets if yuv4mpeg2 */
     if( b_y4m )
     {
         char *psz;
@@ -186,7 +195,8 @@ static int Open( vlc_object_t * p_this )
         int b = 1;
         psz = stream_ReadLine( p_demux->s );
 
-        /* TODO: handle interlacing */
+        /* NB, it is not possible to handle interlaced here, since the
+         * interlaced picture flags are in picture_t not block_t */
 
 #define READ_FRAC( key, num, den ) \
         buf = strstr( psz+9, key );\
@@ -211,10 +221,13 @@ static int Open( vlc_object_t * p_this )
         }
         READ_FRAC( " W", i_width, a )
         READ_FRAC( " H", i_height, a )
-        READ_FRAC( " F", a, b )
-        p_sys->f_fps = (double)a/(double)b;
+        READ_FRAC( " F", u_fps_num, u_fps_den )
         READ_FRAC( " A", a, b )
-        if( b != 0 ) i_aspect = a * VOUT_ASPECT_FACTOR / b;
+        /* Try to calculate aspect ratio here, rather than store ratio
+         * in u_ar_{num,den}, since width may be overridden by then.
+         * Plus, a:b is sar. */
+        if( b != 0 )
+            i_aspect = VOUT_ASPECT_FACTOR * a * i_width / (b * i_height);
 
         buf = strstr( psz+9, " C" );
         if( buf )
@@ -222,34 +235,26 @@ static int Open( vlc_object_t * p_this )
             char *end = strchr( buf+1, ' ' );
             if( end ) *end = '\0';
             buf+=2;
-            if( !strncmp( buf, "420jpeg", 7 ) )
-            {
-                psz_chroma = strdup( "I420" );
+            if( !strncmp( buf, "420jpeg", 7 ) ) {
+                i_chroma = VLC_FOURCC('I','4','2','0');
             }
-            else if( !strncmp( buf, "420paldv", 8 ) )
-            {
-                psz_chroma = strdup( "I420" );
+            else if( !strncmp( buf, "420paldv", 8 ) ) {
+                i_chroma = VLC_FOURCC('I','4','2','0');
             }
-            else if( !strncmp( buf, "420", 3 ) )
-            {
-                psz_chroma = strdup( "I420" );
+            else if( !strncmp( buf, "420", 3 ) ) {
+                i_chroma = VLC_FOURCC('I','4','2','0');
             }
-            else if( !strncmp( buf, "422", 3 ) )
-            {
-                psz_chroma = strdup( "I422" );
+            else if( !strncmp( buf, "422", 3 ) ) {
+                i_chroma = VLC_FOURCC('I','4','2','2');
             }
-            else if( !strncmp( buf, "444", 3 ) )
-            {
-                psz_chroma = strdup( "I444" );
+            else if( !strncmp( buf, "444", 3 ) ) {
+                i_chroma = VLC_FOURCC('I','4','4','4');
             }
-            else if( !strncmp( buf, "mono", 4 ) )
-            {
-                psz_chroma = strdup( "GREY" );
+            else if( !strncmp( buf, "mono", 4 ) ) {
+                i_chroma = VLC_FOURCC('G','R','E','Y');
             }
-            else
-            {
-                msg_Warn( p_demux, "Unknown YUV4MPEG2 chroma type \"%s\"",
-                          buf );
+            else {
+                msg_Warn( p_demux, "Unknown YUV4MPEG2 chroma type \"%s\"", buf );
             }
             if( end ) *end = ' ';
         }
@@ -257,84 +262,118 @@ static int Open( vlc_object_t * p_this )
         free( psz );
     }
 
-    if( p_preset && *p_preset->psz_ext )
+    /* allow the user to override anything guessed from the input */
+    int i_tmp;
+    i_tmp = var_CreateGetInteger( p_demux, "rawvid-width" );
+    if( i_tmp ) i_width = i_tmp;
+
+    i_tmp = var_CreateGetInteger( p_demux, "rawvid-height" );
+    if( i_tmp ) i_height = i_tmp;
+
+    char *psz_tmp;
+    psz_tmp = var_CreateGetString( p_demux, "rawvid-chroma" );
+    if( psz_tmp )
     {
-        if( !i_width ) i_width = p_preset->i_width;
-        if( !i_height ) i_height = p_preset->i_height;
-        if( !p_sys->f_fps ) p_sys->f_fps = p_preset->f_fps;
-        if( !*psz_aspect_ratio )
+        if( strlen( psz_tmp ) != 4 )
         {
-            free( psz_aspect_ratio );
-            psz_aspect_ratio = strdup( psz_aspect_ratio );
+            msg_Err( p_demux, "Invalid fourcc format/chroma specification %s"
+                     " expecting four characters eg, UYVY", psz_tmp );
+            free( psz_tmp );
+            goto error;
         }
-        if( !*psz_chroma )
-        {
-            free( psz_chroma );
-            psz_chroma = strdup( psz_chroma );
-        }
+        memcpy( &i_chroma, psz_tmp, 4 );
+        msg_Dbg( p_demux, "Forcing chroma to 0x%.8x (%4.4s)", i_chroma, (char*)&i_chroma );
+        free( psz_tmp );
     }
 
+    psz_tmp = var_CreateGetString( p_demux, "rawvid-fps" );
+    if( psz_tmp ) {
+        char *p_ptr;
+        /* fps can either be n/d or q.f
+         * for accuracy, avoid representation in float */
+        u_fps_num = strtol( psz_tmp, &p_ptr, 10 );
+        if( *p_ptr == '/' )
+        {
+            p_ptr++;
+            u_fps_den = strtol( p_ptr, NULL, 10 );
+        }
+        else if( *p_ptr == '.' )
+        {
+            char *p_end;
+            p_ptr++;
+            int i_frac =  strtol( p_ptr, &p_end, 10 );
+            u_fps_den = (p_end - p_ptr) * 10;
+            if( !u_fps_den )
+                u_fps_den = 1;
+            u_fps_num = u_fps_num * u_fps_den + i_frac;
+        }
+        else if( *p_ptr == '\0')
+        {
+            u_fps_den = 1;
+        }
+        free( psz_tmp );
+    }
+
+    psz_tmp = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
+    if( psz_tmp )
+    {
+        char *psz_denominator = strchr( psz_tmp, ':' );
+        if( psz_denominator )
+        {
+            *psz_denominator++ = '\0';
+            i_aspect = atoi( psz_tmp ) * VOUT_ASPECT_FACTOR
+                     / atoi( psz_denominator );
+        }
+        free( psz_tmp );
+    }
+
+    /* moan about anything wrong */
     if( i_width <= 0 || i_height <= 0 )
     {
         msg_Err( p_demux, "width and height must be strictly positive." );
-        free( psz_aspect_ratio );
-        free( psz_chroma );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
+    if( !u_fps_num || !u_fps_den )
+    {
+        msg_Err( p_demux, "invalid or no framerate specified." );
+        goto error;
+    }
+
+    /* fixup anything missing with sensible assumptions */
     if( !i_aspect )
     {
-        if( psz_aspect_ratio && *psz_aspect_ratio )
-        {
-            char *psz_parser = strchr( psz_aspect_ratio, ':' );
-            if( psz_parser )
-            {
-                *psz_parser++ = '\0';
-                i_aspect = atoi( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR
-                           / atoi( psz_parser );
-            }
-            else
-            {
-                i_aspect = atof( psz_aspect_ratio ) * VOUT_ASPECT_FACTOR;
-            }
-        }
-        else
-        {
-            i_aspect = i_width * VOUT_ASPECT_FACTOR / i_height;
-        }
+        /* assume 1:1 sar */
+        i_aspect = i_width * VOUT_ASPECT_FACTOR / i_height;
     }
-    free( psz_aspect_ratio );
-
-    if( psz_chroma && strlen( psz_chroma ) >= 4 )
-    {
-        memcpy( &i_chroma, psz_chroma, 4 );
-        msg_Dbg( p_demux, "Forcing chroma to 0x%.8x (%4.4s)", i_chroma,
-                 (char*)&i_chroma );
-    }
-    else
-    {
-        i_chroma = VLC_FOURCC('Y','V','1','2');
-        msg_Dbg( p_demux, "Using default chroma 0x%.8x (%4.4s)", i_chroma,
-                 (char*)&i_chroma );
-    }
-    free( psz_chroma );
 
     es_format_Init( &p_sys->fmt_video, VIDEO_ES, i_chroma );
     vout_InitFormat( &p_sys->fmt_video.video, i_chroma, i_width, i_height,
                      i_aspect );
+
+    vlc_ureduce( &p_sys->fmt_video.video.i_frame_rate,
+                 &p_sys->fmt_video.video.i_frame_rate_base,
+                 u_fps_num, u_fps_den, 0);
+    date_Init( &p_sys->pcr, p_sys->fmt_video.video.i_frame_rate,
+               p_sys->fmt_video.video.i_frame_rate_base );
+    date_Set( &p_sys->pcr, 1 );
+
     if( !p_sys->fmt_video.video.i_bits_per_pixel )
     {
         msg_Err( p_demux, "Unsupported chroma 0x%.8x (%4.4s)", i_chroma,
                  (char*)&i_chroma );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     p_sys->frame_size = i_width * i_height
                         * p_sys->fmt_video.video.i_bits_per_pixel / 8;
     p_sys->p_es_video = es_out_Add( p_demux->out, &p_sys->fmt_video );
 
     return VLC_SUCCESS;
+
+error:
+    if( p_sys )
+        free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -356,9 +395,10 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     block_t     *p_block;
+    mtime_t i_pcr = date_Get( &p_sys->pcr );
 
     /* Call the pace control */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_pcr );
 
     if( p_sys->b_y4m )
     {
@@ -379,10 +419,10 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
 
-    p_block->i_dts = p_block->i_pts = p_sys->i_pcr;
+    p_block->i_dts = p_block->i_pts = i_pcr;
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
-    p_sys->i_pcr += ( INT64_C(1000000) / p_sys->f_fps );
+    date_Increment( &p_sys->pcr, 1 );
 
     return 1;
 }
@@ -394,8 +434,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 
+    /* NB, demux_vaControlHelper only takes int for i_bps currently;
+     * (2**31)-1 is insufficient to store 1080p50 4:4:4. */
+    int64_t i_bps = 8LL * p_sys->frame_size * p_sys->pcr.i_divider_num
+                  / p_sys->pcr.i_divider_den;
+
     /* XXX: DEMUX_SET_TIME is precise here */
-    return demux_vaControlHelper( p_demux->s, 0, -1,
-                                   p_sys->frame_size * p_sys->f_fps * 8,
+    return demux_vaControlHelper( p_demux->s, 0, -1, i_bps,
                                    p_sys->frame_size, i_query, args );
 }
