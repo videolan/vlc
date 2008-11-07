@@ -632,7 +632,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                     p_stream->fmt.i_extra = 0;
 
                 if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
-                    es_out_Control( p_demux->out, ES_OUT_SET_FMT,
+                    es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
                                     p_stream->p_es, &p_stream->fmt );
             }
         }

@@ -83,7 +83,7 @@ enum es_out_query_e
     ES_OUT_GET_TS,             /* arg1=int64_t i_ts(microsecond!) (using default group 0), arg2=int64_t* converted i_ts */
 
     /* Try not to use this one as it is a bit hacky */
-    ES_OUT_SET_FMT,     /* arg1= es_out_id_t* arg2=es_format_t* */
+    ES_OUT_SET_ES_FMT,         /* arg1= es_out_id_t* arg2=es_format_t* */
 
     /* Allow preroll of data (data with dts/pts < i_pts for all ES will be decoded but not displayed */
     ES_OUT_SET_NEXT_DISPLAY_TIME,   /* arg1=int64_t i_pts(microsecond) */
