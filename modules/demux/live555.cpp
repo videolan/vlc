@@ -627,7 +627,7 @@ describe:
         }
         else
         {
-            msg_Dbg( p_demux, "connection timeout, retrying" );
+            msg_Dbg( p_demux, "connection timeout" );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
         }
