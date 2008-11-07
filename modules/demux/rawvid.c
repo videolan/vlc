@@ -107,7 +107,7 @@ struct preset_t
     unsigned u_fps_den;
     unsigned u_ar_num;
     unsigned u_ar_den;
-    int i_chroma;
+    vlc_fourcc_t i_chroma;
 };
 
 static const struct preset_t p_presets[] =
@@ -131,7 +131,7 @@ static int Open( vlc_object_t * p_this )
     int i_width=-1, i_height=-1;
     unsigned u_fps_num=0, u_fps_den=1;
     char *psz_ext;
-    uint32_t i_chroma;
+    vlc_fourcc_t i_chroma;
     unsigned int i_aspect = 0;
     const struct preset_t *p_preset = NULL;
     const uint8_t *p_peek;
@@ -189,23 +189,25 @@ static int Open( vlc_object_t * p_this )
     /* override presets if yuv4mpeg2 */
     if( b_y4m )
     {
-        char *psz;
-        char *buf;
+        char *psz = stream_ReadLine( p_demux->s );
+        char *psz_buf;
         int a = 1;
         int b = 1;
-        psz = stream_ReadLine( p_demux->s );
+
+        /* The string will start with "YUV4MPEG2" */
+        assert( strlen(psz) >= 9 );
 
         /* NB, it is not possible to handle interlaced here, since the
          * interlaced picture flags are in picture_t not block_t */
 
-#define READ_FRAC( key, num, den ) \
-        buf = strstr( psz+9, key );\
-        if( buf )\
+#define READ_FRAC( key, num, den ) do { \
+        psz_buf = strstr( psz+9, key );\
+        if( psz_buf )\
         {\
-            char *end = strchr( buf+1, ' ' );\
+            char *end = strchr( psz_buf+1, ' ' );\
             char *sep;\
             if( end ) *end = '\0';\
-            sep = strchr( buf+1, ':' );\
+            sep = strchr( psz_buf+1, ':' );\
             if( sep )\
             {\
                 *sep = '\0';\
@@ -215,48 +217,53 @@ static int Open( vlc_object_t * p_this )
             {\
                 den = 1;\
             }\
-            num = atoi( buf+2 );\
+            num = atoi( psz_buf+2 );\
             if( sep ) *sep = ':';\
             if( end ) *end = ' ';\
-        }
-        READ_FRAC( " W", i_width, a )
-        READ_FRAC( " H", i_height, a )
-        READ_FRAC( " F", u_fps_num, u_fps_den )
-        READ_FRAC( " A", a, b )
+        } } while(0)
+        READ_FRAC( " W", i_width, a );
+        READ_FRAC( " H", i_height, a );
+        READ_FRAC( " F", u_fps_num, u_fps_den );
+        READ_FRAC( " A", a, b );
+#undef READ_FRAC
         /* Try to calculate aspect ratio here, rather than store ratio
          * in u_ar_{num,den}, since width may be overridden by then.
          * Plus, a:b is sar. */
         if( b != 0 )
             i_aspect = VOUT_ASPECT_FACTOR * a * i_width / (b * i_height);
 
-        buf = strstr( psz+9, " C" );
-        if( buf )
+        psz_buf = strstr( psz+9, " C" );
+        if( psz_buf )
         {
-            char *end = strchr( buf+1, ' ' );
-            if( end ) *end = '\0';
-            buf+=2;
-            if( !strncmp( buf, "420jpeg", 7 ) ) {
-                i_chroma = VLC_FOURCC('I','4','2','0');
+            static const struct { const char *psz_name; vlc_fourcc_t i_fcc; } formats[] =
+            {
+                { "420jpeg",    VLC_FOURCC('I','4','2','0') },
+                { "420paldv",   VLC_FOURCC('I','4','2','0') },
+                { "420",        VLC_FOURCC('I','4','2','0') },
+                { "422",        VLC_FOURCC('I','4','2','2') },
+                { "444",        VLC_FOURCC('I','4','4','4') },
+                { "mono",       VLC_FOURCC('G','R','E','Y') },
+                { NULL, 0 }
+            };
+            bool b_found = false;
+            char *psz_end = strchr( psz_buf+1, ' ' );
+            if( psz_end )
+                *psz_end = '\0';
+            psz_buf += 2;
+
+            for( int i = 0; formats[i].psz_name != NULL; i++ )
+            {
+                if( !strncmp( psz_buf, formats[i].psz_name, strlen(formats[i].psz_name) ) )
+                {
+                    i_chroma = formats[i].i_fcc;
+                    b_found = true;
+                    break;
+                }
             }
-            else if( !strncmp( buf, "420paldv", 8 ) ) {
-                i_chroma = VLC_FOURCC('I','4','2','0');
-            }
-            else if( !strncmp( buf, "420", 3 ) ) {
-                i_chroma = VLC_FOURCC('I','4','2','0');
-            }
-            else if( !strncmp( buf, "422", 3 ) ) {
-                i_chroma = VLC_FOURCC('I','4','2','2');
-            }
-            else if( !strncmp( buf, "444", 3 ) ) {
-                i_chroma = VLC_FOURCC('I','4','4','4');
-            }
-            else if( !strncmp( buf, "mono", 4 ) ) {
-                i_chroma = VLC_FOURCC('G','R','E','Y');
-            }
-            else {
-                msg_Warn( p_demux, "Unknown YUV4MPEG2 chroma type \"%s\"", buf );
-            }
-            if( end ) *end = ' ';
+            if( !b_found )
+                msg_Warn( p_demux, "Unknown YUV4MPEG2 chroma type \"%s\"", psz_buf );
+            if( psz_end )
+                *psz_end = ' ';
         }
 
         free( psz );
@@ -271,7 +278,7 @@ static int Open( vlc_object_t * p_this )
     if( i_tmp ) i_height = i_tmp;
 
     char *psz_tmp;
-    psz_tmp = var_CreateGetString( p_demux, "rawvid-chroma" );
+    psz_tmp = var_CreateGetNonEmptyString( p_demux, "rawvid-chroma" );
     if( psz_tmp )
     {
         if( strlen( psz_tmp ) != 4 )
@@ -286,8 +293,9 @@ static int Open( vlc_object_t * p_this )
         free( psz_tmp );
     }
 
-    psz_tmp = var_CreateGetString( p_demux, "rawvid-fps" );
-    if( psz_tmp ) {
+    psz_tmp = var_CreateGetNonEmptyString( p_demux, "rawvid-fps" );
+    if( psz_tmp )
+    {
         char *p_ptr;
         /* fps can either be n/d or q.f
          * for accuracy, avoid representation in float */
@@ -314,7 +322,7 @@ static int Open( vlc_object_t * p_this )
         free( psz_tmp );
     }
 
-    psz_tmp = var_CreateGetString( p_demux, "rawvid-aspect-ratio" );
+    psz_tmp = var_CreateGetNonEmptyString( p_demux, "rawvid-aspect-ratio" );
     if( psz_tmp )
     {
         char *psz_denominator = strchr( psz_tmp, ':' );
@@ -403,13 +411,17 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_y4m )
     {
         /* Skip the frame header */
-        unsigned char psz_buf[10];
-        psz_buf[9] = '\0';
-        stream_Read( p_demux->s, psz_buf, strlen( "FRAME" ) );
-        while( psz_buf[0] != 0x0a )
+        /* Skip "FRAME" */
+        if( stream_Read( p_demux->s, NULL, 5 ) < 5 )
+            return 0;
+        /* Find \n */
+        for( ;; )
         {
-            if( stream_Read( p_demux->s, psz_buf, 1 ) < 1 )
+            uint8_t b;
+            if( stream_Read( p_demux->s, &b, 1 ) < 1 )
                 return 0;
+            if( b == 0x0a )
+                break;
         }
     }
 
