@@ -203,7 +203,7 @@ static block_t *Block (access_t *p_access)
 
     const uintptr_t page_mask = p_sys->page_size - 1;
     /* Start the mapping on a page boundary: */
-    off_t  outer_offset = p_access->info.i_pos & ~page_mask;
+    off_t  outer_offset = p_access->info.i_pos & ~(off_t)page_mask;
     /* Skip useless bytes at the beginning of the first page: */
     size_t inner_offset = p_access->info.i_pos & page_mask;
     /* Map no more bytes than remain: */
