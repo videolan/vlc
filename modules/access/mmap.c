@@ -197,7 +197,7 @@ static block_t *Block (access_t *p_access)
 #ifdef MMAP_DEBUG
     int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
     if (dbgpos != p_access->info.i_pos)
-        msg_Err (p_access, "position: 0x%08llx instead of 0x%08llx",
+        msg_Err (p_access, "position: 0x%016"PRIx64" instead of 0x%016"PRIx64,
                  p_access->info.i_pos, dbgpos);
 #endif
 
@@ -243,16 +243,16 @@ static block_t *Block (access_t *p_access)
     block->i_buffer -= inner_offset;
 
 #ifdef MMAP_DEBUG
-    msg_Dbg (p_access, "mapped 0x%lx bytes at %p from offset 0x%lx",
-             (unsigned long)length, addr, (unsigned long)outer_offset);
+    msg_Dbg (p_access, "mapped 0x%zx bytes at %p from offset 0x%"PRIx64,
+             length, addr, (uint64_t)outer_offset);
 
     /* Compare normal I/O with memory mapping */
     char *buf = malloc (block->i_buffer);
     ssize_t i_read = read (p_sys->fd, buf, block->i_buffer);
 
     if (i_read != (ssize_t)block->i_buffer)
-        msg_Err (p_access, "read %u instead of %u bytes", (unsigned)i_read,
-                 (unsigned)block->i_buffer);
+        msg_Err (p_access, "read %zd instead of %zu bytes", i_read,
+                 block->i_buffer);
     if (memcmp (buf, block->p_buffer, block->i_buffer))
         msg_Err (p_access, "inconsistent data buffer");
     free (buf);
