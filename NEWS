@@ -1,4 +1,4 @@
-Changes between 0.9.5 and 1.0.0-git:
+Changes between 0.9.6 and 1.0.0-git:
 ------------------------------------
 
 Inputs:
@@ -23,6 +23,15 @@ Playlist:
 
 Audio output:
  * Removed obsolete Esound and aRts plugins
+
+Changes between 0.9.5 and 0.9.6:
+--------------------------------
+New Localizations:
+ * Ukranian
+
+Security updates:
+ * Fixed overflow in CUE support from VCD access (SA-0810, CVE-2008-xxxx)
+ * Fixed overflow in RealText subtitles support (SA-0810, CVE-2008-xxxx)
 
 Changes between 0.9.4 and 0.9.5:
 --------------------------------
