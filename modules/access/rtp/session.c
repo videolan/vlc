@@ -192,11 +192,6 @@ rtp_source_destroy (demux_t *demux, const rtp_session_t *session,
     free (source);
 }
 
-static inline uint8_t rtp_ptype (const block_t *block)
-{
-    return block->p_buffer[1] & 0x7F;
-}
-
 static inline uint16_t rtp_seq (const block_t *block)
 {
     assert (block->i_buffer >= 4);
@@ -234,7 +229,7 @@ rtp_find_ptype (const rtp_session_t *session, rtp_source_t *source,
  * @param block RTP packet including the RTP header
  */
 void
-rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
+rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
 {
     demux_sys_t *p_sys = demux->p_sys;
 
@@ -368,7 +363,7 @@ rtp_receive (demux_t *demux, rtp_session_t *session, block_t *block)
     block->p_next = *pp;
     *pp = block;
 
-    rtp_decode (demux, session, src);
+    /*rtp_decode (demux, session, src);*/
     return;
 
 drop:
@@ -381,16 +376,22 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
 {
     block_t *block = src->blocks;
 
-    /* Buffer underflow? */
-    if (!block || !block->p_next || !block->p_next->p_next)
-        return;
-    /* TODO: use time rather than packet counts for buffer measurement */
+    assert (block);
     src->blocks = block->p_next;
     block->p_next = NULL;
 
     /* Discontinuity detection */
-    if (((src->last_seq + 1) & 0xffff) != rtp_seq (block))
+    uint16_t delta_seq = rtp_seq (block) - (src->last_seq + 1);
+    if (delta_seq != 0)
+    {
+        if (delta_seq >= 0x8000)
+        {   /* Unrecoverable if later packets have already been dequeued */
+            msg_Warn (demux, "ignoring late packet (sequence: %u)",
+                      rtp_seq (block));
+            goto drop;
+        }
         block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
     src->last_seq = rtp_seq (block);
 
     /* Match the payload type */
@@ -408,7 +409,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
      * format, a single source MUST only use payloads of a chosen frequency.
      * Otherwise it would be impossible to compute consistent timestamps. */
     /* FIXME: handle timestamp wrap properly */
-    /* TODO: sync multiple sources sanely... */
+    /* TODO: inter-medias/sessions sync (using RTCP-SR) */
     const uint32_t timestamp = rtp_timestamp (block);
     block->i_pts = UINT64_C(1) * CLOCK_FREQ * timestamp / pt->frequency;
 
@@ -436,4 +437,65 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
 
 drop:
     block_Release (block);
+}
+
+
+bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
+                  mtime_t *restrict deadlinep)
+{
+    mtime_t now = mdate ();
+    bool pending = false;
+
+    for (unsigned i = 0, max = session->srcc; i < max; i++)
+    {
+        rtp_source_t *src = session->srcv[i];
+        block_t *block;
+
+        /* Because of IP packet delay variation (IPDV), we need to guesstimate
+         * how long to wait for a missing packet in the RTP sequence
+         * (see RFC3393 for background on IPDV).
+         *
+         * This situation occurs if a packet got lost, or if the network has
+         * re-ordered packets. Unfortunately, the MSL is 2 minutes, orders of
+         * magnitude too long for multimedia. We need a tradeoff.
+         * If we underestimated IPDV, we may have to discard valid but late
+         * packets. If we overestimate it, we will either cause too much
+         * delay, or worse, underflow our downstream buffers, as we wait for
+         * definitely a lost packets.
+         *
+         * The rest of the "de-jitter buffer" work is done by the interval
+         * LibVLC E/S-out clock synchronization. Here, we need to bother about
+         * re-ordering packets, as decoders can't cope with mis-ordered data.
+         */
+        while (((block = src->blocks)) != NULL)
+        {
+#if 0
+            if (rtp_seq (block) == ((src->last_seq + 1) & 0xffff))
+            {   /* Next block ready, no need to wait */
+                rtp_decode (demux, session, src);
+                continue;
+            }
+#endif
+            /* Wait for 3 times the inter-arrival delay variance (about 99.7%
+             * match for random gaussian jitter). Additionnaly, we implicitly
+             * wait for misordering times the packetization time.
+             */
+            mtime_t deadline = src->last_rx;
+            const rtp_pt_t *pt = rtp_find_ptype (session, src, block, NULL);
+            if (pt)
+                deadline += UINT64_C(3) * CLOCK_FREQ * src->jitter
+                            / pt->frequency;
+
+            if (now >= deadline)
+            {
+                rtp_decode (demux, session, src);
+                continue;
+            }
+            if (*deadlinep > deadline)
+                *deadlinep = deadline;
+            pending = true; /* packet pending in buffer */
+            break;
+        }
+    }
+    return pending;
 }

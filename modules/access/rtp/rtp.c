@@ -31,9 +31,6 @@
 #include <vlc_demux.h>
 #include <vlc_aout.h>
 #include <vlc_network.h>
-#ifdef HAVE_POLL
-# include <poll.h>
-#endif
 #include <vlc_plugin.h>
 
 #include <vlc_codecs.h>
@@ -225,6 +222,8 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    vlc_mutex_init (&p_sys->lock);
+    vlc_cond_init (&p_sys->wait);
     p_sys->srtp         = NULL;
     p_sys->fd           = fd;
     p_sys->rtcp_fd      = rtcp_fd;
@@ -266,6 +265,10 @@ static int Open (vlc_object_t *obj)
         }
     }
 
+    if (vlc_clone (&p_sys->thread, rtp_thread, demux,
+                   VLC_THREAD_PRIORITY_INPUT))
+        goto error;
+    p_sys->thread_ready = true;
     return VLC_SUCCESS;
 
 error:
@@ -281,6 +284,14 @@ static void Close (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *p_sys = demux->p_sys;
+
+    if (p_sys->thread_ready)
+    {
+        vlc_cancel (p_sys->thread);
+        vlc_join (p_sys->thread, NULL);
+    }
+    vlc_cond_destroy (&p_sys->wait);
+    vlc_mutex_destroy (&p_sys->lock);
 
     if (p_sys->srtp)
         srtp_destroy (p_sys->srtp);
@@ -363,81 +374,6 @@ static int Control (demux_t *demux, int i_query, va_list args)
     }
 
     return VLC_EGENERIC;
-}
-
-
-/**
- * Checks if a file descriptor is hung up.
- */
-static bool fd_dead (int fd)
-{
-    struct pollfd ufd = { .fd = fd, };
-
-    return (poll (&ufd, 1, 0) == 1) && (ufd.revents & POLLHUP);
-}
-
-
-/**
- * Gets a datagram from the network, or NULL in case of fatal error.
- */
-static block_t *rtp_dgram_recv (demux_t *demux, int fd)
-{
-    block_t *block = block_Alloc (0xffff);
-    ssize_t len;
-
-    do
-    {
-        len = net_Read (VLC_OBJECT (demux), fd, NULL,
-                                block->p_buffer, block->i_buffer, false);
-        if (((len <= 0) && fd_dead (fd))
-         || !vlc_object_alive (demux))
-        {
-            block_Release (block);
-            return NULL;
-        }
-    }
-    while (len == -1);
-
-    return block_Realloc (block, 0, len);
-}
-
-/**
- * Gets a framed RTP packet, or NULL in case of fatal error.
- */
-static block_t *rtp_stream_recv (demux_t *demux, int fd)
-{
-    ssize_t len = 0;
-    uint8_t hdr[2]; /* frame header */
-
-    /* Receives the RTP frame header */
-    do
-    {
-        ssize_t val = net_Read (VLC_OBJECT (demux), fd, NULL,
-                                hdr + len, 2 - len, false);
-        if (val <= 0)
-            return NULL;
-        len += val;
-    }
-    while (len < 2);
-
-    block_t *block = block_Alloc (GetWBE (hdr));
-
-    /* Receives the RTP packet */
-    for (ssize_t i = 0; i < len;)
-    {
-        ssize_t val;
-
-        val = net_Read (VLC_OBJECT (demux), fd, NULL,
-                        block->p_buffer + i, block->i_buffer - i, false);
-        if (val <= 0)
-        {
-            block_Release (block);
-            return NULL;
-        }
-        i += val;
-    }
-
-    return block;
 }
 
 
@@ -613,6 +549,75 @@ static void *ts_init (demux_t *demux)
 }
 
 
+/* Not using SDP, we need to guess the payload format used */
+/* see http://www.iana.org/assignments/rtp-parameters */
+int rtp_autodetect (demux_t *demux, rtp_session_t *session,
+                    const block_t *block)
+{
+    uint8_t ptype = rtp_ptype (block);
+    rtp_pt_t pt = {
+        .init = NULL,
+        .destroy = codec_destroy,
+        .decode = codec_decode,
+        .frequency = 0,
+        .number = ptype,
+    };
+
+    switch (ptype)
+    {
+      case 0:
+        msg_Dbg (demux, "detected G.711 mu-law");
+        pt.init = pcmu_init;
+        pt.frequency = 8000;
+        break;
+
+      case 8:
+        msg_Dbg (demux, "detected G.711 A-law");
+        pt.init = pcma_init;
+        pt.frequency = 8000;
+        break;
+
+      case 10:
+        msg_Dbg (demux, "detected stereo PCM");
+        pt.init = l16s_init;
+        pt.frequency = 44100;
+        break;
+
+      case 11:
+        msg_Dbg (demux, "detected mono PCM");
+        pt.init = l16m_init;
+        pt.frequency = 44100;
+        break;
+
+      case 14:
+        msg_Dbg (demux, "detected MPEG Audio");
+        pt.init = mpa_init;
+        pt.decode = mpa_decode;
+        pt.frequency = 90000;
+        break;
+
+      case 32:
+        msg_Dbg (demux, "detected MPEG Video");
+        pt.init = mpv_init;
+        pt.decode = mpv_decode;
+        pt.frequency = 90000;
+        break;
+
+      case 33:
+        msg_Dbg (demux, "detected MPEG2 TS");
+        pt.init = ts_init;
+        pt.destroy = stream_destroy;
+        pt.decode = stream_decode;
+        pt.frequency = 90000;
+        break;
+
+      default:
+        return -1;
+    }
+    rtp_add_type (demux, session, &pt);
+    return 0;
+}
+
 /*
  * Dynamic payload type handlers
  * Hmm, none implemented yet.
@@ -623,102 +628,6 @@ static void *ts_init (demux_t *demux)
  */
 static int Demux (demux_t *demux)
 {
-    demux_sys_t *p_sys = demux->p_sys;
-    block_t     *block;
-
-    block = p_sys->framed_rtp
-        ? rtp_stream_recv (demux, p_sys->fd)
-        : rtp_dgram_recv (demux, p_sys->fd);
-    if (!block)
-        return 0;
-
-    if (block->i_buffer < 2)
-        goto drop;
-
-    const uint8_t ptype = block->p_buffer[1] & 0x7F;
-    if (ptype >= 72 && ptype <= 76)
-        goto drop; /* Muxed RTCP, ignore for now */
-
-    if (p_sys->srtp)
-    {
-        size_t len = block->i_buffer;
-        if (srtp_recv (p_sys->srtp, block->p_buffer, &len))
-        {
-            msg_Dbg (demux, "SRTP authentication/decryption failed");
-            goto drop;
-        }
-        block->i_buffer = len;
-    }
-
-    /* Not using SDP, we need to guess the payload format used */
-    /* see http://www.iana.org/assignments/rtp-parameters */
-    if (p_sys->autodetect)
-    {
-        rtp_pt_t pt = {
-            .init = NULL,
-            .destroy = codec_destroy,
-            .decode = codec_decode,
-            .frequency = 0,
-            .number = ptype,
-        };
-        switch (ptype)
-        {
-          case 0:
-            msg_Dbg (demux, "detected G.711 mu-law");
-            pt.init = pcmu_init;
-            pt.frequency = 8000;
-            break;
-
-          case 8:
-            msg_Dbg (demux, "detected G.711 A-law");
-            pt.init = pcma_init;
-            pt.frequency = 8000;
-            break;
-
-          case 10:
-            msg_Dbg (demux, "detected stereo PCM");
-            pt.init = l16s_init;
-            pt.frequency = 44100;
-            break;
-
-          case 11:
-            msg_Dbg (demux, "detected mono PCM");
-            pt.init = l16m_init;
-            pt.frequency = 44100;
-            break;
-
-          case 14:
-            msg_Dbg (demux, "detected MPEG Audio");
-            pt.init = mpa_init;
-            pt.decode = mpa_decode;
-            pt.frequency = 90000;
-            break;
-
-          case 32:
-            msg_Dbg (demux, "detected MPEG Video");
-            pt.init = mpv_init;
-            pt.decode = mpv_decode;
-            pt.frequency = 90000;
-            break;
-
-          case 33:
-            msg_Dbg (demux, "detected MPEG2 TS");
-            pt.init = ts_init;
-            pt.destroy = stream_destroy;
-            pt.decode = stream_decode;
-            pt.frequency = 90000;
-            break;
-
-          default:
-            goto drop;
-        }
-        rtp_add_type (demux, p_sys->session, &pt);
-        p_sys->autodetect = false;
-    }
-    rtp_receive (demux, p_sys->session, block);
-
-    return 1;
-drop:
-    block_Release (block);
+    rtp_process (demux);
     return 1;
 }

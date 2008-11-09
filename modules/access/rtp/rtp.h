@@ -20,8 +20,10 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  ****************************************************************************/
 
-/* RTP payload format */
 typedef struct rtp_pt_t rtp_pt_t;
+typedef struct rtp_session_t rtp_session_t;
+
+/** @section RTP payload format */
 struct rtp_pt_t
 {
     void   *(*init) (demux_t *);
@@ -30,14 +32,22 @@ struct rtp_pt_t
     uint32_t  frequency; /* RTP clock rate (Hz) */
     uint8_t   number;
 };
+int rtp_autodetect (demux_t *, rtp_session_t *, const block_t *);
 
-/* RTP session */
-typedef struct rtp_session_t rtp_session_t;
+static inline uint8_t rtp_ptype (const block_t *block)
+{
+    return block->p_buffer[1] & 0x7F;
+}
+
+/** @section RTP session */
 rtp_session_t *rtp_session_create (demux_t *);
 void rtp_session_destroy (demux_t *, rtp_session_t *);
-void rtp_receive (demux_t *, rtp_session_t *, block_t *);
+void rtp_queue (demux_t *, rtp_session_t *, block_t *);
+bool rtp_dequeue (demux_t *, const rtp_session_t *, mtime_t *);
 int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt);
 
+void rtp_process (demux_t *demux);
+void *rtp_thread (void *data);
 
 /* Global data */
 struct demux_sys_t
@@ -46,6 +56,10 @@ struct demux_sys_t
     struct srtp_session_t *srtp;
     int           fd;
     int           rtcp_fd;
+    vlc_thread_t  thread;
+    vlc_mutex_t   lock;
+    vlc_cond_t    wait;
+    bool thread_ready;
 
     unsigned      caching;
     unsigned      timeout;
