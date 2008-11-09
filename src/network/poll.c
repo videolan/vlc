@@ -1,7 +1,7 @@
 /*****************************************************************************
  * poll.c: I/O event multiplexing
  *****************************************************************************
- * Copyright © 2007 Rémi Denis-Courmont
+ * Copyright © 2007-2008 Rémi Denis-Courmont
  * $Id$
  *
  * Author: Rémi Denis-Courmont
@@ -28,7 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_network.h>
 
-#ifdef HAVE_POLL
+#ifndef WIN32
 struct pollfd;
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
@@ -36,73 +36,70 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
     (void)fds; (void)nfds; (void)timeout;
     abort ();
 }
-#else /* !HAVE_POLL */
+#else
 #include <string.h>
 #include <stdlib.h>
 #include <vlc_network.h>
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
-    fd_set rdset, wrset, exset;
-    struct timeval tv = { 0, 0 };
-    int val = -1;
+    WSAEVENT phEvents[nfds];
+    DWORD val;
 
-    FD_ZERO (&rdset);
-    FD_ZERO (&wrset);
-    FD_ZERO (&exset);
     for (unsigned i = 0; i < nfds; i++)
     {
-        int fd = fds[i].fd;
-        if (val < fd)
-            val = fd;
+        long events = FD_CLOSE;
 
-        /* With POSIX, FD_SET & FD_ISSET are not defined if fd is negative or
-	 * bigger or equal than FD_SETSIZE. That is one of the reasons why VLC
-	 * uses poll() rather than select(). Most POSIX systems implement
-	 * fd_set has a bit field with no sanity checks. This is especially bad
-	 * on systems (such as BSD) that have no process open files limit by
-	 * default, such that it is quite feasible to get fd >= FD_SETSIZE.
-	 * The next instructions will result in a buffer overflow if run on
-	 * a POSIX system, and the later FD_ISSET will do undefined memory
-	 * access.
-	 *
-	 * With Winsock, fd_set is a table of integers. This is awfully slow.
-	 * However, FD_SET and FD_ISSET silently and safely discard
-	 * overflows. If it happens we will loose socket events. Note that
-	 * most (if not all) Winsock SOCKET handles are actually bigger than
-	 * FD_SETSIZE in terms of absolute value - they are not POSIX file
-	 * descriptors. From Vista, there is a much nicer WSAPoll(), but Mingw
-	 * is yet to support it.
-	 *
-	 * With BeOS, the situation is unknown (FIXME: document).
-	 */
         if (fds[i].events & POLLIN)
-            FD_SET (fd, &rdset);
+            events |= FD_READ | FD_ACCEPT;
         if (fds[i].events & POLLOUT)
-            FD_SET (fd, &wrset);
+            events |= FD_WRITE;
         if (fds[i].events & POLLPRI)
-            FD_SET (fd, &exset);
+            events |= FD_OOB;
+        fds[i].revents = 0;
+
+        phEvents[i] = WSACreateEvent ();
+        WSAEventSelect (fds[i].fd, phEvents[i], events);
     }
 
-    if (timeout >= 0)
+    switch (WaitForMultipleObjectsEx (nfds, phEvents, FALSE, timeout, TRUE))
     {
-        div_t d = div (timeout, 1000);
-        tv.tv_sec = d.quot;
-        tv.tv_usec = d.rem * 1000;
+      case WAIT_IO_COMPLETION:
+        WSASetLastError (WSAEINTR);
+        return -1;
+      case WAIT_TIMEOUT:
+        return 0;
     }
 
-    val = select (val + 1, &rdset, &wrset, &exset,
-                  (timeout >= 0) ? &tv : NULL);
-    if (val == -1)
-        return -1;
+    int n = 0, err = 0;
 
     for (unsigned i = 0; i < nfds; i++)
     {
-        int fd = fds[i].fd;
-        fds[i].revents = (FD_ISSET (fd, &rdset) ? POLLIN : 0)
-                       | (FD_ISSET (fd, &wrset) ? POLLOUT : 0)
-                       | (FD_ISSET (fd, &exset) ? POLLPRI : 0);
+        WSANETWORKEVENTS events;
+        err = WSAEnumNetworkEvents (fds[i].fd, phEvents[i], &events);
+        WSACloseEvent (phEvents[i]);
+        if (err)
+        {
+            fds[i].revents |= POLLNVAL;
+            continue;
+        }
+        if (events.lNetworkEvents & FD_CLOSE)
+            fds[i].revents |= POLLHUP | (fds[i].events & POLLIN);
+        if (events.lNetworkEvents & FD_ACCEPT)
+            fds[i].revents |= POLLIN;
+        if (events.lNetworkEvents & FD_OOB)
+            fds[i].revents |= POLLPRI;
+        if (events.lNetworkEvents & FD_READ)
+            fds[i].revents |= POLLIN;
+        if (events.lNetworkEvents & FD_WRITE)
+        {
+            fds[i].revents |= POLLOUT;
+            if (events.iErrorCode[FD_WRITE_BIT])
+                fds[i].revents |= POLLERR;
+        }
+        if (fds[i].events)
+            n++;
     }
-    return val;
+    return err ? -1 : n;
 }
-#endif /* !HAVE_POLL */
+#endif /* WIN32 */
