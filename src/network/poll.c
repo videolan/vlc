@@ -46,6 +46,8 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
     WSAEVENT phEvents[nfds];
     DWORD val;
 
+    vlc_testcancel ();
+
     for (unsigned i = 0; i < nfds; i++)
     {
         long events = FD_CLOSE;
@@ -62,44 +64,52 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
         WSAEventSelect (fds[i].fd, phEvents[i], events);
     }
 
+    int ret = 0, n;
+
     switch (WaitForMultipleObjectsEx (nfds, phEvents, FALSE, timeout, TRUE))
     {
       case WAIT_IO_COMPLETION:
         WSASetLastError (WSAEINTR);
-        return -1;
+        ret = -1;
+        break;
       case WAIT_TIMEOUT:
-        return 0;
+        ret = 0;
+        break;
+      default:
+        for (unsigned i = 0; i < nfds; i++)
+        {
+            WSANETWORKEVENTS events;
+            if (WSAEnumNetworkEvents (fds[i].fd, phEvents[i], &events))
+            {
+                fds[i].revents |= POLLNVAL;
+                ret = -1;
+                continue;
+            }
+            if (events.lNetworkEvents & FD_CLOSE)
+               fds[i].revents |= POLLHUP | (fds[i].events & POLLIN);
+            if (events.lNetworkEvents & FD_ACCEPT)
+               fds[i].revents |= POLLIN;
+            if (events.lNetworkEvents & FD_OOB)
+               fds[i].revents |= POLLPRI;
+            if (events.lNetworkEvents & FD_READ)
+               fds[i].revents |= POLLIN;
+            if (events.lNetworkEvents & FD_WRITE)
+            {
+                fds[i].revents |= POLLOUT;
+                if (events.iErrorCode[FD_WRITE_BIT])
+                    fds[i].revents |= POLLERR;
+            }
+            if (fds[i].events)
+                n++;
+        }
+        if (ret == 0)
+            ret = n;
     }
-
-    int n = 0, err = 0;
 
     for (unsigned i = 0; i < nfds; i++)
-    {
-        WSANETWORKEVENTS events;
-        err = WSAEnumNetworkEvents (fds[i].fd, phEvents[i], &events);
         WSACloseEvent (phEvents[i]);
-        if (err)
-        {
-            fds[i].revents |= POLLNVAL;
-            continue;
-        }
-        if (events.lNetworkEvents & FD_CLOSE)
-            fds[i].revents |= POLLHUP | (fds[i].events & POLLIN);
-        if (events.lNetworkEvents & FD_ACCEPT)
-            fds[i].revents |= POLLIN;
-        if (events.lNetworkEvents & FD_OOB)
-            fds[i].revents |= POLLPRI;
-        if (events.lNetworkEvents & FD_READ)
-            fds[i].revents |= POLLIN;
-        if (events.lNetworkEvents & FD_WRITE)
-        {
-            fds[i].revents |= POLLOUT;
-            if (events.iErrorCode[FD_WRITE_BIT])
-                fds[i].revents |= POLLERR;
-        }
-        if (fds[i].events)
-            n++;
-    }
-    return err ? -1 : n;
+    vlc_testcancel ();
+
+    return ret;
 }
 #endif /* WIN32 */
