@@ -53,7 +53,7 @@ static block_t *rtp_dgram_recv (int fd)
 
         block_cleanup_push (block);
         poll (&ufd, 1, -1);
-        len = read (fd, block->p_buffer, block->i_buffer);
+        len = recv (fd, block->p_buffer, block->i_buffer, 0);
         vlc_cleanup_pop ();
 
         if ((len <= 0) && (ufd.revents & POLLHUP))
@@ -85,7 +85,7 @@ static block_t *rtp_stream_recv (int fd)
         ssize_t val;
 
         poll (&ufd, 1, -1);
-        val = read (fd, hdr + len, 2 - len);
+        val = recv (fd, hdr + len, 2 - len, 0);
         if (val <= 0)
             return NULL;
         len += val;
@@ -101,7 +101,7 @@ static block_t *rtp_stream_recv (int fd)
 
         block_cleanup_push (block);
         poll (&ufd, 1, -1);
-        val = read (fd, block->p_buffer + i, block->i_buffer - i);
+        val = recv (fd, block->p_buffer + i, block->i_buffer - i, 0);
         vlc_cleanup_pop ();
 
         if (val <= 0)
