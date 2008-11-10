@@ -100,7 +100,7 @@ enum es_out_query_e
 
 struct es_out_t
 {
-    es_out_id_t *(*pf_add)    ( es_out_t *, es_format_t * );
+    es_out_id_t *(*pf_add)    ( es_out_t *, const es_format_t * );
     int          (*pf_send)   ( es_out_t *, es_out_id_t *, block_t * );
     void         (*pf_del)    ( es_out_t *, es_out_id_t * );
     int          (*pf_control)( es_out_t *, int i_query, va_list );
@@ -112,7 +112,7 @@ struct es_out_t
 };
 
 LIBVLC_USED
-static inline es_out_id_t * es_out_Add( es_out_t *out, es_format_t *fmt )
+static inline es_out_id_t * es_out_Add( es_out_t *out, const es_format_t *fmt )
 {
     return out->pf_add( out, fmt );
 }

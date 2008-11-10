@@ -157,7 +157,7 @@ struct es_out_sys_t
     sout_instance_t *p_sout_record;
 };
 
-static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
+static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 static int          EsOutControl( es_out_t *, int i_query, va_list );
@@ -1279,7 +1279,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
 /* EsOutAdd:
  *  Add an es_out
  */
-static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
+static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
@@ -1318,13 +1318,13 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     p_pgrm->i_es++;
 
     /* Set up ES */
-    if( fmt->i_id < 0 )
-        fmt->i_id = out->p_sys->i_id;
-    es->i_id = fmt->i_id;
     es->p_pgrm = p_pgrm;
     es_format_Copy( &es->fmt, fmt );
+    if( es->fmt.i_id < 0 )
+        es->fmt.i_id = out->p_sys->i_id;
+    es->i_id = fmt->i_id;
 
-    switch( fmt->i_cat )
+    switch( es->fmt.i_cat )
     {
     case AUDIO_ES:
     {
@@ -1355,7 +1355,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
     case VIDEO_ES:
         es->i_channel = p_sys->i_video;
-        if( fmt->video.i_frame_rate && fmt->video.i_frame_rate_base )
+        if( es->fmt.video.i_frame_rate && es->fmt.video.i_frame_rate_base )
             vlc_ureduce( &es->fmt.video.i_frame_rate,
                          &es->fmt.video.i_frame_rate_base,
                          fmt->video.i_frame_rate,
@@ -1370,8 +1370,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         es->i_channel = 0;
         break;
     }
-    es->psz_language = LanguageGetName( fmt->psz_language ); /* remember so we only need to do it once */
-    es->psz_language_code = LanguageGetCode( fmt->psz_language );
+    es->psz_language = LanguageGetName( es->fmt.psz_language ); /* remember so we only need to do it once */
+    es->psz_language_code = LanguageGetCode( es->fmt.psz_language );
     es->p_dec = NULL;
     es->p_dec_record = NULL;
     for( i = 0; i < 4; i++ )
@@ -1387,7 +1387,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
 
     TAB_APPEND( out->p_sys->i_es, out->p_sys->es, es );
     p_sys->i_id++;  /* always incremented */
-    switch( fmt->i_cat )
+    switch( es->fmt.i_cat )
     {
         case AUDIO_ES:
             p_sys->i_audio++;
