@@ -111,10 +111,14 @@ struct demux_sys_t
     mtime_t i_pcr;
 
     /* stream state */
+    int     i_bos;
     int     i_eos;
 
     /* bitrate */
     int     i_bitrate;
+
+    /* after reading all headers, the first data page is stuffed into the relevant stream, ready to use */
+    bool    b_page_waiting;
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
@@ -223,10 +227,12 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_old_stream = NULL;
 
     /* Begnning of stream, tell the demux to look for elementary streams. */
+    p_sys->i_bos = 0;
     p_sys->i_eos = 0;
 
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );
+    p_sys->b_page_waiting = false;
 
     return VLC_SUCCESS;
 }
@@ -287,23 +293,44 @@ static int Demux( demux_t * p_demux )
     }
 
     /*
-     * Demux an ogg page from the stream
+     * The first data page of a physical stream is stored in the relevant logical stream
+     * in Ogg_FindLogicalStreams. Therefore, we must not read a page and only update the
+     * stream it belongs to if we haven't processed this first page yet. If we do, we
+     * will only process that first page whenever we find the second page for this stream.
+     * While this is fine for Vorbis and Theora, which are continuous codecs, which means
+     * the second page will arrive real quick, this is not fine for Kate, whose second
+     * data page will typically arrive much later.
+     * This means it is now possible to seek right at the start of a stream where the last
+     * logical stream is Kate, without having to wait for the second data page to unblock
+     * the first one, which is the one that triggers the 'no more headers to backup' code.
+     * And, as we all know, seeking without having backed up all headers is bad, since the
+     * codec will fail to initialize if it's missing its headers.
      */
-    if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
+    if( !p_sys->b_page_waiting)
     {
-        return 0; /* EOF */
-    }
+        /*
+         * Demux an ogg page from the stream
+         */
+        if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
+        {
+            return 0; /* EOF */
+        }
 
-    /* Test for End of Stream */
-    if( ogg_page_eos( &oggpage ) ) p_sys->i_eos++;
+        /* Test for End of Stream */
+        if( ogg_page_eos( &oggpage ) ) p_sys->i_eos++;
+    }
 
 
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
 
-        if( ogg_stream_pagein( &p_stream->os, &oggpage ) != 0 )
-            continue;
+        /* if we've just pulled page, look for the right logical stream */
+        if( !p_sys->b_page_waiting )
+        {
+            if( ogg_stream_pagein( &p_stream->os, &oggpage ) != 0 )
+                continue;
+        }
 
         while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
         {
@@ -366,8 +393,15 @@ static int Demux( demux_t * p_demux )
 
             Ogg_DecodePacket( p_demux, p_stream, &oggpacket );
         }
-        break;
+
+        if( !p_sys->b_page_waiting )
+        {
+            break;
+        }
     }
+
+    /* if a page was waiting, it's now processed */
+    p_sys->b_page_waiting = false;
 
     i_stream = 0; p_sys->i_pcr = -1;
     for( ; i_stream < p_sys->i_streams; i_stream++ )
@@ -417,6 +451,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_POSITION:
+            /* forbid seeking if we haven't initialized all logical bitstreams yet;
+               if we allowed, some headers would not get backed up and decoder init
+               would fail, making that logical stream unusable */
+            if( p_sys->i_bos > 0 )
+            {
+                return VLC_EGENERIC;
+            }
+
             for( i = 0; i < p_sys->i_streams; i++ )
             {
                 logical_stream_t *p_stream = p_sys->pp_stream[i];
@@ -428,6 +470,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 ogg_stream_reset( &p_stream->os );
             }
             ogg_sync_reset( &p_sys->oy );
+            /* suspicious lack of break - reading the code, I believe it's intended though */
 
         default:
             return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
@@ -523,6 +566,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     bool b_selected;
     int i_header_len = 0;
     mtime_t i_pts = -1, i_interpolated_pts;
+    demux_sys_t *p_ogg = p_demux->p_sys;
 
     /* Sanity check */
     if( !p_oggpacket->bytes )
@@ -634,6 +678,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
                     es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
                                     p_stream->p_es, &p_stream->fmt );
+
+                /* we're not at BOS anymore for this logical stream */
+                p_ogg->i_bos--;
             }
         }
         else
@@ -852,7 +899,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
 
                 /* Extract the initial header from the first page and verify
-                 * the codec type of tis Ogg bitstream */
+                 * the codec type of this Ogg bitstream */
                 if( ogg_stream_pagein( &p_stream->os, &oggpage ) < 0 )
                 {
                     /* error. stream version mismatch perhaps */
@@ -1229,6 +1276,16 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     return VLC_EGENERIC;
             }
 
+            /* we'll need to get all headers for all of those streams
+               that we have to backup headers for */
+            p_ogg->i_bos = 0;
+            for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
+            {
+                if( p_ogg->pp_stream[i_stream]->b_force_backup )
+                    p_ogg->i_bos++;
+            }
+
+
             /* This is the first data page, which means we are now finished
              * with the initial pages. We just need to store it in the relevant
              * bitstream. */
@@ -1237,6 +1294,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 if( ogg_stream_pagein( &p_ogg->pp_stream[i_stream]->os,
                                        &oggpage ) == 0 )
                 {
+                    p_ogg->b_page_waiting = true;
                     break;
                 }
             }
