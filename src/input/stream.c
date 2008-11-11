@@ -47,7 +47,6 @@
  *  - compute cost for seek
  *  - improve stream mode seeking with closest segments
  *  - ...
- *  - Maybe remove (block/stream) in favour of immediate
  */
 
 /* Two methods:
@@ -115,9 +114,8 @@ typedef struct
 
 } access_entry_t;
 
-typedef enum stream_read_method_t
+typedef enum
 {
-    STREAM_METHOD_IMMEDIATE,
     STREAM_METHOD_BLOCK,
     STREAM_METHOD_STREAM
 } stream_read_method_t;
@@ -158,13 +156,6 @@ struct stream_sys_t
         int i_read_size;
 
     } stream;
-
-    /* Method 3: for pf_read */
-    struct
-    {
-        int64_t i_end;
-        uint8_t *p_buffer;
-    } immediate;
 
     /* Peek temporary buffer */
     unsigned int i_peek;
@@ -219,11 +210,6 @@ static int  AStreamSeekStream( stream_t *s, int64_t i_pos );
 static void AStreamPrebufferStream( stream_t *s );
 static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 
-/* Method 3 */
-static int  AStreamReadImmediate( stream_t *s, void *p_read, unsigned int i_read );
-static int  AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned int i_read );
-static int  AStreamSeekImmediate( stream_t *s, int64_t i_pos );
-
 /* Common */
 static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
@@ -231,37 +217,6 @@ static void UStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, int64_t i_pos );
 static int  ARecordSetState( stream_t *s, bool b_record, const char *psz_extension );
 static void ARecordWrite( stream_t *s, const uint8_t *p_buffer, size_t i_buffer );
-
-/****************************************************************************
- * Method 3 helpers:
- ****************************************************************************/
-
-static inline int64_t stream_buffered_size( stream_t *s )
-{
-    return s->p_sys->immediate.i_end;
-}
-
-static inline void stream_buffer_empty( stream_t *s, int length )
-{
-    length = __MAX( stream_buffered_size( s ), length );
-    if( length )
-    {
-        memmove( s->p_sys->immediate.p_buffer,
-                 s->p_sys->immediate.p_buffer + length,
-                 stream_buffered_size( s ) - length );
-    }
-    s->p_sys->immediate.i_end -= length;
-}
-
-static inline void stream_buffer_fill( stream_t *s, int length )
-{
-    s->p_sys->immediate.i_end += length;
-}
-
-static inline uint8_t * stream_buffer( stream_t *s )
-{
-    return s->p_sys->immediate.p_buffer;
-}
 
 /****************************************************************************
  * stream_CommonNew: create an empty stream structure
@@ -341,8 +296,6 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     p_sys->p_access = p_access;
     if( p_access->pf_block )
         p_sys->method = STREAM_METHOD_BLOCK;
-    else if( var_CreateGetBool( s, "use-stream-immediate" ) )
-        p_sys->method = STREAM_METHOD_IMMEDIATE;
     else
         p_sys->method = STREAM_METHOD_STREAM;
 
@@ -449,24 +402,6 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
             goto error;
         }
     }
-    else if( p_sys->method == STREAM_METHOD_IMMEDIATE )
-    {
-        msg_Dbg( s, "Using AStream*Immediate" );
-
-        s->pf_read = AStreamReadImmediate;
-        s->pf_peek = AStreamPeekImmediate;
-
-        /* Allocate/Setup our tracks (useful to peek)*/
-        p_sys->immediate.i_end = 0;
-        p_sys->immediate.p_buffer = malloc( STREAM_CACHE_SIZE );
-
-        if( p_sys->immediate.p_buffer == NULL )
-            goto error;
-
-        msg_Dbg( s, "p_buffer %p-%p",
-                 p_sys->immediate.p_buffer,
-                 &p_sys->immediate.p_buffer[STREAM_CACHE_SIZE] );
-    }
     else
     {
         int i;
@@ -546,8 +481,6 @@ static void AStreamDestroy( stream_t *s )
 
     if( p_sys->method == STREAM_METHOD_BLOCK )
         block_ChainRelease( p_sys->block.p_first );
-    else if( p_sys->method == STREAM_METHOD_IMMEDIATE )
-        free( p_sys->immediate.p_buffer );
     else
         free( p_sys->stream.p_buffer );
 
@@ -598,10 +531,6 @@ void stream_AccessReset( stream_t *s )
 
         /* Do the prebuffering */
         AStreamPrebufferBlock( s );
-    }
-    else if( p_sys->method == STREAM_METHOD_IMMEDIATE )
-    {
-        stream_buffer_empty( s, stream_buffered_size( s ) );
     }
     else
     {
@@ -695,8 +624,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             {
             case STREAM_METHOD_BLOCK:
                 return AStreamSeekBlock( s, i_64 );
-            case STREAM_METHOD_IMMEDIATE:
-                return AStreamSeekImmediate( s, i_64 );
             case STREAM_METHOD_STREAM:
                 return AStreamSeekStream( s, i_64 );
             default:
@@ -1543,10 +1470,10 @@ static int AStreamRefillStream( stream_t *s )
 
     if( i_toread <= 0 ) return VLC_EGENERIC; /* EOF */
 
-//#ifdef STREAM_DEBUG
+#ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamRefillStream: used=%d toread=%d",
                  p_sys->stream.i_used, i_toread );
-//#endif
+#endif
 
     i_start = mdate();
     while( i_toread > 0 )
@@ -1653,145 +1580,6 @@ static void AStreamPrebufferStream( stream_t *s )
 
         p_sys->stat.i_read_count++;
     }
-}
-
-/****************************************************************************
- * Method 3:
- ****************************************************************************/
-
-static int AStreamReadImmediate( stream_t *s, void *p_read, unsigned int i_read )
-{
-    stream_sys_t *p_sys = s->p_sys;
-    uint8_t *p_data= (uint8_t*)p_read;
-    uint8_t *p_record = p_data;
-    unsigned int i_data;
-
-#ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamReadImmediate p_read=%p i_read=%d",
-             p_read, i_read );
-#endif
-
-    if( p_sys->record.b_active && !p_data )
-        p_record = p_data = malloc( i_read );
-
-    /* First, check if we already have some data in the buffer,
-     * that we could copy directly */
-    i_data = __MIN( stream_buffered_size( s ), i_read );
-    if( i_data > 0 )
-    {
-#ifdef STREAM_DEBUG
-        msg_Dbg( s, "AStreamReadImmediate: copy %u from %p", i_data, stream_buffer( s ) );
-#endif
-
-        assert( i_data <= STREAM_CACHE_SIZE );
-
-        if( p_data )
-        {
-            memcpy( p_data, stream_buffer( s ), i_data );
-            p_data += i_data;
-        }
-    }
-
-    /* Now that we've read our buffer we don't need its i_copy bytes */
-    stream_buffer_empty( s, i_data );
-
-    /* Now check if we have still to really read some data */
-    while( i_data < i_read )
-    {
-        const unsigned int i_to_read = i_read - i_data;
-        int i_result;
-
-        if( p_data )
-        {
-            i_result = AReadStream( s, p_data, i_to_read );
-        }
-        else
-        {
-            void *p_dummy = malloc( i_to_read );
-
-            if( !p_dummy )
-                break;
-
-            i_result = AReadStream( s, p_dummy, i_to_read );
-
-            free( p_dummy );
-        }
-        if( i_result <= 0 )
-            break;
-
-        p_sys->i_pos += i_data;
-        if( p_data )
-            p_data += i_result;
-        i_data += i_result;
-    }
-
-    if( p_sys->record.b_active )
-    {
-        if( i_data > 0 && p_record != NULL)
-            ARecordWrite( s, p_record, i_data );
-        if( !p_read )
-            free( p_record );
-    }
-    return i_data;
-}
-
-static int AStreamPeekImmediate( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
-{
-#ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamPeekImmediate: %d  size=%"PRId64,
-             i_read, size_buffered_size( s ) );
-#endif
-
-    /* Avoid problem, but that shouldn't happen
-     * FIXME yes it can */
-    if( i_read > STREAM_CACHE_SIZE / 2 )
-        i_read = STREAM_CACHE_SIZE / 2;
-
-    int i_to_read = i_read - stream_buffered_size( s );
-    if( i_to_read > 0 )
-    {
-#ifdef STREAM_DEBUG
-        msg_Dbg( s, "AStreamPeekImmediate: Reading %d",
-             i_to_read );
-#endif
-        i_to_read = AReadStream( s, stream_buffer( s ) + stream_buffered_size( s ),
-                                 i_to_read );
-
-        if( i_to_read > 0 )
-            stream_buffer_fill( s, i_to_read );
-    }
-
-    *pp_peek = stream_buffer( s );
-
-    return __MIN( stream_buffered_size( s ), i_read );
-}
-
-static int AStreamSeekImmediate( stream_t *s, int64_t i_pos )
-{
-    stream_sys_t *p_sys = s->p_sys;
-    access_t     *p_access = p_sys->p_access;
-    bool   b_aseek;
-
-#ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamSeekImmediate to %"PRId64" pos=%"PRId64
-             i_pos, p_sys->i_pos );
-#endif
-
-    access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
-    if( !b_aseek )
-    {
-        /* We can't do nothing */
-        msg_Dbg( s, "AStreamSeekImmediate: can't seek" );
-        return VLC_EGENERIC;
-    }
-
-    /* Just reset our buffer */
-    stream_buffer_empty( s, stream_buffered_size( s ) );
-
-    if( ASeek( s, i_pos ) )
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
 }
 
 /****************************************************************************

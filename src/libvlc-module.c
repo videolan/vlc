@@ -1873,8 +1873,7 @@ vlc_module_begin ()
     set_section( N_("Performance options"), NULL )
     add_obsolete_bool( "minimize-threads" )
 
-    add_bool( "use-stream-immediate", false, NULL,
-               USE_STREAM_IMMEDIATE, USE_STREAM_IMMEDIATE_LONGTEXT, true );
+    add_obsolete_bool( "use-stream-immediate" );
 
     add_obsolete_bool( "auto-adjust-pts-delay" )
 
