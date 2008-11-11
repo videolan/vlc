@@ -1118,7 +1118,14 @@ if BUILD_MOZILLA
 	mkdir -p "$(top_builddir)/macosx-plugin-instdata"
 	cp -R "$(top_builddir)/projects/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
 	rm -rf "$(top_builddir)/VLC Internet Plug-In.pkg"
-	PATH=/Developer/usr/bin:/Developer/Tools:$$PATH packagemaker -build -ds -p "$(top_builddir)/VLC Internet Plug-In.pkg" \
+	export PACKAGEMAKER=
+	if test -x /Developer/Tools/packagemaker; then \
+	   export PACKAGEMAKER=/Developer/Tools/packagemaker; \
+	fi; \
+	if test -x /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker; then \
+	   export PACKAGEMAKER=/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker; \
+	fi; \
+	$${PACKAGEMAKER} -build -ds -p "$(top_builddir)/VLC Internet Plug-In.pkg" \
 	-f "$(top_builddir)/macosx-plugin-instdata" \
 	-i "$(srcdir)/extras/package/macosx/plugin/InstallerInfo.plist" \
 	-d "$(srcdir)/extras/package/macosx/plugin/InstallerDescription.plist"; true
