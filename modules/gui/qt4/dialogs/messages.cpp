@@ -166,7 +166,11 @@ void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
      || (item->i_type == VLC_MSG_DBG && verbosityBox->value() < 2 ))
         return;
 
-    messages->textCursor().movePosition( QTextCursor::End );
+    // Saving cursor selection
+    int startPos = messages->textCursor().selectionStart();
+    int endPos = messages->textCursor().selectionEnd();
+
+    messages->moveCursor( QTextCursor::End );
     messages->setFontItalic( true );
     messages->setTextColor( "darkBlue" );
     messages->insertPlainText( qfu( item->psz_module ) );
@@ -198,6 +202,13 @@ void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
     messages->insertPlainText( qfu(item->psz_msg) );
     messages->insertPlainText( "\n" );
     messages->ensureCursorVisible();
+
+    // Restoring saved cursor selection
+    QTextCursor cur = messages->textCursor();
+    cur.movePosition( QTextCursor::Start );
+    cur.movePosition( QTextCursor::NextCharacter, QTextCursor::MoveAnchor, startPos );
+    cur.movePosition( QTextCursor::NextCharacter, QTextCursor::KeepAnchor, endPos - startPos );
+    messages->setTextCursor( cur );
 }
 
 void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
