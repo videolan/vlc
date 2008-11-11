@@ -222,14 +222,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Bail out if buggy decoder */
-    if( i_codec_id == CODEC_ID_AAC )
-    {
-        msg_Dbg( p_dec, "refusing to use ffmpeg's (%s) decoder which is buggy",
-                 psz_namecodec );
-        return VLC_EGENERIC;
-    }
-
     /* Initialization must be done before avcodec_find_decoder() */
     InitLibavcodec(p_this);
 
