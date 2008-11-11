@@ -71,10 +71,10 @@
 #   define STREAM_CACHE_SIZE  (4*STREAM_CACHE_TRACK*1024*1024)
 #endif
 
-/* How many data we try to prebuffer */
-#define STREAM_CACHE_PREBUFFER_SIZE (32767)
-/* Maximum time we take to pre-buffer */
-#define STREAM_CACHE_PREBUFFER_LENGTH (100*1000)
+/* How many data we try to prebuffer
+ * XXX it should be small to avoid useless latency but big enough for
+ * efficient demux probing */
+#define STREAM_CACHE_PREBUFFER_SIZE (128)
 
 /* Method1: Simple, for pf_block.
  *  We get blocks and put them in the linked list.
@@ -94,7 +94,7 @@
  *        - compute a good value for i_read_size
  *        - ?
  */
-#define STREAM_READ_ATONCE 32767
+#define STREAM_READ_ATONCE 1024
 #define STREAM_CACHE_TRACK_SIZE (STREAM_CACHE_SIZE/STREAM_CACHE_TRACK)
 
 typedef struct
@@ -845,12 +845,11 @@ static void AStreamPrebufferBlock( stream_t *s )
     i_start = mdate();
     for( ;; )
     {
-        int64_t i_date = mdate();
+        const int64_t i_date = mdate();
         bool b_eof;
         block_t *b;
 
-        if( s->b_die || p_sys->block.i_size > STREAM_CACHE_PREBUFFER_SIZE ||
-            ( i_first > 0 && i_first + STREAM_CACHE_PREBUFFER_LENGTH < i_date ) )
+        if( s->b_die || p_sys->block.i_size > STREAM_CACHE_PREBUFFER_SIZE )
         {
             int64_t i_byterate;
 
@@ -887,20 +886,12 @@ static void AStreamPrebufferBlock( stream_t *s )
             b = b->p_next;
         }
 
-        if( p_access->info.b_prebuffered )
-        {
-            /* Access has already prebufferred - update stats and exit */
-            p_sys->stat.i_bytes = p_sys->block.i_size;
-            p_sys->stat.i_read_time = mdate() - i_start;
-            break;
-        }
-
         if( i_first == 0 )
         {
             i_first = mdate();
-            msg_Dbg( s, "received first data for our buffer");
+            msg_Dbg( s, "received first data after %d ms",
+                     (int)((i_first-i_start)/1000) );
         }
-
     }
 
     p_sys->block.p_current = p_sys->block.p_first;
@@ -1315,6 +1306,9 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
         if( tk->i_start + p_sys->stream.i_offset >= tk->i_end ||
             p_sys->stream.i_used >= p_sys->stream.i_read_size )
         {
+            if( p_sys->stream.i_used < i_read - i_data )
+                p_sys->stream.i_used = __MIN( i_read - i_data, STREAM_READ_ATONCE * 10 );
+
             if( AStreamRefillStream( s ) )
             {
                 /* EOF */
@@ -1549,10 +1543,10 @@ static int AStreamRefillStream( stream_t *s )
 
     if( i_toread <= 0 ) return VLC_EGENERIC; /* EOF */
 
-#ifdef STREAM_DEBUG
+//#ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamRefillStream: used=%d toread=%d",
                  p_sys->stream.i_used, i_toread );
-#endif
+//#endif
 
     i_start = mdate();
     while( i_toread > 0 )
@@ -1611,11 +1605,8 @@ static void AStreamPrebufferStream( stream_t *s )
 
     int64_t i_first = 0;
     int64_t i_start;
-    int64_t i_prebuffer = p_sys->b_quick ? STREAM_CACHE_TRACK_SIZE /100 :
-        ( (p_access->info.i_title > 1 || p_access->info.i_seekpoint > 1) ?
-          STREAM_CACHE_PREBUFFER_SIZE : STREAM_CACHE_TRACK_SIZE / 3 );
 
-    msg_Dbg( s, "pre-buffering..." );
+    msg_Dbg( s, "pre buffering" );
     i_start = mdate();
     for( ;; )
     {
@@ -1624,8 +1615,7 @@ static void AStreamPrebufferStream( stream_t *s )
         int64_t i_date = mdate();
         int i_read;
 
-        if( s->b_die || tk->i_end >= i_prebuffer ||
-            (i_first > 0 && i_first + STREAM_CACHE_PREBUFFER_LENGTH < i_date) )
+        if( s->b_die || tk->i_end >= STREAM_CACHE_PREBUFFER_SIZE )
         {
             int64_t i_byterate;
 
@@ -1655,7 +1645,8 @@ static void AStreamPrebufferStream( stream_t *s )
         if( i_first == 0 )
         {
             i_first = mdate();
-            msg_Dbg( s, "received first data for our buffer");
+            msg_Dbg( s, "received first data after %d ms",
+                     (int)((i_first-i_start)/1000) );
         }
 
         tk->i_end += i_read;

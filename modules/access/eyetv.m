@@ -163,7 +163,6 @@ static int Open( vlc_object_t *p_this )
     /* Init p_access */
     access_InitFields( p_access );
     ACCESS_SET_CALLBACKS( NULL, BlockRead, Control, NULL );
-    p_access->info.b_prebuffered = false;
     p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;

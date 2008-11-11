@@ -112,12 +112,10 @@ struct access_t
 
         int64_t      i_size;    /* Write only for access, read only for input */
         int64_t      i_pos;     /* idem */
-        bool   b_eof;     /* idem */
+        bool         b_eof;     /* idem */
 
         int          i_title;    /* idem, start from 0 (could be menu) */
         int          i_seekpoint;/* idem, start from 0 */
-
-        bool   b_prebuffered; /* Read only for input */
     } info;
     access_sys_t *p_sys;
 };

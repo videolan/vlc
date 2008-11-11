@@ -66,7 +66,6 @@ static access_t *access_InternalNew( vlc_object_t *p_obj, const char *psz_access
     p_access->info.i_size   = 0;
     p_access->info.i_pos    = 0;
     p_access->info.b_eof    = false;
-    p_access->info.b_prebuffered = false;
     p_access->info.i_title  = 0;
     p_access->info.i_seekpoint = 0;
 
