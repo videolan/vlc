@@ -372,7 +372,7 @@ QStringList DialogsProvider::showSimpleOpen( QString help,
     fileTypes.replace(QString(";*"), QString(" *"));
 
     return QFileDialog::getOpenFileNames( NULL,
-        help.isEmpty() ? qfu(I_OP_SEL_FILES ) : help,
+        help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
         path.isEmpty() ? qfu( p_intf->p_sys->psz_filepath ) : path,
         fileTypes );
 }
