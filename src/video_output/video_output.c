@@ -94,7 +94,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout );
 
 /* Time during which the thread will sleep if it has nothing to
  * display (in micro-seconds) */
-#define VOUT_IDLE_SLEEP                 ((int)(0.020*CLOCK_FREQ))
+#define VOUT_IDLE_SLEEP                 ((int)(0.200*CLOCK_FREQ))
 
 /* Maximum lap of time allowed between the beginning of rendering and
  * display. If, compared to the current date, the next image is too
