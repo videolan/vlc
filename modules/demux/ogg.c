@@ -674,17 +674,21 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     i_interpolated_pts = p_stream->i_interpolated_pcr;
     Ogg_UpdatePCR( p_stream, p_oggpacket );
 
-    if( p_stream->i_pcr >= 0 )
+    /* SPU streams are typically discontinuous, do not mind large gaps */
+    if( p_stream->fmt.i_cat != SPU_ES )
     {
-        /* This is for streams where the granulepos of the header packets
-         * doesn't match these of the data packets (eg. ogg web radios). */
-        if( p_stream->i_previous_pcr == 0 &&
-            p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
+        if( p_stream->i_pcr >= 0 )
         {
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            /* This is for streams where the granulepos of the header packets
+             * doesn't match these of the data packets (eg. ogg web radios). */
+            if( p_stream->i_previous_pcr == 0 &&
+                p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY )
+            {
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
-            /* Call the pace control */
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
+                /* Call the pace control */
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
+            }
         }
     }
 
