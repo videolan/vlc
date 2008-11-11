@@ -651,11 +651,11 @@ void SPrefsPanel::apply()
             CaC( "tcp-caching" ); CaC( "vcd-caching" );
             CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
             CaC( "screen-caching" );
-            CaCi( "rtsp-caching", 4 ); CaCi( "ftp-caching", 2 );
-            CaCi( "http-caching", 4 );
+            CaCi( "rtsp-caching", 2 ); CaCi( "ftp-caching", 2 );
+            CaCi( "http-caching", 2 );
             if (module_exists ("access_realrtsp" ))
                 CaCi( "realrtsp-caching", 10 );
-            CaCi( "mms-caching", 19 );
+            CaCi( "mms-caching", 10 );
             #ifdef WIN32
             CaC( "dshow-caching" );
             #else
