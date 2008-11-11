@@ -2210,7 +2210,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
-        case ES_OUT_SET_FMT:
+        case ES_OUT_SET_ES_FMT:
         {
             /* This ain't pretty but is need by some demuxers (eg. Ogg )
              * to update the p_extra data */

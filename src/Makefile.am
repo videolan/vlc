@@ -309,6 +309,7 @@ SOURCES_libvlc_common = \
 	input/decoder_synchro.c \
 	input/demux.c \
 	input/es_out.c \
+	input/es_out_timeshift.c \
 	input/input.c \
 	input/meta.c \
 	input/access.h \
@@ -316,6 +317,7 @@ SOURCES_libvlc_common = \
 	input/decoder.h \
 	input/demux.h \
 	input/es_out.h \
+	input/es_out_timeshift.h \
 	input/stream.h \
 	input/input_internal.h \
 	input/vlm_internal.h \

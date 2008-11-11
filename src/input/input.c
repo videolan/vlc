@@ -37,6 +37,7 @@
 
 #include "input_internal.h"
 #include "es_out.h"
+#include "es_out_timeshift.h"
 #include "access.h"
 #include "demux.h"
 #include "stream.h"
@@ -200,8 +201,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->b_recording = false;
     TAB_INIT( p_input->p->i_bookmark, p_input->p->bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
-    p_input->p->p_es_out_display =
-    p_input->p->p_es_out         = NULL;
+    p_input->p->p_es_out_display = NULL;
+    p_input->p->p_es_out = NULL;
     p_input->p->p_sout  = NULL;
     p_input->p->b_out_pace_control = false;
     p_input->i_pts_delay = 0;
@@ -1183,8 +1184,8 @@ static int Init( input_thread_t * p_input )
 #endif
 
     /* Create es out */
-    p_input->p->p_es_out         =
     p_input->p->p_es_out_display = input_EsOutNew( p_input, p_input->p->i_rate );
+    p_input->p->p_es_out         = input_EsOutTimeshiftNew( p_input, p_input->p->p_es_out_display );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
@@ -1264,12 +1265,10 @@ static int Init( input_thread_t * p_input )
 error:
     input_ChangeState( p_input, ERROR_S );
 
-    if( p_input->p->p_es_out_display )
-    {
-        //TODO
-    }
     if( p_input->p->p_es_out )
         es_out_Delete( p_input->p->p_es_out );
+    if( p_input->p->p_es_out_display )
+        es_out_Delete( p_input->p->p_es_out_display );
 #ifdef ENABLE_SOUT
     if( p_input->p->p_sout )
     {
@@ -1357,12 +1356,10 @@ static void End( input_thread_t * p_input )
     free( p_input->p->slave );
 
     /* Unload all modules */
-    if( p_input->p->p_es_out_display )
-    {
-        //TODO
-    }
     if( p_input->p->p_es_out )
         es_out_Delete( p_input->p->p_es_out );
+    if( p_input->p->p_es_out_display )
+        es_out_Delete( p_input->p->p_es_out_display );
 
     if( !p_input->b_preparsing )
     {
