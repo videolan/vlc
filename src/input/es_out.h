@@ -64,12 +64,6 @@ enum es_out_query_private_e
 
     /* Set next frame */
     ES_OUT_SET_FRAME_NEXT,                          /*                          res=can fail */
-
-    /* Lock/Unlock es_out
-     * XXX es_out is safe without them, but they ensure coherency between
-     * calls if needed (if es_out is called outside of the main thread) */
-    ES_OUT_LOCK,                                    /*                          res=cannot fail */
-    ES_OUT_UNLOCK,                                  /*                          res=cannot fail */
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -119,16 +113,6 @@ static inline int es_out_SetTime( es_out_t *p_out, mtime_t i_date )
 static inline int es_out_SetFrameNext( es_out_t *p_out )
 {
     return es_out_Control( p_out, ES_OUT_SET_FRAME_NEXT );
-}
-static inline void es_out_Lock( es_out_t *p_out )
-{
-    int i_ret = es_out_Control( p_out, ES_OUT_LOCK );
-    assert( !i_ret );
-}
-static inline void es_out_Unlock( es_out_t *p_out )
-{
-    int i_ret = es_out_Control( p_out, ES_OUT_UNLOCK );
-    assert( !i_ret );
 }
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );

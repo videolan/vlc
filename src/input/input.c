@@ -1560,8 +1560,6 @@ static bool Control( input_thread_t *p_input, int i_type,
     if( !p_input )
         return b_force_update;
 
-    es_out_Lock( p_input->p->p_es_out );
-
     switch( i_type )
     {
         case INPUT_CONTROL_SET_DIE:
@@ -2075,8 +2073,6 @@ static bool Control( input_thread_t *p_input, int i_type,
             msg_Err( p_input, "not yet implemented" );
             break;
     }
-
-    es_out_Unlock( p_input->p->p_es_out );
 
     return b_force_update;
 }

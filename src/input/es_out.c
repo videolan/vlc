@@ -2364,14 +2364,6 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             EsOutFrameNext( out );
             return VLC_SUCCESS;
 
-        case ES_OUT_LOCK:
-            vlc_mutex_lock( &p_sys->lock );
-            return VLC_SUCCESS;
-
-        case ES_OUT_UNLOCK:
-            vlc_mutex_unlock( &p_sys->lock );
-            return VLC_SUCCESS;
-
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
             return VLC_EGENERIC;
