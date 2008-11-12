@@ -1,11 +1,21 @@
 #!/bin/bash
 
-# INTELROOT == path to VLC.app with intel build.
+# This script allows you to create a Universal Binary of VLC.app. It requires 
+# pre-compiled binaries for Intel- and PowerPC-based Macs; no sources.
+# Exotic sub-platforms aka x86_64 or even ppc64 are not supported right now.
+# Using different OS X SDKs for both platforms is absolutely fine of course.
+# All you need to do is CHANGE THE ROOTS and READ THE COMMENTS.
+# Happy releasing!
+
+# INTELROOT == path to VLC.app compiled on an Intel-based Mac (e.g. jones).
 INTELROOT=/Applications/VLC.app
-# PPCROOT   == path to VLC.app with powerpc build.
+# PPCROOT   == path to VLC.app compiled on a PowerPC-based Mac (e.g. veda).
 PPCROOT=/Volumes/vlc-0.9.0-test3/VLC.app
-# UBROOT    == path to copied INTEL VLC.app
-# which will contain Universal Binary.
+# Note that these 2 roots only require read-access and won't be changed at all.
+
+# UBROOT    == path to a VLC.app bundle which will contain the Universal Binary.
+# Note that you should empty the following folders: lib, modules
+# and remove the VLC binary in MacOS (just for sanity reasons)
 UBROOT=/Users/fpk/VLC-release.app
 
 for i in `ls $INTELROOT/Contents/MacOS/lib/`
@@ -24,5 +34,6 @@ cp $INTELROOT/Contents/MacOS/modules/*sse* $UBROOT/Contents/MacOS/modules/
 cp $INTELROOT/Contents/MacOS/modules/*3dn* $UBROOT/Contents/MacOS/modules/
 cp $PPCROOT/Contents/MacOS/modules/*altivec* $UBROOT/Contents/MacOS/modules/
 
-# now you should copy resulting UBROOT dir into vlc build directory
-# and run 'make package-macosx'
+# Now, you need to copy the resulting UBROOT folder into VLC's build directory 
+# and make sure it is actually named "VLC-release.app".
+# Afterwards, run 'make package-macosx' and follow release_howto.txt in /doc
