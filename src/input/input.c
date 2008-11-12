@@ -490,7 +490,7 @@ void input_StopThread( input_thread_t *p_input )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
-sout_instance_t * input_DetachSout( input_thread_t *p_input )
+sout_instance_t *input_DetachSout( input_thread_t *p_input )
 {
     assert( p_input->b_dead );
     sout_instance_t *p_sout = p_input->p->p_sout;
@@ -504,7 +504,7 @@ sout_instance_t * input_DetachSout( input_thread_t *p_input )
  * This is the "normal" thread that spawns the input processing chain,
  * reads the stream, cleans up and waits
  *****************************************************************************/
-static void* Run( vlc_object_t *p_this )
+static void *Run( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     const int canc = vlc_savecancel();
@@ -536,7 +536,7 @@ exit:
  * This is the "just forget me" thread that spawns the input processing chain,
  * reads the stream, cleans up and releases memory
  *****************************************************************************/
-static void* RunAndDestroy( vlc_object_t *p_this )
+static void *RunAndDestroy( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     const int canc = vlc_savecancel();
@@ -1498,20 +1498,23 @@ static void ControlReduce( input_thread_t *p_input )
 /* Pause input */
 static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 {
-    int i_ret;
-    int i_state;
-    if( p_input->p->input.p_access )
-        i_ret = access_Control( p_input->p->input.p_access,
-                                 ACCESS_SET_PAUSE_STATE, true );
-    else
-        i_ret = demux_Control( p_input->p->input.p_demux,
-                                DEMUX_SET_PAUSE_STATE, true );
+    int i_ret = VLC_SUCCESS;
+    int i_state = PAUSE_S;
 
-    i_state = PAUSE_S;
-    if( i_ret )
+    if( p_input->p->b_can_pause )
     {
-        msg_Warn( p_input, "cannot set pause state" );
-        i_state = p_input->i_state;
+        if( p_input->p->input.p_access )
+            i_ret = access_Control( p_input->p->input.p_access,
+                                     ACCESS_SET_PAUSE_STATE, true );
+        else
+            i_ret = demux_Control( p_input->p->input.p_demux,
+                                    DEMUX_SET_PAUSE_STATE, true );
+
+        if( i_ret )
+        {
+            msg_Warn( p_input, "cannot set pause state" );
+            i_state = p_input->i_state;
+        }
     }
 
     /* Switch to new state */
@@ -1519,25 +1522,28 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 
     /* */
     if( !i_ret )
-        es_out_SetPauseState( p_input->p->p_es_out, true, true, i_control_date );
+        es_out_SetPauseState( p_input->p->p_es_out, p_input->p->b_can_pause, true, i_control_date );
 }
 static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 {
-    int i_ret;
-    if( p_input->p->input.p_access )
-        i_ret = access_Control( p_input->p->input.p_access,
-                                 ACCESS_SET_PAUSE_STATE, false );
-    else
-        i_ret = demux_Control( p_input->p->input.p_demux,
-                                DEMUX_SET_PAUSE_STATE, false );
+    int i_ret = VLC_SUCCESS;
 
-    if( i_ret )
+    if( p_input->p->b_can_pause )
     {
-        /* FIXME What to do ? */
-        msg_Warn( p_input, "cannot unset pause -> EOF" );
-        vlc_mutex_unlock( &p_input->p->lock_control );
-        input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
-        vlc_mutex_lock( &p_input->p->lock_control );
+        if( p_input->p->input.p_access )
+            i_ret = access_Control( p_input->p->input.p_access,
+                                     ACCESS_SET_PAUSE_STATE, false );
+        else
+            i_ret = demux_Control( p_input->p->input.p_demux,
+                                    DEMUX_SET_PAUSE_STATE, false );
+        if( i_ret )
+        {
+            /* FIXME What to do ? */
+            msg_Warn( p_input, "cannot unset pause -> EOF" );
+            vlc_mutex_unlock( &p_input->p->lock_control );
+            input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
+            vlc_mutex_lock( &p_input->p->lock_control );
+        }
     }
 
     /* Switch to play */
@@ -1676,14 +1682,14 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 b_force_update = true;
             }
-            else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S &&
-                     p_input->p->b_can_pause )
+            else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S /* &&
+                     p_input->p->b_can_pause */ )
             {
                 ControlPause( p_input, i_control_date );
 
                 b_force_update = true;
             }
-            else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause )
+            else if( val.i_int == PAUSE_S && !p_input->p->b_can_pause && 0 )
             {
                 b_force_update = true;
 
