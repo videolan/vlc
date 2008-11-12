@@ -113,9 +113,11 @@ struct es_out_sys_t
 
     /* Lock for all following fields */
     vlc_mutex_t    lock;
+    vlc_cond_t     wait;
 
     /* */
     bool           b_delayed;
+    vlc_object_t   *p_thread;
 
     /* */
     int            i_es;
@@ -131,6 +133,10 @@ static int          Send   ( es_out_t *, es_out_id_t *, block_t * );
 static void         Del    ( es_out_t *, es_out_id_t * );
 static int          Control( es_out_t *, int i_query, va_list );
 static void         Destroy( es_out_t * );
+
+static int          TsStart( es_out_t * );
+static void         TsStop( es_out_t * );
+static void         *TsRun( vlc_object_t * );
 
 static void CmdPush( es_out_t *, const ts_cmd_t * );
 static int  CmdPop( es_out_t *p_out, ts_cmd_t *p_cmd );
@@ -181,7 +187,10 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     p_sys->p_input = p_input;
     p_sys->p_out = p_next_out;
     vlc_mutex_init_recursive( &p_sys->lock );
+    vlc_cond_init( &p_sys->wait );
+
     p_sys->b_delayed = false;
+    p_sys->p_thread = NULL;
 
     TAB_INIT( p_sys->i_es, p_sys->pp_es );
     TAB_INIT( p_sys->i_cmd, p_sys->pp_cmd );
@@ -193,6 +202,8 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     p_sys->i_tmp_size_max = 50 * 1024*1024;
     p_sys->psz_tmp_path = GetTmpPath( NULL );
 
+    //TsStart( p_out );
+
     return p_out;
 }
 
@@ -203,7 +214,10 @@ static void Destroy( es_out_t *p_out )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
 
-    while( p_sys->i_cmd > 0 )
+    if( p_sys->b_delayed )
+        TsStop( p_out );
+
+    for( ;; )
     {
         ts_cmd_t cmd;
 
@@ -235,6 +249,7 @@ static void Destroy( es_out_t *p_out )
     TAB_CLEAN( p_sys->i_es, p_sys->pp_es  );
 
     free( p_sys->psz_tmp_path );
+    vlc_cond_destroy( &p_sys->wait );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
     free( p_out );
@@ -304,6 +319,115 @@ static void Del( es_out_t *p_out, es_out_id_t *p_es )
 
     vlc_mutex_unlock( &p_sys->lock );
 }
+
+static int ControlLockedGetEmpty( es_out_t *p_out, bool *pb_empty )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( p_sys->b_delayed && p_sys->i_cmd > 0 )
+        *pb_empty = false;
+    else
+        *pb_empty = es_out_GetEmpty( p_sys->p_out );
+
+    return VLC_SUCCESS;
+}
+static int ControlLockedGetWakeup( es_out_t *p_out, mtime_t *pi_wakeup )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( p_sys->b_delayed )
+    {
+        assert( !p_sys->p_input->b_can_pace_control );
+        *pi_wakeup = 0;
+    }
+    else
+    {
+        *pi_wakeup = es_out_GetWakeup( p_sys->p_out );
+    }
+
+    return VLC_SUCCESS;
+}
+static int ControlLockedGetBuffering( es_out_t *p_out, bool *pb_buffering )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( p_sys->b_delayed )
+        *pb_buffering = true;
+    else
+        *pb_buffering = es_out_GetBuffering( p_sys->p_out );
+
+    return VLC_SUCCESS;
+}
+static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( !p_sys->b_delayed &&
+        !b_source_paused == !b_paused )
+    {
+        return es_out_SetPauseState( p_sys->p_out, b_source_paused, b_paused, i_date );
+    }
+
+    if( p_sys->p_input->b_can_pace_control )
+    {
+        /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
+         * and so be able to advertize correctly pace control property in access
+         * module */
+        msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have space control" );
+        return VLC_EGENERIC;
+    }
+
+    if( b_paused )
+    {
+        assert( !b_source_paused );
+
+        if( !p_sys->b_delayed )
+            TsStart( p_out );
+
+        return es_out_SetPauseState( p_sys->p_out, true, true, i_date );
+    }
+    else
+    {
+        /* TODO store pause state to know if stoping b_delayed is possible ? */
+        return es_out_SetPauseState( p_sys->p_out, false, false, i_date );
+    }
+}
+static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( !p_sys->b_delayed &&
+        i_src_rate == i_rate )
+    {
+        return es_out_SetRate( p_sys->p_out, i_src_rate, i_rate );
+    }
+    /* TODO */
+    msg_Err( p_sys->p_input, "EsOutTimeshift does not yet support rate change" );
+    return VLC_EGENERIC;
+}
+static int ControlLockedSetTime( es_out_t *p_out, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( !p_sys->b_delayed )
+        return es_out_SetTime( p_sys->p_out, i_date );
+
+    /* TODO */
+    msg_Err( p_sys->p_input, "EsOutTimeshift does not yet support time change" );
+    return VLC_EGENERIC;
+}
+static int ControlLockedSetFrameNext( es_out_t *p_out )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( !p_sys->b_delayed )
+        return es_out_SetFrameNext( p_sys->p_out );
+
+    /* TODO */
+    msg_Err( p_sys->p_input, "EsOutTimeshift does not yet support frame next" );
+    return VLC_EGENERIC;
+}
+
 static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
@@ -356,18 +480,46 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     }
 
     /* Special control */
-    case ES_OUT_GET_WAKE_UP: /* TODO ? */
-    case ES_OUT_GET_BUFFERING:
     case ES_OUT_GET_EMPTY:
+    {
+        bool *pb_empty = (bool*)va_arg( args, bool* );
+        return ControlLockedGetEmpty( p_out, pb_empty );
+    }
+    case ES_OUT_GET_WAKE_UP: /* TODO ? */
+    {
+        mtime_t *pi_wakeup = (mtime_t*)va_arg( args, mtime_t* );
+        return ControlLockedGetWakeup( p_out, pi_wakeup );
+    }
+    case ES_OUT_GET_BUFFERING:
+    {
+        bool *pb_buffering = (bool *)va_arg( args, bool* );
+        return ControlLockedGetBuffering( p_out, pb_buffering );
+    }
     case ES_OUT_SET_PAUSE_STATE:
+    {
+        const bool b_source_paused = (bool)va_arg( args, int );
+        const bool b_paused = (bool)va_arg( args, int );
+        const mtime_t i_date = (mtime_t) va_arg( args, mtime_t );
+
+        return ControlLockedSetPauseState( p_out, b_source_paused, b_paused, i_date );
+    }
     case ES_OUT_SET_RATE:
+    {
+        const int i_src_rate = (int)va_arg( args, int );
+        const int i_rate = (int)va_arg( args, int );
+
+        return ControlLockedSetRate( p_out, i_src_rate, i_rate );
+    }
     case ES_OUT_SET_TIME:
+    {
+        const mtime_t i_date = (mtime_t)va_arg( args, mtime_t );
+
+        return ControlLockedSetTime( p_out, i_date );
+    }
     case ES_OUT_SET_FRAME_NEXT:
-        if( p_sys->b_delayed )
-        {
-            /* TODO */
-        }
-        return es_out_vaControl( p_sys->p_out, i_query, args );
+    {
+        return ControlLockedSetFrameNext( p_out );
+    }
 
     default:
         msg_Err( p_sys->p_input, "Unknown es_out_Control query !" );
@@ -390,6 +542,94 @@ static int Control( es_out_t *p_out, int i_query, va_list args )
 /*****************************************************************************
  *
  *****************************************************************************/
+static int TsStart( es_out_t *p_out )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    assert( !p_sys->b_delayed );
+
+    p_sys->p_thread = vlc_custom_create( p_sys->p_input, sizeof(vlc_object_t),
+                                         VLC_OBJECT_GENERIC, "es out timeshift" );
+    if( !p_sys->p_thread )
+        return VLC_EGENERIC;
+
+    p_sys->b_delayed = true;
+    p_sys->p_thread->p_private = p_out;
+    if( vlc_thread_create( p_sys->p_thread, "es out timeshift",
+                           TsRun, VLC_THREAD_PRIORITY_INPUT, false ) )
+    {
+        msg_Err( p_sys->p_input, "cannot create input thread" );
+        vlc_object_release( p_sys->p_thread );
+
+        p_sys->b_delayed = false;
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+static void TsStop( es_out_t *p_out )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    assert( p_sys->b_delayed );
+
+    vlc_object_kill( p_sys->p_thread );
+    vlc_thread_join( p_sys->p_thread );
+
+    p_sys->b_delayed = false;
+}
+static void *TsRun( vlc_object_t *p_thread )
+{
+    es_out_t *p_out = p_thread->p_private;
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    for( ;; )
+    {
+        ts_cmd_t cmd;
+
+        vlc_mutex_lock( &p_sys->lock );
+        mutex_cleanup_push( &p_sys->lock );
+
+        while( CmdPop( p_out, &cmd ) )
+            vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+
+        /* TODO we MUST regulate the speed of this thread, to the same speed
+         * than the reading */
+
+        const int canc = vlc_savecancel();
+        switch( cmd.i_type )
+        {
+        case C_ADD:
+            CmdExecuteAdd( p_out, &cmd );
+            CmdCleanAdd( &cmd );
+            break;
+        case C_SEND:
+            CmdExecuteSend( p_out, &cmd );
+            CmdCleanSend( &cmd );
+            break;
+        case C_CONTROL:
+            CmdExecuteControl( p_out, &cmd );
+            CmdCleanControl( &cmd );
+            break;
+        case C_DEL:
+            CmdExecuteDel( p_out, &cmd );
+            break;
+        default:
+            assert(0);
+            break;
+        }
+        vlc_restorecancel( canc );
+
+        vlc_cleanup_pop();
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+
+    return NULL;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
 static void CmdPush( es_out_t *p_out, const ts_cmd_t *p_cmd )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
@@ -399,6 +639,8 @@ static void CmdPush( es_out_t *p_out, const ts_cmd_t *p_cmd )
     {
         *p_dup = *p_cmd;
         TAB_APPEND( p_sys->i_cmd, p_sys->pp_cmd, p_dup );
+
+        vlc_cond_signal( &p_sys->wait );
     }
 }
 static int CmdPop( es_out_t *p_out, ts_cmd_t *p_cmd )
@@ -490,6 +732,9 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 {
     p_cmd->i_type = C_CONTROL;
     p_cmd->control.i_query = i_query;
+    p_cmd->control.p_meta  = NULL;
+    p_cmd->control.p_epg = NULL;
+    p_cmd->control.p_fmt = NULL;
 
     switch( i_query )
     {
