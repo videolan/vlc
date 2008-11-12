@@ -549,6 +549,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     i_tmp = var_GetInteger( p_enc, ENC_CFG_PREFIX ENC_TARGETRATE );
     if( i_tmp > -1 )
         p_sys->ctx.enc_params.trate = i_tmp;
+    p_enc->fmt_out.i_bitrate = p_sys->ctx.enc_params.trate * 1000;
 
     p_sys->ctx.enc_params.lossless = var_GetBool( p_enc, ENC_CFG_PREFIX ENC_LOSSLESS );
 
@@ -589,14 +590,14 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( !psz_tmp )
         goto error;
     else if( !strcmp( psz_tmp, "auto" ) ) {
-        p_sys->b_auto_field_coding = 1;
+        p_sys->b_auto_field_coding = true;
     }
     else if( !strcmp( psz_tmp, "progressive" ) ) {
-        p_sys->b_auto_field_coding = 0;
+        p_sys->b_auto_field_coding = false;
         p_sys->ctx.enc_params.picture_coding_mode = 0;
     }
     else if( !strcmp( psz_tmp, "field" ) ) {
-        p_sys->b_auto_field_coding = 0;
+        p_sys->b_auto_field_coding = false;
         p_sys->ctx.enc_params.picture_coding_mode = 1;
     }
     else {
@@ -734,7 +735,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     /* Set up output buffer */
     /* Unfortunately it isn't possible to determine if the buffer
      * is too small (and then reallocate it) */
-    p_sys->i_buffer_out = p_sys->i_buffer_in;
+    p_sys->i_buffer_out = 4096 + p_sys->i_buffer_in;
     if( ( p_sys->p_buffer_out = malloc( p_sys->i_buffer_out ) ) == NULL )
     {
         CloseEncoder( p_this );
@@ -763,7 +764,7 @@ static int ReadDiracPictureNumber( uint32_t *p_picnum, block_t *p_block )
         /* skip to the next dirac data unit */
         uint32_t u_npo = GetDWBE( p_block->p_buffer + u_pos + 1 );
         assert( u_npo <= UINT32_MAX - u_pos );
-        if (u_npo == 0)
+        if( u_npo == 0 )
             u_npo = 13;
         u_pos += u_npo;
     }
