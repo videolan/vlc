@@ -202,8 +202,6 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     p_sys->i_tmp_size_max = 50 * 1024*1024;
     p_sys->psz_tmp_path = GetTmpPath( NULL );
 
-    //TsStart( p_out );
-
     return p_out;
 }
 
