@@ -280,6 +280,11 @@ modules/access/qtcapture.m
 modules/access/rtmp/access.c
 modules/access/rtmp/rtmp_amf_flv.c
 modules/access/rtmp/rtmp_amf_flv.h
+modules/access/rtp/input.c
+modules/access/rtp/rtp.c
+modules/access/rtp/rtp.h
+modules/access/rtp/session.c
+modules/access/rtp/xiph.c
 modules/access/rtsp/access.c
 modules/access/rtsp/real_asmrp.c
 modules/access/rtsp/real.c
@@ -554,9 +559,6 @@ modules/demux/pva.c
 modules/demux/rawdv.c
 modules/demux/rawvid.c
 modules/demux/real.c
-modules/demux/rtp.c
-modules/demux/rtp.h
-modules/demux/rtpsession.c
 modules/demux/smf.c
 modules/demux/subtitle_asa.c
 modules/demux/subtitle.c
@@ -1068,6 +1070,7 @@ modules/misc/osd/parser.c
 modules/misc/osd/simple.c
 modules/misc/osd/xml.c
 modules/misc/playlist/export.c
+modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c
 modules/misc/playlist/old.c
 modules/misc/playlist/xspf.c
