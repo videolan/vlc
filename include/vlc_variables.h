@@ -199,8 +199,12 @@ VLC_EXPORT( int, __var_TriggerCallback, ( vlc_object_t *, const char * ) );
 static inline void __var_AssertType( vlc_object_t *p_obj, const char *psz_name,
                                      int i_expected )
 {
+#ifndef NDEBUG
     const int i_type = __var_Type( p_obj, psz_name ) & VLC_VAR_CLASS;
     assert( i_type == 0 || i_type == (i_expected&VLC_VAR_CLASS) );
+#else
+    (void)p_obj;    (void)psz_name;    (void)i_expected;
+#endif
 }
 
 /**
