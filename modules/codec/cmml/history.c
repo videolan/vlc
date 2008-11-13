@@ -44,7 +44,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+#ifdef HISTORY_DEBUG
 static void history_Dump( history_t *p_history );
+#endif
 
 /*****************************************************************************
  * Local structure lock
@@ -68,16 +70,6 @@ history_t *history_New( void )
        return NULL;
    }
 
-#ifndef HISTORY_DEBUG
-   /* make dummy reference to history_Dump to avoid compiler warnings */
-   while (0)
-   {
-       void *p_tmp;
-
-       p_tmp = history_Dump;
-   }
-#endif
-
    return p_new_history;
 }
 
@@ -98,6 +90,7 @@ bool history_GoBackSavingCurrentItem ( history_t *p_history,
     return true;
 }
 
+#ifdef HISTORY_DEBUG
 static void history_Dump( history_t *p_history )
 {
     unsigned int i_count;
@@ -124,6 +117,7 @@ static void history_Dump( history_t *p_history )
         }
     }
 }
+#endif
 
 bool history_GoForwardSavingCurrentItem ( history_t *p_history,
                                                 history_item_t *p_item )
