@@ -53,7 +53,7 @@
 #include "xstrcat.h"
 #include "xurl.h"
 
-#undef  CMML_INTF_USE_TIMED_URIS
+#undef CMML_INTF_USE_TIMED_URIS
 
 #undef  CMML_INTF_DEBUG
 #undef  CMML_INTF_HISTORY_DEBUG
@@ -100,8 +100,10 @@ static int   GoForwardCallback          ( vlc_object_t *, char const *,
                                           vlc_value_t, vlc_value_t, void * );
 
 static char *GetTimedURLFromPlaylistItem( intf_thread_t *, playlist_item_t * );
-static char *GetTimedURIFragmentForTime ( int );
+#ifdef CMML_INTF_USE_TIMED_URIS
 static int   GetCurrentTimeInSeconds    ( input_thread_t * );
+static char *GetTimedURIFragmentForTime ( int );
+#endif
 static int   DisplayAnchor              ( intf_thread_t *, vout_thread_t *,
                                           char *, char * );
 static int   DisplayPendingAnchor       ( intf_thread_t *, vout_thread_t * );
@@ -554,17 +556,14 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
     return psz_return_value;
 #else
     VLC_UNUSED(p_intf);
-    void *p;
-
-    /* Suppress warning messages about unused functions */
-    p = GetTimedURIFragmentForTime; /* unused */
-    p = GetCurrentTimeInSeconds;    /* unused */
 
     return input_item_GetURI( p_current_item->p_input );
 #endif
 }
 
 
+
+#ifdef CMML_INTF_USE_TIMED_URIS
 /*
  * Get the current time, rounded down to the nearest second
  *
@@ -590,6 +589,7 @@ char *GetTimedURIFragmentForTime( int seconds )
         return NULL;
     return psz_time;
 }
+#endif
 
 static
 int GoBackCallback( vlc_object_t *p_this, char const *psz_var,
