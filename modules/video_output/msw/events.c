@@ -1145,12 +1145,18 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 }
 
 
-/* Internal wrapper over GetWindowPlacement / SetWindowPlacement */
-static void SetWindowState(HWND hwnd, int nShowCmd)
+/* Internal wrapper over GetWindowPlacement */
+static WINDOWPLACEMENT getWindowState(HWND hwnd)
 {
     WINDOWPLACEMENT window_placement;
     window_placement.length = sizeof(WINDOWPLACEMENT);
     GetWindowPlacement( hwnd, &window_placement );
+    return window_placement;
+}
+
+/* Internal wrapper over SetWindowPlacement */
+static void SetWindowState(HWND hwnd, int nShowCmd,WINDOWPLACEMENT window_placement)
+{
     window_placement.showCmd = nShowCmd;
     SetWindowPlacement( hwnd, &window_placement );
     SetWindowPos( hwnd, 0, 0, 0, 0, 0,
@@ -1172,11 +1178,17 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
     HWND hwnd = (p_vout->p_sys->hparent && p_vout->p_sys->hfswnd) ?
         p_vout->p_sys->hfswnd : p_vout->p_sys->hwnd;
 
+    /* Save the current windows placement/placement to restore
+       when fullscreen is over */
+    WINDOWPLACEMENT window_placement = getWindowState( hwnd );
+
     p_vout->b_fullscreen = ! p_vout->b_fullscreen;
 
+    /* We want to go to Fullscreen */
     if( p_vout->b_fullscreen )
     {
         msg_Dbg( p_vout, "entering fullscreen mode" );
+
         /* Change window style, no borders and no title bar */
         int i_style = WS_CLIPCHILDREN | WS_VISIBLE;
         SetWindowLong( hwnd, GWL_STYLE, i_style );
@@ -1195,7 +1207,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
         }
 
         /* Maximize window */
-        SetWindowState( hwnd, SW_SHOWMAXIMIZED );
+        SetWindowState( hwnd, SW_SHOWMAXIMIZED, window_placement );
 
         if( p_vout->p_sys->hparent )
         {
@@ -1223,7 +1235,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
         SetWindowLong( hwnd, GWL_STYLE, p_vout->p_sys->i_window_style );
 
         /* Normal window */
-        SetWindowState( hwnd, SW_SHOWNORMAL );
+        SetWindowState( hwnd, SW_SHOWNORMAL, window_placement );
 
         if( p_vout->p_sys->hparent )
         {
