@@ -1,6 +1,5 @@
       $CONFIG \
       --without-contrib \
-      --enable-nls \
       --enable-shared-libvlc \
       --enable-update-check \
       --enable-lua \
