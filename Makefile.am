@@ -701,7 +701,7 @@ package-win-common:
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt" ; done;
 	for file in NEWS COPYING README; \
 	  do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; done
-	unix2dos "$(win32_destdir)/"*.txt
+	unix2dos "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
 
 # Necessary icons
 	cp $(srcdir)/share/vlc48x48.ico $(win32_destdir)/
