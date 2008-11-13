@@ -974,7 +974,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 {
                     case VIDEO_ES: code = "RTPV";     break;
                     case AUDIO_ES: code = "RTPARTPV"; break;
-                    case SPU_ES:   code = "RTPTRPTV"; break;
+                    case SPU_ES:   code = "RTPTRTPV"; break;
                     default:       code = "RTPORTPV"; break;
                 }
                 var_SetString (p_stream, "dccp-service", code);
