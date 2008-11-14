@@ -32,6 +32,8 @@
 # include "config.h"
 #endif
 
+#include <limits.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
@@ -1032,6 +1034,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_bih_width  = p_input->p_fmt->video.i_width;
                     p_stream->i_bih_height = p_input->p_fmt->video.i_height;
                     break;
+                case VLC_FOURCC( 'd', 'r', 'a', 'c' ):
+                    /* stream_id makes use of stream_id_extension */
+                    p_stream->i_stream_id = (PES_EXTENDED_STREAM_ID << 8) | 0x60;
+                    p_stream->i_stream_type = 0xd1;
+                    break;
                 default:
                     free( p_stream );
                     return VLC_EGENERIC;
@@ -1538,6 +1545,7 @@ static int Mux( sout_mux_t *p_mux )
                     else
                     {
                         int i_header_size = 0;
+                        int i_max_pes_size = 0;
                         int b_data_alignment = 0;
                         if( p_input->p_fmt->i_cat == SPU_ES )
                         {
@@ -1617,9 +1625,19 @@ static int Mux( sout_mux_t *p_mux )
                             p_data->i_pts = p_data->i_dts;
                         }
 
+                        if( p_input->p_fmt->i_codec ==
+                                   VLC_FOURCC('d','r','a','c') )
+                        {
+                            b_data_alignment = 1;
+                            /* dirac pes packets should be unbounded in
+                             * length, specify a suitibly large max size */
+                            i_max_pes_size = INT_MAX;
+                        }
+
                          EStoPES ( p_mux->p_sout, &p_data, p_data,
                                        p_input->p_fmt, p_stream->i_stream_id,
-                                       1, b_data_alignment, i_header_size, 0 );
+                                       1, b_data_alignment, i_header_size,
+                                       i_max_pes_size );
 
                         BufferChainAppend( &p_stream->chain_pes, p_data );
 
@@ -2667,6 +2685,13 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
             /* "registration" descriptor : "AC-3" */
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
+        }
+        else if( p_stream->i_codec == VLC_FOURCC('d','r','a','c') )
+        {
+            /* Dirac registration descriptor */
+
+            uint8_t data[4] = { 'd', 'r', 'a', 'c' };
+            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
         }
         else if( p_stream->i_codec == VLC_FOURCC('d','t','s',' ') )
         {
