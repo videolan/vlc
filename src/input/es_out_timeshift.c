@@ -63,7 +63,8 @@ enum
 
 typedef struct
 {
-    int i_type;
+    int     i_type;
+    mtime_t i_date;
     union
     {
         struct
@@ -119,6 +120,9 @@ struct es_out_sys_t
     bool           b_delayed;
     vlc_object_t   *p_thread;
 
+    bool           b_paused;
+    mtime_t        i_pause_date;
+
     /* */
     int            i_es;
     es_out_id_t    **pp_es;
@@ -126,6 +130,7 @@ struct es_out_sys_t
     /* */
     int            i_cmd;
     ts_cmd_t       **pp_cmd;
+    mtime_t        i_cmd_delay;
 };
 
 static es_out_id_t *Add    ( es_out_t *, const es_format_t * );
@@ -139,7 +144,9 @@ static void         TsStop( es_out_t * );
 static void         *TsRun( vlc_object_t * );
 
 static void CmdPush( es_out_t *, const ts_cmd_t * );
-static int  CmdPop( es_out_t *p_out, ts_cmd_t *p_cmd );
+static int  CmdPop( es_out_t *, ts_cmd_t * );
+static void CmdClean( ts_cmd_t * );
+static void cmd_cleanup_routine( void *p ) { CmdClean( p ); }
 
 static int  CmdInitAdd    ( ts_cmd_t *, es_out_id_t *, const es_format_t *, bool b_copy );
 static void CmdInitSend   ( ts_cmd_t *, es_out_id_t *, block_t * );
@@ -191,6 +198,9 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
 
     p_sys->b_delayed = false;
     p_sys->p_thread = NULL;
+    p_sys->b_paused = false;
+    p_sys->i_pause_date = -1;
+    p_sys->i_cmd_delay = 0;
 
     TAB_INIT( p_sys->i_es, p_sys->pp_es );
     TAB_INIT( p_sys->i_cmd, p_sys->pp_cmd );
@@ -222,23 +232,7 @@ static void Destroy( es_out_t *p_out )
         if( CmdPop( p_out, &cmd ) )
             break;
 
-        switch( cmd.i_type )
-        {
-        case C_ADD:
-            CmdCleanAdd( &cmd );
-            break;
-        case C_SEND:
-            CmdCleanSend( &cmd );
-            break;
-        case C_CONTROL:
-            CmdCleanControl( &cmd );
-            break;
-        case C_DEL:
-            break;
-        default:
-            assert(0);
-            break;
-        }
+        CmdClean( &cmd );
     }
     TAB_CLEAN( p_sys->i_cmd, p_sys->pp_cmd  );
 
@@ -375,6 +369,7 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
         return VLC_EGENERIC;
     }
 
+    int i_ret;
     if( b_paused )
     {
         assert( !b_source_paused );
@@ -382,13 +377,28 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
         if( !p_sys->b_delayed )
             TsStart( p_out );
 
-        return es_out_SetPauseState( p_sys->p_out, true, true, i_date );
+        i_ret = es_out_SetPauseState( p_sys->p_out, true, true, i_date );
     }
     else
     {
-        /* TODO store pause state to know if stoping b_delayed is possible ? */
-        return es_out_SetPauseState( p_sys->p_out, false, false, i_date );
+        i_ret = es_out_SetPauseState( p_sys->p_out, false, false, i_date );
     }
+
+    if( !i_ret )
+    {
+        if( !b_paused )
+        {
+            assert( p_sys->i_pause_date > 0 );
+
+            p_sys->i_cmd_delay += i_date - p_sys->i_pause_date;
+        }
+
+        p_sys->b_paused = b_paused;
+        p_sys->i_pause_date = i_date;
+
+        vlc_cond_signal( &p_sys->wait );
+    }
+    return i_ret;
 }
 static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
 {
@@ -585,16 +595,29 @@ static void *TsRun( vlc_object_t *p_thread )
     {
         ts_cmd_t cmd;
 
+        /* Pop a command to execute */
         vlc_mutex_lock( &p_sys->lock );
         mutex_cleanup_push( &p_sys->lock );
 
-        while( CmdPop( p_out, &cmd ) )
+        while( p_sys->b_paused || CmdPop( p_out, &cmd ) )
             vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
-        /* TODO we MUST regulate the speed of this thread, to the same speed
-         * than the reading */
+        vlc_cleanup_pop();
+        vlc_mutex_unlock( &p_sys->lock );
 
+        /* Regulate the speed of command processing to the same one than
+         * reading  */
+        //fprintf( stderr, "d=%d - %d\n", (int)(p_sys->i_cmd_delay/1000), (int)( (mdate() - cmd.i_date - p_sys->i_cmd_delay)/1000) );
+        vlc_cleanup_push( cmd_cleanup_routine, &cmd );
+
+        mwait( cmd.i_date + p_sys->i_cmd_delay );
+
+        vlc_cleanup_pop();
+
+        /* Execute the command */
         const int canc = vlc_savecancel();
+
+        vlc_mutex_lock( &p_sys->lock );
         switch( cmd.i_type )
         {
         case C_ADD:
@@ -616,10 +639,9 @@ static void *TsRun( vlc_object_t *p_thread )
             assert(0);
             break;
         }
-        vlc_restorecancel( canc );
-
-        vlc_cleanup_pop();
         vlc_mutex_unlock( &p_sys->lock );
+
+        vlc_restorecancel( canc );
     }
 
     return NULL;
@@ -655,9 +677,31 @@ static int CmdPop( es_out_t *p_out, ts_cmd_t *p_cmd )
     return VLC_SUCCESS;
 }
 
+static void CmdClean( ts_cmd_t *p_cmd )
+{
+    switch( p_cmd->i_type )
+    {
+    case C_ADD:
+        CmdCleanAdd( p_cmd );
+        break;
+    case C_SEND:
+        CmdCleanSend( p_cmd );
+        break;
+    case C_CONTROL:
+        CmdCleanControl( p_cmd );
+        break;
+    case C_DEL:
+        break;
+    default:
+        assert(0);
+        break;
+    }
+}
+
 static int CmdInitAdd( ts_cmd_t *p_cmd, es_out_id_t *p_es, const es_format_t *p_fmt, bool b_copy )
 {
     p_cmd->i_type = C_ADD;
+    p_cmd->i_date = mdate();
     p_cmd->add.p_es = p_es;
     if( b_copy )
     {
@@ -687,6 +731,7 @@ static void CmdCleanAdd( ts_cmd_t *p_cmd )
 static void CmdInitSend( ts_cmd_t *p_cmd, es_out_id_t *p_es, block_t *p_block )
 {
     p_cmd->i_type = C_SEND;
+    p_cmd->i_date = mdate();
     p_cmd->send.p_es = p_es;
     p_cmd->send.p_block = p_block;
 }
@@ -714,6 +759,7 @@ static void CmdCleanSend( ts_cmd_t *p_cmd )
 static int CmdInitDel( ts_cmd_t *p_cmd, es_out_id_t *p_es )
 {
     p_cmd->i_type = C_DEL;
+    p_cmd->i_date = mdate();
     p_cmd->del.p_es = p_es;
     return VLC_SUCCESS;
 }
@@ -729,6 +775,7 @@ static void CmdExecuteDel( es_out_t *p_out, ts_cmd_t *p_cmd )
 static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_copy )
 {
     p_cmd->i_type = C_CONTROL;
+    p_cmd->i_date = mdate();
     p_cmd->control.i_query = i_query;
     p_cmd->control.p_meta  = NULL;
     p_cmd->control.p_epg = NULL;
