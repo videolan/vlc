@@ -54,32 +54,35 @@
  *                     - 0x00   - 0xff   : normal stream_id as per Table 2-18
  *                     - 0xfd00 - 0xfd7f : stream_id_extension = low 7 bits
  *                                         (stream_id = PES_EXTENDED_STREAM_ID)
+ *                     - 0xbd00 - 0xbdff : private_id = low 8 bits
+ *                                         (stream_id = PES_PRIVATE_STREAM)
  * \param i_header_size length of padding data to insert into PES packet
  *                      header in bytes.
  */
 static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                              int i_es_size, es_format_t *p_fmt,
-                             int i_stream_id, int i_private_id,
-                             bool b_mpeg2, bool b_data_alignment,
-                             int i_header_size )
+                             int i_stream_id, bool b_mpeg2,
+                             bool b_data_alignment, int i_header_size )
 {
     bits_buffer_t bits;
     int     i_extra = 0;
+    int i_private_id = -1;
     int i_stream_id_extension = 0;
 
-    /* For PES_PRIVATE_STREAM_1 there is an extra header after the
-       pes header */
-    /* i_private_id != -1 because TS use 0xbd without private_id */
-    if( i_stream_id == PES_PRIVATE_STREAM_1 && i_private_id != -1 )
+    /* HACK for private stream 1 in ps */
+    if( ( i_stream_id >> 8 ) == PES_PRIVATE_STREAM_1 )
     {
-        i_extra = 1;
-        if( ( i_private_id & 0xf0 ) == 0x80 )
-        {
+        i_private_id = i_stream_id & 0xff;
+        i_stream_id = PES_PRIVATE_STREAM_1;
+        /* For PES_PRIVATE_STREAM_1 there is an extra header after the
+           pes header */
+        /* i_private_id != -1 because TS use 0xbd without private_id */
+        if( i_private_id != -1 )
+            i_extra = 1;
+        if( ( i_private_id & 0xf0 ) == 0x80 ) /* implies i_private_id != -1 */
             i_extra += 3;
-        }
     }
-
-    if( ( i_stream_id >> 8 ) == PES_EXTENDED_STREAM_ID )
+    else if( ( i_stream_id >> 8 ) == PES_EXTENDED_STREAM_ID )
     {
         /* Enable support for extended_stream_id as defined in
          * ISO/IEC 13818-1:2000/Amd.2:2003 */
@@ -331,8 +334,6 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
     uint8_t *p_data;
     int     i_size;
 
-    int     i_private_id = -1;
-
     uint8_t header[50];     // PES header + extra < 50 (more like 17)
     int     i_pes_payload;
     int     i_pes_header;
@@ -347,13 +348,6 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
         ( p_fmt->i_cat != VIDEO_ES && i_max_pes_size > PES_PAYLOAD_SIZE_MAX ) )
     {
         i_max_pes_size = PES_PAYLOAD_SIZE_MAX;
-    }
-
-    /* HACK for private stream 1 in ps */
-    if( ( i_stream_id >> 8 ) == PES_PRIVATE_STREAM_1 )
-    {
-        i_private_id = i_stream_id & 0xff;
-        i_stream_id  = PES_PRIVATE_STREAM_1;
     }
 
     if( p_fmt->i_codec == VLC_FOURCC( 'm', 'p','4', 'v' ) &&
@@ -381,7 +375,7 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
     {
         i_pes_payload = __MIN( i_size, i_max_pes_size );
         i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload,
-                                   p_fmt, i_stream_id, i_private_id, b_mpeg2,
+                                   p_fmt, i_stream_id, b_mpeg2,
                                    b_data_alignment, i_header_size );
         i_dts = 0; // only first PES has a dts/pts
         i_pts = 0;
