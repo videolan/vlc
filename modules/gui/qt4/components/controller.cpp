@@ -254,7 +254,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int* i_size,
         QToolButton *frameButton = new QToolButton;
         setupButton( frameButton );
         CONNECT_MAP_SET( frameButton, FRAME_ACTION );
-        BUTTON_SET_BAR( frameButton, "", qtr( "Frame by frame" ) );
+        BUTTON_SET_BAR( frameButton, frame, qtr( "Frame by frame" ) );
         ENABLE_ON_INPUT( frameButton );
         widget = frameButton;
         }
