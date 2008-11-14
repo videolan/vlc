@@ -225,15 +225,6 @@ static void Destroy( es_out_t *p_out )
     if( p_sys->b_delayed )
         TsStop( p_out );
 
-    for( ;; )
-    {
-        ts_cmd_t cmd;
-
-        if( CmdPop( p_out, &cmd ) )
-            break;
-
-        CmdClean( &cmd );
-    }
     TAB_CLEAN( p_sys->i_cmd, p_sys->pp_cmd  );
 
     while( p_sys->i_es > 0 )
@@ -583,6 +574,16 @@ static void TsStop( es_out_t *p_out )
 
     vlc_object_kill( p_sys->p_thread );
     vlc_thread_join( p_sys->p_thread );
+
+    for( ;; )
+    {
+        ts_cmd_t cmd;
+
+        if( CmdPop( p_out, &cmd ) )
+            break;
+
+        CmdClean( &cmd );
+    }
 
     p_sys->b_delayed = false;
 }
