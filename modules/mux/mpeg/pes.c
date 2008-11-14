@@ -48,6 +48,8 @@
 #include "bits.h"
 
 /** PESHeader, write a pes header
+ * \param i_es_size length of payload data. (Must be < PES_PAYLOAD_SIZE_MAX
+ *                  unless the conditions for unbounded PES packets are met)
  * \param i_header_size length of padding data to insert into PES packet
  *                      header in bytes.
  */
@@ -116,8 +118,13 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                     if ( !i_header_size ) i_header_size = 0x0;
                 }
 
-                bits_write( &bits, 16, i_es_size + i_extra + 3
-                             + i_header_size ); // size
+                /* Unbounded streams are only allowed in TS (not PS) and only
+                 * for some ES, eg. MPEG* Video ES or Dirac ES. */
+                if( i_es_size > PES_PAYLOAD_SIZE_MAX )
+                    bits_write( &bits, 16, 0 ); // size unbounded
+                else
+                    bits_write( &bits, 16, i_es_size + i_extra + 3
+                                 + i_header_size ); // size
                 bits_write( &bits, 2, 0x02 ); // mpeg2 id
                 bits_write( &bits, 2, 0x00 ); // pes scrambling control
                 bits_write( &bits, 1, 0x00 ); // pes priority
@@ -238,10 +245,24 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 /** EStoPES, encapsulate an elementary stream block into PES packet(s)
  * each with a maximal payload size of @i_max_pes_size@.
  *
+ * In some circumstances, unbounded PES packets are allowed:
+ *  - Transport streams only (NOT programme streams)
+ *  - Only some types of elementary streams (eg MPEG2 video)
+ * It is the responsibility of the caller to enforce these constraints.
+ *
+ * EStoPES will only produce an unbounded PES packet if:
+ *  - ES is VIDEO_ES
+ *  - i_max_pes_size > PES_PAYLOAD_SIZE_MAX
+ *  - length of p_es > PES_PAYLOAD_SIZE_MAX
+ * If the last condition is not met, a single PES packet is produced
+ * which is not unbounded in length.
+ *
  * \param i_header_size length of padding data to insert into PES packet
  *                      header in bytes.
- * \param i_max_pes_size maximum length of the pes packet payload
- *                       if zero, uses default maximum
+ * \param i_max_pes_size maximum length of each pes packet payload.
+ *                       if zero, uses default maximum.
+ *                       To allow unbounded PES packets in transport stream
+ *                       VIDEO_ES, set to INT_MAX.
  */
 int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
                    es_format_t *p_fmt, int i_stream_id,
@@ -261,6 +282,13 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
     int     i_pes_header;
 
     int     i_pes_count = 1;
+
+    /* NB, Only video ES may have unbounded length */
+    if( !i_max_pes_size ||
+        ( p_fmt->i_cat != VIDEO_ES && i_max_pes_size > PES_PAYLOAD_SIZE_MAX ) )
+    {
+        i_max_pes_size = PES_PAYLOAD_SIZE_MAX;
+    }
 
     /* HACK for private stream 1 in ps */
     if( ( i_stream_id >> 8 ) == PES_PRIVATE_STREAM_1 )
@@ -292,8 +320,7 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
 
     do
     {
-        i_pes_payload = __MIN( i_size, (i_max_pes_size ?
-                               i_max_pes_size : PES_PAYLOAD_SIZE_MAX) );
+        i_pes_payload = __MIN( i_size, i_max_pes_size );
         i_pes_header  = PESHeader( header, i_pts, i_dts, i_pes_payload,
                                    p_fmt, i_stream_id, i_private_id, b_mpeg2,
                                    b_data_alignment, i_header_size );
