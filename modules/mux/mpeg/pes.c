@@ -47,6 +47,10 @@
 #include "pes.h"
 #include "bits.h"
 
+/** PESHeader, write a pes header
+ * \param i_header_size length of padding data to insert into PES packet
+ *                      header in bytes.
+ */
 static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                              int i_es_size, es_format_t *p_fmt,
                              int i_stream_id, int i_private_id,
@@ -231,6 +235,14 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
     }
 }
 
+/** EStoPES, encapsulate an elementary stream block into PES packet(s)
+ * each with a maximal payload size of @i_max_pes_size@.
+ *
+ * \param i_header_size length of padding data to insert into PES packet
+ *                      header in bytes.
+ * \param i_max_pes_size maximum length of the pes packet payload
+ *                       if zero, uses default maximum
+ */
 int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
                    es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
