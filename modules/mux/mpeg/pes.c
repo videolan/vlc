@@ -283,6 +283,9 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
 
     int     i_pes_count = 1;
 
+    assert( i_max_pes_size >= 0 );
+    assert( i_header_size >= 0 );
+
     /* NB, Only video ES may have unbounded length */
     if( !i_max_pes_size ||
         ( p_fmt->i_cat != VIDEO_ES && i_max_pes_size > PES_PAYLOAD_SIZE_MAX ) )
