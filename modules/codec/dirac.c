@@ -351,7 +351,7 @@ static struct
     int i_approx_fps;
     VideoFormat i_vf;
 } dirac_format_guess[] = {
-    /* Important: Keep this list ordered in decending picture height */
+    /* Important: Keep this list ordered in ascending picture height */
     {1, 0, VIDEO_FORMAT_CUSTOM},
     {120, 15, VIDEO_FORMAT_QSIF525},
     {144, 12, VIDEO_FORMAT_QCIF},
@@ -481,7 +481,7 @@ static int OpenEncoder( vlc_object_t *p_this )
      */
     do
     {
-        if( dirac_format_guess[i].i_height < p_enc->fmt_in.video.i_height )
+        if( dirac_format_guess[i].i_height > p_enc->fmt_in.video.i_height )
         {
             guessed_video_fmt = dirac_format_guess[i-1].i_vf;
             break;
