@@ -1108,11 +1108,9 @@ static void* RunThread( vlc_object_t *p_this )
             p_filtered_picture = filter_chain_VideoFilter( p_vout->p->p_vf2_chain,
                                                            p_picture );
 
-        /* FIXME it is a bit ugly that b_snapshot is not locked but I do not
+        /* FIXME it is ugly that b_snapshot is not locked but I do not
          * know which lock to use (here and in the snapshot callback) */
-        const bool b_snapshot = p_vout->p->b_snapshot;
-        if( b_snapshot )
-            p_vout->p->b_snapshot = false;
+        const bool b_snapshot = p_vout->p->b_snapshot && p_picture != NULL;
 
         /*
          * Check for subpictures to display
@@ -1133,7 +1131,12 @@ static void* RunThread( vlc_object_t *p_this )
          * Take a snapshot if requested
          */
         if( p_directbuffer && b_snapshot )
+        {
+            /* FIXME lock (see b_snapshot) */
+            p_vout->p->b_snapshot = false;
+
             vout_Snapshot( p_vout, p_directbuffer );
+        }
 
         /*
          * Call the plugin-specific rendering method if there is one
