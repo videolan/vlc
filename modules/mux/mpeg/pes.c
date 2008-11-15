@@ -77,9 +77,8 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
         /* For PES_PRIVATE_STREAM_1 there is an extra header after the
            pes header */
         /* i_private_id != -1 because TS use 0xbd without private_id */
-        if( i_private_id != -1 )
-            i_extra = 1;
-        if( ( i_private_id & 0xf0 ) == 0x80 ) /* implies i_private_id != -1 */
+        i_extra = 1;
+        if( ( i_private_id & 0xf0 ) == 0x80 )
             i_extra += 3;
     }
     else if( ( i_stream_id >> 8 ) == PES_EXTENDED_STREAM_ID )
