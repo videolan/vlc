@@ -31,6 +31,6 @@
 #include <vlc_common.h>
 
 
-es_out_t *input_EsOutTimeshiftNew( input_thread_t *, es_out_t * );
+es_out_t *input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, int i_rate );
 
 #endif

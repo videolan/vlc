@@ -123,6 +123,11 @@ struct es_out_sys_t
     bool           b_paused;
     mtime_t        i_pause_date;
 
+    int            i_rate;
+    int            i_rate_source;
+    mtime_t        i_rate_date;
+    mtime_t        i_rate_delay;
+
     /* */
     int            i_es;
     es_out_id_t    **pp_es;
@@ -168,7 +173,7 @@ static FILE *GetTmpFile( const char *psz_path );
 /*****************************************************************************
  * input_EsOutTimeshiftNew:
  *****************************************************************************/
-es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out )
+es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out, int i_rate )
 {
     es_out_t *p_out = malloc( sizeof(*p_out) );
     if( !p_out )
@@ -200,6 +205,10 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     p_sys->p_thread = NULL;
     p_sys->b_paused = false;
     p_sys->i_pause_date = -1;
+    p_sys->i_rate_source =
+    p_sys->i_rate        = i_rate;
+    p_sys->i_rate_date = -1;
+    p_sys->i_rate_delay = 0;
     p_sys->i_cmd_delay = 0;
 
     TAB_INIT( p_sys->i_es, p_sys->pp_es );
@@ -350,7 +359,6 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
     {
         return es_out_SetPauseState( p_sys->p_out, b_source_paused, b_paused, i_date );
     }
-
     if( p_sys->p_input->b_can_pace_control )
     {
         /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
@@ -400,9 +408,26 @@ static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
     {
         return es_out_SetRate( p_sys->p_out, i_src_rate, i_rate );
     }
-    /* TODO */
-    msg_Err( p_sys->p_input, "EsOutTimeshift does not yet support rate change" );
-    return VLC_EGENERIC;
+    if( p_sys->p_input->b_can_pace_control )
+    {
+        /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
+         * and so be able to advertize correctly pace control property in access
+         * module */
+        msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have space control" );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->i_cmd_delay += p_sys->i_rate_delay;
+
+    p_sys->i_rate_date = -1;
+    p_sys->i_rate_delay = 0;
+    p_sys->i_rate = i_rate;
+    p_sys->i_rate_source = i_src_rate;
+
+    if( !p_sys->b_delayed )
+        TsStart( p_out );
+
+    return es_out_SetRate( p_sys->p_out, i_rate, i_rate );
 }
 static int ControlLockedSetTime( es_out_t *p_out, mtime_t i_date )
 {
@@ -595,6 +620,7 @@ static void *TsRun( vlc_object_t *p_thread )
     for( ;; )
     {
         ts_cmd_t cmd;
+        mtime_t  i_deadline;
 
         /* Pop a command to execute */
         vlc_mutex_lock( &p_sys->lock );
@@ -603,15 +629,32 @@ static void *TsRun( vlc_object_t *p_thread )
         while( p_sys->b_paused || CmdPop( p_out, &cmd ) )
             vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
-        vlc_cleanup_pop();
-        vlc_mutex_unlock( &p_sys->lock );
+        if( p_sys->i_rate_date < 0 )
+            p_sys->i_rate_date = cmd.i_date;
+
+        p_sys->i_rate_delay = 0;
+        if( p_sys->i_rate_source != p_sys->i_rate )
+        {
+            const mtime_t i_duration = cmd.i_date - p_sys->i_rate_date;
+            p_sys->i_rate_delay = i_duration * p_sys->i_rate / p_sys->i_rate_source - i_duration;
+        }
+
+        i_deadline = cmd.i_date + p_sys->i_cmd_delay + p_sys->i_rate_delay;
+
+        if( p_sys->i_cmd_delay + p_sys->i_rate_delay < 0 )
+        {
+            /* TODO handle when we cannot go faster anymore */
+            msg_Err( p_sys->p_input, "FIXME rate underflow" );
+        }
+
+        vlc_cleanup_run();
 
         /* Regulate the speed of command processing to the same one than
          * reading  */
         //fprintf( stderr, "d=%d - %d\n", (int)(p_sys->i_cmd_delay/1000), (int)( (mdate() - cmd.i_date - p_sys->i_cmd_delay)/1000) );
         vlc_cleanup_push( cmd_cleanup_routine, &cmd );
 
-        mwait( cmd.i_date + p_sys->i_cmd_delay );
+        mwait( i_deadline );
 
         vlc_cleanup_pop();
 

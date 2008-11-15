@@ -1185,7 +1185,7 @@ static int Init( input_thread_t * p_input )
 
     /* Create es out */
     p_input->p->p_es_out_display = input_EsOutNew( p_input, p_input->p->i_rate );
-    p_input->p->p_es_out         = input_EsOutTimeshiftNew( p_input, p_input->p->p_es_out_display );
+    p_input->p->p_es_out         = input_EsOutTimeshiftNew( p_input, p_input->p->p_es_out_display, p_input->p->i_rate );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
@@ -1517,12 +1517,20 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
         }
     }
 
+    /* */
+    if( !i_ret )
+    {
+        i_ret = es_out_SetPauseState( p_input->p->p_es_out, p_input->p->b_can_pause, true, i_control_date );
+        if( i_ret )
+        {
+            msg_Warn( p_input, "cannot set pause state at es_out level" );
+            i_state = p_input->i_state;
+        }
+    }
+
     /* Switch to new state */
     input_ChangeStateWithVarCallback( p_input, i_state, false );
 
-    /* */
-    if( !i_ret )
-        es_out_SetPauseState( p_input->p->p_es_out, p_input->p->b_can_pause, true, i_control_date );
 }
 static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 {
@@ -1766,7 +1774,8 @@ static bool Control( input_thread_t *p_input, int i_type,
                 i_rate = INPUT_RATE_MAX;
             }
             if( i_rate != INPUT_RATE_DEFAULT &&
-                ( ( !p_input->b_can_pace_control && !p_input->p->b_can_rate_control ) ||
+                ( /*( !p_input->b_can_pace_control && !p_input->p->b_can_rate_control ) ||*/
+                  ( !p_input->p->b_can_rate_control && !p_input->p->input.b_rescale_ts ) ||
                   ( p_input->p->p_sout && !p_input->p->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
@@ -1799,7 +1808,10 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 /* FIXME do we need a RESET_PCR when !p_input->p->input.b_rescale_ts ? */
                 if( p_input->p->input.b_rescale_ts )
-                    es_out_SetRate( p_input->p->p_es_out, i_rate, i_rate );
+                {
+                    const int i_rate_source = (p_input->b_can_pace_control || p_input->p->b_can_rate_control ) ? i_rate : INPUT_RATE_DEFAULT;
+                    es_out_SetRate( p_input->p->p_es_out, i_rate_source, i_rate );
+                }
 
                 b_force_update = true;
             }
