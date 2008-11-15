@@ -638,14 +638,27 @@ static void *TsRun( vlc_object_t *p_thread )
             const mtime_t i_duration = cmd.i_date - p_sys->i_rate_date;
             p_sys->i_rate_delay = i_duration * p_sys->i_rate / p_sys->i_rate_source - i_duration;
         }
-
-        i_deadline = cmd.i_date + p_sys->i_cmd_delay + p_sys->i_rate_delay;
-
         if( p_sys->i_cmd_delay + p_sys->i_rate_delay < 0 )
         {
-            /* TODO handle when we cannot go faster anymore */
-            msg_Err( p_sys->p_input, "FIXME rate underflow" );
+            /* Auto reset to rate 1.0 */
+            msg_Warn( p_sys->p_input, "es out timeshift: auto reset rate to %d", p_sys->i_rate_source );
+
+            p_sys->i_cmd_delay = 0;
+
+            p_sys->i_rate_date = -1;
+            p_sys->i_rate_delay = 0;
+            p_sys->i_rate = p_sys->i_rate_source;
+
+            if( !es_out_SetRate( p_sys->p_out, p_sys->i_rate_source, p_sys->i_rate ) )
+            {
+                vlc_value_t val = { .i_int = p_sys->i_rate };
+                /* Warn back input
+                 * FIXME it is perfectly safe BUT it is ugly as it may hide a
+                 * rate change requested by user */
+                input_ControlPush( p_sys->p_input, INPUT_CONTROL_SET_RATE, &val );
+            }
         }
+        i_deadline = cmd.i_date + p_sys->i_cmd_delay + p_sys->i_rate_delay;
 
         vlc_cleanup_run();
 
