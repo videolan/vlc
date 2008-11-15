@@ -63,38 +63,46 @@ enum
 
 typedef struct
 {
+    es_out_id_t *p_es;
+    es_format_t *p_fmt;
+} ts_cmd_add_t
+
+typedef struct
+{
+    es_out_id_t *p_es;
+} ts_cmd_del_t;
+
+typedef struct
+{
+    es_out_id_t *p_es;
+    block_t *p_block;
+} ts_cmd_send_t;
+
+typedef struct
+{
+    int  i_query;
+
+    bool b_bool;
+    bool *pb_bool;
+    int  i_int;
+    int  *pi_int;
+    int64_t i_i64;
+    vlc_meta_t *p_meta;
+    vlc_epg_t *p_epg;
+    es_out_id_t *p_es;
+    es_format_t *p_fmt;
+} ts_cmd_control_t;
+
+typedef struct
+{
     int     i_type;
     mtime_t i_date;
     union
     {
-        struct
-        {
-            es_out_id_t *p_es;
-            es_format_t *p_fmt;
-        } add;
-        struct
-        {
-            es_out_id_t *p_es;
-        } del;
-        struct
-        {
-            es_out_id_t *p_es;
-            block_t *p_block;
-        } send;
-        struct
-        {
-            int  i_query;
-
-            bool b_bool;
-            bool *pb_bool;
-            int  i_int;
-            int  *pi_int;
-            int64_t i_i64;
-            vlc_meta_t *p_meta;
-            vlc_epg_t *p_epg;
-            es_out_id_t *p_es;
-            es_format_t *p_fmt;
-        } control;
+        ts_cmd_add_t     add;
+        ts_cmd_del_t     del;
+        ts_cmd_send_t    send;
+        ts_cmd_control_t control;
     };
 } ts_cmd_t;
 
