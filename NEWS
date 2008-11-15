@@ -18,7 +18,7 @@ Decoders:
  * E-AC3 (A/52b) support
 
 Encoders:
- * Dirac encoding support using libdirac (support in Ogg)
+ * Dirac encoding support using libdirac (support in Ogg, in TS)
 
 Stream output:
  * Restored the old mpeg2 transrating module.
