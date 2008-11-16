@@ -2065,9 +2065,6 @@ static bool Control( input_thread_t *p_input, int i_type,
             break;
 
         case INPUT_CONTROL_SET_FRAME_NEXT:
-            if( !p_input->p->b_can_pause )
-                break;
-
             if( p_input->i_state == PAUSE_S )
             {
                 es_out_SetFrameNext( p_input->p->p_es_out );

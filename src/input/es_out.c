@@ -2152,7 +2152,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             /* search program
              * TODO do not use mdate() but proper stream acquisition date */
             input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
-                                p_sys->p_input->b_can_pace_control, i_pcr, mdate() );
+                                p_sys->p_input->b_can_pace_control || p_sys->b_buffering, i_pcr, mdate() );
             /* Check buffering state on master clock update */
             if( p_sys->b_buffering && p_pgrm == p_sys->p_pgrm )
                 EsOutDecodersStopBuffering( out, false );

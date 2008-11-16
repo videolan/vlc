@@ -4,7 +4,7 @@
  * Copyright (C) 2008 Laurent Aimar
  * $Id$
  *
- * Authors: Laurent Aimar < fenrir _AT_ via _DOT_ ecp _DOT_ fr>
+ * Authors: Laurent Aimar < fenrir _AT_ videolan _DOT_ org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,6 +125,9 @@ typedef struct
     int            i_rate_source;
     mtime_t        i_rate_date;
     mtime_t        i_rate_delay;
+
+    /* */
+    mtime_t        i_buffering_delay;
 
     /* */
     int            i_cmd;
@@ -475,7 +478,7 @@ static int ControlLockedSetFrameNext( es_out_t *p_out )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
 
-    if( !p_sys->b_delayed )
+    //if( !p_sys->b_delayed )
         return es_out_SetFrameNext( p_sys->p_out );
 
     /* TODO */
@@ -640,6 +643,7 @@ static int TsStart( es_out_t *p_out )
     p_ts->i_rate        = p_sys->i_input_rate;
     p_ts->i_rate_date = -1;
     p_ts->i_rate_delay = 0;
+    p_ts->i_buffering_delay = 0;
     p_ts->i_cmd_delay = 0;
     TAB_INIT( p_ts->i_cmd, p_ts->pp_cmd );
 
@@ -795,18 +799,42 @@ static int TsChangeRate( ts_thread_t *p_ts, int i_src_rate, int i_rate )
 static void *TsRun( vlc_object_t *p_thread )
 {
     ts_thread_t *p_ts = (ts_thread_t*)p_thread;
+    mtime_t i_buffering_date = -1;
 
     for( ;; )
     {
         ts_cmd_t cmd;
         mtime_t  i_deadline;
+        bool b_buffering;
 
         /* Pop a command to execute */
         vlc_mutex_lock( &p_ts->lock );
         mutex_cleanup_push( &p_ts->lock );
 
-        while( p_ts->b_paused || TsPopCmdLocked( p_ts, &cmd ) )
+        for( ;; )
+        {
+            const int canc = vlc_savecancel();
+            b_buffering = es_out_GetBuffering( p_ts->p_out );
+            vlc_restorecancel( canc );
+
+            if( ( !p_ts->b_paused || b_buffering ) && !TsPopCmdLocked( p_ts, &cmd ) )
+                break;
+
             vlc_cond_wait( &p_ts->wait, &p_ts->lock );
+        }
+
+        if( b_buffering && i_buffering_date < 0 )
+        {
+            i_buffering_date = cmd.i_date;
+        }
+        else if( i_buffering_date > 0 )
+        {
+            p_ts->i_buffering_delay += i_buffering_date - cmd.i_date; /* It is < 0 */
+            if( b_buffering )
+                i_buffering_date = cmd.i_date;
+            else
+                i_buffering_date = -1;
+        }
 
         if( p_ts->i_rate_date < 0 )
             p_ts->i_rate_date = cmd.i_date;
@@ -817,7 +845,7 @@ static void *TsRun( vlc_object_t *p_thread )
             const mtime_t i_duration = cmd.i_date - p_ts->i_rate_date;
             p_ts->i_rate_delay = i_duration * p_ts->i_rate / p_ts->i_rate_source - i_duration;
         }
-        if( p_ts->i_cmd_delay + p_ts->i_rate_delay < 0 )
+        if( p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay < 0 && p_ts->i_rate != p_ts->i_rate_source )
         {
             const int canc = vlc_savecancel();
 
@@ -825,9 +853,10 @@ static void *TsRun( vlc_object_t *p_thread )
             msg_Warn( p_ts->p_input, "es out timeshift: auto reset rate to %d", p_ts->i_rate_source );
 
             p_ts->i_cmd_delay = 0;
+            p_ts->i_buffering_delay = 0;
 
-            p_ts->i_rate_date = -1;
             p_ts->i_rate_delay = 0;
+            p_ts->i_rate_date = -1;
             p_ts->i_rate = p_ts->i_rate_source;
 
             if( !es_out_SetRate( p_ts->p_out, p_ts->i_rate_source, p_ts->i_rate ) )
@@ -841,7 +870,7 @@ static void *TsRun( vlc_object_t *p_thread )
 
             vlc_restorecancel( canc );
         }
-        i_deadline = cmd.i_date + p_ts->i_cmd_delay + p_ts->i_rate_delay;
+        i_deadline = cmd.i_date + p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay;
 
         vlc_cleanup_run();
 
