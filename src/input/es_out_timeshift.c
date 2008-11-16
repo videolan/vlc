@@ -65,7 +65,7 @@ typedef struct
 {
     es_out_id_t *p_es;
     es_format_t *p_fmt;
-} ts_cmd_add_t
+} ts_cmd_add_t;
 
 typedef struct
 {
@@ -154,10 +154,13 @@ static void         Destroy( es_out_t * );
 
 static int          TsStart( es_out_t * );
 static void         TsStop( es_out_t * );
+static void         TsPushCmd( es_out_t *, const ts_cmd_t * );
+static int          TsPopCmd( es_out_t *, ts_cmd_t * );
+static int          TsChangePause( es_out_t *, bool b_source_paused, bool b_paused, mtime_t i_date );
+static int          TsChangeRate( es_out_t *, int i_src_rate, int i_rate );
+
 static void         *TsRun( vlc_object_t * );
 
-static void CmdPush( es_out_t *, const ts_cmd_t * );
-static int  CmdPop( es_out_t *, ts_cmd_t * );
 static void CmdClean( ts_cmd_t * );
 static void cmd_cleanup_routine( void *p ) { CmdClean( p ); }
 
@@ -276,7 +279,7 @@ static es_out_id_t *Add( es_out_t *p_out, const es_format_t *p_fmt )
     TAB_APPEND( p_sys->i_es, p_sys->pp_es, p_es );
 
     if( p_sys->b_delayed )
-        CmdPush( p_out, &cmd );
+        TsPushCmd( p_out, &cmd );
     else
         CmdExecuteAdd( p_out, &cmd );
 
@@ -294,7 +297,7 @@ static int Send( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
 
     CmdInitSend( &cmd, p_es, p_block );
     if( p_sys->b_delayed )
-        CmdPush( p_out, &cmd );
+        TsPushCmd( p_out, &cmd );
     else
         i_ret = CmdExecuteSend( p_out, &cmd) ;
 
@@ -311,7 +314,7 @@ static void Del( es_out_t *p_out, es_out_id_t *p_es )
 
     CmdInitDel( &cmd, p_es );
     if( p_sys->b_delayed )
-        CmdPush( p_out, &cmd );
+        TsPushCmd( p_out, &cmd );
     else
         CmdExecuteDel( p_out, &cmd );
 
@@ -367,45 +370,7 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
     {
         return es_out_SetPauseState( p_sys->p_out, b_source_paused, b_paused, i_date );
     }
-    if( p_sys->p_input->b_can_pace_control )
-    {
-        /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
-         * and so be able to advertize correctly pace control property in access
-         * module */
-        msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have space control" );
-        return VLC_EGENERIC;
-    }
-
-    int i_ret;
-    if( b_paused )
-    {
-        assert( !b_source_paused );
-
-        if( !p_sys->b_delayed )
-            TsStart( p_out );
-
-        i_ret = es_out_SetPauseState( p_sys->p_out, true, true, i_date );
-    }
-    else
-    {
-        i_ret = es_out_SetPauseState( p_sys->p_out, false, false, i_date );
-    }
-
-    if( !i_ret )
-    {
-        if( !b_paused )
-        {
-            assert( p_sys->i_pause_date > 0 );
-
-            p_sys->i_cmd_delay += i_date - p_sys->i_pause_date;
-        }
-
-        p_sys->b_paused = b_paused;
-        p_sys->i_pause_date = i_date;
-
-        vlc_cond_signal( &p_sys->wait );
-    }
-    return i_ret;
+    return TsChangePause( p_out, b_source_paused, b_paused, i_date );
 }
 static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
 {
@@ -416,26 +381,7 @@ static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
     {
         return es_out_SetRate( p_sys->p_out, i_src_rate, i_rate );
     }
-    if( p_sys->p_input->b_can_pace_control )
-    {
-        /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
-         * and so be able to advertize correctly pace control property in access
-         * module */
-        msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have space control" );
-        return VLC_EGENERIC;
-    }
-
-    p_sys->i_cmd_delay += p_sys->i_rate_delay;
-
-    p_sys->i_rate_date = -1;
-    p_sys->i_rate_delay = 0;
-    p_sys->i_rate = i_rate;
-    p_sys->i_rate_source = i_src_rate;
-
-    if( !p_sys->b_delayed )
-        TsStart( p_out );
-
-    return es_out_SetRate( p_sys->p_out, i_rate, i_rate );
+    return TsChangeRate( p_out, i_src_rate, i_rate );
 }
 static int ControlLockedSetTime( es_out_t *p_out, mtime_t i_date )
 {
@@ -505,7 +451,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
             return VLC_EGENERIC;
         if( p_sys->b_delayed )
         {
-            CmdPush( p_out, &cmd );
+            TsPushCmd( p_out, &cmd );
             return VLC_SUCCESS;
         }
         return CmdExecuteControl( p_out, &cmd );
@@ -612,7 +558,7 @@ static void TsStop( es_out_t *p_out )
     {
         ts_cmd_t cmd;
 
-        if( CmdPop( p_out, &cmd ) )
+        if( TsPopCmd( p_out, &cmd ) )
             break;
 
         CmdClean( &cmd );
@@ -620,6 +566,102 @@ static void TsStop( es_out_t *p_out )
 
     p_sys->b_delayed = false;
 }
+static void TsPushCmd( es_out_t *p_out, const ts_cmd_t *p_cmd )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+    ts_cmd_t *p_dup = malloc( sizeof(*p_dup) );
+
+    if( p_dup )
+    {
+        *p_dup = *p_cmd;
+        TAB_APPEND( p_sys->i_cmd, p_sys->pp_cmd, p_dup );
+
+        vlc_cond_signal( &p_sys->wait );
+    }
+}
+static int TsPopCmd( es_out_t *p_out, ts_cmd_t *p_cmd )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( p_sys->i_cmd <= 0 )
+        return VLC_EGENERIC;
+
+    *p_cmd = *p_sys->pp_cmd[0];
+
+    free( p_sys->pp_cmd[0] );
+    TAB_REMOVE( p_sys->i_cmd, p_sys->pp_cmd, p_sys->pp_cmd[0] );
+    return VLC_SUCCESS;
+}
+static int TsChangePause( es_out_t *p_out, bool b_source_paused, bool b_paused, mtime_t i_date )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( p_sys->p_input->b_can_pace_control )
+    {
+        /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
+         * and so be able to advertize correctly pace control property in access
+         * module */
+        msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have space control" );
+        return VLC_EGENERIC;
+    }
+
+    int i_ret;
+    if( b_paused )
+    {
+        assert( !b_source_paused );
+
+        if( !p_sys->b_delayed )
+            TsStart( p_out );
+
+        i_ret = es_out_SetPauseState( p_sys->p_out, true, true, i_date );
+    }
+    else
+    {
+        i_ret = es_out_SetPauseState( p_sys->p_out, false, false, i_date );
+    }
+
+    if( !i_ret )
+    {
+        if( !b_paused )
+        {
+            assert( p_sys->i_pause_date > 0 );
+
+            p_sys->i_cmd_delay += i_date - p_sys->i_pause_date;
+        }
+
+        p_sys->b_paused = b_paused;
+        p_sys->i_pause_date = i_date;
+
+        vlc_cond_signal( &p_sys->wait );
+    }
+    return i_ret;
+}
+static int TsChangeRate( es_out_t *p_out, int i_src_rate, int i_rate )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( p_sys->p_input->b_can_pace_control )
+    {
+        /* XXX we may do it BUT it would be better to finish the clock clean up+improvments
+         * and so be able to advertize correctly pace control property in access
+         * module */
+        msg_Err( p_sys->p_input, "EsOutTimeshift does not work with streams that have space control" );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->i_cmd_delay += p_sys->i_rate_delay;
+
+    p_sys->i_rate_date = -1;
+    p_sys->i_rate_delay = 0;
+    p_sys->i_rate = i_rate;
+    p_sys->i_rate_source = i_src_rate;
+
+    if( !p_sys->b_delayed )
+        TsStart( p_out );
+
+    return es_out_SetRate( p_sys->p_out, i_rate, i_rate );
+}
+
 static void *TsRun( vlc_object_t *p_thread )
 {
     es_out_t *p_out = p_thread->p_private;
@@ -634,7 +676,7 @@ static void *TsRun( vlc_object_t *p_thread )
         vlc_mutex_lock( &p_sys->lock );
         mutex_cleanup_push( &p_sys->lock );
 
-        while( p_sys->b_paused || CmdPop( p_out, &cmd ) )
+        while( p_sys->b_paused || TsPopCmd( p_out, &cmd ) )
             vlc_cond_wait( &p_sys->wait, &p_sys->lock );
 
         if( p_sys->i_rate_date < 0 )
@@ -715,33 +757,6 @@ static void *TsRun( vlc_object_t *p_thread )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void CmdPush( es_out_t *p_out, const ts_cmd_t *p_cmd )
-{
-    es_out_sys_t *p_sys = p_out->p_sys;
-    ts_cmd_t *p_dup = malloc( sizeof(*p_dup) );
-
-    if( p_dup )
-    {
-        *p_dup = *p_cmd;
-        TAB_APPEND( p_sys->i_cmd, p_sys->pp_cmd, p_dup );
-
-        vlc_cond_signal( &p_sys->wait );
-    }
-}
-static int CmdPop( es_out_t *p_out, ts_cmd_t *p_cmd )
-{
-    es_out_sys_t *p_sys = p_out->p_sys;
-
-    if( p_sys->i_cmd <= 0 )
-        return VLC_EGENERIC;
-
-    *p_cmd = *p_sys->pp_cmd[0];
-
-    free( p_sys->pp_cmd[0] );
-    TAB_REMOVE( p_sys->i_cmd, p_sys->pp_cmd, p_sys->pp_cmd[0] );
-    return VLC_SUCCESS;
-}
-
 static void CmdClean( ts_cmd_t *p_cmd )
 {
     switch( p_cmd->i_type )
