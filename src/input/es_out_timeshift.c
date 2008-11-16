@@ -59,6 +59,8 @@ enum
     C_SEND,
     C_DEL,
     C_CONTROL,
+
+    C_MAX
 };
 
 typedef struct
@@ -76,6 +78,7 @@ typedef struct
 {
     es_out_id_t *p_es;
     block_t *p_block;
+    off_t i_offset;
 } ts_cmd_send_t;
 
 typedef struct
@@ -104,6 +107,23 @@ typedef struct
     };
 } ts_cmd_t;
 
+typedef struct ts_storage_t ts_storage_t;
+struct ts_storage_t
+{
+    ts_storage_t *p_next;
+
+    /* */
+    //char *psz_file;
+    //FILE *p_filew;
+    //FILE *p_filer;
+
+    /* */
+    int      i_cmd_r;
+    int      i_cmd_w;
+    int      i_cmd_max;
+    ts_cmd_t *p_cmd;
+};
+
 typedef struct
 {
     VLC_COMMON_MEMBERS
@@ -130,8 +150,9 @@ typedef struct
     mtime_t        i_buffering_delay;
 
     /* */
-    int            i_cmd;
-    ts_cmd_t       **pp_cmd;
+    ts_storage_t   *p_storage_r;
+    ts_storage_t   *p_storage_w;
+
     mtime_t        i_cmd_delay;
 
 } ts_thread_t;
@@ -178,7 +199,7 @@ static int          TsStart( es_out_t * );
 static void         TsAutoStop( es_out_t * );
 
 static void         TsStop( ts_thread_t * );
-static void         TsPushCmd( ts_thread_t *, const ts_cmd_t * );
+static void         TsPushCmd( ts_thread_t *, ts_cmd_t * );
 static int          TsPopCmdLocked( ts_thread_t *, ts_cmd_t * );
 static bool         TsHasCmd( ts_thread_t * );
 static bool         TsIsUnused( ts_thread_t * );
@@ -186,6 +207,13 @@ static int          TsChangePause( ts_thread_t *, bool b_source_paused, bool b_p
 static int          TsChangeRate( ts_thread_t *, int i_src_rate, int i_rate );
 
 static void         *TsRun( vlc_object_t * );
+
+static ts_storage_t *TsStorageNew(void);
+static void         TsStorageDelete( ts_storage_t * );
+static bool         TsStorageIsFull( ts_storage_t * );
+static bool         TsStorageIsEmpty( ts_storage_t * );
+static void         TsStoragePushCmd( ts_storage_t *, const ts_cmd_t *p_cmd );
+static void         TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd );
 
 static void CmdClean( ts_cmd_t * );
 static void cmd_cleanup_routine( void *p ) { CmdClean( p ); }
@@ -640,7 +668,8 @@ static int TsStart( es_out_t *p_out )
     p_ts->i_rate_delay = 0;
     p_ts->i_buffering_delay = 0;
     p_ts->i_cmd_delay = 0;
-    TAB_INIT( p_ts->i_cmd, p_ts->pp_cmd );
+    p_ts->p_storage_r = NULL;
+    p_ts->p_storage_w = NULL;
 
     vlc_object_set_destructor( p_ts, TsDestructor );
 
@@ -685,38 +714,63 @@ static void TsStop( ts_thread_t *p_ts )
 
         CmdClean( &cmd );
     }
+    assert( !p_ts->p_storage_r || !p_ts->p_storage_r->p_next );
+    if( p_ts->p_storage_r )
+        TsStorageDelete( p_ts->p_storage_r );
     vlc_mutex_unlock( &p_ts->lock );
-    TAB_CLEAN( p_ts->i_cmd, p_ts->pp_cmd  );
 
     vlc_object_release( p_ts );
 }
-static void TsPushCmd( ts_thread_t *p_ts, const ts_cmd_t *p_cmd )
+static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
 {
-    ts_cmd_t *p_dup = malloc( sizeof(*p_dup) );
+    vlc_mutex_lock( &p_ts->lock );
 
-    if( p_dup )
+    if( !p_ts->p_storage_w || TsStorageIsFull( p_ts->p_storage_w ) )
     {
-        *p_dup = *p_cmd;
+        ts_storage_t *p_storage = TsStorageNew();
 
-        vlc_mutex_lock( &p_ts->lock );
+        if( !p_storage )
+        {
+            CmdClean( p_cmd );
+            return;
+        }
 
-        TAB_APPEND( p_ts->i_cmd, p_ts->pp_cmd, p_dup );
-        vlc_cond_signal( &p_ts->wait );
-
-        vlc_mutex_unlock( &p_ts->lock );
+        if( !p_ts->p_storage_w )
+        {
+            p_ts->p_storage_r = p_ts->p_storage_w = p_storage;
+        }
+        else
+        {
+            p_ts->p_storage_w->p_next = p_storage;
+            p_ts->p_storage_w = p_storage;
+        }
     }
+
+    TsStoragePushCmd( p_ts->p_storage_w, p_cmd );
+
+    vlc_cond_signal( &p_ts->wait );
+
+    vlc_mutex_unlock( &p_ts->lock );
 }
 static int TsPopCmdLocked( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
 {
     vlc_assert_locked( &p_ts->lock );
 
-    if( p_ts->i_cmd <= 0 )
+    if( TsStorageIsEmpty( p_ts->p_storage_r ) )
         return VLC_EGENERIC;
 
-    *p_cmd = *p_ts->pp_cmd[0];
+    TsStoragePopCmd( p_ts->p_storage_r, p_cmd );
 
-    free( p_ts->pp_cmd[0] );
-    TAB_REMOVE( p_ts->i_cmd, p_ts->pp_cmd, p_ts->pp_cmd[0] );
+    while( p_ts->p_storage_r && TsStorageIsEmpty( p_ts->p_storage_r ) )
+    {
+        ts_storage_t *p_next = p_ts->p_storage_r->p_next;
+        if( !p_next )
+            break;
+
+        TsStorageDelete( p_ts->p_storage_r );
+        p_ts->p_storage_r = p_next;
+    }
+
     return VLC_SUCCESS;
 }
 static bool TsHasCmd( ts_thread_t *p_ts )
@@ -724,7 +778,7 @@ static bool TsHasCmd( ts_thread_t *p_ts )
     bool b_cmd;
 
     vlc_mutex_lock( &p_ts->lock );
-    b_cmd =  p_ts->i_cmd > 0;
+    b_cmd =  TsStorageIsEmpty( p_ts->p_storage_r );
     vlc_mutex_unlock( &p_ts->lock );
 
     return b_cmd;
@@ -736,7 +790,7 @@ static bool TsIsUnused( ts_thread_t *p_ts )
     vlc_mutex_lock( &p_ts->lock );
     b_unused = !p_ts->b_paused &&
                p_ts->i_rate == p_ts->i_rate_source &&
-               p_ts->i_cmd <= 0;
+               TsStorageIsEmpty( p_ts->p_storage_r );
     vlc_mutex_unlock( &p_ts->lock );
 
     return b_unused;
@@ -904,6 +958,66 @@ static void *TsRun( vlc_object_t *p_thread )
     }
 
     return NULL;
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static ts_storage_t *TsStorageNew(void)
+{
+    ts_storage_t *p_storage = malloc( sizeof(ts_storage_t) );
+    if( !p_storage )
+        return NULL;
+
+    /* */
+    p_storage->p_next = NULL;
+
+    /* */
+    p_storage->i_cmd_w = 0;
+    p_storage->i_cmd_r = 0;
+    p_storage->i_cmd_max = 1000;
+    p_storage->p_cmd = malloc( p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) );
+
+    if( !p_storage->p_cmd )
+    {
+        TsStorageDelete( p_storage );
+        return NULL;
+    }
+    return p_storage;
+}
+static void TsStorageDelete( ts_storage_t *p_storage )
+{
+    while( p_storage->i_cmd_r < p_storage->i_cmd_w )
+    {
+        ts_cmd_t cmd;
+
+        TsStoragePopCmd( p_storage, &cmd );
+
+        CmdClean( &cmd );
+    }
+    free( p_storage->p_cmd );
+
+    free( p_storage );
+}
+static bool TsStorageIsFull( ts_storage_t *p_storage )
+{
+    return p_storage->i_cmd_w >= p_storage->i_cmd_max;
+}
+static bool TsStorageIsEmpty( ts_storage_t *p_storage )
+{
+    return !p_storage || p_storage->i_cmd_r >= p_storage->i_cmd_w;
+}
+static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd )
+{
+    assert( !TsStorageIsFull( p_storage ) );
+
+    p_storage->p_cmd[p_storage->i_cmd_w++] = *p_cmd;
+}
+static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd )
+{
+    assert( !TsStorageIsEmpty( p_storage ) );
+
+    *p_cmd = p_storage->p_cmd[p_storage->i_cmd_r++];
 }
 
 /*****************************************************************************
