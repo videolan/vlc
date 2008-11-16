@@ -174,10 +174,13 @@ static int          Control( es_out_t *, int i_query, va_list );
 static void         Destroy( es_out_t * );
 
 static int          TsStart( es_out_t * );
+static void         TsAutoStop( es_out_t * );
+
 static void         TsStop( ts_thread_t * );
 static void         TsPushCmd( ts_thread_t *, const ts_cmd_t * );
 static int          TsPopCmdLocked( ts_thread_t *, ts_cmd_t * );
 static bool         TsHasCmd( ts_thread_t * );
+static bool         TsIsUnused( ts_thread_t * );
 static int          TsChangePause( ts_thread_t *, bool b_source_paused, bool b_paused, mtime_t i_date );
 static int          TsChangeRate( ts_thread_t *, int i_src_rate, int i_rate );
 
@@ -290,6 +293,8 @@ static es_out_id_t *Add( es_out_t *p_out, const es_format_t *p_fmt )
 
     vlc_mutex_lock( &p_sys->lock );
 
+    TsAutoStop( p_out );
+
     if( CmdInitAdd( &cmd, p_es, p_fmt, p_sys->b_delayed ) )
     {
         vlc_mutex_unlock( &p_sys->lock );
@@ -316,6 +321,8 @@ static int Send( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
 
     vlc_mutex_lock( &p_sys->lock );
 
+    TsAutoStop( p_out );
+
     CmdInitSend( &cmd, p_es, p_block );
     if( p_sys->b_delayed )
         TsPushCmd( p_sys->p_thread, &cmd );
@@ -332,6 +339,8 @@ static void Del( es_out_t *p_out, es_out_id_t *p_es )
     ts_cmd_t cmd;
 
     vlc_mutex_lock( &p_sys->lock );
+
+    TsAutoStop( p_out );
 
     CmdInitDel( &cmd, p_es );
     if( p_sys->b_delayed )
@@ -581,7 +590,11 @@ static int Control( es_out_t *p_out, int i_query, va_list args )
     int i_ret;
 
     vlc_mutex_lock( &p_sys->lock );
+
+    TsAutoStop( p_out );
+
     i_ret = ControlLocked( p_out, i_query, args );
+
     vlc_mutex_unlock( &p_sys->lock );
 
     return i_ret;
@@ -637,6 +650,18 @@ static int TsStart( es_out_t *p_out )
     }
 
     return VLC_SUCCESS;
+}
+static void TsAutoStop( es_out_t *p_out )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    if( !p_sys->b_delayed || !TsIsUnused( p_sys->p_thread ) )
+        return;
+
+    msg_Warn( p_sys->p_input, "es out timeshift: auto stop" );
+    TsStop( p_sys->p_thread );
+
+    p_sys->b_delayed = false;
 }
 static void TsStop( ts_thread_t *p_ts )
 {
@@ -696,6 +721,18 @@ static bool TsHasCmd( ts_thread_t *p_ts )
     vlc_mutex_unlock( &p_ts->lock );
 
     return b_cmd;
+}
+static bool TsIsUnused( ts_thread_t *p_ts )
+{
+    bool b_unused;
+
+    vlc_mutex_lock( &p_ts->lock );
+    b_unused = !p_ts->b_paused &&
+               p_ts->i_rate == p_ts->i_rate_source &&
+               p_ts->i_cmd <= 0;
+    vlc_mutex_unlock( &p_ts->lock );
+
+    return b_unused;
 }
 static int TsChangePause( ts_thread_t *p_ts, bool b_source_paused, bool b_paused, mtime_t i_date )
 {
