@@ -85,13 +85,38 @@ typedef struct
 {
     int  i_query;
 
-    bool b_bool;
-    int  i_int;
-    int64_t i_i64;
-    vlc_meta_t *p_meta;
-    vlc_epg_t *p_epg;
-    es_out_id_t *p_es;
-    es_format_t *p_fmt;
+    union
+    {
+        bool b_bool;
+        int  i_int;
+        int64_t i_i64;
+        es_out_id_t *p_es;
+        struct
+        {
+            int     i_int;
+            int64_t i_i64;
+        } int_i64;
+        struct
+        {
+            int        i_int;
+            vlc_meta_t *p_meta;
+        } int_meta;
+        struct
+        {
+            int       i_int;
+            vlc_epg_t *p_epg;
+        } int_epg;
+        struct
+        {
+            es_out_id_t *p_es;
+            bool        b_bool;
+        } es_bool;
+        struct
+        {
+            es_out_id_t *p_es;
+            es_format_t *p_fmt;
+        } es_fmt;
+    };
 } ts_cmd_control_t;
 
 typedef struct
@@ -113,9 +138,11 @@ struct ts_storage_t
     ts_storage_t *p_next;
 
     /* */
-    //char *psz_file;
-    //FILE *p_filew;
-    //FILE *p_filer;
+    char    *psz_file;  /* Filename */
+    int64_t i_file_max; /* Max size in bytes */
+    int64_t i_file_size;/* Current size in bytes */
+    FILE    *p_filew;   /* FILE handle for data writing */
+    FILE    *p_filer;   /* FILE handle for data reading */
 
     /* */
     int      i_cmd_r;
@@ -131,6 +158,8 @@ typedef struct
     /* */
     input_thread_t *p_input;
     es_out_t       *p_out;
+    int64_t        i_tmp_size_max;
+    const char     *psz_tmp_path;
 
     /* Lock for all following fields */
     vlc_mutex_t    lock;
@@ -208,11 +237,12 @@ static int          TsChangeRate( ts_thread_t *, int i_src_rate, int i_rate );
 
 static void         *TsRun( vlc_object_t * );
 
-static ts_storage_t *TsStorageNew(void);
+static ts_storage_t *TsStorageNew( const char *psz_path, int64_t i_tmp_size_max );
 static void         TsStorageDelete( ts_storage_t * );
-static bool         TsStorageIsFull( ts_storage_t * );
+static void         TsStoragePack( ts_storage_t *p_storage );
+static bool         TsStorageIsFull( ts_storage_t *, const ts_cmd_t *p_cmd );
 static bool         TsStorageIsEmpty( ts_storage_t * );
-static void         TsStoragePushCmd( ts_storage_t *, const ts_cmd_t *p_cmd );
+static void         TsStoragePushCmd( ts_storage_t *, const ts_cmd_t *p_cmd, bool b_flush );
 static void         TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd );
 
 static void CmdClean( ts_cmd_t * );
@@ -236,7 +266,7 @@ static int  CmdExecuteControl( es_out_t *, ts_cmd_t * );
 
 /* File helpers */
 static char *GetTmpPath( char *psz_path );
-static FILE *GetTmpFile( const char *psz_path );
+static FILE *GetTmpFile( char **ppsz_file, const char *psz_path );
 
 /*****************************************************************************
  * input_EsOutTimeshiftNew:
@@ -656,6 +686,8 @@ static int TsStart( es_out_t *p_out )
     if( !p_ts )
         return VLC_EGENERIC;
 
+    p_ts->i_tmp_size_max = p_sys->i_tmp_size_max;
+    p_ts->psz_tmp_path = p_sys->psz_tmp_path;
     p_ts->p_input = p_sys->p_input;
     p_ts->p_out = p_sys->p_out;
     vlc_mutex_init( &p_ts->lock );
@@ -725,9 +757,9 @@ static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
 {
     vlc_mutex_lock( &p_ts->lock );
 
-    if( !p_ts->p_storage_w || TsStorageIsFull( p_ts->p_storage_w ) )
+    if( !p_ts->p_storage_w || TsStorageIsFull( p_ts->p_storage_w, p_cmd ) )
     {
-        ts_storage_t *p_storage = TsStorageNew();
+        ts_storage_t *p_storage = TsStorageNew( p_ts->psz_tmp_path, p_ts->i_tmp_size_max );
 
         if( !p_storage )
         {
@@ -741,12 +773,13 @@ static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
         }
         else
         {
+            TsStoragePack( p_ts->p_storage_w );
             p_ts->p_storage_w->p_next = p_storage;
             p_ts->p_storage_w = p_storage;
         }
     }
 
-    TsStoragePushCmd( p_ts->p_storage_w, p_cmd );
+    TsStoragePushCmd( p_ts->p_storage_w, p_cmd, p_ts->p_storage_r == p_ts->p_storage_w );
 
     vlc_cond_signal( &p_ts->wait );
 
@@ -864,10 +897,13 @@ static void *TsRun( vlc_object_t *p_thread )
         {
             const int canc = vlc_savecancel();
             b_buffering = es_out_GetBuffering( p_ts->p_out );
-            vlc_restorecancel( canc );
 
             if( ( !p_ts->b_paused || b_buffering ) && !TsPopCmdLocked( p_ts, &cmd ) )
+            {
+                vlc_restorecancel( canc );
                 break;
+            }
+            vlc_restorecancel( canc );
 
             vlc_cond_wait( &p_ts->wait, &p_ts->lock );
         }
@@ -963,9 +999,9 @@ static void *TsRun( vlc_object_t *p_thread )
 /*****************************************************************************
  *
  *****************************************************************************/
-static ts_storage_t *TsStorageNew(void)
+static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_max )
 {
-    ts_storage_t *p_storage = malloc( sizeof(ts_storage_t) );
+    ts_storage_t *p_storage = calloc( 1, sizeof(ts_storage_t) );
     if( !p_storage )
         return NULL;
 
@@ -973,12 +1009,20 @@ static ts_storage_t *TsStorageNew(void)
     p_storage->p_next = NULL;
 
     /* */
+    p_storage->i_file_max = i_tmp_size_max;
+    p_storage->i_file_size = 0;
+    p_storage->p_filew = GetTmpFile( &p_storage->psz_file, psz_tmp_path );
+    if( p_storage->psz_file )
+        p_storage->p_filer = utf8_fopen( p_storage->psz_file, "rb" );
+
+    /* */
     p_storage->i_cmd_w = 0;
     p_storage->i_cmd_r = 0;
-    p_storage->i_cmd_max = 1000;
+    p_storage->i_cmd_max = 30000;
     p_storage->p_cmd = malloc( p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) );
+    //fprintf( stderr, "\nSTORAGE name=%s size=%d kbytes\n", p_storage->psz_file, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) /1024 );
 
-    if( !p_storage->p_cmd )
+    if( !p_storage->p_cmd || !p_storage->p_filew || !p_storage->p_filer )
     {
         TsStorageDelete( p_storage );
         return NULL;
@@ -997,27 +1041,112 @@ static void TsStorageDelete( ts_storage_t *p_storage )
     }
     free( p_storage->p_cmd );
 
+    if( p_storage->p_filer )
+        fclose( p_storage->p_filer );
+    if( p_storage->p_filew )
+        fclose( p_storage->p_filew );
+
+    if( p_storage->psz_file )
+    {
+        utf8_unlink( p_storage->psz_file );
+        free( p_storage->psz_file );
+    }
+
     free( p_storage );
 }
-static bool TsStorageIsFull( ts_storage_t *p_storage )
+static void TsStoragePack( ts_storage_t *p_storage )
 {
+    /* Try to release a bit of memory */
+    if( p_storage->i_cmd_w >= p_storage->i_cmd_max )
+        return;
+
+    p_storage->i_cmd_max = __MAX( p_storage->i_cmd_w, 1 );
+
+    ts_cmd_t *p_new = realloc( p_storage->p_cmd, p_storage->i_cmd_max * sizeof(*p_storage->p_cmd) );
+    if( p_new )
+        p_storage->p_cmd = p_new;
+}
+static bool TsStorageIsFull( ts_storage_t *p_storage, const ts_cmd_t *p_cmd )
+{
+    if( p_cmd && p_cmd->i_type == C_SEND && p_storage->i_cmd_w > 0 )
+    {
+        size_t i_size = sizeof(*p_cmd->send.p_block) + p_cmd->send.p_block->i_buffer;
+
+        if( p_storage->i_file_size + i_size >= p_storage->i_file_max )
+            return true;
+    }
     return p_storage->i_cmd_w >= p_storage->i_cmd_max;
 }
 static bool TsStorageIsEmpty( ts_storage_t *p_storage )
 {
     return !p_storage || p_storage->i_cmd_r >= p_storage->i_cmd_w;
 }
-static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd )
+static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd, bool b_flush )
 {
-    assert( !TsStorageIsFull( p_storage ) );
+    ts_cmd_t cmd = *p_cmd;
 
-    p_storage->p_cmd[p_storage->i_cmd_w++] = *p_cmd;
+    assert( !TsStorageIsFull( p_storage, p_cmd ) );
+
+    if( cmd.i_type == C_SEND )
+    {
+        block_t *p_block = cmd.send.p_block;
+
+        cmd.send.p_block = NULL;
+        cmd.send.i_offset = ftell( p_storage->p_filew );
+
+        if( fwrite( p_block, sizeof(*p_block), 1, p_storage->p_filew ) != 1 )
+        {
+            block_Release( p_block );
+            return;
+        }
+        p_storage->i_file_size += sizeof(*p_block);
+        if( p_block->i_buffer > 0 )
+        {
+            if( fwrite( p_block->p_buffer, p_block->i_buffer, 1, p_storage->p_filew ) != 1 )
+            {
+                block_Release( p_block );
+                return;
+            }
+        }
+        p_storage->i_file_size += p_block->i_buffer;
+        block_Release( p_block );
+
+        if( b_flush )
+            fflush( p_storage->p_filew );
+    }
+    p_storage->p_cmd[p_storage->i_cmd_w++] = cmd;
 }
 static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd )
 {
     assert( !TsStorageIsEmpty( p_storage ) );
 
     *p_cmd = p_storage->p_cmd[p_storage->i_cmd_r++];
+    if( p_cmd->i_type == C_SEND )
+    {
+        block_t block;
+
+        if( !fseek( p_storage->p_filer, p_cmd->send.i_offset, SEEK_SET ) &&
+            fread( &block, sizeof(block), 1, p_storage->p_filer ) == 1 )
+        {
+            block_t *p_block = block_Alloc( block.i_buffer );
+            if( p_block )
+            {
+                p_block->i_dts      = block.i_dts;
+                p_block->i_pts      = block.i_pts;
+                p_block->i_flags    = block.i_flags;
+                p_block->i_length   = block.i_length;
+                p_block->i_rate     = block.i_rate;
+                p_block->i_samples  = block.i_samples;
+                p_block->i_buffer = fread( p_block->p_buffer, 1, block.i_buffer, p_storage->p_filer );
+            }
+            p_cmd->send.p_block = p_block;
+        }
+        else
+        {
+            fprintf( stderr, "----------------- 2: %m\n" );
+            p_cmd->send.p_block = block_Alloc( 1 );
+        }
+    }
 }
 
 /*****************************************************************************
@@ -1118,9 +1247,6 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     p_cmd->i_type = C_CONTROL;
     p_cmd->i_date = mdate();
     p_cmd->control.i_query = i_query;
-    p_cmd->control.p_meta  = NULL;
-    p_cmd->control.p_epg = NULL;
-    p_cmd->control.p_fmt = NULL;
 
     switch( i_query )
     {
@@ -1141,8 +1267,8 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         break;
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-        p_cmd->control.i_int = (int)va_arg( args, int );
-        p_cmd->control.i_i64 = (int64_t)va_arg( args, int64_t );
+        p_cmd->control.int_i64.i_int = (int)va_arg( args, int );
+        p_cmd->control.int_i64.i_i64 = (int64_t)va_arg( args, int64_t );
         break;
 
     case ES_OUT_RESET_PCR:           /* no arg */
@@ -1150,48 +1276,48 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=vlc_meta_t* */
     {
-        p_cmd->control.i_int = (int)va_arg( args, int );
+        p_cmd->control.int_meta.i_int = (int)va_arg( args, int );
         vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t * );
 
         if( b_copy )
         {
-            p_cmd->control.p_meta = vlc_meta_New();
-            if( !p_cmd->control.p_meta )
+            p_cmd->control.int_meta.p_meta = vlc_meta_New();
+            if( !p_cmd->control.int_meta.p_meta )
                 return VLC_EGENERIC;
-            vlc_meta_Merge( p_cmd->control.p_meta, p_meta );
+            vlc_meta_Merge( p_cmd->control.int_meta.p_meta, p_meta );
         }
         else
         {
-            p_cmd->control.p_meta = p_meta;
+            p_cmd->control.int_meta.p_meta = p_meta;
         }
         break;
     }
 
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=vlc_epg_t* */
     {
-        p_cmd->control.i_int = (int)va_arg( args, int );
+        p_cmd->control.int_epg.i_int = (int)va_arg( args, int );
         vlc_epg_t *p_epg = (vlc_epg_t*)va_arg( args, vlc_epg_t * );
 
         if( b_copy )
         {
-            p_cmd->control.p_epg = vlc_epg_New( p_epg->psz_name );
-            if( !p_cmd->control.p_epg )
+            p_cmd->control.int_epg.p_epg = vlc_epg_New( p_epg->psz_name );
+            if( !p_cmd->control.int_epg.p_epg )
                 return VLC_EGENERIC;
             for( int i = 0; i < p_epg->i_event; i++ )
             {
                 vlc_epg_event_t *p_evt = p_epg->pp_event[i];
 
-                vlc_epg_AddEvent( p_cmd->control.p_epg,
+                vlc_epg_AddEvent( p_cmd->control.int_epg.p_epg,
                                   p_evt->i_start, p_evt->i_duration,
                                   p_evt->psz_name,
                                   p_evt->psz_short_description, p_evt->psz_description );
             }
-            vlc_epg_SetCurrent( p_cmd->control.p_epg,
+            vlc_epg_SetCurrent( p_cmd->control.int_epg.p_epg,
                                 p_epg->p_current ? p_epg->p_current->i_start : -1 );
         }
         else
         {
-            p_cmd->control.p_epg = p_epg;
+            p_cmd->control.int_epg.p_epg = p_epg;
         }
         break;
     }
@@ -1204,25 +1330,25 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         break;
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
-        p_cmd->control.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
-        p_cmd->control.b_bool = (bool)va_arg( args, int );
+        p_cmd->control.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->control.es_bool.b_bool = (bool)va_arg( args, int );
         break;
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
     {
-        p_cmd->control.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->control.es_fmt.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
         es_format_t *p_fmt = (es_format_t*)va_arg( args, es_format_t * );
 
         if( b_copy )
         {
-            p_cmd->control.p_fmt = malloc( sizeof(*p_fmt) );
-            if( !p_cmd->control.p_fmt )
+            p_cmd->control.es_fmt.p_fmt = malloc( sizeof(*p_fmt) );
+            if( !p_cmd->control.es_fmt.p_fmt )
                 return VLC_EGENERIC;
-            es_format_Copy( p_cmd->control.p_fmt, p_fmt );
+            es_format_Copy( p_cmd->control.es_fmt.p_fmt, p_fmt );
         }
         else
         {
-            p_cmd->control.p_fmt = p_fmt;
+            p_cmd->control.es_fmt.p_fmt = p_fmt;
         }
         break;
     }
@@ -1254,16 +1380,16 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->control.i_i64 );
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-        return es_out_Control( p_out, i_query, p_cmd->control.i_int, p_cmd->control.i_i64 );
+        return es_out_Control( p_out, i_query, p_cmd->control.int_i64.i_int, p_cmd->control.int_i64.i_i64 );
 
     case ES_OUT_RESET_PCR:           /* no arg */
         return es_out_Control( p_out, i_query );
 
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=vlc_meta_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.i_int, p_cmd->control.p_meta );
+        return es_out_Control( p_out, i_query, p_cmd->control.int_meta.i_int, p_cmd->control.int_meta.p_meta );
 
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=vlc_epg_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.i_int, p_cmd->control.p_epg );
+        return es_out_Control( p_out, i_query, p_cmd->control.int_epg.i_int, p_cmd->control.int_epg.p_epg );
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
@@ -1272,10 +1398,10 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es );
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
-        return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es, p_cmd->control.b_bool );
+        return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es, p_cmd->control.es_bool.b_bool );
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es, p_cmd->control.p_fmt );
+        return es_out_Control( p_out, i_query, p_cmd->control.es_fmt.p_es->p_es, p_cmd->control.es_fmt.p_fmt );
 
     default:
         assert(0);
@@ -1284,14 +1410,21 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 }
 static void CmdCleanControl( ts_cmd_t *p_cmd )
 {
-    if( p_cmd->control.p_meta )
-        vlc_meta_Delete( p_cmd->control.p_meta );
-    if( p_cmd->control.p_epg )
-        vlc_epg_Delete( p_cmd->control.p_epg );
-    if( p_cmd->control.p_fmt )
+    if( p_cmd->control.i_query == ES_OUT_SET_GROUP_META &&
+        p_cmd->control.int_meta.p_meta )
     {
-        es_format_Clean( p_cmd->control.p_fmt );
-        free( p_cmd->control.p_fmt );
+        vlc_meta_Delete( p_cmd->control.int_meta.p_meta );
+    }
+    else if( p_cmd->control.i_query == ES_OUT_SET_GROUP_EPG &&
+             p_cmd->control.int_epg.p_epg )
+    {
+        vlc_epg_Delete( p_cmd->control.int_epg.p_epg );
+    }
+    else if( p_cmd->control.i_query == ES_OUT_SET_ES_FMT &&
+             p_cmd->control.es_fmt.p_fmt )
+    {
+        es_format_Clean( p_cmd->control.es_fmt.p_fmt );
+        free( p_cmd->control.es_fmt.p_fmt );
     }
 }
 
@@ -1350,19 +1483,20 @@ static char *GetTmpPath( char *psz_path )
     return psz_path;
 }
 
-static FILE *GetTmpFile( const char *psz_path )
+static FILE *GetTmpFile( char **ppsz_file, const char *psz_path )
 {
     char *psz_name;
     int fd;
     FILE *f;
 
     /* */
+    *ppsz_file = NULL;
     if( asprintf( &psz_name, "%s/vlc-timeshift.XXXXXX", psz_path ) < 0 )
         return NULL;
 
     /* */
     fd = mkstemp( psz_name );
-    free( psz_name );
+    *ppsz_file = psz_name;
 
     if( fd < 0 )
         return NULL;
