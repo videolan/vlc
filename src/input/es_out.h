@@ -33,8 +33,15 @@
 
 enum es_out_query_private_e
 {
+
+    /* activate application of mode */
+    ES_OUT_SET_ACTIVE = ES_OUT_PRIVATE_START,       /* arg1= bool                     */
+
+    /* set/get mode */
+    ES_OUT_SET_MODE,                                /* arg1= int                            */
+
     /* Get date to wait before demuxing more data */
-    ES_OUT_GET_WAKE_UP = ES_OUT_PRIVATE_START,      /* arg1=mtime_t*            res=cannot fail */
+    ES_OUT_GET_WAKE_UP,                             /* arg1=mtime_t*            res=cannot fail */
 
     /* Wrapper for some ES command to work with id */
     ES_OUT_SET_ES_BY_ID,

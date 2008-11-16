@@ -83,9 +83,7 @@ typedef struct
     int  i_query;
 
     bool b_bool;
-    bool *pb_bool;
     int  i_int;
-    int  *pi_int;
     int64_t i_i64;
     vlc_meta_t *p_meta;
     vlc_epg_t *p_epg;
@@ -506,11 +504,8 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
 
     /* Pass-through control */
     case ES_OUT_SET_ACTIVE:
-    case ES_OUT_GET_ACTIVE:
     case ES_OUT_SET_MODE:
-    case ES_OUT_GET_MODE:
     case ES_OUT_SET_GROUP:
-    case ES_OUT_GET_GROUP:
     case ES_OUT_SET_PCR:
     case ES_OUT_SET_GROUP_PCR:
     case ES_OUT_RESET_PCR:
@@ -522,7 +517,6 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_RESTART_ES:
     case ES_OUT_SET_ES_DEFAULT:
     case ES_OUT_SET_ES_STATE:
-    case ES_OUT_GET_ES_STATE:
     case ES_OUT_SET_ES_FMT:
     {
         ts_cmd_t cmd;
@@ -536,7 +530,21 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         return CmdExecuteControl( p_sys->p_out, &cmd );
     }
 
-    /* Special control */
+    /* Special control when delayed */
+    case ES_OUT_GET_ES_STATE:
+    {
+        es_out_id_t *p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        bool *pb_enabled = (bool*)va_arg( args, bool* );
+
+        if( p_sys->b_delayed )
+        {
+            *pb_enabled = true;
+            return VLC_SUCCESS;
+        }
+        return es_out_Control( p_sys->p_out, ES_OUT_GET_ES_STATE, p_es, pb_enabled );
+    }
+
+    /* Special internal input control */
     case ES_OUT_GET_EMPTY:
     {
         bool *pb_empty = (bool*)va_arg( args, bool* );
@@ -983,19 +991,10 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         p_cmd->control.b_bool = (bool)va_arg( args, int );
         break;
 
-    case ES_OUT_GET_ACTIVE:  /* arg1= bool*                    */
-        p_cmd->control.pb_bool = (bool*)va_arg( args, bool * );
-        break;
-
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
         p_cmd->control.i_int = (int)va_arg( args, int );
-        break;
-
-    case ES_OUT_GET_MODE:    /* arg2= int*                           */
-    case ES_OUT_GET_GROUP:   /* arg1= int*                           */
-        p_cmd->control.pi_int = (int*)va_arg( args, int * );
         break;
 
     case ES_OUT_SET_PCR:                /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
@@ -1071,11 +1070,6 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         p_cmd->control.b_bool = (bool)va_arg( args, int );
         break;
 
-    case ES_OUT_GET_ES_STATE:/* arg1= es_out_id_t* arg2=bool*  */
-        p_cmd->control.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
-        p_cmd->control.pb_bool = (bool*)va_arg( args, bool * );
-        break;
-
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
     {
         p_cmd->control.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
@@ -1112,17 +1106,10 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_SET_ACTIVE:  /* arg1= bool                     */
         return es_out_Control( p_out, i_query, p_cmd->control.b_bool );
 
-    case ES_OUT_GET_ACTIVE:  /* arg1= bool*                    */
-        return es_out_Control( p_out, i_query, p_cmd->control.pb_bool );
-
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
         return es_out_Control( p_out, i_query, p_cmd->control.i_int );
-
-    case ES_OUT_GET_MODE:    /* arg2= int*                           */
-    case ES_OUT_GET_GROUP:   /* arg1= int*                           */
-        return es_out_Control( p_out, i_query, p_cmd->control.pi_int );
 
     case ES_OUT_SET_PCR:                /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
@@ -1148,9 +1135,6 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
         return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es, p_cmd->control.b_bool );
-
-    case ES_OUT_GET_ES_STATE:/* arg1= es_out_id_t* arg2=bool*  */
-        return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es, p_cmd->control.pb_bool );
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
         return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es, p_cmd->control.p_fmt );

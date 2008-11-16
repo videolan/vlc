@@ -2001,11 +2001,6 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case ES_OUT_GET_ACTIVE:
-            pb = (bool*) va_arg( args, bool * );
-            *pb = p_sys->b_active;
-            return VLC_SUCCESS;
-
         case ES_OUT_SET_MODE:
             i = (int) va_arg( args, int );
             if( i == ES_OUT_MODE_NONE || i == ES_OUT_MODE_ALL ||
@@ -2029,11 +2024,6 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
-
-        case ES_OUT_GET_MODE:
-            pi = (int*) va_arg( args, int* );
-            *pi = p_sys->i_mode;
-            return VLC_SUCCESS;
 
         case ES_OUT_SET_ES:
         case ES_OUT_RESTART_ES:
@@ -2185,14 +2175,6 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
-
-        case ES_OUT_GET_GROUP:
-            pi = (int*) va_arg( args, int* );
-            if( p_sys->p_pgrm )
-                *pi = p_sys->p_pgrm->i_id;
-            else
-                *pi = -1;    /* FIXME */
-            return VLC_SUCCESS;
 
         case ES_OUT_SET_GROUP:
         {

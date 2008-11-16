@@ -44,15 +44,6 @@ enum es_out_mode_e
 
 enum es_out_query_e
 {
-    /* activate application of mode */
-    ES_OUT_SET_ACTIVE,  /* arg1= bool                     */
-    /* see if mode is currently aplied or not */
-    ES_OUT_GET_ACTIVE,  /* arg1= bool*                    */
-
-    /* set/get mode */
-    ES_OUT_SET_MODE,    /* arg1= int                            */
-    ES_OUT_GET_MODE,    /* arg2= int*                           */
-
     /* set ES selected for the es category (audio/video/spu) */
     ES_OUT_SET_ES,      /* arg1= es_out_id_t*                   */
     ES_OUT_RESTART_ES,  /* arg1= es_out_id_t*                   */
@@ -66,7 +57,6 @@ enum es_out_query_e
 
     /* */
     ES_OUT_SET_GROUP,   /* arg1= int                            */
-    ES_OUT_GET_GROUP,   /* arg1= int*                           */
 
     /* PCR handling, DTS/PTS will be automatically computed using thoses PCR
      * XXX: SET_PCR(_GROUP) are in charge of the pace control. They will wait
