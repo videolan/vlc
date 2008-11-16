@@ -478,12 +478,7 @@ static int ControlLockedSetFrameNext( es_out_t *p_out )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
 
-    //if( !p_sys->b_delayed )
-        return es_out_SetFrameNext( p_sys->p_out );
-
-    /* TODO */
-    msg_Err( p_sys->p_input, "EsOutTimeshift does not yet support frame next" );
-    return VLC_EGENERIC;
+    return es_out_SetFrameNext( p_sys->p_out );
 }
 
 static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
