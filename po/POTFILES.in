@@ -284,7 +284,6 @@ modules/access/rtp/input.c
 modules/access/rtp/rtp.c
 modules/access/rtp/rtp.h
 modules/access/rtp/session.c
-modules/access/rtp/xiph.c
 modules/access/rtsp/access.c
 modules/access/rtsp/real_asmrp.c
 modules/access/rtsp/real.c
