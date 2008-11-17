@@ -53,6 +53,13 @@
  * Local prototypes
  *****************************************************************************/
 
+/* XXX attribute_packed is (and MUST be) used ONLY to reduce memory usage */
+#ifdef HAVE_ATTRIBUTE_PACKED
+#   define attribute_packed __attribute__((__packed__))
+#else
+#   define attribute_packed
+#endif
+
 enum
 {
     C_ADD,
@@ -61,25 +68,25 @@ enum
     C_CONTROL,
 };
 
-typedef struct
+typedef struct attribute_packed
 {
     es_out_id_t *p_es;
     es_format_t *p_fmt;
 } ts_cmd_add_t;
 
-typedef struct
+typedef struct attribute_packed
 {
     es_out_id_t *p_es;
 } ts_cmd_del_t;
 
-typedef struct
+typedef struct attribute_packed
 {
     es_out_id_t *p_es;
     block_t *p_block;
-    off_t i_offset;
+    int     i_offset;  /* We do not use file > INT_MAX */
 } ts_cmd_send_t;
 
-typedef struct
+typedef struct attribute_packed
 {
     int  i_query;
 
@@ -117,9 +124,9 @@ typedef struct
     };
 } ts_cmd_control_t;
 
-typedef struct
+typedef struct attribute_packed
 {
-    int     i_type;
+    int8_t  i_type;
     mtime_t i_date;
     union
     {
@@ -137,7 +144,7 @@ struct ts_storage_t
 
     /* */
     char    *psz_file;  /* Filename */
-    int64_t i_file_max; /* Max size in bytes */
+    size_t  i_file_max; /* Max size in bytes */
     int64_t i_file_size;/* Current size in bytes */
     FILE    *p_filew;   /* FILE handle for data writing */
     FILE    *p_filer;   /* FILE handle for data reading */
@@ -318,6 +325,16 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     char *psz_tmp_path = var_CreateGetNonEmptyString( p_input, "input-timeshift-path" );
     p_sys->psz_tmp_path = GetTmpPath( psz_tmp_path );
     msg_Dbg( p_input, "using timeshift  path '%s'", p_sys->psz_tmp_path );
+
+#if 0
+#define S(t) msg_Err( p_input, "SIZEOF("#t")=%d", sizeof(t) )
+    S(ts_cmd_t);
+    S(ts_cmd_control_t);
+    S(ts_cmd_send_t);
+    S(ts_cmd_del_t);
+    S(ts_cmd_add_t);
+#undef S
+#endif
 
     return p_out;
 }
