@@ -1519,7 +1519,7 @@ static FILE *GetTmpFile( char **ppsz_file, const char *psz_path )
         return NULL;
 
     /* */
-    fd = mkstemp( psz_name );
+    fd = utf8_mkstemp( psz_name );
     *ppsz_file = psz_name;
 
     if( fd < 0 )
