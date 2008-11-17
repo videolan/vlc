@@ -794,8 +794,13 @@ static fe_modulation_t DecodeModulationATSC( access_t *p_access )
 {
     switch( var_GetInteger( p_access, "dvb-modulation" ) )
     {
+        case 0:     return QAM_AUTO;
         case 8:     return VSB_8;
         case 16:    return VSB_16;
+        case 32:    return QAM_32;
+        case 64:    return QAM_64;
+        case 128:   return QAM_128;
+        case 256:   return QAM_256;
         default:
             msg_Dbg( p_access, "ATSC modulation not set, using VSB 8");
             return VSB_8;
