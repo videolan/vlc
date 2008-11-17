@@ -59,8 +59,6 @@ enum
     C_SEND,
     C_DEL,
     C_CONTROL,
-
-    C_MAX
 };
 
 typedef struct
@@ -764,6 +762,8 @@ static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
         if( !p_storage )
         {
             CmdClean( p_cmd );
+            vlc_mutex_unlock( &p_ts->lock );
+            /* TODO warn the user (but only once) */
             return;
         }
 
@@ -779,6 +779,7 @@ static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
         }
     }
 
+    /* TODO return error and warn the user (but only once) */
     TsStoragePushCmd( p_ts->p_storage_w, p_cmd, p_ts->p_storage_r == p_ts->p_storage_w );
 
     vlc_cond_signal( &p_ts->wait );
@@ -1143,7 +1144,7 @@ static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd )
         }
         else
         {
-            fprintf( stderr, "----------------- 2: %m\n" );
+            //fprintf( stderr, "TsStoragePopCmd: %m\n" );
             p_cmd->send.p_block = block_Alloc( 1 );
         }
     }
