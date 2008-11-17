@@ -2429,7 +2429,7 @@ char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
     iconv_handle = vlc_iconv_open( "UTF-8", psz_encoding );
     i_in = i_length - (psz_stringstart - psz_instring );
     i_out = i_in * 6;
-    psz_outstring = psz_tmp = (char*)malloc( i_out * sizeof(char) + 1 );
+    psz_outstring = psz_tmp = (char*)malloc( i_out + 1 );
     vlc_iconv( iconv_handle, &psz_stringstart, &i_in, &psz_tmp, &i_out );
     vlc_iconv_close( iconv_handle );
     *psz_tmp = '\0';

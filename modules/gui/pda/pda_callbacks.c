@@ -270,7 +270,7 @@ static char *get_file_perms(const struct stat st)
 {
     char  *psz_perm;
 
-    psz_perm = (char *) malloc(sizeof(char)*10);
+    psz_perm = (char *) malloc(10);
     strncpy( psz_perm, "----------", sizeof("----------"));
 
     /* determine permission modes */
@@ -658,7 +658,7 @@ void onAddCameraToPlaylist(GtkButton *button, gpointer user_data)
         return;
     for (i=0; i<11; i++)
     {
-        ppsz_options[i] = (char *) malloc(VLC_MAX_MRL * sizeof(char));
+        ppsz_options[i] = (char *) malloc(VLC_MAX_MRL);
         if (ppsz_options[i] == NULL)
         {
             for (i-=1; i>=0; i--)
@@ -1020,7 +1020,7 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
         return;
     for (i=0; i<3; i++)
     {
-        ppsz_options[i] = (char *) malloc(VLC_MAX_MRL * sizeof(char));
+        ppsz_options[i] = (char *) malloc(VLC_MAX_MRL);
         if (ppsz_options[i] == NULL)
         {
             for (i-=1; i>=0; i--)

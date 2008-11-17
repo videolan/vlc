@@ -240,7 +240,7 @@ static int Demux( demux_t *p_demux )
         int64_t i_pos = 0;
         p_sys->i_data_len = stream_Size( p_demux->s ) +1; /* This is a cheat to prevent unnecessary realloc */
         if( p_sys->i_data_len <= 0 && p_sys->i_data_len < 16384 ) p_sys->i_data_len = 1024;
-        p_sys->psz_data = malloc( p_sys->i_data_len * sizeof(char) +1);
+        p_sys->psz_data = malloc( p_sys->i_data_len +1);
 
         /* load the complete file */
         for( ;; )
@@ -310,7 +310,7 @@ static int Demux( demux_t *p_demux )
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
                             msg_Dbg( p_demux, "param name strlen: %d", i_strlen);
-                            psz_string = malloc( i_strlen *sizeof( char ) +1);
+                            psz_string = malloc( i_strlen + 1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             msg_Dbg( p_demux, "param name: %s", psz_string);
@@ -332,7 +332,7 @@ static int Demux( demux_t *p_demux )
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
                             msg_Dbg( p_demux, "param value strlen: %d", i_strlen);
-                            psz_string = malloc( i_strlen *sizeof( char ) +1);
+                            psz_string = malloc( i_strlen +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             msg_Dbg( p_demux, "param value: %s", psz_string);
@@ -455,7 +455,7 @@ static int Demux( demux_t *p_demux )
                         {
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
-                            psz_string = malloc( i_strlen*sizeof( char ) +1);
+                            psz_string = malloc( i_strlen +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             input_item_t *p_input;
@@ -603,7 +603,7 @@ static int Demux( demux_t *p_demux )
                             if( i_strlen < 1 ) continue;
 
                             FREENULL(psz_href);
-                            psz_href = malloc( i_strlen*sizeof( char ) +1);
+                            psz_href = malloc( i_strlen +1);
                             memcpy( psz_href, psz_backup, i_strlen );
                             psz_href[i_strlen] = '\0';
                             psz_tmp = psz_href + (i_strlen-1);

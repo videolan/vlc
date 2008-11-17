@@ -449,7 +449,7 @@ static char *xtag_slurp_to( XTagParser *parser, int good_end, int bad_end )
 
     if( xi > 0 && xtag_cin (s[xi], good_end) )
     {
-        ret = malloc( (xi+1) * sizeof(char) );
+        ret = malloc( xi+1 );
         strncpy( ret, s, xi );
         ret[xi] = '\0';
         parser->start = &s[xi];
@@ -502,7 +502,7 @@ static char *xtag_slurp_quoted( XTagParser *parser )
         }
     }
 
-    ret = malloc( (xi+1) * sizeof(char) );
+    ret = malloc( xi+1 );
     strncpy( ret, s, xi );
     ret[xi] = '\0';
     parser->start = &s[xi];
@@ -644,7 +644,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
         while (parser->end - s > 2) {
             if (strncmp( s, "]]>", 3 ) == 0) {
                 if ( !(tag = malloc( sizeof(*tag))) ) return NULL;
-                if ( !(pcdata = malloc( sizeof(char)*(s - parser->start + 1))) )
+                if ( !(pcdata = malloc( s - parser->start + 1)) )
                 {
                     free( tag );
                     return NULL;

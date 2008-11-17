@@ -382,8 +382,7 @@ char *XURL_GetHead( const char *psz_path )
         size_t i_characters_until_last_slash;
 
         i_characters_until_last_slash = pc_last_slash - psz_path;
-        psz_path_head = malloc(
-                ( i_characters_until_last_slash + 1 ) * sizeof(char) );
+        psz_path_head = malloc( i_characters_until_last_slash + 1 );
         strncpy( psz_path_head, psz_path, i_characters_until_last_slash + 1 );
 
         /* terminate the resulting string with '\0' */

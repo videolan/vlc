@@ -289,7 +289,7 @@ static int Stress( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Allocate required data */
     ppsz_name = malloc( MAXVAR * i_level * sizeof(char*) );
-    psz_blob = malloc( 20 * MAXVAR * i_level * sizeof(char) );
+    psz_blob = malloc( 20 * MAXVAR * i_level );
     for( i = 0; i < MAXVAR * i_level; i++ )
     {
         ppsz_name[i] = psz_blob + 20 * i;

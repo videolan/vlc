@@ -439,7 +439,7 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
   desc=sdpplin_parse(data);
   if( !desc ) return NULL;
 
-  buf= (char *)malloc(sizeof(char)*2048);
+  buf= (char *)malloc(2048);
   if( !buf ) goto error;
 
   header = (rmff_header_t*)malloc(sizeof(rmff_header_t));
@@ -615,7 +615,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   char challenge2[64];
   char checksum[34];
   char *subscribe=NULL;
-  char *buf=(char*)malloc(sizeof(char)*256);
+  char *buf=(char*)malloc(256);
   char *mrl=rtsp_get_mrl(rtsp_session);
   unsigned int size;
   int status;
@@ -668,7 +668,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 
   lprintf("Stream description size: %i\n", size);
 
-  description = (char*)malloc(sizeof(char)*(size+1));
+  description = (char*)malloc(size+1);
   if( !description )
     goto error;
   if( rtsp_read_data(rtsp_session, (uint8_t*)description, size) <= 0)
@@ -677,7 +677,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   //fprintf(stderr, "%s", description);
 
   /* parse sdp (sdpplin) and create a header and a subscribe string */
-  subscribe = (char *) malloc(sizeof(char)*256);
+  subscribe = (char *) malloc(256);
   if( !subscribe )
     goto error;
 

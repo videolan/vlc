@@ -1554,7 +1554,7 @@ void WizardDialog::Run()
                 else if( ab < 0 )
                     ab = 0;
 
-                psz_transcode = (char *)malloc( i_tr_size * sizeof(char) );
+                psz_transcode = (char *)malloc( i_tr_size );
 
                 strcpy( psz_transcode, "transcode{" );
                 if( vcodec != NULL )

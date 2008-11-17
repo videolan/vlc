@@ -381,7 +381,7 @@ rmff_mdpr_t *rmff_new_mdpr(
   }
   mdpr->type_specific_len=type_specific_len;
 
-  mdpr->type_specific_data = malloc(sizeof(char)*type_specific_len);
+  mdpr->type_specific_data = malloc(type_specific_len);
   if( !mdpr->type_specific_data ) {
     free( mdpr->stream_name );
     free( mdpr );

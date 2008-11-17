@@ -319,7 +319,7 @@ static char *assertUTF8URI( char *psz_name )
 
     /* max. 3x for URI conversion (percent escaping) and
        8 bytes for "file://" and NULL-termination */
-    psz_ret = (char *)malloc( sizeof(char)*strlen(psz_name)*6*3+8 );
+    psz_ret = (char *)malloc( strlen(psz_name)*6*3+8 );
     if( !psz_ret )
         return NULL;
 
@@ -378,5 +378,5 @@ static char *assertUTF8URI( char *psz_name )
     }
     *psz_d = '\0';
 
-    return (char *)realloc( psz_ret, sizeof(char)*strlen( psz_ret ) + 1 );
+    return (char *)realloc( psz_ret, strlen( psz_ret ) + 1 );
 }

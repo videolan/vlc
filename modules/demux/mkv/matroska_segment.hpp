@@ -172,7 +172,7 @@ static void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ...
     }
     va_start( args, psz_format );
     static const char psz_foo[] = "|   |   |   |   |   |   |   |   |   |";
-    char *psz_foo2 = (char*)malloc( ( i_level * 4 + 3 + strlen( psz_format ) ) * sizeof(char) );
+    char *psz_foo2 = (char*)malloc( i_level * 4 + 3 + strlen( psz_format ) );
     strncpy( psz_foo2, psz_foo, 4 * i_level );
     psz_foo2[ 4 * i_level ] = '+';
     psz_foo2[ 4 * i_level + 1 ] = ' ';

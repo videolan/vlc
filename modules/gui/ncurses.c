@@ -2557,8 +2557,7 @@ static void ReadDir( intf_thread_t *p_intf )
                 continue;
             }
 
-            psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
-            sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, psz_entry );
+            asprintf( &psz_uri, "%s/%s", p_sys->psz_current_dir, psz_entry );
 
             if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
             {

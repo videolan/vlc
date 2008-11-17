@@ -266,7 +266,7 @@ static void Run( intf_thread_t *p_intf )
                     sprintf( psz_duration," " );
                 }
 
-                psz_display = (char *)malloc( sizeof(char )*
+                psz_display = (char *)malloc(
                                           (strlen( p_input->psz_name ) +
                                           MSTRTIME_MAX_SIZE + 2+6 + 10 +10 ));
                 sprintf( psz_display,"%s %s",

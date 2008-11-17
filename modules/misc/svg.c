@@ -198,7 +198,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
                 msg_Dbg( p_this, "reading %ld bytes from template %s",
                          (unsigned long)s.st_size, psz_filename );
 
-                psz_template = malloc( ( s.st_size + 42 ) * sizeof( char ) );
+                psz_template = malloc( s.st_size + 42 );
                 if( !psz_template )
                 {
                     fclose( file );
@@ -471,7 +471,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         int length;
         char* psz_template = p_sys->psz_template;
         length = strlen( psz_string ) + strlen( psz_template ) + 42;
-        p_svg->psz_text = malloc( ( length + 1 ) * sizeof( char ) );
+        p_svg->psz_text = malloc( length + 1 );
         if( !p_svg->psz_text )
         {
             free( p_svg );
