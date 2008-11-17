@@ -704,6 +704,15 @@ static const char *const ppsz_clock_descriptions[] =
     "When possible, the input stream will be recorded instead of using" \
     "the stream output module" )
 
+#define INPUT_TIMESHIFT_PATH_TEXT N_("Timeshift directory")
+#define INPUT_TIMESHIFT_PATH_LONGTEXT N_( \
+    "Directory used to store the timeshift temporary files." )
+
+#define INPUT_TIMESHIFT_GRANULARITY_TEXT N_("Timeshift granularity")
+#define INPUT_TIMESHIFT_GRANULARITY_LONGTEXT N_( \
+    "This is the maximum size in bytes of the temporary files " \
+    "that will be used to store the timeshifted streams." )
+
 // DEPRECATED
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
@@ -1765,6 +1774,11 @@ vlc_module_begin ()
                 INPUT_RECORD_PATH_LONGTEXT, true );
     add_bool( "input-record-native", true, NULL, INPUT_RECORD_NATIVE_TEXT,
               INPUT_RECORD_NATIVE_LONGTEXT, true );
+
+    add_string( "input-timeshift-path", NULL, NULL, INPUT_TIMESHIFT_PATH_TEXT,
+                INPUT_TIMESHIFT_PATH_LONGTEXT, true );
+    add_integer( "input-timeshift-granularity", -1, NULL, INPUT_TIMESHIFT_GRANULARITY_TEXT,
+                 INPUT_TIMESHIFT_GRANULARITY_LONGTEXT, true );
 
 /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , true )

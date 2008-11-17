@@ -306,12 +306,18 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
 
     TAB_INIT( p_sys->i_es, p_sys->pp_es );
 
-    /* TODO config
-     * timeshift-granularity
-     * timeshift-path
-     */
-    p_sys->i_tmp_size_max = 50 * 1024*1024;
-    p_sys->psz_tmp_path = GetTmpPath( NULL );
+    /* */
+    const int i_tmp_size_max = var_CreateGetInteger( p_input, "input-timeshift-granularity" );
+    if( i_tmp_size_max < 0 )
+        p_sys->i_tmp_size_max = 50*1024*1024;
+    else
+        p_sys->i_tmp_size_max = __MAX( i_tmp_size_max, 1*1024*1024 );
+    msg_Dbg( p_input, "using timeshift granularity of %d bytes",
+             (int)p_sys->i_tmp_size_max );
+
+    char *psz_tmp_path = var_CreateGetNonEmptyString( p_input, "input-timeshift-path" );
+    p_sys->psz_tmp_path = GetTmpPath( psz_tmp_path );
+    msg_Dbg( p_input, "using timeshift  path '%s'", p_sys->psz_tmp_path );
 
     return p_out;
 }
