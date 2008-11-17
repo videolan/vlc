@@ -2351,7 +2351,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( demux_Control( in->p_demux, DEMUX_CAN_PAUSE,
                             &in->b_can_pause ) )
             in->b_can_pause = false;
-        var_SetBool( p_input, "can-pause", in->b_can_pause );
+        var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
 
         int ret = demux_Control( in->p_demux, DEMUX_CAN_SEEK,
                         &val.b_bool );
@@ -2435,7 +2435,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             access_Control( in->p_access, ACCESS_CAN_PAUSE,
                              &in->b_can_pause );
-            var_SetBool( p_input, "can-pause", in->b_can_pause );
+            var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
             access_Control( in->p_access, ACCESS_CAN_SEEK,
                              &val.b_bool );
             var_Set( p_input, "seekable", val );
