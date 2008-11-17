@@ -618,7 +618,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
             *pb_enabled = true;
             return VLC_SUCCESS;
         }
-        return es_out_Control( p_sys->p_out, ES_OUT_GET_ES_STATE, p_es, pb_enabled );
+        return es_out_Control( p_sys->p_out, ES_OUT_GET_ES_STATE, p_es->p_es, pb_enabled );
     }
 
     /* Special internal input control */
