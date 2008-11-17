@@ -222,6 +222,9 @@ struct vout_sys_t
     x11_window_t        original_window;
     x11_window_t        fullscreen_window;
 
+    /* key and mouse event handling */
+    int                 i_vout_event;  /* 1(Fullsupport), 2(FullscreenOnly), 3(none) */
+
     /* X11 generic properties */
     bool          b_altfullscreen;          /* which fullscreen method */
 #ifdef HAVE_SYS_SHM_H

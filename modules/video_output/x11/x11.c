@@ -66,16 +66,6 @@ extern void Deactivate ( vlc_object_t * );
     "Screen to use in fullscreen mode. For instance " \
     "set it to 0 for first screen, 1 for the second.")
 
-#define X11_EVENT_TEXT N_("key and mouse event handling at X11 plugin level.")
-#define X11_EVENT_LONGTEXT N_( \
-    "This parameter accepts values : 1 (full event handling support), " \
-    "2 (event handling only for fullscreen) or 3 (No event handling). "  \
-    "Full event handling support is the default value.")
-
-static const int pi_x11_event_values[] = { 1, 2, 3 };
-static const char *const ppsz_x11_event_descriptions[] =
-     { N_("FullSupport"), N_("Fullscreen-Only"), N_("None") };
-
 vlc_module_begin ()
     set_shortname( "X11" )
     set_category( CAT_VIDEO )
@@ -88,8 +78,6 @@ vlc_module_begin ()
 #ifdef HAVE_XINERAMA
     add_integer ( "x11-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
-    add_integer( "x11-event", 1, NULL, X11_EVENT_TEXT, X11_EVENT_LONGTEXT, true )
-        change_integer_list( pi_x11_event_values, ppsz_x11_event_descriptions, NULL )
     set_description( N_("X11 video output") )
     set_capability( "video output", 70 )
     set_callbacks( Activate, Deactivate )

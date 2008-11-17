@@ -210,6 +210,9 @@ int Activate ( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_vout->p_sys->lock );
 
+    /* key and mouse event handling */
+    p_vout->p_sys->i_vout_event = var_CreateGetInteger( p_vout, "vout-event" );
+
     /* Open display, using the "display" config variable or the DISPLAY
      * environment variable */
     psz_display = config_GetPsz( p_vout, MODULE_STRING "-display" );
@@ -1529,22 +1532,21 @@ static int ManageVideo( vout_thread_t *p_vout )
                            i_x, i_y, i_width, i_height );
     }
 
-    /* cursor hiding depending on --x11-event option
+    /* cursor hiding depending on --vout-event option
      *      activated if:
      *            value = 1 (Fullsupport) (default value)
      *         or value = 2 (Fullscreen-Only) and condition met
      */
-    int i_x11_event = var_CreateGetInteger( p_vout, "x11-event" );
-    bool b_x11_event = (    ( i_x11_event == 1 )
-                         || ( i_x11_event == 2 && p_vout->b_fullscreen )
-                       );
+    bool b_vout_event = (   ( p_vout->p_sys->i_vout_event == 1 )
+                         || ( p_vout->p_sys->i_vout_event == 2 && p_vout->b_fullscreen )
+                        );
 
     /* Autohide Cursour */
     if( mdate() - p_vout->p_sys->i_time_mouse_last_moved >
         p_vout->p_sys->i_mouse_hide_timeout )
     {
         /* Hide the mouse automatically */
-        if( b_x11_event && p_vout->p_sys->b_mouse_pointer_visible )
+        if( b_vout_event && p_vout->p_sys->b_mouse_pointer_visible )
         {
             ToggleCursor( p_vout );
         }
@@ -1800,17 +1802,15 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         }
     } while( !( b_expose && b_configure_notify && b_map_notify ) );
 
-    /* key and mouse events handling depending on --x11-event option
+    /* key and mouse events handling depending on --vout-event option
      *      activated if:
      *            value = 1 (Fullsupport) (default value)
      *         or value = 2 (Fullscreen-Only) and condition met
      */
-    int i_x11_event = var_CreateGetInteger( p_vout, "x11-event" );
-    bool b_x11_event = (    ( i_x11_event == 1 )
-                         || ( i_x11_event == 2 && p_vout->b_fullscreen )
-                       );
-
-    if ( b_x11_event )
+    bool b_vout_event = (   ( p_vout->p_sys->i_vout_event == 1 )
+                         || ( p_vout->p_sys->i_vout_event == 2 && p_vout->b_fullscreen )
+                        );
+    if ( b_vout_event )
         XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
                       StructureNotifyMask | KeyPressMask |
                       ButtonPressMask | ButtonReleaseMask |
