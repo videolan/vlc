@@ -234,7 +234,7 @@ static void         TsAutoStop( es_out_t * );
 
 static void         TsStop( ts_thread_t * );
 static void         TsPushCmd( ts_thread_t *, ts_cmd_t * );
-static int          TsPopCmdLocked( ts_thread_t *, ts_cmd_t * );
+static int          TsPopCmdLocked( ts_thread_t *, ts_cmd_t *, bool b_flush );
 static bool         TsHasCmd( ts_thread_t * );
 static bool         TsIsUnused( ts_thread_t * );
 static int          TsChangePause( ts_thread_t *, bool b_source_paused, bool b_paused, mtime_t i_date );
@@ -248,7 +248,7 @@ static void         TsStoragePack( ts_storage_t *p_storage );
 static bool         TsStorageIsFull( ts_storage_t *, const ts_cmd_t *p_cmd );
 static bool         TsStorageIsEmpty( ts_storage_t * );
 static void         TsStoragePushCmd( ts_storage_t *, const ts_cmd_t *p_cmd, bool b_flush );
-static void         TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd );
+static void         TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_flush );
 
 static void CmdClean( ts_cmd_t * );
 static void cmd_cleanup_routine( void *p ) { CmdClean( p ); }
@@ -762,7 +762,7 @@ static void TsStop( ts_thread_t *p_ts )
     {
         ts_cmd_t cmd;
 
-        if( TsPopCmdLocked( p_ts, &cmd ) )
+        if( TsPopCmdLocked( p_ts, &cmd, true ) )
             break;
 
         CmdClean( &cmd );
@@ -809,14 +809,14 @@ static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
 
     vlc_mutex_unlock( &p_ts->lock );
 }
-static int TsPopCmdLocked( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
+static int TsPopCmdLocked( ts_thread_t *p_ts, ts_cmd_t *p_cmd, bool b_flush )
 {
     vlc_assert_locked( &p_ts->lock );
 
     if( TsStorageIsEmpty( p_ts->p_storage_r ) )
         return VLC_EGENERIC;
 
-    TsStoragePopCmd( p_ts->p_storage_r, p_cmd );
+    TsStoragePopCmd( p_ts->p_storage_r, p_cmd, b_flush );
 
     while( p_ts->p_storage_r && TsStorageIsEmpty( p_ts->p_storage_r ) )
     {
@@ -922,7 +922,7 @@ static void *TsRun( vlc_object_t *p_thread )
             const int canc = vlc_savecancel();
             b_buffering = es_out_GetBuffering( p_ts->p_out );
 
-            if( ( !p_ts->b_paused || b_buffering ) && !TsPopCmdLocked( p_ts, &cmd ) )
+            if( ( !p_ts->b_paused || b_buffering ) && !TsPopCmdLocked( p_ts, &cmd, false ) )
             {
                 vlc_restorecancel( canc );
                 break;
@@ -1059,7 +1059,7 @@ static void TsStorageDelete( ts_storage_t *p_storage )
     {
         ts_cmd_t cmd;
 
-        TsStoragePopCmd( p_storage, &cmd );
+        TsStoragePopCmd( p_storage, &cmd, true );
 
         CmdClean( &cmd );
     }
@@ -1140,7 +1140,7 @@ static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd, bo
     }
     p_storage->p_cmd[p_storage->i_cmd_w++] = cmd;
 }
-static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd )
+static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_flush )
 {
     assert( !TsStorageIsEmpty( p_storage ) );
 
@@ -1149,7 +1149,8 @@ static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd )
     {
         block_t block;
 
-        if( !fseek( p_storage->p_filer, p_cmd->send.i_offset, SEEK_SET ) &&
+        if( !b_flush &&
+            !fseek( p_storage->p_filer, p_cmd->send.i_offset, SEEK_SET ) &&
             fread( &block, sizeof(block), 1, p_storage->p_filer ) == 1 )
         {
             block_t *p_block = block_Alloc( block.i_buffer );
