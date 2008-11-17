@@ -432,3 +432,46 @@ int utf8_unlink( const char *filename )
     LocaleFree( local_name );
     return ret;
 }
+
+int utf8_mkstemp( char *template )
+{
+    static const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    static const int i_digits = sizeof(digits)/sizeof(*digits) - 1;
+
+    /* */
+    assert( template );
+
+    /* Check template validity */
+    const size_t i_length = strlen( template );
+    char *psz_rand = &template[i_length-6];
+
+    if( i_length < 6 || strcmp( psz_rand, "XXXXXX" ) )
+    {
+        errno = EINVAL;
+        return -1;
+    }
+
+    uint64_t i_rand = mdate();
+
+    /* */
+    for( int i = 0; i < 256; i++ )
+    {
+        /* Create a pseudo random file name */
+        for( int j = 0; j < 6; j++ )
+        {
+            i_rand = i_rand * UINT64_C(1103515245) + 12345;
+            psz_rand[j] = digits[((i_rand >> 16) & 0xffff) % i_digits];
+        }
+
+        /* */
+        int fd = utf8_open( template, O_CREAT | O_EXCL | O_RDWR, 0600 );
+        if( fd >= 0 )
+            return fd;
+        if( errno != EEXIST )
+            return -1;
+    }
+
+    errno = EEXIST;
+    return -1;
+}
+
