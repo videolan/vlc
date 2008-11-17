@@ -928,12 +928,9 @@ static void ReadRealIndex( demux_t *p_demux )
         msg_Dbg( p_demux, "Real Index: Does next index exist? %d ",
                         GetDWBE( &buffer[16] )  );
 
-    p_sys->p_index = 
-            (rm_index_t *)malloc( sizeof( rm_index_t ) * (i_index_count+1) );
+    p_sys->p_index = calloc( i_index_count + 1, sizeof( rm_index_t ) );
     if( p_sys->p_index == NULL )
         return;
-
-    memset( p_sys->p_index, 0, sizeof(rm_index_t) * (i_index_count+1) );
 
     for( i=0; i<i_index_count; i++ )
     {
