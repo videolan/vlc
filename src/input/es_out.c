@@ -1322,7 +1322,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
     es_format_Copy( &es->fmt, fmt );
     if( es->fmt.i_id < 0 )
         es->fmt.i_id = out->p_sys->i_id;
-    es->i_id = fmt->i_id;
+    es->i_id = es->fmt.i_id;
 
     switch( es->fmt.i_cat )
     {
@@ -1358,8 +1358,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
         if( es->fmt.video.i_frame_rate && es->fmt.video.i_frame_rate_base )
             vlc_ureduce( &es->fmt.video.i_frame_rate,
                          &es->fmt.video.i_frame_rate_base,
-                         fmt->video.i_frame_rate,
-                         fmt->video.i_frame_rate_base, 0 );
+                         es->fmt.video.i_frame_rate,
+                         es->fmt.video.i_frame_rate_base, 0 );
         break;
 
     case SPU_ES:
