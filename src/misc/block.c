@@ -172,21 +172,21 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         return p_rea;
     }
 
-    /* We have a very large reserved footer now? Release some of it. */
-    if ((p_sys->p_allocated_buffer + p_sys->i_allocated_buffer) -
-        (p_block->p_buffer + p_block->i_buffer) > BLOCK_WASTE_SIZE)
+    /* We have a very large reserved footer now? Release some of it.
+     * XXX it may not keep the algniment of p_buffer */
+    if( (p_sys->p_allocated_buffer + p_sys->i_allocated_buffer) -
+        (p_block->p_buffer + p_block->i_buffer) > BLOCK_WASTE_SIZE )
     {
-        const size_t news = p_block->i_buffer + 2 * BLOCK_PADDING_SIZE + 16;
-        block_sys_t *newb = realloc (p_sys, sizeof (*p_sys) + news);
+        const ptrdiff_t i_prebody = p_block->p_buffer - p_sys->p_allocated_buffer;
+        const size_t i_new = i_prebody + p_block->i_buffer + 1 * BLOCK_PADDING_SIZE;
+        block_sys_t *p_new = realloc( p_sys, sizeof (*p_sys) + i_new );
 
-        if (newb != NULL)
+        if( p_new != NULL )
         {
-            p_sys = newb;
-            p_sys->i_allocated_buffer = news;
+            p_sys = p_new;
+            p_sys->i_allocated_buffer = i_new;
             p_block = &p_sys->self;
-            p_block->p_buffer = p_sys->p_allocated_buffer + BLOCK_PADDING_SIZE
-                + BLOCK_ALIGN
-                - ((uintptr_t)p_sys->p_allocated_buffer % BLOCK_ALIGN);
+            p_block->p_buffer = &p_sys->p_allocated_buffer[i_prebody];
         }
     }
     return p_block;
