@@ -405,6 +405,7 @@ utf8_fprintf
 utf8_loaddir
 utf8_lstat
 utf8_mkdir
+utf8_mkstemp
 utf8_open
 utf8_opendir
 utf8_readdir
