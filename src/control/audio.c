@@ -87,7 +87,7 @@ VLC_PUBLIC_API libvlc_audio_output_t *
                     p_previous = p_actual;
                 }
             }
-            p_actual->psz_name = strdup( module_get_name( p_module, false ) );
+            p_actual->psz_name = strdup( module_get_object( p_module ) );
             p_actual->psz_description = strdup( module_get_name( p_module, true )  );
             p_actual->p_next = NULL;
             if( p_previous != p_actual ) /* not first item */
