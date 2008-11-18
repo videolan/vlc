@@ -4,6 +4,7 @@ Changes between 0.9.6 and 1.0.0-git:
 Playback:
  * Instant pausing
  * Frame-By-Frame Support
+ * Timeshift support
 
 Access:
  * RTSP authentication with Darwing Streaming Server
