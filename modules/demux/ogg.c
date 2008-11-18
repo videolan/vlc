@@ -86,14 +86,14 @@ typedef struct logical_stream_s
     mtime_t          i_previous_pcr;
 
     /* Misc */
-    int b_reinit;
+    bool b_reinit;
     int i_granule_shift;
 
     /* kate streams have the number of headers in the ID header */
     int i_kate_num_headers;
 
     /* for Annodex logical bitstreams */
-    int secondary_header_packets;
+    int i_secondary_header_packets;
 
 } logical_stream_t;
 
@@ -312,12 +312,11 @@ static int Demux( demux_t * p_demux )
          * Demux an ogg page from the stream
          */
         if( Ogg_ReadPage( p_demux, &oggpage ) != VLC_SUCCESS )
-        {
             return 0; /* EOF */
-        }
 
         /* Test for End of Stream */
-        if( ogg_page_eos( &oggpage ) ) p_sys->i_eos++;
+        if( ogg_page_eos( &oggpage ) )
+            p_sys->i_eos++;
     }
 
 
@@ -335,25 +334,25 @@ static int Demux( demux_t * p_demux )
         while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
         {
             /* Read info from any secondary header packets, if there are any */
-            if( p_stream->secondary_header_packets > 0 )
+            if( p_stream->i_secondary_header_packets > 0 )
             {
                 if( p_stream->fmt.i_codec == VLC_FOURCC('t','h','e','o') &&
                         oggpacket.bytes >= 7 &&
                         ! memcmp( oggpacket.packet, "\x80theora", 7 ) )
                 {
                     Ogg_ReadTheoraHeader( p_stream, &oggpacket );
-                    p_stream->secondary_header_packets = 0;
+                    p_stream->i_secondary_header_packets = 0;
                 }
                 else if( p_stream->fmt.i_codec == VLC_FOURCC('v','o','r','b') &&
                         oggpacket.bytes >= 7 &&
                         ! memcmp( oggpacket.packet, "\x01vorbis", 7 ) )
                 {
                     Ogg_ReadVorbisHeader( p_stream, &oggpacket );
-                    p_stream->secondary_header_packets = 0;
+                    p_stream->i_secondary_header_packets = 0;
                 }
-                else if ( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
+                else if( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
                 {
-                    p_stream->secondary_header_packets = 0;
+                    p_stream->i_secondary_header_packets = 0;
                 }
             }
 
@@ -365,7 +364,7 @@ static int Demux( demux_t * p_demux )
 
                 if( p_stream->i_pcr >= 0 )
                 {
-                    p_stream->b_reinit = 0;
+                    p_stream->b_reinit = false;
                 }
                 else
                 {
@@ -395,16 +394,14 @@ static int Demux( demux_t * p_demux )
         }
 
         if( !p_sys->b_page_waiting )
-        {
             break;
-        }
     }
 
     /* if a page was waiting, it's now processed */
     p_sys->b_page_waiting = false;
 
-    i_stream = 0; p_sys->i_pcr = -1;
-    for( ; i_stream < p_sys->i_streams; i_stream++ )
+    p_sys->i_pcr = -1;
+    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
 
@@ -418,9 +415,7 @@ static int Demux( demux_t * p_demux )
     }
 
     if( p_sys->i_pcr >= 0 )
-    {
         es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
-    }
 
     return 1;
 }
@@ -464,13 +459,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 logical_stream_t *p_stream = p_sys->pp_stream[i];
 
                 /* we'll trash all the data until we find the next pcr */
-                p_stream->b_reinit = 1;
+                p_stream->b_reinit = true;
                 p_stream->i_pcr = -1;
                 p_stream->i_interpolated_pcr = -1;
                 ogg_stream_reset( &p_stream->os );
             }
             ogg_sync_reset( &p_sys->oy );
-            /* suspicious lack of break - reading the code, I believe it's intended though */
+            /* XXX The break/return is missing on purpose as
+             * demux_vaControlHelper will do the last part of the job */
 
         default:
             return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
@@ -888,7 +884,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                 memset( p_stream, 0, sizeof(logical_stream_t) );
                 p_stream->p_headers = 0;
-                p_stream->secondary_header_packets = 0;
+                p_stream->i_secondary_header_packets = 0;
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
                 es_format_Init( &p_stream->fmt_old, 0, 0 );
@@ -1359,7 +1355,7 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
 
         p_stream->i_pcr = p_stream->i_previous_pcr =
             p_stream->i_interpolated_pcr = -1;
-        p_stream->b_reinit = 0;
+        p_stream->b_reinit = false;
     }
 
     if( p_ogg->p_old_stream )
@@ -1579,7 +1575,10 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
             msg_Dbg( p_demux, "FLAC header, channels: %i, rate: %i",
                      p_stream->fmt.audio.i_channels, (int)p_stream->f_rate );
         }
-        else msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
+        else
+        {
+            msg_Dbg( p_demux, "FLAC STREAMINFO metadata too short" );
+        }
 
         /* Fake this as the last metadata block */
         *((uint8_t*)p_oggpacket->packet) |= 0x80;
@@ -1619,27 +1618,27 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     p_stream->f_rate = (double)gnum/gden;
 
     p_stream->fmt.psz_language = malloc(16);
-    if (p_stream->fmt.psz_language)
+    if( p_stream->fmt.psz_language )
     {
-        for (n=0;n<16;++n)
+        for( n = 0; n < 16; ++n )
             p_stream->fmt.psz_language[n] = oggpack_read(&opb,8);
         p_stream->fmt.psz_language[15] = 0; /* just in case */
     }
     else
     {
-        for (n=0;n<16;++n)
+        for( n = 0; n < 16; ++n )
             oggpack_read(&opb,8);
     }
     p_stream->fmt.psz_description = malloc(16);
-    if (p_stream->fmt.psz_description)
+    if( p_stream->fmt.psz_description )
     {
-        for (n=0;n<16;++n)
+        for( n = 0; n < 16; ++n )
             p_stream->fmt.psz_description[n] = oggpack_read(&opb,8);
         p_stream->fmt.psz_description[15] = 0; /* just in case */
     }
     else
     {
-        for (n=0;n<16;++n)
+        for( n = 0; n < 16; ++n )
             oggpack_read(&opb,8);
     }
 }
@@ -1678,7 +1677,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
         granule_rate_numerator = GetQWLE( &p_oggpacket->packet[8] );
         granule_rate_denominator = GetQWLE( &p_oggpacket->packet[16] );
-        p_stream->secondary_header_packets =
+        p_stream->i_secondary_header_packets =
             GetDWLE( &p_oggpacket->packet[24] );
 
         /* we are guaranteed that the first header field will be
@@ -1695,7 +1694,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
         msg_Dbg( p_this, "AnxData packet info: %"PRId64" / %"PRId64", %d, ``%s''",
                  granule_rate_numerator, granule_rate_denominator,
-                 p_stream->secondary_header_packets, content_type_string );
+                 p_stream->i_secondary_header_packets, content_type_string );
 
         p_stream->f_rate = (float) granule_rate_numerator /
             (float) granule_rate_denominator;
@@ -1753,19 +1752,21 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 
 static uint32_t dirac_uint( bs_t *p_bs )
 {
-  uint32_t count = 0, value = 0;
-  while( !bs_read ( p_bs, 1 ) ) {
-    count++;
-    value <<= 1;
-    value |= bs_read ( p_bs, 1 );
-  }
+    uint32_t u_count = 0, u_value = 0;
+    /* FIXME possible infinite loop */
+    while( !bs_read( p_bs, 1 ) )
+    {
+        u_count++;
+        u_value <<= 1;
+        u_value |= bs_read( p_bs, 1 );
+    }
 
-  return (1<<count) - 1 + value;
+    return (1<<u_count) - 1 + u_value;
 }
 
 static int dirac_bool( bs_t *p_bs )
 {
-    return bs_read ( p_bs, 1 );
+    return bs_read( p_bs, 1 );
 }
 
 static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
@@ -1791,16 +1792,19 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
 
     uint32_t u_video_format = dirac_uint( &bs ); /* index */
 
-    if (dirac_bool( &bs )) {
+    if( dirac_bool( &bs ) )
+    {
         dirac_uint( &bs ); /* frame_width */
         dirac_uint( &bs ); /* frame_height */
     }
 
-    if (dirac_bool( &bs )) {
+    if( dirac_bool( &bs ) )
+    {
         dirac_uint( &bs ); /* chroma_format */
     }
 
-    if (dirac_bool( &bs )) {
+    if( dirac_bool( &bs ) )
+    {
         dirac_uint( &bs ); /* scan_format */
     }
 
@@ -1816,13 +1820,17 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
         1, 9, 10, 9, 10, 9, 10, 4, 3, 7, 6, 4, 3, 7, 6, 2, 2, 7, 6, 7, 6,
     };
 
+    /* FIXME possible out of bound access */
     uint32_t u_n = dirac_frate_tbl[dirac_vidfmt_frate[u_video_format]].u_n;
     uint32_t u_d = dirac_frate_tbl[dirac_vidfmt_frate[u_video_format]].u_d;
-    if (dirac_bool( &bs )) {
+    if( dirac_bool( &bs ) )
+    {
+        /* FIXME possible out of bound access */
         uint32_t frame_rate_index = dirac_uint( &bs );
         u_n = dirac_frate_tbl[frame_rate_index].u_n;
         u_d = dirac_frate_tbl[frame_rate_index].u_d;
-        if (frame_rate_index == 0) {
+        if( frame_rate_index == 0 )
+        {
             u_n = dirac_uint( &bs ); /* frame_rate_numerator */
             u_d = dirac_uint( &bs ); /* frame_rate_denominator */
         }
