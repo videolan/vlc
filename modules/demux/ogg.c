@@ -667,8 +667,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 free( p_stream->fmt.p_extra );
 
                 p_stream->fmt.i_extra = p_stream->i_headers;
-                p_stream->fmt.p_extra =
-                    realloc( p_stream->fmt.p_extra, p_stream->i_headers );
+                p_stream->fmt.p_extra = malloc( p_stream->i_headers );
                 if( p_stream->fmt.p_extra )
                     memcpy( p_stream->fmt.p_extra, p_stream->p_headers,
                             p_stream->i_headers );
