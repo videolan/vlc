@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include "libvlc.h" /* utf8_mkdir */
+#include <vlc_rand.h>
 
 #include <assert.h>
 
@@ -451,17 +452,15 @@ int utf8_mkstemp( char *template )
         return -1;
     }
 
-    uint64_t i_rand = mdate();
-
     /* */
     for( int i = 0; i < 256; i++ )
     {
         /* Create a pseudo random file name */
+        uint8_t pi_rand[6];
+
+        vlc_rand_bytes( pi_rand, sizeof(pi_rand) );
         for( int j = 0; j < 6; j++ )
-        {
-            i_rand = i_rand * UINT64_C(1103515245) + 12345;
-            psz_rand[j] = digits[((i_rand >> 16) & 0xffff) % i_digits];
-        }
+            psz_rand[j] = digits[pi_rand[j] % i_digits];
 
         /* */
         int fd = utf8_open( template, O_CREAT | O_EXCL | O_RDWR, 0600 );
