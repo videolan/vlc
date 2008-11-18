@@ -1341,7 +1341,14 @@ static int Ogg_BeginningOfStream( demux_t *p_demux )
         }
 
         if( !p_stream->p_es )
+        {
+            /* Better be safe than sorry when possible with ogm */
+            if( p_stream->fmt.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'a' ) ||
+                p_stream->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+                p_stream->fmt.b_packetized = false;
+
             p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
+        }
 
         // TODO: something to do here ?
         if( p_stream->fmt.i_codec == VLC_FOURCC('c','m','m','l') )
@@ -1830,7 +1837,7 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     if( dirac_bool( &bs ) )
     {
         uint32_t u_frame_rate_index = dirac_uint( &bs );
-        if( u_frame_rate_index > u_dirac_frate_tbl )
+        if( u_frame_rate_index >= u_dirac_frate_tbl )
             u_frame_rate_index = 0;
         u_n = p_dirac_frate_tbl[u_frame_rate_index].u_n;
         u_d = p_dirac_frate_tbl[u_frame_rate_index].u_d;
