@@ -873,7 +873,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
              * We found the beginning of our first logical stream. */
             while( ogg_page_bos( &oggpage ) )
             {
-                logical_stream_t **pp_sav = p_ogg->pp_stream;
                 logical_stream_t *p_stream;
 
                 p_stream = malloc( sizeof(logical_stream_t) );
@@ -1753,8 +1752,8 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
 static uint32_t dirac_uint( bs_t *p_bs )
 {
     uint32_t u_count = 0, u_value = 0;
-    /* FIXME possible infinite loop */
-    while( !bs_read( p_bs, 1 ) )
+
+    while( !bs_eof( p_bs ) && !bs_read( p_bs, 1 ) )
     {
         u_count++;
         u_value <<= 1;
@@ -1810,26 +1809,32 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
 
     static const struct {
         uint32_t u_n /* numerator */, u_d /* denominator */;
-    } dirac_frate_tbl[] = { /* table 10.3 */
+    } p_dirac_frate_tbl[] = { /* table 10.3 */
         {1,1}, /* this first value is never used */
         {24000,1001}, {24,1}, {25,1}, {30000,1001}, {30,1},
         {50,1}, {60000,1001}, {60,1}, {15000,1001}, {25,2},
     };
+    static const size_t u_dirac_frate_tbl = sizeof(p_dirac_frate_tbl)/sizeof(*p_dirac_frate_tbl);
 
-    static const uint32_t dirac_vidfmt_frate[] = { /* table C.1 */
+    static const uint32_t pu_dirac_vidfmt_frate[] = { /* table C.1 */
         1, 9, 10, 9, 10, 9, 10, 4, 3, 7, 6, 4, 3, 7, 6, 2, 2, 7, 6, 7, 6,
     };
+    static const size_t u_dirac_vidfmt_frate = sizeof(pu_dirac_vidfmt_frate)/sizeof(*pu_dirac_vidfmt_frate);
 
-    /* FIXME possible out of bound access */
-    uint32_t u_n = dirac_frate_tbl[dirac_vidfmt_frate[u_video_format]].u_n;
-    uint32_t u_d = dirac_frate_tbl[dirac_vidfmt_frate[u_video_format]].u_d;
+    /* */
+    if( u_video_format >= u_dirac_vidfmt_frate )
+        u_video_format = 0;
+
+    uint32_t u_n = p_dirac_frate_tbl[pu_dirac_vidfmt_frate[u_video_format]].u_n;
+    uint32_t u_d = p_dirac_frate_tbl[pu_dirac_vidfmt_frate[u_video_format]].u_d;
     if( dirac_bool( &bs ) )
     {
-        /* FIXME possible out of bound access */
-        uint32_t frame_rate_index = dirac_uint( &bs );
-        u_n = dirac_frate_tbl[frame_rate_index].u_n;
-        u_d = dirac_frate_tbl[frame_rate_index].u_d;
-        if( frame_rate_index == 0 )
+        uint32_t u_frame_rate_index = dirac_uint( &bs );
+        if( u_frame_rate_index > u_dirac_frate_tbl )
+            u_frame_rate_index = 0;
+        u_n = p_dirac_frate_tbl[u_frame_rate_index].u_n;
+        u_d = p_dirac_frate_tbl[u_frame_rate_index].u_d;
+        if( u_frame_rate_index == 0 )
         {
             u_n = dirac_uint( &bs ); /* frame_rate_numerator */
             u_d = dirac_uint( &bs ); /* frame_rate_denominator */
