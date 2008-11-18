@@ -135,7 +135,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                     if ( !i_header_size ) i_header_size = 0x0;
                 }
 
-                if( i_stream_id == 0xfd )
+                if( i_stream_id == PES_EXTENDED_STREAM_ID )
                 {
                     b_pes_extension_flag = true;
                     i_header_size += 1 + 1;
@@ -206,7 +206,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
                     /*   pack_header */
                     /*   program_packet_sequence_counter */
                     /*   P-STD_buffer_flag */
-                    if( i_stream_id == 0xfd )
+                    if( i_stream_id == PES_EXTENDED_STREAM_ID )
                     {
                         /* PES_extension_2 */
                         bits_write( &bits, 1, 0x01 ); // marker
