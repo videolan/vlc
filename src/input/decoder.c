@@ -1532,13 +1532,12 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
     assert( p_owner->p_clock );
+    assert( !p_sout_block->p_next );
 
     vlc_mutex_lock( &p_owner->lock );
 
     if( p_owner->b_buffering || p_owner->buffer.p_block )
     {
-        p_sout_block->p_next = NULL;
-
         block_ChainLastAppend( &p_owner->buffer.pp_block_next, p_sout_block );
 
         p_owner->buffer.i_count++;
@@ -1574,6 +1573,7 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
             if( !b_has_more )
                 p_owner->buffer.pp_block_next = &p_owner->buffer.p_block;
         }
+        p_sout_block->p_next = NULL;
 
         DecoderFixTs( p_dec, &p_sout_block->i_dts, &p_sout_block->i_pts,
                       &p_sout_block->i_length,
