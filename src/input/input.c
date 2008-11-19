@@ -156,6 +156,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     msg_Dbg( p_input, "Creating an input for '%s'", psz_name);
 
     free( psz_name );
+    psz_name = NULL;
 
     /* Start a timer to mesure how long it takes
      * to launch an input */
@@ -1532,6 +1533,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
     input_ChangeStateWithVarCallback( p_input, i_state, false );
 
 }
+
 static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
 {
     int i_ret = VLC_SUCCESS;
@@ -1763,7 +1765,12 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
             }
 
-            if( i_rate < INPUT_RATE_MIN )
+            if( (i_rate < 0) && p_input->p->input.b_rescale_ts )
+            {
+                msg_Dbg( p_input, "cannot set negative rate" );
+                i_rate = INPUT_RATE_MIN;
+            }
+            else if( (i_rate > 0) && (i_rate < INPUT_RATE_MIN) )
             {
                 msg_Dbg( p_input, "cannot set rate faster" );
                 i_rate = INPUT_RATE_MIN;
