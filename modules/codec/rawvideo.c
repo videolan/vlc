@@ -213,7 +213,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( (!p_block->i_pts || !p_block->i_dts) && !date_Get( &p_sys->pts ) )
+
+    if( !p_block->i_pts && !p_block->i_dts && !date_Get( &p_sys->pts ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
