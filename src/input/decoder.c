@@ -823,13 +823,9 @@ static void *DecoderThread( vlc_object_t *p_this )
         if( p_block )
         {
             if( p_dec->b_error )
-            {   /* Trash all received PES packets */
                 block_Release( p_block );
-            }
-            else if( DecoderProcess( p_dec, p_block ) != VLC_SUCCESS )
-            {
-                break;
-            }
+            else
+                DecoderProcess( p_dec, p_block );
         }
     }
 
