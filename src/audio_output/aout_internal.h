@@ -140,7 +140,7 @@ int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t * );
 
 /* From dec.c */
 #define aout_DecNew(a, b, c, d) __aout_DecNew(VLC_OBJECT(a), b, c, d)
-aout_input_t * __aout_DecNew( vlc_object_t *, aout_instance_t **, audio_sample_format_t *, audio_replay_gain_t * );
+aout_input_t * __aout_DecNew( vlc_object_t *, aout_instance_t **, audio_sample_format_t *, const audio_replay_gain_t * );
 int aout_DecDelete ( aout_instance_t *, aout_input_t * );
 aout_buffer_t * aout_DecNewBuffer( aout_input_t *, size_t );
 void aout_DecDeleteBuffer( aout_instance_t *, aout_input_t *, aout_buffer_t * );

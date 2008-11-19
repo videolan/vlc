@@ -44,7 +44,7 @@
  *****************************************************************************/
 static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
                               audio_sample_format_t *p_format,
-                              audio_replay_gain_t *p_replay_gain )
+                              const audio_replay_gain_t *p_replay_gain )
 {
     aout_input_t * p_input;
 
@@ -164,7 +164,7 @@ error:
 aout_input_t * __aout_DecNew( vlc_object_t * p_this,
                               aout_instance_t ** pp_aout,
                               audio_sample_format_t * p_format,
-                              audio_replay_gain_t *p_replay_gain )
+                              const audio_replay_gain_t *p_replay_gain )
 {
     aout_instance_t *p_aout = *pp_aout;
     if ( p_aout == NULL )
