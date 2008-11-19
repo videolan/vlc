@@ -850,7 +850,7 @@ static int Init( vout_thread_t *p_vout )
                 else if (i_row == p_vout->p_sys->i_row -1)
                     p_entry->p_vout->i_alignment |= VOUT_ALIGN_TOP;
             }
-            // i_n : number of active pp_vout
+            // i_active : number of active pp_vout
             int i_active = 0;
             for( int i = 0; i <= p_vout->p_sys->i_vout; i++ )
             {
@@ -858,8 +858,8 @@ static int Init( vout_thread_t *p_vout )
                     i_active++;
             }
             var_SetInteger( p_vout, "align", p_entry->p_vout->i_alignment );
-            var_SetInteger( p_vout, "video-x", i_video_x + p_vout->p_sys->i_offset_x + ((i_active + 1) % p_vout->p_sys->i_col) * p_vout->i_window_width);
-            var_SetInteger( p_vout, "video-y", i_video_y +                             ((i_active + 1) / p_vout->p_sys->i_col) * p_vout->i_window_height);
+            var_SetInteger( p_vout, "video-x", i_video_x + p_vout->p_sys->i_offset_x + (i_active % p_vout->p_sys->i_col) * p_vout->i_window_width);
+            var_SetInteger( p_vout, "video-y", i_video_y +                             (i_active / p_vout->p_sys->i_col) * p_vout->i_window_height);
 #endif
         }
     }
@@ -1040,7 +1040,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                     if( p_vout->p_sys->i_col > 2 )
                     {
                         const int halfl = length / 2;
-                        if( b_col_first == 0)
+                        if( b_col_first)
                             vlc_memcpy( &p_out[halfl], &p_in[0], i_copy_pitch - halfl );
                         else if( b_col_last )
                             vlc_memcpy( &p_out[    0], &p_in[-halfl], i_copy_pitch - halfl );
@@ -1085,10 +1085,7 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                                 p_dst[i_index] = (p_vout->p_sys->lambda[0][i_plane][i_index] * p_dst[i_index]) / ACCURACY +
                                                         p_vout->p_sys->cstYUV[0][i_plane][i_index];
 #else
-                                fprintf( stderr, "r=%d c=%d, i_plane=%d i_index=%d | %d %d\n", i_row, i_col, i_plane, i_index,
-                                         i_copy_pitch, length );
-                                fprintf( stderr, "# %d\n", p_dst[i_index] );
-                                p_dst[i_index] = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda[0][i_plane][i_index]][p_dst[i_index]];
+                               p_dst[i_index] = p_vout->p_sys->LUT[i_plane][p_vout->p_sys->lambda[0][i_plane][i_index]][p_dst[i_index]];
 #endif
                             }
                         }
@@ -1099,36 +1096,46 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
                     p_out += i_out_pitch;
                 }
 #ifdef OVERLAP
-                // horizontal blend
-                if( p_vout->p_sys->i_row > 2 )
+       // horizontal blend
+        if ( p_vout->p_sys->i_row >= 2 )
+        {
+           // black bar
+           if (( p_vout->p_sys->i_row > 2 ) && (( b_row_first ) || ( b_row_last )))
+           {
+
+               int height = 2 * p_vout->p_sys->i_halfHeight / i_div;
+               if ( b_row_first )
+               {
+                    TopOffset = i_lines + (2 * p_vout->p_sys->i_halfHeight) / i_div;
+               }
+               else
                 {
-                    length = 2 * p_vout->p_sys->i_halfHeight / i_div;
-                    if (p_vout->p_sys->b_has_changed)
-                    {
-                        Denom = F2(length);
-                        a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
-                        a_1 = p_vout->p_sys->a_1 * length * (ACCURACY / 100);
-                        a_0 = p_vout->p_sys->a_0 * Denom * (ACCURACY / 100);
-                       for(i_col_mod = 0; i_col_mod < 2; i_col_mod++)
-                        for (i_index = 0; i_index < length; i_index++)
-                        {
-                            p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index] = CLIP_0A(!i_col_mod ? ACCURACY - (F4(a_2, a_1, i_index) + a_0) / Denom : ACCURACY - (F4(a_2, a_1,length - i_index) + a_0) / Denom);
-                            p_vout->p_sys->cstYUV2[i_col_mod][i_plane][i_index] = ((ACCURACY - p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index]) * constantYUV[i_plane]) / ACCURACY;
-                        }
-                    }
-
-                    if( b_row_first )
-                    {
-                        // black bar
-                        TopOffset = i_lines + (2 * p_vout->p_sys->i_halfHeight) / i_div;
-                        uint8_t *p_dst = p_out - TopOffset * i_out_pitch;
-
-                        for (i_index = 0; i_index < length; i_index++)
-                            memset( &p_dst[i_index * i_out_pitch], constantYUV[i_plane], i_copy_pitch );
-                    }
-                    else if( p_vout->p_sys->b_attenuate )
-                    {
-                        // first blended zone
+                   TopOffset = height - (2 * p_vout->p_sys->i_halfHeight) / i_div;
+                }
+                uint8_t *p_dst = p_out - TopOffset * i_out_pitch;
+                for (i_index = 0; i_index < height; i_index++)
+                   for (i_index2 = 0; i_index2 < i_copy_pitch; i_index2++)
+                       p_dst[i_index * i_out_pitch + i_index2] = constantYUV[i_plane];
+           }
+           if( p_vout->p_sys->b_attenuate )
+           {
+               length = 2 * p_vout->p_sys->i_halfHeight / (p_vout->p_sys->pp_vout[i_vout].i_width / i_copy_pitch);
+               if (p_vout->p_sys->b_has_changed)
+               {
+                   Denom = F2(length);
+                   a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
+                   a_1 = p_vout->p_sys->a_1 * length * (ACCURACY / 100);
+                   a_0 = p_vout->p_sys->a_0 * Denom * (ACCURACY / 100);
+                   for(i_col_mod = 0; i_col_mod < 2; i_col_mod++)
+                       for (i_index = 0; i_index < length; i_index++)
+                       {
+                           p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index] = CLIP_0A(!i_col_mod ? ACCURACY - (F4(a_2, a_1, i_index) + a_0) / Denom : ACCURACY - (F4(a_2, a_1,length - i_index) + a_0) / Denom);
+                           p_vout->p_sys->cstYUV2[i_col_mod][i_plane][i_index] = ((ACCURACY - p_vout->p_sys->lambda2[i_col_mod][i_plane][i_index]) * constantYUV[i_plane]) / ACCURACY;
+                       }
+               }
+               // first blended zone
+               if ( !b_row_first )
+               {
                         TopOffset = i_lines;
                         uint8_t *p_dst = p_out - TopOffset * i_out_pitch;
 
@@ -1145,20 +1152,10 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
                             }
                         }
-                    }
-
-                    if( b_row_last )
-                    {
-                        // black bar
-                        TopOffset = length - (2 * p_vout->p_sys->i_halfHeight) / i_div;
-                        uint8_t *p_dst = p_out - TopOffset * p_outpic->p[i_plane].i_pitch;
-
-                        for (i_index = 0; i_index < length; i_index++)
-                            memset( &p_dst[i_index * i_out_pitch], constantYUV[i_plane], i_copy_pitch );
-                    }
-                    else if( p_vout->p_sys->b_attenuate )
-                    {
-                    // second blended zone
+               }
+               // second blended zone
+               if ( !b_row_last )
+               {
                         TopOffset = length;
                         uint8_t *p_dst = p_out - TopOffset * p_outpic->p[i_plane].i_pitch;
 
@@ -1176,9 +1173,10 @@ static void RenderPlanarYUV( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
                             }
                         }
-                    }
-                    // end blended zone
-                }
+               }
+           }
+        }
+       // end blended zone
 #endif
                 // bug for wall filter : fix by CC
                 //            pi_left_skip[i_plane] += i_out_pitch;
