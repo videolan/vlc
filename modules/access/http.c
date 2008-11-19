@@ -1410,6 +1410,8 @@ static int Request( access_t *p_access, int64_t i_tell )
             p_sys->i_icy_meta = atoi( p );
             if( p_sys->i_icy_meta < 0 )
                 p_sys->i_icy_meta = 0;
+            if( p_sys->i_icy_meta > 0 )
+                p_sys->b_icecast = true;
 
             msg_Warn( p_access, "ICY metaint=%d", p_sys->i_icy_meta );
         }
