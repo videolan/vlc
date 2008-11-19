@@ -40,7 +40,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
+#include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_interface.h>
 #include <vlc_network.h>
@@ -1231,14 +1231,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = (int64_t*)va_arg( args, int64_t * );
             if( p_sys->i_npt_length > 0 )
             {
-                *pi64 = p_sys->i_npt_length * 1000000.0;
+                *pi64 = (int64_t)((double)p_sys->i_npt_length * 1000000.0);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double* );
-            if( p_sys->i_npt_length > 0 && p_sys->i_npt > 0)
+            if( (p_sys->i_npt_length > 0) && (p_sys->i_npt > 0) )
             {
                 *pf = ( (double)p_sys->i_npt / (double)p_sys->i_npt_length );
                 return VLC_SUCCESS;
@@ -1247,12 +1247,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
         case DEMUX_SET_TIME:
-            if( p_sys->rtsp && p_sys->i_npt_length > 0 )
+            if( p_sys->rtsp && (p_sys->i_npt_length > 0) )
             {
                 int i;
                 float time;
 
-                if( i_query == DEMUX_SET_TIME && p_sys->i_npt > 0 )
+                if( (i_query == DEMUX_SET_TIME) && (p_sys->i_npt > 0) )
                 {
                     i64 = (int64_t)va_arg( args, int64_t );
                     time = (float)((double)i64 / (double)1000000.0); /* in second */
@@ -1313,54 +1313,70 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #endif
             return VLC_SUCCESS;
 
-#if 0
         case DEMUX_CAN_CONTROL_RATE:
             pb = (bool*)va_arg( args, bool * );
             pb2 = (bool*)va_arg( args, bool * );
 
-            *pb = p_sys->rtsp != NULL && p_sys->i_npt_length > 0 && !var_GetBool( p_demux, "rtsp-kasenna" );
+            *pb = (p_sys->rtsp != NULL) &&
+                    (p_sys->i_npt_length > 0) &&
+                    !var_GetBool( p_demux, "rtsp-kasenna" );
             *pb2 = false;
             return VLC_SUCCESS;
 
         case DEMUX_SET_RATE:
         {
-            double f_scale;
+            double f_scale, f_old_scale;
+            int i;
 
-            if( !p_sys->rtsp || p_sys->i_npt_length <= 0 || var_GetBool( p_demux, "rtsp-kasenna" ) )
+            if( !p_sys->rtsp || (p_sys->i_npt_length <= 0) ||
+                var_GetBool( p_demux, "rtsp-kasenna" ) )
                 return VLC_EGENERIC;
 
-            /* TODO we might want to ensure that the new rate is different from
-             * old rate after playMediaSession...
-             * I have no idea how the server map the requested rate to the
-             * ones it supports.
-             * ex:
-             *  current is x2 we request x1.5 if the server return x2 we will
-             *  never succeed to return to x1.
-             *  In this case we should retry with a lower rate until we have
-             *  one (even x1).
+            /* According to RFC 2326 p56 chapter 12.35 a RTSP server that
+             * supports Scale should:
+             *
+             * "The server should try to approximate the viewing rate, but may
+             *  restrict the range of scale values that it supports. The response
+             *  MUST contain the actual scale value chosen by the server."
+             *
+             * Scale = 1 indicates normal play
+             * Scale > 1 indicates fast forward
+             * Scale < 1 && Scale > 0 indicates slow motion
+             * Scale < 0 value indicates rewind
              */
 
             pi_int = (int*)va_arg( args, int * );
-            f_scale = (double)INPUT_RATE_DEFAULT / (*p_int);
+            f_scale = (double)INPUT_RATE_DEFAULT / (*pi_int);
+            f_old_scale = p_sys->ms->scale();
 
             /* Passing -1 for the start and end time will mean liveMedia won't
-            * create a Range: section for the RTSP message. The server should
-            * pick up from the current position */
+             * create a Range: section for the RTSP message. The server should
+             * pick up from the current position */
             if( !p_sys->rtsp->playMediaSession( *p_sys->ms, -1, -1, f_scale ) )
             {
                 msg_Err( p_demux, "PLAY with Scale %0.2f failed %s", f_scale,
                         p_sys->env->getResultMsg() );
                 return VLC_EGENERIC;
             }
+
+            if( p_sys->ms->scale() == f_old_scale )
+            {
+                msg_Err( p_demux, "no scale change using old Scale %0.2f",
+                          p_sys->ms->scale() );
+                return VLC_EGENERIC;
+            }
+
             /* ReSync the stream */
             p_sys->i_npt_start = 0;
             p_sys->i_pcr = 0;
-            p_sys->i_npt = 0.;
+            p_sys->i_npt = 0.0;
 
-            *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() + 0.5 );
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+
+            *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() );
+            msg_Dbg( p_demux, "PLAY with new Scale %0.2f (%d)", p_sys->ms->scale(), (*pi_int) );
             return VLC_SUCCESS;
         }
-#endif
 
         case DEMUX_SET_PAUSE_STATE:
         {
