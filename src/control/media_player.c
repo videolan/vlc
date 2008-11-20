@@ -1044,16 +1044,24 @@ void libvlc_media_player_set_rate(
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
+    bool b_can_rewind;
 
-    if( rate <= 0 )
+    if( rate != 0 )
         RAISEVOID( "Rate value is invalid" );
 
-    val.i_int = 1000.0f/rate;
-
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
-    if ( !p_input_thread )
+    if( !p_input_thread )
         return;
 
+    b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
+    if( (rate < 0) && !b_can_rewind )
+    {
+        vlc_object_release( p_input_thread );
+        libvlc_exception_raise( p_e, "Rate value is invalid" );
+        return;
+    }
+
+    val.i_int = 1000.0f/rate;
     var_Set( p_input_thread, "rate", val );
     vlc_object_release( p_input_thread );
 }
@@ -1064,12 +1072,19 @@ float libvlc_media_player_get_rate(
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
+    bool b_can_rewind;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
-    if ( !p_input_thread )
-        return -1.0;
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( !p_input_thread )
+        return 0.0;  /* rate < 0 indicates rewind */
 
     var_Get( p_input_thread, "rate", &val );
+    b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
+    if( (val.i_int < 0) && !b_can_rewind )
+    {
+        libvlc_exception_raise( p_e, "invalid rate" );
+        return 0.0;
+    }
     vlc_object_release( p_input_thread );
 
     return (float)1000.0f/val.i_int;

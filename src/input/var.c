@@ -73,6 +73,7 @@ typedef struct
     const char *psz_name;
     vlc_callback_t callback;
 } vlc_input_callback_t;
+
 static void InputAddCallbacks( input_thread_t *, const vlc_input_callback_t * );
 static void InputDelCallbacks( input_thread_t *, const vlc_input_callback_t * );
 
@@ -478,6 +479,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "can-pause", VLC_VAR_BOOL );
     var_SetBool( p_input, "can-pause", true ); /* Fixed later*/
 
+    var_Create( p_input, "can-rewind", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-rewind", false );
+
     var_Create( p_input, "can-record", VLC_VAR_BOOL );
     var_SetBool( p_input, "can-record", false ); /* Fixed later*/
 
@@ -521,6 +525,7 @@ static void InputAddCallbacks( input_thread_t *p_input,
                          p_callbacks[i].psz_name,
                          p_callbacks[i].callback, NULL );
 }
+
 static void InputDelCallbacks( input_thread_t *p_input,
                                const vlc_input_callback_t *p_callbacks )
 {
@@ -530,6 +535,7 @@ static void InputDelCallbacks( input_thread_t *p_input,
                          p_callbacks[i].psz_name,
                          p_callbacks[i].callback, NULL );
 }
+
 /*****************************************************************************
  * All Callbacks:
  *****************************************************************************/
@@ -568,7 +574,6 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
     }
-
     return VLC_SUCCESS;
 }
 
@@ -812,6 +817,7 @@ static int RecordCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_SUCCESS;
 }
+
 static int FrameNextCallback( vlc_object_t *p_this, char const *psz_cmd,
                               vlc_value_t oldval, vlc_value_t newval,
                               void *p_data )
