@@ -83,6 +83,7 @@ typedef enum buttonType_e
     TIME_LABEL,
     SPLITTER,
     ADVANCED_CONTROLLER,
+    REVERSE_BUTTON,
 } buttonType_e;
 
 typedef enum actionType_e
@@ -100,7 +101,8 @@ typedef enum actionType_e
     SNAPSHOT_ACTION,
     RECORD_ACTION,
     FRAME_ACTION,
-    ATOB_ACTION
+    ATOB_ACTION,
+    REVERSE_ACTION,
 } actionType_e;
 
 enum
@@ -147,6 +149,7 @@ protected slots:
     void extSettings();
     void faster();
     void slower();
+    void reverse();
     void playlist();
     void snapshot();
     void record();

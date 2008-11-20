@@ -378,6 +378,15 @@ QWidget *AbstractController::createWidget( buttonType_e button, int* i_size,
             widget = advControls;
             *i_size = advControls->getWidth();
         }
+    case REVERSE_BUTTON:{
+        QToolButton *reverseButton = new QToolButton;
+        setupButton( reverseButton );
+        CONNECT_MAP_SET( reverseButton, REVERSE_ACTION );
+        BUTTON_SET_BAR( reverseButton, reverse, qtr( "Reverse" ) );
+        ENABLE_ON_INPUT( reverseButton );
+        widget = reverseButton;
+        }
+        break;
     default:
         msg_Warn( p_intf, "This should not happen" );
         break;
@@ -665,6 +674,8 @@ void AbstractController::doAction( int id_action )
             THEMIM->getIM()->setAtoB(); break;
         case FRAME_ACTION:
             frame(); break;
+        case REVERSE_ACTION:
+            reverse(); break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;
@@ -728,6 +739,11 @@ void AbstractController::snapshot()
 void AbstractController::extSettings()
 {
     THEDP->extendedDialog();
+}
+
+void AbstractController::reverse()
+{
+    THEMIM->getIM()->reverse();
 }
 
 void AbstractController::slower()
@@ -1226,7 +1242,6 @@ static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const
     return VLC_SUCCESS;
 }
 
-
 /**
  * It is called when video start
  */
@@ -1246,6 +1261,7 @@ void FullscreenControllerWidget::attachVout( vout_thread_t *p_nvout )
                        var_GetInteger( p_vout, "mouse-hide-timeout" ) );
     vlc_mutex_unlock( &lock );
 }
+
 /**
  * It is called after turn off video.
  */
@@ -1294,4 +1310,3 @@ void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
     }
     vlc_mutex_unlock( &lock );
 }
-

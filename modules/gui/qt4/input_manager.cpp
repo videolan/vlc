@@ -572,6 +572,15 @@ void InputManager::activateTeletext( bool b_enable )
     }
 }
 
+void InputManager::reverse()
+{
+    if( hasInput() )
+    {
+        int i_rate = var_GetInteger( p_input, "rate" );
+        var_SetInteger( p_input, "rate", -i_rate );
+    }
+}
+
 void InputManager::slower()
 {
     if( hasInput() )
@@ -869,4 +878,3 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
     QApplication::postEvent( mim, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
-

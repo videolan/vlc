@@ -116,6 +116,7 @@ public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
     void sliderUpdate( float ); ///< User dragged the slider. We get new pos
     /* SpeedRate Rate Management */
+    void reverse();
     void slower();
     void faster();
     void normalRate();
