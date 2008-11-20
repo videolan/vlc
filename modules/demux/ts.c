@@ -1562,15 +1562,15 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
 
         if( !b_old_valid )
         {
-            free( pid->psi );
             pid->psi = malloc( sizeof( ts_psi_t ) );
             if( pid->psi )
             {
-                pid->psi->handle= NULL;
-                pid->psi->i_prg = 0;
-                pid->psi->prg   = NULL;
+                pid->psi->handle = NULL;
+                TAB_INIT( pid->psi->i_prg, pid->psi->prg );
             }
         }
+        assert( pid->psi );
+
         pid->psi->i_pat_version  = -1;
         pid->psi->i_sdt_version  = -1;
         if( p_owner )
@@ -3186,7 +3186,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                  * parsing the SDT/EDT */
                 dvbpsi_DetachDemux( pid->psi->handle );
                 free( pid->psi );
-                pid->psi = 0;
+                pid->psi = NULL;
             }
             else
             {
