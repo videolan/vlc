@@ -36,6 +36,7 @@
 #include <assert.h>
 
 #include "input_internal.h"
+#include "event.h"
 #include "es_out.h"
 #include "es_out_timeshift.h"
 #include "access.h"
@@ -76,8 +77,6 @@ static bool Control( input_thread_t *, int, vlc_value_t );
 static int  UpdateFromAccess( input_thread_t * );
 static int  UpdateFromDemux( input_thread_t * );
 
-static void UpdateItemLength( input_thread_t *, int64_t i_length );
-
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
 static input_source_t *InputSourceNew( input_thread_t *);
@@ -101,6 +100,8 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
 
 static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_forced );
 
+static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO fix name */
+
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
@@ -119,7 +120,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
  * * Get only:
  *  - length
  *  - bookmarks
- *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown
+ *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown FIXME rename can-seek
  *    or not, for that check position != 0.0)
  *  - can-pause
  *  - can-record (if a stream can be recorded while playing)
@@ -307,6 +308,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );
+    input_SendEventMeta( p_input );
 
     /* */
     if( p_input->b_preparsing )
@@ -667,39 +669,26 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
  */
 static void MainLoopInterface( input_thread_t *p_input )
 {
-    vlc_value_t val;
-    double f_pos;
-    int64_t i_time, i_length;
+    input_event_times_t ev;
+
+    ev.f_position = 0.0;
+    ev.i_time = 0;
+    ev.i_length = 0;
 
     /* update input status variables */
-    if( !demux_Control( p_input->p->input.p_demux,
-                         DEMUX_GET_POSITION, &f_pos ) )
-    {
-        val.f_float = (float)f_pos;
-        var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
-    }
-    if( !demux_Control( p_input->p->input.p_demux,
-                         DEMUX_GET_TIME, &i_time ) )
-    {
-        p_input->i_time = i_time;
-        val.i_time = i_time;
-        var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
-    }
-    if( !demux_Control( p_input->p->input.p_demux,
-                         DEMUX_GET_LENGTH, &i_length ) )
-    {
-        vlc_value_t old_val;
-        var_Get( p_input, "length", &old_val );
-        val.i_time = i_length;
-        var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
+    if( demux_Control( p_input->p->input.p_demux,
+                       DEMUX_GET_POSITION, &ev.f_position ) )
+        ev.f_position = 0.0;
 
-        if( old_val.i_time != val.i_time )
-        {
-            UpdateItemLength( p_input, i_length );
-        }
-    }
+    if( demux_Control( p_input->p->input.p_demux,
+                       DEMUX_GET_TIME, &ev.i_time ) )
+        ev.i_time = 0;
 
-    var_SetBool( p_input, "intf-change", true );
+    if( demux_Control( p_input->p->input.p_demux,
+                       DEMUX_GET_LENGTH, &ev.i_length ) )
+        ev.i_length = 0;
+
+    input_SendEventTimes( p_input, &ev );
 }
 
 /**
@@ -715,7 +704,7 @@ static void MainLoopStatistic( input_thread_t *p_input )
         stats_ComputeGlobalStats( p_input->p_libvlc,
                                   p_input->p_libvlc->p_stats );
     }
-    var_SetBool( p_input, "stats-change", true );
+    input_SendEventStatistics( p_input );
 }
 
 /**
@@ -1159,7 +1148,6 @@ static void InitPrograms( input_thread_t * p_input )
 static int Init( input_thread_t * p_input )
 {
     vlc_meta_t *p_meta;
-    vlc_value_t val;
     int i, ret;
 
     for( i = 0; i < p_input->p->input.p_item->i_options; i++ )
@@ -1202,21 +1190,15 @@ static int Init( input_thread_t * p_input )
 
     /* Load master infos */
     /* Init length */
-    if( !demux_Control( p_input->p->input.p_demux, DEMUX_GET_LENGTH,
-                         &val.i_time ) && val.i_time > 0 )
-    {
-        var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-        UpdateItemLength( p_input, val.i_time );
-    }
-    else
-    {
-        val.i_time = input_item_GetDuration( p_input->p->input.p_item );
-        if( val.i_time > 0 )
-        { /* fallback: gets length from metadata */
-            var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
-            UpdateItemLength( p_input, val.i_time );
-        }
-    }
+    input_event_times_t ev_times;
+    ev_times.f_position = 0;
+    ev_times.i_time = 0;
+    if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_LENGTH,
+                         &ev_times.i_length ) )
+        ev_times.i_length = 0;
+    if( ev_times.i_length <= 0 )
+        ev_times.i_length = input_item_GetDuration( p_input->p->input.p_item );
+    input_SendEventTimes( p_input, &ev_times );
 
     StartTitle( p_input );
 
@@ -1529,7 +1511,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
     }
 
     /* Switch to new state */
-    input_ChangeStateWithVarCallback( p_input, i_state, false );
+    input_ChangeState( p_input, i_state );
 
 }
 
@@ -1556,7 +1538,7 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
     }
 
     /* Switch to play */
-    input_ChangeStateWithVarCallback( p_input, PLAYING_S, false );
+    input_ChangeState( p_input, PLAYING_S );
 
     /* */
     if( !i_ret )
@@ -1567,6 +1549,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                            vlc_value_t val )
 {
     const mtime_t i_control_date = mdate();
+    /* FIXME b_force_update is abused, it should be carefully checked */
     bool b_force_update = false;
 
     if( !p_input )
@@ -1703,7 +1686,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 b_force_update = true;
 
                 /* Correct "state" value */
-                input_ChangeStateWithVarCallback( p_input, p_input->i_state, false );
+                input_ChangeState( p_input, p_input->i_state );
             }
             else if( val.i_int != PLAYING_S && val.i_int != PAUSE_S )
             {
@@ -1830,11 +1813,8 @@ static bool Control( input_thread_t *p_input, int i_type,
             /* */
             if( i_rate != p_input->p->i_rate )
             {
-                val.i_int = i_rate;
-                var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
-                var_SetBool( p_input, "rate-change", true );
-
                 p_input->p->i_rate = i_rate;
+                input_SendEventRate( p_input, i_rate );
 
                 if( p_input->p->input.b_rescale_ts )
                 {
@@ -1867,12 +1847,12 @@ static bool Control( input_thread_t *p_input, int i_type,
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
             if( !es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, val.i_time ) )
-                var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
+                input_SendEventAudioDelay( p_input, val.i_time );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
             if( !es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, val.i_time ) )
-                var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
+                input_SendEventSubtitleDelay( p_input, val.i_time );
             break;
 
         case INPUT_CONTROL_SET_TITLE:
@@ -2087,7 +2067,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
                 p_input->p->b_recording = val.b_bool;
 
-                var_Change( p_input, "record", VLC_VAR_SETVALUE, &val, NULL );
+                input_SendEventRecord( p_input, val.b_bool );
 
                 b_force_update = true;
             }
@@ -2121,24 +2101,47 @@ static bool Control( input_thread_t *p_input, int i_type,
 /*****************************************************************************
  * UpdateFromDemux:
  *****************************************************************************/
+static int UpdateTitleSeekpoint( input_thread_t *p_input,
+                                 int i_title, int i_seekpoint )
+{
+    int i_title_end = p_input->p->input.i_title_end -
+                        p_input->p->input.i_title_offset;
+    int i_seekpoint_end = p_input->p->input.i_seekpoint_end -
+                            p_input->p->input.i_seekpoint_offset;
+
+    if( i_title_end >= 0 && i_seekpoint_end >= 0 )
+    {
+        if( i_title > i_title_end ||
+            ( i_title == i_title_end && i_seekpoint > i_seekpoint_end ) )
+            return 0;
+    }
+    else if( i_seekpoint_end >= 0 )
+    {
+        if( i_seekpoint > i_seekpoint_end )
+            return 0;
+    }
+    else if( i_title_end >= 0 )
+    {
+        if( i_title > i_title_end )
+            return 0;
+    }
+    return 1;
+}
 static int UpdateFromDemux( input_thread_t *p_input )
 {
     demux_t *p_demux = p_input->p->input.p_demux;
-    vlc_value_t v;
 
+    /* TODO event-like */
     if( p_demux->info.i_update & INPUT_UPDATE_TITLE )
     {
-        v.i_int = p_demux->info.i_title;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &v, NULL );
-
-        input_ControlVarTitle( p_input, p_demux->info.i_title );
+        input_SendEventTitle( p_input, p_demux->info.i_title );
 
         p_demux->info.i_update &= ~INPUT_UPDATE_TITLE;
     }
     if( p_demux->info.i_update & INPUT_UPDATE_SEEKPOINT )
     {
-        v.i_int = p_demux->info.i_seekpoint;
-        var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &v, NULL);
+        input_SendEventSeekpoint( p_input,
+                                  p_demux->info.i_title, p_demux->info.i_seekpoint );
 
         p_demux->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
@@ -2146,28 +2149,9 @@ static int UpdateFromDemux( input_thread_t *p_input )
 
     /* Hmmm only works with master input */
     if( p_input->p->input.p_demux == p_demux )
-    {
-        int i_title_end = p_input->p->input.i_title_end -
-            p_input->p->input.i_title_offset;
-        int i_seekpoint_end = p_input->p->input.i_seekpoint_end -
-            p_input->p->input.i_seekpoint_offset;
-
-        if( i_title_end >= 0 && i_seekpoint_end >= 0 )
-        {
-            if( p_demux->info.i_title > i_title_end ||
-                ( p_demux->info.i_title == i_title_end &&
-                  p_demux->info.i_seekpoint > i_seekpoint_end ) ) return 0;
-        }
-        else if( i_seekpoint_end >=0 )
-        {
-            if( p_demux->info.i_seekpoint > i_seekpoint_end ) return 0;
-        }
-        else if( i_title_end >= 0 )
-        {
-            if( p_demux->info.i_title > i_title_end ) return 0;
-        }
-    }
-
+        return UpdateTitleSeekpoint( p_input,
+                                     p_demux->info.i_title,
+                                     p_demux->info.i_seekpoint );
     return 1;
 }
 
@@ -2177,14 +2161,10 @@ static int UpdateFromDemux( input_thread_t *p_input )
 static int UpdateFromAccess( input_thread_t *p_input )
 {
     access_t *p_access = p_input->p->input.p_access;
-    vlc_value_t v;
 
     if( p_access->info.i_update & INPUT_UPDATE_TITLE )
     {
-        v.i_int = p_access->info.i_title;
-        var_Change( p_input, "title", VLC_VAR_SETVALUE, &v, NULL );
-
-        input_ControlVarTitle( p_input, p_access->info.i_title );
+        input_SendEventTitle( p_input, p_access->info.i_title );
 
         stream_AccessUpdate( p_input->p->input.p_stream );
 
@@ -2192,8 +2172,9 @@ static int UpdateFromAccess( input_thread_t *p_input )
     }
     if( p_access->info.i_update & INPUT_UPDATE_SEEKPOINT )
     {
-        v.i_int = p_access->info.i_seekpoint;
-        var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &v, NULL);
+        input_SendEventSeekpoint( p_input,
+                                  p_access->info.i_title, p_access->info.i_seekpoint );
+
         p_access->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
     if( p_access->info.i_update & INPUT_UPDATE_META )
@@ -2212,8 +2193,7 @@ static int UpdateFromAccess( input_thread_t *p_input )
         if( access_Control( p_access, ACCESS_GET_SIGNAL, &f_quality, &f_strength ) )
             f_quality = f_strength = -1;
 
-        var_SetFloat( p_input, "signal-quality", f_quality );
-        var_SetFloat( p_input, "signal-strength", f_strength );
+        input_SendEventSignal( p_input, f_quality, f_strength );
 
         p_access->info.i_update &= ~INPUT_UPDATE_SIGNAL;
     }
@@ -2222,37 +2202,10 @@ static int UpdateFromAccess( input_thread_t *p_input )
 
     /* Hmmm only works with master input */
     if( p_input->p->input.p_access == p_access )
-    {
-        int i_title_end = p_input->p->input.i_title_end -
-            p_input->p->input.i_title_offset;
-        int i_seekpoint_end = p_input->p->input.i_seekpoint_end -
-            p_input->p->input.i_seekpoint_offset;
-
-        if( i_title_end >= 0 && i_seekpoint_end >=0 )
-        {
-            if( p_access->info.i_title > i_title_end ||
-                ( p_access->info.i_title == i_title_end &&
-                  p_access->info.i_seekpoint > i_seekpoint_end ) ) return 0;
-        }
-        else if( i_seekpoint_end >=0 )
-        {
-            if( p_access->info.i_seekpoint > i_seekpoint_end ) return 0;
-        }
-        else if( i_title_end >= 0 )
-        {
-            if( p_access->info.i_title > i_title_end ) return 0;
-        }
-    }
-
+        return UpdateTitleSeekpoint( p_input,
+                                     p_access->info.i_title,
+                                     p_access->info.i_seekpoint );
     return 1;
-}
-
-/*****************************************************************************
- * UpdateItemLength:
- *****************************************************************************/
-static void UpdateItemLength( input_thread_t *p_input, int64_t i_length )
-{
-    input_item_SetDuration( p_input->p->input.p_item, (mtime_t) i_length );
 }
 
 /*****************************************************************************
@@ -2807,7 +2760,6 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     input_item_t *p_item = p_input->p->input.p_item;
     char * psz_arturl = NULL;
     char *psz_title = NULL;
-    int i_arturl_event = false;
 
     if( !p_meta )
         return;
@@ -2815,31 +2767,27 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     psz_arturl = input_item_GetArtURL( p_item );
 
     vlc_mutex_lock( &p_item->lock );
+
     if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
         psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
 
     vlc_meta_Merge( p_item->p_meta, p_meta );
 
+    vlc_meta_Delete( p_meta );
+
     if( psz_arturl && *psz_arturl )
     {
         vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_arturl );
-        i_arturl_event = true;
-    }
 
-    vlc_meta_Delete( p_meta );
-
-    if( psz_arturl && !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
-    {
-        /* Don't look for art cover if sout
-         * XXX It can change when sout has meta data support */
-        if( p_input->p->p_sout && !p_input->b_preparsing )
+        if( !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
         {
-            vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, "" );
-            i_arturl_event = true;
-
+            /* Don't look for art cover if sout
+             * XXX It can change when sout has meta data support */
+            if( p_input->p->p_sout && !p_input->b_preparsing )
+                vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, "" );
+            else
+                input_ExtractAttachmentAndCacheArt( p_input );
         }
-        else
-            input_ExtractAttachmentAndCacheArt( p_input );
     }
     free( psz_arturl );
 
@@ -2850,25 +2798,16 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
         p_meta = vlc_meta_New();
         vlc_meta_Merge( p_meta, input_item_GetMetaObject( p_item ) );
     }
+
+    if( psz_title )
+        input_item_SetName( p_item, psz_title );
+    free( psz_title );
+
     vlc_mutex_unlock( &p_item->lock );
 
     input_item_SetPreparsed( p_item, true );
 
-    if( i_arturl_event == true )
-    {
-        vlc_event_t event;
-
-        /* Notify interested third parties */
-        event.type = vlc_InputItemMetaChanged;
-        event.u.input_item_meta_changed.meta_type = vlc_meta_ArtworkURL;
-        vlc_event_send( &p_item->event_manager, &event );
-    }
-
-    if( psz_title )
-    {
-        input_Control( p_input, INPUT_SET_NAME, psz_title );
-        free( psz_title );
-    }
+    input_SendEventMeta( p_input );
 
     /** \todo handle sout meta */
 }
@@ -2920,7 +2859,6 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
     bool b_bool;
     module_t *p_id3;
 
-
 #if 0
     /* XXX I am not sure it is a great idea, besides, there is more than that
      * if we want to do it right */
@@ -2964,6 +2902,22 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
         module_unneed( p_demux, p_id3 );
     }
     free( p_demux->p_private );
+}
+
+static void input_ChangeState( input_thread_t *p_input, int i_state )
+{
+    const bool b_changed = p_input->i_state != i_state;
+
+    p_input->i_state = i_state;
+    if( i_state == ERROR_S )
+        p_input->b_error = true;
+    else if( i_state == END_S )
+        p_input->b_eof = true;
+
+    input_item_SetHasErrorWhenReading( p_input->p->input.p_item, (i_state == ERROR_S) );
+
+    if( b_changed )
+        input_SendEventState( p_input, i_state );
 }
 
 

@@ -312,6 +312,7 @@ bool input_item_IsArtFetched( input_item_t *p_i )
     return p_i->p_meta ? p_i->p_meta->i_status & ITEM_ART_FETCHED : false ;
 }
 
+/* FIXME dangerous, unlocked */
 const vlc_meta_t * input_item_GetMetaObject( input_item_t *p_i )
 {
     if( !p_i->p_meta )
@@ -320,6 +321,7 @@ const vlc_meta_t * input_item_GetMetaObject( input_item_t *p_i )
     return p_i->p_meta;
 }
 
+/* FIXME dangerous, unlocked */
 void input_item_MetaMerge( input_item_t *p_i, const vlc_meta_t * p_new_meta )
 {
     if( !p_i->p_meta )
@@ -472,8 +474,84 @@ int input_item_AddInfo( input_item_t *p_i,
 
     vlc_mutex_unlock( &p_i->lock );
 
+    if( p_info->psz_value )
+    {
+        vlc_event_t event;
+
+        event.type = vlc_InputItemInfoChanged;
+        vlc_event_send( &p_i->event_manager, &event );
+    }
     return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
 }
+int input_item_DelInfo( input_item_t *p_i,
+                        const char *psz_cat,
+                        const char *psz_name )
+{
+    info_category_t *p_cat = NULL;
+    int i_cat;
+    int i;
+
+    vlc_mutex_lock( &p_i->lock );
+    for( i_cat = 0; i_cat < p_i->i_categories; i_cat++ )
+    {
+        if( !strcmp( p_i->pp_categories[i_cat]->psz_name,
+                     psz_cat ) )
+        {
+            p_cat = p_i->pp_categories[i_cat];
+            break;
+        }
+    }
+    if( p_cat == NULL )
+    {
+        vlc_mutex_unlock( &p_i->lock );
+        return VLC_EGENERIC;
+    }
+
+    if( psz_name )
+    {
+        /* Remove a specific info */
+        for( i = 0; i < p_cat->i_infos; i++ )
+        {
+            if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
+            {
+                free( p_cat->pp_infos[i]->psz_name );
+                if( p_cat->pp_infos[i]->psz_value )
+                    free( p_cat->pp_infos[i]->psz_value );
+                free( p_cat->pp_infos[i] );
+                REMOVE_ELEM( p_cat->pp_infos, p_cat->i_infos, i );
+                break;
+            }
+        }
+        if( i >= p_cat->i_infos )
+        {
+            vlc_mutex_unlock( &p_i->lock );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        /* Remove the complete categorie */
+        for( i = 0; i < p_cat->i_infos; i++ )
+        {
+            free( p_cat->pp_infos[i]->psz_name );
+            if( p_cat->pp_infos[i]->psz_value )
+                free( p_cat->pp_infos[i]->psz_value );
+            free( p_cat->pp_infos[i] );
+        }
+        if( p_cat->pp_infos )
+            free( p_cat->pp_infos );
+        REMOVE_ELEM( p_i->pp_categories, p_i->i_categories, i_cat );
+    }
+    vlc_mutex_unlock( &p_i->lock );
+
+
+    vlc_event_t event;
+    event.type = vlc_InputItemInfoChanged;
+    vlc_event_send( &p_i->event_manager, &event );
+
+    return VLC_SUCCESS;
+}
+
 
 input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,

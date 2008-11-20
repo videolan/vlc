@@ -179,7 +179,8 @@ VLC_EXPORT( void,   input_item_MetaMerge, ( input_item_t *p_i, const vlc_meta_t 
 #define input_item_GetSetting( item )        input_item_GetMeta( item, vlc_meta_Setting )
 
 VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
-VLC_EXPORT(int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
+VLC_EXPORT( int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
+VLC_EXPORT( int, input_item_DelInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name ) );
 
 #define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, -1 )
 #define input_item_NewExt(a,b,c,d,e,f) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f)
