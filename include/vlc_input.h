@@ -418,9 +418,6 @@ typedef enum input_state_e
 #define INPUT_UPDATE_META       0x0040
 #define INPUT_UPDATE_SIGNAL     0x0080
 
-/* Input control XXX: internal */
-#define INPUT_CONTROL_FIFO_SIZE    100
-
 /** Get the input item for an input thread */
 VLC_EXPORT(input_item_t*, input_GetItem, (input_thread_t*));
 

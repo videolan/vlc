@@ -36,6 +36,9 @@
 /*****************************************************************************
  *  Private input fields
  *****************************************************************************/
+
+#define INPUT_CONTROL_FIFO_SIZE    100
+
 /* input_source_t: gathers all information per input source */
 typedef struct
 {
