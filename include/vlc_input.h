@@ -398,8 +398,6 @@ typedef enum input_state_e
     PLAYING_S,
     PAUSE_S,
     STOP_S,
-    FORWARD_S,
-    BACKWARD_S,
     END_S,
     ERROR_S,
 } input_state_e;

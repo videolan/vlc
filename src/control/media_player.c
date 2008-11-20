@@ -57,8 +57,6 @@ static const libvlc_state_t vlc_to_libvlc_state_array[] =
     [PLAYING_S]     = libvlc_Playing,
     [PAUSE_S]       = libvlc_Paused,
     [STOP_S]        = libvlc_Stopped,
-    [FORWARD_S]     = libvlc_Forward,
-    [BACKWARD_S]    = libvlc_Backward,
     [END_S]         = libvlc_Ended,
     [ERROR_S]       = libvlc_Error,
 };
@@ -171,14 +169,6 @@ input_state_changed( const vlc_event_t * event, void * p_userdata )
         case STOP_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, NULL);
             forwarded_event.type = libvlc_MediaPlayerStopped;
-            break;
-        case FORWARD_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Forward, NULL);
-            forwarded_event.type = libvlc_MediaPlayerForward;
-            break;
-        case BACKWARD_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Backward, NULL);
-            forwarded_event.type = libvlc_MediaPlayerBackward;
             break;
         case END_S:
             libvlc_media_set_state( p_mi->p_md, libvlc_Ended, NULL);

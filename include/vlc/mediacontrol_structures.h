@@ -75,7 +75,6 @@ typedef enum {
     mediacontrol_UndefinedStatus=0, mediacontrol_InitStatus,
     mediacontrol_BufferingStatus, mediacontrol_PlayingStatus,
     mediacontrol_PauseStatus,     mediacontrol_StopStatus,
-    mediacontrol_ForwardStatus,   mediacontrol_BackwardStatus,
     mediacontrol_EndStatus,       mediacontrol_ErrorStatus,
 } mediacontrol_PlayerStatus;
 

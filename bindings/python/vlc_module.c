@@ -150,10 +150,6 @@ initvlc( void )
                              mediacontrol_PlayingStatus );
     PyModule_AddIntConstant( p_module, "PauseStatus",
                              mediacontrol_PauseStatus );
-    PyModule_AddIntConstant( p_module, "ForwardStatus",
-                             mediacontrol_ForwardStatus );
-    PyModule_AddIntConstant( p_module, "BackwardStatus",
-                             mediacontrol_BackwardStatus );
     PyModule_AddIntConstant( p_module, "InitStatus",
                              mediacontrol_InitStatus );
     PyModule_AddIntConstant( p_module, "EndStatus",

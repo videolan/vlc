@@ -322,7 +322,7 @@ VLC_PUBLIC_API char * libvlc_media_get_meta(
  * Get current state of media descriptor object. Possible media states
  * are defined in libvlc_structures.c ( libvlc_NothingSpecial=0,
  * libvlc_Opening, libvlc_Buffering, libvlc_Playing, libvlc_Paused,
- * libvlc_Stopped, libvlc_Forward, libvlc_Backward, libvlc_Ended,
+ * libvlc_Stopped, libvlc_Ended,
  * libvlc_Error).
  *
  * @see libvlc_state_t

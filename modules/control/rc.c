@@ -75,8 +75,6 @@ static const char *ppsz_input_state[] = {
     N_("Play"),
     N_("Pause"),
     N_("Stop"),
-    N_("Forward"),
-    N_("Backward"),
     N_("End"),
     N_("Error"),
 };
