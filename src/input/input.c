@@ -156,7 +156,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     msg_Dbg( p_input, "Creating an input for '%s'", psz_name);
 
     free( psz_name );
-    psz_name = NULL;
 
     /* Start a timer to mesure how long it takes
      * to launch an input */
@@ -1766,12 +1765,12 @@ static bool Control( input_thread_t *p_input, int i_type,
                 }
             }
 
-            if( (i_rate < 0) && p_input->p->input.b_rescale_ts )
+            if( i_rate < 0 && p_input->p->input.b_rescale_ts )
             {
                 msg_Dbg( p_input, "cannot set negative rate" );
                 i_rate = INPUT_RATE_MIN;
             }
-            else if( (i_rate > 0) && (i_rate < INPUT_RATE_MIN) )
+            else if( i_rate > 0 && i_rate < INPUT_RATE_MIN )
             {
                 msg_Dbg( p_input, "cannot set rate faster" );
                 i_rate = INPUT_RATE_MIN;
@@ -1782,8 +1781,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 i_rate = INPUT_RATE_MAX;
             }
             if( i_rate != INPUT_RATE_DEFAULT &&
-                ( /*( !p_input->b_can_pace_control && !p_input->p->b_can_rate_control ) ||*/
-                  ( !p_input->p->b_can_rate_control && !p_input->p->input.b_rescale_ts ) ||
+                ( ( !p_input->p->b_can_rate_control && !p_input->p->input.b_rescale_ts ) ||
                   ( p_input->p->p_sout && !p_input->p->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
