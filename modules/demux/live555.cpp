@@ -1371,8 +1371,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_pcr = 0;
             p_sys->i_npt = 0.0;
 
-            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-
             *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() );
             msg_Dbg( p_demux, "PLAY with new Scale %0.2f (%d)", p_sys->ms->scale(), (*pi_int) );
             return VLC_SUCCESS;
