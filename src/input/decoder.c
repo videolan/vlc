@@ -370,7 +370,12 @@ void input_DecoderDecode( decoder_t *p_dec, block_t *p_block )
 
     if( p_owner->p_input->p->b_out_pace_control )
     {
-        block_FifoPace( p_owner->p_fifo, 10, SIZE_MAX );
+        /* The fifo is not consummed when buffering and so will
+         * deadlock vlc.
+         * There is no need to lock as b_buffering is never modify
+         * inside decoder thread. */
+        if( !p_owner->b_buffering )
+            block_FifoPace( p_owner->p_fifo, 10, SIZE_MAX );
     }
     else if( block_FifoSize( p_owner->p_fifo ) > 50000000 /* 50 MB */ )
     {
