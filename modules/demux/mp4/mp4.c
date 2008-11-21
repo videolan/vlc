@@ -1958,9 +1958,9 @@ static int TrackGotoChunkSample( demux_t *p_demux, mp4_track_t *p_track,
     bool b_reselect = false;
 
     /* now see if actual es is ok */
-    if( (p_track->i_chunk >= p_track->i_chunk_count - 1) ||
-        (p_track->chunk[p_track->i_chunk].i_sample_description_index !=
-            p_track->chunk[i_chunk].i_sample_description_index) )
+    if( p_track->i_chunk >= p_track->i_chunk_count ||
+        p_track->chunk[p_track->i_chunk].i_sample_description_index !=
+            p_track->chunk[i_chunk].i_sample_description_index )
     {
         msg_Warn( p_demux, "recreate ES for track[Id 0x%x]",
                   p_track->i_track_ID );
