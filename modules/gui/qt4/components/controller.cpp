@@ -378,6 +378,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int* i_size,
             widget = advControls;
             *i_size = advControls->getWidth();
         }
+        break;
     case REVERSE_BUTTON:{
         QToolButton *reverseButton = new QToolButton;
         setupButton( reverseButton );
