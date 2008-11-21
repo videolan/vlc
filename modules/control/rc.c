@@ -1086,7 +1086,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "fastforward" ) )
     {
-        if( var_GetBool( p_input, "can-rewind" ) )
+        if( var_GetBool( p_input, "can-rate" ) )
         {
             int i_rate = var_GetInteger( p_input, "rate" );
             i_rate = (i_rate < 0) ? -i_rate : i_rate * 2;
