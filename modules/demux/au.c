@@ -109,12 +109,11 @@ static int Open( vlc_object_t *p_this )
     int          i_cat;
     int          i_samples, i_modulo;
 
-    CHECK_PEEK( p_peek, 4 );
+    if( stream_Peek( p_demux->s , &p_peek, 4 ) < 4 )
+        return VLC_EGENERIC;
 
     if( memcmp( p_peek, ".snd", 4 ) )
-    {
         return VLC_EGENERIC;
-    }
 
     /* skip signature */
     stream_Read( p_demux->s, NULL, 4 );   /* cannot fail */

@@ -79,3 +79,28 @@ void Close_iTML ( vlc_object_t * );
 
 #define HANDLE_PLAY_AND_RELEASE \
     vlc_object_release( p_input_thread );
+
+
+#define STANDARD_DEMUX_INIT_MSG( msg ) do { \
+    DEMUX_INIT_COMMON();                    \
+    msg_Dbg( p_demux, "%s", msg ); } while(0)
+
+#define DEMUX_BY_EXTENSION_MSG( ext, msg ) \
+    demux_t *p_demux = (demux_t *)p_this; \
+    if( !demux_IsPathExtension( p_demux, ext ) ) \
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT_MSG( msg );
+
+#define DEMUX_BY_EXTENSION_OR_FORCED_MSG( ext, module, msg ) \
+    demux_t *p_demux = (demux_t *)p_this; \
+    if( !demux_IsPathExtension( p_demux, ext ) && !demux_IsForced( p_demux, module ) ) \
+        return VLC_EGENERIC; \
+    STANDARD_DEMUX_INIT_MSG( msg );
+
+
+#define CHECK_PEEK( zepeek, size ) do { \
+    if( stream_Peek( p_demux->s , &zepeek, size ) < size ){ \
+        msg_Dbg( p_demux, "not enough data" ); return VLC_EGENERIC; } } while(0)
+
+#define POKE( peek, stuff, size ) (strncasecmp( (const char *)peek, stuff, size )==0)
+
