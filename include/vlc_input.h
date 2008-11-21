@@ -407,7 +407,7 @@ typedef enum input_state_e
  * A rate above 1000 plays the movie slower.
  */
 #define INPUT_RATE_DEFAULT  1000
-#define INPUT_RATE_MIN       125            /* Up to 8/1 */
+#define INPUT_RATE_MIN        32            /* Up to 32/1 */
 #define INPUT_RATE_MAX     32000            /* Up to 1/32 */
 
 /* i_update field of access_t/demux_t */
