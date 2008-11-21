@@ -5,6 +5,7 @@ Playback:
  * Instant pausing
  * Frame-By-Frame Support
  * Timeshift support
+ * RTSP trickplay support
 
 Access:
  * RTSP authentication with Darwing Streaming Server
