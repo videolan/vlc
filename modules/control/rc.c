@@ -1086,15 +1086,33 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "fastforward" ) )
     {
-        val.i_int = config_GetInt( p_intf, "key-jump+extrashort" );
-        var_Set( p_intf->p_libvlc, "key-pressed", val );
+        if( var_GetBool( p_input, "can-rewind" ) )
+        {
+            int i_rate = var_GetInteger( p_input, "rate" );
+            i_rate = (i_rate < 0) ? -i_rate : i_rate * 2;
+            var_SetInteger( p_input, "rate", i_rate );
+        }
+        else
+        {
+            val.i_int = config_GetInt( p_intf, "key-jump+extrashort" );
+            var_Set( p_intf->p_libvlc, "key-pressed", val );
+        }
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "rewind" ) )
     {
-        val.i_int = config_GetInt( p_intf, "key-jump-extrashort" );
-        var_Set( p_intf->p_libvlc, "key-pressed", val );
+        if( var_GetBool( p_input, "can-rewind" ) )
+        {
+            int i_rate = var_GetInteger( p_input, "rate" );
+            i_rate = (i_rate > 0) ? -i_rate : i_rate / 2;
+            var_SetInteger( p_input, "rate", i_rate );
+        }
+        else
+        {
+            val.i_int = config_GetInt( p_intf, "key-jump-extrashort" );
+            var_Set( p_intf->p_libvlc, "key-pressed", val );
+        }
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
