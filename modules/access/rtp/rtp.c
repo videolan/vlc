@@ -179,12 +179,15 @@ static int Open (vlc_object_t *obj)
     {
         case IPPROTO_UDP:
         case IPPROTO_UDPLITE:
-            fd = net_OpenDgram (obj, dhost, (dport + 1) & ~1,
-                                shost, (sport + 1) & ~1, AF_UNSPEC, tp);
+            if ((dport & 1) != 0 || (sport & 1) != 0)
+                msg_Err (obj, "Using odd port number is higly discouraged");
+
+            fd = net_OpenDgram (obj, dhost, dport,
+                                shost, sport, AF_UNSPEC, tp);
             if (fd == -1)
                 break;
-            rtcp_fd = net_OpenDgram (obj, dhost, dport | 1, shost,
-                                     sport ? (sport | 1) : 0, AF_UNSPEC, tp);
+            rtcp_fd = net_OpenDgram (obj, dhost, dport + 1, shost,
+                                     sport ? (sport + 1) : 0, AF_UNSPEC, tp);
             break;
 
          case IPPROTO_DCCP:
