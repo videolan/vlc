@@ -497,8 +497,12 @@ static int Demux( demux_t *p_demux )
 
                 if( p_sys->b_skip_ads && b_skip_entry )
                 {
+                    char *psz_current_input_name = input_item_GetName( p_current_input );
+
                     msg_Dbg( p_demux, "skipped entry %d %s (%s)",
-                    i_entry_count, ( psz_title_entry ? psz_title_entry : p_current_input->psz_name ), psz_href );
+                             i_entry_count,
+                             ( psz_title_entry ? psz_title_entry : psz_current_input_name ), psz_href );
+                    free( psz_current_input_name );
                 }
                 else
                 {
@@ -521,7 +525,8 @@ static int Demux( demux_t *p_demux )
                     }
 
                     /* create the new entry */
-                    if( asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : p_current_input->psz_name ) ) != -1 )
+                    char *psz_current_input_name = input_item_GetName( p_current_input );
+                    if( asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : psz_current_input_name ) ) != -1 )
                     {
                         p_entry = input_item_NewExt( p_demux, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
                         FREENULL( psz_name );
@@ -540,6 +545,7 @@ static int Demux( demux_t *p_demux )
                         input_item_AddSubItem( p_current_input, p_entry );
                         vlc_gc_decref( p_entry );
                     }
+                    free( psz_current_input_name );
                 }
 
                 /* cleanup entry */;
