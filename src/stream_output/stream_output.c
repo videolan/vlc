@@ -42,8 +42,9 @@
 #include "stream_output.h"
 
 #include <vlc_meta.h>
+#include <vlc_block.h>
 
-#include "input/input_internal.h"
+#include "input/input_interface.h"
 
 #undef DEBUG_BUFFER
 /*****************************************************************************
@@ -154,52 +155,43 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
  *****************************************************************************/
 void sout_UpdateStatistic( sout_instance_t *p_sout, sout_statistic_t i_type, int i_delta )
 {
-    input_thread_t *p_input;
-    int i_bytes; /* That's pretty stupid to define it as an integer, it will overflow
-                    really fast ... */
-
-    if( !libvlc_stats (p_sout) )
+    if( !libvlc_stats( p_sout ) )
         return;
 
-    /* FIXME that's ugly
-     * TODO add a private (ie not VLC_EXPORTed) input_UpdateStatistic for that */
-    p_input = vlc_object_find( p_sout, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_input || p_input->i_state == INIT_S || p_input->i_state == ERROR_S )
+    /* */
+    input_thread_t *p_input = vlc_object_find( p_sout, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( !p_input )
         return;
 
+    int i_input_type;
     switch( i_type )
     {
-#define I(c) stats_UpdateInteger( p_input, p_input->p->counters.c, i_delta, NULL )
     case SOUT_STATISTIC_DECODED_VIDEO:
-        I(p_decoded_video);
+        i_input_type = SOUT_STATISTIC_DECODED_VIDEO;
         break;
     case SOUT_STATISTIC_DECODED_AUDIO:
-        I(p_decoded_audio);
+        i_input_type = SOUT_STATISTIC_DECODED_AUDIO;
         break;
     case SOUT_STATISTIC_DECODED_SUBTITLE:
-        I(p_decoded_sub);
+        i_input_type = SOUT_STATISTIC_DECODED_SUBTITLE;
         break;
-#if 0
-    case SOUT_STATISTIC_ENCODED_VIDEO:
-    case SOUT_STATISTIC_ENCODED_AUDIO:
-    case SOUT_STATISTIC_ENCODED_SUBTITLE:
-        msg_Warn( p_sout, "Not yet supported statistic type %d", i_type );
-        break;
-#endif
 
     case SOUT_STATISTIC_SENT_PACKET:
-        I(p_sout_sent_packets);
+        i_input_type = SOUT_STATISTIC_SENT_PACKET;
         break;
-#undef I
+
     case SOUT_STATISTIC_SENT_BYTE:
-        if( !stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes, i_delta, &i_bytes ) )
-            stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate, i_bytes, NULL );
+        i_input_type = SOUT_STATISTIC_SENT_BYTE;
         break;
 
     default:
-        msg_Err( p_sout, "Invalid statistic type %d (internal error)", i_type );
-        break;
+        msg_Err( p_sout, "Not yet supported statistic type %d", i_type );
+        vlc_object_release( p_input );
+        return;
     }
+
+    input_UpdateStatistic( p_input, i_input_type, i_delta );
+
     vlc_object_release( p_input );
 }
 /*****************************************************************************

@@ -39,7 +39,7 @@ int  input_DownloadAndCacheArt( playlist_t *, input_item_t * );
 
 void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed );
 
-typedef struct playlist_album_t
+typedef struct
 {
     char *psz_artist;
     char *psz_album;
@@ -60,5 +60,23 @@ input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, sout_instance_t * );
 
 sout_instance_t * input_DetachSout( input_thread_t *p_input );
+
+/* */
+typedef enum
+{
+    INPUT_STATISTIC_DECODED_VIDEO,
+    INPUT_STATISTIC_DECODED_AUDIO,
+    INPUT_STATISTIC_DECODED_SUBTITLE,
+
+    /* Use them only if you do not goes through a access_out module */
+    INPUT_STATISTIC_SENT_PACKET,
+    INPUT_STATISTIC_SENT_BYTE,
+
+} input_statistic_t;
+/**
+ * It will update internal input statistics from external sources.
+ * XXX For now, the only one allowed to do it is stream_out and input core.
+ */
+void input_UpdateStatistic( input_thread_t *, input_statistic_t, int i_delta );
 
 #endif

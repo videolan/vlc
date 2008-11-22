@@ -3155,6 +3155,45 @@ bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
 }
 
 /*****************************************************************************
+ * Statistics
+ *****************************************************************************/
+void input_UpdateStatistic( input_thread_t *p_input,
+                            input_statistic_t i_type, int i_delta )
+{
+    assert( p_input->i_state != INIT_S );
+
+    vlc_mutex_lock( &p_input->p->counters.counters_lock);
+    switch( i_type )
+    {
+#define I(c) stats_UpdateInteger( p_input, p_input->p->counters.c, i_delta, NULL )
+    case INPUT_STATISTIC_DECODED_VIDEO:
+        I(p_decoded_video);
+        break;
+    case INPUT_STATISTIC_DECODED_AUDIO:
+        I(p_decoded_audio);
+        break;
+    case INPUT_STATISTIC_DECODED_SUBTITLE:
+        I(p_decoded_sub);
+        break;
+    case INPUT_STATISTIC_SENT_PACKET:
+        I(p_sout_sent_packets);
+        break;
+#undef I
+    case INPUT_STATISTIC_SENT_BYTE:
+    {
+        int i_bytes; /* That's pretty stupid to define it as an integer, it will overflow
+                        really fast ... */
+        if( !stats_UpdateInteger( p_input, p_input->p->counters.p_sout_sent_bytes, i_delta, &i_bytes ) )
+            stats_UpdateFloat( p_input, p_input->p->counters.p_sout_send_bitrate, i_bytes, NULL );
+        break;
+    }
+    default:
+        msg_Err( p_input, "Invalid statistic type %d (internal error)", i_type );
+        break;
+    }
+    vlc_mutex_unlock( &p_input->p->counters.counters_lock);
+}
+/*****************************************************************************
  * input_get_event_manager
  *****************************************************************************/
 vlc_event_manager_t *input_get_event_manager( input_thread_t *p_input )
