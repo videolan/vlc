@@ -783,6 +783,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->p_buffer    = (uint8_t *)malloc( 65536 );
             if( !tk->p_buffer )
             {
+                free( tk );
                 delete iter;
                 return VLC_ENOMEM;
             }
