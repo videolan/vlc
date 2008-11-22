@@ -673,11 +673,11 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
  *****************************************************************************/
 static int OpenVideo( decoder_t *p_dec )
 {
+#ifndef WIN32
     decoder_sys_t *p_sys = malloc( sizeof( decoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
-#ifndef WIN32
     long                                i_result;
     ComponentDescription                desc;
     Component                           prev;
