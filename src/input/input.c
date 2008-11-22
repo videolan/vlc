@@ -60,8 +60,8 @@
  *****************************************************************************/
 static void Destructor( input_thread_t * p_input );
 
-static  void* Run            ( vlc_object_t *p_this );
-static  void* RunAndDestroy  ( vlc_object_t *p_this );
+static  void *Run            ( vlc_object_t *p_this );
+static  void *RunAndDestroy  ( vlc_object_t *p_this );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, sout_instance_t * );
@@ -2791,20 +2791,13 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
     }
     free( psz_arturl );
 
-    /* A bit ugly */
-    p_meta = NULL;
-    if( vlc_dictionary_keys_count( &p_item->p_meta->extra_tags ) > 0 )
-    {
-        p_meta = vlc_meta_New();
-        vlc_meta_Merge( p_meta, input_item_GetMetaObject( p_item ) );
-    }
-
-    if( psz_title )
-        input_item_SetName( p_item, psz_title );
-    free( psz_title );
-
     vlc_mutex_unlock( &p_item->lock );
 
+    if( psz_title )
+    {
+        input_item_SetName( p_item, psz_title );
+        free( psz_title );
+    }
     input_item_SetPreparsed( p_item, true );
 
     input_SendEventMeta( p_input );
@@ -2914,10 +2907,11 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
     else if( i_state == END_S )
         p_input->b_eof = true;
 
-    input_item_SetHasErrorWhenReading( p_input->p->input.p_item, (i_state == ERROR_S) );
-
     if( b_changed )
+    {
+        input_item_SetErrorWhenReading( p_input->p->input.p_item, p_input->b_error );
         input_SendEventState( p_input, i_state );
+    }
 }
 
 

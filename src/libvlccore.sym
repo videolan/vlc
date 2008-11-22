@@ -171,14 +171,12 @@ input_item_DelInfo
 input_item_GetDuration
 input_item_GetInfo
 input_item_GetMeta
-input_item_GetMetaObject
 input_item_GetName
 input_item_GetURI
 input_item_HasErrorWhenReading
 input_item_IsArtFetched
 input_item_IsPreparsed
 input_item_MetaMatch
-input_item_MetaMerge
 __input_item_NewExt
 input_item_NewWithType
 input_item_SetDuration

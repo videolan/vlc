@@ -120,15 +120,11 @@ VLC_EXPORT( void, input_item_AddSubItem, ( input_item_t *p_parent, input_item_t 
 /* Flags handled within input_item_AddOpt() */
 #define VLC_INPUT_OPTION_UNIQUE  0x100
 
-VLC_EXPORT( int, input_item_AddOpt, ( input_item_t *, const char *str, unsigned flags ) );
-VLC_EXPORT( int, input_item_AddOption, (input_item_t *item, const char *str) );
-VLC_EXPORT( int ,input_item_AddOption, (input_item_t *item, const char *str) );
-VLC_EXPORT( bool,input_item_HasErrorWhenReading, (input_item_t *item) );
-VLC_EXPORT( void, input_item_SetMeta, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz_val ));
-
-VLC_EXPORT( bool,input_item_HasErrorWhenReading, (input_item_t *item) );
-
-VLC_EXPORT( bool,input_item_MetaMatch, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz ) );
+VLC_EXPORT( int,  input_item_AddOpt, ( input_item_t *, const char *str, unsigned flags ) );
+VLC_EXPORT( int,  input_item_AddOption, (input_item_t *, const char * ) );
+VLC_EXPORT( bool, input_item_HasErrorWhenReading, ( input_item_t * ) );
+VLC_EXPORT( void, input_item_SetMeta, ( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val ));
+VLC_EXPORT( bool, input_item_MetaMatch, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz ) );
 VLC_EXPORT( char *, input_item_GetMeta, ( input_item_t *p_i, vlc_meta_type_t meta_type ) );
 VLC_EXPORT( char *, input_item_GetName, ( input_item_t * p_i ) );
 VLC_EXPORT( char *, input_item_GetURI, ( input_item_t * p_i ) );
@@ -137,8 +133,6 @@ VLC_EXPORT(mtime_t, input_item_GetDuration, ( input_item_t * p_i ) );
 VLC_EXPORT( void,   input_item_SetDuration, ( input_item_t * p_i, mtime_t i_duration ));
 VLC_EXPORT( bool,   input_item_IsPreparsed, ( input_item_t *p_i ));
 VLC_EXPORT( bool,   input_item_IsArtFetched, ( input_item_t *p_i ));
-VLC_EXPORT( const vlc_meta_t *, input_item_GetMetaObject, ( input_item_t *p_i ));
-VLC_EXPORT( void,   input_item_MetaMerge, ( input_item_t *p_i, const vlc_meta_t * p_new_meta ));
 
 
 #define input_item_SetTitle( item, b )       input_item_SetMeta( item, vlc_meta_Title, b )
@@ -419,7 +413,10 @@ typedef enum input_state_e
 #define INPUT_UPDATE_META       0x0040
 #define INPUT_UPDATE_SIGNAL     0x0080
 
-/** Get the input item for an input thread */
+/** Get the input item for an input thread
+ * FIXME see src/input/item.c but is is unsafe unless
+ * you hold p_input
+ */
 VLC_EXPORT(input_item_t*, input_GetItem, (input_thread_t*));
 
 typedef struct input_thread_private_t input_thread_private_t;

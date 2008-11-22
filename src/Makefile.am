@@ -322,6 +322,7 @@ SOURCES_libvlc_common = \
 	input/event.h \
 	input/stream.h \
 	input/input_internal.h \
+	input/input_interface.h \
 	input/vlm_internal.h \
 	input/stream.c \
 	input/stream_memory.c \

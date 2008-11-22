@@ -32,6 +32,7 @@
 #include <vlc_demux.h>
 #include <vlc_input.h>
 #include <libvlc.h>
+#include "input_interface.h"
 
 /*****************************************************************************
  *  Private input fields
@@ -233,92 +234,18 @@ static inline void input_ControlPush( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->p->lock_control );
 }
 
-/** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
- * anyway. */
-
-static inline void input_item_SetPreparsed( input_item_t *p_i, bool preparsed )
-{
-    bool send_event = false;
-
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    vlc_mutex_lock( &p_i->lock );
-    int new_status;
-    if( preparsed )
-        new_status = p_i->p_meta->i_status | ITEM_PREPARSED;
-    else
-        new_status = p_i->p_meta->i_status & ~ITEM_PREPARSED;
-    if( p_i->p_meta->i_status != new_status )
-    {
-        p_i->p_meta->i_status = new_status;
-        send_event = true;
-    }
-
-    vlc_mutex_unlock( &p_i->lock );
-
-    if( send_event )
-    {
-        vlc_event_t event;
-        event.type = vlc_InputItemPreparsedChanged;
-        event.u.input_item_preparsed_changed.new_status = new_status;
-        vlc_event_send( &p_i->event_manager, &event );
-    }
-}
-
-static inline void input_item_SetArtNotFound( input_item_t *p_i, bool notfound )
-{
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    if( notfound )
-        p_i->p_meta->i_status |= ITEM_ART_NOTFOUND;
-    else
-        p_i->p_meta->i_status &= ~ITEM_ART_NOTFOUND;
-}
-
-static inline void input_item_SetArtFetched( input_item_t *p_i, bool artfetched )
-{
-    if( !p_i->p_meta )
-        p_i->p_meta = vlc_meta_New();
-
-    if( artfetched )
-        p_i->p_meta->i_status |= ITEM_ART_FETCHED;
-    else
-        p_i->p_meta->i_status &= ~ITEM_ART_FETCHED;
-}
-
-void input_item_SetHasErrorWhenReading( input_item_t *p_i, bool error );
-
 /**********************************************************************
  * Item metadata
  **********************************************************************/
-typedef struct playlist_album_t
-{
-    char *psz_artist;
-    char *psz_album;
-    char *psz_arturl;
-    bool b_found;
-} playlist_album_t;
-
-int         input_ArtFind       ( playlist_t *, input_item_t * );
-int         input_DownloadAndCacheArt ( playlist_t *, input_item_t * );
-
-/* Becarefull; p_item lock HAS to be taken */
+/* input_ExtractAttachmentAndCacheArt:
+ *  Becarefull; p_item lock HAS to be taken */
 void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input );
+
+void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error );
 
 /***************************************************************************
  * Internal prototypes
  ***************************************************************************/
-
-/* misc/stats.c */
-input_stats_t *stats_NewInputStats( input_thread_t *p_input );
-
-/* input.c */
-#define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
-input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, sout_instance_t * );
-
-sout_instance_t * input_DetachSout( input_thread_t *p_input );
 
 /* var.c */
 void input_ControlVarInit ( input_thread_t * );

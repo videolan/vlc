@@ -33,6 +33,7 @@
 #include <vlc_playlist.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
+#include "input_internal.h"
 #include "../playlist/playlist_internal.h"
 #include <errno.h>
 #include <limits.h>                                             /* PATH_MAX */
