@@ -806,27 +806,6 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     free( p_add );
 }
 
-/*****************************************************************************
- * Playlist item accessors
- *****************************************************************************/
-
-/**
- * Set the name of a playlist item
- *
- * \param p_item the item
- * \param psz_name the name
- * \return VLC_SUCCESS or VLC_EGENERIC
- */
-int playlist_ItemSetName( playlist_item_t *p_item, const char *psz_name )
-{
-    if( psz_name && p_item )
-    {
-        input_item_SetName( p_item->p_input, psz_name );
-        return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
-}
-
 /***************************************************************************
  * The following functions are local
  ***************************************************************************/

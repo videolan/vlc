@@ -316,9 +316,6 @@ VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( playlist_t *,const ch
 /*************************** Item deletion **************************/
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, bool ) );
 
-/*************************** Item fields accessors **************************/
-VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *, const char * ) );
-
 /******************** Item addition ********************/
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, bool, bool ) );
 VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, const char *const *,int, bool, bool ) );
