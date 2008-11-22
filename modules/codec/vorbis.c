@@ -36,7 +36,6 @@
 #include <vlc_codec.h>
 #include <vlc_aout.h>
 #include <vlc_input.h>
-#include <vlc_playlist.h>
 #include <vlc_sout.h>
 
 #include <ogg/ogg.h>
@@ -611,7 +610,8 @@ static void ParseVorbisComments( decoder_t *p_dec )
     input_item_t *p_item;
     int i = 0;
 
-    if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
+    if( p_input->i_object_type != VLC_OBJECT_INPUT )
+        return;
 
     p_item = input_GetItem( p_input );
 
@@ -685,8 +685,6 @@ static void ParseVorbisComments( decoder_t *p_dec )
                 r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
             }
         }
-        var_SetInteger( pl_Hold( p_input ), "item-change", p_item->i_id );
-        pl_Release( p_input );
         free( psz_comment );
         i++;
     }
