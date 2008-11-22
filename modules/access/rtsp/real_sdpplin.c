@@ -231,16 +231,18 @@ sdpplin_t *sdpplin_parse(char *data) {
 
   sdpplin_t        *desc = malloc(sizeof(sdpplin_t));
   sdpplin_stream_t *stream;
-  char             *buf=malloc(BUFLEN);
-  char             *decoded=malloc(BUFLEN);
+  char             *buf=NULL;
+  char             *decoded=NULL;
   int              handled;
   int              len;
 
   if( !desc ) return NULL;
+  buf = malloc(BUFLEN);
   if( !buf ) {
     free( desc );
     return NULL;
   }
+  decoded = malloc(BUFLEN);
   if( !decoded ) {
     free( buf );
     free( desc );
