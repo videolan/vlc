@@ -463,7 +463,7 @@ static int Manage( vout_thread_t *p_vout )
 
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int &= ~4;
-                    var_Set( p_vout, "mous-button-down", val );
+                    var_Set( p_vout, "mouse-button-down", val );
                     p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
                                                       FIND_ANYWHERE );
                     if( p_intf )
