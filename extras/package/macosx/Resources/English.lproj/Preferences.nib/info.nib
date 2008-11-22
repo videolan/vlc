@@ -10,6 +10,10 @@
 		<string>345 426 590 230 0 0 1280 778 </string>
 		<key>2330</key>
 		<string>345 222 590 502 0 0 1280 778 </string>
+		<key>2440</key>
+		<string>345 307 590 389 0 0 1280 778 </string>
+		<key>2523</key>
+		<string>345 341 590 343 0 0 1280 778 </string>
 		<key>2562</key>
 		<string>345 220 590 505 0 0 1280 778 </string>
 		<key>2668</key>
@@ -23,16 +27,11 @@
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>2330</integer>
-		<integer>2265</integer>
 		<integer>1530</integer>
-		<integer>2677</integer>
-		<integer>2311</integer>
-		<integer>2668</integer>
-		<integer>2562</integer>
+		<integer>2265</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>9E17</string>
+	<string>9F33</string>
 	<key>targetFramework</key>
 	<string>IBCocoaFramework</string>
 </dict>
