@@ -443,6 +443,9 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         input_item_AddOption( p_input_item, psz_first );
         input_item_AddOption( p_input_item, psz_last );
         input_item_AddOption( p_input_item, psz_opt );
+        const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
+                                   CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
+        input_item_SetDuration( p_input_item, i_duration );
 
 #ifdef HAVE_LIBCDDB
         /* If we have CDDB info, change the name */
