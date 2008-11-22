@@ -34,7 +34,7 @@
  * @{
  */
 
-#include "input/input_internal.h"
+#include "input/input_interface.h"
 #include <assert.h>
 
 typedef struct playlist_preparse_t
