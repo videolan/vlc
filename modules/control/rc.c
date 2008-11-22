@@ -1778,6 +1778,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
                          VLC_VAR_GETLIST, &val, &text ) < 0 )
         {
             vlc_object_release( p_vout );
+            free( psz_value );
             return VLC_EGENERIC;
         }
 
