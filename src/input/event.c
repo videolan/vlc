@@ -33,6 +33,8 @@
 #include "input_internal.h"
 #include "event.h"
 
+static void Trigger( input_thread_t *p_input, int i_type );
+
 /*****************************************************************************
  * Event for input.c
  *****************************************************************************/
@@ -54,12 +56,11 @@ void input_SendEventTimes( input_thread_t *p_input, const input_event_times_t *p
     val.i_time = p_times->i_length;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
-    //var_SetBool( p_input, "intf-change-times", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_TIMES );
 }
 void input_SendEventStatistics( input_thread_t *p_input )
 {
-    var_TriggerCallback( p_input, "stats-change" ); /* FIXME rename */
+    Trigger( p_input, INPUT_EVENT_STATISTICS );
 }
 void input_SendEventRate( input_thread_t *p_input, int i_rate )
 {
@@ -68,7 +69,7 @@ void input_SendEventRate( input_thread_t *p_input, int i_rate )
 	val.i_int = i_rate;
 	var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
-	var_TriggerCallback( p_input, "rate-change" ); /* TODO rename */
+    Trigger( p_input, INPUT_EVENT_RATE );
 }
 void input_SendEventAudioDelay( input_thread_t *p_input, mtime_t i_delay )
 {
@@ -77,7 +78,7 @@ void input_SendEventAudioDelay( input_thread_t *p_input, mtime_t i_delay )
 	val.i_time = i_delay;
 	var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val, NULL );
 
-	//var_SetBool( p_input, "intf-change-delay" ); /* TODO */
+    Trigger( p_input, INPUT_EVENT_AUDIO_DELAY );
 }
 
 void input_SendEventSubtitleDelay( input_thread_t *p_input, mtime_t i_delay )
@@ -87,7 +88,7 @@ void input_SendEventSubtitleDelay( input_thread_t *p_input, mtime_t i_delay )
 	val.i_time = i_delay;
 	var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val, NULL );
 
-	//var_SetBool( p_input, "intf-change-delay" ); /* TODO */
+    Trigger( p_input, INPUT_EVENT_SUBTITLE_DELAY );
 }
 
 /* TODO and file name ? */
@@ -98,7 +99,7 @@ void input_SendEventRecord( input_thread_t *p_input, bool b_recording )
 	val.b_bool = b_recording;
 	var_Change( p_input, "record", VLC_VAR_SETVALUE, &val, NULL );
 
-	var_TriggerCallback( p_input, "intf-change" ); /* FIXME */
+    Trigger( p_input, INPUT_EVENT_RECORD );
 }
 
 void input_SendEventTitle( input_thread_t *p_input, int i_title )
@@ -108,9 +109,9 @@ void input_SendEventTitle( input_thread_t *p_input, int i_title )
 	val.i_int = i_title;
 	var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
 
-	input_ControlVarTitle( p_input, i_title ); /* FIXME ??? */
+	input_ControlVarTitle( p_input, i_title );
 
-	//var_SetBool( p_input, "intf-change-title" ); /* TODO */
+    Trigger( p_input, INPUT_EVENT_TITLE );
 }
 
 void input_SendEventSeekpoint( input_thread_t *p_input, int i_title, int i_seekpoint )
@@ -119,17 +120,22 @@ void input_SendEventSeekpoint( input_thread_t *p_input, int i_title, int i_seekp
 
 	VLC_UNUSED( i_title );
 	val.i_int = i_seekpoint;
-	var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL);
+	var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
 
-	//var_SetBool( p_input, "intf-change-seekpoint" ); /* TODO. Merge with intf-change-title ?  */
+    Trigger( p_input, INPUT_EVENT_CHAPTER );
 }
 
 void input_SendEventSignal( input_thread_t *p_input, double f_quality, double f_strength )
 {
-	var_SetFloat( p_input, "signal-quality", f_quality );
-	var_SetFloat( p_input, "signal-strength", f_strength );
+    vlc_value_t val;
 
-	/* TODO use Change and then a intf-change-signal instead ? */
+    val.f_float = f_quality;
+	var_Change( p_input, "signal-quality", VLC_VAR_SETVALUE, &val, NULL );
+
+    val.f_float = f_strength;
+	var_Change( p_input, "signal-strength", VLC_VAR_SETVALUE, &val, NULL );
+
+    Trigger( p_input, INPUT_EVENT_SIGNAL );
 }
 
 void input_SendEventState( input_thread_t *p_input, int i_state )
@@ -139,7 +145,7 @@ void input_SendEventState( input_thread_t *p_input, int i_state )
     val.i_int = i_state;
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_STATE );
 
 	/* FIXME remove this ugliness */
     vlc_event_t event;
@@ -149,13 +155,12 @@ void input_SendEventState( input_thread_t *p_input, int i_state )
     vlc_event_send( &p_input->p->event_manager, &event );
 }
 
-#warning "TODO meta"
 /* FIXME: review them because vlc_event_send might be
  * moved inside input_item* functions.
  */
 void input_SendEventMeta( input_thread_t *p_input )
 {
-    var_TriggerCallback( p_input, "intf-change" ); /* TODO intf-change-item-meta */
+    Trigger( p_input, INPUT_EVENT_ITEM_META );
 
 	/* FIXME remove this ugliness ? */
 	vlc_event_t event;
@@ -167,7 +172,7 @@ void input_SendEventMeta( input_thread_t *p_input )
 
 void input_SendEventMetaInfo( input_thread_t *p_input )
 {
-    var_TriggerCallback( p_input, "intf-change" ); /* TODO intf-change-item-info */
+    Trigger( p_input, INPUT_EVENT_ITEM_INFO );
 
 	/* FIXME remove this ugliness */
     vlc_event_t event;
@@ -178,7 +183,7 @@ void input_SendEventMetaInfo( input_thread_t *p_input )
 
 void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name )
 {
-    var_TriggerCallback( p_input, "intf-change" ); /* TODO intf-change-item-name */
+    Trigger( p_input, INPUT_EVENT_ITEM_NAME );
 
 	/* FIXME remove this ugliness */
     vlc_event_t event;
@@ -203,8 +208,7 @@ void input_SendEventProgramAdd( input_thread_t *p_input,
     var_Change( p_input, "program", VLC_VAR_ADDCHOICE,
                 &val, psz_text ? &text : NULL );
 
-    //var_SetBool( p_input, "intf-change-program", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_PROGRAM );
 }
 void input_SendEventProgramDel( input_thread_t *p_input, int i_program )
 {
@@ -213,8 +217,7 @@ void input_SendEventProgramDel( input_thread_t *p_input, int i_program )
     val.i_int = i_program;
     var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
 
-    //var_SetBool( p_input, "intf-change-program", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_PROGRAM );
 }
 void input_SendEventProgramSelect( input_thread_t *p_input, int i_program )
 {
@@ -223,8 +226,7 @@ void input_SendEventProgramSelect( input_thread_t *p_input, int i_program )
     val.i_int = i_program;
     var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
 
-    //var_SetBool( p_input, "intf-change-program", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_PROGRAM );
 }
 
 static const char *GetEsVarName( int i_cat )
@@ -254,8 +256,7 @@ void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id )
         var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_CLEARCHOICES, NULL, NULL );
     }
 
-    //var_SetBool( p_input, "intf-change-es", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_ES );
 }
 void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const char *psz_text )
 {
@@ -268,8 +269,7 @@ void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const c
     var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_ADDCHOICE,
                 &val, psz_text ? &text : NULL );
 
-    //var_SetBool( p_input, "intf-change-es", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_ES );
 }
 
 /* i_id == -1 will unselect */
@@ -280,8 +280,7 @@ void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
     val.i_int = i_id;
     var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_SETVALUE, &val, NULL );
 
-    //var_SetBool( p_input, "intf-change-es", true ); /* TODO */
-    var_TriggerCallback( p_input, "intf-change" );
+    Trigger( p_input, INPUT_EVENT_ES );
 
     /* FIXME to remove this ugliness */
     vlc_event_t event;
@@ -289,3 +288,15 @@ void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
     vlc_event_send( &p_input->p->event_manager, &event );
 }
 
+void input_SendEventVout( input_thread_t *p_input )
+{
+    Trigger( p_input, INPUT_EVENT_VOUT );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static void Trigger( input_thread_t *p_input, int i_type )
+{
+    var_SetInteger( p_input, "intf-event", i_type );
+}

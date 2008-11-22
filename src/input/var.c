@@ -68,6 +68,9 @@ static int FrameNextCallback( vlc_object_t *p_this, char const *psz_cmd,
                               vlc_value_t oldval, vlc_value_t newval,
                               void *p_data );
 
+static int IntfEvent( vlc_object_t *p_this, char const *psz_cmd,
+                      vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
 typedef struct
 {
     const char *psz_name;
@@ -225,14 +228,14 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     if( !p_input->b_preparsing )
     {
-        /* Special "intf-change" variable, it allows intf to set up a callback
-         * to be notified of some changes.
-         *
-         * Add rate-change to inform about rate changin
-         *
-         * stats-change to inform when statistics are computed
-         *
-         * TODO list all changes warn by these callbacks */
+        /* Special "intf-event" variable. */
+        var_Create( p_input, "intf-event", VLC_VAR_INTEGER );
+
+        /* Callback for legacy variables */
+        var_AddCallback( p_input, "intf-event", IntfEvent, NULL );
+
+        /* Legacy variable
+         * TODO remove them when unused */
         static const char *ppsz_event[] = {
             "intf-change",
             "rate-change",
@@ -835,5 +838,23 @@ static int FrameNextCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_ControlPush( p_input, INPUT_CONTROL_SET_FRAME_NEXT, NULL );
 
     return VLC_SUCCESS;
+}
+
+static int IntfEvent( vlc_object_t *p_this, char const *psz_cmd,
+                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
+    switch( newval.i_int )
+    {
+    case INPUT_EVENT_RATE:
+        return var_SetBool( p_this, "rate-change", true );
+    case INPUT_EVENT_STATISTICS:
+        return var_SetBool( p_this, "stats-change", true );
+    case INPUT_EVENT_VOUT:
+        return var_SetBool( p_this, "intf-change-vout", true );
+
+    default:
+        return var_SetBool( p_this, "intf-change", true );
+    }
 }
 

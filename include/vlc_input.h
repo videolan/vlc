@@ -382,29 +382,6 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
  * input defines/constants.
  *****************************************************************************/
 
-/* "state" value */
-/* NOTE: you need to update ppsz_input_state in the RC interface
- * if you modify this list. */
-typedef enum input_state_e
-{
-    INIT_S = 0,
-    OPENING_S,
-    BUFFERING_S,
-    PLAYING_S,
-    PAUSE_S,
-    STOP_S,
-    END_S,
-    ERROR_S,
-} input_state_e;
-
-/* "rate" default, min/max
- * A rate below 1000 plays the movie faster,
- * A rate above 1000 plays the movie slower.
- */
-#define INPUT_RATE_DEFAULT  1000
-#define INPUT_RATE_MIN        32            /* Up to 32/1 */
-#define INPUT_RATE_MAX     32000            /* Up to 1/32 */
-
 /* i_update field of access_t/demux_t */
 #define INPUT_UPDATE_NONE       0x0000
 #define INPUT_UPDATE_SIZE       0x0001
@@ -445,6 +422,147 @@ struct input_thread_t
      * outside of src/input */
     input_thread_private_t *p;
 };
+
+/*****************************************************************************
+ * Input events and variables
+ *****************************************************************************/
+
+/**
+ * \defgroup inputvariable Input variables
+ *
+ * The input provides multiples variable you can write to and/or read from.
+ *
+ * TODO complete the documentation.
+ * The read only variables are:
+ *  - "length"
+ *  - "bookmarks"
+ *  - "seekable (if you can seek, it doesn't say if 'bar display' has be shown FIXME rename can-seek
+ *    or not, for that check position != 0.0)
+ *  - "can-pause"
+ *  - "can-rewind"
+ *  - "can-record" (if a stream can be recorded while playing)
+ *  - "teletext-es" to get the index of spu track that is teletext --1 if no teletext)
+ *
+ * The read-write variables are:
+ *  - state (\see input_state_e)
+ *  - rate, rate-slower, rate-faster
+ *  - position, position-offset
+ *  - time, time-offset
+ *  - title,title-next,title-prev
+ *  - chapter,chapter-next, chapter-prev
+ *  - program, audio-es, video-es, spu-es
+ *  - audio-delay, spu-delay
+ *  - bookmark
+ *  - TODO add special titles variables
+ *
+ * The variable used for event is
+ *  - intf-event (\see input_event_type_e)
+ *
+ * The legacy variable used for event are
+ *  - intf-change
+ *  - intf-change-vout
+ *  - rate-change
+ *  - stats-change
+ * You are advised to change to intf-event as soon as possible.
+ */
+
+/**
+ * Input state
+ *
+ * This enum is used by the variable "state"
+ *
+ * NOTE: you need to update ppsz_input_state in the RC interface
+ * if you modify this list.
+ */
+typedef enum input_state_e
+{
+    INIT_S = 0,
+    OPENING_S,
+    BUFFERING_S,
+    PLAYING_S,
+    PAUSE_S,
+    STOP_S,
+    END_S,
+    ERROR_S,
+} input_state_e;
+
+/**
+ * Input rate.
+ *
+ * It is an integer used by the variable "rate" in the
+ * range [INPUT_RATE_MIN, INPUT_RATE_MAX] the default value
+ * being INPUT_RATE_DEFAULT.
+ *
+ * A value lower than INPUT_RATE_DEFAULT plays faster.
+ * A value higher than INPUT_RATE_DEFAULT plays slower.
+ */
+
+/**
+ * Default rate value
+ */
+#define INPUT_RATE_DEFAULT  1000
+/**
+ * Minimal rate value
+ */
+#define INPUT_RATE_MIN        32            /* Up to 32/1 */
+/**
+ * Maximal rate value
+ */
+#define INPUT_RATE_MAX     32000            /* Up to 1/32 */
+
+/**
+ * Input events
+ *
+ * You can catch input event by adding a callback on the variable "intf-event".
+ * This variable is an integer that will hold a input_event_type_e value.
+ */
+typedef enum input_event_type_e
+{
+    /* "state" has changed */
+    INPUT_EVENT_STATE,
+    /* "rate" has changed */
+    INPUT_EVENT_RATE,
+    /* At least one of "position" or "time" or "length" has changed */
+    INPUT_EVENT_TIMES,
+
+    /* A title has been added or removed or selected.
+     * It imply that chapter has changed (not chapter event is sent) */
+    INPUT_EVENT_TITLE,
+    /* A chapter has been added or removed or selected. */
+    INPUT_EVENT_CHAPTER,
+
+    /* A program has been added or removed or selected */
+    INPUT_EVENT_PROGRAM,
+    /* A ES has been added or removed or selected */
+    INPUT_EVENT_ES,
+
+    /* "record" has changed */
+    INPUT_EVENT_RECORD,
+
+    /* A vout has been created/deleted by *the input*
+     * FIXME some event are not detected yet (audio visualisation) */
+    INPUT_EVENT_VOUT,
+
+    /* input_item_t media has changed */
+    INPUT_EVENT_ITEM_META,
+    /* input_item_t info has changed */
+    INPUT_EVENT_ITEM_INFO,
+    /* input_item_t name has changed */
+    INPUT_EVENT_ITEM_NAME,
+
+    /* Input statistics have been updated */
+    INPUT_EVENT_STATISTICS,
+    /* At least one of "signal-quality" or "signal-strength" has changed */
+    INPUT_EVENT_SIGNAL,
+
+    /* "audio-delay" has changed */
+    INPUT_EVENT_AUDIO_DELAY,
+    /* "spu-delay" has changed */
+    INPUT_EVENT_SUBTITLE_DELAY,
+
+} input_event_type_e;
+
+/** @}*/
 
 /*****************************************************************************
  * Prototypes

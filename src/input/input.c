@@ -106,32 +106,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
  *
- * Variables for _public_ use:
- * * Get and Set:
- *  - state
- *  - rate,rate-slower, rate-faster
- *  - position, position-offset
- *  - time, time-offset
- *  - title,title-next,title-prev
- *  - chapter,chapter-next, chapter-prev
- *  - program, audio-es, video-es, spu-es
- *  - audio-delay, spu-delay
- *  - bookmark
- * * Get only:
- *  - length
- *  - bookmarks
- *  - seekable (if you can seek, it doesn't say if 'bar display' has be shown FIXME rename can-seek
- *    or not, for that check position != 0.0)
- *  - can-pause
- *  - can-record (if a stream can be recorded while playing)
- *  - teletext-es to get the index of spu track that is teletext --1 if no teletext)
- * * For intf callback upon changes:
- *  - intf-change
- *  - intf-change-vout for when a vout is created or destroyed
- *  - rate-change for when playback rate changes
- *  - stats-change for when statistics are updated
- * TODO explain when Callback is called
- * TODO complete this list (?)
+ * XXX Do not forget to update vlc_input.h if you add new variables.
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                                const char *psz_header, bool b_quick,
