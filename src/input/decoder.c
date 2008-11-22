@@ -46,6 +46,7 @@
 #include "input_internal.h"
 #include "clock.h"
 #include "decoder.h"
+#include "event.h"
 
 #include "../video_output/vout_control.h"
 
