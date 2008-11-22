@@ -114,11 +114,11 @@ static const char *const enc_codingmode_list_text[] =
 
 #define ENC_MCBLK_WIDTH "mc-blk-width"
 #define ENC_MCBLK_WIDTH_TEXT N_("Width of motion compensation blocks")
-#define ENC_MCBLK_WIDTH_LONGTEXT N_("")
+#define ENC_MCBLK_WIDTH_LONGTEXT ""
 
 #define ENC_MCBLK_HEIGHT "mc-blk-height"
 #define ENC_MCBLK_HEIGHT_TEXT N_("Height of motion compensation blocks")
-#define ENC_MCBLK_HEIGHT_LONGTEXT N_("")
+#define ENC_MCBLK_HEIGHT_LONGTEXT ""
 
 /* also known as XBSEP and YBSEP */
 #define ENC_MCBLK_OVERLAP "mc-blk-overlap"
