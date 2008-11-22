@@ -251,7 +251,6 @@ modules/access/fake.c
 modules/access/file.c
 modules/access_filter/bandwidth.c
 modules/access_filter/dump.c
-modules/access_filter/timeshift.c
 modules/access/ftp.c
 modules/access/gnomevfs.c
 modules/access/http.c
