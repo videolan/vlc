@@ -192,6 +192,7 @@ void InputManager::customEvent( QEvent *event )
         UpdateStatus();
         UpdateNavigation();
         UpdateMeta();
+        UpdateTeletext();
         break;
     case ItemTitleChanged_Type:
         UpdateNavigation();
