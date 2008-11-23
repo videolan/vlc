@@ -442,7 +442,7 @@ struct input_thread_t
  *  - "can-rate"
  *  - "can-rewind"
  *  - "can-record" (if a stream can be recorded while playing)
- *  - "teletext-es" to get the index of spu track that is teletext --1 if no teletext)
+ *  - "teletext-es" to get the index of spu track that is teletext -1 if no teletext)
  *  - "signal-quality"
  *  - "signal-strength"
  *
@@ -541,6 +541,8 @@ typedef enum input_event_type_e
     INPUT_EVENT_PROGRAM,
     /* A ES has been added or removed or selected */
     INPUT_EVENT_ES,
+    /* "teletext-es" has changed */
+    INPUT_EVENT_TELETEXT,
 
     /* "record" has changed */
     INPUT_EVENT_RECORD,

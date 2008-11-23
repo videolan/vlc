@@ -800,9 +800,9 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
 
     if( b_delete )
     {
-        /* TODO event */
+        /* TODO it should probably be a list */
         if( b_teletext )
-            var_SetInteger( p_sys->p_input, "teletext-es", -1 );
+            input_SendEventTeletext( p_sys->p_input, -1 );
 
         input_SendEventEsDel( p_input, SPU_ES, i_id );
         return;
@@ -860,9 +860,9 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
 
     if( b_teletext )
     {
-        /* TODO event */
+        /* TODO it should probably be a list */
         if( var_GetInteger( p_sys->p_input, "teletext-es" ) < 0 )
-            var_SetInteger( p_sys->p_input, "teletext-es", i_id );
+            input_SendEventTeletext( p_sys->p_input, i_id );
     }
 }
 

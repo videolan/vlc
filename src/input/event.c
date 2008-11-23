@@ -288,6 +288,16 @@ void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
     vlc_event_send( &p_input->p->event_manager, &event );
 }
 
+void input_SendEventTeletext( input_thread_t *p_input, int i_id )
+{
+    vlc_value_t val;
+
+    val.i_int = i_id;
+    var_Change( p_input, "teletext-es", VLC_VAR_SETVALUE, &val, NULL );
+
+    Trigger( p_input, INPUT_EVENT_TELETEXT );
+}
+
 void input_SendEventVout( input_thread_t *p_input )
 {
     Trigger( p_input, INPUT_EVENT_VOUT );
