@@ -30,6 +30,10 @@
 #include "maemo.h"
 #include "maemo_input.h"
 
+static int input_event_cb( vlc_object_t *p_this, const char *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval, void *param );
+
+
 gboolean process_events( gpointer data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)data;
@@ -60,8 +64,7 @@ void set_input( intf_thread_t *p_intf, input_thread_t *p_input )
     {
         p_intf->p_sys->p_input = p_input;
         vlc_object_hold( p_input );
-        var_AddCallback( p_input, "intf-change", interface_changed_cb, p_intf );
-        var_AddCallback( p_input, "state", item_changed_cb, p_intf );
+        var_AddCallback( p_input, "intf-event", input_event_cb, p_intf );
 
         // "Activate" the seekbar
         gtk_widget_set_sensitive( GTK_WIDGET( p_intf->p_sys->p_seekbar ), TRUE );
@@ -74,10 +77,8 @@ void delete_input( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->p_input )
     {
-        var_DelCallback( p_intf->p_sys->p_input, "intf-change",
-                         interface_changed_cb, p_intf );
-        var_DelCallback( p_intf->p_sys->p_input, "state",
-                         item_changed_cb, p_intf );
+        var_DelCallback( p_intf->p_sys->p_input, "intf-event",
+                         input_event_cb, p_intf );
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
 
@@ -187,3 +188,13 @@ int interface_changed_cb( vlc_object_t *p_this, const char *psz_var,
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
     return VLC_SUCCESS;
 }
+
+static int input_event_cb( vlc_object_t *p_this, const char *psz_var,
+                           vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    if( newval.i_int == INPUT_EVENT_STATE )
+        return item_changed_cb( p_this, psz_var, oldval, newval, param );
+    else
+        return interface_changed_cb( p_this, psz_var, oldval, newval, param );
+}
+
