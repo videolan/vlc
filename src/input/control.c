@@ -134,8 +134,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_ADD_INFO:
         {
-            /* FIXME : Impossible to use input_item_AddInfo because of
-             * the ... problem ? */
             char *psz_cat = (char *)va_arg( args, char * );
             char *psz_name = (char *)va_arg( args, char * );
             char *psz_format = (char *)va_arg( args, char * );
