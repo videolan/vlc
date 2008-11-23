@@ -463,13 +463,6 @@ struct input_thread_t
  *
  * The variable used for event is
  *  - intf-event (\see input_event_type_e)
- *
- * The legacy variable used for event are
- *  - intf-change
- *  - intf-change-vout
- *  - rate-change
- *  - stats-change
- * You are advised to change to intf-event as soon as possible.
  */
 
 /**
