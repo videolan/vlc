@@ -62,12 +62,12 @@ static int ReplayGainCallback( vlc_object_t *, char const *,
                                vlc_value_t, vlc_value_t, void * );
 static void ReplayGainSelect( aout_instance_t *, aout_input_t * );
 
-static vout_thread_t *RequestVout( aout_filter_t *,
+static vout_thread_t *RequestVout( void *,
                                    vout_thread_t *, video_format_t * );
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
-int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
+int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_request_vout_t *p_request_vout )
 {
     audio_sample_format_t chain_input_format;
     audio_sample_format_t chain_output_format;
@@ -82,6 +82,17 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
     p_input->p_first_byte_to_mix = NULL;
+
+    /* */
+    if( p_request_vout )
+    {
+        p_input->request_vout = *p_request_vout;
+    }
+    else
+    {
+        p_input->request_vout.pf_request_vout = RequestVout;
+        p_input->request_vout.p_private = p_aout;
+    }
 
     /* Prepare format structure */
     memcpy( &chain_input_format, &p_input->input,
@@ -273,7 +284,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
             vlc_object_attach( p_filter , p_aout );
 
-            p_filter->pf_request_vout = RequestVout;
+            p_filter->request_vout = p_input->request_vout;
             p_filter->p_owner = malloc( sizeof(*p_filter->p_owner) );
             p_filter->p_owner->p_aout  = p_aout;
             p_filter->p_owner->p_input = p_input;
@@ -517,7 +528,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         aout_InputDelete( p_aout, p_input );
 
-        aout_InputNew( p_aout, p_input );
+        aout_InputNew( p_aout, p_input, &p_input->request_vout );
         p_input->p_first_byte_to_mix = p_first_byte_to_mix;
         p_input->fifo = fifo;
         p_input->b_paused = b_paused;
@@ -793,11 +804,11 @@ static void inputResamplingStop( aout_input_t *p_input )
     }
 }
 
-static vout_thread_t *RequestVout( aout_filter_t *p_filter,
+static vout_thread_t *RequestVout( void *p_private,
                                    vout_thread_t *p_vout, video_format_t *p_fmt )
 {
-    /* TODO */
-    return vout_Request( p_filter, p_vout, p_fmt );
+    aout_instance_t *p_aout = p_private;
+    return vout_Request( p_aout, p_vout, p_fmt );
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,

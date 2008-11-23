@@ -2022,6 +2022,17 @@ static void DeleteDecoder( decoder_t * p_dec )
 /*****************************************************************************
  * Buffers allocation callbacks for the decoders
  *****************************************************************************/
+static vout_thread_t *aout_request_vout( void *p_private,
+                                         vout_thread_t *p_vout, video_format_t *p_fmt )
+{
+    decoder_t *p_dec = p_private;
+
+    p_vout =  vout_Request( p_dec, p_vout, p_fmt );
+    input_SendEventVout( p_dec->p_owner->p_input );
+
+    return p_vout;
+}
+
 static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -2053,6 +2064,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         audio_sample_format_t format;
         aout_input_t *p_aout_input;
         aout_instance_t *p_aout;
+        aout_request_vout_t request_vout;
 
         p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
         p_owner->audio = p_dec->fmt_out.audio;
@@ -2074,9 +2086,12 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
             }
         }
 
+        request_vout.pf_request_vout = aout_request_vout;
+        request_vout.p_private = p_dec;
+
         p_aout = p_owner->p_aout;
         p_aout_input = aout_DecNew( p_dec, &p_aout,
-                                    &format, &p_dec->fmt_out.audio_replay_gain );
+                                    &format, &p_dec->fmt_out.audio_replay_gain, &request_vout );
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_aout = p_aout;

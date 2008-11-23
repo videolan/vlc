@@ -439,21 +439,27 @@ struct input_thread_t
  *  - "seekable (if you can seek, it doesn't say if 'bar display' has be shown FIXME rename can-seek
  *    or not, for that check position != 0.0)
  *  - "can-pause"
+ *  - "can-rate"
  *  - "can-rewind"
  *  - "can-record" (if a stream can be recorded while playing)
  *  - "teletext-es" to get the index of spu track that is teletext --1 if no teletext)
+ *  - "signal-quality"
+ *  - "signal-strength"
  *
  * The read-write variables are:
  *  - state (\see input_state_e)
  *  - rate, rate-slower, rate-faster
  *  - position, position-offset
  *  - time, time-offset
- *  - title,title-next,title-prev
- *  - chapter,chapter-next, chapter-prev
+ *  - title, next-title, prev-title
+ *  - chapter, next-chapter, next-chapter-prev
  *  - program, audio-es, video-es, spu-es
  *  - audio-delay, spu-delay
  *  - bookmark
- *  - TODO add special titles variables
+ *  - record
+ *  - frame-next
+ *  - navigation (list of "title %2i")
+ *  - "title %2i"
  *
  * The variable used for event is
  *  - intf-event (\see input_event_type_e)
@@ -539,8 +545,7 @@ typedef enum input_event_type_e
     /* "record" has changed */
     INPUT_EVENT_RECORD,
 
-    /* A vout has been created/deleted by *the input*
-     * FIXME some event are not detected yet (audio visualisation) */
+    /* A vout has been created/deleted by *the input* */
     INPUT_EVENT_VOUT,
 
     /* input_item_t media has changed */

@@ -44,7 +44,8 @@
  *****************************************************************************/
 static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
                               audio_sample_format_t *p_format,
-                              const audio_replay_gain_t *p_replay_gain )
+                              const audio_replay_gain_t *p_replay_gain,
+                              const aout_request_vout_t *p_request_vout )
 {
     aout_input_t * p_input;
 
@@ -131,10 +132,12 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
         /* Create other input streams. */
         for ( i = 0; i < p_aout->i_nb_inputs - 1; i++ )
         {
-            aout_lock_input( p_aout, p_aout->pp_inputs[i] );
-            aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
-            aout_InputNew( p_aout, p_aout->pp_inputs[i] );
-            aout_unlock_input( p_aout, p_aout->pp_inputs[i] );
+            aout_input_t *p_input = p_aout->pp_inputs[i];
+
+            aout_lock_input( p_aout, p_input );
+            aout_InputDelete( p_aout, p_input );
+            aout_InputNew( p_aout, p_input, &p_input->request_vout );
+            aout_unlock_input( p_aout, p_input );
         }
     }
     else
@@ -149,7 +152,7 @@ static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
         goto error;
     }
 
-    aout_InputNew( p_aout, p_input );
+    aout_InputNew( p_aout, p_input, p_request_vout );
     aout_unlock_input_fifos( p_aout );
 
     aout_unlock_mixer( p_aout );
@@ -164,7 +167,8 @@ error:
 aout_input_t * __aout_DecNew( vlc_object_t * p_this,
                               aout_instance_t ** pp_aout,
                               audio_sample_format_t * p_format,
-                              const audio_replay_gain_t *p_replay_gain )
+                              const audio_replay_gain_t *p_replay_gain,
+                              const aout_request_vout_t *p_request_video )
 {
     aout_instance_t *p_aout = *pp_aout;
     if ( p_aout == NULL )
@@ -180,7 +184,7 @@ aout_input_t * __aout_DecNew( vlc_object_t * p_this,
         *pp_aout = p_aout;
     }
 
-    return DecNew( p_this, p_aout, p_format, p_replay_gain );
+    return DecNew( p_this, p_aout, p_format, p_replay_gain, p_request_video );
 }
 
 /*****************************************************************************

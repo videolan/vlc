@@ -381,8 +381,8 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
 vout_thread_t *aout_filter_RequestVout( aout_filter_t *p_filter,
                                         vout_thread_t *p_vout, video_format_t *p_fmt )
 {
-    if( !p_filter->pf_request_vout )
+    if( !p_filter->request_vout.pf_request_vout )
         return NULL;
-    return p_filter->pf_request_vout( p_filter, p_vout, p_fmt );
+    return p_filter->request_vout.pf_request_vout( p_filter->request_vout.p_private, p_vout, p_fmt );
 }
 

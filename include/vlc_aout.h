@@ -222,6 +222,14 @@ struct aout_fifo_t
     audio_date_t            end_date;
 };
 
+/* */
+typedef struct
+{
+    vout_thread_t  *(*pf_request_vout)( void *,
+                                        vout_thread_t *, video_format_t * );
+    void *p_private;
+} aout_request_vout_t;
+
 /** audio output filter */
 typedef struct aout_filter_owner_sys_t aout_filter_owner_sys_t;
 typedef struct aout_filter_sys_t aout_filter_sys_t;
@@ -247,8 +255,7 @@ struct aout_filter_t
 
     /* Vout callback
      * XXX use aout_filter_RequestVout */
-    vout_thread_t          *(*pf_request_vout)( aout_filter_t *,
-                                                vout_thread_t *, video_format_t * );
+    aout_request_vout_t request_vout;
 
     /* Private structure for the owner of the filter */
     aout_filter_owner_sys_t *p_owner;
@@ -305,6 +312,9 @@ struct aout_input_t
     /* */
     bool              b_paused;
     mtime_t           i_pause_date;
+
+    /* */
+    aout_request_vout_t request_vout;
  };
 
 /** an output stream for the audio output */
