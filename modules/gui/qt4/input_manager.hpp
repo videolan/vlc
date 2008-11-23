@@ -43,10 +43,11 @@ enum {
     ItemTitleChanged_Type,
     ItemRateChanged_Type,
     VolumeChanged_Type,
-    ItemSpuChanged_Type,
+    ItemEsChanged_Type,
     ItemTeletextChanged_Type,
     InterfaceVoutUpdate_Type,
     StatisticsUpdate_Type,
+    MetaChanged_Type,
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
