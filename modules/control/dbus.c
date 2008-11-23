@@ -1037,7 +1037,7 @@ static int UpdateCaps( intf_thread_t* p_intf, bool b_playlist_locked )
          * unconditionnaly true */
         if( var_GetBool( p_input, "can-pause" ) )
             i_caps |= CAPS_CAN_PAUSE;
-        if( var_GetBool( p_input, "seekable" ) )
+        if( var_GetBool( p_input, "can-seek" ) )
             i_caps |= CAPS_CAN_SEEK;
         vlc_object_release( p_input );
     }

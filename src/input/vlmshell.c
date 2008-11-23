@@ -1356,7 +1356,7 @@ static vlm_message_t *vlm_ShowMedia( vlm_media_sys_t *p_media )
             APPEND_INPUT_INFO( "rate", "%d", Integer );
             APPEND_INPUT_INFO( "title", "%d", Integer );
             APPEND_INPUT_INFO( "chapter", "%d", Integer );
-            APPEND_INPUT_INFO( "seekable", "%d", Bool );
+            APPEND_INPUT_INFO( "can-seek", "%d", Bool );
         }
 #undef APPEND_INPUT_INFO
         if( asprintf( &psz_tmp, "%d", p_instance->i_index + 1 ) != -1 )

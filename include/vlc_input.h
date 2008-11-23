@@ -436,7 +436,7 @@ struct input_thread_t
  * The read only variables are:
  *  - "length"
  *  - "bookmarks"
- *  - "seekable (if you can seek, it doesn't say if 'bar display' has be shown FIXME rename can-seek
+ *  - "can-seek" (if you can seek, it doesn't say if 'bar display' has be shown
  *    or not, for that check position != 0.0)
  *  - "can-pause"
  *  - "can-rate"

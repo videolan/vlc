@@ -983,7 +983,7 @@
     {
         if( p_input != NULL )
         {
-            var_Get( p_input, "seekable", &val);
+            var_Get( p_input, "can-seek", &val);
             bEnabled = val.b_bool;
         }
         else bEnabled = FALSE;

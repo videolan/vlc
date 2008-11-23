@@ -410,7 +410,7 @@ static void Run( intf_thread_t *p_intf )
         /* Input options */
         else if( p_input )
         {
-            bool b_seekable = var_GetBool( p_input, "seekable" );
+            bool b_seekable = var_GetBool( p_input, "can-seek" );
             int i_interval =0;
 
             if( i_action == ACTIONID_PAUSE )

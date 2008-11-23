@@ -1513,7 +1513,7 @@ static void * manage_cleanup( void * args )
             }
                  
             /* seekable streams */
-            b_seekable = var_GetBool( p_input, "seekable" );
+            b_seekable = var_GetBool( p_input, "can-seek" );
 
             /* check whether slow/fast motion is possible */
             b_control = p_input->b_can_pace_control;

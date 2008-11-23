@@ -84,8 +84,8 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
     {
         vlc_event_manager_t * p_em = input_get_event_manager( p_input_thread );
         vlc_event_detach( p_em, vlc_InputStateChanged, input_state_changed, p_mi );
-        var_DelCallback( p_input_thread, "seekable", input_seekable_changed, p_mi );
-        var_DelCallback( p_input_thread, "pausable", input_pausable_changed, p_mi );
+        var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
+        var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
 
         /* We owned this one */
@@ -586,8 +586,8 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     vlc_event_manager_t * p_em = input_get_event_manager( p_input_thread );
     vlc_event_attach( p_em, vlc_InputStateChanged, input_state_changed, p_mi );
 
-    var_AddCallback( p_input_thread, "seekable", input_seekable_changed, p_mi );
-    var_AddCallback( p_input_thread, "pausable", input_pausable_changed, p_mi );
+    var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
+    var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
 
     vlc_mutex_unlock( &p_mi->object_lock );
@@ -1078,7 +1078,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
             libvlc_exception_clear( p_e );
         return false;
     }
-    var_Get( p_input_thread, "seekable", &val );
+    var_Get( p_input_thread, "can-seek", &val );
     vlc_object_release( p_input_thread );
 
     return val.b_bool;

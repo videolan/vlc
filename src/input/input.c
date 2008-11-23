@@ -2347,7 +2347,7 @@ static int InputSourceInit( input_thread_t *p_input,
                         &val.b_bool );
         if( ret != VLC_SUCCESS )
             val.b_bool = false;
-        var_Set( p_input, "seekable", val );
+        var_Set( p_input, "can-seek", val );
     }
     else
     {
@@ -2431,7 +2431,7 @@ static int InputSourceInit( input_thread_t *p_input,
 
             access_Control( in->p_access, ACCESS_CAN_SEEK,
                              &val.b_bool );
-            var_Set( p_input, "seekable", val );
+            var_Set( p_input, "can-seek", val );
         }
 
         if( b_master )
