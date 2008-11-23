@@ -152,14 +152,6 @@ void InputManager::customEvent( QEvent *event )
          i_type != MetaChanged_Type )
         return;
 
-    /* TODO ItemStateChanged_Type: should probably be reviewed */
-
-    if( i_type == ItemStateChanged_Type )
-    {
-        UpdateNavigation();
-        UpdateTeletext();
-    }
-
     if( !hasInput() ) return;
 
     if( ( i_type != PositionUpdate_Type  &&
