@@ -54,7 +54,8 @@ static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, int, sout_inst
 static void       DeleteDecoder( decoder_t * );
 
 static void      *DecoderThread( vlc_object_t * );
-static int        DecoderProcess( decoder_t *, block_t * );
+static void       DecoderProcess( decoder_t *, block_t * );
+static void       DecoderError( decoder_t *p_dec, block_t *p_block );
 static void       DecoderOutputChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 static void       DecoderFlush( decoder_t * );
 static void       DecoderSignalBuffering( decoder_t *, bool );
@@ -828,10 +829,14 @@ static void *DecoderThread( vlc_object_t *p_this )
 
         if( p_block )
         {
+            int canc = vlc_savecancel();
+
             if( p_dec->b_error )
-                block_Release( p_block );
+                DecoderError( p_dec, p_block );
             else
                 DecoderProcess( p_dec, p_block );
+
+            vlc_restorecancel( canc );
         }
     }
 
@@ -1860,6 +1865,17 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
     }
 }
 
+/* */
+static void DecoderProcessOnFlush( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    DecoderFlushBuffering( p_dec );
+    vlc_mutex_unlock( &p_owner->lock );
+
+    DecoderSignalFlushed( p_dec );
+}
 /**
  * Decode a block
  *
@@ -1867,7 +1883,7 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
  * \param p_block the block to decode
  * \return VLC_SUCCESS or an error code
  */
-static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
+static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
 {
     decoder_owner_sys_t *p_owner = (decoder_owner_sys_t *)p_dec->p_owner;
     const bool b_flush_request = p_block && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH);
@@ -1876,10 +1892,9 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
     {
         assert( !b_flush_request );
         block_Release( p_block );
-        return VLC_SUCCESS;
+        return;
     }
 
-    int canc = vlc_savecancel();
 #ifdef ENABLE_SOUT
     if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
     {
@@ -1924,17 +1939,21 @@ static int DecoderProcess( decoder_t *p_dec, block_t *p_block )
 
     /* */
     if( b_flush_request )
-    {
-        vlc_mutex_lock( &p_owner->lock );
-        DecoderFlushBuffering( p_dec );
-        vlc_mutex_unlock( &p_owner->lock );
-
-        DecoderSignalFlushed( p_dec );
-    }
-    vlc_restorecancel( canc );
-
-    return p_dec->b_error ? VLC_EGENERIC : VLC_SUCCESS;
+        DecoderProcessOnFlush( p_dec );
 }
+
+static void DecoderError( decoder_t *p_dec, block_t *p_block )
+{
+    const bool b_flush_request = p_block && (p_block->i_flags & BLOCK_FLAG_CORE_FLUSH);
+
+    /* */
+    if( p_block )
+        block_Release( p_block );
+
+    if( b_flush_request )
+        DecoderProcessOnFlush( p_dec );
+}
+
 
 /**
  * Destroys a decoder object
