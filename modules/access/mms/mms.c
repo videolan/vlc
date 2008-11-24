@@ -136,8 +136,11 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if(  MMSTUOpen ( p_access ) )
+    if( MMSTUOpen ( p_access ) )
     {
+        if( p_access->b_die )
+            return VLC_EGENERIC;
+
         /* try mmsh if mmstu failed */
         return  MMSHOpen ( p_access );
     }

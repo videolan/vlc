@@ -155,7 +155,8 @@ int  MMSTUOpen( access_t *p_access )
     {   /* first try with TCP and then UDP*/
         if( ( i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_TCP ) ) )
         {
-            i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_UDP );
+            if( !p_access->b_die )
+                i_status = MMSOpen( p_access, &p_sys->url, MMS_PROTO_UDP );
         }
     }
     else
