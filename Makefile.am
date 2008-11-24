@@ -36,6 +36,7 @@ EXTRA_DIST = \
 	INSTALL.win32 \
 	INSTALL.wince \
 	extras/package/win32/vlc.exe.manifest \
+	extras/package/win32/libvlc.dll.manifest \
 	MAINTAINERS \
 	extras/package/macosx/README.MacOSX.rtf \
 	vlc-config.in.in \
@@ -697,6 +698,7 @@ package-win-common:
 # Copy executables and libs
 	cp "$(top_builddir)/bin/.libs/vlc$(EXEEXT)" "$(win32_destdir)/"
 	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(win32_destdir)/"
+		cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/src/.libs/libvlccore$(LIBEXT)" "$(win32_destdir)/"
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "$(win32_destdir)/"
 

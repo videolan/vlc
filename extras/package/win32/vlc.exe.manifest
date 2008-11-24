@@ -19,4 +19,16 @@
 			/>
 		</dependentAssembly>
 	</dependency>
+	<dependency>
+		<dependentAssembly>
+			<assemblyIdentity
+				type="win32"
+				name="Microsoft-Windows-MSVCRT20"
+				version="6.0.6000.16386"
+				processorArchitecture="x86"
+				publicKeyToken="31bf3856ad364e35"
+				language="*"
+			/>
+		</dependentAssembly>
+	</dependency>
 </assembly>
