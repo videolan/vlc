@@ -1654,16 +1654,11 @@ libxml2-$(XML_VERSION).tar.gz:
 
 xml: libxml2-$(XML_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_WIN32
-	patch -p0 < Patches/xml2-win32.patch
-	rm -f xml/aclocal.m4
-	(cd $@; aclocal && automake && autoreconf)
-endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/xml2-uclibc.patch
 endif
 
-XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp  --without-debug --without-docbook --without-regexps
+XMLCONF = --with-minimal --with-catalog --with-reader --with-tree --with-push --with-xptr --with-valid --with-xpath --with-xinclude --with-sax1 --without-zlib --without-iconv --without-http --without-ftp  --without-debug --without-docbook --without-regexps --without-python
 
 .xml: xml
   ifdef HAVE_CYGWIN
