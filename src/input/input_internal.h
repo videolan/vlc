@@ -33,6 +33,7 @@
 #include <vlc_input.h>
 #include <libvlc.h>
 #include "input_interface.h"
+#include "event.h"
 
 /*****************************************************************************
  *  Private input fields
@@ -118,7 +119,9 @@ struct input_thread_private_t
     bool            b_out_pace_control; /*     idem ? */
 
     /* Main input properties */
-    input_source_t input;
+    input_source_t      input;
+    input_event_times_t input_last_times;
+
     /* Slave demuxers (subs, and others) */
     int            i_slave;
     input_source_t **slave;
