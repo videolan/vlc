@@ -4,3 +4,4 @@
 *.sin
 POTFILES
 Rules-quot
+Makevars.template
