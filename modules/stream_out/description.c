@@ -64,7 +64,6 @@ struct sout_stream_sys_t
 
 struct sout_stream_id_t
 {
-    int i_d_u_m_m_y;
 };
 
 /*****************************************************************************
@@ -124,7 +123,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->i_stream_start = mdate();
 
     id = malloc( sizeof( sout_stream_id_t ) );
-    id->i_d_u_m_m_y = 0;
     return id;
 }
 
