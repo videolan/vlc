@@ -100,6 +100,10 @@ struct decoder_owner_sys_t
     audio_format_t audio;
     es_format_t    sout;
 
+    /* */
+    bool           b_fmt_description;
+    es_format_t    fmt_description;
+
     /* fifo */
     block_fifo_t *p_fifo;
 
@@ -573,6 +577,7 @@ void input_DecoderWaitBuffering( decoder_t *p_dec )
 
     vlc_mutex_unlock( &p_owner->lock );
 }
+
 void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -595,6 +600,23 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
         DecoderFlush( p_dec );
     }
     vlc_mutex_unlock( &p_owner->lock );
+}
+
+bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    bool b_changed;
+
+    vlc_mutex_lock( &p_owner->lock );
+    b_changed = p_owner->b_fmt_description;
+    if( b_changed )
+    {
+        if( p_fmt )
+            es_format_Copy( p_fmt, &p_owner->fmt_description );
+        p_owner->b_fmt_description = false;
+    }
+    vlc_mutex_unlock( &p_owner->lock );
+    return b_changed;
 }
 
 /*****************************************************************************
@@ -774,6 +796,9 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     /* */
     vlc_mutex_init( &p_owner->lock );
     vlc_cond_init( &p_owner->wait );
+
+    p_owner->b_fmt_description = false;
+    es_format_Init( &p_owner->fmt_description, UNKNOWN_ES, 0 );
 
     p_owner->b_paused = false;
     p_owner->pause.i_date = 0;
@@ -2030,6 +2055,8 @@ static void DeleteDecoder( decoder_t * p_dec )
         vlc_object_release( p_owner->p_packetizer );
     }
 
+    es_format_Clean( &p_owner->fmt_description );
+
     vlc_cond_destroy( &p_owner->wait );
     vlc_mutex_destroy( &p_owner->lock );
 
@@ -2041,6 +2068,17 @@ static void DeleteDecoder( decoder_t * p_dec )
 /*****************************************************************************
  * Buffers allocation callbacks for the decoders
  *****************************************************************************/
+static void DecoderUpdateFormatLocked( decoder_t *p_dec )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_assert_locked( &p_owner->lock );
+
+    es_format_Clean( &p_owner->fmt_description );
+
+    p_owner->b_fmt_description = true;
+    es_format_Copy( &p_owner->fmt_description, &p_dec->fmt_out );
+}
 static vout_thread_t *aout_request_vout( void *p_private,
                                          vout_thread_t *p_vout, video_format_t *p_fmt )
 {
@@ -2113,8 +2151,11 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
                                     &format, &p_dec->fmt_out.audio_replay_gain, &request_vout );
 
         vlc_mutex_lock( &p_owner->lock );
+
         p_owner->p_aout = p_aout;
         p_owner->p_aout_input = p_aout_input;
+        DecoderUpdateFormatLocked( p_dec );
+
         vlc_mutex_unlock( &p_owner->lock );
 
         if( p_owner->p_aout_input == NULL )
@@ -2221,6 +2262,9 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
+
+        DecoderUpdateFormatLocked( p_dec );
+
         vlc_mutex_unlock( &p_owner->lock );
 
         input_SendEventVout( p_owner->p_input );

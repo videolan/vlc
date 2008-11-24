@@ -89,4 +89,12 @@ void input_DecoderIsCcPresent( decoder_t *, bool pb_present[4] );
  */
 void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration );
 
+/**
+ * This function will return true if the ES format has changed since the last call
+ * and will do a copy of the current es_format_t if p_fmt is not NULL. This copy
+ * MUST be free by es_format_Clean.
+ * Otherwise it will return false and will not initialize p_fmt.
+ */
+bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt );
+
 #endif
