@@ -120,6 +120,7 @@ const GUID MEDIASUBTYPE_Y211 = {0x31313259, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0
 const GUID MEDIASUBTYPE_YUY2 = {0x32595559, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_YVYU = {0x55595659, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 const GUID MEDIASUBTYPE_UYVY = {0x59565955, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+const GUID MEDIASUBTYPE_HDYC = {0x43594448, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 /* Planar YUV formats */
 const GUID MEDIASUBTYPE_YVU9 = {0x39555659, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
@@ -276,6 +277,12 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
                i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
             else if( media_type.subtype == MEDIASUBTYPE_UYVY )
                i_fourcc = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
+            /* HDYC uses UYVY sample positions but Rec709 colourimetry */
+            /* FIXME: When VLC understands colourspace, something will need
+             * to be added / changed here. Until then, just make it behave
+             * like UYVY */
+            else if( media_type.subtype == MEDIASUBTYPE_HDYC )
+                i_fourcc = VLC_FOURCC( 'U', 'Y', 'V', 'Y');
 
             /* MPEG2 video elementary stream */
             else if( media_type.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
