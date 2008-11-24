@@ -365,7 +365,7 @@ void SoutDialog::setOptions()
     else if( profileString == "h264" ) setProfile( TS, true, "h264", true, "mp4a" )
     else if( profileString == "XBox" ) setProfile( ASF, true, "WMV2", true, "wma" )
     else if( profileString == "Windows" ) setProfile( ASF, true, "WMV2", true, "wma" )
-    else if( profileString == "PSP" ) setProfile( Ogg, true, "DIV3", true, "vorb" )
+    else if( profileString == "PSP" ) setProfile( MP4, true, "mp4v", true, "mp4a" )
 
         /* If the profile is not a custom one, then disable the tabWidget */
         if ( profileString == "Custom" )
