@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+	<assemblyIdentity
+		version="1.0.0.0"
+		processorArchitecture="x86"
+		name="axvlc.dll"
+		type="win32"
+	/>
+	<description>VLC ActiveX plugin</description>
+	<dependency>
+		<dependentAssembly>
+			<assemblyIdentity
+				type="win32"
+				name="Microsoft-Windows-MSVCRT20"
+				version="6.0.6000.16386"
+				processorArchitecture="x86"
+				publicKeyToken="31bf3856ad364e35"
+				language="*"
+			/>
+		</dependentAssembly>
+	</dependency>
+</assembly>
