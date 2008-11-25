@@ -2476,7 +2476,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         return;
 
     /* Remove previous information */
-    input_Control( p_input, INPUT_DEL_INFO, psz_cat );
+    input_Control( p_input, INPUT_DEL_INFO, psz_cat, NULL );
 
     /* Add informations */
     const char *psz_type;
