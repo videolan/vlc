@@ -255,7 +255,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int* i_size,
         setupButton( frameButton );
         CONNECT_MAP_SET( frameButton, FRAME_ACTION );
         BUTTON_SET_BAR( frameButton, frame, qtr( "Frame by frame" ) );
-        ENABLE_ON_INPUT( frameButton );
+        ENABLE_ON_VIDEO( frameButton );
         widget = frameButton;
         }
         break;
