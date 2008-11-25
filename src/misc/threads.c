@@ -49,10 +49,6 @@ static vlc_threadvar_t cancel_key;
 # include <execinfo.h>
 #endif
 
-#ifdef UNDER_CE
-# define WaitForSingleObjectEx(a,b,c) WaitForSingleObject(a,b)
-#endif
-
 /**
  * Print a backtrace to the standard error for debugging purpose.
  */
@@ -144,9 +140,95 @@ typedef struct vlc_cancel_t
     vlc_cleanup_t *cleaners;
     bool           killable;
     bool           killed;
+# ifdef UNDER_CE
+    HANDLE         cancel_event;
+# endif
 } vlc_cancel_t;
 
-# define VLC_CANCEL_INIT { NULL, true, false }
+# ifndef UNDER_CE
+#  define VLC_CANCEL_INIT { NULL, true, false }
+# else
+#  define VLC_CANCEL_INIT { NULL, true, false, NULL }
+# endif
+#endif
+
+#ifdef UNDER_CE
+static void CALLBACK vlc_cancel_self (ULONG_PTR dummy);
+
+static DWORD vlc_cancelable_wait (DWORD count, const HANDLE *handles,
+                                  DWORD delay)
+{
+    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    if (nfo == NULL)
+    {
+        /* Main thread - cannot be cancelled anyway */
+        return WaitForMultipleObjects (count, handles, FALSE, delay);
+    }
+    HANDLE new_handles[count + 1];
+    memcpy(new_handles, handles, count * sizeof(HANDLE));
+    new_handles[count] = nfo->cancel_event;
+    DWORD result = WaitForMultipleObjects (count + 1, new_handles, FALSE,
+                                           delay);
+    if (result == WAIT_OBJECT_0 + count)
+    {
+        vlc_cancel_self (NULL);
+        return WAIT_IO_COMPLETION;
+    }
+    else
+    {
+        return result;
+    }
+}
+
+DWORD SleepEx (DWORD dwMilliseconds, BOOL bAlertable)
+{
+    if (bAlertable)
+    {
+        DWORD result = vlc_cancelable_wait (0, NULL, dwMilliseconds);
+        return (result == WAIT_TIMEOUT) ? 0 : WAIT_IO_COMPLETION;
+    }
+    else
+    {
+        Sleep(dwMilliseconds);
+        return 0;
+    }
+}
+
+DWORD WaitForSingleObjectEx (HANDLE hHandle, DWORD dwMilliseconds,
+                             BOOL bAlertable)
+{
+    if (bAlertable)
+    {
+        /* The MSDN documentation specifies different return codes,
+         * but in practice they are the same. We just check that it
+         * remains so. */
+#if WAIT_ABANDONED != WAIT_ABANDONED_0
+# error Windows headers changed, code needs to be rewritten!
+#endif
+        return vlc_cancelable_wait (1, &hHandle, dwMilliseconds);
+    }
+    else
+    {
+        return WaitForSingleObject (hHandle, dwMilliseconds);
+    }
+}
+
+DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
+                                BOOL bWaitAll, DWORD dwMilliseconds,
+                                BOOL bAlertable)
+{
+    if (bAlertable)
+    {
+        /* We do not support the bWaitAll case */
+        assert (! bWaitAll);
+        return vlc_cancelable_wait (nCount, lpHandles, dwMilliseconds);
+    }
+    else
+    {
+        return WaitForMultipleObjects (nCount, lpHandles, bWaitAll,
+                                       dwMilliseconds);
+    }
+}
 #endif
 
 #ifdef WIN32
@@ -391,10 +473,6 @@ void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 #endif
 }
 
-#ifdef UNDER_CE
-# define WaitForMultipleObjectsEx(a,b,c) WaitForMultipleObjects(a,b)
-#endif
-
 /**
  * Waits for a condition variable. The calling thread will be suspended until
  * another thread calls vlc_cond_signal() or vlc_cond_broadcast() on the same
@@ -536,6 +614,9 @@ static unsigned __stdcall vlc_entry (void *data)
 {
     vlc_cancel_t cancel_data = VLC_CANCEL_INIT;
     vlc_thread_t self = data;
+#ifdef UNDER_CE
+    cancel_data.cancel_event = self->cancel_event;
+#endif
 
     vlc_threadvar_set (&cancel_key, &cancel_data);
     self->data = self->entry (self->data);
@@ -633,6 +714,12 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     th->data = data;
     th->entry = entry;
 #if defined( UNDER_CE )
+    th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
+    if (th->cancel_event == NULL)
+    {
+        free(th);
+        return errno;
+    }
     hThread = CreateThread (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
 #else
     hThread = (HANDLE)(uintptr_t)
@@ -694,18 +781,7 @@ void vlc_cancel (vlc_thread_t thread_id)
 #if defined (LIBVLC_USE_PTHREAD_CANCEL)
     pthread_cancel (thread_id);
 #elif defined (UNDER_CE)
-    /* HACK:There is no way to use something
-     * like QueueUserAPC on Windows CE, so I rely
-     * on some crappy arch specific code */
-    CONTEXT context;
-    context.ContextFlags = CONTEXT_CONTROL;
-    GetThreadContext (thread_id->handle, &context);
-    /* Setting the instruction pointer for the canceled thread */
-#if defined(_ARM_) || defined(ARM)
-    context.Pc = (DWORD_PTR) vlc_cancel_self;
-#endif
-    SetThreadContext (thread_id->handle, &context);
-
+    SetEvent (thread_id->cancel_event);
 #elif defined (WIN32)
     QueueUserAPC (vlc_cancel_self, thread_id->handle, 0);
 #else
@@ -738,6 +814,9 @@ void vlc_join (vlc_thread_t handle, void **result)
     CloseHandle (handle->handle);
     if (result)
         *result = handle->data;
+#if defined( UNDER_CE )
+    CloseHandle (handle->cancel_event);
+#endif
     free (handle);
 
 #endif

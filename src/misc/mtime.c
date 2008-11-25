@@ -52,10 +52,6 @@
 #   include <mmsystem.h>
 #endif
 
-#if defined( UNDER_CE )
-#   define SleepEx(a,b)  Sleep(a)
-#endif
-
 #if defined(HAVE_SYS_TIME_H)
 #   include <sys/time.h>
 #endif

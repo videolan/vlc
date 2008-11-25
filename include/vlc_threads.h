@@ -115,6 +115,9 @@ typedef struct
     HANDLE handle;
     void  *(*entry) (void *);
     void  *data;
+#if defined( UNDER_CE )
+    HANDLE cancel_event;
+#endif
 } *vlc_thread_t;
 
 typedef struct
