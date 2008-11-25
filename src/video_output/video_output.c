@@ -1059,7 +1059,7 @@ static void* RunThread( vlc_object_t *p_this )
             /* Compute FPS rate */
             p_vout->p->p_fps_sample[ p_vout->p->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 
-            if( display_date > current_date + VOUT_DISPLAY_DELAY && !p_vout->p->b_paused )
+            if( !p_vout->p->b_paused && display_date > current_date + VOUT_DISPLAY_DELAY )
             {
                 /* A picture is ready to be rendered, but its rendering date
                  * is far from the current one so the thread will perform an
@@ -1084,6 +1084,11 @@ static void* RunThread( vlc_object_t *p_this )
                     display_date = current_date + p_vout->p->render_time;
                 }
             }
+            else if( p_vout->p->b_paused && display_date > current_date + VOUT_DISPLAY_DELAY )
+            {
+                display_date = current_date + VOUT_DISPLAY_DELAY;
+            }
+
             if( p_picture )
             {
                 if( p_picture->date > 1 )
