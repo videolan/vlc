@@ -147,6 +147,7 @@ struct es_out_sys_t
 
     /* */
     bool        b_paused;
+    mtime_t     i_pause_date;
 
     /* Current preroll */
     mtime_t     i_preroll_end;
@@ -301,6 +302,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->i_spu_delay  = 0;
 
     p_sys->b_paused = false;
+    p_sys->i_pause_date = -1;
 
     p_sys->i_rate = i_rate;
 
@@ -556,6 +558,7 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
         EsOutProgramsChangeRate( out );
     }
     p_sys->b_paused = b_paused;
+    p_sys->i_pause_date = i_date;
 }
 
 static void EsOutChangeRate( es_out_t *out, int i_rate )
@@ -654,10 +657,10 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     msg_Dbg( p_sys->p_input, "Decoder buffering done in %d ms",
               (int)(mdate() - i_decoder_buffering_start)/1000 );
 
-    const mtime_t i_ts_delay = 10*1000 + /* FIXME CLEANUP thread wake up time*/
-                               mdate();
-    //msg_Dbg( p_sys->p_input, "==> %lld", i_ts_delay - p_sys->p_input->i_pts_delay );
-    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, i_ts_delay - i_buffering_duration );
+    const mtime_t i_wakeup_delay = 10*1000; /* FIXME CLEANUP thread wake up time*/
+    const mtime_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : mdate();
+
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, i_current_date + i_wakeup_delay - i_buffering_duration );
 
     for( int i = 0; i < p_sys->i_es; i++ )
     {

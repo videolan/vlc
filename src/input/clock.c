@@ -395,9 +395,6 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, mtime_t i_system )
     cl->ref.i_system += i_offset;
     cl->last.i_system += i_offset;
 
-    if( cl->b_paused )
-        cl->i_pause_date = i_system;
-
     vlc_mutex_unlock( &cl->lock );
 }
 
