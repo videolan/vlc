@@ -41,7 +41,6 @@ EXTRA_DIST = \
 	extras/package/macosx/README.MacOSX.rtf \
 	vlc-config.in.in \
 	extras/package/rpm/vlc.fedora.spec \
-	extras/package/rpm/vlc.mandriva.spec \
 	extras/package/rpm/vlc.altlinux.spec \
 	extras/package/win32/vlc.win32.nsi.in \
 	extras/package/win32/languages/declaration.nsh \
