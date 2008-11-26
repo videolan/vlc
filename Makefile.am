@@ -726,7 +726,7 @@ package-win-common:
 if BUILD_MOZILLA
 	mkdir -p "$(win32_destdir)/mozilla"
 	cp $(top_builddir)/projects/mozilla/.libs/npvlc$(LIBEXT) $(win32_destdir)/mozilla/
-	cp $(top_builddir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)/mozilla/
+	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest $(win32_destdir)/mozilla/
 endif
 
 # ActiveX plugin
@@ -737,7 +737,7 @@ if BUILD_ACTIVEX
 	unix2dos $(win32_destdir)/activex/*
 
 	cp $(top_builddir)/projects/activex/.libs/axvlc$(LIBEXT) $(win32_destdir)/activex/
-	cp $(top_builddir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
+	cp $(top_srcdir)/projects/activex/axvlc.dll.manifest $(win32_destdir)/activex/
 endif
 
 # Rebase all those DLLs to speed up loading (need cygwin rebase)
