@@ -217,6 +217,7 @@ ldt_fs_t* Setup_LDT_Keeper(void)
     ldt_fs->fd = open("/dev/zero", O_RDWR);
     if(ldt_fs->fd<0){
         perror( "Cannot open /dev/zero for READ+WRITE. Check permissions! error: ");
+        free(ldt_fs);
 	return NULL;
     }
     fs_seg=
