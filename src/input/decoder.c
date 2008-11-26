@@ -335,14 +335,12 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     vlc_object_kill( p_dec );
 
-    /* Make sure we aren't paused anymore */
+    /* Make sure we aren't paused/buffering/waiting anymore */
     vlc_mutex_lock( &p_owner->lock );
-    if( p_owner->b_paused || p_owner->b_buffering )
-    {
-        p_owner->b_paused = false;
-        p_owner->b_buffering = false;
-        vlc_cond_signal( &p_owner->wait );
-    }
+    p_owner->b_paused = false;
+    p_owner->b_buffering = false;
+    p_owner->b_flushing = true;
+    vlc_cond_signal( &p_owner->wait );
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_thread_join( p_dec );
@@ -1150,12 +1148,23 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
             i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
             b_reject = true;
 
+        /* Do not wait against unprotected date */
+        const mtime_t i_deadline = p_audio->start_date - AOUT_MAX_PREPARE_TIME;
+        while( !b_reject && i_deadline - VLC_HARD_MIN_SLEEP > mdate() )
+        {
+            vlc_mutex_lock( &p_owner->lock );
+            if( p_owner->b_flushing || p_dec->b_die )
+            {
+                b_reject = true;
+                vlc_mutex_unlock( &p_owner->lock );
+                break;
+            }
+            vlc_cond_timedwait( &p_owner->wait, &p_owner->lock, i_deadline );
+            vlc_mutex_unlock( &p_owner->lock );
+        }
+
         if( !b_reject )
         {
-            /* Wait if we are too early
-             * FIXME that's plain ugly to do it here */
-            mwait( p_audio->start_date - AOUT_MAX_PREPARE_TIME );
-
             if( !aout_DecPlay( p_aout, p_aout_input, p_audio, i_rate ) )
                 *pi_played_sum += 1;
             *pi_lost_sum += aout_DecGetResetLost( p_aout, p_aout_input );
