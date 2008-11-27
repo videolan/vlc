@@ -1782,7 +1782,7 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
 
     p_stream->fmt.i_cat = VIDEO_ES;
     p_stream->fmt.i_codec = VLC_FOURCC( 'd','r','a','c' );
-    p_stream->i_granule_shift = 32;
+    p_stream->i_granule_shift = 22; /* not 32 */
 
     /* Backing up stream headers is not required -- seqhdrs are repeated
      * thoughout the stream at suitable decoding start points */
