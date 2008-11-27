@@ -345,7 +345,7 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         {
             int canc = vlc_savecancel ();
             n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
-            canc = vlc_restorecancel (canc);
+            vlc_restorecancel (canc);
         }
         else
         {
