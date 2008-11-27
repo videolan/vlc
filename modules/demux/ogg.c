@@ -195,7 +195,7 @@ static void Ogg_ReadSpeexHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadKateHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadFlacHeader( demux_t *, logical_stream_t *, ogg_packet * );
 static void Ogg_ReadAnnodexHeader( vlc_object_t *, logical_stream_t *, ogg_packet * );
-static void Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
+static bool Ogg_ReadDiracHeader( logical_stream_t *, ogg_packet * );
 
 /*****************************************************************************
  * Open: initializes ogg demux structures
@@ -969,8 +969,14 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 else if( oggpacket.bytes >= 5 &&
                          ! memcmp( oggpacket.packet, "BBCD\x00", 5 ) )
                 {
-                    Ogg_ReadDiracHeader( p_stream, &oggpacket );
-                    msg_Dbg( p_demux, "found dirac header" );
+                    if( Ogg_ReadDiracHeader( p_stream, &oggpacket ) )
+                        msg_Dbg( p_demux, "found dirac header" );
+                    else
+                    {
+                        msg_Warn( p_demux, "found dirac header isn't decodable" );
+                        free( p_stream );
+                        p_ogg->i_streams--;
+                    }
                 }
                 /* Check for Tarkin header */
                 else if( oggpacket.bytes >= 7 &&
@@ -1775,13 +1781,11 @@ static int dirac_bool( bs_t *p_bs )
     return bs_read( p_bs, 1 );
 }
 
-static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
+static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
                                  ogg_packet *p_oggpacket )
 {
     bs_t bs;
 
-    p_stream->fmt.i_cat = VIDEO_ES;
-    p_stream->fmt.i_codec = VLC_FOURCC( 'd','r','a','c' );
     p_stream->i_granule_shift = 22; /* not 32 */
 
     /* Backing up stream headers is not required -- seqhdrs are repeated
@@ -1797,6 +1801,11 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     dirac_uint( &bs ); /* level */
 
     uint32_t u_video_format = dirac_uint( &bs ); /* index */
+    if( u_video_format > 20 )
+    {
+        /* don't know how to parse this ogg dirac stream */
+        return false;
+    }
 
     if( dirac_bool( &bs ) )
     {
@@ -1828,17 +1837,16 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     };
     static const size_t u_dirac_vidfmt_frate = sizeof(pu_dirac_vidfmt_frate)/sizeof(*pu_dirac_vidfmt_frate);
 
-    /* */
-    if( u_video_format >= u_dirac_vidfmt_frate )
-        u_video_format = 0;
-
     uint32_t u_n = p_dirac_frate_tbl[pu_dirac_vidfmt_frate[u_video_format]].u_n;
     uint32_t u_d = p_dirac_frate_tbl[pu_dirac_vidfmt_frate[u_video_format]].u_d;
     if( dirac_bool( &bs ) )
     {
         uint32_t u_frame_rate_index = dirac_uint( &bs );
         if( u_frame_rate_index >= u_dirac_frate_tbl )
-            u_frame_rate_index = 0;
+        {
+            /* something is wrong with this stream */
+            return false;
+        }
         u_n = p_dirac_frate_tbl[u_frame_rate_index].u_n;
         u_d = p_dirac_frate_tbl[u_frame_rate_index].u_d;
         if( u_frame_rate_index == 0 )
@@ -1848,4 +1856,10 @@ static void Ogg_ReadDiracHeader( logical_stream_t *p_stream,
         }
     }
     p_stream->f_rate = (float) u_n / u_d;
+
+    /* probably is an ogg dirac es */
+    p_stream->fmt.i_cat = VIDEO_ES;
+    p_stream->fmt.i_codec = VLC_FOURCC( 'd','r','a','c' );
+
+    return true;
 }
