@@ -223,7 +223,8 @@ rtp_find_ptype (const rtp_session_t *session, rtp_source_t *source,
 }
 
 /**
- * Receives an RTP packet and queues it.
+ * Receives an RTP packet and queues it. Not a cancellation point.
+ *
  * @param demux VLC demux object
  * @param session RTP session receiving the packet
  * @param block RTP packet including the RTP header
@@ -440,6 +441,15 @@ drop:
 }
 
 
+/**
+ * Dequeues an RTP packet and pass it to decoder. Not cancellation-safe(?).
+ *
+ * @param demux VLC demux object
+ * @param session RTP session receiving the packet
+ * @param deadlinep pointer to deadline to call rtp_dequeue() again
+ * @return true if the buffer is not empty, false otherwise.
+ * In the later case, *deadlinep is undefined.
+ */
 bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
                   mtime_t *restrict deadlinep)
 {
