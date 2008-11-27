@@ -46,7 +46,7 @@ void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, mtime_t *);
 int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt);
 
-void rtp_process (demux_t *demux);
+int rtp_process (demux_t *demux);
 void *rtp_thread (void *data);
 
 /* Global data */

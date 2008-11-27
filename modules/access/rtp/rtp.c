@@ -632,6 +632,5 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
  */
 static int Demux (demux_t *demux)
 {
-    rtp_process (demux);
-    return 1;
+    return rtp_process (demux) ? 0 : 1;
 }

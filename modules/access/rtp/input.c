@@ -190,7 +190,11 @@ void *rtp_thread (void *data)
 }
 
 
-void rtp_process (demux_t *demux)
+/**
+ * Process one RTP packet from the de-jitter queue.
+ * @return 0 on success, -1 on EOF
+ */
+int rtp_process (demux_t *demux)
 {
     demux_sys_t *p_sys = demux->p_sys;
     mtime_t deadline = INT64_MAX;
@@ -202,4 +206,6 @@ void rtp_process (demux_t *demux)
     else
         vlc_cond_wait (&p_sys->wait, &p_sys->lock);
     vlc_mutex_unlock (&p_sys->lock);
+
+    return p_sys->dead ? -1 : 0;
 }
