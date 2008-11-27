@@ -42,21 +42,20 @@
  * @param fd datagram file descriptor
  * @return a block or NULL on fatal error (socket dead)
  */
-static block_t *rtp_dgram_recv (int fd)
+static block_t *rtp_dgram_recv (vlc_object_t *obj, int fd)
 {
     block_t *block = block_Alloc (0xffff);
     ssize_t len;
 
     do
     {
-        struct pollfd ufd = { .fd = fd, .events = POLLIN, };
-
         block_cleanup_push (block);
-        poll (&ufd, 1, -1);
-        len = recv (fd, block->p_buffer, block->i_buffer, 0);
+        len = net_Read (obj, fd, NULL,
+                        block->p_buffer, block->i_buffer, false);
         vlc_cleanup_pop ();
 
-        if ((len <= 0) && (ufd.revents & POLLHUP))
+        if (((len <= 0) && poll (&(struct pollfd){ .fd = fd, }, 1, 0))
+         || !vlc_object_alive (obj))
         {   /* POLLHUP -> permanent (DCCP) socket error */
             block_Release (block);
             return NULL;
@@ -73,19 +72,15 @@ static block_t *rtp_dgram_recv (int fd)
  * @param fd stream file descriptor
  * @return a block or NULL in case of fatal error
  */
-static block_t *rtp_stream_recv (int fd)
+static block_t *rtp_stream_recv (vlc_object_t *obj, int fd)
 {
     ssize_t len = 0;
-    struct pollfd ufd = { .fd = fd, .events = POLLIN, };
     uint8_t hdr[2]; /* frame header */
 
     /* Receives the RTP frame header */
     do
     {
-        ssize_t val;
-
-        poll (&ufd, 1, -1);
-        val = recv (fd, hdr + len, 2 - len, 0);
+        ssize_t val = net_Read (obj, fd, NULL, hdr + len, 2 - len, false);
         if (val <= 0)
             return NULL;
         len += val;
@@ -100,8 +95,8 @@ static block_t *rtp_stream_recv (int fd)
         ssize_t val;
 
         block_cleanup_push (block);
-        poll (&ufd, 1, -1);
-        val = recv (fd, block->p_buffer + i, block->i_buffer - i, 0);
+        val = net_Read (obj, fd, NULL,
+                        block->p_buffer + i, block->i_buffer - i, false);
         vlc_cleanup_pop ();
 
         if (val <= 0)
@@ -123,8 +118,8 @@ static block_t *rtp_recv (demux_t *demux)
     for (block_t *block;; block_Release (block))
     {
         block = p_sys->framed_rtp
-                ? rtp_stream_recv (p_sys->fd)
-                : rtp_dgram_recv (p_sys->fd);
+                ? rtp_stream_recv (VLC_OBJECT (demux), p_sys->fd)
+                : rtp_dgram_recv (VLC_OBJECT (demux), p_sys->fd);
         if (block == NULL)
         {
             msg_Err (demux, "RTP flow stopped");
