@@ -1743,12 +1743,16 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                         {
                             *p2++ = '\0';
                         }
-                        if( !strncasecmp( p, "rtsp:", 5 ) )
-                        {
-                            /* for rtsp url, you have rtsp://localhost:port/path */
-                            p += 5;
-                            while( *p == '/' ) p++;
-                            while( *p && *p != '/' ) p++;
+                        if( !strncasecmp( p, ( cl->query.i_proto
+                                   == HTTPD_PROTO_HTTP ) ? "http" : "rtsp", 4 )
+                         && p[4 + !!strchr( "sS", p[4] )] == ':' )
+                        {   /* Skip hier-part of URL (if present) */
+                            p = strchr( p, ':' ) + 1; /* skip URI scheme */
+                            if( !strncmp( p, "//", 2 ) ) /* skip authority */
+                            {   /* see RFC3986 §3.2 */
+                                p += 2;
+                                while( *p && !strchr( "/?#", *p ) ) p++;
+                            }
                         }
                         cl->query.psz_url = strdup( p );
                         if( ( p3 = strchr( cl->query.psz_url, '?' ) )  )
