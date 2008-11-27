@@ -281,7 +281,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 /*****************************************************************************
  * __net_Read:
  *****************************************************************************
- * Reads from a network socket.
+ * Reads from a network socket. Cancellation point.
  * If waitall is true, then we repeat until we have read the right amount of
  * data; in that case, a short count means EOF has been reached or the VLC
  * object has been signaled.
@@ -343,7 +343,9 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
         ssize_t n;
         if (vs != NULL)
         {
+            int canc = vlc_savecancel ();
             n = vs->pf_recv (vs->p_sys, p_buf, i_buflen);
+            canc = vlc_restorecancel (canc);
         }
         else
         {
