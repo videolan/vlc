@@ -196,9 +196,10 @@ void rtp_process (demux_t *demux)
     mtime_t deadline = INT64_MAX;
 
     vlc_mutex_lock (&p_sys->lock);
-    if (!rtp_dequeue (demux, p_sys->session, &deadline))
-        deadline = mdate () + CLOCK_FREQ / 5;
-    vlc_cond_timedwait (&p_sys->wait, &p_sys->lock, deadline);
+    if (rtp_dequeue (demux, p_sys->session, &deadline))
+        /* Pace the demux thread */
+        vlc_cond_timedwait (&p_sys->wait, &p_sys->lock, deadline);
+    else
+        vlc_cond_wait (&p_sys->wait, &p_sys->lock);
     vlc_mutex_unlock (&p_sys->lock);
 }
-
