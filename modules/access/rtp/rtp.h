@@ -63,10 +63,11 @@ struct demux_sys_t
 
     unsigned      caching;
     unsigned      timeout;
-    uint8_t       max_src;
-    uint16_t      max_dropout;
-    uint16_t      max_misorder;
-    bool          autodetect;
-    bool          framed_rtp;
+    uint16_t      max_dropout; /**< Max packet forward misordering */
+    uint16_t      max_misorder; /**< Max packet backward misordering */
+    uint8_t       max_src; /**< Max simultaneous RTP sources */
+    bool          autodetect; /**< Payload format autodetection */
+    bool          framed_rtp; /**< Framed RTP packets over TCP */
+    bool          dead; /**< End of stream */
 };
 

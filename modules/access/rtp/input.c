@@ -160,30 +160,32 @@ void *rtp_thread (void *data)
     demux_t *demux = data;
     demux_sys_t *p_sys = demux->p_sys;
 
-    for (;;)
+    do
     {
         block_t *block = rtp_recv (demux);
-        if (block == NULL)
-            break; /* fatal error: abort */
 
         vlc_mutex_lock (&p_sys->lock);
-
-        /* Autodetect payload type, _before_ rtp_queue() */
-        if (p_sys->autodetect)
+        if (block == NULL)
+            p_sys->dead = true; /* Fatal error: abort */
+        else
         {
-            if (rtp_autodetect (demux, p_sys->session, block))
-            {
-                block_Release (block);
-                continue;
+            if (p_sys->autodetect)
+            {   /* Autodetect payload type, _before_ rtp_queue() */
+                if (rtp_autodetect (demux, p_sys->session, block))
+                {
+                    vlc_mutex_unlock (&p_sys->lock);
+                    block_Release (block);
+                    continue;
+                }
+                p_sys->autodetect = false;
             }
-            p_sys->autodetect = false;
+            rtp_queue (demux, p_sys->session, block);
         }
-
-        rtp_queue (demux, p_sys->session, block);
         vlc_cond_signal (&p_sys->wait);
         vlc_mutex_unlock (&p_sys->lock);
     }
-    /* TODO: return 0 from Demux */
+    while (!p_sys->dead);
+
     return NULL;
 }
 

@@ -237,6 +237,7 @@ static int Open (vlc_object_t *obj)
     p_sys->max_misorder = var_CreateGetInteger (obj, "rtp-max-misorder");
     p_sys->autodetect   = true;
     p_sys->framed_rtp   = (tp == IPPROTO_TCP);
+    p_sys->dead         = false;
 
     demux->pf_demux   = Demux;
     demux->pf_control = Control;
