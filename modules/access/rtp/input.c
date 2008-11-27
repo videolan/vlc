@@ -196,7 +196,7 @@ void *rtp_thread (void *data)
 void rtp_process (demux_t *demux)
 {
     demux_sys_t *p_sys = demux->p_sys;
-    mtime_t deadline;
+    mtime_t deadline = INT64_MAX;
 
     vlc_mutex_lock (&p_sys->lock);
     if (!rtp_dequeue (demux, p_sys->session, &deadline))
