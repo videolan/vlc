@@ -184,6 +184,7 @@ typedef struct
     int     i_serial_no;
     int     i_keyframe_granule_shift; /* Theora only */
     int     i_last_keyframe; /* dirac and eventually theora */
+    uint64_t u_last_granulepos; /* Used for correct EOS page */
     ogg_stream_state os;
 
     oggds_header_t *p_oggds_header;
@@ -851,7 +852,7 @@ static block_t *OggCreateFooter( sout_mux_t *p_mux )
         op.bytes  = 0;
         op.b_o_s  = 0;
         op.e_o_s  = 1;
-        op.granulepos = -1;
+        op.granulepos = p_stream->u_last_granulepos;
         op.packetno = p_stream->i_packet_no++;
         ogg_stream_packetin( &p_stream->os, &op );
 
@@ -866,7 +867,7 @@ static block_t *OggCreateFooter( sout_mux_t *p_mux )
         op.bytes  = 0;
         op.b_o_s  = 0;
         op.e_o_s  = 1;
-        op.granulepos = -1;
+        op.granulepos = p_sys->pp_del_streams[i]->u_last_granulepos;
         op.packetno = p_sys->pp_del_streams[i]->i_packet_no++;
         ogg_stream_packetin( &p_sys->pp_del_streams[i]->os, &op );
 
@@ -1039,6 +1040,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) / 1000;
     }
 
+    p_stream->u_last_granulepos = op.granulepos;
     ogg_stream_packetin( &p_stream->os, &op );
 
     if( p_stream->i_cat == SPU_ES ||
