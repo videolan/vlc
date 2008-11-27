@@ -11,11 +11,11 @@
 		<dependentAssembly>
 			<assemblyIdentity
 				type="win32"
-				name="Microsoft-Windows-MSVCRT20"
-				version="6.0.6000.16386"
+				name="Microsoft.VC80.CRT"
+				version="8.0.41204.256"
 				processorArchitecture="x86"
-				publicKeyToken="31bf3856ad364e35"
-				language="*"
+				publicKeyToken="1fc8b3b9a1e18e3b"
+				language="neutral"
 			/>
 		</dependentAssembly>
 	</dependency>
