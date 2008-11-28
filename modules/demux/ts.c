@@ -3720,7 +3720,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             {
             case 0x80:
                 pid->es->fmt.i_cat = AUDIO_ES;
-                pid->es->fmt.i_codec = VLC_FOURCC( 'l', 'p', 'c', 'm' );
+                pid->es->fmt.i_codec = VLC_FOURCC( 'b', 'p', 'c', 'm' );
                 break;
             case 0x82:
             case 0x85: /* DTS-HD High resolution audio */
@@ -3729,7 +3729,12 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 pid->es->fmt.i_cat = AUDIO_ES;
                 pid->es->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
                 break;
+
             case 0x83: /* TrueHD AC3 */
+                pid->es->fmt.i_cat = AUDIO_ES;
+                pid->es->fmt.i_codec = VLC_FOURCC( 'm', 'l', 'p', ' ' );
+                break;
+
             case 0x84: /* E-AC3 */
             case 0x87: /* E-AC3 */
             case 0xA1: /* Secondary E-AC3 */
