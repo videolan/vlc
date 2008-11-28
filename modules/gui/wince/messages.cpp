@@ -71,8 +71,8 @@ Messages::Messages( intf_thread_t *p_intf, CBaseWindow *p_parent,
 
 Messages::~Messages()
 {
-    delete cb_data;
     msg_Unsubscribe(sub);
+    delete cb_data;
 }
 
 /***********************************************************************
