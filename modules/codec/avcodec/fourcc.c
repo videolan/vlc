@@ -38,6 +38,10 @@
 #endif
 #include "avcodec.h"
 
+#ifndef AV_VERSION_INT
+#   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
+#endif
+
 /*****************************************************************************
  * Codec fourcc -> ffmpeg_id mapping
  *****************************************************************************/
@@ -433,7 +437,7 @@ static const struct
       VIDEO_ES, "Windows Media Video 2" },
     { VLC_FOURCC('w','m','v','2'), CODEC_ID_WMV2,
       VIDEO_ES, "Windows Media Video 2" },
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(10<<8)+1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 10, 1 )
     { VLC_FOURCC('W','M','V','3'), CODEC_ID_WMV3,
       VIDEO_ES, "Windows Media Video 3" },
     { VLC_FOURCC('w','m','v','3'), CODEC_ID_WMV3,
@@ -505,7 +509,7 @@ static const struct
       VIDEO_ES, "On2's VP3 Video" },
 
     /* On2  VP5, VP6 codecs */
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(14<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 14, 0 )
     { VLC_FOURCC('V','P','5',' '), CODEC_ID_VP5,
       VIDEO_ES, "On2's VP5 Video" },
     { VLC_FOURCC('V','P','5','0'), CODEC_ID_VP5,
@@ -518,14 +522,14 @@ static const struct
       VIDEO_ES, "On2's VP6.2 Video (Flash)" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(27<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 27, 0 )
     { VLC_FOURCC('V','P','6','0'), CODEC_ID_VP6,
       VIDEO_ES, "On2's VP6.0 Video" },
     { VLC_FOURCC('V','P','6','1'), CODEC_ID_VP6,
       VIDEO_ES, "On2's VP6.1 Video" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(47<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 47, 0 )
     { VLC_FOURCC('V','P','6','A'), CODEC_ID_VP6A,
       VIDEO_ES, "On2's VP6 A Video" },
 #endif
@@ -565,7 +569,7 @@ static const struct
       VIDEO_ES, "Real Video 13" },
     { VLC_FOURCC('r','v','1','3'), CODEC_ID_RV10,
       VIDEO_ES, "Real Video 13" },
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(15<<8)+1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 15, 1 )
     { VLC_FOURCC('R','V','2','0'), CODEC_ID_RV20,
       VIDEO_ES, "Real Video 20" },
     { VLC_FOURCC('r','v','2','0'), CODEC_ID_RV20,
@@ -602,7 +606,7 @@ static const struct
     { VLC_FOURCC('Z','M','B','V'), CODEC_ID_ZMBV,
       VIDEO_ES, "DosBox Capture Codec" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 13, 0 )
     { VLC_FOURCC('V','M','n','c'), CODEC_ID_VMNC,
       VIDEO_ES, "VMware Video" },
 #endif
@@ -659,21 +663,21 @@ static const struct
       VIDEO_ES, "Indeo Video v2" },
 
         /* Flash Screen Video */
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(11<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 11, 0 )
     { VLC_FOURCC('F','S','V','1'), CODEC_ID_FLASHSV,
               VIDEO_ES, "Flash Screen Video" },
 #endif
    { VLC_FOURCC('K','M','V','C'), CODEC_ID_KMVC,
       VIDEO_ES, "Karl Morton's Video Codec (Worms)" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(13<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 13, 0 )
     { VLC_FOURCC('N','U','V','1'), CODEC_ID_NUV,
       VIDEO_ES, "Nuppel Video" },
     { VLC_FOURCC('R','J','P','G'), CODEC_ID_NUV,
       VIDEO_ES, "Nuppel Video" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(8<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 8, 0 )
     /* CODEC_ID_SMACKVIDEO */
     { VLC_FOURCC('S','M','K','2'), CODEC_ID_SMACKVIDEO,
       VIDEO_ES, "Smacker Video" },
@@ -682,12 +686,12 @@ static const struct
 #endif
 
     /* Chinese AVS - Untested */
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(8<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 8, 0 )
     { VLC_FOURCC('C','A','V','S'), CODEC_ID_CAVS,
       VIDEO_ES, "Chinese AVS" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 40, 0 )
     /* Untested yet */
     { VLC_FOURCC('A','V','d','n'), CODEC_ID_DNXHD,
       VIDEO_ES, "DNxHD" },
@@ -695,7 +699,7 @@ static const struct
     { VLC_FOURCC('8','B','P','S'), CODEC_ID_8BPS,
       VIDEO_ES, "8BPS" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(52<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 52, 0 )
     { VLC_FOURCC('M','L','2','O'), CODEC_ID_MIMIC,
       VIDEO_ES, "Mimic" },
 #endif
@@ -772,12 +776,12 @@ static const struct
     { VLC_FOURCC('M','J','L','S'), CODEC_ID_JPEGLS,
       VIDEO_ES, "PAM Image" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 0, 0 )
     { VLC_FOURCC('b','m','p',' '), CODEC_ID_BMP,
       VIDEO_ES, "BMP Image" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 40, 1 )
     { VLC_FOURCC('t','i','f','f'), CODEC_ID_TIFF,
       VIDEO_ES, "TIFF Image" },
     { VLC_FOURCC('g','i','f',' '), CODEC_ID_GIF,
@@ -789,12 +793,12 @@ static const struct
     { VLC_FOURCC('M','T','G','A'), CODEC_ID_TARGA,
       VIDEO_ES, "Truevision Targa Image" },
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+3)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 40, 3 )
     { VLC_FOURCC('s','g','i',' '), CODEC_ID_SGI,
       VIDEO_ES, "SGI Image" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(55<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 55, 0 )
     { VLC_FOURCC('d','r','a','c'), CODEC_ID_DIRAC,
       VIDEO_ES, "Dirac" },
 #endif
@@ -833,12 +837,12 @@ static const struct
     { VLC_FOURCC('M','A','C','6'), CODEC_ID_MACE6,
       AUDIO_ES, "MACE-6 Audio" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(41<<8)+1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 41, 1 )
     /* MUSEPACK7 Audio */
     { VLC_FOURCC('M','P','C',' '), CODEC_ID_MUSEPACK7,
       AUDIO_ES, "MUSEPACK7 Audio" },
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(48<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 48, 0 )
     /* MUSEPACK8 Audio */
     { VLC_FOURCC('M','P','C','K'), CODEC_ID_MUSEPACK8,
       AUDIO_ES, "MUSEPACK8 Audio" },
@@ -874,7 +878,7 @@ static const struct
     { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
       AUDIO_ES, "A52 Audio (aka AC3)" },
 
-#if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 0, 0 )
     { VLC_FOURCC('e','a','c','3'), CODEC_ID_EAC3,
       AUDIO_ES, "A/52 B Audio (aka E-AC3)" },
 #endif
@@ -907,7 +911,7 @@ static const struct
     { VLC_FOURCC('R','o','Q','a'), CODEC_ID_ROQ_DPCM,
       AUDIO_ES, "Id RoQ DPCM Audio" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(27<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 27, 0 )
     /* DCIN Audio */
     { VLC_FOURCC('D','C','I','A'), CODEC_ID_DSICINAUDIO,
       AUDIO_ES, "Delphine CIN Audio" },
@@ -947,25 +951,25 @@ static const struct
     { VLC_FOURCC('a','l','a','c'), CODEC_ID_ALAC,
       AUDIO_ES, "Apple Lossless Audio Codec" },
 
-#if LIBAVCODEC_VERSION_INT >= ((50<<16)+(0<<8)+1)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 50, 0, 1 )
     /* QDM2 */
     { VLC_FOURCC('Q','D','M','2'), CODEC_ID_QDM2,
       AUDIO_ES, "QDM2 Audio" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 0, 0 )
     /* COOK */
     { VLC_FOURCC('c','o','o','k'), CODEC_ID_COOK,
       AUDIO_ES, "Cook Audio" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(4<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 4, 0 )
     /* TTA: The Lossless True Audio */
     { VLC_FOURCC('T','T','A','1'), CODEC_ID_TTA,
       AUDIO_ES, "The Lossless True Audio" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(8<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 8, 0 )
     /* Shorten */
     { VLC_FOURCC('s','h','n',' '), CODEC_ID_SHORTEN,
       AUDIO_ES, "Shorten Lossless Audio" },
@@ -973,21 +977,21 @@ static const struct
       AUDIO_ES, "Shorten Lossless Audio" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(16<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 16, 0 )
     { VLC_FOURCC('w','v','p','k'), CODEC_ID_WAVPACK,
       AUDIO_ES, "WavPack" },
     { VLC_FOURCC('W','V','P','K'), CODEC_ID_WAVPACK,
       AUDIO_ES, "WavPack" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(34<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 34, 0 )
     { VLC_FOURCC('g','s','m',' '), CODEC_ID_GSM,
       AUDIO_ES, "GSM Audio" },
     { VLC_FOURCC('g','s','m','s'), CODEC_ID_GSM_MS,
       AUDIO_ES, "Microsoft GSM Audio" },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 40, 4 )
     { VLC_FOURCC('a','t','r','c'), CODEC_ID_ATRAC3,
       AUDIO_ES, "atrac 3" },
     { VLC_FOURCC(0x70,0x2,0x0,0x0), CODEC_ID_ATRAC3,
@@ -997,21 +1001,21 @@ static const struct
     { VLC_FOURCC('S','O','N','C'), CODEC_ID_SONIC,
       AUDIO_ES, "Sonic" },
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(34<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 34, 0 )
     { VLC_FOURCC(0x1,0x4,0x0,0x0), CODEC_ID_IMC,
       AUDIO_ES, "IMC" },
 #endif
     { VLC_FOURCC(0x22,0x0,0x0,0x0), CODEC_ID_TRUESPEECH,
       AUDIO_ES, "TrueSpeech" },
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(46<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 46, 0 )
     { VLC_FOURCC('N','E','L','L'), CODEC_ID_NELLYMOSER,
       AUDIO_ES, "NellyMoser ASAO" },
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(44<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 44, 0 )
     { VLC_FOURCC('A','P','E',' '), CODEC_ID_APE,
       AUDIO_ES, "Monkey's Audio" },
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(58<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 58, 0 )
     { VLC_FOURCC('m','l','p',' '), CODEC_ID_MLP,
       AUDIO_ES, "MLP/TrueHD Audio" },
 #endif
@@ -1052,7 +1056,7 @@ static const struct
       AUDIO_ES, "PCM ULAW" },
 
     /* Subtitle streams */
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(41<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 41, 0 )
     /* Before this version, subs were too experimental */
     { VLC_FOURCC('s','p','u',' '), CODEC_ID_DVD_SUBTITLE,
       SPU_ES, "DVD Subtitles" },
@@ -1063,7 +1067,7 @@ static const struct
     { VLC_FOURCC('x','s','u','b'), CODEC_ID_XSUB,
       SPU_ES, "DivX XSUB subtitles" },
 #endif
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(50<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 50, 0 )
     { VLC_FOURCC('s','s','a',' '), CODEC_ID_SSA,
       SPU_ES, "SubStation Alpha subtitles" },
 #endif
