@@ -1,7 +1,7 @@
 /*****************************************************************************
  * lpcm.c: lpcm decoder/packetizer module
  *****************************************************************************
- * Copyright (C) 1999-2005 the VideoLAN team
+ * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -37,6 +37,29 @@
 #include <vlc_aout.h>
 
 /*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  OpenDecoder   ( vlc_object_t * );
+static int  OpenPacketizer( vlc_object_t * );
+static void CloseCommon   ( vlc_object_t * );
+
+vlc_module_begin ()
+
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_ACODEC )
+    set_description( N_("Linear PCM audio decoder") )
+    set_capability( "decoder", 100 )
+    set_callbacks( OpenDecoder, CloseCommon )
+
+    add_submodule ()
+    set_description( N_("Linear PCM audio packetizer") )
+    set_capability( "packetizer", 100 )
+    set_callbacks( OpenPacketizer, CloseCommon )
+
+vlc_module_end ()
+
+
+/*****************************************************************************
  * decoder_sys_t : lpcm decoder descriptor
  *****************************************************************************/
 struct decoder_sys_t
@@ -49,13 +72,12 @@ struct decoder_sys_t
      */
     audio_date_t end_date;
 
+    /* */
+    unsigned int i_header_size;
 };
 
 /*
- * LPCM header :
- * - PES header
- * - private stream ID (16 bits) == 0xA0 -> not in the bitstream
- *
+ * LPCM DVD header :
  * - frame number (8 bits)
  * - unknown (16 bits) == 0x0003 ?
  * - unknown (4 bits)
@@ -67,69 +89,59 @@ struct decoder_sys_t
  * - start code (8 bits) == 0x80
  */
 
-#define LPCM_HEADER_LEN 6
+#define LPCM_DVD_HEADER_LEN (6)
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  OpenDecoder   ( vlc_object_t * );
-static int  OpenPacketizer( vlc_object_t * );
-static void CloseDecoder  ( vlc_object_t * );
-
 static void *DecodeFrame  ( decoder_t *, block_t ** );
 
 /*****************************************************************************
- * Module descriptor
+ * OpenCommon:
  *****************************************************************************/
-vlc_module_begin ()
-
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACODEC )
-    set_description( N_("Linear PCM audio decoder") )
-    set_capability( "decoder", 100 )
-    set_callbacks( OpenDecoder, CloseDecoder )
-
-    add_submodule ()
-    set_description( N_("Linear PCM audio packetizer") )
-    set_capability( "packetizer", 100 )
-    set_callbacks( OpenPacketizer, CloseDecoder )
-
-vlc_module_end ()
-
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('l','p','c','m')
-         && p_dec->fmt_in.i_codec != VLC_FOURCC('l','p','c','b') )
+    switch( p_dec->fmt_in.i_codec )
     {
+    case VLC_FOURCC('l','p','c','m'):
+    case VLC_FOURCC('l','p','c','b'):
+        break;
+    default:
         return VLC_EGENERIC;
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
     /* Misc init */
-    p_sys->b_packetizer = false;
+    p_sys->b_packetizer = b_packetizer;
+    p_sys->i_header_size = LPCM_DVD_HEADER_LEN;
     aout_DateSet( &p_sys->end_date, 0 );
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
-    if( p_dec->fmt_out.audio.i_bitspersample == 24 )
+    if( b_packetizer )
     {
-        p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+        p_dec->fmt_out.i_codec = VLC_FOURCC('l','p','c','m');
     }
     else
     {
-        p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
-        p_dec->fmt_out.audio.i_bitspersample = 16;
+        switch( p_dec->fmt_out.audio.i_bitspersample )
+        {
+        case 24:
+        case 20:
+            p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+            break;
+        default:
+            p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+            p_dec->fmt_out.audio.i_bitspersample = 16;
+            break;
+        }
     }
 
     /* Set callback */
@@ -140,20 +152,13 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
-
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
+}
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret != VLC_SUCCESS ) return i_ret;
-
-    p_dec->p_sys->b_packetizer = true;
-
-    p_dec->fmt_out.i_codec = VLC_FOURCC('l','p','c','m');
-
-    return i_ret;
+    return OpenCommon( p_this, true );
 }
 
 /*****************************************************************************
@@ -188,7 +193,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( p_block->i_buffer <= LPCM_HEADER_LEN )
+    if( p_block->i_buffer <= p_sys->i_header_size )
     {
         msg_Err(p_dec, "frame is too short");
         block_Release( p_block );
@@ -294,7 +299,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.audio.i_physical_channels
         = i_original_channels & AOUT_CHAN_PHYSMASK;
 
-    i_frame_length = (p_block->i_buffer - LPCM_HEADER_LEN) /
+    i_frame_length = (p_block->i_buffer - p_sys->i_header_size) /
         p_dec->fmt_out.audio.i_channels * 8 / i_bitspersample;
 
     if( p_sys->b_packetizer )
@@ -318,8 +323,8 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         p_aout_buffer->end_date =
             aout_DateIncrement( &p_sys->end_date, i_frame_length );
 
-        p_block->p_buffer += LPCM_HEADER_LEN;
-        p_block->i_buffer -= LPCM_HEADER_LEN;
+        p_block->p_buffer += p_sys->i_header_size;
+        p_block->i_buffer -= p_sys->i_header_size;
 
         /* 20/24 bits LPCM use special packing */
         if( i_bitspersample == 24 )
@@ -390,10 +395,11 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 }
 
 /*****************************************************************************
- * CloseDecoder : lpcm decoder destruction
+ * CloseCommon : lpcm decoder destruction
  *****************************************************************************/
-static void CloseDecoder( vlc_object_t *p_this )
+static void CloseCommon( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     free( p_dec->p_sys );
 }
+
