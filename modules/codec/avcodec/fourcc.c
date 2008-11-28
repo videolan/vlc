@@ -1011,6 +1011,10 @@ static const struct
     { VLC_FOURCC('A','P','E',' '), CODEC_ID_APE,
       AUDIO_ES, "Monkey's Audio" },
 #endif
+#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(58<<8)+0)
+    { VLC_FOURCC('m','l','p',' '), CODEC_ID_MLP,
+      AUDIO_ES, "MLP/TrueHD Audio" },
+#endif
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
