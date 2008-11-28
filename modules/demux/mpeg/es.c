@@ -45,7 +45,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    set_description( N_("MPEG-I/II/4 / A52 / DTS audio" ) )
+    set_description( N_("MPEG-I/II/4 / A52 / DTS / MLP audio" ) )
     set_capability( "demux", 155 )
     set_callbacks( Open, Close )
 
@@ -62,6 +62,8 @@ vlc_module_begin ()
     add_shortcut( "eac3" )
 
     add_shortcut( "dts" )
+
+    add_shortcut( "mlp" )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -125,12 +127,16 @@ static int A52Init( demux_t *p_demux );
 static int DtsProbe( demux_t *p_demux, int64_t *pi_offset );
 static int DtsInit( demux_t *p_demux );
 
+static int MlpProbe( demux_t *p_demux, int64_t *pi_offset );
+static int MlpInit( demux_t *p_demux );
+
 static const codec_t p_codec[] = {
     { VLC_FOURCC( 'm', 'p', '4', 'a' ), false, "mp4 audio",  AacProbe,  AacInit },
     { VLC_FOURCC( 'm', 'p', 'g', 'a' ), false, "mpeg audio", MpgaProbe, MpgaInit },
     { VLC_FOURCC( 'a', '5', '2', ' ' ), true,  "a52 audio",  A52Probe,  A52Init },
     { VLC_FOURCC( 'e', 'a', 'c', '3' ), true,  "eac3 audio", EA52Probe, A52Init },
     { VLC_FOURCC( 'd', 't', 's', ' ' ), false, "dts audio",  DtsProbe,  DtsInit },
+    { VLC_FOURCC( 'm', 'l', 'p', ' ' ), false, "mlp audio",  MlpProbe,  MlpInit },
 
     { 0, false, NULL, NULL, NULL }
 };
@@ -795,6 +801,37 @@ static int DtsInit( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     p_sys->i_packet_size = 16384;
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * MLP
+ *****************************************************************************/
+static bool MlpCheckSync( const uint8_t *p_peek )
+{
+    if( p_peek[4+0] != 0xf8 || p_peek[4+1] != 0x72 || p_peek[4+2] != 0x6f )
+        return false;
+
+    if( p_peek[4+3] != 0xba && p_peek[4+3] != 0xbb )
+        return false;
+
+    /* TODO checksum */
+
+    return true;
+}
+static int MlpProbe( demux_t *p_demux, int64_t *pi_offset )
+{
+    const char *ppsz_name[] = { "mlp", NULL };
+
+    return GenericProbe( p_demux, pi_offset, ppsz_name, MlpCheckSync, 4+28+16*4 );
+}
+static int MlpInit( demux_t *p_demux )
+
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_packet_size = 4096;
 
     return VLC_SUCCESS;
 }
