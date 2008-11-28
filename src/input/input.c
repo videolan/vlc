@@ -198,7 +198,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->input.b_rescale_ts = true;
     p_input->p->input.b_eof = false;
     p_input->p->input.i_cr_average = 0;
-    memset( &p_input->p->input_last_times, 0, sizeof(p_input->p->input_last_times) );
 
     vlc_mutex_lock( &p_item->lock );
 
@@ -646,9 +645,6 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
 static void MainLoopInterface( input_thread_t *p_input )
 {
     input_event_times_t ev;
-    mtime_t i_es_out_delay;
-
-    es_out_GetBuffering( p_input->p->p_es_out, &i_es_out_delay );
 
     ev.f_position = 0.0;
     ev.i_time = 0;
@@ -666,29 +662,6 @@ static void MainLoopInterface( input_thread_t *p_input )
     if( demux_Control( p_input->p->input.p_demux,
                        DEMUX_GET_LENGTH, &ev.i_length ) )
         ev.i_length = 0;
-
-    if( ev.i_time > 0 )
-    {
-        ev.i_time -= i_es_out_delay;
-        if( ev.i_time < 0 )
-            ev.i_time = 0;
-    }
-    if( ev.i_length > 0 )
-    {
-        ev.f_position -= (double)i_es_out_delay / ev.i_length;
-    }
-
-    if( p_input->i_state == PAUSE_S )
-    {
-        input_event_times_t old = p_input->p->input_last_times;
-
-        /* XXX We have a jitter because of PCR frequency/get time precision.
-         * Hides it */
-        if( llabs(ev.i_time - old.i_time) < CLOCK_FREQ )
-            ev.i_time = old.i_time;
-    }
-
-    p_input->p->input_last_times = ev;
 
     input_SendEventTimes( p_input, &ev );
 }
@@ -739,7 +712,7 @@ static void MainLoop( input_thread_t *p_input )
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
         b_paused = p_input->i_state == PAUSE_S &&
-                   !es_out_GetBuffering( p_input->p->p_es_out, NULL );
+                   !es_out_GetBuffering( p_input->p->p_es_out );
 
         if( !b_paused )
         {

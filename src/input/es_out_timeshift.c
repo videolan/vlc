@@ -239,7 +239,6 @@ static bool         TsHasCmd( ts_thread_t * );
 static bool         TsIsUnused( ts_thread_t * );
 static int          TsChangePause( ts_thread_t *, bool b_source_paused, bool b_paused, mtime_t i_date );
 static int          TsChangeRate( ts_thread_t *, int i_src_rate, int i_rate );
-static mtime_t      TsGetDelay( ts_thread_t * );
 
 static void         *TsRun( vlc_object_t * );
 
@@ -461,22 +460,14 @@ static int ControlLockedGetWakeup( es_out_t *p_out, mtime_t *pi_wakeup )
 
     return VLC_SUCCESS;
 }
-static int ControlLockedGetBuffering( es_out_t *p_out, bool *pb_buffering, mtime_t *pi_delay )
+static int ControlLockedGetBuffering( es_out_t *p_out, bool *pb_buffering )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
 
     if( p_sys->b_delayed )
-    {
-        mtime_t i_delay;
-        es_out_GetBuffering( p_sys->p_out, &i_delay );
-
         *pb_buffering = true;
-        *pi_delay = i_delay + TsGetDelay( p_sys->p_thread );
-    }
     else
-    {
-        *pb_buffering = es_out_GetBuffering( p_sys->p_out, pi_delay );
-    }
+        *pb_buffering = es_out_GetBuffering( p_sys->p_out );
 
     return VLC_SUCCESS;
 }
@@ -644,8 +635,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_GET_BUFFERING:
     {
         bool *pb_buffering = (bool *)va_arg( args, bool* );
-        mtime_t *pi_delay = (mtime_t*)va_arg( args, mtime_t* );
-        return ControlLockedGetBuffering( p_out, pb_buffering, pi_delay );
+        return ControlLockedGetBuffering( p_out, pb_buffering );
     }
     case ES_OUT_SET_PAUSE_STATE:
     {
@@ -911,19 +901,6 @@ static int TsChangeRate( ts_thread_t *p_ts, int i_src_rate, int i_rate )
 
     return i_ret;
 }
-static mtime_t TsGetDelay( ts_thread_t *p_ts )
-{
-    mtime_t i_delay;
-
-    vlc_mutex_lock( &p_ts->lock );
-    i_delay = p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay;
-    if( p_ts->b_paused )
-        i_delay += mdate() - p_ts->i_pause_date;
-    vlc_mutex_unlock( &p_ts->lock );
-
-    return i_delay;
-}
-
 
 static void *TsRun( vlc_object_t *p_thread )
 {
@@ -943,7 +920,7 @@ static void *TsRun( vlc_object_t *p_thread )
         for( ;; )
         {
             const int canc = vlc_savecancel();
-            b_buffering = es_out_GetBuffering( p_ts->p_out, NULL );
+            b_buffering = es_out_GetBuffering( p_ts->p_out );
 
             if( ( !p_ts->b_paused || b_buffering ) && !TsPopCmdLocked( p_ts, &cmd, false ) )
             {

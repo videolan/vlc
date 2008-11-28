@@ -2249,14 +2249,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
 
         case ES_OUT_GET_BUFFERING:
-        {
-#warning "TODO ES_OUT_GET_BUFFERING"
-            bool *pb = (bool *)va_arg( args, bool* );
-            mtime_t *pi_delay = (mtime_t*)va_arg( args, mtime_t* );
+            pb = (bool *)va_arg( args, bool* );
             *pb = p_sys->b_buffering;
-            *pi_delay = 0;
             return VLC_SUCCESS;
-        }
 
         case ES_OUT_GET_EMPTY:
             pb = (bool *)va_arg( args, bool* );

@@ -49,7 +49,7 @@ enum es_out_query_private_e
     ES_OUT_SET_ES_DEFAULT_BY_ID,
 
     /* Get buffering state */
-    ES_OUT_GET_BUFFERING,                           /* arg1=bool*, arg2=mtime_t*                                res=cannot fail */
+    ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
 
     /* Check if es_out has still data to play */
     ES_OUT_GET_EMPTY,                               /* arg1=bool*               res=cannot fail */
@@ -81,15 +81,12 @@ static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
     assert( !i_ret );
     return i_wu;
 }
-static inline bool es_out_GetBuffering( es_out_t *p_out, mtime_t *pi_delay )
+static inline bool es_out_GetBuffering( es_out_t *p_out )
 {
     bool b;
-    mtime_t i_delay;
-    int i_ret = es_out_Control( p_out, ES_OUT_GET_BUFFERING, &b, &i_delay );
-    assert( !i_ret );
+    int i_ret = es_out_Control( p_out, ES_OUT_GET_BUFFERING, &b );
 
-    if( pi_delay )
-        *pi_delay = i_delay;
+    assert( !i_ret );
     return b;
 }
 static inline bool es_out_GetEmpty( es_out_t *p_out )
