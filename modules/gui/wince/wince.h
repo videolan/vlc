@@ -40,6 +40,7 @@
 #endif
 
 #include "vlc_keys.h"
+#include <vlc_messages.h>
 
 #include <stdio.h>
 #include <string>
@@ -69,8 +70,7 @@ struct intf_sys_t
     int                 i_slider_oldpos;                /* previous position */
     bool          b_slider_free;                      /* slider status */
 
-    /* The messages window */
-    msg_subscription_t* p_sub;                  /* message bank subscription */
+
 
     /* Playlist management */
     int                 i_playing;                 /* playlist selected item */
@@ -212,20 +212,29 @@ protected:
     BOOL CreateTreeView( HWND );
 };
 
+struct msg_cb_data_t
+{
+    Messages *self;
+};
+
 /* Messages */
 class Messages : public CBaseWindow
 {
 public:
     /* Constructor */
     Messages( intf_thread_t *, CBaseWindow *, HINSTANCE );
-    virtual ~Messages(){};
+     ~Messages();
 
-    void UpdateLog(void);
+    static void sinkMessage (msg_cb_data_t *, msg_item_t *, unsigned);
+    void sinkMessage (msg_item_t *item, unsigned);
 
 protected:
 
     virtual LRESULT WndProc( HWND, UINT, WPARAM, LPARAM );
 
+    /* The messages window */
+    msg_subscription_t* sub;                  /* message bank subscription */
+    msg_cb_data_t *cb_data;
     HWND hListView;
     bool b_verbose;
 };

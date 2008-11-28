@@ -150,9 +150,6 @@ LRESULT DialogsProvider::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
 
 void DialogsProvider::OnIdle( void )
 {
-    /* Update the log window */
-    if( p_messages_dialog ) p_messages_dialog->UpdateLog();
-
     /* Update the playlist */
     if( p_playlist_dialog ) p_playlist_dialog->UpdatePlaylist();
 

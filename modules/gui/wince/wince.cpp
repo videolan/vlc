@@ -116,8 +116,6 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
-    // Suscribe to messages bank
-    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
 
     // Misc init
     p_intf->p_sys->p_audio_menu = NULL;
@@ -178,9 +176,6 @@ static void Close( vlc_object_t *p_this )
 #endif
         vlc_thread_join( p_intf );
     }
-
-    // Unsuscribe to messages bank
-    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     // Destroy structure
     free( p_intf->p_sys );

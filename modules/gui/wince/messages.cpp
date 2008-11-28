@@ -63,6 +63,16 @@ Messages::Messages( intf_thread_t *p_intf, CBaseWindow *p_parent,
                          WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX,
                          0, 0, /*CW_USEDEFAULT*/300, /*CW_USEDEFAULT*/300,
                          p_parent->GetHandle(), NULL, h_inst, (void *)this );
+        // Suscribe to messages bank
+    cb_data = new msg_cb_data_t;
+    cb_data->self = this;
+    sub = msg_Subscribe( p_intf->p_libvlc, sinkMessage, cb_data );
+}
+
+Messages::~Messages()
+{
+    delete cb_data;
+    msg_Unsubscribe(sub);
 }
 
 /***********************************************************************
@@ -122,10 +132,6 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     case WM_SETFOCUS:
         SHSipPreference( hwnd, SIP_DOWN );
         SHFullScreen( hwnd, SHFS_HIDESIPBUTTON );
-        break;
-
-    case WM_TIMER:
-        UpdateLog();
         break;
 
     case WM_CLOSE:
@@ -191,65 +197,42 @@ LRESULT Messages::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     return DefWindowProc( hwnd, msg, wp, lp );
 }
 
-void Messages::UpdateLog()
+void Messages::sinkMessage (msg_cb_data_t *data, msg_item_t *item,
+                                  unsigned overruns)
 {
-    msg_subscription_t *p_sub = p_intf->p_sys->p_sub;
-    string debug;
-    int i_start, i_stop;
+    Messages *self = data->self;
 
-    vlc_mutex_lock( p_sub->p_lock );
-    i_stop = *p_sub->pi_stop;
-    vlc_mutex_unlock( p_sub->p_lock );
-
-    if( p_sub->i_start != i_stop )
-    {
-        for( i_start = p_sub->i_start; i_start != i_stop;
-             i_start = (i_start+1) % VLC_MSG_QSIZE )
-        {
-            vlc_value_t val;
-            var_Get( p_intf->p_libvlc, "verbose", &val );
-
-            switch( p_sub->p_msg[i_start].i_type )
-            {
-            case VLC_MSG_ERR:
-            case VLC_MSG_INFO:
-                if( val.i_int < 0 )  continue;
-                break;
-            case VLC_MSG_WARN:
-                if( val.i_int < 1 ) continue;
-                break;
-            case VLC_MSG_DBG:
-                if( val.i_int < 2 ) continue;
-                break;
-            }
-
-            /* Append all messages to log window */
-            debug = p_sub->p_msg[i_start].psz_module;
- 
-            switch( p_sub->p_msg[i_start].i_type )
-            {
-            case VLC_MSG_INFO: debug += ": "; break;
-            case VLC_MSG_ERR: debug += " error: "; break;
-            case VLC_MSG_WARN: debug += " warning: "; break;
-            default: debug += " debug: "; break;
-            }
-
-            /* Add message */
-            debug += p_sub->p_msg[i_start].psz_msg;
-
-            LVITEM lv;
-            lv.mask = LVIF_TEXT;
-            lv.pszText = TEXT("");
-            lv.cchTextMax = 1;
-            lv.iSubItem = 0;
-            lv.iItem = ListView_GetItemCount( hListView );
-            ListView_InsertItem( hListView, &lv );
-            ListView_SetItemText( hListView, lv.iItem, 0,
-                                  (TCHAR *)_FROMMB(debug.c_str()) );
-        }
-
-        vlc_mutex_lock( p_sub->p_lock );
-        p_sub->i_start = i_start;
-        vlc_mutex_unlock( p_sub->p_lock );
-    }
+    self->sinkMessage (item, overruns);
 }
+
+void Messages::sinkMessage (msg_item_t *item, unsigned overruns)
+{
+    vlc_value_t val;
+    var_Get( p_intf->p_libvlc, "verbose", &val );
+
+
+    /* Append all messages to log window */
+    string debug = item->psz_module;
+
+    switch( item->i_type )
+    {
+        case VLC_MSG_INFO: debug += ": "; break;
+        case VLC_MSG_ERR: debug += " error: "; break;
+        case VLC_MSG_WARN: debug += " warning: "; break;
+        default: debug += " debug: "; break;
+    }
+
+    /* Add message */
+    debug += item->psz_msg;
+
+    LVITEM lv;
+    lv.mask = LVIF_TEXT;
+    lv.pszText = TEXT("");
+    lv.cchTextMax = 1;
+    lv.iSubItem = 0;
+    lv.iItem = ListView_GetItemCount( hListView );
+    ListView_InsertItem( hListView, &lv );
+    ListView_SetItemText( hListView, lv.iItem, 0,
+                          (TCHAR *)_FROMMB(debug.c_str()) );
+}
+
