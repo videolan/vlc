@@ -11,7 +11,6 @@ $Id$
  * access_file: File access module
  * access_filter_bandwidth: Bandwidth limit module
  * access_filter_dump: Raw input Dump module
- * access_filter_timeshift: Timeshifting module
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
  * access_http: HTTP Network access module
@@ -39,7 +38,6 @@ $Id$
  * aout_file: Audio output to write to a file
  * aout_sdl: audio output module using the SDL library.
  * araw: Pseudo audio decoder for raw PCM
- * arts: ArTS audio output
  * asademux: ASS/SSA subtitles demuxer
  * asf: ASF demuxer
  * atmo: Ambilight-like video-output
@@ -75,6 +73,7 @@ $Id$
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
  * dc1394: firewire input module
+ * decomp: Decompression module
  * deinterlace: naive deinterlacing filter.
  * demux_cdg: Demuxer for CD-G files (Karaoke)
  * demuxdump: Pseudo-demuxer that dumps the stream
@@ -99,7 +98,6 @@ $Id$
  * equalizer: a equalizer audio filter
  * erase: Logo erase video filter
  * es: input module for MPEG ES decapsulation.
- * esd: audio output module using the Esound sound daemon.
  * export: playlist export module
  * extract: Extract RGB components video filter
  * faad: AAC decoder using libfaad2
@@ -171,6 +169,7 @@ $Id$
  * lua: Lua scripting inteface
  * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X.
+ * maemo: Maemo interface
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
  * mash: OpenMash based decoder
@@ -214,7 +213,8 @@ $Id$
  * nsv: NullSoft Video demuxer
  * ntservice: run VLC as a NT service
  * nuv: NUV demuxer
- * ogg: input module for OGG decapsulation.
+ * ogg: input module for OGG decapsulation
+ * omapfb: omap framebuffer video output
  * opencv_example: OpenCV example (face identification)
  * opencv_wrapper: OpenCV wrapper video filter
  * opengl: a opengl video output that uses opengl provider modules
@@ -225,6 +225,7 @@ $Id$
  * oss: audio output module using the OSS /dev/dsp interface.
  * packetizer_copy: Simple copy packetizer
  * packetizer_h264: H264 video packetizer
+ * packetizer_mlp: MLP/TrueHD audio packetizer
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  * packetizer_mpeg4video: MPEG4 video packetizer
  * packetizer_mpegvideo: MPEG video packetizer
@@ -262,7 +263,6 @@ $Id$
  * ripple: Ripple video effect
  * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
- * rtcp: incomplete RTCP implementation
  * rv32: RV32 image format conversion module
  * sap: Interface module to read SAP/SDP announcments
  * scale: Images rescaler
@@ -306,6 +306,7 @@ $Id$
  * svg: a svg renderer module
  * svgalib: SGVAlib output plugin
  * swscale: Video scaling filter
+ * swscale_maemo: Video scaling filter for maemo platform
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * tarkin: a tarkin video decoder using libtarkin

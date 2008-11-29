@@ -17,7 +17,9 @@ Inputs:
 
 Decoders:
  * AES3 (SMPTE 302M) support
- * E-AC3 (A/52b) support
+ * Dolby Digital Plus - E-AC-3 (A/52b)  support
+ * True HD/MLP support
+ * Blu-Ray Linear PCM support
 
 Encoders:
  * Dirac encoding support using libdirac (support in Ogg, in TS)
