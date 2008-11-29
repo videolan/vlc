@@ -622,7 +622,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 
     const mtime_t i_buffering_duration = p_sys->p_input->i_pts_delay +
                                          i_preroll_duration +
-                                         p_sys->i_buffering_extra_stream;
+                                         p_sys->i_buffering_extra_stream - p_sys->i_buffering_extra_initial;
 
     if( i_stream_duration <= i_buffering_duration && !b_forced )
     {
