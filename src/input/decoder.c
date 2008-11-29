@@ -1150,7 +1150,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 
         /* Do not wait against unprotected date */
         const mtime_t i_deadline = p_audio->start_date - AOUT_MAX_PREPARE_TIME;
-        while( !b_reject && i_deadline - VLC_HARD_MIN_SLEEP > mdate() )
+        while( !b_reject && i_deadline > mdate() )
         {
             vlc_mutex_lock( &p_owner->lock );
             if( p_owner->b_flushing || p_dec->b_die )
