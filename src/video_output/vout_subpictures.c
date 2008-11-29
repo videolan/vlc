@@ -1604,8 +1604,11 @@ exit:
          * pre-rendered state, so the next time through everything is
          * calculated again.
          */
-        picture_Release( p_region->p_picture );
-        p_region->p_picture = NULL;
+        if( p_region->p_picture )
+        {
+            picture_Release( p_region->p_picture );
+            p_region->p_picture = NULL;
+        }
         if( p_region->p_private )
         {
             SpuRegionPrivateDelete( p_region->p_private );
