@@ -135,11 +135,11 @@ static int Init( vout_thread_t *p_vout )
     char *psz_chroma, *psz_tmp;
     int i_width, i_height, i_pitch, i_chroma;
 
-    i_width = config_GetInt( p_vout, "vmem-width" );
-    i_height = config_GetInt( p_vout, "vmem-height" );
-    i_pitch = config_GetInt( p_vout, "vmem-pitch" );
+    i_width = var_CreateGetInteger( p_vout, "vmem-width" );
+    i_height = var_CreateGetInteger( p_vout, "vmem-height" );
+    i_pitch = var_CreateGetInteger( p_vout, "vmem-pitch" );
 
-    psz_chroma = config_GetPsz( p_vout, "vmem-chroma" );
+    psz_chroma = var_CreateGetString( p_vout, "vmem-chroma" );
     if( psz_chroma )
     {
         if( strlen( psz_chroma ) < 4 )
@@ -158,15 +158,15 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    psz_tmp = config_GetPsz( p_vout, "vmem-lock" );
-    p_vout->p_sys->pf_lock = (void * (*) (void *))(intptr_t)atoll( psz_tmp );
+    psz_tmp = var_CreateGetString( p_vout, "vmem-lock" );
+    p_vout->p_sys->pf_lock = (void (*) (void *, void **))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
-    psz_tmp = config_GetPsz( p_vout, "vmem-unlock" );
+    psz_tmp = var_CreateGetString( p_vout, "vmem-unlock" );
     p_vout->p_sys->pf_unlock = (void (*) (void *))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
-    psz_tmp = config_GetPsz( p_vout, "vmem-data" );
+    psz_tmp = var_CreateGetString( p_vout, "vmem-data" );
     p_vout->p_sys->p_data = (void *)(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
