@@ -1784,6 +1784,20 @@ static int dirac_bool( bs_t *p_bs )
 static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
                                  ogg_packet *p_oggpacket )
 {
+    static const struct {
+        uint32_t u_n /* numerator */, u_d /* denominator */;
+    } p_dirac_frate_tbl[] = { /* table 10.3 */
+        {1,1}, /* this first value is never used */
+        {24000,1001}, {24,1}, {25,1}, {30000,1001}, {30,1},
+        {50,1}, {60000,1001}, {60,1}, {15000,1001}, {25,2},
+    };
+    static const size_t u_dirac_frate_tbl = sizeof(p_dirac_frate_tbl)/sizeof(*p_dirac_frate_tbl);
+
+    static const uint32_t pu_dirac_vidfmt_frate[] = { /* table C.1 */
+        1, 9, 10, 9, 10, 9, 10, 4, 3, 7, 6, 4, 3, 7, 6, 2, 2, 7, 6, 7, 6,
+    };
+    static const size_t u_dirac_vidfmt_frate = sizeof(pu_dirac_vidfmt_frate)/sizeof(*pu_dirac_vidfmt_frate);
+
     bs_t bs;
 
     p_stream->i_granule_shift = 22; /* not 32 */
@@ -1801,7 +1815,7 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     dirac_uint( &bs ); /* level */
 
     uint32_t u_video_format = dirac_uint( &bs ); /* index */
-    if( u_video_format > 20 )
+    if( u_video_format >= u_dirac_vidfmt_frate )
     {
         /* don't know how to parse this ogg dirac stream */
         return false;
@@ -1822,20 +1836,6 @@ static bool Ogg_ReadDiracHeader( logical_stream_t *p_stream,
     {
         dirac_uint( &bs ); /* scan_format */
     }
-
-    static const struct {
-        uint32_t u_n /* numerator */, u_d /* denominator */;
-    } p_dirac_frate_tbl[] = { /* table 10.3 */
-        {1,1}, /* this first value is never used */
-        {24000,1001}, {24,1}, {25,1}, {30000,1001}, {30,1},
-        {50,1}, {60000,1001}, {60,1}, {15000,1001}, {25,2},
-    };
-    static const size_t u_dirac_frate_tbl = sizeof(p_dirac_frate_tbl)/sizeof(*p_dirac_frate_tbl);
-
-    static const uint32_t pu_dirac_vidfmt_frate[] = { /* table C.1 */
-        1, 9, 10, 9, 10, 9, 10, 4, 3, 7, 6, 4, 3, 7, 6, 2, 2, 7, 6, 7, 6,
-    };
-    static const size_t u_dirac_vidfmt_frate = sizeof(pu_dirac_vidfmt_frate)/sizeof(*pu_dirac_vidfmt_frate);
 
     uint32_t u_n = p_dirac_frate_tbl[pu_dirac_vidfmt_frate[u_video_format]].u_n;
     uint32_t u_d = p_dirac_frate_tbl[pu_dirac_vidfmt_frate[u_video_format]].u_d;
