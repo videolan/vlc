@@ -2043,10 +2043,10 @@ static void DeleteDecoder( decoder_t * p_dec )
         vout_thread_t *p_vout;
 
         p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-        if( p_vout && p_owner->p_spu_vout == p_vout )
+        if( p_vout )
         {
-            spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR,
-                         p_owner->i_spu_channel );
+            if( p_owner->p_spu_vout == p_vout )
+                spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR, p_owner->i_spu_channel );
             vlc_object_release( p_vout );
         }
     }
