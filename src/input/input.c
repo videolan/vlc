@@ -1580,19 +1580,13 @@ static bool Control( input_thread_t *p_input, int i_type,
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) ignored while recording" );
                 break;
             }
-            if( i_type == INPUT_CONTROL_SET_POSITION )
-            {
-                f_pos = val.f_float;
-            }
-            else
-            {
-                /* Should not fail */
-                demux_Control( p_input->p->input.p_demux,
-                                DEMUX_GET_POSITION, &f_pos );
-                f_pos += val.f_float;
-            }
-            if( f_pos < 0.0 ) f_pos = 0.0;
-            if( f_pos > 1.0 ) f_pos = 1.0;
+            f_pos = val.f_float;
+            if( i_type != INPUT_CONTROL_SET_POSITION )
+                f_pos += var_GetFloat( p_input, "position" );
+            if( f_pos < 0.0 )
+                f_pos = 0.0;
+            else if( f_pos > 1.0 )
+                f_pos = 1.0;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
             if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
@@ -1624,18 +1618,12 @@ static bool Control( input_thread_t *p_input, int i_type,
                 break;
             }
 
-            if( i_type == INPUT_CONTROL_SET_TIME )
-            {
-                i_time = val.i_time;
-            }
-            else
-            {
-                /* Should not fail */
-                demux_Control( p_input->p->input.p_demux,
-                                DEMUX_GET_TIME, &i_time );
-                i_time += val.i_time;
-            }
-            if( i_time < 0 ) i_time = 0;
+            i_time = val.i_time;
+            if( i_type != INPUT_CONTROL_SET_TIME )
+                i_time += var_GetTime( p_input, "time" );
+
+            if( i_time < 0 )
+                i_time = 0;
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
@@ -1934,9 +1922,8 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     i_seekpoint = p_demux->info.i_seekpoint;
                     i_seekpoint_time = p_input->p->input.title[p_demux->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                    if( i_seekpoint_time >= 0 &&
-                         !demux_Control( p_demux,
-                                          DEMUX_GET_TIME, &i_input_time ) )
+                    i_input_time = var_GetTime( p_input, "time" );
+                    if( i_seekpoint_time >= 0 && i_input_time >= 0 )
                     {
                         if( i_input_time < i_seekpoint_time + 3000000 )
                             i_seekpoint--;
@@ -1970,9 +1957,8 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     i_seekpoint = p_access->info.i_seekpoint;
                     i_seekpoint_time = p_input->p->input.title[p_access->info.i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                    if( i_seekpoint_time >= 0 &&
-                        demux_Control( p_demux,
-                                        DEMUX_GET_TIME, &i_input_time ) )
+                    i_input_time = var_GetTime( p_input, "time" );
+                    if( i_seekpoint_time >= 0 && i_input_time >= 0 )
                     {
                         if( i_input_time < i_seekpoint_time + 3000000 )
                             i_seekpoint--;
