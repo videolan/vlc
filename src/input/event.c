@@ -38,22 +38,23 @@ static void Trigger( input_thread_t *p_input, int i_type );
 /*****************************************************************************
  * Event for input.c
  *****************************************************************************/
-void input_SendEventTimes( input_thread_t *p_input, const input_event_times_t *p_times )
+void input_SendEventTimes( input_thread_t *p_input,
+                           double f_position, mtime_t i_time, mtime_t i_length )
 {
     vlc_value_t val;
 
     /* */
-    val.f_float = p_times->f_position;
+    val.f_float = f_position;
     var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
 
     /* */
-    val.i_time = p_times->i_time;
+    val.i_time = i_time;
     var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
 
 	/* FIXME ugly + what about meta change event ? */
-    if( var_GetTime( p_input, "length" ) != p_times->i_length )
-        input_item_SetDuration( p_input->p->input.p_item, p_times->i_length );
-    val.i_time = p_times->i_length;
+    if( var_GetTime( p_input, "length" ) != i_length )
+        input_item_SetDuration( p_input->p->input.p_item, i_length );
+    val.i_time = i_length;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
     Trigger( p_input, INPUT_EVENT_TIMES );

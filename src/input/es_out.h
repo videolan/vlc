@@ -71,6 +71,9 @@ enum es_out_query_private_e
 
     /* Set next frame */
     ES_OUT_SET_FRAME_NEXT,                          /*                          res=can fail */
+
+    /* Set position/time/length */
+    ES_OUT_SET_TIMES,                               /* arg1=double f_position arg2=mtime_t i_time arg3=mtime_t i_length res=cannot fail */
 };
 
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
@@ -120,6 +123,11 @@ static inline int es_out_SetTime( es_out_t *p_out, mtime_t i_date )
 static inline int es_out_SetFrameNext( es_out_t *p_out )
 {
     return es_out_Control( p_out, ES_OUT_SET_FRAME_NEXT );
+}
+static inline void es_out_SetTimes( es_out_t *p_out, double f_position, mtime_t i_time, mtime_t i_length )
+{
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_TIMES, f_position, i_time, i_length );
+    assert( !i_ret );
 }
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );

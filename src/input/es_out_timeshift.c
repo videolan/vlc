@@ -121,6 +121,13 @@ typedef struct attribute_packed
             es_out_id_t *p_es;
             es_format_t *p_fmt;
         } es_fmt;
+        struct
+        {
+            /* FIXME Really too big (double make the whole thing too big) */
+            double  f_position;
+            mtime_t i_time;
+            mtime_t i_length;
+        } times;
     };
 } ts_cmd_control_t;
 
@@ -595,6 +602,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_ES_DEFAULT:
     case ES_OUT_SET_ES_STATE:
     case ES_OUT_SET_ES_FMT:
+    case ES_OUT_SET_TIMES:
     {
         ts_cmd_t cmd;
         if( CmdInitControl( &cmd, i_query, args, p_sys->b_delayed ) )
@@ -1377,6 +1385,17 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         }
         break;
     }
+    case ES_OUT_SET_TIMES:
+    {
+        double f_position = (double)va_arg( args, double );
+        mtime_t i_time = (mtime_t)va_arg( args, mtime_t );
+        mtime_t i_length = (mtime_t)va_arg( args, mtime_t );
+
+        p_cmd->control.times.f_position = f_position;
+        p_cmd->control.times.i_time = i_time;
+        p_cmd->control.times.i_length = i_length;
+        break;
+    }
 
     default:
         assert(0);
@@ -1405,16 +1424,19 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->control.i_i64 );
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-        return es_out_Control( p_out, i_query, p_cmd->control.int_i64.i_int, p_cmd->control.int_i64.i_i64 );
+        return es_out_Control( p_out, i_query, p_cmd->control.int_i64.i_int,
+                                               p_cmd->control.int_i64.i_i64 );
 
     case ES_OUT_RESET_PCR:           /* no arg */
         return es_out_Control( p_out, i_query );
 
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=vlc_meta_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.int_meta.i_int, p_cmd->control.int_meta.p_meta );
+        return es_out_Control( p_out, i_query, p_cmd->control.int_meta.i_int,
+                                               p_cmd->control.int_meta.p_meta );
 
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=vlc_epg_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.int_epg.i_int, p_cmd->control.int_epg.p_epg );
+        return es_out_Control( p_out, i_query, p_cmd->control.int_epg.i_int,
+                                               p_cmd->control.int_epg.p_epg );
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
@@ -1423,10 +1445,17 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es );
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
-        return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es, p_cmd->control.es_bool.b_bool );
+        return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es,
+                                               p_cmd->control.es_bool.b_bool );
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.es_fmt.p_es->p_es, p_cmd->control.es_fmt.p_fmt );
+        return es_out_Control( p_out, i_query, p_cmd->control.es_fmt.p_es->p_es,
+                                               p_cmd->control.es_fmt.p_fmt );
+
+    case ES_OUT_SET_TIMES:
+        return es_out_Control( p_out, i_query, p_cmd->control.times.f_position,
+                                               p_cmd->control.times.i_time,
+                                               p_cmd->control.times.i_length );
 
     default:
         assert(0);

@@ -2307,6 +2307,17 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             EsOutFrameNext( out );
             return VLC_SUCCESS;
 
+        case ES_OUT_SET_TIMES:
+        {
+            double f_position = (double)va_arg( args, double );
+            mtime_t i_time = (mtime_t)va_arg( args, mtime_t );
+            mtime_t i_length = (mtime_t)va_arg( args, mtime_t );
+
+            /* TODO handle es_out buffering */
+            input_SendEventTimes( p_sys->p_input, f_position, i_time, i_length );
+            return VLC_SUCCESS;
+        }
+
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
             return VLC_EGENERIC;

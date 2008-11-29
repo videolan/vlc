@@ -644,26 +644,24 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
  */
 static void MainLoopInterface( input_thread_t *p_input )
 {
-    input_event_times_t ev;
-
-    ev.f_position = 0.0;
-    ev.i_time = 0;
-    ev.i_length = 0;
+    double f_position = 0.0;
+    mtime_t i_time = 0;
+    mtime_t i_length = 0;
 
     /* update input status variables */
     if( demux_Control( p_input->p->input.p_demux,
-                       DEMUX_GET_POSITION, &ev.f_position ) )
-        ev.f_position = 0.0;
+                       DEMUX_GET_POSITION, &f_position ) )
+        f_position = 0.0;
 
     if( demux_Control( p_input->p->input.p_demux,
-                       DEMUX_GET_TIME, &ev.i_time ) )
-        ev.i_time = 0;
+                       DEMUX_GET_TIME, &i_time ) )
+        i_time = 0;
 
     if( demux_Control( p_input->p->input.p_demux,
-                       DEMUX_GET_LENGTH, &ev.i_length ) )
-        ev.i_length = 0;
+                       DEMUX_GET_LENGTH, &i_length ) )
+        i_length = 0;
 
-    input_SendEventTimes( p_input, &ev );
+    es_out_SetTimes( p_input->p->p_es_out, f_position, i_time, i_length );
 }
 
 /**
@@ -1165,15 +1163,13 @@ static int Init( input_thread_t * p_input )
 
     /* Load master infos */
     /* Init length */
-    input_event_times_t ev_times;
-    ev_times.f_position = 0;
-    ev_times.i_time = 0;
+    mtime_t i_length;
     if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_LENGTH,
-                         &ev_times.i_length ) )
-        ev_times.i_length = 0;
-    if( ev_times.i_length <= 0 )
-        ev_times.i_length = input_item_GetDuration( p_input->p->input.p_item );
-    input_SendEventTimes( p_input, &ev_times );
+                         &i_length ) )
+        i_length = 0;
+    if( i_length <= 0 )
+        i_length = input_item_GetDuration( p_input->p->input.p_item );
+    input_SendEventTimes( p_input, 0.0, 0, i_length );
 
     StartTitle( p_input );
 
