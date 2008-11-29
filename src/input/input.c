@@ -1297,6 +1297,10 @@ static void End( input_thread_t * p_input )
     /* Clean control variables */
     input_ControlVarStop( p_input );
 
+    /* Stop es out activity */
+    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
+    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
+
     /* Clean up master */
     InputSourceClean( &p_input->p->input );
 
