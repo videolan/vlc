@@ -290,7 +290,7 @@ static block_t *PacketizeRawBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        //aout_DateSet( &p_sys->end_date, 0 );
+        aout_DateSet( &p_sys->end_date, 0 );
         block_Release( *pp_block );
         return NULL;
     }

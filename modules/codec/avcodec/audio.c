@@ -261,6 +261,8 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     {
         block_Release( p_block );
         avcodec_flush_buffers( p_sys->p_context );
+        p_sys->i_samples = 0;
+        aout_DateSet( &p_sys->end_date, 0 );
 
         if( p_sys->i_codec_id == CODEC_ID_MP2 || p_sys->i_codec_id == CODEC_ID_MP3 )
             p_sys->i_reject_count = 3;

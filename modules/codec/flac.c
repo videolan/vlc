@@ -388,7 +388,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_NOSYNC;
             block_BytestreamFlush( &p_sys->bytestream );
         }
-//        aout_DateSet( &p_sys->end_date, 0 );
+        aout_DateSet( &p_sys->end_date, 0 );
         block_Release( *pp_block );
         return NULL;
     }
