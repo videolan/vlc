@@ -5,6 +5,7 @@
  * $Id$
  *
  * Author: Rafaël Carré <funman at videolanorg>
+ *         Ilkka Ollakka <ileoo at videolan org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -215,7 +216,7 @@ static void Close( vlc_object_t *p_this )
         if ( p_input )
         {
             if( p_sys->b_state_cb )
-                var_DelCallback( p_input, "state", PlayingChange, p_intf );
+                var_DelCallback( p_input, "intf-event", PlayingChange, p_intf );
 
             vlc_object_release( p_input );
         }
@@ -257,6 +258,7 @@ static void Run( intf_thread_t *p_intf )
     for( ;; )
     {
         bool b_wait = false;
+
 
         vlc_restorecancel( canc );
         vlc_mutex_lock( &p_sys->lock );
@@ -462,20 +464,30 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
 {
     intf_thread_t   *p_intf = ( intf_thread_t* ) p_data;
     intf_sys_t      *p_sys  = p_intf->p_sys;
+    input_thread_t  *p_input = ( input_thread_t* )p_this;
+    vlc_value_t     state_value;
 
     VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
 
-    if( p_sys->b_meta_read == false && newval.i_int >= PLAYING_S )
+    if( newval.i_int != INPUT_EVENT_STATE ) return VLC_SUCCESS;
+
+    state_value.i_int = 0;
+
+    var_Get( p_input, "state", &state_value );
+
+
+    if( p_sys->b_meta_read == false && state_value.i_int >= PLAYING_S )
     {
         ReadMetaData( p_intf );
         return VLC_SUCCESS;
     }
 
-    if( newval.i_int >= END_S )
+
+    if( state_value.i_int >= END_S )
         AddToQueue( p_intf );
-    else if( oldval.i_int == PLAYING_S && newval.i_int == PAUSE_S )
+    else if( state_value.i_int == PAUSE_S )
         p_sys->time_pause = mdate();
-    else if( oldval.i_int == PAUSE_S && newval.i_int == PLAYING_S )
+    else if( p_sys->time_pause > 0 && state_value.i_int == PLAYING_S )
         p_sys->time_total_pauses += ( mdate() - p_sys->time_pause );
 
     return VLC_SUCCESS;
@@ -531,7 +543,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     time( &p_sys->p_current_song.date );        /* to be sent to last.fm */
     p_sys->p_current_song.i_start = mdate();    /* only used locally */
 
-    var_AddCallback( p_input, "state", PlayingChange, p_intf );
+    var_AddCallback( p_input, "intf-event", PlayingChange, p_intf );
     p_sys->b_state_cb = true;
 
     if( input_item_IsPreparsed( p_item ) )
