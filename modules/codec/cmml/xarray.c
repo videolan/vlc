@@ -33,7 +33,7 @@
 #include "xarray.h"
 
 /* local prototypes */
-XSTATIC XArray * xarray_New (unsigned int);
+XArray * xarray_New (unsigned int);
 
 
 #define XARRAY_ASSERT_NOT_NULL(xarray) \
@@ -54,7 +54,7 @@ XSTATIC XArray * xarray_New (unsigned int);
         if (xarray->array == NULL) return XARRAY_ENOMEM; \
     }
 
-XSTATIC XArray * xarray_New (unsigned int initial_size_hint)
+XArray * xarray_New (unsigned int initial_size_hint)
 {
     XArray *new_xarray = NULL;
     void *inner_array;
@@ -82,28 +82,10 @@ XSTATIC XArray * xarray_New (unsigned int initial_size_hint)
 
     new_xarray->array = inner_array;
 
-    /* Make a dummy reference to other functions, so that we don't get
-     * warnings about unused functions from the compiler.  Ahem :) */
-    while (0)
-    {
-        void *dummy_reference;
-
-        dummy_reference = xarray_AddObject;
-        dummy_reference = xarray_InsertObject;
-        dummy_reference = xarray_RemoveLastObject;
-        dummy_reference = xarray_RemoveObject;
-        dummy_reference = xarray_RemoveObjects;
-        dummy_reference = xarray_RemoveObjectsAfter;
-        dummy_reference = xarray_ReplaceObject;
-
-        dummy_reference = xarray_ObjectAtIndex;
-        dummy_reference = xarray_Count;
-    }
- 
     return new_xarray;
 }
 
-XSTATIC int xarray_ObjectAtIndex (XArray *xarray, unsigned int index,
+int xarray_ObjectAtIndex (XArray *xarray, unsigned int index,
         void **out_object)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
@@ -114,7 +96,7 @@ XSTATIC int xarray_ObjectAtIndex (XArray *xarray, unsigned int index,
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_AddObject (XArray *xarray, void *object)
+int xarray_AddObject (XArray *xarray, void *object)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
 
@@ -129,7 +111,7 @@ XSTATIC int xarray_AddObject (XArray *xarray, void *object)
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_InsertObject (XArray *xarray, void *object,
+int xarray_InsertObject (XArray *xarray, void *object,
         unsigned int at_index)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
@@ -155,7 +137,7 @@ XSTATIC int xarray_InsertObject (XArray *xarray, void *object,
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_RemoveLastObject (XArray *xarray)
+int xarray_RemoveLastObject (XArray *xarray)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
 
@@ -168,7 +150,7 @@ XSTATIC int xarray_RemoveLastObject (XArray *xarray)
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_RemoveObject (XArray *xarray, unsigned int at_index)
+int xarray_RemoveObject (XArray *xarray, unsigned int at_index)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
     XARRAY_BOUNDS_CHECK (xarray, at_index);
@@ -189,7 +171,7 @@ XSTATIC int xarray_RemoveObject (XArray *xarray, unsigned int at_index)
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_RemoveObjects (XArray *xarray, unsigned int at_index,
+int xarray_RemoveObjects (XArray *xarray, unsigned int at_index,
         int count)
 {
     int i;
@@ -211,7 +193,7 @@ XSTATIC int xarray_RemoveObjects (XArray *xarray, unsigned int at_index,
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_RemoveObjectsAfter (XArray *xarray, unsigned int index)
+int xarray_RemoveObjectsAfter (XArray *xarray, unsigned int index)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
     XARRAY_BOUNDS_CHECK (xarray, index);
@@ -227,7 +209,7 @@ XSTATIC int xarray_RemoveObjectsAfter (XArray *xarray, unsigned int index)
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_ReplaceObject (XArray *xarray, unsigned int index,
+int xarray_ReplaceObject (XArray *xarray, unsigned int index,
         void *new_object)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
@@ -238,7 +220,7 @@ XSTATIC int xarray_ReplaceObject (XArray *xarray, unsigned int index,
     return XARRAY_SUCCESS;
 }
 
-XSTATIC int xarray_Count (XArray *xarray, unsigned int *out_count)
+int xarray_Count (XArray *xarray, unsigned int *out_count)
 {
     XARRAY_ASSERT_NOT_NULL (xarray);
 

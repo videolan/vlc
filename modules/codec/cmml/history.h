@@ -27,7 +27,6 @@
 #ifndef __VLC_HISTORY_H__
 #define __VLC_HISTORY_H__
 
-#define XARRAY_EMBED_IN_HOST_C_FILE
 #include "xarray.h"
 
 struct history_item_t

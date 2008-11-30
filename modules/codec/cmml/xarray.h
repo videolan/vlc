@@ -27,11 +27,7 @@
 #ifndef __XARRAY_H__
 #define __XARRAY_H__
 
-/* define this to 'static' for static linkage */
-#define XSTATIC
-
 #define XARRAY_DEFAULT_SIZE 69
-#define xarray_malloc malloc
 
 /* Error codes */
 enum xarray_errors
@@ -52,22 +48,22 @@ typedef struct
 XArray;
 
 /* Mutable methods */
-XSTATIC int      xarray_AddObject (XArray *xarray, void *object);
-XSTATIC int      xarray_InsertObject (XArray *xarray, void *object,
+int      xarray_AddObject (XArray *xarray, void *object);
+int      xarray_InsertObject (XArray *xarray, void *object,
                                       unsigned int at_index);
-XSTATIC int      xarray_RemoveLastObject (XArray *xarray);
-XSTATIC int      xarray_RemoveObject (XArray *xarray, unsigned int at_index);
-XSTATIC int      xarray_RemoveObjects (XArray *xarray, unsigned int at_index,
+int      xarray_RemoveLastObject (XArray *xarray);
+int      xarray_RemoveObject (XArray *xarray, unsigned int at_index);
+int      xarray_RemoveObjects (XArray *xarray, unsigned int at_index,
                                        int count);
-XSTATIC int      xarray_RemoveObjectsAfter (XArray *xarray, unsigned int index);
-XSTATIC int      xarray_ReplaceObject (XArray *xarray, unsigned int index,
+int      xarray_RemoveObjectsAfter (XArray *xarray, unsigned int index);
+int      xarray_ReplaceObject (XArray *xarray, unsigned int index,
                                        void *new_object);
 
 /* Immutable methods */
-XSTATIC XArray * xarray_New ();
-XSTATIC int      xarray_ObjectAtIndex (XArray *xarray, unsigned int index,
+XArray * xarray_New ();
+int      xarray_ObjectAtIndex (XArray *xarray, unsigned int index,
                                        void **out_object);
-XSTATIC int      xarray_Count (XArray *xarray, unsigned int *out_count);
+int      xarray_Count (XArray *xarray, unsigned int *out_count);
 
 #endif /* __XARRAY_H__ */
 
