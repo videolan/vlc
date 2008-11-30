@@ -217,14 +217,9 @@ void *drms_alloc( const char *psz_homedir )
 {
     struct drms_s *p_drms;
 
-    p_drms = malloc( sizeof(struct drms_s) );
-
-    if( p_drms == NULL )
-    {
+    p_drms = calloc( 1, sizeof(struct drms_s) );
+    if( !p_drms )
         return NULL;
-    }
-
-    memset( p_drms, 0, sizeof(struct drms_s) );
 
     strncpy( p_drms->psz_homedir, psz_homedir, PATH_MAX );
     p_drms->psz_homedir[ PATH_MAX - 1 ] = '\0';
@@ -239,11 +234,7 @@ void drms_free( void *_p_drms )
 {
     struct drms_s *p_drms = (struct drms_s *)_p_drms;
 
-    if( p_drms->p_name != NULL )
-    {
-        free( (void *)p_drms->p_name );
-    }
-
+    free( (void *)p_drms->p_name );
     free( p_drms );
 }
 
@@ -2097,7 +2088,7 @@ static int GetiPodID( int64_t *p_ipod_id )
 
 #else /* !defined( UNDER_CE ) */
 
-void *drms_alloc( const char *psz_homedir ){ return 0; }
+void *drms_alloc( const char *psz_homedir ){ return NULL; }
 void drms_free( void *a ){}
 void drms_decrypt( void *a, uint32_t *b, uint32_t c, uint32_t *k  ){}
 void drms_get_p_key( void *p_drms, uint32_t *p_key );
