@@ -36,9 +36,9 @@ char * xtag_get_name (XTag * xtag);
 
 char * xtag_get_pcdata (XTag * xtag);
 
-char * xtag_get_attribute (XTag * xtag, char * attribute);
+char * xtag_get_attribute (XTag * xtag, const char * attribute);
 
-XTag * xtag_first_child (XTag * xtag, char * name);
+XTag * xtag_first_child (XTag * xtag, const char * name);
 
 XTag * xtag_next_child (XTag * xtag, char * name);
 

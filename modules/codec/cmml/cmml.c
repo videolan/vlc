@@ -267,8 +267,8 @@ static void ParseText( decoder_t *p_dec, block_t *p_block )
         val.p_address = psz_tmp;
         if( var_Set( p_dec, "psz-current-anchor-url", val ) != VLC_SUCCESS )
         {
-            (void) var_Create( p_dec, "psz-current-anchor-url",
-                               VLC_VAR_ADDRESS|VLC_VAR_DOINHERIT );
+            var_Create( p_dec, "psz-current-anchor-url",
+                        VLC_VAR_ADDRESS | VLC_VAR_DOINHERIT );
             msg_Dbg( p_dec, "creating psz-current-anchor-url" );
             if( var_Set( p_dec, "psz-current-anchor-url", val ) != VLC_SUCCESS )
                 msg_Dbg( p_dec, "var_Set of psz-current-anchor-url failed" );
@@ -282,8 +282,8 @@ static void ParseText( decoder_t *p_dec, block_t *p_block )
         val.p_address = psz_tmp;
         if( var_Set( p_dec, "psz-current-anchor-description", val ) != VLC_SUCCESS )
         {
-            (void) var_Create( p_dec, "psz-current-anchor-description",
-                               VLC_VAR_ADDRESS|VLC_VAR_DOINHERIT );
+            var_Create( p_dec, "psz-current-anchor-description",
+                        VLC_VAR_ADDRESS | VLC_VAR_DOINHERIT );
             msg_Dbg( p_dec, "creating psz-current-anchor-description" );
             if( var_Set( p_dec, "psz-current-anchor-description", val ) != VLC_SUCCESS )
                 msg_Dbg( p_dec, "var_Set of psz-current-anchor-description failed" );

@@ -83,8 +83,8 @@ void   xtag_free (XTag * xtag);
 XTag * xtag_new_parse (const char * s, int n);
 char * xtag_get_name (XTag * xtag);
 char * xtag_get_pcdata (XTag * xtag);
-char * xtag_get_attribute (XTag * xtag, char * attribute);
-XTag * xtag_first_child (XTag * xtag, char * name);
+char * xtag_get_attribute (XTag * xtag, const char* attribute);
+XTag * xtag_first_child (XTag * xtag, const char * name);
 XTag * xtag_next_child (XTag * xtag, char * name);
 int    xtag_snprint (char * buf, int n, XTag * xtag);
 
@@ -521,51 +521,55 @@ xtag_get_pcdata (XTag * xtag)
   return NULL;
 }
 
-char *
-xtag_get_attribute (XTag * xtag, char * attribute)
+char* xtag_get_attribute (XTag * xtag, const char * attribute)
 {
-  XList * l;
-  XAttribute * attr;
+    XList * l;
+    XAttribute * attr;
 
-  if (xtag == NULL) return NULL;
+    if( !xtag )
+        return NULL;
 
-  for (l = xtag->attributes; l; l = l->next) {
-    if ((attr = (XAttribute *)l->data) != NULL) {
-      if (attr->name && attribute && !strcmp (attr->name, attribute))
-        return attr->value;
+    for( l = xtag->attributes; l; l = l->next )
+    {
+        if( ( attr = (XAttribute *)l->data ) != NULL )
+        {
+            if( attr->name && attribute && !strcmp( attr->name, attribute ) )
+                return attr->value;
+        }
     }
-  }
-
-  return NULL;
+    return NULL;
 }
 
-XTag *
-xtag_first_child (XTag * xtag, char * name)
+XTag* xtag_first_child (XTag * xtag, const char * name)
 {
-  XList * l;
-  XTag * child;
+    XList * l;
+    XTag * child;
 
-  if (xtag == NULL) return NULL;
+    if( !xtag )
+        return NULL;
 
-  if ((l = xtag->children) == NULL) return NULL;
+    if( ( l = xtag->children ) == NULL )
+        return NULL;
 
-  if (name == NULL) {
-    xtag->current_child = l;
-    return (XTag *)l->data;
-  }
-
-  for (; l; l = l->next) {
-    child = (XTag *)l->data;
-
-    if (child->name && name && !strcmp(child->name, name)) {
-      xtag->current_child = l;
-      return child;
+    if( !name )
+    {
+        xtag->current_child = l;
+        return (XTag *)l->data;
     }
-  }
 
-  xtag->current_child = NULL;
+    for( ; l; l = l->next )
+    {
+        child = (XTag *)l->data;
 
-  return NULL;
+        if( child->name && name && !strcmp( child->name, name ) )
+        {
+            xtag->current_child = l;
+            return child;
+        }
+    }
+
+    xtag->current_child = NULL;
+    return NULL;
 }
 
 XTag *
