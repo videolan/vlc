@@ -145,6 +145,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             int i_ret = input_item_AddInfo( p_input->p->input.p_item,
                                             psz_cat, psz_name, "%s", psz_value );
+            free( psz_value );
 
             if( !p_input->b_preparsing && !i_ret )
                 input_SendEventMetaInfo( p_input );
