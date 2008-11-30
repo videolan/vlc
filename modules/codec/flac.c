@@ -860,7 +860,8 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_header, i_temp, i_read;
-    int i_blocksize = 0, i_blocksize_hint = 0, i_sample_rate_hint = 0;
+    unsigned i_blocksize = 0;
+    int i_blocksize_hint = 0, i_sample_rate_hint = 0;
     uint64_t i_sample_number = 0;
 
     bool b_variable_blocksize = ( p_sys->b_stream_info &&
