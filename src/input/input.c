@@ -2862,7 +2862,7 @@ static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_d
     if( !b_bool )
         return;
 
-    p_demux->p_private = malloc( sizeof( demux_meta_t ) );
+    p_demux->p_private = calloc( 1, sizeof( demux_meta_t ) );
     if(! p_demux->p_private )
         return;
 
