@@ -79,7 +79,7 @@ struct _XTagParser {
   char * end;
 };
 
-XTag * xtag_free (XTag * xtag);
+void   xtag_free (XTag * xtag);
 XTag * xtag_new_parse (const char * s, int n);
 char * xtag_get_name (XTag * xtag);
 char * xtag_get_pcdata (XTag * xtag);
@@ -410,20 +410,20 @@ xtag_parse_tag (XTagParser * parser)
   return tag;
 }
 
-XTag *
-xtag_free (XTag * xtag)
+void xtag_free (XTag * xtag)
 {
   XList * l;
   XAttribute * attr;
   XTag * child;
 
-  if (xtag == NULL) return NULL;
+  if( !xtag )
+    return;
 
   free( xtag->name );
   free( xtag->pcdata );
 
-  for (l = xtag->attributes; l; l = l->next) {
-    if ((attr = (XAttribute *)l->data) != NULL) {
+  for( l = xtag->attributes; l; l = l->next) {
+    if((attr = (XAttribute *)l->data) != NULL) {
       free( attr->name );
       free( attr->value );
       free( attr );
@@ -433,13 +433,11 @@ xtag_free (XTag * xtag)
 
   for (l = xtag->children; l; l = l->next) {
     child = (XTag *)l->data;
-    xtag_free (child);
+    xtag_free( child );
   }
   xlist_free (xtag->children);
 
-  free (xtag);
-
-  return NULL;
+  free( xtag );
 }
 
 XTag *
