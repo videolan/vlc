@@ -7,7 +7,7 @@ Examples: rc.lua, telnet.lua and http.lua
 
 The "config" global variable is set to the value specified in the
 --lua-config VLC option. For example:
---lua-config "rc={a='test',c=3},telnel{a='hello'}"
+--lua-config "rc={a='test',c=3},telnet={a='hello'}"
 config will be set to {a='test',c=3} in the rc interface, to {a='hello'}
 in the telnet interface and won't be set in other interfaces. 
 
