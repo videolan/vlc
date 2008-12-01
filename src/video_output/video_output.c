@@ -1187,7 +1187,7 @@ static void* RunThread( vlc_object_t *p_this )
         }
         else
         {
-            /* Wait until a frame is being sent or a supurious wakeup (not a problem here) */
+            /* Wait until a frame is being sent or a spurious wakeup (not a problem here) */
             vlc_mutex_lock( &p_vout->picture_lock );
             vlc_cond_timedwait( &p_vout->p->picture_wait, &p_vout->picture_lock, current_date + VOUT_IDLE_SLEEP );
             vlc_mutex_unlock( &p_vout->picture_lock );
