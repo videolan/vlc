@@ -560,7 +560,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
         ( p_input->p->i_run > 0 && *pi_start_mdate+p_input->p->i_run < mdate() ) )
         i_ret = 0; /* EOF */
     else
-        i_ret = p_input->p->input.p_demux->pf_demux(p_input->p->input.p_demux);
+        i_ret = demux_Demux( p_input->p->input.p_demux );
 
     if( i_ret > 0 )
     {
@@ -2650,13 +2650,13 @@ static void SlaveDemux( input_thread_t *p_input )
                 if( i_stime >= i_time )
                     break;
 
-                if( ( i_ret = in->p_demux->pf_demux( in->p_demux ) ) <= 0 )
+                if( ( i_ret = demux_Demux( in->p_demux ) ) <= 0 )
                     break;
             }
         }
         else
         {
-            i_ret = in->p_demux->pf_demux( in->p_demux );
+            i_ret = demux_Demux( in->p_demux );
         }
 
         if( i_ret <= 0 )
