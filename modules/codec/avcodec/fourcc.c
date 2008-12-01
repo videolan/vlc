@@ -562,19 +562,26 @@ static const struct
 
     /* Real Video */
     { VLC_FOURCC('R','V','1','0'), CODEC_ID_RV10,
-      VIDEO_ES, "Real Video 10" },
+      VIDEO_ES, "Real Video 1.0" },
     { VLC_FOURCC('r','v','1','0'), CODEC_ID_RV10,
-      VIDEO_ES, "Real Video 10" },
+      VIDEO_ES, "Real Video 1.0" },
     { VLC_FOURCC('R','V','1','3'), CODEC_ID_RV10,
-      VIDEO_ES, "Real Video 13" },
+      VIDEO_ES, "Real Video 1.3" },
     { VLC_FOURCC('r','v','1','3'), CODEC_ID_RV10,
-      VIDEO_ES, "Real Video 13" },
+      VIDEO_ES, "Real Video 1.3" },
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 15, 1 )
     { VLC_FOURCC('R','V','2','0'), CODEC_ID_RV20,
-      VIDEO_ES, "Real Video 20" },
+      VIDEO_ES, "Real Video 2.0" },
     { VLC_FOURCC('r','v','2','0'), CODEC_ID_RV20,
-      VIDEO_ES, "Real Video 20" },
+      VIDEO_ES, "Real Video 2.0" },
 #endif
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 5, 0 )
+    { VLC_FOURCC('R','V','4','0'), CODEC_ID_RV40,
+      VIDEO_ES, "Real Video 4.0" },
+    { VLC_FOURCC('r','v','4','0'), CODEC_ID_RV40,
+      VIDEO_ES, "Real Video 4.0" },
+#endif
+
 
     /* Apple Video */
     { VLC_FOURCC('r','p','z','a'), CODEC_ID_RPZA,
