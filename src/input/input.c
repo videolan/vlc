@@ -1947,7 +1947,6 @@ static bool Control( input_thread_t *p_input, int i_type,
             }
             else if( p_input->p->input.i_title > 0 )
             {
-                demux_t *p_demux = p_input->p->input.p_demux;
                 access_t *p_access = p_input->p->input.p_access;
                 int i_seekpoint;
                 int64_t i_input_time;
