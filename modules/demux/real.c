@@ -921,14 +921,14 @@ static void ReadRealIndex( demux_t *p_demux )
 
     msg_Dbg( p_demux, "Real Index : num : %d ", i_index_count );
 
-    if( i_index_count == 0 )
+    if( i_index_count > ( 0xffffffff / sizeof( rm_index_t ) ) )
         return;
 
     if( GetDWBE( &buffer[16] ) > 0 )
         msg_Dbg( p_demux, "Real Index: Does next index exist? %d ",
                         GetDWBE( &buffer[16] )  );
 
-    p_sys->p_index = calloc( i_index_count + 1, sizeof( rm_index_t ) );
+    p_sys->p_index = malloc( ( i_index_count + 1 ) * sizeof( rm_index_t ) );
     if( p_sys->p_index == NULL )
         return;
 
@@ -947,12 +947,13 @@ static void ReadRealIndex( demux_t *p_demux )
         p_sys->p_index[i].time_offset = GetDWBE( &buffer[2] );
         p_sys->p_index[i].file_offset = GetDWBE( &buffer[6] );
         p_sys->p_index[i].frame_index = GetDWBE( &buffer[10] );
-        msg_Dbg( p_demux, "Real Index: time %d file %d frame %d ",
-                        p_sys->p_index[i].time_offset,
-                        p_sys->p_index[i].file_offset,
-                        p_sys->p_index[i].frame_index );
-
+        msg_Dbg( p_demux,
+                 "Real Index: time %"PRIu32" file %"PRIu32" frame %"PRIu32,
+                 p_sys->p_index[i].time_offset,
+                 p_sys->p_index[i].file_offset,
+                 p_sys->p_index[i].frame_index );
     }
+    memset( p_sys->p_index + i_index_count, 0, sizeof( rm_index_t ) );
 }
 
 /*****************************************************************************
