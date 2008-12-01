@@ -935,12 +935,6 @@ static void StartTitle( input_thread_t * p_input )
     vlc_value_t val;
 
     /* Start title/chapter */
-    if( p_input->b_preparsing )
-    {
-        p_input->p->i_start = 0;
-        return;
-    }
-
     val.i_int = p_input->p->input.i_title_start -
                 p_input->p->input.i_title_offset;
     if( val.i_int > 0 && val.i_int < p_input->p->input.i_title )
@@ -1179,10 +1173,9 @@ static int Init( input_thread_t * p_input )
         i_length = input_item_GetDuration( p_input->p->input.p_item );
     input_SendEventTimes( p_input, 0.0, 0, i_length );
 
-    StartTitle( p_input );
-
     if( !p_input->b_preparsing )
     {
+        StartTitle( p_input );
         LoadSubtitles( p_input );
         LoadSlaves( p_input );
         InitPrograms( p_input );
@@ -1204,19 +1197,21 @@ static int Init( input_thread_t * p_input )
     }
 
     p_meta = vlc_meta_New();
+    if( p_meta )
+    {
+        /* Get meta data from users */
+        InputMetaUser( p_input, p_meta );
 
-    /* Get meta data from users */
-    InputMetaUser( p_input, p_meta );
+        /* Get meta data from master input */
+        InputSourceMeta( p_input, &p_input->p->input, p_meta );
 
-    /* Get meta data from master input */
-    InputSourceMeta( p_input, &p_input->p->input, p_meta );
+        /* And from slave */
+        for( int i = 0; i < p_input->p->i_slave; i++ )
+            InputSourceMeta( p_input, p_input->p->slave[i], p_meta );
 
-    /* And from slave */
-    for( int i = 0; i < p_input->p->i_slave; i++ )
-        InputSourceMeta( p_input, p_input->p->slave[i], p_meta );
-
-    /* */
-    InputUpdateMeta( p_input, p_meta );
+        /* */
+        InputUpdateMeta( p_input, p_meta );
+    }
 
     if( !p_input->b_preparsing )
     {
@@ -1346,6 +1341,7 @@ static void End( input_thread_t * p_input )
             {
                 stats_ComputeGlobalStats( p_input->p_libvlc,
                                           p_input->p_libvlc->p_stats );
+                /* FIXME how can it be thread safe ? */
                 p_private->p_stats_computer = NULL;
             }
             CL_CO( read_bytes );
@@ -2039,10 +2035,12 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                     /* Get meta (access and demux) */
                     p_meta = vlc_meta_New();
-                    access_Control( slave->p_access, ACCESS_GET_META,
-                                     p_meta );
-                    demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
-                    InputUpdateMeta( p_input, p_meta );
+                    if( p_meta )
+                    {
+                        access_Control( slave->p_access, ACCESS_GET_META, p_meta );
+                        demux_Control( slave->p_demux, DEMUX_GET_META, p_meta );
+                        InputUpdateMeta( p_input, p_meta );
+                    }
 
                     TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
                 }
@@ -2170,8 +2168,11 @@ static void UpdateGenericFromDemux( input_thread_t *p_input )
     if( p_demux->info.i_update & INPUT_UPDATE_META )
     {
         vlc_meta_t *p_meta = vlc_meta_New();
-        demux_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
-        InputUpdateMeta( p_input, p_meta );
+        if( p_meta )
+        {
+            demux_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
+            InputUpdateMeta( p_input, p_meta );
+        }
         p_demux->info.i_update &= ~INPUT_UPDATE_META;
     }
 
@@ -2216,8 +2217,11 @@ static void UpdateGenericFromAccess( input_thread_t *p_input )
     {
         /* TODO maybe multi - access ? */
         vlc_meta_t *p_meta = vlc_meta_New();
-        access_Control( p_input->p->input.p_access, ACCESS_GET_META, p_meta );
-        InputUpdateMeta( p_input, p_meta );
+        if( p_meta )
+        {
+            access_Control( p_input->p->input.p_access, ACCESS_GET_META, p_meta );
+            InputUpdateMeta( p_input, p_meta );
+        }
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
     if( p_access->info.i_update & INPUT_UPDATE_SIGNAL )
@@ -2723,8 +2727,6 @@ static void SlaveSeek( input_thread_t *p_input )
     int64_t i_time;
     int i;
 
-    if( !p_input ) return;
-
     if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
@@ -2755,14 +2757,12 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
     vlc_value_t val;
 
-    if( !p_meta ) return;
-
     /* Get meta information from user */
-#define GET_META( field, s ) \
+#define GET_META( field, s ) do { \
     var_Get( p_input, (s), &val );  \
-    if( *val.psz_string ) \
+    if( val.psz_string && *val.psz_string ) \
         vlc_meta_Set( p_meta, vlc_meta_ ## field, val.psz_string ); \
-    free( val.psz_string )
+    free( val.psz_string ); } while(0)
 
     GET_META( Title, "meta-title" );
     GET_META( Artist, "meta-artist" );
@@ -2781,13 +2781,9 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
     input_item_t *p_item = p_input->p->input.p_item;
-    char * psz_arturl = NULL;
+
     char *psz_title = NULL;
-
-    if( !p_meta )
-        return;
-
-    psz_arturl = input_item_GetArtURL( p_item );
+    char *psz_arturl = input_item_GetArtURL( p_item );
 
     vlc_mutex_lock( &p_item->lock );
 
