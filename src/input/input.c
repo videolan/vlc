@@ -891,15 +891,16 @@ static int InitSout( input_thread_t * p_input )
 
 static void InitTitle( input_thread_t * p_input )
 {
-    vlc_value_t val;
+    input_source_t *p_master = &p_input->p->input;
 
-    if( p_input->b_preparsing ) return;
+    if( p_input->b_preparsing )
+        return;
 
     /* Create global title (from master) */
-    p_input->p->i_title = p_input->p->input.i_title;
-    p_input->p->title   = p_input->p->input.title;
-    p_input->p->i_title_offset = p_input->p->input.i_title_offset;
-    p_input->p->i_seekpoint_offset = p_input->p->input.i_seekpoint_offset;
+    p_input->p->i_title = p_master->i_title;
+    p_input->p->title   = p_master->title;
+    p_input->p->i_title_offset = p_master->i_title_offset;
+    p_input->p->i_seekpoint_offset = p_master->i_seekpoint_offset;
     if( p_input->p->i_title > 0 )
     {
         /* Setup variables */
@@ -908,9 +909,9 @@ static void InitTitle( input_thread_t * p_input )
     }
 
     /* Global flag */
-    p_input->b_can_pace_control = p_input->p->input.b_can_pace_control;
-    p_input->p->b_can_pause        = p_input->p->input.b_can_pause;
-    p_input->p->b_can_rate_control = p_input->p->input.b_can_rate_control;
+    p_input->b_can_pace_control    = p_master->b_can_pace_control;
+    p_input->p->b_can_pause        = p_master->b_can_pause;
+    p_input->p->b_can_rate_control = p_master->b_can_rate_control;
 
     /* Fix pts delay */
     if( p_input->i_pts_delay < 0 )
@@ -918,27 +919,22 @@ static void InitTitle( input_thread_t * p_input )
 
     /* If the desynchronisation requested by the user is < 0, we need to
      * cache more data. */
-    var_Get( p_input, "audio-desync", &val );
-    if( val.i_int < 0 )
-        p_input->i_pts_delay -= (val.i_int * 1000);
+    const int i_desynch = var_GetInteger( p_input, "audio-desync" );
+    if( i_desynch < 0 )
+        p_input->i_pts_delay -= i_desynch * 1000;
 
     /* Update cr_average depending on the caching */
-    p_input->p->input.i_cr_average *= (10 * p_input->i_pts_delay / 200000);
-    p_input->p->input.i_cr_average /= 10;
-    if( p_input->p->input.i_cr_average < 10 ) p_input->p->input.i_cr_average = 10;
+    p_master->i_cr_average *= (10 * p_input->i_pts_delay / 200000);
+    p_master->i_cr_average /= 10;
+    if( p_master->i_cr_average < 10 )
+        p_master->i_cr_average = 10;
 }
 
 static void StartTitle( input_thread_t * p_input )
 {
-    double f_fps;
     vlc_value_t val;
-    int i_delay;
-    char *psz;
-    char *psz_subtitle;
-    int64_t i_length;
 
     /* Start title/chapter */
-
     if( p_input->b_preparsing )
     {
         p_input->p->i_start = 0;
@@ -949,23 +945,23 @@ static void StartTitle( input_thread_t * p_input )
                 p_input->p->input.i_title_offset;
     if( val.i_int > 0 && val.i_int < p_input->p->input.i_title )
         input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
+
     val.i_int = p_input->p->input.i_seekpoint_start -
                 p_input->p->input.i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
-    /* Start time*/
-    /* Set start time */
+    /* Start/stop/run time */
     p_input->p->i_start = INT64_C(1000000) * var_GetInteger( p_input, "start-time" );
     p_input->p->i_stop  = INT64_C(1000000) * var_GetInteger( p_input, "stop-time" );
     p_input->p->i_run   = INT64_C(1000000) * var_GetInteger( p_input, "run-time" );
-    i_length = var_GetTime( p_input, "length" );
     if( p_input->p->i_run < 0 )
     {
         msg_Warn( p_input, "invalid run-time ignored" );
         p_input->p->i_run = 0;
     }
 
+    const mtime_t i_length = var_GetTime( p_input, "length" );
     if( p_input->p->i_start > 0 )
     {
         if( p_input->p->i_start >= i_length )
@@ -988,9 +984,13 @@ static void StartTitle( input_thread_t * p_input )
         msg_Warn( p_input, "invalid stop-time ignored" );
         p_input->p->i_stop = 0;
     }
+}
 
+static void LoadSubtitles( input_thread_t *p_input )
+{
     /* Load subtitles */
     /* Get fps and set it if not already set */
+    double f_fps;
     if( !demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) &&
         f_fps > 1.0 )
     {
@@ -1008,22 +1008,19 @@ static void StartTitle( input_thread_t * p_input )
         }
     }
 
-    i_delay = var_CreateGetInteger( p_input, "sub-delay" );
+    const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-    {
         var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
-    }
 
     /* Look for and add subtitle files */
-    psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
+    char *psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
     if( psz_subtitle != NULL )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
         SubtitleAdd( p_input, psz_subtitle, true );
     }
 
-    var_Get( p_input, "sub-autodetect-file", &val );
-    if( val.b_bool )
+    if( var_GetBool( p_input, "sub-autodetect-file" ) )
     {
         char *psz_autopath = var_GetNonEmptyString( p_input, "sub-autodetect-path" );
         char **ppsz_subs = subtitles_Detect( p_input, psz_autopath,
@@ -1044,47 +1041,44 @@ static void StartTitle( input_thread_t * p_input )
         free( ppsz_subs );
     }
     free( psz_subtitle );
+}
 
-    /* Look for slave */
-    psz = var_GetNonEmptyString( p_input, "input-slave" );
-    if( psz != NULL )
+static void LoadSlaves( input_thread_t *p_input )
+{
+    char *psz = var_GetNonEmptyString( p_input, "input-slave" );
+    if( !psz )
+        return;
+
+    char *psz_org = psz;
+    while( psz && *psz )
     {
-        char *psz_delim;
-        input_source_t *slave;
-        while( psz && *psz )
-        {
-            while( *psz == ' ' || *psz == '#' )
-            {
-                psz++;
-            }
-            if( ( psz_delim = strchr( psz, '#' ) ) )
-            {
-                *psz_delim++ = '\0';
-            }
-            if( *psz == 0 )
-            {
-                break;
-            }
+        while( *psz == ' ' || *psz == '#' )
+            psz++;
 
-            msg_Dbg( p_input, "adding slave input '%s'", psz );
-            slave = InputSourceNew( p_input );
-            if( !InputSourceInit( p_input, slave, psz, NULL ) )
-            {
-                TAB_APPEND( p_input->p->i_slave, p_input->p->slave, slave );
-            }
-            else free( slave );
-            psz = psz_delim;
-        }
-        free( psz );
+        char *psz_delim = strchr( psz, '#' );
+        if( psz_delim )
+            *psz_delim++ = '\0';
+
+        if( *psz == 0 )
+            break;
+
+        msg_Dbg( p_input, "adding slave input '%s'", psz );
+
+        input_source_t *p_slave = InputSourceNew( p_input );
+        if( !InputSourceInit( p_input, p_slave, psz, NULL ) )
+            TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_slave );
+        else
+            free( p_slave );
+
+        psz = psz_delim;
     }
+    free( psz_org );
 }
 
 static void InitPrograms( input_thread_t * p_input )
 {
     int i_es_out_mode;
     vlc_value_t val;
-
-    if( p_input->b_preparsing ) return;
 
     /* Set up es_out */
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, true );
@@ -1187,7 +1181,12 @@ static int Init( input_thread_t * p_input )
 
     StartTitle( p_input );
 
-    InitPrograms( p_input );
+    if( !p_input->b_preparsing )
+    {
+        LoadSubtitles( p_input );
+        LoadSlaves( p_input );
+        InitPrograms( p_input );
+    }
 
     if( !p_input->b_preparsing && p_input->p->p_sout )
     {
@@ -2614,6 +2613,58 @@ static void InputSourceClean( input_source_t *in )
     }
 }
 
+/*****************************************************************************
+ * InputSourceMeta:
+ *****************************************************************************/
+static void InputSourceMeta( input_thread_t *p_input,
+                             input_source_t *p_source, vlc_meta_t *p_meta )
+{
+    access_t *p_access = p_source->p_access;
+    demux_t *p_demux = p_source->p_demux;
+
+    /* XXX Remember that checking against p_item->p_meta->i_status & ITEM_PREPARSED
+     * is a bad idea */
+
+    /* Read access meta */
+    if( p_access )
+        access_Control( p_access, ACCESS_GET_META, p_meta );
+
+    /* Read demux meta */
+    demux_Control( p_demux, DEMUX_GET_META, p_meta );
+
+    /* If the demux report unsupported meta data, try an external "meta reader" */
+    bool b_bool;
+    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
+        return;
+    if( !b_bool )
+        return;
+
+    demux_meta_t *p_demux_meta = p_demux->p_private = calloc( 1, sizeof(*p_demux_meta) );
+    if( !p_demux_meta )
+        return;
+
+    module_t *p_id3 = module_need( p_demux, "meta reader", NULL, 0 );
+    if( p_id3 )
+    {
+        if( p_demux_meta->p_meta )
+        {
+            vlc_meta_Merge( p_meta, p_demux_meta->p_meta );
+            vlc_meta_Delete( p_demux_meta->p_meta );
+        }
+
+        if( p_demux_meta->i_attachments > 0 )
+        {
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
+                              p_demux_meta->i_attachments, p_demux_meta->attachments );
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+        }
+        module_unneed( p_demux, p_id3 );
+    }
+    free( p_demux_meta );
+}
+
+
 static void SlaveDemux( input_thread_t *p_input )
 {
     int64_t i_time;
@@ -2794,55 +2845,6 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
     *pi_attachment = i_attachment;
     *ppp_attachment = attachment;
 }
-
-static void InputSourceMeta( input_thread_t *p_input,
-                             input_source_t *p_source, vlc_meta_t *p_meta )
-{
-    access_t *p_access = p_source->p_access;
-    demux_t *p_demux = p_source->p_demux;
-
-    /* XXX Remember that checking against p_item->p_meta->i_status & ITEM_PREPARSED
-     * is a bad idea */
-
-    /* Read access meta */
-    if( p_access )
-        access_Control( p_access, ACCESS_GET_META, p_meta );
-
-    /* Read demux meta */
-    demux_Control( p_demux, DEMUX_GET_META, p_meta );
-
-    /* If the demux report unsupported meta data, try an external "meta reader" */
-    bool b_bool;
-    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
-        return;
-    if( !b_bool )
-        return;
-
-    demux_meta_t *p_demux_meta = p_demux->p_private = calloc( 1, sizeof(*p_demux_meta) );
-    if( !p_demux_meta )
-        return;
-
-    module_t *p_id3 = module_need( p_demux, "meta reader", NULL, 0 );
-    if( p_id3 )
-    {
-        if( p_demux_meta->p_meta )
-        {
-            vlc_meta_Merge( p_meta, p_demux_meta->p_meta );
-            vlc_meta_Delete( p_demux_meta->p_meta );
-        }
-
-        if( p_demux_meta->i_attachments > 0 )
-        {
-            vlc_mutex_lock( &p_input->p->input.p_item->lock );
-            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
-                              p_demux_meta->i_attachments, p_demux_meta->attachments );
-            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
-        }
-        module_unneed( p_demux, p_id3 );
-    }
-    free( p_demux_meta );
-}
-
 /*****************************************************************************
  * InputGetExtraFiles
  *  Autodetect extra input list
