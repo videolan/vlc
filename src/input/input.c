@@ -70,6 +70,8 @@ static void             WaitDie   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
 
+static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
+
 static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
 static void       ControlReduce( input_thread_t * );
 static bool Control( input_thread_t *, int, vlc_value_t );
@@ -86,6 +88,8 @@ static input_source_t *InputSourceNew( input_thread_t *);
 static int  InputSourceInit( input_thread_t *, input_source_t *,
                              const char *, const char *psz_forced_demux );
 static void InputSourceClean( input_source_t * );
+static void InputSourceMeta( input_thread_t *, input_source_t *, vlc_meta_t * );
+
 /* TODO */
 //static void InputGetAttachments( input_thread_t *, input_source_t * );
 static void SlaveDemux( input_thread_t *p_input );
@@ -96,8 +100,6 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
 static char *InputGetExtraFiles( input_thread_t *p_input,
                                  const char *psz_access, const char *psz_path );
 
-static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_demux );
-static void AccessMeta( input_thread_t * p_input, vlc_meta_t *p_meta );
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               int i_new, input_attachment_t **pp_new );
 
@@ -443,23 +445,6 @@ int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
  *
  * \param the input thread to stop
  */
-static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
-{
-    vlc_list_t *p_list;
-    int i;
-
-    if( p_obj->i_object_type == VLC_OBJECT_VOUT ||
-        p_obj->i_object_type == VLC_OBJECT_AOUT ||
-        p_obj == VLC_OBJECT(p_input->p->p_sout) )
-        return;
-
-    vlc_object_kill( p_obj );
-
-    p_list = vlc_list_children( p_obj );
-    for( i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_input, p_list->p_values[i].p_object );
-    vlc_list_release( p_list );
-}
 void input_StopThread( input_thread_t *p_input )
 {
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
@@ -477,6 +462,27 @@ sout_instance_t *input_DetachSout( input_thread_t *p_input )
     vlc_object_detach( p_sout );
     p_input->p->p_sout = NULL;
     return p_sout;
+}
+
+/*****************************************************************************
+ * ObjectKillChildrens
+ *****************************************************************************/
+static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
+{
+    vlc_list_t *p_list;
+    int i;
+
+    if( p_obj->i_object_type == VLC_OBJECT_VOUT ||
+        p_obj->i_object_type == VLC_OBJECT_AOUT ||
+        p_obj == VLC_OBJECT(p_input->p->p_sout) )
+        return;
+
+    vlc_object_kill( p_obj );
+
+    p_list = vlc_list_children( p_obj );
+    for( i = 0; i < p_list->i_count; i++ )
+        ObjectKillChildrens( p_input, p_list->p_values[i].p_object );
+    vlc_list_release( p_list );
 }
 
 /*****************************************************************************
@@ -1204,11 +1210,13 @@ static int Init( input_thread_t * p_input )
     InputMetaUser( p_input, p_meta );
 
     /* Get meta data from master input */
-    DemuxMeta( p_input, p_meta, p_input->p->input.p_demux );
+    InputSourceMeta( p_input, &p_input->p->input, p_meta );
 
-    /* Access_file does not give any meta, and there are no slave */
-    AccessMeta( p_input, p_meta );
+    /* And from slave */
+    for( int i = 0; i < p_input->p->i_slave; i++ )
+        InputSourceMeta( p_input, p_input->p->slave[i], p_meta );
 
+    /* */
     InputUpdateMeta( p_input, p_meta );
 
     if( !p_input->b_preparsing )
@@ -2235,10 +2243,8 @@ static void UpdateGenericFromAccess( input_thread_t *p_input )
 static input_source_t *InputSourceNew( input_thread_t *p_input )
 {
     VLC_UNUSED(p_input);
-    input_source_t *in = malloc( sizeof( input_source_t ) );
-    if( in )
-        memset( in, 0, sizeof( input_source_t ) );
-    return in;
+
+    return calloc( 1,  sizeof( input_source_t ) );
 }
 
 /*****************************************************************************
@@ -2718,6 +2724,126 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 }
 
 /*****************************************************************************
+ * InputUpdateMeta: merge p_item meta data with p_meta taking care of
+ * arturl and locking issue.
+ *****************************************************************************/
+static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
+{
+    input_item_t *p_item = p_input->p->input.p_item;
+    char * psz_arturl = NULL;
+    char *psz_title = NULL;
+
+    if( !p_meta )
+        return;
+
+    psz_arturl = input_item_GetArtURL( p_item );
+
+    vlc_mutex_lock( &p_item->lock );
+
+    if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
+        psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
+
+    vlc_meta_Merge( p_item->p_meta, p_meta );
+
+    vlc_meta_Delete( p_meta );
+
+    if( psz_arturl && *psz_arturl )
+    {
+        vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_arturl );
+
+        if( !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
+        {
+            /* Don't look for art cover if sout
+             * XXX It can change when sout has meta data support */
+            if( p_input->p->p_sout && !p_input->b_preparsing )
+                vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, "" );
+            else
+                input_ExtractAttachmentAndCacheArt( p_input );
+        }
+    }
+    free( psz_arturl );
+
+    vlc_mutex_unlock( &p_item->lock );
+
+    if( psz_title )
+    {
+        input_item_SetName( p_item, psz_title );
+        free( psz_title );
+    }
+    input_item_SetPreparsed( p_item, true );
+
+    input_SendEventMeta( p_input );
+
+    /** \todo handle sout meta */
+}
+
+static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
+                              int i_new, input_attachment_t **pp_new )
+{
+    int i_attachment = *pi_attachment;
+    input_attachment_t **attachment = *ppp_attachment;
+    int i;
+
+    attachment = realloc( attachment,
+                          sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
+    for( i = 0; i < i_new; i++ )
+        attachment[i_attachment++] = pp_new[i];
+    free( pp_new );
+
+    /* */
+    *pi_attachment = i_attachment;
+    *ppp_attachment = attachment;
+}
+
+static void InputSourceMeta( input_thread_t *p_input,
+                             input_source_t *p_source, vlc_meta_t *p_meta )
+{
+    access_t *p_access = p_source->p_access;
+    demux_t *p_demux = p_source->p_demux;
+
+    /* XXX Remember that checking against p_item->p_meta->i_status & ITEM_PREPARSED
+     * is a bad idea */
+
+    /* Read access meta */
+    if( p_access )
+        access_Control( p_access, ACCESS_GET_META, p_meta );
+
+    /* Read demux meta */
+    demux_Control( p_demux, DEMUX_GET_META, p_meta );
+
+    /* If the demux report unsupported meta data, try an external "meta reader" */
+    bool b_bool;
+    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
+        return;
+    if( !b_bool )
+        return;
+
+    demux_meta_t *p_demux_meta = p_demux->p_private = calloc( 1, sizeof(*p_demux_meta) );
+    if( !p_demux_meta )
+        return;
+
+    module_t *p_id3 = module_need( p_demux, "meta reader", NULL, 0 );
+    if( p_id3 )
+    {
+        if( p_demux_meta->p_meta )
+        {
+            vlc_meta_Merge( p_meta, p_demux_meta->p_meta );
+            vlc_meta_Delete( p_demux_meta->p_meta );
+        }
+
+        if( p_demux_meta->i_attachments > 0 )
+        {
+            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
+                              p_demux_meta->i_attachments, p_demux_meta->attachments );
+            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+        }
+        module_unneed( p_demux, p_id3 );
+    }
+    free( p_demux_meta );
+}
+
+/*****************************************************************************
  * InputGetExtraFiles
  *  Autodetect extra input list
  *****************************************************************************/
@@ -2772,152 +2898,8 @@ static char *InputGetExtraFiles( input_thread_t *p_input,
     return psz_list;
 }
 
-/*****************************************************************************
- * InputUpdateMeta: merge p_item meta data with p_meta taking care of
- * arturl and locking issue.
- *****************************************************************************/
-static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
-{
-    input_item_t *p_item = p_input->p->input.p_item;
-    char * psz_arturl = NULL;
-    char *psz_title = NULL;
 
-    if( !p_meta )
-        return;
-
-    psz_arturl = input_item_GetArtURL( p_item );
-
-    vlc_mutex_lock( &p_item->lock );
-
-    if( vlc_meta_Get( p_meta, vlc_meta_Title ) && !p_item->b_fixed_name )
-        psz_title = strdup( vlc_meta_Get( p_meta, vlc_meta_Title ) );
-
-    vlc_meta_Merge( p_item->p_meta, p_meta );
-
-    vlc_meta_Delete( p_meta );
-
-    if( psz_arturl && *psz_arturl )
-    {
-        vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_arturl );
-
-        if( !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
-        {
-            /* Don't look for art cover if sout
-             * XXX It can change when sout has meta data support */
-            if( p_input->p->p_sout && !p_input->b_preparsing )
-                vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, "" );
-            else
-                input_ExtractAttachmentAndCacheArt( p_input );
-        }
-    }
-    free( psz_arturl );
-
-    vlc_mutex_unlock( &p_item->lock );
-
-    if( psz_title )
-    {
-        input_item_SetName( p_item, psz_title );
-        free( psz_title );
-    }
-    input_item_SetPreparsed( p_item, true );
-
-    input_SendEventMeta( p_input );
-
-    /** \todo handle sout meta */
-}
-
-
-static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
-                              int i_new, input_attachment_t **pp_new )
-{
-    int i_attachment = *pi_attachment;
-    input_attachment_t **attachment = *ppp_attachment;
-    int i;
-
-    attachment = realloc( attachment,
-                          sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
-    for( i = 0; i < i_new; i++ )
-        attachment[i_attachment++] = pp_new[i];
-    free( pp_new );
-
-    /* */
-    *pi_attachment = i_attachment;
-    *ppp_attachment = attachment;
-}
-
-static void AccessMeta( input_thread_t * p_input, vlc_meta_t *p_meta )
-{
-    int i;
-
-    if( p_input->b_preparsing )
-        return;
-
-    if( p_input->p->input.p_access )
-        access_Control( p_input->p->input.p_access, ACCESS_GET_META,
-                         p_meta );
-
-    /* Get meta data from slave input */
-    for( i = 0; i < p_input->p->i_slave; i++ )
-    {
-        DemuxMeta( p_input, p_meta, p_input->p->slave[i]->p_demux );
-        if( p_input->p->slave[i]->p_access )
-        {
-            access_Control( p_input->p->slave[i]->p_access,
-                             ACCESS_GET_META, p_meta );
-        }
-    }
-}
-
-static void DemuxMeta( input_thread_t *p_input, vlc_meta_t *p_meta, demux_t *p_demux )
-{
-    bool b_bool;
-    module_t *p_id3;
-
-#if 0
-    /* XXX I am not sure it is a great idea, besides, there is more than that
-     * if we want to do it right */
-    vlc_mutex_lock( &p_item->lock );
-    if( p_item->p_meta && (p_item->p_meta->i_status & ITEM_PREPARSED ) )
-    {
-        vlc_mutex_unlock( &p_item->lock );
-        return;
-    }
-    vlc_mutex_unlock( &p_item->lock );
-#endif
-
-    demux_Control( p_demux, DEMUX_GET_META, p_meta );
-    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
-        return;
-    if( !b_bool )
-        return;
-
-    p_demux->p_private = calloc( 1, sizeof( demux_meta_t ) );
-    if(! p_demux->p_private )
-        return;
-
-    p_id3 = module_need( p_demux, "meta reader", NULL, 0 );
-    if( p_id3 )
-    {
-        demux_meta_t *p_demux_meta = (demux_meta_t *)p_demux->p_private;
-
-        if( p_demux_meta->p_meta )
-        {
-            vlc_meta_Merge( p_meta, p_demux_meta->p_meta );
-            vlc_meta_Delete( p_demux_meta->p_meta );
-        }
-
-        if( p_demux_meta->i_attachments > 0 )
-        {
-            vlc_mutex_lock( &p_input->p->input.p_item->lock );
-            AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
-                              p_demux_meta->i_attachments, p_demux_meta->attachments );
-            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
-        }
-        module_unneed( p_demux, p_id3 );
-    }
-    free( p_demux->p_private );
-}
-
+/* */
 static void input_ChangeState( input_thread_t *p_input, int i_state )
 {
     const bool b_changed = p_input->i_state != i_state;
