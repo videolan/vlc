@@ -74,8 +74,11 @@ static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t *, mtim
 static void       ControlReduce( input_thread_t * );
 static bool Control( input_thread_t *, int, vlc_value_t );
 
-static int  UpdateFromAccess( input_thread_t * );
-static int  UpdateFromDemux( input_thread_t * );
+static int  UpdateTitleSeekpointFromAccess( input_thread_t * );
+static void UpdateGenericFromAccess( input_thread_t * );
+
+static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
+static void UpdateGenericFromDemux( input_thread_t * );
 
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
@@ -555,19 +558,24 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
 
     if( i_ret > 0 )
     {
-        /* TODO */
-        if( p_input->p->input.b_title_demux &&
-            p_input->p->input.p_demux->info.i_update )
+        if( p_input->p->input.p_demux->info.i_update )
         {
-            i_ret = UpdateFromDemux( p_input );
-            *pb_changed = true;
+            if( p_input->p->input.b_title_demux )
+            {
+                i_ret = UpdateTitleSeekpointFromDemux( p_input );
+                *pb_changed = true;
+            }
+            UpdateGenericFromDemux( p_input );
         }
-        else if( !p_input->p->input.b_title_demux &&
-                  p_input->p->input.p_access &&
-                  p_input->p->input.p_access->info.i_update )
+        else if( p_input->p->input.p_access &&
+                 p_input->p->input.p_access->info.i_update )
         {
-            i_ret = UpdateFromAccess( p_input );
-            *pb_changed = true;
+            if( !p_input->p->input.b_title_demux )
+            {
+                i_ret = UpdateTitleSeekpointFromAccess( p_input );
+                *pb_changed = true;
+            }
+            UpdateGenericFromAccess( p_input );
         }
     }
 
@@ -2090,7 +2098,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 }
 
 /*****************************************************************************
- * UpdateFromDemux:
+ * UpdateTitleSeekpoint
  *****************************************************************************/
 static int UpdateTitleSeekpoint( input_thread_t *p_input,
                                  int i_title, int i_seekpoint )
@@ -2118,7 +2126,10 @@ static int UpdateTitleSeekpoint( input_thread_t *p_input,
     }
     return 1;
 }
-static int UpdateFromDemux( input_thread_t *p_input )
+/*****************************************************************************
+ * Update*FromDemux:
+ *****************************************************************************/
+static int UpdateTitleSeekpointFromDemux( input_thread_t *p_input )
 {
     demux_t *p_demux = p_input->p->input.p_demux;
 
@@ -2136,7 +2147,6 @@ static int UpdateFromDemux( input_thread_t *p_input )
 
         p_demux->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
-    p_demux->info.i_update &= ~INPUT_UPDATE_SIZE;
 
     /* Hmmm only works with master input */
     if( p_input->p->input.p_demux == p_demux )
@@ -2146,10 +2156,26 @@ static int UpdateFromDemux( input_thread_t *p_input )
     return 1;
 }
 
+static void UpdateGenericFromDemux( input_thread_t *p_input )
+{
+    demux_t *p_demux = p_input->p->input.p_demux;
+
+    if( p_demux->info.i_update & INPUT_UPDATE_META )
+    {
+        vlc_meta_t *p_meta = vlc_meta_New();
+        demux_Control( p_input->p->input.p_demux, DEMUX_GET_META, p_meta );
+        InputUpdateMeta( p_input, p_meta );
+        p_demux->info.i_update &= ~INPUT_UPDATE_META;
+    }
+
+    p_demux->info.i_update &= ~INPUT_UPDATE_SIZE;
+}
+
+
 /*****************************************************************************
- * UpdateFromAccess:
+ * Update*FromAccess:
  *****************************************************************************/
-static int UpdateFromAccess( input_thread_t *p_input )
+static int UpdateTitleSeekpointFromAccess( input_thread_t *p_input )
 {
     access_t *p_access = p_input->p->input.p_access;
 
@@ -2168,11 +2194,22 @@ static int UpdateFromAccess( input_thread_t *p_input )
 
         p_access->info.i_update &= ~INPUT_UPDATE_SEEKPOINT;
     }
+    /* Hmmm only works with master input */
+    if( p_input->p->input.p_access == p_access )
+        return UpdateTitleSeekpoint( p_input,
+                                     p_access->info.i_title,
+                                     p_access->info.i_seekpoint );
+    return 1;
+}
+static void UpdateGenericFromAccess( input_thread_t *p_input )
+{
+    access_t *p_access = p_input->p->input.p_access;
+
     if( p_access->info.i_update & INPUT_UPDATE_META )
     {
         /* TODO maybe multi - access ? */
         vlc_meta_t *p_meta = vlc_meta_New();
-        access_Control( p_input->p->input.p_access,ACCESS_GET_META, p_meta );
+        access_Control( p_input->p->input.p_access, ACCESS_GET_META, p_meta );
         InputUpdateMeta( p_input, p_meta );
         p_access->info.i_update &= ~INPUT_UPDATE_META;
     }
@@ -2190,13 +2227,6 @@ static int UpdateFromAccess( input_thread_t *p_input )
     }
 
     p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
-
-    /* Hmmm only works with master input */
-    if( p_input->p->input.p_access == p_access )
-        return UpdateTitleSeekpoint( p_input,
-                                     p_access->info.i_title,
-                                     p_access->info.i_seekpoint );
-    return 1;
 }
 
 /*****************************************************************************
