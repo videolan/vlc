@@ -617,11 +617,10 @@ enum input_query_e
     INPUT_ADD_OPTION,      /* arg1= char * arg2= char *  res=can fail*/
 
     /* Input properties */
-    INPUT_GET_BYTE_POSITION,     /* arg1= int64_t *       res=    */
-    INPUT_SET_BYTE_SIZE,         /* arg1= int64_t *       res=    */
     INPUT_GET_VIDEO_FPS,         /* arg1= double *        res=can fail */
 
     /* bookmarks */
+    INPUT_GET_BOOKMARK,    /* arg1= seekpoint_t *               res=can fail */
     INPUT_GET_BOOKMARKS,   /* arg1= seekpoint_t *** arg2= int * res=can fail */
     INPUT_CLEAR_BOOKMARKS, /* res=can fail */
     INPUT_ADD_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */

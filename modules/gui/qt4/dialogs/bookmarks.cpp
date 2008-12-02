@@ -146,19 +146,15 @@ void BookmarksDialog::add()
     if( !p_input ) return;
 
     seekpoint_t bookmark;
-    vlc_value_t pos;
-    bookmark.psz_name = qtu( THEMIM->getIM()->getName() +
-                    QString("_%1" ).arg( bookmarksList->topLevelItemCount() ) );
-    bookmark.i_byte_offset = 0;
-    bookmark.i_time_offset = 0;
 
-    input_Control( p_input, INPUT_GET_BYTE_POSITION, &bookmark.i_byte_offset );
-    var_Get( p_input, "time", &pos );
-    bookmark.i_time_offset = pos.i_time;
-    input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
+    if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
+    {
+        bookmark.psz_name = qtu( THEMIM->getIM()->getName() +
+                                 QString("_%1" ).arg( bookmarksList->topLevelItemCount() ) );
 
+        input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
+    }
     update();
-
 }
 
 void BookmarksDialog::del()

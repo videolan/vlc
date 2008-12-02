@@ -384,6 +384,19 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             break;
 
+        case INPUT_GET_BOOKMARK:
+            p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
+
+            memset( p_bkmk, 0, sizeof(*p_bkmk) );
+            p_bkmk->psz_name = NULL;
+            p_bkmk->i_level = 0;
+            p_bkmk->i_byte_offset = 0;
+            /* FIXME not safe at all ! */
+            if( p_input->p->input.p_stream )
+                p_bkmk->i_byte_offset = stream_Tell( p_input->p->input.p_stream );
+            p_bkmk->i_time_offset = var_GetTime( p_input, "time" );
+            return VLC_SUCCESS;
+
         case INPUT_ADD_OPTION:
         {
             const char *psz_option = va_arg( args, const char * );
@@ -399,18 +412,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             free( str );
             return i;
         }
-
-        case INPUT_GET_BYTE_POSITION:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = !p_input->p->input.p_stream ? 0 :
-                stream_Tell( p_input->p->input.p_stream );
-            return VLC_SUCCESS;
-
-        case INPUT_SET_BYTE_SIZE:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = !p_input->p->input.p_stream ? 0 :
-                stream_Size( p_input->p->input.p_stream );
-            return VLC_SUCCESS;
 
         case INPUT_GET_VIDEO_FPS:
         {

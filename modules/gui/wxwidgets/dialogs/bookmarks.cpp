@@ -283,17 +283,12 @@ void BookmarksDialog::OnAdd( wxCommandEvent& event )
     if( !p_input ) return;
 
     seekpoint_t bookmark;
-    vlc_value_t pos;
-    bookmark.psz_name = NULL;
-    bookmark.i_byte_offset = 0;
-    bookmark.i_time_offset = 0;
 
-    var_Get( p_input, "position", &pos );
-    bookmark.psz_name = NULL;
-    input_Control( p_input, INPUT_GET_BYTE_POSITION, &bookmark.i_byte_offset );
-    var_Get( p_input, "time", &pos );
-    bookmark.i_time_offset = pos.i_time;
-    input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
+    if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
+    {
+        bookmark.psz_name = NULL;
+        input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
+    }
     vlc_object_release( p_input );
 
     Update();
