@@ -181,7 +181,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->i_state = INIT_S;
     p_input->p->i_rate = INPUT_RATE_DEFAULT;
     p_input->p->b_recording = false;
-    TAB_INIT( p_input->p->i_bookmark, p_input->p->bookmark );
+    memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
+    TAB_INIT( p_input->p->i_bookmark, p_input->p->pp_bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
     p_input->p->p_es_out_display = NULL;
     p_input->p->p_es_out = NULL;
@@ -690,6 +691,13 @@ static void MainLoopInterface( input_thread_t *p_input )
         i_length = 0;
 
     es_out_SetTimes( p_input->p->p_es_out, f_position, i_time, i_length );
+
+    /* update current bookmark */
+    vlc_mutex_lock( &p_input->p->p_item->lock );
+    p_input->p->bookmark.i_time_offset = i_time;
+    if( p_input->p->input.p_stream )
+        p_input->p->bookmark.i_byte_offset = stream_Tell( p_input->p->input.p_stream );
+    vlc_mutex_unlock( &p_input->p->p_item->lock );
 }
 
 /**

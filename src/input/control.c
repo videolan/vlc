@@ -204,7 +204,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                      p_bkmk->psz_name = NULL;
             }
 
-            TAB_APPEND( p_input->p->i_bookmark, p_input->p->bookmark, p_bkmk );
+            TAB_APPEND( p_input->p->i_bookmark, p_input->p->pp_bookmark, p_bkmk );
 
             /* Reflect the changes on the object var */
             var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
@@ -215,7 +215,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 for( i = 0; i < p_input->p->i_bookmark; i++ )
                 {
                     val.i_int = i;
-                    text.psz_string = p_input->p->bookmark[i]->psz_name;
+                    text.psz_string = p_input->p->pp_bookmark[i]->psz_name;
                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
                                 &val, &text );
                 }
@@ -236,14 +236,14 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 vlc_value_t val, text;
                 int i;
 
-                p_input->p->bookmark[i_bkmk] = p_bkmk;
+                p_input->p->pp_bookmark[i_bkmk] = p_bkmk;
 
                 /* Reflect the changes on the object var */
                 var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
                 for( i = 0; i < p_input->p->i_bookmark; i++ )
                 {
                     val.i_int = i;
-                    text.psz_string = p_input->p->bookmark[i]->psz_name;
+                    text.psz_string = p_input->p->pp_bookmark[i]->psz_name;
                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
                                 &val, &text );
                 }
@@ -263,8 +263,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 vlc_value_t val, text;
                 int i;
 
-                p_bkmk = p_input->p->bookmark[i_bkmk];
-                TAB_REMOVE( p_input->p->i_bookmark, p_input->p->bookmark,
+                p_bkmk = p_input->p->pp_bookmark[i_bkmk];
+                TAB_REMOVE( p_input->p->i_bookmark, p_input->p->pp_bookmark,
                             p_bkmk );
                 vlc_seekpoint_Delete( p_bkmk );
 
@@ -273,7 +273,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 for( i = 0; i < p_input->p->i_bookmark; i++ )
                 {
                     val.i_int = i;
-                    text.psz_string = p_input->p->bookmark[i]->psz_name;
+                    text.psz_string = p_input->p->pp_bookmark[i]->psz_name;
                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
                                 &val, &text );
                 }
@@ -302,7 +302,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 for( i = 0; i < p_input->p->i_bookmark; i++ )
                 {
                     (*ppp_bkmk)[i] =
-                        vlc_seekpoint_Duplicate(p_input->p->bookmark[i]);
+                        vlc_seekpoint_Duplicate(p_input->p->pp_bookmark[i]);
                 }
 
                 vlc_mutex_unlock( &p_input->p->p_item->lock );
@@ -327,8 +327,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
                 for( i = p_input->p->i_bookmark - 1; i >= 0; i-- )
                 {
-                    p_bkmk = p_input->p->bookmark[i];
-                    TAB_REMOVE( p_input->p->i_bookmark, p_input->p->bookmark,
+                    p_bkmk = p_input->p->pp_bookmark[i];
+                    TAB_REMOVE( p_input->p->i_bookmark, p_input->p->pp_bookmark,
                                 p_bkmk );
                     vlc_seekpoint_Delete( p_bkmk );
                 }
@@ -349,12 +349,12 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 vlc_value_t pos;
                 int i_ret;
 
-                if( p_input->p->bookmark[i_bkmk]->i_time_offset != -1 )
+                if( p_input->p->pp_bookmark[i_bkmk]->i_time_offset != -1 )
                 {
-                    pos.i_time = p_input->p->bookmark[i_bkmk]->i_time_offset;
+                    pos.i_time = p_input->p->pp_bookmark[i_bkmk]->i_time_offset;
                     i_ret = var_Set( p_input, "time", pos );
                 }
-                else if( p_input->p->bookmark[i_bkmk]->i_byte_offset != -1 )
+                else if( p_input->p->pp_bookmark[i_bkmk]->i_byte_offset != -1 )
                 {
                     // don't crash on bookmarks in live streams
                     if( stream_Size( p_input->p->input.p_stream ) == 0 )
@@ -363,7 +363,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                         return VLC_EGENERIC;
                     }
                     pos.f_float = !p_input->p->input.p_stream ? 0 :
-                        p_input->p->bookmark[i_bkmk]->i_byte_offset /
+                        p_input->p->pp_bookmark[i_bkmk]->i_byte_offset /
                         stream_Size( p_input->p->input.p_stream );
                     i_ret = var_Set( p_input, "position", pos );
                 }
@@ -387,14 +387,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_GET_BOOKMARK:
             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
 
-            memset( p_bkmk, 0, sizeof(*p_bkmk) );
-            p_bkmk->psz_name = NULL;
-            p_bkmk->i_level = 0;
-            p_bkmk->i_byte_offset = 0;
-            /* FIXME not safe at all ! */
-            if( p_input->p->input.p_stream )
-                p_bkmk->i_byte_offset = stream_Tell( p_input->p->input.p_stream );
-            p_bkmk->i_time_offset = var_GetTime( p_input, "time" );
+            vlc_mutex_lock( &p_input->p->p_item->lock );
+            *p_bkmk = p_input->p->bookmark;
+            vlc_mutex_unlock( &p_input->p->p_item->lock );
             return VLC_SUCCESS;
 
         case INPUT_ADD_OPTION:
@@ -510,18 +505,18 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
         for( i = 0; i < p_input->p->i_bookmark; i++ )
         {
             i_len += snprintf( NULL, 0, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
-                               p_input->p->bookmark[i]->psz_name,
-                               p_input->p->bookmark[i]->i_byte_offset,
-                               p_input->p->bookmark[i]->i_time_offset/1000000 );
+                               p_input->p->pp_bookmark[i]->psz_name,
+                               p_input->p->pp_bookmark[i]->i_byte_offset,
+                               p_input->p->pp_bookmark[i]->i_time_offset/1000000 );
         }
         psz_value = psz_next = malloc( i_len + p_input->p->i_bookmark );
 
         for( i = 0; i < p_input->p->i_bookmark; i++ )
         {
             sprintf( psz_next, "{name=%s,bytes=%"PRId64",time=%"PRId64"}",
-                     p_input->p->bookmark[i]->psz_name,
-                     p_input->p->bookmark[i]->i_byte_offset,
-                     p_input->p->bookmark[i]->i_time_offset/1000000 );
+                     p_input->p->pp_bookmark[i]->psz_name,
+                     p_input->p->pp_bookmark[i]->i_byte_offset,
+                     p_input->p->pp_bookmark[i]->i_time_offset/1000000 );
 
             psz_next += strlen( psz_next );
             if( i < p_input->p->i_bookmark - 1)

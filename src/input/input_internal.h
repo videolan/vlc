@@ -98,8 +98,9 @@ struct input_thread_private_t
     int i_seekpoint_offset;
 
     /* User bookmarks FIXME won't be easy with multiples input */
+    seekpoint_t bookmark;
     int         i_bookmark;
-    seekpoint_t **bookmark;
+    seekpoint_t **pp_bookmark;
 
     /* Input attachment */
     int i_attachment;
