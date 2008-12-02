@@ -921,7 +921,7 @@ static void ReadRealIndex( demux_t *p_demux )
 
     msg_Dbg( p_demux, "Real Index : num : %d ", i_index_count );
 
-    if( i_index_count > ( 0xffffffff / sizeof( rm_index_t ) ) )
+    if( i_index_count >= ( 0xffffffff / sizeof( rm_index_t ) ) )
         return;
 
     if( GetDWBE( &buffer[16] ) > 0 )
