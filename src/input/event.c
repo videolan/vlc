@@ -53,7 +53,7 @@ void input_SendEventTimes( input_thread_t *p_input,
 
 	/* FIXME ugly + what about meta change event ? */
     if( var_GetTime( p_input, "length" ) != i_length )
-        input_item_SetDuration( p_input->p->input.p_item, i_length );
+        input_item_SetDuration( p_input->p->p_item, i_length );
     val.i_time = i_length;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
@@ -168,7 +168,7 @@ void input_SendEventMeta( input_thread_t *p_input )
 
 	event.type = vlc_InputItemMetaChanged;
 	event.u.input_item_meta_changed.meta_type = vlc_meta_ArtworkURL;
-	vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
+	vlc_event_send( &p_input->p->p_item->event_manager, &event );
 }
 
 void input_SendEventMetaInfo( input_thread_t *p_input )
@@ -179,7 +179,7 @@ void input_SendEventMetaInfo( input_thread_t *p_input )
     vlc_event_t event;
 
     event.type = vlc_InputItemInfoChanged;
-    vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
+    vlc_event_send( &p_input->p->p_item->event_manager, &event );
 }
 
 void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name )
@@ -191,7 +191,7 @@ void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name )
 
     event.type = vlc_InputItemNameChanged;
     event.u.input_item_name_changed.new_name = psz_name;
-    vlc_event_send( &p_input->p->input.p_item->event_manager, &event );
+    vlc_event_send( &p_input->p->p_item->event_manager, &event );
 }
 
 /*****************************************************************************

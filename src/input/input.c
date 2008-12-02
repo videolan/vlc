@@ -42,6 +42,7 @@
 #include "access.h"
 #include "demux.h"
 #include "stream.h"
+#include "item.h"
 
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"
@@ -188,9 +189,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->b_out_pace_control = false;
     p_input->i_pts_delay = 0;
 
-    /* Init Input fields */
     vlc_gc_incref( p_item ); /* Released in Destructor() */
-    p_input->p->input.p_item = p_item;
+    p_input->p->p_item = p_item;
+
+    /* Init Input fields */
     p_input->p->input.p_access = NULL;
     p_input->p->input.p_stream = NULL;
     p_input->p->input.p_demux  = NULL;
@@ -316,7 +318,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 static void Destructor( input_thread_t * p_input )
 {
 #ifndef NDEBUG
-    char * psz_name = input_item_GetName( p_input->p->input.p_item );
+    char * psz_name = input_item_GetName( p_input->p->p_item );
     msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
     free( psz_name );
 #endif
@@ -329,7 +331,7 @@ static void Destructor( input_thread_t * p_input )
     if( p_input->p->p_sout )
         sout_DeleteInstance( p_input->p->p_sout );
 #endif
-    vlc_gc_decref( p_input->p->input.p_item );
+    vlc_gc_decref( p_input->p->p_item );
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
@@ -462,6 +464,18 @@ sout_instance_t *input_DetachSout( input_thread_t *p_input )
     vlc_object_detach( p_sout );
     p_input->p->p_sout = NULL;
     return p_sout;
+}
+
+/**
+ * Get the item from an input thread
+ * FIXME it does not increase ref count of the item.
+ * if it is used after p_input is destroyed nothing prevent it from
+ * being freed.
+ */
+input_item_t *input_GetItem( input_thread_t *p_input )
+{
+    assert( p_input && p_input->p );
+    return p_input->p->p_item;
 }
 
 /*****************************************************************************
@@ -684,7 +698,7 @@ static void MainLoopInterface( input_thread_t *p_input )
  */
 static void MainLoopStatistic( input_thread_t *p_input )
 {
-    stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
+    stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );
     /* Are we the thread responsible for computing global stats ? */
     if( libvlc_priv( p_input->p_libvlc )->p_stats_computer == p_input )
     {
@@ -831,7 +845,7 @@ static int InitSout( input_thread_t * p_input )
 
     /* Find a usable sout and attach it to p_input */
     psz = var_GetNonEmptyString( p_input, "sout" );
-    if( psz && strncasecmp( p_input->p->input.p_item->psz_uri, "vlc:", 4 ) )
+    if( psz && strncasecmp( p_input->p->p_item->psz_uri, "vlc:", 4 ) )
     {
         /* Check the validity of the provided sout */
         if( p_input->p->p_sout )
@@ -1018,7 +1032,7 @@ static void LoadSubtitles( input_thread_t *p_input )
     {
         char *psz_autopath = var_GetNonEmptyString( p_input, "sub-autodetect-path" );
         char **ppsz_subs = subtitles_Detect( p_input, psz_autopath,
-                                             p_input->p->input.p_item->psz_uri );
+                                             p_input->p->p_item->psz_uri );
         free( psz_autopath );
 
         for( int i = 0; ppsz_subs && ppsz_subs[i]; i++ )
@@ -1125,9 +1139,9 @@ static int Init( input_thread_t * p_input )
     vlc_meta_t *p_meta;
     int i, ret;
 
-    for( i = 0; i < p_input->p->input.p_item->i_options; i++ )
+    for( i = 0; i < p_input->p->p_item->i_options; i++ )
     {
-        if( !strncmp( p_input->p->input.p_item->ppsz_options[i], "meta-file", 9 ) )
+        if( !strncmp( p_input->p->p_item->ppsz_options[i], "meta-file", 9 ) )
         {
             msg_Dbg( p_input, "Input is a meta file: disabling unneeded options" );
             var_SetString( p_input, "sout", "" );
@@ -1156,7 +1170,7 @@ static int Init( input_thread_t * p_input )
     var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
 
     if( InputSourceInit( p_input, &p_input->p->input,
-                         p_input->p->input.p_item->psz_uri, NULL ) )
+                         p_input->p->p_item->psz_uri, NULL ) )
     {
         goto error;
     }
@@ -1170,7 +1184,7 @@ static int Init( input_thread_t * p_input )
                          &i_length ) )
         i_length = 0;
     if( i_length <= 0 )
-        i_length = input_item_GetDuration( p_input->p->input.p_item );
+        i_length = input_item_GetDuration( p_input->p->p_item );
     input_SendEventTimes( p_input, 0.0, 0, i_length );
 
     if( !p_input->b_preparsing )
@@ -1216,7 +1230,7 @@ static int Init( input_thread_t * p_input )
     if( !p_input->b_preparsing )
     {
         msg_Dbg( p_input, "`%s' successfully opened",
-                 p_input->p->input.p_item->psz_uri );
+                 p_input->p->p_item->psz_uri );
 
     }
 
@@ -1336,7 +1350,7 @@ static void End( input_thread_t * p_input )
             libvlc_priv_t *p_private = libvlc_priv( p_input->p_libvlc );
 
             /* make sure we are up to date */
-            stats_ComputeInputStats( p_input, p_input->p->input.p_item->p_stats );
+            stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );
             if( p_private->p_stats_computer == p_input )
             {
                 stats_ComputeGlobalStats( p_input->p_libvlc,
@@ -2559,17 +2573,17 @@ static int InputSourceInit( input_thread_t *p_input,
         if( !demux_Control( in->p_demux, DEMUX_GET_ATTACHMENTS,
                              &attachment, &i_attachment ) )
         {
-            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            vlc_mutex_lock( &p_input->p->p_item->lock );
             AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
                               i_attachment, attachment );
-            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+            vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
     }
     if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) )
     {
-        vlc_mutex_lock( &p_input->p->input.p_item->lock );
+        vlc_mutex_lock( &p_input->p->p_item->lock );
         in->f_fps = f_fps;
-        vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+        vlc_mutex_unlock( &p_input->p->p_item->lock );
     }
 
     if( var_GetInteger( p_input, "clock-synchro" ) != -1 )
@@ -2658,10 +2672,10 @@ static void InputSourceMeta( input_thread_t *p_input,
 
         if( p_demux_meta->i_attachments > 0 )
         {
-            vlc_mutex_lock( &p_input->p->input.p_item->lock );
+            vlc_mutex_lock( &p_input->p->p_item->lock );
             AppendAttachment( &p_input->p->i_attachment, &p_input->p->attachment,
                               p_demux_meta->i_attachments, p_demux_meta->attachments );
-            vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+            vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
         module_unneed( p_demux, p_id3 );
     }
@@ -2780,7 +2794,7 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
  *****************************************************************************/
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
-    input_item_t *p_item = p_input->p->input.p_item;
+    input_item_t *p_item = p_input->p->p_item;
 
     char *psz_title = NULL;
     char *psz_arturl = input_item_GetArtURL( p_item );
@@ -2910,7 +2924,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state )
 
     if( b_changed )
     {
-        input_item_SetErrorWhenReading( p_input->p->input.p_item, p_input->b_error );
+        input_item_SetErrorWhenReading( p_input->p->p_item, p_input->b_error );
         input_SendEventState( p_input, i_state );
     }
 }

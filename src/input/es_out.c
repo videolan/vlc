@@ -978,10 +978,8 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     }
 
     /* Update now playing */
-    input_item_SetNowPlaying( p_input->p->input.p_item,
-                              p_pgrm->psz_now_playing );
-    input_item_SetPublisher( p_input->p->input.p_item,
-                             p_pgrm->psz_publisher );
+    input_item_SetNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
+    input_item_SetPublisher( p_input->p->p_item, p_pgrm->psz_publisher );
 
     input_SendEventMeta( p_input );
 }
@@ -1170,7 +1168,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     {
         if( p_sys->p_pgrm == p_pgrm )
         {
-            input_item_SetPublisher( p_input->p->input.p_item, psz_provider );
+            input_item_SetPublisher( p_input->p->p_item, psz_provider );
             input_SendEventMeta( p_input );
         }
         input_Control( p_input, INPUT_ADD_INFO, psz_cat, input_MetaTypeToLocalizedString(vlc_meta_Publisher), psz_provider );
@@ -1296,7 +1294,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
 
     if( p_pgrm == p_sys->p_pgrm )
     {
-        input_item_SetNowPlaying( p_input->p->input.p_item, p_pgrm->psz_now_playing );
+        input_item_SetNowPlaying( p_input->p->p_item, p_pgrm->psz_now_playing );
         input_SendEventMeta( p_input );
     }
 
@@ -1373,9 +1371,9 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
         es->i_channel = p_sys->i_audio;
 
         memset( &rg, 0, sizeof(rg) );
-        vlc_mutex_lock( &p_input->p->input.p_item->lock );
-        vlc_audio_replay_gain_MergeFromMeta( &rg, p_input->p->input.p_item->p_meta );
-        vlc_mutex_unlock( &p_input->p->input.p_item->lock );
+        vlc_mutex_lock( &p_input->p->p_item->lock );
+        vlc_audio_replay_gain_MergeFromMeta( &rg, p_input->p->p_item->p_meta );
+        vlc_mutex_unlock( &p_input->p->p_item->lock );
 
         for( i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
         {

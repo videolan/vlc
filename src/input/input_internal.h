@@ -43,9 +43,6 @@
 /* input_source_t: gathers all information per input source */
 typedef struct
 {
-    /* Input item description */
-    input_item_t *p_item;
-
     /* Access/Stream/Demux plugins */
     access_t *p_access;
     stream_t *p_stream;
@@ -118,6 +115,8 @@ struct input_thread_private_t
     bool            b_out_pace_control; /*     idem ? */
 
     /* Main input properties */
+    input_item_t *p_item;
+
     input_source_t input;
     /* Slave demuxers (subs, and others) */
     int            i_slave;
@@ -211,8 +210,6 @@ void input_ControlPush( input_thread_t *, int i_type, vlc_value_t * );
 /* input_ExtractAttachmentAndCacheArt:
  *  Becarefull; p_item lock HAS to be taken */
 void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input );
-
-void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error );
 
 /***************************************************************************
  * Internal prototypes

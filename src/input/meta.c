@@ -447,7 +447,7 @@ int input_DownloadAndCacheArt( playlist_t *p_playlist, input_item_t *p_item )
 
 void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
 {
-    input_item_t *p_item = p_input->p->input.p_item;
+    input_item_t *p_item = p_input->p->p_item;
     const char *psz_arturl;
     const char *psz_artist = NULL;
     const char *psz_album = NULL;

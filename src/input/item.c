@@ -30,7 +30,7 @@
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
 
-#include "input_internal.h"
+#include "item.h"
 
 static void GuessType( input_item_t *p_item );
 
@@ -209,18 +209,6 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
     event.type = vlc_InputItemMetaChanged;
     event.u.input_item_meta_changed.meta_type = meta_type;
     vlc_event_send( &p_i->event_manager, &event );
-}
-
-/**
- * Get the item from an input thread
- * FIXME it does not increase ref count of the item.
- * if it is used after p_input is destroyed nothing prevent it from
- * being freed.
- */
-input_item_t *input_GetItem( input_thread_t *p_input )
-{
-    assert( p_input && p_input->p );
-    return p_input->p->input.p_item;
 }
 
 /* FIXME GRRRRRRRRRR args should be in the reverse order to be 
