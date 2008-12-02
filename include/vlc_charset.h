@@ -85,5 +85,6 @@ VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) LIBVLC_USED );
 
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) LIBVLC_USED );
 VLC_EXPORT( double, us_atof, ( const char * ) LIBVLC_USED );
+VLC_EXPORT( int, us_asprintf, ( char **, const char *, ... ) LIBVLC_USED );
 
 #endif

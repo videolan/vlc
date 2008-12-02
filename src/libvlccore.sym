@@ -396,6 +396,7 @@ update_GetRelease
 update_NeedUpgrade
 __update_New
 update_WaitDownload
+us_asprintf
 us_atof
 us_strtod
 utf8_fopen
