@@ -1004,7 +1004,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    p_pgrm->p_clock = input_clock_New( p_input->p->input.i_cr_average, p_sys->i_rate );
+    p_pgrm->p_clock = input_clock_New( p_input->p->i_cr_average, p_sys->i_rate );
     if( !p_pgrm->p_clock )
     {
         free( p_pgrm );

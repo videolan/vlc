@@ -71,9 +71,6 @@ typedef struct
     bool       b_eof;   /* eof of demuxer */
     double     f_fps;
 
-    /* Clock average variation */
-    int     i_cr_average;
-
 } input_source_t;
 
 /** Private input fields */
@@ -115,10 +112,14 @@ struct input_thread_private_t
     bool            b_out_pace_control; /*     idem ? */
 
     /* Main input properties */
-    input_item_t *p_item;
 
+    /* Input item */
+    input_item_t   *p_item;
+    /* Clock average variation */
+    int            i_cr_average;
+    /* Main source */
     input_source_t input;
-    /* Slave demuxers (subs, and others) */
+    /* Slave sources (subs, and others) */
     int            i_slave;
     input_source_t **slave;
 

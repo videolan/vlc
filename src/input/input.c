@@ -188,6 +188,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_sout   = NULL;
     p_input->p->b_out_pace_control = false;
     p_input->i_pts_delay = 0;
+    p_input->p->i_cr_average = 0;
 
     vlc_gc_incref( p_item ); /* Released in Destructor() */
     p_input->p->p_item = p_item;
@@ -204,7 +205,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->input.b_can_rate_control = true;
     p_input->p->input.b_rescale_ts = true;
     p_input->p->input.b_eof = false;
-    p_input->p->input.i_cr_average = 0;
 
     vlc_mutex_lock( &p_item->lock );
 
@@ -236,7 +236,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ControlVarInit( p_input );
 
     /* */
-    p_input->p->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
+    p_input->p->i_cr_average = var_GetInteger( p_input, "cr-average" );
 
     if( !p_input->b_preparsing )
     {
@@ -938,10 +938,10 @@ static void InitTitle( input_thread_t * p_input )
         p_input->i_pts_delay -= i_desynch * 1000;
 
     /* Update cr_average depending on the caching */
-    p_master->i_cr_average *= (10 * p_input->i_pts_delay / 200000);
-    p_master->i_cr_average /= 10;
-    if( p_master->i_cr_average < 10 )
-        p_master->i_cr_average = 10;
+    p_input->p->i_cr_average *= (10 * p_input->i_pts_delay / 200000);
+    p_input->p->i_cr_average /= 10;
+    if( p_input->p->i_cr_average < 10 )
+        p_input->p->i_cr_average = 10;
 }
 
 static void StartTitle( input_thread_t * p_input )
