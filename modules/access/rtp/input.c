@@ -37,6 +37,12 @@
 #include "rtp.h"
 #include <srtp.h>
 
+static bool fd_dead (int fd)
+{
+    struct pollfd ufd = { .fd = fd, };
+    return (poll (&ufd, 1, 0) > 0) && (ufd.revents & POLLHUP);
+}
+
 /**
  * Gets a datagram from the network.
  * @param fd datagram file descriptor
@@ -54,8 +60,7 @@ static block_t *rtp_dgram_recv (vlc_object_t *obj, int fd)
                         block->p_buffer, block->i_buffer, false);
         vlc_cleanup_pop ();
 
-        if (((len <= 0) && poll (&(struct pollfd){ .fd = fd, }, 1, 0))
-         || !vlc_object_alive (obj))
+        if (((len <= 0) && fd_dead (fd)) || !vlc_object_alive (obj))
         {   /* POLLHUP -> permanent (DCCP) socket error */
             block_Release (block);
             return NULL;
