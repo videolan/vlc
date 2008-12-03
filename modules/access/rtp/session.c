@@ -144,7 +144,7 @@ struct rtp_source_t
     uint16_t bad_seq; /* tentatively next expected sequence for resync */
     uint16_t max_seq; /* next expected sequence */
 
-    uint16_t last_seq; /* sequence of the last dequeued packet */
+    uint16_t last_seq; /* sequence of the next dequeued packet */
     block_t *blocks; /* re-ordered blocks queue */
     void    *opaque[0]; /* Per-source private payload data */
 };
@@ -319,35 +319,36 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
     /* Check sequence number */
     /* NOTE: the sequence number is per-source,
      * but is independent from the payload type. */
-    uint16_t delta_seq = seq - (src->max_seq + 1);
-    if ((delta_seq < 0x8000) ? (delta_seq > p_sys->max_dropout)
-                             : ((65535 - delta_seq) > p_sys->max_misorder))
+    int delta_seq = seq - src->max_seq;
+    if ((delta_seq > 0) ? (delta_seq > p_sys->max_dropout)
+                        : (-delta_seq > p_sys->max_misorder))
     {
-        msg_Dbg (demux, "sequence discontinuity (got: %u, expected: %u)",
-                 seq, (src->max_seq + 1) & 0xffff);
-        if (seq == ((src->bad_seq + 1) & 0xffff))
+        msg_Dbg (demux, "sequence discontinuity"
+                 " (got: %"PRIu16", expected: %"PRIu16")", seq, src->max_seq);
+        if (seq == src->bad_seq)
         {
-            src->max_seq = src->bad_seq = seq;
+            src->max_seq = src->bad_seq = seq + 1;
+            src->last_seq = seq - 0x7fffe; /* hack for rtp_decode() */
             msg_Warn (demux, "sequence resynchronized");
             block_ChainRelease (src->blocks);
             src->blocks = NULL;
         }
         else
         {
-            src->bad_seq = seq;
+            src->bad_seq = seq + 1;
             goto drop;
         }
     }
     else
-    if (delta_seq < 0x8000)
-        src->max_seq = seq;
+    if (delta_seq >= 0)
+        src->max_seq = seq + 1;
 
     /* Queues the block in sequence order,
      * hence there is a single queue for all payload types. */
     block_t **pp = &src->blocks;
     for (block_t *prev = *pp; prev != NULL; prev = *pp)
     {
-        int16_t delta_seq = seq - rtp_seq (prev);
+        int delta_seq = seq - rtp_seq (prev);
         if (delta_seq < 0)
             break;
         if (delta_seq == 0)
