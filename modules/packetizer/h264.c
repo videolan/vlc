@@ -40,6 +40,7 @@
 
 #include "vlc_block_helper.h"
 #include "vlc_bits.h"
+#include "../codec/cc.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -61,6 +62,7 @@ vlc_module_end ()
  ****************************************************************************/
 static block_t *Packetize( decoder_t *, block_t ** );
 static block_t *PacketizeAVC1( decoder_t *, block_t ** );
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
 
 typedef struct
 {
@@ -121,6 +123,13 @@ struct decoder_sys_t
     /* */
     mtime_t i_frame_pts;
     mtime_t i_frame_dts;
+
+    /* */
+    bool b_cc_reset;
+    uint32_t i_cc_flags;
+    mtime_t i_cc_pts;
+    mtime_t i_cc_dts;
+    cc_data_t cc;
 };
 
 enum
@@ -161,6 +170,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag );
 static void PutPPS( decoder_t *p_dec, block_t *p_frag );
 static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice,
                         int i_nal_ref_idc, int i_nal_type, const block_t *p_frag );
+static void ParseSei( decoder_t *, block_t * );
 
 
 /*****************************************************************************
@@ -326,15 +336,24 @@ static int Open( vlc_object_t *p_this )
 
         /* Set callback */
         p_dec->pf_packetize = PacketizeAVC1;
+        /* TODO CC ? */
     }
     else
     {
         /* This type of stream contains data with 3 of 4 byte startcodes
          * The fmt_in.p_extra MAY contain SPS/PPS with 4 byte startcodes
          * The fmt_out.p_extra should be the same */
- 
+
         /* Set callback */
         p_dec->pf_packetize = Packetize;
+        p_dec->pf_get_cc = GetCc;
+
+        /* */
+        p_sys->b_cc_reset = false;
+        p_sys->i_cc_pts = 0;
+        p_sys->i_cc_dts = 0;
+        p_sys->i_cc_flags = 0;
+        cc_Init( &p_sys->cc );
 
         /* */
         if( p_dec->fmt_in.i_extra > 0 )
@@ -365,7 +384,8 @@ static void Close( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i;
 
-    if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
+    if( p_sys->p_frame )
+        block_ChainRelease( p_sys->p_frame );
     for( i = 0; i < SPS_MAX; i++ )
     {
         if( p_sys->pp_sps[i] )
@@ -377,6 +397,9 @@ static void Close( vlc_object_t *p_this )
             block_Release( p_sys->pp_pps[i] );
     }
     block_BytestreamRelease( &p_sys->bytestream );
+    if( p_dec->pf_get_cc )
+         cc_Exit( &p_sys->cc );
+
     free( p_sys );
 }
 
@@ -559,6 +582,32 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
     return p_ret;
 }
 
+/*****************************************************************************
+ * GetCc:
+ *****************************************************************************/
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_cc;
+
+    for( int i = 0; i < 4; i++ )
+        pb_present[i] = p_sys->cc.pb_present[i];
+
+    if( p_sys->cc.i_data <= 0 )
+        return NULL;
+
+    p_cc = block_New( p_dec, p_sys->cc.i_data);
+    if( p_cc )
+    {
+        memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
+        p_cc->i_dts =
+        p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
+        p_cc->i_flags = ( p_sys->cc.b_reorder  ? p_sys->i_cc_flags : BLOCK_FLAG_TYPE_P ) & BLOCK_FLAG_TYPE_MASK;
+    }
+    cc_Flush( &p_sys->cc );
+    return p_cc;
+}
+
 /****************************************************************************
  * Helpers
  ****************************************************************************/
@@ -650,6 +699,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
         p_sys->slice.i_frame_type = 0;
         p_sys->p_frame = NULL;
         p_sys->b_slice = false;
+        p_sys->b_cc_reset = true;
     }
 
     if( ( !p_sys->b_sps || !p_sys->b_pps ) &&
@@ -700,7 +750,14 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );
 
-        /* TODO parse SEI for CC support */
+        /* Parse SEI for CC support */
+        ParseSei( p_dec, p_frag );
+    }
+
+    if( !p_pic && p_sys->b_cc_reset )
+    {
+        p_sys->b_cc_reset = false;
+        cc_Flush( &p_sys->cc );
     }
 
     /* Append the block */
@@ -760,6 +817,12 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->i_frame_dts = -1;
     p_sys->i_frame_pts = -1;
     p_sys->b_slice = false;
+
+    /* CC */
+    p_sys->b_cc_reset = true;
+    p_sys->i_cc_pts = p_pic->i_pts;
+    p_sys->i_cc_dts = p_pic->i_dts;
+    p_sys->i_cc_flags = p_pic->i_flags;
 
     return p_pic;
 }
@@ -1096,4 +1159,63 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
     *p_slice = slice;
 }
 
+static void ParseSei( decoder_t *p_dec, block_t *p_frag )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    uint8_t *pb_dec;
+    int i_dec;
+
+    /* */
+    CreateDecodedNAL( &pb_dec, &i_dec, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
+    if( !pb_dec )
+        return;
+
+    /* The +1 is for rbsp trailing bits */
+    for( int i_used = 0; i_used+1 < i_dec; )
+    {
+        /* Read type */
+        int i_type = 0;
+        while( i_used+1 < i_dec )
+        {
+            const int i_byte = pb_dec[i_used++];
+            i_type += i_byte;
+            if( i_byte != 0xff )
+                break;
+        }
+        /* Read size */
+        int i_size = 0;
+        while( i_used+1 < i_dec )
+        {
+            const int i_byte = pb_dec[i_used++];
+            i_size += i_byte;
+            if( i_byte != 0xff )
+                break;
+        }
+        /* Check room */
+        if( i_used + i_size + 1 > i_dec )
+            break;
+
+        /* Look for user_data_registered_itu_t_t35 */
+        if( i_type == 4 )
+        {
+            static const uint8_t p_dvb1_data_start_code[] = {
+                0xb5,
+                0x00, 0x31,
+                0x47, 0x41, 0x39, 0x34
+            };
+            const int      i_t35 = i_size;
+            const uint8_t *p_t35 = &pb_dec[i_used];
+
+            /* Check for we have DVB1_data() */
+            if( i_t35 >= 5 &&
+                !memcmp( p_t35, p_dvb1_data_start_code, sizeof(p_dvb1_data_start_code) ) )
+            {
+                cc_Extract( &p_sys->cc, &p_t35[3], i_t35 - 3 );
+            }
+        }
+        i_used += i_size;
+    }
+
+    free( pb_dec );
+}
 
