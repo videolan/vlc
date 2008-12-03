@@ -188,11 +188,11 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "proto", "udp", NULL, PROTO_TEXT,
                 PROTO_LONGTEXT, false );
         change_string_list( ppsz_protos, ppsz_protocols, NULL );
-    add_integer( SOUT_CFG_PREFIX "port", 50004, NULL, PORT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port", 5004, NULL, PORT_TEXT,
                  PORT_LONGTEXT, true );
-    add_integer( SOUT_CFG_PREFIX "port-audio", 50000, NULL, PORT_AUDIO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-audio", 0, NULL, PORT_AUDIO_TEXT,
                  PORT_AUDIO_LONGTEXT, true );
-    add_integer( SOUT_CFG_PREFIX "port-video", 50002, NULL, PORT_VIDEO_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-video", 0, NULL, PORT_VIDEO_TEXT,
                  PORT_VIDEO_LONGTEXT, true );
 
     add_integer( SOUT_CFG_PREFIX "ttl", -1, NULL, TTL_TEXT,
@@ -1623,7 +1623,14 @@ void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
 
 void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 {
+    static block_t *dummy = NULL;
+    if (!dummy)
+    {
+        dummy = out;
+        return;
+    }
     block_FifoPut( id->p_fifo, out );
+    block_FifoPut( id->p_fifo, dummy );
 }
 
 /**
