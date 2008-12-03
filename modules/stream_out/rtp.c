@@ -1623,14 +1623,7 @@ void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
 
 void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
 {
-    static block_t *dummy = NULL;
-    if (!dummy)
-    {
-        dummy = out;
-        return;
-    }
     block_FifoPut( id->p_fifo, out );
-    block_FifoPut( id->p_fifo, dummy );
 }
 
 /**
