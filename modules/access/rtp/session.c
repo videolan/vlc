@@ -252,7 +252,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
 
     mtime_t        now = mdate ();
     rtp_source_t  *src  = NULL;
-    const uint16_t seq  = GetWBE (block->p_buffer + 2);
+    const uint16_t seq  = rtp_seq (block);
     const uint32_t ssrc = GetDWBE (block->p_buffer + 8);
 
     /* In most case, we know this source already */
