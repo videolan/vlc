@@ -306,7 +306,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
              * That is computed from the RTP timestamps and the system clock.
              * It is independent of RTP sequence. */
             uint32_t freq = pt->frequency;
-            uint32_t ts = rtp_timestamp (block);
+            int64_t ts = rtp_timestamp (block);
             int64_t d = ((now - src->last_rx) * freq) / CLOCK_FREQ;
             d        -=    ts - src->last_ts;
             if (d < 0) d = -d;
