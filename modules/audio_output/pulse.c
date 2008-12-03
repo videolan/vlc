@@ -123,12 +123,43 @@ static int Open ( vlc_object_t *p_this )
 
     PULSE_DEBUG( "Pulse start initialization");
 
-    ss.rate = p_aout->output.output.i_rate;
-    ss.channels = 2;
+    ss.channels = aout_FormatNbChannels( &p_aout->output.output );	/* Get the input stream channel count */
 
+    /* Setup the pulse audio stream based on the input stream count */
+    switch(ss.channels)
+    {
+        case 6:
+            p_aout->output.output.i_physical_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                | AOUT_CHAN_LFE;
+	break;
+
+        case 4:
+            p_aout->output.output.i_physical_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        break;
+
+        case 2:
+            p_aout->output.output.i_physical_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        break;
+
+        case 1:
+            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+        break;
+
+	default:
+            msg_Err(p_aout,"Invalid number of channels");
+	goto fail;
+    }
+
+    /* Add a quick command line info message */
+    msg_Info(p_aout, "No. of Audio Channels: %d", ss.channels);
+
+    ss.rate = p_aout->output.output.i_rate;
     ss.format = PA_SAMPLE_S16LE;
-    p_aout->output.output.i_physical_channels =
-            AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
 
     if (!pa_sample_spec_valid(&ss)) {
@@ -148,8 +179,8 @@ static int Open ( vlc_object_t *p_this )
 
     p_sys->buffer_size = a.minreq;
 
-    pa_channel_map_init_stereo(&map);
-
+    /* Initialise the speaker map setup above */
+    pa_channel_map_init_auto(&map, ss.channels, PA_CHANNEL_MAP_ALSA);
 
     if (!(p_sys->mainloop = pa_threaded_mainloop_new())) {
         msg_Err(p_aout, "Failed to allocate main loop");
