@@ -1006,9 +1006,8 @@ static void LoadSubtitles( input_thread_t *p_input )
 {
     /* Load subtitles */
     /* Get fps and set it if not already set */
-    double f_fps;
-    if( !demux_Control( p_input->p->input.p_demux, DEMUX_GET_FPS, &f_fps ) &&
-        f_fps > 1.0 )
+    const double f_fps = p_input->p->f_fps;
+    if( f_fps > 1.0 )
     {
         float f_requested_fps;
 
@@ -2587,10 +2586,10 @@ static int InputSourceInit( input_thread_t *p_input,
             vlc_mutex_unlock( &p_input->p->p_item->lock );
         }
     }
-    if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) )
+    if( !demux_Control( in->p_demux, DEMUX_GET_FPS, &f_fps ) && f_fps > 0.0 )
     {
         vlc_mutex_lock( &p_input->p->p_item->lock );
-        in->f_fps = f_fps;
+        p_input->p->f_fps = f_fps;
         vlc_mutex_unlock( &p_input->p->p_item->lock );
     }
 

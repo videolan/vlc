@@ -69,7 +69,6 @@ typedef struct
     bool b_rescale_ts;
 
     bool       b_eof;   /* eof of demuxer */
-    double     f_fps;
 
 } input_source_t;
 
@@ -82,10 +81,13 @@ struct input_thread_private_t
     /* Global properties */
     bool        b_can_pause;
     bool        b_can_rate_control;
+    double      f_fps;
 
+    /* Current state */
     int         i_rate;
     bool        b_recording;
-    /* */
+
+    /* Playtime configuration */
     int64_t     i_start;    /* :start-time,0 by default */
     int64_t     i_stop;     /* :stop-time, 0 if none */
     int64_t     i_run;      /* :run-time, 0 if none */
