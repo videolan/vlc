@@ -1416,8 +1416,9 @@ static void EndThread( vout_thread_t *p_vout )
 
     /* FIXME does that function *really* need to be called inside the thread ? */
 
-    /* Destroy subpicture unit */
+    /* Detach subpicture unit from both input and vout */
     spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
+    vlc_object_detach( p_vout->p_spu );
 
     /* Destroy the video filters2 */
     filter_chain_Delete( p_vout->p->p_vf2_chain );
