@@ -435,7 +435,6 @@ struct input_thread_t
  * TODO complete the documentation.
  * The read only variables are:
  *  - "length"
- *  - "bookmarks"
  *  - "can-seek" (if you can seek, it doesn't say if 'bar display' has be shown
  *    or not, for that check position != 0.0)
  *  - "can-pause"
@@ -455,7 +454,7 @@ struct input_thread_t
  *  - chapter, next-chapter, next-chapter-prev
  *  - program, audio-es, video-es, spu-es
  *  - audio-delay, spu-delay
- *  - bookmark
+ *  - bookmark (bookmark list)
  *  - record
  *  - frame-next
  *  - navigation (list of "title %2i")
@@ -559,6 +558,9 @@ typedef enum input_event_type_e
     INPUT_EVENT_AUDIO_DELAY,
     /* "spu-delay" has changed */
     INPUT_EVENT_SUBTITLE_DELAY,
+
+    /* "bookmark" has changed */
+    INPUT_EVENT_BOOKMARK,
 
 } input_event_type_e;
 

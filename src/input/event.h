@@ -68,5 +68,11 @@ void input_SendEventTeletext( input_thread_t *p_input, int i_id );
  *****************************************************************************/
 void input_SendEventVout( input_thread_t *p_input );
 
+/*****************************************************************************
+ * Event for control.c/input.c
+ *****************************************************************************/
+void input_SendEventBookmark( input_thread_t *p_input );
+
+
 #endif
 
