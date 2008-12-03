@@ -479,13 +479,12 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
          */
         while (((block = src->blocks)) != NULL)
         {
-#if 0
-            if (rtp_seq (block) == ((src->last_seq + 1) & 0xffff))
-            {   /* Next block ready, no need to wait */
+            if ((int16_t)(rtp_seq (block) - (src->last_seq + 1)) <= 0)
+            {   /* Next (or earlier) block ready, no need to wait */
                 rtp_decode (demux, session, src);
                 continue;
             }
-#endif
+
             /* Wait for 3 times the inter-arrival delay variance (about 99.7%
              * match for random gaussian jitter). Additionnaly, we implicitly
              * wait for misordering times the packetization time.
