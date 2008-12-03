@@ -848,6 +848,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_id_t  *id;
     int               i_port, cscov = -1;
     char              *psz_sdp;
+    int               i_port_audio_option = var_GetInteger( p_stream, "port-audio" );
+    int               i_port_video_option = var_GetInteger( p_stream, "port-video" );
 
     if (0xffffffff == p_sys->payload_bitmap)
     {
@@ -879,12 +881,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     while( i_port == 0 )
     {
-        if( p_sys->i_port != p_sys->i_port_audio
-         && p_sys->i_port != p_sys->i_port_video )
+        if( p_sys->i_port != i_port_audio_option
+         && p_sys->i_port != i_port_video_option )
         {
             i_port = p_sys->i_port;
-            p_sys->i_port += 2;
-            break;
         }
         p_sys->i_port += 2;
     }
