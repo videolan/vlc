@@ -358,7 +358,11 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         if (delta_seq < 0)
             break;
         if (delta_seq == 0)
+        {
+            msg_Warn (demux, "duplicate packet (sequence: %"PRIu16")",
+                      seq);
             goto drop; /* duplicate */
+        }
         pp = &prev->p_next;
     }
     block->p_next = *pp;
@@ -400,7 +404,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     const rtp_pt_t *pt = rtp_find_ptype (session, src, block, &pt_data);
     if (pt == NULL)
     {
-        msg_Dbg (demux, "ignoring unknown payload (%"PRIu8")",
+        msg_Dbg (demux, "unknown payload (%"PRIu8")",
                  rtp_ptype (block));
         goto drop;
     }
