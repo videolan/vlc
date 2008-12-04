@@ -1692,7 +1692,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 break;
             case VLC_FOURCC( 'Q', 'D', 'M', 'C' ):
             case VLC_FOURCC( 'Q', 'D', 'M', '2' ):
-            case VLC_FOURCC( 'Q', 'c', 'l', 'p' ):
             case VLC_FOURCC( 's', 'a', 'm', 'r' ):
             case VLC_FOURCC( 'a', 'l', 'a', 'c' ):
                 p_track->fmt.i_extra =
@@ -1730,6 +1729,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
             case VLC_FOURCC('m','s',0x00,0x02):
             case VLC_FOURCC('m','s',0x00,0x11):
+            case VLC_FOURCC('Q','c','l','p'):
                 p_track->fmt.audio.i_blockalign = p_sample->data.p_sample_soun->i_bytes_per_frame;
                 break;
 
@@ -2389,8 +2389,11 @@ static int MP4_TrackSampleSize( mp4_track_t *p_track )
 
     if( p_soun->i_qt_version == 1 )
     {
-        i_size = p_track->chunk[p_track->i_chunk].i_sample_count /
-            p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
+        int i_samples = p_track->chunk[p_track->i_chunk].i_sample_count;
+        if( p_track->fmt.audio.i_blockalign > 1 )
+            i_samples = p_soun->i_sample_per_packet;
+
+        i_size = i_samples / p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
     }
     else if( p_track->i_sample_size > 256 )
     {
@@ -2433,8 +2436,10 @@ static uint64_t MP4_TrackGetPos( mp4_track_t *p_track )
         }
         else
         {
-            /* we read chunk by chunk */
-            i_pos += 0;
+            /* we read chunk by chunk unless a blockalign is requested */
+            if( p_track->fmt.audio.i_blockalign > 1 )
+                i_pos += ( p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first ) /
+                                p_soun->i_sample_per_packet * p_soun->i_bytes_per_frame;
         }
     }
     else
@@ -2459,10 +2464,11 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track )
 
         if( p_soun->i_qt_version == 1 )
         {
-            /* chunk by chunk */
-            p_track->i_sample =
-                p_track->chunk[p_track->i_chunk].i_sample_first +
-                p_track->chunk[p_track->i_chunk].i_sample_count;
+            /* we read chunk by chunk unless a blockalign is requested */
+            if( p_track->fmt.audio.i_blockalign > 1 )
+                p_track->i_sample += p_soun->i_sample_per_packet;
+            else
+                p_track->i_sample += p_track->chunk[p_track->i_chunk].i_sample_count;
         }
         else if( p_track->i_sample_size > 256 )
         {
