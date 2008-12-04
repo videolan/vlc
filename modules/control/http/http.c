@@ -400,10 +400,6 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         {
             state = "opening/connecting";
         }
-        else if( val.i_int == BUFFERING_S )
-        {
-            state = "buffering";
-        }
         else if( val.i_int == PAUSE_S )
         {
             state = "paused";

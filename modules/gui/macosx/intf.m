@@ -1506,8 +1506,7 @@ static void * manage_cleanup( void * args )
             /* seekable streams */
             cachedInputState = input_GetState( p_input );
             if ( cachedInputState == INIT_S ||
-                 cachedInputState == OPENING_S ||
-                 cachedInputState == BUFFERING_S )
+                 cachedInputState == OPENING_S )
             {
                 b_buffering = YES;
             }

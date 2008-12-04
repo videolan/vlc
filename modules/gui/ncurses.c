@@ -1547,10 +1547,6 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         {
             mvnprintw( y++, 0, COLS, _(" State    : Opening/Connecting %s"), psz_state );
         }
-        else if( val.i_int == BUFFERING_S )
-        {
-            mvnprintw( y++, 0, COLS, _(" State    : Buffering %s"), psz_state );
-        }
         else if( val.i_int == PAUSE_S )
         {
             mvnprintw( y++, 0, COLS, _(" State    : Paused %s"), psz_state );

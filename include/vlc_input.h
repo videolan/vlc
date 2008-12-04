@@ -477,7 +477,6 @@ typedef enum input_state_e
 {
     INIT_S = 0,
     OPENING_S,
-    BUFFERING_S,
     PLAYING_S,
     PAUSE_S,
     END_S,

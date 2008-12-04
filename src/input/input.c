@@ -2395,10 +2395,6 @@ static int InputSourceInit( input_thread_t *p_input,
     {
         int64_t i_pts_delay;
 
-        /* */
-        if( b_master )
-            input_ChangeState( p_input, BUFFERING_S );
-
         /* Get infos from access_demux */
         demux_Control( in->p_demux,
                         DEMUX_GET_PTS_DELAY, &i_pts_delay );
@@ -2535,9 +2531,6 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Create the stream_t */
-        if( b_master )
-            input_ChangeState( p_input, BUFFERING_S );
-
         in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
 
         /* Restor old value */
