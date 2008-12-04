@@ -1176,6 +1176,10 @@ static int Init( input_thread_t * p_input )
     var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
     var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
 
+    /* */
+    input_ChangeState( p_input, OPENING_S );
+
+    /* */
     if( InputSourceInit( p_input, &p_input->p->input,
                          p_input->p->p_item->psz_uri, NULL ) )
     {
@@ -2390,6 +2394,10 @@ static int InputSourceInit( input_thread_t *p_input,
     {
         int64_t i_pts_delay;
 
+        /* */
+        if( b_master )
+            input_ChangeState( p_input, BUFFERING_S );
+
         /* Get infos from access_demux */
         demux_Control( in->p_demux,
                         DEMUX_GET_PTS_DELAY, &i_pts_delay );
@@ -2436,9 +2444,6 @@ static int InputSourceInit( input_thread_t *p_input,
     else
     {
         int64_t i_pts_delay;
-
-        if( b_master )
-            input_ChangeState( p_input, OPENING_S );
 
         /* Now try a real access */
         in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
@@ -2518,9 +2523,6 @@ static int InputSourceInit( input_thread_t *p_input,
             var_Set( p_input, "can-seek", val );
         }
 
-        if( b_master )
-            input_ChangeState( p_input, BUFFERING_S );
-
         /* Autodetect extra files if none specified */
         char *psz_input_list = var_CreateGetNonEmptyString( p_input, "input-list" );
         if( !psz_input_list )
@@ -2532,6 +2534,9 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Create the stream_t */
+        if( b_master )
+            input_ChangeState( p_input, BUFFERING_S );
+
         in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
 
         /* Restor old value */
