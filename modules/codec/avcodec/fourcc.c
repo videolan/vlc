@@ -92,7 +92,7 @@ static const struct
       VIDEO_ES, "MPEG2 IMX NTSC 525/60 40mb/s (FCP)" },
     { VLC_FOURCC('m','x','4','p'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "MPEG2 IMX PAL 625/50 40mb/s (FCP)" },
-     { VLC_FOURCC('m','x','3','n'), CODEC_ID_MPEG2VIDEO,
+    { VLC_FOURCC('m','x','3','n'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "MPEG2 IMX NTSC 525/60 30mb/s (FCP)" },
     { VLC_FOURCC('m','x','3','p'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "MPEG2 IMX NTSC 625/50 30mb/s (FCP)" },
@@ -107,6 +107,8 @@ static const struct
       VIDEO_ES, "Matrox MPEG-2" },
     { VLC_FOURCC('m','m','e','s'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "Matrox MPEG-2" },
+    { VLC_FOURCC('P','I','M','2'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "Pinnacle DC1000 (MPEG-2 Video)" },
 
     /* MPEG-4 Video */
     { VLC_FOURCC('D','I','V','X'), CODEC_ID_MPEG4,
@@ -186,8 +188,25 @@ static const struct
       VIDEO_ES, "FFmpeg MPEG-4" },
     { VLC_FOURCC('F','V','F','W'), CODEC_ID_MPEG4,
       VIDEO_ES, "FFmpeg MPEG-4" },
+    { VLC_FOURCC('F','F','D','S'), CODEC_ID_MPEG4,
+      VIDEO_ES, "FFDShow MPEG-4" },
     { VLC_FOURCC('V','I','D','M'), CODEC_ID_MPEG4,
       VIDEO_ES, "vidm 4.01 codec" },
+    { VLC_FOURCC('D','C','O','D'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('f','m','p','4'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('M','V','X','M'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('P','M','4','V'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('f','m','p','4'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('M','4','T','3'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('G','E','O','X'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+
 
     /* MSMPEG4 v1 */
     { VLC_FOURCC('D','I','V','1'), CODEC_ID_MSMPEG4V1,
@@ -197,6 +216,8 @@ static const struct
     { VLC_FOURCC('M','P','G','4'), CODEC_ID_MSMPEG4V1,
       VIDEO_ES, "MS MPEG-4 Video v1" },
     { VLC_FOURCC('m','p','g','4'), CODEC_ID_MSMPEG4V1,
+      VIDEO_ES, "MS MPEG-4 Video v1" },
+    { VLC_FOURCC('m','p','4','1'), CODEC_ID_MSMPEG4V1,
       VIDEO_ES, "MS MPEG-4 Video v1" },
 
     /* MSMPEG4 v2 */
@@ -409,7 +430,19 @@ static const struct
       VIDEO_ES, "DV Video" },
     { VLC_FOURCC('d','v','h','d'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','h','p'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','h','q'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','h','3'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','h','5'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','h','6'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
     { VLC_FOURCC('d','v','c',' '), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','2','5'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
     { VLC_FOURCC('d','v','c','p'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video PAL" },
@@ -427,6 +460,9 @@ static const struct
       VIDEO_ES, "DV Video C Pro 50 NTSC" },
     { VLC_FOURCC('A','V','d','v'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "AVID DV" },
+    { VLC_FOURCC('A','V','d','1'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "AVID DV" },
+
 
     /* Windows Media Video */
     { VLC_FOURCC('W','M','V','1'), CODEC_ID_WMV1,
@@ -696,6 +732,8 @@ static const struct
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 8, 0 )
     { VLC_FOURCC('C','A','V','S'), CODEC_ID_CAVS,
       VIDEO_ES, "Chinese AVS" },
+    { VLC_FOURCC('A','V','s','2'), CODEC_ID_CAVS,
+      VIDEO_ES, "Chinese AVS" },
 #endif
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 40, 0 )
@@ -897,6 +935,8 @@ static const struct
     /* AAC audio */
     { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,
       AUDIO_ES, "MPEG AAC Audio" },
+    { VLC_FOURCC('a','a','c',' '), CODEC_ID_AAC,
+      AUDIO_ES, "MPEG AAC Audio" },
 
     /* AC-3 Audio (Dolby Digital) */
     { VLC_FOURCC('a','c','-','3'), CODEC_ID_AC3,
@@ -1026,6 +1066,11 @@ static const struct
     { VLC_FOURCC('m','l','p',' '), CODEC_ID_MLP,
       AUDIO_ES, "MLP/TrueHD Audio" },
 #endif
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 6, 0 )
+    { VLC_FOURCC('Q','c','l','p'), CODEC_ID_QCELP,
+      AUDIO_ES, "QCELP Audio" },
+#endif
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
