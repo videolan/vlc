@@ -575,6 +575,8 @@ static void EsOutChangePosition( es_out_t *out )
 {
     es_out_sys_t      *p_sys = out->p_sys;
 
+    input_SendEventCache( p_sys->p_input, 0.0 );
+
     for( int i = 0; i < p_sys->i_es; i++ )
     {
         es_out_id_t *p_es = p_sys->es[i];
