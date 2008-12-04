@@ -485,6 +485,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "signal-strength", VLC_VAR_FLOAT );
     var_SetFloat( p_input, "signal-strength", -1 );
 
+    var_Create( p_input, "cache", VLC_VAR_FLOAT );
+    var_SetFloat( p_input, "cache", 0.0 );
+
     /* */
     var_Create( p_input, "access-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "access", VLC_VAR_STRING | VLC_VAR_DOINHERIT );

@@ -444,6 +444,7 @@ struct input_thread_t
  *  - "teletext-es" to get the index of spu track that is teletext -1 if no teletext)
  *  - "signal-quality"
  *  - "signal-strength"
+ *  - "cache" (level of data cached [0 .. 1])
  *
  * The read-write variables are:
  *  - state (\see input_state_e)
@@ -560,6 +561,9 @@ typedef enum input_event_type_e
 
     /* "bookmark" has changed */
     INPUT_EVENT_BOOKMARK,
+
+    /* cache" has changed */
+    INPUT_EVENT_CACHE,
 
 } input_event_type_e;
 

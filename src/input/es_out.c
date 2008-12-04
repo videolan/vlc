@@ -626,10 +626,13 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 
     if( i_stream_duration <= i_buffering_duration && !b_forced )
     {
-        msg_Dbg( p_sys->p_input, "Buffering %d%%",
-                 (int)(100 * i_stream_duration / i_buffering_duration ) );
+        const double f_level = (double)i_stream_duration / i_buffering_duration;
+        input_SendEventCache( p_sys->p_input, f_level );
+
+        msg_Dbg( p_sys->p_input, "Buffering %d%%", (int)(100 * f_level) );
         return;
     }
+    input_SendEventCache( p_sys->p_input, 1.0 );
 
     msg_Dbg( p_sys->p_input, "Stream buffering done (%d ms in %d ms)",
               (int)(i_stream_duration/1000), (int)(i_system_duration/1000) );

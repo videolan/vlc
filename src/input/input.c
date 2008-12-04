@@ -1178,6 +1178,7 @@ static int Init( input_thread_t * p_input )
 
     /* */
     input_ChangeState( p_input, OPENING_S );
+    input_SendEventCache( p_input, 0.0 );
 
     /* */
     if( InputSourceInit( p_input, &p_input->p->input,

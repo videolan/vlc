@@ -43,6 +43,7 @@ void input_SendEventTitle( input_thread_t *p_input, int i_title );
 void input_SendEventSeekpoint( input_thread_t *p_input, int i_title, int i_seekpoint );
 void input_SendEventSignal( input_thread_t *p_input, double f_quality, double f_strength );
 void input_SendEventState( input_thread_t *p_input, int i_state );
+void input_SendEventCache( input_thread_t *p_input, double f_level );
 
 /* TODO rename Item* */
 void input_SendEventMeta( input_thread_t *p_input );

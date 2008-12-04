@@ -156,6 +156,16 @@ void input_SendEventState( input_thread_t *p_input, int i_state )
     vlc_event_send( &p_input->p->event_manager, &event );
 }
 
+void input_SendEventCache( input_thread_t *p_input, double f_level )
+{
+    vlc_value_t val;
+
+    val.f_float = f_level;
+	var_Change( p_input, "cache", VLC_VAR_SETVALUE, &val, NULL );
+
+    Trigger( p_input, INPUT_EVENT_CACHE );
+}
+
 /* FIXME: review them because vlc_event_send might be
  * moved inside input_item* functions.
  */
