@@ -76,6 +76,7 @@ if (!p_sys->context || pa_context_get_state(p_sys->context) != PA_CONTEXT_READY 
         goto label; \
     }  \
 } while(0);
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -89,6 +90,7 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata);
 static void stream_latency_update_cb(pa_stream *s, void *userdata);
 static void success_cb(pa_stream *s, int sucess, void *userdata);
 static void uninit(aout_instance_t *p_aout);
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -123,50 +125,57 @@ static int Open ( vlc_object_t *p_this )
 
     PULSE_DEBUG( "Pulse start initialization");
 
-    ss.channels = aout_FormatNbChannels( &p_aout->output.output );	/* Get the input stream channel count */
+    ss.channels = aout_FormatNbChannels( &p_aout->output.output ); /* Get the input stream channel count */
 
     /* Setup the pulse audio stream based on the input stream count */
     switch(ss.channels)
     {
+        case 8:
+            p_aout->output.output.i_physical_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
+                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                | AOUT_CHAN_LFE;
+            break;
         case 6:
             p_aout->output.output.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
                 | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                 | AOUT_CHAN_LFE;
-	break;
+            break;
 
         case 4:
             p_aout->output.output.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                 | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        break;
+            break;
 
         case 2:
             p_aout->output.output.i_physical_channels
                 = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        break;
+            break;
 
         case 1:
             p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
-        break;
+            break;
 
-	default:
+        default:
             msg_Err(p_aout,"Invalid number of channels");
-	goto fail;
+        goto fail;
     }
 
     /* Add a quick command line info message */
     msg_Info(p_aout, "No. of Audio Channels: %d", ss.channels);
 
     ss.rate = p_aout->output.output.i_rate;
-    ss.format = PA_SAMPLE_S16LE;
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+    ss.format = PA_SAMPLE_FLOAT32NE;
+    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
 
     if (!pa_sample_spec_valid(&ss)) {
         msg_Err(p_aout,"Invalid sample spec");
         goto fail;
     }
-    
+
     a.maxlength = pa_bytes_per_second(&ss)/4/pa_frame_size(&ss);
     a.tlength = a.maxlength*9/10;
     a.prebuf = a.tlength/2;
@@ -204,7 +213,7 @@ static int Open ( vlc_object_t *p_this )
     PULSE_DEBUG( "Pulse after context connect");
 
     pa_threaded_mainloop_lock(p_sys->mainloop);
-    
+
     if (pa_threaded_mainloop_start(p_sys->mainloop) < 0) {
         msg_Err(p_aout, "Failed to start main loop");
         goto unlock_and_fail;
