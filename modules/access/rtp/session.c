@@ -353,8 +353,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
             break;
         if (delta_seq == 0)
         {
-            msg_Warn (demux, "duplicate packet (sequence: %"PRIu16")",
-                      seq);
+            msg_Dbg (demux, "duplicate packet (sequence: %"PRIu16")", seq);
             goto drop; /* duplicate */
         }
         pp = &prev->p_next;
@@ -385,7 +384,7 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     {
         if (delta_seq >= 0x8000)
         {   /* Unrecoverable if later packets have already been dequeued */
-            msg_Warn (demux, "ignoring late packet (sequence: %u)",
+            msg_Warn (demux, "ignoring late packet (sequence: %"PRIu16")",
                       rtp_seq (block));
             goto drop;
         }
