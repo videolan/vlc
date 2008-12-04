@@ -942,7 +942,7 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
     }
 
     if( newval.i_int == PLAYING_S || newval.i_int == PAUSE_S ||
-        newval.i_int == STOP_S ||  newval.i_int == END_S )
+        newval.i_int == END_S )
     {
         StatusChangeSignal( p_sys->p_conn, (void*) p_intf );
     }

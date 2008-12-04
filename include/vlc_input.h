@@ -479,7 +479,6 @@ typedef enum input_state_e
     BUFFERING_S,
     PLAYING_S,
     PAUSE_S,
-    STOP_S,
     END_S,
     ERROR_S,
 } input_state_e;

@@ -1543,10 +1543,6 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         {
             mvnprintw( y++, 0, COLS, _(" State    : Playing %s"), psz_state );
         }
-        else if( val.i_int == STOP_S )
-        {
-            mvnprintw( y++, 0, COLS, _(" State    : Stopped %s"), psz_state );
-        }
         else if( val.i_int == OPENING_S )
         {
             mvnprintw( y++, 0, COLS, _(" State    : Opening/Connecting %s"), psz_state );
