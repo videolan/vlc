@@ -70,6 +70,7 @@ Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.
 Daniel Fischer <dan at subsignal dot org> - Shoutcast output support
 Daniel Stränger <vlc at schmaller d0t de> - M3U, xtag and playlist improvements. Meta information core fixes. XSPF playlist support
 Danko Dolch <info at dolchonline d0t net> - Icons and Design for Qt4 Interface
+Danny Wood <danwood76 -- gmail | com> - Surround PulseAudio support.
 David Flynn - Dirac video codec
 David Kennedy <dkennedy at tinytoad.com> - X11 fullscreen patch
 Daniel Nylander <info @t danielnylander at se> - Swedish translation

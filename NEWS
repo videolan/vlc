@@ -49,6 +49,7 @@ Playlist:
 
 Audio output:
  * Removed obsolete Esound and aRts plugins
+ * Surround support for PulseAudio
 
 Changes between 0.9.5 and 0.9.6:
 --------------------------------
