@@ -1080,7 +1080,7 @@ static void LoadSlaves( input_thread_t *p_input )
         msg_Dbg( p_input, "adding slave input '%s'", psz );
 
         input_source_t *p_slave = InputSourceNew( p_input );
-        if( !InputSourceInit( p_input, p_slave, psz, NULL ) )
+        if( p_slave && !InputSourceInit( p_input, p_slave, psz, NULL ) )
             TAB_APPEND( p_input->p->i_slave, p_input->p->slave, p_slave );
         else
             free( p_slave );
@@ -2032,7 +2032,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             {
                 input_source_t *slave = InputSourceNew( p_input );
 
-                if( !InputSourceInit( p_input, slave, val.psz_string, NULL ) )
+                if( slave && !InputSourceInit( p_input, slave, val.psz_string, NULL ) )
                 {
                     vlc_meta_t *p_meta;
                     int64_t i_time;
@@ -2322,8 +2322,6 @@ static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, const char *psz_mrl,
                             const char *psz_forced_demux )
 {
-    const bool b_master = in == &p_input->p->input;
-
     char psz_dup[strlen(psz_mrl) + 1];
     const char *psz_access;
     const char *psz_demux;
@@ -2334,9 +2332,6 @@ static int InputSourceInit( input_thread_t *p_input,
     double f_fps;
 
     strcpy( psz_dup, psz_mrl );
-
-    if( !in ) return VLC_EGENERIC;
-    if( !p_input ) return VLC_EGENERIC;
 
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
@@ -2637,9 +2632,6 @@ static int InputSourceInit( input_thread_t *p_input,
     return VLC_SUCCESS;
 
 error:
-    if( b_master )
-        input_ChangeState( p_input, ERROR_S );
-
     if( in->p_demux )
         demux_Delete( in->p_demux );
 
@@ -3142,7 +3134,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
     var_Change( p_input, "spu-es", VLC_VAR_CHOICESCOUNT, &count, NULL );
 
     sub = InputSourceNew( p_input );
-    if( InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
+    if( !sub || InputSourceInit( p_input, sub, psz_subtitle, "subtitle" ) )
     {
         free( sub );
         return;
