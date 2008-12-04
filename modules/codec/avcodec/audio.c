@@ -211,8 +211,37 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
+
+#if defined(AV_VERSION_INT) && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 65, 0 )
+    switch( p_sys->p_context->sample_fmt )
+    {
+    case SAMPLE_FMT_U8:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('u','8',' ',' ');
+        p_dec->fmt_out.audio.i_bitspersample = 8;
+        break;
+    case SAMPLE_FMT_S32:
+        p_dec->fmt_out.i_codec = AOUT_FMT_S32_NE;
+        p_dec->fmt_out.audio.i_bitspersample = 32;
+        break;
+    case SAMPLE_FMT_FLT:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_dec->fmt_out.audio.i_bitspersample = 32;
+        break;
+    case SAMPLE_FMT_DBL:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','6','4');
+        p_dec->fmt_out.audio.i_bitspersample = 64;
+        break;
+
+    case SAMPLE_FMT_S16:
+    default:
+        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.audio.i_bitspersample = 16;
+        break;
+    }
+#else
     p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
     p_dec->fmt_out.audio.i_bitspersample = 16;
+#endif
 
     return VLC_SUCCESS;
 }
@@ -359,7 +388,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     p_block->i_pts = 0;
 
     /* **** Now we can output these samples **** */
-    p_sys->i_samples = i_output / sizeof(int16_t) / p_sys->p_context->channels;
+    p_sys->i_samples = i_output / (p_dec->fmt_out.audio.i_bitspersample / 8) / p_sys->p_context->channels;
     p_sys->p_samples = p_sys->p_output;
 
     /* Silent unwanted samples */
