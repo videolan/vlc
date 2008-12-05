@@ -206,6 +206,8 @@ static const struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('G','E','O','X'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('D','M','K','2'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
 
 
     /* MSMPEG4 v1 */
@@ -336,6 +338,8 @@ static const struct
       VIDEO_ES, "Microsoft H263" },
     { VLC_FOURCC('X','2','6','3'), CODEC_ID_H263,
       VIDEO_ES, "Xirlink H263" },
+    { VLC_FOURCC('V','X','1','K'), CODEC_ID_H263,
+      VIDEO_ES, "H263" },
 
     /* Zygo (partial) */
     { VLC_FOURCC('Z','y','G','o'), CODEC_ID_H263,
