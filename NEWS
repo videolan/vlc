@@ -20,6 +20,7 @@ Decoders:
  * Dolby Digital Plus - E-AC-3 (A/52b)  support
  * True HD/MLP support
  * Blu-Ray Linear PCM support
+ * QCELP (Qualcomm PureVoice) support
 
 Encoders:
  * Dirac encoding support using libdirac (support in Ogg, in TS)
