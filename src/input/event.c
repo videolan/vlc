@@ -257,6 +257,9 @@ void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id )
 {
     vlc_value_t val;
 
+    if( i_cat == UNKNOWN_ES )
+        return;
+
     if( i_id >= 0 )
     {
         val.i_int = i_id;
@@ -274,6 +277,9 @@ void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const c
     vlc_value_t val;
     vlc_value_t text;
 
+    if( i_cat == UNKNOWN_ES )
+        return;
+
     val.i_int = i_id;
     text.psz_string = (char*)psz_text;
 
@@ -287,6 +293,9 @@ void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const c
 void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
 {
     vlc_value_t val;
+
+    if( i_cat == UNKNOWN_ES )
+        return;
 
     val.i_int = i_id;
     var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_SETVALUE, &val, NULL );
