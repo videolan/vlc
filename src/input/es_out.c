@@ -169,7 +169,7 @@ static int          EsOutControl( es_out_t *, int i_query, va_list );
 static void         EsOutDelete ( es_out_t * );
 
 static void         EsOutSelect( es_out_t *, es_out_id_t *es, bool b_force );
-static void         EsOutUpdateInfo( es_out_t *, es_out_id_t *es, const es_format_t * );
+static void         EsOutUpdateInfo( es_out_t *, es_out_id_t *es, const es_format_t *, const vlc_meta_t * );
 static int          EsOutSetRecord(  es_out_t *, bool b_record );
 
 static bool EsIsSelected( es_out_id_t *es );
@@ -1443,7 +1443,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
             break;
     }
 
-    EsOutUpdateInfo( out, es, &es->fmt );
+    EsOutUpdateInfo( out, es, &es->fmt, NULL );
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -1849,10 +1849,14 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     input_DecoderDecode( es->p_dec, p_block );
 
     es_format_t fmt_dsc;
-    if( input_DecoderHasFormatChanged( es->p_dec, &fmt_dsc ) )
+    vlc_meta_t  *p_meta_dsc;
+    if( input_DecoderHasFormatChanged( es->p_dec, &fmt_dsc, &p_meta_dsc ) )
     {
-        EsOutUpdateInfo( out, es, &fmt_dsc );
+        EsOutUpdateInfo( out, es, &fmt_dsc, p_meta_dsc );
+
         es_format_Clean( &fmt_dsc );
+        if( p_meta_dsc )
+            vlc_meta_Delete( p_meta_dsc );
     }
 
     /* Check CC status */
@@ -2530,7 +2534,7 @@ static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang )
  * EsOutUpdateInfo:
  * - add meta info to the playlist item
  ****************************************************************************/
-static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *fmt )
+static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *fmt, const vlc_meta_t *p_meta )
 {
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
@@ -2669,6 +2673,22 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
 
     default:
         break;
+    }
+
+    /* Append generic meta */
+    if( p_meta )
+    {
+        char **ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
+        for( int i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
+        {
+            char *psz_key = ppsz_all_keys[i];
+            char *psz_value = vlc_dictionary_value_for_key( &p_meta->extra_tags, psz_key );
+
+            if( psz_value )
+                input_Control( p_input, INPUT_ADD_INFO, psz_cat, _(psz_key), _(psz_value) );
+            free( psz_key );
+        }
+        free( ppsz_all_keys );
     }
 
     free( psz_cat );

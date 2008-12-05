@@ -39,6 +39,7 @@
 #include <vlc_sout.h>
 #include <vlc_codec.h>
 #include <vlc_osd.h>
+#include <vlc_meta.h>
 
 #include <vlc_interface.h>
 #include "audio_output/aout_internal.h"
@@ -103,6 +104,7 @@ struct decoder_owner_sys_t
     /* */
     bool           b_fmt_description;
     es_format_t    fmt_description;
+    vlc_meta_t     *p_description;
 
     /* fifo */
     block_fifo_t *p_fifo;
@@ -600,7 +602,7 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
     vlc_mutex_unlock( &p_owner->lock );
 }
 
-bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt )
+bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_meta_t **pp_meta )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     bool b_changed;
@@ -611,6 +613,17 @@ bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt )
     {
         if( p_fmt )
             es_format_Copy( p_fmt, &p_owner->fmt_description );
+
+        if( pp_meta )
+        {
+            *pp_meta = NULL;
+            if( p_owner->p_description )
+            {
+                *pp_meta = vlc_meta_New();
+                if( *pp_meta )
+                    vlc_meta_Merge( *pp_meta, p_owner->p_description );
+            }
+        }
         p_owner->b_fmt_description = false;
     }
     vlc_mutex_unlock( &p_owner->lock );
@@ -799,6 +812,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     p_owner->b_fmt_description = false;
     es_format_Init( &p_owner->fmt_description, UNKNOWN_ES, 0 );
+    p_owner->p_description = NULL;
 
     p_owner->b_paused = false;
     p_owner->pause.i_date = 0;
@@ -2058,6 +2072,8 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_dec->p_description )
         vlc_meta_Delete( p_dec->p_description );
     es_format_Clean( &p_owner->fmt_description );
+    if( p_owner->p_description )
+        vlc_meta_Delete( p_owner->p_description );
 
     if( p_owner->p_packetizer )
     {
@@ -2088,10 +2104,17 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
 
     vlc_assert_locked( &p_owner->lock );
 
-    es_format_Clean( &p_owner->fmt_description );
-
     p_owner->b_fmt_description = true;
+
+    /* Copy es_format */
+    es_format_Clean( &p_owner->fmt_description );
     es_format_Copy( &p_owner->fmt_description, &p_dec->fmt_out );
+
+    /* Move p_description */
+    if( p_owner->p_description && p_dec->p_description )
+        vlc_meta_Delete( p_owner->p_description );
+    p_owner->p_description = p_dec->p_description;
+    p_dec->p_description = NULL;
 }
 static vout_thread_t *aout_request_vout( void *p_private,
                                          vout_thread_t *p_vout, video_format_t *p_fmt )
