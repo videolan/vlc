@@ -69,14 +69,12 @@
 
 /* input_state_e from <vlc_input.h> */
 static const char *ppsz_input_state[] = {
-    N_("Initializing"),
-    N_("Opening"),
-    N_("Buffer"),
-    N_("Play"),
-    N_("Pause"),
-    N_("Stop"),
-    N_("End"),
-    N_("Error"),
+    [INIT_S] = N_("Initializing"),
+    [OPENING_S] = N_("Opening"),
+    [PLAYING_S] = N_("Play"),
+    [PAUSE_S] = N_("Pause"),
+    [END_S] = N_("End"),
+    [ERROR_S] = N_("Error"),
 };
 
 /*****************************************************************************

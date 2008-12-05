@@ -469,9 +469,6 @@ struct input_thread_t
  * Input state
  *
  * This enum is used by the variable "state"
- *
- * NOTE: you need to update ppsz_input_state in the RC interface
- * if you modify this list.
  */
 typedef enum input_state_e
 {
