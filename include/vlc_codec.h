@@ -62,10 +62,10 @@ struct decoder_t
     es_format_t         fmt_out;
 
     /* Some decoders only accept packetized data (ie. not truncated) */
-    bool          b_need_packetized;
+    bool                b_need_packetized;
 
     /* Tell the decoder if it is allowed to drop frames */
-    bool          b_pace_control;
+    bool                b_pace_control;
 
     /* */
     picture_t *         ( * pf_decode_video )( decoder_t *, block_t ** );
@@ -80,6 +80,12 @@ struct decoder_t
      * pb_present will be used to known which cc channel are present (but
      * globaly, not necessary for the current packet */
     block_t *           ( * pf_get_cc )      ( decoder_t *, bool pb_present[4] );
+
+    /* Meta data at codec level
+     *  The decoder owner set it back to NULL once it has retreived what it needs.
+     *  The decoder owner is responsible of its release except when you overwrite it.
+     */
+    vlc_meta_t          *p_description;
 
     /*
      * Owner fields

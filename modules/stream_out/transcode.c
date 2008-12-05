@@ -38,6 +38,7 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_codec.h>
+#include <vlc_meta.h>
 #include <vlc_block.h>
 #include <vlc_filter.h>
 #include <vlc_osd.h>
@@ -1275,6 +1276,10 @@ static void transcode_audio_close( sout_stream_id_t *id )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
     id->p_decoder->p_module = NULL;
 
+    if( id->p_decoder->p_description )
+        vlc_meta_Delete( id->p_decoder->p_description );
+    id->p_decoder->p_description = NULL;
+
     /* Close encoder */
     if( id->p_encoder->p_module )
         module_unneed( id->p_encoder, id->p_encoder->p_module );
@@ -1770,6 +1775,8 @@ static void transcode_video_close( sout_stream_t *p_stream,
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
+    if( id->p_decoder->p_description )
+        vlc_meta_Delete( id->p_decoder->p_description );
 
     if( id->p_decoder->p_owner )
     {
@@ -2315,6 +2322,8 @@ static void transcode_spu_close( sout_stream_id_t *id)
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
+    if( id->p_decoder->p_description )
+        vlc_meta_Delete( id->p_decoder->p_description );
 
     /* Close encoder */
     if( id->p_encoder->p_module )

@@ -39,6 +39,7 @@
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
+#include <vlc_meta.h>
 #include <vlc_filter.h>
 #include <vlc_es.h>
 #include <vlc_image.h>
@@ -641,6 +642,9 @@ static void DeleteDecoder( decoder_t * p_dec )
 
     es_format_Clean( &p_dec->fmt_in );
     es_format_Clean( &p_dec->fmt_out );
+
+    if( p_dec->p_description )
+        vlc_meta_Delete( p_dec->p_description );
 
     vlc_object_release( p_dec );
     p_dec = NULL;

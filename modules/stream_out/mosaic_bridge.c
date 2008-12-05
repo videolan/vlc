@@ -37,6 +37,7 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codec.h>
+#include <vlc_meta.h>
 
 #include <vlc_image.h>
 #include <vlc_filter.h>
@@ -473,6 +474,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         if( p_sys->p_decoder->p_module )
             module_unneed( p_sys->p_decoder, p_sys->p_decoder->p_module );
+        if( p_sys->p_decoder->p_description )
+            vlc_meta_Delete( p_sys->p_decoder->p_description );
+
         vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
 
