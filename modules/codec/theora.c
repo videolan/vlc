@@ -506,15 +506,12 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 }
 
 /*****************************************************************************
- * ParseTheoraComments: FIXME should be done in demuxer
+ * ParseTheoraComments:
  *****************************************************************************/
 static void ParseTheoraComments( decoder_t *p_dec )
 {
-    input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     char *psz_name, *psz_value, *psz_comment;
     int i = 0;
-
-    if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
 
     while ( i < p_dec->p_sys->tc.comments )
     {
@@ -527,8 +524,11 @@ static void ParseTheoraComments( decoder_t *p_dec )
         {
             *psz_value = '\0';
             psz_value++;
-            input_Control( p_input, INPUT_ADD_INFO, _("Theora comment"),
-                           psz_name, "%s", psz_value );
+
+            if( !p_dec->p_description )
+                p_dec->p_description = vlc_meta_New();
+            if( p_dec->p_description )
+                vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
         }
         free( psz_comment );
         i++;

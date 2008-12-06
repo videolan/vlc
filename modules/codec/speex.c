@@ -812,7 +812,7 @@ static block_t *SendPacket( decoder_t *p_dec, block_t *p_block )
 }
 
 /*****************************************************************************
- * ParseSpeexComments: FIXME should be done in demuxer
+ * ParseSpeexComments:
  *****************************************************************************/
 #define readint(buf, base) (((buf[base+3]<<24)&0xff000000)| \
                            ((buf[base+2]<<16)&0xff0000)| \
@@ -821,40 +821,31 @@ static block_t *SendPacket( decoder_t *p_dec, block_t *p_block )
 
 static void ParseSpeexComments( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
-    input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    char *p_buf = (char *)p_oggpacket->packet;
     const SpeexMode *p_mode;
-    int i_len;
-
-    if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
 
     assert( p_sys->p_header->mode < SPEEX_NB_MODES );
 
     p_mode = speex_mode_list[p_sys->p_header->mode];
     assert( p_mode != NULL );
 
-    input_Control( p_input, INPUT_ADD_INFO, _("Speex comment"), _("Mode"),
-                   "%s%s", p_mode->modeName,
-                   p_sys->p_header->vbr ? " VBR" : "" );
-
-    if( p_oggpacket->bytes < 8 )
+    if( !p_dec->p_description )
     {
-        msg_Err( p_dec, "invalid/corrupted comments" );
-        return;
+        p_dec->p_description = vlc_meta_New();
+        if( !p_dec->p_description )
+            return;
     }
 
-    i_len = readint( p_buf, 0 ); p_buf += 4;
-    if( i_len > p_oggpacket->bytes - 4 )
+    /* */
+    char *psz_mode;
+    if( asprintf( &psz_mode, "%s%s", p_mode->modeName, p_sys->p_header->vbr ? " VBR" : "" ) >= 0 )
     {
-        msg_Err( p_dec, "invalid/corrupted comments" );
-        return;
+        vlc_meta_AddExtra( p_dec->p_description, _("Mode"), psz_mode );
+        free( psz_mode );
     }
-
-    input_Control( p_input, INPUT_ADD_INFO, _("Speex comment"), p_buf, "" );
 
     /* TODO: finish comments parsing */
+    VLC_UNUSED( p_oggpacket );
 }
 
 /*****************************************************************************

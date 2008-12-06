@@ -365,27 +365,19 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             = pi_channels_guessed[frame.channels];
 
         /* Adjust stream info when dealing with SBR/PS */
-        if( (p_sys->b_sbr != frame.sbr || p_sys->b_ps != frame.ps) &&
-            p_dec->p_parent->i_object_type == VLC_OBJECT_INPUT )
+        if( p_sys->b_sbr != frame.sbr || p_sys->b_ps != frame.ps )
         {
-            input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
-            char *psz_cat;
             const char *psz_ext = (frame.sbr && frame.ps) ? "SBR+PS" :
                                     frame.sbr ? "SBR" : "PS";
 
             msg_Dbg( p_dec, "AAC %s (channels: %u, samplerate: %lu)",
                     psz_ext, frame.channels, frame.samplerate );
 
-            if( asprintf( &psz_cat, _("Stream %d"), p_dec->fmt_in.i_id ) != -1 )
-            {
-                input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                            _("AAC extension"), "%s", psz_ext );
-                input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                            _("Channels"), "%d", frame.channels );
-                input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                            _("Sample rate"), _("%d Hz"), frame.samplerate );
-                free( psz_cat );
-            }
+            if( !p_dec->p_description )
+                p_dec->p_description = vlc_meta_New();
+            if( p_dec->p_description )
+                vlc_meta_AddExtra( p_dec->p_description, _("AAC extension"), psz_ext );
+
             p_sys->b_sbr = frame.sbr; p_sys->b_ps = frame.ps;
         }
 

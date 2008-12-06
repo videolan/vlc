@@ -605,15 +605,8 @@ static block_t *SendPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
  *****************************************************************************/
 static void ParseVorbisComments( decoder_t *p_dec )
 {
-    input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     char *psz_name, *psz_value, *psz_comment;
-    input_item_t *p_item;
     int i = 0;
-
-    if( p_input->i_object_type != VLC_OBJECT_INPUT )
-        return;
-
-    p_item = input_GetItem( p_input );
 
     while( i < p_dec->p_sys->vc.comments )
     {
@@ -626,33 +619,12 @@ static void ParseVorbisComments( decoder_t *p_dec )
         {
             *psz_value = '\0';
             psz_value++;
-            input_Control( p_input, INPUT_ADD_INFO, _("Vorbis comment"),
-                           psz_name, "%s", psz_value );
-/*TODO: dot he test at the beginning and save time !! */
-#ifndef HAVE_TAGLIB
-            if( psz_value && ( *psz_value != '\0' ) )
-            {
-                if( !strcasecmp( psz_name, "artist" ) )
-                    input_item_SetArtist( p_item, psz_value );
-                else if( !strcasecmp( psz_name, "title" ) )
-                {
-                    input_item_SetTitle( p_item, psz_value );
-                    p_item->psz_name = strdup( psz_value );
-                }
-                else if( !strcasecmp( psz_name, "album" ) )
-                {
-                    input_item_SetAlbum( p_item, psz_value );
-                }
-                else if( !strcasecmp( psz_name, "musicbrainz_trackid" ) )
-                    input_item_SetTrackID( p_item, psz_value );
-#if 0 //not used
-                else if( !strcasecmp( psz_name, "musicbrainz_artistid" ) )
-                    vlc_meta_SetArtistID( p_item, psz_value );
-                else if( !strcasecmp( psz_name, "musicbrainz_albumid" ) )
-                    input_item_SetAlbumID( p_item, psz_value );
-#endif
-            }
-#endif
+
+            if( !p_dec->p_description )
+                p_dec->p_description = vlc_meta_New();
+            if( p_dec->p_description )
+                vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
+
             if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
                      !strcasecmp( psz_name, "RG_RADIO" ) )
             {

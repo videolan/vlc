@@ -702,15 +702,12 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
 }
 
 /*****************************************************************************
- * ParseKateComments: FIXME should be done in demuxer
+ * ParseKateComments:
  *****************************************************************************/
 static void ParseKateComments( decoder_t *p_dec )
 {
-    input_thread_t *p_input = (input_thread_t *)p_dec->p_parent;
     char *psz_name, *psz_value, *psz_comment;
     int i = 0;
-
-    if( p_input->i_object_type != VLC_OBJECT_INPUT ) return;
 
     while ( i < p_dec->p_sys->kc.comments )
     {
@@ -723,8 +720,11 @@ static void ParseKateComments( decoder_t *p_dec )
         {
             *psz_value = '\0';
             psz_value++;
-            input_Control( p_input, INPUT_ADD_INFO, _("Kate comment"),
-                           psz_name, "%s", psz_value );
+
+            if( !p_dec->p_description )
+                p_dec->p_description = vlc_meta_New();
+            if( p_dec->p_description )
+                vlc_meta_AddExtra( p_dec->p_description, psz_name, psz_value );
         }
         free( psz_comment );
         i++;
