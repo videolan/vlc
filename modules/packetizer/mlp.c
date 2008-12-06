@@ -257,7 +257,6 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             {
                 msg_Dbg( p_dec, "emulated sync word "
                          "(no sync on following frame)" );
-                fprintf( stderr,"\n" );
                 p_sys->b_mlp = false;
                 p_sys->i_state = STATE_NOSYNC;
                 block_SkipByte( &p_sys->bytestream );
