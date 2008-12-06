@@ -91,8 +91,15 @@ function parse()
             base_yt_url = "http://youtube.com/"
         end
         arturl = get_arturl( vlc.path, video_id )
+        -- fmt is the format of the video: 18 is HQ (mp4)
+        fmt = get_url_param( vlc.path, "fmt" )
+        if fmt then
+            format = "&fmt=" .. fmt
+        else
+            format = ""
+        end
         if t then
-            return { { path = base_yt_url .. "get_video?video_id="..video_id.."&t="..t; name = name; description = description; artist = artist; arturl = arturl } }
+            return { { path = base_yt_url .. "get_video?video_id="..video_id.."&t="..t..format; name = name; description = description; artist = artist; arturl = arturl } }
         else
             -- This shouldn't happen ... but keep it as a backup.
             return { { path = "http://www.youtube.com/v/"..video_id; name = name; description = description; artist = artist; arturl = arturl } }
@@ -103,11 +110,17 @@ function parse()
         end
         video_id = get_url_param( vlc.path, "video_id" )
         arturl = get_arturl( vlc.path, video_id )
+        fmt = get_url_param( vlc.path, "fmt" )
+        if fmt then
+            format = "&fmt=" .. fmt
+        else
+            format = ""
+        end
         if not string.match( vlc.path, "t=" ) then
             -- This sucks, we're missing "t" which is now mandatory. Let's
             -- try using another url
             return { { path = "http://www.youtube.com/v/"..video_id; name = name; arturl = arturl } }
         end
-        return { { path = "http://www.youtube.com/get_video.php?video_id="..video_id.."&t="..get_url_param( vlc.path, "t" ); name = name; arturl = arturl } }
+        return { { path = "http://www.youtube.com/get_video.php?video_id="..video_id.."&t="..get_url_param( vlc.path, "t" )..format; name = name; arturl = arturl } }
     end
 end
