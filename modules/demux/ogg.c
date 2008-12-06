@@ -39,6 +39,8 @@
 
 #include <vlc_codecs.h>
 #include <vlc_bits.h>
+#include <vlc_charset.h>
+#include "vorbis.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -119,6 +121,9 @@ struct demux_sys_t
 
     /* after reading all headers, the first data page is stuffed into the relevant stream, ready to use */
     bool    b_page_waiting;
+
+    /* */
+    vlc_meta_t *p_meta;
 };
 
 /* OggDS headers for the new header format (used in ogm files) */
@@ -188,6 +193,9 @@ static void Ogg_EndOfStream( demux_t *p_demux );
 static void Ogg_LogicalStreamDelete( demux_t *p_demux, logical_stream_t *p_stream );
 static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *p_stream );
 
+/* */
+static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8_t *p_headers, int i_headers );
+
 /* Logical bitstream headers */
 static void Ogg_ReadTheoraHeader( logical_stream_t *, ogg_packet * );
 static void Ogg_ReadVorbisHeader( logical_stream_t *, ogg_packet * );
@@ -233,6 +241,9 @@ static int Open( vlc_object_t * p_this )
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_sys->oy );
     p_sys->b_page_waiting = false;
+
+    /* */
+    p_sys->p_meta = NULL;
 
     return VLC_SUCCESS;
 }
@@ -426,12 +437,19 @@ static int Demux( demux_t * p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
+    vlc_meta_t *p_meta;
     int64_t *pi64;
     bool *pb_bool;
     int i;
 
     switch( i_query )
     {
+        case DEMUX_GET_META:
+            p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+            if( p_sys->p_meta )
+                vlc_meta_Merge( p_meta, p_sys->p_meta );
+            return VLC_SUCCESS;
+
         case DEMUX_HAS_UNSUPPORTED_META:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
@@ -673,6 +691,10 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 if( Ogg_LogicalStreamResetEsFormat( p_demux, p_stream ) )
                     es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT,
                                     p_stream->p_es, &p_stream->fmt );
+
+                if( p_stream->i_headers > 0 )
+                    Ogg_ExtractMeta( p_demux, p_stream->fmt.i_codec,
+                                     p_stream->p_headers, p_stream->i_headers );
 
                 /* we're not at BOS anymore for this logical stream */
                 p_ogg->i_bos--;
@@ -1396,6 +1418,11 @@ static void Ogg_EndOfStream( demux_t *p_demux )
     p_ogg->i_bitrate = 0;
     p_ogg->i_streams = 0;
     p_ogg->pp_stream = NULL;
+
+    /* */
+    if( p_ogg->p_meta )
+        vlc_meta_Delete( p_ogg->p_meta );
+    p_ogg->p_meta = NULL;
 }
 
 /**
@@ -1462,6 +1489,66 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
         msg_Warn( p_demux, "cannot reuse old stream, resetting the decoder" );
 
     return !b_compatible;
+}
+static void Ogg_ExtractXiphMeta( demux_t *p_demux, const uint8_t *p_headers, int i_headers, int i_skip )
+{
+    demux_sys_t *p_ogg = p_demux->p_sys;
+
+    if( i_headers <= 2 )
+        return;
+
+    /* Skip first packet */
+    const int i_tmp = GetWBE( &p_headers[0] );
+    if( i_tmp > i_headers-2 )
+        return;
+    p_headers += 2 + i_tmp;
+    i_headers -= 2 + i_tmp;
+
+    if( i_headers <= 2 )
+        return;
+
+    /* */
+    int i_comment = GetWBE( &p_headers[0] );
+    const uint8_t *p_comment = &p_headers[2];
+    if( i_comment > i_headers - 2 )
+        return;
+
+    if( i_comment <= i_skip )
+        return;
+
+    /* TODO how to handle multiple comments properly ? */
+    vorbis_ParseComment( &p_ogg->p_meta, &p_comment[i_skip], i_comment - i_skip );
+}
+static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8_t *p_headers, int i_headers )
+{
+    demux_sys_t *p_ogg = p_demux->p_sys;
+
+    switch( i_codec )
+    {
+    /* 3 headers with the 2° one being the comments */
+    case VLC_FOURCC( 'v','o','r','b' ):
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
+        break;
+    case VLC_FOURCC( 't','h','e','o' ):
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
+        break;
+    case VLC_FOURCC( 's','p','x',' ' ):
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0 );
+        break;
+
+    /* TODO */
+    case VLC_FOURCC( 'k','a','t','e' ):
+    case VLC_FOURCC( 'f','l','a','c' ):
+    case VLC_FOURCC( 'c','m','m','l' ):
+        msg_Warn( p_demux, "Ogg_ExtractMeta does not support %4.4s", (const char*)&i_codec );
+        break;
+    /* No meta data */
+    case VLC_FOURCC( 'd','r','a','c' ):
+    default:
+        break;
+    }
+    if( p_ogg->p_meta )
+        p_demux->info.i_update |= INPUT_UPDATE_META;
 }
 
 static void Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
