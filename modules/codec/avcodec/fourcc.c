@@ -486,6 +486,10 @@ static const struct
       VIDEO_ES, "Windows Media Video VC1" },
     { VLC_FOURCC('w','v','c','1'), CODEC_ID_VC1,
       VIDEO_ES, "Windows Media Video VC1" },
+    { VLC_FOURCC('v','c','-','1'), CODEC_ID_VC1,
+      VIDEO_ES, "Windows Media Video VC1" },
+    { VLC_FOURCC('V','C','-','1'), CODEC_ID_VC1,
+      VIDEO_ES, "Windows Media Video VC1" },
     /* WMVA is the VC-1 codec before the standardization proces,
        it is not bitstream compatible and deprecated  */
     { VLC_FOURCC('W','M','V','A'), CODEC_ID_VC1,
