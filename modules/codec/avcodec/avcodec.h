@@ -251,3 +251,7 @@ extern vlc_mutex_t avcodec_lock;
     AVCodecContext *p_context;  \
     AVCodec        *p_codec;
 
+#ifndef AV_VERSION_INT
+#   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
+#endif
+

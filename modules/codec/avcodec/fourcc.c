@@ -38,10 +38,6 @@
 #endif
 #include "avcodec.h"
 
-#ifndef AV_VERSION_INT
-#   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
-#endif
-
 /*****************************************************************************
  * Codec fourcc -> ffmpeg_id mapping
  *****************************************************************************/
