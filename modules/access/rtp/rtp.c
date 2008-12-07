@@ -449,6 +449,19 @@ static void *pcmu_init (demux_t *demux)
     return codec_init (demux, &fmt);
 }
 
+/* PT=3
+ * GSM
+ */
+static void *gsm_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('g', 's', 'm', ' '));
+    fmt.audio.i_rate = 8000;
+    fmt.audio.i_channels = 1;
+    return codec_init (demux, &fmt);
+}
+
 /* PT=8
  * PCMA: G.711 A-law (RFC3551)
  */
@@ -481,6 +494,19 @@ static void *l16m_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('s', '1', '6', 'b'));
     fmt.audio.i_rate = 44100;
+    fmt.audio.i_channels = 1;
+    return codec_init (demux, &fmt);
+}
+
+/* PT=12
+ * QCELP
+ */
+static void *qcelp_init (demux_t *demux)
+{
+    es_format_t fmt;
+
+    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('Q', 'c', 'l', 'p'));
+    fmt.audio.i_rate = 8000;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
 }
@@ -575,6 +601,12 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
         pt.frequency = 8000;
         break;
 
+      case 3:
+        msg_Dbg (demux, "detected GSM");
+        pt.init = gsm_init;
+        pt.frequency = 8000;
+        break;
+
       case 8:
         msg_Dbg (demux, "detected G.711 A-law");
         pt.init = pcma_init;
@@ -591,6 +623,12 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
         msg_Dbg (demux, "detected mono PCM");
         pt.init = l16m_init;
         pt.frequency = 44100;
+        break;
+
+      case 12:
+        msg_Dbg (demux, "detected QCELP");
+        pt.init = qcelp_init;
+        pt.frequency = 8000;
         break;
 
       case 14:
