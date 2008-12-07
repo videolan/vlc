@@ -34,6 +34,7 @@
 
 #include <errno.h>
 #include <sys/types.h>
+#include <limits.h>
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>
@@ -417,47 +418,35 @@ static int Demux( demux_t *p_demux )
 
 static int TextLoad( text_t *txt, stream_t *s )
 {
-    int   i_line_max;
-
-    /* init txt */
-    i_line_max          = 500;
-    txt->i_line_count   = 0;
-    txt->i_line         = 0;
-    txt->line           = calloc( i_line_max, sizeof( char * ) );
-    if( !txt->line )
-        return VLC_EGENERIC;
+    char **lines = NULL;
+    size_t n = 0;
 
     /* load the complete file */
     for( ;; )
     {
         char *psz = stream_ReadLine( s );
+        char **ppsz_new;
 
-        if( psz == NULL )
+        if( psz == NULL || (n >= INT_MAX/sizeof(char *)) )
             break;
 
-        txt->line[txt->i_line_count++] = psz;
-        if( txt->i_line_count >= i_line_max )
+        ppsz_new = realloc( lines, (n + 1) * sizeof (char *) );
+        if( ppsz_new == NULL )
         {
-            char **ppsz_old = txt->line;
-
-            i_line_max += 100;
-            txt->line = realloc( txt->line, i_line_max * sizeof( char*) );
-            if( !txt->line )
-            {
-                free( ppsz_old );
-                break;
-            }
+            free( psz );
+            break;
         }
+        lines = ppsz_new;
+        lines[n++] = psz;
     }
 
-    if( txt->i_line_count <= 0 )
-    {
-        free( txt->line );
-        return VLC_EGENERIC;
-    }
+    txt->i_line_count = 0;
+    txt->i_line       = n;
+    txt->line         = lines;
 
     return VLC_SUCCESS;
 }
+
 static void TextUnload( text_t *txt )
 {
     int i;
