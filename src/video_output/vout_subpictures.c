@@ -1848,7 +1848,7 @@ static void SubFilterAllocationClean( filter_t *p_filter )
 {
     filter_owner_sys_t *p_sys = p_filter->p_owner;
 
-    SpuClearChannel( p_sys->p_spu, p_sys->i_channel, true );
+    SpuClearChannel( p_sys->p_spu, p_sys->i_channel, false );
     free( p_filter->p_owner );
 }
 
