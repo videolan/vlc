@@ -177,17 +177,12 @@ static inline block_t *filter_NewAudioBuffer( filter_t *p_filter, int i_size )
                                         picture_t *p_pic )              \
     {                                                                   \
         picture_t *p_outpic = filter_NewPicture( p_filter );            \
-        if( !p_outpic )                                                 \
+        if( p_outpic )                                                  \
         {                                                               \
-            picture_Release( p_pic );                                   \
-            return NULL;                                                \
+            name( p_filter, p_pic, p_outpic );                          \
+            picture_CopyProperties( p_outpic, p_pic );                  \
         }                                                               \
-                                                                        \
-        name( p_filter, p_pic, p_outpic );                              \
-                                                                        \
-        picture_CopyProperties( p_outpic, p_pic );                      \
         picture_Release( p_pic );                                       \
-                                                                        \
         return p_outpic;                                                \
     }
 
