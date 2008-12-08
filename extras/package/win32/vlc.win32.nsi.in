@@ -741,6 +741,7 @@ Section "un.$Name_Section91" SEC91
   ;remove activex plugin
   UnRegDLL "$INSTDIR\axvlc.dll"
   Delete /REBOOTOK "$INSTDIR\axvlc.dll"
+  Delete /REBOOTOK "$INSTDIR\axvlc.dll.manifest"
 
   ;remove mozilla plugin
   Push $R0
@@ -768,6 +769,7 @@ Section "un.$Name_Section91" SEC91
   "${Index}-End:"
   !undef Index
   Delete /REBOOTOK "$INSTDIR\npvlc.dll"
+  Delete /REBOOTOK "$INSTDIR\npvlc.dll.manifest"
 
   RMDir "$SMPROGRAMS\VideoLAN"
   RMDir /r $SMPROGRAMS\VideoLAN
