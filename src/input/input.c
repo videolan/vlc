@@ -3199,9 +3199,9 @@ void input_UpdateStatistic( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->p->counters.counters_lock);
 }
 /*****************************************************************************
- * input_get_event_manager
+ * input_GetEventManager
  *****************************************************************************/
-vlc_event_manager_t *input_get_event_manager( input_thread_t *p_input )
+vlc_event_manager_t *input_GetEventManager( input_thread_t *p_input )
 {
     return &p_input->p->event_manager;
 }

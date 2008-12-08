@@ -250,7 +250,7 @@ void playlist_release_current_input( playlist_t * p_playlist )
     if( !pl_priv(p_playlist)->p_input ) return;
 
     input_thread_t * p_input = pl_priv(p_playlist)->p_input;
-    vlc_event_manager_t * p_em = input_get_event_manager( p_input );
+    vlc_event_manager_t * p_em = input_GetEventManager( p_input );
 
     vlc_event_detach( p_em, vlc_InputStateChanged,
                       input_state_changed, p_playlist );
@@ -277,7 +277,7 @@ void playlist_set_current_input(
     {
         vlc_object_hold( p_input );
         pl_priv(p_playlist)->p_input = p_input;
-        vlc_event_manager_t * p_em = input_get_event_manager( p_input );
+        vlc_event_manager_t * p_em = input_GetEventManager( p_input );
         vlc_event_attach( p_em, vlc_InputStateChanged,
                           input_state_changed, p_playlist );
         vlc_event_attach( p_em, vlc_InputSelectedStreamChanged,

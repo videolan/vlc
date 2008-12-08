@@ -159,7 +159,7 @@ __input_CreateThread
 input_DecoderDecode
 input_DecoderDelete
 input_DecoderNew
-input_get_event_manager
+input_GetEventManager
 input_GetItem
 input_item_AddInfo
 input_item_AddOpt

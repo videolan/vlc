@@ -80,7 +80,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
     /* No one is tracking this input_thread appart us. Destroy it */
     if( p_mi->b_own_its_input_thread )
     {
-        vlc_event_manager_t * p_em = input_get_event_manager( p_input_thread );
+        vlc_event_manager_t * p_em = input_GetEventManager( p_input_thread );
         vlc_event_detach( p_em, vlc_InputStateChanged, input_state_changed, p_mi );
         var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
         var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
@@ -573,7 +573,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         var_Set( p_input_thread, "drawable", val );
     }
 
-    vlc_event_manager_t * p_em = input_get_event_manager( p_input_thread );
+    vlc_event_manager_t * p_em = input_GetEventManager( p_input_thread );
     vlc_event_attach( p_em, vlc_InputStateChanged, input_state_changed, p_mi );
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
