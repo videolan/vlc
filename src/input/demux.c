@@ -332,13 +332,10 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;
 
-    s->i_char_width = 1;
-    s->b_little_endian = false;
-
     s->p_sys = malloc( sizeof( d_stream_sys_t) );
     if( s->p_sys == NULL )
     {
-        vlc_object_release( s );
+        stream_CommonDelete( s );
         return NULL;
     }
     p_sys = (d_stream_sys_t*)s->p_sys;
@@ -352,7 +349,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     /* decoder fifo */
     if( ( p_sys->p_fifo = block_FifoNew() ) == NULL )
     {
-        vlc_object_release( s );
+        stream_CommonDelete( s );
         free( p_sys->psz_name );
         free( p_sys );
         return NULL;
@@ -361,7 +358,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     if( vlc_thread_create( s, "stream out", DStreamThread,
                            VLC_THREAD_PRIORITY_INPUT, false ) )
     {
-        vlc_object_release( s );
+        stream_CommonDelete( s );
         free( p_sys->psz_name );
         free( p_sys );
         return NULL;
@@ -376,6 +373,9 @@ void stream_DemuxSend( stream_t *s, block_t *p_block )
     if( p_block ) block_FifoPut( p_sys->p_fifo, p_block );
 }
 
+/* FIXME why is it needed ?
+ * We may be able to use pf_destroy
+ */
 void stream_DemuxDelete( stream_t *s )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
@@ -395,7 +395,7 @@ void stream_DemuxDelete( stream_t *s )
     free( p_sys->psz_name );
     free( p_sys );
 
-    vlc_object_release( s );
+    stream_CommonDelete( s );
 }
 
 

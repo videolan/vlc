@@ -32,21 +32,8 @@
 #include <vlc_common.h>
 #include <vlc_stream.h>
 
-/**
- * stream_t definition
- */
-struct stream_t
+struct stream_text_t
 {
-    VLC_COMMON_MEMBERS
-
-    /*block_t *(*pf_block)  ( stream_t *, int i_size );*/
-    int      (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
-    int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
-    int      (*pf_control)( stream_t *, int i_query, va_list );
-    void     (*pf_destroy)( stream_t *);
-
-    stream_sys_t *p_sys;
-
     /* UTF-16 and UTF-32 file reading */
     vlc_iconv_t     conv;
     int             i_char_width;
@@ -55,6 +42,7 @@ struct stream_t
 
 /* */
 stream_t *stream_CommonNew( vlc_object_t * );
+void stream_CommonDelete( stream_t * );
 
 /* */
 stream_t *stream_AccessNew( access_t *p_access, bool );

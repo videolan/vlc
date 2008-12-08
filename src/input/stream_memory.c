@@ -69,8 +69,6 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     s->pf_control = Control;
     s->pf_destroy = Delete;
 
-    s->i_char_width = 1;
-    s->b_little_endian = false;
     vlc_object_attach( s, p_this );
 
     return s;
@@ -81,7 +79,7 @@ static void Delete( stream_t *s )
     if( !s->p_sys->i_preserve_memory ) free( s->p_sys->p_buffer );
     free( s->p_sys );
     vlc_object_detach( s );
-    vlc_object_release( s );
+    stream_CommonDelete( s );
 }
 
 /****************************************************************************

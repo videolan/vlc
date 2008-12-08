@@ -42,6 +42,37 @@ extern "C" {
  * @{
  */
 
+/* Opaque definition for text reader context */
+typedef struct stream_text_t stream_text_t;
+
+/**
+ * stream_t definition
+ */
+
+struct stream_t
+{
+    VLC_COMMON_MEMBERS
+
+    /* Module properties */
+    module_t    *p_module;
+
+    /* For stream filter they will hold an array of stream sources */
+    int      i_source;
+    stream_t **pp_source;
+
+    /* */
+    int      (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
+    int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
+    int      (*pf_control)( stream_t *, int i_query, va_list );
+    void     (*pf_destroy)( stream_t *);
+
+    /* Private data for module */
+    stream_sys_t *p_sys;
+
+    /* Text reader state */
+    stream_text_t *p_text;
+};
+
 /**
  * Possible commands to send to stream_Control() and stream_vaControl()
  */
@@ -142,15 +173,6 @@ VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_u
 
 # ifdef __cplusplus
 }
-# endif
-
-# if defined (__PLUGIN__) || defined (__BUILTIN__)
-   /* FIXME UGLY HACK to keep VLC_OBJECT working */
-   /* Maybe we should make VLC_OBJECT a simple cast noawadays... */
-struct stream_t
-{
-    VLC_COMMON_MEMBERS
-};
 # endif
 
 #endif
