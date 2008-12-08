@@ -3159,22 +3159,6 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
     }
 }
 
-bool input_AddSubtitles( input_thread_t *p_input, char *psz_subtitle,
-                               bool b_check_extension )
-{
-    vlc_value_t val;
-
-    if( b_check_extension && !subtitles_Filter( psz_subtitle ) )
-        return false;
-
-    assert( psz_subtitle != NULL );
-
-    val.psz_string = strdup( psz_subtitle );
-    if( val.psz_string )
-        input_ControlPush( p_input, INPUT_CONTROL_ADD_SUBTITLE, &val );
-    return true;
-}
-
 /*****************************************************************************
  * Statistics
  *****************************************************************************/

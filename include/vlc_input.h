@@ -634,7 +634,8 @@ enum input_query_e
     INPUT_GET_ATTACHMENT,  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
 
     /* On the fly input slave */
-    INPUT_ADD_SLAVE,       /* arg1= char * */
+    INPUT_ADD_SLAVE,       /* arg1= const char * */
+    INPUT_ADD_SUBTITLE,    /* arg1= const char *, arg2=bool b_check_extension */
 
     /* On the fly record while playing */
     INPUT_SET_RECORD_STATE, /* arg1=bool    res=can fail */
@@ -647,19 +648,30 @@ enum input_query_e
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
 VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
 
+/**
+ * It will return the current state of the input.
+ * Provided for convenience.
+ */
 static inline input_state_e input_GetState( input_thread_t * p_input )
 {
     input_state_e state = INIT_S;
     input_Control( p_input, INPUT_GET_STATE, &state );
     return state;
 }
+/**
+ * It will add a new subtitle source to the input.
+ * Provided for convenience.
+ */
+static inline int input_AddSubtitle( input_thread_t *p_input, const char *psz_url, bool b_check_extension )
+{
+    return input_Control( p_input, INPUT_ADD_SUBTITLE, psz_url, b_check_extension );
+}
 
+/* */
 typedef struct input_clock_t input_clock_t;
 VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, input_clock_t *, sout_instance_t * ) );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
 VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
-
-VLC_EXPORT( bool, input_AddSubtitles, ( input_thread_t *, char *, bool ) );
 
 VLC_EXPORT( vlc_event_manager_t *, input_get_event_manager, ( input_thread_t * ) );
 

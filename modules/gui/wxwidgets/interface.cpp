@@ -1329,7 +1329,7 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
                                             VLC_OBJECT_INPUT, FIND_ANYWHERE );
         if( p_input )
         {
-            if( input_AddSubtitles( p_input, psz_utf8, true ) )
+            if( !input_AddSubtitle( p_input, psz_utf8, true ) )
             {
                 vlc_object_release( p_input );
                 wxDnDLocaleFree( psz_utf8 );

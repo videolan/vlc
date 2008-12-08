@@ -1035,7 +1035,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
      {
         if( THEMIM->getIM()->hasInput() )
         {
-            if( input_AddSubtitles( THEMIM->getInput(),
+            if( !input_AddSubtitle( THEMIM->getInput(),
                                     qtu( toNativeSeparators(
                                          mimeData->urls()[0].toLocalFile() ) ),
                                     true ) )
