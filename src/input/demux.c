@@ -557,7 +557,7 @@ static void* DStreamThread( vlc_object_t* p_this )
     /* Main loop */
     while( !s->b_die && !p_demux->b_die )
     {
-        if( p_demux->pf_demux( p_demux ) <= 0 ) break;
+        if( demux_Demux( p_demux ) <= 0 ) break;
     }
 
     vlc_restorecancel( canc );
