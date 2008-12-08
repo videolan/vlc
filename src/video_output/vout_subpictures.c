@@ -160,7 +160,7 @@ static int  CropCallback( vlc_object_t *, char const *,
 
 static int SpuControl( spu_t *, int, va_list );
 
-static void SpuClearChannel( spu_t *p_spu, int i_channel, bool b_locked );
+static void SpuClearChannel( spu_t *p_spu, int i_channel );
 
 /* Buffer allocation for SPU filter (blend, scale, ...) */
 static subpicture_t *spu_new_buffer( filter_t * );
@@ -343,7 +343,7 @@ void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 
     /* DEFAULT_CHAN always reset itself */
     if( p_subpic->i_channel == DEFAULT_CHAN )
-        SpuClearChannel( p_spu, DEFAULT_CHAN, false );
+        SpuClearChannel( p_spu, DEFAULT_CHAN );
 
     /* p_private is for spu only and cannot be non NULL here */
     for( subpicture_region_t *r = p_subpic->p_region; r != NULL; r = r->p_next )
@@ -1661,15 +1661,12 @@ static int SubpictureCmp( const void *s0, const void *s1 )
  * This function destroys the subpictures which belong to the spu channel
  * corresponding to i_channel_id.
  *****************************************************************************/
-static void SpuClearChannel( spu_t *p_spu, int i_channel, bool b_locked )
+static void SpuClearChannel( spu_t *p_spu, int i_channel )
 {
     spu_private_t *p_sys = p_spu->p;
     int          i_subpic;                               /* subpicture index */
 
-    if( !b_locked )
-        vlc_mutex_lock( &p_sys->lock );
-
-    vlc_assert_locked( &p_sys->lock );
+    vlc_mutex_lock( &p_sys->lock );
 
     for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
     {
@@ -1683,8 +1680,7 @@ static void SpuClearChannel( spu_t *p_spu, int i_channel, bool b_locked )
         p_entry->b_reject = true;
     }
 
-    if( !b_locked )
-        vlc_mutex_unlock( &p_sys->lock );
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
 /*****************************************************************************
@@ -1707,7 +1703,7 @@ static int SpuControl( spu_t *p_spu, int i_query, va_list args )
 
     case SPU_CHANNEL_CLEAR:
         i = (int)va_arg( args, int );
-        SpuClearChannel( p_spu, i, false );
+        SpuClearChannel( p_spu, i );
         break;
 
     default:
@@ -1848,7 +1844,7 @@ static void SubFilterAllocationClean( filter_t *p_filter )
 {
     filter_owner_sys_t *p_sys = p_filter->p_owner;
 
-    SpuClearChannel( p_sys->p_spu, p_sys->i_channel, false );
+    SpuClearChannel( p_sys->p_spu, p_sys->i_channel );
     free( p_filter->p_owner );
 }
 
