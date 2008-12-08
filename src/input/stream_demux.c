@@ -32,7 +32,7 @@
 /****************************************************************************
  * stream_Demux*: create a demuxer for an outpout stream (allow demuxer chain)
  ****************************************************************************/
-typedef struct
+struct stream_sys_t
 {
     /* Data buffer */
     block_fifo_t *p_fifo;
@@ -45,7 +45,7 @@ typedef struct
     es_out_t    *out;
     demux_t     *p_demux;
 
-} d_stream_sys_t;
+};
 
 static int  DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
 static int  DStreamPeek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
@@ -58,8 +58,8 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
                              es_out_t *out )
 {
     /* We create a stream reader, and launch a thread */
-    stream_t       *s;
-    d_stream_sys_t *p_sys;
+    stream_t     *s;
+    stream_sys_t *p_sys;
 
     s = stream_CommonNew( p_obj );
     if( s == NULL )
@@ -69,13 +69,12 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s->pf_control= DStreamControl;
     s->pf_destroy= DStreamDelete;
 
-    s->p_sys = malloc( sizeof( d_stream_sys_t) );
+    s->p_sys = p_sys = malloc( sizeof( *p_sys) );
     if( s->p_sys == NULL )
     {
         stream_CommonDelete( s );
         return NULL;
     }
-    p_sys = (d_stream_sys_t*)s->p_sys;
 
     p_sys->i_pos = 0;
     p_sys->out = out;
@@ -106,13 +105,14 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
 
 void stream_DemuxSend( stream_t *s, block_t *p_block )
 {
-    d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
-    if( p_block ) block_FifoPut( p_sys->p_fifo, p_block );
+    stream_sys_t *p_sys = s->p_sys;
+    if( p_block )
+        block_FifoPut( p_sys->p_fifo, p_block );
 }
 
 static void DStreamDelete( stream_t *s )
 {
-    d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
+    stream_sys_t *p_sys = s->p_sys;
     block_t *p_empty;
 
     vlc_object_kill( s );
@@ -122,8 +122,10 @@ static void DStreamDelete( stream_t *s )
     block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_thread_join( s );
 
-    if( p_sys->p_demux ) demux_Delete( p_sys->p_demux );
-    if( p_sys->p_block ) block_Release( p_sys->p_block );
+    if( p_sys->p_demux )
+        demux_Delete( p_sys->p_demux );
+    if( p_sys->p_block )
+        block_Release( p_sys->p_block );
 
     block_FifoRelease( p_sys->p_fifo );
     free( p_sys->psz_name );
@@ -135,7 +137,7 @@ static void DStreamDelete( stream_t *s )
 
 static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
 {
-    d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
+    stream_sys_t *p_sys = s->p_sys;
     uint8_t *p_out = p_read;
     int i_out = 0;
 
@@ -176,7 +178,7 @@ static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
 
 static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, unsigned int i_peek )
 {
-    d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
+    stream_sys_t *p_sys = s->p_sys;
     block_t **pp_block = &p_sys->p_block;
     int i_out = 0;
     *pp_peek = 0;
@@ -214,7 +216,7 @@ static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, unsigned int i_pee
 
 static int DStreamControl( stream_t *s, int i_query, va_list args )
 {
-    d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
+    stream_sys_t *p_sys = s->p_sys;
     int64_t    *p_i64;
     bool *p_b;
     int        *p_int;
@@ -276,7 +278,7 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
 static void* DStreamThread( vlc_object_t* p_this )
 {
     stream_t *s = (stream_t *)p_this;
-    d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
+    stream_sys_t *p_sys = s->p_sys;
     demux_t *p_demux;
     int canc = vlc_savecancel();
 
