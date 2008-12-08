@@ -398,14 +398,14 @@ error:
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        if( tk->b_muxed ) stream_Delete( tk->p_out_muxed );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
 
     if( p_sys->i_track ) free( p_sys->track );
-    if( p_sys->p_out_asf ) stream_DemuxDelete( p_sys->p_out_asf );
+    if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
     if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->teardownMediaSession( *p_sys->ms );
     if( p_sys->p_timeout )
     {
@@ -439,14 +439,14 @@ static void Close( vlc_object_t *p_this )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        if( tk->b_muxed ) stream_Delete( tk->p_out_muxed );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
 
     if( p_sys->i_track ) free( p_sys->track );
-    if( p_sys->p_out_asf ) stream_DemuxDelete( p_sys->p_out_asf );
+    if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
     if( p_sys->rtsp && p_sys->ms ) p_sys->rtsp->teardownMediaSession( *p_sys->ms );
     if( p_sys->p_timeout )
     {
@@ -1457,14 +1457,14 @@ static int RollOverTcp( demux_t *p_demux )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( tk->b_muxed ) stream_DemuxDelete( tk->p_out_muxed );
+        if( tk->b_muxed ) stream_Delete( tk->p_out_muxed );
         if( tk->p_es ) es_out_Del( p_demux->out, tk->p_es );
         es_format_Clean( &tk->fmt );
         free( tk->p_buffer );
         free( tk );
     }
     if( p_sys->i_track ) free( p_sys->track );
-    if( p_sys->p_out_asf ) stream_DemuxDelete( p_sys->p_out_asf );
+    if( p_sys->p_out_asf ) stream_Delete( p_sys->p_out_asf );
 
     p_sys->rtsp->teardownMediaSession( *p_sys->ms );
     Medium::close( p_sys->ms );

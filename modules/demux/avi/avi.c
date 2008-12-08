@@ -770,7 +770,7 @@ static void Close ( vlc_object_t * p_this )
         if( p_sys->track[i] )
         {
             if( p_sys->track[i]->p_out_muxed )
-                stream_DemuxDelete( p_sys->track[i]->p_out_muxed );
+                stream_Delete( p_sys->track[i]->p_out_muxed );
             free( p_sys->track[i]->p_index );
             free( p_sys->track[i]->p_extra );
             free( p_sys->track[i] );

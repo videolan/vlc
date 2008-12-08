@@ -232,7 +232,7 @@ static int Open (demux_t *demux, const char *path)
                                        VLC_THREAD_PRIORITY_INPUT) == 0)
                             ret = VLC_SUCCESS;
                         else
-                            stream_DemuxDelete (p_sys->out);
+                            stream_Delete (p_sys->out);
                     }
                     else
                         msg_Err (demux, "Cannot create demux");
@@ -265,7 +265,7 @@ static void Close (vlc_object_t *obj)
     int status;
 
     vlc_cancel (p_sys->thread);
-    stream_DemuxDelete (p_sys->out);
+    stream_Delete (p_sys->out);
     close (p_sys->read_fd);
     vlc_join (p_sys->thread, NULL);
     close (p_sys->write_fd);

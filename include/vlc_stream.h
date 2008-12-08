@@ -156,14 +156,26 @@ static inline char *stream_ContentType( stream_t *s )
 
 /**
  * Create a special stream and a demuxer, this allows chaining demuxers
+ * You must delete it using stream_Delete.
  */
 #define stream_DemuxNew( a, b, c ) __stream_DemuxNew( VLC_OBJECT(a), b, c)
 VLC_EXPORT( stream_t *,__stream_DemuxNew, ( vlc_object_t *p_obj, const char *psz_demux, es_out_t *out ) );
+/**
+ * Send data to a stream_t handle created by stream_DemuxNew.
+ */
 VLC_EXPORT( void,      stream_DemuxSend,  ( stream_t *s, block_t *p_block ) );
-VLC_EXPORT( void,      stream_DemuxDelete,( stream_t *s ) );
 
+/**
+ * Create a stream_t reading from memory.
+ * You must delete it using stream_Delete.
+ */
 #define stream_MemoryNew( a, b, c, d ) __stream_MemoryNew( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, bool i_preserve_memory ) );
+VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, bool b_preserve_memory ) );
+
+/**
+ * Create a stream_t reading from an URL.
+ * You must delete it using stream_Delete.
+ */
 #define stream_UrlNew( a, b ) __stream_UrlNew( VLC_OBJECT(a), b )
 VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_url ) );
 

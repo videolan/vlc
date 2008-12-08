@@ -418,7 +418,7 @@ static void *stream_init (demux_t *demux, const char *name)
 static void stream_destroy (demux_t *demux, void *data)
 {
     if (data)
-        stream_DemuxDelete ((stream_t *)data);
+        stream_Delete ((stream_t *)data);
     (void)demux;
 }
 

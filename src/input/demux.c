@@ -312,9 +312,10 @@ typedef struct
 
 } d_stream_sys_t;
 
-static int DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
-static int DStreamPeek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
-static int DStreamControl( stream_t *, int i_query, va_list );
+static int  DStreamRead   ( stream_t *, void *p_read, unsigned int i_read );
+static int  DStreamPeek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
+static int  DStreamControl( stream_t *, int i_query, va_list );
+static void DStreamDelete ( stream_t * );
 static void* DStreamThread ( vlc_object_t * );
 
 
@@ -331,6 +332,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s->pf_read   = DStreamRead;
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;
+    s->pf_destroy= DStreamDelete;
 
     s->p_sys = malloc( sizeof( d_stream_sys_t) );
     if( s->p_sys == NULL )
@@ -373,10 +375,7 @@ void stream_DemuxSend( stream_t *s, block_t *p_block )
     if( p_block ) block_FifoPut( p_sys->p_fifo, p_block );
 }
 
-/* FIXME why is it needed ?
- * We may be able to use pf_destroy
- */
-void stream_DemuxDelete( stream_t *s )
+static void DStreamDelete( stream_t *s )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
     block_t *p_empty;
