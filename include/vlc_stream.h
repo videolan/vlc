@@ -53,17 +53,18 @@ struct stream_t
 {
     VLC_COMMON_MEMBERS
 
-    /* Module properties */
+    /* Module properties for stream filter */
     module_t    *p_module;
 
-    /* For stream filter they will hold an array of stream sources */
-    int      i_source;
-    stream_t **pp_source;
+    /* Stream source for stream filter */
+    stream_t *p_source;
 
     /* */
     int      (*pf_read)   ( stream_t *, void *p_read, unsigned int i_read );
     int      (*pf_peek)   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
     int      (*pf_control)( stream_t *, int i_query, va_list );
+
+    /* */
     void     (*pf_destroy)( stream_t *);
 
     /* Private data for module */
@@ -95,10 +96,14 @@ enum stream_query_e
     STREAM_CONTROL_ACCESS,  /* arg1= int i_access_query, args   res: can fail
                              if access unreachable or access control answer */
 
+    /* You should update size of source if any and then update size 
+     * FIXME find a way to avoid it */
+    STREAM_UPDATE_SIZE,
+
+    /* */
     STREAM_GET_CONTENT_TYPE,    /**< arg1= char **         res=can fail */
 
-    /* SET_RECORD:
-     * XXX only data read through stream_Read/Block will be recorded */
+    /* XXX only data read through stream_Read/Block will be recorded */
     STREAM_SET_RECORD_STATE,     /**< arg1=bool, arg2=const char *psz_ext (if arg1 is true)  res=can fail */
 };
 

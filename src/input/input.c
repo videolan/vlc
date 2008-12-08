@@ -1933,8 +1933,8 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     es_out_SetTime( p_input->p->p_es_out, -1 );
 
-                    access_Control( p_access, ACCESS_SET_TITLE, i_title );
-                    stream_AccessReset( p_input->p->input.p_stream );
+                    stream_Control( p_input->p->input.p_stream, STREAM_CONTROL_ACCESS,
+                                    ACCESS_SET_TITLE, i_title );
                 }
             }
             break;
@@ -2012,9 +2012,8 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     es_out_SetTime( p_input->p->p_es_out, -1 );
 
-                    access_Control( p_access, ACCESS_SET_SEEKPOINT,
-                                    i_seekpoint );
-                    stream_AccessReset( p_input->p->input.p_stream );
+                    stream_Control( p_input->p->input.p_stream, STREAM_CONTROL_ACCESS,
+                                    ACCESS_SET_SEEKPOINT, i_seekpoint );
                 }
             }
             break;
@@ -2256,7 +2255,7 @@ static int UpdateTitleSeekpointFromAccess( input_thread_t *p_input )
     {
         input_SendEventTitle( p_input, p_access->info.i_title );
 
-        stream_AccessUpdate( p_input->p->input.p_stream );
+        stream_Control( p_input->p->input.p_stream, STREAM_UPDATE_SIZE );
 
         p_access->info.i_update &= ~INPUT_UPDATE_TITLE;
     }
@@ -2515,6 +2514,10 @@ static int InputSourceInit( input_thread_t *p_input,
             var_Set( p_input, "can-seek", val );
         }
 
+        /* TODO (maybe)
+         * do not let stream_AccessNew access input-list
+         * but give it a list of access ? */
+
         /* Autodetect extra files if none specified */
         char *psz_input_list = var_CreateGetNonEmptyString( p_input, "input-list" );
         if( !psz_input_list )
@@ -2528,7 +2531,7 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Create the stream_t */
         in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
 
-        /* Restor old value */
+        /* Restore old value */
         if( !psz_input_list )
             var_SetString( p_input, "input-list", "" );
         free( psz_input_list );
@@ -2538,6 +2541,37 @@ static int InputSourceInit( input_thread_t *p_input,
             msg_Warn( p_input, "cannot create a stream_t from access" );
             goto error;
         }
+
+        /* Add auto stream filter */
+        for( ;; )
+        {
+            stream_t *p_filter = stream_FilterNew( in->p_stream, NULL );
+            if( !p_filter )
+                break;
+
+            msg_Dbg( p_input, "Inserted a stream filter" );
+            in->p_stream = p_filter;
+        }
+
+        /* Add user stream filter */
+        psz_tmp = psz = var_GetNonEmptyString( p_input, "stream-filter" );
+        while( psz && *psz )
+        {
+            stream_t *p_filter;
+            char *psz_end = strchr( psz, ':' );
+
+            if( psz_end )
+                *psz_end++ = '\0';
+
+            p_filter = stream_FilterNew( in->p_stream, psz );
+            if( p_filter )
+                in->p_stream = p_filter;
+            else
+                msg_Warn( p_input, "failed to insert stream filter %s", psz );
+
+            psz = psz_end;
+        }
+        free( psz_tmp );
 
         /* Open a demuxer */
         if( *psz_demux == '\0' && *in->p_access->psz_demux )
@@ -2597,7 +2631,7 @@ static int InputSourceInit( input_thread_t *p_input,
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
         in->b_can_stream_record = false;
 #ifdef ENABLE_SOUT
-    if( !var_CreateGetBool( p_input, "input-record-native" ) )
+    if( !var_GetBool( p_input, "input-record-native" ) )
         in->b_can_stream_record = false;
     var_SetBool( p_input, "can-record", true );
 #else

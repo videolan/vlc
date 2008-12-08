@@ -1,11 +1,10 @@
 /*****************************************************************************
- * stream.h: Input stream functions
+ * stream_filter.c
  *****************************************************************************
- * Copyright (C) 1998-2008 the VideoLAN team
  * Copyright (C) 2008 Laurent Aimar
  * $Id$
  *
- * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ * Author: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,34 +21,53 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#if defined(__PLUGIN__) || defined(__BUILTIN__) || !defined(__LIBVLC__)
-# error This header file can only be included from LibVLC.
+#ifdef HAVE_CONFIG_H
+# include "config.h"
 #endif
-
-#ifndef _INPUT_STREAM_H
-#define _INPUT_STREAM_H 1
 
 #include <vlc_common.h>
 #include <vlc_stream.h>
+#include <libvlc.h>
 
-struct stream_text_t
-{
-    /* UTF-16 and UTF-32 file reading */
-    vlc_iconv_t     conv;
-    int             i_char_width;
-    bool            b_little_endian;
-};
+#include "stream.h"
 
-/* */
-stream_t *stream_CommonNew( vlc_object_t * );
-void stream_CommonDelete( stream_t * );
+static void StreamDelete( stream_t * );
 
-/* */
-stream_t *stream_AccessNew( access_t *p_access, bool );
-
-/* */
 stream_t *stream_FilterNew( stream_t *p_source,
-                            const char *psz_stream_filter );
+                            const char *psz_stream_filter )
+{
+    stream_t *s;
 
-#endif
+    s = stream_CommonNew( VLC_OBJECT( p_source ) );
+    if( s == NULL )
+        return NULL;
+
+    /* */
+    s->p_source = p_source;
+
+    /* */
+    vlc_object_attach( s, p_source );
+
+    s->p_module = module_need( s, "stream_filter", psz_stream_filter, true );
+
+    if( !s->p_module )
+    {
+        stream_CommonDelete( s );
+        return NULL;
+    }
+
+    s->pf_destroy = StreamDelete;
+
+    return s;
+}
+
+static void StreamDelete( stream_t *s )
+{
+    module_unneed( s, s->p_module );
+
+    if( s->p_source )
+        stream_Delete( s->p_source );
+
+    stream_CommonDelete( s );
+}
 

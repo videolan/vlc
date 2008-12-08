@@ -531,9 +531,9 @@ static void UStreamDestroy( stream_t *s )
 }
 
 /****************************************************************************
- * stream_AccessReset:
+ * AStreamControlReset:
  ****************************************************************************/
-void stream_AccessReset( stream_t *s )
+static void AStreamControlReset( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -578,9 +578,9 @@ void stream_AccessReset( stream_t *s )
 }
 
 /****************************************************************************
- * stream_AccessUpdate:
+ * AStreamControlUpdate:
  ****************************************************************************/
-void stream_AccessUpdate( stream_t *s )
+static void AStreamControlUpdate( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -657,16 +657,27 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case STREAM_CONTROL_ACCESS:
+        {
             i_int = (int) va_arg( args, int );
             if( i_int != ACCESS_SET_PRIVATE_ID_STATE &&
                 i_int != ACCESS_SET_PRIVATE_ID_CA &&
-                i_int != ACCESS_GET_PRIVATE_ID_STATE )
+                i_int != ACCESS_GET_PRIVATE_ID_STATE &&
+                i_int != ACCESS_SET_TITLE &&
+                i_int != ACCESS_SET_SEEKPOINT )
             {
                 msg_Err( s, "Hey, what are you thinking ?"
                             "DON'T USE STREAM_CONTROL_ACCESS !!!" );
                 return VLC_EGENERIC;
             }
-            return access_vaControl( p_access, i_int, args );
+            int i_ret = access_vaControl( p_access, i_int, args );
+            if( i_int == ACCESS_SET_TITLE || i_int == ACCESS_SET_SEEKPOINT )
+                AStreamControlReset( s );
+            return i_ret;
+        }
+
+        case STREAM_UPDATE_SIZE:
+            AStreamControlUpdate( s );
+            return VLC_SUCCESS;
 
         case STREAM_GET_CONTENT_TYPE:
             return access_Control( p_access, ACCESS_GET_CONTENT_TYPE,
