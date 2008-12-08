@@ -1375,9 +1375,6 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         }
 
         /* */
-        int i_rate = INPUT_RATE_DEFAULT;
-        mtime_t i_delay;
-
         if( b_buffering_first )
         {
             assert( p_owner->buffer.b_first );
@@ -1385,10 +1382,10 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             msg_Dbg( p_dec, "Received first picture" );
             p_owner->buffer.b_first = false;
             p_picture->b_force = true;
-            i_delay = 0;
-            if( p_owner->p_clock )
-                i_rate = input_clock_GetRate( p_owner->p_clock );
         }
+
+        int i_rate = INPUT_RATE_DEFAULT;
+        mtime_t i_delay;
         DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
                       &i_rate, &i_delay, false );
 
