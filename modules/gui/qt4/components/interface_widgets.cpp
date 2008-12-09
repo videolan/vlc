@@ -87,15 +87,9 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     setAttribute( Qt::WA_PaintOnScreen, true );
 
     /* The core can ask through a callback to show the video. */
-#if HAS_QT43
     connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
              this, SLOT(SetSizing(unsigned int, unsigned int )),
              Qt::BlockingQueuedConnection );
-#else
-#warning This is broken. Fix it with a QEventLoop with a processEvents ()
-    connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
-             this, SLOT(SetSizing(unsigned int, unsigned int )) );
-#endif
 }
 
 void VideoWidget::paintEvent(QPaintEvent *ev)

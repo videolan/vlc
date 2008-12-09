@@ -309,9 +309,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.outputModule );
             optionWidgets.append( ui.volNormBox );
             /*Little mofification of ui.volumeValue to compile with Qt < 4.3 */
-#if HAS_QT43
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
-#endif
             optionWidgets.append( ui.volumeValue );
             updateAudioOptions( ui.outputModule->currentIndex() );
 

@@ -77,14 +77,12 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
 
     getSettings()->beginGroup("Playlist");
-#if HAS_QT43
     if( getSettings()->contains( "headerState" ) )
     {
         view->header()->restoreState(
                 getSettings()->value( "headerState" ).toByteArray() );
     }
     else
-#endif
     {
         /* Configure the size of the header */
         view->header()->resizeSection( 0, 200 );
@@ -355,11 +353,9 @@ void StandardPLPanel::deleteSelection()
 
 StandardPLPanel::~StandardPLPanel()
 {
-#if HAS_QT43
     getSettings()->beginGroup("Playlist");
     getSettings()->setValue( "headerState", view->header()->saveState() );
     getSettings()->endGroup();
-#endif
 }
 
 

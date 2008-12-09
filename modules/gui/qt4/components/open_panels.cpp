@@ -77,10 +77,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
-#if HAS_QT43
     dialogBox->restoreState(
             getSettings()->value( "file-dialog-state" ).toByteArray() );
-#endif
 
     /* We don't want to see a grip in the middle of the window, do we? */
     dialogBox->setSizeGripEnabled( false );
@@ -96,11 +94,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Ugly hacks to get the good Widget */
     //This lineEdit is the normal line in the fileDialog.
-#if HAS_QT43
     lineFileEdit = dialogBox->findChildren<QLineEdit*>()[0];
-#else
-    lineFileEdit = dialogBox->findChildren<QLineEdit*>()[1];
-#endif
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
     QList<QLabel *> listLabel = dialogBox->findChildren<QLabel*>();
 
@@ -144,9 +138,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 FileOpenPanel::~FileOpenPanel()
 {
-#if HAS_QT43
     getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
-#endif
 }
 
 /* Show a fileBrowser to select a subtitle */

@@ -35,7 +35,9 @@
 
 #include <QEvent>
 
-#define HAS_QT43 ( QT_VERSION >= 0x040300 )
+#if ( QT_VERSION < 0x040300 )
+# error Update your Qt
+#endif
 
 enum {
     QT_NORMAL_MODE = 0,
@@ -115,11 +117,7 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
-#if HAS_QT43
-    #define setLayoutMargins( a, b, c, d, e) setContentsMargins( a, b, c, d )
-#else
-    #define setLayoutMargins( a, b, c, d, e) setMargin( e )
-#endif
+#define setLayoutMargins( a, b, c, d, e) setContentsMargins( a, b, c, d )
 
 #define getSettings() p_intf->p_sys->mainSettings
 
