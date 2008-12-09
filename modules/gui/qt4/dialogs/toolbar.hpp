@@ -70,7 +70,7 @@ class DroppingController: public AbstractController
 {
     Q_OBJECT;
 public:
-    DroppingController( intf_thread_t *  );
+    DroppingController( intf_thread_t *, QString line, QWidget *parent = 0 );
 
 protected:
     virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,

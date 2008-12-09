@@ -44,7 +44,7 @@ ToolbarEditDialog *ToolbarEditDialog::instance = NULL;
 ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
                   : QVLCFrame(  _p_intf )
 {
-    setWindowTitle( qtr( "Toolbars Edition" ) );
+    setWindowTitle( qtr( "Toolbars Editor" ) );
     QGridLayout *mainLayout = new QGridLayout( this );
     setMinimumWidth( 600 );
 
@@ -78,24 +78,25 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
                                            << "Under the Video" );
     mainTboxLayout->addWidget( positionCombo, 0, 1, 1, 1 );
 
-    QFrame *mainToolFrame = new QFrame;
+/*    QFrame *mainToolFrame = new QFrame;
     mainToolFrame->setMinimumSize( QSize( 0, 25 ) );
     mainToolFrame->setFrameShape( QFrame::StyledPanel );
     mainToolFrame->setFrameShadow( QFrame::Raised );
     mainTboxLayout->addWidget( mainToolFrame, 1, 0, 1, 2 );
     mainToolFrame->setAcceptDrops( true );
-    QHBoxLayout *mtlayout = new QHBoxLayout( mainToolFrame );
+    QHBoxLayout *mtlayout = new QHBoxLayout( mainToolFrame ); */
 
-    DroppingController *controller = new DroppingController( p_intf );
-    mtlayout->addWidget( controller );
+    QString line1 = getSettings()->value( "MainWindow/Controls1",
+                        "64;36;37;38;65").toString();
+    DroppingController *controller1 = new DroppingController( p_intf, line1,
+            this );
+    mainTboxLayout->addWidget( controller1, 1, 0, 1, -1 );
 
-
-    QFrame *mainTool2Frame = new QFrame;
-    mainTool2Frame->setMinimumSize( QSize( 0, 25 ) );
-    mainTool2Frame->setFrameShape( QFrame::StyledPanel );
-    mainTool2Frame->setFrameShadow( QFrame::Raised );
-    mainTboxLayout->addWidget( mainTool2Frame, 2, 0, 1, 2 );
-    mainTool2Frame->setAcceptDrops( true );
+    QString line2 = getSettings()->value( "MainWindow/Controls2",
+            "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
+    DroppingController *controller2 = new DroppingController( p_intf, line2,
+            this );
+    mainTboxLayout->addWidget( controller2, 2, 0, 1, -1 );
 
     mainLayout->addWidget( mainToolbarBox, 1, 0, 1, -1 );
 }
@@ -277,8 +278,8 @@ void WidgetListing::startDrag( Qt::DropActions /*supportedActions*/ )
 }
 
 
-DroppingController::DroppingController( intf_thread_t *_p_intf )
-                   : AbstractController( _p_intf )
+DroppingController::DroppingController( intf_thread_t *_p_intf, QString line, QWidget *_parent )
+                   : AbstractController( _p_intf, _parent )
 {
     rubberband = NULL;
     setAcceptDrops( true );
@@ -288,14 +289,8 @@ DroppingController::DroppingController( intf_thread_t *_p_intf )
     setFrameShape( QFrame::StyledPanel );
     setFrameShadow( QFrame::Raised );
 
-    QString line2 = getSettings()->value( "MainWindow/Controls2",
-            "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
 
-    parseAndCreate( line2, controlLayout );
-
-    //QString line1 = getSettings()->value( "MainWindow/Controls2",
-    //                     "18;19;25;0" ).toString();
-    //     parseAndCreate( line1, 1 );
+    parseAndCreate( line, controlLayout );
 
 }
 
