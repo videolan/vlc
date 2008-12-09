@@ -2325,8 +2325,6 @@ static int InputSourceInit( input_thread_t *p_input,
     const char *psz_access;
     const char *psz_demux;
     char *psz_path;
-    char *psz_tmp;
-    char *psz;
     vlc_value_t val;
     double f_fps;
 
@@ -2520,48 +2518,13 @@ static int InputSourceInit( input_thread_t *p_input,
             goto error;
         }
 
-        /* Add auto stream filter */
-        for( ;; )
-        {
-            stream_t *p_filter = stream_FilterNew( in->p_stream, NULL );
-            if( !p_filter )
-                break;
-
-            msg_Dbg( p_input, "Inserted a stream filter" );
-            in->p_stream = p_filter;
-        }
-
-        /* Add user stream filter */
-        psz_tmp = psz = var_GetNonEmptyString( p_input, "stream-filter" );
-        while( psz && *psz )
-        {
-            stream_t *p_filter;
-            char *psz_end = strchr( psz, ':' );
-
-            if( psz_end )
-                *psz_end++ = '\0';
-
-            p_filter = stream_FilterNew( in->p_stream, psz );
-            if( p_filter )
-                in->p_stream = p_filter;
-            else
-                msg_Warn( p_input, "failed to insert stream filter %s", psz );
-
-            psz = psz_end;
-        }
-        free( psz_tmp );
-
-        /* Add record filter if usefull */
-        if( var_GetBool( p_input, "input-record-native" ) )
-        {
-            stream_t *p_filter;
-
-            p_filter = stream_FilterNew( in->p_stream, "stream_filter_record" );
-            if( p_filter )
-                in->p_stream = p_filter;
-            else
-                var_SetBool( p_input, "input-record-native", false );
-        }
+        /* Add stream filters */
+        char *psz_stream_filter = var_GetNonEmptyString( p_input,
+                                                         "stream-filter" );
+        in->p_stream = stream_FilterChainNew( in->p_stream,
+                                              psz_stream_filter,
+                                              var_GetBool( p_input, "input-record-native" ) );
+        free( psz_stream_filter );
 
         /* Open a demuxer */
         if( *psz_demux == '\0' && *in->p_access->psz_demux )

@@ -51,5 +51,9 @@ stream_t *stream_AccessNew( access_t *p_access, bool );
 stream_t *stream_FilterNew( stream_t *p_source,
                             const char *psz_stream_filter );
 
+/* */
+stream_t *stream_FilterChainNew( stream_t *p_source,
+                                 const char *psz_chain,
+                                 bool b_record );
 #endif
 
