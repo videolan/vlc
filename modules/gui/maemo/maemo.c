@@ -69,7 +69,7 @@ vlc_module_begin();
     add_shortcut( "maemo" );
 
     add_submodule();
-        set_capability( "vout window", 50 );
+        set_capability( "vout_window", 50 );
         set_callbacks( OpenWindow, CloseWindow );
 vlc_module_end();
 

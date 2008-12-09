@@ -490,7 +490,7 @@ vlc_module_begin ()
     add_shortcut( "skins" )
 
     add_submodule ()
-        set_capability( "vout window", 51 )
+        set_capability( "vout_window", 51 )
         set_callbacks( WindowOpen, WindowClose )
 
     add_submodule ()
