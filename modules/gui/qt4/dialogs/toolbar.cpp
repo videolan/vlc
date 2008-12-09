@@ -54,14 +54,15 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
                               QSizePolicy::MinimumExpanding );
     QGridLayout *boxLayout = new QGridLayout( widgetBox );
 
-    boxLayout->addWidget( new WidgetListing( p_intf, this ), 0, 0, 1, -1);
     flatBox = new QCheckBox( qtr( "Flat Button" ) );
     bigBox = new QCheckBox( qtr( "Big Button" ) );
     shinyBox = new QCheckBox( qtr( "Native Slider" ) );
     shinyBox->setChecked( true );
+
+    boxLayout->addWidget( new WidgetListing( p_intf, this ), 0, 0, 1, -1);
     boxLayout->addWidget( flatBox, 1, 0 );
     boxLayout->addWidget( bigBox, 1, 1 );
-    boxLayout->addWidget( bigBox, 1, 2 );
+    boxLayout->addWidget( shinyBox, 1, 2 );
     mainLayout->addWidget( widgetBox, 0, 0, 1, -1 );
 
 
@@ -174,8 +175,8 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             break;
         case VOLUME:
             {
-                bool b_shiny = false;
-                SoundWidget *snd = new SoundWidget( this, p_intf, b_shiny );
+                SoundWidget *snd = new SoundWidget( this, p_intf,
+                        parent->getOptions() & WIDGET_SHINY );
                 widget = snd;
             }
             widgetItem->setText( qtr("Volume") );
@@ -232,7 +233,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             break;
         case ADVANCED_CONTROLLER:
             {
-                AdvControlsWidget *advControls = new AdvControlsWidget( p_intf );
+                AdvControlsWidget *advControls = new AdvControlsWidget( p_intf, this );
                 widget = advControls;
             }
             widgetItem->setText( qtr("Advanced Buttons") );
@@ -288,7 +289,7 @@ DroppingController::DroppingController( intf_thread_t *_p_intf )
     setFrameShadow( QFrame::Raised );
 
     QString line2 = getSettings()->value( "MainWindow/Controls2",
-            "0-2;21;4;2;5;21;8;11;10;21;22;20-4" ).toString();
+            "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
 
     parseAndCreate( line2, controlLayout );
 
@@ -329,6 +330,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
 
         /* Some Widgets are deactivated at creation */
         widg->setEnabled( true );
+        widg->show();
         controlLayout->insertWidget( i_index, widg );
     }
 }

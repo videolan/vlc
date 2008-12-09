@@ -59,7 +59,8 @@
  * This has helper to create any toolbar, any buttons and to manage the actions
  *
  *****/
-AbstractController::AbstractController( intf_thread_t * _p_i ) : QFrame( NULL )
+AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
+                   : QFrame( _parent )
 {
     p_intf = _p_i;
     advControls = NULL;
@@ -329,11 +330,11 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case MENU_BUTTONS:
         widget = discFrame();
-//        widget->hide();
+        widget->hide();
         break;
     case TELETEXT_BUTTONS:
         widget = telexFrame();
-//        widget->hide();
+        widget->hide();
         break;
     case VOLUME:
         {
@@ -359,7 +360,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case ADVANCED_CONTROLLER:
         {
-            advControls = new AdvControlsWidget( p_intf );
+            advControls = new AdvControlsWidget( p_intf, this );
             widget = advControls;
         }
         break;
@@ -373,7 +374,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     default:
-        msg_Warn( p_intf, "This should not happen" );
+        msg_Warn( p_intf, "This should not happen %i", button );
         break;
     }
 
@@ -780,8 +781,9 @@ void AbstractController::frame()
  * DA Control Widget !
  *****************************/
 ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
-                                bool b_advControls ) :
-                                AbstractController( _p_i )
+                                bool b_advControls,
+                                QWidget *_parent ) :
+                                AbstractController( _p_i, _parent )
 {
     setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
 
@@ -795,21 +797,22 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout1->setSpacing( 0 );
 
     QString line1 = getSettings()->value( "MainWindow/Controls1",
-            "18;19;25" ).toString();
+            "64;36;37;38;65").toString();
     parseAndCreate( line1, controlLayout1 );
 
-/*    QString line2 = QString( "%1-2;%2;%3;%4;%5;%6;%6;%7;%8;%9;%6;%10;%11-4")
+   /* QString line2 = QString( "%1-2;%2;%3;%4;%5;%6;%6;%7;%8;%9;%6;%10;%11-4")
         .arg( PLAY_BUTTON )         .arg( WIDGET_SPACER )
         .arg( PREVIOUS_BUTTON )         .arg( STOP_BUTTON )
         .arg( NEXT_BUTTON )        .arg( WIDGET_SPACER )
         .arg( FULLSCREEN_BUTTON )        .arg( PLAYLIST_BUTTON )
         .arg( EXTENDED_BUTTON )        .arg( WIDGET_SPACER_EXTEND )
-        .arg( VOLUME ); */
+        .arg( VOLUME );
+    msg_Dbg( p_intf, "%s", qtu( line2 )); */
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
     controlLayout2->setSpacing( 0 );
     QString line2 = getSettings()->value( "MainWindow/Controls2",
-            "0-2;21;4;2;5;21;8;11;10;21;22;20-4" ).toString();
+            "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
     parseAndCreate( line2, controlLayout2 );
 
     if( !b_advancedVisible && advControls ) advControls->hide();
@@ -838,8 +841,8 @@ void ControlsWidget::toggleAdvanced()
     emit advancedControlsToggled( b_advancedVisible );
 }
 
-AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
-                                     AbstractController( _p_i )
+AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
+                                     AbstractController( _p_i, _parent )
 {
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
@@ -851,12 +854,12 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i ) :
         .arg( FRAME_BUTTON ); */
 
     QString line = getSettings()->value( "MainWindow/AdvControl",
-            "12;13;14;15" ).toString();
+            "12;11;13;14" ).toString();
     parseAndCreate( line, controlLayout );
 }
 
-InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i ) :
-                                     AbstractController( _p_i )
+InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
+                                     AbstractController( _p_i, _parent )
 {
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
@@ -867,7 +870,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i ) :
         .arg( INPUT_SLIDER )
         .arg( FASTER_BUTTON ); */
     QString line = getSettings()->value( "MainWindow/InputControl",
-                   "6-1;16;7-1" ).toString();
+                   "5-1;33;6-1" ).toString();
     parseAndCreate( line, controlLayout );
 }
 /**********************************************************************
@@ -901,11 +904,11 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     controlLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
 
     /* First line */
-    InputControlsWidget *inputC = new InputControlsWidget( p_intf );
-//    controlLayout->addWidget( inputC, 0, 0, 1, -1 );
+    InputControlsWidget *inputC = new InputControlsWidget( p_intf, this );
+    controlLayout->addWidget( inputC );
 
     /* Second line */
-    /* QString line2 = QString( "%1-2;%2;%3;%4;%5;%2;%6;%2;%7;%2;%8;%9;%10-4")
+/*     QString line = QString( "%1-2;%2;%3;%4;%5;%2;%6;%2;%7;%2;%8;%9;%10-4")
         .arg( PLAY_BUTTON )
         .arg( WIDGET_SPACER )
         .arg( PREVIOUS_BUTTON )
@@ -919,7 +922,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
         .arg( VOLUME ); */
 
     QString line = getSettings()->value( "MainWindow/FSCline",
-            "0-2;21;4;2;5;21;18;21;19;21;9;22;23-4" ).toString();
+            "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
     parseAndCreate( line, controlLayout );
 
     /* hiding timer */

@@ -375,10 +375,10 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
-                   settings->value( "adv-controls", false ).toBool() );
+                   settings->value( "adv-controls", false ).toBool(), this );
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
-    InputControlsWidget *inputC = new InputControlsWidget( p_intf );
+    InputControlsWidget *inputC = new InputControlsWidget( p_intf, this );
 
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );

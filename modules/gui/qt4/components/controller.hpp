@@ -143,7 +143,7 @@ class AbstractController : public QFrame
 
     Q_OBJECT
 public:
-    AbstractController( intf_thread_t  *_p_i );
+    AbstractController( intf_thread_t  *_p_i, QWidget *_parent = 0 );
 
 protected:
     intf_thread_t       *p_intf;
@@ -251,7 +251,7 @@ class AdvControlsWidget : public AbstractController
 {
     Q_OBJECT
 public:
-    AdvControlsWidget( intf_thread_t * );
+    AdvControlsWidget( intf_thread_t *, QWidget *_parent = 0 );
 };
 
 /* Slider Bar */
@@ -259,7 +259,7 @@ class InputControlsWidget : public AbstractController
 {
     Q_OBJECT
 public:
-    InputControlsWidget( intf_thread_t * );
+    InputControlsWidget( intf_thread_t * , QWidget *_parent = 0 );
 };
 
 /* Button Bar */
@@ -268,7 +268,8 @@ class ControlsWidget : public AbstractController
     Q_OBJECT
 public:
     /* p_intf, advanced control visible or not, blingbling or not */
-    ControlsWidget( intf_thread_t *_p_i, bool b_advControls );
+    ControlsWidget( intf_thread_t *_p_i, bool b_advControls,
+                    QWidget *_parent = 0 );
     virtual ~ControlsWidget();
 
 protected:
