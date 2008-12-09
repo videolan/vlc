@@ -810,7 +810,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
 
         /* Open output stream */
-        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_encoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_encoder->fmt_out );
         id->b_transcode = true;
 
         if( !id->id )
@@ -871,7 +871,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
 
         /* open output stream */
-        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_encoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_encoder->fmt_out );
         id->b_transcode = true;
 
         if( !id->id )
@@ -914,7 +914,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&p_fmt->i_codec );
-        id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+        id->id = sout_StreamIdAdd( p_sys->p_out, p_fmt );
         id->b_transcode = false;
 
         if( !id->id ) goto error;
@@ -968,7 +968,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         }
     }
 
-    if( id->id ) p_sys->p_out->pf_del( p_sys->p_out, id->id );
+    if( id->id ) sout_StreamIdDel( p_sys->p_out, id->id );
 
     if( id->p_decoder )
     {
@@ -997,7 +997,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( !id->b_transcode && id->id )
     {
-        return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+        return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
     }
     else if( !id->b_transcode )
     {
@@ -1042,7 +1042,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         break;
     }
 
-    if( p_out ) return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_out );
+    if( p_out )
+        return sout_StreamIdSend( p_sys->p_out, id->id, p_out );
     return VLC_SUCCESS;
 }
 
@@ -1783,8 +1784,8 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         id->p_encoder->fmt_out.i_codec = VLC_FOURCC('m','p','g','v');
     }
 
-    id->id = p_stream->p_sys->p_out->pf_add( p_stream->p_sys->p_out,
-                                             &id->p_encoder->fmt_out );
+    id->id = sout_StreamIdAdd( p_stream->p_sys->p_out,
+                               &id->p_encoder->fmt_out );
     if( !id->id )
     {
         msg_Err( p_stream, "cannot add this stream" );
@@ -2454,7 +2455,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         }
 
         /* open output stream */
-        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_encoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_encoder->fmt_out );
         id->b_transcode = true;
 
         if( !id->id ) goto error;
@@ -2463,7 +2464,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&id->p_decoder->fmt_out.i_codec );
-        id->id = p_sys->p_out->pf_add( p_sys->p_out, &id->p_decoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_decoder->fmt_out );
         id->b_transcode = false;
 
         if( !id->id ) goto error;
