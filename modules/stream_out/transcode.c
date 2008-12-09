@@ -643,68 +643,23 @@ static void Close( vlc_object_t * p_this )
 
     free( p_sys->psz_af2 );
 
-    while( p_sys->p_audio_cfg != NULL )
-    {
-        config_chain_t *p_next = p_sys->p_audio_cfg->p_next;
-
-        free( p_sys->p_audio_cfg->psz_name );
-        free( p_sys->p_audio_cfg->psz_value );
-        free( p_sys->p_audio_cfg );
-
-        p_sys->p_audio_cfg = p_next;
-    }
+    config_ChainDestroy( p_sys->p_audio_cfg );
     free( p_sys->psz_aenc );
 
     free( p_sys->psz_vf2 );
 
-    while( p_sys->p_video_cfg != NULL )
-    {
-        config_chain_t *p_next = p_sys->p_video_cfg->p_next;
-
-        free( p_sys->p_video_cfg->psz_name );
-        free( p_sys->p_video_cfg->psz_value );
-        free( p_sys->p_video_cfg );
-
-        p_sys->p_video_cfg = p_next;
-    }
+    config_ChainDestroy( p_sys->p_video_cfg );
     free( p_sys->psz_venc );
 
-    while( p_sys->p_deinterlace_cfg != NULL )
-    {
-        config_chain_t *p_next = p_sys->p_deinterlace_cfg->p_next;
-
-        free( p_sys->p_deinterlace_cfg->psz_name );
-        free( p_sys->p_deinterlace_cfg->psz_value );
-        free( p_sys->p_deinterlace_cfg );
-
-        p_sys->p_deinterlace_cfg = p_next;
-    }
+    config_ChainDestroy( p_sys->p_deinterlace_cfg );
     free( p_sys->psz_deinterlace );
 
-    while( p_sys->p_spu_cfg != NULL )
-    {
-        config_chain_t *p_next = p_sys->p_spu_cfg->p_next;
-
-        free( p_sys->p_spu_cfg->psz_name );
-        free( p_sys->p_spu_cfg->psz_value );
-        free( p_sys->p_spu_cfg );
-
-        p_sys->p_spu_cfg = p_next;
-    }
+    config_ChainDestroy( p_sys->p_spu_cfg );
     free( p_sys->psz_senc );
 
     if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
 
-    while( p_sys->p_osd_cfg != NULL )
-    {
-        config_chain_t *p_next = p_sys->p_osd_cfg->p_next;
-
-        free( p_sys->p_osd_cfg->psz_name );
-        free( p_sys->p_osd_cfg->psz_value );
-        free( p_sys->p_osd_cfg );
-
-        p_sys->p_osd_cfg = p_next;
-    }
+    config_ChainDestroy( p_sys->p_osd_cfg );
     free( p_sys->psz_osdenc );
 
     vlc_object_release( p_sys );
