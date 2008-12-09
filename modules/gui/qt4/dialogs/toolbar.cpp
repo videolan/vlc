@@ -329,8 +329,9 @@ void WidgetListing::startDrag( Qt::DropActions /*supportedActions*/ )
 
     QDrag *drag = new QDrag( this );
     drag->setMimeData( mimeData );
-//    drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
-
+    QPixmap aPixmap = item->icon().pixmap( QSize( 22, 22 ) );
+    drag->setPixmap( aPixmap );
+    drag->setHotSpot( QPoint( 20, 20 ) );
     drag->exec(Qt::CopyAction | Qt::MoveAction );
 }
 
