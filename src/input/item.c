@@ -575,8 +575,7 @@ int input_item_DelInfo( input_item_t *p_i,
             if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
             {
                 free( p_cat->pp_infos[i]->psz_name );
-                if( p_cat->pp_infos[i]->psz_value )
-                    free( p_cat->pp_infos[i]->psz_value );
+                free( p_cat->pp_infos[i]->psz_value );
                 free( p_cat->pp_infos[i] );
                 REMOVE_ELEM( p_cat->pp_infos, p_cat->i_infos, i );
                 break;
@@ -594,14 +593,16 @@ int input_item_DelInfo( input_item_t *p_i,
         for( i = 0; i < p_cat->i_infos; i++ )
         {
             free( p_cat->pp_infos[i]->psz_name );
-            if( p_cat->pp_infos[i]->psz_value )
-                free( p_cat->pp_infos[i]->psz_value );
+            free( p_cat->pp_infos[i]->psz_value );
             free( p_cat->pp_infos[i] );
         }
-        if( p_cat->pp_infos )
-            free( p_cat->pp_infos );
+        free( p_cat->pp_infos );
         REMOVE_ELEM( p_i->pp_categories, p_i->i_categories, i_cat );
     }
+
+    // Free the category
+    free( p_cat->psz_name );
+    free( p_cat );
     vlc_mutex_unlock( &p_i->lock );
 
 
