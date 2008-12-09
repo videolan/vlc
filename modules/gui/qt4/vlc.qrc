@@ -85,6 +85,7 @@
   <file alias="update">pixmaps/update.png</file>
   <file alias="clear">pixmaps/clear.png</file>
   <file alias="noart.png">pixmaps/noart.png</file>
+  <file alias="space">pixmaps/space.png</file>
   <file>pixmaps/go-next.png</file>
  </qresource>
 </RCC>
