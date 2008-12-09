@@ -556,7 +556,6 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
             return;
     }
 
-    int canc = vlc_savecancel ();
 #ifdef UNDER_CE
 #   define CE_WRITE(str) WriteFile( QUEUE.logfile, \
                                     str, strlen(str), &i_dummy, NULL );
@@ -570,6 +569,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     FlushFileBuffers( QUEUE.logfile );
 
 #else
+    int canc = vlc_savecancel ();
     /* Send the message to stderr */
     utf8_fprintf( stderr, "[%s%p%s] %s%s%s %s%s: %s%s%s\n",
                   priv->b_color ? GREEN : "",
