@@ -50,6 +50,7 @@
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
+#include "dialogs/toolbar.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -236,6 +237,11 @@ void DialogsProvider::bookmarksDialog()
 void DialogsProvider::podcastConfigureDialog()
 {
     PodcastConfigDialog::getInstance( p_intf )->toggleVisible();
+}
+
+void DialogsProvider::toolbarDialog()
+{
+    ToolbarEditDialog::getInstance( p_intf )->toggleVisible();
 }
 
 /* Generic open file */

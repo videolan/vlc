@@ -362,6 +362,8 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf )
 #endif
     menu->addSeparator();
 
+    addDPStaticEntry( menu, qtr( "&Customize Interface..." ), "",
+        ":/preferences", SLOT( toolbarDialog() ), "" );
     addDPStaticEntry( menu, qtr( "&Preferences..." ), "",
         ":/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
 
