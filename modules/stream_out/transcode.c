@@ -950,12 +950,11 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     block_t *p_out = NULL;
 
-    if( !id->b_transcode && id->id )
+    if( !id->b_transcode )
     {
-        return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
-    }
-    else if( !id->b_transcode )
-    {
+        if( id->id )
+            return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
+
         block_Release( p_buffer );
         return VLC_EGENERIC;
     }
