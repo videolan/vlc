@@ -41,6 +41,8 @@
 #include <QFrame>
 #include <QToolButton>
 
+#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
+
 class QPixmap;
 class QLabel;
 class QGridLayout;
@@ -54,11 +56,11 @@ class VolumeClickHandler;
 class QSignalMapper;
 
 class QTimer;
+class WidgetListing;
 
 typedef enum buttonType_e
 {
     PLAY_BUTTON,
-    PAUSE_BUTTON,
     STOP_BUTTON,
     OPEN_BUTTON,
     PREVIOUS_BUTTON,
@@ -73,23 +75,45 @@ typedef enum buttonType_e
     RECORD_BUTTON,
     ATOB_BUTTON,
     FRAME_BUTTON,
+    REVERSE_BUTTON,
+    BUTTON_MAX,
+
+    SPLITTER = 0x20,
     INPUT_SLIDER,
-    VOLUME_SLIDER,
+    VOLUME,
+    TIME_LABEL,
     MENU_BUTTONS,
     TELETEXT_BUTTONS,
-    VOLUME,
-    WIDGET_SPACER,
-    WIDGET_SPACER_EXTEND,
-    TIME_LABEL,
-    SPLITTER,
     ADVANCED_CONTROLLER,
-    REVERSE_BUTTON,
+    SPECIAL_MAX,
+
+    WIDGET_SPACER = 0x40,
+    WIDGET_SPACER_EXTEND,
+    WIDGET_MAX,
 } buttonType_e;
+
+#include <QString>
+
+static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
+    "Previous", "Next", "Slower", "Faster", "Fullscreen", "De-Fullscreen",
+    "Extended panel", "Playlist", "Snapshot", "Record", "A->B Loop",
+    "Frame By Frame", "Reverse" };
+static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
+    _("Stop playback"),
+    _("Previous media in the playlist"),
+    _("Next media in the playlist"), _("Slower"), _("Faster"),
+    _("Toggle the video in fullscreen"), _("Toggle the video out fullscreen"),
+    _("Show extended settings" ), _( "Show playlist" ), _( "Take a snapshot" ),
+    _( "Record" ), _( "Loop from point A to point B continuously." ),
+    _("Frame by frame"), _("Reverse") };
+static const QString iconL[BUTTON_MAX] ={ ":/play_b", ":/stop_b", "",
+    ":/previous_b", ":/next_b", ":/slower", ":/faster", ":/fullscreen",
+    ":/defullscreen", ":/extended", ":/playlist", ":/snapshot", ":/record",
+    ":/atob_nob", ":/frame", ":/reverse" };
 
 typedef enum actionType_e
 {
     PLAY_ACTION,
-    PAUSE_ACTION,
     STOP_ACTION,
     PREVIOUS_ACTION,
     NEXT_ACTION,
@@ -115,30 +139,34 @@ enum
 
 class AbstractController : public QFrame
 {
+    friend class WidgetListing; /* For ToolBar Edition HACKS */
+
     Q_OBJECT
 public:
     AbstractController( intf_thread_t  *_p_i );
-    int getWidth() { return controlLayout->columnCount(); }
 
 protected:
     intf_thread_t       *p_intf;
 
     QSignalMapper       *toolbarActionsMapper;
-    QGridLayout         *controlLayout;
+    QHBoxLayout         *controlLayout;
+    /* Change to BoxLayout if both dir are needed */
 
     AdvControlsWidget   *advControls;
 
-    void parseAndCreateLine( QString config, int i_line );
+    void parseAndCreate( QString config, QBoxLayout *controlLayout );
 
+    virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
+                                     buttonType_e i_type, int i_option );
+
+    QWidget *createWidget( buttonType_e, int options = WIDGET_NORMAL );
 private:
-    QWidget *createWidget( buttonType_e, int *i_size,
-                           int options = WIDGET_NORMAL );
-    void setupButton( QAbstractButton * );
+    static void setupButton( QAbstractButton * );
     QWidget *discFrame();
     QWidget *telexFrame();
 
-private slots:
-    void doAction( int );
+protected slots:
+    virtual void doAction( int );
 
 protected slots:
     void play();
@@ -204,7 +232,7 @@ class SoundWidget : public QWidget
     friend class VolumeClickHandler;
 
 public:
-    SoundWidget( intf_thread_t  *_p_i, bool );
+    SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool );
 
 private:
     intf_thread_t       *p_intf;

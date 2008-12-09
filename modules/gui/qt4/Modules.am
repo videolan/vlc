@@ -29,6 +29,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/sout.moc.cpp \
 		dialogs/help.moc.cpp \
 		dialogs/gototime.moc.cpp \
+		dialogs/toolbar.moc.cpp \
 		dialogs/open.moc.cpp \
 		dialogs/podcast_configuration.moc.cpp \
 		dialogs/vlm.moc.cpp \
@@ -209,6 +210,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/sout.cpp \
 		dialogs/help.cpp \
 		dialogs/gototime.cpp \
+		dialogs/toolbar.cpp \
 		dialogs/open.cpp \
 		dialogs/vlm.cpp \
 		dialogs/podcast_configuration.cpp \
@@ -247,6 +249,7 @@ noinst_HEADERS = \
 	dialogs/sout.hpp \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
+	dialogs/toolbar.hpp \
 	dialogs/open.hpp \
 	dialogs/vlm.hpp \
 	dialogs/podcast_configuration.hpp \
