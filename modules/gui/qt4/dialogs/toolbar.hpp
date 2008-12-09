@@ -31,6 +31,7 @@
 #include <QListWidget>
 
 class ToolbarEditDialog;
+class DroppingController;
 
 class WidgetListing : public QListWidget
 {
@@ -64,6 +65,12 @@ private:
     QCheckBox *flatBox, *bigBox, *shinyBox;
 
     WidgetListing *widgetListing;
+    DroppingController *controller1, *controller2, *controllerA;
+    DroppingController *controllerFSC, *controller;
+
+private slots:
+    void cancel();
+    void close();
 };
 
 class DroppingController: public AbstractController
@@ -71,6 +78,7 @@ class DroppingController: public AbstractController
     Q_OBJECT;
 public:
     DroppingController( intf_thread_t *, QString line, QWidget *parent = 0 );
+    QString getValue();
 
 protected:
     virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
@@ -82,7 +90,13 @@ protected:
 
     virtual void doAction( int );
 private:
+    struct doubleInt
+    {
+        int i_type;
+        int i_option;
+    };
     QRubberBand *rubberband;
+    QList <doubleInt *> widgetList;
 
     int getParentPosInLayout( QPoint point);
 

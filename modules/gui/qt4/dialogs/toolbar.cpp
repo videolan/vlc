@@ -38,6 +38,7 @@
 #include <QListWidget>
 
 #include <QDragEnterEvent>
+#include <QDialogButtonBox>
 
 ToolbarEditDialog *ToolbarEditDialog::instance = NULL;
 
@@ -74,22 +75,22 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     mainTboxLayout->addWidget(label, 0, 0, 1, 2);
 
     QComboBox *positionCombo = new QComboBox;
-    positionCombo->addItems( QStringList() << "Over the Video"
+    positionCombo->addItems( QStringList() << "Above the Video"
                                            << "Under the Video" );
     mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
     QLabel *line1Label = new QLabel( "Line 1:" );
     QString line1 = getSettings()->value( "MainWindow/Controls1",
                         "64;36;37;38;65").toString();
-    DroppingController *controller1 = new DroppingController( p_intf, line1,
+    controller1 = new DroppingController( p_intf, line1,
             this );
     mainTboxLayout->addWidget( line1Label, 1, 0, 1, 1 );
     mainTboxLayout->addWidget( controller1, 1, 1, 1, 2 );
 
     QLabel *line2Label = new QLabel( "Line 2:" );
     QString line2 = getSettings()->value( "MainWindow/Controls2",
-                        "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
-    DroppingController *controller2 = new DroppingController( p_intf, line2,
+                        "0-2;64;3;1;4;64;7;10;9;65;34-4;" ).toString();
+    controller2 = new DroppingController( p_intf, line2,
             this );
     mainTboxLayout->addWidget( line2Label, 2, 0, 1, 1 );
     mainTboxLayout->addWidget( controller2, 2, 1, 1, 2);
@@ -98,7 +99,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QLabel *advLabel = new QLabel( "Advanced Widget toolbar:" );
     QString lineA = getSettings()->value( "MainWindow/AdvControl",
                         "12;11;13;14").toString();
-    DroppingController *controllerA = new DroppingController( p_intf, lineA,
+    controllerA = new DroppingController( p_intf, lineA,
             this );
     mainTboxLayout->addWidget( advLabel, 3, 0, 1, 2 );
     mainTboxLayout->addWidget( controllerA, 3, 2, 1, 1 );
@@ -109,9 +110,9 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGroupBox *timeToolbarBox = new QGroupBox( "Time Toolbar", this );
     QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
 
-    QString line = getSettings()->value( "timeWindow/InputControl",
+    QString line = getSettings()->value( "MainWindow/InputControl",
                         "5-1;33;6-1").toString();
-    DroppingController *controller = new DroppingController( p_intf, line,
+    controller = new DroppingController( p_intf, line,
             this );
     timeTboxLayout->addWidget( controller, 0, 0, 1, -1 );
 
@@ -122,19 +123,44 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
 
     QString lineFSC = getSettings()->value( "MainWindow/FSCline",
-                        "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
-    DroppingController *controllerFSC = new DroppingController( p_intf,
+                       "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
+    controllerFSC = new DroppingController( p_intf,
             lineFSC, this );
     FSCTboxLayout->addWidget( controllerFSC, 0, 0, 1, -1 );
 
     mainLayout->addWidget( FSCToolbarBox, 3, 0, 1, -1 );
 
+    /* Buttons */
+    QDialogButtonBox *okCancel = new QDialogButtonBox;
+    QPushButton *okButton = new QPushButton( qtr( "Cl&ose" ), this );
+    QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ), this );
+    okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
+    okCancel->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
+    BUTTONACT( okButton, close() );
+    BUTTONACT( cancelButton, cancel() );
+    mainLayout->addWidget( okCancel, 4, 2 );
 }
 
 
 ToolbarEditDialog::~ToolbarEditDialog()
 {
+}
+
+void ToolbarEditDialog::close()
+{
+    msg_Dbg( p_intf, "Close and save" );
+    hide();
+    getSettings()->setValue( "MainWindow/Controls1", controller1->getValue() );
+    getSettings()->setValue( "MainWindow/Controls2", controller2->getValue() );
+    getSettings()->setValue( "MainWindow/AdcControl", controllerA->getValue() );
+    getSettings()->setValue( "MainWindow/InputControl", controller->getValue() );
+    getSettings()->setValue( "MainWindow/FSCline", controllerFSC->getValue() );
+}
+
+void ToolbarEditDialog::cancel()
+{
+    hide();
 }
 
 WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
@@ -332,6 +358,10 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
                                              buttonType_e i_type,
                                              int i_option )
 {
+    doubleInt *value = new doubleInt;
+    value->i_type = i_type;
+    value->i_option = i_option;
+
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
@@ -359,6 +389,26 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
         widg->show();
         controlLayout->insertWidget( i_index, widg );
     }
+    /* QList and QBoxLayout don't act the same with insert() */
+    if( i_index < 0 ) i_index = controlLayout->count() -1 ;
+
+    widgetList.insert( i_index, value );
+}
+
+QString DroppingController::getValue()
+{
+    QString qs = "";
+
+    for( int i = 0; i < controlLayout->count(); i++ )
+    {
+        doubleInt *dI = widgetList.at( i );
+        assert( dI );
+
+        qs.append( QString::number( dI->i_type ) );
+        if( dI->i_option ) qs.append( "-" + QString::number( dI->i_option ) );
+        qs.append( ';' );
+    }
+    return qs;
 }
 
 void DroppingController::dragEnterEvent( QDragEnterEvent * event )
