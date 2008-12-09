@@ -71,34 +71,65 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGridLayout *mainTboxLayout = new QGridLayout( mainToolbarBox );
 
     QLabel *label = new QLabel( "Toolbar position:" );
-    mainTboxLayout->addWidget(label, 0, 0, 1, 1);
+    mainTboxLayout->addWidget(label, 0, 0, 1, 2);
 
     QComboBox *positionCombo = new QComboBox;
     positionCombo->addItems( QStringList() << "Over the Video"
                                            << "Under the Video" );
-    mainTboxLayout->addWidget( positionCombo, 0, 1, 1, 1 );
+    mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
-/*    QFrame *mainToolFrame = new QFrame;
-    mainToolFrame->setMinimumSize( QSize( 0, 25 ) );
-    mainToolFrame->setFrameShape( QFrame::StyledPanel );
-    mainToolFrame->setFrameShadow( QFrame::Raised );
-    mainTboxLayout->addWidget( mainToolFrame, 1, 0, 1, 2 );
-    mainToolFrame->setAcceptDrops( true );
-    QHBoxLayout *mtlayout = new QHBoxLayout( mainToolFrame ); */
-
+    QLabel *line1Label = new QLabel( "Line 1:" );
     QString line1 = getSettings()->value( "MainWindow/Controls1",
                         "64;36;37;38;65").toString();
     DroppingController *controller1 = new DroppingController( p_intf, line1,
             this );
-    mainTboxLayout->addWidget( controller1, 1, 0, 1, -1 );
+    mainTboxLayout->addWidget( line1Label, 1, 0, 1, 1 );
+    mainTboxLayout->addWidget( controller1, 1, 1, 1, 2 );
 
+    QLabel *line2Label = new QLabel( "Line 2:" );
     QString line2 = getSettings()->value( "MainWindow/Controls2",
-            "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
+                        "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
     DroppingController *controller2 = new DroppingController( p_intf, line2,
             this );
-    mainTboxLayout->addWidget( controller2, 2, 0, 1, -1 );
+    mainTboxLayout->addWidget( line2Label, 2, 0, 1, 1 );
+    mainTboxLayout->addWidget( controller2, 2, 1, 1, 2);
+
+    /* Advanced ToolBar */
+    QLabel *advLabel = new QLabel( "Advanced Widget toolbar:" );
+    QString lineA = getSettings()->value( "MainWindow/AdvControl",
+                        "12;11;13;14").toString();
+    DroppingController *controllerA = new DroppingController( p_intf, lineA,
+            this );
+    mainTboxLayout->addWidget( advLabel, 3, 0, 1, 2 );
+    mainTboxLayout->addWidget( controllerA, 3, 2, 1, 1 );
 
     mainLayout->addWidget( mainToolbarBox, 1, 0, 1, -1 );
+
+    /* TimeToolBar */
+    QGroupBox *timeToolbarBox = new QGroupBox( "Time Toolbar", this );
+    QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
+
+    QString line = getSettings()->value( "timeWindow/InputControl",
+                        "5-1;33;6-1").toString();
+    DroppingController *controller = new DroppingController( p_intf, line,
+            this );
+    timeTboxLayout->addWidget( controller, 0, 0, 1, -1 );
+
+    mainLayout->addWidget( timeToolbarBox, 2, 0, 1, -1 );
+
+    /* FSCToolBar */
+    QGroupBox *FSCToolbarBox = new QGroupBox( "Fullscreen Controller", this );
+    QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
+
+    QString lineFSC = getSettings()->value( "MainWindow/FSCline",
+                        "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
+    DroppingController *controllerFSC = new DroppingController( p_intf,
+            lineFSC, this );
+    FSCTboxLayout->addWidget( controllerFSC, 0, 0, 1, -1 );
+
+    mainLayout->addWidget( FSCToolbarBox, 3, 0, 1, -1 );
+
+
 }
 
 
