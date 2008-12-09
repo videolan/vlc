@@ -39,12 +39,12 @@ static inline int bits_initwrite( bits_buffer_t *p_buffer,
     p_buffer->i_data = 0;
     p_buffer->i_mask = 0x80;
     p_buffer->p_data = p_data;
-    p_buffer->p_data[0] = 0;
     if( !p_buffer->p_data )
     {
         if( !( p_buffer->p_data = malloc( i_size ) ) )
             return -1;
     }
+    p_buffer->p_data[0] = 0;
     return 0;
 }
 
