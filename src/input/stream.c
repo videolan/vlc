@@ -185,15 +185,6 @@ struct stream_sys_t
 
     /* Preparse mode ? */
     bool      b_quick;
-
-    /* */
-    struct
-    {
-        bool b_active;
-
-        FILE *f;        /* TODO it could be replaced by access_output_t one day */
-        bool b_error;
-    } record;
 };
 
 /* Method 1: */
@@ -215,8 +206,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
 static void UStreamDestroy( stream_t *s );
 static int  ASeek( stream_t *s, int64_t i_pos );
-static int  ARecordSetState( stream_t *s, bool b_record, const char *psz_extension );
-static void ARecordWrite( stream_t *s, const uint8_t *p_buffer, size_t i_buffer );
 
 /****************************************************************************
  * stream_CommonNew: create an empty stream structure
@@ -320,8 +309,6 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
         p_sys->method = STREAM_METHOD_BLOCK;
     else
         p_sys->method = STREAM_METHOD_STREAM;
-
-    p_sys->record.b_active = false;
 
     p_sys->i_pos = p_access->info.i_pos;
 
@@ -498,9 +485,6 @@ static void AStreamDestroy( stream_t *s )
 
     vlc_object_detach( s );
 
-    if( p_sys->record.b_active )
-        ARecordSetState( s, false, NULL );
-
     if( p_sys->method == STREAM_METHOD_BLOCK )
         block_ChainRelease( p_sys->block.p_first );
     else
@@ -604,11 +588,9 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     stream_sys_t *p_sys = s->p_sys;
     access_t     *p_access = p_sys->p_access;
 
-    bool *p_bool;
-    bool b_bool;
-    const char *psz_string;
-    int64_t    *pi_64, i_64;
-    int        i_int;
+    bool    *p_bool;
+    int64_t *pi_64, i_64;
+    int     i_int;
 
     switch( i_query )
     {
@@ -683,111 +665,11 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             return access_Control( p_access, ACCESS_GET_CONTENT_TYPE,
                                     va_arg( args, char ** ) );
         case STREAM_SET_RECORD_STATE:
-            b_bool = (bool)va_arg( args, int );
-            psz_string = NULL;
-            if( b_bool )
-                psz_string = (const char*)va_arg( args, const char* );
-            return ARecordSetState( s, b_bool, psz_string );
-
         default:
             msg_Err( s, "invalid stream_vaControl query=0x%x", i_query );
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
-}
-
-/****************************************************************************
- * ARecord*: record stream functions
- ****************************************************************************/
-static int  ARecordStart( stream_t *s, const char *psz_extension )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    char *psz_file;
-    FILE *f;
-
-    /* */
-    if( !psz_extension )
-        psz_extension = "dat";
-
-    /* Retreive path */
-    char *psz_path = var_CreateGetString( s, "input-record-path" );
-    if( !psz_path || *psz_path == '\0' )
-    {
-        free( psz_path );
-        psz_path = strdup( config_GetHomeDir() );
-    }
-
-    if( !psz_path )
-        return VLC_ENOMEM;
-
-    /* Create file name
-     * TODO allow prefix configuration */
-    psz_file = input_CreateFilename( VLC_OBJECT(s), psz_path, INPUT_RECORD_PREFIX, psz_extension );
-
-    free( psz_path );
-
-    if( !psz_file )
-        return VLC_ENOMEM;
-
-    f = utf8_fopen( psz_file, "wb" );
-    if( !f )
-    {
-        free( psz_file );
-        return VLC_EGENERIC;
-    }
-    msg_Dbg( s, "Recording into %s", psz_file );
-    free( psz_file );
-
-    /* */
-    p_sys->record.f = f;
-    p_sys->record.b_active = true;
-    p_sys->record.b_error = false;
-    return VLC_SUCCESS;
-}
-static int  ARecordStop( stream_t *s )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    assert( p_sys->record.b_active );
-
-    msg_Dbg( s, "Recording completed" );
-    fclose( p_sys->record.f );
-    p_sys->record.b_active = false;
-    return VLC_SUCCESS;
-}
-
-static int  ARecordSetState( stream_t *s, bool b_record, const char *psz_extension )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    if( !!p_sys->record.b_active == !!b_record )
-        return VLC_SUCCESS;
-
-    if( b_record )
-        return ARecordStart( s, psz_extension );
-    else
-        return ARecordStop( s );
-}
-static void ARecordWrite( stream_t *s, const uint8_t *p_buffer, size_t i_buffer )
-{
-    stream_sys_t *p_sys = s->p_sys;
-
-    assert( p_sys->record.b_active );
-
-    if( i_buffer > 0 )
-    {
-        const bool b_previous_error = p_sys->record.b_error;
-        const size_t i_written = fwrite( p_buffer, 1, i_buffer, p_sys->record.f );
-
-        p_sys->record.b_error = i_written != i_buffer;
-
-        /* TODO maybe a intf_UserError or something like that ? */
-        if( p_sys->record.b_error && !b_previous_error )
-            msg_Err( s, "Failed to record data (begin)" );
-        else if( !p_sys->record.b_error && b_previous_error )
-            msg_Err( s, "Failed to record data (end)" );
-    }
 }
 
 /****************************************************************************
@@ -864,15 +746,11 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
     stream_sys_t *p_sys = s->p_sys;
 
     uint8_t *p_data = p_read;
-    uint8_t *p_record = p_data;
     unsigned int i_data = 0;
 
     /* It means EOF */
     if( p_sys->block.p_current == NULL )
         return 0;
-
-    if( p_sys->record.b_active && !p_data )
-        p_record = p_data = malloc( i_read );
 
     if( p_data == NULL )
     {
@@ -916,14 +794,6 @@ static int AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read )
                 break;
             }
         }
-    }
-
-    if( p_sys->record.b_active )
-    {
-        if( i_data > 0 && p_record != NULL)
-            ARecordWrite( s, p_record, i_data );
-        if( !p_read )
-            free( p_record );
     }
 
     p_sys->i_pos += i_data;
@@ -1205,14 +1075,10 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
     uint8_t *p_data = (uint8_t *)p_read;
-    uint8_t *p_record = p_data;
     unsigned int i_data = 0;
 
     if( tk->i_start >= tk->i_end )
         return 0; /* EOF */
-
-    if( p_sys->record.b_active && !p_data )
-        p_record = p_data = malloc( i_read );
 
     if( p_data == NULL )
     {
@@ -1275,14 +1141,6 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
                 if( tk->i_start >= tk->i_end ) break;
             }
         }
-    }
-
-    if( p_sys->record.b_active )
-    {
-        if( i_data > 0 && p_record != NULL)
-            ARecordWrite( s, p_record, i_data );
-        if( !p_read )
-            free( p_record );
     }
 
     return i_data;

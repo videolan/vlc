@@ -231,9 +231,4 @@ void input_ConfigVarInit ( input_thread_t * );
 char **subtitles_Detect( input_thread_t *, char* path, const char *fname );
 int subtitles_Filter( const char *);
 
-/* Helpers FIXME to export without input_ prefix */
-char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const char *psz_prefix, const char *psz_extension );
-
-#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%H:%M:%S-$ N-$ p"
-
 #endif

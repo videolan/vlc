@@ -2573,6 +2573,18 @@ static int InputSourceInit( input_thread_t *p_input,
         }
         free( psz_tmp );
 
+        /* Add record filter if usefull */
+        if( var_GetBool( p_input, "input-record-native" ) )
+        {
+            stream_t *p_filter;
+
+            p_filter = stream_FilterNew( in->p_stream, "stream_filter_record" );
+            if( p_filter )
+                in->p_stream = p_filter;
+            else
+                var_SetBool( p_input, "input-record-native", false );
+        }
+
         /* Open a demuxer */
         if( *psz_demux == '\0' && *in->p_access->psz_demux )
         {

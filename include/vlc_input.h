@@ -423,6 +423,12 @@ struct input_thread_t
     input_thread_private_t *p;
 };
 
+/**
+ * Record prefix string.
+ * TODO make it configurable.
+ */
+#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%H:%M:%S-$ N-$ p"
+
 /*****************************************************************************
  * Input events and variables
  *****************************************************************************/
@@ -688,5 +694,10 @@ VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
  *  The buffer provided by psz_dup will be modified.
  */
 VLC_EXPORT( void, input_SplitMRL, ( const char **ppsz_access, const char **ppsz_demux, char **ppsz_path, char *psz_dup ) );
+
+/**
+ * This function creates a sane filename path.
+ */
+VLC_EXPORT( char *, input_CreateFilename, ( vlc_object_t *, const char *psz_path, const char *psz_prefix, const char *psz_extension ) );
 
 #endif

@@ -156,6 +156,7 @@ image_HandlerDelete
 InitMD5
 input_Control
 __input_CreateThread
+input_CreateFilename
 input_DecoderDecode
 input_DecoderDelete
 input_DecoderNew
