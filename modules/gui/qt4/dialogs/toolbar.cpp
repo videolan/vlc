@@ -80,7 +80,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
     QLabel *line1Label = new QLabel( "Line 1:" );
-    QString line1 = getSettings()->value( "MainWindow/Controls1",
+    QString line1 = getSettings()->value( "MainWindow/MainToolbar1",
                         "64;36;37;38;65").toString();
     controller1 = new DroppingController( p_intf, line1,
             this );
@@ -88,7 +88,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     mainTboxLayout->addWidget( controller1, 1, 1, 1, 2 );
 
     QLabel *line2Label = new QLabel( "Line 2:" );
-    QString line2 = getSettings()->value( "MainWindow/Controls2",
+    QString line2 = getSettings()->value( "MainWindow/MainToolbar2",
                         "0-2;64;3;1;4;64;7;10;9;65;34-4;" ).toString();
     controller2 = new DroppingController( p_intf, line2,
             this );
@@ -97,7 +97,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
 
     /* Advanced ToolBar */
     QLabel *advLabel = new QLabel( "Advanced Widget toolbar:" );
-    QString lineA = getSettings()->value( "MainWindow/AdvControl",
+    QString lineA = getSettings()->value( "MainWindow/AdvToolbar",
                         "12;11;13;14").toString();
     controllerA = new DroppingController( p_intf, lineA,
             this );
@@ -110,7 +110,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGroupBox *timeToolbarBox = new QGroupBox( "Time Toolbar", this );
     QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
 
-    QString line = getSettings()->value( "MainWindow/InputControl",
+    QString line = getSettings()->value( "MainWindow/InputToolbar",
                         "5-1;33;6-1").toString();
     controller = new DroppingController( p_intf, line,
             this );
@@ -122,7 +122,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGroupBox *FSCToolbarBox = new QGroupBox( "Fullscreen Controller", this );
     QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
 
-    QString lineFSC = getSettings()->value( "MainWindow/FSCline",
+    QString lineFSC = getSettings()->value( "MainWindow/FSCtoolbar",
                        "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
     controllerFSC = new DroppingController( p_intf,
             lineFSC, this );
@@ -151,11 +151,11 @@ void ToolbarEditDialog::close()
 {
     msg_Dbg( p_intf, "Close and save" );
     hide();
-    getSettings()->setValue( "MainWindow/Controls1", controller1->getValue() );
-    getSettings()->setValue( "MainWindow/Controls2", controller2->getValue() );
-    getSettings()->setValue( "MainWindow/AdcControl", controllerA->getValue() );
-    getSettings()->setValue( "MainWindow/InputControl", controller->getValue() );
-    getSettings()->setValue( "MainWindow/FSCline", controllerFSC->getValue() );
+    getSettings()->setValue( "MainWindow/MainToolbar1", controller1->getValue() );
+    getSettings()->setValue( "MainWindow/MainToolbar2", controller2->getValue() );
+    getSettings()->setValue( "MainWindow/AdvToolbar", controllerA->getValue() );
+    getSettings()->setValue( "MainWindow/InputToolbar", controller->getValue() );
+    getSettings()->setValue( "MainWindow/FSCtoolbar", controllerFSC->getValue() );
 }
 
 void ToolbarEditDialog::cancel()

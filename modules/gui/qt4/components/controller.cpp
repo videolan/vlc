@@ -796,7 +796,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 );
 
-    QString line1 = getSettings()->value( "MainWindow/Controls1",
+    QString line1 = getSettings()->value( "MainWindow/MainToolbar1",
             "64;36;37;38;65").toString();
     parseAndCreate( line1, controlLayout1 );
 
@@ -811,7 +811,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
     controlLayout2->setSpacing( 0 );
-    QString line2 = getSettings()->value( "MainWindow/Controls2",
+    QString line2 = getSettings()->value( "MainWindow/MainToolbar2",
             "0-2;64;3;1;4;64;7;10;9;65;34-4" ).toString();
     parseAndCreate( line2, controlLayout2 );
 
@@ -853,7 +853,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
         .arg( ATOB_BUTTON )
         .arg( FRAME_BUTTON ); */
 
-    QString line = getSettings()->value( "MainWindow/AdvControl",
+    QString line = getSettings()->value( "MainWindow/AdvToolbar",
             "12;11;13;14" ).toString();
     parseAndCreate( line, controlLayout );
 }
@@ -869,7 +869,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
         .arg( SLOWER_BUTTON ).arg( WIDGET_FLAT )
         .arg( INPUT_SLIDER )
         .arg( FASTER_BUTTON ); */
-    QString line = getSettings()->value( "MainWindow/InputControl",
+    QString line = getSettings()->value( "MainWindow/InputToolbar",
                    "5-1;33;6-1" ).toString();
     parseAndCreate( line, controlLayout );
 }
@@ -921,7 +921,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
         .arg( TIME_LABEL )
         .arg( VOLUME ); */
 
-    QString line = getSettings()->value( "MainWindow/FSCline",
+    QString line = getSettings()->value( "MainWindow/FSCtoolbar",
             "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
     parseAndCreate( line, controlLayout );
 
