@@ -667,7 +667,7 @@ static void Close( vlc_object_t * p_this )
 
 struct sout_stream_id_t
 {
-    vlc_fourcc_t  b_transcode;
+    bool            b_transcode;
 
     /* id of the out stream */
     void *id;
