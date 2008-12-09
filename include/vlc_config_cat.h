@@ -112,6 +112,12 @@
     "the input side of VLC. You should not touch anything here unless you " \
     "know what you are doing." )
 
+#define STREAM_FILTER_TITLE N_( "Stream filters" )
+#define STREAM_FILTER_HELP N_( \
+    "Stream filters are special modules that allow advanced operations on " \
+    "the input side of VLC. You should not touch anything here unless you " \
+    "know what you are doing." )
+
 #define DEMUX_TITLE N_("Demuxers")
 #define DEMUX_HELP N_( "Demuxers are used to separate audio and video streams." )
 
@@ -265,6 +271,7 @@ static const struct config_category_t categories_array[] =
     { SUBCAT_INPUT_VCODEC, VDEC_TITLE, VDEC_HELP },
     { SUBCAT_INPUT_ACODEC, ADEC_TITLE, ADEC_HELP },
     { SUBCAT_INPUT_SCODEC, SDEC_TITLE, SDEC_HELP },
+    { SUBCAT_INPUT_STREAM_FILTER, STREAM_FILTER_TITLE, STREAM_FILTER_HELP },
 
     { CAT_SOUT, SOUT_TITLE, SOUT_HELP },
     { SUBCAT_SOUT_GENERAL, GENERAL_TITLE, SOUT_GENERAL_HELP },

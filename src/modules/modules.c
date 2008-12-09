@@ -608,6 +608,7 @@ found_shortcut:
     else if( count == 0 )
     {
         if( !strcmp( psz_capability, "access_demux" )
+         || !strcmp( psz_capability, "stream_filter" )
          || !strcmp( psz_capability, "vout_window" ) )
         {
             msg_Dbg( p_this, "no %s module matched \"%s\"",

@@ -5860,6 +5860,7 @@ AC_CONFIG_FILES([
   modules/mux/mpeg/Makefile
   modules/packetizer/Makefile
   modules/services_discovery/Makefile
+  modules/stream_filter/Makefile
   modules/stream_out/Makefile
   modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile

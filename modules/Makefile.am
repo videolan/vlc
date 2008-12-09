@@ -12,6 +12,7 @@ BASE_SUBDIRS = \
 	misc \
 	packetizer \
 	services_discovery \
+	stream_filter \
 	video_chroma \
 	video_filter \
 	video_output \

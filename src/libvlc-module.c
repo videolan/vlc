@@ -1014,8 +1014,11 @@ static const char *const ppsz_clock_descriptions[] =
 
 #define ACCESS_FILTER_TEXT N_("Access filter module")
 #define ACCESS_FILTER_LONGTEXT N_( \
-    "Access filters are used to modify the stream that is being read. " \
-    "This is used for instance for timeshifting.")
+    "Access filters are used to modify the stream that is being read." )
+
+#define STREAM_FILTER_TEXT N_("Stream filter module")
+#define STREAM_FILTER_LONGTEXT N_( \
+    "Stream filters are used to modify the stream that is being read. " )
 
 #define DEMUX_TEXT N_("Demux module")
 #define DEMUX_LONGTEXT N_( \
@@ -1805,6 +1808,10 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
     add_bool( "prefer-system-codecs", false, NULL, SYSTEM_CODEC_TEXT,
                                 SYSTEM_CODEC_LONGTEXT, false );
+
+    set_subcategory( SUBCAT_INPUT_STREAM_FILTER )
+    add_module_list_cat( "stream-filter", SUBCAT_INPUT_STREAM_FILTER, NULL, NULL,
+                STREAM_FILTER_TEXT, STREAM_FILTER_LONGTEXT, false );
 
 
 /* Stream output options */
