@@ -99,7 +99,7 @@ static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
     "Extended panel", "Playlist", "Snapshot", "Record", "A->B Loop",
     "Frame By Frame", "Reverse" };
 static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
-    _("Stop playback"),
+    _("Stop playback"), _("Open a media"),
     _("Previous media in the playlist"),
     _("Next media in the playlist"), _("Slower"), _("Faster"),
     _("Toggle the video in fullscreen"), _("Toggle the video out fullscreen"),
