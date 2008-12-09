@@ -106,12 +106,6 @@
     "Common settings you may want to alter are HTTP proxy or " \
     "caching settings." )
 
-#define ACCESS_FILTER_TITLE N_( "Access filters" )
-#define ACCESS_FILTER_HELP N_( \
-    "Access filters are special modules that allow advanced operations on " \
-    "the input side of VLC. You should not touch anything here unless you " \
-    "know what you are doing." )
-
 #define STREAM_FILTER_TITLE N_( "Stream filters" )
 #define STREAM_FILTER_HELP N_( \
     "Stream filters are special modules that allow advanced operations on " \
@@ -266,7 +260,6 @@ static const struct config_category_t categories_array[] =
     { CAT_INPUT, INPUT_TITLE, INPUT_HELP },
     { SUBCAT_INPUT_GENERAL, ADVANCED_TITLE, ADVANCED_HELP },
     { SUBCAT_INPUT_ACCESS, ACCESS_TITLE, ACCESS_HELP },
-    { SUBCAT_INPUT_ACCESS_FILTER, ACCESS_FILTER_TITLE, ACCESS_FILTER_HELP },
     { SUBCAT_INPUT_DEMUX, DEMUX_TITLE, DEMUX_HELP },
     { SUBCAT_INPUT_VCODEC, VDEC_TITLE, VDEC_HELP },
     { SUBCAT_INPUT_ACODEC, ADEC_TITLE, ADEC_HELP },

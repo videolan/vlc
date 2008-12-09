@@ -2461,28 +2461,6 @@ static int InputSourceInit( input_thread_t *p_input,
             goto error;
         }
 
-        /* */
-        psz_tmp = psz = var_GetNonEmptyString( p_input, "access-filter" );
-        while( psz && *psz )
-        {
-            access_t *p_access = in->p_access;
-            char *end = strchr( psz, ':' );
-
-            if( end )
-                *end++ = '\0';
-
-            in->p_access = access_FilterNew( in->p_access, psz );
-            if( in->p_access == NULL )
-            {
-                in->p_access = p_access;
-                msg_Warn( p_input, "failed to insert access filter %s",
-                          psz );
-            }
-
-            psz = end;
-        }
-        free( psz_tmp );
-
         /* Get infos from access */
         if( !p_input->b_preparsing )
         {

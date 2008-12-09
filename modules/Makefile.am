@@ -1,6 +1,5 @@
 BASE_SUBDIRS = \
 	access \
-	access_filter \
 	audio_filter \
 	audio_mixer \
 	audio_output \

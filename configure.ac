@@ -5808,7 +5808,6 @@ AC_CONFIG_FILES([
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
-  modules/access_filter/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/audio_filter/channel_mixer/Makefile

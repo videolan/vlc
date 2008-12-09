@@ -1012,10 +1012,6 @@ static const char *const ppsz_clock_descriptions[] =
     "the correct access is not automatically detected. You should not "\
     "set this as a global option unless you really know what you are doing." )
 
-#define ACCESS_FILTER_TEXT N_("Access filter module")
-#define ACCESS_FILTER_LONGTEXT N_( \
-    "Access filters are used to modify the stream that is being read." )
-
 #define STREAM_FILTER_TEXT N_("Stream filter module")
 #define STREAM_FILTER_LONGTEXT N_( \
     "Stream filters are used to modify the stream that is being read. " )
@@ -1794,11 +1790,6 @@ vlc_module_begin ()
     add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , false )
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT,
                 ACCESS_LONGTEXT, true );
-
-    set_subcategory( SUBCAT_INPUT_ACCESS_FILTER )
-    add_module_list_cat( "access-filter", SUBCAT_INPUT_ACCESS_FILTER, NULL, NULL,
-                ACCESS_FILTER_TEXT, ACCESS_FILTER_LONGTEXT, false );
-
 
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT,

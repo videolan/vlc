@@ -35,8 +35,6 @@
 #define access_New( a, b, c, d ) __access_New(VLC_OBJECT(a), b, c, d )
 access_t * __access_New( vlc_object_t *p_obj, const char *psz_access,
                           const char *psz_demux, const char *psz_path );
-access_t * access_FilterNew( access_t *p_source,
-                              const char *psz_access_filter );
 void access_Delete( access_t * );
 
 #endif

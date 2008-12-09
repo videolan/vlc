@@ -83,8 +83,6 @@ struct access_t
     char        *psz_access;
     /* Access path/url/filename/.... */
     char        *psz_path;
-    /* Access source for access_filter (NULL for regular access) */
-    access_t    *p_source;
 
     /* Access can fill this entry to force a demuxer
      * XXX: fill it once you know for sure you will succeed

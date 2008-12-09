@@ -114,7 +114,7 @@ vlc_module_end ()
  * - send RTCP-RR and RTCP-BYE
  * - dynamic payload types (need SDP parser)
  * - multiple medias (need SDP parser, and RTCP-SR parser for lip-sync)
- * - support for access_filter in case of stream_Demux (MPEG-TS)
+ * - support for stream_filter in case of stream_Demux (MPEG-TS)
  */
 
 #ifndef IPPROTO_DCCP
