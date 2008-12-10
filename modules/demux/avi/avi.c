@@ -510,27 +510,34 @@ static int Open( vlc_object_t * p_this )
                         case 24:
                             tk->i_codec = VLC_FOURCC('R','V','2','4');
                             break;
-                        case 16:
-                            /* tk->i_codec = VLC_FOURCC('R','V','1','6');*/
-                            /* break;*/
+                        case 16: /* Yes it is RV15 */
                         case 15:
                             tk->i_codec = VLC_FOURCC('R','V','1','5');
                             break;
-                        case 9:
-                            tk->i_codec = VLC_FOURCC( 'Y', 'V', 'U', '9' ); /* <- TODO check that */
+                        case 9: /* <- TODO check that */
+                            tk->i_codec = VLC_FOURCC( 'Y', 'V', 'U', '9' );
                             break;
-                        case 8:
+                        case 8: /* <- TODO check that */
                             tk->i_codec = VLC_FOURCC('Y','8','0','0');
                             break;
                     }
                     es_format_Init( &fmt, VIDEO_ES, tk->i_codec );
 
-                    if( p_vids->p_bih->biBitCount == 24 )
+                    switch( tk->i_codec )
                     {
-                        /* This is in BGR format */
-                        fmt.video.i_bmask = 0x00ff0000;
+                    case VLC_FOURCC('R','V','2','4'):
+                    case VLC_FOURCC('R','V','3','2'):
+                        fmt.video.i_rmask = 0x00ff0000;
                         fmt.video.i_gmask = 0x0000ff00;
-                        fmt.video.i_rmask = 0x000000ff;
+                        fmt.video.i_bmask = 0x000000ff;
+                        break;
+                    case VLC_FOURCC('R','V','1','5'):
+                        fmt.video.i_rmask = 0x7c00;
+                        fmt.video.i_gmask = 0x03e0;
+                        fmt.video.i_bmask = 0x001f;
+                        break;
+                    default:
+                        break;
                     }
                 }
                 else
