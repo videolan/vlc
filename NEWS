@@ -1,4 +1,4 @@
-Changes between 0.9.6 and 1.0.0-git:
+Changes between 0.9.8a and 1.0.0-git:
 ------------------------------------
 
 Playback:
@@ -8,12 +8,12 @@ Playback:
  * RTSP trickplay support
 
 Access:
- * RTSP authentication with Darwing Streaming Server
+ * RTSP authentication with Darwin Streaming Server
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
  * Screen module now supports partial screen capture and mouse following on
-   windows.
+   Windows.
 
 Decoders:
  * AES3 (SMPTE 302M) support
@@ -23,7 +23,7 @@ Decoders:
  * QCELP (Qualcomm PureVoice) support
 
 Encoders:
- * Dirac encoding support using libdirac (support in Ogg, in TS)
+ * Dirac encoding support using libdirac (supported in Ogg and in TS)
 
 Stream output:
  * Restored the old mpeg2 transrating module.
@@ -45,12 +45,22 @@ Windows CE Port:
  EXPERIMENTAL work for the winCE port has been done.
 
 Playlist:
- * export the playlist in HTML
+ * support to Export the playlist in HTML
  * Lua script for BBC radio playback
 
 Audio output:
  * Removed obsolete Esound and aRts plugins
  * Surround support for PulseAudio
+
+
+Changes between 0.9.6 and 0.9.8a:
+---------------------------------
+
+Security update:
+ * Fixed buffer overflow in Real demuxer (SA-0811, CVE-2008-5276)
+
+Bunch of small bugfixes.
+
 
 Changes between 0.9.5 and 0.9.6:
 --------------------------------
@@ -58,8 +68,9 @@ New Localizations:
  * Ukranian
 
 Security updates:
- * Fixed overflow in CUE support from VCD access (SA-0810, CVE-2008-xxxx)
- * Fixed overflow in RealText subtitles support (SA-0810, CVE-2008-xxxx)
+ * Fixed overflow in CUE support from VCD access (SA-0810, CVE-2008-5032)
+ * Fixed overflow in RealText subtitles support (SA-0810, CVE-2008-5036)
+
 
 Changes between 0.9.4 and 0.9.5:
 --------------------------------
@@ -88,6 +99,7 @@ Access:
 
 Translations:
  * Update of Brazillian, Swedish translation
+
 
 Changes between 0.9.3 and 0.9.4:
 ------------------------------------
