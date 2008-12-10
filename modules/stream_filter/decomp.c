@@ -57,6 +57,7 @@ vlc_module_end ()
 struct stream_sys_t
 {
     block_t      *peeked;
+    uint64_t     offset;
     vlc_thread_t thread;
     pid_t        pid;
     int          write_fd, read_fd;
@@ -158,7 +159,11 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
     }
 
     length = net_Read (stream, p_sys->read_fd, NULL, buf, buflen, false);
-    return bonus + ((length >= 0) ? length : 0);
+    if (length < 0)
+        return 0;
+    length += bonus;
+    p_sys->offset += length;
+    return length;
 }
 
 /**
@@ -198,10 +203,27 @@ static int Peek (stream_t *stream, const uint8_t **pbuf, unsigned int len)
  */
 static int Control (stream_t *stream, int query, va_list args)
 {
-    /*stream_sys_t *p_sys = stream->p_sys;*/
-    (void)stream;
-    (void)query; (void)args;
-    return VLC_EGENERIC;
+    stream_sys_t *p_sys = stream->p_sys;
+
+    switch (query)
+    {
+        case STREAM_CAN_SEEK:
+        case STREAM_CAN_FASTSEEK:
+            *(va_arg (args, bool *)) = false;
+            break;
+        case STREAM_GET_POSITION:
+            *(va_arg (args, int64_t *)) = p_sys->offset;
+            break;
+        case STREAM_GET_SIZE:
+            *(va_arg (args, int64_t *)) = 0;
+            break;
+        case STREAM_GET_MTU:
+            *(va_arg (args, int *)) = 0;
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
 /**
@@ -219,6 +241,7 @@ static int Open (stream_t *stream, const char *path)
     stream->pf_peek = Peek;
     stream->pf_control = Control;
     p_sys->peeked = NULL;
+    p_sys->offset = 0;
     p_sys->pid = -1;
 
     /* I am not a big fan of the pyramid style, but I cannot think of anything
