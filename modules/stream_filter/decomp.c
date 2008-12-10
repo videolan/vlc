@@ -82,6 +82,9 @@ static void *Thread (void *data)
 {
     stream_t *stream = data;
     stream_sys_t *p_sys = stream->p_sys;
+#ifdef __linux__
+    uintptr_t page_mask = sysconf (_SC_PAGE_SIZE) - 1;
+#endif
     int fd = p_sys->write_fd;
     bool error = false;
 
@@ -108,9 +111,11 @@ static void *Thread (void *data)
             struct iovec iov[1] = { { buf + i, len - i, } };
 
 #ifdef __linux__
-            j = vmsplice (fd, iov, 1, SPLICE_F_GIFT);
+            if (((len | i) & page_mask) == 0)
+                j = vmsplice (fd, iov, 1, SPLICE_F_GIFT);
+            else
 #else
-            j = writev (fd, iov, 1);
+                j = writev (fd, iov, 1);
 #endif
             if (j <= 0)
             {
