@@ -404,6 +404,8 @@ static const struct
       VIDEO_ES, "Motion JPEG OpenDML Video" },
     { VLC_FOURCC( 'I','J','P','G' ), CODEC_ID_MJPEG,
       VIDEO_ES, "Intergraph JPEG Video" },
+    { VLC_FOURCC( 'A','C','D','V' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "ACD Systems Digital" },
 
     /* SP5x */
     { VLC_FOURCC( 'S','P','5','X' ), CODEC_ID_SP5X,
