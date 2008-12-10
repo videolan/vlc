@@ -383,17 +383,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #else
             ui.systemCodecBox->hide();
 #endif
-            /* Access Filters */
-            char* psz = config_GetPsz( p_intf, "access-filter" );
-            qs_filter = qfu( psz );
-            free( psz );
-            ui.timeshiftBox->setChecked( qs_filter.contains( "timeshift" ) );
-            ui.dumpBox->setChecked( qs_filter.contains( "dump" ) );
-            ui.bandwidthBox->setChecked( qs_filter.contains( "bandwidth" ) );
-
-            optionWidgets.append( ui.dumpBox );
-            optionWidgets.append( ui.bandwidthBox );
-            optionWidgets.append( ui.timeshiftBox );
             optionWidgets.append( ui.DVDDevice );
             optionWidgets.append( ui.cachingCombo );
 
@@ -617,23 +606,6 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "cd-audio", psz_devicepath );
         }
 
-        /* Access filters */
-#define saveBox( name, box ) {\
-        if( box->isChecked() ) { \
-            if( b_first ) { \
-                qs_filter.append( name ); \
-                b_first = false; \
-            } \
-            else qs_filter.append( ":" ).append( name ); \
-        } }
-
-        bool b_first = true;
-        qs_filter.clear();
-        saveBox( "dump", qobject_cast<QCheckBox *>(optionWidgets[dumpChB]) );
-        saveBox( "timeshift", qobject_cast<QCheckBox *>(optionWidgets[timeshiftChB]) );
-        saveBox( "bandwidth", qobject_cast<QCheckBox *>(optionWidgets[bandwidthChB] ) );
-        config_PutPsz( p_intf, "access-filter", qtu( qs_filter ) );
-
 #define CaCi( name, int ) config_PutInt( p_intf, name, int * i_comboValue )
 #define CaC( name ) CaCi( name, 1 )
         /* Caching */
@@ -677,7 +649,7 @@ void SPrefsPanel::apply()
         if( qobject_cast<QRadioButton *>(optionWidgets[skinRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "skins2" );
         if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
-            config_PutPsz( p_intf, "intf", "qt4" );
+            config_PutPsz( p_intf, "intf", "qt" );
         break;
     }
 

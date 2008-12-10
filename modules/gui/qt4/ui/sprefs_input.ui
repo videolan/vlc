@@ -175,36 +175,6 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_4" >
-     <property name="title" >
-      <string>_("Access Filter")</string>
-     </property>
-     <layout class="QHBoxLayout" >
-      <item>
-       <widget class="QCheckBox" name="timeshiftBox" >
-        <property name="text" >
-         <string>_("Timeshift")</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="dumpBox" >
-        <property name="text" >
-         <string>_("Dump")</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="bandwidthBox" >
-        <property name="text" >
-         <string>_("Bandwidth limiter")</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
  <tabstops>
@@ -217,9 +187,6 @@
   <tabstop>AviRepair</tabstop>
   <tabstop>RTSP_TCPBox</tabstop>
   <tabstop>systemCodecBox</tabstop>
-  <tabstop>timeshiftBox</tabstop>
-  <tabstop>dumpBox</tabstop>
-  <tabstop>bandwidthBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
