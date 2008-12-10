@@ -1989,6 +1989,7 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
                 break;
             case AVITWOCC_dc:
             case AVITWOCC_db:
+            case AVITWOCC_AC:
                 SET_PTR( pi_type, VIDEO_ES );
                 break;
             default:
