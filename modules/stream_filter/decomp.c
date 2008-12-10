@@ -106,7 +106,7 @@ static void *Thread (void *data)
         if (len <= 0)
             break;
 
-        for (ssize_t i = 0, j = 0; i < len; i += j)
+        for (ssize_t i = 0, j; i < len; i += j)
         {
             struct iovec iov[1] = { { buf + i, len - i, } };
 
