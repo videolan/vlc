@@ -102,9 +102,7 @@ static void *Thread (void *data)
 
         len = stream_Read (stream->p_source, buf, bufsize);
         vlc_restorecancel (canc);
-
-        if (len <= 0)
-            break;
+        error = len <= 0;
 
         for (ssize_t i = 0, j; i < len; i += j)
         {
