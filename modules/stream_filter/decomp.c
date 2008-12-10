@@ -24,7 +24,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_demux.h>
 #include <vlc_stream.h>
 #include <vlc_network.h>
 #include <unistd.h>
@@ -46,22 +45,18 @@ static void Close (vlc_object_t *);
 vlc_module_begin ()
     set_description (N_("Decompression"))
     set_category (CAT_INPUT)
-    set_subcategory (SUBCAT_INPUT_DEMUX)
-    set_capability ("demux", 20)
+    set_subcategory (SUBCAT_INPUT_STREAM_FILTER)
+    set_capability ("stream_filter", 20)
     set_callbacks (OpenBzip2, Close)
-    /* TODO: shortnames */
-    /* --demux support */
+    /* TODO: access shortnames for stream_UrlNew() */
 
     add_submodule ()
     set_callbacks (OpenGzip, Close)
 vlc_module_end ()
 
-static int Demux   (demux_t *);
-static int Control (demux_t *, int i_query, va_list args);
-
-struct demux_sys_t
+struct stream_sys_t
 {
-    stream_t    *out;
+    block_t      *peeked;
     vlc_thread_t thread;
     pid_t        pid;
     int          write_fd, read_fd;
@@ -84,8 +79,8 @@ static void cleanup_mmap (void *addr)
 
 static void *Thread (void *data)
 {
-    demux_t *demux = data;
-    demux_sys_t *p_sys = demux->p_sys;
+    stream_t *stream = data;
+    stream_sys_t *p_sys = stream->p_sys;
     int fd = p_sys->write_fd;
     bool error = false;
 
@@ -101,7 +96,7 @@ static void *Thread (void *data)
         unsigned char buf[bufsize];
 #endif
 
-        len = stream_Read (demux->s, buf, bufsize);
+        len = stream_Read (stream->p_source, buf, bufsize);
         vlc_restorecancel (canc);
 
         if (len <= 0)
@@ -120,7 +115,7 @@ static void *Thread (void *data)
             {
                 if (j == 0)
                     errno = EPIPE;
-                msg_Err (demux, "cannot write data (%m)");
+                msg_Err (stream, "cannot write data (%m)");
                 error = true;
                 break;
             }
@@ -131,7 +126,7 @@ static void *Thread (void *data)
     }
     while (!error);
 
-    msg_Dbg (demux, "compressed stream at EOF");
+    msg_Dbg (stream, "compressed stream at EOF");
     return NULL;
 }
 
@@ -139,69 +134,98 @@ static void *Thread (void *data)
 #define MIN_BLOCK (1 << 10)
 #define MAX_BLOCK (1 << 20)
 /**
- * Read data, decompress it, and forward
- * @return -1 in case of error, 0 in case of EOF, 1 otherwise.
+ * Reads decompressed from the decompression program
+ * @return -1 for EAGAIN, 0 for EOF, byte count otherwise.
  */
-static int Demux (demux_t *demux)
+static int Read (stream_t *stream, void *buf, unsigned int buflen)
 {
-    demux_sys_t *p_sys = demux->p_sys;
-    int length, fd = p_sys->read_fd;
+    stream_sys_t *p_sys = stream->p_sys;
+    block_t *peeked;
+    size_t bonus = 0;
+    ssize_t length;
 
-#ifdef TIOCINQ
-    if (ioctl (fd, TIOCINQ, &length) == 0)
+    if ((peeked = p_sys->peeked) != NULL)
     {
-        if (length > MAX_BLOCK)
-            length = MAX_BLOCK;
-        else
-        if (length < MIN_BLOCK)
-            length = MIN_BLOCK;
+        bonus = (buflen > peeked->i_buffer) ? peeked->i_buffer : buflen;
+        memcpy (buf, peeked->p_buffer, bonus);
+        peeked->p_buffer += bonus;
+        peeked->i_buffer -= bonus;
+        if (peeked->i_buffer == 0)
+        {
+            block_Release (peeked);
+            p_sys->peeked = NULL;
+        }
     }
-    else
-#endif
-        length = MIN_BLOCK;
 
-    block_t *block = block_Alloc (length);
-    if (block == NULL)
-        return VLC_ENOMEM;
-
-    length = net_Read (demux, fd, NULL, block->p_buffer, length, false);
-    if (length <= 0)
-        return 0;
-    block->i_buffer = length;
-    stream_DemuxSend (p_sys->out, block);
-    return 1;
+    length = net_Read (stream, p_sys->read_fd, NULL, buf, buflen, false);
+    return bonus + ((length >= 0) ? length : 0);
 }
 
-
-/*****************************************************************************
- * Control:
- *****************************************************************************/
-static int Control (demux_t *demux, int query, va_list args)
+/**
+ *
+ */
+static int Peek (stream_t *stream, const uint8_t **pbuf, unsigned int len)
 {
-    /*demux_sys_t *p_sys = demux->p_sys;*/
-    (void)demux;
+    stream_sys_t *p_sys = stream->p_sys;
+    block_t *peeked = p_sys->peeked;
+    size_t curlen = 0;
+    int fd = p_sys->read_fd;
+
+    if (peeked == NULL)
+        peeked = block_Alloc (len);
+    else if ((curlen = peeked->i_buffer) < len)
+        peeked = block_Realloc (peeked, 0, len);
+
+    if ((p_sys->peeked = peeked) == NULL)
+        return 0;
+
+    if (curlen < len)
+    {
+        ssize_t val = net_Read (stream, fd, NULL, peeked->p_buffer + curlen,
+                                len - curlen, true);
+        if (val >= 0)
+        {
+            curlen += val;
+            peeked->i_buffer = curlen;
+        }
+    }
+    *pbuf = peeked->p_buffer;
+    return curlen;
+}
+
+/**
+ *
+ */
+static int Control (stream_t *stream, int query, va_list args)
+{
+    /*stream_sys_t *p_sys = stream->p_sys;*/
+    (void)stream;
     (void)query; (void)args;
     return VLC_EGENERIC;
 }
 
 /**
  * Pipe data through an external executable.
- * @param demux the demux object.
+ * @param stream the stream filter object.
  * @param path path to the executable.
  */
-static int Open (demux_t *demux, const char *path)
+static int Open (stream_t *stream, const char *path)
 {
-    demux_sys_t *p_sys = demux->p_sys = malloc (sizeof (*p_sys));
+    stream_sys_t *p_sys = stream->p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    demux->pf_demux = Demux;
-    demux->pf_control = Control;
+    stream->pf_read = Read;
+    stream->pf_peek = Peek;
+    stream->pf_control = Control;
+    p_sys->peeked = NULL;
+    p_sys->pid = -1;
 
     /* I am not a big fan of the pyramid style, but I cannot think of anything
      * better here. There are too many failure cases. */
     int ret = VLC_EGENERIC;
     int comp[2];
+
     if (pipe (comp) == 0)
     {
         cloexec (comp[1]);
@@ -225,31 +249,28 @@ static int Open (demux_t *demux, const char *path)
                  && !posix_spawnp (&p_sys->pid, path, &actions, NULL, argv,
                                    environ))
                 {
-                    p_sys->out = stream_DemuxNew (demux, "", demux->out);
-                    if (p_sys->out != NULL)
-                    {
-                        if (vlc_clone (&p_sys->thread, Thread, demux,
-                                       VLC_THREAD_PRIORITY_INPUT) == 0)
-                            ret = VLC_SUCCESS;
-                        else
-                            stream_Delete (p_sys->out);
-                    }
-                    else
-                        msg_Err (demux, "Cannot create demux");
+                    if (vlc_clone (&p_sys->thread, Thread, stream,
+                                   VLC_THREAD_PRIORITY_INPUT) == 0)
+                        ret = VLC_SUCCESS;
                 }
                 else
-                    msg_Err (demux, "Cannot execute %s", path);
+                {
+                    msg_Err (stream, "Cannot execute %s", path);
+                    p_sys->pid = -1;
+                }
                 posix_spawn_file_actions_destroy (&actions);
             }
+            close (uncomp[1]);
             if (ret != VLC_SUCCESS)
-            {
-                close (comp[1]);
-                close (comp[0]);
-            }
+                close (uncomp[0]);
         }
+        close (comp[0]);
         if (ret != VLC_SUCCESS)
-            close (uncomp[0]);
-        close (uncomp[1]);
+        {
+            close (comp[1]);
+            if (p_sys->pid != -1)
+                while (waitpid (p_sys->pid, &(int){ 0 }, 0) == -1);
+        }
     }
     return ret;
 }
@@ -260,12 +281,11 @@ static int Open (demux_t *demux, const char *path)
  */
 static void Close (vlc_object_t *obj)
 {
-    demux_t *demux = (demux_t *)obj;
-    demux_sys_t *p_sys = demux->p_sys;
+    stream_t *stream = (stream_t *)obj;
+    stream_sys_t *p_sys = stream->p_sys;
     int status;
 
     vlc_cancel (p_sys->thread);
-    stream_Delete (p_sys->out);
     close (p_sys->read_fd);
     vlc_join (p_sys->thread, NULL);
     close (p_sys->write_fd);
@@ -274,6 +294,8 @@ static void Close (vlc_object_t *obj)
     while (waitpid (p_sys->pid, &status, 0) == -1);
     msg_Dbg (obj, "exit status %d", status);
 
+    if (p_sys->peeked)
+        block_Release (p_sys->peeked);
     free (p_sys);
 }
 
@@ -283,18 +305,17 @@ static void Close (vlc_object_t *obj)
  */
 static int OpenGzip (vlc_object_t *obj)
 {
-    demux_t       *demux = (demux_t *)obj;
-    stream_t      *stream = demux->s;
+    stream_t      *stream = (stream_t *)obj;
     const uint8_t *peek;
 
-    if (stream_Peek (stream, &peek, 3) < 3)
+    if (stream_Peek (stream->p_source, &peek, 3) < 3)
         return VLC_EGENERIC;
 
     if (memcmp (peek, "\x1f\x8b\x08", 3))
         return VLC_EGENERIC;
 
     msg_Dbg (obj, "detected gzip compressed stream");
-    return Open (demux, "zcat");
+    return Open (stream, "zcat");
 }
 
 
@@ -303,19 +324,18 @@ static int OpenGzip (vlc_object_t *obj)
  */
 static int OpenBzip2 (vlc_object_t *obj)
 {
-    demux_t       *demux = (demux_t *)obj;
-    stream_t      *stream = demux->s;
+    stream_t      *stream = (stream_t *)obj;
     const uint8_t *peek;
 
     /* (Try to) parse the bzip2 header */
-    if (stream_Peek (stream, &peek, 10) < 10)
+    if (stream_Peek (stream->p_source, &peek, 10) < 10)
         return VLC_EGENERIC;
 
     if (memcmp (peek, "BZh", 3) || (peek[3] < '1') || (peek[3] > '9')
-     || memcmp (peek, "\x31\x41\x59\x26\x53\x59", 6))
+     || memcmp (peek + 4, "\x31\x41\x59\x26\x53\x59", 6))
         return VLC_EGENERIC;
 
     msg_Dbg (obj, "detected bzip2 compressed stream");
-    return Open (demux, "bzcat");
+    return Open (stream, "bzcat");
 }
 

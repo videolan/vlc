@@ -1,6 +1,6 @@
+SOURCES_decomp = decomp.c
 SOURCES_stream_filter_record = record.c
 
 libvlc_LTLIBRARIES += \
    libstream_filter_record_plugin.la \
    $(NULL)
-
