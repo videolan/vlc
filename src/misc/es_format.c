@@ -60,7 +60,7 @@ static int BinaryLog( uint32_t i )
  */
 static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
 {
-    uint32_t i_low, i_high;            /* lower hand higher bits of the mask */
+    uint32_t i_low, i_high;            /* lower and higher bits of the mask */
 
     if( !i_mask )
     {
