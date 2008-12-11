@@ -193,6 +193,7 @@ void libvlc_wait( libvlc_instance_t *p_i )
 
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
 {
+    assert( p_instance );
     return 1;
 }
 
