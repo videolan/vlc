@@ -57,7 +57,7 @@ group_contains_listener( libvlc_event_listeners_group_t * group,
  */
 
 /**************************************************************************
- *       libvlc_event_manager_init (internal) :
+ *       libvlc_event_manager_new (internal) :
  *
  * Init an object's event manager.
  **************************************************************************/

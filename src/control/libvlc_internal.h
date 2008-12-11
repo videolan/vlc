@@ -202,7 +202,7 @@ struct libvlc_media_discoverer_t
  * libvlc_my_cool_object_new()
  * {
  *        ...
- *        p_self->p_event_manager = libvlc_event_manager_init( p_self,
+ *        p_self->p_event_manager = libvlc_event_manager_new( p_self,
  *                                                   p_self->p_libvlc_instance, p_e);
  *        libvlc_event_manager_register_event_type(p_self->p_event_manager,
  *                libvlc_MyCoolObjectDidSomething, p_e)
