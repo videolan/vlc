@@ -103,7 +103,8 @@ typedef enum libvlc_meta_t {
     libvlc_meta_Publisher,
     libvlc_meta_EncodedBy,
     libvlc_meta_ArtworkURL,
-    libvlc_meta_TrackID
+    libvlc_meta_TrackID,
+    /* Add new meta types HERE */
 } libvlc_meta_t;
 
 /**@} */

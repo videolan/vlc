@@ -45,6 +45,8 @@ extern "C" {
  */
 
 typedef enum libvlc_event_type_t {
+    /* Append new event types at the end.
+     * Do not remove, insert or re-order any entry. */
     libvlc_MediaMetaChanged,
     libvlc_MediaSubItemAdded,
     libvlc_MediaDurationChanged,
@@ -85,8 +87,8 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaDiscovererEnded,
 
     libvlc_MediaPlayerTitleChanged,
-    libvlc_MediaPlayerSnapshotTaken
-
+    libvlc_MediaPlayerSnapshotTaken,
+    /* New event types HERE */
 } libvlc_event_type_t;
 
 /**
