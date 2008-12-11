@@ -224,22 +224,24 @@ static void ObjectGarbageCollector( playlist_t *p_playlist, bool b_force )
 }
 
 /* Input Callback */
-static void input_state_changed( const vlc_event_t * event, void * data )
+static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    (void)event;
-    playlist_t * p_playlist = data;
-    playlist_Signal( p_playlist );
-}
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    playlist_t *p_playlist = p_data;
 
-/* Input Callback */
-static void input_selected_stream_changed( const vlc_event_t * event, void * data )
-{
-    (void)event;
-    playlist_t * p_playlist = data;
-    PL_LOCK;
-    pl_priv(p_playlist)->gc_date = mdate();
-    vlc_object_signal_unlocked( p_playlist );
-    PL_UNLOCK;
+    if( newval.i_int == INPUT_EVENT_STATE )
+    {
+        playlist_Signal( p_playlist );
+    }
+    else if( newval.i_int == INPUT_EVENT_ES )
+    {
+        PL_LOCK;
+        pl_priv(p_playlist)->gc_date = mdate();
+        vlc_object_signal_unlocked( p_playlist );
+        PL_UNLOCK;
+    }
+    return VLC_SUCCESS;
 }
 
 /* Internals */
@@ -250,12 +252,8 @@ void playlist_release_current_input( playlist_t * p_playlist )
     if( !pl_priv(p_playlist)->p_input ) return;
 
     input_thread_t * p_input = pl_priv(p_playlist)->p_input;
-    vlc_event_manager_t * p_em = input_GetEventManager( p_input );
 
-    vlc_event_detach( p_em, vlc_InputStateChanged,
-                      input_state_changed, p_playlist );
-    vlc_event_detach( p_em, vlc_InputSelectedStreamChanged,
-                      input_selected_stream_changed, p_playlist );
+    var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
     pl_priv(p_playlist)->p_input = NULL;
 
     /* Release the playlist lock, because we may get stuck
@@ -277,11 +275,8 @@ void playlist_set_current_input(
     {
         vlc_object_hold( p_input );
         pl_priv(p_playlist)->p_input = p_input;
-        vlc_event_manager_t * p_em = input_GetEventManager( p_input );
-        vlc_event_attach( p_em, vlc_InputStateChanged,
-                          input_state_changed, p_playlist );
-        vlc_event_attach( p_em, vlc_InputSelectedStreamChanged,
-                          input_selected_stream_changed, p_playlist );
+
+        var_AddCallback( p_input, "intf-event", InputEvent, p_playlist );
     }
 }
 

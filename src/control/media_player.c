@@ -29,9 +29,6 @@
 #include <vlc_vout.h>
 #include "libvlc.h"
 
-static void
-input_state_changed( const vlc_event_t * event, void * p_userdata );
-
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval,
@@ -83,8 +80,6 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
     /* No one is tracking this input_thread appart us. Destroy it */
     if( p_mi->b_own_its_input_thread )
     {
-        vlc_event_manager_t * p_em = input_GetEventManager( p_input_thread );
-        vlc_event_detach( p_em, vlc_InputStateChanged, input_state_changed, p_mi );
         var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
         var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
         var_DelCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
@@ -128,51 +123,6 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
     vlc_mutex_unlock( &p_mi->object_lock );
 
     return p_input_thread;
-}
-
-/*
- * input_state_changed (Private) (vlc_InputStateChanged callback)
- */
-static void
-input_state_changed( const vlc_event_t * event, void * p_userdata )
-{
-    libvlc_media_player_t * p_mi = p_userdata;
-    libvlc_event_t forwarded_event;
-    libvlc_event_type_t type = event->u.input_state_changed.new_state;
-
-    switch ( type )
-    {
-        case INIT_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
-            forwarded_event.type = libvlc_MediaPlayerNothingSpecial;
-            break;
-        case OPENING_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Opening, NULL);
-            forwarded_event.type = libvlc_MediaPlayerOpening;
-            break;
-        case PLAYING_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Playing, NULL);
-            forwarded_event.type = libvlc_MediaPlayerPlaying;
-            break;
-        case PAUSE_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Paused, NULL);
-            forwarded_event.type = libvlc_MediaPlayerPaused;
-            break;
-        case END_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Ended, NULL);
-            forwarded_event.type = libvlc_MediaPlayerEndReached;
-            break;
-        case ERROR_S:
-            libvlc_media_set_state( p_mi->p_md, libvlc_Error, NULL);
-            forwarded_event.type = libvlc_MediaPlayerEncounteredError;
-            break;
-
-        default:
-            return;
-    }
-
-    libvlc_event_send( p_mi->p_event_manager, &forwarded_event );
-    return;
 }
 
 static int
@@ -223,23 +173,61 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    if( newval.i_int != INPUT_EVENT_TIMES )
-        return VLC_EGENERIC;
+    assert( !strcmp( psz_cmd, "intf-event" ) );
 
-    assert( !strcmp(psz_cmd, "intf-event" ) );
+    if( newval.i_int == INPUT_EVENT_STATE )
+    {
+        libvlc_state_t libvlc_state;
 
-    if( var_GetInteger( p_input, "state" ) != PLAYING_S )
-        return VLC_SUCCESS; /* Don't send the position while stopped */
+        switch ( var_GetInteger( p_input, "state" ) )
+        {
+            case INIT_S:
+                libvlc_state = libvlc_NothingSpecial;
+                event.type = libvlc_MediaPlayerNothingSpecial;
+                break;
+            case OPENING_S:
+                libvlc_state = libvlc_Opening;
+                event.type = libvlc_MediaPlayerOpening;
+                break;
+            case PLAYING_S:
+                libvlc_state = libvlc_Playing;
+                event.type = libvlc_MediaPlayerPlaying;
+                break;
+            case PAUSE_S:
+                libvlc_state = libvlc_Paused;
+                event.type = libvlc_MediaPlayerPaused;
+                break;
+            case END_S:
+                libvlc_state = libvlc_Ended;
+                event.type = libvlc_MediaPlayerEndReached;
+                break;
+            case ERROR_S:
+                libvlc_state = libvlc_Error;
+                event.type = libvlc_MediaPlayerEncounteredError;
+                break;
 
-    /* */
-    event.type = libvlc_MediaPlayerPositionChanged;
-    event.u.media_player_position_changed.new_position = var_GetFloat( p_input, "position" );;
-    libvlc_event_send( p_mi->p_event_manager, &event );
+            default:
+                return VLC_SUCCESS;
+        }
 
-    /* */
-    event.type = libvlc_MediaPlayerTimeChanged;
-    event.u.media_player_time_changed.new_time = var_GetTime( p_input, "time" );
-    libvlc_event_send( p_mi->p_event_manager, &event );
+        libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL);
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
+    else if( newval.i_int == INPUT_EVENT_TIMES )
+    {
+        if( var_GetInteger( p_input, "state" ) != PLAYING_S )
+            return VLC_SUCCESS; /* Don't send the position while stopped */
+
+        /* */
+        event.type = libvlc_MediaPlayerPositionChanged;
+        event.u.media_player_position_changed.new_position = var_GetFloat( p_input, "position" );;
+        libvlc_event_send( p_mi->p_event_manager, &event );
+
+        /* */
+        event.type = libvlc_MediaPlayerTimeChanged;
+        event.u.media_player_time_changed.new_time = var_GetTime( p_input, "time" );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
 
     return VLC_SUCCESS;
 
@@ -610,9 +598,6 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         var_Create( p_input_thread, "drawable", VLC_VAR_DOINHERIT );
         var_Set( p_input_thread, "drawable", val );
     }
-
-    vlc_event_manager_t * p_em = input_GetEventManager( p_input_thread );
-    vlc_event_attach( p_em, vlc_InputStateChanged, input_state_changed, p_mi );
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );

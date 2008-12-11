@@ -673,13 +673,6 @@ static inline int input_AddSubtitle( input_thread_t *p_input, const char *psz_ur
     return input_Control( p_input, INPUT_ADD_SUBTITLE, psz_url, b_check_extension );
 }
 
-/**
- * It will return the input event manager.
- *
- * You are advised to use "intf-event" instead if you want completness.
- */
-VLC_EXPORT( vlc_event_manager_t *, input_GetEventManager, ( input_thread_t * ) );
-
 /* */
 typedef struct input_clock_t input_clock_t;
 VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, input_clock_t *, sout_instance_t * ) );

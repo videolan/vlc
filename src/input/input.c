@@ -162,12 +162,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
-    /* Init events */
-    vlc_event_manager_t * p_em = &p_input->p->event_manager;
-    vlc_event_manager_init_with_vlc_object( p_em, p_input );
-    vlc_event_manager_register_event_type( p_em, vlc_InputStateChanged );
-    vlc_event_manager_register_event_type( p_em, vlc_InputSelectedStreamChanged );
-
     /* Init Common fields */
     p_input->b_eof = false;
     p_input->b_can_pace_control = true;
@@ -323,8 +317,6 @@ static void Destructor( input_thread_t * p_input )
     msg_Dbg( p_input, "Destroying the input for '%s'", psz_name);
     free( psz_name );
 #endif
-
-    vlc_event_manager_fini( &p_input->p->event_manager );
 
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
@@ -3184,13 +3176,6 @@ void input_UpdateStatistic( input_thread_t *p_input,
         break;
     }
     vlc_mutex_unlock( &p_input->p->counters.counters_lock);
-}
-/*****************************************************************************
- * input_GetEventManager
- *****************************************************************************/
-vlc_event_manager_t *input_GetEventManager( input_thread_t *p_input )
-{
-    return &p_input->p->event_manager;
 }
 
 /**/

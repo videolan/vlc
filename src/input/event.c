@@ -147,13 +147,6 @@ void input_SendEventState( input_thread_t *p_input, int i_state )
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
     Trigger( p_input, INPUT_EVENT_STATE );
-
-	/* FIXME remove this ugliness */
-    vlc_event_t event;
-
-    event.type = vlc_InputStateChanged;
-    event.u.input_state_changed.new_state = i_state;
-    vlc_event_send( &p_input->p->event_manager, &event );
 }
 
 void input_SendEventCache( input_thread_t *p_input, double f_level )
@@ -301,11 +294,6 @@ void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
     var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_SETVALUE, &val, NULL );
 
     Trigger( p_input, INPUT_EVENT_ES );
-
-    /* FIXME to remove this ugliness */
-    vlc_event_t event;
-    event.type = vlc_InputSelectedStreamChanged;
-    vlc_event_send( &p_input->p->event_manager, &event );
 }
 
 void input_SendEventTeletext( input_thread_t *p_input, int i_id )

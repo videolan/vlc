@@ -75,9 +75,6 @@ typedef struct
 /** Private input fields */
 struct input_thread_private_t
 {
-    /* Object's event manager */
-    vlc_event_manager_t event_manager;
-
     /* Global properties */
     bool        b_can_pause;
     bool        b_can_rate_control;
