@@ -161,10 +161,9 @@ struct decoder_synchro_t
  *****************************************************************************/
 decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec, int i_frame_rate )
 {
-    decoder_synchro_t * p_synchro = malloc( sizeof(*p_synchro) );
-    if ( p_synchro == NULL )
+    decoder_synchro_t * p_synchro = calloc( 1, sizeof(*p_synchro) );
+    if( !p_synchro )
         return NULL;
-    memset( p_synchro, 0, sizeof(*p_synchro) );
 
     p_synchro->p_dec = p_dec;
     p_synchro->b_no_skip = !config_GetInt( p_dec, "skip-frames" );

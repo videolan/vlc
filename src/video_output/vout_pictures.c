@@ -1006,12 +1006,10 @@ static void PictureReleaseCallback( picture_t *p_picture )
  *****************************************************************************/
 picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
 {
-    picture_t *p_picture = malloc( sizeof(*p_picture) );
-
+    picture_t *p_picture = calloc( 1, sizeof(*p_picture) );
     if( !p_picture )
         return NULL;
 
-    memset( p_picture, 0, sizeof(*p_picture) );
     if( __vout_AllocatePicture( NULL, p_picture,
                                 i_chroma, i_width, i_height, i_aspect ) )
     {

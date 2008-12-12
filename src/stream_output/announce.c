@@ -65,12 +65,10 @@ sout_AnnounceRegisterSDP( vlc_object_t *obj, const char *psz_sdp,
     assert (p_method == &sap_method);
     (void) p_method;
 
-    session_descriptor_t *p_session = malloc (sizeof (*p_session));
-
-    if (!p_session)
+    session_descriptor_t *p_session = calloc( 1, sizeof (*p_session) );
+    if( !p_session )
         return NULL;
 
-    memset( p_session, 0, sizeof( *p_session ) );
     p_session->psz_sdp = strdup( psz_sdp );
 
     /* GRUIK. We should not convert back-and-forth from string to numbers */

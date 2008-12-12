@@ -1213,10 +1213,9 @@ static void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
         }
         if( b_add )
         {
-            vlc_epg_event_t *p_copy = malloc( sizeof(vlc_epg_event_t) );
+            vlc_epg_event_t *p_copy = calloc( 1, sizeof(vlc_epg_event_t) );
             if( !p_copy )
                 break;
-            memset( p_copy, 0, sizeof(vlc_epg_event_t) );
             p_copy->i_start = p_evt->i_start;
             p_copy->i_duration = p_evt->i_duration;
             p_copy->psz_name = p_evt->psz_name ? strdup( p_evt->psz_name ) : NULL;

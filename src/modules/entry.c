@@ -98,11 +98,10 @@ module_t *vlc_submodule_create (module_t *module)
 {
     assert (module != NULL);
 
-    module_t *submodule = malloc (sizeof (*submodule));
-    if (submodule == NULL)
+    module_t *submodule = calloc( 1, sizeof(*submodule) );
+    if( !submodule )
         return NULL;
 
-    memset (submodule, 0, sizeof (*submodule));
     vlc_gc_init (submodule, vlc_submodule_destruct);
 
     submodule->next = module->submodule;

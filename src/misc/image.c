@@ -79,9 +79,10 @@ static vlc_fourcc_t Ext2Fourcc( const char * );
  */
 image_handler_t *__image_HandlerCreate( vlc_object_t *p_this )
 {
-    image_handler_t *p_image = malloc( sizeof(image_handler_t) );
+    image_handler_t *p_image = calloc( 1, sizeof(image_handler_t) );
+    if( !p_image )
+        return NULL;
 
-    memset( p_image, 0, sizeof(image_handler_t) );
     p_image->p_parent = p_this;
 
     p_image->pf_read = ImageRead;
