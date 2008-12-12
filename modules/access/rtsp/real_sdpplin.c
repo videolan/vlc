@@ -36,18 +36,18 @@ static char *b64_decode(const char *in, char *out, int *size) {
   int i,k;
   unsigned int j;
 
-  for (i = 0; i < 255; i++) {
+  for( i = 0; i < 256; i++ )
     dtable[i] = 0x80;
-  }
-  for (i = 'A'; i <= 'Z'; i++) {
+
+  for( i = 'A'; i <= 'Z'; i++ )
     dtable[i] = 0 + (i - 'A');
-  }
-  for (i = 'a'; i <= 'z'; i++) {
+
+  for( i = 'a'; i <= 'z'; i++ )
     dtable[i] = 26 + (i - 'a');
-  }
-  for (i = '0'; i <= '9'; i++) {
+
+  for( i = '0'; i <= '9'; i++ )
     dtable[i] = 52 + (i - '0');
-  }
+
   dtable['+'] = 62;
   dtable['/'] = 63;
   dtable['='] = 0;
