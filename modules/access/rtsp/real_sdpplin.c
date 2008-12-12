@@ -54,10 +54,11 @@ static char *b64_decode(const char *in, char *out, int *size) {
 
   k=0;
   /*CONSTANTCONDITION*/
-  for (j=0; j<strlen(in); j+=4) {
+  int in_len = strlen(in);
+  for (j=0; j < in_len; j+=4) {
     char a[4], b[4];
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < 4 && j + i < in_len; i++) {
       int c = in[i+j];
 
       if (dtable[c] & 0x80) {
@@ -388,3 +389,4 @@ void sdpplin_free(sdpplin_t *description) {
   free( description->range );
   free( description );
 }
+
