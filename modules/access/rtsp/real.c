@@ -33,7 +33,8 @@
 #include "real.h"
 #include "real_sdpplin.h"
 
-const unsigned char xor_table[] = {
+#define XOR_TABLE_LEN 37
+static const unsigned char xor_table[] = {
     0x05, 0x18, 0x74, 0xd0, 0x0d, 0x09, 0x02, 0x53,
     0xc0, 0x01, 0x05, 0x05, 0x67, 0x03, 0x19, 0x70,
     0x08, 0x27, 0x66, 0x10, 0x10, 0x72, 0x08, 0x09,
@@ -338,16 +339,9 @@ void real_calc_response_and_checksum (char *response, char *chksum, char *challe
     memcpy(ptr, challenge, ch_len);
   }
 
-  if (xor_table != NULL)
-  {
-    table_len = strlen((char *)xor_table);
-
-    if (table_len > 56) table_len=56;
-
-    /* xor challenge bytewise with xor_table */
-    for (i=0; i<table_len; i++)
-      ptr[i] = ptr[i] ^ xor_table[i];
-  }
+  /* xor challenge bytewise with xor_table */
+  for (i=0; i<XOR_TABLE_LEN; i++)
+    ptr[i] = ptr[i] ^ xor_table[i];
 
   calc_response_string (response, buf);
 
@@ -550,15 +544,18 @@ int real_get_rdt_chunk_header(rtsp_client_t *rtsp_session, rmff_pheader_t *ph) {
 
   n=rtsp_read_data(rtsp_session, header, 8);
   if (n<8) return 0;
-  if (header[0] != 0x24) {
+  if (header[0] != 0x24)
+  {
     lprintf("rdt chunk not recognized: got 0x%02x\n", header[0]);
     return 0;
   }
   size=(header[1]<<16)+(header[2]<<8)+(header[3]);
   flags1=header[4];
-  if ((flags1!=0x40)&&(flags1!=0x42)) {
+  if ((flags1!=0x40)&&(flags1!=0x42))
+  {
     lprintf("got flags1: 0x%02x\n",flags1);
-    if (header[6]==0x06) {
+    if (header[6]==0x06)
+    {
       lprintf("got end of stream packet\n");
       return 0;
     }
@@ -613,7 +610,9 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   char challenge2[64];
   char checksum[34];
   char *subscribe=NULL;
-  char *buf=(char*)malloc(256);
+  char *buf = malloc(256);
+  if( !buf )
+    return NULL;
   char *mrl=rtsp_get_mrl(rtsp_session);
   unsigned int size;
   int status;
@@ -666,7 +665,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 
   lprintf("Stream description size: %i\n", size);
 
-  description = (char*)malloc(size+1);
+  description = malloc(size+1);
   if( !description )
     goto error;
   if( rtsp_read_data(rtsp_session, (uint8_t*)description, size) <= 0)
@@ -675,7 +674,7 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
   //fprintf(stderr, "%s", description);
 
   /* parse sdp (sdpplin) and create a header and a subscribe string */
-  subscribe = (char *) malloc(256);
+  subscribe = malloc(256);
   if( !subscribe )
     goto error;
 
