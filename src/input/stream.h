@@ -45,7 +45,7 @@ stream_t *stream_CommonNew( vlc_object_t * );
 void stream_CommonDelete( stream_t * );
 
 /* */
-stream_t *stream_AccessNew( access_t *p_access, bool );
+stream_t *stream_AccessNew( access_t *p_access );
 
 /* */
 stream_t *stream_FilterNew( stream_t *p_source,

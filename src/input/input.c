@@ -2497,7 +2497,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Create the stream_t */
-        in->p_stream = stream_AccessNew( in->p_access, p_input->b_preparsing );
+        in->p_stream = stream_AccessNew( in->p_access );
 
         /* Restore old value */
         if( !psz_input_list )

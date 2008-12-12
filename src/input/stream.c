@@ -182,9 +182,6 @@ struct stream_sys_t
     access_entry_t **list;
     int            i_list_index;
     access_t       *p_list_access;
-
-    /* Preparse mode ? */
-    bool      b_quick;
 };
 
 /* Method 1: */
@@ -269,7 +266,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
         return NULL;
     }
 
-    if( !( p_res = stream_AccessNew( p_access, true ) ) )
+    if( !( p_res = stream_AccessNew( p_access ) ) )
     {
         access_Delete( p_access );
         return NULL;
@@ -279,7 +276,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     return p_res;
 }
 
-stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
+stream_t *stream_AccessNew( access_t *p_access )
 {
     stream_t *s = stream_CommonNew( VLC_OBJECT(p_access) );
     stream_sys_t *p_sys;
@@ -324,8 +321,6 @@ stream_t *stream_AccessNew( access_t *p_access, bool b_quick )
     p_sys->list = 0;
     p_sys->i_list_index = 0;
     p_sys->p_list_access = 0;
-
-    p_sys->b_quick = b_quick;
 
     /* Get the additional list of inputs if any (for concatenation) */
     if( (psz_list = var_CreateGetString( s, "input-list" )) && *psz_list )
