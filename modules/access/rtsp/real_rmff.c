@@ -105,7 +105,7 @@ static int rmff_dump_prop(rmff_prop_t *prop, uint8_t *buffer, int bufsize) {
     return RMFF_PROPHEADER_SIZE;
 }
 
-static int rmff_dump_mdpr(rmff_mdpr_t *mdpr, uint8_t *buffer, int bufsize) {
+static int rmff_dump_mdpr(rmff_mdpr_t *mdpr, uint8_t *buffer, unsigned int bufsize) {
 
     int s1, s2, s3;
 
@@ -293,10 +293,10 @@ void rmff_dump_pheader(rmff_pheader_t *h, char *data) {
 
 rmff_fileheader_t *rmff_new_fileheader(uint32_t num_headers) {
 
-  rmff_fileheader_t *fileheader = malloc(sizeof(rmff_fileheader_t));
-  if( !fileheader ) return NULL;
+  rmff_fileheader_t *fileheader = calloc( 1, sizeof(rmff_fileheader_t) );
+  if( !fileheader )
+    return NULL;
 
-  memset(fileheader, 0, sizeof(rmff_fileheader_t));
   fileheader->object_id=RMF_TAG;
   fileheader->size=18;
   fileheader->object_version=0;
@@ -319,10 +319,10 @@ rmff_prop_t *rmff_new_prop (
   uint16_t num_streams,
   uint16_t flags ) {
 
-  rmff_prop_t *prop = malloc(sizeof(rmff_prop_t));
-  if( !prop ) return NULL;
+  rmff_prop_t *prop = calloc( 1, sizeof(rmff_prop_t) );
+  if( !prop )
+    return NULL;
 
-  memset(prop, 0, sizeof(rmff_prop_t));
   prop->object_id=PROP_TAG;
   prop->size=50;
   prop->object_version=0;
@@ -355,10 +355,10 @@ rmff_mdpr_t *rmff_new_mdpr(
   uint32_t   type_specific_len,
   const char *type_specific_data ) {
 
-  rmff_mdpr_t *mdpr = malloc(sizeof(rmff_mdpr_t));
-  if( !mdpr ) return NULL;
+  rmff_mdpr_t *mdpr = calloc( 1, sizeof(rmff_mdpr_t) );
+  if( !mdpr )
+    return NULL;
 
-  memset(mdpr, 0, sizeof(rmff_mdpr_t));
   mdpr->object_id=MDPR_TAG;
   mdpr->object_version=0;
   mdpr->stream_number=stream_number;
@@ -395,10 +395,10 @@ rmff_mdpr_t *rmff_new_mdpr(
 
 rmff_cont_t *rmff_new_cont(const char *title, const char *author, const char *copyright, const char *comment) {
 
-  rmff_cont_t *cont = malloc(sizeof(rmff_cont_t));
-  if( !cont ) return NULL;
+  rmff_cont_t *cont = calloc( 1, sizeof(rmff_cont_t) );
+  if( !cont )
+    return NULL;
 
-  memset(cont, 0, sizeof(rmff_cont_t));
   cont->object_id=CONT_TAG;
   cont->object_version=0;
   cont->title=NULL;
@@ -432,10 +432,10 @@ rmff_cont_t *rmff_new_cont(const char *title, const char *author, const char *co
 }
 
 rmff_data_t *rmff_new_dataheader(uint32_t num_packets, uint32_t next_data_header) {
-  rmff_data_t *data = malloc(sizeof(rmff_data_t));
-  if( !data ) return NULL;
+  rmff_data_t *data = calloc( 1, sizeof(rmff_data_t) );
+  if( !data )
+    return NULL;
 
-  memset(data, 0, sizeof(rmff_data_t));
   data->object_id=DATA_TAG;
   data->size=18;
   data->object_version=0;
@@ -452,19 +452,22 @@ void rmff_print_header(rmff_header_t *h) {
     printf("rmff_print_header: NULL given\n");
     return;
   }
-  if(h->fileheader) {
+  if(h->fileheader)
+  {
     printf("\nFILE:\n");
     printf("file version      : %d\n", h->fileheader->file_version);
     printf("number of headers : %d\n", h->fileheader->num_headers);
   }
-  if(h->cont) {
+  if(h->cont)
+  {
     printf("\nCONTENT:\n");
     printf("title     : %s\n", h->cont->title);
     printf("author    : %s\n", h->cont->author);
     printf("copyright : %s\n", h->cont->copyright);
     printf("comment   : %s\n", h->cont->comment);
   }
-  if(h->prop) {
+  if(h->prop)
+  {
     printf("\nSTREAM PROPERTIES:\n");
     printf("bit rate (max/avg)    : %i/%i\n", h->prop->max_bit_rate, h->prop->avg_bit_rate);
     printf("packet size (max/avg) : %i/%i bytes\n", h->prop->max_packet_size, h->prop->avg_packet_size);
@@ -481,8 +484,10 @@ void rmff_print_header(rmff_header_t *h) {
     printf("\n");
   }
   stream=h->streams;
-  if(stream) {
-    while (*stream) {
+  if(stream)
+  {
+    while (*stream)
+    {
       printf("\nSTREAM %i:\n", (*stream)->stream_number);
       printf("stream name [mime type] : %s [%s]\n", (*stream)->stream_name, (*stream)->mime_type);
       printf("bit rate (max/avg)      : %i/%i\n", (*stream)->max_bit_rate, (*stream)->avg_bit_rate);
@@ -494,7 +499,8 @@ void rmff_print_header(rmff_header_t *h) {
       stream++;
     }
   }
-  if(h->data) {
+  if(h->data)
+  {
     printf("\nDATA:\n");
     printf("size      : %i\n", h->data->size);
     printf("packets   : %i\n", h->data->num_packets);
@@ -515,9 +521,11 @@ void rmff_fix_header(rmff_header_t *h) {
   }
   if (!h->streams) {
     lprintf("rmff_fix_header: warning: no MDPR chunks\n");
-  } else {
+  } else
+  {
     streams=h->streams;
-    while (*streams) {
+    while (*streams)
+    {
         num_streams++;
         num_headers++;
         header_size+=(*streams)->size;
@@ -525,28 +533,32 @@ void rmff_fix_header(rmff_header_t *h) {
     }
   }
   if (h->prop) {
-    if (h->prop->size != 50) {
+    if (h->prop->size != 50)
+    {
       lprintf("rmff_fix_header: correcting prop.size from %i to %i\n", h->prop->size, 50);
       h->prop->size=50;
     }
-    if (h->prop->num_streams != num_streams) {
+    if (h->prop->num_streams != num_streams)
+    {
       lprintf("rmff_fix_header: correcting prop.num_streams from %i to %i\n", h->prop->num_streams, num_streams);
       h->prop->num_streams=num_streams;
     }
     num_headers++;
     header_size+=50;
-  } else lprintf("rmff_fix_header: warning: no PROP chunk.\n");
+  } else
+    lprintf("rmff_fix_header: warning: no PROP chunk.\n");
 
   if (h->cont) {
     num_headers++;
     header_size+=h->cont->size;
-  } else lprintf("rmff_fix_header: warning: no CONT chunk.\n");
+  } else
+    lprintf("rmff_fix_header: warning: no CONT chunk.\n");
 
   if (!h->data) {
     lprintf("rmff_fix_header: no DATA chunk, creating one\n");
-    h->data = malloc(sizeof(rmff_data_t));
-    if( h->data ) {
-      memset(h->data, 0, sizeof(rmff_data_t));
+    h->data = calloc( 1, sizeof(rmff_data_t) );
+    if( h->data )
+    {
       h->data->object_id=DATA_TAG;
       h->data->object_version=0;
       h->data->size=18;
@@ -558,9 +570,9 @@ void rmff_fix_header(rmff_header_t *h) {
 
   if (!h->fileheader) {
     lprintf("rmff_fix_header: no fileheader, creating one");
-    h->fileheader = malloc(sizeof(rmff_fileheader_t));
-    if( h->fileheader ) {
-      memset(h->fileheader, 0, sizeof(rmff_fileheader_t));
+    h->fileheader = calloc( 1, sizeof(rmff_fileheader_t) );
+    if( h->fileheader )
+    {
       h->fileheader->object_id=RMF_TAG;
       h->fileheader->size=18;
       h->fileheader->object_version=0;
@@ -619,7 +631,8 @@ void rmff_free_header(rmff_header_t *h)
     free( h->cont->comment );
     free( h->cont );
   }
-  if (h->streams) {
+  if (h->streams)
+  {
     rmff_mdpr_t **s=h->streams;
 
     while(*s) {
