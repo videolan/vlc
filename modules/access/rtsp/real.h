@@ -41,7 +41,7 @@
 #ifdef REALDEBUG
 #   define lprintf printf
 #else
-    static inline void lprintf( const char *dummy, ... ){}
+    static inline void lprintf( const char *dummy, ... ) { (void)dummy; }
 #endif
 
 int real_get_rdt_chunk_header(rtsp_client_t *, rmff_pheader_t *);

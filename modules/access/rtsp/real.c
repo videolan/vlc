@@ -208,8 +208,7 @@ static void hash(char *field, char *param)
   LE_32C(field+12, d);
 }
 
-static void call_hash (char *key, char *challenge, int len) {
-
+static void call_hash (char *key, char *challenge, unsigned int len) {
   uint8_t *ptr1, *ptr2;
   uint32_t a, b, c, d, tmp;
 
@@ -221,7 +220,7 @@ static void call_hash (char *key, char *challenge, int len) {
   a += len * 8;
   LE_32C(ptr1, a);
 
-  if (a < (uint32_t)(len << 3))
+  if (a < (len << 3))
   {
     lprintf("not verified: (len << 3) > a true\n");
     ptr2 += 4;
@@ -231,14 +230,14 @@ static void call_hash (char *key, char *challenge, int len) {
   LE_32C(ptr2, tmp);
   a = 64 - b;
   c = 0;
-  if (a <= (uint32_t)len)
+  if (a <= len)
   {
     memcpy(key+b+24, challenge, a);
     hash(key, key+24);
     c = a;
     d = c + 0x3f;
 
-    while ( d < (uint32_t)len ) {
+    while ( d < len ) {
       lprintf("not verified:  while ( d < len )\n");
       hash(key, challenge+d-0x3f);
       d += 64;
@@ -304,7 +303,7 @@ static void calc_response_string (char *result, char *challenge) {
 
 void real_calc_response_and_checksum (char *response, char *chksum, char *challenge) {
 
-  int   ch_len, table_len, resp_len;
+  int   ch_len, resp_len;
   int   i;
   char *ptr;
   char  buf[128];
