@@ -745,6 +745,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV40" ) )
                 tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '4', '0' );
         }
+        else if( !strncmp( tracks[i_track]->psz_codec, "V_DIRAC", 7 ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC('d', 'r', 'a', 'c' );
+        }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_MPEG4", 7 ) )
         {
             if( !strcmp( tracks[i_track]->psz_codec, "V_MPEG4/MS/V3" ) )
