@@ -211,6 +211,19 @@ VLC_PUBLIC_API const char * libvlc_get_compiler(void);
  */
 VLC_PUBLIC_API const char * libvlc_get_changeset(void);
 
+struct vlc_object_t;
+
+/**
+ * Return the libvlc internal object, the main object that all other depend on.
+ * Any of of this function should be considered an ugly hack and avoided at all
+ * cost. E.g. you need to expose some functionality that is not provided by the
+ * libvlc API directly with libvlccore.
+ * Remember to release the object with vlc_object_release( obj* )
+ *
+ * \param p_instance the libvlc instance
+ */
+VLC_PUBLIC_API struct vlc_object_t *libvlc_get_vlc_instance(libvlc_instance_t *);
+
 /** @}*/
 
 /*****************************************************************************
