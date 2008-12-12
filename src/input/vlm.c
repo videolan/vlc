@@ -622,10 +622,9 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         p_vlm->p_vod->pf_media_control = vlm_MediaVodControl;
     }
 
-    p_media = malloc( sizeof( vlm_media_sys_t ) );
+    p_media = calloc( 1, sizeof( vlm_media_sys_t ) );
     if( !p_media )
         return VLC_ENOMEM;
-    memset( p_media, 0, sizeof(vlm_media_sys_t) );
 
     if( p_cfg->b_vod )
         p_vlm->i_vod++;
@@ -743,11 +742,9 @@ static vlm_media_instance_sys_t *vlm_ControlMediaInstanceGetByName( vlm_media_sy
 }
 static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char *psz_name )
 {
-    vlm_media_instance_sys_t *p_instance = malloc( sizeof(vlm_media_instance_sys_t) );
+    vlm_media_instance_sys_t *p_instance = calloc( 1, sizeof(vlm_media_instance_sys_t) );
     if( !p_instance )
         return NULL;
-
-    memset( p_instance, 0, sizeof(vlm_media_instance_sys_t) );
 
     p_instance->psz_name = NULL;
     if( psz_name )
@@ -1154,3 +1151,4 @@ int vlm_Control( vlm_t *p_vlm, int i_query, ... )
 
     return i_result;
 }
+
