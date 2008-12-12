@@ -521,7 +521,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             for( i = 0; i < p_cfg->i_option; i++ )
                 input_item_AddOption( p_media->vod.p_item,
-                                     p_cfg->ppsz_option[i] );
+                                      p_cfg->ppsz_option[i] );
 
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
@@ -614,7 +614,7 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
             msg_Err( p_vlm, "cannot find vod server" );
             vlc_object_detach( p_vlm->p_vod );
             vlc_object_release( p_vlm->p_vod );
-            p_vlm->p_vod = 0;
+            p_vlm->p_vod = NULL;
             return VLC_EGENERIC;
         }
 
