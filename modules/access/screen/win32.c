@@ -55,10 +55,9 @@ int screen_InitCapture( demux_t *p_demux )
     screen_data_t *p_data;
     int i_chroma, i_bits_per_pixel;
 
-    p_sys->p_data = p_data = malloc( sizeof( screen_data_t ) );
+    p_sys->p_data = p_data = calloc( sizeof( 1, screen_data_t ) );
     if( !p_data )
         return VLC_ENOMEM;
-    memset( p_data, 0, sizeof( screen_data_t ) );
 
     /* Get the device context for the whole screen */
     p_data->hdc_src = CreateDC( "DISPLAY", NULL, NULL, NULL );

@@ -142,8 +142,9 @@ static int Open( vlc_object_t *p_this )
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     /* Update default_pts to a suitable value for screen access */
     var_Create( p_demux, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );

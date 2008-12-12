@@ -89,11 +89,9 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
-    if( p_filter->p_sys == NULL )
+    p_filter->p_sys = calloc( 1, sizeof(struct aout_filter_sys_t) );
+    if( !p_filter->p_sys )
         return VLC_ENOMEM;
-    memset( p_filter->p_sys, 0, sizeof(struct aout_filter_sys_t) );
-    p_filter->p_sys->p_buf = 0;
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 1;

@@ -142,9 +142,8 @@ static int Open( vlc_object_t *p_this )
 
     /* Allocate structure */
     p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
-    if( p_sys == NULL )
+    if( !p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
 
     /* Parse MRL */
     Parse( p_demux );

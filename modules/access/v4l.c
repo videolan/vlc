@@ -333,8 +333,9 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_update = 0;
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     var_Create( p_demux, "v4l-audio", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "v4l-audio", &val );

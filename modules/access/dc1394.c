@@ -225,10 +225,9 @@ static int Open( vlc_object_t *p_this )
     p_demux->info.i_title = 0;
     p_demux->info.i_seekpoint = 0;
 
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
     memset( &fmt, 0, sizeof( es_format_t ) );
 
     /* DEFAULTS */

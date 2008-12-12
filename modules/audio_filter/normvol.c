@@ -139,15 +139,13 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->f_max <= 0 ) p_sys->f_max = 0.01;
 
     /* We need to store (nb_buffers+1)*nb_channels floats */
-    p_sys->p_last = malloc( sizeof( float ) * (i_channels) *
-                            (p_filter->p_sys->i_nb + 2) );
+    p_sys->p_last = calloc( i_channels * (p_filter->p_sys->i_nb + 2), sizeof(float) );
     if( !p_sys->p_last )
     {
         free( p_sys );
         return VLC_ENOMEM;
     }
-    memset( p_sys->p_last, 0 ,sizeof( float ) * (i_channels) *
-            (p_filter->p_sys->i_nb + 2) );
+
     return VLC_SUCCESS;
 }
 
@@ -169,10 +167,9 @@ static int Open( vlc_object_t *p_this )
 
     struct aout_filter_sys_t *p_sys = p_filter->p_sys;
 
-    pf_sum = malloc( sizeof(float) * i_channels );
+    pf_sum = calloc( i_channels, sizeof(float) );
     if( !pf_sum )
         return;
-    memset( pf_sum, 0, sizeof(float) * i_channels );
 
     pf_gain = malloc( sizeof(float) * i_channels );
     if( !pf_gain )

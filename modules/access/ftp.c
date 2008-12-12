@@ -367,10 +367,9 @@ static int OutOpen( vlc_object_t *p_this )
     sout_access_out_t *p_access = (sout_access_out_t *)p_this;
     access_sys_t      *p_sys;
 
-    p_sys = malloc( sizeof( *p_sys ) );
-    if( p_sys == NULL )
+    p_sys = calloc( 1, sizeof( *p_sys ) );
+    if( !p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof( *p_sys ) );
 
     /* Init p_access */
     p_sys->fd_data = -1;
