@@ -442,10 +442,9 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
   buf= (char *)malloc(2048);
   if( !buf ) goto error;
 
-  header = (rmff_header_t*)malloc(sizeof(rmff_header_t));
+  header = calloc( 1, sizeof(rmff_header_t) );
   if( !header ) goto error;
 
-  memset(header, 0, sizeof(rmff_header_t));
   header->fileheader=rmff_new_fileheader(4+desc->stream_count);
   header->cont=rmff_new_cont(
       desc->title,
@@ -456,10 +455,9 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
   header->data=rmff_new_dataheader(0,0);
   if( !header->data ) goto error;
 
-  header->streams = (rmff_mdpr_t**) malloc(sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
+  header->streams = calloc( desc->stream_count+1, sizeof(rmff_mdpr_t*) );
   if( !header->streams ) goto error;
 
-  memset(header->streams, 0, sizeof(rmff_mdpr_t*)*(desc->stream_count+1));
   lprintf("number of streams: %u\n", desc->stream_count);
 
   for (i=0; i<desc->stream_count; i++) {
@@ -471,7 +469,7 @@ rmff_header_t *real_parse_sdp(char *data, char **stream_rules, uint32_t bandwidt
 
     lprintf("calling asmrp_match with:\n%s\n%u\n", desc->stream[i]->asm_rule_book, bandwidth);
 
-    n=asmrp_match(desc->stream[i]->asm_rule_book, bandwidth, rulematches);
+    n=asmrp_match(desc->stream[i]->asm_rule_book, bandwidth, rulematches, sizeof(rulematches)/sizeof(rulematches[0]));
     for (j=0; j<n; j++) {
       lprintf("asmrp rule match: %u for stream %u\n", rulematches[j], desc->stream[i]->stream_id);
       sprintf(b,"stream=%u;rule=%u,", desc->stream[i]->stream_id, rulematches[j]);
