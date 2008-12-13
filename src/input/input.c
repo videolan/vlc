@@ -2904,51 +2904,94 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  * InputGetExtraFiles
  *  Autodetect extra input list
  *****************************************************************************/
-static void InputGetExtraFiles( input_thread_t *p_input,
-                                int *pi_list, char ***pppsz_list,
-                                const char *psz_access, const char *psz_path )
+static void InputGetExtraFilesPattern( input_thread_t *p_input,
+                                       int *pi_list, char ***pppsz_list,
+                                       const char *psz_path,
+                                       const char *psz_match,
+                                       const char *psz_format,
+                                       int i_start, int i_stop )
 {
     int i_list;
     char **ppsz_list;
 
     TAB_INIT( i_list, ppsz_list );
 
-    if( ( psz_access && *psz_access && strcmp( psz_access, "file" ) ) || !psz_path )
+    char *psz_base = strdup( psz_path );
+    if( !psz_base )
         goto exit;
 
+    /* Remove the extension */
+    char *psz_end = &psz_base[strlen(psz_base)-strlen(psz_match)];
+    assert( psz_end >= psz_base);
+    *psz_end = '\0';
 
-    const char *psz_ext = strrchr( psz_path, '.' );
-    if( !psz_ext || strcmp( psz_ext, ".001" ) )
-        goto exit;
-
-    char *psz_file = strdup( psz_path );
-    if( !psz_file )
-        goto exit;
-
-    /* Try to list .xyz files */
-    for( int i = 2; i < 999; i++ )
+    /* Try to list files */
+    for( int i = i_start; i <= i_stop; i++ )
     {
-        char *psz_ext = strrchr( psz_file, '.' );
         struct stat st;
+        char *psz_file;
 
-        snprintf( psz_ext, 5, ".%.3d", i );
+        if( asprintf( &psz_file, psz_format, psz_base, i ) < 0 )
+            break;
 
-        if( utf8_stat( psz_file, &st ) ||
-            !S_ISREG( st.st_mode ) || !st.st_size )
-            continue;
+        if( utf8_stat( psz_file, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
+        {
+            free( psz_file );
+            break;
+        }
 
         msg_Dbg( p_input, "Detected extra file `%s'", psz_file );
-        char *psz_tmp = strdup( psz_file );
-        if( psz_tmp )
-            TAB_APPEND( i_list, ppsz_list, psz_tmp );
+        TAB_APPEND( i_list, ppsz_list, psz_file );
     }
-    free( psz_file );
-
+    free( psz_base );
 exit:
     *pi_list = i_list;
     *pppsz_list = ppsz_list;
 }
 
+static void InputGetExtraFiles( input_thread_t *p_input,
+                                int *pi_list, char ***pppsz_list,
+                                const char *psz_access, const char *psz_path )
+{
+    static const struct
+    {
+        const char *psz_match;
+        const char *psz_format;
+        int i_start;
+        int i_stop;
+    } p_pattern[] = {
+        /* XXX the order is important */
+        { ".001",         "%s.%.3d",        2, 999 },
+        { ".part1.rar",   "%s.part%.1d.rar",2, 9 },
+        { ".part01.rar",  "%s.part%.2d.rar",2, 99, },
+        { ".part001.rar", "%s.part%.3d.rar",2, 999 },
+        { ".rar",         "%s.r%.2d",       1, 99 },
+        { NULL, NULL, 0, 0 }
+    };
+
+    TAB_INIT( *pi_list, *pppsz_list );
+
+    if( ( psz_access && *psz_access && strcmp( psz_access, "file" ) ) || !psz_path )
+        return;
+
+    const size_t i_path = strlen(psz_path);
+
+    for( int i = 0; p_pattern[i].psz_match != NULL; i++ )
+    {
+        const size_t i_ext = strlen(p_pattern[i].psz_match );
+
+        if( i_path < i_ext )
+            continue;
+        if( !strcmp( &psz_path[i_path-i_ext], p_pattern[i].psz_match ) )
+        {
+            InputGetExtraFilesPattern( p_input, pi_list, pppsz_list,
+                                       psz_path,
+                                       p_pattern[i].psz_match, p_pattern[i].psz_format,
+                                       p_pattern[i].i_start, p_pattern[i].i_stop );
+            return;
+        }
+    }
+}
 
 /* */
 static void input_ChangeState( input_thread_t *p_input, int i_state )
