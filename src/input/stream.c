@@ -266,7 +266,7 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
         return NULL;
     }
 
-    if( !( p_res = stream_AccessNew( p_access ) ) )
+    if( !( p_res = stream_AccessNew( p_access, NULL ) ) )
     {
         access_Delete( p_access );
         return NULL;
@@ -276,16 +276,15 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     return p_res;
 }
 
-stream_t *stream_AccessNew( access_t *p_access )
+stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
 {
     stream_t *s = stream_CommonNew( VLC_OBJECT(p_access) );
     stream_sys_t *p_sys;
-    char *psz_list = NULL;
 
     if( !s )
         return NULL;
 
-    s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
+    s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
     {
         stream_CommonDelete( s );
@@ -317,67 +316,54 @@ stream_t *stream_AccessNew( access_t *p_access )
     p_sys->stat.i_seek_count = 0;
     p_sys->stat.i_seek_time = 0;
 
-    p_sys->i_list = 0;
-    p_sys->list = 0;
+    TAB_INIT( p_sys->i_list, p_sys->list );
     p_sys->i_list_index = 0;
-    p_sys->p_list_access = 0;
+    p_sys->p_list_access = NULL;
 
     /* Get the additional list of inputs if any (for concatenation) */
-    if( (psz_list = var_CreateGetString( s, "input-list" )) && *psz_list )
+    if( ppsz_list && ppsz_list[0] )
     {
-        access_entry_t *p_entry = malloc( sizeof(access_entry_t) );
-        if( p_entry == NULL )
+        access_entry_t *p_entry = malloc( sizeof(*p_entry) );
+        if( !p_entry )
             goto error;
-        char *psz_name, *psz_parser = psz_name = psz_list;
 
-        p_sys->p_list_access = p_access;
         p_entry->i_size = p_access->info.i_size;
         p_entry->psz_path = strdup( p_access->psz_path );
-        if( p_entry->psz_path == NULL )
+        if( !p_entry->psz_path )
         {
             free( p_entry );
             goto error;
         }
+        p_sys->p_list_access = p_access;
         TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
         msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
                  p_entry->psz_path, p_access->info.i_size );
 
-        while( psz_name && *psz_name )
+        for( int i = 0; ppsz_list[i] != NULL; i++ )
         {
-            psz_parser = strchr( psz_name, ',' );
-            if( psz_parser ) *psz_parser = 0;
+            char *psz_name = strdup( ppsz_list[i] );
 
-            psz_name = strdup( psz_name );
-            if( psz_name )
+            if( !psz_name )
+                break;
+
+            access_t *p_tmp = access_New( p_access,
+                                          p_access->psz_access, "", psz_name );
+            if( !p_tmp )
+                continue;
+
+            msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
+                     psz_name, p_tmp->info.i_size );
+
+            p_entry = malloc( sizeof(*p_entry) );
+            if( p_entry )
             {
-                access_t *p_tmp = access_New( p_access, p_access->psz_access,
-                                               "", psz_name );
-
-                if( !p_tmp )
-                {
-                    psz_name = psz_parser;
-                    if( psz_name ) psz_name++;
-                    continue;
-                }
-
-                msg_Dbg( p_access, "adding file `%s', (%"PRId64" bytes)",
-                         psz_name, p_tmp->info.i_size );
-
-                p_entry = malloc( sizeof(access_entry_t) );
-                if( p_entry == NULL )
-                    goto error;
                 p_entry->i_size = p_tmp->info.i_size;
                 p_entry->psz_path = psz_name;
                 TAB_APPEND( p_sys->i_list, p_sys->list, p_entry );
-
-                access_Delete( p_tmp );
             }
-
-            psz_name = psz_parser;
-            if( psz_name ) psz_name++;
+            access_Delete( p_tmp );
         }
     }
-    FREENULL( psz_list );
 
     /* Peek */
     p_sys->i_peek = 0;
@@ -464,7 +450,6 @@ error:
     while( p_sys->i_list > 0 )
         free( p_sys->list[--(p_sys->i_list)] );
     free( p_sys->list );
-    free( psz_list );
     free( s->p_sys );
     vlc_object_detach( s );
     stream_CommonDelete( s );

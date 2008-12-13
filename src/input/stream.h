@@ -44,14 +44,35 @@ struct stream_text_t
 stream_t *stream_CommonNew( vlc_object_t * );
 void stream_CommonDelete( stream_t * );
 
-/* */
-stream_t *stream_AccessNew( access_t *p_access );
+/**
+ * This function creates a stream_t from a provided access_t.
+ *
+ * An optional NULL terminated list of file may be provided. The content
+ * of these extra files will be concatenated after to the main access.
+ *
+ * XXX ppsz_list is treated as const (I failed to avoid a warning when
+ * using const keywords for pointer of pointers)
+ */
+stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list );
 
-/* */
+/**
+ * This function creates a new stream_t filter.
+ *
+ * You must release it using stream_Delete unless it is used as a
+ * source to another filter.
+ */
 stream_t *stream_FilterNew( stream_t *p_source,
                             const char *psz_stream_filter );
 
-/* */
+/**
+ * This function creates a chain of filters:
+ * - first, automatic probed stream filters are inserted.
+ * - then, optional user filters (configured by psz_chain) are inserted.
+ * - finaly, an optional record filter is inserted if b_record is true.
+ *
+ * You must release the returned value using stream_Delete unless it is used as a
+ * source to another filter.
+ */
 stream_t *stream_FilterChainNew( stream_t *p_source,
                                  const char *psz_chain,
                                  bool b_record );

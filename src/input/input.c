@@ -98,8 +98,9 @@ static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
 static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta );
-static char *InputGetExtraFiles( input_thread_t *p_input,
-                                 const char *psz_access, const char *psz_path );
+static void InputGetExtraFiles( input_thread_t *p_input,
+                                int *pi_list, char ***pppsz_list,
+                                const char *psz_access, const char *psz_path );
 
 static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_attachment,
                               int i_new, input_attachment_t **pp_new );
@@ -2482,27 +2483,55 @@ static int InputSourceInit( input_thread_t *p_input,
             var_Set( p_input, "can-seek", val );
         }
 
-        /* TODO (maybe)
-         * do not let stream_AccessNew access input-list
-         * but give it a list of access ? */
+        /* */
+        int  i_input_list;
+        char **ppsz_input_list;
 
-        /* Autodetect extra files if none specified */
-        char *psz_input_list = var_CreateGetNonEmptyString( p_input, "input-list" );
-        if( !psz_input_list )
+        TAB_INIT( i_input_list, ppsz_input_list );
+
+        /* On master stream only, use input-list */
+        if( &p_input->p->input == in )
         {
-            char *psz_extra_files = InputGetExtraFiles( p_input, psz_access, psz_path );
-            if( psz_extra_files )
-                var_SetString( p_input, "input-list", psz_extra_files );
-            free( psz_extra_files );
+            char *psz_list;
+            char *psz_parser;
+
+            psz_list =
+            psz_parser = var_CreateGetNonEmptyString( p_input, "input-list" );
+
+            while( psz_parser && *psz_parser )
+            {
+                char *p = strchr( psz_parser, ',' );
+                if( p )
+                    *p++ = '\0';
+
+                if( *psz_parser )
+                {
+                    char *psz_name = strdup( psz_parser );
+                    if( psz_name )
+                        TAB_APPEND( i_input_list, ppsz_input_list, psz_name );
+                }
+
+                psz_parser = p;
+            }
+            free( psz_list );
         }
+        /* Autodetect extra files if none specified */
+        if( i_input_list <= 0 )
+        {
+            InputGetExtraFiles( p_input, &i_input_list, &ppsz_input_list,
+                                psz_access, psz_path );
+        }
+        if( i_input_list > 0 )
+            TAB_APPEND( i_input_list, ppsz_input_list, NULL );
 
         /* Create the stream_t */
-        in->p_stream = stream_AccessNew( in->p_access );
-
-        /* Restore old value */
-        if( !psz_input_list )
-            var_SetString( p_input, "input-list", "" );
-        free( psz_input_list );
+        in->p_stream = stream_AccessNew( in->p_access, ppsz_input_list );
+        if( ppsz_input_list )
+        {
+            for( int i = 0; ppsz_input_list[i] != NULL; i++ )
+                free( ppsz_input_list[i] );
+            TAB_CLEAN( i_input_list, ppsz_input_list );
+        }
 
         if( in->p_stream == NULL )
         {
@@ -2875,22 +2904,26 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
  * InputGetExtraFiles
  *  Autodetect extra input list
  *****************************************************************************/
-static char *InputGetExtraFiles( input_thread_t *p_input,
-                                 const char *psz_access, const char *psz_path )
+static void InputGetExtraFiles( input_thread_t *p_input,
+                                int *pi_list, char ***pppsz_list,
+                                const char *psz_access, const char *psz_path )
 {
-    char *psz_list = NULL;
+    int i_list;
+    char **ppsz_list;
+
+    TAB_INIT( i_list, ppsz_list );
 
     if( ( psz_access && *psz_access && strcmp( psz_access, "file" ) ) || !psz_path )
-        return NULL;
+        goto exit;
 
 
     const char *psz_ext = strrchr( psz_path, '.' );
     if( !psz_ext || strcmp( psz_ext, ".001" ) )
-        return NULL;
+        goto exit;
 
     char *psz_file = strdup( psz_path );
     if( !psz_file )
-        return NULL;
+        goto exit;
 
     /* Try to list .xyz files */
     for( int i = 2; i < 999; i++ )
@@ -2900,30 +2933,20 @@ static char *InputGetExtraFiles( input_thread_t *p_input,
 
         snprintf( psz_ext, 5, ".%.3d", i );
 
-        if( utf8_stat( psz_file, &st )
-         || !S_ISREG( st.st_mode ) || !st.st_size )
+        if( utf8_stat( psz_file, &st ) ||
+            !S_ISREG( st.st_mode ) || !st.st_size )
             continue;
 
         msg_Dbg( p_input, "Detected extra file `%s'", psz_file );
-
-        if( psz_list )
-        {
-            char *psz_old = psz_list;
-            /* FIXME how to handle file with ',' ?*/
-            if( asprintf( &psz_list, "%s,%s", psz_old, psz_file ) < 0 )
-            {
-                psz_list = psz_old;
-                break;
-            }
-        }
-        else
-        {
-            psz_list = strdup( psz_file );
-        }
+        char *psz_tmp = strdup( psz_file );
+        if( psz_tmp )
+            TAB_APPEND( i_list, ppsz_list, psz_tmp );
     }
     free( psz_file );
 
-    return psz_list;
+exit:
+    *pi_list = i_list;
+    *pppsz_list = ppsz_list;
 }
 
 
