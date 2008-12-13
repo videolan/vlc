@@ -25,6 +25,9 @@
 
 package org.videolan.jvlc.internal;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -34,11 +37,19 @@ import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;
 import com.sun.jna.Union;
+import com.sun.jna.win32.W32APIFunctionMapper;
+import com.sun.jna.win32.W32APITypeMapper;
 
 
 public interface LibVlc extends Library
 {
-    LibVlc INSTANCE = (LibVlc) Native.loadLibrary(Platform.isWindows()? "libvlc" : "vlc", LibVlc.class);
+    Map options = new HashMap() {
+        {
+            put(Library.OPTION_DLOPEN_GLOBAL, Boolean.TRUE);
+        }
+    };
+    
+    LibVlc INSTANCE = (LibVlc) Native.loadLibrary(Platform.isWindows()? "libvlc" : "vlc", LibVlc.class, options);
 
     LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
     
