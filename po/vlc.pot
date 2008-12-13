@@ -10556,10 +10556,6 @@ msgstr ""
 msgid "CDG demuxer"
 msgstr ""
 
-#: modules/demux/decomp.c:47
-msgid "Decompression"
-msgstr ""
-
 #: modules/demux/demuxdump.c:42
 msgid "Dump filename"
 msgstr ""

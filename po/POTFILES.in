@@ -493,7 +493,6 @@ modules/demux/avi/avi.c
 modules/demux/avi/libavi.c
 modules/demux/avi/libavi.h
 modules/demux/cdg.c
-modules/demux/decomp.c
 modules/demux/demuxdump.c
 modules/demux/flac.c
 modules/demux/gme.cpp
