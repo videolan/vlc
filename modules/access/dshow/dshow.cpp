@@ -579,7 +579,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     access_sys_t *p_sys;
     int i;
 
-    p_sys = calloc( 1, sizeof( access_sys_t ) );
+    p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
     p_demux->p_sys = (demux_sys_t *)p_sys;
@@ -662,7 +662,7 @@ static int AccessOpen( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
 
-    p_access->p_sys = p_sys = calloc( 1, sizeof( access_sys_t ) );
+    p_access->p_sys = p_sys = (access_sys_t*)calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
