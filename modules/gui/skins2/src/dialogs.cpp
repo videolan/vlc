@@ -163,7 +163,7 @@ bool Dialogs::init()
     if( m_pProvider == NULL )
         return false;
 
-    m_pModule = module_need( m_pProvider, "dialogs provider", NULL, 0 );
+    m_pModule = module_need( m_pProvider, "dialogs provider", NULL, false );
     if( m_pModule == NULL )
     {
         msg_Err( getIntf(), "no suitable dialogs provider found (hint: compile the qt4 plugin, and make sure it is loaded properly)" );

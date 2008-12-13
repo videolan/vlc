@@ -547,7 +547,7 @@ static int OpenBlending( intf_thread_t *p_intf )
                 VLC_FOURCC('Y','U','V','A');
 
     p_intf->p_sys->p_blend->p_module =
-        module_need( p_intf->p_sys->p_blend, "video blending", 0, 0 );
+        module_need( p_intf->p_sys->p_blend, "video blending", NULL, false );
 
     if( !p_intf->p_sys->p_blend->p_module )
         return VLC_EGENERIC;
@@ -596,7 +596,7 @@ static int OpenTextRenderer( intf_thread_t *p_intf )
     if( !p_intf->p_sys->p_text->p_module )
     {
         p_intf->p_sys->p_text->p_module =
-            module_need( p_intf->p_sys->p_text, "text renderer", 0, 0 );
+            module_need( p_intf->p_sys->p_text, "text renderer", NULL, false );
     }
     free( psz_modulename );
 

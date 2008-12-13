@@ -295,7 +295,7 @@ static int CreateVout( vlc_object_t *p_this )
                       psz ? psz : "default" );
 
     p_sys->p_vout->p_module =
-        module_need( p_sys->p_vout, "opengl provider", psz, 0 );
+        module_need( p_sys->p_vout, "opengl provider", psz, false );
     free( psz );
     if( p_sys->p_vout->p_module == NULL )
     {

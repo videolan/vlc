@@ -1450,7 +1450,7 @@ static int ChromaCreate( vout_thread_t *p_vout )
     VideoFormatImportRgb( &p_chroma->fmt_in.video, &p_vout->render );
     VideoFormatImportRgb( &p_chroma->fmt_out.video, &p_vout->output );
 
-    p_chroma->p_module = module_need( p_chroma, "video filter2", NULL, 0 );
+    p_chroma->p_module = module_need( p_chroma, "video filter2", NULL, false );
 
     if( p_chroma->p_module == NULL )
     {

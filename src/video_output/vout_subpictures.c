@@ -949,7 +949,7 @@ static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_heigh
 
     /* */
     if( !p_blend->p_module )
-        p_blend->p_module = module_need( p_blend, "video blending", 0, 0 );
+        p_blend->p_module = module_need( p_blend, "video blending", NULL, false );
 }
 static void SpuRenderCreateAndLoadText( spu_t *p_spu )
 {
@@ -1021,7 +1021,7 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
     p_scale->pf_vout_buffer_del = spu_del_video_buffer;
 
     vlc_object_attach( p_scale, p_obj );
-    p_scale->p_module = module_need( p_scale, "video filter2", 0, 0 );
+    p_scale->p_module = module_need( p_scale, "video filter2", NULL, false );
 
     return p_scale;
 }

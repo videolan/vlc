@@ -755,9 +755,9 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     /* Find a suitable decoder/packetizer module */
     if( i_object_type == VLC_OBJECT_DECODER )
-        p_dec->p_module = module_need( p_dec, "decoder", "$codec", 0 );
+        p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
     else
-        p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", 0 );
+        p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", false );
 
     /* Check if decoder requires already packetized data */
     if( i_object_type == VLC_OBJECT_DECODER &&
@@ -777,7 +777,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
             p_dec->p_owner->p_packetizer->p_module =
                 module_need( p_dec->p_owner->p_packetizer,
-                             "packetizer", "$packetizer", 0 );
+                             "packetizer", "$packetizer", false );
 
             if( !p_dec->p_owner->p_packetizer->p_module )
             {

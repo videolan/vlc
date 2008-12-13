@@ -58,7 +58,7 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
     memcpy( &p_filter->input, p_input_format, sizeof(audio_sample_format_t) );
     memcpy( &p_filter->output, p_output_format,
             sizeof(audio_sample_format_t) );
-    p_filter->p_module = module_need( p_filter, "audio filter", NULL, 0 );
+    p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );
     if ( p_filter->p_module == NULL )
     {
         vlc_object_detach( p_filter );

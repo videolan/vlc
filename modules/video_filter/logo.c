@@ -411,7 +411,7 @@ static int Init( vout_thread_t *p_vout )
             p_vout->output.i_height;
 
     p_sys->p_blend->p_module =
-        module_need( p_sys->p_blend, "video blending", 0, 0 );
+        module_need( p_sys->p_blend, "video blending", NULL, false );
     if( !p_sys->p_blend->p_module )
     {
         msg_Err( p_vout, "can't open blending filter, aborting" );

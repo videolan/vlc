@@ -165,7 +165,7 @@ int input_ArtFind( playlist_t *p_playlist, input_item_t *p_item )
     }
     free( psz_title );
 
-    p_module = module_need( p_playlist, "art finder", 0, false );
+    p_module = module_need( p_playlist, "art finder", NULL, false );
 
     if( p_module )
         i_ret = 1;

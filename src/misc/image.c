@@ -621,7 +621,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     vlc_object_attach( p_dec, p_this );
 
     /* Find a suitable decoder module */
-    p_dec->p_module = module_need( p_dec, "decoder", "$codec", 0 );
+    p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
     if( !p_dec->p_module )
     {
         msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
@@ -703,7 +703,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
     vlc_object_attach( p_enc, p_this );
 
     /* Find a suitable decoder module */
-    p_enc->p_module = module_need( p_enc, "encoder", 0, 0 );
+    p_enc->p_module = module_need( p_enc, "encoder", NULL, false );
     if( !p_enc->p_module )
     {
         msg_Err( p_enc, "no suitable encoder module for fourcc `%4.4s'.\n"
@@ -752,7 +752,7 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
     p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
     p_filter->fmt_out.video = *p_fmt_out;
     p_filter->p_module = module_need( p_filter, "video filter2",
-                                      psz_module, 0 );
+                                      psz_module, false );
 
     if( !p_filter->p_module )
     {

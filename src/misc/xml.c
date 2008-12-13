@@ -43,7 +43,7 @@ xml_t *__xml_Create( vlc_object_t *p_this )
                                "xml" );
     vlc_object_attach( p_xml, p_this );
 
-    p_xml->p_module = module_need( p_xml, "xml", 0, 0 );
+    p_xml->p_module = module_need( p_xml, "xml", NULL, false );
     if( !p_xml->p_module )
     {
         vlc_object_detach( p_xml );

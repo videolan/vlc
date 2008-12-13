@@ -54,7 +54,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_lock_output_fifo( p_aout );
 
     /* Find the best output plug-in. */
-    p_aout->output.p_module = module_need( p_aout, "audio output", "$aout", 0);
+    p_aout->output.p_module = module_need( p_aout, "audio output", "$aout", false );
     if ( p_aout->output.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable audio output module" );

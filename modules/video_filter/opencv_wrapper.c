@@ -334,7 +334,7 @@ static int Init( vout_thread_t *p_vout )
 
     if (p_vout->p_sys->psz_inner_name)
         p_sys->p_opencv->p_module =
-            module_need( p_sys->p_opencv, p_sys->psz_inner_name, 0, 0 );
+            module_need( p_sys->p_opencv, p_sys->psz_inner_name, NULL, false );
 
     if( !p_sys->p_opencv->p_module )
     {

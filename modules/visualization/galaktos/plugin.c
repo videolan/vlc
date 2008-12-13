@@ -226,7 +226,7 @@ static void* Thread( vlc_object_t *p_this )
     p_thread->p_opengl->fmt_render = p_thread->p_opengl->fmt_in;
 
     p_thread->p_module =
-        module_need( p_thread->p_opengl, "opengl provider", NULL, 0 );
+        module_need( p_thread->p_opengl, "opengl provider", NULL, false );
     if( p_thread->p_module == NULL )
     {
         msg_Err( p_thread, "unable to initialize OpenGL" );

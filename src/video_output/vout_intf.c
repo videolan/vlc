@@ -116,7 +116,7 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     wnd->pos_y = *pi_y_hint;
     vlc_object_attach (wnd, p_vout);
 
-    wnd->module = module_need (wnd, "vout_window", 0, 0);
+    wnd->module = module_need (wnd, "vout_window", NULL, false);
     if (wnd->module == NULL)
     {
         msg_Dbg (wnd, "no window provider available");

@@ -69,7 +69,7 @@ tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
         var_SetString (srv, "tls-x509-key", key_path);
     }
 
-    srv->p_module = module_need (srv, "tls server", 0, 0);
+    srv->p_module = module_need (srv, "tls server", NULL, false );
     if (srv->p_module == NULL)
     {
         msg_Err (srv, "TLS server plugin not available");
@@ -185,7 +185,7 @@ tls_ClientCreate (vlc_object_t *obj, int fd, const char *psz_hostname)
     else
         msg_Dbg (cl, "requested anonymous server");
 
-    cl->p_module = module_need (cl, "tls client", 0, 0);
+    cl->p_module = module_need (cl, "tls client", NULL, false );
     if (cl->p_module == NULL)
     {
         msg_Err (cl, "TLS client plugin not available");

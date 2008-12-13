@@ -1077,7 +1077,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
 
     id->p_decoder->p_module =
-        module_need( id->p_decoder, "decoder", "$codec", 0 );
+        module_need( id->p_decoder, "decoder", "$codec", false );
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find audio decoder" );
@@ -1467,7 +1467,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     /* id->p_decoder->p_cfg = p_sys->p_video_cfg; */
 
     id->p_decoder->p_module =
-        module_need( id->p_decoder, "decoder", "$codec", 0 );
+        module_need( id->p_decoder, "decoder", "$codec", false );
 
     if( !id->p_decoder->p_module )
     {
@@ -2279,7 +2279,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
     id->p_decoder->p_module =
-        module_need( id->p_decoder, "decoder", "$codec", 0 );
+        module_need( id->p_decoder, "decoder", "$codec", false );
 
     if( !id->p_decoder->p_module )
     {

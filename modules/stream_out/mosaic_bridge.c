@@ -354,7 +354,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     //p_sys->p_decoder->p_cfg = p_sys->p_video_cfg;
 
     p_sys->p_decoder->p_module =
-        module_need( p_sys->p_decoder, "decoder", "$codec", 0 );
+        module_need( p_sys->p_decoder, "decoder", "$codec", false );
 
     if( !p_sys->p_decoder->p_module || !p_sys->p_decoder->pf_decode_video )
     {
