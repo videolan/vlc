@@ -2302,7 +2302,6 @@ libkate-$(KATE_VERSION).tar.gz:
 
 libkate: libkate-$(KATE_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	(cd $@; autoconf)
 
 .kate: libkate .ogg
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind && make && make install)
@@ -2312,6 +2311,25 @@ libkate: libkate-$(KATE_VERSION).tar.gz
 CLEAN_FILE += .kate
 CLEAN_PKG += libkate
 DISTCLEAN_PKG += libkate-$(KATE_VERSION).tar.gz
+
+# ***************************************************************************
+# tiger
+# ***************************************************************************
+
+libtiger-$(TIGER_VERSION).tar.gz:
+	$(WGET) $(TIGER_URL)
+
+libtiger: libtiger-$(TIGER_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.tiger: libtiger .kate
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .tiger
+CLEAN_PKG += libtiger
+DISTCLEAN_PKG += libtiger-$(TIGER_VERSION).tar.gz
 
 # ***************************************************************************
 # Copy aclocal files

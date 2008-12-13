@@ -5,5 +5,5 @@ all: .a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.live .goom2k4 .caca .mod .x264  .xml .twolame \
 	.mpcdec \
 	.dvbpsi .dirac .schroedinger \
-	.dca .lua .zvbi
+	.dca .lua .zvbi .kate .tiger
 
