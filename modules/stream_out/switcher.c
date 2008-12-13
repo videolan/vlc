@@ -185,8 +185,9 @@ static int Open( vlc_object_t *p_this )
     char              *psz_files, *psz_sizes;
     int               i_height = 0, i_width = 0;
 
-    p_sys = malloc( sizeof(sout_stream_sys_t) );
-    memset( p_sys, 0, sizeof(sout_stream_sys_t) );
+    p_sys = calloc( 1, sizeof(sout_stream_sys_t) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
     if( !p_sys->p_out )
@@ -316,36 +317,35 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
     sout_stream_id_t    *id;
 
-    id = malloc( sizeof( sout_stream_id_t ) );
-    memset( id, 0, sizeof( sout_stream_id_t ) );
-    id->id = NULL;
+    id = calloc( 1, sizeof( sout_stream_id_t ) );
+    if( !id )
+        return NULL;
 
-    if ( p_fmt->i_cat == VIDEO_ES
-            && (p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'v')
-                 || p_fmt->i_codec == VLC_FOURCC('f', 'a', 'k', 'e')) )
+    if( p_fmt->i_cat == VIDEO_ES &&
+        ( p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'v') ||
+          p_fmt->i_codec == VLC_FOURCC('f', 'a', 'k', 'e') ) )
     {
         id->b_switcher_video = true;
         p_fmt->i_codec = VLC_FOURCC('m', 'p', 'g', 'v');
-        msg_Dbg( p_stream,
-                 "creating video switcher for fcc=`%4.4s' cmd:%d",
+        msg_Dbg( p_stream, "creating video switcher for fcc=`%4.4s' cmd:%d",
                  (char*)&p_fmt->i_codec, p_sys->i_cmd );
     }
-    else if ( p_fmt->i_cat == AUDIO_ES
-               && p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'a')
-               && p_sys->b_audio )
+    else if ( p_fmt->i_cat == AUDIO_ES &&
+              p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'a') &&
+              p_sys->b_audio )
     {
         int i_ff_codec = CODEC_ID_MP2;
         int i;
 
         id->b_switcher_audio = true;
-        msg_Dbg( p_stream,
-                 "creating audio switcher for fcc=`%4.4s' cmd:%d",
+        msg_Dbg( p_stream, "creating audio switcher for fcc=`%4.4s' cmd:%d",
                  (char*)&p_fmt->i_codec, p_sys->i_cmd );
 
         /* Allocate the encoder right now. */
         if( i_ff_codec == 0 )
         {
             msg_Err( p_stream, "cannot find encoder" );
+            free( id );
             return NULL;
         }
 
@@ -353,6 +353,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( !id->ff_enc )
         {
             msg_Err( p_stream, "cannot find encoder (avcodec)" );
+            free( id );
             return NULL;
         }
 
@@ -386,29 +387,29 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
         {
             msg_Err( p_stream, "cannot open encoder" );
+            av_free( id->ff_enc_c );
+            free( id );
             return NULL;
         }
 
         id->p_buffer_out = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE * 2 );
-        id->p_samples = malloc( id->ff_enc_c->frame_size
-                                 * p_fmt->audio.i_channels * sizeof(int16_t) );
-        memset( id->p_samples, 0,
-                id->ff_enc_c->frame_size * p_fmt->audio.i_channels
-                 * sizeof(int16_t) );
+        id->p_samples = calloc( id->ff_enc_c->frame_size * p_fmt->audio.i_channels,
+                                sizeof(int16_t) );
+        if( !id->p_buffer_out || !id->p_samples )
+            goto error;
 
-        for ( i = 0; i < MAX_AUDIO; i++ )
+        for( i = 0; i < MAX_AUDIO; i++ )
         {
-            if ( p_sys->pp_audio_ids[i] == NULL )
+            if( p_sys->pp_audio_ids[i] == NULL )
             {
                 p_sys->pp_audio_ids[i] = id;
                 break;
             }
         }
-        if ( i == MAX_AUDIO )
+        if( i == MAX_AUDIO )
         {
             msg_Err( p_stream, "too many audio streams!" );
-            free( id );
-            return NULL;
+            goto error;
         }
     }
     else
@@ -423,13 +424,16 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     /* open output stream */
     id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
 
-    if ( id->id == NULL )
-    {
-        free( id );
-        return NULL;
-    }
+    if( id->id != NULL )
+        return id;
 
-    return id;
+error:
+    avcodec_close( id->ff_enc_c );
+    free( id->p_samples );
+    free( id->p_buffer_out );
+    av_free( id->ff_enc_c );
+    free( id );
+    return NULL;
 }
 
 /*****************************************************************************
