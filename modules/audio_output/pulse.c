@@ -118,10 +118,9 @@ static int Open ( vlc_object_t *p_this )
     struct pa_channel_map map;
 
     /* Allocate structures */
-    p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
+    p_aout->output.p_sys = p_sys = calloc( 1, sizeof( aout_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof( aout_sys_t ) );
 
     PULSE_DEBUG( "Pulse start initialization");
 

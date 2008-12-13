@@ -183,12 +183,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     vlc_value_t val;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
+    if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) ) ) == NULL )
         return VLC_ENOMEM;
-    }
-    memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_dec->p_sys->p_context = p_context;
     p_dec->p_sys->p_codec = p_codec;

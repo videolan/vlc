@@ -199,14 +199,11 @@ static int Open( vlc_object_t *p_this )
     p_dec->pf_decode_sub = Decode;
 
     /* Allocate the memory needed to store the decoder's structure */
-    p_dec->p_sys = p_sys = malloc( sizeof( *p_sys ) );
+    p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
     /* init of p_sys */
-    memset( p_sys, 0, sizeof( *p_sys ) );
-    p_sys->i_block = 0;
-
     p_sys->i_field = i_field;
     p_sys->i_channel = i_channel;
 

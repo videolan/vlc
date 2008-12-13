@@ -192,16 +192,12 @@ void *bonjour_start_service( vlc_object_t *p_log, const char *psz_stype,
                              const char *psz_name, int i_port, char *psz_txt )
 {
     int err;
-    bonjour_t *p_sys;
 
-    p_sys = (bonjour_t *)malloc( sizeof(*p_sys) );
+    bonjour_t* p_sys = calloc( 1, sizeof(*p_sys) );
     if( p_sys == NULL )
         return NULL;
 
-    memset( p_sys, 0, sizeof(*p_sys) );
-
     p_sys->p_log = p_log;
-
     p_sys->i_port = i_port;
     p_sys->psz_name = avahi_strdup( psz_name );
     p_sys->psz_stype = avahi_strdup( psz_stype );

@@ -354,13 +354,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'W', 'M', 'V', '2' ):
         case VLC_FOURCC( 'W', 'M', 'V', '3' ):
         case VLC_FOURCC( 'S', 'N', 'O', 'W' ):
-            p_stream->p_oggds_header = malloc( sizeof(oggds_header_t) );
+            p_stream->p_oggds_header = calloc( 1, sizeof(oggds_header_t) );
             if( !p_stream->p_oggds_header )
             {
                 free( p_stream );
                 return VLC_ENOMEM;
             }
-            memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
             memcpy( p_stream->p_oggds_header->stream_type, "video", 5 );
@@ -476,13 +475,12 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         switch( p_stream->i_fourcc )
         {
         case VLC_FOURCC( 's', 'u','b', 't' ):
-            p_stream->p_oggds_header = malloc( sizeof(oggds_header_t) );
+            p_stream->p_oggds_header = calloc( 1, sizeof(oggds_header_t) );
             if( !p_stream->p_oggds_header )
             {
                 free( p_stream );
                 return VLC_ENOMEM;
             }
-            memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
             memcpy( p_stream->p_oggds_header->stream_type, "text", 4 );

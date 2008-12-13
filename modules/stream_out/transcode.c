@@ -693,10 +693,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t *id;
 
-    id = malloc( sizeof( sout_stream_id_t ) );
+    id = calloc( 1, sizeof( sout_stream_id_t ) );
     if( !id )
         goto error;
-    memset( id, 0, sizeof(sout_stream_id_t) );
 
     id->id = NULL;
     id->p_decoder = NULL;

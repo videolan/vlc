@@ -87,11 +87,10 @@ static int Open (vlc_object_t *obj)
     access->pf_control = Control;
     access->info = src->info;
 
-    access_sys_t *p_sys = access->p_sys = malloc (sizeof (*p_sys));
-    if (p_sys == NULL)
+    access_sys_t *p_sys = access->p_sys = calloc( 1, sizeof (*p_sys) );
+    if( !p_sys )
         return VLC_ENOMEM;
 
-    memset (p_sys, 0, sizeof (*p_sys));
     p_sys->bandwidth = var_CreateGetInteger (access, "access-bandwidth");
     p_sys->last_time = mdate ();
 
@@ -175,3 +174,4 @@ static int Seek (access_t *access, int64_t offset)
     access->info = src->info;
     return ret;
 }
+

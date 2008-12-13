@@ -368,14 +368,13 @@ static void Close( vlc_object_t * p_this )
 static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
                               input_item_t *p_item )
 {
-    vod_sys_t *p_sys = p_vod->p_sys;
-    vod_media_t *p_media = malloc( sizeof(vod_media_t) );
     int i;
+    vod_sys_t *p_sys = p_vod->p_sys;
 
+    vod_media_t *p_media = calloc( 1, sizeof(vod_media_t) );
     if( !p_media )
         return NULL;
 
-    memset( p_media, 0, sizeof(vod_media_t) );
     p_media->id = p_sys->i_media_id++;
     TAB_INIT( p_media->i_es, p_media->es );
     p_media->psz_mux = NULL;
@@ -498,11 +497,10 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 
 static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
 {
-    media_es_t *p_es = malloc( sizeof(media_es_t) );
     char *psz_urlc;
-
-    if( !p_es ) return VLC_ENOMEM;
-    memset( p_es, 0, sizeof(media_es_t) );
+    media_es_t *p_es = calloc( 1, sizeof(media_es_t) );
+    if( !p_es )
+        return VLC_ENOMEM;
 
     free( p_media->psz_mux );
     p_media->psz_mux = NULL;
@@ -896,10 +894,10 @@ static void* CommandThread( vlc_object_t *p_this )
  ****************************************************************************/
 static rtsp_client_t *RtspClientNew( vod_media_t *p_media, char *psz_session )
 {
-    rtsp_client_t *p_rtsp = malloc( sizeof(rtsp_client_t) );
+    rtsp_client_t *p_rtsp = calloc( 1, sizeof(rtsp_client_t) );
 
-    if( !p_rtsp ) return NULL;
-    memset( p_rtsp, 0, sizeof(rtsp_client_t) );
+    if( !p_rtsp )
+        return NULL;
     p_rtsp->es = 0;
 
     p_rtsp->psz_session = psz_session;

@@ -1368,9 +1368,7 @@ static void ConditionalAccessOpen( access_t * p_access, int i_session_id )
 
     p_sys->p_sessions[i_session_id - 1].pf_handle = ConditionalAccessHandle;
     p_sys->p_sessions[i_session_id - 1].pf_close = ConditionalAccessClose;
-    p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(system_ids_t));
-    memset( p_sys->p_sessions[i_session_id - 1].p_sys, 0,
-            sizeof(system_ids_t) );
+    p_sys->p_sessions[i_session_id - 1].p_sys = calloc( 1, sizeof(system_ids_t) );
 
     APDUSend( p_access, i_session_id, AOT_CA_INFO_ENQ, NULL, 0 );
 }
@@ -1500,8 +1498,7 @@ static void DateTimeOpen( access_t * p_access, int i_session_id )
     p_sys->p_sessions[i_session_id - 1].pf_handle = DateTimeHandle;
     p_sys->p_sessions[i_session_id - 1].pf_manage = DateTimeManage;
     p_sys->p_sessions[i_session_id - 1].pf_close = DateTimeClose;
-    p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(date_time_t));
-    memset( p_sys->p_sessions[i_session_id - 1].p_sys, 0, sizeof(date_time_t) );
+    p_sys->p_sessions[i_session_id - 1].p_sys = calloc( 1, sizeof(date_time_t) );
 
     DateTimeSend( p_access, i_session_id );
 }

@@ -120,10 +120,9 @@ static int Create( vlc_object_t *p_this )
 
     p_dec->pf_decode_sub = DecodeBlock;
 
-    p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+    p_dec->p_sys = p_sys = calloc( 1, sizeof( decoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    memset( &p_sys->fmt_cached, 0, sizeof( p_sys->fmt_cached ) );
 
     p_sys->p_stream_ext = p_stream_ext;
     p_sys->pf_push_packet = p_stream_ext->push_packet;
