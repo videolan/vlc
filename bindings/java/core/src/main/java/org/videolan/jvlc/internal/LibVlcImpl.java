@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 import org.videolan.jvlc.internal.LibVlc.LibVlcCallback;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
 import org.videolan.jvlc.internal.LibVlc.libvlc_event_t;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
@@ -61,7 +61,7 @@ public class LibVlcImpl
         
         LibVlcInstance libvlc_instance_t = libVlc.libvlc_new(0, new String[] {"/usr/local/bin/vlc"}, exception);
 
-        LibVlcMediaDescriptor mediaDescriptor = libVlc
+        LibVlcMedia mediaDescriptor = libVlc
             .libvlc_media_new(libvlc_instance_t, "/home/carone/a.avi", exception);
 
         LibVlcMediaInstance mediaPlayer = libVlc.libvlc_media_player_new_from_media(mediaDescriptor, exception);

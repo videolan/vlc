@@ -28,7 +28,7 @@ package org.videolan.jvlc.internal;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
@@ -51,7 +51,7 @@ public class MediaListTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
-        LibVlcMediaDescriptor libvlc_media = libvlc.libvlc_media_new(
+        LibVlcMedia libvlc_media = libvlc.libvlc_media_new(
             libvlcInstance,
             mrl,
             exception);
@@ -65,7 +65,7 @@ public class MediaListTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
-        LibVlcMediaDescriptor libvlc_media = libvlc.libvlc_media_new(
+        LibVlcMedia libvlc_media = libvlc.libvlc_media_new(
             libvlcInstance,
             mrl,
             exception);
@@ -95,7 +95,7 @@ public class MediaListTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
-        LibVlcMediaDescriptor libvlc_media = libvlc.libvlc_media_new(
+        LibVlcMedia libvlc_media = libvlc.libvlc_media_new(
             libvlcInstance,
             mrl,
             exception);
@@ -111,7 +111,7 @@ public class MediaListTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
-        LibVlcMediaDescriptor libvlc_media = libvlc.libvlc_media_new(
+        LibVlcMedia libvlc_media = libvlc.libvlc_media_new(
             libvlcInstance,
             mrl,
             exception);
@@ -126,7 +126,7 @@ public class MediaListTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         String mrl = this.getClass().getResource("/raffa_voice.ogg").getPath();
-        LibVlcMediaDescriptor libvlc_media = libvlc.libvlc_media_new(
+        LibVlcMedia libvlc_media = libvlc.libvlc_media_new(
             libvlcInstance,
             mrl,
             exception);

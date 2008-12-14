@@ -28,7 +28,7 @@ package org.videolan.jvlc.internal;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
@@ -39,7 +39,7 @@ public class MediaDescriptorTest extends AbstractVLCInternalTest
     public void mediaDescriptorNew() throws Exception
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         Assert.assertNotNull(md);
         Assert.assertEquals(0, exception.raised);
     }
@@ -48,7 +48,7 @@ public class MediaDescriptorTest extends AbstractVLCInternalTest
     public void mediaDescriptorGetMrl()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaDescriptor md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         String mdMrl = libvlc.libvlc_media_get_mrl(md);
         Assert.assertEquals(mrl, mdMrl);
     }

@@ -27,13 +27,13 @@ package org.videolan.jvlc;
 
 import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
 public class MediaDescriptor
 {
-    private LibVlcMediaDescriptor instance;
+    private LibVlcMedia instance;
     private LibVlc libvlc;
     private LibVlcEventManager eventManager;
     private boolean released;
@@ -50,7 +50,7 @@ public class MediaDescriptor
         eventManager = libvlc.libvlc_media_event_manager(instance, exception);
     }
 
-    MediaDescriptor(JVLC jvlc, LibVlcMediaDescriptor instance)
+    MediaDescriptor(JVLC jvlc, LibVlcMedia instance)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         libvlc = jvlc.getLibvlc();
@@ -90,7 +90,7 @@ public class MediaDescriptor
      * Returns the instance.
      * @return the instance
      */
-    LibVlcMediaDescriptor getInstance()
+    LibVlcMedia getInstance()
     {
         return instance;
     }

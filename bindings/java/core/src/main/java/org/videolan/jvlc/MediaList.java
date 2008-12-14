@@ -30,7 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaDescriptor;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
@@ -112,7 +112,7 @@ public class MediaList
         {
             throw new IndexOutOfBoundsException();
         }
-        LibVlcMediaDescriptor descriptor = jvlc.getLibvlc().libvlc_media_list_item_at_index(instance, index, exception);
+        LibVlcMedia descriptor = jvlc.getLibvlc().libvlc_media_list_item_at_index(instance, index, exception);
         return new MediaDescriptor(jvlc, descriptor);
     }
 

@@ -99,7 +99,7 @@ public interface LibVlc extends Library
     public class media_subitem_added extends Structure
     {
 
-        public LibVlcMediaDescriptor new_child;
+        public LibVlcMedia new_child;
     }
 
     public class media_duration_changed extends Structure
@@ -117,7 +117,7 @@ public interface LibVlc extends Library
     public class media_freed extends Structure
     {
 
-        public LibVlcMediaDescriptor md;
+        public LibVlcMedia md;
     }
 
     public class media_state_changed extends Structure
@@ -146,7 +146,7 @@ public interface LibVlc extends Library
     public class media_list_item_added extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -154,7 +154,7 @@ public interface LibVlc extends Library
     public class media_list_will_add_item extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -162,7 +162,7 @@ public interface LibVlc extends Library
     public class media_list_item_deleted extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -170,7 +170,7 @@ public interface LibVlc extends Library
     public class media_list_will_delete_item extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -179,7 +179,7 @@ public interface LibVlc extends Library
     public class media_list_view_item_added extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -187,7 +187,7 @@ public interface LibVlc extends Library
     public class media_list_view_will_add_item extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -195,7 +195,7 @@ public interface LibVlc extends Library
     public class media_list_view_item_deleted extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -203,7 +203,7 @@ public interface LibVlc extends Library
     public class media_list_view_will_delete_item extends Structure
     {
 
-        public LibVlcMediaDescriptor item;
+        public LibVlcMedia item;
 
         public int index;
     }
@@ -261,7 +261,7 @@ public interface LibVlc extends Library
     {
     }
 
-    public class LibVlcMediaDescriptor extends PointerType
+    public class LibVlcMedia extends PointerType
     {
     }
 
@@ -407,21 +407,21 @@ public interface LibVlc extends Library
 
     // media descriptor
 
-    LibVlcMediaDescriptor libvlc_media_new(LibVlcInstance libvlc_instance, String mrl, libvlc_exception_t exception);
+    LibVlcMedia libvlc_media_new(LibVlcInstance libvlc_instance, String mrl, libvlc_exception_t exception);
 
-    void libvlc_media_add_option(LibVlcMediaDescriptor media, String option, libvlc_exception_t exception);
+    void libvlc_media_add_option(LibVlcMedia media, String option, libvlc_exception_t exception);
 
-    String libvlc_media_get_mrl(LibVlcMediaDescriptor media);
+    String libvlc_media_get_mrl(LibVlcMedia media);
 
-    void libvlc_media_release(LibVlcMediaDescriptor media);
+    void libvlc_media_release(LibVlcMedia media);
 
-    LibVlcEventManager libvlc_media_event_manager(LibVlcMediaDescriptor media, libvlc_exception_t exception);
+    LibVlcEventManager libvlc_media_event_manager(LibVlcMedia media, libvlc_exception_t exception);
 
     // media player
 
     LibVlcMediaInstance libvlc_media_player_new(LibVlcInstance instance, libvlc_exception_t exception);
 
-    LibVlcMediaInstance libvlc_media_player_new_from_media(LibVlcMediaDescriptor media, libvlc_exception_t exception);
+    LibVlcMediaInstance libvlc_media_player_new_from_media(LibVlcMedia media, libvlc_exception_t exception);
 
     void libvlc_media_player_play(LibVlcMediaInstance media_player, libvlc_exception_t exception);
 
@@ -465,25 +465,25 @@ public interface LibVlc extends Library
     void libvlc_media_list_add_file_content(LibVlcMediaList libvlc_media_list, String fileName,
         libvlc_exception_t exception);
 
-    void libvlc_media_list_set_media(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+    void libvlc_media_list_set_media(LibVlcMediaList libvlc_media_list, LibVlcMedia libvlc_media,
         libvlc_exception_t exception);
 
-    LibVlcMediaDescriptor libvlc_media_list_media(LibVlcMediaList libvlc_media_list, libvlc_exception_t exception);
+    LibVlcMedia libvlc_media_list_media(LibVlcMediaList libvlc_media_list, libvlc_exception_t exception);
 
-    void libvlc_media_list_add_media(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+    void libvlc_media_list_add_media(LibVlcMediaList libvlc_media_list, LibVlcMedia libvlc_media,
         libvlc_exception_t exception);
 
-    void libvlc_media_list_insert_media(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+    void libvlc_media_list_insert_media(LibVlcMediaList libvlc_media_list, LibVlcMedia libvlc_media,
         int position, libvlc_exception_t exception);
 
     void libvlc_media_list_remove_index(LibVlcMediaList libvlc_media_list, int position, libvlc_exception_t exception);
 
     int libvlc_media_list_count(LibVlcMediaList libvlc_media_list, libvlc_exception_t exception);
 
-    LibVlcMediaDescriptor libvlc_media_list_item_at_index(LibVlcMediaList libvlc_media_list, int position,
+    LibVlcMedia libvlc_media_list_item_at_index(LibVlcMediaList libvlc_media_list, int position,
         libvlc_exception_t exception);
 
-    int libvlc_media_list_index_of_item(LibVlcMediaList libvlc_media_list, LibVlcMediaDescriptor libvlc_media,
+    int libvlc_media_list_index_of_item(LibVlcMediaList libvlc_media_list, LibVlcMedia libvlc_media,
         libvlc_exception_t exception);
 
     int libvlc_media_list_is_readonly(LibVlcMediaList libvlc_media_list);
@@ -514,7 +514,7 @@ public interface LibVlc extends Library
         libvlc_exception_t exception);
 
     void libvlc_media_list_player_play_item(LibVlcMediaListPlayer libvlc_media_list_player,
-        LibVlcMediaDescriptor libvlc_media, libvlc_exception_t exception);
+        LibVlcMedia libvlc_media, libvlc_exception_t exception);
 
     void libvlc_media_list_player_stop(LibVlcMediaListPlayer libvlc_media_list_player, libvlc_exception_t exception);
 
