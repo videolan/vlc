@@ -34,8 +34,6 @@ public enum LibVlcState
     libvlc_Playing, // 3
     libvlc_Paused, // 4
     libvlc_Stopped, // 5
-    libvlc_Forward, // 6
-    libvlc_Backward, // 7
-    libvlc_Ended, // 8
-    libvlc_Error; // 9
+    libvlc_Ended, // 6
+    libvlc_Error; // 7
 }
