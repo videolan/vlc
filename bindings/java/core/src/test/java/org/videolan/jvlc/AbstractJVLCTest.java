@@ -47,7 +47,7 @@ public abstract class AbstractJVLCTest
 
     protected String mrl;
 
-    private String address = "http://streams.videolan.org/streams-videolan/reference/mp4/bl.mp4";
+    private String address = "http://streams.videolan.org/streams-videolan/avi/Hero-Div3.avi";
 
     /**
      * Logger.

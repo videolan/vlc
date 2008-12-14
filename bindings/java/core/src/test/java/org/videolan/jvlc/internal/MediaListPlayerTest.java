@@ -98,9 +98,6 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
-    /**
-     * this fails: see https://trac.videolan.org/vlc/ticket/1527
-     */
     @Test
     public void mediaListPlayerPlay()
     {
@@ -115,7 +112,6 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
         Assert.assertEquals("Exception message: " + exception.message + ".\n", 0, exception.raised);
         libvlc.libvlc_media_release(mediaDescriptor);
         libvlc.libvlc_media_list_release(mediaList);
-        libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
     @Test

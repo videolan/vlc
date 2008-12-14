@@ -54,7 +54,7 @@ public abstract class AbstractVLCInternalTest
 
     protected libvlc_exception_t exception;
 
-    private String address = "http://streams.videolan.org/streams-videolan/reference/avi/Hero-Div3.avi";
+    private String address = "http://streams.videolan.org/streams-videolan/avi/Hero-Div3.avi";
 
     /**
      * Logger.
@@ -122,6 +122,10 @@ public abstract class AbstractVLCInternalTest
             {
                 out.write(buffer, 0, numRead);
                 numWritten += numRead;
+            }
+            if (numWritten == 0)
+            {
+                throw new RuntimeException("Cannot download sample, please check the url or your internet connection.");
             }
             log.info("Sample downloaded.");
             mrl = testResoucesPath + ".avi";
