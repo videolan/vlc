@@ -358,7 +358,7 @@ static int Demux( demux_t *p_demux )
     {
         real_track_t *tk = p_sys->track[i];
 
-        if( i_pcr <= 0 || ( tk->i_last_dts > 0 && tk->i_last_dts > i_pcr ) )
+        if( i_pcr <= 0 || ( tk->i_last_dts > 0 && tk->i_last_dts < i_pcr ) )
             i_pcr = tk->i_last_dts;
     }
     if( i_pcr > 0 && i_pcr != p_sys->i_pcr )
@@ -701,7 +701,8 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
            tk->p_subpackets[tk->i_out_subpacket] )
     {
         block_t *p_block = tk->p_subpackets[tk->i_out_subpacket];
-        tk->p_subpackets[tk->i_out_subpacket] = 0;
+        tk->p_subpackets[tk->i_out_subpacket] = NULL;
+
         if( tk->p_subpackets_timecode[tk->i_out_subpacket] )
         {
             p_block->i_dts =
