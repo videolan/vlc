@@ -672,11 +672,13 @@ void CaptureOpenPanel::initialize()
     bdas->setChecked( true );
     bdac = new QRadioButton( "DVB-C" );
     bdat = new QRadioButton( "DVB-T" );
+    bdaa = new QRadioButton( "ATSC" );
 
     bdaDevLayout->addWidget( bdaTypeLabel, 0, 0 );
     bdaDevLayout->addWidget( bdas, 0, 1 );
     bdaDevLayout->addWidget( bdac, 0, 2 );
     bdaDevLayout->addWidget( bdat, 0, 3 );
+    bdaDevLayout->addWidget( bdaa, 0, 4 );
 
     /* bda Props */
     QLabel *bdaFreqLabel =
@@ -718,9 +720,11 @@ void CaptureOpenPanel::initialize()
     BUTTONACT( bdas, updateButtons() );
     BUTTONACT( bdat, updateButtons() );
     BUTTONACT( bdac, updateButtons() );
+    BUTTONACT( bdaa, updateButtons() );
     BUTTONACT( bdas, updateMRL() );
     BUTTONACT( bdat, updateMRL() );
     BUTTONACT( bdac, updateMRL() );
+    BUTTONACT( bdaa, updateMRL() );
     }
 
 #else /* WIN32 */
@@ -1026,11 +1030,12 @@ void CaptureOpenPanel::updateMRL()
         if( bdas->isChecked() ) mrl = "dvb-s://";
         else if(  bdat->isChecked() ) mrl = "dvb-t://";
         else if(  bdac->isChecked() ) mrl = "dvb-c://";
+        else if(  bdaa->isChecked() ) mrl = "atsc://";
         else return;
         mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
-        else
+        else if( bdat->isChecked() )
             mrl += " :dvb-bandwidth=" +
                 QString("%1").arg( bdaBandBox->itemData(
                     bdaBandBox->currentIndex() ).toInt() );
@@ -1123,7 +1128,7 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->hide();
             bdaBandLabel->hide();
         }
-        else
+        else if( bdat->isChecked() )
         {
             bdaSrate->hide();
             bdaSrateLabel->hide();
