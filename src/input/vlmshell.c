@@ -138,9 +138,20 @@ static const char *FindCommandEnd( const char *psz_sent )
 static int Unescape( char *out, const char *in )
 {
     char c, quote = 0;
+    bool param = false;
 
     while( (c = *in++) != '\0' )
     {
+        // Don't escape the end of the string if we find a '#'
+        // that's the begining of a vlc command
+        // TODO: find a better solution
+        if( c == '#' || param )
+        {
+            param = true;
+            *out++ = c;
+            continue;
+        }
+
         if( !quote )
         {
             if (strchr(quotes,c))   // opening quote
