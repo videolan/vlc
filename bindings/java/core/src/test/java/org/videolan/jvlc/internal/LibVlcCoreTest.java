@@ -53,4 +53,14 @@ public class LibVlcCoreTest
         instance.libvlc_release(libvlcInstance);
     }
     
+    @Test
+    public void testAddIntf() throws Exception
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcInstance libvlcInstance = instance.libvlc_new(0, new String[] {}, exception);
+        instance.libvlc_add_intf(libvlcInstance, "dummy", exception);
+        Assert.assertEquals(0, exception.raised);
+        instance.libvlc_release(libvlcInstance);
+    }
+    
 }
