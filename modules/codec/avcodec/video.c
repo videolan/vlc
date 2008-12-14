@@ -151,8 +151,8 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         }
     }
 
-    if( p_dec->fmt_out.video.i_frame_rate > 0 &&
-        p_dec->fmt_out.video.i_frame_rate_base > 0 )
+    if( p_dec->fmt_in.video.i_frame_rate > 0 &&
+        p_dec->fmt_in.video.i_frame_rate_base > 0 )
     {
         p_dec->fmt_out.video.i_frame_rate =
             p_dec->fmt_in.video.i_frame_rate;
