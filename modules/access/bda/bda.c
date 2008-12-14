@@ -36,7 +36,6 @@ static void Close( vlc_object_t *p_this );
 static block_t *Block( access_t * );
 static int Control( access_t *, int, va_list );
 
-
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Caching value for DVB streams. This " \
@@ -108,16 +107,25 @@ static const char *const ppsz_inversion_text[] = { N_("Undefined"), N_("Off"),
 
 /* Cable */
 #define MODULATION_TEXT N_("Modulation type")
-#define MODULATION_LONGTEXT N_("QAM constellation points " \
-    "[16, 32, 64, 128, 256]")
-static const int i_qam_list[] = { -1, 16, 32, 64, 128, 256 };
-static const char *const ppsz_qam_text[] = {
-    N_("Undefined"), N_("16"), N_("32"), N_("64"), N_("128"), N_("256") };
+#define MODULATION_LONGTEXT N_("QAM, PSK or VSB modulation method")
+static const int i_mod_list[] = { -1, 16, 32, 64, 128, 256,
+    10002, 10004, 20008, 20016 };
+static const char *const ppsz_mod_text[] = {
+    N_("Undefined"), N_("QAM16"), N_("QAM32"), N_("QAM64"), N_("QAM128"), N_("QAM256"),
+    N_("BPSK"), N_("QPSK"), N_("8VSB"), N_("16VSB") };
+
+/* ATSC */
+#define MAJOR_CHANNEL_TEXT N_("ATSC Major Channel")
+#define MAJOR_CHANNEL_LONGTEXT N_("ATSC Major Channel")
+#define MINOR_CHANNEL_TEXT N_("ATSC Minor Channel")
+#define MINOR_CHANNEL_LONGTEXT N_("ATSC Minor Channel")
+#define PHYSICAL_CHANNEL_TEXT N_("ATSC Physical Channel")
+#define PHYSICAL_CHANNEL_LONGTEXT N_("ATSC Physical Channel")
 
 /* Terrestrial */
-#define CODE_RATE_HP_TEXT N_("Terrestrial high priority stream code rate (FEC)")
-#define CODE_RATE_HP_LONGTEXT N_("High Priority FEC Rate " \
-    "[Undefined,1/2,2/3,3/4,5/6,7/8]")
+#define CODE_RATE_HP_TEXT N_("FEC rate")
+#define CODE_RATE_HP_LONGTEXT N_("FEC rate includes " \
+    "DVB-T high priority stream FEC Rate")
 static const int i_hp_fec_list[] = { -1, 1, 2, 3, 4, 5 };
 static const char *const ppsz_hp_fec_text[] = {
     N_("Undefined"), N_("1/2"), N_("2/3"), N_("3/4"), N_("5/6"), N_("7/8") };
@@ -167,6 +175,13 @@ static const char *const ppsz_polar_list[] = { "H", "V", "L", "R" };
 static const char *const ppsz_polar_text[] = {
     N_("Horizontal"), N_("Vertical"),
     N_("Circular Left"), N_("Circular Right") };
+#define RANGE_TEXT N_("Satellite Range Code")
+#define RANGE_LONGTEXT N_("Satellite Range Code as defined by manufacturer " \
+   "e.g. DISEqC switch code")
+#define NAME_TEXT N_("Network Name")
+#define NAME_LONGTEXT N_("Unique network name in the System Tuning Spaces")
+#define CREATE_TEXT N_("Network Name to Create")
+#define CREATE_LONGTEXT N_("Create Unique name in the System Tuning Spaces")
 
 vlc_module_begin ()
     set_shortname( N_("DVB") )
@@ -179,6 +194,10 @@ vlc_module_begin ()
     add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  false );
 #   if defined(WIN32) || defined(WINCE)
+        add_string( "dvb-network-name", NULL, NULL, NAME_TEXT, NAME_LONGTEXT,
+                    true );
+        add_string( "dvb-create-name", NULL, NULL, CREATE_TEXT,
+                    CREATE_LONGTEXT, true );
 #   else
         add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                      false );
@@ -195,8 +214,9 @@ vlc_module_begin ()
         change_integer_list( i_inversion_list, ppsz_inversion_text, NULL );
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
-            POLARISATION_LONGTEXT, true );
+            POLARISATION_LONGTEXT, false );
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 );
+            /* Note: Polaristion H = voltage 18; V = voltage 13; */
         add_integer( "dvb-network-id", 0, NULL, NETID_TEXT, NETID_LONGTEXT,
             true );
         add_integer( "dvb-azimuth", 0, NULL, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
@@ -205,7 +225,8 @@ vlc_module_begin ()
             ELEVATION_LONGTEXT, true );
         add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
             LONGITUDE_LONGTEXT, true );
-            /* Note: Polaristion H = voltage 18; V = voltage 13; */
+        add_string( "dvb-range", NULL, NULL, RANGE_TEXT,
+            RANGE_LONGTEXT, true );
 #   else
         add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
             true );
@@ -215,6 +236,7 @@ vlc_module_begin ()
             HIGH_VOLTAGE_LONGTEXT, true );
         add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
             true );
+        add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true );
 #   endif
     add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
         LNB_LOF1_LONGTEXT, true );
@@ -222,15 +244,21 @@ vlc_module_begin ()
         LNB_LOF2_LONGTEXT, true );
     add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
         LNB_SLOF_LONGTEXT, true );
-
-    add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
-    add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
+    add_integer( "dvb-srate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT,
         false );
 
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
         MODULATION_LONGTEXT, true );
-        change_integer_list( i_qam_list, ppsz_qam_text, NULL );
+        change_integer_list( i_mod_list, ppsz_mod_text, NULL );
+
+    /* ATSC */
+    add_integer( "dvb-major-channel", 0, NULL, MAJOR_CHANNEL_TEXT,
+        MAJOR_CHANNEL_LONGTEXT, true );
+     add_integer( "dvb-minor-channel", 0, NULL, MINOR_CHANNEL_TEXT,
+        MINOR_CHANNEL_LONGTEXT, true );
+     add_integer( "dvb-physical-channel", 0, NULL, PHYSICAL_CHANNEL_TEXT,
+        PHYSICAL_CHANNEL_LONGTEXT, true );
 
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
@@ -240,7 +268,7 @@ vlc_module_begin ()
         CODE_RATE_LP_LONGTEXT, true );
         change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, NULL );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
-        true );
+        false );
         change_integer_list( i_band_list, ppsz_band_text, NULL );
     add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
         change_integer_list( i_guard_list, ppsz_guard_text, NULL );
@@ -275,7 +303,6 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-
 /*****************************************************************************
  * Open: open direct show device as an access module
  *****************************************************************************/
@@ -284,19 +311,21 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     const char* psz_module  = "dvb";
-    const int   i_param_count = 19;
+    const int   i_param_count = 25;
     const char* psz_param[] = { "frequency", "bandwidth",
         "srate", "azimuth", "elevation", "longitude", "polarisation",
         "modulation", "caching", "lnb-lof1", "lnb-lof2", "lnb-slof",
         "inversion", "network-id", "code-rate-hp", "code-rate-lp",
-        "guard", "transmission", "hierarchy" };
+        "guard", "transmission", "hierarchy", "range", "network-name",
+        "create-name", "major-channel", "minor-channel", "physical-channel" };
 
     const int   i_type[] = { VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_STRING, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
-        VLC_VAR_INTEGER };
+        VLC_VAR_INTEGER, VLC_VAR_STRING, VLC_VAR_STRING, VLC_VAR_STRING,
+        VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER };
 
     char  psz_full_name[128];
     int i_ret;
@@ -383,7 +412,7 @@ static int Open( vlc_object_t *p_this )
 static int ParsePath( access_t *p_access, const char* psz_module,
     const int i_param_count, const char** psz_param, const int* i_type )
 {
-    const int   MAXPARAM = 20;
+    const int   MAXPARAM = 40;
     BOOL        b_used[MAXPARAM];
     char*       psz_parser;
     char*       psz_token;
