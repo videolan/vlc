@@ -141,13 +141,14 @@ int BDAGraph::SubmitATSCTuneRequest()
         }
     } l;
     long l_major_channel, l_minor_channel, l_physical_channel;
+    long l_frequency;
 
     l_major_channel = l_minor_channel = l_physical_channel = -1;
-/*
+    l_frequency = -1;
     l_major_channel = var_GetInteger( p_access, "dvb-major-channel" );
     l_minor_channel = var_GetInteger( p_access, "dvb-minor-channel" );
     l_physical_channel = var_GetInteger( p_access, "dvb-physical-channel" );
-*/
+    l_frequency = var_GetInteger( p_access, "dvb-frequency" );
 
     guid_network_type = CLSID_ATSCNetworkProvider;
     hr = CreateTuneRequest();
@@ -176,6 +177,8 @@ int BDAGraph::SubmitATSCTuneRequest()
     }
 
     hr = S_OK;
+    if( l_frequency > 0 )
+        hr = l.p_atsc_locator->put_CarrierFrequency( l_frequency );
     if( l_major_channel > 0 )
         hr = l.p_atsc_tune_request->put_Channel( l_major_channel );
     if( SUCCEEDED( hr ) && l_minor_channel > 0 )
@@ -506,8 +509,12 @@ int BDAGraph::SubmitDVBSTuneRequest()
         IDVBTuneRequest* p_dvbs_tune_request;
         IDVBSLocator* p_dvbs_locator;
         IDVBSTuningSpace* p_dvbs_tuning_space;
+        BSTR bstr_input_range;
+        WCHAR* pwsz_input_range;
+        int i_range_len;
         localComPtr(): p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
-            p_dvbs_tuning_space(NULL) {};
+            p_dvbs_tuning_space(NULL), bstr_input_range(NULL),
+            pwsz_input_range(NULL), i_range_len(NULL)  {};
         ~localComPtr()
         {
             if( p_dvbs_tuning_space )
@@ -516,17 +523,26 @@ int BDAGraph::SubmitDVBSTuneRequest()
                 p_dvbs_tune_request->Release();
             if( p_dvbs_locator )
                 p_dvbs_locator->Release();
+            SysFreeString( bstr_input_range );
+            if( pwsz_input_range )
+                delete pwsz_input_range;
         }
     } l;
     long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
     long l_lnb_lof1, l_lnb_lof2, l_lnb_slof, l_inversion, l_network_id;
-    char* psz_polarisation;
+    long l_input_range, l_hp_fec;
+    int  i_mod;
+    char* psz_polarisation = NULL;
+    char* psz_input_range = NULL;
     Polarisation i_polar;
     SpectralInversion i_inversion;
     VARIANT_BOOL b_west;
+    BinaryConvolutionCodeRate i_hp_fec;
+    ModulationType i_mod_typ;
 
     l_frequency = l_symbolrate = l_azimuth = l_elevation = l_longitude = -1;
     l_lnb_lof1 = l_lnb_lof2 = l_lnb_slof = l_inversion = l_network_id = -1;
+    l_input_range = l_hp_fec = i_mod = -1;
     l_frequency = var_GetInteger( p_access, "dvb-frequency" );
     l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
     l_azimuth = var_GetInteger( p_access, "dvb-azimuth" );
@@ -536,8 +552,11 @@ int BDAGraph::SubmitDVBSTuneRequest()
     l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" );
     l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
     psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
+    i_mod = var_GetInteger( p_access, "dvb-modulation" );
+    l_hp_fec = var_GetInteger( p_access, "dvb-code-rate-hp" );
     l_inversion = var_GetInteger( p_access, "dvb-inversion" );
-    l_network_id = var_GetInteger( p_access, "dvb-network_id" );
+    l_network_id = var_GetInteger( p_access, "dvb-network-id" );
+    psz_input_range = var_GetNonEmptyString( p_access, "dvb-range" );
 
     b_west = ( l_longitude < 0 ) ? TRUE : FALSE;
 
@@ -566,6 +585,38 @@ int BDAGraph::SubmitDVBSTuneRequest()
         i_inversion = BDA_SPECTRAL_INVERSION_INVERTED;
     if( l_inversion == 2 )
         i_inversion = BDA_SPECTRAL_INVERSION_AUTOMATIC;
+
+    i_mod_typ = BDA_MOD_NOT_SET;
+    if( i_mod == 16 )
+        i_mod_typ = BDA_MOD_16QAM;
+    if( i_mod == 128 )
+        i_mod_typ = BDA_MOD_128QAM;
+    if( i_mod == 256 )
+        i_mod_typ = BDA_MOD_256QAM;
+    if( i_mod == 10004 )
+        i_mod_typ = BDA_MOD_QPSK;
+
+    i_hp_fec = BDA_BCC_RATE_NOT_SET;
+    if( l_hp_fec == 1 )
+        i_hp_fec = BDA_BCC_RATE_1_2;
+    if( l_hp_fec == 2 )
+        i_hp_fec = BDA_BCC_RATE_2_3;
+    if( l_hp_fec == 3 )
+        i_hp_fec = BDA_BCC_RATE_3_4;
+    if( l_hp_fec == 4 )
+        i_hp_fec = BDA_BCC_RATE_5_6;
+    if( l_hp_fec == 5 )
+        i_hp_fec = BDA_BCC_RATE_7_8;
+
+    l.i_range_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
+        psz_input_range, -1, l.pwsz_input_range, 0 );
+    if( l.i_range_len > 0 )
+    {
+        l.pwsz_input_range = new WCHAR[l.i_range_len];
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
+            psz_input_range, -1, l.pwsz_input_range, l.i_range_len );
+        l.bstr_input_range=SysAllocString( l.pwsz_input_range );
+    }
 
     guid_network_type = CLSID_DVBSNetworkProvider;
     hr = CreateTuneRequest();
@@ -606,31 +657,57 @@ int BDAGraph::SubmitDVBSTuneRequest()
         return VLC_EGENERIC;
     }
 
+/*****************************************************************************/
+/* More traces */
+  long l_tmp_lof1, l_tmp_lof2, l_tmp_slof;
+  BSTR bstr_tmp_range;
+  HRESULT hr2;
+  l_tmp_lof1 = l_tmp_lof2 = l_tmp_slof = -1;
+  hr2 = l.p_dvbs_tuning_space->get_LNBSwitch( &l_tmp_slof );
+  msg_Dbg( p_access, "get_LNBSwitch: %d", l_tmp_slof );
+  hr2 = l.p_dvbs_tuning_space->get_LowOscillator( &l_tmp_lof1 );
+  msg_Dbg( p_access, "get_LowOscillator: %d", l_tmp_lof1 );
+  hr2 = l.p_dvbs_tuning_space->get_HighOscillator( &l_tmp_lof2 );
+  msg_Dbg( p_access, "get_HighOscillator: %d", l_tmp_lof2 );
+  hr2 = l.p_dvbs_tuning_space->get_InputRange( &bstr_tmp_range );
+  msg_Dbg( p_access, "get_InputRange: %S", bstr_tmp_range );
+  SysFreeString( bstr_tmp_range );
+
+/*****************************************************************************/
+
     hr = S_OK;
-    if( l_frequency > 0 )
+    if( l_lnb_lof1 > 0 )
+        hr = l.p_dvbs_tuning_space->put_LowOscillator( l_lnb_lof1 );
+    if( SUCCEEDED( hr ) && l_lnb_slof > 0 )
+        hr = l.p_dvbs_tuning_space->put_LNBSwitch( l_lnb_slof );
+    if( SUCCEEDED( hr ) && l_lnb_lof2 > 0 )
+        hr = l.p_dvbs_tuning_space->put_HighOscillator( l_lnb_lof2 );
+    if( SUCCEEDED( hr ) && i_inversion != BDA_SPECTRAL_INVERSION_NOT_SET )
+        hr = l.p_dvbs_tuning_space->put_SpectralInversion( i_inversion );
+    if( SUCCEEDED( hr ) && l_network_id > 0 )
+        hr = l.p_dvbs_tuning_space->put_NetworkID( l_network_id );
+    if( SUCCEEDED( hr ) && l.i_range_len > 0 )
+        hr = l.p_dvbs_tuning_space->put_InputRange( l.bstr_input_range );
+
+    if( SUCCEEDED( hr ) && l_frequency > 0 )
         hr = l.p_dvbs_locator->put_CarrierFrequency( l_frequency );
     if( SUCCEEDED( hr ) && l_symbolrate > 0 )
         hr = l.p_dvbs_locator->put_SymbolRate( l_symbolrate );
+    if( SUCCEEDED( hr ) && i_polar != BDA_POLARISATION_NOT_SET )
+        hr = l.p_dvbs_locator->put_SignalPolarisation( i_polar );
+    if( SUCCEEDED( hr ) && i_mod_typ != BDA_MOD_NOT_SET )
+        hr = l.p_dvbs_locator->put_Modulation( i_mod_typ );
+    if( SUCCEEDED( hr ) && i_hp_fec != BDA_BCC_RATE_NOT_SET )
+        hr = l.p_dvbs_locator->put_InnerFECRate( i_hp_fec );
+
     if( SUCCEEDED( hr ) && l_azimuth > 0 )
         hr = l.p_dvbs_locator->put_Azimuth( l_azimuth );
     if( SUCCEEDED( hr ) && l_elevation > 0 )
         hr = l.p_dvbs_locator->put_Elevation( l_elevation );
     if( SUCCEEDED( hr ) )
-        hr = l.p_dvbs_locator->put_OrbitalPosition( labs( l_longitude ) );
-    if( SUCCEEDED( hr ) )
         hr = l.p_dvbs_locator->put_WestPosition( b_west );
-    if( SUCCEEDED( hr ) && i_polar != BDA_POLARISATION_NOT_SET )
-        hr = l.p_dvbs_locator->put_SignalPolarisation( i_polar );
-    if( SUCCEEDED( hr ) && l_lnb_lof1 > 0 )
-        hr = l.p_dvbs_tuning_space->put_LowOscillator( l_lnb_lof1 );
-    if( SUCCEEDED( hr ) && l_lnb_lof2 > 0 )
-        hr = l.p_dvbs_tuning_space->put_HighOscillator( l_lnb_lof2 );
-    if( SUCCEEDED( hr ) && l_lnb_slof > 0 )
-        hr = l.p_dvbs_tuning_space->put_LNBSwitch( l_lnb_slof );
-    if( SUCCEEDED( hr ) && i_inversion != BDA_SPECTRAL_INVERSION_NOT_SET )
-        hr = l.p_dvbs_tuning_space->put_SpectralInversion( i_inversion );
-    if( SUCCEEDED( hr ) && l_network_id > 0 )
-        hr = l.p_dvbs_tuning_space->put_NetworkID( l_network_id );
+    if( SUCCEEDED( hr ) )
+        hr = l.p_dvbs_locator->put_OrbitalPosition( labs( l_longitude ) );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "SubmitDVBSTuneRequest: "\
@@ -679,8 +756,14 @@ HRESULT BDAGraph::CreateTuneRequest()
         ITuningSpaceContainer*  p_tuning_space_container;
         IEnumTuningSpaces*      p_tuning_space_enum;
         ITuningSpace*           p_this_tuning_space;
+        BSTR                    bstr_name;
+        char * psz_network_name;
+        WCHAR * wpsz_network_name;
+        int i_name_len;
         localComPtr(): p_tuning_space_container(NULL),
-            p_tuning_space_enum(NULL), p_this_tuning_space(NULL) {};
+            p_tuning_space_enum(NULL), p_this_tuning_space(NULL),
+            i_name_len(0), psz_network_name(NULL), wpsz_network_name(NULL),
+            bstr_name(NULL) {};
         ~localComPtr()
         {
             if( p_tuning_space_container )
@@ -689,8 +772,30 @@ HRESULT BDAGraph::CreateTuneRequest()
                 p_tuning_space_enum->Release();
             if( p_this_tuning_space )
                 p_this_tuning_space->Release();
+            SysFreeString( bstr_name );
+            if( wpsz_network_name ) delete wpsz_network_name;
         }
     } l;
+
+    /* We shall test for a specific Tuning space name supplied on the command
+     * line as dvb-networkname=xxx.
+     * For some users with multiple cards and/or multiple networks this could
+     * be useful. This allows us to reasonably safely apply updates to the
+     * System Tuning Space in the registry without disrupting other streams. */
+    l.psz_network_name = var_GetNonEmptyString( p_access, "dvb-network-name" );
+    if( l.psz_network_name )
+    {
+        l.i_name_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
+            l.psz_network_name, -1, l.wpsz_network_name, 0 );
+        if( l.i_name_len > 0 )
+        {
+            l.wpsz_network_name = new WCHAR[l.i_name_len];
+            MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, l.psz_network_name, -1,
+                l.wpsz_network_name, l.i_name_len );
+            msg_Dbg( p_access, "CreateTuneRequest: Find Tuning Space: %S",
+                l.wpsz_network_name );
+        }
+    }
 
     /* A Tuning Space may already have been set up. If it is for the same
      * network type then all is well. Otherwise, reset the Tuning Space and get
@@ -701,13 +806,26 @@ HRESULT BDAGraph::CreateTuneRequest()
         if( FAILED( hr ) ) guid_this_network_type = GUID_NULL;
         if( guid_this_network_type == guid_network_type )
         {
-            return S_OK;
+            hr = p_tuning_space->get_UniqueName( &l.bstr_name );
+            if( FAILED( hr ) )
+            {
+                msg_Warn( p_access, "CreateTuneRequest: "\
+                    "Cannot get UniqueName for Tuning Space: hr=0x%8lx", hr );
+                return hr;
+            }
+            /* Test for a specific Tuning space name supplied on the command
+             * line as dvb-networkname=xxx */
+            if( l.i_name_len == 0 ||
+                lstrcmpW( l.wpsz_network_name, l.bstr_name ) == 0 )
+            {
+                msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %S",
+                    l.bstr_name );
+                return S_OK;
+            }
         }
-        else
-        {
-            p_tuning_space->Release();
-            p_tuning_space = NULL;
-        }
+        /* else */
+        p_tuning_space->Release();
+        p_tuning_space = NULL;
     }
 
     /* Force use of the first available Tuner Device during Build */
@@ -736,7 +854,7 @@ HRESULT BDAGraph::CreateTuneRequest()
     while( l.p_tuning_space_enum->Next( 1, &l.p_this_tuning_space, NULL ) ==
         S_OK )
     {
-       hr = l.p_this_tuning_space->get__NetworkType( &guid_this_network_type );
+        hr = l.p_this_tuning_space->get__NetworkType( &guid_this_network_type );
 
         /* GUID_NULL means a non-BDA network was found e.g analog
          * Ignore failures and non-BDA networks and keep looking */
@@ -752,23 +870,102 @@ HRESULT BDAGraph::CreateTuneRequest()
                     "Cannot QI Tuning Space: hr=0x%8lx", hr );
                 return hr;
             }
-            hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
+            hr = p_tuning_space->get_UniqueName( &l.bstr_name );
             if( FAILED( hr ) )
             {
                 msg_Warn( p_access, "CreateTuneRequest: "\
-                    "Cannot Create Tune Request: hr=0x%8lx", hr );
+                    "Cannot get UniqueName for Tuning Space: hr=0x%8lx", hr );
                 return hr;
             }
-            return hr;
+
+            /* Test for a specific Tuning space name supplied on the command
+             * line as dvb-networkname=xxx */
+            if( l.i_name_len == 0 ||
+                lstrcmpW( l.wpsz_network_name, l.bstr_name ) == 0 )
+            {
+                msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %S",
+                    l.bstr_name );
+                hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
+                if( FAILED( hr ) )
+                    msg_Warn( p_access, "CreateTuneRequest: "\
+                        "Cannot Create Tune Request: hr=0x%8lx", hr );
+                return hr;
+            }
         }
     }
-    hr = E_FAIL;
-    if( FAILED( hr ) )
+    /* No tune request was found. If the create-name parameter was set then
+     * create a tuning space. By rights should use the same name used in
+     * network-name
+     * Also would be nice to copy a tuning space but we only come here if we do
+     * not find any. */
+    l.psz_network_name = var_GetNonEmptyString( p_access, "dvb-create-name" );
+    if( !l.psz_network_name )
     {
+        hr = E_FAIL;
         msg_Warn( p_access, "CreateTuneRequest: "\
             "Cannot find a suitable System Tuning Space: hr=0x%8lx", hr );
         return hr;
     }
+
+    /* Need to use DVBSTuningSpace for DVB-S and ATSCTuningSpace for ATSC */
+    VARIANT var_id;
+    CLSID cls_tuning_space;
+
+    if( IsEqualCLSID( guid_network_type, CLSID_ATSCNetworkProvider ) )
+        cls_tuning_space = CLSID_ATSCTuningSpace;
+    if( IsEqualCLSID( guid_network_type, CLSID_DVBTNetworkProvider ) )
+        cls_tuning_space = CLSID_DVBTuningSpace;
+    if( IsEqualCLSID( guid_network_type, CLSID_DVBCNetworkProvider ) )
+        cls_tuning_space = CLSID_DVBTuningSpace;
+    if( IsEqualCLSID( guid_network_type, CLSID_DVBSNetworkProvider ) )
+        cls_tuning_space = CLSID_DVBSTuningSpace;
+
+    if( l.wpsz_network_name ) delete l.wpsz_network_name;
+    l.i_name_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
+        l.psz_network_name, -1, l.wpsz_network_name, 0 );
+    if( l.i_name_len > 0 )
+    {
+        l.wpsz_network_name = new WCHAR[l.i_name_len];
+        MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, l.psz_network_name, -1,
+            l.wpsz_network_name, l.i_name_len );
+        if( l.bstr_name )
+            SysFreeString( l.bstr_name );
+        l.bstr_name = SysAllocString( l.wpsz_network_name );
+        msg_Dbg( p_access, "CreateTuneRequest: Create Tuning Space: %S",
+             l.bstr_name );
+    }
+    hr = ::CoCreateInstance( cls_tuning_space, 0, CLSCTX_INPROC,
+         IID_ITuningSpace, (void**)&p_tuning_space );
+    if( FAILED( hr ) )
+        msg_Warn( p_access, "CreateTuneRequest: "\
+            "Cannot CoCreate new TuningSpace: hr=0x%8lx", hr );
+    if( SUCCEEDED( hr ) )
+        hr = p_tuning_space->put__NetworkType( guid_network_type );
+    if( FAILED( hr ) )
+        msg_Warn( p_access, "CreateTuneRequest: "\
+            "Cannot Put Network Type: hr=0x%8lx", hr );
+    if( SUCCEEDED( hr ) )
+        hr = p_tuning_space->put_UniqueName( l.bstr_name );
+    if( FAILED( hr ) )
+        msg_Warn( p_access, "CreateTuneRequest: "\
+            "Cannot Put Unique Name: hr=0x%8lx", hr );
+    if( SUCCEEDED( hr ) )
+        hr = p_tuning_space->put_FriendlyName( l.bstr_name );
+    if( FAILED( hr ) )
+        msg_Warn( p_access, "CreateTuneRequest: "\
+            "Cannot Put Friendly Name: hr=0x%8lx", hr );
+    if( SUCCEEDED( hr ) )
+        hr = l.p_tuning_space_container->Add( p_tuning_space, &var_id );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "CreateTuneRequest: "\
+            "Cannot Create new TuningSpace: hr=0x%8lx", hr );
+        return hr;
+    }
+    hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
+    if( FAILED( hr ) )
+        msg_Warn( p_access, "CreateTuneRequest: "\
+            "Cannot Create Tune Request: hr=0x%8lx", hr );
     return hr;
 }
 
@@ -781,7 +978,49 @@ HRESULT BDAGraph::Build()
 {
     HRESULT hr = S_OK;
     long l_capture_used, l_tif_used;
+    VARIANT l_tuning_space_id;
     AM_MEDIA_TYPE grabber_media_type;
+    class localComPtr
+    {
+        public:
+        ITuningSpaceContainer*  p_tuning_space_container;
+        localComPtr(): p_tuning_space_container(NULL) {};
+        ~localComPtr()
+        {
+            if( p_tuning_space_container )
+                p_tuning_space_container->Release();
+        }
+    } l;
+
+    /* Get the SystemTuningSpaces container to save the Tuning space */
+    l_tuning_space_id.vt = VT_I4;
+    l_tuning_space_id.lVal = 0L;
+    hr = ::CoCreateInstance( CLSID_SystemTuningSpaces, 0, CLSCTX_INPROC,
+        IID_ITuningSpaceContainer, (void**)&l.p_tuning_space_container );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Cannot CoCreate SystemTuningSpaces: hr=0x%8lx", hr );
+        return hr;
+    }
+    hr = l.p_tuning_space_container->FindID( p_tuning_space,
+        &l_tuning_space_id.lVal );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Cannot Find Tuning Space ID: hr=0x%8lx", hr );
+        return hr;
+    }
+    msg_Dbg( p_access, "Build: Using Tuning Space ID %d",
+        l_tuning_space_id.lVal );
+    hr = l.p_tuning_space_container->put_Item( l_tuning_space_id,
+        p_tuning_space );
+    if( FAILED( hr ) )
+    {
+        msg_Warn( p_access, "Build: "\
+            "Cannot save Tuning Space: hr=0x%8lx", hr );
+        return hr;
+    }
 
     /* If we have already have a filter graph, rebuild it*/
     Destroy();
@@ -994,7 +1233,7 @@ HRESULT BDAGraph::Build()
 * On subsequent calls, this can be used to start from that point to find
 * another match.
 * This is used when the graph does not run because a tuner device is in use so
-* another one needs to be slected.
+* another one needs to be selected.
 ******************************************************************************/
 HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
     IBaseFilter* p_upstream, IBaseFilter** p_p_downstream )
