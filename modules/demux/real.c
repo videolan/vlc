@@ -31,8 +31,8 @@
  *               - cook is ok.
  *               - raac, racp are ok.
  *               - dnet is twisted "The byte order of the data is reversed
- *                                  from standard AC3"
- *               - 28_8 seem problematic.
+ *                                  from standard AC3" but ok
+ *               - 28_8 is ok.
  *               - sipr should be fine, but our decoder suxx :)
  *               - ralf is unsupported, but hardly any sample exist.
  *               - mp3 is unsupported, one sample exists...
@@ -137,7 +137,6 @@ struct demux_sys_t
     uint8_t buffer[65536];
 
     int64_t     i_pcr;
-    vlc_meta_t *p_meta;
 
     int64_t     i_index_offset;
     bool        b_seek;
@@ -216,20 +215,8 @@ static int Open( vlc_object_t *p_this )
     /* RMF files */
     else if( HeaderRead( p_demux ) )
     {
-        int i;
         msg_Err( p_demux, "invalid header" );
-        for( i = 0; i < p_sys->i_track; i++ )
-        {
-            real_track_t *tk = p_sys->track[i];
-
-            if( tk->p_es )
-                es_out_Del( p_demux->out, tk->p_es );
-
-            free( tk );
-        }
-        if( p_sys->i_track > 0 )
-            free( p_sys->track );
-        free( p_sys );
+        Close( p_this );
         return VLC_EGENERIC;
     }
 
@@ -579,6 +566,8 @@ static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsig
             if( i_type == 2 && i_frame_data > i_pos )
                 i_frame_data = i_pos;
         }
+        if( i_frame_data > i_data )
+            break;
 
         /* */
         tk->i_frame_slice++;
@@ -619,22 +608,23 @@ static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsig
 static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts, unsigned int i_flags )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-
     uint8_t *p_buf = p_sys->buffer;
-    int y = tk->i_subpacket / ( tk->i_frame_size / tk->i_subpacket_size );
 
     /* Sanity check */
     if( (i_flags & 2) || p_sys->b_seek )
     {
-        y = tk->i_subpacket = 0;
+        tk->i_subpacket = 0;
         tk->i_out_subpacket = 0;
         p_sys->b_seek = false;
     }
 
     if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
-        tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ) )
+        tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ) ||
+        tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r' ) )
     {
         const int i_num = tk->i_frame_size / tk->i_subpacket_size;
+        const int y = tk->i_subpacket / ( tk->i_frame_size / tk->i_subpacket_size );
+
         for( int i = 0; i < i_num; i++ )
         {
             block_t *p_block = block_New( p_demux, tk->i_subpacket_size );
@@ -666,19 +656,18 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     }
     else
     {
-        assert( tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8' ) ||
-                tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r' ) );
+        const int y = tk->i_subpacket / (tk->i_subpacket_h / 2);
+        assert( tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8' ) );
 
         for( int i = 0; i < tk->i_subpacket_h / 2; i++ )
         {
             block_t *p_block = block_New( p_demux, tk->i_coded_frame_size);
             if( !p_block )
                 return;
-            if( &p_buf[tk->i_subpacket_size] > &p_sys->buffer[p_sys->i_buffer] )
+            if( &p_buf[tk->i_coded_frame_size] > &p_sys->buffer[p_sys->i_buffer] )
                 return;
 
-            int i_index = (i * 2 * tk->i_frame_size) /
-                          tk->i_coded_frame_size + y;
+            int i_index = (i * 2 * tk->i_frame_size / tk->i_coded_frame_size) + y;
 
             memcpy( p_block->p_buffer, p_buf, tk->i_coded_frame_size );
             p_block->i_dts =
@@ -1178,8 +1167,6 @@ static int HeaderRead( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    p_sys->p_meta = vlc_meta_New();
-
     for( ;; )
     {
         const int64_t i_stream_position = stream_Tell( p_demux->s );
@@ -1406,9 +1393,9 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         i_subpacket_h = R16( &p_data, &i_data );
         i_frame_size = R16( &p_data, &i_data );
         i_subpacket_size = R16( &p_data, &i_data );
-        if( (!i_subpacket_size && !p_sys->b_real_audio ) ||
-            !i_frame_size || !i_coded_frame_size )
-             return VLC_EGENERIC;
+        if( !i_frame_size || !i_coded_frame_size )
+            return VLC_EGENERIC;
+
         RVoid( &p_data, &i_data, 2 + (i_version == 5 ? 6 : 0 ) );
 
         fmt.audio.i_rate = R16( &p_data, &i_data );
@@ -1480,8 +1467,8 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         }
         if( i_extra_codec > 0 )
         {
-            fmt.p_extra = malloc( fmt.i_extra );
-            if( !fmt.p_extra || fmt.i_extra > i_data )
+            fmt.p_extra = malloc( i_extra_codec );
+            if( !fmt.p_extra || i_extra_codec > i_data )
                 return VLC_ENOMEM;
 
             fmt.i_extra = i_extra_codec;
@@ -1493,6 +1480,11 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         fmt.audio.i_flavor = i_flavor;
     case VLC_FOURCC('c','o','o','k'):
     case VLC_FOURCC('a','t','r','c'):
+        if( i_subpacket_size <= 0 )
+        {
+            es_format_Clean( &fmt );
+            return VLC_EGENERIC;
+        }
         if( !memcmp( p_genr, "genr", 4 ) )
             fmt.audio.i_blockalign = i_subpacket_size;
         else
@@ -1500,8 +1492,8 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
 
         if( i_extra_codec > 0 )
         {
-            fmt.p_extra = malloc( fmt.i_extra );
-            if( !fmt.p_extra || fmt.i_extra > i_data )
+            fmt.p_extra = malloc( i_extra_codec );
+            if( !fmt.p_extra || i_extra_codec > i_data )
                 return VLC_ENOMEM;
 
             fmt.i_extra = i_extra_codec;
@@ -1545,7 +1537,8 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     tk->p_subpackets = NULL;
     tk->p_subpackets_timecode = NULL;
     if( fmt.i_codec == VLC_FOURCC('c','o','o','k') ||
-        fmt.i_codec == VLC_FOURCC('a','t','r','c') )
+        fmt.i_codec == VLC_FOURCC('a','t','r','c') ||
+        fmt.i_codec == VLC_FOURCC('s','i','p','r') )
     {
         tk->i_subpackets =
             i_subpacket_h * i_frame_size / tk->i_subpacket_size;
@@ -1565,7 +1558,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     }
 
     /* Check if the calloc went correctly */
-    if( !tk->p_subpackets && !tk->p_subpackets_timecode)
+    if( tk->i_subpacket > 0 && ( !tk->p_subpackets || !tk->p_subpackets_timecode ) )
     {
         free( tk->p_subpackets_timecode );
         free( tk->p_subpackets );
