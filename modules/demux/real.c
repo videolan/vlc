@@ -542,8 +542,7 @@ static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsig
             tk->p_frame = block_New( p_demux, tk->i_frame_size );
             if( !tk->p_frame )
             {
-                tk->i_frame_slice = 0;
-                tk->i_frame_slice_count = 0;
+                tk->i_frame_size = 0;
                 return;
             }
 
@@ -571,7 +570,7 @@ static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsig
 
         /* */
         tk->i_frame_slice++;
-        if( tk->i_frame_slice > tk->i_frame_slice_count )
+        if( tk->i_frame_slice > tk->i_frame_slice_count || !tk->p_frame )
             break;
 
         /* */
