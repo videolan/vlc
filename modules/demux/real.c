@@ -1481,7 +1481,8 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         fmt.audio.i_flavor = i_flavor;
     case VLC_FOURCC('c','o','o','k'):
     case VLC_FOURCC('a','t','r','c'):
-        if( i_subpacket_size <= 0 )
+        if( i_subpacket_size <= 0 ||
+            i_frame_size / i_subpacket_size <= 0 )
         {
             es_format_Clean( &fmt );
             return VLC_EGENERIC;
