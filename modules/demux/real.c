@@ -1150,11 +1150,13 @@ static void HeaderINDX( demux_t *p_demux )
         p_idx->i_file_offset = GetDWBE( &p_entry[6] );
         p_idx->i_frame_index = GetDWBE( &p_entry[10] );
 
+#if 0
         msg_Dbg( p_demux,
                  "Real Index: time %"PRIu32" file %"PRIu32" frame %"PRIu32,
                  p_idx->i_time_offset,
                  p_idx->i_file_offset,
                  p_idx->i_frame_index );
+#endif
     }
 }
 
