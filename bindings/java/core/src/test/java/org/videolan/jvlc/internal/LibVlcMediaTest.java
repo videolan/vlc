@@ -28,6 +28,7 @@ package org.videolan.jvlc.internal;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
@@ -36,7 +37,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
 {
     
     @Test
-    public void mediaDescriptorNew() throws Exception
+    public void testMediaNew() throws Exception
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
@@ -45,12 +46,53 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
     }
     
     @Test
-    public void mediaDescriptorGetMrl()
+    public void testMediaGetMrl()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         String mdMrl = libvlc.libvlc_media_get_mrl(md);
         Assert.assertEquals(mrl, mdMrl);
     }
+    
+    @Test
+    public void testMediaDuplicate()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMedia md2 = libvlc.libvlc_media_duplicate(md);
+        Assert.assertNotSame(md.getPointer(), md2.getPointer());
+        Assert.assertEquals(libvlc.libvlc_media_get_mrl(md2), libvlc.libvlc_media_get_mrl(md));
+    }
+    
+    @Test
+    public void testMediaEventManager()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcEventManager evManager = libvlc.libvlc_media_event_manager(md, exception);
+        Assert.assertEquals(0, exception.raised);
+        Assert.assertNotNull(evManager);
+    }
 
+    @Test
+    public void testMediaGetState()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        int state = libvlc.libvlc_media_get_state(md, exception);
+        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(LibVlcState.libvlc_NothingSpecial.ordinal(), state);
+    }
+
+    @Test
+    public void testMediaIsPreparsed()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        int state = libvlc.libvlc_media_is_preparsed(md, exception);
+        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, state);
+    }
+
+    
 }
