@@ -411,11 +411,23 @@ public interface LibVlc extends Library
 
     void libvlc_media_add_option(LibVlcMedia media, String option, libvlc_exception_t exception);
 
+    LibVlcMedia libvlc_media_duplicate(LibVlcMedia media);
+    
     String libvlc_media_get_mrl(LibVlcMedia media);
 
+    void libvlc_media_retain(LibVlcMedia media);
+    
     void libvlc_media_release(LibVlcMedia media);
+    
+    int libvlc_media_get_state(LibVlcMedia media, libvlc_exception_t exception);
+    
+    LibVlcMediaList libvlc_media_subitems(LibVlcMedia media, libvlc_exception_t exception);
 
     LibVlcEventManager libvlc_media_event_manager(LibVlcMedia media, libvlc_exception_t exception);
+    
+    long libvlc_get_duration(LibVlcMedia media, libvlc_exception_t exception);
+    
+    int libvlc_media_is_preparsed(LibVlcMedia media, libvlc_exception_t exception);
 
     // media player
 
