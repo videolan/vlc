@@ -766,25 +766,6 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
             }
         }
     }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '0' ) ||
-             p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '1', '3' ) ||
-             p_dec->fmt_in.i_codec == VLC_FOURCC( 'R', 'V', '2', '0' ) )
-    {
-        if( p_dec->fmt_in.i_extra == 8 )
-        {
-            p_sys->p_context->extradata_size = 8;
-            p_sys->p_context->extradata = malloc( 8 );
-            if( p_sys->p_context->extradata )
-            {
-                memcpy( p_sys->p_context->extradata,
-                        p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-                p_sys->p_context->sub_id = ((uint32_t*)p_dec->fmt_in.p_extra)[1];
-
-                msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x",
-                          p_sys->p_context->sub_id );
-            }
-        }
-    }
     else
     {
         p_sys->p_context->extradata_size = i_size;
