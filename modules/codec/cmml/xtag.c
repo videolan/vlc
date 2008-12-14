@@ -260,7 +260,11 @@ xtag_slurp_quoted (XTagParser * parser)
   ret[xi] = '\0';
   parser->start = &s[xi];
 
-  if (!xtag_assert_and_pass (parser, quote)) return NULL;
+  if (!xtag_assert_and_pass (parser, quote))
+  {
+     free( ret );
+     return NULL;
+  }
 
   return ret;
 }
