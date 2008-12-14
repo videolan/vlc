@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd ">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>org.videolan</groupId>
   <artifactId>jvlc-parent</artifactId>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <name>JVLC</name>
   <description>Java Bindings for VideoLAN</description>
   <url>http://jvlc.ihack.it/</url>
@@ -27,14 +25,6 @@
     <system>Trac</system>
     <url>http://trac.videolan.org/jvlc</url>
   </issueManagement>
-
-  <distributionManagement>
-    <site>
-      <id>jvlc</id>
-      <url>http://jvlc.ihack.it/maven-site/</url>
-      <name>JVLC Maven Site</name>
-    </site>
-  </distributionManagement>
 
   <scm>
     <connection>scm:git:git://git.videolan.org/vlc</connection>
@@ -146,5 +136,19 @@
     <module>core</module>
     <module>samples</module>
   </modules>
+
+  <distributionManagement>
+    <repository>
+      <id>jvlc.ihack.it</id>
+      <name>jvlc repository</name>
+      <url>scp://jvlc.ihack.it/www/ihack.it/jvlc/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots.jvlc.ihack.it</id>
+      <name>openmind snapshot repository</name>
+      <url>scp://jvlc.ihack.it/home/littlejohn/www/ihack.it/jvlc/maven2-snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
 
 </project>
