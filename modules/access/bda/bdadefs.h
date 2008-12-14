@@ -544,11 +544,13 @@ public:
 extern "C" {
 extern const GUID CLSID_ATSCLocator;
 extern const GUID CLSID_ATSCNetworkProvider;
+extern const GUID CLSID_ATSCTuningSpace;
 extern const GUID CLSID_DVBCLocator;
 extern const GUID CLSID_DVBCNetworkProvider;
 extern const GUID CLSID_DVBSLocator;
 extern const GUID CLSID_DVBSNetworkProvider;
 extern const GUID CLSID_DVBSTuningSpace;
+extern const GUID CLSID_DVBTuningSpace;
 extern const GUID CLSID_DVBTLocator;
 extern const GUID CLSID_DVBTNetworkProvider;
 extern const GUID CLSID_FilterGraph;
