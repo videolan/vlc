@@ -658,7 +658,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
 static void AStreamPrebufferBlock( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    access_t     *p_access = p_sys->p_access;
 
     int64_t i_first = 0;
     int64_t i_start;
@@ -1399,7 +1398,6 @@ static int AStreamRefillStream( stream_t *s )
 static void AStreamPrebufferStream( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    access_t     *p_access = p_sys->p_access;
 
     int64_t i_first = 0;
     int64_t i_start;
