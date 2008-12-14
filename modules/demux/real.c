@@ -66,7 +66,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Real demuxer" ) )
-    set_capability( "demux", 0 )
+    set_capability( "demux", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_callbacks( Open, Close )
@@ -861,7 +861,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * ReadRealIndex:
  *****************************************************************************/
-
 static void ReadRealIndex( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
