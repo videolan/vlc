@@ -971,6 +971,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
             free( psz_uri );
     FOREACH_END();
     PL_UNLOCK;
+    free( psz_bookmark );
     vlc_object_release( p_playlist );
 }
 
