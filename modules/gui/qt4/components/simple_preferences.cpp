@@ -670,10 +670,7 @@ void SPrefsPanel::apply()
                    that we have to remove */
                 if( !b_normChecked )
                 {
-                    /* Ugly :D */
-                    qs_filter.remove( "volnorm:" );
-                    qs_filter.remove( ":volnorm" );
-                    qs_filter.remove( "volnorm" );
+                    qs_filter.remove( QRegExp(":?volnorm:?") );
                 }
             }
             else /* qs_filter not empty, but doesn't have volnorm inside */
