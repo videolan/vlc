@@ -123,7 +123,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
 static
 int mediacontrol_showtext( vout_thread_t *p_vout, int i_channel,
-                           char *psz_string, text_style_t *p_style,
+                           const char *psz_string, text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
@@ -142,12 +142,16 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                            mediacontrol_Exception *exception )
 {
     vout_thread_t *p_vout = NULL;
-    char* psz_message;
     input_thread_t *p_input;
     libvlc_exception_t ex;
 
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
+
+    if( !message )
+    {
+        RAISE_VOID( mediacontrol_InternalException, "Empty text" );
+    }
 
     p_input = libvlc_get_input_thread( self->p_media_player, &ex );
     if( ! p_input )
@@ -158,12 +162,6 @@ mediacontrol_display_text( mediacontrol_Instance *self,
     if( ! p_vout )
     {
         RAISE_VOID( mediacontrol_InternalException, "No video output" );
-    }
-
-    psz_message = strdup( message );
-    if( !psz_message )
-    {
-        RAISE_VOID( mediacontrol_InternalException, "no more memory" );
     }
 
     if( begin->origin == mediacontrol_RelativePosition &&
@@ -179,7 +177,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                                                               mediacontrol_MediaTime,
                                                               end->value );
 
-        mediacontrol_showtext( p_vout, DEFAULT_CHAN, psz_message, NULL,
+        mediacontrol_showtext( p_vout, DEFAULT_CHAN, message, NULL,
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 0, 0,
                                i_now, i_now + i_duration );
     }
@@ -199,7 +197,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
                                           ( mediacontrol_Position * ) end );
         i_fin += i_now;
 
-        vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN, psz_message, NULL,
+        vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN, message, NULL,
                                OSD_ALIGN_BOTTOM | OSD_ALIGN_LEFT, 0, 0,
                                i_debut, i_fin );
     }
