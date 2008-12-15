@@ -735,16 +735,6 @@ void PLModel::sort( int column, Qt::SortOrder order )
     int i_index = -1;
     int i_flag = 0;
 
-    // FIXME: Disable sorting on startup by ignoring
-    // first call of sorting caused by showing dialog
-    // see: standardpanel.cpp:65
-    static bool b_first_time = true;
-    if( b_first_time )
-    {
-        b_first_time = false;
-        return;
-    }
-
     int i_column = 1;
     for( i_column = 1; i_column != COLUMN_END; i_column<<=1 )
     {
