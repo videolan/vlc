@@ -629,6 +629,9 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
 
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {
+        mkv_track_t *p_tk = tracks[i_track];
+        es_format_t *p_fmt = &p_tk->fmt;
+
         if( tracks[i_track]->fmt.i_cat == UNKNOWN_ES )
         {
             msg_Warn( &sys.demuxer, "invalid track[%d, n=%d]", (int)i_track, tracks[i_track]->i_number );
@@ -736,14 +739,24 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_REAL/RV", 9 ) )
         {
-            if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV10" ) )
-                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '1', '0' );
-            else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV20" ) )
-                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '2', '0' );
-            else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV30" ) )
-                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '3', '0' );
-            else if( !strcmp( tracks[i_track]->psz_codec, "V_REAL/RV40" ) )
-                tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'R', 'V', '4', '0' );
+            if( !strcmp( p_tk->psz_codec, "V_REAL/RV10" ) )
+                p_fmt->i_codec = VLC_FOURCC( 'R', 'V', '1', '0' );
+            else if( !strcmp( p_tk->psz_codec, "V_REAL/RV20" ) )
+                p_fmt->i_codec = VLC_FOURCC( 'R', 'V', '2', '0' );
+            else if( !strcmp( p_tk->psz_codec, "V_REAL/RV30" ) )
+                p_fmt->i_codec = VLC_FOURCC( 'R', 'V', '3', '0' );
+            else if( !strcmp( p_tk->psz_codec, "V_REAL/RV40" ) )
+                p_fmt->i_codec = VLC_FOURCC( 'R', 'V', '4', '0' );
+
+            if( p_tk->i_extra_data > 26 )
+            {
+                p_fmt->p_extra = malloc( p_tk->i_extra_data - 26 );
+                if( p_fmt->p_extra )
+                {
+                    p_fmt->i_extra = p_tk->i_extra_data - 26;
+                    memcpy( p_fmt->p_extra, &p_tk->p_extra_data[26], p_fmt->i_extra );
+                }
+            }
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_DIRAC", 7 ) )
         {
@@ -1077,6 +1090,13 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_cat = NAV_ES;
             continue;
+        }
+        else if( !strcmp( p_tk->psz_codec, "A_REAL/14_4" ) )
+        {
+            p_fmt->i_codec = VLC_FOURCC( '1', '4', '_', '4');
+            p_fmt->audio.i_channels = 1;
+            p_fmt->audio.i_rate = 8000;
+            p_fmt->audio.i_blockalign = 0x14;
         }
         else
         {
