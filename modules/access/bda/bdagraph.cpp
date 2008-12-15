@@ -527,11 +527,13 @@ int BDAGraph::SubmitDVBSTuneRequest()
                 p_dvbs_locator->Release();
             SysFreeString( bstr_input_range );
             delete pwsz_input_range;
+            free( psz_input_range );
+            free( psz_polarisation );
         }
     } l;
     long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
     long l_lnb_lof1, l_lnb_lof2, l_lnb_slof, l_inversion, l_network_id;
-    long l_input_range, l_hp_fec;
+    long l_hp_fec;
     int  i_mod;
     Polarisation i_polar;
     SpectralInversion i_inversion;
@@ -541,7 +543,6 @@ int BDAGraph::SubmitDVBSTuneRequest()
 
     l_frequency = l_symbolrate = l_azimuth = l_elevation = l_longitude = -1;
     l_lnb_lof1 = l_lnb_lof2 = l_lnb_slof = l_inversion = l_network_id = -1;
-    l_input_range = l_hp_fec = i_mod = -1;
     l_frequency = var_GetInteger( p_access, "dvb-frequency" );
     l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
     l_azimuth = var_GetInteger( p_access, "dvb-azimuth" );
