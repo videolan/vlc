@@ -122,7 +122,7 @@ static char *xtag_get_attribute( XTag *, char * );
 #endif
 static XTag *xtag_first_child( XTag *, char * );
 static XTag *xtag_next_child( XTag *, char * );
-static XTag *xtag_free( XTag * );
+static void  xtag_free( XTag * );
 static int xtag_snprint( char *, int, XTag * );
 
 /*****************************************************************************
@@ -756,14 +756,14 @@ static XTag *xtag_parse_tag( XTagParser *parser )
     return tag;
 }
 
-static XTag *xtag_free( XTag *xtag )
+static void xtag_free( XTag *xtag )
 {
     XList *l;
     XAttribute *attr;
     XTag *child;
 
     if( !xtag )
-        return NULL;
+        return;
 
     free( xtag->name );
     free( xtag->pcdata );
@@ -787,8 +787,6 @@ static XTag *xtag_free( XTag *xtag )
     xlist_free( xtag->children );
 
     free( xtag );
-
-    return NULL;
 }
 
 static XTag *xtag_new_parse( const char *s, int n )
