@@ -286,7 +286,6 @@ void *vlc_wopendir( const wchar_t *wpath )
 struct _wdirent *vlc_wreaddir( void *_p_dir )
 {
     vlc_DIR *p_dir = (vlc_DIR *)_p_dir;
-    unsigned int i;
     DWORD i_drives;
 
     if ( p_dir->p_real_dir != NULL )
@@ -311,6 +310,7 @@ struct _wdirent *vlc_wreaddir( void *_p_dir )
     swprintf( p_dir->dd_dir.d_name, L"\\");
     p_dir->dd_dir.d_namlen = wcslen(p_dir->dd_dir.d_name);
 #else
+    unsigned int i;
     if ( !i_drives )
         return NULL; /* end */
 
