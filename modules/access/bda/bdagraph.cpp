@@ -527,8 +527,6 @@ int BDAGraph::SubmitDVBSTuneRequest()
                 p_dvbs_locator->Release();
             SysFreeString( bstr_input_range );
             delete pwsz_input_range;
-            free(pwsz_input_range);
-            free(pwsz_input_range);
         }
     } l;
     long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
