@@ -790,15 +790,21 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                                                        tracks[i_track]->p_extra_data,
                                                        tracks[i_track]->i_extra_data,
                                                        true );
-            MP4_ReadBoxCommon( p_mp4_stream, p_box );
-            MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
-            tracks[i_track]->fmt.i_codec = p_box->i_type;
-            tracks[i_track]->fmt.video.i_width = p_box->data.p_sample_vide->i_width;
-            tracks[i_track]->fmt.video.i_height = p_box->data.p_sample_vide->i_height;
-            tracks[i_track]->fmt.i_extra = p_box->data.p_sample_vide->i_qt_image_description;
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-            memcpy( tracks[i_track]->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tracks[i_track]->fmt.i_extra );
-            MP4_FreeBox_sample_vide( p_box );
+            if( MP4_ReadBoxCommon( p_mp4_stream, p_box ) &&
+                MP4_ReadBox_sample_vide( p_mp4_stream, p_box ) )
+            {
+                tracks[i_track]->fmt.i_codec = p_box->i_type;
+                tracks[i_track]->fmt.video.i_width = p_box->data.p_sample_vide->i_width;
+                tracks[i_track]->fmt.video.i_height = p_box->data.p_sample_vide->i_height;
+                tracks[i_track]->fmt.i_extra = p_box->data.p_sample_vide->i_qt_image_description;
+                tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
+                memcpy( tracks[i_track]->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tracks[i_track]->fmt.i_extra );
+                MP4_FreeBox_sample_vide( p_box );
+            }
+            else
+            {
+                free( p_box );
+            }
             stream_Delete( p_mp4_stream );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_MS/ACM" ) )
