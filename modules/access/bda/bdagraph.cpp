@@ -509,12 +509,15 @@ int BDAGraph::SubmitDVBSTuneRequest()
         IDVBTuneRequest* p_dvbs_tune_request;
         IDVBSLocator* p_dvbs_locator;
         IDVBSTuningSpace* p_dvbs_tuning_space;
+        char* psz_polarisation;
+        char* psz_input_range;
         BSTR bstr_input_range;
         WCHAR* pwsz_input_range;
         int i_range_len;
         localComPtr(): p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
             p_dvbs_tuning_space(NULL), bstr_input_range(NULL),
-            pwsz_input_range(NULL), i_range_len(NULL)  {};
+            pwsz_input_range(NULL), i_range_len(NULL), psz_polarisation(NULL),
+            psz_input_range(NULL) {};
         ~localComPtr()
         {
             if( p_dvbs_tuning_space )
@@ -526,14 +529,14 @@ int BDAGraph::SubmitDVBSTuneRequest()
             SysFreeString( bstr_input_range );
             if( pwsz_input_range )
                 delete pwsz_input_range;
+            free(pwsz_input_range);
+            free(pwsz_input_range);
         }
     } l;
     long l_frequency, l_symbolrate, l_azimuth, l_elevation, l_longitude;
     long l_lnb_lof1, l_lnb_lof2, l_lnb_slof, l_inversion, l_network_id;
     long l_input_range, l_hp_fec;
     int  i_mod;
-    char* psz_polarisation = NULL;
-    char* psz_input_range = NULL;
     Polarisation i_polar;
     SpectralInversion i_inversion;
     VARIANT_BOOL b_west;
@@ -551,18 +554,18 @@ int BDAGraph::SubmitDVBSTuneRequest()
     l_lnb_lof1 = var_GetInteger( p_access, "dvb-lnb-lof1" );
     l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" );
     l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
-    psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
+    l.psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
     i_mod = var_GetInteger( p_access, "dvb-modulation" );
     l_hp_fec = var_GetInteger( p_access, "dvb-code-rate-hp" );
     l_inversion = var_GetInteger( p_access, "dvb-inversion" );
     l_network_id = var_GetInteger( p_access, "dvb-network-id" );
-    psz_input_range = var_GetNonEmptyString( p_access, "dvb-range" );
+    l.psz_input_range = var_GetNonEmptyString( p_access, "dvb-range" );
 
     b_west = ( l_longitude < 0 ) ? TRUE : FALSE;
 
     i_polar = BDA_POLARISATION_NOT_SET;
-    if( psz_polarisation != NULL )
-        switch( toupper( psz_polarisation[0] ) )
+    if( l.psz_polarisation != NULL )
+        switch( toupper( l.psz_polarisation[0] ) )
         {
             case 'H':
                 i_polar = BDA_POLARISATION_LINEAR_H;
@@ -609,12 +612,12 @@ int BDAGraph::SubmitDVBSTuneRequest()
         i_hp_fec = BDA_BCC_RATE_7_8;
 
     l.i_range_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
-        psz_input_range, -1, l.pwsz_input_range, 0 );
+        l.psz_input_range, -1, l.pwsz_input_range, 0 );
     if( l.i_range_len > 0 )
     {
         l.pwsz_input_range = new WCHAR[l.i_range_len];
         MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
-            psz_input_range, -1, l.pwsz_input_range, l.i_range_len );
+            l.psz_input_range, -1, l.pwsz_input_range, l.i_range_len );
         l.bstr_input_range=SysAllocString( l.pwsz_input_range );
     }
 
@@ -656,24 +659,6 @@ int BDAGraph::SubmitDVBSTuneRequest()
             "Cannot QI for IDVBSTuningSpace: hr=0x%8lx", hr );
         return VLC_EGENERIC;
     }
-
-/*****************************************************************************/
-/* More traces */
-  long l_tmp_lof1, l_tmp_lof2, l_tmp_slof;
-  BSTR bstr_tmp_range;
-  HRESULT hr2;
-  l_tmp_lof1 = l_tmp_lof2 = l_tmp_slof = -1;
-  hr2 = l.p_dvbs_tuning_space->get_LNBSwitch( &l_tmp_slof );
-  msg_Dbg( p_access, "get_LNBSwitch: %d", l_tmp_slof );
-  hr2 = l.p_dvbs_tuning_space->get_LowOscillator( &l_tmp_lof1 );
-  msg_Dbg( p_access, "get_LowOscillator: %d", l_tmp_lof1 );
-  hr2 = l.p_dvbs_tuning_space->get_HighOscillator( &l_tmp_lof2 );
-  msg_Dbg( p_access, "get_HighOscillator: %d", l_tmp_lof2 );
-  hr2 = l.p_dvbs_tuning_space->get_InputRange( &bstr_tmp_range );
-  msg_Dbg( p_access, "get_InputRange: %S", bstr_tmp_range );
-  SysFreeString( bstr_tmp_range );
-
-/*****************************************************************************/
 
     hr = S_OK;
     if( l_lnb_lof1 > 0 )
@@ -773,7 +758,10 @@ HRESULT BDAGraph::CreateTuneRequest()
             if( p_this_tuning_space )
                 p_this_tuning_space->Release();
             SysFreeString( bstr_name );
-            if( wpsz_network_name ) delete wpsz_network_name;
+            if( wpsz_network_name )
+                delete wpsz_network_name;
+            if( psz_network_name )
+                free(psz_network_name);
         }
     } l;
 
@@ -898,6 +886,7 @@ HRESULT BDAGraph::CreateTuneRequest()
      * network-name
      * Also would be nice to copy a tuning space but we only come here if we do
      * not find any. */
+    free( l.psz_network_name );
     l.psz_network_name = var_GetNonEmptyString( p_access, "dvb-create-name" );
     if( !l.psz_network_name )
     {
