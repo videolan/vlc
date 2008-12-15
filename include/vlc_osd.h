@@ -590,9 +590,9 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, bool b_value )
  * object. The types are declared in the include file include/vlc_osd.h
  * @see vlc_osd.h
  */
-VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
-VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
-VLC_EXPORT( void,osd_Message, ( spu_t *, int, char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
+VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, const char *, text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, const char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+VLC_EXPORT( void, osd_Message, ( spu_t *, int, char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
 /**
  * Default feedback images

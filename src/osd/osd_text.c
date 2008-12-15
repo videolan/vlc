@@ -42,7 +42,7 @@
  * \param i_duration Amount of time the text is to be shown.
  */
 int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
-                           char *psz_string, text_style_t *p_style,
+                           const char *psz_string, text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_duration )
 {
@@ -68,7 +68,7 @@ int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
  *               is about to be shown
  */
 int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
-                           char *psz_string, text_style_t *p_style,
+                           const char *psz_string, text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
