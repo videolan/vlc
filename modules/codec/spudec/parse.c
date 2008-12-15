@@ -119,6 +119,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     {
         /* There was a parse error, delete the subpicture */
         decoder_DeleteSubpicture( p_dec, p_spu );
+        free( p_spu_data );
         return NULL;
     }
 
@@ -127,6 +128,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     {
         /* There was a parse error, delete the subpicture */
         decoder_DeleteSubpicture( p_dec, p_spu );
+        free( p_spu_data );
         return NULL;
     }
 
