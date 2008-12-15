@@ -38,8 +38,7 @@ extern "C" {
 
     void dvb_deleteBDAGraph( access_t* p_access )
     {
-        if( p_access->p_sys->p_bda_module )
-            delete p_access->p_sys->p_bda_module;
+        delete p_access->p_sys->p_bda_module;
     };
 
     int dvb_SubmitATSCTuneRequest( access_t* p_access )
@@ -527,8 +526,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
             if( p_dvbs_locator )
                 p_dvbs_locator->Release();
             SysFreeString( bstr_input_range );
-            if( pwsz_input_range )
-                delete pwsz_input_range;
+            delete pwsz_input_range;
             free(pwsz_input_range);
             free(pwsz_input_range);
         }
@@ -758,10 +756,8 @@ HRESULT BDAGraph::CreateTuneRequest()
             if( p_this_tuning_space )
                 p_this_tuning_space->Release();
             SysFreeString( bstr_name );
-            if( wpsz_network_name )
-                delete wpsz_network_name;
-            if( psz_network_name )
-                free(psz_network_name);
+            delete wpsz_network_name;
+            free(psz_network_name);
         }
     } l;
 
@@ -909,7 +905,7 @@ HRESULT BDAGraph::CreateTuneRequest()
     if( IsEqualCLSID( guid_network_type, CLSID_DVBSNetworkProvider ) )
         cls_tuning_space = CLSID_DVBSTuningSpace;
 
-    if( l.wpsz_network_name ) delete l.wpsz_network_name;
+    delete l.wpsz_network_name;
     l.i_name_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
         l.psz_network_name, -1, l.wpsz_network_name, 0 );
     if( l.i_name_len > 0 )
