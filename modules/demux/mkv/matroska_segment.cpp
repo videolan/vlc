@@ -1033,6 +1033,11 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 i_extra += i_size[i];
             }
         }
+        else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/ASCII" ) )
+        {
+            p_fmt->i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+            p_fmt->subs.psz_encoding = NULL; /* Is there a place where it is stored ? */
+        }
         else if( !strcmp( tracks[i_track]->psz_codec, "S_TEXT/UTF8" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
