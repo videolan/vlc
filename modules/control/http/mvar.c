@@ -414,16 +414,14 @@ mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
 
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
-        char *psz, psz_int[16];
+        char psz_int[16];
         mvar_t *itm;
 
         switch( i_type & VLC_VAR_TYPE )
         {
         case VLC_VAR_STRING:
             itm = mvar_New( name, "set" );
-            /* FIXME: Memory leak here?? (remove strdup?) */
-            psz = strdup( text_list.p_list->p_values[i].psz_string );
-            mvar_AppendNewVar( itm, "name", psz );
+            mvar_AppendNewVar( itm, "name", text_list.p_list->p_values[i].psz_string );
             mvar_AppendNewVar( itm, "id", val_list.p_list->p_values[i].psz_string );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       ( !strcmp( val.psz_string,
@@ -435,8 +433,7 @@ mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
 
         case VLC_VAR_INTEGER:
             itm = mvar_New( name, "set" );
-            psz = strdup( text_list.p_list->p_values[i].psz_string );
-            mvar_AppendNewVar( itm, "name", psz );
+            mvar_AppendNewVar( itm, "name", text_list.p_list->p_values[i].psz_string );
             snprintf( psz_int, sizeof(psz_int), "%d",
                       val_list.p_list->p_values[i].i_int );
             mvar_AppendNewVar( itm, "id", psz_int );
