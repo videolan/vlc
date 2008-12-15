@@ -559,7 +559,7 @@ void VLMBroadcast::update()
 
 void VLMBroadcast::togglePlayPause()
 {
-    if( b_playing = true )
+    if( b_playing )
     {
         VLMWrapper::ControlBroadcast( name, ControlBroadcastPause );
         playButton->setIcon( QIcon( QPixmap( ":/pause_16px" ) ) );
