@@ -534,7 +534,6 @@ void config_UnsetCallbacks( module_config_t *p_new, size_t n )
 void __config_ResetAll( vlc_object_t *p_this )
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    int i_index;
     module_t *p_module;
     module_t **list = module_list_get (NULL);
 
