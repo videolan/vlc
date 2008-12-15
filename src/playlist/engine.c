@@ -62,7 +62,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     static const char playlist_name[] = "playlist";
     playlist_t *p_playlist;
     playlist_private_t *p;
-    bool b_save;
 
     /* Allocate structure */
     p = vlc_custom_create( p_parent, sizeof( *p ),
@@ -151,7 +150,6 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->request.b_request = false;
     pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 
-    b_save = pl_priv(p_playlist)->b_auto_preparse;
     pl_priv(p_playlist)->b_auto_preparse = false;
     playlist_MLLoad( p_playlist );
     pl_priv(p_playlist)->b_auto_preparse = true;
