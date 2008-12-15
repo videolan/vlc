@@ -38,6 +38,8 @@ public class MediaDescriptor
     private LibVlcEventManager eventManager;
     private boolean released;
     
+    private MediaPlayer mediaPlayer;
+    
     /**
      * @param jvlc The jvlc instance to create the media descriptor for.
      * @param media The media string
@@ -71,7 +73,11 @@ public class MediaDescriptor
     
     public MediaPlayer getMediaPlayer()
     {
-        return new MediaPlayer(this);
+        if (mediaPlayer == null)
+        {
+            this.mediaPlayer = new MediaPlayer(this);
+        }
+        return this.mediaPlayer;
     }
     
     /**
