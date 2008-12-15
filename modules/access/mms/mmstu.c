@@ -1256,9 +1256,6 @@ static int  mms_ParsePacket( access_t *p_access,
     size_t i_packet_length;
     uint32_t i_packet_id;
 
-    uint8_t  *p_packet;
-
-
     *pi_used = i_data; /* default */
     if( i_data <= 8 )
     {
@@ -1300,9 +1297,6 @@ static int  mms_ParsePacket( access_t *p_access,
     }
 
     /* we now have a media or a header packet */
-    p_packet = malloc( i_packet_length - 8 ); // don't bother with preheader
-    memcpy( p_packet, p_data + 8, i_packet_length - 8 );
-
     if( i_packet_seq_num != p_sys->i_packet_seq_num )
     {
 #if 0
@@ -1322,14 +1316,14 @@ static int  mms_ParsePacket( access_t *p_access,
             p_sys->p_header = realloc( p_sys->p_header,
                                           p_sys->i_header + i_packet_length - 8 );
             memcpy( &p_sys->p_header[p_sys->i_header],
-                    p_packet,
-                    i_packet_length - 8 );
+                    p_data + 8, i_packet_length - 8 );
             p_sys->i_header += i_packet_length - 8;
 
-            free( p_packet );
         }
         else
         {
+            uint8_t* p_packet = malloc( i_packet_length - 8 ); // don't bother with preheader
+            memcpy( p_packet, p_data + 8, i_packet_length - 8 );
             p_sys->p_header = p_packet;
             p_sys->i_header = i_packet_length - 8;
         }
@@ -1341,6 +1335,8 @@ static int  mms_ParsePacket( access_t *p_access,
     }
     else
     {
+        uint8_t* p_packet = malloc( i_packet_length - 8 ); // don't bother with preheader
+        memcpy( p_packet, p_data + 8, i_packet_length - 8 );
         FREENULL( p_sys->p_media );
         p_sys->p_media = p_packet;
         p_sys->i_media = i_packet_length - 8;
