@@ -64,7 +64,7 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
         WSAEventSelect (fds[i].fd, phEvents[i], events);
     }
 
-    int ret = 0, n;
+    int ret = 0, n = 0;
 
     switch (WaitForMultipleObjectsEx (nfds, phEvents, FALSE, timeout, TRUE))
     {
