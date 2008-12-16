@@ -413,7 +413,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
     const int i_param_count, const char** psz_param, const int* i_type )
 {
     const int   MAXPARAM = 40;
-    BOOL        b_used[MAXPARAM];
+    bool        b_used[MAXPARAM];
     char*       psz_parser;
     char*       psz_token;
     char*       psz_value;
@@ -429,7 +429,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
             return VLC_EGENERIC;
     }
     for( int i = 0; i < i_param_count; i++ )
-        b_used[i] = FALSE;
+        b_used[i] = false;
     psz_parser = p_access->psz_path;
     if( strlen( psz_parser ) <= 0 )
         return VLC_SUCCESS;
@@ -446,8 +446,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
         {
             msg_Warn( p_access, "ParsePath: Unspecified parameter %s",
                 psz_token );
-            if( psz_token )
-                free( psz_token );
+            free( psz_token );
             return VLC_EGENERIC;
         }
         i_this_param = -1;
@@ -462,19 +461,17 @@ static int ParsePath( access_t *p_access, const char* psz_module,
         if( i_this_param < 0 )
         {
             msg_Warn( p_access, "ParsePath: Unknown parameter %s", psz_token );
-            if( psz_token )
-                free( psz_token );
+            free( psz_token );
             return VLC_EGENERIC;
         }
         if( b_used[i_this_param] )
         {
             msg_Warn( p_access, "ParsePath: Duplicate parameter %s",
                 psz_token );
-            if( psz_token )
-                free( psz_token );
+            free( psz_token );
             return VLC_EGENERIC;
         }
-        b_used[i_this_param] = TRUE;
+        b_used[i_this_param] = true;
 
         /* if "=" was found in token then value starts at
          * psz_token + i_paramlen + 1
@@ -490,14 +487,13 @@ static int ParsePath( access_t *p_access, const char* psz_module,
             psz_param[i_this_param] );
         var_Set( p_access, psz_full_name, v_value );
 
-        if( psz_token )
-            free( psz_token );
+        free( psz_token );
         if( i_token_len >= strlen( psz_parser ) )
             break;
         psz_parser += i_token_len + 1;
         i_token_len = strcspn( psz_parser, ":" );
     }
-    while( TRUE );
+    while( true );
     return VLC_SUCCESS;
 }
 

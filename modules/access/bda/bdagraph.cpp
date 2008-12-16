@@ -94,7 +94,7 @@ BDAGraph::BDAGraph( access_t* p_this ):
     l_tuner_used(-1),
     d_graph_register( 0 )
 {
-    b_ready = FALSE;
+    b_ready = false;
     p_tuning_space = NULL;
     p_tune_request = NULL;
     p_media_control = NULL;
