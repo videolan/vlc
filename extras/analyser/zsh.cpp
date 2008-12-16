@@ -209,7 +209,7 @@ void PrintModuleList( libvlc_int_t *p_libvlc, mumap &mods, mcmap &mods2 )
 
 void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
 {
-    char *psz_arguments = strdup( "" );
+    char *psz_arguments = NULL;
     char *psz_exclusive;
     char *psz_option;
     char *psz_name;
@@ -361,7 +361,6 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
 
     case CONFIG_ITEM_BOOL:
 //        p_control = new BoolConfigControl( p_this, p_item, parent );
-        psz_arguments = NULL;
         asprintf( &psz_exclusive, "--no%s --no-%s", p_item->psz_name,
                  p_item->psz_name );
         psz_name = DUP( p_item->psz_name );
@@ -412,6 +411,7 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
     free( psz_name );
     free( psz_text );
     free( psz_longtext );
+    free( psz_arguments );
 }
 
 void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
