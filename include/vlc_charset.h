@@ -81,6 +81,33 @@ static inline char *FromWide (const wchar_t *wide)
 }
 #endif
 
+/**
+ * Converts a nul-terminated string from ISO-8859-1 to UTF-8.
+ */
+static inline char *FromLatin1 (const char *latin)
+{
+    char *str = malloc (2 * strlen (latin) + 1), *utf8 = str;
+    unsigned char c;
+
+    if (str == NULL)
+        return NULL;
+
+    while ((c = *(latin++)) != '\0')
+    {
+         if (c >= 0x80)
+         {
+             *(utf8++) = 0xC0 | (c >> 6);
+             *(utf8++) = 0x80 | (c & 0x3F);
+         }
+         else
+             *(utf8++) = c;
+    }
+    *(utf8++) = '\0';
+
+    utf8 = realloc (str, utf8 - str);
+    return utf8 ? utf8 : str;
+}
+
 VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) LIBVLC_USED );
 
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) LIBVLC_USED );
