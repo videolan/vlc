@@ -86,7 +86,7 @@ static inline char *FromWide (const wchar_t *wide)
  */
 static inline char *FromLatin1 (const char *latin)
 {
-    char *str = malloc (2 * strlen (latin) + 1), *utf8 = str;
+    char *str = (char *)malloc (2 * strlen (latin) + 1), *utf8 = str;
     unsigned char c;
 
     if (str == NULL)
@@ -104,7 +104,7 @@ static inline char *FromLatin1 (const char *latin)
     }
     *(utf8++) = '\0';
 
-    utf8 = realloc (str, utf8 - str);
+    utf8 = (char *)realloc (str, utf8 - str);
     return utf8 ? utf8 : str;
 }
 
