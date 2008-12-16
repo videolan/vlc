@@ -72,11 +72,12 @@ static void cloexec (int fd)
 extern char **environ;
 
 static const size_t bufsize = 65536;
+#ifdef HAVE_VMSPLICE
 static void cleanup_mmap (void *addr)
 {
     munmap (addr, bufsize);
 }
-
+#endif
 
 static void *Thread (void *data)
 {
