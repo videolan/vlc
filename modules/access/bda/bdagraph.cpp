@@ -142,12 +142,10 @@ int BDAGraph::SubmitATSCTuneRequest()
     long l_major_channel, l_minor_channel, l_physical_channel;
     long l_frequency;
 
-    l_major_channel = l_minor_channel = l_physical_channel = -1;
-    l_frequency = -1;
-    l_major_channel = var_GetInteger( p_access, "dvb-major-channel" );
-    l_minor_channel = var_GetInteger( p_access, "dvb-minor-channel" );
-    l_physical_channel = var_GetInteger( p_access, "dvb-physical-channel" );
-    l_frequency = var_GetInteger( p_access, "dvb-frequency" );
+    l_major_channel     = var_GetInteger( p_access, "dvb-major-channel" );
+    l_minor_channel     = var_GetInteger( p_access, "dvb-minor-channel" );
+    l_physical_channel  = var_GetInteger( p_access, "dvb-physical-channel" );
+    l_frequency         = var_GetInteger( p_access, "dvb-frequency" );
 
     guid_network_type = CLSID_ATSCNetworkProvider;
     hr = CreateTuneRequest();
@@ -245,63 +243,81 @@ int BDAGraph::SubmitDVBTTuneRequest()
     TransmissionMode          i_transmission;
     HierarchyAlpha            i_hierarchy;
 
-    l_frequency = l_bandwidth = l_hp_fec = l_lp_fec = l_guard = -1;
-    l_transmission = l_hierarchy = -1;
-    l_frequency = var_GetInteger( p_access, "dvb-frequency" );
-    l_bandwidth = var_GetInteger( p_access, "dvb-bandwidth" );
-    l_hp_fec = var_GetInteger( p_access, "dvb-code-rate-hp" );
-    l_lp_fec = var_GetInteger( p_access, "dvb-code-rate-lp" );
-    l_guard = var_GetInteger( p_access, "dvb-guard" );
+    l_frequency    = var_GetInteger( p_access, "dvb-frequency" );
+    l_bandwidth    = var_GetInteger( p_access, "dvb-bandwidth" );
+    l_hp_fec       = var_GetInteger( p_access, "dvb-code-rate-hp" );
+    l_lp_fec       = var_GetInteger( p_access, "dvb-code-rate-lp" );
+    l_guard        = var_GetInteger( p_access, "dvb-guard" );
     l_transmission = var_GetInteger( p_access, "dvb-transmission" );
-    l_hierarchy = var_GetInteger( p_access, "dvb-hierarchy" );
+    l_hierarchy    = var_GetInteger( p_access, "dvb-hierarchy" );
 
-    i_hp_fec = BDA_BCC_RATE_NOT_SET;
-    if( l_hp_fec == 1 )
-        i_hp_fec = BDA_BCC_RATE_1_2;
-    if( l_hp_fec == 2 )
-        i_hp_fec = BDA_BCC_RATE_2_3;
-    if( l_hp_fec == 3 )
-        i_hp_fec = BDA_BCC_RATE_3_4;
-    if( l_hp_fec == 4 )
-        i_hp_fec = BDA_BCC_RATE_5_6;
-    if( l_hp_fec == 5 )
-        i_hp_fec = BDA_BCC_RATE_7_8;
+    switch( l_hp_fec )
+    {
+    case 1:
+        i_hp_fec = BDA_BCC_RATE_1_2; break;
+    case 2:
+        i_hp_fec = BDA_BCC_RATE_2_3; break;
+    case 3;
+        i_hp_fec = BDA_BCC_RATE_3_4; break;
+    case 4:
+        i_hp_fec = BDA_BCC_RATE_5_6; break;
+    case 5:
+        i_hp_fec = BDA_BCC_RATE_7_8;break;
+    default:
+        i_hp_fec = BDA_BCC_RATE_NOT_SET;
+    }
 
-    i_lp_fec = BDA_BCC_RATE_NOT_SET;
-    if( l_lp_fec == 1 )
-        i_lp_fec = BDA_BCC_RATE_1_2;
-    if( l_lp_fec == 2 )
-        i_lp_fec = BDA_BCC_RATE_2_3;
-    if( l_lp_fec == 3 )
-        i_lp_fec = BDA_BCC_RATE_3_4;
-    if( l_lp_fec == 4 )
-        i_lp_fec = BDA_BCC_RATE_5_6;
-    if( l_lp_fec == 5 )
-        i_lp_fec = BDA_BCC_RATE_7_8;
+    switch( l_lp_fec )
+    {
+    case 1:
+        i_lp_fec = BDA_BCC_RATE_1_2; break;
+    case 2:
+        i_lp_fec = BDA_BCC_RATE_2_3; break;
+    case 3:
+        i_lp_fec = BDA_BCC_RATE_3_4; break;
+    case 4:
+        i_lp_fec = BDA_BCC_RATE_5_6; break;
+    case 5:
+        i_lp_fec = BDA_BCC_RATE_7_8; break;
+    default:
+        i_lp_fec = BDA_BCC_RATE_NOT_SET;
+    }
 
-    i_guard = BDA_GUARD_NOT_SET;
-    if( l_guard == 32 )
-        i_guard = BDA_GUARD_1_32;
-    if( l_guard == 16 )
-        i_guard = BDA_GUARD_1_16;
-    if( l_guard == 8 )
-        i_guard = BDA_GUARD_1_8;
-    if( l_guard == 4 )
-        i_guard = BDA_GUARD_1_4;
+    switch( l_guard )
+    {
+    case 32:
+        i_guard = BDA_GUARD_1_32; break,
+    case 16:
+        i_guard = BDA_GUARD_1_16; break,
+    case 8:
+        i_guard = BDA_GUARD_1_8; break;
+    case 4;
+        i_guard = BDA_GUARD_1_4; break;
+    default;
+        i_guard = BDA_GUARD_NOT_SET;
+    }
 
-    i_transmission = BDA_XMIT_MODE_NOT_SET;
-    if( l_transmission == 2 )
-        i_transmission = BDA_XMIT_MODE_2K;
-    if( l_transmission == 8 )
-        i_transmission = BDA_XMIT_MODE_8K;
+    swicth( l_transmission )
+    {
+    case 2:
+        i_transmission = BDA_XMIT_MODE_2K; break;
+    case 8:
+        i_transmission = BDA_XMIT_MODE_8K; break;
+    default:
+        i_transmission = BDA_XMIT_MODE_NOT_SET;
+    }
 
-    i_hierarchy = BDA_HALPHA_NOT_SET;
-    if( l_hierarchy == 1 )
-        i_hierarchy = BDA_HALPHA_1;
-    if( l_hierarchy == 2 )
-        i_hierarchy = BDA_HALPHA_2;
-    if( l_hierarchy == 4 )
-        i_hierarchy = BDA_HALPHA_4;
+    swicth( l_hierarchy )
+    {
+    case 1:
+        i_hierarchy = BDA_HALPHA_1; break;
+    case 2:
+        i_hierarchy = BDA_HALPHA_2; break;
+    case 4:
+        i_hierarchy = BDA_HALPHA_4; break;
+    default:
+        i_hierarchy = BDA_HALPHA_NOT_SET;
+    }
 
     guid_network_type = CLSID_DVBTNetworkProvider;
     hr = CreateTuneRequest();
@@ -408,21 +424,25 @@ int BDAGraph::SubmitDVBCTuneRequest()
     int  i_qam;
     ModulationType i_qam_mod;
 
-    l_frequency = l_symbolrate = i_qam = -1;
-    l_frequency = var_GetInteger( p_access, "dvb-frequency" );
+    l_frequency  = var_GetInteger( p_access, "dvb-frequency" );
     l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
-    i_qam = var_GetInteger( p_access, "dvb-modulation" );
-    i_qam_mod = BDA_MOD_NOT_SET;
-    if( i_qam == 16 )
-        i_qam_mod = BDA_MOD_16QAM;
-    if( i_qam == 32 )
-        i_qam_mod = BDA_MOD_32QAM;
-    if( i_qam == 64 )
-        i_qam_mod = BDA_MOD_64QAM;
-    if( i_qam == 128 )
-        i_qam_mod = BDA_MOD_128QAM;
-    if( i_qam == 256 )
-        i_qam_mod = BDA_MOD_256QAM;
+    i_qam        = var_GetInteger( p_access, "dvb-modulation" );
+
+    switch( i_qam )
+    {
+    case 16:
+        i_qam_mod = BDA_MOD_16QAM; break;
+    case 32;
+        i_qam_mod = BDA_MOD_32QAM; break;
+    case 64:
+        i_qam_mod = BDA_MOD_64QAM; break;
+    case 128:
+        i_qam_mod = BDA_MOD_128QAM; break;
+    case 256:
+        i_qam_mod = BDA_MOD_256QAM; break;
+    default;
+        i_qam_mod = BDA_MOD_NOT_SET;
+    }
 
     guid_network_type = CLSID_DVBCNetworkProvider;
     hr = CreateTuneRequest();
@@ -515,7 +535,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
         int i_range_len;
         localComPtr(): p_dvbs_tune_request(NULL), p_dvbs_locator(NULL),
             p_dvbs_tuning_space(NULL), bstr_input_range(NULL),
-            pwsz_input_range(NULL), i_range_len(NULL), psz_polarisation(NULL),
+            pwsz_input_range(NULL), i_range_len(0), psz_polarisation(NULL),
             psz_input_range(NULL) {};
         ~localComPtr()
         {
@@ -541,72 +561,85 @@ int BDAGraph::SubmitDVBSTuneRequest()
     BinaryConvolutionCodeRate i_hp_fec;
     ModulationType i_mod_typ;
 
-    l_frequency = l_symbolrate = l_azimuth = l_elevation = l_longitude = -1;
-    l_lnb_lof1 = l_lnb_lof2 = l_lnb_slof = l_inversion = l_network_id = -1;
-    l_frequency = var_GetInteger( p_access, "dvb-frequency" );
-    l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
-    l_azimuth = var_GetInteger( p_access, "dvb-azimuth" );
-    l_elevation = var_GetInteger( p_access, "dvb-elevation" );
-    l_longitude = var_GetInteger( p_access, "dvb-longitude" );
-    l_lnb_lof1 = var_GetInteger( p_access, "dvb-lnb-lof1" );
-    l_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" );
-    l_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
-    l.psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
-    i_mod = var_GetInteger( p_access, "dvb-modulation" );
-    l_hp_fec = var_GetInteger( p_access, "dvb-code-rate-hp" );
-    l_inversion = var_GetInteger( p_access, "dvb-inversion" );
-    l_network_id = var_GetInteger( p_access, "dvb-network-id" );
-    l.psz_input_range = var_GetNonEmptyString( p_access, "dvb-range" );
+    l_frequency        = var_GetInteger( p_access, "dvb-frequency" );
+    l_symbolrate       = var_GetInteger( p_access, "dvb-srate" );
+    l_azimuth          = var_GetInteger( p_access, "dvb-azimuth" );
+    l_elevation        = var_GetInteger( p_access, "dvb-elevation" );
+    l_longitude        = var_GetInteger( p_access, "dvb-longitude" );
+    l_lnb_lof1         = var_GetInteger( p_access, "dvb-lnb-lof1" );
+    l_lnb_lof2         = var_GetInteger( p_access, "dvb-lnb-lof2" );
+    l_lnb_slof         = var_GetInteger( p_access, "dvb-lnb-slof" );
+    i_mod              = var_GetInteger( p_access, "dvb-modulation" );
+    l_hp_fec           = var_GetInteger( p_access, "dvb-code-rate-hp" );
+    l_inversion        = var_GetInteger( p_access, "dvb-inversion" );
+    l_network_id       = var_GetInteger( p_access, "dvb-network-id" );
 
-    b_west = ( l_longitude < 0 ) ? TRUE : FALSE;
+    l.psz_input_range  = var_GetNonEmptyString( p_access, "dvb-range" );
+    l.psz_polarisation = var_GetNonEmptyString( p_access, "dvb-polarisation" );
+
+    b_west = ( l_longitude < 0 );
 
     i_polar = BDA_POLARISATION_NOT_SET;
     if( l.psz_polarisation != NULL )
+    {
         switch( toupper( l.psz_polarisation[0] ) )
         {
-            case 'H':
-                i_polar = BDA_POLARISATION_LINEAR_H;
-                break;
-            case 'V':
-                i_polar = BDA_POLARISATION_LINEAR_V;
-                break;
-            case 'L':
-                i_polar = BDA_POLARISATION_CIRCULAR_L;
-                break;
-            case 'R':
-                i_polar = BDA_POLARISATION_CIRCULAR_R;
-                break;
+        case 'H':
+            i_polar = BDA_POLARISATION_LINEAR_H;
+            break;
+        case 'V':
+            i_polar = BDA_POLARISATION_LINEAR_V;
+            break;
+        case 'L':
+            i_polar = BDA_POLARISATION_CIRCULAR_L;
+            break;
+        case 'R':
+            i_polar = BDA_POLARISATION_CIRCULAR_R;
+            break;
         }
+    }
 
-    i_inversion = BDA_SPECTRAL_INVERSION_NOT_SET;
-    if( l_inversion == 0 )
-        i_inversion = BDA_SPECTRAL_INVERSION_NORMAL;
-    if( l_inversion == 1 )
-        i_inversion = BDA_SPECTRAL_INVERSION_INVERTED;
-    if( l_inversion == 2 )
-        i_inversion = BDA_SPECTRAL_INVERSION_AUTOMATIC;
+    switch( l_inversion )
+    {
+    case 0:
+        i_inversion = BDA_SPECTRAL_INVERSION_NORMAL; break,
+    case 1:
+        i_inversion = BDA_SPECTRAL_INVERSION_INVERTED; break;
+    case 2:
+        i_inversion = BDA_SPECTRAL_INVERSION_AUTOMATIC; break;
+    default:
+        i_inversion = BDA_SPECTRAL_INVERSION_NOT_SET;
+    }
 
-    i_mod_typ = BDA_MOD_NOT_SET;
-    if( i_mod == 16 )
-        i_mod_typ = BDA_MOD_16QAM;
-    if( i_mod == 128 )
-        i_mod_typ = BDA_MOD_128QAM;
-    if( i_mod == 256 )
-        i_mod_typ = BDA_MOD_256QAM;
-    if( i_mod == 10004 )
-        i_mod_typ = BDA_MOD_QPSK;
+    switch( i_mod )
+    {
+    case 16:
+        i_mod_typ = BDA_MOD_16QAM; break;
+    case 128:
+        i_mod_typ = BDA_MOD_128QAM; break;
+    case 256:
+        i_mod_typ = BDA_MOD_256QAM; break;
+    case 10004:
+        i_mod_typ = BDA_MOD_QPSK; break;
+    default:
+        i_mod_typ = BDA_MOD_NOT_SET;
+    }
 
-    i_hp_fec = BDA_BCC_RATE_NOT_SET;
-    if( l_hp_fec == 1 )
-        i_hp_fec = BDA_BCC_RATE_1_2;
-    if( l_hp_fec == 2 )
-        i_hp_fec = BDA_BCC_RATE_2_3;
-    if( l_hp_fec == 3 )
-        i_hp_fec = BDA_BCC_RATE_3_4;
-    if( l_hp_fec == 4 )
-        i_hp_fec = BDA_BCC_RATE_5_6;
-    if( l_hp_fec == 5 )
-        i_hp_fec = BDA_BCC_RATE_7_8;
+    switch( l_hp_fec )
+    {
+    case 1:
+        i_hp_fec = BDA_BCC_RATE_1_2; break;
+    case 2:
+        i_hp_fec = BDA_BCC_RATE_2_3; break;
+    case 3:
+        i_hp_fec = BDA_BCC_RATE_3_4; break;
+    case 4:
+        i_hp_fec = BDA_BCC_RATE_5_6; break;
+    case 5:
+        i_hp_fec = BDA_BCC_RATE_7_8; break;
+    default:
+        i_hp_fec = BDA_BCC_RATE_NOT_SET;
+    }
 
     l.i_range_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
         l.psz_input_range, -1, l.pwsz_input_range, 0 );
@@ -755,8 +788,8 @@ HRESULT BDAGraph::CreateTuneRequest()
             if( p_this_tuning_space )
                 p_this_tuning_space->Release();
             SysFreeString( bstr_name );
-            delete wpsz_network_name;
-            free(psz_network_name);
+            delete[] wpsz_network_name;
+            free( psz_network_name );
         }
     } l;
 
@@ -904,7 +937,7 @@ HRESULT BDAGraph::CreateTuneRequest()
     if( IsEqualCLSID( guid_network_type, CLSID_DVBSNetworkProvider ) )
         cls_tuning_space = CLSID_DVBSTuningSpace;
 
-    delete l.wpsz_network_name;
+    delete[] l.wpsz_network_name;
     l.i_name_len = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED,
         l.psz_network_name, -1, l.wpsz_network_name, 0 );
     if( l.i_name_len > 0 )
@@ -1170,14 +1203,14 @@ HRESULT BDAGraph::Build()
     }
 
     /* Configure the Sample Grabber to buffer the samples continuously */
-    hr = p_grabber->SetBufferSamples( TRUE );
+    hr = p_grabber->SetBufferSamples( true );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
             "Cannot set Sample Grabber to buffering: hr=0x%8lx", hr );
         return hr;
     }
-    hr = p_grabber->SetOneShot( FALSE );
+    hr = p_grabber->SetOneShot( false );
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
