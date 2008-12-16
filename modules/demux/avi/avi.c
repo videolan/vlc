@@ -630,11 +630,7 @@ static int Open( vlc_object_t * p_this )
                 continue;
         }
         if( p_strn )
-        {
-            /* The charset of p_strn is undefined */
-            EnsureUTF8( p_strn->p_str );
-            fmt.psz_description = strdup( p_strn->p_str );
-        }
+            fmt.psz_description = FromLatin1( p_strn->p_str );
         if( tk->p_out_muxed == NULL )
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         TAB_APPEND( p_sys->i_track, p_sys->track, tk );
