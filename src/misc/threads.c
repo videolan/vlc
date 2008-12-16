@@ -334,7 +334,7 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("destroying mutex");
 
 #elif defined( WIN32 )
-    assert (p_mutex->initialized);
+    assert (InterlockedExchange (&p_mutex->initialized, -1) == 1);
     DeleteCriticalSection (&p_mutex->mutex);
 
 #endif
@@ -364,6 +364,7 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
         /* FIXME: destroy the mutex some time... */
         vlc_mutex_unlock (&super_mutex);
     }
+    assert (InterlockedExchange (&p_mutex->initialized, 1) == 1);
     EnterCriticalSection (&p_mutex->mutex);
 
 #endif
@@ -381,6 +382,7 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("unlocking mutex");
 
 #elif defined( WIN32 )
+    assert (InterlockedExchange (&p_mutex->initialized, 1) == 1);
     LeaveCriticalSection (&p_mutex->mutex);
 
 #endif
