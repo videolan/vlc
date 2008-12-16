@@ -360,7 +360,8 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
         assert (p_mutex != &super_mutex); /* this one cannot be static */
 
         vlc_mutex_lock (&super_mutex);
-        vlc_mutex_init (p_mutex);
+        if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
+            vlc_mutex_init (p_mutex);
         /* FIXME: destroy the mutex some time... */
         vlc_mutex_unlock (&super_mutex);
     }
