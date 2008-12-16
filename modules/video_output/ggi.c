@@ -311,7 +311,7 @@ static int Manage( vout_thread_t *p_vout )
                         break;
 
                     case GII_PBUTTON_RIGHT:
-                        /* trigger contextual menu here */
+                        var_SetBool( p_vout->p_libvlc, "intf-popupmenu", true );
                         break;
                 }
                 break;

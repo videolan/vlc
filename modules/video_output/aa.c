@@ -200,8 +200,8 @@ static int Manage( vout_thread_t *p_vout )
     {
     case AA_MOUSE:
         aa_getmouse( p_vout->p_sys->aa_context, &x, &y, &b );
-        /*if ( b & AA_BUTTON3 )
-             trigger contextual menu here */
+        if ( b & AA_BUTTON3 )
+            var_SetBool( p_vout->p_libvlc, "intf-popupmenu", true );
         break;
     case AA_RESIZE:
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
