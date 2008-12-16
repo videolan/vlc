@@ -31,12 +31,12 @@
 #include <spawn.h>
 #include <sys/wait.h>
 #include <sys/ioctl.h>
-#ifdef __linux__
+#if defined (__linux__) && defined (HAVE_VMSPLICE)
 # include <sys/uio.h>
 # include <sys/mman.h>
+#else
+# undef HAVE_VMSPLICE
 #endif
-
-#include <assert.h>
 
 static int  OpenGzip (vlc_object_t *);
 static int  OpenBzip2 (vlc_object_t *);
@@ -82,7 +82,7 @@ static void *Thread (void *data)
 {
     stream_t *stream = data;
     stream_sys_t *p_sys = stream->p_sys;
-#ifdef __linux__
+#ifdef HAVE_VMSPLICE
     ssize_t page_mask = sysconf (_SC_PAGE_SIZE) - 1;
 #endif
     int fd = p_sys->write_fd;
@@ -92,7 +92,7 @@ static void *Thread (void *data)
     {
         ssize_t len;
         int canc = vlc_savecancel ();
-#ifdef __linux__
+#ifdef HAVE_VMSPLICE
         unsigned char *buf = mmap (NULL, bufsize, PROT_READ|PROT_WRITE,
                                    MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
         vlc_cleanup_push (cleanup_mmap, buf);
@@ -106,7 +106,7 @@ static void *Thread (void *data)
 
         for (ssize_t i = 0, j; i < len; i += j)
         {
-#ifdef __linux__
+#ifdef HAVE_VMSPLICE
             if ((len - i) <= page_mask) /* incomplete last page */
                 j = write (fd, buf + i, len - i);
             else
@@ -126,7 +126,7 @@ static void *Thread (void *data)
                 break;
             }
         }
-#ifdef __linux__
+#ifdef HAVE_VMSPLICE
         vlc_cleanup_run (); /* munmap (buf, bufsize) */
 #endif
     }
