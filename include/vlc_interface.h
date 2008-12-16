@@ -70,9 +70,7 @@ struct intf_thread_t
     /** Interaction stuff */
     bool b_interaction;
 
-    /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
-    bool   b_menu;
 };
 
 /** \brief Arguments passed to a dialogs provider
