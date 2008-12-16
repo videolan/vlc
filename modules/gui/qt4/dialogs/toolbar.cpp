@@ -50,7 +50,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     setMinimumWidth( 600 );
 
     /* main GroupBox */
-    QGroupBox *widgetBox = new QGroupBox( "Toolbar Elements", this );
+    QGroupBox *widgetBox = new QGroupBox( qtr( "Toolbar Elements") , this );
     widgetBox->setSizePolicy( QSizePolicy::Preferred,
                               QSizePolicy::MinimumExpanding );
     QGridLayout *boxLayout = new QGridLayout( widgetBox );
@@ -68,15 +68,15 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
 
 
     /* Main ToolBar */
-    QGroupBox *mainToolbarBox = new QGroupBox( "Main Toolbar", this );
+    QGroupBox *mainToolbarBox = new QGroupBox( qtr( "Main Toolbar" ), this );
     QGridLayout *mainTboxLayout = new QGridLayout( mainToolbarBox );
 
-    QLabel *label = new QLabel( "Toolbar position:" );
+    QLabel *label = new QLabel( qtr( "Toolbar position:" ) );
     mainTboxLayout->addWidget(label, 0, 0, 1, 2);
 
     QComboBox *positionCombo = new QComboBox;
-    positionCombo->addItems( QStringList() << "Above the Video"
-                                           << "Under the Video" );
+    positionCombo->addItems( QStringList() << qtr( "Above the Video" )
+                                           << qtr( "Under the Video" ) );
     mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
     QLabel *line1Label = new QLabel( "Line 1:" );
@@ -96,7 +96,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     mainTboxLayout->addWidget( controller2, 2, 1, 1, 2);
 
     /* Advanced ToolBar */
-    QLabel *advLabel = new QLabel( "Advanced Widget toolbar:" );
+    QLabel *advLabel = new QLabel( qtr( "Advanced Widget toolbar:" ) );
     QString lineA = getSettings()->value( "MainWindow/AdvToolbar",
                         "12;11;13;14").toString();
     controllerA = new DroppingController( p_intf, lineA,
@@ -107,7 +107,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     mainLayout->addWidget( mainToolbarBox, 1, 0, 1, -1 );
 
     /* TimeToolBar */
-    QGroupBox *timeToolbarBox = new QGroupBox( "Time Toolbar", this );
+    QGroupBox *timeToolbarBox = new QGroupBox( qtr( "Time Toolbar" ) , this );
     QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
 
     QString line = getSettings()->value( "MainWindow/InputToolbar",
@@ -119,7 +119,8 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     mainLayout->addWidget( timeToolbarBox, 2, 0, 1, -1 );
 
     /* FSCToolBar */
-    QGroupBox *FSCToolbarBox = new QGroupBox( "Fullscreen Controller", this );
+    QGroupBox *FSCToolbarBox = new QGroupBox( qtr( "Fullscreen Controller" ),
+                                              this );
     QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
 
     QString lineFSC = getSettings()->value( "MainWindow/FSCtoolbar",
