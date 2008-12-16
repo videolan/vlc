@@ -108,7 +108,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 
     /* Initialize structure */
     p_intf->b_menu        = false;
-    p_intf->b_menu_change = false;
 
     /* Initialize mutexes */
     vlc_mutex_init( &p_intf->change_lock );

@@ -72,7 +72,6 @@ struct intf_thread_t
 
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
-    bool   b_menu_change;
     bool   b_menu;
 };
 

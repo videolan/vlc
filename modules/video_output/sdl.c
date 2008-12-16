@@ -459,18 +459,9 @@ static int Manage( vout_thread_t *p_vout )
 
             case SDL_BUTTON_RIGHT:
                 {
-                    intf_thread_t *p_intf;
-
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int &= ~4;
                     var_Set( p_vout, "mouse-button-down", val );
-                    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
-                                                      FIND_ANYWHERE );
-                    if( p_intf )
-                    {
-                        p_intf->b_menu_change = 1;
-                        vlc_object_release( p_intf );
-                    }
 
                     val.b_bool = true;
                     var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
