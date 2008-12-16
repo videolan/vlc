@@ -126,6 +126,7 @@ DEPS_res = \
 	pixmaps/go-next.png \
 	pixmaps/next_16px.png \
 	pixmaps/next.png \
+	pixmaps/space.png \
 	pixmaps/noart.png \
 	pixmaps/pause_16px.png \
 	pixmaps/pause.png \
