@@ -68,6 +68,34 @@ nodist_SOURCES_qt4 = \
 		ui/sout.h
 
 DEPS_res = \
+	pixmaps/arrow_down_dark.png \
+	pixmaps/clear.png \
+	pixmaps/eject.png \
+	pixmaps/faster.png \
+	pixmaps/go-next.png \
+	pixmaps/menus/help_16px.png \
+	pixmaps/menus/info_16px.png \
+	pixmaps/menus/messages_16px.png \
+	pixmaps/menus/playlist_16px.png \
+	pixmaps/menus/preferences_16px.png \
+	pixmaps/menus/quit_16px.png \
+	pixmaps/menus/settings_16px.png \
+	pixmaps/menus/stream_16px.png \
+	pixmaps/next.png \
+	pixmaps/next_16px.png \
+	pixmaps/noart.png \
+	pixmaps/pause.png \
+	pixmaps/pause_16px.png \
+	pixmaps/play.png \
+	pixmaps/play_16px.png \
+	pixmaps/playlist/add.png \
+	pixmaps/playlist/jumpto.png \
+	pixmaps/playlist/playlist.png \
+	pixmaps/playlist/repeat_all.png \
+	pixmaps/playlist/repeat_off.png \
+	pixmaps/playlist/repeat_one.png \
+	pixmaps/playlist/shuffle_off.png \
+	pixmaps/playlist/shuffle_on.png \
 	pixmaps/prefs/advprefs_audio.png \
 	pixmaps/prefs/advprefs_codec.png \
 	pixmaps/prefs/advprefs_extended.png \
@@ -81,11 +109,17 @@ DEPS_res = \
 	pixmaps/prefs/spref_cone_Interface_64.png \
 	pixmaps/prefs/spref_cone_Subtitles_64.png \
 	pixmaps/prefs/spref_cone_Video_64.png \
+	pixmaps/previous.png \
+	pixmaps/previous_16px.png \
+	pixmaps/slower.png \
+	pixmaps/space.png \
+	pixmaps/stop.png \
+	pixmaps/stop_16px.png \
 	pixmaps/toolbar/arrows.png \
 	pixmaps/toolbar/aspect-ratio.png \
+	pixmaps/toolbar/atob.png \
 	pixmaps/toolbar/atob_noa.png \
 	pixmaps/toolbar/atob_nob.png \
-	pixmaps/toolbar/atob.png \
 	pixmaps/toolbar/defullscreen.png \
 	pixmaps/toolbar/dvd_menu.png \
 	pixmaps/toolbar/dvd_next.png \
@@ -96,8 +130,8 @@ DEPS_res = \
 	pixmaps/toolbar/record_16px.png \
 	pixmaps/toolbar/snapshot.png \
 	pixmaps/toolbar/tv.png \
-	pixmaps/toolbar/tvtelx.png \
 	pixmaps/toolbar/tvtelx-transparent.png \
+	pixmaps/toolbar/tvtelx.png \
 	pixmaps/toolbar/visu.png \
 	pixmaps/toolbar/volume-high.png \
 	pixmaps/toolbar/volume-low.png \
@@ -105,7 +139,6 @@ DEPS_res = \
 	pixmaps/toolbar/volume-muted.png \
 	pixmaps/toolbar/volume-slider-inside.png \
 	pixmaps/toolbar/volume-slider-outside.png \
-	pixmaps/toolbar/frame-by-frame.png \
 	pixmaps/types/capture-card_16px.png \
 	pixmaps/types/cdda_16px.png \
 	pixmaps/types/disc_16px.png \
@@ -115,41 +148,6 @@ DEPS_res = \
 	pixmaps/types/folder-grey_16px.png \
 	pixmaps/types/harddisk_16px.png \
 	pixmaps/types/network_16px.png \
-	pixmaps/menus/help_16px.png \
-	pixmaps/menus/info_16px.png \
-	pixmaps/menus/messages_16px.png \
-	pixmaps/menus/preferences_16px.png \
-	pixmaps/menus/quit_16px.png \
-	pixmaps/menus/settings_16px.png \
-	pixmaps/menus/stream_16px.png \
-	pixmaps/menus/playlist_16px.png \
-	pixmaps/go-next.png \
-	pixmaps/next_16px.png \
-	pixmaps/next.png \
-	pixmaps/space.png \
-	pixmaps/noart.png \
-	pixmaps/pause_16px.png \
-	pixmaps/pause.png \
-	pixmaps/faster.png \
-	pixmaps/slower.png \
-	pixmaps/play_16px.png \
-	pixmaps/playlist/add.png \
-	pixmaps/playlist/playlist.png \
-	pixmaps/playlist/repeat_all.png \
-	pixmaps/playlist/repeat_off.png \
-	pixmaps/playlist/repeat_one.png \
-	pixmaps/playlist/shuffle_off.png \
-	pixmaps/playlist/shuffle_on.png \
-	pixmaps/playlist/jumpto.png \
-	pixmaps/play.png \
-	pixmaps/previous_16px.png \
-	pixmaps/previous.png \
-	pixmaps/stop_16px.png \
-	pixmaps/stop.png \
-	pixmaps/eject.png \
-	pixmaps/update.png \
-	pixmaps/clear.png \
-	pixmaps/arrow_down_dark.png \
 	pixmaps/types/tape_16px.png \
 	pixmaps/types/type_directory.png \
 	pixmaps/types/type_file.png \
@@ -157,26 +155,7 @@ DEPS_res = \
 	pixmaps/types/type_node.png \
 	pixmaps/types/type_playlist.png \
 	pixmaps/types/type_unknown.xpm \
-	pixmaps/toolbar/extended_16px.png \
-	pixmaps/toolbar/record_16px.png \
-	pixmaps/toolbar/snapshot.png \
-	pixmaps/toolbar/atob.png \
-	pixmaps/toolbar/atob_noa.png \
-	pixmaps/toolbar/atob_nob.png \
-	pixmaps/toolbar/dvd_menu.png \
-	pixmaps/toolbar/dvd_next.png \
-	pixmaps/toolbar/dvd_prev.png \
-	pixmaps/toolbar/tv.png \
-	pixmaps/toolbar/fullscreen.png \
-	pixmaps/toolbar/defullscreen.png \
-	pixmaps/toolbar/tvtelx.png \
-	pixmaps/toolbar/tvtelx-transparent.png \
-	pixmaps/toolbar/volume-high.png \
-	pixmaps/toolbar/volume-medium.png \
-	pixmaps/toolbar/volume-low.png \
-	pixmaps/toolbar/volume-muted.png \
-	pixmaps/toolbar/volume-slider-inside.png \
-	pixmaps/toolbar/volume-slider-outside.png
+	pixmaps/update.png
 
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 
