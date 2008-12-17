@@ -257,7 +257,7 @@ int BDAGraph::SubmitDVBTTuneRequest()
         i_hp_fec = BDA_BCC_RATE_1_2; break;
     case 2:
         i_hp_fec = BDA_BCC_RATE_2_3; break;
-    case 3;
+    case 3:
         i_hp_fec = BDA_BCC_RATE_3_4; break;
     case 4:
         i_hp_fec = BDA_BCC_RATE_5_6; break;
@@ -291,9 +291,9 @@ int BDAGraph::SubmitDVBTTuneRequest()
         i_guard = BDA_GUARD_1_16; break,
     case 8:
         i_guard = BDA_GUARD_1_8; break;
-    case 4;
+    case 4:
         i_guard = BDA_GUARD_1_4; break;
-    default;
+    default:
         i_guard = BDA_GUARD_NOT_SET;
     }
 
@@ -432,7 +432,7 @@ int BDAGraph::SubmitDVBCTuneRequest()
     {
     case 16:
         i_qam_mod = BDA_MOD_16QAM; break;
-    case 32;
+    case 32:
         i_qam_mod = BDA_MOD_32QAM; break;
     case 64:
         i_qam_mod = BDA_MOD_64QAM; break;
@@ -440,7 +440,7 @@ int BDAGraph::SubmitDVBCTuneRequest()
         i_qam_mod = BDA_MOD_128QAM; break;
     case 256:
         i_qam_mod = BDA_MOD_256QAM; break;
-    default;
+    default:
         i_qam_mod = BDA_MOD_NOT_SET;
     }
 
