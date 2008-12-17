@@ -286,9 +286,9 @@ int BDAGraph::SubmitDVBTTuneRequest()
     switch( l_guard )
     {
     case 32:
-        i_guard = BDA_GUARD_1_32; break,
+        i_guard = BDA_GUARD_1_32; break;
     case 16:
-        i_guard = BDA_GUARD_1_16; break,
+        i_guard = BDA_GUARD_1_16; break;
     case 8:
         i_guard = BDA_GUARD_1_8; break;
     case 4:
@@ -602,7 +602,7 @@ int BDAGraph::SubmitDVBSTuneRequest()
     switch( l_inversion )
     {
     case 0:
-        i_inversion = BDA_SPECTRAL_INVERSION_NORMAL; break,
+        i_inversion = BDA_SPECTRAL_INVERSION_NORMAL; break;
     case 1:
         i_inversion = BDA_SPECTRAL_INVERSION_INVERTED; break;
     case 2:
