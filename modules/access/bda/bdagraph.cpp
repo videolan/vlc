@@ -297,7 +297,7 @@ int BDAGraph::SubmitDVBTTuneRequest()
         i_guard = BDA_GUARD_NOT_SET;
     }
 
-    swicth( l_transmission )
+    switch( l_transmission )
     {
     case 2:
         i_transmission = BDA_XMIT_MODE_2K; break;
@@ -307,7 +307,7 @@ int BDAGraph::SubmitDVBTTuneRequest()
         i_transmission = BDA_XMIT_MODE_NOT_SET;
     }
 
-    swicth( l_hierarchy )
+    switch( l_hierarchy )
     {
     case 1:
         i_hierarchy = BDA_HALPHA_1; break;
