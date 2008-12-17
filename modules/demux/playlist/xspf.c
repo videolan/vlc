@@ -394,7 +394,6 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
  */
 static bool parse_track_node COMPLEX_INTERFACE
 {
-    input_item_t *p_new_input = NULL;
     int i_node;
     char *psz_name = NULL;
     char *psz_value = NULL;
@@ -416,6 +415,14 @@ static bool parse_track_node COMPLEX_INTERFACE
           {"extension",    COMPLEX_CONTENT, {.cmplx = parse_extension_node} },
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
+
+    input_item_t *p_new_input = input_item_NewExt( p_demux, NULL, NULL, 0, NULL, -1 );
+
+    if( !p_new_input )
+    {
+        /* malloc has failed for input_item_NewExt, so bailout early */
+        return false;
+    }
 
     /* reset i_track_id */
     p_demux->p_sys->i_track_id = -1;
@@ -503,11 +510,13 @@ static bool parse_track_node COMPLEX_INTERFACE
 
                     if( p_demux->p_sys->i_track_id < 0 )
                     {
-                        if( p_new_input )
+                        char *psz_uri = input_item_GetURI( p_new_input );
+                        if( psz_uri && *psz_uri)
                         {
                             input_item_AddSubItem( p_input_item, p_new_input );
-                            vlc_gc_decref( p_new_input );
                         }
+                        vlc_gc_decref( p_new_input );
+                        free( psz_uri );
                         return true;
                     }
 
@@ -543,14 +552,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( p_handler->name, "location" ) )
                 {
                     char *psz_uri = NULL;
-                    /* there MUST NOT be an item */
-                    if( p_new_input )
-                    {
-                        msg_Err( p_demux, "item <%s> already created",
-                                 psz_name );
-                        FREE_ATT();
-                        return false;
-                    }
                     psz_uri = decode_URI_duplicate( psz_value );
 
                     if( !psz_uri )
@@ -572,8 +573,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                         free( psz_uri );
                         psz_uri = psz_tmp;
                     }
-                    p_new_input = input_item_NewExt( p_demux, psz_uri,
-                                                        NULL, 0, NULL, -1 );
+                    input_item_SetURI( p_new_input, psz_uri );
                     free( psz_uri );
                     input_item_CopyOptions( p_input_item, p_new_input );
                     psz_uri = NULL;
