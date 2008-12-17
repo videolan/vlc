@@ -129,6 +129,8 @@ DEPS_res = \
 	pixmaps/toolbar/fullscreen.png \
 	pixmaps/toolbar/record_16px.png \
 	pixmaps/toolbar/snapshot.png \
+	pixmaps/toolbar/skip_for.png \
+	pixmaps/toolbar/skip_back.png \
 	pixmaps/toolbar/tv.png \
 	pixmaps/toolbar/tvtelx-transparent.png \
 	pixmaps/toolbar/tvtelx.png \

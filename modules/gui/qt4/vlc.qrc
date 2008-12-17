@@ -68,6 +68,8 @@
   <file alias="atob_noa">pixmaps/toolbar/atob_noa.png</file>
   <file alias="atob_nob">pixmaps/toolbar/atob_nob.png</file>
   <file alias="frame">pixmaps/toolbar/frame-by-frame.png</file>
+  <file alias="skip_fw">pixmaps/toolbar/skip_for.png</file>
+  <file alias="skip_back">pixmaps/toolbar/skip_back.png</file>
   <file alias="next">pixmaps/next_16px.png</file>
   <file alias="next_b">pixmaps/next.png</file>
   <file alias="down_arrow">pixmaps/arrow_down_dark.png</file>
