@@ -547,7 +547,7 @@ Section /o $Name_Section03 SEC03
 
 SectionEnd
 
-Section /o $Name_Section04 SEC04
+Section $Name_Section04 SEC04
   SectionIn 3
   SetOutPath "$INSTDIR"
   !insertmacro OpenUninstallLog
