@@ -337,6 +337,7 @@ void input_item_SetURI( input_item_t *p_i, char *psz_uri )
 
     free( p_i->psz_uri );
     p_i->psz_uri = strdup( psz_uri );
+    GuessType( p_i );
 
     vlc_mutex_unlock( &p_i->lock );
 }
