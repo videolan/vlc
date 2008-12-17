@@ -44,11 +44,9 @@
 #include <vlc_interface.h>
 #include <vlc_meta.h>
 #include <vlc_md5.h>
-#include <vlc_block.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
 #include <vlc_network.h>
-#include <vlc_interface.h>
 #include <vlc_playlist.h>
 
 /*****************************************************************************
