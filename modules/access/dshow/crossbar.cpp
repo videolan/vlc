@@ -59,9 +59,9 @@ static HRESULT GetCrossbarIPinAtIndex( IAMCrossbar *pXbar, LONG PinIndex,
                                        BOOL IsInputPin, IPin ** ppPin )
 {
     LONG         cntInPins, cntOutPins;
-    IPin        *pP = 0;
+    IPin        *pP = NULL;
     IBaseFilter *pFilter = NULL;
-    IEnumPins   *pins=0;
+    IEnumPins   *pins = NULL;
     ULONG        n;
 
     if( !pXbar || !ppPin ) return E_POINTER;
@@ -102,9 +102,9 @@ static HRESULT GetCrossbarIndexFromIPin( IAMCrossbar * pXbar, LONG * PinIndex,
                                          BOOL IsInputPin, IPin * pPin )
 {
     LONG         cntInPins, cntOutPins;
-    IPin        *pP = 0;
+    IPin        *pP = NULL;
     IBaseFilter *pFilter = NULL;
-    IEnumPins   *pins = 0;
+    IEnumPins   *pins = NULL;
     ULONG        n;
     BOOL         fOK = FALSE;
 
@@ -159,7 +159,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
         return S_FALSE;
     }
 
-    IAMCrossbar *pXbar=0;
+    IAMCrossbar *pXbar = NULL;
     if( FAILED(pinInfo.pFilter->QueryInterface(IID_IAMCrossbar,
                                                (void **)&pXbar)) )
     {

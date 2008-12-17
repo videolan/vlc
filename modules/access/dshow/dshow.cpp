@@ -432,7 +432,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     /* Initialize some data */
     p_sys->i_streams = 0;
-    p_sys->pp_streams = 0;
+    p_sys->pp_streams = NULL;
     p_sys->i_width = i_width;
     p_sys->i_height = i_height;
     p_sys->i_chroma = i_chroma;
@@ -782,16 +782,16 @@ static bool ConnectFilters( vlc_object_t *p_this, access_sys_t *p_sys,
 
         // Sort out all the possible video inputs
         // The class needs to be given the capture filters ANALOGVIDEO input pin
-        IEnumPins *pins = 0;
+        IEnumPins *pins = NULL;
         if( ( mediaType.majortype == MEDIATYPE_Video ||
               mediaType.majortype == MEDIATYPE_Stream ) &&
             SUCCEEDED(p_filter->EnumPins(&pins)) )
         {
-            IPin        *pP = 0;
+            IPin        *pP = NULL;
             ULONG        n;
             PIN_INFO     pinInfo;
             BOOL         Found = FALSE;
-            IKsPropertySet *pKs=0;
+            IKsPropertySet *pKs = NULL;
             GUID guid;
             DWORD dw;
 
@@ -1706,7 +1706,7 @@ static block_t *ReadCompressed( access_t *p_access )
         return p_block;
     }
 
-    return 0; /* never reached */
+    return NULL; /* never reached */
 }
 
 /****************************************************************************
