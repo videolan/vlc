@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>482</width>
-    <height>516</height>
+    <width>647</width>
+    <height>682</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -140,6 +140,35 @@
          <string>_("Enable wallpaper mode")</string>
         </property>
        </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
+      <string>_("Video")</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout" >
+      <item row="0" column="1" >
+       <widget class="QComboBox" name="deinterlaceBox" />
+      </item>
+      <item row="0" column="0" >
+       <widget class="QLabel" name="label_6" >
+        <property name="text" >
+         <string>_("Deinterlacing Mode")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" >
+       <widget class="QLabel" name="label_7" >
+        <property name="text" >
+         <string>_("Force Aspect Ratio")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" >
+       <widget class="QLineEdit" name="arLine" />
       </item>
      </layout>
     </widget>

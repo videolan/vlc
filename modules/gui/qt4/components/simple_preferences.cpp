@@ -199,6 +199,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.hwYUVBox->setVisible( false );
 #endif
 
+            CONFIG_GENERIC( "deinterlace-mode", StringList, NULL, deinterlaceBox );
+            CONFIG_GENERIC( "aspect-ratio", String, NULL, arLine );
+
             CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
                                  ui.snapshotsDirectory, ui.snapshotsDirectoryBrowse );
             CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
