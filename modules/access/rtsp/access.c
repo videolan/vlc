@@ -155,7 +155,7 @@ static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t *)p_this;
     access_sys_t *p_sys;
-    char *psz_server = 0;
+    char* psz_server = NULL;
     int i_result;
 
     if( !p_access->psz_access || (
@@ -177,7 +177,14 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_title = 0;
     p_access->info.i_seekpoint = 0;
     p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
     p_sys->p_rtsp = malloc( sizeof( rtsp_client_t) );
+    if( !p_sys->p_rtsp )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     p_sys->p_header = NULL;
     p_sys->p_rtsp->p_userdata = p_access;
