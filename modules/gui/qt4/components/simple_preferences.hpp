@@ -71,7 +71,9 @@ enum {
        fileW,
        audioOutCoB,
        normalizerChB,
-       volLW };
+       volLW,
+       headphoneB,
+};
 enum { inputLE, cachingCoB };
 enum { skinRB, qtRB };
 
@@ -115,7 +117,7 @@ private:
     int number;
 
     QList<QWidget *> optionWidgets;
-    QString qs_filter;
+    QStringList qs_filter;
 
 #ifdef WIN32
     QList<QTreeWidgetItem *> listAsso;

@@ -292,9 +292,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
                             detectionDolby );
 
-            CONFIG_GENERIC( "headphone-dolby" , Bool , NULL, headphoneEffect );
-
-            CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float , NULL,
+            CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float, NULL,
                                     volNormSpin );
             CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
 
@@ -314,6 +312,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /*Little mofification of ui.volumeValue to compile with Qt < 4.3 */
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets.append( ui.volumeValue );
+            optionWidgets.append( ui.headphoneEffect );
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
@@ -335,17 +334,19 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 ui.lastfm->hide();
 
             /* Normalizer */
-
             CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin,
                      setEnabled( bool ) );
+
             char* psz = config_GetPsz( p_intf, "audio-filter" );
-            qs_filter = qfu( psz );
+            qs_filter = qfu( psz ).split( ':', QString::SkipEmptyParts );
             free( psz );
-            bool b_normalizer = ( qs_filter.contains( "volnorm" ) );
-            {
-                ui.volNormBox->setChecked( b_normalizer );
-                ui.volNormSpin->setEnabled( b_normalizer );
-            }
+
+            bool b_enabled = ( qs_filter.contains( "volnorm" ) );
+            ui.volNormBox->setChecked( b_enabled );
+            ui.volNormSpin->setEnabled( b_enabled );
+
+            b_enabled = ( qs_filter.contains( "headphone" ) );
+            ui.headphoneEffect->setChecked( b_enabled );
 
             /* Volume Label */
             updateAudioVolume( ui.defaultVolume->value() ); // First time init
@@ -658,28 +659,22 @@ void SPrefsPanel::apply()
 
     case SPrefsAudio:
     {
-        bool b_normChecked =
+        bool b_checked =
             qobject_cast<QCheckBox *>(optionWidgets[normalizerChB])->isChecked();
-        if( qs_filter.isEmpty() )
-        {
-            /* the psz_filter is already empty, so we just append it needed */
-            if( b_normChecked ) qs_filter = "volnorm";
-        }
-        else /* Not Empty */
-        {
-            if( qs_filter.contains( "volnorm" ) )
-            {
-                /* The qs_filter not empty and contains "volnorm"
-                   that we have to remove */
-                if( !b_normChecked )
-                {
-                    qs_filter.remove( QRegExp(":?volnorm:?") );
-                }
-            }
-            else /* qs_filter not empty, but doesn't have volnorm inside */
-                if( b_normChecked ) qs_filter.append( ":volnorm" );
-        }
-        config_PutPsz( p_intf, "audio-filter", qtu( qs_filter ) );
+        if( b_checked && !qs_filter.contains( "volnorm" ) )
+            qs_filter.append( "volnorm" );
+        if( !b_checked && qs_filter.contains( "volnorm" ) )
+            qs_filter.removeAll( "volnorm" );
+
+        b_checked =
+            qobject_cast<QCheckBox *>(optionWidgets[headphoneB])->isChecked();
+
+        if( b_checked && !qs_filter.contains( "headphone" ) )
+            qs_filter.append( "headphone" );
+        if( !b_checked && qs_filter.contains( "headphone" ) )
+            qs_filter.removeAll( "headphone" );
+
+        config_PutPsz( p_intf, "audio-filter", qtu( qs_filter.join( ":" ) ) );
         break;
     }
     }
