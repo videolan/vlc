@@ -149,7 +149,7 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
 
     if(  i_type == WIDGET_SPACER_EXTEND )
     {
-        controlLayout->insertSpacing( i_index, 10 );
+        controlLayout->insertStretch( i_index, 16 );
         return;
     }
 
