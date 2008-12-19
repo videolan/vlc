@@ -373,6 +373,12 @@ static void Run( intf_thread_t *p_intf )
                                    cl->i_mode + 2 );
                 }
 
+#ifdef WIN32
+                if( i_recv <= 0 && WSAGetLastError() == WSAEWOULDBLOCK )
+                {
+                    errno = EAGAIN;
+                }
+#endif
                 if (i_recv <= 0 && ( end || errno != EAGAIN ) )
                     goto drop;
             }
