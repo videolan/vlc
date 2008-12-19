@@ -82,7 +82,7 @@
       <item row="0" column="2" >
        <widget class="QCheckBox" name="overlay" >
         <property name="text" >
-         <string>_("Accelerated video output")</string>
+         <string>_("Accelerated video output (Overlay)")</string>
         </property>
         <property name="checked" >
          <bool>true</bool>
