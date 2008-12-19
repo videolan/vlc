@@ -486,6 +486,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
    setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
 
 
+   CONNECT( THEMIM->getIM(), statusChanged( int ),
+            this, setStatus( int ) );
    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplayPosition( float, int, int ) );
 }
@@ -509,6 +511,14 @@ void TimeLabel::setDisplayPosition( float pos, int time, int length )
 void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
+}
+
+void TimeLabel::setStatus( int i_status )
+{
+    msg_Warn( p_intf, "Status: %i", i_status );
+
+    if( i_status == OPENING_S )
+        setText( "Buffering" );
 }
 
 bool VolumeClickHandler::eventFilter( QObject *obj, QEvent *e )

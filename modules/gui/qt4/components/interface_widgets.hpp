@@ -159,6 +159,7 @@ signals:
     void timeLabelDoubleClicked();
 private slots:
     void setDisplayPosition( float pos, int time, int length );
+    void setStatus( int i_status );
 };
 
 class SpeedLabel : public QLabel
