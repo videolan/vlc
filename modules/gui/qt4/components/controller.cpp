@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_vout.h>
+#include <vlc_keys.h>
 
 #include "dialogs_provider.hpp"
 #include "components/interface_widgets.hpp"
