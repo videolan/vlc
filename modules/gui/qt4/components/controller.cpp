@@ -661,6 +661,14 @@ void AbstractController::doAction( int id_action )
             frame(); break;
         case REVERSE_ACTION:
             reverse(); break;
+        case SKIP_BACK_ACTION:
+            var_SetInteger( p_intf->p_libvlc, "key-pressed",
+                    ACTIONID_JUMP_BACKWARD_SHORT );
+            break;
+        case SKIP_FW_ACTION:
+            var_SetInteger( p_intf->p_libvlc, "key-pressed",
+                    ACTIONID_JUMP_FORWARD_SHORT );
+            break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;
