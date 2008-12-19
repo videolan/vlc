@@ -117,6 +117,7 @@ typedef enum actionType_e
 {
     PLAY_ACTION,
     STOP_ACTION,
+    OPEN_ACTION,
     PREVIOUS_ACTION,
     NEXT_ACTION,
     SLOWER_ACTION,

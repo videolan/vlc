@@ -210,6 +210,14 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         widget = stopButton;
         }
         break;
+    case OPEN_BUTTON:{
+        QToolButton *openButton = new QToolButton;
+        setupButton( openButton );
+        CONNECT_MAP_SET( openButton, OPEN_ACTION );
+        BUTTON_SET_BAR( openButton );
+        widget = openButton;
+        }
+        break;
     case PREVIOUS_BUTTON:{
         QToolButton *prevButton = new QToolButton;
         setupButton( prevButton );
@@ -372,6 +380,24 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         BUTTON_SET_BAR(  reverseButton );
         ENABLE_ON_INPUT( reverseButton );
         widget = reverseButton;
+        }
+        break;
+    case SKIP_BACK_BUTTON: {
+        QToolButton *skipBakButton = new QToolButton;
+        setupButton( skipBakButton );
+        CONNECT_MAP_SET( skipBakButton, SKIP_BACK_ACTION );
+        BUTTON_SET_BAR(  skipBakButton );
+        ENABLE_ON_INPUT( skipBakButton );
+        widget = skipBakButton;
+        }
+        break;
+    case SKIP_FW_BUTTON: {
+        QToolButton *skipFwButton = new QToolButton;
+        setupButton( skipFwButton );
+        CONNECT_MAP_SET( skipFwButton, SKIP_FW_ACTION );
+        BUTTON_SET_BAR(  skipFwButton );
+        ENABLE_ON_INPUT( skipFwButton );
+        widget = skipFwButton;
         }
         break;
     default:
