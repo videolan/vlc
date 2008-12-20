@@ -27,8 +27,6 @@ EXTRA_DIST = \
 	$(DIST_http_lua) \
 	$(DIST_lua) \
 	$(DIST_osdmenu_default) \
-	$(DIST_osdmenu_dvd) \
-	$(DIST_osdmenu_minimal) \
 	$(DIST_mozilla) \
 	$(DIST_maemo)
 
@@ -44,9 +42,7 @@ nobase_dist_pkgdata_DATA += $(DIST_http)
 endif
 if BUILD_OSDMENU
 nobase_dist_pkgdata_DATA += \
-	$(DIST_osdmenu_default) \
-	$(DIST_osdmenu_dvd) \
-	$(DIST_osdmenu_minimal)
+	$(DIST_osdmenu_default)
 endif
 if BUILD_LUA
 nobase_dist_pkgdata_DATA += $(DIST_lua)
@@ -241,49 +237,6 @@ DIST_osdmenu_default = \
 	osdmenu/default/volume/volume_08.png \
 	osdmenu/default/volume/volume_09.png \
 	osdmenu/default/volume/volume_10.png
-
-DIST_osdmenu_dvd = \
-	osdmenu/dvd.cfg \
-	osdmenu/dvd/selection/bw.png \
-	osdmenu/dvd/selection/esc.png \
-	osdmenu/dvd/selection/fw.png \
-	osdmenu/dvd/selection/mute.png \
-	osdmenu/dvd/selection/next.png \
-	osdmenu/dvd/selection/pause.png \
-	osdmenu/dvd/selection/play.png \
-	osdmenu/dvd/selection/previous.png \
-	osdmenu/dvd/selection/slow.png \
-	osdmenu/dvd/selection/stop.png \
-	osdmenu/dvd/selected/bw.png \
-	osdmenu/dvd/selected/next.png \
-	osdmenu/dvd/selected/play.png \
-	osdmenu/dvd/selected/fw.png \
-	osdmenu/dvd/selected/stop.png \
-	osdmenu/dvd/selected/pause.png \
-	osdmenu/dvd/selected/previous.png \
-	osdmenu/dvd/selected/esc.png \
-	osdmenu/dvd/selected/mute.png \
-	osdmenu/dvd/selected/slow.png \
-	osdmenu/dvd/selected/volume.png \
-	osdmenu/dvd/volume/volume00.png \
-	osdmenu/dvd/volume/volume01.png \
-	osdmenu/dvd/volume/volume02.png \
-	osdmenu/dvd/volume/volume03.png \
-	osdmenu/dvd/volume/volume04.png \
-	osdmenu/dvd/volume/volume05.png \
-	osdmenu/dvd/unselect/barroff.png
-
-DIST_osdmenu_minimal = \
-	osdmenu/minimal.cfg \
-	osdmenu/minimal/fs_panel_simple.xcf \
-	osdmenu/minimal/fs_panel_skip_next.png \
-	osdmenu/minimal/fs_panel_simple.png \
-	osdmenu/minimal/fs_panel_volume_max.png \
-	osdmenu/minimal/fs_panel.xcf \
-	osdmenu/minimal/fs_panel_skip_previous.png \
-	osdmenu/minimal/fs_panel_volume_min.png \
-	osdmenu/minimal/fs_panel.png \
-	osdmenu/minimal/fs_panel_mockup.png
 
 DIST_lua= \
 	lua/README.txt \
