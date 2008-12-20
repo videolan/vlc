@@ -510,13 +510,8 @@ static bool parse_track_node COMPLEX_INTERFACE
 
                     if( p_demux->p_sys->i_track_id < 0 )
                     {
-                        char *psz_uri = input_item_GetURI( p_new_input );
-                        if( psz_uri && *psz_uri)
-                        {
-                            input_item_AddSubItem( p_input_item, p_new_input );
-                        }
+                        input_item_AddSubItem( p_input_item, p_new_input );
                         vlc_gc_decref( p_new_input );
-                        free( psz_uri );
                         return true;
                     }
 
