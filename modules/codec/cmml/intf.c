@@ -122,9 +122,7 @@ int OpenIntf ( vlc_object_t *p_this )
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-    {
-        return( 1 );
-    };
+        return VLC_ENOMEM;
 
     p_intf->pf_run = RunIntf;
 
@@ -142,7 +140,7 @@ int OpenIntf ( vlc_object_t *p_this )
     var_AddCallback( p_intf->p_libvlc, "browse-follow-anchor",
                      FollowAnchorCallback, p_intf );
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
