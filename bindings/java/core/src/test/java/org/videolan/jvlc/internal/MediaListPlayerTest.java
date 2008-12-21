@@ -30,7 +30,7 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Test;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaListPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
@@ -230,7 +230,7 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_list_player_set_media_player(mediaListPlayer, mi, exception);
         Assert.assertEquals(0, exception.raised);
     }

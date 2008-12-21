@@ -28,7 +28,7 @@ package org.videolan.jvlc.internal;
 import org.junit.Assert;
 import org.junit.Test;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 
 
 public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
@@ -36,7 +36,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     @Test
     public void mediaInstanceNew()
     {
-        LibVlcMediaInstance instance = libvlc.libvlc_media_player_new(libvlcInstance, exception);
+        LibVlcMediaPlayer instance = libvlc.libvlc_media_player_new(libvlcInstance, exception);
         Assert.assertNotNull(instance);
         Assert.assertEquals(0, exception.raised);
     }
@@ -44,7 +44,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     @Test
     public void mediaInstancePlayBad()
     {
-        LibVlcMediaInstance instance = libvlc.libvlc_media_player_new(libvlcInstance, exception);
+        LibVlcMediaPlayer instance = libvlc.libvlc_media_player_new(libvlcInstance, exception);
         libvlc.libvlc_media_player_play(instance, exception);
         Assert.assertEquals(1, exception.raised); // no associated media descriptor
     }
@@ -53,7 +53,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     public void mediaInstancePlay()
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_play(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
@@ -62,7 +62,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     public void mediaInstancePauseBad()
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_pause(mi, exception);
         Assert.assertEquals(1, exception.raised);
     }
@@ -71,7 +71,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     public void mediaInstancePause()
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_play(mi, exception);
         libvlc.libvlc_media_player_pause(mi, exception);
         Assert.assertEquals(0, exception.raised);
@@ -81,7 +81,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     public void mediaInstanceSetPosition()
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_play(mi, exception);
         libvlc.libvlc_media_player_set_position(mi, 0.5f, exception);
         Assert.assertEquals(0, exception.raised);
@@ -93,7 +93,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     public void mediaInstanceStop()
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_stop(mi, exception);
         Assert.assertEquals(0, exception.raised);
     }
@@ -102,7 +102,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     public void mediaInstanceStop2() throws Exception
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        LibVlcMediaInstance mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_player_play(mi, exception);
         Thread.sleep(100);
         libvlc.libvlc_media_player_stop(mi, exception);

@@ -34,7 +34,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcCallback;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMedia;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_event_t;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
@@ -62,9 +62,9 @@ public class LibVlcImpl
         LibVlcInstance libvlc_instance_t = libVlc.libvlc_new(0, new String[] {"/usr/local/bin/vlc"}, exception);
 
         LibVlcMedia mediaDescriptor = libVlc
-            .libvlc_media_new(libvlc_instance_t, "/home/carone/a.avi", exception);
+            .libvlc_media_new(libvlc_instance_t, "/home/carone/apps/a.avi", exception);
 
-        LibVlcMediaInstance mediaPlayer = libVlc.libvlc_media_player_new_from_media(mediaDescriptor, exception);
+        LibVlcMediaPlayer mediaPlayer = libVlc.libvlc_media_player_new_from_media(mediaDescriptor, exception);
 
         LibVlcEventManager mediaInstanceEventManager = libVlc.libvlc_media_player_event_manager(mediaPlayer, exception);
 

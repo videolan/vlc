@@ -31,7 +31,7 @@ package org.videolan.jvlc;
 
 import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 /**
@@ -119,7 +119,7 @@ public class Playlist {
     public MediaPlayer getMediaInstance()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        LibVlcMediaInstance mi = libvlc.libvlc_playlist_get_media_player(libvlcInstance, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_playlist_get_media_player(libvlcInstance, exception);
         return new MediaPlayer(jvlc, mi);
         
     }

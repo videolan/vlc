@@ -34,14 +34,14 @@ import org.videolan.jvlc.event.MediaPlayerListener;
 import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlcEventType;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
-import org.videolan.jvlc.internal.LibVlc.LibVlcMediaInstance;
+import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
 public class MediaPlayer
 {
 
-    private final LibVlcMediaInstance instance;
+    private final LibVlcMediaPlayer instance;
 
     private final LibVlc libvlc;
 
@@ -51,7 +51,7 @@ public class MediaPlayer
 
     private MediaDescriptor mediaDescriptor;
 
-    MediaPlayer(JVLC jvlc, LibVlcMediaInstance instance)
+    MediaPlayer(JVLC jvlc, LibVlcMediaPlayer instance)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         this.instance = instance;
@@ -188,7 +188,7 @@ public class MediaPlayer
      * Returns the instance.
      * @return the instance
      */
-    LibVlcMediaInstance getInstance()
+    LibVlcMediaPlayer getInstance()
     {
         return instance;
     }
