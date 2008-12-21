@@ -87,7 +87,6 @@ vlc_module_end ()
 using namespace TagLib;
 
 
-
 /* Try detecting embedded art */
 static void DetectImage( FileRef f, demux_t *p_demux )
 {
@@ -290,8 +289,9 @@ static int ReadMetaFromId2v2( ID3v2::Tag* tag, vlc_meta_t* p_meta )
              * terminated string */
             char psz_ufid[64];
             int j = 0;
-            while( ( j < 63 ) &&
-                   ( j < p_ufid->identifier().size() ) )
+            int max_size = p_ufid->identifier().size() < 63 ?
+                           p_ufid->identifier().size() : 63;
+            while( j < max_size )
                 psz_ufid[j] = p_ufid->identifier()[j++];
             psz_ufid[j] = '\0';
             vlc_meta_SetTrackID( p_meta, psz_ufid );
@@ -447,7 +447,7 @@ static int WriteMeta( vlc_object_t *p_this )
     meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
     input_item_t *p_item = p_export->p_item;
 
-    if( p_item == NULL )
+    if( !p_item )
     {
         msg_Err( p_this, "Can't save meta data of an empty input" );
         return VLC_EGENERIC;
@@ -467,29 +467,31 @@ static int WriteMeta( vlc_object_t *p_this )
 
     char *psz_meta;
 
-#define SET(a,b) \
-        if(b) { \
-            String *psz_##a = new String( b, \
-                String::UTF8 ); \
-            p_tag->set##a( *psz_##a ); \
-            delete psz_##a; \
-        }
+#define SET( a, b )                                         \
+    if( b )                                                 \
+    {                                                       \
+        String* psz_tmp = new String( b, String::UTF8 );    \
+        p_tag->set##a( *psz_tmp );                          \
+        delete psz_tmp;                                     \
+    }
 
+    // Saving all common fields
+    // If the title is empty, use the name
+    psz_meta = input_item_GetTitle( p_item );
+    if( !psz_meta ) psz_meta = input_item_GetName( p_item );
+    SET( Title, psz_meta );
+    free( psz_meta );
 
     psz_meta = input_item_GetArtist( p_item );
     SET( Artist, psz_meta );
     free( psz_meta );
 
-    psz_meta = input_item_GetTitle( p_item );
-    if( !psz_meta ) psz_meta = input_item_GetName( p_item );
-    String *psz_title = new String( psz_meta,
-        String::UTF8 );
-    p_tag->setTitle( *psz_title );
-    delete psz_title;
-    free( psz_meta );
-
     psz_meta = input_item_GetAlbum( p_item );
     SET( Album, psz_meta );
+    free( psz_meta );
+
+    psz_meta = input_item_GetDescription( p_item );
+    SET( Comment, psz_meta );
     free( psz_meta );
 
     psz_meta = input_item_GetGenre( p_item );
