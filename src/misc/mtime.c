@@ -350,6 +350,25 @@ void mwait( mtime_t date )
     }
     vlc_testcancel();
 
+#elif defined( __APPLE__ )
+    /* Explicit hack: OSX does not cancel at nanosleep() */
+    struct vlc_mutex_t lock;
+    struct vlc_cond_t  wait;
+
+    vlc_mutex_init (&lock);
+    vlc_cond_init (&wait);
+    vlc_mutex_lock (&lock);
+
+    vlc_cleanup_push (vlc_mutex_destroy, &lock);
+    vlc_cleanup_push (vlc_cond_destroy, &wait);
+    vlc_cleanup_push (vlc_mutex_unlock, &lock);
+
+    vlc_cond_timedwait (&wait, &lock, date);
+
+    vlc_cleanup_run ();
+    vlc_cleanup_run ();
+    vlc_cleanup_run ();
+
 #else
     mtime_t delay = date - mdate();
     if( delay > 0 )
@@ -398,7 +417,7 @@ void msleep( mtime_t delay )
 #elif defined( HAVE_KERNEL_OS_H )
     snooze( delay );
 
-#elif defined( WIN32 ) || defined( UNDER_CE )
+#elif defined( WIN32 ) || defined( UNDER_CE ) || defined( __APPLE__ )
     mwait (mdate () + delay);
 
 #elif defined( HAVE_NANOSLEEP )
