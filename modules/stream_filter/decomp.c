@@ -31,7 +31,9 @@
 # define _POSIX_SPAWN (-1)
 #endif
 #include <fcntl.h>
-#include <spawn.h>
+#if (_POSIX_SPAWN >= 0)
+# include <spawn.h>
+#endif
 #include <sys/wait.h>
 #include <sys/ioctl.h>
 #if defined (__linux__) && defined (HAVE_VMSPLICE)
