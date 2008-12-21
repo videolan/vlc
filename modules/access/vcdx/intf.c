@@ -338,6 +338,8 @@ static int InitThread( intf_thread_t * p_intf )
     p_intf->p_sys->b_key_pressed = false;
 
     vlc_mutex_unlock( &p_intf->change_lock );
+    /* make sure we return a value */
+    return 0;
 }
 
 /*****************************************************************************
