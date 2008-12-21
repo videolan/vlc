@@ -8,6 +8,8 @@ libvlc_LTLIBRARIES += \
    $(NULL)
 if !HAVE_WIN32
 if !HAVE_WINCE
+if !HAVE_DARWIN
 libvlc_LTLIBRARIES += libdecomp_plugin.la
+endif
 endif
 endif
