@@ -37,16 +37,8 @@ import org.videolan.jvlc.internal.LibVlc.libvlc_event_t;
 import com.sun.jna.Pointer;
 
 
-public class LibVlcMediaEventsTest extends AbstractVLCInternalTest
+public class LibVlcMediaEventsTest extends AbstractVLCEventTest
 {
-
-    int eventFired = 0;
-
-    @After
-    public void cleanupFired()
-    {
-        eventFired = 0;
-    }
     
     @Test
     public void mediaFreedTest()
@@ -58,6 +50,7 @@ public class LibVlcMediaEventsTest extends AbstractVLCInternalTest
 
             public void callback(libvlc_event_t libvlc_event, Pointer userData)
             {
+                Assert.assertEquals(LibVlcEventType.libvlc_MediaFreed.ordinal(), libvlc_event.type);
                 eventFired = 1;
             }
             
