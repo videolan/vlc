@@ -137,6 +137,7 @@ int DeleteNonStaticEntries( QMenu *menu )
         else
             i_ret++;
     }
+    return i_ret;
 }
 
 /***
