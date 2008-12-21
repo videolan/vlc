@@ -158,15 +158,6 @@ static void Run( intf_thread_t *p_intf )
 
     free( p_intf->p_sys->psz_service );
 
-    /* Stop and destroy the interfaces we spawned */
-    while( (p_extraintf = vlc_object_find(p_intf, VLC_OBJECT_INTF, FIND_CHILD)))
-    {
-        intf_StopThread( p_extraintf );
-        vlc_object_detach( p_extraintf );
-        vlc_object_release( p_extraintf );
-        vlc_object_release( p_extraintf );
-    }
-
     /* Make sure we exit (In case other interfaces have been spawned) */
     vlc_object_kill( p_intf->p_libvlc );
     vlc_restorecancel( canc );
