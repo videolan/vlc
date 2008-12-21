@@ -73,14 +73,6 @@ int xspf_export_playlist( vlc_object_t *p_this )
     }
     free( psz_temp );
 
-    /* save location of the playlist node */
-    psz_temp = assertUTF8URI( p_export->psz_filename );
-    if( psz_temp && *psz_temp )
-    {
-        fprintf( p_export->p_file, "\t<location>%s</location>\n", psz_temp );
-    }
-    free( psz_temp );
-
     /* export all items in a flat format */
     fprintf( p_export->p_file, "\t<trackList>\n" );
     i_count = 0;
