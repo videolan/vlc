@@ -28,7 +28,7 @@ package org.videolan.jvlc.internal;
 import org.junit.After;
 
 
-public class AbstractVLCEventTest extends AbstractVLCInternalTest
+public abstract class AbstractVLCEventTest extends AbstractVLCInternalTest
 {
     protected int eventFired;
 
