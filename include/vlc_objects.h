@@ -33,7 +33,6 @@
 
 /* Object types */
 #define VLC_OBJECT_INTF        (-4)
-#define VLC_OBJECT_PLAYLIST    (-5)
 #define VLC_OBJECT_INPUT       (-7)
 #define VLC_OBJECT_DECODER     (-8)
 #define VLC_OBJECT_VOUT        (-9)

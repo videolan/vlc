@@ -528,15 +528,8 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
     /* Otherwise, recursively look for the object */
     if ((i_mode & 0x000f) == FIND_ANYWHERE)
-    {
-#ifndef NDEBUG
-        if (i_type == VLC_OBJECT_PLAYLIST)
-	    msg_Err (p_this, "using vlc_object_find(VLC_OBJECT_PLAYLIST) "
-                     "instead of pl_Hold()");
-#endif
         return vlc_object_find (p_this->p_libvlc, i_type,
                                 (i_mode & ~0x000f)|FIND_CHILD);
-    }
 
     libvlc_lock (p_this->p_libvlc);
     p_found = FindObject( p_this, i_type, i_mode );
