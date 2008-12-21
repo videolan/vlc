@@ -45,13 +45,12 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
+#include <vlc_services_discovery.h>
 
 // Constants
 
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
 const char* CONTENT_DIRECTORY_SERVICE_TYPE = "urn:schemas-upnp-org:service:ContentDirectory:1";
-
 
 // Classes
 
@@ -138,7 +137,7 @@ public:
     void subscribeToContentDirectory();
     void fetchContents();
 
-    void setPlaylistNode( playlist_item_t* node );
+    void setInputItem( input_item_t* p_input_item );
 
     bool compareSID( const char* sid );
 
@@ -153,7 +152,7 @@ private:
     services_discovery_t* _p_sd;
 
     Container* _contents;
-    playlist_item_t* _playlistNode;
+    input_item_t* _inputItem;
 
     std::string _UDN;
     std::string _friendlyName;
@@ -195,17 +194,18 @@ public:
           const char* objectID,
           const char* title,
           const char* resource );
+    ~Item();
 
     const char* getObjectID() const;
     const char* getTitle() const;
     const char* getResource() const;
 
-    void setPlaylistNode( playlist_item_t* node );
-    playlist_item_t* getPlaylistNode() const ;
+    void setInputItem( input_item_t* p_input_item );
+    input_item_t* getInputItem() const ;
 
 private:
 
-    playlist_item_t* _playlistNode;
+    input_item_t* _inputItem;
 
     Container* _parent;
     std::string _objectID;
@@ -232,13 +232,14 @@ public:
 
     Item* getItem( unsigned int i ) const;
     Container* getContainer( unsigned int i ) const;
+    Container* getParent();
 
-    void setPlaylistNode( playlist_item_t* node );
-    playlist_item_t* getPlaylistNode() const;
+    void setInputItem( input_item_t* p_input_item );
+    input_item_t* getInputItem() const;
 
 private:
 
-    playlist_item_t* _playlistNode;
+    input_item_t* _inputItem;
 
     Container* _parent;
 
@@ -247,7 +248,6 @@ private:
     std::vector<Item*> _items;
     std::vector<Container*> _containers;
 };
-
 
 // VLC callback prototypes
 
@@ -670,8 +670,8 @@ MediaServer::MediaServer( const char* UDN,
     _UDN = UDN;
     _friendlyName = friendlyName;
 
-    _contents = 0;
-    _playlistNode = 0;
+    _contents = NULL;
+    _inputItem = NULL;
 }
 
 MediaServer::~MediaServer()
@@ -866,22 +866,20 @@ IXML_Document* MediaServer::_browseAction( const char* pObjectID,
 void MediaServer::fetchContents()
 {
     Container* root = new Container( 0, "0", getFriendlyName() );
-    playlist_t * p_playlist = pl_Hold( _p_sd );
     _fetchContents( root );
 
-    if ( _contents )
-    {
-        PL_LOCK;
-        playlist_NodeEmpty( p_playlist, _playlistNode, true );
-        PL_UNLOCK;
-        delete _contents;
-    }
+   // if ( _contents )
+   // {
+   //     PL_LOCK;
+   //     playlist_NodeEmpty( p_playlist, _playlistNode, true );
+   //     PL_UNLOCK;
+   //     delete _contents;
+   // }
 
     _contents = root;
-    _contents->setPlaylistNode( _playlistNode );
+    _contents->setInputItem( _inputItem );
 
     _buildPlaylist( _contents );
-    pl_Release ( _p_sd );
 }
 
 bool MediaServer::_fetchContents( Container* parent )
@@ -1004,49 +1002,40 @@ bool MediaServer::_fetchContents( Container* parent )
 
 void MediaServer::_buildPlaylist( Container* parent )
 {
-    playlist_t *p_playlist = pl_Hold( _p_sd );
     for ( unsigned int i = 0; i < parent->getNumContainers(); i++ )
     {
         Container* container = parent->getContainer( i );
-        playlist_item_t* parentNode = parent->getPlaylistNode();
 
-        char* title = strdup( container->getTitle() );
-        PL_LOCK;
-        playlist_item_t* node = playlist_NodeCreate( p_playlist,
-                                                title, parentNode, 0, NULL );
-        PL_UNLOCK;
-        free( title );
+        input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop", parent->getTitle() ); 
+        input_item_AddSubItem( parent->getInputItem(), p_input_item );
 
-        container->setPlaylistNode( node );
+        container->setInputItem( p_input_item );
         _buildPlaylist( container );
     }
 
     for ( unsigned int i = 0; i < parent->getNumItems(); i++ )
     {
         Item* item = parent->getItem( i );
-        playlist_item_t* parentNode = parent->getPlaylistNode();
 
-        input_item_t* p_input = input_item_New( _p_sd,
+        input_item_t* p_input_item = input_item_New( _p_sd,
                                                item->getResource(),
                                                item->getTitle() );
-        int i_cat;
-        /* FIXME: playlist_AddInput() can fail */
-        playlist_BothAddInput( p_playlist, p_input, parentNode,
-                               PLAYLIST_APPEND, PLAYLIST_END, &i_cat, NULL,
-                               pl_Unlocked );
-        vlc_gc_decref( p_input );
-        /* TODO: do this better by storing ids */
-        playlist_item_t *p_node =
-                playlist_ItemGetById( p_playlist, i_cat, false );
-        assert( p_node );
-        item->setPlaylistNode( p_node );
+        assert( p_input_item );
+        input_item_AddSubItem( parent->getInputItem(), p_input_item );
+        item->setInputItem( p_input_item );
     }
-    pl_Release( _p_sd );
 }
 
-void MediaServer::setPlaylistNode( playlist_item_t* playlistNode )
+void MediaServer::setInputItem( input_item_t* p_input_item )
 {
-    _playlistNode = playlistNode;
+    if(_inputItem == p_input_item)
+        return;
+
+    if(_inputItem)
+        vlc_gc_decref( _inputItem );
+
+    vlc_gc_incref( p_input_item );
+    _inputItem = p_input_item;
 }
 
 bool MediaServer::compareSID( const char* sid )
@@ -1072,41 +1061,21 @@ MediaServerList::~MediaServerList()
 
 bool MediaServerList::addServer( MediaServer* s )
 {
+    input_item_t* p_input_item = NULL;
     if ( getServer( s->getUDN() ) != 0 ) return false;
 
     msg_Dbg( _p_sd, "Adding server '%s'",
             s->getFriendlyName() );
 
     services_discovery_t* p_sd = _p_sd;
-    services_discovery_sys_t* p_sys = p_sd->p_sys;
+    
 
-    playlist_item_t *p_node_cat;
-    playlist_item_t *p_node_one;
-    playlist_t* p_playlist = pl_Hold( _p_sd );
+    p_input_item = input_item_New( p_sd, "vlc://nop", s->getFriendlyName() ); 
+    s->setInputItem( p_input_item );
 
-    for(int i = 0; i < p_playlist->i_sds; i++ )
-    {
-        if(p_playlist->pp_sds[i]->p_sd == p_sd )
-        {
-            p_node_cat = p_playlist->pp_sds[i]->p_cat;
-            p_node_one = p_playlist->pp_sds[i]->p_one;
-            break;
-        }
-    }
-
-    assert (p_node_cat);
-    assert (p_node_one);
+    services_discovery_AddItem( p_sd, p_input_item, NULL );
 
     _list.push_back( s );
-    
-    char* name = strdup( s->getFriendlyName() );
-    PL_LOCK;
-    playlist_item_t* node =
-            playlist_NodeCreate( p_playlist, name, p_node_cat, 0, NULL );
-    PL_UNLOCK;
-    pl_Release( _p_sd );
-    free( name );
-    s->setPlaylistNode( node );
 
     return true;
 }
@@ -1174,7 +1143,13 @@ Item::Item( Container* parent, const char* objectID, const char* title, const ch
     _title = title;
     _resource = resource;
 
-    _playlistNode = 0;
+    _inputItem = NULL;
+}
+
+Item::~Item()
+{
+    if(_inputItem)
+        vlc_gc_decref( _inputItem );
 }
 
 const char* Item::getObjectID() const
@@ -1192,14 +1167,21 @@ const char* Item::getResource() const
     return _resource.c_str();
 }
 
-void Item::setPlaylistNode( playlist_item_t* node )
+void Item::setInputItem( input_item_t* p_input_item )
 {
-    _playlistNode = node;
+    if(_inputItem == p_input_item)
+        return;
+
+    if(_inputItem)
+        vlc_gc_decref( _inputItem );
+
+    vlc_gc_incref( p_input_item );
+    _inputItem = p_input_item;
 }
 
-playlist_item_t* Item::getPlaylistNode() const
+input_item_t* Item::getInputItem() const
 {
-    return _playlistNode;
+    return _inputItem;
 }
 
 
@@ -1214,7 +1196,7 @@ Container::Container( Container*  parent,
     _objectID = objectID;
     _title = title;
 
-    _playlistNode = 0;
+    _inputItem = NULL;
 }
 
 Container::~Container()
@@ -1228,6 +1210,9 @@ Container::~Container()
     {
         delete _items[i];
     }
+
+    if(_inputItem )
+        vlc_gc_decref( _inputItem );
 }
 
 void Container::addItem( Item* item )
@@ -1272,12 +1257,24 @@ Container* Container::getContainer( unsigned int i ) const
     return 0;
 }
 
-void Container::setPlaylistNode( playlist_item_t* node )
+Container* Container::getParent()
 {
-    _playlistNode = node;
+    return _parent;
 }
 
-playlist_item_t* Container::getPlaylistNode() const
+void Container::setInputItem( input_item_t* p_input_item )
 {
-    return _playlistNode;
+    if(_inputItem == p_input_item)
+        return;
+
+    if(_inputItem)
+        vlc_gc_decref( _inputItem );
+
+    vlc_gc_incref( p_input_item );
+    _inputItem = p_input_item;
+}
+
+input_item_t* Container::getInputItem() const
+{
+    return _inputItem;
 }
