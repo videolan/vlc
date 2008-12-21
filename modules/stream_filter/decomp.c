@@ -255,6 +255,8 @@ static int Open (stream_t *stream, const char *path)
     int ret = VLC_EGENERIC;
     int comp[2];
 
+    /* We use two pipes rather than one stream socket pair, so that we can
+     * use vmsplice() on Linux. */
     if (pipe (comp) == 0)
     {
         cloexec (comp[1]);
