@@ -617,6 +617,12 @@ static const struct
     { VLC_FOURCC('r','v','2','0'), CODEC_ID_RV20,
       VIDEO_ES, "Real Video 2.0" },
 #endif
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 8, 0 )
+    { VLC_FOURCC('R','V','3','0'), CODEC_ID_RV30,
+      VIDEO_ES, "Real Video 3.0" },
+    { VLC_FOURCC('r','v','3','0'), CODEC_ID_RV30,
+      VIDEO_ES, "Real Video 3.0" },
+#endif
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 5, 0 )
     { VLC_FOURCC('R','V','4','0'), CODEC_ID_RV40,
       VIDEO_ES, "Real Video 4.0" },
