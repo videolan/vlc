@@ -28,45 +28,45 @@ package org.videolan.jvlc.internal;
 
 public enum LibVlcEventType {
 
-    libvlc_MediaMetaChanged,
-    libvlc_MediaSubItemAdded,
-    libvlc_MediaDurationChanged,
-    libvlc_MediaPreparsedChanged,
-    libvlc_MediaFreed,
-    libvlc_MediaStateChanged,
+    libvlc_MediaMetaChanged, // 0
+    libvlc_MediaSubItemAdded, // 1
+    libvlc_MediaDurationChanged, // 2
+    libvlc_MediaPreparsedChanged, // 3
+    libvlc_MediaFreed, // 4
+    libvlc_MediaStateChanged, // 5
 
-    libvlc_MediaPlayerNothingSpecial,
-    libvlc_MediaPlayerOpening,
-    libvlc_MediaPlayerBuffering,
-    libvlc_MediaPlayerPlaying,
-    libvlc_MediaPlayerPaused,
-    libvlc_MediaPlayerStopped,
-    libvlc_MediaPlayerForward,
-    libvlc_MediaPlayerBackward,
-    libvlc_MediaPlayerEndReached,
-    libvlc_MediaPlayerEncounteredError,
-    libvlc_MediaPlayerTimeChanged,
-    libvlc_MediaPlayerPositionChanged,
-    libvlc_MediaPlayerSeekableChanged,
-    libvlc_MediaPlayerPausableChanged,
+    libvlc_MediaPlayerNothingSpecial, // 6
+    libvlc_MediaPlayerOpening, // 7
+    libvlc_MediaPlayerBuffering, // 8
+    libvlc_MediaPlayerPlaying, // 9
+    libvlc_MediaPlayerPaused, // 10
+    libvlc_MediaPlayerStopped, // 11
+    libvlc_MediaPlayerForward, // 12
+    libvlc_MediaPlayerBackward, // 13
+    libvlc_MediaPlayerEndReached, // 14
+    libvlc_MediaPlayerEncounteredError, // 15
+    libvlc_MediaPlayerTimeChanged, // 16
+    libvlc_MediaPlayerPositionChanged, // 17
+    libvlc_MediaPlayerSeekableChanged, // 18
+    libvlc_MediaPlayerPausableChanged, // 19
 
-    libvlc_MediaListItemAdded,
-    libvlc_MediaListWillAddItem,
-    libvlc_MediaListItemDeleted,
-    libvlc_MediaListWillDeleteItem,
+    libvlc_MediaListItemAdded, // 20
+    libvlc_MediaListWillAddItem, // 21
+    libvlc_MediaListItemDeleted, // 22
+    libvlc_MediaListWillDeleteItem, // 23
 
-    libvlc_MediaListViewItemAdded,
-    libvlc_MediaListViewWillAddItem,
-    libvlc_MediaListViewItemDeleted,
-    libvlc_MediaListViewWillDeleteItem,
+    libvlc_MediaListViewItemAdded, // 24
+    libvlc_MediaListViewWillAddItem, // 25
+    libvlc_MediaListViewItemDeleted, // 26
+    libvlc_MediaListViewWillDeleteItem, // 27
 
-    libvlc_MediaListPlayerPlayed,
-    libvlc_MediaListPlayerNextItemSet,
-    libvlc_MediaListPlayerStopped,
+    libvlc_MediaListPlayerPlayed, // 28
+    libvlc_MediaListPlayerNextItemSet, // 29
+    libvlc_MediaListPlayerStopped, // 30
 
-    libvlc_MediaDiscovererStarted,
-    libvlc_MediaDiscovererEnded,
+    libvlc_MediaDiscovererStarted, // 31
+    libvlc_MediaDiscovererEnded, // 32
 
-    libvlc_MediaPlayerTitleChanged,
-    libvlc_MediaPlayerSnapshotTaken;
+    libvlc_MediaPlayerTitleChanged, // 33
+    libvlc_MediaPlayerSnapshotTaken; // 34
 }
