@@ -98,7 +98,7 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
         Assert.assertEquals(0, exception.raised);
     }
     
-    @Test
+    @Test(timeout = 2000L)
     public void mediaPlayerStop2() throws Exception
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
