@@ -1,4 +1,4 @@
-/*****************************************************************************
+    /*****************************************************************************
  * LibVlcEventType.java: VLC Java Bindings event types enum
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
@@ -65,5 +65,8 @@ public enum LibVlcEventType {
     libvlc_MediaListPlayerStopped,
 
     libvlc_MediaDiscovererStarted,
-    libvlc_MediaDiscovererEnded;
+    libvlc_MediaDiscovererEnded,
+
+    libvlc_MediaPlayerTitleChanged,
+    libvlc_MediaPlayerSnapshotTaken;
 }
