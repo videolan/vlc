@@ -208,28 +208,6 @@ extern size_t vlc_strlcpy (char *tgt, const char *src, size_t bufsize)
 #endif
 }
 
-/**
- * Extract a token from string.
- * It is a replacement for strsep if not present.
- */
-char *vlc_strsep( char **ppsz_string, const char *psz_delimiters )
-{
-    char *psz_string = *ppsz_string;
-    if( !psz_string )
-        return NULL;
-
-    char *p = strpbrk( psz_string, psz_delimiters );
-    if( !p )
-    {
-        *ppsz_string = NULL;
-        return psz_string;
-    }
-    *p++ = '\0';
-
-    *ppsz_string = p;
-    return psz_string;
-}
-
 /*****************************************************************************
  * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters
  * when called with an empty argument or just '\'

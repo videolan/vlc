@@ -740,7 +740,6 @@ VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
 VLC_EXPORT( long long, vlc_strtoll, ( const char *nptr, char **endptr, int base ) LIBVLC_USED );
 
 VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) LIBVLC_USED );
-char *vlc_strsep( char **, const char * );
 
 #if defined(WIN32) || defined(UNDER_CE)
 /* win32, cl and icl support */
