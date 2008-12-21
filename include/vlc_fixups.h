@@ -151,7 +151,7 @@ static inline char *strndup (const char *str, size_t max)
 #endif
 
 #ifndef HAVE_STRSEP
-static inline char *vlc_strsep( char **ppsz_string, const char *psz_delimiters )
+static inline char *strsep( char **ppsz_string, const char *psz_delimiters )
 {
     char *psz_string = *ppsz_string;
     if( !psz_string )
