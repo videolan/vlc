@@ -647,7 +647,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 
         /* Construct and send the event */
         libvlc_event_t event;
-        event.type = libvlc_MediaPlayerEndReached;
+        event.type = libvlc_MediaPlayerStopped;
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
 
