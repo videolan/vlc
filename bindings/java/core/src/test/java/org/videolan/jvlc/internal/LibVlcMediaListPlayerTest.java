@@ -36,7 +36,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcMediaListPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class MediaListPlayerTest extends AbstractVLCInternalTest
+public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
 {
 
     private LibVlcMediaListPlayer current;
@@ -215,6 +215,7 @@ public class MediaListPlayerTest extends AbstractVLCInternalTest
 
         int state = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
         Assert.assertEquals(exception.message, 0, exception.raised);
+        Thread.sleep(200L);
         Assert.assertEquals(
             "Expected state: " + LibVlcState.libvlc_Paused + ".\n",
             LibVlcState.libvlc_Paused.ordinal(),
