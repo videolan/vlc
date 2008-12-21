@@ -58,6 +58,7 @@ class MediaServer;
 class MediaServerList;
 class Item;
 class Container;
+class Lockable;
 
 // VLC handle
 
@@ -65,6 +66,7 @@ struct services_discovery_sys_t
 {
     UpnpClient_Handle clientHandle;
     MediaServerList* serverList;
+    Lockable* callbackLock;
 };
 
 // Class definitions...
@@ -269,7 +271,6 @@ vlc_module_end();
 
 // More prototypes...
 
-static Lockable* CallbackLock;
 static int Callback( Upnp_EventType eventType, void* event, void* user_data );
 
 const char* xml_getChildElementValue( IXML_Element* parent,
@@ -299,7 +300,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->serverList = new MediaServerList( p_sd );
-    CallbackLock = new Lockable();
+    p_sys->callbackLock = new Lockable();
 
     res = UpnpRegisterClient( Callback, p_sys, &p_sys->clientHandle );
     if( res != UPNP_E_SUCCESS )
@@ -328,7 +329,7 @@ static void Close( vlc_object_t *p_this )
 
     UpnpFinish();
     delete p_sd->p_sys->serverList;
-    delete CallbackLock;
+    delete p_sd->p_sys->callbackLock;
 
     free( p_sd->p_sys );
 }
@@ -406,10 +407,9 @@ IXML_Document* parseBrowseResult( IXML_Document* doc )
 // Handles all UPnP events
 static int Callback( Upnp_EventType eventType, void* event, void* user_data )
 {
-    Locker locker( CallbackLock );
-
     services_discovery_t *p_sd = ( services_discovery_t* ) user_data;
     services_discovery_sys_t* p_sys = p_sd->p_sys;
+    Locker locker( p_sys->callbackLock );
 
     switch( eventType ) {
 
