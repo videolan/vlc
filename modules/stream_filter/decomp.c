@@ -27,6 +27,9 @@
 #include <vlc_stream.h>
 #include <vlc_network.h>
 #include <unistd.h>
+#ifndef _POSIX_SPAWN
+# define _POSIX_SPAWN (-1)
+#endif
 #include <fcntl.h>
 #include <spawn.h>
 #include <sys/wait.h>
@@ -268,6 +271,7 @@ static int Open (stream_t *stream, const char *path)
             cloexec (uncomp[0]);
             p_sys->read_fd = uncomp[0];
 
+#if (_POSIX_SPAWN >= 0)
             posix_spawn_file_actions_t actions;
             if (posix_spawn_file_actions_init (&actions) == 0)
             {
@@ -291,6 +295,25 @@ static int Open (stream_t *stream, const char *path)
                 }
                 posix_spawn_file_actions_destroy (&actions);
             }
+#else /* _POSIX_SPAWN */
+            switch (p_sys->pid = fork ())
+            {
+                case -1:
+                    msg_Err (stream, "Cannot fork (%m)");
+                    break;
+                case 0:
+                    dup2 (comp[0], 0);
+                    close (comp[0]);
+                    dup2 (uncomp[1], 1);
+                    close (uncomp[1]);
+                    execlp (path, path, (char *)NULL);
+                    exit (1); /* if we get, execlp() failed! */
+                default:
+                    if (vlc_clone (&p_sys->thread, Thread, stream,
+                                   VLC_THREAD_PRIORITY_INPUT) == 0)
+                        ret = VLC_SUCCESS;
+            }
+#endif /* _POSIX_SPAWN < 0 */
             close (uncomp[1]);
             if (ret != VLC_SUCCESS)
                 close (uncomp[0]);
