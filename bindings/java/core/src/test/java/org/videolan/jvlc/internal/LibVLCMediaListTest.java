@@ -33,7 +33,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class MediaListTest extends AbstractVLCInternalTest
+public class LibVLCMediaListTest extends AbstractVLCInternalTest
 {
 
     @Test
