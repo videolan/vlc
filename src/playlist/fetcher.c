@@ -1,5 +1,5 @@
 /*****************************************************************************
- * preparse.c: Preparser thread.
+ * fetcher.c: Art fetcher thread.
  *****************************************************************************
  * Copyright © 1999-2009 the VideoLAN team
  * $Id$
@@ -27,16 +27,38 @@
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
+#include <vlc_stream.h>
 
 #include "art.h"
 #include "fetcher.h"
 #include "playlist_internal.h"
 
+
+/*****************************************************************************
+ * Structures/definitions
+ *****************************************************************************/
+struct playlist_fetcher_t
+{
+    playlist_t      *p_playlist;
+
+    vlc_thread_t    thread;
+    vlc_mutex_t     lock;
+    vlc_cond_t      wait;
+    int             i_art_policy;
+    int             i_waiting;
+    input_item_t    **pp_waiting;
+
+    DECL_ARRAY(playlist_album_t) albums;
+};
+
 static void *Thread( void * );
 
+
+/*****************************************************************************
+ * Public functions
+ *****************************************************************************/
 playlist_fetcher_t *playlist_fetcher_New( playlist_t *p_playlist )
 {
-    // Secondary Preparse
     playlist_fetcher_t *p_fetcher = malloc( sizeof(*p_fetcher) );
     if( !p_fetcher )
         return NULL;
@@ -46,7 +68,7 @@ playlist_fetcher_t *playlist_fetcher_New( playlist_t *p_playlist )
     vlc_cond_init( &p_fetcher->wait );
     p_fetcher->i_waiting = 0;
     p_fetcher->pp_waiting = NULL;
-    p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist, "album-art" );
+    p_fetcher->i_art_policy = var_GetInteger( p_playlist, "album-art" );
     ARRAY_INIT( p_fetcher->albums );
 
     if( vlc_clone( &p_fetcher->thread, Thread, p_fetcher,
@@ -87,6 +109,10 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
     free( p_fetcher );
 }
 
+
+/*****************************************************************************
+ * Privates functions
+ *****************************************************************************/
 /**
  * This function locates the art associated to an input item.
  * Return codes:
@@ -211,12 +237,130 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     return i_ret;
 }
 
+/**
+ * Download the art using the URL or an art downloaded
+ * This function should be called only if data is not already in cache
+ */
+static int DownloadArt( playlist_t *p_playlist, input_item_t *p_item )
+{
+    char *psz_arturl = input_item_GetArtURL( p_item );
+    assert( *psz_arturl );
+
+    if( !strncmp( psz_arturl , "file://", 7 ) )
+    {
+        msg_Dbg( p_playlist, "Album art is local file, no need to cache" );
+        free( psz_arturl );
+        return VLC_SUCCESS;
+    }
+
+    if( !strncmp( psz_arturl , "APIC", 4 ) )
+    {
+        msg_Warn( p_playlist, "APIC fetch not supported yet" );
+        goto error;
+    }
+
+    stream_t *p_stream = stream_UrlNew( p_playlist, psz_arturl );
+    if( !p_stream )
+        goto error;
+
+    uint8_t *p_data = NULL;
+    int i_data = 0;
+    for( ;; )
+    {
+        int i_read = 65536;
+
+        if( i_data + i_read <= i_data ) /* Protect gainst overflow */
+            break;
+
+        p_data = realloc( p_data, i_data + i_read );
+        if( !p_data )
+            break;
+
+        i_read = stream_Read( p_stream, &p_data[i_data], i_read );
+        if( i_read <= 0 )
+            break;
+
+        i_data += i_read;
+    }
+    stream_Delete( p_stream );
+
+    if( p_data && i_data > 0 )
+    {
+        char *psz_type = strrchr( psz_arturl, '.' );
+        if( psz_type && strlen( psz_type ) > 5 )
+            psz_type = NULL; /* remove extension if it's > to 4 characters */
+
+        playlist_SaveArt( p_playlist, p_item, p_data, i_data, psz_type );
+    }
+
+    free( p_data );
+
+    free( psz_arturl );
+    return VLC_SUCCESS;
+
+error:
+    free( psz_arturl );
+    return VLC_EGENERIC;
+}
+
+
+static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    playlist_fetcher_t *p_fetcher = p_data;
+
+    if( newval.i_int == INPUT_EVENT_ITEM_META )
+        vlc_cond_signal( &p_fetcher->wait );
+
+    return VLC_SUCCESS;
+}
+
+
+/* Check if it is not yet preparsed and if so wait for it
+ * (at most 0.5s)
+ * (This can happen if we fetch art on play)
+ * FIXME this doesn't work if we need to fetch meta before art...
+ */
+static void WaitPreparsed( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
+{
+    playlist_t *p_playlist = p_fetcher->p_playlist;
+
+    if( input_item_IsPreparsed( p_item ) )
+        return;
+
+    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+    if( !p_input )
+        return;
+
+    if( input_GetItem( p_input ) != p_item )
+        goto exit;
+
+    var_AddCallback( p_input, "intf-event", InputEvent, p_fetcher );
+
+    const mtime_t i_deadline = mdate() + 500*1000;
+
+    while( !p_input->b_eof && !p_input->b_error && !input_item_IsPreparsed( p_item ) )
+    {
+        /* A bit weird, but input_item_IsPreparsed does held the protected value */
+        vlc_mutex_lock( &p_fetcher->lock );
+        vlc_cond_timedwait( &p_fetcher->wait, &p_fetcher->lock, i_deadline );
+        vlc_mutex_unlock( &p_fetcher->lock );
+
+        if( i_deadline <= mdate() )
+            break;
+    }
+
+    var_DelCallback( p_input, "intf-event", InputEvent, p_fetcher );
+
+exit:
+    vlc_object_release( p_input );
+}
 
 static void *Thread( void *p_data )
 {
     playlist_fetcher_t *p_fetcher = p_data;
     playlist_t *p_playlist = p_fetcher->p_playlist;
-    playlist_private_t *p_sys = pl_priv( p_playlist );
 
     for( ;; )
     {
@@ -238,51 +382,31 @@ static void *Thread( void *p_data )
 
         /* */
         int canc = vlc_savecancel();
+
+        /* Wait that the input item is preparsed if it is being played */
+        WaitPreparsed( p_fetcher, p_item );
+
+        /* Find art, and download it if needed */
+        int i_ret = FindArt( p_fetcher, p_item );
+        if( i_ret == 1 )
+            i_ret = DownloadArt( p_playlist, p_item );
+
+        /* */
+        char *psz_name = input_item_GetName( p_item );
+        if( !i_ret ) /* Art is now in cache */
         {
-            int i_ret;
-
-            /* Check if it is not yet preparsed and if so wait for it
-             * (at most 0.5s)
-             * (This can happen if we fetch art on play)
-             * FIXME this doesn't work if we need to fetch meta before art...
-             */
-            for( i_ret = 0; i_ret < 10 && !input_item_IsPreparsed( p_item ); i_ret++ )
-            {
-                bool b_break;
-                PL_LOCK;
-                b_break = ( !p_sys->p_input || input_GetItem(p_sys->p_input) != p_item  ||
-                            p_sys->p_input->b_die || p_sys->p_input->b_eof || p_sys->p_input->b_error );
-                PL_UNLOCK;
-                if( b_break )
-                    break;
-                msleep( 50000 );
-            }
-
-            i_ret = FindArt( p_fetcher, p_item );
-            if( i_ret == 1 )
-            {
-                PL_DEBUG( "downloading art for %s", p_item->psz_name );
-                if( playlist_DownloadArt( p_playlist, p_item ) )
-                    input_item_SetArtNotFound( p_item, true );
-                else {
-                    input_item_SetArtFetched( p_item, true );
-                    var_SetInteger( p_playlist, "item-change",
-                                    p_item->i_id );
-                }
-            }
-            else if( i_ret == 0 ) /* Was in cache */
-            {
-                PL_DEBUG( "found art for %s in cache", p_item->psz_name );
-                input_item_SetArtFetched( p_item, true );
-                var_SetInteger( p_playlist, "item-change", p_item->i_id );
-            }
-            else
-            {
-                PL_DEBUG( "art not found for %s", p_item->psz_name );
-                input_item_SetArtNotFound( p_item, true );
-            }
-            vlc_gc_decref( p_item );
+            PL_DEBUG( "found art for %s in cache", psz_name );
+            input_item_SetArtFetched( p_item, true );
+            var_SetInteger( p_playlist, "item-change", p_item->i_id );
         }
+        else
+        {
+            PL_DEBUG( "art not found for %s", psz_name );
+            input_item_SetArtNotFound( p_item, true );
+        }
+        free( psz_name );
+        vlc_gc_decref( p_item );
+
         vlc_restorecancel( canc );
 
         int i_activity = var_GetInteger( p_playlist, "activity" );

@@ -25,22 +25,32 @@
 #ifndef _PLAYLIST_FETCHER_H
 #define _PLAYLIST_FETCHER_H 1
 
-typedef struct
-{
-    playlist_t      *p_playlist;
+/**
+ * Fetcher opaque structure.
+ *
+ * The fether object will retreive the art album data for any given input
+ * item in an asynchronous way.
+ */
+typedef struct playlist_fetcher_t playlist_fetcher_t;
 
-    vlc_thread_t    thread;
-    vlc_mutex_t     lock;
-    vlc_cond_t      wait;
-    int             i_art_policy;
-    int             i_waiting;
-    input_item_t    **pp_waiting;
-
-    DECL_ARRAY(playlist_album_t) albums;
-} playlist_fetcher_t;
-
+/**
+ * This function creates the fetcher object and thread.
+ */
 playlist_fetcher_t *playlist_fetcher_New( playlist_t * );
+
+/**
+ * This function enqueues the provided item to be art fetched.
+ *
+ * The input item is retained until the art fetching is done or until the
+ * fetcher object is destroyed.
+ */
 void playlist_fetcher_Push( playlist_fetcher_t *, input_item_t * );
+
+/**
+ * This function destroys the fetcher object and thread.
+ *
+ * All pending input items will be released.
+ */
 void playlist_fetcher_Delete( playlist_fetcher_t * );
 
 #endif

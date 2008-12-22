@@ -160,6 +160,7 @@ static char *ArtCacheName( input_item_t *p_item, const char *psz_type )
     return psz_filename;
 }
 
+/* */
 int playlist_FindArtInCache( input_item_t *p_item )
 {
     char *psz_path = ArtCachePath( p_item );
@@ -200,71 +201,6 @@ int playlist_FindArtInCache( input_item_t *p_item )
     return b_found ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-/**
- * Download the art using the URL or an art downloaded
- * This function should be called only if data is not already in cache
- */
-int playlist_DownloadArt( playlist_t *p_playlist, input_item_t *p_item )
-{
-    char *psz_arturl = input_item_GetArtURL( p_item );
-    assert( *psz_arturl );
-
-    if( !strncmp( psz_arturl , "file://", 7 ) )
-    {
-        msg_Dbg( p_playlist, "Album art is local file, no need to cache" );
-        free( psz_arturl );
-        return VLC_SUCCESS;
-    }
-
-    if( !strncmp( psz_arturl , "APIC", 4 ) )
-    {
-        msg_Warn( p_playlist, "APIC fetch not supported yet" );
-        goto error;
-    }
-
-    stream_t *p_stream = stream_UrlNew( p_playlist, psz_arturl );
-    if( !p_stream )
-        goto error;
-
-    uint8_t *p_data = NULL;
-    int i_data = 0;
-    for( ;; )
-    {
-        int i_read = 65536;
-
-        if( i_data + i_read <= i_data ) /* Protect gainst overflow */
-            break;
-
-        p_data = realloc( p_data, i_data + i_read );
-        if( !p_data )
-            break;
-
-        i_read = stream_Read( p_stream, &p_data[i_data], i_read );
-        if( i_read <= 0 )
-            break;
-
-        i_data += i_read;
-    }
-    stream_Delete( p_stream );
-
-    if( p_data && i_data > 0 )
-    {
-        char *psz_type = strrchr( psz_arturl, '.' );
-        if( psz_type && strlen( psz_type ) > 5 )
-            psz_type = NULL; /* remove extension if it's > to 4 characters */
-
-        playlist_SaveArt( p_playlist, p_item, p_data, i_data, psz_type );
-    }
-
-    free( p_data );
-
-    free( psz_arturl );
-    return VLC_SUCCESS;
-
-error:
-    free( psz_arturl );
-    return VLC_EGENERIC;
-}
 
 /* */
 int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
