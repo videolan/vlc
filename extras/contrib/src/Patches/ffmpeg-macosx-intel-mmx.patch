@@ -1,7 +1,7 @@
-Index: libavcodec/i386/motion_est_mmx.c
+Index: libavcodec/x86/motion_est_mmx.c
 ===================================================================
---- libavcodec/i386/motion_est_mmx.c	(revision 16251)
-+++ libavcodec/i386/motion_est_mmx.c	(working copy)
+--- libavcodec/x86/motion_est_mmx.c	(revision 16251)
++++ libavcodec/x86/motion_est_mmx.c	(working copy)
 @@ -168,7 +168,7 @@
  static inline void sad8_4_mmx2(uint8_t *blk1, uint8_t *blk2, int stride, int h)
  {
@@ -38,10 +38,10 @@ Index: libavcodec/i386/motion_est_mmx.c
      );
  }
 
-Index: libavcodec/i386/simple_idct_mmx.c
+Index: libavcodec/x86/simple_idct_mmx.c
 ===================================================================
---- libavcodec/i386/simple_idct_mmx.c	(revision 16251)
-+++ libavcodec/i386/simple_idct_mmx.c	(working copy)
+--- libavcodec/x86/simple_idct_mmx.c	(revision 16251)
++++ libavcodec/x86/simple_idct_mmx.c	(working copy)
 @@ -363,7 +363,7 @@
          "movq " #src4 ", %%mm1          \n\t" /* R6     R2      r6      r2 */\
          "movq " #src1 ", %%mm2          \n\t" /* R3     R1      r3      r1 */\
@@ -87,10 +87,10 @@ Index: libavcodec/i386/simple_idct_mmx.c
                  : "%eax"
          );
  }
-Index: libavcodec/i386/cavsdsp_mmx.c
+Index: libavcodec/x86/cavsdsp_mmx.c
 ===================================================================
---- libavcodec/i386/cavsdsp_mmx.c	(revision 16251)
-+++ libavcodec/i386/cavsdsp_mmx.c	(working copy)
+--- libavcodec/x86/cavsdsp_mmx.c	(revision 16251)
++++ libavcodec/x86/cavsdsp_mmx.c	(working copy)
 @@ -25,8 +25,30 @@
  #include "libavutil/common.h"
  #include "libavutil/x86_cpu.h"
@@ -123,10 +123,10 @@ Index: libavcodec/i386/cavsdsp_mmx.c
  /*****************************************************************************
   *
   * inverse transform
-Index: libavcodec/i386/flacdsp_mmx.c
+Index: libavcodec/x86/flacdsp_mmx.c
 ===================================================================
---- libavcodec/i386/flacdsp_mmx.c	(revision 16251)
-+++ libavcodec/i386/flacdsp_mmx.c	(working copy)
+--- libavcodec/x86/flacdsp_mmx.c	(revision 16251)
++++ libavcodec/x86/flacdsp_mmx.c	(working copy)
 @@ -27,7 +27,6 @@
      double c = 2.0 / (len-1.0);
      int n2 = len>>1;
