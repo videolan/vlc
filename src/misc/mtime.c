@@ -352,8 +352,8 @@ void mwait( mtime_t date )
 
 #elif defined( __APPLE__ )
     /* Explicit hack: OSX does not cancel at nanosleep() */
-    struct vlc_mutex_t lock;
-    struct vlc_cond_t  wait;
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
 
     vlc_mutex_init (&lock);
     vlc_cond_init (&wait);
