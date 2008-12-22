@@ -177,6 +177,7 @@ static void playlist_Destructor( vlc_object_t * p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
+    assert( !p_sys->p_sout );
     assert( !p_sys->p_preparser );
     assert( !p_sys->p_fetcher );
 
@@ -496,44 +497,6 @@ void playlist_LastLoop( playlist_t *p_playlist )
 
         msleep( INTF_IDLE_SLEEP );
     }
-
-#ifdef ENABLE_SOUT
-    /* close the remaining sout-keep (if there was no input atm) */
-    sout_instance_t *p_sout = pl_priv(p_playlist)->p_sout;
-    if (p_sout)
-        sout_DeleteInstance( p_sout );
-#endif
-
-    /* Core should have terminated all SDs before the playlist */
-    /* TODO: It fails to do so when not playing anything -- Courmisch */
-    playlist_ServicesDiscoveryKillAll( p_playlist );
-    playlist_MLDump( p_playlist );
-
-    PL_LOCK;
-
-    /* Release the current node */
-    set_current_status_node( p_playlist, NULL );
-
-    /* Release the current item */
-    set_current_status_item( p_playlist, NULL );
-
-    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
-        free( p_del->pp_children );
-        vlc_gc_decref( p_del->p_input );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_playlist->all_items );
-    FOREACH_ARRAY( playlist_item_t *p_del, pl_priv(p_playlist)->items_to_delete )
-        free( p_del->pp_children );
-        vlc_gc_decref( p_del->p_input );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( pl_priv(p_playlist)->items_to_delete );
-
-    ARRAY_RESET( p_playlist->items );
-    ARRAY_RESET( p_playlist->current );
-
-    PL_UNLOCK;
 }
 
 static void VariablesInit( playlist_t *p_playlist )

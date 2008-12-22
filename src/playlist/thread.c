@@ -30,6 +30,7 @@
 #include <vlc_input.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+#include "stream_output/stream_output.h"
 #include "playlist_internal.h"
 
 /*****************************************************************************
@@ -87,7 +88,41 @@ void playlist_Deactivate( playlist_t *p_playlist )
     if( p_sys->p_fetcher )
         playlist_fetcher_Delete( p_sys->p_fetcher );
 
+    /* close the remaining sout-keep */
+    if( p_sys->p_sout )
+        sout_DeleteInstance( p_sys->p_sout );
+
+    /* */
+    playlist_MLDump( p_playlist );
+
+    PL_LOCK;
+
+    /* Release the current node */
+    set_current_status_node( p_playlist, NULL );
+
+    /* Release the current item */
+    set_current_status_item( p_playlist, NULL );
+
+    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
+        free( p_del->pp_children );
+        vlc_gc_decref( p_del->p_input );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_playlist->all_items );
+    FOREACH_ARRAY( playlist_item_t *p_del, pl_priv(p_playlist)->items_to_delete )
+        free( p_del->pp_children );
+        vlc_gc_decref( p_del->p_input );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( pl_priv(p_playlist)->items_to_delete );
+
+    ARRAY_RESET( p_playlist->items );
+    ARRAY_RESET( p_playlist->current );
+
+    PL_UNLOCK;
+
     /* The NULL are there only to assert in playlist destructor */
+    p_sys->p_sout = NULL;
     p_sys->p_preparser = NULL;
     p_sys->p_fetcher = NULL;
     msg_Err( p_playlist, "Deactivated" );
