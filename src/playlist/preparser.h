@@ -29,7 +29,7 @@
  * Preparser opaque structure.
  *
  * The preparser object will retreive the meta data of any given input item in
- * an asynchronious way.
+ * an asynchronous way.
  * It will also issue art fetching requests.
  */
 typedef struct playlist_preparser_t playlist_preparser_t;
@@ -48,7 +48,7 @@ playlist_preparser_t *playlist_preparser_New( playlist_t *, playlist_fetcher_t *
 void playlist_preparser_Push( playlist_preparser_t *, input_item_t * );
 
 /**
- * This function destroy the preparser object and thread.
+ * This function destroys the preparser object and thread.
  *
  * All pending input items will be released.
  */

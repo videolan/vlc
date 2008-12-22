@@ -47,6 +47,8 @@ struct playlist_preparser_t
     vlc_cond_t      wait;
     input_item_t  **pp_waiting;
     int             i_waiting;
+
+    int             i_art_policy;
 };
 
 static void *Thread( void * );
@@ -64,6 +66,7 @@ playlist_preparser_t *playlist_preparser_New( playlist_t *p_playlist, playlist_f
     p_preparser->p_fetcher = p_fetcher;
     vlc_mutex_init( &p_preparser->lock );
     vlc_cond_init( &p_preparser->wait );
+    p_preparser->i_art_policy = var_GetInteger( p_playlist, "album-art" );
     p_preparser->i_waiting = 0;
     p_preparser->pp_waiting = NULL;
 
@@ -154,7 +157,7 @@ static void Art( playlist_preparser_t *p_preparser, input_item_t *p_item )
         const char *psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
         const char *psz_name = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
 
-        if( p_fetcher && p_fetcher->i_art_policy == ALBUM_ART_ALL &&
+        if( p_preparser->i_art_policy == ALBUM_ART_ALL &&
             ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
         {
             msg_Dbg( p_playlist, "meta ok for %s, need to fetch art", psz_name );
@@ -168,7 +171,7 @@ static void Art( playlist_preparser_t *p_preparser, input_item_t *p_item )
     }
     vlc_mutex_unlock( &p_item->lock );
 
-    if( b_fetch )
+    if( b_fetch && p_fetcher )
         playlist_fetcher_Push( p_fetcher, p_item );
 }
 

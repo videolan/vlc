@@ -480,8 +480,8 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
     free( psz_uri );
 
-    /* FIXME remove access to fetcher private data */
-    if( pl_priv(p_playlist)->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
+    /* TODO store art policy in playlist private data */
+    if( var_GetInteger( p_playlist, "album-art" ) == ALBUM_ART_WHEN_PLAYED )
     {
         bool b_has_art;
 
