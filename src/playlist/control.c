@@ -188,30 +188,20 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 int playlist_PreparseEnqueue( playlist_t *p_playlist,
                               input_item_t *p_item )
 {
-    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
+    playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    vlc_gc_incref( p_item );
+    playlist_preparser_Push( p_sys->p_preparser, p_item );
 
-    vlc_mutex_lock( &p_preparse->lock );
-    INSERT_ELEM( p_preparse->pp_waiting, p_preparse->i_waiting,
-                 p_preparse->i_waiting, p_item );
-    vlc_cond_signal( &p_preparse->wait );
-    vlc_mutex_unlock( &p_preparse->lock );
     return VLC_SUCCESS;
 }
 
 int playlist_AskForArtEnqueue( playlist_t *p_playlist,
                                input_item_t *p_item )
 {
-    playlist_fetcher_t *p_fetcher = &pl_priv(p_playlist)->fetcher;
+    playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    vlc_gc_incref( p_item );
+    playlist_fetcher_Push( p_sys->p_fetcher, p_item );
 
-    vlc_mutex_lock( &p_fetcher->lock );
-    INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
-                 p_fetcher->i_waiting, p_item );
-    vlc_cond_signal( &p_fetcher->wait );
-    vlc_mutex_unlock( &p_fetcher->lock );
     return VLC_SUCCESS;
 }
 
@@ -490,7 +480,8 @@ int playlist_PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
     free( psz_uri );
 
-    if( pl_priv(p_playlist)->fetcher.i_art_policy == ALBUM_ART_WHEN_PLAYED )
+    /* FIXME remove access to fetcher private data */
+    if( pl_priv(p_playlist)->p_fetcher->i_art_policy == ALBUM_ART_WHEN_PLAYED )
     {
         bool b_has_art;
 

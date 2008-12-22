@@ -52,42 +52,23 @@ static void* RunControlThread   ( vlc_object_t * );
 void __playlist_ThreadCreate( vlc_object_t *p_parent )
 {
     playlist_t *p_playlist = playlist_Create( p_parent );
-    if( !p_playlist ) return;
-
-    // Preparse
-    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
-    vlc_mutex_init (&p_preparse->lock);
-    vlc_cond_init (&p_preparse->wait);
-    p_preparse->i_waiting = 0;
-    p_preparse->pp_waiting = NULL;
-
-    if( vlc_clone( &p_preparse->thread, playlist_PreparseLoop, p_preparse,
-                   VLC_THREAD_PRIORITY_LOW ) )
-    {
-        msg_Err( p_playlist, "cannot spawn preparse thread" );
-        p_preparse->up = false;
+    if( !p_playlist )
         return;
-    }
-    p_preparse->up = true;
 
-    // Secondary Preparse
-    playlist_fetcher_t *p_fetcher = &pl_priv(p_playlist)->fetcher;
-    vlc_mutex_init (&p_fetcher->lock);
-    vlc_cond_init (&p_fetcher->wait);
-    p_fetcher->i_waiting = 0;
-    p_fetcher->pp_waiting = NULL;
-    p_fetcher->i_art_policy = var_CreateGetInteger( p_playlist, "album-art" );
+    /* */
+    playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    if( vlc_clone( &p_fetcher->thread, playlist_FetcherLoop, p_fetcher,
-                   VLC_THREAD_PRIORITY_LOW ) )
-    {
-        msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
-        p_fetcher->up = false;
-        return;
-    }
-    p_fetcher->up = true;
+    /* Fetcher */
+    p_sys->p_fetcher = playlist_fetcher_New( p_playlist );
+    if( !p_sys->p_fetcher )
+        msg_Err( p_playlist, "cannot create playlist fetcher" );
 
-    // Start the thread
+    /* Preparse */
+    p_sys->p_preparser = playlist_preparser_New( p_playlist, p_sys->p_fetcher );
+    if( !p_sys->p_preparser )
+        msg_Err( p_playlist, "cannot create playlist preparser" );
+
+    /* Start the playlist thread */
     if( vlc_thread_create( p_playlist, "playlist", RunControlThread,
                            VLC_THREAD_PRIORITY_LOW, false ) )
     {
@@ -98,8 +79,6 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
 
     /* The object has been initialized, now attach it */
     vlc_object_attach( p_playlist, p_parent );
-
-    return;
 }
 
 /**

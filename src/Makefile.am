@@ -295,11 +295,14 @@ SOURCES_libvlc_common = \
 	interface/intf_eject.c \
 	interface/interaction.c \
 	playlist/playlist_internal.h \
+	playlist/art.c \
 	playlist/thread.c \
 	playlist/control.c \
 	playlist/engine.c \
+	playlist/fetcher.c \
 	playlist/sort.c \
 	playlist/loadsave.c \
+	playlist/preparser.c \
 	playlist/tree.c \
 	playlist/item.c \
 	playlist/search.c \

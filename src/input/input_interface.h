@@ -34,20 +34,7 @@
 /**********************************************************************
  * Item metadata
  **********************************************************************/
-int  input_ArtFind( playlist_t *, input_item_t * );
-int  input_DownloadAndCacheArt( playlist_t *, input_item_t * );
-
 void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed );
-
-typedef struct
-{
-    char *psz_artist;
-    char *psz_album;
-    char *psz_arturl;
-    bool b_found;
-} playlist_album_t;
-
-
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found );
 void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched );
 

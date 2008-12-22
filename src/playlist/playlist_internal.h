@@ -37,35 +37,16 @@
 #include "input/input_interface.h"
 #include <assert.h>
 
-typedef struct playlist_preparse_t
-{
-    vlc_thread_t    thread;
-    vlc_mutex_t     lock;
-    vlc_cond_t      wait;
-    input_item_t  **pp_waiting;
-    int             i_waiting;
-    bool            up;
-} playlist_preparse_t;
-
-typedef struct playlist_fetcher_t
-{
-    vlc_thread_t    thread;
-    vlc_mutex_t     lock;
-    vlc_cond_t      wait;
-    int             i_art_policy;
-    int             i_waiting;
-    input_item_t    **pp_waiting;
-    bool            up;
-
-    DECL_ARRAY(playlist_album_t) albums;
-} playlist_fetcher_t;
+#include "art.h"
+#include "fetcher.h"
+#include "preparser.h"
 
 typedef struct playlist_private_t
 {
     playlist_t           public_data;
-    playlist_preparse_t  preparse; /**< Preparser data */
-    playlist_fetcher_t   fetcher; /**< Meta and art fetcher data */
-    sout_instance_t      *p_sout; /**< Kept sout instance */
+    playlist_preparser_t *p_preparser;  /**< Preparser data */
+    playlist_fetcher_t   *p_fetcher;    /**< Meta and art fetcher data */
+    sout_instance_t      *p_sout;       /**< Kept sout instance */
 
     playlist_item_array_t items_to_delete; /**< Array of items and nodes to
             delete... At the very end. This sucks. */
