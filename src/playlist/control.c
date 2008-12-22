@@ -35,8 +35,6 @@
  *****************************************************************************/
 static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args );
 
-static void PreparseEnqueueItemSub( playlist_t *, playlist_item_t * );
-
 /*****************************************************************************
  * Playlist control
  *****************************************************************************/
@@ -45,7 +43,7 @@ playlist_t *__pl_Hold( vlc_object_t *p_this )
 {
     playlist_t *pl;
 
-    barrier ();
+    barrier();
     pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
 
     assert( VLC_OBJECT(pl) != p_this /* This does not make sense to hold the playlist
@@ -68,19 +66,13 @@ void __pl_Release( vlc_object_t *p_this )
     vlc_object_release( pl );
 }
 
-void playlist_Signal( playlist_t *p_playlist )
-{
-    /* TODO: assert playlist lock? */
-    vlc_object_signal( p_playlist );
-}
-
 int playlist_Control( playlist_t * p_playlist, int i_query,
                       bool b_locked, ... )
 {
     va_list args;
     int i_result;
-    va_start( args, b_locked );
     PL_LOCK_IF( !b_locked );
+    va_start( args, b_locked );
     i_result = PlaylistVAControl( p_playlist, i_query, args );
     va_end( args );
     PL_UNLOCK_IF( !b_locked );
@@ -208,21 +200,6 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
     return VLC_SUCCESS;
 }
 
-/** Enqueue a playlist item or a node for preparsing.
- *  This function shall be called without playlist and preparser locks */
-int playlist_PreparseEnqueueItem( playlist_t *p_playlist,
-                                  playlist_item_t *p_item )
-{
-    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
-
-    vlc_object_lock( p_playlist );
-    vlc_mutex_lock( &p_preparse->lock );
-    PreparseEnqueueItemSub( p_playlist, p_item );
-    vlc_mutex_unlock( &p_preparse->lock );
-    vlc_object_unlock( p_playlist );
-    return VLC_SUCCESS;
-}
-
 int playlist_AskForArtEnqueue( playlist_t *p_playlist,
                                input_item_t *p_item )
 {
@@ -236,30 +213,6 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
     vlc_cond_signal( &p_fetcher->wait );
     vlc_mutex_unlock( &p_fetcher->lock );
     return VLC_SUCCESS;
-}
-
-static void PreparseEnqueueItemSub( playlist_t *p_playlist,
-                                    playlist_item_t *p_item )
-{
-    playlist_preparse_t *p_preparse = &pl_priv(p_playlist)->preparse;
-
-    if( p_item->i_children == -1 )
-    {
-        /* Leaf item */
-        vlc_gc_incref( p_item->p_input );
-        INSERT_ELEM( p_preparse->pp_waiting,
-                     p_preparse->i_waiting,
-                     p_preparse->i_waiting,
-                     p_item->p_input );
-    }
-    else
-    {
-        /* Non-leaf item: recurse */
-        for( int i = 0; i < p_item->i_children; i++)
-        {
-            PreparseEnqueueItemSub( p_playlist, p_item->pp_children[i] );
-        }
-    }
 }
 
 /*****************************************************************************

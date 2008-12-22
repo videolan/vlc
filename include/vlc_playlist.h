@@ -181,22 +181,27 @@ struct playlist_add_t
     int i_position;
 };
 
-#define SORT_ID 0
-#define SORT_TITLE 1
-#define SORT_TITLE_NODES_FIRST 2
-#define SORT_ARTIST 3
-#define SORT_GENRE 4
-#define SORT_RANDOM 5
-#define SORT_DURATION 6
-#define SORT_TITLE_NUMERIC 7
-#define SORT_ALBUM 8
-#define SORT_TRACK_NUMBER 9
-#define SORT_DESCRIPTION 10
-#define SORT_RATING 11
-#define SORT_URI 12
-
-#define ORDER_NORMAL 0
-#define ORDER_REVERSE 1
+enum
+{
+    SORT_ID = 0,
+    SORT_TITLE = 1,
+    SORT_TITLE_NODES_FIRST = 2,
+    SORT_ARTIST = 3,
+    SORT_GENRE = 4,
+    SORT_RANDOM = 5,
+    SORT_DURATION = 6,
+    SORT_TITLE_NUMERIC = 7,
+    SORT_ALBUM = 8,
+    SORT_TRACK_NUMBER = 9,
+    SORT_DESCRIPTION = 10,
+    SORT_RATING = 11,
+    SORT_URI = 12,
+};
+enum
+{
+    ORDER_NORMAL = 0,
+    ORDER_REVERSE = 1,
+};
 
 /* Used by playlist_Import */
 #define PLAYLIST_INSERT          0x0001
@@ -221,6 +226,7 @@ enum pl_locked_state
 /* Helpers */
 #define PL_LOCK vlc_object_lock( p_playlist )
 #define PL_UNLOCK vlc_object_unlock( p_playlist )
+#define PL_ASSERT_LOCKED vlc_object_assert_locked( p_playlist )
 
 VLC_EXPORT( playlist_t *, __pl_Hold, ( vlc_object_t * ) );
 #define pl_Hold( a ) __pl_Hold( VLC_OBJECT(a) )
@@ -234,7 +240,7 @@ VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
 #define playlist_Stop(p) playlist_Control(p,PLAYLIST_STOP, pl_Unlocked )
 #define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, 1)
 #define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
-#define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  i)
+#define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  (i) )
 
 /**
  * Do a playlist action.
@@ -260,8 +266,6 @@ VLC_EXPORT( void,  playlist_Clear, ( playlist_t *, bool ) );
 /** Enqueue an input item for preparsing */
 VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
 
-/** Enqueue a playlist item and all of its children if any for preparsing */
-VLC_EXPORT( int, playlist_PreparseEnqueueItem, (playlist_t *, playlist_item_t *) );
 /** Request the art for an input item to be fetched */
 VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *) );
 
@@ -269,8 +273,8 @@ VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *) );
 VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
-VLC_EXPORT( playlist_item_t *,  playlist_CurrentPlayingItem, ( playlist_t * ) );
 VLC_EXPORT( int,  playlist_CurrentId, ( playlist_t * ) );
+VLC_EXPORT( playlist_item_t *,  playlist_CurrentPlayingItem, ( playlist_t * ) );
 VLC_EXPORT( bool,  playlist_IsPlaying, ( playlist_t * ) );
 VLC_EXPORT( int,   playlist_Status, ( playlist_t * ) );
 
@@ -283,6 +287,11 @@ VLC_EXPORT( int,   playlist_Status, ( playlist_t * ) );
  * \return VLC_SUCCESS on success
  */
 VLC_EXPORT( int,  playlist_Export, ( playlist_t *p_playlist, const char *psz_name, playlist_item_t *p_export_root, const char *psz_type ) );
+
+/**
+ * Open a playlist file, add its content to the current playlist
+ */
+VLC_EXPORT( int, playlist_Import, ( playlist_t *p_playlist, const char *psz_file ) );
 
 /********************** Services discovery ***********************/
 
@@ -354,21 +363,6 @@ VLC_EXPORT( playlist_item_t *, playlist_GetLastLeaf, ( playlist_t *p_playlist, p
 /***********************************************************************
  * Inline functions
  ***********************************************************************/
-/** Open a playlist file, add its content to the current playlist */
-static inline int playlist_Import( playlist_t *p_playlist, const char *psz_file)
-{
-    char psz_uri[256+10];
-    input_item_t *p_input;
-    snprintf( psz_uri, 256+9, "file/://%s", psz_file );
-    const char *const psz_option = "meta-file";
-    p_input = input_item_NewExt( p_playlist, psz_uri, psz_file,
-                                1, &psz_option, -1 );
-    playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
-                       true, false );
-    input_Read( p_playlist, p_input, true );
-    return VLC_SUCCESS;
-}
-
 /** Small helper tp get current playing input or NULL. Release the input after use. */
 #define pl_CurrentInput(a) __pl_CurrentInput( VLC_OBJECT(a) )
 static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
@@ -381,13 +375,18 @@ static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
 }
 
 /** Tell if the playlist is empty */
-#define playlist_IsEmpty( pl ) ( pl->items.i_size == 0 )
+static inline bool playlist_IsEmpty( playlist_t *p_playlist )
+{
+    PL_ASSERT_LOCKED;
+    return p_playlist->items.i_size == 0;
+}
 
 /** Tell the number of items in the current playing context */
-#define playlist_CurrentSize( pl ) pl->current.i_size
-
-/** Ask the playlist to do some work */
-VLC_EXPORT( void, playlist_Signal, ( playlist_t * ) );
+static inline int playlist_CurrentSize( playlist_t *p_playlist )
+{
+    PL_ASSERT_LOCKED;
+    return p_playlist->current.i_size;
+}
 
 /** @} */
 # ifdef __cplusplus

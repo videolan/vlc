@@ -44,9 +44,14 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
 {
     (void)psz_cmd; (void)oldval; (void)newval; (void)a;
+    playlist_t *p_playlist = (playlist_t*)p_this;
 
-    pl_priv((playlist_t*)p_this)->b_reset_currently_playing = true;
-    playlist_Signal( ((playlist_t*)p_this) );
+    PL_LOCK;
+
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
+    vlc_object_signal_unlocked( p_playlist );
+
+    PL_UNLOCK;
     return VLC_SUCCESS;
 }
 
@@ -228,17 +233,18 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     playlist_t *p_playlist = p_data;
 
-    if( newval.i_int == INPUT_EVENT_STATE )
-    {
-        playlist_Signal( p_playlist );
-    }
-    else if( newval.i_int == INPUT_EVENT_ES )
-    {
-        PL_LOCK;
+    if( newval.i_int != INPUT_EVENT_STATE &&
+        newval.i_int != INPUT_EVENT_ES )
+        return VLC_SUCCESS;
+
+    PL_LOCK;
+
+    if( newval.i_int == INPUT_EVENT_ES )
         pl_priv(p_playlist)->gc_date = mdate();
-        vlc_object_signal_unlocked( p_playlist );
-        PL_UNLOCK;
-    }
+
+    vlc_object_signal_unlocked( p_playlist );
+
+    PL_UNLOCK;
     return VLC_SUCCESS;
 }
 

@@ -288,6 +288,7 @@ playlist_GetNextLeaf
 playlist_GetPreferredNode
 playlist_GetPrevLeaf
 playlist_IsPlaying
+playlist_Import
 playlist_IsServicesDiscoveryLoaded
 playlist_ItemGetById
 playlist_ItemGetByInput
@@ -304,11 +305,9 @@ playlist_NodeInsert
 playlist_NodeRemoveItem
 playlist_NodesPairCreate
 playlist_PreparseEnqueue
-playlist_PreparseEnqueueItem
 playlist_RecursiveNodeSort
 playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryRemove
-playlist_Signal
 playlist_Status
 playlist_TreeMove
 __pl_Hold

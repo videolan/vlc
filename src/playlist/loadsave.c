@@ -92,6 +92,24 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
     return i_ret;
 }
 
+int playlist_Import( playlist_t *p_playlist, const char *psz_file )
+{
+    input_item_t *p_input;
+    char *psz_uri;
+    const char *const psz_option = "meta-file";
+
+    if( asprintf( &psz_uri, "file/://%s", psz_file ) < 0 )
+        return VLC_EGENERIC;
+
+    p_input = input_item_NewExt( p_playlist, psz_uri, psz_file,
+                                1, &psz_option, -1 );
+    free( psz_uri );
+
+    playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
+                       true, false );
+    return input_Read( p_playlist, p_input, true );
+}
+
 /*****************************************************************************
  * A subitem has been added to the Media Library (Event Callback)
  *****************************************************************************/

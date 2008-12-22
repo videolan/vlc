@@ -253,6 +253,5 @@ void InteractionDialog::Finish( int i_ret )
 
     hide();
     vlc_object_unlock( p_dialog->p_interaction );
-    playlist_Signal( THEPL );
 }
 
