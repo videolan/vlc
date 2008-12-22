@@ -25,20 +25,33 @@
 #ifndef _PLAYLIST_PREPARSER_H
 #define _PLAYLIST_PREPARSER_H 1
 
-typedef struct
-{
-    playlist_t          *p_playlist;
-    playlist_fetcher_t  *p_fetcher;
+/**
+ * Preparser opaque structure.
+ *
+ * The preparser object will retreive the meta data of any given input item in
+ * an asynchronious way.
+ * It will also issue art fetching requests.
+ */
+typedef struct playlist_preparser_t playlist_preparser_t;
 
-    vlc_thread_t    thread;
-    vlc_mutex_t     lock;
-    vlc_cond_t      wait;
-    input_item_t  **pp_waiting;
-    int             i_waiting;
-} playlist_preparser_t;
-
+/**
+ * This function creates the preparser object and thread.
+ */
 playlist_preparser_t *playlist_preparser_New( playlist_t *, playlist_fetcher_t * );
+
+/**
+ * This function enqueues the provided item to be preparsed.
+ *
+ * The input item is retained until the preparsing is done or until the
+ * preparser object is deleted.
+ */
 void playlist_preparser_Push( playlist_preparser_t *, input_item_t * );
+
+/**
+ * This function destroy the preparser object and thread.
+ *
+ * All pending input items will be released.
+ */
 void playlist_preparser_Delete( playlist_preparser_t * );
 
 #endif

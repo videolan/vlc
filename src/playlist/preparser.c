@@ -33,8 +33,27 @@
 #include "preparser.h"
 #include "../input/input_interface.h"
 
+
+/*****************************************************************************
+ * Structures/definitions
+ *****************************************************************************/
+struct playlist_preparser_t
+{
+    playlist_t          *p_playlist;
+    playlist_fetcher_t  *p_fetcher;
+
+    vlc_thread_t    thread;
+    vlc_mutex_t     lock;
+    vlc_cond_t      wait;
+    input_item_t  **pp_waiting;
+    int             i_waiting;
+};
+
 static void *Thread( void * );
 
+/*****************************************************************************
+ * Public functions
+ *****************************************************************************/
 playlist_preparser_t *playlist_preparser_New( playlist_t *p_playlist, playlist_fetcher_t *p_fetcher )
 {
     playlist_preparser_t *p_preparser = malloc( sizeof(*p_preparser) );
@@ -82,13 +101,84 @@ void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
     }
     vlc_cond_destroy( &p_preparser->wait );
     vlc_mutex_destroy( &p_preparser->lock );
+    free( p_preparser );
 }
 
+/*****************************************************************************
+ * Privates functions
+ *****************************************************************************/
+/**
+ * This function preparses an item when needed.
+ */
+static void Preparse( playlist_t *p_playlist, input_item_t *p_item )
+{
+    vlc_mutex_lock( &p_item->lock );
+    int i_type = p_item->i_type;
+    vlc_mutex_unlock( &p_item->lock );
+
+    if( i_type != ITEM_TYPE_FILE )
+        return;
+
+    stats_TimerStart( p_playlist, "Preparse run", STATS_TIMER_PREPARSE );
+
+    /* Do not preparse if it is already done (like by playing it) */
+    if( !input_item_IsPreparsed( p_item ) )
+    {
+        input_Preparse( p_playlist, p_item );
+        input_item_SetPreparsed( p_item, true );
+
+        var_SetInteger( p_playlist, "item-change", p_item->i_id );
+    }
+
+    stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
+}
+
+/**
+ * This function ask the fetcher object to fetch the art when needed
+ */
+static void Art( playlist_preparser_t *p_preparser, input_item_t *p_item )
+{
+    playlist_t *p_playlist = p_preparser->p_playlist;
+    playlist_fetcher_t *p_fetcher = p_preparser->p_fetcher;
+
+    bool b_fetch = false;
+    /* If we haven't retrieved enough meta, add to secondary queue
+     * which will run the "meta fetchers".
+     * This only checks for meta, not for art
+     * \todo don't do this for things we won't get meta for, like vids
+     */
+
+    vlc_mutex_lock( &p_item->lock );
+    if( p_item->p_meta )
+    {
+        const char *psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
+        const char *psz_name = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+
+        if( p_fetcher && p_fetcher->i_art_policy == ALBUM_ART_ALL &&
+            ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
+        {
+            msg_Dbg( p_playlist, "meta ok for %s, need to fetch art", psz_name );
+            b_fetch = true;
+        }
+        else
+        {
+            msg_Dbg( p_playlist, "no fetch required for %s (art currently %s)",
+                     psz_name, psz_arturl );
+        }
+    }
+    vlc_mutex_unlock( &p_item->lock );
+
+    if( b_fetch )
+        playlist_fetcher_Push( p_fetcher, p_item );
+}
+
+/**
+ * This function does the preparsing and issues the art fetching requests
+ */
 static void *Thread( void *data )
 {
     playlist_preparser_t *p_preparser = data;
     playlist_t *p_playlist = p_preparser->p_playlist;
-    playlist_fetcher_t *p_fetcher = p_preparser->p_fetcher;
 
     for( ;; )
     {
@@ -108,53 +198,19 @@ static void *Thread( void *data )
         if( !p_current )
             continue;
 
-        int canc = vlc_savecancel ();
-        {
-            PL_LOCK;
-            if( p_current->i_type == ITEM_TYPE_FILE )
-            {
-                stats_TimerStart( p_playlist, "Preparse run",
-                                  STATS_TIMER_PREPARSE );
-                /* Do not preparse if it is already done (like by playing it) */
-                if( !input_item_IsPreparsed( p_current ) )
-                {
-                    PL_UNLOCK;
-                    input_Preparse( p_playlist, p_current );
-                    PL_LOCK;
-                }
-                stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );
-                PL_UNLOCK;
-                input_item_SetPreparsed( p_current, true );
-                var_SetInteger( p_playlist, "item-change", p_current->i_id );
-                PL_LOCK;
-            }
-            /* If we haven't retrieved enough meta, add to secondary queue
-             * which will run the "meta fetchers".
-             * This only checks for meta, not for art
-             * \todo don't do this for things we won't get meta for, like vids
-             */
-            char *psz_arturl = input_item_GetArtURL( p_current );
-            char *psz_name = input_item_GetName( p_current );
-            if( p_fetcher && p_fetcher->i_art_policy == ALBUM_ART_ALL &&
-                ( !psz_arturl || strncmp( psz_arturl, "file://", 7 ) ) )
-            {
-                msg_Dbg( p_playlist, "meta ok for %s, need to fetch art", psz_name );
-                playlist_fetcher_Push( p_fetcher, p_current );
-            }
-            else
-            {
-                msg_Dbg( p_playlist, "no fetch required for %s (art currently %s)",
-                         psz_name, psz_arturl );
-            }
-            vlc_gc_decref( p_current );
-            free( psz_name );
-            free( psz_arturl );
-	    PL_UNLOCK;
-        }
+        int canc = vlc_savecancel();
+
+        Preparse( p_playlist, p_current );
+
+        Art( p_preparser, p_current );
+
         vlc_restorecancel( canc );
 
+        /* */
         int i_activity = var_GetInteger( p_playlist, "activity" );
-        if( i_activity < 0 ) i_activity = 0;
+        if( i_activity < 0 )
+            i_activity = 0;
+
         /* Sleep at least 1ms */
         msleep( (i_activity+1) * 1000 );
     }
