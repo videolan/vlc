@@ -49,17 +49,24 @@ public class JVLC
     private VLM vlm;
     
     private volatile boolean released;
+
+    private MediaListPlayer mediaListPlayer;
     
     public JVLC()
     {
         String[] args = new String[] {};
         instance = createInstance(args);
         mediaList = new MediaList(this);
+        mediaListPlayer = new MediaListPlayer(this);
+        mediaListPlayer.setMediaList(mediaList);
     }
 
     public JVLC(String[] args)
     {
         instance = createInstance(args);
+        mediaList = new MediaList(this);
+        mediaListPlayer = new MediaListPlayer(this);
+        mediaListPlayer.setMediaList(mediaList);
     }
     
     public JVLC(String args)
@@ -79,10 +86,10 @@ public class JVLC
     public MediaPlayer play(String media)
     {
         MediaDescriptor mediaDescriptor = new MediaDescriptor(this, media);
-        MediaPlayer mediaInstance = new MediaPlayer(mediaDescriptor);
-        mediaInstance.play();
+        MediaPlayer mediaPlayer = new MediaPlayer(mediaDescriptor);
+        mediaPlayer.play();
         mediaDescriptor.release();
-        return mediaInstance;
+        return mediaPlayer;
     }
 
     public void setVideoOutput(Canvas canvas)
@@ -175,6 +182,16 @@ public class JVLC
     {
         release();
         super.finalize();
+    }
+
+    
+    /**
+     * Returns the mediaListPlayer.
+     * @return the mediaListPlayer
+     */
+    public MediaListPlayer getMediaListPlayer()
+    {
+        return mediaListPlayer;
     }
     
 }
