@@ -818,8 +818,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->p_interaction = interaction_Init( p_libvlc );
 
     /* Initialize playlist and get commandline files */
-    playlist_ThreadCreate( p_libvlc );
-    if( !priv->p_playlist )
+    p_playlist = playlist_Create( VLC_OBJECT(p_libvlc) );
+    if( !p_playlist )
     {
         msg_Err( p_libvlc, "playlist initialization failed" );
         if( priv->p_memcpy_module != NULL )
@@ -829,7 +829,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
-    p_playlist = priv->p_playlist;
+    playlist_Activate( p_playlist );
+    vlc_object_attach( p_playlist, p_libvlc );
 
     psz_modules = config_GetPsz( p_playlist, "services-discovery" );
     if( psz_modules && *psz_modules )
@@ -1020,11 +1021,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
  */
 int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
-    intf_thread_t      * p_intf = NULL;
-    libvlc_priv_t      *priv = libvlc_priv (p_libvlc);
+    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
+    playlist_t    *p_playlist = priv->p_playlist;
+
+    /* Deactivate the playlist */
+    msg_Dbg( p_libvlc, "deactivating the playlist" );
+    playlist_Deactivate( p_playlist );
+
+    /* Remove all services discovery */
+    msg_Dbg( p_libvlc, "removing all services discovery tasks" );
+    playlist_ServicesDiscoveryKillAll( p_playlist );
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
+    intf_thread_t *p_intf;
     while( (p_intf = vlc_object_find( p_libvlc, VLC_OBJECT_INTF, FIND_CHILD )) )
     {
         intf_StopThread( p_intf );
@@ -1041,17 +1051,13 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
-    playlist_t *p_playlist = priv->p_playlist;
-    /* Remove all services discovery */
-    msg_Dbg( p_libvlc, "removing all services discovery tasks" );
-    playlist_ServicesDiscoveryKillAll( p_playlist );
-
     /* Free playlist */
     /* Any thread still running must not assume pl_Hold() succeeds. */
     msg_Dbg( p_libvlc, "removing playlist" );
-    priv->p_playlist = NULL;
-    vlc_object_kill( p_playlist ); /* <-- memory barrier for pl_Hold() */
-    vlc_thread_join( p_playlist );
+
+    libvlc_priv(p_playlist->p_libvlc)->p_playlist = NULL;
+    barrier();  /* FIXME is that correct ? */
+
     vlc_object_release( p_playlist );
 
     /* Free interaction */
@@ -1087,7 +1093,7 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     if( !p_libvlc )
         return VLC_EGENERIC;
 
-    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
+    libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
 #ifndef WIN32
     char* psz_pidfile = NULL;

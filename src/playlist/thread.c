@@ -42,19 +42,15 @@ static void* RunControlThread   ( vlc_object_t * );
  *****************************************************************************/
 
 /**
- * Create the main playlist thread
+ * Create the main playlist threads.
  * Additionally to the playlist, this thread controls :
  *    - Statistics
  *    - VLM
  * \param p_parent
  * \return an object with a started thread
  */
-void __playlist_ThreadCreate( vlc_object_t *p_parent )
+void playlist_Activate( playlist_t *p_playlist )
 {
-    playlist_t *p_playlist = playlist_Create( p_parent );
-    if( !p_playlist )
-        return;
-
     /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
@@ -73,12 +69,28 @@ void __playlist_ThreadCreate( vlc_object_t *p_parent )
                            VLC_THREAD_PRIORITY_LOW, false ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
-        vlc_object_release( p_playlist );
-        return;
     }
+    msg_Err( p_playlist, "Activated" );
+}
 
-    /* The object has been initialized, now attach it */
-    vlc_object_attach( p_playlist, p_parent );
+void playlist_Deactivate( playlist_t *p_playlist )
+{
+    /* */
+    playlist_private_t *p_sys = pl_priv(p_playlist);
+
+    msg_Err( p_playlist, "Deactivate" );
+    vlc_object_kill( p_playlist );
+    vlc_thread_join( p_playlist );
+
+    if( p_sys->p_preparser )
+        playlist_preparser_Delete( p_sys->p_preparser );
+    if( p_sys->p_fetcher )
+        playlist_fetcher_Delete( p_sys->p_fetcher );
+
+    /* The NULL are there only to assert in playlist destructor */
+    p_sys->p_preparser = NULL;
+    p_sys->p_fetcher = NULL;
+    msg_Err( p_playlist, "Deactivated" );
 }
 
 /**

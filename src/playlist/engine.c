@@ -177,13 +177,10 @@ static void playlist_Destructor( vlc_object_t * p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    if( p_sys->p_preparser )
-        playlist_preparser_Delete( p_sys->p_preparser );
+    assert( !p_sys->p_preparser );
+    assert( !p_sys->p_fetcher );
 
-    if( p_sys->p_fetcher )
-        playlist_fetcher_Delete( p_sys->p_fetcher );
-
-    msg_Dbg( p_this, "Destroyed" );
+    msg_Err( p_this, "Destroyed" );
 }
 
 /* Destroy remaining objects */
@@ -572,6 +569,9 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "loop", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     var_AddCallback( p_playlist, "random", RandomCallback, NULL );
+
+    /* */
+    var_Create( p_playlist, "album-art", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 }
 
 int playlist_CurrentId( playlist_t * p_playlist )

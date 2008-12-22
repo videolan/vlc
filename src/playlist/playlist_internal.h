@@ -99,15 +99,16 @@ typedef struct playlist_private_t
  * Prototypes
  *****************************************************************************/
 
-/* Global thread */
-#define playlist_ThreadCreate(a) __playlist_ThreadCreate(VLC_OBJECT(a))
-void        __playlist_ThreadCreate   ( vlc_object_t * );
+/* Creation/Deletion */
+playlist_t *playlist_Create( vlc_object_t * );
 
+/* */
+void playlist_Activate( playlist_t * );
+void playlist_Deactivate( playlist_t * );
+
+/* */
 playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
                                               input_item_t *p_input );
-
-/* Creation/Deletion */
-playlist_t *playlist_Create   ( vlc_object_t * );
 
 /* Engine */
 void playlist_MainLoop( playlist_t * );
