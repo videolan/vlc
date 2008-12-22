@@ -862,6 +862,7 @@ static void *DecoderThread( vlc_object_t *p_this )
     for( ;; )
     {
         block_t *p_block = block_FifoGet( p_owner->p_fifo );
+
         /* Make sure there is no cancellation point other than this one^^.
          * If you need one, be sure to push cleanup of p_block. */
         DecoderSignalBuffering( p_dec, p_block == NULL );
@@ -877,9 +878,9 @@ static void *DecoderThread( vlc_object_t *p_this )
 
             vlc_restorecancel( canc );
         }
+        /* Ensure fast cancellation in case the fifo is not empty */
+        vlc_testcancel();
     }
-
-    DecoderSignalBuffering( p_dec, true );
     return NULL;
 }
 
