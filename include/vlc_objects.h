@@ -127,6 +127,10 @@ VLC_EXPORT( void, __vlc_object_unlock, ( vlc_object_t * ) );
 #define vlc_object_unlock( obj ) \
     __vlc_object_unlock( VLC_OBJECT( obj ) )
 
+VLC_EXPORT( void, __vlc_object_assert_locked, ( vlc_object_t * ) );
+#define vlc_object_assert_locked( obj ) \
+    __vlc_object_assert_locked( VLC_OBJECT( obj ) )
+
 VLC_EXPORT( void, __vlc_object_wait, ( vlc_object_t * ) );
 #define vlc_object_wait( obj ) \
     __vlc_object_wait( VLC_OBJECT( obj ) )

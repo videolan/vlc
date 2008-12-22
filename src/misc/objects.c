@@ -331,6 +331,10 @@ void __vlc_object_unlock( vlc_object_t *obj )
     vlc_assert_locked( &(vlc_internals(obj)->lock) );
     vlc_mutex_unlock( &(vlc_internals(obj)->lock) );
 }
+void __vlc_object_assert_locked( vlc_object_t *obj )
+{
+    vlc_assert_locked( &(vlc_internals(obj)->lock) );
+}
 
 #ifdef WIN32
 # include <winsock2.h>
