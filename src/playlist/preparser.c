@@ -187,6 +187,9 @@ static void *Thread( void *data )
     {
         input_item_t *p_current;
 
+        /* Be sure to be cancellable before our queue is empty */
+        vlc_testcancel();
+
         /* */
         vlc_mutex_lock( &p_preparser->lock );
         mutex_cleanup_push( &p_preparser->lock );
