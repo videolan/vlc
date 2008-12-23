@@ -440,8 +440,8 @@ static int TextLoad( text_t *txt, stream_t *s )
         lines[n++] = psz;
     }
 
-    txt->i_line_count = 0;
-    txt->i_line       = n;
+    txt->i_line_count = n;
+    txt->i_line       = 0;
     txt->line         = lines;
 
     return VLC_SUCCESS;
