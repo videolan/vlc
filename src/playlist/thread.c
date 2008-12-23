@@ -71,7 +71,7 @@ void playlist_Activate( playlist_t *p_playlist )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
     }
-    msg_Err( p_playlist, "Activated" );
+    msg_Dbg( p_playlist, "Activated" );
 }
 
 void playlist_Deactivate( playlist_t *p_playlist )
@@ -79,9 +79,11 @@ void playlist_Deactivate( playlist_t *p_playlist )
     /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    msg_Err( p_playlist, "Deactivate" );
+    msg_Dbg( p_playlist, "Deactivate" );
+
     vlc_object_kill( p_playlist );
     vlc_thread_join( p_playlist );
+    assert( !p_sys->p_input );
 
     if( p_sys->p_preparser )
         playlist_preparser_Delete( p_sys->p_preparser );
@@ -125,7 +127,7 @@ void playlist_Deactivate( playlist_t *p_playlist )
     p_sys->p_sout = NULL;
     p_sys->p_preparser = NULL;
     p_sys->p_fetcher = NULL;
-    msg_Err( p_playlist, "Deactivated" );
+    msg_Dbg( p_playlist, "Deactivated" );
 }
 
 /* */
@@ -147,42 +149,6 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
 
     PL_UNLOCK;
     return VLC_SUCCESS;
-}
-
-/* Internals */
-static void playlist_release_current_input( playlist_t * p_playlist )
-{
-    PL_ASSERT_LOCKED;
-
-    if( !pl_priv(p_playlist)->p_input ) return;
-
-    input_thread_t * p_input = pl_priv(p_playlist)->p_input;
-
-    var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
-    pl_priv(p_playlist)->p_input = NULL;
-
-    /* Release the playlist lock, because we may get stuck
-     * in vlc_object_release() for some time. */
-    PL_UNLOCK;
-    vlc_thread_join( p_input );
-    vlc_object_release( p_input );
-    PL_LOCK;
-}
-
-/* */
-static void playlist_set_current_input( playlist_t * p_playlist, input_thread_t * p_input )
-{
-    PL_ASSERT_LOCKED;
-
-    playlist_release_current_input( p_playlist );
-
-    if( p_input )
-    {
-        vlc_object_hold( p_input );
-        pl_priv(p_playlist)->p_input = p_input;
-
-        var_AddCallback( p_input, "intf-event", InputEvent, p_playlist );
-    }
 }
 
 /**
@@ -269,6 +235,8 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     sout_instance_t **pp_sout = &pl_priv(p_playlist)->p_sout;
     int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
+    PL_ASSERT_LOCKED;
+
     msg_Dbg( p_playlist, "creating new input thread" );
 
     p_input->i_nb_played++;
@@ -279,10 +247,17 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     var_SetInteger( p_playlist, "activity", i_activity +
                     DEFAULT_INPUT_ACTIVITY );
 
-    input_thread_t * p_input_thread =
+    assert( pl_priv(p_playlist)->p_input == NULL );
+
+    input_thread_t *p_input_thread =
         input_CreateThreadExtended( p_playlist, p_input, NULL, *pp_sout );
-    playlist_set_current_input( p_playlist, p_input_thread );
-    vlc_object_release( p_input_thread );
+
+    if( p_input_thread )
+    {
+        pl_priv(p_playlist)->p_input = p_input_thread;
+
+        var_AddCallback( p_input_thread, "intf-event", InputEvent, p_playlist );
+    }
 
     *pp_sout = NULL;
 
@@ -330,7 +305,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
  * \param p_playlist the playlist object
  * \return nothing
  */
-static playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
+static playlist_item_t *NextItem( playlist_t *p_playlist )
 {
     playlist_item_t *p_new = NULL;
     int i_skip = 0, i;
@@ -485,7 +460,6 @@ static playlist_item_t * playlist_NextItem( playlist_t *p_playlist )
     return p_new;
 }
 
-
 /**
  * Main loop
  *
@@ -532,7 +506,15 @@ check_input:
                 *pp_sout = input_DetachSout( p_input );
 
             /* Destroy input */
-            playlist_release_current_input( p_playlist );
+            var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
+            pl_priv(p_playlist)->p_input = NULL;
+
+            /* Release the playlist lock, because we may get stuck
+             * in vlc_object_release() for some time. */
+            PL_UNLOCK;
+            vlc_thread_join( p_input );
+            vlc_object_release( p_input );
+            PL_LOCK;
 
             int i_activity= var_GetInteger( p_playlist, "activity" );
             var_SetInteger( p_playlist, "activity",
@@ -570,7 +552,7 @@ check_input:
         if( i_status != PLAYLIST_STOPPED )
         {
             msg_Dbg( p_playlist, "starting new item" );
-            playlist_item_t *p_item = playlist_NextItem( p_playlist );
+            playlist_item_t *p_item = NextItem( p_playlist );
 
             if( p_item == NULL )
             {
@@ -601,19 +583,15 @@ check_input:
 static void *Thread ( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t*)p_this;
+    int canc = vlc_savecancel();
 
-    int canc = vlc_savecancel ();
     vlc_object_lock( p_playlist );
-    while( vlc_object_alive( p_playlist ) )
+    while( vlc_object_alive( p_playlist ) || pl_priv(p_playlist)->p_input )
     {
         Loop( p_playlist );
 
-        /* The playlist lock has been unlocked, so we can't tell if
-         * someone has killed us in the meantime. Check now. */
-        if( !vlc_object_alive( p_playlist ) && !pl_priv(p_playlist)->p_input )
-            break;
-
-        vlc_object_wait( p_playlist );
+        if( vlc_object_alive( p_playlist ) )
+            vlc_object_wait( p_playlist );
     }
     vlc_object_unlock( p_playlist );
 
