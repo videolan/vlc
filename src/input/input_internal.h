@@ -123,6 +123,9 @@ struct input_thread_private_t
     int            i_slave;
     input_source_t **slave;
 
+    /* Ressources */
+    input_ressource_t *p_ressource;
+
     /* Stats counters */
     struct {
         counter_t *p_read_packets;

@@ -493,8 +493,12 @@ static int LoopInput( playlist_t *p_playlist )
         PL_DEBUG( "dead input" );
 
         assert( p_sys->p_sout == NULL );
+
+        input_ressource_t *p_ressource = input_DetachRessource( p_input );
+
         if( var_CreateGetBool( p_input, "sout-keep" ) )
-            p_sys->p_sout = input_DetachSout( p_input );
+            p_sys->p_sout = input_ressource_ExtractSout( p_ressource );
+        input_ressource_Delete( p_ressource );
 
         /* The DelCallback must be issued without playlist lock
          * It is not a problem as we return VLC_EGENERIC */

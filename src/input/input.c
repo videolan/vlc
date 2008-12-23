@@ -43,6 +43,7 @@
 #include "demux.h"
 #include "stream.h"
 #include "item.h"
+#include "ressource.h"
 
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"
@@ -212,6 +213,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_slave = 0;
     p_input->p->slave   = NULL;
 
+    /* */
+    p_input->p->p_ressource = input_ressource_New();
+    input_ressource_SetInput( p_input->p->p_ressource, p_input );
+
     /* Init control buffer */
     vlc_mutex_init( &p_input->p->lock_control );
     vlc_cond_init( &p_input->p->wait_control );
@@ -294,7 +299,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* */
     if( p_sout )
-        p_input->p->p_sout = p_sout;
+        input_ressource_RequestSout( p_input->p->p_ressource, p_sout, NULL );
 
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( &p_input->p->counters.counters_lock );
@@ -321,10 +326,10 @@ static void Destructor( input_thread_t * p_input )
 
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
-#ifdef ENABLE_SOUT
-    if( p_input->p->p_sout )
-        sout_DeleteInstance( p_input->p->p_sout );
-#endif
+
+    if( p_input->p->p_ressource )
+        input_ressource_Delete( p_input->p->p_ressource );
+
     vlc_gc_decref( p_input->p->p_item );
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
@@ -451,13 +456,17 @@ void input_StopThread( input_thread_t *p_input )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
-sout_instance_t *input_DetachSout( input_thread_t *p_input )
+input_ressource_t *input_DetachRessource( input_thread_t *p_input )
 {
     assert( p_input->b_dead );
-    sout_instance_t *p_sout = p_input->p->p_sout;
-    vlc_object_detach( p_sout );
+
+    input_ressource_t *p_ressource = p_input->p->p_ressource;
+    input_ressource_SetInput( p_ressource, NULL );
+
+    p_input->p->p_ressource = NULL;
     p_input->p->p_sout = NULL;
-    return p_sout;
+
+    return p_ressource;
 }
 
 /**
@@ -843,46 +852,21 @@ static void InitStatistics( input_thread_t * p_input )
 #ifdef ENABLE_SOUT
 static int InitSout( input_thread_t * p_input )
 {
-    char *psz;
-
-    if( p_input->b_preparsing ) return VLC_SUCCESS;
+    if( p_input->b_preparsing )
+        return VLC_SUCCESS;
 
     /* Find a usable sout and attach it to p_input */
-    psz = var_GetNonEmptyString( p_input, "sout" );
+    char *psz = var_GetNonEmptyString( p_input, "sout" );
     if( psz && strncasecmp( p_input->p->p_item->psz_uri, "vlc:", 4 ) )
     {
-        /* Check the validity of the provided sout */
-        if( p_input->p->p_sout )
+        p_input->p->p_sout  = input_ressource_RequestSout( p_input->p->p_ressource, NULL, psz );
+        if( !p_input->p->p_sout )
         {
-            if( strcmp( p_input->p->p_sout->psz_sout, psz ) )
-            {
-                msg_Dbg( p_input, "destroying unusable sout" );
-
-                sout_DeleteInstance( p_input->p->p_sout );
-                p_input->p->p_sout = NULL;
-            }
-        }
-
-        if( p_input->p->p_sout )
-        {
-            /* Reuse it */
-            msg_Dbg( p_input, "sout keep: reusing sout" );
-            msg_Dbg( p_input, "sout keep: you probably want to use "
-                              "gather stream_out" );
-            vlc_object_attach( p_input->p->p_sout, p_input );
-        }
-        else
-        {
-            /* Create a new one */
-            p_input->p->p_sout = sout_NewInstance( p_input, psz );
-            if( !p_input->p->p_sout )
-            {
-                input_ChangeState( p_input, ERROR_S );
-                msg_Err( p_input, "cannot start stream output instance, " \
-                                  "aborting" );
-                free( psz );
-                return VLC_EGENERIC;
-            }
+            input_ChangeState( p_input, ERROR_S );
+            msg_Err( p_input, "cannot start stream output instance, " \
+                              "aborting" );
+            free( psz );
+            return VLC_EGENERIC;
         }
         if( libvlc_stats( p_input ) )
         {
@@ -894,12 +878,9 @@ static int InitSout( input_thread_t * p_input )
                          1000000;
         }
     }
-    else if( p_input->p->p_sout )
+    else
     {
-        msg_Dbg( p_input, "destroying useless sout" );
-
-        sout_DeleteInstance( p_input->p->p_sout );
-        p_input->p->p_sout = NULL;
+        input_ressource_RequestSout( p_input->p->p_ressource, NULL, NULL );
     }
     free( psz );
 
@@ -1254,13 +1235,13 @@ error:
         es_out_Delete( p_input->p->p_es_out );
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
-#ifdef ENABLE_SOUT
-    if( p_input->p->p_sout )
+    if( p_input->p->p_ressource )
     {
-        vlc_object_detach( p_input->p->p_sout );
-        sout_DeleteInstance( p_input->p->p_sout );
+        if( p_input->p->p_sout )
+            input_ressource_RequestSout( p_input->p->p_ressource,
+                                         p_input->p->p_sout, NULL );
+        input_ressource_SetInput( p_input->p->p_ressource, NULL );
     }
-#endif
 
     if( !p_input->b_preparsing && libvlc_stats( p_input ) )
     {
@@ -1386,8 +1367,6 @@ static void End( input_thread_t * p_input )
             CL_CO( sout_sent_packets );
             CL_CO( sout_sent_bytes );
             CL_CO( sout_send_bitrate );
-
-            vlc_object_detach( p_input->p->p_sout );
         }
 #undef CL_CO
     }
@@ -1398,6 +1377,11 @@ static void End( input_thread_t * p_input )
             vlc_input_attachment_Delete( p_input->p->attachment[i] );
         TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
     }
+
+    /* */
+    input_ressource_RequestSout( p_input->p->p_ressource,
+                                 p_input->p->p_sout, NULL );
+    input_ressource_SetInput( p_input->p->p_ressource, NULL );
 
     /* Tell we're dead */
     input_SendEventDead( p_input );

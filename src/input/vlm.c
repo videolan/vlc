@@ -764,9 +764,14 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
+        input_ressource_t *p_ressource;
+
         input_StopThread( p_input );
         vlc_thread_join( p_input );
-        p_instance->p_sout = input_DetachSout( p_input );
+
+        p_ressource = input_DetachRessource( p_input );
+        input_ressource_Delete( p_ressource );
+
         vlc_object_release( p_input );
     }
     if( p_instance->p_sout )
@@ -834,6 +839,8 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
+        input_ressource_t *p_ressource;
+
         if( p_instance->i_index == i_input_index &&
             !p_input->b_eof && !p_input->b_error )
         {
@@ -844,13 +851,14 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
         input_StopThread( p_input );
         vlc_thread_join( p_input );
-        p_instance->p_sout = input_DetachSout( p_input );
+
+        p_ressource = input_DetachRessource( p_input );
+
         vlc_object_release( p_input );
-        if( !p_instance->b_sout_keep && p_instance->p_sout )
-        {
-            sout_DeleteInstance( p_instance->p_sout );
-            p_instance->p_sout = NULL;
-        }
+
+        if( p_instance->b_sout_keep )
+            p_instance->p_sout = input_ressource_ExtractSout( p_ressource );
+        input_ressource_Delete( p_ressource );
     }
 
     /* Start new one */
@@ -864,6 +872,10 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         {
             TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
             vlm_MediaInstanceDelete( p_instance );
+        }
+        else
+        {
+            p_instance->p_sout = NULL;
         }
         free( psz_log );
     }

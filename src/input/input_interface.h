@@ -42,11 +42,36 @@ void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched );
  * FIXME it should NOT be defined here or not coded in misc/stats.c */
 input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 
+/**
+ * This defines an opaque input ressource handler.
+ */
+typedef struct input_ressource_t input_ressource_t;
+
+/**
+ * This function releases an input_ressource_t and all associated ressources.
+ */
+void input_ressource_Delete( input_ressource_t * );
+
+/**
+ * This function return the current sout (if any) from the ressource
+ * and stop tracking it.
+ *
+ * You are then responsible of its release.
+ */
+sout_instance_t *input_ressource_ExtractSout( input_ressource_t *p_ressource );
+
 /* input.c */
 #define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
 input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, sout_instance_t * );
 
-sout_instance_t * input_DetachSout( input_thread_t *p_input );
+/**
+ * This function detaches ressources from a dead input.
+ *
+ * It MUST be called on a dead input (p_input->b_dead true) otherwise
+ * it will assert.
+ * It does not support concurrent calls.
+ */
+input_ressource_t *input_DetachRessource( input_thread_t * );
 
 /* */
 typedef enum
