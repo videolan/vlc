@@ -1226,8 +1226,6 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
     {
         aout_instance_t *p_aout = p_owner->p_aout;
         aout_input_t    *p_aout_input = p_owner->p_aout_input;
-        int i_lost = 0;
-        int i_played;
 
         if( p_dec->b_die )
         {
