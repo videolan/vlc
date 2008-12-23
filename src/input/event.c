@@ -39,6 +39,13 @@ static void Trigger( input_thread_t *p_input, int i_type );
 /*****************************************************************************
  * Event for input.c
  *****************************************************************************/
+void input_SendEventDead( input_thread_t *p_input )
+{
+    p_input->b_dead = true;
+
+    Trigger( p_input, INPUT_EVENT_DEAD );
+}
+
 void input_SendEventTimes( input_thread_t *p_input,
                            double f_position, mtime_t i_time, mtime_t i_length )
 {

@@ -520,7 +520,9 @@ static void *Run( vlc_object_t *p_this )
     End( p_input );
 
 exit:
-    p_input->b_dead = true;
+    /* Tell we're dead */
+    input_SendEventDead( p_input );
+
     vlc_restorecancel( canc );
     return NULL;
 }
@@ -1398,7 +1400,7 @@ static void End( input_thread_t * p_input )
     }
 
     /* Tell we're dead */
-    p_input->b_dead = true;
+    input_SendEventDead( p_input );
 }
 
 /*****************************************************************************

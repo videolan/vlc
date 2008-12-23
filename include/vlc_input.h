@@ -520,8 +520,12 @@ typedef enum input_event_type_e
 {
     /* "state" has changed */
     INPUT_EVENT_STATE,
+    /* b_dead is true */
+    INPUT_EVENT_DEAD,
+
     /* "rate" has changed */
     INPUT_EVENT_RATE,
+
     /* At least one of "position" or "time" or "length" has changed */
     INPUT_EVENT_TIMES,
 
