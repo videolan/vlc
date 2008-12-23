@@ -190,7 +190,10 @@ int playlist_PreparseEnqueue( playlist_t *p_playlist,
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    playlist_preparser_Push( p_sys->p_preparser, p_item );
+    PL_LOCK;
+    if( p_sys->p_preparser )
+        playlist_preparser_Push( p_sys->p_preparser, p_item );
+    PL_UNLOCK;
 
     return VLC_SUCCESS;
 }
@@ -200,7 +203,10 @@ int playlist_AskForArtEnqueue( playlist_t *p_playlist,
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    playlist_fetcher_Push( p_sys->p_fetcher, p_item );
+    PL_LOCK;
+    if( p_sys->p_fetcher )
+        playlist_fetcher_Push( p_sys->p_fetcher, p_item );
+    PL_UNLOCK;
 
     return VLC_SUCCESS;
 }

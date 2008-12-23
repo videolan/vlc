@@ -85,14 +85,23 @@ void playlist_Deactivate( playlist_t *p_playlist )
     vlc_thread_join( p_playlist );
     assert( !p_sys->p_input );
 
-    if( p_sys->p_preparser )
-        playlist_preparser_Delete( p_sys->p_preparser );
-    if( p_sys->p_fetcher )
-        playlist_fetcher_Delete( p_sys->p_fetcher );
+    PL_LOCK;
+    playlist_preparser_t *p_preparser = p_sys->p_preparser;
+    playlist_fetcher_t *p_fetcher = p_sys->p_fetcher;
+
+    p_sys->p_preparser = NULL;
+    p_sys->p_fetcher = NULL;
+    PL_UNLOCK;
+
+    if( p_preparser )
+        playlist_preparser_Delete( p_preparser );
+    if( p_fetcher )
+        playlist_fetcher_Delete( p_fetcher );
 
     /* close the remaining sout-keep */
     if( p_sys->p_sout )
         sout_DeleteInstance( p_sys->p_sout );
+    p_sys->p_sout = NULL;
 
     /* */
     playlist_MLDump( p_playlist );
@@ -111,22 +120,18 @@ void playlist_Deactivate( playlist_t *p_playlist )
         free( p_del );
     FOREACH_END();
     ARRAY_RESET( p_playlist->all_items );
-    FOREACH_ARRAY( playlist_item_t *p_del, pl_priv(p_playlist)->items_to_delete )
+    FOREACH_ARRAY( playlist_item_t *p_del, p_sys->items_to_delete )
         free( p_del->pp_children );
         vlc_gc_decref( p_del->p_input );
         free( p_del );
     FOREACH_END();
-    ARRAY_RESET( pl_priv(p_playlist)->items_to_delete );
+    ARRAY_RESET( p_sys->items_to_delete );
 
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );
 
     PL_UNLOCK;
 
-    /* The NULL are there only to assert in playlist destructor */
-    p_sys->p_sout = NULL;
-    p_sys->p_preparser = NULL;
-    p_sys->p_fetcher = NULL;
     msg_Dbg( p_playlist, "Deactivated" );
 }
 
@@ -140,7 +145,7 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     playlist_t *p_playlist = p_data;
 
     if( newval.i_int != INPUT_EVENT_STATE &&
-        newval.i_int != INPUT_EVENT_ES )
+        newval.i_int != INPUT_EVENT_DEAD )
         return VLC_SUCCESS;
 
     PL_LOCK;
@@ -149,6 +154,14 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
 
     PL_UNLOCK;
     return VLC_SUCCESS;
+}
+
+static void UpdateActivity( playlist_t *p_playlist, int i_delta )
+{
+    PL_ASSERT_LOCKED;
+
+    const int i_activity = var_GetInteger( p_playlist, "activity" ) ;
+    var_SetInteger( p_playlist, "activity", i_activity + i_delta );
 }
 
 /**
@@ -161,53 +174,55 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
  */
 static void ResyncCurrentIndex( playlist_t *p_playlist, playlist_item_t *p_cur )
 {
-     PL_DEBUG( "resyncing on %s", PLI_NAME( p_cur ) );
-     /* Simply resync index */
-     int i;
-     p_playlist->i_current_index = -1;
-     for( i = 0 ; i< p_playlist->current.i_size; i++ )
-     {
-          if( ARRAY_VAL( p_playlist->current, i ) == p_cur )
-          {
-              p_playlist->i_current_index = i;
-              break;
-          }
-     }
-     PL_DEBUG( "%s is at %i", PLI_NAME( p_cur ), p_playlist->i_current_index );
+    PL_ASSERT_LOCKED;
+
+    PL_DEBUG( "resyncing on %s", PLI_NAME( p_cur ) );
+    /* Simply resync index */
+    int i;
+    p_playlist->i_current_index = -1;
+    for( i = 0 ; i< p_playlist->current.i_size; i++ )
+    {
+        if( ARRAY_VAL( p_playlist->current, i ) == p_cur )
+        {
+            p_playlist->i_current_index = i;
+            break;
+        }
+    }
+    PL_DEBUG( "%s is at %i", PLI_NAME( p_cur ), p_playlist->i_current_index );
 }
 
-static void ResetCurrentlyPlaying( playlist_t *p_playlist, bool b_random,
+static void ResetCurrentlyPlaying( playlist_t *p_playlist,
                                    playlist_item_t *p_cur )
 {
-    playlist_item_t *p_next = NULL;
+    playlist_private_t *p_sys = pl_priv(p_playlist);
+
     stats_TimerStart( p_playlist, "Items array build",
                       STATS_TIMER_PLAYLIST_BUILD );
     PL_DEBUG( "rebuilding array of current - root %s",
-              PLI_NAME( pl_priv(p_playlist)->status.p_node ) );
+              PLI_NAME( p_sys->status.p_node ) );
     ARRAY_RESET( p_playlist->current );
     p_playlist->i_current_index = -1;
-    while( 1 )
+    for( playlist_item_t *p_next = NULL; ; )
     {
         /** FIXME: this is *slow* */
         p_next = playlist_GetNextLeaf( p_playlist,
-                                       pl_priv(p_playlist)->status.p_node,
+                                       p_sys->status.p_node,
                                        p_next, true, false );
-        if( p_next )
-        {
-            if( p_next == p_cur )
-                p_playlist->i_current_index = p_playlist->current.i_size;
-            ARRAY_APPEND( p_playlist->current, p_next);
-        }
-        else break;
+        if( !p_next )
+            break;
+
+        if( p_next == p_cur )
+            p_playlist->i_current_index = p_playlist->current.i_size;
+        ARRAY_APPEND( p_playlist->current, p_next);
     }
     PL_DEBUG("rebuild done - %i items, index %i", p_playlist->current.i_size,
                                                   p_playlist->i_current_index);
-    if( b_random )
+
+    if( var_GetBool( p_playlist, "random" ) )
     {
         /* Shuffle the array */
         srand( (unsigned int)mdate() );
-        int j;
-        for( j = p_playlist->current.i_size - 1; j > 0; j-- )
+        for( int j = p_playlist->current.i_size - 1; j > 0; j-- )
         {
             int i = rand() % (j+1); /* between 0 and j */
             playlist_item_t *p_tmp;
@@ -217,7 +232,7 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist, bool b_random,
             ARRAY_VAL(p_playlist->current,j) = p_tmp;
         }
     }
-    pl_priv(p_playlist)->b_reset_currently_playing = false;
+    p_sys->b_reset_currently_playing = false;
     stats_TimerStop( p_playlist, STATS_TIMER_PLAYLIST_BUILD );
 }
 
@@ -231,9 +246,8 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist, bool b_random,
  */
 static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 {
+    playlist_private_t *p_sys = pl_priv(p_playlist);
     input_item_t *p_input = p_item->p_input;
-    sout_instance_t **pp_sout = &pl_priv(p_playlist)->p_sout;
-    int i_activity = var_GetInteger( p_playlist, "activity" ) ;
 
     PL_ASSERT_LOCKED;
 
@@ -242,24 +256,23 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     p_input->i_nb_played++;
     set_current_status_item( p_playlist, p_item );
 
-    pl_priv(p_playlist)->status.i_status = PLAYLIST_RUNNING;
+    p_sys->status.i_status = PLAYLIST_RUNNING;
 
-    var_SetInteger( p_playlist, "activity", i_activity +
-                    DEFAULT_INPUT_ACTIVITY );
+    UpdateActivity( p_playlist, DEFAULT_INPUT_ACTIVITY );
 
-    assert( pl_priv(p_playlist)->p_input == NULL );
+    assert( p_sys->p_input == NULL );
 
     input_thread_t *p_input_thread =
-        input_CreateThreadExtended( p_playlist, p_input, NULL, *pp_sout );
+        input_CreateThreadExtended( p_playlist, p_input, NULL, p_sys->p_sout );
 
     if( p_input_thread )
     {
-        pl_priv(p_playlist)->p_input = p_input_thread;
+        p_sys->p_input = p_input_thread;
 
         var_AddCallback( p_input_thread, "intf-event", InputEvent, p_playlist );
     }
 
-    *pp_sout = NULL;
+    p_sys->p_sout = NULL;
 
     char *psz_uri = input_item_GetURI( p_item->p_input );
     if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
@@ -307,13 +320,8 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
  */
 static playlist_item_t *NextItem( playlist_t *p_playlist )
 {
+    playlist_private_t *p_sys = pl_priv(p_playlist);
     playlist_item_t *p_new = NULL;
-    int i_skip = 0, i;
-
-    bool b_loop = var_GetBool( p_playlist, "loop" );
-    bool b_random = var_GetBool( p_playlist, "random" );
-    bool b_repeat = var_GetBool( p_playlist, "repeat" );
-    bool b_playstop = var_GetBool( p_playlist, "play-and-stop" );
 
     /* Handle quickly a few special cases */
     /* No items to play */
@@ -323,50 +331,22 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
         return NULL;
     }
 
-    /* Repeat and play/stop */
-    if( !pl_priv(p_playlist)->request.b_request && b_repeat == true &&
-         get_current_status_item( p_playlist ) )
-    {
-        msg_Dbg( p_playlist,"repeating item" );
-        return get_current_status_item( p_playlist );
-    }
-    if( !pl_priv(p_playlist)->request.b_request && b_playstop == true )
-    {
-        msg_Dbg( p_playlist,"stopping (play and stop)" );
-        return NULL;
-    }
-
-    if( !pl_priv(p_playlist)->request.b_request &&
-        get_current_status_item( p_playlist ) )
-    {
-        playlist_item_t *p_parent = get_current_status_item( p_playlist );
-        while( p_parent )
-        {
-            if( p_parent->i_flags & PLAYLIST_SKIP_FLAG )
-            {
-                msg_Dbg( p_playlist, "blocking item, stopping") ;
-                return NULL;
-            }
-            p_parent = p_parent->p_parent;
-        }
-    }
-
     /* Start the real work */
-    if( pl_priv(p_playlist)->request.b_request )
+    if( p_sys->request.b_request )
     {
-        p_new = pl_priv(p_playlist)->request.p_item;
-        i_skip = pl_priv(p_playlist)->request.i_skip;
+        p_new = p_sys->request.p_item;
+        int i_skip = p_sys->request.i_skip;
         PL_DEBUG( "processing request item %s node %s skip %i",
-                        PLI_NAME( pl_priv(p_playlist)->request.p_item ),
-                        PLI_NAME( pl_priv(p_playlist)->request.p_node ), i_skip );
+                        PLI_NAME( p_sys->request.p_item ),
+                        PLI_NAME( p_sys->request.p_node ), i_skip );
 
-        if( pl_priv(p_playlist)->request.p_node &&
-            pl_priv(p_playlist)->request.p_node != get_current_status_node( p_playlist ) )
+        if( p_sys->request.p_node &&
+            p_sys->request.p_node != get_current_status_node( p_playlist ) )
         {
 
-            set_current_status_node( p_playlist, pl_priv(p_playlist)->request.p_node );
-            pl_priv(p_playlist)->request.p_node = NULL;
-            pl_priv(p_playlist)->b_reset_currently_playing = true;
+            set_current_status_node( p_playlist, p_sys->request.p_node );
+            p_sys->request.p_node = NULL;
+            p_sys->b_reset_currently_playing = true;
         }
 
         /* If we are asked for a node, go to it's first child */
@@ -376,7 +356,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
             if( p_new != NULL )
             {
                 p_new = playlist_GetNextLeaf( p_playlist, p_new, NULL, true, false );
-                for( i = 0; i < p_playlist->current.i_size; i++ )
+                for( int i = 0; i < p_playlist->current.i_size; i++ )
                 {
                     if( p_new == ARRAY_VAL( p_playlist->current, i ) )
                     {
@@ -387,9 +367,9 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
             }
         }
 
-        if( pl_priv(p_playlist)->b_reset_currently_playing )
+        if( p_sys->b_reset_currently_playing )
             /* A bit too bad to reset twice ... */
-            ResetCurrentlyPlaying( p_playlist, b_random, p_new );
+            ResetCurrentlyPlaying( p_playlist, p_new );
         else if( p_new )
             ResyncCurrentIndex( p_playlist, p_new );
         else
@@ -399,7 +379,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
         {
             if( p_playlist->i_current_index < -1 )
                 p_playlist->i_current_index = -1;
-            for( i = i_skip; i > 0 ; i-- )
+            for( int i = i_skip; i > 0 ; i-- )
             {
                 p_playlist->i_current_index++;
                 if( p_playlist->i_current_index >= p_playlist->current.i_size )
@@ -413,7 +393,7 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
         }
         else if( p_playlist->current.i_size && (i_skip < 0) )
         {
-            for( i = i_skip; i < 0 ; i++ )
+            for( int i = i_skip; i < 0 ; i++ )
             {
                 p_playlist->i_current_index--;
                 if( p_playlist->i_current_index <= -1 )
@@ -426,11 +406,42 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
                                p_playlist->i_current_index );
         }
         /* Clear the request */
-        pl_priv(p_playlist)->request.b_request = false;
+        p_sys->request.b_request = false;
     }
     /* "Automatic" item change ( next ) */
     else
     {
+        bool b_loop = var_GetBool( p_playlist, "loop" );
+        bool b_repeat = var_GetBool( p_playlist, "repeat" );
+        bool b_playstop = var_GetBool( p_playlist, "play-and-stop" );
+
+        /* Repeat and play/stop */
+        if( b_repeat && get_current_status_item( p_playlist ) )
+        {
+            msg_Dbg( p_playlist,"repeating item" );
+            return get_current_status_item( p_playlist );
+        }
+        if( b_playstop )
+        {
+            msg_Dbg( p_playlist,"stopping (play and stop)" );
+            return NULL;
+        }
+
+        /* */
+        if( get_current_status_item( p_playlist ) )
+        {
+            playlist_item_t *p_parent = get_current_status_item( p_playlist );
+            while( p_parent )
+            {
+                if( p_parent->i_flags & PLAYLIST_SKIP_FLAG )
+                {
+                    msg_Dbg( p_playlist, "blocking item, stopping") ;
+                    return NULL;
+                }
+                p_parent = p_parent->p_parent;
+            }
+        }
+
         PL_DEBUG( "changing item without a request (current %i/%i)",
                   p_playlist->i_current_index, p_playlist->current.i_size );
         /* Cant go to next from current item */
@@ -438,19 +449,21 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
             get_current_status_item( p_playlist )->i_flags & PLAYLIST_SKIP_FLAG )
             return NULL;
 
-        if( pl_priv(p_playlist)->b_reset_currently_playing )
-            ResetCurrentlyPlaying( p_playlist, b_random,
+        if( p_sys->b_reset_currently_playing )
+            ResetCurrentlyPlaying( p_playlist,
                                    get_current_status_item( p_playlist ) );
 
         p_playlist->i_current_index++;
         assert( p_playlist->i_current_index <= p_playlist->current.i_size );
         if( p_playlist->i_current_index == p_playlist->current.i_size )
         {
-            if( !b_loop || p_playlist->current.i_size == 0 ) return NULL;
+            if( !b_loop || p_playlist->current.i_size == 0 )
+                return NULL;
             p_playlist->i_current_index = 0;
         }
         PL_DEBUG( "using item %i", p_playlist->i_current_index );
-        if ( p_playlist->current.i_size == 0 ) return NULL;
+        if ( p_playlist->current.i_size == 0 )
+            return NULL;
 
         p_new = ARRAY_VAL( p_playlist->current, p_playlist->i_current_index );
         /* The new item can't be autoselected  */
@@ -460,120 +473,95 @@ static playlist_item_t *NextItem( playlist_t *p_playlist )
     return p_new;
 }
 
-/**
- * Main loop
- *
- * Main loop for the playlist. It should be entered with the
- * playlist lock (otherwise input event may be lost)
- * \param p_playlist the playlist object
- * \return nothing
- */
-static void Loop( playlist_t *p_playlist )
+static int LoopInput( playlist_t *p_playlist )
 {
-    bool b_playexit = var_GetBool( p_playlist, "play-and-exit" );
+    playlist_private_t *p_sys = pl_priv(p_playlist);
+    input_thread_t *p_input = p_sys->p_input;
 
-    PL_ASSERT_LOCKED;
+    if( !p_input )
+        return VLC_EGENERIC;
 
-    if( pl_priv(p_playlist)->b_reset_currently_playing &&
-        mdate() - pl_priv(p_playlist)->last_rebuild_date > 30000 ) // 30 ms
+    if( ( p_sys->request.b_request || !vlc_object_alive( p_playlist ) ) && !p_input->b_die )
     {
-        ResetCurrentlyPlaying( p_playlist, var_GetBool( p_playlist, "random" ),
-                               get_current_status_item( p_playlist ) );
-        pl_priv(p_playlist)->last_rebuild_date = mdate();
+        PL_DEBUG( "incoming request - stopping current input" );
+        input_StopThread( p_input );
     }
 
-check_input:
-    /* If there is an input, check that it doesn't need to die. */
-    if( pl_priv(p_playlist)->p_input )
+    /* This input is dead. Remove it ! */
+    if( p_input->b_dead )
     {
-        input_thread_t *p_input = pl_priv(p_playlist)->p_input;
+        PL_DEBUG( "dead input" );
 
-        if( pl_priv(p_playlist)->request.b_request && !p_input->b_die )
-        {
-            PL_DEBUG( "incoming request - stopping current input" );
-            input_StopThread( p_input );
-        }
+        assert( p_sys->p_sout == NULL );
+        if( var_CreateGetBool( p_input, "sout-keep" ) )
+            p_sys->p_sout = input_DetachSout( p_input );
 
-        /* This input is dead. Remove it ! */
-        if( p_input->b_dead )
-        {
-            sout_instance_t **pp_sout = &pl_priv(p_playlist)->p_sout;
+        /* The DelCallback must be issued without playlist lock
+         * It is not a problem as we return VLC_EGENERIC */
+        PL_UNLOCK;
+        var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
+        PL_LOCK;
 
-            PL_DEBUG( "dead input" );
+        p_sys->p_input = NULL;
+        vlc_thread_join( p_input );
+        vlc_object_release( p_input );
 
-            assert( *pp_sout == NULL );
-            if( var_CreateGetBool( p_input, "sout-keep" ) )
-                *pp_sout = input_DetachSout( p_input );
+        UpdateActivity( p_playlist, -DEFAULT_INPUT_ACTIVITY );
 
-            /* Destroy input */
-            var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
-            pl_priv(p_playlist)->p_input = NULL;
-
-            /* Release the playlist lock, because we may get stuck
-             * in vlc_object_release() for some time. */
-            PL_UNLOCK;
-            vlc_thread_join( p_input );
-            vlc_object_release( p_input );
-            PL_LOCK;
-
-            int i_activity= var_GetInteger( p_playlist, "activity" );
-            var_SetInteger( p_playlist, "activity",
-                            i_activity - DEFAULT_INPUT_ACTIVITY );
-            goto check_input;
-        }
-        /* This input is dying, let it do */
-        else if( p_input->b_die )
-        {
-            PL_DEBUG( "dying input" );
-            PL_UNLOCK;
-            msleep( INTF_IDLE_SLEEP );
-            PL_LOCK;
-            goto check_input;
-        }
-        /* This input has finished, ask it to die ! */
-        else if( p_input->b_error || p_input->b_eof )
-        {
-            PL_DEBUG( "finished input" );
-            input_StopThread( p_input );
-            /* No need to wait here, we'll wait in the p_input->b_die case */
-            goto check_input;
-        }
+        return VLC_EGENERIC;
     }
-    else
+    /* This input is dying, let it do */
+    else if( p_input->b_die )
     {
-        /* No input. Several cases
-         *  - No request, running status -> start new item
-         *  - No request, stopped status -> collect garbage
-         *  - Request, running requested -> start new item
-         *  - Request, stopped requested -> collect garbage
-        */
-        int i_status = pl_priv(p_playlist)->request.b_request ?
-            pl_priv(p_playlist)->request.i_status : pl_priv(p_playlist)->status.i_status;
-        if( i_status != PLAYLIST_STOPPED )
-        {
-            msg_Dbg( p_playlist, "starting new item" );
-            playlist_item_t *p_item = NextItem( p_playlist );
+        PL_DEBUG( "dying input" );
+    }
+    /* This input has finished, ask it to die ! */
+    else if( p_input->b_error || p_input->b_eof )
+    {
+        PL_DEBUG( "finished input" );
+        input_StopThread( p_input );
+    }
+    return VLC_SUCCESS;
+}
 
-            if( p_item == NULL )
-            {
-                msg_Dbg( p_playlist, "nothing to play" );
-                pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
+static void LoopRequest( playlist_t *p_playlist )
+{
+    playlist_private_t *p_sys = pl_priv(p_playlist);
+    assert( !p_sys->p_input );
 
-                if( b_playexit == true )
-                {
-                    msg_Info( p_playlist, "end of playlist, exiting" );
-                    vlc_object_kill( p_playlist->p_libvlc );
-                }
-                return;
-            }
-            PlayItem( p_playlist, p_item );
-            /* PlayItem loose input event, we need to recheck */
-            goto check_input;
-        }
-        else
-        {
-            pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
-        }
+    /* No input. Several cases
+     *  - No request, running status -> start new item
+     *  - No request, stopped status -> collect garbage
+     *  - Request, running requested -> start new item
+     *  - Request, stopped requested -> collect garbage
+    */
+    const int i_status = p_sys->request.b_request ?
+                         p_sys->request.i_status : p_sys->status.i_status;
+
+    if( i_status == PLAYLIST_STOPPED )
+    {
+        p_sys->status.i_status = PLAYLIST_STOPPED;
+
+        if( vlc_object_alive( p_playlist ) )
+            vlc_object_wait( p_playlist );
+        return;
+    }
+
+    playlist_item_t *p_item = NextItem( p_playlist );
+    if( p_item )
+    {
+        msg_Dbg( p_playlist, "starting new item" );
+        PlayItem( p_playlist, p_item );
+        return;
+    }
+
+    msg_Dbg( p_playlist, "nothing to play" );
+    p_sys->status.i_status = PLAYLIST_STOPPED;
+
+    if( var_GetBool( p_playlist, "play-and-exit" ) )
+    {
+        msg_Info( p_playlist, "end of playlist, exiting" );
+        vlc_object_kill( p_playlist->p_libvlc );
     }
 }
 
@@ -583,15 +571,26 @@ check_input:
 static void *Thread ( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t*)p_this;
+    playlist_private_t *p_sys = pl_priv(p_playlist);
     int canc = vlc_savecancel();
 
     vlc_object_lock( p_playlist );
-    while( vlc_object_alive( p_playlist ) || pl_priv(p_playlist)->p_input )
+    while( vlc_object_alive( p_playlist ) || p_sys->p_input )
     {
-        Loop( p_playlist );
+        /* FIXME: what's that ! */
+        if( p_sys->b_reset_currently_playing &&
+            mdate() - p_sys->last_rebuild_date > 30000 ) // 30 ms
+        {
+            ResetCurrentlyPlaying( p_playlist,
+                                   get_current_status_item( p_playlist ) );
+            p_sys->last_rebuild_date = mdate();
+        }
 
-        if( vlc_object_alive( p_playlist ) )
+        /* If there is an input, check that it doesn't need to die. */
+        while( !LoopInput( p_playlist ) )
             vlc_object_wait( p_playlist );
+
+        LoopRequest( p_playlist );
     }
     vlc_object_unlock( p_playlist );
 
