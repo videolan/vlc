@@ -85,8 +85,6 @@ typedef struct playlist_private_t
     bool     b_tree; /**< Display as a tree */
     bool     b_doing_ml; /**< Doing media library stuff  get quicker */
     bool     b_auto_preparse;
-    bool     b_cant_sleep;
-    mtime_t  gc_date;
     mtime_t  last_rebuild_date;
     bool     b_reset_currently_playing; /** Reset current item array */
     int      i_last_playlist_id; /**< Last id to an item */
@@ -112,9 +110,6 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
 
 /* Engine */
 void playlist_MainLoop( playlist_t * );
-void playlist_LastLoop( playlist_t * );
-void *playlist_PreparseLoop( void * );
-void *playlist_FetcherLoop( void * );
 
 void ResetCurrentlyPlaying( playlist_t *, bool, playlist_item_t * );
 

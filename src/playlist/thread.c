@@ -143,26 +143,14 @@ static void* RunControlThread ( vlc_object_t *p_this )
 
         /* The playlist lock has been unlocked, so we can't tell if
          * someone has killed us in the meantime. Check now. */
-        if( !vlc_object_alive( p_playlist ) )
+        if( !vlc_object_alive( p_playlist ) && !pl_priv(p_playlist)->p_input )
             break;
 
-        if( pl_priv(p_playlist)->b_cant_sleep )
-        {
-            /* 100 ms is an acceptable delay for playlist operations */
-            vlc_object_unlock( p_playlist );
-
-            msleep( INTF_IDLE_SLEEP*2 );
-
-            vlc_object_lock( p_playlist );
-        }
-        else
-        {
-            vlc_object_wait( p_playlist );
-        }
+        vlc_object_wait( p_playlist );
     }
     vlc_object_unlock( p_playlist );
 
-    playlist_LastLoop( p_playlist );
     vlc_restorecancel (canc);
     return NULL;
 }
+
