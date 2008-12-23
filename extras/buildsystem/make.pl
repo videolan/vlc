@@ -23,8 +23,7 @@ while(<STDIN>)
      $line = $_;
      chomp $line;
      # Skip entering/leaving directories and incomplete lines
-     if(
-	$line =~ /make\[([0-9]*)\]:.*/ ||
+     if($line =~ /make\[([0-9]*)\]:.*/ ||
 #       $line =~ /.*\s\\$/ ||
         $line =~ /^test\s\-z\s/ ||
         $line =~ /^Making\sclean\sin\s\./ ||
@@ -45,16 +44,16 @@ while(<STDIN>)
 	$line =~ /^rm\s-fr\s(.*)/ ||
 	$line =~ /^mv\s-f\s(.*)/ ||
 	$line =~ /^ln\s-s\s(.*)/ ||
-	$line =~ /^echo\s/ ||
+	$line =~ /^\s*echo\s/ ||
 	$line =~ /^mkdir\s/ ||
-	$line =~ /^cat\s/ ||
+	$line =~ /^\s*cat\s/ ||
 	$line =~ /^grep\s/ ||
 	$line =~ /^cd\s/ ||
 	$line =~ /^sed\s/ ||
 	$line =~ /^bindir=\s/ ||
 	$line =~ /^libtool:\s/ ||
-	$line =~ /^creating lib.*/ ||
-        $line =~ /^\s*\// )
+	$line =~ /^\/bin\/sh/ ||
+	$line =~ /^creating lib.*/)
      {}
      # Info
      elsif(
