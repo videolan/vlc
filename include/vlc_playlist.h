@@ -264,10 +264,10 @@ VLC_EXPORT( input_thread_t *, playlist_CurrentInput, ( playlist_t *p_playlist ) 
 VLC_EXPORT( void,  playlist_Clear, ( playlist_t *, bool ) );
 
 /** Enqueue an input item for preparsing */
-VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *) );
+VLC_EXPORT( int, playlist_PreparseEnqueue, (playlist_t *, input_item_t *, bool b_locked ) );
 
 /** Request the art for an input item to be fetched */
-VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *) );
+VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *, bool b_locked ) );
 
 /* Playlist sorting */
 VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );

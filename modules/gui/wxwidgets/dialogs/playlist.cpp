@@ -1511,7 +1511,7 @@ void Playlist::Preparse()
     {
         if( p_popup_item->i_children == -1 )
         {
-            playlist_PreparseEnqueue( p_playlist, p_popup_item->p_input );
+            playlist_PreparseEnqueue( p_playlist, p_popup_item->p_input, pl_Unlocked );
         }
         else
         {

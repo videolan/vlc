@@ -447,12 +447,22 @@ CoverArtLabel::CoverArtLabel( QWidget *parent,
     doUpdate();
 }
 
+CoverArtLabel::~CoverArtLabel()
+{
+    playlist_t *p_playlist = pl_Hold( p_this );
+    var_DelCallback( p_playlist, "item-change", downloadCoverCallback, this );
+    pl_Release( p_this );
+
+    if( p_input )
+        vlc_gc_decref( p_input );
+};
+
 void CoverArtLabel::downloadCover()
 {
     if( p_input )
     {
         playlist_t *p_playlist = pl_Hold( p_this );
-        playlist_AskForArtEnqueue( p_playlist, p_input );
+        playlist_AskForArtEnqueue( p_playlist, p_input, pl_Unlocked );
         pl_Release( p_this );
     }
 }

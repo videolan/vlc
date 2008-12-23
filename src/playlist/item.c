@@ -849,7 +849,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
           ( i_mode & PLAYLIST_SPREPARSE &&
             ( EMPTY_STR( psz_artist ) || ( EMPTY_STR( psz_album ) ) )
           ) ) )
-        playlist_PreparseEnqueue( p_playlist, p_item_cat->p_input );
+        playlist_PreparseEnqueue( p_playlist, p_item_cat->p_input, pl_Locked );
     /* If we already have it, signal it */
     else if( !EMPTY_STR( psz_artist ) && !EMPTY_STR( psz_album ) )
         input_item_SetPreparsed( p_item_cat->p_input, true );

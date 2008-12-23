@@ -249,7 +249,7 @@ static VLCInfo *_o_sharedInstance = nil;
         if( !input_item_IsPreparsed( p_item ) )
         {
             playlist_t * p_playlist = pl_Hold( VLCIntf );
-            playlist_PreparseEnqueue( p_playlist, p_item );
+            playlist_PreparseEnqueue( p_playlist, p_item, pl_Unlocked );
             pl_Release( VLCIntf );
         }
 
@@ -428,7 +428,7 @@ error:
 - (IBAction)downloadCoverArt:(id)sender
 {
     playlist_t * p_playlist = pl_Hold( VLCIntf );
-    if( p_item) playlist_AskForArtEnqueue( p_playlist, p_item );
+    if( p_item) playlist_AskForArtEnqueue( p_playlist, p_item, pl_Unlocked );
     pl_Release( VLCIntf );
 }
 

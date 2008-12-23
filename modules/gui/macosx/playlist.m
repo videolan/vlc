@@ -836,7 +836,7 @@
         {
             if( p_item->i_children == -1 )
             {
-                playlist_PreparseEnqueue( p_playlist, p_item->p_input );
+                playlist_PreparseEnqueue( p_playlist, p_item->p_input, pl_Unlocked );
             }
             else
             {
@@ -872,7 +872,7 @@
 
         if( p_item && p_item->i_children == -1 )
         {
-            playlist_AskForArtEnqueue( p_playlist, p_item->p_input );
+            playlist_AskForArtEnqueue( p_playlist, p_item->p_input, pl_Unlocked );
         }
     }
     vlc_object_release( p_playlist );

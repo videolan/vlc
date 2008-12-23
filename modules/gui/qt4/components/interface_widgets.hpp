@@ -196,8 +196,8 @@ public:
     CoverArtLabel( QWidget *parent,
                    vlc_object_t *p_this,
                    input_item_t *p_input = NULL );
-    virtual ~CoverArtLabel()
-    { if( p_input ) vlc_gc_decref( p_input ); }
+    virtual ~CoverArtLabel();
+
 private:
     input_item_t *p_input;
     vlc_object_t *p_this;
