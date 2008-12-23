@@ -109,18 +109,10 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
                                               input_item_t *p_input );
 
 /* Engine */
-void playlist_MainLoop( playlist_t * );
-
-void ResetCurrentlyPlaying( playlist_t *, bool, playlist_item_t * );
-
 playlist_item_t * get_current_status_item( playlist_t * p_playlist);
 playlist_item_t * get_current_status_node( playlist_t * p_playlist );
 void set_current_status_item( playlist_t *, playlist_item_t * );
 void set_current_status_node( playlist_t *, playlist_item_t * );
-
-/* Control */
-playlist_item_t * playlist_NextItem  ( playlist_t * );
-int playlist_PlayItem  ( playlist_t *, playlist_item_t * );
 
 /* Load/Save */
 int playlist_MLLoad( playlist_t *p_playlist );
@@ -144,11 +136,6 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 int playlist_DeleteFromInputInParent( playlist_t *, int, playlist_item_t *, bool );
 int playlist_DeleteFromItemId( playlist_t*, int );
 int playlist_ItemRelease( playlist_item_t * );
-
-void playlist_release_current_input( playlist_t * p_playlist );
-void playlist_set_current_input(
-    playlist_t * p_playlist, input_thread_t * p_input );
-
 
 /**
  * @}
