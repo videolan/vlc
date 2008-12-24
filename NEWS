@@ -6,6 +6,7 @@ Playback:
  * Frame-By-Frame Support
  * Timeshift support
  * RTSP trickplay support
+ * On-the-fly record
 
 Access:
  * RTSP authentication with Darwin Streaming Server
@@ -24,7 +25,7 @@ Decoders:
  * True HD/MLP support
  * Blu-Ray Linear PCM support
  * QCELP (Qualcomm PureVoice) support
- * Real Video 4.0 support
+ * Real Video 3.0 & 4.0 support
 
 Demuxers:
  * Support for Dirac and RealVideo in Matroska files
@@ -37,6 +38,7 @@ Stream output:
  * Restored the old mpeg2 transrating module.
  * Multiple bridge-in instances are now possible.
  * bridge-in can be used to configure a placeholder stream.
+ * Remote Audio Output Protocol (AirTunes) module.
 
 Linux/Windows interface:
  * Recently played items list
@@ -59,6 +61,9 @@ Playlist:
 Audio output:
  * Removed obsolete Esound and aRts plugins
  * Surround support for PulseAudio
+
+Miscellanous:
+ * Invmem, a fake codec to display images from external applications
 
 
 Changes between 0.9.6 and 0.9.8a:
