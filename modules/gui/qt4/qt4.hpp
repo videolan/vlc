@@ -29,14 +29,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
+#include <vlc_common.h>    /* VLC_COMMON_MEMBERS for vlc_interface.h */
+#include <vlc_interface.h> /* intf_thread_t */
+#include <vlc_playlist.h>  /* playlist_t */
 
 #include <QEvent>
 
 #if ( QT_VERSION < 0x040300 )
-# error Update your Qt
+# error Update your Qt version
 #endif
 
 enum {
@@ -68,17 +68,19 @@ class QSettings;
 struct intf_sys_t
 {
     vlc_thread_t thread;
-    QApplication *p_app;
-    MainInterface *p_mi;
 
-    QSettings *mainSettings;
+    QApplication *p_app;     /* Main Qt Application */
+    MainInterface *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
 
-    bool b_isDialogProvider;
+    QSettings *mainSettings; /* Qt State settings not messing main VLC ones */
 
-    playlist_t *p_playlist;
+    bool b_isDialogProvider; /* Qt mode or Skins mode */
 
-    const char *psz_filepath;
-    QMenu * p_popup_menu;
+    playlist_t *p_playlist;  /* Core Playlist discussion */
+
+    const char *psz_filepath; /* Last path used in dialogs */
+
+    QMenu * p_popup_menu;    /* The right click menu */
 };
 
 #define THEPL p_intf->p_sys->p_playlist
