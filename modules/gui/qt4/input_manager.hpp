@@ -77,8 +77,14 @@ public:
     virtual ~InputManager();
 
     void delInput();
-    bool hasInput() { return p_input && !p_input->b_dead
-                            && vlc_object_alive (p_input); }
+    bool hasInput()
+    {
+        return p_input /* We have an input */
+            && !p_input->b_dead /* not dead yet, */
+            && !p_input->b_eof  /* not EOF either, */
+            && vlc_object_alive (p_input); /* and the VLC object is alive */
+    }
+
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
 
