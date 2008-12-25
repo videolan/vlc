@@ -877,7 +877,6 @@ Equalizer::~Equalizer()
 
 void Equalizer::clean()
 {
-    ui.enableCheck->setChecked( false );
     enable();
 }
 /* Write down initial values */
