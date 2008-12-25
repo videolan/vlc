@@ -744,22 +744,9 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( PositionUpdate_Type, 0 );
         break;
 
-    case INPUT_EVENT_STATISTICS:
-        event = new IMEvent( StatisticsUpdate_Type, 0 );
-        break;
-    case INPUT_EVENT_VOUT:
-        event = new IMEvent( InterfaceVoutUpdate_Type, 0 );
-        break;
-
     case INPUT_EVENT_TITLE:
     case INPUT_EVENT_CHAPTER: /* TODO is that correct ? */
         event = new IMEvent( ItemTitleChanged_Type, 0 );
-        break;
-
-    case INPUT_EVENT_ITEM_META:
-    case INPUT_EVENT_ITEM_INFO:
-    case INPUT_EVENT_ITEM_NAME:
-        event = new IMEvent( MetaChanged_Type, 0 );
         break;
 
     case INPUT_EVENT_ES:
@@ -769,11 +756,27 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( ItemTeletextChanged_Type, 0 );
         break;
 
+    case INPUT_EVENT_VOUT:
+        event = new IMEvent( InterfaceVoutUpdate_Type, 0 );
+        break;
+
+    case INPUT_EVENT_STATISTICS:
+        event = new IMEvent( StatisticsUpdate_Type, 0 );
+        break;
+
+    case INPUT_EVENT_ITEM_META:
+    case INPUT_EVENT_ITEM_INFO:
+    case INPUT_EVENT_ITEM_NAME:
+        event = new IMEvent( MetaChanged_Type, 0 );
+        break;
+
     case INPUT_EVENT_PROGRAM:
     case INPUT_EVENT_RECORD:
     case INPUT_EVENT_SIGNAL:
     case INPUT_EVENT_AUDIO_DELAY:
     case INPUT_EVENT_SUBTITLE_DELAY:
+    case INPUT_EVENT_BOOKMARK:
+    case INPUT_EVENT_CACHE:
     default:
         event = NULL;
         break;
