@@ -66,15 +66,13 @@ private:
 #include <QPoint>
 #include <QModelIndex>
 
+/**
+  Special QTreeView that can emit rightClicked()
+  */
 class QVLCTreeView : public QTreeView
 {
     Q_OBJECT;
 public:
-    QVLCTreeView( QWidget * parent ) : QTreeView( parent )
-    {
-    };
-    virtual ~QVLCTreeView()   {};
-
     void mouseReleaseEvent( QMouseEvent* e )
     {
         if( e->button() & Qt::RightButton )
@@ -94,15 +92,20 @@ public:
         }
         QTreeView::mousePressEvent( e );
     }
+
 signals:
     void rightClicked( QModelIndex, QPoint  );
 };
 
+/* VLC Key/Wheel hotkeys interactions */
+
 class QKeyEvent;
 class QWheelEvent;
+
 int qtKeyModifiersToVLC( QInputEvent* e );
 int qtEventToVLCKey( QKeyEvent *e );
 int qtWheelEventToVLCKey( QWheelEvent *e );
 QString VLCKeyToString( int val );
 
 #endif
+

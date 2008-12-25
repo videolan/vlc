@@ -39,28 +39,29 @@ class InputSlider : public QSlider
     Q_OBJECT
 public:
     InputSlider( QWidget *_parent );
-    InputSlider( Qt::Orientation q,QWidget *_parent );
-    virtual ~InputSlider()   {};
+    InputSlider( Qt::Orientation q, QWidget *_parent );
+    virtual ~InputSlider() {};
 protected:
     virtual void mouseMoveEvent(QMouseEvent *event);
     virtual void mousePressEvent(QMouseEvent* event);
     virtual void mouseReleaseEvent(QMouseEvent* event);
     virtual void wheelEvent(QWheelEvent *event);
 private:
-    bool b_sliding;
-    int inputLength;
-    char psz_length[MSTRTIME_MAX_SIZE];
+    bool b_isSliding; /* Whether we are currently sliding by user action */
+    int inputLength;  /* InputLength that can change */
+    char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
+
 public slots:
     void setPosition( float, int, int );
 private slots:
     void userDrag( int );
+
 signals:
     void sliderDragged( float );
 };
 
 
 /* Sound Slider inherited directly from QAbstractSlider */
-
 class QPaintEvent;
 
 class SoundSlider : public QAbstractSlider
@@ -73,19 +74,23 @@ public:
 protected:
     const static int paddingL = 3;
     const static int paddingR = 2;
+
     virtual void paintEvent(QPaintEvent *);
     virtual void wheelEvent( QWheelEvent *event );
     virtual void mousePressEvent( QMouseEvent * );
     virtual void mouseMoveEvent( QMouseEvent * );
     virtual void mouseReleaseEvent( QMouseEvent * );
+
 private:
-    bool b_sliding;
-    bool b_outside;
-    int i_oldvalue;
-    float f_step;
-    void changeValue( int x );
-    QPixmap pixGradient;
-    QPixmap pixOutside;
+    bool b_isSliding; /* Whether we are currently sliding by user action */
+    bool b_mouseOutside; /* Whether the mouse is outside or inside the Widget */
+    int i_oldvalue; /* Store the old Value before changing */
+    float f_step; /* How much do we increase each time we wheel */
+
+    QPixmap pixGradient; /* Gradient pix storage */
+    QPixmap pixOutside; /* OutLine pix storage */
+
+    void changeValue( int x ); /* Function to modify the value from pixel x() */
 };
 
 #endif

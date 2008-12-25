@@ -62,7 +62,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->setSpacing( 0 ); layout->setMargin( 0 );
 
     /* Create and configure the QTreeView */
-    view = new QVLCTreeView( 0 );
+    view = new QVLCTreeView;
     view->header()->setSortIndicator( 0 , Qt::AscendingOrder );
     view->setSortingEnabled( true );
     view->setModel( model );

@@ -45,6 +45,7 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 
+#include <vlc_charset.h> /* us_strtod */
 
 #if 0
 class ConfClickHandler : public QObject
