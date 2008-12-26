@@ -23,6 +23,7 @@
 		A7E542900C960B5500EBBC34 /* VLCMediaLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A7E5428E0C960B5300EBBC34 /* VLCMediaLayer.m */; };
 		A7ECD9710C879C4D009BC0C0 /* BezelServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7ECD9700C879C4D009BC0C0 /* BezelServices.framework */; };
 		A7ECD9D30C87A37E009BC0C0 /* vlc.png in Resources */ = {isa = PBXBuildFile; fileRef = A7ECD9D20C87A37E009BC0C0 /* vlc.png */; };
+		CC1AD6DF0F059AED002BF46D /* ApplianceIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = CC1AD6DE0F059AED002BF46D /* ApplianceIcon.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 		A7E5428E0C960B5300EBBC34 /* VLCMediaLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaLayer.m; sourceTree = "<group>"; };
 		A7ECD9700C879C4D009BC0C0 /* BezelServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BezelServices.framework; path = /System/Library/PrivateFrameworks/BezelServices.framework; sourceTree = "<absolute>"; };
 		A7ECD9D20C87A37E009BC0C0 /* vlc.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vlc.png; sourceTree = "<group>"; };
+		CC1AD6DE0F059AED002BF46D /* ApplianceIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ApplianceIcon.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				A7ECD9D20C87A37E009BC0C0 /* vlc.png */,
+				CC1AD6DE0F059AED002BF46D /* ApplianceIcon.png */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -254,6 +257,7 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				A7ECD9D30C87A37E009BC0C0 /* vlc.png in Resources */,
+				CC1AD6DF0F059AED002BF46D /* ApplianceIcon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
