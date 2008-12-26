@@ -51,7 +51,7 @@
 		635424930D3C1394001F6433 /* VLCMediaListLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 635424920D3C1394001F6433 /* VLCMediaListLayer.m */; };
 		63874B190D25960600F738AD /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 63874B170D25960600F738AD /* MainWindow.xib */; };
 		638B823B0D35294500128F2B /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 638B823A0D35294500128F2B /* QuickTime.framework */; };
-		638F47110D216C8F008E4912 /* type_playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = 638F47100D216C8F008E4912 /* type_playlist.png */; };
+		638F47110D216C8F008E4912 /* playlist.png in Resources */ = {isa = PBXBuildFile; fileRef = 638F47100D216C8F008E4912 /* playlist.png */; };
 		63A742B30D2759C1002D41A0 /* ExceptionHandling.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63A742B20D2759C1002D41A0 /* ExceptionHandling.framework */; };
 		63E380AA0D1C65A600FD6958 /* volume_high.png in Resources */ = {isa = PBXBuildFile; fileRef = 63E380A80D1C65A600FD6958 /* volume_high.png */; };
 		63E380AB0D1C65A600FD6958 /* volume_low.png in Resources */ = {isa = PBXBuildFile; fileRef = 63E380A90D1C65A600FD6958 /* volume_low.png */; };
@@ -175,7 +175,7 @@
 		635424920D3C1394001F6433 /* VLCMediaListLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMediaListLayer.m; path = Sources/VLCMediaListLayer.m; sourceTree = "<group>"; };
 		63874B180D25960600F738AD /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		638B823A0D35294500128F2B /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
-		638F47100D216C8F008E4912 /* type_playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = type_playlist.png; path = ../../../modules/gui/qt4/pixmaps/type_playlist.png; sourceTree = SOURCE_ROOT; };
+		638F47100D216C8F008E4912 /* playlist.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = playlist.png; path = ../../../modules/gui/qt4/pixmaps/playlist/playlist.png; sourceTree = SOURCE_ROOT; };
 		63A742B20D2759C1002D41A0 /* ExceptionHandling.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ExceptionHandling.framework; path = /System/Library/Frameworks/ExceptionHandling.framework; sourceTree = "<absolute>"; };
 		63E380A80D1C65A600FD6958 /* volume_high.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = volume_high.png; path = ../../../extras/package/macosx/Resources/volume_high.png; sourceTree = SOURCE_ROOT; };
 		63E380A90D1C65A600FD6958 /* volume_low.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = volume_low.png; path = ../../../extras/package/macosx/Resources/volume_low.png; sourceTree = SOURCE_ROOT; };
@@ -420,7 +420,7 @@
 		63E768860D35072F00258089 /* Categories Icons */ = {
 			isa = PBXGroup;
 			children = (
-				638F47100D216C8F008E4912 /* type_playlist.png */,
+				638F47100D216C8F008E4912 /* playlist.png */,
 				633BD4D80D2A90C80012A314 /* dialog-error.png */,
 				633BD4D90D2A90C80012A314 /* applications-internet.png */,
 			);
@@ -541,7 +541,7 @@
 				63E380B30D1C65F200FD6958 /* skip_forward_blue.png in Resources */,
 				63E380B60D1C65FC00FD6958 /* skip_previous_active.png in Resources */,
 				63E380B70D1C65FC00FD6958 /* skip_previous_blue.png in Resources */,
-				638F47110D216C8F008E4912 /* type_playlist.png in Resources */,
+				638F47110D216C8F008E4912 /* playlist.png in Resources */,
 				63874B190D25960600F738AD /* MainWindow.xib in Resources */,
 				633BD4DA0D2A90C80012A314 /* dialog-error.png in Resources */,
 				633BD4DB0D2A90C80012A314 /* applications-internet.png in Resources */,
