@@ -54,6 +54,7 @@ export LDFLAGS = -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
 
 ifneq ($(CC),)
 HOSTCC+= CC="$(CC)"
+FFMPEGCONF += --cc=$(CC)
 endif
 ifneq ($(CXX),)
 HOSTCC+= CXX="$(CXX)"
