@@ -6,7 +6,7 @@ diff -ru libmodplug-orig/src/load_abc.cpp libmodplug/src/load_abc.cpp
  #include "load_pat.h"
  
 +#ifndef uint
-+#typedef uint unsigned int
++#define uint unsigned int
 +#endif
 +
  #define MAXABCINCLUDES	8
@@ -20,7 +20,7 @@ diff -ru libmodplug-orig/src/load_mid.cpp libmodplug/src/load_mid.cpp
  #include "load_pat.h"
  
 +#ifndef uint
-+#typedef uint unsigned int
++#define uint unsigned int
 +#endif
 +
  #define ROWSPERNOTE 16
@@ -34,7 +34,7 @@ diff -ru libmodplug-orig/src/load_pat.cpp libmodplug/src/load_pat.cpp
  #include "load_pat.h"
  
 +#ifndef uint
-+#typedef uint unsigned int
++#define uint unsigned int
 +#endif
 +
  #ifdef MSC_VER
