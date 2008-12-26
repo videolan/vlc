@@ -368,25 +368,25 @@ dist_noinst_SCRIPTS += make-alias
 
 MKALIAS = bindir="$(bindir)" transform="$(transform)" program_prefix="$(program_prefix)" program_suffix="$(program_suffix)" $(top_srcdir)/make-alias $@
 
-cvlc: make-alias
+cvlc: make-alias Makefile
 	$(MKALIAS) dummy
 
-rvlc: make-alias
+rvlc: make-alias Makefile
 	$(MKALIAS) rc
 
-svlc: make-alias
+svlc: make-alias Makefile
 	$(MKALIAS) skins2
 
-wxvlc: make-alias
+wxvlc: make-alias Makefile
 	$(MKALIAS) wx
 
-qvlc: make-alias
+qvlc: make-alias Makefile
 	$(MKALIAS) qt4
 
-nvlc: make-alias
+nvlc: make-alias Makefile
 	$(MKALIAS) ncurses
 
-mvlc: make-alias
+mvlc: make-alias Makefile
 	$(MKALIAS) maemo
 
 if BUILD_VLC
