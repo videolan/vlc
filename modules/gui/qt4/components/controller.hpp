@@ -257,13 +257,11 @@ public:
     virtual ~FullscreenControllerWidget();
 
     /* Vout */
-    vout_thread_t *p_vout;
-    void attachVout( vout_thread_t *p_vout );
-    void detachVout();
     void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
+    void mouseChanged( vout_thread_t *, int i_mousex, int i_mousey );
 
-    int i_mouse_last_move_x;
-    int i_mouse_last_move_y;
+public slots:
+    void setVoutList( vout_thread_t **, int );
 
 protected:
     friend class MainInterface;
@@ -298,10 +296,15 @@ private:
     bool b_fscHidden;
 #endif
 
+    /* List of vouts currently tracked */
+    QList<vout_thread_t *> vout;
+
     /* Shared variable between FSC and VLC (protected by a lock) */
     vlc_mutex_t lock;
     bool        b_fullscreen;
     int         i_hide_timeout;  /* FSC hiding timeout, same as mouse hiding timeout */
+    int i_mouse_last_move_x;
+    int i_mouse_last_move_y;
 };
 
 #endif

@@ -798,8 +798,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
 #endif
     b_fullscreen        = false;
     i_hide_timeout      = 1;
-    p_vout              = NULL;
     i_screennumber      = -1;
+
+    vout.clear();
 
     setWindowFlags( Qt::ToolTip );
     setMinimumWidth( 600 );
@@ -854,12 +855,14 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
 #endif
 
     vlc_mutex_init_recursive( &lock );
+
+    CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ), this, setVoutList( vout_thread_t **, int ) );
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
     getSettings()->setValue( "FullScreen/pos", pos() );
-    detachVout();
+    setVoutList( NULL, 0 );
     vlc_mutex_destroy( &lock );
 }
 
@@ -1091,11 +1094,11 @@ static int FullscreenControllerWidgetFullscreenChanged( vlc_object_t *vlc_object
                 vlc_value_t new_val,  void *data )
 {
     vout_thread_t *p_vout = (vout_thread_t *) vlc_object;
+
     msg_Dbg( p_vout, "Qt4: Fullscreen state changed" );
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
 
-    p_fs->fullscreenChanged( p_vout, new_val.b_bool,
-            var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+    p_fs->fullscreenChanged( p_vout, new_val.b_bool, var_GetInteger( p_vout, "mouse-hide-timeout" ) );
 
     return VLC_SUCCESS;
 }
@@ -1104,92 +1107,81 @@ static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const
                                                  vlc_value_t old_val, vlc_value_t new_val,
                                                  void *data )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)vlc_object;
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
 
-    int i_mousex, i_mousey;
-    bool b_toShow = false;
-
     /* Get the value from the Vout - Trust the vout more than Qt */
-    i_mousex = var_GetInteger( p_fs->p_vout, "mouse-x" );
-    i_mousey = var_GetInteger( p_fs->p_vout, "mouse-y" );
+    const int i_mousex = var_GetInteger( p_vout, "mouse-x" );
+    const int i_mousey = var_GetInteger( p_vout, "mouse-y" );
 
-    /* First time */
-    if( p_fs->i_mouse_last_move_x == -1 || p_fs->i_mouse_last_move_y == -1 )
-    {
-        p_fs->i_mouse_last_move_x = i_mousex;
-        p_fs->i_mouse_last_move_y = i_mousey;
-        b_toShow = true;
-    }
-    /* All other times */
-    else
-    {
-        /* Trigger only if move > 3 px dans une direction */
-        if( abs( p_fs->i_mouse_last_move_x - i_mousex ) > 2 ||
-            abs( p_fs->i_mouse_last_move_y - i_mousey ) > 2 )
-        {
-            b_toShow = true;
-            p_fs->i_mouse_last_move_x = i_mousex;
-            p_fs->i_mouse_last_move_y = i_mousey;
-        }
-    }
-
-    if( b_toShow )
-    {
-        /* Show event */
-        IMEvent *eShow = new IMEvent( FullscreenControlShow_Type, 0 );
-        QApplication::postEvent( p_fs, static_cast<QEvent *>(eShow) );
-
-        /* Plan hide event */
-        IMEvent *eHide = new IMEvent( FullscreenControlPlanHide_Type, 0 );
-        QApplication::postEvent( p_fs, static_cast<QEvent *>(eHide) );
-    }
+    p_fs->mouseChanged( p_vout, i_mousex, i_mousey );
 
     return VLC_SUCCESS;
 }
 
 /**
- * It is called when video start
+ * It is call to update the list of vout handled by the fullscreen controller
  */
-void FullscreenControllerWidget::attachVout( vout_thread_t *p_nvout )
+void FullscreenControllerWidget::setVoutList( vout_thread_t **pp_vout, int i_vout )
 {
-    assert( p_nvout && !p_vout );
+    QList<vout_thread_t*> del;
+    QList<vout_thread_t*> add;
 
-    p_vout = p_nvout;
+    QList<vout_thread_t*> set;
 
-    msg_Dbg( p_vout, "Qt FS: Attaching Vout" );
+    /* */
+    for( int i = 0; i < i_vout; i++ )
+        set += pp_vout[i];
+
+    /* Vout to remove */
     vlc_mutex_lock( &lock );
-
-    var_AddCallback( p_vout, "fullscreen",
-            FullscreenControllerWidgetFullscreenChanged, this );
-            /* I miss a add and fire */
-    fullscreenChanged( p_vout, var_GetBool( p_vout, "fullscreen" ),
-                       var_GetInteger( p_vout, "mouse-hide-timeout" ) );
-    vlc_mutex_unlock( &lock );
-}
-
-/**
- * It is called after turn off video.
- */
-void FullscreenControllerWidget::detachVout()
-{
-    if( p_vout )
+    foreach( vout_thread_t *p_vout, vout )
     {
-        msg_Dbg( p_vout, "Qt FS: Detaching Vout" );
+        if( !set.contains( p_vout ) )
+            del += p_vout;
+    }
+    vlc_mutex_unlock( &lock );
+
+    foreach( vout_thread_t *p_vout, del )
+    {
         var_DelCallback( p_vout, "fullscreen",
-                FullscreenControllerWidgetFullscreenChanged, this );
+                         FullscreenControllerWidgetFullscreenChanged, this );
         vlc_mutex_lock( &lock );
         fullscreenChanged( p_vout, false, 0 );
+        vout.removeAll( p_vout );
         vlc_mutex_unlock( &lock );
-        p_vout = NULL;
+    }
+
+    /* Vout to track */
+    vlc_mutex_lock( &lock );
+    foreach( vout_thread_t *p_vout, set )
+    {
+        if( !vout.contains( p_vout ) )
+            add += p_vout;
+    }
+    vlc_mutex_unlock( &lock );
+
+    foreach( vout_thread_t *p_vout, add )
+    {
+        vlc_object_hold( (vlc_object_t*)p_vout );
+
+        vlc_mutex_lock( &lock );
+        vout.append( p_vout );
+        var_AddCallback( p_vout, "fullscreen",
+                         FullscreenControllerWidgetFullscreenChanged, this );
+        /* I miss a add and fire */
+        fullscreenChanged( p_vout, var_GetBool( p_vout, "fullscreen" ),
+                           var_GetInteger( p_vout, "mouse-hide-timeout" ) );
+        vlc_mutex_unlock( &lock );
     }
 }
-
 /**
  * Register and unregister callback for mouse moving
  */
 void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
         bool b_fs, int i_timeout )
 {
+    /* FIXME - multiple vout (ie multiple mouse position ?) and thread safety if multiple vout ? */
     msg_Dbg( p_vout, "Qt: Entering Fullscreen" );
 
     vlc_mutex_lock( &lock );
@@ -1214,5 +1206,35 @@ void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
         QApplication::postEvent( this, static_cast<QEvent *>(eHide) );
     }
     vlc_mutex_unlock( &lock );
+}
+/**
+ * Mouse change callback (show/hide the controller on mouse movement)
+ */
+void FullscreenControllerWidget::mouseChanged( vout_thread_t *p_vout, int i_mousex, int i_mousey )
+{
+    bool b_toShow;
+
+    /* FIXME - multiple vout (ie multiple mouse position ?) and thread safety if multiple vout ? */
+
+    b_toShow = false;
+    if( ( i_mouse_last_move_x == -1 || i_mouse_last_move_y == -1 ) ||
+        ( abs( i_mouse_last_move_x - i_mousex ) > 2 ||
+          abs( i_mouse_last_move_y - i_mousey ) > 2 ) )
+    {
+        i_mouse_last_move_x = i_mousex;
+        i_mouse_last_move_y = i_mousey;
+        b_toShow = true;
+    }
+
+    if( b_toShow )
+    {
+        /* Show event */
+        IMEvent *eShow = new IMEvent( FullscreenControlShow_Type, 0 );
+        QApplication::postEvent( this, static_cast<QEvent *>(eShow) );
+
+        /* Plan hide event */
+        IMEvent *eHide = new IMEvent( FullscreenControlPlanHide_Type, 0 );
+        QApplication::postEvent( this, static_cast<QEvent *>(eHide) );
+    }
 }
 

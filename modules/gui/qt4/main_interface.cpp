@@ -609,8 +609,6 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
         videoIsActive = true;
 
         emit askUpdate();
-
-        if( fullscreenControls ) fullscreenControls->attachVout( p_nvout );
     }
     return ret;
 }
@@ -618,7 +616,6 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
 /* Call from the WindowClose function */
 void MainInterface::releaseVideo( void )
 {
-    if( fullscreenControls ) fullscreenControls->detachVout();
     emit askReleaseVideo( );
 }
 
