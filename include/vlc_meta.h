@@ -135,11 +135,8 @@ static inline void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const
 {
     char *psz_oldvalue = (char *)vlc_dictionary_value_for_key( &m->extra_tags, psz_name );
     if( psz_oldvalue != kVLCDictionaryNotFound )
-    {
-        free( psz_oldvalue );
         vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name,
                                              vlc_meta_FreeExtraKey, NULL );
-    }
     vlc_dictionary_insert( &m->extra_tags, psz_name, strdup(psz_value) );
 }
 
