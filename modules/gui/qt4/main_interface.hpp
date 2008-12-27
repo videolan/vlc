@@ -136,8 +136,6 @@ private:
     pl_dock_e            i_pl_dock;
     bool                 isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 
-    input_thread_t      *p_input;    ///< Main input associated to the playlist
-
     /* Status Bar */
     QLabel              *nameLabel;
 
