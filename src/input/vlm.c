@@ -755,7 +755,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = false;
     p_instance->p_input = NULL;
-    p_instance->p_sout = NULL;
+    p_instance->p_input_ressource = NULL;
 
     return p_instance;
 }
@@ -774,8 +774,8 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
 
         vlc_object_release( p_input );
     }
-    if( p_instance->p_sout )
-        sout_DeleteInstance( p_instance->p_sout );
+    if( p_instance->p_input_ressource )
+        input_ressource_Delete( p_instance->p_input_ressource );
 
     vlc_gc_decref( p_instance->p_item );
     free( p_instance->psz_name );
@@ -839,8 +839,6 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
-        input_ressource_t *p_ressource;
-
         if( p_instance->i_index == i_input_index &&
             !p_input->b_eof && !p_input->b_error )
         {
@@ -852,13 +850,13 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         input_StopThread( p_input );
         vlc_thread_join( p_input );
 
-        p_ressource = input_DetachRessource( p_input );
+        p_instance->p_input_ressource = input_DetachRessource( p_input );
 
         vlc_object_release( p_input );
 
-        if( p_instance->b_sout_keep )
-            p_instance->p_sout = input_ressource_ExtractSout( p_ressource );
-        input_ressource_Delete( p_ressource );
+        if( !p_instance->b_sout_keep )
+            input_ressource_TerminateSout( p_instance->p_input_ressource );
+        input_ressource_TerminateVout( p_instance->p_input_ressource );
     }
 
     /* Start new one */
@@ -867,15 +865,14 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
-        p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item, psz_log, p_instance->p_sout );
+        p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item,
+                                                          psz_log, p_instance->p_input_ressource );
+        p_instance->p_input_ressource = NULL;
+
         if( !p_instance->p_input )
         {
             TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
             vlm_MediaInstanceDelete( p_instance );
-        }
-        else
-        {
-            p_instance->p_sout = NULL;
         }
         free( psz_log );
     }

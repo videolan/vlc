@@ -175,7 +175,7 @@ static void playlist_Destructor( vlc_object_t * p_this )
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
     assert( !p_sys->p_input );
-    assert( !p_sys->p_sout );
+    assert( !p_sys->p_input_ressource );
     assert( !p_sys->p_preparser );
     assert( !p_sys->p_fetcher );
 

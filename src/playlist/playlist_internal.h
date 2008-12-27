@@ -46,7 +46,6 @@ typedef struct playlist_private_t
     playlist_t           public_data;
     playlist_preparser_t *p_preparser;  /**< Preparser data */
     playlist_fetcher_t   *p_fetcher;    /**< Meta and art fetcher data */
-    sout_instance_t      *p_sout;       /**< Kept sout instance */
 
     playlist_item_array_t items_to_delete; /**< Array of items and nodes to
             delete... At the very end. This sucks. */
@@ -60,6 +59,7 @@ typedef struct playlist_private_t
     int                   i_sds;   /**< Number of service discovery modules */
     input_thread_t *      p_input;  /**< the input thread associated
                                      * with the current item */
+    input_ressource_t *   p_input_ressource; /**< input ressources */
     struct {
         /* Current status. These fields are readonly, only the playlist
          * main loop can touch it*/

@@ -60,27 +60,19 @@ static void DestroySout( input_ressource_t *p_ressource )
         sout_DeleteInstance( p_ressource->p_sout );
     p_ressource->p_sout = NULL;
 }
-static sout_instance_t *ExtractSout( input_ressource_t *p_ressource )
-{
-    sout_instance_t *p_sout = p_ressource->p_sout;
-
-    p_ressource->p_sout = NULL;
-
-    return p_sout;
-}
 static sout_instance_t *RequestSout( input_ressource_t *p_ressource,
                                      sout_instance_t *p_sout, const char *psz_sout )
 {
-    assert( p_ressource->p_input );
-    assert( !p_sout || ( !p_ressource->p_sout && !psz_sout ) );
-
     if( !p_sout && !psz_sout )
     {
         if( p_ressource->p_sout )
-            msg_Dbg( p_ressource->p_input, "destroying useless sout" );
+            msg_Dbg( p_ressource->p_sout, "destroying useless sout" );
         DestroySout( p_ressource );
         return NULL;
     }
+
+    assert( p_ressource->p_input );
+    assert( !p_sout || ( !p_ressource->p_sout && !psz_sout ) );
 
     /* Check the validity of the sout */
     if( p_ressource->p_sout &&
@@ -104,7 +96,11 @@ static sout_instance_t *RequestSout( input_ressource_t *p_ressource,
             /* Create a new one */
             p_ressource->p_sout = sout_NewInstance( p_ressource->p_input, psz_sout );
         }
-        return ExtractSout( p_ressource );
+
+        p_sout = p_ressource->p_sout;
+        p_ressource->p_sout = NULL;
+
+        return p_sout;
     }
     else
     {
@@ -128,25 +124,24 @@ static void DestroyVout( input_ressource_t *p_ressource )
 static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
                                    vout_thread_t *p_vout, video_format_t *p_fmt )
 {
-    assert( p_ressource->p_input );
-
     if( !p_vout && !p_fmt )
     {
         if( p_ressource->p_vout_free )
         {
-            msg_Err( p_ressource->p_input, "destroying useless vout" );
+            msg_Dbg( p_ressource->p_vout_free, "destroying useless vout" );
             vout_CloseAndRelease( p_ressource->p_vout_free );
             p_ressource->p_vout_free = NULL;
         }
         return NULL;
     }
 
+    assert( p_ressource->p_input );
     if( p_fmt )
     {
         /* */
         if( !p_vout && p_ressource->p_vout_free )
         {
-            msg_Err( p_ressource->p_input, "trying to reuse free vout" );
+            msg_Dbg( p_ressource->p_input, "trying to reuse free vout" );
             p_vout = p_ressource->p_vout_free;
 
             p_ressource->p_vout_free = NULL;
@@ -171,12 +166,12 @@ static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
         TAB_REMOVE( p_ressource->i_vout, p_ressource->pp_vout, p_vout );
         if( p_ressource->p_vout_free )
         {
-            msg_Err( p_ressource->p_input, "detroying vout (already one saved)" );
+            msg_Dbg( p_ressource->p_input, "detroying vout (already one saved)" );
             vout_CloseAndRelease( p_vout );
         }
         else
         {
-            msg_Err( p_ressource->p_input, "saving a free vout" );
+            msg_Dbg( p_ressource->p_input, "saving a free vout" );
             p_ressource->p_vout_free = p_vout;
         }
         return NULL;
@@ -208,7 +203,7 @@ static aout_instance_t *RequestAout( input_ressource_t *p_ressource, aout_instan
 
     if( p_aout )
     {
-        msg_Err( p_ressource->p_input, "releasing aout" );
+        msg_Dbg( p_ressource->p_input, "releasing aout" );
         vlc_object_release( p_aout );
         return NULL;
     }
@@ -216,19 +211,19 @@ static aout_instance_t *RequestAout( input_ressource_t *p_ressource, aout_instan
     {
         if( !p_ressource->p_aout )
         {
-            msg_Err( p_ressource->p_input, "creating aout" );
+            msg_Dbg( p_ressource->p_input, "creating aout" );
             p_ressource->p_aout = aout_New( p_ressource->p_input );
         }
         else
         {
-            msg_Err( p_ressource->p_input, "reusing aout" );
-            vlc_object_attach( p_ressource->p_aout, p_ressource->p_input );
+            msg_Dbg( p_ressource->p_input, "reusing aout" );
         }
-
 
         if( !p_ressource->p_aout )
             return NULL;
 
+        vlc_object_detach( p_ressource->p_aout );
+        vlc_object_attach( p_ressource->p_aout, p_ressource->p_input );
         vlc_object_hold( p_ressource->p_aout );
         return p_ressource->p_aout;
     }
@@ -295,6 +290,10 @@ vout_thread_t *input_ressource_HoldVout( input_ressource_t *p_ressource )
 
     return p_ret;
 }
+void input_ressource_TerminateVout( input_ressource_t *p_ressource )
+{
+    input_ressource_RequestVout( p_ressource, NULL, NULL );
+}
 
 /* */
 aout_instance_t *input_ressource_RequestAout( input_ressource_t *p_ressource, aout_instance_t *p_aout )
@@ -315,13 +314,8 @@ sout_instance_t *input_ressource_RequestSout( input_ressource_t *p_ressource, so
 
     return p_ret;
 }
-sout_instance_t *input_ressource_ExtractSout( input_ressource_t *p_ressource )
+void input_ressource_TerminateSout( input_ressource_t *p_ressource )
 {
-    vlc_mutex_lock( &p_ressource->lock );
-    sout_instance_t *p_ret = ExtractSout( p_ressource );
-    vlc_mutex_unlock( &p_ressource->lock );
-
-    return p_ret;
+    input_ressource_RequestSout( p_ressource, NULL, NULL );
 }
-
 

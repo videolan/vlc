@@ -66,7 +66,7 @@ static  void *Run            ( vlc_object_t *p_this );
 static  void *RunAndDestroy  ( vlc_object_t *p_this );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
-                                  const char *, bool, sout_instance_t * );
+                                  const char *, bool, input_ressource_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             WaitDie   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
@@ -118,7 +118,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                                const char *psz_header, bool b_quick,
-                               sout_instance_t *p_sout )
+                               input_ressource_t *p_ressource )
 {
     static const char input_name[] = "input";
     input_thread_t *p_input = NULL;                 /* thread descriptor */
@@ -214,7 +214,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->slave   = NULL;
 
     /* */
-    p_input->p->p_ressource = input_ressource_New();
+    if( p_ressource )
+        p_input->p->p_ressource = p_ressource;
+    else
+        p_input->p->p_ressource = input_ressource_New();
     input_ressource_SetInput( p_input->p->p_ressource, p_input );
 
     /* Init control buffer */
@@ -298,9 +301,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
         p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
 
     /* */
-    if( p_sout )
-        input_ressource_RequestSout( p_input->p->p_ressource, p_sout, NULL );
-
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( &p_input->p->counters.counters_lock );
 
@@ -356,11 +356,11 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 /* */
 input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
                                               input_item_t *p_item,
-                                              const char *psz_log, sout_instance_t *p_sout )
+                                              const char *psz_log, input_ressource_t *p_ressource )
 {
     input_thread_t *p_input;
 
-    p_input = Create( p_parent, p_item, psz_log, false, p_sout );
+    p_input = Create( p_parent, p_item, psz_log, false, p_ressource );
     if( !p_input )
         return NULL;
 

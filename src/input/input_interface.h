@@ -53,16 +53,23 @@ typedef struct input_ressource_t input_ressource_t;
 void input_ressource_Delete( input_ressource_t * );
 
 /**
- * This function return the current sout (if any) from the ressource
- * and stop tracking it.
+ * This function deletes the current sout in the ressources.
  *
- * You are then responsible of its release.
+ * It can only be called on detached ressources.
  */
-sout_instance_t *input_ressource_ExtractSout( input_ressource_t *p_ressource );
+void input_ressource_TerminateSout( input_ressource_t *p_ressource );
+
+/**
+ * This function deletes the current vout in the ressources.
+ *
+ * It can only be called on detached ressources.
+ */
+void input_ressource_TerminateVout( input_ressource_t *p_ressource );
+
 
 /* input.c */
 #define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
-input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, sout_instance_t * );
+input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, input_ressource_t * );
 
 /**
  * This function detaches ressources from a dead input.

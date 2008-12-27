@@ -662,6 +662,10 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     msg_Dbg( p_sys->p_input, "Decoder buffering done in %d ms",
               (int)(mdate() - i_decoder_buffering_start)/1000 );
 
+    /* Here is a good place to destroy unused vout with every demuxer */
+    input_ressource_TerminateVout( p_sys->p_input->p->p_ressource );
+
+    /* */
     const mtime_t i_wakeup_delay = 10*1000; /* FIXME CLEANUP thread wake up time*/
     const mtime_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : mdate();
 
@@ -2014,6 +2018,20 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_ACTIVE:
         {
             b = (bool) va_arg( args, int );
+            if( b && !p_sys->b_active && p_sys->i_es > 0 )
+            {
+                /* XXX Terminate vout if there are tracks but no video one.
+                 * This one is not mandatory but is he earliest place where it
+                 * can be done */
+                for( i = 0; i < p_sys->i_es; i++ )
+                {
+                    es_out_id_t *p_es = p_sys->es[i];
+                    if( p_es->fmt.i_cat == VIDEO_ES )
+                        break;
+                }
+                if( i >= p_sys->i_es )
+                    input_ressource_TerminateVout( p_sys->p_input->p->p_ressource );
+            }
             p_sys->b_active = b;
             return VLC_SUCCESS;
         }
@@ -2295,7 +2313,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
               assert(0);
             }
             /* TODO if the lock is made non recursive it should be changed */
-            return es_out_Control( out, i_new_query, p_es );
+            int i_ret = es_out_Control( out, i_new_query, p_es );
+
+            /* Clean up vout after user action (in active mode only).
+             * FIXME it does not work well with multiple video windows */
+            if( p_sys->b_active )
+                input_ressource_TerminateVout( p_sys->p_input->p->p_ressource );
+            return i_ret;
         }
 
         case ES_OUT_GET_BUFFERING:

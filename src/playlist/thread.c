@@ -98,10 +98,10 @@ void playlist_Deactivate( playlist_t *p_playlist )
     if( p_fetcher )
         playlist_fetcher_Delete( p_fetcher );
 
-    /* close the remaining sout-keep */
-    if( p_sys->p_sout )
-        sout_DeleteInstance( p_sys->p_sout );
-    p_sys->p_sout = NULL;
+    /* release input ressources */
+    if( p_sys->p_input_ressource )
+        input_ressource_Delete( p_sys->p_input_ressource );
+    p_sys->p_input_ressource = NULL;
 
     /* */
     playlist_MLDump( p_playlist );
@@ -263,7 +263,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     assert( p_sys->p_input == NULL );
 
     input_thread_t *p_input_thread =
-        input_CreateThreadExtended( p_playlist, p_input, NULL, p_sys->p_sout );
+        input_CreateThreadExtended( p_playlist, p_input, NULL, p_sys->p_input_ressource );
 
     if( p_input_thread )
     {
@@ -272,7 +272,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         var_AddCallback( p_input_thread, "intf-event", InputEvent, p_playlist );
     }
 
-    p_sys->p_sout = NULL;
+    p_sys->p_input_ressource = NULL;
 
     char *psz_uri = input_item_GetURI( p_item->p_input );
     if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
@@ -492,13 +492,11 @@ static int LoopInput( playlist_t *p_playlist )
     {
         PL_DEBUG( "dead input" );
 
-        assert( p_sys->p_sout == NULL );
+        assert( p_sys->p_input_ressource == NULL );
 
-        input_ressource_t *p_ressource = input_DetachRessource( p_input );
-
-        if( var_CreateGetBool( p_input, "sout-keep" ) )
-            p_sys->p_sout = input_ressource_ExtractSout( p_ressource );
-        input_ressource_Delete( p_ressource );
+        p_sys->p_input_ressource = input_DetachRessource( p_input );
+        if( !var_CreateGetBool( p_input, "sout-keep" ) )
+            input_ressource_TerminateSout( p_sys->p_input_ressource );
 
         /* The DelCallback must be issued without playlist lock
          * It is not a problem as we return VLC_EGENERIC */
@@ -545,6 +543,9 @@ static void LoopRequest( playlist_t *p_playlist )
     if( i_status == PLAYLIST_STOPPED )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
+
+        if( p_sys->p_input_ressource )
+            input_ressource_TerminateVout( p_sys->p_input_ressource );
 
         if( vlc_object_alive( p_playlist ) )
             vlc_object_wait( p_playlist );
