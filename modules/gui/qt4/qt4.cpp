@@ -264,23 +264,22 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_playlist = pl_Hold( p_intf );
     p_sys->p_mi = NULL;
 
-    if (vlc_clone (&p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW))
+    if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         pl_Release (p_sys->p_playlist);
         delete p_sys;
         return VLC_ENOMEM;
     }
-    else
-    {
-        QMutexLocker locker (&iface.lock);
-        vlc_value_t val;
 
-        while (p_sys->p_mi == NULL)
-            iface.ready.wait (&iface.lock);
-        var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
-        val.p_address = p_this;
-        var_Set (p_this->p_libvlc, "qt4-iface", val);
-    }
+    /* */
+    QMutexLocker locker (&iface.lock);
+    vlc_value_t val;
+
+    while( p_sys->p_mi == NULL && !p_sys->b_isDialogProvider )
+        iface.ready.wait( &iface.lock );
+    var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
+    val.p_address = p_this;
+    var_Set (p_this->p_libvlc, "qt4-iface", val);
     return VLC_SUCCESS;
 }
 
@@ -303,17 +302,6 @@ static void Close( vlc_object_t *p_this )
 
     var_Destroy (p_this->p_libvlc, "qt4-iface");
     QApplication::postEvent (p_sys->p_mi, new QCloseEvent());
-
-    if( p_intf->p_sys->b_isDialogProvider )
-    {
-        if( DialogsProvider::isAlive() )
-        {
-            msg_Dbg( p_intf, "Asking the DP to quit nicely" );
-            DialogEvent *event = new DialogEvent( INTF_DIALOG_EXIT, 0, NULL );
-            QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
-        }
-        vlc_thread_join( p_intf );
-    }
 
     vlc_join (p_sys->thread, NULL);
     pl_Release (p_this);
@@ -386,21 +374,16 @@ static void *Thread( void *obj )
 
     /* Create the normal interface in non-DP mode */
     if( !p_intf->pf_show_dialog )
-    {
         p_mi = new MainInterface( p_intf );
-        /* We don't show it because it is done in the MainInterface constructor
-        p_mi->show(); */
-
-        QMutexLocker locker (&iface.lock);
-        p_intf->p_sys->p_mi = p_mi;
-        iface.ready.wakeAll ();
-    }
     else
-    {
-        vlc_thread_ready( p_intf );
-        p_intf->p_sys->b_isDialogProvider = true;
         p_mi = NULL;
-    }
+
+    /* */
+    iface.lock.lock();
+    p_intf->p_sys->p_mi = p_mi;
+    p_intf->p_sys->b_isDialogProvider = p_mi == NULL;
+    iface.ready.wakeAll();
+    iface.lock.unlock();
 
     /* Explain to the core how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;

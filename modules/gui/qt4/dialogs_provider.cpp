@@ -97,12 +97,8 @@ DialogsProvider::~DialogsProvider()
 
 void DialogsProvider::quit()
 {
-    /* Stop the playlist */
-    playlist_Stop( THEPL );
     b_isDying = true;
     vlc_object_kill( p_intf->p_libvlc );
-    QApplication::closeAllWindows();
-    QApplication::quit();
 }
 
 void DialogsProvider::customEvent( QEvent *event )

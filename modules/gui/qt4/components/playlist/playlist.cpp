@@ -148,6 +148,7 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
 {
     if( THEDP->isDying() )
     {
+        /* FIXME is it needed ? */
         close();
     }
     else
