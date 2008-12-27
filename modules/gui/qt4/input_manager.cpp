@@ -127,6 +127,7 @@ void InputManager::delInput()
     emit teletextPossible( false );
     emit AtoBchanged( false, false );
     emit voutChanged( false );
+    emit voutListChanged( NULL, 0 );
 
     /* Reset all InfoPanels but stats */
     emit artChanged( NULL );
@@ -154,7 +155,8 @@ void InputManager::customEvent( QEvent *event )
          i_type != InfoChanged_Type &&
          i_type != SynchroChanged_Type &&
          i_type != CachingEvent_Type &&
-         i_type != BookmarksChanged_Type )
+         i_type != BookmarksChanged_Type &&
+         i_type != InterfaceAoutUpdate_Type )
         return;
 
     if( i_type == CachingEvent_Type )
@@ -173,7 +175,8 @@ void InputManager::customEvent( QEvent *event )
           i_type != NameChanged_Type &&
           i_type != InfoChanged_Type &&
           i_type != SynchroChanged_Type &&
-          i_type != BookmarksChanged_Type
+          i_type != BookmarksChanged_Type &&
+          i_type != InterfaceAoutUpdate_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
@@ -241,6 +244,9 @@ void InputManager::customEvent( QEvent *event )
     case BookmarksChanged_Type:
         emit bookmarksChanged();
         break;
+    case InterfaceAoutUpdate_Type:
+        UpdateAout();
+        break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
     }
@@ -299,12 +305,15 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( ItemTeletextChanged_Type, 0 );
         break;
 
+    case INPUT_EVENT_STATISTICS:
+        event = new IMEvent( StatisticsUpdate_Type, 0 );
+        break;
+
     case INPUT_EVENT_VOUT:
         event = new IMEvent( InterfaceVoutUpdate_Type, 0 );
         break;
-
-    case INPUT_EVENT_STATISTICS:
-        event = new IMEvent( StatisticsUpdate_Type, 0 );
+    case INPUT_EVENT_AOUT:
+        event = new IMEvent( InterfaceAoutUpdate_Type, 0 );
         break;
 
     case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
@@ -482,18 +491,37 @@ void InputManager::UpdateVout()
 {
     if( hasInput() )
     {
-        bool b_old_video = b_video;
+        /* Get current vout lists from input */
+        int i_vout;
+        vout_thread_t **pp_vout;
+        if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
+        {
+            i_vout = 0;
+            pp_vout = NULL;
+        }
 
-        vlc_object_t *p_vout = (vlc_object_t*)vlc_object_find( p_input,
-                                         VLC_OBJECT_VOUT, FIND_CHILD );
-        b_video = p_vout != NULL;
-        if( p_vout )
-            vlc_object_release( p_vout );
+        /* */
+        emit voutListChanged( pp_vout, i_vout );
+
+        /* */
+        bool b_old_video = b_video;
+        b_video = i_vout > 0;
         if( !!b_old_video != !!b_video )
             emit voutChanged( b_video );
+
+        /* Release the vout list */
+        for( int i = 0; i < i_vout; i++ )
+            vlc_object_release( (vlc_object_t*)pp_vout[i] );
+        free( pp_vout );
     }
 }
-
+void InputManager::UpdateAout()
+{
+    if( hasInput() )
+    {
+        /* TODO */
+    }
+}
 void InputManager::UpdateCaching()
 {
     float f_newCache = var_GetFloat( p_input, "cache" );

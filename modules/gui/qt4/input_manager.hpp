@@ -48,6 +48,7 @@ enum {
     ItemTeletextChanged_Type,
     InterfaceVoutUpdate_Type,
     StatisticsUpdate_Type, /*10*/
+    InterfaceAoutUpdate_Type,
     MetaChanged_Type,
     NameChanged_Type,
     InfoChanged_Type,
@@ -126,6 +127,7 @@ private:
     void UpdateInfo();
     void UpdateMeta();
     void UpdateVout();
+    void UpdateAout();
     void UpdateStats();
     void UpdateCaching();
 
@@ -182,6 +184,7 @@ signals:
     void synchroChanged();
     void bookmarksChanged();
     void cachingChanged( float );
+    void voutListChanged( vout_thread_t **pp_vout, int i_vout );
 };
 
 class MainInputManager : public QObject
