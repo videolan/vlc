@@ -267,7 +267,7 @@ static int ReadMetaFromAPE( APE::Tag* tag, vlc_meta_t* p_meta )
 
 
 /**
- * read meta information from id3v2 tags
+ * Read meta information from id3v2 tags
  * @param tag: the id3v2 tag
  * @param p_meta: the meta
  * @return VLC_SUCCESS if everything goes ok
@@ -441,6 +441,72 @@ static int ReadMeta( vlc_object_t* p_this)
 }
 
 
+
+/**
+ * Write meta informations to APE tags
+ * @param tag: the APE tag
+ * @param p_input: the input item
+ * @return VLC_SUCCESS if everything goes ok
+ */
+static int WriteMetaToAPE( APE::Tag* tag, input_item_t* p_input )
+{
+    return VLC_SUCCESS;
+}
+
+
+
+/**
+ * Write meta information to id3v2 tags
+ * @param tag: the id3v2 tag
+ * @param p_input: the input item
+ * @return VLC_SUCCESS if everything goes ok
+ */
+static int WriteMetaToId2v2( ID3v2::Tag* tag, input_item_t* p_item )
+{
+    char* psz_meta;
+#define WRITE( metaName, tagName )                                            \
+    psz_meta = input_item_Get##metaName( p_item );                            \
+    if( psz_meta )                                                            \
+    {                                                                         \
+        ByteVector p_byte( tagName, 4 );                                      \
+        tag->removeFrames( p_byte );                                         \
+        ID3v2::TextIdentificationFrame* p_frame =                             \
+            new ID3v2::TextIdentificationFrame( p_byte, String::UTF8 );       \
+        p_frame->setText( psz_meta );                                         \
+        tag->addFrame( p_frame );                                             \
+    }                                                                         \
+    free( psz_meta );
+
+    WRITE( Copyright, "TCOP" );
+    WRITE( EncodedBy, "TENC" );
+    WRITE( Language,  "TLAN" );
+    WRITE( Publisher, "TPUB" );
+
+#undef WRITE
+    return VLC_SUCCESS;
+}
+
+
+
+/**
+ * Write the meta informations to XiphComments
+ * @param tag: the Xiph Comment
+ * @param p_input: the input item
+ * @return VLC_SUCCESS if everything goes ok
+ */
+static int WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_input )
+{
+    return VLC_SUCCESS;
+}
+
+
+
+/**
+ * Set the tags to the file using TagLib
+ * @param p_this: the demux object
+ * @return VLC_SUCCESS if the operation success
+ */
+
 static int WriteMeta( vlc_object_t *p_this )
 {
     playlist_t *p_playlist = (playlist_t *)p_this;
@@ -508,31 +574,54 @@ static int WriteMeta( vlc_object_t *p_this )
     if( psz_meta ) p_tag->setTrack( atoi( psz_meta ) );
     free( psz_meta );
 
-    if( ID3v2::Tag *p_id3tag =
-        dynamic_cast<ID3v2::Tag *>(p_tag) )
+
+    // Try now to write special tags
+    if( FLAC::File* flac = dynamic_cast<FLAC::File*>(f.file()) )
     {
-#define WRITE( foo, bar ) \
-        psz_meta = input_item_Get##foo( p_item ); \
-        if( psz_meta ) \
-        { \
-            ByteVector p_byte( bar, 4 ); \
-            ID3v2::TextIdentificationFrame p_frame( p_byte ); \
-            p_frame.setText( psz_meta ); \
-            p_id3tag->addFrame( &p_frame ); \
-            free( psz_meta ); \
-        } \
-
-        WRITE( Publisher, "TPUB" );
-        WRITE( Copyright, "TCOP" );
-        WRITE( EncodedBy, "TENC" );
-        WRITE( Language, "TLAN" );
-
-#undef WRITE
+        if( flac->ID3v2Tag() )
+            WriteMetaToId2v2( flac->ID3v2Tag(), p_item );
+        else if( flac->xiphComment() )
+            WriteMetaToXiph( flac->xiphComment(), p_item );
+    }
+    else if( MPC::File* mpc = dynamic_cast<MPC::File*>(f.file()) )
+    {
+        if( mpc->APETag() )
+            WriteMetaToAPE( mpc->APETag(), p_item );
+    }
+    else if( MPEG::File* mpeg = dynamic_cast<MPEG::File*>(f.file()) )
+    {
+        if( mpeg->ID3v2Tag() )
+            WriteMetaToId2v2( mpeg->ID3v2Tag(), p_item );
+        else if( mpeg->APETag() )
+            WriteMetaToAPE( mpeg->APETag(), p_item );
+    }
+    else if( Ogg::File* ogg = dynamic_cast<Ogg::File*>(f.file()) )
+    {
+        if( Ogg::FLAC::File* ogg_flac = dynamic_cast<Ogg::FLAC::File*>(f.file()))
+            WriteMetaToXiph( ogg_flac->tag(), p_item );
+        else if( Ogg::Speex::File* ogg_speex = dynamic_cast<Ogg::Speex::File*>(f.file()) )
+            WriteMetaToXiph( ogg_speex->tag(), p_item );
+        else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
+            WriteMetaToXiph( ogg_vorbis->tag(), p_item );
+    }
+    else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
+    {
+        if( trueaudio->ID3v2Tag() )
+            WriteMetaToId2v2( trueaudio->ID3v2Tag(), p_item );
+    }
+    else if( WavPack::File* wavpack = dynamic_cast<WavPack::File*>(f.file()) )
+    {
+        if( wavpack->APETag() )
+            WriteMetaToAPE( wavpack->APETag(), p_item );
     }
 
+    // Save the meta data
     f.save();
+
     return VLC_SUCCESS;
 }
+
+
 
 static int DownloadArt( vlc_object_t *p_this )
 {
