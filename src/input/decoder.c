@@ -2032,6 +2032,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     {
         input_ressource_RequestAout( p_owner->p_input->p->p_ressource,
                                      p_owner->p_aout );
+        input_SendEventAout( p_owner->p_input );
         p_owner->p_aout = NULL;
     }
     if( p_owner->p_vout )
@@ -2039,7 +2040,7 @@ static void DeleteDecoder( decoder_t * p_dec )
         /* Hack to make sure all the the pictures are freed by the decoder */
         vout_FixLeaks( p_owner->p_vout, true );
 
-        /* We are about to die. Reattach video output to p_vlc. */
+        /* */
         input_ressource_RequestVout( p_owner->p_input->p->p_ressource, p_owner->p_vout, NULL );
         input_SendEventVout( p_owner->p_input );
     }
@@ -2194,6 +2195,8 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
         DecoderUpdateFormatLocked( p_dec );
 
         vlc_mutex_unlock( &p_owner->lock );
+
+        input_SendEventAout( p_owner->p_input );
 
         if( p_owner->p_aout_input == NULL )
         {

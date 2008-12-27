@@ -51,16 +51,30 @@ sout_instance_t *input_ressource_RequestSout( input_ressource_t *, sout_instance
 aout_instance_t *input_ressource_RequestAout( input_ressource_t *, aout_instance_t * );
 
 /**
+ * This function return the current aout if any.
+ *
+ * You must call vlc_object_release on the value returned (if non NULL).
+ */
+aout_instance_t *input_ressource_HoldAout( input_ressource_t *p_ressource );
+
+/**
  * This function handles vout request.
  */
 vout_thread_t *input_ressource_RequestVout( input_ressource_t *, vout_thread_t *, video_format_t * );
 
 /**
- * This function return the current vout if any.
+ * This function return one of the current vout if any.
  *
  * You must call vlc_object_release on the value returned (if non NULL).
  */
 vout_thread_t *input_ressource_HoldVout( input_ressource_t * );
+
+/**
+ * This function return all current vouts if any.
+ *
+ * You must call vlc_object_release on all values returned (if non NULL).
+ */
+void input_ressource_HoldVouts( input_ressource_t *, vout_thread_t ***, int * );
 
 #endif
 

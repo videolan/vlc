@@ -189,6 +189,28 @@ static vout_thread_t *HoldVout( input_ressource_t *p_ressource )
 
     return p_vout;
 }
+static void HoldVouts( input_ressource_t *p_ressource, vout_thread_t ***ppp_vout, int *pi_vout )
+{
+    vout_thread_t **pp_vout;
+
+    *pi_vout = 0;
+    *ppp_vout = NULL;
+    if( p_ressource->i_vout <= 0 )
+        return;
+
+    pp_vout = calloc( p_ressource->i_vout, sizeof(*pp_vout) );
+    if( !pp_vout )
+        return;
+
+    *ppp_vout = pp_vout;
+    *pi_vout = p_ressource->i_vout;
+
+    for( int i = 0; i < p_ressource->i_vout; i++ )
+    {
+        pp_vout[i] = p_ressource->pp_vout[i];
+        vlc_object_hold( pp_vout[i] );
+    }
+}
 
 /* */
 static void DestroyAout( input_ressource_t *p_ressource )
@@ -228,7 +250,18 @@ static aout_instance_t *RequestAout( input_ressource_t *p_ressource, aout_instan
         return p_ressource->p_aout;
     }
 }
+static aout_instance_t *HoldAout( input_ressource_t *p_ressource )
+{
+    if( !p_ressource->p_aout )
+        return NULL;
 
+    /* TODO FIXME: p_ressource->pp_vout order is NOT stable */
+    aout_instance_t *p_aout = p_ressource->p_aout;
+
+    vlc_object_hold( p_aout );
+
+    return p_aout;
+}
 /* */
 input_ressource_t *input_ressource_New( void )
 {
@@ -290,6 +323,12 @@ vout_thread_t *input_ressource_HoldVout( input_ressource_t *p_ressource )
 
     return p_ret;
 }
+void input_ressource_HoldVouts( input_ressource_t *p_ressource, vout_thread_t ***ppp_vout, int *pi_vout )
+{
+    vlc_mutex_lock( &p_ressource->lock );
+    HoldVouts( p_ressource, ppp_vout, pi_vout );
+    vlc_mutex_unlock( &p_ressource->lock );
+}
 void input_ressource_TerminateVout( input_ressource_t *p_ressource )
 {
     input_ressource_RequestVout( p_ressource, NULL, NULL );
@@ -304,7 +343,14 @@ aout_instance_t *input_ressource_RequestAout( input_ressource_t *p_ressource, ao
 
     return p_ret;
 }
+aout_instance_t *input_ressource_HoldAout( input_ressource_t *p_ressource )
+{
+    vlc_mutex_lock( &p_ressource->lock );
+    aout_instance_t *p_ret = HoldAout( p_ressource );
+    vlc_mutex_unlock( &p_ressource->lock );
 
+    return p_ret;
+}
 /* */
 sout_instance_t *input_ressource_RequestSout( input_ressource_t *p_ressource, sout_instance_t *p_sout, const char *psz_sout )
 {

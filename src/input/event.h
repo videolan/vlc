@@ -69,6 +69,7 @@ void input_SendEventTeletext( input_thread_t *p_input, int i_id );
  * Event for decoder.c
  *****************************************************************************/
 void input_SendEventVout( input_thread_t *p_input );
+void input_SendEventAout( input_thread_t *p_input );
 
 /*****************************************************************************
  * Event for control.c/input.c

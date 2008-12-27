@@ -545,9 +545,6 @@ typedef enum input_event_type_e
     /* "record" has changed */
     INPUT_EVENT_RECORD,
 
-    /* A vout has been created/deleted by *the input* */
-    INPUT_EVENT_VOUT,
-
     /* input_item_t media has changed */
     INPUT_EVENT_ITEM_META,
     /* input_item_t info has changed */
@@ -571,6 +568,11 @@ typedef enum input_event_type_e
     /* cache" has changed */
     INPUT_EVENT_CACHE,
 
+    /* A aout_instance_t object has been created/deleted by *the input* */
+    INPUT_EVENT_AOUT,
+    /* A vout_thread_t object has been created/deleted by *the input* */
+    INPUT_EVENT_VOUT,
+
 } input_event_type_e;
 
 /** @}*/
@@ -584,12 +586,13 @@ typedef enum input_event_type_e
 #define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
 VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item_t * ) );
 
+VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
+
 #define input_Preparse(a,b) __input_Preparse(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
 
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
 VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );
-VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 
 enum input_query_e
 {
@@ -653,6 +656,11 @@ enum input_query_e
 
     /* ES */
     INPUT_RESTART_ES,       /* arg1=int (-AUDIO/VIDEO/SPU_ES for the whole category) */
+
+    /* Input ressources
+     * XXX You must call vlc_object_release as soon as possible */
+    INPUT_GET_AOUT,         /* arg1=aout_instance_t **              res=can fail */
+    INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, int *        res=can fail */
 };
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
