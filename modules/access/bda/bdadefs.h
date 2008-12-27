@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  *
- * Author: Ken Self <kens@campoz.fslife.co.uk>
+ * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,10 @@
 
 class IATSCChannelTuneRequest;
 class IATSCLocator;
+class IBDA_DeviceControl;
+class IBDA_FrequencyFilter;
+class IBDA_SignalStatistics;
+class IBDA_Topology;
 class IChannelTuneRequest;
 class IComponent;
 class IComponents;
@@ -46,6 +50,14 @@ class ITuneRequest;
 class ITuningSpace;
 class ITuningSpaceContainer;
 class ITuningSpaces;
+class IMpeg2Data;
+class IGuideData;
+class IGuideDataEvent;
+class ISectionList;
+class IEnumTuneRequests;
+class IEnumGuideDataProperties;
+class IGuideDataProperty;
+class IMpeg2Stream;
 
 typedef enum BinaryConvolutionCodeRate
 {
@@ -179,6 +191,27 @@ typedef enum TransmissionMode
     BDA_XMIT_MODE_MAX,
 } TransmissionMode;
 
+typedef struct _BDANODE_DESCRIPTOR
+{
+    ULONG               ulBdaNodeType;
+    GUID                guidFunction;
+    GUID                guidName;
+} BDANODE_DESCRIPTOR, *PBDANODE_DESCRIPTOR;
+
+typedef struct _BDA_TEMPLATE_CONNECTION
+{
+    ULONG   FromNodeType;
+    ULONG   FromNodePinType;
+    ULONG   ToNodeType;
+    ULONG   ToNodePinType;
+} BDA_TEMPLATE_CONNECTION, *PBDA_TEMPLATE_CONNECTION;
+
+typedef struct _BDA_TEMPLATE_PIN_JOINT
+{
+    ULONG   uliTemplateConnection;
+    ULONG   ulcInstancesMax;
+} BDA_TEMPLATE_PIN_JOINT, *PBDA_TEMPLATE_PIN_JOINT;
+
 class IComponent : public IDispatch
 {
 public:
@@ -284,7 +317,8 @@ public:
     virtual HRESULT __stdcall get_TuningSpace(
         ITuningSpace** p_p_tuning_space )=0;
     virtual HRESULT __stdcall put_TuningSpace( ITuningSpace* p_tuning_space )=0;
-    virtual HRESULT __stdcall EnumTuningSpaces( IEnumTuningSpaces** p_p_enum )=0;
+    virtual HRESULT __stdcall EnumTuningSpaces(
+       IEnumTuningSpaces** p_p_enum )=0;
     virtual HRESULT __stdcall get_TuneRequest(
         ITuneRequest** p_p_tune_request )=0;
     virtual HRESULT __stdcall put_TuneRequest( ITuneRequest* p_tune_request )=0;
@@ -541,6 +575,344 @@ public:
         IEnumTuningSpaces** p_p_enum )=0;
 };
 
+class IBDA_DeviceControl : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall StartChanges( void )=0;
+    virtual HRESULT __stdcall CheckChanges( void )=0;
+    virtual HRESULT __stdcall CommitChanges( void )=0;
+    virtual HRESULT __stdcall GetChangeState( ULONG *pState )=0;
+};
+
+class IBDA_FrequencyFilter : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall put_Autotune( ULONG ulTransponder )=0;
+    virtual HRESULT __stdcall get_Autotune( ULONG *pulTransponder )=0;
+    virtual HRESULT __stdcall put_Frequency( ULONG ulFrequency )=0;
+    virtual HRESULT __stdcall get_Frequency( ULONG *pulFrequency )=0;
+    virtual HRESULT __stdcall put_Polarity( Polarisation Polarity )=0;
+    virtual HRESULT __stdcall get_Polarity( Polarisation *pPolarity )=0;
+    virtual HRESULT __stdcall put_Range( ULONG ulRange )=0;
+    virtual HRESULT __stdcall get_Range( ULONG *pulRange )=0;
+    virtual HRESULT __stdcall put_Bandwidth( ULONG ulBandwidth )=0;
+    virtual HRESULT __stdcall get_Bandwidth( ULONG *pulBandwidth )=0;
+    virtual HRESULT __stdcall put_FrequencyMultiplier( ULONG ulMultiplier )=0;
+    virtual HRESULT __stdcall get_FrequencyMultiplier(
+        ULONG *pulMultiplier )=0;
+};
+
+class IBDA_SignalStatistics : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall put_SignalStrength( LONG lDbStrength )=0;
+    virtual HRESULT __stdcall get_SignalStrength( LONG *plDbStrength )=0;
+    virtual HRESULT __stdcall put_SignalQuality( LONG lPercentQuality )=0;
+    virtual HRESULT __stdcall get_SignalQuality( LONG *plPercentQuality )=0;
+    virtual HRESULT __stdcall put_SignalPresent( BOOLEAN fPresent )=0;
+    virtual HRESULT __stdcall get_SignalPresent( BOOLEAN *pfPresent )=0;
+    virtual HRESULT __stdcall put_SignalLocked( BOOLEAN fLocked )=0;
+    virtual HRESULT __stdcall get_SignalLocked( BOOLEAN *pfLocked )=0;
+    virtual HRESULT __stdcall put_SampleTime( LONG lmsSampleTime )=0;
+    virtual HRESULT __stdcall get_SampleTime( LONG *plmsSampleTime )=0;
+};
+
+class IBDA_Topology : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall GetNodeTypes( ULONG *pulcNodeTypes,
+        ULONG ulcNodeTypesMax, ULONG rgulNodeTypes[] )=0;
+    virtual HRESULT __stdcall GetNodeDescriptors( ULONG *ulcNodeDescriptors,
+        ULONG ulcNodeDescriptorsMax,
+        BDANODE_DESCRIPTOR rgNodeDescriptors[] )=0;
+    virtual HRESULT __stdcall GetNodeInterfaces( ULONG ulNodeType,
+        ULONG *pulcInterfaces, ULONG ulcInterfacesMax,
+        GUID rgguidInterfaces[] )=0;
+    virtual HRESULT __stdcall GetPinTypes( ULONG *pulcPinTypes,
+        ULONG ulcPinTypesMax, ULONG rgulPinTypes[] )=0;
+    virtual HRESULT __stdcall GetTemplateConnections( ULONG *pulcConnections,
+        ULONG ulcConnectionsMax, BDA_TEMPLATE_CONNECTION rgConnections[] )=0;
+    virtual HRESULT __stdcall CreatePin( ULONG ulPinType, ULONG *pulPinId )=0;
+    virtual HRESULT __stdcall DeletePin( ULONG ulPinId )=0;
+    virtual HRESULT __stdcall SetMediaType( ULONG ulPinId,
+       AM_MEDIA_TYPE *pMediaType )=0;
+    virtual HRESULT __stdcall SetMedium( ULONG ulPinId,
+       REGPINMEDIUM *pMedium )=0;
+    virtual HRESULT __stdcall CreateTopology( ULONG ulInputPinId,
+       ULONG ulOutputPinId )=0;
+    virtual HRESULT __stdcall GetControlNode( ULONG ulInputPinId,
+        ULONG ulOutputPinId, ULONG ulNodeType, IUnknown **ppControlNode )=0;
+};
+
+typedef struct _MPEG_HEADER_BITS_MIDL
+{
+    WORD Bits;
+} MPEG_HEADER_BITS_MIDL;
+
+typedef struct _MPEG_HEADER_VERSION_BITS_MIDL
+{
+    BYTE Bits;
+} MPEG_HEADER_VERSION_BITS_MIDL;
+
+typedef WORD PID;
+
+typedef BYTE TID;
+
+typedef struct _SECTION
+{
+    TID TableId;
+    union
+    {
+        MPEG_HEADER_BITS_MIDL S;
+        WORD W;
+    } Header;
+    BYTE SectionData[ 1 ];
+} SECTION, *PSECTION;
+
+typedef struct _LONG_SECTION
+{
+    TID TableId;
+    union
+    {
+        MPEG_HEADER_BITS_MIDL S;
+        WORD W;
+    } Header;
+    WORD TableIdExtension;
+    union
+    {
+        MPEG_HEADER_VERSION_BITS_MIDL S;
+        BYTE B;
+        } Version;
+    BYTE SectionNumber;
+    BYTE LastSectionNumber;
+    BYTE RemainingData[ 1 ];
+} LONG_SECTION;
+
+typedef struct _MPEG_BCS_DEMUX
+{
+    DWORD AVMGraphId;
+} MPEG_BCS_DEMUX;
+
+typedef struct _MPEG_WINSOC
+{
+    DWORD AVMGraphId;
+} MPEG_WINSOCK;
+
+typedef enum
+{
+    MPEG_CONTEXT_BCS_DEMUX = 0,
+    MPEG_CONTEXT_WINSOCK = MPEG_CONTEXT_BCS_DEMUX + 1
+} MPEG_CONTEXT_TYPE;
+
+typedef struct _MPEG_RQST_PACKET
+{
+    DWORD dwLength;
+    PSECTION pSection;
+} MPEG_RQST_PACKET, *PMPEG_RQST_PACKET;
+
+typedef struct _MPEG_PACKET_LIST
+{
+    WORD wPacketCount;
+    PMPEG_RQST_PACKET PacketList[ 1 ];
+} MPEG_PACKET_LIST, *PMPEG_PACKET_LIST;
+
+typedef struct _DSMCC_FILTER_OPTIONS
+{
+    BOOL fSpecifyProtocol;
+    BYTE Protocol;
+    BOOL fSpecifyType;
+    BYTE Type;
+    BOOL fSpecifyMessageId;
+    WORD MessageId;
+    BOOL fSpecifyTransactionId;
+    BOOL fUseTrxIdMessageIdMask;
+    DWORD TransactionId;
+    BOOL fSpecifyModuleVersion;
+    BYTE ModuleVersion;
+    BOOL fSpecifyBlockNumber;
+    WORD BlockNumber;
+    BOOL fGetModuleCall;
+    WORD NumberOfBlocksInModule;
+} DSMCC_FILTER_OPTIONS;
+
+typedef struct _ATSC_FILTER_OPTIONS
+{
+    BOOL fSpecifyEtmId;
+    DWORD EtmId;
+} ATSC_FILTER_OPTIONS;
+
+typedef struct _MPEG_STREAM_BUFFER
+{
+    HRESULT hr;
+    DWORD dwDataBufferSize;
+    DWORD dwSizeOfDataRead;
+    BYTE *pDataBuffer;
+} MPEG_STREAM_BUFFER, *PMPEG_STREAM_BUFFER;
+
+typedef struct _MPEG_CONTEXT
+{
+    MPEG_CONTEXT_TYPE Type;
+    union
+    {
+        MPEG_BCS_DEMUX Demux;
+        MPEG_WINSOCK Winsock;
+    } U;
+} MPEG_CONTEXT, *PMPEG_CONTEXT;
+
+typedef enum
+{
+   MPEG_RQST_UNKNOWN = 0,
+   MPEG_RQST_GET_SECTION = MPEG_RQST_UNKNOWN + 1,
+   MPEG_RQST_GET_SECTION_ASYNC = MPEG_RQST_GET_SECTION + 1,
+   MPEG_RQST_GET_TABLE = MPEG_RQST_GET_SECTION_ASYNC + 1,
+   MPEG_RQST_GET_TABLE_ASYNC = MPEG_RQST_GET_TABLE + 1,
+   MPEG_RQST_GET_SECTIONS_STREAM = MPEG_RQST_GET_TABLE_ASYNC + 1,
+   MPEG_RQST_GET_PES_STREAM = MPEG_RQST_GET_SECTIONS_STREAM + 1,
+   MPEG_RQST_GET_TS_STREAM = MPEG_RQST_GET_PES_STREAM + 1,
+   MPEG_RQST_START_MPE_STREAM = MPEG_RQST_GET_TS_STREAM + 1
+} MPEG_REQUEST_TYPE;
+
+typedef struct _MPEG2_FILTER
+{
+    BYTE bVersionNumber;
+    WORD wFilterSize;
+    BOOL fUseRawFilteringBits;
+    BYTE Filter[ 16 ];
+    BYTE Mask[ 16 ];
+    BOOL fSpecifyTableIdExtension;
+    WORD TableIdExtension;
+    BOOL fSpecifyVersion;
+    BYTE Version;
+    BOOL fSpecifySectionNumber;
+    BYTE SectionNumber;
+    BOOL fSpecifyCurrentNext;
+    BOOL fNext;
+    BOOL fSpecifyDsmccOptions;
+    DSMCC_FILTER_OPTIONS Dsmcc;
+    BOOL fSpecifyAtscOptions;
+    ATSC_FILTER_OPTIONS Atsc;
+} MPEG2_FILTER, *PMPEG2_FILTER;
+
+typedef struct _MPEG_HEADER_BITS
+{
+    WORD SectionLength          : 12;
+    WORD Reserved               :  2;
+    WORD PrivateIndicator       :  1;
+    WORD SectionSyntaxIndicator :  1;
+} MPEG_HEADER_BITS, *PMPEG_HEADER_BITS;
+
+typedef struct _MPEG_HEADER_VERSION_BITS
+{
+    BYTE CurrentNextIndicator : 1;
+    BYTE VersionNumber        : 5;
+    BYTE Reserved             : 2;
+} MPEG_HEADER_VERSION_BITS, *PMPEG_HEADER_VERSION_BITS;
+
+class IMpeg2Data : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall GetSection( PID pid, TID tid,
+        PMPEG2_FILTER pFilter, DWORD dwTimeout,
+        ISectionList **ppSectionList )=0;
+    virtual HRESULT __stdcall GetTable( PID pid, TID tid, PMPEG2_FILTER pFilter,
+        DWORD dwTimeout, ISectionList **ppSectionList )=0;
+    virtual HRESULT __stdcall GetStreamOfSections( PID pid, TID tid,
+        PMPEG2_FILTER pFilter, HANDLE hDataReadyEvent,
+        IMpeg2Stream **ppMpegStream )=0;
+};
+
+class IGuideData : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall GetServices(
+        IEnumTuneRequests **ppEnumTuneRequestslass )=0;
+    virtual HRESULT __stdcall GetServiceProperties(
+        ITuneRequest *pTuneRequest,
+        IEnumGuideDataProperties **ppEnumProperties )=0;
+    virtual HRESULT __stdcall GetGuideProgramIDs(
+        IEnumVARIANT **pEnumPrograms )=0;
+    virtual HRESULT __stdcall GetProgramProperties(
+        VARIANT varProgramDescriptionID,
+        IEnumGuideDataProperties **ppEnumProperties )=0;
+    virtual HRESULT __stdcall GetScheduleEntryIDs(
+        IEnumVARIANT **pEnumScheduleEntries )=0;
+    virtual HRESULT __stdcall GetScheduleEntryProperties(
+        VARIANT varScheduleEntryDescriptionID,
+        IEnumGuideDataProperties **ppEnumProperties )=0;
+};
+
+class IGuideDataEvent : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall GuideDataAcquired( void )=0;
+    virtual HRESULT __stdcall ProgramChanged(
+        VARIANT varProgramDescriptionID )=0;
+    virtual HRESULT __stdcall ServiceChanged(
+        VARIANT varServiceDescriptionID )=0;
+    virtual HRESULT __stdcall ScheduleEntryChanged(
+        VARIANT varScheduleEntryDescriptionID )=0;
+    virtual HRESULT __stdcall ProgramDeleted(
+        VARIANT varProgramDescriptionID )=0;
+    virtual HRESULT __stdcall ServiceDeleted(
+        VARIANT varServiceDescriptionID )=0;
+    virtual HRESULT __stdcall ScheduleDeleted(
+            VARIANT varScheduleEntryDescriptionID )=0;
+};
+
+class IGuideDataProperty : public IUnknown
+{
+public:
+    virtual  HRESULT __stdcall get_Name( BSTR *pbstrName )=0;
+    virtual  HRESULT __stdcall get_Language( long *idLang )=0;
+    virtual  HRESULT __stdcall get_Value( VARIANT *pvar )=0;
+};
+
+class IMpeg2Stream : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall Initialize( MPEG_REQUEST_TYPE requestType,
+        IMpeg2Data *pMpeg2Data, PMPEG_CONTEXT pContext, PID pid, TID tid,
+        PMPEG2_FILTER pFilter, HANDLE hDataReadyEvent )=0;
+    virtual HRESULT __stdcall SupplyDataBuffer(
+        PMPEG_STREAM_BUFFER pStreamBuffer )=0;
+};
+
+class ISectionList : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall Initialize( MPEG_REQUEST_TYPE requestType,
+        IMpeg2Data *pMpeg2Data, PMPEG_CONTEXT pContext, PID pid, TID tid,
+        PMPEG2_FILTER pFilter, DWORD timeout, HANDLE hDoneEvent )=0;
+    virtual HRESULT __stdcall InitializeWithRawSections(
+        PMPEG_PACKET_LIST pmplSections )=0;
+    virtual HRESULT __stdcall CancelPendingRequest( void )=0;
+    virtual HRESULT __stdcall GetNumberOfSections( WORD *pCount )=0;
+    virtual HRESULT __stdcall GetSectionData( WORD sectionNumber,
+        DWORD *pdwRawPacketLength, PSECTION *ppSection )=0;
+    virtual HRESULT __stdcall GetProgramIdentifier( PID *pPid )=0;
+    virtual HRESULT __stdcall GetTableIdentifier( TID *pTableId )=0;
+};
+
+class IEnumGuideDataProperties : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall Next( unsigned long celt,
+        IGuideDataProperty **ppprop, unsigned long *pcelt )=0;
+    virtual HRESULT __stdcall Skip( unsigned long celt )=0;
+    virtual HRESULT __stdcall Reset( void )=0;
+    virtual HRESULT __stdcall Clone( IEnumGuideDataProperties **ppenum )=0;
+};
+
+class IEnumTuneRequests : public IUnknown
+{
+public:
+    virtual HRESULT __stdcall Next( unsigned long celt, ITuneRequest **ppprop,
+        unsigned long *pcelt )=0;
+    virtual HRESULT __stdcall Skip( unsigned long celt )=0;
+    virtual HRESULT __stdcall Reset( void )=0;
+    virtual HRESULT __stdcall Clone( IEnumTuneRequests **ppenum )=0;
+};
+
 extern "C" {
 extern const GUID CLSID_ATSCLocator;
 extern const GUID CLSID_ATSCNetworkProvider;
@@ -564,6 +936,13 @@ extern const GUID CLSID_SystemTuningSpaces;
 extern const GUID IID_IATSCChannelTuneRequest;
 extern const GUID IID_IATSCLocator;
 extern const GUID IID_IBaseFilter;
+extern const GUID IID_IBDA_DeviceControl;
+extern const GUID IID_IBDA_FrequencyFilter;
+extern const GUID IID_IBDA_SignalStatistics;
+/* Following symbol does not exist in library
+extern const GUID IID_IBDA_Topology; */
+const GUID IID_IBDA_Topology =
+    {0x79B56888,0x7FEA,0x4690,{0xB4,0x5D,0x38,0xFD,0x3C,0x78,0x49,0xBE}};
 extern const GUID IID_ICreateDevEnum;
 extern const GUID IID_IDVBTLocator;
 extern const GUID IID_IDVBCLocator;
@@ -580,6 +959,17 @@ extern const GUID IID_IScanningTuner;
 extern const GUID IID_ITuner;
 extern const GUID IID_ITuningSpace;
 extern const GUID IID_ITuningSpaceContainer;
+/* Following symbol does not exist in library
+extern const GUID IID_IMpeg2Data; */
+const GUID IID_IMpeg2Data =
+    {0x9B396D40,0xF380,0x4e3c,{0xA5,0x14,0x1A,0x82,0xBF,0x6E,0xBF,0xE6}};
+extern const GUID IID_IGuideData;
+extern const GUID IID_ISectionList;
+extern const GUID IID_IEnumTuneRequests;
+extern const GUID IID_IEnumGuideDataProperties;
+extern const GUID IID_IGuideDataProperty;
+extern const GUID IID_IMpeg2Stream;
+extern const GUID IID_IGuideDataEvent;
 
 extern const GUID MEDIATYPE_MPEG2_SECTIONS;
 extern const GUID MEDIASUBTYPE_None;
@@ -591,4 +981,7 @@ const GUID KSCATEGORY_BDA_RECEIVER_COMPONENT    =
     {0xFD0A5AF4,0xB41D,0x11d2,{0x9c,0x95,0x00,0xc0,0x4f,0x79,0x71,0xe0}};
 const GUID KSCATEGORY_BDA_NETWORK_TUNER         =
     {0x71985f48,0x1ca1,0x11d3,{0x9c,0xc8,0x00,0xc0,0x4f,0x79,0x71,0xe0}};
+const GUID KSDATAFORMAT_SUBTYPE_BDA_MPEG2_TRANSPORT =
+    {0xF4AEB342,0x0329,0x4fdd,{0xA8,0xFD,0x4A,0xFF,0x49,0x26,0xC9,0x78}};
+
 };

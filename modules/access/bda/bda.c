@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  *
- * Author: Ken Self <kens@campoz.fslife.co.uk>
+ * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -191,19 +191,20 @@ vlc_module_begin ()
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true );
-    add_integer( "dvb-frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT,
+    add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  false );
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-network-name", NULL, NULL, NAME_TEXT, NAME_LONGTEXT,
                     true );
         add_string( "dvb-create-name", NULL, NULL, CREATE_TEXT,
                     CREATE_LONGTEXT, true );
+        add_integer( "dvb-adapter", -1, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
+                     true );
 #   else
-        add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
-                     false );
+        /* dvb-device refers to a frontend within an adapter */
         add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                      true );
-        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
+        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true );
         add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
                   true );
 #   endif
@@ -227,6 +228,8 @@ vlc_module_begin ()
             LONGITUDE_LONGTEXT, true );
         add_string( "dvb-range", NULL, NULL, RANGE_TEXT,
             RANGE_LONGTEXT, true );
+        /* dvb-range corresponds to the BDA InputRange parameter which is
+         * used by some drivers to control the diseqc */
 #   else
         add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
             true );
@@ -311,13 +314,14 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     const char* psz_module  = "dvb";
-    const int   i_param_count = 25;
+    const int   i_param_count = 26;
     const char* psz_param[] = { "frequency", "bandwidth",
         "srate", "azimuth", "elevation", "longitude", "polarisation",
         "modulation", "caching", "lnb-lof1", "lnb-lof2", "lnb-slof",
         "inversion", "network-id", "code-rate-hp", "code-rate-lp",
         "guard", "transmission", "hierarchy", "range", "network-name",
-        "create-name", "major-channel", "minor-channel", "physical-channel" };
+        "create-name", "major-channel", "minor-channel", "physical-channel",
+        "adapter" };
 
     const int   i_type[] = { VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
@@ -325,7 +329,7 @@ static int Open( vlc_object_t *p_this )
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER,
         VLC_VAR_INTEGER, VLC_VAR_STRING, VLC_VAR_STRING, VLC_VAR_STRING,
-        VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER };
+        VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER, VLC_VAR_INTEGER };
 
     char  psz_full_name[128];
     int i_ret;
@@ -437,7 +441,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
     i_token_len = strcspn( psz_parser, ":" );
     if( i_token_len <= 0 )
         i_token_len  = strcspn( ++psz_parser, ":" );
- 
+
     do
     {
         psz_token = strndup( psz_parser, i_token_len );

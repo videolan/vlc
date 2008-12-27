@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright( C ) 2007 the VideoLAN team
  *
- * Author: Ken Self <kens@campoz.fslife.co.uk>
+ * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -781,10 +781,10 @@ HRESULT BDAGraph::CreateTuneRequest()
             bstr_name(NULL) {};
         ~localComPtr()
         {
-            if( p_tuning_space_container )
-                p_tuning_space_container->Release();
             if( p_tuning_space_enum )
                 p_tuning_space_enum->Release();
+            if( p_tuning_space_container )
+                p_tuning_space_container->Release();
             if( p_this_tuning_space )
                 p_this_tuning_space->Release();
             SysFreeString( bstr_name );
@@ -840,15 +840,20 @@ HRESULT BDAGraph::CreateTuneRequest()
             }
         }
         /* else */
-        p_tuning_space->Release();
+        if( p_tuning_space )
+            p_tuning_space->Release();
+        if( p_tune_request )
+            p_tune_request->Release();
         p_tuning_space = NULL;
+        p_tune_request = NULL;
     }
 
     /* Force use of the first available Tuner Device during Build */
     l_tuner_used = -1;
 
     /* Get the SystemTuningSpaces container to enumerate through all the
-     * defined tuning spaces */
+     * defined tuning spaces.
+     * l.p_tuning_space_container->Refcount = 1  */
     hr = ::CoCreateInstance( CLSID_SystemTuningSpaces, 0, CLSCTX_INPROC,
         IID_ITuningSpaceContainer, (void**)&l.p_tuning_space_container );
     if( FAILED( hr ) )
@@ -858,6 +863,10 @@ HRESULT BDAGraph::CreateTuneRequest()
         return hr;
     }
 
+    /* Get the SystemTuningSpaces container to enumerate through all the
+     * defined tuning spaces.
+     * l.p_tuning_space_container->Refcount = 2
+     * l.p_tuning_space_enum->Refcount = 1  */
     hr = l.p_tuning_space_container->get_EnumTuningSpaces(
          &l.p_tuning_space_enum );
     if( FAILED( hr ) )
@@ -867,9 +876,17 @@ HRESULT BDAGraph::CreateTuneRequest()
         return hr;
     }
 
-    while( l.p_tuning_space_enum->Next( 1, &l.p_this_tuning_space, NULL ) ==
-        S_OK )
+    do
     {
+        /* l.p_this_tuning_space->RefCount = 1 after the first pass
+         * Release before overwriting with Next */
+        if( l.p_this_tuning_space )
+            l.p_this_tuning_space->Release();
+        l.p_this_tuning_space = NULL;
+
+        hr = l.p_tuning_space_enum->Next( 1, &l.p_this_tuning_space, NULL );
+        if( hr != S_OK ) break;
+
         hr = l.p_this_tuning_space->get__NetworkType( &guid_this_network_type );
 
         /* GUID_NULL means a non-BDA network was found e.g analog
@@ -878,6 +895,8 @@ HRESULT BDAGraph::CreateTuneRequest()
 
         if( guid_this_network_type == guid_network_type )
         {
+            /* QueryInterface to clone l.p_this_tuning_space
+             * l.p_this_tuning_space->RefCount = 2 */
             hr = l.p_this_tuning_space->QueryInterface( IID_ITuningSpace,
                 (void**)&p_tuning_space );
             if( FAILED( hr ) )
@@ -901,15 +920,22 @@ HRESULT BDAGraph::CreateTuneRequest()
             {
                 msg_Dbg( p_access, "CreateTuneRequest: Using Tuning Space: %S",
                     l.bstr_name );
+            /* CreateTuneRequest adds TuneRequest to p_tuning_space
+             * p_tune_request->RefCount = 1 */
                 hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
                 if( FAILED( hr ) )
                     msg_Warn( p_access, "CreateTuneRequest: "\
                         "Cannot Create Tune Request: hr=0x%8lx", hr );
                 return hr;
             }
+            if( p_tuning_space )
+                p_tuning_space->Release();
+            p_tuning_space = NULL;
         }
     }
-    /* No tune request was found. If the create-name parameter was set then
+    while( true );
+
+    /* No tuning space was found. If the create-name parameter was set then
      * create a tuning space. By rights should use the same name used in
      * network-name
      * Also would be nice to copy a tuning space but we only come here if we do
@@ -951,8 +977,10 @@ HRESULT BDAGraph::CreateTuneRequest()
         msg_Dbg( p_access, "CreateTuneRequest: Create Tuning Space: %S",
              l.bstr_name );
     }
+
     hr = ::CoCreateInstance( cls_tuning_space, 0, CLSCTX_INPROC,
          IID_ITuningSpace, (void**)&p_tuning_space );
+
     if( FAILED( hr ) )
         msg_Warn( p_access, "CreateTuneRequest: "\
             "Cannot CoCreate new TuningSpace: hr=0x%8lx", hr );
@@ -971,18 +999,24 @@ HRESULT BDAGraph::CreateTuneRequest()
     if( FAILED( hr ) )
         msg_Warn( p_access, "CreateTuneRequest: "\
             "Cannot Put Friendly Name: hr=0x%8lx", hr );
+
     if( SUCCEEDED( hr ) )
         hr = l.p_tuning_space_container->Add( p_tuning_space, &var_id );
+
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "CreateTuneRequest: "\
             "Cannot Create new TuningSpace: hr=0x%8lx", hr );
         return hr;
     }
+    msg_Dbg( p_access, "CreateTuneRequest: Tuning Space: %S created",
+         l.bstr_name );
+
     hr = p_tuning_space->CreateTuneRequest( &p_tune_request );
     if( FAILED( hr ) )
         msg_Warn( p_access, "CreateTuneRequest: "\
             "Cannot Create Tune Request: hr=0x%8lx", hr );
+
     return hr;
 }
 
@@ -1094,7 +1128,18 @@ HRESULT BDAGraph::Build()
     }
 
     /* Add the Network Tuner to the Network Provider. On subsequent calls,
-     * l_tuner_used will cause a different tuner to be selected */
+     * l_tuner_used will cause a different tuner to be selected
+     * To select a specific device first get the parameter that nominates the
+     * device (dvb-adapter) and use the value to initialise l_tuner_used.
+     * When FindFilter returns check the contents of l_tuner_used.
+     * If it is not what was selected then the requested device was not
+     * available so return with an error. */
+
+    long l_adapter = -1;
+    l_adapter = var_GetInteger( p_access, "dvb-adapter" );
+    if( l_tuner_used < 0 && l_adapter >= 0 )
+        l_tuner_used = l_adapter - 1;
+
     hr = FindFilter( KSCATEGORY_BDA_NETWORK_TUNER, &l_tuner_used,
         p_network_provider, &p_tuner_device );
     if( FAILED( hr ) )
@@ -1104,6 +1149,13 @@ HRESULT BDAGraph::Build()
             "hr=0x%8lx", hr );
         return hr;
     }
+    if( l_adapter > 0 && l_tuner_used != l_adapter )
+    {
+         msg_Warn( p_access, "Build: "\
+             "Tuner device %d is not available", l_adapter );
+        return E_FAIL;
+    }
+    msg_Dbg( p_access, "BDAGraph: Using adapter %d", l_tuner_used );
 
     /* Always look for all capture devices to match the Network Tuner */
     l_capture_used = -1;
@@ -1119,6 +1171,9 @@ HRESULT BDAGraph::Build()
             "Cannot find Capture device. Connecting to tuner: hr=0x%8lx", hr );
     }
 
+    if( p_sample_grabber )
+         p_sample_grabber->Release();
+    p_sample_grabber = NULL;
     /* Insert the Sample Grabber to tap into the Transport Stream. */
     hr = ::CoCreateInstance( CLSID_SampleGrabber, NULL, CLSCTX_INPROC_SERVER,
         IID_IBaseFilter, (void**)&p_sample_grabber );
@@ -1136,6 +1191,9 @@ HRESULT BDAGraph::Build()
         return hr;
     }
 
+    if( p_grabber )
+        p_grabber->Release();
+    p_grabber = NULL;
     hr = p_sample_grabber->QueryInterface( IID_ISampleGrabber,
         (void**)&p_grabber );
     if( FAILED( hr ) )
@@ -1155,6 +1213,7 @@ HRESULT BDAGraph::Build()
             "Cannot set media type on grabber filter: hr=0x%8lx", hr );
         return hr;
     }
+
     hr = Connect( p_capture_device, p_sample_grabber );
     if( FAILED( hr ) )
     {
@@ -1232,6 +1291,9 @@ HRESULT BDAGraph::Build()
     }
 
     /* The Media Control is used to Run and Stop the Graph */
+    if( p_media_control )
+        p_media_control->Release();
+    p_media_control = NULL;
     hr = p_filter_graph->QueryInterface( IID_IMediaControl,
         (void**)&p_media_control );
     if( FAILED( hr ) )
@@ -1273,14 +1335,14 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
             { ::VariantInit(&var_bstr); };
         ~localComPtr()
         {
+            if( p_property_bag )
+                p_property_bag->Release();
+            if( p_filter )
+                p_filter->Release();
             if( p_moniker )
                 p_moniker->Release();
             if( p_moniker_enum )
                 p_moniker_enum->Release();
-            if( p_filter )
-                p_filter->Release();
-            if( p_property_bag )
-                p_property_bag->Release();
             ::VariantClear(&var_bstr);
         }
     } l;
@@ -1305,27 +1367,38 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
             "Cannot CreateClassEnumerator: hr=0x%8lx", hr );
         return E_FAIL;
     }
-    while( l.p_moniker_enum->Next( 1, &l.p_moniker, 0 ) == S_OK )
+
+    do
     {
+        /* We are overwriting l.p_moniker so we should Release and nullify
+         * It is important that p_moniker and p_property_bag are fully released
+         * l.p_filter may not be dereferenced so we could force to NULL */
+        if( l.p_property_bag )
+            l.p_property_bag->Release();
+        l.p_property_bag = NULL;
+        if( l.p_filter )
+            l.p_filter->Release();
+        l.p_filter = NULL;
+        if( l.p_moniker )
+            l.p_moniker->Release();
+         l.p_moniker = NULL;
+
+        hr = l.p_moniker_enum->Next( 1, &l.p_moniker, 0 );
+        if( hr != S_OK ) break;
         i_moniker_index++;
 
         /* Skip over devices already found on previous calls */
         if( i_moniker_index <= *i_moniker_used ) continue;
         *i_moniker_used = i_moniker_index;
 
+        /* l.p_filter is Released at the top of the loop */
         hr = l.p_moniker->BindToObject( NULL, NULL, IID_IBaseFilter,
             (void**)&l.p_filter );
         if( FAILED( hr ) )
         {
-            if( l.p_moniker )
-                l.p_moniker->Release();
-            l.p_moniker = NULL;
-            if( l.p_filter)
-                 l.p_filter->Release();
-            l.p_filter = NULL;
             continue;
         }
-
+        /* l.p_property_bag is released at the top of the loop */
         hr = l.p_moniker->BindToStorage( NULL, NULL, IID_IPropertyBag,
             (void**)&l.p_property_bag );
         if( FAILED( hr ) )
@@ -1334,7 +1407,6 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
                 "Cannot Bind to Property Bag: hr=0x%8lx", hr );
             return hr;
         }
-
         hr = l.p_property_bag->Read( L"FriendlyName", &l.var_bstr, NULL );
         if( FAILED( hr ) )
         {
@@ -1354,6 +1426,7 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
         hr = Connect( p_upstream, l.p_filter );
         if( SUCCEEDED( hr ) )
         {
+            /* p_p_downstream has not been touched yet so no release needed */
             msg_Dbg( p_access, "FindFilter: Connected %S", l.var_bstr.bstrVal );
             l.p_filter->QueryInterface( IID_IBaseFilter,
                 (void**)p_p_downstream );
@@ -1368,13 +1441,8 @@ HRESULT BDAGraph::FindFilter( REFCLSID clsid, long* i_moniker_used,
             return hr;
         }
 
-        if( l.p_moniker )
-            l.p_moniker->Release();
-        l.p_moniker = NULL;
-        if( l.p_filter)
-            l.p_filter->Release();
-        l.p_filter = NULL;
     }
+    while( true );
 
     hr = E_FAIL;
     msg_Warn( p_access, "FindFilter: No filter connected: hr=0x%8lx", hr );
@@ -1400,21 +1468,20 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
             p_pin_temp(NULL) { };
         ~localComPtr()
         {
-            if( p_pin_upstream )
-                p_pin_upstream->Release();
-            if( p_pin_downstream )
-                p_pin_downstream->Release();
-            if( p_pin_upstream_enum )
-                p_pin_upstream_enum->Release();
-            if( p_pin_downstream_enum )
-                p_pin_downstream_enum->Release();
             if( p_pin_temp )
                 p_pin_temp->Release();
+            if( p_pin_downstream )
+                p_pin_downstream->Release();
+            if( p_pin_upstream )
+                p_pin_upstream->Release();
+            if( p_pin_downstream_enum )
+                p_pin_downstream_enum->Release();
+            if( p_pin_upstream_enum )
+                p_pin_upstream_enum->Release();
         }
     } l;
 
-    PIN_INFO            pin_info_upstream;
-    PIN_INFO            pin_info_downstream;
+    PIN_DIRECTION pin_dir;
 
     hr = p_upstream->EnumPins( &l.p_pin_upstream_enum );
     if( FAILED( hr ) )
@@ -1423,26 +1490,36 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
             "Cannot get upstream filter enumerator: hr=0x%8lx", hr );
         return hr;
     }
-    while( l.p_pin_upstream_enum->Next( 1, &l.p_pin_upstream, 0 ) == S_OK )
+
+    do
     {
-        hr = l.p_pin_upstream->QueryPinInfo( &pin_info_upstream );
+        /* Release l.p_pin_upstream before next iteration */
+        if( l.p_pin_upstream  )
+            l.p_pin_upstream ->Release();
+        l.p_pin_upstream = NULL;
+        hr = l.p_pin_upstream_enum->Next( 1, &l.p_pin_upstream, 0 );
+        if( hr != S_OK ) break;
+
+        hr = l.p_pin_upstream->QueryDirection( &pin_dir );
         if( FAILED( hr ) )
         {
             msg_Warn( p_access, "Connect: "\
-                "Cannot get upstream filter pin information: hr=0x%8lx", hr );
+                "Cannot get upstream filter pin direction: hr=0x%8lx", hr );
             return hr;
         }
         hr = l.p_pin_upstream->ConnectedTo( &l.p_pin_downstream );
-        if( hr == S_OK )
+        if( SUCCEEDED( hr ) )
+        {
             l.p_pin_downstream->Release();
-        if(FAILED( hr ) && hr != VFW_E_NOT_CONNECTED )
+            l.p_pin_downstream = NULL;
+        }
+        if( FAILED( hr ) && hr != VFW_E_NOT_CONNECTED )
         {
             msg_Warn( p_access, "Connect: "\
                 "Cannot check upstream filter connection: hr=0x%8lx", hr );
             return hr;
         }
-        if(( pin_info_upstream.dir == PINDIR_OUTPUT ) &&
-           ( hr == VFW_E_NOT_CONNECTED ) )
+        if( ( pin_dir == PINDIR_OUTPUT ) && ( hr == VFW_E_NOT_CONNECTED ) )
         {
             /* The upstream pin is not yet connected so check each pin on the
              * downstream filter */
@@ -1453,19 +1530,33 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                     "downstream filter enumerator: hr=0x%8lx", hr );
                 return hr;
             }
-            while( l.p_pin_downstream_enum->Next( 1, &l.p_pin_downstream, 0 )
-                == S_OK )
+            do
             {
-                hr = l.p_pin_downstream->QueryPinInfo( &pin_info_downstream );
+                /* Release l.p_pin_downstream before next iteration */
+                if( l.p_pin_downstream  )
+                    l.p_pin_downstream ->Release();
+                l.p_pin_downstream = NULL;
+
+                hr = l.p_pin_downstream_enum->Next( 1, &l.p_pin_downstream, 0 );
+                if( hr != S_OK ) break;
+
+                hr = l.p_pin_downstream->QueryDirection( &pin_dir );
                 if( FAILED( hr ) )
                 {
                     msg_Warn( p_access, "Connect: Cannot get "\
-                        "downstream filter pin information: hr=0x%8lx", hr );
+                        "downstream filter pin direction: hr=0x%8lx", hr );
                     return hr;
                 }
 
+                /* Looking for a free Pin to connect to
+                 * A connected Pin may have an reference count > 1
+                 * so Release and nullify the pointer */
                 hr = l.p_pin_downstream->ConnectedTo( &l.p_pin_temp );
-                if( hr == S_OK ) l.p_pin_temp->Release();
+                if( SUCCEEDED( hr ) )
+                {
+                    l.p_pin_temp->Release();
+                    l.p_pin_temp = NULL;
+                }
                 if( hr != VFW_E_NOT_CONNECTED )
                 {
                     if( FAILED( hr ) )
@@ -1475,32 +1566,39 @@ HRESULT BDAGraph::Connect( IBaseFilter* p_upstream, IBaseFilter* p_downstream )
                         return hr;
                     }
                 }
-                if(( pin_info_downstream.dir == PINDIR_INPUT ) &&
-                   ( hr == VFW_E_NOT_CONNECTED ) )
+                if( ( pin_dir == PINDIR_INPUT ) &&
+                    ( hr == VFW_E_NOT_CONNECTED ) )
                 {
                     hr = p_filter_graph->ConnectDirect( l.p_pin_upstream,
                         l.p_pin_downstream, NULL );
                     if( SUCCEEDED( hr ) )
                     {
-                        pin_info_downstream.pFilter->Release();
-                        pin_info_upstream.pFilter->Release();
+                        /* If we arrive here then we have a matching pair of
+                         * pins. */
                         return S_OK;
                     }
                 }
-                /* If we fall out here it means this downstream pin was not
-                 * suitable so try the next downstream pin */
-                l.p_pin_downstream = NULL;
-                pin_info_downstream.pFilter->Release();
+                /* If we arrive here it means this downstream pin is not
+                 * suitable so try the next downstream pin.
+                 * l.p_pin_downstream is released at the top of the loop */
             }
+            while( true );
+            /* If we arrive here then we ran out of pins before we found a
+             * suitable one. Release outstanding refcounts */
+            if( l.p_pin_downstream_enum )
+                l.p_pin_downstream_enum->Release();
+            l.p_pin_downstream_enum = NULL;
+            if( l.p_pin_downstream )
+                l.p_pin_downstream->Release();
+            l.p_pin_downstream = NULL;
         }
-
-        /* If we fall out here it means we did not find any suitable downstream
-         * pin so try the next upstream pin */
-        l.p_pin_upstream = NULL;
-        pin_info_upstream.pFilter->Release();
+        /* If we arrive here it means this upstream pin is not suitable
+         * so try the next upstream pin
+         * l.p_pin_upstream is released at the top of the loop */
     }
-
-    /* If we fall out here it means we did not find any pair of suitable pins */
+    while( true );
+    /* If we arrive here it means we did not find any pair of suitable pins
+     * Outstanding refcounts are released in the destructor */
     return E_FAIL;
 }
 
@@ -1633,9 +1731,33 @@ STDMETHODIMP BDAGraph::BufferCB( double d_time, BYTE* p_buffer,
 HRESULT BDAGraph::Destroy()
 {
     HRESULT hr = S_OK;
+    ULONG ul_refcount = 0;
 
     if( p_media_control )
         hr = p_media_control->Stop();
+
+    if( d_graph_register )
+    {
+        Deregister();
+    }
+
+/* We need to empty the buffers of any unprocessed data */
+    msg_Dbg( p_access, "Queue sample size = %d", queue_sample.size() );
+    while( !queue_sample.empty() )
+    {
+        ul_refcount = queue_sample.front()->Release();
+        queue_sample.pop();
+        if( ul_refcount )
+            msg_Warn( p_access, "BDAGraph: Non-zero Ref: %d", ul_refcount );
+    }
+    msg_Dbg( p_access, "Queue buffer size = %d", queue_buffer.size() );
+    while( !queue_buffer.empty() )
+    {
+        ul_refcount = queue_buffer.front()->Release();
+        queue_buffer.pop();
+        if( ul_refcount )
+            msg_Warn( p_access, "BDAGraph: Non-zero Ref: %d", ul_refcount );
+    }
 
     if( p_transport_info )
     {
@@ -1667,6 +1789,11 @@ HRESULT BDAGraph::Destroy()
         p_tuner_device->Release();
         p_tuner_device = NULL;
     }
+    if( p_scanning_tuner )
+    {
+        p_scanning_tuner->Release();
+        p_scanning_tuner = NULL;
+    }
     if( p_network_provider )
     {
         p_filter_graph->RemoveFilter( p_network_provider );
@@ -1674,11 +1801,6 @@ HRESULT BDAGraph::Destroy()
         p_network_provider = NULL;
     }
 
-    if( p_scanning_tuner )
-    {
-        p_scanning_tuner->Release();
-        p_scanning_tuner = NULL;
-    }
     if( p_media_control )
     {
         p_media_control->Release();
@@ -1689,10 +1811,10 @@ HRESULT BDAGraph::Destroy()
         p_filter_graph->Release();
         p_filter_graph = NULL;
     }
-
-    if( d_graph_register )
+    if( p_system_dev_enum )
     {
-        Deregister();
+        p_system_dev_enum->Release();
+        p_system_dev_enum = NULL;
     }
 
     return S_OK;

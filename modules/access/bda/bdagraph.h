@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright ( C ) 2007 the VideoLAN team
  *
- * Author: Ken Self <kens@campoz.fslife.co.uk>
+ * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ using namespace std;
 
 #include <dshow.h>
 #include <comcat.h>
+#include <ks.h>
 #include "bdadefs.h"
 #include "bda.h"
 
@@ -67,10 +68,11 @@ public:
 
 private:
     /* ISampleGrabberCB methods */
-    STDMETHODIMP_( ULONG ) AddRef( ) { return 1; }
-    STDMETHODIMP_( ULONG ) Release( ) { return 2; }
+    ULONG ul_cbrc;
+    STDMETHODIMP_( ULONG ) AddRef( ) { return ++ul_cbrc; }
+    STDMETHODIMP_( ULONG ) Release( ) { return --ul_cbrc; }
     STDMETHODIMP QueryInterface( REFIID riid, void** p_p_object )
-        {return E_NOTIMPL;  }
+        { return E_NOTIMPL; }
     STDMETHODIMP SampleCB( double d_time, IMediaSample* p_sample );
     STDMETHODIMP BufferCB( double d_time, BYTE* p_buffer, long l_buffer_len );
 
