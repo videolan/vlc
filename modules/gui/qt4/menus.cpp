@@ -324,6 +324,8 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
         ":/capture-card", SLOT( openCaptureDialog() ),
         "Ctrl+C" );
 
+    menu->addSeparator();
+
     recentsMenu = new QMenu( qtr( "Recently played" ), menu );
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
