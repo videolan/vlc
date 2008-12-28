@@ -29,9 +29,11 @@
 
 #include <QRubberBand>
 #include <QListWidget>
+#include <QCheckBox>
 
 class ToolbarEditDialog;
 class DroppingController;
+class QCheckBox;
 
 class WidgetListing : public QListWidget
 {

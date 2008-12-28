@@ -32,10 +32,11 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#include <vlc_aout.h>
+//#include <vlc_aout.h> Visualizer
 
 #include "qt4.hpp"
 #include "main_interface.hpp"
+#include "input_manager.hpp"
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
 
@@ -123,19 +124,6 @@ private slots:
     void next();
 };
 #endif
-
-#define VOLUME_MAX 200
-class VolumeClickHandler : public QObject
-{
-public:
-    VolumeClickHandler( intf_thread_t *_p_intf, SoundWidget *_m ) : QObject(_m)
-    {m = _m; p_intf = _p_intf; }
-    virtual ~VolumeClickHandler() {};
-    virtual bool eventFilter( QObject *obj, QEvent *e );
-private:
-    SoundWidget *m;
-    intf_thread_t *p_intf;
-};
 
 class TimeLabel : public QLabel
 {

@@ -1,12 +1,10 @@
 /*****************************************************************************
- * interface_widgets.hpp : Custom widgets for the main interface
+ * Controller_widget.cpp : Controller Widget for the controllers
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Baptiste Kempf <jb@videolan.org>
- *          Rafaël Carré <funman@videolanorg>
+ * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,33 +28,16 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-
 #include "qt4.hpp"
-#include "main_interface.hpp"
-#include "input_manager.hpp"
 
 #include <QWidget>
-#include <QFrame>
 #include <QToolButton>
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
-class QPixmap;
 class QLabel;
-class QGridLayout;
-
-class InputSlider;
+class QSpinBox;
 class QAbstractSlider;
-
-class QAbstractButton;
-
-class VolumeClickHandler;
-class QSignalMapper;
-
-class QTimer;
-class WidgetListing;
 
 /**
  * SPECIAL Widgets that are a bit more than just a ToolButton
@@ -93,6 +74,9 @@ private slots:
     void toggleTeletextTransparency( bool );
 };
 
+#define VOLUME_MAX 200
+class VolumeClickHandler;
+
 class SoundWidget : public QWidget
 {
     Q_OBJECT
@@ -111,6 +95,18 @@ private:
 protected slots:
     void updateVolume( int );
     void updateVolume( void );
+};
+
+class VolumeClickHandler : public QObject
+{
+public:
+    VolumeClickHandler( intf_thread_t *_p_intf, SoundWidget *_m ) : QObject(_m)
+    {m = _m; p_intf = _p_intf; }
+    virtual ~VolumeClickHandler() {};
+    virtual bool eventFilter( QObject *obj, QEvent *e );
+private:
+    SoundWidget *m;
+    intf_thread_t *p_intf;
 };
 
 #endif

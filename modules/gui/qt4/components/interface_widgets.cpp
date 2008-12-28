@@ -521,16 +521,4 @@ void TimeLabel::setStatus( int i_status )
         setText( "Buffering" );
 }
 
-bool VolumeClickHandler::eventFilter( QObject *obj, QEvent *e )
-{
-    if (e->type() == QEvent::MouseButtonPress  )
-    {
-        aout_VolumeMute( p_intf, NULL );
-        audio_volume_t i_volume;
-        aout_VolumeGet( p_intf, &i_volume );
-//        m->updateVolume( i_volume *  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
-        return true;
-    }
-    return false;
-}
 

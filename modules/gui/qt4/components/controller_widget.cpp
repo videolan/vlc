@@ -4,10 +4,7 @@
  * Copyright ( C ) 2006-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Baptiste Kempf <jb@videolan.org>
- *          Rafaël Carré <funman@videolanorg>
- *          Ilkka Ollakka <ileoo@videolan.org>
+ * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,31 +25,16 @@
 # include "config.h"
 #endif
 
-//#include <vlc_vout.h>
-//#include <vlc_keys.h>
-
 #include "controller_widget.hpp"
 
-#include "dialogs_provider.hpp"
-#include "components/interface_widgets.hpp"
-#include "main_interface.hpp"
-#include "input_manager.hpp"
-#include "menus.hpp"
-#include "util/input_slider.hpp"
-#include "util/customwidgets.hpp"
+#include "input_manager.hpp"         /* Get notification of Volume Change */
+#include "util/input_slider.hpp"     /* SoundSlider */
+
+#include <vlc_aout.h>                /* Volume functions */
 
 #include <QLabel>
-#include <QSpacerItem>
-#include <QCursor>
-#include <QToolButton>
 #include <QHBoxLayout>
-#include <QMenu>
-#include <QPalette>
-#include <QResizeEvent>
-#include <QDate>
-#include <QSignalMapper>
-#include <QTimer>
-
+#include <QSpinBox>
 
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny )
@@ -173,5 +155,18 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
         setIcon( QIcon( ":/atob" ) );
         setToolTip( qtr( "Stop the A to B loop" ) );
     }
+}
+
+bool VolumeClickHandler::eventFilter( QObject *obj, QEvent *e )
+{
+    if (e->type() == QEvent::MouseButtonPress  )
+    {
+        aout_VolumeMute( p_intf, NULL );
+        audio_volume_t i_volume;
+        aout_VolumeGet( p_intf, &i_volume );
+//        m->updateVolume( i_volume *  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
+        return true;
+    }
+    return false;
 }
 

@@ -30,33 +30,29 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-
 #include "qt4.hpp"
-#include "main_interface.hpp"
-#include "input_manager.hpp"
 
-#include <QWidget>
 #include <QFrame>
-#include <QToolButton>
+#include <QString>
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
 class QPixmap;
 class QLabel;
+
 class QGridLayout;
+class QHBoxLayout;
+class QBoxLayout;
 
-class InputSlider;
 class QAbstractSlider;
-
 class QAbstractButton;
+class InputSlider;
 
 class VolumeClickHandler;
-class QSignalMapper;
-
-class QTimer;
 class WidgetListing;
+
+class QSignalMapper;
+class QTimer;
 
 typedef enum buttonType_e
 {
@@ -94,7 +90,6 @@ typedef enum buttonType_e
     WIDGET_MAX,
 } buttonType_e;
 
-#include <QString>
 
 static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
     "Previous", "Next", "Slower", "Faster", "Fullscreen", "De-Fullscreen",
@@ -142,6 +137,7 @@ enum
    WIDGET_SHINY  = 0x4,
 };
 
+class AdvControlsWidget;
 class AbstractController : public QFrame
 {
     friend class WidgetListing; /* For ToolBar Edition HACKS */

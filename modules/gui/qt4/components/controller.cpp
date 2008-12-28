@@ -31,23 +31,19 @@
 #include <vlc_vout.h>
 #include <vlc_keys.h>
 
-#include "dialogs_provider.hpp"
+#include "components/controller.hpp"
+#include "components/controller_widget.hpp"
 #include "components/interface_widgets.hpp"
-#include "main_interface.hpp"
-#include "input_manager.hpp"
-#include "menus.hpp"
-#include "util/input_slider.hpp"
-#include "util/customwidgets.hpp"
 
-#include <QLabel>
+#include "dialogs_provider.hpp"
+#include "input_manager.hpp"
+
+#include "util/input_slider.hpp" /* InputSlider */
+#include "util/customwidgets.hpp" /* qEventToKey */
+
 #include <QSpacerItem>
-#include <QCursor>
 #include <QToolButton>
 #include <QHBoxLayout>
-#include <QMenu>
-#include <QPalette>
-#include <QResizeEvent>
-#include <QDate>
 #include <QSignalMapper>
 #include <QTimer>
 
@@ -689,6 +685,7 @@ void AbstractController::frame()
     if( p_input )
         var_SetVoid( p_input, "frame-next" );
 }
+
 #include <QHBoxLayout>
 /*****************************
  * DA Control Widget !
