@@ -50,6 +50,8 @@ VLC_EXPORT( const char *, module_get_object, ( const module_t *m ) );
 VLC_EXPORT( const char *, module_get_name, ( const module_t *m, bool long_name ) );
 #define module_GetLongName( m ) module_get_name( m, true )
 VLC_EXPORT( const char *, module_get_help, ( const module_t *m ) );
+VLC_EXPORT( const char *, module_get_capability, ( const module_t *m ) );
+VLC_EXPORT( int, module_get_score, ( const module_t *m ) );
 
 static inline module_t *module_get_main (void)
 {

@@ -317,6 +317,28 @@ const char *module_get_help( const module_t *m )
     return m->psz_help;
 }
 
+/**
+ * Get the capability for a module
+ *
+ * \param m the module
+ * return the capability
+ */
+const char *module_get_capability( const module_t *m )
+{
+    return m->psz_capability;
+}
+
+/**
+ * Get the score for a module
+ *
+ * \param m the module
+ * return the score for the capability
+ */
+int module_get_score( const module_t *m )
+{
+    return m->i_score;
+}
+
 module_t *module_hold (module_t *m)
 {
     vlc_hold (&m->vlc_gc_data);

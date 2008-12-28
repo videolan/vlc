@@ -213,9 +213,11 @@ module_config_free
 module_config_get
 module_exists
 module_find
+module_get_capability
 module_get_help
 module_get_name
 module_get_object
+module_get_score
 module_hold
 module_list_free
 module_list_get
