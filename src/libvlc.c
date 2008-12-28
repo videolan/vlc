@@ -346,6 +346,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
 
+    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
+
     /* Check for short help option */
     if( config_GetInt( p_libvlc, "help" ) > 0 )
     {
@@ -366,9 +368,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     /* Check for plugins cache options */
     bool b_cache_delete = config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0;
-
-    /* Will be re-done properly later on */
-    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
 
     /* Check for daemon mode */
 #ifndef WIN32
