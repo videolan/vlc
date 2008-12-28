@@ -281,10 +281,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv->b_color = false;
 #endif
 
-    /* Announce who we are - Do it only for first instance ? */
-    msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
-    msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
-
     /* Initialize mutexes */
     vlc_mutex_init( &priv->timer_lock );
     vlc_mutex_init( &priv->config_lock );
@@ -331,9 +327,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     LoadMessages ();
 
-    /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
-    msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
-
     /* Initialize the module bank and load the configuration of the
      * main module. We need to do this at this stage to be able to display
      * a short help if required by the user. (short help == main module
@@ -347,6 +340,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
+    /* Announce who we are - Do it only for first instance ? */
+    msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
+    msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
+    /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
+    msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
     /* Check for short help option */
     if( config_GetInt( p_libvlc, "help" ) > 0 )
