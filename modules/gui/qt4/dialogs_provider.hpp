@@ -149,6 +149,7 @@ public slots:
     void gotoTimeDialog();
     void podcastConfigureDialog();
     void toolbarDialog();
+    void pluginDialog();
 
     void openFileGenericDialog( intf_dialog_args_t * );
 
