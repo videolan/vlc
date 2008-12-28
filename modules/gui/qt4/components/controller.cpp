@@ -1,12 +1,10 @@
 /*****************************************************************************
  * Controller.cpp : Controller for the main interface
  ****************************************************************************
- * Copyright ( C ) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Clément Stenac <zorglub@videolan.org>
- *          Jean-Baptiste Kempf <jb@videolan.org>
- *          Rafaël Carré <funman@videolanorg>
+ * Authors: Jean-Baptiste Kempf <jb@videolan.org>
  *          Ilkka Ollakka <ileoo@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
