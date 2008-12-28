@@ -125,7 +125,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
 MessagesDialog::~MessagesDialog ()
 {
-    writeSettings( "messages" );
+    writeSettings( "Messages" );
     msg_Unsubscribe (sub);
     delete cb_data;
 };
