@@ -37,6 +37,7 @@
 #include "qt4.hpp"
 #include "main_interface.hpp"
 #include "components/controller.hpp"
+#include "components/controller_widget.hpp"
 
 #include <QWidget>
 #include <QFrame>

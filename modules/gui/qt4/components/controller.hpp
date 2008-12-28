@@ -1,5 +1,5 @@
 /*****************************************************************************
- * interface_widgets.hpp : Custom widgets for the main interface
+ * Controller.hpp : Controller for the main interface
  ****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
  * $Id$
@@ -194,61 +194,6 @@ signals:
     void inputExists( bool ); /// This might be usefull in the IM ?
     void inputPlaying( bool ); /// This might be usefull in the IM ?
     void inputIsRecordable( bool ); /// same ?
-};
-
-/**
- * SPECIAL Widgets that are a bit more than just a ToolButton
- * and have an icon/behaviour that changes depending on the context:
- * - playButton
- * - A->B Button
- * - Teletext group buttons
- * - Sound Widget group
- **/
-class PlayButton : public QToolButton
-{
-    Q_OBJECT
-private slots:
-    void updateButton( bool );
-};
-
-class AtoB_Button : public QToolButton
-{
-    Q_OBJECT
-private slots:
-    void setIcons( bool, bool );
-};
-
-class TeletextController : public QWidget
-{
-    Q_OBJECT
-    friend class AbstractController;
-private:
-    QToolButton         *telexTransparent, *telexOn;
-    QSpinBox            *telexPage;
-
-private slots:
-    void enableTeletextButtons( bool );
-    void toggleTeletextTransparency( bool );
-};
-
-class SoundWidget : public QWidget
-{
-    Q_OBJECT
-    friend class VolumeClickHandler;
-
-public:
-    SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool );
-
-private:
-    intf_thread_t       *p_intf;
-    QLabel              *volMuteLabel;
-    QAbstractSlider     *volumeSlider;
-    VolumeClickHandler  *hVolLabel;
-    bool                 b_my_volume;
-
-protected slots:
-    void updateVolume( int );
-    void updateVolume( void );
 };
 
 /* Advanced Button Bar */

@@ -42,6 +42,7 @@ nodist_SOURCES_qt4 = \
 		components/open_panels.moc.cpp \
 		components/interface_widgets.moc.cpp \
 		components/controller.moc.cpp \
+		components/controller_widget.moc.cpp \
 		components/playlist/playlist_model.moc.cpp \
 		components/playlist/playlist_item.moc.cpp \
 		components/playlist/playlist.moc.cpp \
@@ -206,6 +207,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/open_panels.cpp \
 		components/interface_widgets.cpp \
 		components/controller.cpp \
+		components/controller_widget.cpp \
 		components/playlist/playlist_model.cpp \
 		components/playlist/playlist_item.cpp \
 		components/playlist/standardpanel.cpp \
@@ -246,6 +248,7 @@ noinst_HEADERS = \
 	components/open_panels.hpp \
 	components/interface_widgets.hpp \
 	components/controller.hpp \
+	components/controller_widget.hpp \
 	components/playlist/playlist_model.hpp \
 	components/playlist/playlist_item.hpp \
 	components/playlist/panels.hpp \
