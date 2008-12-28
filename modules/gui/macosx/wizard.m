@@ -1053,7 +1053,8 @@ static VLCWizard *_o_sharedInstance = nil;
         if (anythingEnabled == YES)
         {
             /* re-select the previously chosen item, if available */
-            [o_t5_matrix_encap selectCellWithTag: i_temp];
+            if( [[o_t5_matrix_encap cellWithTag: i_temp] isEnabled] )
+                [o_t5_matrix_encap selectCellWithTag: i_temp];
 
             /* go the encap-tab */
             [o_tab_pageHolder selectTabViewItemAtIndex:4];
