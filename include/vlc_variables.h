@@ -192,6 +192,7 @@ VLC_EXPORT( int, __var_TriggerCallback, ( vlc_object_t *, const char * ) );
  * helpers functions
  *****************************************************************************/
 
+#ifndef NDEBUG
 /**
  * This function assert the variable is of the expected type or it
  * is not defined
@@ -202,6 +203,9 @@ static inline void __var_AssertType( vlc_object_t *p_obj, const char *psz_name,
     const int i_type = __var_Type( p_obj, psz_name ) & VLC_VAR_CLASS;
     assert( i_type == 0 || i_type == (i_expected&VLC_VAR_CLASS) );
 }
+#else
+# define __var_AssertType( o, n, e ) (void)(o, n, e)
+#endif
 
 /**
  * Set the value of an integer variable
