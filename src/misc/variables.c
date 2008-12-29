@@ -34,6 +34,7 @@
 #include "libvlc.h"
 
 #include "vlc_interface.h"
+#include <assert.h>
 
 /*****************************************************************************
  * Private types
@@ -734,14 +735,8 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
     return i_type;
 }
 
-/**
- * Set a variable's value
- *
- * \param p_this The object that hold the variable
- * \param psz_name The name of the variable
- * \param val the value to set
- */
-int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
+int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
+                    int expected_type, vlc_value_t val )
 {
     int i_var;
     variable_t *p_var;
@@ -758,6 +753,8 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     }
 
     p_var = &p_priv->p_vars[i_var];
+    assert( (p_var->i_type & VLC_VAR_CLASS) == 0 || expected_type == 0 ||
+            (p_var->i_type & VLC_VAR_CLASS) == expected_type );
 
     /* Duplicate data if needed */
     p_var->ops->pf_dup( &val );
@@ -811,6 +808,48 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     return VLC_SUCCESS;
 }
 
+
+/**
+ * Set a variable's value
+ *
+ * \param p_this The object that hold the variable
+ * \param psz_name The name of the variable
+ * \param val the value to set
+ */
+int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
+{
+    return var_SetChecked( p_this, psz_name, 0, val );
+}
+
+int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
+                    int expected_type, vlc_value_t *p_val )
+{
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+    int i_var, err = VLC_SUCCESS;
+
+    vlc_mutex_lock( &p_priv->var_lock );
+
+    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+    if( i_var >= 0 )
+    {
+        variable_t *p_var = &p_priv->p_vars[i_var];
+
+        assert( (p_var->i_type & VLC_VAR_CLASS) == 0 || expected_type == 0 ||
+                (p_var->i_type & VLC_VAR_CLASS) == expected_type );
+
+        /* Really get the variable */
+        *p_val = p_var->val;
+
+        /* Duplicate value if needed */
+        p_var->ops->pf_dup( p_val );
+    }
+    else
+        err = VLC_ENOVAR;
+
+    vlc_mutex_unlock( &p_priv->var_lock );
+    return err;
+}
+
 /**
  * Get a variable's value
  *
@@ -821,33 +860,8 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
  */
 int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 {
-    int i_var;
-    variable_t *p_var;
-    vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
-
-    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-
-    if( i_var < 0 )
-    {
-        vlc_mutex_unlock( &p_priv->var_lock );
-        return VLC_ENOVAR;
-    }
-
-    p_var = &p_priv->p_vars[i_var];
-
-    /* Really get the variable */
-    *p_val = p_var->val;
-
-    /* Duplicate value if needed */
-    p_var->ops->pf_dup( p_val );
-
-    vlc_mutex_unlock( &p_priv->var_lock );
-
-    return VLC_SUCCESS;
+    return var_GetChecked( p_this, psz_name, 0, p_val );
 }
-
 
 /**
  * Register a callback in a variable

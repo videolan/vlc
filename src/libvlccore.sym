@@ -417,7 +417,9 @@ __var_Create
 __var_DelCallback
 __var_Destroy
 __var_Get
+var_GetChecked
 __var_Set
+var_SetChecked
 __var_TriggerCallback
 __var_Type
 video_format_FixRgb
