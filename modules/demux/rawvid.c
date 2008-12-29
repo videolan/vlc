@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_vout.h>                                     /* vout_InitFormat */
+#include <assert.h>
 
 /*****************************************************************************
  * Module descriptor
