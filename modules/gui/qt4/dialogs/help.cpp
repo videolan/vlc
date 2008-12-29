@@ -52,7 +52,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
 {
     setWindowTitle( qtr( "Help" ) );
-    setMinimumSize( 250, 300 );
+    setMinimumSize( 350, 300 );
 
     QGridLayout *layout = new QGridLayout( this );
     QTextBrowser *helpBrowser = new QTextBrowser( this );
@@ -65,7 +65,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     layout->addWidget( closeButton, 1, 3 );
 
     BUTTONACT( closeButton, close() );
-    readSettings( "Help", QSize( 400, 450 ) );
+    readSettings( "Help", QSize( 500, 450 ) );
 }
 
 HelpDialog::~HelpDialog()
