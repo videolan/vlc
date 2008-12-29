@@ -176,9 +176,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /**
      * CONNECTS on PLAY_STATUS
      **/
-    /* Status on the main controller */
-    CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
-    /* and in the systray */
+    /* Status on the systray */
     if( sysTray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ), this,
@@ -828,15 +826,6 @@ void MainInterface::setName( QString name )
     nameLabel->setToolTip( " " + name +" " );
 }
 
-void MainInterface::setStatus( int status )
-{
-    msg_Dbg( p_intf, "Updating the stream status: %i", status );
-
-    /* And in the systray for the menu */
-    if( sysTray )
-        QVLCMenu::updateSystrayMenu( this, p_intf );
-}
-
 /*****************************************************************************
  * Systray Icon and Systray Menu
  *****************************************************************************/
@@ -948,6 +937,8 @@ void MainInterface::updateSystrayTooltipName( QString name )
                     QSystemTrayIcon::NoIcon, 3000 );
         }
     }
+
+    QVLCMenu::updateSystrayMenu( this, p_intf );
 }
 
 /**
