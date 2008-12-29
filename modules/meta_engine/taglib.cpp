@@ -6,6 +6,7 @@
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Rafaël Carré <funman@videolanorg>
+ *          Rémi Duraffort <ivoire@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +41,15 @@
 # include <unistd.h>
 #endif
 
-#include <fileref.h>
 
+// Taglib headers
+#include <fileref.h>
 #include <tag.h>
+#include <tbytevector.h>
+
+#include <apetag.h>
 #include <id3v2tag.h>
 #include <xiphcomment.h>
-#include <apetag.h>
 
 #include <flacfile.h>
 #include <mpcfile.h>
@@ -53,25 +57,19 @@
 #include <oggfile.h>
 #include <oggflacfile.h>
 #include <speexfile.h>
-#include <vorbisfile.h>
 #include <trueaudiofile.h>
+#include <vorbisfile.h>
 #include <wavpackfile.h>
 
-#include <tstring.h>
-#include <textidentificationframe.h>
-#include <tbytevector.h>
 #include <attachedpictureframe.h>
-//#include <oggflacfile.h> /* ogg flac files aren't auto-casted by TagLib */
-#include <flacproperties.h>
-#include <vorbisfile.h>
-#include <vorbisproperties.h>
-#include <uniquefileidentifierframe.h>
 #include <textidentificationframe.h>
-//#include <relativevolumeframe.h> /* parse the tags without TagLib helpers? */
+#include <uniquefileidentifierframe.h>
 
-static int  ReadMeta    ( vlc_object_t * );
-static int  DownloadArt ( vlc_object_t * );
-static int  WriteMeta   ( vlc_object_t * );
+
+// Local functions
+static int ReadMeta    ( vlc_object_t * );
+static int DownloadArt ( vlc_object_t * );
+static int WriteMeta   ( vlc_object_t * );
 
 vlc_module_begin ()
     set_capability( "meta reader", 1000 )
