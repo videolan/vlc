@@ -758,10 +758,10 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else
         {
-            struct tm*    curtime;
+            struct tm    curtime;
             time_t        lcurtime ;
             lcurtime = time( NULL ) ;
-            if ( ( (curtime = localtime( &lcurtime )) == NULL ) )
+            if ( ( localtime_r( &lcurtime, &curtime ) == NULL ) )
             {
                 msg_Warn( p_vout, "failed to get current time. Falling back to legacy snapshot naming" );
                 /* failed to get current time. Fallback to old format */
@@ -778,14 +778,14 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
             else
             {
                 char psz_curtime[15] ;
-                if( strftime( psz_curtime, 15, "%y%m%d-%H%M%S", curtime ) == 0 )
+                if( strftime( psz_curtime, 15, "%y%m%d-%H%M%S", &curtime ) == 0 )
                 {
                     msg_Warn( p_vout, "snapshot date string truncated" ) ;
                 }
                 if( asprintf( &psz_filename, "%s" DIR_SEP "%s%s%1u.%s",
                       val.psz_string, psz_prefix, psz_curtime,
                      /* suffix with the last decimal digit in 10s of seconds resolution */
-                     (unsigned int)(p_pic->date / 100*1000) & 0xFF,
+                     (unsigned int)(p_pic->date / (100*1000)) & 0xFF,
                       format.psz_string ) == -1 )
                 {
                     msg_Err( p_vout, "could not create snapshot" );
