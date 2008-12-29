@@ -66,7 +66,6 @@ class MainInterface : public QVLCMW
 {
     Q_OBJECT;
 
-    friend class VolumeClickHandler;
     friend class InteractionDialog;
     friend class PlaylistWidget;
 
@@ -87,7 +86,8 @@ public:
     int getControlsVisibilityStatus();
 
     /* Sizehint() */
-    QSize sizeHint() const;
+    virtual QSize sizeHint() const;
+
 protected:
 //    void resizeEvent( QResizeEvent * );
     void dropEvent( QDropEvent *);
@@ -105,8 +105,6 @@ private:
     QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
     FullscreenControllerWidget *fullscreenControls;
-    QMenu               *speedControlMenu;
-    SpeedControlWidget  *speedControl;
 
     void handleMainUi( QSettings* );
     void askForPrivacy();
@@ -115,9 +113,9 @@ private:
     /* Systray */
     void handleSystray();
     void createSystray();
+    void initSystray();
 
     void createStatusBar();
-    void initSystray();
 
     /* Video */
     VideoWidget         *videoWidget;
@@ -126,13 +124,13 @@ private:
     VisualSelector      *visualSelector;
     PlaylistWidget      *playlistWidget;
 
-    bool                 videoIsActive; ///< Having a video now / THEMIM->hasV
-    bool                 videoEmbeddedFlag; ///< Want an external Video Window
-    bool                 playlistVisible; ///< Is the playlist visible ?
+    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
+    bool                 videoEmbeddedFlag;   ///< Want an external Video Window
+    bool                 playlistVisible;     ///< Is the playlist visible ?
     bool                 visualSelectorEnabled;
     bool                 notificationEnabled; /// Systray Notifications
     bool                 bgWasVisible;
-    int                  i_visualmode; ///< Visual Mode
+    int                  i_visualmode;        ///< Visual Mode
     pl_dock_e            i_pl_dock;
     bool                 isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 

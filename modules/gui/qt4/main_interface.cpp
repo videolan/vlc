@@ -151,15 +151,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **************************/
     /* Connect the input manager to the GUI elements it manages */
 
-
     /**
      * Connects on nameChanged()
      * Those connects are not merged because different options can trigger
      * them down.
      */
     /* Naming in the controller statusbar */
-    CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
-             setName( QString ) );
+    CONNECT( THEMIM->getIM(), nameChanged( QString ),
+             this, setName( QString ) );
     /* and in the systray */
     if( sysTray )
     {
