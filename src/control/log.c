@@ -25,6 +25,7 @@
 #include "libvlc_internal.h"
 #include "../libvlc.h"
 #include <vlc/libvlc.h>
+#include <assert.h>
 
 /* This API is terminally broken.
  * First, it does not implement any kind of notification.

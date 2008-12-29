@@ -28,6 +28,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 #include "libvlc.h"
+#include <assert.h>
 
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,

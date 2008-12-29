@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include "clock.h"
+#include <assert.h>
 
 /* TODO:
  * - clean up locking once clock code is stable

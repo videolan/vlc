@@ -32,6 +32,7 @@
 #include <vlc_input.h>
 #include "input_internal.h"
 #include "event.h"
+#include <assert.h>
 
 static void Trigger( input_thread_t *p_input, int i_type );
 
