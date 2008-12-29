@@ -39,6 +39,8 @@
 #include <QPalette>
 #include <QResizeEvent>
 #include <QDate>
+#include <QMenu>
+#include <QWidgetAction>
 
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
@@ -280,6 +282,52 @@ void VisualSelector::next()
 }
 #endif
 
+SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString text )
+           : QLabel( text ), p_intf( _p_intf )
+{
+    setToolTip( qtr( "Current playback speed.\nRight click to adjust" ) );
+    setContextMenuPolicy ( Qt::CustomContextMenu );
+
+    /* Create the Speed Control Widget */
+    speedControl = new SpeedControlWidget( p_intf );
+    speedControlMenu = new QMenu( this );
+
+    QWidgetAction *widgetAction = new QWidgetAction( speedControl );
+    widgetAction->setDefaultWidget( speedControl );
+    speedControlMenu->addAction( widgetAction );
+
+    /* Speed Label behaviour:
+       - right click gives the vertical speed slider */
+    CONNECT( this, customContextMenuRequested( QPoint ),
+             this, showSpeedMenu( QPoint ) );
+
+    /* Change the SpeedRate in the Status Bar */
+    CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
+
+    // FIXME this is wrong but will work for some time.
+    CONNECT( THEMIM->getIM(), statusChanged( int ),
+             speedControl, activateOnState() );
+}
+
+/****************************************************************************
+ * Small right-click menu for rate control
+ ****************************************************************************/
+void SpeedLabel::showSpeedMenu( QPoint pos )
+{
+    speedControlMenu->exec( QCursor::pos() - pos
+                          + QPoint( 0, height() ) );
+}
+
+void SpeedLabel::setRate( int rate )
+{
+    QString str;
+    str.setNum( ( 1000 / (double)rate ), 'f', 2 );
+    str.append( "x" );
+    setText( str );
+    setToolTip( str );
+    speedControl->updateControls( rate );
+}
+
 /**********************************************************************
  * Speed control widget
  **********************************************************************/
@@ -317,14 +365,13 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
     speedControlLayout->addWidget( speedSlider );
     speedControlLayout->addWidget( normalSpeedButton );
     setLayout( speedControlLayout );
+
+    activateOnState();
 }
 
-SpeedControlWidget::~SpeedControlWidget()
-{}
-
-void SpeedControlWidget::setEnable( bool b_enable )
+void SpeedControlWidget::activateOnState()
 {
-    speedSlider->setEnabled( b_enable );
+    speedSlider->setEnabled( THEMIM->getIM()->hasInput() );
 }
 
 void SpeedControlWidget::updateControls( int rate )

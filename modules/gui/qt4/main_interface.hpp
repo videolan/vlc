@@ -139,8 +139,6 @@ private:
     input_thread_t      *p_input;    ///< Main input associated to the playlist
 
     /* Status Bar */
-    QLabel              *timeLabel;
-    QLabel              *speedLabel;
     QLabel              *nameLabel;
 
     virtual void customEvent( QEvent *);
@@ -164,7 +162,6 @@ private slots:
     void debug();
     void doComponentsUpdate();
     void setStatus( int );
-    void setRate( int );
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );
 #if 0
@@ -173,7 +170,6 @@ private slots:
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
-    void showSpeedMenu( QPoint );
     void updateRecentsMenu();
 signals:
     void askReleaseVideo( );

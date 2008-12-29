@@ -49,12 +49,12 @@
 #include <QSize>
 #include <QDate>
 
+#include <QMenu>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QLabel>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QWidgetAction>
 
 #include <assert.h>
 
@@ -151,8 +151,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **************************/
     /* Connect the input manager to the GUI elements it manages */
 
-    /* Change the SpeedRate in the Status Bar */
-    CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
     /**
      * Connects on nameChanged()
@@ -291,14 +289,11 @@ inline void MainInterface::createStatusBar()
      *  Status Bar  *
      ****************/
     /* Widgets Creation*/
-    timeLabel = new TimeLabel( p_intf );
+    TimeLabel *timeLabel = new TimeLabel( p_intf );
     nameLabel = new QLabel;
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
-    speedLabel = new SpeedLabel( p_intf, "1.00x" );
-    speedLabel->setToolTip(
-            qtr( "Current playback speed.\nRight click to adjust" ) );
-    speedLabel->setContextMenuPolicy ( Qt::CustomContextMenu );
+    SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x" );
 
     /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
@@ -315,11 +310,6 @@ inline void MainInterface::createStatusBar()
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
     CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
-
-    /* Speed Label behaviour:
-       - right click gives the vertical speed slider */
-    CONNECT( speedLabel, customContextMenuRequested( QPoint ),
-             this, showSpeedMenu( QPoint ) );
 }
 
 inline void MainInterface::initSystray()
@@ -382,14 +372,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
     mainLayout->insertWidget( 0, inputC, 0, Qt::AlignBottom );
-
-    /* Create the Speed Control Widget */
-    speedControl = new SpeedControlWidget( p_intf );
-    speedControlMenu = new QMenu( this );
-
-    QWidgetAction *widgetAction = new QWidgetAction( speedControl );
-    widgetAction->setDefaultWidget( speedControl );
-    speedControlMenu->addAction( widgetAction );
 
     /* Visualisation */
     /* Disabled for now, they SUCK */
@@ -587,15 +569,6 @@ void MainInterface::debug()
         msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     }
 #endif
-}
-
-/****************************************************************************
- * Small right-click menu for rate control
- ****************************************************************************/
-void MainInterface::showSpeedMenu( QPoint pos )
-{
-    speedControlMenu->exec( QCursor::pos() - pos
-                          + QPoint( 0, speedLabel->height() ) );
 }
 
 /****************************************************************************
@@ -859,21 +832,9 @@ void MainInterface::setStatus( int status )
 {
     msg_Dbg( p_intf, "Updating the stream status: %i", status );
 
-    speedControl->setEnable( THEMIM->getIM()->hasInput() );
-
     /* And in the systray for the menu */
     if( sysTray )
         QVLCMenu::updateSystrayMenu( this, p_intf );
-}
-
-void MainInterface::setRate( int rate )
-{
-    QString str;
-    str.setNum( ( 1000 / (double)rate ), 'f', 2 );
-    str.append( "x" );
-    speedLabel->setText( str );
-    speedLabel->setToolTip( str );
-    speedControl->updateControls( rate );
 }
 
 /*****************************************************************************

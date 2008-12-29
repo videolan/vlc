@@ -47,6 +47,7 @@ class ResizeEvent;
 class QPalette;
 class QPixmap;
 class QHBoxLayout;
+class QMenu;
 
 /******************** Video Widget ****************/
 class VideoWidget : public QFrame
@@ -153,16 +154,20 @@ class SpeedLabel : public QLabel
 {
     Q_OBJECT
 public:
-    SpeedLabel( intf_thread_t *_p_intf, const QString text ): QLabel( text )
-    { p_intf = _p_intf; }
+    SpeedLabel( intf_thread_t *, const QString );
 
 protected:
     virtual void mouseDoubleClickEvent ( QMouseEvent * event )
     {
         THEMIM->getIM()->setRate( INPUT_RATE_DEFAULT );
     }
+private slots:
+    void showSpeedMenu( QPoint );
+    void setRate( int );
 private:
     intf_thread_t *p_intf;
+    QMenu *speedControlMenu;
+    SpeedControlWidget *speedControl;
 };
 
 /******************** Speed Control Widgets ****************/
@@ -171,14 +176,13 @@ class SpeedControlWidget : public QFrame
     Q_OBJECT
 public:
     SpeedControlWidget( intf_thread_t *);
-    virtual ~SpeedControlWidget();
     void updateControls( int );
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;
 
 public slots:
-    void setEnable( bool );
+    void activateOnState();
 
 private slots:
     void updateRate( int );
