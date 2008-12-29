@@ -28,6 +28,8 @@
 
 #include "components/playlist/playlist.hpp"
 
+#include "util/qt_dirs.hpp"
+
 #include <QUrl>
 #include <QHBoxLayout>
 

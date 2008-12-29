@@ -27,7 +27,6 @@
 
 #include "qt4.hpp"
 
-#include <QAbstractSlider>
 #include <QSlider>
 
 #include <QMouseEvent>

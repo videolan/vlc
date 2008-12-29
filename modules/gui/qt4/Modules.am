@@ -259,6 +259,7 @@ noinst_HEADERS = \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
 	util/qvlcapp.hpp \
+	util/qt_dirs.hpp \
 	util/registry.hpp
 
 EXTRA_DIST += \

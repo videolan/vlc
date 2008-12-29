@@ -1,10 +1,10 @@
 /*****************************************************************************
- * qvlcapp.hpp : A few helpers
- *****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
+ * dirs.hpp : String Directory helpers
+ ****************************************************************************
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Jean-Baptiste Kempf <jb@videolan.org>
+ * Authors:       Jean-Baptiste Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +21,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#ifndef _QT_DIR_H_
+#define _QT_DIR_H_
 
-#ifndef _QVLC_APP_H_
-#define _QVLC_APP_H_
-
-#include <QApplication>
-#include <QEvent>
-
-class QVLCApp : public QApplication
+#include <QString>
+/* Replace separators on Windows because Qt is always using / */
+static inline QString toNativeSeparators( QString s )
 {
-public:
-    QVLCApp( int & argc, char ** argv, bool GUIenabled ) : QApplication( argc,
-            argv, GUIenabled ) {}
-
-#if defined(Q_WS_WIN)
-protected:
-    virtual bool winEventFilter( MSG *msg, long *result )
+#ifdef WIN32
+    for (int i=0; i<(int)s.length(); i++)
     {
-        switch( msg->message )
-        {
-            case 0x0319: /* WM_APPCOMMAND 0x0319 */
-                DefWindowProc( msg->hwnd, msg->message,
-                               msg->wParam, msg->lParam );
-                break;
-        }
-        return false;
+        if (s[i] == QLatin1Char('/'))
+            s[i] = QLatin1Char('\\');
     }
 #endif
-};
+    return s;
+}
+
+static inline QString removeTrailingSlash( QString s )
+{
+    if( ( s.length() > 1 ) && ( s[s.length()-1] == QLatin1Char( '/' ) ) )
+        s.remove( s.length() - 1, 1 );
+    return s;
+}
+
+#define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
 
 #endif
+

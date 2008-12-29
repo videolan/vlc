@@ -33,7 +33,7 @@
 #include "input_manager.hpp"
 
 #include "util/customwidgets.hpp"
-#include "util/qvlcapp.hpp" /* DialogEvent defintion */
+#include "util/qt_dirs.hpp"
 
 #include "components/interface_widgets.hpp"
 #include "components/controller.hpp"

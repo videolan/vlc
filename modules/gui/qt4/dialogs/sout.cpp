@@ -32,6 +32,7 @@
 #endif
 
 #include "dialogs/sout.hpp"
+#include "util/qt_dirs.hpp"
 
 #include <QString>
 #include <QFileDialog>

@@ -27,6 +27,7 @@
 #endif
 
 #include "dialogs/help.hpp"
+#include "util/qt_dirs.hpp"
 
 #include <vlc_about.h>
 #include <vlc_intf_strings.h>

@@ -115,27 +115,4 @@ struct intf_sys_t
 #define getSettings() p_intf->p_sys->mainSettings
 
 
-#include <QString>
-/* Replace separators on Windows because Qt is always using / */
-static inline QString toNativeSeparators( QString s )
-{
-#ifdef WIN32
-    for (int i=0; i<(int)s.length(); i++)
-    {
-        if (s[i] == QLatin1Char('/'))
-            s[i] = QLatin1Char('\\');
-    }
-#endif
-    return s;
-}
-
-static inline QString removeTrailingSlash( QString s )
-{
-    if( ( s.length() > 1 ) && ( s[s.length()-1] == QLatin1Char( '/' ) ) )
-        s.remove( s.length() - 1, 1 );
-    return s;
-}
-
-#define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
-
 #endif

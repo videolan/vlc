@@ -33,7 +33,7 @@
 #include "input_manager.hpp" /* Load Subtitles */
 #include "menus.hpp"
 #include "recents.hpp"
-#include "util/qvlcapp.hpp" /* DialogEvent */
+#include "util/qt_dirs.hpp"
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
