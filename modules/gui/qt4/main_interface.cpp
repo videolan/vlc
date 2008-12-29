@@ -364,7 +364,7 @@ void MainInterface::handleMainUi( QSettings *settings )
                    settings->value( "adv-controls", false ).toBool(), this );
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
-    InputControlsWidget *inputC = new InputControlsWidget( p_intf, this );
+    inputC = new InputControlsWidget( p_intf, this );
 
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
@@ -754,6 +754,7 @@ void MainInterface::toggleMinimalView()
     TOGGLEV( menuBar() );
     TOGGLEV( controls );
     TOGGLEV( statusBar() );
+    TOGGLEV( inputC );
     doComponentsUpdate();
 }
 

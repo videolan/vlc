@@ -44,6 +44,7 @@ class PlaylistWidget;
 class VisualSelector;
 class AdvControlsWidget;
 class ControlsWidget;
+class InputControlsWidget;
 class FullscreenControllerWidget;
 class SpeedControlWidget;
 class QMenu;
@@ -104,6 +105,7 @@ private:
     QString              input_name;
     QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
+    InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
 
     void handleMainUi( QSettings* );
