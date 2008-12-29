@@ -494,8 +494,22 @@ static int WriteMetaToId2v2( ID3v2::Tag* tag, input_item_t* p_item )
  * @param p_input: the input item
  * @return VLC_SUCCESS if everything goes ok
  */
-static int WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_input )
+static int WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
 {
+    char* psz_meta;
+#define WRITE( metaName, keyName )                      \
+    psz_meta = input_item_Get##metaName( p_item );      \
+    if( psz_meta )                                      \
+    {                                                   \
+        String key( keyName, String::UTF8 );            \
+        String value( psz_meta, String::UTF8 );         \
+        tag->addField( key, value, true );              \
+    }                                                   \
+    free( psz_meta );
+
+    WRITE( Copyright, "COPYRIGHT" );
+
+#undef WRITE
     return VLC_SUCCESS;
 }
 
