@@ -30,7 +30,6 @@
 
 #include "components/interface_widgets.hpp"
 
-#include "input_manager.hpp"     /* Rate control */
 #include "menus.hpp"             /* Popup menu on bgWidget */
 
 #include <vlc_vout.h>

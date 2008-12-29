@@ -30,9 +30,9 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include "qt4.hpp"
-#include "dialogs_provider.hpp"
+
+#include "dialogs_provider.hpp" /* Media Info from ArtLabel */
 #include "components/interface_widgets.hpp"
 
 #include <QSplitter>

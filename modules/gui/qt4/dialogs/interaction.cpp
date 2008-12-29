@@ -27,7 +27,6 @@
 
 #include "dialogs/errors.hpp"
 #include "dialogs/interaction.hpp"
-#include "main_interface.hpp"
 
 #include <QLabel>
 #include <QLineEdit>

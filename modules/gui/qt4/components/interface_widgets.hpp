@@ -30,8 +30,8 @@
 # include "config.h"
 #endif
 
-#include "main_interface.hpp"
-#include "input_manager.hpp"
+#include "main_interface.hpp" /* Interface integration */
+#include "input_manager.hpp"  /* Speed control */
 
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"

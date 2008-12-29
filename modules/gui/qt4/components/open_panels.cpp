@@ -33,7 +33,7 @@
 #include "qt4.hpp"
 #include "components/open_panels.hpp"
 #include "dialogs/open.hpp"
-#include "dialogs_provider.hpp"
+#include "dialogs_provider.hpp" /* Open Subtitle file */
 
 #include <QFileDialog>
 #include <QDialogButtonBox>

@@ -26,8 +26,6 @@
 
 #include "dialogs/gototime.hpp"
 
-#include "dialogs_provider.hpp"
-#include "main_interface.hpp"
 #include "input_manager.hpp"
 
 #include <QTabWidget>

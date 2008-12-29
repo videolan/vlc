@@ -22,13 +22,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "qt4.hpp"
 #include "input_manager.hpp"
-#include "dialogs_provider.hpp"
+
+#include <QApplication>
 
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
@@ -616,7 +618,6 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_Change( THEPL, "playlist-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
     IMEvent *event = new IMEvent( ItemChanged_Type, val.i_int);
     QApplication::postEvent( this, static_cast<QEvent*>(event) );
-
 }
 
 MainInputManager::~MainInputManager()

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extended.cpp : Extended controls - Undocked
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -26,9 +26,8 @@
 #endif
 
 #include "dialogs/extended.hpp"
-#include "dialogs_provider.hpp"
 
-#include "main_interface.hpp"
+#include "main_interface.hpp" /* Needed for external MI size */
 #include "input_manager.hpp"
 
 #include <QTabWidget>
@@ -92,7 +91,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     if( !restoreGeometry(getSettings()->value("EPanel/geometry").toByteArray()))
     {
         resize( QSize( 400, 280 ) );
-        
+
         MainInterface *p_mi = p_intf->p_sys->p_mi;
         if( p_mi )
             move( ( p_mi->x() - frameGeometry().width() - 10 ), p_mi->y() );

@@ -31,7 +31,6 @@
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
-#include "main_interface.hpp"
 #include "menus.hpp"
 #include "input_manager.hpp"
 #include "recents.hpp"

@@ -27,7 +27,6 @@
 #endif
 
 #include "dialogs/preferences.hpp"
-#include "dialogs_provider.hpp"
 #include "util/qvlcframe.hpp"
 
 #include "components/complete_preferences.hpp"
@@ -36,9 +35,7 @@
 #include <QHBoxLayout>
 #include <QGroupBox>
 #include <QRadioButton>
-#include <QVBoxLayout>
 #include <QPushButton>
-#include <QCheckBox>
 #include <QMessageBox>
 #include <QDialogButtonBox>
 

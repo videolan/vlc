@@ -26,18 +26,15 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include "dialogs/help.hpp"
+
+#include <vlc_common.h>
 #include <vlc_about.h>
+#include <vlc_intf_strings.h>
 
 #ifdef UPDATE_CHECK
-#include <vlc_update.h>
+# include <vlc_update.h>
 #endif
-
-#include "dialogs_provider.hpp"
-
-#include <vlc_intf_strings.h>
 
 #include <QTextBrowser>
 #include <QTabWidget>

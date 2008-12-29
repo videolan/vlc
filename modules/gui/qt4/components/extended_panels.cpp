@@ -36,7 +36,6 @@
 
 #include "components/extended_panels.hpp"
 #include "dialogs/preferences.hpp"
-#include "dialogs_provider.hpp"
 #include "qt4.hpp"
 #include "input_manager.hpp"
 

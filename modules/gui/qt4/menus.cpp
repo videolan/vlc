@@ -35,8 +35,9 @@
 
 #include <vlc_intf_strings.h>
 
-#include "main_interface.hpp"
 #include "menus.hpp"
+
+#include "main_interface.hpp"    /* View modifications */
 #include "dialogs_provider.hpp"
 #include "input_manager.hpp"
 #include "recents.hpp"

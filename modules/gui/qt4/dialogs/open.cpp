@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.cpp : Advanced open dialog
  *****************************************************************************
- * Copyright © 2006-2007 the VideoLAN team
+ * Copyright © 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
@@ -24,9 +24,10 @@
 # include "config.h"
 #endif
 
-#include "input_manager.hpp"
-
 #include "dialogs/open.hpp"
+
+#include "input_manager.hpp"
+#include "dialogs_provider.hpp"
 
 #include "recents.hpp"
 

@@ -25,9 +25,7 @@
 #endif
 
 #include "dialogs/messages.hpp"
-#include "dialogs_provider.hpp"
 
-#include <QSpacerItem>
 #include <QSpinBox>
 #include <QLabel>
 #include <QTextEdit>

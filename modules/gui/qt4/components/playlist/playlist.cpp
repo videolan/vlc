@@ -29,7 +29,9 @@
 #include "components/playlist/panels.hpp"
 #include "components/playlist/selector.hpp"
 #include "components/playlist/playlist.hpp"
+
 #include "input_manager.hpp" /* art signal */
+#include "main_interface.hpp" /* DropEvent TODO remove this*/
 
 #include <QSettings>
 #include <QLabel>
@@ -132,13 +134,12 @@ PlaylistWidget::~PlaylistWidget()
     msg_Dbg( p_intf, "Playlist Destroyed" );
 }
 
-#include "main_interface.hpp"
-void PlaylistWidget::dropEvent(QDropEvent *event)
+void PlaylistWidget::dropEvent( QDropEvent *event )
 {
     if( p_intf->p_sys->p_mi )
         p_intf->p_sys->p_mi->dropEventPlay( event, false );
 }
-void PlaylistWidget::dragEnterEvent(QDragEnterEvent *event)
+void PlaylistWidget::dragEnterEvent( QDragEnterEvent *event )
 {
     event->acceptProposedAction();
 }

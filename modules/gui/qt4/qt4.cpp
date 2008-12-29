@@ -35,11 +35,11 @@
 #include <QWaitCondition>
 
 #include "qt4.hpp"
-#include "dialogs_provider.hpp"
-#include "input_manager.hpp"
-#include "main_interface.hpp"
-#include "dialogs/help.hpp" /* update */
-#include "recents.hpp"
+#include "input_manager.hpp"    /* THEMIM creation */
+#include "dialogs_provider.hpp" /* THEDP creation */
+#include "main_interface.hpp"   /* MainInterface creation */
+#include "dialogs/help.hpp"     /* Launch Update */
+#include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"
 
 #ifdef HAVE_X11_XLIB_H

@@ -26,17 +26,10 @@
 
 #include "dialogs/playlist.hpp"
 
-#include "main_interface.hpp"
 #include "components/playlist/playlist.hpp"
-#include "dialogs_provider.hpp"
-#include "menus.hpp"
 
 #include <QUrl>
 #include <QHBoxLayout>
-#include <QSignalMapper>
-#include <QMenu>
-#include <QAction>
-#include <QMenuBar>
 
 PlaylistDialog *PlaylistDialog::instance = NULL;
 

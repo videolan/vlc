@@ -27,7 +27,6 @@
 
 #include "dialogs/mediainfo.hpp"
 #include "input_manager.hpp"
-#include "dialogs_provider.hpp"
 
 #include <QTabWidget>
 #include <QGridLayout>

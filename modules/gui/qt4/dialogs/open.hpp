@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 
 #include "util/qvlcframe.hpp"
-#include "dialogs_provider.hpp"
 #include "ui/open.h"
 #include "components/open_panels.hpp"
 

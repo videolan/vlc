@@ -33,7 +33,7 @@
 #include "components/controller_widget.hpp"
 #include "components/interface_widgets.hpp"
 
-#include "dialogs_provider.hpp"
+#include "dialogs_provider.hpp" /* Opening Dialogs */
 #include "input_manager.hpp"
 
 #include "util/input_slider.hpp" /* InputSlider */
