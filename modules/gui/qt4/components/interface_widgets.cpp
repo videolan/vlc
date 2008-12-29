@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface_widgets.cpp : Custom widgets for the main interface
  ****************************************************************************
- * Copyright ( C ) 2006 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -28,23 +28,15 @@
 # include "config.h"
 #endif
 
+#include "components/interface_widgets.hpp"
+
+#include "input_manager.hpp"     /* Rate control */
+#include "menus.hpp"             /* Popup menu on bgWidget */
+
 #include <vlc_vout.h>
 
-#include "dialogs_provider.hpp"
-#include "components/interface_widgets.hpp"
-#include "main_interface.hpp"
-#include "input_manager.hpp"
-#include "menus.hpp"
-#include "util/input_slider.hpp"
-#include "util/customwidgets.hpp"
-
 #include <QLabel>
-#include <QSpacerItem>
-#include <QCursor>
-#include <QPushButton>
 #include <QToolButton>
-#include <QHBoxLayout>
-#include <QMenu>
 #include <QPalette>
 #include <QResizeEvent>
 #include <QDate>
@@ -55,8 +47,6 @@
 #endif
 
 #include <math.h>
-
-#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
@@ -238,6 +228,9 @@ void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 }
 
 #if 0
+#include <QPushButton>
+#include <QHBoxLayout>
+
 /**********************************************************************
  * Visualization selector panel
  **********************************************************************/
@@ -304,10 +297,10 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
     speedSlider->setOrientation( Qt::Vertical );
     speedSlider->setTickPosition( QSlider::TicksRight );
 
-    speedSlider->setRange( -24, 24 );
+    speedSlider->setRange( -34, 34 );
     speedSlider->setSingleStep( 1 );
     speedSlider->setPageStep( 1 );
-    speedSlider->setTickInterval( 12 );
+    speedSlider->setTickInterval( 17 );
 
     CONNECT( speedSlider, valueChanged( int ), this, updateRate( int ) );
 
@@ -343,7 +336,7 @@ void SpeedControlWidget::updateControls( int rate )
         return;
     }
 
-    double value = 12 * log( (double)INPUT_RATE_DEFAULT / rate ) / log( 2 );
+    double value = 17 * log( (double)INPUT_RATE_DEFAULT / rate ) / log( 2 );
     int sliderValue = (int) ( ( value > 0 ) ? value + .5 : value - .5 );
 
     if( sliderValue < speedSlider->minimum() )
@@ -363,7 +356,7 @@ void SpeedControlWidget::updateControls( int rate )
 
 void SpeedControlWidget::updateRate( int sliderValue )
 {
-    double speed = pow( 2, (double)sliderValue / 12 );
+    double speed = pow( 2, (double)sliderValue / 17 );
     int rate = INPUT_RATE_DEFAULT / speed;
 
     THEMIM->getIM()->setRate(rate);
@@ -371,10 +364,8 @@ void SpeedControlWidget::updateRate( int sliderValue )
 
 void SpeedControlWidget::resetRate()
 {
-    THEMIM->getIM()->setRate(INPUT_RATE_DEFAULT);
+    THEMIM->getIM()->setRate( INPUT_RATE_DEFAULT );
 }
-
-
 
 static int downloadCoverCallback( vlc_object_t *p_this,
                                   char const *psz_var,

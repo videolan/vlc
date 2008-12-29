@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface_widgets.hpp : Custom widgets for the main interface
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -30,15 +30,13 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_interface.h>
-//#include <vlc_aout.h> Visualizer
-
-#include "qt4.hpp"
 #include "main_interface.hpp"
 #include "input_manager.hpp"
+
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
+
+//#include <vlc_aout.h> Visualizer
 
 #include <QWidget>
 #include <QFrame>
@@ -155,7 +153,7 @@ class SpeedLabel : public QLabel
 {
     Q_OBJECT
 public:
-    SpeedLabel( intf_thread_t *_p_intf, const QString text ): QLabel( text)
+    SpeedLabel( intf_thread_t *_p_intf, const QString text ): QLabel( text )
     { p_intf = _p_intf; }
 
 protected:
@@ -178,8 +176,10 @@ public:
 private:
     intf_thread_t *p_intf;
     QSlider *speedSlider;
+
 public slots:
     void setEnable( bool );
+
 private slots:
     void updateRate( int );
     void resetRate();
@@ -193,18 +193,22 @@ public:
                    vlc_object_t *p_this,
                    input_item_t *p_input = NULL );
     virtual ~CoverArtLabel()
-            { if( p_input ) vlc_gc_decref( p_input ); };
+    { if( p_input ) vlc_gc_decref( p_input ); }
 private:
     input_item_t *p_input;
     vlc_object_t *p_this;
+
     QString prevArt;
 
 public slots:
     void requestUpdate() { emit updateRequested(); };
     void update( input_item_t* p_item )
-            { if( p_input ) vlc_gc_decref( p_input );
-              if( ( p_input = p_item ) ) vlc_gc_incref( p_input );
-              requestUpdate(); }
+    {
+        if( p_input ) vlc_gc_decref( p_input );
+        if( ( p_input = p_item ) )
+            vlc_gc_incref( p_input );
+        requestUpdate();
+    }
 
 private slots:
     void doUpdate();
