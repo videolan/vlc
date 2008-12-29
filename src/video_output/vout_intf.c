@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include <dirent.h>                                             /* opendir() */
 #include <assert.h>
+#include <time.h>                                           /* strftime */
 
 #include <vlc_interface.h>
 #include <vlc_block.h>
@@ -757,17 +758,42 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else
         {
-            if( asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s",
+            struct tm*    curtime;
+            time_t        lcurtime ;
+            lcurtime = time( NULL ) ;
+            if ( ( (curtime = localtime( &lcurtime )) == NULL ) )
+            {
+                msg_Warn( p_vout, "failed to get current time. Falling back to legacy snapshot naming" );
+                /* failed to get current time. Fallback to old format */
+                if( asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s",
                           val.psz_string, psz_prefix,
                           (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
                           format.psz_string ) == -1 )
-            {
-                msg_Err( p_vout, "could not create snapshot" );
-                image_HandlerDelete( p_image );
-                return VLC_EGENERIC;
+                {
+                    msg_Err( p_vout, "could not create snapshot" );
+                    image_HandlerDelete( p_image );
+                    return VLC_EGENERIC;
+                }
             }
-        }
-
+            else
+            {
+                char psz_curtime[15] ;
+                if( strftime( psz_curtime, 15, "%y%m%d-%H%M%S", curtime ) == 0 )
+                {
+                    msg_Warn( p_vout, "snapshot date string truncated" ) ;
+                }
+                if( asprintf( &psz_filename, "%s" DIR_SEP "%s%s%1u.%s",
+                      val.psz_string, psz_prefix, psz_curtime,
+                     /* suffix with the last decimal digit in 10s of seconds resolution */
+                     (unsigned int)(p_pic->date / 100*1000) & 0xFF,
+                      format.psz_string ) == -1 )
+                {
+                    msg_Err( p_vout, "could not create snapshot" );
+                    image_HandlerDelete( p_image );
+                    return VLC_EGENERIC;
+                }
+            } //end if time() < 0
+        } //end snapshot sequential
         free( psz_prefix );
     }
     else // The user specified a full path name (including file name)
