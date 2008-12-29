@@ -169,7 +169,6 @@ private slots:
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
-    void updateRecentsMenu();
 signals:
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );

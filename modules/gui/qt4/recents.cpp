@@ -24,6 +24,7 @@
 
 #include "recents.hpp"
 #include "dialogs_provider.hpp"
+#include "menus.hpp"
 
 #include <QList>
 #include <QString>
@@ -76,7 +77,7 @@ void RecentsMRL::addRecent( const QString &mrl )
         if( stack->size() > RECENTS_LIST_SIZE )
             stack->takeLast();
     }
-    emit updated();
+    QVLCMenu::updateRecents( p_intf );
     save();
 }
 
@@ -85,7 +86,7 @@ void RecentsMRL::clear()
     if ( stack->isEmpty() )
         return;
     stack->clear();
-    emit updated();
+    QVLCMenu::updateRecents( p_intf );
     save();
 }
 

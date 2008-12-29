@@ -38,9 +38,6 @@ class RecentsMRL : public QObject
 {
     Q_OBJECT
 
-signals:
-    void updated();
-
 public:
     static RecentsMRL* getInstance( intf_thread_t* p_intf )
     {

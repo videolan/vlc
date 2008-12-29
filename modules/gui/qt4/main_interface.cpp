@@ -137,10 +137,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* StatusBar Creation */
     createStatusBar();
 
-    /* Recents menu updates */
-    CONNECT( RecentsMRL::getInstance( p_intf ), updated(),
-             this, updateRecentsMenu() );
-
     /********************
      * Input Manager    *
      ********************/
@@ -1140,11 +1136,3 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
      return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * updateRecentsMenu: event called by RecentsMRL
- *****************************************************************************/
-
-void MainInterface::updateRecentsMenu()
-{
-    QVLCMenu::updateRecents( p_intf );
-}
