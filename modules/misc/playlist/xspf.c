@@ -316,9 +316,9 @@ static char *assertUTF8URI( char *psz_name )
         return NULL;
 
     /** \todo check for a valid scheme part preceding the colon */
-    size_t i_delim = strcspn( psz_s, ":" );
-    if( i_delim != strlen( psz_s ) )
+    if( strstr( psz_s, "://") != NULL )
     {
+        size_t i_delim = strcspn( psz_s, ":" );
         i_delim++; /* skip the ':' */
         strncpy( psz_ret, psz_s, i_delim );
         psz_d = psz_ret + i_delim;
