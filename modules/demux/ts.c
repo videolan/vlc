@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 
 #include <ctype.h>
+#include <assert.h>
 
 #include <vlc_access.h> /* DVB-specific things */
 #include <vlc_demux.h>
