@@ -30,18 +30,10 @@
 # include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <fcntl.h>
-
 #include <vlc_common.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
+#include <assert.h>
 
 #include <vlc_codecs.h>
 #include "pes.h"

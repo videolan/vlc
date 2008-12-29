@@ -35,6 +35,7 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>
 #include <signal.h>
+#include <assert.h>
 
 #include <vlc_interface.h>
 #include <vlc_aout.h>
@@ -1726,7 +1727,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         psz_variable = "video-snapshot";
     }
     else
-        /* This case can't happend */
+        /* This case can't happen */
         assert( 0 );
 
     if( newval.psz_string && *newval.psz_string )

@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
+#include <assert.h>
 
 /*****************************************************************************
  * Module descriptor

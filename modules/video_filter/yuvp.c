@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include "vlc_filter.h"
+#include <assert.h>
 
 /* TODO:
  *  Add anti-aliasing support (specially for DVD where only 4 colors are used)
