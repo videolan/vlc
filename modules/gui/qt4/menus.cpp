@@ -31,16 +31,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include <vlc_intf_strings.h>
 
 #include "menus.hpp"
 
 #include "main_interface.hpp"    /* View modifications */
-#include "dialogs_provider.hpp"
-#include "input_manager.hpp"
-#include "recents.hpp"
+#include "dialogs_provider.hpp"  /* Dialogs display */
+#include "input_manager.hpp"     /* Input Management */
+#include "recents.hpp"           /* Recent Items */
 
 #include <QMenu>
 #include <QMenuBar>

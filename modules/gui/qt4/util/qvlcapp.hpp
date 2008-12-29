@@ -50,21 +50,5 @@ protected:
 #endif
 };
 
-class DialogEvent : public QEvent
-{
-public:
-    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
-                 QEvent( (QEvent::Type)(DialogEvent_Type) )
-    {
-        i_dialog = _i_dialog;
-        i_arg = _i_arg;
-        p_arg = _p_arg;
-    };
-    virtual ~DialogEvent() { delete p_arg; };
-
-    int i_arg, i_dialog;
-    intf_dialog_args_t *p_arg;
-};
-
 
 #endif

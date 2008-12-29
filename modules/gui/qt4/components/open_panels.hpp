@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.hpp : Panels for the open dialogs
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  * $Id$
@@ -32,16 +32,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
-#include <QFileDialog>
+#include "components/preferences_widgets.hpp"
 
 #include "ui/open_file.h"
 #include "ui/open_disk.h"
 #include "ui/open_net.h"
 #include "ui/open_capture.h"
 
-#include "components/preferences_widgets.hpp"
+#include <QFileDialog>
 
 #include <limits.h>
 
@@ -61,7 +59,6 @@ enum
     RTMP_PROTO
 };
 
-
 enum
 {
     V4L_DEVICE,
@@ -76,7 +73,6 @@ enum
 
 static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
                                        "dshow", "screen", "jack" };
-
 
 class QWidget;
 class QLineEdit;

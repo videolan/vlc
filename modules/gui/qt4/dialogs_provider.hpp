@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dialogs_provider.hpp : Dialogs provider
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -30,12 +30,10 @@
 #endif
 
 #include <assert.h>
-#include <vlc_common.h>
-#include <vlc_interface.h>
 
 #include "qt4.hpp"
-#include "dialogs/interaction.hpp"
-#include "dialogs/open.hpp"
+
+#include <QObject>
 
 #define ADD_FILTER_MEDIA( string )     \
     string += qtr( "Media Files" );    \
@@ -72,6 +70,13 @@ enum {
     EXT_FILTER_AUDIO     =  0x04,
     EXT_FILTER_PLAYLIST  =  0x08,
     EXT_FILTER_SUBTITLE  =  0x10,
+};
+
+enum {
+    DialogEvent_Type = QEvent::User + DialogEventType + 1,
+    //PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
+    //PLDockEvent_Type = QEvent::User + DialogEventType + 3;
+    SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4,
 };
 
 class QEvent;
@@ -186,5 +191,22 @@ private slots:
     void menuUpdateAction( QObject * );
     void SDMenuAction( QString );
 };
+
+class DialogEvent : public QEvent
+{
+public:
+    DialogEvent( int _i_dialog, int _i_arg, intf_dialog_args_t *_p_arg ) :
+                 QEvent( (QEvent::Type)(DialogEvent_Type) )
+    {
+        i_dialog = _i_dialog;
+        i_arg = _i_arg;
+        p_arg = _p_arg;
+    };
+    virtual ~DialogEvent() { delete p_arg; };
+
+    int i_arg, i_dialog;
+    intf_dialog_args_t *p_arg;
+};
+
 
 #endif

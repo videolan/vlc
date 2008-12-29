@@ -28,12 +28,12 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
+#include "qt4.hpp"
+
 #include <vlc_input.h>
 #include <vlc_playlist.h>
-#include "playlist_item.hpp"
 
-#include "qt4.hpp"
+#include "playlist_item.hpp"
 
 #include <QModelIndex>
 #include <QObject>

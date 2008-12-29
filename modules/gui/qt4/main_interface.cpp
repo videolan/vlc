@@ -28,37 +28,37 @@
 #endif
 
 #include "qt4.hpp"
+
 #include "main_interface.hpp"
 #include "input_manager.hpp"
-#include "util/qvlcframe.hpp"
-#include "util/qvlcapp.hpp"
+
 #include "util/customwidgets.hpp"
+#include "util/qvlcapp.hpp" /* DialogEvent defintion */
+
 #include "components/interface_widgets.hpp"
 #include "components/controller.hpp"
 #include "components/playlist/playlist.hpp"
-#include "dialogs/extended.hpp"
-#include "dialogs/playlist.hpp"
+
 #include "menus.hpp"
 #include "recents.hpp"
 
-#include <QMenuBar>
 #include <QCloseEvent>
-#include <QPushButton>
-#include <QStatusBar>
 #include <QKeyEvent>
+
 #include <QUrl>
-#include <QSystemTrayIcon>
 #include <QSize>
-#include <QMenu>
-#include <QLabel>
-#include <QSlider>
-#include <QWidgetAction>
-#include <QToolBar>
-#include <QGroupBox>
 #include <QDate>
 
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QLabel>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QWidgetAction>
+
 #include <assert.h>
-#include <vlc_keys.h>
+
+#include <vlc_keys.h> /* Wheel event */
 #include <vlc_vout.h>
 
 /* Callback prototypes */

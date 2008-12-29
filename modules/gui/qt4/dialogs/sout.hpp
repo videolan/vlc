@@ -28,7 +28,7 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
+#include <vlc_common.h> /* Gettext functions */
 
 #include "ui/sout.h"
 #include "util/qvlcframe.hpp"

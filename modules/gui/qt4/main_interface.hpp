@@ -26,10 +26,9 @@
 #define _MAIN_INTERFACE_H_
 
 #include "qt4.hpp"
-#include "util/qvlcframe.hpp"
-#include "components/preferences_widgets.hpp"
 
-#include <vlc_aout.h>
+#include "util/qvlcframe.hpp"
+#include "components/preferences_widgets.hpp" /* First Start */
 
 #include <QSystemTrayIcon>
 

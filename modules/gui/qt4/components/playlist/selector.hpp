@@ -28,10 +28,9 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <QWidget>
-#include <QString>
 #include "components/playlist/playlist_model.hpp"
+
+#include <QWidget>
 
 class QTreeView;
 class PlaylistWidget;

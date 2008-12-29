@@ -30,8 +30,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include "qt4.hpp"
 #include <assert.h>
 
@@ -47,7 +45,6 @@
 #include <QPushButton>
 #include <QVector>
 #include <QDialog>
-
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -386,7 +383,7 @@ public:
     virtual QString getValue();
     virtual void hide() { combo->hide(); if( label ) label->hide(); }
     virtual void show() { combo->show(); if( label ) label->show(); }
-	QComboBox *combo;
+    QComboBox *combo;
 private:
     void finish(module_config_t *, bool );
     QLabel *label;

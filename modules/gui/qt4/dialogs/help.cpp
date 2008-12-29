@@ -28,7 +28,6 @@
 
 #include "dialogs/help.hpp"
 
-#include <vlc_common.h>
 #include <vlc_about.h>
 #include <vlc_intf_strings.h>
 

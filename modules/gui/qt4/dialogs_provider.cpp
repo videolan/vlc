@@ -26,15 +26,14 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include <vlc_intf_strings.h>
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
+#include "input_manager.hpp" /* Load Subtitles */
 #include "menus.hpp"
-#include "input_manager.hpp"
 #include "recents.hpp"
-#include "util/qvlcapp.hpp"
+#include "util/qvlcapp.hpp" /* DialogEvent */
 
 /* The dialogs */
 #include "dialogs/playlist.hpp"
@@ -51,6 +50,7 @@
 #include "dialogs/podcast_configuration.hpp"
 #include "dialogs/toolbar.hpp"
 #include "dialogs/plugins.hpp"
+#include "dialogs/interaction.hpp"
 
 #include <QEvent>
 #include <QApplication>

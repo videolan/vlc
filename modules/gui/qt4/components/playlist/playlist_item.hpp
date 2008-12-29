@@ -28,9 +28,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_input.h>
-#include <vlc_playlist.h>
 #include "components/playlist/playlist_model.hpp"
 
 #include <QString>

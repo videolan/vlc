@@ -28,8 +28,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #include "qt4.hpp"
 #include "components/playlist/playlist.hpp"
 

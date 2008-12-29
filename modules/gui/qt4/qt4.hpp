@@ -51,18 +51,9 @@ enum {
     PLEventType     = 200
 };
 
-enum {
-    DialogEvent_Type = QEvent::User + DialogEventType + 1,
-    //PLUndockEvent_Type = QEvent::User + DialogEventType + 2;
-    //PLDockEvent_Type = QEvent::User + DialogEventType + 3;
-    SetVideoOnTopEvent_Type = QEvent::User + DialogEventType + 4,
-};
-
 class QApplication;
 class QMenu;
 class MainInterface;
-class DialogsProvider;
-class VideoWidget;
 class QSettings;
 
 struct intf_sys_t

@@ -30,16 +30,18 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#include <QWidget>
 
 #include "ui/sprefs_input.h"
 #include "ui/sprefs_audio.h"
 #include "ui/sprefs_video.h"
 #include "ui/sprefs_subtitles.h"
 #include "ui/sprefs_interface.h"
+
 #ifdef WIN32
-#include "util/registry.hpp"
+# include "util/registry.hpp"
 #endif
+
+#include <QWidget>
 
 enum {
     SPrefsInterface = 0,

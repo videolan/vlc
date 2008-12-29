@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +29,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
 #include <vlc_input.h>
 
 #include "qt4.hpp"
