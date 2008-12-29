@@ -128,7 +128,7 @@ void CAtmoConfig::LoadDefaults() {
 
     clearAllChannelMappings();
     m_CurrentChannelAssignment = 0;
-    tChannelAssignment *temp = temp = new tChannelAssignment;
+    tChannelAssignment* temp = new tChannelAssignment;
     temp->system = true;
     for(int i=0;i<ATMO_NUM_CHANNELS;i++)
         temp->mappings[i] = i;
