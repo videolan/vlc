@@ -1825,6 +1825,7 @@ static void *FadeToColorThread(vlc_object_t *obj)
     /* call indirect to OleUnitialize() for this thread */
     AtmoFinalize(p_fadethread->p_filter, 0);
     vlc_restorecancel (canc);
+    return NULL;
 }
 
 /*****************************************************************************
