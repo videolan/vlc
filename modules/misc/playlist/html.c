@@ -31,6 +31,7 @@
 #include <vlc_meta.h>
 #include <vlc_strings.h>
 
+#include <assert.h>
 
 
 // Export the playlist in HTML
