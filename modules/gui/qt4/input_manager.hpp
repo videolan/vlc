@@ -48,6 +48,8 @@ enum {
     InterfaceVoutUpdate_Type,
     StatisticsUpdate_Type,
     MetaChanged_Type,
+    NameChanged_Type,
+    InfoChanged_Type,
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
@@ -107,11 +109,10 @@ private:
     void delCallbacks();
 
     void UpdateRate();
-    void UpdateMeta();
+    void UpdateName();
     void UpdateStatus();
     void UpdateNavigation();
     void UpdatePosition();
-    void UpdateSPU();
     void UpdateTeletext();
     void UpdateArt();
     void UpdateVout();

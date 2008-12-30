@@ -80,7 +80,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     {
         vlc_object_hold( p_input );
         emit statusChanged( PLAYING_S );
-        UpdateMeta();
+        UpdateName();
         UpdateArt();
         UpdateTeletext();
         UpdateNavigation();
@@ -117,6 +117,8 @@ void InputManager::delInput()
         emit artChanged( NULL );
         emit rateChanged( INPUT_RATE_DEFAULT );
         emit voutChanged( false );
+        emit chapterChanged( 0 );
+        emit titleChanged( 0 );
         vlc_object_release( p_input );
         p_input = NULL;
         UpdateTeletext();
@@ -150,7 +152,9 @@ void InputManager::customEvent( QEvent *event )
          i_type != ItemStateChanged_Type &&
          i_type != StatisticsUpdate_Type &&
          i_type != InterfaceVoutUpdate_Type &&
-         i_type != MetaChanged_Type )
+         i_type != MetaChanged_Type &&
+         i_type != NameChanged_Type &&
+         i_type != InfoChanged_Type )
         return;
 
     if( !hasInput() ) return;
@@ -162,7 +166,9 @@ void InputManager::customEvent( QEvent *event )
           i_type != ItemStateChanged_Type &&
           i_type != StatisticsUpdate_Type &&
           i_type != InterfaceVoutUpdate_Type &&
-          i_type != MetaChanged_Type
+          i_type != MetaChanged_Type &&
+          i_type != NameChanged_Type &&
+          i_type != InfoChanged_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
@@ -181,29 +187,37 @@ void InputManager::customEvent( QEvent *event )
         UpdateStats();
         break;
     case ItemChanged_Type:
-        UpdateMeta();
         UpdateStatus();
-        UpdateArt();
-        break;
-    case MetaChanged_Type:
-        UpdateMeta();
-        UpdateArt();
+        // UpdateName();
+        // UpdateArt();
         break;
     case ItemStateChanged_Type:
+        // TODO: Fusion with above state
         UpdateStatus();
-        UpdateNavigation();
-        UpdateMeta();
-        UpdateTeletext();
+        // UpdateName();
+        // UpdateNavigation(); This shouldn't be useful now
+        // UpdateTeletext(); Same
+        break;
+    case NameChanged_Type:
+        UpdateName();
+        break;
+    case MetaChanged_Type:
+        UpdateName(); /* Needed for NowPlaying */
+//        UpdateMeta();
+        UpdateArt();
+        break;
+    case InfoChanged_Type:
+//        UpdateInfo();
         break;
     case ItemTitleChanged_Type:
         UpdateNavigation();
-        UpdateMeta();
+        UpdateName(); /* Display the name of the Chapter */
         break;
     case ItemRateChanged_Type:
         UpdateRate();
         break;
     case ItemEsChanged_Type:
-        UpdateSPU();
+        // We don't do anything. Why ?
         break;
     case ItemTeletextChanged_Type:
         UpdateTeletext();
@@ -276,7 +290,7 @@ void InputManager::UpdateRate()
     }
 }
 
-void InputManager::UpdateMeta()
+void InputManager::UpdateName()
 {
     /* Update text, name and nowplaying */
     QString text;
@@ -323,7 +337,7 @@ void InputManager::UpdateMeta()
     if( oldName != text )
     {
         emit nameChanged( text );
-        oldName=text;
+        oldName = text;
     }
 }
 
@@ -336,11 +350,6 @@ bool InputManager::hasAudio()
         return val.i_int > 0;
     }
     return false;
-}
-
-void InputManager::UpdateSPU()
-{
-    UpdateTeletext();
 }
 
 void InputManager::UpdateTeletext()
@@ -745,7 +754,7 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         break;
 
     case INPUT_EVENT_TITLE:
-    case INPUT_EVENT_CHAPTER: /* TODO is that correct ? */
+    case INPUT_EVENT_CHAPTER:
         event = new IMEvent( ItemTitleChanged_Type, 0 );
         break;
 
@@ -764,10 +773,14 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( StatisticsUpdate_Type, 0 );
         break;
 
-    case INPUT_EVENT_ITEM_META:
-    case INPUT_EVENT_ITEM_INFO:
-    case INPUT_EVENT_ITEM_NAME:
+    case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
         event = new IMEvent( MetaChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_ITEM_INFO: /* Codec Info */
+        event = new IMEvent( InfoChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_ITEM_NAME:
+        event = new IMEvent( NameChanged_Type, 0 );
         break;
 
     case INPUT_EVENT_PROGRAM:

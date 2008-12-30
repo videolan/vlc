@@ -174,8 +174,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Status on the systray */
     if( sysTray )
     {
-        CONNECT( THEMIM->getIM(), statusChanged( int ), this,
-                 updateSystrayTooltipStatus( int ) );
+        CONNECT( THEMIM->getIM(), statusChanged( int ),
+                 this, updateSystrayTooltipStatus( int ) );
     }
 
     /* END CONNECTS ON IM */
