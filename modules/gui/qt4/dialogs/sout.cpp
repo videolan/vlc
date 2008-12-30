@@ -512,7 +512,7 @@ void SoutDialog::updateMRL()
 #define SMUX( x, txt ) if( ui.x->isChecked() ) sout.psz_mux = strdup( txt );
     SMUX( PSMux, "ps" );
     SMUX( TSMux, "ts" );
-    SMUX( MPEG1Mux, "mpeg" );
+    SMUX( MPEG1Mux, "mpeg1" );
     SMUX( OggMux, "ogg" );
     SMUX( ASFMux, "asf" );
     SMUX( MP4Mux, "mp4" );
