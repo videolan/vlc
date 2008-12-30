@@ -218,6 +218,9 @@ static int Open( vlc_object_t *p_this )
     int i_aspect;
     int result = 0;
 
+    if( strncmp(p_demux->psz_access, "dc1394", 6) != 0 )
+        return VLC_EGENERIC;
+
     /* Set up p_demux */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -833,9 +836,6 @@ static int process_options( demux_t *p_demux )
     char *token = NULL;
     char *state = NULL;
     float rate_f;
-
-    if( strncmp(p_demux->psz_access, "dc1394", 6) != 0 )
-        return VLC_EGENERIC;
 
     psz_dup = strdup( p_demux->psz_path );
     psz_parser = psz_dup;
