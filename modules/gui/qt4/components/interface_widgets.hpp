@@ -175,7 +175,7 @@ class SpeedControlWidget : public QFrame
 {
     Q_OBJECT
 public:
-    SpeedControlWidget( intf_thread_t *);
+    SpeedControlWidget( intf_thread_t *, QWidget * );
     void updateControls( int );
 private:
     intf_thread_t *p_intf;

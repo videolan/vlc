@@ -289,7 +289,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString text )
     setContextMenuPolicy ( Qt::CustomContextMenu );
 
     /* Create the Speed Control Widget */
-    speedControl = new SpeedControlWidget( p_intf );
+    speedControl = new SpeedControlWidget( p_intf, this );
     speedControlMenu = new QMenu( this );
 
     QWidgetAction *widgetAction = new QWidgetAction( speedControl );
@@ -304,8 +304,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString text )
     /* Change the SpeedRate in the Status Bar */
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
-    // FIXME this is wrong but will work for some time.
-    CONNECT( THEMIM->getIM(), statusChanged( int ),
+    CONNECT( THEMIM, inputChanged( input_thread_t * ),
              speedControl, activateOnState() );
 }
 
@@ -331,8 +330,8 @@ void SpeedLabel::setRate( int rate )
 /**********************************************************************
  * Speed control widget
  **********************************************************************/
-SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i ) :
-                             QFrame( NULL ), p_intf( _p_i )
+SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
+                    : QFrame( _parent ), p_intf( _p_i )
 {
     QSizePolicy sizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
     sizePolicy.setHorizontalStretch( 0 );
@@ -523,8 +522,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
    setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
 
 
-   CONNECT( THEMIM->getIM(), statusChanged( int ),
-            this, setStatus( int ) );
+/*   CONNECT( THEMIM->getIM(), statusChanged( int ),
+            this, setStatus( int ) ); Remove */
    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplayPosition( float, int, int ) );
 }
@@ -549,7 +548,7 @@ void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
 }
-
+/* This is wrong remove */
 void TimeLabel::setStatus( int i_status )
 {
     msg_Warn( p_intf, "Status: %i", i_status );
