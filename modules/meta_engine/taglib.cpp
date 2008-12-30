@@ -332,6 +332,13 @@ static int ReadMetaFromId2v2( ID3v2::Tag* tag, vlc_meta_t* p_meta )
  */
 static int ReadMetaFromXiph( Ogg::XiphComment* tag, vlc_meta_t* p_meta )
 {
+#define SET( metaName, keyName )                                               \
+    StringList list = tag->fieldListMap()[keyName];                            \
+    if( !list.isEmpty() )                                                      \
+        vlc_meta_Set##metaName( p_meta, (*list.begin()).toCString( true ) );
+
+    SET( Copyright, "COPYRIGHT" );
+#undef SET
     return VLC_SUCCESS;
 }
 
