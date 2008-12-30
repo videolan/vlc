@@ -358,12 +358,11 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
 
     CONNECT( normalSpeedButton, clicked(), this, resetRate() );
 
-    QVBoxLayout *speedControlLayout = new QVBoxLayout;
+    QVBoxLayout *speedControlLayout = new QVBoxLayout( this );
     speedControlLayout->setLayoutMargins( 4, 4, 4, 4, 4 );
     speedControlLayout->setSpacing( 4 );
     speedControlLayout->addWidget( speedSlider );
     speedControlLayout->addWidget( normalSpeedButton );
-    setLayout( speedControlLayout );
 
     activateOnState();
 }
