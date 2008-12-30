@@ -45,6 +45,7 @@
 #include <QFileDialog>
 #include <QDate>
 
+#include <assert.h>
 
 HelpDialog *HelpDialog::instance = NULL;
 
