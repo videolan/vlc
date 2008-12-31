@@ -1,7 +1,16 @@
 Index: configure.ac
 ===================================================================
---- configure.ac	(revision 1157)
+--- configure.ac	(revision 1162)
 +++ configure.ac	(working copy)
+@@ -18,7 +18,7 @@
+ m4_define([dvdread_pre],   [])
+ 
+ AC_INIT([libdvdread], [dvdread_major.dvdread_minor.dvdread_sub[]dvdread_pre])
+-AC_CONFIG_SRCDIR([src/dvd_reader.h])
++AC_CONFIG_SRCDIR([src/dvdread/dvd_reader.h])
+ AM_INIT_AUTOMAKE([1.6])
+ 
+ dnl create a config.h file (Automake will add -DHAVE_CONFIG_H)
 @@ -137,27 +137,59 @@
  dnl ---------------------------------------------
  dnl dynamic linker
