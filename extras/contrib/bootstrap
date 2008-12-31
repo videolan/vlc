@@ -156,13 +156,14 @@ case $HOST in
         echo "HAVE_DARWIN_9 = 1" >> config.mak
         HAVE_DARWIN_9=1
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
-        EXTRA_CFLAGS=" -D\${ENVP} -mmacosx-version-min=\${SDK_TARGET}"
+        EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
+        EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         if test -z "$CONTRIBS_CC_LLVM"; then
-            CC="gcc -isysroot \${MACOSX_SDK}"
-            CXX="g++ -isysroot \${MACOSX_SDK}"
+            CC="gcc"
+            CXX="g++"
         else
-            CC="/Developer/usr/llvm-gcc-4.2/bin/powerpc-apple-darwin9-llvm-gcc-4.2 -isysroot \${MACOSX_SDK}"
-            CXX="/Developer/usr/llvm-gcc-4.2/bin/powerpc-apple-darwin9-llvm-g++-4.2 -isysroot \${MACOSX_SDK}"
+            CC="/Developer/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
+            CXX="/Developer/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
         fi
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin:" >> config.mak
@@ -199,11 +200,11 @@ case $HOST in
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         if test -z "$CONTRIBS_CC_LLVM"; then
-            CC="gcc -isysroot \${MACOSX_SDK}"
-            CXX="g++ -isysroot \${MACOSX_SDK}"
+            CC="gcc"
+            CXX="g++"
         else
-            CC="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-gcc-4.2 -isysroot \${MACOSX_SDK}"
-            CXX="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-g++-4.2 -isysroot \${MACOSX_SDK}"
+            CC="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-gcc-4.2"
+            CXX="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-g++-4.2"
         fi
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak

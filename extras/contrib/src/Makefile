@@ -149,6 +149,7 @@ endif
 
 ifdef HAVE_DARWIN_OS
 X264CONF += --enable-pic
+FFMPEGCONF += --cc=$(CC)
 FFMPEGCONF += --arch=$(ARCH)
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
