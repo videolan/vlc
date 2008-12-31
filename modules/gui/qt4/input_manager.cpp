@@ -101,38 +101,46 @@ void InputManager::setInput( input_thread_t *_p_input )
    p_input is released once here */
 void InputManager::delInput()
 {
-    if( p_input )
-    {
-        delCallbacks();
-        i_old_playing_status = END_S;
-        i_input_id = 0;
-        oldName    = "";
-        artUrl     = "";
-        b_video    = false;
-        timeA      = 0;
-        timeB      = 0;
-        emit positionUpdated( -1.0, 0 ,0 );
-        emit statusChanged( END_S );
-        emit nameChanged( "" );
-        emit artChanged( NULL );
-        emit rateChanged( INPUT_RATE_DEFAULT );
-        emit voutChanged( false );
-        emit chapterChanged( 0 );
-        emit titleChanged( 0 );
-        vlc_object_release( p_input );
-        p_input = NULL;
-        UpdateTeletext();
-    }
+    if( !p_input ) return;
+
+    delCallbacks();
+    i_old_playing_status = END_S;
+    i_input_id           = 0;
+    oldName              = "";
+    artUrl               = "";
+    b_video              = false;
+    timeA                = 0;
+    timeB                = 0;
+
+    emit positionUpdated( -1.0, 0 ,0 );
+    emit rateChanged( INPUT_RATE_DEFAULT ); /* TODO: Do we want this ? */
+    emit nameChanged( "" );
+    emit chapterChanged( 0 );
+    emit titleChanged( 0 );
+    emit statusChanged( END_S );
+
+    /* Reset InfoPanels but stats */
+    emit artChanged( NULL );
+    emit infoChanged( NULL );
+    emit metaChanged( NULL );
+
+    emit teletextPossible( false );
+    emit voutChanged( false );
+
+// FIXME    emit AtoBchanged( );
+    vlc_object_release( p_input ); /* FIXME: Can't we release sooner ? */
+
+    p_input = NULL;
 }
 
 /* Add the callbacks on Input. Self explanatory */
-void InputManager::addCallbacks()
+inline void InputManager::addCallbacks()
 {
     var_AddCallback( p_input, "intf-event", InputEvent, this );
 }
 
 /* Delete the callbacks on Input. Self explanatory */
-void InputManager::delCallbacks()
+inline void InputManager::delCallbacks()
 {
     var_DelCallback( p_input, "intf-event", InputEvent, this );
 }

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mediainfo.cpp : Information about an item
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -21,6 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -89,19 +90,33 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
     CONNECT( MP, editing(), saveMetaButton, show() );
 
+    /* Display the buttonBar according to the Tab selected */
     CONNECT( infoTabW, currentChanged( int ), this, updateButtons( int ) );
 
     /* If using the General Mode */
     if( isMainInputInfo )
     {
         msg_Dbg( p_intf, "Using a general info windows" );
+        /**
+         * Connects on the various signals of input_Manager
+         * For the currently playing element
+         **/
+        CONNECT( THEMIM, infoChanged( input_item_t* ),
+                 IP, update( input_item_t* ) );
+        CONNECT( THEMIM, metaChanged( input_item_t* ),
+                 MP, update( input_item_t* ) );
+        CONNECT( THEMIM, metaChanged( input_item_t* ),
+                 EMP, update( input_item_t* ) );
+        CONNECT( THEMIM, statisticsUpdated( input_item_t* ),
+                 ISP, update( input_item_t* ) );
+
         if( THEMIM->getInput() )
             p_item = input_GetItem( THEMIM->getInput() );
     }
     else
         msg_Dbg( p_intf, "Using an item specific info windows" );
 
-    /* Call update at start, so info is shown for a running input */
+    /* Call update at start, so info is filled up at begginning */
     if( p_item )
         updateAllTabs( p_item );
 
@@ -131,8 +146,7 @@ void MediaInfoDialog::updateAllTabs( input_item_t *p_item )
     MP->update( p_item );
     EMP->update( p_item );
 
-    if( isMainInputInfo )
-        ISP->update( p_item );
+    if( isMainInputInfo ) ISP->update( p_item );
 }
 
 void MediaInfoDialog::clearAllTabs()
@@ -140,6 +154,7 @@ void MediaInfoDialog::clearAllTabs()
     IP->clear();
     MP->clear();
     EMP->clear();
+
     if( isMainInputInfo ) ISP->clear();
 }
 

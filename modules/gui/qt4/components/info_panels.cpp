@@ -22,6 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -30,9 +31,9 @@
 #include "components/info_panels.hpp"
 #include "components/interface_widgets.hpp"
 
+#include <assert.h>
+
 #include <QTreeWidget>
-#include <QListView>
-#include <QPushButton>
 #include <QHeaderView>
 #include <QList>
 #include <QStringList>
@@ -40,7 +41,6 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QSpinBox>
-#include <QTabWidget>
 
 /************************************************************************
  * Single panels
@@ -153,13 +153,13 @@ MetaPanel::MetaPanel( QWidget *parent,
     b_inEditMode = false;
 }
 
-MetaPanel::~MetaPanel(){}
-
 /**
  * Update all the MetaData and art on an "item-changed" event
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
+    if( !p_item ) clear();
+
     /* Don't update if you are in edit mode */
     if( b_inEditMode ) return;
     else p_input = p_item;
@@ -354,6 +354,8 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
  **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
+    if( !p_item ) clear();
+
     QStringList tempItem;
     QList<QTreeWidgetItem *> items;
 
@@ -418,15 +420,13 @@ InfoPanel::InfoPanel( QWidget *parent,
      layout->addWidget(InfoTree, 1, 0 );
 }
 
-InfoPanel::~InfoPanel()
-{
-}
-
 /**
  * Update the Codecs information on parent->update()
  **/
 void InfoPanel::update( input_item_t *p_item)
 {
+    if( !p_item ) clear();
+
     InfoTree->clear();
     QTreeWidgetItem *current_item = NULL;
     QTreeWidgetItem *child_item = NULL;
@@ -546,13 +546,6 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     StatsTree->setColumnWidth( 1 , 200 );
 
     layout->addWidget(StatsTree, 1, 0 );
-
-    CONNECT( THEMIM->getIM() , statisticsUpdated( input_item_t* ),
-            this, update( input_item_t* ) );
-}
-
-InputStatsPanel::~InputStatsPanel()
-{
 }
 
 /**
@@ -560,6 +553,7 @@ InputStatsPanel::~InputStatsPanel()
  **/
 void InputStatsPanel::update( input_item_t *p_item )
 {
+    assert( p_item );
     vlc_mutex_lock( &p_item->p_stats->lock );
 
 #define UPDATE( widget, format, calc... ) \
@@ -599,3 +593,4 @@ input_Control( p_input_thread, INPUT_GET_VIDEO_FPS, &f_fps */
 void InputStatsPanel::clear()
 {
 }
+

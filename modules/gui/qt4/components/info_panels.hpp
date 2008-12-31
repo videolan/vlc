@@ -34,7 +34,6 @@
 #include <vlc_meta.h>
 
 #include <QWidget>
-#include <QLabel>
 
 #include <limits.h>
 
@@ -56,7 +55,6 @@ class MetaPanel: public QWidget
     Q_OBJECT;
 public:
     MetaPanel( QWidget *, intf_thread_t * );
-    virtual ~MetaPanel();
     void saveMeta();
 
     bool isInEditMode();
@@ -100,7 +98,6 @@ class ExtraMetaPanel: public QWidget
     Q_OBJECT;
 public:
     ExtraMetaPanel( QWidget *, intf_thread_t * );
-    virtual  ~ExtraMetaPanel() {};
 private:
     intf_thread_t *p_intf;
     QTreeWidget *extraMetaTree;
@@ -114,7 +111,6 @@ class InputStatsPanel: public QWidget
     Q_OBJECT;
 public:
     InputStatsPanel( QWidget *, intf_thread_t * );
-    virtual ~InputStatsPanel();
 private:
     intf_thread_t *p_intf;
 
@@ -151,7 +147,6 @@ class InfoPanel: public QWidget
     Q_OBJECT;
 public:
     InfoPanel( QWidget *, intf_thread_t * );
-    virtual ~InfoPanel();
 private:
     intf_thread_t *p_intf;
     QTreeWidget *InfoTree;
