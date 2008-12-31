@@ -183,9 +183,11 @@ void InputManager::customEvent( QEvent *event )
         && ( i_input_id != ple->i_id ) )
         return;
 
+#ifndef NDEBUG
     if( i_type != PositionUpdate_Type &&
         i_type != StatisticsUpdate_Type )
         msg_Dbg( p_intf, "New Event: type %i", i_type );
+#endif
 
     /* Actions */
     switch( i_type )
