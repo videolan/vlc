@@ -101,13 +101,13 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
          * Connects on the various signals of input_Manager
          * For the currently playing element
          **/
-        CONNECT( THEMIM, infoChanged( input_item_t* ),
+        CONNECT( THEMIM->getIM(), infoChanged( input_item_t* ),
                  IP, update( input_item_t* ) );
-        CONNECT( THEMIM, metaChanged( input_item_t* ),
+        CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
                  MP, update( input_item_t* ) );
-        CONNECT( THEMIM, metaChanged( input_item_t* ),
+        CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
                  EMP, update( input_item_t* ) );
-        CONNECT( THEMIM, statisticsUpdated( input_item_t* ),
+        CONNECT( THEMIM->getIM(), statisticsUpdated( input_item_t* ),
                  ISP, update( input_item_t* ) );
 
         if( THEMIM->getInput() )

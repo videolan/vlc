@@ -158,7 +158,11 @@ MetaPanel::MetaPanel( QWidget *parent,
  **/
 void MetaPanel::update( input_item_t *p_item )
 {
-    if( !p_item ) clear();
+    if( !p_item )
+    {
+        clear();
+        return;
+    }
 
     /* Don't update if you are in edit mode */
     if( b_inEditMode ) return;
@@ -320,6 +324,7 @@ void MetaPanel::clear()
     art_cover->update( NULL );
 
     setEditMode( false );
+    emit uriSet( "" );
 }
 
 /**
@@ -354,7 +359,11 @@ ExtraMetaPanel::ExtraMetaPanel( QWidget *parent,
  **/
 void ExtraMetaPanel::update( input_item_t *p_item )
 {
-    if( !p_item ) clear();
+    if( !p_item )
+    {
+        clear();
+        return;
+    }
 
     QStringList tempItem;
     QList<QTreeWidgetItem *> items;
@@ -425,7 +434,11 @@ InfoPanel::InfoPanel( QWidget *parent,
  **/
 void InfoPanel::update( input_item_t *p_item)
 {
-    if( !p_item ) clear();
+    if( !p_item )
+    {
+        clear();
+        return;
+    }
 
     InfoTree->clear();
     QTreeWidgetItem *current_item = NULL;
