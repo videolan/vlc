@@ -44,6 +44,14 @@ export CFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CFLAGS) $(EXTRA_CPPFLAGS)
 export LDFLAGS = -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
+ifdef HAVE_DARWIN_OS
+export CC
+export CXX
+export LD
+export RANLIB
+export AR
+export STRIP
+endif
 
 # ***************************************************************************
 # Cross compilation variables

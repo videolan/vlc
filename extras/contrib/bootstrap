@@ -84,6 +84,11 @@ case $HOST in
     *darwin*)
         echo "HAVE_DARWIN_OS = 1" >> config.mak
         echo "HAVE_BSD = 1" >> config.mak
+        if test $CONTRIBS_CC_LLVM; then
+            echo "DARWIN_COMPILER = LLVMGCC" >> config.mak
+        else
+            echo "DARWIN_COMPILER = GCC" >> config.mak
+        fi
     ;;
     *linux*)
         echo "HAVE_LINUX = 1" >> config.mak
@@ -136,15 +141,29 @@ case $HOST in
     ;;
     powerpc-apple-darwin9)
 # Mac OS X 10.5 with Xcode 3, specific rules apply
-        SDK_TARGET=10.4
+        if test -z "$CONTRIBS_CC_LLVM"; then
+            SDK_TARGET=10.4
+        else
+            SDK_TARGET=10.5
+        fi
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
-        echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
+        if test -z "$CONTRIBS_CC_LLVM"; then
+            echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
+        else
+            echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
+        fi
         echo "HAVE_DARWIN_9 = 1" >> config.mak
+        HAVE_DARWIN_9=1
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_CFLAGS=" -D\${ENVP} -mmacosx-version-min=\${SDK_TARGET}"
-        CC="gcc -isysroot \${MACOSX_SDK}"
-        CXX="g++ -isysroot \${MACOSX_SDK}"
+        if test -z "$CONTRIBS_CC_LLVM"; then
+            CC="gcc -isysroot \${MACOSX_SDK}"
+            CXX="g++ -isysroot \${MACOSX_SDK}"
+        else
+            CC="/Developer/usr/llvm-gcc-4.2/bin/powerpc-apple-darwin9-llvm-gcc-4.2 -isysroot \${MACOSX_SDK}"
+            CXX="/Developer/usr/llvm-gcc-4.2/bin/powerpc-apple-darwin9-llvm-g++-4.2 -isysroot \${MACOSX_SDK}"
+        fi
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin:" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
@@ -156,20 +175,36 @@ case $HOST in
         fi
     ;;
     i686-apple-darwin9)
-        SDK_TARGET=10.4
+        if test -z "$CONTRIBS_CC_LLVM"; then
+            SDK_TARGET=10.4
+        else
+            SDK_TARGET=10.5
+        fi
         MIN_LD_VERSION_WITH_TEXT_RELOCATION=81
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
         echo "HAVE_DARWIN_9 = 1" >> config.mak
+        HAVE_DARWIN_9=1
         if test `ld -v 2> /dev/stdout | sed -E 's/.*ld64-([0-9]+).*/\1/'` -lt ${MIN_LD_VERSION_WITH_TEXT_RELOCATION}; then
             echo "ERROR: Your ld version is unable to compile VLC.\nUpdate to Xcode 3.1 or higher." >&2
             exit 1
         fi
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
-        echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
+        if test -z "$CONTRIBS_CC_LLVM"; then
+            echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
+        else
+            echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
+        fi
         CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
+        if test -z "$CONTRIBS_CC_LLVM"; then
+            CC="gcc -isysroot \${MACOSX_SDK}"
+            CXX="g++ -isysroot \${MACOSX_SDK}"
+        else
+            CC="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-gcc-4.2 -isysroot \${MACOSX_SDK}"
+            CXX="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-g++-4.2 -isysroot \${MACOSX_SDK}"
+        fi
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
         if test -e /Developer/SDKs; then
@@ -329,4 +364,17 @@ if test -z "$CONTRIBS_RELEASE"; then
     echo "***********************************************************"
 else
     echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
+fi
+
+if test $HAVE_DARWIN_9; then
+if test -z "$CONTRIBS_CC_LLVM"; then
+    set +x
+    echo
+    echo "***********************************************************"
+    echo "* In case that you target Mac OS X 10.5 or later only,    *"
+    echo "* we recommend to use llvm-gcc-4.2 for compilation.       *"
+    echo "* Please run CONTRIBS_CC_LLVM=yes ./bootstrap to do so.   *"
+    echo "***********************************************************"
+    set -x
+fi
 fi
