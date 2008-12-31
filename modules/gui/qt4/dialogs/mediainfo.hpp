@@ -29,31 +29,24 @@
 #include "components/info_panels.hpp"
 
 class QTabWidget;
-class InfoTab;
-class QLineEdit;
 
 class MediaInfoDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
     MediaInfoDialog( intf_thread_t *,
-                     input_item_t *,
-                     bool stats = true,
-                     bool mainInput = false );
+                     input_item_t * );
 
     static MediaInfoDialog * getInstance( intf_thread_t *p_intf )
     {
-        if( !instance) instance = new MediaInfoDialog( p_intf,
-                                                       NULL,
-                                                       true,
-                                                       true );
+        if( !instance) instance = new MediaInfoDialog( p_intf, NULL );
         return instance;
     }
 
     static void killInstance()
     {
         if( instance ) delete instance;
-        instance= NULL;
+        instance = NULL;
     }
 
     virtual ~MediaInfoDialog();
@@ -64,32 +57,25 @@ public:
 #endif
 
 private:
-    input_item_t *p_item;
     static MediaInfoDialog *instance;
+    bool isMainInputInfo;
 
-    bool mainInput;
-    bool stats;
-    bool b_cleaned;
-    int i_runs;
+    QTabWidget *infoTabW;
 
-    QTabWidget *IT;
     InputStatsPanel *ISP;
     MetaPanel *MP;
     InfoPanel *IP;
     ExtraMetaPanel *EMP;
 
     QPushButton *saveMetaButton;
-    QLineEdit *uriLine;
-
-public slots:
-    void update( input_thread_t * );
-    void update( input_item_t *, bool, bool );
 
 private slots:
-    void close();
-    void clear();
+    void updateAllTabs( input_item_t * );
+    void clearAllTabs();
+
+    virtual void close();
+
     void saveMeta();
-    void showMetaSaveButton();
     void updateButtons( int i_tab );
 };
 

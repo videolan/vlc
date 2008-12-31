@@ -202,16 +202,16 @@ void InputManager::customEvent( QEvent *event )
         UpdateName();
         break;
     case MetaChanged_Type:
+        UpdateMeta();
         UpdateName(); /* Needed for NowPlaying */
-//        UpdateMeta();
-        UpdateArt();
+        UpdateArt(); /* Art is part of meta in the core */
         break;
     case InfoChanged_Type:
-//        UpdateInfo();
+        UpdateInfo();
         break;
     case ItemTitleChanged_Type:
         UpdateNavigation();
-        UpdateName(); /* Display the name of the Chapter */
+        UpdateName(); /* Display the name of the Chapter, if exists */
         break;
     case ItemRateChanged_Type:
         UpdateRate();
@@ -228,11 +228,6 @@ void InputManager::customEvent( QEvent *event )
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
     }
-}
-
-void InputManager::UpdateStats()
-{
-    emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
 void InputManager::UpdatePosition()
@@ -376,10 +371,25 @@ void InputManager::UpdateVout()
     }
 }
 
-void InputManager::UpdateArt()
+inline void InputManager::UpdateArt()
 {
     /* Update Art meta */
     emit artChanged( input_GetItem( p_input ) );
+}
+
+inline void InputManager::UpdateStats()
+{
+    emit statisticsUpdated( input_GetItem( p_input ) );
+}
+
+inline void InputManager::UpdateMeta()
+{
+    emit metaChanged( input_GetItem( p_input ) );
+}
+
+inline void InputManager::UpdateInfo()
+{
+    emit infoChanged( input_GetItem( p_input ) );
 }
 
 /* User update of the slider */

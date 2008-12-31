@@ -115,6 +115,8 @@ private:
     void UpdatePosition();
     void UpdateTeletext();
     void UpdateArt();
+    void UpdateInfo();
+    void UpdateMeta();
     void UpdateVout();
     void UpdateStats();
 
@@ -154,9 +156,11 @@ signals:
     void chapterChanged( bool );
     /// Statistics are updated
     void statisticsUpdated( input_item_t* );
+    void infoChanged( input_item_t* );
+    void metaChanged( input_item_t* );
+    void artChanged( input_item_t* );
     /// Play/pause status
     void statusChanged( int );
-    void artChanged( input_item_t* );
     /// Teletext
     void teletextPossible( bool );
     void teletextActivated( bool );
