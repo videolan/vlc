@@ -1336,7 +1336,7 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
             }
 
             recentsMenu->addSeparator();
-            recentsMenu->addAction( "Clear", rmrl, SLOT( clear() ) );
+            recentsMenu->addAction( "&Clear", rmrl, SLOT( clear() ) );
         }
     }
 }
