@@ -114,6 +114,9 @@ void InputManager::delInput()
     timeA                = 0;
     timeB                = 0;
 
+    vlc_object_release( p_input );
+    p_input = NULL;
+
     emit positionUpdated( -1.0, 0 ,0 );
     emit rateChanged( INPUT_RATE_DEFAULT ); /* TODO: Do we want this ? */
     emit nameChanged( "" );
@@ -121,18 +124,14 @@ void InputManager::delInput()
     emit titleChanged( 0 );
     emit statusChanged( END_S );
 
-    /* Reset InfoPanels but stats */
+    emit teletextPossible( false );
+    emit AtoBchanged( false, false );
+    emit voutChanged( false );
+
+    /* Reset all InfoPanels but stats */
     emit artChanged( NULL );
     emit infoChanged( NULL );
     emit metaChanged( NULL );
-
-    emit teletextPossible( false );
-    emit voutChanged( false );
-
-    emit AtoBchanged( false, false );
-    vlc_object_release( p_input ); /* FIXME: Can't we release sooner ? */
-
-    p_input = NULL;
 }
 
 /* Add the callbacks on Input. Self explanatory */
