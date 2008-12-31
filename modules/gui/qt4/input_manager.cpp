@@ -78,7 +78,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     p_input = _p_input;
     if( p_input && !( p_input->b_dead || !vlc_object_alive (p_input) ) )
     {
-        msg_Warn( p_intf, "IM: Setting an input" );
+        msg_Dbg( p_intf, "IM: Setting an input" );
         vlc_object_hold( p_input );
         emit statusChanged( PLAYING_S );
         UpdateName();
@@ -103,7 +103,7 @@ void InputManager::setInput( input_thread_t *_p_input )
 void InputManager::delInput()
 {
     if( !p_input ) return;
-    msg_Warn( p_intf, "IM: Deleting the input" );
+    msg_Dbg( p_intf, "IM: Deleting the input" );
 
     delCallbacks();
     i_old_playing_status = END_S;
