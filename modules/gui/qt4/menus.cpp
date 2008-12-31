@@ -325,7 +325,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 
     menu->addSeparator();
 
-    recentsMenu = new QMenu( qtr( "Recently played" ), menu );
+    recentsMenu = new QMenu( qtr( "Recently &Played" ), menu );
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
     menu->addSeparator();
