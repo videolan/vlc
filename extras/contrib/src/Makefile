@@ -48,9 +48,6 @@ ifdef HAVE_DARWIN_OS
 export CC
 export CXX
 export LD
-export RANLIB
-export AR
-export STRIP
 endif
 
 # ***************************************************************************
@@ -1365,6 +1362,9 @@ libdca-$(LIBDCA_VERSION).tar.bz2:
 
 libdca: libdca-$(LIBDCA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+ifdef HAVE_DARWIN_9
+	( cd $@; patch -p0 < ../Patches/libdca-llvm-gcc.patch )
+endif
 
 .dca: libdca
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
