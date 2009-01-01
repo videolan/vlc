@@ -259,6 +259,16 @@ static void DetectImage( FileRef f, demux_t *p_demux )
  */
 static int ReadMetaFromAPE( APE::Tag* tag, vlc_meta_t* p_meta )
 {
+    APE::Item item;
+#define SET( keyName, metaName ) \
+    item = tag->itemListMap()[keyName]; \
+    vlc_meta_Set##metaName( p_meta, item.toString().toCString( true ) );\
+
+    SET( "COPYRIGHT", Copyright );
+    SET( "LANGUAGE", Language );
+    SET( "PUBLISHER", Publisher );
+
+#undef SET
     return VLC_SUCCESS;
 }
 
@@ -450,11 +460,28 @@ static int ReadMeta( vlc_object_t* p_this)
 /**
  * Write meta informations to APE tags
  * @param tag: the APE tag
- * @param p_input: the input item
+ * @param p_item: the input item
  * @return VLC_SUCCESS if everything goes ok
  */
-static int WriteMetaToAPE( APE::Tag* tag, input_item_t* p_input )
+static int WriteMetaToAPE( APE::Tag* tag, input_item_t* p_item )
 {
+    char* psz_meta;
+#define WRITE( metaName, keyName )                      \
+    psz_meta = input_item_Get##metaName( p_item );      \
+    if( psz_meta )                                      \
+    {                                                   \
+        String key( keyName, String::UTF8 );            \
+        String value( psz_meta, String::UTF8 );         \
+        tag->addValue( key, value, true );              \
+    }                                                   \
+    free( psz_meta );
+
+    WRITE( Copyright, "COPYRIGHT" );
+    WRITE( Language, "LANGUAGE" );
+    WRITE( Publisher, "PUBLISHER" );
+
+#undef WRITE
+
     return VLC_SUCCESS;
 }
 
