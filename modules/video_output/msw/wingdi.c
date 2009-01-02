@@ -117,15 +117,7 @@ static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 static void InitBuffers        ( vout_thread_t * );
 
-#ifdef MODULE_NAME_IS_wingapi
-#   define GXOpenDisplay p_vout->p_sys->GXOpenDisplay
-#   define GXCloseDisplay p_vout->p_sys->GXCloseDisplay
-#   define GXBeginDraw p_vout->p_sys->GXBeginDraw
-#   define GXEndDraw p_vout->p_sys->GXEndDraw
-#   define GXGetDisplayProperties p_vout->p_sys->GXGetDisplayProperties
-#   define GXSuspend p_vout->p_sys->GXSuspend
-#   define GXResume p_vout->p_sys->GXResume
-#endif
+
 
 #define DX_POSITION_CHANGE 0x1000
 

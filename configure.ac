@@ -4567,6 +4567,8 @@ if test "${enable_wingdi}" != "no"; then
   if test "${SYS}" = "mingwce"; then
     VLC_ADD_PLUGIN([wingdi])
     VLC_ADD_PLUGIN([wingapi])
+    VLC_ADD_LIBS([wingdi],[-laygshell])
+    VLC_ADD_LIBS([wingapi],[-laygshell])
   fi
 fi
 

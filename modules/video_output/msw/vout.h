@@ -64,6 +64,7 @@ typedef struct event_thread_t
 #       define kfDirect444      0x200
 #       define kfDirectInverted 0x400
 #   endif
+
 #endif
 
 /*****************************************************************************
@@ -194,11 +195,22 @@ struct vout_sys_t
     int        i_depth;
     int        render_width;
     int        render_height;
+	    /* Our offscreen bitmap and its framebuffer */
+    HDC        off_dc;
+    HBITMAP    off_bitmap;
+    uint8_t *  p_pic_buffer;
+    int        i_pic_pitch;
+    int        i_pic_pixel_pitch;
+
+    BITMAPINFO bitmapinfo;
+    RGBQUAD    red;
+    RGBQUAD    green;
+    RGBQUAD    blue;
 
     bool b_focus;
     bool b_parent_focus;
 
-    HINSTANCE  gapi_dll;                    /* handle of the opened gapi dll */
+    HINSTANCE  gapi_dll;                   /* handle of the opened gapi dll */
 
     /* GAPI functions */
     int (*GXOpenDisplay)( HWND hWnd, DWORD dwFlags );
@@ -218,6 +230,16 @@ struct vout_sys_t
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
+
+#ifdef MODULE_NAME_IS_wingapi
+#   define GXOpenDisplay p_vout->p_sys->GXOpenDisplay
+#   define GXCloseDisplay p_vout->p_sys->GXCloseDisplay
+#   define GXBeginDraw p_vout->p_sys->GXBeginDraw
+#   define GXEndDraw p_vout->p_sys->GXEndDraw
+#   define GXGetDisplayProperties p_vout->p_sys->GXGetDisplayProperties
+#   define GXSuspend p_vout->p_sys->GXSuspend
+#   define GXResume p_vout->p_sys->GXResume
+#endif
 
 /*****************************************************************************
  * Prototypes from directx.c

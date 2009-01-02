@@ -1037,6 +1037,7 @@ static int DirectXConvertKey( int i_key )
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     unsigned int *pi_width, *pi_height;
+	bool b_bool;
     RECT rect_window;
     POINT point;
 
@@ -1132,7 +1133,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
 #ifdef MODULE_NAME_IS_wingapi
     case VOUT_SET_FOCUS:
-        b_bool = (bool) va_arg( args, int );
+		b_bool = (bool) va_arg( args, int );
         p_vout->p_sys->b_parent_focus = b_bool;
         if( b_bool ) GXResume();
         else if( !p_vout->p_sys->b_focus ) GXSuspend();
