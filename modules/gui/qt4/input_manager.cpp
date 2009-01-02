@@ -134,18 +134,6 @@ void InputManager::delInput()
     emit metaChanged( NULL );
 }
 
-/* Add the callbacks on Input. Self explanatory */
-inline void InputManager::addCallbacks()
-{
-    var_AddCallback( p_input, "intf-event", InputEvent, this );
-}
-
-/* Delete the callbacks on Input. Self explanatory */
-inline void InputManager::delCallbacks()
-{
-    var_DelCallback( p_input, "intf-event", InputEvent, this );
-}
-
 /* Convert the event from the callbacks in actions */
 void InputManager::customEvent( QEvent *event )
 {
@@ -258,6 +246,113 @@ void InputManager::customEvent( QEvent *event )
     }
 }
 
+/* Add the callbacks on Input. Self explanatory */
+inline void InputManager::addCallbacks()
+{
+    var_AddCallback( p_input, "intf-event", InputEvent, this );
+}
+
+/* Delete the callbacks on Input. Self explanatory */
+inline void InputManager::delCallbacks()
+{
+    var_DelCallback( p_input, "intf-event", InputEvent, this );
+}
+
+/* Static callbacks for IM */
+static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    InputManager *im = (InputManager*)param;
+
+    IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
+    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
+}
+
+static int InputEvent( vlc_object_t *p_this, const char *,
+                       vlc_value_t, vlc_value_t newval, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    IMEvent *event;
+
+    switch( newval.i_int )
+    {
+    case INPUT_EVENT_STATE:
+        event = new IMEvent( ItemStateChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_RATE:
+        event = new IMEvent( ItemRateChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_TIMES:
+        event = new IMEvent( PositionUpdate_Type, 0 );
+        break;
+
+    case INPUT_EVENT_TITLE:
+    case INPUT_EVENT_CHAPTER:
+        event = new IMEvent( ItemTitleChanged_Type, 0 );
+        break;
+
+    case INPUT_EVENT_ES:
+        event = new IMEvent( ItemEsChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_TELETEXT:
+        event = new IMEvent( ItemTeletextChanged_Type, 0 );
+        break;
+
+    case INPUT_EVENT_VOUT:
+        event = new IMEvent( InterfaceVoutUpdate_Type, 0 );
+        break;
+
+    case INPUT_EVENT_STATISTICS:
+        event = new IMEvent( StatisticsUpdate_Type, 0 );
+        break;
+
+    case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
+        event = new IMEvent( MetaChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_ITEM_INFO: /* Codec Info */
+        event = new IMEvent( InfoChanged_Type, 0 );
+        break;
+    case INPUT_EVENT_ITEM_NAME:
+        event = new IMEvent( NameChanged_Type, 0 );
+        break;
+
+    case INPUT_EVENT_AUDIO_DELAY:
+    case INPUT_EVENT_SUBTITLE_DELAY:
+        event = new IMEvent( SynchroChanged_Type, 0 );
+        break;
+
+    case INPUT_EVENT_CACHE:
+        event = new IMEvent( CachingEvent_Type, 0 );
+        break;
+
+    case INPUT_EVENT_BOOKMARK:
+        event = new IMEvent( BookmarksChanged_Type, 0 );
+        break;
+
+    case INPUT_EVENT_RECORD:
+        /* This happens when a recording starts. What do we do then?
+           Display a red light? */
+        /* event = new IMEvent( RecordingEvent_Type, 0 );
+        break; */
+
+    case INPUT_EVENT_PROGRAM:
+        /* This is for PID changes */
+        /* event = new IMEvent( ProgramChanged_Type, 0 );
+        break; */
+    case INPUT_EVENT_SIGNAL:
+        /* This is for capture-card signals */
+        /* event = new IMEvent( SignalChanged_Type, 0 );
+        break; */
+    default:
+        event = NULL;
+        break;
+    }
+
+    if( event )
+        QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    return VLC_SUCCESS;
+}
 void InputManager::UpdatePosition()
 {
     /* Update position */
@@ -771,99 +866,7 @@ void MainInputManager::togglePlayPause()
         getIM()->togglePlayPause();
 }
 
-/* Static callbacks */
-
-/* IM */
-static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
-{
-    InputManager *im = (InputManager*)param;
-
-    IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
-    QApplication::postEvent( im, static_cast<QEvent*>(event) );
-    return VLC_SUCCESS;
-}
-
-static int InputEvent( vlc_object_t *p_this, const char *,
-                       vlc_value_t, vlc_value_t newval, void *param )
-{
-    InputManager *im = (InputManager*)param;
-    IMEvent *event;
-
-    switch( newval.i_int )
-    {
-    case INPUT_EVENT_STATE:
-        event = new IMEvent( ItemStateChanged_Type, 0 );
-        break;
-    case INPUT_EVENT_RATE:
-        event = new IMEvent( ItemRateChanged_Type, 0 );
-        break;
-    case INPUT_EVENT_TIMES:
-        event = new IMEvent( PositionUpdate_Type, 0 );
-        break;
-
-    case INPUT_EVENT_TITLE:
-    case INPUT_EVENT_CHAPTER:
-        event = new IMEvent( ItemTitleChanged_Type, 0 );
-        break;
-
-    case INPUT_EVENT_ES:
-        event = new IMEvent( ItemEsChanged_Type, 0 );
-        break;
-    case INPUT_EVENT_TELETEXT:
-        event = new IMEvent( ItemTeletextChanged_Type, 0 );
-        break;
-
-    case INPUT_EVENT_VOUT:
-        event = new IMEvent( InterfaceVoutUpdate_Type, 0 );
-        break;
-
-    case INPUT_EVENT_STATISTICS:
-        event = new IMEvent( StatisticsUpdate_Type, 0 );
-        break;
-
-    case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
-        event = new IMEvent( MetaChanged_Type, 0 );
-        break;
-    case INPUT_EVENT_ITEM_INFO: /* Codec Info */
-        event = new IMEvent( InfoChanged_Type, 0 );
-        break;
-    case INPUT_EVENT_ITEM_NAME:
-        event = new IMEvent( NameChanged_Type, 0 );
-        break;
-
-    case INPUT_EVENT_AUDIO_DELAY:
-    case INPUT_EVENT_SUBTITLE_DELAY:
-        event = new IMEvent( SynchroChanged_Type, 0 );
-        break;
-
-    case INPUT_EVENT_CACHE:
-        event = new IMEvent( CachingEvent_Type, 0 );
-        break;
-
-    case INPUT_EVENT_BOOKMARK:
-        event = new IMEvent( BookmarksChanged_Type, 0 );
-        break;
-    case INPUT_EVENT_PROGRAM:
-        /* event = new IMEvent( ProgramChanged_Type, 0 );
-        break; */
-    case INPUT_EVENT_RECORD:
-        /* event = new IMEvent( RecordingEvent_Type, 0 );
-        break; */
-    case INPUT_EVENT_SIGNAL:
-        /* event = new IMEvent( SignalChanged_Type, 0 );
-        break; */
-    default:
-        event = NULL;
-        break;
-    }
-
-    if( event )
-        QApplication::postEvent( im, static_cast<QEvent*>(event) );
-    return VLC_SUCCESS;
-}
-
-/* MIM */
+/* Static callbacks for MIM */
 static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
@@ -883,5 +886,4 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
     QApplication::postEvent( mim, static_cast<QEvent*>(event) );
     return VLC_SUCCESS;
 }
-
 
