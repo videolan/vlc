@@ -123,7 +123,10 @@ static int playlist_cmp(const void *first, const void *second)
 #define META_STRCASECMP_NAME( ) { \
     char *psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input ); \
     char *psz_ismall = input_item_GetName( (*(playlist_item_t **)second)->p_input ); \
-    i_test = strcasecmp( psz_i, psz_ismall ); \
+    if( psz_i != NULL && psz_ismall != NULL ) i_test = strcasecmp( psz_i, psz_ismall ); \
+    else if ( psz_i == NULL && psz_ismall != NULL ) i_test = 1; \
+    else if ( psz_ismall == NULL && psz_i != NULL ) i_test = -1; \
+    else i_test = 0; \
     free( psz_i ); \
     free( psz_ismall ); \
 }
@@ -232,8 +235,23 @@ static int playlist_cmp(const void *first, const void *second)
         }
         else
         {
-            i_test = strcasecmp( (*(playlist_item_t **)first)->p_input->psz_name,
+            if ( (*(playlist_item_t **)first)->p_input->psz_name != NULL &&
+                 (*(playlist_item_t **)second)->p_input->psz_name != NULL )
+            {
+                i_test = strcasecmp( (*(playlist_item_t **)first)->p_input->psz_name,
                                  (*(playlist_item_t **)second)->p_input->psz_name );
+            }
+            else if ( (*(playlist_item_t **)first)->p_input->psz_name != NULL &&
+                 (*(playlist_item_t **)second)->p_input->psz_name == NULL )
+            {
+                i_test = 1;
+            }
+            else if ( (*(playlist_item_t **)first)->p_input->psz_name == NULL &&
+                 (*(playlist_item_t **)second)->p_input->psz_name != NULL )
+            {
+                i_test = -1;
+            }
+            else i_test = 0;
         }
     }
     else if( sort_mode == SORT_URI )
