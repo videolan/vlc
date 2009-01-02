@@ -836,10 +836,18 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( CachingEvent_Type, 0 );
         break;
 
-    case INPUT_EVENT_PROGRAM:
-    case INPUT_EVENT_RECORD:
-    case INPUT_EVENT_SIGNAL:
     case INPUT_EVENT_BOOKMARK:
+        /* event = new IMEvent( BookmarkChanged_Type, 0 );
+        break; */
+    case INPUT_EVENT_PROGRAM:
+        /* event = new IMEvent( ProgramChanged_Type, 0 );
+        break; */
+    case INPUT_EVENT_RECORD:
+        /* event = new IMEvent( RecordingEvent_Type, 0 );
+        break; */
+    case INPUT_EVENT_SIGNAL:
+        /* event = new IMEvent( SignalChanged_Type, 0 );
+        break; */
     default:
         event = NULL;
         break;

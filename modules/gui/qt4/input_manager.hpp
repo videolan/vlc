@@ -53,6 +53,10 @@ enum {
     InfoChanged_Type,
     SynchroChanged_Type,
     CachingEvent_Type,
+/*    BookmarkChanged_Type,
+    RecordingEvent_Type,
+    ProgramChanged_Type,
+    SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
