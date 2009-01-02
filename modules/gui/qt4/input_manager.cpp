@@ -163,7 +163,8 @@ void InputManager::customEvent( QEvent *event )
          i_type != InterfaceVoutUpdate_Type &&
          i_type != MetaChanged_Type &&
          i_type != NameChanged_Type &&
-         i_type != InfoChanged_Type )
+         i_type != InfoChanged_Type &&
+         i_type != SynchroChanged_Type )
         return;
 
     if( !hasInput() ) return;
@@ -177,7 +178,8 @@ void InputManager::customEvent( QEvent *event )
           i_type != InterfaceVoutUpdate_Type &&
           i_type != MetaChanged_Type &&
           i_type != NameChanged_Type &&
-          i_type != InfoChanged_Type
+          i_type != InfoChanged_Type &&
+          i_type != SynchroChanged_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
@@ -235,6 +237,9 @@ void InputManager::customEvent( QEvent *event )
         break;
     case InterfaceVoutUpdate_Type:
         UpdateVout();
+        break;
+    case SynchroChanged_Type:
+        emit synchroChanged();
         break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
@@ -804,11 +809,14 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         event = new IMEvent( NameChanged_Type, 0 );
         break;
 
+    case INPUT_EVENT_AUDIO_DELAY:
+    case INPUT_EVENT_SUBTITLE_DELAY:
+        event = new IMEvent( SynchroChanged_Type, 0 );
+        break;
+
     case INPUT_EVENT_PROGRAM:
     case INPUT_EVENT_RECORD:
     case INPUT_EVENT_SIGNAL:
-    case INPUT_EVENT_AUDIO_DELAY:
-    case INPUT_EVENT_SUBTITLE_DELAY:
     case INPUT_EVENT_BOOKMARK:
     case INPUT_EVENT_CACHE:
     default:

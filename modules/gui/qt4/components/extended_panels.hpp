@@ -156,6 +156,9 @@ private:
     QDoubleSpinBox *AVSpin;
     QDoubleSpinBox *subsSpin;
     QDoubleSpinBox *subSpeedSpin;
+
+    bool b_userAction;
+
     void clean();
 public slots:
     void update();

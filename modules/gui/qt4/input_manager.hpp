@@ -36,6 +36,7 @@
 #include <QObject>
 #include <QEvent>
 
+
 enum {
     PositionUpdate_Type = QEvent::User + IMEventType + 1,
     ItemChanged_Type,
@@ -46,10 +47,11 @@ enum {
     ItemEsChanged_Type,
     ItemTeletextChanged_Type,
     InterfaceVoutUpdate_Type,
-    StatisticsUpdate_Type,
+    StatisticsUpdate_Type, /*10*/
     MetaChanged_Type,
     NameChanged_Type,
     InfoChanged_Type,
+    SynchroChanged_Type,
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
@@ -170,6 +172,7 @@ signals:
     void AtoBchanged( bool, bool );
     /// Vout
     void voutChanged( bool );
+    void synchroChanged();
 };
 
 class MainInputManager : public QObject

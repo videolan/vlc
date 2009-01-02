@@ -1,7 +1,7 @@
 /*****************************************************************************
  * extended_panels.cpp : Extended controls panels
  ****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2008 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -1266,6 +1266,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     QToolButton *updateButton;
 
+    b_userAction = true;
+
     QGridLayout *mainLayout = new QGridLayout( this );
 
     /* AV sync */
@@ -1296,7 +1298,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     AVSpin->setSingleStep( 0.1 );
     AVSpin->setToolTip( qtr( "A positive value means that\n"
                              "the audio is ahead of the video" ) );
-    AVSpin->setSuffix( "s" );
+    AVSpin->setSuffix( " s" );
     AVLayout->addWidget( AVSpin, 0, 2, 1, 1 );
     mainLayout->addWidget( AVBox, 1, 0, 1, 5 );
 
@@ -1329,7 +1331,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subsSpin->setSingleStep( 0.1 );
     subsSpin->setToolTip( qtr( "A positive value means that\n"
                              "the subtitles are ahead of the video" ) );
-    subsSpin->setSuffix( "s" );
+    subsSpin->setSuffix( " s" );
     subsLayout->addWidget( subsSpin, 0, 2, 1, 1 );
 
 
@@ -1355,6 +1357,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     subSpeedSpin->setMinimum( 1 );
     subSpeedSpin->setMaximum( 100 );
     subSpeedSpin->setSingleStep( 0.2 );
+    subSpeedSpin->setSuffix( " fps" );
     subsLayout->addWidget( subSpeedSpin, 1, 2, 1, 1 );
 
     mainLayout->addWidget( subsBox, 2, 0, 2, 5 );
@@ -1375,6 +1378,8 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( subsSpin, valueChanged ( double ), this, advanceSubs( double ) ) ;
     CONNECT( subSpeedSpin, valueChanged ( double ),
              this, adjustSubsSpeed( double ) );
+
+    CONNECT( THEMIM->getIM(), synchroChanged(), this, update() );
     BUTTON_SET_ACT_I( updateButton, "", update,
             qtr( "Force update of this dialog's values" ), update() );
 
@@ -1384,48 +1389,50 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
 void SyncControls::clean()
 {
+    b_userAction = false;
     AVSpin->setValue( 0.0 );
     subsSpin->setValue( 0.0 );
     subSpeedSpin->setValue( 1.0 );
+    b_userAction = true;
 }
 
 void SyncControls::update()
 {
+    b_userAction = false;
+
     int64_t i_delay;
     if( THEMIM->getInput() )
     {
-        i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
-        AVSpin->setValue( ( (double)i_delay ) / 1000000 );
         i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
+        AVSpin->setValue( ( (double)i_delay ) / 1000000 );
+        i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
         subsSpin->setValue( ( (double)i_delay ) / 1000000 );
         subSpeedSpin->setValue( var_GetFloat( THEMIM->getInput(), "sub-fps" ) );
     }
+    b_userAction = true;
 }
 
 void SyncControls::advanceAudio( double f_advance )
 {
-    if( THEMIM->getInput() )
+    if( THEMIM->getInput() && b_userAction )
     {
-        int64_t i_delay = var_GetTime( THEMIM->getInput(), "audio-delay" );
-        i_delay = f_advance * 1000000;
+        int64_t i_delay = f_advance * 1000000;
         var_SetTime( THEMIM->getInput(), "audio-delay", i_delay );
     }
 }
 
 void SyncControls::advanceSubs( double f_advance )
 {
-    if( THEMIM->getInput() )
+    if( THEMIM->getInput() && b_userAction )
     {
-        int64_t i_delay = var_GetTime( THEMIM->getInput(), "spu-delay" );
-        i_delay = f_advance * 1000000;
+        int64_t i_delay = f_advance * 1000000;
         var_SetTime( THEMIM->getInput(), "spu-delay", i_delay );
-        msg_Dbg( p_intf, "I am advancing subtitles %d", f_advance );
     }
 }
 
 void SyncControls::adjustSubsSpeed( double f_fps )
 {
-    if( THEMIM->getInput() )
+    if( THEMIM->getInput() && b_userAction )
     {
         var_SetFloat( THEMIM->getInput(), "sub-fps", f_fps );
     }
