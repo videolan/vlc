@@ -45,10 +45,7 @@ CtrlGeneric::CtrlGeneric( intf_thread_t *pIntf, const UString &rHelp,
 
 CtrlGeneric::~CtrlGeneric()
 {
-    if( m_pPosition )
-    {
-        delete m_pPosition;
-    }
+    delete m_pPosition;
     if( m_pVisible )
     {
         m_pVisible->delObserver( this );
@@ -60,10 +57,7 @@ void CtrlGeneric::setLayout( GenericLayout *pLayout,
                              const Position &rPosition )
 {
     m_pLayout = pLayout;
-    if( m_pPosition )
-    {
-        delete m_pPosition;
-    }
+    delete m_pPosition;
     m_pPosition = new Position( rPosition );
     onPositionChange();
 }

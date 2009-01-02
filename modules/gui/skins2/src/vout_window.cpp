@@ -39,10 +39,7 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, int left, int top,
 
 VoutWindow::~VoutWindow()
 {
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
 
     // Get the VlcProc
     VlcProc *pVlcProc = getIntf()->p_sys->p_vlcProc;
@@ -61,10 +58,7 @@ void VoutWindow::resize( int width, int height )
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
 
     // Recreate the image
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
     m_pImage = pOsFactory->createOSGraphics( width, height );
     // Draw a black rectangle
     m_pImage->fillRect( 0, 0, width, height, 0 );

@@ -81,10 +81,7 @@ CtrlTree::~CtrlTree()
 {
     m_rTree.getPositionVar().delObserver( this );
     m_rTree.delObserver( this );
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
 }
 
 int CtrlTree::itemHeight()
@@ -729,10 +726,7 @@ void CtrlTree::makeImage()
 {
     stats_TimerStart( getIntf(), "[Skins] Playlist image",
                       STATS_TIMER_SKINS_PLAYTREE_IMAGE );
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
 
     // Get the size of the control
     const Position *pPos = getPosition();

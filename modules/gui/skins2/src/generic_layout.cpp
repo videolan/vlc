@@ -54,10 +54,7 @@ GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
 
 GenericLayout::~GenericLayout()
 {
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
     list<Anchor*>::const_iterator it;
     for( it = m_anchorList.begin(); it != m_anchorList.end(); it++ )
     {

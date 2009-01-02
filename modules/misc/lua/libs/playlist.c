@@ -280,7 +280,7 @@ static int vlclua_playlist_get( lua_State *L )
                 }
             }
 #else
-# warning Don't access playlist iternal, broken code here.
+# warning "Don't access playlist iternal, broken code here."
             abort();
 #endif
             if( !p_item )

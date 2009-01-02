@@ -62,10 +62,7 @@ GenericWindow::~GenericWindow()
 {
     m_pVarVisible->delObserver( this );
 
-    if( m_pOsWindow )
-    {
-        delete m_pOsWindow;
-    }
+    delete m_pOsWindow;
 }
 
 

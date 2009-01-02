@@ -48,10 +48,7 @@ void CmdChangeSkin::execute()
         // Everything went well
         msg_Info( getIntf(), "new theme successfully loaded (%s)",
                  m_file.c_str() );
-        if( pOldTheme )
-        {
-            delete pOldTheme;
-        }
+        delete pOldTheme;
     }
     else if( pOldTheme )
     {

@@ -51,10 +51,7 @@ CtrlVideo::~CtrlVideo()
     VarBox &rVoutSize = VlcProc::instance( getIntf() )->getVoutSizeVar();
     rVoutSize.delObserver( this );
 
-    if( m_pVout )
-    {
-        delete m_pVout;
-    }
+    delete m_pVout;
 }
 
 

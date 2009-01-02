@@ -104,18 +104,9 @@ CtrlText::CtrlText( intf_thread_t *pIntf, VarText &rVariable,
 CtrlText::~CtrlText()
 {
     m_rVariable.delObserver( this );
-    if( m_pTimer )
-    {
-        delete m_pTimer;
-    }
-    if( m_pImg )
-    {
-        delete m_pImg;
-    }
-    if( m_pImgDouble )
-    {
-        delete m_pImgDouble;
-    }
+    delete m_pTimer;
+    delete m_pImg;
+    delete m_pImgDouble;
 }
 
 
@@ -224,10 +215,7 @@ void CtrlText::displayText( const UString &rText )
 {
     // Create the images ('normal' and 'double') from the text
     // 'Normal' image
-    if( m_pImg )
-    {
-        delete m_pImg;
-    }
+    delete m_pImg;
     m_pImg = m_rFont.drawString( rText, m_color );
     if( !m_pImg )
     {
@@ -235,10 +223,7 @@ void CtrlText::displayText( const UString &rText )
     }
     // 'Double' image
     const UString doubleStringWithSep = rText + SEPARATOR_STRING + rText;
-    if( m_pImgDouble )
-    {
-        delete m_pImgDouble;
-    }
+    delete m_pImgDouble;
     m_pImgDouble = m_rFont.drawString( doubleStringWithSep, m_color );
 
     // Update the current image used, as if the control size had changed

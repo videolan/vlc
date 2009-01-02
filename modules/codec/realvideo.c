@@ -435,8 +435,7 @@ static void Close( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &rm_mutex );
 
-    if ( p_sys )
-        free( p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************

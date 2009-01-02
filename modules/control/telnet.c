@@ -502,14 +502,13 @@ static void Run( intf_thread_t *p_intf )
             if (fd == -1)
                 continue;
 
-            telnet_client_t *cl = malloc( sizeof( telnet_client_t ));
+            telnet_client_t *cl = calloc( 1, sizeof( telnet_client_t ));
             if (cl == NULL)
             {
                 net_Close (fd);
                 continue;
             }
 
-            memset( cl, 0, sizeof(telnet_client_t) );
             cl->i_tel_cmd = 0;
             cl->fd = fd;
             cl->buffer_write = NULL;

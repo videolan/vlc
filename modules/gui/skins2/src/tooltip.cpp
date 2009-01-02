@@ -51,10 +51,7 @@ Tooltip::~Tooltip()
     VarManager::instance( getIntf() )->getTooltipText().delObserver( this );
     SKINS_DELETE( m_pTimer );
     SKINS_DELETE( m_pOsTooltip );
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
 }
 
 
@@ -106,10 +103,7 @@ void Tooltip::makeImage( const UString &rText )
     int h = m_rFont.getSize() + 8;
 
     // Create the image of the tooltip
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
     m_pImage = OSFactory::instance( getIntf() )->createOSGraphics( w, h );
     m_pImage->fillRect( 0, 0, w, h, 0xffffd0 );
     m_pImage->drawRect( 0, 0, w, h, 0x000000 );

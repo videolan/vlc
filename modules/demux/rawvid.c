@@ -380,8 +380,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys )
-        free( p_sys );
+    free( p_sys );
     return VLC_EGENERIC;
 }
 
