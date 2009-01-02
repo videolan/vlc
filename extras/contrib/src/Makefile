@@ -1264,7 +1264,7 @@ ifdef HAVE_WIN32
 	(cd $<;./genMakefiles mingw && make $(HOSTCC)) 
 else 
 ifdef HAVE_DARWIN_OS
-	(cd $<; sed -e 's%EXTRA_CFLAGS%$(EXTRA_CFLAGS)%' -e 's%EXTRA_LDFLAGS%$(EXTRA_LDFLAGS)%' -i.orig  config.macosx)
+	(cd $<; sed -e 's%-DBSD=1%-DBSD=1\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%cc%$(CC)%'  -e 's%c++%$(CXX)%' -i.orig  config.macosx)
 	(cd $<; ./genMakefiles macosx && make)
 else
 	(cd $<; sed -e 's/=/= EXTRA_CPPFLAGS/' -e 's%EXTRA_CPPFLAGS%-I/include%' -i.orig groupsock/Makefile.head)
