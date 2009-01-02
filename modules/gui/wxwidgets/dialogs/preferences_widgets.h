@@ -28,7 +28,7 @@ class ConfigControl: public wxPanel
 {
 public:
     ConfigControl( vlc_object_t *, module_config_t *, wxWindow * );
-    ~ConfigControl();
+    virtual ~ConfigControl();
     wxSizer *Sizer();
 
     virtual int GetIntValue() {return 0;}
