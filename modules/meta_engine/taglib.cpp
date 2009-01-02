@@ -342,12 +342,12 @@ static int ReadMetaFromId2v2( ID3v2::Tag* tag, vlc_meta_t* p_meta )
  */
 static int ReadMetaFromXiph( Ogg::XiphComment* tag, vlc_meta_t* p_meta )
 {
-#define SET( metaName, keyName )                                               \
+#define SET( keyName, metaName )                                               \
     StringList list = tag->fieldListMap()[keyName];                            \
     if( !list.isEmpty() )                                                      \
         vlc_meta_Set##metaName( p_meta, (*list.begin()).toCString( true ) );
 
-    SET( Copyright, "COPYRIGHT" );
+    SET( "COPYRIGHT", Copyright );
 #undef SET
     return VLC_SUCCESS;
 }
@@ -386,10 +386,10 @@ static int ReadMeta( vlc_object_t* p_this)
     // Read the tags from the file
     Tag* p_tag = f.tag();
 
-#define SET( meta, tag )                                                       \
+#define SET( tag, meta )                                                       \
     if( !p_tag->tag().isNull() && !p_tag->tag().isEmpty() )                    \
         vlc_meta_Set##meta( p_meta, p_tag->tag().toCString(true) )
-#define SETINT( meta, tag )                                                    \
+#define SETINT( tag, meta )                                                    \
     if( p_tag->tag() )                                                         \
     {                                                                          \
         char psz_tmp[10];                                                      \
@@ -397,13 +397,13 @@ static int ReadMeta( vlc_object_t* p_this)
         vlc_meta_Set##meta( p_meta, psz_tmp );                                 \
     }
 
-    SET( Title, title );
-    SET( Artist, artist );
-    SET( Album, album );
-    SET( Description, comment );
-    SET( Genre, genre );
-    SETINT( Date, year );
-    SETINT( Tracknum, track );
+    SET( title, Title );
+    SET( artist, Artist );
+    SET( album, Album );
+    SET( comment, Description );
+    SET( genre, Genre );
+    SETINT( year, Date );
+    SETINT( track, Tracknum );
 
 #undef SETINT
 #undef SET
