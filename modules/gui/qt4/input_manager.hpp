@@ -52,6 +52,7 @@ enum {
     NameChanged_Type,
     InfoChanged_Type,
     SynchroChanged_Type,
+    CachingEvent_Type,
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
@@ -102,6 +103,7 @@ private:
     QString         oldName;
     QString         artUrl;
     int             i_rate;
+    float           f_cache;
     bool            b_video;
     mtime_t         timeA, timeB;
 
@@ -121,6 +123,7 @@ private:
     void UpdateMeta();
     void UpdateVout();
     void UpdateStats();
+    void UpdateCaching();
 
     void AtoBLoop( int );
 
@@ -173,6 +176,7 @@ signals:
     /// Vout
     void voutChanged( bool );
     void synchroChanged();
+    void cachingChanged( float );
 };
 
 class MainInputManager : public QObject

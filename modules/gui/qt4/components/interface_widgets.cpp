@@ -521,8 +521,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
    setToolTip( qtr( "Toggle between elapsed and remaining time" ) );
 
 
-/*   CONNECT( THEMIM->getIM(), statusChanged( int ),
-            this, setStatus( int ) ); Remove */
+   CONNECT( THEMIM->getIM(), cachingChanged( float ),
+            this, setCaching( float ) );
    CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
              this, setDisplayPosition( float, int, int ) );
 }
@@ -547,13 +547,10 @@ void TimeLabel::toggleTimeDisplay()
 {
     b_remainingTime = !b_remainingTime;
 }
-/* This is wrong remove */
-void TimeLabel::setStatus( int i_status )
-{
-    msg_Warn( p_intf, "Status: %i", i_status );
 
-    if( i_status == OPENING_S )
-        setText( "Buffering" );
+void TimeLabel::setCaching( float f_cache )
+{
+    setText( "Buffering" );
 }
 
 
