@@ -1329,7 +1329,8 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
         {
             for( int i = 0; i < l.size(); ++i )
             {
-                action = recentsMenu->addAction( l.at( i ),
+                action = recentsMenu->addAction(
+                        QString( "&%1: " ).arg( i + 1 ) + l.at( i ),
                         rmrl->signalMapper,
                         SLOT( map() ) );
                 rmrl->signalMapper->setMapping( action, l.at( i ) );
