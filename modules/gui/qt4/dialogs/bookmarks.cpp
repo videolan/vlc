@@ -80,6 +80,9 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
     layout->setColumnStretch( 1, 1 );
     layout->addWidget( closeButton, 7, 2 );
 
+    CONNECT( THEMIM->getIM(), bookmarksChanged(),
+             this, update() );
+
     CONNECT( bookmarksList, activated( QModelIndex ), this,
              activateItem( QModelIndex ) );
     CONNECT( bookmarksList, itemChanged( QTreeWidgetItem*, int ),
@@ -154,7 +157,6 @@ void BookmarksDialog::add()
 
         input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
     }
-    update();
 }
 
 void BookmarksDialog::del()
@@ -168,8 +170,6 @@ void BookmarksDialog::del()
     {
         input_Control( p_input, INPUT_DEL_BOOKMARK, i_focused );
     }
-
-    update();
 }
 
 void BookmarksDialog::clear()
@@ -178,8 +178,6 @@ void BookmarksDialog::clear()
     if( !p_input ) return;
 
     input_Control( p_input, INPUT_CLEAR_BOOKMARKS );
-
-    update();
 }
 
 void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
@@ -238,9 +236,6 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     if( input_Control( p_input, INPUT_CHANGE_BOOKMARK, p_seekpoint, i_edit ) !=
         VLC_SUCCESS )
         goto clear;
-
-    // Everything goes fine : update
-    update();
 
 // Clear the bookmark list
 clear:

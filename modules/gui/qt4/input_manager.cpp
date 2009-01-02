@@ -165,7 +165,8 @@ void InputManager::customEvent( QEvent *event )
          i_type != NameChanged_Type &&
          i_type != InfoChanged_Type &&
          i_type != SynchroChanged_Type &&
-         i_type != CachingEvent_Type )
+         i_type != CachingEvent_Type &&
+         i_type != BookmarksChanged_Type )
         return;
 
     if( i_type == CachingEvent_Type )
@@ -183,7 +184,8 @@ void InputManager::customEvent( QEvent *event )
           i_type != MetaChanged_Type &&
           i_type != NameChanged_Type &&
           i_type != InfoChanged_Type &&
-          i_type != SynchroChanged_Type
+          i_type != SynchroChanged_Type &&
+          i_type != BookmarksChanged_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
@@ -247,6 +249,9 @@ void InputManager::customEvent( QEvent *event )
         break;
     case CachingEvent_Type:
         UpdateCaching();
+        break;
+    case BookmarksChanged_Type:
+        emit bookmarksChanged();
         break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
@@ -837,8 +842,8 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         break;
 
     case INPUT_EVENT_BOOKMARK:
-        /* event = new IMEvent( BookmarkChanged_Type, 0 );
-        break; */
+        event = new IMEvent( BookmarksChanged_Type, 0 );
+        break;
     case INPUT_EVENT_PROGRAM:
         /* event = new IMEvent( ProgramChanged_Type, 0 );
         break; */
