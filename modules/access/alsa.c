@@ -133,6 +133,9 @@ struct demux_sys_t
     snd_pcm_t *p_alsa_pcm;
     size_t i_alsa_frame_size;
     int i_alsa_chunk_size;
+
+    struct pollfd *p_pollfd;
+    int i_pollfd;
 };
 
 static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys )
@@ -181,12 +184,12 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->i_fd_audio = -1;
     p_sys->p_es_audio = NULL;
     p_sys->p_block_audio = NULL;
+    p_sys->p_pollfd = NULL;
 
     if( p_demux->psz_path && *p_demux->psz_path )
         p_sys->psz_device = p_demux->psz_path;
     else
         p_sys->psz_device = ALSA_DEFAULT;
-    msg_Err( p_this, "Device is %s", p_sys->psz_device );
 
     if( FindMainDevice( p_this, p_sys ) != VLC_SUCCESS )
     {
@@ -213,6 +216,9 @@ static void DemuxClose( vlc_object_t *p_this )
     if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
 
     if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
+
+    free( p_sys->p_pollfd );
+
     free( p_sys );
 }
 
@@ -261,15 +267,10 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    struct pollfd fd;
-    fd.fd = p_sys->i_fd_audio;
-    fd.events = POLLIN|POLLPRI;
-    fd.revents = 0;
-
-    /* Wait for data */
-    if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+    int i_wait = snd_pcm_wait( p_sys->p_alsa_pcm, 500 );
+    switch( i_wait )
     {
-        if( fd.revents & (POLLIN|POLLPRI) )
+        case 1:
         {
             block_t *p_block = GrabAudio( p_demux );
             if( p_block )
@@ -277,6 +278,18 @@ static int Demux( demux_t *p_demux )
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
                 es_out_Send( p_demux->out, p_sys->p_es_audio, p_block );
             }
+        }
+
+        case -EPIPE:
+            /* xrun */
+            snd_pcm_prepare( p_sys->p_alsa_pcm );
+            break;
+        case -ESTRPIPE:
+        {
+            /* suspend */
+            int i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
+            if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
+            break;
         }
     }
 
@@ -290,10 +303,9 @@ static int Demux( demux_t *p_demux )
 static block_t* GrabAudio( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i_read = 0, i_correct;
+    int i_read, i_correct;
     block_t *p_block;
 
-    printf("%s %d\n",__func__,__LINE__);
     if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
     else p_block = block_New( p_demux, p_sys->i_audio_max_frame_size );
 
@@ -541,8 +553,7 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys )
         goto adev_fail;
     }
 
-    if( !p_sys->psz_device )
-        p_sys->psz_device = strdup( ALSA_DEFAULT );
+    snd_pcm_start( p_sys->p_alsa_pcm );
 
     /* Return a fake handle so other tests work */
     return 1;
@@ -551,6 +562,7 @@ static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys )
 
     if( p_hw_params ) snd_pcm_hw_params_free( p_hw_params );
     if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
+    p_sys->p_alsa_pcm = NULL;
 
     return -1;
 
