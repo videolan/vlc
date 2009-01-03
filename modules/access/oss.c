@@ -176,7 +176,6 @@ static int DemuxOpen( vlc_object_t *p_this )
         p_sys->psz_device = p_demux->psz_path;
     else
         p_sys->psz_device = OSS_DEFAULT;
-    msg_Err( p_this, "Device is %s", p_sys->psz_device );
 
     if( FindMainDevice( p_demux ) != VLC_SUCCESS )
     {
