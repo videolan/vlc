@@ -2,12 +2,12 @@
 # ***************************************************************************
 # bootstrap : Set up config.mak
 # ***************************************************************************
-# Copyright (C) 2003-2007 the VideoLAN team
+# Copyright (C) 2003-2009 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
-#          Felix Kühne <fkuehne@users.sourceforge.net>
+#          Felix Paul Kühne <fkuehne at videolan dot org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -73,6 +73,9 @@ fi
 case $HOST in
     *powerpc*|*ppc*)
          echo "ARCH=ppc" >> config.mak
+     ;;
+    *darwin10*)
+         echo "ARCH=x86_64" >> config.mak
      ;;
     *86*)
           echo "ARCH=i386" >> config.mak
@@ -215,18 +218,21 @@ case $HOST in
             exit 1
         fi
     ;;
-    i686-apple-darwin10)
+    *-apple-darwin10)
         SDK_TARGET=10.6
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
         echo "HAVE_DARWIN_9 = 1" >> config.mak
         echo "HAVE_DARWIN_10 = 1" >> config.mak
+        HAVE_DARWIN_10=1
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
-        echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.6.sdk" >> config.mak
-        CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
+        echo "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk" >> config.mak
+        CFLAGS_TUNING=" -march=core2"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
+        CC="gcc"
+        CXX="g++"
         cat src/Distributions/darwin.mak >> distro.mak
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
@@ -359,23 +365,37 @@ fi
 if test -z "$CONTRIBS_RELEASE"; then
     set +x
     echo
-    echo "***********************************************************"
-    echo "* If you are building contribs for a release build of VLC *"
-    echo "* Please run CONTRIBS_RELEASE=sexy ./bootstrap            *"
-    echo "***********************************************************"
+    echo "*****************************************************************"
+    echo "* If you are building contribs for a release build of VLC       *"
+    echo "* Please run CONTRIBS_RELEASE=sexy ./bootstrap                  *"
+    echo "*                                                               *"
+    echo "* Ignore this message if you don't compile the 3rd party        *"
+    echo "* libraries your own aka by just running 'make' next.           *"
+    echo "*****************************************************************"
 else
     echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
+    set -x
 fi
 
 if test $HAVE_DARWIN_9; then
 if test -z "$CONTRIBS_CC_LLVM"; then
     set +x
     echo
-    echo "***********************************************************"
-    echo "* In case that you target Mac OS X 10.5 or later only,    *"
-    echo "* we recommend to use llvm-gcc-4.2 for compilation.       *"
-    echo "* Please run CONTRIBS_CC_LLVM=yes ./bootstrap to do so.   *"
-    echo "***********************************************************"
+    echo "*****************************************************************"
+    echo "* In case that you target Mac OS X 10.5 or later only,          *"
+    echo "* we recommend to use llvm-gcc-4.2 for compilation.             *"
+    echo "* Please run CONTRIBS_CC_LLVM=yes ./bootstrap to do so.         *"
+    echo "*****************************************************************"
     set -x
 fi
+fi
+
+if test $HAVE_DARWIN_10; then
+    set +x
+    echo
+    echo "*****************************************************************"
+    echo "* You are running Darwin 10.                                    *"
+    echo "* For testing purposes, VLC will be compiled in 64bit mode.     *"
+    echo "*****************************************************************"
+    set -x
 fi
