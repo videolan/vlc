@@ -13,6 +13,8 @@ Access:
  * On-the-fly gzip and bzip2 file decompression (except on Windows)
  * Playback for video in Rar archives
  * DVB-S and ATSC support on Windows
+ * New OSS and Alsa accesses. The v4l2 and v4l modules no longer support
+   OSS or Alsa audio input. Use --input-slave alsa:// or oss:// if needed.
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
