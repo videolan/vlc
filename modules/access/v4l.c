@@ -49,6 +49,8 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 
+#include <poll.h>
+
 /* From GStreamer's v4l plugin:
  * Because of some really cool feature in video4linux1, also known as
  * 'not including sys/types.h and sys/time.h', we had to include it
@@ -245,7 +247,7 @@ struct demux_sys_t
 {
     /* Devices */
     char *psz_device;         /* Main device from MRL */
-    int  fd_video;
+    int  i_fd;
 
     /* Video properties */
     picture_t pic;
@@ -378,15 +380,15 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_quality = val.i_int;
 
     p_sys->psz_device = NULL;
-    p_sys->fd_video = -1;
+    p_sys->i_fd = -1;
 
     p_sys->p_es = NULL;
 
     ParseMRL( p_demux );
 
     msg_Dbg( p_this, "opening device '%s'", p_sys->psz_device );
-    p_sys->fd_video = OpenVideoDev( p_demux, p_sys->psz_device );
-    if( p_sys->fd_video < 0 )
+    p_sys->i_fd = OpenVideoDev( p_demux, p_sys->psz_device );
+    if( p_sys->i_fd < 0 )
     {
         Close( p_this );
         return VLC_EGENERIC;
@@ -442,12 +444,12 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys   = p_demux->p_sys;
 
     free( p_sys->psz_device );
-    if( p_sys->fd_video >= 0 ) close( p_sys->fd_video );
+    if( p_sys->i_fd >= 0 ) close( p_sys->i_fd );
 
     if( p_sys->b_mjpeg )
     {
         int i_noframe = -1;
-        ioctl( p_sys->fd_video, MJPIOC_QBUF_CAPT, &i_noframe );
+        ioctl( p_sys->i_fd, MJPIOC_QBUF_CAPT, &i_noframe );
     }
 
     if( p_sys->p_video_mmap && p_sys->p_video_mmap != MAP_FAILED )
@@ -505,18 +507,25 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    block_t *p_block = GrabVideo( p_demux );
 
-    if( !p_block )
+    struct pollfd fd;
+    fd.fd = p_sys->i_fd;
+    fd.events = POLLIN|POLLPRI;
+    fd.revents = 0;
+
+    /* Wait for data */
+    if( poll( &fd, 1, 500 ) )
     {
-        /* Sleep so we do not consume all the cpu, 10ms seems
-         * like a good value (100fps) */
-        msleep( 10000 );
-        return 1;
+        if( fd.revents & (POLLIN|POLLPRI) )
+        {
+            block_t *p_block = GrabVideo( p_demux );
+            if( p_block )
+            {
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+                es_out_Send( p_demux->out, p_sys->p_es, p_block );
+            }
+        }
     }
-
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-    es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     return 1;
 }
@@ -1191,7 +1200,7 @@ static uint8_t *GrabCapture( demux_t *p_demux )
 
     p_sys->vid_mmap.frame = (p_sys->i_frame_pos + 1) % p_sys->vid_mbuf.frames;
 
-    while( ioctl( p_sys->fd_video, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
+    while( ioctl( p_sys->i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
     {
         if( errno != EAGAIN )
         {
@@ -1207,7 +1216,7 @@ static uint8_t *GrabCapture( demux_t *p_demux )
         msg_Dbg( p_demux, "grab failed, trying again" );
     }
 
-    while( ioctl(p_sys->fd_video, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
+    while( ioctl(p_sys->i_fd, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
     {
         if( errno != EAGAIN && errno != EINTR )
         {
@@ -1233,7 +1242,7 @@ static uint8_t *GrabMJPEG( demux_t *p_demux )
     /* re-queue the last frame we sync'd */
     if( p_sys->i_frame_pos != -1 )
     {
-        while( ioctl( p_sys->fd_video, MJPIOC_QBUF_CAPT,
+        while( ioctl( p_sys->i_fd, MJPIOC_QBUF_CAPT,
                                        &p_sys->i_frame_pos ) < 0 )
         {
             if( errno != EAGAIN && errno != EINTR )
@@ -1245,7 +1254,7 @@ static uint8_t *GrabMJPEG( demux_t *p_demux )
     }
 
     /* sync on the next frame */
-    while( ioctl( p_sys->fd_video, MJPIOC_SYNC, &sync ) < 0 )
+    while( ioctl( p_sys->i_fd, MJPIOC_SYNC, &sync ) < 0 )
     {
         if( errno != EAGAIN && errno != EINTR )
         {
