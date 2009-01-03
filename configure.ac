@@ -2343,23 +2343,6 @@ then
     VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
   fi
 
-  if test "${enable_alsa}" != "no"
-  then
-    AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_v4l2_alsa="true", have_v4l2_alsa="false"),have_v4l2_alsa="false")
-  fi
-
-  if test "${have_v4l2_alsa}" = "true"
-  then
-    CFLAGS="${CFLAGS_save}"
-    AC_TRY_COMPILE([#define ALSA_PCM_NEW_HW_PARAMS_API
-                    #define ALSA_PCM_NEW_SW_PARAMS_API
-                    #include <alsa/asoundlib.h>],
-       [snd_pcm_hw_params_get_period_time(0,0,0);],
-        AC_DEFINE(HAVE_ALSA_NEW_API, 1, Define if ALSA is at least rc4))
-    VLC_ADD_LDFLAGS([v4l2],[-lasound -lm -ldl])
-    AC_DEFINE(HAVE_ALSA, 1, Define if ALSA is present.)
-  fi
-
   CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l2}"
   AC_CHECK_HEADERS(linux/videodev2.h, [
     VLC_ADD_PLUGIN([v4l2])
@@ -4590,6 +4573,7 @@ if test "${enable_oss}" != "no" &&
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
     VLC_ADD_PLUGIN([oss])
+    VLC_ADD_PLUGIN([access_oss])
     AC_CHECK_LIB(ossaudio,main,VLC_ADD_LIBS([oss],[-lossaudio]))
   ])
 fi

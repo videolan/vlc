@@ -38,6 +38,7 @@ SOURCES_cdda = \
         $(NULL)
 SOURCES_access_jack = jack.c
 SOURCES_access_alsa = alsa.c
+SOURCES_access_oss = oss.c
 
 libvlc_LTLIBRARIES += \
 	libaccess_file_plugin.la \
