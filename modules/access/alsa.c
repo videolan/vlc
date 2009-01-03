@@ -122,9 +122,9 @@ struct demux_sys_t
     int i_pts;
     unsigned int i_sample_rate;
     bool b_stereo;
-    size_t i_audio_max_frame_size;
-    block_t *p_block_audio;
-    es_out_id_t *p_es_audio;
+    size_t i_max_frame_size;
+    block_t *p_block;
+    es_out_id_t *p_es;
 
     /* ALSA Audio */
     snd_pcm_t *p_alsa_pcm;
@@ -134,6 +134,8 @@ struct demux_sys_t
 
 static int FindMainDevice( demux_t *p_demux )
 {
+    /* TODO: if using default device, loop through all alsa devices until
+     * one works. */
     msg_Dbg( p_demux, "opening device '%s'", p_demux->p_sys->psz_device );
     if( ProbeAudioDevAlsa( p_demux, p_demux->p_sys->psz_device ) )
     {
@@ -175,9 +177,8 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->i_sample_rate = var_CreateGetInteger( p_demux, CFG_PREFIX "samplerate" );
     p_sys->b_stereo = var_CreateGetBool( p_demux, CFG_PREFIX "stereo" );
     p_sys->i_pts = var_CreateGetInteger( p_demux, CFG_PREFIX "caching" );
-    p_sys->psz_device = NULL;
-    p_sys->p_es_audio = NULL;
-    p_sys->p_block_audio = NULL;
+    p_sys->p_es = NULL;
+    p_sys->p_block = NULL;
 
     if( p_demux->psz_path && *p_demux->psz_path )
         p_sys->psz_device = p_demux->psz_path;
@@ -206,7 +207,7 @@ static void DemuxClose( vlc_object_t *p_this )
         snd_pcm_close( p_sys->p_alsa_pcm );
     }
 
-    if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
+    if( p_sys->p_block ) block_Release( p_sys->p_block );
 
     free( p_sys );
 }
@@ -265,7 +266,7 @@ static int Demux( demux_t *p_demux )
             if( p_block )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_es_audio, p_block );
+                es_out_Send( p_demux->out, p_sys->p_es, p_block );
             }
         }
 
@@ -295,8 +296,8 @@ static block_t* GrabAudio( demux_t *p_demux )
     int i_read, i_correct;
     block_t *p_block;
 
-    if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
-    else p_block = block_New( p_demux, p_sys->i_audio_max_frame_size );
+    if( p_sys->p_block ) p_block = p_sys->p_block;
+    else p_block = block_New( p_demux, p_sys->i_max_frame_size );
 
     if( !p_block )
     {
@@ -304,7 +305,7 @@ static block_t* GrabAudio( demux_t *p_demux )
         return 0;
     }
 
-    p_sys->p_block_audio = p_block;
+    p_sys->p_block = p_block;
 
     /* ALSA */
     i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
@@ -338,7 +339,7 @@ static block_t* GrabAudio( demux_t *p_demux )
     if( i_read <= 0 ) return 0;
 
     p_block->i_buffer = i_read;
-    p_sys->p_block_audio = 0;
+    p_sys->p_block = 0;
 
     /* Correct the date because of kernel buffering */
     i_correct = i_read;
@@ -349,11 +350,11 @@ static block_t* GrabAudio( demux_t *p_demux )
     {
         size_t i_correction_delta = delay * p_sys->i_alsa_frame_size;
         /* Test for overrun */
-        if( i_correction_delta > p_sys->i_audio_max_frame_size )
+        if( i_correction_delta > p_sys->i_max_frame_size )
         {
             msg_Warn( p_demux, "ALSA read overrun (%zu > %zu)",
-                      i_correction_delta, p_sys->i_audio_max_frame_size );
-            i_correction_delta = p_sys->i_audio_max_frame_size;
+                      i_correction_delta, p_sys->i_max_frame_size );
+            i_correction_delta = p_sys->i_max_frame_size;
             snd_pcm_prepare( p_sys->p_alsa_pcm );
         }
         i_correct += i_correction_delta;
@@ -529,7 +530,7 @@ static int OpenAudioDevAlsa( demux_t *p_demux )
 
     p_sys->i_alsa_chunk_size = chunk_size;
     p_sys->i_alsa_frame_size = bits_per_frame / 8;
-    p_sys->i_audio_max_frame_size = chunk_size * bits_per_frame / 8;
+    p_sys->i_max_frame_size = chunk_size * bits_per_frame / 8;
 
     snd_pcm_hw_params_free( p_hw_params );
     p_hw_params = NULL;
@@ -579,7 +580,7 @@ static int OpenAudioDev( demux_t *p_demux )
     msg_Dbg( p_demux, "new audio es %d channels %dHz",
              fmt.audio.i_channels, fmt.audio.i_rate );
 
-    p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return VLC_SUCCESS;
 }

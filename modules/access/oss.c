@@ -115,15 +115,15 @@ struct demux_sys_t
 {
     const char *psz_device;  /* OSS device from MRL */
 
-    int  i_fd_audio;
+    int  i_fd;
 
     /* Audio */
     int i_pts;
     unsigned int i_sample_rate;
     bool b_stereo;
-    size_t i_audio_max_frame_size;
-    block_t *p_block_audio;
-    es_out_id_t *p_es_audio;
+    size_t i_max_frame_size;
+    block_t *p_block;
+    es_out_id_t *p_es;
 };
 
 static int FindMainDevice( demux_t *p_demux )
@@ -132,10 +132,10 @@ static int FindMainDevice( demux_t *p_demux )
     if( ProbeAudioDevOss( p_demux, p_demux->p_sys->psz_device ) )
     {
         msg_Dbg( p_demux, "'%s' is an audio device", p_demux->p_sys->psz_device );
-        p_demux->p_sys->i_fd_audio = OpenAudioDev( p_demux );
+        p_demux->p_sys->i_fd = OpenAudioDev( p_demux );
     }
 
-    if( p_demux->p_sys->i_fd_audio < 0 )
+    if( p_demux->p_sys->i_fd < 0 )
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -168,10 +168,9 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->i_sample_rate = var_CreateGetInteger( p_demux, CFG_PREFIX "samplerate" );
     p_sys->b_stereo = var_CreateGetBool( p_demux, CFG_PREFIX "stereo" );
     p_sys->i_pts = var_CreateGetInteger( p_demux, CFG_PREFIX "caching" );
-    p_sys->psz_device = NULL;
-    p_sys->i_fd_audio = -1;
-    p_sys->p_es_audio = 0;
-    p_sys->p_block_audio = 0;
+    p_sys->i_fd = -1;
+    p_sys->p_es = NULL;
+    p_sys->p_block = NULL;
 
     if( p_demux->psz_path && *p_demux->psz_path )
         p_sys->psz_device = p_demux->psz_path;
@@ -196,9 +195,9 @@ static void DemuxClose( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys   = p_demux->p_sys;
 
-    if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
+    if( p_sys->i_fd >= 0 ) close( p_sys->i_fd );
 
-    if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
+    if( p_sys->p_block ) block_Release( p_sys->p_block );
     free( p_sys );
 }
 
@@ -248,7 +247,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     struct pollfd fd;
-    fd.fd = p_sys->i_fd_audio;
+    fd.fd = p_sys->i_fd;
     fd.events = POLLIN|POLLPRI;
     fd.revents = 0;
 
@@ -261,7 +260,7 @@ static int Demux( demux_t *p_demux )
             if( p_block )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_es_audio, p_block );
+                es_out_Send( p_demux->out, p_sys->p_es, p_block );
             }
         }
     }
@@ -279,8 +278,8 @@ static block_t* GrabAudio( demux_t *p_demux )
     int i_read = 0, i_correct;
     block_t *p_block;
 
-    if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
-    else p_block = block_New( p_demux, p_sys->i_audio_max_frame_size );
+    if( p_sys->p_block ) p_block = p_sys->p_block;
+    else p_block = block_New( p_demux, p_sys->i_max_frame_size );
 
     if( !p_block )
     {
@@ -288,19 +287,19 @@ static block_t* GrabAudio( demux_t *p_demux )
         return 0;
     }
 
-    p_sys->p_block_audio = p_block;
+    p_sys->p_block = p_block;
 
-    i_read = read( p_sys->i_fd_audio, p_block->p_buffer,
-                p_sys->i_audio_max_frame_size );
+    i_read = read( p_sys->i_fd, p_block->p_buffer,
+                p_sys->i_max_frame_size );
 
     if( i_read <= 0 ) return 0;
 
     p_block->i_buffer = i_read;
-    p_sys->p_block_audio = 0;
+    p_sys->p_block = 0;
 
     /* Correct the date because of kernel buffering */
     i_correct = i_read;
-    if( ioctl( p_sys->i_fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
     {
         i_correct += buf_info.bytes;
     }
@@ -352,7 +351,7 @@ static int OpenAudioDevOss( demux_t *p_demux )
         goto adev_fail;
     }
 
-    p_demux->p_sys->i_audio_max_frame_size = 6 * 1024;
+    p_demux->p_sys->i_max_frame_size = 6 * 1024;
 
     return i_fd;
 
@@ -386,7 +385,7 @@ static int OpenAudioDev( demux_t *p_demux )
     msg_Dbg( p_demux, "new audio es %d channels %dHz",
              fmt.audio.i_channels, fmt.audio.i_rate );
 
-    p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
+    p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return i_fd;
 }
