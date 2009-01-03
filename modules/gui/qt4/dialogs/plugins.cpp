@@ -33,6 +33,8 @@
 #include <QStringList>
 #include <QHeaderView>
 #include <QDialogButtonBox>
+#include <QLineEdit>
+#include <QLabel>
 
 PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
@@ -66,10 +68,19 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     treePlugins->setSortingEnabled( true );
     treePlugins->sortByColumn( 1, Qt::AscendingOrder );
 
+    QLabel *label = new QLabel( _("&Search:"), this );
+    edit = new QLineEdit;
+    label->setBuddy( edit );
+
+    layout->addWidget( label, 1, 0 );
+    layout->addWidget( edit, 1, 1, 1, -1 );
+    CONNECT( edit, textChanged( QString ),
+            this, search( QString ) );
+
     QDialogButtonBox *box = new QDialogButtonBox;
     QPushButton *okButton = new QPushButton( "ok", this );
     box->addButton( okButton, QDialogButtonBox::AcceptRole );
-    layout->addWidget( box, 1, 2 );
+    layout->addWidget( box, 2, 2 );
 
     BUTTONACT( okButton, close() );
 
@@ -91,6 +102,19 @@ inline void PluginDialog::FillTree()
 
         QTreeWidgetItem *item = new QTreeWidgetItem( qs_item );
         treePlugins->addTopLevelItem( item );
+    }
+}
+
+void PluginDialog::search( const QString qs )
+{
+    QList<QTreeWidgetItem *> items = treePlugins->findItems( qs, Qt::MatchContains );
+    items += treePlugins->findItems( qs, Qt::MatchContains, 1 );
+
+    QTreeWidgetItem *item = NULL;
+    for( int i = 0; i < treePlugins->topLevelItemCount(); i++ )
+    {
+        item = treePlugins->topLevelItem( i );
+        item->setHidden( !items.contains( item ) );
     }
 }
 

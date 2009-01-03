@@ -27,6 +27,7 @@
 #include "util/qvlcframe.hpp"
 
 class QTreeWidget;
+class QLineEdit;
 
 class PluginDialog : public QVLCFrame
 {
@@ -38,6 +39,9 @@ private:
     virtual ~PluginDialog();
 
     QTreeWidget *treePlugins;
+    QLineEdit *edit;
+private slots:
+    void search( const QString );
 };
 
 #endif
