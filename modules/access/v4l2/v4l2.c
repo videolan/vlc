@@ -1,7 +1,7 @@
 /*****************************************************************************
  * v4l2.c : Video4Linux2 input module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
