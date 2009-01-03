@@ -85,8 +85,8 @@ inline void PluginDialog::FillTree()
     for( unsigned int i = 0; (p_module = p_list[i] ) != NULL; i++ )
     {
         QStringList qs_item;
-        qs_item << module_get_name( p_module, true )
-                << module_get_capability( p_module )
+        qs_item << qfu( module_get_name( p_module, true ) )
+                << qfu( module_get_capability( p_module ) )
                 << QString::number( module_get_score( p_module ) );
 
         QTreeWidgetItem *item = new QTreeWidgetItem( qs_item );
