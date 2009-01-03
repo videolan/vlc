@@ -130,6 +130,8 @@ struct demux_sys_t
     snd_pcm_t *p_alsa_pcm;
     size_t i_alsa_frame_size;
     int i_alsa_chunk_size;
+
+    int64_t i_next_demux_date; /* Used to handle alsa:// as input-slave properly */
 };
 
 static int FindMainDevice( demux_t *p_demux )
@@ -179,6 +181,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->i_pts = var_CreateGetInteger( p_demux, CFG_PREFIX "caching" );
     p_sys->p_es = NULL;
     p_sys->p_block = NULL;
+    p_sys->i_next_demux_date = -1;
 
     if( p_demux->psz_path && *p_demux->psz_path )
         p_sys->psz_device = p_demux->psz_path;
@@ -242,6 +245,10 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
             *pi64 = mdate();
             return VLC_SUCCESS;
 
+        case DEMUX_SET_NEXT_DEMUX_TIME:
+            p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t );
+            return VLC_SUCCESS;
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
@@ -257,31 +264,47 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int i_wait = snd_pcm_wait( p_sys->p_alsa_pcm, 500 );
-    switch( i_wait )
+    block_t *p_block = NULL;
+
+    do
     {
-        case 1:
+        if( p_block )
         {
-            block_t *p_block = GrabAudio( p_demux );
-            if( p_block )
-            {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_es, p_block );
-            }
+            es_out_Send( p_demux->out, p_sys->p_es, p_block );
+            p_block = NULL;
         }
 
-        case -EPIPE:
-            /* xrun */
-            snd_pcm_prepare( p_sys->p_alsa_pcm );
-            break;
-        case -ESTRPIPE:
+        /* Wait for data */
+        int i_wait = snd_pcm_wait( p_sys->p_alsa_pcm, 500 );
+        switch( i_wait )
         {
-            /* suspend */
-            int i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
-            if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
-            break;
+            case 1:
+            {
+                p_block = GrabAudio( p_demux );
+                if( p_block )
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+            }
+
+            /* FIXME: this is a copy paste from below. Shouldn't be needed
+             * twice. */
+            case -EPIPE:
+                /* xrun */
+                snd_pcm_prepare( p_sys->p_alsa_pcm );
+                break;
+            case -ESTRPIPE:
+            {
+                /* suspend */
+                int i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
+                if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
+                break;
+            }
+            /* </FIXME> */
         }
-    }
+    } while( p_block && p_sys->i_next_demux_date > 0 &&
+             p_block->i_pts < p_sys->i_next_demux_date );
+
+    if( p_block )
+        es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     return 1;
 }

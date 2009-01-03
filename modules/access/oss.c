@@ -124,6 +124,8 @@ struct demux_sys_t
     size_t i_max_frame_size;
     block_t *p_block;
     es_out_id_t *p_es;
+
+    int64_t i_next_demux_date; /* Used to handle oss:// as input-slave properly */
 };
 
 static int FindMainDevice( demux_t *p_demux )
@@ -171,6 +173,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->i_fd = -1;
     p_sys->p_es = NULL;
     p_sys->p_block = NULL;
+    p_sys->i_next_demux_date = -1;
 
     if( p_demux->psz_path && *p_demux->psz_path )
         p_sys->psz_device = p_demux->psz_path;
@@ -230,6 +233,10 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
             *pi64 = mdate();
             return VLC_SUCCESS;
 
+        case DEMUX_SET_NEXT_DEMUX_TIME:
+            p_sys->i_next_demux_date = (int64_t)va_arg( args, int64_t );
+            return VLC_SUCCESS;
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
@@ -250,19 +257,31 @@ static int Demux( demux_t *p_demux )
     fd.events = POLLIN|POLLPRI;
     fd.revents = 0;
 
-    /* Wait for data */
-    if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+    block_t *p_block = NULL;
+
+    do
     {
-        if( fd.revents & (POLLIN|POLLPRI) )
+        if( p_block )
         {
-            block_t *p_block = GrabAudio( p_demux );
-            if( p_block )
+            es_out_Send( p_demux->out, p_sys->p_es, p_block );
+            p_block = NULL;
+        }
+
+        /* Wait for data */
+        if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+        {
+            if( fd.revents & (POLLIN|POLLPRI) )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_es, p_block );
+                p_block = GrabAudio( p_demux );
+                if( p_block )
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
             }
         }
-    }
+    } while( p_block && p_sys->i_next_demux_date > 0 &&
+             p_block->i_pts < p_sys->i_next_demux_date );
+
+    if( p_block )
+        es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     return 1;
 }
