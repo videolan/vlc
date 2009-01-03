@@ -307,6 +307,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pi64 = (int64_t)var_GetInteger( p_demux, "screen-caching" ) *1000;
             return VLC_SUCCESS;
 
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = mdate();
+            return VLC_SUCCESS;
+
         /* TODO implement others */
         default:
             return VLC_EGENERIC;
