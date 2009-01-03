@@ -379,6 +379,9 @@ __net_Read (vlc_object_t *restrict p_this, int fd, const v_socket_t *vs,
             switch (errno)
             {
                 case EAGAIN: /* spurious wakeup or no TLS data */
+#if (EAGAIN != EWOULDBLOCK)
+                case EWOULDBLOCK:
+#endif
                 case EINTR:  /* asynchronous signal */
                     continue;
             }

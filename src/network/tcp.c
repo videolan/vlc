@@ -52,6 +52,8 @@
 #if defined (WIN32) || defined (UNDER_CE)
 #   undef EINPROGRESS
 #   define EINPROGRESS WSAEWOULDBLOCK
+#   undef EWOULDBLOCK
+#   define EWOULDBLOCK WSAEWOULDBLOCK
 #   undef EINTR
 #   define EINTR WSAEINTR
 #   undef ETIMEDOUT
@@ -258,7 +260,7 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
 
     if (fd == -1)
     {
-        if (net_errno != EAGAIN)
+        if (net_errno != EAGAIN && net_errno != EWOULDBLOCK)
             msg_Err (obj, "accept failed (from socket %d): %m", lfd);
         return -1;
     }
