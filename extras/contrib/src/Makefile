@@ -1,13 +1,13 @@
 #***************************************************************************
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
-# Copyright (C) 2003 - 2008 the VideoLAN team
+# Copyright (C) 2003 - 2009 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Eric Petit <titer@m0k.org>
-#          Felix Paul Kühne <fkuehne@videolan.org>
+#          Felix Paul Kühne <fkuehne at videolan dot org>
 #          Christophe Mutricy <xtophe AT xtelevision.com>
 #          Gildas Bazin <gbazin at videolan dot org>
 #          Damien Fouilleul <damienf at videolan dot org>
@@ -1341,6 +1341,8 @@ ifdef HAVE_DARWIN_OS
 ifndef HAVE_DARWIN_OS_ON_INTEL
 	patch -p0 < Patches/caca-osx-ppc.patch
 endif
+	patch -p0 < Patches/libcaca-osx-sdkofourchoice.patch
+	(cd $@; sed -e 's%/Developer/SDKs/MacOSX10.4u.sdk%$(MACOSX_SDK)%' -i.orig  configure)
 endif
 
 .caca: libcaca
