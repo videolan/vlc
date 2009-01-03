@@ -27,11 +27,6 @@
 /*
  * Sections based on the reference V4L2 capture example at
  * http://v4l2spec.bytesex.org/spec/capture-example.html
- *
- * ALSA support based on parts of
- * http://www.equalarea.com/paul/alsa-audio.html
- * and hints taken from alsa-utils (aplay/arecord)
- * http://www.alsa-project.org
  */
 
 /*****************************************************************************
@@ -87,10 +82,6 @@ static void DemuxClose( vlc_object_t * );
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
 
-#define DEV_TEXT N_("Device name")
-#define DEV_LONGTEXT N_( \
-    "Name of the device to use. " \
-    "If you don't specify anything, /dev/video0 will be used.")
 #define STANDARD_TEXT N_( "Standard" )
 #define STANDARD_LONGTEXT N_( \
     "Video standard (Default, SECAM, PAL, or NTSC)." )
@@ -177,26 +168,6 @@ static void AccessClose( vlc_object_t * );
 #define VCENTER_LONGTEXT N_( \
     "Set the camera's vertical centering (if supported by the v4l2 driver)." )
 
-#define ADEV_TEXT N_("Audio device name")
-#ifndef HAVE_ALSA
-#define ADEV_LONGTEXT N_( \
-    "Name of the audio device to use. " \
-    "If you don't specify anything, \"/dev/dsp\" will be used for OSS.")
-#else
-#define ADEV_LONGTEXT N_( \
-    "Name of the audio device to use. " \
-    "If you don't specify anything, \"/dev/dsp\" will be used for OSS, " \
-    "\"hw\" for Alsa.")
-#endif
-#define AUDIO_METHOD_TEXT N_( "Audio method" )
-#ifndef HAVE_ALSA
-#define AUDIO_METHOD_LONGTEXT N_( \
-    "Audio method to use: 0 to disable audio, 1 for OSS." )
-#else
-#define AUDIO_METHOD_LONGTEXT N_( \
-    "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, " \
-    "3 for ALSA or OSS (ALSA is preferred)." )
-#endif
 #define AUDIO_VOLUME_TEXT N_( "Volume" )
 #define AUDIO_VOLUME_LONGTEXT N_( \
     "Volume of the audio input (if supported by the v4l2 driver)." )
@@ -215,13 +186,6 @@ static void AccessClose( vlc_object_t * );
 #define AUDIO_LOUDNESS_TEXT N_( "Loudness" )
 #define AUDIO_LOUDNESS_LONGTEXT N_( \
     "Loudness of the audio input (if supported by the v4l2 driver)." )
-
-#define STEREO_TEXT N_( "Stereo" )
-#define STEREO_LONGTEXT N_( \
-    "Capture the audio stream in stereo." )
-#define SAMPLERATE_TEXT N_( "Samplerate" )
-#define SAMPLERATE_LONGTEXT N_( \
-    "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100, 48000)" )
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -244,6 +208,11 @@ static void AccessClose( vlc_object_t * );
 #define TUNER_AUDIO_MODE_TEXT N_("Audio mode")
 #define TUNER_AUDIO_MODE_LONGTEXT N_( \
     "Tuner audio mono/stereo and track selection." )
+
+#define AUDIO_DEPRECATED_ERROR N_( \
+    "Alsa or OSS audio capture in the v4l2 access is deprecated. " \
+    "please use 'v4l2:/""/ --input-slave alsa:/""/' or " \
+    "'v4l2:/""/ --input-slave oss:/""/' instead." )
 
 typedef enum {
     IO_METHOD_READ,
@@ -273,13 +242,7 @@ static const char *const psz_tuner_audio_modes_list_text[] =
       N_( "Second audio program (Analog TV tuners only)" ),
       N_( "Primary language left, Secondary language right" ) };
 
-#define FIND_VIDEO 1
-#define FIND_AUDIO 2
-
-#define AUDIO_METHOD_OSS 1
-#define OSS_DEFAULT "/dev/dsp"
-#define AUDIO_METHOD_ALSA 2
-#define ALSA_DEFAULT "hw"
+#define V4L2_DEFAULT "/dev/video0"
 #define CFG_PREFIX "v4l2-"
 
 vlc_module_begin ()
@@ -289,8 +252,6 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     set_section( N_( "Video input" ), NULL )
-    add_string( CFG_PREFIX "dev", "/dev/video0", 0, DEV_TEXT, DEV_LONGTEXT,
-                false );
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
                  STANDARD_LONGTEXT, false );
         change_integer_list( i_standards_list, psz_standards_list_text, NULL );
@@ -308,16 +269,6 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true );
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
-
-    set_section( N_( "Audio input" ), NULL )
-    add_string( CFG_PREFIX "adev", NULL, 0, ADEV_TEXT, ADEV_LONGTEXT,
-                false );
-    add_integer( CFG_PREFIX "audio-method", AUDIO_METHOD_OSS|AUDIO_METHOD_ALSA,
-                 NULL, AUDIO_METHOD_TEXT, AUDIO_METHOD_LONGTEXT, true );
-    add_bool( CFG_PREFIX "stereo", true, NULL, STEREO_TEXT, STEREO_LONGTEXT,
-                true );
-    add_integer( CFG_PREFIX "samplerate", 48000, NULL, SAMPLERATE_TEXT,
-                SAMPLERATE_LONGTEXT, true );
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, true );
 
@@ -384,6 +335,13 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
               S_CTRLS_LONGTEXT, true );
 
+    add_obsolete_string( CFG_PREFIX "dev" );
+
+    add_obsolete_string( CFG_PREFIX "adev" );
+    add_obsolete_integer( CFG_PREFIX "audio-method" );
+    add_obsolete_bool( CFG_PREFIX "stereo" );
+    add_obsolete_integer( CFG_PREFIX "samplerate" );
+
     add_shortcut( "v4l2" )
     set_capability( "access_demux", 10 )
     set_callbacks( DemuxOpen, DemuxClose )
@@ -414,20 +372,13 @@ static ssize_t AccessRead( access_t *, uint8_t *, size_t );
 
 static block_t* GrabVideo( demux_t *p_demux );
 static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t );
-static block_t* GrabAudio( demux_t *p_demux );
 
 static bool IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
 
-#ifdef HAVE_ALSA
-static char* ResolveALSADeviceName( const char *psz_device );
-#endif
 static int OpenVideoDev( vlc_object_t *, demux_sys_t *, bool );
-static int OpenAudioDev( vlc_object_t *, demux_sys_t *, bool );
 static bool ProbeVideoDev( vlc_object_t *, demux_sys_t *,
-                                 char *psz_device );
-static bool ProbeAudioDev( vlc_object_t *, demux_sys_t *,
-                                 char *psz_device );
+                                 const char *psz_device );
 
 static int ControlList( vlc_object_t *, int , bool, bool );
 static int Control( vlc_object_t *, int i_fd,
@@ -544,13 +495,8 @@ struct buffer_t
 
 struct demux_sys_t
 {
-    char *psz_device;  /* Main device from MRL, can be video or audio */
-
-    char *psz_vdev;
-    int  i_fd_video;
-
-    char *psz_adev;
-    int  i_fd_audio;
+    char *psz_device;  /* Main device from MRL */
+    int  i_fd;
 
     char *psz_requested_chroma;
 
@@ -589,23 +535,7 @@ struct demux_sys_t
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
 
-    es_out_id_t *p_es_video;
-
-    /* Audio */
-    unsigned int i_sample_rate;
-    bool b_stereo;
-    size_t i_audio_max_frame_size;
-    block_t *p_block_audio;
-    es_out_id_t *p_es_audio;
-
-    int i_audio_method;
-
-#ifdef HAVE_ALSA
-    /* ALSA Audio */
-    snd_pcm_t *p_alsa_pcm;
-    size_t i_alsa_frame_size;
-    int i_alsa_chunk_size;
-#endif
+    es_out_id_t *p_es;
 
     /* Tuner */
     int i_cur_tuner;
@@ -617,99 +547,18 @@ struct demux_sys_t
 };
 
 static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
-                           int i_flags, bool b_demux,
-                           bool b_forced )
+                           bool b_demux )
 {
-    /* Find main device (video or audio) */
-    if( p_sys->psz_device && *p_sys->psz_device )
+    /* TODO: if using default device, loop through all /dev/video* until
+     * one works */
+    msg_Dbg( p_this, "opening device '%s'", p_sys->psz_device );
+    if( ProbeVideoDev( p_this, p_sys, p_sys->psz_device ) )
     {
-        msg_Dbg( p_this, "main device='%s'", p_sys->psz_device );
-
-        bool b_maindevice_is_video = false;
-
-        /* Try to open as video device */
-        if( i_flags & FIND_VIDEO )
-        {
-            msg_Dbg( p_this, "trying device '%s' as video", p_sys->psz_device );
-            if( ProbeVideoDev( p_this, p_sys, p_sys->psz_device ) )
-            {
-                msg_Dbg( p_this, "'%s' is a video device", p_sys->psz_device );
-                /* Device was a video device */
-                free( p_sys->psz_vdev );
-                p_sys->psz_vdev = p_sys->psz_device;
-                p_sys->psz_device = NULL;
-                p_sys->i_fd_video = OpenVideoDev( p_this, p_sys, b_demux );
-                if( p_sys->i_fd_video < 0 )
-                    return VLC_EGENERIC;
-                b_maindevice_is_video = true;
-                /* If successful we carry on to try the audio if access is forced */
-            }
-        }
-
-        /* Try to open as audio device only if main device was not detected as video above */
-        if( i_flags & FIND_AUDIO && !b_maindevice_is_video )
-        {
-            msg_Dbg( p_this, "trying device '%s' as audio", p_sys->psz_device );
-            if( ProbeAudioDev( p_this, p_sys, p_sys->psz_device ) )
-            {
-                msg_Dbg( p_this, "'%s' is an audio device", p_sys->psz_device );
-                /* Device was an audio device */
-                free( p_sys->psz_adev );
-                p_sys->psz_adev = p_sys->psz_device;
-                p_sys->psz_device = NULL;
-                p_sys->i_fd_audio = OpenAudioDev( p_this, p_sys, b_demux );
-                if( p_sys->i_fd_audio < 0 )
-                    return VLC_EGENERIC;
-                /* If successful we carry on to try the video if access is forced */
-            }
-        }
+        msg_Dbg( p_this, "'%s' is a video device", p_sys->psz_device );
+        p_sys->i_fd = OpenVideoDev( p_this, p_sys, b_demux );
     }
 
-    /* If no device opened, only continue if the access was forced */
-    if( b_forced == false
-        && !( ( i_flags & FIND_VIDEO && p_sys->i_fd_video >= 0 )
-           || ( i_flags & FIND_AUDIO && p_sys->i_fd_audio >= 0 ) ) )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* Find video device */
-    if( i_flags & FIND_VIDEO && p_sys->i_fd_video < 0 )
-    {
-        if( !p_sys->psz_vdev || !*p_sys->psz_vdev )
-        {
-            free( p_sys->psz_vdev );
-            p_sys->psz_vdev = var_CreateGetString( p_this, "v4l2-dev" );
-        }
-
-        msg_Dbg( p_this, "opening '%s' as video", p_sys->psz_vdev );
-        if( p_sys->psz_vdev && *p_sys->psz_vdev
-         && ProbeVideoDev( p_this, p_sys, p_sys->psz_vdev ) )
-        {
-            p_sys->i_fd_video = OpenVideoDev( p_this, p_sys, b_demux );
-        }
-    }
-
-    /* Find audio device */
-    if( i_flags & FIND_AUDIO && p_sys->i_fd_audio < 0 )
-    {
-        if( !p_sys->psz_adev )
-        {
-            p_sys->psz_adev = var_CreateGetNonEmptyString( p_this, "v4l2-adev" );
-        }
-
-        msg_Dbg( p_this, "opening '%s' as audio", p_sys->psz_adev );
-        if( ProbeAudioDev( p_this, p_sys, p_sys->psz_adev ) )
-        {
-            p_sys->i_fd_audio = OpenAudioDev( p_this, p_sys, b_demux );
-        }
-    }
-
-    if( !( ( i_flags & FIND_VIDEO && p_sys->i_fd_video >= 0 )
-        || ( i_flags & FIND_AUDIO && p_sys->i_fd_audio >= 0 ) ) )
-    {
-        return VLC_EGENERIC;
-    }
+    if( p_sys->i_fd < 0 ) return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
 
@@ -742,13 +591,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     ParseMRL( p_sys, p_demux->psz_path, (vlc_object_t *) p_demux );
 
-#ifdef HAVE_ALSA
-    /* Alsa support available? */
-    msg_Dbg( p_demux, "ALSA input support available" );
-#endif
-
-    if( FindMainDevice( p_this, p_sys, FIND_VIDEO|FIND_AUDIO,
-        true, !strncmp( p_demux->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
+    if( FindMainDevice( p_this, p_sys, true ) != VLC_SUCCESS)
     {
         DemuxClose( p_this );
         return VLC_EGENERIC;
@@ -779,12 +622,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     var_Create( p_obj, "v4l2-controls-reset", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     p_sys->f_fps = var_CreateGetFloat( p_obj, "v4l2-fps" );
-    p_sys->i_sample_rate = var_CreateGetInteger( p_obj, "v4l2-samplerate" );
     p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
-
-    p_sys->i_audio_method = var_CreateGetInteger( p_obj, "v4l2-audio-method" );
-
-    p_sys->b_stereo = var_CreateGetBool( p_obj, "v4l2-stereo" );
 
     p_sys->i_pts = var_CreateGetInteger( p_obj, "v4l2-caching" );
 
@@ -794,12 +632,10 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 
     p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
-    p_sys->psz_device = p_sys->psz_vdev = p_sys->psz_adev = NULL;
-    p_sys->i_fd_video = -1;
-    p_sys->i_fd_audio = -1;
+    p_sys->psz_device = NULL;
+    p_sys->i_fd = -1;
 
-    p_sys->p_es_video = p_sys->p_es_audio = 0;
-    p_sys->p_block_audio = 0;
+    p_sys->p_es = NULL;
 }
 
 /*****************************************************************************
@@ -822,30 +658,7 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
         {
             *psz_parser++ = '\0';
 
-            if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) ) )
-            {
-                int  i_len;
-
-                psz_parser += strlen( "adev=" );
-                if( strchr( psz_parser, ':' ) )
-                {
-                    i_len = strchr( psz_parser, ':' ) - psz_parser;
-                }
-                else
-                {
-                    i_len = strlen( psz_parser );
-                }
-
-                p_sys->psz_adev = strndup( psz_parser, i_len );
-                if( !*p_sys->psz_adev )
-                {
-                    free( p_sys->psz_adev );
-                    p_sys->psz_adev = NULL;
-                }
-
-                psz_parser += i_len;
-            }
-            else if( !strncmp( psz_parser, "standard=", strlen( "standard=" ) ) )
+            if( !strncmp( psz_parser, "standard=", strlen( "standard=" ) ) )
             {
                 psz_parser += strlen( "standard=" );
                 if( !strncmp( psz_parser, "pal", strlen( "pal" ) ) )
@@ -987,29 +800,6 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                             &psz_parser, 0 ) );
             }
 #endif
-            else if( !strncmp( psz_parser, "samplerate=",
-                               strlen( "samplerate=" ) ) )
-            {
-                p_sys->i_sample_rate =
-                    strtol( psz_parser + strlen( "samplerate=" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "audio-method", strlen( "audio-method" ) ) )
-            {
-                p_sys->i_audio_method =
-                    strtol( psz_parser + strlen( "audio-method" ),
-                            &psz_parser, 0 );
-            }
-            else if( !strncmp( psz_parser, "stereo", strlen( "stereo" ) ) )
-            {
-                psz_parser += strlen( "stereo" );
-                p_sys->b_stereo = true;
-            }
-            else if( !strncmp( psz_parser, "mono", strlen( "mono" ) ) )
-            {
-                psz_parser += strlen( "mono" );
-                p_sys->b_stereo = false;
-            }
             else if( !strncmp( psz_parser, "caching=", strlen( "caching=" ) ) )
             {
                 p_sys->i_pts = strtol( psz_parser + strlen( "caching=" ),
@@ -1050,6 +840,23 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
 
                 psz_parser += i_len;
             }
+            else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) )
+             || !strncmp( psz_parser, "samplerate=", strlen( "samplerate=" ) )
+             || !strncmp( psz_parser, "audio-method", strlen( "audio-method" ) )
+             || !strncmp( psz_parser, "stereo", strlen( "stereo" ) )
+             || !strncmp( psz_parser, "mono", strlen( "mono" ) ) )
+            {
+                if( strchr( psz_parser, ':' ) )
+                {
+                    psz_parser = strchr( psz_parser, ':' );
+                }
+                else
+                {
+                    psz_parser += strlen( psz_parser );
+                }
+
+                msg_Err( p_obj, AUDIO_DEPRECATED_ERROR );
+            }
             else
             {
                 char *psz_unk = strchr( psz_parser, ':' );
@@ -1075,9 +882,9 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
 
     /* Main device */
     if( *psz_dup )
-    {
         p_sys->psz_device = strdup( psz_dup );
-    }
+    else
+        p_sys->psz_device = strdup( V4L2_DEFAULT );
     free( psz_dup );
 }
 
@@ -1102,7 +909,7 @@ static void DemuxClose( vlc_object_t *p_this )
     demux_sys_t *p_sys   = p_demux->p_sys;
 
     /* Stop video capture */
-    if( p_sys->i_fd_video >= 0 )
+    if( p_sys->i_fd >= 0 )
     {
         switch( p_sys->io )
         {
@@ -1119,11 +926,11 @@ static void DemuxClose( vlc_object_t *p_this )
                 buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
                 buf.memory = ( p_sys->io == IO_METHOD_USERPTR ) ?
                     V4L2_MEMORY_USERPTR : V4L2_MEMORY_MMAP;
-                v4l2_ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ); /* ignore result */
+                v4l2_ioctl( p_sys->i_fd, VIDIOC_DQBUF, &buf ); /* ignore result */
             }
 
             buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-            if( v4l2_ioctl( p_sys->i_fd_video, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
+            if( v4l2_ioctl( p_sys->i_fd, VIDIOC_STREAMOFF, &buf_type ) < 0 ) {
                 msg_Err( p_this, "VIDIOC_STREAMOFF failed" );
             }
 
@@ -1166,20 +973,8 @@ static void CommonClose( vlc_object_t *p_this, demux_sys_t *p_sys )
 {
     (void)p_this;
     /* Close */
-    if( p_sys->i_fd_video >= 0 ) v4l2_close( p_sys->i_fd_video );
-#ifdef HAVE_ALSA
-    if( p_sys->p_alsa_pcm )
-    {
-        snd_pcm_close( p_sys->p_alsa_pcm );
-        p_sys->i_fd_audio = -1;
-    }
-#endif
-    if( p_sys->i_fd_audio >= 0 ) close( p_sys->i_fd_audio );
-
-    if( p_sys->p_block_audio ) block_Release( p_sys->p_block_audio );
+    if( p_sys->i_fd >= 0 ) v4l2_close( p_sys->i_fd );
     free( p_sys->psz_device );
-    free( p_sys->psz_vdev );
-    free( p_sys->psz_adev );
     free( p_sys->p_standards );
     free( p_sys->p_inputs );
     free( p_sys->p_tuners );
@@ -1224,8 +1019,7 @@ static int AccessOpen( vlc_object_t * p_this )
 
     ParseMRL( p_sys, p_access->psz_path, (vlc_object_t *) p_access );
 
-    if( FindMainDevice( p_this, p_sys, FIND_VIDEO,
-        false, !strncmp( p_access->psz_access, "v4l2", 4 ) ) != VLC_SUCCESS )
+    if( FindMainDevice( p_this, p_sys, false ) != VLC_SUCCESS )
     {
         AccessClose( p_this );
         return VLC_EGENERIC;
@@ -1340,7 +1134,7 @@ static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len
     struct pollfd ufd;
     int i_ret;
 
-    ufd.fd = p_sys->i_fd_video;
+    ufd.fd = p_sys->i_fd;
     ufd.events = POLLIN;
 
     if( p_access->info.b_eof )
@@ -1361,7 +1155,7 @@ static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len
         return -1;
     }
 
-    i_ret = v4l2_read( p_sys->i_fd_video, p_buffer, i_len );
+    i_ret = v4l2_read( p_sys->i_fd, p_buffer, i_len );
     if( i_ret == 0 )
     {
         p_access->info.b_eof = true;
@@ -1380,58 +1174,25 @@ static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    es_out_id_t *p_es = p_sys->p_es_audio;
-    block_t *p_block = NULL;
 
-    struct pollfd p_fd[2];
-    int i_fd = 0;
-    memset( p_fd, 0, 2 * sizeof( struct pollfd ) );
-    if( p_sys->i_fd_video )
-    {
-        p_fd[i_fd].fd = p_sys->i_fd_video;
-        p_fd[i_fd].events = POLLIN|POLLPRI;
-        i_fd ++;
-    }
-    if( p_sys->i_fd_audio )
-    {
-        p_fd[i_fd].fd = p_sys->i_fd_audio;
-        p_fd[i_fd].events = POLLIN|POLLPRI;
-        i_fd ++;
-    }
+    struct pollfd fd;
+    fd.fd = p_sys->i_fd;
+    fd.events = POLLIN|POLLPRI;
+    fd.revents = 0;
 
     /* Wait for data */
-    if( poll( p_fd, i_fd, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+    if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
     {
-        for( i_fd --; i_fd >= 0; i_fd -- )
+        if( fd.revents & (POLLIN|POLLPRI) )
         {
-            if( p_fd[i_fd].revents & (POLLIN|POLLPRI) )
+            block_t *p_block = GrabVideo( p_demux );
+            if( p_block )
             {
-                if( p_fd[i_fd].fd == p_sys->i_fd_video )
-                {
-                    p_block = GrabVideo( p_demux );
-                    p_es = p_sys->p_es_video;
-                }
-                else /* audio */
-                {
-                    p_block = GrabAudio( p_demux );
-                    p_es = p_sys->p_es_audio;
-                }
-                break;
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+                es_out_Send( p_demux->out, p_sys->p_es, p_block );
             }
         }
     }
-
-    if( !p_block )
-    {
-        /* Looks like poll timed out ...
-         * ... or returned an error on one of the fds.
-         * TODO: process */
-        return 1;
-    }
-
-    assert( p_es );
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-    es_out_Send( p_demux->out, p_es, p_block );
 
     return 1;
 }
@@ -1459,7 +1220,7 @@ static block_t* GrabVideo( demux_t *p_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        i_ret = v4l2_read( p_sys->i_fd_video, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length );
+        i_ret = v4l2_read( p_sys->i_fd, p_sys->p_buffers[0].start, p_sys->p_buffers[0].length );
         if( i_ret == -1 )
         {
             switch( errno )
@@ -1486,7 +1247,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         buf.memory = V4L2_MEMORY_MMAP;
 
         /* Wait for next frame */
-        if (v4l2_ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
+        if (v4l2_ioctl( p_sys->i_fd, VIDIOC_DQBUF, &buf ) < 0 )
         {
             switch( errno )
             {
@@ -1510,7 +1271,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         if( !p_block ) return 0;
 
         /* Unlock */
-        if( v4l2_ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
+        if( v4l2_ioctl( p_sys->i_fd, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
             block_Release( p_block );
@@ -1525,7 +1286,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         buf.memory = V4L2_MEMORY_USERPTR;
 
         /* Wait for next frame */
-        if (v4l2_ioctl( p_sys->i_fd_video, VIDIOC_DQBUF, &buf ) < 0 )
+        if (v4l2_ioctl( p_sys->i_fd, VIDIOC_DQBUF, &buf ) < 0 )
         {
             switch( errno )
             {
@@ -1558,7 +1319,7 @@ static block_t* GrabVideo( demux_t *p_demux )
         if( !p_block ) return 0;
 
         /* Unlock */
-        if( v4l2_ioctl( p_sys->i_fd_video, VIDIOC_QBUF, &buf ) < 0 )
+        if( v4l2_ioctl( p_sys->i_fd, VIDIOC_QBUF, &buf ) < 0 )
         {
             msg_Err( p_demux, "Failed to unlock (VIDIOC_QBUF)" );
             block_Release( p_block );
@@ -1594,119 +1355,6 @@ static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t i_
 
     /* Copy frame */
     memcpy( p_block->p_buffer, p_frame, i_size );
-
-    return p_block;
-}
-
-/*****************************************************************************
- * GrabAudio: Grab an audio frame
- *****************************************************************************/
-static block_t* GrabAudio( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    struct audio_buf_info buf_info;
-    int i_read = 0, i_correct;
-    block_t *p_block;
-
-    if( p_sys->p_block_audio ) p_block = p_sys->p_block_audio;
-    else p_block = block_New( p_demux, p_sys->i_audio_max_frame_size );
-
-    if( !p_block )
-    {
-        msg_Warn( p_demux, "cannot get block" );
-        return 0;
-    }
-
-    p_sys->p_block_audio = p_block;
-
-#ifdef HAVE_ALSA
-    if( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
-    {
-        /* ALSA */
-        i_read = snd_pcm_readi( p_sys->p_alsa_pcm, p_block->p_buffer, p_sys->i_alsa_chunk_size );
-        if( i_read <= 0 )
-        {
-            int i_resume;
-            switch( i_read )
-            {
-                case -EAGAIN:
-                    break;
-                case -EPIPE:
-                    /* xrun */
-                    snd_pcm_prepare( p_sys->p_alsa_pcm );
-                    break;
-                case -ESTRPIPE:
-                    /* suspend */
-                    i_resume = snd_pcm_resume( p_sys->p_alsa_pcm );
-                    if( i_resume < 0 && i_resume != -EAGAIN ) snd_pcm_prepare( p_sys->p_alsa_pcm );
-                    break;
-                default:
-                    msg_Err( p_demux, "Failed to read alsa frame (%s)", snd_strerror( i_read ) );
-                    return 0;
-            }
-        }
-        else
-        {
-            /* convert from frames to bytes */
-            i_read *= p_sys->i_alsa_frame_size;
-        }
-    }
-    else
-#endif
-    if( p_sys->i_audio_method & AUDIO_METHOD_OSS )
-    {
-        /* OSS */
-        i_read = read( p_sys->i_fd_audio, p_block->p_buffer,
-                    p_sys->i_audio_max_frame_size );
-    }
-
-    if( i_read <= 0 ) return 0;
-
-    p_block->i_buffer = i_read;
-    p_sys->p_block_audio = 0;
-
-    /* Correct the date because of kernel buffering */
-    i_correct = i_read;
-    if( p_sys->i_audio_method & AUDIO_METHOD_OSS )
-    {
-        /* OSS */
-        if( ioctl( p_sys->i_fd_audio, SNDCTL_DSP_GETISPACE, &buf_info ) == 0 )
-        {
-            i_correct += buf_info.bytes;
-        }
-    }
-#ifdef HAVE_ALSA
-    else if( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
-    {
-        /* ALSA */
-        int i_err;
-        snd_pcm_sframes_t delay = 0;
-        if( ( i_err = snd_pcm_delay( p_sys->p_alsa_pcm, &delay ) ) >= 0 )
-        {
-            size_t i_correction_delta = delay * p_sys->i_alsa_frame_size;
-            /* Test for overrun */
-            if( i_correction_delta > p_sys->i_audio_max_frame_size )
-            {
-                msg_Warn( p_demux, "ALSA read overrun (%zu > %zu)",
-                          i_correction_delta, p_sys->i_audio_max_frame_size );
-                i_correction_delta = p_sys->i_audio_max_frame_size;
-                snd_pcm_prepare( p_sys->p_alsa_pcm );
-            }
-            i_correct += i_correction_delta;
-        }
-        else
-        {
-            /* delay failed so reset */
-            msg_Warn( p_demux, "ALSA snd_pcm_delay failed (%s)", snd_strerror( i_err ) );
-            snd_pcm_prepare( p_sys->p_alsa_pcm );
-        }
-    }
-#endif
-
-    /* Timestamp */
-    p_block->i_pts = p_block->i_dts =
-        mdate() - INT64_C(1000000) * (mtime_t)i_correct /
-        2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
 
     return p_block;
 }
@@ -1863,7 +1511,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     struct v4l2_format fmt;
     unsigned int i_min;
     enum v4l2_buf_type buf_type;
-    char *psz_device = p_sys->psz_vdev;
+    const char *psz_device = p_sys->psz_device;
     es_format_t es_fmt;
     int libv4l2_fd;
 
@@ -2205,7 +1853,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
         (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
-    p_sys->p_es_video = es_out_Add( p_demux->out, &es_fmt );
+    p_sys->p_es = es_out_Add( p_demux->out, &es_fmt );
 
     /* Start Capture */
 
@@ -2284,313 +1932,11 @@ open_failed:
 
 }
 
-#ifdef HAVE_ALSA
-/*****************************************************************************
- * ResolveALSADeviceName: Change any . to : in the ALSA device name
- *****************************************************************************/
-static char *ResolveALSADeviceName( const char *psz_device )
-{
-    char* psz_alsa_name = strdup( psz_device );
-    for( unsigned int i = 0; i < strlen( psz_device ); i++ )
-    {
-        if( psz_alsa_name[i] == '.' ) psz_alsa_name[i] = ':';
-    }
-    return psz_alsa_name;
-}
-#endif
-
-/*****************************************************************************
- * OpenAudioDev: open and set up the audio device and probe for capabilities
- *****************************************************************************/
-#ifdef HAVE_ALSA
-static int OpenAudioDevAlsa( vlc_object_t *p_this, demux_sys_t *p_sys )
-{
-    char *psz_device = p_sys->psz_adev;
-    p_sys->p_alsa_pcm = NULL;
-    char* psz_alsa_device_name = NULL;
-    snd_pcm_hw_params_t *p_hw_params = NULL;
-    snd_pcm_uframes_t buffer_size;
-    snd_pcm_uframes_t chunk_size;
-
-    /* ALSA */
-    int i_err;
-    psz_alsa_device_name =
-        ResolveALSADeviceName( psz_device?: ALSA_DEFAULT );
-
-    if( ( i_err = snd_pcm_open( &p_sys->p_alsa_pcm, psz_alsa_device_name,
-        SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0)
-    {
-        msg_Err( p_this, "Cannot open ALSA audio device %s (%s)",
-                 psz_alsa_device_name, snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    if( ( i_err = snd_pcm_nonblock( p_sys->p_alsa_pcm, 1 ) ) < 0)
-    {
-        msg_Err( p_this, "Cannot set ALSA nonblock (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Begin setting hardware parameters */
-
-    if( ( i_err = snd_pcm_hw_params_malloc( &p_hw_params ) ) < 0 )
-    {
-        msg_Err( p_this,
-                 "ALSA: cannot allocate hardware parameter structure (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    if( ( i_err = snd_pcm_hw_params_any( p_sys->p_alsa_pcm, p_hw_params ) ) < 0 )
-    {
-        msg_Err( p_this,
-                "ALSA: cannot initialize hardware parameter structure (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Set Interleaved access */
-    if( ( i_err = snd_pcm_hw_params_set_access( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_ACCESS_RW_INTERLEAVED ) ) < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot set access type (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Set 16 bit little endian */
-    if( ( i_err = snd_pcm_hw_params_set_format( p_sys->p_alsa_pcm, p_hw_params, SND_PCM_FORMAT_S16_LE ) ) < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot set sample format (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Set sample rate */
-#ifdef HAVE_ALSA_NEW_API
-    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
-#else
-    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, p_sys->i_sample_rate, NULL );
-#endif
-    if( i_err < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot set sample rate (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Set channels */
-    unsigned int channels = p_sys->b_stereo ? 2 : 1;
-    if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
-    {
-        channels = ( channels==1 ) ? 2 : 1;
-        msg_Warn( p_this, "ALSA: cannot set channel count (%s). "
-                  "Trying with channels=%d",
-                  snd_strerror( i_err ),
-                  channels );
-        if( ( i_err = snd_pcm_hw_params_set_channels( p_sys->p_alsa_pcm, p_hw_params, channels ) ) < 0 )
-        {
-            msg_Err( p_this, "ALSA: cannot set channel count (%s)",
-                     snd_strerror( i_err ) );
-            goto adev_fail;
-        }
-        p_sys->b_stereo = ( channels == 2 );
-    }
-
-    /* Set metrics for buffer calculations later */
-    unsigned int buffer_time;
-    if( ( i_err = snd_pcm_hw_params_get_buffer_time_max(p_hw_params, &buffer_time, 0) ) < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot get buffer time max (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-    if (buffer_time > 500000) buffer_time = 500000;
-
-    /* Set period time */
-    unsigned int period_time = buffer_time / 4;
-#ifdef HAVE_ALSA_NEW_API
-    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
-#else
-    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, period_time, 0 );
-#endif
-    if( i_err < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot set period time (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Set buffer time */
-#ifdef HAVE_ALSA_NEW_API
-    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
-#else
-    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, buffer_time, 0 );
-#endif
-    if( i_err < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot set buffer time (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Apply new hardware parameters */
-    if( ( i_err = snd_pcm_hw_params( p_sys->p_alsa_pcm, p_hw_params ) ) < 0 )
-    {
-        msg_Err( p_this, "ALSA: cannot set hw parameters (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    /* Get various buffer metrics */
-    snd_pcm_hw_params_get_period_size( p_hw_params, &chunk_size, 0 );
-    snd_pcm_hw_params_get_buffer_size( p_hw_params, &buffer_size );
-    if( chunk_size == buffer_size )
-    {
-        msg_Err( p_this,
-                 "ALSA: period cannot equal buffer size (%lu == %lu)",
-                 chunk_size, buffer_size);
-        goto adev_fail;
-    }
-
-    int bits_per_sample = snd_pcm_format_physical_width(SND_PCM_FORMAT_S16_LE);
-    int bits_per_frame = bits_per_sample * channels;
-
-    p_sys->i_alsa_chunk_size = chunk_size;
-    p_sys->i_alsa_frame_size = bits_per_frame / 8;
-    p_sys->i_audio_max_frame_size = chunk_size * bits_per_frame / 8;
-
-    snd_pcm_hw_params_free( p_hw_params );
-    p_hw_params = NULL;
-
-    /* Prep device */
-    if( ( i_err = snd_pcm_prepare( p_sys->p_alsa_pcm ) ) < 0 )
-    {
-        msg_Err( p_this,
-                 "ALSA: cannot prepare audio interface for use (%s)",
-                 snd_strerror( i_err ) );
-        goto adev_fail;
-    }
-
-    free( psz_alsa_device_name );
-
-    if( !p_sys->psz_adev )
-        p_sys->psz_adev = strdup( ALSA_DEFAULT );
-
-    /* Return a fake handle so other tests work */
-    return 1;
-
- adev_fail:
-
-    if( p_hw_params ) snd_pcm_hw_params_free( p_hw_params );
-    if( p_sys->p_alsa_pcm ) snd_pcm_close( p_sys->p_alsa_pcm );
-    free( psz_alsa_device_name );
-
-    return -1;
-
-}
-#endif
-
-static int OpenAudioDevOss( vlc_object_t *p_this, demux_sys_t *p_sys )
-{
-    int i_fd = 0;
-    int i_format;
-    /* OSS */
-    char* psz_oss_device_name = strdup( p_sys->psz_adev ? p_sys->psz_adev : OSS_DEFAULT );
-
-    if( (i_fd = open( psz_oss_device_name, O_RDONLY | O_NONBLOCK )) < 0 )
-    {
-        msg_Err( p_this, "cannot open OSS audio device (%m)" );
-        goto adev_fail;
-    }
-
-    i_format = AFMT_S16_LE;
-    if( ioctl( i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
-        || i_format != AFMT_S16_LE )
-    {
-        msg_Err( p_this,
-                 "cannot set audio format (16b little endian) (%m)" );
-        goto adev_fail;
-    }
-
-    if( ioctl( i_fd, SNDCTL_DSP_STEREO,
-               &p_sys->b_stereo ) < 0 )
-    {
-        msg_Err( p_this, "cannot set audio channels count (%m)" );
-        goto adev_fail;
-    }
-
-    if( ioctl( i_fd, SNDCTL_DSP_SPEED,
-               &p_sys->i_sample_rate ) < 0 )
-    {
-        msg_Err( p_this, "cannot set audio sample rate (%m)" );
-        goto adev_fail;
-    }
-
-    p_sys->i_audio_max_frame_size = 6 * 1024;
-
-    if( !p_sys->psz_adev )
-        p_sys->psz_adev = strdup( OSS_DEFAULT );
-    free( psz_oss_device_name );
-    return i_fd;
-
- adev_fail:
-
-    free( psz_oss_device_name );
-    if( i_fd >= 0 ) close( i_fd );
-    return -1;
-
-}
-
-static int OpenAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
-                         bool b_demux )
-{
-    char *psz_device;
-    int i_fd = -1;
-
-#ifdef HAVE_ALSA
-    if( ( p_sys->i_audio_method & AUDIO_METHOD_ALSA ) && i_fd < 0 )
-        i_fd  = OpenAudioDevAlsa( p_this, p_sys );
-#endif
-
-    if( ( p_sys->i_audio_method & AUDIO_METHOD_OSS ) && i_fd < 0 )
-        i_fd = OpenAudioDevOss( p_this, p_sys );
-
-    if( i_fd < 0 )
-        return i_fd;
-
-    psz_device = p_sys->psz_adev;
-
-    msg_Dbg( p_this, "opened adev=`%s' %s %dHz",
-             psz_device, p_sys->b_stereo ? "stereo" : "mono",
-             p_sys->i_sample_rate );
-
-    es_format_t fmt;
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
-
-    fmt.audio.i_channels = p_sys->b_stereo ? 2 : 1;
-    fmt.audio.i_rate = p_sys->i_sample_rate;
-    fmt.audio.i_bitspersample = 16;
-    fmt.audio.i_blockalign = fmt.audio.i_channels * fmt.audio.i_bitspersample / 8;
-    fmt.i_bitrate = fmt.audio.i_channels * fmt.audio.i_rate * fmt.audio.i_bitspersample;
-
-    msg_Dbg( p_this, "new audio es %d channels %dHz",
-             fmt.audio.i_channels, fmt.audio.i_rate );
-
-    if( b_demux )
-    {
-        demux_t *p_demux = (demux_t *)p_this;
-        p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
-    }
-
-    return i_fd;
-}
-
 /*****************************************************************************
  * ProbeVideoDev: probe video for capabilities
  *****************************************************************************/
 static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
-                                 char *psz_device )
+                                 const char *psz_device )
 {
     int i_index;
     int i_standard;
@@ -2600,7 +1946,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
-        msg_Err( p_obj, "cannot open video device (%m)" );
+        msg_Err( p_obj, "cannot open video device '%s' (%m)", psz_device );
         goto open_failed;
     }
 
@@ -2919,83 +2265,6 @@ open_failed:
     if( i_fd >= 0 ) v4l2_close( i_fd );
     return false;
 
-}
-
-/*****************************************************************************
- * ProbeAudioDev: probe audio for capabilities
- *****************************************************************************/
-#ifdef HAVE_ALSA
-static bool ProbeAudioDevAlsa( vlc_object_t *p_this, char *psz_device )
-{
-    int i_err;
-    snd_pcm_t *p_alsa_pcm;
-    char* psz_alsa_device_name = ResolveALSADeviceName( psz_device ?: ALSA_DEFAULT );
-
-    if( ( i_err = snd_pcm_open( &p_alsa_pcm, psz_alsa_device_name, SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK ) ) < 0 )
-    {
-        msg_Err( p_this, "cannot open device %s for ALSA audio (%s)", psz_alsa_device_name, snd_strerror( i_err ) );
-        free( psz_alsa_device_name );
-        return false;
-    }
-
-    snd_pcm_close( p_alsa_pcm );
-    free( psz_alsa_device_name );
-
-    return true;
-}
-#endif
-
-static bool ProbeAudioDevOss( vlc_object_t *p_this, char *psz_device )
-{
-    int i_fd = 0;
-    int i_caps;
-    char* psz_oss_device_name = strdup( psz_device ? psz_device : OSS_DEFAULT );
-
-    if( ( i_fd = open( psz_oss_device_name, O_RDONLY | O_NONBLOCK ) ) < 0 )
-    {
-        msg_Err( p_this, "cannot open device %s for OSS audio (%m)", psz_oss_device_name );
-        goto open_failed;
-    }
-
-    /* this will fail if the device is video */
-    if( ioctl( i_fd, SNDCTL_DSP_GETCAPS, &i_caps ) < 0 )
-    {
-        msg_Err( p_this, "cannot get audio caps (%m)" );
-        goto open_failed;
-    }
-
-    free( psz_oss_device_name );
-    if( i_fd >= 0 ) close( i_fd );
-
-    return true;
-
-open_failed:
-    free( psz_oss_device_name );
-    if( i_fd >= 0 ) close( i_fd );
-    return false;
-}
-
-static bool ProbeAudioDev( vlc_object_t *p_this, demux_sys_t *p_sys,
-                                 char *psz_device )
-{
-#ifdef HAVE_ALSA
-    if( ( p_sys->i_audio_method & AUDIO_METHOD_ALSA )
-     && ProbeAudioDevAlsa( p_this, psz_device ) )
-    {
-        p_sys->i_audio_method = AUDIO_METHOD_ALSA;
-        return true;
-    }
-#endif
-
-    if( ( p_sys->i_audio_method & AUDIO_METHOD_OSS )
-     && ProbeAudioDevOss( p_this, psz_device ) )
-    {
-        p_sys->i_audio_method = AUDIO_METHOD_OSS;
-        return true;
-    }
-
-    p_sys->i_audio_method = 0;
-    return false;
 }
 
 static void name2var( unsigned char *name )
@@ -3550,7 +2819,7 @@ static int DemuxControlCallback( vlc_object_t *p_this,
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_cid = (long int)p_data;
 
-    int i_fd = p_sys->i_fd_video;
+    int i_fd = p_sys->i_fd;
 
     if( i_fd < 0 )
         return VLC_EGENERIC;
@@ -3567,7 +2836,7 @@ static int DemuxControlResetCallback( vlc_object_t *p_this,
     demux_t *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int i_fd = p_sys->i_fd_video;
+    int i_fd = p_sys->i_fd;
 
     if( i_fd < 0 )
         return VLC_EGENERIC;
@@ -3586,7 +2855,7 @@ static int AccessControlCallback( vlc_object_t *p_this,
     demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
     int i_cid = (long int)p_data;
 
-    int i_fd = p_sys->i_fd_video;
+    int i_fd = p_sys->i_fd;
 
     if( i_fd < 0 )
         return VLC_EGENERIC;
@@ -3603,7 +2872,7 @@ static int AccessControlResetCallback( vlc_object_t *p_this,
     access_t *p_access = (access_t *)p_this;
     demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
 
-    int i_fd = p_sys->i_fd_video;
+    int i_fd = p_sys->i_fd;
 
     if( i_fd < 0 )
         return VLC_EGENERIC;
