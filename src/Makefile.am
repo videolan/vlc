@@ -167,6 +167,9 @@ AM_LDFLAGS = -no-undefined
 if HAVE_WIN32
 AM_LDFLAGS += -avoid-version
 endif
+if HAVE_WINCE
+AM_LDFLAGS += -avoid-version
+endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
 nodist_libvlccore_la_SOURCES = misc/revision.c
