@@ -104,7 +104,7 @@ void RecentsMRL::load()
 
     for( int i = 0; i < list.size(); ++i )
     {
-        if ( !filter && filter->indexIn( list.at(i) ) == -1 )
+        if ( !filter || filter->indexIn( list.at(i) ) == -1 )
             stack->append( list.at(i) );
     }
 }
