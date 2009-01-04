@@ -264,6 +264,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
         (mtime_t)var_CreateGetInteger( p_vout, "video-title-timeout" );
     p_vout->p->i_title_position =
         var_CreateGetInteger( p_vout, "video-title-position" );
+    p_vout->p->psz_title =  NULL;
 
     var_AddCallback( p_vout, "video-title-show", TitleShowCallback, NULL );
     var_AddCallback( p_vout, "video-title-timeout", TitleTimeoutCallback, NULL );

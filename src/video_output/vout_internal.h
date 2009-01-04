@@ -86,6 +86,8 @@ struct vout_thread_sys_t
     bool            b_title_show;
     mtime_t         i_title_timeout;
     int             i_title_position;
+
+    char            *psz_title;
 };
 
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */

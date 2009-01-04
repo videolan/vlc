@@ -73,5 +73,10 @@ void vout_DropPicture( vout_thread_t *p_vout, picture_t * );
  */
 void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
 
+/**
+ * This function will ask the display of the input title
+ */
+void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
+
 #endif
 

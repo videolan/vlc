@@ -153,7 +153,6 @@ static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data
 vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
                                video_format_t *p_fmt )
 {
-    const bool b_vout_provided = p_vout != NULL;
     if( !p_fmt )
     {
         /* Video output is no longer used.
@@ -273,11 +272,6 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
 
             vlc_object_detach( p_vout );
             vlc_object_attach( p_vout, p_this );
-
-            /* Display title if we are not using the vout given to vout_Request.
-             * XXX for now b_vout_provided is always true at this stage */
-            if( p_vout->p->b_title_show && !b_vout_provided )
-                DisplayTitleOnOSD( p_vout );
         }
     }
 
@@ -579,6 +573,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_vout->p->vfilter_lock );
 
     free( p_vout->p->psz_filter_chain );
+    free( p_vout->p->psz_title );
 
     config_ChainDestroy( p_vout->p_cfg );
 
@@ -743,6 +738,18 @@ void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration )
     /* TODO advance subpicture by the duration ... */
 
     vlc_mutex_unlock( &p_vout->picture_lock );
+}
+void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title )
+{
+    assert( psz_title );
+
+    if( !config_GetInt( p_vout, "osd" ) )
+        return;
+
+    vlc_object_lock( p_vout );
+    free( p_vout->p->psz_title );
+    p_vout->p->psz_title = strdup( psz_title );
+    vlc_object_unlock( p_vout );
 }
 
 /*****************************************************************************
@@ -977,9 +984,6 @@ static void* RunThread( vlc_object_t *p_this )
 
     vlc_object_lock( p_vout );
 
-    if( p_vout->p->b_title_show )
-        DisplayTitleOnOSD( p_vout );
-
     /*
      * Main loop - it is not executed if an error occurred during
      * initialization
@@ -993,6 +997,9 @@ static void* RunThread( vlc_object_t *p_this )
         mtime_t display_date;
         picture_t *p_directbuffer;
         int i_index;
+
+        if( p_vout->p->b_title_show && p_vout->p->psz_title )
+            DisplayTitleOnOSD( p_vout );
 
         vlc_mutex_lock( &p_vout->picture_lock );
 
@@ -1693,68 +1700,22 @@ static int VideoFilter2Callback( vlc_object_t *p_this, char const *psz_cmd,
 
 static void DisplayTitleOnOSD( vout_thread_t *p_vout )
 {
-    input_thread_t *p_input;
-    mtime_t i_now, i_stop;
+    const mtime_t i_start = mdate();
+    const mtime_t i_stop = i_start + INT64_C(1000) * p_vout->p->i_title_timeout;
 
-    if( !config_GetInt( p_vout, "osd" ) ) return;
+    vlc_object_assert_locked( p_vout );
 
-    p_input = (input_thread_t *)vlc_object_find( p_vout,
-              VLC_OBJECT_INPUT, FIND_ANYWHERE );
-    if( p_input )
-    {
-        i_now = mdate();
-        i_stop = i_now + (mtime_t)(p_vout->p->i_title_timeout * 1000);
-        char *psz_nowplaying =
-            input_item_GetNowPlaying( input_GetItem( p_input ) );
-        char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-        char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
-        if( EMPTY_STR( psz_name ) )
-        {
-            free( psz_name );
-            psz_name = input_item_GetName( input_GetItem( p_input ) );
-        }
-        if( !EMPTY_STR( psz_nowplaying ) )
-        {
-            vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                                   psz_nowplaying, NULL,
-                                   p_vout->p->i_title_position,
-                                   30 + p_vout->fmt_in.i_width
-                                      - p_vout->fmt_in.i_visible_width
-                                      - p_vout->fmt_in.i_x_offset,
-                                   20 + p_vout->fmt_in.i_y_offset,
-                                   i_now, i_stop );
-        }
-        else if( !EMPTY_STR( psz_artist ) )
-        {
-            char *psz_string = NULL;
-            if( asprintf( &psz_string, "%s - %s", psz_name, psz_artist ) != -1 )
-            {
-                vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                                       psz_string, NULL,
-                                       p_vout->p->i_title_position,
-                                       30 + p_vout->fmt_in.i_width
-                                          - p_vout->fmt_in.i_visible_width
-                                          - p_vout->fmt_in.i_x_offset,
-                                       20 + p_vout->fmt_in.i_y_offset,
-                                       i_now, i_stop );
-                free( psz_string );
-            }
-        }
-        else
-        {
-            vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
-                                   psz_name, NULL,
-                                   p_vout->p->i_title_position,
-                                   30 + p_vout->fmt_in.i_width
-                                      - p_vout->fmt_in.i_visible_width
-                                      - p_vout->fmt_in.i_x_offset,
-                                   20 + p_vout->fmt_in.i_y_offset,
-                                   i_now, i_stop );
-        }
-        vlc_object_release( p_input );
-        free( psz_artist );
-        free( psz_name );
-        free( psz_nowplaying );
-    }
+    vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
+                           p_vout->p->psz_title, NULL,
+                           p_vout->p->i_title_position,
+                           30 + p_vout->fmt_in.i_width
+                              - p_vout->fmt_in.i_visible_width
+                              - p_vout->fmt_in.i_x_offset,
+                           20 + p_vout->fmt_in.i_y_offset,
+                           i_start, i_stop );
+
+    free( p_vout->p->psz_title );
+
+    p_vout->p->psz_title = NULL;
 }
 

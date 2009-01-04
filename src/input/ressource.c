@@ -35,6 +35,7 @@
 #include "../libvlc.h"
 #include "../stream_output/stream_output.h"
 #include "../audio_output/aout_internal.h"
+#include "../video_output/vout_control.h"
 #include "input_interface.h"
 #include "ressource.h"
 
@@ -121,6 +122,48 @@ static void DestroyVout( input_ressource_t *p_ressource )
 
     p_ressource->p_vout_free = NULL;
 }
+static void DisplayVoutTitle( input_ressource_t *p_ressource,
+                              vout_thread_t *p_vout )
+{
+    assert( p_ressource->p_input );
+
+    /* TODO display the title only one time for the same input ? */
+
+    input_item_t *p_item = input_GetItem( p_ressource->p_input );
+
+    char *psz_nowplaying = input_item_GetNowPlaying( p_item );
+    if( psz_nowplaying && *psz_nowplaying )
+    {
+        vout_DisplayTitle( p_vout, psz_nowplaying );
+    }
+    else
+    {
+        char *psz_artist = input_item_GetArtist( p_item );
+        char *psz_name = input_item_GetTitle( p_item );
+
+        if( !psz_name || *psz_name == '\0' )
+        {
+            free( psz_name );
+            psz_name = input_item_GetName( p_item );
+        }
+        if( psz_artist && *psz_artist )
+        {
+            char *psz_string;
+            if( asprintf( &psz_string, "%s - %s", psz_name, psz_artist ) != -1 )
+            {
+                vout_DisplayTitle( p_vout, psz_string );
+                free( psz_string );
+            }
+        }
+        else if( psz_name )
+        {
+            vout_DisplayTitle( p_vout, psz_name );
+        }
+        free( psz_name );
+        free( psz_artist );
+    }
+    free( psz_nowplaying );
+}
 static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
                                    vout_thread_t *p_vout, video_format_t *p_fmt )
 {
@@ -157,6 +200,7 @@ static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
         if( !p_vout )
             return NULL;
 
+        DisplayVoutTitle( p_ressource, p_vout );
         TAB_APPEND( p_ressource->i_vout, p_ressource->pp_vout, p_vout );
         return p_vout;
     }
