@@ -118,7 +118,7 @@ struct demux_sys_t
     int  i_fd;
 
     /* Audio */
-    int i_pts;
+    int i_cache;
     unsigned int i_sample_rate;
     bool b_stereo;
     size_t i_max_frame_size;
@@ -169,7 +169,7 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     p_sys->i_sample_rate = var_CreateGetInteger( p_demux, CFG_PREFIX "samplerate" );
     p_sys->b_stereo = var_CreateGetBool( p_demux, CFG_PREFIX "stereo" );
-    p_sys->i_pts = var_CreateGetInteger( p_demux, CFG_PREFIX "caching" );
+    p_sys->i_cache = var_CreateGetInteger( p_demux, CFG_PREFIX "caching" );
     p_sys->i_fd = -1;
     p_sys->p_es = NULL;
     p_sys->p_block = NULL;
@@ -225,7 +225,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (int64_t)p_sys->i_pts * 1000;
+            *pi64 = (int64_t)p_sys->i_cache * 1000;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

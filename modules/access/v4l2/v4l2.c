@@ -503,7 +503,7 @@ struct demux_sys_t
     /* Video */
     io_method io;
 
-    int i_pts;
+    int i_cache;
 
     struct v4l2_capability dev_cap;
 
@@ -624,7 +624,7 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->f_fps = var_CreateGetFloat( p_obj, "v4l2-fps" );
     p_sys->psz_requested_chroma = var_CreateGetString( p_obj, "v4l2-chroma" );
 
-    p_sys->i_pts = var_CreateGetInteger( p_obj, "v4l2-caching" );
+    p_sys->i_cache = var_CreateGetInteger( p_obj, "v4l2-caching" );
 
     p_sys->i_cur_tuner = var_CreateGetInteger( p_obj, "v4l2-tuner" );
     p_sys->i_frequency = var_CreateGetInteger( p_obj, "v4l2-tuner-frequency" );
@@ -802,8 +802,8 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
 #endif
             else if( !strncmp( psz_parser, "caching=", strlen( "caching=" ) ) )
             {
-                p_sys->i_pts = strtol( psz_parser + strlen( "caching=" ),
-                                       &psz_parser, 0 );
+                p_sys->i_cache = strtol( psz_parser + strlen( "caching=" ),
+                                         &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "tuner=", strlen( "tuner=" ) ) )
             {
@@ -1050,7 +1050,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_PTS_DELAY:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (int64_t)p_sys->i_pts * 1000;
+            *pi64 = (int64_t)p_sys->i_cache * 1000;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -1101,7 +1101,7 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t) p_sys->i_pts * 1000;
+            *pi_64 = (int64_t) p_sys->i_cache * 1000;
             break;
 
         /* */
