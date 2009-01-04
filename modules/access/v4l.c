@@ -134,8 +134,8 @@ static void Close( vlc_object_t * );
 
 #define AUDIO_DEPRECATED_ERROR N_( \
     "Alsa or OSS audio capture in the v4l access is deprecated. " \
-    "please use 'v4l:/""/ --input-slave alsa:/""/' or " \
-    "'v4l:/""/ --input-slave oss:/""/' instead." )
+    "please use 'v4l:/""/ :input-slave=alsa:/""/' or " \
+    "'v4l:/""/ :input-slave=oss:/""/' instead." )
 
 static const int i_norm_list[] =
     { VIDEO_MODE_AUTO, VIDEO_MODE_SECAM, VIDEO_MODE_PAL, VIDEO_MODE_NTSC };

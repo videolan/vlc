@@ -211,8 +211,8 @@ static void AccessClose( vlc_object_t * );
 
 #define AUDIO_DEPRECATED_ERROR N_( \
     "Alsa or OSS audio capture in the v4l2 access is deprecated. " \
-    "please use 'v4l2:/""/ --input-slave alsa:/""/' or " \
-    "'v4l2:/""/ --input-slave oss:/""/' instead." )
+    "please use 'v4l2:/""/ :input-slave=alsa:/""/' or " \
+    "'v4l2:/""/ :input-slave=oss:/""/' instead." )
 
 typedef enum {
     IO_METHOD_READ,
