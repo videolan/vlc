@@ -5824,7 +5824,6 @@ AC_CONFIG_FILES([
   modules/access/rtp/Makefile
   modules/access/rtsp/Makefile
   modules/access/rtmp/Makefile
-  modules/access/v4l2/Makefile
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
