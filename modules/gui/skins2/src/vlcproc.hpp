@@ -166,7 +166,7 @@ class VlcProc: public SkinObject
         void refreshInput();
 
         /// Update the stream name variable
-        void updateStreamName( playlist_t *p_playlist );
+        void updateStreamName();
 
         /// Callback for intf-change variable
         static int onIntfChange( vlc_object_t *pObj, const char *pVariable,

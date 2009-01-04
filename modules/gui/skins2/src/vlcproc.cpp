@@ -45,6 +45,7 @@
 #include "../commands/cmd_resize.hpp"
 #include "../commands/cmd_vars.hpp"
 #include "../commands/cmd_dialogs.hpp"
+#include "../commands/cmd_update_item.hpp"
 #include "../utils/var_bool.hpp"
 #include <sstream>
 
@@ -403,8 +404,7 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
 
     // Update the stream variable
-    playlist_t *p_playlist = (playlist_t*)pObj;
-    pThis->updateStreamName(p_playlist);
+    pThis->updateStreamName();
 
     // Create a playtree notify command (for new style playtree)
     CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
@@ -445,8 +445,7 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     VlcProc *pThis = (VlcProc*)pParam;
 
     // Update the stream variable
-    playlist_t *p_playlist = (playlist_t*)pObj;
-    pThis->updateStreamName(p_playlist);
+    pThis->updateStreamName();
 
     // Create a playtree notify command
     CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
@@ -512,8 +511,7 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
     // Update the stream variable
-    playlist_t *p_playlist = (playlist_t*)pObj;
-    pThis->updateStreamName(p_playlist);
+    pThis->updateStreamName();
 
     // Create two playtree notify commands: one for old item, one for new
     CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
@@ -557,41 +555,15 @@ int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
 }
 
 
-void VlcProc::updateStreamName( playlist_t *p_playlist )
+void VlcProc::updateStreamName()
 {
-    if( p_playlist )
-    {
-        input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-        // Get playlist item information
-        input_item_t *pItem = input_GetItem( p_input );
+    // Create a update item command
+    CmdUpdateItem *pCmdItem = new CmdUpdateItem( getIntf(), getStreamNameVar(), getStreamURIVar() );
 
-        VarText &rStreamName = getStreamNameVar();
-        VarText &rStreamURI = getStreamURIVar();
-        // XXX: we should not need to access p_input->psz_source directly, a
-        // getter should be provided by VLC core
-        string name = pItem->psz_name;
-        // XXX: This should be done in VLC core, not here...
-        // Remove path information if any
-        OSFactory *pFactory = OSFactory::instance( getIntf() );
-        string::size_type pos = name.rfind( pFactory->getDirSeparator() );
-        if( pos != string::npos )
-        {
-            name = name.substr( pos + 1, name.size() - pos + 1 );
-        }
-        UString srcName( getIntf(), name.c_str() );
-        UString srcURI( getIntf(), pItem->psz_uri );
-
-       // Create commands to update the stream variables
-        CmdSetText *pCmd1 = new CmdSetText( getIntf(), rStreamName, srcName );
-        CmdSetText *pCmd2 = new CmdSetText( getIntf(), rStreamURI, srcURI );
-        // Push the commands in the asynchronous command queue
-        AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-        pQueue->push( CmdGenericPtr( pCmd1 ), false );
-        pQueue->push( CmdGenericPtr( pCmd2 ), false );
-        vlc_object_release( p_input );
-    }
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
+    pQueue->push( CmdGenericPtr( pCmdItem ) );
 }
-
 
 void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
                           int *pXHint, int *pYHint,
