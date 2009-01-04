@@ -241,7 +241,6 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_pixel_pitch;
-    vlc_value_t val;
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
