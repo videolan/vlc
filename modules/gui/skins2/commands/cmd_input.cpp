@@ -36,8 +36,14 @@ void CmdPlay::execute()
         return;
     }
 
-    if( !playlist_IsEmpty( pPlaylist ) )
+    vlc_object_lock( pPlaylist );
+    const bool b_empty = playlist_IsEmpty( pPlaylist );
+    vlc_object_unlock( pPlaylist );
+
+    if( !b_empty )
+    {
         playlist_Play( pPlaylist );
+    }
     else
     {
         // If the playlist is empty, open a file requester instead
