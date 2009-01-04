@@ -137,7 +137,7 @@ Jean-François Massol <jf.massol -<@t> gmail.com> - Qt4 Sout work
 Jérôme Guilbaud - Update of the WinAmp 5 VLC skin
 Joel Arvidsson <dogai at privat.utfors.se> - Swedish translation
 Joeri van Dooren <joeri at van.dooren.be> - OS X icon (v0.4.0)
-Joseph Tulou <brezhoneg1 at yahoo.fr> - small dc1394 patch
+Joseph Tulou <brezhoneg1 at yahoo.fr> - small dc1394 patch, image demuxer
 Jörg<vlc-ml at aab.noctis dot de> - VLM seek/show media functions
 Johannes Buchner <buchner.johannes at gmx dot at> - Hotkeys for zoom
 Johen Michael Zorko <zorko at att.net> - fix for delay issues in udp sout
