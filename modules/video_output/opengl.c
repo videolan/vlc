@@ -143,9 +143,6 @@ struct vout_sys_t
     int         i_tex_width;
     int         i_tex_height;
     GLuint      p_textures[2];
-
-    float       f_speed;
-    float       f_radius;
 };
 
 /*****************************************************************************
