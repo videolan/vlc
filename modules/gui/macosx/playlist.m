@@ -525,9 +525,6 @@
 
     if( p_item )
     {
-        /* update our info-panel to reflect the new item */
-        [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
-        
         /* update the state of our Reveal-in-Finder menu items */
         NSMutableString *o_mrl;
         char *psz_uri = input_item_GetURI( p_item->p_input );
@@ -1334,10 +1331,10 @@
     return( o_ctx_menu );
 }
 
-- (void)outlineView: (NSTableView*)o_tv
+- (void)outlineView: (NSTableView *)o_tv
                   didClickTableColumn:(NSTableColumn *)o_tc
 {
-    int i_mode = 0, i_type;
+    int i_mode, i_type = 0;
     intf_thread_t *p_intf = VLCIntf;
 
     playlist_t *p_playlist = pl_Hold( p_intf );
