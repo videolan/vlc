@@ -50,7 +50,7 @@ static inline int vasprintf (char **strp, const char *fmt, va_list ap)
     if (res == NULL)
         return -1;
     *strp = res;
-    return vsprintf (res, fmt, ap);
+    return vsnprintf (res, len, fmt, ap);
 #else
     /* HACK: vsnprintf in the WinCE API behaves like
      * the one in glibc 2.0 and doesn't return the number of characters
