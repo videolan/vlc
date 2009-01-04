@@ -139,6 +139,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     p_sys->b_error = false;
 
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    {
+        block_Release( p_block ); *pp_block = NULL;
+        return NULL;
+    }
+
     p_png = png_create_read_struct( PNG_LIBPNG_VER_STRING, 0, 0, 0 );
     if( p_png == NULL )
     {

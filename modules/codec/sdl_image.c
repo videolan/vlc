@@ -137,6 +137,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( pp_block == NULL || *pp_block == NULL ) return NULL;
     p_block = *pp_block;
 
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+    {
+        block_Release( p_block ); *pp_block = NULL;
+        return NULL;
+    }
+
     p_rw = SDL_RWFromConstMem( p_block->p_buffer, p_block->i_buffer );
 
     /* Decode picture. */
@@ -256,6 +262,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             break;
         }
     }
+
+    p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
 
     SDL_FreeSurface( p_surface );
     block_Release( p_block ); *pp_block = NULL;
