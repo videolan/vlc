@@ -709,7 +709,7 @@ package-win-common:
 	unix2dos "$(win32_destdir)/"*.txt || echo "WARNING: this shouldn't happen"
 
 # Necessary icons
-	cp $(srcdir)/share/vlc48x48.ico $(win32_destdir)/
+	cp $(srcdir)/share/vlc.ico $(win32_destdir)/
 
 # Copy the locales
 	mkdir -p $(win32_destdir)/locale

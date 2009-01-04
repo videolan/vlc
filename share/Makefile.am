@@ -5,6 +5,7 @@ pkgdatadir = $(datadir)/vlc
 nobase_dist_data_DATA = applications/vlc.desktop
 
 dist_pkgdata_DATA = \
+	$(DIST_icons) \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
 	$(DIST_icons48) \
@@ -79,11 +80,13 @@ DIST_pda = \
 	pda-rewindb16x16.xpm \
 	pda-stopb16x16.xpm
 
+DIST_icons = vlc.ico
+
 DIST_icons16 = vlc16x16.png vlc16x16.xpm
 
 DIST_icons32 = vlc32x32.png vlc32x32.xpm vlc32x32-christmas.xpm
 
-DIST_icons48 = vlc48x48.ico vlc48x48.png vlc48x48-christmas.png
+DIST_icons48 = vlc48x48.png vlc48x48-christmas.png
 
 DIST_icons128 = vlc128x128.png vlc128x128-christmas.png
 
