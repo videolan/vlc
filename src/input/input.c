@@ -489,9 +489,12 @@ static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
     vlc_list_t *p_list;
     int i;
 
+    /* FIXME ObjectKillChildrens seems a very bad idea in fact */
     if( p_obj->i_object_type == VLC_OBJECT_VOUT ||
         p_obj->i_object_type == VLC_OBJECT_AOUT ||
-        p_obj == VLC_OBJECT(p_input->p->p_sout) )
+        p_obj == VLC_OBJECT(p_input->p->p_sout) ||
+        p_obj->i_object_type == VLC_OBJECT_DECODER ||
+        p_obj->i_object_type == VLC_OBJECT_PACKETIZER )
         return;
 
     vlc_object_kill( p_obj );
