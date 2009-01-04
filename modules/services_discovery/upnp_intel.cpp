@@ -254,7 +254,6 @@ private:
 
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
-static void Run( services_discovery_t *p_sd );
 
 // Module descriptor
 
@@ -333,20 +332,6 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sd->p_sys );
 }
-
-static void Run( services_discovery_t* p_sd )
-{
-
-    msg_Dbg( p_sd, "UPnP discovery started" );
-    while( vlc_object_alive (p_sd) )
-    {
-        msleep( 500 );
-    }
-
-    msg_Dbg( p_sd, "UPnP discovery stopped" );
-
-}
-
 
 // XML utility functions:
 
