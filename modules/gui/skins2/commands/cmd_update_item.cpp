@@ -46,9 +46,10 @@ void CmdUpdateItem::execute()
 	// Get playlist item information
 	input_item_t *pItem = input_GetItem( p_input );
 
-	// XXX: we should not need to access p_input->psz_source directly, a
-	// getter should be provided by VLC core
-	string name = pItem->psz_name;
+    char *pszName = input_item_GetName( pItem );
+    char *pszUri = input_item_GetURI( pItem );
+
+	string name = pszName;
 	// XXX: This should be done in VLC core, not here...
 	// Remove path information if any
 	OSFactory *pFactory = OSFactory::instance( getIntf() );
@@ -58,7 +59,10 @@ void CmdUpdateItem::execute()
 		name = name.substr( pos + 1, name.size() - pos + 1 );
 	}
 	UString srcName( getIntf(), name.c_str() );
-	UString srcURI( getIntf(), pItem->psz_uri );
+	UString srcURI( getIntf(), pszUri );
+
+    free( pszName );
+    free( pszUri );
 
    // Create commands to update the stream variables
 	CmdSetText *pCmd1 = new CmdSetText( getIntf(), m_rStreamName, srcName );
