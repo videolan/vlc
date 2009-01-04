@@ -519,6 +519,9 @@ static void *Run( vlc_object_t *p_this )
     {
         /* If we failed, wait before we are killed, and exit */
         WaitDie( p_input );
+
+        /* Tell we're dead */
+        input_SendEventDead( p_input );
         goto exit;
     }
 
@@ -532,9 +535,6 @@ static void *Run( vlc_object_t *p_this )
     End( p_input );
 
 exit:
-    /* Tell we're dead */
-    input_SendEventDead( p_input );
-
     vlc_restorecancel( canc );
     return NULL;
 }
