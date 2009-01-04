@@ -102,13 +102,13 @@ static void AccessClose( vlc_object_t * );
     "IO Method (READ, MMAP, USERPTR)." )
 #define WIDTH_TEXT N_( "Width" )
 #define WIDTH_LONGTEXT N_( \
-    "Force width (-1 for autodetect)." )
+    "Force width (-1 for autodetect, 0 for driver default)." )
 #define HEIGHT_TEXT N_( "Height" )
 #define HEIGHT_LONGTEXT N_( \
-    "Force height (-1 for autodetect)." )
+    "Force height (-1 for autodetect, 0 for driver default)." )
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
-    "(-1 for autodetect)." )
+    "(0 for autodetect)." )
 
 #define CTRL_RESET_TEXT N_( "Reset v4l2 controls" )
 #define CTRL_RESET_LONGTEXT N_( \
@@ -264,9 +264,9 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, true );
         change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL );
-    add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
+    add_integer( CFG_PREFIX "width", -1, NULL, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true );
-    add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
+    add_integer( CFG_PREFIX "height", -1, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true );
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
@@ -1500,6 +1500,175 @@ static bool IsPixelFormatSupported( demux_t *p_demux, unsigned int i_pixelformat
     return false;
 }
 
+static float GetMaxFrameRate( demux_t *p_demux, int i_fd,
+                              uint32_t i_pixel_format,
+                              uint32_t i_width, uint32_t i_height )
+{
+    (void)p_demux;
+#ifdef VIDIOC_ENUM_FRAMEINTERVALS
+    /* This is new in Linux 2.6.19 */
+    struct v4l2_frmivalenum frmival;
+    frmival.index = 0;
+    frmival.pixel_format = i_pixel_format;
+    frmival.width = i_width;
+    frmival.height = i_height;
+    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 )
+    {
+        switch( frmival.type )
+        {
+            case V4L2_FRMIVAL_TYPE_DISCRETE:
+            {
+                float f_fps_max = -1;
+                do
+                {
+                    float f_fps = (float)frmival.discrete.denominator
+                                / (float)frmival.discrete.numerator;
+                    if( f_fps > f_fps_max ) f_fps_max = f_fps;
+                    frmival.index++;
+                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS,
+                                     &frmival ) >= 0 );
+                return f_fps_max;
+            }
+            case V4L2_FRMSIZE_TYPE_STEPWISE:
+            case V4L2_FRMIVAL_TYPE_CONTINUOUS:
+                return __MAX( (float)frmival.stepwise.max.denominator
+                            / (float)frmival.stepwise.max.numerator,
+                              (float)frmival.stepwise.min.denominator
+                            / (float)frmival.stepwise.min.numerator );
+        }
+    }
+#endif
+    return -1.;
+}
+
+static float GetAbsoluteMaxFrameRate( demux_t *p_demux, int i_fd,
+                                      uint32_t i_pixel_format )
+{
+    float f_fps_max = -1.;
+#ifdef VIDIOC_ENUM_FRAMESIZES
+    /* This is new in Linux 2.6.19 */
+    struct v4l2_frmsizeenum frmsize;
+    frmsize.index = 0;
+    frmsize.pixel_format = i_pixel_format;
+    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 )
+    {
+        switch( frmsize.type )
+        {
+            case V4L2_FRMSIZE_TYPE_DISCRETE:
+                do
+                {
+                    frmsize.index++;
+                    float f_fps = GetMaxFrameRate( p_demux, i_fd,
+                                                   i_pixel_format,
+                                                   frmsize.discrete.width,
+                                                   frmsize.discrete.height );
+                    if( f_fps > f_fps_max ) f_fps_max = f_fps;
+                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES,
+                         &frmsize ) >= 0 );
+                break;
+            case V4L2_FRMSIZE_TYPE_STEPWISE:
+            {
+                uint32_t i_width = frmsize.stepwise.min_width;
+                uint32_t i_height = frmsize.stepwise.min_height;
+                for( ;
+                     i_width <= frmsize.stepwise.max_width &&
+                     i_height <= frmsize.stepwise.max_width;
+                     i_width += frmsize.stepwise.step_width,
+                     i_height += frmsize.stepwise.step_height )
+                {
+                    float f_fps = GetMaxFrameRate( p_demux, i_fd,
+                                                   i_pixel_format,
+                                                   i_width, i_height );
+                    if( f_fps > f_fps_max ) f_fps_max = f_fps;
+                }
+                break;
+            }
+            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+                /* FIXME */
+                msg_Err( p_demux, "GetAbsoluteMaxFrameRate implementation for V4L2_FRMSIZE_TYPE_CONTINUOUS isn't correct" );
+                 f_fps_max = GetMaxFrameRate( p_demux, i_fd,
+                                              i_pixel_format,
+                                              frmsize.stepwise.max_width,
+                                              frmsize.stepwise.max_height );
+                break;
+        }
+    }
+#endif
+    return f_fps_max;
+}
+
+static void GetMaxDimensions( demux_t *p_demux, int i_fd,
+                              uint32_t i_pixel_format, float f_fps_min,
+                              uint32_t *pi_width, uint32_t *pi_height )
+{
+    *pi_width = 0;
+    *pi_height = 0;
+#ifdef VIDIOC_ENUM_FRAMESIZES
+    /* This is new in Linux 2.6.19 */
+    struct v4l2_frmsizeenum frmsize;
+    frmsize.index = 0;
+    frmsize.pixel_format = i_pixel_format;
+    if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 )
+    {
+        switch( frmsize.type )
+        {
+            case V4L2_FRMSIZE_TYPE_DISCRETE:
+                do
+                {
+                    frmsize.index++;
+                    float f_fps = GetMaxFrameRate( p_demux, i_fd,
+                                                   i_pixel_format,
+                                                   frmsize.discrete.width,
+                                                   frmsize.discrete.height );
+                    if( f_fps >= f_fps_min &&
+                        frmsize.discrete.width > *pi_width )
+                    {
+                        *pi_width = frmsize.discrete.width;
+                        *pi_height = frmsize.discrete.height;
+                    }
+                } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES,
+                         &frmsize ) >= 0 );
+                break;
+            case V4L2_FRMSIZE_TYPE_STEPWISE:
+            {
+                uint32_t i_width = frmsize.stepwise.min_width;
+                uint32_t i_height = frmsize.stepwise.min_height;
+                for( ;
+                     i_width <= frmsize.stepwise.max_width &&
+                     i_height <= frmsize.stepwise.max_width;
+                     i_width += frmsize.stepwise.step_width,
+                     i_height += frmsize.stepwise.step_height )
+                {
+                    float f_fps = GetMaxFrameRate( p_demux, i_fd,
+                                                   i_pixel_format,
+                                                   i_width, i_height );
+                    if( f_fps >= f_fps_min && i_width > *pi_width )
+                    {
+                        *pi_width = i_width;
+                        *pi_height = i_height;
+                    }
+                }
+                break;
+            }
+            case V4L2_FRMSIZE_TYPE_CONTINUOUS:
+                /* FIXME */
+                msg_Err( p_demux, "GetMaxDimension implementation for V4L2_FRMSIZE_TYPE_CONTINUOUS isn't correct" );
+                float f_fps = GetMaxFrameRate( p_demux, i_fd,
+                                               i_pixel_format,
+                                               frmsize.stepwise.max_width,
+                                               frmsize.stepwise.max_height );
+                if( f_fps >= f_fps_min &&
+                    frmsize.stepwise.max_width > *pi_width )
+                {
+                    *pi_width = frmsize.stepwise.max_width;
+                    *pi_height = frmsize.stepwise.max_height;
+                }
+                break;
+        }
+    }
+#endif
+}
+
 /*****************************************************************************
  * OpenVideoDev: open and set up the video device and probe for capabilities
  *****************************************************************************/
@@ -1684,8 +1853,9 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     memset( &fmt, 0, sizeof(fmt) );
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    if( p_sys->i_width <= 0 || p_sys->i_height <= 0 )
+    if( p_sys->i_width == 0 || p_sys->i_height == 0 )
     {
+        /* Use current width and height settings */
         if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
             msg_Err( p_demux, "Cannot get default width and height." );
@@ -1700,8 +1870,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             p_sys->i_height = p_sys->i_height * 2;
         }
     }
+    else if( p_sys->i_width < 0 || p_sys->i_height < 0 )
+    {
+        msg_Dbg( p_demux, "will try to find optimal width and height." );
+    }
     else
     {
+        /* Use user specified width and height */
         msg_Dbg( p_demux, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
     }
 
@@ -1753,6 +1928,22 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
             goto open_failed;
         }
+    }
+
+    if( p_sys->i_width < 0 || p_sys->i_height < 0 )
+    {
+        if( p_sys->f_fps <= 0 )
+        {
+            p_sys->f_fps = GetAbsoluteMaxFrameRate( p_demux, i_fd,
+                                                    fmt.fmt.pix.pixelformat );
+            msg_Dbg( p_demux, "Found maximum framerate of %f", p_sys->f_fps );
+        }
+        GetMaxDimensions( p_demux, i_fd,
+                          fmt.fmt.pix.pixelformat, p_sys->f_fps,
+                          &fmt.fmt.pix.width, &fmt.fmt.pix.height );
+        msg_Dbg( p_demux, "Found optimal dimensions for framerate %f of %dx%d",
+                 p_sys->f_fps, fmt.fmt.pix.width, fmt.fmt.pix.height );
+        if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) {;}
     }
 
     /* Reassign width, height and chroma incase driver override */
@@ -1828,6 +2019,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         }
     }
 #endif
+
 
     /* Init IO method */
     switch( p_sys->io )
@@ -2248,11 +2440,10 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             if( !b_codec_supported )
             {
                     msg_Dbg( p_obj,
-                         "device codec %4s (%s) not supported as access_demux",
+                         "device codec %4s (%s) not supported",
                          psz_fourcc_v4l2,
                          p_sys->p_codecs[i_index].description );
             }
-
         }
     }
 
