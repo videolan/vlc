@@ -41,7 +41,6 @@ block_FifoNew
 block_FifoPut
 block_FifoRelease
 block_FifoShow
-block_FifoSize
 block_FifoWake
 block_File
 block_Init
