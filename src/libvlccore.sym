@@ -153,6 +153,7 @@ httpd_UrlNew
 httpd_UrlNewUnique
 __image_HandlerCreate
 image_HandlerDelete
+image_Ext2Fourcc
 InitMD5
 input_Control
 input_CreateFilename

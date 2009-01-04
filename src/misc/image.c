@@ -70,7 +70,7 @@ static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
                                video_format_t *, const char * );
 static void DeleteFilter( filter_t * );
 
-static vlc_fourcc_t Ext2Fourcc( const char * );
+vlc_fourcc_t image_Ext2Fourcc( const char * );
 /*static const char *Fourcc2Ext( vlc_fourcc_t );*/
 
 /**
@@ -239,7 +239,7 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     if( !p_fmt_in->i_chroma )
     {
         /* Try to guess format from file name */
-        p_fmt_in->i_chroma = Ext2Fourcc( psz_url );
+        p_fmt_in->i_chroma = image_Ext2Fourcc( psz_url );
     }
 
     p_pic = ImageRead( p_image, p_block, p_fmt_in, p_fmt_out );
@@ -351,7 +351,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
     if( !p_fmt_out->i_chroma )
     {
         /* Try to guess format from file name */
-        p_fmt_out->i_chroma = Ext2Fourcc( psz_url );
+        p_fmt_out->i_chroma = image_Ext2Fourcc( psz_url );
     }
 
     file = utf8_fopen( psz_url, "wb" );
@@ -533,7 +533,7 @@ static const struct
     { 0, NULL }
 };
 
-static vlc_fourcc_t Ext2Fourcc( const char *psz_name )
+vlc_fourcc_t image_Ext2Fourcc( const char *psz_name )
 {
     int i;
 

@@ -70,6 +70,8 @@ VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
 #define image_Convert( a, b, c, d ) a->pf_convert( a, b, c, d )
 #define image_Filter( a, b, c, d ) a->pf_filter( a, b, c, d )
 
+VLC_EXPORT( vlc_fourcc_t, image_Ext2Fourcc, ( const char *psz_name ) );
+
 # ifdef __cplusplus
 }
 # endif
