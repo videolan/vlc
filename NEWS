@@ -64,6 +64,9 @@ Audio output:
  * Removed obsolete Esound and aRts plugins
  * Surround support for PulseAudio
 
+Video output:
+ * Effects (cube, torus, etc.) removed from OpenGL video output
+
 Miscellanous:
  * Invmem, a fake codec to display images from external applications
 
