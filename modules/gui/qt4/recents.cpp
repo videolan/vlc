@@ -46,7 +46,10 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
 
     isActive = config_GetInt( p_intf, "qt-recentplay" );
     char* psz_tmp = config_GetPsz( p_intf, "qt-recentplay-filter" );
-    filter = new QRegExp( psz_tmp, Qt::CaseInsensitive );
+    if( psz_tmp && *psz_tmp )
+        filter = new QRegExp( psz_tmp, Qt::CaseInsensitive );
+    else
+        filter = NULL;
     free( psz_tmp );
 
     load();
@@ -61,7 +64,7 @@ RecentsMRL::~RecentsMRL()
 
 void RecentsMRL::addRecent( const QString &mrl )
 {
-    if ( !isActive || filter->indexIn( mrl ) >= 0 )
+    if ( !isActive || ( filter && filter->indexIn( mrl ) >= 0 ) )
         return;
 
     msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
@@ -101,7 +104,7 @@ void RecentsMRL::load()
 
     for( int i = 0; i < list.size(); ++i )
     {
-        if (filter->indexIn( list.at(i) ) == -1)
+        if ( !filter && filter->indexIn( list.at(i) ) == -1 )
             stack->append( list.at(i) );
     }
 }

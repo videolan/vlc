@@ -195,7 +195,7 @@ vlc_module_begin ()
 
     add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
               RECENTPLAY_TEXT, false );
-    add_string( "qt-recentplay-filter", "xxx|porn", NULL,
+    add_string( "qt-recentplay-filter", "", NULL,
                 RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false );
 
     add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
