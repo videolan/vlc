@@ -678,6 +678,7 @@ static void MainLoopInterface( input_thread_t *p_input )
     if( demux_Control( p_input->p->input.p_demux,
                        DEMUX_GET_TIME, &i_time ) )
         i_time = 0;
+    p_input->i_time = i_time;
 
     if( demux_Control( p_input->p->input.p_demux,
                        DEMUX_GET_LENGTH, &i_length ) )
