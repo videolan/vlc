@@ -656,41 +656,6 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 }
             }
             break;
-        case VLC_VAR_TRIGGER_CALLBACKS:
-            {
-                /* Deal with callbacks. Tell we're in a callback, release the lock,
-                 * call stored functions, retake the lock. */
-                if( p_var->i_entries )
-                {
-                    int i_var;
-                    int i_entries = p_var->i_entries;
-                    callback_entry_t *p_entries = p_var->p_entries;
-
-                    p_var->b_incallback = true;
-                    vlc_mutex_unlock( &p_priv->var_lock );
-
-                    /* The real calls */
-                    for( ; i_entries-- ; )
-                    {
-                        p_entries[i_entries].pf_callback( p_this, psz_name, p_var->val, p_var->val,
-                                                          p_entries[i_entries].p_data );
-                    }
-
-                    vlc_mutex_lock( &p_priv->var_lock );
-
-                    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-                    if( i_var < 0 )
-                    {
-                        msg_Err( p_this, "variable %s has disappeared", psz_name );
-                        vlc_mutex_unlock( &p_priv->var_lock );
-                        return VLC_ENOVAR;
-                    }
-
-                    p_var = &p_priv->p_vars[i_var];
-                    p_var->b_incallback = false;
-                }
-            }
-            break;
 
         case VLC_VAR_SETISCOMMAND:
             p_var->i_type |= VLC_VAR_ISCOMMAND;

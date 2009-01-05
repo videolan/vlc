@@ -111,7 +111,6 @@
 #define VLC_VAR_CHOICESCOUNT        0x0028
 
 #define VLC_VAR_INHERITVALUE        0x0030
-#define VLC_VAR_TRIGGER_CALLBACKS   0x0035
 
 #define VLC_VAR_SETISCOMMAND        0x0040
 /**@}*/
