@@ -173,6 +173,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     vlc_mutex_init( &p_priv->lock );
     vlc_cond_init( &p_priv->wait );
     vlc_mutex_init( &p_priv->var_lock );
+    vlc_cond_init( &p_priv->var_wait );
     vlc_spin_init( &p_priv->spin );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
 
@@ -296,6 +297,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     }
 
     free( p_priv->p_vars );
+    vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
 
     free( p_this->psz_header );

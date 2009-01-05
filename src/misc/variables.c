@@ -762,6 +762,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
 
         p_var = &p_priv->p_vars[i_var];
         p_var->b_incallback = false;
+        vlc_cond_broadcast( &p_priv->var_wait );
     }
 
     /* Free data if needed */
@@ -978,6 +979,7 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 
         p_var = &p_priv->p_vars[i_var];
         p_var->b_incallback = false;
+        vlc_cond_broadcast( &p_priv->var_wait );
     }
 
     vlc_mutex_unlock( &p_priv->var_lock );
@@ -1134,18 +1136,19 @@ cleanup:
 /* Following functions are local */
 
 /*****************************************************************************
- * GetUnused: find an unused variable from its name
+ * GetUnused: find an unused (not in callback) variable from its name
  *****************************************************************************
  * We do i_tries tries before giving up, just in case the variable is being
  * modified and called from a callback.
  *****************************************************************************/
 static int GetUnused( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_var, i_tries = 0;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     while( true )
     {
+        int i_var;
+
         i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
         if( i_var < 0 )
         {
@@ -1157,15 +1160,9 @@ static int GetUnused( vlc_object_t *p_this, const char *psz_name )
             return i_var;
         }
 
-        if( i_tries++ > 100 )
-        {
-            msg_Err( p_this, "caught in a callback deadlock? ('%s')", psz_name );
-            return VLC_ETIMEOUT;
-        }
-
-        vlc_mutex_unlock( &p_priv->var_lock );
-        msleep( THREAD_SLEEP );
-        vlc_mutex_lock( &p_priv->var_lock );
+        mutex_cleanup_push( &p_priv->var_lock );
+        vlc_cond_wait( &p_priv->var_wait, &p_priv->var_lock );
+        vlc_cleanup_pop( );
     }
 }
 

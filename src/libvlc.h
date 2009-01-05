@@ -150,6 +150,7 @@ typedef struct vlc_object_internals_t
     /* Object variables */
     variable_t *    p_vars;
     vlc_mutex_t     var_lock;
+    vlc_cond_t      var_wait;
     int             i_vars;
 
     /* Thread properties, if any */
