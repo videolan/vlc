@@ -287,8 +287,8 @@ playlist_GetLastLeaf
 playlist_GetNextLeaf
 playlist_GetPreferredNode
 playlist_GetPrevLeaf
-playlist_IsPlaying
 playlist_Import
+playlist_IsPlaying
 playlist_IsServicesDiscoveryLoaded
 playlist_ItemGetById
 playlist_ItemGetByInput
