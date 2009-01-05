@@ -330,7 +330,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
     var_Get( p_vout, "crop", &old_val );
     if( old_val.psz_string && *old_val.psz_string )
-        var_Change( p_vout, "crop", VLC_VAR_TRIGGER_CALLBACKS, 0, 0 );
+        var_TriggerCallback( p_vout, "crop" );
     free( old_val.psz_string );
 
     /* Monitor pixel aspect-ratio */
@@ -391,7 +391,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
     var_Get( p_vout, "aspect-ratio", &old_val );
     if( (old_val.psz_string && *old_val.psz_string) || b_force_par )
-        var_Change( p_vout, "aspect-ratio", VLC_VAR_TRIGGER_CALLBACKS, 0, 0 );
+        var_TriggerCallback( p_vout, "aspect-ratio" );
     free( old_val.psz_string );
 
     /* Initialize the dimensions of the video window */

@@ -1411,7 +1411,7 @@ static OSStatus HardwareListener( AudioHardwarePropertyID inPropertyID,
         {
             /* something changed in the list of devices */
             /* We trigger the audio-device's aout_ChannelsRestart callback */
-            var_Change( p_aout, "audio-device", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
+            var_TriggerCallback( p_aout, "audio-device" );
             var_Destroy( p_aout, "audio-device" );
         }
         break;

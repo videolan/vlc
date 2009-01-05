@@ -228,7 +228,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
 
         if (faces && (faces->total > 0))    //raise the video filter event
-            var_Change( p_filter->p_libvlc, VIDEO_FILTER_EVENT_VARIABLE, VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
+            var_TriggerCallback( p_filter->p_libvlc, VIDEO_FILTER_EVENT_VARIABLE );
     }
     else
         msg_Err( p_filter, "No cascade - is opencv-haarcascade-file valid?" );

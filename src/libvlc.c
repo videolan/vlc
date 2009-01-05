@@ -736,7 +736,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         var_Set( p_libvlc, "verbose", val );
     }
     var_AddCallback( p_libvlc, "verbose", VerboseCallback, NULL );
-    var_Change( p_libvlc, "verbose", VLC_VAR_TRIGGER_CALLBACKS, NULL, NULL );
+    var_TriggerCallback( p_libvlc, "verbose" );
 
     if( priv->b_color )
         priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;
