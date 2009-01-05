@@ -23,17 +23,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include "customwidgets.hpp"
+#include "qt4.hpp" /*needed for qtr and CONNECT, but not necessary */
+
 #include <QPainter>
 #include <QLineEdit>
 #include <QColorGroup>
 #include <QRect>
 #include <QKeyEvent>
 #include <QWheelEvent>
+#include <QToolButton>
+#include <QHBoxLayout>
+#include <vlc_intf_strings.h>
+
 
 #include <vlc_keys.h>
 
@@ -95,6 +102,48 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
         repaint();
     }
     QLineEdit::focusOutEvent( ev );
+}
+
+SearchLineEdit::SearchLineEdit( QWidget *parent ) : QFrame( parent )
+{
+    setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
+    setLineWidth( 1 );
+
+    QHBoxLayout *frameLayout = new QHBoxLayout( this );
+    frameLayout->setMargin( 0 );
+    frameLayout->setSpacing( 0 );
+
+    QPalette palette;
+    QBrush brush( QColor(255, 255, 255, 255) );
+    brush.setStyle(Qt::SolidPattern);
+    palette.setBrush(QPalette::Active, QPalette::Window, brush); //Qt::white
+
+    setPalette(palette);
+    setAutoFillBackground(true);
+
+    searchLine = new  ClickLineEdit( qtr(I_PL_FILTER), 0 );
+    searchLine->setFrame( false );
+    searchLine->setMinimumWidth( 80 );
+
+    CONNECT( searchLine, textChanged( const QString ),
+             this, updateText( const QString ) );
+    frameLayout->addWidget( searchLine );
+
+    clearButton = new QToolButton;
+    clearButton->setAutoRaise( true );
+    clearButton->setMaximumWidth( 30 );
+    clearButton->setIcon( QIcon( ":/clear" ) );
+    clearButton->setToolTip( qtr( "Clear" ) );
+    clearButton->hide();
+
+    CONNECT( clearButton, clicked(), searchLine, clear() );
+    frameLayout->addWidget( clearButton );
+}
+
+void SearchLineEdit::updateText( const QString text )
+{
+    clearButton->setVisible( !text.isEmpty() );
+    emit textChanged( text );
 }
 
 /***************************************************************************

@@ -27,6 +27,7 @@
 
 #include "qt4.hpp"
 #include "dialogs_provider.hpp"
+
 #include "components/playlist/playlist_model.hpp"
 #include "components/playlist/panels.hpp"
 #include "util/customwidgets.hpp"
@@ -45,7 +46,6 @@
 #include <QSpacerItem>
 #include <QMenu>
 #include <QSignalMapper>
-
 #include <assert.h>
 
 #include "sorting.h"
@@ -164,15 +164,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
     buttons->addWidget( filter );
 
-    searchLine = new  ClickLineEdit( qtr(I_PL_FILTER), 0 );
-    searchLine->setMinimumWidth( 80 );
-    CONNECT( searchLine, textChanged(QString), this, search(QString));
-    buttons->addWidget( searchLine ); filter->setBuddy( searchLine );
-
-    QPushButton *clear = new QPushButton;
-    clear->setMaximumWidth( 30 );
-    BUTTON_SET_ACT_I( clear, "", clear, qtr( "Clear" ), clearFilter() );
-    buttons->addWidget( clear );
+    SearchLineEdit *search = new SearchLineEdit( this );
+    buttons->addWidget( search );
+    filter->setBuddy( search );
+    CONNECT( search, textChanged( QString ), this, search( QString ) );
 
     /* Finish the layout */
     layout->addWidget( view );
@@ -289,12 +284,6 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     }
 
     selectColMenu.exec( QCursor::pos() );
-}
-
-/* ClearFilter LineEdit */
-void StandardPLPanel::clearFilter()
-{
-    searchLine->setText( "" );
 }
 
 /* Search in the playlist */

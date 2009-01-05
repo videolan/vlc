@@ -56,6 +56,23 @@ private:
     bool mDrawClickMsg;
 };
 
+class QToolButton;
+class SearchLineEdit : public QFrame
+{
+    Q_OBJECT
+public:
+    SearchLineEdit( QWidget *parent );
+
+private:
+    ClickLineEdit *searchLine;
+    QToolButton   *clearButton;
+
+private slots:
+    void updateText( const QString );
+
+signals:
+    void textChanged( const QString );
+};
 
 /*****************************************************************
  * Custom views

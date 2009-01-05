@@ -40,7 +40,6 @@ class QTreeView;
 class PLModel;
 class QPushButton;
 class QKeyEvent;
-class ClickLineEdit;
 
 class PLPanel: public QWidget
 {
@@ -75,7 +74,6 @@ protected:
 private:
     QTreeView *view;
     QPushButton *repeatButton, *randomButton, *addButton, *gotoPlayingButton;
-    ClickLineEdit *searchLine;
     int currentRootId;
     QSignalMapper *ContextUpdateMapper;
 public slots:
@@ -89,7 +87,6 @@ private slots:
     void gotoPlayingItem();
     void doPopup( QModelIndex index, QPoint point );
     void search( QString search );
-    void clearFilter();
     void setCurrentRootId( int );
     void popupAdd();
     void popupSelectColumn( QPoint );
