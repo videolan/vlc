@@ -216,6 +216,7 @@ static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
         else
         {
             msg_Dbg( p_ressource->p_input, "saving a free vout" );
+            vout_Flush( p_vout, 1 );
             p_ressource->p_vout_free = p_vout;
         }
         return NULL;
