@@ -711,7 +711,16 @@ void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced )
 
         msg_Dbg( p_vout, "[%d] %d %d", i_pic, p_pic->i_status, p_pic->i_refcount );
         p_pic->i_refcount = 0;
-        vout_UsePictureLocked( p_vout, p_pic );
+
+        switch( p_pic->i_status )
+        {
+        case READY_PICTURE:
+        case DISPLAYED_PICTURE:
+        case RESERVED_PICTURE:
+            if( p_pic != p_vout->p->p_picture_displayed )
+                vout_UsePictureLocked( p_vout, p_pic );
+            break;
+        }
     }
     vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->picture_lock );
