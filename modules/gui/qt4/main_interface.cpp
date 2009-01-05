@@ -1074,9 +1074,6 @@ void MainInterface::closeEvent( QCloseEvent *e )
 {
     hide();
     THEDP->quit();
-
-    QApplication::closeAllWindows();
-    QApplication::quit();
 }
 
 void MainInterface::toggleFullScreen( void )

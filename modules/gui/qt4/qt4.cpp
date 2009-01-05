@@ -301,7 +301,7 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     var_Destroy (p_this->p_libvlc, "qt4-iface");
-    QApplication::postEvent (p_sys->p_mi, new QCloseEvent());
+    QApplication::quit();
 
     vlc_join (p_sys->thread, NULL);
     pl_Release (p_this);
@@ -428,6 +428,8 @@ static void *Thread( void *obj )
 
     /* And quit */
     msg_Dbg( p_intf, "Quitting the Qt4 Interface" );
+
+    QApplication::closeAllWindows();
 
     if (p_mi != NULL)
     {
