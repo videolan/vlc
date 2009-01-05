@@ -153,8 +153,7 @@ static int      GetUnused   ( vlc_object_t *, const char * );
 static uint32_t HashString  ( const char * );
 static int      Insert      ( variable_t *, int, const char * );
 static int      InsertInner ( variable_t *, int, uint32_t );
-static int      Lookup      ( variable_t *, int, const char * );
-static int      LookupInner ( variable_t *, int, uint32_t );
+static int      Lookup      ( variable_t *, size_t, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
 
@@ -1277,93 +1276,57 @@ static int InsertInner( variable_t *p_vars, int i_count, uint32_t i_hash )
     return i_middle + 1;
 }
 
+static int u32cmp( const void *key, const void *data )
+{
+    const variable_t *p_var = data;
+    uint32_t hash = *(const uint32_t *)key ;
+
+    if( hash > p_var->i_hash )
+        return 1;
+    if( hash < p_var->i_hash )
+        return -1;
+    return 0;
+}
+
 /*****************************************************************************
  * Lookup: find an existing variable given its name
  *****************************************************************************
  * We use a recursive inner function indexed on the hash. Care is taken of
  * possible hash collisions.
- * XXX: does this really need to be written recursively?
  *****************************************************************************/
-static int Lookup( variable_t *p_vars, int i_count, const char *psz_name )
+static int Lookup( variable_t *p_vars, size_t i_count, const char *psz_name )
 {
+    variable_t *p_var;
     uint32_t i_hash;
-    int i, i_pos;
-
-    if( i_count == 0 )
-    {
-        return -1;
-    }
 
     i_hash = HashString( psz_name );
-
-    i_pos = LookupInner( p_vars, i_count, i_hash );
+    p_var = bsearch( &i_hash, p_vars, i_count, sizeof( *p_var ), u32cmp );
 
     /* Hash not found */
-    if( i_hash != p_vars[i_pos].i_hash )
-    {
+    if( p_var == NULL )
         return -1;
-    }
 
-    /* Hash found, entry found */
-    if( !strcmp( psz_name, p_vars[i_pos].psz_name ) )
-    {
-        return i_pos;
-    }
+    assert( i_count > 0 );
 
-    /* Hash collision! This should be very rare, but we cannot guarantee
-     * it will never happen. Just do an exhaustive search amongst all
-     * entries with the same hash. */
-    for( i = i_pos - 1 ; i > 0 && i_hash == p_vars[i].i_hash ; i-- )
-    {
-        if( !strcmp( psz_name, p_vars[i].psz_name ) )
-        {
-            return i;
-        }
-    }
+    /* Find the first entry with the right hash */
+    while( (p_var > p_vars) && (i_hash == p_var[-1].i_hash) )
+        p_var--;
 
-    for( i = i_pos + 1 ; i < i_count && i_hash == p_vars[i].i_hash ; i++ )
+    assert( p_var->i_hash == i_hash );
+
+    /* Hash collision should be very unlikely, but we cannot guarantee
+     * it will never happen. So we do an exhaustive search amongst all
+     * entries with the same hash. Typically, there is only one anyway. */
+    for( variable_t *p_end = p_vars + i_count;
+         (p_var < p_end) && (i_hash == p_var->i_hash);
+         p_var++ )
     {
-        if( !strcmp( psz_name, p_vars[i].psz_name ) )
-        {
-            return i;
-        }
+        if( !strcmp( psz_name, p_var->psz_name ) )
+            return p_var - p_vars;
     }
 
     /* Hash found, but entry not found */
     return -1;
-}
-
-static int LookupInner( variable_t *p_vars, int i_count, uint32_t i_hash )
-{
-    int i_middle;
-
-    if( i_hash <= p_vars[0].i_hash )
-    {
-        return 0;
-    }
-
-    if( i_hash >= p_vars[i_count-1].i_hash )
-    {
-        return i_count - 1;
-    }
-
-    i_middle = i_count / 2;
-
-    /* We know that 0 < i_middle */
-    if( i_hash < p_vars[i_middle].i_hash )
-    {
-        return LookupInner( p_vars, i_middle, i_hash );
-    }
-
-    /* We know that i_middle + 1 < i_count */
-    if( i_hash > p_vars[i_middle].i_hash )
-    {
-        return i_middle + LookupInner( p_vars + i_middle,
-                                       i_count - i_middle,
-                                       i_hash );
-    }
-
-    return i_middle;
 }
 
 /*****************************************************************************
