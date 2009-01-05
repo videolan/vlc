@@ -101,7 +101,6 @@ misc.mdate(): Get the current date (in milliseconds).
 misc.mwait(): Wait for the given date (in milliseconds).
 
 misc.lock_and_wait(): Lock our object thread and wait for a wake up signal.
-misc.signal(): Wake up our object thread.
 
 misc.should_die(): Returns true if the interface should quit.
 misc.quit(): Quit VLC.

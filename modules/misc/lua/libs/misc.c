@@ -185,13 +185,6 @@ static int vlclua_lock_and_wait( lua_State *L )
     return 1;
 }
 
-static int vlclua_signal( lua_State *L )
-{
-    vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_object_signal( p_this );
-    return 0;
-}
-
 static int vlclua_mdate( lua_State *L )
 {
     lua_pushnumber( L, mdate() );
@@ -231,7 +224,6 @@ static const luaL_Reg vlclua_misc_reg[] = {
     { "mwait", vlclua_mwait },
 
     { "lock_and_wait", vlclua_lock_and_wait },
-    { "signal", vlclua_signal },
 
     { "should_die", vlclua_intf_should_die },
     { "quit", vlclua_quit },
