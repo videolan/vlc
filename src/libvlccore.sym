@@ -491,7 +491,6 @@ __vlc_object_kill
 __vlc_object_lock
 __vlc_object_release
 __vlc_object_set_destructor
-__vlc_object_signal_unlocked
 __vlc_object_unlock
 __vlc_object_wait
 vlc_poll

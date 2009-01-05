@@ -49,6 +49,9 @@ void system_End       ( libvlc_int_t * );
 /* Hopefully, no need to export this. There is a new thread API instead. */
 void vlc_thread_cancel (vlc_object_t *);
 int vlc_object_waitpipe (vlc_object_t *obj);
+void __vlc_object_signal_unlocked (vlc_object_t *);
+#define vlc_object_signal_unlocked( obj ) \
+    __vlc_object_signal_unlocked( VLC_OBJECT( obj ) )
 
 void vlc_trace (const char *fn, const char *file, unsigned line);
 #define vlc_backtrace() vlc_trace(__func__, __FILE__, __LINE__)
