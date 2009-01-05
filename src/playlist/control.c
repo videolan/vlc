@@ -176,7 +176,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         msg_Err( p_playlist, "unknown playlist query" );
         return VLC_EBADVAR;
     }
-    vlc_object_signal_unlocked( p_playlist );
+    vlc_cond_signal( &pl_priv(p_playlist)->signal );
 
     return VLC_SUCCESS;
 }

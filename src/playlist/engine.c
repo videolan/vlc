@@ -49,7 +49,7 @@ static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
     PL_LOCK;
 
     pl_priv(p_playlist)->b_reset_currently_playing = true;
-    vlc_object_signal_unlocked( p_playlist );
+    vlc_cond_signal( &pl_priv(p_playlist)->signal );
 
     PL_UNLOCK;
     return VLC_SUCCESS;
@@ -81,6 +81,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
 
     VariablesInit( p_playlist );
+    vlc_cond_init( &p->signal );
 
     /* Initialise data structures */
     pl_priv(p_playlist)->i_last_playlist_id = 0;
@@ -179,6 +180,7 @@ static void playlist_Destructor( vlc_object_t * p_this )
     assert( !p_sys->p_preparser );
     assert( !p_sys->p_fetcher );
 
+    vlc_cond_destroy( &p_sys->signal );
     msg_Dbg( p_this, "Destroyed" );
 }
 

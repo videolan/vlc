@@ -82,6 +82,10 @@ void playlist_Deactivate( playlist_t *p_playlist )
     msg_Dbg( p_playlist, "Deactivate" );
 
     vlc_object_kill( p_playlist );
+    PL_LOCK;
+    vlc_cond_signal( &p_sys->signal );
+    PL_UNLOCK;
+
     vlc_thread_join( p_playlist );
     assert( !p_sys->p_input );
 
@@ -150,7 +154,8 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
 
     PL_LOCK;
 
-    vlc_object_signal_unlocked( p_playlist );
+    /* XXX: signaling while not changing any parameter... suspicious... */
+    vlc_cond_signal( &pl_priv(p_playlist)->signal );
 
     PL_UNLOCK;
     return VLC_SUCCESS;
@@ -548,7 +553,8 @@ static void LoopRequest( playlist_t *p_playlist )
             input_ressource_TerminateVout( p_sys->p_input_ressource );
 
         if( vlc_object_alive( p_playlist ) )
-            vlc_object_wait( p_playlist );
+            vlc_cond_wait( &pl_priv(p_playlist)->signal,
+                           &vlc_internals(p_playlist)->lock );
         return;
     }
 
@@ -593,7 +599,8 @@ static void *Thread ( vlc_object_t *p_this )
 
         /* If there is an input, check that it doesn't need to die. */
         while( !LoopInput( p_playlist ) )
-            vlc_object_wait( p_playlist );
+            vlc_cond_wait( &pl_priv(p_playlist)->signal,
+                           &vlc_internals(p_playlist)->lock );
 
         LoopRequest( p_playlist );
     }
