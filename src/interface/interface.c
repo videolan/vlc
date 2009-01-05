@@ -141,7 +141,7 @@ int intf_RunThread( intf_thread_t *p_intf )
         /* Make sure our MonitorLibVLCDeath thread exit */
         vlc_object_kill( p_intf );
         /* It is monitoring libvlc, not the p_intf */
-        vlc_object_signal( p_intf->p_libvlc );
+        vlc_object_kill( p_intf->p_libvlc );
         vlc_thread_join( p_intf );
 
         vlc_object_detach( p_intf );
