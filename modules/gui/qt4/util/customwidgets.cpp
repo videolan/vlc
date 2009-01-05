@@ -106,8 +106,8 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
 
 SearchLineEdit::SearchLineEdit( QWidget *parent ) : QFrame( parent )
 {
-    setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-    setLineWidth( 1 );
+    setFrameStyle( QFrame::WinPanel | QFrame::Sunken );
+    setLineWidth( 0 );
 
     QHBoxLayout *frameLayout = new QHBoxLayout( this );
     frameLayout->setMargin( 0 );
