@@ -82,12 +82,13 @@ typedef struct playlist_private_t
         vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
 
+    int      i_last_playlist_id; /**< Last id to an item */
+    bool     b_reset_currently_playing; /** Reset current item array */
+
     bool     b_tree; /**< Display as a tree */
     bool     b_doing_ml; /**< Doing media library stuff  get quicker */
     bool     b_auto_preparse;
     mtime_t  last_rebuild_date;
-    bool     b_reset_currently_playing; /** Reset current item array */
-    int      i_last_playlist_id; /**< Last id to an item */
 
 } playlist_private_t;
 
