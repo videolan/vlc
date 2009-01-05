@@ -27,6 +27,8 @@
 
 #include "plugins.hpp"
 
+#include "util/customwidgets.hpp"
+
 //#include <vlc_modules.h>
 
 #include <QTreeWidget>
@@ -69,7 +71,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     treePlugins->sortByColumn( 1, Qt::AscendingOrder );
 
     QLabel *label = new QLabel( _("&Search:"), this );
-    edit = new QLineEdit;
+    edit = new SearchLineEdit( this );
     label->setBuddy( edit );
 
     layout->addWidget( label, 1, 0 );

@@ -29,6 +29,7 @@
 class QTreeWidget;
 class QLineEdit;
 
+class SearchLineEdit;
 class PluginDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -39,7 +40,7 @@ private:
     virtual ~PluginDialog();
 
     QTreeWidget *treePlugins;
-    QLineEdit *edit;
+    SearchLineEdit *edit;
 private slots:
     void search( const QString );
 };
