@@ -529,13 +529,14 @@ static int Demux( demux_t *p_demux )
                     if( asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : psz_current_input_name ) ) != -1 )
                     {
                         p_entry = input_item_NewExt( p_demux, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
-                        FREENULL( psz_name );
+                        free( psz_name );
                         input_item_CopyOptions( p_current_input, p_entry );
                         while( i_options )
                         {
                             psz_name = ppsz_options[--i_options];
-                            FREENULL( psz_name );
+                            free( psz_name );
                         }
+                        psz_name = NULL;
 
                         if( psz_title_entry ) input_item_SetTitle( p_entry, psz_title_entry );
                         if( psz_artist_entry ) input_item_SetArtist( p_entry, psz_artist_entry );
@@ -577,7 +578,6 @@ static int Demux( demux_t *p_demux )
 
                 // init entry details
                 FREENULL(psz_href);
-                psz_href = NULL;
                 i_starttime = 0;
                 i_duration = 0;
             }
@@ -602,7 +602,7 @@ static int Demux( demux_t *p_demux )
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
 
-                            FREENULL(psz_href);
+                            free( psz_href );
                             psz_href = malloc( i_strlen +1);
                             memcpy( psz_href, psz_backup, i_strlen );
                             psz_href[i_strlen] = '\0';
