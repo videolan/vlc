@@ -431,6 +431,8 @@ void block_FifoEmpty( block_fifo_t *p_fifo )
  */
 void block_FifoPace (block_fifo_t *fifo, size_t max_depth, size_t max_size)
 {
+    vlc_testcancel ();
+
     vlc_mutex_lock (&fifo->lock);
     while ((fifo->i_depth > max_depth) || (fifo->i_size > max_size))
     {
@@ -483,6 +485,8 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
 {
     block_t *b;
 
+    vlc_testcancel( );
+
     vlc_mutex_lock( &p_fifo->lock );
     mutex_cleanup_push( &p_fifo->lock );
 
@@ -522,6 +526,8 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
 block_t *block_FifoShow( block_fifo_t *p_fifo )
 {
     block_t *b;
+
+    vlc_testcancel( );
 
     vlc_mutex_lock( &p_fifo->lock );
     mutex_cleanup_push( &p_fifo->lock );
