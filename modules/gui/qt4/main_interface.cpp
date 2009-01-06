@@ -195,8 +195,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
 
     /* VideoWidget connects to avoid different threads speaking to each other */
-    CONNECT( this, askReleaseVideo( void ),
-             this, releaseVideoSlot( void ) );
+    connect( this, SIGNAL(askReleaseVideo( void )),
+             this, SLOT(releaseVideoSlot( void )), Qt::BlockingQueuedConnection );
+
     if( videoWidget )
         CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
