@@ -36,7 +36,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void *Thread   ( vlc_object_t * );
+static void *Thread   ( void * );
 
 /*****************************************************************************
  * Main functions for the global thread
@@ -66,8 +66,8 @@ void playlist_Activate( playlist_t *p_playlist )
         msg_Err( p_playlist, "cannot create playlist preparser" );
 
     /* Start the playlist thread */
-    if( vlc_thread_create( p_playlist, "playlist", Thread,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+    if( vlc_clone( &p_sys->thread, Thread, p_playlist,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
     }
@@ -86,7 +86,7 @@ void playlist_Deactivate( playlist_t *p_playlist )
     vlc_cond_signal( &p_sys->signal );
     PL_UNLOCK;
 
-    vlc_thread_join( p_playlist );
+    vlc_join( p_sys->thread, NULL );
     assert( !p_sys->p_input );
 
     PL_LOCK;
@@ -579,11 +579,10 @@ static void LoopRequest( playlist_t *p_playlist )
 /**
  * Run the main control thread itself
  */
-static void *Thread ( vlc_object_t *p_this )
+static void *Thread ( void *data )
 {
-    playlist_t *p_playlist = (playlist_t*)p_this;
+    playlist_t *p_playlist = data;
     playlist_private_t *p_sys = pl_priv(p_playlist);
-    int canc = vlc_savecancel();
 
     vlc_object_lock( p_playlist );
     while( vlc_object_alive( p_playlist ) || p_sys->p_input )
@@ -606,7 +605,6 @@ static void *Thread ( vlc_object_t *p_this )
     }
     vlc_object_unlock( p_playlist );
 
-    vlc_restorecancel (canc);
     return NULL;
 }
 

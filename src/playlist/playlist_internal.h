@@ -82,6 +82,7 @@ typedef struct playlist_private_t
         vlc_mutex_t         lock;     /**< Lock to protect request */
     } request;
 
+    vlc_thread_t thread; /**< engine thread */
     vlc_cond_t signal; /**< wakes up the playlist engine thread */
 
     int      i_last_playlist_id; /**< Last id to an item */
