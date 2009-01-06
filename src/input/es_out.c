@@ -587,7 +587,7 @@ static void EsOutChangePosition( es_out_t *out )
         input_DecoderStartBuffering( p_es->p_dec );
 
         if( p_es->p_dec_record )
-            input_DecoderStartBuffering( p_es->p_dec );
+            input_DecoderStartBuffering( p_es->p_dec_record );
     }
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
@@ -680,7 +680,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
 
         input_DecoderStopBuffering( p_es->p_dec );
         if( p_es->p_dec_record )
-            input_DecoderStopBuffering( p_es->p_dec );
+            input_DecoderStopBuffering( p_es->p_dec_record );
     }
 }
 static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
