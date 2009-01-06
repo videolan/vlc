@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_stream.h>
+#include <limits.h>
 
 #include "art.h"
 #include "fetcher.h"
@@ -269,7 +270,7 @@ static int DownloadArt( playlist_t *p_playlist, input_item_t *p_item )
     {
         int i_read = 65536;
 
-        if( i_data + i_read <= i_data ) /* Protect gainst overflow */
+        if( i_data >= INT_MAX - i_read )
             break;
 
         p_data = realloc( p_data, i_data + i_read );
