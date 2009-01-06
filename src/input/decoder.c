@@ -879,8 +879,6 @@ static void *DecoderThread( vlc_object_t *p_this )
 
             vlc_restorecancel( canc );
         }
-        /* Ensure fast cancellation in case the fifo is not empty */
-        vlc_testcancel();
     }
     return NULL;
 }
