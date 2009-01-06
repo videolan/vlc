@@ -324,8 +324,6 @@ void VlcProc::refreshInput()
     VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
     VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
 
-    input_thread_t *pInput = getIntf()->p_sys->p_input;
-
     // Update the input
     if( getIntf()->p_sys->p_input == NULL )
     {
@@ -338,6 +336,7 @@ void VlcProc::refreshInput()
         getIntf()->p_sys->p_input = NULL;
     }
 
+    input_thread_t *pInput = getIntf()->p_sys->p_input;
 
     if( pInput && vlc_object_alive (pInput) )
     {
