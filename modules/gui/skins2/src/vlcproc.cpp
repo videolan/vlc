@@ -421,7 +421,7 @@ int VlcProc::onIntfShow( vlc_object_t *pObj, const char *pVariable,
                          vlc_value_t oldVal, vlc_value_t newVal,
                          void *pParam )
 {
-    if (newVal.i_int)
+    if (newVal.b_bool)
     {
         VlcProc *pThis = (VlcProc*)pParam;
 
