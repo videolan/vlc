@@ -652,7 +652,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     {
         es_out_id_t *p_es = p_sys->es[i];
 
-        if( !p_es->p_dec )
+        if( !p_es->p_dec || p_es->fmt.i_cat == SPU_ES )
             continue;
         input_DecoderWaitBuffering( p_es->p_dec );
         if( p_es->p_dec_record )
