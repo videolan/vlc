@@ -153,9 +153,11 @@ void MessagesDialog::sinkMessage (msg_cb_data_t *data, msg_item_t *item,
                                   unsigned overruns)
 {
     MessagesDialog *self = data->self;
+    int canc = vlc_savecancel ();
     QMutexLocker locker (&data->lock);
 
     self->sinkMessage (item, overruns);
+    vlc_restorecancel (canc);
 }
 
 void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
