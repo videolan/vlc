@@ -545,7 +545,7 @@ static void LoopRequest( playlist_t *p_playlist )
     const int i_status = p_sys->request.b_request ?
                          p_sys->request.i_status : p_sys->status.i_status;
 
-    if( i_status == PLAYLIST_STOPPED )
+    if( i_status == PLAYLIST_STOPPED || !vlc_object_alive( p_playlist ) )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
 
