@@ -166,6 +166,52 @@ static int Open( vlc_object_t *p_this )
     Dialogs::instance( p_intf );
     ThemeRepository::instance( p_intf );
 
+    // Load a theme
+    char *skin_last = config_GetPsz( p_intf, "skins2-last" );
+
+    ThemeLoader *pLoader = new ThemeLoader( p_intf );
+
+    if( !skin_last || !*skin_last || !pLoader->load( skin_last ) )
+    {
+        // Get the resource path and try to load the default skin
+        OSFactory *pOSFactory = OSFactory::instance( p_intf );
+        const list<string> &resPath = pOSFactory->getResourcePath();
+        const string &sep = pOSFactory->getDirSeparator();
+
+        list<string>::const_iterator it;
+        for( it = resPath.begin(); it != resPath.end(); it++ )
+        {
+            string path = (*it) + sep + "default.vlt";
+            if( pLoader->load( path ) )
+            {
+                // Theme loaded successfully
+                break;
+            }
+        }
+        if( it == resPath.end() )
+        {
+            // Last chance: the user can select a new theme file
+            if( Dialogs::instance( p_intf ) )
+            {
+                CmdDlgChangeSkin *pCmd = new CmdDlgChangeSkin( p_intf );
+                AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
+                pQueue->push( CmdGenericPtr( pCmd ) );
+            }
+            else
+            {
+                // No dialogs provider, just quit...
+                CmdQuit *pCmd = new CmdQuit( p_intf );
+                AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
+                pQueue->push( CmdGenericPtr( pCmd ) );
+                msg_Err( p_intf,
+                         "cannot show the \"open skin\" dialog: exiting...");
+            }
+        }
+    }
+    delete pLoader;
+
+    free( skin_last );
+
 #ifdef WIN32
     p_intf->b_should_run_on_first_thread = true;
 #endif
@@ -211,50 +257,6 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     int canc = vlc_savecancel();
-    // Load a theme
-    ThemeLoader *pLoader = new ThemeLoader( p_intf );
-    char *skin_last = config_GetPsz( p_intf, "skins2-last" );
-
-    if( !skin_last || !*skin_last || !pLoader->load( skin_last ) )
-    {
-        // Get the resource path and try to load the default skin
-        OSFactory *pOSFactory = OSFactory::instance( p_intf );
-        const list<string> &resPath = pOSFactory->getResourcePath();
-        const string &sep = pOSFactory->getDirSeparator();
-
-        list<string>::const_iterator it;
-        for( it = resPath.begin(); it != resPath.end(); it++ )
-        {
-            string path = (*it) + sep + "default.vlt";
-            if( pLoader->load( path ) )
-            {
-                // Theme loaded successfully
-                break;
-            }
-        }
-        if( it == resPath.end() )
-        {
-            // Last chance: the user can select a new theme file
-            if( Dialogs::instance( p_intf ) )
-            {
-                CmdDlgChangeSkin *pCmd = new CmdDlgChangeSkin( p_intf );
-                AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
-                pQueue->push( CmdGenericPtr( pCmd ) );
-            }
-            else
-            {
-                // No dialogs provider, just quit...
-                CmdQuit *pCmd = new CmdQuit( p_intf );
-                AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
-                pQueue->push( CmdGenericPtr( pCmd ) );
-                msg_Err( p_intf,
-                         "cannot show the \"open skin\" dialog: exiting...");
-            }
-        }
-    }
-    delete pLoader;
-
-    free( skin_last );
 
     // Get the instance of OSLoop
     OSLoop *loop = OSFactory::instance( p_intf )->getOSLoop();
