@@ -337,7 +337,20 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 
     free( p_i->psz_uri );
     p_i->psz_uri = strdup( psz_uri );
+
     GuessType( p_i );
+
+    if( !p_i->psz_name && p_i->i_type == ITEM_TYPE_FILE )
+    {
+        const char *psz_filename = strrchr( p_i->psz_uri, DIR_SEP_CHAR );
+        if( psz_filename && *psz_filename == DIR_SEP_CHAR )
+            psz_filename++;
+        if( psz_filename && *psz_filename )
+            p_i->psz_name = strdup( psz_filename );
+    }
+
+    if( !p_i->psz_name )
+        p_i->psz_name = strdup( p_i->psz_uri );
 
     vlc_mutex_unlock( &p_i->lock );
 }
@@ -649,29 +662,17 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
 
     p_input->b_fixed_name = false;
 
-    if( psz_uri )
-        p_input->psz_uri = strdup( psz_uri );
-    else
-        p_input->psz_uri = NULL;
-
     p_input->i_type = i_type;
     p_input->b_prefers_tree = false;
 
-    if( p_input->i_type == ITEM_TYPE_UNKNOWN )
-        GuessType( p_input );
+    if( psz_uri )
+        input_item_SetURI( p_input, psz_uri );
 
-    if( psz_name != NULL )
-        p_input->psz_name = strdup( psz_name );
-    else if( p_input->i_type == ITEM_TYPE_FILE && p_input->psz_uri )
-    {
-        const char *psz_filename = strrchr( p_input->psz_uri, DIR_SEP_CHAR );
-        if( psz_filename && *psz_filename == DIR_SEP_CHAR )
-            psz_filename++;
-        p_input->psz_name = strdup( psz_filename && *psz_filename
-                                    ? psz_filename : p_input->psz_uri );
-    }
-    else
-        p_input->psz_name = p_input->psz_uri ? strdup( p_input->psz_uri ) : NULL;
+    if( i_type != ITEM_TYPE_UNKNOWN )
+        p_input->i_type = i_type;
+
+    if( psz_name )
+        input_item_SetName( p_input, psz_name );
 
     p_input->i_duration = i_duration;
 
