@@ -150,6 +150,12 @@ public class MediaPlayer
         libvlc_exception_t exception = new libvlc_exception_t();
         return libvlc.libvlc_media_player_get_fps(instance, exception);
     }
+    
+    public boolean isPlaying()
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_player_is_playing(instance, exception) == 1? true : false;
+    }
 
     public void addListener(final MediaPlayerListener listener)
     {

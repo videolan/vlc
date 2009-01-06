@@ -454,6 +454,8 @@ public interface LibVlc extends Library
 
     void libvlc_media_player_set_position(LibVlcMediaPlayer instance, float position, libvlc_exception_t exception);
 
+    int libvlc_media_player_is_playing(LibVlcMediaPlayer instance, libvlc_exception_t exception);
+    
     int libvlc_media_player_will_play(LibVlcMediaPlayer instance, libvlc_exception_t exception);
 
     void libvlc_media_player_set_rate(LibVlcMediaPlayer instance, float rate, libvlc_exception_t exception);

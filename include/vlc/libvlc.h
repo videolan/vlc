@@ -499,6 +499,15 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_play
 VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
+ * is_playing
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return 1 if the media player is playing, 0 otherwise
+ */
+VLC_PUBLIC_API int libvlc_media_player_is_playing ( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
  * Play
  *
  * \param p_mi the Media Player

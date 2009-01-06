@@ -634,6 +634,29 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
 }
 
 /**************************************************************************
+ * is_playing
+ **************************************************************************/
+int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
+                                     libvlc_exception_t *p_e )
+{
+    input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+
+    if( !p_input_thread )
+        return 0;
+
+    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+
+    vlc_object_release( p_input_thread );
+    
+    if( state == libvlc_Playing )
+    {
+        return 1;
+    }
+    return 0;
+}
+
+
+/**************************************************************************
  * Stop
  **************************************************************************/
 void libvlc_media_player_stop( libvlc_media_player_t *p_mi,

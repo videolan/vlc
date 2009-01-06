@@ -35,7 +35,7 @@ public class MediaListPlayer
     private final LibVlcMediaListPlayer instance;
 
     private final JVLC jvlc;
-
+    
     public MediaListPlayer(JVLC jvlc)
     {
         libvlc_exception_t exception = new libvlc_exception_t();

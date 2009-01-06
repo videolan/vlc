@@ -59,6 +59,18 @@ public class LibVlcMediaPlayerTest extends AbstractVLCInternalTest
     }
     
     @Test
+    public void mediaPlayerIsPlaying() throws Exception
+    {
+        LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
+        LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
+        Assert.assertEquals(0, libvlc.libvlc_media_player_is_playing(mi, exception));
+        libvlc.libvlc_media_player_play(mi, exception);
+        Assert.assertEquals(0, exception.raised);
+        Thread.sleep(200);
+        Assert.assertEquals(1, libvlc.libvlc_media_player_is_playing(mi, exception));
+    }
+    
+    @Test
     public void mediaPlayerPauseBad()
     {
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
