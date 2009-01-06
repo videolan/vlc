@@ -339,11 +339,11 @@ static int Open( vlc_object_t * p_this )
     if( ( p_sys->meta = vlc_meta_New() ) )
     {
         char buffer[200];
-        sprintf( buffer, "%s%s%s%s",
-                 p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
-                 p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
-                 p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
-                 p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+        snprintf( buffer, sizeof(buffer), "%s%s%s%s",
+                  p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
+                  p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
+                  p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
+                  p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
         vlc_meta_SetSetting( p_sys->meta, buffer );
     }
 
