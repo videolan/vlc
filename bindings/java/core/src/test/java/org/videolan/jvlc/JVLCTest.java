@@ -72,5 +72,21 @@ public class JVLCTest extends AbstractJVLCTest
         
     }
     
-
+    @Test
+    public void twoAudioInstancesTest() throws Exception
+    {
+        JVLC instance1 = new JVLC();
+        JVLC instance2 = new JVLC();
+        
+        instance1.play(mrl);
+        instance2.play(mrl);
+        
+        Thread.sleep(1000);
+        
+        instance1.getAudio().setMute(true);
+        Assert.assertNotNull(instance2.getAudio());
+        Assert.assertTrue(instance1.getAudio().getMute());
+        Assert.assertTrue(!instance2.getAudio().getMute());
+        
+    }
 }
