@@ -128,7 +128,7 @@ VLC_EXPORT( bool, input_item_MetaMatch, ( input_item_t *p_i, vlc_meta_type_t met
 VLC_EXPORT( char *, input_item_GetMeta, ( input_item_t *p_i, vlc_meta_type_t meta_type ) );
 VLC_EXPORT( char *, input_item_GetName, ( input_item_t * p_i ) );
 VLC_EXPORT( char *, input_item_GetURI, ( input_item_t * p_i ) );
-VLC_EXPORT( void,   input_item_SetURI, ( input_item_t * p_i, char * psz_uri ));
+VLC_EXPORT( void,   input_item_SetURI, ( input_item_t * p_i, const char *psz_uri ));
 VLC_EXPORT(mtime_t, input_item_GetDuration, ( input_item_t * p_i ) );
 VLC_EXPORT( void,   input_item_SetDuration, ( input_item_t * p_i, mtime_t i_duration ));
 VLC_EXPORT( bool,   input_item_IsPreparsed, ( input_item_t *p_i ));

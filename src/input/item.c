@@ -331,7 +331,7 @@ char *input_item_GetURI( input_item_t *p_i )
     vlc_mutex_unlock( &p_i->lock );
     return psz_s;
 }
-void input_item_SetURI( input_item_t *p_i, char *psz_uri )
+void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 {
     vlc_mutex_lock( &p_i->lock );
 
