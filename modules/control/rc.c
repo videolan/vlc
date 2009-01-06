@@ -1542,11 +1542,6 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    playlist_t *p_playlist;
-
-    p_playlist = pl_Hold( p_this );
-    playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
     
     vlc_object_kill( p_this->p_libvlc );
     return VLC_SUCCESS;
