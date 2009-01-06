@@ -38,7 +38,6 @@ void CmdQuit::execute()
 {
     // Stop the playlist
     vout_OSDMessage( getIntf(), DEFAULT_CHAN, _( "Quit" ) );
-    playlist_Stop( getIntf()->p_sys->p_playlist );
 
     // Get the instance of OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
