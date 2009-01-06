@@ -48,6 +48,8 @@ public class JVLC
     
     private VLM vlm;
     
+    private Audio audio;
+    
     private volatile boolean released;
 
     private MediaListPlayer mediaListPlayer;
@@ -56,17 +58,21 @@ public class JVLC
     {
         String[] args = new String[] {};
         instance = createInstance(args);
-        mediaList = new MediaList(this);
-        mediaListPlayer = new MediaListPlayer(this);
-        mediaListPlayer.setMediaList(mediaList);
+        init();
     }
 
     public JVLC(String[] args)
     {
         instance = createInstance(args);
+        init();
+    }
+    
+    private void init()
+    {
         mediaList = new MediaList(this);
         mediaListPlayer = new MediaListPlayer(this);
         mediaListPlayer.setMediaList(mediaList);
+        audio = new Audio(this);
     }
     
     public JVLC(String args)
@@ -192,6 +198,14 @@ public class JVLC
     public MediaListPlayer getMediaListPlayer()
     {
         return mediaListPlayer;
+    }
+
+    /**
+     * @return
+     */
+    public Audio getAudio()
+    {
+        return audio;
     }
     
 }
