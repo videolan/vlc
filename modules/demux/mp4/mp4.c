@@ -2124,6 +2124,7 @@ static void MP4_TrackCreate( demux_t *p_demux, mp4_track_t *p_track,
         case( FOURCC_text ):
         case( FOURCC_subp ):
         case( FOURCC_tx3g ):
+        case( FOURCC_sbtl ):
             p_track->fmt.i_cat = SPU_ES;
             break;
 

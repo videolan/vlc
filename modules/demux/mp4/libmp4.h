@@ -187,6 +187,7 @@
 #define FOURCC_text VLC_FOURCC( 't', 'e', 'x', 't' )
 #define FOURCC_tx3g VLC_FOURCC( 't', 'x', '3', 'g' )
 #define FOURCC_subp VLC_FOURCC( 's', 'u', 'b', 'p' )
+#define FOURCC_sbtl VLC_FOURCC( 's', 'b', 't', 'l' )
 
 #define FOURCC_0xa9nam VLC_FOURCC( 0xa9, 'n', 'a', 'm' )
 #define FOURCC_0xa9aut VLC_FOURCC( 0xa9, 'a', 'u', 't' )

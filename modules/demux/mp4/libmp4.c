@@ -1438,7 +1438,7 @@ static int MP4_ReadBox_sample_tx3g( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_GET2BYTES( p_box->data.p_sample_text->i_text_box_right );
 
 #ifdef MP4_VERBOSE
-    msg_Dbg( p_stream, "read box: \"text\" in stsd text" );
+    msg_Dbg( p_stream, "read box: \"tx3g\" in stsd text" );
 #endif
     MP4_READBOX_EXIT( 1 );
 }
@@ -2446,6 +2446,7 @@ static int MP4_ReadBox_default( stream_t *p_stream, MP4_Box_t *p_box )
             case FOURCC_text:
                 return MP4_ReadBox_sample_text( p_stream, p_box );
             case FOURCC_tx3g:
+            case FOURCC_sbtl:
                 return MP4_ReadBox_sample_tx3g( p_stream, p_box );
             default:
                 msg_Warn( p_stream,
