@@ -809,12 +809,12 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     setFrameStyle( QFrame::Sunken );
     setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
-    controlLayout = new QHBoxLayout( this );
-    controlLayout->setLayoutMargins( 5, 2, 5, 2, 5 );
+    QVBoxLayout *controlLayout2 = new QVBoxLayout( this );
+    controlLayout2->setLayoutMargins( 5, 2, 5, 2, 5 );
 
     /* First line */
     InputControlsWidget *inputC = new InputControlsWidget( p_intf, this );
-    controlLayout->addWidget( inputC );
+    controlLayout2->addWidget( inputC );
 
     /* Second line */
 /*     QString line = QString( "%1-2;%2;%3;%4;%5;%2;%6;%2;%7;%2;%8;%9;%10-4")
@@ -830,9 +830,11 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
         .arg( TIME_LABEL )
         .arg( VOLUME ); */
 
+    controlLayout = new QHBoxLayout;
     QString line = getSettings()->value( "MainWindow/FSCtoolbar",
             "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
     parseAndCreate( line, controlLayout );
+    controlLayout2->addLayout( controlLayout );
 
     /* hiding timer */
     p_hideTimer = new QTimer( this );
