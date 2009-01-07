@@ -354,11 +354,10 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->psz_sdp_file = NULL;
 
-    if( p_sys->i_port_audio == p_sys->i_port_video )
+    if( p_sys->i_port_audio && p_sys->i_port_video == p_sys->i_port_audio )
     {
-        msg_Err( p_stream, "audio and video port cannot be the same" );
-        p_sys->i_port_audio = 0;
-        p_sys->i_port_video = 0;
+        msg_Err( p_stream, "audio and video RTP port must be distinct" );
+        return VLC_EGENERIC;
     }
 
     for( p_cfg = p_stream->p_cfg; p_cfg != NULL; p_cfg = p_cfg->p_next )
