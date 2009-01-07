@@ -300,7 +300,7 @@ modules/access/screen/x11.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
-modules/access/v4l2/v4l2.c
+modules/access/v4l2.c
 modules/access/v4l.c
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
