@@ -2764,7 +2764,7 @@ static int InitDisplay( vout_thread_t *p_vout )
 #ifdef HAVE_SYS_SHM_H
     p_vout->p_sys->i_shm_opcode = 0;
 
-    if( config_GetInt( p_vout, MODULE_STRING "-shm" ) )
+    if( config_GetInt( p_vout, MODULE_STRING "-shm" ) > 0 )
     {
         int major, evt, err;
 
