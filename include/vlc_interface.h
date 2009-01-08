@@ -179,7 +179,8 @@ typedef enum vlc_dialog {
                          "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;" \
                          "*.mpeg2;*.mpeg4;*.mpg;*.mts;*.mxf;*.nuv;" \
                          "*.ogg;*.ogm;*.ogv;*.ogx;" \
-                         "*.ps;*.rm;*.rmvb;*.ts;*.vob;*.wmv"
+                         "*.ps;*.rm;*.rmvb;*.ts;*.vob;*.wmv;" \
+                         "*.iso"
 
 #define EXTENSIONS_PLAYLIST "*.asx;*.b4s;*.m3u;*.pls;*.vlc;*.xspf"
 
