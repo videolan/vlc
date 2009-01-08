@@ -29,38 +29,22 @@
   \TODO: Debug messages: "__FILE__, __LINE__" ok ???, Wrn/Err ???
   \TODO: Change names to VLC standard ???
 */
-
-
-#include <vector>
-#include <string>
-
-#include <upnp/upnp.h>
-#include <upnp/upnptools.h>
-
 #undef PACKAGE_NAME
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
+#include "upnp_intel.hpp"
+
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
 
-// Constants
 
+// Constants
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
 const char* CONTENT_DIRECTORY_SERVICE_TYPE = "urn:schemas-upnp-org:service:ContentDirectory:1";
 
-// Classes
-
-class MediaServer;
-class MediaServerList;
-class Item;
-class Container;
-class Lockable;
-
 // VLC handle
-
 struct services_discovery_sys_t
 {
     UpnpClient_Handle clientHandle;
@@ -68,202 +52,19 @@ struct services_discovery_sys_t
     Lockable* callbackLock;
 };
 
-// Class definitions...
-
-class Lockable
-{
-public:
-
-    Lockable()
-    {
-        vlc_mutex_init( &_mutex );
-    }
-
-    ~Lockable()
-    {
-        vlc_mutex_destroy( &_mutex );
-    }
-
-    void lock() { vlc_mutex_lock( &_mutex ); }
-    void unlock() { vlc_mutex_unlock( &_mutex ); }
-
-private:
-
-    vlc_mutex_t _mutex;
-};
-
-
-class Locker
-{
-public:
-    Locker( Lockable* l )
-    {
-        _lockable = l;
-        _lockable->lock();
-    }
-
-    ~Locker()
-    {
-        _lockable->unlock();
-    }
-
-private:
-    Lockable* _lockable;
-};
-
-
-class MediaServer
-{
-public:
-
-    static void parseDeviceDescription( IXML_Document* doc,
-                                        const char*    location,
-                                        services_discovery_t* p_sd );
-
-    MediaServer( const char* UDN,
-                 const char* friendlyName,
-                 services_discovery_t* p_sd );
-    
-    ~MediaServer();
-
-    const char* getUDN() const;
-    const char* getFriendlyName() const;
-
-    void setContentDirectoryEventURL( const char* url );
-    const char* getContentDirectoryEventURL() const;
-
-    void setContentDirectoryControlURL( const char* url );
-    const char* getContentDirectoryControlURL() const;
-
-    void subscribeToContentDirectory();
-    void fetchContents();
-
-    void setInputItem( input_item_t* p_input_item );
-
-    bool compareSID( const char* sid );
-
-private:
-
-    bool _fetchContents( Container* parent );
-    void _buildPlaylist( Container* container );
-    
-    IXML_Document* _browseAction( const char*, const char*,
-            const char*, const char*, const char*, const char* );
-
-    services_discovery_t* _p_sd;
-
-    Container* _contents;
-    input_item_t* _inputItem;
-
-    std::string _UDN;
-    std::string _friendlyName;
-
-    std::string _contentDirectoryEventURL;
-    std::string _contentDirectoryControlURL;
-
-    int _subscriptionTimeOut;
-    Upnp_SID _subscriptionID;
-};
-
-
-class MediaServerList
-{
-public:
-
-    MediaServerList( services_discovery_t* p_sd );
-    ~MediaServerList();
-
-    bool addServer( MediaServer* s );
-    void removeServer( const char* UDN );
-
-    MediaServer* getServer( const char* UDN );
-    MediaServer* getServerBySID( const char* );
-
-private:
-
-    services_discovery_t* _p_sd;
-
-    std::vector<MediaServer*> _list;
-};
-
-
-class Item
-{
-public:
-
-    Item( Container*  parent,
-          const char* objectID,
-          const char* title,
-          const char* resource );
-    ~Item();
-
-    const char* getObjectID() const;
-    const char* getTitle() const;
-    const char* getResource() const;
-
-    void setInputItem( input_item_t* p_input_item );
-    input_item_t* getInputItem() const ;
-
-private:
-
-    input_item_t* _inputItem;
-
-    Container* _parent;
-    std::string _objectID;
-    std::string _title;
-    std::string _resource;
-};
-
-
-class Container
-{
-public:
-
-    Container( Container* parent, const char* objectID, const char* title );
-    ~Container();
-
-    void addItem( Item* item );
-    void addContainer( Container* container );
-
-    const char* getObjectID() const;
-    const char* getTitle() const;
-
-    unsigned int getNumItems() const;
-    unsigned int getNumContainers() const;
-
-    Item* getItem( unsigned int i ) const;
-    Container* getContainer( unsigned int i ) const;
-    Container* getParent();
-
-    void setInputItem( input_item_t* p_input_item );
-    input_item_t* getInputItem() const;
-
-private:
-
-    input_item_t* _inputItem;
-
-    Container* _parent;
-
-    std::string _objectID;
-    std::string _title;
-    std::vector<Item*> _items;
-    std::vector<Container*> _containers;
-};
-
 // VLC callback prototypes
-
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
 
 // Module descriptor
 
 vlc_module_begin();
-set_shortname( "UPnP" );
-set_description( N_( "Universal Plug'n'Play discovery" ) );
-set_category( CAT_PLAYLIST );
-set_subcategory( SUBCAT_PLAYLIST_SD );
-set_capability( "services_discovery", 0 );
-set_callbacks( Open, Close );
+    set_shortname( "UPnP" );
+    set_description( N_( "Universal Plug'n'Play discovery" ) );
+    set_category( CAT_PLAYLIST );
+    set_subcategory( SUBCAT_PLAYLIST_SD );
+    set_capability( "services_discovery", 0 );
+    set_callbacks( Open, Close );
 vlc_module_end();
 
 
