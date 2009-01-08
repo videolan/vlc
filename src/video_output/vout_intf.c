@@ -91,8 +91,6 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
                           unsigned int *pi_width_hint,
                           unsigned int *pi_height_hint )
 {
-    /* Small kludge */
-    if( !var_Type( p_vout, "aspect-ratio" ) ) vout_IntfInit( p_vout );
 
     /* Get requested coordinates */
     *pi_x_hint = var_GetInteger( p_vout, "video-x" );
