@@ -82,8 +82,6 @@
 #include <vlc_aout.h>
 #include "audio_output/aout_internal.h"
 
-#include <vlc_vout.h>
-#include <vlc_sout.h>
 #include <vlc_charset.h>
 
 #include "libvlc.h"
