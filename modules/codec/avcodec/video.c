@@ -58,7 +58,6 @@ struct decoder_sys_t
     mtime_t i_pts;
 
     AVFrame          *p_ff_pic;
-    BITMAPINFOHEADER *p_format;
 
     /* for frame skipping algo */
     int b_hurry_up;
