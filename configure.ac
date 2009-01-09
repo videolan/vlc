@@ -5247,7 +5247,7 @@ dnl
 dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
-  [  --enable-libgcrypt      libgcrypts support (default enabled)])
+  [  --disable-libgcrypt      libgcrypts support (default enabled)])
 AS_IF([test "${enable_libgcrypt}" != "no"], [
   AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
 ])
