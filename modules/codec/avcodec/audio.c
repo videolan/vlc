@@ -110,6 +110,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_codec = p_codec;
     p_sys->i_codec_id = i_codec_id;
     p_sys->psz_namecodec = psz_namecodec;
+    p_sys->b_delayed_open = false;
 
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;

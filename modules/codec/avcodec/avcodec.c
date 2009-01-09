@@ -309,9 +309,12 @@ static void CloseDecoder( vlc_object_t *p_this )
         free( p_sys->p_context->extradata );
         p_sys->p_context->extradata = NULL;
 
-        vlc_mutex_lock( &avcodec_lock );
-        avcodec_close( p_sys->p_context );
-        vlc_mutex_unlock( &avcodec_lock );
+        if( !p_sys->b_delayed_open )
+        {
+            vlc_mutex_lock( &avcodec_lock );
+            avcodec_close( p_sys->p_context );
+            vlc_mutex_unlock( &avcodec_lock );
+        }
         msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
         av_free( p_sys->p_context );
     }

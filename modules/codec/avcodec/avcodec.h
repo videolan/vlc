@@ -249,7 +249,8 @@ extern vlc_mutex_t avcodec_lock;
     int i_codec_id;             \
     const char *psz_namecodec;  \
     AVCodecContext *p_context;  \
-    AVCodec        *p_codec;
+    AVCodec        *p_codec;    \
+    bool b_delayed_open;
 
 #ifndef AV_VERSION_INT
 #   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))

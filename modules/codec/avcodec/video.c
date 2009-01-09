@@ -60,7 +60,7 @@ struct decoder_sys_t
     AVFrame          *p_ff_pic;
 
     /* for frame skipping algo */
-    int b_hurry_up;
+    bool b_hurry_up;
     enum AVDiscard i_skip_frame;
     enum AVDiscard i_skip_idct;
 
@@ -69,7 +69,7 @@ struct decoder_sys_t
     mtime_t i_late_frames_start;
 
     /* for direct rendering */
-    int b_direct_rendering;
+    bool b_direct_rendering;
 
     bool b_has_b_frames;
 
@@ -93,6 +93,7 @@ static const AVPaletteControl palette_control;
  * Local prototypes
  *****************************************************************************/
 static void ffmpeg_InitCodec      ( decoder_t * );
+static int  ffmpeg_OpenCodec      ( decoder_t * );
 static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
@@ -185,21 +186,15 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) ) ) == NULL )
         return VLC_ENOMEM;
 
-    p_dec->p_sys->p_context = p_context;
-    p_dec->p_sys->p_codec = p_codec;
-    p_dec->p_sys->i_codec_id = i_codec_id;
-    p_dec->p_sys->psz_namecodec = psz_namecodec;
+    p_sys->p_context = p_context;
+    p_sys->p_codec = p_codec;
+    p_sys->i_codec_id = i_codec_id;
+    p_sys->psz_namecodec = psz_namecodec;
     p_sys->p_ff_pic = avcodec_alloc_frame();
+    p_sys->b_delayed_open = true;
 
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_codec );
-    p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
-    p_sys->p_context->height = p_dec->fmt_in.video.i_height;
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
-    p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
-#else
-    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
-#endif
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
@@ -288,7 +283,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_skip_idct = p_sys->p_context->skip_idct;
 
     /* ***** ffmpeg direct rendering ***** */
-    p_sys->b_direct_rendering = 0;
+    p_sys->b_direct_rendering = false;
     var_Create( p_dec, "ffmpeg-dr", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-dr", &val );
     if( val.b_bool && (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
@@ -300,11 +295,11 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
-        p_sys->b_direct_rendering = 1;
+        p_sys->b_direct_rendering = true;
     }
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
-    //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
+    //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = false;
     if( p_sys->b_direct_rendering )
     {
         msg_Dbg( p_dec, "using direct rendering" );
@@ -317,9 +312,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->reget_buffer = ffmpeg_ReGetFrameBuf;
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
     p_sys->p_context->opaque = p_dec;
-
-    /* ***** init this codec with special data ***** */
-    ffmpeg_InitCodec( p_dec );
 
     /* ***** misc init ***** */
     p_sys->input_pts = p_sys->input_dts = 0;
@@ -376,19 +368,17 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->p_context->palctrl = &p_sys->palette;
     }
 
+    /* ***** init this codec with special data ***** */
+    ffmpeg_InitCodec( p_dec );
+
     /* ***** Open the codec ***** */
-    vlc_mutex_lock( &avcodec_lock );
-    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
+    if( ffmpeg_OpenCodec( p_dec ) < 0 )
     {
-        vlc_mutex_unlock( &avcodec_lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         free( p_sys->p_buffer_orig );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    vlc_mutex_unlock( &avcodec_lock );
-    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
-
 
     return VLC_SUCCESS;
 }
@@ -403,12 +393,25 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     int b_null_size = false;
     block_t *p_block;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( !pp_block || !*pp_block )
+        return NULL;
 
     if( !p_sys->p_context->extradata_size && p_dec->fmt_in.i_extra )
+    {
         ffmpeg_InitCodec( p_dec );
+        if( p_sys->b_delayed_open )
+        {
+            if( ffmpeg_OpenCodec( p_dec ) )
+                msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        }
+    }
 
     p_block = *pp_block;
+    if( p_sys->b_delayed_open )
+    {
+        block_Release( p_block );
+        return NULL;
+    }
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
@@ -781,6 +784,45 @@ static void ffmpeg_InitCodec( decoder_t *p_dec )
 }
 
 /*****************************************************************************
+ * ffmpeg_OpenCodec:
+ *****************************************************************************/
+static int ffmpeg_OpenCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_context->extradata_size <= 0 )
+    {
+        if( p_sys->i_codec_id == CODEC_ID_VC1 ||
+            p_sys->i_codec_id == CODEC_ID_VORBIS ||
+            p_sys->i_codec_id == CODEC_ID_THEORA )
+        {
+            msg_Warn( p_dec, "waiting for extra data for codec %s",
+                      p_sys->psz_namecodec );
+            return 1;
+        }
+    }
+    p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
+    p_sys->p_context->height = p_dec->fmt_in.video.i_height;
+#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
+    p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+#else
+    p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
+#endif
+
+    vlc_mutex_lock( &avcodec_lock );
+    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
+    {
+        vlc_mutex_unlock( &avcodec_lock );
+        return VLC_EGENERIC;
+    }
+    vlc_mutex_unlock( &avcodec_lock );
+    msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
+
+    p_sys->b_delayed_open = false;
+
+    return VLC_SUCCESS;
+}
+/*****************************************************************************
  * ffmpeg_CopyPicture: copy a picture from ffmpeg internal buffers to a
  *                     picture_t structure (when not in direct rendering mode).
  *****************************************************************************/
@@ -861,7 +903,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         p_context->pix_fmt == PIX_FMT_PAL8 )
     {
         msg_Dbg( p_dec, "disabling direct rendering" );
-        p_sys->b_direct_rendering = 0;
+        p_sys->b_direct_rendering = false;
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
@@ -871,7 +913,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
     if( !p_pic )
     {
-        p_sys->b_direct_rendering = 0;
+        p_sys->b_direct_rendering = false;
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
     p_sys->p_context->draw_horiz_band = NULL;
