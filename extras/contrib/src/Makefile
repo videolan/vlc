@@ -2520,6 +2520,25 @@ CLEAN_PKG += libass
 DISTCLEAN_PKG += libass-$(ASS_VERSION).tar.bz2
 
 # ***************************************************************************
+# UPNP library
+# ***************************************************************************
+
+libupnp-$(UPNP_VERSION).tar.bz2:
+	$(WGET) $(UPNP_URL)
+
+libupnp: libupnp-$(UPNP_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.libupnp: libupnp
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-samples --without-documentation --disable-webserver CFLAGS="$(CFLAGS) -O3" && make && make install)
+	touch $@
+
+CLEAN_FILE += .libupnp
+CLEAN_PKG += libupnp
+DISTCLEAN_PKG += libupnp-$(UPNP_VERSION).tar.bz2
+
+
+# ***************************************************************************
 # Some cleaning
 # ***************************************************************************
 
