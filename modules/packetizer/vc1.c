@@ -188,7 +188,7 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Packetize: packetize an access unit
  *****************************************************************************/
-static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag );
+static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag );
 
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
@@ -220,6 +220,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
     for( ;; )
     {
+        bool b_used_ts;
+
         switch( p_sys->i_state )
         {
 
@@ -258,12 +260,10 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_offset = 0;
 
             /* Parse and return complete frame */
-            p_pic = ParseIDU( p_dec, p_pic );
+            p_pic = ParseIDU( p_dec, &b_used_ts, p_pic );
 
             /* Don't reuse the same timestamps several times */
-            if( p_sys->p_frame &&
-                p_sys->p_frame->i_dts == p_sys->bytestream.p_block->i_dts &&
-                p_sys->p_frame->i_pts == p_sys->bytestream.p_block->i_pts )
+            if( b_used_ts )
             {
                 p_sys->bytestream.p_block->i_pts = -1;
                 p_sys->bytestream.p_block->i_dts = -1;
@@ -338,12 +338,13 @@ static void BuildExtraData( decoder_t *p_dec )
             p_sys->ep.p_ep->p_buffer, p_sys->ep.p_ep->i_buffer );
 }
 /* ParseIDU: parse an Independent Decoding Unit */
-static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
+static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic;
     const idu_type_t idu = p_frag->p_buffer[3];
 
+    *pb_used_ts = false;
     if( !p_sys->b_sequence_header && idu != IDU_TYPE_SEQUENCE_HEADER )
     {
         msg_Warn( p_dec, "waiting for sequence header" );
@@ -370,14 +371,23 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
         /* */
         p_pic = block_ChainGather( p_sys->p_frame );
 
+        /* */
+        if( p_pic->i_dts > 0 )
+            p_sys->i_interpolated_dts = p_pic->i_dts;
+
         /* We can interpolate dts/pts only if we have a frame rate */
         if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
         {
-            //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64, p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
+            if( p_sys->i_interpolated_dts > 0 )
+                p_sys->i_interpolated_dts += INT64_C(1000000) *
+                                             p_dec->fmt_out.video.i_frame_rate_base /
+                                             p_dec->fmt_out.video.i_frame_rate;
+
+            //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
+            //         p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
             if( p_pic->i_dts <= 0 )
                 p_pic->i_dts = p_sys->i_interpolated_dts;
 
-            p_sys->i_interpolated_dts += INT64_C(1000000) * p_dec->fmt_out.video.i_frame_rate_base / p_dec->fmt_out.video.i_frame_rate;
             if( p_pic->i_pts <= 0 )
             {
                 if( !p_sys->sh.b_has_bframe || (p_pic->i_flags & BLOCK_FLAG_TYPE_B ) )
@@ -385,11 +395,11 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
                 /* TODO compute pts for other case */
             }
         }
-        p_sys->i_interpolated_dts = p_pic->i_dts;
 
         //msg_Dbg( p_dec, "-------------- dts=%"PRId64" pts=%"PRId64, p_pic->i_dts, p_pic->i_pts );
 
         /* Reset context */
+        p_sys->b_frame = false;
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
     }
@@ -398,10 +408,12 @@ static block_t *ParseIDU( decoder_t *p_dec, block_t *p_frag )
     if( p_sys->p_frame )
     {
         block_t *p_frame = p_sys->p_frame;
-        if( p_frame->i_dts < 0 )
+        if( p_frame->i_dts <= 0 && p_frame->i_pts <= 0 )
+        {
             p_frame->i_dts = p_frag->i_dts;
-        if( p_frame->i_pts < 0 )
             p_frame->i_pts = p_frag->i_pts;
+            *pb_used_ts = true;
+        }
     }
     block_ChainLastAppend( &p_sys->pp_last, p_frag );
 
