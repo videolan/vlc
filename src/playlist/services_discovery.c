@@ -233,7 +233,6 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modules )
 {
     const char *psz_parser = psz_modules ?: "";
-    int retval = VLC_SUCCESS;
 
     for (;;)
     {
@@ -262,7 +261,15 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
 
         p_sd = vlc_sd_Create( (vlc_object_t*)p_playlist );
         if( !p_sd )
-            continue;
+            return VLC_ENOMEM;
+
+        /* Free in playlist_ServicesDiscoveryRemove */
+        p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
+        if( !p_sds )
+        {
+            vlc_sd_Destroy( p_sd );
+            return VLC_ENOMEM;
+        }
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
                           vlc_ServicesDiscoveryItemAdded,
@@ -287,6 +294,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
         if( !vlc_sd_Start( p_sd, psz_plugin ) )
         {
             vlc_sd_Destroy( p_sd );
+            free( p_sds );
             return VLC_EGENERIC;
         }        
 
@@ -298,10 +306,6 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
         PL_UNLOCK;
         free( psz );
 
-        /* Free in playlist_ServicesDiscoveryRemove */
-        p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
-        if( !p_sds )
-            return VLC_ENOMEM;
 
         /* We want tree-view for service directory */
         p_one->p_input->b_prefers_tree = true;
@@ -315,7 +319,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
 
     }
 
-    return retval;
+    return VLC_SUCCESS;
 }
 
 int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
