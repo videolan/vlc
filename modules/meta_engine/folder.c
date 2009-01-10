@@ -31,10 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_interface.h>
-#include <vlc_meta.h>
 #include <vlc_playlist.h>
-#include <vlc_input.h>
 #include <vlc_charset.h>
 
 #ifdef HAVE_SYS_STAT_H
