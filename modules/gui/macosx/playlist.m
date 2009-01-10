@@ -386,7 +386,7 @@
     o_tc_sortColumn = nil;
 
     char ** ppsz_name;
-    char ** ppsz_services = services_discovery_GetServicesNames( p_playlist, &ppsz_name );
+    char ** ppsz_services = vlc_sd_GetNames( &ppsz_name );
     if( !ppsz_services )
     {
         vlc_object_release( p_playlist );

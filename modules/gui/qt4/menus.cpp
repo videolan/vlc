@@ -609,8 +609,7 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     QMenu *menu = new QMenu();
     menu->setTitle( qtr( I_PL_SD ) );
     char **ppsz_longnames;
-    char **ppsz_names = services_discovery_GetServicesNames( p_intf,
-                                                             &ppsz_longnames );
+    char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
     if( !ppsz_names )
         return menu;
 

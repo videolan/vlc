@@ -1407,8 +1407,7 @@ wxMenu *Playlist::SDMenu()
     p_sd_menu = new wxMenu;
 
     char **ppsz_longnames;
-    char **ppsz_names = services_discovery_GetServicesNames( p_playlist,
-                                                             &ppsz_longnames );
+    char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
     if( !ppsz_names )
         return p_sd_menu;
 

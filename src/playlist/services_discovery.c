@@ -40,11 +40,10 @@
  * That's how the playlist get's Service Discovery information
  */
 
-/***********************************************************************
- * GetServicesNames
- ***********************************************************************/
-char ** __services_discovery_GetServicesNames( vlc_object_t * p_super,
-                                               char ***pppsz_longnames )
+/**
+ * Gets the list of available services discovery plugins.
+ */
+char **vlc_sd_GetNames( char ***pppsz_longnames )
 {
     return module_GetModulesNamesForCapability( "services_discovery",
                                                 pppsz_longnames );
