@@ -90,7 +90,7 @@ vlc_module_begin ()
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, false );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
-    add_string( "ignore-filetypes", "m3u,db,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue",
+    add_string( "ignore-filetypes", "m3u,db,nfo,jpg,gif,sfv,txt,sub,idx,srt,cue,ssa",
                 NULL, IGNORE_TEXT, IGNORE_LONGTEXT, false );
     set_callbacks( Open, Close )
 vlc_module_end ()
