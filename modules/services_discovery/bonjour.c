@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
 #include <vlc_arrays.h>
+#include <vlc_services_discovery.h>
 
 #include <avahi-client/client.h>
 #include <avahi-client/publish.h>

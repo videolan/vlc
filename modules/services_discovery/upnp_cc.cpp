@@ -39,6 +39,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
+#include <vlc_services_discovery.h>
 
 /* FIXME: thread-safety ?? */
 /* FIXME: playlist locking */
