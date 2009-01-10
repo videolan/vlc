@@ -866,7 +866,7 @@ void MainInterface::toggleUpdateSystrayMenu()
     }
     else
     {
-        /* Visible */
+        /* Visible (possibly under other windows) */
 #ifdef WIN32
         /* check if any visible window is above vlc in the z-order,
          * but ignore the ones always on top
@@ -879,18 +879,18 @@ void MainInterface::toggleUpdateSystrayMenu()
                     ( GetWindowInfo( hwnd, &wi ) &&
                       (wi.dwExStyle&WS_EX_NOACTIVATE) ) );
                 hwnd = GetNextWindow( hwnd, GW_HWNDPREV ) );
-        if( !hwnd || !GetWindowInfo( hwnd, &wi ) ||
+            if( !hwnd || !GetWindowInfo( hwnd, &wi ) ||
                 (wi.dwExStyle&WS_EX_TOPMOST) )
+            {
+                hide();
+            }
+            else
+            {
+                activateWindow();
+            }
 #else
-        if( isActiveWindow() )
+        hide();
 #endif
-        {
-            hide();
-        }
-        else
-        {
-            activateWindow();
-        }
     }
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
