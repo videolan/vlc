@@ -70,7 +70,7 @@ typedef struct vlc_event_listeners_group_t
 } vlc_event_listeners_group_t;
 
 #ifdef DEBUG_EVENT
-static const char ppsz_event_type_to_name[][33] =
+static const char ppsz_event_type_to_name[][40] =
 {
     [vlc_InputStateChanged]             = "vlc_InputStateChanged",
     [vlc_InputSelectedStreamChanged]    = "vlc_InputSelectedStreamChanged",
@@ -84,8 +84,8 @@ static const char ppsz_event_type_to_name[][33] =
     [vlc_InputItemErrorWhenReadingChanged] = "vlc_InputItemErrorWhenReadingChanged",
 
     [vlc_ServicesDiscoveryItemAdded]    = "vlc_ServicesDiscoveryItemAdded",
-    [vlc_ServicesDiscoveryItemRemoved]  = "vlc_ServicesDiscoveryItemRemoved"
-    [vlc_ServicesDiscoveryStarted]      = "vlc_ServicesDiscoveryStarted"
+    [vlc_ServicesDiscoveryItemRemoved]  = "vlc_ServicesDiscoveryItemRemoved",
+    [vlc_ServicesDiscoveryStarted]      = "vlc_ServicesDiscoveryStarted",
     [vlc_ServicesDiscoveryEnded]        = "vlc_ServicesDiscoveryEnded"
 };
 #endif
