@@ -830,11 +830,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     playlist_Activate( p_playlist );
     vlc_object_attach( p_playlist, p_libvlc );
 
+    /* Add service discovery modules */
     psz_modules = config_GetPsz( p_playlist, "services-discovery" );
     if( psz_modules && *psz_modules )
     {
-        /* Add service discovery modules */
-        playlist_ServicesDiscoveryAdd( p_playlist, psz_modules );
+        char *p = psz_modules, *m;
+        while( ( m = strsep( &p, " :," ) ) != NULL )
+            playlist_ServicesDiscoveryAdd( p_playlist, m );
     }
     free( psz_modules );
 
