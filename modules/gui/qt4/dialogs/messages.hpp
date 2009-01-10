@@ -64,9 +64,10 @@ private:
     QPushButton *clearUpdateButton;
     QPushButton *saveLogButton;
     msg_subscription_t *sub;
-    msg_cb_data_t *cb_data;
-    static void sinkMessage (msg_cb_data_t *, msg_item_t *, unsigned);
-    void sinkMessage (msg_item_t *item, unsigned);
+    msg_cb_data_t *cbData;
+    static void sinkMessage( msg_cb_data_t *, msg_item_t *, unsigned );
+    void customEvent( QEvent * );
+    void sinkMessage( msg_item_t *item, unsigned );
 
 private slots:
     void updateTab( int );

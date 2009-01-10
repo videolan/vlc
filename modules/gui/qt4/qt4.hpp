@@ -48,7 +48,8 @@ enum {
 enum {
     DialogEventType = 0,
     IMEventType     = 100,
-    PLEventType     = 200
+    PLEventType     = 200,
+    MsgEventType    = 300,
 };
 
 class QApplication;

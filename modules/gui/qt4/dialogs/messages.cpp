@@ -39,13 +39,35 @@
 #include <QHeaderView>
 #include <QMutex>
 
+#include <assert.h>
+
 MessagesDialog *MessagesDialog::instance = NULL;
+
+enum {
+    MsgEvent_Type = QEvent::User + MsgEventType + 1,
+};
+
+class MsgEvent : public QEvent
+{
+public:
+    MsgEvent( msg_item_t *msg )
+        : msg(msg), QEvent( (QEvent::Type)MsgEvent_Type )
+    {
+        msg_Hold( msg );
+    }
+    virtual ~MsgEvent()
+    {
+        msg_Release( msg );
+    }
+
+    msg_item_t *msg;
+};
 
 struct msg_cb_data_t
 {
     MessagesDialog *self;
-    QMutex          lock; /**< protects MessagesDialog::messages */
 };
+static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 
 MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                : QVLCFrame( _p_intf )
@@ -116,16 +138,16 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
 
     /* Hook up to LibVLC messaging */
-    cb_data = new msg_cb_data_t;
-    cb_data->self = this;
-    sub = msg_Subscribe (_p_intf->p_libvlc, sinkMessage, cb_data);
+    cbData = new msg_cb_data_t;
+    cbData->self = this;
+    sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, cbData );
 }
 
-MessagesDialog::~MessagesDialog ()
+MessagesDialog::~MessagesDialog()
 {
     writeSettings( "Messages" );
-    msg_Unsubscribe (sub);
-    delete cb_data;
+    msg_Unsubscribe( sub );
+    delete cbData;
 };
 
 void MessagesDialog::updateTab( int index )
@@ -147,17 +169,6 @@ void MessagesDialog::updateTab( int index )
         clearUpdateButton->setText( qtr( "&Clear" ) );
         saveLogButton->show();
     }
-}
-
-void MessagesDialog::sinkMessage (msg_cb_data_t *data, msg_item_t *item,
-                                  unsigned overruns)
-{
-    MessagesDialog *self = data->self;
-    int canc = vlc_savecancel ();
-    QMutexLocker locker (&data->lock);
-
-    self->sinkMessage (item, overruns);
-    vlc_restorecancel (canc);
 }
 
 void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
@@ -210,6 +221,13 @@ void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
     cur.movePosition( QTextCursor::NextCharacter, QTextCursor::KeepAnchor, endPos - startPos );
     messages->setTextCursor( cur );
 }
+void MessagesDialog::customEvent( QEvent *event )
+{
+    MsgEvent *msg = dynamic_cast<MsgEvent*>(event);
+
+    assert( msg );
+    sinkMessage( msg->msg, 0 );
+}
 
 void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
                                 vlc_object_t *p_obj )
@@ -253,7 +271,6 @@ void MessagesDialog::updateTree()
 
 void MessagesDialog::clear()
 {
-    QMutexLocker locker (&cb_data->lock);
     messages->clear();
 }
 
@@ -276,10 +293,19 @@ bool MessagesDialog::save()
         }
 
         QTextStream out( &file );
-        QMutexLocker locker (&cb_data->lock);
         out << messages->toPlainText() << "\n";
 
         return true;
     }
     return false;
 }
+
+static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned )
+{
+    int canc = vlc_savecancel();
+
+    QApplication::postEvent( data->self, new MsgEvent( item ) );
+
+    vlc_restorecancel( canc );
+}
+
