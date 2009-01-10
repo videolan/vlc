@@ -118,22 +118,6 @@ void playlist_Deactivate( playlist_t *p_playlist )
     /* Release the current item */
     set_current_status_item( p_playlist, NULL );
 
-    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
-        free( p_del->pp_children );
-        vlc_gc_decref( p_del->p_input );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_playlist->all_items );
-    FOREACH_ARRAY( playlist_item_t *p_del, p_sys->items_to_delete )
-        free( p_del->pp_children );
-        vlc_gc_decref( p_del->p_input );
-        free( p_del );
-    FOREACH_END();
-    ARRAY_RESET( p_sys->items_to_delete );
-
-    ARRAY_RESET( p_playlist->items );
-    ARRAY_RESET( p_playlist->current );
-
     PL_UNLOCK;
 
     msg_Dbg( p_playlist, "Deactivated" );

@@ -181,6 +181,24 @@ static void playlist_Destructor( vlc_object_t * p_this )
     assert( !p_sys->p_fetcher );
 
     vlc_cond_destroy( &p_sys->signal );
+
+    /* Remove all remaining items */
+    FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )
+        free( p_del->pp_children );
+        vlc_gc_decref( p_del->p_input );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_playlist->all_items );
+    FOREACH_ARRAY( playlist_item_t *p_del, p_sys->items_to_delete )
+        free( p_del->pp_children );
+        vlc_gc_decref( p_del->p_input );
+        free( p_del );
+    FOREACH_END();
+    ARRAY_RESET( p_sys->items_to_delete );
+
+    ARRAY_RESET( p_playlist->items );
+    ARRAY_RESET( p_playlist->current );
+
     msg_Dbg( p_this, "Destroyed" );
 }
 
