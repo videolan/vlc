@@ -269,7 +269,7 @@ static int parser_SetTextColor( char *psz_command, char *psz_end,
         if( parse_digit( &psz_command, &b ) == VLC_EGENERIC )
             return VLC_EGENERIC;
     }
-    p_params->fontstyle.i_font_color = (r<<24) | (g<<16) | (b<<8);
+    p_params->fontstyle.i_font_color = (r<<16) | (g<<8) | (b<<0);
     return VLC_SUCCESS;
 }
 
