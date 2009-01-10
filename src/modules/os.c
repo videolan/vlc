@@ -70,7 +70,7 @@
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void * GetSymbol        ( module_handle_t, const char * );
+static void *module_Lookup( module_handle_t, const char * );
 
 #if defined(HAVE_DL_WINDOWS)
 static char * GetWindowsError  ( void );
@@ -90,7 +90,8 @@ int module_Call( vlc_object_t *obj, module_t *p_module )
     int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
-    pf_symbol = (int (*)(module_t *)) GetSymbol( p_module->handle, psz_name );
+    pf_symbol = (int (*)(module_t *)) module_Lookup( p_module->handle,
+                                                     psz_name );
 
     if( pf_symbol == NULL )
     {
@@ -287,41 +288,24 @@ void module_Unload( module_handle_t handle )
 }
 
 /**
- * GetSymbol: get a symbol from a dynamic library
+ * Looks up a symbol from a dynamically loaded library
  *
  * This function queries a loaded library for a symbol specified in a
  * string, and returns a pointer to it. We don't check for dlerror() or
  * similar functions, since we want a non-NULL symbol anyway.
- * \param handle handle to the module
- * \param psz_function function name
- * \return nothing
+ *
+ * @param handle handle to the module
+ * @param psz_function function name
+ * @return NULL on error, or the address of the symbol
  */
-static void * _module_getsymbol( module_handle_t, const char * );
-
-static void * GetSymbol( module_handle_t handle, const char * psz_function )
-{
-    void * p_symbol = _module_getsymbol( handle, psz_function );
-
-    /* MacOS X dl library expects symbols to begin with "_". So do
-     * some other operating systems. That's really lame, but hey, what
-     * can we do ? */
-    if( p_symbol == NULL )
-    {
-        char psz_call[strlen( psz_function ) + 2];
-
-        psz_call[ 0 ] = '_';
-        memcpy( psz_call + 1, psz_function, sizeof (psz_call) - 1 );
-        p_symbol = _module_getsymbol( handle, psz_call );
-    }
-
-    return p_symbol;
-}
-
-static void * _module_getsymbol( module_handle_t handle,
-                                 const char * psz_function )
+static void *module_Lookup( module_handle_t handle, const char *psz_function )
 {
 #if defined(HAVE_DL_DYLD)
-    NSSymbol sym = NSLookupSymbolInModule( handle, psz_function );
+    char psz_call[strlen( psz_function ) + 2];
+    psz_call[0] = '_';
+    memcpy( psz_call + 1, psz_function, sizeof( psz_call ) - 1 );
+
+    NSSymbol sym = NSLookupSymbolInModule( handle, psz_call );
     return NSAddressOfSymbol( sym );
 
 #elif defined(HAVE_DL_BEOS)
