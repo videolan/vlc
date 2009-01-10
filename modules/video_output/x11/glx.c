@@ -238,11 +238,11 @@ int InitGLX13( vout_thread_t *p_vout )
     XVisualInfo *p_vi;
     int p_attr[] = { GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5,
                      GLX_BLUE_SIZE, 5, GLX_DOUBLEBUFFER, True,
-                     GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, 0 };
+                     GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, None, };
 
     /* Get the FB configuration */
     p_fbconfs = glXChooseFBConfig( p_sys->p_display, 0, p_attr, &i_nbelem );
-    if( (i_nbelem <= 0) || !p_fbconfs )
+    if( !p_fbconfs || (i_nbelem <= 0) )
     {
         msg_Err( p_vout, "Cannot get FB configurations");
         if( p_fbconfs ) XFree( p_fbconfs );
@@ -266,6 +266,7 @@ int InitGLX13( vout_thread_t *p_vout )
     if( p_sys->gwnd == None )
     {
         msg_Err( p_vout, "Cannot create GLX window" );
+        XFree( p_fbconfs );
         return VLC_EGENERIC;
     }
 
