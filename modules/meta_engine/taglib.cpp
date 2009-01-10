@@ -270,21 +270,21 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_t* p_demux, demux_met
     StringList mime_list = tag->fieldListMap()[ "COVERARTMIME" ];
     StringList art_list = tag->fieldListMap()[ "COVERART" ];
 
-    /* we support only one cover in ogg/vorbis */
-    if( mime_list.size() != 1 || art_list.size() != 1 )
+    // We get only the first covert art
+    if( mime_list.size() > 1 || art_list.size() > 1 )
+        msg_Warn( p_demux, "Found %i embedded arts, so using only the first one",
+                  art_list.size() );
+    else if( mime_list.size() == 0 || art_list.size() == 0 )
         return;
 
     input_attachment_t *p_attachment;
 
-    const char *psz_name, *psz_mime, *psz_description;
+    const char* psz_name = "cover";
+    const char* psz_mime = mime_list[0].toCString(true);
+    const char* psz_description = "cover";
+
     uint8_t *p_data;
-    int i_data;
-
-    psz_name = "cover";
-    psz_mime = mime_list[0].toCString(true);
-    psz_description = "cover";
-
-    i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
+    int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(true) );
 
     msg_Dbg( p_demux, "Found embedded art: %s (%s) is %i bytes",
              psz_name, psz_mime, i_data );
