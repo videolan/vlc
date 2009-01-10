@@ -308,22 +308,21 @@ inline void MainInterface::createStatusBar()
 
 inline void MainInterface::initSystray()
 {
-    bool b_createSystray = false;
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
-    if( config_GetInt( p_intf, "qt-start-minimized") )
+    bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
+
+    if( config_GetInt( p_intf, "qt-start-minimized") > 0 )
     {
         if( b_systrayAvailable )
         {
-            b_createSystray = true;
+            b_systrayWanted = true;
             hide();
         }
-        else msg_Err( p_intf, "You can't minimize if you haven't a system "
-                "tray bar" );
+        else
+            msg_Err( p_intf, "cannot start minimized without system tray bar" );
     }
-    if( config_GetInt( p_intf, "qt-system-tray") )
-        b_createSystray = true;
 
-    if( b_systrayAvailable && b_createSystray )
+    if( b_systrayAvailable && b_systrayWanted )
             createSystray();
 }
 
