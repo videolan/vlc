@@ -320,9 +320,6 @@ static int Open( vlc_object_t *p_this )
     /* Cache sap_timeshift value */
     p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" );
 
-    /* Set our name */
-    services_discovery_SetLocalizedName( p_sd, _("SAP") );
-
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
     /* TODO: create sockets here, and fix racy sockets table */

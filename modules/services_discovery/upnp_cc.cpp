@@ -125,8 +125,6 @@ static int Open( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
 
-    services_discovery_SetLocalizedName( p_sd, _("Devices") );
-
     UPnPHandler *u = new UPnPHandler( p_sd );
     u->start( );
     msg_Dbg( p_sd, "upnp discovery started" );

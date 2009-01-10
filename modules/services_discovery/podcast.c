@@ -123,8 +123,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_update = true;
 
     p_sd->p_sys  = p_sys;
-    /* Give us a name */
-    services_discovery_SetLocalizedName( p_sd, _("Podcasts") );
 
     /* Launch the callback associated with this variable */
     var_Create( p_sd, "podcast-urls", VLC_VAR_STRING | VLC_VAR_DOINHERIT );

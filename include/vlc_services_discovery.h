@@ -46,7 +46,6 @@ struct services_discovery_t
     char *              psz_module;
     module_t *          p_module;
 
-    char *              psz_localized_name; /* Accessed through Setters for non class function */
     vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
 
     services_discovery_sys_t *p_sys;
@@ -86,7 +85,6 @@ VLC_EXPORT( char *,                 services_discovery_GetLocalizedName, ( servi
 VLC_EXPORT( vlc_event_manager_t *,  services_discovery_EventManager, ( services_discovery_t * p_this ) );
 
 /* Used by services_discovery to post update about their items */
-VLC_EXPORT( void,                   services_discovery_SetLocalizedName, ( services_discovery_t * p_this, const char * ) );
     /* About the psz_category, it is a legacy way to add info to the item,
      * for more options, directly set the (meta) data on the input item */
 VLC_EXPORT( void,                   services_discovery_AddItem, ( services_discovery_t * p_this, input_item_t * p_item, const char * psz_category ) );

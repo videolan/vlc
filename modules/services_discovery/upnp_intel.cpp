@@ -90,8 +90,6 @@ static int Open( vlc_object_t *p_this )
     if(!(p_sd->p_sys = p_sys))
         return VLC_ENOMEM;
 
-    services_discovery_SetLocalizedName( p_sd, _("UPnP devices") );
-
     res = UpnpInit( 0, 0 );
     if( res != UPNP_E_SUCCESS )
     {

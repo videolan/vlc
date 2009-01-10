@@ -64,7 +64,6 @@ services_discovery_Create ( vlc_object_t * p_super, const char * psz_module_name
     if( !p_sd )
         return NULL;
 
-    p_sd->psz_localized_name = strdup( "Unnamed service discovery" ); // FIXME: Set that back to NULL
     p_sd->psz_module = strdup( psz_module_name );
 
     vlc_event_manager_init( &p_sd->event_manager, p_sd, (vlc_object_t *)p_sd );
@@ -141,10 +140,7 @@ static void services_discovery_Destructor ( services_discovery_t * p_sd )
     assert(!p_sd->p_module); /* Forgot to call Stop */
 
     vlc_event_manager_fini( &p_sd->event_manager );
-    
     free( p_sd->psz_module );
-    free( p_sd->psz_localized_name );
-    
     vlc_object_release( p_sd );
 }
 
@@ -154,17 +150,7 @@ static void services_discovery_Destructor ( services_discovery_t * p_sd )
 char *
 services_discovery_GetLocalizedName ( services_discovery_t * p_sd )
 {
-    return p_sd->psz_localized_name ? strdup( p_sd->psz_localized_name ) : NULL;
-}
-
-/***********************************************************************
- * SetLocalizedName
- ***********************************************************************/
-void
-services_discovery_SetLocalizedName ( services_discovery_t * p_sd, const char *psz )
-{
-    free( p_sd->psz_localized_name );
-    p_sd->psz_localized_name = strdup(psz);
+    return strdup( module_get_name( p_sd->p_module, true ) );
 }
 
 /***********************************************************************
@@ -308,15 +294,6 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
         if( !p_sd )
             continue;
 
-        /* FIXME: Thanks to previous changeset this is broken */
-        char * psz = services_discovery_GetLocalizedName( p_sd );
-        assert( psz );
-        PL_LOCK;
-        playlist_NodesPairCreate( p_playlist, psz,
-                &p_cat, &p_one, false );
-        PL_UNLOCK;
-        free( psz );
-
         vlc_event_attach( services_discovery_EventManager( p_sd ),
                           vlc_ServicesDiscoveryItemAdded,
                           playlist_sd_item_added,
@@ -343,7 +320,15 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,  const char *psz_modu
             vlc_object_release( p_sd );
             return VLC_EGENERIC;
         }        
-        
+
+        char *psz = services_discovery_GetLocalizedName( p_sd );
+        assert( psz );
+        PL_LOCK;
+        playlist_NodesPairCreate( p_playlist, psz,
+                &p_cat, &p_one, false );
+        PL_UNLOCK;
+        free( psz );
+
         /* Free in playlist_ServicesDiscoveryRemove */
         p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
         if( !p_sds )

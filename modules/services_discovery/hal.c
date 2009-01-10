@@ -145,8 +145,6 @@ static int Open( vlc_object_t *p_this )
     if( vlc_clone( &p_sys->thread, Run, p_this, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
 
-    services_discovery_SetLocalizedName( p_sd, _("Devices") );
-
     return VLC_SUCCESS;
 error:
     dbus_error_free( &dbus_error );

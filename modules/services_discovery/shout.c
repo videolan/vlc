@@ -153,7 +153,6 @@ struct services_discovery_sys_t
 static int Open( vlc_object_t *p_this, enum type_e i_type )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_SetLocalizedName( p_sd, _(p_items[i_type].psz_name) );
 
     p_sd->p_sys = malloc (sizeof (*(p_sd->p_sys)));
     if (p_sd->p_sys == NULL)

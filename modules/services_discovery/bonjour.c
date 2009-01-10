@@ -282,8 +282,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
     }
 
-    services_discovery_SetLocalizedName( p_sd, _("Bonjour") );
-
     return VLC_SUCCESS;
 
 error:
