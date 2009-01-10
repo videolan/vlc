@@ -1333,7 +1333,7 @@
     return( o_ctx_menu );
 }
 
-- (void)outlineView: (NSTableView *)o_tv
+- (void)outlineView: (NSOutlineView *)o_tv
                   didClickTableColumn:(NSTableColumn *)o_tc
 {
     int i_mode, i_type = 0;

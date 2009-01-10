@@ -174,7 +174,6 @@
         /* We have a detached vout */
         else if( [[window className] isEqualToString: @"VLCVoutWindow"] )
         {
-            msg_Dbg( VLCIntf, "detached vout controls.m call voutView" );
             voutView = [window voutView];
         }
     }

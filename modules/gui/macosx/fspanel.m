@@ -178,10 +178,13 @@
 
 - (void)setActive:(id)noData
 {
-    if( [[[[VLCMain sharedInstance] getControls] voutView] isFullscreen] )
+    if( [[[VLCMain sharedInstance] getControls] voutView] != nil )
     {
-        b_nonActive = NO;
-        [self fadeIn];
+        if( [[[[VLCMain sharedInstance] getControls] voutView] isFullscreen] )
+        {
+            b_nonActive = NO;
+            [self fadeIn];
+        }
     }
 }
 
