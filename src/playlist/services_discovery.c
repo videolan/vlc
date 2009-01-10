@@ -230,6 +230,9 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     vlc_object_unlock( p_parent->p_playlist );
 }
 
+/* FIXME: this function sucks by design. Trying to probe multiple SDs at the
+ * same time prevents proper error handling. We should really probe ONLY ONE
+ * SD at a time. */
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modules )
 {
     const char *psz_parser = psz_modules ?: "";
@@ -257,9 +260,8 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
 
         /* Perform the addition */
         msg_Dbg( p_playlist, "Add services_discovery %s", psz_plugin );
-        services_discovery_t *p_sd;
 
-        p_sd = vlc_sd_Create( (vlc_object_t*)p_playlist );
+        services_discovery_t *p_sd = vlc_sd_Create( VLC_OBJECT(p_playlist) );
         if( !p_sd )
             return VLC_ENOMEM;
 
@@ -270,6 +272,19 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
             vlc_sd_Destroy( p_sd );
             return VLC_ENOMEM;
         }
+
+        module_t *m = module_find( psz_plugin );
+        if( !m )
+        {
+             msg_Err( p_playlist, "No such module: %s", psz_plugin );
+             return VLC_EGENERIC;
+        }
+
+        PL_LOCK;
+        playlist_NodesPairCreate( p_playlist, module_get_name( m, true ),
+                                  &p_cat, &p_one, false );
+        PL_UNLOCK;
+        module_release( m );
 
         vlc_event_attach( services_discovery_EventManager( p_sd ),
                           vlc_ServicesDiscoveryItemAdded,
@@ -296,16 +311,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
             vlc_sd_Destroy( p_sd );
             free( p_sds );
             return VLC_EGENERIC;
-        }        
-
-        char *psz = services_discovery_GetLocalizedName( p_sd );
-        assert( psz );
-        PL_LOCK;
-        playlist_NodesPairCreate( p_playlist, psz,
-                &p_cat, &p_one, false );
-        PL_UNLOCK;
-        free( psz );
-
+        }
 
         /* We want tree-view for service directory */
         p_one->p_input->b_prefers_tree = true;
