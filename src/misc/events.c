@@ -319,7 +319,7 @@ int __vlc_event_attach( vlc_event_manager_t * p_em,
     FOREACH_END()
     vlc_mutex_unlock( &p_em->object_lock );
 
-    msg_Err( p_em->p_parent_object, "Can't attach to an object event manager event" );
+    msg_Err( p_em->p_parent_object, "cannot attach to an object event" );
     free(listener);
     return VLC_EGENERIC;
 }
@@ -373,7 +373,7 @@ int vlc_event_detach( vlc_event_manager_t *p_em,
     vlc_mutex_unlock( &p_em->event_sending_lock );
     vlc_mutex_unlock( &p_em->object_lock );
 
-    msg_Warn( p_em->p_parent_object, "Can't detach to an object event manager event" );
+    msg_Warn( p_em->p_parent_object, "cannot detach from an object event" );
 
     return VLC_EGENERIC;
 }
