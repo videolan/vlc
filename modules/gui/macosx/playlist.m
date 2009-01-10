@@ -482,6 +482,7 @@
 
     playlist_t *p_playlist = pl_Hold( VLCIntf );
 
+    PL_LOCK;
     if( playlist_CurrentSize( p_playlist ) >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
@@ -495,6 +496,7 @@
         else
             [o_status_field setStringValue: _NS("1 item")];
     }
+    PL_UNLOCK;
     vlc_object_release( p_playlist );
 
     [self outlineViewSelectionDidChange: nil];
@@ -1473,6 +1475,7 @@
     id o_value = [super outlineView: outlineView child: index ofItem: item];
     playlist_t *p_playlist = pl_Hold( VLCIntf );
 
+    PL_LOCK;
     if( playlist_CurrentSize( p_playlist )  >= 2 )
     {
         [o_status_field setStringValue: [NSString stringWithFormat:
@@ -1490,6 +1493,8 @@
             [o_status_field setStringValue: _NS("1 item")];
         }
     }
+    PL_UNLOCK;
+
     vlc_object_release( p_playlist );
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
