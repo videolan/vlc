@@ -230,100 +230,74 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     vlc_object_unlock( p_parent->p_playlist );
 }
 
-/* FIXME: this function sucks by design. Trying to probe multiple SDs at the
- * same time prevents proper error handling. We should really probe ONLY ONE
- * SD at a time. */
-int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modules )
+int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_module )
 {
-    const char *psz_parser = psz_modules ?: "";
+    /* Perform the addition */
+    msg_Dbg( p_playlist, "adding services_discovery %s...", psz_module );
 
-    for (;;)
+    services_discovery_t *p_sd = vlc_sd_Create( VLC_OBJECT(p_playlist) );
+    if( !p_sd )
+        return VLC_ENOMEM;
+
+    module_t *m = module_find( psz_module );
+    if( !m )
     {
-        struct playlist_services_discovery_support_t * p_sds;
-        playlist_item_t * p_cat;
-        playlist_item_t * p_one;
-
-        while( *psz_parser == ' ' || *psz_parser == ':' || *psz_parser == ',' )
-            psz_parser++;
-
-        if( *psz_parser == '\0' )
-            break;
-
-        const char *psz_next = strchr( psz_parser, ':' );
-        if( psz_next == NULL )
-            psz_next = psz_parser + strlen( psz_parser );
-
-        char psz_plugin[psz_next - psz_parser + 1];
-        memcpy (psz_plugin, psz_parser, sizeof (psz_plugin) - 1);
-        psz_plugin[sizeof (psz_plugin) - 1] = '\0';
-        psz_parser = psz_next;
-
-        /* Perform the addition */
-        msg_Dbg( p_playlist, "Add services_discovery %s", psz_plugin );
-
-        services_discovery_t *p_sd = vlc_sd_Create( VLC_OBJECT(p_playlist) );
-        if( !p_sd )
-            return VLC_ENOMEM;
-
-        /* Free in playlist_ServicesDiscoveryRemove */
-        p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
-        if( !p_sds )
-        {
-            vlc_sd_Destroy( p_sd );
-            return VLC_ENOMEM;
-        }
-
-        module_t *m = module_find( psz_plugin );
-        if( !m )
-        {
-             msg_Err( p_playlist, "No such module: %s", psz_plugin );
-             return VLC_EGENERIC;
-        }
-
-        PL_LOCK;
-        playlist_NodesPairCreate( p_playlist, module_get_name( m, true ),
-                                  &p_cat, &p_one, false );
-        PL_UNLOCK;
-        module_release( m );
-
-        vlc_event_attach( services_discovery_EventManager( p_sd ),
-                          vlc_ServicesDiscoveryItemAdded,
-                          playlist_sd_item_added,
-                          p_one );
-        
-        vlc_event_attach( services_discovery_EventManager( p_sd ),
-                          vlc_ServicesDiscoveryItemAdded,
-                          playlist_sd_item_added,
-                          p_cat );
-
-        vlc_event_attach( services_discovery_EventManager( p_sd ),
-                          vlc_ServicesDiscoveryItemRemoved,
-                          playlist_sd_item_removed,
-                          p_one );
-
-        vlc_event_attach( services_discovery_EventManager( p_sd ),
-                          vlc_ServicesDiscoveryItemRemoved,
-                          playlist_sd_item_removed,
-                          p_cat );
-
-        if( !vlc_sd_Start( p_sd, psz_plugin ) )
-        {
-            vlc_sd_Destroy( p_sd );
-            free( p_sds );
-            return VLC_EGENERIC;
-        }
-
-        /* We want tree-view for service directory */
-        p_one->p_input->b_prefers_tree = true;
-        p_sds->p_sd = p_sd;
-        p_sds->p_one = p_one;
-        p_sds->p_cat = p_cat;
-
-        PL_LOCK;
-        TAB_APPEND( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds, p_sds );
-        PL_UNLOCK;
-
+        msg_Err( p_playlist, "No such module: %s", psz_module );
+        vlc_sd_Destroy( p_sd );
+        return VLC_EGENERIC;
     }
+
+    /* Free in playlist_ServicesDiscoveryRemove */
+    struct playlist_services_discovery_support_t * p_sds;
+    p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
+    if( !p_sds )
+    {
+        vlc_sd_Destroy( p_sd );
+        module_release( m );
+        return VLC_ENOMEM;
+    }
+
+    playlist_item_t * p_cat;
+    playlist_item_t * p_one;
+
+    PL_LOCK;
+    playlist_NodesPairCreate( p_playlist, module_get_name( m, true ),
+                              &p_cat, &p_one, false );
+    PL_UNLOCK;
+    module_release( m );
+
+    vlc_event_attach( services_discovery_EventManager( p_sd ),
+                      vlc_ServicesDiscoveryItemAdded,
+                      playlist_sd_item_added, p_one );
+        
+    vlc_event_attach( services_discovery_EventManager( p_sd ),
+                      vlc_ServicesDiscoveryItemAdded,
+                      playlist_sd_item_added, p_cat );
+
+    vlc_event_attach( services_discovery_EventManager( p_sd ),
+                      vlc_ServicesDiscoveryItemRemoved,
+                      playlist_sd_item_removed, p_one );
+
+    vlc_event_attach( services_discovery_EventManager( p_sd ),
+                      vlc_ServicesDiscoveryItemRemoved,
+                      playlist_sd_item_removed, p_cat );
+
+    if( !vlc_sd_Start( p_sd, psz_module ) )
+    {
+        vlc_sd_Destroy( p_sd );
+        free( p_sds );
+        return VLC_EGENERIC;
+    }
+
+    /* We want tree-view for service directory */
+    p_one->p_input->b_prefers_tree = true;
+    p_sds->p_sd = p_sd;
+    p_sds->p_one = p_one;
+    p_sds->p_cat = p_cat;
+
+    PL_LOCK;
+    TAB_APPEND( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds, p_sds );
+    PL_UNLOCK;
 
     return VLC_SUCCESS;
 }
