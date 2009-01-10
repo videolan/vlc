@@ -43,6 +43,10 @@
 
 #include <ass/ass.h>
 
+#if defined(WIN32)
+#   include <vlc_charset.h>
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -675,7 +679,31 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     }
     free( pp_attachments );
 
-    char *psz_font_dir = config_GetCacheDir();
+    char *psz_font_dir = NULL;
+
+#if defined(WIN32)
+    const UINT uPath = GetSystemWindowsDirectory( NULL, 0 );
+    if( uPath > 0 )
+    {
+        wchar_t *psw_path = calloc( uPath + 1, sizeof(wchar_t) );
+        if( psw_path )
+        {
+            if( GetSystemWindowsDirectoryW( psw_path, uPath + 1 ) > 0 )
+            {
+                char *psz_tmp = FromWide( psw_path );
+                if( psz_tmp &&
+                    asprintf( &psz_font_dir, "%s\\Fonts", psz_tmp ) < 0 )
+                    psz_font_dir = NULL;
+                free( psz_tmp );
+            }
+            free( psw_path );
+        }
+    }
+#endif
+
+    if( !psz_font_dir )
+        psz_font_dir = config_GetCacheDir();
+
     if( !psz_font_dir )
         goto error;
     ass_set_fonts_dir( p_library, psz_font_dir );
