@@ -174,7 +174,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
     libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
             libvlc_MediaDiscovererEnded, NULL );
 
-    p_mdis->p_sd = services_discovery_Create( (vlc_object_t*)p_inst->p_libvlc_int, psz_name );
+    p_mdis->p_sd = vlc_sd_Create( (vlc_object_t*)p_inst->p_libvlc_int );
 
     if( !p_mdis->p_sd )
     {
@@ -202,8 +202,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                       p_mdis );
 
     /* Here we go */
-    bool ret = services_discovery_Start( p_mdis->p_sd );
-    if(!ret)
+    if( !vlc_sd_Start( p_mdis->p_sd, psz_name ) )
     {
         libvlc_media_list_release( p_mdis->p_mlist );
         libvlc_exception_raise( p_e, "Can't start the services_discovery module named '%s'", psz_name );
@@ -223,7 +222,7 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
     int i;
 
     libvlc_media_list_release( p_mdis->p_mlist );
-    services_discovery_StopAndRelease( p_mdis->p_sd );
+    vlc_sd_StopAndDestroy( p_mdis->p_sd );
 
     /* Free catname_to_submedialist and all the mlist */
     char ** all_keys = vlc_dictionary_all_keys( &p_mdis->catname_to_submedialist );

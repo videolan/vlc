@@ -317,13 +317,10 @@ sdp_AddAttribute
 sdp_AddMedia
 secstotimestr
 services_discovery_AddItem
-services_discovery_Create
 services_discovery_EventManager
 services_discovery_GetLocalizedName
 __services_discovery_GetServicesNames
 services_discovery_RemoveItem
-services_discovery_Start
-services_discovery_Stop
 sout_AccessOutControl
 sout_AccessOutDelete
 sout_AccessOutNew
@@ -496,7 +493,10 @@ vlc_poll
 vlc_rand_bytes
 vlc_recvmsg
 vlc_release
+vlc_sd_Create
 vlc_sdp_Start
+vlc_sd_Start
+vlc_sd_Stop
 vlc_sendmsg
 vlc_strcasestr
 vlc_strlcpy

@@ -43,7 +43,6 @@ extern "C" {
 struct services_discovery_t
 {
     VLC_COMMON_MEMBERS
-    char *              psz_module;
     module_t *          p_module;
 
     vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
@@ -62,14 +61,19 @@ VLC_EXPORT( char **, __services_discovery_GetServicesNames, ( vlc_object_t * p_s
         __services_discovery_GetServicesNames(VLC_OBJECT(a),b)
 
 /* Creation of a service_discovery object */
-VLC_EXPORT( services_discovery_t *, services_discovery_Create, ( vlc_object_t * p_super, const char * psz_service_name ) );
-VLC_EXPORT( bool,                   services_discovery_Start, ( services_discovery_t * p_this ) );
-VLC_EXPORT( void,                   services_discovery_Stop, ( services_discovery_t * p_this ) );
+VLC_EXPORT( services_discovery_t *, vlc_sd_Create, ( vlc_object_t * ) );
+VLC_EXPORT( bool, vlc_sd_Start, ( services_discovery_t *, const char * ) );
+VLC_EXPORT( void, vlc_sd_Stop, ( services_discovery_t * ) );
 
-static inline void services_discovery_StopAndRelease( services_discovery_t * p_this )
+static inline void vlc_sd_Destroy( services_discovery_t *p_sd )
 {
-    services_discovery_Stop( p_this );
-    vlc_object_release( p_this );
+    vlc_object_release( VLC_OBJECT(p_sd) );
+}
+
+static inline void vlc_sd_StopAndDestroy( services_discovery_t * p_this )
+{
+    vlc_sd_Stop( p_this );
+    vlc_sd_Destroy( p_this );
 }
 
 /* Read info from discovery object */
