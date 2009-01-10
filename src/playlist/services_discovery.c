@@ -33,8 +33,6 @@
 #include "../libvlc.h"
 
 
-static void services_discovery_Destructor ( services_discovery_t * p_sd );
-
 /*
  * Services discovery
  * Basically you just listen to Service discovery event through the
@@ -128,17 +126,6 @@ void vlc_sd_Stop ( services_discovery_t * p_sd )
 
     module_unneed( p_sd, p_sd->p_module );
     p_sd->p_module = NULL;
-}
-
-/***********************************************************************
- * Destructor
- ***********************************************************************/
-static void services_discovery_Destructor ( services_discovery_t * p_sd )
-{
-    assert(!p_sd->p_module); /* Forgot to call Stop */
-
-    vlc_event_manager_fini( &p_sd->event_manager );
-    vlc_object_release( p_sd );
 }
 
 /***********************************************************************
