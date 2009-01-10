@@ -36,7 +36,7 @@ public class MediaDescriptor
     private LibVlcMedia instance;
     private LibVlc libvlc;
     private LibVlcEventManager eventManager;
-    private boolean released;
+    private volatile boolean released;
     
     private MediaPlayer mediaPlayer;
     

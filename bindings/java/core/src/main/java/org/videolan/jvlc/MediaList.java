@@ -26,7 +26,6 @@
 package org.videolan.jvlc;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
@@ -42,10 +41,12 @@ public class MediaList
 
     private final LibVlcMediaList instance;
 
-    private final LibVlcEventManager eventManager;
-
     private List<String> items = new ArrayList<String>();
 
+    private LibVlcEventManager eventManager;
+
+    private volatile boolean released;
+    
     public MediaList(JVLC jvlc)
     {
         this.jvlc = jvlc;
@@ -188,7 +189,7 @@ public class MediaList
     @Override
     protected void finalize() throws Throwable
     {
-        jvlc.getLibvlc().libvlc_media_list_release(instance);
+        release();
         super.finalize();
     }
 
@@ -199,6 +200,20 @@ public class MediaList
     LibVlcMediaList getInstance()
     {
         return instance;
+    }
+
+    /**
+     * 
+     */
+    public void release()
+    {
+        if (released)
+        {
+            return;
+        }
+        released = true;
+        
+        jvlc.getLibvlc().libvlc_media_list_release(instance);
     }
 
 

@@ -176,6 +176,9 @@ public class JVLC
             vlm.release();
             vlm = null;
         }
+        mediaList.release();
+        mediaListPlayer.release();
+        
         libvlc.libvlc_release(instance);
     }
 

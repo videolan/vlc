@@ -35,6 +35,8 @@ public class MediaListPlayer
     private final LibVlcMediaListPlayer instance;
 
     private final JVLC jvlc;
+
+    private volatile boolean released;
     
     public MediaListPlayer(JVLC jvlc)
     {
@@ -172,8 +174,22 @@ public class MediaListPlayer
     @Override
     protected void finalize() throws Throwable
     {
-        jvlc.getLibvlc().libvlc_media_list_player_release(instance);
+        release();
         super.finalize();
+    }
+
+    /**
+     * 
+     */
+    public void release()
+    {
+        if (released)
+        {
+            return;
+        }
+        released = true;
+        jvlc.getLibvlc().libvlc_media_list_player_release(instance);
+        
     }
 
 }

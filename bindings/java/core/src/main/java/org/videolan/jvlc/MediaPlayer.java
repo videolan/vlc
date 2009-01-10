@@ -51,6 +51,8 @@ public class MediaPlayer
 
     private MediaDescriptor mediaDescriptor;
 
+    private volatile boolean released;
+
     MediaPlayer(JVLC jvlc, LibVlcMediaPlayer instance)
     {
         libvlc_exception_t exception = new libvlc_exception_t();
@@ -176,6 +178,18 @@ public class MediaPlayer
     @Override
     protected void finalize() throws Throwable
     {
+        release();
+        super.finalize();
+    }
+
+    public void release()
+    {
+        if (released)
+        {
+            return;
+        }
+        released = true;
+
         libvlc_exception_t exception = new libvlc_exception_t();
         for (MediaPlayerCallback callback : callbacks)  
         {
@@ -187,9 +201,9 @@ public class MediaPlayer
             }
         }
         libvlc.libvlc_media_player_release(instance);
-        super.finalize();
+        
     }
-
+    
     /**
      * Returns the instance.
      * @return the instance
