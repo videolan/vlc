@@ -682,7 +682,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     char *psz_font_dir = NULL;
 
 #if defined(WIN32)
-    const UINT uPath = GetSystemWindowsDirectory( NULL, 0 );
+    const UINT uPath = GetSystemWindowsDirectoryW( NULL, 0 );
     if( uPath > 0 )
     {
         wchar_t *psw_path = calloc( uPath + 1, sizeof(wchar_t) );
