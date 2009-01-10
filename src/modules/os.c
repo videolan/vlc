@@ -321,10 +321,13 @@ static void *module_Lookup( module_handle_t handle, const char *psz_function )
     }
 
 #elif defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
-    wchar_t psz_real[256];
-    MultiByteToWideChar( CP_ACP, 0, psz_function, -1, psz_real, 256 );
+    wchar_t wide[sizeof( psz_function ) + 1];
+    size_t i;
+    do
+        wide[i] = psz_function[i]; /* UTF-16 <- ASCII */
+    while( psz_function[i++] );
 
-    return (void *)GetProcAddress( handle, psz_real );
+    return (void *)GetProcAddress( handle, wide );
 
 #elif defined(HAVE_DL_WINDOWS) && defined(WIN32)
     return (void *)GetProcAddress( handle, (char *)psz_function );
