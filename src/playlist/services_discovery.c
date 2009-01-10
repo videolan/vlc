@@ -77,18 +77,6 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super )
     return p_sd;
 }
 
-static void ObjectKillChildrens( vlc_object_t *p_obj )
-{
-    vlc_list_t *p_list;
-    int i;
-    vlc_object_kill( p_obj );
-
-    p_list = vlc_list_children( p_obj );
-    for( i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_list->p_values[i].p_object );
-    vlc_list_release( p_list );
-}
-
 /***********************************************************************
  * Stop
  ***********************************************************************/
@@ -119,8 +107,6 @@ void vlc_sd_Stop ( services_discovery_t * p_sd )
     vlc_event_t event = {
         .type = vlc_ServicesDiscoveryEnded
     };
-    
-    ObjectKillChildrens( VLC_OBJECT(p_sd) );
     
     vlc_event_send( &p_sd->event_manager, &event );
 
