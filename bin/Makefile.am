@@ -27,9 +27,7 @@ vlc_wrapper_SOURCES = rootwrap.c
 vlc_DEPENDENCIES = ../src/libvlc.la
 
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-# vlc needs libvlccore for locale conversion
-vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la $(LTLIBINTL) \
-	`$(VLC_CONFIG) -libs vlc`
+vlc_LDADD = ../src/libvlc.la `$(VLC_CONFIG) -libs vlc`
 
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
