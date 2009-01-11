@@ -159,10 +159,10 @@ void InputManager::customEvent( QEvent *event )
          i_type != InterfaceAoutUpdate_Type )
         return;
 
+    if( !hasInput() ) return;
+
     if( i_type == CachingEvent_Type )
         UpdateCaching();
-
-    if( !hasInput() ) return;
 
     if( ( i_type != PositionUpdate_Type  &&
           i_type != ItemRateChanged_Type &&
