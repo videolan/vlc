@@ -47,7 +47,7 @@
  * Local prototypes
  *****************************************************************************/
 static interaction_t *          InteractionGet( vlc_object_t * );
-static void                     InteractionSearchInterface( interaction_t * );
+static intf_thread_t *          SearchInterface( interaction_t * );
 static void*                    InteractionLoop( vlc_object_t * );
 static void                     InteractionManage( interaction_t * );
 
@@ -401,6 +401,39 @@ void interaction_Destroy( interaction_t *p_interaction )
     vlc_object_release( p_interaction );
 }
 
+static vlc_mutex_t intf_lock = VLC_STATIC_MUTEX;
+
+int interaction_Register( intf_thread_t *intf )
+{
+    libvlc_priv_t *priv = libvlc_priv( intf->p_libvlc );
+    int ret = VLC_EGENERIC;
+
+    vlc_mutex_lock( &intf_lock );
+    if( priv->p_interaction_intf == NULL )
+    {   /* Since the interface is responsible for unregistering itself before
+         * it terminates, an object reference is not needed. */
+        priv->p_interaction_intf = intf;
+        ret = VLC_SUCCESS;
+    }
+    vlc_mutex_unlock( &intf_lock );
+    return ret;
+}
+
+int interaction_Unregister( intf_thread_t *intf )
+{
+    libvlc_priv_t *priv = libvlc_priv( intf->p_libvlc );
+    int ret = VLC_EGENERIC;
+
+    vlc_mutex_lock( &intf_lock );
+    if( priv->p_interaction_intf == intf )
+    {
+        priv->p_interaction_intf = NULL;
+        ret = VLC_SUCCESS;
+    }
+    vlc_mutex_unlock( &intf_lock );
+    return ret;
+}
+
 /**********************************************************************
  * The following functions are local
  **********************************************************************/
@@ -415,32 +448,19 @@ static interaction_t * InteractionGet( vlc_object_t *p_this )
 }
 
 
-/* Look for an interface suitable for interaction */
-static void InteractionSearchInterface( interaction_t *p_interaction )
+/* Look for an interface suitable for interaction, and hold it. */
+static intf_thread_t *SearchInterface( interaction_t *p_interaction )
 {
-    vlc_list_t  *p_list;
-    int          i_index;
+    libvlc_priv_t *priv = libvlc_priv( p_interaction->p_libvlc );
+    intf_thread_t *intf;
 
-    p_interaction->p_intf = NULL;
+    vlc_mutex_lock( &intf_lock );
+    intf = priv->p_interaction_intf;
+    if( intf != NULL )
+        vlc_object_hold( intf );
+    vlc_mutex_unlock( &intf_lock );
 
-    p_list = vlc_list_find( p_interaction, VLC_OBJECT_INTF, FIND_ANYWHERE );
-    if( !p_list )
-    {
-        msg_Err( p_interaction, "unable to create module list" );
-        return;
-    }
-
-    for( i_index = 0; i_index < p_list->i_count; i_index ++ )
-    {
-        intf_thread_t *p_intf = (intf_thread_t *)
-                                        p_list->p_values[i_index].p_object;
-        if( p_intf->b_interaction )
-        {
-            p_interaction->p_intf = p_intf;
-            break;
-        }
-    }
-    vlc_list_release ( p_list );
+    return intf;
 }
 
 /* Find an interaction dialog by its id */
@@ -595,7 +615,7 @@ static void InteractionManage( interaction_t *p_interaction )
     /* Nothing to do */
     if( p_interaction->i_dialogs == 0 ) return;
 
-    InteractionSearchInterface( p_interaction );
+    p_interaction->p_intf = SearchInterface( p_interaction );
     if( !p_interaction->p_intf )
     {
         /* We mark all dialogs as answered with their "default" answer */
@@ -611,8 +631,6 @@ static void InteractionManage( interaction_t *p_interaction )
                 p_dialog->i_status = HIDING_DIALOG;
         }
     }
-    else
-        vlc_object_hold( p_interaction->p_intf );
 
     for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
     {

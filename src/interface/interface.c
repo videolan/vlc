@@ -89,7 +89,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
     p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
     if( !p_intf )
         return NULL;
-    p_intf->b_interaction = false;
 #if defined( __APPLE__ ) || defined( WIN32 )
     p_intf->b_should_run_on_first_thread = false;
 #endif

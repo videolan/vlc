@@ -67,9 +67,6 @@ struct intf_thread_t
     void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
                                intf_dialog_args_t * );
 
-    /** Interaction stuff */
-    bool b_interaction;
-
     vlc_mutex_t  change_lock;
 };
 
@@ -107,6 +104,9 @@ VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 
 #define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
+
+VLC_EXPORT( int, interaction_Register, ( intf_thread_t * ) );
+VLC_EXPORT( int, interaction_Unregister, ( intf_thread_t * ) );
 
 /*@}*/
 

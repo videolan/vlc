@@ -186,7 +186,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      ************/
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
-    p_intf->b_interaction = true;
+    interaction_Register( p_intf );
 
     var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
@@ -267,7 +267,7 @@ MainInterface::~MainInterface()
     /* Unregister callback for the intf-popupmenu variable */
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
-    p_intf->b_interaction = false;
+    interaction_Unregister( p_intf );
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
     p_intf->p_sys->p_mi = NULL;

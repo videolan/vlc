@@ -409,7 +409,7 @@ static VLCMain *_o_sharedMainInstance = nil;
  
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, self );
-    p_intf->b_interaction = true;
+    interaction_Register( p_intf );
 
     /* update the playmode stuff */
     p_intf->p_sys->b_playmode_update = true;
@@ -685,7 +685,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         [o_extended savePrefs];
     }
  
-    p_intf->b_interaction = false;
+    interaction_Unregister( p_intf );
     var_DelCallback( p_intf, "interaction", InteractCallback, self );
 
     /* remove global observer watching for vout device changes correctly */
