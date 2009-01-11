@@ -1435,16 +1435,15 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
         return VLC_SUCCESS;
     }
 
-    if( stat( psz_name, &stat_info ) || !S_ISREG( stat_info.st_mode ) )
-    {
-        /* Let dvdnav_open() do the probing */
-        return VLC_SUCCESS;
-    }
-
     if( (i_fd = open( psz_name, O_RDONLY )) == -1 )
     {
-        /* Let dvdnav_open() do the probing */
-        return VLC_SUCCESS;
+        return VLC_SUCCESS; /* Let dvdnav_open() do the probing */
+    }
+
+    if( fstat( i_fd, &stat_info ) || !S_ISREG( stat_info.st_mode ) )
+    {
+        close( i_fd );
+        return VLC_SUCCESS; /* Let dvdnav_open() do the probing */
     }
 
     /* Try to find the anchor (2 bytes at LBA 256) */
