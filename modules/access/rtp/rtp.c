@@ -208,14 +208,14 @@ static int Open (vlc_object_t *obj)
 #ifdef SOCK_DCCP
             var_Create (obj, "dccp-service", VLC_VAR_STRING);
             var_SetString (obj, "dccp-service", "RTPV"); /* FIXME: RTPA? */
-            fd = net_Connect (obj, shost, (sport + 1) & ~1, SOCK_DCCP, tp);
+            fd = net_Connect (obj, shost, sport, SOCK_DCCP, tp);
 #else
             msg_Err (obj, "DCCP support not included");
 #endif
             break;
 
         case IPPROTO_TCP:
-            fd = net_Connect (obj, shost, (sport + 1) & ~1, SOCK_STREAM, tp);
+            fd = net_Connect (obj, shost, sport, SOCK_STREAM, tp);
             break;
     }
 
