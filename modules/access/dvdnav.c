@@ -97,6 +97,7 @@ vlc_module_begin ()
     set_capability( "access_demux", 5 )
     add_shortcut( "dvd" )
     add_shortcut( "dvdnav" )
+    add_shortcut( "file" );
     set_callbacks( Open, Close )
 vlc_module_end ()
 
