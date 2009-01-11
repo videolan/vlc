@@ -84,22 +84,22 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 
     add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
-                 RTP_CACHING_LONGTEXT, true);
+                 RTP_CACHING_LONGTEXT, true)
         change_integer_range (0, 65535)
     add_string ("srtp-key", "", NULL,
-                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false);
+                SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false)
     add_string ("srtp-salt", "", NULL,
-                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false);
+                SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false)
     add_integer ("rtp-max-src", 1, NULL, RTP_MAX_SRC_TEXT,
-                 RTP_MAX_SRC_LONGTEXT, true);
+                 RTP_MAX_SRC_LONGTEXT, true)
         change_integer_range (1, 255)
     add_integer ("rtp-timeout", 5, NULL, RTP_TIMEOUT_TEXT,
-                 RTP_TIMEOUT_LONGTEXT, true);
+                 RTP_TIMEOUT_LONGTEXT, true)
     add_integer ("rtp-max-dropout", 3000, NULL, RTP_MAX_DROPOUT_TEXT,
-                 RTP_MAX_DROPOUT_LONGTEXT, true);
+                 RTP_MAX_DROPOUT_LONGTEXT, true)
         change_integer_range (0, 32767)
     add_integer ("rtp-max-misorder", 100, NULL, RTP_MAX_MISORDER_TEXT,
-                 RTP_MAX_MISORDER_LONGTEXT, true);
+                 RTP_MAX_MISORDER_LONGTEXT, true)
         change_integer_range (0, 32767)
 
     add_shortcut ("dccp")
