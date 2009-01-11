@@ -199,6 +199,7 @@ struct  sdp_t
     /* "computed" URI */
     char *psz_uri;
     int           i_media_type;
+    unsigned rtcp_port;
 
     /* a= global attributes */
     int           i_attributes;
@@ -666,6 +667,15 @@ static int Demux( demux_t *p_demux )
 
     input_item_SetURI( p_parent_input, p_sdp->psz_uri );
     input_item_SetName( p_parent_input, p_sdp->psz_sessionname );
+    if( p_sdp->rtcp_port )
+    {
+        char *rtcp;
+        if( asprintf( &rtcp, ":rtcp-port=%u", p_sdp->rtcp_port ) != -1 )
+        {
+            input_item_AddOption( p_parent_input, rtcp );
+            free( rtcp );
+        }
+    }
 
     vlc_mutex_lock( &p_parent_input->lock );
 
@@ -876,6 +886,16 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     if( p_sys->b_timeshift )
         input_item_AddOption( p_input, ":access-filter=timeshift" );
 
+    if( p_sdp->rtcp_port )
+    {
+        char *rtcp;
+        if( asprintf( &rtcp, ":rtcp-port=%u", p_sdp->rtcp_port ) != -1 )
+        {
+            input_item_AddOption( p_input, rtcp );
+            free( rtcp );
+        }
+    }
+
     psz_value = GetAttribute( p_sap->p_sdp->pp_attributes, p_sap->p_sdp->i_attributes, "tool" );
     if( psz_value != NULL )
     {
@@ -1011,6 +1031,20 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         return VLC_EGENERIC;
     }
 
+    if (FindAttribute (p_sdp, 0, "rtcp-mux"))
+        p_sdp->rtcp_port = 0;
+    else
+    {
+        const char *rtcp = FindAttribute (p_sdp, 0, "rtcp");
+        if (rtcp)
+            p_sdp->rtcp_port = atoi (rtcp);
+        else
+        if (port & 1) /* odd port -> RTCP; next even port -> RTP */
+            p_sdp->rtcp_port = port++;
+        else /* even port -> RTP; next odd port -> RTCP */
+            p_sdp->rtcp_port = port + 1;
+    }
+
     if (flags & 1)
     {
         /* Connection-oriented media */
@@ -1031,7 +1065,6 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
     else
     {
         /* Non-connected (normally multicast) media */
-
         char psz_source[258] = "";
         const char *sfilter = FindAttribute (p_sdp, 0, "source-filter");
         if (sfilter != NULL)
