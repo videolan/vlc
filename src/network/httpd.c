@@ -229,6 +229,7 @@ static const struct
     { ".ogg",   "application/ogg" },
     { ".ogm",   "application/ogg" },
     { ".ogv",   "video/ogg" },
+    { ".ogx",   "application/ogg" },
     { ".spx",   "audio/ogg" },
     { ".wav",   "audio/wav" },
     { ".wma",   "audio/x-ms-wma" },
