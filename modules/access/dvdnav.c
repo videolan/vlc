@@ -1427,7 +1427,6 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
 #ifdef HAVE_SYS_STAT_H
     struct stat stat_info;
     uint8_t pi_anchor[2];
-    uint16_t i_tag_id = 0;
     int i_fd, i_ret;
 
     if( !*psz_name )
@@ -1449,21 +1448,11 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
     }
 
     /* Try to find the anchor (2 bytes at LBA 256) */
-    i_ret = VLC_SUCCESS;
-    if( lseek( i_fd, 256 * DVD_VIDEO_LB_LEN, SEEK_SET ) == -1 )
-    {
-        i_ret = VLC_EGENERIC;
-    }
-
-    if( read( i_fd, pi_anchor, 2 ) == 2 )
-    {
-        i_tag_id = GetWLE(pi_anchor);
-        if( i_tag_id != 2 ) i_ret = VLC_EGENERIC; /* Not an anchor */
-    }
-    else
-    {
-        i_ret = VLC_EGENERIC;
-    }
+    i_ret = VLC_EGENERIC;
+    if( lseek( i_fd, 256 * DVD_VIDEO_LB_LEN, SEEK_SET ) != -1
+     && read( i_fd, pi_anchor, 2 ) == 2
+     && GetWLE( pi_anchor ) == 2 )
+        i_ret = VLC_SUCCESS; /* Found a potential anchor */
 
     close( i_fd );
 
