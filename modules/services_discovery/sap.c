@@ -113,9 +113,6 @@
        "This enables a SAP caching mechanism. " \
        "This will result in lower SAP startup time, but you could end up " \
        "with items corresponding to legacy streams." )
-#define SAP_TIMESHIFT_TEXT N_("Allow timeshifting")
-#define SAP_TIMESHIFT_LONGTEXT N_( "This automatically enables timeshifting " \
-        "for streams discovered through SAP announcements." )
 
 /* Callbacks */
     static int  Open ( vlc_object_t * );
@@ -145,8 +142,7 @@ vlc_module_begin ()
     add_bool( "sap-cache", 0 , NULL,
                SAP_CACHE_TEXT,SAP_CACHE_LONGTEXT, true );
 #endif
-    add_bool( "sap-timeshift", 0 , NULL,
-              SAP_TIMESHIFT_TEXT,SAP_TIMESHIFT_LONGTEXT, true );
+    add_obsolete_bool( "sap-timeshift" ) /* Redumdant since 1.0.0 */
 
     set_capability( "services_discovery", 0 )
     set_callbacks( Open, Close )
@@ -246,7 +242,6 @@ struct services_discovery_sys_t
     /* Modes */
     bool  b_strict;
     bool  b_parse;
-    bool  b_timeshift;
 
     int i_timeout;
 };
@@ -317,9 +312,6 @@ static int Open( vlc_object_t *p_this )
         CacheLoad( p_sd );
     }
 #endif
-
-    /* Cache sap_timeshift value */
-    p_sys->b_timeshift = var_CreateGetInteger( p_sd, "sap-timeshift" );
 
     p_sys->i_announces = 0;
     p_sys->pp_announces = NULL;
@@ -882,9 +874,6 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         free( p_sap );
         return NULL;
     }
-
-    if( p_sys->b_timeshift )
-        input_item_AddOption( p_input, ":access-filter=timeshift" );
 
     if( p_sdp->rtcp_port )
     {
