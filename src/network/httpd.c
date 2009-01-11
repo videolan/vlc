@@ -227,6 +227,7 @@ static const struct
     { ".moov",  "video/quicktime" },
     { ".ogg",   "application/ogg" },
     { ".ogm",   "application/ogg" },
+    { ".ogv",   "application/ogg" },
     { ".wav",   "audio/wav" },
     { ".wma",   "audio/x-ms-wma" },
     { ".wmv",   "video/x-ms-wmv" },
