@@ -4,7 +4,7 @@
  */
 /*****************************************************************************
  * Copyright (C) 2001-2005 the VideoLAN team
- * Copyright © 2007-2008 Rémi Denis-Courmont
+ * Copyright © 2007-2009 Rémi Denis-Courmont
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,6 +41,11 @@
 #define RTP_CACHING_TEXT N_("RTP de-jitter buffer length (msec)")
 #define RTP_CACHING_LONGTEXT N_( \
     "How long to wait for late RTP packets (and delay the performance)." )
+
+#define RTCP_PORT_TEXT N_("RTCP (local) port")
+#define RTCP_PORT_LONGTEXT N_( \
+    "RTCP packets will be received on this transport protocol port. " \
+    "If zero, multiplexed RTP/RTCP is used.")
 
 #define SRTP_KEY_TEXT N_("SRTP key (hexadecimal)")
 #define SRTP_KEY_LONGTEXT N_( \
@@ -86,6 +91,10 @@ vlc_module_begin ()
     add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
                  RTP_CACHING_LONGTEXT, true)
         change_integer_range (0, 65535)
+    add_integer ("rtcp-port", 0, NULL, RTCP_PORT_TEXT,
+                 RTCP_PORT_LONGTEXT, false)
+        change_integer_range (0, 65535)
+        change_safe ()
     add_string ("srtp-key", "", NULL,
                 SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false)
     add_string ("srtp-salt", "", NULL,
@@ -172,6 +181,8 @@ static int Open (vlc_object_t *obj)
     if (dport == 0)
         dport = 5004; /* avt-profile-1 port */
 
+    int rtcp_dport = var_CreateGetInteger (obj, "rtcp-port");
+
     /* Try to connect */
     int fd = -1, rtcp_fd = -1;
 
@@ -179,15 +190,13 @@ static int Open (vlc_object_t *obj)
     {
         case IPPROTO_UDP:
         case IPPROTO_UDPLITE:
-            if ((dport & 1) != 0 || (sport & 1) != 0)
-                msg_Err (obj, "Using odd port number is higly discouraged");
-
             fd = net_OpenDgram (obj, dhost, dport,
                                 shost, sport, AF_UNSPEC, tp);
             if (fd == -1)
                 break;
-            rtcp_fd = net_OpenDgram (obj, dhost, dport + 1, shost,
-                                     sport ? (sport + 1) : 0, AF_UNSPEC, tp);
+            if (rtcp_dport > 0) /* XXX: source port is unknown */
+                rtcp_fd = net_OpenDgram (obj, dhost, rtcp_dport, shost, 0,
+                                         AF_UNSPEC, tp);
             break;
 
          case IPPROTO_DCCP:
