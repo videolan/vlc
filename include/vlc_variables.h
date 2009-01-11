@@ -61,6 +61,8 @@
 #define VLC_VAR_ISCOMMAND 0x2000
 
 /** Creation flag */
+/* If the variable is not found on the current module
+   search all parents and finally module config until found */
 #define VLC_VAR_DOINHERIT 0x8000
 /**@}*/
 

@@ -1384,7 +1384,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
     int i_var;
     variable_t *p_var;
 
-    if( p_this->p_parent || ( p_this->p_libvlc && p_this != p_this->p_libvlc ) )
+    if( p_this->p_parent || ( p_this->p_libvlc && p_this != (vlc_object_t*) p_this->p_libvlc ) )
     {
         vlc_object_internals_t *p_priv;
 
@@ -1406,6 +1406,8 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             /* Duplicate value if needed */
             p_var->ops->pf_dup( p_val );
 
+            msg_Dbg( p_this, "Inherited value for var %s from object %s", psz_name ? : "(null)",
+                p_this->psz_object_name ? : "(Unknown)" ) ;
             return VLC_SUCCESS;
         }
         else if ( p_this->p_parent ) /* We are still not there */
@@ -1460,9 +1462,11 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             break;
         }
         default:
+            msg_Warn( p_this, "Could not inherit value for var %s from config. Invalid Type", psz_name ) ;
             return VLC_ENOOBJ;
             break;
     }
+    msg_Dbg( p_this, "Inherited value for var %s from config", psz_name ) ;
     return VLC_SUCCESS;
 }
 
