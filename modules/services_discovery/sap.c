@@ -1020,7 +1020,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         return VLC_EGENERIC;
     }
 
-    if (FindAttribute (p_sdp, 0, "rtcp-mux"))
+    if (!strcmp (vlc_proto, "udp") || FindAttribute (p_sdp, 0, "rtcp-mux"))
         p_sdp->rtcp_port = 0;
     else
     {
