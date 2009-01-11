@@ -2299,7 +2299,7 @@ yasm: yasm-$(YASM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .yasm: yasm
-	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $< && $(HOSTCC) ./configure --prefix=$(PREFIX) --host=$(HOST) && make && make install)
 	touch $@
 
 CLEAN_FILE += .yasm
