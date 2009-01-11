@@ -103,7 +103,8 @@ demux_t *__demux_New( vlc_object_t *p_obj,
             { "mp4",  "mp4" }, { "m4a",  "mp4" }, { "mov",  "mp4" }, { "moov", "mp4" },
             { "mod",  "mod" }, { "it",  "mod" }, { "s3m",  "mod" }, { "xm",   "mod" },
             { "nsv",  "nsv" },
-            { "ogg",  "ogg" }, { "ogm",  "ogg" }, { "ogv", "ogg" },
+            { "ogg",  "ogg" }, { "ogm",  "ogg" }, /* legacy Ogg */
+            { "oga",  "ogg" }, { "spx",  "ogg" }, { "ogv", "ogg" }, /*RFC5334*/
             { "pva",  "pva" },
             { "rm",   "rm" },
             { "m4v",  "m4v" },
