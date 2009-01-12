@@ -182,6 +182,8 @@ void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
     int endPos = messages->textCursor().selectionEnd();
 
     messages->moveCursor( QTextCursor::End );
+    if( startPos == endPos && messages->textCursor().selectionEnd() == endPos )
+        endPos = 0;
     messages->setFontItalic( true );
     messages->setTextColor( "darkBlue" );
     messages->insertPlainText( qfu( item->psz_module ) );
@@ -215,11 +217,18 @@ void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
     messages->ensureCursorVisible();
 
     // Restoring saved cursor selection
-    QTextCursor cur = messages->textCursor();
-    cur.movePosition( QTextCursor::Start );
-    cur.movePosition( QTextCursor::NextCharacter, QTextCursor::MoveAnchor, startPos );
-    cur.movePosition( QTextCursor::NextCharacter, QTextCursor::KeepAnchor, endPos - startPos );
-    messages->setTextCursor( cur );
+    // If the cursor was at this end, put it at the end,
+    // so we don't need to scroll down.
+    if( endPos == 0 )
+        messages->moveCursor( QTextCursor::End );
+    else
+    {
+        QTextCursor cur = messages->textCursor();
+        cur.movePosition( QTextCursor::Start );
+        cur.movePosition( QTextCursor::NextCharacter, QTextCursor::MoveAnchor, startPos );
+        cur.movePosition( QTextCursor::NextCharacter, QTextCursor::KeepAnchor, endPos - startPos );
+        messages->setTextCursor( cur );
+    }
 }
 void MessagesDialog::customEvent( QEvent *event )
 {
