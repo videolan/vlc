@@ -519,9 +519,6 @@ static void *Run( vlc_object_t *p_this )
     {
         /* If we failed, wait before we are killed, and exit */
         WaitDie( p_input );
-
-        /* Tell we're dead */
-        input_SendEventDead( p_input );
         goto exit;
     }
 
@@ -535,6 +532,8 @@ static void *Run( vlc_object_t *p_this )
     End( p_input );
 
 exit:
+    /* Tell we're dead */
+    input_SendEventDead( p_input );
     vlc_restorecancel( canc );
     return NULL;
 }
@@ -1385,9 +1384,6 @@ static void End( input_thread_t * p_input )
     input_ressource_RequestSout( p_input->p->p_ressource,
                                  p_input->p->p_sout, NULL );
     input_ressource_SetInput( p_input->p->p_ressource, NULL );
-
-    /* Tell we're dead */
-    input_SendEventDead( p_input );
 }
 
 /*****************************************************************************
