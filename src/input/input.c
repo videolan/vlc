@@ -515,15 +515,11 @@ static void *Run( vlc_object_t *p_this )
     const int canc = vlc_savecancel();
 
     if( Init( p_input ) )
-    {
-        input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
         goto exit;
-    }
 
     MainLoop( p_input );
 
     /* Clean up */
-    input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
     End( p_input );
 
 exit:
