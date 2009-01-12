@@ -106,7 +106,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     line++;
 
     /* ART_URL */
-    art_cover = new CoverArtLabel( this, VLC_OBJECT( p_intf ) );
+    art_cover = new CoverArtLabel( this, p_intf );
     metaLayout->addWidget( art_cover, line, 8, 4, 2, Qt::AlignRight );
 
 /* Settings is unused */
@@ -226,8 +226,6 @@ void MetaPanel::update( input_item_t *p_item )
 #undef UPDATE_META_INT
 #undef UPDATE_META
 
-    /* Update Art */
-    art_cover->update( p_item );
 }
 
 /**
@@ -321,7 +319,6 @@ void MetaPanel::clear()
     language_text->clear();
     nowplaying_text->clear();
     publisher_text->clear();
-    art_cover->update( NULL );
 
     setEditMode( false );
     emit uriSet( "" );

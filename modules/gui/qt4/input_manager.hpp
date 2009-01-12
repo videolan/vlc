@@ -97,6 +97,7 @@ public:
 
     bool hasAudio();
     bool hasVideo() { return hasInput() && b_video; }
+    void requestArtUpdate();
 
     QString getName() { return oldName; }
 
@@ -169,7 +170,7 @@ signals:
     void statisticsUpdated( input_item_t* );
     void infoChanged( input_item_t* );
     void metaChanged( input_item_t* );
-    void artChanged( input_item_t* );
+    void artChanged( QString );
     /// Play/pause status
     void statusChanged( int );
     /// Teletext

@@ -70,7 +70,7 @@ class ArtLabel : public CoverArtLabel
     Q_OBJECT
 public:
     ArtLabel( QWidget *parent, intf_thread_t *intf )
-            : CoverArtLabel( parent, VLC_OBJECT( intf ) ) {};
+            : CoverArtLabel( parent, intf ) {};
     void mouseDoubleClickEvent( QMouseEvent *event )
     {
         THEDP->mediaInfoDialog();

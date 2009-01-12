@@ -105,7 +105,7 @@ private:
 
 public slots:
     void toggle(){ TOGGLEV( this ); }
-    void updateArt( input_item_t* );
+    void updateArt( QString );
 };
 
 #if 0
@@ -193,30 +193,22 @@ class CoverArtLabel : public QLabel
 {
     Q_OBJECT
 public:
-    CoverArtLabel( QWidget *parent,
-                   vlc_object_t *p_this,
-                   input_item_t *p_input = NULL );
-    virtual ~CoverArtLabel();
+    CoverArtLabel( QWidget *parent, intf_thread_t * );
+    virtual ~CoverArtLabel(){};
 
 private:
-    input_item_t *p_input;
-    vlc_object_t *p_this;
-
-    QString prevArt;
+    intf_thread_t *p_intf;
 
 public slots:
     void requestUpdate() { emit updateRequested(); };
-    void update( input_item_t* p_item )
+    void update( )
     {
-        if( p_input ) vlc_gc_decref( p_input );
-        if( ( p_input = p_item ) )
-            vlc_gc_incref( p_input );
         requestUpdate();
     }
 
 private slots:
     void doUpdate();
-    void downloadCover();
+    void doUpdate(QString);
 
 signals:
     void updateRequested();

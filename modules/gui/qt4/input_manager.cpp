@@ -199,7 +199,7 @@ void InputManager::customEvent( QEvent *event )
     case ItemChanged_Type:
         UpdateStatus();
         // UpdateName();
-        // UpdateArt();
+        UpdateArt();
         break;
     case ItemStateChanged_Type:
         // TODO: Fusion with above state
@@ -533,10 +533,31 @@ void InputManager::UpdateCaching()
     }
 }
 
-inline void InputManager::UpdateArt()
+void InputManager::requestArtUpdate()
 {
+    if( hasInput() )
+    {
+        playlist_t *p_playlist = pl_Hold( p_intf );
+        playlist_AskForArtEnqueue( p_playlist, input_GetItem( p_input ), pl_Unlocked );
+        pl_Release( p_intf );
+    }
+}
+
+void InputManager::UpdateArt()
+{
+    QString url;
+
+    if( hasInput() )
+    {
+        char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
+        url = psz_art;
+        free( psz_art );
+    }
+    url = url.replace( "file://", QString("" ) );
+    /* Taglib seems to define a attachment://, It won't work yet */
+    url = url.replace( "attachment://", QString("" ) );
     /* Update Art meta */
-    emit artChanged( input_GetItem( p_input ) );
+    emit artChanged( url );
 }
 
 inline void InputManager::UpdateStats()
