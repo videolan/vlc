@@ -55,7 +55,6 @@ struct intf_thread_t
 #endif
 
     /* Specific interfaces */
-    intf_console_t *    p_console;                               /** console */
     intf_sys_t *        p_sys;                          /** system interface */
     char *              psz_intf;                    /** intf name specified */
 
