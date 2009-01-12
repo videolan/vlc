@@ -476,10 +476,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         "video filter" : "video output", psz_name, p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain );
     free( psz_name );
 
+    vlc_object_set_destructor( p_vout, vout_Destructor );
+
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
-        vlc_object_set_destructor( p_vout, vout_Destructor );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -521,7 +522,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     {
         module_unneed( p_vout, p_vout->p_module );
         p_vout->p_module = NULL;
-        vlc_object_set_destructor( p_vout, vout_Destructor );
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -534,8 +534,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         vlc_cond_wait( &p_vout->p->change_wait, &p_vout->change_lock );
     }
     vlc_mutex_unlock( &p_vout->change_lock );
-
-    vlc_object_set_destructor( p_vout, vout_Destructor );
 
     if( p_vout->b_error )
     {
