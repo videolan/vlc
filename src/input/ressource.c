@@ -63,13 +63,16 @@ struct input_ressource_t
 /* */
 static void DestroySout( input_ressource_t *p_ressource )
 {
+#ifdef ENABLE_SOUT
     if( p_ressource->p_sout )
         sout_DeleteInstance( p_ressource->p_sout );
+#endif
     p_ressource->p_sout = NULL;
 }
 static sout_instance_t *RequestSout( input_ressource_t *p_ressource,
                                      sout_instance_t *p_sout, const char *psz_sout )
 {
+#ifdef ENABLE_SOUT
     if( !p_sout && !psz_sout )
     {
         if( p_ressource->p_sout )
@@ -116,6 +119,9 @@ static sout_instance_t *RequestSout( input_ressource_t *p_ressource,
 
         return NULL;
     }
+#else
+    return NULL;
+#endif
 }
 
 /* */
