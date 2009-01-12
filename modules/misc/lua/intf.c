@@ -50,13 +50,7 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-struct intf_sys_t
-{
-    char *psz_filename;
-    lua_State *L;
-};
-
-static void Run( intf_thread_t *p_intf );
+static void *Run( void * );
 
 /*****************************************************************************
  *
@@ -264,32 +258,54 @@ int Open_LuaIntf( vlc_object_t *p_this )
 
     p_sys->L = L;
 
-    p_intf->pf_run = Run;
-    p_intf->psz_header = strdup( psz_name ); /* Do I need to clean that up myself in Close_LuaIntf? */
+    p_intf->psz_header = psz_name;
+    /* ^^ Do I need to clean that up myself in Close_LuaIntf? */
 
-    free( psz_name );
+    vlc_mutex_init( &p_sys->lock );
+    vlc_cond_init( &p_sys->wait );
+    p_sys->exiting = false;
+
+    if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    {
+        p_sys->exiting = true;
+        Close_LuaIntf( p_this );
+        return VLC_ENOMEM;
+    }
+
     return VLC_SUCCESS;
 }
 
 void Close_LuaIntf( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    lua_close( p_intf->p_sys->L );
-    free( p_intf->p_sys );
+    if( !p_sys->exiting ) /* <- Read-only here and in thread: no locking */
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        p_sys->exiting = true;
+        vlc_cond_signal( &p_sys->wait );
+        vlc_mutex_unlock( &p_sys->lock );
+        vlc_join( p_sys->thread, NULL );
+    }
+    vlc_cond_destroy( &p_sys->wait );
+    vlc_mutex_destroy( &p_sys->lock );
+
+    lua_close( p_sys->L );
+    free( p_sys );
 }
 
-static void Run( intf_thread_t *p_intf )
+static void *Run( void *data )
 {
-    int canc = vlc_savecancel( );
-    lua_State *L = p_intf->p_sys->L;
+    intf_thread_t *p_intf = data;
+    intf_sys_t *p_sys = p_intf->p_sys;
+    lua_State *L = p_sys->L;
 
-    if( luaL_dofile( L, p_intf->p_sys->psz_filename ) )
+    if( luaL_dofile( L, p_sys->psz_filename ) )
     {
-        msg_Err( p_intf, "Error loading script %s: %s",
-                 p_intf->p_sys->psz_filename,
+        msg_Err( p_intf, "Error loading script %s: %s", p_sys->psz_filename,
                  lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
     }
-    vlc_restorecancel( canc );
+    return NULL;
 }

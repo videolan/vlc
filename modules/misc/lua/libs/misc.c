@@ -170,18 +170,14 @@ static int vlclua_datadir_list( lua_State *L )
  *****************************************************************************/
 static int vlclua_lock_and_wait( lua_State *L )
 {
-    vlc_object_t *p_this = vlclua_get_this( L );
-    int b_quit;
+    intf_thread_t *p_intf = (intf_thread_t *)vlclua_get_this( L );
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_object_lock( p_this );
-    b_quit = vlc_object_alive( p_this );
-    if( b_quit )
-    {
-        vlc_object_wait( p_this );
-        b_quit = vlc_object_alive( p_this );
-    }
-    vlc_object_unlock( p_this );
-    lua_pushboolean( L, b_quit );
+    vlc_mutex_lock( &p_sys->lock );
+    while( !p_sys->exiting )
+        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
+    vlc_mutex_unlock( &p_sys->lock );
+    lua_pushboolean( L, 1 );
     return 1;
 }
 
