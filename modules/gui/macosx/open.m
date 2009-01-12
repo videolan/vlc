@@ -405,6 +405,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
             [o_options addObject: [NSString stringWithString:
                                                 @"access-filter=timeshift"]];
         }
+        if( [[[o_tabview selectedTabViewItem] label] isEqualToString: _NS("Capture")] )
+        {
+            if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
+                [o_options addObject: [NSString stringWithFormat: @"screen-fps=%i", [o_screen_fps_fld intValue]]];
+        }
+
+        /* apply the options to our item(s) */
         [o_dic setObject: (NSArray *)[o_options copy] forKey: @"ITEM_OPTIONS"];
         if( b_autoplay )
             [o_playlist appendArray: [NSArray arrayWithObject: o_dic] atPos: -1 enqueue:NO];
@@ -864,7 +871,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
     {
         [self showCaptureView: o_screen_view];
-        [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%@", [o_screen_fps_fld stringValue]]];
+        [o_mrl setStringValue: @"screen://"];
     }
     else if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: @"iSight"] )
     {
@@ -882,7 +889,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 {
     [o_screen_fps_fld setIntValue: [o_screen_fps_stp intValue]];
     [o_panel makeFirstResponder: o_screen_fps_fld];
-    [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%@", [o_screen_fps_fld stringValue]]];
+    [o_mrl setStringValue: @"screen://"];
 }
 
 - (void)screenFPSfieldChanged:(NSNotification *)o_notification
@@ -890,7 +897,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_screen_fps_stp setIntValue: [o_screen_fps_fld intValue]];
     if( [[o_screen_fps_fld stringValue] isEqualToString: @""] )
         [o_screen_fps_fld setIntValue: 1];
-    [o_mrl setStringValue: [NSString stringWithFormat:@"screen:// :screen-fps=%i", [o_screen_fps_fld intValue]]];
+    [o_mrl setStringValue: @"screen://"];
 }
 
 - (IBAction)eyetvSwitchChannel:(id)sender
