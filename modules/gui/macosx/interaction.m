@@ -248,7 +248,7 @@
 - (void)sheetDidEnd:(NSWindow *)o_sheet returnCode:(int)i_return
     contextInfo:(void *)o_context
 {
-    vlc_object_lock( p_dialog->p_interaction );
+    vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
     if( i_return == NSAlertDefaultReturn )
     {
         p_dialog->i_return = DIALOG_OK_YES;
@@ -262,7 +262,7 @@
         p_dialog->i_return = DIALOG_CANCELLED;
     }
     p_dialog->i_status = ANSWERED_DIALOG;
-    vlc_object_unlock( p_dialog->p_interaction );
+    vlc_object_unlock( (vlc_object_t *)(p_dialog->p_interaction) );
 }
 
 -(void)updateDialog
@@ -348,10 +348,10 @@
 - (IBAction)cancelAndClose:(id)sender
 {
     /* tell the core that the dialog was cancelled in a yes/no-style dialogue */
-    vlc_object_lock( p_dialog->p_interaction );
+    vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
     p_dialog->i_return = DIALOG_CANCELLED;
     p_dialog->i_status = ANSWERED_DIALOG;
-    vlc_object_unlock( p_dialog->p_interaction );
+    vlc_object_unlock( (vlc_object_t *)(p_dialog->p_interaction) );
     msg_Dbg( p_intf, "dialog cancelled" );
 }
 
@@ -359,16 +359,16 @@
 {
     /* tell core that the user wishes to cancel the dialogue
      * Use this function if cancelling is optionally like in the progress-dialogue */
-    vlc_object_lock( p_dialog->p_interaction );
+    vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
     p_dialog->b_cancelled = true;
-    vlc_object_unlock( p_dialog->p_interaction );
+    vlc_object_unlock( (vlc_object_t *)(p_dialog->p_interaction) );
     msg_Dbg( p_intf, "cancelling dialog, will close it later on" );
 }
 
 - (IBAction)okayAndClose:(id)sender
 {
     msg_Dbg( p_intf, "running okayAndClose" );
-    vlc_object_lock( p_dialog->p_interaction );
+    vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
     if( p_dialog->i_flags == DIALOG_LOGIN_PW_OK_CANCEL )
     {
         p_dialog->psz_returned[0] = strdup( [[o_auth_login_fld stringValue] UTF8String] );
@@ -378,7 +378,7 @@
         p_dialog->psz_returned[0] = strdup( [[o_input_fld stringValue] UTF8String] );
     p_dialog->i_return = DIALOG_OK_YES;
     p_dialog->i_status = ANSWERED_DIALOG;
-    vlc_object_unlock( p_dialog->p_interaction );
+    vlc_object_unlock( (vlc_object_t *)(p_dialog->p_interaction) );
     msg_Dbg( p_intf, "dialog acknowledged" );
 }
 

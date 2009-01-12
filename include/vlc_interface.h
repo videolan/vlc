@@ -273,20 +273,6 @@ enum
     INTERACT_DESTROY
 };
 
-/**
- * This structure contains the active interaction dialogs, and is
- * used by the manager
- */
-struct interaction_t
-{
-    VLC_COMMON_MEMBERS
-
-    int                         i_dialogs;      ///< Number of dialogs
-    interaction_dialog_t      **pp_dialogs;     ///< Dialogs
-    intf_thread_t              *p_intf;         ///< Interface to use
-    int                         i_last_id;      ///< Last attributed ID
-};
-
 /***************************************************************************
  * Exported symbols
  ***************************************************************************/

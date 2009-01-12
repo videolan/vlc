@@ -232,7 +232,7 @@ void InteractionDialog::otherB()
 
 void InteractionDialog::Finish( int i_ret )
 {
-    vlc_object_lock( p_dialog->p_interaction );
+    vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
 
     if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
@@ -252,6 +252,6 @@ void InteractionDialog::Finish( int i_ret )
         p_dialog->b_cancelled = true;
 
     hide();
-    vlc_object_unlock( p_dialog->p_interaction );
+    vlc_object_unlock( (vlc_object_t *)(p_dialog->p_interaction) );
 }
 
