@@ -68,7 +68,6 @@ static  void *RunAndDestroy  ( vlc_object_t *p_this );
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, input_ressource_t * );
 static  int             Init    ( input_thread_t *p_input );
-static void             WaitDie   ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
 
@@ -517,18 +516,14 @@ static void *Run( vlc_object_t *p_this )
 
     if( Init( p_input ) )
     {
-        /* If we failed, wait before we are killed, and exit */
-        WaitDie( p_input );
+        input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
         goto exit;
     }
 
     MainLoop( p_input );
 
-    /* Wait until we are asked to die */
-    if( !p_input->b_die )
-        WaitDie( p_input );
-
     /* Clean up */
+    input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
     End( p_input );
 
 exit:
@@ -1281,22 +1276,6 @@ error:
     p_input->p->p_sout = NULL;
 
     return VLC_EGENERIC;
-}
-
-/*****************************************************************************
- * WaitDie: Wait until we are asked to die.
- *****************************************************************************
- * This function is called when an error occurred during thread main's loop.
- *****************************************************************************/
-static void WaitDie( input_thread_t *p_input )
-{
-    input_ChangeState( p_input, p_input->b_error ? ERROR_S : END_S );
-
-    /* Wait a die order */
-    vlc_object_lock( p_input );
-    while( vlc_object_alive( p_input ) )
-        vlc_object_wait( p_input );
-    vlc_object_unlock( p_input );
 }
 
 /*****************************************************************************
