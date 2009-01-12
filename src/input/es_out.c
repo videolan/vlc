@@ -2399,7 +2399,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             if( f_position < 0 )
                 f_position = 0;
 
-            input_SendEventTimes( p_sys->p_input, f_position, i_time, i_length );
+            if( !p_sys->b_buffering )
+                input_SendEventTimes( p_sys->p_input, f_position, i_time, i_length );
             return VLC_SUCCESS;
         }
 
