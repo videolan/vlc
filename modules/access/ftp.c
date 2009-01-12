@@ -39,7 +39,7 @@
 #include <vlc_interface.h>
 
 #include <vlc_network.h>
-#include "vlc_url.h"
+#include <vlc_url.h>
 #include <vlc_sout.h>
 
 #ifndef IPPORT_FTP
@@ -75,23 +75,23 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true );
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
-                false );
+                false )
     add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
-                PASS_LONGTEXT, false );
+                PASS_LONGTEXT, false )
     add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
-                ACCOUNT_LONGTEXT, false );
+                ACCOUNT_LONGTEXT, false )
     add_shortcut( "ftp" )
     set_callbacks( InOpen, InClose )
 
     add_submodule ()
-    set_shortname( "FTP" )
-    set_description( N_("FTP upload output") )
-    set_capability( "sout access", 0 )
-    set_category( CAT_SOUT )
-    set_subcategory( SUBCAT_SOUT_ACO )
-    set_callbacks( OutOpen, OutClose )
+        set_shortname( "FTP" )
+        set_description( N_("FTP upload output") )
+        set_capability( "sout access", 0 )
+        set_category( CAT_SOUT )
+        set_subcategory( SUBCAT_SOUT_ACO )
+        set_callbacks( OutOpen, OutClose )
 vlc_module_end ()
 
 /*****************************************************************************
