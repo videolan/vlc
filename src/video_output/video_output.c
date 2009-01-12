@@ -66,7 +66,7 @@
  * Local prototypes
  *****************************************************************************/
 static int      InitThread        ( vout_thread_t * );
-static void*    RunThread         ( vlc_object_t *  );
+static void*    RunThread         ( void *  );
 static void     ErrorThread       ( vout_thread_t * );
 static void     CleanThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
@@ -515,8 +515,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
     var_AddCallback( p_vout, "vout-filter", FilterCallback, NULL );
 
-    if( vlc_thread_create( p_vout, "video output", RunThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, true ) )
+    vlc_cond_init( &p_vout->p->change_wait );
+    if( vlc_clone( &p_vout->p->thread, RunThread, p_vout,
+                   VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         module_unneed( p_vout, p_vout->p_module );
         p_vout->p_module = NULL;
@@ -524,6 +525,15 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         vlc_object_release( p_vout );
         return NULL;
     }
+
+    vlc_mutex_lock( &p_vout->change_lock );
+    while( !p_vout->p->b_ready )
+    {   /* We are (ab)using the same condition in opposite directions for
+         * b_ready and b_done. This works because of the strict ordering. */
+        assert( !p_vout->p->b_done );
+        vlc_cond_wait( &p_vout->p->change_wait, &p_vout->change_lock );
+    }
+    vlc_mutex_unlock( &p_vout->change_lock );
 
     vlc_object_set_destructor( p_vout, vout_Destructor );
 
@@ -543,14 +553,17 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
  * You HAVE to call it on vout created by vout_Create before vlc_object_release.
  * You should NEVER call it on vout not obtained through vout_Create
  * (like with vout_Request or vlc_object_find.)
- * You can use vout_CloseAndRelease() as a convenient method.
+ * You can use vout_CloseAndRelease() as a convenience method.
  *****************************************************************************/
 void vout_Close( vout_thread_t *p_vout )
 {
     assert( p_vout );
 
-    vlc_object_kill( p_vout );
-    vlc_thread_join( p_vout );
+    vlc_mutex_lock( &p_vout->change_lock );
+    p_vout->p->b_done = true;
+    vlc_cond_signal( &p_vout->p->change_wait );
+    vlc_mutex_unlock( &p_vout->change_lock );
+    vlc_join( p_vout->p->thread, NULL );
     module_unneed( p_vout, p_vout->p_module );
     p_vout->p_module = NULL;
 }
@@ -567,6 +580,7 @@ static void vout_Destructor( vlc_object_t * p_this )
     spu_Destroy( p_vout->p_spu );
 
     /* Destroy the locks */
+    vlc_cond_destroy( &p_vout->p->change_wait );
     vlc_cond_destroy( &p_vout->p->picture_wait );
     vlc_mutex_destroy( &p_vout->picture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
@@ -599,7 +613,7 @@ static void vout_Destructor( vlc_object_t * p_this )
 /* */
 void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
 {
-    vlc_object_lock( p_vout );
+    vlc_mutex_lock( &p_vout->change_lock );
 
     assert( !p_vout->p->b_paused || !b_paused );
 
@@ -630,11 +644,12 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
     p_vout->p->b_paused = b_paused;
     p_vout->p->i_pause_date = i_date;
 
-    vlc_object_unlock( p_vout );
+    vlc_mutex_unlock( &p_vout->change_lock );
 }
+
 void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost )
 {
-    vlc_object_lock( p_vout );
+    vlc_mutex_lock( &p_vout->change_lock );
 
     *pi_displayed = p_vout->p->i_picture_displayed;
     *pi_lost = p_vout->p->i_picture_lost;
@@ -642,8 +657,9 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_l
     p_vout->p->i_picture_displayed = 0;
     p_vout->p->i_picture_lost = 0;
 
-    vlc_object_unlock( p_vout );
+    vlc_mutex_unlock( &p_vout->change_lock );
 }
+
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -664,6 +680,7 @@ void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
     vlc_cond_signal( &p_vout->p->picture_wait );
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
+
 void vout_FixLeaks( vout_thread_t *p_vout, bool b_forced )
 {
     int i_pic, i_ready_pic;
@@ -748,6 +765,7 @@ void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration )
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
+
 void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title )
 {
     assert( psz_title );
@@ -755,10 +773,10 @@ void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title )
     if( !config_GetInt( p_vout, "osd" ) )
         return;
 
-    vlc_object_lock( p_vout );
+    vlc_mutex_lock( &p_vout->change_lock );
     free( p_vout->p->psz_title );
     p_vout->p->psz_title = strdup( psz_title );
-    vlc_object_unlock( p_vout );
+    vlc_mutex_unlock( &p_vout->change_lock );
 }
 
 /*****************************************************************************
@@ -963,14 +981,12 @@ static int InitThread( vout_thread_t *p_vout )
  * terminated. It handles the pictures arriving in the video heap and the
  * display device events.
  *****************************************************************************/
-static void* RunThread( vlc_object_t *p_this )
+static void* RunThread( void *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_thread_t *p_vout = p_this;
     int             i_idle_loops = 0;  /* loops without displaying a picture */
 
     bool            b_drop_late;
-
-    int canc = vlc_savecancel();
 
     /*
      * Initialize thread
@@ -981,23 +997,21 @@ static void* RunThread( vlc_object_t *p_this )
     b_drop_late = var_CreateGetBool( p_vout, "drop-late-frames" );
 
     /* signal the creation of the vout */
-    vlc_thread_ready( p_vout );
+    p_vout->p->b_ready = true;
+    vlc_cond_signal( &p_vout->p->change_wait );
 
     if( p_vout->b_error )
     {
         EndThread( p_vout );
         vlc_mutex_unlock( &p_vout->change_lock );
-        vlc_restorecancel( canc );
         return NULL;
     }
-
-    vlc_object_lock( p_vout );
 
     /*
      * Main loop - it is not executed if an error occurred during
      * initialization
      */
-    while( vlc_object_alive( p_vout ) && !p_vout->b_error )
+    while( !p_vout->p->b_done && !p_vout->b_error )
     {
         /* Initialize loop variables */
         const mtime_t current_date = mdate();
@@ -1189,8 +1203,6 @@ static void* RunThread( vlc_object_t *p_this )
         /* Give back change lock */
         vlc_mutex_unlock( &p_vout->change_lock );
 
-        vlc_object_unlock( p_vout );
-
         /* Sleep a while or until a given date */
         if( display_date != 0 )
         {
@@ -1211,9 +1223,7 @@ static void* RunThread( vlc_object_t *p_this )
 
         /* On awakening, take back lock and send immediately picture
          * to display. */
-        vlc_object_lock( p_vout );
-        /* Note: vlc_object_alive() could be false here, and we
-         * could be dead */
+        /* Note: p_vout->p->b_done could be true here and now */
         vlc_mutex_lock( &p_vout->change_lock );
 
         /*
@@ -1364,8 +1374,6 @@ static void* RunThread( vlc_object_t *p_this )
     EndThread( p_vout );
     vlc_mutex_unlock( &p_vout->change_lock );
 
-    vlc_object_unlock( p_vout );
-    vlc_restorecancel( canc );
     return NULL;
 }
 
@@ -1378,9 +1386,9 @@ static void* RunThread( vlc_object_t *p_this )
  *****************************************************************************/
 static void ErrorThread( vout_thread_t *p_vout )
 {
-    /* Wait until a `die' order */
-    while( vlc_object_alive( p_vout ) )
-        vlc_object_wait( p_vout );
+    /* Wait until a `close' order */
+    while( !p_vout->p->b_done )
+        vlc_cond_wait( &p_vout->p->change_wait, &p_vout->change_lock );
 }
 
 /*****************************************************************************
@@ -1712,7 +1720,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     const mtime_t i_start = mdate();
     const mtime_t i_stop = i_start + INT64_C(1000) * p_vout->p->i_title_timeout;
 
-    vlc_object_assert_locked( p_vout );
+    vlc_assert_locked( &p_vout->change_lock );
 
     vout_ShowTextAbsolute( p_vout, DEFAULT_CHAN,
                            p_vout->p->psz_title, NULL,

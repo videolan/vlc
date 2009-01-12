@@ -38,6 +38,12 @@
 /* */
 struct vout_thread_sys_t
 {
+    /* Thread & synchronization */
+    vlc_thread_t    thread;
+    vlc_cond_t      change_wait;
+    bool            b_ready;
+    bool            b_done;
+
     /* */
     bool            b_picture_displayed;
     bool            b_picture_empty;
