@@ -132,10 +132,12 @@ static inline void bs_skip( bs_t *s, int i_count )
 {
     s->i_left -= i_count;
 
-    while( s->i_left <= 0 )
+    if( s->i_left <= 0 )
     {
-        s->p++;
-        s->i_left += 8;
+        const int i_bytes = ( -s->i_left + 8 ) / 8;
+
+        s->p += i_bytes;
+        s->i_left += 8 * i_bytes;
     }
 }
 
