@@ -49,7 +49,6 @@
  *****************************************************************************/
 static int vlclua_sd_get_services_names( lua_State *L )
 {
-    vlc_object_t *p_this = vlclua_get_this( L );
     char **ppsz_longnames;
     char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
     if( !ppsz_names )
