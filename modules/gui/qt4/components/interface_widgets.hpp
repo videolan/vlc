@@ -194,7 +194,7 @@ class CoverArtLabel : public QLabel
     Q_OBJECT
 public:
     CoverArtLabel( QWidget *parent, intf_thread_t * );
-    virtual ~CoverArtLabel(){};
+    virtual ~CoverArtLabel();
 
 private:
     intf_thread_t *p_intf;

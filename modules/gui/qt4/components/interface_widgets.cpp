@@ -413,8 +413,19 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     setMaximumHeight( 128 );
     setMaximumWidth( 128 );
     setScaledContents( true );
+    QList< QAction* > artActions = actions();
+    QAction *action = new QAction( qtr( "Download cover art" ), this );
+    addAction( action );
+    CONNECT( action, triggered(), this, doUpdate() );
 
     doUpdate();
+}
+
+CoverArtLabel::~CoverArtLabel()
+{
+    QList< QAction* > artActions = actions();
+    foreach( QAction *act, artActions )
+        removeAction( act );
 }
 
 void CoverArtLabel::doUpdate( QString url )
