@@ -524,10 +524,12 @@ void InputManager::UpdateAout()
 }
 void InputManager::UpdateCaching()
 {
-    float f_newCache = var_GetFloat( p_input, "cache" );
+    if(!hasInput()) return;
+
+    float f_newCache = var_GetFloat ( p_input, "cache" );
     if( f_newCache != f_cache )
     {
-        f_newCache = f_cache;
+        f_cache = f_newCache;
         /* Update rate */
         emit cachingChanged( f_cache );
     }

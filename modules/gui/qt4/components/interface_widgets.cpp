@@ -483,7 +483,10 @@ void TimeLabel::toggleTimeDisplay()
 
 void TimeLabel::setCaching( float f_cache )
 {
-    setText( "Buffering" );
+    QString amount;
+    amount.setNum( (int)(100 * f_cache) );
+    msg_Dbg( p_intf, "New caching: %d", (int)(100*f_cache));
+    setText( "Buffering " + amount + "%" );
 }
 
 
