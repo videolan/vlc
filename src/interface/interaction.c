@@ -46,9 +46,27 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+/**
+ * This structure contains the active interaction dialogs, and is
+ * used by the manager
+ */
+struct interaction_t
+{
+    VLC_COMMON_MEMBERS
+
+    vlc_thread_t thread;
+    vlc_cond_t wait;
+
+    int                         i_dialogs;      ///< Number of dialogs
+    interaction_dialog_t      **pp_dialogs;     ///< Dialogs
+    intf_thread_t              *p_intf;         ///< Interface to use
+    int                         i_last_id;      ///< Last attributed ID
+};
+
 static interaction_t *          InteractionGet( vlc_object_t * );
 static intf_thread_t *          SearchInterface( interaction_t * );
-static void*                    InteractionLoop( vlc_object_t * );
+static void*                    InteractionLoop( void * );
 static void                     InteractionManage( interaction_t * );
 
 static interaction_dialog_t    *DialogGetById( interaction_t* , int );
@@ -219,7 +237,7 @@ void __intf_ProgressUpdate( vlc_object_t *p_this, int i_id,
 
     p_dialog->i_status = UPDATED_DIALOG;
 
-    vlc_object_signal_unlocked( p_interaction );
+    vlc_cond_signal( &p_interaction->wait );
     vlc_object_unlock( p_interaction );
     vlc_object_release( p_interaction );
 }
@@ -345,7 +363,7 @@ void __intf_UserHide( vlc_object_t *p_this, int i_id )
     if( p_dialog )
     {
         p_dialog->i_status = ANSWERED_DIALOG;
-        vlc_object_signal_unlocked( p_interaction );
+        vlc_cond_signal( &p_interaction->wait );
     }
 
     vlc_object_unlock( p_interaction );
@@ -377,9 +395,10 @@ interaction_t * interaction_Init( libvlc_int_t *p_libvlc )
     p_interaction->p_intf = NULL;
     p_interaction->i_last_id = 0;
 
-    if( vlc_thread_create( p_interaction, "Interaction control",
-                           InteractionLoop, VLC_THREAD_PRIORITY_LOW,
-                           false ) )
+    vlc_cond_init( &p_interaction->wait );
+
+    if( vlc_clone( &p_interaction->thread, InteractionLoop, p_interaction,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_interaction, "Interaction control thread creation failed, "
                  "interaction will not be displayed" );
@@ -396,8 +415,17 @@ void interaction_Destroy( interaction_t *p_interaction )
     if( !p_interaction )
         return;
 
-    vlc_object_kill( p_interaction );
-    vlc_thread_join( p_interaction );
+    vlc_cancel( p_interaction->thread );
+    vlc_join( p_interaction->thread, NULL );
+    vlc_cond_destroy( &p_interaction->wait );
+
+    /* Remove all dialogs - Interfaces must be able to clean up their data */
+    for( int i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
+    {
+        interaction_dialog_t * p_dialog = p_interaction->pp_dialogs[i];
+        DialogDestroy( p_dialog );
+        REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
+    }
     vlc_object_release( p_interaction );
 }
 
@@ -538,7 +566,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 
         if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) /* Wait for answer */
         {
-            vlc_object_signal_unlocked( p_interaction );
+            vlc_cond_signal( &p_interaction->wait );
             while( p_dialog->i_status != ANSWERED_DIALOG &&
                    p_dialog->i_status != HIDING_DIALOG &&
                    p_dialog->i_status != HIDDEN_DIALOG &&
@@ -554,7 +582,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
                 p_dialog->i_status = ANSWERED_DIALOG;
             }
             p_dialog->i_flags |= DIALOG_GOT_ANSWER;
-            vlc_object_signal_unlocked( p_interaction );
+            vlc_cond_signal( &p_interaction->wait );
             vlc_object_unlock( p_interaction );
             vlc_object_release( p_interaction );
             return p_dialog->i_return;
@@ -563,7 +591,7 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
         {
             /* Pretend we already retrieved the "answer" */
             p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
-            vlc_object_signal_unlocked( p_interaction );
+            vlc_cond_signal( &p_interaction->wait );
             vlc_object_unlock( p_interaction );
             vlc_object_release( p_interaction );
             return VLC_SUCCESS;
@@ -576,28 +604,22 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
     }
 }
 
-static void* InteractionLoop( vlc_object_t *p_this )
+static void* InteractionLoop( void *p_this )
 {
-    interaction_t *p_interaction = (interaction_t*) p_this;
-    int canc = vlc_savecancel ();
+    interaction_t *p_interaction = p_this;
 
-    vlc_object_lock( p_this );
-    while( vlc_object_alive( p_this ) )
+    vlc_object_lock( p_interaction );
+    mutex_cleanup_push( &(vlc_internals(p_interaction)->lock) );
+    for( ;; )
     {
+        int canc = vlc_savecancel();
         InteractionManage( p_interaction );
-        vlc_object_wait( p_this );
-    }
-    vlc_object_unlock( p_this );
+        vlc_restorecancel( canc );
 
-    /* Remove all dialogs - Interfaces must be able to clean up their data */
-    for( int i = p_interaction->i_dialogs -1 ; i >= 0; i-- )
-    {
-        interaction_dialog_t * p_dialog = p_interaction->pp_dialogs[i];
-        DialogDestroy( p_dialog );
-        REMOVE_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs, i );
+        vlc_cond_wait( &p_interaction->wait, &(vlc_internals(p_interaction)->lock) );
     }
-    vlc_restorecancel (canc);
-    return NULL;
+    vlc_cleanup_pop( );
+    assert( 0 );
 }
 
 /**
