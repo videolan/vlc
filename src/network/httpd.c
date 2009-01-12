@@ -2462,11 +2462,7 @@ retry:
 
         vlc_object_lock( host );
         if( ufd[nfd - 1].revents )
-        {
             b_die = !vlc_object_alive( host );
-            if( !b_die )
-                vlc_object_wait( host );
-        }
         vlc_object_unlock( host );
 
         /* Handle client sockets */
