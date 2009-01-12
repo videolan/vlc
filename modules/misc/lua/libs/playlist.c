@@ -267,9 +267,8 @@ static int vlclua_playlist_get( lua_State *L )
                                 : p_playlist->p_root_onelevel;
         else
         {
-            int i;
 #ifdef FIX_THAT_CODE_NOT_TO_MESS_WITH_PLAYLIST_INTERNALS
-            for( i = 0; i < p_playlist->i_sds; i++ )
+            for( int i = 0; i < p_playlist->i_sds; i++ )
             {
                 if( !strcasecmp( psz_what,
                                  p_playlist->pp_sds[i]->p_sd->psz_module ) )
