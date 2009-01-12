@@ -384,10 +384,12 @@ void InputManager::UpdateNavigation()
     if( val.i_int > 0 )
     {
         emit titleChanged( true );
+        msg_Dbg( p_intf, "Title %i", val.i_int );
         /* p_input != NULL since val.i_int != 0 */
         val.i_int = 0;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
         emit chapterChanged( (val.i_int > 0) );
+        msg_Dbg( p_intf, "Chapter: %i", val.i_int );
     }
     else
         emit titleChanged( false );
