@@ -120,9 +120,9 @@ static void *Thread (void *data)
                 struct iovec iov = { buf + i, (len - i) & ~page_mask, };
                 j = vmsplice (fd, &iov, 1, SPLICE_F_GIFT);
             }
-#else
-            j = write (fd, buf + i, len - i);
+            if (j == -1 && errno == ENOSYS) /* vmsplice() not supported */
 #endif
+            j = write (fd, buf + i, len - i);
             if (j <= 0)
             {
                 if (j == 0)
