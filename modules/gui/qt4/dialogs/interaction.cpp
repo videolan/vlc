@@ -52,40 +52,51 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     {
         i_ret = QMessageBox::critical( NULL, qfu( p_dialog->psz_title ),
                                        qfu( p_dialog->psz_description ),
-                                       QMessageBox::Ok, 0, 0 );
+                                       QMessageBox::Ok, QMessageBox::Ok );
     }
     else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
         if( config_GetInt( p_intf, "qt-error-dialogs" ) != 0 )
             ErrorsDialog::getInstance( p_intf )->addError(
                  qfu( p_dialog->psz_title ), qfu( p_dialog->psz_description ) );
-        i_ret = 0;
+        i_ret = QMessageBox::AcceptRole;
     }
     else if( p_dialog->i_flags & DIALOG_WARNING )
     {
         if( config_GetInt( p_intf, "qt-error-dialogs" ) != 0 )
             ErrorsDialog::getInstance( p_intf )->addWarning(
                 qfu( p_dialog->psz_title ),qfu( p_dialog->psz_description ) );
-        i_ret = 0;
+        i_ret = QMessageBox::AcceptRole;
     }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         p_dialog->i_status = SENT_DIALOG;
-        i_ret = QMessageBox::question( NULL,
-              qfu( p_dialog->psz_title), qfu( p_dialog->psz_description ),
-              p_dialog->psz_default_button ?
-                    qfu( p_dialog->psz_default_button ) : QString::null,
-              p_dialog->psz_alternate_button ?
-                    qfu( p_dialog->psz_alternate_button ) : QString::null,
-              p_dialog->psz_other_button ?
-                    qfu( p_dialog->psz_other_button ) : QString::null, 0,
-              p_dialog->psz_other_button ? 2 : -1 );
+
+        QMessageBox cancelBox;
+
+        cancelBox.setWindowTitle( qfu( p_dialog->psz_title) );
+        cancelBox.setText( qfu( p_dialog->psz_description ) );
+
+        if( p_dialog->psz_default_button )
+            cancelBox.addButton( qfu( p_dialog->psz_default_button ),
+                                 QMessageBox::AcceptRole );
+
+        if( p_dialog->psz_alternate_button )
+            cancelBox.addButton( qfu( p_dialog->psz_alternate_button ),
+                                 QMessageBox::RejectRole );
+
+        if( p_dialog->psz_other_button )
+            cancelBox.addButton( qfu( p_dialog->psz_other_button ),
+                                 QMessageBox::ActionRole );
+
+        i_ret = cancelBox.exec();
+        msg_Dbg( p_intf, "Warning %i %i", i_ret, cancelBox.result() );
     }
     else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
-        dialog = new QWidget( 0 ); layout = new QVBoxLayout( dialog );
+        dialog = new QWidget; layout = new QVBoxLayout( dialog );
         layout->setMargin( 2 );
-        panel = new QWidget( 0 );
+        panel = new QWidget( dialog );
         QGridLayout *grid = new QGridLayout;
 
         description = new QLabel( qfu( p_dialog->psz_description ) );
@@ -106,7 +117,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     else if( (p_dialog->i_flags & DIALOG_INTF_PROGRESS ) ||
              ( p_dialog->i_flags & DIALOG_USER_PROGRESS ) )
     {
-        dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
+        dialog = new QWidget; layout = new QVBoxLayout( dialog );
         layout->setMargin( 2 );
         description = new QLabel( qfu( p_dialog->psz_description ) );
         layout->addWidget( description );
@@ -119,7 +130,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     }
     else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
-        dialog = new QWidget( 0 );layout = new QVBoxLayout( dialog );
+        dialog = new QWidget; layout = new QVBoxLayout( dialog );
         layout->setMargin( 2 );
         description = new QLabel( qfu( p_dialog->psz_description ) );
         layout->addWidget( description );
@@ -133,16 +144,17 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         return;
     }
 
-    /* We used a message box */
+    msg_Dbg( p_intf, "Warning %i", i_ret );
+    /* We used a QMessageBox */
     if( i_ret != -1 )
     {
-        if( i_ret == 0 ) Finish( DIALOG_OK_YES );
-        else if ( i_ret == 1 ) Finish( DIALOG_NO );
-        else if ( i_ret == 2 ) return ;
+        if( i_ret == QMessageBox::AcceptRole || i_ret == QMessageBox::Ok )
+            Finish( DIALOG_OK_YES );
+        else if ( i_ret == QMessageBox::RejectRole ) Finish( DIALOG_NO );
         else Finish( DIALOG_CANCELLED );
     }
     else
-    /* Custom box, finish it */
+    /* Custom dialog, finish it */
     {
         assert( dialog );
         /* Start the DialogButtonBox config */
@@ -171,12 +183,9 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         /* End the DialogButtonBox */
 
         /* CONNECTs */
-        if( p_dialog->psz_default_button )
-            BUTTONACT( defaultButton, defaultB() );
-        if( p_dialog->psz_alternate_button )
-            BUTTONACT( altButton, altB() );
-        if( p_dialog->psz_other_button )
-            BUTTONACT( otherButton, otherB() );
+        if( p_dialog->psz_default_button ) BUTTONACT( defaultButton, defaultB() );
+        if( p_dialog->psz_alternate_button ) BUTTONACT( altButton, altB() );
+        if( p_dialog->psz_other_button ) BUTTONACT( otherButton, otherB() );
 
         /* set the layouts and thte title */
         dialog->setLayout( layout );
@@ -213,7 +222,6 @@ void InteractionDialog::update()
 
 InteractionDialog::~InteractionDialog()
 {
-//    delete panel;
     delete dialog;
 }
 
@@ -234,6 +242,7 @@ void InteractionDialog::Finish( int i_ret )
 {
     vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
 
+    /* Special cases when we have to return psz to the core */
     if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
     {
         p_dialog->psz_returned[0] = strdup( qtu( loginEdit->text() ) );
@@ -243,6 +252,8 @@ void InteractionDialog::Finish( int i_ret )
     {
         p_dialog->psz_returned[0] = strdup( qtu( inputEdit->text() ) );
     }
+
+    /* We finished the dialog, answer it */
     p_dialog->i_status = ANSWERED_DIALOG;
     p_dialog->i_return = i_ret;
 
