@@ -106,11 +106,9 @@ int screen_InitCapture( demux_t *p_demux )
     p_data->left = p_sys->i_left;
     p_data->top = p_sys->i_top;
     p_data->src_width = var_CreateGetInteger( p_demux, "screen-width" );
-    if (p_data->src_width <= 0) {
-      p_data->src_width = p_data->screen_width;
-    }
     p_data->src_height = var_CreateGetInteger( p_demux, "screen-height" );
-    if (p_data->src_height <= 0) {
+    if (p_data->src_width <= 0 || p_data->src_height <= 0) {
+      p_data->src_width = p_data->screen_width;
       p_data->src_height = p_data->screen_height;
     }
     p_data->dest_width = p_data->src_width;

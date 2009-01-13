@@ -209,6 +209,10 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_screen_lbl setStringValue: _NS("Screen Capture Input")];
     [o_screen_long_lbl setStringValue: _NS("This facility allows you to process your screen's output.")];
     [o_screen_fps_lbl setStringValue: _NS("Frames per Second:")];
+    [o_screen_left_lbl setStringValue: _NS("Subscreen left:")];
+    [o_screen_top_lbl setStringValue: _NS("Subscreen top:")];
+    [o_screen_width_lbl setStringValue: _NS("Subscreen width:")];
+    [o_screen_height_lbl setStringValue: _NS("Subscreen height:")];
     [o_eyetv_currentChannel_lbl setStringValue: _NS("Current channel:")];
     [o_eyetv_previousProgram_btn setTitle: _NS("Previous Channel")];
     [o_eyetv_nextProgram_btn setTitle: _NS("Next Channel")];
@@ -409,6 +413,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
         {
             if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
                 [o_options addObject: [NSString stringWithFormat: @"screen-fps=%i", [o_screen_fps_fld intValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"screen-left=%i", [o_screen_left_fld intValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"screen-top=%i", [o_screen_top_fld intValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"screen-width=%i", [o_screen_width_fld intValue]]];
+                [o_options addObject: [NSString stringWithFormat: @"screen-height=%i", [o_screen_height_fld intValue]]];
+                if ([o_screen_follow_mouse_btn state]) {
+                  [o_options addObject: @"screen-follow-mouse"];
+                }
         }
 
         /* apply the options to our item(s) */

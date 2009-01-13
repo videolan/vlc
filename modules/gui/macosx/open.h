@@ -128,6 +128,15 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_screen_long_lbl;
     IBOutlet id o_screen_fps_stp;
     IBOutlet id o_screen_fps_lbl;
+    IBOutlet id o_screen_left_fld;
+    IBOutlet id o_screen_left_lbl;
+    IBOutlet id o_screen_top_fld;
+    IBOutlet id o_screen_top_lbl;
+    IBOutlet id o_screen_width_fld;
+    IBOutlet id o_screen_width_lbl;
+    IBOutlet id o_screen_height_fld;
+    IBOutlet id o_screen_height_lbl;
+    IBOutlet id o_screen_follow_mouse_btn;
 
     BOOL b_autoplay;
     id o_currentCaptureView;
