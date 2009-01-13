@@ -34,9 +34,7 @@ LIBAMR_NB_VERSION=7.0.0.0
 LIBAMR_NB=$(PENGUIN)/amrnb-$(LIBAMR_NB_VERSION).tar.bz2
 LIBAMR_WB_VERSION=7.0.0.2
 LIBAMR_WB=$(PENGUIN)/amrwb-$(LIBAMR_WB_VERSION).tar.bz2
-# Autoconf > 2.57 doesn't work ok on BeOS. Don't ask why.
-# we have to use a newer though, because bootstrap won't work otherwise
-AUTOCONF_VERSION=2.61
+AUTOCONF_VERSION=2.63
 AUTOCONF_URL=$(GNU)/autoconf/autoconf-$(AUTOCONF_VERSION).tar.bz2
 GNUMAKE_VERSION=3.81
 GNUMAKE_URL=$(GNU)/make/make-$(GNUMAKE_VERSION).tar.bz2
@@ -44,7 +42,7 @@ CMAKE_VERSION=2.6.0
 CMAKE_URL=http://www.cmake.org/files/v2.6/cmake-$(CMAKE_VERSION).tar.gz
 LIBTOOL_VERSION=1.5.24
 LIBTOOL_URL=$(GNU)/libtool/libtool-$(LIBTOOL_VERSION).tar.gz
-AUTOMAKE_VERSION=1.9.6
+AUTOMAKE_VERSION=1.10.2
 AUTOMAKE_URL=$(GNU)/automake/automake-$(AUTOMAKE_VERSION).tar.gz
 PKGCFG_VERSION=0.20
 PKGCFG_URL=$(VIDEOLAN)/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
