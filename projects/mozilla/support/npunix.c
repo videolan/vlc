@@ -38,12 +38,18 @@
  *----------------------------------------------------------------------
  */
 
+#include "config.h"
+
 #define XP_UNIX 1
 #define OJI 1
 
 #include <stdio.h>
 #include <npapi.h>
+#ifdef HAVE_NPFUNCTIONS_H
+#include <npfunctions.h>
+#else
 #include <npupp.h>
+#endif
 
 /*
  * Define PLUGIN_TRACE to have the wrapper functions print

@@ -42,7 +42,11 @@
 #endif
 
 #include "npapi.h"
+#ifdef HAVE_NPFUNCTIONS_H
+#include "npfunctions.h"
+#else
 #include "npupp.h"
+#endif
 
 //\\// DEFINE
 #define NP_EXPORT

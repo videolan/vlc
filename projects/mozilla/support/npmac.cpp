@@ -4,6 +4,8 @@
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#include "config.h"
+
 #include <string.h>
 
 #include <Processes.h>
@@ -54,7 +56,11 @@
 #undef XP_UNIX
 #endif
 
+#ifdef HAVE_NPFUNCTIONS_H
+#include "npfunctions.h"
+#else
 #include "npupp.h"
+#endif
 
 #ifdef __MWERKS__
 #ifndef powerc
