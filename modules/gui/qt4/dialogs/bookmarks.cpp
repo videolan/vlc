@@ -197,7 +197,7 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
 
     // We get the bookmarks list
     seekpoint_t** pp_bookmarks;
-    seekpoint_t*  p_seekpoint;
+    seekpoint_t*  p_seekpoint = NULL;
     int i_bookmarks;
 
     if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,

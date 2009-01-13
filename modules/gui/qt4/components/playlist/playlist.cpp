@@ -52,7 +52,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
     QSplitter *leftW = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
-    selector = new PLSelector( this, p_intf, THEPL );
+    selector = new PLSelector( this, p_intf );
     leftW->addWidget( selector );
 
     /* Create a Container for the Art Label
@@ -156,4 +156,5 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
         if( p_intf->p_sys->p_mi )
             p_intf->p_sys->p_mi->togglePlaylist();
     }
+    event->accept();
 }

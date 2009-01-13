@@ -130,12 +130,11 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
                                                   l, line );
         break;
     case CONFIG_ITEM_FILE:
-        p_control = new FileConfigControl( p_this, p_item, parent, l,
-                                                line, false );
+        p_control = new FileConfigControl( p_this, p_item, parent, l, line);
         break;
     case CONFIG_ITEM_DIRECTORY:
         p_control = new DirectoryConfigControl( p_this, p_item, parent, l,
-                                                line, false );
+                                                line );
         break;
 #if 0
     case CONFIG_ITEM_FONT:
@@ -237,6 +236,7 @@ StringConfigControl::StringConfigControl( vlc_object_t *_p_this,
                            VStringConfigControl( _p_this, _p_item )
 {
     text = _text;
+    if( pwd ) text->setEchoMode( QLineEdit::Password );
     label = _label;
     finish( );
 }
@@ -253,7 +253,7 @@ void StringConfigControl::finish()
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
                                           module_config_t *_p_item,
                                           QWidget *_parent, QGridLayout *l,
-                                          int &line, bool pwd ) :
+                                          int &line ) :
                            VStringConfigControl( _p_this, _p_item, _parent )
 {
     label = new QLabel( qtr(p_item->psz_text) );
@@ -288,7 +288,7 @@ FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
 FileConfigControl::FileConfigControl( vlc_object_t *_p_this,
                                    module_config_t *_p_item,
                                    QLabel *_label, QLineEdit *_text,
-                                   QPushButton *_button, bool pwd ):
+                                   QPushButton *_button ):
                            VStringConfigControl( _p_this, _p_item )
 {
     browse = _button;
@@ -319,14 +319,14 @@ void FileConfigControl::finish()
 /********* String / Directory **********/
 DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QWidget *_p_widget,
-                        QGridLayout *_p_layout, int& _int, bool _pwd ) :
-     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int, _pwd)
+                        QGridLayout *_p_layout, int& _int ) :
+     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int )
 {}
 
 DirectoryConfigControl::DirectoryConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QLabel *_p_label,
-                        QLineEdit *_p_line, QPushButton *_p_button, bool _pwd ):
-     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button, _pwd)
+                        QLineEdit *_p_line, QPushButton *_p_button ):
+     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button)
 {}
 
 void DirectoryConfigControl::updateField()
@@ -486,7 +486,7 @@ QString StringListConfigControl::getValue()
 }
 
 void setfillVLCConfigCombo( const char *configname, intf_thread_t *p_intf,
-                        QComboBox *combo, QWidget *parent )
+                        QComboBox *combo )
 {
     module_config_t *p_config =
                       config_FindConfig( VLC_OBJECT(p_intf), configname );
@@ -654,7 +654,7 @@ ModuleListConfigControl::~ModuleListConfigControl()
        QCheckBox *cb = new QCheckBox( qtr( module_GetLongName( p_parser ) ) );\
        checkBoxListItem *cbl = new checkBoxListItem; \
 \
-       CONNECT( cb, stateChanged( int ), this, onUpdate( int ) );\
+       CONNECT( cb, stateChanged( int ), this, onUpdate() );\
        cb->setToolTip( formatTooltip( qtr( module_get_help( p_parser ))));\
        cbl->checkBox = cb; \
 \
@@ -732,7 +732,7 @@ void ModuleListConfigControl::show()
 }
 
 
-void ModuleListConfigControl::onUpdate( int value )
+void ModuleListConfigControl::onUpdate()
 {
     text->clear();
     bool first = true;
@@ -998,6 +998,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
                    VIntConfigControl( _p_this, _p_item )
 {
     checkbox = _checkbox;
+    label = _label;
     finish();
 }
 
@@ -1006,6 +1007,8 @@ void BoolConfigControl::finish()
     checkbox->setCheckState( p_item->value.i == true ? Qt::Checked
                                                         : Qt::Unchecked );
     checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+    if( label )
+        label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int BoolConfigControl::getValue()

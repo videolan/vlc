@@ -1188,7 +1188,7 @@ void CaptureOpenPanel::advancedDialog()
     scroll->setWidget( advFrame );
 
     /* Create the options inside the FrameLayout */
-    for( int n = 0; n < i_confsize; n++ )
+    for( int n = 0; n < (int)i_confsize; n++ )
     {
         module_config_t *p_item = p_config + n;
         ConfigControl *config = ConfigControl::createControl(

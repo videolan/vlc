@@ -139,8 +139,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 if( p_config )                                                \
                 {                                                             \
                     control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                               p_config, label, qcontrol, qbutton,      \
-                            false );                                          \
+                               p_config, label, qcontrol, qbutton ); \
                     controls.append( control );                               \
                 }
 

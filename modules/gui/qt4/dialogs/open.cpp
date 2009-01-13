@@ -320,7 +320,7 @@ void OpenDialog::finish( bool b_enqueue = false )
     if( i_action_flag != SELECT )
     {
         QStringList tempMRL = SeparateEntries( mrl );
-        for( size_t i = 0; i < tempMRL.size(); i++ )
+        for( int i = 0; i < tempMRL.size(); i++ )
         {
             bool b_start = !i && !b_enqueue;
             input_item_t *p_input;

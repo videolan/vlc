@@ -453,7 +453,6 @@ void ExtVideo::setWidgetValue( QObject *widget )
 
     if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
     {
-        int i_int = 0;
         if( slider )        slider->setValue( val.i_int );
         else if( checkbox ) checkbox->setCheckState( val.i_int? Qt::Checked
                                                               : Qt::Unchecked );
@@ -471,7 +470,6 @@ void ExtVideo::setWidgetValue( QObject *widget )
     }
     else if( i_type == VLC_VAR_FLOAT )
     {
-        double f_float = 0;
         if( slider ) slider->setValue( ( int )( val.f_float*( double )slider->tickInterval() ) ); /* hack alert! */
         else if( doublespinbox ) doublespinbox->setValue( val.f_float );
         else msg_Warn( p_intf, "Oops %s %s %d", __FILE__, __func__, __LINE__ );

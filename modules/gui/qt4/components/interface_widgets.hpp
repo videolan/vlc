@@ -133,9 +133,11 @@ protected:
     virtual void mousePressEvent( QMouseEvent *event )
     {
         toggleTimeDisplay();
+        event->accept();
     }
     virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
+        event->accept();
         toggleTimeDisplay();
         emit timeLabelDoubleClicked();
     }
@@ -159,6 +161,7 @@ public:
 protected:
     virtual void mouseDoubleClickEvent ( QMouseEvent * event )
     {
+        event->accept();
         THEMIM->getIM()->setRate( INPUT_RATE_DEFAULT );
     }
 private slots:

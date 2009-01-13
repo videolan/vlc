@@ -524,7 +524,7 @@ void SoutDialog::updateMRL()
 
     SoutMrl smrl( ":sout=#" );
 
-    if ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked()
+    if ( ( ui.transcodeVideo->isChecked() || ui.transcodeAudio->isChecked() )
          && !ui.rawInput->isChecked() /*demuxdump speciality*/ )
     {
         smrl.begin( "transcode" );

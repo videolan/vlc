@@ -92,7 +92,7 @@ public:
                                    bool b_force_visible = false);
 
     /* Actions */
-    static void DoAction( intf_thread_t *, QObject * );
+    static void DoAction( QObject * );
 
     /* HACK for minimalView */
     static QAction *minimalViewAction;
@@ -111,13 +111,12 @@ private:
     static QMenu *HelpMenu( QMenu * );
 
     /* Popups Menus */
-    static void PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu );
+    static void PopupMenuStaticEntries( QMenu *menu );
     static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                          input_thread_t *p_input );
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
-                             vector<const char*>&, vector<vlc_object_t *>&,
-                             bool append = false );
+                             vector<const char*>&, vector<vlc_object_t *>& );
 
     static void CreateAndConnect( QMenu *, const char *, QString, QString,
                                   int, vlc_object_t *, vlc_value_t, int, bool c = false );

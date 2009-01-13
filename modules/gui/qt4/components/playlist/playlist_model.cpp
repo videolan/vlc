@@ -612,7 +612,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     assert( rootItem );
     /* Recreate from root */
     UpdateNodeChildren( rootItem );
-    if( p_item=playlist_CurrentPlayingItem(p_playlist) )
+    if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
     {
         PLItem *currentItem = FindByInput( rootItem,
                                            p_item->p_input->i_id );

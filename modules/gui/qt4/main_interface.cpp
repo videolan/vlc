@@ -901,12 +901,16 @@ void MainInterface::handleSystrayClick(
     switch( reason )
     {
         case QSystemTrayIcon::Trigger:
+        case QSystemTrayIcon::DoubleClick:
             toggleUpdateSystrayMenu();
             break;
         case QSystemTrayIcon::MiddleClick:
+        case QSystemTrayIcon::Context:
             sysTray->showMessage( qtr( "VLC media player" ),
                     qtr( "Control menu for the player" ),
                     QSystemTrayIcon::Information, 3000 );
+            break;
+        default:
             break;
     }
 }
@@ -1072,6 +1076,7 @@ void MainInterface::wheelEvent( QWheelEvent *e )
 
 void MainInterface::closeEvent( QCloseEvent *e )
 {
+    e->accept();
     hide();
     THEDP->quit();
 }

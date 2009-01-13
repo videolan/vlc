@@ -503,7 +503,6 @@ void DialogsProvider::saveAPlaylist()
 
             QString file = qfd->selectedFiles().first();
             QString filter = qfd->selectedFilter();
-            const char* filt = filter.toAscii();
 
             if( file.contains( ".xsp" ) || filter.contains( "XSPF" ) )
             {
@@ -605,7 +604,7 @@ void DialogsProvider::loadSubtitlesFile()
 
 void DialogsProvider::menuAction( QObject *data )
 {
-    QVLCMenu::DoAction( p_intf, data );
+    QVLCMenu::DoAction( data );
 }
 
 void DialogsProvider::menuUpdateAction( QObject *data )

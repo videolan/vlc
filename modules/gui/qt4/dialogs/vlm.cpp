@@ -694,6 +694,8 @@ void VLMWrapper::EnableItem( const QString name, bool b_enable )
 {
     vlm_message_t *message;
     QString command = "setup \"" + name + ( b_enable ? " enable" : " disable" );
+    vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+    vlm_MessageDelete( message );
 }
 
 void VLMWrapper::ControlBroadcast( const QString name, int BroadcastStatus,

@@ -988,6 +988,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
             if( b_fs )
+            {
 #ifdef WIN32TRICK
                 if( b_fscHidden )
 #else
@@ -999,6 +1000,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
                 }
                 else
                     hideFSC();
+            }
             break;
         case FullscreenControlShow_Type:
             vlc_mutex_lock( &lock );
@@ -1018,6 +1020,8 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
         case FullscreenControlPlanHide_Type:
             if( !b_mouse_over ) // Only if the mouse is not over FSC
                 planHideFSC();
+            break;
+        default:
             break;
     }
 }
@@ -1061,6 +1065,7 @@ void FullscreenControllerWidget::enterEvent( QEvent *event )
 #if HAVE_TRANSPARENCY
     p_slowHideTimer->stop();
 #endif
+    event->accept();
 }
 
 /**
@@ -1071,6 +1076,7 @@ void FullscreenControllerWidget::leaveEvent( QEvent *event )
     planHideFSC();
 
     b_mouse_over = false;
+    event->accept();
 }
 
 /**

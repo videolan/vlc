@@ -112,7 +112,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
     }
     p_vout = p_nvout;
 #ifndef NDEBUG
-    msg_Dbg( p_intf, "embedded video ready (handle %p)", winId() );
+    msg_Dbg( p_intf, "embedded video ready (handle %p)", (void *)winId() );
 #endif
     return ( void* )winId();
 }
@@ -215,6 +215,7 @@ void BackgroundWidget::updateArt( QString url )
 void BackgroundWidget::contextMenuEvent( QContextMenuEvent *event )
 {
     QVLCMenu::PopupMenu( p_intf, true );
+    event->accept();
 }
 
 #if 0
@@ -462,6 +463,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
 
 void TimeLabel::setDisplayPosition( float pos, int time, int length )
 {
+    VLC_UNUSED( pos );
+
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time

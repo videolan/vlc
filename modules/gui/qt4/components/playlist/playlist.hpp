@@ -71,9 +71,10 @@ class ArtLabel : public CoverArtLabel
 public:
     ArtLabel( QWidget *parent, intf_thread_t *intf )
             : CoverArtLabel( parent, intf ) {};
-    void mouseDoubleClickEvent( QMouseEvent *event )
+    virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
         THEDP->mediaInfoDialog();
+        event->accept();
     }
 };
 

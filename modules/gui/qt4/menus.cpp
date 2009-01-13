@@ -276,6 +276,7 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 void QVLCMenu::createMenuBar( MainInterface *mi,
                               intf_thread_t *p_intf,
                               bool visual_selector_enabled )
+/* FIXME remove this visual dependency */
 {
     /* QMainWindows->menuBar()
        gives the QProcess::destroyed timeout issue on Cleanlooks style with
@@ -344,6 +345,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 /* Playlist/MediaLibrary Control */
 QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf )
 {
+    VLC_UNUSED( p_intf ); //TODO remove
     QMenu *menu = new QMenu();
 
     addDPStaticEntry( menu, qtr( I_MENU_EXT ), ":/settings",
@@ -595,7 +597,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     {
         vlc_object_release( p_object );
     }
-    return Populate( p_intf, menu, varnames, objects, true );
+    return Populate( p_intf, menu, varnames, objects );
 }
 
 /**
@@ -699,7 +701,7 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
             ":/next", SLOT( next() ) );
 }
 
-void QVLCMenu::PopupMenuStaticEntries( intf_thread_t *p_intf, QMenu *menu )
+void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 {
 #if 0
     QMenu *toolsmenu = ToolsMenu( p_intf, menu, false, true );
@@ -772,7 +774,6 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
 /* Navigation stuff, and general menus ( open ) */
 void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 {
-    vlc_value_t val;
     POPUP_BOILERPLATE;
 
     if( p_input )
@@ -790,7 +791,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
     PopupMenuControlEntries( menu, p_intf, p_input );
 
     menu->addSeparator();
-    PopupMenuStaticEntries( p_intf, menu );
+    PopupMenuStaticEntries( menu );
 
     p_intf->p_sys->p_popup_menu = menu;
     menu->popup( QCursor::pos() );
@@ -914,7 +915,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             menu->addMenu( submenu );
         }
 
-        PopupMenuStaticEntries( p_intf, menu );
+        PopupMenuStaticEntries( menu );
 
         p_intf->p_sys->p_popup_menu = menu;
         p_intf->p_sys->p_popup_menu->popup( QCursor::pos() );
@@ -979,8 +980,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
                             QMenu *current,
                             vector< const char *> & varnames,
-                            vector<vlc_object_t *> & objects,
-                            bool append )
+                            vector<vlc_object_t *> & objects )
 {
     QMenu *menu = current;
     if( !menu ) menu = new QMenu();
@@ -1299,7 +1299,7 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
     menu->addAction( action );
 }
 
-void QVLCMenu::DoAction( intf_thread_t *p_intf, QObject *data )
+void QVLCMenu::DoAction( QObject *data )
 {
     MenuItemData *itemData = qobject_cast<MenuItemData *>( data );
     vlc_object_t *p_object = itemData->p_obj;

@@ -192,6 +192,7 @@ public:
     virtual int getType() { return CONFIG_ITEM_BOOL; }
 private:
     QCheckBox *checkbox;
+    QLabel *label;
     void finish();
 };
 
@@ -283,9 +284,9 @@ class FileConfigControl : public VStringConfigControl
     Q_OBJECT;
 public:
     FileConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                       QGridLayout *, int&, bool pwd );
+                       QGridLayout *, int& );
     FileConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                       QLineEdit *, QPushButton *, bool pwd );
+                       QLineEdit *, QPushButton * );
     virtual ~FileConfigControl() {};
     virtual QString getValue() { return text->text(); };
     virtual void show() { text->show(); if( label ) label->show(); browse->show(); }
@@ -304,9 +305,9 @@ class DirectoryConfigControl : public FileConfigControl
     Q_OBJECT;
 public:
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                            QGridLayout *, int&, bool pwd );
+                            QGridLayout *, int& );
     DirectoryConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                            QLineEdit *, QPushButton *, bool pwd );
+                            QLineEdit *, QPushButton * );
     virtual ~DirectoryConfigControl() {};
 public slots:
     virtual void updateField();
@@ -363,7 +364,7 @@ public:
     virtual void hide();
     virtual void show();
 public slots:
-    void onUpdate( int value );
+    void onUpdate();
 private:
     void finish( bool );
     QVector<checkBoxListItem*> modules;
@@ -393,7 +394,7 @@ private slots:
 };
 
 void setfillVLCConfigCombo(const char *configname, intf_thread_t *p_intf,
-                        QComboBox *combo, QWidget *parent = 0 );
+                        QComboBox *combo );
 
 #if 0
 struct ModuleCheckBox {

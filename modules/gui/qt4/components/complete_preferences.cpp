@@ -370,11 +370,11 @@ AdvPrefsPanel::AdvPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     {
         while (p_item < p_end)
         {
-            if( p_item->i_type == CONFIG_SUBCATEGORY &&
-                            ( data->i_type == TYPE_SUBCATEGORY &&
+            if(  p_item->i_type == CONFIG_SUBCATEGORY &&
+                            ( ( data->i_type == TYPE_SUBCATEGORY &&
                               p_item->value.i == data->i_object_id ) ||
                             ( data->i_type == TYPE_CATSUBCAT &&
-                              p_item->value.i == data->i_subcat_id ) )
+                              p_item->value.i == data->i_subcat_id ) ) )
                 break;
             p_item++;
         }

@@ -63,7 +63,6 @@ static void Close        ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
 static int  WindowOpen   ( vlc_object_t * );
 static void WindowClose  ( vlc_object_t * );
-static void Run          ( intf_thread_t * );
 static void *Thread      ( void * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
@@ -317,7 +316,6 @@ static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     MainInterface *p_mi;
-    vlc_value_t val;
     char dummy[] = "";
     char *argv[] = { dummy };
     int argc = 1;

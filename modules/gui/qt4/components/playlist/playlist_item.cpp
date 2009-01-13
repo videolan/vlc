@@ -169,9 +169,6 @@ int PLItem::row() const
    */
 void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
-    char psz_duration[MSTRTIME_MAX_SIZE];
-    char *psz_meta;
-
     assert( p_item->p_input->i_id == i_input_id );
 
     /* Useful for the model */

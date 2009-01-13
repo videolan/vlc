@@ -51,7 +51,7 @@ class MsgEvent : public QEvent
 {
 public:
     MsgEvent( msg_item_t *msg )
-        : msg(msg), QEvent( (QEvent::Type)MsgEvent_Type )
+        : QEvent( (QEvent::Type)MsgEvent_Type ), msg(msg)
     {
         msg_Hold( msg );
     }

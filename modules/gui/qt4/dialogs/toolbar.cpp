@@ -504,10 +504,14 @@ void DroppingController::dropEvent( QDropEvent *event )
 void DroppingController::dragLeaveEvent ( QDragLeaveEvent * event )
 {
     if( rubberband ) rubberband->hide();
+    event->accept();
 }
 
 /**
  * Overloading doAction to block any action
  **/
-void DroppingController::doAction( int i ){}
+void DroppingController::doAction( int i )
+{
+    VLC_UNUSED( i );
+}
 

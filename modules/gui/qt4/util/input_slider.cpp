@@ -78,6 +78,7 @@ void InputSlider::userDrag( int new_value )
 void InputSlider::mouseReleaseEvent( QMouseEvent *event )
 {
     b_isSliding = false;
+    event->accept();
 }
 
 void InputSlider::mousePressEvent(QMouseEvent* event)
@@ -263,5 +264,6 @@ void SoundSlider::paintEvent( QPaintEvent *e )
                       QString::number( value() ) + '%' );
 
     painter.end();
+    e->accept();
 }
 
