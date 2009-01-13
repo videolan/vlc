@@ -143,6 +143,8 @@ static void *Thread (void *data)
 }
 
 
+static int Peek (stream_t *, const uint8_t **, unsigned int);
+
 #define MIN_BLOCK (1 << 10)
 #define MAX_BLOCK (1 << 20)
 /**
@@ -155,11 +157,17 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
     block_t *peeked;
     ssize_t length;
 
+    if (buf == NULL) /* caller skips data, get big enough peek buffer */
+        buflen = Peek (stream, &(const uint8_t *){ NULL }, buflen);
+
     if ((peeked = p_sys->peeked) != NULL)
     {   /* dequeue peeked data */
         length = (buflen > peeked->i_buffer) ? peeked->i_buffer : buflen;
-        memcpy (buf, peeked->p_buffer, length);
-        buf = ((char *)buf) + length;
+        if (buf != NULL)
+        {
+            memcpy (buf, peeked->p_buffer, length);
+            buf = ((char *)buf) + length;
+        }
         buflen -= length;
         peeked->p_buffer += length;
         peeked->i_buffer -= length;
