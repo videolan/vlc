@@ -321,8 +321,8 @@ static void *module_Lookup( module_handle_t handle, const char *psz_function )
     }
 
 #elif defined(HAVE_DL_WINDOWS) && defined(UNDER_CE)
-    wchar_t wide[sizeof( psz_function ) + 1];
-    size_t i;
+    wchar_t wide[strlen( psz_function ) + 1];
+    size_t i = 0;
     do
         wide[i] = psz_function[i]; /* UTF-16 <- ASCII */
     while( psz_function[i++] );
