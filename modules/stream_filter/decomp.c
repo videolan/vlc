@@ -153,26 +153,31 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
 {
     stream_sys_t *p_sys = stream->p_sys;
     block_t *peeked;
-    size_t bonus = 0;
     ssize_t length;
 
     if ((peeked = p_sys->peeked) != NULL)
-    {
-        bonus = (buflen > peeked->i_buffer) ? peeked->i_buffer : buflen;
-        memcpy (buf, peeked->p_buffer, bonus);
-        peeked->p_buffer += bonus;
-        peeked->i_buffer -= bonus;
+    {   /* dequeue peeked data */
+        length = (buflen > peeked->i_buffer) ? peeked->i_buffer : buflen;
+        memcpy (buf, peeked->p_buffer, length);
+        buf = ((char *)buf) + length;
+        buflen -= length;
+        peeked->p_buffer += length;
+        peeked->i_buffer -= length;
         if (peeked->i_buffer == 0)
         {
             block_Release (peeked);
             p_sys->peeked = NULL;
         }
+        p_sys->offset += length;
+
+        if (buflen > 0)
+            length += Read (stream, ((char *)buf) + length, buflen - length);
+        return length;
     }
 
     length = net_Read (stream, p_sys->read_fd, NULL, buf, buflen, false);
     if (length < 0)
         return 0;
-    length += bonus;
     p_sys->offset += length;
     return length;
 }
