@@ -26,6 +26,7 @@
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
 #include <vlc_network.h>
+#include <assert.h>
 #include <unistd.h>
 #ifndef _POSIX_SPAWN
 # define _POSIX_SPAWN (-1)
@@ -182,6 +183,7 @@ static int Read (stream_t *stream, void *buf, unsigned int buflen)
             length += Read (stream, ((char *)buf) + length, buflen - length);
         return length;
     }
+    assert ((buf != NULL) || (buflen == 0));
 
     length = net_Read (stream, p_sys->read_fd, NULL, buf, buflen, false);
     if (length < 0)
