@@ -219,6 +219,9 @@ typedef enum
     RTSP_CMD_TYPE_SEEK,
     RTSP_CMD_TYPE_REWIND,
     RTSP_CMD_TYPE_FORWARD,
+
+    RTSP_CMD_TYPE_ADD,
+    RTSP_CMD_TYPE_DEL,
 } rtsp_cmd_type_t;
 
 /* */
@@ -226,7 +229,7 @@ typedef struct
 {
     int i_type;
     int i_media_id;
-    //vod_media_t *p_media;
+    vod_media_t *p_media;
     char *psz_session;
     char *psz_arg;
     double f_arg;
@@ -234,6 +237,7 @@ typedef struct
 
 static vod_media_t *MediaNew( vod_t *, const char *, input_item_t * );
 static void         MediaDel( vod_t *, vod_media_t * );
+static void         MediaAskDel ( vod_t *, vod_media_t * );
 static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
 static void         MediaDelES( vod_t *, vod_media_t *, es_format_t * );
 
@@ -313,7 +317,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_media_id = 0;
 
     p_vod->pf_media_new = MediaNew;
-    p_vod->pf_media_del = MediaDel;
+    p_vod->pf_media_del = MediaAskDel;
     p_vod->pf_media_add_es = MediaAddES;
     p_vod->pf_media_del_es = MediaDelES;
 
@@ -361,6 +365,8 @@ static void Close( vlc_object_t * p_this )
          p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
          memcpy( &cmd, p_block_cmd->p_buffer, sizeof(cmd) );
          block_Release( p_block_cmd );
+         if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
+             MediaDel(p_vod, cmd.p_media);
          free( cmd.psz_session );
          free( cmd.psz_arg );
     }
@@ -453,10 +459,6 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     p_media->p_vod = p_vod;
 
-    vlc_mutex_lock( &p_sys->lock_media );
-    TAB_APPEND( p_sys->i_media, p_sys->media, p_media );
-    vlc_mutex_unlock( &p_sys->lock_media );
-
     vlc_mutex_init( &p_media->lock );
     p_media->psz_session_name = strdup("");
     p_media->psz_session_description = strdup("");
@@ -480,7 +482,13 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     }
     vlc_mutex_unlock( &p_item->lock );
 
+    CommandPush( p_vod, RTSP_CMD_TYPE_ADD, p_media, NULL, 0.0, NULL );
     return p_media;
+}
+
+static void MediaAskDel ( vod_t *p_vod, vod_media_t *p_media )
+{
+    CommandPush( p_vod, RTSP_CMD_TYPE_DEL, p_media, NULL, 0.0, NULL );
 }
 
 static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
@@ -809,6 +817,7 @@ static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_me
 
     memset( &cmd, 0, sizeof(cmd) );
     cmd.i_type = i_type;
+    cmd.p_media = p_media;
     if( p_media )
         cmd.i_media_id = p_media->id;
     if( psz_session )
@@ -845,6 +854,20 @@ static void* CommandThread( vlc_object_t *p_this )
         if( cmd.i_type == RTSP_CMD_TYPE_NONE )
             break;
 
+        if ( cmd.i_type == RTSP_CMD_TYPE_ADD )
+        {
+            vlc_mutex_lock( &p_sys->lock_media );
+            TAB_APPEND( p_sys->i_media, p_sys->media, cmd.p_media );
+            vlc_mutex_unlock( &p_sys->lock_media );
+            goto next;
+        }
+
+        if ( cmd.i_type == RTSP_CMD_TYPE_DEL )
+        {
+            MediaDel(p_vod, cmd.p_media);
+            goto next;
+        }
+
         /* */
         vlc_mutex_lock( &p_sys->lock_media );
         for( i = 0; i < p_sys->i_media; i++ )
@@ -853,7 +876,10 @@ static void* CommandThread( vlc_object_t *p_this )
                 break;
         }
         if( i >= p_sys->i_media )
+        {
+            vlc_mutex_unlock( &p_sys->lock_media );
             goto next;
+        }
         p_media = p_sys->media[i];
 
         switch( cmd.i_type )
@@ -889,9 +915,9 @@ static void* CommandThread( vlc_object_t *p_this )
         default:
             break;
         }
+        vlc_mutex_unlock( &p_sys->lock_media );
 
     next:
-        vlc_mutex_unlock( &p_sys->lock_media );
         free( cmd.psz_session );
         free( cmd.psz_arg );
     }
