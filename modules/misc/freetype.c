@@ -514,8 +514,6 @@ static void* FontBuilderThread( vlc_object_t *p_this )
 {
     FcConfig      *p_fontconfig = FcInitLoadConfig();
 
-    vlc_thread_ready( p_this );
-
     if( p_fontconfig )
     {
         mtime_t    t1, t2;
