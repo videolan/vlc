@@ -246,7 +246,7 @@ void ExtVideo::clean()
     ui.cropRightPx->setValue( 0 );
 }
 
-void ExtVideo::ChangeVFiltersString( char *psz_name, bool b_add )
+void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
 {
     char *psz_parser, *psz_string;
     const char *psz_filter_type;

@@ -620,7 +620,7 @@ void DialogsProvider::menuUpdateAction( QObject *data )
 
 void DialogsProvider::SDMenuAction( QString data )
 {
-    char *psz_sd = qtu( data );
+    const char *psz_sd = qtu( data );
     if( !playlist_IsServicesDiscoveryLoaded( THEPL, psz_sd ) )
         playlist_ServicesDiscoveryAdd( THEPL, psz_sd );
     else

@@ -59,7 +59,7 @@ private:
     vout_thread_t *p_vout;
     void initComboBoxItems( QObject* );
     void setWidgetValue( QObject* );
-    void ChangeVFiltersString( char *psz_name, bool b_add );
+    void ChangeVFiltersString( const char *psz_name, bool b_add );
     void clean();
 private slots:
     void updateFilters();

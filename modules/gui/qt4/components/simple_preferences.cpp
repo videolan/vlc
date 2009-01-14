@@ -601,7 +601,7 @@ void SPrefsPanel::apply()
     case SPrefsInputAndCodecs:
     {
         /* Device default selection */
-        char *psz_devicepath =
+        const char *psz_devicepath =
               qtu( qobject_cast<QLineEdit *>(optionWidgets[inputLE] )->text() );
         if( !EMPTY_STR( psz_devicepath ) )
         {
