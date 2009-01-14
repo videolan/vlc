@@ -121,7 +121,7 @@ void* EventThread( vlc_object_t *p_this )
     }
 
     /* Signal the creation of the window */
-    vlc_thread_ready( p_event );
+    SetEvent( p_event->window_ready );
 
 #ifndef UNDER_CE
     /* Set power management stuff */

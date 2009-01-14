@@ -191,12 +191,16 @@ static void Run( intf_thread_t *p_intf )
         /* The module is used in dialog provider mode */
 
         /* Create a new thread for the dialogs provider */
+        p_intf->p_sys->thread_ready = CreateEvent (NULL, TRUE, FALSE, NULL);
         if( vlc_thread_create( p_intf, "WinCE Dialogs Thread",
-                               MainLoop, 0, true ) )
+                               MainLoop, 0, false ) )
         {
             msg_Err( p_intf, "cannot create WinCE Dialogs Thread" );
             p_intf->pf_show_dialog = NULL;
         }
+        else
+            WaitForSingleObject (p_priv->thread_ready, INFINITE);
+        CloseHandle (p_priv->thread_ready);
     }
     else
     {
@@ -252,7 +256,7 @@ static void* MainLoop( vlc_object_t * p_this )
     p_intf->p_sys->pf_show_dialog = ShowDialog;
 
     /* OK, initialization is over */
-    vlc_thread_ready( p_intf );
+    SetEvent( p_intf->p_sys->thread_ready );
 
     // Main message loop
     while( GetMessage( &msg, NULL, 0, 0 ) > 0 )

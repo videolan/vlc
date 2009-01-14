@@ -86,6 +86,8 @@ struct intf_sys_t
     vector<MenuItemExt*> *p_settings_menu;
 
     VideoWindow          *p_video_window;
+
+    HANDLE   thread_ready;
 };
 
 /*****************************************************************************

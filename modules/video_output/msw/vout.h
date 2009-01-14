@@ -30,6 +30,7 @@ typedef struct event_thread_t
     VLC_COMMON_MEMBERS
 
     vout_thread_t * p_vout;
+    HANDLE window_ready;
 
 } event_thread_t;
 
