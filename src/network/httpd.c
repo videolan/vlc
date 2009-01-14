@@ -87,7 +87,7 @@ struct httpd_host_t
     httpd_t     *httpd;
 
     /* ref count */
-    int         i_ref;
+    unsigned    i_ref;
 
     /* address/port and socket for listening at connections */
     char        *psz_hostname;
@@ -96,6 +96,7 @@ struct httpd_host_t
     unsigned     nfd;
 
     vlc_mutex_t lock;
+    vlc_cond_t  wait;
 
     /* all registered url (becarefull that 2 httpd_url_t could point at the same url)
      * This will slow down the url research but make my live easier
@@ -1032,8 +1033,13 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
          || strcmp( host->psz_hostname, psz_hostname ) )
             continue;
 
-        /* yep found */
+        /* Increase existing matching host reference count.
+         * The reference count is written under both the global httpd and the
+         * host lock. It is read with either or both locks held. The global
+         * lock is always acquired first. */
+        vlc_mutex_lock( &host->lock );
         host->i_ref++;
+        vlc_mutex_unlock( &host->lock );
 
         vlc_mutex_unlock( lockval.p_address );
         return host;
@@ -1075,6 +1081,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     host->httpd = httpd;
     vlc_mutex_init( &host->lock );
+    vlc_cond_init( &host->wait );
     host->i_ref = 1;
 
     host->fds = net_ListenTCP( p_this, psz_host, i_port );
@@ -1129,6 +1136,7 @@ error:
     if( host != NULL )
     {
         net_ListenClose( host->fds );
+        vlc_cond_destroy( &host->wait );
         vlc_mutex_destroy( &host->lock );
         vlc_object_release( host );
     }
@@ -1149,7 +1157,11 @@ void httpd_HostDelete( httpd_host_t *host )
     var_Get( httpd->p_libvlc, "httpd_mutex", &lockval );
     vlc_mutex_lock( lockval.p_address );
 
+    vlc_mutex_lock( &host->lock );
     host->i_ref--;
+    if( host->i_ref == 0 )
+        vlc_cond_signal( &host->wait );
+    vlc_mutex_unlock( &host->lock );
     if( host->i_ref > 0 )
     {
         /* still used */
@@ -1185,6 +1197,7 @@ void httpd_HostDelete( httpd_host_t *host )
     net_ListenClose( host->fds );
     free( host->psz_hostname );
 
+    vlc_cond_destroy( &host->wait );
     vlc_mutex_destroy( &host->lock );
     vlc_object_release( host );
 
@@ -1241,6 +1254,7 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
     }
 
     TAB_APPEND( host->i_url, host->url, url );
+    vlc_cond_signal( &host->wait );
     vlc_mutex_unlock( &host->lock );
 
     return url;
@@ -2029,25 +2043,11 @@ static void* httpd_HostThread( vlc_object_t *p_this )
     tls_session_t *p_tls = NULL;
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
-    int evfd;
-    bool b_die;
     int canc = vlc_savecancel ();
+    int evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
 
-retry:
-    vlc_object_lock( host );
-    evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
-    b_die = !vlc_object_alive( host );
-    vlc_object_unlock( host );
-
-    while( !b_die )
+    for( ;; )
     {
-        if( host->i_url <= 0 )
-        {
-            /* 0.2s (FIXME: use a condition variable) */
-            msleep( 200000 );
-            goto retry;
-        }
-
         /* prepare a new TLS session */
         if( ( p_tls == NULL ) && ( host->p_tls != NULL ) )
             p_tls = tls_ServerSessionPrepare( host->p_tls );
@@ -2063,6 +2063,9 @@ retry:
 
         /* add all socket that should be read/write and close dead connection */
         vlc_mutex_lock( &host->lock );
+        while( host->i_url <= 0 && host->i_ref > 0 )
+            vlc_cond_wait( &host->wait, &host->lock );
+
         mtime_t now = mdate();
         bool b_low_delay = false;
 
@@ -2457,10 +2460,8 @@ retry:
                 continue;
         }
 
-        vlc_object_lock( host );
         if( ufd[nfd - 1].revents )
-            b_die = !vlc_object_alive( host );
-        vlc_object_unlock( host );
+            break;
 
         /* Handle client sockets */
         vlc_mutex_lock( &host->lock );
