@@ -94,6 +94,7 @@ static int Open( vlc_object_t *p_this )
     if( res != UPNP_E_SUCCESS )
     {
         msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
