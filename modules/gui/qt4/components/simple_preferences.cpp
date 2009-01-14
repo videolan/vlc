@@ -794,7 +794,7 @@ void SPrefsPanel::assoDialog()
     listAsso.clear();
 }
 
-void addAsso( QVLCRegistry *qvReg, char *psz_ext )
+void addAsso( QVLCRegistry *qvReg, const char *psz_ext )
 {
     std::string s_path( "VLC" ); s_path += psz_ext;
     std::string s_path2 = s_path;
@@ -833,7 +833,7 @@ void addAsso( QVLCRegistry *qvReg, char *psz_ext )
     }
 }
 
-void delAsso( QVLCRegistry *qvReg, char *psz_ext )
+void delAsso( QVLCRegistry *qvReg, const char *psz_ext )
 {
     char psz_VLC[] = "VLC";
     char *psz_value = qvReg->ReadRegistryString( psz_ext, "", ""  );
