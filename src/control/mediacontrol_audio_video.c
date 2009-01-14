@@ -72,7 +72,9 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     {
         RAISE_NULL( mediacontrol_InternalException, "No input" );
     }
+
     p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    vlc_object_release( p_input );
     if( ! p_vout )
     {
         RAISE_NULL( mediacontrol_InternalException, "No video output" );
@@ -96,7 +98,6 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     p_snapshot = ( snapshot_t* ) p_cache->p_private;
     vlc_object_unlock( p_cache );
     vlc_object_release( p_cache );
-    vlc_object_release( p_input );
 
     if( p_snapshot )
     {
