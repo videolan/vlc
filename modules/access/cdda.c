@@ -432,7 +432,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
             psz_last = NULL;
 
         /* Define a "default name" */
-        if( asprintf( &psz_name, _("Audio CD - Track %i"), (i+1) ) == -1 )
+        if( asprintf( &psz_name, _("Audio CD - Track %02i"), (i+1) ) == -1 )
             psz_name = NULL;
 
         /* Create playlist items */
