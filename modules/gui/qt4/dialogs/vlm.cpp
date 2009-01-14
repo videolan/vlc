@@ -816,9 +816,17 @@ void VLMWrapper::EditSchedule( const QString name, const QString input,
         _schetime.toString( "hh:mm:ss" ) + "\"";
     vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
     vlm_MessageDelete( message );
+
     if( _scherepeatnumber > 0 )
     {
        command = "setup \"" + name + "\" repeat \"" + _scherepeatnumber + "\"";
+       vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
+       vlm_MessageDelete( message );
+    }
+
+    if( _repeatDays > 0 )
+    {
+       command = "setup \"" + name + "\" period \"" + _repeatDays + "\"";
        vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
        vlm_MessageDelete( message );
     }

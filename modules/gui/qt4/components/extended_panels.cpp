@@ -39,6 +39,7 @@
 #include "qt4.hpp"
 #include "input_manager.hpp"
 
+#include "../../audio_filter/equalizer_presets.h"
 #include <vlc_aout.h>
 #include <vlc_intf_strings.h>
 #include <vlc_vout.h>

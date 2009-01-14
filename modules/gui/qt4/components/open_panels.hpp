@@ -71,9 +71,6 @@ enum
     JACK_DEVICE
 };
 
-static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
-                                       "dshow", "screen", "jack" };
-
 class QWidget;
 class QLineEdit;
 class QString;

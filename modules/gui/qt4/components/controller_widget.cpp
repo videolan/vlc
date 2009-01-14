@@ -38,7 +38,7 @@
 
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny )
-                         : b_my_volume( false ), QWidget( _parent )
+                         : QWidget( _parent ), b_my_volume( false )
 {
     p_intf = _p_intf;
     QHBoxLayout *layout = new QHBoxLayout( this );
@@ -159,14 +159,20 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
 
 bool VolumeClickHandler::eventFilter( QObject *obj, QEvent *e )
 {
+    VLC_UNUSED( obj );
     if (e->type() == QEvent::MouseButtonPress  )
     {
         aout_VolumeMute( p_intf, NULL );
         audio_volume_t i_volume;
         aout_VolumeGet( p_intf, &i_volume );
 //        m->updateVolume( i_volume *  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
+        e->accept();
         return true;
     }
-    return false;
+    else
+    {
+        e->ignore();
+        return false;
+    }
 }
 

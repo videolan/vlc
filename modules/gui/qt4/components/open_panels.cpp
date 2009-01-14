@@ -49,6 +49,9 @@
 
 #define I_DEVICE_TOOLTIP N_("Select the device or the VIDEO_TS directory")
 
+static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
+                                       "dshow", "screen", "jack" };
+
 /**************************************************************************
  * Open Files and subtitles                                               *
  **************************************************************************/

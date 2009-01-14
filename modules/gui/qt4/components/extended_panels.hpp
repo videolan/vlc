@@ -35,11 +35,10 @@
 #include "ui/equalizer.h"
 #include "ui/video_effects.h"
 #include "ui/v4l2.h"
-#include "../../audio_filter/equalizer_presets.h"
 
 #include <QTabWidget>
 
-#define BANDS EQZ_BANDS_MAX
+#define BANDS 10
 #define NUM_SP_CTRL 5
 
 class QSignalMapper;

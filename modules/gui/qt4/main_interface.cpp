@@ -640,6 +640,7 @@ void MainInterface::releaseVideoSlot( void )
 /* Call from WindowControl function */
 int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
 {
+    VLC_UNUSED( p_window ); //FIXME remove this param
     int i_ret = VLC_SUCCESS;
     switch( i_query )
     {

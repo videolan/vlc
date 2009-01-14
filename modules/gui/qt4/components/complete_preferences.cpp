@@ -201,7 +201,9 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
         // Main module excluded
         if( module_is_main( p_module) ) continue;
 
-        unsigned i_subcategory = 0, i_category = 0, confsize;
+        unsigned  confsize;
+        int i_subcategory = 0, i_category = 0;
+
         bool b_options = false;
         module_config_t *const p_config = module_config_get (p_module, &confsize);
 
