@@ -676,8 +676,12 @@ static int64_t IOSeek( void *opaque, int64_t offset, int whence )
             return -1;
 
     }
+
     if( i_absolute < 0 )
-        i_absolute = 0;
+    {
+        msg_Dbg( p_demux, "Trying to seek before the beginning" );
+        return -1;
+    }
 
     if( i_size > 0 && i_absolute >= i_size )
     {
