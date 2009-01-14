@@ -137,7 +137,7 @@ public:
 
         if( !value.isEmpty() )
         {
-            char *psz = config_StringEscape( qta(value) );
+            char *psz = config_StringEscape( qtu(value) );
             if( psz )
             {
                 QString v = QString( psz );
@@ -339,7 +339,7 @@ void SoutDialog::setOptions()
 {
     QString profileString =
         ui.profileBox->itemData( ui.profileBox->currentIndex() ).toString();
-    msg_Dbg( p_intf, "Profile Used: %s",  qta( profileString ));
+    msg_Dbg( p_intf, "Profile Used: %s",  qtu( profileString ));
     int index;
 
 #define setProfile( muxName, hasVideo, vCodecName, hasAudio, aCodecName ) \
@@ -497,7 +497,7 @@ void SoutDialog::updateMRL()
     sout.i_ab = ui.aBitrateSpin->value();
     sout.i_vb = ui.vBitrateSpin->value();
     sout.i_channels = ui.aChannelsSpin->value();
-    sout.f_scale = atof( qta( ui.vScaleBox->currentText() ) );
+    sout.f_scale = atof( qtu( ui.vScaleBox->currentText() ) );
     sout.psz_group = strdup( qtu( ui.sapGroup->text() ) );
     sout.psz_name = strdup( qtu( ui.sapName->text() ) );
 

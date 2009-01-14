@@ -85,7 +85,6 @@ struct intf_sys_t
 #define qfu( i ) QString::fromUtf8( i )
 #define qtr( i ) QString::fromUtf8( _(i) )
 #define qtu( i ) ((i).toUtf8().constData())
-#define qta( i ) ((i).toAscii().constData())
 
 #define CONNECT( a, b, c, d ) connect( a, SIGNAL( b ), c, SLOT(d) )
 #define BUTTONACT( b, a ) connect( b, SIGNAL( clicked() ), this, SLOT(a) )

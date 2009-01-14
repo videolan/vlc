@@ -396,7 +396,7 @@ void OpenDialog::updateMRL() {
     if( ui.slaveCheckbox->isChecked() ) {
         mrl += " :input-slave=" + ui.slaveText->text();
     }
-    int i_cache = config_GetInt( p_intf, qta( storedMethod ) );
+    int i_cache = config_GetInt( p_intf, qtu( storedMethod ) );
     if( i_cache != ui.cacheSpinBox->value() ) {
         mrl += QString( " :%1=%2" ).arg( storedMethod ).
                                   arg( ui.cacheSpinBox->value() );
@@ -412,7 +412,7 @@ void OpenDialog::newCachingMethod( QString method )
 {
     if( method != storedMethod ) {
         storedMethod = method;
-        int i_value = config_GetInt( p_intf, qta( storedMethod ) );
+        int i_value = config_GetInt( p_intf, qtu( storedMethod ) );
         ui.cacheSpinBox->setValue( i_value );
     }
 }
