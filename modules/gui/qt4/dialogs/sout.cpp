@@ -140,10 +140,7 @@ public:
             char *psz = config_StringEscape( qtu(value) );
             if( psz )
             {
-                QString v = QString( psz );
-
-                mrl += "=\"" + v + "\"";
-
+                mrl += "=\"" + qfu( psz ) + "\"";
                 free( psz );
             }
         }
@@ -534,7 +531,7 @@ void SoutDialog::updateMRL()
 
         if ( ui.transcodeVideo->isChecked() )
         {
-            smrl.option( "vcodec", sout.psz_vcodec );
+            smrl.option( "vcodec", qfu( sout.psz_vcodec ) );
             smrl.option( "vb", sout.i_vb );
             smrl.option( "scale", sout.f_scale );
             trans = true;
@@ -542,7 +539,7 @@ void SoutDialog::updateMRL()
 
         if ( ui.transcodeAudio->isChecked() )
         {
-            smrl.option( "acodec", sout.psz_acodec );
+            smrl.option( "acodec", qfu( sout.psz_acodec ) );
             smrl.option( "ab", sout.i_ab );
             smrl.option( "channels", sout.i_channels );
             trans = true;
@@ -557,7 +554,7 @@ void SoutDialog::updateMRL()
     if ( sout.b_file && sout.b_dump )
     {
         mrl = ":demux=dump :demuxdump-file=";
-        mrl.append( sout.psz_file );
+        mrl.append( qfu( sout.psz_file ) );
     }
     else
 
@@ -593,8 +590,8 @@ void SoutDialog::updateMRL()
             m.begin( "std" );
             m.option( "access", "file" );
             if( sout.psz_mux )
-                m.option( "mux", sout.psz_mux );
-            m.option( "dst", sout.psz_file );
+                m.option( "mux", qfu( sout.psz_mux ) );
+            m.option( "dst", qfu( sout.psz_file ) );
             m.end();
 
             ADD( m );
@@ -608,8 +605,8 @@ void SoutDialog::updateMRL()
             m.begin( "std" );
             m.option(  "access", "http" );
             if( sout.psz_mux )
-                m.option( "mux", sout.psz_mux );
-            m.option( "dst", sout.psz_http, sout.i_http );
+                m.option( "mux", qfu( sout.psz_mux ) );
+            m.option( "dst", qfu( sout.psz_http ), sout.i_http );
             m.end();
 
             ADD( m );
@@ -623,7 +620,7 @@ void SoutDialog::updateMRL()
             m.begin( "std" );
             m.option(  "access", "mmsh" );
             m.option( "mux", "asfh" );
-            m.option( "dst", sout.psz_mms, sout.i_mms );
+            m.option( "dst", qfu( sout.psz_mms ), sout.i_mms );
             m.end();
 
             ADD( m );
@@ -638,17 +635,17 @@ void SoutDialog::updateMRL()
                 m.begin( "std" );
                 m.option(  "access", "udp" );
                 if( sout.psz_mux )
-                    m.option( "mux", sout.psz_mux );
-                m.option( "dst", sout.psz_udp, sout.i_udp );
+                    m.option( "mux", qfu( sout.psz_mux ) );
+                m.option( "dst", qfu( sout.psz_udp ), sout.i_udp );
             }
             else
             {
                 m.begin( "rtp" );
 
                 if( sout.psz_rtp && *sout.psz_rtp )
-                    m.option( "dst", sout.psz_rtp );
+                    m.option( "dst", qfu( sout.psz_rtp ) );
                 if( sout.psz_mux )
-                    m.option( "mux", sout.psz_mux );
+                    m.option( "mux", qfu( sout.psz_mux ) );
 
                 m.option( "port", sout.i_rtp );
                 if( !sout.psz_mux || strncmp( sout.psz_mux, "ts", 2 ) )
@@ -662,8 +659,8 @@ void SoutDialog::updateMRL()
             if ( sout.b_sap )
             {
                 m.option( "sap" );
-                m.option( "group", sout.psz_group );
-                m.option( "name", sout.psz_name );
+                m.option( "group", qfu( sout.psz_group ) );
+                m.option( "name", qfu( sout.psz_name ) );
             }
 
             m.end();
@@ -676,8 +673,10 @@ void SoutDialog::updateMRL()
             SoutMrl m;
             QString url;
 
-            url = QString(sout.sa_icecast.psz_username) + "@" + sout.psz_icecast + ":" +
-                  QString::number( sout.i_icecast, 10 ) + "/" + sout.psz_icecast_mountpoint;
+            url = qfu(sout.sa_icecast.psz_username) + "@"
+                + qfu( sout.psz_icecast )
+                + ":" + QString::number( sout.i_icecast, 10 )
+                + "/" + qfu( sout.psz_icecast_mountpoint );
 
             m.begin( "std" );
             m.option( "access", "shout" );
