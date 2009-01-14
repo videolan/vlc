@@ -234,7 +234,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
     else if( i_ret > 0 )
         p_access->info.i_pos += i_ret;
-    else if( i_ret == 0 )
+    else
         p_access->info.b_eof = true;
 
     p_sys->i_nb_reads++;
