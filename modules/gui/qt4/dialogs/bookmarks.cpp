@@ -152,8 +152,8 @@ void BookmarksDialog::add()
 
     if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
     {
-        bookmark.psz_name = qtu( THEMIM->getIM()->getName() +
-                                 QString("_%1" ).arg( bookmarksList->topLevelItemCount() ) );
+        bookmark.psz_name = const_cast<char *>qtu( THEMIM->getIM()->getName() +
+                   QString("_%1" ).arg( bookmarksList->topLevelItemCount() ) );
 
         input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
     }

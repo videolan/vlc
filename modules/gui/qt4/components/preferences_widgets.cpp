@@ -434,7 +434,7 @@ void StringListConfigControl::actionRequested( int i_action )
     if(!p_module_config) return;
 
     vlc_value_t val;
-    val.psz_string =
+    val.psz_string = const_cast<char *>
         qtu( (combo->itemData( combo->currentIndex() ).toString() ) );
 
     p_module_config->ppf_action[i_action]( p_this, getName(), val, val, 0 );
