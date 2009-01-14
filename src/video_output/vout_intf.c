@@ -568,13 +568,13 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     DIR *path;
     int i_ret;
     bool b_embedded_snapshot;
-    uintmax_t i_id = (uintptr_t)NULL;
+    void *p_obj;
 
     /* */
     val.psz_string = var_GetNonEmptyString( p_vout, "snapshot-path" );
 
     /* Embedded snapshot : if snapshot-path == object:object_ptr */
-    if( val.psz_string && sscanf( val.psz_string, "object:%ju", &i_id ) > 0 )
+    if( val.psz_string && sscanf( val.psz_string, "object:%p", &p_obj ) > 0 )
         b_embedded_snapshot = true;
     else
         b_embedded_snapshot = false;
@@ -634,7 +634,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
      */
     if( b_embedded_snapshot )
     {
-        vlc_object_t* p_dest = (vlc_object_t *)(uintptr_t)i_id;
+        vlc_object_t* p_dest = p_obj;
         block_t *p_block;
         snapshot_t *p_snapshot;
         size_t i_size;
