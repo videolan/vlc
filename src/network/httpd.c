@@ -1073,15 +1073,6 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     if (host == NULL)
         goto error;
 
-    vlc_object_lock( host );
-    if( vlc_object_waitpipe( VLC_OBJECT( host ) ) == -1 )
-    {
-        msg_Err( host, "signaling pipe error: %m" );
-        vlc_object_unlock( host );
-        goto error;
-    }
-    vlc_object_unlock( host );
-
     host->httpd = httpd;
     vlc_mutex_init( &host->lock );
     host->i_ref = 1;
@@ -1093,6 +1084,12 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         goto error;
     }
     for (host->nfd = 0; host->fds[host->nfd] != -1; host->nfd++);
+
+    if( vlc_object_waitpipe( VLC_OBJECT( host ) ) == -1 )
+    {
+        msg_Err( host, "signaling pipe error: %m" );
+        goto error;
+    }
 
     host->i_port = i_port;
     host->psz_hostname = psz_host;
