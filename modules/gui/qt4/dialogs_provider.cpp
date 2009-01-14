@@ -548,12 +548,9 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
 
     if( s->exec() == QDialog::Accepted )
     {
-        msg_Dbg( p_intf, "Sout mrl %s", qta( s->getMrl() ) );
-        /* Just do it */
-        int i_len = strlen( qtu( s->getMrl() ) ) + 10;
-        char *psz_option = (char*)malloc( i_len );
-        snprintf( psz_option, i_len - 1, "%s", qtu( s->getMrl() ) );
+        const char *psz_option = qtu( s->getMrl() );
 
+        msg_Dbg( p_intf, "Sout mrl %s", psz_option );
         playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
                         -1, &psz_option, 1, true, pl_Unlocked );
