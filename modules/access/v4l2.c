@@ -42,23 +42,13 @@
 #include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
-#include <vlc_vout.h>
 
 #include <ctype.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 
 #include <linux/videodev2.h>
-
-#include <sys/soundcard.h>
-
-#ifdef HAVE_ALSA
-#   define ALSA_PCM_NEW_HW_PARAMS_API
-#   define ALSA_PCM_NEW_SW_PARAMS_API
-#   include <alsa/asoundlib.h>
-#endif
 
 #include <poll.h>
 
