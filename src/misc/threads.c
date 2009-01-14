@@ -868,8 +868,6 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     assert( !p_priv->b_thread );
 
 #if defined( LIBVLC_USE_PTHREAD )
-    if (b_wait)
-        sem_init (&p_priv->thread_ready, 0, 0);
 #ifndef __APPLE__
     if( config_GetInt( p_this, "rt-priority" ) > 0 )
 #endif
@@ -878,9 +876,6 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
         if( config_GetType( p_this, "rt-offset" ) )
             i_priority += config_GetInt( p_this, "rt-offset" );
     }
-#elif defined (WIN32)
-    if (b_wait)
-        p_priv->thread_ready = CreateEvent (NULL, TRUE, FALSE, NULL);
 #endif
 
     p_priv->b_thread = true;
@@ -889,17 +884,7 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     {
         msg_Dbg( p_this, "thread (%s) created at priority %d (%s:%d)",
                  psz_name, i_priority, psz_file, i_line );
-        if( b_wait )
-        {
-            msg_Dbg( p_this, "waiting for thread initialization" );
-#if defined (LIBVLC_USE_PTHREAD)
-            sem_wait (&p_priv->thread_ready);
-            sem_destroy (&p_priv->thread_ready);
-#elif defined (WIN32)
-            WaitForSingleObject (p_priv->thread_ready, INFINITE);
-            CloseHandle (p_priv->thread_ready);
-#endif
-        }
+        assert( !b_wait );
     }
     else
     {
@@ -910,20 +895,6 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     }
 
     return i_ret;
-}
-
-#undef vlc_thread_ready
-void vlc_thread_ready (vlc_object_t *obj)
-{
-    vlc_object_internals_t *priv = vlc_internals (obj);
-
-    assert (priv->b_thread);
-#if defined (LIBVLC_USE_PTHREAD)
-    assert (pthread_equal (pthread_self (), priv->thread_id));
-    sem_post (&priv->thread_ready);
-#elif defined (WIN32)
-    SetEvent (priv->thread_ready);
-#endif
 }
 
 /*****************************************************************************

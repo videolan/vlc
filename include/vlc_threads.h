@@ -172,9 +172,6 @@ enum {
 };
 #endif
 
-VLC_EXPORT(void, vlc_thread_ready, (vlc_object_t *obj));
-#define vlc_thread_ready(o) vlc_thread_ready(VLC_OBJECT(o))
-
 /**
  * Save the cancellation state and disable cancellation for the calling thread.
  * This function must be called before entering a piece of code that is not
