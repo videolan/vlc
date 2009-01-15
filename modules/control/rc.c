@@ -65,7 +65,7 @@
 #    include <sys/un.h>
 #endif
 
-#define MAX_LINE_LENGTH 256
+#define MAX_LINE_LENGTH 1024
 #define STATUS_CHANGE "status change: "
 
 /* input_state_e from <vlc_input.h> */
@@ -1542,7 +1542,7 @@ static int Quit( vlc_object_t *p_this, char const *psz_cmd,
 {
     VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    
+
     vlc_object_kill( p_this->p_libvlc );
     return VLC_SUCCESS;
 }
