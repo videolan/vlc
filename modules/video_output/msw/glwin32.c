@@ -134,18 +134,18 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->p_event =
         vlc_object_create( p_vout, sizeof(event_thread_t) );
     p_vout->p_sys->p_event->p_vout = p_vout;
-    p_vout->p_sys->p_event->ready = CreateEvent( NULL, TRUE, FALSE, NULL );
+    p_vout->p_sys->p_event->window_ready = CreateEvent( NULL, TRUE, FALSE, NULL );
     if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
                            EventThread, 0, false ) )
     {
         msg_Err( p_vout, "cannot create Vout EventThread" );
-        CloseHandle( p_vout->p_sys->p_event->ready );
+        CloseHandle( p_vout->p_sys->p_event->window_ready );
         vlc_object_release( p_vout->p_sys->p_event );
         p_vout->p_sys->p_event = NULL;
         goto error;
     }
-    WaitForSingleObject( p_vout->p_sys->p_event->ready, INFINITE )
-    CloseHandle( p_vout->p_sys->p_event->ready );
+    WaitForSingleObject( p_vout->p_sys->p_event->window_ready, INFINITE );
+    CloseHandle( p_vout->p_sys->p_event->window_ready );
 
     if( p_vout->p_sys->p_event->b_error )
     {
