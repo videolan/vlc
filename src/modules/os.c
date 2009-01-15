@@ -228,7 +228,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     const int flags = 0;
 # endif
 
-    handle = dlopen( psz_file, RTLD_NOW );
+    handle = dlopen( psz_file, flags );
     if( handle == NULL )
     {
         msg_Warn( p_this, "cannot load module `%s' (%s)",
