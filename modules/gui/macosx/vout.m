@@ -805,7 +805,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     return YES;
 }
 
-- (bool)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
+- (BOOL)setVout: (vout_thread_t *) p_arg_vout subView: (NSView *) view
                      frame: (NSRect *) s_arg_frame
 {
     BOOL b_return = [super setVout: p_arg_vout subView: view frame:s_arg_frame];

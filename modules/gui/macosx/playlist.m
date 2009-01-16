@@ -50,6 +50,7 @@
 #import "vlc_osd.h"
 #import "misc.h"
 #import <vlc_interface.h>
+#import <vlc_services_discovery.h>
 
 /*****************************************************************************
  * VLCPlaylistView implementation
