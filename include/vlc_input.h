@@ -413,7 +413,6 @@ struct input_thread_t
 
     int i_state;
     bool b_can_pace_control;
-    int64_t     i_time;     /* Current time */
 
     /* All other data is input_thread is PRIVATE. You can't access it
      * outside of src/input */

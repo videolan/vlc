@@ -870,7 +870,7 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                     if( p_item && p_input )
                     {
                         mtime_t i_duration = input_item_GetDuration( p_item );
-                        int64_t i_time = p_input->i_time;
+                        int64_t i_time = var_GetInteger( p_input, "time" );
                         sprintf( buf, "%02d:%02d:%02d",
                      (int)( ( i_duration - i_time ) / 3600000000 ),
                      (int)( ( ( i_duration - i_time ) / 60000000 ) % 60 ),
@@ -938,10 +938,11 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                 case 'T':
                     if( p_input )
                     {
+                        int64_t i_time = var_GetInteger( p_input, "time" );
                         sprintf( buf, "%02d:%02d:%02d",
-                            (int)( p_input->i_time / ( 3600000000 ) ),
-                            (int)( ( p_input->i_time / ( 60000000 ) ) % 60 ),
-                            (int)( ( p_input->i_time / 1000000 ) % 60 ) );
+                            (int)( i_time / ( 3600000000 ) ),
+                            (int)( ( i_time / ( 60000000 ) ) % 60 ),
+                            (int)( ( i_time / 1000000 ) % 60 ) );
                     }
                     else
                     {

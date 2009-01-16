@@ -167,7 +167,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->b_eof = false;
     p_input->b_can_pace_control = true;
     p_input->p->i_start = 0;
-    p_input->i_time     = 0;
+    p_input->p->i_time  = 0;
     p_input->p->i_stop  = 0;
     p_input->p->i_run   = 0;
     p_input->p->i_title = 0;
@@ -568,7 +568,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
 
     *pb_changed = false;
 
-    if( ( p_input->p->i_stop > 0 && p_input->i_time >= p_input->p->i_stop ) ||
+    if( ( p_input->p->i_stop > 0 && p_input->p->i_time >= p_input->p->i_stop ) ||
         ( p_input->p->i_run > 0 && *pi_start_mdate+p_input->p->i_run < mdate() ) )
         i_ret = 0; /* EOF */
     else
@@ -682,7 +682,7 @@ static void MainLoopInterface( input_thread_t *p_input )
     if( demux_Control( p_input->p->input.p_demux,
                        DEMUX_GET_TIME, &i_time ) )
         i_time = 0;
-    p_input->i_time = i_time;
+    p_input->p->i_time = i_time;
 
     if( demux_Control( p_input->p->input.p_demux,
                        DEMUX_GET_LENGTH, &i_length ) )

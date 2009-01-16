@@ -87,10 +87,11 @@ struct input_thread_private_t
     int         i_rate;
     bool        b_recording;
 
-    /* Playtime configuration */
+    /* Playtime configuration and state */
     int64_t     i_start;    /* :start-time,0 by default */
     int64_t     i_stop;     /* :stop-time, 0 if none */
     int64_t     i_run;      /* :run-time, 0 if none */
+    int64_t     i_time;     /* Current time */
 
     /* Title infos FIXME multi-input (not easy) ? */
     int          i_title;
