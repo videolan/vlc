@@ -1191,6 +1191,7 @@ elif test "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGIN([dmo])
     VLC_ADD_PLUGIN([msn])
     VLC_ADD_LIBS([dmo],[-lole32 -luuid])
+    VLC_ADD_PLUGIN([globalhotkeys])
 else
     VLC_ADD_PLUGIN([win32text])
 fi
