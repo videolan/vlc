@@ -36,7 +36,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include <vlc_input.h>                 /* for input_thread_t and i_pts_delay */
+#include <vlc_input.h>
 #include <vlc_vout.h>                  /* for vout_Request */
 
 #ifdef HAVE_ALLOCA_H
