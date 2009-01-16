@@ -11,6 +11,10 @@
 #include "AtmoExternalCaptureInput.h"
 #include "AtmoTools.h"
 
+#ifndef INT64_C
+#define INT64_C(c)  c ## LL
+#endif
+
 #if defined(_ATMO_VLC_PLUGIN_)
 
 CAtmoExternalCaptureInput::CAtmoExternalCaptureInput(CAtmoDynData *pAtmoDynData) :
