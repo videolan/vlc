@@ -582,10 +582,6 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         assert(0);
         return VLC_EGENERIC;
 
-    /* TODO ? or to remove ? */
-    case ES_OUT_GET_TS:
-        return VLC_EGENERIC;
-
     /* Pass-through control */
     case ES_OUT_SET_ACTIVE:
     case ES_OUT_SET_MODE:

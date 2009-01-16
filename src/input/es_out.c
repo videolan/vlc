@@ -2194,17 +2194,6 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             EsOutChangePosition( out );
             return VLC_SUCCESS;
 
-        case ES_OUT_GET_TS:
-            if( p_sys->p_pgrm )
-            {
-                int64_t i_ts = (int64_t)va_arg( args, int64_t );
-                int64_t *pi_ts = (int64_t *)va_arg( args, int64_t * );
-                *pi_ts = input_clock_GetTS( p_sys->p_pgrm->p_clock, NULL,
-                                            p_sys->p_input->i_pts_delay, i_ts );
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
-
         case ES_OUT_SET_GROUP:
         {
             int j;
