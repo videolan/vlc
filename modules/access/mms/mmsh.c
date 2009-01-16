@@ -79,23 +79,7 @@ int MMSHOpen( access_t *p_access )
     char            *psz_location = NULL;
     char            *psz_proxy;
 
-    /* init p_sys */
-
-    /* Set up p_access */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_control = Control;
-    p_access->pf_seek = Seek;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-
-    p_access->p_sys = p_sys = calloc( 1, sizeof( access_sys_t ) );
-    if( !p_sys )
-        return VLC_ENOMEM;
+    STANDARD_READ_ACCESS_INIT
 
     p_sys->i_proto= MMS_PROTO_HTTP;
     p_sys->fd     = -1;
@@ -187,7 +171,10 @@ int MMSHOpen( access_t *p_access )
         input_item_t * p_new_loc;
 
         if( !p_input )
+        {
+            free( psz_location );
             return VLC_EGENERIC;
+        }
         /** \bug we do not autodelete here */
         p_new_loc = input_item_New( p_access, psz_location, psz_location );
         input_item_AddSubItem( input_GetItem( p_input ), p_new_loc );
@@ -199,6 +186,7 @@ int MMSHOpen( access_t *p_access )
         p_access->pf_read = ReadRedirect;
         return VLC_SUCCESS;
     }
+    free( psz_location );
 
     /* Start playing */
     if( Start( p_access, 0 ) )
