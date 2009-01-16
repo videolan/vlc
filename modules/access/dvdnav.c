@@ -649,7 +649,7 @@ static int Demux( demux_t *p_demux )
             else
             {
                 p_sys->p_ev->i_still_end = (int64_t)event->length *
-                    1000000 + mdate() + p_sys->p_input->i_pts_delay;
+                    1000000 + mdate();
             }
         }
         vlc_mutex_unlock( &p_sys->p_ev->lock );
