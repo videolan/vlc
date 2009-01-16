@@ -411,8 +411,6 @@ struct input_thread_t
     bool b_preparsing;
     bool b_dead;
 
-    bool b_can_pace_control;
-
     /* All other data is input_thread is PRIVATE. You can't access it
      * outside of src/input */
     input_thread_private_t *p;

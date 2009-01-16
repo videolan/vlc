@@ -78,6 +78,7 @@ struct input_thread_private_t
     /* Global properties */
     bool        b_can_pause;
     bool        b_can_rate_control;
+    bool        b_can_pace_control;
     double      f_fps;
     int         i_state;
 

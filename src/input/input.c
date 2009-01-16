@@ -165,7 +165,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Init Common fields */
     p_input->b_eof = false;
-    p_input->b_can_pace_control = true;
+    p_input->p->b_can_pace_control = true;
     p_input->p->i_start = 0;
     p_input->p->i_time  = 0;
     p_input->p->i_stop  = 0;
@@ -901,7 +901,7 @@ static void InitTitle( input_thread_t * p_input )
     }
 
     /* Global flag */
-    p_input->b_can_pace_control    = p_master->b_can_pace_control;
+    p_input->p->b_can_pace_control    = p_master->b_can_pace_control;
     p_input->p->b_can_pause        = p_master->b_can_pause;
     p_input->p->b_can_rate_control = p_master->b_can_rate_control;
 
@@ -1181,7 +1181,7 @@ static int Init( input_thread_t * p_input )
     {
         p_input->p->b_out_pace_control = (p_input->p->p_sout->i_out_pace_nocontrol > 0);
 
-        if( p_input->b_can_pace_control && p_input->p->b_out_pace_control )
+        if( p_input->p->b_can_pace_control && p_input->p->b_out_pace_control )
         {
             /* We don't want a high input priority here or we'll
              * end-up sucking up all the CPU time */
@@ -1773,7 +1773,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 i_rate = INPUT_RATE_DEFAULT;
             }
             if( i_rate != p_input->p->i_rate &&
-                !p_input->b_can_pace_control && p_input->p->b_can_rate_control )
+                !p_input->p->b_can_pace_control && p_input->p->b_can_rate_control )
             {
                 int i_ret;
                 if( p_input->p->input.p_access )
@@ -1803,7 +1803,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                 if( p_input->p->input.b_rescale_ts )
                 {
-                    const int i_rate_source = (p_input->b_can_pace_control || p_input->p->b_can_rate_control ) ? i_rate : INPUT_RATE_DEFAULT;
+                    const int i_rate_source = (p_input->p->b_can_pace_control || p_input->p->b_can_rate_control ) ? i_rate : INPUT_RATE_DEFAULT;
                     es_out_SetRate( p_input->p->p_es_out, i_rate_source, i_rate );
                 }
 
