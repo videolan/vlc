@@ -87,7 +87,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     BUTTONACT( okButton, close() );
 
     setMinimumSize( 500, 300 );
-    readSettings( "Plugins", QSize( 500, 300 ) );
+    readSettings( "Plugins", QSize( 540, 400 ) );
 }
 
 inline void PluginDialog::FillTree()

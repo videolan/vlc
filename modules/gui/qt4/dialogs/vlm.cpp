@@ -157,12 +157,14 @@ VLMDialog::VLMDialog( QWidget *parent, intf_thread_t *_p_intf ) : QVLCDialog( pa
     BUTTONACT( ui.saveButton, saveModifications() );
     BUTTONACT( ui.inputButton, selectInput() );
     BUTTONACT( ui.outputButton, selectOutput() );
+    //readSettings( "VLM", QSize( 700, 500 ) );
 }
 
 VLMDialog::~VLMDialog()
 {
     delete vlmWrapper;
 
+    //writeSettings( "VLM" );
    /* TODO :you have to destroy vlm here to close
     * but we shouldn't destroy vlm here in case somebody else wants it */
     if( p_vlm )

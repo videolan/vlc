@@ -96,7 +96,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
 #endif
     BUTTONACT( closeButton, close() );
 
-    readSettings( "Bookmarks", QSize( 435, 206 ) );
+    readSettings( "Bookmarks", QSize( 435, 280 ) );
     updateGeometry();
 }
 
