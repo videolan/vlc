@@ -1277,6 +1277,11 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
+- (BOOL)isPlaylistCollapsed
+{
+    return ![o_btn_playlist state];
+}
+
 - (id)getInfo
 {
     if( o_info )
@@ -1511,10 +1516,10 @@ static void * manage_cleanup( void * args )
                 b_buffering = YES;
             }
 
-            /* update our info-panel to reflect the new item */
-            [[[VLCMain sharedInstance] getInfo]
-                updatePanelWithItem: 
-                    playlist_CurrentPlayingItem( p_playlist )->p_input];
+            /* update our info-panel to reflect the new item, if we don't show
+             * the playlist or the selection is empty */
+            if( [self isPlaylistCollapsed] == YES )
+                [[self getInfo] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
 
             /* seekable streams */
             b_seekable = var_GetBool( p_input, "can-seek" );
@@ -2502,13 +2507,11 @@ end:
 - (void)updateTogglePlaylistState
 {
     if( [o_window contentRectForFrameRect:[o_window frame]].size.height <= 169. )
-    {
         [o_btn_playlist setState: NO];
-    }
     else
-    {
         [o_btn_playlist setState: YES];
-    }
+
+    [[self getPlaylist] outlineViewSelectionDidChange: NULL];
 }
 
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize

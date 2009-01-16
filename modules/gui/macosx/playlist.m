@@ -548,6 +548,12 @@
         }
         [o_mi_revealInFinder setEnabled: NO];
         [o_mm_mi_revealInFinder setEnabled: NO];
+
+        if( [[VLCMain sharedInstance] isPlaylistCollapsed] == NO )
+        {
+            /* update our info-panel to reflect the new item, if we aren't collapsed */
+            [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
+        }
     }
 }
 
