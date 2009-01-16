@@ -1525,7 +1525,7 @@ static void * manage_cleanup( void * args )
             b_seekable = var_GetBool( p_input, "can-seek" );
 
             /* check whether slow/fast motion is possible */
-            b_control = p_input->b_can_pace_control;
+            b_control = var_GetBool( p_input, "can-rate" );
 
             /* chapters & titles */
             //b_chapters = p_input->stream.i_area_nb > 1;

@@ -185,7 +185,7 @@ static void Run( intf_thread_t *p_intf )
             vlc_object_release( p_vout );
             if( p_input )
             {
-                if( PLAYING_S == p_input->i_state )
+                if( PLAYING_S == var_GetInteger( p_input, "state" ) )
                 {
                     /* http://www.jwz.org/xscreensaver/faq.html#dvd */
                     const char *const ppsz_xsargs[] = { "/bin/sh", "-c",

@@ -596,7 +596,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         }
 
         /* control buttons for free pace streams */
-        b_control = p_intf->p_sys->p_input->b_can_pace_control;
+        b_control = var_GetBool( p_intf->p_sys->p_input, "can-rate" );
 
         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
     }

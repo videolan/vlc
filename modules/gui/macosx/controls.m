@@ -932,7 +932,7 @@
     {
         if( p_input != NULL )
         {
-            bEnabled = p_input->b_can_pace_control;
+            bEnabled = var_GetBool( p_input, "can-rate" );
         }
         else
         {
