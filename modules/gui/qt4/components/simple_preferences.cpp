@@ -186,11 +186,11 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "video-on-top", Bool, NULL, alwaysOnTop );
             CONFIG_GENERIC( "video-deco", Bool, NULL, windowDecorations );
             CONFIG_GENERIC( "skip-frames" , Bool, NULL, skipFrames );
-            CONFIG_GENERIC( "vout", Module, NULL, outputModule );
+            CONFIG_GENERIC( "vout", Module, ui.voutLabel, outputModule );
 
 #ifdef WIN32
             CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
-            CONFIG_GENERIC( "directx-device", StringList, NULL,
+            CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
                             dXdisplayDevice );
             CONFIG_GENERIC( "directx-hw-yuv", Bool, NULL, hwYUVBox );
 #else
@@ -198,15 +198,15 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.hwYUVBox->setVisible( false );
 #endif
 
-            CONFIG_GENERIC( "deinterlace-mode", StringList, NULL, deinterlaceBox );
-            CONFIG_GENERIC( "aspect-ratio", String, NULL, arLine );
+            CONFIG_GENERIC( "deinterlace-mode", StringList, ui.deinterLabel, deinterlaceBox );
+            CONFIG_GENERIC( "aspect-ratio", String, ui.arLabel, arLine );
 
-            CONFIG_GENERIC_FILE( "snapshot-path", Directory, NULL,
+            CONFIG_GENERIC_FILE( "snapshot-path", Directory, ui.dirLabel,
                                  ui.snapshotsDirectory, ui.snapshotsDirectoryBrowse );
-            CONFIG_GENERIC( "snapshot-prefix", String, NULL, snapshotsPrefix );
+            CONFIG_GENERIC( "snapshot-prefix", String, ui.prefixLabel, snapshotsPrefix );
             CONFIG_GENERIC( "snapshot-sequential", Bool, NULL,
                             snapshotsSequentialNumbering );
-            CONFIG_GENERIC( "snapshot-format", StringList, NULL,
+            CONFIG_GENERIC( "snapshot-format", StringList, ui.arLabel,
                             snapshotsFormat );
          END_SPREFS_CAT;
 
@@ -254,14 +254,14 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             audioControl( DirectX );
             optionWidgets.append( DirectXControl );
             CONFIG_GENERIC2( "directx-audio-device", IntegerList,
-                    DirectXLabel, DirectXDevice );
+                    ui.DirectXLabel, DirectXDevice );
 #else
             if( module_exists( "alsa" ) )
             {
                 audioControl( alsa );
                 optionWidgets.append( alsaControl );
 
-                CONFIG_GENERIC2( "alsa-audio-device" , StringList , alsaLabel,
+                CONFIG_GENERIC2( "alsa-audio-device" , StringList, NULL,
                                 alsaDevice );
             }
             else
@@ -270,7 +270,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             {
                 audioControl2( OSS );
                 optionWidgets.append( OSSControl );
-                CONFIG_GENERIC_FILE( "oss-audio-device" , File , OSSLabel, OSSDevice,
+                CONFIG_GENERIC_FILE( "oss-audio-device" , File, NULL, OSSDevice,
                                  OSSBrowse );
             }
             else
@@ -283,26 +283,27 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.defaultVolume, valueChanged( int ),
                     this, updateAudioVolume( int ) );
 
-            CONFIG_GENERIC( "audio-language" , String , NULL,
+            CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
                             preferredAudioLanguage );
 
             CONFIG_GENERIC( "spdif", Bool, NULL, spdifBox );
             CONFIG_GENERIC( "qt-autosave-volume", Bool, NULL, saveVolBox );
-            CONFIG_GENERIC( "force-dolby-surround" , IntegerList , NULL,
+            CONFIG_GENERIC( "force-dolby-surround", IntegerList, ui.dolbyLabel,
                             detectionDolby );
 
             CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float, NULL,
                                     volNormSpin );
-            CONFIG_GENERIC( "audio-visual" , Module , NULL, visualisation);
+            CONFIG_GENERIC( "audio-visual" , Module , ui.visuLabel,
+                            visualisation);
 
             /* Audio Output Specifics */
-            CONFIG_GENERIC( "aout", Module, NULL, outputModule );
+            CONFIG_GENERIC( "aout", Module, ui.outputLabel, outputModule );
 
             CONNECT( ui.outputModule, currentIndexChanged( int ),
                      this, updateAudioOptions( int ) );
 
             /* File output exists on all platforms */
-            CONFIG_GENERIC_FILE( "audiofile-file" , File , ui.fileLabel,
+            CONFIG_GENERIC_FILE( "audiofile-file", File, ui.fileLabel,
                                  ui.fileName, ui.fileBrowseButton );
 
             optionWidgets.append( ui.fileControl );
@@ -326,8 +327,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     ui.lastfm->setChecked( true );
                 else
                     ui.lastfm->setChecked( false );
-                CONNECT( ui.lastfm, stateChanged( int ), this ,
-                        lastfm_Changed( int ) );
+                CONNECT( ui.lastfm, stateChanged( int ),
+                         this, lastfm_Changed( int ) );
             }
             else
                 ui.lastfm->hide();
@@ -376,10 +377,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 free( psz_vcddiscpath );
             }
 
-            CONFIG_GENERIC_NO_BOOL( "server-port", Integer, NULL, UDPPort );
-            CONFIG_GENERIC( "http-proxy", String , NULL, proxy );
-            CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, NULL, PostProcLevel );
-            CONFIG_GENERIC( "avi-index", IntegerList, NULL, AviRepair );
+            CONFIG_GENERIC_NO_BOOL( "server-port", Integer, ui.portLabel,
+                                    UDPPort );
+            CONFIG_GENERIC( "http-proxy", String , ui.httpProxyLabel, proxy );
+            CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, ui.ppLabel,
+                                    PostProcLevel );
+            CONFIG_GENERIC( "avi-index", IntegerList, ui.aviLabel, AviRepair );
             CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
 #ifdef WIN32
             CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
@@ -448,7 +451,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.skinsLabel->setFont( italicFont );
 
 #if defined( WIN32 )
-            CONFIG_GENERIC( "language", StringList, NULL, language );
+            CONFIG_GENERIC( "language", StringList, ui.languageLabel, language );
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
             ui.language->hide();
@@ -471,13 +474,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
 
-            CONFIG_GENERIC( "qt-display-mode", IntegerList, NULL,
+            CONFIG_GENERIC( "qt-display-mode", IntegerList, ui.displayLabel,
                             displayModeBox );
             CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
             CONFIG_GENERIC( "qt-fs-controller", Bool, NULL, fsController );
             CONFIG_GENERIC( "qt-system-tray", Bool, NULL, systrayBox );
-            CONFIG_GENERIC_FILE( "skins2-last", File, NULL, ui.fileSkin,
-                    ui.skinBrowse );
+            CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
+                                 ui.fileSkin, ui.skinBrowse );
 
             CONFIG_GENERIC( "album-art", IntegerList, ui.artFetchLabel,
                                                       artFetcher );
@@ -506,25 +509,30 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                      ui.recentlyPlayedFilters, setEnabled( bool ) );
             ui.recentlyPlayedFilters->setEnabled( false );
             CONFIG_GENERIC( "qt-recentplay", Bool, NULL, saveRecentlyPlayed );
-            CONFIG_GENERIC( "qt-recentplay-filter", String, NULL,
+            CONFIG_GENERIC( "qt-recentplay-filter", String, ui.filterLabel,
                     recentlyPlayedFilters );
 
         END_SPREFS_CAT;
 
-        START_SPREFS_CAT( Subtitles, qtr("Subtitles & On Screen Display Settings") );
+        START_SPREFS_CAT( Subtitles,
+                            qtr("Subtitles & On Screen Display Settings") );
             CONFIG_GENERIC( "osd", Bool, NULL, OSDBox);
             CONFIG_GENERIC( "video-title-show", Bool, NULL, OSDTitleBox);
 
 
-            CONFIG_GENERIC( "subsdec-encoding", StringList, NULL, encoding );
-            CONFIG_GENERIC( "sub-language", String, NULL, preferredLanguage );
-            CONFIG_GENERIC_FILE( "freetype-font", File, NULL, ui.font,
+            CONFIG_GENERIC( "subsdec-encoding", StringList, ui.encodLabel,
+                            encoding );
+            CONFIG_GENERIC( "sub-language", String, ui.subLangLabel,
+                            preferredLanguage );
+            CONFIG_GENERIC_FILE( "freetype-font", File, ui.fontLabel, ui.font,
                             ui.fontBrowse );
-            CONFIG_GENERIC( "freetype-color", IntegerList, NULL, fontColor );
-            CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList, NULL,
-                            fontSize );
-            CONFIG_GENERIC( "freetype-effect", IntegerList, NULL, effect );
-            CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, NULL, subsPosition );
+            CONFIG_GENERIC( "freetype-color", IntegerList, ui.fontColorLabel,
+                            fontColor );
+            CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
+                            ui.fontSizeLabel, fontSize );
+            CONFIG_GENERIC( "freetype-effect", IntegerList, ui.fontEffectLabel,
+                            effect );
+            CONFIG_GENERIC_NO_BOOL( "sub-margin", Integer, ui.subsPosLabel, subsPosition );
 
         END_SPREFS_CAT;
 

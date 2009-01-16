@@ -6,7 +6,7 @@
     <x>0</x>
     <y>0</y>
     <width>434</width>
-    <height>441</height>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -52,7 +52,7 @@
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
+       <widget class="QLabel" name="subLangLabel" >
         <property name="text" >
          <string>_("Preferred subtitles language")</string>
         </property>
@@ -72,7 +72,7 @@
        <widget class="QLineEdit" name="preferredLanguage" />
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_2" >
+       <widget class="QLabel" name="encodLabel" >
         <property name="text" >
          <string>_("Default encoding")</string>
         </property>
@@ -94,7 +94,7 @@
        <widget class="QComboBox" name="effect" />
       </item>
       <item row="3" column="0" >
-       <widget class="QLabel" name="label_6" >
+       <widget class="QLabel" name="fontEffectLabel" >
         <property name="text" >
          <string>_("Effect")</string>
         </property>
@@ -107,7 +107,7 @@
        <widget class="QComboBox" name="fontColor" />
       </item>
       <item row="2" column="0" >
-       <widget class="QLabel" name="label_4" >
+       <widget class="QLabel" name="fontColorLabel" >
         <property name="text" >
          <string>_("Font color")</string>
         </property>
@@ -120,7 +120,7 @@
        <widget class="QComboBox" name="fontSize" />
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_3" >
+       <widget class="QLabel" name="fontSizeLabel" >
         <property name="text" >
          <string>_("Font size")</string>
         </property>
@@ -140,7 +140,7 @@
        <widget class="QLineEdit" name="font" />
       </item>
       <item row="0" column="0" >
-       <widget class="QLabel" name="label_5" >
+       <widget class="QLabel" name="fontLabel" >
         <property name="text" >
          <string>_("Font")</string>
         </property>
@@ -166,7 +166,7 @@
        </widget>
       </item>
       <item row="4" column="0" >
-       <widget class="QLabel" name="label_7" >
+       <widget class="QLabel" name="subsPosLabel" >
         <property name="text" >
          <string>_("Force subtitle position")</string>
         </property>

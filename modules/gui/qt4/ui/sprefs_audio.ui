@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
+    <width>559</width>
     <height>609</height>
    </rect>
   </property>
@@ -108,7 +108,7 @@
        </widget>
       </item>
       <item row="2" column="0" >
-       <widget class="QLabel" name="label_8" >
+       <widget class="QLabel" name="dolbyLabel" >
         <property name="text" >
          <string>_("Force detection of Dolby Surround")</string>
         </property>
@@ -137,7 +137,7 @@
        </widget>
       </item>
       <item row="3" column="0" >
-       <widget class="QLabel" name="label" >
+       <widget class="QLabel" name="langLabel" >
         <property name="text" >
          <string>_("Preferred audio language")</string>
         </property>
@@ -175,7 +175,7 @@
      </property>
      <layout class="QGridLayout" name="outputAudioLayout" >
       <item row="0" column="0" >
-       <widget class="QLabel" name="label_3" >
+       <widget class="QLabel" name="outputLabel" >
         <property name="minimumSize" >
          <size>
           <width>100</width>
@@ -268,7 +268,7 @@
        </widget>
       </item>
       <item row="2" column="0" >
-       <widget class="QLabel" name="label_5" >
+       <widget class="QLabel" name="visuLabel" >
         <property name="text" >
          <string>_("Visualization")</string>
         </property>

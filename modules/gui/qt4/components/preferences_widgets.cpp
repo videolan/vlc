@@ -246,7 +246,10 @@ void StringConfigControl::finish()
     text->setText( qfu(p_item->value.psz) );
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setBuddy( text );
+    }
 }
 
 /*********** File **************/
@@ -313,7 +316,10 @@ void FileConfigControl::finish()
     text->setText( qfu(p_item->value.psz) );
     text->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setBuddy( text );
+    }
 }
 
 /********* String / Directory **********/
@@ -477,7 +483,10 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
     }
     combo->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
+        label->setBuddy( combo );
+    }
 }
 
 QString StringListConfigControl::getValue()
@@ -593,7 +602,10 @@ void ModuleConfigControl::finish( bool bycat )
     module_list_free( p_list );
     combo->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setBuddy( combo );
+    }
 }
 
 QString ModuleConfigControl::getValue()
@@ -801,7 +813,10 @@ void IntegerConfigControl::finish()
     spin->setValue( p_item->value.i );
     spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setBuddy( spin );
+    }
 }
 
 int IntegerConfigControl::getValue()
@@ -846,7 +861,10 @@ IntegerRangeSliderConfigControl::IntegerRangeSliderConfigControl(
     slider->setValue( p_item->value.i );
     slider->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setBuddy( slider );
+    }
 }
 
 int IntegerRangeSliderConfigControl::getValue()
@@ -939,7 +957,10 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config, bool byc
     }
     combo->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_module_config->psz_longtext)) );
+        label->setBuddy( combo );
+    }
 }
 
 void IntegerListConfigControl::actionRequested( int i_action )
@@ -1064,7 +1085,10 @@ void FloatConfigControl::finish()
     spin->setValue( (double)p_item->value.f );
     spin->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
     if( label )
+    {
         label->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
+        label->setBuddy( spin );
+    }
 }
 
 float FloatConfigControl::getValue()

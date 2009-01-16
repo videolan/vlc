@@ -70,7 +70,7 @@
        <widget class="QComboBox" name="outputModule" />
       </item>
       <item row="3" column="0" >
-       <widget class="QLabel" name="label_4" >
+       <widget class="QLabel" name="voutLabel" >
         <property name="text" >
          <string>_("Output")</string>
         </property>
@@ -125,7 +125,7 @@
        <widget class="QComboBox" name="dXdisplayDevice" />
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_5" >
+       <widget class="QLabel" name="dxDeviceLabel" >
         <property name="text" >
          <string>_("Display device")</string>
         </property>
@@ -154,14 +154,14 @@
        <widget class="QComboBox" name="deinterlaceBox" />
       </item>
       <item row="0" column="0" >
-       <widget class="QLabel" name="label_6" >
+       <widget class="QLabel" name="deinterLabel" >
         <property name="text" >
          <string>_("Deinterlacing Mode")</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
+       <widget class="QLabel" name="arLabel" >
         <property name="text" >
          <string>_("Force Aspect Ratio")</string>
         </property>
@@ -196,7 +196,7 @@
        </widget>
       </item>
       <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
+       <widget class="QLabel" name="dirLabel" >
         <property name="text" >
          <string>_("Directory")</string>
         </property>
@@ -206,7 +206,7 @@
        </widget>
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_2" >
+       <widget class="QLabel" name="prefixLabel" >
         <property name="text" >
          <string>_("Prefix")</string>
         </property>
@@ -223,7 +223,7 @@
        </widget>
       </item>
       <item row="2" column="0" >
-       <widget class="QLabel" name="label_3" >
+       <widget class="QLabel" name="formatLabel" >
         <property name="text" >
          <string>_("Format")</string>
         </property>

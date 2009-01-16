@@ -50,7 +50,7 @@
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
-       <widget class="QLabel" name="label_4" >
+       <widget class="QLabel" name="portLabel" >
         <property name="text" >
          <string>_("Server default port")</string>
         </property>
@@ -76,7 +76,7 @@
        </widget>
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_7" >
+       <widget class="QLabel" name="httpProxyLabel" >
         <property name="text" >
          <string>_("HTTP proxy")</string>
         </property>
@@ -120,7 +120,7 @@
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
-       <widget class="QLabel" name="label_5" >
+       <widget class="QLabel" name="ppLabel" >
         <property name="text" >
          <string>_("Post-Processing quality")</string>
         </property>
@@ -146,7 +146,7 @@
        </widget>
       </item>
       <item row="1" column="0" >
-       <widget class="QLabel" name="label_6" >
+       <widget class="QLabel" name="aviLabel" >
         <property name="text" >
          <string>_("Repair AVI files")</string>
         </property>
