@@ -359,19 +359,11 @@ static void Destroy( vlc_object_t *p_this )
 /* Return the position in ms from the start of the movie */
 static mtime_t snapshot_GetMovietime( vout_thread_t *p_vout )
 {
-    input_thread_t* p_input;
-    vlc_value_t val;
-    mtime_t i_result;
-
-    p_input = p_vout->p_sys->p_input;
+    input_thread_t *p_input = p_vout->p_sys->p_input;
     if( !p_input )
         return 0;
 
-    var_Get( p_input, "time", &val );
-
-    i_result = val.i_time - p_input->i_pts_delay;
-
-    return( i_result / 1000 );
+    return var_GetTime( p_input, "time" ) / 1000;
 }
 
 /*****************************************************************************
