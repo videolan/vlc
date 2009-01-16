@@ -990,20 +990,11 @@ static int AccessOpen( vlc_object_t * p_this )
     /* Only when selected */
     if( *p_access->psz_access == '\0' ) return VLC_EGENERIC;
 
-    p_access->pf_read = AccessRead;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = NULL;
-    p_access->pf_control = AccessControl;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-
-    p_sys = calloc( 1, sizeof( demux_sys_t ) );
-    p_access->p_sys = (access_sys_t *) p_sys;
-    if( p_sys == NULL ) return VLC_ENOMEM;
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, NULL );
+    p_sys = calloc( 1, sizeof( demux_sys_t ));
+    if( !p_sys ) return VLC_ENOMEM;
+    p_access->p_sys = (access_sys_t*)p_sys;
 
     GetV4L2Params( p_sys, (vlc_object_t *) p_access );
 

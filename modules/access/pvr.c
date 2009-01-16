@@ -553,23 +553,10 @@ static int Open( vlc_object_t * p_this )
 
     memset( &device_capability, 0, sizeof(struct v4l2_capability) );
 
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = NULL;
-    p_access->pf_control = Control;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-
-    /* create private access data */
-    p_sys = calloc( sizeof( access_sys_t ), 1 );
-    if( !p_sys )
-        return VLC_ENOMEM;
-
-    p_access->p_sys = p_sys;
+    access_InitFields( p_access );
+    ACCESS_SET_CALLBACKS( Read, NULL, Control, NULL );
+    p_sys = p_access->p_sys = calloc( 1, sizeof( access_sys_t ));
+    if( !p_sys ) return VLC_ENOMEM;
 
     /* defaults values */
     var_Create( p_access, "pvr-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
