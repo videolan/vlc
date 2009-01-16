@@ -141,7 +141,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_new->i_flags = p_this->i_flags
             & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
 
-    p_priv->p_vars = calloc( sizeof( variable_t ), 16 );
+    p_priv->p_vars = calloc( 16, sizeof( variable_t ) );
 
     if( !p_priv->p_vars )
     {

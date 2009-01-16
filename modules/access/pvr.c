@@ -433,8 +433,8 @@ static int ConfigureV4L2( access_t * p_access )
     controls.reserved[0] = 0;
     controls.reserved[1] = 0;
     controls.count       = 0;
-    controls.controls    = calloc( sizeof( struct v4l2_ext_control ),
-                                   MAX_V4L2_CTRLS );
+    controls.controls    = calloc( MAX_V4L2_CTRLS,
+                                   sizeof( struct v4l2_ext_control ) );
 
     if( controls.controls == NULL )
         return VLC_ENOMEM;

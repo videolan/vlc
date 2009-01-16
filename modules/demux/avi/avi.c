@@ -584,7 +584,7 @@ static int Open( vlc_object_t * p_this )
                     {
                         const uint8_t *p_pal = fmt.p_extra;
 
-                        fmt.video.p_palette = calloc( sizeof(video_palette_t), 1 );
+                        fmt.video.p_palette = calloc( 1, sizeof(video_palette_t) );
                         fmt.video.p_palette->i_entries = __MIN(fmt.i_extra/4, 256);
 
                         for( int i = 0; i < fmt.video.p_palette->i_entries; i++ )

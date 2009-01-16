@@ -140,7 +140,7 @@ static int CreateVout( vlc_object_t *p_this )
     char * psz;
 
     /* Allocate structure */
-    p_vout->p_sys = p_sys = calloc( sizeof( vout_sys_t ), 1 );
+    p_vout->p_sys = p_sys = calloc( 1, sizeof( vout_sys_t ) );
     if( p_sys == NULL )
         return VLC_EGENERIC;
 

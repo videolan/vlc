@@ -397,7 +397,7 @@ static int OpenAudio( decoder_t *p_dec )
     /* get lock, avoid segfault */
     vlc_mutex_lock( &qt_mutex );
 
-    p_sys = calloc( sizeof( decoder_sys_t ), 1 );
+    p_sys = calloc( 1, sizeof( decoder_sys_t ) );
     p_dec->p_sys = p_sys;
     p_dec->pf_decode_audio = DecodeAudio;
 

@@ -513,7 +513,7 @@ static int AVI_ChunkRead_indx( stream_t *s, avi_chunk_t *p_chk )
 
         i_count = __MIN( p_indx->i_entriesinuse, i_read / 8 );
         p_indx->i_entriesinuse = i_count;
-        p_indx->idx.std = calloc( sizeof( indx_std_entry_t ), i_count );
+        p_indx->idx.std = calloc( i_count, sizeof( indx_std_entry_t ) );
 
         for( i = 0; i < i_count; i++ )
         {
@@ -528,7 +528,7 @@ static int AVI_ChunkRead_indx( stream_t *s, avi_chunk_t *p_chk )
 
         i_count = __MIN( p_indx->i_entriesinuse, i_read / 12 );
         p_indx->i_entriesinuse = i_count;
-        p_indx->idx.field = calloc( sizeof( indx_field_entry_t ), i_count );
+        p_indx->idx.field = calloc( i_count, sizeof( indx_field_entry_t ) );
         for( i = 0; i < i_count; i++ )
         {
             AVI_READ4BYTES( p_indx->idx.field[i].i_offset );
@@ -545,7 +545,7 @@ static int AVI_ChunkRead_indx( stream_t *s, avi_chunk_t *p_chk )
 
         i_count = __MIN( p_indx->i_entriesinuse, i_read / 16 );
         p_indx->i_entriesinuse = i_count;
-        p_indx->idx.super = calloc( sizeof( indx_super_entry_t ), i_count );
+        p_indx->idx.super = calloc( i_count, sizeof( indx_super_entry_t ) );
 
         for( i = 0; i < i_count; i++ )
         {
