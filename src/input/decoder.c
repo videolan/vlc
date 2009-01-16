@@ -653,7 +653,7 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
     if( !p_owner->p_clock || !i_ts )
         return i_ts;
 
-    return input_clock_GetTS( p_owner->p_clock, NULL, p_owner->p_input->i_pts_delay, i_ts );
+    return input_clock_GetTS( p_owner->p_clock, NULL, p_owner->p_input->p->i_pts_delay, i_ts );
 }
 static int DecoderGetDisplayRate( decoder_t *p_dec )
 {
@@ -1044,7 +1044,7 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
 
     vlc_assert_locked( &p_owner->lock );
 
-    const mtime_t i_ts_delay = p_owner->p_input->i_pts_delay;
+    const mtime_t i_ts_delay = p_owner->p_input->p->i_pts_delay;
     const mtime_t i_es_delay = p_owner->i_ts_delay;
 
     if( p_clock )

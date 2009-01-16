@@ -80,6 +80,9 @@ struct input_thread_private_t
     bool        b_can_rate_control;
     double      f_fps;
 
+    /* Internal caching common to all sources */
+    mtime_t     i_pts_delay;
+
     /* Current state */
     int         i_rate;
     bool        b_recording;

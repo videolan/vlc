@@ -545,7 +545,7 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
             if( !i_ret )
             {
                 /* FIXME pcr != exactly what wanted */
-                const mtime_t i_used = /*(i_stream_duration - p_sys->p_input->i_pts_delay)*/ p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
+                const mtime_t i_used = /*(i_stream_duration - p_sys->p_input->p->i_pts_delay)*/ p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial;
                 i_date -= i_used;
             }
             p_sys->i_buffering_extra_initial = 0;
@@ -622,7 +622,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     if( p_sys->i_preroll_end >= 0 )
         i_preroll_duration = __MAX( p_sys->i_preroll_end - i_stream_start, 0 );
 
-    const mtime_t i_buffering_duration = p_sys->p_input->i_pts_delay +
+    const mtime_t i_buffering_duration = p_sys->p_input->p->i_pts_delay +
                                          i_preroll_duration +
                                          p_sys->i_buffering_extra_stream - p_sys->i_buffering_extra_initial;
 
@@ -787,7 +787,7 @@ static void EsOutFrameNext( es_out_t *out )
         if( i_ret )
             return;
 
-        p_sys->i_buffering_extra_initial = 1 + i_stream_duration - p_sys->p_input->i_pts_delay; /* FIXME < 0 ? */
+        p_sys->i_buffering_extra_initial = 1 + i_stream_duration - p_sys->p_input->p->i_pts_delay; /* FIXME < 0 ? */
         p_sys->i_buffering_extra_system =
         p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
     }
@@ -842,7 +842,7 @@ static mtime_t EsOutGetBuffering( es_out_t *out )
         }
 
         const mtime_t i_consumed = i_system_duration * INPUT_RATE_DEFAULT / p_sys->i_rate - i_stream_duration;
-        i_delay = p_sys->p_input->i_pts_delay - i_consumed;
+        i_delay = p_sys->p_input->p->i_pts_delay - i_consumed;
     }
     if( i_delay < 0 )
         return 0;

@@ -183,7 +183,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout   = NULL;
     p_input->p->b_out_pace_control = false;
-    p_input->i_pts_delay = 0;
+    p_input->p->i_pts_delay = 0;
     p_input->p->i_cr_average = 0;
 
     vlc_gc_incref( p_item ); /* Released in Destructor() */
@@ -906,17 +906,17 @@ static void InitTitle( input_thread_t * p_input )
     p_input->p->b_can_rate_control = p_master->b_can_rate_control;
 
     /* Fix pts delay */
-    if( p_input->i_pts_delay < 0 )
-        p_input->i_pts_delay = 0;
+    if( p_input->p->i_pts_delay < 0 )
+        p_input->p->i_pts_delay = 0;
 
     /* If the desynchronisation requested by the user is < 0, we need to
      * cache more data. */
     const int i_desynch = var_GetInteger( p_input, "audio-desync" );
     if( i_desynch < 0 )
-        p_input->i_pts_delay -= i_desynch * 1000;
+        p_input->p->i_pts_delay -= i_desynch * 1000;
 
     /* Update cr_average depending on the caching */
-    p_input->p->i_cr_average *= (10 * p_input->i_pts_delay / 200000);
+    p_input->p->i_cr_average *= (10 * p_input->p->i_pts_delay / 200000);
     p_input->p->i_cr_average /= 10;
     if( p_input->p->i_cr_average < 10 )
         p_input->p->i_cr_average = 10;
@@ -2344,7 +2344,7 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Get infos from access_demux */
         demux_Control( in->p_demux,
                         DEMUX_GET_PTS_DELAY, &i_pts_delay );
-        p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
+        p_input->p->i_pts_delay = __MAX( p_input->p->i_pts_delay, i_pts_delay );
 
         in->b_title_demux = true;
         if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
@@ -2418,7 +2418,7 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             access_Control( in->p_access,
                              ACCESS_GET_PTS_DELAY, &i_pts_delay );
-            p_input->i_pts_delay = __MAX( p_input->i_pts_delay, i_pts_delay );
+            p_input->p->i_pts_delay = __MAX( p_input->p->i_pts_delay, i_pts_delay );
 
             in->b_title_demux = false;
             if( access_Control( in->p_access, ACCESS_GET_TITLE_INFO,

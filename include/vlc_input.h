@@ -415,9 +415,6 @@ struct input_thread_t
     bool b_can_pace_control;
     int64_t     i_time;     /* Current time */
 
-    /* Internal caching common to all inputs */
-    mtime_t i_pts_delay;
-
     /* All other data is input_thread is PRIVATE. You can't access it
      * outside of src/input */
     input_thread_private_t *p;
