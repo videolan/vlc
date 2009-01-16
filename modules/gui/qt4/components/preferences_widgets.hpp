@@ -192,7 +192,6 @@ public:
     virtual int getType() { return CONFIG_ITEM_BOOL; }
 private:
     QCheckBox *checkbox;
-    QLabel *label;
     void finish();
 };
 
