@@ -222,8 +222,8 @@ static int Open( vlc_object_t *p_this )
         free( psz_uri );
         return VLC_ENOMEM;
     }
-    p_smb->debug = 1;
-    p_smb->callbacks.auth_fn = smb_auth;
+    smbc_setDebug( p_smb, 1 );
+    smbc_setFunctionAuthData( p_smb, smb_auth );
 
     if( !smbc_init_context( p_smb ) )
     {
@@ -233,7 +233,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( !(p_file = (p_smb->open)( p_smb, psz_uri, O_RDONLY, 0 )) )
+    if( !(p_file = (smbc_getFunctionOpen( p_smb ))( p_smb, psz_uri, O_RDONLY, 0 )) )
     {
         msg_Err( p_access, "open failed for '%s' (%m)",
                  p_access->psz_path );
@@ -245,7 +245,7 @@ static int Open( vlc_object_t *p_this )
     /* Init p_access */
     STANDARD_READ_ACCESS_INIT;
 
-    i_ret = p_smb->fstat( p_smb, p_file, &filestat );
+    i_ret = (smbc_getFunctionFstat( p_smb ))( p_smb, p_file, &filestat );
     if( i_ret ) msg_Err( p_access, "stat failed (%m)" );
     else p_access->info.i_size = filestat.st_size;
 #else
@@ -313,7 +313,7 @@ static void Close( vlc_object_t *p_this )
 #  ifndef HAVE__SMBCCTX_CLOSE_FN
     p_sys->p_smb->close( p_sys->p_smb, p_sys->p_file );
 #  else
-    p_sys->p_smb->close_fn( p_sys->p_smb, p_sys->p_file );
+    (smbc_getFunctionClose( p_sys->p_smb ))( p_sys->p_smb, p_sys->p_file );
 #  endif
     smbc_free_context( p_sys->p_smb, 1 );
 #else
@@ -336,7 +336,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
 #ifdef USE_CTX
-    i_ret = p_sys->p_smb->lseek(p_sys->p_smb, p_sys->p_file, i_pos, SEEK_SET);
+    i_ret = (smbc_getFunctionLseek( p_sys->p_smb ))(p_sys->p_smb, p_sys->p_file, i_pos, SEEK_SET);
 #else
     i_ret = smbc_lseek( p_sys->i_smb, i_pos, SEEK_SET );
 #endif
@@ -363,7 +363,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_access->info.b_eof ) return 0;
 
 #ifdef USE_CTX
-    i_read = p_sys->p_smb->read(p_sys->p_smb, p_sys->p_file, p_buffer, i_len);
+    i_read = (smbc_getFunctionRead( p_sys->p_smb ))(p_sys->p_smb, p_sys->p_file, p_buffer, i_len);
 #else
     i_read = smbc_read( p_sys->i_smb, p_buffer, i_len );
 #endif
