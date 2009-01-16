@@ -132,7 +132,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* State */
     var_Create( p_input, "state", VLC_VAR_INTEGER );
-    val.i_int = p_input->i_state;
+    val.i_int = p_input->p->i_state;
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
     /* Rate */

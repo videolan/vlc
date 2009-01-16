@@ -173,7 +173,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->i_title = 0;
     p_input->p->title = NULL;
     p_input->p->i_title_offset = p_input->p->i_seekpoint_offset = 0;
-    p_input->i_state = INIT_S;
+    p_input->p->i_state = INIT_S;
     p_input->p->i_rate = INPUT_RATE_DEFAULT;
     p_input->p->b_recording = false;
     memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
@@ -740,10 +740,10 @@ static void MainLoop( input_thread_t *p_input )
         /* Demux data */
         b_force_update = false;
         i_wakeup = 0;
-        /* FIXME if p_input->i_state == PAUSE_S the access/access_demux
+        /* FIXME if p_input->p->i_state == PAUSE_S the access/access_demux
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
-        b_paused = p_input->i_state == PAUSE_S &&
+        b_paused = p_input->p->i_state == PAUSE_S &&
                    !es_out_GetBuffering( p_input->p->p_es_out );
 
         if( !b_paused )
@@ -1492,7 +1492,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
         if( i_ret )
         {
             msg_Warn( p_input, "cannot set pause state" );
-            i_state = p_input->i_state;
+            i_state = p_input->p->i_state;
         }
     }
 
@@ -1503,7 +1503,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
         if( i_ret )
         {
             msg_Warn( p_input, "cannot set pause state at es_out level" );
-            i_state = p_input->i_state;
+            i_state = p_input->p->i_state;
         }
     }
 
@@ -1652,14 +1652,14 @@ static bool Control( input_thread_t *p_input, int i_type,
         }
 
         case INPUT_CONTROL_SET_STATE:
-            if( ( val.i_int == PLAYING_S && p_input->i_state == PAUSE_S ) ||
-                ( val.i_int == PAUSE_S && p_input->i_state == PAUSE_S ) )
+            if( ( val.i_int == PLAYING_S && p_input->p->i_state == PAUSE_S ) ||
+                ( val.i_int == PAUSE_S && p_input->p->i_state == PAUSE_S ) )
             {
                 ControlUnpause( p_input, i_control_date );
 
                 b_force_update = true;
             }
-            else if( val.i_int == PAUSE_S && p_input->i_state == PLAYING_S /* &&
+            else if( val.i_int == PAUSE_S && p_input->p->i_state == PLAYING_S /* &&
                      p_input->p->b_can_pause */ )
             {
                 ControlPause( p_input, i_control_date );
@@ -1671,7 +1671,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                 b_force_update = true;
 
                 /* Correct "state" value */
-                input_ChangeState( p_input, p_input->i_state );
+                input_ChangeState( p_input, p_input->p->i_state );
             }
             else if( val.i_int != PLAYING_S && val.i_int != PAUSE_S )
             {
@@ -2057,11 +2057,11 @@ static bool Control( input_thread_t *p_input, int i_type,
             break;
 
         case INPUT_CONTROL_SET_FRAME_NEXT:
-            if( p_input->i_state == PAUSE_S )
+            if( p_input->p->i_state == PAUSE_S )
             {
                 es_out_SetFrameNext( p_input->p->p_es_out );
             }
-            else if( p_input->i_state == PLAYING_S )
+            else if( p_input->p->i_state == PLAYING_S )
             {
                 ControlPause( p_input, i_control_date );
             }
@@ -2956,9 +2956,9 @@ static void InputGetExtraFiles( input_thread_t *p_input,
 /* */
 static void input_ChangeState( input_thread_t *p_input, int i_state )
 {
-    const bool b_changed = p_input->i_state != i_state;
+    const bool b_changed = p_input->p->i_state != i_state;
 
-    p_input->i_state = i_state;
+    p_input->p->i_state = i_state;
     if( i_state == ERROR_S )
         p_input->b_error = true;
     else if( i_state == END_S )
@@ -3170,7 +3170,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
 void input_UpdateStatistic( input_thread_t *p_input,
                             input_statistic_t i_type, int i_delta )
 {
-    assert( p_input->i_state != INIT_S );
+    assert( p_input->p->i_state != INIT_S );
 
     vlc_mutex_lock( &p_input->p->counters.counters_lock);
     switch( i_type )

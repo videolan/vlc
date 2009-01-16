@@ -79,6 +79,7 @@ struct input_thread_private_t
     bool        b_can_pause;
     bool        b_can_rate_control;
     double      f_fps;
+    int         i_state;
 
     /* Internal caching common to all sources */
     mtime_t     i_pts_delay;

@@ -411,7 +411,6 @@ struct input_thread_t
     bool b_preparsing;
     bool b_dead;
 
-    int i_state;
     bool b_can_pace_control;
 
     /* All other data is input_thread is PRIVATE. You can't access it
