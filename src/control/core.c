@@ -122,15 +122,14 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     /* Because we probably don't want a GUI by default */
 
     i_ret = libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv );
-    if( i_ret == VLC_EEXITSUCCESS )
+    if( i_ret )
     {
+        libvlc_InternalDestroy( p_libvlc_int );
         free( p_new );
-        return NULL;
-    }
-    else if( i_ret != 0 )
-    {
-        free( p_new );
-        RAISENULL( "VLC initialization failed" );
+        if( i_ret == VLC_EEXITSUCCESS )
+            return NULL;
+        else
+            RAISENULL( "VLC initialization failed" );
     }
 
     p_new->p_libvlc_int = p_libvlc_int;
