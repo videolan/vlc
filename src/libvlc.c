@@ -430,6 +430,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
+        free( priv->psz_configfile );
         module_EndBank( p_libvlc );
         return i_ret;
     }
@@ -540,6 +541,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
+        free( priv->psz_configfile );
         module_EndBank( p_libvlc );
         return i_ret;
     }
@@ -567,6 +569,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                  "that they are valid.\n" );
         PauseConsole();
 #endif
+        free( priv->psz_configfile );
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
@@ -719,6 +722,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                             "-dontprintthatone\n"
                             "(keyword 'all' to applies to all objects)\n");
                     free( psz_verbose_objects );
+                    /* FIXME: leaks!!!! */
                     return VLC_EGENERIC;
             }
         }
@@ -792,7 +796,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !p_libvlc->p_stats )
     {
         vlc_object_release( p_libvlc );
-        return VLC_ENOMEM;
+        return VLC_ENOMEM; /* FIXME: leaks */
     }
     vlc_mutex_init( &p_libvlc->p_stats->lock );
     priv->p_stats_computer = NULL;
@@ -823,6 +827,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             module_unneed( p_libvlc, priv->p_memcpy_module );
         }
         module_EndBank( p_libvlc );
+        free( priv->psz_configfile );
         return VLC_EGENERIC;
     }
     playlist_Activate( p_playlist );
