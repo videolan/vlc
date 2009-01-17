@@ -194,7 +194,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
                       char ***pppsz_options, int *pi_options )
 {
     char *psz_name = NULL, *psz_parse = psz_line;
-    int i_count = 0, i_program = 0, i_frequency = 0;
+    int i_count = 0, i_program = 0, i_frequency = 0, i_symbolrate = 0;
     bool b_valid = false;
 
     if( pppsz_options ) *pppsz_options = NULL;
@@ -257,6 +257,12 @@ static int ParseLine( char *psz_line, char **ppsz_name,
 
                 i_value = strtol( psz_parse, &psz_end, 10 );
                 if( psz_end != psz_parse &&
+                    i_value != LONG_MAX && i_value != LONG_MIN &&
+                    !i_symbolrate )
+                {
+                    i_symbolrate = i_value;
+                }
+                else if( psz_end != psz_parse &&
                     i_value != LONG_MAX && i_value != LONG_MIN )
                 {
                     i_program = i_value;
@@ -297,6 +303,14 @@ static int ParseLine( char *psz_line, char **ppsz_name,
         char *psz_option;
 
         if( asprintf( &psz_option, "dvb-frequency=%i", i_frequency ) != -1 )
+            INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
+                         psz_option );
+    }
+    if( i_symbolrate && pppsz_options && pi_options )
+    {
+        char *psz_option;
+
+        if( asprintf( &psz_option, "dvb-srate=%i", i_symbolrate ) != -1 )
             INSERT_ELEM( *pppsz_options, (*pi_options), (*pi_options),
                          psz_option );
     }
