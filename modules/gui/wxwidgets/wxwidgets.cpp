@@ -278,8 +278,7 @@ static void Run( intf_thread_t *p_intf )
         /* The module is used in dialog provider mode */
 
         /* Create a new thread for wxWidgets */
-        if( vlc_thread_create( p_intf, "Skins Dialogs Thread",
-                               Init, 0, true ) )
+        if( vlc_thread_create( p_intf, "Skins Dialogs Thread", Init, 0 ) )
         {
             msg_Err( p_intf, "cannot create Skins Dialogs Thread" );
             p_intf->pf_show_dialog = NULL;

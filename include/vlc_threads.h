@@ -152,7 +152,7 @@ VLC_EXPORT( void, vlc_cond_wait, (vlc_cond_t *, vlc_mutex_t *) );
 VLC_EXPORT( int, vlc_cond_timedwait, (vlc_cond_t *, vlc_mutex_t *, mtime_t) );
 VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) );
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
-VLC_EXPORT( int,  __vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int, bool ) );
+VLC_EXPORT( int,  vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int ) );
 VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
 VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t * ) );
 
@@ -433,8 +433,8 @@ static inline void barrier (void)
 /*****************************************************************************
  * vlc_thread_create: create a thread
  *****************************************************************************/
-#define vlc_thread_create( P_THIS, PSZ_NAME, FUNC, PRIORITY, WAIT )         \
-    __vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, FUNC, PRIORITY, WAIT )
+#define vlc_thread_create( P_THIS, PSZ_NAME, FUNC, PRIORITY )         \
+    vlc_thread_create( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PSZ_NAME, FUNC, PRIORITY )
 
 /*****************************************************************************
  * vlc_thread_set_priority: set the priority of the calling thread

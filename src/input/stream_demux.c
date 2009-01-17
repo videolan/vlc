@@ -92,7 +92,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     }
 
     if( vlc_thread_create( s, "stream out", DStreamThread,
-                           VLC_THREAD_PRIORITY_INPUT, false ) )
+                           VLC_THREAD_PRIORITY_INPUT ) )
     {
         stream_CommonDelete( s );
         free( p_sys->psz_name );

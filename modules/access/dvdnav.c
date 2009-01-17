@@ -349,7 +349,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev = vlc_object_create( p_demux, sizeof( event_thread_t ) );
     p_sys->p_ev->p_demux = p_demux;
     vlc_thread_create( p_sys->p_ev, "dvdnav event thread handler", EventThread,
-                       VLC_THREAD_PRIORITY_LOW, false );
+                       VLC_THREAD_PRIORITY_LOW );
 
     return VLC_SUCCESS;
 }

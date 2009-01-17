@@ -130,7 +130,7 @@ int intf_RunThread( intf_thread_t *p_intf )
     if( p_intf->b_should_run_on_first_thread )
     {
         if( vlc_thread_create( p_intf, "interface", MonitorLibVLCDeath,
-                               VLC_THREAD_PRIORITY_LOW, false ) )
+                               VLC_THREAD_PRIORITY_LOW ) )
         {
             msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
             return VLC_EGENERIC;
@@ -150,7 +150,7 @@ int intf_RunThread( intf_thread_t *p_intf )
 #endif
     /* Run the interface in a separate thread */
     if( vlc_thread_create( p_intf, "interface", RunInterface,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+                           VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_intf, "cannot spawn interface thread" );
         return VLC_EGENERIC;

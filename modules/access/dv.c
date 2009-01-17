@@ -236,8 +236,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;
     vlc_mutex_init( &p_sys->p_ev->lock );
-    vlc_thread_create( p_sys->p_ev, "dv event thread handler", Raw1394EventThread,
-                       VLC_THREAD_PRIORITY_OUTPUT, false );
+    vlc_thread_create( p_sys->p_ev, "dv event thread handler",
+                       Raw1394EventThread, VLC_THREAD_PRIORITY_OUTPUT );
 
     free( psz_name );
     return VLC_SUCCESS;

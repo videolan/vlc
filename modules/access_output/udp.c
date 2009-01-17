@@ -250,7 +250,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_buffer = NULL;
 
     if( vlc_thread_create( p_sys->p_thread, "sout write thread", ThreadWrite,
-                           VLC_THREAD_PRIORITY_HIGHEST, false ) )
+                           VLC_THREAD_PRIORITY_HIGHEST ) )
     {
         msg_Err( p_access, "cannot spawn sout access thread" );
         net_Close (i_handle);

@@ -196,7 +196,7 @@ void demux_sys_t::StartUiThread()
         p_ev->b_die = false;
         vlc_mutex_init( &p_ev->lock );
         vlc_thread_create( p_ev, "mkv event thread handler", EventThread,
-                        VLC_THREAD_PRIORITY_LOW, false );
+                        VLC_THREAD_PRIORITY_LOW );
     }
 }
 

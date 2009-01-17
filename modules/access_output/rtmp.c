@@ -218,7 +218,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     if( vlc_thread_create( p_sys->p_thread, "rtmp control thread", ThreadControl,
-                           VLC_THREAD_PRIORITY_INPUT, false ) )
+                           VLC_THREAD_PRIORITY_INPUT ) )
     {
         msg_Err( p_access, "cannot spawn rtmp control thread" );
         goto error2;

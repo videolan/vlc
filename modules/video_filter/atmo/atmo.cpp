@@ -944,8 +944,7 @@ static void Atmo_Shutdown(filter_t *p_filter)
             if( vlc_thread_create( p_sys->p_fadethread,
                 "AtmoLight fadeing",
                 FadeToColorThread,
-                VLC_THREAD_PRIORITY_LOW,
-                false ) )
+                VLC_THREAD_PRIORITY_LOW ) )
             {
                 msg_Err( p_filter, "cannot create FadeToColorThread" );
                 vlc_object_release( p_sys->p_fadethread );
@@ -1898,8 +1897,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
                 if( vlc_thread_create( p_sys->p_fadethread,
                     "AtmoLight fadeing",
                     FadeToColorThread,
-                    VLC_THREAD_PRIORITY_LOW,
-                    false) )
+                    VLC_THREAD_PRIORITY_LOW ) )
                 {
                     msg_Err( p_filter, "cannot create FadeToColorThread" );
                     vlc_object_release( p_sys->p_fadethread );

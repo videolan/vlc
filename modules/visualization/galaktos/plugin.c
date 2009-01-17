@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
 
     if( vlc_thread_create( p_thread, "galaktos update thread", Thread,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+                           VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_filter, "cannot lauch galaktos thread" );
         free( p_thread->psz_title );

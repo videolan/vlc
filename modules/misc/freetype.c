@@ -468,8 +468,7 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter )
             if( vlc_thread_create( p_fontbuilder,
                                    "fontlist builder",
                                    FontBuilderThread,
-                                   VLC_THREAD_PRIORITY_LOW,
-                                   false ) )
+                                   VLC_THREAD_PRIORITY_LOW ) )
             {
                 msg_Warn( p_filter, "fontconfig database builder thread can't "
                         "be launched. Font styling support will be limited." );

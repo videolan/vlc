@@ -220,7 +220,7 @@ static int Open( vlc_object_t * p_this )
 
         /* Create PORTAUDIOThread */
         if( vlc_thread_create( pa_thread, "aout", PORTAUDIOThread,
-                               VLC_THREAD_PRIORITY_OUTPUT, false ) )
+                               VLC_THREAD_PRIORITY_OUTPUT ) )
         {
             msg_Err( p_aout, "cannot create PORTAUDIO thread" );
             return VLC_EGENERIC;

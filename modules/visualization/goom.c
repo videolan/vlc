@@ -193,7 +193,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
 
     if( vlc_thread_create( p_thread, "Goom Update Thread", Thread,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+                           VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_filter, "cannot lauch goom thread" );
         vlc_object_release( p_thread->p_vout );

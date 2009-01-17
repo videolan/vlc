@@ -192,8 +192,7 @@ static void Run( intf_thread_t *p_intf )
 
         /* Create a new thread for the dialogs provider */
         p_intf->p_sys->thread_ready = CreateEvent (NULL, TRUE, FALSE, NULL);
-        if( vlc_thread_create( p_intf, "WinCE Dialogs Thread",
-                               MainLoop, 0, false ) )
+        if( vlc_thread_create( p_intf, "WinCE Dialogs Thread", MainLoop, 0 ) )
         {
             msg_Err( p_intf, "cannot create WinCE Dialogs Thread" );
             p_intf->pf_show_dialog = NULL;

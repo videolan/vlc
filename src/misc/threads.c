@@ -845,15 +845,16 @@ static void *thread_entry (void *data)
     return NULL;
 }
 
+#undef vlc_thread_create
 /*****************************************************************************
- * vlc_thread_create: create a thread, inner version
+ * vlc_thread_create: create a thread
  *****************************************************************************
  * Note that i_priority is only taken into account on platforms supporting
  * userland real-time priority threads.
  *****************************************************************************/
-int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
-                         const char *psz_name, void * ( *func ) ( vlc_object_t * ),
-                         int i_priority, bool b_wait )
+int vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
+                       const char *psz_name, void *(*func) ( vlc_object_t * ),
+                       int i_priority )
 {
     int i_ret;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
@@ -881,11 +882,8 @@ int __vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line
     p_priv->b_thread = true;
     i_ret = vlc_clone( &p_priv->thread_id, thread_entry, boot, i_priority );
     if( i_ret == 0 )
-    {
         msg_Dbg( p_this, "thread (%s) created at priority %d (%s:%d)",
                  psz_name, i_priority, psz_file, i_line );
-        assert( !b_wait );
-    }
     else
     {
         p_priv->b_thread = false;

@@ -685,7 +685,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Create ALSA thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", ALSAThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
+                           VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create ALSA thread (%m)" );
         goto error;

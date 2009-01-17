@@ -333,8 +333,7 @@ static int CreateFilter ( vlc_object_t *p_this )
                                                 sizeof( vlc_object_t ) );
     vlc_object_attach( p_sys->p_worker_thread, p_this );
     if( vlc_thread_create( p_sys->p_worker_thread, "vnc worker thread",
-                           vnc_worker_thread,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+                           vnc_worker_thread, VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_object_detach( p_sys->p_worker_thread );
         vlc_object_release( p_sys->p_worker_thread );
@@ -715,8 +714,7 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
     vlc_object_attach( p_update_request_thread, p_filter );
     if( vlc_thread_create( p_update_request_thread,
                            "vnc update request thread",
-                           update_request_thread,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+                           update_request_thread, VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_object_detach( p_update_request_thread );
         vlc_object_release( p_update_request_thread );

@@ -138,8 +138,7 @@ void CThread::Run()
    if(vlc_thread_create( m_pAtmoThread,
                          "Atmo-CThread-Class",
                          CThread::ThreadProc,
-                         VLC_THREAD_PRIORITY_LOW,
-                         false ))
+                         VLC_THREAD_PRIORITY_LOW ))
    {
       msg_Err( m_pOwner, "cannot launch one of the AtmoLight threads");
    }

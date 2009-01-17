@@ -518,7 +518,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Create OSS thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", OSSThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, false ) )
+                           VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create OSS thread (%m)" );
         close( p_sys->i_fd );

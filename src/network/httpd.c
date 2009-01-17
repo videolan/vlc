@@ -1110,7 +1110,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     /* create the thread */
     if( vlc_thread_create( host, "httpd host thread", httpd_HostThread,
-                           VLC_THREAD_PRIORITY_LOW, false ) )
+                           VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_this, "cannot spawn http host thread" );
         goto error;
