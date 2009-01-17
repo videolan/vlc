@@ -463,7 +463,11 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
 
 void TimeLabel::setDisplayPosition( float pos, int time, int length )
 {
-    VLC_UNUSED( pos );
+    if( pos == -1 )
+    {
+        setText( " --:--/--:-- " );
+        return;
+    }
 
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
     secstotimestr( psz_length, length );
