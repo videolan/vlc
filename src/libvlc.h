@@ -160,7 +160,6 @@ typedef struct vlc_object_internals_t
     vlc_mutex_t     lock;
     vlc_cond_t      wait;
     int             pipes[2];
-    vlc_spinlock_t  spin;
 
     /* Objects management */
     vlc_spinlock_t   ref_spin;
