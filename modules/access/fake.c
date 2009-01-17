@@ -214,19 +214,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
+            if( p_sys->i_duration <= 0 )
+                return VLC_EGENERIC;
             pf = (double*)va_arg( args, double* );
-            if( p_sys->i_duration > 0 )
-            {
-                *pf = (double)( p_sys->i_last_pts - p_sys->i_first_pts )
-                                / (double)(p_sys->i_duration);
-            }
-            else
-            {
-                *pf = 0;
-            }
+            *pf = (double)( p_sys->i_last_pts - p_sys->i_first_pts )
+                            / (double)(p_sys->i_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
+            if( p_sys->i_duration <= 0 )
+                return VLC_EGENERIC;
             f = (double)va_arg( args, double );
             i64 = f * (double)p_sys->i_duration;
             p_sys->i_first_pts = p_sys->i_last_pts - i64;
@@ -235,13 +232,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t *)va_arg( args, int64_t * );
-            if ( p_sys->i_duration )
-                *pi64 = p_sys->i_last_pts - p_sys->i_first_pts;
-            else
-                *pi64 = p_sys->i_last_pts;
+            *pi64 = p_sys->i_last_pts - p_sys->i_first_pts;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
+            if( p_sys->i_duration <= 0 )
+                return VLC_EGENERIC;
             pi64 = (int64_t*)va_arg( args, int64_t * );
             *pi64 = p_sys->i_duration;
             return VLC_SUCCESS;
