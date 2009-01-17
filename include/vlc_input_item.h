@@ -66,7 +66,7 @@ struct input_item_t
 
     mtime_t    i_duration;           /**< Duration in milliseconds*/
 
-    uint8_t    i_type;               /**< Type (file, disc, ...) */
+    uint8_t    i_type;               /**< Type (file, disc, ... see input_item_type_e) */
     bool b_prefers_tree;             /**< Do we prefer being displayed as tree*/
 
     int        i_categories;         /**< Number of info categories */
@@ -87,16 +87,21 @@ struct input_item_t
     vlc_mutex_t lock;                 /**< Lock for the item */
 };
 
-#define ITEM_TYPE_UNKNOWN       0
-#define ITEM_TYPE_FILE          1
-#define ITEM_TYPE_DIRECTORY     2
-#define ITEM_TYPE_DISC          3
-#define ITEM_TYPE_CDDA          4
-#define ITEM_TYPE_CARD          5
-#define ITEM_TYPE_NET           6
-#define ITEM_TYPE_PLAYLIST      7
-#define ITEM_TYPE_NODE          8
-#define ITEM_TYPE_NUMBER        9
+enum input_item_type_e
+{
+    ITEM_TYPE_UNKNOWN,
+    ITEM_TYPE_FILE,
+    ITEM_TYPE_DIRECTORY,
+    ITEM_TYPE_DISC,
+    ITEM_TYPE_CDDA,
+    ITEM_TYPE_CARD,
+    ITEM_TYPE_NET,
+    ITEM_TYPE_PLAYLIST,
+    ITEM_TYPE_NODE,
+
+    /* This one is not a real type but the number of input_item types. */
+    ITEM_TYPE_NUMBER
+};
 
 VLC_EXPORT( void, input_item_CopyOptions, ( input_item_t *p_parent, input_item_t *p_child ) );
 VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_name ) );
@@ -177,13 +182,27 @@ VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat
 VLC_EXPORT( int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
 VLC_EXPORT( int, input_item_DelInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name ) );
 
-#define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
-#define input_item_NewExt(a,b,c,d,e,f,g) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
-VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, unsigned, mtime_t i_duration )  );
+/**
+ * This function creates a new input_item_t with the provided informations.
+ *
+ * XXX You may also use input_item_New or input_item_NewExt as they need
+ * less arguments.
+ */
+VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) );
 
 /**
  * This function creates a new input_item_t with the provided informations.
+ *
+ * Provided for convenience.
  */
-VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) );
+#define input_item_NewExt(a,b,c,d,e,f,g) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
+VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration ) );
+
+/**
+ * This function creates a new input_item_t with the provided informations.
+ *
+ * Provided for convenience.
+ */
+#define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
 
 #endif
