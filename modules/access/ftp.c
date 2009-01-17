@@ -508,7 +508,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                       p_sys->url.psz_host, p_sys->url.i_port,
                       p_sys->url.psz_path, psz_line );
             free( psz_line );
-            msg_Err( p_access, "%s", p_buffer );
             return strlen( (const char *)p_buffer );
         }
     }
