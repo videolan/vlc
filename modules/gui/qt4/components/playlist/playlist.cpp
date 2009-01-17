@@ -96,10 +96,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
 
     emit rootChanged( p_root->i_id );
 
-    /* art */
-    CONNECT( THEMIM->getIM(), artChanged( input_item_t* ) ,
-             art, update( input_item_t* ) );
-
     /* Add the two sides of the QSplitter */
     addWidget( leftW );
     addWidget( rightPanel );
