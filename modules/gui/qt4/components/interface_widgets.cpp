@@ -463,7 +463,7 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
 
 void TimeLabel::setDisplayPosition( float pos, int time, int length )
 {
-    if( pos == -1 )
+    if( pos == -1.f )
     {
         setText( " --:--/--:-- " );
         return;
