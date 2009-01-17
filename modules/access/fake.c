@@ -55,7 +55,9 @@ static void Close( vlc_object_t * );
 #define DURATION_TEXT N_("Duration in ms")
 #define DURATION_LONGTEXT N_( \
     "Duration of the fake streaming before faking an " \
-    "end-of-file (default is 0, meaning that the stream is unlimited).")
+    "end-of-file (default is -1 meaning that the stream is unlimited when " \
+    "fake is forced, or lasts for 10 seconds otherwise. 0, means that the " \
+    "stream is unlimited).")
 
 vlc_module_begin ()
     set_shortname( N_("Fake") )
@@ -67,7 +69,7 @@ vlc_module_begin ()
                  CACHING_TEXT, CACHING_LONGTEXT, true );
     add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, true )
-    add_integer( "fake-duration", 0, NULL, DURATION_TEXT, DURATION_LONGTEXT,
+    add_integer( "fake-duration", -1, NULL, DURATION_TEXT, DURATION_LONGTEXT,
                  true );
 
     add_shortcut( "fake" )
@@ -119,12 +121,15 @@ static int Open( vlc_object_t *p_this )
         vlc_fourcc_t i_codec = image_Ext2Fourcc( p_demux->psz_path );
         if( !i_codec )
             return VLC_EGENERIC;
-
         char* p_codec = (char*) &i_codec;
         msg_Dbg( p_demux, "still image detected with codec format %c%c%c%c",
                    p_codec[0], p_codec[1], p_codec[2], p_codec[3] );
+    }
 
-        vlc_object_t* p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    if( p_demux->psz_path && *p_demux->psz_path )
+    {
+        vlc_object_t* p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT,
+                                                 FIND_PARENT );
         if( !p_input )
             return VLC_EGENERIC;
 
@@ -143,6 +148,13 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_duration =
         (mtime_t)var_CreateGetInteger( p_demux, "fake-duration" ) * 1000;
+    if( p_sys->i_duration < 0 )
+    {
+        if( !strcmp( p_demux->psz_access, "fake" ) )
+            p_sys->i_duration = 0;
+        else
+            p_sys->i_duration = 10000*1000;
+    }
     p_sys->f_fps = var_CreateGetFloat( p_demux, "fake-fps" );
 
     /* Declare the elementary stream */
