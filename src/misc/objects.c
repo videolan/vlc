@@ -129,7 +129,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     assert (i_size >= sizeof (vlc_object_t));
     p_new = (vlc_object_t *)(p_priv + 1);
 
-    p_new->i_object_type = i_type;
+    p_priv->i_object_type = i_type;
     p_new->psz_object_type = psz_type;
     p_new->psz_object_name = NULL;
 
@@ -504,7 +504,8 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     vlc_object_t *p_found;
 
     /* If we are of the requested type ourselves, don't look further */
-    if( !(i_mode & FIND_STRICT) && p_this->i_object_type == i_type )
+    if( !(i_mode & FIND_STRICT)
+     && vlc_internals (p_this)->i_object_type == i_type )
     {
         vlc_object_hold( p_this );
         return p_this;
@@ -1025,7 +1026,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         p_tmp = p_this->p_parent;
         if( p_tmp )
         {
-            if( p_tmp->i_object_type == i_type )
+            if( vlc_internals( p_tmp )->i_object_type == i_type )
             {
                 vlc_object_hold( p_tmp );
                 return p_tmp;
@@ -1041,7 +1042,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
         for( i = vlc_internals( p_this )->i_children; i--; )
         {
             p_tmp = vlc_internals( p_this )->pp_children[i];
-            if( p_tmp->i_object_type == i_type )
+            if( vlc_internals( p_tmp )->i_object_type == i_type )
             {
                 vlc_object_hold( p_tmp );
                 return p_tmp;
@@ -1288,7 +1289,7 @@ static int CountChildren( vlc_object_t *p_this, int i_type )
     {
         p_tmp = vlc_internals( p_this )->pp_children[i];
 
-        if( p_tmp->i_object_type == i_type )
+        if( vlc_internals( p_tmp )->i_object_type == i_type )
         {
             i_count++;
         }
@@ -1307,7 +1308,7 @@ static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
     {
         p_tmp = vlc_internals( p_this )->pp_children[i];
 
-        if( p_tmp->i_object_type == i_type )
+        if( vlc_internals( p_tmp )->i_object_type == i_type )
             ListReplace( p_list, p_tmp, p_list->i_count++ );
 
         ListChildren( p_list, p_tmp, i_type );

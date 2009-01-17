@@ -1940,7 +1940,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
 
 #ifdef ENABLE_SOUT
-    if( p_dec->i_object_type == VLC_OBJECT_PACKETIZER )
+    if( vlc_internals( p_dec )->i_object_type == VLC_OBJECT_PACKETIZER )
     {
         if( p_block )
             p_block->i_flags &= ~BLOCK_FLAG_CORE_PRIVATE_MASK;

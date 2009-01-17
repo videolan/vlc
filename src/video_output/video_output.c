@@ -420,7 +420,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* If the parent is not a VOUT object, that means we are at the start of
      * the video output pipe */
-    if( p_parent->i_object_type != VLC_OBJECT_VOUT )
+    if( vlc_internals( p_parent )->i_object_type != VLC_OBJECT_VOUT )
     {
         /* Look for the default filter configuration */
         p_vout->p->psz_filter_chain =

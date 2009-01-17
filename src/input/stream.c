@@ -1674,7 +1674,7 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
     int i_total = 0;
 
     if( s->p_parent && s->p_parent->p_parent &&
-        s->p_parent->p_parent->i_object_type == VLC_OBJECT_INPUT )
+        vlc_internals( s->p_parent->p_parent )->i_object_type == VLC_OBJECT_INPUT )
         p_input = (input_thread_t *)s->p_parent->p_parent;
 
     if( !p_sys->i_list )
@@ -1744,7 +1744,7 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     int i_total = 0;
 
     if( s->p_parent && s->p_parent->p_parent &&
-        s->p_parent->p_parent->i_object_type == VLC_OBJECT_INPUT )
+        vlc_internals( s->p_parent->p_parent )->i_object_type == VLC_OBJECT_INPUT )
         p_input = (input_thread_t *)s->p_parent->p_parent;
 
     if( !p_sys->i_list )

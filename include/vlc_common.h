@@ -509,7 +509,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
  * these members are common for all vlc objects                             \
  */                                                                         \
 /**@{*/                                                                     \
-    int   i_object_type;                                                    \
     const char *psz_object_type;                                            \
     char *psz_object_name;                                                  \
                                                                             \

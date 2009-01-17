@@ -146,6 +146,8 @@ VLC_EXPORT(char **, module_GetModulesNamesForCapability,
  */
 typedef struct vlc_object_internals_t
 {
+    int             i_object_type; /* Object type, deprecated */
+
     /* Object variables */
     variable_t *    p_vars;
     vlc_mutex_t     var_lock;
