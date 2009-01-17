@@ -1071,18 +1071,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     msg_Dbg( p_libvlc, "removing stats" );
     vlc_mutex_destroy( &p_libvlc->p_stats->lock );
     FREENULL( p_libvlc->p_stats );
-}
-
-/**
- * Destroy everything.
- * This function requests the running threads to finish, waits for their
- * termination, and destroys their structure.
- * It stops the thread systems: no instance can run after this has run
- * \param p_libvlc the instance to destroy
- */
-void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
-{
-    libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
 #ifndef WIN32
     char* psz_pidfile = NULL;
@@ -1116,6 +1104,18 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
                      p_libvlc->p_hotkeys );
     FREENULL( p_libvlc->p_hotkeys );
+}
+
+/**
+ * Destroy everything.
+ * This function requests the running threads to finish, waits for their
+ * termination, and destroys their structure.
+ * It stops the thread systems: no instance can run after this has run
+ * \param p_libvlc the instance to destroy
+ */
+void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
+{
+    libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
     vlc_mutex_lock( &global_lock );
     i_instances--;
