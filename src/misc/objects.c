@@ -308,7 +308,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     vlc_spin_destroy( &p_priv->ref_spin );
     vlc_mutex_destroy( &p_priv->lock );
     vlc_cond_destroy( &p_priv->wait );
-    if( p_priv->pipes[1] != -1 )
+    if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
         close( p_priv->pipes[1] );
     if( p_priv->pipes[0] != -1 )
         close( p_priv->pipes[0] );
@@ -411,6 +411,9 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         /* This can only ever happen if someone killed us without locking: */
         assert (internals->pipes[1] == -1);
 
+#ifdef HAVE_EVENTFD
+        if ((internals->pipes[0] = internals->pipes[1] = eventfd (0, 0)) == -1)
+#endif
         if (pipe (internals->pipes))
             internals->pipes[0] = internals->pipes[1] = -1;
         else

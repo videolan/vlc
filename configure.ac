@@ -493,12 +493,15 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS([gettimeofday strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid_r memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork bsearch lstat strlcpy strdup strndup strnlen atof lldiv posix_fadvise posix_madvise uselocale vmsplice])
+AC_CHECK_FUNCS([gettimeofday strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid_r memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon scandir fork bsearch lstat strlcpy strdup strndup strnlen atof lldiv posix_fadvise posix_madvise uselocale])
 AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(fcntl)
+
+dnl Check for Linux system calls
+AC_CHECK_FUNCS([vmsplice eventfd])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 
