@@ -146,6 +146,7 @@ void *vlc_hold (gc_object_t * p_gc)
 {
     uintptr_t refs;
     assert( p_gc );
+    assert ((((uintptr_t)&refs) & (sizeof (void *) - 1)) == 0); /* alignment */
 
 #if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
     refs = __sync_add_and_fetch (&p_gc->refs, 1);
@@ -173,6 +174,7 @@ void vlc_release (gc_object_t *p_gc)
     unsigned refs;
 
     assert( p_gc );
+    assert ((((uintptr_t)&refs) & (sizeof (void *) - 1)) == 0); /* alignment */
 
 #if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
     refs = __sync_sub_and_fetch (&p_gc->refs, 1);
