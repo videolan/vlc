@@ -192,8 +192,8 @@ static input_item_t * CreateInputItemFromShoutItem( services_discovery_t *p_sd,
 
     /* Copy options */
     for( i = 0; p_item->ppsz_options[i] != NULL; i++ )
-        input_item_AddOption( p_input, p_item->ppsz_options[i] );
-    input_item_AddOption( p_input, "no-playlist-autostart" );
+        input_item_AddOption( p_input, p_item->ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( p_input, "no-playlist-autostart", VLC_INPUT_OPTION_TRUSTED );
 
     return p_input;
 }

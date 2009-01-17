@@ -514,14 +514,14 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             if( psz_output && asprintf( &psz_dup, "sout=%s", psz_output ) != -1 )
             {
-                input_item_AddOption( p_media->vod.p_item, psz_dup );
+                input_item_AddOption( p_media->vod.p_item, psz_dup, VLC_INPUT_OPTION_TRUSTED );
                 free( psz_dup );
             }
             free( psz_output );
 
             for( i = 0; i < p_cfg->i_option; i++ )
                 input_item_AddOption( p_media->vod.p_item,
-                                      p_cfg->ppsz_option[i] );
+                                      p_cfg->ppsz_option[i], VLC_INPUT_OPTION_TRUSTED );
 
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
@@ -818,7 +818,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
                       (p_cfg->psz_output && psz_vod_output) ? ":" : psz_vod_output ? "#" : "",
                       psz_vod_output ? psz_vod_output : "" ) != -1 )
             {
-                input_item_AddOption( p_instance->p_item, psz_buffer );
+                input_item_AddOption( p_instance->p_item, psz_buffer, VLC_INPUT_OPTION_TRUSTED );
                 free( psz_buffer );
             }
         }
@@ -830,7 +830,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             else if( !strcmp( p_cfg->ppsz_option[i], "nosout-keep" ) || !strcmp( p_cfg->ppsz_option[i], "no-sout-keep" ) )
                 p_instance->b_sout_keep = false;
             else
-                input_item_AddOption( p_instance->p_item, p_cfg->ppsz_option[i] );
+                input_item_AddOption( p_instance->p_item, p_cfg->ppsz_option[i], VLC_INPUT_OPTION_TRUSTED );
         }
         TAB_APPEND( p_media->i_instance, p_media->instance, p_instance );
     }

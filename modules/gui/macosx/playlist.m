@@ -1073,7 +1073,8 @@
     {
         for( i = 0; i < (int)[o_options count]; i++ )
         {
-            input_item_AddOption( p_input, strdup( [[o_options objectAtIndex:i] UTF8String] ) );
+            input_item_AddOption( p_input, strdup( [[o_options objectAtIndex:i] UTF8String] ),
+                                  VLC_INPUT_OPTION_TRUSTED );
         }
     }
 

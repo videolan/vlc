@@ -318,8 +318,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if( asprintf( &str, "%s=%s", psz_option, psz_value ) == -1 )
                 return VLC_ENOMEM;
 
-            i = input_item_AddOpt( p_input->p->p_item, str,
-                                  VLC_INPUT_OPTION_UNIQUE );
+            i = input_item_AddOption( p_input->p->p_item, str,
+                                      VLC_INPUT_OPTION_UNIQUE );
             free( str );
             return i;
         }
@@ -489,7 +489,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     vlc_mutex_unlock( &p_input->p->p_item->lock );
 
     if( psz_value )
-        input_item_AddOpt( p_input->p->p_item, psz_value, VLC_INPUT_OPTION_UNIQUE );
+        input_item_AddOption( p_input->p->p_item, psz_value, VLC_INPUT_OPTION_UNIQUE );
 
     free( psz_value );
 

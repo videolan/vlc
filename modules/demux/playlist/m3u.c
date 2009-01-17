@@ -225,7 +225,7 @@ static int Demux( demux_t *p_demux )
 
             input_item_AddSubItem( p_current_input, p_input );
             for( int i = 0; i < i_options; i++ )
-                input_item_AddOpt( p_input, ppsz_options[i], 0 );
+                input_item_AddOption( p_input, ppsz_options[i], 0 );
             vlc_gc_decref( p_input );
             free( psz_mrl );
         }

@@ -1168,7 +1168,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
                ((const char *)mrl[i + 1].mb_str(wxConvUTF8))[0] == ':' )
         {
             psz_utf8 = wxFromLocale( mrl[i + 1] );
-            input_item_AddOption( p_input, psz_utf8 );
+            input_item_AddOption( p_input, psz_utf8, VLC_INPUT_OPTION_TRUSTED );
             wxLocaleFree( psz_utf8 );
             i++;
         }
@@ -1179,7 +1179,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
                 psz_utf8 = wxFromLocale( subsfile_mrl[j] );
-                input_item_AddOption( p_input, psz_utf8 );
+                input_item_AddOption( p_input, psz_utf8, VLC_INPUT_OPTION_TRUSTED );
                 wxLocaleFree( psz_utf8 );
             }
         }
@@ -1190,7 +1190,7 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
                 psz_utf8 = wxFromLocale( sout_mrl[j] );
-                input_item_AddOption( p_input, psz_utf8 );
+                input_item_AddOption( p_input, psz_utf8, VLC_INPUT_OPTION_TRUSTED );
                 wxLocaleFree( psz_utf8 );
             }
         }

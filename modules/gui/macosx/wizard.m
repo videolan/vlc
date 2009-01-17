@@ -1278,14 +1278,16 @@ static VLCWizard *_o_sharedInstance = nil;
                 objectAtIndex:x] UTF8String],
                 [tempString UTF8String] );
             input_item_AddOption( p_input, [[[o_userSelections
-                objectForKey:@"opts"] objectAtIndex: x] UTF8String]);
+                objectForKey:@"opts"] objectAtIndex: x] UTF8String],
+                VLC_INPUT_OPTION_TRUSTED );
 
             if(! [[o_userSelections objectForKey:@"partExtractFrom"]
                 isEqualToString:@""] )
             {
                 input_item_AddOption( p_input, [[NSString
                     stringWithFormat: @"start-time=%@", [o_userSelections
-                    objectForKey: @"partExtractFrom"]] UTF8String] );
+                    objectForKey: @"partExtractFrom"]] UTF8String],
+					VLC_INPUT_OPTION_TRUSTED );
             }
 
             if(! [[o_userSelections objectForKey:@"partExtractTo"]
@@ -1293,12 +1295,14 @@ static VLCWizard *_o_sharedInstance = nil;
             {
                 input_item_AddOption( p_input, [[NSString
                     stringWithFormat: @"stop-time=%@", [o_userSelections
-                    objectForKey: @"partExtractTo"]] UTF8String] );
+                    objectForKey: @"partExtractTo"]] UTF8String],
+                    VLC_INPUT_OPTION_TRUSTED );
             }
 
             input_item_AddOption( p_input, [[NSString stringWithFormat:
                 @"ttl=%@", [o_userSelections objectForKey:@"ttl"]]
-                UTF8String] );
+                UTF8String],
+                VLC_INPUT_OPTION_TRUSTED );
 
             /* FIXME: playlist_AddInput() can fail */
             playlist_AddInput( p_playlist, p_input, PLAYLIST_STOP,

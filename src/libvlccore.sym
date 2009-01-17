@@ -162,7 +162,6 @@ input_DecoderDelete
 input_DecoderNew
 input_GetItem
 input_item_AddInfo
-input_item_AddOpt
 input_item_AddOption
 input_item_AddSubItem
 input_item_CopyOptions

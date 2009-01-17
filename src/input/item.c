@@ -223,9 +223,9 @@ void input_item_CopyOptions( input_item_t *p_parent,
         if( !strcmp( p_parent->ppsz_options[i], "meta-file" ) )
             continue;
 
-        input_item_AddOpt( p_child,
-                           p_parent->ppsz_options[i],
-                           p_parent->optflagv[i] );
+        input_item_AddOption( p_child,
+                              p_parent->ppsz_options[i],
+                              p_parent->optflagv[i] );
     }
 
     vlc_mutex_unlock( &p_parent->lock );
@@ -249,11 +249,6 @@ void input_item_AddSubItem( input_item_t *p_parent, input_item_t *p_child )
     event.type = vlc_InputItemSubItemAdded;
     event.u.input_item_subitem_added.p_new_child = p_child;
     vlc_event_send( &p_parent->event_manager, &event );
-}
-
-int input_item_AddOption( input_item_t *p_item, const char *psz_option )
-{
-    return input_item_AddOpt( p_item, psz_option, VLC_INPUT_OPTION_TRUSTED );
 }
 
 bool input_item_HasErrorWhenReading( input_item_t *p_item )
@@ -451,8 +446,8 @@ static void input_item_Destroy ( gc_object_t *p_gc )
     free( p_item );
 }
 
-int input_item_AddOpt( input_item_t *p_input, const char *psz_option,
-                      unsigned flags )
+int input_item_AddOption( input_item_t *p_input, const char *psz_option,
+                          unsigned flags )
 {
     int err = VLC_SUCCESS;
 
@@ -677,7 +672,7 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     p_input->i_duration = i_duration;
 
     for( int i = 0; i < i_options; i++ )
-        input_item_AddOption( p_input, ppsz_options[i] );
+        input_item_AddOption( p_input, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
     return p_input;
 }
 

@@ -671,7 +671,7 @@ static bool set_option SIMPLE_INTERFACE
     /* re-convert xml special characters inside psz_value */
     resolve_xml_special_chars( psz_value );
 
-    input_item_AddOpt( p_input, psz_value, 0 );
+    input_item_AddOption( p_input, psz_value, 0 );
 
     return true;
 }

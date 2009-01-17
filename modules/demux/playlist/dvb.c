@@ -121,7 +121,7 @@ static int Demux( demux_t *p_demux )
         for( i = 0; i< i_options; i++ )
         {
             EnsureUTF8( ppsz_options[i] );
-            input_item_AddOption( p_input, ppsz_options[i] );
+            input_item_AddOption( p_input, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
         }
         input_item_AddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );

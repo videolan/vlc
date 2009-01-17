@@ -114,14 +114,21 @@ VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_na
 VLC_EXPORT( void, input_item_AddSubItem, ( input_item_t *p_parent, input_item_t *p_child ) );
 
 
-/* Flags handled past input_item_AddOpt() */
-#define VLC_INPUT_OPTION_TRUSTED 0x2
+/**
+ * Option flags
+ */
+enum input_item_option_e
+{
+    VLC_INPUT_OPTION_TRUSTED = 0x2,
+    VLC_INPUT_OPTION_UNIQUE  = 0x100,
+};
 
-/* Flags handled within input_item_AddOpt() */
-#define VLC_INPUT_OPTION_UNIQUE  0x100
+/**
+ * This function allows to add an option to an existing input_item_t.
+ */
+VLC_EXPORT( int,  input_item_AddOption, (input_item_t *, const char *, unsigned i_flags ) );
 
-VLC_EXPORT( int,  input_item_AddOpt, ( input_item_t *, const char *str, unsigned flags ) );
-VLC_EXPORT( int,  input_item_AddOption, (input_item_t *, const char * ) );
+/* */
 VLC_EXPORT( bool, input_item_HasErrorWhenReading, ( input_item_t * ) );
 VLC_EXPORT( void, input_item_SetMeta, ( input_item_t *, vlc_meta_type_t meta_type, const char *psz_val ));
 VLC_EXPORT( bool, input_item_MetaMatch, ( input_item_t *p_i, vlc_meta_type_t meta_type, const char *psz ) );

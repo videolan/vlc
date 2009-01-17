@@ -247,7 +247,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
                          strdup( psz_urls ) );
             p_input = input_item_NewExt( p_sd, psz_urls,
                                         psz_urls, 0, NULL, -1 );
-            input_item_AddOption( p_input, "demux=podcast" );
+            input_item_AddOption( p_input, "demux=podcast", VLC_INPUT_OPTION_TRUSTED );
             services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
             vlc_gc_decref( p_input );
             INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,

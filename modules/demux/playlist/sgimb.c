@@ -393,7 +393,7 @@ static int Demux ( demux_t *p_demux )
         p_sys->i_packet_size += 1000;
         if( asprintf( &psz_option, "mtu=%i", p_sys->i_packet_size ) != -1 )
         {
-            input_item_AddOption( p_child, psz_option );
+            input_item_AddOption( p_child, psz_option, VLC_INPUT_OPTION_TRUSTED );
             free( psz_option );
         }
     }
@@ -402,7 +402,7 @@ static int Demux ( demux_t *p_demux )
         char *psz_option;
         if( asprintf( &psz_option, "rtsp-caching=5000" ) != -1 )
         {
-            input_item_AddOption( p_child, psz_option );
+            input_item_AddOption( p_child, psz_option, VLC_INPUT_OPTION_TRUSTED );
             free( psz_option );
         }
     }
@@ -411,7 +411,7 @@ static int Demux ( demux_t *p_demux )
         char *psz_option;
         if( asprintf( &psz_option, "rtsp-kasenna" ) != -1 )
         {
-            input_item_AddOption( p_child, psz_option );
+            input_item_AddOption( p_child, psz_option, VLC_INPUT_OPTION_TRUSTED );
             free( psz_option );
         }
     }

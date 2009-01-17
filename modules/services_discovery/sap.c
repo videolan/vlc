@@ -664,7 +664,7 @@ static int Demux( demux_t *p_demux )
         char *rtcp;
         if( asprintf( &rtcp, ":rtcp-port=%u", p_sdp->rtcp_port ) != -1 )
         {
-            input_item_AddOption( p_parent_input, rtcp );
+            input_item_AddOption( p_parent_input, rtcp, VLC_INPUT_OPTION_TRUSTED );
             free( rtcp );
         }
     }
@@ -880,7 +880,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
         char *rtcp;
         if( asprintf( &rtcp, ":rtcp-port=%u", p_sdp->rtcp_port ) != -1 )
         {
-            input_item_AddOption( p_input, rtcp );
+            input_item_AddOption( p_input, rtcp, VLC_INPUT_OPTION_TRUSTED );
             free( rtcp );
         }
     }

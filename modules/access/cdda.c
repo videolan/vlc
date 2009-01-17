@@ -440,9 +440,9 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
                                               psz_uri, psz_name, 0, NULL, -1,
                                               ITEM_TYPE_DISC );
         input_item_CopyOptions( p_current, p_input_item );
-        input_item_AddOption( p_input_item, psz_first );
-        input_item_AddOption( p_input_item, psz_last );
-        input_item_AddOption( p_input_item, psz_opt );
+        input_item_AddOption( p_input_item, psz_first, VLC_INPUT_OPTION_TRUSTED );
+        input_item_AddOption( p_input_item, psz_last, VLC_INPUT_OPTION_TRUSTED );
+        input_item_AddOption( p_input_item, psz_opt, VLC_INPUT_OPTION_TRUSTED );
         const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i+1] - p_sys->p_sectors[i] ) *
                                    CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
         input_item_SetDuration( p_input_item, i_duration );

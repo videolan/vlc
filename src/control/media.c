@@ -346,8 +346,8 @@ void libvlc_media_add_option(
                                    libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
-    input_item_AddOpt( p_md->p_input_item, ppsz_option,
-                      VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
+    input_item_AddOption( p_md->p_input_item, ppsz_option,
+                          VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
 
 /**************************************************************************

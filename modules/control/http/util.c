@@ -897,7 +897,7 @@ input_item_t *MRLParse( intf_thread_t *p_intf, const char *mrl,
         {
             s_temp = s_mrl + strlen( s_mrl );
         }
-        input_item_AddOption( p_input, s_mrl );
+        input_item_AddOption( p_input, s_mrl, VLC_INPUT_OPTION_TRUSTED );
         s_mrl = s_temp;
     }
 

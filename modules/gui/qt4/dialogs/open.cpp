@@ -331,7 +331,7 @@ void OpenDialog::finish( bool b_enqueue = false )
             while( i + 1 < tempMRL.size() && tempMRL[i + 1].startsWith( ":" ) )
             {
                 i++;
-                input_item_AddOption( p_input, qtu( tempMRL[i] ) );
+                input_item_AddOption( p_input, qtu( tempMRL[i] ), VLC_INPUT_OPTION_TRUSTED );
             }
 
             /* Switch between enqueuing and starting the item */
