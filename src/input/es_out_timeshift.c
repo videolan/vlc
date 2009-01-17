@@ -1552,7 +1552,7 @@ static FILE *GetTmpFile( char **ppsz_file, const char *psz_path )
         return NULL;
 
     /* */
-    f = fdopen( fd, "rw+" );
+    f = fdopen( fd, "r+b" );
     if( !f )
         close( fd );
 
