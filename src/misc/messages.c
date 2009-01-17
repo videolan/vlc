@@ -61,6 +61,13 @@ typedef struct
     char * psz_message;
 } msg_context_t;
 
+static void cleanup_msg_context (void *data)
+{
+    msg_context_t *ctx = data;
+    free (ctx->psz_message);
+    free (ctx);
+}
+
 static vlc_threadvar_t msg_context;
 static uintptr_t banks = 0;
 
@@ -117,7 +124,7 @@ void msg_Create (libvlc_int_t *p_libvlc)
 
     vlc_mutex_lock( &msg_stack_lock );
     if( banks++ == 0 )
-        vlc_threadvar_create( &msg_context, NULL );
+        vlc_threadvar_create( &msg_context, cleanup_msg_context );
     vlc_mutex_unlock( &msg_stack_lock );
 }
 
