@@ -78,15 +78,15 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         cancelBox.setText( qfu( p_dialog->psz_description ) );
 
         if( p_dialog->psz_default_button )
-            cancelBox.addButton( qfu( p_dialog->psz_default_button ),
+            cancelBox.addButton( "&" + qfu( p_dialog->psz_default_button ),
                                  QMessageBox::AcceptRole );
 
         if( p_dialog->psz_alternate_button )
-            cancelBox.addButton( qfu( p_dialog->psz_alternate_button ),
+            cancelBox.addButton( "&" + qfu( p_dialog->psz_alternate_button ),
                                  QMessageBox::RejectRole );
 
         if( p_dialog->psz_other_button )
-            cancelBox.addButton( qfu( p_dialog->psz_other_button ),
+            cancelBox.addButton( "&" + qfu( p_dialog->psz_other_button ),
                                  QMessageBox::ActionRole );
 
         i_ret = cancelBox.exec();
@@ -164,19 +164,19 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         {
             defaultButton = new QPushButton;
             defaultButton->setFocus();
-            defaultButton->setText( qfu( p_dialog->psz_default_button ) );
+            defaultButton->setText( "&" + qfu( p_dialog->psz_default_button ) );
             buttonBox->addButton( defaultButton, QDialogButtonBox::AcceptRole );
         }
         if( p_dialog->psz_alternate_button )
         {
             altButton = new QPushButton;
-            altButton->setText( qfu( p_dialog->psz_alternate_button ) );
+            altButton->setText( "&" + qfu( p_dialog->psz_alternate_button ) );
             buttonBox->addButton( altButton, QDialogButtonBox::RejectRole );
         }
         if( p_dialog->psz_other_button )
         {
             otherButton = new QPushButton;
-            otherButton->setText( qfu( p_dialog->psz_other_button ) );
+            otherButton->setText( "&" + qfu( p_dialog->psz_other_button ) );
             buttonBox->addButton( otherButton, QDialogButtonBox::ActionRole );
         }
         layout->addWidget( buttonBox );
