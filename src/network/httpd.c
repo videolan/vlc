@@ -975,6 +975,7 @@ httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
 }
 
 static const char psz_object_type[] = "http server";
+static vlc_mutex_t httpd_mutex = VLC_STATIC_MUTEX;
 
 httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
                                 int i_port,
@@ -985,7 +986,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     httpd_host_t *host;
     tls_server_t *p_tls;
     char *psz_host;
-    vlc_value_t  lockval, ptrval;
+    vlc_value_t  ptrval;
     int i;
 
     if( psz_hostname == NULL )
@@ -996,9 +997,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         return NULL;
 
     /* to be sure to avoid multiple creation */
-    var_Create( p_this->p_libvlc, "httpd_mutex", VLC_VAR_MUTEX );
-    var_Get( p_this->p_libvlc, "httpd_mutex", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( &httpd_mutex );
     httpd = libvlc_priv (p_this->p_libvlc)->p_httpd;
 
     if( httpd == NULL )
@@ -1009,7 +1008,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
                                               psz_object_type );
         if( httpd == NULL )
         {
-            vlc_mutex_unlock( lockval.p_address );
+            vlc_mutex_unlock( &httpd_mutex );
             free( psz_host );
             return NULL;
         }
@@ -1042,7 +1041,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
         host->i_ref++;
         vlc_mutex_unlock( &host->lock );
 
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( &httpd_mutex );
         return host;
     }
 
@@ -1119,7 +1118,7 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
     /* now add it to httpd */
     TAB_APPEND( httpd->i_host, httpd->host, host );
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( &httpd_mutex );
 
     return host;
 
@@ -1132,7 +1131,7 @@ error:
         vlc_object_detach( httpd );
         vlc_object_release( httpd );
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( &httpd_mutex );
 
     if( host != NULL )
     {
@@ -1152,11 +1151,9 @@ error:
 void httpd_HostDelete( httpd_host_t *host )
 {
     httpd_t *httpd = host->httpd;
-    vlc_value_t lockval;
     int i;
 
-    var_Get( httpd->p_libvlc, "httpd_mutex", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( &httpd_mutex );
 
     vlc_mutex_lock( &host->lock );
     host->i_ref--;
@@ -1166,7 +1163,7 @@ void httpd_HostDelete( httpd_host_t *host )
     if( host->i_ref > 0 )
     {
         /* still used */
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( &httpd_mutex );
         msg_Dbg( host, "httpd_HostDelete: host still used" );
         return;
     }
@@ -1212,7 +1209,7 @@ void httpd_HostDelete( httpd_host_t *host )
         vlc_object_release( httpd );
 
     }
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( &httpd_mutex );
 }
 
 /* register a new url */
