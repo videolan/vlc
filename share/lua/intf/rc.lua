@@ -155,14 +155,18 @@ function quit(name,client)
 end
 
 function add(name,client,arg)
-    -- TODO: parse (and use) options
     local f
     if name == "enqueue" then
         f = vlc.playlist.enqueue
     else
         f = vlc.playlist.add
     end
-    f({{path=arg}})
+    local options = {}
+    for o in string.gmatch(arg," +:([^ ]*)") do
+        table.insert(options,o)
+    end
+    arg = string.gsub(arg," +:.*$","")
+    f({{path=arg,options=options}})
 end
 
 function playlist_is_tree( client )
