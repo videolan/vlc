@@ -99,7 +99,6 @@
 /*****************************************************************************
  * The evil global variables. We handle them with care, don't worry.
  *****************************************************************************/
-static libvlc_int_t *    p_static_vlc = NULL;
 static unsigned          i_instances = 0;
 
 #ifndef WIN32
@@ -284,9 +283,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
     /* Initialize mutexes */
     vlc_mutex_init( &priv->timer_lock );
     vlc_mutex_init( &priv->config_lock );
-
-    /* Store data for the non-reentrant API */
-    p_static_vlc = p_libvlc;
 
     return p_libvlc;
 }
