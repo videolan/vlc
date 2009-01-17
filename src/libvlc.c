@@ -1020,7 +1020,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
  * Cleanup a libvlc instance. The instance is not completely deallocated
  * \param p_libvlc the instance to clean
  */
-int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
+void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     playlist_t    *p_playlist = priv->p_playlist;
@@ -1071,8 +1071,6 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     msg_Dbg( p_libvlc, "removing stats" );
     vlc_mutex_destroy( &p_libvlc->p_stats->lock );
     FREENULL( p_libvlc->p_stats );
-
-    return VLC_SUCCESS;
 }
 
 /**
@@ -1082,11 +1080,8 @@ int libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
  * It stops the thread systems: no instance can run after this has run
  * \param p_libvlc the instance to destroy
  */
-int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
+void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 {
-    if( !p_libvlc )
-        return VLC_EGENERIC;
-
     libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
 #ifndef WIN32
@@ -1139,9 +1134,6 @@ int libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     vlc_mutex_destroy( &priv->timer_lock );
 
     vlc_object_release( p_libvlc );
-    p_libvlc = NULL;
-
-    return VLC_SUCCESS;
 }
 
 /**
