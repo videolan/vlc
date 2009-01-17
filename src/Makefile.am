@@ -61,6 +61,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
+	../include/vlc_input_item.h \
 	../include/vlc_main.h \
 	../include/vlc_md5.h \
 	../include/vlc_messages.h \
