@@ -112,6 +112,7 @@ struct access_sys_t
 
     char       sz_epsv_ip[NI_MAXNUMERICHOST];
     bool       out;
+    bool       directory;
 };
 #define GET_OUT_SYS( p_this ) \
     ((access_sys_t *)(((sout_access_out_t *)(p_this))->p_sys))
@@ -324,6 +325,7 @@ static int InOpen( vlc_object_t *p_this )
     STANDARD_READ_ACCESS_INIT
     p_sys->fd_data = -1;
     p_sys->out = false;
+    p_sys->directory = false;
 
     if( parseURL( &p_sys->url, p_access->psz_path ) )
         goto exit_error;
@@ -335,13 +337,23 @@ static int InOpen( vlc_object_t *p_this )
     if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ? : "" ) < 0 ||
         ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
     {
-        msg_Err( p_access, "cannot get file size" );
-        net_Close( p_sys->fd_cmd );
-        goto exit_error;
+        msg_Dbg( p_access, "cannot get file size" );
+        msg_Dbg( p_access, "will try to get directory contents" );
+        if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path ?: "" ) < 0 ||
+        ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
+        {
+            msg_Err( p_access, "file or directory doesn't exist" );
+            net_Close( p_sys->fd_cmd );
+            goto exit_error;
+        }
+        p_sys->directory = true;
     }
-    p_access->info.i_size = atoll( &psz_arg[4] );
-    free( psz_arg );
-    msg_Dbg( p_access, "file size: %"PRId64, p_access->info.i_size );
+    else
+    {
+        p_access->info.i_size = atoll( &psz_arg[4] );
+        free( psz_arg );
+        msg_Dbg( p_access, "file size: %"PRId64, p_access->info.i_size );
+    }
 
     /* Start the 'stream' */
     if( ftp_StartStream( p_this, p_sys, 0 ) < 0 )
@@ -475,7 +487,6 @@ static int OutSeek( sout_access_out_t *p_access, off_t i_pos )
 static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_read;
 
     assert( p_sys->fd_data != -1 );
     assert( !p_sys->out );
@@ -483,14 +494,35 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     if( p_access->info.b_eof )
         return 0;
 
-    i_read = net_Read( p_access, p_sys->fd_data, NULL, p_buffer, i_len,
-                       false );
-    if( i_read == 0 )
-        p_access->info.b_eof = true;
-    else if( i_read > 0 )
-        p_access->info.i_pos += i_read;
+    if( p_sys->directory )
+    {
+        char *psz_line = net_Gets( p_access, p_sys->fd_data, NULL );
+        if( !psz_line )
+        {
+            p_access->info.b_eof = true;
+            return 0;
+        }
+        else
+        {
+            snprintf( (char*)p_buffer, i_len, "ftp://%s:%d/%s/%s\n",
+                      p_sys->url.psz_host, p_sys->url.i_port,
+                      p_sys->url.psz_path, psz_line );
+            free( psz_line );
+            msg_Err( p_access, "%s", p_buffer );
+            return strlen( (const char *)p_buffer );
+        }
+    }
+    else
+    {
+        int i_read = net_Read( p_access, p_sys->fd_data, NULL,
+                               p_buffer, i_len, false );
+        if( i_read == 0 )
+            p_access->info.b_eof = true;
+        else if( i_read > 0 )
+            p_access->info.i_pos += i_read;
 
-    return i_read;
+        return i_read;
+    }
 }
 
 /*****************************************************************************
@@ -760,14 +792,26 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
     msg_Dbg( p_access, "connection with \"%s:%d\" successful",
              psz_ip, i_port );
 
-    /* "1xx" message */
-    if( ftp_SendCommand( p_access, p_sys, "%s %s",
-                         p_sys->out ? "STOR" : "RETR",
-                         p_sys->url.psz_path ?: "" ) < 0 ||
-        ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
+    if( p_sys->directory )
     {
-        msg_Err( p_access, "cannot retrieve file" );
+        if( ftp_SendCommand( p_access, p_sys, "NLST" ) < 0 ||
+            ftp_ReadCommand( p_access, p_sys, NULL, &psz_arg ) > 2 )
+        {
+            msg_Err( p_access, "cannot list directory contents" );
         return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        /* "1xx" message */
+        if( ftp_SendCommand( p_access, p_sys, "%s %s",
+                             p_sys->out ? "STOR" : "RETR",
+                             p_sys->url.psz_path ?: "" ) < 0 ||
+            ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
+        {
+            msg_Err( p_access, "cannot retrieve file" );
+            return VLC_EGENERIC;
+        }
     }
 
     shutdown( p_sys->fd_data, p_sys->out ? SHUT_RD : SHUT_WR );
