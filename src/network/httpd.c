@@ -95,6 +95,7 @@ struct httpd_host_t
     int         *fds;
     unsigned     nfd;
 
+    vlc_thread_t thread;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
@@ -963,7 +964,7 @@ void httpd_StreamDelete( httpd_stream_t *stream )
 /*****************************************************************************
  * Low level
  *****************************************************************************/
-static void* httpd_HostThread( vlc_object_t * );
+static void* httpd_HostThread( void * );
 
 /* create a new host */
 httpd_host_t *httpd_HostNew( vlc_object_t *p_this, const char *psz_host,
@@ -1109,8 +1110,8 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
     host->p_tls = p_tls;
 
     /* create the thread */
-    if( vlc_thread_create( host, "httpd host thread", httpd_HostThread,
-                           VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &host->thread, httpd_HostThread, host,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_this, "cannot spawn http host thread" );
         goto error;
@@ -1172,7 +1173,7 @@ void httpd_HostDelete( httpd_host_t *host )
     TAB_REMOVE( httpd->i_host, httpd->host, host );
 
     vlc_object_kill( host );
-    vlc_thread_join( host );
+    vlc_join( host->thread, NULL );
 
     msg_Dbg( host, "HTTP host removed" );
 
@@ -2037,13 +2038,12 @@ static void httpd_ClientTlsHsOut( httpd_client_t *cl )
     }
 }
 
-static void* httpd_HostThread( vlc_object_t *p_this )
+static void* httpd_HostThread( void *data )
 {
-    httpd_host_t *host = (httpd_host_t *)p_this;
+    httpd_host_t *host = data;
     tls_session_t *p_tls = NULL;
     counter_t *p_total_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
     counter_t *p_active_counter = stats_CounterCreate( host, VLC_VAR_INTEGER, STATS_COUNTER );
-    int canc = vlc_savecancel ();
     int evfd = vlc_object_waitpipe( VLC_OBJECT( host ) );
 
     for( ;; )
@@ -2572,6 +2572,5 @@ static void* httpd_HostThread( vlc_object_t *p_this )
         stats_CounterClean( p_total_counter );
     if( p_active_counter )
         stats_CounterClean( p_active_counter );
-    vlc_restorecancel (canc);
     return NULL;
 }
