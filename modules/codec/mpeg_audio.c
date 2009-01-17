@@ -127,21 +127,14 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
- * OpenDecoder: probe the decoder and return score
+ * Open: probe the decoder and return score
  *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','a') )
-    {
-        return VLC_EGENERIC;
-    }
-
-    /* HACK: Don't use this codec if we don't have an mpga audio filter */
-    if( p_dec->i_object_type == VLC_OBJECT_DECODER &&
-        !module_exists( "mpgatofixed32" ) )
     {
         return VLC_EGENERIC;
     }
@@ -175,11 +168,20 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    /* HACK: Don't use this codec if we don't have an mpga audio filter */
+    if( !module_exists( "mpgatofixed32" ) )
+        return VLC_EGENERIC;
+
+    return Open( p_this );
+}
+
 static int OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    int i_ret = OpenDecoder( p_this );
+    int i_ret = Open( p_this );
 
     if( i_ret == VLC_SUCCESS ) p_dec->p_sys->b_packetizer = true;
 

@@ -287,7 +287,6 @@ static int OpenWindow (vlc_object_t *obj)
         msg_Err( obj, "Maemo interface not found" );
         return VLC_EGENERIC; /* Maemo not in use */
     }
-    assert (intf->i_object_type == VLC_OBJECT_INTF);
 
     wnd->handle = request_video( intf, wnd->vout );
     msg_Dbg( intf, "Using handle %p", wnd->handle );
