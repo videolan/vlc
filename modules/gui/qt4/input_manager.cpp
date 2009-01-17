@@ -545,6 +545,12 @@ void InputManager::requestArtUpdate()
         playlist_AskForArtEnqueue( p_playlist, input_GetItem( p_input ), pl_Unlocked );
         pl_Release( p_intf );
     }
+    else
+    {
+        /* No input will signal the cover art to update,
+         * let's do it ourself */
+        UpdateArt();
+    }
 }
 
 void InputManager::UpdateArt()
