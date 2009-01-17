@@ -73,7 +73,7 @@ vlc_module_begin ()
                  true );
 
     add_shortcut( "fake" )
-    set_capability( "access_demux", 100 )
+    set_capability( "access_demux", 10 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -102,9 +102,9 @@ static int Open( vlc_object_t *p_this )
 
     if( *p_demux->psz_access != '\0' )
     {
-       /* if an access is provided, then it has to be "fake" */
-       if( strcmp( p_demux->psz_access, "fake" ) != 0 )
-        return VLC_EGENERIC;
+        /* if an access is provided, then it has to be "fake" */
+        if( strcmp( p_demux->psz_access, "fake" ) )
+            return VLC_EGENERIC;
 
         msg_Dbg( p_demux, "fake:// access_demux detected" );
     }
@@ -121,23 +121,15 @@ static int Open( vlc_object_t *p_this )
         vlc_fourcc_t i_codec = image_Ext2Fourcc( p_demux->psz_path );
         if( !i_codec )
             return VLC_EGENERIC;
-        char* p_codec = (char*) &i_codec;
-        msg_Dbg( p_demux, "still image detected with codec format %c%c%c%c",
-                   p_codec[0], p_codec[1], p_codec[2], p_codec[3] );
+        msg_Dbg( p_demux, "still image detected with codec format %4.4s",
+                 (const char*)&i_codec );
     }
 
     if( p_demux->psz_path && *p_demux->psz_path )
     {
-        vlc_object_t* p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT,
-                                                 FIND_PARENT );
-        if( !p_input )
-            return VLC_EGENERIC;
-
         /* set up fake-file on the fly */
-        var_Create( p_input, "fake-file", VLC_VAR_STRING );
-        var_SetString( p_input, "fake-file", p_demux->psz_path );
-
-        vlc_object_release( p_input );
+        var_Create( p_demux->p_parent, "fake-file", VLC_VAR_STRING );
+        var_SetString( p_demux->p_parent, "fake-file", p_demux->psz_path );
     }
 
     /* Set up p_demux */
