@@ -188,7 +188,7 @@ static input_item_t * CreateInputItemFromShoutItem( services_discovery_t *p_sd,
     /* Create the item */
     input_item_t *p_input = input_item_NewExt( p_sd,
                     p_item->psz_url, _(p_item->psz_name),
-                    0, NULL, -1 );
+                    0, NULL, 0, -1 );
 
     /* Copy options */
     for( i = 0; p_item->ppsz_options[i] != NULL; i++ )

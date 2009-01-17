@@ -177,9 +177,13 @@ VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat
 VLC_EXPORT( int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
 VLC_EXPORT( int, input_item_DelInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name ) );
 
-#define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, -1 )
-#define input_item_NewExt(a,b,c,d,e,f) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, mtime_t i_duration )  );
-VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *, const char *e, int, const char *const *, mtime_t i_duration, int ) );
+#define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
+#define input_item_NewExt(a,b,c,d,e,f,g) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
+VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *, const char*, int, const char *const *, unsigned, mtime_t i_duration )  );
+
+/**
+ * This function creates a new input_item_t with the provided informations.
+ */
+VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration, int i_type ) );
 
 #endif

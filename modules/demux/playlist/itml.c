@@ -381,7 +381,7 @@ static bool parse_track_dict COMPLEX_INTERFACE
             msg_Info( p_demux, "Adding '%s'", psz_uri );
 
             p_new_input = input_item_NewExt( p_demux, psz_uri,
-                                            NULL, 0, NULL, -1 );
+                                            NULL, 0, NULL, 0, -1 );
             input_item_AddSubItem( p_input_item, p_new_input );
 
             /* add meta info */

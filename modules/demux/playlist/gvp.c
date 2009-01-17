@@ -203,7 +203,7 @@ static int Demux( demux_t *p_demux )
     else
     {
         p_input = input_item_NewExt( p_demux,
-                                    psz_url, psz_title, 0, NULL, -1 );
+                                    psz_url, psz_title, 0, NULL, 0, -1 );
 #define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
                     p_input, _("Google Video"), _(type), "%s", field ) ; }
         SADD_INFO( "gvp_version", psz_version );

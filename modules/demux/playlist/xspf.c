@@ -416,7 +416,7 @@ static bool parse_track_node COMPLEX_INTERFACE
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
 
-    input_item_t *p_new_input = input_item_NewExt( p_demux, NULL, NULL, 0, NULL, -1 );
+    input_item_t *p_new_input = input_item_NewExt( p_demux, NULL, NULL, 0, NULL, 0, -1 );
 
     if( !p_new_input )
     {
@@ -737,7 +737,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
             return false;
         }
         p_new_input = input_item_NewWithType( VLC_OBJECT( p_demux ),
-                          "vlc://nop", psz_title, 0, NULL, -1,
+                          "vlc://nop", psz_title, 0, NULL, 0, -1,
                           ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {

@@ -193,8 +193,9 @@ playlist_item_t * playlist_ItemNewWithType( playlist_t *p_playlist,
     input_item_t *p_input;
     if( psz_uri == NULL ) return NULL;
     p_input = input_item_NewWithType( VLC_OBJECT(p_playlist), psz_uri,
-                                     psz_name, i_options, ppsz_options,
-                                     i_duration, i_type );
+                                      psz_name,
+                                      i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
+                                      i_duration, i_type );
     return playlist_ItemNewFromInput( p_playlist, p_input );
 }
 
@@ -386,7 +387,7 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
 {
     int i_ret;
     input_item_t *p_input = input_item_NewExt( p_playlist, psz_uri, psz_name,
-                                              i_options, ppsz_options,
+                                              i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
                                               i_duration );
 
     i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist,

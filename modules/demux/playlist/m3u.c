@@ -218,7 +218,7 @@ static int Demux( demux_t *p_demux )
             if( !psz_mrl ) goto error;
 
             p_input = input_item_NewExt( p_demux, psz_mrl, psz_name,
-                                        0, NULL, i_duration );
+                                        0, NULL, 0, i_duration );
 
             if ( psz_artist && *psz_artist )
                 input_item_SetArtist( p_input, psz_artist );

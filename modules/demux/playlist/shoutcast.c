@@ -229,7 +229,7 @@ static int DemuxGenre( demux_t *p_demux )
                              psz_name ) != -1 )
                     {
                         p_input = input_item_NewExt( p_demux, psz_mrl,
-                                                    psz_name, 0, NULL, -1 );
+                                                    psz_name, 0, NULL, 0, -1 );
                         input_item_CopyOptions( p_sys->p_current_input, p_input );
                         free( psz_mrl );
                         input_item_AddSubItem( p_sys->p_current_input, p_input );
@@ -400,7 +400,7 @@ static int DemuxStation( demux_t *p_demux )
                             psz_mrl = NULL;
                     }
                     p_input = input_item_NewExt( p_demux, psz_mrl,
-                                                psz_name , 0, NULL, -1 );
+                                                psz_name , 0, NULL, 0, -1 );
                     free( psz_mrl );
 
                     input_item_CopyOptions( p_sys->p_current_input,

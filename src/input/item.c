@@ -627,10 +627,11 @@ input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,
                                   int i_options,
                                   const char *const *ppsz_options,
+                                  unsigned i_option_flags,
                                   mtime_t i_duration )
 {
     return input_item_NewWithType( p_obj, psz_uri, psz_name,
-                                  i_options, ppsz_options,
+                                  i_options, ppsz_options, i_option_flags,
                                   i_duration, ITEM_TYPE_UNKNOWN );
 }
 
@@ -639,6 +640,7 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 const char *psz_name,
                                 int i_options,
                                 const char *const *ppsz_options,
+                                unsigned i_option_flags,
                                 mtime_t i_duration,
                                 int i_type )
 {
@@ -672,7 +674,7 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     p_input->i_duration = i_duration;
 
     for( int i = 0; i < i_options; i++ )
-        input_item_AddOption( p_input, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
+        input_item_AddOption( p_input, ppsz_options[i], i_option_flags );
     return p_input;
 }
 

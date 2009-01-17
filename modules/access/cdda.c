@@ -437,7 +437,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 
         /* Create playlist items */
         p_input_item = input_item_NewWithType( VLC_OBJECT( p_access ),
-                                              psz_uri, psz_name, 0, NULL, -1,
+                                              psz_uri, psz_name, 0, NULL, 0, -1,
                                               ITEM_TYPE_DISC );
         input_item_CopyOptions( p_current, p_input_item );
         input_item_AddOption( p_input_item, psz_first, VLC_INPUT_OPTION_TRUSTED );

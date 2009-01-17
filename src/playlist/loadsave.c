@@ -102,7 +102,7 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
         return VLC_EGENERIC;
 
     p_input = input_item_NewExt( p_playlist, psz_uri, psz_file,
-                                1, &psz_option, -1 );
+                                 1, &psz_option, VLC_INPUT_OPTION_TRUSTED, -1 );
     free( psz_uri );
 
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
@@ -162,8 +162,8 @@ int playlist_MLLoad( playlist_t *p_playlist )
     const char *const psz_option = "meta-file";
     /* that option has to be cleaned in input_item_subitem_added() */
     /* vlc_gc_decref() in the same function */
-    p_input = input_item_NewExt( p_playlist, psz_uri,
-                                _("Media Library"), 1, &psz_option, -1 );
+    p_input = input_item_NewExt( p_playlist, psz_uri, _("Media Library"),
+                                 1, &psz_option, VLC_INPUT_OPTION_TRUSTED, -1 );
     if( p_input == NULL )
         goto error;
 

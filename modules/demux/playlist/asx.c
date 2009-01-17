@@ -528,7 +528,8 @@ static int Demux( demux_t *p_demux )
                     char *psz_current_input_name = input_item_GetName( p_current_input );
                     if( asprintf( &psz_name, "%d %s", i_entry_count, ( psz_title_entry ? psz_title_entry : psz_current_input_name ) ) != -1 )
                     {
-                        p_entry = input_item_NewExt( p_demux, psz_href, psz_name, i_options, (const char * const *)ppsz_options, -1 );
+                        p_entry = input_item_NewExt( p_demux, psz_href, psz_name,
+                                                     i_options, (const char * const *)ppsz_options, VLC_INPUT_OPTION_TRUSTED, -1 );
                         free( psz_name );
                         input_item_CopyOptions( p_current_input, p_entry );
                         while( i_options )
