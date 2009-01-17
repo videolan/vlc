@@ -416,11 +416,11 @@ static bool parse_track_node COMPLEX_INTERFACE
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
 
-    input_item_t *p_new_input = input_item_NewExt( p_demux, NULL, NULL, 0, NULL, 0, -1 );
+    input_item_t *p_new_input = input_item_New( p_demux, NULL, NULL );
 
     if( !p_new_input )
     {
-        /* malloc has failed for input_item_NewExt, so bailout early */
+        /* malloc has failed for input_item_New, so bailout early */
         return false;
     }
 

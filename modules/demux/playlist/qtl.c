@@ -349,8 +349,7 @@ static int Demux( demux_t *p_demux )
     }
     else
     {
-        p_input = input_item_NewExt( p_demux,
-                                psz_src, psz_moviename, 0, NULL, 0, -1 );
+        p_input = input_item_New( p_demux, psz_src, psz_moviename );
 #define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
                     p_input, "QuickTime Media Link", _(type), "%s", field ) ; }
         SADD_INFO( "href", psz_href );
@@ -359,8 +358,7 @@ static int Demux( demux_t *p_demux )
         vlc_gc_decref( p_input );
         if( psz_qtnext )
         {
-            p_input = input_item_NewExt( p_demux,
-                                        psz_qtnext, NULL, 0, NULL, 0, -1 );
+            p_input = input_item_New( p_demux, psz_qtnext, NULL );
             input_item_AddSubItem( p_current_input, p_input );
             vlc_gc_decref( p_input );
         }

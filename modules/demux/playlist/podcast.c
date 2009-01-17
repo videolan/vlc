@@ -291,8 +291,7 @@ static int Demux( demux_t *p_demux )
                         free( psz_elname );
                         return -1;
                     }
-                    p_input = input_item_NewExt( p_demux, psz_item_mrl,
-                                                psz_item_name, 0, NULL, 0, -1 );
+                    p_input = input_item_New( p_demux, psz_item_mrl, psz_item_name );
                     if( p_input == NULL ) break;
 #define ADD_INFO( info, field ) \
     if( field ) { input_item_AddInfo( p_input, \

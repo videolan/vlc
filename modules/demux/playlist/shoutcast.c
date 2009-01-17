@@ -228,8 +228,7 @@ static int DemuxGenre( demux_t *p_demux )
                     if( asprintf( &psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
                              psz_name ) != -1 )
                     {
-                        p_input = input_item_NewExt( p_demux, psz_mrl,
-                                                    psz_name, 0, NULL, 0, -1 );
+                        p_input = input_item_New( p_demux, psz_mrl, psz_name );
                         input_item_CopyOptions( p_sys->p_current_input, p_input );
                         free( psz_mrl );
                         input_item_AddSubItem( p_sys->p_current_input, p_input );
@@ -399,12 +398,9 @@ static int DemuxStation( demux_t *p_demux )
                              psz_base, psz_id ) == -1 )
                             psz_mrl = NULL;
                     }
-                    p_input = input_item_NewExt( p_demux, psz_mrl,
-                                                psz_name , 0, NULL, 0, -1 );
+                    p_input = input_item_New( p_demux, psz_mrl, psz_name );
+                    input_item_CopyOptions( p_sys->p_current_input, p_input );
                     free( psz_mrl );
-
-                    input_item_CopyOptions( p_sys->p_current_input,
-                                                p_input );
 
 #define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
                     p_input, _("Shoutcast"), _(type), "%s", field ) ; }

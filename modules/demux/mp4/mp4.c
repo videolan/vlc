@@ -416,8 +416,7 @@ static int Open( vlc_object_t * p_this )
                     free( psz_path );
                 }
                 msg_Dbg( p_demux, "adding ref = `%s'", psz_ref );
-                input_item_t *p_input = input_item_NewExt( p_demux, psz_ref
-                                                           , NULL, 0, NULL, 0, -1 );
+                input_item_t *p_input = input_item_New( p_demux, psz_ref, NULL );
                 input_item_CopyOptions( p_current, p_input );
                 input_item_AddSubItem( p_current, p_input );
                 vlc_gc_decref( p_input );

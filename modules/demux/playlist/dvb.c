@@ -106,7 +106,7 @@ static int Demux( demux_t *p_demux )
     while( (psz_line = stream_ReadLine( p_demux->s )) )
     {
         char **ppsz_options = NULL;
-        int  i, i_options = 0;
+        int  i_options = 0;
         char *psz_name = NULL;
 
         if( !ParseLine( psz_line, &psz_name, &ppsz_options, &i_options ) )
@@ -116,16 +116,16 @@ static int Demux( demux_t *p_demux )
         }
 
         EnsureUTF8( psz_name );
-
-        p_input = input_item_NewExt( p_demux, "dvb://", psz_name, 0, NULL, 0, -1 );
-        for( i = 0; i< i_options; i++ )
-        {
+        for( int i = 0; i< i_options; i++ )
             EnsureUTF8( ppsz_options[i] );
-            input_item_AddOption( p_input, ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
-        }
+
+        p_input = input_item_NewExt( p_demux, "dvb://", psz_name,
+                                     i_options, (const char**)ppsz_options, VLC_INPUT_OPTION_TRUSTED, -1 );
         input_item_AddSubItem( p_current_input, p_input );
         vlc_gc_decref( p_input );
-        while( i_options-- ) free( ppsz_options[i_options] );
+
+        while( i_options-- )
+            free( ppsz_options[i_options] );
         free( ppsz_options );
 
         free( psz_line );

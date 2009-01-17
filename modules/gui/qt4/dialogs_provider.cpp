@@ -437,8 +437,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
     {
         QString mrl = dir.endsWith( "VIDEO_TS", Qt::CaseInsensitive ) ?
             "dvd://" : "directory://" + toNativeSeparators( dir );
-        input_item_t *p_input = input_item_NewExt( THEPL, qtu( mrl ),
-                              NULL, 0, NULL, 0, -1 );
+        input_item_t *p_input = input_item_New( THEPL, qtu( mrl ), NULL );
 
         /* FIXME: playlist_AddInput() can fail */
         playlist_AddInput( THEPL, p_input,

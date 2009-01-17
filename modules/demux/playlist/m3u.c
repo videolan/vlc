@@ -218,14 +218,12 @@ static int Demux( demux_t *p_demux )
             if( !psz_mrl ) goto error;
 
             p_input = input_item_NewExt( p_demux, psz_mrl, psz_name,
-                                        0, NULL, 0, i_duration );
+                                        i_options, ppsz_options, 0, i_duration );
 
             if ( psz_artist && *psz_artist )
                 input_item_SetArtist( p_input, psz_artist );
 
             input_item_AddSubItem( p_current_input, p_input );
-            for( int i = 0; i < i_options; i++ )
-                input_item_AddOption( p_input, ppsz_options[i], 0 );
             vlc_gc_decref( p_input );
             free( psz_mrl );
         }
