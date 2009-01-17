@@ -221,9 +221,9 @@ enum pl_locked_state
  *****************************************************************************/
 
 /* Helpers */
-#define PL_LOCK vlc_object_lock( p_playlist )
-#define PL_UNLOCK vlc_object_unlock( p_playlist )
-#define PL_ASSERT_LOCKED vlc_object_assert_locked( p_playlist )
+#define PL_LOCK playlist_Lock( p_playlist )
+#define PL_UNLOCK playlist_Unlock( p_playlist )
+#define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
 VLC_EXPORT( playlist_t *, __pl_Hold, ( vlc_object_t * ) );
 #define pl_Hold( a ) __pl_Hold( VLC_OBJECT(a) )
@@ -238,6 +238,10 @@ VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
 #define playlist_Next(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, 1)
 #define playlist_Prev(p) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked, -1)
 #define playlist_Skip(p,i) playlist_Control(p,PLAYLIST_SKIP, pl_Unlocked,  (i) )
+
+VLC_EXPORT( void, playlist_Lock, ( playlist_t * ) );
+VLC_EXPORT( void, playlist_Unlock, ( playlist_t * ) );
+VLC_EXPORT( void, playlist_AssertLocked, ( playlist_t * ) );
 
 /**
  * Do a playlist action.

@@ -52,7 +52,7 @@ Playtree::~Playtree()
 void Playtree::delSelected()
 {
     Iterator it = begin();
-    vlc_object_lock( getIntf()->p_sys->p_playlist );
+    playlist_Lock( getIntf()->p_sys->p_playlist );
     for( it = begin(); it != end(); it = getNextVisibleItem( it ) )
     {
         if( (*it).m_selected && !(*it).isReadonly() )
@@ -93,12 +93,12 @@ void Playtree::delSelected()
             it = getNextVisibleItem( it );
         }
     }
-    vlc_object_unlock( getIntf()->p_sys->p_playlist );
+    playlist_Unlock( getIntf()->p_sys->p_playlist );
 }
 
 void Playtree::action( VarTree *pItem )
 {
-    vlc_object_lock( m_pPlaylist );
+    playlist_Lock( m_pPlaylist );
     VarTree::Iterator it;
 
     playlist_item_t *p_item = (playlist_item_t *)pItem->m_pData;
@@ -114,7 +114,7 @@ void Playtree::action( VarTree *pItem )
     {
         playlist_Control( m_pPlaylist, PLAYLIST_VIEWPLAY, pl_Locked, p_parent, p_item );
     }
-    vlc_object_unlock( m_pPlaylist );
+    playlist_Unlock( m_pPlaylist );
 }
 
 void Playtree::onChange()
@@ -213,7 +213,7 @@ void Playtree::buildNode( playlist_item_t *pNode, VarTree &rTree )
 void Playtree::buildTree()
 {
     clear();
-    vlc_object_lock( m_pPlaylist );
+    playlist_Lock( m_pPlaylist );
 
     i_items_to_append = 0;
 
@@ -228,7 +228,7 @@ void Playtree::buildTree()
 
     buildNode( m_pPlaylist->p_root_category, *this );
 
-    vlc_object_unlock( m_pPlaylist );
+    playlist_Unlock( m_pPlaylist );
 //  What is it ?
 //    checkParents( NULL );
 }

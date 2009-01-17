@@ -287,9 +287,9 @@ mvar_t *mvar_PlaylistSetNew( intf_thread_t *p_intf, char *name,
                                  playlist_t *p_pl )
 {
     mvar_t *s = mvar_New( name, "set" );
-    vlc_object_lock( p_pl );
+    playlist_Lock( p_pl );
     PlaylistListNode( p_intf, p_pl, p_pl->p_root_category , name, s, 0 );
-    vlc_object_unlock( p_pl );
+    playlist_Unlock( p_pl );
     return s;
 }
 

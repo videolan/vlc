@@ -36,9 +36,9 @@ void CmdPlay::execute()
         return;
     }
 
-    vlc_object_lock( pPlaylist );
+    playlist_Lock( pPlaylist );
     const bool b_empty = playlist_IsEmpty( pPlaylist );
-    vlc_object_unlock( pPlaylist );
+    playlist_Unlock( pPlaylist );
 
     if( !b_empty )
     {

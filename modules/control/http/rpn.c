@@ -494,12 +494,12 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             int i_id = SSPopN( st, vars );
             int i_ret;
 
-            vlc_object_lock( p_sys->p_playlist );
+            playlist_Lock( p_sys->p_playlist );
             i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
                                       pl_Locked, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
                                       i_id, pl_Locked ) );
-            vlc_object_unlock( p_sys->p_playlist );
+            playlist_Unlock( p_sys->p_playlist );
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );
             SSPushN( st, i_ret );
         }

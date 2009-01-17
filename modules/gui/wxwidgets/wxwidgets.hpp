@@ -225,13 +225,13 @@ wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
 inline void LockPlaylist( intf_sys_t *p_sys, playlist_t *p_pl )
 {
     if( p_sys->i_playlist_usage++ == 0)
-        vlc_object_lock( p_pl );
+        playlist_lock( p_pl );
 }
 
 inline void UnlockPlaylist( intf_sys_t *p_sys, playlist_t *p_pl )
 {
     if( --p_sys->i_playlist_usage == 0)
-        vlc_object_unlock( p_pl );
+        playlist_Unlock( p_pl );
 }
 
 #endif

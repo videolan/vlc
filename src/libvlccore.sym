@@ -275,6 +275,7 @@ playlist_Add
 playlist_AddExt
 playlist_AddInput
 playlist_AskForArtEnqueue
+playlist_AssertLocked
 playlist_BothAddInput
 playlist_ChildSearchName
 playlist_Clear
@@ -297,6 +298,7 @@ playlist_ItemGetByInputId
 playlist_ItemNewWithType
 playlist_ItemToNode
 playlist_LiveSearchUpdate
+playlist_Lock
 playlist_NodeAppend
 playlist_NodeChildrenCount
 playlist_NodeCreate
@@ -311,6 +313,7 @@ playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryRemove
 playlist_Status
 playlist_TreeMove
+playlist_Unlock
 __pl_Hold
 __pl_Release
 resolve_xml_special_chars
