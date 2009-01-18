@@ -136,7 +136,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
                               (const char*)name,
                               PLAYLIST_APPEND, PLAYLIST_END,
                               (mtime_t) 0,
-                              (const char **) ppsz_options, i_pos,
+                              (const char **) ppsz_options, i_options,
                               true, pl_Unlocked );
             }
 
