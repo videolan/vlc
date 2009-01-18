@@ -2,45 +2,45 @@ Changes between 0.9.8a and 1.0.0-git:
 ------------------------------------
 
 Playback:
- * Instant pausing
- * Frame-By-Frame Support
- * Timeshift support
+ * Instantaneous pausing
+ * Frame-by-Frame playback
+ * Timeshift for all medias
+ * On-the-fly recording for all medias
  * RTSP trickplay support
- * On-the-fly record
+
+New Decoders:
+ * AES3 (SMPTE 302M)
+ * Dolby Digital Plus - E-AC-3 (A/52b)
+ * True HD/MLP
+ * Blu-Ray Linear PCM
+ * QCELP (Qualcomm PureVoice)
+ * Real Video 3.0 & 4.0
+
+Demuxers:
+ * Support for Dirac and RealVideo in Matroska files
+ * Major improvements in RealMedia files opening (.rm and .rmvb)
+ * Improvements of the TS demuxer for M2TS files
+
+Encoders:
+ * Dirac encoding using libdirac (supported in Ogg and in TS)
 
 Access:
  * RTSP authentication with Darwin Streaming Server
  * On-the-fly gzip and bzip2 file decompression (except on Windows)
- * Playback for video in Rar archives
- * DVB-S and ATSC support on Windows
+ * Playback for video in uncompressed multi-RAR archives
+ * DVB-S and ATSC cards support on Windows
  * New OSS and Alsa accesses. The v4l2 and v4l modules no longer support
    OSS or Alsa audio input. Use --input-slave alsa:// or oss:// if needed.
+ * DVB scanning on linux
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
- * Screen module now supports partial screen capture and mouse following on
+ * Screen module now features partial screen capture and mouse following on
    Windows.
 
-Decoders:
- * AES3 (SMPTE 302M) support
- * Dolby Digital Plus - E-AC-3 (A/52b)  support
- * True HD/MLP support
- * Blu-Ray Linear PCM support
- * QCELP (Qualcomm PureVoice) support
- * Real Video 3.0 & 4.0 support
-
-Demuxers:
- * Support for Dirac and RealVideo in Matroska files
- * Major improvements in RealMedia files (.rm and .rmvb)
-
-Encoders:
- * Dirac encoding support using libdirac (supported in Ogg and in TS)
-
-Stream output:
- * Restored the old mpeg2 transrating module.
- * Multiple bridge-in instances are now possible.
- * bridge-in can be used to configure a placeholder stream.
- * Remote Audio Output Protocol (AirTunes) module.
+Playlist:
+ * Export the playlist in HTML
+ * Lua script for BBC radio playback
 
 Linux/Windows interface:
  * Recently played items list
@@ -50,6 +50,12 @@ Linux/Windows interface:
 Mac OS X Interface:
  * Reveal-in-Finder functionality for locally stored items.
 
+Stream output:
+ * Restored the old mpeg2 transrating module.
+ * Multiple bridge-in instances are now possible.
+ * bridge-in can be used to configure a placeholder stream.
+ * Remote Audio Output Protocol (AirTunes) module.
+
 Maemo Port:
  * New Maemo port with:
    - an interface based on Hildon framework.
@@ -57,10 +63,6 @@ Maemo Port:
 
 Windows CE Port:
  EXPERIMENTAL work for the winCE port has been done.
-
-Playlist:
- * support to Export the playlist in HTML
- * Lua script for BBC radio playback
 
 Audio output:
  * Removed obsolete Esound and aRts plugins
