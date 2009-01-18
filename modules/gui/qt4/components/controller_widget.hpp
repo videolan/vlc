@@ -31,6 +31,7 @@
 #include "qt4.hpp"
 
 #include <QWidget>
+#include <QFrame>
 #include <QToolButton>
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
@@ -61,7 +62,7 @@ private slots:
     void setIcons( bool, bool );
 };
 
-class TeletextController : public QWidget
+class TeletextController : public QFrame
 {
     Q_OBJECT
     friend class AbstractController;

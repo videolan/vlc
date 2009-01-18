@@ -417,10 +417,10 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     return widget;
 }
 
-QWidget *AbstractController::discFrame()
+QFrame *AbstractController::discFrame()
 {
     /** Disc and Menus handling */
-    QWidget *discFrame = new QWidget( this );
+    QFrame *discFrame = new QFrame( this );
 
     QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
     discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
@@ -459,7 +459,7 @@ QWidget *AbstractController::discFrame()
     return discFrame;
 }
 
-QWidget *AbstractController::telexFrame()
+QFrame *AbstractController::telexFrame()
 {
     /**
      * Telextext QFrame

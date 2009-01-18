@@ -161,8 +161,8 @@ protected:
     QWidget *createWidget( buttonType_e, int options = WIDGET_NORMAL );
 private:
     static void setupButton( QAbstractButton * );
-    QWidget *discFrame();
-    QWidget *telexFrame();
+    QFrame *discFrame();
+    QFrame *telexFrame();
 
 protected slots:
     virtual void doAction( int );
