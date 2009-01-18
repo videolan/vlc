@@ -38,6 +38,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_interface.h>
+#include <vlc_playlist.h>
 
 #include <dbus/dbus.h>
 
@@ -225,14 +226,16 @@ static int UnInhibit( intf_thread_t *p_intf )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+
+    playlist_t *p_playlist = pl_Hold( p_intf );
+    input_thread_t *p_input;
+
     for( ;; )
     {
-        input_thread_t *p_input;
-
         /* Check playing state every 30 seconds */
         msleep( 30 * CLOCK_FREQ );
 
-        p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+        p_input = playlist_CurrentInput( p_playlist );
         if( p_input )
         {
             const int i_state = var_GetInteger( p_input, "state" );
@@ -258,4 +261,6 @@ static void Run( intf_thread_t *p_intf )
                 break;
         }
     }
+
+    pl_Release( p_intf );
 }
