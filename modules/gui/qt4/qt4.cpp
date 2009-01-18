@@ -53,6 +53,7 @@
 #ifdef WIN32
  #include <QtPlugin>
  Q_IMPORT_PLUGIN(qjpeg)
+ Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #endif
 
 /*****************************************************************************
