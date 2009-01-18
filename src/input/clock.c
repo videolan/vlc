@@ -68,7 +68,7 @@
  * in all the FIFOs, but it may be not enough.
  */
 
-/* p_input->p->i_cr_average : Maximum number of samples used to compute the
+/* i_cr_average : Maximum number of samples used to compute the
  * dynamic average value.
  * We use the following formula :
  * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
