@@ -5390,6 +5390,10 @@ AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
 if test "${have_zlib}" = "yes"
 then
   VLC_ADD_PLUGIN([unzip])
+  VLC_ADD_LIBS([zip],[-lz])
+  VLC_ADD_PLUGIN([zip])
+  VLC_ADD_CFLAGS([zip],[-I../../../@top_srcdir@/libs/unzip])
+  VLC_ADD_LIBS([zip],[../../../libs/unzip/libunzip.la])
 fi
 
 
@@ -5887,6 +5891,7 @@ AC_CONFIG_FILES([
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
+  modules/access/zip/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/audio_filter/channel_mixer/Makefile
