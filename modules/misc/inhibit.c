@@ -146,7 +146,7 @@ static int Inhibit( intf_thread_t *p_intf )
     }
     free( psz_app );
 
-    char *psz_inhibit_reason = strdup( "Playing some media." );
+    char *psz_inhibit_reason = strdup( _("Playing some media.") );
     if( !psz_inhibit_reason )
     {
         dbus_message_unref( p_msg );
