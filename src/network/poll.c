@@ -99,7 +99,7 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
                 if (events.iErrorCode[FD_WRITE_BIT])
                     fds[i].revents |= POLLERR;
             }
-            if (fds[i].events)
+            if (fds[i].revents)
                 n++;
         }
         if (ret == 0)
