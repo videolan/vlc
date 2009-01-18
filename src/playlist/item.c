@@ -183,22 +183,6 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     return p_item;
 }
 
-playlist_item_t * playlist_ItemNewWithType( playlist_t *p_playlist,
-                                            const char *psz_uri,
-                                            const char *psz_name,
-                                            int i_options,
-                                            const char *const *ppsz_options,
-                                            int i_duration, int i_type )
-{
-    input_item_t *p_input;
-    if( psz_uri == NULL ) return NULL;
-    p_input = input_item_NewWithType( VLC_OBJECT(p_playlist), psz_uri,
-                                      psz_name,
-                                      i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
-                                      i_duration, i_type );
-    return playlist_ItemNewFromInput( p_playlist, p_input );
-}
-
 /***************************************************************************
  * Playlist item destruction
  ***************************************************************************/

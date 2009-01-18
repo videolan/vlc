@@ -309,20 +309,6 @@ VLC_EXPORT( bool, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char 
  * Item management
  ********************************************************/
 
-/*************************** Item creation **************************/
-
-VLC_EXPORT( playlist_item_t* , playlist_ItemNewWithType, ( playlist_t *,const char *,const char *, int , const char *const *, int, int) );
-
-/** Create a new item, without adding it to the playlist
- * \param p_obj a vlc object (anyone will do)
- * \param psz_uri the mrl of the item
- * \param psz_name a text giving a name or description of the item
- * \return the new item or NULL on failure
- */
-#define playlist_ItemNew( a , b, c ) \
-    playlist_ItemNewWithType( VLC_OBJECT(a) , b , c, 0, NULL, -1, 0 )
-
-
 /*************************** Item deletion **************************/
 VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, bool ) );
 

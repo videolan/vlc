@@ -295,7 +295,6 @@ playlist_IsServicesDiscoveryLoaded
 playlist_ItemGetById
 playlist_ItemGetByInput
 playlist_ItemGetByInputId
-playlist_ItemNewWithType
 playlist_ItemToNode
 playlist_LiveSearchUpdate
 playlist_Lock
