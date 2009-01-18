@@ -1,0 +1,425 @@
+/*****************************************************************************
+ * zipaccess.c: Module (access) to extract different archives, based on zlib
+ *****************************************************************************
+ * Copyright (C) 2007 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Jean-Philippe André <jpeg@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+/** @todo:
+ * - implement crypto (using url zip://user:password@path-to-archive#ZIP#file
+ * - read files in zip with long name (use unz_file_info.size_filename)
+ * - multi-volume archive support ?
+ */
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#ifdef HAVE_ZLIB_H
+
+#include "zip.h"
+#include <vlc_access.h>
+
+/** **************************************************************************
+ * This is our own access_sys_t for zip files
+ *****************************************************************************/
+struct access_sys_t
+{
+    /* zlib / unzip members */
+    unzFile            zipFile;
+    zlib_filefunc_def *fileFunctions;
+
+    /* file in zip information */
+    char              *psz_fileInzip;
+};
+
+static int AccessControl( access_t *p_access, int i_query, va_list args );
+static ssize_t AccessRead( access_t *, uint8_t *, size_t );
+static int AccessSeek( access_t *, int64_t );
+static int OpenFileInZip( access_t *p_access, int i_pos );
+
+/** **************************************************************************
+ * \brief Open access
+ *****************************************************************************/
+int AccessOpen( vlc_object_t *p_this )
+{
+    access_t     *p_access = (access_t*)p_this;
+    access_sys_t *p_sys;
+    int i_ret              = VLC_EGENERIC;
+    unzFile file           = 0;
+
+    char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
+
+    p_access->p_sys = p_sys = (access_sys_t*)
+            calloc( sizeof( access_sys_t ), 1 );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+    /* Split the MRL */
+    psz_path = strdup( p_access->psz_path );
+    psz_sep = strchr( psz_path, ZIP_SEP_CHAR );
+    if( !psz_sep )
+        return VLC_EGENERIC;
+
+    *psz_sep = '\0';
+    psz_pathToZip = unescape_URI_duplicate( psz_path );
+    p_sys->psz_fileInzip = strdup( psz_sep + 1 );
+
+    /* Define IO functions */
+    zlib_filefunc_def *p_func = (zlib_filefunc_def*)
+                                    calloc( 1, sizeof( zlib_filefunc_def ) );
+    p_func->zopen_file   = ZipIO_Open;
+    p_func->zread_file   = ZipIO_Read;
+    p_func->zwrite_file  = ZipIO_Write; // see comment
+    p_func->ztell_file   = ZipIO_Tell;
+    p_func->zseek_file   = ZipIO_Seek;
+    p_func->zclose_file  = ZipIO_Close;
+    p_func->zerror_file  = ZipIO_Error;
+    p_func->opaque       = p_access;
+
+    /* Open zip archive */
+    file = p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, p_func );
+    if( !file )
+    {
+        msg_Err( p_access, "not a valid zip archive: '%s'", psz_pathToZip );
+        goto exit;
+    }
+
+    /* Open file in zip */
+    OpenFileInZip( p_access, 0 );
+
+    /* Set callback */
+    ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, AccessSeek );
+
+    /* Get some infos about current file. Maybe we could want some more ? */
+    unz_file_info z_info;
+    unzGetCurrentFileInfo( file, &z_info, NULL, 0, NULL, 0, NULL, 0 );
+
+    /* Set access informations: size is needed for AccessSeek */
+    p_access->info.i_size = z_info.uncompressed_size;
+    p_access->info.i_pos  = 0;
+    p_access->info.b_eof  = false;
+
+    i_ret = VLC_SUCCESS;
+
+exit:
+    if( i_ret != VLC_SUCCESS )
+    {
+        if( file )
+        {
+            unzCloseCurrentFile( file );
+            unzClose( file );
+        }
+        free( p_sys->psz_fileInzip );
+        free( p_sys->fileFunctions );
+        free( p_sys );
+    }
+
+    free( psz_pathToZip );
+    free( psz_path );
+    return i_ret;
+}
+
+/** **************************************************************************
+ * \brief Close access: free structures
+ *****************************************************************************/
+void AccessClose( vlc_object_t *p_this )
+{
+    access_t     *p_access = (access_t*)p_this;
+    access_sys_t *p_sys = p_access->p_sys;
+    if( p_sys )
+    {
+        unzFile file = p_sys->zipFile;
+        if( file )
+        {
+            unzCloseCurrentFile( file );
+            unzClose( file );
+        }
+        free( p_sys->psz_fileInzip );
+        free( p_sys->fileFunctions );
+        free( p_sys );
+    }
+    var_Destroy( p_access, "zip-no-xspf" );
+}
+
+/** **************************************************************************
+ * \brief Control access
+ *****************************************************************************/
+static int AccessControl( access_t *p_access, int i_query, va_list args )
+{
+    bool         *pb_bool;
+    int          *pi_int;
+    int64_t      *pi_64;
+
+    switch( i_query )
+    {
+        /* */
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_PAUSE:
+        case ACCESS_CAN_CONTROL_PACE:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
+            break;
+
+        case ACCESS_CAN_FASTSEEK:
+            pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = false;
+            break;
+
+        /* */
+        case ACCESS_GET_MTU:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = 0;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = DEFAULT_PTS_DELAY;
+            break;
+
+        /* */
+        case ACCESS_SET_PAUSE_STATE:
+            /* Nothing to do */
+            break;
+
+        case ACCESS_GET_TITLE_INFO:
+        case ACCESS_SET_TITLE:
+        case ACCESS_SET_SEEKPOINT:
+        case ACCESS_SET_PRIVATE_ID_STATE:
+        case ACCESS_GET_META:
+        case ACCESS_GET_PRIVATE_ID_STATE:
+        case ACCESS_GET_CONTENT_TYPE:
+            return VLC_EGENERIC;
+
+        default:
+            msg_Warn( p_access, "unimplemented query %d in control", i_query );
+            return VLC_EGENERIC;
+
+    }
+    return VLC_SUCCESS;
+}
+
+/** **************************************************************************
+ * \brief Read access
+ * Reads current opened file in zip. This does not open the file in zip.
+ * Return -1 if no data yet, 0 if no more data, else real data read
+ *****************************************************************************/
+static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    assert( p_sys );
+    unzFile file = p_sys->zipFile;
+    if( !file )
+    {
+        msg_Err( p_access, "archive not opened !" );
+        return VLC_EGENERIC;
+    }
+
+    int i_read = 0;
+    i_read = unzReadCurrentFile( file, p_buffer, sz );
+
+    p_access->info.i_pos = unztell( file );
+    return ( i_read >= 0 ? i_read : VLC_EGENERIC );
+}
+
+/** **************************************************************************
+ * \brief Seek inside zip file
+ *****************************************************************************/
+static int AccessSeek( access_t *p_access, int64_t seek_len )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    assert( p_sys );
+    unzFile file = p_sys->zipFile;
+    if( !file )
+    {
+        msg_Err( p_access, "archive not opened !" );
+        return VLC_EGENERIC;
+    }
+
+    /* Reopen file in zip if needed */
+    if( p_access->info.i_pos != 0 )
+    {
+        OpenFileInZip( p_access, p_access->info.i_pos + seek_len );
+    }
+
+    /* Read seek_len data and drop it */
+    int i_seek = 0;
+    int i_read = 1;
+    char *p_buffer = ( char* ) calloc( 1, ZIP_BUFFER_LEN );
+    while( ( i_seek < seek_len ) && ( i_read > 0 ) )
+    {
+        i_read = ( seek_len - i_seek < ZIP_BUFFER_LEN )
+               ? ( seek_len - i_seek ) : ZIP_BUFFER_LEN;
+        i_read = unzReadCurrentFile( file, p_buffer, i_read );
+        if( i_read < 0 )
+        {
+            msg_Warn( p_access, "could not seek in file" );
+            free( p_buffer );
+            return VLC_EGENERIC;
+        }
+        else
+        {
+            i_seek += i_read;
+        }
+    }
+    free( p_buffer );
+
+    p_access->info.i_pos = unztell( file );
+    return VLC_SUCCESS;
+}
+
+/** **************************************************************************
+ * \brief Open file in zip
+ *****************************************************************************/
+static int OpenFileInZip( access_t *p_access, int i_pos )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    unzFile file = p_sys->zipFile;
+    if( !p_sys->psz_fileInzip )
+    {
+        return VLC_EGENERIC;
+    }
+
+    i_pos = __MIN( i_pos, 0 );
+    p_access->info.i_pos = 0;
+
+    unzCloseCurrentFile( file ); /* returns UNZ_PARAMERROR if file not opened */
+    if( unzLocateFile( file, p_sys->psz_fileInzip, 0 ) != UNZ_OK )
+    {
+        msg_Err( p_access, "could not [re]locate file in zip: '%s'",
+                 p_sys->psz_fileInzip );
+        return VLC_EGENERIC;
+    }
+    if( unzOpenCurrentFile( file ) != UNZ_OK )
+    {
+        msg_Err( p_access, "could not [re]open file in zip: '%s'",
+                 p_sys->psz_fileInzip );
+        return VLC_EGENERIC;
+    }
+    if( i_pos > 0 )
+        return AccessSeek( p_access, i_pos );
+    else
+        return VLC_SUCCESS;
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: open (read only)
+ *****************************************************************************/
+static void* ZCALLBACK ZipIO_Open( void* opaque, const char* file, int mode )
+{
+    assert(opaque != NULL);
+    assert(mode == (ZLIB_FILEFUNC_MODE_READ | ZLIB_FILEFUNC_MODE_EXISTING));
+
+    access_t *p_access = (access_t*) opaque;
+
+    return stream_UrlNew( p_access, file );
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: read
+ *****************************************************************************/
+static uLong ZCALLBACK ZipIO_Read( void* opaque, void* stream,
+                                   void* buf, uLong size )
+{
+    (void)opaque;
+    //access_t *p_access = (access_t*) opaque;
+    //msg_Dbg(p_access, "read %d", size);
+    return stream_Read( (stream_t*) stream, buf, size );
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: write (assert insteadof segfault)
+ *****************************************************************************/
+static uLong ZCALLBACK ZipIO_Write( void* opaque, void* stream,
+                                    const void* buf, uLong size )
+{
+    (void)opaque; (void)stream; (void)buf; (void)size;
+    int zip_access_cannot_write_this_should_not_happen = 0;
+    assert(zip_access_cannot_write_this_should_not_happen);
+    return 0;
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: tell
+ *****************************************************************************/
+static long ZCALLBACK ZipIO_Tell( void* opaque, void* stream )
+{
+    (void)opaque;
+    int64_t i64_tell = stream_Tell( (stream_t*) stream );
+    //access_t *p_access = (access_t*) opaque;
+    //msg_Dbg(p_access, "tell %" PRIu64, i64_tell);
+    return (long)i64_tell;
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: seek
+ *****************************************************************************/
+static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
+                                  uLong offset, int origin )
+{
+    (void)opaque;
+    //access_t *p_access = (access_t*) opaque;
+    int64_t pos = offset;
+    switch( origin )
+    {
+        case SEEK_CUR:
+            pos += stream_Tell( (stream_t*) stream );
+            break;
+        case SEEK_SET:
+            break;
+        case SEEK_END:
+            pos += stream_Size( (stream_t*) stream );
+            break;
+        default:
+            return -1;
+    }
+    //msg_Dbg( p_access, "seek (%d,%d): %" PRIu64, offset, origin, pos );
+    stream_Seek( (stream_t*) stream, pos );
+    /* Note: in unzip.c, unzlocal_SearchCentralDir seeks to the end of
+             the stream, which is doable but returns an error in VLC.
+             That's why we always assume this was OK. FIXME */
+    return 0;
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: close
+ *****************************************************************************/
+static int ZCALLBACK ZipIO_Close( void* opaque, void* stream )
+{
+    (void)opaque;
+    stream_Delete( (stream_t*) stream );
+    return 0;
+}
+
+/** **************************************************************************
+ * \brief I/O functions for the ioapi: test error (man 3 ferror)
+ *****************************************************************************/
+static int ZCALLBACK ZipIO_Error( void* opaque, void* stream )
+{
+    (void)opaque;
+    (void)stream;
+    //msg_Dbg( p_access, "error" );
+    return 0;
+}
+
+
+
+#else
+# error Can not compile zip demuxer without zlib support
+#endif
