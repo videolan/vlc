@@ -704,23 +704,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 );
 
-    QString line1 = getSettings()->value( "MainWindow/MainToolbar1",
-            "64;36;37;38;65").toString();
+    QString line1 = getSettings()->value( "MainToolbar1",
+            "64;38;64;37-4;65;").toString();
     parseAndCreate( line1, controlLayout1 );
-
-   /* QString line2 = QString( "%1-2;%2;%3;%4;%5;%6;%6;%7;%8;%9;%6;%10;%11-4")
-        .arg( PLAY_BUTTON )         .arg( WIDGET_SPACER )
-        .arg( PREVIOUS_BUTTON )         .arg( STOP_BUTTON )
-        .arg( NEXT_BUTTON )        .arg( WIDGET_SPACER )
-        .arg( FULLSCREEN_BUTTON )        .arg( PLAYLIST_BUTTON )
-        .arg( EXTENDED_BUTTON )        .arg( WIDGET_SPACER_EXTEND )
-        .arg( VOLUME );
-    msg_Dbg( p_intf, "%s", qtu( line2 )); */
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
     controlLayout2->setSpacing( 0 );
-    QString line2 = getSettings()->value( "MainWindow/MainToolbar2",
-            "0-2;64;3;1;4;64;7;10;9;65;35-4" ).toString();
+    QString line2 = getSettings()->value( "MainToolbar2",
+            "0-2;64;3;1;4;64;7;10;9;64-4;36-4;65;35-4;" ).toString();
     parseAndCreate( line2, controlLayout2 );
 
     if( !b_advancedVisible && advControls ) advControls->hide();
@@ -756,13 +747,8 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 
-    /* QString line = QString( "%1;%2;%3").arg( RECORD_BUTTON )
-        .arg( SNAPSHOT_BUTTON )
-        .arg( ATOB_BUTTON )
-        .arg( FRAME_BUTTON ); */
-
-    QString line = getSettings()->value( "MainWindow/AdvToolbar",
-            "12;11;13;14" ).toString();
+    QString line = getSettings()->value( "AdvToolbar", "12;11;13;14" )
+        .toString();
     parseAndCreate( line, controlLayout );
 }
 
@@ -773,11 +759,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 
-    /*    QString line = QString( "%1-%2;%3;%4-%2")
-        .arg( SLOWER_BUTTON ).arg( WIDGET_FLAT )
-        .arg( INPUT_SLIDER )
-        .arg( FASTER_BUTTON ); */
-    QString line = getSettings()->value( "MainWindow/InputToolbar",
+    QString line = getSettings()->value( "InputToolbar",
                    "5-1;33;6-1" ).toString();
     parseAndCreate( line, controlLayout );
 }
@@ -816,23 +798,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     InputControlsWidget *inputC = new InputControlsWidget( p_intf, this );
     controlLayout2->addWidget( inputC );
 
-    /* Second line */
-/*     QString line = QString( "%1-2;%2;%3;%4;%5;%2;%6;%2;%7;%2;%8;%9;%10-4")
-        .arg( PLAY_BUTTON )
-        .arg( WIDGET_SPACER )
-        .arg( PREVIOUS_BUTTON )
-        .arg( STOP_BUTTON )
-        .arg( NEXT_BUTTON )
-        .arg( MENU_BUTTONS )
-        .arg( TELETEXT_BUTTONS )
-        .arg( DEFULLSCREEN_BUTTON )
-        .arg( WIDGET_SPACER_EXTEND )
-        .arg( TIME_LABEL )
-        .arg( VOLUME ); */
-
     controlLayout = new QHBoxLayout;
-    QString line = getSettings()->value( "MainWindow/FSCtoolbar",
-            "0-2;64;3;1;4;64;36;64;37;64;8;65;34-4;35" ).toString();
+    QString line = getSettings()->value( "FSCtoolbar",
+            "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34;" ).toString();
     parseAndCreate( line, controlLayout );
     controlLayout2->addLayout( controlLayout );
 
