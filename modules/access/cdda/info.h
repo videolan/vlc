@@ -34,13 +34,5 @@ int      CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
  */
 void     CDDAMetaInfo( access_t *p_access, track_t i_track );
 
-/*
- Saves Meta Information about the CD-DA.
-
- Saves information that CDDAMetaInfo uses. Should be called before
- CDDAMetaInfo is called.
- */
-void     CDDAMetaInfoInit( access_t *p_access );
-
 char *CDDAFormatTitle( const access_t *p_access, track_t i_track );
 

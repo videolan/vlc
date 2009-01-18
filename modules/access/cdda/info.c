@@ -39,6 +39,7 @@
 #ifdef HAVE_ERRNO_H
 #   include <errno.h>
 #endif
+#include <assert.h>
 
 static char *CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                 const char format_str[], const char *psz_mrl,
@@ -227,7 +228,7 @@ cddb_end: ;
   Therefore, this should be called before CDDAMetaInfo is called.
 
  */
-void
+static void
 CDDAMetaInfoInit( access_t *p_access )
 {
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
@@ -807,38 +808,6 @@ CDDAFormatTitle( const access_t *p_access, track_t i_track )
     return NULL;
 }
 
-static playlist_item_t *
-CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
-                        playlist_t *p_playlist, playlist_item_t *p_item,
-                        track_t i_track )
-{
-    unsigned int i_track_frames =
-    cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) -
-    cdio_get_track_lsn(p_cdda->p_cdio, i_track);
-    mtime_t i_mduration = i_track_frames * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) ;
-    char *psz_title = NULL;
-    char *psz_mrl   = NULL;
-
-    playlist_item_t *p_child = NULL;
-
-    if( !p_item ) return NULL;
-
-    psz_title = CDDAFormatTitle( p_access, i_track ) ;
-    psz_mrl = CDDAFormatMRL( p_access, i_track  ) ;
-
-    dbg_print( INPUT_DBG_META, "mrl: %s, title: %s, duration, %ld",
-               psz_mrl, psz_title, (long int) i_mduration / 1000000 );
-
-    p_child = playlist_ItemNew( p_playlist, psz_mrl, psz_title );
-    input_item_SetDuration( p_child->p_input,
-            (mtime_t) i_mduration );
-    free(psz_mrl);
-    free(psz_title);
-
-    if( !p_child ) return NULL;
-    return p_child;
-}
-
 /*
    Fixes up playlist.
 */
@@ -847,10 +816,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
                    bool b_single_track )
 {
     int i;
-    playlist_t * p_playlist = NULL;
     const track_t i_first_track = p_cdda->i_first_track;
-    playlist_item_t *p_item = NULL;
-    bool b_play = false;
     track_t    i_track;
 
 #ifdef HAVE_LIBCDDB
@@ -863,10 +829,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         return VLC_SUCCESS;
 #endif
 
-    if (! p_cdda->b_nav_mode ) {
-        p_playlist = pl_Hold( p_access );
-    }
-
     if( b_single_track || p_cdda->b_nav_mode ) {
         i_track = p_cdda->i_track;
     }
@@ -876,21 +838,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     }
     CDDAMetaInfoInit( p_access );
     CDDAMetaInfo( p_access, p_cdda->i_track );
-
-    if( p_playlist )
-    {
-        input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
-        if( p_input )
-        {
-            p_item = playlist_ItemGetByInput( p_playlist, input_GetItem(p_input), pl_Unlocked );
-
-            if( p_item == playlist_CurrentPlayingItem(p_playlist) && !b_single_track )
-                b_play = true;
-            else
-                b_play = false;
-            vlc_object_release( p_input );
-        }
-    }
 
     if( b_single_track && !p_cdda->b_nav_mode )
     {
@@ -909,23 +856,17 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         t->i_size = i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
         t->i_length = INT64_C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
 
-        if( p_item )
-        {
-            input_item_SetDuration( p_item->p_input, (mtime_t) i_track_frames
-            * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) );
-                input_item_SetURI( p_item->p_input,
-                        CDDAFormatMRL( p_access, i_track ) );
-        }
-
         p_cdda->i_titles = 1;
         p_access->info.i_update = INPUT_UPDATE_TITLE;
     }
     else
     {
-        input_title_t *t;
+        input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+        if( !p_input )
+            return VLC_EGENERIC;
 
-        if( !p_cdda->b_nav_mode )
-            playlist_ItemToNode( p_playlist, p_item, pl_Unlocked );
+        input_item_t *p_current = input_GetItem( p_input );
+        assert( p_current );
 
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {
@@ -933,6 +874,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
             const track_t i_track = i_first_track + i;
             unsigned int i_track_frames =
                 cdio_get_track_sec_count(p_cdda->p_cdio, i_track);
+            input_title_t *t;
 
             t = p_cdda->p_title[i] = vlc_input_title_New();
 
@@ -943,31 +885,44 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
             t->i_length = INT64_C(1000000) * t->i_size
                 / CDDA_FREQUENCY_SAMPLE / 4;
 
-            if ( ! p_cdda->b_nav_mode )
+            if( !p_cdda->b_nav_mode )
             {
-                p_child = CDDACreatePlaylistItem( p_access, p_cdda, p_playlist,
-                                                  p_item, i_track );
+                input_item_t *p_child;
+                char *psz_mrl = CDDAFormatMRL( p_access, i_track  );
+                char *psz_title = CDDAFormatTitle( p_access, i_track );
+                unsigned int i_track_frames =
+                    cdio_get_track_lsn(p_cdda->p_cdio, i_track+1) -
+                    cdio_get_track_lsn(p_cdda->p_cdio, i_track);
+                mtime_t i_mduration = i_track_frames * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) ;
+
+                p_child = input_item_NewWithType( VLC_OBJECT( p_access ),
+                                                  psz_mrl, psz_title, 0, NULL, 0, i_mduration,
+                                                  ITEM_TYPE_DISC );
+                if( p_child )
+                {
+                    input_item_CopyOptions( p_current, p_child );
+
+                    input_item_AddSubItem( p_current, p_child );
+
+                    vlc_gc_decref( p_child );
+                }
+                free( psz_mrl );
+                free( psz_title );
             }
         }
 
         p_cdda->i_titles = p_cdda->i_tracks;
         p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
-        if( p_item )
+        if( p_current )
         {
-            input_item_SetDuration( p_item->p_input, (mtime_t) p_access->info.i_size
-                    * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) );
-            input_item_SetURI( p_item->p_input,
-                    CDDAFormatMRL( p_access, p_cdda->i_track ) );
+            input_item_SetDuration( p_current,
+                                    (mtime_t) p_access->info.i_size * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC) );
+            input_item_SetURI( p_current, CDDAFormatMRL( p_access, p_cdda->i_track ) );
         }
+
+        vlc_object_release( p_input );
     }
 
-    if( b_play )
-    {
-        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked,
-                          playlist_CurrentPlayingItem(p_playlist), NULL );
-    }
-
-    if (p_playlist) pl_Release( p_access );
     return VLC_SUCCESS;
 }
 
