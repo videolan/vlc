@@ -412,12 +412,14 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         assert (internals->pipes[1] == -1);
 
 #ifdef HAVE_EVENTFD
-        if ((internals->pipes[0] = internals->pipes[1] = eventfd (0, 0)) == -1)
+        if ((internals->pipes[0] = eventfd (0, 0)) == -1)
 #endif
-        if (pipe (internals->pipes))
-            internals->pipes[0] = internals->pipes[1] = -1;
-        else
-        if (obj->b_die)
+        {
+            if (pipe (internals->pipes))
+                internals->pipes[0] = internals->pipes[1] = -1;
+        }
+
+        if (internals->pipes[0] != -1 && obj->b_die)
         {   /* Race condition: vlc_object_kill() already invoked! */
             msg_Dbg (obj, "waitpipe: object already dying");
             write (internals->pipes[1], &(uint64_t){ 1 }, sizeof (uint64_t));
