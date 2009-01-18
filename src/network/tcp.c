@@ -297,10 +297,8 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             ufd[i].events = POLLIN;
             ufd[i].revents = 0;
         }
-        if (evfd == -1)
-            n--; /* avoid EBADF */
 
-        switch (poll (ufd, n, timeout))
+        switch (poll (ufd, n + (evfd != -1), timeout))
         {
             case -1:
                 if (net_errno == EINTR)
