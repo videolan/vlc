@@ -348,8 +348,10 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                   NULL, PLAYLIST_APPEND |
                         ( ( i_opt || p_data->enqueue ) ? 0 : PLAYLIST_GO ),
                   PLAYLIST_END, -1,
+                  i_options,
                   (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                  i_options, true, pl_Unlocked );
+                  VLC_INPUT_OPTION_TRUSTED,
+                  true, pl_Unlocked );
 
                 i_opt += i_options;
             }

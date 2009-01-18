@@ -171,8 +171,9 @@ int libvlc_playlist_add_extended( libvlc_instance_t *p_instance,
         return VLC_EGENERIC;
     }
     return playlist_AddExt( PL, psz_uri, psz_name,
-                            PLAYLIST_INSERT, PLAYLIST_END, -1, ppsz_options,
-                            i_options, 1, pl_Unlocked );
+                            PLAYLIST_INSERT, PLAYLIST_END, -1,
+                            i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
+                            true, pl_Unlocked );
 }
 
 

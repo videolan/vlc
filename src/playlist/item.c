@@ -344,7 +344,7 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
                   bool b_playlist, bool b_locked )
 {
     return playlist_AddExt( p_playlist, psz_uri, psz_name,
-                            i_mode, i_pos, -1, NULL, 0, b_playlist, b_locked );
+                            i_mode, i_pos, -1, 0, NULL, 0, b_playlist, b_locked );
 }
 
 /**
@@ -358,20 +358,22 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  *        PLAYLIST_END the item will be added at the end of the playlist
  *        regardless of its size
  * \param i_duration length of the item in milliseconds.
- * \param ppsz_options an array of options
  * \param i_options the number of options
+ * \param ppsz_options an array of options
+ * \param i_option_flags options flags
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \param b_locked TRUE if the playlist is locked
  * \return The id of the playlist item
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos,
-                     mtime_t i_duration, const char *const *ppsz_options,
-                     int i_options, bool b_playlist, bool b_locked )
+                     mtime_t i_duration,
+                     int i_options, const char *const *ppsz_options, unsigned i_option_flags,
+                     bool b_playlist, bool b_locked )
 {
     int i_ret;
     input_item_t *p_input = input_item_NewExt( p_playlist, psz_uri, psz_name,
-                                              i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED,
+                                              i_options, ppsz_options, i_option_flags,
                                               i_duration );
 
     i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist,

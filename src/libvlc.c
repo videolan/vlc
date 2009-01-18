@@ -1013,7 +1013,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     {
         playlist_t *p_playlist = pl_Hold( p_libvlc );
         playlist_AddExt( p_playlist, val.psz_string, NULL, PLAYLIST_INSERT, 0,
-                         -1, NULL, 0, true, pl_Unlocked );
+                         -1, 0, NULL, 0, true, pl_Unlocked );
         pl_Release( p_libvlc );
     }
     free( val.psz_string );
@@ -1293,8 +1293,9 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
 
         playlist_t *p_playlist = pl_Hold( p_vlc );
         playlist_AddExt( p_playlist, ppsz_argv[i_opt], NULL, PLAYLIST_INSERT,
-                         0, -1, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ),
-                         i_options, true, pl_Unlocked );
+                         0, -1,
+                         i_options, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ), VLC_INPUT_OPTION_TRUSTED,
+                         true, pl_Unlocked );
         pl_Release( p_vlc );
     }
 
