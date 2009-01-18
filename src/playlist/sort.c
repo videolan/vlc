@@ -159,7 +159,7 @@ static int playlist_cmp(const void *first, const void *second)
     } \
     else \
     { \
-        if( !integer ) i_test = strcmp( psz_a, psz_b ); \
+        if( !integer ) i_test = strcasecmp( psz_a, psz_b ); \
         else           i_test = atoi( psz_a ) - atoi( psz_b ); \
     } \
     free( psz_a ); \
