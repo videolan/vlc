@@ -73,7 +73,7 @@ for k,v in pairs(env) do
     if config[k] then
         if type(env[k]) == type(config[k]) then
             env[k] = config[k]
-            vlc.msg.dbg("set environement variable `"..k.."' to "..tonumber(env[k]))
+            vlc.msg.dbg("set environement variable `"..k.."' to "..tostring(env[k]))
         else
             vlc.msg.err("environement variable `"..k.."' should be of type "..type(env[k])..". config value will be discarded.")
         end
@@ -155,6 +155,7 @@ function quit(name,client)
 end
 
 function add(name,client,arg)
+    -- TODO: par single and double quotes properly
     local f
     if name == "enqueue" then
         f = vlc.playlist.enqueue
@@ -336,8 +337,8 @@ function ret_print(foo,start,stop)
     return function(discard,client,...) client:append(start..tostring(foo(...))..stop) end
 end
 
-function get_time(var,client)
-    return function()
+function get_time(var)
+    return function(name,client)
         local input = vlc.object.input()
         client:append(math.floor(vlc.var.get( input, var )))
     end
