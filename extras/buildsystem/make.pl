@@ -54,6 +54,7 @@ while(<STDIN>)
 	$line =~ /^libtool:\s/ ||
 	$line =~ /^\/bin\/sh/ ||
 	$line =~ /^\/usr\/bin\/moc-qt4/ ||
+	$line =~ /^\/usr\/bin\/uic-qt4/ ||
 	$line =~ /^creating lib.*/)
      {}
      # Info
