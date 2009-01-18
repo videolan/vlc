@@ -34,6 +34,7 @@
 #include <vlc_codec.h>
 #include <vlc_aout.h>
 #include <vlc_block_helper.h>
+#include <vlc_bits.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -75,6 +76,7 @@ struct decoder_sys_t
 
     mtime_t i_pts;
 
+    bool         b_dts_hd;  /* Is the current frame a DTS HD one */
     unsigned int i_bit_rate;
     unsigned int i_frame_size;
     unsigned int i_frame_length;
@@ -102,7 +104,7 @@ static int OpenCommon( vlc_object_t *, bool b_packetizer );
 static void *DecodeBlock( decoder_t *, block_t ** );
 
 static inline int SyncCode( const uint8_t * );
-static int  SyncInfo( const uint8_t *, unsigned int *, unsigned int *,
+static int  SyncInfo( const uint8_t *, bool *, unsigned int *, unsigned int *,
                       unsigned int *, unsigned int *, unsigned int * );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
@@ -151,6 +153,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_sys->b_packetizer = b_packetizer;
     p_sys->i_state = STATE_NOSYNC;
     aout_DateSet( &p_sys->end_date, 0 );
+    p_sys->b_dts_hd = false;
 
     p_sys->bytestream = block_BytestreamInit();
 
@@ -247,6 +250,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Check if frame is valid and get frame info */
             p_sys->i_frame_size = SyncInfo( p_header,
+                                            &p_sys->b_dts_hd,
                                             &p_sys->i_channels,
                                             &p_sys->i_channels_conf,
                                             &p_sys->i_rate,
@@ -299,6 +303,14 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_SEND_DATA;
 
         case STATE_SEND_DATA:
+            if( p_sys->b_dts_hd  )
+            {
+                /* Ignore DTS-HD */
+                block_SkipBytes( &p_sys->bytestream, p_sys->i_frame_size );
+                p_sys->i_state = STATE_NOSYNC;
+                break;
+            }
+
             if( !(p_buf = GetOutBuffer( p_dec, &p_out_buffer )) )
             {
                 //p_dec->b_error = true;
@@ -552,10 +564,18 @@ static inline int SyncCode( const uint8_t *p_buf )
     {
         return VLC_SUCCESS;
     }
-    else return VLC_EGENERIC;
+    /* DTS-HD */
+    else if( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
+             p_buf[2] == 0x20 && p_buf[3] ==  0x25 )
+    {
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
 }
 
 static int SyncInfo( const uint8_t *p_buf,
+                     bool *pb_dts_hd,
                      unsigned int *pi_channels,
                      unsigned int *pi_channels_conf,
                      unsigned int *pi_sample_rate,
@@ -603,7 +623,42 @@ static int SyncInfo( const uint8_t *p_buf,
         i_frame_size = SyncInfo16be( p_buf, &i_audio_mode, pi_sample_rate,
                                      pi_bit_rate, pi_frame_length );
     }
-    else return 0;
+    /* DTS-HD */
+    else if( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
+             p_buf[2] == 0x20 && p_buf[3] ==  0x25 )
+    {
+        int i_dts_hd_size;
+        bs_t s;
+        bs_init( &s, &p_buf[4], DTS_HEADER_SIZE - 4 );
+
+        bs_skip( &s, 8 + 2 );
+
+        if( bs_read1( &s ) )
+        {
+            bs_skip( &s, 12 );
+            i_dts_hd_size = bs_read( &s, 20 ) + 1;
+        }
+        else
+        {
+            bs_skip( &s, 8 );
+            i_dts_hd_size = bs_read( &s, 16 ) + 1;
+        }
+        //uint16_t s0 = bs_read( &s, 16 );
+        //uint16_t s1 = bs_read( &s, 16 );
+        //fprintf( stderr, "DTS HD=%d : %x %x\n", i_dts_hd_size, s0, s1 );
+
+        *pb_dts_hd = true;
+        /* As we ignore the stream, do not modify those variables:
+        *pi_channels = ;
+        *pi_channels_conf = ;
+        *pi_sample_rate = ;
+        *pi_bit_rate = ;
+        *pi_frame_length = ;
+        */
+        return i_dts_hd_size;
+    }
+
+    *pb_dts_hd = false;
 
     switch( i_audio_mode & 0xFFFF )
     {
