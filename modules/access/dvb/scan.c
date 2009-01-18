@@ -110,6 +110,15 @@ int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_pa
                  p_parameter->bandwidth.i_min, p_parameter->bandwidth.i_max );
         msg_Dbg( p_obj, " - exhaustive mode %s", p_parameter->b_exhaustive ? "on" : "off" );
     }
+    else if( p_parameter->type == SCAN_DVB_C )
+    {
+        msg_Dbg( p_obj, "DVB-C scanning:" );
+        msg_Dbg( p_obj, " - frequency [%d, %d]",
+                 p_parameter->frequency.i_min, p_parameter->frequency.i_max );
+        msg_Dbg( p_obj, " - bandwidth [%d,%d]",
+                 p_parameter->bandwidth.i_min, p_parameter->bandwidth.i_max );
+        msg_Dbg( p_obj, " - exhaustive mode %s", p_parameter->b_exhaustive ? "on" : "off" );
+    }
     else
     {
         return VLC_EGENERIC;
@@ -134,6 +143,33 @@ void scan_Clean( scan_t *p_scan )
     TAB_CLEAN( p_scan->i_service, p_scan->pp_service );
 }
 
+static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+{
+    msg_Dbg( p_scan->p_obj, "Scan index %d", p_scan->i_index );
+    if( p_scan->i_index <= ( 10 ) )
+    {
+        p_cfg->i_frequency = 100500000 + ( ( p_scan->i_index ) * 700000);
+    } 
+    else if ( p_scan->i_index <= (10 + 9  ) )
+    {
+        p_cfg->i_frequency = 97000000 + ( ( p_scan->i_index - 20 ) * 800000);
+    }
+    else if ( p_scan->i_index <= (38 + 17 ) )
+    {
+        p_cfg->i_frequency = 14250000 + ( ( p_scan->i_index - 33 ) * 700000);
+    }
+    else if ( p_scan->i_index <= (72 + (90-21) ) )
+    {
+        p_cfg->i_frequency = 13800000 + ( ( p_scan->i_index - (72 + 21 ) )  * 800000);
+    }
+    else
+    {
+        return VLC_EGENERIC;
+    }
+    *pf_pos = (double)p_scan->i_index / ( (90-21+22-5+10+9));
+    return VLC_SUCCESS;
+
+}
 
 static int ScanDvbTNextExhaustive( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
@@ -222,6 +258,14 @@ static int ScanDvbTNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
     }
 }
 
+static int ScanDvbCNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
+{
+    if( p_scan->parameter.b_exhaustive )
+        return ScanDvbTNextExhaustive( p_scan, p_cfg, pf_pos );
+    else
+        return ScanDvbCNextFast( p_scan, p_cfg, pf_pos );
+}
+
 static int ScanDvbTNext( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     if( p_scan->parameter.b_exhaustive )
@@ -243,6 +287,9 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
     {
     case SCAN_DVB_T:
         i_ret = ScanDvbTNext( p_scan, p_cfg, &f_position );
+        break;
+    case SCAN_DVB_C:
+        i_ret = ScanDvbCNext( p_scan, p_cfg, &f_position );
         break;
     default:
         i_ret = VLC_EGENERIC;

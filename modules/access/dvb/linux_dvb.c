@@ -402,6 +402,28 @@ void FrontendGetStatus( access_t *p_access, frontend_status_t *p_status )
     p_status->b_has_carrier = (p_frontend->i_last_status & FE_HAS_CARRIER) != 0;
     p_status->b_has_lock = (p_frontend->i_last_status & FE_HAS_LOCK) != 0;
 }
+static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
+{
+    const frontend_t *p_frontend = p_access->p_sys->p_frontend;
+
+
+    memset( p_scan, 0, sizeof(*p_scan) );
+    p_scan->type = SCAN_DVB_C;
+    p_scan->b_exhaustive = false;
+
+    /* */
+    p_scan->frequency.i_min = p_frontend->info.frequency_min;
+    p_scan->frequency.i_max = p_frontend->info.frequency_max;
+    p_scan->frequency.i_step = p_frontend->info.frequency_stepsize;
+    p_scan->frequency.i_count = (p_scan->frequency.i_max-p_scan->frequency.i_min)/p_scan->frequency.i_step;
+
+    /* */
+    p_scan->bandwidth.i_min  = 6;
+    p_scan->bandwidth.i_max  = 8;
+    p_scan->bandwidth.i_step = 1;
+    p_scan->bandwidth.i_count = 3;
+    return VLC_SUCCESS;
+}
 static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
 {
     const frontend_t *p_frontend = p_access->p_sys->p_frontend;
@@ -431,6 +453,8 @@ int  FrontendGetScanParameter( access_t *p_access, scan_parameter_t *p_scan )
 
     if( p_frontend->info.type == FE_OFDM )  // DVB-T
         return ScanParametersDvbT( p_access, p_scan );
+    else if( p_frontend->info.type == FE_QAM )  // DVB-C
+        return ScanParametersDvbC( p_access, p_scan );
 
     msg_Err( p_access, "Frontend type not supported for scanning" );
     return VLC_EGENERIC;
