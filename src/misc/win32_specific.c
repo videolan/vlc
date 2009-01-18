@@ -377,7 +377,7 @@ void system_End( libvlc_int_t *p_this )
         psz_vlcpath = NULL;
     }
 
-    if( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) )
+    if( ( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) ) != 0 )
     {
         SendMessage( ipcwindow, WM_QUIT, 0, 0 );
     }
