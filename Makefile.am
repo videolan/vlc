@@ -9,7 +9,7 @@
 #  - libs/* are needed by modules
 BASE_SUBDIRS = po src bin modules share doc test
 EXTRA_SUBDIRS = m4 extras/package/ipkg \
-	libs/loader libs/srtp \
+	libs/loader libs/srtp libs/unzip \
 	projects/mozilla projects/activex
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
@@ -19,6 +19,9 @@ SUBDIRS += libs/loader
 endif
 if HAVE_LIBGCRYPT
 SUBDIRS += libs/srtp
+endif
+if HAVE_ZLIB
+SUBDIRS += libs/unzip
 endif
 if BUILD_VLC
 SUBDIRS += bin

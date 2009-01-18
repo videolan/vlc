@@ -183,12 +183,7 @@ SOURCES_skins2 = \
 	vars/time.cpp \
 	vars/time.hpp \
 	vars/volume.cpp \
-	vars/volume.hpp \
-    unzip/crypt.h \
-	unzip/ioapi.c \
-	unzip/ioapi.h \
-	unzip/unzip.c \
-	unzip/unzip.h
+	vars/volume.hpp
 
 if HAVE_WIN32
 SOURCES_skins2 += \

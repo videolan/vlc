@@ -3239,6 +3239,8 @@ dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
   VLC_ADD_LIBS([mp4 skins2 sap mkv gme],[-lz])
+  VLC_ADD_CPPFLAGS([skins2],[-I../../../@top_srcdir@/libs/unzip])
+  VLC_ADD_LIBS([skins2],[../../../libs/unzip/libunzip.la])
 ] )
 
 AC_ARG_ENABLE(libsysfs,
@@ -5379,6 +5381,18 @@ then
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
 
+
+dnl
+dnl ZIP files demuxer
+dnl
+AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
+AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
+if test "${have_zlib}" = "yes"
+then
+  VLC_ADD_PLUGIN([unzip])
+fi
+
+
 dnl
 dnl  Endianness check
 dnl
@@ -5843,6 +5857,7 @@ AC_CONFIG_FILES([
   extras/package/ipkg/Makefile
   libs/loader/Makefile
   libs/srtp/Makefile
+  libs/unzip/Makefile
   modules/Makefile
   projects/mozilla/Makefile
   m4/Makefile
