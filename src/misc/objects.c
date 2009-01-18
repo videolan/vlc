@@ -62,6 +62,9 @@
 # include <fcntl.h>
 # include <errno.h> /* ENOSYS */
 #endif
+#ifdef HAVE_SYS_EVENTFD_H
+# include <sys/eventfd.h>
+#endif
 #include <assert.h>
 
 /*****************************************************************************
