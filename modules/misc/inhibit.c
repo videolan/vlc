@@ -53,6 +53,9 @@ static void Deactivate   ( vlc_object_t * );
 
 static void Run          ( intf_thread_t *p_intf );
 
+static int Inhibit( intf_thread_t *p_intf );
+static int UnInhibit( intf_thread_t *p_intf );
+
 struct intf_sys_t
 {
     DBusConnection  *p_conn;
@@ -103,6 +106,9 @@ static int Activate( vlc_object_t *p_this )
 static void Deactivate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    if( p_intf->p_sys->i_cookie )
+        UnInhibit( p_intf );
+
     dbus_connection_unref( p_intf->p_sys->p_conn );
     free( p_intf->p_sys );
 }
@@ -232,10 +238,13 @@ static void Run( intf_thread_t *p_intf )
             const int i_state = var_GetInteger( p_input, "state" );
             vlc_object_release( p_input );
 
-            if( PLAYING_S == i_state && !p_intf->p_sys->i_cookie )
+            if( PLAYING_S == i_state )
             {
-                if( !Inhibit( p_intf ) )
-                    break;
+               if( !p_intf->p_sys->i_cookie )
+               {
+                   if( !Inhibit( p_intf ) )
+                       break;
+               }
             }
             else if( p_intf->p_sys->i_cookie )
             {
