@@ -81,6 +81,7 @@ class DroppingController: public AbstractController
 public:
     DroppingController( intf_thread_t *, QString line, QWidget *parent = 0 );
     QString getValue();
+    virtual ~DroppingController();
 
 protected:
     virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
@@ -91,6 +92,8 @@ protected:
     virtual void dragLeaveEvent ( QDragLeaveEvent * event );
 
     virtual void doAction( int );
+
+    bool eventFilter( QObject *, QEvent * );
 private:
     struct doubleInt
     {
@@ -101,6 +104,8 @@ private:
     QList <doubleInt *> widgetList;
 
     int getParentPosInLayout( QPoint point);
+
+    bool b_draging;
 
 };
 

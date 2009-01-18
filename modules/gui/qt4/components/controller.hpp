@@ -76,8 +76,8 @@ typedef enum buttonType_e
 
     SPLITTER = 0x20,
     INPUT_SLIDER,
-    VOLUME,
     TIME_LABEL,
+    VOLUME,
     MENU_BUTTONS,
     TELETEXT_BUTTONS,
     ADVANCED_CONTROLLER,

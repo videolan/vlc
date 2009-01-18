@@ -107,6 +107,7 @@ void InputSlider::mouseMoveEvent(QMouseEvent *event)
 
     secstotimestr( psz_length, ( event->x() * inputLength) / size().width() );
     setToolTip( psz_length );
+    event->accept();
 }
 
 void InputSlider::wheelEvent( QWheelEvent *event)

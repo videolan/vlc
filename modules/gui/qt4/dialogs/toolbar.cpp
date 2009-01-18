@@ -111,7 +111,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
 
     QString line = getSettings()->value( "MainWindow/InputToolbar",
-                        "5-1;33;6-1").toString();
+                        "5-1;34;6-1").toString();
     controller = new DroppingController( p_intf, line,
             this );
     timeTboxLayout->addWidget( controller, 0, 0, 1, -1 );
@@ -124,7 +124,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
 
     QString lineFSC = getSettings()->value( "MainWindow/FSCtoolbar",
-                       "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34" ).toString();
+                       "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;33" ).toString();
     controllerFSC = new DroppingController( p_intf,
             lineFSC, this );
     FSCTboxLayout->addWidget( controllerFSC, 0, 0, 1, -1 );
@@ -164,6 +164,10 @@ void ToolbarEditDialog::cancel()
     hide();
 }
 
+/************************************************
+ *  Widget Listing:
+ * Creation of the list of drawed lovely buttons
+ ************************************************/
 WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
               : QListWidget( _parent )
 {
@@ -250,6 +254,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
         case MENU_BUTTONS:
             {
                 QWidget *discFrame = new QWidget( this );
+                //discFrame->setLineWidth( 1 );
                 QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
                 discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
 
@@ -316,7 +321,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
 
 void WidgetListing::startDrag( Qt::DropActions /*supportedActions*/ )
 {
-    QListWidgetItem *item =currentItem();
+    QListWidgetItem *item = currentItem();
 
     QByteArray itemData;
     QDataStream dataStream( &itemData, QIODevice::WriteOnly );
@@ -325,45 +330,52 @@ void WidgetListing::startDrag( Qt::DropActions /*supportedActions*/ )
     int i_option = parent->getOptions();
     dataStream << i_type << i_option;
 
+    /* Create a new dragging event */
+    QDrag *drag = new QDrag( this );
+
+    /* With correct mimedata */
     QMimeData *mimeData = new QMimeData;
     mimeData->setData( "vlc/button-bar", itemData );
-
-    QDrag *drag = new QDrag( this );
     drag->setMimeData( mimeData );
+
+    /* And correct pixmap */
     QPixmap aPixmap = item->icon().pixmap( QSize( 22, 22 ) );
     drag->setPixmap( aPixmap );
     drag->setHotSpot( QPoint( 20, 20 ) );
-    drag->exec(Qt::CopyAction | Qt::MoveAction );
+
+    /* We want to keep a copy */
+    drag->exec( Qt::CopyAction | Qt::MoveAction );
 }
 
-
-DroppingController::DroppingController( intf_thread_t *_p_intf, QString line, QWidget *_parent )
+/*
+ * The special controller with drag'n drop abilities.
+ * We don't do this in the main controller, since we don't want the OverHead
+ * to propagate there too
+ */
+DroppingController::DroppingController( intf_thread_t *_p_intf,
+                                        QString line,
+                                        QWidget *_parent )
                    : AbstractController( _p_intf, _parent )
 {
     rubberband = NULL;
+    b_draging = false;
     setAcceptDrops( true );
     controlLayout = new QHBoxLayout( this );
-    controlLayout->setSpacing( 0 );
+    controlLayout->setSpacing( 5 );
     controlLayout->setMargin( 0 );
     setFrameShape( QFrame::StyledPanel );
     setFrameShadow( QFrame::Raised );
 
-
     parseAndCreate( line, controlLayout );
-
 }
 
 /* Overloading the AbstractController one, because we don't manage the
-   Spacing in the same ways */
+   Spacing items in the same ways */
 void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
                                              int i_index,
                                              buttonType_e i_type,
                                              int i_option )
 {
-    doubleInt *value = new doubleInt;
-    value->i_type = i_type;
-    value->i_option = i_option;
-
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
@@ -371,30 +383,78 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
         label->setPixmap( QPixmap( ":/space" ) );
         if( i_type == WIDGET_SPACER_EXTEND )
         {
-            label->setScaledContents( true );
             label->setSizePolicy( QSizePolicy::MinimumExpanding,
                     QSizePolicy::Preferred );
+
+            /* Create a box around it */
+            label->setFrameStyle( QFrame::Panel | QFrame::Sunken );
+            label->setLineWidth ( 1 );
+            label->setAlignment( Qt::AlignCenter );
         }
         else
             label->setSizePolicy( QSizePolicy::Fixed,
                     QSizePolicy::Preferred );
 
+        /* Install event Filter for drag'n drop */
+        label->installEventFilter( this );
         controlLayout->insertWidget( i_index, label );
     }
+
+    /* Normal Widgets */
     else
     {
         QWidget *widg = createWidget( i_type, i_option );
         if( !widg ) return;
+
+        /* Install the Event Filter in order to catch the drag */
+        widg->installEventFilter( this );
+
+        /* We are in a complex widget, we need to stop events on children too */
+        if( i_type >= VOLUME && i_type < SPECIAL_MAX )
+        {
+            QList<QObject *>children = widg->children();
+
+            QObject *child;
+            foreach( child, children )
+            {
+                QWidget *childWidg;
+                if( childWidg = qobject_cast<QWidget *>( child ) )
+                {
+                    child->installEventFilter( this );
+                    childWidg->setEnabled( true );
+                }
+            }
+
+            /* Decorating the frames when possible */
+            QFrame *frame;
+            if( i_type >= MENU_BUTTONS  /* Don't bother to check for volume */
+                && ( frame = qobject_cast<QFrame *>( widg ) ) != NULL )
+            {
+                frame->setFrameStyle( QFrame::Panel | QFrame::Raised );
+                frame->setLineWidth ( 1 );
+            }
+        }
 
         /* Some Widgets are deactivated at creation */
         widg->setEnabled( true );
         widg->show();
         controlLayout->insertWidget( i_index, widg );
     }
-    /* QList and QBoxLayout don't act the same with insert() */
-    if( i_index < 0 ) i_index = controlLayout->count() -1 ;
 
+    /* QList and QBoxLayout don't act the same with insert() */
+    if( i_index < 0 ) i_index = controlLayout->count() - 1;
+
+    /* Insert in the value listing */
+    doubleInt *value = new doubleInt;
+    value->i_type = i_type;
+    value->i_option = i_option;
     widgetList.insert( i_index, value );
+}
+
+DroppingController::~DroppingController()
+{
+    qDeleteAll( widgetList );
+    widgetList.clear();
 }
 
 QString DroppingController::getValue()
@@ -458,7 +518,7 @@ void DroppingController::dragMoveEvent( QDragMoveEvent *event )
     rubberband->show();
 }
 
-inline int DroppingController::getParentPosInLayout( QPoint point)
+inline int DroppingController::getParentPosInLayout( QPoint point )
 {
     point.ry() = height() / 2 ;
     QPoint origin = mapToGlobal ( point );
@@ -513,5 +573,67 @@ void DroppingController::dragLeaveEvent ( QDragLeaveEvent * event )
 void DroppingController::doAction( int i )
 {
     VLC_UNUSED( i );
+}
+
+bool DroppingController::eventFilter( QObject *obj, QEvent *event )
+{
+    switch( event->type() )
+    {
+        case QEvent::MouseButtonPress:
+            b_draging = true;
+            return true;
+        case QEvent::MouseButtonRelease:
+            b_draging = false;
+            return true;
+        case QEvent::MouseMove:
+            {
+            if( !b_draging ) return true;
+            QWidget *widg = static_cast<QWidget*>(obj);
+
+            QByteArray itemData;
+            QDataStream dataStream( &itemData, QIODevice::WriteOnly );
+
+            int i = -1;
+            i = controlLayout->indexOf( widg );
+            if( i == -1 )
+            {
+                i = controlLayout->indexOf( widg->parentWidget() );
+                widg = widg->parentWidget();
+                /* NOTE: be extra-careful Now with widg access */
+            }
+
+            if( i == -1 ) return true;
+            doubleInt *dI = widgetList.at( i );
+
+            int i_type = dI->i_type;
+            int i_option = dI->i_option;
+            dataStream << i_type << i_option;
+
+            /* With correct mimedata */
+            QMimeData *mimeData = new QMimeData;
+            mimeData->setData( "vlc/button-bar", itemData );
+
+            QDrag *drag = new QDrag( widg );
+            drag->setMimeData( mimeData );
+
+            /* Start the effective drag */
+            drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::MoveAction);
+
+            widgetList.removeAt( i );
+            controlLayout->removeWidget( widg );
+            widg->hide();
+            b_draging = false;
+            }
+            return true;
+
+        case QEvent::EnabledChange:
+        case QEvent::Hide:
+        case QEvent::HideToParent:
+        case QEvent::Move:
+        case QEvent::ZOrderChange:
+            return true;
+        default:
+            return false;
+    }
 }
 
