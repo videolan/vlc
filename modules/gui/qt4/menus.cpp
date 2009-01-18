@@ -325,6 +325,13 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 
     menu->addSeparator();
 
+    addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", SLOT( openAPlaylist() ),
+        "Ctrl+X" );
+    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
+        "Ctrl+Y" );
+
+    menu->addSeparator();
+
     recentsMenu = new QMenu( qtr( "Recently &Played" ), menu );
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
@@ -396,12 +403,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         act->setData( "_static_" );
     }
     menu->addMenu( SDMenu( p_intf ) );
-    menu->addSeparator();
-
-    addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", SLOT( openAPlaylist() ),
-        "Ctrl+X" );
-    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
-        "Ctrl+Y" );
     /*menu->addSeparator();
     menu->addAction( qtr( "Undock from Interface" ), mi,
                      SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
