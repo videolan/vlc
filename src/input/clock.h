@@ -43,7 +43,8 @@
  * This function creates a new input_clock_t.
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( int i_cr_average, int i_rate );
+input_clock_t *input_clock_New( int i_rate );
+
 /**
  * This function destroys a input_clock_t created by input_clock_New.
  */
@@ -88,8 +89,10 @@ void    input_clock_ChangeSystemOrigin( input_clock_t *, mtime_t i_system );
  *
  * If pi_rate is provided it will be field with the rate value used for
  * the conversion.
+ * If i_ts_bound is not INT64_MAX, the value will be invalidated if not
+ * before mdate() + i_pts_delay + i_ts_bound.
  */
-mtime_t input_clock_GetTS( input_clock_t *, int *pi_rate, mtime_t i_pts_delay, mtime_t );
+mtime_t input_clock_GetTS( input_clock_t *, int *pi_rate, mtime_t i_ts, mtime_t i_ts_bound );
 
 /**
  * This function returns the current rate.
@@ -103,6 +106,12 @@ int input_clock_GetRate( input_clock_t * );
 int input_clock_GetState( input_clock_t *,
                           mtime_t *pi_stream_start, mtime_t *pi_system_start,
                           mtime_t *pi_stream_duration, mtime_t *pi_system_duration );
+
+/**
+ * This function allows the set the minimal configuration for the jitter estimation algo.
+ */
+void input_clock_SetJitter( input_clock_t *,
+                            mtime_t i_pts_delay, int i_cr_average );
 
 #endif
 

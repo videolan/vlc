@@ -68,6 +68,9 @@ typedef struct
     bool b_can_stream_record;
     bool b_rescale_ts;
 
+    /* */
+    int64_t i_pts_delay;
+
     bool       b_eof;   /* eof of demuxer */
 
 } input_source_t;
@@ -81,9 +84,6 @@ struct input_thread_private_t
     bool        b_can_pace_control;
     double      f_fps;
     int         i_state;
-
-    /* Internal caching common to all sources */
-    mtime_t     i_pts_delay;
 
     /* Current state */
     int         i_rate;
@@ -121,8 +121,7 @@ struct input_thread_private_t
 
     /* Input item */
     input_item_t   *p_item;
-    /* Clock average variation */
-    int            i_cr_average;
+
     /* Main source */
     input_source_t input;
     /* Slave sources (subs, and others) */

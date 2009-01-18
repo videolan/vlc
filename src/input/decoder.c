@@ -652,7 +652,7 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
     if( !p_owner->p_clock || !i_ts )
         return i_ts;
 
-    return input_clock_GetTS( p_owner->p_clock, NULL, p_owner->p_input->p->i_pts_delay, i_ts );
+    return input_clock_GetTS( p_owner->p_clock, NULL, i_ts, INT64_MAX );
 }
 static int DecoderGetDisplayRate( decoder_t *p_dec )
 {
@@ -1020,7 +1020,7 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
 }
 
-static mtime_t DecoderTeletextFixTs( mtime_t i_ts, mtime_t i_ts_delay )
+static mtime_t DecoderTeletextFixTs( mtime_t i_ts )
 {
     mtime_t current_date = mdate();
 
@@ -1029,13 +1029,13 @@ static mtime_t DecoderTeletextFixTs( mtime_t i_ts, mtime_t i_ts_delay )
     {
         /* ETSI EN 300 472 Annex A : do not take into account the PTS
          * for teletext streams. */
-        return current_date + 400000 + i_ts_delay;
+        return current_date + 400000;
     }
     return i_ts;
 }
 
 static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
-                          mtime_t *pi_duration, int *pi_rate, mtime_t *pi_delay, bool b_telx )
+                          mtime_t *pi_duration, int *pi_rate, mtime_t i_ts_bound, bool b_telx )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_clock_t   *p_clock = p_owner->p_clock;
@@ -1043,7 +1043,6 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
 
     vlc_assert_locked( &p_owner->lock );
 
-    const mtime_t i_ts_delay = p_owner->p_input->p->i_pts_delay;
     const mtime_t i_es_delay = p_owner->i_ts_delay;
 
     if( p_clock )
@@ -1051,11 +1050,14 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
         const bool b_ephemere = pi_ts1 && *pi_ts0 == *pi_ts1;
 
         if( *pi_ts0 > 0 )
-            *pi_ts0 = input_clock_GetTS( p_clock, &i_rate, i_ts_delay,
-                                         *pi_ts0 + i_es_delay );
+            *pi_ts0 = input_clock_GetTS( p_clock, &i_rate, *pi_ts0 + i_es_delay, i_ts_bound );
         if( pi_ts1 && *pi_ts1 > 0 )
-            *pi_ts1 = input_clock_GetTS( p_clock, &i_rate, i_ts_delay,
-                                         *pi_ts1 + i_es_delay );
+        {
+            if( *pi_ts0 > 0 )
+                *pi_ts1 = input_clock_GetTS( p_clock, &i_rate, *pi_ts1 + i_es_delay, INT64_MAX );
+            else
+                *pi_ts1 = 0;
+        }
 
         /* Do not create ephemere data because of rounding errors */
         if( !b_ephemere && pi_ts1 && *pi_ts0 == *pi_ts1 )
@@ -1073,15 +1075,10 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
 
         if( b_telx )
         {
-            *pi_ts0 = DecoderTeletextFixTs( *pi_ts0, i_ts_delay );
+            *pi_ts0 = DecoderTeletextFixTs( *pi_ts0 );
             if( pi_ts1 && *pi_ts1 <= 0 )
                 *pi_ts1 = *pi_ts0;
         }
-    }
-    if( pi_delay )
-    {
-        const int r = i_rate > 0 ? i_rate : INPUT_RATE_DEFAULT;
-        *pi_delay = i_ts_delay + i_es_delay * r / INPUT_RATE_DEFAULT;
     }
 }
 
@@ -1146,19 +1143,16 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
 
         /* */
+        const bool b_dated = p_audio->start_date > 0;
         int i_rate = INPUT_RATE_DEFAULT;
-        mtime_t i_delay;
 
         DecoderFixTs( p_dec, &p_audio->start_date, &p_audio->end_date, NULL,
-                      &i_rate, &i_delay, false );
+                      &i_rate, AOUT_MAX_ADVANCE_TIME, false );
 
         vlc_mutex_unlock( &p_owner->lock );
 
-        /* */
-        const mtime_t i_max_date = mdate() + i_delay + AOUT_MAX_ADVANCE_TIME;
-
         if( !p_aout || !p_aout_input ||
-            p_audio->start_date <= 0 || p_audio->start_date > i_max_date ||
+            p_audio->start_date <= 0 ||
             i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE ||
             i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
             b_reject = true;
@@ -1186,15 +1180,11 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
         else
         {
-            if( p_audio->start_date <= 0 )
-            {
+            if( b_dated )
+                msg_Warn( p_aout, "received buffer in the future" );
+            else
                 msg_Warn( p_dec, "non-dated audio buffer received" );
-            }
-            else if( p_audio->start_date > i_max_date )
-            {
-                msg_Warn( p_aout, "received buffer in the future (%"PRId64")",
-                          p_audio->start_date - mdate() );
-            }
+
             *pi_lost_sum += 1;
             aout_BufferFree( p_audio );
         }
@@ -1381,17 +1371,15 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             p_picture->b_force = true;
         }
 
+        const bool b_dated = p_picture->date > 0;
         int i_rate = INPUT_RATE_DEFAULT;
-        mtime_t i_delay;
         DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
-                      &i_rate, &i_delay, false );
+                      &i_rate, DECODER_BOGUS_VIDEO_DELAY, false );
 
         vlc_mutex_unlock( &p_owner->lock );
 
         /* */
-        const mtime_t i_max_date = mdate() + i_delay + DECODER_BOGUS_VIDEO_DELAY;
-
-        if( !p_picture->b_force && ( p_picture->date <= 0 || p_picture->date >= i_max_date ) )
+        if( !p_picture->b_force && p_picture->date <= 0 )
             b_reject = true;
 
         if( !b_reject )
@@ -1406,15 +1394,11 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         }
         else
         {
-            if( p_picture->date <= 0 )
-            {
-                msg_Warn( p_vout, "non-dated video buffer received" );
-            }
+            if( b_dated )
+                msg_Warn( p_vout, "early picture skipped" );
             else
-            {
-                msg_Warn( p_vout, "early picture skipped (%"PRId64")",
-                          p_picture->date - mdate() );
-            }
+                msg_Warn( p_vout, "non-dated video buffer received" );
+
             *pi_lost_sum += 1;
             vout_DropPicture( p_vout, p_picture );
         }
@@ -1557,7 +1541,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
 
         /* */
         DecoderFixTs( p_dec, &p_subpic->i_start, &p_subpic->i_stop, NULL,
-                      NULL, NULL, b_telx );
+                      NULL, INT64_MAX, b_telx );
 
         vlc_mutex_unlock( &p_owner->lock );
 
@@ -1628,7 +1612,7 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
 
         DecoderFixTs( p_dec, &p_sout_block->i_dts, &p_sout_block->i_pts,
                       &p_sout_block->i_length,
-                      &p_sout_block->i_rate, NULL, b_telx );
+                      &p_sout_block->i_rate, INT64_MAX, b_telx );
 
         vlc_mutex_unlock( &p_owner->lock );
 

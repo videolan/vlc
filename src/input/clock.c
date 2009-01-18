@@ -107,6 +107,7 @@ static void    AvgClean( average_t * );
 static void    AvgReset( average_t * );
 static void    AvgUpdate( average_t *, mtime_t i_value );
 static mtime_t AvgGet( average_t * );
+static void    AvgRescale( average_t *, int i_divider );
 
 /* */
 typedef struct
@@ -144,6 +145,7 @@ struct input_clock_t
 
     /* Current modifiers */
     int     i_rate;
+    mtime_t i_pts_delay;
     bool    b_paused;
     mtime_t i_pause_date;
 };
@@ -154,7 +156,7 @@ static mtime_t ClockSystemToStream( input_clock_t *, mtime_t i_system );
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( int i_cr_average, int i_rate )
+input_clock_t *input_clock_New( int i_rate )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
@@ -169,9 +171,10 @@ input_clock_t *input_clock_New( int i_cr_average, int i_rate )
     cl->i_ts_max = 0;
 
     cl->i_next_drift_update = 0;
-    AvgInit( &cl->drift, i_cr_average );
+    AvgInit( &cl->drift, 10 );
 
     cl->i_rate = i_rate;
+    cl->i_pts_delay = 0;
     cl->b_paused = false;
     cl->i_pause_date = 0;
 
@@ -325,7 +328,7 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
  * input_clock_GetTS: manages a PTS or DTS
  *****************************************************************************/
 mtime_t input_clock_GetTS( input_clock_t *cl, int *pi_rate,
-                           mtime_t i_pts_delay, mtime_t i_ts )
+                           mtime_t i_ts, mtime_t i_ts_bound )
 {
     mtime_t i_converted_ts;
 
@@ -347,7 +350,14 @@ mtime_t input_clock_GetTS( input_clock_t *cl, int *pi_rate,
 
     vlc_mutex_unlock( &cl->lock );
 
-    return i_converted_ts + i_pts_delay;
+    i_converted_ts += cl->i_pts_delay;
+
+    /* Check ts validity */
+    if( i_ts_bound != INT64_MAX &&
+        i_converted_ts >= mdate() + cl->i_pts_delay + i_ts_bound )
+        return 0;
+
+    return i_converted_ts;
 }
 /*****************************************************************************
  * input_clock_GetRate: Return current rate
@@ -395,6 +405,28 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, mtime_t i_system )
 
     cl->ref.i_system += i_offset;
     cl->last.i_system += i_offset;
+
+    vlc_mutex_unlock( &cl->lock );
+}
+
+#warning "input_clock_SetJitter needs more work"
+void input_clock_SetJitter( input_clock_t *cl,
+                            mtime_t i_pts_delay, int i_cr_average )
+{
+    vlc_mutex_lock( &cl->lock );
+
+    /* TODO always save the value, and when rebuffering use the new one if smaller
+     * TODO when increasing -> force rebuffering
+     */
+    if( cl->i_pts_delay < i_pts_delay )
+        cl->i_pts_delay = i_pts_delay;
+
+    /* */
+    if( i_cr_average < 10 )
+        i_cr_average = 10;
+
+    if( cl->drift.i_divider != i_cr_average )
+        AvgRescale( &cl->drift, i_cr_average );
 
     vlc_mutex_unlock( &cl->lock );
 }
@@ -457,4 +489,11 @@ static mtime_t AvgGet( average_t *p_avg )
 {
     return p_avg->i_value;
 }
+static void AvgRescale( average_t *p_avg, int i_divider )
+{
+    const mtime_t i_tmp = p_avg->i_value * p_avg->i_divider + p_avg->i_residue;
 
+    p_avg->i_divider = i_divider;
+    p_avg->i_value   = i_tmp / p_avg->i_divider;
+    p_avg->i_residue = i_tmp % p_avg->i_divider;
+}

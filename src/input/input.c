@@ -183,8 +183,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->p_es_out = NULL;
     p_input->p->p_sout   = NULL;
     p_input->p->b_out_pace_control = false;
-    p_input->p->i_pts_delay = 0;
-    p_input->p->i_cr_average = 0;
 
     vlc_gc_incref( p_item ); /* Released in Destructor() */
     p_input->p->p_item = p_item;
@@ -239,8 +237,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_ControlVarInit( p_input );
 
     /* */
-    p_input->p->i_cr_average = var_GetInteger( p_input, "cr-average" );
-
     if( !p_input->b_preparsing )
     {
         var_Get( p_input, "bookmarks", &val );
@@ -903,22 +899,6 @@ static void InitTitle( input_thread_t * p_input )
     p_input->p->b_can_pace_control    = p_master->b_can_pace_control;
     p_input->p->b_can_pause        = p_master->b_can_pause;
     p_input->p->b_can_rate_control = p_master->b_can_rate_control;
-
-    /* Fix pts delay */
-    if( p_input->p->i_pts_delay < 0 )
-        p_input->p->i_pts_delay = 0;
-
-    /* If the desynchronisation requested by the user is < 0, we need to
-     * cache more data. */
-    const int i_desynch = var_GetInteger( p_input, "audio-desync" );
-    if( i_desynch < 0 )
-        p_input->p->i_pts_delay -= i_desynch * 1000;
-
-    /* Update cr_average depending on the caching */
-    p_input->p->i_cr_average *= (10 * p_input->p->i_pts_delay / 200000);
-    p_input->p->i_cr_average /= 10;
-    if( p_input->p->i_cr_average < 10 )
-        p_input->p->i_cr_average = 10;
 }
 
 static void StartTitle( input_thread_t * p_input )
@@ -1059,10 +1039,39 @@ static void LoadSlaves( input_thread_t *p_input )
     free( psz_org );
 }
 
+static void UpdatePtsDelay( input_thread_t *p_input )
+{
+    input_thread_private_t *p_sys = p_input->p;
+
+    /* Get max pts delay from input source */
+    mtime_t i_pts_delay = p_sys->input.i_pts_delay;
+    for( int i = 0; i < p_sys->i_slave; i++ )
+        i_pts_delay = __MAX( i_pts_delay, p_sys->slave[i]->i_pts_delay );
+
+    if( i_pts_delay < 0 )
+        i_pts_delay = 0;
+
+    /* Take care of audio/spu delay */
+    const int i_audio_delay = var_GetTime( p_input, "audio-delay" );
+    const int i_spu_delay   = var_GetTime( p_input, "spu-delay" );
+    const int i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
+    if( i_extra_delay < 0 )
+        i_pts_delay -= i_extra_delay * INT64_C(1000);
+
+    /* Update cr_average depending on the caching */
+    const int i_cr_average = var_GetInteger( p_input, "cr-average" ) * i_pts_delay / DEFAULT_PTS_DELAY;
+
+    /* */
+    es_out_SetJitter( p_input->p->p_es_out, i_pts_delay, i_cr_average );
+}
+
 static void InitPrograms( input_thread_t * p_input )
 {
     int i_es_out_mode;
     vlc_value_t val;
+
+    /* Compute correct pts_delay */
+    UpdatePtsDelay( p_input );
 
     /* Set up es_out */
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, true );
@@ -1831,12 +1840,18 @@ static bool Control( input_thread_t *p_input, int i_type,
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
             if( !es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, val.i_time ) )
+            {
                 input_SendEventAudioDelay( p_input, val.i_time );
+                UpdatePtsDelay( p_input );
+            }
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
             if( !es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, val.i_time ) )
+            {
                 input_SendEventSubtitleDelay( p_input, val.i_time );
+                UpdatePtsDelay( p_input );
+            }
             break;
 
         case INPUT_CONTROL_SET_TITLE:
@@ -2338,12 +2353,9 @@ static int InputSourceInit( input_thread_t *p_input,
 
     if( in->p_demux )
     {
-        int64_t i_pts_delay;
-
         /* Get infos from access_demux */
         demux_Control( in->p_demux,
-                        DEMUX_GET_PTS_DELAY, &i_pts_delay );
-        p_input->p->i_pts_delay = __MAX( p_input->p->i_pts_delay, i_pts_delay );
+                        DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
 
         in->b_title_demux = true;
         if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
@@ -2385,8 +2397,6 @@ static int InputSourceInit( input_thread_t *p_input,
     }
     else
     {
-        int64_t i_pts_delay;
-
         /* Now try a real access */
         in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
 
@@ -2416,8 +2426,7 @@ static int InputSourceInit( input_thread_t *p_input,
         if( !p_input->b_preparsing )
         {
             access_Control( in->p_access,
-                             ACCESS_GET_PTS_DELAY, &i_pts_delay );
-            p_input->p->i_pts_delay = __MAX( p_input->p->i_pts_delay, i_pts_delay );
+                             ACCESS_GET_PTS_DELAY, &in->i_pts_delay );
 
             in->b_title_demux = false;
             if( access_Control( in->p_access, ACCESS_GET_TITLE_INFO,

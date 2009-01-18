@@ -142,7 +142,9 @@ struct es_out_sys_t
     int64_t i_audio_delay;
     int64_t i_spu_delay;
 
-    /* Rate used for clock */
+    /* Clock configuration */
+    mtime_t     i_pts_delay;
+    int         i_cr_average;
     int         i_rate;
 
     /* */
@@ -305,6 +307,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->i_pause_date = -1;
 
     p_sys->i_rate = i_rate;
+    p_sys->i_pts_delay = 0;
+    p_sys->i_cr_average = 0;
 
     p_sys->b_buffering = true;
     p_sys->i_buffering_extra_initial = 0;
@@ -622,7 +626,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     if( p_sys->i_preroll_end >= 0 )
         i_preroll_duration = __MAX( p_sys->i_preroll_end - i_stream_start, 0 );
 
-    const mtime_t i_buffering_duration = p_sys->p_input->p->i_pts_delay +
+    const mtime_t i_buffering_duration = p_sys->i_pts_delay +
                                          i_preroll_duration +
                                          p_sys->i_buffering_extra_stream - p_sys->i_buffering_extra_initial;
 
@@ -787,7 +791,7 @@ static void EsOutFrameNext( es_out_t *out )
         if( i_ret )
             return;
 
-        p_sys->i_buffering_extra_initial = 1 + i_stream_duration - p_sys->p_input->p->i_pts_delay; /* FIXME < 0 ? */
+        p_sys->i_buffering_extra_initial = 1 + i_stream_duration - p_sys->i_pts_delay; /* FIXME < 0 ? */
         p_sys->i_buffering_extra_system =
         p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
     }
@@ -842,7 +846,7 @@ static mtime_t EsOutGetBuffering( es_out_t *out )
         }
 
         const mtime_t i_consumed = i_system_duration * INPUT_RATE_DEFAULT / p_sys->i_rate - i_stream_duration;
-        i_delay = p_sys->p_input->p->i_pts_delay - i_consumed;
+        i_delay = p_sys->i_pts_delay - i_consumed;
     }
     if( i_delay < 0 )
         return 0;
@@ -1013,12 +1017,14 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
     p_pgrm->p_epg = NULL;
-    p_pgrm->p_clock = input_clock_New( p_input->p->i_cr_average, p_sys->i_rate );
+    p_pgrm->p_clock = input_clock_New( p_sys->i_rate );
     if( !p_pgrm->p_clock )
     {
         free( p_pgrm );
         return NULL;
     }
+    input_clock_SetJitter( p_pgrm->p_clock, p_sys->i_pts_delay, p_sys->i_cr_average );
+
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -2390,6 +2396,23 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
             if( !p_sys->b_buffering )
                 input_SendEventTimes( p_sys->p_input, f_position, i_time, i_length );
+            return VLC_SUCCESS;
+        }
+        case ES_OUT_SET_JITTER:
+        {
+            mtime_t i_pts_delay = (mtime_t)va_arg( args, mtime_t );
+            int     i_cr_average = (int)va_arg( args, int );
+
+            if( i_pts_delay == p_sys->i_pts_delay &&
+                i_cr_average == p_sys->i_cr_average )
+                return VLC_SUCCESS;
+
+            p_sys->i_pts_delay = i_pts_delay;
+            p_sys->i_cr_average = i_cr_average;
+
+            for( int i = 0; i < p_sys->i_pgrm; i++ )
+                input_clock_SetJitter( p_sys->pgrm[i]->p_clock,
+                                       i_pts_delay, i_cr_average );
             return VLC_SUCCESS;
         }
 

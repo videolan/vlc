@@ -128,6 +128,11 @@ typedef struct attribute_packed
             mtime_t i_time;
             mtime_t i_length;
         } times;
+        struct
+        {
+            mtime_t i_pts_delay;
+            int     i_cr_average;
+        } jitter;
     };
 } ts_cmd_control_t;
 
@@ -599,6 +604,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_ES_STATE:
     case ES_OUT_SET_ES_FMT:
     case ES_OUT_SET_TIMES:
+    case ES_OUT_SET_JITTER:
     {
         ts_cmd_t cmd;
         if( CmdInitControl( &cmd, i_query, args, p_sys->b_delayed ) )
@@ -1392,6 +1398,15 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         p_cmd->control.times.i_length = i_length;
         break;
     }
+    case ES_OUT_SET_JITTER:
+    {
+        mtime_t i_pts_delay = (mtime_t)va_arg( args, mtime_t );
+        int     i_cr_average = (int)va_arg( args, int );
+
+        p_cmd->control.jitter.i_pts_delay = i_pts_delay;
+        p_cmd->control.jitter.i_cr_average = i_cr_average;
+        break;
+    }
 
     default:
         assert(0);
@@ -1452,6 +1467,9 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->control.times.f_position,
                                                p_cmd->control.times.i_time,
                                                p_cmd->control.times.i_length );
+    case ES_OUT_SET_JITTER:
+        return es_out_Control( p_out, i_query, p_cmd->control.jitter.i_pts_delay,
+                                               p_cmd->control.jitter.i_cr_average );
 
     default:
         assert(0);
