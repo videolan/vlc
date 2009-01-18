@@ -46,7 +46,11 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
     fd_set rdset, wrset, exset;
     struct timeval tv = { 0, 0 };
-    int val = -1;
+    int val;
+
+resume:
+    val = -1;
+    vlc_testcancel ();
 
     FD_ZERO (&rdset);
     FD_ZERO (&wrset);
@@ -87,13 +91,10 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 
 #ifndef HAVE_ALERTABLE_SELECT
 # warning FIXME! Fix cancellation and remove this crap.
-resume:
-    vlc_testcancel ();
-
     if ((timeout < 0) || (timeout > 50))
     {
         tv.tv_sec = 0;
-        tv.tv_usec = 50;
+        tv.tv_usec = 50000;
     }
     else
 #endif
@@ -105,10 +106,9 @@ resume:
     }
 
     val = select (val + 1, &rdset, &wrset, &exset,
-                  (timeout >= 0) ? &tv : NULL);
+                  /*(timeout >= 0) ?*/ &tv /*: NULL*/);
 
 #ifndef HAVE_ALERTABLE_SELECT
-# warning FIXME! Fix cancellation and remove this crap.
     if (val == 0)
     {
         if (timeout > 0)
