@@ -39,7 +39,6 @@
 #define VLC_OBJECT_AOUT        (-10)
 #define VLC_OBJECT_PACKETIZER  (-13)
 #define VLC_OBJECT_ENCODER     (-14)
-#define VLC_OBJECT_OSDMENU     (-28)
 /* Please add new object types below -34 */
 /* Please do not add new object types anyway */
 #define VLC_OBJECT_GENERIC     (-666)

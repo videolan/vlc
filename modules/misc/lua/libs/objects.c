@@ -95,7 +95,6 @@ static int vlc_object_type_from_string( const char *psz_name )
           { VLC_OBJECT_AOUT, "aout" },
           { VLC_OBJECT_PACKETIZER, "packetizer" },
           { VLC_OBJECT_ENCODER, "encoder" },
-          { VLC_OBJECT_OSDMENU, "osdmenu" },
           { VLC_OBJECT_GENERIC, "generic" },
           { 0, "" } };
     int i;
