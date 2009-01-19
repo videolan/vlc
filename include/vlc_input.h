@@ -568,7 +568,7 @@ static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
 static inline aout_instance_t *input_GetAout( input_thread_t *p_input )
 {
      aout_instance_t *p_aout;
-     return input_Control( p_input, INPUT_GET_VOUTS, &p_aout ) ? NULL : p_aout;
+     return input_Control( p_input, INPUT_GET_AOUT, &p_aout ) ? NULL : p_aout;
 }
 
 /* */
