@@ -111,8 +111,7 @@ void ActionsManager::play()
  */
 void ActionsManager::fullscreen()
 {
-    vout_thread_t *p_vout =
-      (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    vout_thread_t *p_vout = THEMIM->getVout();
     if( p_vout)
     {
         var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
@@ -122,8 +121,7 @@ void ActionsManager::fullscreen()
 
 void ActionsManager::snapshot()
 {
-    vout_thread_t *p_vout =
-      (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    vout_thread_t *p_vout = THEMIM->getVout();
     if( p_vout )
     {
         vout_Control( p_vout, VOUT_SNAPSHOT );
