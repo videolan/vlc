@@ -499,7 +499,7 @@ MMRESULT WINAPI acmStreamOpen(PHACMSTREAM phas, HACMDRIVER had, PWAVEFORMATEX pw
 
 	    ret = acmDriverOpen(&had, (HACMDRIVERID)wadi, 0L);
 	    if (ret == MMSYSERR_NOERROR) {
-		if ((wad = MSACM_GetDriver(had)) != 0) {
+		if ((wad = MSACM_GetDriver(had)) != NULL) {
 		    was->obj.pACMDriverID = wad->obj.pACMDriverID;
 		    was->pDrv = wad;
 		    was->hAcmDriver = had;

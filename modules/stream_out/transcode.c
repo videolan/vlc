@@ -2134,7 +2134,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
     /* Find an empty space in the picture ring buffer */
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
     {
-        if( pp_ring[i] != 0 && pp_ring[i]->i_status == DESTROYED_PICTURE )
+        if( pp_ring[i] != NULL && pp_ring[i]->i_status == DESTROYED_PICTURE )
         {
             pp_ring[i]->i_status = RESERVED_PICTURE;
             return pp_ring[i];
@@ -2142,7 +2142,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
     }
     for( i = 0; i < PICTURE_RING_SIZE; i++ )
     {
-        if( pp_ring[i] == 0 ) break;
+        if( pp_ring[i] == NULL ) break;
     }
 
     if( i == PICTURE_RING_SIZE && p_sys->i_threads >= 1 )
@@ -2159,7 +2159,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
         /* Find an empty space in the picture ring buffer */
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
         {
-            if( pp_ring[i] != 0 && pp_ring[i]->i_status == DESTROYED_PICTURE )
+            if( pp_ring[i] != NULL && pp_ring[i]->i_status == DESTROYED_PICTURE )
             {
                 pp_ring[i]->i_status = RESERVED_PICTURE;
                 return pp_ring[i];
@@ -2167,7 +2167,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
         }
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
         {
-            if( pp_ring[i] == 0 ) break;
+            if( pp_ring[i] == NULL ) break;
         }
     }
 

@@ -298,7 +298,7 @@ ldt_fs_t* Setup_LDT_Keeper(void)
 
 void Restore_LDT_Keeper(ldt_fs_t* ldt_fs)
 {
-    if (ldt_fs == NULL || ldt_fs->fs_seg == 0)
+    if (ldt_fs == NULL || ldt_fs->fs_seg == NULL)
 	return;
     free(ldt_fs->prev_struct);
     munmap((char*)ldt_fs->fs_seg, getpagesize());

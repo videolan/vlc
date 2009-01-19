@@ -522,7 +522,7 @@ int load_preset_file(char * pathname, preset_t * preset) {
 	  return FAILURE;
   
   /* Open the file corresponding to pathname */
-  if ((fs = utf8_fopen(pathname, "r")) == 0) {
+  if ((fs = utf8_fopen(pathname, "r")) == NULL) {
     if (PRESET_DEBUG) printf("load_preset_file: loading of file %s failed!\n", pathname);
     return ERROR;	
   }
@@ -793,7 +793,7 @@ void savePreset(char * filename) {
     return;
   
   /* Open the file corresponding to pathname */
-  if ((fs = utf8_fopen(filename, "w+")) == 0) {
+  if ((fs = utf8_fopen(filename, "w+")) == NULL) {
     if (PRESET_DEBUG) printf("savePreset: failed to create filename \"%s\"!\n", filename);
     return;	
   }

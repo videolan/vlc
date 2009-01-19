@@ -96,9 +96,9 @@ WINE_MODREF* MODULE_FindModule(LPCSTR m)
 static void MODULE_RemoveFromList(WINE_MODREF *mod)
 {
     modref_list* list=local_wm;
-    if(list==0)
+    if(list==NULL)
 	return;
-    if(mod==0)
+    if(mod==NULL)
 	return;
     if((list->prev==NULL)&&(list->next==NULL))
     {
@@ -396,7 +396,7 @@ HMODULE WINAPI LoadLibraryExA(LPCSTR libname, HANDLE hfile, DWORD flags)
 //	if(fs_installed==0)
 //	    install_fs();
 
-	while (wm == 0 && listpath[++i])
+	while (wm == NULL && listpath[++i])
 	{
 	    if (i < 2)
 	    {

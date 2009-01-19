@@ -125,7 +125,7 @@ static void open_registry(void)
 		read(fd,&regs[i].type,4);
 		read(fd,&len,4);
 		regs[i].name=(char*)malloc(len+1);
-		if(regs[i].name==0)
+		if(regs[i].name==NULL)
 		{
 			reg_size=i+1;
 			goto error;
@@ -134,7 +134,7 @@ static void open_registry(void)
 		regs[i].name[len]=0;
 		read(fd,&regs[i].len,4);
 		regs[i].value=(char*)malloc(regs[i].len+1);
-		if(regs[i].value==0)
+		if(regs[i].value==NULL)
 		{
 		        free(regs[i].name);
 			reg_size=i+1;
@@ -247,7 +247,7 @@ static reg_handle_t* insert_handle(long handle, const char* name)
 {
 	reg_handle_t* t;
 	t=(reg_handle_t*)malloc(sizeof(reg_handle_t));
-	if(head==0)
+	if(head==NULL)
 	{
 		t->prev=0;
 	}
@@ -267,7 +267,7 @@ static char* build_keyname(long key, const char* subkey)
 {
 	char* full_name;
 	reg_handle_t* t;
- 	if((t=find_handle(key))==0)
+        if((t=find_handle(key))==NULL)
 	{
 		TRACE("Invalid key\n");
 		return NULL;
@@ -291,10 +291,10 @@ static struct reg_value* insert_reg_value(int handle, const char* name, int type
 		return NULL;
 	}
 
-	if((v=find_value_by_name(fullname))==0)
+	if((v=find_value_by_name(fullname))==NULL)
 	//creating new value in registry
 	{
-		if(regs==0)
+		if(regs==NULL)
 		    create_registry();
 		regs=(struct reg_value*)realloc(regs, sizeof(struct reg_value)*(reg_size+1));
 		//regs=(struct reg_value*)my_realloc(regs, sizeof(struct reg_value)*(reg_size+1));
@@ -334,7 +334,7 @@ static void init_registry(void)
 	// registry.c is holding its own internal pointer
 	// localregpathname  - which is being allocate/deallocated
 
-	if (localregpathname == 0)
+	if (localregpathname == NULL)
 	{
             const char* pthn = regpathname;
 	    if (!regpathname)
@@ -360,7 +360,7 @@ static reg_handle_t* find_handle_2(long key, const char* subkey)
 {
 	char* full_name;
 	reg_handle_t* t;
- 	if((t=find_handle(key))==0)
+        if((t=find_handle(key))==NULL)
 	{
 		TRACE("Invalid key\n");
 		return (reg_handle_t*)-1;
@@ -414,7 +414,7 @@ long __stdcall RegCloseKey(long key)
     if(key==(long)HKEY_CURRENT_USER)
 	return 0;
     handle=find_handle(key);
-    if(handle==0)
+    if(handle==NULL)
 	return 0;
     if(handle->prev)
 	handle->prev->next=handle->next;
@@ -440,7 +440,7 @@ long __stdcall RegQueryValueExA(long key, const char* value, int* reserved, int*
 	return 1;
     t=find_value_by_name(c);
     free(c);
-    if (t==0)
+    if (t==NULL)
 	return 2;
     if (type)
 	*type=t->type;
@@ -476,7 +476,7 @@ long __stdcall RegCreateKeyExA(long key, const char* name, long reserved,
 	return 1;
     TRACE("Creating/Opening key %s\n", fullname);
     v=find_value_by_name(fullname);
-    if(v==0)
+    if(v==NULL)
     {
 	int qw=45708;
 	v=insert_reg_value(key, name, DIR, &qw, 4);

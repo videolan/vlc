@@ -95,7 +95,7 @@ static int needs_free=0;
 void SetCodecPath(const char* path)
 {
     if(needs_free)free(def_path);
-    if(path==0)
+    if(path==NULL)
     {
 	def_path=WIN32_PATH;
 	needs_free=0;

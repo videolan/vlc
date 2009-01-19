@@ -142,7 +142,7 @@ LPSTR WINAPI lstrcpynWtoA(LPSTR dest, LPCWSTR src, INT count)
 {
     LPSTR result = dest;
     int moved=0;
-    if((dest==0) || (src==0))
+    if((dest==NULL) || (src==NULL))
 	return 0;
     while(moved<count)
     {
@@ -204,7 +204,7 @@ LPWSTR HEAP_strdupAtoW(HANDLE heap, DWORD flags, LPCSTR string)
 {
     int size, i;
     WCHAR* answer;
-    if(string==0)
+    if(string==NULL)
 	return 0;
     size=strlen(string);
     answer = (WCHAR*) malloc(sizeof(WCHAR) * (size + 1));
@@ -216,7 +216,7 @@ LPSTR HEAP_strdupWtoA(HANDLE heap, DWORD flags, LPCWSTR string)
 {
     int size, i;
     char* answer;
-    if(string==0)
+    if(string==NULL)
 	return 0;
     size=0;
     while(string[size])
@@ -396,7 +396,7 @@ HANDLE WINAPI CreateFileMappingA(HANDLE handle, LPSECURITY_ATTRIBUTES lpAttr,
         close(hFile);
     if(answer!=(LPVOID)-1)
     {
-	if(fm==0)
+	if(fm==NULL)
 	{
 	    fm = (file_mapping*) malloc(sizeof(file_mapping));
 	    fm->prev=NULL;
@@ -428,7 +428,7 @@ WIN_BOOL WINAPI UnmapViewOfFile(LPVOID handle)
 {
     file_mapping* p;
     int result;
-    if(fm==0)
+    if(fm==NULL)
 	return 0;
     for(p=fm; p; p=p->next)
     {
@@ -489,7 +489,7 @@ LPVOID WINAPI VirtualAlloc(LPVOID address, DWORD size, DWORD type,  DWORD protec
     if (type&MEM_RESERVE && size<0x10000) size = 0x10000;
     if (size%pgsz) size += pgsz - size%pgsz;
 
-    if(address!=0)
+    if(address!=NULL)
     {
     //check whether we can allow to allocate this
         virt_alloc* str=vm;
@@ -593,14 +593,14 @@ INT WINAPI WideCharToMultiByte(UINT codepage, DWORD flags, LPCWSTR src,
      INT srclen,LPSTR dest, INT destlen, LPCSTR defch, WIN_BOOL* used_defch)
 {
     int i;
-    if(src==0)
+    if(src==NULL)
 	return 0;
-    if ((srclen==-1)&&(dest==0)) return 0;
+    if ((srclen==-1)&&(dest==NULL)) return 0;
     if(srclen==-1){srclen=0; while(src[srclen++]);}
 //    for(i=0; i<srclen; i++)
 //	printf("%c", src[i]);
 //    printf("\n");
-    if(dest==0)
+    if(dest==NULL)
     {
     for(i=0; i<srclen; i++)
     {
@@ -630,13 +630,13 @@ INT WINAPI MultiByteToWideChar(UINT codepage,DWORD flags, LPCSTR src, INT srclen
 HANDLE WINAPI OpenFileMappingA(DWORD access, WIN_BOOL prot, LPCSTR name)
 {
     file_mapping* p;
-    if(fm==0)
+    if(fm==NULL)
 	return (HANDLE)0;
-    if(name==0)
+    if(name==NULL)
 	return (HANDLE)0;
     for(p=fm; p; p=p->prev)
     {
-	if(p->name==0)
+	if(p->name==NULL)
 	    continue;
 	if(strcmp(p->name, name)==0)
 	    return (HANDLE)p->handle;

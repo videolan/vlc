@@ -495,7 +495,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             if ( !p_es->b_empty )
             {
                 i_numpics ++;
-                if( p_sys->i_order_length && p_es->psz_id != 0 )
+                if( p_sys->i_order_length && p_es->psz_id != NULL )
                 {
                     /* We also want to leave slots for images given in
                      * mosaic-order that are not available in p_vout_picture */
