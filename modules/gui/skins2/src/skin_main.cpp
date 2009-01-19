@@ -82,7 +82,7 @@ static struct
 {
     intf_thread_t *intf;
     vlc_mutex_t mutex;
-} skin_load = { NULL, VLC_STATIC_MUTEX, };
+} skin_load = { NULL, VLC_STATIC_MUTEX };
 
 //---------------------------------------------------------------------------
 // Open: initialize interface
