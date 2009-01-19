@@ -172,7 +172,7 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
     objects.push_back( 0 ); varnames.push_back( "" ); \
     i_last_separator = objects.size(); }
 
-static int InputAutoMenuBuilder( vlc_object_t *p_object,
+static int InputAutoMenuBuilder( input_thread_t *p_object,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
 {
@@ -567,10 +567,6 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
  **/
 QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
-    vlc_object_t *p_object;
-    vector<vlc_object_t *> objects;
-    vector<const char *> varnames;
-
     if( !menu ) menu = new QMenu();
 
     if( menu->isEmpty() )
@@ -586,9 +582,12 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
         ACT_ADD( menu, "navigation", qtr( "&Navigation" ) );
     }
 
-    p_object = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_INPUT,
-            FIND_ANYWHERE );
-    InputAutoMenuBuilder(  p_object, objects, varnames );
+    input_thread_t *p_object;
+    vector<vlc_object_t *> objects;
+    vector<const char *> varnames;
+
+    p_object = THEMIM->getInput();
+    InputAutoMenuBuilder( p_object, objects, varnames );
     PUSH_VAR( "prev-title" );
     PUSH_VAR( "next-title" );
     PUSH_VAR( "prev-chapter" );
@@ -780,7 +779,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
     {
         vlc_object_hold( p_input );
         varnames.push_back( "audio-es" );
-        InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
+        InputAutoMenuBuilder( p_input, objects, varnames );
         PUSH_SEPARATOR;
     }
 
@@ -839,7 +838,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             menu->addSeparator();
 
             vlc_object_hold( p_input );
-            InputAutoMenuBuilder( VLC_OBJECT( p_input ), objects, varnames );
+            InputAutoMenuBuilder( p_input, objects, varnames );
             vlc_object_release( p_input );
 
             submenu = new QMenu( menu );
@@ -1118,7 +1117,7 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     bool forceDisabled = false;
     if( !strcmp( psz_var, "spu-es" ) )
     {
-        vlc_object_t *p_vout = THEMIM->getVout();
+        vout_thread_t *p_vout = THEMIM->getVout();
         forceDisabled = ( p_vout == NULL );
         if( p_vout )
             vlc_object_release( p_vout );
