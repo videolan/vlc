@@ -131,15 +131,9 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
              * but in our case it will be a '\0'
              * terminated string */
             char psz_ufid[64];
-            int j = 0;
-            int max_size = p_ufid->identifier().size() < 63 ?
-                           p_ufid->identifier().size() : 63;
-            while( j < max_size )
-            {
-                psz_ufid[j] = p_ufid->identifier()[j];
-                j++;
-            }
-            psz_ufid[j] = '\0';
+            int max_size = __MIN( p_ufid->identifier().size(), 63);
+            strncmp( psz_ufid, p_ufid->identifier().data(), max_size );
+            psz_ufid[max_size] = '\0';
             vlc_meta_SetTrackID( p_meta, psz_ufid );
         }
     }
