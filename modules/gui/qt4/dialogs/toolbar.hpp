@@ -34,6 +34,7 @@
 class ToolbarEditDialog;
 class DroppingController;
 class QCheckBox;
+class QComboBox;
 
 class WidgetListing : public QListWidget
 {
@@ -65,6 +66,7 @@ private:
     static ToolbarEditDialog *instance;
 
     QCheckBox *flatBox, *bigBox, *shinyBox;
+    QComboBox *positionCombo;
 
     WidgetListing *widgetListing;
     DroppingController *controller1, *controller2, *controllerA;

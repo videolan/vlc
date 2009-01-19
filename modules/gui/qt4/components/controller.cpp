@@ -704,14 +704,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 );
 
-    QString line1 = getSettings()->value( "MainToolbar1",
-            "64;38;64;37-4;65;").toString();
+    QString line1 = getSettings()->value( "MainToolbar1", MAIN_TB1_DEFAULT )
+                                        .toString();
     parseAndCreate( line1, controlLayout1 );
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
     controlLayout2->setSpacing( 0 );
-    QString line2 = getSettings()->value( "MainToolbar2",
-            "0-2;64;3;1;4;64;7;10;9;64-4;36-4;65;35-4;" ).toString();
+    QString line2 = getSettings()->value( "MainToolbar2", MAIN_TB2_DEFAULT )
+                                        .toString();
     parseAndCreate( line2, controlLayout2 );
 
     if( !b_advancedVisible && advControls ) advControls->hide();
@@ -747,7 +747,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 
-    QString line = getSettings()->value( "AdvToolbar", "12;11;13;14" )
+    QString line = getSettings()->value( "AdvToolbar", ADV_TB_DEFAULT )
         .toString();
     parseAndCreate( line, controlLayout );
 }
@@ -759,8 +759,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
 
-    QString line = getSettings()->value( "InputToolbar",
-                   "5-1;33;6-1" ).toString();
+    QString line = getSettings()->value( "InputToolbar", INPT_TB_DEFAULT ).toString();
     parseAndCreate( line, controlLayout );
 }
 /**********************************************************************
@@ -799,8 +798,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     controlLayout2->addWidget( inputC );
 
     controlLayout = new QHBoxLayout;
-    QString line = getSettings()->value( "FSCtoolbar",
-            "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34;" ).toString();
+    QString line = getSettings()->value( "FSCtoolbar", FSC_TB_DEFAULT ).toString();
     parseAndCreate( line, controlLayout );
     controlLayout2->addLayout( controlLayout );
 

@@ -362,11 +362,7 @@ void MainInterface::handleMainUi( QSettings *settings )
              this, doComponentsUpdate() );
     inputC = new InputControlsWidget( p_intf, this );
 
-    /* Add the controls Widget to the main Widget */
-    mainLayout->insertWidget( 0, controls, 0, Qt::AlignBottom );
-    mainLayout->insertWidget( 0, inputC, 0, Qt::AlignBottom );
-
-    /* Visualisation */
+        /* Visualisation */
     /* Disabled for now, they SUCK */
     #if 0
     visualSelector = new VisualSelector( p_intf );
@@ -379,7 +375,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     bgWidget->resize(
             settings->value( "backgroundSize", QSize( 300, 200 ) ).toSize() );
     bgWidget->updateGeometry();
-    mainLayout->insertWidget( 0, bgWidget );
     CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
 
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
@@ -390,10 +385,15 @@ void MainInterface::handleMainUi( QSettings *settings )
 
     /* And video Outputs */
     if( videoEmbeddedFlag )
-    {
         videoWidget = new VideoWidget( p_intf );
-        mainLayout->insertWidget( 0, videoWidget, 10 );
-    }
+
+    /* Add the controls Widget to the main Widget */
+    mainLayout->insertWidget( 0, bgWidget );
+    if( videoWidget ) mainLayout->insertWidget( 0, videoWidget, 10 );
+    mainLayout->insertWidget( 2, inputC, 0, Qt::AlignBottom );
+    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                              controls, 0, Qt::AlignBottom );
+
 
     /* Finish the sizing */
     main->updateGeometry();

@@ -74,20 +74,22 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QLabel *label = new QLabel( qtr( "Toolbar position:" ) );
     mainTboxLayout->addWidget(label, 0, 0, 1, 2);
 
-    QComboBox *positionCombo = new QComboBox;
-    positionCombo->addItems( QStringList() << qtr( "Above the Video" )
-                                           << qtr( "Under the Video" ) );
+    positionCombo = new QComboBox;
+    positionCombo->addItem( qtr( "Under the Video" ), QVariant( 0 ) );
+    positionCombo->addItem( qtr( "Above the Video" ), QVariant( 1 ) );
     mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
     QLabel *line1Label = new QLabel( "Line 1:" );
-    QString line1 = getSettings()->value( "MainWindow/MainToolbar1" ).toString();
+    QString line1 = getSettings()->value( "MainWindow/MainToolbar1",
+                                          MAIN_TB1_DEFAULT ).toString();
     controller1 = new DroppingController( p_intf, line1,
             this );
     mainTboxLayout->addWidget( line1Label, 1, 0, 1, 1 );
     mainTboxLayout->addWidget( controller1, 1, 1, 1, 2 );
 
     QLabel *line2Label = new QLabel( "Line 2:" );
-    QString line2 = getSettings()->value( "MainWindow/MainToolbar2" ).toString();
+    QString line2 = getSettings()->value( "MainWindow/MainToolbar2",
+                                          MAIN_TB2_DEFAULT ).toString();
     controller2 = new DroppingController( p_intf, line2,
             this );
     mainTboxLayout->addWidget( line2Label, 2, 0, 1, 1 );
@@ -95,8 +97,8 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
 
     /* Advanced ToolBar */
     QLabel *advLabel = new QLabel( qtr( "Advanced Widget toolbar:" ) );
-    QString lineA = getSettings()->value( "MainWindow/AdvToolbar" )
-                        .toString();
+    QString lineA = getSettings()->value( "MainWindow/AdvToolbar",
+                                          ADV_TB_DEFAULT ).toString();
     controllerA = new DroppingController( p_intf, lineA,
             this );
     mainTboxLayout->addWidget( advLabel, 3, 0, 1, 2 );
@@ -108,7 +110,8 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     QGroupBox *timeToolbarBox = new QGroupBox( qtr( "Time Toolbar" ) , this );
     QGridLayout *timeTboxLayout = new QGridLayout( timeToolbarBox );
 
-    QString line = getSettings()->value( "MainWindow/InputToolbar" ).toString();
+    QString line = getSettings()->value( "MainWindow/InputToolbar",
+                                         INPT_TB_DEFAULT ).toString();
     controller = new DroppingController( p_intf, line,
             this );
     timeTboxLayout->addWidget( controller, 0, 0, 1, -1 );
@@ -120,8 +123,8 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
                                               this );
     QGridLayout *FSCTboxLayout = new QGridLayout( FSCToolbarBox );
 
-    QString lineFSC = getSettings()->value( "MainWindow/FSCtoolbar" )
-                       .toString();
+    QString lineFSC = getSettings()->value( "MainWindow/FSCtoolbar",
+                                            FSC_TB_DEFAULT ).toString();
     controllerFSC = new DroppingController( p_intf,
             lineFSC, this );
     FSCTboxLayout->addWidget( controllerFSC, 0, 0, 1, -1 );
@@ -149,6 +152,8 @@ void ToolbarEditDialog::close()
 {
     msg_Dbg( p_intf, "Close and save" );
     hide();
+    getSettings()->setValue( "MainWindow/ToolbarPos",
+            positionCombo->itemData( positionCombo->currentIndex() ).toInt() );
     getSettings()->setValue( "MainWindow/MainToolbar1", controller1->getValue() );
     getSettings()->setValue( "MainWindow/MainToolbar2", controller2->getValue() );
     getSettings()->setValue( "MainWindow/AdvToolbar", controllerA->getValue() );
