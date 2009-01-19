@@ -131,6 +131,9 @@ VLC_EXPORT( void, __vlc_object_assert_locked, ( vlc_object_t * ) );
 #define vlc_object_assert_locked( obj ) \
     __vlc_object_assert_locked( VLC_OBJECT( obj ) )
 
+#if defined (__GNUC__) && !defined __cplusplus
+__attribute__((deprecated))
+#endif
 VLC_EXPORT( void, __vlc_object_wait, ( vlc_object_t * ) );
 #define vlc_object_wait( obj ) \
     __vlc_object_wait( VLC_OBJECT( obj ) )
