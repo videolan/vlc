@@ -894,7 +894,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 objects.clear();
                 varnames.clear();
                 vlc_object_t *p_object = ( vlc_object_t* )
-                     vlc_object_find( p_intf, VLC_OBJECT_INTF, FIND_PARENT );
+                     vlc_object_find_name( p_intf, "skins2", FIND_PARENT );
                 if( p_object )
                 {
                     objects.push_back( p_object );
