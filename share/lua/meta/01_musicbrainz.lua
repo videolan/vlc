@@ -46,7 +46,7 @@ function fetch_art()
 
     -- FIXME: multiple results may be available
     _,_,asin = string.find( page, "<asin>(.-)</asin>" )
-    if asin ~= page then
+    if asin then
         return "http://images.amazon.com/images/P/"..asin..".01._SCLZZZZZZZ_.jpg"
     else
         return nil
