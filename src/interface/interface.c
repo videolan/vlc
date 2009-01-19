@@ -233,28 +233,11 @@ static void * MonitorLibVLCDeath( vlc_object_t * p_this )
     int canc = vlc_savecancel ();
 
     vlc_object_lock( p_libvlc );
-    while(vlc_object_alive( p_libvlc ) )
-    {
-        if(p_intf->b_die)
-        {
-            vlc_object_unlock( p_libvlc );
-            return NULL;
-        }
+    while( vlc_object_alive( p_libvlc ) )
         vlc_object_wait( p_libvlc );
-    }
     vlc_object_unlock( p_libvlc );
 
-    /* Someone killed libvlc */
-
-    /* Make sure we kill all interface objects, especially
-     * those that are blocking libvlc (running on main thread) */
-    vlc_list_t * p_list = vlc_list_find( p_libvlc, VLC_OBJECT_INTF, FIND_CHILD );
-    for( int i = 0; i < p_list->i_count; i++ )
-    {
-        vlc_object_t * p_intf = p_list->p_values[i].p_object;
-        vlc_object_kill( p_intf );
-    }
-    vlc_list_release( p_list );
+    vlc_object_kill( p_intf ); /* Kill the stupid first thread interface */
     vlc_restorecancel (canc);
     return NULL;
 }

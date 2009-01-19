@@ -372,7 +372,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     p_list = module_list_get( NULL );
     if( !p_item ||!p_list )
     {
-        if( p_list ) vlc_list_release(p_list);
+        if( p_list ) module_list_free(p_list);
         NSLog( @"serious problem, item or list not found" );
         return;
     }
