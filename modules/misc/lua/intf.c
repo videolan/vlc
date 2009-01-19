@@ -152,7 +152,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     bool b_config_set = false;
     if( !psz_name ) psz_name = strdup( "dummy" );
 
-    p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t*) );
+    p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t) );
     if( !p_intf->p_sys )
     {
         free( psz_name );
