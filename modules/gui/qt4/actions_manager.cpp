@@ -50,32 +50,34 @@ void ActionsManager::doAction( int id_action )
     {
         case PLAY_ACTION:
             play(); break;
-        case PREVIOUS_ACTION:
-            prev(); break;
-        case NEXT_ACTION:
-            next(); break;
         case STOP_ACTION:
-            stop(); break;
+            THEMIM->stop(); break;
+        case OPEN_ACTION:
+            break;
+        case PREVIOUS_ACTION:
+            THEMIM->prev(); break;
+        case NEXT_ACTION:
+            THEMIM->next(); break;
         case SLOWER_ACTION:
-            slower(); break;
+            THEMIM->getIM()->slower(); break;
         case FASTER_ACTION:
-            faster(); break;
+            THEMIM->getIM()->faster(); break;
         case FULLSCREEN_ACTION:
             fullscreen(); break;
         case EXTENDED_ACTION:
-            extSettings(); break;
+            THEDP->extendedDialog(); break;
         case PLAYLIST_ACTION:
             playlist(); break;
         case SNAPSHOT_ACTION:
             snapshot(); break;
         case RECORD_ACTION:
             record(); break;
-        case ATOB_ACTION:
-            THEMIM->getIM()->setAtoB(); break;
         case FRAME_ACTION:
             frame(); break;
+        case ATOB_ACTION:
+            THEMIM->getIM()->setAtoB(); break;
         case REVERSE_ACTION:
-            reverse(); break;
+            THEMIM->getIM()->reverse(); break;
         case SKIP_BACK_ACTION:
             var_SetInteger( p_intf->p_libvlc, "key-pressed",
                     ACTIONID_JUMP_BACKWARD_SHORT );
@@ -90,11 +92,6 @@ void ActionsManager::doAction( int id_action )
     }
 }
 
-inline void ActionsManager::stop()
-{
-    THEMIM->stop();
-}
-
 void ActionsManager::play()
 {
     if( THEPL->current.i_size == 0 )
@@ -104,16 +101,6 @@ void ActionsManager::play()
         return;
     }
     THEMIM->togglePlayPause();
-}
-
-inline void ActionsManager::prev()
-{
-    THEMIM->prev();
-}
-
-inline void ActionsManager::next()
-{
-    THEMIM->next();
 }
 
 /**
@@ -144,27 +131,7 @@ void ActionsManager::snapshot()
     }
 }
 
-inline void ActionsManager::extSettings()
-{
-    THEDP->extendedDialog();
-}
-
-inline void ActionsManager::reverse()
-{
-    THEMIM->getIM()->reverse();
-}
-
-inline void ActionsManager::slower()
-{
-    THEMIM->getIM()->slower();
-}
-
-inline void ActionsManager::faster()
-{
-    THEMIM->getIM()->faster();
-}
-
-inline void ActionsManager::playlist()
+void ActionsManager::playlist()
 {
     if( p_intf->p_sys->p_mi ) p_intf->p_sys->p_mi->togglePlaylist();
 }

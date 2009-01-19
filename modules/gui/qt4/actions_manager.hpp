@@ -79,16 +79,9 @@ protected slots:
 
 protected slots:
     void play();
-    void stop();
-    void prev();
-    void next();
     void fullscreen();
-    void extSettings();
-    void faster();
-    void slower();
-    void reverse();
-    void playlist();
     void snapshot();
+    void playlist();
     void record();
     void frame();
 
