@@ -230,7 +230,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     return VLC_SUCCESS;
 }
 
-static int AudioAutoMenuBuilder( vlc_object_t *p_object,
+static int AudioAutoMenuBuilder( aout_instance_t *p_object,
         input_thread_t *p_input,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
@@ -477,7 +477,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     vector<vlc_object_t *> objects;
     vector<const char *> varnames;
-    vlc_object_t *p_aout;
+    aout_instance_t *p_aout;
     input_thread_t *p_input;
 
     if( !current ) current = new QMenu();
@@ -494,9 +494,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     p_input = THEMIM->getInput();
     if( p_input )
         vlc_object_hold( p_input );
-    p_aout = ( vlc_object_t * ) vlc_object_find( p_intf,
-                                                 VLC_OBJECT_AOUT,
-                                                 FIND_ANYWHERE );
+    p_aout = THEMIM->getAout();
 
     AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
 
@@ -759,8 +757,7 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
     if( p_input )
     {
         vlc_object_hold( p_input );
-        vlc_object_t *p_aout = ( vlc_object_t * )vlc_object_find( p_input,
-                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+        aout_instance_t *p_aout = THEMIM->getAout();
         AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
         if( p_aout )
             vlc_object_release( p_aout );

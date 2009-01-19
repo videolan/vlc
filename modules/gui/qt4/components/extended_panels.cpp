@@ -875,8 +875,7 @@ void Equalizer::updateUIFromCore()
     float f_preamp;
     int i_preset;
 
-    aout_instance_t *p_aout = ( aout_instance_t * )vlc_object_find( p_intf,
-                                    VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = THEMIM->getAout();
     if( p_aout )
     {
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
@@ -938,8 +937,7 @@ void Equalizer::enable( bool en )
 /* Function called when the set2Pass button is activated */
 void Equalizer::set2Pass()
 {
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                 VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout= THEMIM->getAout();
     bool b_2p = ui.eq2PassCheck->isChecked();
 
     if( p_aout == NULL )
@@ -960,8 +958,7 @@ void Equalizer::set2Pass()
 void Equalizer::setPreamp()
 {
     const float f = ( float )(  ui.preampSlider->value() ) /10 - 20;
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                       VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = THEMIM->getAout();
 
     ui.preampLabel->setText( qtr( "Preamp\n" ) + QString::number( f, 'f', 1 )
                                                + qtr( "dB" ) );
@@ -990,8 +987,7 @@ void Equalizer::setCoreBands()
     }
     const char *psz_values = values.toAscii().constData();
 
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                          VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = THEMIM->getAout();
     if( p_aout )
     {
         //delCallbacks( p_aout );
@@ -1053,8 +1049,7 @@ void Equalizer::setCorePreset( int i_preset )
     char *psz_values = createValuesFromPreset( i_preset );
     if( !psz_values ) return ;
 
-    aout_instance_t *p_aout= ( aout_instance_t * )vlc_object_find( p_intf,
-                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout= THEMIM->getAout();
     if( p_aout )
     {
         delCallbacks( p_aout );
@@ -1148,8 +1143,7 @@ Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
     BUTTONACT( enableCheck, enable() );
 
     /* Write down initial values */
-    aout_instance_t *p_aout = ( aout_instance_t * )
-        vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = THEMIM->getAout();
     char *psz_af;
 
     if( p_aout )
@@ -1204,8 +1198,7 @@ void Spatializer::setInitValues()
 
 void Spatializer::setValues( float *controlVars )
 {
-    aout_instance_t *p_aout= ( aout_instance_t * )
-        vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    aout_instance_t *p_aout = THEMIM->getAout();
 
     for( int i = 0 ; i < NUM_SP_CTRL ; i++ )
     {

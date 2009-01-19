@@ -31,6 +31,7 @@
 
 #include <vlc_input.h>
 #include <vlc_vout.h>
+#include <vlc_aout.h>
 
 #include "qt4.hpp"
 
@@ -220,6 +221,14 @@ public:
         return NULL;
     }
 
+    aout_instance_t *getAout()
+    {
+        aout_instance_t *p_aout;
+        if( p_input && !input_Control( p_input, INPUT_GET_AOUT, &p_aout ) )
+        {
+            return p_aout;
+        }
+    }
 private:
     MainInputManager( intf_thread_t * );
     static MainInputManager *instance;
