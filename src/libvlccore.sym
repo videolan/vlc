@@ -331,6 +331,7 @@ sout_AccessOutSeek
 sout_AccessOutWrite
 sout_AnnounceRegisterSDP
 sout_AnnounceUnRegister
+sout_EncoderCreate
 sout_MethodRelease
 sout_MuxAddStream
 sout_MuxDelete

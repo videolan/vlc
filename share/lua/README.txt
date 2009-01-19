@@ -156,7 +156,7 @@ object.find( object, type, mode ): Find an object of given type. mode can
   "object"'s children. If set to "anywhere", it will look in all the
   objects. If object is unset, the current module's object will be used.
   Type can be: "libvlc", "playlist", "input", "decoder",
-  "vout", "aout", "packetizer", "encoder", "generic".
+  "vout", "aout", "packetizer", "generic".
   This function is deprecated and slow and should be avoided.
 object.find_name( object, name, mode ): Same as above except that it matches
   on the object's name and not type. This function is also slow and should
