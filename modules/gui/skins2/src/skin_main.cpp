@@ -78,6 +78,12 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
                             void *pParam );
 
 
+static struct
+{
+    intf_thread_t *intf;
+    vlc_mutex_t mutex;
+} skin_load = { NULL, VLC_STATIC_MUTEX, };
+
 //---------------------------------------------------------------------------
 // Open: initialize interface
 //---------------------------------------------------------------------------
@@ -163,6 +169,10 @@ static int Open( vlc_object_t *p_this )
 #endif
         return VLC_EGENERIC;
     }
+    vlc_mutex_lock( &skin_load.mutex );
+    skin_load.intf = p_intf;
+    vlc_mutex_unlock( &skin_load.mutex );
+
     Dialogs::instance( p_intf );
     ThemeRepository::instance( p_intf );
 
@@ -225,6 +235,10 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    vlc_mutex_lock( &skin_load.mutex );
+    skin_load.intf = NULL;
+    vlc_mutex_unlock( &skin_load.mutex);
 
     // Destroy "singleton" objects
     OSFactory::instance( p_intf )->destroyOSLoop();
@@ -325,30 +339,27 @@ static int DemuxOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_intf = (intf_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INTF,
-                                               FIND_ANYWHERE );
+    vlc_mutex_lock( &skin_load.mutex );
+    p_intf = skin_load.intf;
+    if( p_intf )
+        vlc_object_hold( p_intf );
+    vlc_mutex_unlock( &skin_load.mutex );
+
     if( p_intf != NULL )
     {
-        // Do nothing is skins2 is not the main interface
-        if( var_Type( p_intf, "skin-to-load" ) == VLC_VAR_STRING )
-        {
-            playlist_t *p_playlist = pl_Hold( p_this );
-            // Make sure the item is deleted afterwards
-            /// \bug does not always work
-            playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
-            vlc_object_release( p_playlist );
+        playlist_t *p_playlist = pl_Hold( p_this );
+        // Make sure the item is deleted afterwards
+        /// \bug does not always work
+        playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
+        vlc_object_release( p_playlist );
 
-            vlc_value_t val;
-            val.psz_string = p_demux->psz_path;
-            var_Set( p_intf, "skin-to-load", val );
-        }
-        else
-        {
-            msg_Warn( p_this,
-                      "skin could not be loaded (not using skins2 intf)" );
-        }
-
+        var_SetString( p_intf, "skin-to-load", p_demux->psz_path );
         vlc_object_release( p_intf );
+    }
+    else
+    {
+        msg_Warn( p_this,
+                  "skin could not be loaded (not using skins2 intf)" );
     }
 
     return VLC_SUCCESS;
@@ -382,28 +393,29 @@ static int onSystrayChange( vlc_object_t *pObj, const char *pVariable,
                             vlc_value_t oldVal, vlc_value_t newVal,
                             void *pParam )
 {
-    intf_thread_t *pIntf =
-        (intf_thread_t*)vlc_object_find( pObj, VLC_OBJECT_INTF, FIND_ANYWHERE );
+    intf_thread_t *pIntf;
+
+    vlc_mutex_lock( &skin_load.mutex );
+    pIntf = skin_load.intf;
+    if( pIntf )
+        vlc_object_hold( pIntf );
+    vlc_mutex_unlock( &skin_load.mutex );
 
     if( pIntf == NULL )
     {
         return VLC_EGENERIC;
     }
 
-    // Check that we found the correct interface (same check as for the demux)
-    if( var_Type( pIntf, "skin-to-load" ) == VLC_VAR_STRING )
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    if( newVal.b_bool )
     {
-        AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-        if( newVal.b_bool )
-        {
-            CmdAddInTray *pCmd = new CmdAddInTray( pIntf );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-        }
-        else
-        {
-            CmdRemoveFromTray *pCmd = new CmdRemoveFromTray( pIntf );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-        }
+        CmdAddInTray *pCmd = new CmdAddInTray( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+    else
+    {
+        CmdRemoveFromTray *pCmd = new CmdRemoveFromTray( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
     }
 
     vlc_object_release( pIntf );
@@ -416,28 +428,29 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
                             vlc_value_t oldVal, vlc_value_t newVal,
                             void *pParam )
 {
-    intf_thread_t *pIntf =
-        (intf_thread_t*)vlc_object_find( pObj, VLC_OBJECT_INTF, FIND_ANYWHERE );
+    intf_thread_t *pIntf;
+
+    vlc_mutex_lock( &skin_load.mutex );
+    pIntf = skin_load.intf;
+    if( pIntf )
+        vlc_object_hold( pIntf );
+    vlc_mutex_unlock( &skin_load.mutex );
 
     if( pIntf == NULL )
     {
         return VLC_EGENERIC;
     }
 
-    // Check that we found the correct interface (same check as for the demux)
-    if( var_Type( pIntf, "skin-to-load" ) == VLC_VAR_STRING )
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    if( newVal.b_bool )
     {
-        AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-        if( newVal.b_bool )
-        {
-            CmdAddInTaskBar *pCmd = new CmdAddInTaskBar( pIntf );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-        }
-        else
-        {
-            CmdRemoveFromTaskBar *pCmd = new CmdRemoveFromTaskBar( pIntf );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-        }
+        CmdAddInTaskBar *pCmd = new CmdAddInTaskBar( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
+    }
+    else
+    {
+        CmdRemoveFromTaskBar *pCmd = new CmdRemoveFromTaskBar( pIntf );
+        pQueue->push( CmdGenericPtr( pCmd ) );
     }
 
     vlc_object_release( pIntf );
