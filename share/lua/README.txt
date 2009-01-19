@@ -95,7 +95,8 @@ misc.homedir(): Get the user's home directory.
 misc.configdir(): Get the user's VLC config directory.
 misc.cachedir(): Get the user's VLC cache directory.
 
-misc.datadir_list( name ): FIXME: write description ... or ditch function if it isn't usefull anymore, we have datadir and userdatadir :)
+misc.datadir_list( name ): FIXME: write description ... or ditch function
+  if it isn't usefull anymore, we have datadir and userdatadir :)
 
 misc.mdate(): Get the current date (in milliseconds).
 misc.mwait(): Wait for the given date (in milliseconds).
@@ -124,7 +125,9 @@ end
 net.close( fd ): Close file descriptor.
 net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
-net.select( nfds, fds_read, fds_write, timeout ): Monitor a bunch of file descriptors. Returns number of fds to handle and the amount of time not slept. See "man select".
+net.select( nfds, fds_read, fds_write, timeout ): Monitor a bunch of file
+  descriptors. Returns number of fds to handle and the amount of time not
+  slept. See "man select".
 net.fd_set_new(): Create a new fd_set.
 local fds = vlc.net.fd_set_new()
 fds:clr( fd ) -- remove fd from set
@@ -315,6 +318,7 @@ a reference to it, all VLM items will be deleted.
 Volume
 ------
 volume.set( level ): Set volume to an absolute level between 0 and 1024.
+  256 is 100%.
 volume.get(): Get volume.
 volume.up( [n] ): Increment volume by n steps of 32. n defaults to 1.
 volume.down( [n] ): Decrement volume by n steps of 32. n defaults to 1.
