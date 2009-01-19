@@ -185,7 +185,7 @@ static int InputAutoMenuBuilder( vlc_object_t *p_object,
     return VLC_SUCCESS;
 }
 
-static int VideoAutoMenuBuilder( vlc_object_t *p_object,
+static int VideoAutoMenuBuilder( vout_thread_t *p_object,
         input_thread_t *p_input,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
@@ -204,6 +204,7 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
     PUSH_VAR( "video-snapshot" );
 
     /* Special case for postproc */
+    // FIXME
     if( p_object )
     {
         /* p_object is the vout, so the decoder is our parent and the
@@ -218,7 +219,7 @@ static int VideoAutoMenuBuilder( vlc_object_t *p_object,
                                                        FIND_CHILD );
             if( p_pp )
             {
-                p_object = p_pp;
+                vlc_object_t *p_object = p_pp;
                 PUSH_VAR( "postproc-q" );
                 vlc_object_release( p_pp );
             }
@@ -513,7 +514,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
  **/
 QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 {
-    vlc_object_t *p_vout;
+    vout_thread_t *p_vout;
     input_thread_t *p_input;
     vector<vlc_object_t *> objects;
     vector<const char *> varnames;
@@ -548,8 +549,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     p_input = THEMIM->getInput();
     if( p_input )
         vlc_object_hold( p_input );
-    p_vout = ( vlc_object_t * )vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-            FIND_ANYWHERE );
+    p_vout = THEMIM->getVout();
 
     VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
 
@@ -741,8 +741,7 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
     if( p_input )
     {
         vlc_object_hold( p_input );
-        vlc_object_t *p_vout = ( vlc_object_t * )vlc_object_find( p_input,
-                VLC_OBJECT_VOUT, FIND_CHILD );
+        vout_thread_t *p_vout = THEMIM->getVout();
         if( p_vout )
         {
             VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
@@ -821,8 +820,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
         if( p_input )
         {
-            vlc_object_t *p_vout = (vlc_object_t *)
-                vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+            vout_thread_t *p_vout = THEMIM->getVout();
 
             /* Add a fullscreen switch button */
             if( p_vout )
@@ -1120,8 +1118,7 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     bool forceDisabled = false;
     if( !strcmp( psz_var, "spu-es" ) )
     {
-        vlc_object_t *p_vout = ( vlc_object_t* )( vlc_object_find( p_intf,
-                                    VLC_OBJECT_VOUT, FIND_ANYWHERE ) );
+        vlc_object_t *p_vout = THEMIM->getVout();
         forceDisabled = ( p_vout == NULL );
         if( p_vout )
             vlc_object_release( p_vout );
