@@ -179,8 +179,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     intf_thread_t *p_intf;
 
     /* Destroy the interface object/thread */
-    p_intf = vlc_object_find( p_dec, VLC_OBJECT_INTF, FIND_CHILD );
-    if( p_intf != NULL )
+    if( p_sys->p_intf != NULL )
     {
 #ifdef CMML_DEBUG
         msg_Dbg( p_dec, "CMML decoder is freeing interface thread" );
@@ -188,10 +187,7 @@ static void CloseDecoder( vlc_object_t *p_this )
         intf_StopThread( p_intf );
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
-        vlc_object_release( p_intf );
     }
-
-    p_sys->p_intf = NULL;
 
     free( p_sys );
 }
