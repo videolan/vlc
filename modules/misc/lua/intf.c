@@ -138,7 +138,7 @@ static char *GetModuleName( intf_thread_t *p_intf )
             return strdup( pp_shortcuts[i].psz_name );
     }
 
-    return var_GetString( p_intf, "lua-intf" );
+    return var_CreateGetString( p_intf, "lua-intf" );
 }
 
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
@@ -231,7 +231,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     }
     /* </gruik> */
 
-    psz_config = config_GetPsz( p_intf, "lua-config" );
+    psz_config = var_CreateGetString( p_intf, "lua-config" );
     if( psz_config && *psz_config )
     {
         char *psz_buffer;
