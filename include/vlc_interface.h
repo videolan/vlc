@@ -67,6 +67,8 @@ struct intf_thread_t
                                intf_dialog_args_t * );
 
     vlc_mutex_t  change_lock;
+
+    config_chain_t *p_cfg;
 };
 
 /** \brief Arguments passed to a dialogs provider

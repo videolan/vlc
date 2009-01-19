@@ -69,6 +69,7 @@ static void intf_Destroy( vlc_object_t *obj )
         module_unneed( p_intf, p_intf->p_module );
 
     free( p_intf->psz_intf );
+    config_ChainDestroy( p_intf->p_cfg );
     vlc_mutex_destroy( &p_intf->change_lock );
 }
 
@@ -94,8 +95,15 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
 #endif
 
     /* Choose the best module */
-    p_intf->psz_intf = strdup( psz_module );
-    p_intf->p_module = module_need( p_intf, "interface", psz_module, true );
+    p_intf->p_cfg = NULL;
+    char *psz_parser = *psz_module == '$'
+                     ? var_CreateGetString(p_intf,psz_module+1)
+                     : strdup( psz_module );
+    char *psz_tmp = config_ChainCreate( &p_intf->psz_intf, &p_intf->p_cfg,
+                                        psz_parser );
+    free( psz_tmp );
+    free( psz_parser );
+    p_intf->p_module = module_need( p_intf, "interface", p_intf->psz_intf, true );
 
     if( p_intf->p_module == NULL )
     {
