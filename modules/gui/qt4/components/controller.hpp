@@ -113,27 +113,6 @@ static const QString iconL[BUTTON_MAX] ={ ":/play_b", ":/stop_b", ":/eject",
     ":/defullscreen", ":/extended", ":/playlist", ":/snapshot", ":/record",
     ":/atob_nob", ":/frame", ":/reverse", ":/skip_back", ":/skip_fw" };
 
-typedef enum actionType_e
-{
-    PLAY_ACTION,
-    STOP_ACTION,
-    OPEN_ACTION,
-    PREVIOUS_ACTION,
-    NEXT_ACTION,
-    SLOWER_ACTION,
-    FASTER_ACTION,
-    FULLSCREEN_ACTION,
-    EXTENDED_ACTION,
-    PLAYLIST_ACTION,
-    SNAPSHOT_ACTION,
-    RECORD_ACTION,
-    FRAME_ACTION,
-    ATOB_ACTION,
-    REVERSE_ACTION,
-    SKIP_BACK_ACTION,
-    SKIP_FW_ACTION,
-} actionType_e;
-
 enum
 {
    WIDGET_NORMAL = 0x0,
@@ -172,23 +151,6 @@ private:
     QFrame *telexFrame();
 
 protected slots:
-    virtual void doAction( int );
-
-protected slots:
-    void play();
-    void stop();
-    void prev();
-    void next();
-    void fullscreen();
-    void extSettings();
-    void faster();
-    void slower();
-    void reverse();
-    void playlist();
-    void snapshot();
-    void record();
-    void frame();
-
     virtual void setStatus( int );
 
 signals:

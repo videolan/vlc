@@ -17,6 +17,7 @@ nodist_SOURCES_qt4 = \
 		menus.moc.cpp \
 		dialogs_provider.moc.cpp \
 		input_manager.moc.cpp \
+		actions_manager.moc.cpp \
 		recents.moc.cpp \
 		dialogs/playlist.moc.cpp \
 		dialogs/bookmarks.moc.cpp \
@@ -182,6 +183,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		main_interface.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
+		actions_manager.cpp \
 		recents.cpp \
 		dialogs/playlist.cpp \
 		dialogs/bookmarks.cpp \
@@ -223,6 +225,7 @@ noinst_HEADERS = \
 	main_interface.hpp \
 	dialogs_provider.hpp \
 	input_manager.hpp \
+	actions_manager.hpp \
 	recents.hpp \
 	dialogs/playlist.hpp \
 	dialogs/bookmarks.hpp \

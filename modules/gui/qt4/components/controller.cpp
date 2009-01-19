@@ -35,6 +35,7 @@
 
 #include "dialogs_provider.hpp" /* Opening Dialogs */
 #include "input_manager.hpp"
+#include "actions_manager.hpp"
 
 #include "util/input_slider.hpp" /* InputSlider */
 #include "util/customwidgets.hpp" /* qEventToKey */
@@ -62,7 +63,8 @@ AbstractController::AbstractController( intf_thread_t * _p_i, QWidget *_parent )
 
     /* Main action provider */
     toolbarActionsMapper = new QSignalMapper( this );
-    CONNECT( toolbarActionsMapper, mapped( int ), this, doAction( int ) );
+    CONNECT( toolbarActionsMapper, mapped( int ),
+             ActionsManager::getInstance( p_intf  ), doAction( int ) );
     CONNECT( THEMIM->getIM(), statusChanged( int ), this, setStatus( int ) );
 }
 
@@ -526,163 +528,6 @@ QFrame *AbstractController::telexFrame()
 #undef BUTTON_SET_BAR
 #undef ENABLE_ON_VIDEO
 #undef ENABLE_ON_INPUT
-
-//* Actions */
-void AbstractController::doAction( int id_action )
-{
-    switch( id_action )
-    {
-        case PLAY_ACTION:
-            play(); break;
-        case PREVIOUS_ACTION:
-            prev(); break;
-        case NEXT_ACTION:
-            next(); break;
-        case STOP_ACTION:
-            stop(); break;
-        case SLOWER_ACTION:
-            slower(); break;
-        case FASTER_ACTION:
-            faster(); break;
-        case FULLSCREEN_ACTION:
-            fullscreen(); break;
-        case EXTENDED_ACTION:
-            extSettings(); break;
-        case PLAYLIST_ACTION:
-            playlist(); break;
-        case SNAPSHOT_ACTION:
-            snapshot(); break;
-        case RECORD_ACTION:
-            record(); break;
-        case ATOB_ACTION:
-            THEMIM->getIM()->setAtoB(); break;
-        case FRAME_ACTION:
-            frame(); break;
-        case REVERSE_ACTION:
-            reverse(); break;
-        case SKIP_BACK_ACTION:
-            var_SetInteger( p_intf->p_libvlc, "key-pressed",
-                    ACTIONID_JUMP_BACKWARD_SHORT );
-            break;
-        case SKIP_FW_ACTION:
-            var_SetInteger( p_intf->p_libvlc, "key-pressed",
-                    ACTIONID_JUMP_FORWARD_SHORT );
-            break;
-        default:
-            msg_Dbg( p_intf, "Action: %i", id_action );
-            break;
-    }
-}
-
-void AbstractController::stop()
-{
-    THEMIM->stop();
-}
-
-void AbstractController::play()
-{
-    if( THEPL->current.i_size == 0 )
-    {
-        /* The playlist is empty, open a file requester */
-        THEDP->openFileDialog();
-        return;
-    }
-    THEMIM->togglePlayPause();
-}
-
-void AbstractController::prev()
-{
-    THEMIM->prev();
-}
-
-void AbstractController::next()
-{
-    THEMIM->next();
-}
-
-/**
-  * TODO
- * This functions toggle the fullscreen mode
- * If there is no video, it should first activate Visualisations...
- *  This has also to be fixed in enableVideo()
- */
-void AbstractController::fullscreen()
-{
-    vout_thread_t *p_vout =
-      (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout)
-    {
-        var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
-        vlc_object_release( p_vout );
-    }
-}
-
-void AbstractController::snapshot()
-{
-    vout_thread_t *p_vout =
-      (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout )
-    {
-        vout_Control( p_vout, VOUT_SNAPSHOT );
-        vlc_object_release( p_vout );
-    }
-}
-
-void AbstractController::extSettings()
-{
-    THEDP->extendedDialog();
-}
-
-void AbstractController::reverse()
-{
-    THEMIM->getIM()->reverse();
-}
-
-void AbstractController::slower()
-{
-    THEMIM->getIM()->slower();
-}
-
-void AbstractController::faster()
-{
-    THEMIM->getIM()->faster();
-}
-
-void AbstractController::playlist()
-{
-    if( p_intf->p_sys->p_mi ) p_intf->p_sys->p_mi->togglePlaylist();
-}
-
-void AbstractController::record()
-{
-    input_thread_t *p_input = THEMIM->getInput();
-    if( p_input )
-    {
-        /* This method won't work fine if the stream can't be cut anywhere */
-        const bool b_recording = var_GetBool( p_input, "record" );
-        var_SetBool( p_input, "record", !b_recording );
-#if 0
-        else
-        {
-            /* 'record' access-filter is not loaded, we open Save dialog */
-            input_item_t *p_item = input_GetItem( p_input );
-            if( !p_item )
-                return;
-
-            char *psz = input_item_GetURI( p_item );
-            if( psz )
-                THEDP->streamingDialog( NULL, psz, true );
-        }
-#endif
-    }
-}
-
-void AbstractController::frame()
-{
-    input_thread_t *p_input = THEMIM->getInput();
-    if( p_input )
-        var_SetVoid( p_input, "frame-next" );
-}
 
 #include <QHBoxLayout>
 /*****************************
