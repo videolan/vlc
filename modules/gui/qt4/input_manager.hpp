@@ -208,28 +208,10 @@ public:
 
     input_thread_t *getInput() { return p_input; };
     InputManager *getIM() { return im; };
-    vout_thread_t * getVout()
-    {
-        vout_thread_t **pp_vout; int i_vout;
-        if( p_input && !input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
-        {
-            for( int i = 1; i < i_vout; i++ ) vlc_object_release( pp_vout[i]);
-            vout_thread_t *p_tmp = pp_vout[0];
-            free( pp_vout );
-            return p_tmp;
-        }
-        return NULL;
-    }
 
-    aout_instance_t *getAout()
-    {
-        aout_instance_t *p_aout;
-        if( p_input && !input_Control( p_input, INPUT_GET_AOUT, &p_aout ) )
-        {
-            return p_aout;
-        }
-        return NULL;
-    }
+    vout_thread_t* getVout();
+    aout_instance_t *getAout();
+
 private:
     MainInputManager( intf_thread_t * );
     static MainInputManager *instance;
