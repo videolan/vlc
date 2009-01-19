@@ -37,15 +37,13 @@
 ActionsManager * ActionsManager::instance = NULL;
 
 ActionsManager::ActionsManager( intf_thread_t * _p_i, QObject *_parent )
-                   : QObject( _parent )
+               : QObject( _parent )
 {
     p_intf = _p_i;
 }
 
-ActionsManager::~ActionsManager()
-{
-}
-//* Actions */
+ActionsManager::~ActionsManager(){}
+
 void ActionsManager::doAction( int id_action )
 {
     switch( id_action )
@@ -92,7 +90,7 @@ void ActionsManager::doAction( int id_action )
     }
 }
 
-void ActionsManager::stop()
+inline void ActionsManager::stop()
 {
     THEMIM->stop();
 }
@@ -108,12 +106,12 @@ void ActionsManager::play()
     THEMIM->togglePlayPause();
 }
 
-void ActionsManager::prev()
+inline void ActionsManager::prev()
 {
     THEMIM->prev();
 }
 
-void ActionsManager::next()
+inline void ActionsManager::next()
 {
     THEMIM->next();
 }
@@ -146,27 +144,27 @@ void ActionsManager::snapshot()
     }
 }
 
-void ActionsManager::extSettings()
+inline void ActionsManager::extSettings()
 {
     THEDP->extendedDialog();
 }
 
-void ActionsManager::reverse()
+inline void ActionsManager::reverse()
 {
     THEMIM->getIM()->reverse();
 }
 
-void ActionsManager::slower()
+inline void ActionsManager::slower()
 {
     THEMIM->getIM()->slower();
 }
 
-void ActionsManager::faster()
+inline void ActionsManager::faster()
 {
     THEMIM->getIM()->faster();
 }
 
-void ActionsManager::playlist()
+inline void ActionsManager::playlist()
 {
     if( p_intf->p_sys->p_mi ) p_intf->p_sys->p_mi->togglePlaylist();
 }

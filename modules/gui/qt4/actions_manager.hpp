@@ -57,10 +57,10 @@ class ActionsManager : public QObject
 
     Q_OBJECT
 public:
-    static ActionsManager *getInstance( intf_thread_t *_p_intf )
+    static ActionsManager *getInstance( intf_thread_t *_p_intf, QObject *_parent = 0 )
     {
         if( !instance )
-            instance = new ActionsManager( _p_intf );
+            instance = new ActionsManager( _p_intf, _parent );
         return instance;
     }
     static void killInstance()
@@ -71,7 +71,7 @@ public:
 
 private:
     static ActionsManager *instance;
-    ActionsManager( intf_thread_t  *_p_i, QObject *_parent = 0 );
+    ActionsManager( intf_thread_t  *_p_i, QObject *_parent );
     intf_thread_t       *p_intf;
 
 protected slots:
