@@ -224,17 +224,13 @@ ExtVideo::~ExtVideo()
 
 void ExtVideo::cropChange()
 {
-    if( THEMIM->getInput() )
+    p_vout = THEMIM->getVout();
+    if( p_vout )
     {
-        p_vout = ( vout_thread_t * )vlc_object_find( THEMIM->getInput(),
-                VLC_OBJECT_VOUT, FIND_CHILD );
-        if( p_vout )
-        {
-            var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );
-            var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
-            var_SetInteger( p_vout, "crop-left", ui.cropLeftPx->value() );
-            var_SetInteger( p_vout, "crop-right", ui.cropRightPx->value() );
-        }
+        var_SetInteger( p_vout, "crop-top", ui.cropTopPx->value() );
+        var_SetInteger( p_vout, "crop-bottom", ui.cropBotPx->value() );
+        var_SetInteger( p_vout, "crop-left", ui.cropLeftPx->value() );
+        var_SetInteger( p_vout, "crop-right", ui.cropRightPx->value() );
         vlc_object_release( p_vout );
     }
 }
@@ -340,13 +336,7 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
         ui.subpictureFilterText->setText( psz_string );
 
     /* Try to set on the fly */
-    if( THEMIM->getInput() )
-        p_vout = ( vout_thread_t * )vlc_object_find( THEMIM->getInput(),
-                VLC_OBJECT_VOUT, FIND_CHILD );
-    /* If you have stopped the video, p_vout is still at its old value */
-    else
-        p_vout = NULL;
-
+    p_vout = THEMIM->getVout();
     if( p_vout )
     {
         if( !strcmp( psz_filter_type, "sub-filter" ) )
