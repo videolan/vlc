@@ -52,6 +52,8 @@
  *****************************************************************************/
 static void *Run( void * );
 
+static const char * const ppsz_intf_options[] = { "intf", "config", NULL };
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -126,9 +128,9 @@ static char *GetModuleName( intf_thread_t *p_intf )
 {
     int i;
     const char *psz_intf;
-    if( *p_intf->psz_intf == '$' )
+    /*if( *p_intf->psz_intf == '$' )
         psz_intf = var_GetString( p_intf, p_intf->psz_intf+1 );
-    else
+    else*/
         psz_intf = p_intf->psz_intf;
     for( i = 0; pp_shortcuts[i].psz_name; i++ )
     {
@@ -136,7 +138,7 @@ static char *GetModuleName( intf_thread_t *p_intf )
             return strdup( pp_shortcuts[i].psz_name );
     }
 
-    return config_GetPsz( p_intf, "lua-intf" );
+    return var_GetString( p_intf, "lua-intf" );
 }
 
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
@@ -147,6 +149,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     intf_sys_t *p_sys;
     lua_State *L;
 
+    config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
     char *psz_name = GetModuleName( p_intf );
     const char *psz_config;
     bool b_config_set = false;
