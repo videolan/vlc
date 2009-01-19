@@ -36,7 +36,6 @@ static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
                                    bool *pb_need_release )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
-    int i_object_type = 0;
     vlc_object_t *p_object = NULL;
     *pb_need_release = false;
 
@@ -48,18 +47,17 @@ static vlc_object_t *GetVLCObject( intf_thread_t *p_intf,
         p_object = VLC_OBJECT(p_sys->p_playlist);
     else if( !strcmp( psz_object, "VLC_OBJECT_INPUT" ) )
         p_object = VLC_OBJECT(p_sys->p_input);
-    else if( !strcmp( psz_object, "VLC_OBJECT_VOUT" ) )
-        i_object_type = VLC_OBJECT_VOUT;
-    else if( !strcmp( psz_object, "VLC_OBJECT_AOUT" ) )
-        i_object_type = VLC_OBJECT_AOUT;
+    else if( p_sys->p_input )
+    {
+        if( !strcmp( psz_object, "VLC_OBJECT_VOUT" ) )
+            p_object = VLC_OBJECT( input_GetVout( p_sys->p_input ) );
+        else if( !strcmp( psz_object, "VLC_OBJECT_AOUT" ) )
+            p_object = VLC_OBJECT( input_GetAout( p_sys->p_input ) );
+        if( p_object )
+            *pb_need_release = true;
+    }
     else
         msg_Warn( p_intf, "unknown object type (%s)", psz_object );
-
-    if( p_object == NULL && i_object_type )
-    {
-        *pb_need_release = true;
-        p_object = vlc_object_find( p_intf, i_object_type, FIND_ANYWHERE );
-    }
 
     return p_object;
 }
@@ -1123,10 +1121,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         {
             if( p_sys->p_input )
             {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
-
+                vout_thread_t *p_vout = input_GetVout( p_sys->p_input );
                 if( p_vout )
                 {
                     vout_Control( p_vout, VOUT_SNAPSHOT );

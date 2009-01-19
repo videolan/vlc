@@ -230,9 +230,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     if( p_sys->p_input )
                     {
                         vout_thread_t *p_vout;
-                        p_vout = vlc_object_find( p_sys->p_input,
-                                                  VLC_OBJECT_VOUT, FIND_CHILD );
 
+                        p_vout = input_GetVout( p_sys->p_input );
                         if( p_vout )
                         {
                             p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
