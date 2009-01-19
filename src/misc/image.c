@@ -45,6 +45,7 @@
 #include <vlc_image.h>
 #include <vlc_stream.h>
 #include <vlc_charset.h>
+#include <vlc_sout.h>
 #include <libvlc.h>
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
@@ -656,7 +657,7 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
 {
     encoder_t *p_enc;
 
-    p_enc = vlc_object_create( p_this, VLC_OBJECT_ENCODER );
+    p_enc = sout_EncoderCreate( p_this );
     if( p_enc == NULL )
         return NULL;
 

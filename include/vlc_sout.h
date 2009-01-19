@@ -239,6 +239,13 @@ static inline int sout_StreamIdSend( sout_stream_t *s, sout_stream_id_t *id, blo
 }
 
 /****************************************************************************
+ * Encoder
+ ****************************************************************************/
+
+VLC_EXPORT( encoder_t *, sout_EncoderCreate, ( vlc_object_t *obj ) );
+#define sout_EncoderCreate(o) sout_EncoderCreate(VLC_OBJECT(o))
+
+/****************************************************************************
  * Announce handler
  ****************************************************************************/
 VLC_EXPORT(session_descriptor_t*,sout_AnnounceRegisterSDP, ( vlc_object_t *, const char *, const char *, announce_method_t* ) );

@@ -711,7 +711,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_decoder->b_pace_control = true;
 
     /* Create encoder object */
-    id->p_encoder = vlc_object_create( p_stream, VLC_OBJECT_ENCODER );
+    id->p_encoder = sout_EncoderCreate( p_stream );
     if( !id->p_encoder )
         goto error;
     vlc_object_attach( id->p_encoder, p_stream );

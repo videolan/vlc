@@ -43,6 +43,7 @@
 
 #include <vlc_meta.h>
 #include <vlc_block.h>
+#include <vlc_codec.h>
 
 #include "input/input_interface.h"
 
@@ -873,4 +874,12 @@ rtp:
 
     mrl_Clean( &mrl );
     return psz_chain;
+}
+
+#undef sout_EncoderCreate
+encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
+{
+    static const char type[] = "encoder";
+    return vlc_custom_create( p_this, sizeof( encoder_t ), VLC_OBJECT_GENERIC,
+                              type );
 }
