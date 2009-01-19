@@ -287,25 +287,6 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
 
     if( p_vout != NULL )
     {
-        /* don't display anchor if main interface can display it */
-        p_primary_intf = vlc_object_find( p_intf->p_libvlc, VLC_OBJECT_INTF,
-                FIND_CHILD );
-
-        if( p_primary_intf )
-        {
-            if( var_Get( p_primary_intf, "intf-displays-cmml-description", &val )
-                    == VLC_SUCCESS )
-            {
-                if( val.b_bool == true )
-                {
-                    vlc_object_release( p_primary_intf );
-                    return true;
-                }
-            }
-
-            vlc_object_release( p_primary_intf );
-        }
-
         /* display anchor as subtitle on-screen */
         if( DisplayAnchor( p_intf, p_vout, psz_description, psz_url )
                 != VLC_SUCCESS )
