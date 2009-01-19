@@ -210,7 +210,7 @@ public:
     vout_thread_t * getVout()
     {
         vout_thread_t **pp_vout; int i_vout;
-        if( !input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
+        if( p_input && !input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
         {
             for( int i = 1; i < i_vout; i++ ) vlc_object_release( pp_vout[i]);
             vout_thread_t *p_tmp = pp_vout[0];
