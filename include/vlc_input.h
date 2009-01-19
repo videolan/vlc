@@ -536,6 +536,41 @@ static inline int input_AddSubtitle( input_thread_t *p_input, const char *psz_ur
     return input_Control( p_input, INPUT_ADD_SUBTITLE, psz_url, b_check_extension );
 }
 
+/**
+ * Return one of the video output (if any). If possible, you should use
+ * INPUT_GET_VOUTS directly and process _all_ video outputs instead.
+ * @param p_input an input thread from which to get a video output
+ * @return NULL on error, or a video output thread pointer (which needs to be
+ * released with vlc_object_release()).
+ */
+static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
+{
+     vout_thread_t **pp_vout, *p_vout;
+     unsigned i_vout;
+
+     if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
+         return NULL;
+
+     for( unsigned i = 1; i < i_vout; i++ )
+         vlc_object_release( (vlc_object_t *)(pp_vout[i]) );
+
+     p_vout = (i_vout >= 1) ? pp_vout[0] : NULL;
+     free (pp_vout);
+     return p_vout;
+}
+
+/**
+ * Return the audio output (if any) associated with an input.
+ * @param p_input an input thread
+ * @return NULL on error, or the audio output (which needs to be
+ * released with vlc_object_release()).
+ */
+static inline aout_instance_t *input_GetAout( input_thread_t *p_input )
+{
+     aout_instance_t *p_aout;
+     return input_Control( p_input, INPUT_GET_VOUTS, &p_aout ) ? NULL : p_aout;
+}
+
 /* */
 typedef struct input_clock_t input_clock_t;
 VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, input_clock_t *, sout_instance_t * ) );
