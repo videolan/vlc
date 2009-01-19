@@ -467,7 +467,6 @@ vlc_inet_ntop
 vlc_inet_pton
 vlc_join
 __vlc_list_children
-__vlc_list_find
 vlc_list_release
 vlc_memcpy
 vlc_memset

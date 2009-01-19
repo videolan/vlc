@@ -53,6 +53,8 @@ void __vlc_object_signal_unlocked (vlc_object_t *);
 #define vlc_object_signal_unlocked( obj ) \
     __vlc_object_signal_unlocked( VLC_OBJECT( obj ) )
 
+vlc_list_t *vlc_list_find( vlc_object_t *, int, int ); /* legacy */
+
 void vlc_trace (const char *fn, const char *file, unsigned line);
 #define vlc_backtrace() vlc_trace(__func__, __FILE__, __LINE__)
 
