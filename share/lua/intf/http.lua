@@ -277,7 +277,7 @@ local u = vlc.net.url_parse( config.host or "localhost:8080" )
 h = vlc.httpd(u.host,u.port)
 load_dir( http_dir )
 
-while not die do die = vlc.misc.lock_and_wait() end -- everything happens in callbacks
+while not vlc.misc.lock_and_wait() do end -- everything happens in callbacks
 
 -- FIXME: We shouldn't need to do this ourselves.
 for i=1,#files do
