@@ -850,25 +850,12 @@ MainInputManager::~MainInputManager()
 
 vout_thread_t* MainInputManager::getVout()
 {
-    vout_thread_t **pp_vout; int i_vout;
-    if( p_input && !input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
-    {
-        for( int i = 1; i < i_vout; i++ ) vlc_object_release( pp_vout[i]);
-        vout_thread_t *p_tmp = pp_vout[0];
-        free( pp_vout );
-        return p_tmp;
-    }
-    return NULL;
+    return p_input ? input_GetVout( p_input ) : NULL;
 }
 
 aout_instance_t * MainInputManager::getAout()
 {
-    aout_instance_t *p_aout;
-    if( p_input && !input_Control( p_input, INPUT_GET_AOUT, &p_aout ) )
-    {
-        return p_aout;
-    }
-    return NULL;
+    return p_input ? input_GetAout( p_input ) : NULL;
 }
 
 void MainInputManager::customEvent( QEvent *event )
