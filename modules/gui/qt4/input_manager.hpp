@@ -228,6 +228,7 @@ public:
         {
             return p_aout;
         }
+        return NULL;
     }
 private:
     MainInputManager( intf_thread_t * );
