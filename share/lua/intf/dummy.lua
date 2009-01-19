@@ -10,3 +10,5 @@ For example: vlc -I lua --lua-intf rc]]
 for line in string.gmatch(msg,"([^\n]+)\n*") do
     vlc.msg.err(line)
 end
+
+vlc.misc.quit()
