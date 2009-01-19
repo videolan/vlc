@@ -77,6 +77,8 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     positionCombo = new QComboBox;
     positionCombo->addItem( qtr( "Under the Video" ), QVariant( 0 ) );
     positionCombo->addItem( qtr( "Above the Video" ), QVariant( 1 ) );
+    positionCombo->setCurrentIndex( positionCombo->findData(
+                getSettings()->value( "MainWindow/ToolbarPos", 0 ).toInt() ) );
     mainTboxLayout->addWidget( positionCombo, 0, 2, 1, 1 );
 
     QLabel *line1Label = new QLabel( "Line 1:" );
@@ -134,6 +136,7 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     /* Buttons */
     QDialogButtonBox *okCancel = new QDialogButtonBox;
     QPushButton *okButton = new QPushButton( qtr( "Cl&ose" ), this );
+    okButton->setDefault( true );
     QPushButton *cancelButton = new QPushButton( qtr( "&Cancel" ), this );
     okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
     okCancel->addButton( cancelButton, QDialogButtonBox::RejectRole );
