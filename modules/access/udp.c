@@ -188,9 +188,8 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool    *pb_bool;
+    int64_t *pi_64;
 
     switch( i_query )
     {
@@ -203,11 +202,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pb_bool = false;
             break;
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = MTU;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = var_GetInteger( p_access, "udp-caching" ) * 1000;

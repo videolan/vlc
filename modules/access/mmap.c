@@ -292,10 +292,6 @@ static int Control (access_t *p_access, int query, va_list args)
             *((bool *)va_arg (args, bool *)) = true;
             return VLC_SUCCESS;
 
-        case ACCESS_GET_MTU:
-            *((int *)va_arg (args, int *)) = p_sys->mtu;
-            return VLC_SUCCESS;
-
         case ACCESS_GET_PTS_DELAY:
         {
             int delay_ms = var_CreateGetInteger (p_access, "file-caching");

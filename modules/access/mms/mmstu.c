@@ -251,7 +251,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     access_sys_t *p_sys = p_access->p_sys;
     bool   *pb_bool;
     bool    b_bool;
-    int          *pi_int;
     int64_t      *pi_64;
     int           i_int;
     vlc_value_t  val;
@@ -285,11 +284,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             var_Get( p_access, "mms-caching", &val );
@@ -737,7 +731,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
 
     msg_Dbg( p_access,
              "answer 0x06 flags:0x%8.8"PRIx32" media_length:%"PRIu32"s "
-             "packet_length:%zul packet_count:%"PRId32" max_bit_rate:%d "
+             "packet_length:%u packet_count:%"PRId32" max_bit_rate:%d "
              "header_size:%zu",
              p_sys->i_flags_broadcast,
              p_sys->i_media_length,

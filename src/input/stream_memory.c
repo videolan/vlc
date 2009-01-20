@@ -122,7 +122,6 @@ static int Control( stream_t *s, int i_query, va_list args )
             p_sys->i_pos = i_64;
             break;
 
-        case STREAM_GET_MTU:
         case STREAM_GET_CONTENT_TYPE:
             return VLC_EGENERIC;
 

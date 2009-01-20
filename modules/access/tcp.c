@@ -164,9 +164,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool    *pb_bool;
+    int64_t *pi_64;
 
     switch( i_query )
     {
@@ -183,12 +182,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;    /* FIXME */
-            break;
-
-        /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
             break;
 
         case ACCESS_GET_PTS_DELAY:

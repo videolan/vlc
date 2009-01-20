@@ -1053,9 +1053,8 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool    *pb_bool;
+    int64_t *pi_64;
     demux_sys_t  *p_sys = (demux_sys_t *) p_access->p_sys;
 
     switch( i_query )
@@ -1076,11 +1075,6 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
             break;
 
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = (int64_t) p_sys->i_cache * 1000;

@@ -410,12 +410,10 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
         if( p_sys->stream.p_buffer == NULL )
             goto error;
         p_sys->stream.i_used   = 0;
-        access_Control( p_access, ACCESS_GET_MTU,
-                         &p_sys->stream.i_read_size );
-        if( p_sys->stream.i_read_size <= 0 )
-            p_sys->stream.i_read_size = STREAM_READ_ATONCE;
-        else if( p_sys->stream.i_read_size <= 256 )
-            p_sys->stream.i_read_size = 256;
+        p_sys->stream.i_read_size = STREAM_READ_ATONCE;
+#if STREAM_READ_ATONCE < 256
+#   error "Invalid STREAM_READ_ATONCE value"
+#endif
 
         for( i = 0; i < STREAM_CACHE_TRACK; i++ )
         {
@@ -614,9 +612,6 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
                 assert(0);
                 return VLC_EGENERIC;
             }
-
-        case STREAM_GET_MTU:
-            return VLC_EGENERIC;
 
         case STREAM_CONTROL_ACCESS:
         {

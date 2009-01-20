@@ -243,9 +243,6 @@ static int Control (stream_t *stream, int query, va_list args)
         case STREAM_GET_SIZE:
             *(va_arg (args, int64_t *)) = 0;
             break;
-        case STREAM_GET_MTU:
-            *(va_arg (args, int *)) = 0;
-            break;
         default:
             return VLC_EGENERIC;
     }

@@ -553,9 +553,8 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool    *pb_bool;
+    int64_t *pi_64;
 
     switch( i_query )
     {
@@ -578,11 +577,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = (int64_t)var_GetInteger( p_access, "ftp-caching" ) * INT64_C(1000);

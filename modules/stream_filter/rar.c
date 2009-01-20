@@ -276,13 +276,6 @@ static int Control( stream_t *s, int i_query, va_list args )
         return VLC_SUCCESS;
     }
 
-    case STREAM_GET_MTU:
-    {
-        int *pi_mtu = (int*)va_arg( args, int* );
-        *pi_mtu = 0;
-        return VLC_SUCCESS;
-    }
-
     /* */
     case STREAM_GET_CONTENT_TYPE: /* arg1= char ** */
         return VLC_EGENERIC;

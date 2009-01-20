@@ -913,10 +913,9 @@ static int Seek( access_t *p_access, int64_t i_pos )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
-    vlc_meta_t   *p_meta;
+    bool       *pb_bool;
+    int64_t    *pi_64;
+    vlc_meta_t *p_meta;
 
     switch( i_query )
     {
@@ -941,11 +940,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = (int64_t)var_GetInteger( p_access, "http-caching" ) * 1000;
@@ -1710,7 +1704,7 @@ static void AuthParseHeader( access_t *p_access, const char *psz_header,
         const char *psz_end = strchr( psz_header, ' ' );
         if( psz_end )
             msg_Warn( p_access, "Unknown authentication scheme: '%*s'",
-                      psz_end - psz_header, psz_header );
+                      (int)(psz_end - psz_header), psz_header );
         else
             msg_Warn( p_access, "Unknown authentication scheme: '%s'",
                       psz_header );

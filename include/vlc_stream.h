@@ -89,8 +89,6 @@ enum stream_query_e
 
     STREAM_GET_SIZE,            /**< arg1= int64_t *      res=cannot fail (0 if no sense)*/
 
-    STREAM_GET_MTU,             /**< arg1= int *          res=cannot fail (0 if no sense)*/
-
     /* Special for direct access control from demuxer.
      * XXX: avoid using it by all means */
     STREAM_CONTROL_ACCESS,  /* arg1= int i_access_query, args   res: can fail
@@ -133,13 +131,6 @@ static inline int64_t stream_Size( stream_t *s )
     int64_t i_pos;
     stream_Control( s, STREAM_GET_SIZE, &i_pos );
     return i_pos;
-}
-
-static inline int stream_MTU( stream_t *s )
-{
-    int i_mtu;
-    stream_Control( s, STREAM_GET_MTU, &i_mtu );
-    return i_mtu;
 }
 
 static inline int stream_Seek( stream_t *s, int64_t i_pos )

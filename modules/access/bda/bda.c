@@ -535,10 +535,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
         pb_bool = (bool*)va_arg( args, bool* );
         *pb_bool = false;
         break;
-    case ACCESS_GET_MTU:            /* 4 */
-        pi_int = (int*)va_arg( args, int * );
-        *pi_int = 0;
-        break;
     case ACCESS_GET_PTS_DELAY:      /* 5 */
         pi_64 = (int64_t*)va_arg( args, int64_t * );
         *pi_64 = var_GetInteger( p_access, "dvb-caching" ) * 1000;

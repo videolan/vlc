@@ -929,15 +929,6 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
 
-        /* */
-        case ACCESS_GET_MTU:
-        {
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = p_cdda-> i_blocks_per_read * CDIO_CD_FRAMESIZE_RAW;
-            dbg_print( INPUT_DBG_META, "Get MTU %d", *pi_int);
-            break;
-        }
-
         case ACCESS_GET_PTS_DELAY:
         {
             int64_t *pi_64 = (int64_t*)va_arg( args, int64_t * );

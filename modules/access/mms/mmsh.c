@@ -232,7 +232,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     access_sys_t *p_sys = p_access->p_sys;
     bool   *pb_bool;
     bool    b_bool;
-    int          *pi_int;
     int64_t      *pi_64;
     int          i_int;
 
@@ -256,11 +255,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = (int64_t)var_GetInteger( p_access, "mms-caching" ) * INT64_C(1000);

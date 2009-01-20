@@ -712,7 +712,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool         *pb_bool, b_bool;
-    int          *pi_int, i_int;
+    int          i_int;
     int64_t      *pi_64;
     double       *pf1, *pf2;
     dvbpsi_pmt_t *p_pmt;
@@ -729,14 +729,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pb_bool = false;
             break;
         /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            if( p_sys->b_scan_mode )
-                *pi_int = 0;
-            else
-                *pi_int = DVB_READ_ONCE * TS_PACKET_SIZE;
-            break;
-
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = var_GetInteger( p_access, "dvb-caching" ) * 1000;

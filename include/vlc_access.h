@@ -45,8 +45,7 @@ enum access_query_e
     ACCESS_CAN_CONTROL_PACE,/* arg1= bool*    cannot fail */
 
     /* */
-    ACCESS_GET_MTU = 0x100, /* arg1= int*           cannot fail(0 if no sense)*/
-    ACCESS_GET_PTS_DELAY,   /* arg1= int64_t*       cannot fail */
+    ACCESS_GET_PTS_DELAY = 0x101,/* arg1= int64_t*       cannot fail */
     /* */
     ACCESS_GET_TITLE_INFO,  /* arg1=input_title_t*** arg2=int*      res=can fail */
     /* Meta data */

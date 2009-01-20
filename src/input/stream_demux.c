@@ -219,7 +219,6 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
     stream_sys_t *p_sys = s->p_sys;
     int64_t    *p_i64;
     bool *p_b;
-    int        *p_int;
 
     switch( i_query )
     {
@@ -258,11 +257,6 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             }
             return VLC_SUCCESS;
         }
-
-        case STREAM_GET_MTU:
-            p_int = (int*) va_arg( args, int * );
-            *p_int = 0;
-            return VLC_SUCCESS;
 
         case STREAM_CONTROL_ACCESS:
         case STREAM_GET_CONTENT_TYPE:

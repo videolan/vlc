@@ -341,9 +341,8 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool    *pb_bool;
+    int64_t *pi_64;
 
     switch( i_query )
     {
@@ -353,11 +352,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = true;
-            break;
-
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = CDDA_DATA_ONCE;
             break;
 
         case ACCESS_GET_PTS_DELAY:
