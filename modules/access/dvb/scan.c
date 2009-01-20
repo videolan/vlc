@@ -145,7 +145,7 @@ void scan_Clean( scan_t *p_scan )
 
 static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
-    msg_Dbg( p_scan->p_obj, "Scan index %d", p_scan->i_index );
+    msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
     if( p_scan->i_index <= ( 10 ) )
     {
         p_cfg->i_frequency = 100500000 + ( ( p_scan->i_index ) * 700000);
