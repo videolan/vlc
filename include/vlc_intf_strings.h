@@ -77,7 +77,7 @@
 #define I_PL_ADDDIR     N_("Add directory...")
 
 #define I_PL_SAVE       N_("Save Playlist to &File...")
-#define I_PL_LOAD       N_("&Load Playlist File...")
+#define I_PL_LOAD       N_("Open Play&list...")
 
 #define I_PL_SEARCH     N_("Search")
 #define I_PL_FILTER     N_("Search Filter")
