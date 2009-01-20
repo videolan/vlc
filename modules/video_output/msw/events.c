@@ -41,6 +41,7 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
+#include <vlc_window.h>
 
 #include <windows.h>
 #include <windowsx.h>
@@ -64,7 +65,7 @@
     //WINSHELLAPI BOOL WINAPI SHFullScreen(HWND hwndRequester, DWORD dwState);
 #endif
 
-/*#if defined(UNDER_CE) && !defined(__PLUGIN__) /*FIXME*/
+/*#if defined(UNDER_CE) && !defined(__PLUGIN__) --FIXME*/
 /*#   define SHFS_SHOWSIPBUTTON 0x0004
 #   define SHFS_HIDESIPBUTTON 0x0008
 #   define MENU_HEIGHT 26
@@ -80,6 +81,7 @@ static void DirectXCloseWindow ( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
 
 static int Control( vout_thread_t *p_vout, int i_query, va_list args );
+static int vaControlParentWindow( vout_thread_t *, int, va_list );
 
 static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
 {
@@ -416,11 +418,12 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     hInstance = GetModuleHandle(NULL);
 
     /* If an external window was specified, we'll draw in it. */
-    p_vout->p_sys->hparent =
+    p_vout->p_sys->parent_window =
         vout_RequestWindow( p_vout, &p_vout->p_sys->i_window_x,
                             &p_vout->p_sys->i_window_y,
                             &p_vout->p_sys->i_window_width,
                             &p_vout->p_sys->i_window_height );
+    p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle;
 
     /* We create the window ourself, there is no previous window proc. */
     p_vout->p_sys->pf_wndproc = NULL;
@@ -598,9 +601,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     DestroyWindow( p_vout->p_sys->hwnd );
     if( p_vout->p_sys->hfswnd ) DestroyWindow( p_vout->p_sys->hfswnd );
 
-    if( p_vout->p_sys->hparent )
-        vout_ReleaseWindow( p_vout, (void *)p_vout->p_sys->hparent );
-
+    vout_ReleaseWindow( p_vout->p_sys->parent_window );
     p_vout->p_sys->hwnd = NULL;
 
     /* We don't unregister the Window Class because it could lead to race
@@ -1044,9 +1045,8 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
     case VOUT_GET_SIZE:
-        if( p_vout->p_sys->hparent )
-            return vout_ControlWindow( p_vout,
-                    (void *)p_vout->p_sys->hparent, i_query, args );
+        if( p_vout->p_sys->parent_window )
+            return vaControlParentWindow( p_vout, i_query, args );
 
         pi_width  = va_arg( args, unsigned int * );
         pi_height = va_arg( args, unsigned int * );
@@ -1058,9 +1058,8 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case VOUT_SET_SIZE:
-        if( p_vout->p_sys->hparent )
-            return vout_ControlWindow( p_vout,
-                    (void *)p_vout->p_sys->hparent, i_query, args );
+        if( p_vout->p_sys->parent_window )
+            return vaControlParentWindow( p_vout, i_query, args );
 
         /* Update dimensions */
         rect_window.top = rect_window.left = 0;
@@ -1121,12 +1120,12 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                           SWP_FRAMECHANGED );
         }
 
-        return vout_vaControlDefault( p_vout, i_query, args );
+        vout_ReleaseWindow( p_vout->p_sys->parent_window );
+        return VLC_SUCCESS;
 
     case VOUT_SET_STAY_ON_TOP:
         if( p_vout->p_sys->hparent && !var_GetBool( p_vout, "fullscreen" ) )
-            return vout_ControlWindow( p_vout,
-                    (void *)p_vout->p_sys->hparent, i_query, args );
+            return vaControlParentWindow( p_vout, i_query, args );
 
         p_vout->p_sys->b_on_top_change = true;
         return VLC_SUCCESS;
@@ -1165,13 +1164,21 @@ static void SetWindowState(HWND hwnd, int nShowCmd,WINDOWPLACEMENT window_placem
 }
 
 /* Internal wrapper to call vout_ControlWindow for hparent */
-static void ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
+static int vaControlParentWindow( vout_thread_t *p_vout, int i_query,
+                                   va_list args )
+{
+    return vout_ControlWindow( p_vout->p_sys->parent_window, i_query, args );
+}
+
+static int ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
 {
     va_list args;
+    int ret;
+
     va_start( args, i_query );
-    vout_ControlWindow( p_vout,
-        (void *)p_vout->p_sys->hparent, i_query, args );
+    ret = vaControlParentWindow( p_vout, i_query, args );
     va_end( args );
+    return ret;
 }
 
 void Win32ToggleFullscreen( vout_thread_t *p_vout )

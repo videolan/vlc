@@ -35,6 +35,7 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
+#include <vlc_window.h>
 #include <vlc_keys.h>
 
 #include <errno.h>                                                 /* ENOMEM */
@@ -1160,7 +1161,7 @@ static int ManageVideo( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_win->owner_window )
     {
         while( XCheckWindowEvent( p_vout->p_sys->p_display,
-                                  p_vout->p_sys->p_win->owner_window,
+                                  p_vout->p_sys->p_win->owner_window->handle,
                                   StructureNotifyMask, &xevent ) == True )
         {
             /* ConfigureNotify event: prepare  */
@@ -1621,9 +1622,8 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( !p_vout->b_fullscreen )
     {
-        void *ptr = vout_RequestWindow( p_vout, &p_win->i_x, &p_win->i_y,
-                                        &p_win->i_width, &p_win->i_height );
-        p_win->owner_window = (uintptr_t)ptr;
+        p_win->owner_window = vout_RequestWindow( p_vout, &p_win->i_x,
+                              &p_win->i_y, &p_win->i_width, &p_win->i_height );
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
         xsize_hints.base_height = xsize_hints.height = p_win->i_height;
         xsize_hints.flags       = PSize | PMinSize;
@@ -1638,7 +1638,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     else
     {
         /* Fullscreen window size and position */
-        p_win->owner_window = 0;
+        p_win->owner_window = NULL;
         p_win->i_x = p_win->i_y = 0;
         p_win->i_width =
             DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
@@ -1719,11 +1719,11 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         unsigned int dummy4, dummy5;
 
         /* Select events we are interested in. */
-        XSelectInput( p_vout->p_sys->p_display, p_win->owner_window,
+        XSelectInput( p_vout->p_sys->p_display, p_win->owner_window->handle,
                       StructureNotifyMask );
 
         /* Get the parent window's geometry information */
-        XGetGeometry( p_vout->p_sys->p_display, p_win->owner_window,
+        XGetGeometry( p_vout->p_sys->p_display, p_win->owner_window->handle,
                       &dummy1, &dummy2, &dummy3,
                       &p_win->i_width,
                       &p_win->i_height,
@@ -1736,7 +1736,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
          * ButtonPress event, so we need to open a new window anyway. */
         p_win->base_window =
             XCreateWindow( p_vout->p_sys->p_display,
-                           p_win->owner_window,
+                           p_win->owner_window->handle,
                            0, 0,
                            p_win->i_width, p_win->i_height,
                            0,
@@ -1883,8 +1883,7 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
     XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
 
-    if( p_win->owner_window )
-        vout_ReleaseWindow( p_vout, (void *)p_win->owner_window );
+    vout_ReleaseWindow( p_win->owner_window );
 }
 
 /*****************************************************************************
@@ -3131,8 +3130,8 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     {
         case VOUT_GET_SIZE:
             if( p_vout->p_sys->p_win->owner_window )
-                return vout_ControlWindow( p_vout,
-                    (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
+                return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
+                                           i_query, args);
 
             pi_width  = va_arg( args, unsigned int * );
             pi_height = va_arg( args, unsigned int * );
@@ -3145,8 +3144,8 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
         case VOUT_SET_SIZE:
             if( p_vout->p_sys->p_win->owner_window )
-                return vout_ControlWindow( p_vout,
-                    (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
+                return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
+                                           i_query, args);
 
             vlc_mutex_lock( &p_vout->p_sys->lock );
 
@@ -3193,17 +3192,18 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                              p_vout->p_sys->original_window.base_window,
                              d, 0, 0);
             XSync( p_vout->p_sys->p_display, False );
-            p_vout->p_sys->original_window.owner_window = 0;
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
             vlc_mutex_unlock( &p_vout->p_sys->lock );
-            return vout_vaControlDefault( p_vout, i_query, args );
+            vout_ReleaseWindow( p_vout->p_sys->p_win->owner_window );
+            p_vout->p_sys->original_window.owner_window = NULL;
+            return VLC_SUCCESS;
 
         case VOUT_SET_STAY_ON_TOP:
             if( p_vout->p_sys->p_win->owner_window )
-                return vout_ControlWindow( p_vout,
-                    (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
+                return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
+                                           i_query, args);
 
             b_arg = (bool) va_arg( args, int );
             vlc_mutex_lock( &p_vout->p_sys->lock );

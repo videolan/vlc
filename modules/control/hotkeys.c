@@ -1021,7 +1021,7 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
         vout_OSDMessage( p_input, POSITION_TEXT_CHAN, psz_time );
     }
 
-    if( !p_vout->p_window || p_vout->b_fullscreen )
+    if( p_vout->b_fullscreen )
     {
         var_Get( p_input, "position", &pos );
         vout_OSDSlider( VLC_OBJECT( p_input ), POSITION_WIDGET_CHAN,
@@ -1038,7 +1038,7 @@ static void DisplayVolume( intf_thread_t *p_intf, vout_thread_t *p_vout,
     }
     ClearChannels( p_intf, p_vout );
 
-    if( !p_vout->p_window || p_vout->b_fullscreen )
+    if( p_vout->b_fullscreen )
     {
         vout_OSDSlider( VLC_OBJECT( p_vout ), VOLUME_WIDGET_CHAN,
             i_vol*100/AOUT_VOLUME_MAX, OSD_VERT_SLIDER );

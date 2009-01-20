@@ -46,4 +46,8 @@ struct vout_window_t
     int (*control) (struct vout_window_t *, int, va_list);
 };
 
+VLC_EXPORT( vout_window_t *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
+VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_window_t * ) );
+VLC_EXPORT( int, vout_ControlWindow, ( vout_window_t *, int, va_list ) );
+
 #endif /* !LIBVLCCORE_WINDOW_H */

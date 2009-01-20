@@ -68,6 +68,8 @@ typedef struct event_thread_t
 
 #endif
 
+struct vout_window_t;
+
 /*****************************************************************************
  * vout_sys_t: video output method descriptor
  *****************************************************************************
@@ -78,6 +80,7 @@ struct vout_sys_t
 {
     HWND                 hwnd;                  /* Handle of the main window */
     HWND                 hvideownd;        /* Handle of the video sub-window */
+    struct vout_window_t *parent_window;         /* Parent window VLC object */
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
     WNDPROC              pf_wndproc;             /* Window handling callback */

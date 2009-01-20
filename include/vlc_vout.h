@@ -512,7 +512,6 @@ struct vout_thread_t
     unsigned int        i_window_height;            /**< video window height */
     unsigned int        i_alignment;          /**< video alignment in window */
 
-    struct vout_window_t *p_window;   /**< window for embedded vout (if any) */
     /**@}*/
 
     /** \name Plugin used and shortcuts to access its capabilities */
@@ -670,9 +669,6 @@ VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 
 VLC_EXPORT( int, vout_vaControlDefault, ( vout_thread_t *, int, va_list ) );
-VLC_EXPORT( void *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
-VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_thread_t *, void * ) );
-VLC_EXPORT( int, vout_ControlWindow, ( vout_thread_t *, void *, int, va_list ) );
 void vout_IntfInit( vout_thread_t * );
 VLC_EXPORT( int, vout_Snapshot, ( vout_thread_t *p_vout, picture_t *p_pic ) );
 VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,bool , bool  ) );

@@ -55,6 +55,7 @@
 #include <libosso.h>
 #endif
 
+struct vout_window_t;
 
 /*****************************************************************************
  * x11_window_t: X11 window descriptor
@@ -63,7 +64,7 @@
  *****************************************************************************/
 typedef struct x11_window_t
 {
-    Window              owner_window;               /* owner window (if any) */
+    struct vout_window_t*owner_window;               /* owner window (if any) */
     Window              base_window;                          /* base window */
     Window              video_window;     /* sub-window for displaying video */
     GC                  gc;              /* graphic context instance handler */

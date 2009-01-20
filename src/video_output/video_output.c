@@ -385,7 +385,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->b_paused = false;
     p_vout->p->i_pause_date = 0;
     p_vout->pf_control = NULL;
-    p_vout->p_window = NULL;
     p_vout->p->i_par_num =
     p_vout->p->i_par_den = 1;
     p_vout->p->p_picture_displayed = NULL;

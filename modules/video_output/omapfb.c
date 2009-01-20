@@ -50,6 +50,7 @@
 #include <vlc_plugin.h>
 #include <vlc_keys.h>
 #include <vlc_vout.h>
+#include <vlc_window.h>
 #include <vlc_playlist.h>
 
 /*****************************************************************************
@@ -160,7 +161,7 @@ struct vout_sys_t
 
     /* X11 */
     Display   *p_display;
-    Window     owner_window;
+    vout_window_t *owner_window;
     Window     window;
     mtime_t    i_time_button_last_pressed;         /* To detect double click */
 
@@ -243,7 +244,7 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_vout->p_sys->b_embed )
     {
-        vout_ReleaseWindow( p_vout, (void *)p_vout->p_sys->owner_window );
+        vout_ReleaseWindow( p_vout->p_sys->owner_window );
         if( p_vout->b_fullscreen )
             XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
         XCloseDisplay( p_vout->p_sys->p_display );
@@ -374,6 +375,10 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     switch( i_query )
     {
+       case VOUT_REPARENT:
+       case VOUT_CLOSE:
+            vout_ReleaseWindow( p_vout->p_sys->owner_window );
+            return VLC_SUCCESS;
        default:
             return vout_vaControlDefault( p_vout, i_query, args );
     }
@@ -696,7 +701,7 @@ static void CreateWindow( vout_sys_t *p_sys )
         BlackPixel( p_sys->p_display, DefaultScreen(p_sys->p_display) );
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
     p_sys->window = XCreateWindow( p_sys->p_display,
-                                   p_sys->owner_window,
+                                   p_sys->owner_window->handle,
                                    0, 0,
                                    p_sys->main_window.i_width,
                                    p_sys->main_window.i_height,
@@ -709,7 +714,7 @@ static void CreateWindow( vout_sys_t *p_sys )
     XSelectInput( p_sys->p_display, p_sys->window,
                   KeyPressMask | ButtonPressMask | StructureNotifyMask |
                   VisibilityChangeMask | FocusChangeMask );
-    XSelectInput( p_sys->p_display, p_sys->owner_window,
+    XSelectInput( p_sys->p_display, p_sys->owner_window->handle,
                   StructureNotifyMask );
     XSetInputFocus( p_sys->p_display, p_sys->window, RevertToParent, CurrentTime );
 }

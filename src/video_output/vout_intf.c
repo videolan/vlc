@@ -81,13 +81,10 @@ static int TitlePositionCallback( vlc_object_t *, char const *,
 
 /**
  * Creates a video output window.
- * On Unix systems, this returns an X11 drawable handle.
- * On Windows, this returns a Win32 window handle.
+ * On Unix systems, this is an X11 drawable (handle).
+ * On Windows, this is a Win32 window (handle).
  * Video output plugins are supposed to called this function and display the
  * video within the resulting window, while in windowed mode.
- *
- * Note that a given video output thread must not allocate more than one
- * such window at a time.
  *
  * @param p_vout video output thread to create a window for
  * @param pi_x_hint pointer to store the recommended horizontal position [OUT]
@@ -95,16 +92,14 @@ static int TitlePositionCallback( vlc_object_t *, char const *,
  * @param pi_width_hint pointer to store the recommended width [OUT]
  * @param pi_height_hint pointer to store the recommended height [OUT]
  *
- * @return a platform-specific window handle, or NULL in case of failure.
- * In case of success, the handle is released with vout_ReleaseWindow().
+ * @return a vout_window_t object, or NULL in case of failure.
+ * The window is released with vout_ReleaseWindow().
  */
-void *vout_RequestWindow( vout_thread_t *p_vout,
+vout_window_t *vout_RequestWindow( vout_thread_t *p_vout,
                           int *pi_x_hint, int *pi_y_hint,
                           unsigned int *pi_width_hint,
                           unsigned int *pi_height_hint )
 {
-    assert (p_vout->p_window == NULL);
-
     /* Get requested coordinates */
     *pi_x_hint = var_GetInteger( p_vout, "video-x" );
     *pi_y_hint = var_GetInteger( p_vout, "video-y" );
@@ -135,40 +130,31 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
         vlc_object_release (wnd);
         return NULL;
     }
-    p_vout->p_window = wnd;
     *pi_width_hint = wnd->width;
     *pi_height_hint = wnd->height;
     *pi_x_hint = wnd->pos_x;
     *pi_y_hint = wnd->pos_y;
-    return wnd->handle;
+    return wnd;
 }
 
 /**
  * Releases a window handle obtained with vout_RequestWindow().
  * @param p_vout video output thread that allocated the window
- * @param dummy unused legacy paramater
+ *               (if this is NULL; this fnction is a no-op).
  */
-void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
+void vout_ReleaseWindow( vout_window_t *wnd )
 {
-    vout_window_t *wnd = p_vout->p_window;
-
     if (wnd == NULL)
         return;
-    p_vout->p_window = NULL;
 
     assert (wnd->module);
     module_unneed (wnd, wnd->module);
 
     vlc_object_release (wnd);
-    (void)dummy;
 }
 
-int vout_ControlWindow( vout_thread_t *p_vout, void *dummy,
-                        int i_query, va_list args )
+int vout_ControlWindow( vout_window_t *wnd, int i_query, va_list args )
 {
-    (void)dummy;
-    vout_window_t *wnd = p_vout->p_window;
-
     if (wnd == NULL)
         return VLC_EGENERIC;
 
@@ -922,11 +908,6 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
     (void)args;
     switch( i_query )
     {
-    case VOUT_REPARENT:
-    case VOUT_CLOSE:
-        vout_ReleaseWindow( p_vout, NULL );
-        return VLC_SUCCESS;
-
     case VOUT_SNAPSHOT:
         p_vout->p->b_snapshot = true;
         return VLC_SUCCESS;
