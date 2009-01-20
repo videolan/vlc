@@ -236,6 +236,13 @@ sout_AnnounceUnRegister (vlc_object_t *obj, session_descriptor_t *d)
     assert (0);
 }
 
+#undef sout_EncoderCreate
+encoder_t *sout_EncoderCreate( vlc_object_t *p_this )
+{
+    msg_Err (p_this, "Encoding support not compiled-in!");
+    return NULL;
+}
+
 void sout_MethodRelease (announce_method_t *method)
 {
     (void)method;
