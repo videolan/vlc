@@ -79,18 +79,31 @@ static int TitleTimeoutCallback( vlc_object_t *, char const *,
 static int TitlePositionCallback( vlc_object_t *, char const *,
                                   vlc_value_t, vlc_value_t, void * );
 
-/*****************************************************************************
- * vout_RequestWindow: Create/Get a video window if possible.
- *****************************************************************************
- * This function looks for the main interface and tries to request
- * a new video window. If it fails then the vout will still need to create the
- * window by itself.
- *****************************************************************************/
+/**
+ * Creates a video output window.
+ * On Unix systems, this returns an X11 drawable handle.
+ * On Windows, this returns a Win32 window handle.
+ * Video output plugins are supposed to called this function and display the
+ * video within the resulting window, while in windowed mode.
+ *
+ * Note that a given video output thread must not allocate more than one
+ * such window at a time.
+ *
+ * @param p_vout video output thread to create a window for
+ * @param pi_x_hint pointer to store the recommended horizontal position [OUT]
+ * @param pi_y_hint pointer to store the recommended vertical position [OUT]
+ * @param pi_width_hint pointer to store the recommended width [OUT]
+ * @param pi_height_hint pointer to store the recommended height [OUT]
+ *
+ * @return a platform-specific window handle, or NULL in case of failure.
+ * In case of success, the handle is released with vout_ReleaseWindow().
+ */
 void *vout_RequestWindow( vout_thread_t *p_vout,
                           int *pi_x_hint, int *pi_y_hint,
                           unsigned int *pi_width_hint,
                           unsigned int *pi_height_hint )
 {
+    assert (p_vout->p_window == NULL);
 
     /* Get requested coordinates */
     *pi_x_hint = var_GetInteger( p_vout, "video-x" );
@@ -130,6 +143,11 @@ void *vout_RequestWindow( vout_thread_t *p_vout,
     return wnd->handle;
 }
 
+/**
+ * Releases a window handle obtained with vout_RequestWindow().
+ * @param p_vout video output thread that allocated the window
+ * @param dummy unused legacy paramater
+ */
 void vout_ReleaseWindow( vout_thread_t *p_vout, void *dummy )
 {
     vout_window_t *wnd = p_vout->p_window;
