@@ -76,7 +76,7 @@ int   MMSTUOpen   ( access_t * );
 void  MMSTUClose  ( access_t * );
 
 
-static ssize_t Read( access_t *, uint8_t *, size_t );
+static block_t *Block( access_t * );
 static int Seek( access_t *, int64_t );
 static int Control( access_t *, int, va_list );
 
@@ -102,16 +102,12 @@ int  MMSTUOpen( access_t *p_access )
     int             i_status;
 
     /* Set up p_access */
-    p_access->pf_read = Read;
-    p_access->pf_block = NULL;
+    access_InitFields( p_access );
+    p_access->pf_read = NULL;
+    p_access->pf_block = Block;
     p_access->pf_control = Control;
     p_access->pf_seek = Seek;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
+
     p_access->p_sys = p_sys = calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys ) return VLC_ENOMEM;
 
@@ -291,7 +287,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_MTU:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = 3 * p_sys->i_packet_length;
+            *pi_int = 0;
             break;
 
         case ACCESS_GET_PTS_DELAY:
@@ -442,59 +438,53 @@ static int Seek( access_t * p_access, int64_t i_pos )
 }
 
 /*****************************************************************************
- * Read:
+ * Block:
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+static block_t *Block( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    size_t      i_data;
-    size_t      i_copy;
 
     if( p_access->info.b_eof )
+        return NULL;
+
+    if( p_access->info.i_pos < p_sys->i_header )
     {
-        return 0;
+        const size_t i_copy = p_sys->i_header - p_access->info.i_pos;
+
+        block_t *p_block = block_New( p_access, i_copy );
+        if( !p_block )
+            return NULL;
+
+        memcpy( p_block->p_buffer, &p_sys->p_header[p_access->info.i_pos], i_copy );
+        p_access->info.i_pos += i_copy;
+        return p_block;
+    }
+    else if( p_sys->p_media && p_sys->i_media_used < __MAX( p_sys->i_media, p_sys->i_packet_length ) )
+    {
+        size_t i_copy = 0;
+        size_t i_padding = 0;
+
+        if( p_sys->i_media_used < p_sys->i_media )
+            i_copy = p_sys->i_media - p_sys->i_media_used;
+        if( __MAX( p_sys->i_media, p_sys->i_media_used ) < p_sys->i_packet_length )
+            i_padding = p_sys->i_packet_length - __MAX( p_sys->i_media, p_sys->i_media_used );
+
+        block_t *p_block = block_New( p_access, i_copy + i_padding );
+        if( !p_block )
+            return NULL;
+
+        if( i_copy > 0 )
+            memcpy( &p_block->p_buffer[0], &p_sys->p_media[p_sys->i_media_used], i_copy );
+        if( i_padding > 0 )
+            memset( &p_block->p_buffer[i_copy], 0, i_padding );
+
+        p_sys->i_media_used += i_copy + i_padding;
+        p_access->info.i_pos += i_copy + i_padding;
+        return p_block;
     }
 
-    i_data = 0;
-
-    /* *** now send data if needed *** */
-    while( i_data < i_len )
-    {
-        if( p_access->info.i_pos < p_sys->i_header )
-        {
-            i_copy = __MIN( i_len, p_sys->i_header - p_access->info.i_pos );
-            memcpy( &p_buffer[i_data], &p_sys->p_header[p_access->info.i_pos], i_copy );
-            i_data += i_copy;
-            p_access->info.i_pos += i_copy;
-        }
-        else if( p_sys->i_media_used < p_sys->i_media )
-        {
-            i_copy = __MIN( i_len - i_data ,
-                            p_sys->i_media - p_sys->i_media_used );
-            memcpy( &p_buffer[i_data], &p_sys->p_media[p_sys->i_media_used], i_copy );
-            i_data += i_copy;
-            p_sys->i_media_used += i_copy;
-            p_access->info.i_pos += i_copy;
-        }
-        else if( p_sys->p_media != NULL &&
-                 p_sys->i_media_used < p_sys->i_packet_length )
-        {
-            i_copy = __MIN( i_len - i_data,
-                            p_sys->i_packet_length - p_sys->i_media_used);
-            memset( &p_buffer[i_data], 0, i_copy );
-
-            i_data += i_copy;
-            p_sys->i_media_used += i_copy;
-            p_access->info.i_pos += i_copy;
-        }
-        else if( p_access->info.b_eof ||
-                 mms_HeaderMediaRead( p_access, MMS_PACKET_MEDIA ) < 0 )
-        {
-            break;
-        }
-    }
-
-    return i_data;
+    mms_HeaderMediaRead( p_access, MMS_PACKET_MEDIA );
+    return NULL;
 }
 
 /****************************************************************************

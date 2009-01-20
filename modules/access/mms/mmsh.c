@@ -52,7 +52,7 @@
 int  MMSHOpen  ( access_t * );
 void MMSHClose ( access_t * );
 
-static ssize_t Read( access_t *, uint8_t *, size_t );
+static block_t *Block( access_t *p_access );
 static ssize_t ReadRedirect( access_t *, uint8_t *, size_t );
 static int  Seek( access_t *, int64_t );
 static int  Control( access_t *, int, va_list );
@@ -79,7 +79,7 @@ int MMSHOpen( access_t *p_access )
     char            *psz_location = NULL;
     char            *psz_proxy;
 
-    STANDARD_READ_ACCESS_INIT
+    STANDARD_BLOCK_ACCESS_INIT
 
     p_sys->i_proto= MMS_PROTO_HTTP;
     p_sys->fd     = -1;
@@ -183,6 +183,7 @@ int MMSHOpen( access_t *p_access )
 
         free( psz_location );
 
+        p_access->pf_block = NULL;
         p_access->pf_read = ReadRedirect;
         return VLC_SUCCESS;
     }
@@ -257,7 +258,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_MTU:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = 3 * p_sys->asfh.i_min_data_packet_size;
+            *pi_int = 0;
             break;
 
         case ACCESS_GET_PTS_DELAY:
@@ -336,88 +337,85 @@ static int Seek( access_t *p_access, int64_t i_pos )
 }
 
 /*****************************************************************************
- * Read:
+ * ReadRedirect:
  *****************************************************************************/
 static ssize_t ReadRedirect( access_t *p_access, uint8_t *p, size_t i_len )
 {
+    VLC_UNUSED(p_access); VLC_UNUSED(p); VLC_UNUSED(i_len);
     return 0;
 }
 
 /*****************************************************************************
- * Read:
+ * Block:
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+static block_t *Block( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    size_t       i_copy;
-    size_t       i_data = 0;
+    const unsigned i_packet_min = p_sys->asfh.i_min_data_packet_size;
 
-    if( p_access->info.b_eof )
-        return 0;
-
-    while( i_data < (size_t) i_len )
+    if( p_access->info.i_pos < p_sys->i_start + p_sys->i_header )
     {
-        if( p_access->info.i_pos < (p_sys->i_start + p_sys->i_header) )
-        {
-            int i_offset = p_access->info.i_pos - p_sys->i_start;
-            i_copy = __MIN( p_sys->i_header - i_offset,
-                            (int)((size_t)i_len - i_data) );
-            memcpy( &p_buffer[i_data], &p_sys->p_header[i_offset], i_copy );
+        const size_t i_offset = p_access->info.i_pos - p_sys->i_start;
+        const size_t i_copy = p_sys->i_header - i_offset;
 
-            i_data += i_copy;
-            p_access->info.i_pos += i_copy;
-        }
-        else if( p_sys->i_packet_used < p_sys->i_packet_length )
-        {
-            i_copy = __MIN( p_sys->i_packet_length - p_sys->i_packet_used,
-                            i_len - i_data );
-            memcpy( &p_buffer[i_data],
-                    &p_sys->p_packet[p_sys->i_packet_used],
-                    i_copy );
+        block_t *p_block = block_New( p_access, i_copy );
+        if( !p_block )
+            return NULL;
 
-            i_data += i_copy;
-            p_sys->i_packet_used += i_copy;
-            p_access->info.i_pos += i_copy;
-        }
-        else if( (p_sys->i_packet_length > 0) &&
-                 ((int)p_sys->i_packet_used < p_sys->asfh.i_min_data_packet_size) )
-        {
-            i_copy = __MIN( p_sys->asfh.i_min_data_packet_size - p_sys->i_packet_used,
-                            i_len - i_data );
-            memset( &p_buffer[i_data], 0, i_copy );
+        memcpy( p_block->p_buffer, &p_sys->p_header[i_offset], i_copy );
+        p_access->info.i_pos += i_copy;
+        return p_block;
+    }
+    else if( p_sys->i_packet_length > 0 &&
+             p_sys->i_packet_used < __MAX( p_sys->i_packet_length, i_packet_min ) )
+    {
+        size_t i_copy = 0;
+        size_t i_padding = 0;
 
-            i_data += i_copy;
-            p_sys->i_packet_used += i_copy;
-            p_access->info.i_pos += i_copy;
-        }
-        else
-        {
-            chunk_t ck;
-            if( GetPacket( p_access, &ck ) )
-            {
-                int i_ret = -1;
-                if( p_sys->b_broadcast )
-                {
-                    if( (ck.i_type == 0x4524) && (ck.i_sequence != 0) )
-                        i_ret = Restart( p_access );
-                    else if( ck.i_type == 0x4324 )
-                        i_ret = Reset( p_access );
-                }
-                if( i_ret )
-                {
-                    p_access->info.b_eof = true;
-                    return 0;
-                }
-            }
-            if( ck.i_type != 0x4424 )
-            {
-                p_sys->i_packet_used = 0;
-                p_sys->i_packet_length = 0;
-            }
-        }
+        if( p_sys->i_packet_used < p_sys->i_packet_length )
+            i_copy = p_sys->i_packet_length - p_sys->i_packet_used;
+        if( __MAX( p_sys->i_packet_used, p_sys->i_packet_length ) < i_packet_min )
+            i_padding = i_packet_min - __MAX( p_sys->i_packet_used, p_sys->i_packet_length );
+
+        block_t *p_block = block_New( p_access, i_copy + i_padding );
+        if( !p_block )
+            return NULL;
+
+        if( i_copy > 0 )
+            memcpy( &p_block->p_buffer[0], &p_sys->p_packet[p_sys->i_packet_used], i_copy );
+        if( i_padding > 0 )
+            memset( &p_block->p_buffer[i_copy], 0, i_padding );
+
+        p_sys->i_packet_used += i_copy + i_padding;
+        p_access->info.i_pos += i_copy + i_padding;
+        return p_block;
+
     }
 
-    return( i_data );
+    chunk_t ck;
+    if( GetPacket( p_access, &ck ) )
+    {
+        int i_ret = -1;
+        if( p_sys->b_broadcast )
+        {
+            if( (ck.i_type == 0x4524) && (ck.i_sequence != 0) )
+                i_ret = Restart( p_access );
+            else if( ck.i_type == 0x4324 )
+                i_ret = Reset( p_access );
+        }
+        if( i_ret )
+        {
+            p_access->info.b_eof = true;
+            return 0;
+        }
+    }
+    if( ck.i_type != 0x4424 )
+    {
+        p_sys->i_packet_used = 0;
+        p_sys->i_packet_length = 0;
+    }
+
+    return NULL;
 }
 
 /* */
@@ -705,6 +703,9 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
+
+    if( p_sys->asfh.i_min_data_packet_size <= 0 )
+        goto error;
 
      asf_StreamSelect( &p_sys->asfh,
                            var_CreateGetInteger( p_access, "mms-maxbitrate" ),
