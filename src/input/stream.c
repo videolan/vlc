@@ -967,7 +967,7 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
         }
         while( p_sys->block.i_start + p_sys->block.i_size < i_pos );
 
-        p_sys->block.i_offset = i_pos - p_sys->i_pos;
+        p_sys->block.i_offset += i_pos - p_sys->i_pos;
         p_sys->i_pos = i_pos;
 
         return VLC_SUCCESS;
