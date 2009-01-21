@@ -495,11 +495,11 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( p_input )
         vlc_object_hold( p_input );
     p_aout = THEMIM->getAout();
-
-    AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
-
     if( p_aout )
+    {
+        AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
         vlc_object_release( p_aout );
+    }
     if( p_input )
         vlc_object_release( p_input );
 
@@ -547,12 +547,13 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     p_input = THEMIM->getInput();
     if( p_input )
         vlc_object_hold( p_input );
+
     p_vout = THEMIM->getVout();
-
-    VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
-
     if( p_vout )
+    {
+        VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
         vlc_object_release( p_vout );
+    }
     if( p_input )
         vlc_object_release( p_input );
 
@@ -585,6 +586,8 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     vector<const char *> varnames;
 
     p_object = THEMIM->getInput();
+    if( p_object )
+        vlc_object_hold( p_object );
     InputAutoMenuBuilder( p_object, objects, varnames );
     PUSH_VAR( "prev-title" );
     PUSH_VAR( "next-title" );
