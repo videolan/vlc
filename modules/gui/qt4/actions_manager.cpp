@@ -53,7 +53,7 @@ void ActionsManager::doAction( int id_action )
         case STOP_ACTION:
             THEMIM->stop(); break;
         case OPEN_ACTION:
-            break;
+            THEDP->openDialog(); break;
         case PREVIOUS_ACTION:
             THEMIM->prev(); break;
         case NEXT_ACTION:
