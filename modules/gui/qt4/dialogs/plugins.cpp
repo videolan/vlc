@@ -80,7 +80,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
             this, search( QString ) );
 
     QDialogButtonBox *box = new QDialogButtonBox;
-    QPushButton *okButton = new QPushButton( "ok", this );
+    QPushButton *okButton = new QPushButton( qtr( "&Close" ), this );
     box->addButton( okButton, QDialogButtonBox::AcceptRole );
     layout->addWidget( box, 2, 2 );
 
