@@ -50,6 +50,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("FFmpeg demuxer" ) )
+    set_shortname( N_("Avformat") )
     set_capability( "demux", 2 )
     set_callbacks( OpenDemux, CloseDemux )
 
