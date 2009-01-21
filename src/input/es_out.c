@@ -867,7 +867,7 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
         if( b_teletext )
             input_SendEventTeletext( p_sys->p_input, -1 );
 
-        input_SendEventEsDel( p_input, SPU_ES, i_id );
+        input_SendEventEsDel( p_input, fmt->i_cat, i_id );
         return;
     }
 
