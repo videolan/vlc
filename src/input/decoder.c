@@ -652,7 +652,10 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
     if( !p_owner->p_clock || !i_ts )
         return i_ts;
 
-    return input_clock_GetTS( p_owner->p_clock, NULL, i_ts, INT64_MAX );
+    if( input_clock_ConvertTS( p_owner->p_clock, NULL, &i_ts, NULL, INT64_MAX ) )
+        return 0;
+
+    return i_ts;
 }
 static int DecoderGetDisplayRate( decoder_t *p_dec )
 {
@@ -1039,7 +1042,6 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     input_clock_t   *p_clock = p_owner->p_clock;
-    int i_rate = 0;
 
     vlc_assert_locked( &p_owner->lock );
 
@@ -1048,23 +1050,23 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
     if( p_clock )
     {
         const bool b_ephemere = pi_ts1 && *pi_ts0 == *pi_ts1;
+        int i_rate;
 
         if( *pi_ts0 > 0 )
-            *pi_ts0 = input_clock_GetTS( p_clock, &i_rate, *pi_ts0 + i_es_delay, i_ts_bound );
-        if( pi_ts1 && *pi_ts1 > 0 )
         {
-            if( *pi_ts0 > 0 )
-                *pi_ts1 = input_clock_GetTS( p_clock, &i_rate, *pi_ts1 + i_es_delay, INT64_MAX );
-            else
-                *pi_ts1 = 0;
+            *pi_ts0 += i_es_delay;
+            if( pi_ts1 && *pi_ts1 > 0 )
+                *pi_ts1 += i_es_delay;
+            input_clock_ConvertTS( p_clock, &i_rate, pi_ts0, pi_ts1, i_ts_bound );
+        }
+        else
+        {
+            i_rate = input_clock_GetRate( p_clock );
         }
 
         /* Do not create ephemere data because of rounding errors */
         if( !b_ephemere && pi_ts1 && *pi_ts0 == *pi_ts1 )
             *pi_ts1 += 1;
-
-        if( i_rate <= 0 )
-            i_rate = input_clock_GetRate( p_clock ); 
 
         if( pi_duration )
             *pi_duration = ( *pi_duration * i_rate +

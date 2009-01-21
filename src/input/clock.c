@@ -136,7 +136,7 @@ struct input_clock_t
      * It is used to detect unexpected stream discontinuities */
     clock_point_t last;
 
-    /* Maximal timestamp returned by input_clock_GetTS (in system unit) */
+    /* Maximal timestamp returned by input_clock_ConvertTS (in system unit) */
     mtime_t i_ts_max;
 
     /* Clock drift */
@@ -325,13 +325,15 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
 }
 
 /*****************************************************************************
- * input_clock_GetTS: manages a PTS or DTS
+ * input_clock_ConvertTS
  *****************************************************************************/
-mtime_t input_clock_GetTS( input_clock_t *cl, int *pi_rate,
-                           mtime_t i_ts, mtime_t i_ts_bound )
+int input_clock_ConvertTS( input_clock_t *cl,
+                           int *pi_rate, mtime_t *pi_ts0, mtime_t *pi_ts1,
+                           mtime_t i_ts_bound )
 {
-    mtime_t i_converted_ts;
+    mtime_t i_pts_delay;
 
+    assert( pi_ts0 );
     vlc_mutex_lock( &cl->lock );
 
     if( pi_rate )
@@ -340,24 +342,37 @@ mtime_t input_clock_GetTS( input_clock_t *cl, int *pi_rate,
     if( !cl->b_has_reference )
     {
         vlc_mutex_unlock( &cl->lock );
-        return 0;
+        *pi_ts0 = 0;
+        if( pi_ts1 )
+            *pi_ts1 = 0;
+        return VLC_EGENERIC;
     }
 
     /* */
-    i_converted_ts = ClockStreamToSystem( cl, i_ts + AvgGet( &cl->drift ) );
-    if( i_converted_ts > cl->i_ts_max )
-        cl->i_ts_max = i_converted_ts;
+    if( *pi_ts0 > 0 )
+    {
+        *pi_ts0 = ClockStreamToSystem( cl, *pi_ts0 + AvgGet( &cl->drift ) );
+        if( *pi_ts0 > cl->i_ts_max )
+            cl->i_ts_max = *pi_ts0;
+        *pi_ts0 += cl->i_pts_delay;
+    }
 
+    /* XXX we do not ipdate i_ts_max on purpose */
+    if( pi_ts1 && *pi_ts1 > 0 )
+    {
+        *pi_ts1 = ClockStreamToSystem( cl, *pi_ts1 + AvgGet( &cl->drift ) ) +
+                  cl->i_pts_delay;
+    }
+
+    i_pts_delay = cl->i_pts_delay;
     vlc_mutex_unlock( &cl->lock );
-
-    i_converted_ts += cl->i_pts_delay;
 
     /* Check ts validity */
     if( i_ts_bound != INT64_MAX &&
-        i_converted_ts >= mdate() + cl->i_pts_delay + i_ts_bound )
-        return 0;
+        *pi_ts0 > 0 && *pi_ts0 >= mdate() + cl->i_pts_delay + i_ts_bound )
+        return VLC_EGENERIC;
 
-    return i_converted_ts;
+    return VLC_SUCCESS;
 }
 /*****************************************************************************
  * input_clock_GetRate: Return current rate

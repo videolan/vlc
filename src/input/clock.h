@@ -85,14 +85,20 @@ void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date 
 void    input_clock_ChangeSystemOrigin( input_clock_t *, mtime_t i_system );
 
 /**
- * This function converts a timestamp from stream clock to system clock.
+ * This function converts a pair of timestamp from stream clock to system clock.
  *
- * If pi_rate is provided it will be field with the rate value used for
+ * If pi_rate is provided it will be filled with the rate value used for
  * the conversion.
- * If i_ts_bound is not INT64_MAX, the value will be invalidated if not
- * before mdate() + i_pts_delay + i_ts_bound.
+ * p_ts0 is a pointer to a timestamp to be converted (in place) and must be non NULL.
+ * p_ts1 is a pointer to a timestamp to be converted (in place) and can be NULL.
+ *
+ * It will return VLC_EGENERIC if i_ts_bound is not INT64_MAX and if the value *p_ts0
+ * after conversion is not before the deadline mdate() + i_pts_delay + i_ts_bound.
+ * It will also return VLC_EGENERIC if the conversion cannot be done successfully. In
+ * this case, *p_ts0 and *p_ts1 will hold an invalid timestamp.
+ * Otherwise it will return VLC_SUCCESS.
  */
-mtime_t input_clock_GetTS( input_clock_t *, int *pi_rate, mtime_t i_ts, mtime_t i_ts_bound );
+int input_clock_ConvertTS( input_clock_t *, int *pi_rate, mtime_t *pi_ts0, mtime_t *pi_ts1, mtime_t i_ts_bound );
 
 /**
  * This function returns the current rate.
