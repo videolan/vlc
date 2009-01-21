@@ -839,8 +839,9 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     /* emit check if playlist has allready started playing */
     vlc_value_t val;
     var_Change( THEPL, "playlist-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
+
     IMEvent *event = new IMEvent( ItemChanged_Type, val.i_int);
-    QApplication::postEvent( this, static_cast<QEvent*>(event) );
+    customEvent( static_cast<QEvent*>(event) );
 }
 
 MainInputManager::~MainInputManager()
