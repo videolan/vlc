@@ -165,6 +165,7 @@ public slots:
     void openDialog();
     void openDiscDialog();
     void openFileDialog();
+    void openUrlDialog();
     void openNetDialog();
     void openCaptureDialog();
 

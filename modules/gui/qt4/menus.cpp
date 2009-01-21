@@ -314,6 +314,8 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 #else
         ":/file-asym", SLOT( openFileDialog() ), "Ctrl+O" );
 #endif
+    addDPStaticEntry( menu, qtr( "Open &URL" ),
+                      NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
     addDPStaticEntry( menu, qtr( I_OPEN_FOLDER ),
         ":/folder-grey", SLOT( PLOpenDir() ), "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ),

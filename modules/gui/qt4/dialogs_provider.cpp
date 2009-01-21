@@ -45,6 +45,7 @@
 #include "dialogs/vlm.hpp"
 #include "dialogs/sout.hpp"
 #include "dialogs/open.hpp"
+#include "dialogs/openurl.hpp"
 #include "dialogs/help.hpp"
 #include "dialogs/gototime.hpp"
 #include "dialogs/podcast_configuration.hpp"
@@ -421,6 +422,31 @@ void DialogsProvider::simplePLAppendDialog()
 void DialogsProvider::simpleMLAppendDialog()
 {
     addFromSimple( false, false );
+}
+
+/* Url & Clipboard */
+/**
+ * Open a MRL.
+ * If the clipboard contains URLs, the first is automatically 'preselected'.
+ **/
+void DialogsProvider::openUrlDialog()
+{
+    OpenUrlDialog *oud = OpenUrlDialog::getInstance( p_intf->p_sys->p_mi,
+                                                     p_intf );
+    if( oud->exec() == QDialog::Accepted )
+    {
+        QString url = oud->url();
+        if( !url.isEmpty() )
+        {
+            playlist_Add( THEPL, qtu( toNativeSeparators( url ) ),
+                          NULL, !oud->shouldEnqueue() ?
+                                  ( PLAYLIST_APPEND | PLAYLIST_GO )
+                                : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
+                          PLAYLIST_END, true, false );
+            RecentsMRL::getInstance( p_intf )->addRecent(
+                                     toNativeSeparators( url ) );
+        }
+    }
 }
 
 /* Directory */

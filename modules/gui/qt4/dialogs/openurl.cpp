@@ -1,0 +1,148 @@
+/*****************************************************************************
+ * openurl.cpp: Open a MRL or clipboard content
+ *****************************************************************************
+ * Copyright © 2009 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Jean-Philippe André <jpeg@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include "dialogs/openurl.hpp"
+#include "util/customwidgets.hpp"
+
+#include <QPushButton>
+#include <QDialogButtonBox>
+#include <QApplication>
+#include <QClipboard>
+#include <QMimeData>
+#include <QList>
+#include <QUrl>
+#include <QFile>
+#include <QLabel>
+
+OpenUrlDialog *OpenUrlDialog::instance = NULL;
+
+OpenUrlDialog* OpenUrlDialog::getInstance( QWidget *parent,
+                                           intf_thread_t *p_intf,
+                                           bool bClipboard )
+{
+    /* Creation */
+    if( !instance )
+        instance = new OpenUrlDialog( parent, p_intf, bClipboard );
+    else
+        instance->bClipboard = bClipboard;
+    return instance;
+}
+
+OpenUrlDialog::OpenUrlDialog( QWidget *parent,
+                              intf_thread_t *_p_intf,
+                              bool bClipboard ) : QVLCDialog( parent, _p_intf )
+{
+    this->bClipboard = bClipboard;
+    this->setWindowTitle( qtr( "Open URL" ) );
+
+    /* Buttons */
+    QPushButton *but;
+
+    QDialogButtonBox *box = new QDialogButtonBox( this );
+    but = box->addButton( QDialogButtonBox::Ok );
+    CONNECT( but, clicked(), this, play() );
+    but = box->addButton( QDialogButtonBox::Cancel );
+    but = box->addButton( qtr( "&Enqueue" ), QDialogButtonBox::AcceptRole );
+    CONNECT( but, clicked(), this, enqueue() );
+
+    CONNECT( box, rejected(), this, reject() );
+
+    /* Info label and line edit */
+    edit = new ClickLineEdit( qtr( "Enter URL here..." ), this );
+
+    QLabel *info = new QLabel( qtr( "Please enter the URL or path "
+                                    "to the media you want to play"),
+                               this );
+
+    this->setToolTip( qtr( "If your clipboard contains a valid URL\n"
+                           "or the path to a file on your computer,\n"
+                           "it will be automatically selected." ) );
+
+    /* Layout */
+    QVBoxLayout *vlay = new QVBoxLayout( this );
+
+    vlay->addWidget( info );
+    vlay->addWidget( edit );
+    vlay->addWidget( box );
+}
+
+void OpenUrlDialog::enqueue()
+{
+    bShouldEnqueue = true;
+    lastUrl = edit->text();
+    accept();
+}
+
+void OpenUrlDialog::play()
+{
+    lastUrl = edit->text();
+    accept();
+}
+
+QString OpenUrlDialog::url() const
+{
+    return lastUrl;
+}
+
+bool OpenUrlDialog::shouldEnqueue() const
+{
+    return bShouldEnqueue;
+}
+
+/** Show Event:
+ * When the dialog is shown, try to extract an URL from the clipboard
+ * and paste it in the Edit box.
+ * showEvent can happen not only on exec() but I think it's cool to
+ * actualize the URL on showEvent (eg. change virtual desktop...)
+ **/
+void OpenUrlDialog::showEvent( QShowEvent *ev )
+{
+    (void) ev;
+    bShouldEnqueue = false;
+    edit->setFocus( Qt::OtherFocusReason );
+    if( !lastUrl.isEmpty() && edit->text().isEmpty() )
+    {
+        /* The text should not have been changed, excepted if the user
+        has clicked Cancel before */
+        edit->setText( lastUrl );
+    }
+    else
+        edit->clear();
+
+    if( bClipboard )
+    {
+        QClipboard *clipboard = QApplication::clipboard();
+        const QMimeData *data = clipboard->mimeData( QClipboard::Selection );
+        QString txt = data->text().trimmed();
+
+        if( txt.isEmpty() || ( !txt.contains("://") && !QFile::exists(txt) ) )
+            txt = clipboard->mimeData()->text().trimmed();
+
+        if( txt.contains( "://" ) || QFile::exists( txt ) )
+            edit->setText( txt );
+    }
+}

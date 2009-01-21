@@ -33,6 +33,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/gototime.moc.cpp \
 		dialogs/toolbar.moc.cpp \
 		dialogs/open.moc.cpp \
+		dialogs/openurl.moc.cpp \
 		dialogs/podcast_configuration.moc.cpp \
 		dialogs/vlm.moc.cpp \
 		components/extended_panels.moc.cpp \
@@ -199,6 +200,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/gototime.cpp \
 		dialogs/toolbar.cpp \
 		dialogs/open.cpp \
+		dialogs/openurl.cpp \
 		dialogs/vlm.cpp \
 		dialogs/podcast_configuration.cpp \
 		components/extended_panels.cpp \
@@ -241,6 +243,7 @@ noinst_HEADERS = \
 	dialogs/gototime.hpp \
 	dialogs/toolbar.hpp \
 	dialogs/open.hpp \
+	dialogs/openurl.hpp \
 	dialogs/vlm.hpp \
 	dialogs/podcast_configuration.hpp \
 	components/extended_panels.hpp \
