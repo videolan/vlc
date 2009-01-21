@@ -654,7 +654,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     controlLayout2->addWidget( inputC );
 
     controlLayout = new QHBoxLayout;
-    QString line = getSettings()->value( "FSCtoolbar", FSC_TB_DEFAULT ).toString();
+    QString line = getSettings()->value( "MainWindow/FSCtoolbar", FSC_TB_DEFAULT ).toString();
     parseAndCreate( line, controlLayout );
     controlLayout2->addLayout( controlLayout );
 
