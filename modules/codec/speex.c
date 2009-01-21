@@ -94,6 +94,7 @@ vlc_module_begin ()
 
     set_description( N_("Speex audio decoder") )
     set_capability( "decoder", 100 )
+    set_shortname( N_("Speex") )
     set_callbacks( OpenDecoder, CloseDecoder )
 
     add_submodule ()
