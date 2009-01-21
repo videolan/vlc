@@ -118,7 +118,7 @@ vlc_module_begin ()
                  true );
     add_bool( "fb-hw-accel", true, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
               true );
-    set_description( N_("GNU/Linux console framebuffer video output") )
+    set_description( N_("GNU/Linux framebuffer video output") )
     set_capability( "video output", 30 )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
