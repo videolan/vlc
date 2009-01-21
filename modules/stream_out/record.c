@@ -57,6 +57,7 @@ vlc_module_begin ()
     set_description( N_("Record stream output") )
     set_capability( "sout stream", 0 )
     add_shortcut( "record" )
+    set_shortname( N_("Record") )
 
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )

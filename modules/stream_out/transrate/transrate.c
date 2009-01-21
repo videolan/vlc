@@ -79,6 +79,7 @@ vlc_module_begin ()
     set_description( N_("MPEG2 video transrating stream output") )
     set_capability( "sout stream", 50 )
     add_shortcut( "transrate" )
+    set_shortname( N_("Transrate") )
     set_callbacks( Open, Close )
 
     add_integer( SOUT_CFG_PREFIX "vb", 3 * 100 * 1000, NULL,
