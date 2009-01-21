@@ -57,8 +57,8 @@ enum {
     SynchroChanged_Type,
     CachingEvent_Type,
     BookmarksChanged_Type,
-/*    RecordingEvent_Type,
-    ProgramChanged_Type,
+    RecordingEvent_Type,
+/*    ProgramChanged_Type,
     SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
@@ -133,6 +133,7 @@ private:
     void UpdateAout();
     void UpdateStats();
     void UpdateCaching();
+    void UpdateRecord();
 
     void AtoBLoop( int );
 
@@ -175,6 +176,7 @@ signals:
     void artChanged( QString );
     /// Play/pause status
     void statusChanged( int );
+    void recordingStateChanged( bool );
     /// Teletext
     void teletextPossible( bool );
     void teletextActivated( bool );

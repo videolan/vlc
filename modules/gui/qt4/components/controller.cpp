@@ -307,6 +307,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         CONNECT_MAP_SET( recordButton, RECORD_ACTION );
         BUTTON_SET_BAR(  recordButton );
         ENABLE_ON_INPUT( recordButton );
+        recordButton->setCheckable( true );
+        CONNECT( THEMIM->getIM(), recordingStateChanged( bool ),
+                 recordButton, setChecked( bool ) );
         widget = recordButton;
         }
         break;

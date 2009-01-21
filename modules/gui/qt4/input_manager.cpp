@@ -156,7 +156,8 @@ void InputManager::customEvent( QEvent *event )
          i_type != SynchroChanged_Type &&
          i_type != CachingEvent_Type &&
          i_type != BookmarksChanged_Type &&
-         i_type != InterfaceAoutUpdate_Type )
+         i_type != InterfaceAoutUpdate_Type &&
+         i_type != RecordingEvent_Type )
         return;
 
     if( !hasInput() ) return;
@@ -176,7 +177,8 @@ void InputManager::customEvent( QEvent *event )
           i_type != InfoChanged_Type &&
           i_type != SynchroChanged_Type &&
           i_type != BookmarksChanged_Type &&
-          i_type != InterfaceAoutUpdate_Type
+          i_type != InterfaceAoutUpdate_Type &&
+          i_type != RecordingEvent_Type
         )
         && ( i_input_id != ple->i_id ) )
         return;
@@ -246,6 +248,9 @@ void InputManager::customEvent( QEvent *event )
         break;
     case InterfaceAoutUpdate_Type:
         UpdateAout();
+        break;
+    case RecordingEvent_Type:
+        UpdateRecord();
         break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
@@ -340,10 +345,8 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         break;
 
     case INPUT_EVENT_RECORD:
-        /* This happens when a recording starts. What do we do then?
-           Display a red light? */
-        /* event = new IMEvent( RecordingEvent_Type, 0 );
-        break; */
+        event = new IMEvent( RecordingEvent_Type, 0 );
+        break;
 
     case INPUT_EVENT_PROGRAM:
         /* This is for PID changes */
@@ -583,6 +586,14 @@ inline void InputManager::UpdateMeta()
 inline void InputManager::UpdateInfo()
 {
     emit infoChanged( input_GetItem( p_input ) );
+}
+
+void InputManager::UpdateRecord()
+{
+    if( hasInput() )
+    {
+        emit recordingStateChanged( var_GetBool( p_input, "record" ) );
+    }
 }
 
 /* User update of the slider */
