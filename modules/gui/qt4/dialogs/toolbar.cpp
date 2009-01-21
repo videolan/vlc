@@ -630,6 +630,7 @@ bool DroppingController::eventFilter( QObject *obj, QEvent *event )
             }
             return true;
 
+        case QEvent::MouseButtonDblClick:
         case QEvent::EnabledChange:
         case QEvent::Hide:
         case QEvent::HideToParent:
