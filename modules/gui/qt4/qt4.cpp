@@ -355,6 +355,10 @@ static void *Thread( void *obj )
     /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
 
+    /* Detect screensize for small screens like TV or EEEpc*/
+    p_intf->p_sys->i_screenHeight =
+        app->QApplication::desktop()->availableGeometry().height();
+
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
     if( config_GetInt( p_intf, "qt-updates-notif" ) &&

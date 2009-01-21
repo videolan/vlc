@@ -68,6 +68,8 @@ struct intf_sys_t
 
     bool b_isDialogProvider; /* Qt mode or Skins mode */
 
+    int  i_screenHeight;     /* Detection of Small screens */
+
     playlist_t *p_playlist;  /* Core Playlist discussion */
 
     const char *psz_filepath; /* Last path used in dialogs */
