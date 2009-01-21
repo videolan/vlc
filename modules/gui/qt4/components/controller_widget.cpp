@@ -61,6 +61,8 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     {
         volumeSlider = new QSlider( this );
         volumeSlider->setOrientation( Qt::Horizontal );
+        volumeSlider->setMaximum( config_GetInt( p_intf, "qt-volume-complete" )
+                                  ? 400 : 200 );
     }
     volumeSlider->setMaximumSize( QSize( 200, 40 ) );
     volumeSlider->setMinimumSize( QSize( 85, 30 ) );
