@@ -58,7 +58,6 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     flatBox = new QCheckBox( qtr( "Flat Button" ) );
     bigBox = new QCheckBox( qtr( "Big Button" ) );
     shinyBox = new QCheckBox( qtr( "Native Slider" ) );
-    shinyBox->setChecked( true );
 
     boxLayout->addWidget( new WidgetListing( p_intf, this ), 0, 0, 1, -1);
     boxLayout->addWidget( flatBox, 1, 0 );

@@ -60,7 +60,7 @@ public:
     virtual ~ToolbarEditDialog();
     int getOptions() { return flatBox->isChecked() * WIDGET_FLAT +
                         bigBox->isChecked() * WIDGET_BIG +
-                        shinyBox->isChecked() * WIDGET_SHINY; }
+                        !shinyBox->isChecked() * WIDGET_SHINY; }
 private:
     ToolbarEditDialog( intf_thread_t * );
     static ToolbarEditDialog *instance;
