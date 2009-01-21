@@ -64,7 +64,7 @@ static void ShowDialog( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 vlc_module_begin ()
     set_shortname( "WinCE" )
-    set_description( (char *) _("WinCE interface module") )
+    set_description( (char *) _("WinCE interface") )
     set_capability( "interface", 100 )
     set_callbacks( Open, Close )
     add_shortcut( "wince" )

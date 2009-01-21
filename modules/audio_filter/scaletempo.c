@@ -44,7 +44,7 @@ static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
 vlc_module_begin ()
-    set_description( N_("Scale audio tempo in sync with playback rate") )
+    set_description( N_("Audio tempo scaler synched with rate") )
     set_shortname( N_("Scaletempo") )
     set_capability( "audio filter", 0 )
     set_category( CAT_AUDIO )

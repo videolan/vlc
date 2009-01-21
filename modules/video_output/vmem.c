@@ -72,7 +72,7 @@ static int  UnlockPicture ( vout_thread_t *, picture_t * );
 #define LT_DATA N_( "Data for the locking and unlocking functions" )
 
 vlc_module_begin ()
-    set_description( N_( "Video memory module" ) )
+    set_description( N_( "Video memory output" ) )
     set_shortname( N_("Video memory") )
 
     set_category( CAT_VIDEO )

@@ -77,7 +77,7 @@ static void Display   ( vout_thread_t *, picture_t * );
 
 
 vlc_module_begin ()
-    set_description( N_( "Snapshot module" ) )
+    set_description( N_( "Snapshot output" ) )
     set_shortname( N_("Snapshot") )
 
     set_category( CAT_VIDEO )

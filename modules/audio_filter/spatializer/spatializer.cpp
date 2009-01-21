@@ -62,7 +62,7 @@ static void Close( vlc_object_t * );
 #define DAMP_LONGTEXT ""
 
 vlc_module_begin ()
-    set_description( N_("spatializer") )
+    set_description( N_("Audio Spatializer") )
     set_shortname( N_("Spatializer" ) )
     set_capability( "audio filter", 0 )
     set_category( CAT_AUDIO )

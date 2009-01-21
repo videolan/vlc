@@ -45,7 +45,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
 vlc_module_begin ()
-    set_description( N_("GaLaktos visualization plugin") )
+    set_description( N_("GaLaktos visualization") )
     set_capability( "visualization", 0 )
     set_callbacks( Open, Close )
     add_shortcut( "galaktos" )

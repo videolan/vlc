@@ -415,7 +415,7 @@ static const char *const direct_pred_list_text[] =
 #endif
 
 vlc_module_begin ()
-    set_description( N_("H.264/MPEG4 AVC encoder (using x264 library)"))
+    set_description( N_("H.264/MPEG4 AVC encoder (x264)"))
     set_capability( "encoder", 200 )
     set_callbacks( Open, Close )
     set_category( CAT_INPUT )

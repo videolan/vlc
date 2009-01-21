@@ -146,7 +146,7 @@ struct sout_stream_id_t
 
 vlc_module_begin();
     set_shortname( N_("RAOP") )
-    set_description( N_("Remote Audio Output Protocol streaming plugin") );
+    set_description( N_("Remote Audio Output Protocol stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "raop" );
     set_category( CAT_SOUT );

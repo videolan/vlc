@@ -118,7 +118,7 @@ static const char *const psz_playlist_views[] = {
 
 vlc_module_begin ()
     set_shortname( "wxWidgets" )
-    set_description( N_("wxWidgets interface module") )
+    set_description( N_("wxWidgets interface") )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     set_capability( "interface", 150 )
