@@ -79,6 +79,7 @@ typedef enum buttonType_e
     REVERSE_BUTTON,
     SKIP_BACK_BUTTON,
     SKIP_FW_BUTTON,
+    QUIT_BUTTON,
     BUTTON_MAX,
 
     SPLITTER = 0x20,
@@ -99,7 +100,8 @@ typedef enum buttonType_e
 static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
     "Previous", "Next", "Slower", "Faster", "Fullscreen", "De-Fullscreen",
     "Extended panel", "Playlist", "Snapshot", "Record", "A->B Loop",
-    "Frame By Frame", "Reverse", "Skip backward" , "Skip forward" };
+    "Frame By Frame", "Reverse", "Skip backward" , "Skip forward",
+    "Quit" };
 static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     _("Stop playback"), _("Open a media"),
     _("Previous media in the playlist"),
@@ -107,11 +109,13 @@ static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     _("Toggle the video in fullscreen"), _("Toggle the video out fullscreen"),
     _("Show extended settings" ), _( "Show playlist" ), _( "Take a snapshot" ),
     _( "Record" ), _( "Loop from point A to point B continuously." ),
-    _("Frame by frame"), _("Reverse"), _("Skip backward"), _("Skip forward") };
+    _("Frame by frame"), _("Reverse"), _("Skip backward"), _("Skip forward"),
+    _("Quit") };
 static const QString iconL[BUTTON_MAX] ={ ":/play_b", ":/stop_b", ":/eject",
     ":/previous_b", ":/next_b", ":/slower", ":/faster", ":/fullscreen",
     ":/defullscreen", ":/extended", ":/playlist", ":/snapshot", ":/record",
-    ":/atob_nob", ":/frame", ":/reverse", ":/skip_back", ":/skip_fw" };
+    ":/atob_nob", ":/frame", ":/reverse", ":/skip_back", ":/skip_fw",
+    ":/quit"};
 
 enum
 {

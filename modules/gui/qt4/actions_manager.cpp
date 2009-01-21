@@ -86,6 +86,8 @@ void ActionsManager::doAction( int id_action )
             var_SetInteger( p_intf->p_libvlc, "key-pressed",
                     ACTIONID_JUMP_FORWARD_SHORT );
             break;
+        case QUIT_ACTION:
+            THEDP->quit();  break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;

@@ -399,6 +399,14 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         widget = skipFwButton;
         }
         break;
+    case QUIT_BUTTON: {
+        QToolButton *quitButton = new QToolButton;
+        setupButton( quitButton );
+        CONNECT_MAP_SET( quitButton, QUIT_ACTION );
+        BUTTON_SET_BAR(  quitButton );
+        widget = quitButton;
+        }
+        break;
     default:
         msg_Warn( p_intf, "This should not happen %i", button );
         break;

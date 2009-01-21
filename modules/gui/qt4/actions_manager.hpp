@@ -50,6 +50,7 @@ typedef enum actionType_e
     REVERSE_ACTION,
     SKIP_BACK_ACTION,
     SKIP_FW_ACTION,
+    QUIT_ACTION,
 } actionType_e;
 
 class ActionsManager : public QObject
