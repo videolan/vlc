@@ -31,6 +31,8 @@
 
 #include <QApplication>
 
+#include <assert.h>
+
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int PLItemChanged( vlc_object_t *, const char *,
@@ -141,7 +143,7 @@ void InputManager::customEvent( QEvent *event )
     int i_type = event->type();
     IMEvent *ple = static_cast<IMEvent *>(event);
 
-    if ( i_type != PositionUpdate_Type &&
+    assert( !( i_type != PositionUpdate_Type &&
          i_type != ItemChanged_Type &&
          i_type != ItemRateChanged_Type &&
          i_type != ItemTitleChanged_Type &&
@@ -157,8 +159,7 @@ void InputManager::customEvent( QEvent *event )
          i_type != CachingEvent_Type &&
          i_type != BookmarksChanged_Type &&
          i_type != InterfaceAoutUpdate_Type &&
-         i_type != RecordingEvent_Type )
-        return;
+         i_type != RecordingEvent_Type ) );
 
     if( !hasInput() ) return;
 
