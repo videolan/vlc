@@ -1052,11 +1052,11 @@ static void UpdatePtsDelay( input_thread_t *p_input )
         i_pts_delay = 0;
 
     /* Take care of audio/spu delay */
-    const int i_audio_delay = var_GetTime( p_input, "audio-delay" );
-    const int i_spu_delay   = var_GetTime( p_input, "spu-delay" );
-    const int i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
+    const mtime_t i_audio_delay = var_GetTime( p_input, "audio-delay" );
+    const mtime_t i_spu_delay   = var_GetTime( p_input, "spu-delay" );
+    const mtime_t i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
     if( i_extra_delay < 0 )
-        i_pts_delay -= i_extra_delay * INT64_C(1000);
+        i_pts_delay -= i_extra_delay;
 
     /* Update cr_average depending on the caching */
     const int i_cr_average = var_GetInteger( p_input, "cr-average" ) * i_pts_delay / DEFAULT_PTS_DELAY;
