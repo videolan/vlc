@@ -81,6 +81,8 @@ private:
 
     static PrefsDialog *instance;
 
+    bool b_small;
+
 private slots:
     void setAdvanced();
     void setSmall();

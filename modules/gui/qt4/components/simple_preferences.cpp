@@ -38,18 +38,18 @@
 #include <QToolButton>
 #include <QButtonGroup>
 #include <QVBoxLayout>
+#include <QScrollArea>
 
 #include <QtAlgorithms>
 
 #include <string>
 
 #define ICON_HEIGHT 64
-#define BUTTON_HEIGHT 74
 
 /*********************************************************************
  * The List of categories
  *********************************************************************/
-SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
+SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool small ) :
                                   QWidget( _parent ), p_intf( _p_intf )
 {
     QVBoxLayout *layout = new QVBoxLayout();
@@ -59,13 +59,15 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent ) :
     CONNECT( buttonGroup, buttonClicked ( int ),
             this, switchPanel( int ) );
 
+    short icon_height = small ? ICON_HEIGHT /2 : ICON_HEIGHT;
+
 #define ADD_CATEGORY( button, label, icon, numb )                           \
     QToolButton * button = new QToolButton( this );                         \
     button->setIcon( QIcon( ":/pixmaps/prefs/" #icon ) );                   \
-    button->setIconSize( QSize( ICON_HEIGHT , ICON_HEIGHT ) );              \
     button->setText( label );                                               \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
-    button->resize( BUTTON_HEIGHT , BUTTON_HEIGHT);                         \
+    button->setIconSize( QSize( icon_height, icon_height ) );               \
+    button->resize( icon_height + 6 , icon_height + 6 );                    \
     button->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding) ;  \
     button->setAutoRaise( true );                                           \
     button->setCheckable( true );                                           \
@@ -100,7 +102,7 @@ void SPrefsCatList::switchPanel( int i )
  * The Panels
  *********************************************************************/
 SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
-                          int _number ) : QWidget( _parent ), p_intf( _p_intf )
+                          int _number, bool small ) : QWidget( _parent ), p_intf( _p_intf )
 {
     module_config_t *p_config;
     ConfigControl *control;
@@ -556,8 +558,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
     panel_layout->addWidget( panel_label );
     panel_layout->addWidget( title_line );
-    panel_layout->addWidget( panel );
-    if( number != SPrefsHotkeys ) panel_layout->addStretch( 2 );
+
+    if( small )
+    {
+        QScrollArea *scroller= new QScrollArea;
+        scroller->setWidget( panel );
+        scroller->setWidgetResizable( true );
+        scroller->setFrameStyle( QFrame::NoFrame );
+        panel_layout->addWidget( scroller );
+    }
+    else
+    {
+        panel_layout->addWidget( panel );
+        if( number != SPrefsHotkeys ) panel_layout->addStretch( 2 );
+    }
 
     setLayout( panel_layout );
 }

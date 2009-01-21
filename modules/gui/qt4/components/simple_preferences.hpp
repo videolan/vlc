@@ -94,7 +94,7 @@ class SPrefsCatList : public QWidget
 {
     Q_OBJECT;
 public:
-    SPrefsCatList( intf_thread_t *, QWidget *);
+    SPrefsCatList( intf_thread_t *, QWidget *, bool );
     virtual ~SPrefsCatList() {};
 private:
     intf_thread_t *p_intf;
@@ -108,7 +108,7 @@ class SPrefsPanel : public QWidget
 {
     Q_OBJECT
 public:
-    SPrefsPanel( intf_thread_t *, QWidget *, int );
+    SPrefsPanel( intf_thread_t *, QWidget *, int, bool );
     virtual ~SPrefsPanel();
     void apply();
     void clean();

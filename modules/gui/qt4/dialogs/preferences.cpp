@@ -98,7 +98,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     main_layout->setColumnMinimumWidth( 1, 10 );
     main_layout->setColumnStretch( 0, 1 );
     main_layout->setColumnStretch( 1, 0 );
-    main_layout->setColumnStretch( 2, 3 );
+    main_layout->setColumnStretch( 2, 10 );
 
     main_layout->setRowStretch( 2, 4 );
 
@@ -109,6 +109,9 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     tree_panel_l->setMargin( 1 );
     main_panel_l->setLayoutMargins( 6, 0, 0, 3, 3 );
 
+    b_small = (p_intf->p_sys->i_screenHeight < 750);
+    if( b_small ) msg_Dbg( p_intf, "Small");
+    setMaximumHeight( p_intf->p_sys->i_screenHeight );
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;
 
     if( config_GetInt( p_intf, "qt-advanced-pref" ) == 1 )
@@ -123,7 +126,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     BUTTONACT( small, setSmall() );
     BUTTONACT( all, setAdvanced() );
 
-    resize( 750, sizeHint().height() );
+    resize( 780, sizeHint().height() );
 }
 
 void PrefsDialog::setAdvanced()
@@ -176,7 +179,7 @@ void PrefsDialog::setSmall()
     /* If no simple_tree, create one, connect it */
     if( !simple_tree )
     {
-         simple_tree = new SPrefsCatList( p_intf, tree_panel );
+         simple_tree = new SPrefsCatList( p_intf, tree_panel, b_small );
          CONNECT( simple_tree,
                   currentItemChanged( int ),
                   this,  changeSimplePanel( int ) );
@@ -193,7 +196,7 @@ void PrefsDialog::setSmall()
     if( !current_simple_panel )
     {
         current_simple_panel =
-            new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat );
+            new SPrefsPanel( p_intf, main_panel, SPrefsDefaultCat, b_small );
         simple_panels[SPrefsDefaultCat] =  current_simple_panel;
         main_panel_l->addWidget( current_simple_panel );
     }
@@ -211,7 +214,7 @@ void PrefsDialog::changeSimplePanel( int number )
     current_simple_panel = simple_panels[number];
     if( !current_simple_panel )
     {
-        current_simple_panel  = new SPrefsPanel( p_intf, main_panel, number );
+        current_simple_panel  = new SPrefsPanel( p_intf, main_panel, number, b_small );
         simple_panels[number] = current_simple_panel;
         main_panel_l->addWidget( current_simple_panel );
     }
