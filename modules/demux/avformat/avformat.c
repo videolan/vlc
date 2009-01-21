@@ -48,7 +48,7 @@
 vlc_module_begin ()
     add_shortcut( "ffmpeg" )
     set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("FFmpeg demuxer" ) )
     set_capability( "demux", 2 )
     set_callbacks( OpenDemux, CloseDemux )
