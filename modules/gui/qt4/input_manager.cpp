@@ -63,7 +63,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     b_video      = false;
     timeA        = 0;
     timeB        = 0;
-
+    f_cache      = -1.; /* impossible initial value, different from all */
 }
 
 InputManager::~InputManager()
