@@ -448,10 +448,12 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
  * This function will be accessed by plugins. It calculates the relative
  * position of the output window and the image window.
  */
-void vout_PlacePicture( vout_thread_t *p_vout,
+void vout_PlacePicture( const vout_thread_t *p_vout,
                         unsigned int i_width, unsigned int i_height,
-                        unsigned int *pi_x, unsigned int *pi_y,
-                        unsigned int *pi_width, unsigned int *pi_height )
+                        unsigned int *restrict pi_x,
+                        unsigned int *restrict pi_y,
+                        unsigned int *restrict pi_width,
+                        unsigned int *restrict pi_height )
 {
     if( (i_width <= 0) || (i_height <=0) )
     {
