@@ -398,14 +398,16 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                             bool with_intf )
 {
     QMenu *menu = new QMenu( current );
+    QAction *act;
     if( mi )
     {
-        QAction *act=
-            menu->addAction( QIcon( ":/playlist_menu" ), qtr( "Play&list..." ),
-                    mi, SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
+        act = menu->addAction( QIcon( ":/playlist_menu" ),
+                               qtr( "Play&list..." ), mi,
+                               SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
         act->setData( "_static_" );
     }
-    menu->addMenu( SDMenu( p_intf ) );
+    act = menu->addMenu( SDMenu( p_intf ) );
+    act->setData( "_static_" );
     /*menu->addSeparator();
     menu->addAction( qtr( "Undock from Interface" ), mi,
                      SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
