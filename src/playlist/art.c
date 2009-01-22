@@ -230,7 +230,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
         }
         else
         {
-            msg_Dbg( p_playlist, "album art saved to %s\n", psz_filename );
+            msg_Dbg( p_playlist, "album art saved to %s", psz_filename );
             input_item_SetArtURL( p_item, psz_filename );
         }
         fclose( f );
