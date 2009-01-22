@@ -119,12 +119,6 @@ void SoundWidget::updateVolume()
     }
 }
 
-void TeletextController::toggleTeletextTransparency( bool b_transparent )
-{
-    telexTransparent->setIcon( b_transparent ? QIcon( ":/tvtelx" )
-                                             : QIcon( ":/tvtelx-trans" ) );
-}
-
 void TeletextController::enableTeletextButtons( bool b_enabled )
 {
     telexOn->setChecked( b_enabled );

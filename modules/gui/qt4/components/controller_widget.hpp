@@ -72,7 +72,6 @@ private:
 
 private slots:
     void enableTeletextButtons( bool );
-    void toggleTeletextTransparency( bool );
 };
 
 #define VOLUME_MAX 200

@@ -504,13 +504,14 @@ QFrame *AbstractController::telexFrame()
     BUTTON_SET_BAR2( telexTransparent, tvtelx,
                      qtr( "Toggle Transparency " ) );
     telexTransparent->setEnabled( false );
+    telexTransparent->setCheckable( true );
     telexLayout->addWidget( telexTransparent );
 
     /* Transparency change and set */
     CONNECT( telexTransparent, clicked( bool ),
             THEMIM->getIM(), telexSetTransparency( bool ) );
     CONNECT( THEMIM->getIM(), teletextTransparencyActivated( bool ),
-            telexFrame, toggleTeletextTransparency( bool ) );
+             telexTransparent, setChecked( bool ) );
 
 
     /* Page setting */

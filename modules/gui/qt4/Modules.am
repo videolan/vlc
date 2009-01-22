@@ -137,7 +137,6 @@ DEPS_res = \
 	pixmaps/toolbar/skip_for.png \
 	pixmaps/toolbar/skip_back.png \
 	pixmaps/toolbar/tv.png \
-	pixmaps/toolbar/tvtelx-transparent.png \
 	pixmaps/toolbar/tvtelx.png \
 	pixmaps/toolbar/visu.png \
 	pixmaps/toolbar/volume-high.png \
