@@ -158,7 +158,8 @@ protected:
             msg_Dbg( p_intf, "Escp Key pressed" );
             cancel();
         }
-        else if( keyEvent->key() == Qt::Key_Return )
+        else if( keyEvent->key() == Qt::Key_Return
+              || keyEvent->key() == Qt::Key_Enter )
         {
              msg_Dbg( p_intf, "Enter Key pressed" );
              close();
@@ -197,7 +198,8 @@ protected:
             msg_Dbg( p_intf, "Escp Key pressed" );
             cancel();
         }
-        else if( keyEvent->key() == Qt::Key_Return )
+        else if( keyEvent->key() == Qt::Key_Return
+              || keyEvent->key() == Qt::Key_Enter )
         {
              msg_Dbg( p_intf, "Enter Key pressed" );
              close();
