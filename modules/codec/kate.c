@@ -346,12 +346,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int            i_ret;
 
-    msg_Dbg( p_dec, "kate: OpenDecoder");
-
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('k','a','t','e') )
     {
         return VLC_EGENERIC;
     }
+
+    msg_Dbg( p_dec, "kate: OpenDecoder");
 
     /* Set callbacks */
     p_dec->pf_decode_sub = (subpicture_t *(*)(decoder_t *, block_t **))
