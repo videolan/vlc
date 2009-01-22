@@ -115,7 +115,7 @@ static const QString iconL[BUTTON_MAX] ={ ":/play_b", ":/stop_b", ":/eject",
     ":/previous_b", ":/next_b", ":/slower", ":/faster", ":/fullscreen",
     ":/defullscreen", ":/extended", ":/playlist", ":/snapshot", ":/record",
     ":/atob_nob", ":/frame", ":/reverse", ":/skip_back", ":/skip_fw",
-    ":/quit"};
+    ":/clear" };
 
 enum
 {
