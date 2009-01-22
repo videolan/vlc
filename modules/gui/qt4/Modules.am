@@ -131,6 +131,7 @@ DEPS_res = \
 	pixmaps/toolbar/extended_16px.png \
 	pixmaps/toolbar/frame-by-frame.png \
 	pixmaps/toolbar/fullscreen.png \
+	pixmaps/toolbar/play_reverse.png \
 	pixmaps/toolbar/record_16px.png \
 	pixmaps/toolbar/snapshot.png \
 	pixmaps/toolbar/skip_for.png \
