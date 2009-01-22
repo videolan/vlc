@@ -194,6 +194,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
     list = tag->frameListMap()[ "APIC" ];
     if( list.isEmpty() )
         return;
+
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
     for( ID3v2::FrameList::Iterator iter = list.begin();
          iter != list.end(); iter++ )
@@ -202,11 +203,24 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
             dynamic_cast<ID3v2::AttachedPictureFrame*>(*iter);
         input_attachment_t *p_attachment;
 
-        const char *psz_name, *psz_mime, *psz_description;
+        const char *psz_mime;
         const char *p_data; int i_data;
+        char *psz_name, *psz_description;
 
+        // Get the mime and description of the image.
+        // If the description is empty, take the type as a description
         psz_mime = p_apic->mimeType().toCString( true );
-        psz_description = psz_name = p_apic->description().toCString( true );
+        if( p_apic->description().size() > 0 )
+            psz_description = strdup( p_apic->description().toCString( true ) );
+        else
+        {
+            if( asprintf( &psz_description, "%i", p_apic->type() ) == -1 )
+                psz_description = NULL;
+        }
+
+        if( !psz_description )
+            continue;
+        psz_name = psz_description;
 
         /* some old iTunes version not only sets incorrectly the mime type
          * or the description of the image,
@@ -216,7 +230,8 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
             !strncmp( psz_name, "\xC2\x89PNG", 5 ) )
         {
             msg_Warn( p_demux, "Invalid picture embedded by broken iTunes version" );
-            break;
+            free( psz_description );
+            continue;
         }
 
         p_data = p_apic->picture().data();
@@ -230,6 +245,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
         TAB_APPEND_CAST( (input_attachment_t**),
                          p_demux_meta->i_attachments, p_demux_meta->attachments,
                          p_attachment );
+        free( psz_description );
 
         if( pi_cover_score[p_apic->type()] > i_score )
         {
@@ -237,7 +253,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
             char *psz_url;
             if( asprintf( &psz_url, "attachment://%s",
                           p_attachment->psz_name ) == -1 )
-                break;
+                continue;
             vlc_meta_SetArtURL( p_meta, psz_url );
             free( psz_url );
         }
