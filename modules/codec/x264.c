@@ -1134,9 +1134,11 @@ static int  Open ( vlc_object_t *p_this )
     if( val.i_int >= 0 && val.i_int <= 32 )
         p_sys->param.analyse.i_luma_deadzone[1] = val.i_int;
 
+#if X264_BUILD <= 65
     var_Get( p_enc, SOUT_CFG_PREFIX "direct-8x8", &val );
     if( val.i_int >= -1 && val.i_int <= 1 )
         p_sys->param.analyse.i_direct_8x8_inference = val.i_int;
+#endif
 #endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "asm", &val );
