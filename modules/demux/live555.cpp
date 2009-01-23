@@ -235,8 +235,6 @@ static int  Open ( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = NULL;
 
-    MediaSubsessionIterator *iter   = NULL;
-    MediaSubsession         *sub    = NULL;
     int i, i_return;
     int i_error = VLC_EGENERIC;
 
@@ -1034,7 +1032,6 @@ static int SessionsSetup( demux_t *p_demux )
 static int Play( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int i;
 
     if( p_sys->rtsp )
     {
@@ -1327,7 +1324,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_RATE:
         {
             double f_scale, f_old_scale;
-            int i;
 
             if( !p_sys->rtsp || (p_sys->i_npt_length <= 0) ||
                 var_GetBool( p_demux, "rtsp-kasenna" ) )
