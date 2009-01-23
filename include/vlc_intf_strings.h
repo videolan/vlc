@@ -39,15 +39,15 @@
 
 /******************* Menus *****************/
 
-#define I_MENU_INFO  N_("Media &Information...")
-#define I_MENU_CODECINFO  N_("&Codec Information...")
-#define I_MENU_MSG   N_("&Messages...")
-#define I_MENU_EXT   N_("&Extended Settings...")
-#define I_MENU_GOTOTIME N_("Go to Specific &Time...")
-#define I_MENU_BOOKMARK N_("&Bookmarks...")
-#define I_MENU_VLM N_("&VLM Configuration...")
+#define I_MENU_INFO  N_("Media &Information")
+#define I_MENU_CODECINFO  N_("&Codec Information")
+#define I_MENU_MSG   N_("&Messages")
+#define I_MENU_EXT   N_("&Extended Settings")
+#define I_MENU_GOTOTIME N_("Go to Specific &Time")
+#define I_MENU_BOOKMARK N_("&Bookmarks")
+#define I_MENU_VLM N_("&VLM Configuration")
 
-#define I_MENU_ABOUT N_("&About...")
+#define I_MENU_ABOUT N_("&About")
 
 /* Playlist popup */
 #define I_POP_PLAY N_("Play")
@@ -82,7 +82,7 @@
 #define I_PL_SEARCH     N_("Search")
 #define I_PL_FILTER     N_("Search Filter")
 
-#define I_PL_SD         N_("Additional &Sources")
+#define I_PL_SD         N_("&Services Discovery" )
 
 /*************** Preferences *************/
 

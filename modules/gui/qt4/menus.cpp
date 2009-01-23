@@ -360,26 +360,30 @@ QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf )
 
     addDPStaticEntry( menu, qtr( I_MENU_EXT ), ":/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
-    addDPStaticEntry( menu, qtr( I_MENU_MSG ),
-        ":/messages", SLOT( messagesDialog() ),
-        "Ctrl+M" );
+
     addDPStaticEntry( menu, qtr( I_MENU_INFO ) , ":/info",
         SLOT( mediaInfoDialog() ), "Ctrl+I" );
     addDPStaticEntry( menu, qtr( I_MENU_CODECINFO ) ,
         ":/info", SLOT( mediaCodecDialog() ), "Ctrl+J" );
+
     addDPStaticEntry( menu, qtr( I_MENU_BOOKMARK ),"",
                       SLOT( bookmarksDialog() ), "Ctrl+B" );
 #ifdef ENABLE_VLM
     addDPStaticEntry( menu, qtr( I_MENU_VLM ), "", SLOT( vlmDialog() ),
         "Ctrl+W" );
 #endif
+
+    addDPStaticEntry( menu, qtr( I_MENU_MSG ),
+        ":/messages", SLOT( messagesDialog() ),
+        "Ctrl+M" );
+
     addDPStaticEntry( menu, qtr( "Plu&gins and extensions" ),
         "", SLOT( pluginDialog() ) );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
         ":/preferences", SLOT( toolbarDialog() ) );
-    addDPStaticEntry( menu, qtr( "&Preferences..." ),
+    addDPStaticEntry( menu, qtr( "&Preferences" ),
         ":/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
 
     return menu;
@@ -714,7 +718,7 @@ void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
     menu->addMenu( toolsmenu );
 #endif
 
-    QMenu *openmenu = new QMenu( qtr( "Open" ), menu );
+    QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
         ":/file-asym", SLOT( openFileDialog() ) );
     addDPStaticEntry( openmenu, qtr( I_OPEN_FOLDER ),
