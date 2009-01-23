@@ -31,6 +31,7 @@
 #include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_playlist.h>
+#include <vlc_thread.h>
 #include <vlc_window.h>
 
 #include "dialogs.hpp"
