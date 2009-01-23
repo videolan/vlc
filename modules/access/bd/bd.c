@@ -591,8 +591,8 @@ static int SetPlayItem( demux_t *p_demux, int i_mpls, int i_play_item )
 
     /* */
     const bool b_same_mpls = i_mpls == p_demux->info.i_title;
-    const bool b_same_play_item = b_same_mpls &&
-                                  i_play_item == p_sys->i_play_item;
+    //const bool b_same_play_item = b_same_mpls &&
+    //                              i_play_item == p_sys->i_play_item;
 
     /* */
     const bd_mpls_t *p_mpls = p_sys->pp_mpls[i_mpls];
@@ -633,7 +633,7 @@ static int SetPlayItem( demux_t *p_demux, int i_mpls, int i_play_item )
      * - b_same_play_item is too strict, we should check the play_items connection.
      * - a way to completely flush the demuxer is also needed !
      */
-    const bool b_same_parser = b_same_play_item && false;
+    //const bool b_same_parser = b_same_play_item && false;
     stream_t *p_parser = stream_DemuxNew( p_demux, "ts", p_sys->p_out );
     if( !p_parser )
     {
@@ -906,10 +906,13 @@ static int64_t GetMplsUniqueDuration( const bd_mpls_t *p_mpls )
     }
     return i_length;
 }
-static int SortMpls( void **pp_a, void **pp_b )
+static int SortMpls( const void *a, const void *b )
 {
-    const int64_t i_length_a = GetMplsUniqueDuration( *pp_a );
-    const int64_t i_length_b = GetMplsUniqueDuration( *pp_b );
+    const bd_mpls_t * const *pp_mpls_a = a;
+    const bd_mpls_t * const *pp_mpls_b = b;
+
+    const int64_t i_length_a = GetMplsUniqueDuration( *pp_mpls_a );
+    const int64_t i_length_b = GetMplsUniqueDuration( *pp_mpls_b );
 
     if( i_length_a == i_length_b )
         return 0;
