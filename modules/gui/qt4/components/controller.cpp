@@ -699,11 +699,12 @@ void FullscreenControllerWidget::showFSC()
     adjustSize();
     /* center down */
     int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
-    if( number != i_screennumber )
+    if( number != i_screennumber ||
+        screenRes != QApplication::desktop()->screenGeometry(number) )
     {
+        screenRes = QApplication::desktop()->screenGeometry(number);
         msg_Dbg( p_intf, "Calculation fullscreen controllers center");
         /* screen has changed, calculate new position */
-        QRect screenRes = QApplication::desktop()->screenGeometry(number);
         QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
                              screenRes.y() + screenRes.height() - height());
         move( pos );

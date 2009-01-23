@@ -264,6 +264,7 @@ private:
     int i_mouse_last_x, i_mouse_last_y;
     bool b_mouse_over;
     int i_screennumber;
+    QRect screenRes;
 
 #ifdef WIN32TRICK
     bool b_fscHidden;
