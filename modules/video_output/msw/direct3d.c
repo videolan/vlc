@@ -1387,35 +1387,37 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Setup vertices */
-    f_width  = (float)(p_vout->output.i_width) + 1;
-    f_height = (float)(p_vout->output.i_height) + 1;
+    f_width  = (float)(p_vout->output.i_width);
+    f_height = (float)(p_vout->output.i_height);
 
-    p_vertices[0].x       = 0.0f;       // left
-    p_vertices[0].y       = 0.0f;       // top
+    /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
+    /* http://www.sjbrown.co.uk/2003/05/01/fix-directx-rasterisation/ */
+    p_vertices[0].x       = -0.5f;       // left
+    p_vertices[0].y       = -0.5f;       // top
     p_vertices[0].z       = 0.0f;
     p_vertices[0].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[0].rhw     = 1.0f;
     p_vertices[0].tu      = 0.0f;
     p_vertices[0].tv      = 0.0f;
 
-    p_vertices[1].x       = f_width;    // right
-    p_vertices[1].y       = 0.0f;       // top
+    p_vertices[1].x       = f_width - 0.5f;    // right
+    p_vertices[1].y       = -0.5f;       // top
     p_vertices[1].z       = 0.0f;
     p_vertices[1].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[1].rhw     = 1.0f;
     p_vertices[1].tu      = 1.0f;
     p_vertices[1].tv      = 0.0f;
 
-    p_vertices[2].x       = f_width;    // right
-    p_vertices[2].y       = f_height;   // bottom
+    p_vertices[2].x       = f_width - 0.5f;    // right
+    p_vertices[2].y       = f_height - 0.5f;   // bottom
     p_vertices[2].z       = 0.0f;
     p_vertices[2].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[2].rhw     = 1.0f;
     p_vertices[2].tu      = 1.0f;
     p_vertices[2].tv      = 1.0f;
 
-    p_vertices[3].x       = 0.0f;       // left
-    p_vertices[3].y       = f_height;   // bottom
+    p_vertices[3].x       = -0.5f;       // left
+    p_vertices[3].y       = f_height - 0.5f;   // bottom
     p_vertices[3].z       = 0.0f;
     p_vertices[3].diffuse = D3DCOLOR_ARGB(255, 255, 255, 255);
     p_vertices[3].rhw     = 1.0f;
