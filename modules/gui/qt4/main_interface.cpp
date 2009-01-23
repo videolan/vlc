@@ -995,7 +995,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
         }
      }
      bool first = b_play;
-     foreach( QUrl url, mimeData->urls() )
+     foreach( const QUrl &url, mimeData->urls() )
      {
         QString s = toNativeSeparators( url.toLocalFile() );
 

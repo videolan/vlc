@@ -291,7 +291,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         p_arg->i_results = files.count();
         p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
         i = 0;
-        foreach( QString file, files )
+        foreach( const QString &file, files )
             p_arg->psz_results[i++] = strdup( qtu( toNativeSepNoSlash( file ) ) );
     }
 
@@ -395,7 +395,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
 {
     QStringList files = DialogsProvider::showSimpleOpen();
     int i = 0;
-    foreach( QString file, files )
+    foreach( const QString &file, files )
     {
         playlist_Add( THEPL, qtu( toNativeSeparators( file ) ), NULL,
                       go ? ( PLAYLIST_APPEND | ( i ? 0 : PLAYLIST_GO ) |
@@ -498,7 +498,7 @@ void DialogsProvider::openAPlaylist()
 {
     QStringList files = showSimpleOpen( qtr( "Open playlist..." ),
                                         EXT_FILTER_PLAYLIST );
-    foreach( QString file, files )
+    foreach( const QString &file, files )
     {
         playlist_Import( THEPL, qtu( toNativeSeparators( file ) ) );
     }
@@ -612,8 +612,7 @@ void DialogsProvider::loadSubtitlesFile()
                                       EXT_FILTER_SUBTITLE,
                                       path );
     free( path );
-    QString qsFile;
-    foreach( qsFile, qsl )
+    foreach( const QString &qsFile, qsl )
     {
         if( input_AddSubtitle( p_input, qtu( toNativeSeparators( qsFile ) ),
                     true ) )

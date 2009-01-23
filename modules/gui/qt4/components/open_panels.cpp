@@ -161,7 +161,7 @@ void FileOpenPanel::browseFileSub()
 void FileOpenPanel::updateMRL()
 {
     QString mrl = "";
-    foreach( QString file, dialogBox->selectedFiles() ) {
+    foreach( const QString &file, dialogBox->selectedFiles() ) {
          mrl += "\"" + file + "\" ";
     }
 

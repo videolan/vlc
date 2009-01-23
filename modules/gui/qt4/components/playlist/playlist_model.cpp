@@ -133,7 +133,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
     QByteArray encodedData;
     QDataStream stream( &encodedData, QIODevice::WriteOnly );
 
-    foreach( QModelIndex index, indexes ) {
+    foreach( const QModelIndex &index, indexes ) {
         if( index.isValid() && index.column() == 0 )
             stream << itemId( index );
     }
