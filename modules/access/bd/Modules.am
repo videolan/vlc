@@ -1,0 +1,10 @@
+SOURCES_access_bd = \
+    bd.c \
+    mpls.c \
+    mpls.h \
+    clpi.c \
+    clpi.h \
+    $(NULL)
+
+libvlc_LTLIBRARIES += libaccess_bd_plugin.la
+

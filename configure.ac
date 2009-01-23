@@ -5821,6 +5821,7 @@ AC_CONFIG_FILES([
 
 AC_CONFIG_FILES([
   modules/access/Makefile
+  modules/access/bd/Makefile
   modules/access/bda/Makefile
   modules/access/dshow/Makefile
   modules/access/dvb/Makefile
