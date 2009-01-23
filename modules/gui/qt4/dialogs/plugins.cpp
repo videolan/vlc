@@ -101,6 +101,9 @@ inline void PluginDialog::FillTree()
         qs_item << qfu( module_get_name( p_module, true ) )
                 << qfu( module_get_capability( p_module ) )
                 << QString::number( module_get_score( p_module ) );
+#ifndef DEBUG
+        if( qs_item.at(1).isEmpty() ) continue;
+#endif
 
         QTreeWidgetItem *item = new QTreeWidgetItem( qs_item );
         treePlugins->addTopLevelItem( item );
