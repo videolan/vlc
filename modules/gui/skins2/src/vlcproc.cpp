@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlcproc.cpp
  *****************************************************************************
- * Copyright (C) 2003 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
@@ -369,8 +369,7 @@ void VlcProc::refreshInput()
         pVarHasAudio->set( audio_es.i_int > 0 );
 
         // Refresh fullscreen status
-        vout_thread_t *pVout = (vout_thread_t *)vlc_object_find( pInput,
-                                     VLC_OBJECT_VOUT, FIND_CHILD );
+        vout_thread_t *pVout = input_GetVout( pInput );
         pVarHasVout->set( pVout != NULL );
         if( pVout )
         {
