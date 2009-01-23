@@ -743,7 +743,7 @@ static void Direct3DVoutClose( vout_thread_t *p_vout )
        IDirect3DDevice9_Release(p_vout->p_sys->p_d3ddev);
        p_vout->p_sys->p_d3ddev = NULL;
     }
- 
+
     p_vout->p_sys->hmonitor = NULL;
 }
 
@@ -1041,7 +1041,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
 
         /* fill surface with black color */
         IDirect3DDevice9_ColorFill(p_d3ddev, p_d3dsurf, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0) );
- 
+
         /* assign surface to internal structure */
         p_pic->p_sys = (void *)p_d3dsurf;
 
@@ -1397,7 +1397,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     p_vertices[0].rhw     = 1.0f;
     p_vertices[0].tu      = 0.0f;
     p_vertices[0].tv      = 0.0f;
- 
+
     p_vertices[1].x       = f_width;    // right
     p_vertices[1].y       = 0.0f;       // top
     p_vertices[1].z       = 0.0f;
@@ -1405,7 +1405,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     p_vertices[1].rhw     = 1.0f;
     p_vertices[1].tu      = 1.0f;
     p_vertices[1].tv      = 0.0f;
- 
+
     p_vertices[2].x       = f_width;    // right
     p_vertices[2].y       = f_height;   // bottom
     p_vertices[2].z       = 0.0f;
@@ -1413,7 +1413,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     p_vertices[2].rhw     = 1.0f;
     p_vertices[2].tu      = 1.0f;
     p_vertices[2].tv      = 1.0f;
- 
+
     p_vertices[3].x       = 0.0f;       // left
     p_vertices[3].y       = f_height;   // bottom
     p_vertices[3].z       = 0.0f;
@@ -1421,7 +1421,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     p_vertices[3].rhw     = 1.0f;
     p_vertices[3].tu      = 0.0f;
     p_vertices[3].tv      = 1.0f;
- 
+
     hr= IDirect3DVertexBuffer9_Unlock(p_d3dvtc);
     if( FAILED(hr) )
     {
@@ -1457,16 +1457,8 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
         IDirect3DDevice9_EndScene(p_d3ddev);
         return;
     }
- 
-    // we use FVF instead of vertex shader
-    hr = IDirect3DDevice9_SetVertexShader(p_d3ddev, NULL);
-    if( FAILED(hr) )
-    {
-        msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
-        IDirect3DDevice9_EndScene(p_d3ddev);
-        return;
-    }
 
+    // we use FVF instead of vertex shader
     hr = IDirect3DDevice9_SetFVF(p_d3ddev, D3DFVF_CUSTOMVERTEX);
     if( FAILED(hr) )
     {
