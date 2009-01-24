@@ -93,13 +93,6 @@ static void vlc_object_dump( vlc_object_t *p_this );
 /*****************************************************************************
  * Local structure lock
  *****************************************************************************/
-static void close_nocancel (int fd)
-{
-    int canc = vlc_savecancel ();
-    close (fd);
-    vlc_restorecancel (canc);
-}
-
 static void libvlc_lock (libvlc_int_t *p_libvlc)
 {
     vlc_mutex_lock (&(libvlc_priv (p_libvlc)->structure_lock));
