@@ -45,9 +45,7 @@ void system_End       ( libvlc_int_t * );
 /*
  * Legacy object stuff that is still used within libvlccore (only)
  */
-void __vlc_object_signal_unlocked (vlc_object_t *);
-#define vlc_object_signal_unlocked( obj ) \
-    __vlc_object_signal_unlocked( VLC_OBJECT( obj ) )
+#define vlc_object_signal_unlocked( obj )
 
 vlc_list_t *vlc_list_find( vlc_object_t *, int, int );
 #define VLC_OBJECT_INTF        (-4)
@@ -168,7 +166,6 @@ typedef struct vlc_object_internals_t
 
     /* Objects thread synchronization */
     vlc_mutex_t     lock;
-    vlc_cond_t      wait;
     int             pipes[2];
 
     /* Objects management */

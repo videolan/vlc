@@ -169,7 +169,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     /* Initialize mutexes and condvars */
     vlc_mutex_init( &p_priv->lock );
-    vlc_cond_init( &p_priv->wait );
     vlc_mutex_init( &p_priv->var_lock );
     vlc_cond_init( &p_priv->var_wait );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
@@ -299,7 +298,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     vlc_spin_destroy( &p_priv->ref_spin );
     vlc_mutex_destroy( &p_priv->lock );
-    vlc_cond_destroy( &p_priv->wait );
     if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
         close( p_priv->pipes[1] );
     if( p_priv->pipes[0] != -1 )
@@ -424,38 +422,6 @@ int vlc_object_waitpipe( vlc_object_t *obj )
 
 
 /**
- * Suspends until another thread calls vlc_object_signal_unlocked().
- * The thread may be woken up earlier due to limitations of the underlying
- * implementation.
- *
- * In new code, please use vlc_cond_wait() instead.
- *
- * This function is a cancellation point. In case of cancellation, the object
- * will be in locked state.
- */
-void __vlc_object_wait( vlc_object_t *obj )
-{
-    vlc_object_internals_t *priv = vlc_internals( obj );
-    vlc_assert_locked( &priv->lock);
-    vlc_cond_wait( &priv->wait, &priv->lock );
-}
-
-
-/**
- * Wakes up one thread waiting on the object. If no thread are (yet) waiting,
- * nothing happens.
- *
- * Please do not use this function in new code as we are trying to untangle
- * objects and threads. Use vlc_cond_wait() instead.
- */
-void __vlc_object_signal_unlocked( vlc_object_t *obj )
-{
-    vlc_assert_locked (&(vlc_internals(obj)->lock));
-    vlc_cond_signal( &(vlc_internals(obj)->wait) );
-}
-
-
-/**
  * Requests termination of an object, cancels the object thread, and make the
  * object wait pipe (if it exists) readable. Not a cancellation point.
  */
@@ -472,7 +438,6 @@ void __vlc_object_kill( vlc_object_t *p_this )
         p_this->b_die = true;
     }
 
-    vlc_cond_broadcast (&priv->wait);
     /* This also serves as a memory barrier toward vlc_object_alive(): */
     vlc_object_unlock( p_this );
 
