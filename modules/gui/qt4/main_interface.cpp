@@ -99,8 +99,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Set The Video In emebedded Mode or not */
     videoEmbeddedFlag = config_GetInt( p_intf, "embedded-video" );
 
-    /* Do we confine videos within a persistent resizeable window */
-    b_keep_size = config_GetInt( p_intf, "qt-keep-size" );
+    /* Does the interface resize to video size or the opposite */
+    b_keep_size = !config_GetInt( p_intf, "qt-video-autoresize" );
 
     /* Are we in the enhanced always-video mode or not ? */
     i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
