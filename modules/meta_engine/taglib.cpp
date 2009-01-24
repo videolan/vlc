@@ -204,7 +204,6 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
         input_attachment_t *p_attachment;
 
         const char *psz_mime;
-        const char *p_data; int i_data;
         char *psz_name, *psz_description;
 
         // Get the mime and description of the image.
@@ -234,17 +233,19 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
             continue;
         }
 
-        p_data = p_apic->picture().data();
-        i_data = p_apic->picture().size();
+        const ByteVector picture = p_apic->picture();
+        const char *p_data = picture.data();
+        const unsigned i_data = picture.size();
 
-        msg_Dbg( p_demux, "Found embedded art: %s (%s) is %i bytes",
+        msg_Dbg( p_demux, "Found embedded art: %s (%s) is %u bytes",
                  psz_name, psz_mime, i_data );
 
         p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
                                 psz_description, p_data, i_data );
-        TAB_APPEND_CAST( (input_attachment_t**),
-                         p_demux_meta->i_attachments, p_demux_meta->attachments,
-                         p_attachment );
+        if( p_attachment )
+            TAB_APPEND_CAST( (input_attachment_t**),
+                             p_demux_meta->i_attachments, p_demux_meta->attachments,
+                             p_attachment );
         free( psz_description );
 
         if( pi_cover_score[p_apic->type()] > i_score )
