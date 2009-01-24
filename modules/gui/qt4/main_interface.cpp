@@ -221,7 +221,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     settings->beginGroup( "MainWindow" );
     QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
 
-    /* resize to previously saved main window size if appicable */ 
+    /* resize to previously saved main window size if appicable */
     if( b_keep_size )
     {
        if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
@@ -642,7 +642,7 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    unsigned int *pi_height )
 {
     /* Request the videoWidget */
-    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, 
+    void *ret = videoWidget->request( p_nvout,pi_x, pi_y,
                                       pi_width, pi_height, b_keep_size );
     if( ret ) /* The videoWidget is available */
     {

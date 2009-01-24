@@ -132,7 +132,7 @@ private:
     bool                 visualSelectorEnabled;
     bool                 notificationEnabled; /// Systray Notifications
     bool                 bgWasVisible;
-    bool                 b_keep_size;         ///< persistent resizeable window 
+    bool                 b_keep_size;         ///< persistent resizeable window
     QSize                mainBasedSize;       ///< based Wnd (normal mode only)
     QSize                mainVideoSize;       ///< Wnd with video (all modes)
     int                  i_visualmode;        ///< Visual Mode
