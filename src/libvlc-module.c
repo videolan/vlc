@@ -678,6 +678,10 @@ static const char *const ppsz_clock_descriptions[] =
 #define RUN_TIME_LONGTEXT N_( \
     "The stream will run this duration (in seconds)." )
 
+#define INPUT_FAST_SEEK_TEXT N_("Fast seek")
+#define INPUT_FAST_SEEK_LONGTEXT N_( \
+    "Favor speed over precision while seeking" )
+
 #define INPUT_LIST_TEXT N_("Input list")
 #define INPUT_LIST_LONGTEXT N_( \
     "You can give a comma-separated list " \
@@ -1702,6 +1706,10 @@ vlc_module_begin ()
     add_integer( "run-time", 0, NULL,
                  RUN_TIME_TEXT, RUN_TIME_LONGTEXT, true );
         change_safe ()
+    add_bool( "input-fast-seek", false, NULL,
+              INPUT_FAST_SEEK_TEXT, INPUT_FAST_SEEK_LONGTEXT, false );
+        change_safe ()
+
     add_string( "input-list", NULL, NULL,
                  INPUT_LIST_TEXT, INPUT_LIST_LONGTEXT, true );
     add_string( "input-slave", NULL, NULL,

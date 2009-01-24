@@ -948,6 +948,7 @@ static void StartTitle( input_thread_t * p_input )
         msg_Warn( p_input, "invalid stop-time ignored" );
         p_input->p->i_stop = 0;
     }
+    p_input->p->b_fast_seek = var_GetBool( p_input, "input-fast-seek" );
 }
 
 static void LoadSubtitles( input_thread_t *p_input )
@@ -1585,7 +1586,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_SetTime( p_input->p->p_es_out, -1 );
             if( demux_Control( p_input->p->input.p_demux, DEMUX_SET_POSITION,
-                                f_pos ) )
+                                f_pos, !p_input->p->b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION(_OFFSET) "
                          "%2.1f%% failed", f_pos * 100 );
@@ -1624,7 +1625,8 @@ static bool Control( input_thread_t *p_input, int i_type,
             es_out_SetTime( p_input->p->p_es_out, -1 );
 
             i_ret = demux_Control( p_input->p->input.p_demux,
-                                    DEMUX_SET_TIME, i_time );
+                                   DEMUX_SET_TIME, i_time,
+                                   !p_input->p->b_fast_seek );
             if( i_ret )
             {
                 int64_t i_length;
@@ -1636,7 +1638,8 @@ static bool Control( input_thread_t *p_input, int i_type,
                 {
                     double f_pos = (double)i_time / (double)i_length;
                     i_ret = demux_Control( p_input->p->input.p_demux,
-                                            DEMUX_SET_POSITION, f_pos );
+                                            DEMUX_SET_POSITION, f_pos,
+                                            !p_input->p->b_fast_seek );
                 }
             }
             if( i_ret )
@@ -2014,7 +2017,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                         break;
                     }
                     if( demux_Control( slave->p_demux,
-                                       DEMUX_SET_TIME, i_time ) )
+                                       DEMUX_SET_TIME, i_time, true ) )
                     {
                         msg_Err( p_input, "seek failed for new slave" );
                         InputSourceClean( slave );
@@ -2760,7 +2763,7 @@ static void SlaveSeek( input_thread_t *p_input )
     {
         input_source_t *in = p_input->p->slave[i];
 
-        if( demux_Control( in->p_demux, DEMUX_SET_TIME, i_time ) )
+        if( demux_Control( in->p_demux, DEMUX_SET_TIME, i_time, true ) )
         {
             if( !in->b_eof )
                 msg_Err( p_input, "seek failed for slave %d -> EOF", i );
