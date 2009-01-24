@@ -464,6 +464,8 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter )
 
             var_Create( p_fontbuilder, "build-done", VLC_VAR_BOOL );
             var_SetBool( p_fontbuilder, "build-done", false );
+            var_Create( p_fontbuilder, "build-joined", VLC_VAR_BOOL );
+            var_SetBool( p_fontbuilder, "build-joined", false );
 
             if( vlc_thread_create( p_fontbuilder,
                                    "fontlist builder",
@@ -490,21 +492,17 @@ static void FontBuilderDetach( filter_t *p_filter, vlc_object_t *p_fontbuilder )
     vlc_mutex_lock( &fb_lock );
     if( p_fontbuilder )
     {
-        const bool b_alive = vlc_object_alive( p_fontbuilder );
-
         var_DelCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
 
         /* We wait for the thread on the first FontBuilderDetach */
-        if( b_alive )
+        if( !var_GetBool( p_fontbuilder, "build-joined" ) )
         {
-            vlc_object_kill( p_fontbuilder );
+            var_SetBool( p_fontbuilder, "build-joined", true );
             vlc_mutex_unlock( &fb_lock );
-
             /* We need to unlock otherwise we may not join (the thread waiting
              * for the lock). It is safe to unlock as no one else will try a
              * join and we have a reference on the object) */
             vlc_thread_join( p_fontbuilder );
-
             vlc_mutex_lock( &fb_lock );
         }
         vlc_object_release( p_fontbuilder );
