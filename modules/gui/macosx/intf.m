@@ -751,7 +751,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     vlc_object_kill( p_playlist );
     pl_Release( p_intf );
 
-    vlc_object_kill( p_intf->p_libvlc );
+    libvlc_Quit( p_intf->p_libvlc );
 
     [self setIntf:nil];
 

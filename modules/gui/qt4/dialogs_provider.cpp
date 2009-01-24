@@ -99,7 +99,7 @@ DialogsProvider::~DialogsProvider()
 void DialogsProvider::quit()
 {
     b_isDying = true;
-    vlc_object_kill( p_intf->p_libvlc );
+    libvlc_Quit( p_intf->p_libvlc );
 }
 
 void DialogsProvider::customEvent( QEvent *event )

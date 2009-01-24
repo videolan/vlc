@@ -293,7 +293,7 @@ static int Manage( vout_thread_t *p_vout )
                     case 'q':
                     case 'Q':
                     case GIIUC_Escape:
-                        vlc_object_kill( p_vout->p_libvlc );
+                        libvlc_Quit( p_vout->p_libvlc );
                         break;
 
                     default:

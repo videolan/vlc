@@ -46,5 +46,5 @@ void CmdQuit::execute()
     pOsFactory->getOSLoop()->exit();
 
     // Kill libvlc
-    vlc_object_kill( getIntf()->p_libvlc );
+    libvlc_Quit( getIntf()->p_libvlc );
 }

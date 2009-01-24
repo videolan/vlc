@@ -235,7 +235,7 @@ static int Manage( vout_thread_t *p_vout )
     if( keyboard_keypressed(SCANCODE_ESCAPE)
          || keyboard_keypressed(SCANCODE_Q ) )
     {
-        vlc_object_kill( p_vout->p_libvlc );
+        libvlc_Quit( p_vout->p_libvlc );
     }
 
     return VLC_SUCCESS;

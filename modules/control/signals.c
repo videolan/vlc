@@ -117,7 +117,7 @@ static void *SigThread (void *data)
             case SIGQUIT:
                 msg_Err (obj, "Caught %s signal, exiting...",
                          strsignal (signum));
-                vlc_object_kill (obj->p_libvlc);
+                libvlc_Quit (obj->p_libvlc);
                 break;
         }
     }

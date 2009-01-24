@@ -428,7 +428,7 @@ static void Run( intf_thread_t *p_intf )
                 else if( !strncmp( cl->buffer_read, "shutdown", 8 ) )
                 {
                     msg_Err( p_intf, "shutdown requested" );
-                    vlc_object_kill( p_intf->p_libvlc );
+                    libvlc_Quit( p_intf->p_libvlc );
                 }
                 else if( *cl->buffer_read == '@'
                           && strchr( cl->buffer_read, ' ' ) )

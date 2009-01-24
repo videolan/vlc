@@ -1038,7 +1038,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         case 'q':
         case 'Q':
         case KEY_EXIT:
-            vlc_object_kill( p_intf->p_libvlc );
+            libvlc_Quit( p_intf->p_libvlc );
             ReturnFalse;
 
         /* Box switching */

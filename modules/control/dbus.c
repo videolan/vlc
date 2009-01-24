@@ -125,7 +125,7 @@ vlc_module_end ()
 DBUS_METHOD( Quit )
 { /* exits vlc */
     REPLY_INIT;
-    vlc_object_kill(((vlc_object_t*)p_this)->p_libvlc);
+    libvlc_Quit(((vlc_object_t*)p_this)->p_libvlc);
     REPLY_SEND;
 }
 

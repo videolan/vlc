@@ -572,7 +572,7 @@ static void LoopRequest( playlist_t *p_playlist )
     if( var_GetBool( p_playlist, "play-and-exit" ) )
     {
         msg_Info( p_playlist, "end of playlist, exiting" );
-        vlc_object_kill( p_playlist->p_libvlc );
+        libvlc_Quit( p_playlist->p_libvlc );
     }
 }
 

@@ -347,7 +347,7 @@ gboolean onPDADeleteEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    vlc_object_kill( p_intf->p_libvlc );
+    libvlc_Quit( p_intf->p_libvlc );
     vlc_mutex_unlock( &p_intf->change_lock );
     msg_Dbg( p_intf, "about to exit vlc ... signaled" );
 

@@ -520,7 +520,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_SHUTDOWN:
                 {
                     msg_Dbg( p_intf, "requested shutdown" );
-                    vlc_object_kill( p_intf->p_libvlc );
+                    libvlc_Quit( p_intf->p_libvlc );
                     break;
                 }
 #ifdef ENABLE_VLM

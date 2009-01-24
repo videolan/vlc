@@ -159,7 +159,7 @@ static void Run( intf_thread_t *p_intf )
     free( p_intf->p_sys->psz_service );
 
     /* Make sure we exit (In case other interfaces have been spawned) */
-    vlc_object_kill( p_intf->p_libvlc );
+    libvlc_Quit( p_intf->p_libvlc );
     vlc_restorecancel( canc );
 }
 

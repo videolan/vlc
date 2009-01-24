@@ -377,7 +377,7 @@ static int Manage( vout_thread_t *p_vout )
                 playlist_Stop( p_playlist );
                 pl_Release( p_vout );
             }
-            vlc_object_kill( p_vout->p_libvlc );
+            libvlc_Quit( p_vout->p_libvlc );
             break;
         }
 #endif

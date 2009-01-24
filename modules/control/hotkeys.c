@@ -195,7 +195,7 @@ static void Run( intf_thread_t *p_intf )
         /* Quit */
         if( i_action == ACTIONID_QUIT )
         {
-            vlc_object_kill( p_intf->p_libvlc );
+            libvlc_Quit( p_intf->p_libvlc );
 
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );

@@ -243,7 +243,7 @@ bool VlcApplication::QuitRequested()
 {
     if( !fReadyToQuit )
     {
-        vlc_object_kill( p_this->p_libvlc );
+        libvlc_Quit( p_this->p_libvlc );
         return false;
     }
 
