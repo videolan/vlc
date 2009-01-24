@@ -783,7 +783,7 @@ vlc_list_t * vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     switch( i_mode & 0x000f )
     {
     case FIND_ANYWHERE:
-        return vlc_list_find (p_this->p_libvlc, i_type, FIND_CHILD);
+        return vlc_list_find (VLC_OBJECT(p_this->p_libvlc), i_type, FIND_CHILD);
 
     case FIND_CHILD:
         libvlc_lock (p_this->p_libvlc);
