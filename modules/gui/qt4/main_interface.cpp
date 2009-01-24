@@ -31,6 +31,7 @@
 
 #include "main_interface.hpp"
 #include "input_manager.hpp"
+#include "actions_manager.hpp"
 
 #include "util/customwidgets.hpp"
 #include "util/qt_dirs.hpp"
@@ -248,6 +249,8 @@ MainInterface::~MainInterface()
 
         delete playlistWidget;
     }
+
+    ActionsManager::killInstance();
 
     settings->beginGroup( "MainWindow" );
 
