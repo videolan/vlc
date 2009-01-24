@@ -63,16 +63,20 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     input_item_t *p_item = p_input->p->p_item;
 
     /* */
-    const char *psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
+    char *psz_arturl = input_item_GetArtURL( p_item );
     if( !psz_arturl || strncmp( psz_arturl, "attachment://", strlen("attachment://") ) )
     {
         msg_Err( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
+        free( psz_arturl );
         return;
     }
 
     playlist_t *p_playlist = pl_Hold( p_input );
     if( !p_playlist )
+    {
+        free( psz_arturl );
         return;
+    }
 
 
     if( input_item_IsArtFetched( p_item ) )
@@ -81,26 +85,30 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
          * condition */
         msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
         playlist_FindArtInCache( p_item );
-        pl_Release( p_playlist );
-        return;
+        goto exit;
     }
 
     /* */
     input_attachment_t *p_attachment = NULL;
+
+    vlc_mutex_lock( &p_item->lock );
     for( int i_idx = 0; i_idx < p_input->p->i_attachment; i_idx++ )
     {
         if( !strcmp( p_input->p->attachment[i_idx]->psz_name,
                      &psz_arturl[strlen("attachment://")] ) )
         {
-            p_attachment = p_input->p->attachment[i_idx];
+            p_attachment = vlc_input_attachment_Duplicate( p_input->p->attachment[i_idx] );
             break;
         }
     }
+    vlc_mutex_unlock( &p_item->lock );
+
     if( !p_attachment || p_attachment->i_data <= 0 )
     {
+        if( p_attachment )
+            vlc_input_attachment_Delete( p_attachment );
         msg_Warn( p_input, "internal input error with input_ExtractAttachmentAndCacheArt" );
-        pl_Release( p_playlist );
-        return;
+        goto exit;
     }
 
     /* */
@@ -114,6 +122,10 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     playlist_SaveArt( p_playlist, p_item,
                       p_attachment->p_data, p_attachment->i_data, psz_type );
 
-    pl_Release( p_playlist );
+    vlc_input_attachment_Delete( p_attachment );
+
+exit:
+    pl_Release( p_input );
+    free( psz_arturl );
 }
 

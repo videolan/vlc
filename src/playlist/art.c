@@ -221,7 +221,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
     }
 
     /* Dump it otherwise */
-    FILE *f = utf8_fopen( psz_filename+7, "w" );
+    FILE *f = utf8_fopen( psz_filename+7, "wb" );
     if( f )
     {
         if( fwrite( p_buffer, i_buffer, 1, f ) != 1 )

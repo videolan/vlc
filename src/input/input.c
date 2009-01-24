@@ -2822,26 +2822,26 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 
     if( !psz_arturl || *psz_arturl == '\0' )
     {
-        psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
-        if( psz_arturl )
-            psz_arturl = strdup( psz_arturl );
+        const char *psz_tmp = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
+        if( psz_tmp )
+            psz_arturl = strdup( psz_tmp );
     }
+    vlc_mutex_unlock( &p_item->lock );
 
     if( psz_arturl && *psz_arturl )
     {
-        vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_arturl );
+        input_item_SetArtURL( p_item, psz_arturl );
 
         if( !strncmp( psz_arturl, "attachment://", strlen("attachment") ) )
         {
             /* Don't look for art cover if sout
              * XXX It can change when sout has meta data support */
             if( p_input->p->p_sout && !p_input->b_preparsing )
-                vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, "" );
+                input_item_SetArtURL( p_item, "" );
             else
                 input_ExtractAttachmentAndCacheArt( p_input );
         }
     }
-    vlc_mutex_unlock( &p_item->lock );
     free( psz_arturl );
 
     if( psz_title )
