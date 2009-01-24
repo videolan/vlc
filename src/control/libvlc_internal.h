@@ -45,6 +45,7 @@ VLC_EXPORT (void, libvlc_InternalCleanup, ( libvlc_int_t * ) );
 VLC_EXPORT (void, libvlc_InternalDestroy, ( libvlc_int_t * ) );
 
 VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char * ) );
+VLC_EXPORT (void, libvlc_InternalWait, ( libvlc_int_t * ) );
 
 /***************************************************************************
  * Opaque structures for libvlc API

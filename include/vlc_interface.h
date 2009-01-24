@@ -106,6 +106,8 @@ VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 #define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)
 VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 
+VLC_EXPORT( void, libvlc_Quit, ( libvlc_int_t * ) );
+
 VLC_EXPORT( int, interaction_Register, ( intf_thread_t * ) );
 VLC_EXPORT( int, interaction_Unregister, ( intf_thread_t * ) );
 
