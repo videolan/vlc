@@ -195,9 +195,8 @@ void Dialogs::showFileGeneric( const string &rTitle, const string &rExtensions,
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-        intf_dialog_args_t *p_arg =
-            (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
-        memset( p_arg, 0, sizeof(intf_dialog_args_t) );
+        intf_dialog_args_t *p_arg = (intf_dialog_args_t*)
+                                    calloc( 1, sizeof( intf_dialog_args_t ) );
 
         p_arg->psz_title = strdup( rTitle.c_str() );
         p_arg->psz_extensions = strdup( rExtensions.c_str() );
@@ -243,7 +242,7 @@ void Dialogs::showPlaylist()
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_PLAYLIST,
-                                     0, 0 );
+                                     0, NULL );
     }
 }
 
@@ -252,7 +251,7 @@ void Dialogs::showFileSimple( bool play )
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILE_SIMPLE,
-                                     (int)play, 0 );
+                                     (int)play, NULL );
     }
 }
 
@@ -262,7 +261,7 @@ void Dialogs::showFile( bool play )
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILE,
-                                     (int)play, 0 );
+                                     (int)play, NULL );
     }
 }
 
@@ -272,7 +271,7 @@ void Dialogs::showDirectory( bool play )
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_DIRECTORY,
-                                     (int)play, 0 );
+                                     (int)play, NULL );
     }
 }
 
@@ -282,7 +281,7 @@ void Dialogs::showDisc( bool play )
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_DISC,
-                                     (int)play, 0 );
+                                     (int)play, NULL );
     }
 }
 
@@ -292,7 +291,7 @@ void Dialogs::showNet( bool play )
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_NET,
-                                     (int)play, 0 );
+                                     (int)play, NULL );
     }
 }
 
@@ -301,7 +300,7 @@ void Dialogs::showMessages()
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_MESSAGES, 0, 0 );
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_MESSAGES, 0, NULL );
     }
 }
 
@@ -310,7 +309,7 @@ void Dialogs::showPrefs()
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_PREFS, 0, 0 );
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_PREFS, 0, NULL );
     }
 }
 
@@ -319,7 +318,7 @@ void Dialogs::showFileInfo()
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILEINFO, 0, 0 );
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_FILEINFO, 0, NULL );
     }
 }
 
@@ -328,7 +327,7 @@ void Dialogs::showStreamingWizard()
 {
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
-        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_WIZARD, 0, 0 );
+        m_pProvider->pf_show_dialog( m_pProvider, INTF_DIALOG_WIZARD, 0, NULL );
     }
 }
 
@@ -338,15 +337,14 @@ void Dialogs::showPopupMenu( bool bShow, int popupType = INTF_DIALOG_POPUPMENU )
     if( m_pProvider && m_pProvider->pf_show_dialog )
     {
         m_pProvider->pf_show_dialog( m_pProvider, popupType,
-                                     (int)bShow, 0 );
+                                     (int)bShow, NULL );
     }
 }
 
 void Dialogs::showInteraction( interaction_dialog_t *p_dialog )
 {
-    intf_dialog_args_t *p_arg =
-            (intf_dialog_args_t *)malloc( sizeof(intf_dialog_args_t) );
-    memset( p_arg, 0, sizeof(intf_dialog_args_t) );
+    intf_dialog_args_t *p_arg = (intf_dialog_args_t *)
+                                calloc( 1, sizeof(intf_dialog_args_t) );
 
     p_arg->p_dialog = p_dialog;
     p_arg->p_intf = getIntf();
