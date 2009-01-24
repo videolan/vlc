@@ -32,6 +32,7 @@ Access:
  * New OSS and Alsa accesses. The v4l2 and v4l modules no longer support
    OSS or Alsa audio input. Use --input-slave alsa:// or oss:// if needed.
  * DVB scanning on linux
+ * EXPERIMENTAL Blu-Ray Disc Folder support
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
