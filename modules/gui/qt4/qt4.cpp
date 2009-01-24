@@ -215,6 +215,8 @@ vlc_module_begin ()
               false );
         change_internal ()
 
+    add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
+
     add_submodule ()
         set_description( "Dialogs provider" )
         set_capability( "dialogs provider", 51 )
