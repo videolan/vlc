@@ -484,13 +484,17 @@ static int LoopInput( playlist_t *p_playlist )
         assert( p_sys->p_input_ressource == NULL );
 
         p_sys->p_input_ressource = input_DetachRessource( p_input );
+
+        PL_UNLOCK;
+        /* We can unlock as we return VLC_EGENERIC (no event will be lost) */
+
+        /* input_ressource_t must be manipulated without playlist lock */
         if( !var_CreateGetBool( p_input, "sout-keep" ) )
             input_ressource_TerminateSout( p_sys->p_input_ressource );
 
-        /* The DelCallback must be issued without playlist lock
-         * It is not a problem as we return VLC_EGENERIC */
-        PL_UNLOCK;
+        /* The DelCallback must be issued without playlist lock */
         var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
+
         PL_LOCK;
 
         p_sys->p_input = NULL;
@@ -533,12 +537,24 @@ static void LoopRequest( playlist_t *p_playlist )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
 
-        if( p_sys->p_input_ressource )
+        if( p_sys->p_input_ressource &&
+            input_ressource_HasVout( p_sys->p_input_ressource ) )
+        {
+            /* XXX We can unlock if we don't issue the wait as we will be
+             * call again without anything else done between the calls */
+            PL_UNLOCK;
+
+            /* input_ressource_t must be manipulated without playlist lock */
             input_ressource_TerminateVout( p_sys->p_input_ressource );
 
-        if( vlc_object_alive( p_playlist ) )
-            vlc_cond_wait( &pl_priv(p_playlist)->signal,
-                           &vlc_internals(p_playlist)->lock );
+            PL_LOCK;
+        }
+        else
+        {
+            if( vlc_object_alive( p_playlist ) )
+                vlc_cond_wait( &pl_priv(p_playlist)->signal,
+                               &vlc_internals(p_playlist)->lock );
+        }
         return;
     }
 
