@@ -511,8 +511,7 @@ void DialogsProvider::saveAPlaylist()
                                    qfu( p_intf->p_sys->psz_filepath ),
                                    qtr( "XSPF playlist (*.xspf);; " ) +
                                    qtr( "M3U playlist (*.m3u);; " ) +
-                                   qtr( "HTML playlist (*.html);;" ) +
-                                   qtr( "Any (*.*) " ) );
+                                   qtr( "HTML playlist (*.html)" ) );
     qfd->setFileMode( QFileDialog::AnyFile );
     qfd->setAcceptMode( QFileDialog::AcceptSave );
     qfd->setConfirmOverwrite( true );
