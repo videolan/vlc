@@ -289,7 +289,8 @@ int bd_mpls_Parse( bd_mpls_t *p_mpls, bs_t *s, int i_id )
     /* */
     if( bs_read( s, 32 ) != 0x4d504c53 )
         return VLC_EGENERIC;
-    if( bs_read( s, 32 ) != 0x30323030 )
+    const uint32_t i_version = bs_read( s, 32 );
+    if( i_version != 0x30313030 && i_version != 0x30323030 )
         return VLC_EGENERIC;
 
     const uint32_t i_play_item_start = bs_read( s, 32 );
