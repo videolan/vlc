@@ -102,16 +102,21 @@ void CmdPlaylistSave::execute()
     if( pPlaylist != NULL )
     {
         static const char psz_xspf[] = "export-xspf",
-                          psz_m3u[] = "export-m3u";
+                          psz_m3u[] = "export-m3u",
+                          psz_html[] = "export-html";
         const char *psz_module;
         if( m_file.find( ".xsp", 0 ) != string::npos )
             psz_module = psz_xspf;
+        else if( m_file.find( "m3u", 0 ) != string::npos )
+            psz_module = psz_m3u;
+        else if( m_file.find( "html", 0 ) != string::npos )
+            psz_module = psz_html;
         else
         {
-            psz_module = psz_m3u;
-            if( m_file.find( ".m3u", 0 ) == string::npos )
-                m_file.append( ".m3u" );
+            msg_Err( getIntf(), "Impossible to recognise the file type" );
+            return;
         }
+
         playlist_Export( pPlaylist, m_file.c_str(), pPlaylist->p_local_category, psz_module );
     }
 }
