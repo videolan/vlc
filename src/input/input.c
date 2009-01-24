@@ -73,7 +73,7 @@ static void             MainLoop( input_thread_t *p_input );
 
 static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
 
-static inline int ControlPopNoLock( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
+static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
 static void       ControlReduce( input_thread_t * );
 static bool Control( input_thread_t *, int, vlc_value_t );
 
@@ -767,16 +767,15 @@ static void MainLoop( input_thread_t *p_input )
                 i_deadline = __MIN( i_intf_update, i_statistic_update );
 
             /* Handle control */
-            vlc_mutex_lock( &p_input->p->lock_control );
             ControlReduce( p_input );
-            while( !ControlPopNoLock( p_input, &i_type, &val, i_deadline ) )
+            while( !ControlPop( p_input, &i_type, &val, i_deadline ) )
             {
+
                 msg_Dbg( p_input, "control type=%d", i_type );
 
                 if( Control( p_input, i_type, val ) )
                     b_force_update = true;
             }
-            vlc_mutex_unlock( &p_input->p->lock_control );
 
             /* Update interface and statistics */
             i_current = mdate();
@@ -1403,49 +1402,47 @@ void input_ControlPush( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->p->lock_control );
 }
 
-static inline int ControlPopNoLock( input_thread_t *p_input,
-                                    int *pi_type, vlc_value_t *p_val,
-                                    mtime_t i_deadline )
+static inline int ControlPop( input_thread_t *p_input,
+                              int *pi_type, vlc_value_t *p_val,
+                              mtime_t i_deadline )
 {
+    input_thread_private_t *p_sys = p_input->p;
 
-    while( p_input->p->i_control <= 0 )
+    vlc_mutex_lock( &p_sys->lock_control );
+    while( p_sys->i_control <= 0 )
     {
-        if( !vlc_object_alive( p_input ) )
-            return VLC_EGENERIC;
-
-        if( i_deadline < 0 )
-            return VLC_EGENERIC;
-
-        if( vlc_cond_timedwait( &p_input->p->wait_control, &p_input->p->lock_control, i_deadline ) )
-            return VLC_EGENERIC;
-    }
-
-    *pi_type = p_input->p->control[0].i_type;
-    *p_val   = p_input->p->control[0].val;
-
-    p_input->p->i_control--;
-    if( p_input->p->i_control > 0 )
-    {
-        int i;
-
-        for( i = 0; i < p_input->p->i_control; i++ )
+        if( !vlc_object_alive( p_input ) || i_deadline < 0 )
         {
-            p_input->p->control[i].i_type = p_input->p->control[i+1].i_type;
-            p_input->p->control[i].val    = p_input->p->control[i+1].val;
+            vlc_mutex_unlock( &p_sys->lock_control );
+            return VLC_EGENERIC;
+        }
+
+        if( vlc_cond_timedwait( &p_sys->wait_control, &p_sys->lock_control,
+                                i_deadline ) )
+        {
+            vlc_mutex_unlock( &p_sys->lock_control );
+            return VLC_EGENERIC;
         }
     }
+
+    /* */
+    *pi_type = p_sys->control[0].i_type;
+    *p_val   = p_sys->control[0].val;
+
+    p_sys->i_control--;
+    if( p_sys->i_control > 0 )
+        memmove( &p_sys->control[0], &p_sys->control[1],
+                 sizeof(*p_sys->control) * p_sys->i_control );
+    vlc_mutex_unlock( &p_sys->lock_control );
 
     return VLC_SUCCESS;
 }
 
 static void ControlReduce( input_thread_t *p_input )
 {
-    int i;
+    vlc_mutex_lock( &p_input->p->lock_control );
 
-    if( !p_input )
-        return;
-
-    for( i = 1; i < p_input->p->i_control; i++ )
+    for( int i = 1; i < p_input->p->i_control; i++ )
     {
         const int i_lt = p_input->p->control[i-1].i_type;
         const int i_ct = p_input->p->control[i].i_type;
@@ -1481,6 +1478,7 @@ static void ControlReduce( input_thread_t *p_input )
                 */
         }
     }
+    vlc_mutex_unlock( &p_input->p->lock_control );
 }
 /* Pause input */
 static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
@@ -1536,9 +1534,7 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
         {
             /* FIXME What to do ? */
             msg_Warn( p_input, "cannot unset pause -> EOF" );
-            vlc_mutex_unlock( &p_input->p->lock_control );
             input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
-            vlc_mutex_lock( &p_input->p->lock_control );
         }
     }
 
