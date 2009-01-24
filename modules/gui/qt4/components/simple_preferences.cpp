@@ -645,7 +645,7 @@ void SPrefsPanel::apply()
                 CaC( "dvdnav-caching" );
             CaC( "tcp-caching" ); CaC( "vcd-caching" );
             CaC( "fake-caching" ); CaC( "cdda-caching" ); CaC( "file-caching" );
-            CaC( "screen-caching" ); Cac( "bd-caching" );
+            CaC( "screen-caching" ); CaC( "bd-caching" );
             CaCi( "rtsp-caching", 2 ); CaCi( "ftp-caching", 2 );
             CaCi( "http-caching", 2 );
             if (module_exists ("access_realrtsp" ))
