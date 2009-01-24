@@ -1323,8 +1323,6 @@ static int ManageVideo( vout_thread_t *p_vout )
 
                 case Button3:
                     {
-                        intf_thread_t *p_intf;
-
                         var_Get( p_vout, "mouse-button-down", &val );
                         val.i_int &= ~4;
                         var_Set( p_vout, "mouse-button-down", val );
@@ -2110,7 +2108,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         /* Getting current window position */
         Window root_win;
         Window* child_windows;
-        int num_child_windows;
+        unsigned int num_child_windows;
         Window parent_win;
         Window child_win;
         XWindowAttributes win_attr;
