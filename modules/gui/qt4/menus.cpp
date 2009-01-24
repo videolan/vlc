@@ -406,7 +406,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     if( mi )
     {
         act = menu->addAction( QIcon( ":/playlist_menu" ),
-                               qtr( "Play&list..." ), mi,
+                               qtr( "Play&list" ), mi,
                                SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
         act->setData( "_static_" );
     }
