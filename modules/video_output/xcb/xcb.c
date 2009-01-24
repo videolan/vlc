@@ -69,6 +69,7 @@ struct vout_sys_t
     xcb_window_t parent; /* parent X window */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
+    uint8_t bpp; /* bits per pixel */
 };
 
 static int Init (vout_thread_t *);
@@ -176,10 +177,68 @@ static void Close (vlc_object_t *obj)
     free (p_sys);
 }
 
+struct picture_sys_t
+{
+    xcb_image_t *image;
+};
+
+static void PictureRelease (picture_t *pic);
+
+static int PictureInit (vout_thread_t *vout, picture_t *pic)
+{
+    vout_sys_t *p_sys = vout->p_sys;
+    picture_sys_t *priv = malloc (sizeof (*p_sys));
+
+    if (priv == NULL)
+        return VLC_ENOMEM;
+
+    assert (pic->i_status == FREE_PICTURE);
+    vout_InitPicture (vout, pic, vout->output.i_chroma,
+                      vout->output.i_width, vout->output.i_height,
+                      vout->output.i_aspect);
+
+    const unsigned real_width = pic->p->i_pitch / (p_sys->bpp >> 3);
+    /* FIXME: anyway to getthing more intuitive than that?? */
+
+    /* NOTE: 32-bits scanline_pad assumed, FIXME? (see xdpyinfo) */
+    xcb_image_t *img;
+    img = xcb_image_create (real_width, pic->p->i_lines,
+                            XCB_IMAGE_FORMAT_Z_PIXMAP, 32,
+                            p_sys->screen->root_depth, p_sys->bpp, p_sys->bpp,
+#ifdef WORDS_BIGENDIAN
+                            XCB_IMAGE_ORDER_MSB_FIRST,
+#else
+                            XCB_IMAGE_ORDER_LSB_FIRST,
+#endif
+                            XCB_IMAGE_ORDER_MSB_FIRST,
+                            NULL, 0, NULL);
+
+    if (img == NULL)
+        goto error;
+
+    priv->image = img;
+    pic->p_sys = priv;
+    pic->p->p_pixels = img->data;
+    pic->pf_release = PictureRelease;
+    pic->i_status = DESTROYED_PICTURE;
+    pic->i_type = DIRECT_PICTURE;
+    return VLC_SUCCESS;
+
+error:
+    free (p_sys);
+    return VLC_EGENERIC;
+}
+
+
+/**
+ * Release picture private data
+ */
 static void PictureRelease (picture_t *pic)
 {
-    xcb_image_t *img = (xcb_image_t *)pic->p_sys;
-    xcb_image_destroy (img);
+    struct picture_sys_t *p_sys = pic->p_sys;
+
+    xcb_image_destroy (p_sys->image);
+    free (p_sys);
 }
 
 /**
@@ -212,11 +271,11 @@ static int Init (vout_thread_t *vout)
     }
 
     /* Determine our input format */
-    uint8_t depth = screen->root_depth, bpp = depth;
-    switch (depth)
+    p_sys->bpp = screen->root_depth;
+    switch (screen->root_depth)
     {
         case 24:
-            bpp = 32;
+            p_sys->bpp = 32;
         case 32: /* FIXME: untested */
             vout->output.i_chroma = VLC_FOURCC ('R', 'V', '3', '2');
             break;
@@ -226,7 +285,7 @@ static int Init (vout_thread_t *vout)
             break;
 
         case 15:
-            bpp = 16;
+            p_sys->bpp = 16;
             vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '5');
             break;
 
@@ -270,34 +329,8 @@ static int Init (vout_thread_t *vout)
     {
         picture_t *pic = vout->p_picture + I_OUTPUTPICTURES;
 
-        assert (pic->i_status == FREE_PICTURE);
-        vout_InitPicture (vout, pic, vout->output.i_chroma,
-                          vout->output.i_width, vout->output.i_height,
-                          vout->output.i_aspect);
-
-        xcb_image_t *img;
-        const unsigned real_width = pic->p->i_pitch / (bpp >> 3);
-        /* FIXME: anyway to getthing more intuitive than that?? */
-
-        /* NOTE: 32-bits scanline_pad assumed, FIXME? (see xdpyinfo) */
-        img = xcb_image_create (real_width, height, XCB_IMAGE_FORMAT_Z_PIXMAP,
-                                32, depth, bpp, bpp,
-#ifdef WORDS_BIGENDIAN
-                                XCB_IMAGE_ORDER_MSB_FIRST,
-#else
-                                XCB_IMAGE_ORDER_LSB_FIRST,
-#endif
-                                XCB_IMAGE_ORDER_MSB_FIRST,
-                                NULL, 0, NULL);
-        if (!img)
-            goto error;
-
-        pic->p_sys = (picture_sys_t *)img;
-        pic->pf_release = PictureRelease;
-        pic->p->p_pixels = img->data;
-
-        pic->i_status = DESTROYED_PICTURE;
-        pic->i_type = DIRECT_PICTURE;
+        if (PictureInit (vout, pic))
+            break;
         PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
     }
     while (I_OUTPUTPICTURES < 2);
@@ -331,7 +364,7 @@ static void Deinit (vout_thread_t *vout)
 static void Display (vout_thread_t *vout, picture_t *pic)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    xcb_image_t *img = (xcb_image_t *)pic->p_sys;
+    xcb_image_t *img = pic->p_sys->image;
     xcb_image_t *native = xcb_image_native (p_sys->conn, img, 1);
 
     if (native == NULL)
