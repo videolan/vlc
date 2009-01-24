@@ -38,6 +38,8 @@
 #include <QFile>
 #include <QLabel>
 
+#include <assert.h>
+
 OpenUrlDialog *OpenUrlDialog::instance = NULL;
 
 OpenUrlDialog* OpenUrlDialog::getInstance( QWidget *parent,
@@ -54,10 +56,10 @@ OpenUrlDialog* OpenUrlDialog::getInstance( QWidget *parent,
 
 OpenUrlDialog::OpenUrlDialog( QWidget *parent,
                               intf_thread_t *_p_intf,
-                              bool bClipboard ) : QVLCDialog( parent, _p_intf )
+                              bool _bClipboard ) :
+        QVLCDialog( parent, _p_intf ), bClipboard( _bClipboard )
 {
-    this->bClipboard = bClipboard;
-    this->setWindowTitle( qtr( "Open URL" ) );
+    setWindowTitle( qtr( "Open URL" ) );
 
     /* Buttons */
     QPushButton *but;
@@ -78,9 +80,9 @@ OpenUrlDialog::OpenUrlDialog( QWidget *parent,
                                     "to the media you want to play"),
                                this );
 
-    this->setToolTip( qtr( "If your clipboard contains a valid URL\n"
-                           "or the path to a file on your computer,\n"
-                           "it will be automatically selected." ) );
+    setToolTip( qtr( "If your clipboard contains a valid URL\n"
+                     "or the path to a file on your computer,\n"
+                     "it will be automatically selected." ) );
 
     /* Layout */
     QVBoxLayout *vlay = new QVBoxLayout( this );
@@ -136,11 +138,11 @@ void OpenUrlDialog::showEvent( QShowEvent *ev )
     if( bClipboard )
     {
         QClipboard *clipboard = QApplication::clipboard();
-        const QMimeData *data = clipboard->mimeData( QClipboard::Selection );
-        QString txt = data->text().trimmed();
+        assert( clipboard != NULL );
+        QString txt = clipboard->text( QClipboard::Selection ).trimmed();
 
         if( txt.isEmpty() || ( !txt.contains("://") && !QFile::exists(txt) ) )
-            txt = clipboard->mimeData()->text().trimmed();
+            txt = clipboard->text( QClipboard::Clipboard ).trimmed();
 
         if( txt.contains( "://" ) || QFile::exists( txt ) )
             edit->setText( txt );

@@ -438,13 +438,12 @@ void DialogsProvider::openUrlDialog()
         QString url = oud->url();
         if( !url.isEmpty() )
         {
-            playlist_Add( THEPL, qtu( toNativeSeparators( url ) ),
+            playlist_Add( THEPL, qtu( url ),
                           NULL, !oud->shouldEnqueue() ?
                                   ( PLAYLIST_APPEND | PLAYLIST_GO )
                                 : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
                           PLAYLIST_END, true, false );
-            RecentsMRL::getInstance( p_intf )->addRecent(
-                                     toNativeSeparators( url ) );
+            RecentsMRL::getInstance( p_intf )->addRecent( url );
         }
     }
 }
