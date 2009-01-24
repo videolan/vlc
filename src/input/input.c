@@ -2820,6 +2820,13 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
 
     vlc_meta_Delete( p_meta );
 
+    if( !psz_arturl || *psz_arturl == '\0' )
+    {
+        psz_arturl = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
+        if( psz_arturl )
+            psz_arturl = strdup( psz_arturl );
+    }
+
     if( psz_arturl && *psz_arturl )
     {
         vlc_meta_Set( p_item->p_meta, vlc_meta_ArtworkURL, psz_arturl );
@@ -2834,9 +2841,8 @@ static void InputUpdateMeta( input_thread_t *p_input, vlc_meta_t *p_meta )
                 input_ExtractAttachmentAndCacheArt( p_input );
         }
     }
-    free( psz_arturl );
-
     vlc_mutex_unlock( &p_item->lock );
+    free( psz_arturl );
 
     if( psz_title )
     {
