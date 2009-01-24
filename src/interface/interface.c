@@ -240,10 +240,7 @@ static void * MonitorLibVLCDeath( vlc_object_t * p_this )
     libvlc_int_t * p_libvlc = p_intf->p_libvlc;
     int canc = vlc_savecancel ();
 
-    vlc_object_lock( p_libvlc );
-    while( vlc_object_alive( p_libvlc ) )
-        vlc_object_wait( p_libvlc );
-    vlc_object_unlock( p_libvlc );
+    libvlc_InternalWait( p_libvlc );
 
     vlc_object_kill( p_intf ); /* Kill the stupid first thread interface */
     vlc_restorecancel (canc);

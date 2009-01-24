@@ -184,10 +184,7 @@ void libvlc_add_intf( libvlc_instance_t *p_i, const char *name,
 void libvlc_wait( libvlc_instance_t *p_i )
 {
     libvlc_int_t *p_libvlc = p_i->p_libvlc_int;
-    vlc_object_lock( p_libvlc );
-    while( vlc_object_alive( p_libvlc ) )
-        vlc_object_wait( p_libvlc );
-    vlc_object_unlock( p_libvlc );
+    libvlc_InternalWait( p_libvlc );
 }
 
 int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
