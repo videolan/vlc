@@ -59,7 +59,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("BD") )
-    set_description( N_("BD Input") )
+    set_description( N_("Blu-Ray Disc Input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "bd-caching", DEFAULT_PTS_DELAY / 1000, NULL,
