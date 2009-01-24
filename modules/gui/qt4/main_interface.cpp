@@ -99,12 +99,24 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Set The Video In emebedded Mode or not */
     videoEmbeddedFlag = config_GetInt( p_intf, "embedded-video" );
 
+    /* Do we confine videos within a persistent resizeable window */
+    b_keep_size = config_GetInt( p_intf, "qt-keep-size" );
+
     /* Are we in the enhanced always-video mode or not ? */
     i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
 
     /* Set the other interface settings */
     settings = getSettings();
     settings->beginGroup( "MainWindow" );
+
+    /**
+     * Retrieve saved sizes for main window
+     *   mainBasedSize = based window size for normal mode
+     *                  (no video, no background)
+     *   mainVideoSize = window size with video (all modes)
+     **/
+    mainBasedSize = settings->value( "mainBasedSize", QSize( 350, 120 ) ).toSize();
+    mainVideoSize = settings->value( "mainVideoSize", QSize( 400, 300 ) ).toSize();
 
     /* Visualisation, not really used yet */
     visualSelectorEnabled = settings->value( "visual-selector", false).toBool();
@@ -209,6 +221,20 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     settings->beginGroup( "MainWindow" );
     QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
 
+    /* resize to previously saved main window size if appicable */ 
+    if( b_keep_size )
+    {
+       if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
+           i_visualmode == QT_MINIMAL_MODE )
+       {
+           resize( mainVideoSize );
+       }
+       else
+       {
+           resize( mainBasedSize );
+       }
+    }
+
     bool b_visible = settings->value( "playlist-visible", 0 ).toInt();
     settings->endGroup();
 
@@ -258,6 +284,9 @@ MainInterface::~MainInterface()
     settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
                         getControlsVisibilityStatus() & CONTROLS_ADVANCED );
+
+    settings->setValue( "mainBasedSize", mainBasedSize );
+    settings->setValue( "mainVideoSize", mainVideoSize );
 
     if( bgWidget )
         settings->setValue( "backgroundSize", bgWidget->size() );
@@ -397,7 +426,6 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls, 0, Qt::AlignBottom );
 
-
     /* Finish the sizing */
     main->updateGeometry();
 
@@ -518,6 +546,24 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
 
 QSize MainInterface::sizeHint() const
 {
+    if( b_keep_size )
+    {
+        if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
+            i_visualmode == QT_MINIMAL_MODE )
+        {
+                return mainVideoSize;
+        }
+        else
+        {
+            if( VISIBLE( bgWidget) ||
+                ( videoIsActive && videoWidget->isVisible() )
+              )
+                return mainVideoSize;
+            else
+                return mainBasedSize;
+        }
+    }
+
     int nwidth  = controls->sizeHint().width();
     int nheight = controls->isVisible() ?
                   controls->size().height()
@@ -596,7 +642,8 @@ void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    unsigned int *pi_height )
 {
     /* Request the videoWidget */
-    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, pi_width, pi_height );
+    void *ret = videoWidget->request( p_nvout,pi_x, pi_y, 
+                                      pi_width, pi_height, b_keep_size );
     if( ret ) /* The videoWidget is available */
     {
         /* Did we have a bg ? Hide it! */
@@ -1069,6 +1116,27 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
     }
     else
         e->ignore();
+}
+
+void MainInterface::resizeEvent( QResizeEvent * event )
+{
+    if( b_keep_size )
+    {
+        if( i_visualmode == QT_ALWAYS_VIDEO_MODE ||
+            i_visualmode == QT_MINIMAL_MODE )
+        {
+                mainVideoSize = size();
+        }
+        else
+        {
+            if( VISIBLE( bgWidget) ||
+                ( videoIsActive && videoWidget->isVisible() )
+              )
+                mainVideoSize = size();
+            else
+                mainBasedSize = size();
+        }
+    }
 }
 
 void MainInterface::wheelEvent( QWheelEvent *e )

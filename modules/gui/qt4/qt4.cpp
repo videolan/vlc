@@ -84,6 +84,12 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define MINIMIZED_LONGTEXT N_( "VLC will start with just an icon in " \
                                "your taskbar" )
 
+#define KEEPSIZE_TEXT N_( "Confine video to a persistent resizable window" )
+#define KEEPSIZE_LONGTEXT N_( "You can choose to confine a video to a " \
+                              "persistent resizeable window or let it freely " \
+                              "expand to match the original size. " \
+                              "By default, videos are expanded to original size." )
+
 #define TITLE_TEXT N_( "Show playing item name in window title" )
 #define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
                            "controler window title." )
@@ -176,6 +182,8 @@ vlc_module_begin ()
               SYSTRAY_LONGTEXT, false);
     add_bool( "qt-start-minimized", false, NULL, MINIMIZED_TEXT,
               MINIMIZED_LONGTEXT, true);
+    add_bool( "qt-keep-size", false, NULL, KEEPSIZE_TEXT,
+              KEEPSIZE_LONGTEXT, false )
     add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
               TITLE_LONGTEXT, false );
     add_bool( "qt-fs-controller", true, NULL, QT_FULLSCREEN_TEXT,

@@ -60,7 +60,7 @@ public:
     virtual ~VideoWidget();
 
     void *request( vout_thread_t *, int *, int *,
-                   unsigned int *, unsigned int * );
+                   unsigned int *, unsigned int *, bool );
     void  release( void );
     int   control( void *, int, va_list );
 

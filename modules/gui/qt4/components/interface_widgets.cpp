@@ -101,9 +101,17 @@ VideoWidget::~VideoWidget()
  * Request the video to avoid the conflicts
  **/
 void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
-                            unsigned int *pi_width, unsigned int *pi_height )
+                            unsigned int *pi_width, unsigned int *pi_height,
+                            bool b_keep_size )
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
+
+    if( b_keep_size )
+    {
+        *pi_width  = size().width();
+        *pi_height = size().height();
+    }
+
     emit askVideoWidgetToShow( *pi_width, *pi_height );
     if( p_vout )
     {
