@@ -475,6 +475,8 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter )
             }
         }
     }
+    else
+        vlc_object_hold( p_fontbuilder );
     if( p_fontbuilder )
     {
         var_AddCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
