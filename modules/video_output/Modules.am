@@ -22,13 +22,16 @@ SOURCES_yuv = yuv.c
 
 # TODO: move to configure.ac once/if xcb plugin gets more functional
 XCB_LIBS = -lxcb
+XCB_SHM_LIBS = -lxcb-shm
 XCB_AUX_LIBS = -lxcb-aux
 XCB_IMAGE_LIBS = -lxcb-image
 
 libxcb_plugin_la_SOURCES = xcb/xcb.c
 libxcb_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS) $(XCB_AUX_CFLAGS) $(XCB_IMAGE_CFLAGS)
+	$(XCB_CFLAGS) $(XCB_SHM) \
+	$(XCB_AUX_CFLAGS) $(XCB_IMAGE_CFLAGS)
 libxcb_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS) $(XCB_AUX_LIBS) $(XCB_IMAGE_LIBS)
+	$(XCB_LIBS) $(XCB_SHM) \
+	$(XCB_AUX_LIBS) $(XCB_IMAGE_LIBS)
 libxcb_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libxcb_plugin.la

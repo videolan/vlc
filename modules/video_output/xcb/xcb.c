@@ -27,7 +27,12 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include <sys/types.h>
+#include <sys/shm.h>
+
 #include <xcb/xcb.h>
+#include <xcb/shm.h>
+
 #include <xcb/xcb_aux.h>
 #include <xcb/xcb_image.h>
 
@@ -40,6 +45,10 @@
 #define DISPLAY_LONGTEXT N_( \
     "X11 hardware display to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
+
+#define SHM_TEXT N_("Use shared memory")
+#define SHM_LONGTEXT N_( \
+    "Use shared memory to communicate between VLC and the X server.")
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
@@ -57,6 +66,7 @@ vlc_module_begin ()
 
     add_string ("x11-display", NULL, NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
+    add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
 vlc_module_end ()
 
 struct vout_sys_t
@@ -69,6 +79,7 @@ struct vout_sys_t
     xcb_window_t parent; /* parent X window */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
+    bool shm; /* whether to use MIT-SHM */
     uint8_t bpp; /* bits per pixel */
 };
 
@@ -151,6 +162,23 @@ static int Open (vlc_object_t *obj)
     }
     p_sys->vid = vt->visual_id;
 
+    p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
+    if (p_sys->shm)
+    {
+        xcb_shm_query_version_cookie_t ck;
+        xcb_shm_query_version_reply_t *r;
+        xcb_generic_error_t *err;
+
+        ck = xcb_shm_query_version (p_sys->conn);
+        r = xcb_shm_query_version_reply (p_sys->conn, ck, &err);
+        if (!r)
+        {
+            msg_Err (vout, "shared memory (MIT-SHM) not available");
+            msg_Warn (vout, "display will be slow");
+            p_sys->shm = false;
+        }
+    }
+
     vout->pf_init = Init;
     vout->pf_end = Deinit;
     vout->pf_display = Display;
@@ -179,10 +207,14 @@ static void Close (vlc_object_t *obj)
 
 struct picture_sys_t
 {
+    xcb_connection_t *conn;
     xcb_image_t *image;
+    xcb_shm_seg_t segment;
 };
 
 static void PictureRelease (picture_t *pic);
+static void PictureShmRelease (picture_t *pic);
+#define SHM_ERR ((void *)(intptr_t)(-1))
 
 static int PictureInit (vout_thread_t *vout, picture_t *pic)
 {
@@ -196,6 +228,43 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     vout_InitPicture (vout, pic, vout->output.i_chroma,
                       vout->output.i_width, vout->output.i_height,
                       vout->output.i_aspect);
+
+    void *shm = SHM_ERR;
+    const size_t size = pic->p->i_pitch * pic->p->i_lines;
+
+    if (p_sys->shm)
+    {   /* Allocate shared memory segment */
+        int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
+
+        if (id == -1)
+        {
+            msg_Err (vout, "shared memory allocation error: %m");
+            goto error;
+        }
+
+        /* Attach the segment to VLC */
+        shm = shmat (id, NULL, 0 /* read/write */);
+        if (shm == SHM_ERR)
+        {
+            msg_Err (vout, "shared memory attachment error: %m");
+            shmctl (id, IPC_RMID, 0);
+            goto error;
+        }
+
+        /* Attach the segment to X */
+        xcb_void_cookie_t ck;
+
+        priv->segment = xcb_generate_id (p_sys->conn);
+        ck = xcb_shm_attach_checked (p_sys->conn, priv->segment, id, 1);
+        shmctl (id, IPC_RMID, 0);
+
+        if (CheckError (vout, "shared memory server-side error", ck))
+        {
+            msg_Info (vout, "using buggy X (remote) server? SSH?");
+            shmdt (shm);
+            shm = SHM_ERR;
+        }
+    }
 
     const unsigned real_width = pic->p->i_pitch / (p_sys->bpp >> 3);
     /* FIXME: anyway to getthing more intuitive than that?? */
@@ -211,20 +280,36 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
                             XCB_IMAGE_ORDER_LSB_FIRST,
 #endif
                             XCB_IMAGE_ORDER_MSB_FIRST,
-                            NULL, 0, NULL);
+                            NULL,
+                            (shm != SHM_ERR) ? size : 0,
+                            (shm != SHM_ERR) ? shm : NULL);
 
     if (img == NULL)
+    {
+        if (shm != SHM_ERR)
+            xcb_shm_detach (p_sys->conn, priv->segment);
         goto error;
+    }
+    if (shm != SHM_ERR && xcb_image_native (p_sys->conn, img, 0) == NULL)
+    {
+        msg_Err (vout, "incompatible X server image format");
+        xcb_image_destroy (img);
+        goto error;
+    }
 
+    priv->conn = p_sys->conn;
     priv->image = img;
     pic->p_sys = priv;
     pic->p->p_pixels = img->data;
-    pic->pf_release = PictureRelease;
+    pic->pf_release = (shm != SHM_ERR) ? PictureShmRelease
+                                       : PictureRelease;
     pic->i_status = DESTROYED_PICTURE;
     pic->i_type = DIRECT_PICTURE;
     return VLC_SUCCESS;
 
 error:
+    if (shm != SHM_ERR)
+        shmdt (shm);
     free (p_sys);
     return VLC_EGENERIC;
 }
@@ -239,6 +324,18 @@ static void PictureRelease (picture_t *pic)
 
     xcb_image_destroy (p_sys->image);
     free (p_sys);
+}
+
+/**
+ * Release shared memory picture private data
+ */
+static void PictureShmRelease (picture_t *pic)
+{
+    struct picture_sys_t *p_sys = pic->p_sys;
+
+    xcb_shm_detach (p_sys->conn, p_sys->segment);
+    shmdt (p_sys->image->data);
+    PictureRelease (pic);
 }
 
 /**
@@ -364,23 +461,32 @@ static void Deinit (vout_thread_t *vout)
 static void Display (vout_thread_t *vout, picture_t *pic)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    xcb_image_t *img = pic->p_sys->image;
-    xcb_image_t *native = xcb_image_native (p_sys->conn, img, 1);
+    picture_sys_t *priv = pic->p_sys;
+    xcb_image_t *img = priv->image;
 
-    if (native == NULL)
+    if (img->base == NULL)
     {
-        msg_Err (vout, "image conversion failure");
-        return;
-    }
+        xcb_shm_segment_info_t info = {
+            .shmseg = priv->segment,
+            .shmid = -1, /* lost track of it, unimportant */
+            .shmaddr = img->data,
+        };
 
-    xcb_image_put (p_sys->conn, p_sys->window, p_sys->gc, native, 0, 0, 0);
+        xcb_image_shm_put (p_sys->conn, p_sys->window, p_sys->gc, img, info,
+                        0, 0, 0, 0, img->width, img->height, 0);
+    }
+    else
+    {
+        xcb_image_t *native = xcb_image_native (p_sys->conn, img, 1);
+
+        if (native == NULL)
+            return;
+
+        xcb_image_put (p_sys->conn, p_sys->window, p_sys->gc, native, 0, 0, 0);
+        if (native != img)
+            xcb_image_destroy (native);
+    }
     xcb_flush (p_sys->conn);
-
-    if (native != img)
-    {
-        /*msg_Warn (vout, "image not in native X11 pixmap format");*/
-        xcb_image_destroy (native);
-    }
 }
 
 /**
