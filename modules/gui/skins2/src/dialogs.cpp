@@ -224,9 +224,8 @@ void Dialogs::showChangeSkin()
 void Dialogs::showPlaylistLoad()
 {
     showFileGeneric( _("Open playlist"),
-                     _("All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|"
-                       "M3U files|*.m3u|"
-                       "XSPF playlist|*.xspf"),
+                     _("Playlist Files|"EXTENSIONS_PLAYLIST"|"
+                       "All Files|*"),
                      showPlaylistLoadCB, kOPEN );
 }
 
