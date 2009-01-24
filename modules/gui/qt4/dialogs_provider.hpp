@@ -203,7 +203,7 @@ public:
         i_arg = _i_arg;
         p_arg = _p_arg;
     };
-    virtual ~DialogEvent() { delete p_arg; };
+    virtual ~DialogEvent() { };
 
     int i_arg, i_dialog;
     intf_dialog_args_t *p_arg;

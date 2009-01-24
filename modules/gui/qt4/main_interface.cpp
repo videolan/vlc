@@ -1123,7 +1123,7 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
     if( p_intf->pf_show_dialog )
     {
         p_intf->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
-                                new_val.b_bool, 0 );
+                                new_val.b_bool, NULL );
     }
 
     return VLC_SUCCESS;
