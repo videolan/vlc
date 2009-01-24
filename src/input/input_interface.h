@@ -54,18 +54,20 @@ void input_ressource_Delete( input_ressource_t * );
 
 /**
  * This function deletes the current sout in the ressources.
- *
- * It can only be called on detached ressources.
  */
 void input_ressource_TerminateSout( input_ressource_t *p_ressource );
 
 /**
  * This function deletes the current vout in the ressources.
- *
- * It can only be called on detached ressources.
  */
 void input_ressource_TerminateVout( input_ressource_t *p_ressource );
 
+/**
+ * This function return true if there is at least one vout in the ressources.
+ *
+ * It can only be called on detached ressources.
+ */
+bool input_ressource_HasVout( input_ressource_t *p_ressource );
 
 /* input.c */
 #define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)

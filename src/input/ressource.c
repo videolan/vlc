@@ -339,6 +339,7 @@ static aout_instance_t *HoldAout( input_ressource_t *p_ressource )
 
     return p_aout;
 }
+
 /* */
 input_ressource_t *input_ressource_New( void )
 {
@@ -405,6 +406,15 @@ void input_ressource_HoldVouts( input_ressource_t *p_ressource, vout_thread_t **
 void input_ressource_TerminateVout( input_ressource_t *p_ressource )
 {
     input_ressource_RequestVout( p_ressource, NULL, NULL );
+}
+bool input_ressource_HasVout( input_ressource_t *p_ressource )
+{
+    vlc_mutex_lock( &p_ressource->lock );
+    assert( !p_ressource->p_input );
+    const bool b_vout = p_ressource->p_vout_free != NULL;
+    vlc_mutex_unlock( &p_ressource->lock );
+
+    return b_vout;
 }
 
 /* */
