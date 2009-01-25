@@ -41,6 +41,8 @@
 #include <vlc_vout.h>
 #include <vlc_window.h>
 
+#include "xcb_vlc.h"
+
 #define DISPLAY_TEXT N_("X11 display")
 #define DISPLAY_LONGTEXT N_( \
     "X11 hardware display to use. By default VLC will " \
@@ -88,8 +90,7 @@ static void Deinit (vout_thread_t *);
 static void Display (vout_thread_t *, picture_t *);
 static int Manage (vout_thread_t *);
 
-static int CheckError (vout_thread_t *vout, const char *str,
-                       xcb_void_cookie_t ck)
+int CheckError (vout_thread_t *vout, const char *str, xcb_void_cookie_t ck)
 {
     xcb_generic_error_t *err;
 
@@ -402,16 +403,24 @@ static int Init (vout_thread_t *vout)
     /* FIXME: I don't get the subtlety between output and fmt_out here */
 
     /* Create window */
+    const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t values[2] = {
+        /* XCB_CW_BACK_PIXEL */
+        screen->black_pixel,
+        /* XCB_CW_EVENT_MASK */
+        XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
+        XCB_EVENT_MASK_POINTER_MOTION,
+    };
     xcb_void_cookie_t c;
     xcb_window_t window = xcb_generate_id (p_sys->conn);
 
-    p_sys->window = window;
     c = xcb_create_window_checked (p_sys->conn, screen->root_depth, window,
                                    p_sys->parent, x, y, width, height, 0,
                                    XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                                   screen->root_visual, 0, NULL);
+                                   screen->root_visual, mask, values);
     if (CheckError (vout, "cannot create X11 window", c))
         goto error;
+    p_sys->window = window;
     msg_Dbg (vout, "using X11 window %08"PRIx32, p_sys->window);
     xcb_map_window (p_sys->conn, window);
 
@@ -498,14 +507,7 @@ static int Manage (vout_thread_t *vout)
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (p_sys->conn)) != NULL)
-    {
-        switch (ev->response_type & ~0x80)
-        {
-        default:
-            msg_Dbg (vout, "unhandled event %02x", (unsigned)ev->response_type);
-        }
-        free (ev);
-    }
+        ProcessEvent (vout, ev);
 
     if (xcb_connection_has_error (p_sys->conn))
     {

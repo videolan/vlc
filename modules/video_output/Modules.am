@@ -26,7 +26,10 @@ XCB_SHM_LIBS = -lxcb-shm
 XCB_AUX_LIBS = -lxcb-aux
 XCB_IMAGE_LIBS = -lxcb-image
 
-libxcb_plugin_la_SOURCES = xcb/xcb.c
+libxcb_plugin_la_SOURCES = \
+	xcb/xcb_vlc.h \
+	xcb/xcb.c \
+	xcb/events.c
 libxcb_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM) \
 	$(XCB_AUX_CFLAGS) $(XCB_IMAGE_CFLAGS)
