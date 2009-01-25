@@ -357,7 +357,6 @@ static void *Thread( void *p_data )
         }
     }
 
-    vlc_restorecancel( canc );
     return NULL;
 }
 
