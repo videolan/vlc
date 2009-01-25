@@ -5852,6 +5852,7 @@ AC_CONFIG_FILES([
   modules/codec/xvmc/Makefile
   modules/control/Makefile
   modules/control/http/Makefile
+  modules/control/globalhotkeys/Makefile
   modules/demux/Makefile
   modules/demux/asf/Makefile
   modules/demux/avformat/Makefile

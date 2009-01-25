@@ -1,4 +1,4 @@
-SUBDIRS = http
+SUBDIRS = http globalhotkeys
 SOURCES_gestures = gestures.c
 SOURCES_showintf = showintf.c
 SOURCES_telnet = telnet.c

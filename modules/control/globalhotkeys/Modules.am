@@ -1,0 +1,8 @@
+if HAVE_WIN32
+globalhotkeys_extra = win32.c
+endif
+
+SOURCES_globalhotkeys = \
+    $(globalhotkeys_extra) \
+    $(NULL)
+
