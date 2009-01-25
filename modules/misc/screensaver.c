@@ -172,7 +172,7 @@ static void Run( intf_thread_t *p_intf )
 #endif
 
     for( ;; )
-   {
+    {
         vlc_object_t *p_vout;
 
         p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
@@ -211,6 +211,7 @@ static void Run( intf_thread_t *p_intf )
         vlc_restorecancel( canc );
         /* Check screensaver every 30 seconds */
         msleep( 30 * CLOCK_FREQ );
+        canc = vlc_savecancel( );
     }
 }
 
