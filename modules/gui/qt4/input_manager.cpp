@@ -842,6 +842,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 
     IMEvent *event = new IMEvent( ItemChanged_Type, val.i_int);
     customEvent( static_cast<QEvent*>(event) );
+    delete event;
 }
 
 MainInputManager::~MainInputManager()
