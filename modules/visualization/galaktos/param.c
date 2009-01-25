@@ -53,25 +53,25 @@ int is_valid_param_string(char * string); /* true if string is valid variable or
 /* A splay tree of builtin parameters */
 splaytree_t * builtin_param_tree = NULL;
 
-int insert_param_alt_name(param_t * param, char * alt_name);
+int insert_param_alt_name(param_t * param, const char * alt_name);
 
 int insert_builtin_param(param_t * param);
 
 /* Private function prototypes */
 int compare_param(char * name, char * name2);
 
-int load_builtin_param_double(char * name, void * engine_val, void * matrix, short int flags, 
-								double init_val, double upper_bound, double lower_bound, char * alt_name);
+int load_builtin_param_double(const char * name, void * engine_val, void * matrix, short int flags,
+								double init_val, double upper_bound, double lower_bound, const char * alt_name);
 
-int load_builtin_param_int(char * name, void * engine_val, short int flags, 
-								int init_val, int upper_bound, int lower_bound, char * alt_name);
+int load_builtin_param_int(const char * name, void * engine_val, short int flags,
+								int init_val, int upper_bound, int lower_bound, const char * alt_name);
 								
-int load_builtin_param_bool(char * name, void * engine_val, short int flags, 
-								int init_val, char * alt_name);
+int load_builtin_param_bool(const char * name, void * engine_val, short int flags,
+								int init_val, const char * alt_name);
 								
 								
 								
-param_t * create_param (char * name, short int type, short int flags, void * engine_val, void * matrix,
+param_t * create_param (const char * name, short int type, short int flags, void * engine_val, void * matrix,
 							value_t default_init_val, value_t upper_bound, value_t lower_bound) {
 
   param_t * param = NULL;
@@ -179,7 +179,7 @@ int destroy_builtin_param_db() {
 
 
 /* Insert a parameter into the database with an alternate name */
-int insert_param_alt_name(param_t * param, char * alt_name) {
+int insert_param_alt_name(param_t * param, const char * alt_name) {
   
   if (param == NULL)
     return ERROR;
@@ -408,8 +408,8 @@ void free_param(param_t * param) {
 }
 
 /* Loads a double parameter into the builtin database */
-int load_builtin_param_double(char * name, void * engine_val, void * matrix, short int flags, 
-						double init_val, double upper_bound, double lower_bound, char * alt_name) {
+int load_builtin_param_double(const char * name, void * engine_val, void * matrix, short int flags, 
+						double init_val, double upper_bound, double lower_bound, const char * alt_name) {
 
   param_t * param = NULL;
   value_t iv, ub, lb;
@@ -466,7 +466,7 @@ int load_builtin_param_double(char * name, void * engine_val, void * matrix, sho
 
 
 /* Loads a double parameter into the builtin database */
-param_t * new_param_double(char * name, short int flags, void * engine_val, void * matrix,
+param_t * new_param_double(const char * name, short int flags, void * engine_val, void * matrix,
 						double upper_bound, double lower_bound, double init_val) {
 
   param_t * param;
@@ -486,7 +486,7 @@ param_t * new_param_double(char * name, short int flags, void * engine_val, void
 
 
 /* Creates a new parameter of type int */
-param_t * new_param_int(char * name, short int flags, void * engine_val,
+param_t * new_param_int(const char * name, short int flags, void * engine_val,
 						int upper_bound, int lower_bound, int init_val) {
 
   param_t * param;
@@ -505,7 +505,7 @@ param_t * new_param_int(char * name, short int flags, void * engine_val,
 }
 
 /* Creates a new parameter of type bool */
-param_t * new_param_bool(char * name, short int flags, void * engine_val,
+param_t * new_param_bool(const char * name, short int flags, void * engine_val,
 						int upper_bound, int lower_bound, int init_val) {
 
   param_t * param;
@@ -525,8 +525,8 @@ param_t * new_param_bool(char * name, short int flags, void * engine_val,
 
 
 /* Loads a integer parameter into the builtin database */
-int load_builtin_param_int(char * name, void * engine_val, short int flags,
-						int init_val, int upper_bound, int lower_bound, char * alt_name) {
+int load_builtin_param_int(const char * name, void * engine_val, short int flags,
+						int init_val, int upper_bound, int lower_bound, const char * alt_name) {
 
   param_t * param;
   value_t iv, ub, lb;
@@ -555,8 +555,8 @@ int load_builtin_param_int(char * name, void * engine_val, short int flags,
 }							
 							
 /* Loads a boolean parameter */
-int load_builtin_param_bool(char * name, void * engine_val, short int flags, 
-								int init_val, char * alt_name) {
+int load_builtin_param_bool(const char * name, void * engine_val, short int flags,
+								int init_val, const char * alt_name) {
 
   param_t * param;
   value_t iv, ub, lb;

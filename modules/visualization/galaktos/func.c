@@ -38,7 +38,7 @@ void * copy_func_key(char * string) {
 }	
 
 
-func_t * create_func (char * name, double (*func_ptr)(), int num_args) {
+func_t * create_func (const char * name, double (*func_ptr)(), int num_args) {
 
   func_t * func;
   func = (func_t*)malloc(sizeof(func_t));
@@ -137,7 +137,7 @@ int compare_func(char * name, char * name2) {
 }
 
 /* Loads a builtin function */
-int load_builtin_func(char * name,  double (*func_ptr)(), int num_args) {
+int load_builtin_func(const char * name,  double (*func_ptr)(), int num_args) {
 
   func_t * func; 
   int retval; 

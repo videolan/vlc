@@ -403,7 +403,7 @@ splaynode_t * new_splaynode(int type, void * key, void * data) {
 }
 
 /* Inserts a link into the splay tree */
-int splay_insert_link(void * alias_key, void * orig_key, splaytree_t * splaytree) {
+int splay_insert_link(const void * alias_key, void * orig_key, splaytree_t * splaytree) {
 
    splaynode_t * splaynode, * data_node;
    void * key_clone;

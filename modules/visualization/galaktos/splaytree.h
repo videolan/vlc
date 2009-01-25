@@ -10,7 +10,7 @@
 
 void * splay_find(void * key, splaytree_t * t);
 int splay_insert(void * data, void * key, splaytree_t * t);
-int splay_insert_link(void * alias_key, void * orig_key, splaytree_t * splaytree);
+int splay_insert_link(const void * alias_key, void * orig_key, splaytree_t * splaytree);
 int splay_delete(void * key, splaytree_t * splaytree);
 int splay_size(splaytree_t * t);
 splaytree_t * create_splaytree(int (*compare)(), void * (*copy_key)(), void (*free_key)());
