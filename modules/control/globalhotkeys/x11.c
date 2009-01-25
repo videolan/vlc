@@ -72,6 +72,7 @@ static void Mapping( intf_thread_t *p_intf );
 static void Register( intf_thread_t *p_intf );
 static void Unregister( intf_thread_t *p_intf );
 static void *Thread( void *p_data );
+static int X11ErrorHandler( Display *, XErrorEvent * );
 
 /*****************************************************************************
  * Open:
@@ -84,6 +85,7 @@ static int Open( vlc_object_t *p_this )
     Display *p_display = XOpenDisplay( NULL );
     if( !p_display )
         return VLC_EGENERIC;
+    XSetErrorHandler( X11ErrorHandler );
 
     p_intf->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
@@ -125,8 +127,24 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Thread:
+ *
  *****************************************************************************/
+static int X11ErrorHandler( Display *p_display, XErrorEvent *p_event )
+{
+#if 0
+    char psz_txt[1024];
+
+    XGetErrorText( p_display, p_event->error_code, psz_txt, sizeof(psz_txt) );
+    fprintf( stderr,
+             "[????????] globalhotkeys interface error: X11 request %u.%u failed "
+              "with error code %u:\n %s\n",
+             p_event->request_code, p_event->minor_code, p_event->error_code, psz_txt );
+#else
+    VLC_UNUSED(p_display); VLC_UNUSED(p_event);
+#endif
+    /* Ignore them */
+    return 0;
+}
 static unsigned GetModifier( Display *p_display, KeySym sym )
 {
     static const unsigned pi_mask[8] = {
@@ -357,7 +375,6 @@ static void *Thread( void *p_data )
         }
     }
 
-    vlc_restorecancel( canc );
     return NULL;
 }
 
