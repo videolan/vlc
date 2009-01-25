@@ -339,6 +339,7 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     /* Make sure we aren't paused/buffering/waiting anymore */
     vlc_mutex_lock( &p_owner->lock );
+    const b_was_paused = p_owner->b_paused;
     p_owner->b_paused = false;
     p_owner->b_buffering = false;
     p_owner->b_flushing = true;
@@ -346,6 +347,8 @@ void input_DecoderDelete( decoder_t *p_dec )
     vlc_mutex_unlock( &p_owner->lock );
 
     vlc_thread_join( p_dec );
+    p_owner->b_paused = b_was_paused;
+
     module_unneed( p_dec, p_dec->p_module );
 
     /* */
@@ -2020,8 +2023,11 @@ static void DeleteDecoder( decoder_t * p_dec )
     }
     if( p_owner->p_vout )
     {
-        /* Hack to make sure all the the pictures are freed by the decoder */
+        /* Hack to make sure all the the pictures are freed by the decoder
+         * and that the vout is not paused anymore */
         vout_FixLeaks( p_owner->p_vout, true );
+        if( p_owner->b_paused )
+            vout_ChangePause( p_owner->p_vout, false, mdate() );
 
         /* */
         input_ressource_RequestVout( p_owner->p_input->p->p_ressource, p_owner->p_vout, NULL );
