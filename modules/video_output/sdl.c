@@ -436,8 +436,7 @@ static int Manage( vout_thread_t *p_vout )
                     val.i_int &= ~1;
                     var_Set( p_vout, "mouse-button-down", val );
 
-                    val.b_bool = true;
-                    var_Set( p_vout, "mouse-clicked", val );
+                    var_SetBool( p_vout, "mouse-clicked", true );
 
                     val.b_bool = false;
                     var_Set( p_vout->p_libvlc, "intf-popupmenu", val );

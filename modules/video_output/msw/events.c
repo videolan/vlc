@@ -222,8 +222,7 @@ void* EventThread( vlc_object_t *p_this )
             val.i_int &= ~1;
             var_Set( p_event->p_vout, "mouse-button-down", val );
 
-            val.b_bool = true;
-            var_Set( p_event->p_vout, "mouse-clicked", val );
+            var_SetBool( p_event->p_vout, "mouse-clicked", true );
             break;
 
         case WM_LBUTTONDBLCLK:

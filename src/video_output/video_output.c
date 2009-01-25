@@ -403,7 +403,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
-    var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-clicked", VLC_VAR_BOOL );
 
     /* Initialize subpicture unit */
     p_vout->p_spu = spu_Create( p_vout );

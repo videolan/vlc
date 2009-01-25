@@ -432,7 +432,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
-    var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
+    var_Create( p_vout, "mouse-clicked", VLC_VAR_BOOL );
 
     var_Create( p_vout, "intf-change", VLC_VAR_BOOL );
     var_SetBool( p_vout, "intf-change", true );

@@ -956,8 +956,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                         {
                             vlc_value_t val;
 
-                            val.b_bool = true;
-                            var_Set( p_vout, "mouse-clicked", val );
+                            var_SetBool( p_vout, "mouse-clicked", true );
 
                             var_Get( p_vout, "mouse-button-down", &val );
                             val.i_int &= ~1;

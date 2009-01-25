@@ -579,9 +579,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( p_vout && [o_event type] == NSLeftMouseUp )
     {
-        vlc_value_t b_val;
-        b_val.b_bool = true;
-        var_Set( p_vout, "mouse-clicked", b_val );
+        var_SetBool( p_vout, "mouse-clicked", true );
 
         var_Get( p_vout, "mouse-button-down", &val );
         val.i_int &= ~1;

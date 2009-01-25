@@ -1123,9 +1123,7 @@ VLCView::MouseDown(BPoint where)
 void
 VLCView::MouseUp( BPoint where )
 {
-    vlc_value_t val;
-    val.b_bool = true;
-    var_Set( p_vout, "mouse-clicked", val );
+    var_SetBool( p_vout, "mouse-clicked", true );
 }
 
 /*****************************************************************************

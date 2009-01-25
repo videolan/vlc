@@ -306,8 +306,7 @@ static int Manage( vout_thread_t *p_vout )
                 switch( event.pbutton.button )
                 {
                     case GII_PBUTTON_LEFT:
-                        val.b_bool = true;
-                        var_Set( p_vout, "mouse-clicked", val );
+                        var_SetBool( p_vout, "mouse-clicked", true );
                         break;
 
                     case GII_PBUTTON_RIGHT:

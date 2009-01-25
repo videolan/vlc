@@ -366,8 +366,7 @@ static int Manage( vout_thread_t *p_vout )
             var_Set( p_vout, "mouse-moved", val );
             break;
         case CACA_EVENT_MOUSE_RELEASE:
-            val.b_bool = true;
-            var_Set( p_vout, "mouse-clicked", val );
+            var_SetBool( p_vout, "mouse-clicked", true );
             break;
         case CACA_EVENT_QUIT:
         {
