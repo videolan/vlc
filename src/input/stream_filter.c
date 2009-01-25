@@ -43,6 +43,12 @@ stream_t *stream_FilterNew( stream_t *p_source,
         return NULL;
 
     /* */
+    s->psz_path = strdup( p_source->psz_path );
+    if( !s->psz_path )
+    {
+        stream_CommonDelete( s );
+        return NULL;
+    }
     s->p_source = p_source;
 
     /* */

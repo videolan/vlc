@@ -56,9 +56,16 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     stream_t *s = stream_CommonNew( p_this );
     stream_sys_t *p_sys;
 
-    if( !s ) return NULL;
+    if( !s )
+        return NULL;
 
+    s->psz_path = strdup( "" ); /* N/A */
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
+    if( !s->psz_path || !s->p_sys )
+    {
+        stream_CommonDelete( s );
+        return NULL;
+    }
     p_sys->i_pos = 0;
     p_sys->i_size = i_size;
     p_sys->p_buffer = p_buffer;

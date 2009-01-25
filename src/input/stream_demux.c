@@ -64,13 +64,14 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s = stream_CommonNew( p_obj );
     if( s == NULL )
         return NULL;
+    s->psz_path  = strdup(""); /* N/A */
     s->pf_read   = DStreamRead;
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;
     s->pf_destroy= DStreamDelete;
 
     s->p_sys = p_sys = malloc( sizeof( *p_sys) );
-    if( s->p_sys == NULL )
+    if( !s->psz_path || !s->p_sys )
     {
         stream_CommonDelete( s );
         return NULL;

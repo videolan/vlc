@@ -56,6 +56,9 @@ struct stream_t
     /* Module properties for stream filter */
     module_t    *p_module;
 
+    /* Real or virtual path (it can only be changed during stream_t opening) */
+    char        *psz_path;
+
     /* Stream source for stream filter */
     stream_t *p_source;
 
