@@ -353,7 +353,7 @@ enum vlc_config_properties
     add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, \
                    p_callback, value )
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(SYS_LINUX)
 #define add_key( name, value, p_callback, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_KEY, name, text, longtext, advc, p_callback, \
                    value )
