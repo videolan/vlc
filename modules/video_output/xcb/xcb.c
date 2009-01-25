@@ -151,12 +151,12 @@ static int Open (vlc_object_t *obj)
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using TrueColor visual ID %d", (int)vt->visual_id);
     else
-    if ((vt = xcb_aux_find_visual_by_attrs (scr,XCB_VISUAL_CLASS_STATIC_COLOR,
+    if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_COLOR,
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using static color visual ID %d", (int)vt->visual_id);
     else
     {
-        vt = xcb_aux_get_visualtype (p_sys->conn, snum, scr->root_visual);
+        vt = xcb_aux_find_visual_by_id (scr, scr->root_visual);
         assert (vt);
         msg_Err (vout, "unsupported visual class %"PRIu8, vt->_class);
         goto error;
