@@ -805,8 +805,7 @@ void vlc_join (vlc_thread_t handle, void **result)
 {
 #if defined( LIBVLC_USE_PTHREAD )
     int val = pthread_join (handle, result);
-    if (val)
-        vlc_thread_fatal ("joining thread", val, __func__, __FILE__, __LINE__);
+    VLC_THREAD_ASSERT ("joining thread");
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
     do
@@ -822,6 +821,101 @@ void vlc_join (vlc_thread_t handle, void **result)
 #endif
     free (handle);
 
+#endif
+}
+
+/**
+ * Save the current cancellation state (enabled or disabled), then disable
+ * cancellation for the calling thread.
+ * This function must be called before entering a piece of code that is not
+ * cancellation-safe, unless it can be proven that the calling thread will not
+ * be cancelled.
+ * @return Previous cancellation state (opaque value for vlc_restorecancel()).
+ */
+int vlc_savecancel (void)
+{
+    int state;
+
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
+    int val = pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &state);
+    VLC_THREAD_ASSERT ("saving cancellation");
+
+#else
+    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    if (nfo == NULL)
+        return; /* Main thread - cannot be cancelled anyway */
+
+     state = nfo->killable;
+     nfo->killable = false;
+
+#endif
+    return state;
+}
+
+/**
+ * Restore the cancellation state for the calling thread.
+ * @param state previous state as returned by vlc_savecancel().
+ * @return Nothing, always succeeds.
+ */
+void vlc_restorecancel (int state)
+{
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
+# ifndef NDEBUG
+    int oldstate, val;
+
+    val = pthread_setcancelstate (state, &oldstate);
+    /* This should fail if an invalid value for given for state */
+    VLC_THREAD_ASSERT ("restoring cancellation");
+
+    if (oldstate != PTHREAD_CANCEL_DISABLE)
+         vlc_thread_fatal ("restoring cancellation while not disabled", EINVAL,
+                           __func__, __FILE__, __LINE__);
+# else
+    pthread_setcancelstate (state, NULL);
+# endif
+
+#else
+    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    assert (state == false || state == true);
+
+    if (nfo == NULL)
+        return; /* Main thread - cannot be cancelled anyway */
+    nfo->killable = state != 0;
+
+#endif
+}
+
+/**
+ * Issues an explicit deferred cancellation point.
+ * This has no effect if thread cancellation is disabled.
+ * This can be called when there is a rather slow non-sleeping operation.
+ * This is also used to force a cancellation point in a function that would
+ * otherwise "not always" be a one (block_FifoGet() is an example).
+ */
+void vlc_testcancel (void)
+{
+#if defined (LIBVLC_USE_PTHREAD_CANCEL)
+    pthread_testcancel ();
+
+#else
+    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    if (nfo == NULL)
+        return; /* Main thread - cannot be cancelled anyway */
+
+    if (nfo->killable && nfo->killed)
+    {
+        for (vlc_cleanup_t *p = nfo->cleaners; p != NULL; p = p->next)
+             p->proc (p->data);
+# if defined (LIBVLC_USE_PTHREAD)
+        pthread_exit (PTHREAD_CANCELLED);
+# elif defined (UNDER_CE)
+        ExitThread(0);
+# elif defined (WIN32)
+        _endthread ();
+# else
+#  error Not implemented!
+# endif
+    }
 #endif
 }
 
@@ -1058,41 +1152,6 @@ void vlc_control_cancel (int cmd, ...)
     va_start (ap, cmd);
     switch (cmd)
     {
-        case VLC_SAVE_CANCEL:
-        {
-            int *p_state = va_arg (ap, int *);
-            *p_state = nfo->killable;
-            nfo->killable = false;
-            break;
-        }
-
-        case VLC_RESTORE_CANCEL:
-        {
-            int state = va_arg (ap, int);
-            nfo->killable = state != 0;
-            break;
-        }
-
-        case VLC_TEST_CANCEL:
-            if (nfo->killable && nfo->killed)
-            {
-                for (vlc_cleanup_t *p = nfo->cleaners; p != NULL; p = p->next)
-                     p->proc (p->data);
-#ifndef WIN32
-                free (nfo);
-#endif
-#if defined (LIBVLC_USE_PTHREAD)
-                pthread_exit (PTHREAD_CANCELLED);
-#elif defined (UNDER_CE)
-                ExitThread(0);
-#elif defined (WIN32)
-                _endthread ();
-#else
-# error Not implemented!
-#endif
-            }
-            break;
-
         case VLC_DO_CANCEL:
             nfo->killed = true;
             break;

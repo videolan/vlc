@@ -496,6 +496,8 @@ vlc_poll
 vlc_rand_bytes
 vlc_recvmsg
 vlc_release
+vlc_restorecancel
+vlc_savecancel
 vlc_sd_Create
 vlc_sd_GetNames
 vlc_sdp_Start
@@ -506,6 +508,7 @@ vlc_strcasestr
 vlc_strlcpy
 vlc_strtoll
 vlc_submodule_create
+vlc_testcancel
 vlc_thread_create
 __vlc_thread_join
 __vlc_thread_set_priority
