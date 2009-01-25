@@ -1035,7 +1035,7 @@ void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
 
         /* Force fs hidding */
         IMEvent *eHide = new IMEvent( FullscreenControlHide_Type, 0 );
-        QApplication::postEvent( this, static_cast<QEvent *>(eHide) );
+        QApplication::postEvent( this, eHide );
     }
     vlc_mutex_unlock( &lock );
 }
@@ -1062,11 +1062,11 @@ void FullscreenControllerWidget::mouseChanged( vout_thread_t *p_vout, int i_mous
     {
         /* Show event */
         IMEvent *eShow = new IMEvent( FullscreenControlShow_Type, 0 );
-        QApplication::postEvent( this, static_cast<QEvent *>(eShow) );
+        QApplication::postEvent( this, eShow );
 
         /* Plan hide event */
         IMEvent *eHide = new IMEvent( FullscreenControlPlanHide_Type, 0 );
-        QApplication::postEvent( this, static_cast<QEvent *>(eHide) );
+        QApplication::postEvent( this, eHide );
     }
 }
 

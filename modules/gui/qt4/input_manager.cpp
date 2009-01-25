@@ -277,7 +277,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     InputManager *im = (InputManager*)param;
 
     IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
-    QApplication::postEvent( im, static_cast<QEvent*>(event) );
+    QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
 
@@ -363,7 +363,7 @@ static int InputEvent( vlc_object_t *p_this, const char *,
     }
 
     if( event )
-        QApplication::postEvent( im, static_cast<QEvent*>(event) );
+        QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
 void InputManager::UpdatePosition()
@@ -841,7 +841,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_Change( THEPL, "playlist-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
 
     IMEvent *event = new IMEvent( ItemChanged_Type, val.i_int);
-    customEvent( static_cast<QEvent*>(event) );
+    customEvent( event );
     delete event;
 }
 
@@ -956,7 +956,7 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
     MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
-    QApplication::postEvent( mim, static_cast<QEvent*>(event) );
+    QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
 
@@ -966,7 +966,7 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
     MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( VolumeChanged_Type, newval.i_int );
-    QApplication::postEvent( mim, static_cast<QEvent*>(event) );
+    QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
 

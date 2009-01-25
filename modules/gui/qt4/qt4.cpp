@@ -485,7 +485,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
 {
     VLC_UNUSED( p_intf );
     DialogEvent *event = new DialogEvent( i_dialog_event, i_arg, p_arg );
-    QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
+    QApplication::postEvent( THEDP, event );
 }
 
 /**

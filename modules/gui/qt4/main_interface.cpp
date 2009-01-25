@@ -597,7 +597,7 @@ void MainInterface::toggleFSC()
    if( !fullscreenControls ) return;
 
    IMEvent *eShow = new IMEvent( FullscreenControlToggle_Type, 0 );
-   QApplication::postEvent( fullscreenControls, static_cast<QEvent *>(eShow) );
+   QApplication::postEvent( fullscreenControls, eShow );
 }
 
 void MainInterface::debug()
@@ -1174,7 +1174,7 @@ static int InteractCallback( vlc_object_t *p_this,
     intf_dialog_args_t *p_arg = new intf_dialog_args_t;
     p_arg->p_dialog = (interaction_dialog_t *)(new_val.p_address);
     DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
-    QApplication::postEvent( THEDP, static_cast<QEvent*>(event) );
+    QApplication::postEvent( THEDP, event );
     return VLC_SUCCESS;
 }
 
