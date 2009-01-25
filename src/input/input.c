@@ -2522,13 +2522,13 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         {
-            /* Take access redirections into account */
+            /* Take access/stream redirections into account */
             char *psz_real_path;
             char *psz_buf = NULL;
-            if( in->p_access->psz_path )
+            if( in->p_stream->psz_path )
             {
                 const char *psz_a, *psz_d;
-                psz_buf = strdup( in->p_access->psz_path );
+                psz_buf = strdup( in->p_stream->psz_path );
                 input_SplitMRL( &psz_a, &psz_d, &psz_real_path, psz_buf );
             }
             else
