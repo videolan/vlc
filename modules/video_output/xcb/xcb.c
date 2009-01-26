@@ -82,6 +82,7 @@ struct vout_sys_t
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
+    bool gray; /* whether display is grayscale */
     uint8_t bpp; /* bits per pixel */
 };
 
@@ -147,6 +148,7 @@ static int Open (vlc_object_t *obj)
 
     /* Determine the visual (color depth and palette) */
     xcb_visualtype_t *vt = NULL;
+    p_sys->gray = false;
     if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_TRUE_COLOR,
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using TrueColor visual ID %d", (int)vt->visual_id);
@@ -154,6 +156,14 @@ static int Open (vlc_object_t *obj)
     if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_COLOR,
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using static color visual ID %d", (int)vt->visual_id);
+    else
+    if ((scr->root_depth == 8)
+     && (vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_GRAY,
+                                            scr->root_depth)) != NULL)
+    {
+        msg_Dbg (vout, "using static gray visual ID %d", (int)vt->visual_id);
+        p_sys->gray = true;
+    }
     else
     {
         vt = xcb_aux_find_visual_by_id (scr, scr->root_visual);
@@ -388,7 +398,9 @@ static int Init (vout_thread_t *vout)
             break;
 
         case 8: /* FIXME: VLC cannot convert */
-            vout->output.i_chroma = VLC_FOURCC ('R', 'G', 'B', '2');
+            vout->output.i_chroma =
+                p_sys->gray ? VLC_FOURCC ('G', 'R', 'E', 'Y')
+                            : VLC_FOURCC ('R', 'G', 'B', '2');
             break;
 
         default:
