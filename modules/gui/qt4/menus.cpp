@@ -194,6 +194,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     PUSH_INPUTVAR( "spu-es" );
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "zoom" );
+    PUSH_VAR( "scaling" );
     PUSH_VAR( "deinterlace" );
     PUSH_VAR( "aspect-ratio" );
     PUSH_VAR( "crop" );
