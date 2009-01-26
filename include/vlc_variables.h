@@ -316,7 +316,7 @@ static inline int __var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline int __var_GetBool( vlc_object_t *p_obj, const char *psz_name )
+static inline bool __var_GetBool( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val; val.b_bool = false;
 
@@ -455,7 +455,7 @@ static inline int __var_CreateGetInteger( vlc_object_t *p_obj, const char *psz_n
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline int __var_CreateGetBool( vlc_object_t *p_obj, const char *psz_name )
+static inline bool __var_CreateGetBool( vlc_object_t *p_obj, const char *psz_name )
 {
     __var_Create( p_obj, psz_name, VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     return __var_GetBool( p_obj, psz_name );
@@ -552,7 +552,7 @@ static inline int __var_CreateGetIntegerCommand( vlc_object_t *p_obj, const char
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline int __var_CreateGetBoolCommand( vlc_object_t *p_obj, const char *psz_name )
+static inline bool __var_CreateGetBoolCommand( vlc_object_t *p_obj, const char *psz_name )
 {
     __var_Create( p_obj, psz_name, VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                                    | VLC_VAR_ISCOMMAND );
