@@ -552,6 +552,17 @@ describe:
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
 #endif
+    if( psz_options == NULL && authenticator.realm() != NULL )
+    {
+        // try again, with the realm set this time
+#if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
+        psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
+                                               &authenticator, timeout );
+#else
+        psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
+                                               &authenticator );
+#endif
+    }
     if( psz_options )
     {
         p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
