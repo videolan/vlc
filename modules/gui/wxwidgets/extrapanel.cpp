@@ -799,7 +799,7 @@ void ExtraPanel::OnChangeEqualizer( wxScrollEvent &event )
     {
         char psz_val[5];
         float f_val = (float)( 400 - band_sliders[i]->GetValue() ) / 10- 20 ;
-        sprintf( psz_values, "%s %f", psz_values, f_val );
+        sprintf( psz_values + strlen( psz_value ), " %f", f_val );
         sprintf( psz_val, "%.1f", f_val );
         band_texts[i]->SetLabel( band_frequencies[i] + wxT("\n") +
                         wxU( psz_val ) + wxT("dB" ) );
