@@ -307,13 +307,9 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
     QMenu *menu = new QMenu();
 
     addDPStaticEntry( menu, qtr( "&Open File..." ),
-#ifdef WIN32
         ":/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
     addDPStaticEntry( menu, qtr( "Advanced Open File..." ),
-        ":/file-asym", SLOT( openFileDialog() ) );
-#else
-        ":/file-asym", SLOT( openFileDialog() ), "Ctrl+O" );
-#endif
+        ":/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
     addDPStaticEntry( menu, qtr( "Open &URL" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
     addDPStaticEntry( menu, qtr( I_OPEN_FOLDER ),
