@@ -131,19 +131,6 @@ extern "C" {
 
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
-/*****************************************************************************
- * Some functions to manipulate memory
- *****************************************************************************/
-#define GetFOURCC( p )  __GetFOURCC( (uint8_t*)p )
-static vlc_fourcc_t __GetFOURCC( uint8_t *p )
-{
-    return VLC_FOURCC( p[0], p[1], p[2], p[3] );
-}
-static inline char * ToUTF8( const UTFstring &u )
-{
-    return strdup( u.GetUTF8().c_str() );
-}
-
 
 using namespace LIBMATROSKA_NAMESPACE;
 using namespace std;

@@ -29,6 +29,14 @@
 #include "demux.hpp"
 
 /*****************************************************************************
+ * Some functions to manipulate memory
+ *****************************************************************************/
+static inline char * ToUTF8( const UTFstring &u )
+{
+    return strdup( u.GetUTF8().c_str() );
+}
+
+/*****************************************************************************
  * ParseSeekHead:
  *****************************************************************************/
 void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
