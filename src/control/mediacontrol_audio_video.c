@@ -56,7 +56,6 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
                        mediacontrol_Exception *exception )
 {
     (void)a_position;
-    vlc_object_t* p_cache;
     vout_thread_t* p_vout;
     input_thread_t *p_input;
     mediacontrol_RGBPicture *p_pic = NULL;
@@ -66,6 +65,13 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
+
+
+    p_snapshot = malloc( sizeof( snapshot_t ) );
+    if( ! p_snapshot )
+    {
+        RAISE_NULL( mediacontrol_InternalException, "Cannot allocate snapshot" );
+    }
 
     p_input = libvlc_get_input_thread( self->p_media_player, &ex );
     if( ! p_input )
@@ -79,26 +85,49 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     {
         RAISE_NULL( mediacontrol_InternalException, "No video output" );
     }
-    p_cache = vlc_object_create( p_input, sizeof( vlc_object_t ) );
-    if( p_cache == NULL )
-    {
-        vlc_object_release( p_vout );
-        vlc_object_release( p_input );
-        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
-    }
-    snprintf( path, 255, "object:%p", p_cache );
+
+    /* TODO:
+   vlc_mutex_lock (&lock);
+   mutex_cleanup_push (&lock); // release the mutex in case of cancellation
+
+   while (!foobar)
+       vlc_cond_wait (&wait, &lock);
+
+   --- foobar is now true, do something about it here --
+
+   vlc_cleanup_run (); // release the mutex
+    */
+
+    snprintf( path, 255, "object:%p", p_snapshot );
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
 
-    vlc_object_lock( p_cache );
+    vlc_mutex_init( &p_snapshot->p_mutex );
+    vlc_cond_init( &p_snapshot->p_condvar );
+
+    vlc_mutex_lock( &p_snapshot->p_mutex );
+    mutex_cleanup_push( &p_snapshot->p_mutex );
+
+    /* Use p_snapshot address as sentinel against spurious vlc_object_wait wakeups.
+
+       If a legitimate wakeup occurs, then p_snapshot->p_data will hold either
+       NULL (in case of error) or a pointer to valid data. */
+    p_snapshot->p_data = ( char* )p_snapshot;
+
     vout_Control( p_vout, VOUT_SNAPSHOT );
+    while ( p_snapshot->p_data == ( char* )p_snapshot )
+    {
+        vlc_cond_wait( &p_snapshot->p_condvar, &p_snapshot->p_mutex );
+    }
+    vlc_cleanup_pop();
+
     vlc_object_release( p_vout );
 
-    p_snapshot = ( snapshot_t* ) p_cache->p_private;
-    vlc_object_unlock( p_cache );
-    vlc_object_release( p_cache );
+    vlc_mutex_unlock( &p_snapshot->p_mutex );
+    vlc_cond_destroy( &p_snapshot->p_condvar );
+    vlc_mutex_destroy( &p_snapshot->p_mutex );
 
-    if( p_snapshot )
+    if( p_snapshot->p_data )
     {
         /* Note: p_snapshot->p_data is directly used, not copied. Thus
            do not free it here. */

@@ -638,13 +638,12 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
      */
     if( b_embedded_snapshot )
     {
-        vlc_object_t* p_dest = p_obj;
         block_t *p_block;
-        snapshot_t *p_snapshot;
+        snapshot_t *p_snapshot = p_obj;
         size_t i_size;
 
-	vlc_object_lock( p_dest );
-        p_dest->p_private = NULL;
+	vlc_mutex_lock( &p_snapshot->p_mutex );
+	p_snapshot->p_data = NULL;
 
         /* Save the snapshot to a memory zone */
         p_block = image_Write( p_image, p_pic, &fmt_in, &fmt_out );
@@ -652,21 +651,9 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         {
             msg_Err( p_vout, "Could not get snapshot" );
             image_HandlerDelete( p_image );
-            vlc_object_signal_unlocked( p_dest );
-	    vlc_object_unlock( p_dest );
+	    vlc_cond_signal( &p_snapshot->p_condvar );
+	    vlc_mutex_unlock( &p_snapshot->p_mutex );
             return VLC_EGENERIC;
-        }
-
-        /* Copy the p_block data to a snapshot structure */
-        /* FIXME: get the timestamp */
-        p_snapshot = malloc( sizeof( snapshot_t ) );
-        if( !p_snapshot )
-        {
-            block_Release( p_block );
-            image_HandlerDelete( p_image );
-            vlc_object_signal_unlocked( p_dest );
-	    vlc_object_unlock( p_dest );
-            return VLC_ENOMEM;
         }
 
         i_size = p_block->i_buffer;
@@ -679,21 +666,18 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
         if( !p_snapshot->p_data )
         {
             block_Release( p_block );
-            free( p_snapshot );
             image_HandlerDelete( p_image );
-            vlc_object_signal_unlocked( p_dest );
-	    vlc_object_unlock( p_dest );
+	    vlc_cond_signal( &p_snapshot->p_condvar );
+	    vlc_mutex_unlock( &p_snapshot->p_mutex );
             return VLC_ENOMEM;
         }
         memcpy( p_snapshot->p_data, p_block->p_buffer, p_block->i_buffer );
 
-        p_dest->p_private = p_snapshot;
-
         block_Release( p_block );
 
         /* Unlock the object */
-        vlc_object_signal_unlocked( p_dest );
-	vlc_object_unlock( p_dest );
+	vlc_cond_signal( &p_snapshot->p_condvar );
+	vlc_mutex_unlock( &p_snapshot->p_mutex );
 
         image_HandlerDelete( p_image );
         return VLC_SUCCESS;

@@ -714,6 +714,8 @@ typedef struct snapshot_t {
   int i_height;      /* In pixels */
   int i_datasize;    /* In bytes */
   mtime_t date;      /* Presentation time */
+  vlc_cond_t p_condvar;
+  vlc_mutex_t p_mutex;
 } snapshot_t;
 
 /**@}*/
