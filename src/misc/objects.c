@@ -401,7 +401,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         /* This can only ever happen if someone killed us without locking: */
         assert (internals->pipes[1] == -1);
 
-#ifdef HAVE_EVENTFD
+#ifdef HAVE_SYS_EVENTFD_H
         internals->pipes[0] = internals->pipes[1] = eventfd (0, 0);
         if (internals->pipes[0] == -1)
 #endif
