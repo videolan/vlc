@@ -864,9 +864,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( psz_modules && *psz_modules && psz_control && *psz_control )
     {
-        psz_modules = (char *)realloc( psz_modules, strlen( psz_modules ) +
-                                                    strlen( psz_control ) + 1 );
-        sprintf( psz_modules, "%s:%s", psz_modules, psz_control );
+        char* psz_tmp;
+        if( asprintf( &psz_tmp, "%s:%s", psz_modules, psz_control ) != -1 )
+        {
+            free( psz_modules );
+            psz_modules = psz_tmp;
+        }
     }
     else if( psz_control && *psz_control )
     {
