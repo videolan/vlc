@@ -349,6 +349,7 @@ static void *Thread( void *p_data )
         {
             if( errno != EINTR )
                 break;
+            canc = vlc_savecancel();
             continue;
         }
         canc = vlc_savecancel();
