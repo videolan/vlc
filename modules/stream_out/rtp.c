@@ -350,13 +350,15 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
     p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
     p_sys->i_port_video = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-video" );
-    p_sys->rtcp_mux   = var_GetBool( p_stream, SOUT_CFG_PREFIX "rtcp-mux" );
+    p_sys->rtcp_mux     = var_GetBool( p_stream, SOUT_CFG_PREFIX "rtcp-mux" );
 
     p_sys->psz_sdp_file = NULL;
 
     if( p_sys->i_port_audio && p_sys->i_port_video == p_sys->i_port_audio )
     {
         msg_Err( p_stream, "audio and video RTP port must be distinct" );
+        free( p_sys->psz_destination );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -469,6 +471,7 @@ static int Open( vlc_object_t *p_this )
             free( psz );
             vlc_mutex_destroy( &p_sys->lock_sdp );
             vlc_mutex_destroy( &p_sys->lock_es );
+            free( p_sys->psz_destination );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -483,6 +486,7 @@ static int Open( vlc_object_t *p_this )
             sout_AccessOutDelete( p_sys->p_grab );
             vlc_mutex_destroy( &p_sys->lock_sdp );
             vlc_mutex_destroy( &p_sys->lock_es );
+            free( p_sys->psz_destination );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -494,6 +498,7 @@ static int Open( vlc_object_t *p_this )
             sout_AccessOutDelete( p_sys->p_grab );
             vlc_mutex_destroy( &p_sys->lock_sdp );
             vlc_mutex_destroy( &p_sys->lock_es );
+            free( p_sys->psz_destination );
             free( p_sys );
             return VLC_EGENERIC;
         }
