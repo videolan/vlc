@@ -278,7 +278,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     vlc_meta_t *p_meta;
     input_attachment_t ***ppp_attach;
     int *pi_int;
-    int i;
 
     switch( i_query )
     {
@@ -294,7 +293,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                                         p_sys->stored_attachments.size() );
             if( !(*ppp_attach) )
                 return VLC_ENOMEM;
-            for( i = 0; i < p_sys->stored_attachments.size(); i++ )
+            for( size_t i = 0; i < p_sys->stored_attachments.size(); i++ )
             {
                 attachment_c *a = p_sys->stored_attachments[i];
                 (*ppp_attach)[i] = vlc_input_attachment_New( a->psz_file_name.c_str(), a->psz_mime_type.c_str(), NULL,

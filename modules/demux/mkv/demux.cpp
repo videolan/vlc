@@ -284,8 +284,6 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
         /* KEY part */
         if( p_ev->i_key_action )
         {
-            int i;
-
             msg_Dbg( p_ev->p_demux, "Handle Key Event");
 
             vlc_mutex_lock( &p_ev->lock );

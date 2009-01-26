@@ -87,7 +87,6 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
 {
     EbmlParser  *ep;
     EbmlElement *el;
-    size_t i, j;
 
     if( b_cues )
     {
@@ -187,7 +186,6 @@ void matroska_segment_c::LoadTags( KaxTags *tags )
 {
     EbmlParser  *ep;
     EbmlElement *el;
-    size_t i, j;
 
     /* Master elements */
     ep = new EbmlParser( &es, tags, &sys.demuxer );
@@ -597,8 +595,6 @@ int matroska_segment_c::BlockFindTrackIndex( size_t *pi_track,
                                              const KaxBlock *p_block, const KaxSimpleBlock *p_simpleblock )
 {
     size_t          i_track;
-    unsigned int    i;
-    bool            b;
 
     for( i_track = 0; i_track < tracks.size(); i_track++ )
     {

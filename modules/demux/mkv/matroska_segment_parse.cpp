@@ -35,8 +35,6 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
 {
     EbmlParser  *ep;
     EbmlElement *l;
-    size_t i, j;
-    int i_upper_level = 0;
     bool b_seekable;
 
     i_seekhead_count++;
@@ -124,6 +122,31 @@ void matroska_segment_c::ParseSeekHead( KaxSeekHead *seekhead )
     }
     delete ep;
 }
+
+
+/**
+ * Helper function to print the mkv parse tree
+ */
+static void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ... )
+{
+    va_list args;
+    if( i_level > 9 )
+    {
+        msg_Err( &demuxer, "too deep tree" );
+        return;
+    }
+    va_start( args, psz_format );
+    static const char psz_foo[] = "|   |   |   |   |   |   |   |   |   |";
+    char *psz_foo2 = (char*)malloc( i_level * 4 + 3 + strlen( psz_format ) );
+    strncpy( psz_foo2, psz_foo, 4 * i_level );
+    psz_foo2[ 4 * i_level ] = '+';
+    psz_foo2[ 4 * i_level + 1 ] = ' ';
+    strcpy( &psz_foo2[ 4 * i_level + 2 ], psz_format );
+    __msg_GenericVa( VLC_OBJECT(&demuxer),VLC_MSG_DBG, "mkv", psz_foo2, args );
+    free( psz_foo2 );
+    va_end( args );
+}
+
 
 /*****************************************************************************
  * ParseTrackEntry:

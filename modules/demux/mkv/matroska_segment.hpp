@@ -42,14 +42,14 @@ public:
         ,i_timescale(MKVD_TIMECODESCALE)
         ,i_duration(-1)
         ,i_start_time(0)
+        ,i_seekhead_count(0)
+        ,i_seekhead_position(-1)
         ,i_cues_position(-1)
+        ,i_tracks_position(-1)
         ,i_info_position(-1)
         ,i_chapters_position(-1)
         ,i_tags_position(-1)
-        ,i_tracks_position(-1)
         ,i_attachments_position(-1)
-        ,i_seekhead_position(-1)
-        ,i_seekhead_count(0)
         ,cluster(NULL)
         ,i_block_pos(0)
         ,i_cluster_pos(0)
@@ -158,29 +158,6 @@ public:
 
     static bool CompareSegmentUIDs( const matroska_segment_c * item_a, const matroska_segment_c * item_b );
 };
-
-/**
- * Helper function to print the mkv parse tree
- */
-static void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ... )
-{
-    va_list args;
-    if( i_level > 9 )
-    {
-        msg_Err( &demuxer, "too deep tree" );
-        return;
-    }
-    va_start( args, psz_format );
-    static const char psz_foo[] = "|   |   |   |   |   |   |   |   |   |";
-    char *psz_foo2 = (char*)malloc( i_level * 4 + 3 + strlen( psz_format ) );
-    strncpy( psz_foo2, psz_foo, 4 * i_level );
-    psz_foo2[ 4 * i_level ] = '+';
-    psz_foo2[ 4 * i_level + 1 ] = ' ';
-    strcpy( &psz_foo2[ 4 * i_level + 2 ], psz_format );
-    __msg_GenericVa( VLC_OBJECT(&demuxer),VLC_MSG_DBG, "mkv", psz_foo2, args );
-    free( psz_foo2 );
-    va_end( args );
-}
 
 
 #endif
