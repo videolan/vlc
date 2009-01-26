@@ -217,6 +217,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
     if( !utf8_stat( psz_filename+7, &s ) )
     {
         input_item_SetArtURL( p_item, psz_filename );
+        free( psz_filename );
         return VLC_SUCCESS;
     }
 
@@ -235,6 +236,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
         }
         fclose( f );
     }
+    free( psz_filename );
     return VLC_SUCCESS;
 }
 
