@@ -148,11 +148,13 @@ D: JACK audio output
 S: France
 
 N: Rémi Denis-Courmont
-E: rem#videolan.org
+W: www.remlab.net
 C: courmisch
-D: network/DNS
-D: SSL/TLS support (core, HTTP server, HTTP input)
-D: VOC files demultiplexer
+D: network subsystem
+D: threading subsystem
+D: Demux: RTP receiver, VOC, XA, Standard MIDI files
+D: Codecs: EA ADPCM, MIDI synthesis
+D: TLS and SRTP
 S: Finland
 
 N: Colin Delacroix
