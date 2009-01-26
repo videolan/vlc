@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.cpp : Panels for the open dialogs
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * Copyright (C) 2007 Société des arts technologiques
  * Copyright (C) 2007 Savoir-faire Linux
  *
@@ -61,6 +61,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* Classic UI Setup */
     ui.setupUi( this );
 
+#if 0
     /** BEGIN QFileDialog tweaking **/
     /* Use a QFileDialog and customize it because we don't want to
        rewrite it all. Be careful to your eyes cause there are a few hacks.
@@ -114,14 +115,16 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     // Add the DialogBox to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
+#endif
 
+/*    lineFileEdit = ui.fileEdit;
     //TODO later: fill the fileCompleteList with previous items played.
     QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
     fileCompleter->setModel( new QDirModel( fileCompleter ) );
-    lineFileEdit->setCompleter( fileCompleter );
+    lineFileEdit->setCompleter( fileCompleter );*/
 
     // Hide the subtitles control by default.
-    ui.subFrame->hide();
+    ui.subFrame->setEnabled( false );
 
     /* Build the subs size combo box */
     setfillVLCConfigCombo( "freetype-rel-fontsize" , p_intf,
@@ -131,10 +134,11 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     setfillVLCConfigCombo( "subsdec-align", p_intf, ui.alignSubComboBox );
 
     /* Connects  */
+    BUTTONACT( ui.fileBrowseButton, browseFile() );
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
-    BUTTONACT( ui.subCheckBox, toggleSubtitleFrame());
+    CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
 
-    CONNECT( lineFileEdit, textChanged( QString ), this, updateMRL() );
+    CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
     CONNECT( ui.subInput, textChanged( QString ), this, updateMRL() );
     CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
@@ -142,7 +146,19 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
 FileOpenPanel::~FileOpenPanel()
 {
-    getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
+//  getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
+}
+
+void FileOpenPanel::browseFile()
+{
+    QStringList files = QFileDialog::getOpenFileNames( this );
+    foreach( const QString &file, files)
+    {
+        QListWidgetItem *item = new QListWidgetItem( file, ui.fileListWidg );
+        item->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled );
+        ui.fileListWidg->addItem( item );
+    }
+    updateMRL();
 }
 
 /* Show a fileBrowser to select a subtitle */
@@ -150,22 +166,32 @@ void FileOpenPanel::browseFileSub()
 {
     // TODO Handle selection of more than one subtitles file
     QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
-                            EXT_FILTER_SUBTITLE,
-                            dialogBox->directory().absolutePath() );
+                           EXT_FILTER_SUBTITLE, p_intf->p_sys->psz_filepath );
+
     if( files.isEmpty() ) return;
     ui.subInput->setText( files.join(" ") );
     updateMRL();
 }
 
+void FileOpenPanel::toggleSubtitleFrame( bool b )
+{
+    ui.subFrame->setEnabled( b );
+
+    /* Update the MRL */
+    updateMRL();
+}
+
+
 /* Update the current MRL */
 void FileOpenPanel::updateMRL()
 {
-    QString mrl = "";
-    foreach( const QString &file, dialogBox->selectedFiles() ) {
-         mrl += "\"" + file + "\" ";
-    }
+    QStringList fileList;
+    QString mrl;
 
-    if( ui.subCheckBox->isChecked() ) {
+    for( int i = 0; i < ui.fileListWidg->count(); i++ )
+        fileList << ui.fileListWidg->item( i )->text();
+
+    if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
         mrl.append( " :sub-file=\"" + ui.subInput->text() + "\"" );
         int align = ui.alignSubComboBox->itemData(
                     ui.alignSubComboBox->currentIndex() ).toInt();
@@ -175,40 +201,22 @@ void FileOpenPanel::updateMRL()
         mrl.append( " :freetype-rel-fontsize=" + QString().setNum( size ) );
     }
 
-    emit mrlUpdated( mrl );
+    emit mrlUpdated( fileList, mrl );
     emit methodChanged( "file-caching" );
 }
 
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
-    //TODO set the completer
-    p_intf->p_sys->psz_filepath = qtu( dialogBox->directory().absolutePath() );
-}
-
-void FileOpenBox::accept()
-{
-    OpenDialog::getInstance( NULL, NULL, true )->selectSlots();
-}
-
-void FileOpenBox::reject()
-{
-    OpenDialog::getInstance( NULL, NULL, true )->cancel();
+    //FIXME
+ //   p_intf->p_sys->psz_filepath = qtu( dialogBox->directory().absolutePath() );
 }
 
 /* Function called by Open Dialog when clicked on cancel */
 void FileOpenPanel::clear()
 {
-    lineFileEdit->clear();
+    ui.fileListWidg->clear();
     ui.subInput->clear();
-}
-
-void FileOpenPanel::toggleSubtitleFrame()
-{
-    TOGGLEV( ui.subFrame );
-
-    /* Update the MRL */
-    updateMRL();
 }
 
 /**************************************************************************
@@ -285,6 +293,8 @@ void DiscOpenPanel::clear()
 {
     ui.titleSpin->setValue( 0 );
     ui.chapterSpin->setValue( 0 );
+    ui.subtitlesSpin->setValue( -1 );
+    ui.audioSpin->setValue( -1 );
     b_firstcdda = true;
     b_firstdvd = true;
     b_firstvcd = true;
@@ -349,14 +359,15 @@ void DiscOpenPanel::updateButtons()
 void DiscOpenPanel::updateMRL()
 {
     QString mrl = "";
+    QStringList fileList;
 
-    /* CDDAX and VCDX not implemented. TODO ? */
+    /* CDDAX and VCDX not implemented. TODO ? No. */
     /* DVD */
     if( ui.dvdRadioButton->isChecked() ) {
         if( !ui.dvdsimple->isChecked() )
-            mrl = "\"dvd://";
+            mrl = "dvd://";
         else
-            mrl = "\"dvdsimple://";
+            mrl = "dvdsimple://";
         mrl += ui.deviceCombo->currentText();
         emit methodChanged( "dvdnav-caching" );
 
@@ -369,7 +380,7 @@ void DiscOpenPanel::updateMRL()
 
     /* VCD */
     } else if ( ui.vcdRadioButton->isChecked() ) {
-        mrl = "\"vcd://" + ui.deviceCombo->currentText();
+        mrl = "vcd://" + ui.deviceCombo->currentText();
         emit methodChanged( "vcd-caching" );
 
         if( ui.titleSpin->value() > 0 ) {
@@ -378,13 +389,13 @@ void DiscOpenPanel::updateMRL()
 
     /* CDDA */
     } else {
-        mrl = "\"cdda://" + ui.deviceCombo->currentText();
+        mrl = "cdda://" + ui.deviceCombo->currentText();
         if( ui.titleSpin->value() > 0 ) {
-            QString("@%1").arg( ui.titleSpin->value() );
+            mrl += QString("@%1").arg( ui.titleSpin->value() );
         }
     }
 
-    mrl += "\"";
+    fileList << mrl; mrl = "";
 
     if ( ui.dvdRadioButton->isChecked() || ui.vcdRadioButton->isChecked() )
     {
@@ -397,7 +408,7 @@ void DiscOpenPanel::updateMRL()
                 QString("%1").arg( ui.subtitlesSpin->value() );
         }
     }
-    emit mrlUpdated( mrl );
+    emit mrlUpdated( fileList, mrl );
 }
 
 void DiscOpenPanel::browseDevice()
@@ -431,7 +442,6 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
              this, updateProtocol( int ) );
     CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.addressText, textChanged( QString ), this, updateMRL());
-    CONNECT( ui.timeShift, clicked(), this, updateMRL());
 
     ui.protocolCombo->addItem( "" );
     ui.protocolCombo->addItem("HTTP", QVariant("http"));
@@ -476,7 +486,6 @@ void NetOpenPanel::updateProtocol( int idx_proto ) {
     QString addr = ui.addressText->text();
     QString proto = ui.protocolCombo->itemData( idx_proto ).toString();
 
-    ui.timeShift->setEnabled( idx_proto == UDP_PROTO );
     ui.portSpin->setEnabled( idx_proto == UDP_PROTO ||
                              idx_proto == RTP_PROTO );
 
@@ -573,10 +582,8 @@ void NetOpenPanel::updateMRL() {
         }
     }
 
-    if( ui.timeShift->isEnabled() && ui.timeShift->isChecked() ) {
-        mrl += " :access-filter=timeshift";
-    }
-    emit mrlUpdated( mrl );
+    QStringList qsl; qsl<< mrl;
+    emit mrlUpdated( qsl, "" );
 }
 
 void NetOpenPanel::updateCompleter()
@@ -830,15 +837,15 @@ void CaptureOpenPanel::initialize()
     jackChannels->setAlignment( Qt::AlignRight );
     jackDevLayout->addWidget( jackChannels, 1, 1 );
 
-    /* Jack Props panel */
-
     /* Selected ports */
     QLabel *jackPortsLabel = new QLabel( qtr( "Selected ports:" ) );
-    jackPropLayout->addWidget( jackPortsLabel, 0 , 0 );
+    jackDevLayout->addWidget( jackPortsLabel, 0 , 0 );
 
     jackPortsSelected = new QLineEdit( qtr( ".*") );
     jackPortsSelected->setAlignment( Qt::AlignRight );
-    jackPropLayout->addWidget( jackPortsSelected, 0, 1 );
+    jackDevLayout->addWidget( jackPortsSelected, 0, 1 );
+
+    /* Jack Props panel */
 
     /* Caching */
     QLabel *jackCachingLabel = new QLabel( qtr( "Input caching:" ) );
@@ -848,7 +855,7 @@ void CaptureOpenPanel::initialize()
     jackCaching->setSuffix( " ms" );
     jackCaching->setValue(1000);
     jackCaching->setAlignment( Qt::AlignRight );
-    jackPropLayout->addWidget( jackCaching, 1 , 1 );
+    jackPropLayout->addWidget( jackCaching, 1 , 2 );
 
     /* Pace */
     jackPace = new QCheckBox(qtr( "Use VLC pace" ));
@@ -856,7 +863,7 @@ void CaptureOpenPanel::initialize()
 
     /* Auto Connect */
     jackConnect = new QCheckBox( qtr( "Auto connnection" ));
-    jackPropLayout->addWidget( jackConnect, 3, 1 );
+    jackPropLayout->addWidget( jackConnect, 2, 2 );
 
     /* Jack CONNECTs */
     CuMRL( jackChannels, valueChanged( int ) );
@@ -1025,6 +1032,7 @@ void CaptureOpenPanel::clear()
 void CaptureOpenPanel::updateMRL()
 {
     QString mrl = "";
+    QStringList fileList;
     int i_devicetype = ui.deviceCombo->itemData(
             ui.deviceCombo->currentIndex() ).toInt();
     switch( i_devicetype )
@@ -1036,6 +1044,8 @@ void CaptureOpenPanel::updateMRL()
         else if(  bdac->isChecked() ) mrl = "dvb-c://";
         else if(  bdaa->isChecked() ) mrl = "atsc://";
         else return;
+        fileList << mrl; mrl = "";
+
         mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
@@ -1045,7 +1055,7 @@ void CaptureOpenPanel::updateMRL()
                     bdaBandBox->currentIndex() ).toInt() );
         break;
     case DSHOW_DEVICE:
-        mrl = "dshow://";
+        fileList << "dshow://";
         mrl+= " :dshow-vdev=" + QString("\"%1\"").arg( vdevDshowW->getValue() );
         mrl+= " :dshow-adev=" + QString("\"%1\"").arg( adevDshowW->getValue() );
         if( dshowVSizeLine->isModified() )
@@ -1053,14 +1063,14 @@ void CaptureOpenPanel::updateMRL()
         break;
 #else
     case V4L_DEVICE:
-        mrl = "v4l://";
+        fileList << "v4l://";
         mrl += " :v4l-vdev=" + v4lVideoDevice->text();
         mrl += " :v4l-adev=" + v4lAudioDevice->text();
         mrl += " :v4l-norm=" + QString("%1").arg( v4lNormBox->currentIndex() );
         mrl += " :v4l-frequency=" + QString("%1").arg( v4lFreq->value() );
         break;
     case V4L2_DEVICE:
-        mrl = "v4l2://";
+        fileList << "v4l2://";
         mrl += " :v4l2-dev=" + v4l2VideoDevice->text();
         mrl += " :v4l2-adev=" + v4l2AudioDevice->text();
         mrl += " :v4l2-standard=" + QString("%1").arg( v4l2StdBox->currentIndex() );
@@ -1069,18 +1079,20 @@ void CaptureOpenPanel::updateMRL()
         mrl = "jack://";
         mrl += "channels=" + QString("%1").arg( jackChannels->value() );
         mrl += ":ports=" + jackPortsSelected->text();
-        mrl += " --jack-input-caching=" + QString("%1").arg( jackCaching->value() );
+        fileList << mrl; mrl = "";
+
+        mrl += " :jack-input-caching=" + QString("%1").arg( jackCaching->value() );
         if ( jackPace->isChecked() )
         {
-                mrl += " --jack-input-use-vlc-pace";
+                mrl += " :jack-input-use-vlc-pace";
         }
         if ( jackConnect->isChecked() )
         {
-                mrl += " --jack-input-auto-connect";
+                mrl += " :jack-input-auto-connect";
         }
         break;
     case PVR_DEVICE:
-        mrl = "pvr://";
+        fileList << "pvr://";
         mrl += " :pvr-device=" + pvrDevice->text();
         mrl += " :pvr-radio-device=" + pvrRadioDevice->text();
         mrl += " :pvr-norm=" + QString("%1").arg( pvrNormBox->currentIndex() );
@@ -1090,22 +1102,22 @@ void CaptureOpenPanel::updateMRL()
             mrl += " :pvr-bitrate=" + QString("%1").arg( pvrBitr->value() );
         break;
     case DVB_DEVICE:
-        mrl = "dvb://";
+        fileList << "dvb://";
         mrl += " :dvb-adapter=" + QString("%1").arg( dvbCard->value() );
         mrl += " :dvb-frequency=" + QString("%1").arg( dvbFreq->value() );
         mrl += " :dvb-srate=" + QString("%1").arg( dvbSrate->value() );
         break;
 #endif
     case SCREEN_DEVICE:
-        mrl = "screen://";
-        mrl += " :screen-fps=" + QString("%1").arg( screenFPS->value() );
+        fileList << "screen://";
+        mrl = " :screen-fps=" + QString("%1").arg( screenFPS->value() );
         updateButtons();
         break;
     }
 
     if( !advMRL.isEmpty() ) mrl += advMRL;
 
-    emit mrlUpdated( mrl );
+    emit mrlUpdated( fileList, mrl );
 }
 
 /**

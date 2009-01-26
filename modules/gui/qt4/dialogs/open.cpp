@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.cpp : Advanced open dialog
  *****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
@@ -85,9 +85,7 @@ OpenDialog::OpenDialog( QWidget *parent,
 
     /* Basic Creation of the Window */
     ui.setupUi( this );
-    setWindowTitle( qtr( "Open" ) );
-    /* resize( 410, 600 ); */
-    setMinimumSize( 520, 490 );
+    setWindowTitle( qtr( "Open a Media" ) );
 
     /* Tab definition and creation */
     fileOpenPanel    = new FileOpenPanel( ui.Tab, p_intf );
@@ -140,10 +138,14 @@ OpenDialog::OpenDialog( QWidget *parent,
     /* Force MRL update on tab change */
     CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent( int ) );
 
-    CONNECT( fileOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
-    CONNECT( netOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
-    CONNECT( discOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
-    CONNECT( captureOpenPanel, mrlUpdated( QString ), this, updateMRL( QString ) );
+    CONNECT( fileOpenPanel, mrlUpdated( QStringList, QString ),
+             this, updateMRL( QStringList, QString ) );
+    CONNECT( netOpenPanel, mrlUpdated( QStringList, QString ),
+             this, updateMRL( QStringList, QString ) );
+    CONNECT( discOpenPanel, mrlUpdated( QStringList, QString ),
+             this, updateMRL( QStringList, QString ) );
+    CONNECT( captureOpenPanel, mrlUpdated( QStringList, QString ),
+             this, updateMRL( QStringList, QString ) );
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
              this, newCachingMethod( QString ) );
@@ -155,6 +157,7 @@ OpenDialog::OpenDialog( QWidget *parent,
              this, newCachingMethod( QString ) );
 
     /* Advanced frame Connects */
+    CONNECT( ui.slaveCheckbox, toggled( bool ), this, updateMRL() );
     CONNECT( ui.slaveText, textChanged( QString ), this, updateMRL() );
     CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.startTimeSpinBox, valueChanged( int ), this, updateMRL() );
@@ -176,12 +179,19 @@ OpenDialog::OpenDialog( QWidget *parent,
     storedMethod = "";
     newCachingMethod( "file-caching" );
 
-    resize( getSettings()->value( "opendialog-size", QSize( 520, 490 ) ).toSize() );
+    resize( getSettings()->value( "opendialog-size", QSize( 400, 490 ) ).toSize() );
 }
 
 OpenDialog::~OpenDialog()
 {
     getSettings()->setValue( "opendialog-size", size() );
+}
+
+/* Used by VLM dialog and inputSlave selection */
+QString OpenDialog::getMRL( bool b_all )
+{
+    return b_all ? itemsMRL[0] + ui.advancedLineInput->text()
+                 : itemsMRL[0];
 }
 
 /* Finish the dialog and decide if you open another one after */
@@ -237,7 +247,6 @@ void OpenDialog::toggleAdvancedPanel()
     if( ui.advancedFrame->isVisible() )
     {
         ui.advancedFrame->hide();
-        //setMinimumSize( 520, 460 );
         if( size().isValid() )
             resize( size().width(), size().height()
                     - ui.advancedFrame->height() );
@@ -245,7 +254,6 @@ void OpenDialog::toggleAdvancedPanel()
     else
     {
         ui.advancedFrame->show();
-        //setMinimumSize( 520, 460 + ui.advancedFrame->height() );
         if( size().isValid() )
             resize( size().width(), size().height()
                     + ui.advancedFrame->height() );
@@ -263,8 +271,8 @@ void OpenDialog::cancel()
         dynamic_cast<OpenPanel*>( ui.Tab->widget( i ) )->clear();
 
     /* Clear the variables */
-    mrl.clear();
-    mainMRL.clear();
+    itemsMRL.clear();
+    optionsMRL.clear();
 
     /* If in Select Mode, reject instead of hiding */
     if( i_action_flag == SELECT ) reject();
@@ -315,38 +323,50 @@ void OpenDialog::enqueue()
 void OpenDialog::finish( bool b_enqueue = false )
 {
     toggleVisible();
-    mrl = ui.advancedLineInput->text();
 
-    if( i_action_flag != SELECT )
+    if( i_action_flag == SELECT )
     {
-        QStringList tempMRL = SeparateEntries( mrl );
-        for( int i = 0; i < tempMRL.size(); i++ )
-        {
-            bool b_start = !i && !b_enqueue;
-            input_item_t *p_input;
+        accept();
+        return;
+    }
 
-            p_input = input_item_New( p_intf, qtu( tempMRL[i] ), NULL );
+    /* Go through the item list */
+    for( int i = 0; i < itemsMRL.size(); i++ )
+    {
+        bool b_start = !i && !b_enqueue;
+
+        input_item_t *p_input;
+        p_input = input_item_New( p_intf, qtu( itemsMRL[i] ), NULL );
+
+        /* Insert options only for the first element.
+           We don't know how to edit that anyway. */
+        if( i == 0 )
+        {
+            /* Take options from the UI, not from what we stored */
+            QStringList optionsList = ui.advancedLineInput->text().split( ":" );
 
             /* Insert options */
-            while( i + 1 < tempMRL.size() && tempMRL[i + 1].startsWith( ":" ) )
+            for( int j = 0; j < optionsList.size(); j++ )
             {
-                i++;
-                input_item_AddOption( p_input, qtu( tempMRL[i] ), VLC_INPUT_OPTION_TRUSTED );
+                QString qs = optionsList[j].trimmed();
+                if( !qs.isEmpty() )
+                {
+                    input_item_AddOption( p_input, qtu( qs ), VLC_INPUT_OPTION_TRUSTED );
+                    //  msg_Err( p_intf, "Here %s", qtu( qs ));
+                }
             }
+        }
 
-            /* Switch between enqueuing and starting the item */
-            /* FIXME: playlist_AddInput() can fail */
-            playlist_AddInput( THEPL, p_input,
+        /* Switch between enqueuing and starting the item */
+        /* FIXME: playlist_AddInput() can fail */
+        playlist_AddInput( THEPL, p_input,
                 PLAYLIST_APPEND | ( b_start ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
                 PLAYLIST_END, b_pl ? true : false, pl_Unlocked );
-            vlc_gc_decref( p_input );
+        vlc_gc_decref( p_input );
 
-            /* Do not add the current MRL if playlist_AddInput fail */
-            RecentsMRL::getInstance( p_intf )->addRecent( tempMRL[i] );
-        }
+        /* Do not add the current MRL if playlist_AddInput fail */
+        RecentsMRL::getInstance( p_intf )->addRecent( itemsMRL[i] );
     }
-    else
-        accept();
 }
 
 void OpenDialog::transcode()
@@ -356,43 +376,24 @@ void OpenDialog::transcode()
 
 void OpenDialog::stream( bool b_transcode_only )
 {
-    mrl = ui.advancedLineInput->text();
+    QString soutMRL = getMRL();
     toggleVisible();
 
-    /* Separate the entries */
-    QStringList listMRL = SeparateEntries( mrl );
-
-    /* We can only take the first entry since we have no idea what
-       to do with many files ? Gather ? */
-    if( listMRL.size() > 0 )
-    {
-        /* First item */
-        QString soutMRL = listMRL[0];
-
-        /* Keep all the :xxx options because they are needed see v4l and dshow */
-        for( int i = 1; i < listMRL.size(); i++ )
-        {
-            if( listMRL[i].at( 0 ) == ':' )
-                soutMRL.append( " " + listMRL[i] );
-            else
-                break;
-        }
-
-        /* Dbg and send :D */
-        msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
-        THEDP->streamingDialog( this, soutMRL, b_transcode_only );
-    }
+    /* Dbg and send :D */
+    msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
+    THEDP->streamingDialog( this, soutMRL, b_transcode_only );
 }
 
 /* Update the MRL */
-void OpenDialog::updateMRL( QString tempMRL )
+void OpenDialog::updateMRL( QStringList item, QString tempMRL )
 {
-    mainMRL = tempMRL;
+    optionsMRL = tempMRL;
+    itemsMRL = item;
     updateMRL();
 }
 
 void OpenDialog::updateMRL() {
-    mrl = mainMRL;
+    QString mrl = optionsMRL;
     if( ui.slaveCheckbox->isChecked() ) {
         mrl += " :input-slave=" + ui.slaveText->text();
     }
@@ -406,6 +407,7 @@ void OpenDialog::updateMRL() {
             arg( ui.startTimeSpinBox->value() );
     }
     ui.advancedLineInput->setText( mrl );
+    ui.mrlLine->setText( itemsMRL.join( " " ) );
 }
 
 void OpenDialog::newCachingMethod( QString method )
@@ -469,6 +471,6 @@ void OpenDialog::browseInputSlave()
 {
     OpenDialog *od = new OpenDialog( this, p_intf, true, SELECT );
     od->exec();
-    ui.slaveText->setText( od->getMRL() );
+    ui.slaveText->setText( od->getMRL( false ) );
     delete od;
 }
