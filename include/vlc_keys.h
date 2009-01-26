@@ -309,7 +309,6 @@ typedef enum vlc_key {
     ACTIONID_DISC_MENU,
     ACTIONID_ASPECT_RATIO,
     ACTIONID_CROP,
-    ACTIONID_TOGGLE_SCALING,
     ACTIONID_DEINTERLACE,
     ACTIONID_ZOOM,
     ACTIONID_UNZOOM,
@@ -340,5 +339,7 @@ typedef enum vlc_key {
     ACTIONID_ZOOM_DOUBLE,
     /* Cycle Through Audio Devices */
     ACTIONID_AUDIODEVICE_CYCLE
+    /* Scaling in fullscreen */
+    ACTIONID_TOGGLE_SCALING,
 } vlc_key_t;
 #endif

@@ -2681,7 +2681,6 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-subtitle-track", ACTIONID_SUBTITLE_TRACK, 0, },
     { "key-aspect-ratio", ACTIONID_ASPECT_RATIO, 0, },
     { "key-crop", ACTIONID_CROP, 0, },
-    { "key-toggle-scaling", ACTIONID_TOGGLE_SCALING, 0, },
     { "key-deinterlace", ACTIONID_DEINTERLACE, 0, },
     { "key-intf-show", ACTIONID_INTF_SHOW, 0, },
     { "key-intf-hide", ACTIONID_INTF_HIDE, 0, },
@@ -2745,6 +2744,7 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-menu-down", ACTIONID_MENU_DOWN, 0, },
     { "key-menu-select", ACTIONID_MENU_SELECT, 0, },
     { "key-audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, 0, },
+    { "key-toggle-scaling", ACTIONID_TOGGLE_SCALING, 0, },
     { NULL, 0, 0, }
 };
 
