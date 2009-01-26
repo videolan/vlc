@@ -1221,6 +1221,8 @@ static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
 
     vlc_mutex_unlock( &p_vout->change_lock );
+
+    return VLC_SUCCESS;
 }
 
 static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
