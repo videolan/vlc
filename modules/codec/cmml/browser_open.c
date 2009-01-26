@@ -28,29 +28,38 @@
 # include "config.h"
 #endif
 
-#include "xstrcat.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "browser_open.h"
+
 
 int browser_Open( const char *psz_url )
 {
 #ifdef __APPLE__
     char *psz_open_commandline;
+    int i_ret;
 
-    psz_open_commandline = strdup( "/usr/bin/open " );
-    psz_open_commandline = xstrcat( psz_open_commandline, psz_url );
+    if( asprintf( &psz_open_commandline, "/usr/bin/open %s", psz_url ) == -1 )
+        return -1;
 
-    return system( psz_open_commandline );
+    i_ret = system( psz_open_commandline );
+    free( psz_open_commandline );
+    return i_ret;
 
 #elif defined( UNDER_CE )
     return -1;
 
 #elif defined( WIN32 )
     char *psz_open_commandline;
+    int i_ret;
 
-    psz_open_commandline = strdup( "explorer " );
-    xstrcat( psz_open_commandline, psz_url );
+    if( asprintf( &psz_open_commandline, "explorer %s", psz_url ) == -1 )
+        return -1;
 
-    return system( psz_open_commandline );
+    i_ret = system( psz_open_commandline );
+    free( psz_open_commandline );
+    return i_ret;
 
 #else
     /* Assume we're on a UNIX of some sort */
@@ -58,18 +67,22 @@ int browser_Open( const char *psz_url )
     int i_ret;
 
     /* Debian uses www-browser */
-    psz_open_commandline = strdup( "www-browser" );
-    xstrcat( psz_open_commandline, psz_url );
+    if( asprintf( &psz_open_commandline, "www-browser %s", psz_url ) == -1 )
+        return -1;
+
     i_ret = system( psz_open_commandline );
-
-    if( i_ret == 0 ) return 0;
-
     free( psz_open_commandline );
 
+    if( i_ret == 0 )
+        return 0;
+
     /* Try mozilla */
-    psz_open_commandline = strdup( "mozilla" );
-    xstrcat( psz_open_commandline, psz_url );
-    return system( psz_open_commandline );
+    if( asprintf( &psz_open_commandline, "mozilla %s", psz_url ) == -1 )
+        return -1;
+
+    i_ret = system( psz_open_commandline );
+    free( psz_open_commandline );
+    return i_ret;
 #endif
 }
 
