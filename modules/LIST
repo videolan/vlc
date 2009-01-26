@@ -359,7 +359,6 @@ $Id$
  * wince: Pocket PC interface
  * wingapi: Win CE video output
  * wingdi: WIN 32 / WIN CE GDI video output
- * wxwidgets: interface module using the cross-platform wxWindows library.
  * x11: video output module using the X11 API.
  * x264: H264 video decoder using X264
  * xa: XA demuxer
