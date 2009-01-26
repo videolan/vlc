@@ -609,6 +609,11 @@ static void Run( intf_thread_t *p_intf )
                 }
                 free( val.psz_string );
             }
+            else if( i_action == ACTIONID_TOGGLE_SCALING && p_vout )
+            {
+                bool b_scaling = var_GetBool( p_vout, "scaling" );
+                var_SetBool( p_vout, "scaling", !b_scaling );
+            }
             else if( i_action == ACTIONID_DEINTERLACE && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;

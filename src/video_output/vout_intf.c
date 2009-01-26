@@ -65,6 +65,8 @@ static int CropCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int AspectCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+static int ScalingCallback( vlc_object_t *, char const *,
+                            vlc_value_t, vlc_value_t, void * );
 static int OnTopCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static int FullscreenCallback( vlc_object_t *, char const *,
@@ -396,6 +398,15 @@ void vout_IntfInit( vout_thread_t *p_vout )
     if( (old_val.psz_string && *old_val.psz_string) || b_force_par )
         var_TriggerCallback( p_vout, "aspect-ratio" );
     free( old_val.psz_string );
+
+    /* Add a variable to indicate if scaling video is activated or not */
+    var_Create( p_vout, "scaling", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
+                | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Scaling video");
+    var_Change( p_vout, "scaling", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "scaling", ScalingCallback, NULL );
+    var_Get( p_vout, "scaling", &val );
+    p_vout->b_scale = val.b_bool;
 
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
@@ -1197,6 +1208,19 @@ static int AspectCallback( vlc_object_t *p_this, char const *psz_cmd,
     int i_ret = CropCallback( p_this, "crop", val, val, 0 );
     free( val.psz_string );
     return i_ret;
+}
+
+static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    vlc_mutex_lock( &p_vout->change_lock );
+
+    p_vout->b_scale = newval.b_bool;
+    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+
+    vlc_mutex_unlock( &p_vout->change_lock );
 }
 
 static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
