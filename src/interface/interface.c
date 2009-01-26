@@ -229,6 +229,7 @@ static void* RunInterface( vlc_object_t *p_this )
 }
 
 #if defined( __APPLE__ ) || defined( WIN32 )
+#include "control/libvlc_internal.h" /* libvlc_InternalWait */
 /**
  * MonitorLibVLCDeath: Used when b_should_run_on_first_thread is set.
  *
