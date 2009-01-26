@@ -180,7 +180,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /******************************
          * VIDEO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Video , qtr("General Video Settings") );
+        START_SPREFS_CAT( Video , qtr("Video Settings") );
             CONFIG_GENERIC( "video", Bool, NULL, enableVideo );
 
             CONFIG_GENERIC( "fullscreen", Bool, NULL, fullscreen );
@@ -215,7 +215,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         /******************************
          * AUDIO Panel Implementation *
          ******************************/
-        START_SPREFS_CAT( Audio, qtr("General Audio Settings") );
+        START_SPREFS_CAT( Audio, qtr("Audio Settings") );
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
 
@@ -279,7 +279,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 optionWidgets.append( NULL );
 #endif
 
-            /* General Audio Options */
+            /* Audio Options */
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONNECT( ui.defaultVolume, valueChanged( int ),
