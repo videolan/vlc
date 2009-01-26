@@ -346,7 +346,15 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     }
 
     p_media = libvlc_media_player_get_media( self->p_media_player, &ex );
-    HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
+    if( libvlc_exception_raised( &ex ) )
+    {
+        free( retval );
+        RAISE( mediacontrol_InternalException,
+               libvlc_exception_get_message( &ex ) );
+        libvlc_exception_clear( &ex );
+        return NULL;
+    }
+
     if( ! p_media )
     {
         /* No p_media defined */
@@ -358,8 +366,17 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     else
     {
         libvlc_state_t state;
+
         state = libvlc_media_player_get_state( self->p_media_player, &ex );
-        HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
+        if( libvlc_exception_raised( &ex ) )
+        {
+            free( retval );
+            RAISE( mediacontrol_InternalException,
+                   libvlc_exception_get_message( &ex ) );
+            libvlc_exception_clear( &ex );
+            return NULL;
+        }
+
         switch( state )
         {
         case libvlc_NothingSpecial:
