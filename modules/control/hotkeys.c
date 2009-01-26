@@ -1,7 +1,7 @@
 /*****************************************************************************
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -952,15 +952,13 @@ static int ActionEvent( vlc_object_t *libvlc, char const *psz_var,
 
 static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 {
-    vlc_value_t val;
-    char psz_bookmark_name[11];
+    char *psz_bookmark_name;
+    if( asprintf( &psz_bookmark_name, "bookmark%i", i_num ) == -1 )
+        return;
+
     playlist_t *p_playlist = pl_Hold( p_intf );
+    char *psz_bookmark = var_CreateGetString( p_intf, psz_bookmark_name );
 
-    sprintf( psz_bookmark_name, "bookmark%i", i_num );
-    var_Create( p_intf, psz_bookmark_name, VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-    var_Get( p_intf, psz_bookmark_name, &val );
-
-    char *psz_bookmark = strdup( val.psz_string );
     PL_LOCK;
     FOREACH_ARRAY( playlist_item_t *p_item, p_playlist->items )
         char *psz_uri = input_item_GetURI( p_item->p_input );
@@ -975,15 +973,19 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
             free( psz_uri );
     FOREACH_END();
     PL_UNLOCK;
+
     free( psz_bookmark );
-    vlc_object_release( p_playlist );
+    free( psz_bookmark_name );
+    pl_Release( p_intf );
 }
 
 static void SetBookmark( intf_thread_t *p_intf, int i_num )
 {
+    char *psz_bookmark_name;
+    if( asprintf( &psz_bookmark_name, "bookmark%i", i_num ) == -1 )
+        return;
+
     playlist_t *p_playlist = pl_Hold( p_intf );
-    char psz_bookmark_name[11];
-    sprintf( psz_bookmark_name, "bookmark%i", i_num );
     var_Create( p_intf, psz_bookmark_name,
                 VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
@@ -995,7 +997,9 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
         free( psz_uri );
         config_SaveConfigFile( p_intf, "hotkeys" );
     }
+
     pl_Release( p_intf );
+    free( psz_bookmark_name );
 }
 
 static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
