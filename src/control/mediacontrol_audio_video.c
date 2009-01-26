@@ -86,18 +86,6 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         RAISE_NULL( mediacontrol_InternalException, "No video output" );
     }
 
-    /* TODO:
-   vlc_mutex_lock (&lock);
-   mutex_cleanup_push (&lock); // release the mutex in case of cancellation
-
-   while (!foobar)
-       vlc_cond_wait (&wait, &lock);
-
-   --- foobar is now true, do something about it here --
-
-   vlc_cleanup_run (); // release the mutex
-    */
-
     snprintf( path, 255, "object:%p", p_snapshot );
     var_SetString( p_vout, "snapshot-path", path );
     var_SetString( p_vout, "snapshot-format", "png" );
