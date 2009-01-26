@@ -436,8 +436,6 @@ static int Open( vlc_object_t *p_this )
     bool         b_append;
     bool         b_topfield = false;
 
-    vlc_value_t  val;
-
     if( stream_Peek( p_demux->s, &p_peek, TS_PACKET_SIZE_MAX ) <
         TS_PACKET_SIZE_MAX ) return VLC_EGENERIC;
 
@@ -587,9 +585,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->b_file_out = true;
 
-        var_Create( p_demux, "ts-dump-append", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-        var_Get( p_demux, "ts-dump-append", &val );
-        b_append = val.b_bool;
+        b_append = var_CreateGetBool( p_demux, "ts-dump-append" );
         if ( b_append )
             psz_mode = "ab";
         else
@@ -608,13 +604,9 @@ static int Open( vlc_object_t *p_this )
 
         if( p_sys->b_file_out )
         {
-            vlc_value_t bufsize;
-
             /* Determine how many packets to read. */
-            var_Create( p_demux, "ts-dump-size",
-                        VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_Get( p_demux, "ts-dump-size", &bufsize );
-            p_sys->i_ts_read = (int) (bufsize.i_int / p_sys->i_packet_size);
+            int bufsize = var_CreateGetInteger( p_demux, "ts-dump-size" );
+            p_sys->i_ts_read = (int) (bufsize / p_sys->i_packet_size);
             if( p_sys->i_ts_read <= 0 )
             {
                 p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
@@ -691,16 +683,12 @@ static int Open( vlc_object_t *p_this )
     TAB_INIT( p_sys->i_pmt, p_sys->pmt );
 
     /* Read config */
-    var_Create( p_demux, "ts-es-id-pid", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "ts-es-id-pid", &val );
-    p_sys->b_es_id_pid = val.b_bool;
+    p_sys->b_es_id_pid = var_CreateGetBool( p_demux, "ts-es-id-pid" );
 
-    var_Create( p_demux, "ts-out", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "ts-out", &val );
-    if( val.psz_string && *val.psz_string && !p_sys->b_file_out )
+    char* psz_string = var_CreateGetString( p_demux, "ts-out" );
+    if( psz_string && *psz_string && !p_sys->b_file_out )
     {
-        vlc_value_t mtu;
-        char *psz = strchr( val.psz_string, ':' );
+        char *psz = strchr( psz_string, ':' );
         int   i_port = 0;
 
         p_sys->b_udp_out = true;
@@ -711,9 +699,9 @@ static int Open( vlc_object_t *p_this )
             i_port = atoi( psz );
         }
         if( i_port <= 0 ) i_port  = 1234;
-        msg_Dbg( p_demux, "resend ts to '%s:%d'", val.psz_string, i_port );
+        msg_Dbg( p_demux, "resend ts to '%s:%d'", psz_string, i_port );
 
-        p_sys->fd = net_ConnectUDP( VLC_OBJECT(p_demux), val.psz_string, i_port, -1 );
+        p_sys->fd = net_ConnectUDP( VLC_OBJECT(p_demux), psz_string, i_port, -1 );
         if( p_sys->fd < 0 )
         {
             msg_Err( p_demux, "failed to open udp socket, send disabled" );
@@ -721,10 +709,8 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            var_Create( p_demux, "ts-out-mtu",
-                        VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_Get( p_demux, "ts-out-mtu", &mtu );
-            p_sys->i_ts_read = mtu.i_int / p_sys->i_packet_size;
+            int i_mtu = var_CreateGetInteger( p_demux, "ts-out-mtu" );
+            p_sys->i_ts_read = i_mtu / p_sys->i_packet_size;
             if( p_sys->i_ts_read <= 0 )
             {
                 p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
@@ -732,38 +718,35 @@ static int Open( vlc_object_t *p_this )
             p_sys->buffer = malloc( p_sys->i_packet_size * p_sys->i_ts_read );
         }
     }
-    free( val.psz_string );
+    free( psz_string );
 
     /* We handle description of an extra PMT */
-    var_Create( p_demux, "ts-extra-pmt", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "ts-extra-pmt", &val );
+    psz_string = var_CreateGetString( p_demux, "ts-extra-pmt" );
     p_sys->b_user_pmt = false;
-    if( val.psz_string && *val.psz_string )
-        UserPmt( p_demux, val.psz_string );
-    free( val.psz_string );
+    if( psz_string && *psz_string )
+        UserPmt( p_demux, psz_string );
+    free( psz_string );
 
-    var_Create( p_demux, "ts-csa-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Get( p_demux, "ts-csa-ck", &val );
-    if( val.psz_string && *val.psz_string )
+    psz_string = var_CreateGetStringCommand( p_demux, "ts-csa-ck" );
+    if( psz_string && *psz_string )
     {
         int i_res;
-        vlc_value_t csa2;
+        char* psz_csa2;
 
         p_sys->csa = csa_New();
 
-        var_Create( p_demux, "ts-csa2-ck", VLC_VAR_STRING | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
-        var_Get( p_demux, "ts-csa2-ck", &csa2 );
-        i_res = csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, true );
-        if( i_res == VLC_SUCCESS && csa2.psz_string && *csa2.psz_string )
+        psz_csa2 = var_CreateGetStringCommand( p_demux, "ts-csa2-ck" );
+        i_res = csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_string, true );
+        if( i_res == VLC_SUCCESS && psz_csa2 && *psz_csa2 )
         {
-            if( csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, csa2.psz_string, false ) != VLC_SUCCESS )
+            if( csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_csa2, false ) != VLC_SUCCESS )
             {
-                csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, false );
+                csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_string, false );
             }
         }
         else if ( i_res == VLC_SUCCESS )
         {
-            csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, val.psz_string, false );
+            csa_SetCW( (vlc_object_t*)p_demux, p_sys->csa, psz_string, false );
         }
         else
         {
@@ -773,29 +756,25 @@ static int Open( vlc_object_t *p_this )
 
         if( p_sys->csa )
         {
-            vlc_value_t pkt_val;
-
             var_AddCallback( p_demux, "ts-csa-ck", ChangeKeyCallback, (void *)1 );
             var_AddCallback( p_demux, "ts-csa2-ck", ChangeKeyCallback, NULL );
 
-            var_Create( p_demux, "ts-csa-pkt", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_Get( p_demux, "ts-csa-pkt", &pkt_val );
-            if( pkt_val.i_int < 4 || pkt_val.i_int > 188 )
+            int i_pkt = var_CreateGetInteger( p_demux, "ts-csa-pkt" );
+            if( i_pkt < 4 || i_pkt > 188 )
             {
-                msg_Err( p_demux, "wrong packet size %d specified.", pkt_val.i_int );
+                msg_Err( p_demux, "wrong packet size %d specified.", i_pkt );
                 msg_Warn( p_demux, "using default packet size of 188 bytes" );
                 p_sys->i_csa_pkt_size = 188;
             }
-            else p_sys->i_csa_pkt_size = pkt_val.i_int;
+            else
+                p_sys->i_csa_pkt_size = i_pkt;
             msg_Dbg( p_demux, "decrypting %d bytes of packet", p_sys->i_csa_pkt_size );
         }
-        free( csa2.psz_string );
+        free( psz_csa2 );
     }
-    free( val.psz_string );
+    free( psz_string );
 
-    var_Create( p_demux, "ts-silent", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "ts-silent", &val );
-    p_sys->b_silent = val.b_bool;
+    p_sys->b_silent = var_CreateGetBool( p_demux, "ts-silent" );
 
     return VLC_SUCCESS;
 }
