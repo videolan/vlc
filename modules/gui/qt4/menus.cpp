@@ -311,8 +311,6 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
         ":/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
     addDPStaticEntry( menu, qtr( "Advanced Open File..." ),
         ":/file-asym", SLOT( openFileDialog() ), "Ctrl+Shift+O" );
-    addDPStaticEntry( menu, qtr( "Open &URL" ),
-                      NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
     addDPStaticEntry( menu, qtr( I_OPEN_FOLDER ),
         ":/folder-grey", SLOT( PLOpenDir() ), "Ctrl+F" );
     addDPStaticEntry( menu, qtr( "Open &Disc..." ),
@@ -324,6 +322,8 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
         "Ctrl+C" );
 
     menu->addSeparator();
+    addDPStaticEntry( menu, qtr( "Paste &MRL" ),
+                      NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
     addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", SLOT( openAPlaylist() ),
         "Ctrl+X" );
