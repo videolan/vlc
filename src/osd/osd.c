@@ -691,7 +691,7 @@ osd_button_t *__osd_ButtonFind( vlc_object_t *p_this, int i_x, int i_y,
     {
         vlc_mutex_unlock( lockval.p_address );
         msg_Err( p_this, "osd_ButtonFind failed" );
-        return;
+        return NULL;
     }
 
     p_button = p_osd->p_button;
