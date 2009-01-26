@@ -1,7 +1,7 @@
 /*****************************************************************************
  * http.c
  *****************************************************************************
- * Copyright (C) 2001-2005 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -39,7 +39,7 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
-#ifdef HAVE_AVAHI_CLIENT
+#if 0 //def HAVE_AVAHI_CLIENT
     #include "bonjour.h"
 
     #if defined( WIN32 )
@@ -114,8 +114,10 @@ vlc_module_begin ()
                 CA_TEXT, CA_LONGTEXT, true );
     add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
                 CRL_TEXT, CRL_LONGTEXT, true );
+#if 0 //def HAVE_AVAHI_CLIENT
     add_bool( SOUT_CFG_PREFIX "bonjour", false, NULL,
               BONJOUR_TEXT, BONJOUR_LONGTEXT, true);
+#endif
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -145,7 +147,7 @@ struct sout_access_out_sys_t
     uint8_t             *p_header;
     bool          b_header_complete;
 
-#ifdef HAVE_AVAHI_CLIENT
+#if 0 //def HAVE_AVAHI_CLIENT
     void                *p_bonjour;
 #endif
 };
@@ -348,7 +350,7 @@ static void Close( vlc_object_t * p_this )
     sout_access_out_t       *p_access = (sout_access_out_t*)p_this;
     sout_access_out_sys_t   *p_sys = p_access->p_sys;
 
-#ifdef HAVE_AVAHI_CLIENT
+#if 0 //def HAVE_AVAHI_CLIENT
     if( p_sys->p_bonjour != NULL )
         bonjour_stop_service( p_sys->p_bonjour );
 #endif
