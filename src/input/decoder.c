@@ -339,7 +339,7 @@ void input_DecoderDelete( decoder_t *p_dec )
 
     /* Make sure we aren't paused/buffering/waiting anymore */
     vlc_mutex_lock( &p_owner->lock );
-    const b_was_paused = p_owner->b_paused;
+    const bool b_was_paused = p_owner->b_paused;
     p_owner->b_paused = false;
     p_owner->b_buffering = false;
     p_owner->b_flushing = true;
