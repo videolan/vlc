@@ -25,8 +25,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#undef vlc_module_set
-#undef vlc_config_set
 #include <assert.h>
 #include <stdarg.h>
 
@@ -460,8 +458,8 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         }
 
         default:
-            fprintf (stderr, "LibVLC: unknown module property %d", propid);
-            fprintf (stderr, "LibVLC: too old to use this module?");
+            fprintf (stderr, "LibVLC: unknown module property %d\n", propid);
+            fprintf (stderr, "LibVLC: too old to use this module?\n");
             ret = -1;
             break;
     }
