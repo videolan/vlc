@@ -168,72 +168,72 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_STREAM )
     set_section( N_("Video"), NULL )
     add_string( SOUT_CFG_PREFIX "venc", NULL, NULL, VENC_TEXT,
-                VENC_LONGTEXT, false );
+                VENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
-                VCODEC_LONGTEXT, false );
+                VCODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "vb", 800 * 1000, NULL, VB_TEXT,
-                 VB_LONGTEXT, false );
+                 VB_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "scale", 1, NULL, SCALE_TEXT,
-               SCALE_LONGTEXT, false );
+               SCALE_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "fps", 0, NULL, FPS_TEXT,
-               FPS_LONGTEXT, false );
+               FPS_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "hurry-up", true, NULL, HURRYUP_TEXT,
-               HURRYUP_LONGTEXT, false );
+               HURRYUP_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "deinterlace", 0, NULL, DEINTERLACE_TEXT,
-              DEINTERLACE_LONGTEXT, false );
+              DEINTERLACE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
-                false );
+                false )
         change_string_list( ppsz_deinterlace_type, 0, 0 );
     add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
-                 WIDTH_LONGTEXT, true );
+                 WIDTH_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
-                 HEIGHT_LONGTEXT, true );
+                 HEIGHT_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "maxwidth", 0, NULL, MAXWIDTH_TEXT,
-                 MAXWIDTH_LONGTEXT, true );
+                 MAXWIDTH_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "maxheight", 0, NULL, MAXHEIGHT_TEXT,
-                 MAXHEIGHT_LONGTEXT, true );
+                 MAXHEIGHT_LONGTEXT, true )
     add_module_list( SOUT_CFG_PREFIX "vfilter", "video filter2",
                      NULL, NULL,
-                     VFILTER_TEXT, VFILTER_LONGTEXT, false );
+                     VFILTER_TEXT, VFILTER_LONGTEXT, false )
 
     set_section( N_("Audio"), NULL )
     add_string( SOUT_CFG_PREFIX "aenc", NULL, NULL, AENC_TEXT,
-                AENC_LONGTEXT, false );
+                AENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "acodec", NULL, NULL, ACODEC_TEXT,
-                ACODEC_LONGTEXT, false );
+                ACODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "ab", 0, NULL, AB_TEXT,
-                 AB_LONGTEXT, false );
+                 AB_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "channels", 0, NULL, ACHANS_TEXT,
-                 ACHANS_LONGTEXT, false );
+                 ACHANS_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
-                 ARATE_LONGTEXT, true );
+                 ARATE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "audio-sync", 0, NULL, ASYNC_TEXT,
-              ASYNC_LONGTEXT, false );
+              ASYNC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter2",
                      NULL, NULL,
-                     AFILTER_TEXT, AFILTER_LONGTEXT, false );
+                     AFILTER_TEXT, AFILTER_LONGTEXT, false )
 
     set_section( N_("Overlays/Subtitles"), NULL )
     add_string( SOUT_CFG_PREFIX "senc", NULL, NULL, SENC_TEXT,
-                SENC_LONGTEXT, false );
+                SENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "scodec", NULL, NULL, SCODEC_TEXT,
-                SCODEC_LONGTEXT, false );
+                SCODEC_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "soverlay", 0, NULL, SCODEC_TEXT,
-               SCODEC_LONGTEXT, false );
+               SCODEC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "sfilter", "video filter",
                      NULL, NULL,
-                     SFILTER_TEXT, SFILTER_LONGTEXT, false );
+                     SFILTER_TEXT, SFILTER_LONGTEXT, false )
 
     set_section( N_("On Screen Display"), NULL )
     add_bool( SOUT_CFG_PREFIX "osd", 0, NULL, OSD_TEXT,
-              OSD_LONGTEXT, false );
+              OSD_LONGTEXT, false )
 
     set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
-                 THREADS_LONGTEXT, true );
+                 THREADS_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "high-priority", 0, NULL, HP_TEXT, HP_LONGTEXT,
-              true );
+              true )
 
 vlc_module_end ()
 

@@ -152,9 +152,9 @@ vlc_module_begin();
     set_category( CAT_SOUT );
     set_subcategory( SUBCAT_SOUT_STREAM );
     add_string( SOUT_CFG_PREFIX "host", "", NULL,
-                HOST_TEXT, HOST_LONGTEXT, false );
+                HOST_TEXT, HOST_LONGTEXT, false )
     add_integer_with_range( SOUT_CFG_PREFIX "volume", 100, 0, 255, NULL,
-                            VOLUME_TEXT, VOLUME_LONGTEXT, false );
+                            VOLUME_TEXT, VOLUME_LONGTEXT, false )
     set_callbacks( Open, Close );
 vlc_module_end();
 

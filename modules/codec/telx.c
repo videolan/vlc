@@ -77,11 +77,11 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_integer( "telx-override-page", -1, NULL,
-                 OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, true );
+                 OVERRIDE_PAGE_TEXT, OVERRIDE_PAGE_LONGTEXT, true )
     add_bool( "telx-ignore-subtitle-flag", 0, NULL,
-              IGNORE_SUB_FLAG_TEXT, IGNORE_SUB_FLAG_LONGTEXT, true );
+              IGNORE_SUB_FLAG_TEXT, IGNORE_SUB_FLAG_LONGTEXT, true )
     add_bool( "telx-french-workaround", 0, NULL,
-              FRENCH_WORKAROUND_TEXT, FRENCH_WORKAROUND_LONGTEXT, true );
+              FRENCH_WORKAROUND_TEXT, FRENCH_WORKAROUND_LONGTEXT, true )
 
 vlc_module_end ()
 

@@ -58,7 +58,7 @@ vlc_module_begin ()
 
     add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") )
     add_integer( "vcd-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, true );
+                 CACHING_LONGTEXT, true )
     add_shortcut( "vcd" )
     add_shortcut( "svcd" )
 vlc_module_end ()

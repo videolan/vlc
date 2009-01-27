@@ -148,7 +148,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
     add_string( CFG_PREFIX "marquee", "VLC", NULL, MSG_TEXT, MSG_LONGTEXT,
-                false );
+                false )
 
     set_section( N_("Position"), NULL )
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
@@ -159,18 +159,18 @@ vlc_module_begin ()
     set_section( N_("Font"), NULL )
     /* 5 sets the default to top [1] left [4] */
     add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, false );
+        OPACITY_TEXT, OPACITY_LONGTEXT, false )
     add_integer( CFG_PREFIX "color", 0xFFFFFF, NULL, COLOR_TEXT, COLOR_LONGTEXT,
-                 false );
+                 false )
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
     add_integer( CFG_PREFIX "size", -1, NULL, SIZE_TEXT, SIZE_LONGTEXT,
-                 false );
+                 false )
 
     set_section( N_("Misc"), NULL )
     add_integer( CFG_PREFIX "timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
-                 false );
+                 false )
     add_integer( CFG_PREFIX "refresh", 1000, NULL, REFRESH_TEXT,
-                 REFRESH_LONGTEXT, false );
+                 REFRESH_LONGTEXT, false )
 
     set_description( N_("Marquee display") )
     add_shortcut( "time" )

@@ -120,7 +120,7 @@ vlc_module_begin ()
         add_integer( "rtsp-http-port", 80, NULL,
                   N_("HTTP tunnel port"),
                   N_("Port to use for tunneling the RTSP/RTP over HTTP."),
-                  true );
+                  true )
         add_integer("rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                     CACHING_TEXT, CACHING_LONGTEXT, true );
         add_bool(   "rtsp-kasenna", false, NULL, KASENNA_TEXT,

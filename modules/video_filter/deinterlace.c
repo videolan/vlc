@@ -131,7 +131,7 @@ vlc_module_begin ()
 
     set_section( N_("Display"),NULL)
     add_string( "deinterlace-mode", "discard", NULL, MODE_TEXT,
-                MODE_LONGTEXT, false );
+                MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 );
 
     add_shortcut( "deinterlace" )
@@ -141,7 +141,7 @@ vlc_module_begin ()
     set_capability( "video filter2", 0 )
     set_section( N_("Streaming"),NULL)
     add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, SOUT_MODE_TEXT,
-                SOUT_MODE_LONGTEXT, false );
+                SOUT_MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 );
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()

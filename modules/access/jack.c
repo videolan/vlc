@@ -78,11 +78,11 @@ vlc_module_begin ()
      set_subcategory( SUBCAT_INPUT_ACCESS )
 
      add_integer( "jack-input-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-         CACHING_TEXT, CACHING_LONGTEXT, true );
+         CACHING_TEXT, CACHING_LONGTEXT, true )
      add_bool( "jack-input-use-vlc-pace", false, NULL,
-         PACE_TEXT, PACE_LONGTEXT, true );
+         PACE_TEXT, PACE_LONGTEXT, true )
      add_bool( "jack-input-auto-connect", false, NULL,
-         AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT, true );
+         AUTO_CONNECT_TEXT, AUTO_CONNECT_LONGTEXT, true )
 
      add_shortcut( "jack" )
      set_callbacks( Open, Close )

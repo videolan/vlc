@@ -89,7 +89,7 @@ vlc_module_begin ()
     add_float_with_range( "opencv-scale", 1.0, 0.1, 2.0, NULL,
                           N_("Scale factor (0.1-2.0)"),
                           N_("Ammount by which to scale the picture before sending it to the internal OpenCV filter"),
-                          false );
+                          false )
     add_string( "opencv-chroma", "input", NULL,
                           N_("OpenCV filter chroma"),
                           N_("Chroma to convert picture to before sending it to the internal OpenCV filter"), false);

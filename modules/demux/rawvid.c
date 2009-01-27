@@ -73,9 +73,9 @@ vlc_module_begin ()
     add_integer( "rawvid-width", 0, 0, WIDTH_TEXT, WIDTH_LONGTEXT, 0 )
     add_integer( "rawvid-height", 0, 0, HEIGHT_TEXT, HEIGHT_LONGTEXT, 0 )
     add_string( "rawvid-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true );
+                true )
     add_string( "rawvid-aspect-ratio", NULL, NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************

@@ -96,9 +96,9 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_integer( "gestures-threshold", 30, NULL,
-                 THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true );
+                 THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
     add_string( "gestures-button", "right", NULL,
-                BUTTON_TEXT, BUTTON_LONGTEXT, false );
+                BUTTON_TEXT, BUTTON_LONGTEXT, false )
         change_string_list( button_list, button_list_text, 0 );
     set_description( N_("Mouse gestures control interface") )
 

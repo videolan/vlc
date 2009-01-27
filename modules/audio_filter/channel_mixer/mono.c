@@ -115,10 +115,10 @@ vlc_module_begin ()
     set_capability( "audio filter2", 2 )
 
     add_bool( MONO_CFG "downmix", true, NULL, MONO_DOWNMIX_TEXT,
-              MONO_DOWNMIX_LONGTEXT, false );
+              MONO_DOWNMIX_LONGTEXT, false )
     add_integer( MONO_CFG "channel", -1, NULL, MONO_CHANNEL_TEXT,
-        MONO_CHANNEL_LONGTEXT, false );
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
+        MONO_CHANNEL_LONGTEXT, false )
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
 
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )

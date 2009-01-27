@@ -75,7 +75,7 @@ vlc_module_begin ()
 
     add_usage_hint( N_("[cdda:][device][@[track]]") )
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, true );
+                 CACHING_LONGTEXT, true )
 
     add_integer( "cdda-track", -1 , NULL, NULL, NULL, true )
         change_internal ()
@@ -86,10 +86,10 @@ vlc_module_begin ()
 
     add_string( "cddb-server", "freedb.freedb.org", NULL,
                 N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
-                true );
+                true )
     add_integer( "cddb-port", 8880, NULL,
                 N_( "CDDB port" ), N_( "CDDB Server port to use." ),
-                true );
+                true )
     add_shortcut( "cdda" )
     add_shortcut( "cddasimple" )
 vlc_module_end ()

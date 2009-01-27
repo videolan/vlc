@@ -73,22 +73,22 @@ static picture_t *DecodeBlock  ( decoder_t *, block_t ** );
                         "set all --invmem-* options in vlc_argv an use " \
                         "libvlc_media_new(libvlc, \"fake://\", &ex);. " \
                         "Besides is simillar to vmem video output module." )
-vlc_module_begin();
-    set_category( CAT_INPUT );
-    set_subcategory( SUBCAT_INPUT_VCODEC );
-    set_shortname( N_("Memory video decoder") );
-    set_description( N_("Memory video decoder") );
-    set_help( INVMEM_HELP );
-    set_capability( "decoder", 50 );
-    set_callbacks( OpenDecoder, CloseDecoder );
-    add_shortcut( "invmem" );
+vlc_module_begin()
+    set_category( CAT_INPUT )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
+    set_shortname( N_("Memory video decoder") )
+    set_description( N_("Memory video decoder") )
+    set_help( INVMEM_HELP )
+    set_capability( "decoder", 50 )
+    set_callbacks( OpenDecoder, CloseDecoder )
+    add_shortcut( "invmem" )
 
-    add_integer( "invmem-width", "0", NULL, T_WIDTH, LT_WIDTH, false );
-    add_integer( "invmem-height", "0", NULL, T_HEIGHT, LT_HEIGHT, false );
-    add_string( "invmem-lock", "0", NULL, T_LOCK, LT_LOCK, true );
-    add_string( "invmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true );
-    add_string( "invmem-data", "0", NULL, T_DATA, LT_DATA, true );
-vlc_module_end();
+    add_integer( "invmem-width", "0", NULL, T_WIDTH, LT_WIDTH, false )
+    add_integer( "invmem-height", "0", NULL, T_HEIGHT, LT_HEIGHT, false )
+    add_string( "invmem-lock", "0", NULL, T_LOCK, LT_LOCK, true )
+    add_string( "invmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true )
+    add_string( "invmem-data", "0", NULL, T_DATA, LT_DATA, true )
+vlc_module_end()
 
 
 struct decoder_sys_t

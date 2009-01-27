@@ -102,11 +102,11 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VOUT );
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-              false );
+              false )
     add_string( "omap-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true );
+                true )
     add_bool( "omap-embedded", true, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT,
-                 true );
+                 true )
     set_description( N_("OMAP framebuffer video output") );
     set_capability( "video output", 200 );
     set_callbacks( Create, Destroy );

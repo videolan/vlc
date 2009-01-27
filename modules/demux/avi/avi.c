@@ -68,9 +68,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "avi-interleaved", 0, NULL,
-              INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, true );
+              INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, true )
     add_integer( "avi-index", 0, NULL,
-              INDEX_TEXT, INDEX_LONGTEXT, false );
+              INDEX_TEXT, INDEX_LONGTEXT, false )
         change_integer_list( pi_index, ppsz_indexes, NULL );
 
     set_callbacks( Open, Close )

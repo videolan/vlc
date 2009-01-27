@@ -60,7 +60,7 @@ vlc_module_begin ()
     set_description( N_("FFmpeg muxer" ) )
     set_capability( "sout mux", 2 )
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,
-                MUX_LONGTEXT, true );
+                MUX_LONGTEXT, true )
     set_callbacks( OpenMux, CloseMux )
 #endif
 vlc_module_end ()

@@ -107,12 +107,12 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dvdread-angle", 1, NULL, ANGLE_TEXT,
-        ANGLE_LONGTEXT, false );
+        ANGLE_LONGTEXT, false )
     add_integer( "dvdread-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-        CACHING_TEXT, CACHING_LONGTEXT, true );
+        CACHING_TEXT, CACHING_LONGTEXT, true )
     add_string( "dvdread-css-method", NULL, NULL, CSSMETHOD_TEXT,
-                CSSMETHOD_LONGTEXT, true );
-        change_string_list( psz_css_list, psz_css_list_text, 0 );
+                CSSMETHOD_LONGTEXT, true )
+        change_string_list( psz_css_list, psz_css_list_text, 0 )
     set_capability( "access_demux", 0 )
     add_shortcut( "dvd" )
     add_shortcut( "dvdread" )

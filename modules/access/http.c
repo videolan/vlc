@@ -103,19 +103,19 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT,
-                false );
+                false )
     add_password( "http-proxy-pwd", NULL, NULL,
-                  PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false );
+                  PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true );
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
-                AGENT_LONGTEXT, true );
+                AGENT_LONGTEXT, true )
     add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,
-              RECONNECT_LONGTEXT, true );
+              RECONNECT_LONGTEXT, true )
     add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,
-              CONTINUOUS_LONGTEXT, true );
+              CONTINUOUS_LONGTEXT, true )
     add_bool( "http-forward-cookies", true, NULL, FORWARD_COOKIES_TEXT,
-              FORWARD_COOKIES_LONGTEXT, true );
+              FORWARD_COOKIES_LONGTEXT, true )
     add_obsolete_string("http-user")
     add_obsolete_string("http-pwd")
     add_shortcut( "http" )

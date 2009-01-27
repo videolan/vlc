@@ -116,12 +116,12 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
 
     add_string( "audiofile-format", "s16", NULL,
-                FORMAT_TEXT, FORMAT_LONGTEXT, true );
-        change_string_list( format_list, 0, 0 );
+                FORMAT_TEXT, FORMAT_LONGTEXT, true )
+        change_string_list( format_list, 0, 0 )
     add_integer( "audiofile-channels", 0, NULL,
-                 CHANNELS_TEXT, CHANNELS_LONGTEXT, true );
+                 CHANNELS_TEXT, CHANNELS_LONGTEXT, true )
     add_file( "audiofile-file", "audiofile.wav", NULL, FILE_TEXT,
-              FILE_LONGTEXT, false );
+              FILE_LONGTEXT, false )
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, true )
 
     set_capability( "audio output", 0 )

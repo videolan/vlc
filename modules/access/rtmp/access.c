@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, true );
+                 CACHING_LONGTEXT, true )
 
     set_capability( "access", 0 )
     set_callbacks( Open, Close )

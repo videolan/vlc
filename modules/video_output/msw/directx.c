@@ -165,19 +165,19 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
-              true );
+              true )
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
-              true );
+              true )
     add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT,
-              TRIPLEBUF_LONGTEXT, true );
+              TRIPLEBUF_LONGTEXT, true )
 
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                true );
+                true )
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
         change_action_add( FindDevicesCallback, N_("Refresh list") )
 
     add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
-              true );
+              true )
 
     set_description( N_("DirectX video output") )
     set_capability( "video output", 100 )

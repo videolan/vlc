@@ -117,21 +117,21 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_string( SOUT_CFG_PREFIX "files", "", NULL, FILES_TEXT,
-                FILES_LONGTEXT, false );
+                FILES_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "sizes", "", NULL, SIZES_TEXT,
-                SIZES_LONGTEXT, false );
+                SIZES_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "aspect-ratio", "4:3", NULL, RATIO_TEXT,
-                RATIO_LONGTEXT, false );
+                RATIO_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "port", 5001, NULL,
-                 PORT_TEXT, PORT_LONGTEXT, true );
+                 PORT_TEXT, PORT_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "command", 0, NULL,
-                 COMMAND_TEXT, COMMAND_LONGTEXT, true );
+                 COMMAND_TEXT, COMMAND_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "gop", 8, NULL,
-                 GOP_TEXT, GOP_LONGTEXT, true );
+                 GOP_TEXT, GOP_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "qscale", 5, NULL,
-                 QSCALE_TEXT, QSCALE_LONGTEXT, true );
+                 QSCALE_TEXT, QSCALE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "mute-audio", 1, NULL,
-              AUDIO_TEXT, AUDIO_LONGTEXT, true );
+              AUDIO_TEXT, AUDIO_LONGTEXT, true )
 vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {

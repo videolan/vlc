@@ -104,28 +104,28 @@ vlc_module_begin ()
 
     add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, true )
     add_integer ( "ffmpeg-error-resilience", 1, NULL, ERROR_TEXT,
-        ERROR_LONGTEXT, true );
+        ERROR_LONGTEXT, true )
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, BUGS_TEXT, BUGS_LONGTEXT,
-        false );
+        false )
     add_bool( "ffmpeg-hurry-up", 1, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
-        false );
+        false )
     add_integer( "ffmpeg-skip-frame", 0, NULL, SKIP_FRAME_TEXT,
-        SKIP_FRAME_LONGTEXT, true );
+        SKIP_FRAME_LONGTEXT, true )
         change_integer_range( -1, 4 )
     add_integer( "ffmpeg-skip-idct", 0, NULL, SKIP_IDCT_TEXT,
-        SKIP_IDCT_LONGTEXT, true );
+        SKIP_IDCT_LONGTEXT, true )
         change_integer_range( -1, 4 )
     add_integer ( "ffmpeg-vismv", 0, NULL, VISMV_TEXT, VISMV_LONGTEXT,
-        true );
+        true )
     add_integer ( "ffmpeg-lowres", 0, NULL, LOWRES_TEXT, LOWRES_LONGTEXT,
-        true );
+        true )
         change_integer_range( 0, 2 )
     add_integer ( "ffmpeg-skiploopfilter", 0, NULL, SKIPLOOPF_TEXT,
-                  SKIPLOOPF_LONGTEXT, true );
-        change_integer_list( nloopf_list, nloopf_list_text, NULL );
+                  SKIPLOOPF_LONGTEXT, true )
+        change_integer_list( nloopf_list, nloopf_list_text, NULL )
 
     add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEXT, DEBUG_LONGTEXT,
-                 true );
+                 true )
 
 #ifdef ENABLE_SOUT
     /* encoder submodule */
@@ -136,59 +136,59 @@ vlc_module_begin ()
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_string( ENC_CFG_PREFIX "hq", "simple", NULL, ENC_HQ_TEXT,
-                ENC_HQ_LONGTEXT, false );
-        change_string_list( enc_hq_list, enc_hq_list_text, 0 );
+                ENC_HQ_LONGTEXT, false )
+        change_string_list( enc_hq_list, enc_hq_list_text, 0 )
     add_integer( ENC_CFG_PREFIX "keyint", 0, NULL, ENC_KEYINT_TEXT,
-                 ENC_KEYINT_LONGTEXT, false );
+                 ENC_KEYINT_LONGTEXT, false )
     add_integer( ENC_CFG_PREFIX "bframes", 0, NULL, ENC_BFRAMES_TEXT,
-                 ENC_BFRAMES_LONGTEXT, false );
+                 ENC_BFRAMES_LONGTEXT, false )
     add_bool( ENC_CFG_PREFIX "hurry-up", 0, NULL, ENC_HURRYUP_TEXT,
-              ENC_HURRYUP_LONGTEXT, false );
+              ENC_HURRYUP_LONGTEXT, false )
     add_bool( ENC_CFG_PREFIX "interlace", 0, NULL, ENC_INTERLACE_TEXT,
-              ENC_INTERLACE_LONGTEXT, true );
+              ENC_INTERLACE_LONGTEXT, true )
     add_bool( ENC_CFG_PREFIX "interlace-me", 1, NULL, ENC_INTERLACE_ME_TEXT,
-              ENC_INTERLACE_ME_LONGTEXT, true );
+              ENC_INTERLACE_ME_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "vt", 0, NULL, ENC_VT_TEXT,
-                 ENC_VT_LONGTEXT, true );
+                 ENC_VT_LONGTEXT, true )
     add_bool( ENC_CFG_PREFIX "pre-me", 0, NULL, ENC_PRE_ME_TEXT,
-              ENC_PRE_ME_LONGTEXT, true );
+              ENC_PRE_ME_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8, NULL,
-                 ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, true );
+                 ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 1.0, NULL,
-               ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, true );
+               ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "i-quant-factor", 0, NULL,
-               ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, true );
+               ENC_IQUANT_FACTOR_TEXT, ENC_IQUANT_FACTOR_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "noise-reduction", 0, NULL,
-                 ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, true );
+                 ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, true )
     add_bool( ENC_CFG_PREFIX "mpeg4-matrix", 0, NULL,
-              ENC_MPEG4_MATRIX_TEXT, ENC_MPEG4_MATRIX_LONGTEXT, true );
+              ENC_MPEG4_MATRIX_TEXT, ENC_MPEG4_MATRIX_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "qmin", 0, NULL,
-                 ENC_QMIN_TEXT, ENC_QMIN_LONGTEXT, true );
+                 ENC_QMIN_TEXT, ENC_QMIN_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "qmax", 0, NULL,
-                 ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, true );
+                 ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, true )
     add_bool( ENC_CFG_PREFIX "trellis", 0, NULL,
-              ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, true );
+              ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "qscale", 0, NULL,
-               ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, true );
+               ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "strict", 0, NULL,
-                 ENC_STRICT_TEXT, ENC_STRICT_LONGTEXT, true );
+                 ENC_STRICT_TEXT, ENC_STRICT_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "lumi-masking", 0.0, NULL,
-               ENC_LUMI_MASKING_TEXT, ENC_LUMI_MASKING_LONGTEXT, true );
+               ENC_LUMI_MASKING_TEXT, ENC_LUMI_MASKING_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "dark-masking", 0.0, NULL,
-               ENC_DARK_MASKING_TEXT, ENC_DARK_MASKING_LONGTEXT, true );
+               ENC_DARK_MASKING_TEXT, ENC_DARK_MASKING_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "p-masking", 0.0, NULL,
-               ENC_P_MASKING_TEXT, ENC_P_MASKING_LONGTEXT, true );
+               ENC_P_MASKING_TEXT, ENC_P_MASKING_LONGTEXT, true )
     add_float( ENC_CFG_PREFIX "border-masking", 0.0, NULL,
-               ENC_BORDER_MASKING_TEXT, ENC_BORDER_MASKING_LONGTEXT, true );
+               ENC_BORDER_MASKING_TEXT, ENC_BORDER_MASKING_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "luma-elim-threshold", 0, NULL,
-                 ENC_LUMA_ELIM_TEXT, ENC_LUMA_ELIM_LONGTEXT, true );
+                 ENC_LUMA_ELIM_TEXT, ENC_LUMA_ELIM_LONGTEXT, true )
     add_integer( ENC_CFG_PREFIX "chroma-elim-threshold", 0, NULL,
-                 ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, true );
+                 ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, true )
 
 #if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     /* Audio AAC encoder profile */
     add_string( ENC_CFG_PREFIX "aac-profile", "low", NULL,
-                ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true );
+                ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true )
 #endif
 #endif /* ENABLE_SOUT */
 

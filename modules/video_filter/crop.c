@@ -108,29 +108,29 @@ vlc_module_begin ()
     set_capability( "video filter", 0 )
 
     add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
-                                             GEOMETRY_LONGTEXT, false );
+                                             GEOMETRY_LONGTEXT, false )
     add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT,
-                                   AUTOCROP_LONGTEXT, false );
+                                   AUTOCROP_LONGTEXT, false )
 
 #ifdef BEST_AUTOCROP
     add_integer_with_range( "autocrop-ratio-max", 2405, 0, RATIO_MAX, NULL,
-                            RATIOMAX_TEXT, RATIOMAX_LONGTEXT, true );
+                            RATIOMAX_TEXT, RATIOMAX_LONGTEXT, true )
 
     add_integer_with_range( "crop-ratio", 0, 0, RATIO_MAX, NULL, RATIO_TEXT,
-                            RATIO_LONGTEXT, false );
+                            RATIO_LONGTEXT, false )
     add_integer( "autocrop-time", 25, NULL, TIME_TEXT,
-                 TIME_LONGTEXT, true );
+                 TIME_LONGTEXT, true )
     add_integer( "autocrop-diff", 16, NULL, DIFF_TEXT,
-                                            DIFF_LONGTEXT, true );
+                                            DIFF_LONGTEXT, true )
 
     add_integer( "autocrop-non-black-pixels", 3, NULL,
-                 NBP_TEXT, NBP_LONGTEXT, true );
+                 NBP_TEXT, NBP_LONGTEXT, true )
 
     add_integer_with_range( "autocrop-skip-percent", 17, 0, 100, NULL,
-                            SKIP_TEXT, SKIP_LONGTEXT, true );
+                            SKIP_TEXT, SKIP_LONGTEXT, true )
 
     add_integer_with_range( "autocrop-luminance-threshold", 40, 0, 128, NULL,
-                            LUM_TEXT, LUM_LONGTEXT, true );
+                            LUM_TEXT, LUM_LONGTEXT, true )
 #endif //BEST_AUTOCROP
 
     add_shortcut( "crop" )

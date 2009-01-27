@@ -124,7 +124,7 @@ vlc_module_begin ()
     add_shortcut( "opengl" )
     /* Allow opengl provider plugin selection */
     add_string( "opengl-provider", "default", NULL, PROVIDER_TEXT, 
-                    PROVIDER_LONGTEXT, true );
+                    PROVIDER_LONGTEXT, true )
     set_callbacks( CreateVout, DestroyVout )
 vlc_module_end ()
 

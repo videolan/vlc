@@ -77,19 +77,19 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_string( SOUT_CFG_PREFIX "title", "", NULL, TITLE_TEXT, TITLE_LONGTEXT,
-                                 true );
+                                 true )
     add_string( SOUT_CFG_PREFIX "author",   "", NULL, AUTHOR_TEXT,
-                                 AUTHOR_LONGTEXT, true );
+                                 AUTHOR_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "copyright","", NULL, COPYRIGHT_TEXT,
-                                 COPYRIGHT_LONGTEXT, true );
+                                 COPYRIGHT_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "comment",  "", NULL, COMMENT_TEXT,
-                                 COMMENT_LONGTEXT, true );
+                                 COMMENT_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "rating",  "", NULL, RATING_TEXT,
-                                 RATING_LONGTEXT, true );
+                                 RATING_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "packet-size", 4096, NULL, PACKETSIZE_TEXT,
-                                 PACKETSIZE_LONGTEXT, true );
+                                 PACKETSIZE_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "bitrate-override", 0, NULL, BITRATE_TEXT,
-                                 BITRATE_LONGTEXT, true );
+                                 BITRATE_LONGTEXT, true )
 
 vlc_module_end ()
 

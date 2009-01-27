@@ -60,7 +60,7 @@ vlc_module_begin ()
     set_callbacks( DecoderOpen, DecoderClose )
 
     add_integer ( MODULE_STRING "-debug", 0, NULL,
-                  DEBUG_TEXT, DEBUG_LONGTEXT, true );
+                  DEBUG_TEXT, DEBUG_LONGTEXT, true )
 
     add_submodule ()
     set_description( N_("Philips OGT (SVCD subtitle) packetizer") )

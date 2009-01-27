@@ -70,7 +70,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "eyetv-channel", 0, NULL,
-                 CHANNEL_TEXT, CHANNEL_LONGTEXT, false );
+                 CHANNEL_TEXT, CHANNEL_LONGTEXT, false )
 
     set_capability( "access", 0 )
     add_shortcut( "eyetv" )

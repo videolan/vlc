@@ -79,21 +79,21 @@ vlc_module_begin ()
 
     set_section( N_("Benchmarking"), NULL )
     add_integer( CFG_PREFIX "loops", 1000, NULL, LOOPS_TEXT,
-              LOOPS_LONGTEXT, false );
+              LOOPS_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "alpha", 128, 0, 255, NULL, ALPHA_TEXT,
-              ALPHA_LONGTEXT, false );
+              ALPHA_LONGTEXT, false )
 
     set_section( N_("Base image"), NULL )
     add_file( CFG_PREFIX "base-image", NULL, NULL, BASE_IMAGE_TEXT,
-              BASE_IMAGE_LONGTEXT, false );
+              BASE_IMAGE_LONGTEXT, false )
     add_string( CFG_PREFIX "base-chroma", "I420", NULL, BASE_CHROMA_TEXT,
-              BASE_CHROMA_LONGTEXT, false );
+              BASE_CHROMA_LONGTEXT, false )
 
     set_section( N_("Blend image"), NULL )
     add_file( CFG_PREFIX "blend-image", NULL, NULL, BLEND_IMAGE_TEXT,
-              BLEND_IMAGE_LONGTEXT, false );
+              BLEND_IMAGE_LONGTEXT, false )
     add_string( CFG_PREFIX "blend-chroma", "YUVA", NULL, BLEND_CHROMA_TEXT,
-              BLEND_CHROMA_LONGTEXT, false );
+              BLEND_CHROMA_LONGTEXT, false )
 
     set_callbacks( Create, Destroy )
 vlc_module_end ()

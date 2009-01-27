@@ -169,14 +169,14 @@ vlc_module_begin ()
 
     add_shortcut("qt")
     add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
-                 QT_MODE_TEXT, QT_MODE_LONGTEXT, false );
+                 QT_MODE_TEXT, QT_MODE_LONGTEXT, false )
         change_integer_list( i_mode_list, psz_mode_list_text, NULL );
 
     add_bool( "qt-notification", true, NULL, NOTIFICATION_TEXT,
-              NOTIFICATION_LONGTEXT, false );
+              NOTIFICATION_LONGTEXT, false )
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
-                          OPACITY_LONGTEXT, false );
+                          OPACITY_LONGTEXT, false )
 
     add_bool( "qt-system-tray", true, NULL, SYSTRAY_TEXT,
               SYSTRAY_LONGTEXT, false);
@@ -185,9 +185,9 @@ vlc_module_begin ()
     add_bool( "qt-video-autoresize", true, NULL, KEEPSIZE_TEXT,
               KEEPSIZE_LONGTEXT, false )
     add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
-              TITLE_LONGTEXT, false );
+              TITLE_LONGTEXT, false )
     add_bool( "qt-fs-controller", true, NULL, QT_FULLSCREEN_TEXT,
-              QT_FULLSCREEN_TEXT, false );
+              QT_FULLSCREEN_TEXT, false )
 
     add_bool( "qt-volume-complete", false, NULL, COMPLETEVOL_TEXT,
               COMPLETEVOL_LONGTEXT, true );
@@ -199,28 +199,28 @@ vlc_module_begin ()
         change_internal ()
 
     add_bool( "qt-recentplay", true, NULL, RECENTPLAY_TEXT,
-              RECENTPLAY_TEXT, false );
+              RECENTPLAY_TEXT, false )
     add_string( "qt-recentplay-filter", "", NULL,
-                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false );
+                RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
 
     add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
               ADVANCED_OPTIONS_LONGTEXT, true );
     add_bool( "qt-advanced-pref", false, NULL, ADVANCED_PREFS_TEXT,
-              ADVANCED_PREFS_LONGTEXT, false );
+              ADVANCED_PREFS_LONGTEXT, false )
     add_bool( "qt-error-dialogs", true, NULL, ERROR_TEXT,
-              ERROR_TEXT, false );
+              ERROR_TEXT, false )
 #ifdef UPDATE_CHECK
     add_bool( "qt-updates-notif", true, NULL, UPDATER_TEXT,
-              UPDATER_LONGTEXT, false );
+              UPDATER_LONGTEXT, false )
     add_integer( "qt-updates-days", 7, NULL, UPDATER_DAYS_TEXT,
-                 UPDATER_DAYS_TEXT, false );
+                 UPDATER_DAYS_TEXT, false )
 #endif
     add_string( "qt-slider-colours",
                 "255;255;255;20;226;20;255;176;15;235;30;20",
-                NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false );
+                NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
 
     add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
-              false );
+              false )
         change_internal ()
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */

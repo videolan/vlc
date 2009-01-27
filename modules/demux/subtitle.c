@@ -78,12 +78,12 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_float( "sub-fps", 0.0, NULL,
                N_("Frames per second"),
-               SUB_FPS_LONGTEXT, true );
+               SUB_FPS_LONGTEXT, true )
     add_integer( "sub-delay", 0, NULL,
                N_("Subtitles delay"),
-               SUB_DELAY_LONGTEXT, true );
+               SUB_DELAY_LONGTEXT, true )
     add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
-                SUB_TYPE_LONGTEXT, true );
+                SUB_TYPE_LONGTEXT, true )
         change_string_list( ppsz_sub_type, NULL, NULL );
     set_callbacks( Open, Close )
 
@@ -956,7 +956,7 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
 
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d.%d,%d:%d:%d.%d",
-                                 true );
+                                 true )
 }
 
 /* ParseSSA

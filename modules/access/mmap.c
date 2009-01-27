@@ -59,7 +59,7 @@ vlc_module_begin ()
     add_shortcut ("file")
     set_callbacks (Open, Close)
     add_bool ("file-mmap", false, NULL,
-              FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true);
+              FILE_MMAP_TEXT, FILE_MMAP_LONGTEXT, true)
 vlc_module_end ()
 
 static block_t *Block (access_t *);

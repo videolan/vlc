@@ -79,11 +79,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( CFG_PREFIX "rows", 4, 1, 128, NULL,
-                            ROWS_TEXT, ROWS_LONGTEXT, false );
+                            ROWS_TEXT, ROWS_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "cols", 4, 1, 128, NULL,
-                            COLS_TEXT, COLS_LONGTEXT, false );
+                            COLS_TEXT, COLS_LONGTEXT, false )
     add_bool( CFG_PREFIX "black-slot", 0, NULL,
-              BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, false );
+              BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, false )
 
     set_callbacks( Create, Destroy )
 vlc_module_end ()

@@ -83,11 +83,11 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_integer( SOUT_CFG_PREFIX "vb", 3 * 100 * 1000, NULL,
-                 VB_TEXT, VB_LONGTEXT, false );
+                 VB_TEXT, VB_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "shaping", 500, NULL,
-                 SHAPING_TEXT, SHAPING_LONGTEXT, false );
+                 SHAPING_TEXT, SHAPING_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "mpeg4-matrix", false, NULL,
-              MPEG4_MATRIX_TEXT, MPEG4_MATRIX_LONGTEXT, false );
+              MPEG4_MATRIX_TEXT, MPEG4_MATRIX_LONGTEXT, false )
 vlc_module_end ()
 
 static const char *const ppsz_sout_options[] = {

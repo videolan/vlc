@@ -69,9 +69,9 @@ vlc_module_begin ()
     set_capability( "sub filter", 0 )
 
     add_file( "overlay-input", NULL, NULL, INPUT_TEXT, INPUT_LONGTEXT,
-              false );
+              false )
     add_file( "overlay-output", NULL, NULL, OUTPUT_TEXT, OUTPUT_LONGTEXT,
-              false );
+              false )
 
     add_shortcut( "overlay" )
     set_callbacks( Create, Destroy )

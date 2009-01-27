@@ -105,9 +105,9 @@ vlc_module_begin ()
 
         add_obsolete_integer( "gnutls-dh-bits" )
         add_integer( "gnutls-cache-timeout", CACHE_TIMEOUT, NULL,
-                    CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true );
+                    CACHE_TIMEOUT_TEXT, CACHE_TIMEOUT_LONGTEXT, true )
         add_integer( "gnutls-cache-size", CACHE_SIZE, NULL, CACHE_SIZE_TEXT,
-                    CACHE_SIZE_LONGTEXT, true );
+                    CACHE_SIZE_LONGTEXT, true )
 vlc_module_end ()
 
 static vlc_mutex_t gnutls_mutex = VLC_STATIC_MUTEX;

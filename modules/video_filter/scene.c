@@ -100,22 +100,22 @@ vlc_module_begin ()
 
     /* General options */
     add_string(  CFG_PREFIX "format", "png", NULL,
-                 FORMAT_TEXT, FORMAT_LONGTEXT, false );
+                 FORMAT_TEXT, FORMAT_LONGTEXT, false )
     change_string_list( psz_format_list, psz_format_list_text, 0 );
     add_integer( CFG_PREFIX "width", 288, NULL,
-                 WIDTH_TEXT, WIDTH_LONGTEXT, true );
+                 WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", 160, NULL,
-                 HEIGHT_TEXT, HEIGHT_LONGTEXT, true );
+                 HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
     add_string(  CFG_PREFIX "prefix", "scene", NULL,
-                 PREFIX_TEXT, PREFIX_LONGTEXT, false );
+                 PREFIX_TEXT, PREFIX_LONGTEXT, false )
     add_string(  CFG_PREFIX "path", NULL, NULL,
-                 PATH_TEXT, PATH_LONGTEXT, false );
+                 PATH_TEXT, PATH_LONGTEXT, false )
     add_bool(    CFG_PREFIX "replace", false, NULL,
-                 REPLACE_TEXT, REPLACE_LONGTEXT, false );
+                 REPLACE_TEXT, REPLACE_LONGTEXT, false )
 
     /* Snapshot method */
     add_integer( CFG_PREFIX "ratio", 50, NULL,
-                 RATIO_TEXT, RATIO_LONGTEXT, false );
+                 RATIO_TEXT, RATIO_LONGTEXT, false )
 
     set_callbacks( Create, Destroy )
 vlc_module_end ()

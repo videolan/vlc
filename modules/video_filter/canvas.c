@@ -69,15 +69,15 @@ vlc_module_begin ()
     set_callbacks( Activate, Destroy )
 
     add_integer_with_range( CFG_PREFIX "width", 0, 0, INT_MAX, NULL,
-                            WIDTH_TEXT, WIDTH_LONGTEXT, false );
+                            WIDTH_TEXT, WIDTH_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "height", 0, 0, INT_MAX, NULL,
-                            HEIGHT_TEXT, HEIGHT_LONGTEXT, false );
+                            HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
 
     add_string( CFG_PREFIX "aspect", "4:3", NULL,
-                ASPECT_TEXT, ASPECT_LONGTEXT, false );
+                ASPECT_TEXT, ASPECT_LONGTEXT, false )
 
     add_bool( CFG_PREFIX "padd", true, NULL,
-              PADD_TEXT, PADD_LONGTEXT, false );
+              PADD_TEXT, PADD_LONGTEXT, false )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

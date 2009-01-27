@@ -79,9 +79,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_ADVANCED_MISC )
 
     add_bool( "netsync-master", 0, NULL,
-              NETSYNC_TEXT, NETSYNC_LONGTEXT, true );
+              NETSYNC_TEXT, NETSYNC_LONGTEXT, true )
     add_string( "netsync-master-ip", NULL, NULL, MIP_TEXT, MIP_LONGTEXT,
-                true );
+                true )
 
     set_capability( "interface", 0 )
     set_callbacks( Activate, Close )

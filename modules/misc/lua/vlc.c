@@ -85,9 +85,9 @@ vlc_module_begin ()
         set_description( N_("Lua Interface Module") )
         set_capability( "interface", 0 )
         add_string( "lua-intf", "dummy", NULL,
-                    INTF_TEXT, INTF_LONGTEXT, false );
+                    INTF_TEXT, INTF_LONGTEXT, false )
         add_string( "lua-config", "", NULL,
-                    CONFIG_TEXT, CONFIG_LONGTEXT, false );
+                    CONFIG_TEXT, CONFIG_LONGTEXT, false )
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
 vlc_module_end ()
 

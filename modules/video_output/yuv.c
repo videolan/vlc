@@ -70,11 +70,11 @@ vlc_module_begin ()
     set_capability( "video output", 0 )
 
     add_string( CFG_PREFIX "file", "stream.yuv", NULL,
-                YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false );
+                YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false )
     add_string( CFG_PREFIX "chroma", NULL, NULL,
-                CHROMA_TEXT, CHROMA_LONGTEXT, true );
+                CHROMA_TEXT, CHROMA_LONGTEXT, true )
     add_bool  ( CFG_PREFIX "yuv4mpeg2", false, NULL,
-                YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true );
+                YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true )
 
     set_callbacks( Create, Destroy )
 vlc_module_end ()

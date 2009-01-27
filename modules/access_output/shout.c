@@ -114,26 +114,26 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_shortcut( "shout" )
     add_string( SOUT_CFG_PREFIX "name", "VLC media player - Live stream", NULL,
-                NAME_TEXT, NAME_LONGTEXT, false );
+                NAME_TEXT, NAME_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "description",
                  "Live stream from VLC media player", NULL,
-                DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, false );
+                DESCRIPTION_TEXT, DESCRIPTION_LONGTEXT, false )
     add_bool(   SOUT_CFG_PREFIX "mp3", false, NULL,
-                MP3_TEXT, MP3_LONGTEXT, true );
+                MP3_TEXT, MP3_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "genre", "Alternative", NULL,
-                GENRE_TEXT, GENRE_LONGTEXT, false );
+                GENRE_TEXT, GENRE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "url", "http://www.videolan.org/vlc", NULL,
-                URL_TEXT, URL_LONGTEXT, false );
+                URL_TEXT, URL_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "bitrate", "", NULL,
-                BITRATE_TEXT, BITRATE_LONGTEXT, false );
+                BITRATE_TEXT, BITRATE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "samplerate", "", NULL,
-                SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, false );
+                SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "channels", "", NULL,
-                CHANNELS_TEXT, CHANNELS_LONGTEXT, false );
+                CHANNELS_TEXT, CHANNELS_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "quality", "", NULL,
-                QUALITY_TEXT, QUALITY_LONGTEXT, false );
+                QUALITY_TEXT, QUALITY_LONGTEXT, false )
     add_bool(   SOUT_CFG_PREFIX "public", false, NULL,
-                PUBLIC_TEXT, PUBLIC_LONGTEXT, true );
+                PUBLIC_TEXT, PUBLIC_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

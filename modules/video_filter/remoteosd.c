@@ -125,22 +125,22 @@ vlc_module_begin ()
     set_callbacks( CreateFilter, DestroyFilter )
 
     add_string( RMTOSD_CFG "host", "myvdr", NULL, RMTOSD_HOST_TEXT,
-        RMTOSD_HOST_LONGTEXT, false );
+        RMTOSD_HOST_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "port", 20001, 1, 0xFFFF, NULL,
-        RMTOSD_PORT_TEXT, RMTOSD_PORT_LONGTEXT, false );
+        RMTOSD_PORT_TEXT, RMTOSD_PORT_LONGTEXT, false )
     add_password( RMTOSD_CFG "password", "", NULL, RMTOSD_PASSWORD_TEXT,
-        RMTOSD_PASSWORD_LONGTEXT, false );
+        RMTOSD_PASSWORD_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "update", RMTOSD_UPDATE_DEFAULT,
         RMTOSD_UPDATE_MIN, RMTOSD_UPDATE_MAX, NULL, RMTOSD_UPDATE_TEXT,
-        RMTOSD_UPDATE_LONGTEXT, true );
+        RMTOSD_UPDATE_LONGTEXT, true )
     add_bool( RMTOSD_CFG "vnc-polling", 0, NULL,
-              RMTOSD_POLL_TEXT , RMTOSD_POLL_LONGTEXT, false );
+              RMTOSD_POLL_TEXT , RMTOSD_POLL_LONGTEXT, false )
     add_bool( RMTOSD_CFG "mouse-events", 0, NULL,
-              RMTOSD_MOUSE_TEXT , RMTOSD_MOUSE_LONGTEXT, false );
+              RMTOSD_MOUSE_TEXT , RMTOSD_MOUSE_LONGTEXT, false )
     add_bool( RMTOSD_CFG "key-events", 0, NULL,
-              RMTOSD_KEYS_TEXT , RMTOSD_KEYS_LONGTEXT, false );
+              RMTOSD_KEYS_TEXT , RMTOSD_KEYS_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "alpha", 255, 0, 255, NULL,
-        RMTOSD_ALPHA_TEXT, RMTOSD_ALPHA_LONGTEXT, true );
+        RMTOSD_ALPHA_TEXT, RMTOSD_ALPHA_LONGTEXT, true )
 
 vlc_module_end ()
 

@@ -146,39 +146,39 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "v4l-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true );
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
     add_obsolete_string( "v4l-vdev" );
     add_obsolete_string( "v4l-adev" );
     add_string( "v4l-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true );
+                true )
     add_float( "v4l-fps", -1.0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_obsolete_integer( "v4l-samplerate" );
     add_integer( "v4l-channel", 0, NULL, CHANNEL_TEXT, CHANNEL_LONGTEXT,
-                true );
+                true )
     add_integer( "v4l-tuner", -1, NULL, TUNER_TEXT, TUNER_LONGTEXT, true )
     add_integer( "v4l-norm", VIDEO_MODE_AUTO, NULL, NORM_TEXT, NORM_LONGTEXT,
-                false );
+                false )
         change_integer_list( i_norm_list, psz_norm_list_text, NULL );
     add_integer( "v4l-frequency", -1, NULL, FREQUENCY_TEXT, FREQUENCY_LONGTEXT,
-                false );
+                false )
     add_integer( "v4l-audio", -1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, true )
     add_obsolete_bool( "v4l-stereo" );
     add_integer( "v4l-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( "v4l-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
-                true );
+                true )
     add_integer( "v4l-brightness", -1, NULL, BRIGHTNESS_TEXT,
-                BRIGHTNESS_LONGTEXT, true );
+                BRIGHTNESS_LONGTEXT, true )
     add_integer( "v4l-colour", -1, NULL, COLOUR_TEXT, COLOUR_LONGTEXT,
-                true );
+                true )
     add_integer( "v4l-hue", -1, NULL, HUE_TEXT, HUE_LONGTEXT, true )
     add_integer( "v4l-contrast", -1, NULL, CONTRAST_TEXT, CONTRAST_LONGTEXT,
-                true );
+                true )
     add_bool( "v4l-mjpeg", false, NULL, MJPEG_TEXT, MJPEG_LONGTEXT,
-            true );
+            true )
     add_integer( "v4l-decimation", 1, NULL, DECIMATION_TEXT,
-            DECIMATION_LONGTEXT, true );
+            DECIMATION_LONGTEXT, true )
     add_integer( "v4l-quality", 100, NULL, QUALITY_TEXT, QUALITY_LONGTEXT,
-            true );
+            true )
 
     add_shortcut( "v4l" )
     set_capability( "access_demux", 10 )

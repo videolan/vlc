@@ -55,13 +55,13 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
     add_bool( "playlist-autostart", 1, NULL,
-              AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false );
+              AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
 
     add_integer( "parent-item", 0, NULL, NULL, NULL, true )
         change_internal ()
 
     add_bool( "playlist-skip-ads", 1, NULL,
-              SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, false );
+              SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, false )
 
     set_shortname( N_("Playlist") )
     set_description( N_("Playlist") )
@@ -102,7 +102,7 @@ vlc_module_begin ()
         set_capability( "demux", 10 )
         set_callbacks( Import_Shoutcast, Close_Shoutcast )
         add_bool( "shoutcast-show-adult", false, NULL,
-                   SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, false );
+                   SHOW_ADULT_TEXT, SHOW_ADULT_LONGTEXT, false )
     add_submodule ()
         set_description( N_("ASX playlist import") )
         add_shortcut( "asx-open" )

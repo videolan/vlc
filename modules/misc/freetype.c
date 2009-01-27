@@ -135,29 +135,29 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
-              false );
+              false )
 
     add_integer( "freetype-fontsize", 0, NULL, FONTSIZE_TEXT,
-                 FONTSIZE_LONGTEXT, true );
+                 FONTSIZE_LONGTEXT, true )
 
     /* opacity valid on 0..255, with default 255 = fully opaque */
     add_integer_with_range( "freetype-opacity", 255, 0, 255, NULL,
-        OPACITY_TEXT, OPACITY_LONGTEXT, true );
+        OPACITY_TEXT, OPACITY_LONGTEXT, true )
 
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "freetype-color", 0x00FFFFFF, NULL, COLOR_TEXT,
-                 COLOR_LONGTEXT, false );
+                 COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
 
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
-                 FONTSIZER_LONGTEXT, false );
+                 FONTSIZER_LONGTEXT, false )
         change_integer_list( pi_sizes, ppsz_sizes_text, NULL );
     add_integer( "freetype-effect", 2, NULL, EFFECT_TEXT,
-                 EFFECT_LONGTEXT, false );
+                 EFFECT_LONGTEXT, false )
         change_integer_list( pi_effects, ppsz_effects_text, NULL );
 
     add_bool( "freetype-yuvp", 0, NULL, YUVP_TEXT,
-              YUVP_LONGTEXT, true );
+              YUVP_LONGTEXT, true )
     set_capability( "text renderer", 100 )
     add_shortcut( "text" )
     set_callbacks( Create, Destroy )
@@ -2241,7 +2241,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
                               (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
-                              true );
+                              true )
     if( p_sub )
     {
         p_xml = xml_Create( p_filter );

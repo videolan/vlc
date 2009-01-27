@@ -190,96 +190,96 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, true );
+                 CACHING_LONGTEXT, true )
     add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
-                 false );
+                 false )
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-network-name", NULL, NULL, NAME_TEXT, NAME_LONGTEXT,
-                    true );
+                    true )
         add_string( "dvb-create-name", NULL, NULL, CREATE_TEXT,
-                    CREATE_LONGTEXT, true );
+                    CREATE_LONGTEXT, true )
         add_integer( "dvb-adapter", -1, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
-                     true );
+                     true )
 #   else
         /* dvb-device refers to a frontend within an adapter */
         add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                     true );
-        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true );
+                     true )
+        add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
         add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
-                  true );
+                  true )
 #   endif
 
     /* DVB-S (satellite) */
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT,
-        INVERSION_LONGTEXT, true );
+        INVERSION_LONGTEXT, true )
         change_integer_list( i_inversion_list, ppsz_inversion_text, NULL );
 #   if defined(WIN32) || defined(WINCE)
         add_string( "dvb-polarisation", NULL, NULL, POLARISATION_TEXT,
-            POLARISATION_LONGTEXT, false );
+            POLARISATION_LONGTEXT, false )
             change_string_list( ppsz_polar_list, ppsz_polar_text, 0 );
             /* Note: Polaristion H = voltage 18; V = voltage 13; */
         add_integer( "dvb-network-id", 0, NULL, NETID_TEXT, NETID_LONGTEXT,
-            true );
+            true )
         add_integer( "dvb-azimuth", 0, NULL, AZIMUTH_TEXT, AZIMUTH_LONGTEXT,
-            true );
+            true )
         add_integer( "dvb-elevation", 0, NULL, ELEVATION_TEXT,
-            ELEVATION_LONGTEXT, true );
+            ELEVATION_LONGTEXT, true )
         add_integer( "dvb-longitude", 0, NULL, LONGITUDE_TEXT,
-            LONGITUDE_LONGTEXT, true );
+            LONGITUDE_LONGTEXT, true )
         add_string( "dvb-range", NULL, NULL, RANGE_TEXT,
-            RANGE_LONGTEXT, true );
+            RANGE_LONGTEXT, true )
         /* dvb-range corresponds to the BDA InputRange parameter which is
          * used by some drivers to control the diseqc */
 #   else
         add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
-            true );
+            true )
         add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-            true );
+            true )
         add_bool( "dvb-high-voltage", 0, NULL, HIGH_VOLTAGE_TEXT,
-            HIGH_VOLTAGE_LONGTEXT, true );
+            HIGH_VOLTAGE_LONGTEXT, true )
         add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
-            true );
-        add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true );
+            true )
+        add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
 #   endif
     add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
-        LNB_LOF1_LONGTEXT, true );
+        LNB_LOF1_LONGTEXT, true )
     add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
-        LNB_LOF2_LONGTEXT, true );
+        LNB_LOF2_LONGTEXT, true )
     add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
-        LNB_SLOF_LONGTEXT, true );
+        LNB_SLOF_LONGTEXT, true )
     add_integer( "dvb-srate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT,
-        false );
+        false )
 
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", -1, NULL, MODULATION_TEXT,
-        MODULATION_LONGTEXT, true );
+        MODULATION_LONGTEXT, true )
         change_integer_list( i_mod_list, ppsz_mod_text, NULL );
 
     /* ATSC */
     add_integer( "dvb-major-channel", 0, NULL, MAJOR_CHANNEL_TEXT,
-        MAJOR_CHANNEL_LONGTEXT, true );
+        MAJOR_CHANNEL_LONGTEXT, true )
      add_integer( "dvb-minor-channel", 0, NULL, MINOR_CHANNEL_TEXT,
-        MINOR_CHANNEL_LONGTEXT, true );
+        MINOR_CHANNEL_LONGTEXT, true )
      add_integer( "dvb-physical-channel", 0, NULL, PHYSICAL_CHANNEL_TEXT,
-        PHYSICAL_CHANNEL_LONGTEXT, true );
+        PHYSICAL_CHANNEL_LONGTEXT, true )
 
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", -1, NULL, CODE_RATE_HP_TEXT,
-        CODE_RATE_HP_LONGTEXT, true );
+        CODE_RATE_HP_LONGTEXT, true )
         change_integer_list( i_hp_fec_list, ppsz_hp_fec_text, NULL );
     add_integer( "dvb-code-rate-lp", -1, NULL, CODE_RATE_LP_TEXT,
-        CODE_RATE_LP_LONGTEXT, true );
+        CODE_RATE_LP_LONGTEXT, true )
         change_integer_list( i_lp_fec_list, ppsz_lp_fec_text, NULL );
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
-        false );
+        false )
         change_integer_list( i_band_list, ppsz_band_text, NULL );
     add_integer( "dvb-guard", -1, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
         change_integer_list( i_guard_list, ppsz_guard_text, NULL );
     add_integer( "dvb-transmission", -1, NULL, TRANSMISSION_TEXT,
-        TRANSMISSION_LONGTEXT, true );
+        TRANSMISSION_LONGTEXT, true )
         change_integer_list( i_transmission_list, ppsz_transmission_text, NULL );
     add_integer( "dvb-hierarchy", -1, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
-        true );
+        true )
         change_integer_list( i_hierarchy_list, ppsz_hierarchy_text, NULL );
 
     set_capability( "access", 0 )

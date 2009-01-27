@@ -101,19 +101,19 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
     add_string( SOUT_CFG_PREFIX "user", "", NULL,
-                USER_TEXT, USER_LONGTEXT, true );
+                USER_TEXT, USER_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "pwd", "", NULL,
-                PASS_TEXT, PASS_LONGTEXT, true );
+                PASS_TEXT, PASS_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "mime", "", NULL,
-                MIME_TEXT, MIME_LONGTEXT, true );
+                MIME_TEXT, MIME_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL,
-                CERT_TEXT, CERT_LONGTEXT, true );
+                CERT_TEXT, CERT_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "key", NULL, NULL,
-                KEY_TEXT, KEY_LONGTEXT, true );
+                KEY_TEXT, KEY_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "ca", NULL, NULL,
-                CA_TEXT, CA_LONGTEXT, true );
+                CA_TEXT, CA_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
-                CRL_TEXT, CRL_LONGTEXT, true );
+                CRL_TEXT, CRL_LONGTEXT, true )
 #if 0 //def HAVE_AVAHI_CLIENT
     add_bool( SOUT_CFG_PREFIX "bonjour", false, NULL,
               BONJOUR_TEXT, BONJOUR_LONGTEXT, true);

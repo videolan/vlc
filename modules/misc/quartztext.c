@@ -115,12 +115,12 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
     add_string( "quartztext-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT,
-              false );
+              false )
     add_integer( "quartztext-rel-fontsize", DEFAULT_REL_FONT_SIZE, NULL, FONTSIZER_TEXT,
-                 FONTSIZER_LONGTEXT, false );
+                 FONTSIZER_LONGTEXT, false )
         change_integer_list( pi_sizes, ppsz_sizes_text, NULL );
     add_integer( "quartztext-color", 0x00FFFFFF, NULL, COLOR_TEXT,
-                 COLOR_LONGTEXT, false );
+                 COLOR_LONGTEXT, false )
         change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
     set_capability( "text renderer", 150 )
     add_shortcut( "text" )
@@ -560,7 +560,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_sub = stream_MemoryNew( VLC_OBJECT(p_filter),
                               (uint8_t *) p_region_in->psz_html,
                               strlen( p_region_in->psz_html ),
-                              true );
+                              true )
     if( p_sub )
     {
         p_xml = xml_Create( p_filter );

@@ -166,7 +166,7 @@ vlc_module_begin ()
     add_bool( "ts-es-id-pid", 1, NULL, PID_TEXT, PID_LONGTEXT, true )
     add_string( "ts-out", NULL, NULL, TSOUT_TEXT, TSOUT_LONGTEXT, true )
     add_integer( "ts-out-mtu", 1400, NULL, MTUOUT_TEXT,
-                 MTUOUT_LONGTEXT, true );
+                 MTUOUT_LONGTEXT, true )
     add_string( "ts-csa-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, true )
     add_string( "ts-csa2-ck", NULL, NULL, CSA_TEXT, CSA_LONGTEXT, true )
     add_integer( "ts-csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true )
@@ -175,7 +175,7 @@ vlc_module_begin ()
     add_file( "ts-dump-file", NULL, NULL, TSDUMP_TEXT, TSDUMP_LONGTEXT, false )
     add_bool( "ts-dump-append", 0, NULL, APPEND_TEXT, APPEND_LONGTEXT, false )
     add_integer( "ts-dump-size", 16384, NULL, DUMPSIZE_TEXT,
-                 DUMPSIZE_LONGTEXT, true );
+                 DUMPSIZE_LONGTEXT, true )
 
     set_capability( "demux", 10 )
     set_callbacks( Open, Close )
@@ -1337,10 +1337,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
-                                    true );
+                                    true )
                     stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
-                                    true );
+                                    true )
 
                     for( i = 2; i < 8192; i++ )
                     {
@@ -3091,7 +3091,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         /* Set demux filter */
         stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                         ACCESS_SET_PRIVATE_ID_STATE, prg->i_pid_pcr,
-                        true );
+                        true )
     }
     else if ( p_sys->b_dvb_control )
     {
@@ -3910,7 +3910,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             /* Set demux filter */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                             ACCESS_SET_PRIVATE_ID_STATE, p_es->i_pid,
-                            true );
+                            true )
         }
     }
 

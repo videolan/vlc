@@ -424,242 +424,242 @@ vlc_module_begin ()
 /* Frame-type options */
 
     add_integer( SOUT_CFG_PREFIX "keyint", 250, NULL, KEYINT_TEXT,
-                 KEYINT_LONGTEXT, false );
+                 KEYINT_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "min-keyint", 25, NULL, MIN_KEYINT_TEXT,
-                 MIN_KEYINT_LONGTEXT, false );
+                 MIN_KEYINT_LONGTEXT, false )
         add_deprecated_alias( SOUT_CFG_PREFIX "keyint-min" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "scenecut", 40, NULL, SCENE_TEXT,
-                 SCENE_LONGTEXT, false );
+                 SCENE_LONGTEXT, false )
         change_integer_range( -1, 100 )
 
 #if X264_BUILD >= 55 /* r607 */
     add_bool( SOUT_CFG_PREFIX "pre-scenecut", 0, NULL, PRESCENE_TEXT,
-              PRESCENE_LONGTEXT, false );
+              PRESCENE_LONGTEXT, false )
 #endif
 
     add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
-                 BFRAMES_LONGTEXT, false );
+                 BFRAMES_LONGTEXT, false )
         change_integer_range( 0, 16 )
 
 #if X264_BUILD >= 63
     add_integer( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
-                 B_ADAPT_LONGTEXT, false );
+                 B_ADAPT_LONGTEXT, false )
         change_integer_range( 0, 2 )
 #elif  X264_BUILD >= 0x0013 /* r137 */
     add_bool( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
-              B_ADAPT_LONGTEXT, false );
+              B_ADAPT_LONGTEXT, false )
 #endif
 
 #if  X264_BUILD >= 0x0013 /* r137 */
     add_integer( SOUT_CFG_PREFIX "b-bias", 0, NULL, B_BIAS_TEXT,
-                 B_BIAS_LONGTEXT, false );
+                 B_BIAS_LONGTEXT, false )
         change_integer_range( -100, 100 )
 #endif
 
     add_bool( SOUT_CFG_PREFIX "bpyramid", 0, NULL, BPYRAMID_TEXT,
-              BPYRAMID_LONGTEXT, false );
+              BPYRAMID_LONGTEXT, false )
 
     add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, CABAC_TEXT, CABAC_LONGTEXT,
-              false );
+              false )
 
     add_integer( SOUT_CFG_PREFIX "ref", 1, NULL, REF_TEXT,
-                 REF_LONGTEXT, false );
+                 REF_LONGTEXT, false )
         change_integer_range( 1, 16 )
         add_deprecated_alias( SOUT_CFG_PREFIX "frameref" ) /* Deprecated since 0.8.5 */
 
     add_bool( SOUT_CFG_PREFIX "nf", 0, NULL, NF_TEXT,
-              NF_LONGTEXT, false );
+              NF_LONGTEXT, false )
         add_deprecated_alias( SOUT_CFG_PREFIX "loopfilter" ) /* Deprecated since 0.8.5 */
 
     add_string( SOUT_CFG_PREFIX "deblock", "0:0", NULL, FILTER_TEXT,
-                 FILTER_LONGTEXT, false );
+                 FILTER_LONGTEXT, false )
         add_deprecated_alias( SOUT_CFG_PREFIX "filter" ) /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "level", "5.1", NULL, LEVEL_TEXT,
-               LEVEL_LONGTEXT, false );
+               LEVEL_LONGTEXT, false )
 
 #if X264_BUILD >= 51 /* r570 */
     add_bool( SOUT_CFG_PREFIX "interlaced", 0, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
-              false );
+              false )
 #endif
 
 /* Ratecontrol */
 
     add_integer( SOUT_CFG_PREFIX "qp", 26, NULL, QP_TEXT, QP_LONGTEXT,
-                 false );
+                 false )
         change_integer_range( 0, 51 ) /* QP 0 -> lossless encoding */
 
 #if X264_BUILD >= 37 /* r334 */
     add_integer( SOUT_CFG_PREFIX "crf", 0, NULL, CRF_TEXT,
-                 CRF_LONGTEXT, false );
+                 CRF_LONGTEXT, false )
         change_integer_range( 0, 51 )
 #endif
 
     add_integer( SOUT_CFG_PREFIX "qpmin", 10, NULL, QPMIN_TEXT,
-                 QPMIN_LONGTEXT, false );
+                 QPMIN_LONGTEXT, false )
         change_integer_range( 0, 51 )
         add_deprecated_alias( SOUT_CFG_PREFIX "qp-min" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpmax", 51, NULL, QPMAX_TEXT,
-                 QPMAX_LONGTEXT, false );
+                 QPMAX_LONGTEXT, false )
         change_integer_range( 0, 51 )
         add_deprecated_alias( SOUT_CFG_PREFIX "qp-max" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "qpstep", 4, NULL, QPSTEP_TEXT,
-                 QPSTEP_LONGTEXT, false );
+                 QPSTEP_LONGTEXT, false )
         change_integer_range( 0, 51 )
 
     add_float( SOUT_CFG_PREFIX "ratetol", 1.0, NULL, RATETOL_TEXT,
-               RATETOL_LONGTEXT, false );
+               RATETOL_LONGTEXT, false )
         change_float_range( 0, 100 )
         add_deprecated_alias( SOUT_CFG_PREFIX "tolerance" ) /* Deprecated since 0.8.5 */
 
     add_integer( SOUT_CFG_PREFIX "vbv-maxrate", 0, NULL, VBV_MAXRATE_TEXT,
-                 VBV_MAXRATE_LONGTEXT, false );
+                 VBV_MAXRATE_LONGTEXT, false )
 
     add_integer( SOUT_CFG_PREFIX "vbv-bufsize", 0, NULL, VBV_BUFSIZE_TEXT,
-                 VBV_BUFSIZE_LONGTEXT, false );
+                 VBV_BUFSIZE_LONGTEXT, false )
 
     add_float( SOUT_CFG_PREFIX "vbv-init", 0.9, NULL, VBV_INIT_TEXT,
-               VBV_INIT_LONGTEXT, false );
+               VBV_INIT_LONGTEXT, false )
         change_float_range( 0, 1 )
 
     add_float( SOUT_CFG_PREFIX "ipratio", 1.40, NULL, IPRATIO_TEXT,
-               IPRATIO_LONGTEXT, false );
+               IPRATIO_LONGTEXT, false )
         change_float_range( 1, 2 )
 
     add_float( SOUT_CFG_PREFIX "pbratio", 1.30, NULL, PBRATIO_TEXT,
-               PBRATIO_LONGTEXT, false );
+               PBRATIO_LONGTEXT, false )
         change_float_range( 1, 2 )
 
 #if X264_BUILD >= 23 /* r190 */
     add_integer( SOUT_CFG_PREFIX "chroma-qp-offset", 0, NULL, CHROMA_QP_OFFSET_TEXT,
-                 CHROMA_QP_OFFSET_LONGTEXT, false );
+                 CHROMA_QP_OFFSET_LONGTEXT, false )
 #endif
 
     add_integer( SOUT_CFG_PREFIX "pass", 0, NULL, PASS_TEXT,
-                 PASS_LONGTEXT, false );
+                 PASS_LONGTEXT, false )
         change_integer_range( 0, 3 )
 
     add_float( SOUT_CFG_PREFIX "qcomp", 0.60, NULL, QCOMP_TEXT,
-               QCOMP_LONGTEXT, false );
+               QCOMP_LONGTEXT, false )
         change_float_range( 0, 1 )
 
     add_float( SOUT_CFG_PREFIX "cplxblur", 20.0, NULL, CPLXBLUR_TEXT,
-               CPLXBLUR_LONGTEXT, false );
+               CPLXBLUR_LONGTEXT, false )
 
     add_float( SOUT_CFG_PREFIX "qblur", 0.5, NULL, QBLUR_TEXT,
-               QBLUR_LONGTEXT, false );
+               QBLUR_LONGTEXT, false )
 #if X264_BUILD >= 59
     add_integer( SOUT_CFG_PREFIX "aq-mode", 2, NULL, AQ_MODE_TEXT,
-                 AQ_MODE_LONGTEXT, false );
+                 AQ_MODE_LONGTEXT, false )
          change_integer_range( 0, 2 )
     add_float( SOUT_CFG_PREFIX "aq-strength", 1.0, NULL, AQ_STRENGTH_TEXT,
-               AQ_STRENGTH_LONGTEXT, false );
+               AQ_STRENGTH_LONGTEXT, false )
 #endif
 
 /* Analysis */
 
     /* x264 partitions = none (default). set at least "normal" mode. */
     add_string( SOUT_CFG_PREFIX "partitions", "normal", NULL, ANALYSE_TEXT,
-                ANALYSE_LONGTEXT, false );
+                ANALYSE_LONGTEXT, false )
         change_string_list( enc_analyse_list, enc_analyse_list_text, 0 );
         add_deprecated_alias( SOUT_CFG_PREFIX "analyse" ) /* Deprecated since 0.8.6 */
 
     add_string( SOUT_CFG_PREFIX "direct", "spatial", NULL, DIRECT_PRED_TEXT,
-                DIRECT_PRED_LONGTEXT, false );
+                DIRECT_PRED_LONGTEXT, false )
         change_string_list( direct_pred_list, direct_pred_list_text, 0 );
 
 #if X264_BUILD >= 52 /* r573 */
     add_integer( SOUT_CFG_PREFIX "direct-8x8", -1, NULL, DIRECT_PRED_SIZE_TEXT,
-                 DIRECT_PRED_SIZE_LONGTEXT, false );
+                 DIRECT_PRED_SIZE_LONGTEXT, false )
         change_integer_range( -1, 1 )
 #endif
 
 #if X264_BUILD >= 0x0012 /* r134 */
     add_bool( SOUT_CFG_PREFIX "weightb", 0, NULL, WEIGHTB_TEXT,
-              WEIGHTB_LONGTEXT, false );
+              WEIGHTB_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 24 /* r221 */
     add_string( SOUT_CFG_PREFIX "me", "hex", NULL, ME_TEXT,
-                ME_LONGTEXT, false );
+                ME_LONGTEXT, false )
         change_string_list( enc_me_list, enc_me_list_text, 0 );
 
     add_integer( SOUT_CFG_PREFIX "merange", 16, NULL, MERANGE_TEXT,
-                 MERANGE_LONGTEXT, false );
+                 MERANGE_LONGTEXT, false )
         change_integer_range( 1, 64 )
 #endif
 
     add_integer( SOUT_CFG_PREFIX "mvrange", -1, NULL, MVRANGE_TEXT,
-                 MVRANGE_LONGTEXT, false );
+                 MVRANGE_LONGTEXT, false )
 
 #if X264_BUILD >= 55 /* r607 */
     add_integer( SOUT_CFG_PREFIX "mvrange-thread", -1, NULL, MVRANGE_THREAD_TEXT,
-                 MVRANGE_THREAD_LONGTEXT, false );
+                 MVRANGE_THREAD_LONGTEXT, false )
 #endif
 
     add_integer( SOUT_CFG_PREFIX "subme", 5, NULL, SUBME_TEXT,
-                 SUBME_LONGTEXT, false );
+                 SUBME_LONGTEXT, false )
         change_integer_range( 1, SUBME_MAX )
         add_deprecated_alias( SOUT_CFG_PREFIX "subpel" ) /* Deprecated since 0.8.5 */
 
 #if X264_BUILD >= 41 && X264_BUILD < 65 /* r368 */
     add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
-              B_RDO_LONGTEXT, false );
+              B_RDO_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 36 /* r318 */
     add_bool( SOUT_CFG_PREFIX "mixed-refs", 0, NULL, MIXED_REFS_TEXT,
-              MIXED_REFS_LONGTEXT, false );
+              MIXED_REFS_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 23 /* r171 */
     add_bool( SOUT_CFG_PREFIX "chroma-me", 1, NULL, CHROMA_ME_TEXT,
-              CHROMA_ME_LONGTEXT, false );
+              CHROMA_ME_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 43 && X264_BUILD < 65 /* r390 */
     add_bool( SOUT_CFG_PREFIX "bime", 0, NULL, BIME_TEXT,
-              BIME_LONGTEXT, false );
+              BIME_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 30 /* r251 */
     add_bool( SOUT_CFG_PREFIX "8x8dct", 0, NULL, TRANSFORM_8X8DCT_TEXT,
-              TRANSFORM_8X8DCT_LONGTEXT, false );
+              TRANSFORM_8X8DCT_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 39 /* r360 */
     add_integer( SOUT_CFG_PREFIX "trellis", 0, NULL, TRELLIS_TEXT,
-                 TRELLIS_LONGTEXT, false );
+                 TRELLIS_LONGTEXT, false )
         change_integer_range( 0, 2 )
 #endif
 
 #if X264_BUILD >= 42 /* r384 */
     add_bool( SOUT_CFG_PREFIX "fast-pskip", 1, NULL, FAST_PSKIP_TEXT,
-              FAST_PSKIP_LONGTEXT, false );
+              FAST_PSKIP_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 46 /* r503 */
     add_bool( SOUT_CFG_PREFIX "dct-decimate", 1, NULL, DCT_DECIMATE_TEXT,
-              DCT_DECIMATE_LONGTEXT, false );
+              DCT_DECIMATE_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 44 /* r398 */
     add_integer( SOUT_CFG_PREFIX "nr", 0, NULL, NR_TEXT,
-                 NR_LONGTEXT, false );
+                 NR_LONGTEXT, false )
         change_integer_range( 0, 1000 )
 #endif
 
 #if X264_BUILD >= 52 /* r573 */
     add_integer( SOUT_CFG_PREFIX "deadzone-inter", 21, NULL, DEADZONE_INTER_TEXT,
-                 DEADZONE_INTRA_LONGTEXT, false );
+                 DEADZONE_INTRA_LONGTEXT, false )
         change_integer_range( 0, 32 )
 
     add_integer( SOUT_CFG_PREFIX "deadzone-intra", 11, NULL, DEADZONE_INTRA_TEXT,
-                 DEADZONE_INTRA_LONGTEXT, false );
+                 DEADZONE_INTRA_LONGTEXT, false )
         change_integer_range( 0, 32 )
 #endif
 
@@ -667,40 +667,40 @@ vlc_module_begin ()
 
 #if X264_BUILD >= 55 /* r607 */
     add_bool( SOUT_CFG_PREFIX "non-deterministic", 0, NULL, NON_DETERMINISTIC_TEXT,
-              NON_DETERMINISTIC_LONGTEXT, false );
+              NON_DETERMINISTIC_LONGTEXT, false )
 #endif
 
     add_bool( SOUT_CFG_PREFIX "asm", 1, NULL, ASM_TEXT,
-              ASM_LONGTEXT, false );
+              ASM_LONGTEXT, false )
 
     /* x264 psnr = 1 (default). disable PSNR computation for speed. */
     add_bool( SOUT_CFG_PREFIX "psnr", 0, NULL, PSNR_TEXT,
-              PSNR_LONGTEXT, false );
+              PSNR_LONGTEXT, false )
 
 #if X264_BUILD >= 50 /* r554 */
     /* x264 ssim = 1 (default). disable SSIM computation for speed. */
     add_bool( SOUT_CFG_PREFIX "ssim", 0, NULL, SSIM_TEXT,
-              SSIM_LONGTEXT, false );
+              SSIM_LONGTEXT, false )
 #endif
 
     add_bool( SOUT_CFG_PREFIX "quiet", 0, NULL, QUIET_TEXT,
-              QUIET_LONGTEXT, false );
+              QUIET_LONGTEXT, false )
 
 #if X264_BUILD >= 47 /* r518 */
     add_integer( SOUT_CFG_PREFIX "sps-id", 0, NULL, SPS_ID_TEXT,
-                 SPS_ID_LONGTEXT, false );
+                 SPS_ID_LONGTEXT, false )
 #endif
 
     add_bool( SOUT_CFG_PREFIX "aud", 0, NULL, AUD_TEXT,
-              AUD_LONGTEXT, false );
+              AUD_LONGTEXT, false )
 
 #if X264_BUILD >= 0x000e /* r81 */
     add_bool( SOUT_CFG_PREFIX "verbose", 0, NULL, VERBOSE_TEXT,
-              VERBOSE_LONGTEXT, false );
+              VERBOSE_LONGTEXT, false )
 #endif
 
     add_string( SOUT_CFG_PREFIX "stats", "x264_2pass.log", NULL, STATS_TEXT,
-                STATS_LONGTEXT, false );
+                STATS_LONGTEXT, false )
 
 vlc_module_end ()
 

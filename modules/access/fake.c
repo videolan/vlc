@@ -66,11 +66,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "fake-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true );
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
     add_float( "fake-fps", 25.0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( "fake-id", 0, NULL, ID_TEXT, ID_LONGTEXT, true )
     add_integer( "fake-duration", -1, NULL, DURATION_TEXT, DURATION_LONGTEXT,
-                 true );
+                 true )
 
     add_shortcut( "fake" )
     set_capability( "access_demux", 10 )

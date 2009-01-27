@@ -243,94 +243,94 @@ vlc_module_begin ()
 
     set_section( N_( "Video input" ), NULL )
     add_integer( CFG_PREFIX "standard", 0, NULL, STANDARD_TEXT,
-                 STANDARD_LONGTEXT, false );
-        change_integer_list( i_standards_list, psz_standards_list_text, NULL );
+                 STANDARD_LONGTEXT, false )
+        change_integer_list( i_standards_list, psz_standards_list_text, NULL )
     add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true );
+                true )
     add_integer( CFG_PREFIX "input", 0, NULL, INPUT_TEXT, INPUT_LONGTEXT,
-                true );
+                true )
     add_integer( CFG_PREFIX "audio-input", 0, NULL, AUDIO_INPUT_TEXT,
-                 AUDIO_INPUT_LONGTEXT, true );
+                 AUDIO_INPUT_LONGTEXT, true )
     add_integer( CFG_PREFIX "io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
-                 IOMETHOD_LONGTEXT, true );
-        change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL );
+                 IOMETHOD_LONGTEXT, true )
+        change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL )
     add_integer( CFG_PREFIX "width", -1, NULL, WIDTH_TEXT,
-                WIDTH_LONGTEXT, true );
+                WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", -1, NULL, HEIGHT_TEXT,
-                HEIGHT_LONGTEXT, true );
+                HEIGHT_LONGTEXT, true )
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                CACHING_TEXT, CACHING_LONGTEXT, true );
+                CACHING_TEXT, CACHING_LONGTEXT, true )
 
     set_section( N_( "Tuner" ), NULL )
     add_integer( CFG_PREFIX "tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT,
-                 true );
+                 true )
     add_integer( CFG_PREFIX "tuner-frequency", -1, NULL, FREQUENCY_TEXT,
-                 FREQUENCY_LONGTEXT, true );
+                 FREQUENCY_LONGTEXT, true )
     add_integer( CFG_PREFIX "tuner-audio-mode", -1, NULL, TUNER_AUDIO_MODE_TEXT,
-                 TUNER_AUDIO_MODE_LONGTEXT, true );
+                 TUNER_AUDIO_MODE_LONGTEXT, true )
         change_integer_list( i_tuner_audio_modes_list,
-                             psz_tuner_audio_modes_list_text, 0 );
+                             psz_tuner_audio_modes_list_text, 0 )
 
     set_section( N_( "Controls" ),
-                 N_( "v4l2 driver controls, if supported by your v4l2 driver." ) );
+                 N_( "v4l2 driver controls, if supported by your v4l2 driver." ) )
     add_bool( CFG_PREFIX "controls-reset", false, NULL, CTRL_RESET_TEXT,
-              CTRL_RESET_LONGTEXT, true );
+              CTRL_RESET_LONGTEXT, true )
     add_integer( CFG_PREFIX "brightness", -1, NULL, BRIGHTNESS_TEXT,
-                 BRIGHTNESS_LONGTEXT, true );
+                 BRIGHTNESS_LONGTEXT, true )
     add_integer( CFG_PREFIX "contrast", -1, NULL, CONTRAST_TEXT,
-                 CONTRAST_LONGTEXT, true );
+                 CONTRAST_LONGTEXT, true )
     add_integer( CFG_PREFIX "saturation", -1, NULL, SATURATION_TEXT,
-                 SATURATION_LONGTEXT, true );
+                 SATURATION_LONGTEXT, true )
     add_integer( CFG_PREFIX "hue", -1, NULL, HUE_TEXT,
-                 HUE_LONGTEXT, true );
+                 HUE_LONGTEXT, true )
     add_integer( CFG_PREFIX "black-level", -1, NULL, BLACKLEVEL_TEXT,
-                 BLACKLEVEL_LONGTEXT, true );
+                 BLACKLEVEL_LONGTEXT, true )
     add_integer( CFG_PREFIX "auto-white-balance", -1, NULL,
-                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true );
+                 AUTOWHITEBALANCE_TEXT, AUTOWHITEBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "do-white-balance", -1, NULL, DOWHITEBALANCE_TEXT,
-                 DOWHITEBALANCE_LONGTEXT, true );
+                 DOWHITEBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "red-balance", -1, NULL, REDBALANCE_TEXT,
-                 REDBALANCE_LONGTEXT, true );
+                 REDBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "blue-balance", -1, NULL, BLUEBALANCE_TEXT,
-                 BLUEBALANCE_LONGTEXT, true );
+                 BLUEBALANCE_LONGTEXT, true )
     add_integer( CFG_PREFIX "gamma", -1, NULL, GAMMA_TEXT,
-                 GAMMA_LONGTEXT, true );
+                 GAMMA_LONGTEXT, true )
     add_integer( CFG_PREFIX "exposure", -1, NULL, EXPOSURE_TEXT,
-                 EXPOSURE_LONGTEXT, true );
+                 EXPOSURE_LONGTEXT, true )
     add_integer( CFG_PREFIX "autogain", -1, NULL, AUTOGAIN_TEXT,
-                 AUTOGAIN_LONGTEXT, true );
+                 AUTOGAIN_LONGTEXT, true )
     add_integer( CFG_PREFIX "gain", -1, NULL, GAIN_TEXT,
-                 GAIN_LONGTEXT, true );
+                 GAIN_LONGTEXT, true )
     add_integer( CFG_PREFIX "hflip", -1, NULL, HFLIP_TEXT,
-                 HFLIP_LONGTEXT, true );
+                 HFLIP_LONGTEXT, true )
     add_integer( CFG_PREFIX "vflip", -1, NULL, VFLIP_TEXT,
-                 VFLIP_LONGTEXT, true );
+                 VFLIP_LONGTEXT, true )
     add_integer( CFG_PREFIX "hcenter", -1, NULL, HCENTER_TEXT,
-                 HCENTER_LONGTEXT, true );
+                 HCENTER_LONGTEXT, true )
     add_integer( CFG_PREFIX "vcenter", -1, NULL, VCENTER_TEXT,
-                 VCENTER_LONGTEXT, true );
+                 VCENTER_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-volume", -1, NULL, AUDIO_VOLUME_TEXT,
-                AUDIO_VOLUME_LONGTEXT, true );
+                AUDIO_VOLUME_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-balance", -1, NULL, AUDIO_BALANCE_TEXT,
-                AUDIO_BALANCE_LONGTEXT, true );
+                AUDIO_BALANCE_LONGTEXT, true )
     add_bool( CFG_PREFIX "audio-mute", false, NULL, AUDIO_MUTE_TEXT,
-              AUDIO_MUTE_LONGTEXT, true );
+              AUDIO_MUTE_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-bass", -1, NULL, AUDIO_BASS_TEXT,
-                AUDIO_BASS_LONGTEXT, true );
+                AUDIO_BASS_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-treble", -1, NULL, AUDIO_TREBLE_TEXT,
-                AUDIO_TREBLE_LONGTEXT, true );
+                AUDIO_TREBLE_LONGTEXT, true )
     add_integer( CFG_PREFIX "audio-loudness", -1, NULL, AUDIO_LOUDNESS_TEXT,
-                AUDIO_LOUDNESS_LONGTEXT, true );
+                AUDIO_LOUDNESS_LONGTEXT, true )
     add_string( CFG_PREFIX "set-ctrls", NULL, NULL, S_CTRLS_TEXT,
-              S_CTRLS_LONGTEXT, true );
+              S_CTRLS_LONGTEXT, true )
 
-    add_obsolete_string( CFG_PREFIX "dev" );
+    add_obsolete_string( CFG_PREFIX "dev" )
 
-    add_obsolete_string( CFG_PREFIX "adev" );
-    add_obsolete_integer( CFG_PREFIX "audio-method" );
-    add_obsolete_bool( CFG_PREFIX "stereo" );
-    add_obsolete_integer( CFG_PREFIX "samplerate" );
+    add_obsolete_string( CFG_PREFIX "adev" )
+    add_obsolete_integer( CFG_PREFIX "audio-method" )
+    add_obsolete_bool( CFG_PREFIX "stereo" )
+    add_obsolete_integer( CFG_PREFIX "samplerate" )
 
     add_shortcut( "v4l2" )
     set_capability( "access_demux", 10 )

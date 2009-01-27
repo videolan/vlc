@@ -234,9 +234,9 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_shortcut( "directx" )
     add_integer( "directx-audio-device", 0, NULL, DEVICE_TEXT,
-                 DEVICE_LONGTEXT, true );
+                 DEVICE_LONGTEXT, true )
     add_bool( "directx-audio-float32", 0, 0, FLOAT_TEXT,
-              FLOAT_LONGTEXT, true );
+              FLOAT_LONGTEXT, true )
     set_callbacks( OpenAudio, CloseAudio )
 vlc_module_end ()
 

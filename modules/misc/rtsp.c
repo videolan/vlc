@@ -89,11 +89,11 @@ vlc_module_begin ()
     add_shortcut( "rtsp" )
     add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
     add_string( "rtsp-raw-mux", "ts", NULL, RAWMUX_TEXT,
-                RAWMUX_TEXT, true );
+                RAWMUX_TEXT, true )
     add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
-                                           THROTLE_LONGTEXT, true );
+                                           THROTLE_LONGTEXT, true )
     add_integer( "rtsp-session-timeout", 5, NULL, SESSION_TIMEOUT_TEXT,
-                 SESSION_TIMEOUT_LONGTEXT, true );
+                 SESSION_TIMEOUT_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************

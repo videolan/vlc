@@ -176,21 +176,21 @@ vlc_module_begin ()
     add_shortcut( "mosaic-bridge" )
 
     add_string( CFG_PREFIX "id", "Id", NULL, ID_TEXT, ID_LONGTEXT,
-                false );
+                false )
     add_integer( CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
-                 WIDTH_LONGTEXT, true );
+                 WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,
-                 HEIGHT_LONGTEXT, true );
+                 HEIGHT_LONGTEXT, true )
     add_string( CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
-                RATIO_LONGTEXT, false );
+                RATIO_LONGTEXT, false )
     add_string( CFG_PREFIX "chroma", 0, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                false );
+                false )
 
     add_module_list( CFG_PREFIX "vfilter", "video filter2",
-                     NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false );
+                     NULL, NULL, VFILTER_TEXT, VFILTER_LONGTEXT, false )
 
     add_integer_with_range( CFG_PREFIX "alpha", 255, 0, 255, NULL,
-                            ALPHA_TEXT, ALPHA_LONGTEXT, false );
+                            ALPHA_TEXT, ALPHA_LONGTEXT, false )
     add_integer( CFG_PREFIX "x", -1, NULL, X_TEXT, X_LONGTEXT, false )
     add_integer( CFG_PREFIX "y", -1, NULL, Y_TEXT, Y_LONGTEXT, false )
 

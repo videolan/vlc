@@ -71,7 +71,7 @@ vlc_module_begin ()
     set_callbacks( Create, Destroy )
 
     add_string( CFG_PREFIX "mask", NULL, NULL, MASK_TEXT,
-                MASK_LONGTEXT, false );
+                MASK_LONGTEXT, false )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

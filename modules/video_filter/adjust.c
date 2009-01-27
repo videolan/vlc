@@ -86,18 +86,18 @@ vlc_module_begin ()
     set_capability( "video filter2", 0 )
 
     add_float_with_range( "contrast", 1.0, 0.0, 2.0, NULL,
-                          CONT_TEXT, CONT_LONGTEXT, false );
+                          CONT_TEXT, CONT_LONGTEXT, false )
     add_float_with_range( "brightness", 1.0, 0.0, 2.0, NULL,
-                           LUM_TEXT, LUM_LONGTEXT, false );
+                           LUM_TEXT, LUM_LONGTEXT, false )
     add_integer_with_range( "hue", 0, 0, 360, NULL,
-                            HUE_TEXT, HUE_LONGTEXT, false );
+                            HUE_TEXT, HUE_LONGTEXT, false )
     add_float_with_range( "saturation", 1.0, 0.0, 3.0, NULL,
-                          SAT_TEXT, SAT_LONGTEXT, false );
+                          SAT_TEXT, SAT_LONGTEXT, false )
     add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL,
-                          GAMMA_TEXT, GAMMA_LONGTEXT, false );
+                          GAMMA_TEXT, GAMMA_LONGTEXT, false )
 
     add_bool( "brightness-threshold", 0, NULL,
-              THRES_TEXT, THRES_LONGTEXT, false );
+              THRES_TEXT, THRES_LONGTEXT, false )
 
     add_shortcut( "adjust" )
     set_callbacks( Create, Destroy )

@@ -63,7 +63,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "bd-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-        CACHING_TEXT, CACHING_LONGTEXT, true );
+        CACHING_TEXT, CACHING_LONGTEXT, true )
     set_capability( "access_demux", 60 )
     add_shortcut( "bd" )
     set_callbacks( Open, Close )

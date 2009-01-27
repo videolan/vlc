@@ -82,7 +82,7 @@ vlc_module_begin ()
                  "to rotate the video") )
 
     add_bool( "motion-use-rotate", 0, NULL,
-              USE_ROTATE_TEXT, USE_ROTATE_TEXT, false );
+              USE_ROTATE_TEXT, USE_ROTATE_TEXT, false )
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )

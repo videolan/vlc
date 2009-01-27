@@ -303,18 +303,18 @@ set_section( N_("Choose between the built-in AtmoLight "\
 add_bool(CFG_PREFIX "usebuildin", true, NULL,
          USEBUILDIN_TEXT, USEBUILDIN_LONGTEXT, false);
 add_string(CFG_PREFIX "serialdev", "COM1", NULL,
-           SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false );
+           SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 
 /*
     on win32 the executeable external driver application
     for automatic start if needed
 */
 add_file(CFG_PREFIX "atmowinexe", NULL, NULL,
-         ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false );
+         ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false )
 #else
 set_section( N_("Enter the connection of your AtmoLight hardware" ), 0 )
 add_string(CFG_PREFIX "serialdev", "/dev/ttyS01", NULL,
-           SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false );
+           SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 #endif
 
 /*
@@ -371,7 +371,7 @@ add_integer_with_range(CFG_PREFIX "SatWinSize",   3, 0, 5, NULL,
                        SATWINSIZE_TEXT, SATWINSIZE_LONGTEXT, false);
 
 add_integer(CFG_PREFIX "filtermode", (int)afmCombined, NULL,
-            FILTERMODE_TEXT, FILTERMODE_LONGTEXT, false );
+            FILTERMODE_TEXT, FILTERMODE_LONGTEXT, false )
 
 change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions, NULL );
 
@@ -392,27 +392,27 @@ add_integer_with_range(CFG_PREFIX "FrameDelay", 18, 0, 35, NULL,
 */
 set_section( N_("Change channel assignment (fixes wrong wiring)" ), 0 )
 add_integer( CFG_PREFIX "channel_0", 0, NULL,
-            CHANNEL_0_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false );
+            CHANNEL_0_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_channel_assignment_values,
                      ppsz_channel_assignment_descriptions, 0 );
 
 add_integer( CFG_PREFIX "channel_1", 1, NULL,
-            CHANNEL_1_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false );
+            CHANNEL_1_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_channel_assignment_values,
                      ppsz_channel_assignment_descriptions, 0 );
 
 add_integer( CFG_PREFIX "channel_2", 2, NULL,
-            CHANNEL_2_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false );
+            CHANNEL_2_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_channel_assignment_values,
                      ppsz_channel_assignment_descriptions, 0 );
 
 add_integer( CFG_PREFIX "channel_3", 3, NULL,
-            CHANNEL_3_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false );
+            CHANNEL_3_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_channel_assignment_values,
                      ppsz_channel_assignment_descriptions, 0 );
 
 add_integer( CFG_PREFIX "channel_4", 4, NULL,
-            CHANNEL_4_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false );
+            CHANNEL_4_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
 change_integer_list( pi_channel_assignment_values,
                      ppsz_channel_assignment_descriptions, 0 );
 
@@ -458,7 +458,7 @@ add_file(CFG_PREFIX "gradient_zone_4", NULL, NULL,
 add_bool(CFG_PREFIX "saveframes", false, NULL,
          SAVEFRAMES_TEXT, SAVEFRAMES_LONGTEXT, false);
 add_string(CFG_PREFIX "framepath", "", NULL,
-           FRAMEPATH_TEXT, FRAMEPATH_LONGTEXT, false );
+           FRAMEPATH_TEXT, FRAMEPATH_LONGTEXT, false )
 #endif
 /*
    may be later if computers gets more power ;-) than now we increase

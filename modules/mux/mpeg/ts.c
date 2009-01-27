@@ -199,55 +199,55 @@ vlc_module_begin ()
     add_shortcut( "ts" )
 
     add_integer( SOUT_CFG_PREFIX "pid-video", 0, NULL,VPID_TEXT, VPID_LONGTEXT,
-                                  true );
+                                  true )
     add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT,
-                 APID_LONGTEXT, true );
+                 APID_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "pid-spu", 0, NULL, SPUPID_TEXT,
-                 SPUPID_LONGTEXT, true );
+                 SPUPID_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, NULL, PMTPID_TEXT,
-                 PMTPID_LONGTEXT, true );
+                 PMTPID_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
-                 TSID_LONGTEXT, true );
+                 TSID_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT
     add_integer( SOUT_CFG_PREFIX "netid", 0, NULL, NETID_TEXT,
-                 NETID_LONGTEXT, true );
+                 NETID_LONGTEXT, true )
 #endif
     add_string( SOUT_CFG_PREFIX "program-pmt", NULL, NULL, PMTPROG_TEXT,
-                PMTPROG_LONGTEXT, true );
+                PMTPROG_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
-              true );
+              true )
     add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT
     add_string( SOUT_CFG_PREFIX "sdtdesc", NULL, NULL, SDTDESC_TEXT, SDTDESC_LONGTEXT, true )
 #endif
     add_bool( SOUT_CFG_PREFIX "alignment", true, NULL, ALIGNMENT_TEXT,
-              ALIGNMENT_LONGTEXT, true );
+              ALIGNMENT_LONGTEXT, true )
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL, SHAPING_TEXT,
-                 SHAPING_LONGTEXT, true );
+                 SHAPING_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "use-key-frames", false, NULL, KEYF_TEXT,
-              KEYF_LONGTEXT, true );
+              KEYF_LONGTEXT, true )
 
     add_integer( SOUT_CFG_PREFIX "pcr", 70, NULL, PCR_TEXT, PCR_LONGTEXT,
-                 true );
+                 true )
     add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
-                 true );
+                 true )
     add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
-                 true );
+                 true )
     add_integer( SOUT_CFG_PREFIX "dts-delay", 400, NULL, DTS_TEXT,
-                 DTS_LONGTEXT, true );
+                 DTS_LONGTEXT, true )
 
     add_bool( SOUT_CFG_PREFIX "crypt-audio", true, NULL, ACRYPT_TEXT,
-              ACRYPT_LONGTEXT, true );
+              ACRYPT_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "crypt-video", true, NULL, VCRYPT_TEXT,
-              VCRYPT_LONGTEXT, true );
+              VCRYPT_LONGTEXT, true )
 
     add_string( SOUT_CFG_PREFIX "csa-ck", NULL, NULL, CK_TEXT, CK_LONGTEXT,
-                true );
+                true )
     add_string( SOUT_CFG_PREFIX "csa2-ck", NULL, NULL, CK2_TEXT, CK2_LONGTEXT,
-                true );
+                true )
     add_string( SOUT_CFG_PREFIX "csa-use", "1", NULL, CU_TEXT, CU_LONGTEXT,
-                true );
+                true )
     add_integer( SOUT_CFG_PREFIX "csa-pkt", 188, NULL, CPKT_TEXT, CPKT_LONGTEXT, true )
 
     set_callbacks( Open, Close )

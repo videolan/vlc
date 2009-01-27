@@ -82,13 +82,13 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "smb-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true );
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
     add_string( "smb-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
-                false );
+                false )
     add_string( "smb-pwd", NULL, NULL, PASS_TEXT,
-                PASS_LONGTEXT, false );
+                PASS_LONGTEXT, false )
     add_string( "smb-domain", NULL, NULL, DOMAIN_TEXT,
-                DOMAIN_LONGTEXT, false );
+                DOMAIN_LONGTEXT, false )
     add_shortcut( "smb" )
     set_callbacks( Open, Close )
 vlc_module_end ()

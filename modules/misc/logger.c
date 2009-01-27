@@ -147,7 +147,7 @@ vlc_module_begin ()
     add_file( "logfile", NULL, NULL,
              N_("Log filename"), N_("Specify the log filename."), false );
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,
-                false );
+                false )
         change_string_list( mode_list, mode_list_text, 0 );
 
     add_file( "rrd-file", NULL, NULL, N_("RRD output file") ,

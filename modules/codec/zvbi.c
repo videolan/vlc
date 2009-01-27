@@ -88,13 +88,13 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 
     add_integer( "vbi-page", 100, NULL,
-                 PAGE_TEXT, PAGE_LONGTEXT, false );
+                 PAGE_TEXT, PAGE_LONGTEXT, false )
     add_bool( "vbi-opaque", true, NULL,
-                 OPAQUE_TEXT, OPAQUE_LONGTEXT, false );
+                 OPAQUE_TEXT, OPAQUE_LONGTEXT, false )
     add_integer( "vbi-position", 4, NULL, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
     add_bool( "vbi-text", false, NULL,
-              TELX_TEXT, TELX_LONGTEXT, false );
+              TELX_TEXT, TELX_LONGTEXT, false )
 vlc_module_end ()
 
 /****************************************************************************

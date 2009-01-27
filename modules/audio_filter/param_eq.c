@@ -56,25 +56,25 @@ vlc_module_begin ()
 
     add_float( "param-eq-lowf", 100, NULL, N_("Low freq (Hz)"),"", false )
     add_float_with_range( "param-eq-lowgain", 0, -20.0, 20.0, NULL,
-                          N_("Low freq gain (dB)"), "",false );
+                          N_("Low freq gain (dB)"), "",false )
     add_float( "param-eq-highf", 10000, NULL, N_("High freq (Hz)"),"", false )
     add_float_with_range( "param-eq-highgain", 0, -20.0, 20.0, NULL,
-                          N_("High freq gain (dB)"),"",false );
+                          N_("High freq gain (dB)"),"",false )
     add_float( "param-eq-f1", 300, NULL, N_("Freq 1 (Hz)"),"", false )
     add_float_with_range( "param-eq-gain1", 0, -20.0, 20.0, NULL,
-                          N_("Freq 1 gain (dB)"), "",false );
+                          N_("Freq 1 gain (dB)"), "",false )
     add_float_with_range( "param-eq-q1", 3, 0.1, 100.0, NULL,
-                          N_("Freq 1 Q"), "",false );
+                          N_("Freq 1 Q"), "",false )
     add_float( "param-eq-f2", 1000, NULL, N_("Freq 2 (Hz)"),"", false )
     add_float_with_range( "param-eq-gain2", 0, -20.0, 20.0, NULL,
-                          N_("Freq 2 gain (dB)"),"",false );
+                          N_("Freq 2 gain (dB)"),"",false )
     add_float_with_range( "param-eq-q2", 3, 0.1, 100.0, NULL,
-                          N_("Freq 2 Q"),"",false );
+                          N_("Freq 2 Q"),"",false )
     add_float( "param-eq-f3", 3000, NULL, N_("Freq 3 (Hz)"),"", false )
     add_float_with_range( "param-eq-gain3", 0, -20.0, 20.0, NULL,
-                          N_("Freq 3 gain (dB)"),"",false );
+                          N_("Freq 3 gain (dB)"),"",false )
     add_float_with_range( "param-eq-q3", 3, 0.1, 100.0, NULL,
-                          N_("Freq 3 Q"),"",false );
+                          N_("Freq 3 Q"),"",false )
 
     set_callbacks( Open, Close )
 vlc_module_end ()

@@ -71,7 +71,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( FILTER_PREFIX "angle", 30, 0, 359, NULL,
-        ANGLE_TEXT, ANGLE_LONGTEXT, false );
+        ANGLE_TEXT, ANGLE_LONGTEXT, false )
 
     add_shortcut( "rotate" )
     set_callbacks( Create, Destroy )

@@ -61,7 +61,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, true );
+                 CACHING_LONGTEXT, true )
     add_obsolete_integer( "rtp-late" )
     add_obsolete_bool( "udp-auto-mtu" )
 

@@ -94,13 +94,13 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
-              false );
+              false )
     add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
-              false );
+              false )
     add_bool( "macosx-eq-keep", 1, NULL, EQ_KEEP_TEXT, EQ_KEEP_LONGTEXT,
-              false );
+              false )
     add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
-              false );
+              false )
 
     add_submodule ()
         set_description( "Mac OS X OpenGL" )
@@ -110,14 +110,14 @@ vlc_module_begin ()
         set_callbacks( OpenVideoGL, CloseVideoGL )
 
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
-                     false );
+                     false )
         add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
-                  false );
+                  false )
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                               OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
         add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
-                  false );
+                  false )
         add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
-                  false );
+                  false )
 vlc_module_end ()
 

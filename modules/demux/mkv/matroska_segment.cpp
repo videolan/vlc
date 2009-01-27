@@ -789,7 +789,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
                                                        tracks[i_track]->p_extra_data,
                                                        tracks[i_track]->i_extra_data,
-                                                       true );
+                                                       true )
             MP4_ReadBoxCommon( p_mp4_stream, p_box );
             MP4_ReadBox_sample_vide( p_mp4_stream, p_box );
             tracks[i_track]->fmt.i_codec = p_box->i_type;

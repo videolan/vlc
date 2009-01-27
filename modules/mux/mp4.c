@@ -64,7 +64,7 @@ vlc_module_begin ()
 
     add_bool( SOUT_CFG_PREFIX "faststart", 1, NULL,
               FASTSTART_TEXT, FASTSTART_LONGTEXT,
-              true );
+              true )
     set_capability( "sout mux", 5 )
     add_shortcut( "mp4" )
     add_shortcut( "mov" )

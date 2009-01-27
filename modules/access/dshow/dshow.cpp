@@ -203,16 +203,16 @@ vlc_module_begin ()
     add_string( "dshow-size", NULL, NULL, SIZE_TEXT, SIZE_LONGTEXT, false)
 
     add_string( "dshow-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true );
+                true )
 
     add_float( "dshow-fps", 0.0f, NULL, FPS_TEXT, FPS_LONGTEXT,
-                true );
+                true )
 
     add_bool( "dshow-config", false, NULL, CONFIG_TEXT, CONFIG_LONGTEXT,
-              true );
+              true )
 
     add_bool( "dshow-tuner", false, NULL, TUNER_TEXT, TUNER_LONGTEXT,
-              true );
+              true )
 
     add_integer( "dshow-tuner-channel", 0, NULL, CHANNEL_TEXT,
                  CHANNEL_LONGTEXT, true );

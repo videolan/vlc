@@ -84,11 +84,11 @@ vlc_module_begin ()
     set_callbacks( DemuxOpen, DemuxClose )
 
     add_bool( CFG_PREFIX "stereo", true, NULL, STEREO_TEXT, STEREO_LONGTEXT,
-                true );
+                true )
     add_integer( CFG_PREFIX "samplerate", 48000, NULL, SAMPLERATE_TEXT,
-                SAMPLERATE_LONGTEXT, true );
+                SAMPLERATE_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                CACHING_TEXT, CACHING_LONGTEXT, true );
+                CACHING_TEXT, CACHING_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************

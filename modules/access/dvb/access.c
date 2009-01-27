@@ -196,70 +196,70 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
-                 CACHING_LONGTEXT, true );
+                 CACHING_LONGTEXT, true )
     add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
-                 false );
+                 false )
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                 true );
+                 true )
     add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
-                 false );
+                 false )
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
-                 true );
+                 true )
     add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
     add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
-              true );
+              true )
     /* DVB-S (satellite) */
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
-                 true );
+                 true )
     add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
-                 true );
+                 true )
     add_bool( "dvb-high-voltage", 0, NULL, HIGH_VOLTAGE_TEXT,
-              HIGH_VOLTAGE_LONGTEXT, true );
+              HIGH_VOLTAGE_LONGTEXT, true )
     add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
-                 true );
+                 true )
     add_integer( "dvb-fec", 9, NULL, FEC_TEXT, FEC_LONGTEXT, true )
     add_integer( "dvb-srate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT,
-                 false );
+                 false )
     add_integer( "dvb-lnb-lof1", 0, NULL, LNB_LOF1_TEXT,
-                 LNB_LOF1_LONGTEXT, true );
+                 LNB_LOF1_LONGTEXT, true )
     add_integer( "dvb-lnb-lof2", 0, NULL, LNB_LOF2_TEXT,
-                 LNB_LOF2_LONGTEXT, true );
+                 LNB_LOF2_LONGTEXT, true )
     add_integer( "dvb-lnb-slof", 0, NULL, LNB_SLOF_TEXT,
-                 LNB_SLOF_LONGTEXT, true );
+                 LNB_SLOF_LONGTEXT, true )
     /* DVB-C (cable) */
     add_integer( "dvb-modulation", 0, NULL, MODULATION_TEXT,
-                 MODULATION_LONGTEXT, true );
+                 MODULATION_LONGTEXT, true )
     /* DVB-T (terrestrial) */
     add_integer( "dvb-code-rate-hp", 9, NULL, CODE_RATE_HP_TEXT,
-                 CODE_RATE_HP_LONGTEXT, true );
+                 CODE_RATE_HP_LONGTEXT, true )
     add_integer( "dvb-code-rate-lp", 9, NULL, CODE_RATE_LP_TEXT,
-                 CODE_RATE_LP_LONGTEXT, true );
+                 CODE_RATE_LP_LONGTEXT, true )
     add_integer( "dvb-bandwidth", 0, NULL, BANDWIDTH_TEXT, BANDWIDTH_LONGTEXT,
-                 true );
+                 true )
     add_integer( "dvb-guard", 0, NULL, GUARD_TEXT, GUARD_LONGTEXT, true )
     add_integer( "dvb-transmission", 0, NULL, TRANSMISSION_TEXT,
-                 TRANSMISSION_LONGTEXT, true );
+                 TRANSMISSION_LONGTEXT, true )
     add_integer( "dvb-hierarchy", 0, NULL, HIERARCHY_TEXT, HIERARCHY_LONGTEXT,
-                 true );
+                 true )
 #ifdef ENABLE_HTTPD
     /* MMI HTTP interface */
     set_section( N_("HTTP server" ), 0 )
     add_string( "dvb-http-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT,
-                true );
+                true )
     add_string( "dvb-http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
-                true );
+                true )
     add_string( "dvb-http-password", NULL, NULL, PASSWORD_TEXT,
-                PASSWORD_LONGTEXT, true );
+                PASSWORD_LONGTEXT, true )
     add_string( "dvb-http-acl", NULL, NULL, ACL_TEXT, ACL_LONGTEXT,
-                true );
+                true )
     add_string( "dvb-http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT,
-                true );
+                true )
     add_string( "dvb-http-intf-key",  NULL, NULL, KEY_TEXT,  KEY_LONGTEXT,
-                true );
+                true )
     add_string( "dvb-http-intf-ca",   NULL, NULL, CA_TEXT,   CA_LONGTEXT,
-                true );
+                true )
     add_string( "dvb-http-intf-crl",  NULL, NULL, CRL_TEXT,  CRL_LONGTEXT,
-                true );
+                true )
 #endif
 
     set_capability( "access", 0 )

@@ -93,25 +93,25 @@ vlc_module_begin ()
     add_shortcut( "fake" )
 
     add_file( "fake-file", "", NULL, FILE_TEXT,
-                FILE_LONGTEXT, false );
+                FILE_LONGTEXT, false )
     add_integer( "fake-file-reload", 0, NULL, RELOAD_TEXT,
-                RELOAD_LONGTEXT, false );
+                RELOAD_LONGTEXT, false )
     add_integer( "fake-width", 0, NULL, WIDTH_TEXT,
-                 WIDTH_LONGTEXT, true );
+                 WIDTH_LONGTEXT, true )
     add_integer( "fake-height", 0, NULL, HEIGHT_TEXT,
-                 HEIGHT_LONGTEXT, true );
+                 HEIGHT_LONGTEXT, true )
     add_bool( "fake-keep-ar", 0, NULL, KEEP_AR_TEXT, KEEP_AR_LONGTEXT,
-              true );
+              true )
     add_string( "fake-aspect-ratio", "", NULL,
-                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true );
+                ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true )
     add_bool( "fake-deinterlace", 0, NULL, DEINTERLACE_TEXT,
-              DEINTERLACE_LONGTEXT, false );
+              DEINTERLACE_LONGTEXT, false )
     add_string( "fake-deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
-                false );
-        change_string_list( ppsz_deinterlace_type, 0, 0 );
+                false )
+        change_string_list( ppsz_deinterlace_type, 0, 0 )
     add_string( "fake-chroma", "I420", NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true );
+                true )
 vlc_module_end ()
 
 struct decoder_sys_t

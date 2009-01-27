@@ -73,11 +73,11 @@ vlc_module_begin ()
     set_description( N_("Growl UDP Notification Plugin") )
 
     add_string( "growl-server", SERVER_DEFAULT, NULL,
-                SERVER_TEXT, SERVER_LONGTEXT, false );
+                SERVER_TEXT, SERVER_LONGTEXT, false )
     add_password( "growl-password", PASS_DEFAULT, NULL,
-                PASS_TEXT, PASS_LONGTEXT, false );
+                PASS_TEXT, PASS_LONGTEXT, false )
     add_integer( "growl-port", 9887, NULL,
-                PORT_TEXT, PORT_LONGTEXT, true );
+                PORT_TEXT, PORT_LONGTEXT, true )
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )

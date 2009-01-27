@@ -118,7 +118,7 @@ vlc_module_begin ()
 
 #   define ENC_CFG_PREFIX "sout-theora-"
     add_integer( ENC_CFG_PREFIX "quality", 2, NULL, ENC_QUALITY_TEXT,
-                 ENC_QUALITY_LONGTEXT, false );
+                 ENC_QUALITY_LONGTEXT, false )
 vlc_module_end ()
 
 static const char *const ppsz_enc_options[] = {

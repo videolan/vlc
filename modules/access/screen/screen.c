@@ -97,7 +97,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-        CACHING_TEXT, CACHING_LONGTEXT, true );
+        CACHING_TEXT, CACHING_LONGTEXT, true )
     add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, true )
 
 #ifdef SCREEN_SUBSCREEN
@@ -106,17 +106,17 @@ vlc_module_begin ()
     add_integer( "screen-width", 0, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( "screen-height", 0, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
     add_bool( "screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
-              FOLLOW_MOUSE_LONGTEXT, true );
+              FOLLOW_MOUSE_LONGTEXT, true )
 #endif
 
 #ifdef SCREEN_MOUSE
     add_file( "screen-mouse-image", "", NULL, MOUSE_TEXT, MOUSE_LONGTEXT,
-              true );
+              true )
 #endif
 
 #ifdef WIN32
     add_integer( "screen-fragment-size", 0, NULL, FRAGS_TEXT,
-        FRAGS_LONGTEXT, true );
+        FRAGS_LONGTEXT, true )
 #endif
 
     set_capability( "access_demux", 0 )

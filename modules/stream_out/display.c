@@ -58,11 +58,11 @@ vlc_module_begin ()
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
     add_bool( SOUT_CFG_PREFIX "audio", 1, NULL, AUDIO_TEXT,
-              AUDIO_LONGTEXT, true );
+              AUDIO_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "video", 1, NULL, VIDEO_TEXT,
-              VIDEO_LONGTEXT, true );
+              VIDEO_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "delay", 100, NULL, DELAY_TEXT,
-                 DELAY_LONGTEXT, true );
+                 DELAY_LONGTEXT, true )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

@@ -122,15 +122,15 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_SCODEC )
 
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
-                 false );
-        change_integer_list( pi_justification, ppsz_justification_text, NULL );
+                 false )
+        change_integer_list( pi_justification, ppsz_justification_text, NULL )
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
-                ENCODING_TEXT, ENCODING_LONGTEXT, false );
-        change_string_list( ppsz_encodings, 0, 0 );
+                ENCODING_TEXT, ENCODING_LONGTEXT, false )
+        change_string_list( ppsz_encodings, 0, 0 )
     add_bool( "subsdec-autodetect-utf8", true, NULL,
-              AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false );
+              AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false )
     add_bool( "subsdec-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
-                 false );
+                 false )
 vlc_module_end ()
 
 /*****************************************************************************

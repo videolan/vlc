@@ -60,7 +60,7 @@ vlc_module_begin ()
     add_shortcut( "rtmp" )
     set_callbacks( Open, Close )
     add_bool( "rtmp-connect", false, NULL, RTMP_CONNECT_TEXT,
-              RTMP_CONNECT_LONGTEXT, false );
+              RTMP_CONNECT_LONGTEXT, false )
 vlc_module_end ()
 
 /*****************************************************************************

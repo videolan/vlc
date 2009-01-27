@@ -280,15 +280,15 @@ vlc_module_begin ()
     add_shortcut( "kate" )
 
     add_bool( "kate-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
-              true );
+              true )
 
 #ifdef HAVE_TIGER
     add_bool( "kate-use-tiger", true, NULL, TIGER_TEXT, TIGER_LONGTEXT,
-              true );
+              true )
     add_float_with_range( "kate-tiger-quality",
                           TIGER_QUALITY_DEFAULT, 0.0f, 1.0f, TigerConfigurationCallback,
                           TIGER_QUALITY_TEXT, TIGER_QUALITY_LONGTEXT,
-                          true );
+                          true )
 
     set_section( N_("Tiger rendering defaults"), NULL );
     add_string( "kate-tiger-default-font-desc",
@@ -298,12 +298,12 @@ vlc_module_begin ()
                             TIGER_DEFAULT_FONT_EFFECT_DEFAULT,
                             0, sizeof(pi_font_effects)/sizeof(pi_font_effects[0])-1, TigerConfigurationCallback,
                             TIGER_DEFAULT_FONT_EFFECT_TEXT, TIGER_DEFAULT_FONT_EFFECT_LONGTEXT,
-                            true );
+                            true )
     change_integer_list( pi_font_effects, ppsz_font_effect_names, NULL );
     add_float_with_range( "kate-tiger-default-font-effect-strength",
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_DEFAULT, 0.0f, 1.0f, TigerConfigurationCallback,
               TIGER_DEFAULT_FONT_EFFECT_STRENGTH_TEXT, TIGER_DEFAULT_FONT_EFFECT_STRENGTH_LONGTEXT,
-              true );
+              true )
     add_integer_with_range( "kate-tiger-default-font-color",
                             TIGER_DEFAULT_FONT_COLOR_DEFAULT, 0, 0x00ffffff, TigerConfigurationCallback,
                             TIGER_DEFAULT_FONT_COLOR_TEXT, TIGER_DEFAULT_FONT_COLOR_LONGTEXT,

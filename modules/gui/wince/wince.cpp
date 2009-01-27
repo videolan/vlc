@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_bool( "wince-embed", 1, NULL,
-              EMBED_TEXT, EMBED_LONGTEXT, false );
+              EMBED_TEXT, EMBED_LONGTEXT, false )
 
     add_submodule ()
     set_description( N_("WinCE dialogs provider") )

@@ -159,9 +159,9 @@ vlc_module_begin ()
     set_shortname( N_( "Audioscrobbler" ) )
     set_description( N_("Submission of played songs to last.fm") )
     add_string( "lastfm-username", "", NULL,
-                USERNAME_TEXT, USERNAME_LONGTEXT, false );
+                USERNAME_TEXT, USERNAME_LONGTEXT, false )
     add_password( "lastfm-password", "", NULL,
-                PASSWORD_TEXT, PASSWORD_LONGTEXT, false );
+                PASSWORD_TEXT, PASSWORD_LONGTEXT, false )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()

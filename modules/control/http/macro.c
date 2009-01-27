@@ -208,12 +208,12 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 }
                 case MVLC_STOP:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_STOP,
-                                      true );
+                                      true )
                     msg_Dbg( p_intf, "requested playlist stop" );
                     break;
                 case MVLC_PAUSE:
                     playlist_Control( p_sys->p_playlist, PLAYLIST_PAUSE,
-                                      true );
+                                      true )
                     msg_Dbg( p_intf, "requested playlist pause" );
                     break;
                 case MVLC_NEXT:

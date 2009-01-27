@@ -86,15 +86,15 @@ vlc_module_begin ()
     set_callbacks( Create, Destroy )
 
     add_integer_with_range( CFG_PREFIX "u", 120, 0, 255, NULL,
-                            BLUESCREENU_TEXT, BLUESCREENU_LONGTEXT, false );
+                            BLUESCREENU_TEXT, BLUESCREENU_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "v", 90, 0, 255, NULL,
-                            BLUESCREENV_TEXT, BLUESCREENV_LONGTEXT, false );
+                            BLUESCREENV_TEXT, BLUESCREENV_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "ut", 17, 0, 255, NULL,
                             BLUESCREENUTOL_TEXT, BLUESCREENUTOL_LONGTEXT,
-                            false );
+                            false )
     add_integer_with_range( CFG_PREFIX "vt", 17, 0, 255, NULL,
                             BLUESCREENVTOL_TEXT, BLUESCREENVTOL_LONGTEXT,
-                            false );
+                            false )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
