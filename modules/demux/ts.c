@@ -1337,10 +1337,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
-                                    true )
+                                    true );
                     stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
-                                    true )
+                                    true );
 
                     for( i = 2; i < 8192; i++ )
                     {
@@ -3091,7 +3091,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         /* Set demux filter */
         stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                         ACCESS_SET_PRIVATE_ID_STATE, prg->i_pid_pcr,
-                        true )
+                        true );
     }
     else if ( p_sys->b_dvb_control )
     {
@@ -3910,7 +3910,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             /* Set demux filter */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                             ACCESS_SET_PRIVATE_ID_STATE, p_es->i_pid,
-                            true )
+                            true );
         }
     }
 

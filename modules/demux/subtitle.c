@@ -956,7 +956,7 @@ static int  ParseSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
 
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d.%d,%d:%d:%d.%d",
-                                 true )
+                                 true );
 }
 
 /* ParseSSA
