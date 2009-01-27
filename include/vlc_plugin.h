@@ -326,12 +326,12 @@ enum vlc_config_properties
 #define add_module_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_CAT, name, text, longtext, advc, \
                       p_callback, value ) \
-    p_config->min.i = i_subcategory /* gruik */;
+    change_integer_range (i_subcategory /* gruik */, 0);
 
 #define add_module_list_cat( name, i_subcategory, value, p_callback, text, longtext, advc ) \
     add_string_inner( CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
                       advc, p_callback, value ) \
-    p_config->min.i = i_subcategory /* gruik */;
+    change_integer_range (i_subcategory /* gruik */, 0);
 #endif
 
 #define add_integer( name, value, p_callback, text, longtext, advc ) \

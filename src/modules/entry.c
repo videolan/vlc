@@ -299,7 +299,9 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
 
         case VLC_CONFIG_RANGE:
         {
-            if (IsConfigIntegerType (item->i_type))
+            if (IsConfigIntegerType (item->i_type)
+             || item->i_type == CONFIG_ITEM_MODULE_LIST_CAT
+             || item->i_type == CONFIG_ITEM_MODULE_CAT)
             {
                 item->min.i = va_arg (ap, int);
                 item->max.i = va_arg (ap, int);
