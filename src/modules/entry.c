@@ -180,10 +180,6 @@ int vlc_module_set (module_t *module, int propid, ...)
             module->i_score = va_arg (ap, int);
             break;
 
-        case VLC_MODULE_PROGRAM:
-            fprintf (stderr, "deprecated module property %d", propid);
-            break;
-
         case VLC_MODULE_CB_OPEN:
             module->pf_activate = va_arg (ap, int (*) (vlc_object_t *));
             break;

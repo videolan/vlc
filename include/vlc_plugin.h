@@ -2,7 +2,7 @@
  * vlc_plugin.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001-2006 the VideoLAN team
- * Copyright © 2007-2008 Rémi Denis-Courmont
+ * Copyright © 2007-2009 Rémi Denis-Courmont
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,7 +46,6 @@ enum vlc_module_properties
     VLC_MODULE_HELP_NODOMAIN,
     VLC_MODULE_CAPABILITY,
     VLC_MODULE_SCORE,
-    VLC_MODULE_PROGRAM, /* obsoleted */
     VLC_MODULE_CB_OPEN,
     VLC_MODULE_CB_CLOSE,
     VLC_MODULE_NO_UNLOAD,
