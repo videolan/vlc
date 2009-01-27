@@ -80,7 +80,7 @@ static const char *const ppsz_language[] =
     "sl",
     "es",
     "sv",
-    "tr"
+    "tr",
 };
 
 static const char *const ppsz_language_text[] =
@@ -120,7 +120,7 @@ static const char *const ppsz_language_text[] =
     N_("Slovenian"),
     N_("Spanish"),
     N_("Swedish"),
-    N_("Turkish")
+    N_("Turkish"),
 };
 #endif
 
