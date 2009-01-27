@@ -843,7 +843,7 @@ int vlc_savecancel (void)
 #else
     vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
     if (nfo == NULL)
-        return; /* Main thread - cannot be cancelled anyway */
+        return true; /* Main thread - cannot be cancelled anyway */
 
      state = nfo->killable;
      nfo->killable = false;
