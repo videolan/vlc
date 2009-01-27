@@ -177,9 +177,9 @@ libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
-	-DDATA_PATH=\"$(pkgdatadir)\" \
+	-DDATA_PATH=\"$(vlcdatadir)\" \
 	-DLIBDIR=\"$(libdir)\" \
-	-DPLUGIN_PATH=\"$(pkglibdir)\"
+	-DPLUGIN_PATH=\"$(vlclibdir)\"
 libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 1:0:0

@@ -1,22 +1,20 @@
-MOSTLYCLEANFILES = $(nobase_pkgdata_DATA) 
-
-pkgdatadir = $(datadir)/vlc
+MOSTLYCLEANFILES = $(nobase_vlcdata_DATA)
 
 nobase_dist_data_DATA = applications/vlc.desktop
 
-dist_pkgdata_DATA = \
+dist_vlcdata_DATA = \
 	$(DIST_icons) \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
 	$(DIST_icons48) \
 	$(DIST_icons128)
-nobase_dist_pkgdata_SCRIPTS = \
+nobase_dist_vlcdata_SCRIPTS = \
 	utils/gnome-vlc-default.sh \
 	utils/audio-vlc-default.sh \
 	utils/video-vlc-default.sh \
 	$(NULL)
 
-nobase_dist_pkgdata_DATA = $(NULL)
+nobase_dist_vlcdata_DATA = $(NULL)
 
 EXTRA_DIST = \
 	$(DIST_rsrc) \
@@ -31,31 +29,31 @@ EXTRA_DIST = \
 	$(DIST_maemo)
 
 if BUILD_SKINS
-nobase_pkgdata_DATA = skins2/default.vlt
-nobase_dist_pkgdata_DATA += $(DIST_skins2)
+nobase_vlcdata_DATA = skins2/default.vlt
+nobase_dist_vlcdata_DATA += $(DIST_skins2)
 endif
 if BUILD_PDA
-nobase_dist_pkgdata_DATA += $(DIST_pda)
+nobase_dist_vlcdata_DATA += $(DIST_pda)
 endif
 if BUILD_HTTPD
-nobase_dist_pkgdata_DATA += $(DIST_http)
+nobase_dist_vlcdata_DATA += $(DIST_http)
 endif
 if BUILD_OSDMENU
-nobase_dist_pkgdata_DATA += \
+nobase_dist_vlcdata_DATA += \
 	$(DIST_osdmenu_default)
 endif
 if BUILD_LUA
-nobase_dist_pkgdata_DATA += $(DIST_lua)
+nobase_dist_vlcdata_DATA += $(DIST_lua)
 if BUILD_HTTPD
-nobase_dist_pkgdata_DATA += $(DIST_http_lua)
+nobase_dist_vlcdata_DATA += $(DIST_http_lua)
 endif
 endif
 if BUILD_MOZILLA
 # TODO: move to the mozilla directory
-nobase_dist_pkgdata_DATA += $(DIST_mozilla)
+nobase_dist_vlcdata_DATA += $(DIST_mozilla)
 endif
 if BUILD_MAEMO
-nobase_dist_pkgdata_DATA += $(DIST_maemo)
+nobase_dist_vlcdata_DATA += $(DIST_maemo)
 endif
 
 DIST_rsrc = \

@@ -7,6 +7,8 @@ VERSION_MAJOR="1"
 VERSION_MINOR="0"
 VERSION_REVISION="0"
 VERSION_EXTRA="-git"
+PKGDIR="vlc"
+AC_SUBST(PKGDIR)
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="Goldeneye"
@@ -31,6 +33,16 @@ dnl can't expect you to enable it manually.
 AS_IF([test "x${enable_maintainer_mode}" != "xno"],
 	[enable_maintainer_mode="yes"])
 AM_MAINTAINER_MODE
+
+dnl
+dnl Directories
+dnl
+dnl vlcincludedir="\${includedir}/\${PKGDIR}"
+dnl AC_SUBST(vlcincludedir)
+vlcdatadir="\${datadir}/\${PKGDIR}"
+AC_SUBST(vlcdatadir)
+vlclibdir="\${libdir}/\${PKGDIR}"
+AC_SUBST(vlclibdir)
 
 dnl
 dnl  Deprecated options
