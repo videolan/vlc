@@ -1182,6 +1182,28 @@ if test "${SYS}" != "mingwce"; then
   ALIASES="${ALIASES} rvlc"
 fi
 
+if test "${SYS}" = "mingwce"; then
+  VLC_ADD_PLUGIN([chain])
+  VLC_ADD_PLUGIN([aout_file])
+  VLC_ADD_PLUGIN([linear_resampler])
+  VLC_ADD_PLUGIN([bandlimited_resampler])
+  VLC_ADD_PLUGIN([float32_mixer])
+  VLC_ADD_PLUGIN([spdif_mixer])
+  VLC_ADD_PLUGIN([simple_channel_mixer])
+  VLC_ADD_PLUGIN([headphone_channel_mixer])
+  VLC_ADD_PLUGIN([normvol])
+  VLC_ADD_PLUGIN([converter_float])
+  VLC_ADD_PLUGIN([a52tospdif])
+  VLC_ADD_PLUGIN([dtstospdif])
+  VLC_ADD_PLUGIN([audio_format])
+  VLC_ADD_PLUGIN([i420_yuy2])
+  VLC_ADD_PLUGIN([i422_yuy2])
+  VLC_ADD_PLUGIN([i420_ymga])
+  VLC_ADD_PLUGIN([i422_i420])
+  VLC_ADD_PLUGIN([yuy2_i422])
+  VLC_ADD_PLUGIN([yuy2_i420])
+fi
+
 dnl
 dnl Some plugins aren't useful on some platforms
 dnl
