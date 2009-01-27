@@ -880,6 +880,8 @@ void vlc_restorecancel (int state)
 
     if (nfo == NULL)
         return; /* Main thread - cannot be cancelled anyway */
+
+    assert (nfo->killable);
     nfo->killable = state != 0;
 
 #endif
