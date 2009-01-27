@@ -133,7 +133,7 @@ int module_Call( vlc_object_t *obj, module_t *p_module )
 /* Make sure libvlccore is in the global namespace */
 static void load_libvlccore( void )
 {
-    if( !dlsym( RTLD_DEFAULT, "vlc_module_create" )
+    if( !dlsym( RTLD_DEFAULT, "libvlc_Quit" )
      && !dlopen( "libvlccore.so", RTLD_GLOBAL|RTLD_NOLOAD ) )
         fprintf( stderr, "ERROR: failed loading libvlccore\n" );
 }

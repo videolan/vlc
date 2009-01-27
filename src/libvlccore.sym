@@ -473,7 +473,6 @@ __vlc_list_children
 vlc_list_release
 vlc_memcpy
 vlc_memset
-vlc_module_create
 vlc_module_set
 vlc_mutex_destroy
 vlc_mutex_init

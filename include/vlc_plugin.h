@@ -29,7 +29,6 @@
  * This file implements plugin (module) macros used to define a vlc module.
  */
 
-VLC_EXPORT( module_t *, vlc_module_create, ( vlc_object_t * ) );
 VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
 VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, ...) );
 VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int type) );
