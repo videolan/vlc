@@ -110,14 +110,23 @@ int utf8_open (const char *filename, int flags, mode_t mode)
         return -1;
     }
 
-    int fd = open (local_name, flags, mode);
-#ifdef HAVE_FCNTL
-    if (fd != -1)
-    {
-        int flags = fcntl (fd, F_GETFD);
-        fcntl (fd, F_SETFD, FD_CLOEXEC | ((flags != -1) ? flags : 0));
-    }
+    int fd;
+
+#ifdef O_CLOEXEC
+    fd = open (local_name, flags | O_CLOEXEC, mode);
+    if (fd == -1 && errno == EINVAL)
 #endif
+    {
+        fd = open (local_name, flags, mode);
+#ifdef HAVE_FCNTL
+        if (fd != -1)
+        {
+            int flags = fcntl (fd, F_GETFD);
+            fcntl (fd, F_SETFD, FD_CLOEXEC | ((flags != -1) ? flags : 0));
+        }
+#endif
+    }
+
     LocaleFree (local_name);
     return fd;
 }
