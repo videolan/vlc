@@ -1,7 +1,7 @@
 /*****************************************************************************
- * zip.h: Module (access+demux) to extract different archives, based on zlib
+ * zip.h: Module (access+filter) to extract different archives, based on zlib
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Philippe André <jpeg@videolan.org>

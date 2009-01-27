@@ -1,7 +1,7 @@
 /*****************************************************************************
  * zipstream.c: stream_filter that creates a XSPF playlist from a Zip archive
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Philippe André <jpeg@videolan.org>
@@ -51,7 +51,7 @@ vlc_module_begin()
     add_submodule()
         set_subcategory( SUBCAT_INPUT_ACCESS )
         set_description( _( "Zip access" ) )
-        set_capability( "access", 70 )
+        set_capability( "access", 0 )
         add_shortcut( "unzip" )
         add_shortcut( "zip" )
         set_callbacks( AccessOpen, AccessClose )
@@ -211,26 +211,15 @@ int StreamOpen( vlc_object_t *p_this )
     }
 
     /* Find the stream uri */
-    /* FIXME FIXME FIXME */
-    input_thread_t *p_input_thread = (input_thread_t*)
-            vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_input_thread )
+    char *psz_tmp;
+    if( asprintf( &psz_tmp, "%s.xspf", s->psz_path ) == -1 )
     {
         free( p_sys );
         free( p_sys->fileFunctions );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
-    input_item_t *p_input_item = input_GetItem( p_input_thread );
-    if( !p_input_item )
-    {
-        free( p_sys );
-        free( p_sys->fileFunctions );
-        return VLC_EGENERIC;
-    }
-    s->p_sys->psz_path = strdup( p_input_item->psz_uri );
-    vlc_gc_decref( p_input_item );
-//     vlc_object_release( p_input_thread );
-    /* FIXME FIXME FIXME */
+    p_sys->psz_path = s->psz_path;
+    s->psz_path = psz_tmp;
 
     return VLC_SUCCESS;
 }
@@ -337,13 +326,6 @@ static int Control( stream_t *s, int i_query, va_list args )
         {
             int64_t *pi_size = (int64_t*)va_arg( args, int64_t* );
             *pi_size = (int64_t) p_sys->i_len;
-            return VLC_SUCCESS;
-        }
-
-        case STREAM_GET_MTU:
-        {
-            int *pi_mtu = (int*)va_arg( args, int* );
-            *pi_mtu = 0;
             return VLC_SUCCESS;
         }
 

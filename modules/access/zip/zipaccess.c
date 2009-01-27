@@ -1,7 +1,7 @@
 /*****************************************************************************
  * zipaccess.c: Module (access) to extract different archives, based on zlib
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Philippe André <jpeg@videolan.org>
@@ -155,7 +155,6 @@ void AccessClose( vlc_object_t *p_this )
         free( p_sys->fileFunctions );
         free( p_sys );
     }
-    var_Destroy( p_access, "zip-no-xspf" );
 }
 
 /** **************************************************************************
@@ -164,7 +163,6 @@ void AccessClose( vlc_object_t *p_this )
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
     bool         *pb_bool;
-    int          *pi_int;
     int64_t      *pi_64;
 
     switch( i_query )
@@ -180,12 +178,6 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
             pb_bool = (bool*)va_arg( args, bool* );
             *pb_bool = false;
-            break;
-
-        /* */
-        case ACCESS_GET_MTU:
-            pi_int = (int*)va_arg( args, int * );
-            *pi_int = 0;
             break;
 
         case ACCESS_GET_PTS_DELAY:
