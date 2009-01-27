@@ -444,7 +444,6 @@ vlc_cond_signal
 vlc_cond_timedwait
 vlc_cond_wait
 vlc_config_create
-vlc_config_set
 vlc_control_cancel
 vlc_CPU
 vlc_error
@@ -473,7 +472,6 @@ __vlc_list_children
 vlc_list_release
 vlc_memcpy
 vlc_memset
-vlc_module_set
 vlc_mutex_destroy
 vlc_mutex_init
 vlc_mutex_init_recursive
@@ -491,6 +489,7 @@ __vlc_object_lock
 __vlc_object_release
 __vlc_object_set_destructor
 __vlc_object_unlock
+vlc_plugin_set
 vlc_poll
 vlc_rand_bytes
 vlc_recvmsg

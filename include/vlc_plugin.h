@@ -30,15 +30,17 @@
  */
 
 VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
-VLC_EXPORT( int, vlc_module_set, (module_t *module, int propid, ...) );
-VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int type) );
-VLC_EXPORT( int, vlc_config_set, (module_config_t *, int, ...) );
+VLC_EXPORT( int, vlc_plugin_set, (module_t *, module_config_t *, int, ...) );
+VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int) );
+
+#define vlc_module_set( mod, ... ) vlc_plugin_set ((mod), NULL, __VA_ARGS__)
+#define vlc_config_set( cfg, ... ) vlc_plugin_set (NULL, (cfg), __VA_ARGS__)
 
 enum vlc_module_properties
 {
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
-    VLC_MODULE_CPU_REQUIREMENT,
+    VLC_MODULE_CPU_REQUIREMENT=0x100,
     VLC_MODULE_SHORTCUT,
     VLC_MODULE_CAPABILITY,
     VLC_MODULE_SCORE,
@@ -49,14 +51,11 @@ enum vlc_module_properties
     VLC_MODULE_SHORTNAME,
     VLC_MODULE_DESCRIPTION,
     VLC_MODULE_HELP,
-};
+    /* Insert new VLC_MODULE_* here */
 
-enum vlc_config_properties
-{
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
-
-    VLC_CONFIG_NAME,
+    VLC_CONFIG_NAME=0x1000,
     /* command line name (args=const char *, vlc_callback_t) */
 
     VLC_CONFIG_VALUE,
@@ -105,6 +104,8 @@ enum vlc_config_properties
     VLC_CONFIG_ADD_ACTION,
     /* add value change callback
      * (args=const char *, vlc_callback_t, const char *) */
+
+    /* Insert new VLC_CONFIG_* here */
 };
 
 /*****************************************************************************

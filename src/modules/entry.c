@@ -25,6 +25,8 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#undef vlc_module_set
+#undef vlc_config_set
 #include <assert.h>
 #include <stdarg.h>
 
@@ -124,12 +126,10 @@ module_t *vlc_submodule_create (module_t *module)
 }
 
 
-int vlc_module_set (module_t *module, int propid, ...)
+static int vlc_module_set (module_t *module, int propid, va_list ap)
 {
-    va_list ap;
     int ret = VLC_SUCCESS;
 
-    va_start (ap, propid);
     switch (propid)
     {
         case VLC_MODULE_CPU_REQUIREMENT:
@@ -215,7 +215,6 @@ int vlc_module_set (module_t *module, int propid, ...)
             ret = VLC_EGENERIC;
             break;
     }
-    va_end (ap);
     return ret;
 }
 
@@ -248,13 +247,11 @@ module_config_t *vlc_config_create (module_t *module, int type)
     return tab + confsize;
 }
 
-int vlc_config_set (module_config_t *restrict item, int id, ...)
+static int vlc_config_set (module_config_t *restrict item, int id, va_list ap)
 {
     int ret = -1;
-    va_list ap;
 
     assert (item != NULL);
-    va_start (ap, id);
 
     switch (id)
     {
@@ -499,7 +496,20 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             break;
         }
     }
+    return ret;
+}
 
+int vlc_plugin_set (module_t *module, module_config_t *cfg, int id, ...)
+{
+    va_list ap;
+    int ret = -1;
+
+    va_start (ap, id);
+    if (module != NULL)
+        ret = vlc_module_set (module, id, ap);
+    else if (cfg != NULL)
+        ret = vlc_config_set (cfg, id, ap);
     va_end (ap);
+
     return ret;
 }
