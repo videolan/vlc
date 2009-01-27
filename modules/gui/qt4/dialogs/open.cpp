@@ -190,6 +190,7 @@ OpenDialog::~OpenDialog()
 /* Used by VLM dialog and inputSlave selection */
 QString OpenDialog::getMRL( bool b_all )
 {
+    if( itemsMRL.size() == 0 ) return "";
     return b_all ? itemsMRL[0] + ui.advancedLineInput->text()
                  : itemsMRL[0];
 }
@@ -377,6 +378,7 @@ void OpenDialog::transcode()
 void OpenDialog::stream( bool b_transcode_only )
 {
     QString soutMRL = getMRL();
+    if( soutMRL.isEmpty() ) return;
     toggleVisible();
 
     /* Dbg and send :D */
