@@ -22,7 +22,6 @@ SUFFIXES = .pc.in .pc
 # Headers
 ###############################################################################
 
-pkgincludedir = $(includedir)/vlc
 pluginsincludedir = $(pkgincludedir)/plugins
 
 pkginclude_HEADERS = \
