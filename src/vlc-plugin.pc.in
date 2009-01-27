@@ -3,6 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 pkgincludedir=@pkgincludedir@
+PKGDIR=@PKGDIR@
+vlclibdir=@vlclibdir@
 
 Name: VLC plugin API
 Description: VLC media player plugin interface
