@@ -1202,6 +1202,15 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
 
         if( p_vout->p_sys->hparent )
         {
+#ifdef UNDER_CE
+            POINT point = {0,0};
+            RECT rect;
+            ClientToScreen( p_vout->p_sys->hwnd, &point );
+            GetClientRect( p_vout->p_sys->hwnd, &rect );
+            SetWindowPos( hwnd, 0, point.x, point.y,
+                          rect.right, rect.bottom,
+                          SWP_NOZORDER|SWP_FRAMECHANGED );
+#else
             /* Retrieve current window position so fullscreen will happen
             *on the right screen */
             HMONITOR hmon = MonitorFromWindow(p_vout->p_sys->hparent,
@@ -1214,6 +1223,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
                             mi.rcMonitor.right - mi.rcMonitor.left,
                             mi.rcMonitor.bottom - mi.rcMonitor.top,
                             SWP_NOZORDER|SWP_FRAMECHANGED );
+#endif
         }
 
         /* Maximize window */
