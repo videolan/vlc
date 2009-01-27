@@ -705,7 +705,7 @@ void VLMWrapper::ControlBroadcast( const QString name, int BroadcastStatus,
 {
     vlm_message_t *message;
 
-    QString command = "control \"" + name;
+    QString command = "control \"" + name + "\"";
     switch( BroadcastStatus )
     {
     case ControlBroadcastPlay:
