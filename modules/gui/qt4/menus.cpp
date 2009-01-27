@@ -105,18 +105,18 @@ void addDPStaticEntry( QMenu *menu,
         else
             action = menu->addAction( text, THEDP, member );
     }
-    action->setData( "_static_" );
+    action->setData( true );
 }
 
 void EnableDPStaticEntries( QMenu *menu, bool enable = true )
 {
     if( !menu ) return;
 
-    QAction *action;
-    foreach( action, menu->actions() )
+    QList< QAction* > actions = menu->actions();
+    for( int i = 0; i < actions.size(); ++i )
     {
-        if( action->data().toString() == "_static_" )
-            action->setEnabled( enable );
+        if( actions[i]->data().toBool() )
+            actions[i]->setEnabled( enable );
     }
 }
 
@@ -126,13 +126,13 @@ void EnableDPStaticEntries( QMenu *menu, bool enable = true )
 int DeleteNonStaticEntries( QMenu *menu )
 {
     int i_ret = 0;
-    QAction *action;
     if( !menu )
         return VLC_EGENERIC;
-    foreach( action, menu->actions() )
+    QList< QAction* > actions = menu->actions();
+    for( int i = 0; i < actions.size(); ++i )
     {
-        if( action->data().toString() != "_static_" )
-            delete action;
+        if( !actions[i]->data().toBool() )
+            delete actions[i];
         else
             i_ret++;
     }
@@ -245,11 +245,11 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
 
 static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 {
-    QAction *action;
-    foreach( action, menu->actions() )
+    QList< QAction* > actions = menu->actions();
+    for( int i = 0; i < actions.size(); ++i )
     {
-        if( action->data().toString() == psz_var )
-            return action;
+        if( actions[i]->data().toString() == psz_var )
+            return actions[i];
     }
     return NULL;
 }
@@ -405,10 +405,10 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         act = menu->addAction( QIcon( ":/playlist_menu" ),
                                qtr( "Play&list" ), mi,
                                SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
-        act->setData( "_static_" );
+        act->setData( true );
     }
     act = menu->addMenu( SDMenu( p_intf ) );
-    act->setData( "_static_" );
+    act->setData( true );
     /*menu->addSeparator();
     menu->addAction( qtr( "Undock from Interface" ), mi,
                      SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
@@ -430,7 +430,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         QAction *action = menu->addAction( qtr( "Mi&nimal View" ), mi,
                                 SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
         action->setCheckable( true );
-        action->setData( "_static_" );
+        action->setData( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
             action->setChecked( true );
         minimalViewAction = action; /* HACK for minimalView */
@@ -439,13 +439,13 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
                                   SLOT( toggleFullScreen() ), QString( "F11" ) );
         action->setCheckable( true );
-        action->setData( "_static_" );
+        action->setData( true );
 
         /* Advanced Controls */
         action = menu->addAction( qtr( "&Advanced Controls" ), mi,
                                   SLOT( toggleAdvanced() ) );
         action->setCheckable( true );
-        action->setData( "_static_" );
+        action->setData( true );
         if( mi->getControlsVisibilityStatus() & CONTROLS_ADVANCED )
             action->setChecked( true );
 #if 0 /* For Visualisations. Not yet working */
@@ -500,6 +500,7 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( p_input )
         vlc_object_hold( p_input );
     p_aout = THEMIM->getAout();
+    EnableDPStaticEntries( current, ( p_aout != NULL ) );
     if( p_aout )
     {
         AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
@@ -554,6 +555,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         vlc_object_hold( p_input );
 
     p_vout = THEMIM->getVout();
+    EnableDPStaticEntries( current, ( p_vout != NULL ) );
     if( p_vout )
     {
         VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
@@ -989,11 +991,11 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
     if( !menu ) menu = new QMenu();
 
     /* Disable all non static entries */
-    QAction *p_action;
-    foreach( p_action, menu->actions() )
+    QList< QAction* > actions = menu->actions();
+    for( int i = 0; i < actions.size(); ++i )
     {
-        if( p_action->data().toString() != "_static_" )
-            p_action->setEnabled( false );
+        if( !actions[i]->data().toBool() )
+            actions[i]->setEnabled( false );
     }
 
     currentGroup = NULL;
