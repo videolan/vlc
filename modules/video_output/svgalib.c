@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
+#include <vlc_interface.h>
 
 #include <vga.h>
 #include <vgagl.h>
