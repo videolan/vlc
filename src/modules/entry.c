@@ -123,7 +123,7 @@ module_t *vlc_submodule_create (module_t *module)
     return submodule;
 }
 
-module_config_t *vlc_config_create (module_t *module, int type)
+static module_config_t *vlc_config_create (module_t *module, int type)
 {
     unsigned confsize = module->confsize;
     module_config_t *tab = module->p_config;
@@ -161,6 +161,25 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
     va_start (ap, propid);
     switch (propid)
     {
+        case VLC_SUBMODULE_CREATE:
+        {
+            module_t **pp = va_arg (ap, module_t **);
+            *pp = vlc_submodule_create (module);
+            if (*pp == NULL)
+                ret = -1;
+            break;
+        }
+
+        case VLC_CONFIG_CREATE:
+        {
+            int type = va_arg (ap, int);
+            module_config_t **pp = va_arg (ap, module_config_t **);
+            *pp = vlc_config_create (module, type);
+            if (*pp == NULL)
+                ret = -1;
+            break;
+        }
+
         case VLC_MODULE_CPU_REQUIREMENT:
             assert (!module->b_submodule);
             module->i_cpu |= va_arg (ap, int);

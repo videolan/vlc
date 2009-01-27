@@ -147,6 +147,7 @@ struct module_t
 };
 
 module_t *vlc_module_create (vlc_object_t *);
+module_t *vlc_submodule_create (module_t *module);
 
 #define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
 void  __module_InitBank        ( vlc_object_t * );

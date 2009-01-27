@@ -29,15 +29,16 @@
  * This file implements plugin (module) macros used to define a vlc module.
  */
 
-VLC_EXPORT( module_t *, vlc_submodule_create, ( module_t * ) );
 VLC_EXPORT( int, vlc_plugin_set, (module_t *, module_config_t *, int, ...) );
-VLC_EXPORT( module_config_t *, vlc_config_create, (module_t *, int) );
 
 #define vlc_module_set( mod, ... ) vlc_plugin_set ((mod), NULL, __VA_ARGS__)
 #define vlc_config_set( cfg, ... ) vlc_plugin_set (NULL, (cfg), __VA_ARGS__)
 
 enum vlc_module_properties
 {
+    VLC_SUBMODULE_CREATE,
+    VLC_CONFIG_CREATE,
+
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
      * Append new items at the end ONLY. */
     VLC_MODULE_CPU_REQUIREMENT=0x100,
@@ -191,7 +192,8 @@ enum vlc_module_properties
     VLC_METADATA_EXPORTS
 
 #define add_submodule( ) \
-    p_submodule = vlc_submodule_create( p_module );
+    if (vlc_plugin_set (p_module, NULL, VLC_SUBMODULE_CREATE, &p_submodule)) \
+        goto error;
 
 #define add_requirement( cap ) \
     if (vlc_module_set (p_module, VLC_MODULE_CPU_REQUIREMENT, \
@@ -249,7 +251,7 @@ enum vlc_module_properties
  *****************************************************************************/
 
 #define add_type_inner( type ) \
-    p_config = vlc_config_create (p_module, type);
+    vlc_plugin_set (p_module, NULL, VLC_CONFIG_CREATE, (type), &p_config);
 
 #define add_typedesc_inner( type, text, longtext ) \
     add_type_inner( type ) \

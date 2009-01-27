@@ -443,7 +443,6 @@ vlc_cond_init
 vlc_cond_signal
 vlc_cond_timedwait
 vlc_cond_wait
-vlc_config_create
 vlc_control_cancel
 vlc_CPU
 vlc_error
@@ -505,7 +504,6 @@ vlc_sendmsg
 vlc_strcasestr
 vlc_strlcpy
 vlc_strtoll
-vlc_submodule_create
 vlc_testcancel
 vlc_thread_create
 __vlc_thread_join
