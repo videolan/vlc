@@ -867,9 +867,9 @@ if BUILD_OSDMENU
 #OSD Menu
 	mkdir -p "$(win32_destdir)/osdmenu"
 	cp $(srcdir)/share/osdmenu/*.* "$(win32_destdir)/osdmenu"
-	for dir in dvd dvd/selected dvd/unselect dvd/selection dvd/volume default default/selected default/selection default/volume minimal;do \
+	for dir in default default/selected default/selection default/volume ;do \
 		mkdir -p "$(win32_destdir)/osdmenu/$$dir"; \
-		for file in $(srcdir)/share/osdmenu/$${dir}/*.png ;do \
+		for file in $(srcdir)/share/osdmenu/$${dir}/*.png;do \
 			 cp -- "$$file" "$(win32_destdir)/osdmenu/$$dir"; \
 		done; \
 	done
