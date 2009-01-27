@@ -41,9 +41,6 @@ enum vlc_module_properties
      * Append new items at the end ONLY. */
     VLC_MODULE_CPU_REQUIREMENT,
     VLC_MODULE_SHORTCUT,
-    VLC_MODULE_SHORTNAME_NODOMAIN,
-    VLC_MODULE_DESCRIPTION_NODOMAIN,
-    VLC_MODULE_HELP_NODOMAIN,
     VLC_MODULE_CAPABILITY,
     VLC_MODULE_SCORE,
     VLC_MODULE_CB_OPEN,
@@ -62,9 +59,6 @@ enum vlc_config_properties
 
     VLC_CONFIG_NAME,
     /* command line name (args=const char *, vlc_callback_t) */
-
-    VLC_CONFIG_DESC_NODOMAIN,
-    /* description (args=const char *, const char *) */
 
     VLC_CONFIG_VALUE,
     /* actual value (args=int/double/const char *) */
@@ -95,13 +89,6 @@ enum vlc_config_properties
 
     VLC_CONFIG_SHORTCUT,
     /* one-character (short) command line option name (args=char) */
-
-    VLC_CONFIG_LIST_NODOMAIN,
-    /* possible values list
-     * (args=size_t, const <type> *, const char *const *) */
-
-    VLC_CONFIG_ADD_ACTION_NODOMAIN,
-    /* add value change callback (args=vlc_callback_t, const char *) */
 
     VLC_CONFIG_OLDNAME,
     /* former option name (args=const char *) */

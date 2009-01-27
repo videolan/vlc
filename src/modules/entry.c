@@ -151,27 +151,6 @@ int vlc_module_set (module_t *module, int propid, ...)
             break;
         }
 
-        case VLC_MODULE_SHORTNAME_NODOMAIN:
-        {
-            const char *name = va_arg (ap, char *);
-            ret = vlc_module_set (module, VLC_MODULE_SHORTNAME, NULL, name);
-            break;
-        }
-
-        case VLC_MODULE_DESCRIPTION_NODOMAIN:
-        {
-            const char *desc = va_arg (ap, char *);
-            ret = vlc_module_set (module, VLC_MODULE_DESCRIPTION, NULL, desc);
-            break;
-        }
-
-        case VLC_MODULE_HELP_NODOMAIN:
-        {
-            const char *help = va_arg (ap, char *);
-            ret = vlc_module_set (module, VLC_MODULE_HELP, NULL, help);
-            break;
-        }
-
         case VLC_MODULE_CAPABILITY:
             module->psz_capability = va_arg (ap, char *);
             break;
@@ -291,14 +270,6 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             break;
         }
 
-        case VLC_CONFIG_DESC_NODOMAIN:
-        {
-            const char *text = va_arg (ap, const char *);
-            const char *longtext = va_arg (ap, const char *);
-            ret = vlc_config_set (item, VLC_CONFIG_DESC, NULL, text, longtext);
-            break;
-        }
-
         case VLC_CONFIG_VALUE:
         {
             if (IsConfigIntegerType (item->i_type))
@@ -386,35 +357,6 @@ int vlc_config_set (module_config_t *restrict item, int id, ...)
             item->i_short = va_arg (ap, int);
             ret = 0;
             break;
-
-        case VLC_CONFIG_LIST_NODOMAIN:
-        {
-            size_t len = va_arg (ap, size_t);
-            if (IsConfigIntegerType (item->i_type))
-            {
-                const int *src = va_arg (ap, const int *);
-                const char *const *text = va_arg (ap, const char *const *);
-                ret = vlc_config_set (item, VLC_CONFIG_LIST, NULL, len, src,
-                                      text);
-            }
-            else
-            if (IsConfigStringType (item->i_type))
-            {
-                const char *const *src = va_arg (ap, const char *const *);
-                const char *const *text = va_arg (ap, const char *const *);
-                ret = vlc_config_set (item, VLC_CONFIG_LIST, NULL, len, src,
-                                      text);
-            }
-            break;
-        }
-
-        case VLC_CONFIG_ADD_ACTION_NODOMAIN:
-        {
-            vlc_callback_t cb = va_arg (ap, vlc_callback_t);
-            const char *name = va_arg (ap, const char *);
-            ret = vlc_config_set (item, VLC_CONFIG_ADD_ACTION, NULL, cb, name);
-            break;
-        }
 
         case VLC_CONFIG_OLDNAME:
         {
