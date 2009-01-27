@@ -723,7 +723,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         free(th);
         return errno;
     }
-    hThread = CreateThread (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+    hThread = CreateThread (NULL, 128*1024, vlc_entry, th, CREATE_SUSPENDED, NULL);
 #else
     hThread = (HANDLE)(uintptr_t)
         _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
