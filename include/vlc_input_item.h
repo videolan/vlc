@@ -118,7 +118,12 @@ VLC_EXPORT( void, input_item_AddSubItem, ( input_item_t *p_parent, input_item_t 
  */
 enum input_item_option_e
 {
+    /* Allow VLC to trust the given option.
+     * By default options are untrusted */
     VLC_INPUT_OPTION_TRUSTED = 0x2,
+
+    /* Change the value associated to an option if already present, otherwise
+     * add the option */
     VLC_INPUT_OPTION_UNIQUE  = 0x100,
 };
 
