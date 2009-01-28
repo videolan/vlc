@@ -84,9 +84,7 @@ static void Direct3DVoutRenderScene     ( vout_thread_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 
-static bool _got_vista_or_above;
-
-static int get_capability_for_osversion(void)
+static bool IsVistaOrAbove(void)
 {
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -96,13 +94,21 @@ static int get_capability_for_osversion(void)
         if( winVer.dwMajorVersion > 5 )
         {
             /* Windows Vista or above, make this module the default */
-        _got_vista_or_above = true;
-            return 150;
+            return true;
         }
     }
     /* Windows XP or lower, make sure this module isn't the default */
-    _got_vista_or_above = false;
-    return 50;
+    return false;
+}
+
+static int OpenVideoXP( vlc_object_t *obj )
+{
+    return IsVistaOrAbove() ? VLC_EGENERIC : OpenVideo( obj );
+}
+
+static int OpenVideoVista( vlc_object_t *obj )
+{
+    return IsVistaOrAbove() ? OpenVideo( obj ) : VLC_EGENERIC;
 }
 
 vlc_module_begin ()
@@ -110,12 +116,16 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     set_description( N_("DirectX 3D video output") )
-    set_capability( "video output", get_capability_for_osversion() )
+    set_capability( "video output", 50 )
     add_shortcut( "direct3d" )
-    set_callbacks( OpenVideo, CloseVideo )
+    set_callbacks( OpenVideoXP, CloseVideo )
 
     /* FIXME: Hack to avoid unregistering our window class */
     linked_with_a_crap_library_which_uses_atexit ()
+
+    add_submodule()
+        set_capability( "video output", 150 )
+        set_callbacks( OpenVideoVista, CloseVideo )
 vlc_module_end ()
 
 #if 0 /* FIXME */
