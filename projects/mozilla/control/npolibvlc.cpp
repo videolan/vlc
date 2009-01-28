@@ -1481,12 +1481,12 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     }
                 }
 
-                int item = libvlc_playlist_add_extended(p_plugin->getVLC(),
-                                                        url,
-                                                        name,
-                                                        i_options,
-                                                        const_cast<const char **>(ppsz_options),
-                                                        &ex);
+                int item = libvlc_playlist_add_extended_untrusted(p_plugin->getVLC(),
+                                                                  url,
+                                                                  name,
+                                                                  i_options,
+                                                                  const_cast<const char **>(ppsz_options),
+                                                                  &ex);
                 free(url);
                 free(name);
                 for( int i=0; i< i_options; ++i )
