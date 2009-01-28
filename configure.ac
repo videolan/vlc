@@ -3716,6 +3716,9 @@ if test "${enable_x264}" != "no"; then
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
+        if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
+          VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
+        fi
       ],[
         AC_MSG_ERROR([the specified tree hasn't been compiled])
       ])
@@ -3729,6 +3732,9 @@ if test "${enable_x264}" != "no"; then
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
+        if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
+          VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
+        fi
       ],[
         if test "${enable_x264}" = "yes"; then
             AC_MSG_ERROR([Could not find libx264 on your system: you may get it from http://www.videolan.org/x264.html])
