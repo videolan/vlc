@@ -411,13 +411,6 @@ enum vlc_module_properties
                     (const char *const *)(list_text), \
                     (vlc_callback_t)(list_update_func));
 
-#define change_float_list( list, list_text, list_update_func ) \
-    vlc_config_set (p_config, VLC_CONFIG_LIST, domain, \
-                    (size_t)(sizeof (list) / sizeof (float)), \
-                    (const float *)(list), \
-                    (const char *const *)(list_text), \
-                    (vlc_callback_t)(list_update_func));
-
 #define change_integer_range( minv, maxv ) \
     vlc_config_set (p_config, VLC_CONFIG_RANGE, (int)(minv), (int)(maxv));
 

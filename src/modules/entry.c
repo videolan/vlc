@@ -386,21 +386,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 item->pi_list = dst;
             }
             else
-#if 0
-            if (IsConfigFloatType (item->i_type))
-            {
-                const float *src = va_arg (ap, const float *);
-                float *dst = malloc (sizeof (float) * (len + 1));
-
-                if (dst != NULL)
-                {
-                    memcpy (dst, src, sizeof (float) * len);
-                    dst[len] = 0.;
-                }
-                item->pf_list = dst;
-            }
-            else
-#endif
             if (IsConfigStringType (item->i_type))
             {
                 const char *const *src = va_arg (ap, const char *const *);
