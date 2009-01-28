@@ -535,7 +535,7 @@ HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
                     options[i_options++] = timeBuffer;
                 }
                 // add default target to playlist
-                libvlc_playlist_add_extended(_p_libvlc, psz_mrl, NULL, i_options, options, NULL);
+                libvlc_playlist_add_extended_untrusted(_p_libvlc, psz_mrl, NULL, i_options, options, NULL);
                 CoTaskMemFree(psz_mrl);
             }
         }
