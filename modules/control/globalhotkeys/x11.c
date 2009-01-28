@@ -44,10 +44,10 @@ static void Close( vlc_object_t *p_this );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin()
-    set_shortname( _("Global Hotkeys") )
+    set_shortname( N_("Global Hotkeys") )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_HOTKEYS )
-    set_description( _("Global Hotkeys interface") )
+    set_description( N_("Global Hotkeys interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
 vlc_module_end()

@@ -63,8 +63,7 @@ static int PPNameCallback( vlc_object_t *, char const *,
     "better looking pictures." )
 
 #define NAME_TEXT N_("FFmpeg post processing filter chains")
-/* defined by libpostproc */
-#define NAME_LONGTEXT pp_help
+#define NAME_LONGTEXT NAME_TEXT
 
 #define FILTER_PREFIX "postproc-"
 
