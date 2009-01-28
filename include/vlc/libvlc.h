@@ -278,6 +278,24 @@ VLC_PUBLIC_API void libvlc_media_add_option(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_options,
                                    libvlc_exception_t * p_e );
+/**
+ * Add an option to the media from an untrusted source.
+ *
+ * This option will be used to determine how the media_player will
+ * read the media. This allows to use VLC's advanced
+ * reading/streaming options on a per-media basis.
+ *
+ * The options are detailed in vlc --long-help, for instance "--sout-all"
+ *
+ * \param p_instance the instance
+ * \param ppsz_options the options (as a string)
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_add_option_untrusted(
+                                   libvlc_media_t * p_md,
+                                   const char * ppsz_options,
+                                   libvlc_exception_t * p_e );
+
 
 /**
  * Retain a reference to a media descriptor object (libvlc_media_t). Use

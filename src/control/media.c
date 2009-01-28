@@ -351,6 +351,20 @@ void libvlc_media_add_option(
 }
 
 /**************************************************************************
+ * Same as libvlc_media_add_option but with untrusted source.
+ **************************************************************************/
+void libvlc_media_add_option_untrusted(
+                                   libvlc_media_t * p_md,
+                                   const char * ppsz_option,
+                                   libvlc_exception_t *p_e )
+{
+    VLC_UNUSED(p_e);
+    input_item_AddOption( p_md->p_input_item, ppsz_option,
+                          VLC_INPUT_OPTION_UNIQUE );
+}
+
+
+/**************************************************************************
  * Delete a media descriptor object
  **************************************************************************/
 void libvlc_media_release( libvlc_media_t *p_md )

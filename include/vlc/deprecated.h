@@ -216,6 +216,22 @@ VLC_DEPRECATED_API int libvlc_playlist_add_extended( libvlc_instance_t *, const 
                                                  libvlc_exception_t * );
 
 /**
+ * Append an item to the playlist. The item is added at the end, with
+ * additional input options from an untrusted source.
+ *
+ * \param p_instance the playlist instance
+ * \param psz_uri the URI to open, using VLC format
+ * \param psz_name a name that you might want to give or NULL
+ * \param i_options the number of options to add
+ * \param ppsz_options strings representing the options to add
+ * \param p_e an initialized exception pointer
+ * \return the identifier of the new item
+ */
+VLC_DEPRECATED_API int libvlc_playlist_add_extended_untrusted( libvlc_instance_t *, const char *,
+                                                 const char *, int, const char **,
+                                                 libvlc_exception_t * );
+
+/**
  * Delete the playlist item with the given ID.
  *
  * \param p_instance the playlist instance

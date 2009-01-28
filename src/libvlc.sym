@@ -48,6 +48,7 @@ libvlc_log_iterator_has_next
 libvlc_log_iterator_next
 libvlc_log_open
 libvlc_media_add_option
+libvlc_media_add_option_untrusted
 libvlc_media_discoverer_event_manager
 libvlc_media_discoverer_is_running
 libvlc_media_discoverer_localized_name
@@ -161,6 +162,7 @@ libvlc_media_subitems
 libvlc_new
 libvlc_playlist_add
 libvlc_playlist_add_extended
+libvlc_playlist_add_extended_untrusted
 libvlc_playlist_clear
 libvlc_playlist_delete_item
 libvlc_playlist_get_media_player
