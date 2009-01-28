@@ -184,7 +184,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
                 false )
-        change_string_list( ppsz_deinterlace_type, 0, 0 );
+        change_string_list( ppsz_deinterlace_type, 0, 0 )
     add_integer( SOUT_CFG_PREFIX "width", 0, NULL, WIDTH_TEXT,
                  WIDTH_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "height", 0, NULL, HEIGHT_TEXT,

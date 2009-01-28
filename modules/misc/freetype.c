@@ -147,14 +147,14 @@ vlc_module_begin ()
     /* hook to the color values list, with default 0x00ffffff = white */
     add_integer( "freetype-color", 0x00FFFFFF, NULL, COLOR_TEXT,
                  COLOR_LONGTEXT, false )
-        change_integer_list( pi_color_values, ppsz_color_descriptions, NULL );
+        change_integer_list( pi_color_values, ppsz_color_descriptions, NULL )
 
     add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZER_TEXT,
                  FONTSIZER_LONGTEXT, false )
-        change_integer_list( pi_sizes, ppsz_sizes_text, NULL );
+        change_integer_list( pi_sizes, ppsz_sizes_text, NULL )
     add_integer( "freetype-effect", 2, NULL, EFFECT_TEXT,
                  EFFECT_LONGTEXT, false )
-        change_integer_list( pi_effects, ppsz_effects_text, NULL );
+        change_integer_list( pi_effects, ppsz_effects_text, NULL )
 
     add_bool( "freetype-yuvp", 0, NULL, YUVP_TEXT,
               YUVP_LONGTEXT, true )

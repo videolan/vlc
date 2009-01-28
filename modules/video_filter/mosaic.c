@@ -191,8 +191,8 @@ vlc_module_begin ()
                  WIDTH_TEXT, WIDTH_LONGTEXT, false )
 
     add_integer( CFG_PREFIX "align", 5, NULL,
-                 ALIGN_TEXT, ALIGN_LONGTEXT, true);
-        change_integer_list( pi_align_values, ppsz_align_descriptions, NULL );
+                 ALIGN_TEXT, ALIGN_LONGTEXT, true)
+        change_integer_list( pi_align_values, ppsz_align_descriptions, NULL )
 
     add_integer( CFG_PREFIX "xoffset", 0, NULL,
                  XOFFSET_TEXT, XOFFSET_LONGTEXT, true )
@@ -208,7 +208,7 @@ vlc_module_begin ()
 
     add_integer( CFG_PREFIX "position", 0, NULL,
                  POS_TEXT, POS_LONGTEXT, false )
-        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL );
+        change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
     add_integer( CFG_PREFIX "rows", 2, NULL,
                  ROWS_TEXT, ROWS_LONGTEXT, false )
     add_integer( CFG_PREFIX "cols", 2, NULL,

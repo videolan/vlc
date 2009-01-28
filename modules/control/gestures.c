@@ -99,7 +99,7 @@ vlc_module_begin ()
                  THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
     add_string( "gestures-button", "right", NULL,
                 BUTTON_TEXT, BUTTON_LONGTEXT, false )
-        change_string_list( button_list, button_list_text, 0 );
+        change_string_list( button_list, button_list_text, 0 )
     set_description( N_("Mouse gestures control interface") )
 
     set_capability( "interface", 0 )

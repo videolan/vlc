@@ -144,19 +144,19 @@ struct sout_stream_id_t
 #define VOLUME_LONGTEXT N_("Output volume for analog output: 0 for silence, " \
                            "1..255 from almost silent to very loud.")
 
-vlc_module_begin();
+vlc_module_begin()
     set_shortname( N_("RAOP") )
-    set_description( N_("Remote Audio Output Protocol stream output") );
-    set_capability( "sout stream", 0 );
-    add_shortcut( "raop" );
-    set_category( CAT_SOUT );
-    set_subcategory( SUBCAT_SOUT_STREAM );
+    set_description( N_("Remote Audio Output Protocol stream output") )
+    set_capability( "sout stream", 0 )
+    add_shortcut( "raop" )
+    set_category( CAT_SOUT )
+    set_subcategory( SUBCAT_SOUT_STREAM )
     add_string( SOUT_CFG_PREFIX "host", "", NULL,
                 HOST_TEXT, HOST_LONGTEXT, false )
     add_integer_with_range( SOUT_CFG_PREFIX "volume", 100, 0, 255, NULL,
                             VOLUME_TEXT, VOLUME_LONGTEXT, false )
-    set_callbacks( Open, Close );
-vlc_module_end();
+    set_callbacks( Open, Close )
+vlc_module_end()
 
 static const char *const ppsz_sout_options[] = {
     "host",

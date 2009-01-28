@@ -188,15 +188,15 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "dshow-caching", (mtime_t)(0.2*CLOCK_FREQ) / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true );
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
 
     add_string( "dshow-vdev", NULL, NULL, VDEV_TEXT, VDEV_LONGTEXT, false)
-        change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback );
+        change_string_list( ppsz_vdev, ppsz_vdev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
     add_string( "dshow-adev", NULL, NULL, ADEV_TEXT, ADEV_LONGTEXT, false)
-        change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback );
+        change_string_list( ppsz_adev, ppsz_adev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
         change_action_add( ConfigDevicesCallback, N_("Configure") )
 
@@ -215,37 +215,37 @@ vlc_module_begin ()
               true )
 
     add_integer( "dshow-tuner-channel", 0, NULL, CHANNEL_TEXT,
-                 CHANNEL_LONGTEXT, true );
+                 CHANNEL_LONGTEXT, true )
 
     add_integer( "dshow-tuner-country", 0, NULL, COUNTRY_TEXT,
-                 COUNTRY_LONGTEXT, true );
+                 COUNTRY_LONGTEXT, true )
 
     add_integer( "dshow-tuner-input", 0, NULL, TUNER_INPUT_TEXT,
-                 TUNER_INPUT_LONGTEXT, true );
-        change_integer_list( pi_tuner_input, ppsz_tuner_input_text, NULL );
+                 TUNER_INPUT_LONGTEXT, true )
+        change_integer_list( pi_tuner_input, ppsz_tuner_input_text, NULL )
 
     add_integer( "dshow-video-input",  -1, NULL, VIDEO_IN_TEXT,
-                 VIDEO_IN_LONGTEXT, true );
+                 VIDEO_IN_LONGTEXT, true )
 
     add_integer( "dshow-audio-input",  -1, NULL, AUDIO_IN_TEXT,
-                 AUDIO_IN_LONGTEXT, true );
+                 AUDIO_IN_LONGTEXT, true )
 
     add_integer( "dshow-video-output", -1, NULL, VIDEO_OUT_TEXT,
-                 VIDEO_OUT_LONGTEXT, true );
+                 VIDEO_OUT_LONGTEXT, true )
 
     add_integer( "dshow-audio-output", -1, NULL, AUDIO_OUT_TEXT,
-                 AUDIO_OUT_LONGTEXT, true );
+                 AUDIO_OUT_LONGTEXT, true )
 
     add_integer( "dshow-amtuner-mode", AMTUNER_MODE_TV, NULL,
-                AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false);
-        change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, NULL );
+                AMTUNER_MODE_TEXT, AMTUNER_MODE_LONGTEXT, false)
+        change_integer_list( pi_amtuner_mode, ppsz_amtuner_mode_text, NULL )
 
     add_integer( "dshow-audio-channels", 0, NULL, AUDIO_CHANNELS_TEXT,
-                 AUDIO_CHANNELS_LONGTEXT, true );
+                 AUDIO_CHANNELS_LONGTEXT, true )
     add_integer( "dshow-audio-samplerate", 0, NULL, AUDIO_SAMPLERATE_TEXT,
-                 AUDIO_SAMPLERATE_LONGTEXT, true );
+                 AUDIO_SAMPLERATE_LONGTEXT, true )
     add_integer( "dshow-audio-bitspersample", 0, NULL, AUDIO_BITSPERSAMPLE_TEXT,
-                 AUDIO_BITSPERSAMPLE_LONGTEXT, true );
+                 AUDIO_BITSPERSAMPLE_LONGTEXT, true )
 
     add_shortcut( "dshow" )
     set_capability( "access_demux", 0 )

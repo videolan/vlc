@@ -101,7 +101,7 @@ vlc_module_begin ()
     /* General options */
     add_string(  CFG_PREFIX "format", "png", NULL,
                  FORMAT_TEXT, FORMAT_LONGTEXT, false )
-    change_string_list( psz_format_list, psz_format_list_text, 0 );
+    change_string_list( psz_format_list, psz_format_list_text, 0 )
     add_integer( CFG_PREFIX "width", 288, NULL,
                  WIDTH_TEXT, WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", 160, NULL,

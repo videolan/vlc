@@ -173,7 +173,7 @@ vlc_module_begin ()
 
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
                 true )
-        change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
+        change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
 
     add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,

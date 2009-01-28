@@ -84,7 +84,7 @@ vlc_module_begin ()
                SUB_DELAY_LONGTEXT, true )
     add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
                 SUB_TYPE_LONGTEXT, true )
-        change_string_list( ppsz_sub_type, NULL, NULL );
+        change_string_list( ppsz_sub_type, NULL, NULL )
     set_callbacks( Open, Close )
 
     add_shortcut( "subtitle" )

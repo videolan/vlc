@@ -170,7 +170,7 @@ vlc_module_begin ()
     add_shortcut("qt")
     add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
                  QT_MODE_TEXT, QT_MODE_LONGTEXT, false )
-        change_integer_list( i_mode_list, psz_mode_list_text, NULL );
+        change_integer_list( i_mode_list, psz_mode_list_text, NULL )
 
     add_bool( "qt-notification", true, NULL, NOTIFICATION_TEXT,
               NOTIFICATION_LONGTEXT, false )
@@ -179,9 +179,9 @@ vlc_module_begin ()
                           OPACITY_LONGTEXT, false )
 
     add_bool( "qt-system-tray", true, NULL, SYSTRAY_TEXT,
-              SYSTRAY_LONGTEXT, false);
+              SYSTRAY_LONGTEXT, false)
     add_bool( "qt-start-minimized", false, NULL, MINIMIZED_TEXT,
-              MINIMIZED_LONGTEXT, true);
+              MINIMIZED_LONGTEXT, true)
     add_bool( "qt-video-autoresize", true, NULL, KEEPSIZE_TEXT,
               KEEPSIZE_LONGTEXT, false )
     add_bool( "qt-name-in-title", true, NULL, TITLE_TEXT,
@@ -190,11 +190,11 @@ vlc_module_begin ()
               QT_FULLSCREEN_TEXT, false )
 
     add_bool( "qt-volume-complete", false, NULL, COMPLETEVOL_TEXT,
-              COMPLETEVOL_LONGTEXT, true );
+              COMPLETEVOL_LONGTEXT, true )
     add_bool( "qt-autosave-volume", false, NULL, SAVEVOL_TEXT,
-              SAVEVOL_TEXT, true );
+              SAVEVOL_TEXT, true )
     add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
-                FILEDIALOG_PATH_TEXT, true );
+                FILEDIALOG_PATH_TEXT, true )
         change_autosave ()
         change_internal ()
 
@@ -204,7 +204,7 @@ vlc_module_begin ()
                 RECENTPLAY_FILTER_TEXT, RECENTPLAY_FILTER_LONGTEXT, false )
 
     add_bool( "qt-adv-options", false, NULL, ADVANCED_OPTIONS_TEXT,
-              ADVANCED_OPTIONS_LONGTEXT, true );
+              ADVANCED_OPTIONS_LONGTEXT, true )
     add_bool( "qt-advanced-pref", false, NULL, ADVANCED_PREFS_TEXT,
               ADVANCED_PREFS_LONGTEXT, false )
     add_bool( "qt-error-dialogs", true, NULL, ERROR_TEXT,
