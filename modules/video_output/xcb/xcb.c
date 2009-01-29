@@ -59,8 +59,8 @@ static void Close (vlc_object_t *);
  * Module descriptor
  */
 vlc_module_begin ()
-    set_shortname (_("XCB"))
-    set_description (_("(Experimental) XCB video output"))
+    set_shortname (N_("XCB"))
+    set_description (N_("(Experimental) XCB video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("video output", 0)
