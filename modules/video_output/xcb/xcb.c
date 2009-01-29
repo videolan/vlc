@@ -130,8 +130,10 @@ static int Open (vlc_object_t *obj)
     {
         msg_Err (vout, "cannot connect to X server %s",
                  display ? display : "");
+        free (display);
         goto error;
     }
+    free (display);
 
     /* Get the preferred screen */
     xcb_screen_t *scr = xcb_aux_get_screen (p_sys->conn, snum);
