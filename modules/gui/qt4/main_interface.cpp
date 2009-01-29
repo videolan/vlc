@@ -567,6 +567,7 @@ QSize MainInterface::sizeHint() const
     int nwidth  = controls->sizeHint().width();
     int nheight = controls->isVisible() ?
                   controls->size().height()
+                  + inputC->size().height()
                   + menuBar()->size().height()
                   + statusBar()->size().height()
                   : 0 ;
@@ -635,7 +636,7 @@ private:
 /**
  * README
  * Thou shall not call/resize/hide widgets from on another thread.
- * This is wrong, and this is TEH reason to emit signals on those Video Functions
+ * This is wrong, and this is THE reason to emit signals on those Video Functions
  **/
 void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                    int *pi_y, unsigned int *pi_width,
