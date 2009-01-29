@@ -1,7 +1,7 @@
 /*****************************************************************************
  * menus.cpp : Qt menus
  *****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -108,15 +108,18 @@ void addDPStaticEntry( QMenu *menu,
     action->setData( true );
 }
 
-void EnableDPStaticEntries( QMenu *menu, bool enable = true )
+/**
+ * @brief Enable all static entries, disable the others
+ * @param enable if false, disable all entries
+ */
+void EnableStaticEntries( QMenu *menu, bool enable = true )
 {
     if( !menu ) return;
 
     QList< QAction* > actions = menu->actions();
     for( int i = 0; i < actions.size(); ++i )
     {
-        if( actions[i]->data().toBool() )
-            actions[i]->setEnabled( enable );
+        actions[i]->setEnabled( enable && actions[i]->data().toBool() );
     }
 }
 
@@ -500,10 +503,10 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( p_input )
         vlc_object_hold( p_input );
     p_aout = THEMIM->getAout();
-    EnableDPStaticEntries( current, ( p_aout != NULL ) );
+    AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
+    EnableStaticEntries( current, ( p_aout != NULL ) );
     if( p_aout )
     {
-        AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
         vlc_object_release( p_aout );
     }
     if( p_input )
@@ -555,10 +558,10 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         vlc_object_hold( p_input );
 
     p_vout = THEMIM->getVout();
-    EnableDPStaticEntries( current, ( p_vout != NULL ) );
+    VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
+    EnableStaticEntries( current, ( p_vout != NULL ) );
     if( p_vout )
     {
-        VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
         vlc_object_release( p_vout );
     }
     if( p_input )
@@ -600,7 +603,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     PUSH_VAR( "next-title" );
     PUSH_VAR( "prev-chapter" );
     PUSH_VAR( "next-chapter" );
-    EnableDPStaticEntries( menu, ( p_object != NULL ) );
+    EnableStaticEntries( menu, ( p_object != NULL ) );
     if( p_object )
     {
         vlc_object_release( p_object );
@@ -990,20 +993,11 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
     QMenu *menu = current;
     if( !menu ) menu = new QMenu();
 
-    /* Disable all non static entries */
-    QList< QAction* > actions = menu->actions();
-    for( int i = 0; i < actions.size(); ++i )
-    {
-        if( !actions[i]->data().toBool() )
-            actions[i]->setEnabled( false );
-    }
-
     currentGroup = NULL;
 
     vlc_object_t *p_object;
-    int i;
 
-    for( i = 0; i < ( int )objects.size() ; i++ )
+    for( int i = 0; i < ( int )objects.size() ; i++ )
     {
         if( !varnames[i] || !*varnames[i] )
         {
@@ -1078,9 +1072,14 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
         DeleteNonStaticEntries( action->menu() );
 
     if( !p_object )
+    {
+        if( action )
+            action->setEnabled( false );
         return;
+    }
 
     /* Check the type of the object variable */
+    /* What is the following HACK needed for? */
     if( !strcmp( psz_var, "audio-es" )
      || !strcmp( psz_var, "video-es" )
      || !strcmp( psz_var, "postproc-q" ) )
@@ -1099,12 +1098,18 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
             break;
         default:
             /* Variable doesn't exist or isn't handled */
+            if( action )
+                action->setEnabled( false );
             return;
     }
 
     /* Make sure we want to display the variable */
     if( menu->isEmpty() && IsMenuEmpty( psz_var, p_object ) )
+    {
+        if( action )
+            action->setEnabled( false );
         return;
+    }
 
     /* Get the descriptive name of the variable */
     int i_ret = var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
@@ -1149,7 +1154,8 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
                 action->setEnabled( false );
         }
         else
-            CreateChoicesMenu( menu, psz_var, p_object, true );
+            action->setEnabled(
+                CreateChoicesMenu( menu, psz_var, p_object, true ) == 0 );
         FREENULL( text.psz_string );
         return;
     }
@@ -1263,7 +1269,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 
 #undef CURVAL
 #undef CURTEXT
-    return VLC_SUCCESS;
+    return submenu->isEmpty() ? VLC_EGENERIC : VLC_SUCCESS;
 }
 
 void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
