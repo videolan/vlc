@@ -53,8 +53,16 @@ static void HandleButtonRelease (vout_thread_t *vout,
     buttons &= ~(1 << (ev->detail - 1));
     var_SetInteger (vout, "mouse-button-down", buttons);
 
-    if (ev->detail == 1) /* left mouse button */
-        var_SetBool (vout, "mouse-clicked", true);
+    switch (ev->detail)
+    {
+        case 1: /* left mouse button */
+            var_SetBool (vout, "mouse-clicked", true);
+            var_SetBool (vout->p_libvlc, "intf-popupmenu", false);
+            break;
+        case 3:
+            var_SetBool (vout->p_libvlc, "intf-popupmenu", true);
+            break;
+    }
 }
 
 static void HandleMotionNotify (vout_thread_t *vout,
