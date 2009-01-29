@@ -1438,8 +1438,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
 #endif
     char psz_spaces_text[PADDING_SPACES+LINE_START+1];
     char psz_spaces_longtext[LINE_START+3];
-    char psz_format[sizeof(COLOR_FORMAT_STRING) + 1];
-    char psz_format_bool[sizeof(COLOR_FORMAT_STRING_BOOL) + 1];
+    char psz_format[sizeof(COLOR_FORMAT_STRING)];
+    char psz_format_bool[sizeof(COLOR_FORMAT_STRING_BOOL)];
     char psz_buffer[10000];
     char psz_short[4];
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);

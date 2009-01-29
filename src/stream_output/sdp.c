@@ -267,7 +267,7 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfgpref,
     if (cfglen > 100)
         return NULL;
 
-    char varname[cfglen + sizeof ("description") + 1], *subvar = varname + cfglen;
+    char varname[cfglen + sizeof ("description")], *subvar = varname + cfglen;
     strcpy (varname, cfgpref);
 
     strcpy (subvar, "name");
