@@ -212,11 +212,11 @@ int playlist_MLDump( playlist_t *p_playlist )
     if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
     if( !psz_datadir ) /* XXX: This should never happen */
     {
-        msg_Err( p_playlist, "no data directory, cannot save media library") ;
+        msg_Err( p_playlist, "no data directory, cannot save media library");
         return VLC_EGENERIC;
     }
 
-    char psz_dirname[ strlen( psz_datadir ) + sizeof( DIR_SEP "ml.xspf")];
+    char psz_dirname[strlen( psz_datadir ) + sizeof( DIR_SEP "ml.xspf" ) + 1];
     strcpy( psz_dirname, psz_datadir );
     free( psz_datadir );
     if( config_CreateDir( (vlc_object_t *)p_playlist, psz_dirname ) )
