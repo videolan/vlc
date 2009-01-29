@@ -220,6 +220,7 @@ void VLMDialog::addVLMItem()
     int repeatnum = scherepeatnumber->value();
     int repeatdays = repeatDays->value();
     VLMAWidget * vlmAwidget;
+    outputText.remove( ":sout=" );
 
     switch( type )
     {
@@ -436,7 +437,7 @@ void VLMDialog::saveModifications()
     if( vlmObj )
     {
         vlmObj->input = ui.inputLedit->text();
-        vlmObj->output = ui.outputLedit->text();
+        vlmObj->output = ui.outputLedit->text().remove( ":sout=" );
         vlmObj->setChecked( ui.enableCheck->isChecked() );
         vlmObj->b_enabled = ui.enableCheck->isChecked();
         switch( vlmObj->type )
