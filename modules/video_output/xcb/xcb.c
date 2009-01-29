@@ -406,13 +406,26 @@ static int Init (vout_thread_t *vout)
         default:
             assert (0);
     }
-
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
-    vout->output.i_width = width;
-    vout->output.i_height = height;
-    assert (height > 0);
-    vout->output.i_aspect = width * VOUT_ASPECT_FACTOR / height;
+
     /* FIXME: I don't get the subtlety between output and fmt_out here */
+    vout->fmt_out.i_chroma = vout->output.i_chroma;
+    vout->fmt_out.i_visible_width = width;
+    vout->fmt_out.i_visible_height = height;
+    vout->fmt_out.i_sar_num = vout->fmt_out.i_sar_den = 1;
+
+    vout->output.i_width = vout->fmt_out.i_width =
+        width * vout->fmt_in.i_width / vout->fmt_in.i_visible_width;
+    vout->output.i_height = vout->fmt_out.i_height =
+        height * vout->fmt_in.i_height / vout->fmt_in.i_visible_height;
+    vout->fmt_out.i_x_offset =
+        width * vout->fmt_in.i_x_offset / vout->fmt_in.i_visible_width;
+    p_vout->fmt_out.i_y_offset =
+        height * vout->fmt_in.i_y_offset / vout->fmt_in.i_visible_height;
+
+    assert (height > 0);
+    vout->output.i_aspect = vout->fmt_out.i_aspect =
+        width * VOUT_ASPECT_FACTOR / height;
 
     /* Create window */
     const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
