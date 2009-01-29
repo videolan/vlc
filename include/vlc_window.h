@@ -37,6 +37,7 @@ struct vout_window_t
     module_t      *module;
     vout_thread_t *vout;
     void          *handle; /* OS-specific Window handle */
+    void          *p_sys;  /* window provider private data */
 
     unsigned       width;  /* pixels width */
     unsigned       height; /* pixels height */
