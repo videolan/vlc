@@ -37,4 +37,12 @@ libxcb_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM) \
 	$(XCB_AUX_LIBS) $(XCB_IMAGE_LIBS)
 libxcb_plugin_la_DEPENDENCIES =
-EXTRA_LTLIBRARIES += libxcb_plugin.la
+
+libxcb_window_plugin_la_SOURCES = xcb/window.c
+libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XCB_CFLAGS) $(XCB_AUX_CFLAGS)
+libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(XCB_LIBS) $(XCB_AUX_LIBS)
+libxcb_window_plugin_la_DEPENDENCIES =
+
+EXTRA_LTLIBRARIES += libxcb_plugin.la libxcb_window_plugin.la
