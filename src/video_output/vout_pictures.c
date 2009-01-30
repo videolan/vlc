@@ -461,15 +461,29 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
         return;
     }
 
-    if( p_vout->b_scale )
+    bool b_autoscale = p_vout->b_autoscale;
+    int i_zoom = p_vout->i_zoom;
+
+    /* be realistic, scaling factor confined between .2 and 10. */
+    if( i_zoom > 10 * ZOOM_FP_FACTOR  || i_zoom <  ZOOM_FP_FACTOR / 5 )
+        i_zoom = ZOOM_FP_FACTOR;
+
+    if( b_autoscale )
     {
         *pi_width = i_width;
         *pi_height = i_height;
     }
-    else
+    else if( i_zoom == ZOOM_FP_FACTOR )  /* original size */
     {
         *pi_width = __MIN( i_width, p_vout->fmt_in.i_visible_width );
         *pi_height = __MIN( i_height, p_vout->fmt_in.i_visible_height );
+    }
+    else 
+    {
+        *pi_width = 
+             p_vout->fmt_in.i_visible_width * i_zoom / ZOOM_FP_FACTOR;
+        *pi_height =
+             p_vout->fmt_in.i_visible_height * i_zoom / ZOOM_FP_FACTOR;
     }
 
      int64_t i_scaled_width = p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *

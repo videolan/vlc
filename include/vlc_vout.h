@@ -506,7 +506,8 @@ struct vout_thread_t
     /**@{*/
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
-    bool                b_scale;                  /**< allow picture scaling */
+    bool                b_autoscale;        /**< auto scaling picture or not */
+    int                 i_zoom;               /**< scaling factor if no auto */
     bool                b_fullscreen;         /**< toogle fullscreen display */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
@@ -566,12 +567,14 @@ struct vout_thread_t
 #define VOUT_INFO_CHANGE        0x0001
 /** b_interface changed */
 #define VOUT_INTF_CHANGE        0x0004
-/** b_scale changed */
+/** b_autoscale changed */
 #define VOUT_SCALE_CHANGE       0x0008
 /** b_cursor changed */
 #define VOUT_CURSOR_CHANGE      0x0020
 /** b_fullscreen changed */
 #define VOUT_FULLSCREEN_CHANGE  0x0040
+/** i_zoom changed */
+#define VOUT_ZOOM_CHANGE        0x0080
 /** size changed */
 #define VOUT_SIZE_CHANGE        0x0200
 /** depth changed */
@@ -595,6 +598,9 @@ struct vout_thread_t
 #define VOUT_ALIGN_VMASK        0x000C
 
 #define MAX_JITTER_SAMPLES      20
+
+/* scaling factor (applied to i_zoom in vout_thread_t) */
+#define ZOOM_FP_FACTOR          1000
 
 /*****************************************************************************
  * Prototypes

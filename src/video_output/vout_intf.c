@@ -400,14 +400,20 @@ void vout_IntfInit( vout_thread_t *p_vout )
         var_TriggerCallback( p_vout, "aspect-ratio" );
     free( old_val.psz_string );
 
-    /* Add a variable to indicate if scaling video is activated or not */
-    var_Create( p_vout, "scaling", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
+    /* Add variables to manage scaling video */
+    var_Create( p_vout, "autoscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Scaling video");
-    var_Change( p_vout, "scaling", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "scaling", ScalingCallback, NULL );
-    var_Get( p_vout, "scaling", &val );
-    p_vout->b_scale = val.b_bool;
+    text.psz_string = _("Autoscale video");
+    var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "autoscale", ScalingCallback, NULL );
+    p_vout->b_autoscale = var_GetBool( p_vout, "autoscale" );
+
+    var_Create( p_vout, "scale", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT
+                | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Scale factor");
+    var_Change( p_vout, "scale", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "scale", ScalingCallback, NULL );
+    p_vout->i_zoom = (int)( ZOOM_FP_FACTOR * var_GetFloat( p_vout, "scale" ) );
 
     /* Initialize the dimensions of the video window */
     InitWindowSize( p_vout, &p_vout->i_window_width,
@@ -1215,11 +1221,18 @@ static int ScalingCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    (void)oldval; (void)newval; (void)p_data;
 
     vlc_mutex_lock( &p_vout->change_lock );
 
-    p_vout->b_scale = newval.b_bool;
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
+    if( !strcmp( psz_cmd, "autoscale" ) )
+    {
+        p_vout->i_changes |= VOUT_SCALE_CHANGE;
+    }
+    else if( !strcmp( psz_cmd, "scale" ) )
+    {
+        p_vout->i_changes |= VOUT_ZOOM_CHANGE;
+    }
 
     vlc_mutex_unlock( &p_vout->change_lock );
 

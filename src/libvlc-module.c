@@ -510,9 +510,14 @@ static const char *const ppsz_pos_descriptions[] =
     "aspect, or a float value (1.25, 1.3333, etc.) expressing pixel " \
     "squareness.")
 
-#define SCALING_TEXT N_("Video scaling")
-#define SCALING_LONGTEXT N_( \
-    "This enables upscaling a video in a given window.")
+#define AUTOSCALE_TEXT N_("Video Auto Scaling")
+#define AUTOSCALE_LONGTEXT N_( \
+    "Forces video scaling to fit a given window.")
+
+#define SCALEFACTOR_TEXT N_("Video scale factor")
+#define SCALEFACTOR_LONGTEXT N_( \
+    "scale factor used if --no-auto-scale is selected." \
+    "Default value is 1.0 (original video size).")
 
 #define CUSTOM_CROP_RATIOS_TEXT N_("Custom crop ratios list")
 #define CUSTOM_CROP_RATIOS_LONGTEXT N_( \
@@ -1348,8 +1353,12 @@ static const char *const ppsz_albumart_descriptions[] =
 #define ASPECT_RATIO_KEY_LONGTEXT N_("Cycle through a predefined list of source aspect ratios.")
 #define CROP_KEY_TEXT N_("Cycle video crop")
 #define CROP_KEY_LONGTEXT N_("Cycle through a predefined list of crop formats.")
-#define TOGGLE_SCALING_KEY_TEXT N_("Toggle upscaling")
-#define TOGGLE_SCALING_KEY_LONGTEXT N_("Activate or deactivate upscaling.")
+#define TOGGLE_AUTOSCALE_KEY_TEXT N_("Toggle autoscaling")
+#define TOGGLE_AUTOSCALE_KEY_LONGTEXT N_("Activate or deactivate autoscaling.")
+#define SCALE_UP_KEY_TEXT N_("Increase scale factor")
+#define SCALE_UP_KEY_LONGTEXT N_("Increase scale factor.")
+#define SCALE_DOWN_KEY_TEXT N_("Decrease scale factor")
+#define SCALE_DOWN_KEY_LONGTEXT N_("Decrease scale factor.")
 #define DEINTERLACE_KEY_TEXT N_("Cycle deinterlace modes")
 #define DEINTERLACE_KEY_LONGTEXT N_("Cycle through deinterlace modes.")
 #define INTF_SHOW_KEY_TEXT N_("Show interface")
@@ -1604,7 +1613,9 @@ vlc_module_begin ()
     add_string( "aspect-ratio", NULL, NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, false )
         change_safe ()
-    add_bool( "scaling", true, NULL, SCALING_TEXT, SCALING_LONGTEXT, false )
+    add_bool( "autoscale", true, NULL, AUTOSCALE_TEXT, AUTOSCALE_LONGTEXT, false )
+        change_safe ()
+    add_float( "scale", 1.0, NULL, SCALEFACTOR_TEXT, SCALEFACTOR_LONGTEXT, false )
         change_safe ()
     add_string( "monitor-par", NULL, NULL,
                 MASPECT_RATIO_TEXT, MASPECT_RATIO_LONGTEXT, true )
@@ -2133,7 +2144,9 @@ vlc_module_begin ()
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_ASPECT_RATIO       'a'
 #   define KEY_CROP               'c'
-#   define KEY_TOGGLE_SCALING     'o'
+#   define KEY_TOGGLE_AUTOSCALE   'o'
+#   define KEY_SCALE_UP           KEY_MODIFIER_ALT|'o'
+#   define KEY_SCALE_DOWN         KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|'o'
 #   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          KEY_MODIFIER_SHIFT|'i'
@@ -2245,7 +2258,9 @@ vlc_module_begin ()
 #   define KEY_SUBTITLE_TRACK     'v'
 #   define KEY_ASPECT_RATIO       'a'
 #   define KEY_CROP               'c'
-#   define KEY_TOGGLE_SCALING     'o'
+#   define KEY_TOGGLE_AUTOSCALE   'o'
+#   define KEY_SCALE_UP           KEY_MODIFIER_ALT|'o'
+#   define KEY_SCALE_DOWN         KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|'o'
 #   define KEY_DEINTERLACE        'd'
 #   define KEY_INTF_SHOW          'i'
 #   define KEY_INTF_HIDE          KEY_MODIFIER_SHIFT|'i'
@@ -2403,8 +2418,12 @@ vlc_module_begin ()
              ASPECT_RATIO_KEY_TEXT, ASPECT_RATIO_KEY_LONGTEXT, false )
     add_key( "key-crop", KEY_CROP, NULL,
              CROP_KEY_TEXT, CROP_KEY_LONGTEXT, false )
-    add_key( "key-toggle-scaling", KEY_TOGGLE_SCALING, NULL,
-             TOGGLE_SCALING_KEY_TEXT, TOGGLE_SCALING_KEY_LONGTEXT, false )
+    add_key( "key-toggle-autoscale", KEY_TOGGLE_AUTOSCALE, NULL,
+             TOGGLE_AUTOSCALE_KEY_TEXT, TOGGLE_AUTOSCALE_KEY_LONGTEXT, false )
+    add_key( "key-incr-scalefactor", KEY_SCALE_UP, NULL,
+             SCALE_UP_KEY_TEXT, SCALE_UP_KEY_LONGTEXT, false )
+    add_key( "key-decr-scalefactor", KEY_SCALE_DOWN, NULL,
+             SCALE_DOWN_KEY_TEXT, SCALE_DOWN_KEY_LONGTEXT, false )
     add_key( "key-deinterlace", KEY_DEINTERLACE, NULL,
              DEINTERLACE_KEY_TEXT, DEINTERLACE_KEY_LONGTEXT, false )
     add_key( "key-intf-show", KEY_INTF_SHOW, NULL,
@@ -2744,7 +2763,9 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-menu-down", ACTIONID_MENU_DOWN, 0, },
     { "key-menu-select", ACTIONID_MENU_SELECT, 0, },
     { "key-audiodevice-cycle", ACTIONID_AUDIODEVICE_CYCLE, 0, },
-    { "key-toggle-scaling", ACTIONID_TOGGLE_SCALING, 0, },
+    { "key-toggle-autoscale", ACTIONID_TOGGLE_AUTOSCALE, 0, },
+    { "key-incr-scalefactor", ACTIONID_SCALE_UP, 0, },
+    { "key-decr-scalefactor", ACTIONID_SCALE_DOWN, 0, },
     { NULL, 0, 0, }
 };
 

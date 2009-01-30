@@ -190,7 +190,8 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->render.i_aspect = p_vout->render.i_aspect;
     p_sys->p_vout->fmt_render = p_vout->fmt_render;
     p_sys->p_vout->fmt_in = p_vout->fmt_in;
-    p_sys->p_vout->b_scale = p_vout->b_scale;
+    p_sys->p_vout->b_autoscale = p_vout->b_autoscale;
+    p_sys->p_vout->i_zoom = p_vout->i_zoom;
     p_sys->p_vout->i_alignment = p_vout->i_alignment;
 
     psz = config_GetPsz( p_vout, "opengl-provider" );

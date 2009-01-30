@@ -609,10 +609,44 @@ static void Run( intf_thread_t *p_intf )
                 }
                 free( val.psz_string );
             }
-            else if( i_action == ACTIONID_TOGGLE_SCALING && p_vout )
+            else if( i_action == ACTIONID_TOGGLE_AUTOSCALE && p_vout )
             {
-                bool b_scaling = var_GetBool( p_vout, "scaling" );
-                var_SetBool( p_vout, "scaling", !b_scaling );
+                float f_scalefactor = var_GetFloat( p_vout, "scale" );
+                if ( f_scalefactor != 1.0 )
+                {
+                    var_SetFloat( p_vout, "scale", 1.0 );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                         _("Zooming reset") );
+                }
+                else
+                {
+                    bool b_autoscale = !var_GetBool( p_vout, "autoscale" );
+                    var_SetBool( p_vout, "autoscale", b_autoscale );
+                    if( b_autoscale )
+                        vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                         _("Scaled to screen") );
+                    else
+                        vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                         _("Original Size") );
+                }
+            }
+            else if( i_action == ACTIONID_SCALE_UP && p_vout )
+            {
+               float f_scalefactor;
+
+               f_scalefactor = var_GetFloat( p_vout, "scale" );
+               if( f_scalefactor < 10. )
+                   f_scalefactor += .1;
+               var_SetFloat( p_vout, "scale", f_scalefactor );
+            }
+            else if( i_action == ACTIONID_SCALE_DOWN && p_vout )
+            {
+               float f_scalefactor;
+
+               f_scalefactor = var_GetFloat( p_vout, "scale" );
+               if( f_scalefactor > .3 )
+                   f_scalefactor -= .1;
+               var_SetFloat( p_vout, "scale", f_scalefactor );
             }
             else if( i_action == ACTIONID_DEINTERLACE && p_vout )
             {
