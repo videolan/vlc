@@ -225,12 +225,18 @@ static int CreateVout( vlc_object_t *p_this )
     var_Create( p_sys->p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "video-on-top",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_sys->p_vout, "autoscale",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_sys->p_vout, "scale",
+                VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
 
     var_AddCallback( p_sys->p_vout, "mouse-x", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-y", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-moved", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-clicked", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-button-down", SendEvents, p_vout );
+    var_AddCallback( p_vout, "autoscale", SendEvents, p_sys->p_vout );
+    var_AddCallback( p_vout, "scale", SendEvents, p_sys->p_vout );
 
     return VLC_SUCCESS;
 }
@@ -455,9 +461,27 @@ static int Manage( vout_thread_t *p_vout )
 // to align in real time in OPENGL
     if (p_sys->p_vout->i_alignment != p_vout->i_alignment)
     {
-        p_vout->i_changes = VOUT_CROP_CHANGE;        //to force change
+        p_vout->i_changes |= VOUT_CROP_CHANGE;        //to force change
         p_sys->p_vout->i_alignment = p_vout->i_alignment;    
     }
+
+    /* forward signal that autoscale toggle has changed */
+    if (p_vout->i_changes & VOUT_SCALE_CHANGE )
+    {
+        p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
+
+        p_sys->p_vout->i_changes |= VOUT_SCALE_CHANGE;
+    }
+
+    /* forward signal that scale has changed */
+    if (p_vout->i_changes & VOUT_ZOOM_CHANGE )
+    {
+        p_vout->i_changes &= ~VOUT_ZOOM_CHANGE;
+
+        p_sys->p_vout->i_changes |= VOUT_ZOOM_CHANGE;
+    }
+
+
     return i_ret;
 }
 
