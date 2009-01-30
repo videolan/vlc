@@ -90,11 +90,15 @@ static int SetParentVal( vlc_object_t *p_this, char const *psz_var,
 
 #define ADD_PARENT_CALLBACKS( handler ) \
     var_AddCallback( p_vout, "fullscreen", handler, NULL );                   \
+    var_AddCallback( p_vout, "autoscale", handler, NULL );                    \
+    var_AddCallback( p_vout, "scale", handler, NULL );                 \
     var_AddCallback( p_vout, "aspect-ratio", handler, NULL );                 \
     var_AddCallback( p_vout, "crop", handler, NULL );
 
 #define DEL_PARENT_CALLBACKS( handler ) \
     var_DelCallback( p_vout, "fullscreen", handler, NULL );                   \
+    var_DelCallback( p_vout, "autoscale", handler, NULL );                    \
+    var_DelCallback( p_vout, "scale", handler, NULL );                 \
     var_DelCallback( p_vout, "aspect-ratio", handler, NULL );                 \
     var_DelCallback( p_vout, "crop", handler, NULL );
 
