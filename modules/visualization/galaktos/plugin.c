@@ -218,7 +218,6 @@ static void* Thread( vlc_object_t *p_this )
     p_thread->p_opengl->render.i_width = p_thread->i_width;
     p_thread->p_opengl->render.i_height = p_thread->i_width;
     p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
-    p_thread->p_opengl->b_scale = true;
     p_thread->p_opengl->b_fullscreen = false;
     p_thread->p_opengl->i_alignment = 0;
     p_thread->p_opengl->fmt_in.i_sar_num = 1;
