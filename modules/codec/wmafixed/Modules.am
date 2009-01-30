@@ -1,0 +1,3 @@
+SOURCES_wma_fixed = asf.h bswap.h fft.h mdct.h wma.c wmadeci.c bitstream.c \
+  wmadata.h wmafixed.c bitstream.h fft.c mdct.c \
+  wmadec.h wmafixed.h

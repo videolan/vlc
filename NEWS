@@ -15,6 +15,7 @@ New Decoders:
  * Blu-Ray Linear PCM
  * QCELP (Qualcomm PureVoice)
  * Real Video 3.0 & 4.0
+ * WMA v1/2 fixed point integer
 
 Demuxers:
  * Support for Dirac and RealVideo in Matroska files

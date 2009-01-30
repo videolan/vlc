@@ -31,7 +31,7 @@ dnl automake behavior, you've likely never heard of maintainer mode, so we
 dnl can't expect you to enable it manually.
 
 AS_IF([test "x${enable_maintainer_mode}" != "xno"],
-	[enable_maintainer_mode="yes"])
+    [enable_maintainer_mode="yes"])
 AM_MAINTAINER_MODE
 
 dnl
@@ -212,8 +212,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([libvlc],[-Wl,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
-      AS_HELP_STRING([--enable-macosx-defaults],[Build the default configuration
-		     on Mac OS X (default enabled)]))
+      AS_HELP_STRING([--enable-macosx-defaults],[Build the default configuration on Mac OS X (default enabled)]))
     if test "x${enable_macosx_defaults}" != "xno"
     then
         echo ""
@@ -1086,6 +1085,11 @@ case "${host_cpu}" in
   "")
     ARCH=unknown
     ;;
+  arm*)
+    dnl use arm assembly
+    VLC_ADD_CFLAGS([wma_fixed],[-DCPU_ARM])
+    ARCH="${host_cpu}"
+    ;;
   *)
     ARCH="${host_cpu}"
     ;;
@@ -1471,7 +1475,7 @@ dnl - Others: test should fail
 
   AC_CHECK_HEADERS(altivec.h)
   CPPFLAGS="${CPPFLAGS_save}"
-  
+
   AS_IF([test "${ac_cv_c_altivec}" != "no"], [
     AC_DEFINE(CAN_COMPILE_C_ALTIVEC, 1,
               [Define to 1 if C AltiVec extensions are available.])
@@ -2202,9 +2206,9 @@ then
     if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
     then
       test -z "${with_opencv_tree}" && AC_MSG_ERROR([You have to specify --with-opencv-tree])
-	  AC_MSG_CHECKING(for opencv in ${with_opencv_tree})
-	  if test -f ${with_opencv_tree}/cv/include/cv.h -a -f ${with_opencv_tree}/cxcore/include/cxcore.h \
-	    -a -f ${with_opencv_tree}/cvaux/include/cvaux.h -a -f ${with_opencv_tree}/otherlibs/highgui/highgui.h
+      AC_MSG_CHECKING(for opencv in ${with_opencv_tree})
+      if test -f ${with_opencv_tree}/cv/include/cv.h -a -f ${with_opencv_tree}/cxcore/include/cxcore.h \
+        -a -f ${with_opencv_tree}/cvaux/include/cvaux.h -a -f ${with_opencv_tree}/otherlibs/highgui/highgui.h
       then
         AC_MSG_RESULT(yes)
         VLC_ADD_PLUGIN([opencv_wrapper])
@@ -2420,7 +2424,6 @@ then
   then
     AC_DEFINE_UNQUOTED(VIDEODEV2_H_FILE, "${with_videodev2}", [Location of videodev2.h])
   fi
-    
 
   AC_CACHE_CHECK([for new linux/videodev2.h],
       [ac_cv_new_linux_videodev2_h],
@@ -2888,6 +2891,16 @@ dnl  Codec plugins
 dnl
 
 AC_ARG_WITH(,[Codec plugins:])
+
+dnl
+dnl wmafixed plugin
+dnl
+AC_ARG_ENABLE(wma-fixed,
+  [  --enable-wma-fixed      libwma-fixed module (default disabled)])
+if test "${enable_wma_fixed}" = "yes"
+then
+  VLC_ADD_PLUGIN([wma_fixed])
+fi
 
 dnl
 dnl  mad plugin
@@ -5906,6 +5919,7 @@ AC_CONFIG_FILES([
   modules/codec/dmo/Makefile
   modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
+  modules/codec/wmafixed/Makefile
   modules/codec/xvmc/Makefile
   modules/control/Makefile
   modules/control/http/Makefile

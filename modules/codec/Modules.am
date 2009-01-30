@@ -1,4 +1,4 @@
-SUBDIRS = cmml dmo avcodec subtitles spudec xvmc
+SUBDIRS = cmml dmo avcodec subtitles spudec wmafixed xvmc
 SOURCES_a52 = a52.c
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c
