@@ -305,6 +305,28 @@ static int Manage( vout_thread_t *p_vout )
         vlc_mutex_unlock( &p_vout->p_sys->lock );
     }
 
+    /* autoscale toggle */
+    if( p_vout->i_changes & VOUT_SCALE_CHANGE )
+    {
+        p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
+
+        p_vout->b_autoscale = var_GetBool( p_vout, "autoscale" );
+        p_vout->i_zoom = (int) ZOOM_FP_FACTOR;
+
+        UpdateRects( p_vout, true );
+    }
+
+    /* scaling factor */
+    if( p_vout->i_changes & VOUT_ZOOM_CHANGE )
+    {
+        p_vout->i_changes &= ~VOUT_ZOOM_CHANGE;
+
+        p_vout->b_autoscale = false;
+        p_vout->i_zoom =
+            (int)( ZOOM_FP_FACTOR * var_GetFloat( p_vout, "scale" ) );
+        UpdateRects( p_vout, true );
+    }
+
     /* Check for cropping / aspect changes */
     if( p_vout->i_changes & VOUT_CROP_CHANGE ||
         p_vout->i_changes & VOUT_ASPECT_CHANGE )
