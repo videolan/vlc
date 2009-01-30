@@ -2903,6 +2903,16 @@ then
 fi
 
 dnl
+dnl shine fixed point mp3 encoder
+dnl
+AC_ARG_ENABLE(shine,
+  [  --enable-shine          shine mp3 encoding module (default disabled)])
+if test "${enable_shine}" = "yes"
+then
+  VLC_ADD_PLUGIN([shine])
+fi
+
+dnl
 dnl  mad plugin
 dnl
 AC_ARG_ENABLE(mad,
@@ -5917,6 +5927,7 @@ AC_CONFIG_FILES([
   modules/codec/avcodec/Makefile
   modules/codec/cmml/Makefile
   modules/codec/dmo/Makefile
+  modules/codec/shine/Makefile
   modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
   modules/codec/wmafixed/Makefile

@@ -24,6 +24,7 @@ Demuxers:
 
 Encoders:
  * Dirac encoding using libdirac (supported in Ogg and in TS)
+ * Shine mp3 fixed point encoder
 
 Access:
  * RTSP authentication with Darwin Streaming Server
