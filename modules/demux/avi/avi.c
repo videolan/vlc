@@ -2375,7 +2375,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
     off_t i_movi_end;
 
     mtime_t i_dialog_update;
-    int     i_dialog_id;
+    interaction_dialog_t *p_dialog = NULL;
 
     p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
     p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
@@ -2400,10 +2400,9 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
 
     /* Only show dialog if AVI is > 10MB */
-    i_dialog_id = -1;
     i_dialog_update = mdate();
     if( stream_Size( p_demux->s ) > 10000000 )
-        i_dialog_id = intf_IntfProgress( p_demux, _("Fixing AVI Index..."), 0.0 );
+        p_dialog = intf_IntfProgress( p_demux, _("Fixing AVI Index..."), 0.0 );
 
     for( ;; )
     {
@@ -2413,14 +2412,14 @@ static void AVI_IndexCreate( demux_t *p_demux )
             break;
 
         /* Don't update/check dialog too often */
-        if( i_dialog_id > 0 && mdate() - i_dialog_update > 100000 )
+        if( p_dialog && mdate() - i_dialog_update > 100000 )
         {
-            if( intf_ProgressIsCancelled( p_demux, i_dialog_id ) )
+            if( intf_ProgressIsCancelled( p_demux, p_dialog ) )
                 break;
 
             double f_pos = 100.0 * stream_Tell( p_demux->s ) /
                            stream_Size( p_demux->s );
-            intf_ProgressUpdate( p_demux, i_dialog_id,
+            intf_ProgressUpdate( p_demux, p_dialog,
                                  _( "Fixing AVI Index..." ), f_pos, -1 );
 
             i_dialog_update = mdate();
@@ -2484,8 +2483,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
     }
 
 print_stat:
-    if( i_dialog_id > 0 )
-        intf_UserHide( p_demux, i_dialog_id );
+    if( p_dialog != NULL )
+        intf_UserHide( p_demux, p_dialog );
 
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {

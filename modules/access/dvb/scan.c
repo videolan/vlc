@@ -126,7 +126,7 @@ int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_pa
 
     p_scan->p_obj = VLC_OBJECT(p_obj);
     p_scan->i_index = 0;
-    p_scan->i_dialog_id = -1;
+    p_scan->p_dialog = NULL;
     TAB_INIT( p_scan->i_service, p_scan->pp_service );
     p_scan->parameter = *p_parameter;
     p_scan->i_time_start = mdate();
@@ -135,8 +135,8 @@ int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_pa
 }
 void scan_Clean( scan_t *p_scan )
 {
-    if( p_scan->i_dialog_id >= 0 )
-        intf_UserHide( p_scan->p_obj, p_scan->i_dialog_id );
+    if( p_scan->p_dialog != NULL )
+        intf_UserHide( p_scan->p_obj, p_scan->p_dialog );
 
     for( int i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
@@ -317,10 +317,10 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
         if( i_eta >= 0 )
             msg_Info( p_scan->p_obj, "Scan ETA %s | %f", secstotimestr( psz_eta, i_eta/1000000 ), f_position * 100 );
 
-        if( p_scan->i_dialog_id < 0 )
-            p_scan->i_dialog_id = intf_UserProgress( p_scan->p_obj, _("Scanning DVB-T"), psz_text, 100.0 * f_position, -1 );
+        if( p_scan->p_dialog == NULL )
+            p_scan->p_dialog = intf_UserProgress( p_scan->p_obj, _("Scanning DVB-T"), psz_text, 100.0 * f_position, -1 );
         else
-            intf_ProgressUpdate( p_scan->p_obj, p_scan->i_dialog_id, psz_text, 100 * f_position, -1 );
+            intf_ProgressUpdate( p_scan->p_obj, p_scan->p_dialog, psz_text, 100 * f_position, -1 );
         free( psz_text );
     }
 
@@ -330,7 +330,7 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
 
 bool scan_IsCancelled( scan_t *p_scan )
 {
-    return p_scan->i_dialog_id >= 0 && intf_ProgressIsCancelled( p_scan->p_obj, p_scan->i_dialog_id );
+    return p_scan->p_dialog && intf_ProgressIsCancelled( p_scan->p_obj, p_scan->p_dialog );
 }
 
 static scan_service_t *ScanFindService( scan_t *p_scan, int i_service_start, int i_program )

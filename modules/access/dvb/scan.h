@@ -127,8 +127,8 @@ typedef struct
 typedef struct
 {
     vlc_object_t *p_obj;
+    interaction_dialog_t *p_dialog;
     int64_t i_index;
-    int i_dialog_id;
     scan_parameter_t parameter;
     int64_t i_time_start;
 
