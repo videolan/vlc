@@ -514,7 +514,7 @@ AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(fcntl)
 
 dnl Check for Linux system calls
-AC_CHECK_FUNCS([vmsplice eventfd])
+AC_CHECK_FUNCS([vmsplice])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 

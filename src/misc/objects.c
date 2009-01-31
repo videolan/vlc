@@ -53,10 +53,22 @@
 # include <fcntl.h>
 # include <errno.h> /* ENOSYS */
 #endif
-#ifdef HAVE_SYS_EVENTFD_H
-# include <sys/eventfd.h>
-#endif
+
 #include <assert.h>
+
+#ifdef __linux__
+# if defined (HAVE_SYS_EVENTFD_H)
+#  include <sys/eventfd.h>
+# else
+#  include <sys/syscall.h>
+static inline int eventfd (unsigned int initval, int flags)
+{
+    return syscall (SYS_eventfd, initval, flags);
+}
+# endif
+# define HAVE_EVENTFD 1
+#endif
+
 
 /*****************************************************************************
  * Local prototypes
@@ -392,7 +404,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         /* This can only ever happen if someone killed us without locking: */
         assert (internals->pipes[1] == -1);
 
-#ifdef HAVE_SYS_EVENTFD_H
+#ifdef HAVE_EVENTFD
         internals->pipes[0] = internals->pipes[1] = eventfd (0, 0);
         if (internals->pipes[0] == -1)
 #endif
