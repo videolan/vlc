@@ -2414,12 +2414,12 @@ static void AVI_IndexCreate( demux_t *p_demux )
         /* Don't update/check dialog too often */
         if( p_dialog && mdate() - i_dialog_update > 100000 )
         {
-            if( intf_ProgressIsCancelled( p_demux, p_dialog ) )
+            if( intf_ProgressIsCancelled( p_dialog ) )
                 break;
 
             double f_pos = 100.0 * stream_Tell( p_demux->s ) /
                            stream_Size( p_demux->s );
-            intf_ProgressUpdate( p_demux, p_dialog,
+            intf_ProgressUpdate( p_dialog,
                                  _( "Fixing AVI Index..." ), f_pos, -1 );
 
             i_dialog_update = mdate();
@@ -2484,7 +2484,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
 print_stat:
     if( p_dialog != NULL )
-        intf_UserHide( p_demux, p_dialog );
+        intf_UserHide( p_dialog );
 
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {

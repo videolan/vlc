@@ -294,12 +294,9 @@ VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*
 #define intf_IntfProgress( a, b, c ) __intf_Progress( VLC_OBJECT(a), NULL, b,c, -1 )
 #define intf_UserProgress( a, b, c, d, e ) __intf_Progress( VLC_OBJECT(a),b,c,d,e )
 VLC_EXPORT( interaction_dialog_t *, __intf_Progress,( vlc_object_t*, const char*, const char*, float, int) );
-#define intf_ProgressUpdate( a, b, c, d, e ) __intf_ProgressUpdate( VLC_OBJECT(a),b,c,d,e )
-VLC_EXPORT( void, __intf_ProgressUpdate,( vlc_object_t*, interaction_dialog_t *, const char*, float, int) );
-#define intf_ProgressIsCancelled( a, b ) __intf_UserProgressIsCancelled( VLC_OBJECT(a),b )
-VLC_EXPORT( bool, __intf_UserProgressIsCancelled,( vlc_object_t*, interaction_dialog_t * ) );
-#define intf_UserHide( a, b ) __intf_UserHide( VLC_OBJECT(a), b )
-VLC_EXPORT( void, __intf_UserHide,( vlc_object_t *, interaction_dialog_t * ));
+VLC_EXPORT( void, intf_ProgressUpdate,( interaction_dialog_t *, const char*, float, int) );
+VLC_EXPORT( bool, intf_ProgressIsCancelled,( interaction_dialog_t * ) );
+VLC_EXPORT( void, intf_UserHide,( interaction_dialog_t * ));
 
 /** @} */
 /** @} */

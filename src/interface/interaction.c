@@ -204,20 +204,17 @@ __intf_Progress( vlc_object_t *p_this, const char *psz_title,
 /**
  * Update a progress bar in a dialogue
  *
- * \param p_this           Parent vlc_object
  * \param p_dialog         Dialog
  * \param psz_status       New status
  * \param f_position       New position (0.0->100.0)
  * \param i_timeToGo       Time (in sec) to go until process is finished
  * \return                 nothing
  */
-void __intf_ProgressUpdate( vlc_object_t *p_this,
-                            interaction_dialog_t *p_dialog,
+void intf_ProgressUpdate( interaction_dialog_t *p_dialog,
                             const char *psz_status, float f_pos, int i_time )
 {
-    interaction_t *p_interaction = InteractionGet( p_this );
-
-    if( !p_interaction ) return;
+    interaction_t *p_interaction = InteractionGet( p_dialog->p_parent );
+    assert( p_interaction );
 
     vlc_object_lock( p_interaction );
     free( p_dialog->psz_description );
@@ -237,18 +234,15 @@ void __intf_ProgressUpdate( vlc_object_t *p_this,
  * Helper function to communicate dialogue cancellations between the
  * interface module and the caller
  *
- * \param p_this           Parent vlc_object
  * \param p_dialog         Dialog
  * \return                 Either true or false
  */
-bool __intf_UserProgressIsCancelled( vlc_object_t *p_this,
-                                     interaction_dialog_t *p_dialog )
+bool intf_ProgressIsCancelled( interaction_dialog_t *p_dialog )
 {
-    interaction_t *p_interaction = InteractionGet( p_this );
+    interaction_t *p_interaction = InteractionGet( p_dialog->p_parent );
     bool b_cancel;
 
-    if( !p_interaction ) return true;
-
+    assert( p_interaction );
     vlc_object_lock( p_interaction );
     b_cancel = p_dialog->b_cancelled;
     vlc_object_unlock( p_interaction );
@@ -329,15 +323,13 @@ int __intf_UserStringInput( vlc_object_t *p_this,
 /**
  * Hide an interaction dialog
  *
- * \param p_this the parent vlc object
  * \param p_dialog the dialog to hide
  * \return nothing
  */
-void __intf_UserHide( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
+void intf_UserHide( interaction_dialog_t *p_dialog )
 {
-    interaction_t *p_interaction = InteractionGet( p_this );
-
-    if( !p_interaction ) return;
+    interaction_t *p_interaction = InteractionGet( p_dialog->p_parent );
+    assert( p_interaction );
 
     vlc_object_lock( p_interaction );
     p_dialog->i_status = ANSWERED_DIALOG;
@@ -442,7 +434,7 @@ int interaction_Unregister( intf_thread_t *intf )
  * The following functions are local
  **********************************************************************/
 
-/* Get the interaction object. Create it if needed */
+/* Get the interaction object */
 static interaction_t * InteractionGet( vlc_object_t *p_this )
 {
     interaction_t *obj = libvlc_priv(p_this->p_libvlc)->p_interaction;
@@ -482,7 +474,7 @@ static void DialogDestroy( interaction_dialog_t *p_dialog )
  * if required */
 static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 {
-    interaction_t *p_interaction = InteractionGet( p_this );
+    interaction_t *p_interaction = InteractionGet( p_dialog->p_parent );
 
     if( !p_interaction )
         return VLC_EGENERIC;

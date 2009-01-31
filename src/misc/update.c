@@ -1597,7 +1597,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     vlc_object_lock( p_udt );
     while( vlc_object_alive( p_udt ) &&
            ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
-           !intf_ProgressIsCancelled( p_udt, p_progress ) )
+           !intf_ProgressIsCancelled( p_progress ) )
     {
         vlc_object_unlock( p_udt );
         if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
@@ -1614,7 +1614,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
                       p_update->release.psz_url, psz_downloaded, psz_size,
                       f_progress ) != -1 )
         {
-            intf_ProgressUpdate( p_udt, p_progress, psz_status, f_progress, 0 );
+            intf_ProgressUpdate( p_progress, psz_status, f_progress, 0 );
             free( psz_status );
         }
         free( psz_downloaded );
@@ -1626,13 +1626,13 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     p_file = NULL;
 
     if( vlc_object_alive( p_udt ) &&
-        !intf_ProgressIsCancelled( p_udt, p_progress ) )
+        !intf_ProgressIsCancelled( p_progress ) )
     {
         vlc_object_unlock( p_udt );
         if( asprintf( &psz_status, _("%s\nDone %s (100.0%%)"),
             p_update->release.psz_url, psz_size ) != -1 )
         {
-            intf_ProgressUpdate( p_udt, p_progress, psz_status, 100.0, 0 );
+            intf_ProgressUpdate( p_progress, psz_status, 100.0, 0 );
             p_progress = NULL
             free( psz_status );
         }
@@ -1725,7 +1725,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
 end:
     if( p_progress )
     {
-        intf_ProgressUpdate( p_udt, p_progress, _("Cancelled"), 100.0, 0 );
+        intf_ProgressUpdate( p_progress, _("Cancelled"), 100.0, 0 );
     }
     if( p_stream )
         stream_Delete( p_stream );

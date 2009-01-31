@@ -192,13 +192,13 @@ interaction_Unregister
 __intf_Create
 __intf_Eject
 __intf_Progress
-__intf_ProgressUpdate
+intf_ProgressIsCancelled
+intf_ProgressUpdate
 intf_RunThread
 intf_StopThread
 __intf_UserFatal
-__intf_UserHide
+intf_UserHide
 __intf_UserLoginPassword
-__intf_UserProgressIsCancelled
 __intf_UserStringInput
 __intf_UserWarn
 __intf_UserYesNo
