@@ -90,7 +90,7 @@ VLC_TYPE vlcbuf4[VLCBUF4SIZE][2];
  *
  */
 
-#ifdef CPU_ARM
+#ifdef __arm__
 static inline
 void vector_fmul_add_add(int32_t *dst, const int32_t *data,
                          const int32_t *window, int n)

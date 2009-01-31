@@ -1085,11 +1085,6 @@ case "${host_cpu}" in
   "")
     ARCH=unknown
     ;;
-  arm*)
-    dnl use arm assembly
-    VLC_ADD_CFLAGS([wma_fixed],[-DCPU_ARM])
-    ARCH="${host_cpu}"
-    ;;
   *)
     ARCH="${host_cpu}"
     ;;

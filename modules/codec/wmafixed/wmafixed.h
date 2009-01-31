@@ -49,7 +49,7 @@ int64_t fixdiv64(int64_t x, int64_t y);
 int32_t fixsqrt32(int32_t x);
 long fsincos(unsigned long phase, int32_t *cos);
 
-#ifdef CPU_ARM
+#ifdef __arm__
 
 /*Sign-15.16 format */
 
@@ -138,7 +138,7 @@ static inline int32_t fixmul32b(int32_t x, int32_t y)
 
 #endif
 
-#ifdef CPU_ARM
+#ifdef __arm__
 static inline
 void CMUL(int32_t *x, int32_t *y,
           int32_t  a, int32_t  b,

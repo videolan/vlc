@@ -32,7 +32,7 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#ifdef CPU_ARM
+#ifdef __arm__
 #define CONFIG_ALIGN 1
 #endif
 
