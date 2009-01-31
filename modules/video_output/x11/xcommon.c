@@ -1619,7 +1619,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( !p_vout->b_fullscreen )
     {
-        p_win->owner_window = vout_RequestWindow( p_vout, &p_win->i_x,
+        p_win->owner_window = vout_RequestXWindow( p_vout, &p_win->i_x,
                               &p_win->i_y, &p_win->i_width, &p_win->i_height );
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
         xsize_hints.base_height = xsize_hints.height = p_win->i_height;

@@ -669,7 +669,7 @@ static int InitWindow( vout_thread_t *p_vout )
 
         // Request window from interface
         p_sys->owner_window =
-            vout_RequestWindow( p_vout,
+            vout_RequestXWindow( p_vout,
                                 &p_sys->embedded_window.i_x,
                                 &p_sys->embedded_window.i_y,
                                 &p_sys->embedded_window.i_width,

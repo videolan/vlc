@@ -50,7 +50,7 @@ vlc_module_begin ()
     set_description (N_("(Experimental) XCB video window"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout_window", 10)
+    set_capability ("xwindow", 10)
     set_callbacks (Open, Close)
 
     add_string ("x11-display", NULL, NULL,
@@ -114,7 +114,7 @@ static void Close (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
     xcb_connection_t *conn = wnd->p_sys;
-    xcb_window_t window = (uintptr_t)wnd->handle;
+    xcb_window_t window = wnd->handle.xid;
 
     xcb_unmap_window (conn, window);
     xcb_destroy_window (conn, window);

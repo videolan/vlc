@@ -89,6 +89,7 @@ static int TitlePositionCallback( vlc_object_t *, char const *,
  * video within the resulting window, while in windowed mode.
  *
  * @param p_vout video output thread to create a window for
+ * @param psz_cap VLC module capability (window system type)
  * @param pi_x_hint pointer to store the recommended horizontal position [OUT]
  * @param pi_y_hint pointer to store the recommended vertical position [OUT]
  * @param pi_width_hint pointer to store the recommended width [OUT]
@@ -97,7 +98,7 @@ static int TitlePositionCallback( vlc_object_t *, char const *,
  * @return a vout_window_t object, or NULL in case of failure.
  * The window is released with vout_ReleaseWindow().
  */
-vout_window_t *vout_RequestWindow( vout_thread_t *p_vout,
+vout_window_t *vout_RequestWindow( vout_thread_t *p_vout, const char *psz_cap,
                           int *pi_x_hint, int *pi_y_hint,
                           unsigned int *pi_width_hint,
                           unsigned int *pi_height_hint )
@@ -125,10 +126,10 @@ vout_window_t *vout_RequestWindow( vout_thread_t *p_vout,
     wnd->pos_y = *pi_y_hint;
     vlc_object_attach (wnd, p_vout);
 
-    wnd->module = module_need (wnd, "vout_window", NULL, false);
+    wnd->module = module_need (wnd, psz_cap, NULL, false);
     if (wnd->module == NULL)
     {
-        msg_Dbg (wnd, "no window provider available");
+        msg_Dbg (wnd, "no \"%s\" window provider available", psz_cap);
         vlc_object_release (wnd);
         return NULL;
     }

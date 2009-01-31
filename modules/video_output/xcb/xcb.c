@@ -370,7 +370,7 @@ static int Init (vout_thread_t *vout)
     }
     else
     {
-        p_sys->embed = vout_RequestWindow (vout, &(int){ 0 }, &(int){ 0 },
+        p_sys->embed = vout_RequestXWindow (vout, &(int){ 0 }, &(int){ 0 },
                                             &width, &height);
         if (p_sys->embed == NULL)
         {

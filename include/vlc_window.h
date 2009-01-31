@@ -51,8 +51,22 @@ struct vout_window_t
     int (*control) (struct vout_window_t *, int, va_list);
 };
 
-VLC_EXPORT( vout_window_t *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
+VLC_EXPORT( vout_window_t *, vout_RequestWindow, ( vout_thread_t *, const char *, int *, int *, unsigned int *, unsigned int * ) );
 VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_window_t * ) );
 VLC_EXPORT( int, vout_ControlWindow, ( vout_window_t *, int, va_list ) );
+
+static inline vout_window_t *
+vout_RequestXWindow (vout_thread_t *vout,
+                     int *x, int *y, unsigned *w, unsigned *h)
+{
+    return vout_RequestWindow (vout, "xwindow", x, y, w, h);
+}
+
+static inline vout_window_t *
+vout_RequestHWND (vout_thread_t *vout,
+                  int *x, int *y, unsigned *w, unsigned *h)
+{
+    return vout_RequestWindow (vout, "hwnd", x, y, w, h);
+}
 
 #endif /* !LIBVLCCORE_WINDOW_H */

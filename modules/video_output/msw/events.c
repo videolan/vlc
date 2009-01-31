@@ -418,7 +418,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* If an external window was specified, we'll draw in it. */
     p_vout->p_sys->parent_window =
-        vout_RequestWindow( p_vout, &p_vout->p_sys->i_window_x,
+        vout_RequestHWND( p_vout, &p_vout->p_sys->i_window_x,
                             &p_vout->p_sys->i_window_y,
                             &p_vout->p_sys->i_window_width,
                             &p_vout->p_sys->i_window_height );

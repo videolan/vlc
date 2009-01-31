@@ -231,9 +231,16 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
+#if defined (Q_WS_X11)
+# define WID_CAPABILITY "xwindow"
+#elif defined (WIN32)
+# define WID_CAPABILITY "hwnd"
+#endif
+#ifdef WID_CAPABILITY
     add_submodule ()
-        set_capability( "vout_window", 50 )
+        set_capability( WID_CAPABILITY, 50 )
         set_callbacks( WindowOpen, WindowClose )
+#endif
 
 vlc_module_end ()
 
