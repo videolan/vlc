@@ -638,13 +638,13 @@ private:
  * Thou shall not call/resize/hide widgets from on another thread.
  * This is wrong, and this is THE reason to emit signals on those Video Functions
  **/
-void *MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
-                                   int *pi_y, unsigned int *pi_width,
-                                   unsigned int *pi_height )
+WId MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
+                                 int *pi_y, unsigned int *pi_width,
+                                 unsigned int *pi_height )
 {
     /* Request the videoWidget */
-    void *ret = videoWidget->request( p_nvout,pi_x, pi_y,
-                                      pi_width, pi_height, b_keep_size );
+    WId ret = videoWidget->request( p_nvout,pi_x, pi_y,
+                                    pi_width, pi_height, b_keep_size );
     if( ret ) /* The videoWidget is available */
     {
         /* Did we have a bg ? Hide it! */
@@ -689,9 +689,8 @@ void MainInterface::releaseVideoSlot( void )
 }
 
 /* Call from WindowControl function */
-int MainInterface::controlVideo( void *p_window, int i_query, va_list args )
+int MainInterface::controlVideo( int i_query, va_list args )
 {
-    VLC_UNUSED( p_window ); //FIXME remove this param
     int i_ret = VLC_SUCCESS;
     switch( i_query )
     {

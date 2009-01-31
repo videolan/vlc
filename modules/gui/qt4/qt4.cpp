@@ -516,10 +516,22 @@ static int WindowOpen (vlc_object_t *obj)
     MainInterface *p_mi = intf->p_sys->p_mi;
     msg_Dbg (obj, "requesting video...");
 
-    wnd->handle = p_mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
-                                      &wnd->width, &wnd->height);
-    if (!wnd->handle)
+#if defined (Q_WS_X11)
+    wnd->handle.xid = p_mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
+                                          &wnd->width, &wnd->height);
+    if (!wnd->handle.xid)
         return VLC_EGENERIC;
+
+#elif defined (WIN32)
+    wnd->handle.hwnd = p_mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
+                                           &wnd->width, &wnd->height);
+    if (!wnd->handle.hwnd)
+        return VLC_EGENERIC;
+
+#else
+    return VLC_EGENERIC;
+
+#endif
 
     wnd->control = WindowControl;
     wnd->p_private = p_mi;
@@ -531,7 +543,7 @@ static int WindowControl (vout_window_t *wnd, int query, va_list args)
     MainInterface *p_mi = (MainInterface *)wnd->p_private;
     QMutexLocker locker (&iface.lock);
 
-    return p_mi->controlVideo (wnd->handle, query, args);
+    return p_mi->controlVideo (query, args);
 }
 
 static void WindowClose (vlc_object_t *obj)

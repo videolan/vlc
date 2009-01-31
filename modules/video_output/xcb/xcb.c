@@ -377,7 +377,7 @@ static int Init (vout_thread_t *vout)
             msg_Err (vout, "cannot get window");
             return VLC_EGENERIC;
         }
-        p_sys->parent = (intptr_t)p_sys->embed->handle;
+        p_sys->parent = p_sys->embed->handle.xid;
     }
 
     /* Determine our input format */

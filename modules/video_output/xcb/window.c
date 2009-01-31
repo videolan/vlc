@@ -96,7 +96,7 @@ static int Open (vlc_object_t *obj)
     xcb_map_window (conn, window);
     xcb_flush (conn);
 
-    wnd->handle = (void *)(intptr_t)window;
+    wnd->handle.xid = window;
     wnd->p_sys = conn;
     wnd->control = Control;
     return VLC_SUCCESS;

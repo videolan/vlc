@@ -100,9 +100,9 @@ VideoWidget::~VideoWidget()
 /**
  * Request the video to avoid the conflicts
  **/
-void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
-                            unsigned int *pi_width, unsigned int *pi_height,
-                            bool b_keep_size )
+WId VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
+                          unsigned int *pi_width, unsigned int *pi_height,
+                          bool b_keep_size )
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
 
@@ -122,7 +122,7 @@ void *VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
 #ifndef NDEBUG
     msg_Dbg( p_intf, "embedded video ready (handle %p)", (void *)winId() );
 #endif
-    return ( void* )winId();
+    return winId();
 }
 
 /* Set the Widget to the correct Size */

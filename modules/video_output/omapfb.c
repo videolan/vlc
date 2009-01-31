@@ -701,7 +701,7 @@ static void CreateWindow( vout_sys_t *p_sys )
         BlackPixel( p_sys->p_display, DefaultScreen(p_sys->p_display) );
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
     p_sys->window = XCreateWindow( p_sys->p_display,
-                                   p_sys->owner_window->handle,
+                                   p_sys->owner_window->handle.xid,
                                    0, 0,
                                    p_sys->main_window.i_width,
                                    p_sys->main_window.i_height,
@@ -714,7 +714,7 @@ static void CreateWindow( vout_sys_t *p_sys )
     XSelectInput( p_sys->p_display, p_sys->window,
                   KeyPressMask | ButtonPressMask | StructureNotifyMask |
                   VisibilityChangeMask | FocusChangeMask );
-    XSelectInput( p_sys->p_display, p_sys->owner_window->handle,
+    XSelectInput( p_sys->p_display, p_sys->owner_window->handle.xid,
                   StructureNotifyMask );
     XSetInputFocus( p_sys->p_display, p_sys->window, RevertToParent, CurrentTime );
 }

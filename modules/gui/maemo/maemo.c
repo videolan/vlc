@@ -36,6 +36,7 @@
 #include <hildon/hildon-banner.h>
 #include <gtk/gtk.h>
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "maemo.h"
 #include "maemo_callbacks.h"
@@ -288,8 +289,8 @@ static int OpenWindow (vlc_object_t *obj)
         return VLC_EGENERIC; /* Maemo not in use */
     }
 
-    wnd->handle = request_video( intf, wnd->vout );
-    msg_Dbg( intf, "Using handle %p", wnd->handle );
+    wnd->handle.xid = request_video( intf, wnd->vout );
+    msg_Dbg( intf, "Using handle %"PRIu32, wnd->handle.xid );
 
     wnd->control = ControlWindow;
     wnd->p_private = intf;
