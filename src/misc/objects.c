@@ -39,20 +39,11 @@
 #include <vlc_common.h>
 
 #include "../libvlc.h"
-#include <vlc_vout.h>
 #include <vlc_aout.h>
 #include "audio_output/aout_internal.h"
 
-#include <vlc_access.h>
-#include <vlc_demux.h>
-#include <vlc_stream.h>
-
-#include <vlc_sout.h>
-#include "stream_output/stream_output.h"
-
 #include "vlc_interface.h"
 #include "vlc_codec.h"
-#include "vlc_filter.h"
 
 #include "variables.h"
 #ifndef WIN32
