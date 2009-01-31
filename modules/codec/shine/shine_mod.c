@@ -86,6 +86,16 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if( p_enc->fmt_out.i_bitrate <= 0 )
+    {
+        msg_Err( p_enc, "unknown bitrate" );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_enc, "bitrate %d, samplerate %d, channels %d",
+             p_enc->fmt_out.i_bitrate, p_enc->fmt_out.audio.i_rate,
+             p_enc->fmt_out.audio.i_channels );
+
     p_sys = p_enc->p_sys = malloc( sizeof( encoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
@@ -118,12 +128,12 @@ static block_t *GetPCM( encoder_t *p_enc, aout_buffer_t *p_block )
     {
         unsigned int i_buffer = 0;
         p_pcm_block = block_New( p_enc, pcm_chunk_size );
-        if( !p_pcm_block ) break;
+        if( !p_pcm_block )
+            break;
 
         if( p_sys->i_buffer )
         {
-            vlc_memcpy( p_pcm_block->p_buffer, p_sys->p_buffer,
-                p_sys->i_buffer );
+            vlc_memcpy( p_pcm_block->p_buffer, p_sys->p_buffer, p_sys->i_buffer );
 
             i_buffer = p_sys->i_buffer;
             p_sys->i_buffer = 0;
@@ -131,7 +141,7 @@ static block_t *GetPCM( encoder_t *p_enc, aout_buffer_t *p_block )
         }
 
         vlc_memcpy( p_pcm_block->p_buffer + i_buffer,
-            p_block->p_buffer , pcm_chunk_size - i_buffer );
+                    p_block->p_buffer, pcm_chunk_size - i_buffer );
         p_block->p_buffer += pcm_chunk_size - i_buffer;
 
         p_block->i_nb_bytes -= pcm_chunk_size - i_buffer;
@@ -142,18 +152,23 @@ static block_t *GetPCM( encoder_t *p_enc, aout_buffer_t *p_block )
     /* We hadn't enough data to make a block, put it in standby */
     if( p_block->i_nb_bytes )
     {
-        p_sys->p_buffer = p_sys->i_buffer ?
-            realloc( p_sys->p_buffer, p_block->i_nb_bytes + p_sys->i_buffer ) :
-            malloc( p_block->i_nb_bytes );
+        uint8_t *p_tmp;
 
-        if( !p_sys->p_buffer )
+        if( p_sys->i_buffer > 0 )
+            p_tmp = realloc( p_sys->p_buffer, p_block->i_nb_bytes + p_sys->i_buffer );
+        else
+            p_tmp = malloc( p_block->i_nb_bytes );
+
+        if( !p_tmp )
         {
             p_sys->i_buffer = 0;
+            free( p_sys->p_buffer );
+            p_sys->p_buffer = NULL;
             return NULL;
         }
-
+        p_sys->p_buffer = p_tmp;
         vlc_memcpy( p_sys->p_buffer + p_sys->i_buffer,
-            p_block->p_buffer, p_block->i_nb_bytes );
+                    p_block->p_buffer, p_block->i_nb_bytes );
 
         p_sys->i_buffer += p_block->i_nb_bytes;
         p_block->i_nb_bytes = 0;
@@ -166,14 +181,16 @@ buffered:
 
 static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
 {
+    encoder_sys_t *p_sys = (encoder_sys_t *)p_enc->p_sys;
     block_t *p_pcm_block;
     block_t *p_chain = NULL;
-    unsigned int i_samples = p_block->i_nb_bytes / 4 /* s16l stereo */;
+    unsigned int i_samples = p_block->i_nb_bytes >> 2 /* s16l stereo */;
     mtime_t start_date = p_block->start_date;
-    start_date -= i_samples * 1000000 / p_enc->fmt_out.audio.i_rate;
+    start_date -= (mtime_t)i_samples * (mtime_t)1000000 / (mtime_t)p_enc->fmt_out.audio.i_rate;
 
     do {
-        if( !( p_pcm_block = GetPCM( p_enc, p_block ) ) )
+        p_pcm_block = GetPCM( p_enc, p_block );
+        if( !p_pcm_block )
             break;
 
         p_block = NULL; /* we don't need it anymore */
@@ -189,8 +206,7 @@ static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
         if( !p_mp3_block )
             break;
 
-        vlc_memcpy( p_mp3_block->p_buffer, chunk->enc_data,
-            chunk->enc_size );
+        vlc_memcpy( p_mp3_block->p_buffer, chunk->enc_data, chunk->enc_size );
 
         /* date management */
         p_mp3_block->i_length = SAMP_PER_FRAME1 * 1000000 /
@@ -202,6 +218,7 @@ static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
         p_mp3_block->i_samples = SAMP_PER_FRAME1;
 
         block_ChainAppend( &p_chain, p_mp3_block );
+
     } while( p_pcm_block );
 
     return p_chain;
