@@ -41,6 +41,9 @@
 
 #if defined( LIBVLC_USE_PTHREAD )
 # include <sched.h>
+# ifdef __linux__
+#  include <sys/syscall.h> /* SYS_gettid */
+# endif
 #else
 static vlc_threadvar_t cancel_key;
 #endif
@@ -68,11 +71,16 @@ void vlc_trace (const char *fn, const char *file, unsigned line)
 
 static inline unsigned long vlc_threadid (void)
 {
-#if defined(LIBVLC_USE_PTHREAD)
+#if defined (LIBVLC_USE_PTHREAD)
+# if defined (__linux__)
+     return syscall (SYS_gettid);
+
+# else
      union { pthread_t th; unsigned long int i; } v = { };
      v.th = pthread_self ();
      return v.i;
 
+#endif
 #elif defined (WIN32)
      return GetCurrentThreadId ();
 
