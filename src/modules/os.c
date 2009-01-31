@@ -65,6 +65,9 @@
 #       include <dl.h>
 #   endif
 #endif
+#ifdef HAVE_VALGRIND_VALGRIND_H
+# include <valgrind/valgrind.h>
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -274,11 +277,11 @@ void module_Unload( module_handle_t handle )
     FreeLibrary( handle );
 
 #elif defined(HAVE_DL_DLOPEN)
-# ifdef NDEBUG
-    dlclose( handle );
-# else
-    (void)handle;
+# ifdef HAVE_VALGRIND_VALGRIND_H
+    if( RUNNING_ON_VALGRIND > 0 )
+        return; /* do not dlclose() so that we get proper stack traces */
 # endif
+    dlclose( handle );
 
 #elif defined(HAVE_DL_SHL_LOAD)
     shl_unload( handle );

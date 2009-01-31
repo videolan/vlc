@@ -1565,7 +1565,11 @@ AC_ARG_ENABLE(debug,
 test "${enable_debug}" != "yes" && enable_debug="no"
 AH_TEMPLATE(NDEBUG,
             [Define to 1 if debug code should NOT be compiled])
-AS_IF([test "x${enable_debug}" = "xno"], [AC_DEFINE(NDEBUG)])
+AS_IF([test "x${enable_debug}" = "xno"], [
+  AC_DEFINE(NDEBUG)
+], [
+  AC_CHECK_HEADERS([valgrind/valgrind.h])
+])
 
 dnl
 dnl Allow runing as root (usefull for people runing on embedded platforms)
