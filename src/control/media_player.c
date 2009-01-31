@@ -545,7 +545,7 @@ static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
     event.u.media_player_snapshot_taken.psz_filename = newval.psz_string ;
     /* Snapshot psz data is a vlc_variable owned by libvlc object .
          Its memmory management is taken care by the obj*/
-    msg_Dbg( p_this, "about to emit libvlc_snapshot_taken.make psz_str=0x%x (%s)",
+    msg_Dbg( p_this, "about to emit libvlc_snapshot_taken.make psz_str=0x%p (%s)",
           event.u.media_player_snapshot_taken.psz_filename ,event.u.media_player_snapshot_taken.psz_filename );
     libvlc_event_send( p_mi->p_event_manager, &event );
 
