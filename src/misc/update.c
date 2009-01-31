@@ -1633,7 +1633,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
             p_update->release.psz_url, psz_size ) != -1 )
         {
             intf_ProgressUpdate( p_progress, psz_status, 100.0, 0 );
-            p_progress = NULL
+            p_progress = NULL;
             free( psz_status );
         }
     }
