@@ -122,10 +122,10 @@ typedef struct
 
 typedef struct
 {
-    CRITICAL_SECTION mutex;
     LONG initialized;
+    CRITICAL_SECTION mutex;
 } vlc_mutex_t;
-#define VLC_STATIC_MUTEX { .initialized = 0, }
+#define VLC_STATIC_MUTEX { 0, }
 
 typedef HANDLE  vlc_cond_t;
 typedef DWORD   vlc_threadvar_t;
