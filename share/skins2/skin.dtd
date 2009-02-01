@@ -92,12 +92,14 @@
 <!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
                  Anchor|Video|Playtree|Panel)+>
     <!ATTLIST Group
+        id          CDATA   "none"
         x           CDATA   "0"
         y           CDATA   "0"
     >
 <!ELEMENT Panel (Group|Image|Button|Playlist|Slider|RadialSlider|Text|Checkbox|
                  Anchor|Video|Playtree|Panel)+>
     <!ATTLIST Panel
+        id          CDATA   "none"
         x           CDATA   "0"
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
@@ -111,6 +113,7 @@
 <!-- Anchors -->
 <!ELEMENT Anchor EMPTY>
     <!ATTLIST Anchor
+        id          CDATA   "none"
         x           CDATA   "0"
         y           CDATA   "0"
         lefttop     CDATA   "lefttop"
