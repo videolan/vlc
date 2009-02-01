@@ -316,9 +316,16 @@ static int QNXManage( vout_thread_t *p_vout )
 
         if( i_ev == Ph_RESIZE_MSG )
         {
+            PhEvent_t *buf;
+
             i_buflen = PhGetMsgSize( p_event );
-            if( ( p_event = realloc( p_event, i_buflen ) ) == NULL )
+            buf = realloc( p_event, i_buflen );
+            if( buf == NULL )
+            {
+                free( p_event );
                 return( 1 );
+            }
+            p_event = buf;
         }
         else if( i_ev == Ph_EVENT_MSG )
         {
