@@ -224,6 +224,7 @@ struct interaction_dialog_t
     interaction_t  *p_interaction;      ///< Parent interaction object
     vlc_object_t   *p_parent;           ///< The vlc object that asked
                                         //for interaction
+    intf_thread_t  *p_interface;
 };
 
 /**

@@ -476,16 +476,27 @@ static void DialogDestroy( interaction_dialog_t *p_dialog )
  * if required */
 static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
 {
-    interaction_t *p_interaction = InteractionGet( p_dialog->p_parent );
+    interaction_t *p_interaction;
+    intf_thread_t *p_intf;
 
+    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+        return VLC_EGENERIC;
+
+    p_interaction = InteractionGet( p_dialog->p_parent );
     if( !p_interaction )
         return VLC_EGENERIC;
 
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+    p_intf = SearchInterface( p_interaction );
+    if( p_intf == NULL )
     {
+        p_dialog->i_return = DIALOG_DEFAULT; /* Give default answer */
+
+        /* Pretend we have hidden and destroyed it */
+        p_dialog->i_status = HIDING_DIALOG;
         vlc_object_release( p_interaction );
-        return VLC_EGENERIC;
+        return VLC_SUCCESS;
     }
+    p_dialog->p_interface = p_intf;
 
     if( config_GetInt( p_this, "interact" ) ||
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
@@ -585,26 +596,6 @@ static void InteractionManage( interaction_t *p_interaction )
     vlc_value_t val;
     int i_index;
 
-    /* Nothing to do */
-    if( p_interaction->i_dialogs == 0 ) return;
-
-    p_interaction->p_intf = SearchInterface( p_interaction );
-    if( !p_interaction->p_intf )
-    {
-        /* We mark all dialogs as answered with their "default" answer */
-        for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
-        {
-            interaction_dialog_t *p_dialog = p_interaction->pp_dialogs[i_index];
-            p_dialog->i_return = DIALOG_DEFAULT; /* Give default answer */
-
-            /* Pretend we have hidden and destroyed it */
-            if( p_dialog->i_status == HIDDEN_DIALOG )
-                p_dialog->i_status = DESTROYED_DIALOG;
-            else
-                p_dialog->i_status = HIDING_DIALOG;
-        }
-    }
-
     for( i_index = 0 ; i_index < p_interaction->i_dialogs; i_index ++ )
     {
         interaction_dialog_t *p_dialog = p_interaction->pp_dialogs[i_index];
@@ -614,23 +605,20 @@ static void InteractionManage( interaction_t *p_interaction )
             /* Ask interface to hide it */
             p_dialog->i_action = INTERACT_HIDE;
             val.p_address = p_dialog;
-            if( p_interaction->p_intf )
-                var_Set( p_interaction->p_intf, "interaction", val );
+            var_Set( p_dialog->p_interface, "interaction", val );
             p_dialog->i_status = HIDING_DIALOG;
             break;
         case UPDATED_DIALOG:
             p_dialog->i_action = INTERACT_UPDATE;
             val.p_address = p_dialog;
-            if( p_interaction->p_intf )
-                var_Set( p_interaction->p_intf, "interaction", val );
+            var_Set( p_dialog->p_interface, "interaction", val );
             p_dialog->i_status = SENT_DIALOG;
             break;
         case HIDDEN_DIALOG:
             if( !(p_dialog->i_flags & DIALOG_GOT_ANSWER) ) break;
             p_dialog->i_action = INTERACT_DESTROY;
             val.p_address = p_dialog;
-            if( p_interaction->p_intf )
-                var_Set( p_interaction->p_intf, "interaction", val );
+            var_Set( p_dialog->p_interface, "interaction", val );
             break;
         case DESTROYED_DIALOG:
             /* Interface has now destroyed it, remove it */
@@ -644,13 +632,9 @@ static void InteractionManage( interaction_t *p_interaction )
 
             p_dialog->i_action = INTERACT_NEW;
             val.p_address = p_dialog;
-            if( p_interaction->p_intf )
-                var_Set( p_interaction->p_intf, "interaction", val );
+            var_Set( p_dialog->p_interface, "interaction", val );
             p_dialog->i_status = SENT_DIALOG;
             break;
         }
     }
-
-    if( p_interaction->p_intf )
-        vlc_object_release( p_interaction->p_intf );
 }
