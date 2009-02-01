@@ -163,8 +163,7 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     p_new->i_flags = DIALOG_YES_NO_CANCEL;
     p_new->psz_default_button = strdup( psz_default );
     p_new->psz_alternate_button = strdup( psz_alternate );
-    if( psz_other )
-        p_new->psz_other_button = strdup( psz_other );
+    p_new->psz_other_button = psz_other ? strdup( psz_other ) : NULL;
 
     return DialogSend( p_new );
 }
