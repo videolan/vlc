@@ -70,7 +70,7 @@ static void*                    InteractionLoop( void * );
 static void                     InteractionManage( interaction_t * );
 
 static void                     DialogDestroy( interaction_dialog_t * );
-static int DialogSend( vlc_object_t *, interaction_dialog_t * );
+static int DialogSend( interaction_dialog_t * );
 
 #define DIALOG_INIT( type, err ) \
         interaction_dialog_t* p_new = calloc( 1, sizeof( interaction_dialog_t ) ); \
@@ -113,7 +113,7 @@ int __intf_UserFatal( vlc_object_t *p_this, bool b_blocking,
     else
         p_new->i_flags = DIALOG_NONBLOCKING_ERROR;
 
-    return DialogSend( p_this, p_new );
+    return DialogSend( p_new );
 }
 
 /**
@@ -136,7 +136,7 @@ int __intf_UserWarn( vlc_object_t *p_this,
 
     p_new->i_flags = DIALOG_WARNING;
 
-    return DialogSend( p_this, p_new );
+    return DialogSend( p_new );
 }
 
 /**
@@ -167,7 +167,7 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     if( psz_other )
         p_new->psz_other_button = strdup( psz_other );
 
-    return DialogSend( p_this, p_new );
+    return DialogSend( p_new );
 }
 
 /**
@@ -198,7 +198,7 @@ __intf_Progress( vlc_object_t *p_this, const char *psz_title,
     else
         p_new->i_flags = DIALOG_INTF_PROGRESS;
 
-    DialogSend( p_this, p_new );
+    DialogSend( p_new );
     return p_new;
 }
 
@@ -277,7 +277,7 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
 
     p_new->i_flags = DIALOG_LOGIN_PW_OK_CANCEL;
 
-    i_ret = DialogSend( p_this, p_new );
+    i_ret = DialogSend( p_new );
 
     if( i_ret != DIALOG_CANCELLED && i_ret != VLC_EGENERIC )
     {
@@ -311,7 +311,7 @@ int __intf_UserStringInput( vlc_object_t *p_this,
 
     p_new->i_flags = DIALOG_PSZ_INPUT_OK_CANCEL;
 
-    i_ret = DialogSend( p_this, p_new );
+    i_ret = DialogSend( p_new );
 
     if( i_ret != DIALOG_CANCELLED )
     {
@@ -474,12 +474,12 @@ static void DialogDestroy( interaction_dialog_t *p_dialog )
 
 /* Ask for the dialog to be sent to the user. Wait for answer
  * if required */
-static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
+static int DialogSend( interaction_dialog_t *p_dialog )
 {
     interaction_t *p_interaction;
     intf_thread_t *p_intf;
 
-    if( p_this->i_flags & OBJECT_FLAGS_NOINTERACT )
+    if( p_dialog->p_parent->i_flags & OBJECT_FLAGS_NOINTERACT )
         return VLC_EGENERIC;
 
     p_interaction = InteractionGet( p_dialog->p_parent );
@@ -498,12 +498,11 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
     }
     p_dialog->p_interface = p_intf;
 
-    if( config_GetInt( p_this, "interact" ) ||
+    if( config_GetInt( p_interaction, "interact" ) ||
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
         p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
         p_dialog->p_interaction = p_interaction;
-        p_dialog->p_parent = p_this;
 
         /* Check if we have already added this dialog */
         vlc_object_lock( p_interaction );
