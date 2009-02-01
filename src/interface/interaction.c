@@ -75,6 +75,7 @@ static int DialogSend( vlc_object_t *, interaction_dialog_t * );
 #define DIALOG_INIT( type, err ) \
         interaction_dialog_t* p_new = calloc( 1, sizeof( interaction_dialog_t ) ); \
         if( !p_new ) return err;                        \
+        p_new->p_parent = vlc_object_hold( p_this );    \
         p_new->b_cancelled = false;                     \
         p_new->i_status = NEW_DIALOG;                   \
         p_new->i_flags = 0;                             \
@@ -467,6 +468,7 @@ static void DialogDestroy( interaction_dialog_t *p_dialog )
     free( p_dialog->psz_default_button );
     free( p_dialog->psz_alternate_button );
     free( p_dialog->psz_other_button );
+    vlc_object_release( p_dialog->p_parent );
     free( p_dialog );
 }
 
