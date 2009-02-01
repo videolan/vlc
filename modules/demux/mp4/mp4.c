@@ -903,7 +903,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     break;
 
                 case FOURCC_0xa9trk: /* Track */
-                    SET( vlc_meta_SetTracknum );
+                    SET( vlc_meta_SetTrackNum );
                     break;
 
                 case FOURCC_0xa9cmt: /* Commment */

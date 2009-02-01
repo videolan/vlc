@@ -80,7 +80,7 @@ struct vlc_meta_t
 #define vlc_meta_SetGenre( meta, b )       vlc_meta_Set( meta, vlc_meta_Genre, b )
 #define vlc_meta_SetCopyright( meta, b )   vlc_meta_Set( meta, vlc_meta_Copyright, b )
 #define vlc_meta_SetAlbum( meta, b )       vlc_meta_Set( meta, vlc_meta_Album, b )
-#define vlc_meta_SetTracknum( meta, b )    vlc_meta_Set( meta, vlc_meta_TrackNumber, b )
+#define vlc_meta_SetTrackNum( meta, b )    vlc_meta_Set( meta, vlc_meta_TrackNumber, b )
 #define vlc_meta_SetDescription( meta, b ) vlc_meta_Set( meta, vlc_meta_Description, b )
 #define vlc_meta_SetRating( meta, b )      vlc_meta_Set( meta, vlc_meta_Rating, b )
 #define vlc_meta_SetDate( meta, b )        vlc_meta_Set( meta, vlc_meta_Date, b )

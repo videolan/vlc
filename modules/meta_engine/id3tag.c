@@ -215,7 +215,7 @@ static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
             }
             else if( DESCR_IS( "Track number/position in set" ) )
             {
-                vlc_meta_SetTracknum( p_meta, psz_temp );
+                vlc_meta_SetTrackNum( p_meta, psz_temp );
             }
             else if( DESCR_IS( "Album/movie/show title" ) )
             {
@@ -345,7 +345,7 @@ static void ParseAPEvXTag( demux_t *p_demux, const uint8_t *p_data, int i_data )
                 char *p = strchr( psz_value, '/' );
                 if( p )
                     *p++ = '\0';
-                vlc_meta_SetTracknum( p_meta, psz_value );
+                vlc_meta_SetTrackNum( p_meta, psz_value );
             }
             else  if( IS( "Comment" ) )
                 vlc_meta_SetDescription( p_meta, psz_value );
