@@ -85,7 +85,6 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
     p  = strstr( psz_parse, ":/" );
     if( p != NULL )
     {
-        char *p2;
         for( p2 = psz_parse; p2 < p; p2++ )
         {
 #define I(i,a,b) ( (a) <= (i) && (i) <= (b) )
@@ -132,8 +131,6 @@ static inline void vlc_UrlParse( vlc_url_t *url, const char *psz_url,
     p = strchr( psz_parse, '/' );
     if( !p || psz_parse < p )
     {
-        char *p2;
-
         /* We have a host[:port] */
         url->psz_host = strdup( psz_parse );
         if( p )
