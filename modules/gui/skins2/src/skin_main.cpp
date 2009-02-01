@@ -302,7 +302,7 @@ static int WindowOpen( vlc_object_t *p_this )
 
     /* FIXME: most probably not thread-safe,
      * albeit no worse than ever before */
-    pWnd->handle = VlcProc::getWindow( pIntf, pWnd->vout,
+    pWnd->handle.hwnd = VlcProc::getWindow( pIntf, pWnd->vout,
                                        &pWnd->pos_x, &pWnd->pos_y,
                                        &pWnd->width, &pWnd->height );
     pWnd->p_private = pIntf;
@@ -506,7 +506,11 @@ vlc_module_begin ()
     add_shortcut( "skins" )
 
     add_submodule ()
-        set_capability( "vout_window", 51 )
+#ifndef WIN32
+        set_capability( "xwindow", 51 )
+#else
+        set_capability( "hwnd", 51 )
+#endif
         set_callbacks( WindowOpen, WindowClose )
 
     add_submodule ()
