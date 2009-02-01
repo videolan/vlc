@@ -32,5 +32,5 @@
       --enable-activex \
       --disable-gnomevfs --disable-hal --disable-gtk \
       --disable-cddax --disable-vcdx \
-      --disable-libcddb --disable-dvb --disable-zvbi \
+      --disable-libcddb --disable-dvb --disable-zvbi --enable-telx\
       --disable-pulse
