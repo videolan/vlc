@@ -41,6 +41,7 @@
 #include <vlc_bits.h>
 #include <vlc_charset.h>
 #include "vorbis.h"
+#include "kate_categories.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -1696,6 +1697,7 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     int32_t gnum;
     int32_t gden;
     int n;
+    char *psz_desc;
 
     p_stream->fmt.i_cat = SPU_ES;
     p_stream->fmt.i_codec = VLC_FOURCC( 'k','a','t','e' );
@@ -1719,25 +1721,33 @@ static void Ogg_ReadKateHeader( logical_stream_t *p_stream,
     p_stream->fmt.psz_language = malloc(16);
     if( p_stream->fmt.psz_language )
     {
-        for( n = 0; n < 16; ++n )
+        for( n = 0; n < 16; n++ )
             p_stream->fmt.psz_language[n] = oggpack_read(&opb,8);
         p_stream->fmt.psz_language[15] = 0; /* just in case */
     }
     else
     {
-        for( n = 0; n < 16; ++n )
+        for( n = 0; n < 16; n++ )
             oggpack_read(&opb,8);
     }
     p_stream->fmt.psz_description = malloc(16);
     if( p_stream->fmt.psz_description )
     {
-        for( n = 0; n < 16; ++n )
+        for( n = 0; n < 16; n++ )
             p_stream->fmt.psz_description[n] = oggpack_read(&opb,8);
         p_stream->fmt.psz_description[15] = 0; /* just in case */
+
+        /* Now find a localized user readable description for this category */
+        psz_desc = strdup(FindKateCategoryName(p_stream->fmt.psz_description));
+        if( psz_desc )
+        {
+            free( p_stream->fmt.psz_description );
+            p_stream->fmt.psz_description = psz_desc;
+        }
     }
     else
     {
-        for( n = 0; n < 16; ++n )
+        for( n = 0; n < 16; n++ )
             oggpack_read(&opb,8);
     }
 }
