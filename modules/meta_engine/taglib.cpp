@@ -196,8 +196,7 @@ static void ReadMetaFromId3v2( ID3v2::Tag* tag, demux_t* p_demux, demux_meta_t* 
         return;
 
     TAB_INIT( p_demux_meta->i_attachments, p_demux_meta->attachments );
-    for( ID3v2::FrameList::Iterator iter = list.begin();
-         iter != list.end(); iter++ )
+    for( iter = list.begin(); iter != list.end(); iter++ )
     {
         ID3v2::AttachedPictureFrame* p_apic =
             dynamic_cast<ID3v2::AttachedPictureFrame*>(*iter);
