@@ -61,7 +61,6 @@ struct interaction_t
     int                         i_dialogs;      ///< Number of dialogs
     interaction_dialog_t      **pp_dialogs;     ///< Dialogs
     intf_thread_t              *p_intf;         ///< Interface to use
-    int                         i_last_id;      ///< Last attributed ID
 };
 
 static interaction_t *          InteractionGet( vlc_object_t * );
@@ -362,7 +361,6 @@ interaction_t * interaction_Init( libvlc_int_t *p_libvlc )
     p_interaction->i_dialogs = 0;
     p_interaction->pp_dialogs = NULL;
     p_interaction->p_intf = NULL;
-    p_interaction->i_last_id = 0;
 
     vlc_cond_init( &p_interaction->wait );
 
