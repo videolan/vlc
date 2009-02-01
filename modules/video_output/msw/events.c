@@ -422,7 +422,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                             &p_vout->p_sys->i_window_y,
                             &p_vout->p_sys->i_window_width,
                             &p_vout->p_sys->i_window_height );
-    p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle.hwnd;
+    if( p_vout->p_sys->parent_window )
+        p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle.hwnd;
 
     /* We create the window ourself, there is no previous window proc. */
     p_vout->p_sys->pf_wndproc = NULL;
