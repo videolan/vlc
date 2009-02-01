@@ -376,7 +376,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool   *pb_bool;
-    int          *pi_int;
     int64_t      *pi_64;
 
     switch( i_query )

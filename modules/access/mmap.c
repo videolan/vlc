@@ -280,8 +280,6 @@ static int Seek (access_t *p_access, int64_t i_pos)
 
 static int Control (access_t *p_access, int query, va_list args)
 {
-    access_sys_t *p_sys = p_access->p_sys;
-
     switch (query)
     {
         case ACCESS_CAN_SEEK:
