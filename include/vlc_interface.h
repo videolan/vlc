@@ -252,8 +252,7 @@ enum
 /** Possible status  */
 enum
 {
-    NEW_DIALOG,                 ///< Just created
-    SENT_DIALOG,                ///< Sent to interface
+    SENT_DIALOG=1,                ///< Sent to interface
     UPDATED_DIALOG,             ///< Update to send
     ANSWERED_DIALOG,            ///< Got "answer"
     HIDING_DIALOG,              ///< Hiding requested

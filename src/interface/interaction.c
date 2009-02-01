@@ -77,7 +77,7 @@ static int DialogSend( interaction_dialog_t * );
         if( !p_new ) return err;                        \
         p_new->p_parent = vlc_object_hold( p_this );    \
         p_new->b_cancelled = false;                     \
-        p_new->i_status = NEW_DIALOG;                   \
+        p_new->i_status = SENT_DIALOG;                  \
         p_new->i_flags = 0;                             \
         p_new->i_type = INTERACT_DIALOG_##type;         \
         p_new->psz_returned[0] = NULL;                  \
@@ -502,7 +502,12 @@ static int DialogSend( interaction_dialog_t *p_dialog )
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
         p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
+        vlc_value_t val;
+
         p_dialog->p_interaction = p_interaction;
+        p_dialog->i_action = INTERACT_NEW;
+        val.p_address = p_dialog;
+        var_Set( p_dialog->p_interface, "interaction", val );
 
         /* Check if we have already added this dialog */
         vlc_object_lock( p_interaction );
@@ -611,14 +616,6 @@ static void InteractionManage( interaction_t *p_interaction )
                          i_index);
             i_index--;
             DialogDestroy( p_dialog );
-            break;
-        case NEW_DIALOG:
-            /* This is truly a new dialog, send it. */
-
-            p_dialog->i_action = INTERACT_NEW;
-            val.p_address = p_dialog;
-            var_Set( p_dialog->p_interface, "interaction", val );
-            p_dialog->i_status = SENT_DIALOG;
             break;
         }
     }
