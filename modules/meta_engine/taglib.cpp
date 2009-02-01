@@ -366,7 +366,7 @@ static int ReadMeta( vlc_object_t* p_this)
     SET( comment, Description );
     SET( genre, Genre );
     SETINT( year, Date );
-    SETINT( track, Tracknum );
+    SETINT( track, TrackNum );
 
 #undef SETINT
 #undef SET

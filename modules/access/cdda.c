@@ -457,8 +457,28 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
                 if( psz_artist )
                     input_item_SetArtist( p_input_item, psz_artist );
             }
+
+            const char *psz_album = cddb_disc_get_title( p_sys->p_disc );
+            if( psz_album && *psz_album )
+                input_item_SetAlbum( p_input_item, psz_album );
+
+            const unsigned i_year = cddb_disc_get_year( p_sys->p_disc );
+            if( i_year > 0 )
+            {
+                char psz_date[4+1];
+                snprintf( psz_date, sizeof(psz_date), "%u", i_year );
+                input_item_SetDate( p_input_item, psz_date );
+            }
+
+            const char *psz_genre = cddb_disc_get_genre( p_sys->p_disc );
+            if( psz_genre && *psz_genre )
+                input_item_SetGenre( p_input_item, psz_genre );
         }
 #endif
+        char psz_num[3+1];
+        snprintf( psz_num, sizeof(psz_num), "%d", 1+i );
+        input_item_SetTrackNum( p_input_item, psz_num );
+
         input_item_AddSubItem( p_current, p_input_item );
         vlc_gc_decref( p_input_item );
         free( psz_uri ); free( psz_opt ); free( psz_name );
