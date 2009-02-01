@@ -502,29 +502,15 @@ static int DialogSend( vlc_object_t *p_this, interaction_dialog_t *p_dialog )
         p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
         p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
     {
-        bool b_found = false;
-        int i;
         p_dialog->p_interaction = p_interaction;
         p_dialog->p_parent = p_this;
 
         /* Check if we have already added this dialog */
         vlc_object_lock( p_interaction );
-        for( i = 0 ; i< p_interaction->i_dialogs; i++ )
-        {
-            if( p_interaction->pp_dialogs[i] == p_dialog )
-                b_found = true;
-        }
         /* Add it to the queue, the main loop will send the orders to the
          * interface */
-        if( ! b_found )
-        {
-            INSERT_ELEM( p_interaction->pp_dialogs,
-                         p_interaction->i_dialogs,
-                         p_interaction->i_dialogs,
-                         p_dialog );
-        }
-        else
-            p_dialog->i_status = UPDATED_DIALOG;
+        INSERT_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs,
+                     p_interaction->i_dialogs,  p_dialog );
 
         if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) /* Wait for answer */
         {
