@@ -616,7 +616,7 @@ int VlcProc::controlWindow( struct vout_window_t *pWnd,
 
                 // Post a resize vout command
                 CmdResizeVout *pCmd =
-                    new CmdResizeVout( pThis->getIntf(), pWnd->handle,
+                    new CmdResizeVout( pThis->getIntf(), pWnd->handle.hwnd,
                                        i_width, i_height );
                 AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
                 pQueue->push( CmdGenericPtr( pCmd ) );
