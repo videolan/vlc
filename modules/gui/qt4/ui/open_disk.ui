@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>521</width>
-    <height>336</height>
+    <width>500</width>
+    <height>311</height>
    </rect>
   </property>
   <property name="minimumSize" >
@@ -65,7 +65,7 @@
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>40</width>
+          <width>20</width>
           <height>20</height>
          </size>
         </property>
@@ -85,20 +85,20 @@
         </property>
         <property name="sizeHint" stdset="0" >
          <size>
-          <width>40</width>
+          <width>20</width>
           <height>20</height>
          </size>
         </property>
        </spacer>
       </item>
-      <item row="0" column="5" colspan="3" >
+      <item row="0" column="5" >
        <widget class="QRadioButton" name="vcdRadioButton" >
         <property name="text" >
          <string>SVCD/VCD</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="8" >
+      <item row="0" column="6" >
        <spacer>
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
@@ -121,70 +121,64 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2" >
-       <widget class="QLabel" name="deviceLabel" >
-        <property name="text" >
-         <string>_("Disc device")</string>
-        </property>
-        <property name="buddy" >
-         <cstring>deviceCombo</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="7" >
+      <item row="2" column="2" colspan="5" >
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="3" column="2" colspan="4" >
-       <widget class="QComboBox" name="deviceCombo" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="editable" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="6" >
-       <widget class="QToolButton" name="ejectButton" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="7" colspan="2" >
-       <widget class="QPushButton" name="browseDiscButton" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>_("Browse...")</string>
-        </property>
-       </widget>
+      <item row="3" column="0" colspan="7" >
+       <layout class="QHBoxLayout" name="horizontalLayout_5" >
+        <item>
+         <widget class="QLabel" name="deviceLabel" >
+          <property name="text" >
+           <string>_("Disc device")</string>
+          </property>
+          <property name="buddy" >
+           <cstring>deviceCombo</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="deviceCombo" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="editable" >
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="ejectButton" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="browseDiscButton" >
+          <property name="sizePolicy" >
+           <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text" >
+           <string>_("Browse...")</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
-     <zorder>dvdRadioButton</zorder>
-     <zorder>dvdsimple</zorder>
-     <zorder>line</zorder>
-     <zorder>deviceLabel</zorder>
-     <zorder>deviceCombo</zorder>
-     <zorder>ejectButton</zorder>
-     <zorder>browseDiscButton</zorder>
-     <zorder>audioCDRadioButton</zorder>
-     <zorder>vcdRadioButton</zorder>
-     <zorder></zorder>
     </widget>
    </item>
    <item>
@@ -357,6 +351,11 @@
        </widget>
       </item>
      </layout>
+     <zorder>subtitlesLabel</zorder>
+     <zorder>subtitlesSpin</zorder>
+     <zorder>audioLabel</zorder>
+     <zorder>audioSpin</zorder>
+     <zorder>diskGroupBox</zorder>
     </widget>
    </item>
    <item>
