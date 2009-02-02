@@ -106,6 +106,8 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
 	$(INSTALL) -d "$@/Contents/MacOS/lib"
 	$(INSTALL) -d "$@/Contents/Resources"
+	$(INSTALL) .libs/npvlc.dylib "$@/Contents/MacOS/VLC Plugin"
+	dylib="$@/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH);
 	$(INSTALL) npvlc.rsrc "$@/Contents/Resources/VLC Plugin.rsrc"
 	cp -r "$(top_srcdir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
 	cp -r "$(top_builddir)/extras/package/macosx/plugin/English.lproj" "$@/Contents/Resources/"
