@@ -74,7 +74,7 @@ Audio output:
 
 Video output:
  * Effects (cube, torus, etc.) removed from OpenGL video output
- * Video is able to stay in original size in fullscreen (hotkey 'o')
+ * Video is able to stay in original size and to zoom in fullscreen (hotkey 'o') while keeping black borders
 
 Miscellanous:
  * Invmem, a fake codec to display images from external applications
