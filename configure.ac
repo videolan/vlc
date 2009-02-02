@@ -918,6 +918,21 @@ then
   )
 fi
 
+dnl Check for mtp
+AC_ARG_ENABLE(mtp,
+  [  --enable-mtp            MTP devices support (default enabled)])
+
+if test "${enable_mtp}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
+then
+  PKG_CHECK_MODULES(MTP, libmtp >= 0.3.0,
+    [ VLC_ADD_PLUGIN([mtp])
+      VLC_ADD_PLUGIN([access_mtp])
+      VLC_ADD_LIBS([mtp access_mtp],[$MTP_LIBS])
+      VLC_ADD_CFLAGS([mtp access_mtp],[$MTP_CFLAGS])],
+       [AC_MSG_WARN(MTP library not found)]
+  )
+fi
+
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
