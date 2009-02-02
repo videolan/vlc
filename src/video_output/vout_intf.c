@@ -110,10 +110,6 @@ vout_window_t *vout_RequestWindow( vout_thread_t *p_vout, const char *psz_cap,
     *pi_width_hint = p_vout->i_window_width;
     *pi_height_hint = p_vout->i_window_height;
 
-    /* Check whether someone provided us with a window ID */
-    int drawable = var_CreateGetInteger( p_vout, "drawable" );
-    if( drawable ) return (void *)(intptr_t)drawable;
-
     vout_window_t *wnd = vlc_custom_create (VLC_OBJECT(p_vout), sizeof (*wnd),
                                             VLC_OBJECT_GENERIC, "window");
     if (wnd == NULL)
