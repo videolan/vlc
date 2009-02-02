@@ -155,13 +155,11 @@ protected:
     {
         if( keyEvent->key() == Qt::Key_Escape )
         {
-            msg_Dbg( p_intf, "Escp Key pressed" );
             cancel();
         }
         else if( keyEvent->key() == Qt::Key_Return
               || keyEvent->key() == Qt::Key_Enter )
         {
-             msg_Dbg( p_intf, "Enter Key pressed" );
              close();
          }
     }
