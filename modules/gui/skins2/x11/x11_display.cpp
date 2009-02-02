@@ -53,8 +53,10 @@
 X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_mainWindow( 0 ), m_gc( NULL ), m_colormap( 0 )
 {
+    char *psz_display = var_CreateGetNonEmptyString( pIntf, "x11-display" );
     // Open a connection to the X Server
-    m_pDisplay = XOpenDisplay( NULL );
+    m_pDisplay = XOpenDisplay( psz_display );
+    free( psz_display );
 
     if( m_pDisplay == NULL )
     {

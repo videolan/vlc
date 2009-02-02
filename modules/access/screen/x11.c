@@ -41,11 +41,13 @@ int screen_InitCapture( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     Display *p_display;
+    char *psz_display = var_CreateGetNonEmptyString( p_demux, "x11-display" );
     XWindowAttributes win_info;
     int i_chroma;
 
     /* Open the display */
-    p_display = XOpenDisplay( NULL );
+    p_display = XOpenDisplay( psz_display );
+    free( psz_display );
     if( !p_display )
     {
         msg_Err( p_demux, "cannot open display" );

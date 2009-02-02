@@ -558,7 +558,10 @@ static int AdjustHeight( vout_thread_t *p_vout )
         i_window_width  = GetSystemMetrics(SM_CXSCREEN);
         i_window_height = GetSystemMetrics(SM_CYSCREEN);
 #else
-        Display *p_display = XOpenDisplay( "" );
+        char *psz_display = var_CreateGetNonEmptyString( p_vout,
+                                                        "x11-display" );
+        Display *p_display = XOpenDisplay( psz_display );
+        free( psz_display );
         if (p_vout->p_sys->b_xinerama)
         {
             i_window_width = DisplayWidth(p_display, 0) / p_vout->p_sys->i_col;

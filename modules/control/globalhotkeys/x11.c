@@ -81,8 +81,10 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
+    char *psz_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
 
-    Display *p_display = XOpenDisplay( NULL );
+    Display *p_display = XOpenDisplay( psz_display );
+    free( psz_display );
     if( !p_display )
         return VLC_EGENERIC;
     XSetErrorHandler( X11ErrorHandler );
