@@ -506,9 +506,9 @@ struct vout_thread_t
     /**@{*/
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
+    bool                b_fullscreen;         /**< toogle fullscreen display */
     bool                b_autoscale;        /**< auto scaling picture or not */
     int                 i_zoom;               /**< scaling factor if no auto */
-    bool                b_fullscreen;         /**< toogle fullscreen display */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
     unsigned int        i_alignment;          /**< video alignment in window */
