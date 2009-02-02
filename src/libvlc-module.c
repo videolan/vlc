@@ -512,11 +512,11 @@ static const char *const ppsz_pos_descriptions[] =
 
 #define AUTOSCALE_TEXT N_("Video Auto Scaling")
 #define AUTOSCALE_LONGTEXT N_( \
-    "Forces video scaling to fit a given window.")
+    "Let the video scale to fit a given window or fullscreen.")
 
-#define SCALEFACTOR_TEXT N_("Video scale factor")
+#define SCALEFACTOR_TEXT N_("Video scaling factor")
 #define SCALEFACTOR_LONGTEXT N_( \
-    "scale factor used if --no-auto-scale is selected." \
+    "Scaling factor used when Auto Scaling is disabled.\n" \
     "Default value is 1.0 (original video size).")
 
 #define CUSTOM_CROP_RATIOS_TEXT N_("Custom crop ratios list")
