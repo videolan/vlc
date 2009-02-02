@@ -311,6 +311,7 @@ case "${host_os}" in
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
     AC_CHECK_TOOL(WINDRES, windres, :)
+    AC_CHECK_TOOL(OBJCOPY, objcopy, :)
 
     case "${host_os}" in
       *wince* | *mingwce* | *mingw32ce* | *pe*)

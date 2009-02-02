@@ -683,6 +683,9 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 ## Win                                                                    ##
 ############################################################################
 win32_destdir=$(top_builddir)/vlc-$(VERSION)
+win32_debugdir=$(top_builddir)/symbols-$(VERSION)
+npvlc=vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)
+axvlc=vlc-$(VERSION)/activex/axvlc$(LIBEXT)
 win32_lua_destdir=$(win32_destdir)/lua
 win32_http_destdir=$(win32_destdir)/http
 
@@ -896,19 +899,42 @@ endif
 
 #strip exe and main dll
 package-win-common-strip: package-win32-base-debug
+	@if test -e "$(win32_debugdir)"; then \
+	  echo "Error: please remove $(win32_debugdir), it is in the way"; \
+	  false; \
+	else \
+	  echo "OK."; mkdir -p "$(win32_debugdir)"; \
+	fi
 	for i in "" vlc-$(VERSION)/*$(LIBEXT) ; \
-	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi; done
+      do if test -n "$$i" ; then \
+      $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
+      $(OBJCOPY) --strip-debug "$$i" ; \
+      $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
+	  mv "$$i.dbg" "$(win32_debugdir)"; \
+    fi; done
+
 if BUILD_MOZILLA
-	$(STRIP) "vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)"
+	$(OBJCOPY) --only-keep-debug "$(npvlc)" "$(npvlc).dbg"
+	$(OBJCOPY) --strip-debug "$(npvlc)"
+	$(OBJCOPY) --add-gnu-debuglink="$(npvlc).dbg" "$(npvlc)"
+	mv "$(npvlc).dbg" "$(win32_debugdir)"
 endif
 if BUILD_ACTIVEX
-	$(STRIP) "vlc-$(VERSION)/activex/axvlc$(LIBEXT)"
+	$(OBJCOPY) --only-keep-debug "$(axvlc)" "$(axvlc).dbg"
+	$(OBJCOPY) --strip-debug "$(axvlc)"
+	$(OBJCOPY) --add-gnu-debuglink="$(axvlc).dbg" "$(axvlc)"
+	mv "$(axvlc).dbg" "$(win32_debugdir)"
 endif
 
 #strip all plugins dll
 package-win32-base: package-win-common-strip
 	for i in "" $(win32_destdir)/plugins/*$(LIBEXT) ; \
-	  do if test -n "$$i" ; then $(STRIP) "$$i" ; fi ; done
+	  do if test -n "$$i" ; then \
+	  $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
+	  $(OBJCOPY) --strip-debug "$$i" ; \
+	  $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
+	  mv "$$i.dbg" "$(win32_debugdir)"; \
+	fi ; done
 
 package-win32-base-exe: package-win32-base
 # Create package
