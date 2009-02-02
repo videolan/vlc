@@ -280,6 +280,8 @@ void spu_Destroy( spu_t *p_spu )
 {
     spu_private_t *p_sys = p_spu->p;
 
+    var_DelCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
+
     if( p_sys->p_blend )
         FilterRelease( p_sys->p_blend );
 
