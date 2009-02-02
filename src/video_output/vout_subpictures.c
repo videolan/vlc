@@ -90,6 +90,7 @@ struct spu_private_t
     uint8_t palette[4][4];                               /**< forced palette */
 
     /* Subpiture filters */
+    char           *psz_chain_update;
     filter_chain_t *p_chain;
 
     /* */
@@ -168,8 +169,6 @@ static void spu_del_buffer( filter_t *, subpicture_t * );
 static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
 
-static int spu_ParseChain( spu_t * );
-
 /* Buffer aloccation fir SUB filter */
 static int SubFilterCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
@@ -221,6 +220,7 @@ spu_t *__spu_Create( vlc_object_t *p_this )
 
     vlc_object_attach( p_spu, p_this );
 
+    p_sys->psz_chain_update = NULL;
     p_sys->p_chain = filter_chain_New( p_spu, "sub filter", false,
                                        SubFilterAllocationInit,
                                        SubFilterAllocationClean,
@@ -250,25 +250,9 @@ int spu_Init( spu_t *p_spu )
 
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
-
-    spu_ParseChain( p_spu );
+    var_TriggerCallback( p_spu, "sub-filter" );
 
     return VLC_SUCCESS;
-}
-
-int spu_ParseChain( spu_t *p_spu )
-{
-    char *psz_parser = var_GetString( p_spu, "sub-filter" );
-    int i_ret;
-
-    if( !psz_parser )
-        return VLC_EGENERIC;
-
-    i_ret = filter_chain_AppendFromString( p_spu->p->p_chain, psz_parser );
-
-    free( psz_parser );
-
-    return i_ret;
 }
 
 /**
@@ -295,6 +279,7 @@ void spu_Destroy( spu_t *p_spu )
         FilterRelease( p_sys->p_scale );
 
     filter_chain_Delete( p_sys->p_chain );
+    free( p_sys->psz_chain_update );
 
     /* Destroy all remaining subpictures */
     SpuHeapClean( &p_sys->heap );
@@ -565,6 +550,21 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
     spu_private_t *p_sys = p_spu->p;
     int i_channel;
     subpicture_t *p_subpic = NULL;
+
+    /* Update sub-filter chain */
+    vlc_mutex_lock( &p_sys->lock );
+    char *psz_chain_update = p_sys->psz_chain_update;
+    p_sys->psz_chain_update = NULL;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    if( psz_chain_update )
+    {
+        filter_chain_Reset( p_sys->p_chain, NULL, NULL );
+
+        filter_chain_AppendFromString( p_spu->p->p_chain, psz_chain_update );
+
+        free( psz_chain_update );
+    }
 
     /* Run subpicture filters */
     filter_chain_SubFilter( p_sys->p_chain, display_date );
@@ -1856,12 +1856,13 @@ static int SubFilterCallback( vlc_object_t *p_object, char const *psz_var,
     spu_t *p_spu = p_data;
     spu_private_t *p_sys = p_spu->p;
 
-    VLC_UNUSED(p_object); VLC_UNUSED(oldval);
-    VLC_UNUSED(newval); VLC_UNUSED(psz_var);
+    VLC_UNUSED(p_object); VLC_UNUSED(oldval); VLC_UNUSED(psz_var);
 
     vlc_mutex_lock( &p_sys->lock );
-    filter_chain_Reset( p_sys->p_chain, NULL, NULL );
-    spu_ParseChain( p_spu );
+
+    free( p_sys->psz_chain_update );
+    p_sys->psz_chain_update = strdup( newval.psz_string );
+
     vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
