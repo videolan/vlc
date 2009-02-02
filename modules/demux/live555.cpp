@@ -564,18 +564,16 @@ describe:
 #endif
     }
     if( psz_options )
-    {
         p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
+    delete [] psz_options;
+
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
-        p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
+    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
                                           var_GetBool( p_demux, "rtsp-kasenna" ), timeout );
 #else
-        p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
+    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
                                           var_GetBool( p_demux, "rtsp-kasenna" ) );
 #endif
-
-    }
-    delete [] psz_options;
 
     if( p_sdp == NULL )
     {
