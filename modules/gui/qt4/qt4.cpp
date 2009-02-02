@@ -259,7 +259,7 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
 
-#if defined Q_WS_X11 && defined HAVE_X11_XLIB_H
+#ifdef Q_WS_X11
     /* Thanks for libqt4 calling exit() in QApplication::QApplication()
      * instead of returning an error, we have to check the X11 display */
     Display *p_display = XOpenDisplay( NULL );
@@ -268,7 +268,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_intf, "Could not connect to X server" );
         return VLC_EGENERIC;
     }
-    XCloseDisplay( p_display );
 #endif
 
     /* Allocations */
@@ -277,6 +276,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_popup_menu = NULL; /* ??? */
     p_sys->p_playlist = pl_Hold( p_intf );
     p_sys->p_mi = NULL;
+#ifdef Q_WS_X11
+    p_sys->display = p_display;
+#endif
 
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
@@ -318,6 +320,9 @@ static void Close( vlc_object_t *p_this )
     QApplication::quit();
 
     vlc_join (p_sys->thread, NULL);
+#ifdef Q_WS_X11
+    XCloseDisplay ((Display *)p_sys->display);
+#endif
     pl_Release (p_this);
     delete p_sys;
 }
@@ -349,8 +354,12 @@ static void *Thread( void *obj )
 #endif
 
     /* Start the QApplication here */
-    QVLCApp *app = new QVLCApp( argc, argv , true );
-    p_intf->p_sys->p_app = app;
+#ifdef Q_WS_X11
+    QVLCApp app( (Display *)p_intf->p_sys->display, argc, argv );
+#else
+    QVLCApp app( argc, argv );
+#endif
+    p_intf->p_sys->p_app = &app;
 
     p_intf->p_sys->mainSettings = new QSettings(
 #ifdef WIN32
@@ -362,16 +371,16 @@ static void *Thread( void *obj )
 
     /* Icon setting */
     if( QDate::currentDate().dayOfYear() >= 354 )
-        app->setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
+        app.setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
     else
-        app->setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
+        app.setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
 
     /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
 
     /* Detect screensize for small screens like TV or EEEpc*/
     p_intf->p_sys->i_screenHeight =
-        app->QApplication::desktop()->availableGeometry().height();
+        app.QApplication::desktop()->availableGeometry().height();
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
@@ -429,11 +438,11 @@ static void *Thread( void *obj )
     bool b_loaded = qtTranslator.load( path + "qt_" + lang );
     if (!b_loaded)
         msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
-    app->installTranslator( &qtTranslator );
+    app.installTranslator( &qtTranslator );
 #endif  //ENABLE_NLS
 
     /* Last settings */
-    app->setQuitOnLastWindowClosed( false );
+    app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
     char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
@@ -441,7 +450,7 @@ static void *Thread( void *obj )
                                                         : psz_path;
 
     /* Launch */
-    app->exec();
+    app.exec();
 
     /* And quit */
     msg_Dbg( p_intf, "Quitting the Qt4 Interface" );
@@ -475,12 +484,12 @@ static void *Thread( void *obj )
     /* Destroy the MainInputManager */
     MainInputManager::killInstance();
 
-    /* Delete the application */
-    delete app;
 
     /* Save the path */
     config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
     free( psz_path );
+
+    /* Delete the application automatically */
     return NULL;
 }
 

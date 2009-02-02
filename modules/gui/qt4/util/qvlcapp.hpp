@@ -31,8 +31,14 @@
 class QVLCApp : public QApplication
 {
 public:
-    QVLCApp( int & argc, char ** argv, bool GUIenabled ) : QApplication( argc,
-            argv, GUIenabled ) {}
+    QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true ) { }
+
+#if defined (Q_WS_X11)
+     QVLCApp( Display *dp, int & argc, char ** argv )
+         : QApplication( dp, argc, argv )
+     {
+     }
+#endif
 
 #if defined(Q_WS_WIN)
 protected:
