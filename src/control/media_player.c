@@ -89,7 +89,8 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
         input_StopThread( p_input_thread );
         vlc_thread_join( p_input_thread );
 
-        var_Destroy( p_input_thread, "drawable" );
+        var_Destroy( p_input_thread, "drawable-hwnd" );
+        var_Destroy( p_input_thread, "drawable-xid" );
     }
 
     vlc_object_release( p_input_thread );
@@ -257,7 +258,11 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
         return NULL;
     }
     p_mi->p_md = NULL;
-    p_mi->drawable = 0;
+#ifndef WIN32
+    p_mi->drawable.xid = 0;
+#else
+    p_mi->drawable.hwnd = NULL;
+#endif
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->p_input_thread = NULL;
     /* refcount strategy:
@@ -592,13 +597,14 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
 
     p_input_thread = p_mi->p_input_thread;
 
-    if( p_mi->drawable )
-    {
-        vlc_value_t val;
-        val.i_int = p_mi->drawable;
-        var_Create( p_input_thread, "drawable", VLC_VAR_DOINHERIT );
-        var_Set( p_input_thread, "drawable", val );
-    }
+    var_Create( p_input_thread, "drawable-xid", VLC_VAR_INTEGER );
+    var_Create( p_input_thread, "drawable-hwnd", VLC_VAR_ADDRESS );
+
+#ifndef WIN32
+    var_SetInteger( p_input_thread, "drawable-xid", p_mi->drawable.xid );
+#else
+    var_SetInteger( p_input_thread, "drawable-hwnd", p_mi->drawable.hwnd );
+#endif
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
@@ -703,7 +709,7 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
     input_thread_t *p_input_thread;
     vout_thread_t *p_vout = NULL;
 
-    p_mi->drawable = drawable;
+    p_mi->drawable.xid = drawable;
 
     /* Allow on the fly drawable changing. This is tricky has this may
      * not be supported by every vout. We though can't disable it
@@ -732,7 +738,7 @@ libvlc_drawable_t
 libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
-    return p_mi->drawable;
+    return p_mi->drawable.xid;
 }
 
 /**************************************************************************

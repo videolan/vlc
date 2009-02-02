@@ -32,7 +32,8 @@
 #include <vlc_vout.h>
 #include <vlc_window.h>
 
-static int  Open (vlc_object_t *);
+static int  OpenXID (vlc_object_t *);
+static int  OpenHWND (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 /*
@@ -40,15 +41,16 @@ static void Close (vlc_object_t *);
  */
 vlc_module_begin ()
     set_shortname (N_("Drawable"))
-    set_description (N_("External embedded video window"))
+    set_description (N_("Embedded X window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-#ifdef WIN32
-    set_capability ("hwnd", 70)
-#else
     set_capability ("xwindow", 70)
-#endif
-    set_callbacks (Open, Close)
+    set_callbacks (OpenXID, Close)
+
+    add_submodule ()
+        set_description (N_("Embedded Windows video"))
+        set_capability ("hwnd", 70)
+        set_callbacks (OpenHWND, Close)
 
 vlc_module_end ()
 
@@ -57,11 +59,11 @@ static int Control (vout_window_t *, int, va_list);
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open (vlc_object_t *obj)
+static int Open (vlc_object_t *obj, const char *varname, bool ptr)
 {
     static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
     vout_window_t *wnd = (vout_window_t *)obj;
-    int drawable = 0;
+    vlc_value_t val;
 
     if (var_Create (obj->p_libvlc, "drawable-busy", VLC_VAR_BOOL))
         return VLC_ENOMEM;
@@ -71,31 +73,38 @@ static int Open (vlc_object_t *obj)
      * It would break libvlc_video_get_parent(). */
     if (!var_GetBool (obj->p_libvlc, "drawable-busy"))
     {
-        /* TODO: implement separate variables for XIDs and HWNDs */
-        drawable = var_GetInteger (obj->p_libvlc, "drawable");
-        if (drawable != 0)
+        var_Get (obj->p_libvlc, varname, &val);
+        if (ptr ? (val.p_address != NULL): (val.i_int == 0))
             var_SetBool (obj->p_libvlc, "drawable-busy", true);
     }
     vlc_mutex_unlock (&serializer);
 
-    if (drawable == 0)
+    if (ptr ? (val.p_address == NULL) : (val.i_int == 0))
     {
         var_Destroy (obj->p_libvlc, "drawable-busy");
         return VLC_EGENERIC;
     }
 
-#ifdef WIN32
-    /* FIXME: don't loose critical bits on Win64 */
-    wnd->handle.hwnd = (void *)drawable;
-#else
+    if (ptr)
+        wnd->handle.hwnd = val.p_address;
+    else
+        wnd->handle.xid = val.i_int;
+
     /* FIXME: check that X server matches --x11-display (if specified) */
-    /* FIXME: get X drawable dimensions */
-    wnd->handle.xid = drawable;
-#endif
     /* FIXME: get window size (in platform-dependent ways) */
 
     wnd->control = Control;
     return VLC_SUCCESS;
+}
+
+static int  OpenXID (vlc_object_t *obj)
+{
+    return Open (obj, "drawable-xid", false);
+}
+
+static int  OpenHWND (vlc_object_t *obj)
+{
+    return Open (obj, "drawable-hwnd", true);
 }
 
 

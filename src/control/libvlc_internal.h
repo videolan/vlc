@@ -153,7 +153,11 @@ struct libvlc_media_player_t
     struct libvlc_instance_t *  p_libvlc_instance; /* Parent instance */
     libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t *    p_event_manager;
-    libvlc_drawable_t           drawable;
+    union
+    {
+        void *hwnd;
+        uint32_t xid;
+    } drawable;
 
     bool        b_own_its_input_thread;
 };

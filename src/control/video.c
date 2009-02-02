@@ -236,7 +236,16 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
                               libvlc_exception_t *p_e )
 {
     /* set as default for future vout instances */
-    var_SetInteger(p_instance->p_libvlc_int, "drawable", (int)d);
+#ifdef WIN32
+    vlc_value_t val;
+
+    if( sizeof(HWND) > sizeof(libvlc_drawable_t) )
+        return; /* BOOM! we told you not to use this function! */
+    val.p_address = (void *)(uintptr_t)d;
+    var_Set( p_instance->p_libvlc_int, "drawable-hwnd", val );
+#else
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-xid", d );
+#endif
 
     libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
     if( p_mi )
@@ -251,11 +260,16 @@ libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc
 {
     VLC_UNUSED(p_e);
 
-    libvlc_drawable_t result;
+#ifdef WIN32
+    vlc_value_t val;
 
-    result = var_GetInteger( p_instance->p_libvlc_int, "drawable" );
-
-    return result;
+    if( sizeof(HWND) > sizeof(libvlc_drawable_t) )
+        return 0;
+    var_Get( p_instance->p_libvlc_int, "drawable-hwnd", &val );
+    return (uintptr_t)val.p_address;
+#else
+    return var_GetInteger( p_instance->p_libvlc_int, "drawable-xid" );
+#endif
 }
 
 
