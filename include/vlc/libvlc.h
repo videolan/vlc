@@ -550,7 +550,18 @@ VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *, libvlc_
 VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
- * Set the drawable where the media player should render its video output
+ * Set the drawable where the media player should render its video output.
+ *
+ * On Windows 32-bits, a window handle (HWND) is expected.
+ * On Windows 64-bits, this function will always fail.
+ *
+ * On OSX, a CGrafPort is expected.
+ *
+ * Otherwise, this shall be the identifier of an existing X11 drawable (window
+ * or pixmap). It is assumed that the X11 server is the same as the one in
+ * x11-display if configured. If XVideo is <b>not</b> supported, it is assumed
+ * that the drawable has the same pixmap format as the default X11 screen
+ * (especially depth, scan line pad, black pixel); this is a bug.
  *
  * \param p_mi the Media Player
  * \param drawable the libvlc_drawable_t where the media player

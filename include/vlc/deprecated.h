@@ -37,10 +37,11 @@ extern "C" {
 /**
  * Set the default video output's parent.
  *
- * This setting will be used as default for all video outputs.
+ * This setting will be used as default for any video output.
  *
  * \param p_instance libvlc instance
- * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param drawable the new parent window
+ *                 (see libvlc_media_player_set_drawable() for details)
  * \param p_e an initialized exception pointer
  * @deprecated Use libvlc_media_player_set_drawable
  */
