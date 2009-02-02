@@ -1100,7 +1100,8 @@ void Equalizer::addCallbacks( aout_instance_t *p_aout )
  **********************************************************************/
 static const char *psz_control_names[] =
 {
-    "Roomsize", "Width" , "Wet", "Dry", "Damp"
+    "spatializer-roomsize", "spatializer-width",
+    "spatializer-wet", "spatializer-dry", "spatializer-damp"
 };
 
 Spatializer::Spatializer( intf_thread_t *_p_intf, QWidget *_parent ) :
