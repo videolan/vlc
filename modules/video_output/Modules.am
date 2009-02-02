@@ -46,3 +46,10 @@ libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 libxcb_window_plugin_la_DEPENDENCIES =
 
 EXTRA_LTLIBRARIES += libxcb_plugin.la libxcb_window_plugin.la
+
+# XXX: do we need yet another modules/ subdirectory?
+libdrawable_plugin_la_SOURCES = drawable.c
+libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
+libdrawable_plugin_la_LIBADD = $(AM_LIBADD)
+libdrawable_plugin_la_DEPENDENCIES =
+libvlc_LTLIBRARIES += libdrawable_plugin.la
