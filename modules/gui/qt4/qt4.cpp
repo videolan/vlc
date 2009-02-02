@@ -260,9 +260,9 @@ static int Open( vlc_object_t *p_this )
     intf_sys_t *p_sys;
 
 #ifdef Q_WS_X11
-    /* Thanks for libqt4 calling exit() in QApplication::QApplication()
-     * instead of returning an error, we have to check the X11 display */
-    Display *p_display = XOpenDisplay( NULL );
+    char *psz_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
+    Display *p_display = XOpenDisplay( psz_display );
+    free( psz_display );
     if( !p_display )
     {
         msg_Err( p_intf, "Could not connect to X server" );
