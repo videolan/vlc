@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>843</height>
+    <width>643</width>
+    <height>651</height>
    </rect>
   </property>
   <property name="windowTitle" >
@@ -41,26 +41,16 @@
         </item>
         <item row="1" column="3" >
          <widget class="QLabel" name="fileLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Filename")</string>
           </property>
          </widget>
         </item>
         <item row="1" column="4" >
-         <widget class="QLineEdit" name="fileEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="fileEdit" />
         </item>
         <item row="1" column="5" >
          <widget class="QPushButton" name="fileSelectButton" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="sizePolicy" >
            <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
             <horstretch>0</horstretch>
@@ -74,9 +64,6 @@
         </item>
         <item row="1" column="6" >
          <widget class="QCheckBox" name="rawInput" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Dump raw input")</string>
           </property>
@@ -91,26 +78,16 @@
         </item>
         <item row="2" column="3" >
          <widget class="QLabel" name="HTTPLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Address")</string>
           </property>
          </widget>
         </item>
         <item row="2" column="4" >
-         <widget class="QLineEdit" name="HTTPEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="HTTPEdit" />
         </item>
         <item row="2" column="5" >
          <widget class="QLabel" name="HTTPPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Port:")</string>
           </property>
@@ -121,9 +98,6 @@
         </item>
         <item row="2" column="6" >
          <widget class="QSpinBox" name="HTTPPort" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -156,26 +130,16 @@
         </item>
         <item row="3" column="3" >
          <widget class="QLabel" name="MMSHLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Address")</string>
           </property>
          </widget>
         </item>
         <item row="3" column="4" >
-         <widget class="QLineEdit" name="MMSHEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="MMSHEdit" />
         </item>
         <item row="3" column="5" >
          <widget class="QLabel" name="MMSHPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Port:")</string>
           </property>
@@ -186,9 +150,6 @@
         </item>
         <item row="3" column="6" >
          <widget class="QSpinBox" name="MMSHPort" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -218,26 +179,16 @@
         </item>
         <item row="4" column="3" >
          <widget class="QLabel" name="RTPLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Address")</string>
           </property>
          </widget>
         </item>
         <item row="4" column="4" >
-         <widget class="QLineEdit" name="RTPEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="RTPEdit" />
         </item>
         <item row="4" column="5" >
          <widget class="QLabel" name="RTPPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Port:")</string>
           </property>
@@ -248,9 +199,6 @@
         </item>
         <item row="4" column="6" >
          <widget class="QSpinBox" name="RTPPort" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -282,17 +230,10 @@
          </widget>
         </item>
         <item row="5" column="4" >
-         <widget class="QLineEdit" name="UDPEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="UDPEdit" />
         </item>
         <item row="5" column="5" >
          <widget class="QLabel" name="UDPPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Port")</string>
           </property>
@@ -303,9 +244,6 @@
         </item>
         <item row="5" column="6" >
          <widget class="QSpinBox" name="UDPPort" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -331,9 +269,6 @@
         </item>
         <item row="6" column="5" >
          <widget class="QLabel" name="RTPPortLabel2" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Video Port")</string>
           </property>
@@ -344,9 +279,6 @@
         </item>
         <item row="6" column="6" >
          <widget class="QSpinBox" name="RTPPort2" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -376,26 +308,16 @@
         </item>
         <item row="7" column="3" >
          <widget class="QLabel" name="IcecastLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Address")</string>
           </property>
          </widget>
         </item>
         <item row="7" column="4" >
-         <widget class="QLineEdit" name="IcecastEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="IcecastEdit" />
         </item>
         <item row="7" column="5" >
          <widget class="QLabel" name="IcecastPortLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Port:")</string>
           </property>
@@ -406,9 +328,6 @@
         </item>
         <item row="7" column="6" >
          <widget class="QSpinBox" name="IcecastPort" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="maximumSize" >
            <size>
             <width>90</width>
@@ -428,26 +347,16 @@
         </item>
         <item row="8" column="3" >
          <widget class="QLabel" name="IcecastMountpointLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Mount Point")</string>
           </property>
          </widget>
         </item>
         <item row="8" column="4" >
-         <widget class="QLineEdit" name="IcecastMountpointEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="IcecastMountpointEdit" />
         </item>
         <item row="8" column="5" >
          <widget class="QLabel" name="IcecastNameLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Login:pass:")</string>
           </property>
@@ -457,17 +366,10 @@
          </widget>
         </item>
         <item row="8" column="6" >
-         <widget class="QLineEdit" name="IcecastNamePassEdit" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="IcecastNamePassEdit" />
         </item>
         <item rowspan="2" row="5" column="2" >
          <widget class="QLabel" name="UDPRTPLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="sizePolicy" >
            <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
             <horstretch>0</horstretch>
@@ -499,9 +401,6 @@
         </item>
         <item row="5" column="1" >
          <widget class="QCheckBox" name="UDPOutput" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="sizePolicy" >
            <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
             <horstretch>0</horstretch>
@@ -528,368 +427,14 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" >
-    <widget class="QLabel" name="label_3" >
-     <property name="text" >
-      <string>_("Profile")</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1" >
-    <widget class="QComboBox" name="profileBox" />
-   </item>
    <item row="3" column="0" colspan="2" >
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="currentIndex" >
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="muxer" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>622</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <attribute name="title" >
-       <string>_("Encapsulation")</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QRadioButton" name="TSMux" >
-         <property name="text" >
-          <string>MPEG-TS</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QRadioButton" name="OggMux" >
-         <property name="text" >
-          <string>Ogg/Ogm</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" >
-        <widget class="QRadioButton" name="MOVMux" >
-         <property name="text" >
-          <string>MOV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3" >
-        <widget class="QRadioButton" name="FLVMux" >
-         <property name="text" >
-          <string>FLV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QRadioButton" name="PSMux" >
-         <property name="text" >
-          <string>MPEG-PS</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QRadioButton" name="ASFMux" >
-         <property name="text" >
-          <string>ASF/WMV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2" >
-        <widget class="QRadioButton" name="WAVMux" >
-         <property name="text" >
-          <string>WAV</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QRadioButton" name="MPEG1Mux" >
-         <property name="text" >
-          <string>MPEG 1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QRadioButton" name="MP4Mux" >
-         <property name="text" >
-          <string>MP4</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="2" >
-        <widget class="QRadioButton" name="RAWMux" >
-         <property name="text" >
-          <string>RAW</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="3" >
-        <widget class="QRadioButton" name="MKVMux" >
-         <property name="text" >
-          <string>MKV</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="videoCodec" >
-      <property name="enabled" >
-       <bool>true</bool>
-      </property>
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>622</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <attribute name="title" >
-       <string>_("Video codec")</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QCheckBox" name="transcodeVideo" >
-         <property name="text" >
-          <string>_("Video")</string>
-         </property>
-        </widget>
-       </item>
-       <item rowspan="2" row="0" column="1" >
-        <widget class="QComboBox" name="vCodecBox" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="editable" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="vCodecLabel" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Codec")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="vBitrateLabel" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Bitrate (kb/s)")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QSpinBox" name="vBitrateSpin" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="accelerated" >
-          <bool>true</bool>
-         </property>
-         <property name="suffix" >
-          <string> kb/s</string>
-         </property>
-         <property name="minimum" >
-          <number>8</number>
-         </property>
-         <property name="maximum" >
-          <number>8192</number>
-         </property>
-         <property name="value" >
-          <number>800</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="vScaleLabel" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Scale")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1" >
-        <widget class="QComboBox" name="vScaleBox" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="editable" >
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="audioCodec" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>622</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <attribute name="title" >
-       <string>_("Audio codec")</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QCheckBox" name="transcodeAudio" >
-         <property name="text" >
-          <string>_("Audio")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="aCodecLabel" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Codec")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QComboBox" name="aCodecBox" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" >
-        <widget class="QLabel" name="aBitrateLabel" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Bitrate (kb/s)")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QSpinBox" name="aBitrateSpin" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="suffix" >
-          <string> kb/s</string>
-         </property>
-         <property name="minimum" >
-          <number>8</number>
-         </property>
-         <property name="maximum" >
-          <number>512</number>
-         </property>
-         <property name="value" >
-          <number>128</number>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" >
-        <widget class="QLabel" name="aChannelsLabel" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Channels")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1" >
-        <widget class="QSpinBox" name="aChannelsSpin" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="alignment" >
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="minimum" >
-          <number>1</number>
-         </property>
-         <property name="maximum" >
-          <number>10</number>
-         </property>
-         <property name="value" >
-          <number>2</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="subtitles" >
-      <property name="geometry" >
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>622</width>
-        <height>151</height>
-       </rect>
-      </property>
-      <attribute name="title" >
-       <string>_("Subtitles")</string>
-      </attribute>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QCheckBox" name="transcodeSubs" >
-         <property name="text" >
-          <string>_("Subtitles")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QComboBox" name="subsCodecBox" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QCheckBox" name="subsOverlay" >
-         <property name="enabled" >
-          <bool>false</bool>
-         </property>
-         <property name="text" >
-          <string>_("Overlay subtitles on the video")</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2" >
     <widget class="Line" name="line_2" >
      <property name="orientation" >
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2" >
+   <item row="4" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
       <string>_("Miscellaneous")</string>
@@ -899,9 +444,6 @@
        <layout class="QGridLayout" >
         <item row="0" column="0" >
          <widget class="QCheckBox" name="sap" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("SAP announce")</string>
           </property>
@@ -909,20 +451,13 @@
         </item>
         <item row="0" column="3" >
          <widget class="QLabel" name="sapGroupLabel" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
           <property name="text" >
            <string>_("Group name")</string>
           </property>
          </widget>
         </item>
         <item row="0" column="4" >
-         <widget class="QLineEdit" name="sapGroup" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="sapGroup" />
         </item>
         <item row="1" column="4" >
          <widget class="QSpinBox" name="ttl" >
@@ -938,11 +473,7 @@
          </widget>
         </item>
         <item row="0" column="1" colspan="2" >
-         <widget class="QLineEdit" name="sapName" >
-          <property name="enabled" >
-           <bool>false</bool>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="sapName" />
         </item>
         <item row="1" column="0" colspan="2" >
          <widget class="QCheckBox" name="soutAll" >
@@ -970,7 +501,7 @@
      </layout>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2" >
+   <item row="5" column="0" colspan="2" >
     <widget class="QGroupBox" name="groupBox_4" >
      <property name="title" >
       <string>_("Generated stream output string")</string>
@@ -982,7 +513,7 @@
      </layout>
     </widget>
    </item>
-   <item row="7" column="0" colspan="2" >
+   <item row="6" column="0" colspan="2" >
     <layout class="QHBoxLayout" >
      <item>
       <spacer>
@@ -1006,8 +537,19 @@
      </item>
     </layout>
    </item>
+   <item row="2" column="0" colspan="2" >
+    <widget class="VLCProfileSelector" native="1" name="profileSelect" />
+   </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>VLCProfileSelector</class>
+   <extends>QWidget</extends>
+   <header>components/sout/profile_selector.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

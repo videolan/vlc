@@ -1,0 +1,496 @@
+<ui version="4.0" >
+ <class>Profiles</class>
+ <widget class="QWidget" name="Profiles" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>631</width>
+    <height>378</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_4" >
+   <item row="0" column="0" >
+    <widget class="QLabel" name="label_5" >
+     <property name="text" >
+      <string>_("Profile Name")</string>
+     </property>
+     <property name="margin" >
+      <number>10</number>
+     </property>
+     <property name="buddy" >
+      <cstring>profileLine</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" >
+    <widget class="QLineEdit" name="profileLine" />
+   </item>
+   <item row="1" column="0" colspan="2" >
+    <widget class="QTabWidget" name="tabWidget" >
+     <property name="sizePolicy" >
+      <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="currentIndex" >
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="muxer" >
+      <attribute name="title" >
+       <string>_("Encapsulation")</string>
+      </attribute>
+      <layout class="QGridLayout" >
+       <property name="leftMargin" >
+        <number>9</number>
+       </property>
+       <property name="rightMargin" >
+        <number>9</number>
+       </property>
+       <item row="2" column="0" >
+        <widget class="QRadioButton" name="TSMux" >
+         <property name="text" >
+          <string>MPEG-TS</string>
+         </property>
+         <property name="checked" >
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" >
+        <widget class="QRadioButton" name="PSMux" >
+         <property name="text" >
+          <string>MPEG-PS</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" >
+        <widget class="QRadioButton" name="WAVMux" >
+         <property name="text" >
+          <string>WAV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QRadioButton" name="ASFMux" >
+         <property name="text" >
+          <string>ASF/WMV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QRadioButton" name="OggMux" >
+         <property name="text" >
+          <string>Ogg/Ogm</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2" >
+        <widget class="QRadioButton" name="RAWMux" >
+         <property name="text" >
+          <string>RAW</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" >
+        <widget class="QRadioButton" name="MPEG1Mux" >
+         <property name="text" >
+          <string>MPEG 1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3" >
+        <widget class="QRadioButton" name="FLVMux" >
+         <property name="text" >
+          <string>FLV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="3" >
+        <widget class="QRadioButton" name="AVIMux" >
+         <property name="text" >
+          <string>AVI</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3" >
+        <widget class="QRadioButton" name="MOVMux" >
+         <property name="text" >
+          <string>MP4/MOV</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" >
+        <widget class="QRadioButton" name="MJPEGMux" >
+         <property name="text" >
+          <string>MJPEG</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1" >
+        <widget class="QRadioButton" name="MKVMux" >
+         <property name="text" >
+          <string>MKV</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="videoCodec" >
+      <property name="enabled" >
+       <bool>true</bool>
+      </property>
+      <attribute name="title" >
+       <string>_("Video codec")</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2" >
+       <property name="spacing" >
+        <number>6</number>
+       </property>
+       <item row="0" column="0" colspan="2" >
+        <widget class="QCheckBox" name="transcodeVideo" >
+         <property name="text" >
+          <string>_("Video")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="vCodecLabel" >
+         <property name="enabled" >
+          <bool>true</bool>
+         </property>
+         <property name="text" >
+          <string>_("Codec")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>vCodecBox</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2" >
+        <widget class="QComboBox" name="vCodecBox" >
+         <property name="editable" >
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2" >
+        <widget class="QLabel" name="vBitrateLabel" >
+         <property name="text" >
+          <string>_("Bitrate")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>vBitrateSpin</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QSpinBox" name="vBitrateSpin" >
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="accelerated" >
+          <bool>true</bool>
+         </property>
+         <property name="suffix" >
+          <string> kb/s</string>
+         </property>
+         <property name="minimum" >
+          <number>8</number>
+         </property>
+         <property name="maximum" >
+          <number>8192</number>
+         </property>
+         <property name="value" >
+          <number>800</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2" >
+        <widget class="QLabel" name="vFrameLabel" >
+         <property name="text" >
+          <string>_("Frame Rate")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>vFrameBox</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" >
+        <widget class="QDoubleSpinBox" name="vFrameBox" >
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="prefix" >
+          <string/>
+         </property>
+         <property name="suffix" >
+          <string> fps</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="3" >
+        <widget class="QGroupBox" name="groupBox" >
+         <property name="title" >
+          <string>Resolution</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout" >
+          <property name="spacing" >
+           <number>6</number>
+          </property>
+          <item row="0" column="0" colspan="2" >
+           <widget class="QLabel" name="vScaleLabel" >
+            <property name="text" >
+             <string>_("Scale")</string>
+            </property>
+            <property name="buddy" >
+             <cstring>vScaleBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="4" >
+           <widget class="QComboBox" name="vScaleBox" >
+            <property name="editable" >
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" >
+           <widget class="QLabel" name="heightLabel" >
+            <property name="text" >
+             <string>_("Height")</string>
+            </property>
+            <property name="buddy" >
+             <cstring>heightBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" >
+           <widget class="QSpinBox" name="heightBox" >
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum" >
+             <number>8000</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3" >
+           <widget class="QLabel" name="widthLabel" >
+            <property name="text" >
+             <string>_("Width")</string>
+            </property>
+            <property name="buddy" >
+             <cstring>widthBox</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4" >
+           <widget class="QSpinBox" name="widthBox" >
+            <property name="alignment" >
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="maximum" >
+             <number>8000</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2" >
+           <spacer name="horizontalSpacer" >
+            <property name="orientation" >
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType" >
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0" >
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="audioCodec" >
+      <attribute name="title" >
+       <string>_("Audio codec")</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_3" >
+       <item row="0" column="0" colspan="2" >
+        <widget class="QCheckBox" name="transcodeAudio" >
+         <property name="text" >
+          <string>_("Audio")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="aCodecLabel" >
+         <property name="text" >
+          <string>_("Codec")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>aCodecBox</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="2" >
+        <widget class="QComboBox" name="aCodecBox" />
+       </item>
+       <item row="2" column="0" colspan="2" >
+        <widget class="QLabel" name="aBitrateLabel" >
+         <property name="text" >
+          <string>_("Bitrate")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>aBitrateSpin</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2" >
+        <widget class="QSpinBox" name="aBitrateSpin" >
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="suffix" >
+          <string> kb/s</string>
+         </property>
+         <property name="minimum" >
+          <number>8</number>
+         </property>
+         <property name="maximum" >
+          <number>512</number>
+         </property>
+         <property name="value" >
+          <number>128</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2" >
+        <widget class="QLabel" name="aChannelsLabel" >
+         <property name="text" >
+          <string>_("Channels")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>aChannelsSpin</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2" >
+        <widget class="QSpinBox" name="aChannelsSpin" >
+         <property name="alignment" >
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="minimum" >
+          <number>1</number>
+         </property>
+         <property name="maximum" >
+          <number>10</number>
+         </property>
+         <property name="value" >
+          <number>2</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0" colspan="2" >
+        <widget class="QLabel" name="aSampleLabel" >
+         <property name="text" >
+          <string>_("Sample Rate")</string>
+         </property>
+         <property name="buddy" >
+          <cstring>aSampleBox</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2" >
+        <widget class="QComboBox" name="aSampleBox" />
+       </item>
+       <item row="5" column="2" >
+        <spacer name="verticalSpacer" >
+         <property name="orientation" >
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0" >
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="subtitles" >
+      <attribute name="title" >
+       <string>_("Subtitles")</string>
+      </attribute>
+      <layout class="QGridLayout" name="_4" >
+       <item row="0" column="0" >
+        <widget class="QCheckBox" name="transcodeSubs" >
+         <property name="text" >
+          <string>_("Subtitles")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QComboBox" name="subsCodecBox" />
+       </item>
+       <item row="1" column="1" >
+        <widget class="QCheckBox" name="subsOverlay" >
+         <property name="text" >
+          <string>_("Overlay subtitles on the video")</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2" >
+    <widget class="QDialogButtonBox" name="buttonBox" />
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>profileLine</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>TSMux</tabstop>
+  <tabstop>ASFMux</tabstop>
+  <tabstop>OggMux</tabstop>
+  <tabstop>MOVMux</tabstop>
+  <tabstop>PSMux</tabstop>
+  <tabstop>MJPEGMux</tabstop>
+  <tabstop>WAVMux</tabstop>
+  <tabstop>FLVMux</tabstop>
+  <tabstop>MPEG1Mux</tabstop>
+  <tabstop>MKVMux</tabstop>
+  <tabstop>RAWMux</tabstop>
+  <tabstop>AVIMux</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>transcodeVideo</tabstop>
+  <tabstop>vCodecBox</tabstop>
+  <tabstop>vBitrateSpin</tabstop>
+  <tabstop>vFrameBox</tabstop>
+  <tabstop>vScaleBox</tabstop>
+  <tabstop>heightBox</tabstop>
+  <tabstop>widthBox</tabstop>
+  <tabstop>transcodeAudio</tabstop>
+  <tabstop>aCodecBox</tabstop>
+  <tabstop>aBitrateSpin</tabstop>
+  <tabstop>aChannelsSpin</tabstop>
+  <tabstop>aSampleBox</tabstop>
+  <tabstop>transcodeSubs</tabstop>
+  <tabstop>subsCodecBox</tabstop>
+  <tabstop>subsOverlay</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -50,6 +50,7 @@ nodist_SOURCES_qt4 = \
 		components/playlist/playlist.moc.cpp \
 		components/playlist/panels.moc.cpp \
 		components/playlist/selector.moc.cpp \
+		components/sout/profile_selector.moc.cpp \
 		util/input_slider.moc.cpp \
 		util/customwidgets.moc.cpp \
 		resources.cpp \
@@ -63,6 +64,7 @@ nodist_SOURCES_qt4 = \
 		ui/open.h \
 		ui/vlm.h \
 		ui/podcast_configuration.h \
+		ui/profiles.h \
 		ui/sprefs_audio.h \
 		ui/sprefs_input.h \
 		ui/sprefs_interface.h \
@@ -217,6 +219,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/playlist/standardpanel.cpp \
 		components/playlist/playlist.cpp \
 		components/playlist/selector.cpp \
+		components/sout/profile_selector.cpp \
 		util/input_slider.cpp \
 		util/customwidgets.cpp \
 		util/registry.cpp
@@ -261,6 +264,7 @@ noinst_HEADERS = \
 	components/playlist/playlist.hpp \
 	components/playlist/selector.hpp \
 	components/playlist/sorting.h \
+	components/sout/profile_selector.cpp \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
@@ -279,6 +283,7 @@ EXTRA_DIST += \
 	ui/open_capture.ui \
 	ui/open.ui \
 	ui/podcast_configuration.ui \
+	ui/profiles.ui \
 	ui/sprefs_audio.ui \
 	ui/sprefs_input.ui \
 	ui/sprefs_interface.ui \

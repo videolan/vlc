@@ -38,6 +38,76 @@ class QCheckBox;
 class QGridLayout;
 class QTextEdit;
 
+class SoutMrl
+{
+public:
+    SoutMrl( const QString head = "")
+    {
+        mrl = head;
+        b_first = true;
+        b_has_bracket = false;
+    }
+
+    QString getMrl()
+    {
+        return mrl;
+    }
+
+    void begin( QString module )
+    {
+        if( !b_first )
+            mrl += ":";
+        b_first = false;
+
+        mrl += module;
+        b_has_bracket = false;
+    }
+    void end()
+    {
+        if( b_has_bracket )
+            mrl += "}";
+    }
+    void option( const QString option, const QString value = "" )
+    {
+        if( !b_has_bracket )
+            mrl += "{";
+        else
+            mrl += ",";
+        b_has_bracket = true;
+
+        mrl += option;
+
+        if( !value.isEmpty() )
+        {
+            char *psz = config_StringEscape( qtu(value) );
+            if( psz )
+            {
+                mrl += "=\"" + qfu( psz ) + "\"";
+                free( psz );
+            }
+        }
+    }
+    void option( const QString name, const int i_value, const int i_precision = 10 )
+    {
+        option( name, QString::number( i_value, i_precision ) );
+    }
+    void option( const QString name, const double f_value )
+    {
+        option( name, QString::number( f_value ) );
+    }
+
+    void option( const QString name, const QString base, const int i_value, const int i_precision = 10 )
+    {
+        option( name, base + ":" + QString::number( i_value, i_precision ) );
+    }
+
+private:
+    QString mrl;
+    bool b_has_bracket;
+    bool b_first;
+};
+
+
 class SoutDialog : public QVLCDialog
 {
     Q_OBJECT;
@@ -79,9 +149,6 @@ private slots:
     void toggleSout();
     void setOptions();
     void fileBrowse();
-    void setVTranscodeOptions( bool );
-    void setATranscodeOptions( bool );
-    void setSTranscodeOptions( bool );
     void setRawOptions( bool );
     void changeUDPandRTPmess( bool );
     void RTPtoggled( bool );
