@@ -396,11 +396,54 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 
 #ifdef HAVE_LIBCDDB
     GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
+    const char *psz_album = NULL;
+    const char *psz_year = NULL;
+    const char *psz_genre = NULL;
+    char psz_year_buffer[4+1];
+
     if( p_sys->p_disc )
     {
-        const char *psz_name = cddb_disc_get_title( p_sys->p_disc );
-        if( psz_name && *psz_name )
-            input_item_SetName( p_current, psz_name );
+        psz_album = cddb_disc_get_title( p_sys->p_disc );
+        if( psz_album && *psz_album )
+        {
+            input_item_SetName( p_current, psz_album );
+            input_item_SetAlbum( p_current, psz_album );
+        }
+
+        const unsigned i_year = cddb_disc_get_year( p_sys->p_disc );
+        if( i_year > 0 )
+        {
+            psz_year = psz_year_buffer;
+            snprintf( psz_year_buffer, sizeof(psz_year_buffer), "%u", i_year );
+            input_item_SetDate( p_current, psz_year );
+        }
+
+        psz_genre = cddb_disc_get_genre( p_sys->p_disc );
+        if( psz_genre && *psz_genre )
+            input_item_SetGenre( p_current, psz_genre );
+
+        /* Set artist only if unique */
+        const char *psz_artist = NULL;
+        for( int i = 0; i < i_titles; i++ )
+        {
+            cddb_track_t *t = cddb_disc_get_track( p_sys->p_disc, i );
+            if( !t )
+                continue;
+            const char *psz_track_artist = cddb_track_get_artist( t );
+            if( psz_artist && psz_track_artist &&
+                strcmp( psz_artist, psz_track_artist ) )
+            {
+                psz_artist = NULL;
+                break;
+            }
+            psz_artist = psz_track_artist;
+        }
+        if( psz_artist && *psz_artist )
+            input_item_SetArtist( p_current, psz_artist );
+
+        const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i_titles] - p_sys->p_sectors[0] ) *
+                                   CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
+        input_item_SetDuration( p_current, i_duration );
     }
 #endif
 
@@ -458,19 +501,12 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
                     input_item_SetArtist( p_input_item, psz_artist );
             }
 
-            const char *psz_album = cddb_disc_get_title( p_sys->p_disc );
             if( psz_album && *psz_album )
                 input_item_SetAlbum( p_input_item, psz_album );
 
-            const unsigned i_year = cddb_disc_get_year( p_sys->p_disc );
-            if( i_year > 0 )
-            {
-                char psz_date[4+1];
-                snprintf( psz_date, sizeof(psz_date), "%u", i_year );
-                input_item_SetDate( p_input_item, psz_date );
-            }
+            if( psz_year )
+                input_item_SetDate( p_input_item, psz_year );
 
-            const char *psz_genre = cddb_disc_get_genre( p_sys->p_disc );
             if( psz_genre && *psz_genre )
                 input_item_SetGenre( p_input_item, psz_genre );
         }
