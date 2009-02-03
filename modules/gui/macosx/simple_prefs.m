@@ -242,22 +242,17 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [[[o_hotkeys_listbox tableColumnWithIdentifier: @"shortcut"] headerCell] setStringValue: _NS("Shortcut")];
 
     /* input */
-    [o_input_access_box setTitle: _NS("Access Filter")];
     [o_input_avi_txt setStringValue: _NS("Repair AVI Files")];
-    [o_input_bandwidth_ckb setTitle: _NS("Bandwidth limiter")];
     [o_input_cachelevel_txt setStringValue: _NS("Default Caching Level")];
     [o_input_caching_box setTitle: _NS("Caching")];
     [o_input_cachelevel_custom_txt setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
-    [o_input_dump_ckb setTitle: _NS("Dump")];
     [o_input_httpproxy_txt setStringValue: _NS("HTTP Proxy")];
     [o_input_httpproxypwd_txt setStringValue: _NS("Password for HTTP Proxy")];
     [o_input_mux_box setTitle: _NS("Codecs / Muxers")];
     [o_input_net_box setTitle: _NS("Network")];
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
-    [o_input_record_ckb setTitle: _NS("Record")];
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
     [o_input_serverport_txt setStringValue: _NS("Default Server Port")];
-    [o_input_timeshift_ckb setTitle: _NS("Timeshift")];
 
     /* interface */
     [o_intf_art_txt setStringValue: _NS("Album art download policy")];
@@ -504,15 +499,6 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
     [o_input_rtsp_ckb setState: config_GetInt( p_intf, "rtsp-tcp" )];
-
-    psz_tmp = config_GetPsz( p_intf, "access-filter" );
-    if( psz_tmp )
-    {
-        [o_input_record_ckb setState: (int)strstr( psz_tmp, "record" )];
-        [o_input_dump_ckb setState: (int)strstr( psz_tmp, "dump" )];
-        [o_input_bandwidth_ckb setState: (int)strstr( psz_tmp, "bandwidth" )];
-        [o_input_timeshift_ckb setState: (int)strstr( psz_tmp, "timeshift" )];
-    }
 
     [o_input_cachelevel_pop removeAllItems];
     [o_input_cachelevel_pop addItemsWithTitles: 
@@ -882,27 +868,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             i = i + config_SaveConfigFile( p_intf, "access_realrtsp" );
         }
         CaCi( "mms-caching", 19 );
-
-        #define SaveAccessFilter( object, name ) \
-        if( [object state] == NSOnState ) \
-        { \
-            if( b_first ) \
-            { \
-                [o_temp appendString: name]; \
-                b_first = NO; \
-            } \
-            else \
-                [o_temp appendFormat: @":%@", name]; \
-        }
-
-        BOOL b_first = YES;
-        NSMutableString *o_temp = [[NSMutableString alloc] init];
-        SaveAccessFilter( o_input_record_ckb, @"record" );
-        SaveAccessFilter( o_input_dump_ckb, @"dump" );
-        SaveAccessFilter( o_input_bandwidth_ckb, @"bandwidth" );
-        SaveAccessFilter( o_input_timeshift_ckb, @"timeshift" );
-        config_PutPsz( p_intf, "access-filter", [o_temp UTF8String] );
-        [o_temp release];
 
         i = config_SaveConfigFile( p_intf, "main" );
         i = i + config_SaveConfigFile( p_intf, "ffmpeg" );

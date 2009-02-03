@@ -78,7 +78,6 @@
                 "o_audio_vol_fld" = id;
                 "o_audio_vol_sld" = id;
                 "o_audio_vol_txt" = id;
-                "o_currentlyShownCategoryView" = id;
                 "o_hotkeys_change_btn" = id;
                 "o_hotkeys_change_cancel_btn" = id;
                 "o_hotkeys_change_keys_lbl" = id;
@@ -90,15 +89,12 @@
                 "o_hotkeys_lbl" = id;
                 "o_hotkeys_listbox" = id;
                 "o_hotkeys_view" = id;
-                "o_input_access_box" = id;
                 "o_input_avi_pop" = id;
                 "o_input_avi_txt" = id;
-                "o_input_bandwidth_ckb" = id;
                 "o_input_cachelevel_custom_txt" = id;
                 "o_input_cachelevel_pop" = id;
                 "o_input_cachelevel_txt" = id;
                 "o_input_caching_box" = id;
-                "o_input_dump_ckb" = id;
                 "o_input_httpproxy_fld" = id;
                 "o_input_httpproxy_txt" = id;
                 "o_input_httpproxypwd_sfld" = id;
@@ -107,11 +103,9 @@
                 "o_input_net_box" = id;
                 "o_input_postproc_fld" = id;
                 "o_input_postproc_txt" = id;
-                "o_input_record_ckb" = id;
                 "o_input_rtsp_ckb" = id;
                 "o_input_serverport_fld" = id;
                 "o_input_serverport_txt" = id;
-                "o_input_timeshift_ckb" = id;
                 "o_input_view" = id;
                 "o_intf_art_pop" = id;
                 "o_intf_art_txt" = id;
