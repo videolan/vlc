@@ -5891,6 +5891,7 @@ AC_CONFIG_FILES([
   po/Makefile.in
   projects/activex/axvlc_rc.rc
   projects/mozilla/npvlc_rc.rc
+  projects/mozilla/vlc.r
   share/Makefile
   share/vlc_win32_rc.rc
   share/libvlc_win32_rc.rc
