@@ -1302,9 +1302,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                         var_Set( p_vout, "mouse-button-down", val );
 
                         var_SetBool( p_vout, "mouse-clicked", true );
-
-                        vlc_value_t val; val.b_bool = false;
-                        var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
+                        var_SetBool( p_vout->p_libvlc, "intf-popupmenu", false );
                     }
                     break;
 
@@ -1326,8 +1324,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                         val.i_int &= ~4;
                         var_Set( p_vout, "mouse-button-down", val );
 
-                        vlc_value_t val; val.b_bool = true;
-                        var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
+                        var_SetBool( p_vout->p_libvlc, "intf-popupmenu", true );
                     }
                     break;
 
@@ -1349,7 +1346,6 @@ static int ManageVideo( vout_thread_t *p_vout )
         else if( xevent.type == MotionNotify )
         {
             unsigned int i_width, i_height, i_x, i_y;
-            vlc_value_t val;
 
             /* somewhat different use for vout_PlacePicture:
              * here the values are needed to give to mouse coordinates
@@ -1384,8 +1380,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 
             var_Set( p_vout, "mouse-y", val );
 
-            val.b_bool = true;
-            var_Set( p_vout, "mouse-moved", val );
+            var_SetBool( p_vout, "mouse-moved", true );
 
             p_vout->p_sys->i_time_mouse_last_moved = mdate();
             if( ! p_vout->p_sys->b_mouse_pointer_visible )
@@ -2795,7 +2790,7 @@ static int InitDisplay( vout_thread_t *p_vout )
 
         if( p_vout->p_sys->i_shm_opcode )
         {
-            int major, minor;
+            int minor;
             Bool pixmaps;
 
             XShmQueryVersion( p_vout->p_sys->p_display, &major, &minor,
