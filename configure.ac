@@ -1572,7 +1572,7 @@ dnl Allow runing as root (usefull for people runing on embedded platforms)
 dnl
 AC_ARG_ENABLE(run-as-root,
 [  --enable-run-as-root    allow runing VLC as root (default disabled)])
-AS_IF([test "${enable_run_as_root}" == "yes"],[
+AS_IF([test "${enable_run_as_root}" = "yes"],[
     AC_DEFINE(ALLOW_RUN_AS_ROOT, 1,
               [Define to 1 to allow runing VLC as root (uid 0).])
 ])
