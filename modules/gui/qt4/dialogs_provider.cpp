@@ -573,7 +573,7 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
         const char *psz_option = qtu( s->getMrl() );
 
         msg_Dbg( p_intf, "Sout mrl %s", psz_option );
-        playlist_AddExt( THEPL, qtu( mrl ), "Streaming",
+        playlist_AddExt( THEPL, qtu( mrl ), _("Streaming"),
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
                         -1, 1, &psz_option, VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
