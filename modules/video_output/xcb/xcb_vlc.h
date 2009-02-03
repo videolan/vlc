@@ -22,3 +22,8 @@
 
 int CheckError (vout_thread_t *, const char *str, xcb_void_cookie_t);
 int ProcessEvent (vout_thread_t *, xcb_generic_event_t *);
+
+typedef struct key_handler_t key_handler_t;
+key_handler_t *CreateKeyHandler (vlc_object_t *, xcb_connection_t *);
+void DestroyKeyHandler (key_handler_t *);
+int ProcessKeyEvent (key_handler_t *, xcb_generic_event_t *);

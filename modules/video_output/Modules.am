@@ -25,17 +25,21 @@ XCB_LIBS = -lxcb
 XCB_SHM_LIBS = -lxcb-shm
 XCB_AUX_LIBS = -lxcb-aux
 XCB_IMAGE_LIBS = -lxcb-image
+XCB_KEYSYMS_LIBS = -lxcb-keysyms
 
 libxcb_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/xcb.c \
-	xcb/events.c
+	xcb/events.c \
+	xcb/keys.c
 libxcb_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM) \
-	$(XCB_AUX_CFLAGS) $(XCB_IMAGE_CFLAGS)
+	$(XPROTO_CFLAGS) \
+	$(XCB_AUX_CFLAGS) $(XCB_IMAGE_CFLAGS) $(XCB_KEYSYMS_CFLAGS)
 libxcb_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM) \
-	$(XCB_AUX_LIBS) $(XCB_IMAGE_LIBS)
+	$(XPROTO_LIBS) \
+	$(XCB_AUX_LIBS) $(XCB_IMAGE_LIBS) $(XCB_KEYSYMS_LIBS)
 libxcb_plugin_la_DEPENDENCIES =
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c
