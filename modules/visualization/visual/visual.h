@@ -34,6 +34,12 @@ typedef struct visual_effect_t
     int        i_nb_chans;
 } visual_effect_t ;
 
+typedef struct spectrum_data
+{
+    int *peaks;
+    int *prev_heights;
+} spectrum_data;
+
 
 /*****************************************************************************
  * aout_filter_sys_t: visualizer audio filter method descriptor

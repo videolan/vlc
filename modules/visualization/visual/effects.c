@@ -39,6 +39,7 @@
 #include "fft.h"
 
 #define PEAK_SPEED 1
+#define BAR_DECREASE_SPEED 5
 
 #define GRAD_ANGLE_MIN 0.2
 #define GRAD_ANGLE_MAX 0.5
@@ -61,13 +62,15 @@ int dummy_Run( visual_effect_t * p_effect, aout_instance_t *p_aout,
 int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                  aout_buffer_t * p_buffer , picture_t * p_picture)
 {
+    spectrum_data *p_data = p_effect->p_data;
     float p_output[FFT_BUFFER_SIZE];  /* Raw FFT Result  */
     int *height;                      /* Bar heights */
     int *peaks;                       /* Peaks */
-    int i_nb_bands;                   /* number of bands */
+    int *prev_heights;                /* Previous bar heights */
+    int i_80_bands;                   /* number of bands : 80 if true else 20 */
+    int i_nb_bands;                   /* number of bands : 80 or 20 */
     int i_band_width;                 /* width of bands */
-    int i_separ;                      /* Should we let blanks ? */
-    int i_amp;                        /* Vertical amplification */
+    int i_start;                      /* first band horizontal position */
     int i_peak;                       /* Should we draw peaks ? */
 
     /* Horizontal scale for 20-band equalizer */
@@ -82,7 +85,6 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
      52,53,54,55,56,57,58,59,61,63,67,72,77,82,87,93,99,105,
      110,115,121,130,141,152,163,174,185,200,255};
     const int *xscale;
-    const double y_scale =  3.60673760222;  /* (log 256) */
 
     fft_state *p_state;                 /* internal FFT data */
 
@@ -105,39 +107,39 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         return -1;
 
     p_buffs = p_s16_buff;
-    i_nb_bands = config_GetInt ( p_aout, "visual-nbbands" );
-    i_separ    = config_GetInt( p_aout, "visual-separ" );
-    i_amp     = config_GetInt ( p_aout, "visual-amp" );
+    i_80_bands = config_GetInt ( p_aout, "visual-80-bands" );
     i_peak     = config_GetInt ( p_aout, "visual-peaks" );
 
-    if( i_nb_bands == 20)
+    if( i_80_bands != 0)
     {
-        xscale = xscale1;
+        xscale = xscale2;
+        i_nb_bands = 80;
     }
     else
     {
-        i_nb_bands = 80;
-        xscale = xscale2;
+        xscale = xscale1;
+        i_nb_bands = 20;
     }
 
-    if( !p_effect->p_data )
+    if( !p_data )
     {
-        p_effect->p_data = malloc(i_nb_bands * sizeof(int) );
-        if( !p_effect->p_data)
+        p_effect->p_data = p_data = malloc( sizeof( spectrum_data ) );
+
+        p_data->peaks = calloc( 80, sizeof(int) );
+        p_data->prev_heights = calloc( 80, sizeof(int) );
+
+        if( !p_data)
         {
             free( p_s16_buff );
             return -1;
         }
-        peaks = (int *)p_effect->p_data;
-        for( i = 0 ; i < i_nb_bands ; i++)
-        {
-           peaks[i] = 0;
-        }
-
+        peaks = ( int * )p_data->peaks;
+        prev_heights = ( int * )p_data->prev_heights;
     }
     else
     {
-        peaks =(int *)p_effect->p_data;
+        peaks = (int *)p_data->peaks;
+        prev_heights = (int *)p_data->prev_heights;
     }
 
 
@@ -170,48 +172,48 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     p_buffs = p_s16_buff;
     for ( i = 0 ; i < FFT_BUFFER_SIZE ; i++)
     {
-        p_output[i]    = 0;
+        p_output[i]  = 0;
         p_buffer1[i] = *p_buffs;
         p_buffs      = p_buffs + p_effect->i_nb_chans;
     }
     fft_perform( p_buffer1, p_output, p_state);
-    for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
-        p_dest[i] = ( (int) sqrt( p_output [ i ] ) ) >> 8;
+    for( i = 0; i< FFT_BUFFER_SIZE ; i++ )
+        p_dest[i] = p_output[i] *  ( 2 ^ 16 ) / ( ( FFT_BUFFER_SIZE / 2 * 32768 ) ^ 2 );
 
-    for ( i = 0 ; i< i_nb_bands ;i++)
+    /* Compute the horizontal position of the first band */
+    i_band_width = floor( p_effect->i_width / i_nb_bands);
+    i_start = ( p_effect->i_width - i_band_width * i_nb_bands ) / 2;
+
+    for ( i = 0 ; i < i_nb_bands ;i++)
     {
         /* We search the maximum on one scale */
-        for( j = xscale[i] , y=0 ; j< xscale[ i + 1 ] ; j++ )
+        for( j = xscale[i], y = 0; j< xscale[ i + 1 ]; j++ )
         {
             if ( p_dest[j] > y )
                  y = p_dest[j];
         }
         /* Calculate the height of the bar */
-        y >>=7;/* remove some noise */
-        if( y != 0)
+        if( y != 0 )
         {
-            height[i] = (int)log(y)* y_scale;
-               if(height[i] > 150)
-                  height[i] = 150;
+            height[i] = log( y ) * 30;
+            if( height[i] > 380 )
+                height[i] = 380;
         }
         else
-        {
-            height[i] = 0 ;
-        }
+            height[ i ] = 0;
 
         /* Draw the bar now */
-        i_band_width = floor( p_effect->i_width / i_nb_bands) ;
 
-        if( i_amp * height[i] > peaks[i])
+        if( height[i] > peaks[i] )
         {
-            peaks[i] = i_amp * height[i];
+            peaks[i] = height[i];
         }
-        else if (peaks[i] > 0 )
+        else if( peaks[i] > 0 )
         {
             peaks[i] -= PEAK_SPEED;
-            if( peaks[i] < i_amp * height[i] )
+            if( peaks[i] < height[i] )
             {
-                peaks[i] = i_amp * height[i];
+                peaks[i] = height[i];
             }
             if( peaks[i] < 0 )
             {
@@ -219,93 +221,103 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             }
         }
 
+        /* Decrease the bars if needed */
+        if( height[i] <= prev_heights[i] - BAR_DECREASE_SPEED )
+        {
+            height[i] = prev_heights[i];
+            height[i] -= BAR_DECREASE_SPEED;
+        }
+        prev_heights[i] = height[i];
+
         if( peaks[i] > 0 && i_peak )
         {
             if( peaks[i] >= p_effect->i_height )
                 peaks[i] = p_effect->i_height - 2;
             i_line = peaks[i];
 
-            for( j = 0 ; j< i_band_width - i_separ; j++)
+            for( j = 0; j < i_band_width - 1; j++ )
             {
-               for( k = 0 ; k< 3 ; k ++)
+               for( k = 0; k < 3; k ++ )
                {
                    /* Draw the peak */
-                     *(p_picture->p[0].p_pixels +
-                    (p_picture->p[0].i_lines - i_line -1 -k ) *
-                     p_picture->p[0].i_pitch + (i_band_width*i +j) )
+                   *(p_picture->p[0].p_pixels +
+                    ( p_effect->i_height - i_line -1 -k ) *
+                     p_picture->p[0].i_pitch +
+                     ( i_start + i_band_width*i + j ) )
                                     = 0xff;
 
-                    *(p_picture->p[1].p_pixels +
-                     (p_picture->p[1].i_lines - i_line /2 -1 -k/2 ) *
+                   *(p_picture->p[1].p_pixels +
+                    ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                      p_picture->p[1].i_pitch +
-                    ( ( i_band_width * i + j ) /2  ) )
+                     ( ( i_start + i_band_width * i + j ) /2  ) )
                                     = 0x00;
 
-                   if( 0x04 * (i_line + k ) - 0x0f > 0 )
+                   if( i_line + k - 0x0f > 0 )
                    {
-                       if ( 0x04 * (i_line + k ) -0x0f < 0xff)
+                       if ( i_line + k - 0x0f < 0xff )
                            *(p_picture->p[2].p_pixels  +
-                            (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                            ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                              p_picture->p[2].i_pitch +
-                             ( ( i_band_width * i + j ) /2  ) )
-                                    = ( 0x04 * ( i_line + k ) ) -0x0f ;
+                             ( ( i_start + i_band_width * i + j ) /2  ) )
+                                    = ( i_line + k ) - 0x0f;
                        else
                            *(p_picture->p[2].p_pixels  +
-                            (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                            ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                              p_picture->p[2].i_pitch +
-                             ( ( i_band_width * i + j ) /2  ) )
+                             ( ( i_start + i_band_width * i + j ) /2  ) )
                                     = 0xff;
                    }
                    else
                    {
                         *(p_picture->p[2].p_pixels  +
-                         (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                         ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                          p_picture->p[2].i_pitch +
-                         ( ( i_band_width * i + j ) /2  ) )
+                         ( ( i_start + i_band_width * i + j ) /2  ) )
                                = 0x10 ;
                    }
                }
             }
         }
 
-        if(height[i] * i_amp > p_effect->i_height)
-            height[i] = floor(p_effect->i_height / i_amp );
+        if(height[i] > p_effect->i_height)
+            height[i] = floor(p_effect->i_height );
 
-        for(i_line = 0 ; i_line < i_amp * height[i]; i_line ++ )
+        for( i_line = 0; i_line < height[i]; i_line++ )
         {
-            for( j = 0 ; j< i_band_width - i_separ ; j++)
+            for( j = 0 ; j < i_band_width - 1; j++)
             {
                *(p_picture->p[0].p_pixels +
-                 (p_picture->p[0].i_lines - i_line -1) *
-                  p_picture->p[0].i_pitch + (i_band_width*i +j) ) = 0xff;
+                 (p_effect->i_height - i_line - 1) *
+                  p_picture->p[0].i_pitch +
+                  ( i_start + i_band_width*i + j ) ) = 0xff;
 
-                *(p_picture->p[1].p_pixels +
-                 (p_picture->p[1].i_lines - i_line /2 -1) *
+               *(p_picture->p[1].p_pixels +
+                 ( ( p_effect->i_height - i_line ) / 2 - 1) *
                  p_picture->p[1].i_pitch +
-                 ( ( i_band_width * i + j ) /2  ) ) = 0x00;
+                 ( ( i_start + i_band_width * i + j ) /2  ) ) = 0x00;
 
-               if( 0x04 * i_line - 0x0f > 0 )
+               if( i_line - 0x0f > 0 )
                {
-                    if( 0x04 * i_line - 0x0f < 0xff )
+                    if( i_line - 0x0f < 0xff )
                          *(p_picture->p[2].p_pixels  +
-                          (p_picture->p[2].i_lines - i_line /2 - 1) *
+                           ( ( p_effect->i_height - i_line ) / 2 - 1) *
                            p_picture->p[2].i_pitch +
-                           ( ( i_band_width * i + j ) /2  ) ) =
-                               ( 0x04 * i_line) -0x0f ;
+                           ( ( i_start + i_band_width * i + j ) /2  ) ) =
+                               i_line - 0x0f;
                     else
                          *(p_picture->p[2].p_pixels  +
-                          (p_picture->p[2].i_lines - i_line /2 - 1) *
+                           ( ( p_effect->i_height - i_line ) / 2  - 1) *
                            p_picture->p[2].i_pitch +
-                           ( ( i_band_width * i + j ) /2  ) ) =
+                           ( ( i_start + i_band_width * i + j ) /2  ) ) =
                                        0xff;
                }
                else
                {
                     *(p_picture->p[2].p_pixels  +
-                     (p_picture->p[2].i_lines - i_line /2 - 1) *
-                     p_picture->p[2].i_pitch +
-                     ( ( i_band_width * i + j ) /2  ) ) =
-                            0x10 ;
+                      ( ( p_effect->i_height - i_line ) / 2  - 1) *
+                      p_picture->p[2].i_pitch +
+                      ( ( i_start + i_band_width * i + j ) /2  ) ) =
+                            0x10;
                }
             }
         }
@@ -332,7 +344,8 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     float p_output[FFT_BUFFER_SIZE];  /* Raw FFT Result  */
     int *height;                      /* Bar heights */
     int *peaks;                       /* Peaks */
-    int i_nb_bands;                   /* number of bands */
+    int i_80_bands;                   /* number of bands : 80 if true else 20 */
+    int i_nb_bands;                   /* number of bands : 80 or 20 */
     int i_band_width;                 /* width of bands */
     int i_separ;                      /* Should we let blanks ? */
     int i_amp;                        /* Vertical amplification */
@@ -392,7 +405,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
     p_buffs = p_s16_buff;
     i_original     = config_GetInt ( p_aout, "spect-show-original" );
-    i_nb_bands     = config_GetInt ( p_aout, "spect-nbbands" );
+    i_80_bands     = config_GetInt ( p_aout, "spect-80-bands" );
     i_separ        = config_GetInt ( p_aout, "spect-separ" );
     i_amp          = config_GetInt ( p_aout, "spect-amp" );
     i_peak         = config_GetInt ( p_aout, "spect-show-peaks" );
@@ -404,20 +417,20 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     i_peak_height  = config_GetInt ( p_aout, "spect-peak-height" );
     color1         = config_GetInt ( p_aout, "spect-color" );
 
-    if( i_nb_bands == 20)
+    if( i_80_bands != 0)
     {
-        xscale = xscale1;
+        xscale = xscale2;
+        i_nb_bands = 80;
     }
     else
     {
-        if( i_nb_bands > 80 )
-            i_nb_bands = 80;
-        xscale = xscale2;
+        xscale = xscale1;
+        i_nb_bands = 20;
     }
 
     if( !p_effect->p_data )
     {
-        p_effect->p_data=(void *)malloc( i_nb_bands * sizeof(int) );
+        p_effect->p_data=(void *)malloc( 80 * sizeof(int) );
         if( !p_effect->p_data )
         {
             free( p_s16_buff );
@@ -531,12 +544,12 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                {
                    //* Draw the peak
                      *(p_picture->p[0].p_pixels +
-                    (p_picture->p[0].i_lines - i_line -1 -k ) *
+                    (p_effect->i_height - i_line -1 -k ) *
                      p_picture->p[0].i_pitch + (i_band_width*i +j) )
                                     = 0xff;
 
                     *(p_picture->p[1].p_pixels +
-                     (p_picture->p[1].i_lines - i_line /2 -1 -k/2 ) *
+                     ( ( p_effect->i_height - i_line ) / 2 -1 -k/2 ) *
                      p_picture->p[1].i_pitch +
                     ( ( i_band_width * i + j ) /2  ) )
                                     = 0x00;
@@ -545,13 +558,13 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                    {
                        if ( 0x04 * (i_line + k ) -0x0f < 0xff)
                            *(p_picture->p[2].p_pixels  +
-                            (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                            ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                              p_picture->p[2].i_pitch +
                              ( ( i_band_width * i + j ) /2  ) )
                                     = ( 0x04 * ( i_line + k ) ) -0x0f ;
                        else
                            *(p_picture->p[2].p_pixels  +
-                            (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                            ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                              p_picture->p[2].i_pitch +
                              ( ( i_band_width * i + j ) /2  ) )
                                     = 0xff;
@@ -559,7 +572,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                    else
                    {
                         *(p_picture->p[2].p_pixels  +
-                         (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                         ( ( p_effect->i_height - i_line ) / 2 - 1 -k/2 ) *
                          p_picture->p[2].i_pitch +
                          ( ( i_band_width * i + j ) /2  ) )
                                = 0x10 ;
@@ -575,11 +588,11 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             for( j = 0 ; j< i_band_width - i_separ ; j++)
             {
                *(p_picture->p[0].p_pixels +
-                 (p_picture->p[0].i_lines - i_line -1) *
+                 (p_effect->i_height - i_line -1) *
                   p_picture->p[0].i_pitch + (i_band_width*i +j) ) = 0xff;
 
                 *(p_picture->p[1].p_pixels +
-                 (p_picture->p[1].i_lines - i_line /2 -1) *
+                 ( ( p_effect->i_height - i_line ) / 2 -1) *
                  p_picture->p[1].i_pitch +
                  ( ( i_band_width * i + j ) /2  ) ) = 0x00;
 
@@ -587,13 +600,13 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                {
                     if( 0x04 * i_line - 0x0f < 0xff )
                          *(p_picture->p[2].p_pixels  +
-                          (p_picture->p[2].i_lines - i_line /2 - 1) *
+                          ( ( p_effect->i_height - i_line ) / 2 - 1) *
                            p_picture->p[2].i_pitch +
                            ( ( i_band_width * i + j ) /2  ) ) =
                                ( 0x04 * i_line) -0x0f ;
                     else
                          *(p_picture->p[2].p_pixels  +
-                          (p_picture->p[2].i_lines - i_line /2 - 1) *
+                          ( ( p_effect->i_height - i_line ) / 2 - 1) *
                            p_picture->p[2].i_pitch +
                            ( ( i_band_width * i + j ) /2  ) ) =
                                        0xff;
@@ -601,7 +614,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                else
                {
                     *(p_picture->p[2].p_pixels  +
-                     (p_picture->p[2].i_lines - i_line /2 - 1) *
+                     ( ( p_effect->i_height - i_line ) / 2 - 1) *
                      p_picture->p[2].i_pitch +
                      ( ( i_band_width * i + j ) /2  ) ) =
                             0x10 ;
@@ -615,7 +628,7 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     section_sep_angle = 360.0 / i_sections;
     if( i_peak_height < 1 )
         i_peak_height = 1;
-    max_band_length = p_picture->p[0].i_lines / 2 - ( i_rad + i_peak_height + 1 );
+    max_band_length = p_effect->i_height / 2 - ( i_rad + i_peak_height + 1 );
 
     i_band_width = floor( 360 / i_nb_bands - i_separ );
     if( i_band_width < 1 )
@@ -634,8 +647,9 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             /* circular line pattern(so color blend is more visible) */
             for( j = 0 ; j < i_peak_height ; j++ )
             {
-                x = p_picture->p[0].i_pitch / 2;
-                y = p_picture->p[0].i_lines / 2;
+                //x = p_picture->p[0].i_pitch / 2;
+                x = p_effect->i_width / 2;
+                y = p_effect->i_height / 2;
                 xx = x;
                 yy = y;
                 for( k = 0 ; k < (i_band_width + i_extra_width) ; k++ )
@@ -680,8 +694,9 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         /* DO BASE OF BAND (mostly makes a circle) */
         if( i_show_base != 0 )
         {
-            x = p_picture->p[0].i_pitch / 2;
-            y = p_picture->p[0].i_lines / 2;
+            //x = p_picture->p[0].i_pitch / 2;
+            x = p_effect->i_width / 2;
+            y = p_effect->i_height / 2;
 
             a =  ( (i+1) * band_sep_angle + section_sep_angle * (c+1) )
                 * 3.141592 / 180.0;
@@ -717,8 +732,8 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         if( i_show_bands != 0 )
         for( j = 0 ; j < i_band_width ; j++ )
         {
-            x = p_picture->p[0].i_pitch / 2;
-            y = p_picture->p[0].i_lines / 2;
+            x = p_effect->i_width / 2;
+            y = p_effect->i_height / 2;
             xx = x;
             yy = y;
             a = ( (i+1) * band_sep_angle + section_sep_angle * (c+1) + j )

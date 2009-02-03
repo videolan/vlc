@@ -51,11 +51,11 @@
 #define HEIGHT_LONGTEXT N_( \
       "The height of the effects video window, in pixels." )
 
-#define NBBANDS_TEXT N_( "Number of bands" )
+#define NBBANDS_TEXT N_( "More bands : 80 / 20" )
 #define NBBANDS_LONGTEXT N_( \
-      "Number of bands used by spectrum analyzer, should be 20 or 80." )
+      "More bands for the spectrum analyzer : 80 if enabled else 20." )
 #define SPNBBANDS_LONGTEXT N_( \
-      "Number of bands used by the spectrometer, from 20 to 80." )
+      "More bands for the spectrometer : 80 if enabled else 20." )
 
 #define SEPAR_TEXT N_( "Band separator" )
 #define SEPAR_LONGTEXT N_( \
@@ -121,12 +121,11 @@ vlc_module_begin ()
     add_integer("effect-height" , VOUT_HEIGHT , NULL,
              HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
     set_section( N_("Spectrum analyser") , NULL )
-    add_integer("visual-nbbands", 80, NULL,
-             NBBANDS_TEXT, NBBANDS_LONGTEXT, true )
-    add_integer("visual-separ", 1, NULL,
-             SEPAR_TEXT, SEPAR_LONGTEXT, true )
-    add_integer("visual-amp", 3, NULL,
-             AMP_TEXT, AMP_LONGTEXT, true )
+    add_obsolete_integer( "visual-nbbands" ) /* Since 1.0.0 */
+    add_bool("visual-80-bands", 1, NULL,
+             NBBANDS_TEXT, NBBANDS_LONGTEXT, true );
+    add_obsolete_integer( "visual-separ" ) /* Since 1.0.0 */
+    add_obsolete_integer( "visual-amp" ) /* Since 1.0.0 */
     add_bool("visual-peaks", true, NULL,
              PEAKS_TEXT, PEAKS_LONGTEXT, true )
     set_section( N_("Spectrometer") , NULL )
@@ -141,8 +140,9 @@ vlc_module_begin ()
     add_integer("spect-color", 80, NULL,
              COLOR1_TEXT, COLOR1_LONGTEXT, true )
     add_bool("spect-show-bands", true, NULL,
-             BANDS_TEXT, BANDS_LONGTEXT, true )
-    add_integer("spect-nbbands", 32, NULL,
+             BANDS_TEXT, BANDS_LONGTEXT, true );
+    add_obsolete_integer( "spect-nbbands" ) /* Since 1.0.0 */
+    add_bool("spect-80-bands", 1, NULL,
              NBBANDS_TEXT, SPNBBANDS_LONGTEXT, true )
     add_integer("spect-separ", 1, NULL,
              SEPAR_TEXT, SEPAR_LONGTEXT, true )
@@ -208,8 +208,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_height = config_GetInt( p_filter , "effect-height");
     p_sys->i_width  = config_GetInt( p_filter , "effect-width");
 
-    if( p_sys->i_height < 20 ) p_sys->i_height =  20;
-    if( p_sys->i_width  < 20 ) p_sys->i_width  =  20;
+    if( p_sys->i_height < 400 ) p_sys->i_height = 400;
+    if( p_sys->i_width  < 532 ) p_sys->i_width  = 532;
     if( (p_sys->i_height % 2 ) != 0 ) p_sys->i_height--;
     if( (p_sys->i_width % 2 )  != 0 ) p_sys->i_width--;
 
@@ -394,6 +394,11 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_effect; i++ )
     {
 #define p_effect p_sys->effect[i]
+        if( !strncmp( p_effect->psz_name, "spectrum", strlen( "spectrum" ) ) )
+        {
+            free( ( ( spectrum_data * )p_effect->p_data )->peaks );
+            free( ( ( spectrum_data * )p_effect->p_data )->prev_heights );
+        }
         free( p_effect->p_data );
         free( p_effect->psz_name );
         free( p_effect->psz_args );
