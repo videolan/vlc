@@ -521,8 +521,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_quit setTitle: _NS("Quit VLC")];
 
     [o_mu_file setTitle: _ANS("1:File")];
-    [o_mi_open_generic setTitle: _NS("Open File...")];
-    [o_mi_open_file setTitle: _NS("Quick Open File...")];
+    [o_mi_open_generic setTitle: _NS("Advanced Open File...")];
+    [o_mi_open_file setTitle: _NS("Open File...")];
     [o_mi_open_disc setTitle: _NS("Open Disc...")];
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_capture setTitle: _NS("Open Capture Device...")];
