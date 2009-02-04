@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include <vlc_meta.h>
 
 #include <libmodplug/modplug.h>
 
@@ -348,6 +349,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
         }
         return VLC_EGENERIC;
+
+    case DEMUX_HAS_UNSUPPORTED_META:
+    {
+        bool *pb_bool = (bool*)va_arg( args, bool* );
+        *pb_bool = false; /* FIXME I am not sure of this one */
+        return VLC_SUCCESS;
+    }
+    case DEMUX_GET_META:
+    {
+        vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
+        const char *psz_name = ModPlug_GetName( p_sys->f );
+        if( psz_name && *psz_name )
+            vlc_meta_SetTitle( p_meta, psz_name );
+        return VLC_SUCCESS;
+    }
 
     case DEMUX_GET_FPS: /* meaningless */
     default:
