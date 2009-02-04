@@ -127,6 +127,10 @@ static const char *ppsz_mod_ext[] =
     "psm", NULL
 };
 
+/* We load the complete file in memory, put a higher bound
+ * of 500 Mo (which is really big anyway) */
+#define MOD_MAX_FILE_SIZE (500*1000*1000)
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
@@ -139,10 +143,11 @@ static int Open( vlc_object_t *p_this )
     /* We accept file based on extension match */
     if( !p_demux->b_force )
     {
-        char *psz_ext;
+        const char *psz_ext = strrchr( p_demux->psz_path, '.' );
         int i;
-        if( ( psz_ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
-            stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;
+
+        if( !psz_ext )
+            return VLC_EGENERIC;
 
         psz_ext++;  /* skip . */
         for( i = 0; ppsz_mod_ext[i] != NULL; i++ )
@@ -155,16 +160,23 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_demux, "running MOD demuxer (ext=%s)", ppsz_mod_ext[i] );
     }
 
+    const int64_t i_size = stream_Size( p_demux->s );
+    if( i_size <= 0 || i_size >= MOD_MAX_FILE_SIZE )
+        return VLC_EGENERIC;
+
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = malloc( sizeof( *p_sys ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     msg_Dbg( p_demux, "loading complete file (could be long)" );
-    p_sys->i_data = stream_Size( p_demux->s );
+    p_sys->i_data = i_size;
     p_sys->p_data = malloc( p_sys->i_data );
-    p_sys->i_data = stream_Read( p_demux->s, p_sys->p_data, p_sys->i_data );
-    if( p_sys->i_data <= 0 )
+    if( p_sys->p_data )
+        p_sys->i_data = stream_Read( p_demux->s, p_sys->p_data, p_sys->i_data );
+    if( p_sys->i_data <= 0 || !p_sys->p_data )
     {
         msg_Err( p_demux, "failed to read the complete file" );
         free( p_sys->p_data );
@@ -257,6 +269,8 @@ static int Demux( demux_t *p_demux )
     int         i_read;
 
     p_frame = block_New( p_demux, p_sys->fmt.audio.i_rate / 10 * i_bk );
+    if( !p_frame )
+        return -1;
 
     i_read = ModPlug_Read( p_sys->f, p_frame->p_buffer, p_frame->i_buffer );
     if( i_read <= 0 )
