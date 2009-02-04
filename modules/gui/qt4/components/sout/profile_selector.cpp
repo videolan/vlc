@@ -244,7 +244,7 @@ inline void VLCProfileEditor::registerCodecs()
 #define ADD_SAMPLERATE( sample ) ui.aSampleBox->addItem( sample );
     ADD_SAMPLERATE( "11250" )
     ADD_SAMPLERATE( "22500" )
-    ADD_SAMPLERATE( "41000" )
+    ADD_SAMPLERATE( "44100" )
     ADD_SAMPLERATE( "48000" )
 
 #define ADD_SCODEC( name, fourcc ) ui.subsCodecBox->addItem( name, QVariant( fourcc ) );
