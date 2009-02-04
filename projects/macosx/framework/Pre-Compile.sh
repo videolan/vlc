@@ -10,8 +10,14 @@ if test "${ACTION}" = ""; then
     # Debug --
 # Hack to use that script with the current VLC-release.app
 elif test "${ACTION}" = "release-makefile"; then
-    TARGET_BUILD_DIR="${build_dir}"
+    echo "running Pre-Compile.sh in release-makefile mode"
+
     FULL_PRODUCT_NAME="${PRODUCT}"
+    if [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
+        TARGET_BUILD_DIR="${src_dir}"
+    else
+        TARGET_BUILD_DIR="${build_dir}"
+    fi
     CONTENTS_FOLDER_PATH="${FULL_PRODUCT_NAME}/Contents/MacOS"
     VLC_BUILD_DIR="${build_dir}"
     VLC_SRC_DIR="${src_dir}"
@@ -97,10 +103,10 @@ if test "${ACTION}" = "build"; then
         install_library "${VLC_BUILD_DIR}/bin/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
         mv ${target}/vlc ${target}/VLC
         chmod +x ${target}/VLC
-    elif [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-        install_library "${VLC_BUILD_DIR}/src/${prefix}npvlc.${suffix}" "${target}" "bin" "@loader_path/lib"
-        mv ${target}/npvlc.${suffix} "${target}/VLC Plugin.plugin"
-        chmod +x "${target}/VLC Plugin.plugin"
+#    elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
+#        install_library "${VLC_BUILD_DIR}/projects/mozilla/.libs/${prefix}npvlc.${suffix}" "${target}" "bin" "@loader_path/lib"
+#        mv ${target}/npvlc.${suffix} "${target}/VLC\ Plugin"
+#        chmod +x "${target}/VLC\ Plugin"
     fi
 
     ##########################
@@ -150,15 +156,24 @@ if test "${ACTION}" = "build"; then
 
     ##########################
     # Build the share folder
-    echo "Building share folder..."
-    pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
-    mkdir -p ${target_share}
-    $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
+    if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+        echo "Building share folder..."
+        pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
+        mkdir -p ${target_share}
+        $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
+    else
+        echo "Share folder not needed for this product"
+    fi 
+    
 
     ##########################
     # Exporting headers
-    echo "Exporting headers..."
-    mkdir -p ${target_include}/vlc
-    $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
+    if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
+        echo "Exporting headers..."
+        mkdir -p ${target_include}/vlc
+        $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
+    else
+        echo "Headers not needed for this product"
+    fi
 
 fi

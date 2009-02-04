@@ -87,9 +87,8 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
 
     /* locate VLC module path */
 #ifdef XP_MACOSX
-    ppsz_argv[ppsz_argc++] = "--plugin-path";
-    ppsz_argv[ppsz_argc++] = "/Library/Internet Plug-Ins/VLC Plugin.plugin/"
-                             "Contents/MacOS/modules";
+    ppsz_argv[ppsz_argc++] = "--plugin-path=/Library/Internet\\ Plug-Ins/VLC\\ Plugin.plugin/Contents/MacOS/modules";
+    ppsz_argv[ppsz_argc++] = "--vout=macosx";
 #elif defined(XP_WIN)
     HKEY h_key;
     DWORD i_type, i_data = MAX_PATH + 1;
@@ -118,8 +117,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     ppsz_argv[ppsz_argc++] = "--no-stats";
     ppsz_argv[ppsz_argc++] = "--no-media-library";
     ppsz_argv[ppsz_argc++] = "--ignore-config";
-    ppsz_argv[ppsz_argc++] = "--intf";
-    ppsz_argv[ppsz_argc++] = "dummy";
+    ppsz_argv[ppsz_argc++] = "--intf=dummy";
 
     const char *progid = NULL;
 
