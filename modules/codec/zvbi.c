@@ -357,6 +357,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     vlc_mutex_unlock( &p_sys->lock );
 
     /* Try to see if the page we want is in the cache yet */
+    memset( &p_page, 0, sizeof(vbi_page) );
     b_cached = vbi_fetch_vt_page( p_sys->p_vbi_dec, &p_page,
                                   vbi_dec2bcd( i_wanted_page ),
                                   i_wanted_subpage, VBI_WST_LEVEL_3p5,
