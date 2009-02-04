@@ -1,7 +1,7 @@
 /*****************************************************************************
  * mod.c: MOD file demuxer (using libmodplug)
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -120,7 +120,7 @@ struct demux_sys_t
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static const char* mod_ext[] =
+static const char *ppsz_mod_ext[] =
 {
     "mod", "s3m", "xm",  "it",  "669", "amf", "ams", "dbm", "dmf", "dsm",
     "far", "mdl", "med", "mtm", "okt", "ptm", "stm", "ult", "umx", "mt2",
@@ -135,26 +135,24 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     ModPlug_Settings settings;
-    vlc_value_t val;
 
     /* We accept file based on extension match */
     if( !p_demux->b_force )
     {
-        char *ext;
+        char *psz_ext;
         int i;
-        if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
+        if( ( psz_ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
             stream_Size( p_demux->s ) == 0 ) return VLC_EGENERIC;
 
-        ext++;  /* skip . */
-        for( i = 0; mod_ext[i] != NULL; i++ )
+        psz_ext++;  /* skip . */
+        for( i = 0; ppsz_mod_ext[i] != NULL; i++ )
         {
-            if( !strcasecmp( ext, mod_ext[i] ) )
-            {
+            if( !strcasecmp( psz_ext, ppsz_mod_ext[i] ) )
                 break;
-            }
         }
-        if( mod_ext[i] == NULL ) return VLC_EGENERIC;
-        msg_Dbg( p_demux, "running MOD demuxer (ext=%s)", mod_ext[i] );
+        if( ppsz_mod_ext[i] == NULL )
+            return VLC_EGENERIC;
+        msg_Dbg( p_demux, "running MOD demuxer (ext=%s)", ppsz_mod_ext[i] );
     }
 
     /* Fill p_demux field */
@@ -173,17 +171,6 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    /* Create our config variable */
-    var_Create( p_demux, "mod-noisereduction", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-reverb", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-reverb-level", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-reverb-delay", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-megabass", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-megabass-level", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-megabass-range", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-surround", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-surround-level", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Create( p_demux, "mod-surround-delay", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     /* Configure modplug before loading the file */
     ModPlug_GetSettings( &settings );
@@ -193,29 +180,23 @@ static int Open( vlc_object_t *p_this )
     settings.mFrequency = 44100;
     settings.mResamplingMode = MODPLUG_RESAMPLE_FIR;
 
-    var_Get( p_demux, "mod-noisereduction", &val );
-    if( val.b_bool) settings.mFlags |= MODPLUG_ENABLE_NOISE_REDUCTION;
+    if( var_CreateGetBool( p_demux, "mod-noisereduction" ) )
+        settings.mFlags |= MODPLUG_ENABLE_NOISE_REDUCTION;
 
-    var_Get( p_demux, "mod-reverb", &val );
-    if( val.b_bool) settings.mFlags |= MODPLUG_ENABLE_REVERB;
-    var_Get( p_demux, "mod-reverb-level", &val );
-    settings.mReverbDepth = val.i_int;
-    var_Get( p_demux, "mod-reverb-delay", &val );
-    settings.mReverbDelay = val.i_int;
+    if( var_CreateGetBool( p_demux, "mod-reverb" ) )
+        settings.mFlags |= MODPLUG_ENABLE_REVERB;
+    settings.mReverbDepth = var_CreateGetInteger( p_demux, "mod-reverb-level" );
+    settings.mReverbDelay = var_CreateGetInteger( p_demux, "mod-reverb-delay" );
 
-    var_Get( p_demux, "mod-megabass", &val );
-    if( val.b_bool) settings.mFlags |= MODPLUG_ENABLE_MEGABASS;
-    var_Get( p_demux, "mod-megabass-level", &val );
-    settings.mBassAmount = val.i_int;
-    var_Get( p_demux, "mod-megabass-range", &val );
-    settings.mBassRange = val.i_int;
+    if( var_CreateGetBool( p_demux, "mod-megabass" ) )
+        settings.mFlags |= MODPLUG_ENABLE_MEGABASS;
+    settings.mBassAmount = var_CreateGetInteger( p_demux, "mod-megabass-level" );
+    settings.mBassRange = var_CreateGetInteger( p_demux, "mod-megabass-range" );
 
-    var_Get( p_demux, "mod-surround", &val );
-    if( val.b_bool) settings.mFlags |= MODPLUG_ENABLE_SURROUND;
-    var_Get( p_demux, "mod-surround-level", &val );
-    settings.mSurroundDepth = val.i_int;
-    var_Get( p_demux, "mod-surround-delay", &val );
-    settings.mSurroundDelay = val.i_int;
+    if( var_CreateGetBool( p_demux, "mod-surround" ) )
+        settings.mFlags |= MODPLUG_ENABLE_SURROUND;
+    settings.mSurroundDepth = var_CreateGetInteger( p_demux, "mod-surround-level" );
+    settings.mSurroundDelay = var_CreateGetInteger( p_demux, "mod-surround-delay" );
 
     ModPlug_SetSettings( &settings );
 
@@ -231,7 +212,7 @@ static int Open( vlc_object_t *p_this )
 
     /* init time */
     p_sys->i_time  = 1;
-    p_sys->i_length = ModPlug_GetLength( p_sys->f ) * (int64_t)1000;
+    p_sys->i_length = ModPlug_GetLength( p_sys->f ) * INT64_C(1000);
 
     msg_Dbg( p_demux, "MOD loaded name=%s lenght=%"PRId64"ms",
              ModPlug_GetName( p_sys->f ),
@@ -290,7 +271,7 @@ static int Demux( demux_t *p_demux )
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_time );
 
     /* We should use p_frame->i_buffer */
-    p_sys->i_time += (int64_t)1000000 * p_frame->i_buffer / i_bk / p_sys->fmt.audio.i_rate;
+    p_sys->i_time += INT64_C(1000000) * p_frame->i_buffer / i_bk / p_sys->fmt.audio.i_rate;
 
     /* Send data */
     p_frame->i_dts = p_frame->i_pts = p_sys->i_time;
@@ -310,53 +291,53 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
-        case DEMUX_GET_POSITION:
-            pf = (double*) va_arg( args, double* );
-            if( p_sys->i_length > 0 )
-            {
-                *pf = (double)p_sys->i_time / (double)p_sys->i_length;
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
-
-        case DEMUX_SET_POSITION:
-            f = (double) va_arg( args, double );
-
-            i64 = f * p_sys->i_length;
-            if( i64 >= 0 && i64 <= p_sys->i_length )
-            {
-                ModPlug_Seek( p_sys->f, i64 / 1000 );
-                p_sys->i_time = i64 + 1;
-
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
-
-        case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = p_sys->i_time;
+    case DEMUX_GET_POSITION:
+        pf = (double*) va_arg( args, double* );
+        if( p_sys->i_length > 0 )
+        {
+            *pf = (double)p_sys->i_time / (double)p_sys->i_length;
             return VLC_SUCCESS;
+        }
+        return VLC_EGENERIC;
 
-        case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = p_sys->i_length;
+    case DEMUX_SET_POSITION:
+        f = (double) va_arg( args, double );
+
+        i64 = f * p_sys->i_length;
+        if( i64 >= 0 && i64 <= p_sys->i_length )
+        {
+            ModPlug_Seek( p_sys->f, i64 / 1000 );
+            p_sys->i_time = i64 + 1;
+
             return VLC_SUCCESS;
+        }
+        return VLC_EGENERIC;
 
-        case DEMUX_SET_TIME:
-            i64 = (int64_t)va_arg( args, int64_t );
+    case DEMUX_GET_TIME:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        *pi64 = p_sys->i_time;
+        return VLC_SUCCESS;
 
-            if( i64 >= 0 && i64 <= p_sys->i_length )
-            {
-                ModPlug_Seek( p_sys->f, i64 / 1000 );
-                p_sys->i_time = i64 + 1;
+    case DEMUX_GET_LENGTH:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        *pi64 = p_sys->i_length;
+        return VLC_SUCCESS;
 
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
+    case DEMUX_SET_TIME:
+        i64 = (int64_t)va_arg( args, int64_t );
 
-        case DEMUX_GET_FPS: /* meaningless */
-        default:
-            return VLC_EGENERIC;
+        if( i64 >= 0 && i64 <= p_sys->i_length )
+        {
+            ModPlug_Seek( p_sys->f, i64 / 1000 );
+            p_sys->i_time = i64 + 1;
+
+            return VLC_SUCCESS;
+        }
+        return VLC_EGENERIC;
+
+    case DEMUX_GET_FPS: /* meaningless */
+    default:
+        return VLC_EGENERIC;
     }
 }
 
