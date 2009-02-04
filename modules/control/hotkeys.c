@@ -938,7 +938,6 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
     int i_action;
 
-    (void)libvlc;
     (void)psz_var;
     (void)oldval;
 
@@ -959,6 +958,9 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
             break;
         case KEY_MOUSEWHEELRIGHT:
             i_action = ACTIONID_JUMP_FORWARD_EXTRASHORT;
+            break;
+        case KEY_MENU:
+            var_SetBool( libvlc, "intf-popupmenu", true );
             break;
         default:
           return VLC_SUCCESS;
