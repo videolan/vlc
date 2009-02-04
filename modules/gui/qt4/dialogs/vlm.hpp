@@ -78,6 +78,7 @@ public:
         return instance;
     };
     virtual ~VLMDialog();
+    void toggleVisible();
 
     VLMWrapper *vlmWrapper;
     vlm_t *p_vlm;
