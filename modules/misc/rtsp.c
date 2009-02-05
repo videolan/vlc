@@ -472,11 +472,12 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
     TAB_REMOVE( p_sys->i_media, p_sys->media, p_media );
     vlc_mutex_unlock( &p_sys->lock_media );
 
+    httpd_UrlDelete( p_media->p_rtsp_url );
+
     while( p_media->i_rtsp > 0 )
         RtspClientDel( p_media, p_media->rtsp[0] );
     TAB_CLEAN( p_media->i_rtsp, p_media->rtsp );
 
-    httpd_UrlDelete( p_media->p_rtsp_url );
     free( p_media->psz_rtsp_path );
     free( p_media->psz_rtsp_control_v6 );
     free( p_media->psz_rtsp_control_v4 );
