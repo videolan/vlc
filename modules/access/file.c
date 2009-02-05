@@ -97,6 +97,7 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static int  Seek( access_t *, int64_t );
+static int  NoSeek( access_t *, int64_t );
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int  Control( access_t *, int, va_list );
 
@@ -109,7 +110,6 @@ struct access_sys_t
     int fd;
 
     /* */
-    bool b_seekable;
     bool b_pace_control;
 };
 
@@ -163,9 +163,10 @@ static int Open( vlc_object_t *p_this )
     if (S_ISREG (st.st_mode))
         p_access->info.i_size = st.st_size;
     else if (!S_ISBLK (st.st_mode))
-        p_sys->b_seekable = false;
+        p_access->pf_seek = NoSeek;
 #else
-    p_sys->b_seekable = !b_stdin;
+    if (b_stdin)
+        p_access->pf_seek = NoSeek;
 # warning File size not known!
 #endif
 
@@ -204,7 +205,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     ssize_t i_ret;
 
 #ifndef WIN32
-    if (!p_sys->b_seekable)
+    if (p_access->pf_seek == NoSeek)
         i_ret = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
     else
 #endif
@@ -263,6 +264,13 @@ static int Seek (access_t *p_access, int64_t i_pos)
     return VLC_SUCCESS;
 }
 
+static int NoSeek (access_t *p_access, int64_t i_pos)
+{
+    /* assert(0); ?? */
+    (void) p_access; (void) i_pos;
+    return VLC_EGENERIC;
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -278,7 +286,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
             pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = p_sys->b_seekable;
+            *pb_bool = (p_access->pf_seek != NoSeek);
             break;
 
         case ACCESS_CAN_PAUSE:
