@@ -177,7 +177,8 @@ static void DisplayVoutTitle( input_ressource_t *p_ressource,
     free( psz_nowplaying );
 }
 static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
-                                   vout_thread_t *p_vout, video_format_t *p_fmt )
+                                   vout_thread_t *p_vout, video_format_t *p_fmt,
+                                   bool b_recycle )
 {
     if( !p_vout && !p_fmt )
     {
@@ -232,9 +233,10 @@ static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
         const int i_vout_active = p_ressource->i_vout;
         vlc_mutex_unlock( &p_ressource->lock_vout );
 
-        if( p_ressource->p_vout_free || i_vout_active > 0 )
+        if( p_ressource->p_vout_free || i_vout_active > 0 || !b_recycle )
         {
-            msg_Dbg( p_ressource->p_input, "detroying vout (already one saved or active)" );
+            if( b_recycle )
+                msg_Dbg( p_ressource->p_input, "detroying vout (already one saved or active)" );
             vout_CloseAndRelease( p_vout );
         }
         else
@@ -388,10 +390,10 @@ void input_ressource_SetInput( input_ressource_t *p_ressource, input_thread_t *p
 }
 
 vout_thread_t *input_ressource_RequestVout( input_ressource_t *p_ressource,
-                                            vout_thread_t *p_vout, video_format_t *p_fmt )
+                                            vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recycle )
 {
     vlc_mutex_lock( &p_ressource->lock );
-    vout_thread_t *p_ret = RequestVout( p_ressource, p_vout, p_fmt );
+    vout_thread_t *p_ret = RequestVout( p_ressource, p_vout, p_fmt, b_recycle );
     vlc_mutex_unlock( &p_ressource->lock );
 
     return p_ret;
@@ -406,7 +408,7 @@ void input_ressource_HoldVouts( input_ressource_t *p_ressource, vout_thread_t **
 }
 void input_ressource_TerminateVout( input_ressource_t *p_ressource )
 {
-    input_ressource_RequestVout( p_ressource, NULL, NULL );
+    input_ressource_RequestVout( p_ressource, NULL, NULL, false );
 }
 bool input_ressource_HasVout( input_ressource_t *p_ressource )
 {

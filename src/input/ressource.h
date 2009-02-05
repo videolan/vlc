@@ -60,7 +60,7 @@ aout_instance_t *input_ressource_HoldAout( input_ressource_t *p_ressource );
 /**
  * This function handles vout request.
  */
-vout_thread_t *input_ressource_RequestVout( input_ressource_t *, vout_thread_t *, video_format_t * );
+vout_thread_t *input_ressource_RequestVout( input_ressource_t *, vout_thread_t *, video_format_t *, bool b_recycle );
 
 /**
  * This function return one of the current vout if any.

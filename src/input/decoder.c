@@ -2030,7 +2030,7 @@ static void DeleteDecoder( decoder_t * p_dec )
             vout_ChangePause( p_owner->p_vout, false, mdate() );
 
         /* */
-        input_ressource_RequestVout( p_owner->p_input->p->p_ressource, p_owner->p_vout, NULL );
+        input_ressource_RequestVout( p_owner->p_input->p->p_ressource, p_owner->p_vout, NULL, true );
         input_SendEventVout( p_owner->p_input );
     }
 
@@ -2110,11 +2110,7 @@ static vout_thread_t *aout_request_vout( void *p_private,
     decoder_t *p_dec = p_private;
     input_thread_t *p_input = p_dec->p_owner->p_input;
 
-    p_vout = input_ressource_RequestVout( p_input->p->p_ressource, p_vout, p_fmt );
-    /* TODO it would be better to give b_recyle to input_ressource_RequestVout
-     * as here we are not sure of which vout we destroy */
-    if( !b_recyle )
-        input_ressource_TerminateVout( p_input->p->p_ressource );
+    p_vout = input_ressource_RequestVout( p_input->p->p_ressource, p_vout, p_fmt, b_recyle );
     input_SendEventVout( p_input );
 
     return p_vout;
@@ -2293,7 +2289,7 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         vlc_mutex_unlock( &p_owner->lock );
 
         p_vout = input_ressource_RequestVout( p_owner->p_input->p->p_ressource,
-                                              p_vout, &p_dec->fmt_out.video );
+                                              p_vout, &p_dec->fmt_out.video, true );
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
