@@ -226,7 +226,7 @@ struct aout_fifo_t
 typedef struct
 {
     vout_thread_t  *(*pf_request_vout)( void *,
-                                        vout_thread_t *, video_format_t * );
+                                        vout_thread_t *, video_format_t *, bool b_recycle );
     void *p_private;
 } aout_request_vout_t;
 
@@ -314,6 +314,7 @@ struct aout_input_t
     mtime_t           i_pause_date;
 
     /* */
+    bool                b_recycle_vout;
     aout_request_vout_t request_vout;
  };
 

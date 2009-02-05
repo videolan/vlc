@@ -383,6 +383,7 @@ vout_thread_t *aout_filter_RequestVout( aout_filter_t *p_filter,
 {
     if( !p_filter->request_vout.pf_request_vout )
         return NULL;
-    return p_filter->request_vout.pf_request_vout( p_filter->request_vout.p_private, p_vout, p_fmt );
+    return p_filter->request_vout.pf_request_vout( p_filter->request_vout.p_private,
+                                                   p_vout, p_fmt, true );
 }
 

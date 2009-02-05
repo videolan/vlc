@@ -2105,12 +2105,17 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
     p_dec->p_description = NULL;
 }
 static vout_thread_t *aout_request_vout( void *p_private,
-                                         vout_thread_t *p_vout, video_format_t *p_fmt )
+                                         vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recyle )
 {
     decoder_t *p_dec = p_private;
+    input_thread_t *p_input = p_dec->p_owner->p_input;
 
-    p_vout = input_ressource_RequestVout( p_dec->p_owner->p_input->p->p_ressource, p_vout, p_fmt );
-    input_SendEventVout( p_dec->p_owner->p_input );
+    p_vout = input_ressource_RequestVout( p_input->p->p_ressource, p_vout, p_fmt );
+    /* TODO it would be better to give b_recyle to input_ressource_RequestVout
+     * as here we are not sure of which vout we destroy */
+    if( !b_recyle )
+        input_ressource_TerminateVout( p_input->p->p_ressource );
+    input_SendEventVout( p_input );
 
     return p_vout;
 }

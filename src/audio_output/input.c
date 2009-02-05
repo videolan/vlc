@@ -63,7 +63,10 @@ static int ReplayGainCallback( vlc_object_t *, char const *,
 static void ReplayGainSelect( aout_instance_t *, aout_input_t * );
 
 static vout_thread_t *RequestVout( void *,
-                                   vout_thread_t *, video_format_t * );
+                                   vout_thread_t *, video_format_t *, bool );
+static vout_thread_t *RequestVoutFromFilter( void *,
+                                             vout_thread_t *, video_format_t *, bool  );
+
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
  *****************************************************************************/
@@ -232,8 +235,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
     psz_filters = var_GetString( p_aout, "audio-filter" );
     psz_visual = var_GetString( p_aout, "audio-visual");
-
     psz_scaletempo = var_GetBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
+
+    p_input->b_recycle_vout = psz_visual && *psz_visual;
 
     /* parse user filter lists */
     for( i_visual = 0; i_visual < 3 && !AOUT_FMT_NON_LINEAR(&chain_output_format); i_visual++ )
@@ -282,7 +286,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
             vlc_object_attach( p_filter , p_aout );
 
-            p_filter->request_vout = p_input->request_vout;
+            p_filter->request_vout.pf_request_vout = RequestVoutFromFilter;
+            p_filter->request_vout.p_private = p_input;
+
             p_filter->p_owner = malloc( sizeof(*p_filter->p_owner) );
             p_filter->p_owner->p_aout  = p_aout;
             p_filter->p_owner->p_input = p_input;
@@ -479,7 +485,16 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 {
     AOUT_ASSERT_MIXER_LOCKED;
-    if ( p_input->b_error ) return 0;
+    if ( p_input->b_error )
+        return 0;
+
+    /* XXX We need to update b_recycle_vout before calling aout_FiltersDestroyPipeline.
+     * FIXME They can be a race condition if audio-visual is updated between
+     * aout_InputDelete and aout_InputNew.
+     */
+    char *psz_visual = var_GetString( p_aout, "audio-visual");
+    p_input->b_recycle_vout = psz_visual && *psz_visual;
+    free( psz_visual );
 
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
                                  p_input->i_nb_filters );
@@ -803,10 +818,21 @@ static void inputResamplingStop( aout_input_t *p_input )
 }
 
 static vout_thread_t *RequestVout( void *p_private,
-                                   vout_thread_t *p_vout, video_format_t *p_fmt )
+                                   vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recycle )
 {
     aout_instance_t *p_aout = p_private;
+    VLC_UNUSED(b_recycle);
     return vout_Request( p_aout, p_vout, p_fmt );
+}
+
+static vout_thread_t *RequestVoutFromFilter( void *p_private,
+                                            vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recycle )
+{
+    aout_input_t *p_input = p_private;
+    aout_request_vout_t *p_request = &p_input->request_vout;
+
+    return p_request->pf_request_vout( p_request->p_private,
+                                       p_vout, p_fmt, p_input->b_recycle_vout && b_recycle );
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
