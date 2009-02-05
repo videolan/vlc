@@ -130,15 +130,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_nb_reads = 0;
 
     if (!strcasecmp (p_access->psz_access, "stream"))
-    {
-        p_sys->b_seekable = false;
         p_sys->b_pace_control = false;
-    }
     else
-    {
-        p_sys->b_seekable = true;
         p_sys->b_pace_control = true;
-    }
 
     /* Open file */
     msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
