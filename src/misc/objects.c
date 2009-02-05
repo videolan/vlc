@@ -56,16 +56,8 @@
 
 #include <assert.h>
 
-#ifdef __linux__
-# if defined (HAVE_SYS_EVENTFD_H)
-#  include <sys/eventfd.h>
-# else
-#  include <sys/syscall.h>
-static inline int eventfd (unsigned int initval, int flags)
-{
-    return syscall (SYS_eventfd, initval, flags);
-}
-# endif
+#if defined (HAVE_SYS_EVENTFD_H)
+# include <sys/eventfd.h>
 # define HAVE_EVENTFD 1
 #endif
 
