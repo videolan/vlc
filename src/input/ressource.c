@@ -229,11 +229,12 @@ static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
 
         vlc_mutex_lock( &p_ressource->lock_vout );
         TAB_REMOVE( p_ressource->i_vout, p_ressource->pp_vout, p_vout );
+        const int i_vout_active = p_ressource->i_vout;
         vlc_mutex_unlock( &p_ressource->lock_vout );
 
-        if( p_ressource->p_vout_free )
+        if( p_ressource->p_vout_free || i_vout_active > 0 )
         {
-            msg_Dbg( p_ressource->p_input, "detroying vout (already one saved)" );
+            msg_Dbg( p_ressource->p_input, "detroying vout (already one saved or active)" );
             vout_CloseAndRelease( p_vout );
         }
         else
