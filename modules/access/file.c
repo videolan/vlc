@@ -210,10 +210,11 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     ssize_t i_ret;
 
 #ifndef WIN32
-    i_ret = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
-#else
-    i_ret = read (fd, p_buffer, i_len);
+    if (!p_sys->b_seekable)
+        i_ret = net_Read (p_access, fd, NULL, p_buffer, i_len, false);
+    else
 #endif
+        i_ret = read (fd, p_buffer, i_len);
 
     if( i_ret < 0 )
     {
