@@ -976,7 +976,6 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
 static int AStreamRefillBlock( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-    int64_t      i_start, i_stop;
     block_t      *b;
 
     /* Release data */
@@ -1000,7 +999,7 @@ static int AStreamRefillBlock( stream_t *s )
     }
 
     /* Now read a new block */
-    i_start = mdate();
+    const int64_t i_start = mdate();
     for( ;; )
     {
         bool b_eof;
@@ -1015,10 +1014,9 @@ static int AStreamRefillBlock( stream_t *s )
             return VLC_EGENERIC;
     }
 
+    p_sys->stat.i_read_time += mdate() - i_start;
     while( b )
     {
-        i_stop = mdate();
-
         /* Append the block */
         p_sys->block.i_size += b->i_buffer;
         *p_sys->block.pp_last = b;
@@ -1030,11 +1028,9 @@ static int AStreamRefillBlock( stream_t *s )
 
         /* Update stat */
         p_sys->stat.i_bytes += b->i_buffer;
-        p_sys->stat.i_read_time += i_stop - i_start;
         p_sys->stat.i_read_count++;
 
         b = b->p_next;
-        i_start = mdate();
     }
     return VLC_SUCCESS;
 }
