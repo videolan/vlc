@@ -559,6 +559,8 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
         es.i_descriptor = i_info_length;
         if( i_info_length > 0 )
         {
+            int i = 0;
+
             es.p_descriptor = malloc( i_info_length );
             if( es.p_descriptor )
             {
