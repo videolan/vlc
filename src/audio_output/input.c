@@ -51,7 +51,7 @@
 #define AOUT_ASSERT_INPUT_LOCKED vlc_assert_locked( &p_input->lock )
 
 static void inputFailure( aout_instance_t *, aout_input_t *, const char * );
-static void inputDrop( aout_instance_t *, aout_input_t *, aout_buffer_t * );
+static void inputDrop( aout_input_t *, aout_buffer_t * );
 static void inputResamplingStop( aout_input_t *p_input );
 
 static int VisualizationCallback( vlc_object_t *, char const *,
@@ -135,7 +135,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
         if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
         {
-            var_Set( p_aout, "visual", val );
+            var_SetString( p_aout, "visual", val.psz_string );
             free( val.psz_string );
         }
         var_AddCallback( p_aout, "visual", VisualizationCallback, NULL );
@@ -230,10 +230,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                     VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     }
 
-    var_Get( p_aout, "audio-filter", &val );
-    psz_filters = val.psz_string;
-    var_Get( p_aout, "audio-visual", &val );
-    psz_visual = val.psz_string;
+    psz_filters = var_GetString( p_aout, "audio-filter" );
+    psz_visual = var_GetString( p_aout, "audio-visual");
 
     psz_scaletempo = var_GetBool( p_aout, "audio-time-stretch" ) ? strdup( "scaletempo" ) : NULL;
 
@@ -540,7 +538,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     if( i_input_rate != INPUT_RATE_DEFAULT && p_input->p_playback_rate_filter == NULL )
     {
-        inputDrop( p_aout, p_input, p_buffer );
+        inputDrop( p_input, p_buffer );
         return 0;
     }
 
@@ -607,7 +605,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
                   mdate() - p_buffer->start_date );
 
-        inputDrop( p_aout, p_input, p_buffer );
+        inputDrop( p_input, p_buffer );
         inputResamplingStop( p_input );
         return 0;
     }
@@ -634,7 +632,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     {
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), dropping buffer",
                   start_date - p_buffer->start_date );
-        inputDrop( p_aout, p_input, p_buffer );
+        inputDrop( p_input, p_buffer );
         return 0;
     }
 
@@ -784,7 +782,7 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
     p_input->b_error = 1;
 }
 
-static void inputDrop( aout_instance_t *p_aout, aout_input_t *p_input, aout_buffer_t *p_buffer )
+static void inputDrop( aout_input_t *p_input, aout_buffer_t *p_buffer )
 {
     aout_BufferFree( p_buffer );
 
@@ -823,7 +821,6 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     char *psz_mode = newval.psz_string;
-    vlc_value_t val;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
     if( !psz_mode || !*psz_mode )
@@ -848,9 +845,8 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            val.psz_string = psz_mode;
             var_Create( p_aout, "effect-list", VLC_VAR_STRING );
-            var_Set( p_aout, "effect-list", val );
+            var_SetString( p_aout, "effect-list", psz_mode );
 
             ChangeFiltersString( p_aout, "audio-visual", "goom", false );
             ChangeFiltersString( p_aout, "audio-visual", "visual", true );
@@ -869,7 +865,6 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     char *psz_mode = newval.psz_string;
-    vlc_value_t val;
     int i_ret;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
@@ -880,12 +875,10 @@ static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
-        val.psz_string = psz_mode;
         var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING );
-        var_Set( p_aout, "equalizer-preset", val );
+        var_SetString( p_aout, "equalizer-preset", psz_mode );
         i_ret = ChangeFiltersString( p_aout, "audio-filter", "equalizer",
                                      true );
-
     }
 
     /* That sucks */
