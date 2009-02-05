@@ -936,7 +936,7 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
                             void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    int i_action;
+    int i_action = 0;
 
     (void)psz_var;
     (void)oldval;
