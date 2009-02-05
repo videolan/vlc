@@ -76,7 +76,6 @@ struct vout_sys_t
     xcb_connection_t *conn;
     xcb_screen_t *screen;
     vout_window_t *embed; /* VLC window (when windowed) */
-    key_handler_t *keys;
 
     xcb_visualid_t vid;
     xcb_window_t parent; /* parent X window */
@@ -193,9 +192,6 @@ static int Open (vlc_object_t *obj)
         }
     }
 
-    /* Prefetch keyboard mappings */
-    p_sys->keys = CreateKeyHandler (obj, p_sys->conn);
-
     vout->pf_init = Init;
     vout->pf_end = Deinit;
     vout->pf_display = Display;
@@ -217,8 +213,6 @@ static void Close (vlc_object_t *obj)
     vout_sys_t *p_sys = vout->p_sys;
 
     assert (p_sys->embed == NULL);
-    if (p_sys->keys)
-        DestroyKeyHandler (p_sys->keys);
     if (p_sys->conn)
         xcb_disconnect (p_sys->conn);
     free (p_sys);
@@ -441,7 +435,6 @@ static int Init (vout_thread_t *vout)
         /* XCB_CW_BACK_PIXEL */
         screen->black_pixel,
         /* XCB_CW_EVENT_MASK */
-        XCB_EVENT_MASK_KEY_PRESS |
         XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
         XCB_EVENT_MASK_POINTER_MOTION,
     };
@@ -541,11 +534,7 @@ static int Manage (vout_thread_t *vout)
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (p_sys->conn)) != NULL)
-    {
-        if (p_sys->keys && (ProcessKeyEvent (p_sys->keys, ev) == 0))
-            continue;
         ProcessEvent (vout, ev);
-    }
 
     if (xcb_connection_has_error (p_sys->conn))
     {
