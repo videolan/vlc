@@ -111,7 +111,7 @@ struct demux_sys_t
     es_format_t  fmt;
     es_out_id_t *es;
 
-    int64_t     i_time;
+    date_t      pts;
     int64_t     i_length;
 
     int         i_data;
@@ -233,7 +233,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* init time */
-    p_sys->i_time  = 1;
+    date_Init( &p_sys->pts, settings.mFrequency, 1 );
+    date_Set( &p_sys->pts, 1 );
     p_sys->i_length = ModPlug_GetLength( p_sys->f ) * INT64_C(1000);
 
     msg_Dbg( p_demux, "MOD loaded name=%s lenght=%"PRId64"ms",
@@ -274,15 +275,14 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_frame;
-    int         i_bk = ( p_sys->fmt.audio.i_bitspersample / 8 ) *
+    const int i_bk = ( p_sys->fmt.audio.i_bitspersample / 8 ) *
                        p_sys->fmt.audio.i_channels;
-    int         i_read;
 
     p_frame = block_New( p_demux, p_sys->fmt.audio.i_rate / 10 * i_bk );
     if( !p_frame )
         return -1;
 
-    i_read = ModPlug_Read( p_sys->f, p_frame->p_buffer, p_frame->i_buffer );
+    const int i_read = ModPlug_Read( p_sys->f, p_frame->p_buffer, p_frame->i_buffer );
     if( i_read <= 0 )
     {
         /* EOF */
@@ -290,15 +290,13 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
     p_frame->i_buffer = i_read;
+    p_frame->i_dts =
+    p_frame->i_pts = date_Increment( &p_sys->pts, p_frame->i_buffer / i_bk );
 
     /* Set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_time );
-
-    /* We should use p_frame->i_buffer */
-    p_sys->i_time += INT64_C(1000000) * p_frame->i_buffer / i_bk / p_sys->fmt.audio.i_rate;
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_frame->i_pts );
 
     /* Send data */
-    p_frame->i_dts = p_frame->i_pts = p_sys->i_time;
     es_out_Send( p_demux->out, p_sys->es, p_frame );
 
     return 1;
@@ -319,7 +317,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         pf = (double*) va_arg( args, double* );
         if( p_sys->i_length > 0 )
         {
-            *pf = (double)p_sys->i_time / (double)p_sys->i_length;
+            *pf = (double)date_Get( &p_sys->pts ) / (double)p_sys->i_length;
             return VLC_SUCCESS;
         }
         return VLC_EGENERIC;
@@ -331,7 +329,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i64 >= 0 && i64 <= p_sys->i_length )
         {
             ModPlug_Seek( p_sys->f, i64 / 1000 );
-            p_sys->i_time = i64 + 1;
+            date_Set( &p_sys->pts, i64 + 1 );
 
             return VLC_SUCCESS;
         }
@@ -339,7 +337,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_TIME:
         pi64 = (int64_t*)va_arg( args, int64_t * );
-        *pi64 = p_sys->i_time;
+        *pi64 = date_Get( &p_sys->pts );
         return VLC_SUCCESS;
 
     case DEMUX_GET_LENGTH:
@@ -353,7 +351,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i64 >= 0 && i64 <= p_sys->i_length )
         {
             ModPlug_Seek( p_sys->f, i64 / 1000 );
-            p_sys->i_time = i64 + 1;
+            date_Set( &p_sys->pts, i64 + 1 );
 
             return VLC_SUCCESS;
         }
