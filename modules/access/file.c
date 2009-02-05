@@ -166,9 +166,9 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg (p_access, "ignoring directory");
         goto error;
     }
-
-    p_access->info.i_size = st.st_size;
-    if (!S_ISREG (st.st_mode))
+    if (S_ISREG (st.st_mode))
+        p_access->info.i_size = st.st_size;
+    else if (!S_ISBLK (st.st_mode))
         p_sys->b_seekable = false;
 #else
     p_sys->b_seekable = !b_stdin;
