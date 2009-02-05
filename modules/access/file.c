@@ -128,7 +128,6 @@ static int Open( vlc_object_t *p_this )
 
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
-    int fd = p_sys->fd = -1;
 
     if (!strcasecmp (p_access->psz_access, "stream"))
     {
@@ -144,38 +143,30 @@ static int Open( vlc_object_t *p_this )
     /* Open file */
     msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
 
+    int fd = -1;
     if (b_stdin)
         fd = dup (0);
     else
         fd = open_file (p_access, p_access->psz_path);
+    if (fd == -1)
+        goto error;
 
 #ifdef HAVE_SYS_STAT_H
     struct stat st;
 
-    while (fd != -1)
+    if (fstat (fd, &st))
     {
-        if (fstat (fd, &st))
-            msg_Err (p_access, "fstat(%d): %m", fd);
-        else
-        if (S_ISDIR (st.st_mode))
-            /* The directory plugin takes care of that */
-            msg_Dbg (p_access, "file is a directory, aborting");
-        else
-            break; // success
-
-        close (fd);
-        fd = -1;
+        msg_Err (p_access, "failed to read (%m)");
+        goto error;
     }
-#endif
-
-    if (fd == -1)
+    /* Directories can be opened and read from, but only readdir() knows
+     * how to parse the data. The directory plugin will do it. */
+    if (S_ISDIR (st.st_mode))
     {
-        free (p_sys);
-        return VLC_EGENERIC;
+        msg_Dbg (p_access, "ignoring directory");
+        goto error;
     }
-    p_sys->fd = fd;
 
-#ifdef HAVE_SYS_STAT_H
     p_access->info.i_size = st.st_size;
     if (!S_ISREG (st.st_mode))
         p_sys->b_seekable = false;
@@ -184,7 +175,14 @@ static int Open( vlc_object_t *p_this )
 # warning File size not known!
 #endif
 
+    p_sys->fd = fd;
     return VLC_SUCCESS;
+
+error:
+    if (fd != -1)
+        close (fd);
+    free (p_sys);
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -226,7 +224,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
                 break;
 
             default:
-                msg_Err (p_access, "read failed (%m)");
+                msg_Err (p_access, "failed to read (%m)");
                 intf_UserFatal (p_access, false, _("File reading failed"),
                                 _("VLC could not read the file."));
                 p_access->info.b_eof = true;
