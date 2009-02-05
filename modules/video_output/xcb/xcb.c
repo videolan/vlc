@@ -82,7 +82,6 @@ struct vout_sys_t
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
-    bool gray; /* whether display is grayscale */
     uint8_t bpp; /* bits per pixel */
 };
 
@@ -141,16 +140,10 @@ static int Open (vlc_object_t *obj)
     assert (p_sys->screen);
     msg_Dbg (vout, "using screen %d (depth %"PRIu8")", snum, scr->root_depth);
 
-    if (strchr ("\x08\x0f\x10\x18\x20", scr->root_depth) == NULL)
-    {
-        msg_Err (vout, "unsupported %"PRIu8"-bits color depth",
-                 scr->root_depth);
-        goto error;
-    }
-
     /* Determine the visual (color depth and palette) */
     xcb_visualtype_t *vt = NULL;
-    p_sys->gray = false;
+    bool gray = false;
+
     if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_TRUE_COLOR,
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using TrueColor visual ID %d", (int)vt->visual_id);
@@ -166,7 +159,7 @@ static int Open (vlc_object_t *obj)
                                             scr->root_depth)) != NULL)
     {
         msg_Dbg (vout, "using static gray visual ID %d", (int)vt->visual_id);
-        p_sys->gray = true;
+        gray = true;
     }
     else
     {
@@ -177,6 +170,39 @@ static int Open (vlc_object_t *obj)
     }
     p_sys->vid = vt->visual_id;
 
+    /* Determine our input format (normally, done in Init() but X11
+     * never changes its format) */
+    p_sys->bpp = scr->root_depth;
+    switch (scr->root_depth)
+    {
+        case 24:
+            p_sys->bpp = 32;
+        case 32: /* FIXME: untested */
+            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '3', '2');
+            break;
+
+        case 16:
+            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '6');
+            break;
+
+        case 15:
+            p_sys->bpp = 16;
+            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '5');
+            break;
+
+        case 8: /* FIXME: VLC cannot convert */
+            vout->output.i_chroma = gray ? VLC_FOURCC ('G', 'R', 'E', 'Y')
+                                         : VLC_FOURCC ('R', 'G', 'B', '2');
+            break;
+
+        default:
+            msg_Err (vout, "unsupported %"PRIu8"-bits screen depth",
+                     scr->root_depth);
+            goto error;
+    }
+    vout->fmt_out.i_chroma = vout->output.i_chroma;
+
+    /* Check shared memory support */
     p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
     if (p_sys->shm)
     {
@@ -382,38 +408,9 @@ static int Init (vout_thread_t *vout)
         p_sys->parent = p_sys->embed->handle.xid;
     }
 
-    /* Determine our input format */
-    p_sys->bpp = screen->root_depth;
-    switch (screen->root_depth)
-    {
-        case 24:
-            p_sys->bpp = 32;
-        case 32: /* FIXME: untested */
-            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '3', '2');
-            break;
-
-        case 16:
-            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '6');
-            break;
-
-        case 15:
-            p_sys->bpp = 16;
-            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '5');
-            break;
-
-        case 8: /* FIXME: VLC cannot convert */
-            vout->output.i_chroma =
-                p_sys->gray ? VLC_FOURCC ('G', 'R', 'E', 'Y')
-                            : VLC_FOURCC ('R', 'G', 'B', '2');
-            break;
-
-        default:
-            assert (0);
-    }
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
 
     /* FIXME: I don't get the subtlety between output and fmt_out here */
-    vout->fmt_out.i_chroma = vout->output.i_chroma;
     vout->fmt_out.i_visible_width = width;
     vout->fmt_out.i_visible_height = height;
     vout->fmt_out.i_sar_num = vout->fmt_out.i_sar_den = 1;
