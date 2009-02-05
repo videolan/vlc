@@ -29,6 +29,7 @@
 # include <stdarg.h>
 
 typedef struct vout_window_t vout_window_t;
+typedef struct vout_window_sys_t vout_window_sys_t;
 
 struct vout_window_t
 {
@@ -41,7 +42,7 @@ struct vout_window_t
         void      *hwnd; /* Win32 window handle */
         uint32_t   xid;  /* X11 window ID */
     } handle;
-    void          *p_sys;  /* window provider private data */
+    vout_window_sys_t *p_sys;  /* window provider private data */
 
     unsigned       width;  /* pixels width */
     unsigned       height; /* pixels height */
