@@ -70,7 +70,7 @@ public:
 private:
     void registerCodecs();
     void fillProfile( QString qs );
-protected:
+protected slots:
     virtual void close();
 private slots:
     void setVTranscodeOptions( bool );

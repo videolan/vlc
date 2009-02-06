@@ -58,6 +58,7 @@ inline void VLCProfileSelector::fillProfilesCombo()
     for( int i = 0; i < i_size; i++ )
     {
         settings.setArrayIndex( i );
+        if( settings.value( "Profile-Name" ).toString().isEmpty() ) continue;
         profileBox->addItem( settings.value( "Profile-Name" ).toString(),
                 settings.value( "Profile-Value" ) );
     }
@@ -204,7 +205,7 @@ VLCProfileEditor::VLCProfileEditor( QString qs_name, QString value,
 
 inline void VLCProfileEditor::registerCodecs()
 {
- 
+
 #define ADD_VCODEC( name, fourcc ) ui.vCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_VCODEC( "MPEG-1", "mp1v" )
     ADD_VCODEC( "MPEG-2", "mp2v" )
