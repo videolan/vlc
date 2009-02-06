@@ -794,6 +794,10 @@ ifdef HAVE_WIN32
 THEORACONF += --disable-docs
 endif
 
+ifdef HAVE_DARWIN_10
+THEORACONF += --disable-asm
+endif
+
 .theora: libtheora .ogg
 ifdef HAVE_BEOS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) --disable-asm && make && make install)

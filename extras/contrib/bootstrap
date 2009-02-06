@@ -219,7 +219,7 @@ case $HOST in
         fi
     ;;
     *-apple-darwin10)
-        SDK_TARGET=10.6
+        SDK_TARGET=10.5
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
         echo "HAVE_DARWIN_9 = 1" >> config.mak
