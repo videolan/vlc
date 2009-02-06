@@ -2249,7 +2249,7 @@ end:
 - (IBAction)crashReporterAction:(id)sender
 {
     if( sender == o_crashrep_send_btn )
-        [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath]] withUserComment: [o_crashrep_fld string]];
+        [self sendCrashLog:[NSString stringWithContentsOfFile: [self latestCrashLogPath] encoding: NSUTF8StringEncoding error: NULL] withUserComment: [o_crashrep_fld string]];
 
     [NSApp stopModal];
     [o_crashrep_win orderOut: sender];

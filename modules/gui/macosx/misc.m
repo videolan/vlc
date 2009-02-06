@@ -222,7 +222,7 @@ static NSMutableArray *blackoutWindows = NULL;
  *****************************************************************************/
 
 @implementation VLCWindow
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(unsigned int)styleMask
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
     backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
     self = [super initWithContentRect:contentRect styleMask:styleMask backing:backingType defer:flag];
@@ -403,7 +403,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 @implementation VLCControllerWindow
 
-- (id)initWithContentRect:(NSRect)contentRect styleMask:(unsigned int)styleMask
+- (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
     backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
     self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask

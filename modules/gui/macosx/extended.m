@@ -113,11 +113,11 @@ static VLCExtended *_o_sharedInstance = nil;
     /* set the video-filter-checkboxes to the correct values */
     if( psz_vfilters )
     {
-        [o_ckb_blur setState: (int)strstr( psz_vfilters, "motionblur")];
-        [o_ckb_imgClone setState: (int)strstr( psz_vfilters, "clone")];
-        [o_ckb_imgCrop setState: (int)strstr( psz_vfilters, "crop")];
-        [o_ckb_trnsform setState: (int)strstr( psz_vfilters, "transform")];
-        [o_ckb_intZoom setState: (int)strstr( psz_vfilters, "magnify")];
+        [o_ckb_blur setState: (NSInteger)strstr( psz_vfilters, "motionblur")];
+        [o_ckb_imgClone setState: (NSInteger)strstr( psz_vfilters, "clone")];
+        [o_ckb_imgCrop setState: (NSInteger)strstr( psz_vfilters, "crop")];
+        [o_ckb_trnsform setState: (NSInteger)strstr( psz_vfilters, "transform")];
+        [o_ckb_intZoom setState: (NSInteger)strstr( psz_vfilters, "magnify")];
 
         free( psz_vfilters );
     }
@@ -147,11 +147,11 @@ static VLCExtended *_o_sharedInstance = nil;
     }
     if( psz_vifilters )
     {
-        [o_ckb_wave setState: (int)strstr( psz_vifilters, "wave")];
-        [o_ckb_psycho setState: (int)strstr( psz_vifilters, "psychedelic")];
-        [o_ckb_ripple setState: (int)strstr( psz_vifilters, "ripple")];
-        [o_ckb_gradient setState: (int)strstr( psz_vifilters, "gradient")];
-        [o_ckb_imgInvers setState: (int)strstr( psz_vifilters, "invert")];
+        [o_ckb_wave setState: (NSInteger)strstr( psz_vifilters, "wave")];
+        [o_ckb_psycho setState: (NSInteger)strstr( psz_vifilters, "psychedelic")];
+        [o_ckb_ripple setState: (NSInteger)strstr( psz_vifilters, "ripple")];
+        [o_ckb_gradient setState: (NSInteger)strstr( psz_vifilters, "gradient")];
+        [o_ckb_imgInvers setState: (NSInteger)strstr( psz_vifilters, "invert")];
 
         free( psz_vifilters );
     }
@@ -161,8 +161,8 @@ static VLCExtended *_o_sharedInstance = nil;
     psz_afilters = config_GetPsz( p_intf, "audio-filter" );
     if( psz_afilters )
     {
-        [o_ckb_hdphnVirt setState: (int)strstr( psz_afilters, "headphone" ) ];
-        [o_ckb_vlme_norm setState: (int)strstr( psz_afilters, "normvol" ) ];
+        [o_ckb_hdphnVirt setState: (NSInteger)strstr( psz_afilters, "headphone" ) ];
+        [o_ckb_vlme_norm setState: (NSInteger)strstr( psz_afilters, "normvol" ) ];
  
         free( psz_afilters );
     }

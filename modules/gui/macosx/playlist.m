@@ -146,7 +146,7 @@
 @implementation VLCPlaylistCommon (NSOutlineViewDataSource)
 
 /* return the number of children for Obj-C pointer item */ /* DONE */
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     int i_return = 0;
     playlist_item_t *p_item = NULL;
@@ -167,7 +167,7 @@
 }
 
 /* return the child at index for the Obj-C pointer item */ /* DONE */
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     playlist_item_t *p_return = NULL, *p_item = NULL;
     NSValue *o_value;
@@ -1478,7 +1478,7 @@
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     id o_value = [super outlineView: outlineView child: index ofItem: item];
     playlist_t *p_playlist = pl_Hold( VLCIntf );
@@ -1562,7 +1562,7 @@
     return YES;
 }
 
-- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(int)index
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
 {
     playlist_t *p_playlist = pl_Hold( VLCIntf );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];
@@ -1626,7 +1626,7 @@
     return NSDragOperationNone;
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(int)index
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
 {
     playlist_t * p_playlist =  pl_Hold( VLCIntf );
     NSPasteboard *o_pasteboard = [info draggingPasteboard];

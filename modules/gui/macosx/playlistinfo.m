@@ -458,7 +458,7 @@ error:
 
 @implementation VLCInfo (NSTableDataSource)
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     return (item == nil) ? [rootItem numberOfChildren] : [item numberOfChildren];
 }
@@ -467,7 +467,7 @@ error:
     return ([item numberOfChildren] > 0);
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     return (item == nil) ? [rootItem childAtIndex:index] : (id)[item childAtIndex:index];
 }

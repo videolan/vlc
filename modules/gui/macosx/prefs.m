@@ -249,7 +249,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 @implementation VLCPrefs (NSTableDataSource)
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     return (item == nil) ? [_rootTreeItem numberOfChildren] : [item numberOfChildren];
 }
@@ -259,7 +259,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     return ![item isKindOfClass:[VLCTreeSubCategoryItem class]];
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     return (item == nil) ? (id)[_rootTreeItem childAtIndex:index]: (id)[item childAtIndex:index];
 }

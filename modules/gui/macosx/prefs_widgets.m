@@ -1096,12 +1096,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 @end
 
 @implementation StringListConfigControl (NSComboBoxDataSource)
-- (int)numberOfItemsInComboBox:(NSComboBox *)aComboBox
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
         return p_item->i_list;
 }
 
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)i_index
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)i_index
 {
     if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
     {
@@ -1550,12 +1550,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 @end
 
 @implementation IntegerListConfigControl (NSComboBoxDataSource)
-- (int)numberOfItemsInComboBox:(NSComboBox *)aComboBox
+- (NSInteger)numberOfItemsInComboBox:(NSComboBox *)aComboBox
 {
     return p_item->i_list;
 }
 
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)i_index
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)i_index
 {
     if( p_item->ppsz_list_text && p_item->ppsz_list_text[i_index] )
         return [[VLCMain sharedInstance]
@@ -2215,7 +2215,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 }
 
 - (NSDragOperation)tableView:(NSTableView*)table
-    validateDrop:(id <NSDraggingInfo>)info proposedRow:(int)row
+    validateDrop:(id <NSDraggingInfo>)info proposedRow:(NSInteger)row
     proposedDropOperation:(NSTableViewDropOperation)op
 {
     // Make drops at the end of the table go to the end.
@@ -2233,7 +2233,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 }
 
 - (BOOL)tableView:(NSTableView*)table acceptDrop:(id <NSDraggingInfo>)info
-    row:(int)dropRow dropOperation:(NSTableViewDropOperation)op;
+    row:(NSInteger)dropRow dropOperation:(NSTableViewDropOperation)op;
 {
     NSPasteboard    *pb = [info draggingPasteboard];
     NSDragOperation srcMask = [info draggingSourceOperationMask];
@@ -2287,13 +2287,13 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
     return accepted;
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [o_modulearray count];
 }
 
 - (id)tableView:(NSTableView *)aTableView
-    objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+    objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if( [[aTableColumn identifier] isEqualToString: @"Enabled"] )
         return [[o_modulearray objectAtIndex:rowIndex] objectAtIndex:2];
@@ -2304,7 +2304,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 }
 
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject
-    forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+    forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     [[o_modulearray objectAtIndex:rowIndex] replaceObjectAtIndex:2
         withObject: anObject];

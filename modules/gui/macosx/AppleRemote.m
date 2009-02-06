@@ -61,6 +61,10 @@ const int REMOTE_SWITCH_COOKIE=19;
 const NSTimeInterval DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE=0.35;
 const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
+#ifndef NSUInteger
+#define NSUInteger unsigned
+#endif
+
 @implementation AppleRemote
 
 #pragma public interface
@@ -305,7 +309,7 @@ static AppleRemote* sharedInstance=nil;
 - (id)retain {
     return self;
 }
-- (unsigned)retainCount {
+- (NSUInteger)retainCount {
     return UINT_MAX;  //denotes an object that cannot be released
 }
 - (void)release {

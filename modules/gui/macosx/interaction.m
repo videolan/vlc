@@ -474,13 +474,13 @@
 /*----------------------------------------------------------------------------
  * data source methods
  *---------------------------------------------------------------------------*/
-- (int)numberOfRowsInTableView:(NSTableView *)theDataTable
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)theDataTable
 {
     return [o_errors count];
 }
 
 - (id)tableView:(NSTableView *)theDataTable objectValueForTableColumn:
-    (NSTableColumn *)theTableColumn row: (int)row
+    (NSTableColumn *)theTableColumn row: (NSInteger)row
 {
     if( [[theTableColumn identifier] isEqualToString: @"error_msg"] )
         return [o_errors objectAtIndex: row];

@@ -423,7 +423,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     psz_tmp = config_GetPsz( p_intf, "audio-filter" );
     if( psz_tmp )
     {
-        [o_audio_norm_ckb setState: (int)strstr( psz_tmp, "volnorm" )];
+        [o_audio_norm_ckb setState: (NSInteger)strstr( psz_tmp, "volnorm" )];
         [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
         [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
     }
@@ -744,7 +744,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             psz_tmp = config_GetPsz( p_intf, "audio-filter" );
             if(! psz_tmp)
                 config_PutPsz( p_intf, "audio-filter", "volnorm" );
-            else if( (int)strstr( psz_tmp, "normvol" ) == NO )
+            else if( (NSInteger)strstr( psz_tmp, "normvol" ) == NO )
             {
                 /* work-around a GCC 4.0.1 bug */
                 psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
@@ -845,7 +845,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
         #define CaC( name ) CaCi( name, 1 )
-        msg_Dbg( p_intf, "Adjusting all cache values to: %i", [[o_input_cachelevel_pop selectedItem] tag] );
+        msg_Dbg( p_intf, "Adjusting all cache values to: %i", (int)[[o_input_cachelevel_pop selectedItem] tag] );
         CaC( "udp-caching" );
         if( module_exists ( "dvdread" ) )
         {
@@ -1144,7 +1144,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     }
     else if( sender == o_hotkeys_change_ok_btn )
     {
-        int i_returnValue;
+        NSInteger i_returnValue;
         if(! o_keyInTransition )
         {
             [NSApp stopModal];
@@ -1199,7 +1199,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (BOOL)changeHotkeyTo: (int)i_theNewKey
 {
-    int i_returnValue;
+    NSInteger i_returnValue;
     i_returnValue = [o_hotkeysNonUseableKeys indexOfObject: [NSNumber numberWithInt: i_theNewKey]];
     if( i_returnValue != NSNotFound || i_theNewKey == 0 )
     {

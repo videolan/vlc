@@ -41,7 +41,7 @@
 @implementation VLCFSPanel
 /* We override this initializer so we can set the NSBorderlessWindowMask styleMask, and set a few other important settings */
 - (id)initWithContentRect:(NSRect)contentRect 
-                styleMask:(unsigned int)aStyle 
+                styleMask:(NSInteger)aStyle 
                   backing:(NSBackingStoreType)bufferingType 
                     defer:(BOOL)flag
 {
