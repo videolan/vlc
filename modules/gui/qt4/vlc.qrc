@@ -89,5 +89,6 @@
   <file alias="noart.png">pixmaps/noart.png</file>
   <file alias="space">pixmaps/space.png</file>
   <file>pixmaps/go-next.png</file>
+  <file alias="new.png">pixmaps/profile_new.png</file>
  </qresource>
 </RCC>

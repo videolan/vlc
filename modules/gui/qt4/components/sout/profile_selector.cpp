@@ -29,7 +29,7 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     layout->addWidget( deleteButton );
 
     QToolButton *newButton = new QToolButton( this );
-//    newButton->setIcon( QIcon( ":/clear" ) );
+    newButton->setIcon( QIcon( ":/new" ) );
     newButton->setToolTip( qtr( "Create a new profile" ) );
     layout->addWidget(newButton);
 
