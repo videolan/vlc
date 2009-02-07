@@ -266,14 +266,6 @@ typedef struct libvlc_audio_output_t
  */
 
 /**
-* Downcast to this general type as placeholder for a platform specific one, such as:
-*  Drawable on X11,
-*  CGrafPort on MacOSX,
-*  HWND on win32
-*/
-typedef int libvlc_drawable_t;
-
-/**
 * Rectangle type for video geometry
 */
 typedef struct libvlc_rectangle_t
