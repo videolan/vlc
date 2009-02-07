@@ -101,7 +101,7 @@ private:
     /* All main Menus */
     static QMenu *FileMenu( intf_thread_t * );
     static QMenu *SDMenu( intf_thread_t * );
-    static QMenu *ToolsMenu( intf_thread_t * );
+    static QMenu *ToolsMenu( QMenu * );
     static QMenu *ViewMenu( intf_thread_t *, QMenu *, MainInterface *,
                              bool, bool with = true );
     static QMenu *NavigMenu( intf_thread_t *, QMenu * );

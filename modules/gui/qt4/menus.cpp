@@ -293,7 +293,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
     BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "P&layback" ), 3 );
 
-    BAR_ADD( ToolsMenu( p_intf ), qtr( "&Tools" ) );
+    BAR_ADD( ToolsMenu( NULL ), qtr( "&Tools" ) );
     BAR_ADD( ViewMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
              qtr( "V&iew" ) );
 
@@ -353,11 +353,13 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 }
 
 /* Playlist/MediaLibrary Control */
-QMenu *QVLCMenu::ToolsMenu( intf_thread_t *p_intf )
+QMenu *QVLCMenu::ToolsMenu( QMenu *parent )
 {
-    VLC_UNUSED( p_intf ); //TODO remove
-    QMenu *menu = new QMenu();
-
+    QMenu *menu;
+    if( parent == NULL )
+        menu = new QMenu();
+    else
+        menu = parent;
     addDPStaticEntry( menu, qtr( I_MENU_EXT ), ":/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
 
@@ -715,12 +717,6 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
 
 void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 {
-#if 0
-    QMenu *toolsmenu = ToolsMenu( p_intf, menu, false, true );
-    toolsmenu->setTitle( qtr( "Tools" ) );
-    menu->addMenu( toolsmenu );
-#endif
-
     QMenu *openmenu = new QMenu( qtr( "Open Media" ), menu );
     addDPStaticEntry( openmenu, qtr( "&Open File..." ),
         ":/file-asym", SLOT( openFileDialog() ) );
@@ -881,13 +877,6 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             {
                 submenu->addAction( QIcon( ":/playlist" ),
                          qtr( "Show Playlist" ), mi, SLOT( togglePlaylist() ) );
-            }
-            addDPStaticEntry( submenu, qtr( I_MENU_EXT ),
-                ":/settings", SLOT( extendedDialog() ) );
-            addDPStaticEntry( submenu, qtr( I_MENU_INFO ) , ":/info",
-                SLOT( mediaInfoDialog() ), "Ctrl+I" );
-            if( mi )
-            {
                 action = submenu->addAction( QIcon( "" ),
                      qtr( "Minimal View" ), mi, SLOT( toggleMinimalView() ) );
                 action->setCheckable( true );
@@ -902,8 +891,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
             else /* We are using the skins interface.
                     If not, this entry will not show. */
             {
-                addDPStaticEntry( submenu, qtr( "&Preferences..." ),
-                    ":/preferences", SLOT( prefsDialog() ), "Ctrl+P" );
+
+                QMenu *tools = ToolsMenu( submenu );
                 submenu->addSeparator();
                 objects.clear();
                 varnames.clear();
