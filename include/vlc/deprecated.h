@@ -96,6 +96,16 @@ VLC_PUBLIC_API void libvlc_video_set_parent( libvlc_instance_t *, libvlc_drawabl
  */
 VLC_PUBLIC_API libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *, libvlc_exception_t * );
 
+/**
+ * Change the parent for the current the video output.
+ *
+ * \param p_instance libvlc instance
+ * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_e an initialized exception pointer
+ * \return the success status (boolean)
+ */
+VLC_PUBLIC_API int libvlc_video_reparent( libvlc_media_player_t *, libvlc_drawable_t, libvlc_exception_t * );
+
 /*
  * This function shall not be used at all. It may lead to crash and race condition.
  */
