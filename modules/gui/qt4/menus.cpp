@@ -842,22 +842,26 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
             menu->addSeparator();
 
+            /* Input menu */
             vlc_object_hold( p_input );
             InputAutoMenuBuilder( p_input, objects, varnames );
             vlc_object_release( p_input );
 
+            /* Audio menu */
             submenu = new QMenu( menu );
             action = menu->addMenu( AudioMenu( p_intf, submenu ) );
             action->setText( qtr( "&Audio" ) );
             if( action->menu()->isEmpty() )
                 action->setEnabled( false );
 
+            /* Video menu */
             submenu = new QMenu( menu );
             action = menu->addMenu( VideoMenu( p_intf, submenu ) );
             action->setText( qtr( "&Video" ) );
             if( action->menu()->isEmpty() )
                 action->setEnabled( false );
 
+            /* Playback menu for chapters */
             submenu = new QMenu( menu );
             action = menu->addMenu( NavigMenu( p_intf, submenu ) );
             action->setText( qtr( "&Playback" ) );
@@ -904,13 +908,12 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                     vlc_object_release( p_object );
                 }
                 else
-                {
                     msg_Dbg( p_intf, "could not find parent interface" );
-                }
             }
             menu->addMenu( submenu );
         }
 
+        /* Static entries for ending, like open */
         PopupMenuStaticEntries( menu );
 
         p_intf->p_sys->p_popup_menu = menu;
