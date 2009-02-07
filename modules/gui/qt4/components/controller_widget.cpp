@@ -57,8 +57,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     /* Normal View, click on icon mutes */
     if( !b_special )
     {
-        hVolLabel = new VolumeClickHandler( p_intf, this );
-        volMuteLabel->installEventFilter( hVolLabel );
+        volMuteLabel->installEventFilter( this );
         volumeMenu = NULL;
         subLayout = NULL;
     }
@@ -134,6 +133,24 @@ void SoundWidget::showVolumeMenu( QPoint pos )
                           + QPoint( width(), height() /2) );
 }
 
+bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
+{
+    VLC_UNUSED( obj );
+    if (e->type() == QEvent::MouseButtonPress  )
+    {
+        aout_VolumeMute( p_intf, NULL );
+        audio_volume_t i_volume;
+        aout_VolumeGet( p_intf, &i_volume );
+        e->accept();
+        return true;
+    }
+    else
+    {
+        e->ignore();
+        return false;
+    }
+}
+
 void SoundWidget::updateVolume( int i_sliderVolume )
 {
     if( !b_my_volume )
@@ -206,22 +223,4 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
     }
 }
 
-bool VolumeClickHandler::eventFilter( QObject *obj, QEvent *e )
-{
-    VLC_UNUSED( obj );
-    if (e->type() == QEvent::MouseButtonPress  )
-    {
-        aout_VolumeMute( p_intf, NULL );
-        audio_volume_t i_volume;
-        aout_VolumeGet( p_intf, &i_volume );
-//        m->updateVolume( i_volume *  VOLUME_MAX / (AOUT_VOLUME_MAX/2) );
-        e->accept();
-        return true;
-    }
-    else
-    {
-        e->ignore();
-        return false;
-    }
-}
 

@@ -80,7 +80,6 @@ class VolumeClickHandler;
 class SoundWidget : public QWidget
 {
     Q_OBJECT
-    friend class VolumeClickHandler;
 
 public:
     SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool,
@@ -90,26 +89,13 @@ private:
     intf_thread_t       *p_intf;
     QLabel              *volMuteLabel;
     QAbstractSlider     *volumeSlider;
-    VolumeClickHandler  *hVolLabel;
     bool                 b_my_volume;
     QMenu               *volumeMenu;
-
+    virtual bool eventFilter( QObject *obj, QEvent *e );
 protected slots:
     void updateVolume( int );
     void updateVolume( void );
     void showVolumeMenu( QPoint pos );
-};
-
-class VolumeClickHandler : public QObject
-{
-public:
-    VolumeClickHandler( intf_thread_t *_p_intf, SoundWidget *_m ) : QObject(_m)
-    {m = _m; p_intf = _p_intf; }
-    virtual ~VolumeClickHandler() {};
-    virtual bool eventFilter( QObject *obj, QEvent *e );
-private:
-    SoundWidget *m;
-    intf_thread_t *p_intf;
 };
 
 #endif
