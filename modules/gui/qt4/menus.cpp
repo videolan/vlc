@@ -390,9 +390,7 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *parent )
 }
 
 /**
- * Tools/View Menu
- * This is kept in the same menu for now, but could change if it gets much
- * longer.
+ * View Menu
  * This menu can be an interface menu but also a right click menu.
  **/
 QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
