@@ -154,10 +154,12 @@ static int Open (vlc_object_t *obj)
     if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_TRUE_COLOR,
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using TrueColor visual ID %d", (int)vt->visual_id);
+#if 0
     else
     if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_COLOR,
                                             scr->root_depth)) != NULL)
         msg_Dbg (vout, "using static color visual ID %d", (int)vt->visual_id);
+#endif
     else
     if ((scr->root_depth == 8)
      && (vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_GRAY,
