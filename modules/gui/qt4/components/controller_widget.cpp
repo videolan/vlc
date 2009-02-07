@@ -37,6 +37,7 @@
 #include <QSpinBox>
 #include <QMenu>
 #include <QWidgetAction>
+#include <QMouseEvent>
 
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny, bool b_special )
@@ -66,7 +67,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         /* Special view, click on button shows the slider */
         b_shiny = false;
 
-        setContextMenuPolicy ( Qt::CustomContextMenu );
+        volMuteLabel->installEventFilter( this );
 
         QFrame *volumeControlWidget = new QFrame;
         subLayout = new QVBoxLayout( volumeControlWidget );
@@ -76,11 +77,6 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         QWidgetAction *widgetAction = new QWidgetAction( volumeControlWidget );
         widgetAction->setDefaultWidget( volumeControlWidget );
         volumeMenu->addAction( widgetAction );
-
-        /* Speed Label behaviour:
-           - right click gives the vertical speed slider */
-        CONNECT( this, customContextMenuRequested( QPoint ),
-                this, showVolumeMenu( QPoint ) );
 
     }
 
@@ -138,9 +134,17 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
     VLC_UNUSED( obj );
     if (e->type() == QEvent::MouseButtonPress  )
     {
-        aout_VolumeMute( p_intf, NULL );
-        audio_volume_t i_volume;
-        aout_VolumeGet( p_intf, &i_volume );
+        if( volumeSlider->orientation() ==  Qt::Vertical )
+        {
+            QMouseEvent *event = static_cast<QMouseEvent*>(e);
+            showVolumeMenu( event->pos() );
+        }
+        else
+        {
+            aout_VolumeMute( p_intf, NULL );
+            audio_volume_t i_volume;
+            aout_VolumeGet( p_intf, &i_volume );
+        }
         e->accept();
         return true;
     }
