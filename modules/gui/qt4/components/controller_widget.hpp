@@ -83,7 +83,8 @@ class SoundWidget : public QWidget
     friend class VolumeClickHandler;
 
 public:
-    SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool );
+    SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool,
+                 bool b_special = false );
 
 private:
     intf_thread_t       *p_intf;
@@ -91,10 +92,12 @@ private:
     QAbstractSlider     *volumeSlider;
     VolumeClickHandler  *hVolLabel;
     bool                 b_my_volume;
+    QMenu               *volumeMenu;
 
 protected slots:
     void updateVolume( int );
     void updateVolume( void );
+    void showVolumeMenu( QPoint pos );
 };
 
 class VolumeClickHandler : public QObject

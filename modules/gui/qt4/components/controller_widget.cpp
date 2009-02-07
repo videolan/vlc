@@ -35,21 +35,60 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QSpinBox>
+#include <QMenu>
+#include <QWidgetAction>
 
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
-                          bool b_shiny )
-                         : QWidget( _parent ), b_my_volume( false )
+                          bool b_shiny, bool b_special )
+                         : QWidget( _parent ), b_my_volume( false ),
+                           p_intf( _p_intf)
 {
-    p_intf = _p_intf;
+    /* We need a layout for this widget */
     QHBoxLayout *layout = new QHBoxLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
-    hVolLabel = new VolumeClickHandler( p_intf, this );
 
+    /* We need a Label for the pix */
     volMuteLabel = new QLabel;
     volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
-    volMuteLabel->installEventFilter( hVolLabel );
+
+    /* We might need a subLayout too */
+    QVBoxLayout *subLayout;
+
+    /* Normal View, click on icon mutes */
+    if( !b_special )
+    {
+        hVolLabel = new VolumeClickHandler( p_intf, this );
+        volMuteLabel->installEventFilter( hVolLabel );
+        volumeMenu = NULL;
+        subLayout = NULL;
+    }
+    else
+    {
+        /* Special view, click on button shows the slider */
+        b_shiny = false;
+
+        setContextMenuPolicy ( Qt::CustomContextMenu );
+
+        QFrame *volumeControlWidget = new QFrame;
+        subLayout = new QVBoxLayout( volumeControlWidget );
+        subLayout->setLayoutMargins( 4, 4, 4, 4, 4 );
+        volumeMenu = new QMenu( this );
+
+        QWidgetAction *widgetAction = new QWidgetAction( volumeControlWidget );
+        widgetAction->setDefaultWidget( volumeControlWidget );
+        volumeMenu->addAction( widgetAction );
+
+        /* Speed Label behaviour:
+           - right click gives the vertical speed slider */
+        CONNECT( this, customContextMenuRequested( QPoint ),
+                this, showVolumeMenu( QPoint ) );
+
+    }
+
+    /* And add the label */
     layout->addWidget( volMuteLabel );
 
+    /* Slider creation: shiny or clean */
     if( b_shiny )
     {
         volumeSlider = new SoundSlider( this,
@@ -59,15 +98,23 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     }
     else
     {
-        volumeSlider = new QSlider( this );
-        volumeSlider->setOrientation( Qt::Horizontal );
+        volumeSlider = new QSlider( NULL );
+        volumeSlider->setOrientation( b_special ? Qt::Vertical
+                                                : Qt::Horizontal );
         volumeSlider->setMaximum( config_GetInt( p_intf, "qt-volume-complete" )
                                   ? 400 : 200 );
     }
-    volumeSlider->setMaximumSize( QSize( 200, 40 ) );
-    volumeSlider->setMinimumSize( QSize( 85, 30 ) );
+    if( volumeSlider->orientation() ==  Qt::Horizontal )
+    {
+        volumeSlider->setMaximumSize( QSize( 200, 40 ) );
+        volumeSlider->setMinimumSize( QSize( 85, 30 ) );
+    }
+
     volumeSlider->setFocusPolicy( Qt::NoFocus );
-    layout->addWidget( volumeSlider );
+    if( b_special )
+        subLayout->addWidget( volumeSlider );
+    else
+        layout->addWidget( volumeSlider );
 
     /* Set the volume from the config */
     volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
@@ -79,6 +126,12 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
+}
+
+void SoundWidget::showVolumeMenu( QPoint pos )
+{
+    volumeMenu->exec( QCursor::pos() - pos - QPoint( 0, volumeMenu->height()/2 )
+                          + QPoint( width(), height() /2) );
 }
 
 void SoundWidget::updateVolume( int i_sliderVolume )
