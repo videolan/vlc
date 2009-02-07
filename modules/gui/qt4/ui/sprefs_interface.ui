@@ -5,7 +5,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>693</width>
+    <width>701</width>
     <height>604</height>
    </rect>
   </property>
@@ -119,14 +119,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4" colspan="2" >
-       <widget class="QCheckBox" name="systrayBox" >
-        <property name="text" >
-         <string>_("Systray icon")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" colspan="4" >
+      <item row="3" column="2" colspan="2" >
        <widget class="QCheckBox" name="fsController" >
         <property name="text" >
          <string>_("Show a controller in fullscreen")</string>
@@ -214,6 +207,20 @@
        <widget class="Line" name="line" >
         <property name="orientation" >
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4" colspan="2" >
+       <widget class="QCheckBox" name="systrayBox" >
+        <property name="text" >
+         <string>_("Systray icon")</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4" colspan="2" >
+       <widget class="QCheckBox" name="resizingBox" >
+        <property name="text" >
+         <string>_("Resize interface to video size")</string>
         </property>
        </widget>
       </item>
