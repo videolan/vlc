@@ -52,6 +52,10 @@ static vlc_threadvar_t cancel_key;
 # include <execinfo.h>
 #endif
 
+#ifdef __APPLE__
+# include <sys/time.h> /* gettimeofday in vlc_cond_timedwait */
+#endif
+
 /**
  * Print a backtrace to the standard error for debugging purpose.
  */
@@ -556,6 +560,16 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
 #if defined(LIBVLC_USE_PTHREAD)
+#ifdef __APPLE__
+    /* mdate() is mac_absolute_time on osx, which we must convert to do
+     * the same base than gettimeofday() on which pthread_cond_timedwait
+     * counts on. */
+    mtime_t oldbase = mdate();
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    mtime_t newbase = (mtime_t)tv.tv_sec * 1000000 + (mtime_t) tv.tv_usec;
+    deadline = deadline - oldbase + newbase;
+#endif
     lldiv_t d = lldiv( deadline, CLOCK_FREQ );
     struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
 

@@ -56,6 +56,11 @@
 #   include <sys/time.h>
 #endif
 
+#ifdef __APPLE__
+#   include <mach/mach.h>
+#   include <mach/mach_time.h>
+#endif
+
 #if !defined(HAVE_STRUCT_TIMESPEC)
 struct timespec
 {
@@ -168,6 +173,15 @@ static inline unsigned mprec( void )
 #endif
 }
 
+#ifdef __APPLE__
+static mach_timebase_info_data_t mtime_timebase_info;
+static pthread_once_t mtime_timebase_info_once = PTHREAD_ONCE_INIT;
+static void mtime_init_timebase(void)
+{
+    mach_timebase_info(&mtime_timebase_info);
+}
+#endif
+
 /**
  * Return high precision date
  *
@@ -193,6 +207,16 @@ mtime_t mdate( void )
 #elif defined( HAVE_KERNEL_OS_H )
     res = real_time_clock_usecs();
 
+#elif defined( __APPLE__ )
+    pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
+    uint64_t date = mach_absolute_time();
+
+    /* Convert to nanoseconds */
+    date *= mtime_timebase_info.numer;
+    date /= mtime_timebase_info.denom;
+
+    /* Convert to microseconds */
+    res = date / 1000;
 #elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't need the real date, just the value of a high precision timer */
     static mtime_t freq = INT64_C(-1);
@@ -299,6 +323,11 @@ mtime_t mdate( void )
         i_previous_time = res;
         LeaveCriticalSection( &date_lock );
     }
+#elif defined( __APPLE__ ) /* The version that should be used, if it was cancelable */
+    pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
+    uint64_t mach_time = date * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
+    mach_wait_until(mach_time);
+
 #else
     struct timeval tv_date;
 
@@ -394,6 +423,11 @@ void msleep( mtime_t delay )
     ts_delay.tv_nsec = (delay % 1000000) * 1000;
 
     while( nanosleep( &ts_delay, &ts_delay ) && ( errno == EINTR ) );
+
+#elif defined( __APPLE__ ) /* The version that should be used, if it was cancelable */
+    pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
+    uint64_t mach_time = delay * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
+    mach_wait_until(mach_time + mach_absolute_time());
 
 #else
     struct timeval tv_delay;
