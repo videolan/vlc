@@ -55,19 +55,17 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     /* We might need a subLayout too */
     QVBoxLayout *subLayout;
 
+    volMuteLabel->installEventFilter( this );
+
     /* Normal View, click on icon mutes */
     if( !b_special )
     {
-        volMuteLabel->installEventFilter( this );
-        volumeMenu = NULL;
-        subLayout = NULL;
+        volumeMenu = NULL; subLayout = NULL;
     }
     else
     {
         /* Special view, click on button shows the slider */
         b_shiny = false;
-
-        volMuteLabel->installEventFilter( this );
 
         QFrame *volumeControlWidget = new QFrame;
         subLayout = new QVBoxLayout( volumeControlWidget );
@@ -77,7 +75,6 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         QWidgetAction *widgetAction = new QWidgetAction( volumeControlWidget );
         widgetAction->setDefaultWidget( volumeControlWidget );
         volumeMenu->addAction( widgetAction );
-
     }
 
     /* And add the label */
