@@ -453,7 +453,7 @@ static int Init (vout_thread_t *vout)
     c = xcb_create_window_checked (p_sys->conn, screen->root_depth, window,
                                    p_sys->parent, x, y, width, height, 0,
                                    XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                                   screen->root_visual, mask, values);
+                                   p_sys->vid, mask, values);
     if (CheckError (vout, "cannot create X11 window", c))
         goto error;
     p_sys->window = window;
