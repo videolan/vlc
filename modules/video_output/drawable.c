@@ -63,21 +63,36 @@ static int Open (vlc_object_t *obj, const char *varname, bool ptr)
 {
     static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
     vout_window_t *wnd = (vout_window_t *)obj;
-    vlc_value_t val;
+    vlc_value_t val, globval;
 
-    if (var_Create (obj->p_libvlc, "drawable-busy", VLC_VAR_BOOL))
+    if (var_Create (obj->p_libvlc, "drawable-busy", VLC_VAR_BOOL)
+     || var_Create (obj, varname, VLC_VAR_DOINHERIT
+                                  | (ptr ? VLC_VAR_ADDRESS : VLC_VAR_INTEGER)))
         return VLC_ENOMEM;
+    var_Get (obj, varname, &val);
 
     vlc_mutex_lock (&serializer);
     /* Note: We cannot simply clear the drawable variable.
      * It would break libvlc_video_get_parent(). */
-    if (!var_GetBool (obj->p_libvlc, "drawable-busy"))
+    var_Get (obj->p_libvlc, varname, &globval);
+    if (ptr ? (val.p_address == globval.p_address)
+            : (val.i_int == globval.i_int))
     {
-        var_Get (obj->p_libvlc, varname, &val);
-        if (ptr ? (val.p_address != NULL): (val.i_int == 0))
+        if (var_GetBool (obj->p_libvlc, "drawable-busy"))
+        {   /* LibVLC-wide drawable already in use */
+            if (ptr)
+                val.p_address = NULL;
+            else
+                val.i_int = 0;
+        }
+        else
             var_SetBool (obj->p_libvlc, "drawable-busy", true);
     }
+    /* If we got a drawable _not_ from the root object (from the input?),
+     * We assume it is not busy. This is a bug. */
     vlc_mutex_unlock (&serializer);
+
+    var_Destroy (obj, varname);
 
     if (ptr ? (val.p_address == NULL) : (val.i_int == 0))
     {
