@@ -214,7 +214,7 @@ typedef struct libvlc_playlist_item_t
 /** \defgroup libvlc_media_player libvlc_media_player
  * \ingroup libvlc
  * LibVLC Media Player, object that let you play a media
- * in a libvlc_drawable_t
+ * in a drawable
  * @{
  */
 

@@ -258,11 +258,8 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
         return NULL;
     }
     p_mi->p_md = NULL;
-#ifndef WIN32
     p_mi->drawable.xid = 0;
-#else
     p_mi->drawable.hwnd = NULL;
-#endif
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->p_input_thread = NULL;
     /* refcount strategy:
@@ -598,13 +595,15 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     p_input_thread = p_mi->p_input_thread;
 
     var_Create( p_input_thread, "drawable-xid", VLC_VAR_INTEGER );
-    var_Create( p_input_thread, "drawable-hwnd", VLC_VAR_ADDRESS );
+    if( p_mi->drawable.xid )
+        var_SetInteger( p_input_thread, "drawable-xid", p_mi->drawable.xid );
 
-#ifndef WIN32
-    var_SetInteger( p_input_thread, "drawable-xid", p_mi->drawable.xid );
-#else
-    var_SetInteger( p_input_thread, "drawable-hwnd", p_mi->drawable.hwnd );
-#endif
+    var_Create( p_input_thread, "drawable-hwnd", VLC_VAR_ADDRESS );
+    if( p_mi->drawable.hwnd != NULL )
+    {
+        vlc_value_t val = { .p_address = p_mi->drawable.hwnd };
+        var_Set( p_input_thread, "drawable-hwnd", val );
+    }
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
@@ -697,6 +696,22 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
         input_StopThread( p_input_thread );
         vlc_object_release( p_input_thread );
     }
+}
+
+void libvlc_media_player_set_xid( libvlc_media_player_t *p_mi,
+                                  uint32_t drawable,
+                                  libvlc_exception_t *p_e )
+{
+    (void) p_e;
+    p_mi->drawable.xid = drawable;
+}
+
+void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
+                                   void *drawable,
+                                   libvlc_exception_t *p_e )
+{
+    (void) p_e;
+    p_mi->drawable.hwnd = drawable;
 }
 
 /**************************************************************************

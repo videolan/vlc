@@ -445,7 +445,7 @@ VLC_PUBLIC_API void *
 /** \defgroup libvlc_media_player libvlc_media_player
  * \ingroup libvlc
  * LibVLC Media Player, object that let you play a media
- * in a libvlc_drawable_t
+ * in a custom drawable
  * @{
  */
 
@@ -548,6 +548,37 @@ VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *, libvlc_
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_exception_t * );
+
+/**
+ * Set an X Window System drawable where the media player should render its
+ * video output. If LibVLC was built without X11 output support, then this has
+ * no effects.
+ *
+ * The specified identifier must correspond to an existing Input/Output class
+ * X11 drawable. The caller shall ensure that the X11 server is the same as the
+ * one the VLC instance has been configured with.
+ * If XVideo is <b>not</b> supported or usable, it is assumed that the drawable
+ * has the following properties in common with the default X11 screen:
+ * depth, scan line pad, black pixel. This is a bug.
+ * Using a pixmap rather than a window might not work as VLC might try to
+ * get window properties and subscribe to window events.
+ *
+ * \param p_mi the Media Player
+ * \param drawable the ID of the X drawable
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_xid ( libvlc_media_player_t *p_mi, uint32_t drawable, libvlc_exception_t *p_e );
+
+/**
+ * Set a Win32/Win64 API window handle (HWND) where the media player should
+ * render its video output. If LibVLC was built without Win32/Win64 API output
+ * support, then this has no effects.
+ *
+ * \param p_mi the Media Player
+ * \param drawable windows handle of the drawable
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_media_player_set_hwnd ( libvlc_media_player_t *p_mi, void *drawable, libvlc_exception_t *p_e );
 
 /**
  * Set the drawable where the media player should render its video output.
