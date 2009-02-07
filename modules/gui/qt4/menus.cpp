@@ -239,10 +239,10 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
 {
+    PUSH_VAR( "visual" );
     PUSH_INPUTVAR( "audio-es" );
     PUSH_VAR( "audio-device" );
     PUSH_VAR( "audio-channels" );
-    PUSH_VAR( "visual" );
     return VLC_SUCCESS;
 }
 
@@ -493,11 +493,11 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     if( current->isEmpty() )
     {
+        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
+        current->addSeparator();
         ACT_ADD( current, "audio-es", qtr( "Audio &Track" ) );
         ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
         ACT_ADD( current, "audio-channels", qtr( "Audio &Channels" ) );
-        current->addSeparator();
-        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
     }
 
     p_input = THEMIM->getInput();
