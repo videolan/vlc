@@ -184,6 +184,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     bool b_flat = options & WIDGET_FLAT;
     bool b_big = options & WIDGET_BIG;
     bool b_shiny = options & WIDGET_SHINY;
+    bool b_special = false;
 
     QWidget *widget = NULL;
     switch( button )
@@ -344,9 +345,11 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         widget = telexFrame();
         widget->hide();
         break;
+    case VOLUME_SPECIAL:
+        b_special = true;
     case VOLUME:
         {
-            SoundWidget *snd = new SoundWidget( this, p_intf, b_shiny );
+            SoundWidget *snd = new SoundWidget( this, p_intf, b_shiny, b_special );
             widget = snd;
         }
         break;

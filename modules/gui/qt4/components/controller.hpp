@@ -35,11 +35,11 @@
 
 #define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
 
-#define MAIN_TB1_DEFAULT "64;38;64;37-4;65"
-#define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;10;9;64-4;36-4;65;35-4"
+#define MAIN_TB1_DEFAULT "64;39;64;38;65"
+#define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;10;9;64-4;37;65;35-4"
 #define ADV_TB_DEFAULT "12;11;13;14"
 #define INPT_TB_DEFAULT "5-1;33;6-1"
-#define FSC_TB_DEFAULT "0-2;64;3;1;4;64;36;64;37;64;8;65;35-4;34"
+#define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;35-4;34"
 
 
 class QPixmap;
@@ -86,6 +86,7 @@ typedef enum buttonType_e
     INPUT_SLIDER,
     TIME_LABEL,
     VOLUME,
+    VOLUME_SPECIAL,
     MENU_BUTTONS,
     TELETEXT_BUTTONS,
     ADVANCED_CONTROLLER,

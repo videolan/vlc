@@ -248,6 +248,15 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             }
             widgetItem->setText( qtr("Volume") );
             break;
+        case VOLUME_SPECIAL:
+            {
+                QListWidgetItem *widgetItem = new QListWidgetItem( this );
+                widgetItem->setText( "Small Volume" );
+                widgetItem->setIcon( QIcon( ":/volume-medium" ) );
+                widgetItem->setData( Qt::UserRole, QVariant( i ) );
+                addItem( widgetItem );
+            }
+            continue;
         case TIME_LABEL:
             {
                 QLabel *timeLabel = new QLabel( "12:42/2:12:42", this );
