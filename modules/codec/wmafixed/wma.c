@@ -198,12 +198,22 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
-    mtime_t start = mdate(); /* for statistics */
     aout_buffer_t *p_aout_buffer = NULL;
+#ifdef NDEBUG
+    mtime_t start = mdate(); /* for statistics */
+#endif
 
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
+
+    if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        aout_DateSet( &p_sys->end_date, 0 );
+        block_Release( p_block );
+        *pp_block = NULL;
+        return NULL;
+    }
 
     if( p_block->i_buffer <= 0 )
     {
@@ -235,8 +245,14 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    wma_decode_superframe_init( &p_sys->wmadec, p_block->p_buffer,
-            p_block->i_buffer );
+    if( wma_decode_superframe_init( &p_sys->wmadec, p_block->p_buffer,
+            p_block->i_buffer ) == 0 )
+    {
+        msg_Err( p_dec, "failed initializing wmafixed decoder" );
+        block_Release( p_block );
+        *pp_block = NULL;
+        return NULL;
+    }
 
     if( p_sys->wmadec.nb_frames <= 0 )
     {
@@ -248,6 +264,8 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     /* worst case */
     size_t i_buffer = BLOCK_MAX_SIZE * MAX_CHANNELS * p_sys->wmadec.nb_frames;
+    if( p_sys->p_output )
+        free( p_sys->p_output );
     p_sys->p_output = malloc(i_buffer * sizeof(int32_t) );
     p_sys->p_samples = (int8_t*)p_sys->p_output;
 
@@ -269,10 +287,14 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
                  p_block->p_buffer, p_block->i_buffer );
 
         if( i_samples < 0 )
+        {
             msg_Warn( p_dec,
                 "wma_decode_superframe_frame() failed for frame %d", i );
-        else
-            p_sys->i_samples += i_samples; /* advance in the samples buffer */
+            free( p_sys->p_output );
+            p_sys->p_output = NULL;
+            return NULL;
+        }
+        p_sys->i_samples += i_samples; /* advance in the samples buffer */
     }
 
     p_block->i_buffer = 0; /* this block has been decoded */
