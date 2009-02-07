@@ -77,8 +77,9 @@ struct vout_sys_t
     xcb_screen_t *screen;
     vout_window_t *embed; /* VLC window (when windowed) */
 
-    xcb_visualid_t vid;
+    xcb_visualid_t vid; /* selected visual */
     xcb_window_t parent; /* parent X window */
+    xcb_colormap_t cmap; /* colormap for selected visual */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
@@ -202,6 +203,11 @@ static int Open (vlc_object_t *obj)
     }
     vout->fmt_out.i_chroma = vout->output.i_chroma;
 
+    /* Create colormap (needed to select non-default visual) */
+    p_sys->cmap = xcb_generate_id (p_sys->conn);
+    xcb_create_colormap (p_sys->conn, XCB_COLORMAP_ALLOC_NONE,
+                         p_sys->cmap, scr->root, p_sys->vid);
+
     /* Check shared memory support */
     p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
     if (p_sys->shm)
@@ -241,6 +247,7 @@ static void Close (vlc_object_t *obj)
     vout_sys_t *p_sys = vout->p_sys;
 
     assert (p_sys->embed == NULL);
+    /* colormap is garbage-ollected by X (?) */
     if (p_sys->conn)
         xcb_disconnect (p_sys->conn);
     free (p_sys);
@@ -429,13 +436,16 @@ static int Init (vout_thread_t *vout)
         width * VOUT_ASPECT_FACTOR / height;
 
     /* Create window */
-    const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    uint32_t values[2] = {
+    const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK
+                        | XCB_CW_COLORMAP;
+    uint32_t values[] = {
         /* XCB_CW_BACK_PIXEL */
         screen->black_pixel,
         /* XCB_CW_EVENT_MASK */
         XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
         XCB_EVENT_MASK_POINTER_MOTION,
+        /* XCB_CW_COLORMAP */
+        p_sys->cmap,
     };
     xcb_void_cookie_t c;
     xcb_window_t window = xcb_generate_id (p_sys->conn);
