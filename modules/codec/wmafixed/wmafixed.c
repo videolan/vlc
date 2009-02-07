@@ -122,7 +122,7 @@ int32_t fixsqrt32(int32_t x)
 
 #undef STEP
 
-    return (int32_t)(r << (PRECISION / 2));
+    return (int32_t)(r << (PRECISION >> 1));
 }
 
 /* Inverse gain of circular cordic rotation in s0.31 format. */
@@ -191,17 +191,17 @@ long fsincos(unsigned long phase, int32_t *cos)
     z = phase;
 
     /* The phase has to be somewhere between 0..pi for this to work right */
-    if (z < 0xffffffff / 4) {
+    if (z < 0xffffffff >> 2) {
         /* z in first quadrant, z += pi/2 to correct */
         x = -x;
-        z += 0xffffffff / 4;
-    } else if (z < 3 * (0xffffffff / 4)) {
+        z += 0xffffffff >> 2;
+    } else if (z < 3 * (0xffffffff >> 2)) {
         /* z in third quadrant, z -= pi/2 to correct */
-        z -= 0xffffffff / 4;
+        z -= 0xffffffff >> 2;
     } else {
         /* z in fourth quadrant, z -= 3pi/2 to correct */
         x = -x;
-        z -= 3 * (0xffffffff / 4);
+        z -= 3 * (0xffffffff >> 2);
     }
 
     /* Each iteration adds roughly 1-bit of extra precision */
@@ -211,7 +211,7 @@ long fsincos(unsigned long phase, int32_t *cos)
         z1 = atan_table[i];
 
         /* Decided which direction to rotate vector. Pivot point is pi/2 */
-        if (z >= 0xffffffff / 4) {
+        if (z >= 0xffffffff >> 2) {
             x -= y1;
             y += x1;
             z -= z1;

@@ -238,7 +238,7 @@ static void wma_window(WMADecodeContext *s, int32_t *in, int32_t *out)
          /*previous block was smaller or the same size, so use it's size to set the window length*/
          block_len = 1 << s->prev_block_len_bits;
          /*find the middle of the two overlapped blocks, this will be the first overlapped sample*/
-         n = (s->block_len - block_len) / 2;
+         n = (s->block_len - block_len) >> 1;
          bsize = s->frame_len_bits - s->prev_block_len_bits;
 
          vector_fmul_add_add(out+n, in+n, s->windows[bsize],  block_len);
@@ -261,7 +261,7 @@ static void wma_window(WMADecodeContext *s, int32_t *in, int32_t *out)
 
      } else {
          block_len = 1 << s->next_block_len_bits;
-         n = (s->block_len - block_len) / 2;
+         n = (s->block_len - block_len) >> 1;
          bsize = s->frame_len_bits - s->next_block_len_bits;
 
          memcpy(out, in, n*sizeof(int32_t));
