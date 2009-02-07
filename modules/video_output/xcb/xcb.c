@@ -202,6 +202,12 @@ static int Open (vlc_object_t *obj)
             goto error;
     }
     vout->fmt_out.i_chroma = vout->output.i_chroma;
+    if (!gray)
+    {
+        vout->output.i_rmask = vt->red_mask;
+        vout->output.i_gmask = vt->green_mask;
+        vout->output.i_bmask = vt->blue_mask;
+    }
 
     /* Create colormap (needed to select non-default visual) */
     p_sys->cmap = xcb_generate_id (p_sys->conn);
