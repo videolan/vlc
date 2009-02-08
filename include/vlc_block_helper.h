@@ -60,6 +60,19 @@ static inline void block_BytestreamRelease( block_bytestream_t *p_bytestream )
     p_bytestream->p_chain = p_bytestream->p_block = NULL;
 }
 
+/**
+ * It flush all data (read and unread) from a block_bytestream_t.
+ */
+static inline void block_BytestreamEmpty( block_bytestream_t *p_bytestream )
+{
+    block_BytestreamRelease( p_bytestream );
+
+    *p_bytestream = block_BytestreamInit();
+}
+
+/**
+ * It flushes all already read data from a block_bytestream_t.
+ */
 static inline void block_BytestreamFlush( block_bytestream_t *p_bytestream )
 {
     while( p_bytestream->p_chain != p_bytestream->p_block )
