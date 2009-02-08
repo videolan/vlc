@@ -76,6 +76,7 @@ static QActionGroup *currentGroup;
 /* HACK for minimalView to go around a Qt bug/feature
  * that doesn't update the QAction checked state when QMenu is hidden */
 QAction *QVLCMenu::minimalViewAction = NULL;
+QAction *QVLCMenu::fullscreenViewAction = NULL;
 
 QMenu *QVLCMenu::recentsMenu = NULL;
 
@@ -440,6 +441,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         /* FullScreen View */
         action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
                                   SLOT( toggleFullScreen() ), QString( "F11" ) );
+        fullscreenViewAction = action;
         action->setCheckable( true );
         action->setData( true );
 

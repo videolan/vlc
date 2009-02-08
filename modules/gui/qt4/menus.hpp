@@ -96,6 +96,7 @@ public:
 
     /* HACK for minimalView */
     static QAction *minimalViewAction;
+    static QAction *fullscreenViewAction;
 
 private:
     /* All main Menus */
