@@ -34,11 +34,8 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGridLayout>
 #include <QHeaderView>
-#include <QPalette>
-#include <QColor>
 
 #include "components/complete_preferences.hpp"
 #include "components/preferences_widgets.hpp"
