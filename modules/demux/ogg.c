@@ -1491,9 +1491,19 @@ static bool Ogg_LogicalStreamResetEsFormat( demux_t *p_demux, logical_stream_t *
 
     return !b_compatible;
 }
-static void Ogg_ExtractXiphMeta( demux_t *p_demux, const uint8_t *p_headers, int i_headers, int i_skip )
+static void Ogg_ExtractXiphMeta( demux_t *p_demux, const uint8_t *p_headers, int i_headers, int i_skip, bool b_has_num_headers )
 {
     demux_sys_t *p_ogg = p_demux->p_sys;
+
+    if (b_has_num_headers)
+    {
+        if (i_headers <= 0)
+            return;
+        /* number of headers on a byte, we're interested in the second header, so should be at least 2 to go on */
+        if (*p_headers++ < 2)
+            return;
+        --i_headers;
+    }
 
     if( i_headers <= 2 )
         return;
@@ -1528,22 +1538,28 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
     {
     /* 3 headers with the 2° one being the comments */
     case VLC_FOURCC( 'v','o','r','b' ):
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6, false );
         break;
     case VLC_FOURCC( 't','h','e','o' ):
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6 );
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6, false );
         break;
     case VLC_FOURCC( 's','p','x',' ' ):
-        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0 );
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0, false );
+        break;
+
+    /* N headers with the 2° one being the comments */
+    case VLC_FOURCC( 'k','a','t','e' ):
+        /* 1 byte for header type, 7 bit for magic, 1 reserved zero byte */
+        Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+7+1, true );
         break;
 
     /* TODO */
-    case VLC_FOURCC( 'k','a','t','e' ):
     case VLC_FOURCC( 'f','l','a','c' ):
-    case VLC_FOURCC( 'c','m','m','l' ):
         msg_Warn( p_demux, "Ogg_ExtractMeta does not support %4.4s", (const char*)&i_codec );
         break;
+
     /* No meta data */
+    case VLC_FOURCC( 'c','m','m','l' ): /* CMML is XML text, doesn't have Vorbis comments */
     case VLC_FOURCC( 'd','r','a','c' ):
     default:
         break;
