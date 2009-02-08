@@ -144,8 +144,8 @@ extern char *psz_vlcpath;
 /* Return a NULL terminated array with the names of the modules that have a
  * certain capability.
  * Free after uses both the string and the table. */
-VLC_EXPORT(char **, module_GetModulesNamesForCapability,
-                    ( const char * psz_capability, char ***psz_longname ) );
+char **module_GetModulesNamesForCapability (const char * psz_capability,
+                                            char ***psz_longname);
 module_t *module_find_by_shortcut (const char *psz_shortcut);
 
 /**
