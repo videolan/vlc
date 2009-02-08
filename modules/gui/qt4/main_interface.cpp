@@ -781,9 +781,6 @@ void MainInterface::dockPlaylist( pl_dock_e i_pos )
 
 void MainInterface::toggleMinimalView()
 {
-    /* HACK for minimalView, see menus.cpp */
-    if( !menuBar()->isVisible() ) QVLCMenu::minimalViewAction->toggle();
-
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
     { /* NORMAL MODE then */
@@ -800,6 +797,8 @@ void MainInterface::toggleMinimalView()
     TOGGLEV( statusBar() );
     TOGGLEV( inputC );
     doComponentsUpdate();
+
+    QVLCMenu::minimalViewAction->setChecked( bgWasVisible );
 }
 
 /* Video widget cannot do this synchronously as it runs in another thread */

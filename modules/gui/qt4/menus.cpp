@@ -899,7 +899,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 action->setChecked( !( mi->getControlsVisibilityStatus() &
                             CONTROLS_VISIBLE ) );
                 action = submenu->addAction( QIcon( "" ),
-                        qtr( "Toggle Fullscreen Interface" ),
+                        qtr( "Fullscreen Interface" ),
                         mi, SLOT( toggleFullScreen() ) );
                 action->setCheckable( true );
                 action->setChecked( mi->isFullScreen() );
