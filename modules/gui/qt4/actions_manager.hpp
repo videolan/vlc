@@ -75,9 +75,10 @@ private:
     ActionsManager( intf_thread_t  *_p_i, QObject *_parent );
     intf_thread_t       *p_intf;
 
-protected slots:
-    virtual void doAction( int );
-
+public slots:
+    void toggleMuteAudio();
+    void AudioUp();
+    void AudioDown();
 protected slots:
     void play();
     void fullscreen();
@@ -86,6 +87,7 @@ protected slots:
     void record();
     void frame();
 
+    virtual void doAction( int );
 };
 
 #endif

@@ -27,6 +27,7 @@
 #endif
 
 #include <vlc_vout.h>
+#include <vlc_aout.h>
 #include <vlc_keys.h>
 
 #include "actions_manager.hpp"
@@ -167,4 +168,18 @@ void ActionsManager::frame()
         var_SetVoid( p_input, "frame-next" );
 }
 
+void ActionsManager::toggleMuteAudio()
+{
+     aout_VolumeMute( p_intf, NULL );
+}
+
+void ActionsManager::AudioUp()
+{
+    aout_VolumeUp( p_intf, 1, NULL );
+}
+
+void ActionsManager::AudioDown()
+{
+    aout_VolumeDown( p_intf, 2, NULL );
+}
 

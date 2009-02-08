@@ -139,8 +139,6 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
         else
         {
             aout_VolumeMute( p_intf, NULL );
-            audio_volume_t i_volume;
-            aout_VolumeGet( p_intf, &i_volume );
         }
         e->accept();
         return true;

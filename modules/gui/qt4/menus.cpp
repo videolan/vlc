@@ -40,6 +40,7 @@
 #include "dialogs_provider.hpp"  /* Dialogs display */
 #include "input_manager.hpp"     /* Input Management */
 #include "recents.hpp"           /* Recent Items */
+#include "actions_manager.hpp"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -493,6 +494,17 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     if( current->isEmpty() )
     {
+        QAction *action = current->addAction( qtr( "Mute Audio" ),
+                ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
+        action->setData( true );
+        action = current->addAction( qtr( "Increase Volume" ),
+                ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
+        action->setData( true );
+        action = current->addAction( qtr( "Decrease Volume" ),
+                ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
+        action->setData( true );
+
+        current->addSeparator();
         ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
         current->addSeparator();
         ACT_ADD( current, "audio-es", qtr( "Audio &Track" ) );
