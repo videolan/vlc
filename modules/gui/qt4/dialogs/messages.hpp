@@ -67,7 +67,7 @@ private:
     msg_cb_data_t *cbData;
     static void sinkMessage( msg_cb_data_t *, msg_item_t *, unsigned );
     void customEvent( QEvent * );
-    void sinkMessage( msg_item_t *item, unsigned );
+    void sinkMessage( msg_item_t *item );
 
 private slots:
     void updateTab( int );

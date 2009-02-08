@@ -88,6 +88,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
     messages->setReadOnly( true );
     messages->setGeometry( 0, 0, 440, 600 );
     messages->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    messages->setTextInteractionFlags( Qt::TextSelectableByMouse );
 
     msgLayout->addWidget( messages, 0, 0, 1, 0 );
     mainTab->addTab( msgWidget, qtr( "Messages" ) );
@@ -171,19 +172,21 @@ void MessagesDialog::updateTab( int index )
     }
 }
 
-void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
+void MessagesDialog::sinkMessage( msg_item_t *item )
 {
     if ((item->i_type == VLC_MSG_WARN && verbosityBox->value() < 1)
      || (item->i_type == VLC_MSG_DBG && verbosityBox->value() < 2 ))
         return;
 
-    // Saving cursor selection
-    int startPos = messages->textCursor().selectionStart();
-    int endPos = messages->textCursor().selectionEnd();
+    /* Copy selected text to the clipboard */
+    if( messages->textCursor().hasSelection() )
+        messages->copy();
 
-    messages->moveCursor( QTextCursor::End );
-    if( startPos == endPos && messages->textCursor().selectionEnd() == endPos )
-        endPos = 0;
+    /* Fix selected text bug */
+    if( !messages->textCursor().atEnd() ||
+         messages->textCursor().anchor() != messages->textCursor().position() )
+         messages->moveCursor( QTextCursor::End );
+
     messages->setFontItalic( true );
     messages->setTextColor( "darkBlue" );
     messages->insertPlainText( qfu( item->psz_module ) );
@@ -214,54 +217,14 @@ void MessagesDialog::sinkMessage (msg_item_t *item, unsigned)
     messages->setTextColor( "black" );
     messages->insertPlainText( qfu(item->psz_msg) );
     messages->insertPlainText( "\n" );
-    messages->ensureCursorVisible();
-
-    // Restoring saved cursor selection
-    // If the cursor was at this end, put it at the end,
-    // so we don't need to scroll down.
-    if( endPos == 0 )
-        messages->moveCursor( QTextCursor::End );
-    else
-    {
-        QTextCursor cur = messages->textCursor();
-        cur.movePosition( QTextCursor::Start );
-        cur.movePosition( QTextCursor::NextCharacter, QTextCursor::MoveAnchor, startPos );
-        cur.movePosition( QTextCursor::NextCharacter, QTextCursor::KeepAnchor, endPos - startPos );
-        messages->setTextCursor( cur );
-    }
 }
+
 void MessagesDialog::customEvent( QEvent *event )
 {
-    MsgEvent *msg = dynamic_cast<MsgEvent*>(event);
+    MsgEvent *msge = static_cast<MsgEvent *>(event);
 
-    assert( msg );
-    sinkMessage( msg->msg, 0 );
-}
-
-void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
-                                vlc_object_t *p_obj )
-{
-    QTreeWidgetItem *item;
-
-    if( parentItem )
-        item = new QTreeWidgetItem( parentItem );
-    else
-        item = new QTreeWidgetItem( modulesTree );
-
-    if( p_obj->psz_object_name )
-        item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
-                       qfu( p_obj->psz_object_name ) + "\" (" +
-                       QString::number((uintptr_t)p_obj) + ")" );
-    else
-        item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
-                       QString::number((uintptr_t)p_obj) + ")" );
-
-    item->setExpanded( true );
-
-    vlc_list_t *l = vlc_list_children( p_obj );
-    for( int i=0; i < l->i_count; i++ )
-        buildTree( item, l->p_values[i].p_object );
-    vlc_list_release( l );
+    assert( msge );
+    sinkMessage( msge->msg );
 }
 
 void MessagesDialog::clearOrUpdate()
@@ -270,12 +233,6 @@ void MessagesDialog::clearOrUpdate()
         updateTree();
     else
         clear();
-}
-
-void MessagesDialog::updateTree()
-{
-    modulesTree->clear();
-    buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
 }
 
 void MessagesDialog::clear()
@@ -307,6 +264,38 @@ bool MessagesDialog::save()
         return true;
     }
     return false;
+}
+
+void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
+                                vlc_object_t *p_obj )
+{
+    QTreeWidgetItem *item;
+
+    if( parentItem )
+        item = new QTreeWidgetItem( parentItem );
+    else
+        item = new QTreeWidgetItem( modulesTree );
+
+    if( p_obj->psz_object_name )
+        item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
+                       qfu( p_obj->psz_object_name ) + "\" (" +
+                       QString::number((uintptr_t)p_obj) + ")" );
+    else
+        item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
+                       QString::number((uintptr_t)p_obj) + ")" );
+
+    item->setExpanded( true );
+
+    vlc_list_t *l = vlc_list_children( p_obj );
+    for( int i=0; i < l->i_count; i++ )
+        buildTree( item, l->p_values[i].p_object );
+    vlc_list_release( l );
+}
+
+void MessagesDialog::updateTree()
+{
+    modulesTree->clear();
+    buildTree( NULL, VLC_OBJECT( p_intf->p_libvlc ) );
 }
 
 static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned )
