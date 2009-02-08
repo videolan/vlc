@@ -181,8 +181,8 @@ static int Open ( vlc_object_t *p_this )
 
             val.i_int = (obtained.channels == 2) ? AOUT_VAR_STEREO :
                         AOUT_VAR_MONO;
-            text.psz_string = (obtained.channels == 2) ? N_("Stereo") :
-                              N_("Mono");
+            text.psz_string = (obtained.channels == 2) ? _("Stereo") :
+                              _("Mono");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
@@ -198,10 +198,10 @@ static int Open ( vlc_object_t *p_this )
         var_Change( p_aout, "audio-device", VLC_VAR_SETTEXT, &text, NULL );
 
         val.i_int = AOUT_VAR_STEREO;
-        text.psz_string = N_("Stereo");
+        text.psz_string = _("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         val.i_int = AOUT_VAR_MONO;
-        text.psz_string = N_("Mono");
+        text.psz_string = _("Mono");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         if ( i_nb_channels == 2 )
         {

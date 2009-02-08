@@ -170,7 +170,7 @@ static void Probe( aout_instance_t * p_aout )
                          | AOUT_CHAN_LFE)) )
             {
                 val.i_int = AOUT_VAR_5_1;
-                text.psz_string = "5.1";
+                text.psz_string = (char*) "5.1";
                 var_Change( p_aout, "audio-device",
                             VLC_VAR_ADDCHOICE, &val, &text );
             }
@@ -181,7 +181,7 @@ static void Probe( aout_instance_t * p_aout )
                          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT)) )
             {
                 val.i_int = AOUT_VAR_2F2R;
-                text.psz_string = N_("2 Front 2 Rear");
+                text.psz_string = _("2 Front 2 Rear");
                 var_Change( p_aout, "audio-device",
                             VLC_VAR_ADDCHOICE, &val, &text );
             }
@@ -205,7 +205,7 @@ static void Probe( aout_instance_t * p_aout )
          && i_nb_channels == 2 )
     {
         val.i_int = AOUT_VAR_STEREO;
-        text.psz_string = N_("Stereo");
+        text.psz_string = _("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
     }
 
@@ -225,7 +225,7 @@ static void Probe( aout_instance_t * p_aout )
          && i_nb_channels == 1 )
     {
         val.i_int = AOUT_VAR_MONO;
-        text.psz_string = N_("Mono");
+        text.psz_string = _("Mono");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER )
         {
@@ -249,7 +249,7 @@ static void Probe( aout_instance_t * p_aout )
              && i_format == AFMT_AC3 )
         {
             val.i_int = AOUT_VAR_SPDIF;
-            text.psz_string = N_("A/52 over S/PDIF");
+            text.psz_string = _("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             if( config_GetInt( p_aout, "spdif" ) )

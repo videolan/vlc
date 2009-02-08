@@ -478,7 +478,7 @@ static void Probe( aout_instance_t * p_aout )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_5_1;
-            text.psz_string = (char *)N_("5.1");
+            text.psz_string = (char *)_("5.1");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             msg_Dbg( p_aout, "device supports 5.1 channels" );
@@ -499,7 +499,7 @@ static void Probe( aout_instance_t * p_aout )
             == VLC_SUCCESS )
         {
             val.i_int = AOUT_VAR_2F2R;
-            text.psz_string = (char *)N_("2 Front 2 Rear");
+            text.psz_string = (char *)_("2 Front 2 Rear");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             msg_Dbg( p_aout, "device supports 4 channels" );
@@ -516,7 +516,7 @@ static void Probe( aout_instance_t * p_aout )
         == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_STEREO;
-        text.psz_string = (char *)N_("Stereo");
+        text.psz_string = (char *)_("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         msg_Dbg( p_aout, "device supports 2 channels" );
     }
@@ -531,7 +531,7 @@ static void Probe( aout_instance_t * p_aout )
         == VLC_SUCCESS )
     {
         val.i_int = AOUT_VAR_MONO;
-        text.psz_string = (char *)N_("Mono");
+        text.psz_string = (char *)_("Mono");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
         msg_Dbg( p_aout, "device supports 1 channel" );
     }
@@ -549,7 +549,7 @@ static void Probe( aout_instance_t * p_aout )
         {
             msg_Dbg( p_aout, "device supports A/52 over S/PDIF" );
             val.i_int = AOUT_VAR_SPDIF;
-            text.psz_string = (char *)N_("A/52 over S/PDIF");
+            text.psz_string = (char *)_("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
             if( config_GetInt( p_aout, "spdif" ) )
