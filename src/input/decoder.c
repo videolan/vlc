@@ -1060,7 +1060,8 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
             *pi_ts0 += i_es_delay;
             if( pi_ts1 && *pi_ts1 > 0 )
                 *pi_ts1 += i_es_delay;
-            input_clock_ConvertTS( p_clock, &i_rate, pi_ts0, pi_ts1, i_ts_bound );
+            if( input_clock_ConvertTS( p_clock, &i_rate, pi_ts0, pi_ts1, i_ts_bound ) )
+                *pi_ts0 = 0;
         }
         else
         {
