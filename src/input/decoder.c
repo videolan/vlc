@@ -888,10 +888,23 @@ static void *DecoderThread( vlc_object_t *p_this )
     return NULL;
 }
 
+static block_t *DecoderBlockFlushNew()
+{
+    block_t *p_null = block_Alloc( 128 );
+    if( !p_null )
+        return NULL;
+
+    p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY |
+                       BLOCK_FLAG_CORRUPTED |
+                       BLOCK_FLAG_CORE_FLUSH;
+    memset( p_null->p_buffer, 0, p_null->i_buffer );
+
+    return p_null;
+}
+
 static void DecoderFlush( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
-    block_t *p_null;
 
     vlc_assert_locked( &p_owner->lock );
 
@@ -903,15 +916,9 @@ static void DecoderFlush( decoder_t *p_dec )
     vlc_cond_signal( &p_owner->wait );
 
     /* Send a special block */
-    p_null = block_New( p_dec, 128 );
+    block_t *p_null = DecoderBlockFlushNew();
     if( !p_null )
         return;
-    p_null->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-    p_null->i_flags |= BLOCK_FLAG_CORE_FLUSH;
-    if( !p_dec->fmt_in.b_packetized )
-        p_null->i_flags |= BLOCK_FLAG_CORRUPTED;
-    memset( p_null->p_buffer, 0, p_null->i_buffer );
-
     input_DecoderDecode( p_dec, p_null );
 
     /* */
@@ -1796,6 +1803,14 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
                 p_packetized_block = p_next;
             }
         }
+        /* The packetizer does not output a block that tell the decoder to flush
+         * do it ourself */
+        if( b_flush )
+        {
+            block_t *p_null = DecoderBlockFlushNew();
+            if( p_null )
+                DecoderDecodeVideo( p_dec, p_null );
+        }
     }
     else if( p_block )
     {
@@ -1835,6 +1850,14 @@ static void DecoderProcessAudio( decoder_t *p_dec, block_t *p_block, bool b_flus
 
                 p_packetized_block = p_next;
             }
+        }
+        /* The packetizer does not output a block that tell the decoder to flush
+         * do it ourself */
+        if( b_flush )
+        {
+            block_t *p_null = DecoderBlockFlushNew();
+            if( p_null )
+                DecoderDecodeAudio( p_dec, p_null );
         }
     }
     else if( p_block )
