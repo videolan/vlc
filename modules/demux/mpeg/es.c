@@ -671,17 +671,28 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
         if( !b_forced_demux )
             return VLC_EGENERIC;
     }
+    const bool b_wav = i_skip > 0;
 
-    /* peek the begining */
-    if( stream_Peek( p_demux->s, &p_peek, i_skip + i_check_size ) < i_skip + i_check_size )
+    /* peek the begining
+     * It is common that wav files have some sort of garbage at the begining */
+    const int i_probe = i_skip + i_check_size + ( b_wav ? 16000 : 0);
+    const int i_peek = stream_Peek( p_demux->s, &p_peek, i_probe );
+    if( i_peek < i_skip + i_check_size )
     {
         msg_Err( p_demux, "cannot peek" );
         return VLC_EGENERIC;
     }
-    if( !pf_check( &p_peek[i_skip] ) )
+    for( ;; )
     {
-        if( !b_forced_demux )
-            return VLC_EGENERIC;
+        if( i_skip + i_check_size > i_peek )
+        {
+            if( !b_forced_demux )
+                return VLC_EGENERIC;
+            break;
+        }
+        if( pf_check( &p_peek[i_skip] ) )
+            break;
+        i_skip++;
     }
 
     *pi_offset = i_offset + i_skip;
