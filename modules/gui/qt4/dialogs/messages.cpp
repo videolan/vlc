@@ -217,6 +217,7 @@ void MessagesDialog::sinkMessage( msg_item_t *item )
     messages->setTextColor( "black" );
     messages->insertPlainText( qfu(item->psz_msg) );
     messages->insertPlainText( "\n" );
+    messages->ensureCursorVisible();
 }
 
 void MessagesDialog::customEvent( QEvent *event )
