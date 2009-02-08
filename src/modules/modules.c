@@ -689,7 +689,6 @@ void __module_unneed( vlc_object_t * p_this, module_t * p_module )
 /**
  * Get a pointer to a module_t given it's name.
  *
- * \param p_this vlc object structure
  * \param psz_name the name of the module
  * \return a pointer to the module or NULL in case of a failure
  */
@@ -718,7 +717,6 @@ module_t *module_find( const char * psz_name )
 /**
  * Tell if a module exists and release it in thic case
  *
- * \param p_this vlc object structure
  * \param psz_name th name of the module
  * \return TRUE if the module exists
  */
@@ -728,6 +726,41 @@ bool module_exists (const char * psz_name)
     if( p_module )
         module_release (p_module);
     return p_module != NULL;
+}
+
+/**
+ * Get a pointer to a module_t that matches a shortcut.
+ * This is a temporary hack for SD. Do not re-use (generally multiple modules
+ * can have the same shortcut, so this is *broken* - use module_need()!).
+ *
+ * \param psz_shortcut shortcut of the module
+ * \param psz_cap capability of the module
+ * \return a pointer to the module or NULL in case of a failure
+ */
+module_t *module_find_by_shortcut (const char *psz_shortcut)
+{
+    module_t **list, *module;
+
+    list = module_list_get (NULL);
+    if (!list)
+        return NULL;
+
+    for (size_t i = 0; (module = list[i]) != NULL; i++)
+    {
+        for (size_t j = 0;
+             (module->pp_shortcuts[j] != NULL) && (j < MODULE_SHORTCUT_MAX);
+             j++)
+        {
+            if (!strcmp (module->pp_shortcuts[j], psz_shortcut))
+            {
+                module_hold (module);
+                goto out;
+             }
+        }
+    }
+out:
+    module_list_free (list);
+    return module;
 }
 
 /**

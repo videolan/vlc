@@ -146,6 +146,7 @@ extern char *psz_vlcpath;
  * Free after uses both the string and the table. */
 VLC_EXPORT(char **, module_GetModulesNamesForCapability,
                     ( const char * psz_capability, char ***psz_longname ) );
+module_t *module_find_by_shortcut (const char *psz_shortcut);
 
 /**
  * Private LibVLC data for each object.
