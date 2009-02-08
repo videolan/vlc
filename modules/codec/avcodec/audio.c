@@ -89,6 +89,8 @@ struct decoder_sys_t
     int     i_reject_count;
 };
 
+static void SetupOutputCodec( decoder_t *p_dec );
+
 /*****************************************************************************
  * InitAudioDec: initialize audio decoder
  *****************************************************************************
@@ -100,8 +102,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     decoder_sys_t *p_sys;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
     {
         return VLC_ENOMEM;
     }
@@ -189,7 +190,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* ***** Open the codec ***** */
     vlc_mutex_lock( &avcodec_lock );
 
-    if (avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0)
+    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
     {
         vlc_mutex_unlock( &avcodec_lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
@@ -213,36 +214,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
-#if defined(AV_VERSION_INT) && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 65, 0 )
-    switch( p_sys->p_context->sample_fmt )
-    {
-    case SAMPLE_FMT_U8:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('u','8',' ',' ');
-        p_dec->fmt_out.audio.i_bitspersample = 8;
-        break;
-    case SAMPLE_FMT_S32:
-        p_dec->fmt_out.i_codec = AOUT_FMT_S32_NE;
-        p_dec->fmt_out.audio.i_bitspersample = 32;
-        break;
-    case SAMPLE_FMT_FLT:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
-        p_dec->fmt_out.audio.i_bitspersample = 32;
-        break;
-    case SAMPLE_FMT_DBL:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','6','4');
-        p_dec->fmt_out.audio.i_bitspersample = 64;
-        break;
-
-    case SAMPLE_FMT_S16:
-    default:
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
-        p_dec->fmt_out.audio.i_bitspersample = 16;
-        break;
-    }
-#else
-    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
-    p_dec->fmt_out.audio.i_bitspersample = 16;
-#endif
+    SetupOutputCodec( p_dec );
 
     return VLC_SUCCESS;
 }
@@ -375,6 +347,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* **** Set audio output parameters **** */
+    SetupOutputCodec( p_dec );
     p_dec->fmt_out.audio.i_rate     = p_sys->p_context->sample_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
     p_dec->fmt_out.audio.i_original_channels =
@@ -412,4 +385,43 @@ void EndAudioDec( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     free( p_sys->p_output );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static void SetupOutputCodec( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+#if defined(AV_VERSION_INT) && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 65, 0 )
+    switch( p_sys->p_context->sample_fmt )
+    {
+    case SAMPLE_FMT_U8:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('u','8',' ',' ');
+        p_dec->fmt_out.audio.i_bitspersample = 8;
+        break;
+    case SAMPLE_FMT_S32:
+        p_dec->fmt_out.i_codec = AOUT_FMT_S32_NE;
+        p_dec->fmt_out.audio.i_bitspersample = 32;
+        break;
+    case SAMPLE_FMT_FLT:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_dec->fmt_out.audio.i_bitspersample = 32;
+        break;
+    case SAMPLE_FMT_DBL:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','6','4');
+        p_dec->fmt_out.audio.i_bitspersample = 64;
+        break;
+
+    case SAMPLE_FMT_S16:
+    default:
+        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.audio.i_bitspersample = 16;
+        break;
+    }
+#else
+    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+    p_dec->fmt_out.audio.i_bitspersample = 16;
+#endif
 }
