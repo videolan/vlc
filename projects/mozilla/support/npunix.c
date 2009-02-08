@@ -421,6 +421,24 @@ void NPN_SetException(NPObject *npobj, const NPUTF8 *message)
  * setting up globals for 68K plugins.
  *
  ***********************************************************************/
+NPError Private_New(NPMIMEType pluginType, NPP instance, uint16 mode,
+            int16 argc, char* argn[], char* argv[], NPSavedData* saved);
+NPError Private_Destroy(NPP instance, NPSavedData** save);
+NPError Private_SetWindow(NPP instance, NPWindow* window);
+NPError Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream,
+            NPBool seekable, uint16* stype);
+int32 Private_WriteReady(NPP instance, NPStream* stream);
+int32 Private_Write(NPP instance, NPStream* stream, int32 offset, int32 len,
+            void* buffer);
+void Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname);
+NPError Private_DestroyStream(NPP instance, NPStream* stream, NPError reason);
+void Private_URLNotify(NPP instance, const char* url, NPReason reason, void* notifyData);
+void Private_Print(NPP instance, NPPrint* platformPrint);
+NPError Private_GetValue(NPP instance, NPPVariable variable, void *r_value);
+NPError Private_SetValue(NPP instance, NPPVariable variable, void *r_value);
+JRIGlobalRef Private_GetJavaClass(void);
+
+/* */
 
 NPError
 Private_New(NPMIMEType pluginType, NPP instance, uint16 mode,
@@ -484,7 +502,6 @@ Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname)
     NPP_StreamAsFile(instance, stream, fname);
 }
 
-
 NPError
 Private_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 {
@@ -497,13 +514,10 @@ Private_DestroyStream(NPP instance, NPStream* stream, NPError reason)
 void
 Private_URLNotify(NPP instance, const char* url,
                 NPReason reason, void* notifyData)
- 
 {
     PLUGINDEBUGSTR("URLNotify");
     NPP_URLNotify(instance, url, reason, notifyData);
 }
-
-
 
 void
 Private_Print(NPP instance, NPPrint* platformPrint)
