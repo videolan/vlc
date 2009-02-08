@@ -326,14 +326,29 @@ static int ReadMeta( vlc_object_t* p_this)
     demux_t*        p_demux = (demux_t*)p_this;
     demux_meta_t*   p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t*     p_meta;
-    TagLib::FileRef f;
+    FileRef f;
 
     p_demux_meta->p_meta = NULL;
+
+
+#if defined(WIN32) || defined (UNDER_CE)
+    if(GetVersion() < 0x80000000)
+    {
+        wchar_t wpath[MAX_PATH + 1];
+        if( !MultiByteToWideChar( CP_UTF8, 0, p_demux->psz_path, -1, wpath, MAX_PATH) )
+            return VLC_EGENERIC;
+        wpath[MAX_PATH] = L'\0';
+        f = FileRef( wpath );
+    }
+    else
+        return VLC_EGENERIC;
+#else
     const char* local_name = ToLocale( p_demux->psz_path );
     if( !local_name )
         return VLC_EGENERIC;
     f = FileRef( local_name );
     LocaleFree( local_name );
+#endif
 
     if( f.isNull() )
         return VLC_EGENERIC;
@@ -510,6 +525,7 @@ static int WriteMeta( vlc_object_t *p_this )
     playlist_t *p_playlist = (playlist_t *)p_this;
     meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
     input_item_t *p_item = p_export->p_item;
+    FileRef f;
 
     if( !p_item )
     {
@@ -517,7 +533,25 @@ static int WriteMeta( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    FileRef f( p_export->psz_file );
+#if defined(WIN32) || defined (UNDER_CE)
+    if(GetVersion() < 0x80000000)
+    {
+        wchar_t wpath[MAX_PATH + 1];
+        if( !MultiByteToWideChar( CP_UTF8, 0, p_export->psz_file, -1, wpath, MAX_PATH) )
+            return VLC_EGENERIC;
+        wpath[MAX_PATH] = L'\0';
+        f = FileRef( wpath );
+    }
+    else
+        return VLC_EGENERIC;
+#else
+    const char* local_name = ToLocale( p_export->psz_file );
+    if( !local_name )
+        return VLC_EGENERIC;
+    f = FileRef( local_name );
+    LocaleFree( local_name );
+#endif
+
     if( f.isNull() || !f.tag() || f.file()->readOnly() )
     {
         msg_Err( p_this, "File %s can't be opened for tag writing\n",
