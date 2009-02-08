@@ -1420,7 +1420,7 @@ ifdef HAVE_WIN32
   ifdef HAVE_CYGWIN
 	(cd $<; $(HOSTCC) RANLIB="ranlib" AR="ar" STRIP="strip" ./configure $(X264CONF) --prefix="$(PREFIX)" --extra-cflags="-I$(PREFIX)/include" --extra-ldflags="-L$(PREFIX)/lib" && make && make install)
   else
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --disable-pthread && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pthread && make && make install)
   endif
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
