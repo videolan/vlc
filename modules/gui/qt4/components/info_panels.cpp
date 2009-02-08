@@ -362,7 +362,6 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         return;
     }
 
-    QStringList tempItem;
     QList<QTreeWidgetItem *> items;
 
     extraMetaTree->clear();
@@ -382,6 +381,7 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     {
         const char * psz_value = (const char *)vlc_dictionary_value_for_key(
                 p_dict, ppsz_allkey[i] );
+        QStringList tempItem;
         tempItem.append( qfu( ppsz_allkey[i] ) + " : ");
         tempItem.append( qfu( psz_value ) );
         items.append( new QTreeWidgetItem ( extraMetaTree, tempItem ) );
