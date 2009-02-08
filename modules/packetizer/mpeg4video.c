@@ -229,20 +229,20 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
         {
             p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamFlush( &p_sys->bytestream );
+            block_BytestreamEmpty( &p_sys->bytestream );
 
             if( p_sys->p_frame )
                 block_ChainRelease( p_sys->p_frame );
             p_sys->p_frame = NULL;
             p_sys->pp_last = &p_sys->p_frame;
         }
-//        p_sys->i_interpolated_pts =
-//        p_sys->i_interpolated_dts =
-//        p_sys->i_last_ref_pts =
-//        p_sys->i_last_time_ref =
-//        p_sys->i_time_ref =
-//        p_sys->i_last_time =
-//        p_sys->i_last_timeincr = 0;
+        p_sys->i_interpolated_pts =
+        p_sys->i_interpolated_dts =
+        p_sys->i_last_ref_pts =
+        p_sys->i_last_time_ref =
+        p_sys->i_time_ref =
+        p_sys->i_last_time =
+        p_sys->i_last_timeincr = 0;
 
         block_Release( *pp_block );
         return NULL;

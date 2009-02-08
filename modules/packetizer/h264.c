@@ -421,7 +421,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
         {
             p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamFlush( &p_sys->bytestream );
+            block_BytestreamEmpty( &p_sys->bytestream );
 
             if( p_sys->p_frame )
                 block_ChainRelease( p_sys->p_frame );
@@ -429,6 +429,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_sys->slice.i_frame_type = 0;
             p_sys->b_slice = false;
         }
+        p_sys->i_frame_pts = -1;
+        p_sys->i_frame_dts = -1;
+
         block_Release( *pp_block );
         return NULL;
     }
