@@ -238,7 +238,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     if( !p_sd )
         return VLC_ENOMEM;
 
-    module_t *m = module_find( psz_module );
+    module_t *m = module_find_by_shortcut( psz_module );
     if( !m )
     {
         msg_Err( p_playlist, "No such module: %s", psz_module );
