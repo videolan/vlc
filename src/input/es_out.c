@@ -2628,7 +2628,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
 
         if( fmt->audio.i_physical_channels & AOUT_CHAN_PHYSMASK )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Channels"),
-                           "%s", aout_FormatPrintChannels( &fmt->audio ) );
+                           "%s", _( aout_FormatPrintChannels( &fmt->audio ) ) );
         else if( fmt->audio.i_channels > 0 )
             input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Channels"),
                            "%u", fmt->audio.i_channels );

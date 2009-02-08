@@ -40,7 +40,7 @@
 
 #include "input_internal.h"
 
-#undef STREAM_DEBUG
+// #define STREAM_DEBUG 1
 
 /* TODO:
  *  - tune the 2 methods (block/stream)
