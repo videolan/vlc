@@ -364,7 +364,7 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
 error:
     if (shm != SHM_ERR)
         shmdt (shm);
-    free (p_sys);
+    free (priv);
     return VLC_EGENERIC;
 }
 
