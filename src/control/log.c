@@ -144,10 +144,10 @@ void libvlc_log_clear( libvlc_log_t *p_log, libvlc_exception_t *p_e )
 {
     if( p_log )
     {
-        vlc_spin_lock (&p_log->data.lock);
+        /*vlc_spin_lock (&p_log->data.lock);*/
         p_log->data.count = 0;
         /* FIXME: release items */
-        vlc_spin_unlock (&p_log->data.lock);
+        /*vlc_spin_unlock (&p_log->data.lock);*/
     }
     else
         RAISEVOID("Invalid log object!");
