@@ -109,6 +109,8 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	ACTION="release-makefile" PRODUCT="VLC-Plugin.plugin" src_dir=$(srcdir) build_dir=$(top_builddir) sh ../macosx/framework/Pre-Compile.sh
 	$(INSTALL) .libs/npvlc.dylib "VLC-Plugin.plugin/Contents/MacOS/VLC Plugin"
 	dylib="VLC-Plugin.plugin/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH);
+	$(INSTALL) .libs/npvlc.dylib "VLC-Plugin.plugin/Contents/MacOS/lib"
+	dylib="VLC-Plugin.plugin/Contents/MacOS/lib/npvlc.dylib"; $(FIXEXECPATH);
 	$(INSTALL) npvlc.rsrc "VLC-Plugin.plugin/Contents/Resources/VLC Plugin.rsrc"
 	cp -r "$(top_srcdir)/extras/package/macosx/plugin/English.lproj" "VLC-Plugin.plugin/Contents/Resources/"
 	cp -r "$(top_builddir)/extras/package/macosx/plugin/English.lproj" "VLC-Plugin.plugin/Contents/Resources/"
