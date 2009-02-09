@@ -206,9 +206,12 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
     {
 #if 0
 #define V(x) ( ( x < 0x20 || x >= 0x7f ) ? '?' : x )
-        fprintf( stderr, "-------------- unknown user data %2.2x %2.2x %2.2x %2.2x %c%c%c%c\n",
-                 p_src[0], p_src[1], p_src[2], p_src[3],
-                 V(p_src[0]), V(p_src[1]), V(p_src[2]), V(p_src[3]) );
+        fprintf( stderr, "-------------- unknown user data " );
+        for( int i = 0; i < i_src; i++ )
+            fprintf( stderr, "%2.2x ", p_src[i] );
+        for( int i = 0; i < i_src; i++ )
+            fprintf( stderr, "%c ", V(p_src[i]) );
+        fprintf( stderr, "\n" );
 #undef V
 #endif
         /* TODO DVD CC, ... */
