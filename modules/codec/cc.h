@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 #ifndef _CC_H
-#define _C_H 1
+#define _CC_H 1
 
 /* CC have a maximum rate of 9600 bit/s (per field?) */
 #define CC_MAX_DATA_SIZE (2 * 3*600)
