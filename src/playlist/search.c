@@ -1,7 +1,7 @@
 /*****************************************************************************
  * search.c : Search functions
  *****************************************************************************
- * Copyright (C) 1999-2004 the VideoLAN team
+ * Copyright (C) 1999-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -127,9 +127,30 @@ playlist_item_t * playlist_ItemGetByInputId( playlist_t *p_playlist,
  * Live search handling
  ***************************************************************************/
 
-static bool playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
-                                                     playlist_item_t *p_root,
-                                                     const char *psz_string )
+/**
+ * Enable all items in the playlist
+ * @param p_root: the current root item
+ */
+static void playlist_LiveSearchClean( playlist_item_t *p_root )
+{
+    for( int i = 0; i < p_root->i_children; i++ )
+    {
+        playlist_item_t *p_item = p_root->pp_children[i];
+        if( p_item->i_children >= 0 )
+            playlist_LiveSearchClean( p_item );
+        p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
+    }
+}
+
+
+/**
+ * Enable/Disable items in the playlist according to the search argument
+ * @param p_root: the current root item
+ * @param psz_string: the string to search
+ * @return true if an item match
+ */
+static bool playlist_LiveSearchUpdateInternal( playlist_item_t *p_root,
+                                               const char *psz_string )
 {
    int i;
    bool b_match = false;
@@ -138,7 +159,7 @@ static bool playlist_LiveSearchUpdateInternal( playlist_t *p_playlist,
         playlist_item_t *p_item = p_root->pp_children[i];
         if( p_item->i_children > -1 )
         {
-            if( playlist_LiveSearchUpdateInternal( p_playlist, p_item, psz_string ) ||
+            if( playlist_LiveSearchUpdateInternal( p_item, psz_string ) ||
                 strcasestr( p_item->p_input->psz_name, psz_string ) )
             {
                 p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
@@ -172,7 +193,11 @@ int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
 {
     PL_ASSERT_LOCKED;
     pl_priv(p_playlist)->b_reset_currently_playing = true;
-    playlist_LiveSearchUpdateInternal( p_playlist, p_root, psz_string );
+    if( *psz_string )
+        playlist_LiveSearchUpdateInternal( p_root, psz_string );
+    else
+        playlist_LiveSearchClean( p_root );
     vlc_cond_signal( &pl_priv(p_playlist)->signal );
     return VLC_SUCCESS;
 }
+
