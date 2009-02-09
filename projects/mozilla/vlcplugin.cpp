@@ -176,7 +176,11 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         }
         else if( !strcmp( argn[i], "toolbar" ) )
         {
+/* FIXME: Remove this when toolbar functionality has been implemented on\
+ * MacOS X and Win32 for Firefox/Mozilla/Safari. */
+#ifdef XP_UNIX
             b_toolbar = boolValue(argv[i]);
+#endif
         }
     }
 
