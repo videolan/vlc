@@ -458,6 +458,7 @@ RuntimeNPObject::InvokeResult LibvlcInputNPObject::getProperty(int index, NPVari
             {
                 /* for input state, return CLOSED rather than an exception */
                 INT32_TO_NPVARIANT(0, result);
+                libvlc_exception_clear(&ex);
                 return INVOKERESULT_NO_ERROR;
             }
         }
