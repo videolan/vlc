@@ -125,11 +125,12 @@ struct decoder_sys_t
     mtime_t i_frame_dts;
 
     /* */
-    bool b_cc_reset;
     uint32_t i_cc_flags;
     mtime_t i_cc_pts;
     mtime_t i_cc_dts;
     cc_data_t cc;
+
+    cc_data_t cc_next;
 };
 
 enum
@@ -349,11 +350,11 @@ static int Open( vlc_object_t *p_this )
         p_dec->pf_get_cc = GetCc;
 
         /* */
-        p_sys->b_cc_reset = false;
         p_sys->i_cc_pts = 0;
         p_sys->i_cc_dts = 0;
         p_sys->i_cc_flags = 0;
         cc_Init( &p_sys->cc );
+        cc_Init( &p_sys->cc_next );
 
         /* */
         if( p_dec->fmt_in.i_extra > 0 )
@@ -398,7 +399,10 @@ static void Close( vlc_object_t *p_this )
     }
     block_BytestreamRelease( &p_sys->bytestream );
     if( p_dec->pf_get_cc )
+    {
+         cc_Exit( &p_sys->cc_next );
          cc_Exit( &p_sys->cc );
+    }
 
     free( p_sys );
 }
@@ -702,7 +706,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
         p_sys->slice.i_frame_type = 0;
         p_sys->p_frame = NULL;
         p_sys->b_slice = false;
-        p_sys->b_cc_reset = true;
+        cc_Flush( &p_sys->cc_next );
     }
 
     if( ( !p_sys->b_sps || !p_sys->b_pps ) &&
@@ -755,12 +759,6 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
 
         /* Parse SEI for CC support */
         ParseSei( p_dec, p_frag );
-    }
-
-    if( !p_pic && p_sys->b_cc_reset )
-    {
-        p_sys->b_cc_reset = false;
-        cc_Flush( &p_sys->cc );
     }
 
     /* Append the block */
@@ -822,10 +820,16 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->b_slice = false;
 
     /* CC */
-    p_sys->b_cc_reset = true;
     p_sys->i_cc_pts = p_pic->i_pts;
     p_sys->i_cc_dts = p_pic->i_dts;
     p_sys->i_cc_flags = p_pic->i_flags;
+
+    /* Swap cc buffer */
+    cc_data_t cc_tmp = p_sys->cc;
+    p_sys->cc = p_sys->cc_next;
+    p_sys->cc_next = cc_tmp;
+
+    cc_Flush( &p_sys->cc_next );
 
     return p_pic;
 }
@@ -1213,7 +1217,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
             if( i_t35 >= 5 &&
                 !memcmp( p_t35, p_dvb1_data_start_code, sizeof(p_dvb1_data_start_code) ) )
             {
-                cc_Extract( &p_sys->cc, &p_t35[3], i_t35 - 3 );
+                cc_Extract( &p_sys->cc_next, &p_t35[3], i_t35 - 3 );
             }
         }
         i_used += i_size;
