@@ -1,7 +1,7 @@
 /*****************************************************************************
  * taglib.cpp: Taglib tag parser/writer
  *****************************************************************************
- * Copyright (C) 2003-2008 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -68,15 +68,11 @@
 
 // Local functions
 static int ReadMeta    ( vlc_object_t * );
-static int DownloadArt ( vlc_object_t * );
 static int WriteMeta   ( vlc_object_t * );
 
 vlc_module_begin ()
     set_capability( "meta reader", 1000 )
     set_callbacks( ReadMeta, NULL )
-    add_submodule ()
-        set_capability( "art downloader", 50 )
-        set_callbacks( DownloadArt, NULL )
     add_submodule ()
         set_capability( "meta writer", 50 )
         set_callbacks( WriteMeta, NULL )
@@ -651,15 +647,5 @@ static int WriteMeta( vlc_object_t *p_this )
     f.save();
 
     return VLC_SUCCESS;
-}
-
-
-
-static int DownloadArt( vlc_object_t *p_this )
-{
-    /* We need to be passed the file name
-     * Fetch the thing from the file, save it to the cache folder
-     */
-    return VLC_EGENERIC;
 }
 
