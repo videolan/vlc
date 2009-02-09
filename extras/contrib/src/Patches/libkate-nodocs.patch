@@ -1,0 +1,24 @@
+diff -ru libkate-0.1.7/doc/Makefile libkate/doc/Makefile
+diff -ru libkate-0.1.7/doc/Makefile.am libkate/doc/Makefile.am
+--- libkate-0.1.7/doc/Makefile.am	2008-08-11 01:59:03.000000000 +0300
++++ libkate/doc/Makefile.am	2009-02-09 23:41:53.000000000 +0200
+@@ -31,7 +31,6 @@
+ else
+ .doc-dummy-target:
+ 	echo "doxygen not found, cannot build docs"
+-	/bin/false
+ endif
+ 
+ dist-hook: .doc-dummy-target
+Seulement dans libkate/doc: Makefile.am~
+diff -ru libkate-0.1.7/doc/Makefile.in libkate/doc/Makefile.in
+--- libkate-0.1.7/doc/Makefile.in	2008-08-11 01:59:03.000000000 +0300
++++ libkate/doc/Makefile.in	2009-02-09 23:42:13.000000000 +0200
+@@ -389,7 +389,6 @@
+ @HAVE_DOXYGEN_TRUE@	doxygen kate.doxygen
+ @HAVE_DOXYGEN_FALSE@.doc-dummy-target:
+ @HAVE_DOXYGEN_FALSE@	echo "doxygen not found, cannot build docs"
+-@HAVE_DOXYGEN_FALSE@	/bin/false
+ 
+ dist-hook: .doc-dummy-target
+ 	cp -fR * $(distdir)
