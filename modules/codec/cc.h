@@ -24,6 +24,8 @@
 #ifndef _CC_H
 #define _CC_H 1
 
+#include <vlc_bits.h>
+
 /* CC have a maximum rate of 9600 bit/s (per field?) */
 #define CC_MAX_DATA_SIZE (2 * 3*600)
 typedef struct
@@ -81,6 +83,7 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
     static const uint8_t p_cc_replaytv4b[2] = { 0xcc, 0x02 };
     static const uint8_t p_cc_replaytv5a[2] = { 0x99, 0x02 };
     static const uint8_t p_cc_replaytv5b[2] = { 0xaa, 0x02 };
+    static const uint8_t p_cc_scte20[2] = { 0x03, 0x81 };
     //static const uint8_t p_afd_start[4] = { 0x44, 0x54, 0x47, 0x31 };
 
     if( i_src < 4 )
@@ -201,6 +204,42 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
             c->p_data[c->i_data++] = cc[3];
         }
         c->b_reorder = false;
+    }
+    else if( !memcmp( p_cc_scte20, p_src, 2 ) && i_src > 2 )
+    {
+        /* SCTE-20 CC */
+        bs_t s;
+        bs_init( &s, &p_src[2], i_src - 2 );
+        const int i_cc_count = bs_read( &s, 5 );
+        for( int i = 0; i < i_cc_count; i++ )
+        {
+            bs_skip( &s, 2 );
+            const int i_field_idx = bs_read( &s, 2 );
+            bs_skip( &s, 5 );
+            uint8_t cc[2];
+            for( int j = 0; j < 2; j++ )
+            {
+                cc[j] = 0;
+                for( int k = 0; k < 8; k++ )
+                    cc[j] |= bs_read( &s, 1 ) << k;
+            }
+            bs_skip( &s, 1 );
+
+            if( i_field_idx != 1 && i_field_idx != 2 )
+                continue;
+            if( c->i_data + 2*3 > CC_MAX_DATA_SIZE )
+                continue;
+
+            const int i_field = i_field_idx - 1;
+            const int i_channel = cc_Channel( i_field, cc );
+            if( i_channel >= 0 && i_channel < 4 )
+                c->pb_present[i_channel] = true;
+
+            c->p_data[c->i_data++] = i_field;
+            c->p_data[c->i_data++] = cc[0];
+            c->p_data[c->i_data++] = cc[1];
+        }
+        c->b_reorder = true;
     }
     else
     {
