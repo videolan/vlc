@@ -153,7 +153,7 @@ libvlc_media_player_set_position
 libvlc_media_player_set_rate
 libvlc_media_player_set_time
 libvlc_media_player_set_title
-libvlc_media_player_set_xid
+libvlc_media_player_set_xwindow
 libvlc_media_player_stop
 libvlc_media_player_will_play
 libvlc_media_release

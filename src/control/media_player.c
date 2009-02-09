@@ -698,9 +698,9 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     }
 }
 
-void libvlc_media_player_set_xid( libvlc_media_player_t *p_mi,
-                                  uint32_t drawable,
-                                  libvlc_exception_t *p_e )
+void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
+                                      uint32_t drawable,
+                                      libvlc_exception_t *p_e )
 {
     (void) p_e;
     p_mi->drawable.xid = drawable;
