@@ -16,6 +16,7 @@ New Decoders:
  * QCELP (Qualcomm PureVoice)
  * Real Video 3.0 & 4.0
  * WMA v1/2 fixed point integer
+ * Close Caption under SCTE-20 standard
 
 Demuxers:
  * Support for Dirac and RealVideo in Matroska files
