@@ -1,74 +1,85 @@
 INSTALL file for the Maemo version of the VLC media player
 
 
-Building VLC from the source code
-=================================
+Building VLC from source code
+=============================
 
-If you want to build the maemo version of VLC from the source, you have to install the
-Maemo Software Development Kit as indicated in the Maemo Diablo Reference Manual for
-Maemo 4.1 that you can find on this page : http://maemo.org/development/documentation/tutorials/
+If you want to build the Maemo version of VLC from the source, you have to
+install the Maemo Software Development Kit as indicated in the Maemo Diablo
+Reference Manual for Maemo 4.1. You can find it from this page:
+http://maemo.org/development/documentation/tutorials/
 
-You have to use the ARMEL target (arm) of the Maemo SDK. The X86 target isn't tested.
+You have to use the ARMEL target (arm) of the Maemo SDK. The x86 target was
+not tested.
 
 
-Installing the correct tools in the scratchbox
-==============================================
-
-When you have a working scratchbox with the Maemo SDK installed, before compiling VLC, you
-must install additional tools and libraries.
-
-To compile, VLC needs the lastest version of automake avaible in the SDK : automake-1.9. To
-use it, you must set the environment variable SBOX_DEFAULT_AUTOMAKE to 1.9 :
-    export SBOX_DEFAULT_AUTOMAKE=1.9
-You can put it in the .bashrc file inside the scratchbox.
-
-You also need autoconf-2.61 which is *not* avaible in the Maemo SDK. You have to build it and
-install it yourself.
-
-Additional libraries
+Installing autotools
 ====================
 
-You have to install libgcrypt under the scratchbox to build VLC.
+Once you have a working scratchbox with the Maemo SDK installed and before
+compiling VLC, you must install some additional tools and libraries.
 
-You can also install fribidi, libvorbixidev, libmad and other VLC dependancies that you can find
-in the extra repositories of Maemo :
-    deb http://repository.maemo.org/extras/ diablo free
-    deb-src http://repository.maemo.org/extras/ diablo free
+VLC requires automake 1.9 and autoconf 2.61 (or more recent). As of the Diablo
+release, they are not easy to install within the Maemo SDK for Scratchbox.
+The easiest solution is to use those from your Linux distribution _outside_
+Scratchbox (in your native desktop environment). You will also need the
+gettext and libgcrypt development files.
+
+Go to the VLC source code directory, e.g.:
+    cd /scratchbox/users/$(whoami)/home/$(whoami)/vlc
+and run:
+    ./bootstrap
+
 
 Installing correct headers
 ==========================
 
-For VLC to compile under the Maemo SDK, you must copy the linux/videodev2.h from your Linux
-distribution into the scratchbox.
+For VLC to compile under the Maemo SDK, you must copy the linux/videodev2.h
+from your Linux distribution into the Scratchbox.
 
-To build the omap frame buffer video output module, you also need an up-to-date
-asm/arch-omap/omapfb.h (you can find it on google by searching omapfb.h).
+To build the OMAP Frame Buffer video output module, you also need an up-to-date
+asm/arch-omap/omapfb.h (you can find it on google by searching for "omapfb.h").
+
+
+Installing additional libraries
+===============================
+
+Login to Scratchbox. You can also install fribidi, libvorbixidev, libmad and
+other VLC dependencies which you can find in the Maemo extra repositories.
+Add these lines to /etc/apt/sources.list (if not alerady done):
+    deb http://repository.maemo.org/extras/ diablo free
+    deb-src http://repository.maemo.org/extras/ diablo free
+
+Then run:
+    apt-get update
+
 
 FFmpeg (not necessary)
-======
+======================
 
-You can also build ffmpeg. For this, you can use Debian source package.
+You should also build FFMPEG. To that end, you can use Debian source package
+as is. Get the ffmpeg-free_0.svn20080206.orig.tar.gz and the Debian diff file
+ffmpeg-free_0.svn20080206-8.diff.gz for example. Decompress them and apply the
+patch.
 
-You have to get the ffmpeg-free_0.svn20080206.orig.tar.gz and the Debian diff file
-ffmpeg-free_0.svn20080206-8.diff.gz for example. Decompress them and apply the patch.
-
-You have to modify the debian/rules and debian/control files to remove the dependancies
-which aren't available in the maemo or maemo extra repositories.
+You will need to alter the debian/rules and debian/control files to remove a
+few dependencies not available in Maemo.
 
 You might have to change the line 3550 of ffmpeg/libavcodec/dsputil.c from
     DECLARE_ALIGNED_8 (uint64_t, aligned_bak[stride]);
 to
     uint64_t *aligned_bak[stride];
-to build ffmpeg into the scratchbox.
+to build FFMPEG within Scratchbox.
+
 
 Configuring
 ===========
 
-You can do :
-./bootstrap && ./configure --disable-qt4 --disable-skins2 --disable-glx --disable-a52 \
-                           --enable-tremor --enable-maemo --enable-omapfb --enable-flac \
-                           --enable-debug
-for example.
+You can run, for example:
+    ./configure --disable-qt4 --disable-skins2 --disable-glx --disable-a52 \
+                --enable-tremor --enable-maemo --enable-omapfb --enable-flac \
+                --enable-debug
+
 
 Building VLC
 ============
@@ -76,7 +87,9 @@ Building VLC
 Just do :
     make
 
-Run VLC
-=======
 
-VLC doesn't run inside the scratchbox, you must test it directly on a N800/N810 devices.
+Running VLC
+===========
+
+VLC will not properly run inside the Scratchbox, you must test it directly on
+the target device.
