@@ -487,7 +487,7 @@ QFrame *AbstractController::telexFrame()
              telexFrame, setVisible( bool ) );
 
     /* On/Off button */
-    QToolButton *telexOn = new QToolButton;
+    QToolButton *telexOn = new QToolButton( this );
     telexFrame->telexOn = telexOn;
     setupButton( telexOn );
     BUTTON_SET_BAR2( telexOn, tv, qtr( "Teletext Activation" ) );
@@ -501,7 +501,7 @@ QFrame *AbstractController::telexFrame()
 
 
     /* Transparency button */
-    QToolButton *telexTransparent = new QToolButton;
+    QToolButton *telexTransparent = new QToolButton( this );
     telexFrame->telexTransparent = telexTransparent;
     setupButton( telexTransparent );
     BUTTON_SET_BAR2( telexTransparent, tvtelx,
@@ -518,7 +518,7 @@ QFrame *AbstractController::telexFrame()
 
 
     /* Page setting */
-    QSpinBox *telexPage = new QSpinBox;
+    QSpinBox *telexPage = new QSpinBox( this );
     telexFrame->telexPage = telexPage;
     telexPage->setRange( 0, 999 );
     telexPage->setValue( 100 );
