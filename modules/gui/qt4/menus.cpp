@@ -330,16 +330,13 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
     addDPStaticEntry( menu, qtr( "Paste &MRL" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
-    addDPStaticEntry( menu, qtr( I_PL_LOAD ), "", SLOT( openAPlaylist() ),
-        "Ctrl+X" );
-    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
-        "Ctrl+Y" );
-
-    menu->addSeparator();
-
     recentsMenu = new QMenu( qtr( "Recently &Played" ), menu );
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
+    menu->addSeparator();
+
+    addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
+        "Ctrl+Y" );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "",
