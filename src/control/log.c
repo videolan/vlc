@@ -23,7 +23,6 @@
  *****************************************************************************/
 
 #include "libvlc_internal.h"
-#include "../libvlc.h"
 #include <vlc/libvlc.h>
 #include <assert.h>
 
@@ -42,10 +41,14 @@ struct msg_cb_data_t
     vlc_spinlock_t lock;
     msg_item_t *items[VLC_MSG_QSIZE];
     unsigned    count;
+    int         verbosity;
 };
 
 static void handler( msg_cb_data_t *d, msg_item_t *p_item, unsigned i_drop )
 {
+    if (p_item->i_type > d->verbosity)
+        return;
+
     vlc_spin_lock (&d->lock);
     if (d->count < VLC_MSG_QSIZE)
     {
@@ -72,23 +75,16 @@ struct libvlc_log_iterator_t
 
 unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
 {
-    if( p_instance )
-    {
-        libvlc_priv_t *p_priv = libvlc_priv( p_instance->p_libvlc_int );
-        return p_priv->i_verbose;
-    }
-    RAISEZERO("Invalid VLC instance!");
+    assert( p_instance );
+    (void)p_e;
+    return p_instance->verbosity;
 }
 
 void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, libvlc_exception_t *p_e )
 {
-    if( p_instance )
-    {
-        libvlc_priv_t *p_priv = libvlc_priv( p_instance->p_libvlc_int );
-        p_priv->i_verbose = level;
-    }
-    else
-        RAISEVOID("Invalid VLC instance!");
+    assert( p_instance );
+    (void)p_e;
+    p_instance->verbosity = level;
 }
 
 libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
@@ -99,6 +95,7 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t
     if( !p_log ) RAISENULL( "Out of memory" );
 
     p_log->p_instance = p_instance;
+    p_log->data.verbosity = p_instance->verbosity;
     p_log->p_messages = msg_Subscribe(p_instance->p_libvlc_int, handler, &p_log->data);
 
     if( !p_log->p_messages )
