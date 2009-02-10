@@ -116,6 +116,8 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	cp -r "$(top_builddir)/extras/package/macosx/plugin/English.lproj" "VLC-Plugin.plugin/Contents/Resources/"
 	$(INSTALL) "$(top_builddir)/extras/package/macosx/plugin/Info.plist" "VLC-Plugin.plugin/Contents/Info.plist"
 	mv "VLC-Plugin.plugin" "VLC Plugin.plugin"
+	find "VLC Plugin.plugin" -type d -exec chmod ugo+rx '{}' \;
+	find "VLC Plugin.plugin" -type f -exec chmod ugo+r '{}' \;
 
 # uncomment if dependencies on XPCOM libs is sought
 #	if test -d "$(MOZILLA_SDK_PATH)/lib"; then \
