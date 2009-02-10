@@ -222,9 +222,6 @@ static void PauseConsole  ( void );
 #endif
 static int  ConsoleWidth  ( void );
 
-static int  VerboseCallback( vlc_object_t *, char const *,
-                             vlc_value_t, vlc_value_t, void * );
-
 static void InitDeviceValues( libvlc_int_t * );
 
 static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
@@ -730,14 +727,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         free( psz_verbose_objects );
     }
 
+    /* Last change to set the verbosity. Once we start interfaces and other
+     * threads, verbosity becomes read-only. */
     var_Create( p_libvlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     if( config_GetInt( p_libvlc, "quiet" ) > 0 )
     {
-        val.i_int = -1;
-        var_Set( p_libvlc, "verbose", val );
+        var_SetInteger( p_libvlc, "verbose", -1 );
+        priv->i_verbose = -1;
     }
-    var_AddCallback( p_libvlc, "verbose", VerboseCallback, NULL );
-    var_TriggerCallback( p_libvlc, "verbose" );
 
     if( priv->b_color )
         priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;
@@ -2073,21 +2070,6 @@ static int ConsoleWidth( void )
 #endif
 
     return i_width;
-}
-
-static int VerboseCallback( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param)
-{
-    libvlc_int_t *p_libvlc = (libvlc_int_t *)p_this;
-    (void)psz_variable;
-    (void)old_val;
-    (void)param;
-
-    if( new_val.i_int >= -1 )
-    {
-        libvlc_priv (p_libvlc)->i_verbose = __MIN( new_val.i_int, 2 );
-    }
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
