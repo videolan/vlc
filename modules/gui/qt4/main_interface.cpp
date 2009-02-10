@@ -316,10 +316,10 @@ inline void MainInterface::createStatusBar()
      ****************/
     /* Widgets Creation*/
     TimeLabel *timeLabel = new TimeLabel( p_intf );
-    nameLabel = new QLabel;
+    nameLabel = new QLabel( this );
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
                                       | Qt::TextSelectableByKeyboard );
-    SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x" );
+    SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x", this );
 
     /* Styling those labels */
     timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );

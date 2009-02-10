@@ -280,8 +280,9 @@ void VisualSelector::next()
 }
 #endif
 
-SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString text )
-           : QLabel( text ), p_intf( _p_intf )
+SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
+                        QWidget *parent )
+           : QLabel( text, parent ), p_intf( _p_intf )
 {
     setToolTip( qtr( "Current playback speed.\nRight click to adjust" ) );
     setContextMenuPolicy ( Qt::CustomContextMenu );
