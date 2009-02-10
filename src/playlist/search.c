@@ -152,42 +152,59 @@ static void playlist_LiveSearchClean( playlist_item_t *p_root )
 static bool playlist_LiveSearchUpdateInternal( playlist_item_t *p_root,
                                                const char *psz_string )
 {
-   int i;
-   bool b_match = false;
-   for( i = 0 ; i < p_root->i_children ; i ++ )
-   {
+    int i;
+    bool b_match = false;
+    for( i = 0 ; i < p_root->i_children ; i ++ )
+    {
+        bool b_enable = false;
         playlist_item_t *p_item = p_root->pp_children[i];
-        if( p_item->i_children > -1 )
+        // Go recurssively if their is some children
+        if( p_item->i_children >= 0 &&
+            playlist_LiveSearchUpdateInternal( p_item, psz_string ) )
         {
-            if( playlist_LiveSearchUpdateInternal( p_item, psz_string ) ||
-                strcasestr( p_item->p_input->psz_name, psz_string ) )
+            b_enable = true;
+        }
+
+        if( !b_enable )
+        {
+            vlc_mutex_lock( &p_item->p_input->lock );
+            // Do we have some meta ?
+            if( p_item->p_input->p_meta )
             {
-                p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
-                b_match = true;
+                // Use Title or fall back to psz_name
+                const char *psz_title = vlc_meta_Get( p_item->p_input->p_meta, vlc_meta_Title );
+                if( !psz_title )
+                    psz_title = p_item->p_input->psz_name;
+                const char *psz_album = vlc_meta_Get( p_item->p_input->p_meta, vlc_meta_Album );
+                const char *psz_artist = vlc_meta_Get( p_item->p_input->p_meta, vlc_meta_Artist );
+                b_enable = ( psz_title && strcasestr( psz_title, psz_string ) ) ||
+                           ( psz_album && strcasestr( psz_album, psz_string ) ) ||
+                           ( psz_artist && strcasestr( psz_artist, psz_string ) );
             }
             else
-            {
-                p_item->i_flags |= PLAYLIST_DBL_FLAG;
-            }
+                b_enable = p_item->p_input->psz_name && strcasestr( p_item->p_input->psz_name, psz_string );
+            vlc_mutex_unlock( &p_item->p_input->lock );
         }
+
+        if( b_enable )
+            p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
         else
-        {
-            if( input_item_MetaMatch( p_item->p_input, vlc_meta_Title, psz_string ) ||
-                input_item_MetaMatch( p_item->p_input, vlc_meta_Album, psz_string ) ||
-                input_item_MetaMatch( p_item->p_input, vlc_meta_Artist, psz_string ) )
-            {
-                p_item->i_flags &= ~PLAYLIST_DBL_FLAG;
-                b_match = true;
-            }
-            else
-            {
-                p_item->i_flags |= PLAYLIST_DBL_FLAG;
-            }
-        }
+            p_item->i_flags |= PLAYLIST_DBL_FLAG;
+
+        b_match |= b_enable;
    }
    return b_match;
 }
 
+
+
+/**
+ * Launch the recursive search in the playlist
+ * @param p_playlist: the playlist
+ * @param p_root: the current root item
+ * @param psz_string: the string to find
+ * @return VLC_SUCCESS
+ */
 int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
                                const char *psz_string )
 {
