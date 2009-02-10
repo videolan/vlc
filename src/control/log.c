@@ -68,7 +68,7 @@ struct libvlc_log_t
 
 struct libvlc_log_iterator_t
 {
-    const msg_cb_data_t *p_data;
+    msg_cb_data_t *p_data;
     unsigned i_pos;
     unsigned i_end;
 };
@@ -95,6 +95,8 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t
     if( !p_log ) RAISENULL( "Out of memory" );
 
     p_log->p_instance = p_instance;
+    vlc_spin_init( &p_log->data.lock );
+    p_log->data.count = 0;
     p_log->data.verbosity = p_instance->verbosity;
     p_log->p_messages = msg_Subscribe(p_instance->p_libvlc_int, handler, &p_log->data);
 
@@ -115,6 +117,7 @@ void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
         assert( p_log->p_messages );
         msg_Unsubscribe(p_log->p_messages);
         libvlc_release( p_log->p_instance );
+        vlc_spin_destroy( &p_log->data.lock );
         free(p_log);
     }
     else
@@ -125,13 +128,14 @@ unsigned libvlc_log_count( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
 {
     if( p_log )
     {
+        msg_cb_data_t *data = &((libvlc_log_t *)p_log)->data;
         unsigned ret;
 
-        /* We cannot lock due to pointer constraints.
-         * Even then, this would not be thread safe anyway. */
-        /*vlc_spin_lock (&p_log->data.lock);*/
-        ret = p_log->data.count;
-        /*vlc_spin_unlock (&p_log->data.lock);*/
+        /* We cannot lock due to constant pointer constraints. Break them.
+         * Even then, this si not really thread safe anyway. */
+        vlc_spin_lock (&data->lock);
+        ret = data->count;
+        vlc_spin_unlock (&data->lock);
         return ret;
     }
     RAISEZERO("Invalid log object!");
@@ -141,10 +145,10 @@ void libvlc_log_clear( libvlc_log_t *p_log, libvlc_exception_t *p_e )
 {
     if( p_log )
     {
-        /*vlc_spin_lock (&p_log->data.lock);*/
+        vlc_spin_lock (&p_log->data.lock);
         p_log->data.count = 0;
         /* FIXME: release items */
-        /*vlc_spin_unlock (&p_log->data.lock);*/
+        vlc_spin_unlock (&p_log->data.lock);
     }
     else
         RAISEVOID("Invalid log object!");
@@ -156,14 +160,16 @@ libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log, libvl
     {
         struct libvlc_log_iterator_t *p_iter =
             (struct libvlc_log_iterator_t *)malloc(sizeof(struct libvlc_log_iterator_t));
+        /* FIXME: break constant pointer constraints */
+        msg_cb_data_t *data = &((libvlc_log_t *)p_log)->data;
 
         if( !p_iter ) RAISENULL( "Out of memory" );
 
-        /*vlc_spin_lock (&p_log->data.lock);*/
-        p_iter->p_data  = &p_log->data;
+        vlc_spin_lock (&data->lock);
+        p_iter->p_data  = data;
         p_iter->i_pos   = 0;
-        p_iter->i_end   = p_log->data.count;
-        /*vlc_spin_unlock (&p_log->data.lock);*/
+        p_iter->i_end   = data->count;
+        vlc_spin_unlock (&data->lock);
 
         return p_iter;
     }
@@ -204,14 +210,14 @@ libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
     if( i_pos != p_iter->i_end )
     {
         msg_item_t *msg;
-        /*vlc_spin_lock (&p_iter->p_data->lock);*/
+        vlc_spin_lock (&p_iter->p_data->lock);
         msg = p_iter->p_data->items[i_pos];
         buffer->i_severity  = msg->i_type;
         buffer->psz_type    = msg->psz_object_type;
         buffer->psz_name    = msg->psz_module;
         buffer->psz_header  = msg->psz_header;
         buffer->psz_message = msg->psz_msg;
-        /*vlc_spin_unlock (&p_iter->p_data->lock);*/
+        vlc_spin_unlock (&p_iter->p_data->lock);
         p_iter->i_pos++;
 
         return buffer;
