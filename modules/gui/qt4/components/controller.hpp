@@ -227,7 +227,7 @@ class FullscreenControllerWidget : public AbstractController
 {
     Q_OBJECT
 public:
-    FullscreenControllerWidget( intf_thread_t * );
+    FullscreenControllerWidget( intf_thread_t *, QWidget *parent );
     virtual ~FullscreenControllerWidget();
 
     /* Vout */

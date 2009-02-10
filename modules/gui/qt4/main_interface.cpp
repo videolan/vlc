@@ -436,7 +436,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     /* Create the FULLSCREEN CONTROLS Widget */
     if( config_GetInt( p_intf, "qt-fs-controller" ) )
     {
-        fullscreenControls = new FullscreenControllerWidget( p_intf );
+        fullscreenControls = new FullscreenControllerWidget( p_intf, this );
     }
 }
 

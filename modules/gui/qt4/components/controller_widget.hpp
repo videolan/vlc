@@ -51,6 +51,8 @@ class QAbstractSlider;
 class PlayButton : public QToolButton
 {
     Q_OBJECT
+public:
+    PlayButton( QWidget *parent ) : QToolButton( parent ) { }
 private slots:
     void updateButton( bool );
 };
@@ -58,6 +60,8 @@ private slots:
 class AtoB_Button : public QToolButton
 {
     Q_OBJECT
+public:
+    AtoB_Button( QWidget *parent ) : QToolButton( parent ) { }
 private slots:
     void setIcons( bool, bool );
 };
@@ -66,6 +70,10 @@ class TeletextController : public QFrame
 {
     Q_OBJECT
     friend class AbstractController;
+
+public:
+    TeletextController( QWidget *parent ) : QFrame( parent ) { }
+
 private:
     QToolButton         *telexTransparent, *telexOn;
     QSpinBox            *telexPage;
