@@ -336,7 +336,7 @@ SpeedControlWidget::SpeedControlWidget( intf_thread_t *_p_i, QWidget *_parent )
     sizePolicy.setHorizontalStretch( 0 );
     sizePolicy.setVerticalStretch( 0 );
 
-    speedSlider = new QSlider;
+    speedSlider = new QSlider( this );
     speedSlider->setSizePolicy( sizePolicy );
     speedSlider->setMaximumSize( QSize( 80, 200 ) );
     speedSlider->setOrientation( Qt::Vertical );
