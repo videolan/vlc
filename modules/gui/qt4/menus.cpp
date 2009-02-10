@@ -289,17 +289,17 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
        gives the QProcess::destroyed timeout issue on Cleanlooks style with
        setDesktopAware set to false */
     QMenuBar *bar = mi->menuBar();
-    BAR_ADD( FileMenu( p_intf ), qtr( "&Media" ) );
+    BAR_ADD( FileMenu( p_intf, bar ), qtr( "&Media" ) );
 
-    BAR_DADD( AudioMenu( p_intf, NULL ), qtr( "&Audio" ), 1 );
-    BAR_DADD( VideoMenu( p_intf, NULL ), qtr( "&Video" ), 2 );
-    BAR_DADD( NavigMenu( p_intf, NULL ), qtr( "P&layback" ), 3 );
+    BAR_DADD( AudioMenu( p_intf, bar ), qtr( "&Audio" ), 1 );
+    BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
+    BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
 
-    BAR_ADD( ToolsMenu( NULL ), qtr( "&Tools" ) );
+    BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
     BAR_ADD( ViewMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
              qtr( "V&iew" ) );
 
-    BAR_ADD( HelpMenu( NULL ), qtr( "&Help" ) );
+    BAR_ADD( HelpMenu( bar ), qtr( "&Help" ) );
 }
 #undef BAR_ADD
 #undef BAR_DADD
@@ -308,9 +308,9 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
  * Media ( File ) Menu
  * Opening, streaming and quit
  **/
-QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
+QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
 {
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( parent );
 
     addDPStaticEntry( menu, qtr( "&Open File..." ),
         ":/file-asym", SLOT( simpleOpenDialog() ), "Ctrl+O" );
@@ -352,13 +352,8 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf )
 }
 
 /* Playlist/MediaLibrary Control */
-QMenu *QVLCMenu::ToolsMenu( QMenu *parent )
+QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
 {
-    QMenu *menu;
-    if( parent == NULL )
-        menu = new QMenu();
-    else
-        menu = parent;
     addDPStaticEntry( menu, qtr( I_MENU_EXT ), ":/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
 
@@ -388,6 +383,11 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *parent )
     return menu;
 }
 
+QMenu *QVLCMenu::ToolsMenu( QWidget *parent )
+{
+    return ToolsMenu( new QMenu( parent ) );
+}
+
 /**
  * View Menu
  * This menu can be an interface menu but also a right click menu.
@@ -398,7 +398,11 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                             bool visual_selector_enabled,
                             bool with_intf )
 {
-    QMenu *menu = new QMenu( current );
+    QMenu *menu;
+    if( current )
+        menu = new QMenu( current );
+    else
+        menu = new QMenu( mi );
     QAction *act;
     if( mi )
     {
@@ -407,7 +411,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                                SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
         act->setData( true );
     }
-    act = menu->addMenu( SDMenu( p_intf ) );
+    act = menu->addMenu( SDMenu( p_intf, menu ) );
     act->setData( true );
     /*menu->addSeparator();
     menu->addAction( qtr( "Undock from Interface" ), mi,
@@ -489,8 +493,6 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     aout_instance_t *p_aout;
     input_thread_t *p_input;
 
-    if( !current ) current = new QMenu();
-
     if( current->isEmpty() )
     {
         ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
@@ -528,6 +530,11 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     return Populate( p_intf, current, varnames, objects );
 }
 
+QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QWidget *parent )
+{
+    return AudioMenu( p_intf, new QMenu( parent ) );
+}
+
 /**
  * Main Video Menu
  * Subtitles are part of Video.
@@ -538,8 +545,6 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     input_thread_t *p_input;
     vector<vlc_object_t *> objects;
     vector<const char *> varnames;
-
-    if( !current ) current = new QMenu();
 
     if( current->isEmpty() )
     {
@@ -583,14 +588,17 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     return Populate( p_intf, current, varnames, objects );
 }
 
+QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QWidget *parent )
+{
+    return VideoMenu( p_intf, new QMenu( parent ) );
+}
+
 /**
  * Navigation Menu
  * For DVD, MP4, MOV and other chapter based format
  **/
 QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
-    if( !menu ) menu = new QMenu();
-
     if( menu->isEmpty() )
     {
         addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
@@ -624,12 +632,17 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     return Populate( p_intf, menu, varnames, objects );
 }
 
+QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QWidget *parent )
+{
+    return NavigMenu( p_intf, new QMenu( parent ) );
+}
+
 /**
  * Service Discovery SubMenu
  **/
-QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
+QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf, QWidget *parent )
 {
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu( parent );
     menu->setTitle( qtr( I_PL_SD ) );
     char **ppsz_longnames;
     char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
@@ -661,12 +674,13 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf )
     free( ppsz_longnames );
     return menu;
 }
+
 /**
  * Help/About Menu
 **/
-QMenu *QVLCMenu::HelpMenu( QMenu *current )
+QMenu *QVLCMenu::HelpMenu( QWidget *parent )
 {
-    QMenu *menu = new QMenu( current );
+    QMenu *menu = new QMenu( parent );
     addDPStaticEntry( menu, qtr( "&Help..." ) ,
         ":/help", SLOT( helpDialog() ), "F1" );
 #ifdef UPDATE_CHECK
@@ -994,7 +1008,11 @@ QMenu * QVLCMenu::Populate( intf_thread_t *p_intf,
                             vector<vlc_object_t *> & objects )
 {
     QMenu *menu = current;
-    if( !menu ) menu = new QMenu();
+    if( !menu )
+    {
+        msg_Warn( p_intf,  "%s leaking a menu", __func__ );
+        menu = new QMenu();
+    }
 
     currentGroup = NULL;
 
