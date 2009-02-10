@@ -83,6 +83,7 @@ vlc_module_end ()
 struct demux_sys_t
 {
     char *psz_base;
+    bool b_shortname;
 
     /* */
     int       i_mpls;
@@ -118,7 +119,7 @@ struct demux_sys_t
 static int Control( demux_t *, int, va_list );
 static int Demux( demux_t * );
 
-static char *FindPathBase( const char * );
+static char *FindPathBase( const char *, bool *pb_shortname );
 
 static int LoadPlaylist( demux_t * );
 static int LoadClip( demux_t * );
@@ -155,7 +156,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* */
-    char *psz_base = FindPathBase( p_demux->psz_path );
+    bool b_shortname;
+    char *psz_base = FindPathBase( p_demux->psz_path, &b_shortname );
     if( !psz_base )
         return VLC_EGENERIC;
 
@@ -166,6 +168,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_EGENERIC;
     p_sys->psz_base = psz_base;
+    p_sys->b_shortname = b_shortname;
     TAB_INIT( p_sys->i_mpls, p_sys->pp_mpls );
     TAB_INIT( p_sys->i_clpi, p_sys->pp_clpi );
     TAB_INIT( p_sys->i_title, p_sys->pp_title );
@@ -616,7 +619,8 @@ static int SetPlayItem( demux_t *p_demux, int i_mpls, int i_play_item )
     if( !b_same_clpi )
     {
         char *psz_m2ts;
-        if( asprintf( &psz_m2ts, "%s/STREAM/%05d.m2ts", p_sys->psz_base, p_mpls_clpi->i_id ) < 0 )
+        if( asprintf( &psz_m2ts, "%s/STREAM/%05d.%s",
+                      p_sys->psz_base, p_mpls_clpi->i_id, p_sys->b_shortname ? "MTS" : "m2ts" ) < 0 )
             return VLC_EGENERIC;
 
         p_m2ts = stream_UrlNew( p_demux, psz_m2ts );
@@ -927,8 +931,26 @@ static void ReorderPlaylist( demux_t *p_demux )
 /*****************************************************************************
  * Helpers:
  *****************************************************************************/
+static int CheckFileList( const char *psz_base, const char *ppsz_name[] )
+{
+    for( int i = 0; ppsz_name[i] != NULL ; i++ )
+    {
+        struct stat s;
+        char *psz_tmp;
+
+        if( asprintf( &psz_tmp, "%s/%s", psz_base, ppsz_name[i] ) < 0 )
+            return VLC_EGENERIC;
+
+        bool b_ok = utf8_stat( psz_tmp, &s ) == 0 && S_ISREG( s.st_mode );
+
+        free( psz_tmp );
+        if( !b_ok )
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
 /* */
-static char *FindPathBase( const char *psz_path )
+static char *FindPathBase( const char *psz_path, bool *pb_shortname )
 {
     struct stat s;
     char *psz_tmp;
@@ -960,26 +982,23 @@ static char *FindPathBase( const char *psz_path )
     }
 
     /* Check presence of mandatory files */
-    for( int i = 0;; i++ )
+    static const char *ppsz_name_long[] = {
+        "index.bdmv",
+        "MovieObject.bdmv",
+        NULL
+    };
+    static const char *ppsz_name_short[] = {
+        "INDEX.BDM",
+        "MOVIEOBJ.BDM",
+        NULL
+    };
+    *pb_shortname = false;
+    if( CheckFileList( psz_base, ppsz_name_long ) )
     {
-        static const char *ppsz_name[] = {
-            "index.bdmv",
-            "MovieObject.bdmv",
-            NULL
-        };
-        if( !ppsz_name[i] )
-            break;
-
-        if( asprintf( &psz_tmp, "%s/%s", psz_base, ppsz_name[i] ) < 0 )
+        if( CheckFileList( psz_base, ppsz_name_short ) )
             goto error;
-
-        bool b_ok = utf8_stat( psz_tmp, &s ) == 0 && S_ISREG( s.st_mode );
-
-        free( psz_tmp );
-        if( !b_ok )
-            goto error;
+        *pb_shortname = true;
     }
-
     return psz_base;
 
 error:
@@ -1006,10 +1025,15 @@ static block_t *LoadBlock( demux_t *p_demux, const char *psz_name )
 }
 
 /* */
-static int FilterMpls( const char *psz_name )
+static int FilterMplsLong( const char *psz_name )
 {
     return strlen( psz_name ) == strlen( "xxxxx.mpls" ) &&
            !strcmp( &psz_name[5], ".mpls" );
+}
+static int FilterMplsShort( const char *psz_name )
+{
+    return strlen( psz_name ) == strlen( "xxxxx.MPL" ) &&
+           !strcmp( &psz_name[5], ".MPL" );
 }
 
 static void LoadMpls( demux_t *p_demux, const char *psz_name, int i_id )
@@ -1095,10 +1119,15 @@ error:
 }
 
 /* */
-static int FilterClpi( const char *psz_name )
+static int FilterClpiLong( const char *psz_name )
 {
     return strlen( psz_name ) == strlen( "xxxxx.clpi" ) &&
            !strcmp( &psz_name[5], ".clpi" );
+}
+static int FilterClpiShort( const char *psz_name )
+{
+    return strlen( psz_name ) == strlen( "xxxxx.CPI" ) &&
+           !strcmp( &psz_name[5], ".CPI" );
 }
 
 static void LoadClpi( demux_t *p_demux, const char *psz_name, int i_id )
@@ -1205,11 +1234,13 @@ static int Load( demux_t *p_demux,
 
 static int LoadPlaylist( demux_t *p_demux )
 {
-    return Load( p_demux, "PLAYLIST", FilterMpls, LoadMpls );
+    return Load( p_demux, "PLAYLIST",
+                 p_demux->p_sys->b_shortname ? FilterMplsShort : FilterMplsLong, LoadMpls );
 }
 static int LoadClip( demux_t *p_demux )
 {
-    return Load( p_demux, "CLIPINF", FilterClpi, LoadClpi );
+    return Load( p_demux, "CLIPINF",
+                 p_demux->p_sys->b_shortname ? FilterClpiShort : FilterClpiLong, LoadClpi );
 }
 
 /* */
