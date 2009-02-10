@@ -53,7 +53,7 @@ static void handler( msg_cb_data_t *d, msg_item_t *p_item, unsigned i_drop )
     if (d->count < VLC_MSG_QSIZE)
     {
         d->items[d->count++] = p_item;
-        /* FIXME FIXME: yield the message item */
+        msg_Hold (p_item);
     }
     vlc_spin_unlock (&d->lock);
     (void)i_drop;
@@ -117,6 +117,7 @@ void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
         assert( p_log->p_messages );
         msg_Unsubscribe(p_log->p_messages);
         libvlc_release( p_log->p_instance );
+        libvlc_log_clear( p_log, p_e );
         vlc_spin_destroy( &p_log->data.lock );
         free(p_log);
     }
@@ -146,9 +147,13 @@ void libvlc_log_clear( libvlc_log_t *p_log, libvlc_exception_t *p_e )
     if( p_log )
     {
         vlc_spin_lock (&p_log->data.lock);
+        msg_item_t *tab[p_log->data.count];
+        memcpy (tab, p_log->data.items, sizeof (tab));
         p_log->data.count = 0;
-        /* FIXME: release items */
         vlc_spin_unlock (&p_log->data.lock);
+
+        for (unsigned i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
+            msg_Release (tab[i]);
     }
     else
         RAISEVOID("Invalid log object!");
