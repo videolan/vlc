@@ -184,8 +184,8 @@ static int InputAutoMenuBuilder( input_thread_t *p_object,
     PUSH_VAR( "bookmark" );
     PUSH_VAR( "title" );
     PUSH_VAR( "chapter" );
-    PUSH_VAR( "program" );
     PUSH_VAR( "navigation" );
+    PUSH_VAR( "program" );
     PUSH_VAR( "dvd_menus" );
     return VLC_SUCCESS;
 }
@@ -334,6 +334,8 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
     menu->addSeparator();
+    menu->addMenu( SDMenu( p_intf, menu ) );
+    menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
         "Ctrl+Y" );
@@ -411,8 +413,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                                SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
         act->setData( true );
     }
-    act = menu->addMenu( SDMenu( p_intf, menu ) );
-    act->setData( true );
     /*menu->addSeparator();
     menu->addAction( qtr( "Undock from Interface" ), mi,
                      SLOT( undockPlaylist() ), qtr( "Ctrl+U" ) );*/
@@ -608,8 +608,8 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
         ACT_ADD( menu, "bookmark", qtr( "&Bookmarks" ) );
         ACT_ADD( menu, "title", qtr( "T&itle" ) );
         ACT_ADD( menu, "chapter", qtr( "&Chapter" ) );
-        ACT_ADD( menu, "program", qtr( "&Program" ) );
         ACT_ADD( menu, "navigation", qtr( "&Navigation" ) );
+        ACT_ADD( menu, "program", qtr( "&Program" ) );
     }
 
     input_thread_t *p_object;
