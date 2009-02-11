@@ -1,5 +1,6 @@
 if HAVE_ZLIB
 SOURCES_zip = \
+	zip.h \
 	zipstream.c \
 	zipaccess.c \
 	$(NULL)
