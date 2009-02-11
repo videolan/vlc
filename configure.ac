@@ -888,8 +888,8 @@ then
       MINIZIP_LIBS="-lminizip -lz"
     ], [
       have_minizip=no
-      MINIZIP_CFLAGS="-I\$(top_builddir)/libs/unzip"
-      MINIZIP_LIBS="\$(top_builddir)/libs/unzip/libunzip.la"
+      MINIZIP_CFLAGS="-I../../../@top_srcdir@//libs/unzip"
+      MINIZIP_LIBS="../../../libs/unzip/libunzip.la"
     ])
   ])
   AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
@@ -3001,11 +3001,11 @@ AC_ARG_ENABLE( id3tag,
 [  --disable-id3tag        id3tag metadata reader plugin (default disabled)])
 AS_IF([test "${enable_id3tag}" = "yes"], [
   AC_CHECK_HEADERS(id3tag.h, [
-    if test "${have_zlib}" = "yes"
-      VLC_ADD_LIBS([id3tag],[-lid3tag -lz])
-      VLC_ADD_PLUGIN([id3tag])
-    fi
-  ])
+      AS_IF([test "${have_zlib}" = "yes"],[
+          VLC_ADD_LIBS([id3tag],[-lid3tag -lz])
+          VLC_ADD_PLUGIN([id3tag])
+       ])
+    ])
 ])
 
 dnl
