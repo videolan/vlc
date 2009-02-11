@@ -854,11 +854,12 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 {
                     playlist_item_t *p_item;
                     msg_Dbg( p_intf, "requested mrl add: %s", mrl );
+                    playlist_Lock( p_sys->p_playlist );
                     p_item = playlist_ItemGetByInput( p_sys->p_playlist,
-                                                      p_input,
-                                                      pl_Unlocked );
+                                                      p_input );
                     if( p_item )
                         i_ret = p_item->i_id;
+                    playlist_Unlock( p_sys->p_playlist );
                 }
                 else
                     msg_Warn( p_intf, "adding mrl %s failed", mrl );

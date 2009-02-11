@@ -1120,7 +1120,7 @@
         {
             playlist_item_t *p_item = NULL;
             playlist_item_t *p_node = NULL;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input );
             if( p_item )
             {
                 if( p_item->i_children == -1 )
@@ -1173,7 +1173,7 @@
         if( i_item == 0 && !b_enqueue )
         {
             playlist_item_t *p_item;
-            p_item = playlist_ItemGetByInput( p_playlist, p_input, pl_Locked );
+            p_item = playlist_ItemGetByInput( p_playlist, p_input );
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Locked, p_node, p_item );
         }
         PL_UNLOCK;

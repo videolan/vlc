@@ -53,36 +53,29 @@ playlist_item_t* playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 
 /**
  * Search an item by its input_item_t
- *
- * \param p_playlist the playlist
- * \param p_item the input_item_t to find
- * \return the item, or NULL on failure
+ * The playlist have to be locked
+ * @param p_playlist: the playlist
+ * @param p_item: the input_item_t to find
+ * @return the item, or NULL on failure
  */
-playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
-                                           input_item_t *p_item,
-                                           bool b_locked )
+playlist_item_t* playlist_ItemGetByInput( playlist_t * p_playlist,
+                                          input_item_t *p_item )
 {
     int i;
-    PL_LOCK_IF( !b_locked );
+    PL_ASSERT_LOCKED;
     if( get_current_status_item( p_playlist ) &&
         get_current_status_item( p_playlist )->p_input == p_item )
     {
-        /* FIXME: this is potentially dangerous, we could destroy
-         * p_ret any time soon */
-        playlist_item_t *p_ret = get_current_status_item( p_playlist );
-        PL_UNLOCK_IF( !b_locked );
-        return p_ret;
+        return get_current_status_item( p_playlist );
     }
     /** \todo Check if this is always incremental and whether we can bsearch */
     for( i =  0 ; i < p_playlist->all_items.i_size; i++ )
     {
         if( ARRAY_VAL(p_playlist->all_items, i)->p_input->i_id == p_item->i_id )
         {
-            PL_UNLOCK_IF( !b_locked );
             return ARRAY_VAL(p_playlist->all_items, i);
         }
     }
-    PL_UNLOCK_IF( !b_locked );
     return NULL;
 }
 
