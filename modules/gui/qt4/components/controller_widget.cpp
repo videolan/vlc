@@ -188,13 +188,6 @@ void SoundWidget::updateVolume()
     }
 }
 
-void TeletextController::enableTeletextButtons( bool b_enabled )
-{
-    telexOn->setChecked( b_enabled );
-    telexTransparent->setEnabled( b_enabled );
-    telexPage->setEnabled( b_enabled );
-}
-
 void PlayButton::updateButton( bool b_playing )
 {
     setIcon( b_playing ? QIcon( ":/pause_b" ) : QIcon( ":/play_b" ) );

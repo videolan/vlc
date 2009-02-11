@@ -66,22 +66,6 @@ private slots:
     void setIcons( bool, bool );
 };
 
-class TeletextController : public QFrame
-{
-    Q_OBJECT
-    friend class AbstractController;
-
-public:
-    TeletextController( QWidget *parent ) : QFrame( parent ) { }
-
-private:
-    QToolButton         *telexTransparent, *telexOn;
-    QSpinBox            *telexPage;
-
-private slots:
-    void enableTeletextButtons( bool );
-};
-
 #define VOLUME_MAX 200
 class VolumeClickHandler;
 

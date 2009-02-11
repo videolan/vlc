@@ -480,15 +480,14 @@ QFrame *AbstractController::telexFrame()
     /**
      * Telextext QFrame
      **/
-    TeletextController *telexFrame = new TeletextController( this );
+    QFrame *telexFrame = new QFrame;
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
     telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
     CONNECT( THEMIM->getIM(), teletextPossible( bool ),
              telexFrame, setVisible( bool ) );
 
     /* On/Off button */
-    QToolButton *telexOn = new QToolButton( this );
-    telexFrame->telexOn = telexOn;
+    QToolButton *telexOn = new QToolButton;
     setupButton( telexOn );
     BUTTON_SET_BAR2( telexOn, tv, qtr( "Teletext Activation" ) );
     telexLayout->addWidget( telexOn );
@@ -496,13 +495,10 @@ QFrame *AbstractController::telexFrame()
     /* Teletext Activation and set */
     CONNECT( telexOn, clicked( bool ),
              THEMIM->getIM(), activateTeletext( bool ) );
-    CONNECT( THEMIM->getIM(), teletextActivated( bool ),
-             telexFrame, enableTeletextButtons( bool ) );
 
 
     /* Transparency button */
-    QToolButton *telexTransparent = new QToolButton( this );
-    telexFrame->telexTransparent = telexTransparent;
+    QToolButton *telexTransparent = new QToolButton;
     setupButton( telexTransparent );
     BUTTON_SET_BAR2( telexTransparent, tvtelx,
                      qtr( "Toggle Transparency " ) );
@@ -518,8 +514,7 @@ QFrame *AbstractController::telexFrame()
 
 
     /* Page setting */
-    QSpinBox *telexPage = new QSpinBox( this );
-    telexFrame->telexPage = telexPage;
+    QSpinBox *telexPage = new QSpinBox( telexFrame );
     telexPage->setRange( 0, 999 );
     telexPage->setValue( 100 );
     telexPage->setAccelerated( true );
@@ -535,6 +530,9 @@ QFrame *AbstractController::telexFrame()
     CONNECT( THEMIM->getIM(), newTelexPageSet( int ),
             telexPage, setValue( int ) );
 
+    CONNECT( THEMIM->getIM(), teletextActivated( bool ), telexPage, setEnabled( bool ) );
+    CONNECT( THEMIM->getIM(), teletextActivated( bool ), telexTransparent, setEnabled( bool ) );
+    CONNECT( THEMIM->getIM(), teletextActivated( bool ), telexOn, setChecked( bool ) );
     return telexFrame;
 }
 #undef CONNECT_MAP
