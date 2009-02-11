@@ -361,15 +361,7 @@ static int Create( vlc_object_t *p_this )
 
     if( OpenDisplay( p_vout ) )
     {
-        if( p_sys->b_tty )
-        {
-            ioctl( p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
-            sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-            sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-            TextMode( p_sys->i_tty );
-        }
-        free( p_vout->p_sys );
+        Destroy( VLC_OBJECT(p_vout) );
         return VLC_EGENERIC;
     }
 
@@ -959,21 +951,24 @@ static void CloseDisplay( vout_thread_t *p_vout )
         munmap( p_vout->p_sys->p_video, p_vout->p_sys->i_page_size );
     }
 
-    /* Restore palette */
-    if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
+    if( p_vout->p_sys->i_fd >= 0 )
     {
+        /* Restore palette */
+        if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
+        {
+            ioctl( p_vout->p_sys->i_fd,
+                   FBIOPUTCMAP, &p_vout->p_sys->fb_cmap );
+            free( p_vout->p_sys->p_palette );
+            p_vout->p_sys->p_palette = NULL;
+        }
+
+        /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
-               FBIOPUTCMAP, &p_vout->p_sys->fb_cmap );
-        free( p_vout->p_sys->p_palette );
-        p_vout->p_sys->p_palette = NULL;
+               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
+
+        /* Close fb */
+        close( p_vout->p_sys->i_fd );
     }
-
-    /* Restore fb config */
-    ioctl( p_vout->p_sys->i_fd,
-           FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
-
-    /* Close fb */
-    close( p_vout->p_sys->i_fd );
 }
 
 /*****************************************************************************
