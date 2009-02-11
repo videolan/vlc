@@ -278,6 +278,8 @@ MainInterface::~MainInterface()
 
     ActionsManager::killInstance();
 
+    if( fullscreenControls ) delete fullscreenControls;
+
     settings->beginGroup( "MainWindow" );
 
     settings->setValue( "pl-dock-status", (int)i_pl_dock );
