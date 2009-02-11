@@ -21,9 +21,7 @@ if HAVE_LIBGCRYPT
 SUBDIRS += libs/srtp
 endif
 if HAVE_ZLIB
-if !HAVE_MINIZIP
 SUBDIRS += libs/unzip
-endif
 endif
 if BUILD_VLC
 SUBDIRS += bin
