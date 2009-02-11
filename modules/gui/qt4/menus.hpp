@@ -141,7 +141,9 @@ class MenuFunc : public QObject
     Q_OBJECT
 
 public:
-    MenuFunc( QMenu *_menu, int _id ) { menu = _menu; id = _id; };
+    MenuFunc( QMenu *_menu, int _id ) : QObject( (QObject *)_menu ),
+                                        menu( _menu ), id( _id ){}
+
     void doFunc( intf_thread_t *p_intf)
     {
         switch( id )
