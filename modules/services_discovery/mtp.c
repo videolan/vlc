@@ -147,7 +147,7 @@ static void *Run( void *data )
              i_status == 0 )
         {
             /* Found a new device, add it */
-            msg_Info( p_sd, "New device found" );
+            msg_Dbg( p_sd, "New device found" );
             if( AddDevice( p_sd, &p_rawdevices[0] ) == VLC_SUCCESS )
                 i_status = 1;
         }
@@ -191,7 +191,9 @@ static int AddDevice( services_discovery_t *p_sd,
         p_sd->p_sys->i_product_id = p_raw_device->device_entry.product_id;
         if( ( p_track = LIBMTP_Get_Tracklisting_With_Callback( p_device,
                             CountTracks, p_sd ) ) == NULL )
-            msg_Info( p_sd, "No tracks on the device" );
+        {
+            msg_Warn( p_sd, "No tracks on the device" );
+        }
         else
         {
             if( !( p_sd->p_sys->pp_items = calloc( p_sd->p_sys->i_tracks_num,
@@ -214,7 +216,7 @@ static int AddDevice( services_discovery_t *p_sd,
     }
     else
     {
-        msg_Info( p_sd, "No device found, after all" );
+        msg_Warn( p_sd, "No device found, after all" );
         return VLC_EGENERIC;
     }
 }
