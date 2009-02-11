@@ -920,7 +920,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                          p_sys->i_bytes_per_pixel;
 
     /* Map a framebuffer at the beginning */
-    p_sys->p_video = mmap( 0, p_sys->i_page_size,
+    p_sys->p_video = mmap( NULL, p_sys->i_page_size,
                               PROT_READ | PROT_WRITE, MAP_SHARED,
                               p_sys->i_fd, 0 );
 
@@ -952,8 +952,12 @@ static int OpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void CloseDisplay( vout_thread_t *p_vout )
 {
-    /* Clear display */
-    memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
+    if( p_vout->p_sys->p_video )
+    {
+        /* Clear display */
+        memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
+        munmap( p_vout->p_sys->p_video, p_vout->p_sys->i_page_size );
+    }
 
     /* Restore palette */
     if( p_vout->p_sys->var_info.bits_per_pixel == 8 )
