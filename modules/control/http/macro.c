@@ -199,10 +199,11 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         msg_Dbg( p_intf, "requested playlist play" );
                         break;
                     }
+                    //TODO: really locked here ?
                     playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
                                       true, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
-                                      i_item, true ) );
+                                      i_item ) );
                     msg_Dbg( p_intf, "requested playlist item: %i", i_item );
                     break;
                 }

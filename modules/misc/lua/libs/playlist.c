@@ -150,8 +150,7 @@ static int vlclua_playlist_goto( lua_State * L )
     PL_LOCK;
     int i_ret = playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                                   true, NULL,
-                                  playlist_ItemGetById( p_playlist, i_id,
-                                                        true ) );
+                                  playlist_ItemGetById( p_playlist, i_id ) );
     PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return vlclua_push_ret( L, i_ret );
@@ -243,7 +242,7 @@ static int vlclua_playlist_get( lua_State *L )
     if( lua_isnumber( L, 1 ) )
     {
         int i_id = lua_tointeger( L, 1 );
-        p_item = playlist_ItemGetById( p_playlist, i_id, true );
+        p_item = playlist_ItemGetById( p_playlist, i_id );
         if( !p_item )
         {
             PL_UNLOCK;

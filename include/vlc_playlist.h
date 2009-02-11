@@ -322,7 +322,7 @@ VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_
 VLC_EXPORT( playlist_item_t*, playlist_ItemToNode, (playlist_t *,playlist_item_t *, bool) );
 
 /********************************** Item search *************************/
-VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int, bool ) );
+VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int ) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item_t *, bool ) );
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInputId, (playlist_t *, int, playlist_item_t *) );
 

@@ -867,7 +867,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
         playlist_t *p_playlist = (playlist_t*)p_this;
         playlist_add_t *p_add = newval.p_address;
         playlist_item_t *p_item;
-        p_item = playlist_ItemGetById( p_playlist, p_add->i_node, pl_Locked );
+        p_item = playlist_ItemGetById( p_playlist, p_add->i_node );
         assert( p_item );
         while( p_item->p_parent )
             p_item = p_item->p_parent;

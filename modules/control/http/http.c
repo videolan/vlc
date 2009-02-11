@@ -776,10 +776,12 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
     i_id = atoi( psz_id );
     if( i_id )
     {
+        playlist_Lock( p_sys->p_playlist );
         playlist_item_t *p_pl_item = playlist_ItemGetById( p_sys->p_playlist,
-                                                           i_id, false );
+                                                           i_id );
         if( p_pl_item )
             p_item = p_pl_item->p_input;
+        playlist_Unlock( p_sys->p_playlist );
     }
     else
     {

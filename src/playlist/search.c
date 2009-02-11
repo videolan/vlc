@@ -34,25 +34,21 @@
  ***************************************************************************/
 
 /**
- * Search a playlist item by its playlist_item id
- *
- * \param p_playlist the playlist
- * \param i_id the id to find
- * \return the item or NULL on failure
+ * Search a playlist item by its playlist_item id.
+ * The playlist have to be locked
+ * @param p_playlist: the playlist
+ * @param i_id: the id to find
+ * @return the item or NULL on failure
  */
-playlist_item_t * playlist_ItemGetById( playlist_t * p_playlist , int i_id,
-                                        bool b_locked )
+playlist_item_t* playlist_ItemGetById( playlist_t * p_playlist , int i_id )
 {
     int i;
-    PL_LOCK_IF( !b_locked );
+    PL_ASSERT_LOCKED;
     ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
     if( i != -1 )
-    {
-        PL_UNLOCK_IF( !b_locked );
         return ARRAY_VAL( p_playlist->all_items, i );
-    }
-    PL_UNLOCK_IF( !b_locked );
-    return NULL;
+    else
+        return NULL;
 }
 
 /**

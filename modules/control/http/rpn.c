@@ -494,7 +494,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             i_ret = playlist_Control( p_sys->p_playlist, PLAYLIST_VIEWPLAY,
                                       pl_Locked, NULL,
                                       playlist_ItemGetById( p_sys->p_playlist,
-                                      i_id, pl_Locked ) );
+                                      i_id ) );
             playlist_Unlock( p_sys->p_playlist );
             msg_Dbg( p_intf, "requested playlist item: %i", i_id );
             SSPushN( st, i_ret );
@@ -878,12 +878,13 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "playlist_delete" ) )
         {
             int i_id = SSPopN( st, vars );
+            playlist_Lock( p_sys->p_playlist );
             playlist_item_t *p_item = playlist_ItemGetById( p_sys->p_playlist,
-                                                            i_id, pl_Unlocked );
+                                                            i_id );
             if( p_item )
             {
                 playlist_DeleteFromInput( p_sys->p_playlist,
-                                          p_item->p_input->i_id, pl_Unlocked );
+                                          p_item->p_input->i_id, pl_Locked );
                 msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
             }
             else
@@ -891,6 +892,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 msg_Dbg( p_intf, "couldn't find playlist item to delete (%d)",
                          i_id );
             }
+            playlist_Unlock( p_sys->p_playlist );
         }
         else if( !strcmp( s, "playlist_move" ) )
         {

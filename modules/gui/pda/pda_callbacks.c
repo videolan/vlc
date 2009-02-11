@@ -164,7 +164,7 @@ void PlaylistRebuildListStore( intf_thread_t *p_intf,
     PL_LOCK;
     for( i_dummy = 0; i_dummy < playlist_CurrentSize(p_playlist) ; i_dummy++ )
     {
-        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy, pl_Locked );
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_dummy );
         if( p_item )
         {
             ppsz_text[0] = p_item->p_input->psz_name;

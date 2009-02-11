@@ -525,20 +525,24 @@ LRESULT Playlist::ProcessCustomDraw( LPARAM lParam )
             pl_Release( p_intf );
             return CDRF_NEWFONT;
         }
- 
+
+        PL_LOCK;
         playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                        (int)lplvcd->nmcd.dwItemSpec, FALSE );
+                                        (int)lplvcd->nmcd.dwItemSpec );
         if( !p_item )
         {
+            PL_UNLOCK;
             pl_Release( p_intf );
             return CDRF_DODEFAULT;
         }
         if( p_item->i_flags & PLAYLIST_DBL_FLAG )
         {
             lplvcd->clrText = RGB(192,192,192);
+            PL_UNLOCK;
             pl_Release( p_intf );
             return CDRF_NEWFONT;
         }
+        PL_UNLOCK;
         pl_Release( p_intf );
     }
 
@@ -663,10 +667,12 @@ void Playlist::UpdateItem( int i )
 
     if( p_playlist == NULL ) return;
 
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i, FALSE );
+    PL_LOCK;
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i );
 
     if( !p_item )
     {
+        PL_UNLOCK;
         pl_Release( p_intf );
         return;
     }
@@ -679,6 +685,7 @@ void Playlist::UpdateItem( int i )
 
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = input_item_GetDuration( p_item->p_input );
+    PL_UNLOCK;
 
     if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
     else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
@@ -816,9 +823,10 @@ void Playlist::OnEnableSelection()
     {
         if( ListView_GetItemState( hListView, item, LVIS_SELECTED ) )
         {
-            playlist_item_t *p_item =
-                playlist_ItemGetById( p_playlist, item, FALSE );
+            PL_LOCK;
+            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item );
             p_item->i_flags ^= PLAYLIST_DBL_FLAG;
+            PL_UNLOCK;
             UpdateItem( item );
         }
     }
@@ -835,10 +843,10 @@ void Playlist::OnDisableSelection()
     {
         if( ListView_GetItemState( hListView, item, LVIS_SELECTED ) )
         {
-            /*XXX*/
-            playlist_item_t *p_item =
-                playlist_ItemGetById( p_playlist, item, FALSE );
+            PL_LOCK;
+            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item );
             p_item->i_flags |= PLAYLIST_DBL_FLAG;
+            PL_UNLOCK;
             UpdateItem( item );
         }
     }
@@ -870,13 +878,12 @@ void Playlist::ShowInfos( HWND hwnd, int i_item )
     if( p_playlist == NULL ) return;
 
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item, true );
-    PL_UNLOCK;
-
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item );
     if( p_item )
     {
         ItemInfoDialog *iteminfo_dialog =
             new ItemInfoDialog( p_intf, this, hInst, p_item );
+        PL_UNLOCK;
         CreateDialogBox( hwnd, iteminfo_dialog );
         UpdateItem( i_item );
         delete iteminfo_dialog;
@@ -1098,8 +1105,8 @@ void Playlist::OnPopupEna()
     playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
 
-    playlist_item_t *p_item =
-        playlist_ItemGetById( p_playlist, i_popup_item, FALSE );
+    PL_LOCK;
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_popup_item );
 
     if( !(p_playlist->items.p_elems[i_popup_item]->i_flags & PLAYLIST_DBL_FLAG) )
         //playlist_IsEnabled( p_playlist, i_popup_item ) )
@@ -1111,6 +1118,7 @@ void Playlist::OnPopupEna()
         p_item->i_flags ^= PLAYLIST_DBL_FLAG;
     }
 
+    PL_UNLOCK;
     pl_Release( p_intf );
     UpdateItem( i_popup_item );
 }

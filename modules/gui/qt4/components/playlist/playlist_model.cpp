@@ -168,10 +168,8 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
 
             PL_LOCK;
             playlist_item_t *p_target =
-                        playlist_ItemGetById( p_playlist, targetItem->i_id,
-                                              pl_Locked );
-            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId,
-                                                           pl_Locked );
+                        playlist_ItemGetById( p_playlist, targetItem->i_id );
+            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId );
 
             if( !p_target || !p_src )
             {
@@ -183,8 +181,7 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                 PLItem *parentItem = targetItem->parent();
                 assert( parentItem );
                 playlist_item_t *p_parent =
-                         playlist_ItemGetById( p_playlist, parentItem->i_id,
-                                               pl_Locked );
+                         playlist_ItemGetById( p_playlist, parentItem->i_id );
                 if( !p_parent )
                 {
                     PL_UNLOCK;
@@ -246,8 +243,7 @@ void PLModel::activateItem( const QModelIndex &index )
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
     assert( item );
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
-                                                    pl_Locked );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
     activateItem( p_item );
     PL_UNLOCK;
 }
@@ -563,7 +559,7 @@ void PLModel::ProcessItemAppend( playlist_add_t *p_add )
     PL_LOCK;
     if( !nodeItem ) goto end;
 
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item, pl_Locked );
+    p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
     if( i_depth == DEPTH_SEL && p_item->p_parent &&
                         p_item->p_parent->i_id != rootItem->i_id )
@@ -632,8 +628,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
 /* This function must be entered WITH the playlist lock */
 void PLModel::UpdateNodeChildren( PLItem *root )
 {
-    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id,
-                                                    pl_Locked );
+    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
     UpdateNodeChildren( p_node, root );
 }
 
@@ -654,8 +649,7 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 /* This function must be entered WITH the playlist lock */
 void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 {
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
-                                                    pl_Locked );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
     UpdateTreeItem( p_item, item, signal, force );
 }
 
@@ -714,11 +708,11 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
     fullList->removeAll( deleteIndex );
 
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id,
-                                                    pl_Locked );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
     if( !p_item )
     {
-        PL_UNLOCK; return;
+        PL_UNLOCK;
+        return;
     }
     if( p_item->i_children == -1 )
         playlist_DeleteFromInput( p_playlist, item->i_input_id, pl_Locked );
@@ -752,8 +746,7 @@ next:
     PL_LOCK;
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
-                                                        rootItem->i_id,
-                                                        pl_Locked );
+                                                        rootItem->i_id );
         if( p_root )
         {
             playlist_RecursiveNodeSort( p_playlist, p_root,
@@ -772,8 +765,7 @@ void PLModel::search( QString search_text )
     PL_LOCK;
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
-                                                        rootItem->i_id,
-                                                        pl_Locked );
+                                                        rootItem->i_id );
         assert( p_root );
         char *psz_name = search_text.toUtf8().data();
         playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
@@ -787,8 +779,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 {
     assert( index.isValid() );
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    itemId( index ), pl_Locked );
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
     if( p_item )
     {
         i_popup_item = p_item->i_id;
@@ -867,8 +858,7 @@ void PLModel::popupPlay()
     PL_LOCK;
     {
         playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                        i_popup_item,
-                                                        pl_Locked );
+                                                        i_popup_item );
         activateItem( p_item );
     }
     PL_UNLOCK;
@@ -876,12 +866,16 @@ void PLModel::popupPlay()
 
 void PLModel::popupInfo()
 {
+    PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    i_popup_item,
-                                                    pl_Unlocked );
+                                                    i_popup_item );
     if( p_item )
     {
-        MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_item->p_input );
+        input_item_t* p_input = p_item->p_input;
+        vlc_gc_incref( p_input );
+        PL_UNLOCK;
+        MediaInfoDialog *mid = new MediaInfoDialog( p_intf, p_input );
+        vlc_gc_decref( p_input );
         mid->setParent( PlaylistDialog::getInstance( p_intf ),
                         Qt::Dialog );
         mid->show();
@@ -908,13 +902,14 @@ void PLModel::popupSave()
 #include <QDesktopServices>
 void PLModel::popupExplore()
 {
+    PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    i_popup_item,
-                                                    pl_Unlocked );
+                                                    i_popup_item );
     if( p_item )
     {
        input_item_t *p_input = p_item->p_input;
        char *psz_meta = input_item_GetURI( p_input );
+       PL_UNLOCK;
        if( psz_meta )
        {
            const char *psz_access;
@@ -933,6 +928,8 @@ void PLModel::popupExplore()
            free( psz_meta );
        }
     }
+    else
+        PL_UNLOCK;
 }
 
 /**********************************************************************
