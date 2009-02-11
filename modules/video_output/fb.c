@@ -944,12 +944,9 @@ static int OpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void CloseDisplay( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->p_video )
-    {
-        /* Clear display */
-        memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
-        munmap( p_vout->p_sys->p_video, p_vout->p_sys->i_page_size );
-    }
+    /* Clear display */
+    memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
+    munmap( p_vout->p_sys->p_video, p_vout->p_sys->i_page_size );
 
     if( p_vout->p_sys->i_fd >= 0 )
     {
