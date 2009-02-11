@@ -306,7 +306,11 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
              speedControl, activateOnState() );
 }
-
+SpeedLabel::~SpeedLabel()
+{
+        delete speedControl;
+        delete speedControlMenu;
+}
 /****************************************************************************
  * Small right-click menu for rate control
  ****************************************************************************/

@@ -157,6 +157,7 @@ class SpeedLabel : public QLabel
     Q_OBJECT
 public:
     SpeedLabel( intf_thread_t *, const QString&, QWidget * );
+    virtual ~SpeedLabel();
 
 protected:
     virtual void mouseDoubleClickEvent ( QMouseEvent * event )
