@@ -468,7 +468,7 @@ inline void MainInterface::askForPrivacy()
 
 int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
 {
-    QDialog *privacy = new QDialog();
+    QDialog *privacy = new QDialog( this );
 
     privacy->setWindowTitle( qtr( "Privacy and Network Policies" ) );
 
