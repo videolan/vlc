@@ -1217,12 +1217,8 @@ static int Init( input_thread_t * p_input )
         InputUpdateMeta( p_input, p_meta );
     }
 
-    if( !p_input->b_preparsing )
-    {
-        msg_Dbg( p_input, "`%s' successfully opened",
-                 p_input->p->p_item->psz_uri );
-
-    }
+    msg_Dbg( p_input, "`%s' successfully opened",
+             p_input->p->p_item->psz_uri );
 
     /* initialization is complete */
     input_ChangeState( p_input, PLAYING_S );
