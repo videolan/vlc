@@ -88,6 +88,14 @@ static int DialogSend( interaction_dialog_t * );
             return VLC_EGENERIC; \
         va_end( args )
 
+static inline int DialogFireForget( interaction_dialog_t *d )
+{
+    int ret = DialogSend( d );
+    if( ret == VLC_EGENERIC )
+        DialogDestroy( d );
+    return ret;
+}
+
 /**
  * Send an error message, both in a blocking and non-blocking way
  *
@@ -112,7 +120,7 @@ int __intf_UserFatal( vlc_object_t *p_this, bool b_blocking,
     else
         p_new->i_flags = DIALOG_NONBLOCKING_ERROR;
 
-    return DialogSend( p_new );
+    return DialogFireForget( p_new );
 }
 
 /**
@@ -135,7 +143,7 @@ int __intf_UserWarn( vlc_object_t *p_this,
 
     p_new->i_flags = DIALOG_WARNING;
 
-    return DialogSend( p_new );
+    return DialogFireForget( p_new );
 }
 
 /**
@@ -165,7 +173,7 @@ int __intf_UserYesNo( vlc_object_t *p_this,
     p_new->psz_alternate_button = strdup( psz_alternate );
     p_new->psz_other_button = psz_other ? strdup( psz_other ) : NULL;
 
-    return DialogSend( p_new );
+    return DialogFireForget( p_new );
 }
 
 /**
@@ -277,7 +285,9 @@ int __intf_UserLoginPassword( vlc_object_t *p_this,
 
     i_ret = DialogSend( p_new );
 
-    if( i_ret != DIALOG_CANCELLED && i_ret != VLC_EGENERIC )
+    if( i_ret == VLC_EGENERIC )
+        DialogDestroy( p_new );
+    else if( i_ret != DIALOG_CANCELLED )
     {
         *ppsz_login = p_new->psz_returned[0]?
             strdup( p_new->psz_returned[0] ) : NULL;
@@ -311,7 +321,9 @@ int __intf_UserStringInput( vlc_object_t *p_this,
 
     i_ret = DialogSend( p_new );
 
-    if( i_ret != DIALOG_CANCELLED )
+    if( i_ret == VLC_EGENERIC )
+        DialogDestroy( p_new );
+    else if( i_ret != DIALOG_CANCELLED )
     {
         *ppsz_usersString = p_new->psz_returned[0]?
             strdup( p_new->psz_returned[0] ) : NULL;
