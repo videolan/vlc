@@ -40,6 +40,7 @@
 
 #include "utils.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <winreg.h>
 #include <winuser.h>

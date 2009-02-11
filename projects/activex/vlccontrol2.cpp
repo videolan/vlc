@@ -27,6 +27,7 @@
 
 #include "utils.h"
 
+#include <stdio.h>
 #include <shlwapi.h>
 #include <wininet.h>
 #include <tchar.h>

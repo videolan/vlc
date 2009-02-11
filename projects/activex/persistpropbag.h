@@ -23,6 +23,7 @@
 #ifndef __PERSISTPROPBAG_H__
 #define __PERSISTPROPBAG_H__
 
+#include <stdio.h>
 #include <ocidl.h>
 
 class VLCPersistPropertyBag : public IPersistPropertyBag
