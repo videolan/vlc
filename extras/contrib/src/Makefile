@@ -2321,8 +2321,7 @@ libkate: libkate-$(KATE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .kate: libkate .ogg
-	(cd $<; patch -p1) < Patches/libkate-nodocs.patch
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-valgrind --disable-doc && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
