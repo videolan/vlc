@@ -672,6 +672,8 @@ BOOL VLCPlugin::isInPlaceActive(void)
 HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect)
 {
     RECT clipRect = *lprcClipRect;
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
     /*
     ** record keeping of control geometry within container
