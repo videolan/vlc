@@ -16,7 +16,6 @@
       --enable-dca \
       --enable-libass \
       --enable-x264 \
-      --enable-zvbi --disable-telx \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
       --enable-goom \
@@ -32,5 +31,5 @@
       --enable-activex \
       --disable-gnomevfs --disable-hal --disable-gtk \
       --disable-cddax --disable-vcdx \
-      --disable-libcddb --disable-dvb --disable-zvbi --enable-telx\
+      --disable-libcddb --disable-dvb --disable-zvbi --enable-telx \
       --disable-pulse
