@@ -38,6 +38,8 @@ void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed );
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found );
 void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched );
 
+int input_Preparse( vlc_object_t *, input_item_t * );
+
 /* misc/stats.c
  * FIXME it should NOT be defined here or not coded in misc/stats.c */
 input_stats_t *stats_NewInputStats( input_thread_t *p_input );

@@ -439,9 +439,6 @@ VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item
 
 VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
 
-#define input_Preparse(a,b) __input_Preparse(VLC_OBJECT(a),b)
-VLC_EXPORT( int, __input_Preparse, ( vlc_object_t *, input_item_t * ) );
-
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
 VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );
 

@@ -412,13 +412,13 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
 
 /**
  * Initialize an input and initialize it to preparse the item
- * This function is blocking. It will only accept to parse files
+ * This function is blocking. It will only accept parsing regular files.
  *
  * \param p_parent a vlc_object_t
  * \param p_item an input item
  * \return VLC_SUCCESS or an error
  */
-int __input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
+int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
 {
     input_thread_t *p_input;
 

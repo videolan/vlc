@@ -127,7 +127,7 @@ static void Preparse( playlist_t *p_playlist, input_item_t *p_item )
     /* Do not preparse if it is already done (like by playing it) */
     if( !input_item_IsPreparsed( p_item ) )
     {
-        input_Preparse( p_playlist, p_item );
+        input_Preparse( VLC_OBJECT(p_playlist), p_item );
         input_item_SetPreparsed( p_item, true );
 
         var_SetInteger( p_playlist, "item-change", p_item->i_id );
