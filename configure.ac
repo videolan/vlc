@@ -5906,9 +5906,6 @@ AC_CONFIG_FILES([
   src/test/Makefile
   bin/Makefile
   test/Makefile
-])
-
-AC_CONFIG_FILES([
   modules/access/Makefile
   modules/access/bd/Makefile
   modules/access/bda/Makefile
