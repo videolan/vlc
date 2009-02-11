@@ -221,7 +221,7 @@ UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     updateLabelDown->setWordWrap( true );
     updateLabelDown->hide();
 
-    updateText = new QTextEdit;
+    updateText = new QTextEdit( this );
     updateText->setAcceptRichText(false);
     updateText->setTextInteractionFlags( Qt::TextSelectableByKeyboard|
                                          Qt::TextSelectableByMouse);
