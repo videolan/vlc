@@ -550,9 +550,6 @@ AC_CHECK_FUNCS(send,,[
   ])
 ])
 
-AC_CHECK_HEADERS(zlib.h, [
-  VLC_ADD_LIBS([access_http],[-lz])
-])
 
 dnl Check for socklen_t
 AH_TEMPLATE(socklen_t, [Define to `int' if <sys/socket.h> does not define.])
@@ -876,6 +873,33 @@ dnl Make PKG_CONFIG_PATH precious so that it appears in the help and get saved
 AC_ARG_VAR(PKG_CONFIG_PATH, 
 	   [Paths where to find .pc not at the default location])
 PKG_PROG_PKG_CONFIG()
+
+dnl
+dnl Check for zlib.h and -lz along with system -lminizip if available
+dnl 
+AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
+AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
+if test "${have_zlib}" = "yes"
+then
+  VLC_ADD_LIBS([access_http gme mp4 skins2 sap mkv unzip zip],[-lz])
+  PKG_CHECK_MODULES([MINIZIP], [minizip] , [ have_minizip=yes ], [
+    AC_CHECK_HEADERS([unzip.h], [ 
+      have_minizip=yes
+      MINIZIP_LIBS="-lminizip -lz"
+    ], [
+      have_minizip=no
+      MINIZIP_CFLAGS="-I\$(top_builddir)/libs/unzip"
+      MINIZIP_LIBS="\$(top_builddir)/libs/unzip/libunzip.la"
+    ])
+  ])
+  AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
+  VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
+  VLC_ADD_CFLAGS([zip],[$MINIZIP_CFLAGS])
+  VLC_ADD_LIBS([skins2 zip],[$MINIZIP_LIBS])
+  VLC_ADD_PLUGIN([unzip])
+  VLC_ADD_PLUGIN([zip])
+fi
+
 
 dnl Check for hal
 AC_ARG_ENABLE(hal,
@@ -2977,10 +3001,10 @@ AC_ARG_ENABLE( id3tag,
 [  --disable-id3tag        id3tag metadata reader plugin (default disabled)])
 AS_IF([test "${enable_id3tag}" = "yes"], [
   AC_CHECK_HEADERS(id3tag.h, [
-    AC_CHECK_HEADERS(zlib.h, [
+    if test "${have_zlib}" = "yes"
       VLC_ADD_LIBS([id3tag],[-lid3tag -lz])
       VLC_ADD_PLUGIN([id3tag])
-    ])
+    fi
   ])
 ])
 
@@ -3256,15 +3280,6 @@ AC_ARG_ENABLE(realrtsp,
 if test "${enable_realrtsp}" = "yes"; then
   VLC_ADD_PLUGIN([access_realrtsp])
 fi
-
-dnl
-dnl MP4 module
-dnl
-AC_CHECK_HEADERS(zlib.h, [
-  VLC_ADD_LIBS([mp4 skins2 sap mkv gme],[-lz])
-  VLC_ADD_CPPFLAGS([skins2],[-I../../../@top_srcdir@/libs/unzip])
-  VLC_ADD_LIBS([skins2],[../../../libs/unzip/libunzip.la])
-] )
 
 AC_ARG_ENABLE(libsysfs,
   [  --enable-libsysfs       Get user key from firewire connected iPod via libsysfs (default enabled)])
@@ -5408,21 +5423,6 @@ then
   VLC_ADD_LIBS([libvlc], [${LIBGCRYPT_LIBS}])
   VLC_ADD_CFLAGS([libvlc], [${LIBGCRYPT_CFLAGS}])
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
-fi
-
-
-dnl
-dnl ZIP files demuxer
-dnl
-AC_CHECK_HEADERS(zlib.h, [ have_zlib=yes ], [ have_zlib=no ])
-AM_CONDITIONAL(HAVE_ZLIB, [ test "${have_zlib}" = "yes" ])
-if test "${have_zlib}" = "yes"
-then
-  VLC_ADD_PLUGIN([unzip])
-  VLC_ADD_LIBS([zip],[-lz])
-  VLC_ADD_PLUGIN([zip])
-  VLC_ADD_CFLAGS([zip],[-I../../../@top_srcdir@/libs/unzip])
-  VLC_ADD_LIBS([zip],[../../../libs/unzip/libunzip.la])
 fi
 
 
