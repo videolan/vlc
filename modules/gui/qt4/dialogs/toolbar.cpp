@@ -55,14 +55,16 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
                               QSizePolicy::MinimumExpanding );
     QGridLayout *boxLayout = new QGridLayout( widgetBox );
 
+    QLabel *styleLabel = new QLabel( qtr( "Next widget style:" ) );
     flatBox = new QCheckBox( qtr( "Flat Button" ) );
     bigBox = new QCheckBox( qtr( "Big Button" ) );
     shinyBox = new QCheckBox( qtr( "Native Slider" ) );
 
     boxLayout->addWidget( new WidgetListing( p_intf, this ), 0, 0, 1, -1);
-    boxLayout->addWidget( flatBox, 1, 0 );
-    boxLayout->addWidget( bigBox, 1, 1 );
-    boxLayout->addWidget( shinyBox, 1, 2 );
+    boxLayout->addWidget( styleLabel, 1, 0 );
+    boxLayout->addWidget( flatBox, 1, 1 );
+    boxLayout->addWidget( bigBox, 1, 2 );
+    boxLayout->addWidget( shinyBox, 1, 3 );
     mainLayout->addWidget( widgetBox, 0, 0, 1, -1 );
 
 
