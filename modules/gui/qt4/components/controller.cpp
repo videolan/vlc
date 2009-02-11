@@ -190,7 +190,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     switch( button )
     {
     case PLAY_BUTTON: {
-        PlayButton *playButton = new PlayButton( this );
+        PlayButton *playButton = new PlayButton;
         setupButton( playButton );
         BUTTON_SET_BAR(  playButton );
         CONNECT_MAP_SET( playButton, PLAY_ACTION );
@@ -200,7 +200,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case STOP_BUTTON:{
-        QToolButton *stopButton = new QToolButton( this );
+        QToolButton *stopButton = new QToolButton;
         setupButton( stopButton );
         CONNECT_MAP_SET( stopButton, STOP_ACTION );
         BUTTON_SET_BAR(  stopButton );
@@ -208,7 +208,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case OPEN_BUTTON:{
-        QToolButton *openButton = new QToolButton( this );
+        QToolButton *openButton = new QToolButton;
         setupButton( openButton );
         CONNECT_MAP_SET( openButton, OPEN_ACTION );
         BUTTON_SET_BAR( openButton );
@@ -216,7 +216,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case PREVIOUS_BUTTON:{
-        QToolButton *prevButton = new QToolButton( this );
+        QToolButton *prevButton = new QToolButton;
         setupButton( prevButton );
         CONNECT_MAP_SET( prevButton, PREVIOUS_ACTION );
         BUTTON_SET_BAR( prevButton );
@@ -225,7 +225,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case NEXT_BUTTON:
         {
-        QToolButton *nextButton = new QToolButton( this );
+        QToolButton *nextButton = new QToolButton;
         setupButton( nextButton );
         CONNECT_MAP_SET( nextButton, NEXT_ACTION );
         BUTTON_SET_BAR( nextButton );
@@ -233,7 +233,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case SLOWER_BUTTON:{
-        QToolButton *slowerButton = new QToolButton( this );
+        QToolButton *slowerButton = new QToolButton;
         setupButton( slowerButton );
         CONNECT_MAP_SET( slowerButton, SLOWER_ACTION );
         BUTTON_SET_BAR(  slowerButton );
@@ -242,7 +242,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case FASTER_BUTTON:{
-        QToolButton *fasterButton = new QToolButton( this );
+        QToolButton *fasterButton = new QToolButton;
         setupButton( fasterButton );
         CONNECT_MAP_SET( fasterButton, FASTER_ACTION );
         BUTTON_SET_BAR(  fasterButton );
@@ -251,7 +251,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case FRAME_BUTTON: {
-        QToolButton *frameButton = new QToolButton( this );
+        QToolButton *frameButton = new QToolButton;
         setupButton( frameButton );
         CONNECT_MAP_SET( frameButton, FRAME_ACTION );
         BUTTON_SET_BAR(  frameButton );
@@ -260,7 +260,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case FULLSCREEN_BUTTON:{
-        QToolButton *fullscreenButton = new QToolButton( this );
+        QToolButton *fullscreenButton = new QToolButton;
         setupButton( fullscreenButton );
         CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
         BUTTON_SET_BAR( fullscreenButton );
@@ -269,7 +269,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case DEFULLSCREEN_BUTTON:{
-        QToolButton *fullscreenButton = new QToolButton( this );
+        QToolButton *fullscreenButton = new QToolButton;
         setupButton( fullscreenButton );
         CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
         BUTTON_SET_BAR( fullscreenButton )
@@ -278,7 +278,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case EXTENDED_BUTTON:{
-        QToolButton *extSettingsButton = new QToolButton( this );
+        QToolButton *extSettingsButton = new QToolButton;
         setupButton( extSettingsButton );
         CONNECT_MAP_SET( extSettingsButton, EXTENDED_ACTION );
         BUTTON_SET_BAR( extSettingsButton )
@@ -286,7 +286,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case PLAYLIST_BUTTON:{
-        QToolButton *playlistButton = new QToolButton( this );
+        QToolButton *playlistButton = new QToolButton;
         setupButton( playlistButton );
         CONNECT_MAP_SET( playlistButton, PLAYLIST_ACTION );
         BUTTON_SET_BAR( playlistButton );
@@ -294,7 +294,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case SNAPSHOT_BUTTON:{
-        QToolButton *snapshotButton = new QToolButton( this );
+        QToolButton *snapshotButton = new QToolButton;
         setupButton( snapshotButton );
         CONNECT_MAP_SET( snapshotButton, SNAPSHOT_ACTION );
         BUTTON_SET_BAR(  snapshotButton );
@@ -303,7 +303,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case RECORD_BUTTON:{
-        QToolButton *recordButton = new QToolButton( this );
+        QToolButton *recordButton = new QToolButton;
         setupButton( recordButton );
         CONNECT_MAP_SET( recordButton, RECORD_ACTION );
         BUTTON_SET_BAR(  recordButton );
@@ -315,7 +315,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case ATOB_BUTTON: {
-        AtoB_Button *ABButton = new AtoB_Button( this );
+        AtoB_Button *ABButton = new AtoB_Button;
         setupButton( ABButton );
         BUTTON_SET_BAR( ABButton );
         ENABLE_ON_INPUT( ABButton );
@@ -361,7 +361,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case SPLITTER:
         {
-            QFrame *line = new QFrame( this );
+            QFrame *line = new QFrame;
             line->setFrameShape( QFrame::VLine );
             line->setFrameShadow( QFrame::Raised );
             line->setLineWidth( 0 );
@@ -376,7 +376,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case REVERSE_BUTTON:{
-        QToolButton *reverseButton = new QToolButton( this );
+        QToolButton *reverseButton = new QToolButton;
         setupButton( reverseButton );
         CONNECT_MAP_SET( reverseButton, REVERSE_ACTION );
         BUTTON_SET_BAR(  reverseButton );
@@ -385,7 +385,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case SKIP_BACK_BUTTON: {
-        QToolButton *skipBakButton = new QToolButton( this );
+        QToolButton *skipBakButton = new QToolButton;
         setupButton( skipBakButton );
         CONNECT_MAP_SET( skipBakButton, SKIP_BACK_ACTION );
         BUTTON_SET_BAR(  skipBakButton );
@@ -394,7 +394,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case SKIP_FW_BUTTON: {
-        QToolButton *skipFwButton = new QToolButton( this );
+        QToolButton *skipFwButton = new QToolButton;
         setupButton( skipFwButton );
         CONNECT_MAP_SET( skipFwButton, SKIP_FW_ACTION );
         BUTTON_SET_BAR(  skipFwButton );
@@ -403,7 +403,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case QUIT_BUTTON: {
-        QToolButton *quitButton = new QToolButton( this );
+        QToolButton *quitButton = new QToolButton;
         setupButton( quitButton );
         CONNECT_MAP_SET( quitButton, QUIT_ACTION );
         BUTTON_SET_BAR(  quitButton );
@@ -623,8 +623,8 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
 /**********************************************************************
  * Fullscrenn control widget
  **********************************************************************/
-FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWidget *parent )
-                           : AbstractController( _p_i, parent )
+FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
+                           : AbstractController( _p_i )
 {
     i_mouse_last_x      = -1;
     i_mouse_last_y      = -1;
