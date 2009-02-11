@@ -1108,7 +1108,7 @@ endif
 
 FFMPEGCONF += --enable-gpl --enable-postproc --disable-vhook --disable-ffserver --disable-ffmpeg --disable-ffplay --disable-devices --disable-protocols --disable-network --enable-swscale
 ifdef HAVE_WIN32
-FFMPEGCONF += --disable-bzlib
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca
 endif
 
 ifdef HAVE_WINCE
