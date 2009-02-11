@@ -160,10 +160,9 @@ public:
     virtual ~SpeedLabel();
 
 protected:
-    virtual void mouseDoubleClickEvent ( QMouseEvent * event )
+    virtual void mousePressEvent ( QMouseEvent * event )
     {
-        event->accept();
-        THEMIM->getIM()->setRate( INPUT_RATE_DEFAULT );
+        showSpeedMenu( event->pos() );
     }
 private slots:
     void showSpeedMenu( QPoint );

@@ -284,8 +284,7 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
                         QWidget *parent )
            : QLabel( text, parent ), p_intf( _p_intf )
 {
-    setToolTip( qtr( "Current playback speed.\nRight click to adjust" ) );
-    setContextMenuPolicy ( Qt::CustomContextMenu );
+    setToolTip( qtr( "Current playback speed.\nClick to adjust" ) );
 
     /* Create the Speed Control Widget */
     speedControl = new SpeedControlWidget( p_intf, this );
@@ -295,16 +294,12 @@ SpeedLabel::SpeedLabel( intf_thread_t *_p_intf, const QString& text,
     widgetAction->setDefaultWidget( speedControl );
     speedControlMenu->addAction( widgetAction );
 
-    /* Speed Label behaviour:
-       - right click gives the vertical speed slider */
-    CONNECT( this, customContextMenuRequested( QPoint ),
-             this, showSpeedMenu( QPoint ) );
-
     /* Change the SpeedRate in the Status Bar */
     CONNECT( THEMIM->getIM(), rateChanged( int ), this, setRate( int ) );
 
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
              speedControl, activateOnState() );
+
 }
 SpeedLabel::~SpeedLabel()
 {
