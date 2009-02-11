@@ -501,7 +501,7 @@ void TimeLabel::setCaching( float f_cache )
     QString amount;
     amount.setNum( (int)(100 * f_cache) );
     msg_Dbg( p_intf, "New caching: %d", (int)(100*f_cache));
-    setText( "Buffering " + amount + "%" );
+    setText( "Buff: " + amount + "%" );
 }
 
 
