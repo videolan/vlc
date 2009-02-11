@@ -916,7 +916,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                               PROT_READ | PROT_WRITE, MAP_SHARED,
                               p_sys->i_fd, 0 );
 
-    if( p_sys->p_video == ((void*)-1) )
+    if( p_sys->p_video == MAP_FAILED )
     {
         msg_Err( p_vout, "cannot map video memory (%m)" );
 
