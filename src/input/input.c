@@ -1142,7 +1142,7 @@ static int Init( input_thread_t * p_input )
 #ifdef ENABLE_SOUT
     ret = InitSout( p_input );
     if( ret != VLC_SUCCESS )
-        return ret; /* FIXME: goto error; should be better here */
+        goto error_stats;
 #endif
 
     /* Create es out */
@@ -1240,6 +1240,9 @@ error:
         input_ressource_SetInput( p_input->p->p_ressource, NULL );
     }
 
+#ifdef ENABLE_SOUT
+error_stats:
+#endif
     if( !p_input->b_preparsing && libvlc_stats( p_input ) )
     {
 #define EXIT_COUNTER( c ) do { if( p_input->p->counters.p_##c ) \
