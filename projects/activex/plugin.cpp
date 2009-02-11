@@ -726,10 +726,16 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
         libvlc_video_set_parent(p_libvlc,
             reinterpret_cast<libvlc_drawable_t>(_inplacewnd), NULL);
 
-        if( _b_autoplay & (libvlc_playlist_items_count(p_libvlc, NULL) > 0) )
+        if( _b_autoplay )
         {
-            libvlc_playlist_play(p_libvlc, 0, 0, NULL, NULL);
-            fireOnPlayEvent();
+            libvlc_playlist_lock(p_libvlc);
+            unsigned count = libvlc_playlist_items_count(p_libvlc, &ex);
+            if( count > 0 )
+            {
+              libvlc_playlist_play(p_libvlc, 0, 0, NULL, NULL);
+              fireOnPlayEvent();
+            }
+            libvlc_playlist_unlock(p_libvlc);
         }
     }
 

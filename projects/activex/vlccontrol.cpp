@@ -939,7 +939,9 @@ STDMETHODIMP VLCControl::get_PlaylistCount(int *count)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
+        libvlc_playlist_lock(p_libvlc);
         *count = libvlc_playlist_items_count(p_libvlc, &ex);
+        libvlc_playlist_unlock(p_libvlc);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCControl,

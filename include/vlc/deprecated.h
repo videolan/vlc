@@ -173,6 +173,8 @@ VLC_DEPRECATED_API int libvlc_playlist_isplaying( libvlc_instance_t *,
 /**
  * Get the number of items in the playlist
  *
+ * Expects the playlist instance to be locked already.
+ *
  * \param p_instance the playlist instance
  * \param p_e an initialized exception pointer
  * \return the number of items
