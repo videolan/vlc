@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>472</width>
-    <height>290</height>
+    <width>533</width>
+    <height>275</height>
    </rect>
   </property>
   <property name="currentIndex" >
@@ -224,106 +224,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="tab_2" >
-   <attribute name="title" >
-    <string>_("Color fun")</string>
-   </attribute>
-   <layout class="QGridLayout" >
-    <item row="1" column="1" >
-     <widget class="QGroupBox" name="extractEnable" >
-      <property name="title" >
-       <string>_("Color extraction")</string>
-      </property>
-      <property name="checkable" >
-       <bool>true</bool>
-      </property>
-      <property name="checked" >
-       <bool>false</bool>
-      </property>
-      <layout class="QGridLayout" >
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_6" >
-         <property name="text" >
-          <string>_("Color")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QLineEdit" name="extractComponentText" >
-         <property name="inputMask" >
-          <string>>HHHHHH;#</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="0" column="1" >
-     <widget class="QCheckBox" name="invertEnable" >
-      <property name="text" >
-       <string>_("Invert colors")</string>
-      </property>
-     </widget>
-    </item>
-    <item rowspan="2" row="0" column="0" >
-     <widget class="QGroupBox" name="colorthresEnable" >
-      <property name="title" >
-       <string>_("Color threshold")</string>
-      </property>
-      <property name="checkable" >
-       <bool>true</bool>
-      </property>
-      <property name="checked" >
-       <bool>false</bool>
-      </property>
-      <layout class="QGridLayout" >
-       <item row="2" column="0" >
-        <widget class="QLabel" name="label_14" >
-         <property name="text" >
-          <string>_("Similarity")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1" >
-        <widget class="QSlider" name="colorthresSimilaritythresSlider" >
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1" >
-        <widget class="QSlider" name="colorthresSaturationthresSlider" >
-         <property name="orientation" >
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0" >
-        <widget class="QLabel" name="label_13" >
-         <property name="text" >
-          <string>_("Saturation")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" >
-        <widget class="QLabel" name="label_8" >
-         <property name="text" >
-          <string>_("Color")</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1" >
-        <widget class="QLineEdit" name="colorthresColorText" >
-         <property name="inputMask" >
-          <string>>HHHHHH;#</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="tab_3" >
    <attribute name="title" >
     <string>_("Crop")</string>
@@ -419,7 +319,7 @@
       <property name="sizeType" >
        <enum>QSizePolicy::Expanding</enum>
       </property>
-      <property name="sizeHint" >
+      <property name="sizeHint" stdset="0" >
        <size>
         <width>20</width>
         <height>40</height>
@@ -437,7 +337,7 @@
     <item row="0" column="0" >
      <widget class="QCheckBox" name="magnifyEnable" >
       <property name="text" >
-       <string>_("Magnification")</string>
+       <string>_("Magnification/Zoom")</string>
       </property>
      </widget>
     </item>
@@ -532,6 +432,106 @@
         <widget class="QLabel" name="label_28" >
          <property name="text" >
           <string>_("Angle")</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="tab_2" >
+   <attribute name="title" >
+    <string>_("Color fun")</string>
+   </attribute>
+   <layout class="QGridLayout" >
+    <item row="1" column="1" >
+     <widget class="QGroupBox" name="extractEnable" >
+      <property name="title" >
+       <string>_("Color extraction")</string>
+      </property>
+      <property name="checkable" >
+       <bool>true</bool>
+      </property>
+      <property name="checked" >
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" >
+       <item row="0" column="0" >
+        <widget class="QLabel" name="label_6" >
+         <property name="text" >
+          <string>_("Color")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QLineEdit" name="extractComponentText" >
+         <property name="inputMask" >
+          <string>>HHHHHH;#</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1" >
+     <widget class="QCheckBox" name="invertEnable" >
+      <property name="text" >
+       <string>_("Invert colors")</string>
+      </property>
+     </widget>
+    </item>
+    <item rowspan="2" row="0" column="0" >
+     <widget class="QGroupBox" name="colorthresEnable" >
+      <property name="title" >
+       <string>_("Color threshold")</string>
+      </property>
+      <property name="checkable" >
+       <bool>true</bool>
+      </property>
+      <property name="checked" >
+       <bool>false</bool>
+      </property>
+      <layout class="QGridLayout" >
+       <item row="2" column="0" >
+        <widget class="QLabel" name="label_14" >
+         <property name="text" >
+          <string>_("Similarity")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1" >
+        <widget class="QSlider" name="colorthresSimilaritythresSlider" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" >
+        <widget class="QSlider" name="colorthresSaturationthresSlider" >
+         <property name="orientation" >
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" >
+        <widget class="QLabel" name="label_13" >
+         <property name="text" >
+          <string>_("Saturation")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" >
+        <widget class="QLabel" name="label_8" >
+         <property name="text" >
+          <string>_("Color")</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" >
+        <widget class="QLineEdit" name="colorthresColorText" >
+         <property name="inputMask" >
+          <string>>HHHHHH;#</string>
          </property>
         </widget>
        </item>
