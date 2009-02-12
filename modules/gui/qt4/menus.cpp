@@ -198,16 +198,16 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     PUSH_INPUTVAR( "video-es" );
     PUSH_INPUTVAR( "spu-es" );
     PUSH_VAR( "fullscreen" );
-    PUSH_VAR( "zoom" );
-    PUSH_VAR( "scaling" );
-    PUSH_VAR( "deinterlace" );
-    PUSH_VAR( "aspect-ratio" );
-    PUSH_VAR( "crop" );
     PUSH_VAR( "video-on-top" );
 #ifdef WIN32
     PUSH_VAR( "directx-wallpaper" );
 #endif
     PUSH_VAR( "video-snapshot" );
+    PUSH_VAR( "zoom" );
+    PUSH_VAR( "scale" );
+    PUSH_VAR( "aspect-ratio" );
+    PUSH_VAR( "crop" );
+    PUSH_VAR( "deinterlace" );
 
     /* Special case for postproc */
     // FIXME
@@ -241,10 +241,10 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
         vector<vlc_object_t *> &objects,
         vector<const char *> &varnames )
 {
-    PUSH_VAR( "visual" );
     PUSH_INPUTVAR( "audio-es" );
-    PUSH_VAR( "audio-device" );
     PUSH_VAR( "audio-channels" );
+    PUSH_VAR( "audio-device" );
+    PUSH_VAR( "visual" );
     return VLC_SUCCESS;
 }
 
@@ -291,9 +291,9 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     QMenuBar *bar = mi->menuBar();
     BAR_ADD( FileMenu( p_intf, bar ), qtr( "&Media" ) );
 
+    BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
     BAR_DADD( AudioMenu( p_intf, bar ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
-    BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
 
     BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
     BAR_ADD( ViewMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
@@ -330,7 +330,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     addDPStaticEntry( menu, qtr( "Paste &MRL" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
-    recentsMenu = new QMenu( qtr( "Recently &Played" ), menu );
+    recentsMenu = new QMenu( qtr( "&Recent Media" ), menu );
     updateRecents( p_intf );
     menu->addMenu( recentsMenu );
     menu->addSeparator();
@@ -496,22 +496,24 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     if( current->isEmpty() )
     {
         ACT_ADD( current, "audio-es", qtr( "Audio &Track" ) );
-        ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
         ACT_ADD( current, "audio-channels", qtr( "Audio &Channels" ) );
+        ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
+        current->addSeparator();
+        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
 
         current->addSeparator();
         ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
 
         current->addSeparator();
 
-        QAction *action = current->addAction( qtr( "Mute Audio" ),
-                ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
-        action->setData( true );
-        action = current->addAction( qtr( "Increase Volume" ),
+        QAction *action = current->addAction( qtr( "Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
         action->setData( true );
         action = current->addAction( qtr( "Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
+        action->setData( true );
+        action = current->addAction( qtr( "Mute" ),
+                ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
         action->setData( true );
     }
 
@@ -558,18 +560,22 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         addDPStaticEntry( submenu, qtr( "Open File..." ), "",
                           SLOT( loadSubtitlesFile() ) );
         submenu->addSeparator();
+        current->addSeparator();
 
         ACT_ADD( current, "fullscreen", qtr( "&Fullscreen" ) );
-        ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
-        ACT_ADD( current, "deinterlace", qtr( "&Deinterlace" ) );
-        ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
-        ACT_ADD( current, "crop", qtr( "&Crop" ) );
         ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
 #ifdef WIN32
         ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
 #endif
         ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
-        ACT_ADD( current, "postproc-q", qtr( "Post processing" ) );
+        current->addSeparator();
+
+        ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
+        ACT_ADD( current, "scale", qtr( "Sca&le" ) );
+        ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
+        ACT_ADD( current, "crop", qtr( "&Crop" ) );
+        ACT_ADD( current, "deinterlace", qtr( "&Deinterlace" ) );
+        ACT_ADD( current, "postproc-q", qtr( "&Post processing" ) );
     }
 
     p_input = THEMIM->getInput();
