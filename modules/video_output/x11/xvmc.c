@@ -545,7 +545,7 @@ XvMCSubpicture *xxmc_xvmc_alloc_subpicture( vout_thread_t *p_vout,
                 return NULL;
             }
             XVMCUNLOCKDISPLAY( p_vout->p_sys->p_display );
-            msg_Dbg( p_vout, "video_out_xxmc: created subpicture %d\n", i );
+            msg_Dbg( p_vout, "video_out_xxmc: created subpicture %d", i );
             handler->subInUse[i] = 1;
             handler->subValid[i] = 1;
             pthread_mutex_unlock( &handler->mutex );

@@ -800,7 +800,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
         p_sys->p_dirac = dirac_encoder_init( &p_sys->ctx, 0 );
         if( !p_sys->p_dirac )
         {
-            msg_Err( p_enc, "Failed to initialize dirac encoder\n" );
+            msg_Err( p_enc, "Failed to initialize dirac encoder" );
             p_enc->b_error = 1;
             return NULL;
         }

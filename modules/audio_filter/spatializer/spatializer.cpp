@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
     bool         b_fit = true;
-    msg_Dbg(p_this, "Opening filter spatializer %s %s %d\n", __FILE__,__func__,__LINE__);
+    msg_Dbg(p_this, "Opening filter spatializer %s %s %d", __FILE__,__func__,__LINE__);
 
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
         p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
@@ -185,7 +185,7 @@ static void Close( vlc_object_t *p_this )
     delete p_sys->p_reverbm;
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
-    msg_Dbg(p_this, "Closing filter spatializer %s %s %d\n", __FILE__,__func__,__LINE__);
+    msg_Dbg(p_this, "Closing filter spatializer %s %s %d", __FILE__,__func__,__LINE__);
 }
 
 /*****************************************************************************
@@ -280,7 +280,7 @@ static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setroomsize(newval.f_float);
-    msg_Dbg (p_this,"room callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
+    msg_Dbg (p_this,"room callback %3.1f %s %s %d", newval.f_float, __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 
@@ -291,7 +291,7 @@ static int WidthCallback( vlc_object_t *p_this, char const *psz_cmd,
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setwidth(newval.f_float);
-    msg_Dbg (p_this,"width callback %3.1f %s %s %d\n", newval.f_float,  __FILE__,__func__,__LINE__);
+    msg_Dbg (p_this,"width callback %3.1f %s %s %d", newval.f_float,  __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 static int WetCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -301,7 +301,7 @@ static int WetCallback( vlc_object_t *p_this, char const *psz_cmd,
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setwet(newval.f_float);
-    msg_Dbg (p_this,"wet callback %3.1f %s %s %d\n", newval.f_float,  __FILE__,__func__,__LINE__);
+    msg_Dbg (p_this,"wet callback %3.1f %s %s %d", newval.f_float,  __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 static int DryCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -311,7 +311,7 @@ static int DryCallback( vlc_object_t *p_this, char const *psz_cmd,
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setdry(newval.f_float);
-    msg_Dbg (p_this,"dry callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
+    msg_Dbg (p_this,"dry callback %3.1f %s %s %d", newval.f_float, __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -321,7 +321,7 @@ static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setdamp(newval.f_float);
-    msg_Dbg (p_this, "damp callback %3.1f %s %s %d\n", newval.f_float, __FILE__,__func__,__LINE__);
+    msg_Dbg (p_this, "damp callback %3.1f %s %s %d", newval.f_float, __FILE__,__func__,__LINE__);
     return VLC_SUCCESS;
 }
 

@@ -511,7 +511,7 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
 
         if( buffer[1] != 0x00 )
         {
-            msg_Err( p_obj, "socks: CONNECT request failed\n" );
+            msg_Err( p_obj, "socks: CONNECT request failed" );
             return VLC_EGENERIC;
         }
 

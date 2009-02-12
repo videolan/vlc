@@ -728,7 +728,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
         if( sc.retsts || sc.error )
         {
-            msg_Err( p_this, "SCSI command failed: status %d error %d\n",
+            msg_Err( p_this, "SCSI command failed: status %d error %d",
                              sc.retsts, sc.error );
             if( i_type == VCD_TYPE ) free( p_block );
            return -1;

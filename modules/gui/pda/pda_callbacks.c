@@ -490,7 +490,7 @@ void onFileListRow(GtkTreeView *treeview, GtkTreePath *path,
         p_model = gtk_tree_view_get_model(treeview);
         if (!p_model)
         {
-            msg_Err(p_intf, "PDA: Filelist model contains a NULL pointer\n" );
+            msg_Err(p_intf, "PDA: Filelist model contains a NULL pointer" );
             return;
         }
         if (!gtk_tree_model_get_iter(p_model, &iter, path))
@@ -785,7 +785,7 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
         p_model = gtk_tree_view_get_model(treeview);
         if (!p_model)
         {
-            msg_Err(p_intf, "PDA: Playlist model contains a NULL pointer\n" );
+            msg_Err(p_intf, "PDA: Playlist model contains a NULL pointer" );
             return;
         }
         if (!gtk_tree_model_get_iter(p_model, &iter, path))

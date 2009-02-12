@@ -182,13 +182,13 @@ static int BuildChromaChain( filter_t *p_filter )
 
     if( var_Create( p_filter, MODULE_STRING"-level", VLC_VAR_INTEGER | (b_first ? VLC_VAR_DOINHERIT : 0 ) ) )
     {
-        msg_Err( p_filter, "Failed to create %s variable\n", psz_option );
+        msg_Err( p_filter, "Failed to create %s variable", psz_option );
         return VLC_EGENERIC;
     }
     int i_level = var_GetInteger( p_filter, psz_option );
     if( i_level >= CHAIN_LEVEL_MAX )
     {
-        msg_Err( p_filter, "Too high level of recursion (%d)\n", i_level );
+        msg_Err( p_filter, "Too high level of recursion (%d)", i_level );
         return VLC_EGENERIC;
     }
     var_SetInteger( p_filter, psz_option, i_level + 1 );

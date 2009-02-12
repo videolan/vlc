@@ -1332,7 +1332,7 @@ static void* RunThread( void *p_this )
 
             p_vout->b_error = InitThread( p_vout );
             if( p_vout->b_error )
-                msg_Err( p_vout, "InitThread after VOUT_PICTURE_BUFFERS_CHANGE failed\n" );
+                msg_Err( p_vout, "InitThread after VOUT_PICTURE_BUFFERS_CHANGE failed" );
 
             vlc_cond_signal( &p_vout->p->picture_wait );
             vlc_mutex_unlock( &p_vout->picture_lock );

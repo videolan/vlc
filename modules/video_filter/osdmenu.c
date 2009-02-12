@@ -707,7 +707,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
             osd_ButtonSelect( p_this, p_button );
             p_sys->b_update = p_sys->b_visible ? true : false;
             p_sys->b_clicked = true;
-            msg_Dbg( p_this, "mouse clicked %s (%d,%d)\n", p_button->psz_name, i_x, i_y );
+            msg_Dbg( p_this, "mouse clicked %s (%d,%d)", p_button->psz_name, i_x, i_y );
         }
     }
     return VLC_SUCCESS;

@@ -709,13 +709,13 @@ static void GetVideoSize( decoder_t *p_dec, int *w, int *h )
     {
         *w = p_sys->ki.original_canvas_width;
         *h = p_sys->ki.original_canvas_height;
-        msg_Dbg( p_dec, "original canvas %zu %zu\n",
+        msg_Dbg( p_dec, "original canvas %zu %zu",
 	         p_sys->ki.original_canvas_width, p_sys->ki.original_canvas_height );
     }
     else
     {
         /* nothing, leave defaults */
-        msg_Dbg( p_dec, "original canvas size unknown\n");
+        msg_Dbg( p_dec, "original canvas size unknown");
     }
 #else
     /* keep this just in case it might be allowed one day ;) */
@@ -734,7 +734,7 @@ static void GetVideoSize( decoder_t *p_dec, int *w, int *h )
             *w = p_vout->fmt_in.i_width;
             *h = p_vout->fmt_in.i_height;
         }
-        msg_Dbg( p_dec, "video: in %d %d, out %d %d, original canvas %zu %zu\n",
+        msg_Dbg( p_dec, "video: in %d %d, out %d %d, original canvas %zu %zu",
                  p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
                  p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
                  p_sys->ki.original_canvas_width, p_sys->ki.original_canvas_height );
@@ -1110,7 +1110,7 @@ static int OnConfigurationChanged( decoder_t *p_dec, const char *psz_var,
 
     vlc_mutex_lock( &p_sys->lock );
 
-    msg_Dbg( p_dec, "OnConfigurationChanged: %s\n", psz_var );
+    msg_Dbg( p_dec, "OnConfigurationChanged: %s", psz_var );
 
     if( !p_sys->b_use_tiger || !p_sys->p_tr )
     {
@@ -1366,7 +1366,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
         /* create the bitmap */
         CreateKateBitmap( p_bitmap_region->p_picture, ev->bitmap );
 
-        msg_Dbg(p_dec, "Created bitmap, %zux%zu, %zu colors\n", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
+        msg_Dbg(p_dec, "Created bitmap, %zux%zu, %zu colors", ev->bitmap->width, ev->bitmap->height, ev->palette->ncolors);
     }
 
     /* text region */

@@ -746,17 +746,17 @@ static int OpenVideo( decoder_t *p_dec )
 
     memset( &icap, 0, sizeof( ImageSubCodecDecompressCapabilities ) );
     cres =  p_sys->ImageCodecInitialize( p_sys->ci, &icap );
-    msg_Dbg( p_dec, "ImageCodecInitialize->0x%X size=%d (%d)\n",
+    msg_Dbg( p_dec, "ImageCodecInitialize->0x%X size=%d (%d)",
              (int)cres, (int)icap.recordSize, (int)icap.decompressRecordSize);
 
     memset( &cinfo, 0, sizeof( CodecInfo ) );
     cres =  p_sys->ImageCodecGetCodecInfo( p_sys->ci, &cinfo );
     msg_Dbg( p_dec,
-             "Flags: compr: 0x%x decomp: 0x%x format: 0x%x\n",
+             "Flags: compr: 0x%x decomp: 0x%x format: 0x%x",
              (unsigned int)cinfo.compressFlags,
              (unsigned int)cinfo.decompressFlags,
              (unsigned int)cinfo.formatFlags );
-    msg_Dbg( p_dec, "quicktime_video: Codec name: %.*s\n",
+    msg_Dbg( p_dec, "quicktime_video: Codec name: %.*s",
              ((unsigned char*)&cinfo.typeName)[0],
              ((unsigned char*)&cinfo.typeName)+1 );
 
@@ -822,7 +822,7 @@ static int OpenVideo( decoder_t *p_dec )
                                           p_sys->plane,
                                           p_dec->fmt_in.video.i_width * 2 );
 
-    msg_Dbg( p_dec, "NewGWorldFromPtr returned:%ld\n",
+    msg_Dbg( p_dec, "NewGWorldFromPtr returned:%ld",
              65536 - ( i_result&0xffff ) );
 
     memset( &p_sys->decpar, 0, sizeof( CodecDecompressParams ) );
@@ -840,7 +840,7 @@ static int OpenVideo( decoder_t *p_dec )
     p_sys->decpar.dstPixMap        = **p_sys->GetGWorldPixMap( p_sys->OutBufferGWorld );/*destPixmap;  */
 
     cres =  p_sys->ImageCodecPreDecompress( p_sys->ci, &p_sys->decpar );
-    msg_Dbg( p_dec, "quicktime_video: ImageCodecPreDecompress cres=0x%X\n",
+    msg_Dbg( p_dec, "quicktime_video: ImageCodecPreDecompress cres=0x%X",
              (int)cres );
 
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC( 'Y', 'U', 'Y', '2' ));
@@ -937,7 +937,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( cres &0xFFFF )
         {
             msg_Dbg( p_dec, "quicktime_video: ImageCodecBandDecompress"
-                     " cres=0x%X (-0x%X) %d :(\n",
+                     " cres=0x%X (-0x%X) %d :(",
                      (int)cres,(int)-cres, (int)cres );
         }
 

@@ -195,7 +195,7 @@ DBUS_METHOD( PositionSet )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -243,7 +243,7 @@ DBUS_METHOD( VolumeSet )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -392,7 +392,7 @@ DBUS_METHOD( AddTrack )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -443,7 +443,7 @@ DBUS_METHOD( GetMetadata )
     {
         PL_UNLOCK;
         pl_Release( (vlc_object_t*) p_this );
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -488,7 +488,7 @@ DBUS_METHOD( DelTrack )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -525,7 +525,7 @@ DBUS_METHOD( SetLoop )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -556,7 +556,7 @@ DBUS_METHOD( Repeat )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -588,7 +588,7 @@ DBUS_METHOD( SetRandom )
 
     if( dbus_error_is_set( &error ) )
     {
-        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s\n",
+        msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;

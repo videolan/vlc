@@ -434,7 +434,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     /* Create user specified video filters */
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
-    msg_Dbg( p_stream, "psz_chain: %s\n", psz_chain );
+    msg_Dbg( p_stream, "psz_chain: %s", psz_chain );
     if( psz_chain )
     {
         p_sys->p_vf2 = filter_chain_New( p_stream, "video filter2", false,

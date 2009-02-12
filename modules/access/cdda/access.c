@@ -302,14 +302,14 @@ static block_t * CDDAReadBlocks( access_t * p_access )
                 char *psz_mes = cdio_cddap_messages( p_cdda->paranoia_cd );
 
                 if( psz_mes || psz_err )
-                    msg_Err( p_access, "%s%s\n", psz_mes ? psz_mes: "",
+                    msg_Err( p_access, "%s%s", psz_mes ? psz_mes: "",
                              psz_err ? psz_err: "" );
 
                 free( psz_err );
                 free( psz_mes );
                 if( !p_readbuf )
                 {
-                    msg_Err( p_access, "paranoia read error on frame %i\n",
+                    msg_Err( p_access, "paranoia read error on frame %i",
                     p_cdda->i_lsn+i );
                 }
                 else

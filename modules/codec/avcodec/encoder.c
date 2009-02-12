@@ -245,7 +245,7 @@ int OpenEncoder( vlc_object_t *p_this )
         msg_Err( p_enc, "cannot find encoder %s\n"
 "*** Your FFMPEG installation is crippled.   ***\n"
 "*** Please check with your FFMPEG packager. ***\n"
-"*** This is NOT a VLC media player issue.   ***\n", psz_namecodec );
+"*** This is NOT a VLC media player issue.   ***", psz_namecodec );
 
         intf_UserFatal( p_enc, false, _("Streaming / Transcoding failed"), _(
 /* I have had enough of all these MPEG-3 transcoding bug reports.

@@ -483,7 +483,7 @@ static int Raw1394GetNumPorts( access_t *p_access )
 
     if ( ( n_ports = raw1394_get_port_info( handle, pinf, 16 ) ) < 0 )
     {
-        msg_Err( p_access, "raw1394 - failed to get port info: %m.\n" );
+        msg_Err( p_access, "raw1394 - failed to get port info: %m." );
         raw1394_destroy_handle( handle );
         return VLC_EGENERIC;
     }
@@ -573,7 +573,7 @@ static int DiscoverAVC( access_t *p_access, int* port, uint64_t guid )
                 /* select first AV/C Tape Reccorder Player node */
                 if( rom1394_get_directory( handle, i, &rom_dir ) < 0 )
                 {
-                    msg_Err( p_access, "error reading config rom directory for node %d\n", i );
+                    msg_Err( p_access, "error reading config rom directory for node %d", i );
                     continue;
                 }
                 if( ( rom1394_get_node_type( &rom_dir ) == ROM1394_NODE_TYPE_AVC ) &&

@@ -415,14 +415,14 @@ static void svg_RenderPicture( filter_t *p_filter,
                  ( guchar* )p_svg->psz_text, strlen( p_svg->psz_text ),
                  &error ) )
     {
-        msg_Err( p_filter, "error while rendering SVG: %s\n", error->message );
+        msg_Err( p_filter, "error while rendering SVG: %s", error->message );
         g_object_unref( G_OBJECT( p_handle ) );
         return;
     }
 
     if( ! rsvg_handle_close( p_handle, &error ) )
     {
-        msg_Err( p_filter, "error while rendering SVG (close): %s\n", error->message );
+        msg_Err( p_filter, "error while rendering SVG (close): %s", error->message );
         g_object_unref( G_OBJECT( p_handle ) );
         return;
     }

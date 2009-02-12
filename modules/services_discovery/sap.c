@@ -1246,7 +1246,7 @@ static sdp_t *ParseSDP (vlc_object_t *p_obj, const char *psz_sdp)
                  || ((p_sdp->orig_ip_version != 4)
                   && (p_sdp->orig_ip_version != 6)))
                 {
-                    msg_Dbg (p_obj, "SDP origin not supported: %s\n", data);
+                    msg_Dbg (p_obj, "SDP origin not supported: %s", data);
                     /* Or maybe out-of-range, but this looks suspicious */
                     return NULL;
                 }

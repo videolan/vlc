@@ -533,7 +533,7 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
     if (p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_vout, "VlcPictureToIplImageRgb took %2.4f seconds\n", duration );
+        msg_Dbg( p_vout, "VlcPictureToIplImageRgb took %2.4f seconds", duration );
 }
 
 /*****************************************************************************
@@ -586,7 +586,7 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     finish = clock();
     duration = (double)(finish - start) / CLOCKS_PER_SEC;
     if (p_vout->p_sys->i_verbosity > VERB_WARN)
-        msg_Dbg( p_vout, "Render took %2.4f seconds\n", duration );
+        msg_Dbg( p_vout, "Render took %2.4f seconds", duration );
 
     ReleaseImages(p_vout);
     p_outpic->date  = p_pic->date;

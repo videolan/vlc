@@ -598,7 +598,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( (p_sys->p_video = (uint8_t *)mmap( 0, p_sys->i_page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
                                             p_sys->i_fd, 0 )) == MAP_FAILED )
     {
-        msg_Err( p_vout, "Can't mmap: %s\n", strerror(errno) );
+        msg_Err( p_vout, "Can't mmap: %s", strerror(errno) );
         return VLC_EGENERIC;
     }
 
@@ -615,7 +615,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( (p_sys->p_null = (uint8_t *)mmap( 0, p_sys->i_page_size, PROT_READ | PROT_WRITE,
                                           MAP_PRIVATE, p_sys->i_null_fd, 0 )) == MAP_FAILED )
     {
-        msg_Err( p_vout, "Can't mmap 2: %s\n", strerror(errno) );
+        msg_Err( p_vout, "Can't mmap 2: %s", strerror(errno) );
         return VLC_EGENERIC;
     }
 

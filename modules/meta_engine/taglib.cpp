@@ -550,7 +550,7 @@ static int WriteMeta( vlc_object_t *p_this )
 
     if( f.isNull() || !f.tag() || f.file()->readOnly() )
     {
-        msg_Err( p_this, "File %s can't be opened for tag writing\n",
+        msg_Err( p_this, "File %s can't be opened for tag writing",
             p_export->psz_file );
         return VLC_EGENERIC;
     }

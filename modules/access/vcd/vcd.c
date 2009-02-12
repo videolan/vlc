@@ -180,8 +180,8 @@ static int Open( vlc_object_t *p_this )
     {
         input_title_t *t = p_sys->title[i] = vlc_input_title_New();
 
-        msg_Dbg( p_access, "title[%d] start=%d\n", i, p_sys->p_sectors[1+i] );
-        msg_Dbg( p_access, "title[%d] end=%d\n", i, p_sys->p_sectors[i+2] );
+        msg_Dbg( p_access, "title[%d] start=%d", i, p_sys->p_sectors[1+i] );
+        msg_Dbg( p_access, "title[%d] end=%d", i, p_sys->p_sectors[i+2] );
 
         t->i_size = ( p_sys->p_sectors[i+2] - p_sys->p_sectors[i+1] ) *
                     (int64_t)VCD_DATA_SIZE;
@@ -490,7 +490,7 @@ static int EntryPoints( access_t *p_access )
         if( i_title < 0 ) continue;   /* Should not occur */
         if( i_title >= p_sys->i_titles ) continue;
 
-        msg_Dbg( p_access, "Entry[%d] title=%d sector=%d\n",
+        msg_Dbg( p_access, "Entry[%d] title=%d sector=%d",
                  i, i_title, i_sector );
 
         s = vlc_seekpoint_New();

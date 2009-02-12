@@ -458,7 +458,7 @@ static picture_t *VideoBufferNew( filter_t *p_filter )
                                         p_fmt->i_width, p_fmt->i_height,
                                         p_fmt->i_aspect );
     if( !p_picture )
-        msg_Err( p_filter, "Failed to allocate picture\n" );
+        msg_Err( p_filter, "Failed to allocate picture" );
     return p_picture;
 }
 static void VideoBufferDelete( filter_t *p_filter, picture_t *p_picture )

@@ -718,7 +718,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     msg_Err( p_libvlc, "verbose-objects usage: \n"
                             "--verbose-objects=+printthatobject,"
                             "-dontprintthatone\n"
-                            "(keyword 'all' to applies to all objects)\n");
+                            "(keyword 'all' to applies to all objects)");
                     free( psz_verbose_objects );
                     /* FIXME: leaks!!!! */
                     return VLC_EGENERIC;
