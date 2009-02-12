@@ -137,7 +137,7 @@ int module_Call( vlc_object_t *obj, module_t *p_module )
 static void load_libvlccore( void )
 {
     if( !dlsym( RTLD_DEFAULT, "libvlc_Quit" )
-     && !dlopen( "libvlccore.so", RTLD_GLOBAL|RTLD_NOLOAD ) )
+     && !dlopen( "libvlccore.so", RTLD_LAZY|RTLD_GLOBAL|RTLD_NOLOAD ) )
         fprintf( stderr, "ERROR: failed loading libvlccore\n" );
 }
 #endif
