@@ -495,11 +495,12 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     if( current->isEmpty() )
     {
-        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
-        current->addSeparator();
         ACT_ADD( current, "audio-es", qtr( "Audio &Track" ) );
         ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
         ACT_ADD( current, "audio-channels", qtr( "Audio &Channels" ) );
+
+        current->addSeparator();
+        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
 
         current->addSeparator();
 
