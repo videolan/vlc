@@ -891,7 +891,7 @@ static void InitTitle( input_thread_t * p_input )
     {
         /* Setup variables */
         input_ControlVarNavigation( p_input );
-        input_ControlVarTitle( p_input, 0 );
+        input_SendEventTitle( p_input, 0 );
     }
 
     /* Global flag */
@@ -1880,7 +1880,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     es_out_SetTime( p_input->p->p_es_out, -1 );
 
                     demux_Control( p_demux, DEMUX_SET_TITLE, i_title );
-                    input_ControlVarTitle( p_input, i_title );
+                    input_SendEventTitle( p_input, i_title );
                 }
             }
             else if( p_input->p->input.i_title > 0 )
@@ -1901,6 +1901,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                     stream_Control( p_input->p->input.p_stream, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_TITLE, i_title );
+                    input_SendEventTitle( p_input, i_title );
                 }
             }
             break;
@@ -1946,6 +1947,7 @@ static bool Control( input_thread_t *p_input, int i_type,
                     es_out_SetTime( p_input->p->p_es_out, -1 );
 
                     demux_Control( p_demux, DEMUX_SET_SEEKPOINT, i_seekpoint );
+                    input_SendEventSeekpoint( p_input, p_demux->info.i_title, i_seekpoint );
                 }
             }
             else if( p_input->p->input.i_title > 0 )
@@ -1980,6 +1982,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
                     stream_Control( p_input->p->input.p_stream, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_SEEKPOINT, i_seekpoint );
+                    input_SendEventSeekpoint( p_input, p_access->info.i_title, i_seekpoint );
                 }
             }
             break;
