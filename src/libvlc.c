@@ -983,7 +983,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "drawable-xid", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_ADDRESS );
 #ifdef __APPLE__
-    var_Create( p_libvlc, "drawable", VLC_VAR_INTERGER );
+    var_Create( p_libvlc, "drawable", VLC_VAR_INTEGER );
 #endif
     var_Create( p_libvlc, "drawable-view-top", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-view-left", VLC_VAR_INTEGER );
