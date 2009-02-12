@@ -143,45 +143,7 @@ void InputManager::customEvent( QEvent *event )
     int i_type = event->type();
     IMEvent *ple = static_cast<IMEvent *>(event);
 
-    assert( !( i_type != PositionUpdate_Type &&
-         i_type != ItemChanged_Type &&
-         i_type != ItemRateChanged_Type &&
-         i_type != ItemTitleChanged_Type &&
-         i_type != ItemEsChanged_Type &&
-         i_type != ItemTeletextChanged_Type &&
-         i_type != ItemStateChanged_Type &&
-         i_type != StatisticsUpdate_Type &&
-         i_type != InterfaceVoutUpdate_Type &&
-         i_type != MetaChanged_Type &&
-         i_type != NameChanged_Type &&
-         i_type != InfoChanged_Type &&
-         i_type != SynchroChanged_Type &&
-         i_type != CachingEvent_Type &&
-         i_type != BookmarksChanged_Type &&
-         i_type != InterfaceAoutUpdate_Type &&
-         i_type != RecordingEvent_Type ) );
-
-    if( !hasInput() ) return;
-
-    if( i_type == CachingEvent_Type )
-        UpdateCaching();
-
-    if( ( i_type != PositionUpdate_Type  &&
-          i_type != ItemRateChanged_Type &&
-          i_type != ItemEsChanged_Type &&
-          i_type != ItemTeletextChanged_Type &&
-          i_type != ItemStateChanged_Type &&
-          i_type != StatisticsUpdate_Type &&
-          i_type != InterfaceVoutUpdate_Type &&
-          i_type != MetaChanged_Type &&
-          i_type != NameChanged_Type &&
-          i_type != InfoChanged_Type &&
-          i_type != SynchroChanged_Type &&
-          i_type != BookmarksChanged_Type &&
-          i_type != InterfaceAoutUpdate_Type &&
-          i_type != RecordingEvent_Type
-        )
-        && ( i_input_id != ple->i_id ) )
+    if( !hasInput() )
         return;
 
 #ifndef NDEBUG
@@ -200,9 +162,13 @@ void InputManager::customEvent( QEvent *event )
         UpdateStats();
         break;
     case ItemChanged_Type:
-        UpdateStatus();
-        // UpdateName();
-        UpdateArt();
+        /* Ignore ItemChanged_Type event that does not apply to our input */
+        if( i_input_id == ple->i_id )
+        {
+            UpdateStatus();
+            // UpdateName();
+            UpdateArt();
+        }
         break;
     case ItemStateChanged_Type:
         // TODO: Fusion with above state
@@ -255,6 +221,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
+        assert(0);
     }
 }
 
