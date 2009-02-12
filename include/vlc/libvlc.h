@@ -569,6 +569,16 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_e
 VLC_PUBLIC_API void libvlc_media_player_set_xwindow ( libvlc_media_player_t *p_mi, uint32_t drawable, libvlc_exception_t *p_e );
 
 /**
+ * Get the X Window System window identifier previously set with
+ * libvlc_media_player_set_xwindow(). Note that this will return the identifier
+ * even if VLC is not currently using it (for instance if it is playing an
+ * audio-only input).
+ *
+ * \return an X window ID, or 0 if none where set.
+ */
+VLC_PUBLIC_API uint32_t libvlc_media_player_get_xwindow ( libvlc_media_player_t *p_mi );
+
+/**
  * Set a Win32/Win64 API window handle (HWND) where the media player should
  * render its video output. If LibVLC was built without Win32/Win64 API output
  * support, then this has no effects.
@@ -578,6 +588,17 @@ VLC_PUBLIC_API void libvlc_media_player_set_xwindow ( libvlc_media_player_t *p_m
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_player_set_hwnd ( libvlc_media_player_t *p_mi, void *drawable, libvlc_exception_t *p_e );
+
+/**
+ * Get the Windows API window handle (HWND) previously set with
+ * libvlc_media_player_set_hwnd(). The handle will be returned even if LibVLC
+ * is not currently outputting any video to it.
+ *
+ * \return a window handle or NULL if there are none.
+ */
+VLC_PUBLIC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi );
+
+
 
 /** \bug This might go away ... to be replaced by a broader system */
 

@@ -706,12 +706,22 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
     p_mi->drawable.xid = drawable;
 }
 
+uint32_t libvlc_media_player_get_xwindow( libvlc_media_player_t *p_mi )
+{
+    return p_mi->drawable.xid;
+}
+
 void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
                                    void *drawable,
                                    libvlc_exception_t *p_e )
 {
     (void) p_e;
     p_mi->drawable.hwnd = drawable;
+}
+
+void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
+{
+    return p_mi->drawable.hwnd;
 }
 
 /**************************************************************************
