@@ -107,8 +107,8 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
     break;
   default:
     msg_Warn( p_vcd_access, "%s\n%s %d", message,
-            _("The above message had unknown log level"),
-            level);
+              "The above message had unknown log level",
+              level);
   }
   return;
 }
@@ -133,8 +133,8 @@ vcd_log_handler (vcd_log_level_t level, const char message[])
     break;
   default:
     msg_Warn( p_vcd_access, "%s\n%s %d", message,
-            _("The above message had unknown vcdimager log level"),
-            level);
+              "The above message had unknown vcdimager log level",
+              level);
   }
   return;
 }
