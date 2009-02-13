@@ -49,6 +49,7 @@ class FullscreenControllerWidget;
 class SpeedControlWidget;
 class QMenu;
 class QSize;
+class QStatusBar;
 
 enum {
     CONTROLS_HIDDEN = 0x0,
@@ -117,7 +118,7 @@ private:
     void createSystray();
     void initSystray();
 
-    void createStatusBar();
+    QStatusBar * createStatusBar();
 
     /* Video */
     VideoWidget         *videoWidget;

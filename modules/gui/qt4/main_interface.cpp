@@ -148,7 +148,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
 
     /* StatusBar Creation */
-    createStatusBar();
+    setStatusBar( createStatusBar() );
 
     /********************
      * Input Manager    *
@@ -311,8 +311,10 @@ MainInterface::~MainInterface()
  *   Main UI handling        *
  *****************************/
 
-inline void MainInterface::createStatusBar()
+QStatusBar * MainInterface::createStatusBar()
 {
+    QStatusBar *statusBar = new QStatusBar;
+
     /****************
      *  Status Bar  *
      ****************/
@@ -329,15 +331,16 @@ inline void MainInterface::createStatusBar()
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
 
     /* and adding those */
-    statusBar()->addWidget( nameLabel, 8 );
-    statusBar()->addPermanentWidget( speedLabel, 0 );
-    statusBar()->addPermanentWidget( timeLabel, 0 );
+    statusBar->addWidget( nameLabel, 8 );
+    statusBar->addPermanentWidget( speedLabel, 0 );
+    statusBar->addPermanentWidget( timeLabel, 0 );
 
     /* timeLabel behaviour:
        - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
     CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+    return statusBar;
 }
 
 inline void MainInterface::initSystray()
