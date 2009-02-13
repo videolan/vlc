@@ -1041,15 +1041,8 @@
     if( [[o_mi title] isEqualToString: _NS("Normal Size")] );
     {
         NSMenuItem *item = [[o_mi menu] itemWithTitle:_NS("Teletext")];
-        bool b_telx = false;
-        if( p_input )
-        {
-            const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
-            const int i_spu_es = var_GetInteger( p_input, "spu-es" );
+		bool b_telx = p_input && var_GetInteger( p_input, "teletext-es" ) >= 0;
 
-            if( i_teletext_es >= 0 && i_teletext_es == i_spu_es )
-                b_telx = true;
-        }
         [[item submenu] setAutoenablesItems:NO];
         for( int k=0; k < [[item submenu] numberOfItems]; k++ )
         {
