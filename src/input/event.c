@@ -245,16 +245,16 @@ static const char *GetEsVarName( int i_cat )
         return "spu-es";
     }
 }
-void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id )
-{
-    if( i_cat != UNKNOWN_ES )
-        VarListDel( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES, i_id );
-}
 void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const char *psz_text )
 {
     if( i_cat != UNKNOWN_ES )
         VarListAdd( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES,
                     i_id, psz_text );
+}
+void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id )
+{
+    if( i_cat != UNKNOWN_ES )
+        VarListDel( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES, i_id );
 }
 /* i_id == -1 will unselect */
 void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
@@ -263,15 +263,18 @@ void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
         VarListSelect( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES, i_id );
 }
 
-void input_SendEventTeletext( input_thread_t *p_input, int i_id )
+void input_SendEventTeletextAdd( input_thread_t *p_input,
+                                 int i_teletext, const char *psz_text )
 {
-    vlc_value_t val;
-
-    val.i_int = i_id;
-    var_Change( p_input, "teletext-es", VLC_VAR_SETVALUE, &val, NULL );
-
-    Trigger( p_input, INPUT_EVENT_TELETEXT );
-
+    VarListAdd( p_input, "teletext-es", INPUT_EVENT_TELETEXT, i_teletext, psz_text );
+}
+void input_SendEventTeletextDel( input_thread_t *p_input, int i_teletext )
+{
+    VarListDel( p_input, "teletext-es", INPUT_EVENT_TELETEXT, i_teletext );
+}
+void input_SendEventTeletextSelect( input_thread_t *p_input, int i_teletext )
+{
+    VarListSelect( p_input, "teletext-es", INPUT_EVENT_TELETEXT, i_teletext );
 }
 
 void input_SendEventVout( input_thread_t *p_input )

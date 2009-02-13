@@ -205,7 +205,10 @@ static inline int EsOutGetClosedCaptionsChannel( vlc_fourcc_t fcc )
     }
     return -1;
 }
-
+static inline bool EsFmtIsTeletext( const es_format_t *p_fmt )
+{
+    return p_fmt->i_cat == SPU_ES && p_fmt->i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' );
+}
 
 /*****************************************************************************
  * input_EsOutNew:
@@ -853,19 +856,18 @@ static mtime_t EsOutGetBuffering( es_out_t *out )
     return i_delay;
 }
 
-static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, const char *psz_language,
+static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
+                                     const es_format_t *fmt, const char *psz_language,
                                      bool b_delete )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
-    const  bool b_teletext = fmt->i_cat == SPU_ES && fmt->i_codec == VLC_FOURCC( 't', 'e', 'l', 'x' );
     vlc_value_t       val, text;
 
     if( b_delete )
     {
-        /* TODO it should probably be a list */
-        if( b_teletext )
-            input_SendEventTeletext( p_sys->p_input, -1 );
+        if( EsFmtIsTeletext( fmt ) )
+            input_SendEventTeletextDel( p_sys->p_input, i_id );
 
         input_SendEventEsDel( p_input, fmt->i_cat, i_id );
         return;
@@ -918,15 +920,10 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id, es_format_t *fmt, 
     }
 
     input_SendEventEsAdd( p_input, fmt->i_cat, i_id, text.psz_string );
+    if( EsFmtIsTeletext( fmt ) )
+        input_SendEventTeletextAdd( p_sys->p_input, i_id, NULL );
 
     free( text.psz_string );
-
-    if( b_teletext )
-    {
-        /* TODO it should probably be a list */
-        if( var_GetInteger( p_sys->p_input, "teletext-es" ) < 0 )
-            input_SendEventTeletext( p_sys->p_input, i_id );
-    }
 }
 
 static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
@@ -979,6 +976,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     input_SendEventEsDel( p_input, AUDIO_ES, -1 );
     input_SendEventEsDel( p_input, VIDEO_ES, -1 );
     input_SendEventEsDel( p_input, SPU_ES, -1 );
+    input_SendEventTeletextDel( p_input, -1 );
 
     /* TODO event */
     var_SetInteger( p_input, "teletext-es", -1 );
@@ -1577,6 +1575,8 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
 
     /* Mark it as selected */
     input_SendEventEsSelect( p_input, es->fmt.i_cat, es->i_id );
+    if( EsFmtIsTeletext( &es->fmt ) )
+        input_SendEventTeletextSelect( p_input, es->i_id );
 }
 
 static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
@@ -1629,6 +1629,8 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
 
     /* Mark it as unselected */
     input_SendEventEsSelect( p_input, es->fmt.i_cat, -1 );
+    if( EsFmtIsTeletext( &es->fmt ) )
+        input_SendEventTeletextSelect( p_input, -1 );
 }
 
 /**

@@ -298,7 +298,8 @@ struct input_thread_t
  *  - "can-rate"
  *  - "can-rewind"
  *  - "can-record" (if a stream can be recorded while playing)
- *  - "teletext-es" to get the index of spu track that is teletext -1 if no teletext)
+ *  - "teletext-es" (list of id from the spu tracks (spu-es) that are teletext, the
+ *                   variable value being the one currently selected, -1 if no teletext)
  *  - "signal-quality"
  *  - "signal-strength"
  *  - "cache" (level of data cached [0 .. 1])

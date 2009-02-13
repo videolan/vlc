@@ -63,7 +63,10 @@ void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id );
 void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const char *psz_text );
 void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id ); /* i_id == -1 will unselect */
 
-void input_SendEventTeletext( input_thread_t *p_input, int i_id );
+void input_SendEventTeletextAdd( input_thread_t *p_input,
+                                 int i_teletext, const char *psz_text );
+void input_SendEventTeletextDel( input_thread_t *p_input, int i_teletext );
+void input_SendEventTeletextSelect( input_thread_t *p_input, int i_teletext );
 
 /*****************************************************************************
  * Event for decoder.c
