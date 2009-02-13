@@ -560,52 +560,50 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
     p_input_thread = libvlc_get_input_thread(p_mi, p_e);
     if( !p_input_thread ) return;
 
-    p_vbi = (vlc_object_t *) vlc_object_find_name( p_input_thread, "zvbi",
-                                                   FIND_ANYWHERE );
+    if( var_CountChoices( p_input_thread, "teletext-es" ) <= 0 )
+    {
+        vlc_object_release( p_input_thread );
+        return;
+    }
+    const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
+
+    p_vbi = (vlc_object_t *)vlc_object_find_name( p_input_thread, "zvbi",
+                                                  FIND_ANYWHERE );
     if( p_vbi )
     {
-        const int i_teletext_es = var_GetInteger( p_input_thread, "teletext-es" );
-        const int i_spu_es = var_GetInteger( p_input_thread, "spu-es" );
-
-        if( (i_teletext_es >= 0) && (i_teletext_es == i_spu_es) )
+        if( b_selected )
         {
-            int i_page = 100;
-
-            i_page = var_GetInteger( p_vbi, "vbi-page" );
-            i_page = (i_teletext_es >= 0) ? i_page : 0;
-
-            i_ret = var_SetInteger( p_vbi, "vbi-page", i_page );
+            /* FIXME Gni, why that ? */
+            i_ret = var_SetInteger( p_vbi, "vbi-page",
+                                    var_GetInteger( p_vbi, "vbi-page" ) );
             if( i_ret )
                 libvlc_exception_raise( p_e,
                                 "Unexpected error while setting teletext page" );
         }
-        else if( i_teletext_es >= 0 )
+        else
         {
-            bool opaque = true;
-
-            opaque = var_GetBool( p_vbi, "vbi-opaque" );
-            i_ret = var_SetBool( p_vbi, "vbi-opaque", !opaque );
+            /* FIXME Gni^2 */
+            i_ret = var_SetBool( p_vbi, "vbi-opaque",
+                                 !var_GetBool( p_vbi, "vbi-opaque" ) );
             if( i_ret )
                 libvlc_exception_raise( p_e,
                                 "Unexpected error while setting teletext transparency" );
         }
         vlc_object_release( p_vbi );
     }
+    else if( b_selected )
+    {
+        var_SetInteger( p_input_thread, "spu-es", -1 );
+    }
     else
     {
-        /* Teletext is not enabled yet, so enable it.
-         * Only after it is enable it is possible to view teletext pages
-         */
-        const int i_teletext_es = var_GetInteger( p_input_thread, "teletext-es" );
-
-        if( i_teletext_es >= 0 )
+        vlc_value_t list;
+        if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETLIST, &list, NULL ) )
         {
-            const int i_spu_es = var_GetInteger( p_input_thread, "spu-es" );
+            if( list.p_list->i_count > 0 )
+                var_SetInteger( p_input_thread, "spu-es", list.p_list->p_values[0].i_int );
 
-            if( i_teletext_es == i_spu_es )
-                var_SetInteger( p_input_thread, "spu-es", -1 );
-            else
-                var_SetInteger( p_input_thread, "spu-es", i_teletext_es );
+            var_Change( p_input_thread, "teletext-es", VLC_VAR_FREELIST, &list, NULL );
         }
     }
     vlc_object_release( p_input_thread );
