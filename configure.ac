@@ -892,13 +892,13 @@ then
       MINIZIP_LIBS="../../../libs/unzip/libunzip.la"
     ])
   ])
-  AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
   VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
   VLC_ADD_CFLAGS([zip],[$MINIZIP_CFLAGS])
   VLC_ADD_LIBS([skins2 zip],[$MINIZIP_LIBS])
   VLC_ADD_PLUGIN([unzip])
   VLC_ADD_PLUGIN([zip])
 fi
+AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
 dnl Check for hal
