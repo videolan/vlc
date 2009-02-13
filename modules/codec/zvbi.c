@@ -255,6 +255,7 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->i_wanted_page = 100 * p_dec->fmt_in.subs.teletext.i_magazine +
                                vbi_bcd2dec( p_dec->fmt_in.subs.teletext.i_page );
+        var_SetInteger( p_dec, "vbi-page", p_sys->i_wanted_page );
     }
     p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
 
