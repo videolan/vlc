@@ -606,15 +606,16 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     if( menu->isEmpty() )
     {
-        addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
-                          SLOT( gotoTimeDialog() ), "Ctrl+T" );
-        menu->addSeparator();
-
         ACT_ADD( menu, "bookmark", qtr( "&Bookmarks" ) );
         ACT_ADD( menu, "title", qtr( "T&itle" ) );
         ACT_ADD( menu, "chapter", qtr( "&Chapter" ) );
         ACT_ADD( menu, "navigation", qtr( "&Navigation" ) );
         ACT_ADD( menu, "program", qtr( "&Program" ) );
+
+        menu->addSeparator();
+        addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
+                          SLOT( gotoTimeDialog() ), "Ctrl+T" );
+
     }
 
     input_thread_t *p_object;
