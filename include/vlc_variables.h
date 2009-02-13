@@ -634,6 +634,19 @@ static inline char *__var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
  */
 #define var_CreateGetStringCommand(a,b)   __var_CreateGetStringCommand( VLC_OBJECT(a),b)
 #define var_CreateGetNonEmptyStringCommand(a,b)   __var_CreateGetNonEmptyStringCommand( VLC_OBJECT(a),b)
+
+static inline int __var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t count;
+    if( __var_Change( p_obj, psz_name, VLC_VAR_CHOICESCOUNT, &count, NULL ) )
+        return 0;
+    return count.i_int;
+}
+/**
+ * __var_CountChoices() with automatic casting
+ */
+#define var_CountChoices(a,b) __var_CountChoices( VLC_OBJECT(a),b)
+
 /**
  * @}
  */
