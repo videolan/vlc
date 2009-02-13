@@ -921,7 +921,14 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
 
     input_SendEventEsAdd( p_input, fmt->i_cat, i_id, text.psz_string );
     if( EsFmtIsTeletext( fmt ) )
-        input_SendEventTeletextAdd( p_sys->p_input, i_id, NULL );
+    {
+        char psz_page[3+1];
+        snprintf( psz_page, sizeof(psz_page), "%d%2.2x",
+                  fmt->subs.teletext.i_magazine,
+                  fmt->subs.teletext.i_page );
+        input_SendEventTeletextAdd( p_sys->p_input,
+                                    i_id, fmt->subs.teletext.i_magazine >= 0 ? psz_page : NULL );
+    }
 
     free( text.psz_string );
 }
