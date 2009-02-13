@@ -34,7 +34,17 @@
 #include "event.h"
 #include <assert.h>
 
-static void Trigger( input_thread_t *p_input, int i_type );
+/* */
+static void Trigger( input_thread_t *, int i_type );
+static void VarListAdd( input_thread_t *,
+                        const char *psz_variable, int i_event,
+                        int i_value, const char *psz_text );
+static void VarListDel( input_thread_t *,
+                        const char *psz_variable, int i_event,
+                        int i_value );
+static void VarListSelect( input_thread_t *,
+                           const char *psz_variable, int i_event,
+                           int i_value );
 
 /*****************************************************************************
  * Event for input.c
@@ -211,34 +221,15 @@ void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name )
 void input_SendEventProgramAdd( input_thread_t *p_input,
                                 int i_program, const char *psz_text )
 {
-    vlc_value_t val;
-    vlc_value_t text;
-
-    val.i_int = i_program;
-    text.psz_string = (char*)psz_text;
-
-    var_Change( p_input, "program", VLC_VAR_ADDCHOICE,
-                &val, psz_text ? &text : NULL );
-
-    Trigger( p_input, INPUT_EVENT_PROGRAM );
+    VarListAdd( p_input, "program", INPUT_EVENT_PROGRAM, i_program, psz_text );
 }
 void input_SendEventProgramDel( input_thread_t *p_input, int i_program )
 {
-    vlc_value_t val;
-
-    val.i_int = i_program;
-    var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val, NULL );
-
-    Trigger( p_input, INPUT_EVENT_PROGRAM );
+    VarListDel( p_input, "program", INPUT_EVENT_PROGRAM, i_program );
 }
 void input_SendEventProgramSelect( input_thread_t *p_input, int i_program )
 {
-    vlc_value_t val;
-
-    val.i_int = i_program;
-    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
-
-    Trigger( p_input, INPUT_EVENT_PROGRAM );
+    VarListSelect( p_input, "program", INPUT_EVENT_PROGRAM, i_program );
 }
 
 static const char *GetEsVarName( int i_cat )
@@ -256,52 +247,20 @@ static const char *GetEsVarName( int i_cat )
 }
 void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id )
 {
-    vlc_value_t val;
-
-    if( i_cat == UNKNOWN_ES )
-        return;
-
-    if( i_id >= 0 )
-    {
-        val.i_int = i_id;
-        var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_DELCHOICE, &val, NULL );
-    }
-    else
-    {
-        var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_CLEARCHOICES, NULL, NULL );
-    }
-
-    Trigger( p_input, INPUT_EVENT_ES );
+    if( i_cat != UNKNOWN_ES )
+        VarListDel( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES, i_id );
 }
 void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const char *psz_text )
 {
-    vlc_value_t val;
-    vlc_value_t text;
-
-    if( i_cat == UNKNOWN_ES )
-        return;
-
-    val.i_int = i_id;
-    text.psz_string = (char*)psz_text;
-
-    var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_ADDCHOICE,
-                &val, psz_text ? &text : NULL );
-
-    Trigger( p_input, INPUT_EVENT_ES );
+    if( i_cat != UNKNOWN_ES )
+        VarListAdd( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES,
+                    i_id, psz_text );
 }
-
 /* i_id == -1 will unselect */
 void input_SendEventEsSelect( input_thread_t *p_input, int i_cat, int i_id )
 {
-    vlc_value_t val;
-
-    if( i_cat == UNKNOWN_ES )
-        return;
-
-    val.i_int = i_id;
-    var_Change( p_input, GetEsVarName( i_cat ), VLC_VAR_SETVALUE, &val, NULL );
-
-    Trigger( p_input, INPUT_EVENT_ES );
+    if( i_cat != UNKNOWN_ES )
+        VarListSelect( p_input, GetEsVarName( i_cat ), INPUT_EVENT_ES, i_id );
 }
 
 void input_SendEventTeletext( input_thread_t *p_input, int i_id )
@@ -312,6 +271,7 @@ void input_SendEventTeletext( input_thread_t *p_input, int i_id )
     var_Change( p_input, "teletext-es", VLC_VAR_SETVALUE, &val, NULL );
 
     Trigger( p_input, INPUT_EVENT_TELETEXT );
+
 }
 
 void input_SendEventVout( input_thread_t *p_input )
@@ -339,3 +299,49 @@ static void Trigger( input_thread_t *p_input, int i_type )
 {
     var_SetInteger( p_input, "intf-event", i_type );
 }
+static void VarListAdd( input_thread_t *p_input,
+                        const char *psz_variable, int i_event,
+                        int i_value, const char *psz_text )
+{
+    vlc_value_t val;
+    vlc_value_t text;
+
+    val.i_int = i_value;
+    text.psz_string = (char*)psz_text;
+
+    var_Change( p_input, psz_variable, VLC_VAR_ADDCHOICE,
+                &val, psz_text ? &text : NULL );
+
+    Trigger( p_input, i_event );
+}
+static void VarListDel( input_thread_t *p_input,
+                        const char *psz_variable, int i_event,
+                        int i_value )
+{
+    vlc_value_t val;
+
+    if( i_value >= 0 )
+    {
+        val.i_int = i_value;
+        var_Change( p_input, psz_variable, VLC_VAR_DELCHOICE, &val, NULL );
+    }
+    else
+    {
+        var_Change( p_input, psz_variable, VLC_VAR_CLEARCHOICES, &val, NULL );
+    }
+
+    Trigger( p_input, i_event );
+}
+static void VarListSelect( input_thread_t *p_input,
+                           const char *psz_variable, int i_event,
+                           int i_value )
+{
+    vlc_value_t val;
+
+    val.i_int = i_value;
+    var_Change( p_input, psz_variable, VLC_VAR_SETVALUE, &val, NULL );
+
+    Trigger( p_input, i_event );
+}
+
+
