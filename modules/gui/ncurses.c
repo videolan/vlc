@@ -393,7 +393,6 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
 
         /* Update the input */
-        PL_LOCK;
         if( p_sys->p_input == NULL )
         {
             p_sys->p_input = playlist_CurrentInput( p_playlist );
@@ -405,7 +404,6 @@ static void Run( intf_thread_t *p_intf )
             p_sys->f_slider = p_sys->f_slider_old = 0.0;
             p_sys->b_box_cleared = false;
         }
-        PL_UNLOCK;
 
         if( p_sys->b_box_plidx_follow && playlist_CurrentPlayingItem(p_playlist) )
         {
