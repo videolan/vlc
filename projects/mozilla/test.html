@@ -136,7 +136,7 @@ Insert Slider widget
 <INPUT type=button value="Forward" onClick='doForwardPlay(500);'>
 <INPUT type=button value="Fullscreen" onClick='getVLC("vlc").video.toggleFullscreen();'>
 <INPUT type=button value="Version" onClick='alert("vlc " + getVLC("vlc").VersionInfo);'>
-<INPUT type=button value=" State " onClick='doState();'>
+<INPUT type=button value=" State " onClick='alert("state: " + getVLC("vlc").input.state);'>
 </TD><TD align="right">
 <SPAN style="text-align:center">Volume:</SPAN>
 <INPUT type=button value=" - " onClick='updateVolume(-10)'>
