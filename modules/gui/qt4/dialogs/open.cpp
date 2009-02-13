@@ -331,6 +331,9 @@ void OpenDialog::finish( bool b_enqueue = false )
         return;
     }
 
+    /* Sort alphabetically */
+    itemsMRL.sort();
+
     /* Go through the item list */
     for( int i = 0; i < itemsMRL.size(); i++ )
     {
