@@ -470,8 +470,8 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
     {
         int i_zoom = p_vout->i_zoom;
         /* be realistic, scaling factor confined between .2 and 10. */
-        if( i_zoom > 10 * ZOOM_FP_FACTOR  || i_zoom <  ZOOM_FP_FACTOR / 5 )
-            i_zoom = ZOOM_FP_FACTOR;
+        if( i_zoom > 10 * ZOOM_FP_FACTOR )      i_zoom = 10 * ZOOM_FP_FACTOR;
+        else if( i_zoom <  ZOOM_FP_FACTOR / 5 ) i_zoom = ZOOM_FP_FACTOR / 5;
 
         unsigned int i_original_width, i_original_height;
 
