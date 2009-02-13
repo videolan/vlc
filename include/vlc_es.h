@@ -206,6 +206,11 @@ struct subs_format_t
     {
         int i_id;
     } dvb;
+    struct
+    {
+        int i_magazine;
+        int i_page;
+    } teletext;
 };
 
 /**

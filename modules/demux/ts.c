@@ -3464,24 +3464,24 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                              p_page->i_teletext_magazine_number,
                                              p_page->i_teletext_page_number );
 
-                                /* Hack, FIXME This stores the initial page for this track,
+                                /* This stores the initial page for this track,
                                    so that it can be used by the telx and zvbi decoders. */
-                                p_es->fmt.subs.dvb.i_id =
+                                p_es->fmt.subs.teletext.i_magazine =
+                                    p_page->i_teletext_magazine_number ? : 8;
+                                p_es->fmt.subs.teletext.i_page =
                                     p_page->i_teletext_page_number;
-                                p_es->fmt.subs.dvb.i_id |=
-                                    ((int)p_page->i_teletext_magazine_number << 16);
 
                                 i++;
                             }
                         }
-
                         if( !i )
                             pid->es->fmt.i_cat = UNKNOWN_ES;
                     }
                     else
 #endif  /* defined _DVBPSI_DR_56_H_  && DVBPSI_VERSION(0,1,6) */
                     {
-                        pid->es->fmt.subs.dvb.i_id = -1;
+                        pid->es->fmt.subs.teletext.i_magazine = -1;
+                        pid->es->fmt.subs.teletext.i_page = 0;
                         pid->es->fmt.psz_description = strdup( _(ppsz_teletext_type[1]) );
                     }
                 }

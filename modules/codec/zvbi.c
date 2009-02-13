@@ -251,13 +251,10 @@ static int Open( vlc_object_t *p_this )
                      RequestPage, p_sys );
 
     /* Check if the Teletext track has a known "initial page". */
-    if( p_sys->i_wanted_page == 100 && p_dec->fmt_in.subs.dvb.i_id != -1 )
+    if( p_sys->i_wanted_page == 100 && p_dec->fmt_in.subs.teletext.i_magazine != -1 )
     {
-        int i_wanted_magazine = p_dec->fmt_in.subs.dvb.i_id >> 16;
-        if( i_wanted_magazine == 0 )
-            i_wanted_magazine = 8;
-        p_sys->i_wanted_page = vbi_bcd2dec(p_dec->fmt_in.subs.dvb.i_id & 0xff);
-        p_sys->i_wanted_page += 100*i_wanted_magazine;
+        p_sys->i_wanted_page = 100 * p_dec->fmt_in.subs.teletext.i_magazine +
+                               vbi_bcd2dec( p_dec->fmt_in.subs.teletext.i_page );
     }
     p_sys->i_wanted_subpage = VBI_ANY_SUBNO;
 
