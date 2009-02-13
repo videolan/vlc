@@ -196,7 +196,8 @@ void InputManager::customEvent( QEvent *event )
         UpdateRate();
         break;
     case ItemEsChanged_Type:
-        // We don't do anything. Why ?
+        UpdateTeletext();
+        // We don't do anything ES related. Why ?
         break;
     case ItemTeletextChanged_Type:
         UpdateTeletext();
@@ -455,7 +456,7 @@ bool InputManager::hasAudio()
 void InputManager::UpdateTeletext()
 {
     if( hasInput() )
-        telexActivation( var_GetInteger( p_input, "teletext-es" ) >= 0 );
+        telexActivation( var_CountChoices( p_input, "teletext-es" ) > 0 );
     else
         telexActivation( false );
 }
@@ -639,9 +640,8 @@ void InputManager::telexSetPage( int page )
     if( hasInput() )
     {
         const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
-        const int i_spu_es = var_GetInteger( p_input, "spu-es" );
 
-        if( i_teletext_es >= 0 && i_teletext_es == i_spu_es )
+        if( i_teletext_es >= 0 )
         {
             vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
                         "zvbi", FIND_ANYWHERE );
@@ -664,7 +664,7 @@ void InputManager::telexSetTransparency( bool b_transparentTelextext )
                     "zvbi", FIND_ANYWHERE );
         if( p_vbi )
         {
-            var_SetBool( p_vbi, "vbi-opaque", b_transparentTelextext );
+            var_SetBool( p_vbi, "vbi-opaque", !b_transparentTelextext );
             vlc_object_release( p_vbi );
             emit teletextTransparencyActivated( b_transparentTelextext );
         }
@@ -676,18 +676,17 @@ void InputManager::telexActivation( bool b_enabled )
     if( hasInput() )
     {
         const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
-        const int i_spu_es = var_GetInteger( p_input, "spu-es" );
 
         /* Teletext is possible. Show the buttons */
-        b_enabled = (i_teletext_es >= 0);
+        b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
         emit teletextPossible( b_enabled );
         if( !b_enabled ) return;
 
         /* If Teletext is selected */
-        if( i_teletext_es == i_spu_es )
+        if( i_teletext_es >= 0 )
         {
             /* Activate the buttons */
-            teletextActivated( true );
+            emit teletextActivated( true );
 
             /* Then, find the current page */
             int i_page = 100;
@@ -707,13 +706,13 @@ void InputManager::telexActivation( bool b_enabled )
 
 void InputManager::activateTeletext( bool b_enable )
 {
-    if( hasInput() )
+    vlc_value_t list;
+    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETLIST, &list, NULL ) )
     {
-        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
-        if( i_teletext_es >= 0 )
-        {
-            var_SetInteger( p_input, "spu-es", b_enable ? i_teletext_es : -1 );
-        }
+        if( list.p_list->i_count > 0 )
+            var_SetInteger( p_input, "spu-es", b_enable ? list.p_list->p_values[0].i_int : -1 );
+
+        var_Change( p_input, "teletext-es", VLC_VAR_FREELIST, &list, NULL );
     }
 }
 

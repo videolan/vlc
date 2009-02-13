@@ -490,12 +490,16 @@ QFrame *AbstractController::telexFrame()
     QToolButton *telexOn = new QToolButton;
     setupButton( telexOn );
     BUTTON_SET_BAR2( telexOn, tv, qtr( "Teletext Activation" ) );
+    telexOn->setEnabled( false );
+    telexOn->setCheckable( true );
+
     telexLayout->addWidget( telexOn );
 
     /* Teletext Activation and set */
     CONNECT( telexOn, clicked( bool ),
              THEMIM->getIM(), activateTeletext( bool ) );
-
+    CONNECT( THEMIM->getIM(), teletextPossible( bool ),
+             telexOn, setEnabled( bool ) );
 
     /* Transparency button */
     QToolButton *telexTransparent = new QToolButton;
