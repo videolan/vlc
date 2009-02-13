@@ -1575,8 +1575,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
 
     /* Mark it as selected */
     input_SendEventEsSelect( p_input, es->fmt.i_cat, es->i_id );
-    if( EsFmtIsTeletext( &es->fmt ) )
-        input_SendEventTeletextSelect( p_input, es->i_id );
+    input_SendEventTeletextSelect( p_input, EsFmtIsTeletext( &es->fmt ) ? es->i_id : -1 );
 }
 
 static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
@@ -1621,10 +1620,6 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
     }
 
     if( !b_update )
-        return;
-
-    /* Update var */
-    if( es->p_dec == NULL )
         return;
 
     /* Mark it as unselected */
