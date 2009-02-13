@@ -63,8 +63,6 @@ private slots:
 };
 
 #define VOLUME_MAX 200
-class VolumeClickHandler;
-
 class SoundWidget : public QWidget
 {
     Q_OBJECT
