@@ -487,9 +487,14 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
             i_original_height = p_vout->fmt_in.i_visible_height *
                                 p_vout->fmt_in.i_sar_den / p_vout->fmt_in.i_sar_num;
         }
-
+#ifdef WIN32
+        /* On windows, inner video window exceeding container leads to black screen */
+        *pi_width = __MIN( i_width, i_original_width * i_zoom / ZOOM_FP_FACTOR );
+        *pi_height = __MIN( i_height, i_original_height * i_zoom / ZOOM_FP_FACTOR );
+#else
         *pi_width = i_original_width * i_zoom / ZOOM_FP_FACTOR ;
         *pi_height = i_original_height * i_zoom / ZOOM_FP_FACTOR ;
+#endif
     }
 
     int64_t i_scaled_width = p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
