@@ -473,17 +473,25 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
         *pi_width = i_width;
         *pi_height = i_height;
     }
-    else if( i_zoom == ZOOM_FP_FACTOR )  /* original size */
-    {
-        *pi_width = __MIN( i_width, p_vout->fmt_in.i_visible_width );
-        *pi_height = __MIN( i_height, p_vout->fmt_in.i_visible_height );
-    }
     else 
     {
-        *pi_width = 
-             p_vout->fmt_in.i_visible_width * i_zoom / ZOOM_FP_FACTOR;
-        *pi_height =
-             p_vout->fmt_in.i_visible_height * i_zoom / ZOOM_FP_FACTOR;
+        unsigned int i_original_width, i_original_height;
+
+        if( p_vout->fmt_in.i_sar_num >= p_vout->fmt_in.i_sar_den )
+        {
+            i_original_width = p_vout->fmt_in.i_visible_width *
+                               p_vout->fmt_in.i_sar_num / p_vout->fmt_in.i_sar_den;
+            i_original_height =  p_vout->fmt_in.i_visible_height;
+        }
+        else
+        {
+            i_original_width =  p_vout->fmt_in.i_visible_width;
+            i_original_height = p_vout->fmt_in.i_visible_height *
+                                p_vout->fmt_in.i_sar_den / p_vout->fmt_in.i_sar_num;
+        }
+
+        *pi_width = i_original_width * i_zoom / ZOOM_FP_FACTOR ;
+        *pi_height = i_original_height * i_zoom / ZOOM_FP_FACTOR ;
     }
 
      int64_t i_scaled_width = p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
