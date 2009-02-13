@@ -7,6 +7,8 @@
 # For each UI
 #   - Add it to EXTRA_DIST
 #   - Add the .h to nodist_SOURCES_qt4
+# For each ressource (icon, png, ...)
+#   - Add it to DEPS_res
 
 AUTOMAKE_OPTIONS = subdir-objects
 MOSTLYCLEANFILES = $(UIH)
@@ -117,6 +119,7 @@ DEPS_res = \
 	pixmaps/prefs/spref_cone_Video_64.png \
 	pixmaps/previous.png \
 	pixmaps/previous_16px.png \
+	pixmaps/profile_new.png \
 	pixmaps/slower.png \
 	pixmaps/space.png \
 	pixmaps/stop.png \
@@ -264,7 +267,7 @@ noinst_HEADERS = \
 	components/playlist/playlist.hpp \
 	components/playlist/selector.hpp \
 	components/playlist/sorting.h \
-	components/sout/profile_selector.cpp \
+	components/sout/profile_selector.hpp \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
