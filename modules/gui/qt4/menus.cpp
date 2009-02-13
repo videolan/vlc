@@ -499,11 +499,8 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
         ACT_ADD( current, "audio-channels", qtr( "Audio &Channels" ) );
         ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
         current->addSeparator();
-        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
 
-        current->addSeparator();
         ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
-
         current->addSeparator();
 
         QAction *action = current->addAction( qtr( "Increase Volume" ),
@@ -568,6 +565,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
 #endif
         ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
+
         current->addSeparator();
 
         ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
