@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
+#include <vlc_osd.h>
 #include <vlc_aout.h>
 #include <vlc_sout.h>
 #include "../libvlc.h"
@@ -243,6 +244,8 @@ static vout_thread_t *RequestVout( input_ressource_t *p_ressource,
         {
             msg_Dbg( p_ressource->p_input, "saving a free vout" );
             vout_Flush( p_vout, 1 );
+            spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR, -1 );
+
             p_ressource->p_vout_free = p_vout;
         }
         return NULL;

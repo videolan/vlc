@@ -1675,7 +1675,9 @@ static void SpuClearChannel( spu_t *p_spu, int i_channel )
         spu_heap_entry_t *p_entry = &p_sys->heap.p_entry[i_subpic];
         subpicture_t *p_subpic = p_entry->p_subpicture;
 
-        if( !p_subpic || p_subpic->i_channel != i_channel )
+        if( !p_subpic )
+            continue;
+        if( p_subpic->i_channel != i_channel && ( i_channel != -1 || p_subpic->i_channel == DEFAULT_CHAN ) )
             continue;
 
         /* You cannot delete subpicture outside of spu_SortSubpictures */
