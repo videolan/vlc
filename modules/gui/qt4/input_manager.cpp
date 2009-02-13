@@ -468,6 +468,7 @@ void InputManager::UpdateTeletext()
         {
             /* Then, find the current page */
             int i_page = 100;
+            bool b_transparent = false;
 
             vlc_object_t *p_vbi = (vlc_object_t *)
                 vlc_object_find_name( p_input, "zvbi", FIND_ANYWHERE );
@@ -475,9 +476,12 @@ void InputManager::UpdateTeletext()
             if( p_vbi )
             {
                 i_page = var_GetInteger( p_vbi, "vbi-page" );
+                b_transparent = !var_GetBool( p_vbi, "vbi-opaque" );
                 vlc_object_release( p_vbi );
             }
             emit newTelexPageSet( i_page );
+            emit teletextTransparencyActivated( b_transparent );
+
         }
         emit teletextActivated( b_enabled && i_teletext_es >= 0 );
     }
