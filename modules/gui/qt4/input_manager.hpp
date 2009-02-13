@@ -153,7 +153,6 @@ public slots:
     /* Teletext */
     void telexSetPage( int );          ///< Goto teletext page
     void telexSetTransparency( bool ); ///< Transparency on teletext background
-    void telexActivation( bool );      ///< Enable disable teletext buttons
     void activateTeletext( bool );     ///< Toggle buttons after click
     /* A to B Loop */
     void setAtoB();

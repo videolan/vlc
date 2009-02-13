@@ -456,9 +456,36 @@ bool InputManager::hasAudio()
 void InputManager::UpdateTeletext()
 {
     if( hasInput() )
-        telexActivation( var_CountChoices( p_input, "teletext-es" ) > 0 );
+    {
+        const bool b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
+        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
+
+        /* Teletext is possible. Show the buttons */
+        emit teletextPossible( b_enabled );
+
+        msg_Err( p_intf, "InputManager::UpdateTeletext: %d %d", b_enabled, i_teletext_es );
+        /* If Teletext is selected */
+        if( b_enabled && i_teletext_es >= 0 )
+        {
+
+            /* Then, find the current page */
+            int i_page = 100;
+            vlc_object_t *p_vbi = (vlc_object_t *)
+                vlc_object_find_name( p_input, "zvbi", FIND_ANYWHERE );
+            if( p_vbi )
+            {
+                i_page = var_GetInteger( p_vbi, "vbi-page" );
+                vlc_object_release( p_vbi );
+                emit newTelexPageSet( i_page );
+            }
+        }
+        emit teletextActivated( b_enabled && i_teletext_es >= 0 );
+    }
     else
-        telexActivation( false );
+    {
+        emit teletextActivated( false );
+        emit teletextPossible( false );
+    }
 }
 
 void InputManager::UpdateVout()
@@ -669,39 +696,6 @@ void InputManager::telexSetTransparency( bool b_transparentTelextext )
             emit teletextTransparencyActivated( b_transparentTelextext );
         }
     }
-}
-
-void InputManager::telexActivation( bool b_enabled )
-{
-    if( hasInput() )
-    {
-        const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
-
-        /* Teletext is possible. Show the buttons */
-        b_enabled = var_CountChoices( p_input, "teletext-es" ) > 0;
-        emit teletextPossible( b_enabled );
-        if( !b_enabled ) return;
-
-        /* If Teletext is selected */
-        if( i_teletext_es >= 0 )
-        {
-            /* Activate the buttons */
-            emit teletextActivated( true );
-
-            /* Then, find the current page */
-            int i_page = 100;
-            vlc_object_t *p_vbi = (vlc_object_t *)
-                vlc_object_find_name( p_input, "zvbi", FIND_ANYWHERE );
-            if( p_vbi )
-            {
-                i_page = var_GetInteger( p_vbi, "vbi-page" );
-                vlc_object_release( p_vbi );
-                emit newTelexPageSet( i_page );
-            }
-        }
-    }
-    else
-        emit teletextPossible( b_enabled );
 }
 
 void InputManager::activateTeletext( bool b_enable )
