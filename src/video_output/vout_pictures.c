@@ -455,26 +455,24 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
                         unsigned int *restrict pi_width,
                         unsigned int *restrict pi_height )
 {
-    if( (i_width <= 0) || (i_height <=0) )
+    if( i_width <= 0 || i_height <= 0 )
     {
         *pi_width = *pi_height = *pi_x = *pi_y = 0;
         return;
     }
 
-    bool b_autoscale = p_vout->b_autoscale;
-    int i_zoom = p_vout->i_zoom;
-
-    /* be realistic, scaling factor confined between .2 and 10. */
-    if( i_zoom > 10 * ZOOM_FP_FACTOR  || i_zoom <  ZOOM_FP_FACTOR / 5 )
-        i_zoom = ZOOM_FP_FACTOR;
-
-    if( b_autoscale )
+    if( p_vout->b_autoscale )
     {
         *pi_width = i_width;
         *pi_height = i_height;
     }
     else 
     {
+        int i_zoom = p_vout->i_zoom;
+        /* be realistic, scaling factor confined between .2 and 10. */
+        if( i_zoom > 10 * ZOOM_FP_FACTOR  || i_zoom <  ZOOM_FP_FACTOR / 5 )
+            i_zoom = ZOOM_FP_FACTOR;
+
         unsigned int i_original_width, i_original_height;
 
         if( p_vout->fmt_in.i_sar_num >= p_vout->fmt_in.i_sar_den )
@@ -494,9 +492,9 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
         *pi_height = i_original_height * i_zoom / ZOOM_FP_FACTOR ;
     }
 
-     int64_t i_scaled_width = p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
+    int64_t i_scaled_width = p_vout->fmt_in.i_visible_width * (int64_t)p_vout->fmt_in.i_sar_num *
                               *pi_height / p_vout->fmt_in.i_visible_height / p_vout->fmt_in.i_sar_den;
-     int64_t i_scaled_height = p_vout->fmt_in.i_visible_height * (int64_t)p_vout->fmt_in.i_sar_den *
+    int64_t i_scaled_height = p_vout->fmt_in.i_visible_height * (int64_t)p_vout->fmt_in.i_sar_den *
                                *pi_width / p_vout->fmt_in.i_visible_width / p_vout->fmt_in.i_sar_num;
 
     if( i_scaled_width <= 0 || i_scaled_height <= 0 )
