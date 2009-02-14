@@ -91,25 +91,15 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     input_thread_t * p_input;
     decoder_sys_t *p_sys;
-    vlc_value_t val;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('c','m','m','l') )
-    {
         return VLC_EGENERIC;
-    }
 
     p_dec->pf_decode_sub = DecodeBlock;
 
-#ifdef CMML_DEBUG
-    msg_Dbg( p_dec, "i am at %p", p_dec );
-#endif
-
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
-    {
-        return VLC_EGENERIC;
-    }
+    if( ( p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) ) ) == NULL )
+        return VLC_ENOMEM;
 
     /* Let other interested modules know that we're a CMML decoder
      * We have to set this variable on the input thread, because there's
@@ -117,21 +107,26 @@ static int OpenDecoder( vlc_object_t *p_this )
      * decoder succesfully with vlc_object_find.  (Any hints on how to achieve
      * this would be rather appreciated ;) */
     p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_ANYWHERE );
-#ifdef CMML_DEBUG
-    msg_Dbg( p_dec, "p_input is at %p", p_input );
-#endif
-    val.p_address = p_dec;
-    var_Create( p_input, "has-cmml-decoder",
-                VLC_VAR_ADDRESS|VLC_VAR_DOINHERIT );
-    if( var_Set( p_input, "has-cmml-decoder", val ) != VLC_SUCCESS )
+    if( p_input )
     {
-        msg_Dbg( p_dec, "var_Set of has-cmml-decoder failed" );
+        vlc_value_t val;
+
+#ifdef CMML_DEBUG
+        msg_Dbg( p_dec, "p_input is at %p", p_input );
+#endif
+        val.p_address = p_dec;
+        var_Create( p_input, "has-cmml-decoder",
+                    VLC_VAR_ADDRESS|VLC_VAR_DOINHERIT );
+
+        if( var_Set( p_input, "has-cmml-decoder", val ) != VLC_SUCCESS )
+            msg_Dbg( p_dec, "var_Set of has-cmml-decoder failed" );
+        vlc_object_release( p_input );
     }
-    vlc_object_release( p_input );
 
     /* initialise the CMML responder interface */
     p_sys->p_intf = intf_Create( p_dec, "cmml" );
-    intf_RunThread( p_sys->p_intf );
+    if( p_sys->p_intf )
+        intf_RunThread( p_sys->p_intf );
 
     return VLC_SUCCESS;
 }
@@ -176,14 +171,11 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    intf_thread_t *p_intf;
 
     /* Destroy the interface object/thread */
     if( p_sys->p_intf != NULL )
     {
-#ifdef CMML_DEBUG
-        msg_Dbg( p_dec, "CMML decoder is freeing interface thread" );
-#endif
+        intf_thread_t *p_intf = p_sys->p_intf;
         intf_StopThread( p_intf );
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
@@ -219,9 +211,9 @@ static void ParseText( decoder_t *p_dec, block_t *p_block )
 
     /* Copy the whole CMML tag into our own buffer:
        allocate i_buffer bytes + 1 for the terminating \0 */
-    if ( (psz_cmml = malloc( p_block->i_buffer + 1 )) == NULL )
+    if( (psz_cmml = malloc( p_block->i_buffer + 1 )) == NULL )
         return;
-    psz_cmml = memcpy( psz_cmml, p_block->p_buffer, p_block->i_buffer );
+    memcpy( psz_cmml, p_block->p_buffer, p_block->i_buffer );
     psz_cmml[p_block->i_buffer] = '\0'; /* terminate the string */
 #ifdef CMML_DEBUG
     msg_Dbg( p_dec, "psz_cmml is \"%s\"", psz_cmml );
