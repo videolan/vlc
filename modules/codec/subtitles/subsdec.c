@@ -156,14 +156,15 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     p_dec->pf_decode_sub = DecodeBlock;
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = 0;
 
     /* Allocate the memory needed to store the decoder's structure */
-    p_dec->p_sys = p_sys = malloc( sizeof( *p_sys ) );
+    p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
     /* init of p_sys */
-    memset( p_sys, 0, sizeof( *p_sys ) );
     p_sys->i_align = 0;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = false;

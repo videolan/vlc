@@ -96,10 +96,9 @@ static int OpenEncoder( vlc_object_t *p_this )
              p_enc->fmt_out.i_bitrate, p_enc->fmt_out.audio.i_rate,
              p_enc->fmt_out.audio.i_channels );
 
-    p_sys = p_enc->p_sys = malloc( sizeof( encoder_sys_t ) );
+    p_enc->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof( encoder_sys_t ) );
 
     if( !( p_sys->p_fifo = block_FifoNew() ) )
     {
@@ -111,6 +110,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_enc->fmt_out.audio.i_channels, p_enc->fmt_out.i_bitrate / 1000 );
 
     p_enc->pf_encode_audio = EncodeFrame;
+    p_enc->fmt_out.i_cat = AUDIO_ES;
 
     return VLC_SUCCESS;
 }

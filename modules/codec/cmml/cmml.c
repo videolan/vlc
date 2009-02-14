@@ -128,6 +128,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( p_sys->p_intf )
         intf_RunThread( p_sys->p_intf );
 
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = 0;
+
     return VLC_SUCCESS;
 }
 

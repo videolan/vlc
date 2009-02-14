@@ -129,12 +129,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(*p_sys)) ) == NULL )
         return VLC_ENOMEM;
 
     /* Initialize the thread properties */
-    memset( p_sys, 0, sizeof(decoder_sys_t) );
     p_sys->p_mpeg2dec = NULL;
     p_sys->p_synchro  = NULL;
     p_sys->p_info     = NULL;
@@ -200,6 +198,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_info = mpeg2_info( p_sys->p_mpeg2dec );
 
     p_dec->pf_decode_video = DecodeBlock;
+    p_dec->fmt_out.i_cat = VIDEO_ES;
+    p_dec->fmt_out.i_codec = 0;
 
     return VLC_SUCCESS;
 }

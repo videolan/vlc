@@ -167,6 +167,9 @@ static int Create( vlc_object_t *p_this )
     ass_process_codec_private( p_track, p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
     vlc_mutex_unlock( &libass_lock );
 
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
+
     return VLC_SUCCESS;
 }
 

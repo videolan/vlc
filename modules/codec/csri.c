@@ -130,6 +130,9 @@ static int Create( vlc_object_t *p_this )
                                                    p_dec->fmt_in.p_extra,
                                                    p_dec->fmt_in.p_extra ? strnlen( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra ) : 0,
                                                    NULL);
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
+
     return VLC_SUCCESS;
 }
 

@@ -265,6 +265,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef LOADER
         p_dec->p_sys = NULL;
         p_dec->pf_decode_video = DecodeVideo;
+        p_dec->fmt_out.i_cat = VIDEO_ES;
         return VLC_SUCCESS;
 #else
         return OpenVideo( p_dec );
@@ -303,6 +304,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef LOADER
         p_dec->p_sys = NULL;
         p_dec->pf_decode_audio = DecodeAudio;
+        p_dec->fmt_out.i_cat = AUDIO_ES;
         return VLC_SUCCESS;
 #else
 

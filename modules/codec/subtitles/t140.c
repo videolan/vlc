@@ -70,6 +70,7 @@ static int Open( vlc_object_t *p_this )
     p_enc->p_sys = NULL;
 
     p_enc->pf_encode_sub = Encode;
+    p_enc->fmt_out.i_cat = SPU_ES;
     return VLC_SUCCESS;
 }
 

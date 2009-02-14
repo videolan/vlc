@@ -76,6 +76,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_dec->pf_decode_sub = DecodeBlock;
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = 0;
 
     /* Unused fields of p_sys - not needed for USF decoding */
     p_sys->b_ass = false;

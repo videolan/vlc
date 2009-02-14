@@ -181,11 +181,11 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_dec->pf_decode_sub = Decode;
-    p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
+    p_sys = p_dec->p_sys = calloc( 1, sizeof(*p_sys) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
-
-    memset( p_sys, 0, sizeof(decoder_sys_t) );
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = 0;
 
     p_sys->i_align = 0;
     for ( i = 0; i < 9; i++ )

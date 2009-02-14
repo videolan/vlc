@@ -209,6 +209,9 @@ static int Open( vlc_object_t *p_this )
 
     Eia608Init( &p_sys->eia608 );
 
+    p_dec->fmt_out.i_cat = SPU_ES;
+    p_dec->fmt_out.i_codec = VLC_FOURCC('T','E','X','T');
+
     return VLC_SUCCESS;
 }
 
