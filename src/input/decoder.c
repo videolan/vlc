@@ -77,8 +77,6 @@ static void vout_unlink_picture( decoder_t *, picture_t * );
 static subpicture_t *spu_new_buffer( decoder_t * );
 static void spu_del_buffer( decoder_t *, subpicture_t * );
 
-static es_format_t null_es_format;
-
 struct decoder_owner_sys_t
 {
     int64_t         i_preroll_end;
@@ -694,6 +692,8 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 {
     decoder_t *p_dec;
     decoder_owner_sys_t *p_owner;
+    es_format_t null_es_format;
+
     int i;
 
     p_dec = vlc_object_create( p_input, i_object_type );
