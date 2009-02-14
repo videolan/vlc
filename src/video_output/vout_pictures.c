@@ -466,7 +466,7 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
         *pi_width = i_width;
         *pi_height = i_height;
     }
-    else 
+    else
     {
         int i_zoom = p_vout->i_zoom;
         /* be realistic, scaling factor confined between .2 and 10. */
