@@ -275,9 +275,8 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             [p_vout->p_sys->o_vout_view setOnTop: b_arg];
             return VLC_SUCCESS;
 
-        case VOUT_REPARENT:
         default:
-            return vout_vaControlDefault( p_vout, i_query, args );
+            return VLC_EGENERIC;
     }
 }
 
@@ -792,7 +791,7 @@ static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
         }
 
         default:
-            return vout_vaControlDefault( p_vout, i_query, args );
+            return VLC_EGENERIC;
     }
 }
 

@@ -674,7 +674,6 @@ VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_PlacePicture,   ( const vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 
-VLC_EXPORT( int, vout_vaControlDefault, ( vout_thread_t *, int, va_list ) );
 void vout_IntfInit( vout_thread_t * );
 VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,bool , bool  ) );
 

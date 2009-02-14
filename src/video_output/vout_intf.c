@@ -899,20 +899,6 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
 }
 
 /*****************************************************************************
- * vout_ControlDefault: default methods for video output control.
- *****************************************************************************/
-int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
-{
-    (void)args;
-    switch( i_query )
-    {
-    default:
-        msg_Dbg( p_vout, "control query not supported" );
-    }
-    return VLC_EGENERIC;
-}
-
-/*****************************************************************************
  * InitWindowSize: find the initial dimensions the video window should have.
  *****************************************************************************
  * This function will check the "width", "height" and "zoom" config options and

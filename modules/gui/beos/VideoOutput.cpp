@@ -1367,7 +1367,7 @@ void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
 static int Control( vout_thread_t * p_vout, int i_query, va_list args )
 {
-    return vout_vaControlDefault( p_vout, i_query, args );
+    return VLC_EGENERIC;
 }
 
 /* following functions are local */

@@ -151,9 +151,8 @@ int cocoaglvoutviewControl( vout_thread_t *p_vout, int i_query, va_list args )
             [[p_vout->p_sys->o_glview container] setOnTop: b_arg];
             return VLC_SUCCESS;
 
-        case VOUT_REPARENT:
         default:
-            return vout_vaControlDefault( p_vout, i_query, args );
+            return VLC_EGENERIC;
     }
 }
 

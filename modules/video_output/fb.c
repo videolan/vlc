@@ -651,11 +651,8 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    switch( i_query )
-    {
-       default:
-            return vout_vaControlDefault( p_vout, i_query, args );
-    }
+    (void) p_vout; (void) i_query; (void) args;
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

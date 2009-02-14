@@ -334,14 +334,9 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    switch( i_query )
-    {
-    default:
-        if( p_sys->p_vout->pf_control )
-            return p_sys->p_vout->pf_control( p_sys->p_vout, i_query, args );
-        else
-            return vout_vaControlDefault( p_vout, i_query, args );
-    }
+    if( p_sys->p_vout->pf_control )
+        return p_sys->p_vout->pf_control( p_sys->p_vout, i_query, args );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

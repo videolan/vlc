@@ -541,6 +541,5 @@ vout_RequestWindow
 vout_ShowTextAbsolute
 vout_ShowTextRelative
 vout_UnlinkPicture
-vout_vaControlDefault
 __xml_Create
 xml_Delete
