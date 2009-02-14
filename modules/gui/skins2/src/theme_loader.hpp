@@ -28,7 +28,7 @@
 #include "skin_common.hpp"
 #include <string>
 #if defined( HAVE_ZLIB_H )
-#   include "../unzip/unzip.h"
+#   include "unzip.h"
 #endif
 
 class ThemeLoader: public SkinObject
