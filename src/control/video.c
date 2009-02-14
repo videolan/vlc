@@ -517,7 +517,7 @@ int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
     if( !p_vout ) return i_ret;
 
     p_vbi = (vlc_object_t *) vlc_object_find_name( p_vout, "zvbi",
-                                                   FIND_ANYWHERE );
+                                                   FIND_CHILD );
     if( p_vbi )
     {
         i_ret = var_GetInteger( p_vbi, "vbi-page" );
@@ -538,7 +538,7 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
     if( !p_vout ) return;
 
     p_vbi = (vlc_object_t *) vlc_object_find_name( p_vout, "zvbi",
-                                                   FIND_ANYWHERE );
+                                                   FIND_CHILD );
     if( p_vbi )
     {
         i_ret = var_SetInteger( p_vbi, "vbi-page", i_page );
@@ -568,7 +568,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
     const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
 
     p_vbi = (vlc_object_t *)vlc_object_find_name( p_input_thread, "zvbi",
-                                                  FIND_ANYWHERE );
+                                                  FIND_CHILD );
     if( p_vbi )
     {
         if( b_selected )
