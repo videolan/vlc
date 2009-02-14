@@ -132,16 +132,6 @@ int module_Call( vlc_object_t *obj, module_t *p_module )
     return 0;
 }
 
-#if defined (RTLD_NOLOAD)
-/* Make sure libvlccore is in the global namespace */
-static void load_libvlccore( void )
-{
-    if( !dlsym( RTLD_DEFAULT, "libvlc_Quit" )
-     && !dlopen( "libvlccore.so", RTLD_LAZY|RTLD_GLOBAL|RTLD_NOLOAD ) )
-        fprintf( stderr, "ERROR: failed loading libvlccore\n" );
-}
-#endif
-
 /**
  * Load a dynamically linked library using a system dependent method.
  *
@@ -218,10 +208,6 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     }
 
 #elif defined(HAVE_DL_DLOPEN)
-# if defined (RTLD_NOLOAD)
-    static pthread_once_t once = PTHREAD_ONCE_INIT;
-    pthread_once( &once, &load_libvlccore );
-# endif
 
 # if defined (RTLD_NOW)
     const int flags = RTLD_NOW;
