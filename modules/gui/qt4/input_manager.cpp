@@ -42,6 +42,8 @@ static int VolumeChanged( vlc_object_t *, const char *,
 
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
+static int VbiEvent( vlc_object_t *, const char *,
+                     vlc_value_t, vlc_value_t, void * );
 
 
 /**********************************************************************
@@ -334,6 +336,17 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
+static int VbiEvent( vlc_object_t *, const char *,
+                     vlc_value_t, vlc_value_t, void *param )
+{
+    InputManager *im = (InputManager*)param;
+    IMEvent *event = new IMEvent( ItemTeletextChanged_Type, 0 );
+
+    if( event )
+        QApplication::postEvent( im, event );
+    return VLC_SUCCESS;
+}
+
 void InputManager::UpdatePosition()
 {
     /* Update position */
@@ -475,6 +488,13 @@ void InputManager::UpdateTeletext()
 
             if( p_vbi )
             {
+                /* We deleted it (if not here, it does not harm), because
+                 * var_AddCallback will silently add a duplicated one */
+                var_DelCallback( p_vbi, "vbi-page", VbiEvent, this );
+                /* This callback is not remove explicitly, but interfaces
+                 * are guaranted to outlive input */
+                var_AddCallback( p_vbi, "vbi-page", VbiEvent, this );
+
                 i_page = var_GetInteger( p_vbi, "vbi-page" );
                 b_transparent = !var_GetBool( p_vbi, "vbi-opaque" );
                 vlc_object_release( p_vbi );
