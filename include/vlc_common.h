@@ -855,7 +855,6 @@ VLC_EXPORT( const char *, VLC_CompileHost, ( void ) LIBVLC_USED );
 VLC_EXPORT( const char *, VLC_CompileDomain, ( void ) LIBVLC_USED );
 VLC_EXPORT( const char *, VLC_Compiler, ( void ) LIBVLC_USED );
 VLC_EXPORT( const char *, VLC_Error, ( int ) LIBVLC_USED );
-VLC_EXPORT( const char *, VLC_Changeset, ( void ) LIBVLC_USED );
 
 /*****************************************************************************
  * Additional vlc stuff
