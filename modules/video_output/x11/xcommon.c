@@ -3183,13 +3183,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
-       case VOUT_CLOSE:
-            vlc_mutex_lock( &p_vout->p_sys->lock );
-            XUnmapWindow( p_vout->p_sys->p_display,
-                          p_vout->p_sys->original_window.base_window );
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
-            /* Fall through */
-
        case VOUT_REPARENT:
             vlc_mutex_lock( &p_vout->p_sys->lock );
             if( i_query == VOUT_REPARENT ) d = (Drawable)va_arg( args, int );

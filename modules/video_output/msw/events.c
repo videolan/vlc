@@ -1075,8 +1075,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
         return VLC_SUCCESS;
 
-    case VOUT_CLOSE:
-        ShowWindow( p_vout->p_sys->hwnd, SW_HIDE );
     case VOUT_REPARENT:
         /* Retrieve the window position */
         point.x = point.y = 0;
@@ -1094,8 +1092,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             p_vout->p_sys->i_window_style =
                 WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
             SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
-                           p_vout->p_sys->i_window_style |
-                           (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
+                           p_vout->p_sys->i_window_style | WS_VISIBLE);
             SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW );
             SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
                           SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
@@ -1109,8 +1106,7 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             SetParent( p_vout->p_sys->hwnd, d );
             p_vout->p_sys->i_window_style = WS_CLIPCHILDREN;
             SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
-                           p_vout->p_sys->i_window_style |
-                           (i_query == VOUT_CLOSE ? 0 : WS_VISIBLE) );
+                           p_vout->p_sys->i_window_style | WS_VISIBLE);
             SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW );
 
             /* Retrieve the parent size */
