@@ -34,7 +34,7 @@ void CmdSnapshot::execute()
     if( pVout )
     {
         // Take a snapshot
-        vout_Control( pVout, VOUT_SNAPSHOT );
+        var_TriggerCallback( pVout, "video-snapshot" );
         vlc_object_release( pVout );
     }
 }

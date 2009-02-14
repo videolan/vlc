@@ -127,7 +127,7 @@ void ActionsManager::snapshot()
     vout_thread_t *p_vout = THEMIM->getVout();
     if( p_vout )
     {
-        vout_Control( p_vout, VOUT_SNAPSHOT );
+        var_TriggerCallback( p_vout, "video-snapshot" );
         vlc_object_release( p_vout );
     }
 }

@@ -906,10 +906,6 @@ int vout_vaControlDefault( vout_thread_t *p_vout, int i_query, va_list args )
     (void)args;
     switch( i_query )
     {
-    case VOUT_SNAPSHOT:
-        p_vout->p->b_snapshot = true;
-        return VLC_SUCCESS;
-
     default:
         msg_Dbg( p_vout, "control query not supported" );
     }
@@ -1270,10 +1266,12 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    /* FIXME: this is definitely not thread-safe */
+    p_vout->p->b_snapshot = true;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(newval); VLC_UNUSED(p_data);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    vout_Control( p_vout, VOUT_SNAPSHOT );
     return VLC_SUCCESS;
 }
 

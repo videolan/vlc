@@ -1125,7 +1125,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 vout_thread_t *p_vout = input_GetVout( p_sys->p_input );
                 if( p_vout )
                 {
-                    vout_Control( p_vout, VOUT_SNAPSHOT );
+                    vout_TriggerCallback( p_vout, "video-snapshot" );
                     vlc_object_release( p_vout );
                     msg_Dbg( p_intf, "requested snapshot" );
                 }

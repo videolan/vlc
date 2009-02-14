@@ -232,7 +232,7 @@ void snapshot_cb( GtkMenuItem *menuitem, gpointer user_data )
         return;
     }
 
-    vout_Control( p_intf->p_sys->p_vout, VOUT_SNAPSHOT );
+    var_TriggerCallback( p_intf->p_sys->p_vout, "video-snapshot" );
     hildon_banner_show_information( GTK_WIDGET( p_intf->p_sys->p_main_window ),
                                     NULL,
                                     "Snapshot taken" );

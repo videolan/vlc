@@ -446,7 +446,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
 - (void)snapshot
 {
-    vout_Control( p_real_vout, VOUT_SNAPSHOT );
+    var_TriggerCallback( p_real_vout, "video-snapshot" );
 }
 
 - (void)manage

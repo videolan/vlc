@@ -132,7 +132,7 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, char *psz_filepath,
     var_SetString( p_vout, "snapshot-path", psz_filepath );
     var_SetString( p_vout, "snapshot-format", "png" );
 
-    vout_Control( p_vout, VOUT_SNAPSHOT );
+    var_TriggerCallback( p_vout, "video-snapshot" );
     vlc_object_release( p_vout );
 }
 

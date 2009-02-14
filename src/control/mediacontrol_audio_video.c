@@ -102,7 +102,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
        NULL (in case of error) or a pointer to valid data. */
     p_snapshot->p_data = ( char* )p_snapshot;
 
-    vout_Control( p_vout, VOUT_SNAPSHOT );
+    var_TriggerCallback( p_vout, "video-snapshot" );
     while ( p_snapshot->p_data == ( char* )p_snapshot )
     {
         vlc_cond_wait( &p_snapshot->p_condvar, &p_snapshot->p_mutex );
