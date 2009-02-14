@@ -540,7 +540,6 @@ __vout_Request
 vout_RequestWindow
 vout_ShowTextAbsolute
 vout_ShowTextRelative
-vout_Snapshot
 vout_UnlinkPicture
 vout_vaControlDefault
 __xml_Create
