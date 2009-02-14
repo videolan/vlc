@@ -143,12 +143,9 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->p_sys = (decoder_sys_t *)malloc( sizeof( decoder_sys_t ) );
+    p_dec->p_sys = calloc( 1, sizeof( *p_dec->p_sys ) );
     if( !p_dec->p_sys )
-    {
         return VLC_ENOMEM;
-    }
-    memset( p_dec->p_sys, 0, sizeof( decoder_sys_t ) );
 
     psz_file = var_CreateGetNonEmptyStringCommand( p_dec, "fake-file" );
     if( !psz_file )

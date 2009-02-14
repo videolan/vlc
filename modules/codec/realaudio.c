@@ -200,10 +200,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+    p_dec->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     /* Flavor for SIPR codecs */
     p_sys->i_codec_flavor = -1;

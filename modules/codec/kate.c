@@ -360,8 +360,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         DecodeBlock;
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
         return VLC_ENOMEM;
 
     vlc_mutex_init( &p_sys->lock );
@@ -426,8 +425,10 @@ static int OpenDecoder( vlc_object_t *p_this )
 
 #endif
 
+    es_format_Init( &p_dec->fmt_out, SPU_ES, 0 );
+
     /* add the decoder to the global list */
-    decoder_t **list = ( decoder_t** ) realloc( kate_decoder_list, (kate_decoder_list_size+1) * sizeof( decoder_t* ));
+    decoder_t **list = realloc( kate_decoder_list, (kate_decoder_list_size+1) * sizeof( *list ));
     if( list )
     {
         list[ kate_decoder_list_size++ ] = p_dec;
