@@ -86,13 +86,8 @@ static VLAboutBox *_o_sharedInstance = nil;
         [o_about_window setTitle: _NS("About VLC media player")];
 
         /* setup the creator / revision field */
-        if( VLC_Changeset() != "exported" )
-            [o_revision_field setStringValue:
-                [NSString stringWithFormat: _NS("Compiled by %s, based on Git commit %s"),
-                    VLC_CompileBy(), VLC_Changeset()]];
-        else
-            [o_revision_field setStringValue: 
-                [NSString stringWithFormat: _NS("Compiled by %s"), VLC_CompileBy()]];
+        [o_revision_field setStringValue: 
+            [NSString stringWithFormat: _NS("Compiled by %s"), VLC_CompileBy()]];
  
         /* Setup the nameversion field */
         [o_name_version_field setStringValue: [NSString stringWithFormat:@"Version %s (%s)", VLC_Version(), PLATFORM]];

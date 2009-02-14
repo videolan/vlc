@@ -120,7 +120,6 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             + qfu( VLC_CompileBy() )+ "@" + qfu( VLC_CompileHost() ) + "."
             + qfu( VLC_CompileDomain() ) + ".\n"
             + qtr( "Compiler: " ) + qfu( VLC_Compiler() ) + ".\n"
-            + qtr( "Based on Git commit: " ) + qfu( VLC_Changeset() ) + ".\n"
             + qtr( "You are using the Qt4 Interface.\n\n" )
             + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
             + qtr( " by the VideoLAN Team.\n" )

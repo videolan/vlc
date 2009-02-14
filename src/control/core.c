@@ -206,7 +206,7 @@ const char * libvlc_get_compiler(void)
 
 const char * libvlc_get_changeset(void)
 {
-    return VLC_Changeset();
+    return "exported";
 }
 
 /* export internal libvlc_instance for ugly hacks with libvlccore */

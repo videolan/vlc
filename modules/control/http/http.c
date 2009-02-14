@@ -432,7 +432,6 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
     mvar_AppendNewVar( p_args->vars, "vlc_compile_domain",
                            VLC_CompileDomain() );
     mvar_AppendNewVar( p_args->vars, "vlc_compiler", VLC_Compiler() );
-    mvar_AppendNewVar( p_args->vars, "vlc_changeset", VLC_Changeset() );
     mvar_AppendNewVar( p_args->vars, "stream_position", position );
     mvar_AppendNewVar( p_args->vars, "stream_time", time );
     mvar_AppendNewVar( p_args->vars, "stream_length", length );
