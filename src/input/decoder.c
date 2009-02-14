@@ -303,8 +303,9 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
     }
 
     p_dec->p_owner->p_clock = p_clock;
+    assert( p_dec->fmt_out.i_cat != UNKNOWN_ES );
 
-    if( fmt->i_cat == AUDIO_ES )
+    if( p_dec->fmt_out.i_cat == AUDIO_ES )
         i_priority = VLC_THREAD_PRIORITY_AUDIO;
     else
         i_priority = VLC_THREAD_PRIORITY_VIDEO;
@@ -586,7 +587,7 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration )
     *pi_duration = 0;
 
     vlc_mutex_lock( &p_owner->lock );
-    if( p_dec->fmt_in.i_cat == VIDEO_ES )
+    if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
         if( p_owner->b_paused && p_owner->p_vout )
         {
@@ -1011,13 +1012,13 @@ static void DecoderOutputChangePause( decoder_t *p_dec, bool b_paused, mtime_t i
      * - for sout it is useless
      * - for subs, it is done by the vout
      */
-    if( p_dec->fmt_in.i_cat == AUDIO_ES )
+    if( p_dec->fmt_out.i_cat == AUDIO_ES )
     {
         if( p_owner->p_aout && p_owner->p_aout_input )
             aout_DecChangePause( p_owner->p_aout, p_owner->p_aout_input,
                                  b_paused, i_date );
     }
-    else if( p_dec->fmt_in.i_cat == VIDEO_ES )
+    else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
         if( p_owner->p_vout )
             vout_ChangePause( p_owner->p_vout, b_paused, i_date );
@@ -1975,15 +1976,15 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
             p_block->i_flags &= ~BLOCK_FLAG_CORE_PRIVATE_MASK;
         }
 
-        if( p_dec->fmt_in.i_cat == AUDIO_ES )
+        if( p_dec->fmt_out.i_cat == AUDIO_ES )
         {
             DecoderProcessAudio( p_dec, p_block, b_flush );
         }
-        else if( p_dec->fmt_in.i_cat == VIDEO_ES )
+        else if( p_dec->fmt_out.i_cat == VIDEO_ES )
         {
             DecoderProcessVideo( p_dec, p_block, b_flush );
         }
-        else if( p_dec->fmt_in.i_cat == SPU_ES )
+        else if( p_dec->fmt_out.i_cat == SPU_ES )
         {
             DecoderProcessSpu( p_dec, p_block, b_flush );
         }
@@ -2066,7 +2067,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     }
 #endif
 
-    if( p_dec->fmt_in.i_cat == SPU_ES )
+    if( p_dec->fmt_out.i_cat == SPU_ES )
     {
         vout_thread_t *p_vout;
 
