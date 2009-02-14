@@ -254,8 +254,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( p_vout )
     {
-        if( vout_Control( p_vout, VOUT_CLOSE ) != VLC_SUCCESS )
-            vout_Control( p_vout, VOUT_REPARENT, 0 );
+        vout_Control( p_vout, VOUT_REPARENT, 0 );
         vlc_object_release( p_vout );
     }
 

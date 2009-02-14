@@ -203,8 +203,7 @@ void VlcProc::registerVoutWindow( void *pVoutWindow )
     // Reparent the vout window
     if( m_pVout )
     {
-        if( vout_Control( m_pVout, VOUT_REPARENT, 0 ) != VLC_SUCCESS )
-            vout_Control( m_pVout, VOUT_CLOSE );
+        vout_Control( m_pVout, VOUT_REPARENT, 0 );
     }
 }
 
@@ -219,8 +218,7 @@ void VlcProc::dropVout()
 {
     if( m_pVout )
     {
-        if( vout_Control( m_pVout, VOUT_REPARENT, 0 ) != VLC_SUCCESS )
-            vout_Control( m_pVout, VOUT_CLOSE );
+        vout_Control( m_pVout, VOUT_REPARENT, 0 );
         m_pVout = NULL;
     }
 }
