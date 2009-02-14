@@ -2148,8 +2148,8 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             playlist_item_t *p_node = p_sys->p_node;
             int c = ' ';
             if( ( p_node && p_item->p_input == p_node->p_input ) ||
-                        ( !p_node && p_item->p_input ==
-                        playlist_CurrentPlayingItem(p_playlist)->p_input ) )
+                        ( !p_node && playlist_CurrentInput( p_playlist ) &&
+                          p_item->p_input == playlist_CurrentPlayingItem(p_playlist)->p_input ) )
                 c = '*';
             else if( p_item == p_node || ( p_item != p_node &&
                         PlaylistIsPlaying( p_intf, p_item ) ) )
