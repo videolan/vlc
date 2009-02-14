@@ -21,18 +21,9 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-avoid-version -module \
 	-export-symbol-regex ^vlc_entry \
 	-shrext $(LIBEXT) \
+	-no-undefined \
 	 `$(VLC_CONFIG) --ldflags plugin $@`
-AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@`
-if HAVE_WIN32
-# Windows does not support undefined symbols
-AM_LDFLAGS += -no-undefined
-AM_LIBADD += $(LTLIBVLCCORE)
-endif
-if HAVE_WINCE
-# Same for Windows CE
-AM_LDFLAGS += -no-undefined
-AM_LIBADD += $(LTLIBVLCCORE)
-endif
+AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` $(LTLIBVLCCORE)
 
 include $(srcdir)/Modules.am
 
