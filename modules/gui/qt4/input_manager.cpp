@@ -484,7 +484,7 @@ void InputManager::UpdateTeletext()
             bool b_transparent = false;
 
             vlc_object_t *p_vbi = (vlc_object_t *)
-                vlc_object_find_name( p_input, "zvbi", FIND_ANYWHERE );
+                vlc_object_find_name( p_input, "zvbi", FIND_CHILD );
 
             if( p_vbi )
             {
@@ -695,7 +695,7 @@ void InputManager::telexSetPage( int page )
         if( i_teletext_es >= 0 )
         {
             vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                        "zvbi", FIND_ANYWHERE );
+                        "zvbi", FIND_CHILD );
             if( p_vbi )
             {
                 var_SetInteger( p_vbi, "vbi-page", page );
@@ -712,7 +712,7 @@ void InputManager::telexSetTransparency( bool b_transparentTelextext )
     if( hasInput() )
     {
         vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                    "zvbi", FIND_ANYWHERE );
+                    "zvbi", FIND_CHILD );
         if( p_vbi )
         {
             var_SetBool( p_vbi, "vbi-opaque", !b_transparentTelextext );
