@@ -214,8 +214,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
              this, SLOT(releaseVideoSlot( void )), Qt::BlockingQueuedConnection );
 
     if( videoWidget )
+    {
         CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
+
+        connect( this, SIGNAL(askVideoToShow( unsigned int, unsigned int)),
+             videoWidget, SLOT(SetSizing(unsigned int, unsigned int )),
+             Qt::BlockingQueuedConnection );
+    }
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
 
@@ -661,6 +667,9 @@ WId MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
         }
         else
             bgWasVisible = false;
+
+        /* ask videoWidget to show */
+        emit askVideoToShow( *pi_width, *pi_height );
 
         /* Consider the video active now */
         videoIsActive = true;

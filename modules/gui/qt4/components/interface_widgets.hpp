@@ -80,9 +80,6 @@ private:
 
     QSize videoSize;
 
-signals:
-    void askVideoWidgetToShow( unsigned int, unsigned int );
-
 public slots:
     void SetSizing( unsigned int, unsigned int );
 

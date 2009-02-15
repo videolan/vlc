@@ -76,11 +76,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
        Widgets with this attribute set do not participate in composition
        management */
     setAttribute( Qt::WA_PaintOnScreen, true );
-
-    /* The core can ask through a callback to show the video. */
-    connect( this, SIGNAL(askVideoWidgetToShow( unsigned int, unsigned int)),
-             this, SLOT(SetSizing(unsigned int, unsigned int )),
-             Qt::BlockingQueuedConnection );
 }
 
 void VideoWidget::paintEvent(QPaintEvent *ev)
@@ -112,7 +107,6 @@ WId VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
         *pi_height = size().height();
     }
 
-    emit askVideoWidgetToShow( *pi_width, *pi_height );
     if( p_vout )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
