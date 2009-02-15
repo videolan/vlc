@@ -214,6 +214,7 @@ void libvlc_video_redraw_rectangle( libvlc_media_player_t *p_mi,
                            const libvlc_rectangle_t *area,
                            libvlc_exception_t *p_e )
 {
+#ifdef __APPLE__
     if( (NULL != area)
      && ((area->bottom - area->top) > 0)
      && ((area->right - area->left) > 0) )
@@ -227,6 +228,9 @@ void libvlc_video_redraw_rectangle( libvlc_media_player_t *p_mi,
             vlc_object_release( p_vout );
         }
     }
+#else
+    (void) p_mi; (void) area; (void) p_e;
+#endif
 }
 
 /* global video settings */
@@ -298,6 +302,7 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
                             const libvlc_rectangle_t *view, const libvlc_rectangle_t *clip,
                            libvlc_exception_t *p_e )
 {
+#ifdef __APPLE__
     if( !view )
     {
         libvlc_exception_raise( p_e, "viewport is NULL" );
@@ -332,6 +337,9 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance,
         }
         libvlc_media_player_release(p_mi);
     }
+#else
+    (void) p_instance; (void) view; (void) clip; (void) p_e;
+#endif
 }
 
 char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi,
