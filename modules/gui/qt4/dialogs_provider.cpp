@@ -80,7 +80,6 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 
 DialogsProvider::~DialogsProvider()
 {
-    msg_Dbg( p_intf, "Destroying the Dialog Provider" );
     PlaylistDialog::killInstance();
     MediaInfoDialog::killInstance();
     MessagesDialog::killInstance();
@@ -90,6 +89,7 @@ DialogsProvider::~DialogsProvider()
 #ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
 #endif
+    ToolbarEditDialog::killInstance();
 
     delete menusMapper;
     delete menusUpdateMapper;

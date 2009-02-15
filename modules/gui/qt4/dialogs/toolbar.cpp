@@ -39,6 +39,7 @@
 
 #include <QDragEnterEvent>
 #include <QDialogButtonBox>
+#include <QInputDialog>
 
 ToolbarEditDialog *ToolbarEditDialog::instance = NULL;
 
@@ -134,6 +135,37 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
 
     mainLayout->addWidget( FSCToolbarBox, 3, 0, 1, -1 );
 
+    /* Profile */
+    QGroupBox *profileBox = new QGroupBox( qtr( "Profile" ), this );
+    QGridLayout *profileBoxLayout = new QGridLayout( profileBox );
+
+    profileCombo = new QComboBox;
+    QLabel *profileLabel = new QLabel( qtr( "Select profile:" ), this );
+
+    QToolButton *newButton = new QToolButton;
+    newButton->setIcon( QIcon( ":/new" ) );
+    QToolButton *deleteButton = new QToolButton;
+    deleteButton->setIcon( QIcon( ":/clear" ) );
+    deleteButton->setToolTip( qtr( "Delete the current profile" ) );
+
+    profileBoxLayout->addWidget( profileLabel, 0, 0 );
+    profileBoxLayout->addWidget( profileCombo, 0, 1 );
+    profileBoxLayout->addWidget( newButton, 0, 2 );
+    profileBoxLayout->addWidget( deleteButton, 0, 3 );
+
+    mainLayout->addWidget( profileBox, 4, 0, 1, -1 );
+
+    /* Fill combos */
+    int i_size = getSettings()->beginReadArray( "ToolbarProfiles" );
+    for( int i = 0; i < i_size; i++ )
+    {
+        getSettings()->setArrayIndex(i);
+        profileCombo->addItem( getSettings()->value( "ProfileName" ).toString(),
+                               getSettings()->value( "Value" ).toString() );
+    }
+    getSettings()->endArray();
+    profileCombo->setCurrentIndex( -1 );
+
     /* Buttons */
     QDialogButtonBox *okCancel = new QDialogButtonBox;
     QPushButton *okButton = new QPushButton( qtr( "Cl&ose" ), this );
@@ -142,14 +174,62 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
     okCancel->addButton( okButton, QDialogButtonBox::AcceptRole );
     okCancel->addButton( cancelButton, QDialogButtonBox::RejectRole );
 
+    BUTTONACT( deleteButton, deleteProfile() );
+    BUTTONACT( newButton, newProfile() );
+    CONNECT( profileCombo, currentIndexChanged( int ), this, changeProfile( int ) );
     BUTTONACT( okButton, close() );
     BUTTONACT( cancelButton, cancel() );
-    mainLayout->addWidget( okCancel, 4, 2 );
+    mainLayout->addWidget( okCancel, 5, 2 );
 }
 
 
 ToolbarEditDialog::~ToolbarEditDialog()
 {
+    getSettings()->beginWriteArray( "ToolbarProfiles" );
+    for( int i = 0; i < profileCombo->count(); i++ )
+    {
+        getSettings()->setArrayIndex(i);
+        getSettings()->setValue( "ProfileName", profileCombo->itemText( i ) );
+        getSettings()->setValue( "Value", profileCombo->itemData( i ) );
+    }
+    getSettings()->endArray();
+}
+
+void ToolbarEditDialog::newProfile()
+{
+    bool ok;
+    QString name =  QInputDialog::getText( this, qtr( "Profile Name" ),
+                 qtr( "Please enter the new profile name." ), QLineEdit::Normal, 0, &ok );
+    if( !ok ) return;
+
+    QString temp = QString::number( positionCombo->currentIndex() );
+    temp += "|" + controller1->getValue();
+    temp += "|" + controller2->getValue();
+    temp += "|" + controllerA->getValue();
+    temp += "|" + controller->getValue();
+    temp += "|" + controllerFSC->getValue();
+
+    profileCombo->addItem( name, temp );
+    profileCombo->setCurrentIndex( profileCombo->count() - 1 );
+}
+
+void ToolbarEditDialog::deleteProfile()
+{
+    profileCombo->removeItem( profileCombo->currentIndex() );
+}
+
+void ToolbarEditDialog::changeProfile( int i )
+{
+    QStringList qs_list = profileCombo->itemData( i ).toString().split( "|" );
+    if( qs_list.count() < 6 )
+        return;
+
+    positionCombo->setCurrentIndex( positionCombo->findData( qs_list[0].toInt() ) );
+    controller1->resetLine( qs_list[1] );
+    controller2->resetLine( qs_list[2] );
+    controllerA->resetLine( qs_list[3] );
+    controller->resetLine( qs_list[4] );
+    controllerFSC->resetLine( qs_list[5] );
 }
 
 void ToolbarEditDialog::close()
@@ -382,6 +462,21 @@ DroppingController::DroppingController( intf_thread_t *_p_intf,
     setFrameShadow( QFrame::Raised );
 
     parseAndCreate( line, controlLayout );
+}
+
+void DroppingController::resetLine( QString line )
+{
+    hide();
+    QLayoutItem *child;
+    int i =0;
+    while( (child = controlLayout->takeAt( 0 ) ) != 0 )
+    {
+        child->widget()->hide();
+        delete child;
+    }
+
+    parseAndCreate( line, controlLayout );
+    show();
 }
 
 /* Overloading the AbstractController one, because we don't manage the

@@ -57,6 +57,8 @@ public:
             instance = new ToolbarEditDialog( p_intf );
         return instance;
     }
+    static void killInstance()
+    { if( instance ) delete instance; instance = NULL;}
     virtual ~ToolbarEditDialog();
     int getOptions() { return flatBox->isChecked() * WIDGET_FLAT +
                         bigBox->isChecked() * WIDGET_BIG +
@@ -66,13 +68,16 @@ private:
     static ToolbarEditDialog *instance;
 
     QCheckBox *flatBox, *bigBox, *shinyBox;
-    QComboBox *positionCombo;
+    QComboBox *positionCombo, *profileCombo;
 
     WidgetListing *widgetListing;
     DroppingController *controller1, *controller2, *controllerA;
     DroppingController *controllerFSC, *controller;
 
 private slots:
+    void newProfile();
+    void deleteProfile();
+    void changeProfile( int );
     void cancel();
     void close();
 };
@@ -85,6 +90,7 @@ public:
     QString getValue();
     virtual ~DroppingController();
 
+    void resetLine( QString );
 protected:
     virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
             buttonType_e i_type, int i_option );
