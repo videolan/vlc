@@ -204,7 +204,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
 #endif
     PUSH_VAR( "video-snapshot" );
     PUSH_VAR( "zoom" );
-    PUSH_VAR( "scale" );
+    PUSH_VAR( "autoscale" );
     PUSH_VAR( "aspect-ratio" );
     PUSH_VAR( "crop" );
     PUSH_VAR( "deinterlace" );
@@ -233,6 +233,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
             vlc_object_release( p_dec );
         }
     }
+
     return VLC_SUCCESS;
 }
 
@@ -276,6 +277,14 @@ static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 #define ACT_ADD( _menu, val, title ) { \
     QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
     _menu->addAction( _action ); }
+
+#define ACT_ADDMENU( _menu, val, title ) { \
+    QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
+    _action->setMenu( new QMenu() ); _menu->addAction( _action ); }
+
+#define ACT_ADDCHECK( _menu, val, title ) { \
+    QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
+    _action->setCheckable( true ); _menu->addAction( _action ); }
 
 /**
  * Main Menu Bar Creation
@@ -495,12 +504,12 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
     if( current->isEmpty() )
     {
-        ACT_ADD( current, "audio-es", qtr( "Audio &Track" ) );
-        ACT_ADD( current, "audio-channels", qtr( "Audio &Channels" ) );
-        ACT_ADD( current, "audio-device", qtr( "Audio &Device" ) );
+        ACT_ADDMENU( current, "audio-es", qtr( "Audio &Track" ) );
+        ACT_ADDMENU( current, "audio-channels", qtr( "Audio &Channels" ) );
+        ACT_ADDMENU( current, "audio-device", qtr( "Audio &Device" ) );
         current->addSeparator();
 
-        ACT_ADD( current, "visual", qtr( "&Visualizations" ) );
+        ACT_ADDMENU( current, "visual", qtr( "&Visualizations" ) );
         current->addSeparator();
 
         QAction *action = current->addAction( qtr( "Increase Volume" ),
@@ -548,7 +557,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
     if( current->isEmpty() )
     {
-        ACT_ADD( current, "video-es", qtr( "Video &Track" ) );
+        ACT_ADDMENU( current, "video-es", qtr( "Video &Track" ) );
 
         QAction *action;
         QMenu *submenu = new QMenu( qtr( "&Subtitles Track" ), current );
@@ -559,21 +568,21 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         submenu->addSeparator();
         current->addSeparator();
 
-        ACT_ADD( current, "fullscreen", qtr( "&Fullscreen" ) );
-        ACT_ADD( current, "video-on-top", qtr( "Always &On Top" ) );
+        ACT_ADDCHECK( current, "fullscreen", qtr( "&Fullscreen" ) );
+        ACT_ADDCHECK( current, "video-on-top", qtr( "Always &On Top" ) );
 #ifdef WIN32
-        ACT_ADD( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
+        ACT_ADDCHECK( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
 #endif
         ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );
 
         current->addSeparator();
 
-        ACT_ADD( current, "zoom", qtr( "&Zoom" ) );
-        ACT_ADD( current, "scale", qtr( "Sca&le" ) );
-        ACT_ADD( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
-        ACT_ADD( current, "crop", qtr( "&Crop" ) );
-        ACT_ADD( current, "deinterlace", qtr( "&Deinterlace" ) );
-        ACT_ADD( current, "postproc-q", qtr( "&Post processing" ) );
+        ACT_ADDMENU( current, "zoom", qtr( "&Zoom" ) );
+        ACT_ADDCHECK( current, "autoscale", qtr( "Sca&le" ) );
+        ACT_ADDMENU( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
+        ACT_ADDMENU( current, "crop", qtr( "&Crop" ) );
+        ACT_ADDMENU( current, "deinterlace", qtr( "&Deinterlace" ) );
+        ACT_ADDMENU( current, "postproc-q", qtr( "&Post processing" ) );
     }
 
     p_input = THEMIM->getInput();
@@ -606,11 +615,11 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     if( menu->isEmpty() )
     {
-        ACT_ADD( menu, "bookmark", qtr( "&Bookmarks" ) );
-        ACT_ADD( menu, "title", qtr( "T&itle" ) );
-        ACT_ADD( menu, "chapter", qtr( "&Chapter" ) );
-        ACT_ADD( menu, "navigation", qtr( "&Navigation" ) );
-        ACT_ADD( menu, "program", qtr( "&Program" ) );
+        ACT_ADDMENU( menu, "bookmark", qtr( "&Bookmarks" ) );
+        ACT_ADDMENU( menu, "title", qtr( "T&itle" ) );
+        ACT_ADDMENU( menu, "chapter", qtr( "&Chapter" ) );
+        ACT_ADDMENU( menu, "navigation", qtr( "&Navigation" ) );
+        ACT_ADDMENU( menu, "program", qtr( "&Program" ) );
 
         menu->addSeparator();
         addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
@@ -960,6 +969,8 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 }
 
 #undef ACT_ADD
+#undef ACT_ADDMENU
+#undef ACT_ADDCHECK
 
 /************************************************************************
  * Systray Menu                                                         *
@@ -1181,8 +1192,10 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
                 action->setEnabled( false );
         }
         else
+        {
             action->setEnabled(
                 CreateChoicesMenu( menu, psz_var, p_object, true ) == 0 );
+        }
         FREENULL( text.psz_string );
         return;
     }
@@ -1306,10 +1319,13 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
         bool checked )
 {
     QAction *action = FindActionWithVar( menu, psz_var );
+
+    bool b_new = false;
     if( !action )
     {
         action = new QAction( text, menu );
         menu->addAction( action );
+        b_new = true;
     }
 
     action->setToolTip( help );
@@ -1333,7 +1349,9 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
             val, psz_var );
     CONNECT( action, triggered(), THEDP->menusMapper, map() );
     THEDP->menusMapper->setMapping( action, itemData );
-    menu->addAction( action );
+
+    if( b_new )
+        menu->addAction( action );
 }
 
 void QVLCMenu::DoAction( QObject *data )
