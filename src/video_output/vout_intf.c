@@ -1221,13 +1221,17 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, newval.b_bool );
-    (void)psz_cmd; (void)oldval; (void)p_data;
+
+    vlc_mutex_lock( &p_vout->change_lock );
+    p_vout->i_changes |= VOUT_ON_TOP_CHANGE;
+    p_vout->b_on_top = newval.b_bool;
+    vlc_mutex_unlock( &p_vout->change_lock );
 
     /* Modify libvlc as well because the vout might have to be restarted */
     var_Create( p_vout->p_libvlc, "video-on-top", VLC_VAR_BOOL );
     var_Set( p_vout->p_libvlc, "video-on-top", newval );
 
+    (void)psz_cmd; (void)oldval; (void)p_data;
     return VLC_SUCCESS;
 }
 

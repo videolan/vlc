@@ -1265,6 +1265,14 @@ static void* RunThread( void *p_this )
             break;
         }
 
+        while( p_vout->i_changes & VOUT_ON_TOP_CHANGE )
+        {
+            p_vout->i_changes &= ~VOUT_ON_TOP_CHANGE;
+            vlc_mutex_unlock( &p_vout->change_lock );
+            vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, p_vout->b_on_top );
+            vlc_mutex_lock( &p_vout->change_lock );
+        }
+
         if( p_vout->i_changes & VOUT_SIZE_CHANGE )
         {
             /* this must only happen when the vout plugin is incapable of

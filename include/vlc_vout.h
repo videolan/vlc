@@ -506,8 +506,9 @@ struct vout_thread_t
     /**@{*/
     uint16_t            i_changes;          /**< changes made to the thread.
                                                       \see \ref vout_changes */
-    bool                b_fullscreen;         /**< toogle fullscreen display */
-    bool                b_autoscale;        /**< auto scaling picture or not */
+    unsigned            b_fullscreen:1;       /**< toogle fullscreen display */
+    unsigned            b_autoscale:1;      /**< auto scaling picture or not */
+    unsigned            b_on_top:1; /**< stay always on top of other windows */
     int                 i_zoom;               /**< scaling factor if no auto */
     unsigned int        i_window_width;              /**< video window width */
     unsigned int        i_window_height;            /**< video window height */
@@ -569,6 +570,8 @@ struct vout_thread_t
 #define VOUT_INTF_CHANGE        0x0004
 /** b_autoscale changed */
 #define VOUT_SCALE_CHANGE       0x0008
+/** b_on_top changed */
+#define VOUT_ON_TOP_CHANGE	0x0010
 /** b_cursor changed */
 #define VOUT_CURSOR_CHANGE      0x0020
 /** b_fullscreen changed */
