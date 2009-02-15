@@ -2109,7 +2109,6 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
     Atom prop;
-    XEvent xevent;
     mwmhints_t mwmhints;
     XSetWindowAttributes attributes;
 
@@ -2403,6 +2402,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
      * the call is first redirected to the window manager) */
 
 #if BADFS // RASTER: this is silly... if we have already mapped before
+    XEvent xevent;
     do
     {
         XWindowEvent( p_vout->p_sys->p_display,
