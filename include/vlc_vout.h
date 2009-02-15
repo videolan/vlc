@@ -700,7 +700,6 @@ static inline int vout_Control( vout_thread_t *p_vout, int i_query, ... )
 
 enum output_query_e
 {
-    VOUT_GET_SIZE,         /* arg1= unsigned int*, arg2= unsigned int*, res= */
     VOUT_SET_SIZE,         /* arg1= unsigned int, arg2= unsigned int, res= */
     VOUT_SET_STAY_ON_TOP,  /* arg1= bool       res=    */
     VOUT_REPARENT,

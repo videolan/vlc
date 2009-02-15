@@ -140,15 +140,6 @@ static int Control (vout_window_t *wnd, int query, va_list ap)
 {
     switch (query)
     {
-        case VOUT_GET_SIZE:
-        {
-            unsigned int *pi_width = va_arg (ap, unsigned int *);
-            unsigned int *pi_height = va_arg (ap, unsigned int *);
-            *pi_width = wnd->width;
-            *pi_height = wnd->height;
-            return VLC_SUCCESS;
-        }
-
         case VOUT_SET_SIZE: /* not allowed */
         case VOUT_SET_STAY_ON_TOP: /* not allowed either, would be ugly */
             return VLC_EGENERIC;

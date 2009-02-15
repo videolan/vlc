@@ -1044,19 +1044,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
     switch( i_query )
     {
-    case VOUT_GET_SIZE:
-        if( p_vout->p_sys->parent_window )
-            return vaControlParentWindow( p_vout, i_query, args );
-
-        pi_width  = va_arg( args, unsigned int * );
-        pi_height = va_arg( args, unsigned int * );
-
-        GetClientRect( p_vout->p_sys->hwnd, &rect_window );
-
-        *pi_width  = rect_window.right - rect_window.left;
-        *pi_height = rect_window.bottom - rect_window.top;
-        return VLC_SUCCESS;
-
     case VOUT_SET_SIZE:
         if( p_vout->p_sys->parent_window )
             return vaControlParentWindow( p_vout, i_query, args );

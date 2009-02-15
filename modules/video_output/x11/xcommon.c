@@ -3128,18 +3128,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
     switch( i_query )
     {
-        case VOUT_GET_SIZE:
-            if( p_vout->p_sys->p_win->owner_window )
-                return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
-                                           i_query, args);
-
-            pi_width  = va_arg( args, unsigned int * );
-            pi_height = va_arg( args, unsigned int * );
-
-            *pi_width  = p_vout->p_sys->p_win->i_width;
-            *pi_height = p_vout->p_sys->p_win->i_height;
-            return VLC_SUCCESS;
-
         case VOUT_SET_SIZE:
             if( p_vout->p_sys->p_win->owner_window )
                 return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,

@@ -699,14 +699,6 @@ int MainInterface::controlVideo( int i_query, va_list args )
     int i_ret = VLC_SUCCESS;
     switch( i_query )
     {
-        case VOUT_GET_SIZE:
-        {
-            unsigned int *pi_width  = va_arg( args, unsigned int * );
-            unsigned int *pi_height = va_arg( args, unsigned int * );
-            *pi_width = videoWidget->videoSize.width();
-            *pi_height = videoWidget->videoSize.height();
-            break;
-        }
         case VOUT_SET_SIZE:
         {
             unsigned int i_width  = va_arg( args, unsigned int );
