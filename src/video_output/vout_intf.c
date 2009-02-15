@@ -918,7 +918,6 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
     {
         *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
-        goto initwsize_end;
     }
     else if( i_width > 0 )
     {
@@ -926,7 +925,6 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
         *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom *
             p_vout->fmt_in.i_sar_den * i_width / p_vout->fmt_in.i_sar_num /
             FP_FACTOR / p_vout->fmt_in.i_visible_width );
-        goto initwsize_end;
     }
     else if( i_height > 0 )
     {
@@ -934,10 +932,9 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
         *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom *
             p_vout->fmt_in.i_sar_num * i_height / p_vout->fmt_in.i_sar_den /
             FP_FACTOR / p_vout->fmt_in.i_visible_height );
-        goto initwsize_end;
     }
-
-    if( p_vout->fmt_in.i_sar_num == 0 || p_vout->fmt_in.i_sar_den == 0 ) {
+    else if( p_vout->fmt_in.i_sar_num == 0 || p_vout->fmt_in.i_sar_den == 0 )
+    {
         msg_Warn( p_vout, "aspect ratio screwed up" );
         *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom /FP_FACTOR);
@@ -957,9 +954,7 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
             p_vout->fmt_in.i_sar_den / p_vout->fmt_in.i_sar_num / FP_FACTOR );
     }
 
-initwsize_end:
-    msg_Dbg( p_vout, "window size: %dx%d", p_vout->i_window_width,
-             p_vout->i_window_height );
+    msg_Dbg( p_vout, "window size: %ux%u", *pi_width, *pi_height );
 
 #undef FP_FACTOR
 }
