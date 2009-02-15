@@ -209,8 +209,6 @@ int Activate ( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
 
-    vlc_mutex_init( &p_vout->p_sys->lock );
-
     /* key and mouse event handling */
     p_vout->p_sys->i_vout_event = var_CreateGetInteger( p_vout, "vout-event" );
 
@@ -519,7 +517,6 @@ void Deactivate ( vlc_object_t *p_this )
     XCloseDisplay( p_vout->p_sys->p_display );
 
     /* Destroy structure */
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
 #ifdef MODULE_NAME_IS_xvmc
     free_context_lock( &p_vout->p_sys->xvmc_lock );
 #endif
@@ -589,14 +586,12 @@ static void RenderVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_xxmc_t *xxmc = NULL;
 
-    vlc_mutex_lock( &p_vout->p_sys->lock );
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
     xxmc = &p_pic->p_sys->xxmc_data;
     if( (!xxmc->decoded ||
         !xxmc_xvmc_surface_valid( p_vout, p_pic->p_sys->xvmc_surf )) )
     {
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
         xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
         return;
     }
@@ -761,8 +756,6 @@ static void RenderVideo( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->lastsubtitle_lock );
 #endif
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
-
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 #endif
 
@@ -967,8 +960,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                        p_vout->p_sys->p_win->i_height,
                        &i_x, &i_y, &i_width, &i_height );
 
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-
 #ifdef MODULE_NAME_IS_xvmc
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 
@@ -979,7 +970,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
       msg_Dbg( p_vout, "DisplayVideo decoded=%d\tsurfacevalid=%d",
                xxmc->decoded,
                xxmc_xvmc_surface_valid( p_vout, p_pic->p_sys->xvmc_surf ) );
-      vlc_mutex_unlock( &p_vout->p_sys->lock );
       xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
       return;
     }
@@ -1135,8 +1125,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Make sure the command is sent now - do NOT use XFlush !*/
     XSync( p_vout->p_sys->p_display, False );
-
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 
 /*****************************************************************************
@@ -1150,8 +1138,6 @@ static int ManageVideo( vout_thread_t *p_vout )
 {
     XEvent      xevent;                                         /* X11 event */
     vlc_value_t val;
-
-    vlc_mutex_lock( &p_vout->p_sys->lock );
 
 #ifdef MODULE_NAME_IS_xvmc
     xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
@@ -1579,8 +1565,6 @@ static int ManageVideo( vout_thread_t *p_vout )
         }
     }
 #endif
-
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
     return 0;
 }
 
@@ -3152,18 +3136,14 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
             pi_width  = va_arg( args, unsigned int * );
             pi_height = va_arg( args, unsigned int * );
 
-            vlc_mutex_lock( &p_vout->p_sys->lock );
             *pi_width  = p_vout->p_sys->p_win->i_width;
             *pi_height = p_vout->p_sys->p_win->i_height;
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
         case VOUT_SET_SIZE:
             if( p_vout->p_sys->p_win->owner_window )
                 return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
                                            i_query, args);
-
-            vlc_mutex_lock( &p_vout->p_sys->lock );
 
             i_width  = va_arg( args, unsigned int );
             i_height = va_arg( args, unsigned int );
@@ -3180,11 +3160,9 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
        case VOUT_REPARENT:
-            vlc_mutex_lock( &p_vout->p_sys->lock );
             if( i_query == VOUT_REPARENT ) d = (Drawable)va_arg( args, int );
             if( !d )
             {
@@ -3204,7 +3182,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
             vout_ReleaseWindow( p_vout->p_sys->p_win->owner_window );
             p_vout->p_sys->original_window.owner_window = NULL;
             return VLC_SUCCESS;
@@ -3215,7 +3192,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                                            i_query, args);
 
             b_arg = (bool) va_arg( args, int );
-            vlc_mutex_lock( &p_vout->p_sys->lock );
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 #endif
@@ -3223,7 +3199,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 #ifdef MODULE_NAME_IS_xvmc
             xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
             return VLC_SUCCESS;
 
        default:
