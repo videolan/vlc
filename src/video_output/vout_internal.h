@@ -106,5 +106,11 @@ picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
  */
 void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_pic  );
 
+
+/*
+ * DO NOT use vout_UsePictureLocked unless you are in src/video_ouput.
+ */
+int vout_Snapshot( vout_thread_t *, picture_t *p_pic );
+
 #endif
 
