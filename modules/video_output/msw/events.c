@@ -1126,15 +1126,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
         p_vout->p_sys->b_on_top_change = true;
         return VLC_SUCCESS;
 
-#ifdef MODULE_NAME_IS_wingapi
-    case VOUT_SET_FOCUS:
-		b_bool = (bool) va_arg( args, int );
-        p_vout->p_sys->b_parent_focus = b_bool;
-        if( b_bool ) GXResume();
-        else if( !p_vout->p_sys->b_focus ) GXSuspend();
-        return VLC_SUCCESS;
-#endif
-
     default:
         return VLC_EGENERIC;
     }

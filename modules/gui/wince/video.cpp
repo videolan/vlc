@@ -202,13 +202,9 @@ LRESULT VideoWindow::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     switch( msg )
     {
     case WM_KILLFOCUS:
-        if( p_vout )
-            vout_Control( p_vout, VOUT_SET_FOCUS, (bool)false );
         return TRUE;
 
     case WM_SETFOCUS:
-        if( p_vout )
-            vout_Control( p_vout, VOUT_SET_FOCUS, (bool)true );
         return TRUE;
 
     default:
