@@ -295,6 +295,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONFIG_GENERIC_NO_BOOL( "norm-max-level" , Float, NULL,
                                     volNormSpin );
+            CONFIG_GENERIC( "audio-replay-gain-mode", StringList, ui.replayLabel,
+                            replayCombo );
             CONFIG_GENERIC( "audio-visual" , Module , ui.visuLabel,
                             visualisation);
 
