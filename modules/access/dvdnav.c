@@ -1436,7 +1436,7 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
         return VLC_SUCCESS;
     }
 
-    if( (i_fd = open( psz_name, O_RDONLY )) == -1 )
+    if( (i_fd = utf8_open( psz_name, O_RDONLY |O_NONBLOCK, 0666 )) == -1 )
     {
         return VLC_SUCCESS; /* Let dvdnav_open() do the probing */
     }
@@ -1444,6 +1444,9 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
     if( fstat( i_fd, &stat_info ) || !S_ISREG( stat_info.st_mode ) )
     {
         close( i_fd );
+
+        if( S_ISFIFO( stat_info.st_mode ) )
+            return VLC_EGENERIC;
         return VLC_SUCCESS; /* Let dvdnav_open() do the probing */
     }
 
