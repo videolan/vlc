@@ -145,7 +145,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="text" >
-         <string>_("This is VLC's skinnable interface. You can download skins at &lt;a href="http://www.videolan.org/vlc/skins.php">http://www.videolan.org/vlc/skins.php&lt;/a> to customize your player.")</string>
+         <string/>
         </property>
         <property name="textFormat" >
          <enum>Qt::RichText</enum>
