@@ -164,6 +164,18 @@ ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
                                getSettings()->value( "Value" ).toString() );
     }
     getSettings()->endArray();
+
+    /* Load defaults ones if we have no combos */
+    /* We could decide that we load defaults on first launch of the dialog
+       or when the combo is back to 0. I choose the second solution, because some clueless
+       user might hit on delete a bit too much, but discussion is opened. -- jb */
+    if( i_size == 0 )
+    {
+        profileCombo->addItem( PROFILE_NAME_1, QString( VALUE_1 ) );
+        profileCombo->addItem( PROFILE_NAME_2, QString( VALUE_2 ) );
+        profileCombo->addItem( PROFILE_NAME_3, QString( VALUE_3 ) );
+        profileCombo->addItem( PROFILE_NAME_4, QString( VALUE_4 ) );
+    }
     profileCombo->setCurrentIndex( -1 );
 
     /* Buttons */
