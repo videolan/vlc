@@ -217,8 +217,10 @@ case "${host_os}" in
     then
         echo ""
         echo "Building with Mac OS X defaults:"
-        with_macosx_version_min="10.4"
-        echo "  Assuming --with-macosx-version-min=10.4"
+        with_macosx_version_min="10.5"
+        echo "  Assuming --with-macosx-version-min=10.5"
+        with_macosx_sdk="/Developer/SDKs/MacOSX${with_macosx_version_min}.sdk"
+        echo "  Assuming --with-macosx-sdk=/Developer/SDKs/MacOSX${with_macosx_version_min}.sdk"
         build_dir=`pwd`
         echo "  Assuming --prefix=${build_dir}/vlc_install_dir"
         ac_default_prefix="${build_dir}/vlc_install_dir"
@@ -1793,7 +1795,7 @@ dnl
 dnl Taglibplugin
 dnl
 AC_ARG_ENABLE(taglib,
-  [  --disable-taglib Taglib support (default enabled) ])
+  [  --disable-taglib        Taglib support (default enabled) ])
   AS_IF([test "${enable_taglib}" != "no"],[
     PKG_CHECK_MODULES(TAGLIB, taglib,
       [ AC_DEFINE( HAVE_TAGLIB, 1, [Define if you have taglib plugin built] )
