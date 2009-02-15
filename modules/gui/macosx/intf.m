@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -91,7 +91,8 @@ int OpenIntf ( vlc_object_t *p_this )
 
     p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-//    p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    /* subscribe to LibVLCCore's messages */
+    p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, NULL );
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
 
@@ -105,11 +106,30 @@ void CloseIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
 
-//    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
     [p_intf->p_sys->o_pool release];
 
     free( p_intf->p_sys );
+}
+
+static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned int i )
+{
+    int canc = vlc_savecancel();
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+
+    NSDictionary *o_dict = [NSDictionary dictionaryWithObjects: 
+                    [NSArray arrayWithObjects: 
+                        [NSString stringWithUTF8String: item->psz_module],
+                        [NSString stringWithUTF8String: item->psz_msg],
+                        [NSNumber numberWithInt: item->i_type], nil] 
+                                         forKeys:
+              [NSArray arrayWithObjects: @"Module", @"Message", @"Type", nil]];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreMessageReceived" 
+                                                        object: nil 
+                                                      userInfo: o_dict];
+
+    [o_pool release];
+    vlc_restorecancel( canc );
 }
 
 /*****************************************************************************
@@ -147,7 +167,7 @@ static void Run( intf_thread_t *p_intf )
      * see applicationWillTerminate: */
     if(setjmp(jmpbuffer) == 0)
         [NSApp run];
-
+    
     [o_pool release];
 }
 
@@ -245,6 +265,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
         _o_sharedMainInstance = [super init];
 
+    o_msg_lock = [[NSLock alloc] init];
+    o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
+    /* subscribe to LibVLC's debug messages as early as possible (for us) */
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(libvlcMessageReceived:) name: @"VLCCoreMessageReceived" object: nil];
+    
     o_about = [[VLAboutBox alloc] init];
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
@@ -434,9 +459,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
 {
-    o_msg_lock = [[NSLock alloc] init];
-    o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
-
     /* FIXME: don't poll */
     interfaceTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
                                      target: self selector: @selector(manageIntf:)
@@ -736,6 +758,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_img_play_pressed release];
     [o_img_pause release];
     [o_img_play release];
+
+    /* unsubscribe from libvlc's debug messages */
+    msg_Unsubscribe( p_intf->p_sys->p_sub );
 
     [o_msg_arr removeAllObjects];
     [o_msg_arr release];
@@ -1674,7 +1699,7 @@ static void * manage_cleanup( void * args )
     }
 
 end:
-    [self updateMessageArray];
+    [self updateMessageDisplay];
 
     if( ((i_end_scroll != -1) && (mdate() > i_end_scroll)) || !p_input )
         [self resetScrollField];
@@ -2347,6 +2372,12 @@ end:
 - (void)windowDidBecomeKey:(NSNotification *)o_notification
 {
     if( [o_notification object] == o_msgs_panel )
+        [self updateMessageDisplay];
+}
+
+- (void)updateMessageDisplay
+{
+    if( [o_msgs_panel isVisible] && b_msg_arr_changed )
     {
         id o_msg;
         NSEnumerator * o_enum;
@@ -2362,73 +2393,57 @@ end:
             [o_messages insertText: o_msg];
         }
 
+        b_msg_arr_changed = NO;
         [o_msg_lock unlock];
     }
 }
 
-- (void)updateMessageArray
+- (void)libvlcMessageReceived: (NSNotification *)o_notification
 {
-    int i_start, i_stop;
-#if 0
-    vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
-    i_stop = *p_intf->p_sys->p_sub->pi_stop;
-    vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
+    NSColor *o_white = [NSColor whiteColor];
+    NSColor *o_red = [NSColor redColor];
+    NSColor *o_yellow = [NSColor yellowColor];
+    NSColor *o_gray = [NSColor grayColor];
 
-    if( p_intf->p_sys->p_sub->i_start != i_stop )
+    NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
+    static const char * ppsz_type[4] = { ": ", " error: ",
+    " warning: ", " debug: " };
+
+    NSString *o_msg;
+    NSDictionary *o_attr;
+    NSAttributedString *o_msg_color;
+
+    int i_type = [[[o_notification userInfo] objectForKey: @"Type"] intValue];
+
+    [o_msg_lock lock];
+
+    if( [o_msg_arr count] + 2 > 400 )
     {
-        NSColor *o_white = [NSColor whiteColor];
-        NSColor *o_red = [NSColor redColor];
-        NSColor *o_yellow = [NSColor yellowColor];
-        NSColor *o_gray = [NSColor grayColor];
-
-        NSColor * pp_color[4] = { o_white, o_red, o_yellow, o_gray };
-        static const char * ppsz_type[4] = { ": ", " error: ",
-                                             " warning: ", " debug: " };
-
-        for( i_start = p_intf->p_sys->p_sub->i_start;
-             i_start != i_stop;
-             i_start = (i_start+1) % VLC_MSG_QSIZE )
-        {
-            NSString *o_msg;
-            NSDictionary *o_attr;
-            NSAttributedString *o_msg_color;
-
-            int i_type = p_intf->p_sys->p_sub->p_msg[i_start].i_type;
-
-            [o_msg_lock lock];
-
-            if( [o_msg_arr count] + 2 > 400 )
-            {
-                unsigned rid[] = { 0, 1 };
-                [o_msg_arr removeObjectsFromIndices: (unsigned *)&rid
-                           numIndices: sizeof(rid)/sizeof(rid[0])];
-            }
-
-            o_attr = [NSDictionary dictionaryWithObject: o_gray
-                forKey: NSForegroundColorAttributeName];
-            o_msg = [NSString stringWithFormat: @"%s%s",
-                p_intf->p_sys->p_sub->p_msg[i_start].psz_module,
-                ppsz_type[i_type]];
-            o_msg_color = [[NSAttributedString alloc]
-                initWithString: o_msg attributes: o_attr];
-            [o_msg_arr addObject: [o_msg_color autorelease]];
-
-            o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]
-                forKey: NSForegroundColorAttributeName];
-            o_msg = [[NSString stringWithUTF8String: p_intf->p_sys->p_sub->p_msg[i_start].psz_msg] stringByAppendingString: @"\n"];
-            o_msg_color = [[NSAttributedString alloc]
-                initWithString: o_msg attributes: o_attr];
-            [o_msg_arr addObject: [o_msg_color autorelease]];
-
-            [o_msg_lock unlock];
-        }
-
-        vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
-        p_intf->p_sys->p_sub->i_start = i_start;
-        vlc_mutex_unlock( p_intf->p_sys->p_sub->p_lock );
+        unsigned rid[] = { 0, 1 };
+        [o_msg_arr removeObjectsFromIndices: (unsigned *)&rid
+                                 numIndices: sizeof(rid)/sizeof(rid[0])];
     }
-#endif
+
+    o_attr = [NSDictionary dictionaryWithObject: o_gray
+                                         forKey: NSForegroundColorAttributeName];
+    o_msg = [NSString stringWithFormat: @"%@%s",
+             [[o_notification userInfo] objectForKey: @"Module"],
+             ppsz_type[i_type]];
+    o_msg_color = [[NSAttributedString alloc]
+                   initWithString: o_msg attributes: o_attr];
+    [o_msg_arr addObject: [o_msg_color autorelease]];
+
+    o_attr = [NSDictionary dictionaryWithObject: pp_color[i_type]
+                                         forKey: NSForegroundColorAttributeName];
+    o_msg = [[[o_notification userInfo] objectForKey: @"Message"] stringByAppendingString: @"\n"];
+    o_msg_color = [[NSAttributedString alloc]
+                   initWithString: o_msg attributes: o_attr];
+    [o_msg_arr addObject: [o_msg_color autorelease]];
+
+    b_msg_arr_changed = YES;
+    [o_msg_lock unlock];
 }
+
 
 #pragma mark -
 #pragma mark Playlist toggling

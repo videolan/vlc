@@ -83,6 +83,8 @@ struct intf_sys_t
     msg_subscription_t * p_sub;
 };
 
+static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
+
 /*****************************************************************************
  * VLCMain interface
  *****************************************************************************/
@@ -152,10 +154,11 @@ struct intf_sys_t
     IBOutlet VLCControls * o_controls;     /* VLCControls    */
     IBOutlet VLCPlaylist * o_playlist;     /* VLCPlaylist    */
 
-    IBOutlet id o_messages;     /* messages tv    */
-    IBOutlet id o_msgs_panel;   /* messages panel */
-    NSMutableArray * o_msg_arr; /* messages array */
-    NSLock * o_msg_lock;        /* messages lock  */
+    IBOutlet NSTextView * o_messages;           /* messages tv    */
+    IBOutlet NSWindow * o_msgs_panel;           /* messages panel */
+    NSMutableArray * o_msg_arr;                 /* messages array */
+    NSLock * o_msg_lock;                        /* messages lock */
+    BOOL b_msg_arr_changed;                     /* did the array change? */
     IBOutlet NSButton * o_msgs_btn_crashlog;    /* messages open crashlog */
     
     /* CrashReporter panel */
@@ -368,7 +371,7 @@ struct intf_sys_t
 - (void)setScrollField:(NSString *)o_string stopAfter:(int )timeout;
 - (void)resetScrollField;
 
-- (void)updateMessageArray;
+- (void)updateMessageDisplay;
 - (void)playStatusUpdated:(int) i_status;
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)manageVolumeSlider;
