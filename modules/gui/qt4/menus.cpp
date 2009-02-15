@@ -615,7 +615,13 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 {
     if( menu->isEmpty() )
     {
-        ACT_ADDMENU( menu, "bookmark", qtr( "&Bookmarks" ) );
+        QAction *action;
+        QMenu *submenu = new QMenu( qtr( "&Bookmarks" ), menu );
+        addDPStaticEntry( submenu, qtr( "Manage &bookmarks" ), "",
+                          SLOT( bookmarksDialog() ) );
+        submenu->addSeparator();
+        action = menu->addMenu( submenu );
+        action->setData( "bookmark" );
         ACT_ADDMENU( menu, "title", qtr( "T&itle" ) );
         ACT_ADDMENU( menu, "chapter", qtr( "&Chapter" ) );
         ACT_ADDMENU( menu, "navigation", qtr( "&Navigation" ) );
