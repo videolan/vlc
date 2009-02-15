@@ -907,18 +907,12 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
 static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
                             unsigned *pi_height )
 {
-    vlc_value_t val;
-    int i_width, i_height;
-    uint64_t ll_zoom;
-
 #define FP_FACTOR 1000                             /* our fixed point factor */
 
-    var_Get( p_vout, "width", &val );
-    i_width = val.i_int;
-    var_Get( p_vout, "height", &val );
-    i_height = val.i_int;
-    var_Get( p_vout, "zoom", &val );
-    ll_zoom = (uint64_t)( FP_FACTOR * val.f_float );
+    int i_width = var_GetInteger( p_vout, "width" );
+    int i_height = var_GetInteger( p_vout, "height" );
+    float f_zoom = var_GetFloat( p_vout, "zoom" );
+    uint64_t ll_zoom = (uint64_t)( FP_FACTOR * f_zoom );
 
     if( i_width > 0 && i_height > 0)
     {
@@ -944,7 +938,7 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
     }
 
     if( p_vout->fmt_in.i_sar_num == 0 || p_vout->fmt_in.i_sar_den == 0 ) {
-        msg_Warn( p_vout, "fucked up aspect" );
+        msg_Warn( p_vout, "aspect ratio screwed up" );
         *pi_width = (int)( p_vout->fmt_in.i_visible_width * ll_zoom / FP_FACTOR );
         *pi_height = (int)( p_vout->fmt_in.i_visible_height * ll_zoom /FP_FACTOR);
     }
