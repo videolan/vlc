@@ -69,9 +69,12 @@ void input_SendEventTimes( input_thread_t *p_input,
     val.i_time = i_time;
     var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
 
-	/* FIXME ugly + what about meta change event ? */
+    /* FIXME ugly */
     if( var_GetTime( p_input, "length" ) != i_length )
+    {
         input_item_SetDuration( p_input->p->p_item, i_length );
+        input_SendEventMeta( p_input );
+    }
     val.i_time = i_length;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 

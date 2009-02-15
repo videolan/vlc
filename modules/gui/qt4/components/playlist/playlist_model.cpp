@@ -528,6 +528,14 @@ void PLModel::customEvent( QEvent *event )
         rebuild();
 }
 
+void PLModel::updateMeta ( input_item_t *p_item )
+{
+    if( p_item )
+    {
+        ProcessInputItemUpdate( p_item->i_id );
+    }
+}
+
 /**** Events processing ****/
 void PLModel::ProcessInputItemUpdate( int i_input_id )
 {
@@ -623,6 +631,9 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* And signal the view */
     emit layoutChanged();
     addCallbacks();
+    /* Connect item update for metachanges */
+    CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
+             this, updateMeta( input_item_t *) );
 }
 
 /* This function must be entered WITH the playlist lock */
