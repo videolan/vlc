@@ -124,11 +124,21 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Do we want anoying popups or not */
     notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
 
+    /**************
+     * Status Bar *
+     **************/
+    createStatusBar();
+
     /**************************
      *  UI and Widgets design
      **************************/
     setVLCWindowsTitle();
     handleMainUi( settings );
+
+    /************
+     * Menu Bar *
+     ************/
+    QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
 
 #if 0
     /* Create a Dock to get the playlist */
@@ -141,14 +151,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                            | Qt::BottomDockWidgetArea );
     dockPL->hide();
 #endif
-
-    /**************************
-     * Menu Bar and Status Bar
-     **************************/
-    QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
-
-    /* StatusBar Creation */
-    setStatusBar( createStatusBar() );
 
     /********************
      * Input Manager    *
@@ -311,14 +313,14 @@ MainInterface::~MainInterface()
  *   Main UI handling        *
  *****************************/
 
-QStatusBar * MainInterface::createStatusBar()
+inline void MainInterface::createStatusBar()
 {
-    QStatusBar *statusBar = new QStatusBar;
-
     /****************
      *  Status Bar  *
      ****************/
     /* Widgets Creation*/
+    QStatusBar *statusBarr = statusBar();
+
     TimeLabel *timeLabel = new TimeLabel( p_intf );
     nameLabel = new QLabel( this );
     nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
@@ -331,16 +333,15 @@ QStatusBar * MainInterface::createStatusBar()
     nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
 
     /* and adding those */
-    statusBar->addWidget( nameLabel, 8 );
-    statusBar->addPermanentWidget( speedLabel, 0 );
-    statusBar->addPermanentWidget( timeLabel, 0 );
+    statusBarr->addWidget( nameLabel, 8 );
+    statusBarr->addPermanentWidget( speedLabel, 0 );
+    statusBarr->addPermanentWidget( timeLabel, 0 );
 
     /* timeLabel behaviour:
        - double clicking opens the goto time dialog
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
     CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
-    return statusBar;
 }
 
 inline void MainInterface::initSystray()
