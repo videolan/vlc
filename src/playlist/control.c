@@ -98,7 +98,6 @@ int playlist_Control( playlist_t * p_playlist, int i_query,
 static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args )
 {
     playlist_item_t *p_item, *p_node;
-    vlc_value_t val;
 
     PL_ASSERT_LOCKED;
 
@@ -138,8 +137,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
     case PLAYLIST_PLAY:
         if( pl_priv(p_playlist)->p_input )
         {
-            val.i_int = PLAYING_S;
-            var_Set( pl_priv(p_playlist)->p_input, "state", val );
+            var_SetInteger( pl_priv(p_playlist)->p_input, "state", PLAYING_S );
             break;
         }
         else
@@ -153,17 +151,13 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
         break;
 
     case PLAYLIST_PAUSE:
-        val.i_int = 0;
-        if( pl_priv(p_playlist)->p_input )
-            var_Get( pl_priv(p_playlist)->p_input, "state", &val );
-
-        if( val.i_int == PAUSE_S )
+        if( pl_priv(p_playlist)->p_input &&
+            var_GetInteger( pl_priv(p_playlist)->p_input, "state" ) == PAUSE_S )
         {
             pl_priv(p_playlist)->status.i_status = PLAYLIST_RUNNING;
             if( pl_priv(p_playlist)->p_input )
             {
-                val.i_int = PLAYING_S;
-                var_Set( pl_priv(p_playlist)->p_input, "state", val );
+                var_SetInteger( pl_priv(p_playlist)->p_input, "state", PLAYING_S );
             }
         }
         else
@@ -171,8 +165,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
             pl_priv(p_playlist)->status.i_status = PLAYLIST_PAUSED;
             if( pl_priv(p_playlist)->p_input )
             {
-                val.i_int = PAUSE_S;
-                var_Set( pl_priv(p_playlist)->p_input, "state", val );
+                var_SetInteger( pl_priv(p_playlist)->p_input, "state", PAUSE_S );
             }
         }
         break;

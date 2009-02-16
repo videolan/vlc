@@ -266,25 +266,20 @@ void set_current_status_node( playlist_t * p_playlist,
 
 static void VariablesInit( playlist_t *p_playlist )
 {
-    vlc_value_t val;
     /* These variables control updates */
     var_Create( p_playlist, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = true;
-    var_Set( p_playlist, "intf-change", val );
+    var_SetBool( p_playlist, "intf-change", true );
 
     var_Create( p_playlist, "item-change", VLC_VAR_INTEGER );
-    val.i_int = -1;
-    var_Set( p_playlist, "item-change", val );
+    var_SetInteger( p_playlist, "item-change", -1 );
 
     var_Create( p_playlist, "item-deleted", VLC_VAR_INTEGER );
-    val.i_int = -1;
-    var_Set( p_playlist, "item-deleted", val );
+    var_SetInteger( p_playlist, "item-deleted", -1 );
 
     var_Create( p_playlist, "item-append", VLC_VAR_ADDRESS );
 
     var_Create( p_playlist, "playlist-current", VLC_VAR_INTEGER );
-    val.i_int = -1;
-    var_Set( p_playlist, "playlist-current", val );
+    var_SetInteger( p_playlist, "playlist-current", -1 );
 
     var_Create( p_playlist, "activity", VLC_VAR_INTEGER );
     var_SetInteger( p_playlist, "activity", 0 );
