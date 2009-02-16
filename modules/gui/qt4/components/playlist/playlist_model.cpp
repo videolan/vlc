@@ -221,7 +221,7 @@ void PLModel::addCallbacks()
     /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
     /* We went to the next item */
-    var_AddCallback( p_playlist, "playlist-current", PlaylistNext, this );
+    var_AddCallback( p_playlist, "item-current", PlaylistNext, this );
     /* One item has been updated */
     var_AddCallback( p_playlist, "item-change", ItemChanged, this );
     var_AddCallback( p_playlist, "item-append", ItemAppended, this );
@@ -231,7 +231,7 @@ void PLModel::addCallbacks()
 void PLModel::delCallbacks()
 {
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
-    var_DelCallback( p_playlist, "playlist-current", PlaylistNext, this );
+    var_DelCallback( p_playlist, "item-current", PlaylistNext, this );
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_DelCallback( p_playlist, "item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "item-deleted", ItemDeleted, this );

@@ -1410,7 +1410,7 @@ static void * manage_cleanup( void * args )
     id self = manage_cleanup_stack->self;
     playlist_t * p_playlist = manage_cleanup_stack->p_playlist;
 
-    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
@@ -1433,7 +1433,7 @@ static void * manage_cleanup( void * args )
 
     p_playlist = pl_Hold( p_intf );
 
-    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "item-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );

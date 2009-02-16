@@ -825,7 +825,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     im = new InputManager( this, p_intf );
 
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
-    var_AddCallback( THEPL, "playlist-current", PLItemChanged, this );
+    var_AddCallback( THEPL, "item-current", PLItemChanged, this );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
@@ -836,7 +836,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
 
     /* emit check if playlist has allready started playing */
     vlc_value_t val;
-    var_Change( THEPL, "playlist-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    var_Change( THEPL, "item-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
 
     IMEvent *event = new IMEvent( ItemChanged_Type, val.i_int);
     customEvent( event );
@@ -857,7 +857,7 @@ MainInputManager::~MainInputManager()
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
 
-    var_DelCallback( THEPL, "playlist-current", PLItemChanged, this );
+    var_DelCallback( THEPL, "item-current", PLItemChanged, this );
 }
 
 vout_thread_t* MainInputManager::getVout()

@@ -757,7 +757,7 @@ static int Open( vlc_object_t *p_this )
 
     p_playlist = pl_Hold( p_intf );
     PL_LOCK;
-    var_AddCallback( p_playlist, "playlist-current", TrackChange, p_intf );
+    var_AddCallback( p_playlist, "item-current", TrackChange, p_intf );
     var_AddCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
     var_AddCallback( p_playlist, "item-append", TrackListChangeEmit, p_intf );
     var_AddCallback( p_playlist, "item-deleted", TrackListChangeEmit, p_intf );
@@ -786,7 +786,7 @@ static void Close   ( vlc_object_t *p_this )
     playlist_t      *p_playlist = pl_Hold( p_intf );;
     input_thread_t  *p_input;
 
-    var_DelCallback( p_playlist, "playlist-current", TrackChange, p_intf );
+    var_DelCallback( p_playlist, "item-current", TrackChange, p_intf );
     var_DelCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
     var_DelCallback( p_playlist, "item-append", TrackListChangeEmit, p_intf );
     var_DelCallback( p_playlist, "item-deleted", TrackListChangeEmit, p_intf );
@@ -966,7 +966,7 @@ static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
 }
 
 /*****************************************************************************
- * TrackChange: callback on playlist "playlist-current"
+ * TrackChange: callback on playlist "item-current"
  *****************************************************************************/
 static int TrackChange( vlc_object_t *p_this, const char *psz_var,
             vlc_value_t oldval, vlc_value_t newval, void *p_data )

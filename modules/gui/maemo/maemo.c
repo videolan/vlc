@@ -228,7 +228,7 @@ static void Run( intf_thread_t *p_intf )
     g_timeout_add( 150 /* miliseconds */, should_die, p_intf );
     var_AddCallback( p_intf->p_sys->p_playlist, "item-change",
                      item_changed_cb, p_intf );
-    var_AddCallback( p_intf->p_sys->p_playlist, "playlist-current",
+    var_AddCallback( p_intf->p_sys->p_playlist, "item-current",
                      playlist_current_cb, p_intf );
     var_AddCallback( p_intf->p_sys->p_playlist, "activity",
                      activity_cb, p_intf );
@@ -244,7 +244,7 @@ static void Run( intf_thread_t *p_intf )
     delete_input( p_intf );
     var_DelCallback( p_intf->p_sys->p_playlist, "item-change",
                      item_changed_cb, p_intf );
-    var_DelCallback( p_intf->p_sys->p_playlist, "playlist-current",
+    var_DelCallback( p_intf->p_sys->p_playlist, "item-current",
                      playlist_current_cb, p_intf );
     var_DelCallback( p_intf->p_sys->p_playlist, "activity",
                      activity_cb, p_intf );

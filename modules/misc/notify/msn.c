@@ -103,7 +103,7 @@ static int Open( vlc_object_t *p_this )
 
     p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
     return VLC_SUCCESS;
@@ -122,7 +122,7 @@ static void Close( vlc_object_t *p_this )
     SendToMSN( "\\0Music\\01\\0\\0\\0\\0\\0\\0\\0" );
 
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
     pl_Release( p_this );
 
     /* Destroy structure */

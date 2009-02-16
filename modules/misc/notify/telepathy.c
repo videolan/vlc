@@ -126,7 +126,7 @@ static int Open( vlc_object_t *p_this )
 
     p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_AddCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
     return VLC_SUCCESS;
@@ -142,7 +142,7 @@ static void Close( vlc_object_t *p_this )
     input_thread_t *p_input = NULL;
 
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
-    var_DelCallback( p_playlist, "playlist-current", ItemChange, p_intf );
+    var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
     if( (p_input = playlist_CurrentInput( p_playlist )) )
     {
         var_DelCallback( p_input, "state", StateChange, p_intf );
@@ -177,7 +177,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     input_thread_t *p_input;
 
     /* Don't update Telepathy presence each time an item has been preparsed */
-    if( !strncmp( "playlist-current", psz_var, 16 ) )
+    if( !strncmp( "item-current", psz_var, 16 ) )
     { /* stores the current input item id */
         p_intf->p_sys->i_id = newval.i_int;
         p_intf->p_sys->i_item_changes = 0;
@@ -211,7 +211,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         }
     }
 
-    if( !strncmp( "playlist-current", psz_var, 16 ) )
+    if( !strncmp( "item-current", psz_var, 16 ) )
         var_AddCallback( p_input, "state", StateChange, p_intf );
 
     /* We format the string to be displayed */

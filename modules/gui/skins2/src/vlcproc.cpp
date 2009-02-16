@@ -153,7 +153,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( pIntf->p_libvlc, "intf-show",
                      onIntfShow, this );
     // Called when the current played item changes
-    var_AddCallback( pIntf->p_sys->p_playlist, "playlist-current",
+    var_AddCallback( pIntf->p_sys->p_playlist, "item-current",
                      onPlaylistChange, this );
     // Called when a playlist item changed
     var_AddCallback( pIntf->p_sys->p_playlist, "item-change",
@@ -189,7 +189,7 @@ VlcProc::~VlcProc()
                      onItemDelete, this );
     var_DelCallback( getIntf()->p_libvlc, "intf-show",
                      onIntfShow, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-current",
+    var_DelCallback( getIntf()->p_sys->p_playlist, "item-current",
                      onPlaylistChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
                      onItemChange, this );

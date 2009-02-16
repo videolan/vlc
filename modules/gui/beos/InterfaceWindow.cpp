@@ -209,7 +209,7 @@ InterfaceWindow::InterfaceWindow( intf_thread_t * _p_intf, BRect frame,
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, this );
     var_AddCallback( p_playlist, "item-append", PlaylistChanged, this );
     var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, this );
-    var_AddCallback( p_playlist, "playlist-current", PlaylistChanged, this );
+    var_AddCallback( p_playlist, "item-current", PlaylistChanged, this );
 
     char psz_tmp[1024];
 #define ADD_ELLIPSIS( a ) \

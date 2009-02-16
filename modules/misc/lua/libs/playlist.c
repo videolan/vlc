@@ -318,7 +318,7 @@ static int vlclua_playlist_search( lua_State *L )
 static int vlclua_playlist_current( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    lua_pushinteger( L, var_GetInteger( p_playlist, "playlist-current" ) );
+    lua_pushinteger( L, var_GetInteger( p_playlist, "item-current" ) );
     vlclua_release_playlist_internal( p_playlist );
     return 1;
 }
