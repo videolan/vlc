@@ -136,7 +136,7 @@ void InputManager::delInput()
     /* Reset all InfoPanels but stats */
     emit artChanged( NULL );
     emit infoChanged( NULL );
-    emit metaChanged( NULL );
+    emit metaChanged( (input_item_t *)NULL );
 }
 
 /* Convert the event from the callbacks in actions */
@@ -171,7 +171,9 @@ void InputManager::customEvent( QEvent *event )
             UpdateStatus();
             // UpdateName();
             UpdateArt();
+            /* Update duration of file */
         }
+        UpdateMeta( ple->i_id );
         break;
     case ItemStateChanged_Type:
         // TODO: Fusion with above state
@@ -599,6 +601,11 @@ inline void InputManager::UpdateStats()
     emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
+inline void InputManager::UpdateMeta( int id )
+{
+    emit metaChanged( id );
+}
+
 inline void InputManager::UpdateMeta()
 {
     emit metaChanged( input_GetItem( p_input ) );
@@ -889,7 +896,7 @@ void MainInputManager::customEvent( QEvent *event )
         vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || !vlc_object_alive (p_input) ) )
         {
-            emit inputChanged( NULL );
+            emit inputChanged( p_input );
             var_DelCallback( p_input, "state", PLItemChanged, this );
             vlc_object_release( p_input );
             p_input = NULL;

@@ -129,6 +129,7 @@ private:
     void UpdateArt();
     void UpdateInfo();
     void UpdateMeta();
+    void UpdateMeta(int);
     void UpdateVout();
     void UpdateAout();
     void UpdateStats();
@@ -172,6 +173,7 @@ signals:
     void statisticsUpdated( input_item_t* );
     void infoChanged( input_item_t* );
     void metaChanged( input_item_t* );
+    void metaChanged( int );
     void artChanged( QString );
     /// Play/pause status
     void statusChanged( int );

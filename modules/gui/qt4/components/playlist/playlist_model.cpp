@@ -96,6 +96,10 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 #undef ADD_ICON
 
     rebuild( p_root );
+    CONNECT( THEMIM->getIM(), metaChanged( int ),
+            this, ProcessInputItemUpdate( int ) );
+    CONNECT( THEMIM, inputChanged( input_thread_t * ),
+            this, ProcessInputItemUpdate( input_thread_t* ) );
 }
 
 PLModel::~PLModel()
@@ -220,18 +224,20 @@ void PLModel::addCallbacks()
 {
     /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
-    /* We went to the next item */
+    /* We went to the next item 
     var_AddCallback( p_playlist, "item-current", PlaylistNext, this );
+    */
     /* One item has been updated */
-    var_AddCallback( p_playlist, "item-change", ItemChanged, this );
-    var_AddCallback( p_playlist, "playlist-item-append", ItemAppended, this );
-    var_AddCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
+    var_AddCallback( p_playlist, "item-append", ItemAppended, this );
+    var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
 }
 
 void PLModel::delCallbacks()
 {
     var_DelCallback( p_playlist, "item-change", ItemChanged, this );
+    /*
     var_DelCallback( p_playlist, "item-current", PlaylistNext, this );
+    */
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_DelCallback( p_playlist, "playlist-item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
@@ -512,16 +518,14 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 void PLModel::customEvent( QEvent *event )
 {
     int type = event->type();
-    if( type != ItemUpdate_Type && type != ItemAppend_Type &&
+    if( type != ItemAppend_Type &&
         type != ItemDelete_Type && type != PLUpdate_Type )
         return;
 
     PLEvent *ple = static_cast<PLEvent *>(event);
 
-    if( type == ItemUpdate_Type )
-        ProcessInputItemUpdate( ple->i_id );
-    else if( type == ItemAppend_Type )
-        ProcessItemAppend( &ple->add );
+    if( type == ItemAppend_Type )
+        ProcessItemAppend( ple->p_add );
     else if( type == ItemDelete_Type )
         ProcessItemRemoval( ple->i_id );
     else
@@ -529,6 +533,11 @@ void PLModel::customEvent( QEvent *event )
 }
 
 /**** Events processing ****/
+void PLModel::ProcessInputItemUpdate( input_thread_t *p_input )
+{
+    if( !p_input ) return;
+    ProcessInputItemUpdate( input_GetItem( p_input )->i_id );
+}
 void PLModel::ProcessInputItemUpdate( int i_input_id )
 {
     if( i_input_id <= 0 ) return;

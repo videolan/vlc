@@ -140,7 +140,6 @@ private:
     static QIcon icons[ITEM_TYPE_NUMBER];
 
     /* Update processing */
-    void ProcessInputItemUpdate( int i_input_id );
     void ProcessItemRemoval( int i_id );
     void ProcessItemAppend( const playlist_add_t *p_add );
 
@@ -184,6 +183,8 @@ private slots:
     void popupSave();
     void popupExplore();
     void viewchanged( int );
+    void ProcessInputItemUpdate( int i_input_id );
+    void ProcessInputItemUpdate( input_thread_t* p_input );
 };
 
 #endif
