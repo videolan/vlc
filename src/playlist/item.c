@@ -115,9 +115,9 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 static void input_item_changed( const vlc_event_t * p_event,
                                 void * user_data )
 {
-    (void)p_event;
-    playlist_item_t * p_item = user_data;
-    var_SetInteger( p_item->p_playlist, "item-change", p_item->i_id );
+    playlist_item_t *p_item = user_data;
+    VLC_UNUSED( p_event );
+    var_SetInteger( p_item->p_playlist, "item-change", p_item->p_input->i_id );
 }
 
 /*****************************************************************************
@@ -624,8 +624,7 @@ static playlist_item_t *ItemToNode( playlist_t *p_playlist,
         }
         pl_priv(p_playlist)->b_reset_currently_playing = true;
         vlc_cond_signal( &pl_priv(p_playlist)->signal );
-        var_SetInteger( p_playlist, "item-change", p_item_in_category->
-                                                        p_input->i_id );
+        var_SetInteger( p_playlist, "item-change", p_item_in_category->p_input->i_id );
         PL_UNLOCK_IF( !b_locked );
         return p_item_in_category;
     }
