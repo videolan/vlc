@@ -147,6 +147,10 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','4','a') );
         }
+        else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x11 )
+        {
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','4','a') );
+        }
         else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x03 )
         {
             es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
