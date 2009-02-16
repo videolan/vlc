@@ -2,7 +2,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
-pkgincludedir=@pkgincludedir@
+pkgincludedir=@includedir@/@PACKAGE@
 PKGDIR=@PKGDIR@
 vlclibdir=@vlclibdir@
 
