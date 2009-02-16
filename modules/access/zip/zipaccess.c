@@ -67,7 +67,7 @@ int AccessOpen( vlc_object_t *p_this )
     char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
 
     p_access->p_sys = p_sys = (access_sys_t*)
-            calloc( sizeof( access_sys_t ), 1 );
+            calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 

@@ -178,7 +178,7 @@ int StreamOpen( vlc_object_t *p_this )
     if( memcmp( p_peek, p_zip_marker, i_zip_marker ) )
         return VLC_EGENERIC;
 
-    s->p_sys = p_sys = calloc( sizeof( *p_sys ), 1 );
+    s->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
