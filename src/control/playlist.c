@@ -215,7 +215,7 @@ int libvlc_playlist_isplaying( libvlc_instance_t *p_instance,
     VLC_UNUSED(p_e);
 
     assert( PL );
-    return playlist_IsPlaying( PL );
+    return playlist_Status( PL ) == PLAYLIST_RUNNING;
 }
 
 int libvlc_playlist_items_count( libvlc_instance_t *p_instance,
@@ -233,7 +233,10 @@ int libvlc_playlist_get_current_index ( libvlc_instance_t *p_instance,
     VLC_UNUSED(p_e);
 
     assert( PL );
-    return playlist_CurrentId( PL );
+    playlist_item_t *p_item = playlist_CurrentPlayingItem( PL );
+    if( !p_item )
+        return -1;
+    return p_item->i_id;
 }
 
 void libvlc_playlist_lock( libvlc_instance_t *p_instance )

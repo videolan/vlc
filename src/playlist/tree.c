@@ -239,35 +239,6 @@ int playlist_NodeRemoveItem( playlist_t *p_playlist,
    return VLC_SUCCESS;
 }
 
-
-/**
- * Count the children of a node
- *
- * \param p_playlist the playlist
- * \param p_node the node
- * \return the number of children
- */
-int playlist_NodeChildrenCount( playlist_t *p_playlist, playlist_item_t*p_node)
-{
-    PL_ASSERT_LOCKED;
-    int i;
-    int i_nb = 0;
-
-    if( p_node->i_children == -1 )
-        return 0;
-
-    i_nb = p_node->i_children;
-    for( i=0 ; i< p_node->i_children;i++ )
-    {
-        if( p_node->pp_children[i]->i_children == -1 )
-            break;
-        else
-            i_nb += playlist_NodeChildrenCount( p_playlist,
-                                                p_node->pp_children[i] );
-    }
-    return i_nb;
-}
-
 /**
  * Search a child of a node by its name
  *

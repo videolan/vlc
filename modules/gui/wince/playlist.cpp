@@ -631,9 +631,8 @@ void Playlist::Rebuild()
     playlist_item_t * p_root = p_playlist->p_local_onelevel;
     playlist_item_t * p_child = NULL;
 
-    for( int i = 0; i < playlist_NodeChildrenCount( p_playlist, p_root ); i++ )
+    while( ( p_child = playlist_GetNextLeaf( p_playlist, p_root, p_child, FALSE, FALSE ) ) )
     {
-        p_child = playlist_GetNextLeaf( p_playlist, p_root, p_child, FALSE, FALSE);
         LVITEM lv;
         lv.mask = LVIF_TEXT;
         lv.pszText = _T("");

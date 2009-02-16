@@ -653,14 +653,6 @@ void MediaServer::fetchContents()
     Container* root = new Container( 0, "0", getFriendlyName() );
     _fetchContents( root );
 
-   // if ( _contents )
-   // {
-   //     PL_LOCK;
-   //     playlist_NodeEmpty( p_playlist, _playlistNode, true );
-   //     PL_UNLOCK;
-   //     delete _contents;
-   // }
-
     _contents = root;
     _contents->setInputItem( _inputItem );
 

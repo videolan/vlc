@@ -38,6 +38,8 @@ static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
 static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
                         bool b_stop );
 
+static playlist_item_t *ItemToNode( playlist_t *, playlist_item_t *, bool );
+
 /*****************************************************************************
  * An input item has gained a subitem (Event Callback)
  *****************************************************************************/
@@ -86,7 +88,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
         /* If this item is already a node don't transform it */
         if( p_item_in_category->i_children == -1 )
         {
-            p_item_in_category = playlist_ItemToNode( p_playlist,
+            p_item_in_category = ItemToNode( p_playlist,
                     p_item_in_category, pl_Locked );
             p_item_in_category->p_input->i_type = ITEM_TYPE_PLAYLIST;
         }
@@ -547,9 +549,9 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
  * \param b_locked TRUE if the playlist is locked
  * \return the item transform in a node
  */
-playlist_item_t *playlist_ItemToNode( playlist_t *p_playlist,
-                                      playlist_item_t *p_item,
-                                      bool b_locked )
+static playlist_item_t *ItemToNode( playlist_t *p_playlist,
+                                    playlist_item_t *p_item,
+                                    bool b_locked )
 {
 
     playlist_item_t *p_item_in_category;

@@ -302,18 +302,6 @@ static void VariablesInit( playlist_t *p_playlist )
     var_Create( p_playlist, "album-art", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 }
 
-int playlist_CurrentId( playlist_t * p_playlist )
-{
-    return pl_priv(p_playlist)->status.p_item->i_id;
-
-}
-
-bool playlist_IsPlaying( playlist_t * p_playlist )
-{
-    return ( pl_priv(p_playlist)->status.i_status == PLAYLIST_RUNNING &&
-            !(pl_priv(p_playlist)->request.b_request && pl_priv(p_playlist)->request.i_status == PLAYLIST_STOPPED) );
-}
-
 playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )
 {
     return pl_priv(p_playlist)->status.p_item;
@@ -323,3 +311,4 @@ int playlist_Status( playlist_t * p_playlist )
 {
     return pl_priv(p_playlist)->status.i_status;
 }
+
