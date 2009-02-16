@@ -861,7 +861,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED(oldval);
     intf_thread_t *p_intf = p_data;
 
-    if( !strcmp( psz_var, "item-append" ) || !strcmp( psz_var, "item-remove" ) )
+    if( !strcmp( psz_var, "item-append" ) )
     {
         /* don't signal when items are added/removed in p_category */
         playlist_t *p_playlist = (playlist_t*)p_this;
