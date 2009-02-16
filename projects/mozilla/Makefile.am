@@ -83,7 +83,7 @@ noinst_DATA = npvlc.rsrc VLC\ Plugin.plugin
 MOSTLYCLEANFILES += npvlc.rsrc
 CLEANFILES += VLC\ Plugin.plugin
 
-npvlc.rsrc: $(srcdir)/vlc.r
+npvlc.rsrc: vlc.r
 	/Developer/Tools/Rez -useDF /Developer/Headers/FlatCarbon/Types.r $< -o $@
 
 #
