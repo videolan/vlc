@@ -228,8 +228,8 @@ void PLModel::addCallbacks()
     var_AddCallback( p_playlist, "item-current", PlaylistNext, this );
     */
     /* One item has been updated */
-    var_AddCallback( p_playlist, "item-append", ItemAppended, this );
-    var_AddCallback( p_playlist, "item-deleted", ItemDeleted, this );
+    var_AddCallback( p_playlist, "playlist-item-append", ItemAppended, this );
+    var_AddCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
 }
 
 void PLModel::delCallbacks()
