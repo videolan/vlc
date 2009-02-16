@@ -266,6 +266,8 @@ enum
 /* Quantification type */
 enum
 {
+    QTYPE_NONE,
+
     QTYPE_MPEG1,
     QTYPE_MPEG2,
     QTYPE_H264,
