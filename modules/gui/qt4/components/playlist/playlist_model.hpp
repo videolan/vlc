@@ -61,15 +61,21 @@ class PLEvent : public QEvent
 {
 public:
     PLEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
-    { i_id = id; p_add = NULL; };
+    {
+        i_id = id;
+        add.i_node = -1;
+        add.i_item = -1;
+    };
 
-    PLEvent( playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
-    { p_add = a; };
+    PLEvent( const playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
+    {
+        add = *a;
+    };
 
-    virtual ~PLEvent() { free( p_add ); };
+    virtual ~PLEvent() { };
 
     int i_id;
-    playlist_add_t *p_add;
+    playlist_add_t add;
 };
 
 
@@ -136,7 +142,7 @@ private:
     /* Update processing */
     void ProcessInputItemUpdate( int i_input_id );
     void ProcessItemRemoval( int i_id );
-    void ProcessItemAppend( playlist_add_t *p_add );
+    void ProcessItemAppend( const playlist_add_t *p_add );
 
     void UpdateTreeItem( PLItem *, bool, bool force = false );
     void UpdateTreeItem( playlist_item_t *, PLItem *, bool, bool forc = false );

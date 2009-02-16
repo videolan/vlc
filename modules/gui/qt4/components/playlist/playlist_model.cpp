@@ -521,7 +521,7 @@ void PLModel::customEvent( QEvent *event )
     if( type == ItemUpdate_Type )
         ProcessInputItemUpdate( ple->i_id );
     else if( type == ItemAppend_Type )
-        ProcessItemAppend( ple->p_add );
+        ProcessItemAppend( &ple->add );
     else if( type == ItemDelete_Type )
         ProcessItemRemoval( ple->i_id );
     else
@@ -550,7 +550,7 @@ void PLModel::ProcessItemRemoval( int i_id )
     removeItem( i_id );
 }
 
-void PLModel::ProcessItemAppend( playlist_add_t *p_add )
+void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
 {
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
@@ -977,9 +977,7 @@ static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
                          vlc_value_t oval, vlc_value_t nval, void *param )
 {
     PLModel *p_model = (PLModel *) param;
-    playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t));
-    memcpy( p_add, nval.p_address, sizeof( playlist_add_t ) );
-
+    const playlist_add_t *p_add = (playlist_add_t *)nval.p_address;
     PLEvent *event = new PLEvent( p_add );
     QApplication::postEvent( p_model, event );
     return VLC_SUCCESS;
