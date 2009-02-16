@@ -178,7 +178,6 @@ private slots:
     void popupSave();
     void popupExplore();
     void viewchanged( int );
-    void updateMeta( input_item_t * );
 };
 
 #endif
