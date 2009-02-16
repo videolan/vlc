@@ -164,7 +164,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     else
     {
         int i;
-        var_SetInteger( p_playlist, "item-deleted", p_root->i_id );
+        var_SetInteger( p_playlist, "playlist-item-deleted", p_root->i_id );
         ARRAY_BSEARCH( p_playlist->all_items, ->i_id, int,
                        p_root->i_id, i );
         if( i != -1 )

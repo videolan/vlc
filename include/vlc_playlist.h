@@ -122,8 +122,8 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
  * * - "item-current": It will contains a input_item_t->i_id of the current
  * item being played.
  *
- * - "item-append": It will contains a pointer to a playlist_add_t.
- * - "item-deleted": It will contains the playlist_item_t->i_id of a deleted
+ * - "playlist-item-append": It will contains a pointer to a playlist_add_t.
+ * - "playlist-item-deleted": It will contains the playlist_item_t->i_id of a deleted
  * playlist_item_t.
  *
  * XXX Be really carefull, playlist_item_t->i_id and input_item_t->i_id are not

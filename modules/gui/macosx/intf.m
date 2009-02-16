@@ -1413,8 +1413,8 @@ static void * manage_cleanup( void * args )
     var_AddCallback( p_playlist, "item-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "playlist-item-append", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "playlist-item-deleted", PlaylistChanged, self );
 
     pl_Release( p_intf );
 
@@ -1436,8 +1436,8 @@ static void * manage_cleanup( void * args )
     var_AddCallback( p_playlist, "item-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
     var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "item-append", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "item-deleted", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "playlist-item-append", PlaylistChanged, self );
+    var_AddCallback( p_playlist, "playlist-item-deleted", PlaylistChanged, self );
 
     struct manage_cleanup_stack stack = { p_intf, &p_input, p_playlist, self };
     pthread_cleanup_push(manage_cleanup, &stack);

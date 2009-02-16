@@ -143,11 +143,11 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     // Called when a playlist item is added
-    var_AddCallback( pIntf->p_sys->p_playlist, "item-append",
+    var_AddCallback( pIntf->p_sys->p_playlist, "playlist-item-append",
                      onItemAppend, this );
     // Called when a playlist item is deleted
     // TODO: properly handle item-deleted
-    var_AddCallback( pIntf->p_sys->p_playlist, "item-deleted",
+    var_AddCallback( pIntf->p_sys->p_playlist, "playlist-item-deleted",
                      onItemDelete, this );
     // Called when the "interface shower" wants us to show the skin
     var_AddCallback( pIntf->p_libvlc, "intf-show",
@@ -183,9 +183,9 @@ VlcProc::~VlcProc()
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "item-append",
+    var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-append",
                      onItemAppend, this );
-    var_DelCallback( getIntf()->p_sys->p_playlist, "item-deleted",
+    var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-deleted",
                      onItemDelete, this );
     var_DelCallback( getIntf()->p_libvlc, "intf-show",
                      onIntfShow, this );

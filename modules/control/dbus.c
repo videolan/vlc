@@ -759,8 +759,8 @@ static int Open( vlc_object_t *p_this )
     PL_LOCK;
     var_AddCallback( p_playlist, "item-current", TrackChange, p_intf );
     var_AddCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "item-append", TrackListChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "item-deleted", TrackListChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "playlist-item-append", TrackListChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "playlist-item-deleted", TrackListChangeEmit, p_intf );
     var_AddCallback( p_playlist, "random", StatusChangeEmit, p_intf );
     var_AddCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
     var_AddCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
@@ -788,8 +788,8 @@ static void Close   ( vlc_object_t *p_this )
 
     var_DelCallback( p_playlist, "item-current", TrackChange, p_intf );
     var_DelCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "item-append", TrackListChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "item-deleted", TrackListChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "playlist-item-append", TrackListChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "playlist-item-deleted", TrackListChangeEmit, p_intf );
     var_DelCallback( p_playlist, "random", StatusChangeEmit, p_intf );
     var_DelCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
     var_DelCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
@@ -861,7 +861,7 @@ static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
     VLC_UNUSED(oldval);
     intf_thread_t *p_intf = p_data;
 
-    if( !strcmp( psz_var, "item-append" ) )
+    if( !strcmp( psz_var, "playlist-item-append" ) )
     {
         /* don't signal when items are added/removed in p_category */
         playlist_t *p_playlist = (playlist_t*)p_this;

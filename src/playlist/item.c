@@ -789,7 +789,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
     if( b_signal )
         vlc_cond_signal( &pl_priv(p_playlist)->signal );
 
-    var_Set( p_playlist, "item-append", val );
+    var_Set( p_playlist, "playlist-item-append", val );
     free( p_add );
 }
 
@@ -888,7 +888,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         return playlist_NodeDelete( p_playlist, p_item, true, false );
     }
     pl_priv(p_playlist)->b_reset_currently_playing = true;
-    var_SetInteger( p_playlist, "item-deleted", i_id );
+    var_SetInteger( p_playlist, "playlist-item-deleted", i_id );
 
     /* Remove the item from the bank */
     ARRAY_BSEARCH( p_playlist->all_items,->i_id, int, i_id, i );
