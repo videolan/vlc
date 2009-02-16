@@ -775,22 +775,21 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
 void playlist_SendAddNotify( playlist_t *p_playlist, int i_item_id,
                              int i_node_id, bool b_signal )
 {
-    vlc_value_t val;
+    playlist_private_t *p_sys = pl_priv(p_playlist);
     PL_ASSERT_LOCKED;
 
-    playlist_add_t *p_add = (playlist_add_t *)malloc( sizeof( playlist_add_t) );
-    if( !p_add )
-        return;
-
-    p_add->i_item = i_item_id;
-    p_add->i_node = i_node_id;
-    val.p_address = p_add;
-    pl_priv(p_playlist)->b_reset_currently_playing = true;
+    p_sys->b_reset_currently_playing = true;
     if( b_signal )
-        vlc_cond_signal( &pl_priv(p_playlist)->signal );
+        vlc_cond_signal( &p_sys->signal );
+
+    playlist_add_t add;
+    add.i_item = i_item_id;
+    add.i_node = i_node_id;
+
+    vlc_value_t val;
+    val.p_address = &add;
 
     var_Set( p_playlist, "playlist-item-append", val );
-    free( p_add );
 }
 
 /***************************************************************************
@@ -900,17 +899,10 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         ARRAY_REMOVE( p_playlist->items, i );
 
     /* Check if it is the current item */
-    if( get_current_status_item( p_playlist ) == p_item )
+    if( get_current_status_item( p_playlist ) == p_item && b_stop )
     {
-        /* Hack we don't call playlist_Control for lock reasons */
-        if( b_stop )
-        {
-            pl_priv(p_playlist)->request.i_status = PLAYLIST_STOPPED;
-            pl_priv(p_playlist)->request.b_request = true;
-            pl_priv(p_playlist)->request.p_item = NULL;
-            msg_Info( p_playlist, "stopping playback" );
-            vlc_cond_signal( &pl_priv(p_playlist)->signal );
-        }
+        playlist_Control( p_playlist, PLAYLIST_STOP, pl_Locked );
+        msg_Info( p_playlist, "stopping playback" );
     }
 
     PL_DEBUG( "deleting item `%s'", p_item->p_input->psz_name );

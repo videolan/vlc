@@ -188,9 +188,8 @@ struct playlist_t
 /** Helper to add an item */
 struct playlist_add_t
 {
-    int i_node;
-    int i_item;
-    int i_position;
+    int i_node; /**< Playist id of the parent node */
+    int i_item; /**< Playist id of the playlist_item_t */
 };
 
 enum
