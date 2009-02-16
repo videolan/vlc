@@ -118,9 +118,14 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
  * The playlist defines the following event variables:
  * - "item-change": It will contains the input_item_t->i_id of a changed input
  * item monitored by the playlist.
+ * - "item-deleted": It will contains the playlist_item_t->i_id of a deleted
+ * playlist_item_t.
+ * - "item-append": It will contains a pointer to a playlist_add_t.
+ * - "playlist-current": It will contains a input_item_t->i_id of the current
+ * item being played.
  *
  * XXX Be really carefull, playlist_item_t->i_id and input_item_t->i_id are not
- * the same.
+ * the same. Yes, the situation is pretty bad.
  *
  * @{
  */
