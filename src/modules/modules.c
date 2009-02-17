@@ -99,8 +99,8 @@ static vlc_mutex_t module_lock = VLC_STATIC_MUTEX;
 #ifdef HAVE_DYNAMIC_PLUGINS
 static void AllocateAllPlugins  ( vlc_object_t * );
 static void AllocatePluginDir   ( vlc_object_t *, const char *, int );
-static int  AllocatePluginFile  ( vlc_object_t *, char *, int64_t, int64_t );
-static module_t * AllocatePlugin( vlc_object_t *, char * );
+static int  AllocatePluginFile  ( vlc_object_t *, const char *, int64_t, int64_t );
+static module_t * AllocatePlugin( vlc_object_t *, const char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
 static void DeleteModule ( module_bank_t *, module_t * );
@@ -1172,7 +1172,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
  * for its information data. The module can then be handled by module_need
  * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
+static int AllocatePluginFile( vlc_object_t * p_this, const char * psz_file,
                                int64_t i_file_time, int64_t i_file_size )
 {
     module_t * p_module = NULL;
@@ -1260,7 +1260,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, char * psz_file,
  * for its information data. The module can then be handled by module_need
  * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
-static module_t * AllocatePlugin( vlc_object_t * p_this, char * psz_file )
+static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
 {
     module_t * p_module = NULL;
     module_handle_t handle;
