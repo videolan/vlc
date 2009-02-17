@@ -1131,7 +1131,7 @@ RuntimeNPObject::InvokeResult LibvlcLogNPObject::setProperty(int index, const NP
                     int verbosity = numberValue(value);
                     if( verbosity >= 0 )
                     {
-                        if( ! p_log )
+                        if( !p_log )
                         {
                             p_log = libvlc_log_open(p_libvlc, &ex);
                             if( libvlc_exception_raised(&ex) )
@@ -1430,7 +1430,7 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                     {
                         url = p_plugin->getAbsoluteURL(s);
                         if( url )
-			    free(s);
+                            free(s);
                         else
                             // problem with combining url, use argument
                             url = s;
@@ -1498,7 +1498,7 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::invoke(int index, const NP
                 free(name);
                 for( int i=0; i< i_options; ++i )
                 {
-		    free(ppsz_options[i]);
+                    free(ppsz_options[i]);
                 }
                 free(ppsz_options);
 
@@ -2169,4 +2169,3 @@ RuntimeNPObject::InvokeResult LibvlcVideoNPObject::invoke(int index, const NPVar
     }
     return INVOKERESULT_GENERIC_ERROR;
 }
-
