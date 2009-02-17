@@ -97,9 +97,11 @@ static vlc_mutex_t module_lock = VLC_STATIC_MUTEX;
  * Local prototypes
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void AllocateAllPlugins  ( vlc_object_t * );
-static void AllocatePluginDir   ( vlc_object_t *, const char *, int );
-static int  AllocatePluginFile  ( vlc_object_t *, const char *, int64_t, int64_t );
+static void AllocateAllPlugins( vlc_object_t *, module_bank_t * );
+static void AllocatePluginDir( vlc_object_t *, module_bank_t *, const char *,
+                               unsigned );
+static int  AllocatePluginFile( vlc_object_t *, module_bank_t *, const char *,
+                                int64_t, int64_t );
 static module_t * AllocatePlugin( vlc_object_t *, const char * );
 #endif
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
@@ -264,7 +266,7 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
         CacheLoad( p_this, p_module_bank, b_cache_delete );
 
     /* FIXME: race - do this under the lock */
-    AllocateAllPlugins( p_this );
+    AllocateAllPlugins( p_this, p_module_bank );
 #endif
 }
 
@@ -937,7 +939,7 @@ char *psz_vlcpath = NULL;
  * AllocateAllPlugins: load all plugin modules we can find.
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void AllocateAllPlugins( vlc_object_t *p_this )
+static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 {
     const char *vlcpath = psz_vlcpath;
     int count,i;
@@ -976,7 +978,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         msg_Dbg( p_this, "recursively browsing `%s'", path );
 
         /* Don't go deeper than 5 subdirectories */
-        AllocatePluginDir( p_this, path, 5 );
+        AllocatePluginDir( p_this, p_bank, path, 5 );
 
         free( path );
     }
@@ -988,8 +990,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 /*****************************************************************************
  * AllocatePluginDir: recursively parse a directory to look for plugins
  *****************************************************************************/
-static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
-                               int i_maxdepth )
+static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
+                               const char *psz_dir, unsigned i_maxdepth )
 {
 /* FIXME: Needs to be ported to wide char on ALL Windows builds */
 #ifdef WIN32
@@ -1013,10 +1015,8 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
 #endif
     char * psz_file;
 
-    if( p_this->p_libvlc->b_die || i_maxdepth < 0 )
-    {
+    if( i_maxdepth == 0 )
         return;
-    }
 
 #if defined( UNDER_CE ) || defined( _MSC_VER )
 #ifdef UNDER_CE
@@ -1138,7 +1138,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
         i_stat = stat( psz_file, &statbuf );
         if( !i_stat && statbuf.st_mode & S_IFDIR )
         {
-            AllocatePluginDir( p_this, psz_file, i_maxdepth - 1 );
+            AllocatePluginDir( p_this, p_bank, psz_file, i_maxdepth - 1 );
         }
         else if( i_len > strlen( LIBEXT )
                   /* We only load files ending with LIBEXT */
@@ -1153,7 +1153,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
                 i_size = statbuf.st_size;
             }
 
-            AllocatePluginFile( p_this, psz_file, i_time, i_size );
+            AllocatePluginFile( p_this, p_bank, psz_file, i_time, i_size );
         }
 
         free( psz_file );
@@ -1172,7 +1172,8 @@ static void AllocatePluginDir( vlc_object_t *p_this, const char *psz_dir,
  * for its information data. The module can then be handled by module_need
  * and module_unneed. It can be removed by DeleteModule.
  *****************************************************************************/
-static int AllocatePluginFile( vlc_object_t * p_this, const char * psz_file,
+static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
+                               const char *psz_file,
                                int64_t i_file_time, int64_t i_file_size )
 {
     module_t * p_module = NULL;
@@ -1181,9 +1182,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, const char * psz_file,
     /*
      * Check our plugins cache first then load plugin if needed
      */
-    p_cache_entry =
-        CacheFind( p_module_bank, psz_file, i_file_time, i_file_size );
-
+    p_cache_entry = CacheFind( p_bank, psz_file, i_file_time, i_file_size );
     if( !p_cache_entry )
     {
         p_module = AllocatePlugin( p_this, psz_file );
@@ -1227,13 +1226,12 @@ static int AllocatePluginFile( vlc_object_t * p_this, const char * psz_file,
 
         /* msg_Dbg( p_this, "plugin \"%s\", %s",
                     p_module->psz_object_name, p_module->psz_longname ); */
-        p_module->next = p_module_bank->head;
-        p_module_bank->head = p_module;
+        p_module->next = p_bank->head;
+        p_bank->head = p_module;
 
         if( !p_module_bank->b_cache )
             return 0;
 
-#define p_bank p_module_bank
         /* Add entry to cache */
         p_bank->pp_cache =
             realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
@@ -1247,7 +1245,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, const char * psz_file,
         p_bank->pp_cache[p_bank->i_cache]->b_used = true;
         p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
         p_bank->i_cache++;
-#undef p_bank
     }
 
     return p_module ? 0 : -1;
