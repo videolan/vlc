@@ -1486,6 +1486,70 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         }
     }
 
+    /* */
+    switch( p_track->fmt.i_cat )
+    {
+    case VIDEO_ES:
+        p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
+        p_track->fmt.video.i_height = p_sample->data.p_sample_vide->i_height;
+        p_track->fmt.video.i_bits_per_pixel =
+            p_sample->data.p_sample_vide->i_depth;
+
+        /* fall on display size */
+        if( p_track->fmt.video.i_width <= 0 )
+            p_track->fmt.video.i_width = p_track->i_width;
+        if( p_track->fmt.video.i_height <= 0 )
+            p_track->fmt.video.i_height = p_track->i_height;
+
+        /* Find out apect ratio from display size */
+        if( p_track->i_width > 0 && p_track->i_height > 0 &&
+            /* Work-around buggy muxed files */
+            p_sample->data.p_sample_vide->i_width != p_track->i_width )
+            p_track->fmt.video.i_aspect =
+                VOUT_ASPECT_FACTOR * p_track->i_width / p_track->i_height;
+
+        /* Support for cropping (eg. in H263 files) */
+        p_track->fmt.video.i_visible_width = p_track->fmt.video.i_width;
+        p_track->fmt.video.i_visible_height = p_track->fmt.video.i_height;
+
+        /* Frame rate */
+        p_track->fmt.video.i_frame_rate = p_track->i_timescale;
+        p_track->fmt.video.i_frame_rate_base = 1;
+
+        if( p_track->fmt.video.i_frame_rate &&
+            (p_box = MP4_BoxGet( p_track->p_stbl, "stts" )) &&
+            p_box->data.p_stts->i_entry_count >= 1 )
+        {
+            p_track->fmt.video.i_frame_rate_base =
+                p_box->data.p_stts->i_sample_delta[0];
+        }
+
+        break;
+
+    case AUDIO_ES:
+        p_track->fmt.audio.i_channels =
+            p_sample->data.p_sample_soun->i_channelcount;
+        p_track->fmt.audio.i_rate =
+            p_sample->data.p_sample_soun->i_sampleratehi;
+        p_track->fmt.i_bitrate = p_sample->data.p_sample_soun->i_channelcount *
+            p_sample->data.p_sample_soun->i_sampleratehi *
+                p_sample->data.p_sample_soun->i_samplesize;
+        p_track->fmt.audio.i_bitspersample =
+            p_sample->data.p_sample_soun->i_samplesize;
+
+        if( p_track->i_sample_size != 0 &&
+            p_sample->data.p_sample_soun->i_qt_version == 1 && p_sample->data.p_sample_soun->i_sample_per_packet <= 0 )
+        {
+            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1" );
+            return VLC_EGENERIC;
+        }
+        break;
+
+    default:
+        break;
+    }
+
+
     /* It's a little ugly but .. there are special cases */
     switch( p_sample->i_type )
     {
@@ -1496,6 +1560,34 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             p_track->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
             if( p_track->i_sample_size > 1 )
                 p_soun->i_qt_version = 0;
+            break;
+        }
+        case( VLC_FOURCC( 'a', 'c', '-', '3' ) ):
+        {
+            MP4_Box_t *p_dac3_box = MP4_BoxGet(  p_sample, "dac3", 0 );
+
+            p_track->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+            if( p_dac3_box )
+            {
+                static const int pi_bitrate[] = {
+                     32,  40,  48,  56,
+                     64,  80,  96, 112,
+                    128, 160, 192, 224,
+                    256, 320, 384, 448,
+                    512, 576, 640,
+                };
+                MP4_Box_data_dac3_t *p_dac3 = p_dac3_box->data.p_dac3;
+                p_track->fmt.audio.i_channels = 0;
+                p_track->fmt.i_bitrate = 0;
+                if( p_dac3->i_bitrate_code < sizeof(pi_bitrate)/sizeof(*pi_bitrate) )
+                    p_track->fmt.i_bitrate = pi_bitrate[p_dac3->i_bitrate_code] * 1000;
+                p_track->fmt.audio.i_bitspersample = 0;
+            }
+            break;
+        }
+        case( VLC_FOURCC( 'e', 'c', '-', '3' ) ):
+        {
+            p_track->fmt.i_codec = VLC_FOURCC( 'e', 'a', 'c', '3' );
             break;
         }
 
@@ -1739,69 +1831,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     }
 
 #undef p_decconfig
-
-    /* some last initialisation */
-    switch( p_track->fmt.i_cat )
-    {
-    case VIDEO_ES:
-        p_track->fmt.video.i_width = p_sample->data.p_sample_vide->i_width;
-        p_track->fmt.video.i_height = p_sample->data.p_sample_vide->i_height;
-        p_track->fmt.video.i_bits_per_pixel =
-            p_sample->data.p_sample_vide->i_depth;
-
-        /* fall on display size */
-        if( p_track->fmt.video.i_width <= 0 )
-            p_track->fmt.video.i_width = p_track->i_width;
-        if( p_track->fmt.video.i_height <= 0 )
-            p_track->fmt.video.i_height = p_track->i_height;
-
-        /* Find out apect ratio from display size */
-        if( p_track->i_width > 0 && p_track->i_height > 0 &&
-            /* Work-around buggy muxed files */
-            p_sample->data.p_sample_vide->i_width != p_track->i_width )
-            p_track->fmt.video.i_aspect =
-                VOUT_ASPECT_FACTOR * p_track->i_width / p_track->i_height;
-
-        /* Support for cropping (eg. in H263 files) */
-        p_track->fmt.video.i_visible_width = p_track->fmt.video.i_width;
-        p_track->fmt.video.i_visible_height = p_track->fmt.video.i_height;
-
-        /* Frame rate */
-        p_track->fmt.video.i_frame_rate = p_track->i_timescale;
-        p_track->fmt.video.i_frame_rate_base = 1;
-
-        if( p_track->fmt.video.i_frame_rate &&
-            (p_box = MP4_BoxGet( p_track->p_stbl, "stts" )) &&
-            p_box->data.p_stts->i_entry_count >= 1 )
-        {
-            p_track->fmt.video.i_frame_rate_base =
-                p_box->data.p_stts->i_sample_delta[0];
-        }
-
-        break;
-
-    case AUDIO_ES:
-        p_track->fmt.audio.i_channels =
-            p_sample->data.p_sample_soun->i_channelcount;
-        p_track->fmt.audio.i_rate =
-            p_sample->data.p_sample_soun->i_sampleratehi;
-        p_track->fmt.i_bitrate = p_sample->data.p_sample_soun->i_channelcount *
-            p_sample->data.p_sample_soun->i_sampleratehi *
-                p_sample->data.p_sample_soun->i_samplesize;
-        p_track->fmt.audio.i_bitspersample =
-            p_sample->data.p_sample_soun->i_samplesize;
-
-        if( p_track->i_sample_size != 0 &&
-            p_sample->data.p_sample_soun->i_qt_version == 1 && p_sample->data.p_sample_soun->i_sample_per_packet <= 0 )
-        {
-            msg_Err( p_demux, "Invalid sample per packet value for qt_version 1" );
-            return VLC_EGENERIC;
-        }
-        break;
-
-    default:
-        break;
-    }
 
     if( pp_es )
         *pp_es = es_out_Add( p_demux->out, &p_track->fmt );
