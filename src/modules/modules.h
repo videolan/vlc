@@ -155,8 +155,6 @@ void module_LoadPlugins( vlc_object_t *, bool );
 #define module_LoadPlugins(a,b) module_LoadPlugins(VLC_OBJECT(a),b)
 #define module_EndBank(a)      __module_EndBank(VLC_OBJECT(a))
 void  __module_EndBank         ( vlc_object_t * );
-#define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
-void  __module_ResetBank       ( vlc_object_t * );
 
 /* Low-level OS-dependent handler */
 int  module_Load   (vlc_object_t *, const char *, module_handle_t *);
