@@ -472,7 +472,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadBuiltins( p_libvlc );
     module_LoadPlugins( p_libvlc, b_cache_delete );
     if( p_libvlc->b_die )
     {

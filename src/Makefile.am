@@ -6,14 +6,14 @@ AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = . test
 
 NULL =
-EXTRA_DIST = extras/COPYING modules/builtin.h.in \
+EXTRA_DIST = extras/COPYING \
 	misc/beos_specific.cpp \
 	libvlc.pc.in \
 	vlc-plugin.pc.in \
 	libvlc.sym \
 	libvlccore.sym
 
-BUILT_SOURCES = modules/builtin.h ../include/vlc_about.h
+BUILT_SOURCES = ../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
 
 SUFFIXES = .pc.in .pc
@@ -101,31 +101,6 @@ noinst_HEADERS = \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \
 	$(NULL)
-
-modules/builtin.h: modules/builtin.h.in ../vlc-config Makefile.am
-	rm -f -- "$@.tmp"
-	cat "$(srcdir)/modules/builtin.h.in" > "$@.tmp"
-if !HAVE_PLUGINS
-	plugins="$$($(VLC_CONFIG) --list plugin)" ; \
-	test -n "$${plugins}" && \
-	for p in $${plugins}; do \
-		echo "int vlc_entry__$$p (module_t *);" ; \
-	done >> "$@.tmp"
-endif
-	echo "#define ALLOCATE_ALL_BUILTINS() \\" >> "$@.tmp"
-	echo "    do \\" >> "$@.tmp"
-	echo "    { \\" >> "$@.tmp"
-if !HAVE_PLUGINS
-	plugins="$$($(VLC_CONFIG) --list plugin)" ; \
-	test -n "$${plugins}" && \
-	for p in $${plugins}; do \
-		echo "        ALLOCATE_BUILTIN($$p); \\" ; \
-	done >> "$@.tmp"
-endif
-	echo '    } while( 0 );' >> "$@.tmp"
-	mv -f -- "$@.tmp" "$@"
-
-modules/modules.c: modules/builtin.h
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
 	rm -f -- "$@.tmp"

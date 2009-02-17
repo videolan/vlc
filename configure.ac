@@ -5794,18 +5794,9 @@ AS_IF([test "${ac_cv_have_plugins}" = "no"], [
   plugin_support=no
 ])
 
-AS_IF([test "${enable_shared}" = "no"], [
-  plugin_support=no
-])
-
 AS_IF([test "${plugin_support}" != "no"], [
-  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, Define if we have support for dynamic plugins)
+  AC_DEFINE(HAVE_DYNAMIC_PLUGINS, 1, [Define if dynamic plugins are supported])
 ])
-AM_CONDITIONAL(HAVE_PLUGINS, [test "${plugin_support}" != "no"])
-
-dnl Temporary(?) hack for plugins/builtins transition
-dnl VLC_ADD_PLUGIN([${BUILTINS}])
-dnl BUILTINS=""
 
 dnl
 dnl Pic and shared libvlc stuff

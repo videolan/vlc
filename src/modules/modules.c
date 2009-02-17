@@ -88,10 +88,11 @@
 #include "vlc_arrays.h"
 
 #include "modules/modules.h"
-#include "modules/builtin.h"
 
 static module_bank_t *p_module_bank = NULL;
 static vlc_mutex_t module_lock = VLC_STATIC_MUTEX;
+
+int vlc_entry__main( module_t * );
 
 /*****************************************************************************
  * Local prototypes
@@ -213,29 +214,6 @@ void __module_EndBank( vlc_object_t *p_this )
         DeleteModule( p_bank, p_bank->head );
 
     free( p_bank );
-}
-
-/**
- * Load all modules which we built with.
- *
- * Fills the module bank structure with the builtin modules.
- * \param p_this vlc object structure
- * \return nothing
- */
-void __module_LoadBuiltins( vlc_object_t * p_this )
-{
-    vlc_mutex_lock( &module_lock );
-    if( p_module_bank->b_builtins )
-    {
-        vlc_mutex_unlock( &module_lock );
-        return;
-    }
-    p_module_bank->b_builtins = true;
-    vlc_mutex_unlock( &module_lock );
-
-    msg_Dbg( p_this, "checking builtin modules" );
-    /* FIXME: race here - do this under the lock!! */
-    ALLOCATE_ALL_BUILTINS();
 }
 
 #undef module_LoadPlugins
