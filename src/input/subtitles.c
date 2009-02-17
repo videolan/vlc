@@ -345,7 +345,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
             int i_prio;
 
-            if( psz_name == NULL )
+            if( psz_name == NULL || psz_name[0] == '.' )
                 continue;
 
             /* retrieve various parts of the filename */
