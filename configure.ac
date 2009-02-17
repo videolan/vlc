@@ -5900,7 +5900,6 @@ AC_CONFIG_FILES([
   extras/package/macosx/Resources/English.lproj/InfoPlist.strings
   extras/package/macosx/plugin/Info.plist
   extras/package/macosx/plugin/InstallerInfo.plist
-  extras/package/macosx/plugin/English.lproj/InfoPlist.strings
   Makefile
   projects/activex/Makefile
   projects/activex/axvlc.inf
