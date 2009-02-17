@@ -1252,8 +1252,7 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
         return NULL;
     }
 
-    /* We need to fill these since they may be needed by module_Call() */
-    p_module->psz_filename = psz_file;
+    p_module->psz_filename = strdup( psz_file );
     p_module->handle = handle;
     p_module->b_loaded = true;
 
@@ -1261,13 +1260,13 @@ static module_t * AllocatePlugin( vlc_object_t * p_this, const char *psz_file )
     if( module_Call( p_this, p_module ) != 0 )
     {
         /* We couldn't call module_init() */
+        free( p_module->psz_filename );
         module_release( p_module );
         module_Unload( handle );
         return NULL;
     }
 
     DupModule( p_module );
-    p_module->psz_filename = strdup( p_module->psz_filename );
 
     /* Everything worked fine ! The module is ready to be added to the list. */
     p_module->b_builtin = false;
