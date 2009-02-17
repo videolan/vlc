@@ -2185,12 +2185,12 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
         i = 0;
     }
 
+    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     p_pic = picture_New( p_dec->fmt_out.video.i_chroma,
                          p_dec->fmt_out.video.i_width,
                          p_dec->fmt_out.video.i_height,
                          p_dec->fmt_out.video.i_aspect );
     if( !p_pic ) return NULL;
-    p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
     p_pic->p_sys = calloc( 1, sizeof(picture_sys_t) );
     if( !p_pic->p_sys )
     {
