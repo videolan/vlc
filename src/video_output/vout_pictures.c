@@ -59,6 +59,7 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
         msg_Err( p_vout, "picture to display %p has invalid status %d",
                          p_pic, p_pic->i_status );
     }
+    p_vout->p->i_picture_qtype = p_pic->i_qtype;
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
