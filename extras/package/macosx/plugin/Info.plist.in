@@ -7,7 +7,9 @@
 	<key>CFBundleExecutable</key>
 	<string>VLC Plugin</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Copyright @COPYRIGHT_YEARS@ The VideoLAN Team.</string>
+	<string>VLC Webbrowser Plugin - Version @VERSION@ - (c) @COPYRIGHT_YEARS@ The VideoLAN Team.</string>
+	<key>CFHumanReadableCopyright</key>
+	<string>Copyright (c) @COPYRIGHT_YEARS@ the VideoLAN Team</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.netscape.vlc</string>
 	<key>CFBundleInfoDictionaryVersion</key>
