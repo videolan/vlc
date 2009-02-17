@@ -191,6 +191,8 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
     memset( p_sys, 0, sizeof(vout_sys_t) );
 
+    p_sys->p_video = MAP_FAILED;
+
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
@@ -941,8 +943,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void CloseDisplay( vout_thread_t *p_vout )
 {
-    if( p_vout->p_sys->p_video != NULL &&
-        p_vout->p_sys->p_video != MAP_FAILED )
+    if( p_vout->p_sys->p_video != MAP_FAILED )
     {
         /* Clear display */
         memset( p_vout->p_sys->p_video, 0, p_vout->p_sys->i_page_size );
