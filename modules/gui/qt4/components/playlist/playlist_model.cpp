@@ -525,7 +525,7 @@ void PLModel::customEvent( QEvent *event )
     PLEvent *ple = static_cast<PLEvent *>(event);
 
     if( type == ItemAppend_Type )
-        ProcessItemAppend( ple->p_add );
+        ProcessItemAppend( &ple->add );
     else if( type == ItemDelete_Type )
         ProcessItemRemoval( ple->i_id );
     else
