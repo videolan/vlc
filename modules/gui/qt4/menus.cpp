@@ -208,31 +208,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     PUSH_VAR( "aspect-ratio" );
     PUSH_VAR( "crop" );
     PUSH_VAR( "deinterlace" );
-
-    /* Special case for postproc */
-    // FIXME
-    if( p_object )
-    {
-        /* p_object is the vout, so the decoder is our parent and the
-         * postproc filter one of the decoder's children */
-        vlc_object_t *p_dec = (vlc_object_t *)
-                              vlc_object_find( p_object, VLC_OBJECT_DECODER,
-                                               FIND_PARENT );
-        if( p_dec )
-        {
-            vlc_object_t *p_pp = (vlc_object_t *)
-                                 vlc_object_find_name( p_dec, "postproc",
-                                                       FIND_CHILD );
-            if( p_pp )
-            {
-                vlc_object_t *p_object = p_pp;
-                PUSH_VAR( "postproc-q" );
-                vlc_object_release( p_pp );
-            }
-
-            vlc_object_release( p_dec );
-        }
-    }
+    PUSH_VAR( "postprocess" );
 
     return VLC_SUCCESS;
 }
@@ -582,7 +558,7 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         ACT_ADDMENU( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         ACT_ADDMENU( current, "crop", qtr( "&Crop" ) );
         ACT_ADDMENU( current, "deinterlace", qtr( "&Deinterlace" ) );
-        ACT_ADDMENU( current, "postproc-q", qtr( "&Post processing" ) );
+        ACT_ADDMENU( current, "postprocess", qtr( "&Post processing" ) );
     }
 
     p_input = THEMIM->getInput();
@@ -1125,8 +1101,7 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     /* Check the type of the object variable */
     /* What is the following HACK needed for? */
     if( !strcmp( psz_var, "audio-es" )
-     || !strcmp( psz_var, "video-es" )
-     || !strcmp( psz_var, "postproc-q" ) )
+     || !strcmp( psz_var, "video-es" ) )
         i_type = VLC_VAR_INTEGER | VLC_VAR_HASCHOICE;
     else
         i_type = var_Type( p_object, psz_var );
