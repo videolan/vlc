@@ -157,5 +157,6 @@ void system_End( libvlc_int_t *p_this )
 {
     (void)p_this;
     free( psz_vlcpath );
+    psz_vlcpath = NULL;
 }
 
