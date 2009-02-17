@@ -3,8 +3,6 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 pkgincludedir=@includedir@/@PACKAGE@
-PKGDIR=@PKGDIR@
-vlclibdir=@vlclibdir@
 
 Name: VLC plugin API
 Description: VLC media player plugin interface
@@ -16,5 +14,4 @@ Cflags: -I${includedir} -I${pkgincludedir}/plugins \
 	@DEFS_BIGENDIAN@ \
 	-D_REENTRANT \
 	-D_THREAD_SAFE
-# Plugins should link against an _already_ loaded LibVLC.
-#Libs: -L${libdir} -lvlccore
+Libs: -L${libdir} -lvlccore
