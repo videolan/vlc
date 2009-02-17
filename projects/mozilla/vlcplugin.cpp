@@ -583,7 +583,9 @@ void VlcPlugin::redrawToolbar()
     if( p_md )
     {
         /* get isplaying */
+        libvlc_playlist_lock( getVLC() );
         is_playing = libvlc_playlist_isplaying( getVLC(), &ex );
+        libvlc_playlist_unlock( getVLC() );
         libvlc_exception_clear( &ex );
 
         /* get movie position in % */
@@ -696,7 +698,9 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
 
     /* get isplaying */
     libvlc_exception_init( &ex );
+    libvlc_playlist_lock( getVLC() );
     is_playing = libvlc_playlist_isplaying( getVLC(), &ex );
+    libvlc_playlist_unlock( getVLC() );
     libvlc_exception_clear( &ex );
 
     /* get mute info */

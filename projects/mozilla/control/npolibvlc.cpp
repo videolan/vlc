@@ -1349,7 +1349,9 @@ RuntimeNPObject::InvokeResult LibvlcPlaylistNPObject::getProperty(int index, NPV
             }
             case ID_playlist_isplaying:
             {
+                libvlc_playlist_lock(p_plugin->getVLC());
                 int val = libvlc_playlist_isplaying(p_plugin->getVLC(), &ex);
+                libvlc_playlist_unlock(p_plugin->getVLC());
                 if( libvlc_exception_raised(&ex) )
                 {
                     NPN_SetException(this, libvlc_exception_get_message(&ex));

@@ -184,7 +184,11 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                 libvlc_instance_t *p_vlc = p_plugin->getVLC();
                 if( p_vlc )
                 {
-                    if( libvlc_playlist_isplaying(p_vlc, NULL) )
+                    int is_playing;
+                    libvlc_playlist_lock(p_vlc);
+                    is_playing = libvlc_playlist_isplaying(p_vlc, NULL);
+                    libvlc_playlist_lunock(p_vlc);
+                    if( is_playing )
                     {
                         libvlc_media_player_t *p_md =
                             libvlc_playlist_get_media_player(p_vlc, NULL);
@@ -215,7 +219,11 @@ int16 NPP_HandleEvent( NPP instance, void * event )
 
                 if( p_vlc )
                 {
-                    if( libvlc_playlist_isplaying(p_vlc, NULL) )
+                    int is_playing;
+                    libvlc_playlist_lock(p_vlc);
+                    is_playing = libvlc_playlist_isplaying(p_vlc, NULL);
+                    libvlc_playlist_unlock(p_vlc);
+                    if( is_playing )
                     {
                         libvlc_media_player_t *p_md =
                             libvlc_playlist_get_media_player(p_vlc, NULL);
@@ -846,7 +854,9 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
         libvlc_exception_clear( &ex );
 
+        libvlc_playlist_lock( p_plugin->getVLC() );
         i_playing = libvlc_playlist_isplaying( p_plugin->getVLC(), &ex );
+        libvlc_playlist_unlock( p_plugin->getVLC() );
         if( libvlc_exception_raised(&ex) )
             fprintf( stderr, "%s\n", libvlc_exception_get_message(&ex));
         libvlc_exception_clear( &ex );
