@@ -329,7 +329,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true ) )
     {
-        module_EndBank( p_libvlc );
+        module_EndBank( p_libvlc, false );
         return VLC_EGENERIC;
     }
 
@@ -429,7 +429,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( b_exit )
     {
         free( priv->psz_configfile );
-        module_EndBank( p_libvlc );
+        module_EndBank( p_libvlc, false );
         return i_ret;
     }
 
@@ -455,7 +455,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
-        module_EndBank( p_libvlc );
+        module_EndBank( p_libvlc, false );
         module_InitBank( p_libvlc );
         if( !config_GetInt( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
@@ -541,7 +541,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( b_exit )
     {
         free( priv->psz_configfile );
-        module_EndBank( p_libvlc );
+        module_EndBank( p_libvlc, true );
         return i_ret;
     }
 
@@ -569,7 +569,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         PauseConsole();
 #endif
         free( priv->psz_configfile );
-        module_EndBank( p_libvlc );
+        module_EndBank( p_libvlc, true );
         return VLC_EGENERIC;
     }
     priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
@@ -826,7 +826,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         {
             module_unneed( p_libvlc, priv->p_memcpy_module );
         }
-        module_EndBank( p_libvlc );
+        module_EndBank( p_libvlc, true );
         free( priv->psz_configfile );
         return VLC_EGENERIC;
     }
@@ -1109,7 +1109,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 
     /* Free module bank. It is refcounted, so we call this each time  */
-    module_EndBank( p_libvlc );
+    module_EndBank( p_libvlc, true );
 
     FREENULL( priv->psz_configfile );
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,

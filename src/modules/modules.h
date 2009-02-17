@@ -152,8 +152,8 @@ module_t *vlc_submodule_create (module_t *module);
 void  __module_InitBank        ( vlc_object_t * );
 void module_LoadPlugins( vlc_object_t *, bool );
 #define module_LoadPlugins(a,b) module_LoadPlugins(VLC_OBJECT(a),b)
-#define module_EndBank(a)      __module_EndBank(VLC_OBJECT(a))
-void  __module_EndBank         ( vlc_object_t * );
+void module_EndBank( vlc_object_t *, bool );
+#define module_EndBank(a,b) module_EndBank(VLC_OBJECT(a), b)
 
 /* Low-level OS-dependent handler */
 int  module_Load   (vlc_object_t *, const char *, module_handle_t *);

@@ -148,28 +148,39 @@ void __module_InitBank( vlc_object_t *p_this )
     else
         p_module_bank->i_usage++;
 
-    vlc_mutex_unlock( &module_lock );
+    /* We do retain the module bank lock until the plugins are loaded as well.
+     * This is ugly, this staged loading approach is needed: LibVLC gets
+     * some configuration parameters relevant to loading the plugins from
+     * the main (builtin) module. The module bank becomes shared read-only data
+     * once it is ready, so we need to fully serialize initialization.
+     * DO NOT UNCOMMENT the following line unless you managed to squeeze
+     * module_LoadPlugins() before you unlock the mutex. */
+    /*vlc_mutex_unlock( &module_lock );*/
 }
 
-
+#undef module_EndBank
 /**
- * End bank
- *
  * Unloads all unused plugin modules and empties the module
  * bank in case of success.
  * \param p_this vlc object structure
  * \return nothing
  */
-void __module_EndBank( vlc_object_t *p_this )
+void module_EndBank( vlc_object_t *p_this, bool b_plugins )
 {
-    module_bank_t *p_bank;
+    module_bank_t *p_bank = p_module_bank;
+
+    assert (p_bank != NULL);
 
     /* Save the configuration */
     config_AutoSaveConfigFile( p_this );
 
-    vlc_mutex_lock( &module_lock );
-    p_bank = p_module_bank;
-    assert (p_bank != NULL);
+    /* If plugins were _not_ loaded, then the caller still has the bank lock
+     * from module_InitBank(). */
+    if( b_plugins )
+        vlc_mutex_lock( &module_lock );
+    /*else
+        vlc_assert_locked( &module_lock ); not for static mutexes :( */
+
     if( --p_bank->i_usage > 0 )
     {
         vlc_mutex_unlock( &module_lock );
@@ -218,34 +229,32 @@ void __module_EndBank( vlc_object_t *p_this )
 
 #undef module_LoadPlugins
 /**
- * Load all plugins
- *
- * Load all plugin modules we can find.
+ * Loads module descriptions for all available plugins.
  * Fills the module bank structure with the plugin modules.
+ *
  * \param p_this vlc object structure
  * \return nothing
  */
 void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
 {
+    module_bank_t *p_bank = p_module_bank;
+
+    assert( p_bank );
+    /*vlc_assert_locked( &module_lock ); not for static mutexes :( */
+
 #ifdef HAVE_DYNAMIC_PLUGINS
-    vlc_mutex_lock( &module_lock );
-    if( p_module_bank->b_plugins )
+    if( p_bank->i_usage == 1 )
     {
-        vlc_mutex_unlock( &module_lock );
-        return;
+        msg_Dbg( p_this, "checking plugin modules" );
+        p_module_bank->b_cache = config_GetInt( p_this, "plugins-cache" ) > 0;
+
+        if( p_module_bank->b_cache || b_cache_delete )
+            CacheLoad( p_this, p_module_bank, b_cache_delete );
+        AllocateAllPlugins( p_this, p_module_bank );
     }
+#endif
     p_module_bank->b_plugins = true;
     vlc_mutex_unlock( &module_lock );
-
-    msg_Dbg( p_this, "checking plugin modules" );
-    p_module_bank->b_cache = config_GetInt( p_this, "plugins-cache" ) > 0;
-
-    if( p_module_bank->b_cache || b_cache_delete )
-        CacheLoad( p_this, p_module_bank, b_cache_delete );
-
-    /* FIXME: race - do this under the lock */
-    AllocateAllPlugins( p_this, p_module_bank );
-#endif
 }
 
 /**
