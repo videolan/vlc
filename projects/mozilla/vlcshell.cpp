@@ -187,7 +187,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                     int is_playing;
                     libvlc_playlist_lock(p_vlc);
                     is_playing = libvlc_playlist_isplaying(p_vlc, NULL);
-                    libvlc_playlist_lunock(p_vlc);
+                    libvlc_playlist_unlock(p_vlc);
                     if( is_playing )
                     {
                         libvlc_media_player_t *p_md =
