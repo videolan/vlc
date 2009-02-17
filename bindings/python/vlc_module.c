@@ -22,7 +22,6 @@
  *****************************************************************************/
 
 #include "vlcglue.h"
-#include <dlfcn.h>
 
 /**************************************************************************
  * VLC Module
@@ -47,21 +46,6 @@ vlcMODINIT_FUNC
 initvlc( void )
 {
     PyObject* p_module;
-
-#ifdef WIN32
-    /*
-      FIXME: Win32 support is trickier than that (does not support dlopen).
-      Get code from src/modules/os.c to work on different OSes.
-    */
-    #define LIBVLCCORE "libvlccore.dll"
-#else
-    #define LIBVLCCORE "libvlccore.so"
-#endif
-    /* Workaround for the 2257/2266 VLC bug. */
-    if ( !dlopen( LIBVLCCORE, RTLD_NOW | RTLD_GLOBAL ) )
-    {
-        fprintf( stderr, "Error when loading libvlccore:\n%s\nTrying to continue anyway.\n", dlerror() );
-    }
 
     /* vlcMediaPlayer_Type.tp_new = PyType_GenericNew; */
     vlcMediaPlayer_Type.tp_alloc = PyType_GenericAlloc;
