@@ -443,6 +443,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !config_GetInt( p_libvlc, "ignore-config" ) )
         config_LoadConfigFile( p_libvlc, "main" );
     config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
+    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
 
     /* Check if the user specified a custom language */
     psz_language = config_GetPsz( p_libvlc, "language" );
@@ -459,6 +460,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( !config_GetInt( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
+        priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
     }
     free( psz_language );
 # endif
@@ -571,6 +573,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc );
         return VLC_EGENERIC;
     }
+    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
 
     /*
      * System specific configuration
@@ -727,7 +730,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         free( psz_verbose_objects );
     }
 
-    /* Last change to set the verbosity. Once we start interfaces and other
+    /* Last chance to set the verbosity. Once we start interfaces and other
      * threads, verbosity becomes read-only. */
     var_Create( p_libvlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     if( config_GetInt( p_libvlc, "quiet" ) > 0 )
