@@ -1088,13 +1088,13 @@ static int NetFillBuffer( access_t *p_access )
         }
         if( i_udp > 0 )
         {
-            ufd[nfd].fd = p_sys->i_handle_tcp;
+            ufd[nfd].fd = p_sys->i_handle_udp;
             ufd[nfd].events = POLLIN;
             nfd++;
         }
 
         /* We'll wait 0.5 second if nothing happens */
-        timeout = 500;
+        timeout = __MIN( 500, p_sys->i_timeout );
 
         if( i_try * timeout > p_sys->i_timeout )
         {
@@ -1107,7 +1107,8 @@ static int NetFillBuffer( access_t *p_access )
             return -1;
         }
 
-        if( !vlc_object_alive (p_access) || p_access->b_error ) return -1;
+        if( !vlc_object_alive (p_access) || p_access->b_error )
+            return -1;
 
         //msg_Dbg( p_access, "NetFillBuffer: trying again (select)" );
 
