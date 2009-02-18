@@ -757,6 +757,12 @@ static void Run( intf_thread_t *p_intf )
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  _("Slower") );
             }
+            else if( i_action == ACTIONID_RATE_NORMAL )
+            {
+                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                 _("1x") );
+            }
             else if( i_action == ACTIONID_POSITION && b_seekable )
             {
                 DisplayPosition( p_intf, p_vout, p_input );

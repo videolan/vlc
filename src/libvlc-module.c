@@ -1215,6 +1215,8 @@ static const char *const ppsz_albumart_descriptions[] =
 #define FASTER_KEY_LONGTEXT N_("Select the hotkey to use for fast forward playback.")
 #define SLOWER_KEY_TEXT N_("Slower")
 #define SLOWER_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback.")
+#define RATE_NORMAL_KEY_TEXT N_("Normal rate")
+#define RATE_NORMAL_KEY_LONGTEXT N_("Select the hotkey to set the playback rate back to normal.")
 #define NEXT_KEY_TEXT N_("Next")
 #define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the playlist.")
 #define PREV_KEY_TEXT N_("Previous")
@@ -2114,6 +2116,7 @@ vlc_module_begin ()
 #   define KEY_PLAY               KEY_UNSET
 #   define KEY_FASTER             KEY_MODIFIER_COMMAND|'='
 #   define KEY_SLOWER             KEY_MODIFIER_COMMAND|'-'
+#   define KEY_RATE_NORMAL        KEY_UNSET
 #   define KEY_NEXT               KEY_MODIFIER_COMMAND|KEY_RIGHT
 #   define KEY_PREV               KEY_MODIFIER_COMMAND|KEY_LEFT
 #   define KEY_STOP               KEY_MODIFIER_COMMAND|'.'
@@ -2225,6 +2228,7 @@ vlc_module_begin ()
 #   define KEY_PLAY               KEY_UNSET
 #   define KEY_FASTER             '+'
 #   define KEY_SLOWER             '-'
+#   define KEY_RATE_NORMAL        KEY_UNSET
 #   define KEY_NEXT               'n'
 #   define KEY_PREV               'p'
 #   define KEY_STOP               's'
@@ -2345,6 +2349,8 @@ vlc_module_begin ()
              FASTER_KEY_LONGTEXT, false )
     add_key( "key-slower", KEY_SLOWER, NULL, SLOWER_KEY_TEXT,
              SLOWER_KEY_LONGTEXT, false )
+    add_key( "key-rate-normal", KEY_RATE_NORMAL, NULL, RATE_NORMAL_KEY_TEXT,
+             RATE_NORMAL_KEY_LONGTEXT, false )
     add_key( "key-next", KEY_NEXT, NULL, NEXT_KEY_TEXT,
              NEXT_KEY_LONGTEXT, false )
     add_key( "key-prev", KEY_PREV, NULL, PREV_KEY_TEXT,
@@ -2687,6 +2693,7 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-next", ACTIONID_NEXT, 0, },
     { "key-faster", ACTIONID_FASTER, 0, },
     { "key-slower", ACTIONID_SLOWER, 0, },
+    { "key-rate-normal", ACTIONID_RATE_NORMAL, 0, },
     { "key-toggle-fullscreen", ACTIONID_TOGGLE_FULLSCREEN, 0, },
     { "key-leave-fullscreen", ACTIONID_LEAVE_FULLSCREEN, 0, },
     { "key-vol-up", ACTIONID_VOL_UP, 0, },
