@@ -77,7 +77,7 @@ vlc_module_begin ()
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
 
-    add_integer( "cdda-track", -1 , NULL, NULL, NULL, true )
+    add_integer( "cdda-track", 0 , NULL, NULL, NULL, true )
         change_internal ()
     add_integer( "cdda-first-sector", -1, NULL, NULL, NULL, true )
         change_internal ()
@@ -142,7 +142,6 @@ static int Open( vlc_object_t *p_this )
     access_sys_t *p_sys;
     vcddev_t *vcddev;
     char *psz_name;
-    int i_mrl_tracknum = -1;
     int i_ret;
 
     if( !p_access->psz_path || !*p_access->psz_path )
@@ -178,9 +177,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->vcddev = vcddev;
 
    /* Do we play a single track ? */
-   p_sys->i_track = var_CreateGetInteger( p_access, "cdda-track" );
+   p_sys->i_track = var_CreateGetInteger( p_access, "cdda-track" ) - 1;
 
-   if( p_sys->i_track < 0 && i_mrl_tracknum <= 0 )
+   if( p_sys->i_track < 0 )
    {
         /* We only do separate items if the whole disc is requested */
         input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
@@ -224,16 +223,16 @@ static int Open( vlc_object_t *p_this )
         /* Tracknumber in MRL */
         if( p_sys->i_first_sector < 0 || p_sys->i_last_sector < 0 )
         {
-            int i_titles;
-            if( i_mrl_tracknum <= 0 )
+            const int i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
+                                                     p_sys->vcddev, &p_sys->p_sectors );
+            if( p_sys->i_track >= i_titles )
             {
-                msg_Err( p_access, "wrong sector information" );
+                msg_Err( p_access, "invalid track number" );
                 goto error;
             }
-            i_titles = ioctl_GetTracksMap( VLC_OBJECT(p_access),
-                                            p_sys->vcddev, &p_sys->p_sectors );
+            p_sys->i_first_sector = p_sys->p_sectors[p_sys->i_track];
+            p_sys->i_last_sector = p_sys->p_sectors[p_sys->i_track+1];
         }
-
 
         p_sys->i_sector = p_sys->i_first_sector;
         p_access->info.i_size = (p_sys->i_last_sector - p_sys->i_first_sector)
