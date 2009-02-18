@@ -33,10 +33,6 @@
 #include <vlc_keys.h>
 #include <unistd.h> /* execl() */
 
-#ifdef HAVE_CONFIG_H
-#   include "config.h"
-#endif
-
 #import "intf.h"
 #import "fspanel.h"
 #import "vout.h"
@@ -57,8 +53,6 @@
 #import "simple_prefs.h"
 #import "vlm.h"
 
-#import <vlc_input.h>
-#import <vlc_interface.h>
 #import <AddressBook/AddressBook.h>
 
 /*****************************************************************************
@@ -111,27 +105,6 @@ void CloseIntf ( vlc_object_t *p_this )
     free( p_intf->p_sys );
 }
 
-static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned int i )
-{
-    int canc = vlc_savecancel();
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-
-    NSDictionary *o_dict = [NSDictionary dictionaryWithObjects: 
-                    [NSArray arrayWithObjects: 
-                        [NSString stringWithUTF8String: item->psz_module],
-                        [NSString stringWithUTF8String: item->psz_msg],
-                        [NSNumber numberWithInt: item->i_type], nil] 
-                                         forKeys:
-              [NSArray arrayWithObjects: @"Module", @"Message", @"Type", nil]];
-
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreMessageReceived" 
-                                                        object: nil 
-                                                      userInfo: o_dict];
-
-    [o_pool release];
-    vlc_restorecancel( canc );
-}
-
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
@@ -173,6 +146,33 @@ static void Run( intf_thread_t *p_intf )
 
 #pragma mark -
 #pragma mark Variables Callback
+
+/*****************************************************************************
+ * MsgCallback: Callback triggered by the core once a new debug message is
+ * ready to be displayed. We store everything in a NSArray in our Cocoa part
+ * of this file, so we are forwarding everything through notifications.
+ *****************************************************************************/
+static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned int i )
+{
+    int canc = vlc_savecancel();
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    
+    NSDictionary *o_dict = [NSDictionary dictionaryWithObjects: 
+                            [NSArray arrayWithObjects: 
+                             [NSString stringWithUTF8String: item->psz_module],
+                             [NSString stringWithUTF8String: item->psz_msg],
+                             [NSNumber numberWithInt: item->i_type], nil] 
+                                                       forKeys:
+                            [NSArray arrayWithObjects: @"Module", @"Message", @"Type", nil]];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreMessageReceived" 
+                                                        object: nil 
+                                                      userInfo: o_dict];
+    
+    [o_pool release];
+    vlc_restorecancel( canc );
+}
+
 
 /*****************************************************************************
  * playlistChanged: Callback triggered by the intf-change playlist
@@ -317,6 +317,30 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* Check if we already did this once. Opening the other nibs calls it too, because VLCMain is the owner */
     if( nib_main_loaded ) return;
+
+    /* check whether the user runs a valid version of OS X */
+    if( MACOS_VERSION < 10.5f )
+    {
+        NSAlert *ourAlert;
+        int i_returnValue;
+        NSString *o_blabla;
+        if( MACOS_VERSION == 10.5f )
+            o_blabla = _NS("VLC's last release for your OS is the 0.9 series." );
+        else if( MACOS_VERSION == 10.3f )
+            o_blabla = _NS("VLC's last release for your OS is VLC 0.8.6i, which is prone to known security issues." );
+        else // 10.2 and 10.1, still 3% of the OS X market share
+            o_blabla = _NS("VLC's last release for your OS is VLC 0.7.2, which is highly out of date and prone to " \
+                         "known security issues. We recommend you to update your Mac to a modern version of Mac OS X.");
+        ourAlert = [NSAlert alertWithMessageText: _NS("Your version of Mac OS X is no longer supported")
+                                   defaultButton: _NS("Quit")
+                                 alternateButton: NULL
+                                     otherButton: NULL
+                       informativeTextWithFormat: _NS("VLC media player %s requires Mac OS X 10.5 or higher.\n\n%@"), VLC_Version(), o_blabla];
+        [ourAlert setAlertStyle: NSCriticalAlertStyle];
+        i_returnValue = [ourAlert runModal];
+        [NSApp performSelectorOnMainThread: @selector(terminate:) withObject:nil waitUntilDone:NO];
+        return;
+    }
 
     [self initStrings];
 
@@ -470,21 +494,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_controls setupVarMenuItem: o_mi_add_intf target: (vlc_object_t *)p_intf
         var: "intf-add" selector: @selector(toggleVar:)];
 
-    /* check whether the user runs a valid version of OSX; alert is auto-released */
-    if( MACOS_VERSION < 10.4f )
-    {
-        NSAlert *ourAlert;
-        int i_returnValue;
-        ourAlert = [NSAlert alertWithMessageText: _NS("Your version of Mac OS X is not supported")
-                        defaultButton: _NS("Quit")
-                      alternateButton: NULL
-                          otherButton: NULL
-            informativeTextWithFormat: _NS("VLC media player requires Mac OS X 10.4 or higher.")];
-        [ourAlert setAlertStyle: NSCriticalAlertStyle];
-        i_returnValue = [ourAlert runModal];
-        [NSApp terminate: self];
-    }
-
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }
 
@@ -527,7 +536,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* messages panel */
     [o_msgs_panel setTitle: _NS("Messages")];
-    [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog...")];
+    [o_msgs_crashlog_btn setTitle: _NS("Open CrashLog...")];
+    [o_msgs_save_btn setTitle: _NS("Save this Log...")];
 
     /* main menu */
     [o_mi_about setTitle: [_NS("About VLC media player") \
@@ -1611,7 +1621,10 @@ static void * manage_cleanup( void * args )
 
     if( p_intf->p_sys->b_intf_show )
     {
-        [o_window makeKeyAndOrderFront: self];
+        if( [[o_controls voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
+            [[o_controls getFSPanel] fadeIn];
+        else
+            [o_window makeKeyAndOrderFront: self];
 
         p_intf->p_sys->b_intf_show = false;
     }
@@ -2450,6 +2463,28 @@ end:
     [o_msg_lock unlock];
 }
 
+- (IBAction)saveDebugLog:(id)sender
+{
+    NSOpenPanel * saveFolderPanel = [[NSSavePanel alloc] init];
+    
+    [saveFolderPanel setCanChooseDirectories: NO];
+    [saveFolderPanel setCanChooseFiles: YES];
+    [saveFolderPanel setCanSelectHiddenExtension: NO];
+    [saveFolderPanel setCanCreateDirectories: YES];
+    [saveFolderPanel setRequiredFileType: @"rtfd"];
+    [saveFolderPanel beginSheetForDirectory:nil file: [NSString stringWithFormat: _NS("VLC Debug Log (%s).rtfd"), VLC_Version()] modalForWindow: o_msgs_panel modalDelegate:self didEndSelector:@selector(saveDebugLogAsRTF:returnCode:contextInfo:) contextInfo:nil];
+}
+
+- (void)saveDebugLogAsRTF: (NSSavePanel *)sheet returnCode: (int)returnCode contextInfo: (void *)contextInfo
+{
+    BOOL b_returned;
+    if( returnCode == NSOKButton )
+    {
+        b_returned = [o_messages writeRTFDToFile: [sheet filename] atomically: YES];
+        if(! b_returned )
+            msg_Warn( p_intf, "Error while saving the debug log" );
+    }
+}
 
 #pragma mark -
 #pragma mark Playlist toggling

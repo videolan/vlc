@@ -163,6 +163,7 @@
                 openReadMe = id;
                 openRecentItem = id;
                 openWebsite = id;
+                saveDebugLog = id;
                 showBookmarks = id;
                 showExtended = id;
                 showInformationPanel = id;
@@ -301,8 +302,9 @@
                 "o_mi_vol_down" = NSMenuItem;
                 "o_mi_vol_up" = NSMenuItem;
                 "o_mi_website" = NSMenuItem;
-                "o_msgs_btn_crashlog" = NSButton;
+                "o_msgs_crashlog_btn" = NSButton;
                 "o_msgs_panel" = id;
+                "o_msgs_save_btn" = id;
                 "o_mu_add_intf" = NSMenu;
                 "o_mu_aspect_ratio" = NSMenu;
                 "o_mu_audio" = NSMenu;

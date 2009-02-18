@@ -1,7 +1,7 @@
 /*****************************************************************************
  * intf.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -159,7 +159,8 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     NSMutableArray * o_msg_arr;                 /* messages array */
     NSLock * o_msg_lock;                        /* messages lock */
     BOOL b_msg_arr_changed;                     /* did the array change? */
-    IBOutlet NSButton * o_msgs_btn_crashlog;    /* messages open crashlog */
+    IBOutlet NSButton * o_msgs_crashlog_btn;    /* messages open crashlog */
+    IBOutlet NSButton * o_msgs_save_btn;        /* save the log as rtf */
     
     /* CrashReporter panel */
     IBOutlet NSButton * o_crashrep_dontSend_btn;
@@ -407,6 +408,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 - (IBAction)showInformationPanel:(id)sender;
 
 - (IBAction)crashReporterAction:(id)sender;
+- (IBAction)saveDebugLog:(id)sender;
 
 - (IBAction)togglePlaylist:(id)sender;
 - (void)updateTogglePlaylistState;
