@@ -1059,7 +1059,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
         if( GetFileAttributes( psz_path ) & FILE_ATTRIBUTE_DIRECTORY )
 #endif
         {
-            AllocatePluginDir( p_this, psz_path, i_maxdepth - 1 );
+            AllocatePluginDir( p_this, p_bank, psz_path, i_maxdepth - 1 );
         }
         else if( i_len > strlen( LIBEXT )
                   /* We only load files ending with LIBEXT */
@@ -1087,7 +1087,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
             }
             psz_file = psz_path;
 
-            AllocatePluginFile( p_this, psz_file, i_time, i_size );
+            AllocatePluginFile( p_this, p_bank, psz_file, i_time, i_size );
         }
     }
     while( !p_this->p_libvlc->b_die && FindNextFile( handle, &finddata ) );
