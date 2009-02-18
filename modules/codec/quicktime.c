@@ -1,7 +1,7 @@
 /*****************************************************************************
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
- * Copyright (C) 2003 the VideoLAN team
+ * Copyright (C) 2003, 2008 - 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
@@ -234,9 +234,13 @@ static int Open( vlc_object_t *p_this )
     err = Gestalt(gestaltQuickTimeVersion, &qtVersion);
     err = Gestalt(gestaltSystemVersion, &macosversion);
 #ifndef NDEBUG
-    msg_Dbg( p_this, "mac os version is %#lx", macosversion );
-    msg_Dbg( p_this, "quicktime version is %#lx", qtVersion );
+    msg_Dbg( p_this, "Mac OS version is %#lx", macosversion );
+    msg_Dbg( p_this, "Quicktime version is %#lx", qtVersion );
 #endif
+
+    /* bail out. This plugin is soo Carbon, that it can't be used on 10.5 at all */
+    msg_Info( p_dec, "Your Mac OS version is to new to use this plugin for anything." );
+    return VLC_EGENERIC;
 #endif
 
     switch( p_dec->fmt_in.i_codec )
@@ -307,19 +311,6 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.i_cat = AUDIO_ES;
         return VLC_SUCCESS;
 #else
-
-#ifdef __APPLE__
-        /* FIXME: right now, we don't support audio decoding on 10.5 and later
-         because we are still using the hardcore-outdated SoundManager API,
-         which was removed after 10.4 */
-
-        if( macosversion >= 0x1050 || err != noErr )
-        {
-            msg_Warn( p_dec, "Your Mac OS version doesn't have SoundManager anymore. "
-                     "You can't use this plugin for audio." );
-            return VLC_EGENERIC;
-        }
-#endif
         return OpenAudio( p_dec );
 #endif
 

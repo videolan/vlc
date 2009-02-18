@@ -1,7 +1,7 @@
 /*****************************************************************************
  * quartztext.c : Put text on the video, using Mac OS X Quartz Engine
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007, 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Bernie Purcell <bitmap@videolan.org>
@@ -667,11 +667,7 @@ static CGContextRef CreateOffScreenContext( int i_width, int i_height,
 
         p_bitmap->p_data = calloc( i_height, p_bitmap->i_bytesPerRow );
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_4
         *pp_colorSpace = CGColorSpaceCreateWithName( kCGColorSpaceGenericRGB );
-#else
-        *pp_colorSpace = CreateGenericRGBColorSpace();
-#endif
 
         if( p_bitmap->p_data && *pp_colorSpace )
         {
@@ -681,14 +677,10 @@ static CGContextRef CreateOffScreenContext( int i_width, int i_height,
         }
         if( p_context )
         {
-#if MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_1
-            // OS X 10.1 doesn't support weak linking of this call which is only available
-            // int 10.4 and later
             if( CGContextSetAllowsAntialiasing != NULL )
             {
                 CGContextSetAllowsAntialiasing( p_context, true );
             }
-#endif
         }
         *pp_memory = p_bitmap;
     }

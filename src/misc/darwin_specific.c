@@ -1,7 +1,7 @@
 /*****************************************************************************
  * darwin_specific.m: Darwin specific features
  *****************************************************************************
- * Copyright (C) 2001-2007 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -43,33 +43,6 @@
 #ifndef MAXPATHLEN
 # define MAXPATHLEN 1024
 #endif
-
-/* CFLocaleCopyAvailableLocaleIdentifiers is present only on post-10.4 */
-extern CFArrayRef CFLocaleCopyAvailableLocaleIdentifiers(void) __attribute__((weak_import));
-
-/* emulate CFLocaleCopyAvailableLocaleIdentifiers on pre-10.4 */
-static CFArrayRef copy_all_locale_indentifiers(void)
-{
-    CFMutableArrayRef available_locales;
-    DIR * dir;
-    struct dirent *file;
-
-    dir = opendir( "/usr/share/locale" );
-    available_locales = CFArrayCreateMutable( kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks );
-
-    while ( (file = readdir(dir)) )
-    {
-        /* we should probably filter out garbage */
-        /* we can't use CFStringCreateWithFileSystemRepresentation as it is
-         * supported only on post-10.4 (and this function is only for pre-10.4) */
-        CFStringRef locale = CFStringCreateWithCString( kCFAllocatorDefault, file->d_name, kCFStringEncodingUTF8 );
-        CFArrayAppendValue( available_locales, (void*)locale );
-        CFRelease( locale );
-    }
-
-    closedir( dir );
-    return available_locales;
-}
 
 /*****************************************************************************
  * system_Init: fill in program path & retrieve language
@@ -149,10 +122,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         CFArrayRef all_locales, preferred_locales;
         char psz_locale[50];
 
-        if( CFLocaleCopyAvailableLocaleIdentifiers )
-            all_locales = CFLocaleCopyAvailableLocaleIdentifiers();
-        else
-            all_locales = copy_all_locale_indentifiers();
+        all_locales = CFLocaleCopyAvailableLocaleIdentifiers();
 
         preferred_locales = CFBundleCopyLocalizationsForPreferences( all_locales, NULL );
 

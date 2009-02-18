@@ -3,7 +3,7 @@
  * browsing
  *****************************************************************************
  * Copyright (C) 2007 Pierre d'Herbemont
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007, 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
@@ -683,8 +683,7 @@
 
         if (![[self window] isVisible] || [[self window] alphaValue] == 0.0 || [self isHiddenOrHasHiddenAncestor] )
         {
-            /* We don't animate if we are not visible or if we are running on
-             * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+            /* We don't animate if we are not visible, instead we
              * simply fade the display */
             CGDisplayFadeReservationToken token;
  
@@ -817,8 +816,7 @@
 
     if (fadeout || [tempFullScreenView isHiddenOrHasHiddenAncestor])
     {
-        /* We don't animate if we are not visible or if we are running on
-        * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+        /* We don't animate if we are not visible, instead we
         * simply fade the display */
         CGDisplayFadeReservationToken token;
 

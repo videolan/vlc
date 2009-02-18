@@ -1,7 +1,7 @@
 /*****************************************************************************
  * embeddedwindow.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2005-2008 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
@@ -261,10 +261,9 @@
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
 
-        if (![self isVisible] || [self alphaValue] == 0.0 || MACOS_VERSION < 10.4f)
+        if (![self isVisible] || [self alphaValue] == 0.0)
         {
-            /* We don't animate if we are not visible or if we are running on
-             * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+            /* We don't animate if we are not visible, instead we
              * simply fade the display */
             CGDisplayFadeReservationToken token;
  
@@ -299,14 +298,6 @@
         [o_fullscreen_window setContentView:o_view];
         [o_fullscreen_window makeKeyAndOrderFront:self];
         EnableScreenUpdates();
-    }
-
-    if (MACOS_VERSION < 10.4f)
-    {
-        /* We were already fullscreen nothing to do when NSAnimation
-         * is not supported */
-        [self unlockFullscreenAnimation];
-        return;
     }
 
     /* We are in fullscreen (and no animation is running) */
@@ -410,10 +401,9 @@
         return;
     }
 
-    if (fadeout || MACOS_VERSION < 10.4f)
+    if (fadeout)
     {
-        /* We don't animate if we are not visible or if we are running on
-        * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+        /* We don't animate if we are not visible, instead we
         * simply fade the display */
         CGDisplayFadeReservationToken token;
 
