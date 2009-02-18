@@ -573,7 +573,9 @@
     playlist_item_t *p_item, *p_temp_item;
     NSMutableArray *o_array = [NSMutableArray array];
 
+    PL_LOCK;
     p_item = playlist_CurrentPlayingItem( p_playlist );
+    PL_UNLOCK;
     if( p_item == NULL )
     {
         pl_Release( VLCIntf );
@@ -1416,8 +1418,10 @@
 
     id o_playing_item;
 
+    PL_LOCK;
     o_playing_item = [o_outline_dict objectForKey:
                 [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
+    PL_UNLOCK;
 
     if( [self isItem: [o_playing_item pointerValue] inNode:
                         [item pointerValue] checkItemExistence: YES]

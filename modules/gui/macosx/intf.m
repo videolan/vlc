@@ -1544,7 +1544,11 @@ static void * manage_cleanup( void * args )
             /* update our info-panel to reflect the new item, if we don't show
              * the playlist or the selection is empty */
             if( [self isPlaylistCollapsed] == YES )
+            {
+                PL_LOCK;
                 [[self getInfo] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
+                PL_UNLOCK;
+            }
 
             /* seekable streams */
             b_seekable = var_GetBool( p_input, "can-seek" );
@@ -1836,11 +1840,13 @@ end:
     if( p_input && vlc_object_alive (p_input) )
     {
         NSString *o_temp;
+        PL_LOCK;
         playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
         if( input_item_GetNowPlaying( p_item->p_input ) )
             o_temp = [NSString stringWithUTF8String:input_item_GetNowPlaying( p_item->p_input )];
         else
             o_temp = [NSString stringWithUTF8String:p_item->p_input->psz_name];
+        PL_UNLOCK;
         [self setScrollField: o_temp stopAfter:-1];
         [[[self getControls] getFSPanel] setStreamTitle: o_temp];
         vlc_object_release( p_input );
