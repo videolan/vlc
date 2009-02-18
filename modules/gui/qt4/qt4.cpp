@@ -293,9 +293,12 @@ static int Open( vlc_object_t *p_this )
 
     while( p_sys->p_mi == NULL && !p_sys->b_isDialogProvider )
         iface.ready.wait( &iface.lock );
-    var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
-    val.p_address = p_this;
-    var_Set (p_this->p_libvlc, "qt4-iface", val);
+    if( !p_sys->b_isDialogProvider )
+    {
+        var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
+        val.p_address = p_this;
+        var_Set (p_this->p_libvlc, "qt4-iface", val);
+    }
     return VLC_SUCCESS;
 }
 

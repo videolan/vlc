@@ -305,11 +305,17 @@ static int WindowOpen( vlc_object_t *p_this )
     pWnd->handle.hwnd = VlcProc::getWindow( pIntf, pWnd->vout,
                                        &pWnd->pos_x, &pWnd->pos_y,
                                        &pWnd->width, &pWnd->height );
-    pWnd->p_private = pIntf;
-    pWnd->control = &VlcProc::controlWindow;
-    return VLC_SUCCESS;
+    if( pWnd->handle.hwnd )
+    {
+        pWnd->p_private = pIntf;
+        pWnd->control = &VlcProc::controlWindow;
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        return VLC_EGENERIC;
+    }
 }
-
 
 static void WindowClose( vlc_object_t *p_this )
 {
