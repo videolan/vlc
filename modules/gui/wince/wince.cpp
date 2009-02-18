@@ -198,8 +198,8 @@ static void Run( intf_thread_t *p_intf )
             p_intf->pf_show_dialog = NULL;
         }
         else
-            WaitForSingleObject (p_priv->thread_ready, INFINITE);
-        CloseHandle (p_priv->thread_ready);
+            WaitForSingleObject (p_intf->p_sys->thread_ready, INFINITE);
+        CloseHandle (p_intf->p_sys->thread_ready);
     }
     else
     {
