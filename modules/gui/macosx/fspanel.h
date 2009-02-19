@@ -37,7 +37,7 @@
     int i_device;
 }
 - (id)initWithContentRect: (NSRect)contentRect
-                styleMask: (unsigned int)aStyle
+                styleMask: (NSUInteger)aStyle
                   backing: (NSBackingStoreType)bufferingType
                     defer: (BOOL)flag;
 - (void)awakeFromNib;
