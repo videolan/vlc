@@ -366,7 +366,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
     ConfigTreeData *config_data = new ConfigTreeData;
     config_data->i_object_id = TYPE_CATEGORY;
     config_data->psz_help = strdup(MAIN_HELP);
-    config_data->psz_name = strdup( GENERAL_TITLE );
+    config_data->psz_name = strdup( "General" );
     tvi.pszText = _T("General settings");
     tvi.cchTextMax = lstrlen(_T("General settings"));
     tvi.lParam = (long)config_data;
