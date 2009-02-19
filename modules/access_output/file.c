@@ -116,11 +116,15 @@ static int Open( vlc_object_t *p_this )
 
     if( !strcmp( p_access->psz_path, "-" ) )
     {
+#ifndef UNDER_CE
 #ifdef WIN32
         setmode (fileno (stdout), O_BINARY);
 #endif
         fd = dup (fileno (stdout));
         msg_Dbg( p_access, "using stdout" );
+#else
+#warning stdout is not supported on Windows Mobile, but may be used on Windows CE
+#endif
     }
     else
     {
