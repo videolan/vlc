@@ -42,6 +42,10 @@
 #   include <sys/time.h>                                   /* gettimeofday() */
 #endif
 
+#ifdef UNDER_CE
+#include <sys/time.h>                                      /* gettimeofday() */
+#endif
+
 #ifdef HAVE_TIME_H
 #   include <time.h>                                              /* ctime() */
 #   include <sys/timeb.h>                                         /* ftime() */
