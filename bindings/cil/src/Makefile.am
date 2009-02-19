@@ -7,6 +7,8 @@ SOURCES_dll = \
 	ustring.cs \
 	exception.cs \
 	marshal.cs \
+	media.cs \
+	player.cs \
 	libvlc.cs
 
 VideoLAN.LibVLC.dll: $(SOURCES_dll)

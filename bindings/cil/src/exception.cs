@@ -1,11 +1,11 @@
-/*
- * libvlc.cs - libvlc CIL bindings
- *
- * $Id$
+/**
+ * @file exception.cs
+ * @brief LibVLC exceptions
+ * @ingroup API
  */
 
 /**********************************************************************
- *  Copyright (C) 2007 Rémi Denis-Courmont.                           *
+ *  Copyright (C) 2007-2009 Rémi Denis-Courmont.                      *
  *  This program is free software; you can redistribute and/or modify *
  *  it under the terms of the GNU General Public License as published *
  *  by the Free Software Foundation; version 2 of the license, or (at *
@@ -27,7 +27,8 @@ using System.Runtime.InteropServices;
 namespace VideoLAN.LibVLC
 {
     /**
-     * VLCException: managed base class for LibVLC exceptions
+     * @brief VLCException: base class for LibVLC exceptions
+     * @ingroup API
      */
     public class VLCException : Exception
     {
@@ -57,6 +58,10 @@ namespace VideoLAN.LibVLC
         {
         }
     };
+
+    /**
+     * @section Internals
+     */
 
     /**
      * libvlc_exception_t: structure for unmanaged LibVLC exceptions

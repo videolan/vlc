@@ -1,12 +1,11 @@
 /**
  * @file marshal.cs
- * @brief LibVLC marshalling utilities
- *
- * $Id$
+ * @brief Common LibVLC objects marshalling utilities
+ * @ingroup Internals
  */
 
 /**********************************************************************
- *  Copyright (C) 2007 Rémi Denis-Courmont.                           *
+ *  Copyright (C) 2007-2009 Rémi Denis-Courmont.                      *
  *  This program is free software; you can redistribute and/or modify *
  *  it under the terms of the GNU General Public License as published *
  *  by the Free Software Foundation; version 2 of the license, or (at *
@@ -28,17 +27,21 @@ using System.Runtime.InteropServices;
 namespace VideoLAN.LibVLC
 {
     /**
-     * Abstract safe handle class for non-NULL pointers
-     * (Microsoft.* namespace has a similar class,
-     *  but lets stick to System.*).
+     * @brief NonNullHandle: abstract safe handle class for non-NULL pointers
+     * @ingroup Internals
+     * Microsoft.* namespace has a similar class. However we want to use the
+     * System.* namespace only.
      */
-    public abstract class NonNullHandle : SafeHandle
+    internal abstract class NonNullHandle : SafeHandle
     {
         protected NonNullHandle ()
             : base (IntPtr.Zero, true)
         {
         }
 
+        /**
+         * System.Runtime.InteropServices.SafeHandle::IsInvalid.
+         */
         public override bool IsInvalid
         {
             get
@@ -46,26 +49,49 @@ namespace VideoLAN.LibVLC
                 return handle == IntPtr.Zero;
             }
         }
+
+        protected abstract void Destroy ();
+
+        /**
+         * System.Runtime.InteropServices.SafeHandle::ReleaseHandle.
+         */
+        protected override bool ReleaseHandle ()
+        {
+            Destroy ();
+            return true;
+        }
+
     };
 
     /**
-     * Generic class for managed wrapper around a native safe handle.
+     * @brief BaseObject: generic wrapper around a safe handle.
+     * @ingroup Internals
+     * This is the baseline for all managed LibVLC objects which wrap
+     * an unmanaged LibVLC pointer.
      */
-    public class BaseObject<HandleT> : IDisposable where HandleT : SafeHandle
+    public class BaseObject : IDisposable
     {
-        protected NativeException ex;
-        protected HandleT self;
+        protected NativeException ex; /**< buffer for LibVLC exceptions */
+        protected SafeHandle handle; /**< wrapped safe handle */
 
-        internal BaseObject (HandleT self)
+        internal BaseObject ()
         {
-            this.self = self;
             ex = new NativeException ();
+            this.handle = null;
         }
 
+        protected void Raise ()
+        {
+            ex.Raise ();
+        }
+
+        /**
+         * IDisposable::Dispose.
+         */
         public void Dispose ()
         {
             ex.Dispose ();
-            self.Close ();
+            handle.Close ();
         }
     };
 };

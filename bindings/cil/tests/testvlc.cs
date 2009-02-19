@@ -31,28 +31,20 @@ namespace VideoLAN.LibVLC.Test
         public static int Main (string[] args)
         {
             string[] argv = new string[]{
-                "-vvv", "-I", "dummy", "--plugin-path=../../modules"
+                "-v", "-I", "dummy", "--plugin-path=../../modules"
             };
 
-            Instance vlc = VLC.CreateInstance (argv);
-            MediaDescriptor md = vlc.CreateDescriptor ("/dev/null");
-            md.Dispose ();
+            Console.WriteLine("Running on VLC {0} ({1})", VLC.Version,
+                            VLC.ChangeSet);
+            Console.WriteLine("Compiled with {0}", VLC.Compiler);
 
-            PlaylistItem item = null;
+            VLC vlc = new VLC (argv);
+            Media m = new Media (vlc, "/dev/null");
 
-            foreach (string s in args)
-                item = vlc.Add (s);
+            vlc.AddInterface ("qt4");
+            vlc.Run ();
 
-            vlc.Loop = false;
-            vlc.TogglePause ();
-            Console.ReadLine ();
-            vlc.Stop ();
-
-            if (item != null)
-                vlc.Delete (item);
-            vlc.Clear ();
-
-            Console.ReadLine ();
+            m.Dispose ();
             vlc.Dispose ();
             return 0;
         }

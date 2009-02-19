@@ -1,7 +1,7 @@
-/*
- * ustring.cs - Managed LibVLC string
- *
- * $Id$
+/**
+ * @file ustring.cs
+ * @brief Managed LibVLC strings
+ * @ingroup Internals
  */
 
 /**********************************************************************
@@ -27,13 +27,20 @@ using System.Runtime.InteropServices;
 namespace VideoLAN.LibVLC
 {
     /**
-     * Managed class for UTF-8 nul-terminated character arrays
+     * @brief U8String: Native UTF-8 characters array
+     * @ingroup Internals
+     * This supports conversion between native UTF-8 nul-terminated characters
+     * arrays (as used by the native LibVLC) and managed strings.
      */
     [StructLayout (LayoutKind.Sequential)]
     public struct U8String
     {
-        public byte[] mb_str;
+        public byte[] mb_str; /**< nul-terminated UTF-8 bytes array */
 
+        /**
+         * Creates an UTF-8 characters array from a .NET string.
+         * @param value string to convert
+         */
         public U8String (string value)
         {
             mb_str = null;
@@ -46,7 +53,7 @@ namespace VideoLAN.LibVLC
             mb_str[bytes.Length] = 0;
         }
 
-        public U8String (IntPtr ptr)
+        private U8String (IntPtr ptr)
         {
             mb_str = null;
             if (ptr == IntPtr.Zero)
@@ -61,6 +68,9 @@ namespace VideoLAN.LibVLC
             Marshal.Copy (ptr, mb_str, 0, i);
         }
 
+        /**
+         * Object::ToString.
+         */
         public override string ToString ()
         {
             if (mb_str == null)
@@ -72,6 +82,10 @@ namespace VideoLAN.LibVLC
             return System.Text.Encoding.UTF8.GetString (bytes);
         }
 
+        /**
+         * Converts a pointer to a nul-terminated UTF-8 characters array into
+         * a managed string.
+         */
         public static string FromNative (IntPtr ptr)
         {
             return new U8String (ptr).ToString ();
