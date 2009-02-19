@@ -683,7 +683,7 @@ void __module_unneed( vlc_object_t * p_this, module_t * p_module )
  */
 module_t *module_find( const char * psz_name )
 {
-    module_t **list, *module = NULL;
+    module_t **list, *module;
 
     list = module_list_get (NULL);
     if (!list)
