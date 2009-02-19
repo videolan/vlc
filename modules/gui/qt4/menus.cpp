@@ -110,6 +110,26 @@ void addDPStaticEntry( QMenu *menu,
     action->setData( true );
 }
 
+/***
+ * Same for MIM
+ ***/
+void addMIMStaticEntry( intf_thread_t *p_intf,
+                        QMenu *menu,
+                        const QString text,
+                        const char *icon,
+                        const char *member )
+{
+    if( strlen( icon ) > 0 )
+    {
+        QAction *action = menu->addAction( text, THEMIM,  member );
+        action->setIcon( QIcon( icon ) );
+    }
+    else
+    {
+        menu->addAction( text, THEMIM, member );
+    }
+}
+
 /**
  * @brief Enable all static entries, disable the others
  * @param enable if false, disable all entries
@@ -144,24 +164,18 @@ int DeleteNonStaticEntries( QMenu *menu )
     return i_ret;
 }
 
-/***
- * Same for MIM
- ***/
-void addMIMStaticEntry( intf_thread_t *p_intf,
-                        QMenu *menu,
-                        const QString text,
-                        const char *icon,
-                        const char *member )
+/**
+ * \return QAction associated to psz_var variable
+ **/
+static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
 {
-    if( strlen( icon ) > 0 )
+    QList< QAction* > actions = menu->actions();
+    for( int i = 0; i < actions.size(); ++i )
     {
-        QAction *action = menu->addAction( text, THEMIM,  member );
-        action->setIcon( QIcon( icon ) );
+        if( actions[i]->data().toString() == psz_var )
+            return actions[i];
     }
-    else
-    {
-        menu->addAction( text, THEMIM, member );
-    }
+    return NULL;
 }
 
 /*****************************************************************************
@@ -223,17 +237,6 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
     PUSH_VAR( "audio-device" );
     PUSH_VAR( "visual" );
     return VLC_SUCCESS;
-}
-
-static QAction * FindActionWithVar( QMenu *menu, const char *psz_var )
-{
-    QList< QAction* > actions = menu->actions();
-    for( int i = 0; i < actions.size(); ++i )
-    {
-        if( actions[i]->data().toString() == psz_var )
-            return actions[i];
-    }
-    return NULL;
 }
 
 /*****************************************************************************
