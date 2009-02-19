@@ -1,13 +1,24 @@
 Index: configure
 ===================================================================
---- configure	(revision 15654)
-+++ configure	(working copy)
-@@ -1141,7 +1141,7 @@
- TMPS="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.S"
- TMPSH="${TMPDIR1}/ffmpeg-conf-${RANDOM}-$$-${RANDOM}.sh"
+--- configure	(révision 17381)
++++ configure	(copie de travail)
+@@ -1359,7 +1359,7 @@
+     die "C compiler test failed."
+ fi
  
 -check_cflags -std=c99
 +#check_cflags -std=c99
  
  case "$arch" in
      i386|i486|i586|i686|i86pc|BePC)
+@@ -1531,8 +1531,8 @@
+         objformat="win32"
+         enable dos_paths
+         if ! enabled x86_64; then
+-            check_cpp_condition _mingw.h "(__MINGW32_MAJOR_VERSION > 3) || (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION >= 15)" ||
+-                die "ERROR: MinGW runtime version must be >= 3.15."
++            check_cpp_condition _mingw.h "(__MINGW32_MAJOR_VERSION > 3) || (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION >= 13)" ||
++                die "ERROR: MinGW runtime version must be >= 3.13."
+             enabled_any avisynth vfwcap_demuxer &&
+                 { check_cpp_condition w32api.h "(__W32API_MAJOR_VERSION > 3) || (__W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION >= 13)" ||
+                   die "ERROR: avisynth and vfwcap_demuxer require w32api version 3.13 or later."; }
