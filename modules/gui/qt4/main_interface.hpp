@@ -159,6 +159,7 @@ public slots:
     void toggleAdvanced();
     void toggleFullScreen();
     void toggleFSC();
+    void popupMenu();
 
     /* Manage the Video Functions from the vout threads */
     void releaseVideoSlot( void );

@@ -256,6 +256,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Playlist */
     if( b_visible ) togglePlaylist();
 
+    /* Enable the popup menu in the MI */
+    setContextMenuPolicy( Qt::CustomContextMenu );
+    CONNECT( this, customContextMenuRequested( const QPoint& ),
+             this, popupMenu() );
+
     /* Final sizing and showing */
     setMinimumWidth( __MAX( controls->sizeHint().width(),
                             menuBar()->sizeHint().width() ) );
@@ -645,6 +650,11 @@ void MainInterface::toggleFSC()
 
    IMEvent *eShow = new IMEvent( FullscreenControlToggle_Type, 0 );
    QApplication::postEvent( fullscreenControls, eShow );
+}
+
+void MainInterface::popupMenu()
+{
+    QVLCMenu::PopupMenu( p_intf, true );
 }
 
 void MainInterface::debug()
