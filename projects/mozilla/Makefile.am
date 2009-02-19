@@ -106,13 +106,13 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	rm -Rf "$@"
 	$(INSTALL) -d "VLC-Plugin.plugin/Contents/MacOS/lib"
 	$(INSTALL) -d "VLC-Plugin.plugin/Contents/Resources"
-	ACTION="release-makefile" PRODUCT="VLC-Plugin.plugin" src_dir=$(srcdir) build_dir=$(top_builddir) sh ../macosx/framework/Pre-Compile.sh
+	ACTION="release-makefile" PRODUCT="VLC-Plugin.plugin" src_dir=$(srcdir) build_dir=$(top_builddir) sh "$(top_srcdir)/projects/macosx/framework/Pre-Compile.sh"
 	$(INSTALL) .libs/npvlc.dylib "VLC-Plugin.plugin/Contents/MacOS/VLC Plugin"
 	dylib="VLC-Plugin.plugin/Contents/MacOS/VLC Plugin"; $(FIXEXECPATH);
 	$(INSTALL) .libs/npvlc.dylib "VLC-Plugin.plugin/Contents/MacOS/lib"
 	dylib="VLC-Plugin.plugin/Contents/MacOS/lib/npvlc.dylib"; $(FIXEXECPATH);
 	$(INSTALL) npvlc.rsrc "VLC-Plugin.plugin/Contents/Resources/VLC Plugin.rsrc"
-	$(INSTALL) "$(top_builddir)/extras/package/macosx/plugin/Info.plist" "VLC-Plugin.plugin/Contents/Info.plist"
+	$(INSTALL) "$(top_srcdir)/extras/package/macosx/plugin/Info.plist" "VLC-Plugin.plugin/Contents/Info.plist"
 	mv "VLC-Plugin.plugin" "VLC Plugin.plugin"
 	find "VLC Plugin.plugin" -type d -exec chmod ugo+rx '{}' \;
 	find "VLC Plugin.plugin" -type f -exec chmod ugo+r '{}' \;
