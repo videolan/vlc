@@ -1051,7 +1051,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     if( !p_input ) return VLC_ENOOBJ;
 
     var_Get( p_input, "state", &val );
-    if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
+    if( ( val.i_int == PAUSE_S ) &&
         ( strcmp( psz_cmd, "pause" ) != 0 ) )
     {
         msg_rc( _("Press menu select or pause to continue.") );
@@ -1328,7 +1328,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         var_Get( p_input, "state", &val );
         vlc_object_release( p_input );
 
-        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
+        if( val.i_int == PAUSE_S )
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
             pl_Release( p_this );
@@ -1583,7 +1583,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         vlc_value_t val;
 
         var_Get( p_input, "state", &val );
-        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
+        if( val.i_int == PAUSE_S )
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_input );
@@ -1654,7 +1654,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         vlc_value_t val;
 
         var_Get( p_input, "state", &val );
-        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )
+        if( val.i_int == PAUSE_S )
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_input );
@@ -1839,7 +1839,8 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         vlc_value_t val;
 
         var_Get( p_input, "state", &val );
-        if( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) )        {
+        if( val.i_int == PAUSE_S )
+        {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_input );
             return VLC_EGENERIC;
@@ -1938,7 +1939,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         var_Get( p_input, "state", &val );
         vlc_object_release( p_input );
 
-        if( ( ( val.i_int == PAUSE_S ) || ( val.i_int == PLAYLIST_PAUSED ) ) &&
+        if( ( val.i_int == PAUSE_S ) &&
             ( strcmp( newval.psz_string, "select" ) != 0 ) )
         {
             msg_rc( _("Type 'menu select' or 'pause' to continue.") );
