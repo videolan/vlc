@@ -590,8 +590,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_chapter setTitle: _NS("Chapter")];
 
     [o_mu_audio setTitle: _NS("Audio")];
-    [o_mi_vol_up setTitle: _NS("Volume Up")];
-    [o_mi_vol_down setTitle: _NS("Volume Down")];
+    [o_mi_vol_up setTitle: _NS("Increase Volume")];
+    [o_mi_vol_down setTitle: _NS("Decrease Volume")];
     [o_mi_mute setTitle: _NS("Mute")];
     [o_mi_audiotrack setTitle: _NS("Audio Track")];
     [o_mu_audiotrack setTitle: _NS("Audio Track")];
@@ -620,6 +620,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_screen setTitle: _NS("Fullscreen Video Device")];
     [o_mi_subtitle setTitle: _NS("Subtitles Track")];
     [o_mu_subtitle setTitle: _NS("Subtitles Track")];
+    [o_mi_addSub setTitle: _NS("Open File...")];
     [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mu_deinterlace setTitle: _NS("Deinterlace")];
     [o_mi_ffmpeg_pp setTitle: _NS("Post processing")];
@@ -1755,6 +1756,10 @@ end:
         [o_controls setupVarMenuItem: o_mi_subtitle target: (vlc_object_t *)p_input
             var: "spu-es" selector: @selector(toggleVar:)];
 
+        /* special case for "Open File" inside the subtitles menu item */
+        if( [o_mi_videotrack isEnabled] == YES )
+            [o_mi_subtitle setEnabled: YES];
+
         aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                     FIND_ANYWHERE );
         if( p_aout != NULL )
@@ -1910,6 +1915,7 @@ end:
     [o_mi_screen setEnabled: b_enabled];
     [o_mi_aspect_ratio setEnabled: b_enabled];
     [o_mi_crop setEnabled: b_enabled];
+    [o_mi_teletext setEnabled: b_enabled];
 }
 
 - (IBAction)timesliderUpdate:(id)sender

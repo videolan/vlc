@@ -41,6 +41,7 @@
         },
                 {
             ACTIONS =             {
+                addSubtitleFile = id;
                 backward = id;
                 faster = id;
                 forward = id;
@@ -215,6 +216,7 @@
                 "o_main_pgbar" = NSProgressIndicator;
                 "o_messages" = id;
                 "o_mi_about" = NSMenuItem;
+                "o_mi_addSub" = NSMenuItem;
                 "o_mi_add_intf" = NSMenuItem;
                 "o_mi_aspect_ratio" = NSMenuItem;
                 "o_mi_audiotrack" = NSMenuItem;
@@ -286,7 +288,6 @@
                 "o_mi_show_all" = NSMenuItem;
                 "o_mi_slower" = NSMenuItem;
                 "o_mi_snapshot" = NSMenuItem;
-                "o_mi_sprefs" = NSMenuItem;
                 "o_mi_stop" = NSMenuItem;
                 "o_mi_subtitle" = NSMenuItem;
                 "o_mi_teletext" = NSMenuItem;

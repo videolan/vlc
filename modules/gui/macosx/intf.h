@@ -258,6 +258,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     IBOutlet NSMenu * o_mu_crop;
     IBOutlet NSMenuItem * o_mi_subtitle;
     IBOutlet NSMenu * o_mu_subtitle;
+    IBOutlet NSMenuItem * o_mi_addSub;
     IBOutlet NSMenuItem * o_mi_deinterlace;
     IBOutlet NSMenu * o_mu_deinterlace;
     IBOutlet NSMenuItem * o_mi_ffmpeg_pp;

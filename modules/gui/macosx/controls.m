@@ -1,14 +1,14 @@
 /*****************************************************************************
  * controls.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2007 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Benjamin Pracht <bigben at videolan doit org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -532,7 +532,7 @@
     }
 }
 
-- (IBAction)telxNavLink:(id)sender;
+- (IBAction)telxNavLink:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
     vlc_object_t *p_vbi;
@@ -556,6 +556,43 @@
     {
         var_SetInteger( p_vbi, "vbi-page", i_page );
         vlc_object_release( p_vbi );
+    }
+}
+
+- (IBAction)addSubtitleFile:(id)sender
+{
+    NSInteger i_returnValue = 0;
+    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+    if( !p_input ) return;
+
+    input_item_t *p_item = input_GetItem( p_input );
+    if( !p_item ) return;
+
+    char *path = input_item_GetURI( p_item );
+    if( !path ) path = strdup( "" );
+
+    NSOpenPanel * openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseFiles: YES];
+    [openPanel setCanChooseDirectories: NO];
+    [openPanel setAllowsMultipleSelection: YES];
+    i_returnValue = [openPanel runModalForDirectory: [NSString stringWithUTF8String: path] file: nil types: [NSArray arrayWithObjects: @"cdg",@"@idx",@"srt",@"sub",@"utf",@"ass",@"ssa",@"aqt",@"jss",@"psb",@"rt",@"smi", nil]];
+    free( path );
+
+    if( i_returnValue == NSOKButton )
+    {
+        NSUInteger c = 0;
+        if( !p_input ) return;
+        
+        c = [[openPanel filenames] count];
+        NSLog( @"count: %i", c );
+        for (int i = 0; [[openPanel filenames] count] > i ; i++)
+        {
+            msg_Dbg( VLCIntf, "loading subs from %s", [[[openPanel filenames] objectAtIndex: i] UTF8String] );
+            if( input_AddSubtitle( p_input, [[[openPanel filenames] objectAtIndex: i] UTF8String], TRUE ) )
+                msg_Warn( VLCIntf, "unable to load subtitles from '%s'",
+                         [[[openPanel filenames] objectAtIndex: i] UTF8String] );
+            i++;
+        }
     }
 }
 
@@ -754,6 +791,17 @@
     /* make (un)sensitive */
     [o_parent setEnabled: ( val_list.p_list->i_count > 1 )];
 
+    /* special case for the subtitles items */
+    if( [[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES )
+    {
+        NSMenuItem * o_lmi_tmp;
+        o_lmi_tmp = [o_menu addItemWithTitle: _NS("Open File...") action: @selector(addSubtitleFile:) keyEquivalent: @""];
+        [o_lmi_tmp setTarget: self];
+        [o_lmi_tmp setEnabled: YES];
+        [o_parent setEnabled: YES];
+        [o_menu addItem: [NSMenuItem separatorItem]];
+    }
+
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
         vlc_value_t another_val;
@@ -801,6 +849,14 @@
         default:
           break;
         }
+    }
+
+    /* special case for the subtitles sub-menu
+     * In case that we don't have any subs, we don't want a separator item at the end */
+    if( [[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES )
+    {
+        if( [o_menu numberOfItems] == 2 )
+            [o_menu removeItemAtIndex: 1];
     }
 
     /* clean up everything */
