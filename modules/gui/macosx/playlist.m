@@ -575,9 +575,9 @@
 
     PL_LOCK;
     p_item = playlist_CurrentPlayingItem( p_playlist );
-    PL_UNLOCK;
     if( p_item == NULL )
     {
+        PL_UNLOCK;
         pl_Release( VLCIntf );
         return;
     }
@@ -601,6 +601,7 @@
 
     }
 
+    PL_UNLOCK;
     pl_Release( VLCIntf );
 }
 

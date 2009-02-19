@@ -324,7 +324,7 @@ static VLCMain *_o_sharedMainInstance = nil;
         NSAlert *ourAlert;
         int i_returnValue;
         NSString *o_blabla;
-        if( MACOS_VERSION == 10.5f )
+        if( MACOS_VERSION == 10.4f )
             o_blabla = _NS("VLC's last release for your OS is the 0.9 series." );
         else if( MACOS_VERSION == 10.3f )
             o_blabla = _NS("VLC's last release for your OS is VLC 0.8.6i, which is prone to known security issues." );
