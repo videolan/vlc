@@ -277,8 +277,10 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
        gives the QProcess::destroyed timeout issue on Cleanlooks style with
        setDesktopAware set to false */
     QMenuBar *bar = mi->menuBar();
+
     BAR_ADD( FileMenu( p_intf, bar ), qtr( "&Media" ) );
 
+    /* Dynamic menus, rebuilt before being showed */
     BAR_DADD( NavigMenu( p_intf, bar ), qtr( "P&layback" ), 3 );
     BAR_DADD( AudioMenu( p_intf, bar ), qtr( "&Audio" ), 1 );
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
@@ -286,7 +288,6 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
     BAR_ADD( ViewMenu( p_intf, NULL, mi, visual_selector_enabled, true ),
              qtr( "V&iew" ) );
-
     BAR_ADD( HelpMenu( bar ), qtr( "&Help" ) );
 }
 #undef BAR_ADD
@@ -341,7 +342,9 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     return menu;
 }
 
-/* Playlist/MediaLibrary Control */
+/**
+ * Tools, like Media Information, Preferences or Messages 
+ **/
 QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
 {
     addDPStaticEntry( menu, qtr( I_MENU_EXT ), ":/settings",
@@ -380,7 +383,7 @@ QMenu *QVLCMenu::ToolsMenu( QWidget *parent )
 
 /**
  * View Menu
- * This menu can be an interface menu but also a right click menu.
+ * Interface Modification
  **/
 QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                             QMenu *current,
@@ -464,7 +467,6 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 {
     vector<vlc_object_t *> objects;
     vector<const char *> varnames;
-    /** \todo add "switch to XXX" */
     varnames.push_back( "intf-add" );
     objects.push_back( VLC_OBJECT(p_intf) );
 
@@ -473,7 +475,7 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 
 /**
  * Main Audio Menu
- */
+ **/
 QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 {
     vector<vlc_object_t *> objects;
