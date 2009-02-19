@@ -990,8 +990,9 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
     {
-        p_playlist = pl_Hold( p_input );
         char cmd[6];
+        p_playlist = pl_Hold( p_input );
+        playlist_Lock( p_playlist );
         switch( playlist_Status( p_playlist ) )
         {
         case PLAYLIST_STOPPED:
@@ -1006,6 +1007,7 @@ static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
         default:
             cmd[0] = '\0';
         } /* var_GetInteger( p_input, "state" )  */
+        playlist_Unlock( p_playlist );
         msg_rc( STATUS_CHANGE "( %s state: %d ): %s",
                               cmd, newval.i_int,
                               ppsz_input_state[ newval.i_int ] );
