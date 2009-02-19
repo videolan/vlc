@@ -631,6 +631,8 @@ void Playlist::Rebuild()
     playlist_item_t * p_root = p_playlist->p_local_onelevel;
     playlist_item_t * p_child = NULL;
 
+    int iItem = 0;
+
     while( ( p_child = playlist_GetNextLeaf( p_playlist, p_root, p_child, FALSE, FALSE ) ) )
     {
         LVITEM lv;
@@ -638,12 +640,13 @@ void Playlist::Rebuild()
         lv.pszText = _T("");
         lv.cchTextMax = 1;
         lv.iSubItem = 0;
-        lv.iItem = i;
+        lv.iItem = iItem;
         ListView_InsertItem( hListView, &lv );
         ListView_SetItemText( hListView, lv.iItem, 0,
             _FROMMB(p_child->p_input->psz_name) );
 
         UpdateItem( p_child->i_id );
+        iItem++;
     }
     PL_UNLOCK;
 
