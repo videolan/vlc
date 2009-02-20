@@ -242,6 +242,7 @@ DIST_lua= \
 	lua/meta/01_musicbrainz.lua \
 	lua/meta/10_googleimage.lua \
 	lua/playlist/README.txt \
+	lua/playlist/anevia_streams.lua \
 	lua/playlist/appletrailers.lua \
 	lua/playlist/break.lua \
 	lua/playlist/dailymotion.lua \
