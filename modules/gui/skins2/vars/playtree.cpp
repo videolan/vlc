@@ -136,7 +136,9 @@ void Playtree::onUpdateItem( int id )
         playlist_item_t* pNode = (playlist_item_t*)(it->m_pData);
         UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
         it->m_cString = UStringPtr( pName );
+        playlist_Lock( m_pPlaylist );
         it->m_playing = playlist_CurrentPlayingItem( m_pPlaylist ) == pNode;
+        playlist_Unlock( m_pPlaylist );
         if( it->m_playing ) descr.b_active_item = true;
     }
     else
