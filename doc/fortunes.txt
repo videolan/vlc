@@ -889,3 +889,12 @@ VLC development is NOT about being a sed god.
 < thresh> a coworker of mine typed that, really
  -- #videolan
 %
+< jpsaman> where is dionoea when you need him?
+< j-b> at work?
+< xtophe> without internet
+< DiDjCodt> he's slicing some pyramids in pieces...
+< TypX> or he has been rapt by alien
+< TypX> and will come back in six month as usual
+< linkfanel> dionoea has been raped by aliens???
+ -- #videolan
+%
