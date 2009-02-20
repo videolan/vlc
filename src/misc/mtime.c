@@ -362,20 +362,6 @@ void mwait( mtime_t date )
 #include "libvlc.h" /* vlc_backtrace() */
 #undef msleep
 
-#if defined(__APPLE__) && defined( HAVE_NANOSLEEP )
-/* Mac OS X 10.5's nanosleep is not a cancellation point */
-static inline int
-semi_testcancelable_nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
-{
-    int ret;
-    pthread_testcancel();
-    ret = nanosleep(rqtp, rmtp);
-    pthread_testcancel();
-    return ret;
-}
-#define nanosleep semi_testcancelable_nanosleep
-#endif
-
 /**
  * Portable usleep(). Cancellation point.
  *
