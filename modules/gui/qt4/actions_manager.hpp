@@ -79,8 +79,8 @@ public slots:
     void toggleMuteAudio();
     void AudioUp();
     void AudioDown();
-protected slots:
     void play();
+protected slots:
     void fullscreen();
     void snapshot();
     void playlist();

@@ -614,6 +614,7 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     }
 
+    /* */
     input_thread_t *p_object;
     vector<vlc_object_t *> objects;
     vector<const char *> varnames;
@@ -622,15 +623,20 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     if( p_object )
         vlc_object_hold( p_object );
     InputAutoMenuBuilder( p_object, objects, varnames );
+
+    /* Title and so on */
     PUSH_VAR( "prev-title" );
     PUSH_VAR( "next-title" );
     PUSH_VAR( "prev-chapter" );
     PUSH_VAR( "next-chapter" );
+
+    menu->addSeparator();
+
     EnableStaticEntries( menu, ( p_object != NULL ) );
+
     if( p_object )
-    {
         vlc_object_release( p_object );
-    }
+
     return Populate( p_intf, menu, varnames, objects );
 }
 
@@ -715,23 +721,17 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
                                         input_thread_t *p_input )
 {
-    if( p_input )
+    if( !p_input || var_GetInteger( p_input, "state" ) != PLAYING_S )
     {
-        vlc_value_t val;
-        var_Get( p_input, "state", &val );
-        if( val.i_int == PLAYING_S )
+        QAction *action = menu->addAction( qtr( "Play" ),
+                ActionsManager::getInstance( p_intf ), SLOT( play() ) );
+        action->setIcon( QIcon( ":/play" ) );
+    }
+    else
+    {
             addMIMStaticEntry( p_intf, menu, qtr( "Pause" ),
                     ":/pause", SLOT( togglePlayPause() ) );
-        else
-            addMIMStaticEntry( p_intf, menu, qtr( "Play" ),
-                    ":/play", SLOT( togglePlayPause() ) );
     }
-    else if( THEPL->items.i_size )
-        addMIMStaticEntry( p_intf, menu, qtr( "Play" ),
-                ":/play", SLOT( togglePlayPause() ) );
-    else
-        addDPStaticEntry( menu, qtr( "Play" ),
-                ":/play", SLOT( openDialog() ) );
 
     addMIMStaticEntry( p_intf, menu, qtr( "Stop" ),
             ":/stop", SLOT( stop() ) );
