@@ -112,7 +112,7 @@ VLC\ Plugin.plugin: npvlc.rsrc $(lib_LTLIBRARIES)
 	$(INSTALL) .libs/npvlc.dylib "VLC-Plugin.plugin/Contents/MacOS/lib"
 	dylib="VLC-Plugin.plugin/Contents/MacOS/lib/npvlc.dylib"; $(FIXEXECPATH);
 	$(INSTALL) npvlc.rsrc "VLC-Plugin.plugin/Contents/Resources/VLC Plugin.rsrc"
-	$(INSTALL) "$(top_srcdir)/extras/package/macosx/plugin/Info.plist" "VLC-Plugin.plugin/Contents/Info.plist"
+	$(INSTALL) "$(top_builddir)/extras/package/macosx/plugin/Info.plist" "VLC-Plugin.plugin/Contents/Info.plist"
 	mv "VLC-Plugin.plugin" "VLC Plugin.plugin"
 	find "VLC Plugin.plugin" -type d -exec chmod ugo+rx '{}' \;
 	find "VLC Plugin.plugin" -type f -exec chmod ugo+r '{}' \;
