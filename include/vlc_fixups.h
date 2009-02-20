@@ -77,8 +77,7 @@ static inline int vasprintf (char **strp, const char *fmt, va_list ap)
         }
 
         /* Else try again with more space. */
-        if (n == -1)
-            size *= 2;  /* twice the old size */
+        size *= 2;  /* twice the old size */
 
         if ((np = (char *) realloc (res, size)) == NULL)
         {
