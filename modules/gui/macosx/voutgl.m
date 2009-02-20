@@ -110,11 +110,11 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-        return( 1 );
+        return VLC_ENOMEM;
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
+    var_Get( p_vout->p_libvlc, "drawable-xid", &value_drawable );
     if( value_drawable.i_int != 0 )
     {
         static const GLint ATTRIBUTES[] = {
@@ -497,7 +497,7 @@ static int aglInit( vout_thread_t * p_vout )
     Rect viewBounds;
     Rect clipBounds;
  
-    var_Get( p_vout->p_libvlc, "drawable", &val );
+    var_Get( p_vout->p_libvlc, "drawable-xid", &val );
     p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
     aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
@@ -617,7 +617,7 @@ static int aglManage( vout_thread_t * p_vout )
             Rect viewBounds;
             Rect clipBounds;
 
-            var_Get( p_vout->p_libvlc, "drawable", &val );
+            var_Get( p_vout->p_libvlc, "drawable-xid", &val );
             p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
             aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
