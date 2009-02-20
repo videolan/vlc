@@ -634,7 +634,7 @@ static void Run( intf_thread_t *p_intf )
 
                 if( psz_msg )
                 {
-                    msg_rc( psz_msg );
+                    msg_rc( "%s", psz_msg );
                     free( psz_msg );
                 }
             }

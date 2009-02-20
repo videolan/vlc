@@ -85,7 +85,7 @@ static int vlclua_osd_message( lua_State *L )
     const char *psz_message = luaL_checkstring( L, 1 );
     int i_chan = luaL_optint( L, 2, DEFAULT_CHAN );
     vlc_object_t *p_this = vlclua_get_this( L );
-    vout_OSDMessage( p_this, i_chan, psz_message );
+    vout_OSDMessage( p_this, i_chan, "%s", psz_message );
     return 0;
 }
 

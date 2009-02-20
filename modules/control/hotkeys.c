@@ -1069,7 +1069,7 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
     }
     else if( i_seconds > 0 )
     {
-        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, psz_time );
+        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, "%s", psz_time );
     }
 
     if( p_vout->b_fullscreen )

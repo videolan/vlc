@@ -456,7 +456,7 @@ static void Run( intf_thread_t *p_intf )
                     if( psz_msg )
                     {
                         vlm_message_t *message;
-                        message = vlm_MessageNew( "Module command", psz_msg );
+                        message = vlm_MessageNew( "Module command", "%s", psz_msg );
                         Write_message( cl, message, NULL, WRITE_MODE_CMD );
                         vlm_MessageDelete( message );
                         free( psz_msg );

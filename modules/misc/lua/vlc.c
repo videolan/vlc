@@ -317,7 +317,7 @@ void __vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
                                  psz_meta_category, psz_meta_name,
                                  psz_meta_value );
                         input_item_AddInfo( p_input, psz_meta_category,
-                                           psz_meta_name, psz_meta_value );
+                                           psz_meta_name, "%s", psz_meta_value );
                     }
                     lua_pop( L, 1 ); /* pop item */
                     /* ... item meta key value key2 */
