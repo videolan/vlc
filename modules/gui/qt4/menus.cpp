@@ -721,9 +721,12 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
                                         intf_thread_t *p_intf,
                                         input_thread_t *p_input )
 {
+    QAction *action;
+
+    /* Play or Pause action and icon */
     if( !p_input || var_GetInteger( p_input, "state" ) != PLAYING_S )
     {
-        QAction *action = menu->addAction( qtr( "Play" ),
+        action = menu->addAction( qtr( "Play" ),
                 ActionsManager::getInstance( p_intf ), SLOT( play() ) );
         action->setIcon( QIcon( ":/play" ) );
     }
@@ -733,8 +736,24 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu,
                     ":/pause", SLOT( togglePlayPause() ) );
     }
 
+    /* Stop */
     addMIMStaticEntry( p_intf, menu, qtr( "Stop" ),
             ":/stop", SLOT( stop() ) );
+
+    /* Faster/Slower */
+    action = menu->addAction( qtr( "Faster" ), THEMIM->getIM(), SLOT( faster() ) );
+    action->setIcon( QIcon( ":/faster") );
+    menu->addAction( qtr( "Normal Speed" ), THEMIM->getIM(), SLOT( normalRate() ) );
+    action = menu->addAction( qtr( "Slower" ), THEMIM->getIM(), SLOT( slower() ) );
+    action->setIcon( QIcon( ":/slower") );
+}
+
+
+void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
+                                        intf_thread_t *p_intf,
+                                        input_thread_t *p_input )
+{
+    /* Next / Previous */
     addMIMStaticEntry( p_intf, menu, qtr( "Previous" ),
             ":/previous", SLOT( prev() ) );
     addMIMStaticEntry( p_intf, menu, qtr( "Next" ),
@@ -823,6 +842,9 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
     PopupMenuControlEntries( menu, p_intf, p_input );
 
     menu->addSeparator();
+    PopupMenuPlaylistControlEntries( menu, p_intf, p_input );
+
+    menu->addSeparator();
     PopupMenuStaticEntries( menu );
 
     p_intf->p_sys->p_popup_menu = menu;
@@ -848,6 +870,9 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         POPUP_BOILERPLATE;
 
         PopupMenuControlEntries( menu, p_intf, p_input );
+        menu->addSeparator();
+
+        PopupMenuPlaylistControlEntries( menu, p_intf, p_input );
         menu->addSeparator();
 
         if( p_input )
@@ -989,6 +1014,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
 
     sysMenu->addSeparator();
     PopupMenuControlEntries( sysMenu, p_intf, p_input );
+    PopupMenuPlaylistControlEntries( sysMenu, p_intf, p_input );
 
     sysMenu->addSeparator();
     addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
