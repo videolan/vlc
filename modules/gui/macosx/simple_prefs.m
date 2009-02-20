@@ -1059,11 +1059,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             [o_video_snap_folder_fld setStringValue: [o_selectFolderPanel filename]];
             b_videoSettingChanged = YES;
         }
-        else if( contextInfo == o_osd_font_btn )
-        {
-            [o_osd_font_fld setStringValue: [o_selectFolderPanel filename]];
-            b_osdSettingChanged = YES;
-        }
     }
 
     [o_selectFolderPanel release];
@@ -1095,8 +1090,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
         [[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
     }
-    [[NSFontManager sharedFontManager] setDelegate: self];
-    [o_sprefs_win makeFirstResponder: o_sprefs_win];
+    [[NSFontManager sharedFontManager] setTarget: self];
     [[NSFontPanel sharedFontPanel] orderFront:self];
 }
 
