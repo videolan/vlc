@@ -398,23 +398,9 @@ static int Demux ( demux_t *p_demux )
         }
     }
     if( !p_sys->psz_mcast_ip )
-    {
-        char *psz_option;
-        if( asprintf( &psz_option, "rtsp-caching=5000" ) != -1 )
-        {
-            input_item_AddOption( p_child, psz_option, VLC_INPUT_OPTION_TRUSTED );
-            free( psz_option );
-        }
-    }
+        input_item_AddOption( p_child, "rtsp-caching=5000", VLC_INPUT_OPTION_TRUSTED );
     if( !p_sys->psz_mcast_ip && p_sys->b_rtsp_kasenna )
-    {
-        char *psz_option;
-        if( asprintf( &psz_option, "rtsp-kasenna" ) != -1 )
-        {
-            input_item_AddOption( p_child, psz_option, VLC_INPUT_OPTION_TRUSTED );
-            free( psz_option );
-        }
-    }
+        input_item_AddOption( p_child, "rtsp-kasenna", VLC_INPUT_OPTION_TRUSTED );
 
     input_item_AddSubItem( p_current_input, p_child );
     vlc_gc_decref( p_child );
