@@ -723,7 +723,7 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	patch -d libvorbis -p0 < Patches/libvorbis-r14598-CVE-2008-1420.patch
 	patch -d libvorbis -p0 < Patches/libvorbis-r14602-CVE-2008-1419.patch
 	patch -d libvorbis -p0 < Patches/libvorbis-r14602-CVE-2008-1423.patch
-	(cd $@; autoconf)
+	(cd $@; sh autogen.sh)
 
 .vorbis: libvorbis .ogg
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
@@ -902,7 +902,7 @@ faad2-$(FAAD2_VERSION).tar.gz:
 
 faad2: faad2-$(FAAD2_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	(cd $@; ./bootstrap)
+	(cd $@; sh ./bootstrap)
 
 .faad: faad2
 	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --disable-shared --prefix=$(PREFIX) CFLAGS="-O3" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
