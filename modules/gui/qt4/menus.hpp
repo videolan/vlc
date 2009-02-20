@@ -119,6 +119,8 @@ private:
     static void PopupMenuStaticEntries( QMenu *menu );
     static void PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf,
                                          input_thread_t *p_input );
+    static void PopupMenuPlaylistControlEntries( QMenu *menu, intf_thread_t *p_intf,
+                                         input_thread_t *p_input );
     /* Generic automenu methods */
     static QMenu * Populate( intf_thread_t *, QMenu *current,
                              vector<const char*>&, vector<vlc_object_t *>& );
