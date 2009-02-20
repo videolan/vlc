@@ -88,9 +88,9 @@ case $HOST in
         echo "HAVE_DARWIN_OS = 1" >> config.mak
         echo "HAVE_BSD = 1" >> config.mak
         if test $CONTRIBS_CC_LLVM; then
-            echo "DARWIN_COMPILER = LLVMGCC" >> config.mak
-        else
             echo "DARWIN_COMPILER = GCC" >> config.mak
+        else
+            echo "DARWIN_COMPILER = LLVMGCC" >> config.mak
         fi
     ;;
     *linux*)
@@ -144,14 +144,14 @@ case $HOST in
     ;;
     powerpc-apple-darwin9)
 # Mac OS X 10.5 with Xcode 3, specific rules apply
-        if test -z "$CONTRIBS_CC_LLVM"; then
-            SDK_TARGET=10.4
-        else
+        if test "$CONTRIBS_CC_LLVM"; then
             SDK_TARGET=10.5
+        else
+            SDK_TARGET=10.4
         fi
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
-        if test -z "$CONTRIBS_CC_LLVM"; then
+        if test "$CONTRIBS_CC_LLVM"; then
             echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
         else
             echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
@@ -161,7 +161,7 @@ case $HOST in
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
-        if test -z "$CONTRIBS_CC_LLVM"; then
+        if test "$CONTRIBS_CC_LLVM"; then
             CC="gcc"
             CXX="g++"
         else
@@ -179,7 +179,7 @@ case $HOST in
         fi
     ;;
     i686-apple-darwin9)
-        if test -z "$CONTRIBS_CC_LLVM"; then
+        if test "$CONTRIBS_CC_LLVM"; then
             SDK_TARGET=10.4
         else
             SDK_TARGET=10.5
@@ -194,7 +194,7 @@ case $HOST in
             exit 1
         fi
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
-        if test -z "$CONTRIBS_CC_LLVM"; then
+        if test "$CONTRIBS_CC_LLVM"; then
             echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.4u.sdk" >> config.mak
         else
             echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
@@ -202,7 +202,7 @@ case $HOST in
         CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
-        if test -z "$CONTRIBS_CC_LLVM"; then
+        if test "$CONTRIBS_CC_LLVM"; then
             CC="gcc"
             CXX="g++"
         else
@@ -374,7 +374,6 @@ if test -z "$CONTRIBS_RELEASE"; then
     echo "*****************************************************************"
 else
     echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
-    set -x
 fi
 
 if test $HAVE_DARWIN_9; then
@@ -382,11 +381,11 @@ if test -z "$CONTRIBS_CC_LLVM"; then
     set +x
     echo
     echo "*****************************************************************"
-    echo "* In case that you target Mac OS X 10.5 or later only,          *"
-    echo "* we recommend to use llvm-gcc-4.2 for compilation.             *"
-    echo "* Please run CONTRIBS_CC_LLVM=yes ./bootstrap to do so.         *"
+    echo "* We are using the llvm-gcc-4.2 compiler by default on OS X,    *"
+    echo "* so no build will run on earlier version than Mac OS X 10.5.   *"
+    echo "*                                                               *"
+    echo "* Please run CONTRIBS_CC_LLVM=no ./bootstrap to disable this.   *"
     echo "*****************************************************************"
-    set -x
 fi
 fi
 
