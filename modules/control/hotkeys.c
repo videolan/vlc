@@ -1064,7 +1064,7 @@ static void DisplayPosition( intf_thread_t *p_intf, vout_thread_t *p_vout,
     if( time.i_time > 0 )
     {
         secstotimestr( psz_duration, time.i_time / 1000000 );
-        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, (char *) "%s / %s",
+        vout_OSDMessage( p_input, POSITION_TEXT_CHAN, "%s / %s",
                          psz_time, psz_duration );
     }
     else if( i_seconds > 0 )
