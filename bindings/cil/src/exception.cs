@@ -74,15 +74,15 @@ namespace VideoLAN.LibVLC
         IntPtr message;
 
         [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_init")]
-        static extern void Init (NativeException e);
+        private static extern void Init (NativeException e);
         [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_clear")]
-        static extern void Clear (NativeException e);
+        private static extern void Clear (NativeException e);
         /*[DllImport ("libvlc.dll",
                     EntryPoint="libvlc_exception_raised")]
-        static extern int Raised (NativeException e);*/
+        private static extern int Raised (NativeException e);*/
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_exception_get_message")]
-        static extern IntPtr GetMessage (NativeException e);
+        private static extern IntPtr GetMessage (NativeException e);
 
         public NativeException ()
         {
