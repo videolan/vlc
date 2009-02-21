@@ -138,5 +138,125 @@ namespace VideoLAN.LibVLC
         /*[DllImport ("libvlc.dll", EntryPoint="libvlc_media_get_user_data")]
         public static extern
         IntPtr MediaIsPreparsed (MediaHandle media, NativeException ex);*/
+
+        /* media_player.c */
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_media_player_new")]
+        public static extern
+        PlayerHandle PlayerCreate (InstanceHandle inst, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_new_from_media")]
+        public static extern
+        PlayerHandle PlayerCreateFromMedia (MediaHandle media,
+                                            NativeException ex);
+
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_media_player_release")]
+        public static extern
+        void PlayerRelease (IntPtr ptr);
+
+        /* PlayerRetain */
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_media")]
+        public static extern
+        void PlayerSetMedia (PlayerHandle player, MediaHandle media,
+                             NativeException ex);
+
+        /*[DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_media")]
+        public static extern
+        MediaHandle PlayerGetMedia (PlayerHandle player,
+                                    NativeException ex);*/
+
+        /*[DllImport ("libvlc.dll",
+                      EntryPoint="libvlc_media_player_event_manager")]
+        public static extern
+        EventManagerHandle PlayerGetEventManager (PlayerHandle media,
+                                                  NativeException ex);*/
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_is_playing")]
+        public static extern
+        int PlayerIsPlaying (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_play")]
+        public static extern
+        void PlayerPlay (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_pause")]
+        public static extern
+        void PlayerPause (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_stop")]
+        public static extern
+        void PlayerStop (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_xwindow")]
+        public static extern
+        void PlayerSetXWindow (PlayerHandle player, int xid,
+                               NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_xwindow")]
+        public static extern
+        int PlayerGetXWindow (PlayerHandle player,
+                              NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_hwnd")]
+        public static extern
+        void PlayerSetHWND (PlayerHandle player, SafeHandle hwnd,
+                            NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_hwnd")]
+        public static extern
+        IntPtr PlayerGetHWND (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_length")]
+        public static extern
+        long PlayerGetLength (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_media_player_get_time")]
+        public static extern
+        long PlayerGetTime (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_media_player_set_time")]
+        public static extern
+        void PlayerSetTime (PlayerHandle player, long time,
+                            NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_position")]
+        public static extern
+        float PlayerGetPosition (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_position")]
+        public static extern
+        void PlayerSetPosition (PlayerHandle player, float position,
+                                NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_chapter")]
+        public static extern
+        int PlayerGetChapter (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_chapter")]
+        public static extern
+        void PlayerSetChapter (PlayerHandle player, int chapter,
+                               NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_chapter_count")]
+        public static extern
+        int PlayerGetChapterCounter (PlayerHandle player, NativeException ex);
+
+        /* PlayerWillPlay */
     };
 };

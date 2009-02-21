@@ -35,34 +35,14 @@ using System.Runtime.InteropServices;
 namespace VideoLAN.LibVLC
 {
    /**
-     * @brief MediaPlayerHandle: unmanaged LibVLC media player pointer
+     * @brief PlayerHandle: unmanaged LibVLC media player pointer
      * @ingroup Internals
      */
-    internal sealed class MediaPlayerHandle : NonNullHandle
+    internal sealed class PlayerHandle : NonNullHandle
     {
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_player_new")]
-        internal static extern
-        MediaPlayerHandle Create (InstanceHandle inst, NativeException ex);
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_player_new_from_media")]
-        internal static extern
-        MediaPlayerHandle Create (MediaHandle media, NativeException ex);
-
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_player_release")]
-        internal static extern void Release (IntPtr ptr);
-
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_player_set_media")]
-        internal static extern
-        MediaPlayerHandle SetMedia (MediaPlayerHandle player,
-                                    MediaHandle media,
-                                    NativeException ex);
-
         protected override void Destroy ()
         {
-            Release (handle);
+            LibVLC.PlayerRelease (handle);
         }
     };
 
@@ -71,13 +51,13 @@ namespace VideoLAN.LibVLC
      * @ingroup API
      * Use this class to play a media.
      */
-    public class MediaPlayer : BaseObject
+    public class Player : BaseObject
     {
-        internal MediaPlayerHandle Handle
+        internal PlayerHandle Handle
         {
             get
             {
-                return handle as MediaPlayerHandle;
+                return handle as PlayerHandle;
             }
         }
 
@@ -96,35 +76,34 @@ namespace VideoLAN.LibVLC
             {
                 MediaHandle mh = (value != null) ? value.Handle : null;
 
-                MediaPlayerHandle.SetMedia (Handle, mh, null);
+                LibVLC.PlayerSetMedia (Handle, mh, null);
                 media = value;
             }
         }
 
         /**
-         * Creates an empty MediaPlayer object.
+         * Creates a player with no medias.
          * An input media will be needed before this media player can be used.
          *
          * @param instance VLC instance
          */
-        public MediaPlayer (VLC instance)
+        public Player (VLC instance)
         {
             this.media = null;
-            handle = MediaPlayerHandle.Create (instance.Handle, ex);
-            ex.Raise ();
+            handle = LibVLC.PlayerCreate (instance.Handle, ex);
+            Raise ();
         }
 
         /**
-         * Creates a MediaPlayer object from a Media object.
-         * This allows playing the specified media.
+         * Creates a player object for a given a media.
          *
          * @param media media object
          */
-        public MediaPlayer (Media media)
+        public Player (Media media)
         {
             this.media = media;
-            handle = MediaPlayerHandle.Create (media.Handle, ex);
-            ex.Raise ();
+            handle = LibVLC.PlayerCreateFromMedia (media.Handle, ex);
+            Raise ();
         }
 
     };
