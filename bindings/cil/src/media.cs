@@ -47,7 +47,7 @@ namespace VideoLAN.LibVLC
      * @ingroup API
      * Each media object represents an input media, such as a file or an URL.
      */
-    public class Media : BaseObject
+    public class Media : BaseObject, ICloneable
     {
         internal MediaHandle Handle
         {
@@ -93,6 +93,62 @@ namespace VideoLAN.LibVLC
             else
                 LibVLC.MediaAddUntrustedOption (Handle, uopts, ex);
             Raise ();
+        }
+
+        /**
+         * The media location (file path, URL, ...).
+         */
+        public string Location
+        {
+            get
+            {
+                MemoryHandle str = LibVLC.MediaGetMRL (Handle, ex);
+                Raise ();
+                return str.Transform ();
+            }
+        }
+
+        private Media (MediaHandle handle)
+        {
+            this.handle = handle;
+        }
+
+        /**
+         * Duplicates a media object.
+         */
+        public object Clone ()
+        {
+            return new Media (LibVLC.MediaDuplicate (Handle));
+        }
+
+        /**
+         * Duration of the media in microseconds. The precision of the result
+         * depends on the input stram protocol and file format. The value
+         * might be incorrect and unknown (VLC usually returns 0 then).
+         */
+        public long Duration
+        {
+            get
+            {
+                long duration = LibVLC.MediaGetDuration (Handle, ex);
+                Raise ();
+                return duration;
+            }
+        }
+
+        /**
+         * Whether the media was "preparsed". If true, the meta-infos were
+         * extracted, even before the media was played. This is normally only
+         * available if the input files is stored on a local filesystem.
+         */
+        public bool IsPreparsed
+        {
+            get
+            {
+                int preparsed = LibVLC.MediaIsPreparsed (Handle, ex);
+                Raise ();
+                return preparsed != 0;
+            }
         }
     };
 };

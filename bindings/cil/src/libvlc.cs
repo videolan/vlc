@@ -117,7 +117,7 @@ namespace VideoLAN.LibVLC
         public static extern
         MediaListHandle MediaSubItems (MediaHandle media, NativeException ex);*/
 
-        /*[DllImport ("libvlc.dll", EntryPoint="libvlc_media_get_state")]
+        /*[DllImport ("libvlc.dll", EntryPoint="libvlc_media_event_manager")]
         public static extern
         EventManagerHandle MediaGetEventManager (MediaHandle media,
                                                  NativeException ex);*/
