@@ -1017,26 +1017,34 @@ else
     fi
 fi
 
-AC_CACHE_CHECK([if \$CC accepts -O3],
-    [ac_cv_c_o3],
-    [CFLAGS="${CFLAGS_save} -O3"
-     AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
-if test "${ac_cv_c_o3}" != "no" -a "x${enable_debug}" = "xno"; then
-    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O3"
+AC_CACHE_CHECK([if \$CC accepts -O4],
+    [ac_cv_c_o4],
+    [CFLAGS="${CFLAGS_save} -O4"
+     AC_TRY_COMPILE([],,ac_cv_c_o4=yes, ac_cv_c_o4=no)])
+if test "${ac_cv_c_o4}" != "no" -a "x${enable_debug}" = "xno"; then
+    CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O4"
 else
-    AC_CACHE_CHECK([if \$CC accepts -O2],
-        [ac_cv_c_o2],
-        [CFLAGS="${CFLAGS_save} -O2"
-         AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
-    if test "${ac_cv_c_o2}" != "no"; then
-        CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O2"
+    AC_CACHE_CHECK([if \$CC accepts -O3],
+        [ac_cv_c_o3],
+        [CFLAGS="${CFLAGS_save} -O3"
+         AC_TRY_COMPILE([],,ac_cv_c_o3=yes, ac_cv_c_o3=no)])
+    if test "${ac_cv_c_o3}" != "no" -a "x${enable_debug}" = "xno"; then
+        CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O3"
     else
-        AC_CACHE_CHECK([if \$CC accepts -O],
-            [ac_cv_c_o],
-            [CFLAGS="${CFLAGS_save} -O"
-             AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
-        if test "${ac_cv_c_o}" != "no"; then
-            CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O"
+        AC_CACHE_CHECK([if \$CC accepts -O2],
+            [ac_cv_c_o2],
+            [CFLAGS="${CFLAGS_save} -O2"
+             AC_TRY_COMPILE([],,ac_cv_c_o2=yes, ac_cv_c_o2=no)])
+        if test "${ac_cv_c_o2}" != "no"; then
+            CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O2"
+        else
+            AC_CACHE_CHECK([if \$CC accepts -O],
+                [ac_cv_c_o],
+                [CFLAGS="${CFLAGS_save} -O"
+                 AC_TRY_COMPILE([],,ac_cv_c_o=yes, ac_cv_c_o=no)])
+            if test "${ac_cv_c_o}" != "no"; then
+                CFLAGS_OPTIM_SPEED="${CFLAGS_OPTIM_SPEED} -O"
+            fi
         fi
     fi
 fi
