@@ -35,8 +35,9 @@ Access:
  * New OSS and Alsa accesses. The v4l2 and v4l modules no longer support
    OSS or Alsa audio input. Use --input-slave alsa:// or oss:// if needed.
  * DVB scanning on linux
- * EXPERIMENTAL Blu-Ray Disc Folder support
+ * EXPERIMENTAL Blu-Ray Disc and AVCHD Folders support
  * On-the-fly zip file decompression and browsing (MRL of the form zip://file.zip|file.avi to specify the file)
+ * Opening of any file descriptor using 'fd://'
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
