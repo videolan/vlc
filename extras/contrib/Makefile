@@ -25,7 +25,7 @@
 
 include ./config.mak
 
-BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp gecko-sdk
+BUILDDIRS = bin doc etc include info lib man sbin share tmp gecko-sdk
 
 ifdef HAVE_DARWIN_OS
 TARGETALL=using-bin
@@ -80,7 +80,7 @@ package-macosx:
 		exit 1 ; \
 	fi
 	mkdir tmp
-	tar cf - bin sbin include lib vlc-lib share/aclocal* share/autoconf* \
+	tar cf - bin sbin include lib share/aclocal* share/autoconf* \
 		share/automake* share/gettext* share/libtool* gecko-sdk \
 		| (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
