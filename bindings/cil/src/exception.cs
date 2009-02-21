@@ -32,6 +32,18 @@ namespace VideoLAN.LibVLC
      */
     public class VLCException : Exception
     {
+        int code;
+        /**
+         * VLC exception code.
+         */
+        public int Code
+        {
+            get
+            {
+                return code;
+            }
+        }
+
         /**
          * Creates a managed VLC exception.
          */
@@ -56,6 +68,25 @@ namespace VideoLAN.LibVLC
         public VLCException (string message, Exception inner)
            : base (message, inner)
         {
+        }
+
+        /**
+         * Creates a VLC exception
+         * @param code VLC exception code
+         * @param message VLC exception message
+         */
+        public VLCException (int code, string message) : base (message)
+        {
+            this.code = code;
+        }
+
+        /**
+         * Creates a VLC exception
+         * @param code VLC exception code
+         */
+        public VLCException (int code) : base ()
+        {
+            this.code = code;
         }
     };
 
@@ -92,11 +123,16 @@ namespace VideoLAN.LibVLC
          */
         public void Raise ()
         {
+            if (raised == 0)
+                return;
+
+            string msg = U8String.FromNative (message);
             try
             {
-                string msg = U8String.FromNative (GetMessage (this));
                 if (msg != null)
-                    throw new VLCException (msg);
+                    throw new VLCException (code, msg);
+                else
+                    throw new VLCException (code);
             }
             finally
             {
