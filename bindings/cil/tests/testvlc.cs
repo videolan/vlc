@@ -28,24 +28,31 @@ namespace VideoLAN.LibVLC.Test
 {
     public sealed class Test
     {
+        private static void DumpMedia (Media m)
+        {
+            Console.WriteLine ("Media at    {0}", m.Location);
+            Console.WriteLine (" duration:  {0}µs", m.Duration);
+            Console.WriteLine (" preparsed: {0}", m.IsPreparsed);
+        }
+
         public static int Main (string[] args)
         {
             string[] argv = new string[]{
-                "-v", "-I", "dummy", "--plugin-path=../../modules"
+                "-vv", "-I", "dummy", "--plugin-path=../../modules"
             };
 
-            Console.WriteLine("Running on VLC {0} ({1})", VLC.Version,
-                            VLC.ChangeSet);
-            Console.WriteLine("Compiled with {0}", VLC.Compiler);
+            Console.WriteLine ("Running on LibVLC {0} ({1})", VLC.Version,
+                               VLC.ChangeSet);
+            Console.WriteLine (" (compiled with {0})", VLC.Compiler);
 
             VLC vlc = new VLC (argv);
             Media m = new Media (vlc, "/dev/null");
+            DumpMedia (m);
 
-            vlc.AddInterface ("qt4");
-            vlc.Run ();
+            DumpMedia ((Media)m.Clone ());
 
-            m.Dispose ();
             vlc.Dispose ();
+            m.Dispose ();
             return 0;
         }
     };

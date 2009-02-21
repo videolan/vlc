@@ -124,7 +124,7 @@ namespace VideoLAN.LibVLC
         /**
          * Duration of the media in microseconds. The precision of the result
          * depends on the input stram protocol and file format. The value
-         * might be incorrect and unknown (VLC usually returns 0 then).
+         * might be incorrect and unknown (VLC usually returns 0 or -1 then).
          */
         public long Duration
         {
