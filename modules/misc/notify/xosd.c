@@ -215,62 +215,68 @@ static void Run( intf_thread_t *p_intf )
 {
     playlist_t *p_playlist;
     playlist_item_t *p_item = NULL;
-    input_item_t *p_input;
-    char psz_duration[MSTRTIME_MAX_SIZE+2];
     char *psz_display = NULL;
 
     for( ;; )
     {
         int canc = vlc_savecancel();
+
         if( p_intf->p_sys->b_need_update == true )
         {
             p_intf->p_sys->b_need_update = false;
             p_playlist = pl_Hold( p_intf );
+            PL_LOCK;
 
             if( playlist_IsEmpty( p_playlist ) )
             {
+                PL_UNLOCK;
                 pl_Release( p_intf );
+                vlc_restorecancel( canc );
                 continue;
             }
             free( psz_display );
-            psz_display = NULL;
+
             int i_status = playlist_Status( p_playlist );
             if( i_status == PLAYLIST_STOPPED )
             {
                 psz_display = strdup(_("Stop"));
+                PL_UNLOCK;
                 pl_Release( p_intf );
             }
             else if( i_status == PLAYLIST_PAUSED )
             {
                 psz_display = strdup(_("Pause"));
+                PL_UNLOCK;
                 pl_Release( p_intf );
             }
             else
             {
                 p_item = playlist_CurrentPlayingItem( p_playlist );
-                p_input = p_item->p_input;
-
-                pl_Release( p_intf );
                 if( !p_item )
+                {
+                    PL_UNLOCK;
+                    pl_Release( p_intf );
+                    vlc_restorecancel( canc );
                     continue;
+                }
+                input_item_t *p_input = p_item->p_input;
+                vlc_gc_incref( p_input );
+
+                PL_UNLOCK;
+                pl_Release( p_intf );
 
                 mtime_t i_duration = input_item_GetDuration( p_input );
                 if( i_duration != -1 )
                 {
                     char psz_durationstr[MSTRTIME_MAX_SIZE];
                     secstotimestr( psz_durationstr, i_duration / 1000000 );
-                    sprintf( psz_duration, "(%s)", psz_durationstr );
+                    if( asprintf( &psz_display, "%s (%s)", p_input->psz_name, psz_durationstr ) == -1 )
+                        psz_display = NULL;
                 }
                 else
-                {
-                    sprintf( psz_duration," " );
-                }
+                    psz_display = strdup( p_input->psz_name );
 
-                psz_display = (char *)malloc(
-                                          (strlen( p_input->psz_name ) +
-                                          MSTRTIME_MAX_SIZE + 2+6 + 10 +10 ));
-                sprintf( psz_display,"%s %s",
-                         p_input->psz_name, psz_duration);
+                vlc_gc_decref( p_input );
             }
 
             /* Display */
@@ -279,7 +285,6 @@ static void Run( intf_thread_t *p_intf )
                             XOSD_string,
                             psz_display );
         }
-
         vlc_restorecancel( canc );
         msleep( INTF_IDLE_SLEEP );
     }
