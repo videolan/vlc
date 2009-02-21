@@ -35,6 +35,21 @@ namespace VideoLAN.LibVLC.Test
             Console.WriteLine (" preparsed: {0}", m.IsPreparsed);
         }
 
+        private static void DumpPlayer (Player p)
+        {
+            if (!p.IsPlaying)
+                return;
+
+            int percent = (int)(p.Position * 100);
+            Console.Write ("{0} of {1} ms ({2}%)\r", p.Time, p.Length,
+                           percent);
+        }
+
+        private static void Sleep (int msec)
+        {
+            System.Threading.Thread.Sleep (msec);
+        }
+
         public static int Main (string[] args)
         {
             string[] argv = new string[]{
@@ -46,13 +61,27 @@ namespace VideoLAN.LibVLC.Test
             Console.WriteLine (" (compiled with {0})", VLC.Compiler);
 
             VLC vlc = new VLC (argv);
-            Media m = new Media (vlc, "/dev/null");
-            DumpMedia (m);
+            foreach (string mrl in args)
+            {
+                Media media = new Media (vlc, mrl);
+                Player player = new Player (media);
 
-            DumpMedia ((Media)m.Clone ());
+                DumpMedia (media);
+                DumpMedia ((Media)media.Clone ());
+
+                player.Play ();
+                do
+                {
+                    DumpPlayer (player);
+                    Sleep (500);
+                }
+                while (player.IsPlaying);
+                player.Stop ();
+                media.Dispose ();
+                player.Dispose ();
+            }
 
             vlc.Dispose ();
-            m.Dispose ();
             return 0;
         }
     };

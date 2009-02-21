@@ -193,7 +193,7 @@ namespace VideoLAN.LibVLC
         }
 
         /**
-         * Total length in microseconds of the playback (if known).
+         * Total length in milliseconds of the playback (if known).
          */
         public long Length
         {
@@ -206,7 +206,7 @@ namespace VideoLAN.LibVLC
         }
 
         /**
-         * Playback position in microseconds from the start (if applicable).
+         * Playback position in milliseconds from the start (if applicable).
          * Setting this value might not work depending on the underlying
          * media capability and file format.
          *
@@ -229,6 +229,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * Playback position as a fraction of the total (if applicable).
+         * At start, this is 0; at the end, this is 1.
          * Setting this value might not work depending on the underlying
          * media capability and file format.
          *
