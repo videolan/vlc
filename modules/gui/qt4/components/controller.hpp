@@ -38,7 +38,7 @@
 #define MAIN_TB1_DEFAULT "64;39;64;38;65"
 #define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;10;9;64-4;37;65;35-4"
 #define ADV_TB_DEFAULT "12;11;13;14"
-#define INPT_TB_DEFAULT "5-1;33;6-1"
+#define INPT_TB_DEFAULT "5-1;15-1;33;6-1"
 #define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;35-4;34"
 
 
@@ -162,6 +162,7 @@ signals:
     void inputExists( bool ); /// This might be usefull in the IM ?
     void inputPlaying( bool ); /// This might be usefull in the IM ?
     void inputIsRecordable( bool ); /// same ?
+    void inputIsTrickPlayable( bool ); /// same ?
 };
 
 /* Advanced Button Bar */

@@ -79,6 +79,9 @@ void AbstractController::setStatus( int status )
 
     emit inputIsRecordable( b_hasInput &&
                             var_GetBool( THEMIM->getInput(), "can-record" ) );
+
+    emit inputIsTrickPlayable( b_hasInput &&
+                            var_GetBool( THEMIM->getInput(), "can-rewind" ) );
 }
 
 /* Generic button setup */
@@ -383,7 +386,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         reverseButton->setCheckable( true );
         /* You should, of COURSE change this to the correct event,
            when/if we have one, that tells us if trickplay is possible . */
-        CONNECT( this, inputExists( bool ), reverseButton, setVisible( bool ) );
+        CONNECT( this, inputIsTrickPlayable( bool ), reverseButton, setVisible( bool ) );
         reverseButton->setVisible( false );
         widget = reverseButton;
         }
