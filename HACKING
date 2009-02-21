@@ -47,17 +47,13 @@ The bootstrap script does the following actions:
    Modules.am file. A module "foo" exists if there is a Modules.am file in
    the modules/ directory which defines SOURCES_foo.
 
- - create a top-level Modules.am file (which will be included by Makefile.am)
-   which contains additional build rules for modules, and includes all the
-   Modules.am files that were found in modules/
-
  - create an m4/private.m4 from configure.ac, generating m4 macros that will
    be needed by configure.ac.
 
  - create a Makefile.am file for each Modules.am file found in modules/ .
 
- - run autopoint (previously gettextize) to create an intl/ directory,
-   needed when libgettext is not available.
+ - run autopoint (previously gettextize) to provide build system support
+   for internationalization.
 
  - run the usual aclocal, autoheader, automake and autoconf, which create
    the various Makefile.in files from the corresponding Makefile.am and the
