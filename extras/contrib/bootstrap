@@ -345,17 +345,14 @@ else
 fi
 
 if test -z "$CONTRIBS_RELEASE"; then
+    echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
     set +x
     echo
     echo "*****************************************************************"
-    echo "* If you are building contribs for a release build of VLC       *"
-    echo "* Please run CONTRIBS_RELEASE=sexy ./bootstrap                  *"
-    echo "*                                                               *"
-    echo "* Ignore this message if you don't compile the 3rd party        *"
-    echo "* libraries your own aka by just running 'make' next.           *"
+    echo "* If you need contribs with all debug information, run the      *"
+    echo "* line and compile the libraries on your own.                   *"
+    echo "* CONTRIBS_RELEASE=no ./bootstrap                               *"
     echo "*****************************************************************"
-else
-    echo "EXTRA_CFLAGS += -DNDEBUG" >> config.mak
 fi
 
 if test $HAVE_DARWIN_9; then
