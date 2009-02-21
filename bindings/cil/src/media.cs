@@ -33,30 +33,9 @@ namespace VideoLAN.LibVLC
      */
     internal sealed class MediaHandle : NonNullHandle
     {
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_new")]
-        public static extern
-        MediaHandle Create (InstanceHandle inst, U8String mrl,
-                            NativeException ex);
-
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_release")]
-        private static extern void Release (IntPtr ptr);
-
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_add_option")]
-        public static extern void AddOption (MediaHandle ptr, U8String options,
-                                             NativeException ex);
-
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_media_add_option_untrusted")]
-        public static extern void AddUntrustedOption (MediaHandle ptr,
-                                                      U8String options,
-                                                      NativeException ex);
-
         protected override void Destroy ()
         {
-            Release (handle);
+            LibVLC.MediaRelease (handle);
         }
     };
 
@@ -84,7 +63,7 @@ namespace VideoLAN.LibVLC
         {
             U8String umrl = new U8String (mrl);
 
-            handle = MediaHandle.Create (instance.Handle, umrl, ex);
+            handle = LibVLC.MediaCreate (instance.Handle, umrl, ex);
             Raise ();
         }
 
@@ -93,9 +72,9 @@ namespace VideoLAN.LibVLC
             U8String uopts = new U8String (options);
 
             if (trusted)
-                MediaHandle.AddOption (Handle, uopts, ex);
+                LibVLC.MediaAddOption (Handle, uopts, ex);
             else
-                MediaHandle.AddUntrustedOption (Handle, uopts, ex);
+                LibVLC.MediaAddUntrustedOption (Handle, uopts, ex);
             Raise ();
         }
     };

@@ -7,6 +7,7 @@ SOURCES_dll = \
 	ustring.cs \
 	exception.cs \
 	marshal.cs \
+	instance.cs \
 	media.cs \
 	player.cs \
 	libvlc.cs
