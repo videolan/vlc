@@ -105,12 +105,6 @@ namespace VideoLAN.LibVLC
         private static extern void Init (NativeException e);
         [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_clear")]
         private static extern void Clear (NativeException e);
-        /*[DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_exception_raised")]
-        private static extern int Raised (NativeException e);*/
-        [DllImport ("libvlc.dll",
-                    EntryPoint="libvlc_exception_get_message")]
-        private static extern IntPtr GetMessage (NativeException e);
 
         public NativeException ()
         {
@@ -142,6 +136,17 @@ namespace VideoLAN.LibVLC
 
         /** IDisposable implementation. */
         public void Dispose ()
+        {
+            Dispose (true);
+            GC.SuppressFinalize (this);
+        }
+
+        ~NativeException ()
+        {
+            Dispose (false);
+        }
+
+        private void Dispose (bool disposing)
         {
             Clear (this);
         }

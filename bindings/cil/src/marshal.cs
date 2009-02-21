@@ -97,8 +97,20 @@ namespace VideoLAN.LibVLC
          */
         public void Dispose ()
         {
-            ex.Dispose ();
-            handle.Close ();
+            Dispose (true);
+            GC.SuppressFinalize (this);
+        }
+
+        protected virtual void Dispose (bool disposing)
+        {
+            if (disposing)
+            {
+                ex.Dispose ();
+                if (handle != null)
+                    handle.Close ();
+            }
+            ex = null;
+            handle = null;
         }
     };
 };
