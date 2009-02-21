@@ -101,7 +101,7 @@ typedef enum buttonType_e
 static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
     "Previous", "Next", "Slower", "Faster", "Fullscreen", "De-Fullscreen",
     "Extended panel", "Playlist", "Snapshot", "Record", "A->B Loop",
-    "Frame By Frame", "Reverse", "Skip backward" , "Skip forward",
+    "Frame By Frame", "Trickplay Reverse", "Skip backward" , "Skip forward",
     "Quit" };
 static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     _("Stop playback"), _("Open a media"),

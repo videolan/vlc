@@ -380,7 +380,11 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         setupButton( reverseButton );
         CONNECT_MAP_SET( reverseButton, REVERSE_ACTION );
         BUTTON_SET_BAR(  reverseButton );
-        ENABLE_ON_INPUT( reverseButton );
+        reverseButton->setCheckable( true );
+        /* You should, of COURSE change this to the correct event,
+           when/if we have one, that tells us if trickplay is possible . */
+        CONNECT( this, inputExists( bool ), reverseButton, setVisible( bool ) );
+        reverseButton->setVisible( false );
         widget = reverseButton;
         }
         break;
