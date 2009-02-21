@@ -2119,14 +2119,20 @@ CLEAN_PKG += tiff
 DISTCLEAN_PKG += tiff-$(TIFF_VERSION).tar.gz
 
 # ***************************************************************************
-# SDL
+# LibSDL
 # ***************************************************************************
 
+ifndef HAVE_DARWIN_OS
 SDL-$(SDL_VERSION).tar.gz:
 	$(WGET) $(SDL_URL)
 
 SDL: SDL-$(SDL_VERSION).tar.gz 
 	$(EXTRACT_GZ)
+else
+SDL: 
+	$(SVN) co http://svn.libsdl.org/trunk/SDL -r 4444 SDL
+	(cd $@; sh autogen.sh)
+endif
 
 .SDL: SDL
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-audio --disable-video-x11 --disable-video-aalib --disable-video-dga --disable-video-fbcon --disable-video-directfb --disable-video-ggi --disable-video-svga --disable-directx --enable-joystick --disable-cdrom --disable-threads --disable-sdl-dlopen CFLAGS="$(CFLAGS)" && make && make install)
