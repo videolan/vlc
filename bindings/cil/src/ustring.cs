@@ -33,7 +33,7 @@ namespace VideoLAN.LibVLC
      * arrays (as used by the native LibVLC) and managed strings.
      */
     [StructLayout (LayoutKind.Sequential)]
-    public struct U8String
+    internal struct U8String
     {
         public byte[] mb_str; /**< nul-terminated UTF-8 bytes array */
 
@@ -89,6 +89,36 @@ namespace VideoLAN.LibVLC
         public static string FromNative (IntPtr ptr)
         {
             return new U8String (ptr).ToString ();
+        }
+    };
+
+    /**
+     * @brief MemoryHandle: heap allocation by the C run-time
+     * @ingroup Internals
+     */
+    internal sealed class MemoryHandle : NonNullHandle
+    {
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_free")]
+        private static extern void Free (IntPtr ptr);
+
+        /**
+         * NonNullHandle.Destroy
+         */
+        protected override void Destroy ()
+        {
+            Free (handle);
+        }
+
+        public override string ToString ()
+        {
+            return U8String.FromNative (handle);
+        }
+
+        public string Transform ()
+        {
+            string value = ToString ();
+            Close ();
+            return value;
         }
     };
 };
