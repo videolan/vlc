@@ -50,6 +50,9 @@ namespace VideoLAN.LibVLC
             }
         }
 
+        /**
+         * Destroys an handle. Cannot fail.
+         */
         protected abstract void Destroy ();
 
         /**
@@ -80,6 +83,10 @@ namespace VideoLAN.LibVLC
             this.handle = null;
         }
 
+        /**
+         * Checks if the LibVLC run-time raised an exception
+         * If so, raises a CIL exception.
+         */
         protected void Raise ()
         {
             ex.Raise ();

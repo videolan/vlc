@@ -33,6 +33,9 @@ namespace VideoLAN.LibVLC
      */
     internal sealed class MediaHandle : NonNullHandle
     {
+        /**
+         * NonNullHandle.Destroy
+         */
         protected override void Destroy ()
         {
             LibVLC.MediaRelease (handle);
@@ -41,7 +44,8 @@ namespace VideoLAN.LibVLC
 
     /**
      * @brief Media: a source media
-     * Use this class to extract meta-informations from a media.
+     * @ingroup API
+     * Each media object represents an input media, such as a file or an URL.
      */
     public class Media : BaseObject
     {
@@ -67,6 +71,19 @@ namespace VideoLAN.LibVLC
             Raise ();
         }
 
+        /**
+         * Add VLC input item options to the media.
+         * @param options VLC options in VLC input item format
+         *                (see example below)
+         * @param trusted whether the options are set by a trusted agent
+         *                (e.g. the local computer configuration) or not
+         *                (e.g. a downloaded file).
+         * @code
+         * Media m = new Media(vlc, "http://www.example.com/music.ogg");
+         * m.AddOptions(":http-user-agent=LibVLC.Net "
+         *            + ":http-proxy=proxy:8080", true);
+         * @endcode
+         */
         public void AddOptions (string options, bool trusted)
         {
             U8String uopts = new U8String (options);

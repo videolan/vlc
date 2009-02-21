@@ -36,6 +36,9 @@ namespace VideoLAN.LibVLC
      */
     internal sealed class InstanceHandle : NonNullHandle
     {
+        /**
+         * NonNullHandle.Destroy
+         */
         protected override void Destroy ()
         {
             LibVLC.Release (handle, null);

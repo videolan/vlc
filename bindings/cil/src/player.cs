@@ -68,6 +68,7 @@ namespace VideoLAN.LibVLC
 
     /**
      * @brief MediaPlayer: a simple media player
+     * @ingroup API
      * Use this class to play a media.
      */
     public class MediaPlayer : BaseObject

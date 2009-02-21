@@ -60,11 +60,8 @@ namespace VideoLAN.LibVLC
     };
 
     /**
-     * @section Internals
-     */
-
-    /**
-     * libvlc_exception_t: structure for unmanaged LibVLC exceptions
+     * @brief NativeException: CIL representation for libvlc_exception_t.
+     * @ingroup Internals
      */
     [StructLayout (LayoutKind.Sequential)]
     public sealed class NativeException : IDisposable
