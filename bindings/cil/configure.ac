@@ -19,8 +19,8 @@ dnl *  along with this program; if not, you can get it from:              *
 dnl *  http://www.gnu.org/copyleft/gpl.html                               *
 dnl ***********************************************************************
 
-AC_COPYRIGHT([Copyright (C) 2004-2007 Remi Denis-Courmont])
-AC_INIT(libvlc-cil, 0.9.0, vlc-devel_no_bulk_mail@videolan.org)
+AC_COPYRIGHT([Copyright (C) 2004-2009 Remi Denis-Courmont])
+AC_INIT(libvlc-cil, 1.0.0, vlc-devel_no_bulk_mail@videolan.org)
 AC_PREREQ(2.50)
 
 AC_CONFIG_SRCDIR(configure.ac)
