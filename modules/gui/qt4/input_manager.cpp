@@ -129,7 +129,6 @@ void InputManager::delInput()
     emit statusChanged( END_S );
 
     emit teletextPossible( false );
-    emit encryptionChanged( false );
     emit AtoBchanged( false, false );
     emit voutChanged( false );
     emit voutListChanged( NULL, 0 );
@@ -138,6 +137,9 @@ void InputManager::delInput()
     emit artChanged( NULL );
     emit infoChanged( NULL );
     emit metaChanged( (input_item_t *)NULL );
+#if 0
+    emit encryptionChanged( false );
+#endif
 }
 
 /* Convert the event from the callbacks in actions */

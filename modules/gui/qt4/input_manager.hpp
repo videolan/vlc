@@ -192,7 +192,9 @@ signals:
     void synchroChanged();
     void bookmarksChanged();
     void cachingChanged( float );
+#if 0
     void encryptionChanged( bool );
+#endif
 };
 
 class MainInputManager : public QObject
