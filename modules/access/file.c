@@ -88,6 +88,7 @@ vlc_module_begin ()
     add_obsolete_string( "file-cat" )
     set_capability( "access", 50 )
     add_shortcut( "file" )
+    add_shortcut( "fd" )
     add_shortcut( "stream" )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -121,8 +122,6 @@ static int Open( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
 
-    bool    b_stdin = !strcmp (p_access->psz_path, "-");
-
     /* Update default_pts to a suitable value for file access */
     var_Create( p_access, "file-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
@@ -135,13 +134,17 @@ static int Open( vlc_object_t *p_this )
         p_sys->b_pace_control = true;
 
     /* Open file */
-    msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
-
     int fd = -1;
-    if (b_stdin)
+
+    if (!strcasecmp (p_access->psz_access, "fd"))
+        fd = dup (atoi (p_access->psz_path));
+    else if (!strcmp (p_access->psz_path, "-"))
         fd = dup (0);
     else
+    {
+        msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
         fd = open_file (p_access, p_access->psz_path);
+    }
     if (fd == -1)
         goto error;
 
@@ -165,8 +168,6 @@ static int Open( vlc_object_t *p_this )
     else if (!S_ISBLK (st.st_mode))
         p_access->pf_seek = NoSeek;
 #else
-    if (b_stdin)
-        p_access->pf_seek = NoSeek;
 # warning File size not known!
 #endif
 
