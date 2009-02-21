@@ -215,3 +215,8 @@ vlc_object_t *libvlc_get_vlc_instance( libvlc_instance_t* p_instance )
     vlc_object_hold( p_instance->p_libvlc_int ) ;
     return (vlc_object_t*) p_instance->p_libvlc_int ;
 }
+
+void libvlc_free( void *ptr )
+{
+    free( ptr );
+}

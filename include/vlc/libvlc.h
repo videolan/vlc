@@ -224,6 +224,13 @@ struct vlc_object_t;
  */
 VLC_PUBLIC_API struct vlc_object_t *libvlc_get_vlc_instance(libvlc_instance_t *);
 
+/**
+ * Frees an heap allocation (char *) returned by a LibVLC API.
+ * If you know you're using the same underlying C run-time as the LibVLC
+ * implementation, then you can call ANSI C free() directly instead.
+ */
+VLC_PUBLIC_API void libvlc_free( void *ptr );
+
 /** @}*/
 
 /*****************************************************************************

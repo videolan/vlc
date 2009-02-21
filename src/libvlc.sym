@@ -31,6 +31,7 @@ libvlc_exception_get_message
 libvlc_exception_init
 libvlc_exception_raise
 libvlc_exception_raised
+libvlc_free
 libvlc_get_changeset
 libvlc_get_compiler
 libvlc_get_fullscreen
