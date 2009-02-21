@@ -106,5 +106,315 @@ namespace VideoLAN.LibVLC
             Raise ();
         }
 
+        /**
+         * Whether the player is currently active.
+         */
+        public bool IsPlaying
+        {
+            get
+            {
+                int ret = LibVLC.PlayerIsPlaying (Handle, ex);
+                Raise ();
+                return ret != 0;
+            }
+        }
+
+        /**
+         * Starts playing the selected media.
+         */
+        public void Play ()
+        {
+            LibVLC.PlayerPlay (Handle, ex);
+            Raise ();
+        }
+
+        /**
+         * Pauses the playback.
+         */
+        public void Pause ()
+        {
+            LibVLC.PlayerPause (Handle, ex);
+            Raise ();
+        }
+
+        /**
+         * Stops the playback.
+         */
+        public void Stop ()
+        {
+            LibVLC.PlayerStop (Handle, ex);
+            Raise ();
+        }
+
+        /**
+         * The 32-bits identifier of an X Window System window,
+         * or 0 if not specified.
+         * Video will be rendered inside that window, if the underlying VLC
+         * supports X11. Note that X pixmaps are <b>not</b> supported.
+         * Also note that you should set/change/unset the window while
+         * playback is not started or stopped; live reparenting might not
+         * work.
+         *
+         * <b>Warning:</b>
+         * If the identifier is invalid, Xlib might abort the process.
+         */
+        public int XWindow
+        {
+            get
+            {
+                return LibVLC.PlayerGetXWindow (Handle);
+            }
+            set
+            {
+                LibVLC.PlayerSetXWindow (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * The handle of a window (HWND) from the Win32 API,
+         * or NULL if unspecified.
+         * Video will be rendered inside that window, if the underlying VLC
+         * supports one of DirectDraw, Direct3D, GDI or OpenGL/Win32.
+         * Note that you should set/change/unset the window while playback is
+         * not started or stopped; live reparenting might not work.
+         */
+        public SafeHandle HWND
+        {
+            get
+            {
+                return LibVLC.PlayerGetHWND (Handle);
+            }
+            set
+            {
+                LibVLC.PlayerSetHWND (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * Total length in microseconds of the playback (if known).
+         */
+        public long Length
+        {
+            get
+            {
+                long ret = LibVLC.PlayerGetLength (Handle, ex);
+                Raise ();
+                return ret;
+            }
+        }
+
+        /**
+         * Playback position in microseconds from the start (if applicable).
+         * Setting this value might not work depending on the underlying
+         * media capability and file format.
+         *
+         * Changing the Time will also change the Position.
+         */
+        public long Time
+        {
+            get
+            {
+                long ret = LibVLC.PlayerGetTime (Handle, ex);
+                Raise ();
+                return ret;
+            }
+            set
+            {
+                LibVLC.PlayerSetTime (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * Playback position as a fraction of the total (if applicable).
+         * Setting this value might not work depending on the underlying
+         * media capability and file format.
+         *
+         * Changing the Position will also change the Time.
+         */
+        public float Position
+        {
+            get
+            {
+                float ret = LibVLC.PlayerGetPosition (Handle, ex);
+                Raise ();
+                return ret;
+            }
+            set
+            {
+                LibVLC.PlayerSetPosition (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * Number of the current chapter (within the current title).
+         * This is mostly used for DVDs and the likes.
+         */
+        public int Chapter
+        {
+            get
+            {
+                int ret = LibVLC.PlayerGetChapter (Handle, ex);
+                Raise ();
+                return ret;
+            }
+            set
+            {
+                LibVLC.PlayerSetChapter (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * Number of chapters within the current title,
+         */
+        public int ChapterCount
+        {
+            get
+            {
+                int ret = LibVLC.PlayerGetChapterCount (Handle, ex);
+                Raise ();
+                return ret;
+            }
+        }
+
+        /**
+         * Gets the number of chapters within a given title.
+         * @param title media title number
+         */
+        public int GetChapterCountByTitle (int title)
+        {
+            int ret = LibVLC.PlayerGetChapterCountForTitle (Handle, title, ex);
+            Raise ();
+            return ret;
+        }
+
+        /**
+         * Number of the current title.
+         */
+        public int Title
+        {
+            get
+            {
+                int ret = LibVLC.PlayerGetTitle (Handle, ex);
+                Raise ();
+                return ret;
+            }
+            set
+            {
+                LibVLC.PlayerSetTitle (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * Total number of titles.
+         */
+        public int TitleCount
+        {
+            get
+            {
+                int ret = LibVLC.PlayerGetTitleCount (Handle, ex);
+                Raise ();
+                return ret;
+            }
+        }
+
+        /**
+         * Skips to the beginning of the next chapter.
+         */
+        public void NextChapter ()
+        {
+            LibVLC.PlayerNextChapter (Handle, ex);
+            Raise ();
+        }
+
+        /**
+         * Rewinds to the previous chapter.
+         */
+        public void PreviousChapter ()
+        {
+            LibVLC.PlayerPreviousChapter (Handle, ex);
+            Raise ();
+        }
+
+        /**
+         * Media playback rate.
+         * 1.0 is the nominal rate.
+         * Less than one is slower than nominal.
+         * More than one is faster than nominal.
+         */
+        public float Rate
+        {
+            get
+            {
+                float ret = LibVLC.PlayerGetRate (Handle, ex);
+                Raise ();
+                return ret;
+            }
+            set
+            {
+                LibVLC.PlayerSetRate (Handle, value, ex);
+                Raise ();
+            }
+        }
+
+        /**
+         * Frame rate in unit/seconds.
+         */
+        public float FramePerSeconds
+        {
+            get
+            {
+                float ret = LibVLC.PlayerGetFPS (Handle, ex);
+                Raise ();
+                return ret;
+            }
+        }
+
+        /**
+         * Whether a video track is currently active.
+         * This is false if there is no video track, or if video is discarded.
+         */
+        public bool HasVideo
+        {
+            get
+            {
+                int ret = LibVLC.PlayerHasVout (Handle, ex);
+                Raise ();
+                return ret != 0;
+            }
+        }
+
+        /**
+         * Whether the media supports seeking.
+         * Note that this tells nothing about the seeking precision.
+         */
+        public bool CanSeek
+        {
+            get
+            {
+                int ret = LibVLC.PlayerIsSeekable (Handle, ex);
+                Raise ();
+                return ret != 0;
+            }
+        }
+
+        /**
+         * Whether the media supports pausing.
+         * Live content cannot be paused, unless timeshifting is enabled.
+         */
+        public bool CanPause
+        {
+            get
+            {
+                int ret = LibVLC.PlayerCanPause (Handle, ex);
+                Raise ();
+                return ret != 0;
+            }
+        }
     };
 };

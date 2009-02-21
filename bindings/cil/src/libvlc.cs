@@ -202,8 +202,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_get_xwindow")]
         public static extern
-        int PlayerGetXWindow (PlayerHandle player,
-                              NativeException ex);
+        int PlayerGetXWindow (PlayerHandle player);
 
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_set_hwnd")]
@@ -214,7 +213,7 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_get_hwnd")]
         public static extern
-        IntPtr PlayerGetHWND (PlayerHandle player, NativeException ex);
+        SafeHandle PlayerGetHWND (PlayerHandle player);
 
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_get_length")]
@@ -255,8 +254,78 @@ namespace VideoLAN.LibVLC
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_get_chapter_count")]
         public static extern
-        int PlayerGetChapterCounter (PlayerHandle player, NativeException ex);
+        int PlayerGetChapterCount (PlayerHandle player, NativeException ex);
 
         /* PlayerWillPlay */
+
+        [DllImport ("libvlc.dll",
+                EntryPoint="libvlc_media_player_get_chapter_count_for_title")]
+        public static extern
+        int PlayerGetChapterCountForTitle (PlayerHandle player, int title,
+                                           NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_title")]
+        public static extern
+        int PlayerGetTitle (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_title")]
+        public static extern
+        void PlayerSetTitle (PlayerHandle player, int chapter,
+                             NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_title_count")]
+        public static extern
+        int PlayerGetTitleCount (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_next_chapter")]
+        public static extern
+        void PlayerNextChapter (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_previous_chapter")]
+        public static extern
+        void PlayerPreviousChapter (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_rate")]
+        public static extern
+        float PlayerGetRate (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_set_rate")]
+        public static extern
+        void PlayerSetRate (PlayerHandle player, float rate,
+                            NativeException ex);
+
+        /*[DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_state")]
+        public static extern
+        void PlayerSetState (PlayerHandle player, float rate,
+                             NativeException ex); */
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_get_fps")]
+        public static extern
+        float PlayerGetFPS (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_has_vout")]
+        public static extern
+        int PlayerHasVout (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_is_seekable")]
+        public static extern
+        int PlayerIsSeekable (PlayerHandle player, NativeException ex);
+
+        [DllImport ("libvlc.dll",
+                    EntryPoint="libvlc_media_player_can_pause")]
+        public static extern
+        int PlayerCanPause (PlayerHandle player, NativeException ex);
+
     };
 };
