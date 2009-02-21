@@ -129,6 +129,7 @@ void InputManager::delInput()
     emit statusChanged( END_S );
 
     emit teletextPossible( false );
+    emit encryptionChanged( false );
     emit AtoBchanged( false, false );
     emit voutChanged( false );
     emit voutListChanged( NULL, 0 );

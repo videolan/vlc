@@ -141,6 +141,7 @@ private:
 
     /* Status Bar */
     QLabel              *nameLabel;
+    QLabel              *cryptedLabel;
 
     virtual void customEvent( QEvent *);
     virtual void keyPressEvent( QKeyEvent *);
@@ -171,6 +172,8 @@ private slots:
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( QString );
     void updateSystrayTooltipStatus( int );
+
+    void showCryptedLabel( bool );
 signals:
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );

@@ -82,6 +82,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     playlistVisible      = false;
     input_name           = "";
     fullscreenControls   = NULL;
+    cryptedLabel         = NULL;
 
     /* Ask for privacy */
     askForPrivacy();
@@ -348,6 +349,20 @@ inline void MainInterface::createStatusBar()
        - right-clicking and clicking just toggle between remaining and
          elapsed time.*/
     CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+
+    CONNECT( THEMIM->getIM(), encryptionChanged( bool ) , this, showCryptedLabel( bool ) );
+}
+
+void MainInterface::showCryptedLabel( bool )
+{
+    if( cryptedLabel == NULL )
+    {
+        cryptedLabel = new QLabel;
+        cryptedLabel->setPixmap( QPixmap( ":/eject" ) );
+        statusBar()->addWidget( cryptedLabel );
+    }
+
+    cryptedLabel->show();
 }
 
 inline void MainInterface::initSystray()

@@ -187,10 +187,12 @@ signals:
     void AtoBchanged( bool, bool );
     /// Vout
     void voutChanged( bool );
+    void voutListChanged( vout_thread_t **pp_vout, int i_vout );
+    /// Other
     void synchroChanged();
     void bookmarksChanged();
     void cachingChanged( float );
-    void voutListChanged( vout_thread_t **pp_vout, int i_vout );
+    void encryptionChanged( bool );
 };
 
 class MainInputManager : public QObject
