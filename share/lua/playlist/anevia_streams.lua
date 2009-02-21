@@ -2,7 +2,7 @@
  $Id$
 
  Parse list of available streams on Anevia Toucan servers.
- The URI rtsp://ipaddress:554/list_streams.idp describes a list of
+ The URI http://ipaddress:554/list_streams.idp describes a list of
  available streams on the server.
 
  Copyright © 2009 M2X BV
