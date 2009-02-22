@@ -247,6 +247,11 @@ case $HOST in
         fi
         cat src/Distributions/beos.mak >> distro.mak
     ;;
+    *mingw32ce)
+        echo "HAVE_WINCE = 1" >> config.mak
+        echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
+        cat src/Distributions/wince.mak >> distro.mak
+    ;;
     *mingw32*)
         echo "HAVE_WIN32 = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
