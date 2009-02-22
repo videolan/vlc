@@ -40,13 +40,11 @@
 #endif
 
 #include <vlc_codec.h>
-#include <vlc_input.h>
 #include <vlc_interface.h>
-#include <vlc_vout.h>
 #include <vlc_playlist.h>
 #include <vlc_osd.h>
 
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 
 #include "browser_open.h"
 #include "history.h"
