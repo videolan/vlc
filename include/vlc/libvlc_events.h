@@ -145,11 +145,11 @@ typedef struct libvlc_event_t
         } media_player_title_changed;
         struct
         {
-            libvlc_time_t new_seekable;
+            uint64_t new_seekable; /* FIXME: that's a boolean! */
         } media_player_seekable_changed;
         struct
         {
-            libvlc_time_t new_pausable;
+            uint64_t new_pausable; /* FIXME: that's a BOOL!!! */
         } media_player_pausable_changed;
 
         /* media list */
@@ -195,16 +195,6 @@ typedef struct libvlc_event_t
             libvlc_media_t * item;
             int index;
         } media_list_view_will_delete_item;
-
-        /* media discoverer */
-        struct
-        {
-            void * unused;
-        } media_media_discoverer_started;
-        struct
-        {
-            void * unused;
-        } media_media_discoverer_ended;
 
         /* snapshot taken */
         struct
