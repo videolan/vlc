@@ -1,9 +1,10 @@
 /**
  * @file instance.cs
- * @brief Bindings to LibVLC for the .NET Common Intermediate Language
+ * @brief LibVLC instance class
  * @ingroup API
  *
  * @defgroup API Managed interface to LibVLC
+ *
  * This is the primary class library for .NET applications
  * to embed and control LibVLC.
  */
@@ -28,6 +29,13 @@
 using System;
 using System.Runtime.InteropServices;
 
+/**
+ * @brief VideoLAN.LibVLC: VideoLAN project's LibVLC .Net bindings
+ * @ingroup API
+ *
+ * This namespace provides a set of managed APIs around the native LibVLC
+ * for the .Net Common Language Runtime.
+ */
 namespace VideoLAN.LibVLC
 {
     /**
@@ -149,3 +157,76 @@ namespace VideoLAN.LibVLC
         }
     };
 };
+
+/**
+ * @mainpage libvlc-cil documentation
+ *
+ * @section Introduction
+ *
+ * libvlc-cil is a thin API layer around LibVLC,
+ * the VideoLAN's project media framework C library.
+ * LibVLC comes built-in the VLC media player.
+ *
+ * With libvlc-cil, you can use LibVLC
+ * from within the .Net Common Language Runtime,
+ * with the CIL programming language of your preference.
+ * However, libvlc-cil and the code sample in this documentation
+ * are written is C#.
+ *
+ * @section Installation
+ *
+ * libvlc-cil does <b>not</b> include the underlying LibVLC by default.
+ * Make sure VLC, or at least LibVLC and the relevant VLC plugins are present.
+ * The LibVLC runtime library needs to be in the library search path for the
+ * Common Language Runtime. Check the documentation for your CLR for details.
+ *
+ * On Windows, libvlc.dll needs to be in the current directory, the DLL path
+ * of the running process, or the system search path (but the latter is
+ * uncommon and not supported by the official LibVLC installer).
+ *
+ * On Linux, libvlc.so should be in /usr/lib; if it is in another directory,
+ * such as /usr/local/lib, you might need to add that directory to the
+ * LD_LIBRARY_PATH environment variable.
+ *
+ * @section Usage
+ *
+ * First, you need to create a VLC instance. This will load and setup the
+ * native VLC runtime, the VLC configuration, the list of available plugins,
+ * the platform adaptation and the VLC log messages and objects subsystems
+ * (see \ref VideoLAN::LibVLC::VLC for details).
+ *
+ * @code
+ * using System;
+ * using VideoLAN.LibVLC;
+ * ...
+ *
+ * try {
+ *     Console.WriteLine("Running on VLC version {0}", VLC.Version);
+ * }
+ * catch (Exception e) {
+ *     Console.WriteLine("VLC is not available on your system.");
+ *     throw e;
+ * }
+ *
+ * string[] args = new string[]{ "-v", "--ignore-config" };
+ * VLC vlc = new VLC(args);
+ * @endcode
+ *
+ * To play media, you need a media and a player.
+ * See the \ref VideoLAN::LibVLC::Media
+ * and \ref VideoLAN::LibVLC::Player classes for details.
+ * @code
+ * Media media = new Media(vlc, "http://www.example.com/video.ogv");
+ * Player player = new Player(media);
+ * player.Play();
+ * @endcode
+ *
+ * All these objects use unmanaged resources.
+ * They all implement the IDisposeable interface.
+ * You should dispose them when you do not need them anymore:
+ * @code
+ * player.Dispose();
+ * media.Dispose();
+ * vlc.Dispose();
+ * @endcode
+ */

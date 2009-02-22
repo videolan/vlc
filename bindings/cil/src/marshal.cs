@@ -69,8 +69,11 @@ namespace VideoLAN.LibVLC
     /**
      * @brief BaseObject: generic wrapper around a safe LibVLC handle.
      * @ingroup Internals
-     * This is the baseline for all managed LibVLC objects which wrap
-     * an unmanaged LibVLC pointer, and provides exception handling.
+     *
+     * This is the baseline for all managed LibVLC objects. It wraps:
+     *  - an unmanaged LibVLC pointer,
+     *  - a native exception structure, and
+     *  - the object's native event manager.
      */
     public class BaseObject : IDisposable
     {
