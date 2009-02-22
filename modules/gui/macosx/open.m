@@ -193,7 +193,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
     [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
     [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("HTTP/FTP/MMS/RTSP")];
-    [o_net_timeshift_ckbox setTitle: _NS("Allow timeshifting")];
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
@@ -400,11 +399,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [o_options addObject: [NSString stringWithString:
                       [[(VLCOutput *)o_sout_options getMRL] objectAtIndex: i]]];
             }
-        }
-        if( [o_net_timeshift_ckbox state] == NSOnState )
-        {
-            [o_options addObject: [NSString stringWithString:
-                                                @"access-filter=timeshift"]];
         }
         if( [[[o_tabview selectedTabViewItem] label] isEqualToString: _NS("Capture")] )
         {

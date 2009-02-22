@@ -76,7 +76,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_net_udpm_port_stp;
     IBOutlet id o_net_http_url;
     IBOutlet id o_net_http_url_lbl;
-    IBOutlet id o_net_timeshift_ckbox;
 
     /* open subtitle file */
     IBOutlet id o_file_sub_ckbox;
