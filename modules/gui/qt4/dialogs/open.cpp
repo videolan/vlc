@@ -127,6 +127,7 @@ OpenDialog::OpenDialog( QWidget *parent,
                                     QKeySequence( "Alt+C" ) );
 
     ui.menuButton->setMenu( openButtonMenu );
+    ui.menuButton->setIcon( QIcon( ":/down_arrow" ) );
 
     /* Add the three Buttons */
     ui.buttonsBox->addButton( selectButton, QDialogButtonBox::AcceptRole );

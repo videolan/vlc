@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>311</height>
+    <height>319</height>
    </rect>
   </property>
   <property name="minimumSize" >
@@ -351,11 +351,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>subtitlesLabel</zorder>
-     <zorder>subtitlesSpin</zorder>
-     <zorder>audioLabel</zorder>
-     <zorder>audioSpin</zorder>
-     <zorder>diskGroupBox</zorder>
     </widget>
    </item>
    <item>

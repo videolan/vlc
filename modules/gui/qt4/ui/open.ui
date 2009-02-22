@@ -207,7 +207,7 @@
     </spacer>
    </item>
    <item row="3" column="1" >
-    <widget class="QPushButton" name="menuButton" >
+    <widget class="QToolButton" name="menuButton" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
        <horstretch>0</horstretch>
@@ -216,18 +216,21 @@
      </property>
      <property name="maximumSize" >
       <size>
-       <width>20</width>
+       <width>16</width>
        <height>16777215</height>
       </size>
      </property>
      <property name="focusPolicy" >
       <enum>Qt::ClickFocus</enum>
      </property>
-     <property name="contextMenuPolicy" >
-      <enum>Qt::NoContextMenu</enum>
-     </property>
      <property name="toolTip" >
       <string>_("Select play mode")</string>
+     </property>
+     <property name="popupMode" >
+      <enum>QToolButton::InstantPopup</enum>
+     </property>
+     <property name="arrowType" >
+      <enum>Qt::NoArrow</enum>
      </property>
     </widget>
    </item>
