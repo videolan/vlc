@@ -778,7 +778,7 @@ void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
     addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
             ":/next", SLOT( next() ) );
     menu->addSeparator();
-
+}
 
 void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 {
