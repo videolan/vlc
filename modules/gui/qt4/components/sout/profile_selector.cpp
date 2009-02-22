@@ -1,5 +1,29 @@
+/*****************************************************************************
+ * profile_selector.cpp : A small profile selector and editor
+ ****************************************************************************
+ * Copyright (C) 2009 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Jean-Baptiste Kempf <jb@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
 
 #include "components/sout/profile_selector.hpp"
+#include "components/sout/profiles.hpp"
 #include "dialogs/sout.hpp"
 
 #include <QHBoxLayout>
@@ -61,6 +85,14 @@ inline void VLCProfileSelector::fillProfilesCombo()
         if( settings.value( "Profile-Name" ).toString().isEmpty() ) continue;
         profileBox->addItem( settings.value( "Profile-Name" ).toString(),
                 settings.value( "Profile-Value" ) );
+    }
+    if( i_size == 0 )
+    {
+        for( int i = 0; i < NB_PROFILE; i++ )
+        {
+            profileBox->addItem( video_profile_name_list[i],
+                                 video_profile_value_list[i] );
+        }
     }
     settings.endArray();
 }
