@@ -193,8 +193,6 @@ namespace VideoLAN.LibVLC
  * First, you need to create a VLC instance. This will load and setup the
  * native VLC runtime, the VLC configuration, the list of available plugins,
  * the platform adaptation and the VLC log messages and objects subsystems
- * (see \ref VideoLAN::LibVLC::VLC for details).
- *
  * @code
  * using System;
  * using VideoLAN.LibVLC;
@@ -211,15 +209,15 @@ namespace VideoLAN.LibVLC
  * string[] args = new string[]{ "-v", "--ignore-config" };
  * VLC vlc = new VLC(args);
  * @endcode
+ * @see VideoLAN::LibVLC::VLC
  *
  * To play media, you need a media and a player.
- * See the \ref VideoLAN::LibVLC::Media
- * and \ref VideoLAN::LibVLC::Player classes for details.
  * @code
  * Media media = new Media(vlc, "http://www.example.com/video.ogv");
  * Player player = new Player(media);
  * player.Play();
  * @endcode
+ * @see VideoLAN::LibVLC::Media @see VideoLAN::LibVLC::Player
  *
  * All these objects use unmanaged resources.
  * They all implement the IDisposeable interface.
