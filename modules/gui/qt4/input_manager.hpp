@@ -147,6 +147,9 @@ public slots:
     void faster();
     void normalRate();
     void setRate( int );
+    /* Jumping */
+    void jumpFwd();
+    void jumpBwd();
     /* Menus */
     void sectionNext();
     void sectionPrev();

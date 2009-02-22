@@ -791,6 +791,28 @@ void InputManager::setRate( int new_rate )
         var_SetInteger( p_input, "rate", new_rate );
 }
 
+void InputManager::jumpFwd()
+{
+    int i_interval = config_GetInt( p_input, "short-jump-size" );
+    if( i_interval > 0 )
+    {
+        vlc_value_t val;
+        val.i_time = (mtime_t)(i_interval) * 1000000L;
+        var_Set( p_input, "time-offset", val );
+    }
+}
+
+void InputManager::jumpBwd()
+{
+    int i_interval = config_GetInt( p_input, "short-jump-size" );
+    if( i_interval > 0 )
+    {
+        vlc_value_t val;
+        val.i_time = -1 *(mtime_t)(i_interval) * 1000000L;
+        var_Set( p_input, "time-offset", val );
+    }
+}
+
 void InputManager::setAtoB()
 {
     if( !timeA )
