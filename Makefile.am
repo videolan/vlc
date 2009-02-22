@@ -868,6 +868,8 @@ if BUILD_SKINS
 	for i in $(top_builddir)/share/skins2/*.*; do \
 	  cp -- "$$i" $(win32_destdir)/skins/ || true ; \
 	done
+	cp -- $(srcdir)/share/skins2/skin.catalog $(win32_destdir)/skins/ || true ;
+	cp -- $(srcdir)/share/skins2/skin.dtd $(win32_destdir)/skins/ || true ;
 endif
 
 if BUILD_OSDMENU
