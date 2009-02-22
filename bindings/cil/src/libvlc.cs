@@ -109,9 +109,9 @@ namespace VideoLAN.LibVLC
         MediaHandle MediaDuplicate (MediaHandle media, int type,
                                     NativeException ex);*/
 
-        /*[DllImport ("libvlc.dll", EntryPoint="libvlc_media_get_state")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_media_get_state")]
         public static extern
-        int MediaGetState (MediaHandle media, NativeException ex);*/
+        State MediaGetState (MediaHandle media, NativeException ex);
 
         /*[DllImport ("libvlc.dll", EntryPoint="libvlc_media_subitems")]
         public static extern
@@ -301,11 +301,10 @@ namespace VideoLAN.LibVLC
         void PlayerSetRate (PlayerHandle player, float rate,
                             NativeException ex);
 
-        /*[DllImport ("libvlc.dll",
+        [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_get_state")]
         public static extern
-        void PlayerSetState (PlayerHandle player, float rate,
-                             NativeException ex); */
+        State PlayerGetState (PlayerHandle player, NativeException ex);
 
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_get_fps")]

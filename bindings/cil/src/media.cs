@@ -43,6 +43,24 @@ namespace VideoLAN.LibVLC
     };
 
     /**
+     * @brief State: media/player state
+     *
+     * Media and Player objects are always in one of these state.
+     * @see Media::State and @see Player::State.
+     */
+    public enum State
+    {
+        NothingSpecial, /**< Nothing going on */
+        Opening, /**< Being opened */
+        Buffering, /**< Buffering before play */
+        Playing, /**< Playing */
+        Paused, /**< Paused */
+        Stopped, /**< Stopped */
+        Ended, /**< Played until the end */
+        Error, /**< Failed */
+    };
+
+    /**
      * @brief Media: a source media
      * @ingroup API
      * Each media object represents an input media, such as a file or an URL.
@@ -119,6 +137,19 @@ namespace VideoLAN.LibVLC
         public object Clone ()
         {
             return new Media (LibVLC.MediaDuplicate (Handle));
+        }
+
+        /**
+         * Current state of the media.
+         */
+        public State State
+        {
+            get
+            {
+                State ret = LibVLC.MediaGetState (Handle, ex);
+                Raise ();
+                return ret;
+            }
         }
 
         /**

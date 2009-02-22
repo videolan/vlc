@@ -364,6 +364,19 @@ namespace VideoLAN.LibVLC
         }
 
         /**
+         * Current state of the player.
+         */
+        public State State
+        {
+            get
+            {
+                State ret = LibVLC.PlayerGetState (Handle, ex);
+                Raise ();
+                return ret;
+            }
+        }
+
+        /**
          * Frame rate in unit/seconds.
          */
         public float FramePerSeconds

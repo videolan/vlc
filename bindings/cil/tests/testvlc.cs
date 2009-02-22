@@ -33,6 +33,7 @@ namespace VideoLAN.LibVLC.Test
             Console.WriteLine ("Media at    {0}", m.Location);
             Console.WriteLine (" duration:  {0}µs", m.Duration);
             Console.WriteLine (" preparsed: {0}", m.IsPreparsed);
+            Console.WriteLine (" state:     {0}", m.State);
         }
 
         private static void DumpPlayer (Player p)
@@ -41,8 +42,8 @@ namespace VideoLAN.LibVLC.Test
                 return;
 
             int percent = (int)(p.Position * 100);
-            Console.Write ("{0} of {1} ms ({2}%)\r", p.Time, p.Length,
-                           percent);
+            Console.Write ("{0}: {1} of {2} ms ({3}%)\r", p.State,
+                           p.Time, p.Length, percent);
         }
 
         private static void Sleep (int msec)
