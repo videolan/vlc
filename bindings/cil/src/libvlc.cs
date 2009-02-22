@@ -117,10 +117,10 @@ namespace VideoLAN.LibVLC
         public static extern
         MediaListHandle MediaSubItems (MediaHandle media, NativeException ex);*/
 
-        /*[DllImport ("libvlc.dll", EntryPoint="libvlc_media_event_manager")]
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_media_event_manager")]
         public static extern
-        EventManagerHandle MediaGetEventManager (MediaHandle media,
-                                                 NativeException ex);*/
+        EventManagerHandle MediaEventManager (MediaHandle media,
+                                              NativeException ex);
 
         [DllImport ("libvlc.dll", EntryPoint="libvlc_media_get_duration")]
         public static extern
@@ -168,11 +168,12 @@ namespace VideoLAN.LibVLC
         MediaHandle PlayerGetMedia (PlayerHandle player,
                                     NativeException ex);*/
 
-        /*[DllImport ("libvlc.dll",
+        [DllImport ("libvlc.dll",
                       EntryPoint="libvlc_media_player_event_manager")]
         public static extern
-        EventManagerHandle PlayerGetEventManager (PlayerHandle media,
-                                                  NativeException ex);*/
+        EventManagerHandle PlayerEventManager (PlayerHandle media,
+                                               NativeException ex);
+
         [DllImport ("libvlc.dll",
                     EntryPoint="libvlc_media_player_is_playing")]
         public static extern
@@ -326,5 +327,76 @@ namespace VideoLAN.LibVLC
         public static extern
         int PlayerCanPause (PlayerHandle player, NativeException ex);
 
+
+        /* TODO: video, audio */
+
+        /* event.c */
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_event_attach")]
+        public static extern
+        void EventAttach (EventManagerHandle manager, EventType type,
+                          IntPtr callback, IntPtr user_data,
+                          NativeException ex);
+
+        [DllImport ("libvlc.dll", EntryPoint="libvlc_event_detach")]
+        public static extern
+        void EventDetach (EventManagerHandle manager, EventType type,
+                          IntPtr callback, IntPtr user_data,
+                          NativeException ex);
+
+        /* libvlc_event_type_name */
+    };
+
+    /**
+     * @brief EventCallback: LibVLC event handler
+     * @ingroup Internals
+     */
+    internal delegate void EventCallback (IntPtr ev, IntPtr data);
+
+    /**
+     * @brief EventType: LibVLC event types
+     * @ingroup Internals
+     */
+    internal enum EventType
+    {
+        MediaMetaChanged,
+        MediaSubItemAdded,
+        MediaDurationChanged,
+        MediaPreparsedChanged,
+        MediaFreed,
+        MediaStateChanged,
+
+        PlayerNothingSpecial,
+        PlayerOpening,
+        PlayerBuffering,
+        PlayerPlaying,
+        PlayerPaused,
+        PlayerStopped,
+        PlayerForward,
+        PlayerBackward,
+        PlayerEndReached,
+        PlayerEncounteredError,
+        PlayerTimeChanged,
+        PlayerPositionChanged,
+        PlayerSeekableChanged,
+        PlayerPausableChanged,
+
+        ListItemAdded,
+        ListWillAddItem,
+        ListItemDeleted,
+        ListWillDeleteItem,
+
+        ListViewItemAdded,
+        ListViewWillAddItem,
+        ListViewItemDeleted,
+        ListViewWillDeleteItem,
+
+        ListPlayerPlayed,
+        ListPlayerNextItemSet,
+        ListPlayerStopped,
+
+        DiscovererStarted,
+        DiscovererEnded,
+
+        PlayerTitleChanged,
     };
 };

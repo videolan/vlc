@@ -22,6 +22,8 @@
  **********************************************************************/
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace VideoLAN.LibVLC
@@ -63,7 +65,6 @@ namespace VideoLAN.LibVLC
             Destroy ();
             return true;
         }
-
     };
 
     /**
@@ -72,8 +73,7 @@ namespace VideoLAN.LibVLC
      *
      * This is the baseline for all managed LibVLC objects. It wraps:
      *  - an unmanaged LibVLC pointer,
-     *  - a native exception structure, and
-     *  - the object's native event manager.
+     *  - a native exception structure.
      */
     public class BaseObject : IDisposable
     {
@@ -119,6 +119,125 @@ namespace VideoLAN.LibVLC
             }
             ex = null;
             handle = null;
+        }
+    };
+
+    internal class EventManagerHandle : NonNullHandle
+    {
+        protected override void Destroy ()
+        {
+        }
+    };
+
+
+    /**
+     * @brief EventingObject: wrapper around an eventing LibVLC handle.
+     * @ingroup Internals
+     *
+     * This is the base class for all managed LibVLC objects which do have an
+     * event manager.
+     */
+    public abstract class EventingObject : BaseObject
+    {
+        /**
+         * @brief Managed to unmanaged event handler mapping
+         * @ingroup Internals
+         *
+         * The CLR cannot do reference counting for unmanaged callbacks.
+         * We keep track of handled events here instead.
+         */
+        private class Event
+        {
+            public EventCallback managed;
+            public IntPtr        unmanaged;
+
+            public Event (EventCallback managed, IntPtr unmanaged)
+            {
+                this.managed = managed;
+                this.unmanaged = unmanaged;
+            }
+        };
+        private Dictionary<EventType, Event> events;
+        /**< references to our unmanaged function pointers */
+
+        internal EventingObject () : base ()
+        {
+            events = new Dictionary<EventType, Event> ();
+        }
+
+        /**
+         * Releases unmanaged resources associated with the object.
+         * @param disposing true if the disposing the object explicitly,
+         *                  false if finalizing the object inside the GC.
+         */
+        protected override void Dispose (bool disposing)
+        {
+            events = null;
+            base.Dispose (disposing);
+        }
+
+        /**
+         * @return the unmanaged event manager for this object
+         */
+        internal abstract EventManagerHandle GetManager ();
+
+        /**
+         * Registers an event handler.
+         * @param type event type to register to
+         * @param callback callback to invoke when the event occurs
+         *
+         * @note
+         * For simplicity, we only allow one handler per type.
+         * Multicasting can be implemented higher up with managed code.
+         */
+        internal void Attach (EventType type, EventCallback callback)
+        {
+            EventManagerHandle manager;
+            IntPtr cb = Marshal.GetFunctionPointerForDelegate (callback);
+            Event ev = new Event (callback, cb);
+            bool unref = false;
+
+            if (events.ContainsKey (type))
+                throw new ArgumentException ("Duplicate event");
+
+            try
+            {
+                handle.DangerousAddRef (ref unref);
+                manager = GetManager ();
+                LibVLC.EventAttach (manager, type, cb, IntPtr.Zero, ex);
+            }
+            finally
+            {
+                if (unref)
+                    handle.DangerousRelease ();
+            }
+            Raise ();
+            events.Add (type, ev);
+        }
+
+        private void Detach (EventType type, IntPtr callback)
+        {
+            EventManagerHandle manager;
+            bool unref = false;
+
+            try
+            {
+                handle.DangerousAddRef (ref unref);
+                manager = GetManager ();
+                LibVLC.EventDetach (manager, type, callback, IntPtr.Zero, ex);
+            }
+            finally
+            {
+                if (unref)
+                    handle.DangerousRelease ();
+            }
+            Raise ();
+            events.Remove (type);
+        }
+
+        internal void Detach (EventType type)
+        {
+            Detach(type, events[type].unmanaged);
         }
     };
 };

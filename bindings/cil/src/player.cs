@@ -51,7 +51,7 @@ namespace VideoLAN.LibVLC
      * @ingroup API
      * Use this class to play a media.
      */
-    public class Player : BaseObject
+    public class Player : EventingObject
     {
         internal PlayerHandle Handle
         {
@@ -104,6 +104,11 @@ namespace VideoLAN.LibVLC
             this.media = media;
             handle = LibVLC.PlayerCreateFromMedia (media.Handle, ex);
             Raise ();
+        }
+
+        internal override EventManagerHandle GetManager ()
+        {
+            return LibVLC.PlayerEventManager (Handle, null);
         }
 
         /**

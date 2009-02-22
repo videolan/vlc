@@ -65,7 +65,7 @@ namespace VideoLAN.LibVLC
      * @ingroup API
      * Each media object represents an input media, such as a file or an URL.
      */
-    public class Media : BaseObject, ICloneable
+    public class Media : EventingObject, ICloneable
     {
         internal MediaHandle Handle
         {
@@ -152,6 +152,11 @@ namespace VideoLAN.LibVLC
                 Raise ();
                 return ret;
             }
+        }
+
+        internal override EventManagerHandle GetManager ()
+        {
+            return LibVLC.MediaEventManager (Handle, null);
         }
 
         /**
