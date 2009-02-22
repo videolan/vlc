@@ -34,21 +34,25 @@
 
 char *httpd_ClientIP (const httpd_client_t *cl, char *psz_ip)
 {
+    (void) cl; (void) psz_ip;
     assert (0);
 }
 
 void httpd_ClientModeBidir (httpd_client_t *cl)
 {
+    (void) cl;
     assert (0);
 }
 
 void httpd_ClientModeStream (httpd_client_t *cl)
 {
+    (void) cl;
     assert (0);
 }
 
 httpd_file_sys_t *httpd_FileDelete (httpd_file_t *file)
 {
+    (void) file;
     assert (0);
 }
 
@@ -58,11 +62,16 @@ httpd_file_t *httpd_FileNew (httpd_host_t *host,
                              const vlc_acl_t *acl,
                              httpd_file_callback_t cb, httpd_file_sys_t *data)
 {
+    (void) host;
+    (void) url; (void) content_type;
+    (void) login; (void) password; (void) acl;
+    (void) cb; (void) data;
     assert (0);
 }
 
 httpd_handler_sys_t *httpd_HandlerDelete (httpd_handler_t *handler)
 {
+    (void) handler;
     assert (0);
 }
 
@@ -72,11 +81,15 @@ httpd_handler_t *httpd_HandlerNew (httpd_host_t *host, const char *url,
                                    httpd_handler_callback_t cb,
                                    httpd_handler_sys_t *data)
 {
+    (void) host; (void) url; (void) content_type;
+    (void) login; (void) password; (void) acl;
+    (void) cb; (void) data;
     assert (0);
 }
 
 void httpd_HostDelete (httpd_host_t *h)
 {
+    (void) h;
     assert (0);
 }
 
@@ -87,37 +100,44 @@ httpd_host_t *httpd_HostNew (vlc_object_t *obj, const char *host, int port)
 
 void httpd_MsgAdd (httpd_message_t *m, const char *name, const char *fmt, ...)
 {
+    (void) m; (void) name; (void) fmt;
     assert (0);
 }
 
 const char *httpd_MsgGet (const httpd_message_t *m, const char *name)
 {
+    (void) m; (void) name;
     assert (0);
 }
 
 void httpd_RedirectDelete (httpd_redirect_t *r)
 {
+    (void) r;
     assert (0);
 }
 
 httpd_redirect_t *httpd_RedirectNew (httpd_host_t *host,
                                      const char *dst, const char *src)
 {
+    (void) host; (void) dst; (void) src;
     assert (0);
 }
 
 char *httpd_ServerIP (const httpd_client_t *client, char *ip)
 {
+    (void) client; (void) ip;
     assert (0);
 }
 
 void httpd_StreamDelete (httpd_stream_t *stream)
 {
+    (void) stream;
     assert (0);
 }
 
 int httpd_StreamHeader (httpd_stream_t *stream, uint8_t *data, int count)
 {
+    (void) stream; (void) data; (void) count;
     assert (0);
 }
 
@@ -126,11 +146,14 @@ httpd_stream_t *httpd_StreamNew (httpd_host_t *host,
                                  const char *login, const char *password,
                                  const vlc_acl_t *acl)
 {
+    (void) host; (void) url; (void) content_type;
+    (void) login; (void) password; (void) acl;
     assert (0);
 }
 
 int httpd_StreamSend (httpd_stream_t *stream, uint8_t *data, int count)
 {
+    (void) stream; (void) data; (void) count;
     assert (0);
 }
 
@@ -138,6 +161,8 @@ httpd_host_t *httpd_TLSHostNew (vlc_object_t *obj, const char *host, int port,
                                 const char *cert, const char *key,
                                 const char *ca, const char *crl)
 {
+     (void) host; (void) port;
+     (void) cert; (void) key; (void) ca; (void) crl;
      msg_Err (obj, "VLC httpd support not compiled-in!");
      return NULL;
 }
@@ -145,11 +170,13 @@ httpd_host_t *httpd_TLSHostNew (vlc_object_t *obj, const char *host, int port,
 int httpd_UrlCatch (httpd_url_t *url, int request, httpd_callback_t cb,
                     httpd_callback_sys_t *data)
 {
+    (void) url; (void) request; (void) cb; (void) data;
     assert (0);
 }
 
 void httpd_UrlDelete (httpd_url_t *url)
 {
+    (void) url;
     assert (0);
 }
 
@@ -157,6 +184,7 @@ httpd_url_t *httpd_UrlNew (httpd_host_t *host, const char *url,
                            const char *login, const char *password,
                            const vlc_acl_t *acl)
 {
+    (void) host; (void) url; (void) login; (void) password; (void) acl;
     assert (0);
 }
 
@@ -164,6 +192,7 @@ httpd_url_t *httpd_UrlNewUnique (httpd_host_t *host, const char *url,
                                  const char *login, const char *password,
                                  const vlc_acl_t *acl)
 {
+    (void) host; (void) url; (void) login; (void) password; (void) acl;
     assert (0);
 }
 #endif /* !ENABLE_HTTPD */
