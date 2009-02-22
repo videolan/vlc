@@ -102,7 +102,7 @@ namespace VideoLAN.LibVLC
         {
             get
             {
-                MemoryHandle str = LibVLC.MediaGetMRL (Handle, ex);
+                StringHandle str = LibVLC.MediaGetMRL (Handle, ex);
                 Raise ();
                 return str.Transform ();
             }

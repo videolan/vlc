@@ -98,7 +98,7 @@ namespace VideoLAN.LibVLC
 
         [DllImport ("libvlc.dll", EntryPoint="libvlc_media_get_mrl")]
         public static extern
-        MemoryHandle MediaGetMRL (MediaHandle media, NativeException ex);
+        StringHandle MediaGetMRL (MediaHandle media, NativeException ex);
 
         [DllImport ("libvlc.dll", EntryPoint="libvlc_media_duplicate")]
         public static extern

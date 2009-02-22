@@ -96,7 +96,7 @@ namespace VideoLAN.LibVLC
      * @brief MemoryHandle: heap allocation by the C run-time
      * @ingroup Internals
      */
-    internal sealed class MemoryHandle : NonNullHandle
+    internal class MemoryHandle : NonNullHandle
     {
         [DllImport ("libvlc.dll", EntryPoint="libvlc_free")]
         private static extern void Free (IntPtr ptr);
@@ -108,7 +108,19 @@ namespace VideoLAN.LibVLC
         {
             Free (handle);
         }
+    };
 
+    /**
+     * @brief StringHandle: heap-allocated characters array
+     * @ingroup Internals
+     */
+    internal sealed class StringHandle : MemoryHandle
+    {
+        /**
+         * Converts an heap-allocated nul-terminated UTF-8 characters array
+         * into a managed string.
+         * @return the resulting managed string.
+         */
         public override string ToString ()
         {
             return U8String.FromNative (handle);
