@@ -67,10 +67,10 @@ namespace VideoLAN.LibVLC
     };
 
     /**
-     * @brief BaseObject: generic wrapper around a safe handle.
+     * @brief BaseObject: generic wrapper around a safe LibVLC handle.
      * @ingroup Internals
      * This is the baseline for all managed LibVLC objects which wrap
-     * an unmanaged LibVLC pointer.
+     * an unmanaged LibVLC pointer, and provides exception handling.
      */
     public class BaseObject : IDisposable
     {
@@ -101,6 +101,11 @@ namespace VideoLAN.LibVLC
             GC.SuppressFinalize (this);
         }
 
+        /**
+         * Releases unmanaged resources associated with the object.
+         * @param disposing true if the disposing the object explicitly,
+         *                  false if finalizing the object inside the GC.
+         */
         protected virtual void Dispose (bool disposing)
         {
             if (disposing)

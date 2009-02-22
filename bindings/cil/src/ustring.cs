@@ -114,6 +114,10 @@ namespace VideoLAN.LibVLC
             return U8String.FromNative (handle);
         }
 
+        /**
+         * Converts the buffer (as in ToString()) and release it.
+         * @return managed string representation of the buffer
+         */
         public string Transform ()
         {
             string value = ToString ();
