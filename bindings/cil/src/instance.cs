@@ -147,6 +147,7 @@ namespace VideoLAN.LibVLC
         /**
          * The unmanaged VLC-internal instance object.
          * Do not use this unless you really know what you are doing.
+         * @version VLC 1.0
          */
         public SafeHandle Object
         {

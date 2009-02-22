@@ -108,6 +108,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * Whether the player is currently active.
+         * @version VLC 1.0
          */
         public bool IsPlaying
         {
@@ -155,8 +156,8 @@ namespace VideoLAN.LibVLC
          * playback is not started or stopped; live reparenting might not
          * work.
          *
-         * <b>Warning:</b>
-         * If the identifier is invalid, Xlib might abort the process.
+         * @warning If the identifier is invalid, Xlib might abort the process.
+         * @version VLC 1.0
          */
         public int XWindow
         {
@@ -178,6 +179,7 @@ namespace VideoLAN.LibVLC
          * supports one of DirectDraw, Direct3D, GDI or OpenGL/Win32.
          * Note that you should set/change/unset the window while playback is
          * not started or stopped; live reparenting might not work.
+         * @version VLC 1.0
          */
         public SafeHandle HWND
         {
@@ -285,6 +287,7 @@ namespace VideoLAN.LibVLC
         /**
          * Gets the number of chapters within a given title.
          * @param title media title number
+         * @version VLC 1.0
          */
         public int GetChapterCountByTitle (int title)
         {
@@ -295,6 +298,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * Number of the current title.
+         * @version VLC 1.0
          */
         public int Title
         {
@@ -313,6 +317,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * Total number of titles.
+         * @version VLC 1.0
          */
         public int TitleCount
         {
@@ -326,6 +331,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * Skips to the beginning of the next chapter.
+         * @version VLC 1.0
          */
         public void NextChapter ()
         {
@@ -335,6 +341,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * Rewinds to the previous chapter.
+         * @version VLC 1.0
          */
         public void PreviousChapter ()
         {

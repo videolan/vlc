@@ -91,16 +91,17 @@ namespace VideoLAN.LibVLC
 
         /**
          * Add VLC input item options to the media.
-         * @param options VLC options in VLC input item format
-         *                (see example below)
-         * @param trusted whether the options are set by a trusted agent
-         *                (e.g. the local computer configuration) or not
-         *                (e.g. a downloaded file).
          * @code
          * Media m = new Media(vlc, "http://www.example.com/music.ogg");
          * m.AddOptions(":http-user-agent=LibVLC.Net "
          *            + ":http-proxy=proxy:8080", true);
          * @endcode
+         * @param options VLC options in VLC input item format
+         *                (see example below)
+         * @param trusted whether the options are set by a trusted agent
+         *                (e.g. the local computer configuration) or not
+         *                (e.g. a downloaded file).
+         * @version VLC 0.9.9 if trusted is false
          */
         public void AddOptions (string options, bool trusted)
         {
@@ -115,6 +116,7 @@ namespace VideoLAN.LibVLC
 
         /**
          * The media location (file path, URL, ...).
+         * @version VLC 1.0
          */
         public string Location
         {
