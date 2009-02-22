@@ -121,9 +121,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     mainBasedSize = settings->value( "mainBasedSize", QSize( 350, 120 ) ).toSize();
     mainVideoSize = settings->value( "mainVideoSize", QSize( 400, 300 ) ).toSize();
 
-    /* Visualisation, not really used yet */
-    visualSelectorEnabled = settings->value( "visual-selector", false).toBool();
-
     /* Do we want anoying popups or not */
     notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
 
@@ -141,7 +138,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /************
      * Menu Bar *
      ************/
-    QVLCMenu::createMenuBar( this, p_intf, visualSelectorEnabled );
+    QVLCMenu::createMenuBar( this, p_intf );
 
 #if 0
     /* Create a Dock to get the playlist */
