@@ -45,8 +45,10 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    xosd * p_osd;               /* libxosd handle */
-    bool  b_need_update;   /* Update display ? */
+    xosd *      p_osd;          /* libxosd handle */
+    bool        b_need_update;  /* Update display ? */
+    vlc_mutex_t lock;           /* lock for the condition variable */
+    vlc_cond_t  cond;           /* condition variable to know when to update */
 };
 
 #define MAX_LINE_LENGTH 256
@@ -54,13 +56,13 @@ struct intf_sys_t
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
+static int  Open        ( vlc_object_t * );
+static void Close       ( vlc_object_t * );
 
-static void Run          ( intf_thread_t * );
+static void Run         ( intf_thread_t * );
 
-static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
-                vlc_value_t oval, vlc_value_t nval, void *param );
+static int PlaylistNext ( vlc_object_t *p_this, const char *psz_variable,
+                          vlc_value_t oval, vlc_value_t nval, void *param );
 
 /*****************************************************************************
  * Module descriptor
@@ -111,7 +113,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_font, *psz_colour;
 
     /* Allocate instance and initialize some members */
-    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
+    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
@@ -146,13 +148,16 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    psz_colour = config_GetPsz( p_intf,"xosd-colour" );
+    psz_colour = config_GetPsz( p_intf, "xosd-colour" );
     xosd_set_colour( p_osd, psz_colour );
     xosd_set_timeout( p_osd, 3 );
     free( psz_colour );
 #endif
 
-
+    // Initialize mutex and condition variable before adding the callbacks
+    vlc_mutex_init( &p_intf->p_sys->lock );
+    vlc_cond_init( &p_intf->p_sys->cond );
+    // Add the callbacks
     playlist_t *p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_AddCallback( p_playlist, "item-change", PlaylistNext, p_this );
@@ -194,6 +199,7 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
     playlist_t *p_playlist = pl_Hold( p_intf );
     var_DelCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_DelCallback( p_playlist, "item-change", PlaylistNext, p_this );
@@ -203,6 +209,8 @@ static void Close( vlc_object_t *p_this )
     xosd_destroy( p_intf->p_sys->p_osd );
 
     /* Destroy structure */
+    vlc_cond_destroy( &p_intf->p_sys->cond );
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
     free( p_intf->p_sys );
 }
 
@@ -216,86 +224,93 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *p_playlist;
     playlist_item_t *p_item = NULL;
     char *psz_display = NULL;
+    int cancel = vlc_savecancel();
 
-    for( ;; )
+    while( true )
     {
-        int canc = vlc_savecancel();
+        // Wait for a signal
+        vlc_restorecancel( cancel );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
+        mutex_cleanup_push( &p_intf->p_sys->lock );
+        while( !p_intf->p_sys->b_need_update )
+            vlc_cond_wait( &p_intf->p_sys->cond, &p_intf->p_sys->lock );
+        p_intf->p_sys->b_need_update = false;
+        vlc_cleanup_run();
 
-        if( p_intf->p_sys->b_need_update == true )
+        // Compute the signal
+        cancel = vlc_savecancel();
+        p_playlist = pl_Hold( p_intf );
+        PL_LOCK;
+
+        // If the playlist is empty don't do anything
+        if( playlist_IsEmpty( p_playlist ) )
         {
-            p_intf->p_sys->b_need_update = false;
-            p_playlist = pl_Hold( p_intf );
-            PL_LOCK;
+            PL_UNLOCK;
+            pl_Release( p_intf );
+            continue;
+        }
 
-            if( playlist_IsEmpty( p_playlist ) )
+        free( psz_display );
+        int i_status = playlist_Status( p_playlist );
+        if( i_status == PLAYLIST_STOPPED )
+        {
+            psz_display = strdup(_("Stop"));
+            PL_UNLOCK;
+            pl_Release( p_intf );
+        }
+        else if( i_status == PLAYLIST_PAUSED )
+        {
+            psz_display = strdup(_("Pause"));
+            PL_UNLOCK;
+            pl_Release( p_intf );
+        }
+        else
+        {
+            p_item = playlist_CurrentPlayingItem( p_playlist );
+            if( !p_item )
             {
                 PL_UNLOCK;
                 pl_Release( p_intf );
-                vlc_restorecancel( canc );
                 continue;
             }
-            free( psz_display );
+            input_item_t *p_input = p_item->p_input;
+            vlc_gc_incref( p_input );
 
-            int i_status = playlist_Status( p_playlist );
-            if( i_status == PLAYLIST_STOPPED )
+            PL_UNLOCK;
+            pl_Release( p_intf );
+
+            mtime_t i_duration = input_item_GetDuration( p_input );
+            if( i_duration != -1 )
             {
-                psz_display = strdup(_("Stop"));
-                PL_UNLOCK;
-                pl_Release( p_intf );
-            }
-            else if( i_status == PLAYLIST_PAUSED )
-            {
-                psz_display = strdup(_("Pause"));
-                PL_UNLOCK;
-                pl_Release( p_intf );
+                char psz_durationstr[MSTRTIME_MAX_SIZE];
+                secstotimestr( psz_durationstr, i_duration / 1000000 );
+                if( asprintf( &psz_display, "%s (%s)", p_input->psz_name, psz_durationstr ) == -1 )
+                    psz_display = NULL;
             }
             else
-            {
-                p_item = playlist_CurrentPlayingItem( p_playlist );
-                if( !p_item )
-                {
-                    PL_UNLOCK;
-                    pl_Release( p_intf );
-                    vlc_restorecancel( canc );
-                    continue;
-                }
-                input_item_t *p_input = p_item->p_input;
-                vlc_gc_incref( p_input );
+                psz_display = strdup( p_input->psz_name );
 
-                PL_UNLOCK;
-                pl_Release( p_intf );
-
-                mtime_t i_duration = input_item_GetDuration( p_input );
-                if( i_duration != -1 )
-                {
-                    char psz_durationstr[MSTRTIME_MAX_SIZE];
-                    secstotimestr( psz_durationstr, i_duration / 1000000 );
-                    if( asprintf( &psz_display, "%s (%s)", p_input->psz_name, psz_durationstr ) == -1 )
-                        psz_display = NULL;
-                }
-                else
-                    psz_display = strdup( p_input->psz_name );
-
-                vlc_gc_decref( p_input );
-            }
-
-            /* Display */
-            xosd_display( p_intf->p_sys->p_osd,
-                            0,                               /* first line */
-                            XOSD_string,
-                            psz_display );
+            vlc_gc_decref( p_input );
         }
-        vlc_restorecancel( canc );
-        msleep( INTF_IDLE_SLEEP );
+
+        /* Display */
+        xosd_display( p_intf->p_sys->p_osd, 0, /* first line */
+                      XOSD_string, psz_display );
     }
 }
 
 static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
                 vlc_value_t oval, vlc_value_t nval, void *param )
 {
+    (void)p_this;    (void)psz_variable;    (void)oval;    (void)nval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
+    // Send the signal using the condition variable
+    vlc_mutex_lock( &p_intf->p_sys->lock );
     p_intf->p_sys->b_need_update = true;
+    vlc_cond_signal( &p_intf->p_sys->cond );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
+
     return VLC_SUCCESS;
 }
 
