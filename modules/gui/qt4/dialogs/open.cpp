@@ -88,10 +88,10 @@ OpenDialog::OpenDialog( QWidget *parent,
     setWindowTitle( qtr( "Open a Media" ) );
 
     /* Tab definition and creation */
-    fileOpenPanel    = new FileOpenPanel( ui.Tab, p_intf );
-    discOpenPanel    = new DiscOpenPanel( ui.Tab, p_intf );
-    netOpenPanel     = new NetOpenPanel( ui.Tab, p_intf );
-    captureOpenPanel = new CaptureOpenPanel( ui.Tab, p_intf );
+    fileOpenPanel    = new FileOpenPanel( this, p_intf );
+    discOpenPanel    = new DiscOpenPanel( this, p_intf );
+    netOpenPanel     = new NetOpenPanel( this, p_intf );
+    captureOpenPanel = new CaptureOpenPanel( this, p_intf );
 
     /* Insert the tabs */
     ui.Tab->insertTab( OPEN_FILE_TAB, fileOpenPanel, qtr( "&File" ) );
@@ -179,7 +179,8 @@ OpenDialog::OpenDialog( QWidget *parent,
     storedMethod = "";
     newCachingMethod( "file-caching" );
 
-    resize( getSettings()->value( "opendialog-size", QSize( 400, 490 ) ).toSize() );
+    setMinimumSize( sizeHint() );
+    resize( getSettings()->value( "opendialog-size", QSize( 500, 490 ) ).toSize() );
 }
 
 OpenDialog::~OpenDialog()
