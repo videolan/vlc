@@ -74,8 +74,8 @@ namespace VideoLAN.LibVLC
      */
     public class BaseObject : IDisposable
     {
-        protected NativeException ex; /**< buffer for LibVLC exceptions */
-        protected SafeHandle handle; /**< wrapped safe handle */
+        internal NativeException ex; /**< buffer for LibVLC exceptions */
+        internal SafeHandle handle; /**< wrapped safe handle */
 
         internal BaseObject ()
         {
@@ -87,7 +87,7 @@ namespace VideoLAN.LibVLC
          * Checks if the LibVLC run-time raised an exception
          * If so, raises a CIL exception.
          */
-        protected void Raise ()
+        internal void Raise ()
         {
             ex.Raise ();
         }
