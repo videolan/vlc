@@ -552,25 +552,23 @@ static void Run( intf_thread_t *p_intf )
         {
             PL_LOCK;
             int status = playlist_Status( p_playlist );
-            if( (p_intf->p_sys->i_last_state != status) &&
-                (status == PLAYLIST_STOPPED) )
+            if( p_intf->p_sys->i_last_state != status )
             {
-                p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
-                msg_rc( STATUS_CHANGE "( stop state: 5 )" );
-            }
-            else if(
-                (p_intf->p_sys->i_last_state != status) &&
-                (status == PLAYLIST_RUNNING) )
-            {
-                p_intf->p_sys->i_last_state = PLAYLIST_RUNNING;
-                 msg_rc( STATUS_CHANGE "( play state: 3 )" );
-            }
-            else if(
-                (p_intf->p_sys->i_last_state != status) &&
-                (status == PLAYLIST_PAUSED) )
-            {
-                p_intf->p_sys->i_last_state = PLAYLIST_PAUSED;
-                msg_rc( STATUS_CHANGE "( pause state: 4 )" );
+                if( status == PLAYLIST_STOPPED )
+                {
+                    p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
+                    msg_rc( STATUS_CHANGE "( stop state: 5 )" );
+                }
+                else if( status == PLAYLIST_RUNNING )
+                {
+                    p_intf->p_sys->i_last_state = PLAYLIST_RUNNING;
+                    msg_rc( STATUS_CHANGE "( play state: 3 )" );
+                }
+                else if( status == PLAYLIST_PAUSED )
+                {
+                    p_intf->p_sys->i_last_state = PLAYLIST_PAUSED;
+                    msg_rc( STATUS_CHANGE "( pause state: 4 )" );
+                }
             }
             PL_UNLOCK;
         }
