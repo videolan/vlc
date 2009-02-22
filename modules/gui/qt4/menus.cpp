@@ -736,28 +736,28 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
     QAction *action;
 
     /* Faster/Slower */
-    action = menu->addAction( qtr( "Faster" ), THEMIM->getIM(),
+    action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
                               SLOT( faster() ) );
     action->setIcon( QIcon( ":/faster") );
     action->setData( true );
 
-    action = menu->addAction( qtr( "Normal Speed" ), THEMIM->getIM(),
+    action = menu->addAction( qtr( "N&ormal Speed" ), THEMIM->getIM(),
                               SLOT( normalRate() ) );
     action->setData( true );
 
-    action = menu->addAction( qtr( "Slower" ), THEMIM->getIM(),
+    action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
                               SLOT( slower() ) );
     action->setIcon( QIcon( ":/slower") );
     action->setData( true );
 
     menu->addSeparator();
 
-    action = menu->addAction( qtr( "Jump Forward" ), THEMIM->getIM(),
+    action = menu->addAction( qtr( "&Jump Forward" ), THEMIM->getIM(),
              SLOT( jumpFwd() ) );
     action->setIcon( QIcon( ":/skip_fw") );
     action->setData( true );
 
-    action = menu->addAction( qtr( "Jump Backward" ), THEMIM->getIM(),
+    action = menu->addAction( qtr( "Jump Bac&kward" ), THEMIM->getIM(),
              SLOT( jumpBwd() ) );
     action->setIcon( QIcon( ":/skip_back") );
     action->setData( true );
@@ -770,15 +770,15 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
 void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
                                                 intf_thread_t *p_intf )
 {
-    addMIMStaticEntry( p_intf, menu, qtr( "Stop" ), ":/stop", SLOT( stop() ) );
+    addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/stop", SLOT( stop() ) );
 
     /* Next / Previous */
-    addMIMStaticEntry( p_intf, menu, qtr( "Previous" ),
+    addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
             ":/previous", SLOT( prev() ) );
-    addMIMStaticEntry( p_intf, menu, qtr( "Next" ),
+    addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
             ":/next", SLOT( next() ) );
     menu->addSeparator();
-}
+
 
 void QVLCMenu::PopupMenuStaticEntries( QMenu *menu )
 {
