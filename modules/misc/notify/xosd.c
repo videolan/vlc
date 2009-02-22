@@ -274,10 +274,6 @@ static void Run( intf_thread_t *p_intf )
                 continue;
             }
             input_item_t *p_input = p_item->p_input;
-            vlc_gc_incref( p_input );
-
-            PL_UNLOCK;
-            pl_Release( p_intf );
 
             mtime_t i_duration = input_item_GetDuration( p_input );
             if( i_duration != -1 )
@@ -290,7 +286,8 @@ static void Run( intf_thread_t *p_intf )
             else
                 psz_display = strdup( p_input->psz_name );
 
-            vlc_gc_decref( p_input );
+            PL_UNLOCK;
+            pl_Release( p_intf );
         }
 
         /* Display */
