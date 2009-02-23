@@ -598,24 +598,26 @@ static void HtmlCopy( char **ppsz_html, char **ppsz_subtitle, const char *psz_te
 
 static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
 {
-    char   *psz_tag = malloc( ( strlen( psz_subtitle ) / 3 ) + 1 );
-    if( !psz_tag ) return NULL;
-    size_t  i_buf_size     = strlen( psz_subtitle ) + 100;
-    char   *psz_html_start = malloc( i_buf_size );
-    bool b_has_align = false;
-
+    /* */
+    char *psz_tag = malloc( ( strlen( psz_subtitle ) / 3 ) + 1 );
+    if( !psz_tag )
+        return NULL;
     psz_tag[ 0 ] = '\0';
 
+    /* */
+    size_t i_buf_size = strlen( psz_subtitle ) + 100;
+    char   *psz_html_start = malloc( i_buf_size );
+    char   *psz_html = psz_html_start;
     if( psz_html_start == NULL )
     {
         free( psz_tag );
         return NULL;
     }
-    
-    char *psz_html = psz_html_start;
+    psz_html[0] = '\0';
 
-    strcpy( psz_html, "<text>" );
-    psz_html += 6;
+    bool b_has_align = false;
+
+    HtmlPut( &psz_html, "<text>" );
 
     /* */
     while( *psz_subtitle )
@@ -877,27 +879,58 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
 
         if( ( size_t )( psz_html - psz_html_start ) > i_buf_size - 50 )
         {
-            int i_len = psz_html - psz_html_start;
+            const int i_len = psz_html - psz_html_start;
 
             i_buf_size += 200;
-            psz_html_start = realloc( psz_html_start, i_buf_size );
-            psz_html = psz_html_start + i_len;
-            *psz_html = '\0';
+            char *psz_new = realloc( psz_html_start, i_buf_size );
+            if( !psz_new )
+                break;
+            psz_html_start = psz_new;
+            psz_html = &psz_new[i_len];
         }
     }
-    strcpy( psz_html, "</text>" );
-    psz_html += 7;
+    if( psz_html_start )
+    {
+        static const char *psz_text_close = "</text>";
+        static const char *psz_tag_long = "/font>";
 
-    if( psz_tag[ 0 ] != '\0' )
-    {
-        /* Not well formed -- kill everything */
-        free( psz_html_start );
-        psz_html_start = NULL;
-    }
-    else if( psz_html_start )
-    {
-        /* Shrink the memory requirements */
-        psz_html_start = realloc( psz_html_start,  psz_html - psz_html_start + 1 );
+        /* Realloc for closing tags and shrink memory */
+        const size_t i_length = (size_t)( psz_html - psz_html_start );
+
+        const size_t i_size = i_length + strlen(psz_tag_long) * strlen(psz_tag) + strlen(psz_text_close) + 1;
+        char *psz_new = realloc( psz_html_start, i_size );
+        if( psz_new )
+        {
+            psz_html_start = psz_new;
+            psz_html = &psz_new[i_length];
+
+            /* Close not well formed subtitle */
+            while( *psz_tag )
+            {
+                /* */
+                char *psz_last = &psz_tag[strlen(psz_tag)-1];
+                switch( *psz_last )
+                {
+                case 'b':
+                    HtmlPut( &psz_html, "</b>" );
+                    break;
+                case 'i':
+                    HtmlPut( &psz_html, "</i>" );
+                    break;
+                case 'u':
+                    HtmlPut( &psz_html, "</u>" );
+                    break;
+                case 'f':
+                    HtmlPut( &psz_html, "/font>" );
+                    break;
+                case 'I':
+                    break;
+                }
+
+                *psz_last = '\0';
+            }
+            HtmlPut( &psz_html, psz_text_close );
+        }
     }
     free( psz_tag );
 
