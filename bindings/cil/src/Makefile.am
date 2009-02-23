@@ -6,6 +6,7 @@ pkglib_SCRIPTS = VideoLAN.LibVLC.dll
 SOURCES_dll = \
 	ustring.cs \
 	exception.cs \
+	event.cs \
 	marshal.cs \
 	instance.cs \
 	media.cs \
