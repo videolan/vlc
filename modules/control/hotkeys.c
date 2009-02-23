@@ -47,6 +47,7 @@
 #define VOLUME_WIDGET_CHAN   p_intf->p_sys->p_channels[ 1 ]
 #define POSITION_TEXT_CHAN   p_intf->p_sys->p_channels[ 2 ]
 #define POSITION_WIDGET_CHAN p_intf->p_sys->p_channels[ 3 ]
+
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
  *****************************************************************************/
@@ -61,6 +62,7 @@ struct intf_sys_t
     vout_thread_t *     p_vout;        /* pointer to vout object */
     vlc_mutex_t         lock; /* callback lock */
     vlc_cond_t          wait; /* callback event */
+    int                 i_mousewheel_mode;
 };
 
 /*****************************************************************************
@@ -83,23 +85,31 @@ static void ClearChannels  ( intf_thread_t *, vout_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define BOOKMARK1_TEXT    N_("Playlist bookmark 1")
-#define BOOKMARK2_TEXT    N_("Playlist bookmark 2")
-#define BOOKMARK3_TEXT    N_("Playlist bookmark 3")
-#define BOOKMARK4_TEXT    N_("Playlist bookmark 4")
-#define BOOKMARK5_TEXT    N_("Playlist bookmark 5")
-#define BOOKMARK6_TEXT    N_("Playlist bookmark 6")
-#define BOOKMARK7_TEXT    N_("Playlist bookmark 7")
-#define BOOKMARK8_TEXT    N_("Playlist bookmark 8")
-#define BOOKMARK9_TEXT    N_("Playlist bookmark 9")
-#define BOOKMARK10_TEXT   N_("Playlist bookmark 10")
-#define BOOKMARK_LONGTEXT N_("Define playlist bookmarks.")
+
+enum{
+    MOUSEWHEEL_VOLUME,
+    MOUSEWHEEL_POSITION,
+    NO_MOUSEWHEEL,
+};
+
+static const int i_mode_list[] =
+    { MOUSEWHEEL_VOLUME, MOUSEWHEEL_POSITION, NO_MOUSEWHEEL };
+
+static const char *const psz_mode_list_text[] =
+    { N_("Volume Control"), N_("Position Control"), N_("Ignore") };
 
 vlc_module_begin ()
     set_shortname( N_("Hotkeys") )
     set_description( N_("Hotkeys management interface") )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
+
+    add_integer( "hotkeys-mousewheel-mode", MOUSEWHEEL_VOLUME, NULL,
+                 N_("MouseWheel x-axe Control"),
+                 N_("MouseWheel x-axe can control volume, position or"
+                    "mousewheel event can be ignored"), false )
+            change_integer_list( i_mode_list, psz_mode_list_text, NULL )
+
 vlc_module_end ()
 
 /*****************************************************************************
@@ -119,6 +129,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_size = 0;
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
+    p_intf->p_sys->i_mousewheel_mode =
+        config_GetInt( p_intf, "hotkeys-mousewheel-mode" );
 
     var_AddCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
     var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
@@ -947,23 +959,28 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
     (void)psz_var;
     (void)oldval;
 
+    int i_mode = p_intf->p_sys->i_mousewheel_mode;
+
     /* Special action for mouse event */
-    /* FIXME: This should probably be configurable */
     /* FIXME: rework hotkeys handling to allow more than 1 event
      * to trigger one same action */
     switch (newval.i_int & KEY_SPECIAL)
     {
         case KEY_MOUSEWHEELUP:
-            i_action = ACTIONID_VOL_UP;
+            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ? ACTIONID_VOL_UP
+                                 : ACTIONID_JUMP_FORWARD_EXTRASHORT;
             break;
         case KEY_MOUSEWHEELDOWN:
-            i_action = ACTIONID_VOL_DOWN;
+            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ? ACTIONID_VOL_DOWN
+                                : ACTIONID_JUMP_BACKWARD_EXTRASHORT;
             break;
         case KEY_MOUSEWHEELLEFT:
-            i_action = ACTIONID_JUMP_BACKWARD_EXTRASHORT;
+            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ?
+                        ACTIONID_JUMP_BACKWARD_EXTRASHORT : ACTIONID_VOL_DOWN;
             break;
         case KEY_MOUSEWHEELRIGHT:
-            i_action = ACTIONID_JUMP_FORWARD_EXTRASHORT;
+            i_action = (i_mode == MOUSEWHEEL_VOLUME ) ?
+                        ACTIONID_JUMP_FORWARD_EXTRASHORT : ACTIONID_VOL_UP;
             break;
         case KEY_MENU:
             var_SetBool( libvlc, "intf-popupmenu", true );
@@ -971,6 +988,8 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
         default:
           return VLC_SUCCESS;
     }
+
+    if( i_mode == NO_MOUSEWHEEL ) return VLC_SUCCESS;
 
     if( i_action )
         return PutAction( p_intf, i_action );
