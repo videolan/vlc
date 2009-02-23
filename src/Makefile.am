@@ -161,6 +161,7 @@ AM_LDFLAGS += -avoid-version
 endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
+nodist_libvlccore_la_SOURCES = revision.c
 libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlccore` \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
@@ -467,6 +468,28 @@ SOURCES_libvlc_control = \
 	control/mediacontrol_util.c \
 	control/mediacontrol_audio_video.c \
 	control/media_discoverer.c
+
+###############################################################################
+# GIT revision
+###############################################################################
+
+BUILT_SOURCES += stamp-revision
+CLEANFILES += revision.txt revision.c
+
+revision.c: revision.txt
+	rm -f -- revision.c
+	echo -n "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
+		> revision.c
+
+revision.txt:
+	$(MAKE) stamp-revision
+	touch revision.txt
+
+stamp-revision:
+	rm -f -- revision.tmp
+	git describe --tags --long --always > revision.tmp
+	diff revision.tmp revision.txt >/dev/null 2>&1 || \
+	mv -f -- revision.tmp revision.txt
 
 ###############################################################################
 # Unit/regression test
