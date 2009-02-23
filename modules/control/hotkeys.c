@@ -192,7 +192,7 @@ static void Run( intf_thread_t *p_intf )
 
         /* Update the vout */
         p_last_vout = p_vout;
-        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+        p_vout = input_GetVout( p_input );
 
         /* Register OSD channels */
         if( p_vout && p_vout != p_last_vout )
