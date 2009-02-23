@@ -172,6 +172,7 @@
                 showMessagesPanel = id;
                 showVLM = id;
                 showWizard = id;
+                timeFieldWasClicked = id;
                 timesliderUpdate = id;
                 togglePlaylist = id;
                 viewAbout = id;

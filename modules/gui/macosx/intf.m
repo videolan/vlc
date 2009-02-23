@@ -1672,7 +1672,13 @@ static void * manage_cleanup( void * args )
 
             var_Get( p_input, "time", &time );
 
-            o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
+            mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
+            if( b_time_remaining && dur != -1 )
+            {
+                o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000))];
+            }
+            else
+                o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
 
             [o_timefield setStringValue: o_time];
             [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
@@ -1950,7 +1956,14 @@ end:
 
         var_Get( p_input, "time", &time );
 
-        o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
+        mtime_t dur = input_item_GetDuration( input_GetItem( p_input ) );
+        if( b_time_remaining && dur != -1 )
+        {
+            o_time = [NSString stringWithFormat: @"-%s", secstotimestr( psz_time, ((dur - time.i_time) / 1000000) )];
+        }
+        else
+            o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
+
         [o_timefield setStringValue: o_time];
         [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
         [o_embedded_window setTime: o_time position: f_updated];
@@ -1958,6 +1971,12 @@ end:
     }
     pl_Release( p_intf );
 }
+
+- (IBAction)timeFieldWasClicked:(id)sender
+{
+    b_time_remaining = !b_time_remaining;
+}
+    
 
 #pragma mark -
 #pragma mark Recent Items

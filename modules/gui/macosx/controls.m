@@ -1180,5 +1180,7 @@
 {
     if( [ourEvent clickCount] > 1 )
         [[[VLCMain sharedInstance] getControls] goToSpecificTime: nil];
+    else
+        [[VLCMain sharedInstance] timeFieldWasClicked: self];
 }
 @end

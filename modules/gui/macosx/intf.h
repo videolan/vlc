@@ -123,15 +123,16 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_vlm_loaded;        /* VLM Panel nibfile */
 
-    IBOutlet VLControllerWindow * o_window;       /* main window    */
-    IBOutlet NSView * o_playlist_view;/* playlist view  */
-    IBOutlet id o_scrollfield;  /* info field     */
-    IBOutlet NSTextField * o_timefield;    /* time field     */
-    IBOutlet NSSlider * o_timeslider;   /* time slider    */
-    IBOutlet VLCEmbeddedWindow * o_embedded_window; /* Embedded Vout Window */
-    float f_slider;             /* slider value   */
-    float f_slider_old;         /* old slider val */
-    IBOutlet NSSlider * o_volumeslider; /* volume slider  */
+    IBOutlet VLControllerWindow * o_window;                     /* main window */
+    IBOutlet NSView * o_playlist_view;                          /* playlist view  */
+    IBOutlet id o_scrollfield;                                  /* info field */
+    IBOutlet NSTextField * o_timefield;                         /* time field */
+    IBOutlet NSSlider * o_timeslider;                           /* time slider */
+    BOOL b_time_remaining;                                      /* show remaining time or playtime ? */
+    IBOutlet VLCEmbeddedWindow * o_embedded_window;             /* Embedded Vout Window */
+    float f_slider;                                             /* slider value */
+    float f_slider_old;                                         /* old slider val */
+    IBOutlet NSSlider * o_volumeslider;                         /* volume slider */
 
     IBOutlet NSView * toolbarMediaControl;   /* view with the controls */
 
@@ -378,6 +379,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 - (void)setSubmenusEnabled:(BOOL)b_enabled;
 - (void)manageVolumeSlider;
 - (IBAction)timesliderUpdate:(id)sender;
+- (IBAction)timeFieldWasClicked:(id)sender;
 
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)sender;
