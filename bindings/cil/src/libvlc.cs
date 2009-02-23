@@ -68,7 +68,7 @@ namespace VideoLAN.LibVLC
 
         [DllImport ("libvlc.dll", EntryPoint="libvlc_get_vlc_instance")]
         public static extern
-        SafeHandle GetVLCInstance (InstanceHandle h);
+        IntPtr GetVLCInstance (InstanceHandle h);
 
         /* media.c */
         [DllImport ("libvlc.dll", EntryPoint="libvlc_media_new")]
