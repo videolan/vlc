@@ -139,30 +139,12 @@ namespace VideoLAN.LibVLC
      */
     public abstract class EventingObject : BaseObject
     {
-        /**
-         * @brief Managed to unmanaged event handler mapping
-         * @ingroup Internals
-         *
-         * The CLR cannot do reference counting for unmanaged callbacks.
-         * We keep track of handled events here instead.
-         */
-        private class Event
-        {
-            public EventCallback managed;
-            public IntPtr        unmanaged;
-
-            public Event (EventCallback managed, IntPtr unmanaged)
-            {
-                this.managed = managed;
-                this.unmanaged = unmanaged;
-            }
-        };
-        private Dictionary<EventType, Event> events;
+        private Dictionary<Delegate, IntPtr> events;
         /**< references to our unmanaged function pointers */
 
         internal EventingObject () : base ()
         {
-            events = new Dictionary<EventType, Event> ();
+            events = new Dictionary<Delegate, IntPtr> ();
         }
 
         /**
@@ -187,19 +169,20 @@ namespace VideoLAN.LibVLC
          * @param callback callback to invoke when the event occurs
          *
          * @note
-         * For simplicity, we only allow one handler per type.
-         * Multicasting can be implemented higher up with managed code.
+         * For simplicity, we require distinct callbacks for each event type.
+         * This is hardly an issue since most events have different formats.
          */
-        internal void Attach (EventType type, EventCallback callback)
+        internal void Attach (EventType type, Delegate callback)
         {
             EventManagerHandle manager;
             IntPtr cb = Marshal.GetFunctionPointerForDelegate (callback);
-            Event ev = new Event (callback, cb);
             bool unref = false;
 
-            if (events.ContainsKey (type))
-                throw new ArgumentException ("Duplicate event");
-
+            /* If things go wrong, we will leak the callback thunk... until
+             * this object is destroyed anyway. If we added the thunk _after_
+             * the critical section, the native code could try to jump to a
+             * non-existent address, which is much worse. */
+            events.Add (callback, cb);
             try
             {
                 handle.DangerousAddRef (ref unref);
@@ -212,19 +195,19 @@ namespace VideoLAN.LibVLC
                     handle.DangerousRelease ();
             }
             Raise ();
-            events.Add (type, ev);
         }
 
-        private void Detach (EventType type, IntPtr callback)
+        internal void Detach (EventType type, Delegate callback)
         {
             EventManagerHandle manager;
+            IntPtr cb = events[callback];
             bool unref = false;
 
             try
             {
                 handle.DangerousAddRef (ref unref);
                 manager = GetManager ();
-                LibVLC.EventDetach (manager, type, callback, IntPtr.Zero, ex);
+                LibVLC.EventDetach (manager, type, cb, IntPtr.Zero, ex);
             }
             finally
             {
@@ -232,12 +215,7 @@ namespace VideoLAN.LibVLC
                     handle.DangerousRelease ();
             }
             Raise ();
-            events.Remove (type);
-        }
-
-        internal void Detach (EventType type)
-        {
-            Detach(type, events[type].unmanaged);
+            events.Remove (callback);
         }
     };
 };
