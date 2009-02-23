@@ -1143,9 +1143,11 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     QLineEdit *actionSearch = new QLineEdit;*/
 
     table = new QTreeWidget;
-    table->setColumnCount(2);
+    table->setColumnCount(3);
     table->headerItem()->setText( 0, qtr( "Action" ) );
     table->headerItem()->setText( 1, qtr( "Shortcut" ) );
+    table->headerItem()->setText( 2, qtr( "Global" ) );
+    table->setAlternatingRowColors( true );
 
     shortcutValue = new KeyShortcutEdit;
     shortcutValue->setReadOnly(true);
@@ -1177,8 +1179,6 @@ void KeySelectorControl::finish()
         label->setToolTip( formatTooltip( qtr( p_item->psz_longtext ) ) );
 
     /* Fill the table */
-    table->setColumnCount( 2 );
-    table->setAlternatingRowColors( true );
 
     /* Get the main Module */
     module_t *p_main = module_get_main();
@@ -1197,6 +1197,7 @@ void KeySelectorControl::finish()
         /* If we are a key option not empty */
         if( p_item->i_type & CONFIG_ITEM && p_item->psz_name
             && strstr( p_item->psz_name , "key-" )
+            && !strstr( p_item->psz_name , "global-key" )
             && !EMPTY_STR( p_item->psz_text ) )
         {
             /*
@@ -1213,6 +1214,21 @@ void KeySelectorControl::finish()
             treeItem->setText( 1, VLCKeyToString( p_item->value.i ) );
             treeItem->setData( 1, Qt::UserRole, QVariant( p_item->value.i ) );
             table->addTopLevelItem( treeItem );
+            continue;
+        }
+
+        if( p_item->i_type & CONFIG_ITEM && p_item->psz_name
+                && strstr( p_item->psz_name , "global-key" )
+                && !EMPTY_STR( p_item->psz_text ) )
+        {
+            QList<QTreeWidgetItem *> list =
+                table->findItems( qtr( p_item->psz_text ), Qt::MatchExactly );
+            if( list.count() > 1 )
+            {
+                list[0]->setText( 2, VLCKeyToString( p_item->value.i ) );
+                list[0]->setData( 2, Qt::UserRole,
+                                  QVariant( p_item->value.i ) );
+            }
         }
     }
     module_config_free (p_config);
