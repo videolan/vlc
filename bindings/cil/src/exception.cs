@@ -101,14 +101,9 @@ namespace VideoLAN.LibVLC
         int code;
         IntPtr message;
 
-        [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_init")]
-        private static extern void Init (NativeException e);
-        [DllImport ("libvlc.dll", EntryPoint="libvlc_exception_clear")]
-        private static extern void Clear (NativeException e);
-
         public NativeException ()
         {
-            Init (this);
+            LibVLC.ExceptionInit (this);
         }
 
         /**
@@ -130,7 +125,7 @@ namespace VideoLAN.LibVLC
             }
             finally
             {
-                Clear (this);
+                LibVLC.ExceptionClear (this);
             }
         }
 
@@ -148,7 +143,7 @@ namespace VideoLAN.LibVLC
 
         private void Dispose (bool disposing)
         {
-            Clear (this);
+            LibVLC.ExceptionClear (this);
         }
     };
 };

@@ -98,15 +98,12 @@ namespace VideoLAN.LibVLC
      */
     internal class MemoryHandle : NonNullHandle
     {
-        [DllImport ("libvlc.dll", EntryPoint="libvlc_free")]
-        private static extern void Free (IntPtr ptr);
-
         /**
          * NonNullHandle.Destroy
          */
         protected override void Destroy ()
         {
-            Free (handle);
+            LibVLC.Free (handle);
         }
     };
 
