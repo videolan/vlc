@@ -30,10 +30,14 @@ namespace VideoLAN.LibVLC.Test
     {
         private static void DumpMedia (Media m)
         {
-            Console.WriteLine ("Media at    {0}", m.Location);
-            Console.WriteLine (" duration:  {0}µs", m.Duration);
-            Console.WriteLine (" preparsed: {0}", m.IsPreparsed);
-            Console.WriteLine (" state:     {0}", m.State);
+            Console.WriteLine ("Media: {0} {1} (duration: {2}, {3}preparsed)",
+                               m.State, m.Location, m.Duration,
+                               m.IsPreparsed ? "" : "not ");
+        }
+
+        private static void WriteMediaState (Media m, State s)
+        {
+            Console.WriteLine (" -> {0}", s);
         }
 
         private static void DumpPlayer (Player p)
@@ -69,6 +73,7 @@ namespace VideoLAN.LibVLC.Test
 
                 DumpMedia (media);
                 DumpMedia ((Media)media.Clone ());
+                media.StateChanged += WriteMediaState;
 
                 player.Play ();
                 do

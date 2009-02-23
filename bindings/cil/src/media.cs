@@ -43,6 +43,30 @@ namespace VideoLAN.LibVLC
     };
 
     /**
+     * @brief MetaType: type of a media meta-information entry
+     */
+    public enum MetaType
+    {
+        Title,
+        Artist,
+        Genre,
+        Copyright,
+        Album,
+        TrackNumber,
+        Description,
+        Rating,
+        Date,
+        Setting,
+        URL,
+        Language,
+        NowPlaying,
+        Publisher,
+        EncodedBy,
+        ArtworkURL,
+        TrackID,
+    };
+
+    /**
      * @brief State: media/player state
      *
      * Media and Player objects are always in one of these state.
@@ -59,6 +83,45 @@ namespace VideoLAN.LibVLC
         Ended, /**< Played until the end */
         Error, /**< Failed */
     };
+
+    /* Media events */
+    [StructLayout (LayoutKind.Sequential)]
+    internal sealed class MediaMetaEvent : GenericEvent
+    {
+        public MetaType metaType;
+    };
+    internal delegate void MediaMetaCallback (MediaMetaEvent e, IntPtr d);
+
+    /*[StructLayout (LayoutKind.Sequential)]
+    internal sealed class MediaSubitemEvent : GenericEvent
+    {
+        public IntPtr child; -- MediaHandle
+    };*/
+
+    [StructLayout (LayoutKind.Sequential)]
+    internal sealed class MediaDurationEvent : GenericEvent
+    {
+        public long duration;
+    };
+    internal delegate void MediaDurationCallback (MediaDurationEvent e,
+                                                  IntPtr d);
+
+    [StructLayout (LayoutKind.Sequential)]
+    internal sealed class MediaPreparseEvent : GenericEvent
+    {
+        public int status;
+    };
+    internal delegate void MediaPreparseCallback (MediaPreparseEvent e,
+                                                  IntPtr d);
+
+    /* media_freed -> bad idea w.r.t. the GC */
+
+    [StructLayout (LayoutKind.Sequential)]
+    internal sealed class MediaStateEvent : GenericEvent
+    {
+        public State state;
+    };
+    internal delegate void MediaStateCallback (MediaStateEvent e, IntPtr d);
 
     /**
      * @brief Media: a source media
@@ -87,6 +150,35 @@ namespace VideoLAN.LibVLC
 
             handle = LibVLC.MediaCreate (instance.Handle, umrl, ex);
             Raise ();
+            Attach ();
+        }
+
+        private Media (MediaHandle handle)
+        {
+            this.handle = handle;
+            Attach ();
+        }
+
+        /**
+         * Duplicates a media object.
+         */
+        public object Clone ()
+        {
+            return new Media (LibVLC.MediaDuplicate (Handle));
+        }
+
+        private void Attach ()
+        {
+            Attach (EventType.MediaMetaChanged,
+                    new MediaMetaCallback (MetaCallback));
+            //Attach (EventType.MediaSubItemAdded, SubItemAdded);
+            Attach (EventType.MediaDurationChanged,
+                    new MediaDurationCallback (DurationCallback));
+            /*Attach (EventType.MediaPreparsedChanged,
+                    new MediaPreparseCallback (PreparseCallback));*/
+            /* MediaFreed: better not... */
+            Attach (EventType.MediaStateChanged,
+                    new MediaStateCallback (StateCallback));
         }
 
         /**
@@ -128,17 +220,9 @@ namespace VideoLAN.LibVLC
             }
         }
 
-        private Media (MediaHandle handle)
+        public override string ToString ()
         {
-            this.handle = handle;
-        }
-
-        /**
-         * Duplicates a media object.
-         */
-        public object Clone ()
-        {
-            return new Media (LibVLC.MediaDuplicate (Handle));
+            return Location;
         }
 
         /**
@@ -152,6 +236,14 @@ namespace VideoLAN.LibVLC
                 Raise ();
                 return ret;
             }
+        }
+
+        public delegate void StateChange (Media media, State state);
+        public event StateChange StateChanged;
+        private void StateCallback (MediaStateEvent ev, IntPtr data)
+        {
+            if (StateChanged != null)
+                StateChanged (this, ev.state);
         }
 
         internal override EventManagerHandle GetManager ()
@@ -174,6 +266,14 @@ namespace VideoLAN.LibVLC
             }
         }
 
+        public delegate void DurationChange (Media media, long duration);
+        public event DurationChange DurationChanged;
+        private void DurationCallback (MediaDurationEvent ev, IntPtr data)
+        {
+            if (DurationChanged != null)
+                DurationChanged (this, ev.duration);
+        }
+
         /**
          * Whether the media was "preparsed". If true, the meta-infos were
          * extracted, even before the media was played. This is normally only
@@ -187,6 +287,14 @@ namespace VideoLAN.LibVLC
                 Raise ();
                 return preparsed != 0;
             }
+        }
+
+        public delegate void PreparseChange (Media media, bool preparsed);
+        public event PreparseChange PreparseChanged;
+        private void PreparseCallback (MediaPreparseEvent ev, IntPtr data)
+        {
+            if (PreparseChanged != null)
+                PreparseChanged (this, ev.status != 0);
         }
     };
 };
