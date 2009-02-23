@@ -75,6 +75,13 @@ namespace VideoLAN.LibVLC.Test
                 DumpMedia ((Media)media.Clone ());
                 media.StateChanged += WriteMediaState;
 
+                /*foreach (MetaType type in Enum.GetValues (typeof (MetaType)))
+                {
+                    string meta = media.GetMeta (type);
+                    if (meta != null)
+                        Console.WriteLine (" {0}: {1}", type, meta);
+                }*/
+
                 player.Play ();
                 do
                 {

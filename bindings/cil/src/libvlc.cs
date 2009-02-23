@@ -118,10 +118,10 @@ namespace VideoLAN.LibVLC
         public static extern
         MediaHandle MediaDuplicate (MediaHandle media);
 
-        /*[DllImport (lib, EntryPoint="libvlc_media_read_meta")]
+        [DllImport (lib, EntryPoint="libvlc_media_get_meta")]
         public static extern
-        MediaHandle MediaDuplicate (MediaHandle media, int type,
-                                    NativeException ex);*/
+        StringHandle MediaGetMeta (MediaHandle media, MetaType type,
+                                   NativeException ex);
 
         [DllImport (lib, EntryPoint="libvlc_media_get_state")]
         public static extern

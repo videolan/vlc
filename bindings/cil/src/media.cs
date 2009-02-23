@@ -226,6 +226,25 @@ namespace VideoLAN.LibVLC
         }
 
         /**
+         * @param type meta data type
+         * @return the meta data value, or @a null if unknown
+         */
+        public string GetMeta (MetaType type)
+        {
+            StringHandle str = LibVLC.MediaGetMeta (Handle, type, ex);
+            Raise ();
+            return str.Transform ();
+        }
+
+        public delegate void MetaChange (Media media, MetaType type);
+        public event MetaChange MetaChanged;
+        private void MetaCallback (MediaMetaEvent ev, IntPtr data)
+        {
+            if (MetaChanged != null)
+                MetaChanged (this, ev.metaType);
+        }
+
+        /**
          * Current state of the media.
          */
         public State State
