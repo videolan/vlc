@@ -1164,7 +1164,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     gLayout->addWidget( shortcutValue, 3, 1, 1, 2 );
     gLayout->addWidget( setButton, 3, 3, 1, 1 );
 
-    l->addWidget( keyContainer, line, 0, 1, 2 );
+    l->addWidget( keyContainer, line, 0, 1, -1 );
 
     CONNECT( clearButton, clicked(), shortcutValue, clear() );
     CONNECT( clearButton, clicked(), this, setTheKey() );
