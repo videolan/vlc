@@ -35,7 +35,7 @@ vlc_static_LDADD = $(vlc_LDADD)
 vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
 
 if HAVE_WIN32
-vlc_LDADD += vlc_win32_rc.$(OBJEXT)
+vlc_LDADD += -lwininet vlc_win32_rc.$(OBJEXT)
 vlc_DEPENDENCIES += vlc_win32_rc.$(OBJEXT)
 endif
 

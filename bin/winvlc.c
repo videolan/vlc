@@ -39,6 +39,8 @@
 #   define  _WIN32_IE 0x500
 #   include <shlobj.h>
 #   include <tlhelp32.h>
+#   include <wininet.h>
+static void check_crashdump();
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
 #endif
 
@@ -136,6 +138,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     libvlc_exception_init (&dummy);
 
 #if !defined( UNDER_CE ) && defined ( NDEBUG )
+    check_crashdump();
     SetUnhandledExceptionFilter(vlc_exception_filter);
 #endif
 
@@ -162,26 +165,76 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 
 #if !defined( UNDER_CE ) && defined ( NDEBUG )
+
+static void get_crashdump_path(wchar_t * wdir)
+{
+    if( S_OK != SHGetFolderPathW( NULL,
+                        CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                        NULL, SHGFP_TYPE_CURRENT, wdir ) )
+        fprintf( stderr, "Can't open the vlc conf PATH\n" );
+
+    swprintf( wdir+wcslen( wdir ), L"%s", L"\\vlc\\crashdump" );
+}
+
+static void check_crashdump()
+{
+    wchar_t * wdir = (wchar_t *)malloc(sizeof(wchar_t)*MAX_PATH);
+    get_crashdump_path(wdir);
+
+    FILE * fd = _wfopen ( wdir, L"r, ccs=UTF-8" );
+    if( fd )
+    {
+        fclose( fd );
+        int answer = MessageBox( NULL, L"VLC media player just crashed." \
+        " Do you want to send a bug report to the developers team?",
+        L"VLC crash reporting", MB_YESNO);
+
+        if(answer == IDYES)
+        {
+            HINTERNET Hint = InternetOpen(L"VLC Crash Reporter", INTERNET_OPEN_TYPE_PRECONFIG, NULL,NULL,0);
+            if(Hint)
+            {
+                HINTERNET ftp = InternetConnect(Hint, L"crash.videolan.org", INTERNET_DEFAULT_FTP_PORT,
+                                                NULL, NULL, INTERNET_SERVICE_FTP, 0, 0);
+                if(ftp)
+                {
+                    SYSTEMTIME now;
+                    GetSystemTime(&now);
+                    wchar_t remote_file[MAX_PATH];
+                    swprintf( remote_file, L"/crashs/%04d%02d%02d%02d%02d%02d",now.wYear,
+                            now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond  );
+
+                    FtpPutFile( ftp, wdir, remote_file, FTP_TRANSFER_TYPE_BINARY, 0);
+                    InternetCloseHandle(ftp);
+                }
+                else
+                    fprintf(stderr,"Can't connect to FTP server%d\n",GetLastError());
+                InternetCloseHandle(Hint);
+            }
+        }
+
+        _wremove(wdir);
+    }
+    free((void *)wdir);
+}
+
 /*****************************************************************************
  * vlc_exception_filter: handles unhandled exceptions, like segfaults
  *****************************************************************************/
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
 {
-    wchar_t wdir[MAX_PATH];
-
     fprintf( stderr, "unhandled vlc exception\n" );
 
-    if( S_OK != SHGetFolderPathW( NULL,
-                         CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                  NULL, SHGFP_TYPE_CURRENT, wdir ) )
-            fprintf( stderr, "Can't open the vlc conf PATH\n" );
-
-    swprintf( wdir+wcslen( wdir ), L"%s", L"\\vlc\\crashdump" );
-
+    wchar_t * wdir = (wchar_t *)malloc(sizeof(wchar_t)*MAX_PATH);
+    get_crashdump_path(wdir);
     FILE * fd = _wfopen ( wdir, L"w, ccs=UTF-8" );
+    free((void *)wdir);
 
     if( !fd )
+    {
         fprintf( stderr, "\nerror while opening file" );
+        exit( 1 );
+    }
 
     OSVERSIONINFO osvi;
     ZeroMemory( &osvi, sizeof(OSVERSIONINFO) );
