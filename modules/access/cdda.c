@@ -117,10 +117,6 @@ struct access_sys_t
     int         i_track;
     int         i_first_sector;
     int         i_last_sector;
-
-#ifdef HAVE_LIBCDDB
-    cddb_disc_t *p_disc;
-#endif
 };
 
 static block_t *Block( access_t * );
@@ -130,7 +126,7 @@ static int      Control( access_t *, int, va_list );
 static int GetTracks( access_t *p_access, input_item_t *p_current );
 
 #ifdef HAVE_LIBCDDB
-static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors );
+static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors );
 #endif
 
 /*****************************************************************************
@@ -397,22 +393,22 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     input_item_SetName( p_current, "Audio CD" );
 
 #ifdef HAVE_LIBCDDB
-    GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
+    cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     const char *psz_album = NULL;
     const char *psz_year = NULL;
     const char *psz_genre = NULL;
     char psz_year_buffer[4+1];
 
-    if( p_sys->p_disc )
+    if( p_disc )
     {
-        psz_album = cddb_disc_get_title( p_sys->p_disc );
+        psz_album = cddb_disc_get_title( p_disc );
         if( psz_album && *psz_album )
         {
             input_item_SetName( p_current, psz_album );
             input_item_SetAlbum( p_current, psz_album );
         }
 
-        const unsigned i_year = cddb_disc_get_year( p_sys->p_disc );
+        const unsigned i_year = cddb_disc_get_year( p_disc );
         if( i_year > 0 )
         {
             psz_year = psz_year_buffer;
@@ -420,7 +416,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
             input_item_SetDate( p_current, psz_year );
         }
 
-        psz_genre = cddb_disc_get_genre( p_sys->p_disc );
+        psz_genre = cddb_disc_get_genre( p_disc );
         if( psz_genre && *psz_genre )
             input_item_SetGenre( p_current, psz_genre );
 
@@ -428,7 +424,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         const char *psz_artist = NULL;
         for( int i = 0; i < i_titles; i++ )
         {
-            cddb_track_t *t = cddb_disc_get_track( p_sys->p_disc, i );
+            cddb_track_t *t = cddb_disc_get_track( p_disc, i );
             if( !t )
                 continue;
             const char *psz_track_artist = cddb_track_get_artist( t );
@@ -486,9 +482,9 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 
 #ifdef HAVE_LIBCDDB
         /* If we have CDDB info, change the name */
-        if( p_sys->p_disc )
+        if( p_disc )
         {
-            cddb_track_t *t = cddb_disc_get_track( p_sys->p_disc, i );
+            cddb_track_t *t = cddb_disc_get_track( p_disc, i );
             if( t != NULL )
             {
                 const char *psz_title = cddb_track_get_title( t );
@@ -522,27 +518,33 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );
     }
+
+#ifdef HAVE_LIBCDDB
+    if( p_disc )
+        cddb_disc_destroy( p_disc );
+#endif
     return VLC_SUCCESS;
 }
 
 #ifdef HAVE_LIBCDDB
-static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
+static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
 {
-    int i, i_matches;
-    int64_t  i_length = 0, i_size = 0;
-    cddb_conn_t  *p_cddb = cddb_new();
-
+    /* */
+    cddb_conn_t *p_cddb = cddb_new();
     if( !p_cddb )
     {
         msg_Warn( p_access, "unable to use CDDB" );
-        goto cddb_destroy;
+        return NULL;
     }
 
-    char* psz_tmp = config_GetPsz( p_access, "cddb-server" );
-    cddb_set_email_address( p_cddb, "vlc@videolan.org" );
+    /* */
+    char *psz_tmp = config_GetPsz( p_access, "cddb-server" );
     cddb_set_server_name( p_cddb, psz_tmp );
-    cddb_set_server_port( p_cddb, config_GetInt( p_access, "cddb-port" ) );
     free( psz_tmp );
+
+    cddb_set_server_port( p_cddb, config_GetInt( p_access, "cddb-port" ) );
+
+    cddb_set_email_address( p_cddb, "vlc@videolan.org" );
 
     /// \todo
     cddb_cache_disable( p_cddb );
@@ -556,47 +558,52 @@ static void GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
     /// \todo
     cddb_http_disable( p_cddb);
 
-    p_access->p_sys->p_disc = cddb_disc_new();
-
-    if(! p_access->p_sys->p_disc )
+    /* */
+    cddb_disc_t *p_disc = cddb_disc_new();
+    if( !p_disc )
     {
         msg_Err( p_access, "unable to create CDDB disc structure." );
-        goto cddb_end;
+        goto error;
     }
 
-    for(i = 0; i < i_titles ; i++ )
+    int64_t i_length = 0;
+    for( int i = 0; i < i_titles; i++ )
     {
         cddb_track_t *t = cddb_track_new();
-        cddb_track_set_frame_offset(t, p_sectors[i] );
-        cddb_disc_add_track( p_access->p_sys->p_disc, t );
-        i_size = ( p_sectors[i+1] - p_sectors[i] ) *
-                   (int64_t)CDDA_DATA_SIZE;
+        cddb_track_set_frame_offset( t, p_sectors[i] );
+        cddb_disc_add_track( p_disc, t );
+        const int64_t i_size = ( p_sectors[i+1] - p_sectors[i] ) *
+                               (int64_t)CDDA_DATA_SIZE;
         i_length += INT64_C(1000000) * i_size / 44100 / 4  ;
     }
 
-    cddb_disc_set_length( p_access->p_sys->p_disc, (int)(i_length/1000000) );
+    cddb_disc_set_length( p_disc, (int)(i_length/1000000) );
 
-    if (!cddb_disc_calc_discid(p_access->p_sys->p_disc ))
+    if( !cddb_disc_calc_discid( p_disc ) )
     {
         msg_Err( p_access, "CDDB disc ID calculation failed" );
-        goto cddb_destroy;
+        goto error;
     }
 
-    i_matches = cddb_query( p_cddb, p_access->p_sys->p_disc);
-
-    if (i_matches > 0)
+    const int i_matches = cddb_query( p_cddb, p_disc );
+    if( i_matches <= 0 )
     {
-        if (i_matches > 1)
-             msg_Warn( p_access, "found %d matches in CDDB. Using first one.",
-                                 i_matches);
-        cddb_read( p_cddb, p_access->p_sys->p_disc );
-    }
-    else
         msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno));
+        goto error;
+    }
 
-cddb_destroy:
+    if( i_matches > 1 )
+        msg_Warn( p_access, "found %d matches in CDDB. Using first one.", i_matches );
+    cddb_read( p_cddb, p_disc );
+
     cddb_destroy( p_cddb);
+    return p_disc;
 
-cddb_end: ;
+error:
+    if( p_disc )
+        cddb_disc_destroy( p_disc );
+    cddb_destroy( p_cddb );
+    return NULL;
 }
 #endif /*HAVE_LIBCDDB*/
+
