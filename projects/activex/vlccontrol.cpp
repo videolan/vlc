@@ -203,10 +203,12 @@ STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
         result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
+            libvlc_playlist_lock( p_libvlc );
             if( libvlc_playlist_isplaying(p_libvlc, NULL) )
                 *isPlaying = VARIANT_TRUE;
             else
                 *isPlaying = VARIANT_FALSE;
+            libvlc_playlist_unlock( p_libvlc );
             return NOERROR;
         }
     }
@@ -354,7 +356,11 @@ STDMETHODIMP VLCControl::fullscreen(void)
         result = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(result) )
         {
-            if( libvlc_playlist_isplaying(p_libvlc, NULL) )
+            bool b_playing;
+            libvlc_playlist_lock( p_libvlc );
+            b_playing = libvlc_playlist_isplaying(p_libvlc, NULL);
+            libvlc_playlist_unlock( p_libvlc );
+            if( b_playing )
             {
                 libvlc_media_player_t *p_md =
                     libvlc_playlist_get_media_player(p_libvlc, NULL);

@@ -1706,15 +1706,18 @@ STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
+        libvlc_playlist_lock( p_libvlc );
         *isPlaying = libvlc_playlist_isplaying(p_libvlc, &ex) ?
                                     VARIANT_TRUE: VARIANT_FALSE;
         if( libvlc_exception_raised(&ex) )
         {
+            libvlc_playlist_unlock( p_libvlc );
             _p_instance->setErrorInfo(IID_IVLCPlaylist,
                          libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
+        libvlc_playlist_unlock( p_libvlc );
         return NOERROR;
     }
     return hr;
