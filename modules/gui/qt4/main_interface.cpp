@@ -359,7 +359,7 @@ void MainInterface::showCryptedLabel( bool )
     if( cryptedLabel == NULL )
     {
         cryptedLabel = new QLabel;
-        cryptedLabel->setPixmap( QPixmap( ":/eject" ) );
+        cryptedLabel->setPixmap( QPixmap( ":/lock" ) );
         statusBar()->addWidget( cryptedLabel );
     }
 
