@@ -236,9 +236,10 @@ int InitGLX13( vout_thread_t *p_vout )
     int i_nbelem;
     GLXFBConfig *p_fbconfs, fbconf;
     XVisualInfo *p_vi;
-    int p_attr[] = { GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5,
-                     GLX_BLUE_SIZE, 5, GLX_DOUBLEBUFFER, True,
-                     GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, None, };
+    static const int p_attr[] = {
+        GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5, GLX_BLUE_SIZE, 5,
+        GLX_DOUBLEBUFFER, True, GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, None,
+    };
 
     /* Get the FB configuration */
     p_fbconfs = glXChooseFBConfig( p_sys->p_display, 0, p_attr, &i_nbelem );
