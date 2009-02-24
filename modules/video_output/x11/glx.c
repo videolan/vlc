@@ -238,7 +238,9 @@ int InitGLX13( vout_thread_t *p_vout )
     XVisualInfo *p_vi;
     static const int p_attr[] = {
         GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5, GLX_BLUE_SIZE, 5,
-        GLX_DOUBLEBUFFER, True, GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT, None,
+        GLX_DOUBLEBUFFER, True, GLX_X_RENDERABLE, True,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        None,
     };
 
     /* Get the FB configuration */
