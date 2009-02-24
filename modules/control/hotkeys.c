@@ -192,7 +192,7 @@ static void Run( intf_thread_t *p_intf )
 
         /* Update the vout */
         p_last_vout = p_vout;
-        p_vout = input_GetVout( p_input );
+        p_vout = p_input ? input_GetVout( p_input ) : NULL;
 
         /* Register OSD channels */
         if( p_vout && p_vout != p_last_vout )
