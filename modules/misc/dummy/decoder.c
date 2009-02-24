@@ -117,6 +117,8 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     p_dec->pf_decode_sub = (subpicture_t *(*)(decoder_t *, block_t **))
         DecodeBlock;
 
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+
     return VLC_SUCCESS;
 }
 
