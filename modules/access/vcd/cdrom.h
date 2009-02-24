@@ -95,3 +95,8 @@ void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
 int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
 int       ioctl_ReadSectors  ( vlc_object_t *, const vcddev_t *,
                                int, uint8_t *, int, int );
+
+/* CDDA only
+ * The track 0 is for album meta data */
+int       ioctl_GetCdText( vlc_object_t *, const vcddev_t *,
+                           vlc_meta_t ***ppp_tracks, int *pi_tracks );

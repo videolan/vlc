@@ -102,6 +102,14 @@ typedef struct __RAW_READ_INFO {
     ULONG SectorCount;
     TRACK_MODE_TYPE TrackMode;
 } RAW_READ_INFO, *PRAW_READ_INFO;
+typedef struct _CDROM_READ_TOC_EX {
+  UCHAR  Format : 4;
+  UCHAR  Reserved1 : 3;
+  UCHAR  Msf : 1;
+  UCHAR  SessionTrack;
+  UCHAR  Reserved2;
+  UCHAR  Reserved3;
+} CDROM_READ_TOC_EX, *PCDROM_READ_TOC_EX;
 
 #ifndef IOCTL_CDROM_BASE
 #    define IOCTL_CDROM_BASE FILE_DEVICE_CD_ROM
@@ -114,6 +122,12 @@ typedef struct __RAW_READ_INFO {
 #define IOCTL_CDROM_RAW_READ CTL_CODE(IOCTL_CDROM_BASE, 0x000F, \
                                       METHOD_OUT_DIRECT, FILE_READ_ACCESS)
 #endif
+#define IOCTL_CDROM_READ_TOC_EX CTL_CODE(IOCTL_CDROM_BASE, 0x0015, \
+                                         METHOD_BUFFERED, FILE_READ_ACCESS)
+
+
+#define MINIMUM_CDROM_READ_TOC_EX_SIZE    2
+#define CDROM_READ_TOC_EX_FORMAT_CDTEXT   0x05
 
 /* Win32 aspi specific */
 #define WIN_NT               ( GetVersion() < 0x80000000 )
