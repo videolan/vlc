@@ -94,7 +94,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
     /*
      *  Initialize structure with default values
      */
-    p_vcddev = (vcddev_t *)malloc( sizeof(vcddev_t) );
+    p_vcddev = malloc( sizeof(*p_vcddev) );
     if( p_vcddev == NULL )
         return NULL;
     p_vcddev->i_vcdimage_handle = -1;
@@ -207,11 +207,11 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         if( pp_sectors )
         {
-            *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+            *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
                 return 0;
             memcpy( *pp_sectors, p_vcddev->p_sectors,
-                    (i_tracks + 1) * sizeof(int) );
+                    (i_tracks + 1) * sizeof(**pp_sectors) );
         }
 
         return i_tracks;
@@ -243,7 +243,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             CDTOCDescriptor *pTrackDescriptors;
             u_char track;
 
-            *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+            *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
             {
                 darwin_freeTOC( pTOC );
@@ -348,7 +348,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                               ((unsigned int)p_tocheader[1] << 8);
 
                 p_fulltoc = malloc( i_toclength );
-                *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+                *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
 
                 if( *pp_sectors == NULL || p_fulltoc == NULL )
                 {
@@ -414,7 +414,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             {
                 int i;
 
-                *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+                *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
                 if( *pp_sectors == NULL )
                     return 0;
 
@@ -447,7 +447,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         {
              int i;
 
-             *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+             *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
              if( *pp_sectors == NULL )
                  return 0;
 
@@ -502,7 +502,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         {
             int i;
 
-            *pp_sectors = malloc( (i_tracks + 1) * sizeof(int) );
+            *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
                 return 0;
 
@@ -539,8 +539,10 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
     uint8_t *p_block;
     int i;
 
-    if( i_type == VCD_TYPE ) p_block = malloc( VCD_SECTOR_SIZE * i_nb );
-    else p_block = p_buffer;
+    if( i_type == VCD_TYPE )
+        p_block = malloc( VCD_SECTOR_SIZE * i_nb );
+    else
+        p_block = p_buffer;
 
     if( p_vcddev->i_vcdimage_handle != -1 )
     {
@@ -933,7 +935,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
             p_sectors = buf;
             p_sectors[i_tracks] = MSF_TO_LBA(i_min, i_sec, i_frame);
             msg_Dbg( p_this, "vcd track %i begins at sector:%i",
-                     i_tracks, p_sectors[i_tracks] );
+                     (int)i_tracks, (int)p_sectors[i_tracks] );
             i_tracks++;
             break;
         }
@@ -947,7 +949,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     p_sectors[i_tracks] = lseek(p_vcddev->i_vcdimage_handle, 0, SEEK_END)
                                  / VCD_SECTOR_SIZE;
     msg_Dbg( p_this, "vcd track %i, begins at sector:%i",
-             i_tracks, p_sectors[i_tracks] );
+             (int)i_tracks, (int)p_sectors[i_tracks] );
     p_vcddev->i_tracks = ++i_tracks;
     p_vcddev->p_sectors = p_sectors;
     i_ret = 0;
@@ -966,6 +968,7 @@ error:
  ****************************************************************************/
 static void CloseVCDImage( vlc_object_t * p_this, vcddev_t *p_vcddev )
 {
+    VLC_UNUSED( p_this );
     if( p_vcddev->i_vcdimage_handle != -1 )
         close( p_vcddev->i_vcdimage_handle );
     else
@@ -1060,7 +1063,7 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
         buf_len = CFDataGetLength( data ) + 1;
         range = CFRangeMake( 0, buf_len );
 
-        if( ( pTOC = (CDTOC *)malloc( buf_len ) ) != NULL )
+        if( ( pTOC = malloc( buf_len ) ) != NULL )
         {
             CFDataGetBytes( data, range, (u_char *)pTOC );
         }
