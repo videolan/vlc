@@ -166,7 +166,8 @@ DEPS_res = \
 	pixmaps/types/type_node.png \
 	pixmaps/types/type_playlist.png \
 	pixmaps/types/type_unknown.xpm \
-	pixmaps/update.png
+	pixmaps/update.png \
+	pixmaps/lock.png
 
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 

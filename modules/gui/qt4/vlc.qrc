@@ -90,5 +90,6 @@
   <file alias="space">pixmaps/space.png</file>
   <file>pixmaps/go-next.png</file>
   <file alias="new.png">pixmaps/profile_new.png</file>
+  <file alias="lock">pixmaps/lock.png</file>
  </qresource>
 </RCC>
