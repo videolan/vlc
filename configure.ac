@@ -890,8 +890,8 @@ then
       MINIZIP_LIBS="-lminizip -lz"
     ], [
       have_minizip=no
-      MINIZIP_CFLAGS="-I../../../@top_srcdir@//libs/unzip"
-      MINIZIP_LIBS="../../../libs/unzip/libunzip.la"
+      MINIZIP_CFLAGS="-I\\\${top_srcdir}/libs/unzip"
+      MINIZIP_LIBS="\\\${top_builddir}/libs/unzip/libunzip.la"
     ])
   ])
   VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
@@ -5472,14 +5472,14 @@ AC_ARG_ENABLE(loader,
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
-    VLC_ADD_CPPFLAGS([dmo],[-I../../../@top_srcdir@/libs/loader])
-    VLC_ADD_LIBS([dmo],[../../../libs/loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([quicktime],[-I../../@top_srcdir@/libs/loader])
-    VLC_ADD_LIBS([quicktime],[../../libs/loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([realaudio],[-I../../@top_srcdir@/libs/loader -DLOADER])
-    VLC_ADD_LIBS([realaudio],[../../libs/loader/libloader.la])
-    VLC_ADD_CPPFLAGS([realvideo],[-I../../@top_srcdir@/libs/loader -DLOADER])
-    VLC_ADD_LIBS([realvideo],[../../libs/loader/libloader.la])
+    VLC_ADD_CPPFLAGS([dmo],[-I\\\${top_srcdir}/libs/loader])
+    VLC_ADD_LIBS([dmo],[\\\${top_builddir}/libs/loader/libloader.la -lpthread])
+    VLC_ADD_CPPFLAGS([quicktime],[-I\\\${top_srcdir}/libs/loader])
+    VLC_ADD_LIBS([quicktime],[\\\${top_builddir}/libs/loader/libloader.la -lpthread])
+    VLC_ADD_CPPFLAGS([realaudio],[-I\\\${top_srcdir}/libs/loader -DLOADER])
+    VLC_ADD_LIBS([realaudio],[\\\${top_builddir}/libs/loader/libloader.la])
+    VLC_ADD_CPPFLAGS([realvideo],[-I\\\${top_srcdir}/libs/loader -DLOADER])
+    VLC_ADD_LIBS([realvideo],[\\\${top_builddir}/libs/loader/libloader.la])
   ])
 
 AC_ARG_WITH(,[Components:])
@@ -5852,7 +5852,7 @@ AC_SUBST(VERSION_EXTRA_RC)
 dnl
 dnl  Handle substvars that use $(top_srcdir)
 dnl
-VLC_CONFIG="top_builddir=\"\$(top_builddir)\" \$(top_builddir)/vlc-config"
+VLC_CONFIG="top_srcdir=\"\$(top_srcdir)\" top_builddir=\"\$(top_builddir)\" \$(top_builddir)/vlc-config"
 AC_SUBST(VLC_CONFIG)
 CPPFLAGS_save="-I\$(top_srcdir)/include -I\$(top_builddir)/include ${CPPFLAGS_save}"
 

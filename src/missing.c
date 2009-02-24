@@ -81,7 +81,7 @@ httpd_handler_t *httpd_HandlerNew (httpd_host_t *host, const char *url,
                                    httpd_handler_callback_t cb,
                                    httpd_handler_sys_t *data)
 {
-    (void) host; (void) url; (void) content_type;
+    (void) host; (void) url;
     (void) login; (void) password; (void) acl;
     (void) cb; (void) data;
     assert (0);
