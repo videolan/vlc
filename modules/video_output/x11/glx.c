@@ -243,10 +243,9 @@ int InitGLX13( vout_thread_t *p_vout )
 
     /* Get the FB configuration */
     p_fbconfs = glXChooseFBConfig( p_sys->p_display, 0, p_attr, &i_nbelem );
-    if( !p_fbconfs || (i_nbelem <= 0) )
+    if( p_fbconfs == NULL )
     {
         msg_Err( p_vout, "Cannot get FB configurations");
-        if( p_fbconfs ) XFree( p_fbconfs );
         return VLC_EGENERIC;
     }
     fbconf = p_fbconfs[0];
