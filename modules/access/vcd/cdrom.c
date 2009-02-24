@@ -184,6 +184,7 @@ void ioctl_Close( vlc_object_t * p_this, vcddev_t *p_vcddev )
     if( p_vcddev->i_device_handle != -1 )
         close( p_vcddev->i_device_handle );
 #endif
+    free( p_vcddev );
 }
 
 /*****************************************************************************
