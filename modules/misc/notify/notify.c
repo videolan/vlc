@@ -1,7 +1,7 @@
 /*****************************************************************************
  * notify.c : libnotify notification plugin
  *****************************************************************************
- * Copyright (C) 2006-2007 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Mutricy <xtophe -at- videolan -dot- org>
@@ -70,7 +70,7 @@ vlc_module_begin ()
     set_shortname( N_( "Notify" ) )
     set_description( N_("LibNotify Notification Plugin") )
 
-    add_integer( "notify-timeout", 4000,NULL,
+    add_integer( "notify-timeout", 4000, NULL,
                 TIMEOUT_TEXT, TIMEOUT_LONGTEXT, true )
 
     set_capability( "interface", 0 )
@@ -215,11 +215,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
     else /* else we show state-of-the art logo */
     {
-        const char *data_path = config_GetDataDir ();
-        char buf[strlen (data_path) + sizeof ("/vlc48x48.png")];
-
-        snprintf (buf, sizeof (buf), "%s/vlc48x48.png", data_path);
-        pix = gdk_pixbuf_new_from_file( buf, &p_error );
+        char *psz_pixbuf;
+        if( asprintf( &psz_pixbuf, "%s/vlc48x48.png", config_GetDataDir() ) >= 0 )
+        {
+            pix = gdk_pixbuf_new_from_file( psz_pixbuf, &p_error );
+            free( psz_pixbuf );
+        }
     }
 
     /* we need to replace '&' with '&amp;' because '&' is a keyword of
