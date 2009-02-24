@@ -86,7 +86,7 @@ AUTOMAKE_OPTIONS = \
 ChangeLog: Makefile.am
 	rm -f -- "$@"
 	cd doc && $(MAKE) $(AM_MAKEFLAGS) changelogs
-	ln -sf doc/ChangeLog-2008 "$@"
+	ln -sf doc/ChangeLog-2009 "$@"
 
 ###############################################################################
 # MacOS X project
