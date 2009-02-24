@@ -186,14 +186,6 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
     if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
     i_last_separator = i;
 
-    /* vlc_object_find is needed because of the dialogs provider case */
-    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INTF,
-                                                FIND_PARENT );
-    if( p_object != NULL )
-    {
-        /* Nothing for now */
-        vlc_object_release( p_object );
-    }
 
     /* Build menu */
     vector<MenuItemExt*> popup_menu;
@@ -438,14 +430,17 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
 
     AppendMenu( hMenu, MF_STRING, ID_PREFERENCES, _T("&Preferences...") );
 
-    p_object = (vlc_object_t *)
-        vlc_object_find( p_intf, VLC_OBJECT_INTF, FIND_PARENT );
+	/* Other interfaces */
+    /*FIXME: copy the Qt way of mapping menus and objects */
+    /*p_object = (vlc_object_t *) NULL;
+        //vlc_object_find_name( p_intf, "wince", FIND_PARENT );
     if( p_object != NULL )
     {
         ppsz_varnames[i] = "intf-add";
         pi_objects[i++] = p_object;
         vlc_object_release( p_object );
-    }
+    }*/
+
 
     /* Build menu */
     RefreshMenu( p_intf, p_intf->p_sys->p_settings_menu, hMenu, i,
