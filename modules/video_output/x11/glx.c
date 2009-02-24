@@ -244,7 +244,7 @@ int InitGLX13( vout_thread_t *p_vout )
     };
 
     /* Get the FB configuration */
-    p_fbconfs = glXChooseFBConfig( p_sys->p_display, 0, p_attr, &i_nbelem );
+    p_fbconfs = glXChooseFBConfig( p_sys->p_display, p_sys->i_screen, p_attr, &i_nbelem );
     if( p_fbconfs == NULL )
     {
         msg_Err( p_vout, "Cannot get FB configurations");
