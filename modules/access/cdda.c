@@ -392,36 +392,35 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 
     input_item_SetName( p_current, "Audio CD" );
 
-#ifdef HAVE_LIBCDDB
-    cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     const char *psz_album = NULL;
     const char *psz_year = NULL;
     const char *psz_genre = NULL;
+    const char *psz_artist = NULL;
+    const char *psz_description = NULL;
     char psz_year_buffer[4+1];
 
+/* Return true if the given string is not NULL and not empty */
+#define NONEMPTY( psz ) ( (psz) && *(psz) )
+/* If the given string is NULL or empty, fill it by the return value of 'code' */
+#define ON_EMPTY( psz, code ) do { if( !NONEMPTY( psz) ) { (psz) = code; } } while(0)
+
+    /* Retreive CDDB informations */
+#ifdef HAVE_LIBCDDB
+    cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     if( p_disc )
     {
         psz_album = cddb_disc_get_title( p_disc );
-        if( psz_album && *psz_album )
-        {
-            input_item_SetName( p_current, psz_album );
-            input_item_SetAlbum( p_current, psz_album );
-        }
+        psz_genre = cddb_disc_get_genre( p_disc );
 
+        /* */
         const unsigned i_year = cddb_disc_get_year( p_disc );
         if( i_year > 0 )
         {
             psz_year = psz_year_buffer;
             snprintf( psz_year_buffer, sizeof(psz_year_buffer), "%u", i_year );
-            input_item_SetDate( p_current, psz_year );
         }
 
-        psz_genre = cddb_disc_get_genre( p_disc );
-        if( psz_genre && *psz_genre )
-            input_item_SetGenre( p_current, psz_genre );
-
         /* Set artist only if unique */
-        const char *psz_artist = NULL;
         for( int i = 0; i < i_titles; i++ )
         {
             cddb_track_t *t = cddb_disc_get_track( p_disc, i );
@@ -436,14 +435,30 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
             }
             psz_artist = psz_track_artist;
         }
-        if( psz_artist && *psz_artist )
-            input_item_SetArtist( p_current, psz_artist );
-
-        const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i_titles] - p_sys->p_sectors[0] ) *
-                                   CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
-        input_item_SetDuration( p_current, i_duration );
     }
 #endif
+
+    if( NONEMPTY( psz_album ) )
+    {
+        input_item_SetName( p_current, psz_album );
+        input_item_SetAlbum( p_current, psz_album );
+    }
+
+    if( NONEMPTY( psz_genre ) )
+        input_item_SetGenre( p_current, psz_genre );
+
+    if( NONEMPTY( psz_artist ) )
+        input_item_SetArtist( p_current, psz_artist );
+
+    if( NONEMPTY( psz_year ) )
+        input_item_SetDate( p_current, psz_year );
+
+    if( NONEMPTY( psz_description ) )
+        input_item_SetDescription( p_current, psz_description );
+
+    const mtime_t i_duration = (int64_t)( p_sys->p_sectors[i_titles] - p_sys->p_sectors[0] ) *
+                               CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
+    input_item_SetDuration( p_current, i_duration );
 
     /* Build title table */
     for( int i = 0; i < i_titles; i++ )
@@ -480,35 +495,51 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         input_item_AddOption( p_input_item, psz_last, VLC_INPUT_OPTION_TRUSTED );
         input_item_AddOption( p_input_item, psz_opt, VLC_INPUT_OPTION_TRUSTED );
 
+        const char *psz_track_title = NULL;
+        const char *psz_track_artist = NULL;
+        const char *psz_track_genre = NULL;
+        const char *psz_track_description = NULL;
+
 #ifdef HAVE_LIBCDDB
-        /* If we have CDDB info, change the name */
+        /* Retreive CDDB informations */
         if( p_disc )
         {
             cddb_track_t *t = cddb_disc_get_track( p_disc, i );
             if( t != NULL )
             {
-                const char *psz_title = cddb_track_get_title( t );
-                const char *psz_artist = cddb_track_get_artist( t );
-
-                if( psz_title )
-                {
-                    input_item_SetName( p_input_item, psz_title );
-                    input_item_SetTitle( p_input_item, psz_title );
-                }
-                if( psz_artist )
-                    input_item_SetArtist( p_input_item, psz_artist );
+                psz_track_title = cddb_track_get_title( t );
+                psz_track_artist = cddb_track_get_artist( t );
             }
-
-            if( psz_album && *psz_album )
-                input_item_SetAlbum( p_input_item, psz_album );
-
-            if( psz_year )
-                input_item_SetDate( p_input_item, psz_year );
-
-            if( psz_genre && *psz_genre )
-                input_item_SetGenre( p_input_item, psz_genre );
         }
 #endif
+
+        /* */
+        ON_EMPTY( psz_track_artist,       psz_artist );
+        ON_EMPTY( psz_track_genre,        psz_genre );
+        ON_EMPTY( psz_track_description,  psz_description );
+
+        /* */
+        if( NONEMPTY( psz_track_title ) )
+        {
+            input_item_SetName( p_input_item, psz_track_title );
+            input_item_SetTitle( p_input_item, psz_track_title );
+        }
+
+        if( NONEMPTY( psz_track_artist ) )
+            input_item_SetArtist( p_input_item, psz_track_artist );
+
+        if( NONEMPTY( psz_track_genre ) )
+            input_item_SetGenre( p_input_item, psz_track_genre );
+
+        if( NONEMPTY( psz_track_description ) )
+            input_item_SetDescription( p_input_item, psz_track_description );
+
+        if( NONEMPTY( psz_album ) )
+            input_item_SetAlbum( p_input_item, psz_album );
+
+        if( NONEMPTY( psz_year ) )
+            input_item_SetDate( p_input_item, psz_year );
+
         char psz_num[3+1];
         snprintf( psz_num, sizeof(psz_num), "%d", 1+i );
         input_item_SetTrackNum( p_input_item, psz_num );
@@ -518,6 +549,9 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );
     }
+#undef ON_EMPTY
+#undef NONEMPTY
+
 
 #ifdef HAVE_LIBCDDB
     if( p_disc )
