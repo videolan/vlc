@@ -390,6 +390,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         return VLC_EGENERIC;;
     }
 
+    /* */
     input_item_SetName( p_current, "Audio CD" );
 
     const char *psz_album = NULL;
@@ -437,6 +438,27 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         }
     }
 #endif
+
+    /* */
+    vlc_meta_t **pp_cd_text;
+    int        i_cd_text;
+
+    if( ioctl_GetCdText( VLC_OBJECT(p_access), p_sys->vcddev, &pp_cd_text, &i_cd_text ) )
+    {
+        msg_Dbg( p_access, "CD-TEXT information missing" );
+        i_cd_text = 0;
+        pp_cd_text = NULL;
+    }
+
+    /* Retreive CD-TEXT informations but prefer CDDB */
+    if( i_cd_text > 0 && pp_cd_text[0] )
+    {
+        const vlc_meta_t *p_disc = pp_cd_text[0];
+        ON_EMPTY( psz_album,       vlc_meta_Get( p_disc, vlc_meta_Album ) );
+        ON_EMPTY( psz_genre,       vlc_meta_Get( p_disc, vlc_meta_Genre ) );
+        ON_EMPTY( psz_artist,      vlc_meta_Get( p_disc, vlc_meta_Artist ) );
+        ON_EMPTY( psz_description, vlc_meta_Get( p_disc, vlc_meta_Description ) );
+    }
 
     if( NONEMPTY( psz_album ) )
     {
@@ -513,6 +535,17 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         }
 #endif
 
+        /* Retreive CD-TEXT informations but prefer CDDB */
+        if( i+1 < i_cd_text && pp_cd_text[i+1] )
+        {
+            const vlc_meta_t *t = pp_cd_text[i+1];
+
+            ON_EMPTY( psz_track_title,       vlc_meta_Get( t, vlc_meta_Title ) );
+            ON_EMPTY( psz_track_artist,      vlc_meta_Get( t, vlc_meta_Artist ) );
+            ON_EMPTY( psz_track_genre,       vlc_meta_Get( t, vlc_meta_Genre ) );
+            ON_EMPTY( psz_track_description, vlc_meta_Get( t, vlc_meta_Description ) );
+        }
+
         /* */
         ON_EMPTY( psz_track_artist,       psz_artist );
         ON_EMPTY( psz_track_genre,        psz_genre );
@@ -552,6 +585,15 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 #undef ON_EMPTY
 #undef NONEMPTY
 
+    /* */
+    for( int i = 0; i < i_cd_text; i++ )
+    {
+        vlc_meta_t *p_meta = pp_cd_text[i];
+        if( !p_meta )
+            continue;
+        vlc_meta_Delete( p_meta );
+    }
+    free( pp_cd_text );
 
 #ifdef HAVE_LIBCDDB
     if( p_disc )
