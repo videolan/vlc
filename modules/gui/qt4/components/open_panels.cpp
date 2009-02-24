@@ -210,6 +210,7 @@ void FileOpenPanel::accept()
 {
     //FIXME
  //   p_intf->p_sys->psz_filepath = qtu( dialogBox->directory().absolutePath() );
+    ui.fileListWidg->clear();
 }
 
 /* Function called by Open Dialog when clicked on cancel */
