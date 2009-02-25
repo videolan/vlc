@@ -173,9 +173,10 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     playlist_t* p_playlist = (playlist_t*) p_this;
     char *psz_buf = NULL;
     input_thread_t *p_input;
+    bool b_is_item_current = !strncmp( "item-current", psz_var, 12 );
 
     /* Don't update Telepathy presence each time an item has been preparsed */
-    if( !strncmp( "item-current", psz_var, 16 ) )
+    if( b_is_item_current )
     { /* stores the current input item id */
         p_intf->p_sys->i_id = newval.i_int;
         p_intf->p_sys->i_item_changes = 0;
@@ -209,7 +210,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         }
     }
 
-    if( !strncmp( "item-current", psz_var, 16 ) )
+    if( b_is_item_current )
         var_AddCallback( p_input, "state", StateChange, p_intf );
 
     /* We format the string to be displayed */
