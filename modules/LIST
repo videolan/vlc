@@ -19,6 +19,7 @@ $Id$
  * access_jack: JACK audio input module
  * access_mmap: mmap file access
  * access_mms: MMS over TCP, UDP and HTTP access module
+ * access_mtp: MTP access module
  * access_oss: OSS access module
  * access_output_dummy: dummy access_output module
  * access_output_file: File access_output module
@@ -200,6 +201,7 @@ $Id$
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
  * mpgv: MPEG-I/II Video demuxer
  * msn: announce currently playing stream to MSN
+ * mtp: MTP interface module
  * mux_asf: ASF muxer
  * mux_avi: AVI muxer
  * mux_dummy: dummy muxer
@@ -278,6 +280,7 @@ $Id$
  * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
  * sharpen: Sharpen video filter
+ * shine: MP3 encoder using Shine, a fixed point implementation
  * shout: Shoutcast services discovery
  * showintf: shows the main interface
  * signals: POSIX signals handling interface
@@ -361,6 +364,7 @@ $Id$
  * wince: Pocket PC interface
  * wingapi: Win CE video output
  * wingdi: WIN 32 / WIN CE GDI video output
+ * wma_fixed: wma decoder using integer decoder from Rockbox
  * x11: video output module using the X11 API
  * x264: H264 video decoder using X264
  * xa: XA demuxer
