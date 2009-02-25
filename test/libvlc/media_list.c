@@ -115,7 +115,7 @@ static void test_media_list (const char ** argv, int argc)
     p_non_exist = libvlc_media_list_item_at_index (ml, -1, &ex);
     assert (have_exception ());
 
-    md4 = libvlc_media_new (vlc, "/dev/dsp", &ex);
+    md4 = libvlc_media_new (vlc, "/dev/null", &ex);
     catch ();
 
     /* try to find non inserted item */
