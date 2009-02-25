@@ -270,6 +270,35 @@ static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
     pl_Release( ((vlc_object_t*) p) );
 }
 
+static gboolean
+can_support_actions ()
+{
+    static gboolean supports_actions = FALSE;
+    static gboolean have_checked = FALSE;
+
+    if( !have_checked ) {
+        GList *caps = NULL;
+        GList *c;
+
+        have_checked = TRUE;
+
+        caps = notify_get_server_caps ();
+        if( caps != NULL ) {
+            for( c = caps; c != NULL; c = c->next ) {
+                if( strcmp( (char*)c->data, "actions" ) == 0 ) {
+                    supports_actions = TRUE;
+                    break;
+                }
+            }
+        }
+
+	g_list_foreach( caps, (GFunc)g_free, NULL );
+	g_list_free( caps );
+    }
+
+    return supports_actions;
+}
+
 static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
                    intf_thread_t *p_intf )
 {
@@ -294,11 +323,13 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
         gdk_pixbuf_unref( pix );
     }
 
-    /* Adds previous and next buttons in the notification */
-    notify_notification_add_action( notification, "previous", _("Previous"), Prev,
-                                    (gpointer*) p_intf, NULL );
-    notify_notification_add_action( notification, "next", _("Next"), Next,
-                                    (gpointer*) p_intf, NULL );
+    /* Adds previous and next buttons in the notification if actions are supported. */
+    if( can_support_actions() ) {
+      notify_notification_add_action( notification, "previous", _("Previous"), Prev,
+				      (gpointer*) p_intf, NULL );
+      notify_notification_add_action( notification, "next", _("Next"), Next,
+				      (gpointer*) p_intf, NULL );
+    }
 
     notify_notification_show( notification, NULL);
 
