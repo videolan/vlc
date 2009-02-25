@@ -1217,6 +1217,10 @@ static const char *const ppsz_albumart_descriptions[] =
 #define SLOWER_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback.")
 #define RATE_NORMAL_KEY_TEXT N_("Normal rate")
 #define RATE_NORMAL_KEY_LONGTEXT N_("Select the hotkey to set the playback rate back to normal.")
+#define RATE_FASTER_FINE_KEY_TEXT N_("Faster (fine)")
+#define RATE_FASTER_FINE_KEY_LONGTEXT N_("Select the hotkey to use for fast forward playback.")
+#define RATE_SLOWER_FINE_KEY_TEXT N_("Slower (fine)")
+#define RATE_SLOWER_FINE_KEY_LONGTEXT N_("Select the hotkey to use for slow motion playback.")
 #define NEXT_KEY_TEXT N_("Next")
 #define NEXT_KEY_LONGTEXT N_("Select the hotkey to use to skip to the next item in the playlist.")
 #define PREV_KEY_TEXT N_("Previous")
@@ -2117,6 +2121,8 @@ vlc_module_begin ()
 #   define KEY_FASTER             KEY_MODIFIER_COMMAND|'='
 #   define KEY_SLOWER             KEY_MODIFIER_COMMAND|'-'
 #   define KEY_RATE_NORMAL        KEY_UNSET
+#   define KEY_RATE_FASTER_FINE   KEY_UNSET
+#   define KEY_RATE_SLOWER_FINE   KEY_UNSET
 #   define KEY_NEXT               KEY_MODIFIER_COMMAND|KEY_RIGHT
 #   define KEY_PREV               KEY_MODIFIER_COMMAND|KEY_LEFT
 #   define KEY_STOP               KEY_MODIFIER_COMMAND|'.'
@@ -2229,6 +2235,8 @@ vlc_module_begin ()
 #   define KEY_FASTER             '+'
 #   define KEY_SLOWER             '-'
 #   define KEY_RATE_NORMAL        KEY_UNSET
+#   define KEY_RATE_FASTER_FINE   KEY_UNSET
+#   define KEY_RATE_SLOWER_FINE   KEY_UNSET
 #   define KEY_NEXT               'n'
 #   define KEY_PREV               'p'
 #   define KEY_STOP               's'
@@ -2351,6 +2359,10 @@ vlc_module_begin ()
              SLOWER_KEY_LONGTEXT, false )
     add_key( "key-rate-normal", KEY_RATE_NORMAL, NULL, RATE_NORMAL_KEY_TEXT,
              RATE_NORMAL_KEY_LONGTEXT, false )
+    add_key( "key-rate-faster-fine", KEY_RATE_FASTER_FINE, NULL, RATE_FASTER_FINE_KEY_TEXT,
+             RATE_FASTER_FINE_KEY_LONGTEXT, false )
+    add_key( "key-rate-slower-fine", KEY_RATE_SLOWER_FINE, NULL, RATE_SLOWER_FINE_KEY_TEXT,
+             RATE_SLOWER_FINE_KEY_LONGTEXT, false )
     add_key( "key-next", KEY_NEXT, NULL, NEXT_KEY_TEXT,
              NEXT_KEY_LONGTEXT, false )
     add_key( "key-prev", KEY_PREV, NULL, PREV_KEY_TEXT,
@@ -2694,6 +2706,8 @@ const struct hotkey libvlc_hotkeys[] =
     { "key-faster", ACTIONID_FASTER, 0, },
     { "key-slower", ACTIONID_SLOWER, 0, },
     { "key-rate-normal", ACTIONID_RATE_NORMAL, 0, },
+    { "key-rate-faster-fine", ACTIONID_RATE_FASTER_FINE, 0, },
+    { "key-rate-slower-fine", ACTIONID_RATE_SLOWER_FINE, 0, },
     { "key-toggle-fullscreen", ACTIONID_TOGGLE_FULLSCREEN, 0, },
     { "key-leave-fullscreen", ACTIONID_LEAVE_FULLSCREEN, 0, },
     { "key-vol-up", ACTIONID_VOL_UP, 0, },

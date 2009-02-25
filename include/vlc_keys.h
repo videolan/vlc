@@ -345,6 +345,8 @@ typedef enum vlc_key {
     ACTIONID_SCALE_DOWN,
     /* */
     ACTIONID_RATE_NORMAL,
+    ACTIONID_RATE_SLOWER_FINE,
+    ACTIONID_RATE_FASTER_FINE,
 
 } vlc_key_t;
 #endif

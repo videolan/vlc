@@ -39,6 +39,7 @@
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
 #include "vlc_keys.h"
+#include "math.h"
 
 #define BUFFER_SIZE 10
 
@@ -773,7 +774,34 @@ static void Run( intf_thread_t *p_intf )
             {
                 var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
-                                 _("1x") );
+                                 _("1.00x") );
+            }
+            else if( i_action == ACTIONID_RATE_FASTER_FINE ||
+                     i_action == ACTIONID_RATE_SLOWER_FINE )
+            {
+                /* The playback rate is defined by INPUT_RATE_DEFAULT / "rate"
+                 * and we want to increase/decrease it by 0.1 while making sure
+                 * that the resulting playback rate is a multiple of 0.1
+                 */
+                int i_rate = var_GetInteger( p_input, "rate" );
+                if( i_rate == 0 )
+                    i_rate = INPUT_RATE_MIN;
+                int i_sign = i_rate < 0 ? -1 : 1;
+                const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
+
+                const double f_speed = floor( ( (double)INPUT_RATE_DEFAULT / abs(i_rate) + 0.05 ) / 0.1 + i_dir ) * 0.1;
+                if( f_speed <= (double)INPUT_RATE_DEFAULT / INPUT_RATE_MAX ) /* Needed to avoid infinity */
+                    i_rate = INPUT_RATE_MAX;
+                else
+                    i_rate = INPUT_RATE_DEFAULT / f_speed + 0.5;
+
+                i_rate = i_sign * __MIN( __MAX( i_rate, INPUT_RATE_MIN ), INPUT_RATE_MAX );
+
+                var_SetInteger( p_input, "rate", i_rate );
+
+                char psz_msg[7+1];
+                snprintf( psz_msg, sizeof(psz_msg), _("%.2fx"), (double)INPUT_RATE_DEFAULT / i_rate );
+                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, psz_msg );
             }
             else if( i_action == ACTIONID_POSITION && b_seekable )
             {
