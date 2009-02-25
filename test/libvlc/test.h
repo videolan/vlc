@@ -62,7 +62,8 @@ static const char * test_defaults_args[] = {
 static const int test_defaults_nargs =
     sizeof (test_defaults_args) / sizeof (test_defaults_args[0]);
 
-static const char * test_default_sample = "samples/test.sample";
+/*static const char test_default_sample[] = "samples/test.sample";*/
+static const char test_default_sample[] = SRCDIR"/samples/empty.voc";
 
 
 /*********************************************************************

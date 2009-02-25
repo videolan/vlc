@@ -18,6 +18,7 @@ EXTRA_PROGRAMS = \
 	test_libvlc_meta \
 	$(NULL)
 #check_DATA = samples/test.sample samples/meta.sample
+EXTRA_DIST = samples/empty.voc
 
 check_HEADERS = libvlc/test.h
 
@@ -36,7 +37,7 @@ samples/meta.sample:
 	mkdir -p `dirname $@`
 	curl $(SAMPLES_SERVER)/metadata/id3tag/Wesh-Bonneville.mp3 > $@
 
-CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc`
+CFLAGS_tests = `$(VLC_CONFIG) --cflags libvlc` -DSRCDIR=\"$(srcdir)\"
 
 test_libvlc_core_SOURCES = libvlc/core.c
 test_libvlc_core_LDADD = $(top_builddir)/src/libvlc.la
