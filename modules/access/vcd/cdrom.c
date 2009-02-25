@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <limits.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -208,7 +209,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 
         if( pp_sectors )
         {
-            *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
+            *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
                 return 0;
             memcpy( *pp_sectors, p_vcddev->p_sectors,
@@ -244,7 +245,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             CDTOCDescriptor *pTrackDescriptors;
             u_char track;
 
-            *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
+            *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
             {
                 darwin_freeTOC( pTOC );
@@ -349,7 +350,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                               ((unsigned int)p_tocheader[1] << 8);
 
                 p_fulltoc = malloc( i_toclength );
-                *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
+                *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
 
                 if( *pp_sectors == NULL || p_fulltoc == NULL )
                 {
@@ -415,7 +416,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             {
                 int i;
 
-                *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
+                *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
                 if( *pp_sectors == NULL )
                     return 0;
 
@@ -448,7 +449,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         {
              int i;
 
-             *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
+             *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
              if( *pp_sectors == NULL )
                  return 0;
 
@@ -503,7 +504,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         {
             int i;
 
-            *pp_sectors = malloc( (i_tracks + 1) * sizeof(**pp_sectors) );
+            *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
             if( *pp_sectors == NULL )
                 return 0;
 
@@ -914,7 +915,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
      * about the cuefile */
     size_t i_tracks = 0;
 
-    while( fgets( line, 1024, cuefile ) )
+    while( fgets( line, 1024, cuefile ) && i_tracks < INT_MAX-1 )
     {
         /* look for a TRACK line */
         char psz_dummy[9];
@@ -930,7 +931,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
                          &i_min, &i_sec, &i_frame ) != 4) || (i_num != 1) )
                 continue;
 
-            int *buf = realloc (p_sectors, (i_tracks + 1) * sizeof (int));
+            int *buf = realloc (p_sectors, (i_tracks + 1) * sizeof (*buf));
             if (buf == NULL)
                 goto error;
             p_sectors = buf;
@@ -943,7 +944,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     }
 
     /* fill in the last entry */
-    int *buf = realloc (p_sectors, (i_tracks + 1) * sizeof (int));
+    int *buf = realloc (p_sectors, (i_tracks + 1) * sizeof (*buf));
     if (buf == NULL)
         goto error;
     p_sectors = buf;
