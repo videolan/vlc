@@ -1,7 +1,7 @@
 /*****************************************************************************
  * export.c :  Playlist export module
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -47,13 +47,13 @@ vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_EXPORT )
     add_submodule ()
-        set_description( N_("M3U playlist exporter") )
+        set_description( N_("M3U playlist export") )
         add_shortcut( "export-m3u" )
         set_capability( "playlist export" , 0 )
         set_callbacks( Export_M3U , NULL )
 
     add_submodule ()
-        set_description( N_("Old playlist exporter") )
+        set_description( N_("Old playlist export") )
         add_shortcut( "export-old" )
         set_capability( "playlist export" , 0 )
         set_callbacks( Export_Old , NULL )
