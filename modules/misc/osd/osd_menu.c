@@ -49,16 +49,11 @@ osd_menu_t *osd_MenuNew( osd_menu_t *p_menu, const char *psz_path,
 {
     if( !p_menu ) return NULL;
 
-    p_menu->p_state = (osd_menu_state_t *) malloc( sizeof( osd_menu_state_t ) );
+    p_menu->p_state = calloc( 1, sizeof( osd_menu_state_t ) );
     if( !p_menu->p_state )
         return NULL;
 
-    memset(p_menu->p_state, 0, sizeof(osd_menu_state_t));
-    if( psz_path != NULL )
-        p_menu->psz_path = strdup( psz_path );
-    else
-        p_menu->psz_path = NULL;
-
+    p_menu->psz_path = psz_path ? strdup( psz_path ) : NULL;
     p_menu->i_x = i_x;
     p_menu->i_y = i_y;
     p_menu->i_style = OSD_MENU_STYLE_SIMPLE;
@@ -89,11 +84,10 @@ void osd_MenuFree( osd_menu_t *p_menu )
 osd_button_t *osd_ButtonNew( const char *psz_action, int i_x, int i_y )
 {
     osd_button_t *p_button = NULL;
-    p_button = (osd_button_t*) malloc( sizeof(osd_button_t) );
+    p_button = calloc( 1, sizeof(osd_button_t) );
     if( !p_button )
         return NULL;
 
-    memset( p_button, 0, sizeof(osd_button_t) );
     p_button->psz_action = strdup(psz_action);
     p_button->psz_action_down = NULL;
     p_button->p_feedback = NULL;
@@ -186,7 +180,6 @@ void osd_ButtonFree( osd_menu_t *p_menu, osd_button_t *p_button )
             osd_StatesFree( p_menu, p_button->p_states );
 
         free( p_button );
-        p_button = NULL;
     }
 }
 
@@ -199,11 +192,10 @@ osd_state_t *osd_StateNew( osd_menu_t *p_menu, const char *psz_file,
     osd_state_t *p_state = NULL;
     video_format_t fmt_in, fmt_out;
 
-    p_state = (osd_state_t*) malloc( sizeof(osd_state_t) );
+    p_state = calloc( 1, sizeof(osd_state_t) );
     if( !p_state )
         return NULL;
 
-    memset( p_state, 0, sizeof(osd_state_t) );
     memset( &fmt_in, 0, sizeof(video_format_t) );
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
@@ -282,6 +274,6 @@ void osd_StatesFree( osd_menu_t *p_menu, osd_state_t *p_states )
         }
         free( p_state->psz_state );
         free( p_states );
-        p_states = NULL;
     }
 }
+
