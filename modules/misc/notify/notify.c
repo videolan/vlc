@@ -73,6 +73,7 @@ struct intf_sys_t
 {
     NotifyNotification *notification;
     vlc_mutex_t     lock;
+    bool            b_has_actions;
 };
 
 /*****************************************************************************
@@ -81,7 +82,6 @@ struct intf_sys_t
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t   *p_intf = (intf_thread_t *)p_this;
-    playlist_t      *p_playlist;
     intf_sys_t      *p_sys  = malloc( sizeof( *p_sys ) );
 
     if( !p_sys )
@@ -97,8 +97,25 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_sys->lock );
     p_sys->notification = NULL;
+    p_sys->b_has_actions = false;
 
-    p_playlist = pl_Hold( p_intf );
+    GList *p_caps = notify_get_server_caps ();
+    if( p_caps )
+    {
+        for( GList *c = p_caps; c != NULL; c = c->next )
+        {
+            if( !strcmp( (char*)c->data, "actions" ) )
+            {
+                p_sys->b_has_actions = true;
+                break;
+            }
+        }
+        g_list_foreach( p_caps, (GFunc)g_free, NULL );
+        g_list_free( p_caps );
+    }
+
+    /* */
+    playlist_t *p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
     pl_Release( p_intf );
 
@@ -266,46 +283,19 @@ static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
     pl_Release( ((vlc_object_t*) p) );
 }
 
-static gboolean
-can_support_actions ()
-{
-    static gboolean supports_actions = FALSE;
-    static gboolean have_checked = FALSE;
-
-    if( !have_checked ) {
-        GList *caps = NULL;
-        GList *c;
-
-        have_checked = TRUE;
-
-        caps = notify_get_server_caps ();
-        if( caps != NULL ) {
-            for( c = caps; c != NULL; c = c->next ) {
-                if( strcmp( (char*)c->data, "actions" ) == 0 ) {
-                    supports_actions = TRUE;
-                    break;
-                }
-            }
-        }
-
-	g_list_foreach( caps, (GFunc)g_free, NULL );
-	g_list_free( caps );
-    }
-
-    return supports_actions;
-}
-
 static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
                    intf_thread_t *p_intf )
 {
+    intf_sys_t *p_sys = p_intf->p_sys;
+
     NotifyNotification * notification;
-    GError *p_error = NULL;
 
     /* Close previous notification if still active */
-    if( p_intf->p_sys->notification )
+    if( p_sys->notification )
     {
-        notify_notification_close( p_intf->p_sys->notification, &p_error );
-        g_object_unref( p_intf->p_sys->notification );
+        GError *p_error = NULL;
+        notify_notification_close( p_sys->notification, &p_error );
+        g_object_unref( p_sys->notification );
     }
 
     notification = notify_notification_new( _("Now Playing"),
@@ -320,17 +310,18 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     }
 
     /* Adds previous and next buttons in the notification if actions are supported. */
-    if( can_support_actions() ) {
+    if( p_sys->b_has_actions )
+    {
       notify_notification_add_action( notification, "previous", _("Previous"), Prev,
-				      (gpointer*) p_intf, NULL );
+				                      (gpointer*)p_intf, NULL );
       notify_notification_add_action( notification, "next", _("Next"), Next,
-				      (gpointer*) p_intf, NULL );
+				                      (gpointer*)p_intf, NULL );
     }
 
     notify_notification_show( notification, NULL);
 
     /* Stores the notification to be able to close it */
-    p_intf->p_sys->notification = notification;
+    p_sys->notification = notification;
     return VLC_SUCCESS;
 }
 
