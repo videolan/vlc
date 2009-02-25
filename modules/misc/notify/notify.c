@@ -135,7 +135,11 @@ static void Close( vlc_object_t *p_this )
     pl_Release( p_this );
 
     if( p_sys->notification )
+    {
+        GError *p_error = NULL;
+        notify_notification_close( p_sys->notification, &p_error );
         g_object_unref( p_sys->notification );
+    }
 
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
@@ -169,7 +173,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
-    /*Wait a tad so the meta has been fetched*/
+
+    /* Wait a tad so the meta has been fetched
+     * FIXME that's awfully wrong */
     msleep( 1000*4 );
 
     /* Playing something ... */
@@ -215,21 +221,20 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     free( psz_album );
 
     GdkPixbuf *pix = NULL;
-    GError *p_error = NULL;
-
     psz_arturl = input_item_GetArtURL( p_input_item );
     vlc_object_release( p_input );
 
     if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
                 strlen( psz_arturl ) > 7 )
     { /* scale the art to show it in notify popup */
-        gboolean b = TRUE;
-        pix = gdk_pixbuf_new_from_file_at_scale(
-                (psz_arturl + 7), 72, 72, b, &p_error );
+        GError *p_error = NULL;
+        pix = gdk_pixbuf_new_from_file_at_scale( &psz_arturl[7],
+                                                 72, 72, TRUE, &p_error );
         free( psz_arturl );
     }
     else /* else we show state-of-the art logo */
     {
+        GError *p_error = NULL;
         char *psz_pixbuf;
         if( asprintf( &psz_pixbuf, "%s/vlc48x48.png", config_GetDataDir() ) >= 0 )
         {
@@ -240,18 +245,19 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     /* we need to replace '&' with '&amp;' because '&' is a keyword of
      * notification-daemon parser */
-    int i_notify, i_len, i;
-    i_len = strlen( psz_tmp );
-    i_notify = 0;
-    for( i = 0; ( ( i < i_len ) && ( i_notify < ( MAX_LENGTH - 5 ) ) ); i++ )
+    const int i_len = strlen( psz_tmp );
+    int i_notify = 0;
+    for( int i = 0; i < i_len && i_notify < ( MAX_LENGTH - 5 ); i++ )
     { /* we use MAX_LENGTH - 5 because if the last char of psz_tmp is '&'
        * we will need 5 more characters: 'amp;\0' .
        * however that's unlikely to happen because the last char is '\0' */
         if( psz_tmp[i] != '&' )
+        {
             psz_notify[i_notify] = psz_tmp[i];
+        }
         else
         {
-            snprintf( psz_notify + i_notify, 6, "&amp;" );
+            snprintf( &psz_notify[i_notify], 6, "&amp;" );
             i_notify += 4;
         }
         i_notify++;
@@ -269,20 +275,24 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
 static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
 { /* libnotify callback, called when the "Next" button is pressed */
+    vlc_object_t *p_object = (vlc_object_t*)p;
+
     VLC_UNUSED(psz);
-    notify_notification_close (notification, NULL);
-    playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p) );
+    notify_notification_close( notification, NULL );
+    playlist_t *p_playlist = pl_Hold( p_object );
     playlist_Next( p_playlist );
-    pl_Release( ((vlc_object_t*) p) );
+    pl_Release( p_object );
 }
 
 static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
 { /* libnotify callback, called when the "Previous" button is pressed */
+    vlc_object_t *p_object = (vlc_object_t*)p;
+
     VLC_UNUSED(psz);
-    notify_notification_close (notification, NULL);
-    playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p) );
+    notify_notification_close( notification, NULL );
+    playlist_t *p_playlist = pl_Hold( p_object );
     playlist_Prev( p_playlist );
-    pl_Release( ((vlc_object_t*) p) );
+    pl_Release( p_object );
 }
 
 static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
@@ -301,7 +311,7 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     }
 
     notification = notify_notification_new( _("Now Playing"),
-            psz_temp, NULL, NULL);
+                                            psz_temp, NULL, NULL );
     notify_notification_set_timeout( notification,
                                      config_GetInt(p_this, "notify-timeout") );
     notify_notification_set_urgency( notification, NOTIFY_URGENCY_LOW );
