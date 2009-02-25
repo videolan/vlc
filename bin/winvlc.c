@@ -241,12 +241,11 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
     osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
     GetVersionEx( &osvi );
 
-    fwprintf( fd, L"[Version]\n0S=%d.%d.%d.%d.%s\nVLC=%s", osvi.dwMajorVersion,
+    fwprintf( fd, L"[Version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE, osvi.dwMajorVersion,
                                                            osvi.dwMinorVersion,
                                                            osvi.dwBuildNumber,
                                                            osvi.dwPlatformId,
-                                                           osvi.szCSDVersion,
-                                                           VERSION_MESSAGE);
+                                                           osvi.szCSDVersion);
 
     const CONTEXT *const pContext = (const CONTEXT *)lpExceptionInfo->ContextRecord;
     const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)lpExceptionInfo->ExceptionRecord;
