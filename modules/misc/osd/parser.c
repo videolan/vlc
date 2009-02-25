@@ -30,13 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
-#include <vlc_config.h>
-
-#include <vlc_keys.h>
-#include <vlc_image.h>
 #include <vlc_osd.h>
-#include <vlc_charset.h>
 
 #include "osd_menu.h"
 
