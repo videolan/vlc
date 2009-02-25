@@ -201,8 +201,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         psz_album = NULL;
     }
 
-    vlc_object_release( p_input );
-
     if( psz_artist && psz_album )
         snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s\n[%s]",
                   psz_title, psz_artist, psz_album );
@@ -220,6 +218,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     GError *p_error = NULL;
 
     psz_arturl = input_item_GetArtURL( p_input_item );
+    vlc_object_release( p_input );
+
     if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
                 strlen( psz_arturl ) > 7 )
     { /* scale the art to show it in notify popup */
