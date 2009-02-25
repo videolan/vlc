@@ -1,7 +1,7 @@
 /*****************************************************************************
  * telepathy.c : changes Telepathy Presence information using MissionControl
  *****************************************************************************
- * Copyright © 2007 the VideoLAN team
+ * Copyright © 2007-2009 the VideoLAN team
  * $Id$
  *
  * Author: Rafaël Carré <funman@videoanorg>
@@ -32,9 +32,9 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_meta.h>
 #include <vlc_playlist.h>
 #include <vlc_strings.h>
+
 #include <dbus/dbus.h>
 
 /*****************************************************************************
@@ -94,7 +94,6 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     playlist_t *p_playlist;
-    DBusConnection  *p_conn;
     DBusError       error;
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
@@ -103,8 +102,8 @@ static int Open( vlc_object_t *p_this )
 
     /* connect to the session bus */
     dbus_error_init( &error );
-    p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
-    if( !p_conn )
+    p_intf->p_sys->p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
+    if( !p_intf->p_sys->p_conn )
     {
         msg_Err( p_this, "Failed to connect to the DBus session daemon: %s",
                 error.message );
@@ -112,7 +111,6 @@ static int Open( vlc_object_t *p_this )
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
-    p_intf->p_sys->p_conn = p_conn;
 
     p_intf->p_sys->psz_format = config_GetPsz( p_intf, "telepathy-format" );
     if( !p_intf->p_sys->psz_format )

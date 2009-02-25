@@ -32,9 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
-#include <vlc_meta.h>
 
-#include <errno.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <libnotify/notify.h>
 
