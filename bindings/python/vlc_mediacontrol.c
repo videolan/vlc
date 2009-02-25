@@ -40,7 +40,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 
     self = PyObject_New( MediaControl, &MediaControl_Type );
 
-    fprintf (stderr, "Instanciating mediacontrol\n");
+    fprintf (stderr, "Instantiating mediacontrol\n");
     if( PyArg_ParseTuple( args, "O", &py_param ) )
     {
         if( PyObject_TypeCheck( py_param, &vlcInstance_Type ) == 1 )

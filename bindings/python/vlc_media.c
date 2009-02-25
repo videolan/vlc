@@ -30,7 +30,7 @@ static PyObject *
 vlcMedia_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 {
     fprintf(stderr, "vlcMedia_new called\n");
-    PyErr_SetString( PyExc_TypeError, "vlc.Media can be instanciated by itself. You should use vlc.Instance().media_new(mrl)." );
+    PyErr_SetString( PyExc_TypeError, "vlc.Media can be instantiated by itself. You should use vlc.Instance().media_new(mrl)." );
     return NULL;
 }
 

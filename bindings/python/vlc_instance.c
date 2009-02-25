@@ -80,7 +80,7 @@ vlcInstance_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     char** ppsz_args = NULL;
     int i_size = 0;
 
-    fprintf(stderr, "Instancianting\n");
+    fprintf(stderr, "Instantiating\n");
     if( PyArg_ParseTuple( args, "|O", &py_list ) )
     {
         i_size = pyoptions_to_args( py_list, &ppsz_args );
