@@ -37,25 +37,10 @@
 #include <libnotify/notify.h>
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Open    ( vlc_object_t * );
-static void Close   ( vlc_object_t * );
-
-static int ItemChange( vlc_object_t *, const char *,
-                       vlc_value_t, vlc_value_t, void * );
-static int Notify( vlc_object_t *, const char *, GdkPixbuf *, intf_thread_t * );
-#define MAX_LENGTH 256
-
-struct intf_sys_t
-{
-    NotifyNotification *notification;
-    vlc_mutex_t     lock;
-};
-
-/*****************************************************************************
  * Module descriptor
  ****************************************************************************/
+static int  Open    ( vlc_object_t * );
+static void Close   ( vlc_object_t * );
 
 #define APPLICATION_NAME "VLC media player"
 
@@ -75,6 +60,21 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int ItemChange( vlc_object_t *, const char *,
+                       vlc_value_t, vlc_value_t, void * );
+static int Notify( vlc_object_t *, const char *, GdkPixbuf *, intf_thread_t * );
+#define MAX_LENGTH 256
+
+struct intf_sys_t
+{
+    NotifyNotification *notification;
+    vlc_mutex_t     lock;
+};
+
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
@@ -82,7 +82,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t   *p_intf = (intf_thread_t *)p_this;
     playlist_t      *p_playlist;
-    intf_sys_t      *p_sys  = malloc( sizeof( intf_sys_t ) );
+    intf_sys_t      *p_sys  = malloc( sizeof( *p_sys ) );
 
     if( !p_sys )
         return VLC_ENOMEM;
@@ -93,12 +93,10 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_intf, "can't find notification daemon" );
         return VLC_EGENERIC;
     }
-
-    vlc_mutex_init( &p_sys->lock );
-
     p_intf->p_sys = p_sys;
 
-    p_intf->p_sys->notification = NULL;
+    vlc_mutex_init( &p_sys->lock );
+    p_sys->notification = NULL;
 
     p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
@@ -119,8 +117,8 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "item-current", ItemChange, p_this );
     pl_Release( p_this );
 
-    if( p_intf->p_sys->notification )
-        g_object_unref( p_intf->p_sys->notification );
+    if( p_sys->notification )
+        g_object_unref( p_sys->notification );
 
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
@@ -142,7 +140,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char                *psz_arturl     = NULL;
     input_thread_t      *p_input        =  playlist_CurrentInput(
                                                     (playlist_t*) p_this );
-    intf_thread_t       *p_intf         = ( intf_thread_t* ) param;
+    intf_thread_t       *p_intf         = param;
     intf_sys_t          *p_sys          = p_intf->p_sys;
 
     if( !p_input ) return VLC_SUCCESS;
