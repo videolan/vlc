@@ -123,7 +123,9 @@ static char *xtag_get_attribute( XTag *, char * );
 static XTag *xtag_first_child( XTag *, char * );
 static XTag *xtag_next_child( XTag *, char * );
 static void  xtag_free( XTag * );
+#if 0
 static int xtag_snprint( char *, int, XTag * );
+#endif
 
 /*****************************************************************************
  * Module initialization
@@ -965,6 +967,7 @@ static XTag *xtag_next_child( XTag *xtag, char *name )
     return NULL;
 }
 
+#if 0
 /*
  * This snprints function takes a variable list of char *, the last of
  * which must be NULL, and prints each in turn to buf.
@@ -1066,4 +1069,5 @@ static int xtag_snprint( char *buf, int n, XTag *xtag )
 
     return written;
 }
+#endif
 
