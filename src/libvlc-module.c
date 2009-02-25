@@ -2234,9 +2234,9 @@ vlc_module_begin ()
 #   define KEY_PLAY               KEY_UNSET
 #   define KEY_FASTER             '+'
 #   define KEY_SLOWER             '-'
-#   define KEY_RATE_NORMAL        KEY_UNSET
-#   define KEY_RATE_FASTER_FINE   KEY_UNSET
-#   define KEY_RATE_SLOWER_FINE   KEY_UNSET
+#   define KEY_RATE_NORMAL        '='
+#   define KEY_RATE_FASTER_FINE   ']'
+#   define KEY_RATE_SLOWER_FINE   '['
 #   define KEY_NEXT               'n'
 #   define KEY_PREV               'p'
 #   define KEY_STOP               's'
