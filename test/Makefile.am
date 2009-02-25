@@ -63,6 +63,8 @@ test_libvlc_meta_SOURCES = libvlc/meta.c
 test_libvlc_meta_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_meta_CFLAGS = $(CFLAGS_tests)
 
+checkall:
+	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
 
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2
