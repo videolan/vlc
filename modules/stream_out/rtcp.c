@@ -36,6 +36,10 @@
 
 #include <assert.h>
 
+#ifndef SOL_IP
+# define SOL_IP IPPROTO_IP
+#endif
+
 /*
  * NOTE on RTCP implementation:
  * - there is a single sender (us), no conferencing here! => n = sender = 1,
