@@ -46,7 +46,7 @@ struct encoder_sys_t
  * Local prototypes
  *****************************************************************************/
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict );
-static block_t *EncodeAudio( encoder_t *p_enc, picture_t *p_pict );
+static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_abuff );
 
 /*****************************************************************************
  * OpenDecoder: open the dummy encoder.
@@ -91,9 +91,9 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
 /****************************************************************************
  * EncodeVideo: the whole thing
  ****************************************************************************/
-static block_t *EncodeAudio( encoder_t *p_enc, picture_t *p_pict )
+static block_t *EncodeAudio( encoder_t *p_enc, aout_buffer_t *p_abuff )
 {
-    (void)p_pict;
+    (void)p_abuff;
     (void)p_enc;
     return NULL;
 }
