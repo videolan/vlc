@@ -160,7 +160,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     intf_thread_t       *p_intf         = param;
     intf_sys_t          *p_sys          = p_intf->p_sys;
 
-    if( !p_input ) return VLC_SUCCESS;
+    if( !p_input )
+        return VLC_SUCCESS;
 
     if( p_input->b_dead )
     {
@@ -172,13 +173,14 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     msleep( 1000*4 );
 
     /* Playing something ... */
-    psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-    psz_album = input_item_GetAlbum( input_GetItem( p_input ) ) ;
-    psz_title = input_item_GetTitle( input_GetItem( p_input ) );
+    input_item_t *p_input_item = input_GetItem( p_input );
+    psz_artist = input_item_GetArtist( p_input_item );
+    psz_album = input_item_GetAlbum( p_input_item );
+    psz_title = input_item_GetTitle( p_input_item );
     if( ( psz_title == NULL ) || EMPTY_STR( psz_title ) )
     {
         free( psz_title );
-        psz_title = input_item_GetName( input_GetItem( p_input ) );
+        psz_title = input_item_GetName( p_input_item );
     }
     if( ( psz_title == NULL ) || EMPTY_STR( psz_title ) )
     {  /* Not enough metadata ... */
@@ -217,7 +219,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     GdkPixbuf *pix = NULL;
     GError *p_error = NULL;
 
-    psz_arturl = input_item_GetArtURL( input_GetItem( p_input ) );
+    psz_arturl = input_item_GetArtURL( p_input_item );
     if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
                 strlen( psz_arturl ) > 7 )
     { /* scale the art to show it in notify popup */
