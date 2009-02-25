@@ -47,9 +47,8 @@ static ssize_t AccessRead( access_t *p_access, uint8_t *p, size_t i_size )
 }
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
+    bool        *pb_bool;
+    int64_t     *pi_64;
 
     switch( i_query )
     {
