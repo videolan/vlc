@@ -4,6 +4,7 @@ Changes between 0.9.8a and 1.0.0-git:
 Playback:
  * Instantaneous pausing
  * Frame-by-Frame playback
+ * Finer speed control
  * Timeshift for all medias
  * On-the-fly recording for all medias
  * RTSP trickplay support
@@ -38,6 +39,8 @@ Access:
  * EXPERIMENTAL Blu-Ray Disc and AVCHD Folders support
  * On-the-fly zip file decompression and browsing (MRL of the form zip://file.zip|file.avi to specify the file)
  * Opening of any file descriptor using 'fd://'
+ * MTP device access on Unix
+ * CD-Text support on the cdda module (CD-Audio)
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
@@ -50,8 +53,17 @@ Playlist:
 
 Linux/Windows interface:
  * Recently played items list
- * Interface customizations
  * Global Hotkeys on Windows and Linux
+ * Various fixes for skins2 interface
+ * Interface toolbar customizations
+ * Various Improvements on the Qt interface:
+    - More menus actions
+    - Finer speed slider
+    - Improvements on many dialogs
+    - New dialog for plugins listing
+    - Fixed-size mode for videos
+    - Better teletext, trickplay and encrypted streams control
+ * Better integration in GTK environments
 
 Mac OS X Interface:
  * Reveal-in-Finder functionality for locally stored items.
