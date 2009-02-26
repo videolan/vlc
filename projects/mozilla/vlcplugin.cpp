@@ -85,6 +85,10 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     const char *ppsz_argv[32];
     int ppsz_argc = 0;
 
+#ifndef NDEBUG
+    ppsz_argv[ppsz_argc++] = "--no-plugins-cache";
+#endif
+
     /* locate VLC module path */
 #ifdef XP_MACOSX
     ppsz_argv[ppsz_argc++] = "--plugin-path=/Library/Internet\\ Plug-Ins/VLC\\ Plugin.plugin/Contents/MacOS/modules";
@@ -152,8 +156,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         {
             if( boolValue(argv[i]) )
             {
-                ppsz_argv[ppsz_argc++] = "--volume";
-                ppsz_argv[ppsz_argc++] = "0";
+                ppsz_argv[ppsz_argc++] = "--volume=0";
             }
         }
         else if( !strcmp( argn[i], "loop")
