@@ -46,8 +46,8 @@
 struct intf_sys_t
 {
     vlc_object_t *      p_vout;
-    bool          b_got_gesture;
-    bool          b_button_pressed;
+    bool                b_got_gesture;
+    bool                b_button_pressed;
     int                 i_mouse_x, i_mouse_y;
     int                 i_last_x, i_last_y;
     unsigned int        i_pattern;
@@ -150,6 +150,7 @@ static void RunIntf( intf_thread_t *p_intf )
 {
     playlist_t * p_playlist = NULL;
     int canc = vlc_savecancel();
+    input_thread_t *p_input;
 
     vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->p_vout = NULL;
@@ -181,19 +182,37 @@ static void RunIntf( intf_thread_t *p_intf )
             switch( p_intf->p_sys->i_pattern )
             {
             case LEFT:
+                // Get the current input
+                p_playlist = pl_Hold( p_intf );
+                p_input = playlist_CurrentInput( p_playlist );
+                pl_Release( p_intf );
+                if( !p_input )
+                    break;
+
                 i_interval = config_GetInt( p_intf , "short-jump-size" );
-                if ( i_interval > 0 ) {
+                if ( i_interval > 0 )
+                {
                     val.i_time = ( (mtime_t)( -i_interval ) * 1000000L);
-                    var_Set( p_intf, "time-offset", val );
+                    var_Set( p_input, "time-offset", val );
                 }
+                vlc_object_release( p_input );
                 msg_Dbg(p_intf, "Go backward in the movie!");
                 break;
+
             case RIGHT:
+                p_playlist = pl_Hold( p_intf );
+                p_input = playlist_CurrentInput( p_playlist );
+                pl_Release( p_intf );
+                if( !p_input )
+                    break;
+
                 i_interval = config_GetInt( p_intf , "short-jump-size" );
-                if ( i_interval > 0 ) {
+                if ( i_interval > 0 )
+                {
                     val.i_time = ( (mtime_t)( i_interval ) * 1000000L);
-                    var_Set( p_intf, "time-offset", val );
+                    var_Set( p_input, "time-offset", val );
                 }
+                vlc_object_release( p_input );
                 msg_Dbg(p_intf, "Go forward in the movie!");
                 break;
             case GESTURE(LEFT,UP,NONE,NONE):
@@ -207,7 +226,6 @@ static void RunIntf( intf_thread_t *p_intf )
             case GESTURE(LEFT,RIGHT,NONE,NONE):
             case GESTURE(RIGHT,LEFT,NONE,NONE):
                 {
-                    input_thread_t * p_input;
                     p_playlist = pl_Hold( p_intf );
                     p_input = playlist_CurrentInput( p_playlist );
                     pl_Release( p_intf );
@@ -267,7 +285,6 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(UP,RIGHT,NONE,NONE):
                 {
-                   input_thread_t * p_input;
                    vlc_value_t val, list, list2;
                    int i_count, i;
 
@@ -320,7 +337,6 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(DOWN,RIGHT,NONE,NONE):
                 {
-                    input_thread_t * p_input;
                     vlc_value_t val, list, list2;
                     int i_count, i;
 
