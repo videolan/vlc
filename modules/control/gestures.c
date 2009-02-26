@@ -1,7 +1,7 @@
 /*****************************************************************************
  * gestures.c: control vlc with mouse gestures
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -116,13 +116,11 @@ int Open ( vlc_object_t *p_this )
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-    {
-        return( 1 );
-    };
+        return VLC_ENOMEM;
 
     p_intf->pf_run = RunIntf;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -131,15 +129,6 @@ int Open ( vlc_object_t *p_this )
 static int gesture( int i_pattern, int i_num )
 {
     return ( i_pattern >> ( i_num * 4 ) ) & 0xF;
-}
-
-/*****************************************************************************
- * input_from_playlist: don't forget to release the return value
- *  Also this function should really be available from core.
- *****************************************************************************/
-static input_thread_t * input_from_playlist ( playlist_t *p_playlist )
-{
-    return playlist_CurrentInput( p_playlist );
 }
 
 /*****************************************************************************
@@ -220,9 +209,8 @@ static void RunIntf( intf_thread_t *p_intf )
                 {
                     input_thread_t * p_input;
                     p_playlist = pl_Hold( p_intf );
-
-                    p_input = input_from_playlist( p_playlist );
-                    vlc_object_release( p_playlist );
+                    p_input = playlist_CurrentInput( p_playlist );
+                    pl_Release( p_intf );
  
                     if( !p_input )
                         break;
@@ -247,15 +235,13 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(LEFT,DOWN,NONE,NONE):
                 p_playlist = pl_Hold( p_intf );
-
                 playlist_Prev( p_playlist );
-                vlc_object_release( p_playlist );
+                pl_Release( p_intf );
                 break;
             case GESTURE(RIGHT,DOWN,NONE,NONE):
                 p_playlist = pl_Hold( p_intf );
-
                 playlist_Next( p_playlist );
-                vlc_object_release( p_playlist );
+                pl_Release( p_intf );
                 break;
             case UP:
                 {
@@ -286,10 +272,8 @@ static void RunIntf( intf_thread_t *p_intf )
                    int i_count, i;
 
                     p_playlist = pl_Hold( p_intf );
-
-                    p_input = input_from_playlist( p_playlist );
-
-                    vlc_object_release( p_playlist );
+                    p_input = playlist_CurrentInput( p_playlist );
+                    pl_Release( p_intf );
 
                     if( !p_input )
                         break;
@@ -341,9 +325,8 @@ static void RunIntf( intf_thread_t *p_intf )
                     int i_count, i;
 
                     p_playlist = pl_Hold( p_intf );
-
-                    p_input = input_from_playlist( p_playlist );
-                    vlc_object_release( p_playlist );
+                    p_input = playlist_CurrentInput( p_playlist );
+                    pl_Release( p_intf );
 
                     if( !p_input )
                         break;
