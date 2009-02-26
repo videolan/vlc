@@ -46,7 +46,7 @@
 /* Enable/disable debugging printf's for X11 resizing */
 #undef X11_RESIZE_DEBUG
 
-#define WINDOW_TEXT "Video is loading..."
+#define WINDOW_TEXT "Waiting for video"
 
 /*****************************************************************************
  * Unix-only declarations
