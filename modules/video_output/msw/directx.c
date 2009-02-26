@@ -457,6 +457,7 @@ static int Init( vout_thread_t *p_vout )
         /* If it still didn't work then don't try to use an overlay */
         p_vout->output.i_chroma = i_chroma_backup;
         p_vout->p_sys->b_using_overlay = 0;
+        msg_Warn( p_vout, "Could not initialize directx overlay" ) ;
         NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
     }
 
