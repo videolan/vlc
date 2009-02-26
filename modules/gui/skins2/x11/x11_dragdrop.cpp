@@ -186,10 +186,9 @@ void X11DragDrop::dndDrop( ldata_t data )
         selection = selection.substr( 0, end - 1 );
 
         // Find the protocol, if any
-        string::size_type pos = selection.find( ":", 0 );
-        if( selection.find( "///", pos + 1 ) == pos + 1 )
+        if( selection.find( "file://", 0 ) == 0 )
         {
-            selection.erase( pos + 1, 2 );
+            selection.erase( 0, 7 );
         }
 
         char *psz_fileName = new char[selection.size() + 1];
