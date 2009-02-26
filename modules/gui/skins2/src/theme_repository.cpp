@@ -131,14 +131,12 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
 
             // Add the theme in the popup menu
             string shortname = name.substr( 0, name.size() - 4 );
-            val.psz_string = new char[path.size() + 1];
-            text.psz_string = new char[shortname.size() + 1];
-            strcpy( val.psz_string, path.c_str() );
-            strcpy( text.psz_string, shortname.c_str() );
+            val.psz_string = strdup( path.c_str() );
+            text.psz_string = strdup( shortname.c_str() );
             var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                         &text );
-            delete[] val.psz_string;
-            delete[] text.psz_string;
+            free( val.psz_string );
+            free( text.psz_string );
         }
 
         free( pszDirContent );
