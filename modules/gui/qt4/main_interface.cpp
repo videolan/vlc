@@ -855,8 +855,6 @@ void MainInterface::toggleAdvanced()
 /* Get the visibility status of the controls (hidden or not, advanced or not) */
 int MainInterface::getControlsVisibilityStatus()
 {
-    msg_Warn( p_intf, "%i", (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
-                            + CONTROLS_ADVANCED * controls->b_advancedVisible );
     return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
                 + CONTROLS_ADVANCED * controls->b_advancedVisible );
 }
