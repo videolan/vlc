@@ -320,6 +320,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case ATOB_BUTTON: {
         AtoB_Button *ABButton = new AtoB_Button;
         setupButton( ABButton );
+        ABButton->setShortcut( qtr("Shift+L") );
         BUTTON_SET_BAR( ABButton );
         ENABLE_ON_INPUT( ABButton );
         CONNECT_MAP_SET( ABButton, ATOB_ACTION );
