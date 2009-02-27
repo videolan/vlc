@@ -163,7 +163,6 @@ static void Run( intf_thread_t *p_intf )
 {
     vout_thread_t *p_vout = NULL;
     vlc_value_t val;
-    int i;
     playlist_t *p_playlist = pl_Hold( p_intf );
     int canc = vlc_savecancel();
 
@@ -198,6 +197,7 @@ static void Run( intf_thread_t *p_intf )
         /* Register OSD channels */
         if( p_vout && p_vout != p_last_vout )
         {
+            int i;
             for( i = 0; i < CHANNELS_NUMBER; i++ )
             {
                 spu_Control( p_vout->p_spu, SPU_CHANNEL_REGISTER,
@@ -502,22 +502,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     msg_Warn( p_input,
                               "invalid current audio track, selecting 0" );
-                    var_Set( p_input, "audio-es",
-                             list.p_list->p_values[0] );
                     i = 0;
                 }
                 else if( i == i_count - 1 )
-                {
-                    var_Set( p_input, "audio-es",
-                             list.p_list->p_values[1] );
                     i = 1;
-                }
                 else
-                {
-                    var_Set( p_input, "audio-es",
-                             list.p_list->p_values[i+1] );
                     i++;
-                }
+                var_Set( p_input, "audio-es", list.p_list->p_values[i] );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  _("Audio track: %s"),
                                  list2.p_list->p_values[i].psz_string );
@@ -549,19 +540,13 @@ static void Run( intf_thread_t *p_intf )
                 {
                     msg_Warn( p_input,
                               "invalid current subtitle track, selecting 0" );
-                    var_Set( p_input, "spu-es", list.p_list->p_values[0] );
                     i = 0;
                 }
                 else if( i == i_count - 1 )
-                {
-                    var_Set( p_input, "spu-es", list.p_list->p_values[0] );
                     i = 0;
-                }
                 else
-                {
-                    var_Set( p_input, "spu-es", list.p_list->p_values[i+1] );
-                    i = i + 1;
-                }
+                    i++;
+                var_Set( p_input, "spu-es", list.p_list->p_values[i] );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  _("Subtitle track: %s"),
                                  list2.p_list->p_values[i].psz_string );
