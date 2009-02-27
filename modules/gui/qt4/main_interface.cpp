@@ -274,8 +274,10 @@ MainInterface::~MainInterface()
 {
     msg_Dbg( p_intf, "Destroying the main interface" );
 
+    /* Unsure we hide the videoWidget before destroying it */
     if( videoIsActive ) videoWidget->hide();
 
+    /* Save playlist state */
     if( playlistWidget )
     {
         if( !isDocked() )
@@ -284,12 +286,14 @@ MainInterface::~MainInterface()
         delete playlistWidget;
     }
 
+    /* Be sure to kill the actionsManager... FIXME */
     ActionsManager::killInstance();
 
+    /* Delete the FSC controller */
     if( fullscreenControls ) delete fullscreenControls;
 
+    /* Save states */
     settings->beginGroup( "MainWindow" );
-
     settings->setValue( "pl-dock-status", (int)i_pl_dock );
     settings->setValue( "playlist-visible", (int)playlistVisible );
     settings->setValue( "adv-controls",
@@ -301,12 +305,13 @@ MainInterface::~MainInterface()
     if( bgWidget )
         settings->setValue( "backgroundSize", bgWidget->size() );
 
+    /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
     settings->endGroup();
 
-    var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
-    /* Unregister callback for the intf-popupmenu variable */
+    /* Unregister callbacks */
+    var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     interaction_Unregister( p_intf );
