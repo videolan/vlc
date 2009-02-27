@@ -198,107 +198,108 @@ static void RunIntf( intf_thread_t *p_intf )
             switch( p_intf->p_sys->i_pattern )
             {
             case LEFT:
-                // Get the current input
+                msg_Dbg( p_intf, "Go backward in the movie!" );
                 p_playlist = pl_Hold( p_intf );
                 p_input = playlist_CurrentInput( p_playlist );
                 pl_Release( p_intf );
-                if( !p_input )
-                    break;
-
-                i_interval = config_GetInt( p_intf , "short-jump-size" );
-                if ( i_interval > 0 )
+                if( p_input )
                 {
-                    val.i_time = ( (mtime_t)( -i_interval ) * 1000000L);
-                    var_Set( p_input, "time-offset", val );
-                }
-                vlc_object_release( p_input );
-                msg_Dbg(p_intf, "Go backward in the movie!");
-                break;
-
-            case RIGHT:
-                p_playlist = pl_Hold( p_intf );
-                p_input = playlist_CurrentInput( p_playlist );
-                pl_Release( p_intf );
-                if( !p_input )
-                    break;
-
-                i_interval = config_GetInt( p_intf , "short-jump-size" );
-                if ( i_interval > 0 )
-                {
-                    val.i_time = ( (mtime_t)( i_interval ) * 1000000L);
-                    var_Set( p_input, "time-offset", val );
-                }
-                vlc_object_release( p_input );
-                msg_Dbg(p_intf, "Go forward in the movie!");
-                break;
-            case GESTURE(LEFT,UP,NONE,NONE):
-                /*FIXME BF*/
-                msg_Dbg(p_intf, "Going slower.");
-                break;
-            case GESTURE(RIGHT,UP,NONE,NONE):
-                /*FIXME FF*/
-                msg_Dbg(p_intf, "Going faster.");
-                break;
-            case GESTURE(LEFT,RIGHT,NONE,NONE):
-            case GESTURE(RIGHT,LEFT,NONE,NONE):
-                {
-                    p_playlist = pl_Hold( p_intf );
-                    p_input = playlist_CurrentInput( p_playlist );
-                    pl_Release( p_intf );
- 
-                    if( !p_input )
-                        break;
- 
-                    val.i_int = PLAYING_S;
-                    if( p_input )
+                    i_interval = config_GetInt( p_intf , "short-jump-size" );
+                    if ( i_interval > 0 )
                     {
-                        var_Get( p_input, "state", &val);
-                        if( val.i_int == PAUSE_S )
-                        {
-                            val.i_int = PLAYING_S;
-                        }
-                        else
-                        {
-                            val.i_int = PAUSE_S;
-                        }
-                        var_Set( p_input, "state", val);
+                        val.i_time = ( (mtime_t)( -i_interval ) * 1000000L);
+                        var_Set( p_input, "time-offset", val );
                     }
-                    msg_Dbg(p_intf, "Play/Pause");
                     vlc_object_release( p_input );
                 }
                 break;
+
+            case RIGHT:
+                msg_Dbg( p_intf, "Go forward in the movie!" );
+                p_playlist = pl_Hold( p_intf );
+                p_input = playlist_CurrentInput( p_playlist );
+                pl_Release( p_intf );
+
+                if( p_input )
+                {
+                    i_interval = config_GetInt( p_intf , "short-jump-size" );
+                    if ( i_interval > 0 )
+                    {
+                        val.i_time = ( (mtime_t)( i_interval ) * 1000000L);
+                        var_Set( p_input, "time-offset", val );
+                    }
+                    vlc_object_release( p_input );
+                }
+                break;
+
+            case GESTURE(LEFT,UP,NONE,NONE):
+                msg_Dbg( p_intf, "Going slower." );
+                p_playlist = pl_Hold( p_intf );
+                p_input = playlist_CurrentInput( p_playlist );
+                pl_Release( p_intf );
+                if( p_input )
+                {
+                    var_SetVoid( p_input, "rate-slower" );
+                    vlc_object_release( p_input );
+                }
+                break;
+
+            case GESTURE(RIGHT,UP,NONE,NONE):
+                msg_Dbg( p_intf, "Going faster." );
+                p_playlist = pl_Hold( p_intf );
+                p_input = playlist_CurrentInput( p_playlist );
+                pl_Release( p_intf );
+                if( p_input )
+                {
+                    var_SetVoid( p_input, "rate-faster" );
+                    vlc_object_release( p_input );
+                }
+                break;
+
+            case GESTURE(LEFT,RIGHT,NONE,NONE):
+            case GESTURE(RIGHT,LEFT,NONE,NONE):
+                msg_Dbg( p_intf, "Play/Pause" );
+                p_playlist = pl_Hold( p_intf );
+                p_input = playlist_CurrentInput( p_playlist );
+                pl_Release( p_intf );
+ 
+                if( p_input )
+                {
+                    var_Get( p_input, "state", &val);
+                    val.i_int = ( val.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S;
+                    var_Set( p_input, "state", val);
+                    vlc_object_release( p_input );
+                }
+                break;
+
             case GESTURE(LEFT,DOWN,NONE,NONE):
                 p_playlist = pl_Hold( p_intf );
                 playlist_Prev( p_playlist );
                 pl_Release( p_intf );
                 break;
+
             case GESTURE(RIGHT,DOWN,NONE,NONE):
                 p_playlist = pl_Hold( p_intf );
                 playlist_Next( p_playlist );
                 pl_Release( p_intf );
                 break;
+
             case UP:
-                {
-                    audio_volume_t i_newvol;
-                    aout_VolumeUp( p_intf, 1, &i_newvol );
-                    msg_Dbg(p_intf, "Louder");
-                }
+                msg_Dbg(p_intf, "Louder");
+                aout_VolumeUp( p_intf, 1, NULL );
                 break;
+
             case DOWN:
-                {
-                    audio_volume_t i_newvol;
-                    aout_VolumeDown( p_intf, 1, &i_newvol );
-                    msg_Dbg(p_intf, "Quieter");
-                }
+                msg_Dbg(p_intf, "Quieter");
+                aout_VolumeDown( p_intf, 1, NULL );
                 break;
+
             case GESTURE(UP,DOWN,NONE,NONE):
             case GESTURE(DOWN,UP,NONE,NONE):
-                {
-                    audio_volume_t i_newvol = -1;
-                    aout_VolumeMute( p_intf, &i_newvol );
-                    msg_Dbg(p_intf, "Mute sound");
-                }
+                msg_Dbg(p_intf, "Mute sound");
+                aout_VolumeMute( p_intf, NULL );
                 break;
+
             case GESTURE(UP,RIGHT,NONE,NONE):
                 {
                    vlc_value_t val, list, list2;
@@ -323,32 +324,21 @@ static void RunIntf( intf_thread_t *p_intf )
                    for( i = 0; i < i_count; i++ )
                    {
                        if( val.i_int == list.p_list->p_values[i].i_int )
-                       {
                            break;
-                       }
                    }
-                   /* value of audio-es was not in choices list */
-                   if( i == i_count )
-                   {
-                       msg_Warn( p_input,
-                               "invalid current audio track, selecting 0" );
-                       var_Set( p_input, "audio-es",
-                               list.p_list->p_values[0] );
-                       i = 0;
-                   }
-                   else if( i == i_count - 1 )
-                   {
-                       var_Set( p_input, "audio-es",
-                               list.p_list->p_values[1] );
-                       i = 1;
-                   }
-                   else
-                   {
-                       var_Set( p_input, "audio-es",
-                               list.p_list->p_values[i+1] );
-                       i++;
-                   }
-                   vlc_object_release( p_input );
+                    /* value of audio-es was not in choices list */
+                    if( i == i_count )
+                    {
+                        msg_Warn( p_input,
+                                  "invalid current audio track, selecting 0" );
+                        i = 0;
+                    }
+                    else if( i == i_count - 1 )
+                        i = 1;
+                    else
+                        i++;
+                    var_Set( p_input, "audio-es", list.p_list->p_values[i] );
+                    vlc_object_release( p_input );
                 }
                 break;
             case GESTURE(DOWN,RIGHT,NONE,NONE):
@@ -385,20 +375,13 @@ static void RunIntf( intf_thread_t *p_intf )
                     {
                         msg_Warn( p_input,
                                 "invalid current subtitle track, selecting 0" );
-                        var_Set( p_input, "spu-es", list.p_list->p_values[0] );
                         i = 0;
                     }
                     else if( i == i_count - 1 )
-                    {
-                        var_Set( p_input, "spu-es", list.p_list->p_values[0] );
                         i = 0;
-                    }
                     else
-                    {
-                        var_Set( p_input, "spu-es",
-                                list.p_list->p_values[i+1] );
-                        i = i + 1;
-                    }
+                        i++;
+                    var_Set( p_input, "spu-es", list.p_list->p_values[i] );
                     vlc_object_release( p_input );
                 }
                 break;
