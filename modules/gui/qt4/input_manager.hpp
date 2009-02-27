@@ -237,6 +237,7 @@ public slots:
     void stop();
     void next();
     void prev();
+    void activatePlayQuit( bool );
 
 signals:
     void inputChanged( input_thread_t * );
