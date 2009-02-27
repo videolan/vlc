@@ -385,13 +385,16 @@ static void RunIntf( intf_thread_t *p_intf )
                     vlc_object_release( p_input );
                 }
                 break;
+
             case GESTURE(UP,LEFT,NONE,NONE):
                 if (p_intf->p_sys->p_vout )
                 {
-                    ((vout_thread_t *)p_intf->p_sys->p_vout)->i_changes |=
-                        VOUT_FULLSCREEN_CHANGE;
+                    var_Get( p_intf->p_sys->p_vout, "fullscreen", &val );
+                    val.b_bool = !val.b_bool;
+                    var_Set( p_intf->p_sys->p_vout, "fullscreen", val );
                 }
                 break;
+
             case GESTURE(DOWN,LEFT,NONE,NONE):
                 /* FIXME: Should close the vout!"*/
                 libvlc_Quit( p_intf->p_libvlc );
@@ -423,8 +426,14 @@ static void RunIntf( intf_thread_t *p_intf )
 
         if( p_intf->p_sys->p_vout == NULL )
         {
-            p_intf->p_sys->p_vout = vlc_object_find( p_intf,
-                                      VLC_OBJECT_VOUT, FIND_ANYWHERE );
+            p_playlist = pl_Hold( p_intf );
+            p_input = playlist_CurrentInput( p_playlist );
+            pl_Release( p_intf );
+            if( p_input )
+            {
+                p_intf->p_sys->p_vout = input_GetVout( p_input );
+                vlc_object_release( p_input );
+            }
             if( p_intf->p_sys->p_vout )
             {
                 var_AddCallback( p_intf->p_sys->p_vout, "mouse-moved",
