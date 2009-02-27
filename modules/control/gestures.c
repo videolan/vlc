@@ -68,8 +68,6 @@ struct intf_sys_t
 
 int  Open   ( vlc_object_t * );
 void Close  ( vlc_object_t * );
-static int  InitThread     ( intf_thread_t *p_intf );
-static void EndThread      ( intf_thread_t *p_intf );
 static int  MouseEvent     ( vlc_object_t *, char const *,
                              vlc_value_t, vlc_value_t, void * );
 
@@ -114,11 +112,30 @@ int Open ( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     /* Allocate instance and initialize some members */
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    intf_sys_t *p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
+    // Configure the module
     p_intf->pf_run = RunIntf;
+
+    p_sys->p_vout = NULL;
+    p_sys->b_got_gesture = false;
+    p_sys->b_button_pressed = false;
+    p_sys->i_threshold = config_GetInt( p_intf, "gestures-threshold" );
+
+    // Choose the tight button to use
+    char *psz_button = config_GetPsz( p_intf, "gestures-button" );
+    if( !strcmp( psz_button, "left" ) )
+        p_sys->i_button_mask = 1;
+    else if( !strcmp( psz_button, "middle" ) )
+        p_sys->i_button_mask = 2;
+    else // psz_button == "right"
+        p_sys->i_button_mask = 4;
+    free( psz_button );
+
+    p_sys->i_pattern = 0;
+    p_sys->i_num_gestures = 0;
 
     return VLC_SUCCESS;
 }
@@ -138,6 +155,16 @@ void Close ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
+    // Destroy the callbacks
+    if( p_intf->p_sys->p_vout )
+    {
+        var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
+                         MouseEvent, p_intf );
+        var_DelCallback( p_intf->p_sys->p_vout, "mouse-button-down",
+                         MouseEvent, p_intf );
+        vlc_object_release( p_intf->p_sys->p_vout );
+    }
+
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -151,17 +178,6 @@ static void RunIntf( intf_thread_t *p_intf )
     playlist_t * p_playlist = NULL;
     int canc = vlc_savecancel();
     input_thread_t *p_input;
-
-    vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->p_sys->p_vout = NULL;
-    vlc_mutex_unlock( &p_intf->change_lock );
-
-    if( InitThread( p_intf ) < 0 )
-    {
-        msg_Err( p_intf, "can't initialize interface thread" );
-        return;
-    }
-    msg_Dbg( p_intf, "interface thread initialized" );
 
     /* Main loop */
     while( vlc_object_alive( p_intf ) )
@@ -441,74 +457,7 @@ static void RunIntf( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
     }
 
-    EndThread( p_intf );
     vlc_restorecancel( canc );
-}
-
-/*****************************************************************************
- * InitThread:
- *****************************************************************************/
-static int InitThread( intf_thread_t * p_intf )
-{
-    char *psz_button;
-    /* we might need some locking here */
-    if( vlc_object_alive( p_intf ) )
-    {
-        /* p_intf->change_lock locking strategy:
-         * - Every access to p_intf->p_sys are locked threw p_intf->change_lock
-         * - make sure there won't be  cross increment/decrement ref count
-         *   of p_intf->p_sys members p_intf->change_lock should be locked
-         *   during those operations */
-        vlc_mutex_lock( &p_intf->change_lock );
-
-        p_intf->p_sys->b_got_gesture = false;
-        p_intf->p_sys->b_button_pressed = false;
-        p_intf->p_sys->i_threshold =
-                     config_GetInt( p_intf, "gestures-threshold" );
-        psz_button = config_GetPsz( p_intf, "gestures-button" );
-        if ( !strcmp( psz_button, "left" ) )
-        {
-            p_intf->p_sys->i_button_mask = 1;
-        }
-        else if ( !strcmp( psz_button, "middle" ) )
-        {
-            p_intf->p_sys->i_button_mask = 2;
-        }
-        else if ( !strcmp( psz_button, "right" ) )
-        {
-            p_intf->p_sys->i_button_mask = 4;
-        }
-        free( psz_button );
-
-        p_intf->p_sys->i_pattern = 0;
-        p_intf->p_sys->i_num_gestures = 0;
-        vlc_mutex_unlock( &p_intf->change_lock );
-
-        return 0;
-    }
-    else
-    {
-        return -1;
-    }
-}
-
-/*****************************************************************************
- * EndThread:
- *****************************************************************************/
-static void EndThread( intf_thread_t * p_intf )
-{
-    vlc_mutex_lock( &p_intf->change_lock );
-
-    if( p_intf->p_sys->p_vout )
-    {
-        var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
-                         MouseEvent, p_intf );
-        var_DelCallback( p_intf->p_sys->p_vout, "mouse-button-down",
-                         MouseEvent, p_intf );
-        vlc_object_release( p_intf->p_sys->p_vout );
-    }
-
-    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 /*****************************************************************************
