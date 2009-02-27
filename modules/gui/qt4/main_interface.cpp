@@ -1183,12 +1183,12 @@ void MainInterface::toggleFullScreen( void )
     {
         showNormal();
         emit askUpdate(); // Needed if video was launched after the F11
-        QVLCMenu::fullscreenViewAction->setChecked( false );
+        emit fullscreenInterfaceToggled( false );
     }
     else
     {
         showFullScreen();
-        QVLCMenu::fullscreenViewAction->setChecked( true );
+        emit fullscreenInterfaceToggled( true );
     }
 
 }

@@ -186,6 +186,7 @@ signals:
     void askBgWidgetToToggle();
     void askUpdate();
     void minimalViewToggled( bool );
+    void fullscreenInterfaceToggled( bool );
 };
 
 #endif

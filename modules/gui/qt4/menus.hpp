@@ -94,10 +94,6 @@ public:
     /* Actions */
     static void DoAction( QObject * );
 
-    /* HACK for minimalView */
-    static QAction *minimalViewAction;
-    static QAction *fullscreenViewAction;
-
 private:
     /* All main Menus */
     static QMenu *FileMenu( intf_thread_t *, QWidget * );
