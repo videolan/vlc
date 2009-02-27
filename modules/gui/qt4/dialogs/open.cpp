@@ -181,6 +181,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     newCachingMethod( "file-caching" );
 
     setMinimumSize( sizeHint() );
+    setMaximumWidth( 900 );
     resize( getSettings()->value( "opendialog-size", QSize( 500, 490 ) ).toSize() );
 }
 
