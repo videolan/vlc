@@ -839,7 +839,6 @@ void InputManager::setAtoB()
 /* Function called regularly when in an AtoB loop */
 void InputManager::AtoBLoop( float, int i_time, int )
 {
-    msg_Dbg( p_intf, "I am here" );
     if( timeB )
     {
         if( ( i_time >= (int)( timeB/1000000 ) )
