@@ -136,7 +136,6 @@ private:
     void UpdateCaching();
     void UpdateRecord();
 
-    void AtoBLoop( int );
 
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
@@ -163,6 +162,7 @@ public slots:
 
 private slots:
     void togglePlayPause();
+    void AtoBLoop( float, int, int );
 
 signals:
     /// Send new position, new time and new length

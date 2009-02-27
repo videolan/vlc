@@ -823,18 +823,23 @@ void InputManager::setAtoB()
     {
         timeB = var_GetTime( THEMIM->getInput(), "time"  );
         var_SetTime( THEMIM->getInput(), "time" , timeA );
+        CONNECT( this, positionUpdated( float, int, int ),
+                 this, AtoBLoop( float, int, int ) );
     }
     else
     {
         timeA = 0;
         timeB = 0;
+        disconnect( this, SIGNAL( positionUpdated( float, int, int ) ),
+                    this, SLOT( AtoBLoop( float, int, int ) ) );
     }
     emit AtoBchanged( (timeA != 0 ), (timeB != 0 ) );
 }
 
 /* Function called regularly when in an AtoB loop */
-void InputManager::AtoBLoop( int i_time )
+void InputManager::AtoBLoop( float, int i_time, int )
 {
+    msg_Dbg( p_intf, "I am here" );
     if( timeB )
     {
         if( ( i_time >= (int)( timeB/1000000 ) )
