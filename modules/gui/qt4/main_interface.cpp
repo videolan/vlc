@@ -257,7 +257,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* And switch to minimal view if needed
        Must be called after the show() */
     if( i_visualmode == QT_MINIMAL_MODE )
-        toggleMinimalView();
+        toggleMinimalView( true );
 
     /* Update the geometry : It is useful if you switch between
        qt-display-modes ?*/
@@ -803,7 +803,7 @@ void MainInterface::dockPlaylist( pl_dock_e i_pos )
 {
 }
 
-void MainInterface::toggleMinimalView()
+void MainInterface::toggleMinimalView( bool b_switch )
 {
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
@@ -816,13 +816,13 @@ void MainInterface::toggleMinimalView()
         }
     }
 
-    TOGGLEV( menuBar() );
-    TOGGLEV( controls );
-    TOGGLEV( statusBar() );
-    TOGGLEV( inputC );
+    menuBar()->setVisible( !b_switch );
+    controls->setVisible( !b_switch );
+    statusBar()->setVisible( !b_switch );
+    inputC->setVisible( !b_switch );
     doComponentsUpdate();
 
-    QVLCMenu::minimalViewAction->setChecked( bgWasVisible );
+    emit minimalViewToggled( b_switch );
 }
 
 /* Video widget cannot do this synchronously as it runs in another thread */
@@ -855,6 +855,8 @@ void MainInterface::toggleAdvanced()
 /* Get the visibility status of the controls (hidden or not, advanced or not) */
 int MainInterface::getControlsVisibilityStatus()
 {
+    msg_Warn( p_intf, "%i", (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
+                            + CONTROLS_ADVANCED * controls->b_advancedVisible );
     return( (controls->isVisible() ? CONTROLS_VISIBLE : CONTROLS_HIDDEN )
                 + CONTROLS_ADVANCED * controls->b_advancedVisible );
 }
@@ -1126,7 +1128,7 @@ void MainInterface::keyPressEvent( QKeyEvent *e )
     if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() == Qt::Key_H )
           && menuBar()->isHidden() )
     {
-        toggleMinimalView();
+        toggleMinimalView( false );
         e->accept();
     }
 

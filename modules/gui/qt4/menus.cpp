@@ -75,7 +75,6 @@ static QActionGroup *currentGroup;
 
 /* HACK for minimalView to go around a Qt bug/feature
  * that doesn't update the QAction checked state when QMenu is hidden */
-QAction *QVLCMenu::minimalViewAction = NULL;
 QAction *QVLCMenu::fullscreenViewAction = NULL;
 
 QMenu *QVLCMenu::recentsMenu = NULL;
@@ -413,13 +412,14 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     }
 
     /* Minimal View */
-    QAction *action = menu->addAction( qtr( "Mi&nimal View" ), mi,
-            SLOT( toggleMinimalView() ), qtr( "Ctrl+H" ) );
+    QAction *action = menu->addAction( qtr( "Mi&nimal View" ) );
+    action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
+    action->setChecked( !with_intf &&
+            (mi->getControlsVisibilityStatus() && CONTROLS_HIDDEN ) );
 
-    if( mi->getControlsVisibilityStatus() & CONTROLS_VISIBLE )
-        action->setChecked( true );
-    minimalViewAction = action; /* HACK for minimalView */
+    CONNECT( action, triggered( bool ), mi, toggleMinimalView( bool ) );
+    CONNECT( mi, minimalViewToggled( bool ), action, setChecked( bool ) );
 
     /* FullScreen View */
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,

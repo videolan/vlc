@@ -51,9 +51,9 @@ class QMenu;
 class QSize;
 
 enum {
-    CONTROLS_HIDDEN = 0x0,
     CONTROLS_VISIBLE = 0x1,
-    CONTROLS_ADVANCED = 0x2
+    CONTROLS_HIDDEN = 0x2,
+    CONTROLS_ADVANCED = 0x4,
 };
 
 typedef enum pl_dock_e {
@@ -153,7 +153,7 @@ private:
 public slots:
     void undockPlaylist();
     void dockPlaylist( pl_dock_e i_pos = PL_BOTTOM );
-    void toggleMinimalView();
+    void toggleMinimalView( bool );
     void togglePlaylist();
     void toggleUpdateSystrayMenu();
     void toggleAdvanced();
@@ -185,6 +185,7 @@ signals:
     void askVideoToToggle();
     void askBgWidgetToToggle();
     void askUpdate();
+    void minimalViewToggled( bool );
 };
 
 #endif
