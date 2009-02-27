@@ -120,6 +120,44 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
 }
 
+void SoundWidget::updateVolume( int i_sliderVolume )
+{
+    if( !b_my_volume )
+    {
+        int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
+        aout_VolumeSet( p_intf, i_res );
+    }
+    if( i_sliderVolume == 0 )
+    {
+        volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
+        volMuteLabel->setToolTip( qtr( "Unmute" ) );
+        return;
+    }
+
+    if( i_sliderVolume < VOLUME_MAX / 3 )
+        volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
+    else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
+        volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
+    volMuteLabel->setToolTip( qtr( "Mute" ) );
+}
+
+void SoundWidget::updateVolume()
+{
+    /* Audio part */
+    audio_volume_t i_volume;
+    aout_VolumeGet( p_intf, &i_volume );
+    i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
+    int i_gauge = volumeSlider->value();
+    b_my_volume = false;
+    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
+    {
+        b_my_volume = true;
+        volumeSlider->setValue( i_volume );
+        b_my_volume = false;
+    }
+}
+
 void SoundWidget::showVolumeMenu( QPoint pos )
 {
     volumeMenu->exec( QCursor::pos() - pos - QPoint( 0, volumeMenu->height()/2 )
@@ -150,44 +188,9 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
     }
 }
 
-void SoundWidget::updateVolume( int i_sliderVolume )
-{
-    if( !b_my_volume )
-    {
-        int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
-        aout_VolumeSet( p_intf, i_res );
-    }
-    if( i_sliderVolume == 0 )
-    {
-        volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
-        volMuteLabel->setToolTip( qtr( "Unmute" ) );
-        return;
-    }
-
-    if( i_sliderVolume < VOLUME_MAX / 3 )
-        volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
-    else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
-        volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
-    else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
-    volMuteLabel->setToolTip( qtr( "Mute" ) );
-}
-
-void SoundWidget::updateVolume()
-{
-    /* Audio part */
-    audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
-    i_volume = ( i_volume *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
-    int i_gauge = volumeSlider->value();
-    b_my_volume = false;
-    if( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
-    {
-        b_my_volume = true;
-        volumeSlider->setValue( i_volume );
-        b_my_volume = false;
-    }
-}
-
+/**
+ * Play Button
+ **/
 void PlayButton::updateButton( bool b_playing )
 {
     setIcon( b_playing ? QIcon( ":/pause_b" ) : QIcon( ":/play_b" ) );
