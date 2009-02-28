@@ -742,8 +742,10 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                 case 'f':
                     if( p_item && p_item->p_stats )
                     {
+                        vlc_mutex_lock( &p_item->p_stats->lock );
                         snprintf( buf, 10, "%d",
                                   p_item->p_stats->i_displayed_pictures );
+                        vlc_mutex_unlock( &p_item->p_stats->lock );
                     }
                     else
                     {
