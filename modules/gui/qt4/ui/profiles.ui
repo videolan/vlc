@@ -45,12 +45,6 @@
        <string>_("Encapsulation")</string>
       </attribute>
       <layout class="QGridLayout" >
-       <property name="leftMargin" >
-        <number>9</number>
-       </property>
-       <property name="rightMargin" >
-        <number>9</number>
-       </property>
        <item row="2" column="0" >
         <widget class="QRadioButton" name="TSMux" >
          <property name="text" >
