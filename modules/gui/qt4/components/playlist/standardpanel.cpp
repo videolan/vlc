@@ -127,20 +127,23 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Repeat 3-state button */
     repeatButton = new QPushButton( this );
+    repeatButton->setToolTip( qtr( "Click to toggle between loop one, loop all" ) );
+    repeatButton->setCheckable( true );
+
     if( model->hasRepeat() )
     {
         repeatButton->setIcon( QIcon( ":/repeat_one" ) );
-        repeatButton->setToolTip( qtr( I_PL_REPEAT ));
+        repeatButton->setChecked( true );
     }
     else if( model->hasLoop() )
     {
         repeatButton->setIcon( QIcon( ":/repeat_all" ) );
-        repeatButton->setToolTip( qtr( I_PL_LOOP ));
+        repeatButton->setChecked( true );
     }
     else
     {
-        repeatButton->setIcon( QIcon( ":/repeat_off" ) );
-        repeatButton->setToolTip( qtr( I_PL_NOREPEAT ));
+        repeatButton->setIcon( QIcon( ":/repeat_one" ) );
+        repeatButton->setChecked( false );
     }
     BUTTONACT( repeatButton, toggleRepeat() );
     buttons->addWidget( repeatButton );
@@ -177,19 +180,19 @@ void StandardPLPanel::toggleRepeat()
     {
         model->setRepeat( false ); model->setLoop( true );
         repeatButton->setIcon( QIcon( ":/repeat_all" ) );
-        repeatButton->setToolTip( qtr( I_PL_LOOP ));
+        repeatButton->setChecked( true );
     }
     else if( model->hasLoop() )
     {
         model->setRepeat( false ) ; model->setLoop( false );
-        repeatButton->setIcon( QIcon( ":/repeat_off" ) );
-        repeatButton->setToolTip( qtr( I_PL_NOREPEAT ));
+        repeatButton->setChecked( false );
+        repeatButton->setIcon( QIcon( ":/repeat_one" ) );
     }
     else
     {
-        model->setRepeat( true );
+        model->setRepeat( true ); model->setLoop( false );
+        repeatButton->setChecked( true );
         repeatButton->setIcon( QIcon( ":/repeat_one" ) );
-        repeatButton->setToolTip( qtr( I_PL_REPEAT ));
     }
 }
 
