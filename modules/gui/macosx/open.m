@@ -1,14 +1,14 @@
 /*****************************************************************************
- * open.m: MacOS X module for vlc
+ * open.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *          Benjamin Pracht <bigben at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -163,7 +163,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
 
-    [o_btn_ok setTitle: _NS("OK")];
+    [o_btn_ok setTitle: _NS("Open")];
     [o_btn_cancel setTitle: _NS("Cancel")];
 
     [[o_tabview tabViewItemAtIndex: 0] setLabel: _NS("File")];
@@ -180,19 +180,23 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_disc_videots_btn_browse setTitle: _NS("Browse...")];
     [o_disc_dvd_menus setTitle: _NS("No DVD menus")];
 
-    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS directory")];
+    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("VIDEO_TS folder")];
     [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD")];
     [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
     [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("Audio CD")];
 
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
-    [o_net_udpm_addr_lbl setStringValue: _NS("Address")];
+    [o_net_udpm_addr_lbl setStringValue: _NS("IP Address")];
     [o_net_udpm_port_lbl setStringValue: _NS("Port")];
     [o_net_http_url_lbl setStringValue: _NS("URL")];
+    [o_net_help_lbl setStringValue: _NS("To Open a usual network stream (HTTP, RTSP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.")];
+    [o_net_help_udp_lbl setStringValue: _NS("If you want to open a multicast stream, enter the respective IP address given by the stream provider. In unicast mode, VLC use your machine's IP automatically.\n\nTo open a stream using a different protocol, just press Cancel to close this sheet.")];
+    [o_net_udp_cancel_btn setTitle: _NS("Cancel")];
+    [o_net_udp_ok_btn setTitle: _NS("Open")];
+    [o_net_openUDP_btn setTitle: _NS("Open RTP/UDP Stream")];
 
     [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
     [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
-    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("HTTP/FTP/MMS/RTSP")];
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
@@ -200,8 +204,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_eyetv_chn_bgbar setUsesThreadedAnimation: YES];
 
     [o_capture_mode_pop removeAllItems];
-    if( MACOS_VERSION > 10.4f )
-        [o_capture_mode_pop addItemWithTitle: @"iSight"];
+    [o_capture_mode_pop addItemWithTitle: @"iSight"];
     [o_capture_mode_pop addItemWithTitle: _NS("Screen")];
     [o_capture_mode_pop addItemWithTitle: @"EyeTV"];
     [o_screen_lbl setStringValue: _NS("Screen Capture Input")];
@@ -729,7 +732,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else if ( [[sender selectedCell] tag] == 1 )
         [o_panel makeFirstResponder: o_net_udpm_addr];
     else
-        [o_panel makeFirstResponder: o_net_http_url];
+        msg_Warn( p_intf, "Unknown sender tried to change UDP/RTP mode" );
+
 
     [self openNetInfoChanged: nil];
 }
@@ -758,37 +762,40 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)openNetInfoChanged:(NSNotification *)o_notification
 {
-    NSString *o_mode;
     NSString *o_mrl_string = [NSString string];
 
-    o_mode = [[o_net_mode selectedCell] title];
-
-    if( [o_mode isEqualToString: _NS("UDP/RTP")] )
+    if( [o_net_udp_panel isVisible] )
     {
-        int i_port = [o_net_udp_port intValue];
+        NSString *o_mode;
+        o_mode = [[o_net_mode selectedCell] title];
 
-        o_mrl_string = [NSString stringWithString: @"udp://"];
-
-        if( i_port != config_GetInt( p_intf, "server-port" ) )
+        if( [o_mode isEqualToString: _NS("UDP/RTP")] )
         {
-            o_mrl_string =
-                [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
+            int i_port = [o_net_udp_port intValue];
+
+            o_mrl_string = [NSString stringWithString: @"udp://"];
+
+            if( i_port != config_GetInt( p_intf, "server-port" ) )
+            {
+                o_mrl_string =
+                    [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
+            }
+        }
+        else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] )
+        {
+            NSString *o_addr = [o_net_udpm_addr stringValue];
+            int i_port = [o_net_udpm_port intValue];
+
+            o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
+
+            if( i_port != config_GetInt( p_intf, "server-port" ) )
+            {
+                o_mrl_string =
+                    [o_mrl_string stringByAppendingFormat: @":%i", i_port];
+            }
         }
     }
-    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] )
-    {
-        NSString *o_addr = [o_net_udpm_addr stringValue];
-        int i_port = [o_net_udpm_port intValue];
-
-        o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
-
-        if( i_port != config_GetInt( p_intf, "server-port" ) )
-        {
-            o_mrl_string =
-                [o_mrl_string stringByAppendingFormat: @":%i", i_port];
-        }
-    }
-    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS/RTSP")] )
+    else
     {
         NSString *o_url = [o_net_http_url stringValue];
 
@@ -801,6 +808,55 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_mrl setStringValue: o_mrl_string];
 }
 
+- (IBAction)openNetUDPButtonAction:(id)sender
+{
+    if( sender == o_net_openUDP_btn )
+    {
+        [NSApp beginSheet: o_net_udp_panel
+           modalForWindow: o_panel
+            modalDelegate: self
+           didEndSelector: NULL
+              contextInfo: nil];
+    }
+    else if( sender == o_net_udp_cancel_btn )
+    {
+        [o_net_udp_panel orderOut: sender];
+        [NSApp endSheet: o_net_udp_panel];
+    }
+    else if( sender == o_net_udp_ok_btn )
+    {
+        NSString *o_mrl_string = [NSString string];
+        if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("UDP/RTP")] )
+        {
+            int i_port = [o_net_udp_port intValue];
+            
+            o_mrl_string = [NSString stringWithString: @"udp://"];
+            
+            if( i_port != config_GetInt( p_intf, "server-port" ) )
+            {
+                o_mrl_string =
+                [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
+            }
+        }
+        else if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("UDP/RTP Multicast")] )
+        {
+            NSString *o_addr = [o_net_udpm_addr stringValue];
+            int i_port = [o_net_udpm_port intValue];
+            
+            o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
+            
+            if( i_port != config_GetInt( p_intf, "server-port" ) )
+            {
+                o_mrl_string =
+                [o_mrl_string stringByAppendingFormat: @":%i", i_port];
+            }
+        }
+        [o_mrl setStringValue: o_mrl_string];
+        [o_net_udp_panel orderOut: sender];
+        [NSApp endSheet: o_net_udp_panel];
+    }
+}
+    
 - (void)openFile
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
@@ -1034,6 +1090,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
         contextInfo: nil];
 }
 
+- (IBAction)subCloseSheet:(id)sender
+{
+    [o_file_sub_sheet orderOut:sender];
+    [NSApp endSheet: o_file_sub_sheet];
+}
+    
 - (IBAction)subFileBrowse:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
@@ -1067,12 +1129,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)subFpsStepperChanged:(id)sender;
 {
     [o_file_sub_fps setFloatValue: [o_file_sub_fps_stp floatValue]];
-}
-
-- (IBAction)subCloseSheet:(id)sender
-{
-    [o_file_sub_sheet orderOut:sender];
-    [NSApp endSheet: o_file_sub_sheet];
 }
 
 - (IBAction)panelCancel:(id)sender

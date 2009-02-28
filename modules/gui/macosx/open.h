@@ -1,13 +1,13 @@
 /*****************************************************************************
- * open.h: MacOS X module for vlc
+ * open.h: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,7 +65,15 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_disc_dvd_menus;
 
     /* open network */
+    IBOutlet id o_net_help_lbl;
+    IBOutlet id o_net_help_udp_lbl;
+    IBOutlet id o_net_http_url;
+    IBOutlet id o_net_http_url_lbl;
     IBOutlet id o_net_mode;
+    IBOutlet id o_net_openUDP_btn;
+    IBOutlet id o_net_udp_cancel_btn;
+    IBOutlet id o_net_udp_ok_btn;
+    IBOutlet id o_net_udp_panel;
     IBOutlet id o_net_udp_port;
     IBOutlet id o_net_udp_port_lbl;
     IBOutlet id o_net_udp_port_stp;
@@ -74,8 +82,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_net_udpm_port;
     IBOutlet id o_net_udpm_port_lbl;
     IBOutlet id o_net_udpm_port_stp;
-    IBOutlet id o_net_http_url;
-    IBOutlet id o_net_http_url_lbl;
 
     /* open subtitle file */
     IBOutlet id o_file_sub_ckbox;
@@ -170,6 +176,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)openNetModeChanged:(id)sender;
 - (IBAction)openNetStepperChanged:(id)sender;
 - (void)openNetInfoChanged:(NSNotification *)o_notification;
+- (IBAction)openNetUDPButtonAction:(id)sender;
 
 - (void)openCapture;
 - (void)showCaptureView: theView;
