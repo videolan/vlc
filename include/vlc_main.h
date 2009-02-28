@@ -37,9 +37,6 @@ struct libvlc_int_t
 {
     VLC_COMMON_MEMBERS
 
-    /* FIXME: this is only used by the logger module! */
-    global_stats_t       *p_stats;           ///< Global statistics
-
     /* Structure storing the action name / key associations */
     struct hotkey
     {

@@ -149,17 +149,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( !p_input->p )
         return NULL;
 
-    /* One "randomly" selected input thread is responsible for computing
-     * the global stats. Check if there is already someone doing this */
-    if( p_input->p_libvlc->p_stats && !b_quick )
-    {
-        libvlc_priv_t *p_private = libvlc_priv( p_input->p_libvlc );
-        vlc_mutex_lock( &p_input->p_libvlc->p_stats->lock );
-        if( p_private->p_stats_computer == NULL )
-            p_private->p_stats_computer = p_input;
-        vlc_mutex_unlock( &p_input->p_libvlc->p_stats->lock );
-    }
-
     p_input->b_preparsing = b_quick;
     p_input->psz_header = psz_header ? strdup( psz_header ) : NULL;
 
@@ -700,12 +689,6 @@ static void MainLoopInterface( input_thread_t *p_input )
 static void MainLoopStatistic( input_thread_t *p_input )
 {
     stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );
-    /* Are we the thread responsible for computing global stats ? */
-    if( libvlc_priv( p_input->p_libvlc )->p_stats_computer == p_input )
-    {
-        stats_ComputeGlobalStats( p_input->p_libvlc,
-                                  p_input->p_libvlc->p_stats );
-    }
     input_SendEventStatistics( p_input );
 }
 
@@ -1324,13 +1307,6 @@ static void End( input_thread_t * p_input )
 
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );
-            if( p_private->p_stats_computer == p_input )
-            {
-                stats_ComputeGlobalStats( p_input->p_libvlc,
-                                          p_input->p_libvlc->p_stats );
-                /* FIXME how can it be thread safe ? */
-                p_private->p_stats_computer = NULL;
-            }
             CL_CO( read_bytes );
             CL_CO( read_packets );
             CL_CO( demux_read );

@@ -217,9 +217,6 @@ typedef struct libvlc_priv_t
     int                i_timers;    ///< Number of timers
     bool               b_stats;     ///< Whether to collect stats
 
-    void              *p_stats_computer;  ///< Input thread computing stats
-                                          /// (needs cleanup)
-
     /* Singleton objects */
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
     playlist_t        *p_playlist; //< the playlist singleton

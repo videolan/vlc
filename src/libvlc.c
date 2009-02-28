@@ -791,16 +791,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->i_timers = 0;
     priv->pp_timers = NULL;
 
-    /* Init stats */
-    p_libvlc->p_stats = (global_stats_t *)malloc( sizeof( global_stats_t ) );
-    if( !p_libvlc->p_stats )
-    {
-        vlc_object_release( p_libvlc );
-        return VLC_ENOMEM; /* FIXME: leaks */
-    }
-    vlc_mutex_init( &p_libvlc->p_stats->lock );
-    priv->p_stats_computer = NULL;
-
     priv->i_last_input_id = 0; /* Not very safe, should be removed */
 
     /*
@@ -1080,8 +1070,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     stats_TimersCleanAll( p_libvlc );
 
     msg_Dbg( p_libvlc, "removing stats" );
-    vlc_mutex_destroy( &p_libvlc->p_stats->lock );
-    FREENULL( p_libvlc->p_stats );
 
 #ifndef WIN32
     char* psz_pidfile = NULL;
