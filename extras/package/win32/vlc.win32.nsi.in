@@ -214,6 +214,7 @@ FunctionEnd
   !insertmacro ${_action} ".spx"
   !insertmacro ${_action} ".wav"
   !insertmacro ${_action} ".wma"
+  !insertmacro ${_action} ".wv"
   !insertmacro ${_action} ".xm"
 !macroend
 
