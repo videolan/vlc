@@ -602,6 +602,7 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
         .number = ptype,
     };
 
+    /* Remember to keep this in sync with modules/services_discovery/sap.c */
     switch (ptype)
     {
       case 0:

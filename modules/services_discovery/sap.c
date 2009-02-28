@@ -290,9 +290,11 @@ static bool IsWellKnownPayload (int type)
     switch (type)
     {   /* Should be in sync with modules/demux/rtp.c */
         case  0: /* PCMU/8000 */
+        case  3:
         case  8: /* PCMA/8000 */
         case 10: /* L16/44100/2 */
         case 11: /* L16/44100 */
+        case 12:
         case 14: /* MPA/90000 */
         case 32: /* MPV/90000 */
         case 33: /* MP2/90000 */
