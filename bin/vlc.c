@@ -120,8 +120,20 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigdelset (&set, SIGCHLD);
 
     /* Note that FromLocale() can be used before libvlc is initialized */
-    for (int i = 0; i < i_argc; i++)
-        if ((ppsz_argv[i] = FromLocale (ppsz_argv[i])) == NULL)
+    const char *argv[i_argc + 3];
+    int argc = 0;
+
+#ifdef TOP_BUILDDIR
+    argv[argc++] = FromLocale ("--plugin-path="TOP_BUILDDIR"/modules");
+#endif
+#ifdef TOP_SRCDIR
+# ifdef ENABLE_HTTPD
+    argv[argc++] = FromLocale ("--http-src="TOP_SRCDIR"/share/http");
+# endif
+#endif
+
+    for (int i = 1; i < i_argc; i++)
+        if ((argv[argc++] = FromLocale (ppsz_argv[i])) == NULL)
             return 1; // BOOM!
 
     libvlc_exception_t ex, dummy;
@@ -129,9 +141,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_exception_init (&dummy);
 
     /* Initialize libvlc */
-    int i_argc_real = i_argc ? i_argc - 1 : 0;
-    const char **ppsz_argv_real = i_argc ? &ppsz_argv[1] : ppsz_argv;
-    libvlc_instance_t *vlc = libvlc_new (i_argc_real, ppsz_argv_real, &ex);
+    libvlc_instance_t *vlc = libvlc_new (argc, argv, &ex);
 
     if (vlc != NULL)
     {
@@ -153,8 +163,8 @@ int main( int i_argc, const char *ppsz_argv[] )
     libvlc_exception_clear (&ex);
     libvlc_exception_clear (&dummy);
 
-    for (int i = 0; i < i_argc; i++)
-        LocaleFree (ppsz_argv[i]);
+    for (int i = 0; i < argc; i++)
+        LocaleFree (argv[i]);
 
     return i_ret;
 }

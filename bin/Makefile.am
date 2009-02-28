@@ -30,6 +30,10 @@ vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
 vlc_LDADD = ../src/libvlc.la `$(VLC_CONFIG) -libs vlc`
 
 vlc_static_SOURCES = $(vlc_SOURCES)
+vlc_static_CFLAGS = $(AM_CFLAGS) \
+	-DTOP_BUILDDIR=\"$$(cd "$(top_builddir)"; pwd)\" \
+	-DTOP_SRCDIR=\"$$(cd "$(top_srcdir)"; pwd)\" \
+	$(NULL)
 vlc_static_DEPENDENCIES = $(vlc_DEPENDENCIES)
 vlc_static_LDADD = $(vlc_LDADD)
 vlc_static_LDFLAGS = $(vlc_LDFLAGS) -no-install -static
