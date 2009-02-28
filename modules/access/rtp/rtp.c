@@ -556,6 +556,7 @@ static void *mpv_init (demux_t *demux)
     es_format_t fmt;
 
     es_format_Init (&fmt, VIDEO_ES, VLC_FOURCC ('m', 'p', 'g', 'v'));
+    fmt.b_packetized = false;
     return codec_init (demux, &fmt);
 }
 
