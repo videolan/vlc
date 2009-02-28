@@ -121,6 +121,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     randomButton->setIcon( QIcon( ":/shuffle_on" ));
     randomButton->setToolTip( qtr( I_PL_RANDOM ));
     randomButton->setCheckable( true );
+    randomButton->setChecked( model->hasRandom() );
     BUTTONACT( randomButton, toggleRandom() );
     buttons->addWidget( randomButton );
 
