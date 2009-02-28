@@ -285,6 +285,22 @@ static inline int min_int( int a, int b )
     return a > b ? b : a;
 }
 
+static bool IsWellKnownPayload (int type)
+{
+    switch (type)
+    {   /* Should be in sync with modules/demux/rtp.c */
+        case  0: /* PCMU/8000 */
+        case  8: /* PCMA/8000 */
+        case 10: /* L16/44100/2 */
+        case 11: /* L16/44100 */
+        case 14: /* MPA/90000 */
+        case 32: /* MPV/90000 */
+        case 33: /* MP2/90000 */
+            return true;
+   }
+   return false;
+}
+
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
@@ -391,19 +407,8 @@ static int OpenDemux( vlc_object_t *p_this )
     {
         p_sdp->psz_uri = NULL;
     }
-    switch (p_sdp->i_media_type)
-    {   /* Should be in sync with modules/demux/rtp.c */
-        case  0: /* PCMU/8000 */
-        case  8: /* PCMA/8000 */
-        case 10: /* L16/44100/2 */
-        case 11: /* L16/44100 */
-        case 14: /* MPA/90000 */
-        case 32: /* MPV/90000 */
-        case 33: /* MP2/90000 */
-            break;
-        default:
-            goto error;
-    }
+    if (!IsWellKnownPayload (p_sdp->i_media_type))
+        goto error;
     if( p_sdp->psz_uri == NULL ) goto error;
 
     p_demux->p_sys = (demux_sys_t *)malloc( sizeof(demux_sys_t) );
@@ -789,10 +794,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
         p_sdp->psz_uri = NULL;
 
     /* Multi-media or no-parse -> pass to LIVE.COM */
-    if( ( p_sdp->i_media_type != 14
-       && p_sdp->i_media_type != 32
-       && p_sdp->i_media_type != 33)
-     || p_sd->p_sys->b_parse == false )
+    if( !IsWellKnownPayload( p_sdp->i_media_type ) || !p_sd->p_sys->b_parse )
     {
         free( p_sdp->psz_uri );
         if (asprintf( &p_sdp->psz_uri, "sdp://%s", p_sdp->psz_sdp ) == -1)
