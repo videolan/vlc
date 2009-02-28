@@ -479,6 +479,8 @@ QFrame *AbstractController::discFrame()
             sectionNext() );
     CONNECT( menuButton, clicked(), THEMIM->getIM(),
             sectionMenu() );
+    connect( THEMIM->getIM(), SIGNAL( titleChanged( bool ) ),
+             this, SIGNAL( sizeChanged() ) );
 
     return discFrame;
 }

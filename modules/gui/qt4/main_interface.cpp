@@ -426,6 +426,8 @@ void MainInterface::handleMainUi( QSettings *settings )
                    settings->value( "adv-controls", false ).toBool(), this );
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
+    CONNECT( controls, sizeChanged(),
+             this, doComponentsUpdate() );
     inputC = new InputControlsWidget( p_intf, this );
 
         /* Visualisation */
