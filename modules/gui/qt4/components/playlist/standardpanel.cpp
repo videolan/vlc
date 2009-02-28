@@ -118,16 +118,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Random 2-state button */
     randomButton = new QPushButton( this );
-    if( model->hasRandom() )
-    {
-        randomButton->setIcon( QIcon( ":/shuffle_on" ));
-        randomButton->setToolTip( qtr( I_PL_RANDOM ));
-    }
-    else
-    {
-         randomButton->setIcon( QIcon( ":/shuffle_off" ) );
-         randomButton->setToolTip( qtr( I_PL_NORANDOM ));
-    }
+    randomButton->setIcon( QIcon( ":/shuffle_on" ));
+    randomButton->setToolTip( qtr( I_PL_RANDOM ));
+    randomButton->setCheckable( true );
     BUTTONACT( randomButton, toggleRandom() );
     buttons->addWidget( randomButton );
 
@@ -204,10 +197,6 @@ void StandardPLPanel::toggleRandom()
 {
     bool prev = model->hasRandom();
     model->setRandom( !prev );
-    randomButton->setIcon( prev ?
-                QIcon( ":/shuffle_off" ) :
-                QIcon( ":/shuffle_on" ) );
-    randomButton->setToolTip( prev ? qtr( I_PL_NORANDOM ) : qtr(I_PL_RANDOM ) );
 }
 
 void StandardPLPanel::gotoPlayingItem()

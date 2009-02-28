@@ -39,7 +39,6 @@
   <file alias="repeat_all">pixmaps/playlist/repeat_all.png</file>
   <file alias="repeat_off">pixmaps/playlist/repeat_off.png</file>
   <file alias="repeat_one">pixmaps/playlist/repeat_one.png</file>
-  <file alias="shuffle_off">pixmaps/playlist/shuffle_off.png</file>
   <file alias="shuffle_on">pixmaps/playlist/shuffle_on.png</file>
   <file alias="jump_to">pixmaps/playlist/jumpto.png</file>
   <file alias="type_directory">pixmaps/types/type_directory.png</file>
