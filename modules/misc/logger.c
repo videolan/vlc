@@ -88,12 +88,6 @@ struct msg_cb_data_t
  *****************************************************************************/
 struct intf_sys_t
 {
-    struct
-    {
-        FILE *stream;
-        vlc_thread_t thread;
-    } rrd;
-
     msg_subscription_t *p_sub;
     msg_cb_data_t msg;
 };
@@ -110,8 +104,6 @@ static void HtmlPrint         ( const msg_item_t *, FILE * );
 #ifdef HAVE_SYSLOG_H
 static void SyslogPrint       ( const msg_item_t *);
 #endif
-
-static void *DoRRD( void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -150,8 +142,7 @@ vlc_module_begin ()
                 false )
         change_string_list( mode_list, mode_list_text, 0 )
 
-    add_file( "rrd-file", NULL, NULL, N_("RRD output file") ,
-                    N_("Output data for RRDTool in this file." ), true )
+    add_obsolete_string( "rrd-file" )
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
@@ -164,7 +155,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
-    char *psz_mode, *psz_rrd_file;
+    char *psz_mode;
 
     CONSOLE_INTRO_MSG;
     msg_Info( p_intf, "using logger..." );
@@ -263,27 +254,6 @@ static int Open( vlc_object_t *p_this )
 #endif
     }
 
-    psz_rrd_file = config_GetPsz( p_intf, "rrd-file" );
-    if( psz_rrd_file && *psz_rrd_file )
-    {
-        FILE *rrd = utf8_fopen( psz_rrd_file, "w" );
-        if (rrd != NULL)
-        {
-            setvbuf (rrd, NULL, _IOLBF, BUFSIZ);
-            if (!vlc_clone (&p_sys->rrd.thread, DoRRD, p_intf,
-                            VLC_THREAD_PRIORITY_LOW))
-                p_sys->rrd.stream = rrd;
-            else
-            {
-                fclose (rrd);
-                p_sys->rrd.stream = NULL;
-            }
-        }
-    }
-    else
-        p_sys->rrd.stream = NULL;
-    free( psz_rrd_file );
-
     p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, Overflow, &p_sys->msg );
 
     return 0;
@@ -296,12 +266,6 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
-
-    if (p_sys->rrd.stream)
-    {
-        vlc_cancel (p_sys->rrd.thread);
-        vlc_join (p_sys->rrd.thread, NULL);
-    }
 
     /* Flush the queue and unsubscribe from the message queue */
     /* FIXME: flush */
@@ -406,31 +370,4 @@ static void HtmlPrint( const msg_item_t *p_msg, FILE *p_file )
     fprintf( p_file, "%s%s%s%s</span>\n", p_msg->psz_module,
              ppsz_type[p_msg->i_type], ppsz_color[p_msg->i_type],
              p_msg->psz_msg );
-}
-
-static void *DoRRD (void *data)
-{
-    intf_thread_t *p_intf = data;
-    FILE *file = p_intf->p_sys->rrd.stream;
-
-    for (;;)
-    {
-        /* FIXME: I wonder how memory synchronization occurs here...
-         * -- Courmisch */
-        if( p_intf->p_libvlc->p_stats )
-        {
-            lldiv_t in = lldiv( p_intf->p_libvlc->p_stats->f_input_bitrate * 1000000,
-                                1000 );
-            lldiv_t dm = lldiv( p_intf->p_libvlc->p_stats->f_demux_bitrate * 1000000,
-                                1000 );
-            lldiv_t out = lldiv( p_intf->p_libvlc->p_stats->f_output_bitrate * 1000000,
-                                1000 );
-            fprintf( file,
-                    "%"PRIi64":%lld.%03llu:%lld.%03llu:%lld.%03llu\n",
-                    (int64_t)time(NULL), in.quot, in.rem, dm.quot, dm.rem, out.quot, out.rem );
-        }
-#undef msleep /* yeah, we really want to wake up every second here */
-        msleep (CLOCK_FREQ);
-    }
-    assert (0);
 }
