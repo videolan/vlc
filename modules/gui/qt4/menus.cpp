@@ -1139,7 +1139,8 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     }
 
     /* Check the type of the object variable */
-    /* What is the following HACK needed for? */
+    /* This HACK is needed so we have a radio button for audio and video tracks
+       instread of a checkbox */
     if( !strcmp( psz_var, "audio-es" )
      || !strcmp( psz_var, "video-es" ) )
         i_type = VLC_VAR_INTEGER | VLC_VAR_HASCHOICE;
