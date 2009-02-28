@@ -495,6 +495,8 @@ QFrame *AbstractController::telexFrame()
     telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
     CONNECT( THEMIM->getIM(), teletextPossible( bool ),
              telexFrame, setVisible( bool ) );
+    connect( THEMIM->getIM(), SIGNAL( teletextPossible( bool ) ),
+             this, SIGNAL( sizeChanged() ) );
 
     /* On/Off button */
     QToolButton *telexOn = new QToolButton;
