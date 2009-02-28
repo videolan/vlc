@@ -427,9 +427,6 @@ int OpenEncoder( vlc_object_t *p_this )
 
         p_context->width = p_enc->fmt_in.video.i_width;
         p_context->height = p_enc->fmt_in.video.i_height;
-        if( p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '2', 'v')
-             && (p_context->width > 720 || p_context->height > 576) )
-            p_context->level = 4; /* High level */
 
         p_context->time_base.num = p_enc->fmt_in.video.i_frame_rate_base;
         p_context->time_base.den = p_enc->fmt_in.video.i_frame_rate;
