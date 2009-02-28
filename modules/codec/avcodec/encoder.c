@@ -70,7 +70,7 @@ struct thread_context_t;
 static void* FfmpegThread( vlc_object_t *p_this );
 static int FfmpegExecute( AVCodecContext *s,
                           int (*pf_func)(AVCodecContext *c2, void *arg2),
-                          void **arg, int *ret, int count );
+                          void *arg, int *ret, int count, int );
 
 /*****************************************************************************
  * thread_context_t : for multithreaded encoding
@@ -751,25 +751,25 @@ static void* FfmpegThread( vlc_object_t *p_this )
 
 static int FfmpegExecute( AVCodecContext *s,
                           int (*pf_func)(AVCodecContext *c2, void *arg2),
-                          void **arg, int *ret, int count )
+                          void *arg, int *ret, int count, int size )
 {
     struct thread_context_t ** pp_contexts =
                          (struct thread_context_t **)s->thread_opaque;
-    int i;
+    void **argv = arg;
 
     /* Note, we can be certain that this is not called with the same
      * AVCodecContext by different threads at the same time */
-    for ( i = 0; i < count; i++ )
+    for ( int i = 0; i < count; i++ )
     {
         vlc_mutex_lock( &pp_contexts[i]->lock );
-        pp_contexts[i]->arg = arg[i];
+        pp_contexts[i]->arg = argv[i];
         pp_contexts[i]->pf_func = pf_func;
         pp_contexts[i]->i_ret = 12345;
         pp_contexts[i]->b_work = 1;
         vlc_cond_signal( &pp_contexts[i]->cond );
         vlc_mutex_unlock( &pp_contexts[i]->lock );
     }
-    for ( i = 0; i < count; i++ )
+    for ( int i = 0; i < count; i++ )
     {
         vlc_mutex_lock( &pp_contexts[i]->lock );
         while ( !pp_contexts[i]->b_done )
@@ -786,6 +786,7 @@ static int FfmpegExecute( AVCodecContext *s,
         }
     }
 
+    (void)size;
     return 0;
 }
 
