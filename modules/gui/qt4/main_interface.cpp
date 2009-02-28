@@ -1129,7 +1129,7 @@ void MainInterface::customEvent( QEvent *event )
 void MainInterface::keyPressEvent( QKeyEvent *e )
 {
     if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() == Qt::Key_H )
-          && menuBar()->isHidden() )
+          && !menuBar()->isVisible() )
     {
         toggleMinimalView( false );
         e->accept();

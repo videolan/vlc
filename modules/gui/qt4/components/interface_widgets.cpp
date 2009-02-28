@@ -127,7 +127,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
     videoSize.rwidth() = w;
     videoSize.rheight() = h;
-    if( isHidden() ) show();
+    if( !isVisible() ) show();
     updateGeometry(); // Needed for deinterlace
 }
 
