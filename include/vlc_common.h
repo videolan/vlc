@@ -361,7 +361,6 @@ typedef struct counter_t     counter_t;
 typedef struct counter_sample_t counter_sample_t;
 typedef struct stats_handler_t stats_handler_t;
 typedef struct input_stats_t input_stats_t;
-typedef struct global_stats_t global_stats_t;
 
 /* Update */
 typedef struct update_t update_t;

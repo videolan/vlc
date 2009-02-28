@@ -343,7 +343,6 @@ spu_DisplaySubpicture
 spu_Init
 spu_RenderSubpictures
 spu_SortSubpictures
-__stats_ComputeGlobalStats
 stats_ComputeInputStats
 stats_CounterClean
 __stats_CounterCreate

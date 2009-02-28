@@ -299,24 +299,6 @@ VLC_EXPORT( void, stats_ComputeInputStats, (input_thread_t*, input_stats_t*) );
 VLC_EXPORT( void, stats_ReinitInputStats, (input_stats_t *) );
 VLC_EXPORT( void, stats_DumpInputStats, (input_stats_t *) );
 
-/********************
- * Global stats
- *******************/
-struct global_stats_t
-{
-    vlc_mutex_t lock;
-
-    float f_input_bitrate;
-    float f_demux_bitrate;
-    float f_output_bitrate;
-
-    int i_http_clients;
-};
-
-#define stats_ComputeGlobalStats(a,b) __stats_ComputeGlobalStats( VLC_OBJECT(a),b)
-VLC_EXPORT( void, __stats_ComputeGlobalStats, (vlc_object_t*,global_stats_t*));
-
-
 /*********
  * Timing
  ********/
