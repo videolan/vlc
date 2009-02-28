@@ -529,6 +529,7 @@ static void *mpa_init (demux_t *demux)
 
     es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('m', 'p', 'g', 'a'));
     fmt.audio.i_channels = 2;
+    fmt.b_packetized = false;
     return codec_init (demux, &fmt);
 }
 
