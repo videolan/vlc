@@ -397,12 +397,8 @@ if BUILD_VLC
 noinst_SCRIPTS += vlc$(EXEEXT)
 endif
 
-vlc$(EXEEXT): Makefile.am
-	rm -f -- vlc vlc.tmp
-	echo '#! /bin/sh' > vlc.tmp
-	echo 'exec "$$(dirname "$$0")/bin/vlc-static$(EXEEXT)" "--plugin-path=$$(dirname "$$0")/modules" "$$@"' >> vlc.tmp
-	chmod +x vlc.tmp
-	mv -f -- vlc.tmp vlc
+vlc$(EXEEXT):
+	ln -sf bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 
 if HAVE_DARWIN
 if BUILD_VLC
