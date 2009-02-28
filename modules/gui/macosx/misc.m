@@ -1,7 +1,7 @@
 /*****************************************************************************
  * misc.m: code not specific to vlc
  *****************************************************************************
- * Copyright (C) 2003-2008 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -248,7 +248,7 @@ static NSMutableArray *blackoutWindows = NULL;
 {
     NSInvocation *invoc;
  
-    if (!animate || MACOS_VERSION < 10.4f)
+    if (!animate)
     {
         [super close];
         return;
@@ -280,7 +280,7 @@ static NSMutableArray *blackoutWindows = NULL;
     NSViewAnimation *current_anim;
     NSMutableDictionary *dict;
 
-    if (!animate || MACOS_VERSION < 10.4f)
+    if (!animate)
     {
         [self orderOut: sender];
         return;
@@ -329,7 +329,7 @@ static NSMutableArray *blackoutWindows = NULL;
     NSViewAnimation *current_anim;
     NSMutableDictionary *dict;
  
-    if (!animate || MACOS_VERSION < 10.4f)
+    if (!animate)
     {
         [super orderFront: sender];
         [self setAlphaValue: 1.0];
