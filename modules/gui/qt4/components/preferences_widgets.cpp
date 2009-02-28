@@ -1145,7 +1145,7 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     table = new QTreeWidget;
     table->setColumnCount(3);
     table->headerItem()->setText( 0, qtr( "Action" ) );
-    table->headerItem()->setText( 1, qtr( "Shortcut" ) );
+    table->headerItem()->setText( 1, qtr( "Hotkey" ) );
     table->headerItem()->setText( 2, qtr( "Global" ) );
     table->setAlternatingRowColors( true );
 
