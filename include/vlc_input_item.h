@@ -210,4 +210,41 @@ VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *ps
  */
 #define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
 
+/******************
+ * Input stats
+ ******************/
+struct input_stats_t
+{
+    vlc_mutex_t         lock;
+
+    /* Input */
+    int i_read_packets;
+    int i_read_bytes;
+    float f_input_bitrate;
+    float f_average_input_bitrate;
+
+    /* Demux */
+    int i_demux_read_packets;
+    int i_demux_read_bytes;
+    float f_demux_bitrate;
+    float f_average_demux_bitrate;
+
+    /* Decoders */
+    int i_decoded_audio;
+    int i_decoded_video;
+
+    /* Vout */
+    int i_displayed_pictures;
+    int i_lost_pictures;
+
+    /* Sout */
+    int i_sent_packets;
+    int i_sent_bytes;
+    float f_send_bitrate;
+
+    /* Aout */
+    int i_played_abuffers;
+    int i_lost_abuffers;
+};
+
 #endif
