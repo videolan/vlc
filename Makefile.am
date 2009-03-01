@@ -575,7 +575,7 @@ VLC-release.app: vlc
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
 
 # This is just for development purposes. 
-# The resulting VLC.app will only in this tree.
+# The resulting VLC.app will only run in this tree.
 VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.libs/libvlc.dylib
 	(cd src && make install)
 	rm -Rf $(top_builddir)/tmp

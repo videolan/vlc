@@ -80,7 +80,7 @@ if test "${ACTION}" = "build"; then
             for linked_lib in `otool -L ${lib_dest}  | grep '(' | sed 's/\((.*)\)//'`; do
                 local name=`basename ${linked_lib}`
                 case "${linked_lib}" in
-                    */vlc_build_dir/*  | *vlc* | */extras/contrib/lib/*)
+                    */vlc_build_dir/* | */vlc_install_dir/* | *vlc* | */extras/contrib/lib/*)
                         if test -e ${linked_lib}; then
                             install_name_tool -change "$linked_lib" "${lib_install_prefix}/${name}" "${lib_dest}"
                             linked_libs="${linked_libs} ${ref_lib}"
@@ -103,10 +103,11 @@ if test "${ACTION}" = "build"; then
         install_library "${VLC_BUILD_DIR}/bin/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
         mv ${target}/vlc ${target}/VLC
         chmod +x ${target}/VLC
-#    elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
-#        install_library "${VLC_BUILD_DIR}/projects/mozilla/.libs/${prefix}npvlc.${suffix}" "${target}" "bin" "@loader_path/lib"
-#        mv ${target}/npvlc.${suffix} "${target}/VLC\ Plugin"
-#        chmod +x "${target}/VLC\ Plugin"
+    elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
+        # install Safari webplugin
+        install_library "${VLC_BUILD_DIR}/projects/mozilla/${prefix}npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
+        mv ${target}/npvlc.${suffix} "${target}/VLC Plugin"
+        chmod +x "${target}/VLC Plugin"
     fi
 
     ##########################
@@ -152,7 +153,9 @@ if test "${ACTION}" = "build"; then
         esac
     done
 
-    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" ${target_lib} "library"
+    #install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" ${target_lib} "library"
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.2.dylib" ${target_lib} "library"
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlccore.dylib" ${target_lib} "library"
 
     ##########################
     # Build the share folder
