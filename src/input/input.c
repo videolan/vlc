@@ -440,7 +440,7 @@ void input_StopThread( input_thread_t *p_input )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
-input_resource_t *input_DetachRessource( input_thread_t *p_input )
+input_resource_t *input_DetachResource( input_thread_t *p_input )
 {
     assert( p_input->b_dead );
 

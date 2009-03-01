@@ -483,7 +483,7 @@ static int LoopInput( playlist_t *p_playlist )
 
         assert( p_sys->p_input_resource == NULL );
 
-        p_sys->p_input_resource = input_DetachRessource( p_input );
+        p_sys->p_input_resource = input_DetachResource( p_input );
 
         PL_UNLOCK;
         /* We can unlock as we return VLC_EGENERIC (no event will be lost) */

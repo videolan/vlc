@@ -82,7 +82,7 @@ input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, c
  * it will assert.
  * It does not support concurrent calls.
  */
-input_resource_t *input_DetachRessource( input_thread_t * );
+input_resource_t *input_DetachResource( input_thread_t * );
 
 /* */
 typedef enum

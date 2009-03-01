@@ -773,7 +773,7 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
         input_StopThread( p_input );
         vlc_thread_join( p_input );
 
-        p_resource = input_DetachRessource( p_input );
+        p_resource = input_DetachResource( p_input );
         input_resource_Delete( p_resource );
 
         vlc_object_release( p_input );
@@ -854,7 +854,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         input_StopThread( p_input );
         vlc_thread_join( p_input );
 
-        p_instance->p_input_resource = input_DetachRessource( p_input );
+        p_instance->p_input_resource = input_DetachResource( p_input );
 
         vlc_object_release( p_input );
 

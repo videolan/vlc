@@ -25,8 +25,8 @@
 # error This header file can only be included from LibVLC.
 #endif
 
-#ifndef _INPUT_RESSOURCE_H
-#define _INPUT_RESSOURCE_H 1
+#ifndef _INPUT_RESOURCE_H
+#define _INPUT_RESOURCE_H 1
 
 #include <vlc_common.h>
 
