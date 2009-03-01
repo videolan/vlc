@@ -33,7 +33,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
-
+#ifdef HAVE_X11_XLIB_H
+# include <X11/Xlib.h>
+#endif
 
 /* Explicit HACK */
 extern void LocaleFree (const char *);
@@ -80,6 +82,15 @@ int main( int i_argc, const char *ppsz_argv[] )
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
     putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
 #   endif
+#endif
+
+#ifdef HAVE_X11_XLIB_H
+    /* Initialize Xlib thread support. */
+    if (!XInitThreads ())
+    {
+        fputs ("VLC requires a thread-safe Xlib. Sorry.\n", stderr);
+        return 1;
+    }
 #endif
 
     /* Synchronously intercepted POSIX signals.

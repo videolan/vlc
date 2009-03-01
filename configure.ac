@@ -3964,6 +3964,9 @@ AC_ARG_ENABLE(x11,
 
 CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
 AC_CHECK_HEADERS(X11/Xlib.h, [
+  VLC_ADD_CPPFLAGS([vlc], [${X_CFLAGS}])
+  VLC_ADD_LIBS([vlc], [${X_LIBS} ${X_PRE_LIBS} -lX11])
+
   VLC_ADD_PLUGIN([screen])
   VLC_ADD_CPPFLAGS([screen],[${X_CFLAGS}])
   VLC_ADD_LIBS([screen],[${X_LIBS} ${X_PRE_LIBS} -lX11])
