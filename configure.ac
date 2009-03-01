@@ -4122,6 +4122,29 @@ CPPFLAGS="${CPPFLAGS_save}"
 
 
 dnl
+dnl  X C Bindings modules
+dnl  (work in progress)
+dnl
+AC_ARG_ENABLE(xcb,
+  [  --enable-xcb            X C Bindings work-in-progress (default disabled)],
+  ,[enable_xcb="no"])
+AS_IF([test "${enable_xcb}" != "no"], [
+  PKG_CHECK_MODULES(XPROTO, [xproto])
+
+  dnl libxcb
+  PKG_CHECK_MODULES(XCB, [xcb])
+  PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
+
+  dnl xcb-utils
+  PKG_CHECK_MODULES(XCB_AUX, [xcb-aux])
+  PKG_CHECK_MODULES(XCB_IMAGE, [xcb-image])
+  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])
+
+  VLC_ADD_PLUGIN([xcb])
+  VLC_ADD_PLUGIN([xcb_window])
+])
+
+dnl
 dnl  OpenGL module
 dnl  (enabled by default except on beos)
 dnl

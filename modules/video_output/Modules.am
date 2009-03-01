@@ -20,13 +20,6 @@ SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
 
-# TODO: move to configure.ac once/if xcb plugin gets more functional
-XCB_LIBS = -lxcb
-XCB_SHM_LIBS = -lxcb-shm
-XCB_AUX_LIBS = -lxcb-aux
-XCB_IMAGE_LIBS = -lxcb-image
-XCB_KEYSYMS_LIBS = -lxcb-keysyms
-
 libxcb_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/xcb.c \
@@ -51,6 +44,7 @@ libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 libxcb_window_plugin_la_DEPENDENCIES =
 
 EXTRA_LTLIBRARIES += libxcb_plugin.la libxcb_window_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBxcb) $(LTLIBxcb_window)
 
 # XXX: do we need yet another modules/ subdirectory?
 libdrawable_plugin_la_SOURCES = drawable.c
