@@ -543,6 +543,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             UpdateSeekPoint( p_demux, i64 );
             return VLC_SUCCESS;
 
+        case DEMUX_HAS_UNSUPPORTED_META:
+        {
+            bool *pb_bool = (bool*)va_arg( args, bool* );
+            *pb_bool = true;
+            return VLC_SUCCESS;
+        }
+
+
         case DEMUX_GET_META:
         {
             vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
