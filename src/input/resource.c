@@ -70,6 +70,15 @@ static void DestroySout( input_resource_t *p_resource )
 #endif
     p_resource->p_sout = NULL;
 }
+
+static sout_instance_t *DetachSout( input_resource_t *p_resource )
+{
+    sout_instance_t *p_sout = p_resource->p_sout;
+    p_resource->p_sout = NULL;
+
+    return p_sout;
+}
+
 static sout_instance_t *RequestSout( input_resource_t *p_resource,
                                      sout_instance_t *p_sout, const char *psz_sout )
 {
@@ -135,6 +144,15 @@ static void DestroyVout( input_resource_t *p_resource )
 
     p_resource->p_vout_free = NULL;
 }
+static vout_thread_t *DetachVout( input_resource_t *p_resource )
+{
+    assert( p_resource->i_vout == 0 );
+    vout_thread_t *p_vout = p_resource->p_vout_free;
+    p_resource->p_vout_free = NULL;
+
+    return p_vout;
+}
+
 static void DisplayVoutTitle( input_resource_t *p_resource,
                               vout_thread_t *p_vout )
 {
@@ -303,6 +321,14 @@ static void DestroyAout( input_resource_t *p_resource )
         vlc_object_release( p_resource->p_aout );
     p_resource->p_aout = NULL;
 }
+static aout_instance_t *DetachAout( input_resource_t *p_resource )
+{
+    aout_instance_t *p_aout = p_resource->p_aout;
+    p_resource->p_aout = NULL;
+
+    return p_aout;
+}
+
 static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance_t *p_aout )
 {
     assert( p_resource->p_input );
@@ -390,6 +416,22 @@ void input_resource_SetInput( input_resource_t *p_resource, input_thread_t *p_in
     p_resource->p_input = p_input;
 
     vlc_mutex_unlock( &p_resource->lock );
+}
+
+input_resource_t *input_resource_Detach( input_resource_t *p_resource )
+{
+    input_resource_t *p_ret = input_resource_New();
+    if( !p_ret )
+        return NULL;
+
+    vlc_mutex_lock( &p_resource->lock );
+    assert( !p_resource->p_input );
+    p_ret->p_sout = DetachSout( p_resource );
+    p_ret->p_vout_free = DetachVout( p_resource );
+    p_ret->p_aout = DetachAout( p_resource );
+    vlc_mutex_unlock( &p_resource->lock );
+
+    return p_ret;
 }
 
 vout_thread_t *input_resource_RequestVout( input_resource_t *p_resource,

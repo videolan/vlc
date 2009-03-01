@@ -444,10 +444,9 @@ input_resource_t *input_DetachResource( input_thread_t *p_input )
 {
     assert( p_input->b_dead );
 
-    input_resource_t *p_resource = p_input->p->p_resource;
-    input_resource_SetInput( p_resource, NULL );
+    input_resource_SetInput( p_input->p->p_resource, NULL );
 
-    p_input->p->p_resource = NULL;
+    input_resource_t *p_resource = input_resource_Detach( p_input->p->p_resource );
     p_input->p->p_sout = NULL;
 
     return p_resource;

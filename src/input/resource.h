@@ -41,6 +41,13 @@ input_resource_t *input_resource_New( void );
 void input_resource_SetInput( input_resource_t *, input_thread_t * );
 
 /**
+ * This function return a input_resource_t with all resources detach from the
+ * given input_resource_t.
+ * It must not be associated to an input.
+ */
+input_resource_t *input_resource_Detach( input_resource_t * );
+
+/**
  * This function handles sout request.
  */
 sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t *, const char *psz_sout );
