@@ -160,7 +160,7 @@ void __msg_DisableObjectPrinting (vlc_object_t *p_this, char * psz_object)
  * Destroy the message queues
  *
  * This functions prints all messages remaining in the queues,
- * then frees all the allocated ressources
+ * then frees all the allocated resources
  * No other messages interface functions should be called after this one.
  */
 void msg_Destroy (libvlc_int_t *p_libvlc)

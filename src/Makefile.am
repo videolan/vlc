@@ -308,8 +308,8 @@ SOURCES_libvlc_common = \
 	input/input_internal.h \
 	input/input_interface.h \
 	input/vlm_internal.h \
-	input/ressource.h \
-	input/ressource.c \
+	input/resource.h \
+	input/resource.c \
 	input/stream.c \
 	input/stream_demux.c \
 	input/stream_filter.c \

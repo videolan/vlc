@@ -102,10 +102,10 @@ void playlist_Deactivate( playlist_t *p_playlist )
     if( p_fetcher )
         playlist_fetcher_Delete( p_fetcher );
 
-    /* release input ressources */
-    if( p_sys->p_input_ressource )
-        input_ressource_Delete( p_sys->p_input_ressource );
-    p_sys->p_input_ressource = NULL;
+    /* release input resources */
+    if( p_sys->p_input_resource )
+        input_resource_Delete( p_sys->p_input_resource );
+    p_sys->p_input_resource = NULL;
 
     /* */
     playlist_MLDump( p_playlist );
@@ -252,7 +252,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     assert( p_sys->p_input == NULL );
 
     input_thread_t *p_input_thread =
-        input_CreateThreadExtended( p_playlist, p_input, NULL, p_sys->p_input_ressource );
+        input_CreateThreadExtended( p_playlist, p_input, NULL, p_sys->p_input_resource );
 
     if( p_input_thread )
     {
@@ -261,7 +261,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         var_AddCallback( p_input_thread, "intf-event", InputEvent, p_playlist );
     }
 
-    p_sys->p_input_ressource = NULL;
+    p_sys->p_input_resource = NULL;
 
     char *psz_uri = input_item_GetURI( p_item->p_input );
     if( psz_uri && ( !strncmp( psz_uri, "directory:", 10 ) ||
@@ -481,16 +481,16 @@ static int LoopInput( playlist_t *p_playlist )
     {
         PL_DEBUG( "dead input" );
 
-        assert( p_sys->p_input_ressource == NULL );
+        assert( p_sys->p_input_resource == NULL );
 
-        p_sys->p_input_ressource = input_DetachRessource( p_input );
+        p_sys->p_input_resource = input_DetachRessource( p_input );
 
         PL_UNLOCK;
         /* We can unlock as we return VLC_EGENERIC (no event will be lost) */
 
-        /* input_ressource_t must be manipulated without playlist lock */
+        /* input_resource_t must be manipulated without playlist lock */
         if( !var_CreateGetBool( p_input, "sout-keep" ) )
-            input_ressource_TerminateSout( p_sys->p_input_ressource );
+            input_resource_TerminateSout( p_sys->p_input_resource );
 
         /* The DelCallback must be issued without playlist lock */
         var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
@@ -537,15 +537,15 @@ static void LoopRequest( playlist_t *p_playlist )
     {
         p_sys->status.i_status = PLAYLIST_STOPPED;
 
-        if( p_sys->p_input_ressource &&
-            input_ressource_HasVout( p_sys->p_input_ressource ) )
+        if( p_sys->p_input_resource &&
+            input_resource_HasVout( p_sys->p_input_resource ) )
         {
             /* XXX We can unlock if we don't issue the wait as we will be
              * call again without anything else done between the calls */
             PL_UNLOCK;
 
-            /* input_ressource_t must be manipulated without playlist lock */
-            input_ressource_TerminateVout( p_sys->p_input_ressource );
+            /* input_resource_t must be manipulated without playlist lock */
+            input_resource_TerminateVout( p_sys->p_input_resource );
 
             PL_LOCK;
         }

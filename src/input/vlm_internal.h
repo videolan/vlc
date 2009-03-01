@@ -43,7 +43,7 @@ typedef struct
 
     input_item_t      *p_item;
     input_thread_t    *p_input;
-    input_ressource_t *p_input_ressource;
+    input_resource_t *p_input_resource;
 
 } vlm_media_instance_sys_t;
 

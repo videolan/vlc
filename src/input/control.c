@@ -32,7 +32,7 @@
 
 #include "input_internal.h"
 #include "event.h"
-#include "ressource.h"
+#include "resource.h"
 
 
 static void UpdateBookmarksOption( input_thread_t * );
@@ -415,7 +415,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_AOUT:
         {
-            aout_instance_t *p_aout = input_ressource_HoldAout( p_input->p->p_ressource );
+            aout_instance_t *p_aout = input_resource_HoldAout( p_input->p->p_resource );
             if( !p_aout )
                 return VLC_EGENERIC;
 
@@ -429,7 +429,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vout_thread_t ***ppp_vout = (vout_thread_t***)va_arg( args, vout_thread_t*** );
             int           *pi_vout = (int*)va_arg( args, int* );
 
-            input_ressource_HoldVouts( p_input->p->p_ressource, ppp_vout, pi_vout );
+            input_resource_HoldVouts( p_input->p->p_resource, ppp_vout, pi_vout );
             if( *pi_vout <= 0 )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;

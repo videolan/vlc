@@ -43,7 +43,7 @@
 #include "demux.h"
 #include "stream.h"
 #include "item.h"
-#include "ressource.h"
+#include "resource.h"
 
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"
@@ -66,7 +66,7 @@ static  void *Run            ( vlc_object_t *p_this );
 static  void *RunAndDestroy  ( vlc_object_t *p_this );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
-                                  const char *, bool, input_ressource_t * );
+                                  const char *, bool, input_resource_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input );
@@ -117,7 +117,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  *****************************************************************************/
 static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                                const char *psz_header, bool b_quick,
-                               input_ressource_t *p_ressource )
+                               input_resource_t *p_resource )
 {
     static const char input_name[] = "input";
     input_thread_t *p_input = NULL;                 /* thread descriptor */
@@ -200,11 +200,11 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->p->slave   = NULL;
 
     /* */
-    if( p_ressource )
-        p_input->p->p_ressource = p_ressource;
+    if( p_resource )
+        p_input->p->p_resource = p_resource;
     else
-        p_input->p->p_ressource = input_ressource_New();
-    input_ressource_SetInput( p_input->p->p_ressource, p_input );
+        p_input->p->p_resource = input_resource_New();
+    input_resource_SetInput( p_input->p->p_resource, p_input );
 
     /* Init control buffer */
     vlc_mutex_init( &p_input->p->lock_control );
@@ -311,8 +311,8 @@ static void Destructor( input_thread_t * p_input )
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
 
-    if( p_input->p->p_ressource )
-        input_ressource_Delete( p_input->p->p_ressource );
+    if( p_input->p->p_resource )
+        input_resource_Delete( p_input->p->p_resource );
 
     vlc_gc_decref( p_input->p->p_item );
 
@@ -340,11 +340,11 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 /* */
 input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
                                               input_item_t *p_item,
-                                              const char *psz_log, input_ressource_t *p_ressource )
+                                              const char *psz_log, input_resource_t *p_resource )
 {
     input_thread_t *p_input;
 
-    p_input = Create( p_parent, p_item, psz_log, false, p_ressource );
+    p_input = Create( p_parent, p_item, psz_log, false, p_resource );
     if( !p_input )
         return NULL;
 
@@ -440,17 +440,17 @@ void input_StopThread( input_thread_t *p_input )
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
 }
 
-input_ressource_t *input_DetachRessource( input_thread_t *p_input )
+input_resource_t *input_DetachRessource( input_thread_t *p_input )
 {
     assert( p_input->b_dead );
 
-    input_ressource_t *p_ressource = p_input->p->p_ressource;
-    input_ressource_SetInput( p_ressource, NULL );
+    input_resource_t *p_resource = p_input->p->p_resource;
+    input_resource_SetInput( p_resource, NULL );
 
-    p_input->p->p_ressource = NULL;
+    p_input->p->p_resource = NULL;
     p_input->p->p_sout = NULL;
 
-    return p_ressource;
+    return p_resource;
 }
 
 /**
@@ -829,7 +829,7 @@ static int InitSout( input_thread_t * p_input )
     char *psz = var_GetNonEmptyString( p_input, "sout" );
     if( psz && strncasecmp( p_input->p->p_item->psz_uri, "vlc:", 4 ) )
     {
-        p_input->p->p_sout  = input_ressource_RequestSout( p_input->p->p_ressource, NULL, psz );
+        p_input->p->p_sout  = input_resource_RequestSout( p_input->p->p_resource, NULL, psz );
         if( !p_input->p->p_sout )
         {
             input_ChangeState( p_input, ERROR_S );
@@ -850,7 +850,7 @@ static int InitSout( input_thread_t * p_input )
     }
     else
     {
-        input_ressource_RequestSout( p_input->p->p_ressource, NULL, NULL );
+        input_resource_RequestSout( p_input->p->p_resource, NULL, NULL );
     }
     free( psz );
 
@@ -1215,12 +1215,12 @@ error:
         es_out_Delete( p_input->p->p_es_out );
     if( p_input->p->p_es_out_display )
         es_out_Delete( p_input->p->p_es_out_display );
-    if( p_input->p->p_ressource )
+    if( p_input->p->p_resource )
     {
         if( p_input->p->p_sout )
-            input_ressource_RequestSout( p_input->p->p_ressource,
+            input_resource_RequestSout( p_input->p->p_resource,
                                          p_input->p->p_sout, NULL );
-        input_ressource_SetInput( p_input->p->p_ressource, NULL );
+        input_resource_SetInput( p_input->p->p_resource, NULL );
     }
 
 #ifdef ENABLE_SOUT
@@ -1339,9 +1339,9 @@ static void End( input_thread_t * p_input )
     }
 
     /* */
-    input_ressource_RequestSout( p_input->p->p_ressource,
+    input_resource_RequestSout( p_input->p->p_resource,
                                  p_input->p->p_sout, NULL );
-    input_ressource_SetInput( p_input->p->p_ressource, NULL );
+    input_resource_SetInput( p_input->p->p_resource, NULL );
 }
 
 /*****************************************************************************

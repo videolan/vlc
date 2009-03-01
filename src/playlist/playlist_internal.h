@@ -59,7 +59,7 @@ typedef struct playlist_private_t
     int                   i_sds;   /**< Number of service discovery modules */
     input_thread_t *      p_input;  /**< the input thread associated
                                      * with the current item */
-    input_ressource_t *   p_input_ressource; /**< input ressources */
+    input_resource_t *   p_input_resource; /**< input resources */
     struct {
         /* Current status. These fields are readonly, only the playlist
          * main loop can touch it*/

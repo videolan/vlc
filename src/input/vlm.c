@@ -759,7 +759,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
     p_instance->i_index = 0;
     p_instance->b_sout_keep = false;
     p_instance->p_input = NULL;
-    p_instance->p_input_ressource = NULL;
+    p_instance->p_input_resource = NULL;
 
     return p_instance;
 }
@@ -768,18 +768,18 @@ static void vlm_MediaInstanceDelete( vlm_media_instance_sys_t *p_instance )
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
-        input_ressource_t *p_ressource;
+        input_resource_t *p_resource;
 
         input_StopThread( p_input );
         vlc_thread_join( p_input );
 
-        p_ressource = input_DetachRessource( p_input );
-        input_ressource_Delete( p_ressource );
+        p_resource = input_DetachRessource( p_input );
+        input_resource_Delete( p_resource );
 
         vlc_object_release( p_input );
     }
-    if( p_instance->p_input_ressource )
-        input_ressource_Delete( p_instance->p_input_ressource );
+    if( p_instance->p_input_resource )
+        input_resource_Delete( p_instance->p_input_resource );
 
     vlc_gc_decref( p_instance->p_item );
     free( p_instance->psz_name );
@@ -854,13 +854,13 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
         input_StopThread( p_input );
         vlc_thread_join( p_input );
 
-        p_instance->p_input_ressource = input_DetachRessource( p_input );
+        p_instance->p_input_resource = input_DetachRessource( p_input );
 
         vlc_object_release( p_input );
 
         if( !p_instance->b_sout_keep )
-            input_ressource_TerminateSout( p_instance->p_input_ressource );
-        input_ressource_TerminateVout( p_instance->p_input_ressource );
+            input_resource_TerminateSout( p_instance->p_input_resource );
+        input_resource_TerminateVout( p_instance->p_input_resource );
     }
 
     /* Start new one */
@@ -870,8 +870,8 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
         p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item,
-                                                          psz_log, p_instance->p_input_ressource );
-        p_instance->p_input_ressource = NULL;
+                                                          psz_log, p_instance->p_input_resource );
+        p_instance->p_input_resource = NULL;
 
         if( !p_instance->p_input )
         {

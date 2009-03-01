@@ -670,7 +670,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
               (int)(mdate() - i_decoder_buffering_start)/1000 );
 
     /* Here is a good place to destroy unused vout with every demuxer */
-    input_ressource_TerminateVout( p_sys->p_input->p->p_ressource );
+    input_resource_TerminateVout( p_sys->p_input->p->p_resource );
 
     /* */
     const mtime_t i_wakeup_delay = 10*1000; /* FIXME CLEANUP thread wake up time*/
@@ -2040,7 +2040,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                         break;
                 }
                 if( i >= p_sys->i_es )
-                    input_ressource_TerminateVout( p_sys->p_input->p->p_ressource );
+                    input_resource_TerminateVout( p_sys->p_input->p->p_resource );
             }
             p_sys->b_active = b;
             return VLC_SUCCESS;
@@ -2317,7 +2317,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             /* Clean up vout after user action (in active mode only).
              * FIXME it does not work well with multiple video windows */
             if( p_sys->b_active )
-                input_ressource_TerminateVout( p_sys->p_input->p->p_ressource );
+                input_resource_TerminateVout( p_sys->p_input->p->p_resource );
             return i_ret;
         }
 

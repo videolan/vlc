@@ -45,44 +45,44 @@ int input_Preparse( vlc_object_t *, input_item_t * );
 input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 
 /**
- * This defines an opaque input ressource handler.
+ * This defines an opaque input resource handler.
  */
-typedef struct input_ressource_t input_ressource_t;
+typedef struct input_resource_t input_resource_t;
 
 /**
- * This function releases an input_ressource_t and all associated ressources.
+ * This function releases an input_resource_t and all associated resources.
  */
-void input_ressource_Delete( input_ressource_t * );
+void input_resource_Delete( input_resource_t * );
 
 /**
- * This function deletes the current sout in the ressources.
+ * This function deletes the current sout in the resources.
  */
-void input_ressource_TerminateSout( input_ressource_t *p_ressource );
+void input_resource_TerminateSout( input_resource_t *p_resource );
 
 /**
- * This function deletes the current vout in the ressources.
+ * This function deletes the current vout in the resources.
  */
-void input_ressource_TerminateVout( input_ressource_t *p_ressource );
+void input_resource_TerminateVout( input_resource_t *p_resource );
 
 /**
- * This function return true if there is at least one vout in the ressources.
+ * This function return true if there is at least one vout in the resources.
  *
- * It can only be called on detached ressources.
+ * It can only be called on detached resources.
  */
-bool input_ressource_HasVout( input_ressource_t *p_ressource );
+bool input_resource_HasVout( input_resource_t *p_resource );
 
 /* input.c */
 #define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
-input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, input_ressource_t * );
+input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, input_resource_t * );
 
 /**
- * This function detaches ressources from a dead input.
+ * This function detaches resources from a dead input.
  *
  * It MUST be called on a dead input (p_input->b_dead true) otherwise
  * it will assert.
  * It does not support concurrent calls.
  */
-input_ressource_t *input_DetachRessource( input_thread_t * );
+input_resource_t *input_DetachRessource( input_thread_t * );
 
 /* */
 typedef enum
