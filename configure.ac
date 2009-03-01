@@ -867,9 +867,6 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(pthread.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
-dnl Find where are the X headers and libraries
-AC_PATH_XTRA()
-
 dnl it seems that autoconf do the pkg-config detection only for the first PKG_CHECK_MODULES in the configure.ac ( which is logical) but in our case it is nested in a if so it was not working if you're not on linux or have disable hal.
 dnl Make PKG_CONFIG_PATH precious so that it appears in the help and get saved
 AC_ARG_VAR(PKG_CONFIG_PATH,
@@ -2719,14 +2716,6 @@ if test "${enable_screen}" != "no"; then
     VLC_ADD_PLUGIN([screen])
     VLC_ADD_CXXFLAGS([screen],[])
     VLC_ADD_LIBS([screen],[-lbe])
-  else
-    CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
-    AC_CHECK_HEADERS(X11/Xlib.h, [
-      VLC_ADD_PLUGIN([screen])
-      VLC_ADD_LIBS([screen],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-      VLC_ADD_CPPFLAGS([screen],[${X_CFLAGS}])
-    ])
-    CPPFLAGS="${CPPFLAGS_save}"
   fi
 fi
 
@@ -3959,9 +3948,43 @@ dnl
 
 AC_ARG_WITH(,[Video plugins:])
 
+dnl
+dnl  Xlib
+dnl
+
+AC_PATH_XTRA()
+AC_ARG_ENABLE(x11,
+  [  --enable-x11            X11 support (default enabled)],, [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+    enable_x11="yes"
+  ], [
+    enable_x11="no"
+  ])
+])
+
+CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
+AC_CHECK_HEADERS(X11/Xlib.h, [
+  VLC_ADD_PLUGIN([screen])
+  VLC_ADD_CPPFLAGS([screen],[${X_CFLAGS}])
+  VLC_ADD_LIBS([screen],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+
+  VLC_ADD_PLUGIN([panoramix])
+  VLC_ADD_LIBS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+  VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
+
+  VLC_ADD_PLUGIN([globalhotkeys])
+  VLC_ADD_LIBS([globalhotkeys],[${X_LIBS} ${X_PRE_LIBS} -lX11])
+  VLC_ADD_CPPFLAGS([globalhotkeys],[${X_CFLAGS}])
+
+  AC_CHECK_LIB(Xext, XShmAttach, [
+    VLC_ADD_PLUGIN([x11])
+    VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+    VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
+  ])
+])
+
 dnl Check for DPMS
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
+AS_IF([test "${enable_x11}" != "no"], [
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
     AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
     AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
@@ -3974,45 +3997,17 @@ if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
   ],,[
     #include <X11/Xlib.h>
   ])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
-
-dnl
-dnl  X11 module
-dnl  (enabled by default except on win32)
-dnl
-AC_ARG_ENABLE(x11,
-  [  --enable-x11            X11 support (default enabled)])
-if test "${enable_x11}" != "no" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_x11}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
-  AC_CHECK_HEADERS(X11/Xlib.h, [
-    VLC_ADD_PLUGIN([panoramix])
-    VLC_ADD_LIBS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
-    VLC_ADD_PLUGIN([globalhotkeys])
-    VLC_ADD_LIBS([globalhotkeys],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_CPPFLAGS([globalhotkeys],[${X_CFLAGS}])
-    AC_CHECK_LIB(Xext, XShmAttach, [
-      VLC_ADD_PLUGIN([x11])
-      VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
-      VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
-    ])
-  ])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
+])
 
 dnl
 dnl  XVideo module
 dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvideo,
-  [  --enable-xvideo         XVideo support (default enabled)])
-if test "${enable_xvideo}" != "no" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_xvideo}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
+  [  --enable-xvideo         XVideo support (default enabled)],, [
+    enable_xvideo="$enable_x11"
+])
+AS_IF([test "${enable_xvideo}" != "no"], [
   AC_CHECK_HEADERS(X11/extensions/Xv.h, [
     CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
     AC_CHECK_LIB(Xv,XvPutImage,[
@@ -4021,20 +4016,18 @@ if test "${enable_xvideo}" != "no" &&
         VLC_ADD_LIBS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
     ])
     CFLAGS="${CFLAGS_save}"
-  ]
-  CPPFLAGS="${CPPFLAGS_save}")
-fi
+  ])
+])
 
 dnl
 dnl  GLX module
 dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(glx,
-  [  --enable-glx            X11 OpenGL (GLX) support (default enabled)])
-if test "${enable_glx}" != "no" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_glx}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
+  [  --enable-glx            X11 OpenGL (GLX) support (default enabled)],, [
+  enable_glx="$enable_x11"
+])
+AS_IF([test "${enable_glx}" != "no"], [
   AC_CHECK_HEADERS(X11/Xlib.h GL/glu.h GL/glx.h)
   AC_COMPILE_IFELSE(AC_LANG_PROGRAM(
     [[#if !defined(HAVE_X11_XLIB_H) || !defined(HAVE_GL_GLU_H) || !defined(HAVE_GL_GLX_H)
@@ -4045,37 +4038,33 @@ if test "${enable_glx}" != "no" &&
       VLC_ADD_LIBS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
       VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
     ],[AC_MSG_ERROR([Please install GL development package. Alternatively you can also configure with --disable-glx.])])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
+])
 
 dnl
 dnl  XVMC module
 dnl  (disabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvmc,
-  [  --enable-xvmc           XVMC support (default disabled)])
-if test "${enable_xvmc}" = "yes" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_xvmc}" = "yes"); then
-  CPPFLAGS="${CPPFLAGS_save} ${X_FLAGS}"
+  [  --enable-xvmc           XVMC support (default disabled)],, [
+  enable_xvmc="no"
+])
+AS_IF([test "${enable_xvmc}" != "no"], [
   AC_CHECK_HEADERS(X11/extensions/vldXvMC.h, [
     VLC_ADD_PLUGIN([xvmc])
     VLC_ADD_LIBS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXvMCW -lXv -lXinerama])
     VLC_ADD_CPPFLAGS([xvmc],[${X_CFLAGS}])
   ])
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
+])
 
 dnl
 dnl  Check for the Xinerama extension
 dnl
 AC_ARG_ENABLE(xinerama,
-  [  --enable-xinerama       Xinerama support (default enabled)])
-if test "${enable_xvideo}" != "no" && test "${enable_xinerama}" != "no" &&
-  (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
-   test "${enable_xvideo}" = "yes"); then
+  [  --enable-xinerama       Xinerama support (default enabled)],, [
+  enable_xinerama="$enable_xvideo"
+])
+AS_IF([test "$enable_xinerama" != "no"], [
   ac_cv_have_xinerama="no"
-  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
   CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
   AC_CHECK_HEADERS(X11/extensions/Xinerama.h,[
     AC_CHECK_LIB(Xinerama_pic, XineramaQueryExtension,[
@@ -4095,15 +4084,11 @@ if test "${enable_xvideo}" != "no" && test "${enable_xinerama}" != "no" &&
   if test "${ac_cv_have_xinerama}" = "yes"; then
     AC_DEFINE(HAVE_XINERAMA, 1, [Define this if you have libXinerama installed])
   fi
-  CFLAGS="${CFLAGS_save}"
-  CPPFLAGS="${CPPFLAGS_save}"
 
 dnl
 dnl  Check for XF86VidMode extension
 dnl
   ac_cv_have_xf86vidmode="no"
-  CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
-  CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
   AC_CHECK_HEADERS(X11/extensions/xf86vmode.h,[
     AC_CHECK_LIB(Xxf86vm_pic, XF86VidModeGetViewPort,[
       VLC_ADD_LIBS([xvideo],[-lXxf86vm_pic])
@@ -4129,9 +4114,11 @@ dnl
     [AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define this if you have libXxf86vm installed])
   ])
   CFLAGS="${CFLAGS_save}"
-  CPPFLAGS="${CPPFLAGS_save}"
+])
 
-fi
+dnl End of Xlib tests
+CPPFLAGS="${CPPFLAGS_save}"
+
 
 dnl
 dnl  OpenGL module
