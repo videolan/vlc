@@ -3978,11 +3978,11 @@ AS_IF([test "${enable_x11}" != "no"], [
     VLC_ADD_LIBS([globalhotkeys],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([globalhotkeys],[${X_CFLAGS}])
 
-  AC_CHECK_LIB(Xext, XShmAttach, [
     VLC_ADD_PLUGIN([x11])
-    VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext])
+    VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
-  ])
+
+    AC_CHECK_LIB(Xext, XShmAttach, [VLC_ADD_LIBS([x11],[-lXext])])
   ])
 
 dnl Check for DPMS
