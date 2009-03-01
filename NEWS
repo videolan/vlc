@@ -5,7 +5,7 @@ Playback:
  * Instantaneous pausing
  * Frame-by-Frame playback
  * Finer speed control
- * Timeshift for all medias
+ * Timeshift for most medias
  * On-the-fly recording for all medias
  * RTSP trickplay support
 
@@ -22,11 +22,11 @@ New Decoders:
 Demuxers:
  * Support for Dirac and RealVideo in Matroska files
  * Major improvements in RealMedia files opening (.rm and .rmvb)
- * Improvements of the TS demuxer for M2TS files
+ * Improvements of the TS demuxer for M2TS files from Blu-Ray and AVCHD
 
 Encoders:
  * Dirac encoding using libdirac (supported in Ogg and in TS)
- * Shine mp3 fixed point encoder
+ * Shine mp3 fixed-point encoder
 
 Access:
  * RTSP authentication with Darwin Streaming Server
@@ -50,11 +50,12 @@ Inputs:
 Playlist:
  * Export the playlist in HTML
  * Lua script for BBC radio playback
+ * Better metadata handling and reading
 
 Linux/Windows interface:
- * Recently played items list
  * Global Hotkeys on Windows and Linux
  * Various fixes for skins2 interface
+ * Recently played items list
  * Interface toolbar customizations
  * Various Improvements on the Qt interface:
     - More menus actions
