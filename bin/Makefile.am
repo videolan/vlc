@@ -24,8 +24,7 @@ endif
 
 vlc_wrapper_SOURCES = rootwrap.c
 
-vlc_DEPENDENCIES = ../src/libvlc.la
-
+vlc_DEPENDENCIES = ../src/libvlc.sym
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
 vlc_LDADD = ../src/libvlc.la `$(VLC_CONFIG) -libs vlc`
 
