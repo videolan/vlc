@@ -1302,8 +1302,6 @@ static void End( input_thread_t * p_input )
 #define CL_CO( c ) stats_CounterClean( p_input->p->counters.p_##c ); p_input->p->counters.p_##c = NULL;
         if( libvlc_stats( p_input ) )
         {
-            libvlc_priv_t *p_private = libvlc_priv( p_input->p_libvlc );
-
             /* make sure we are up to date */
             stats_ComputeInputStats( p_input, p_input->p->p_item->p_stats );
             CL_CO( read_bytes );
