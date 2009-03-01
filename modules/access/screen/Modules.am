@@ -6,8 +6,6 @@ screen_extra = beos.cpp
 else
 if HAVE_DARWIN
 screen_extra = mac.c
-else
-screen_extra = x11.c
 endif
 endif
 endif
@@ -15,4 +13,10 @@ SOURCES_screen = \
         screen.c \
         screen.h \
         $(screen_extra) \
+        $(NULL)
+
+SOURCES_x11_screen = \
+        screen.c \
+        screen.h \
+        x11.c \
         $(NULL)
