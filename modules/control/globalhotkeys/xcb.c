@@ -1,5 +1,5 @@
 /*****************************************************************************
- * x11.c: Global-Hotkey X11 handling for vlc
+ * xcb.c: Global-Hotkey X11 using xcb handling for vlc
  *****************************************************************************
  * Copyright (C) 2009 the VideoLAN team
  *
@@ -23,16 +23,18 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#include <X11/Xlib.h>
-#include <X11/keysym.h>
-#include <X11/Xutil.h>
-#include <X11/XF86keysym.h>
-#include <poll.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_keys.h>
+#include <ctype.h>
+
+#include <xcb/xcb.h>
+#include <xcb/xcb_keysyms.h>
+#include <X11/keysym.h>
+#include <X11/XF86keysym.h>
+
+#include <poll.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -54,15 +56,18 @@ vlc_module_end()
 
 typedef struct
 {
-    KeyCode     i_x11;
-    unsigned    i_modifier;
-    int         i_action;
+    xcb_keycode_t i_x11;
+    unsigned      i_modifier;
+    int           i_action;
 } hotkey_mapping_t;
 
 struct intf_sys_t
 {
     vlc_thread_t thread;
-    Display *p_display;
+
+    xcb_connection_t  *p_connection;
+    xcb_window_t      root;
+    xcb_key_symbols_t *p_symbols;
 
     int              i_map;
     hotkey_mapping_t *p_map;
@@ -72,7 +77,6 @@ static void Mapping( intf_thread_t *p_intf );
 static void Register( intf_thread_t *p_intf );
 static void Unregister( intf_thread_t *p_intf );
 static void *Thread( void *p_data );
-static int X11ErrorHandler( Display *, XErrorEvent * );
 
 /*****************************************************************************
  * Open:
@@ -81,33 +85,56 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
+
+    p_intf->p_sys = p_sys = calloc( 1, sizeof(*p_sys) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
     char *psz_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
 
-    Display *p_display = XOpenDisplay( psz_display );
+    int i_screen_default;
+    p_sys->p_connection = xcb_connect( psz_display, &i_screen_default );
     free( psz_display );
-    if( !p_display )
-        return VLC_EGENERIC;
-    XSetErrorHandler( X11ErrorHandler );
 
-    p_intf->p_sys = p_sys = malloc( sizeof(*p_sys) );
-    if( !p_sys )
+    if( !p_sys->p_connection )
+        goto error;
+
+    /* Get the root windows of the default screen */
+    memset( &p_sys->root, 0, sizeof( p_sys->root ) );
+    xcb_screen_iterator_t iter = xcb_setup_roots_iterator( xcb_get_setup( p_sys->p_connection ) );
+    for( int i = 0; i < i_screen_default; i++ )
     {
-        XCloseDisplay( p_display );
-        return VLC_ENOMEM;
+        if( !iter.rem )
+            break;
+        xcb_screen_next( &iter );
     }
-    p_sys->p_display = p_display;
+    if( !iter.rem )
+        goto error;
+    p_sys->root = iter.data->root;
+
+    /* */
+    p_sys->p_symbols = xcb_key_symbols_alloc( p_sys->p_connection ); // FIXME
+    if( !p_sys->p_symbols )
+        goto error;
+
     Mapping( p_intf );
     Register( p_intf );
 
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         Unregister( p_intf );
-        XCloseDisplay( p_display );
         free( p_sys->p_map );
-        free( p_sys );
-        return VLC_ENOMEM;
+        goto error;
     }
     return VLC_SUCCESS;
+
+error:
+    if( p_sys->p_symbols )
+        xcb_key_symbols_free( p_sys->p_symbols );
+    if( p_sys->p_connection )
+        xcb_disconnect( p_sys->p_connection );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -122,80 +149,70 @@ static void Close( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
 
     Unregister( p_intf );
-    XCloseDisplay( p_sys->p_display );
     free( p_sys->p_map );
 
+    xcb_key_symbols_free( p_sys->p_symbols );
+    xcb_disconnect( p_sys->p_connection );
     free( p_sys );
 }
 
 /*****************************************************************************
  *
  *****************************************************************************/
-static int X11ErrorHandler( Display *p_display, XErrorEvent *p_event )
-{
-#if 0
-    char psz_txt[1024];
-
-    XGetErrorText( p_display, p_event->error_code, psz_txt, sizeof(psz_txt) );
-    fprintf( stderr,
-             "[????????] globalhotkeys interface error: X11 request %u.%u failed "
-              "with error code %u:\n %s\n",
-             p_event->request_code, p_event->minor_code, p_event->error_code, psz_txt );
-#else
-    VLC_UNUSED(p_display); VLC_UNUSED(p_event);
-#endif
-    /* Ignore them */
-    return 0;
-}
-static unsigned GetModifier( Display *p_display, KeySym sym )
+static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *p_symbols, xcb_keysym_t sym )
 {
     static const unsigned pi_mask[8] = {
-        ShiftMask, LockMask, ControlMask, Mod1Mask,
-        Mod2Mask, Mod3Mask, Mod4Mask, Mod5Mask
+        XCB_MOD_MASK_SHIFT, XCB_MOD_MASK_LOCK, XCB_MOD_MASK_CONTROL, XCB_MOD_MASK_1,
+        XCB_MOD_MASK_2, XCB_MOD_MASK_3, XCB_MOD_MASK_4, XCB_MOD_MASK_5
     };
 
-    const KeyCode key = XKeysymToKeycode( p_display, sym );
+    const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_symbols, sym );
     if( key == 0 )
         return 0;
 
-    XModifierKeymap *p_map = XGetModifierMapping( p_display );
+    xcb_get_modifier_mapping_cookie_t r = xcb_get_modifier_mapping( p_connection );
+    xcb_get_modifier_mapping_reply_t *p_map = xcb_get_modifier_mapping_reply( p_connection, r, NULL );
     if( !p_map )
         return 0;
 
+    xcb_keycode_t *p_keycode = xcb_get_modifier_mapping_keycodes( p_map );
+    if( !p_keycode )
+        return 0;
+
     unsigned i_mask = 0;
-    for( int i = 0; i < 8 * p_map->max_keypermod; i++ )
+    for( int i = 0; i < 8; i++ )
     {
-        if( p_map->modifiermap[i] == key )
+        for( int j = 0; j < p_map->keycodes_per_modifier; j++ )
         {
-            i_mask = pi_mask[i / p_map->max_keypermod];
-            break;
+            if( p_keycode[i * p_map->keycodes_per_modifier + j] == key )
+                i_mask = pi_mask[i];
         }
     }
 
-    XFreeModifiermap( p_map );
+    free( p_map ); // FIXME to check
     return i_mask;
 }
-static unsigned GetX11Modifier( Display *p_display, unsigned i_vlc )
+static unsigned GetX11Modifier( xcb_connection_t *p_connection, xcb_key_symbols_t *p_symbols, unsigned i_vlc )
 {
     unsigned i_mask = 0;
 
     if( i_vlc & KEY_MODIFIER_ALT )
-        i_mask |= GetModifier( p_display, XK_Alt_L ) |
-                  GetModifier( p_display, XK_Alt_R );
+        i_mask |= GetModifier( p_connection, p_symbols, XK_Alt_L ) |
+                  GetModifier( p_connection, p_symbols, XK_Alt_R );
     if( i_vlc & KEY_MODIFIER_CTRL )
-        i_mask |= GetModifier( p_display, XK_Control_L ) |
-                  GetModifier( p_display, XK_Control_R );
+        i_mask |= GetModifier( p_connection, p_symbols, XK_Control_L ) |
+                  GetModifier( p_connection, p_symbols, XK_Control_R );
     if( i_vlc & KEY_MODIFIER_SHIFT )
-        i_mask |= GetModifier( p_display, XK_Shift_L ) |
-                  GetModifier( p_display, XK_Shift_R );
+        i_mask |= GetModifier( p_connection, p_symbols, XK_Shift_L ) |
+                  GetModifier( p_connection, p_symbols, XK_Shift_R );
     return i_mask;
 }
 
 /* FIXME this table is also used by the vout */
 static const struct
 {
-    KeySym   i_x11;
-    unsigned i_vlc;
+    xcb_keysym_t i_x11;
+    unsigned     i_vlc;
 
 } x11keys_to_vlckeys[] =
 {
@@ -232,7 +249,7 @@ static const struct
 
     { 0, 0 }
 };
-static KeySym GetX11Key( unsigned i_vlc )
+static xcb_keysym_t GetX11Key( unsigned i_vlc )
 {
     for( int i = 0; x11keys_to_vlckeys[i].i_vlc != 0; i++ )
     {
@@ -240,15 +257,16 @@ static KeySym GetX11Key( unsigned i_vlc )
             return x11keys_to_vlckeys[i].i_x11;
     }
 
-    char psz_key[2];
-    psz_key[0] = i_vlc;
-    psz_key[1] = '\0';
-    return XStringToKeysym( psz_key );
+    /* Copied from xcb, it seems that xcb use ascii code for ascii characters */
+    if( isascii( i_vlc ) )
+        return i_vlc;
+
+    return XK_VoidSymbol;
 }
 
 static void Mapping( intf_thread_t *p_intf )
 {
-    static const KeySym p_x11_modifier_ignored[] = {
+    static const xcb_keysym_t p_x11_modifier_ignored[] = {
         0,
         XK_Num_Lock,
         XK_Scroll_Lock,
@@ -277,13 +295,12 @@ static void Mapping( intf_thread_t *p_intf )
         if( !i_vlc_key )
             continue;
 
-        const KeyCode key = XKeysymToKeycode( p_sys->p_display,
-                                              GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
-        const unsigned i_modifier = GetX11Modifier( p_sys->p_display, i_vlc_key & KEY_MODIFIER );
+        const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
+        const unsigned i_modifier = GetX11Modifier( p_sys->p_connection, p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
 
         for( int j = 0; j < sizeof(p_x11_modifier_ignored)/sizeof(*p_x11_modifier_ignored); j++ )
         {
-            const unsigned i_ignored = GetModifier( p_sys->p_display, p_x11_modifier_ignored[j] );
+            const unsigned i_ignored = GetModifier( p_sys->p_connection, p_sys->p_symbols, p_x11_modifier_ignored[j] );
             if( j != 0 && i_ignored == 0x00)
                 continue;
 
@@ -309,9 +326,10 @@ static void Register( intf_thread_t *p_intf )
 
     for( int i = 0; i < p_sys->i_map; i++ )
     {
-        hotkey_mapping_t *p_map = &p_sys->p_map[i];
-        XGrabKey( p_sys->p_display, p_map->i_x11, p_map->i_modifier,
-                  DefaultRootWindow( p_sys->p_display ), True, GrabModeAsync, GrabModeAsync );
+        const hotkey_mapping_t *p_map = &p_sys->p_map[i];
+        xcb_grab_key( p_sys->p_connection, true, p_sys->root,
+                      p_map->i_modifier, p_map->i_x11,
+                      XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC );
     }
 }
 static void Unregister( intf_thread_t *p_intf )
@@ -320,9 +338,8 @@ static void Unregister( intf_thread_t *p_intf )
 
     for( int i = 0; i < p_sys->i_map; i++ )
     {
-        hotkey_mapping_t *p_map = &p_sys->p_map[i];
-        XUngrabKey( p_sys->p_display, p_map->i_x11, p_map->i_modifier,
-                    DefaultRootWindow( p_sys->p_display ) );
+        const hotkey_mapping_t *p_map = &p_sys->p_map[i];
+        xcb_ungrab_key( p_sys->p_connection, p_map->i_x11, p_sys->root, p_map->i_modifier );
     }
 }
 
@@ -330,18 +347,15 @@ static void *Thread( void *p_data )
 {
     intf_thread_t *p_intf = p_data;
     intf_sys_t *p_sys = p_intf->p_sys;
-    Display *p_display = p_sys->p_display;
+    xcb_connection_t *p_connection = p_sys->p_connection;
 
     int canc = vlc_savecancel();
 
-    if( !p_display )
-        return NULL;
+    /* */
+    xcb_flush( p_connection );
 
     /* */
-    XFlush( p_display );
-
-    /* */
-    int fd = ConnectionNumber( p_display );
+    int fd = xcb_get_file_descriptor( p_connection );
     for( ;; )
     {
         /* Wait for x11 event */
@@ -356,25 +370,29 @@ static void *Thread( void *p_data )
         }
         canc = vlc_savecancel();
 
-        while( XPending( p_display ) > 0 )
+        xcb_generic_event_t *p_event;
+        while( ( p_event = xcb_poll_for_event( p_connection ) ) )
         {
-            XEvent e;
-
-            XNextEvent( p_display, &e );
-            if( e.type != KeyPress )
+            if( ( p_event->response_type & 0x7f ) != XCB_KEY_PRESS )
+            {
+                free( p_event );
                 continue;
+            }
+
+            xcb_key_press_event_t *e = (xcb_key_press_event_t *)p_event;
 
             for( int i = 0; i < p_sys->i_map; i++ )
             {
                 hotkey_mapping_t *p_map = &p_sys->p_map[i];
 
-                if( p_map->i_x11 == e.xkey.keycode &&
-                    p_map->i_modifier == e.xkey.state )
+                if( p_map->i_x11 == e->detail &&
+                    p_map->i_modifier == e->state )
                 {
                     var_SetInteger( p_intf->p_libvlc, "key-action", p_map->i_action );
                     break;
                 }
             }
+            free( p_event );
         }
     }
 

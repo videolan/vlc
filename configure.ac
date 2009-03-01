@@ -3974,10 +3974,6 @@ AS_IF([test "${enable_x11}" != "no"], [
     VLC_ADD_LIBS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
 
-    VLC_ADD_PLUGIN([globalhotkeys])
-    VLC_ADD_LIBS([globalhotkeys],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_CPPFLAGS([globalhotkeys],[${X_CFLAGS}])
-
     VLC_ADD_PLUGIN([x11])
     VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
@@ -5366,6 +5362,18 @@ then
   fi
 fi
 
+dnl
+dnl Global hotkeys using XCB
+dnl
+PKG_CHECK_MODULES(XCB, [xcb], [
+  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms], [
+    PKG_CHECK_MODULES(XPROTO, [xproto], [
+      VLC_ADD_PLUGIN([globalhotkeys])
+      VLC_ADD_CFLAGS([globalhotkeys],[${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}] )
+      VLC_ADD_LIBS([globalhotkeys],[${XCB_KEYSYMS_LIBS} ${XCB_LIBS}] )
+    ], [ AC_MSG_WARN( [Xproto not found] ) ])
+  ], [ AC_MSG_WARN( [XCB keysyms was not found]) ])
+], [ AC_MSG_WARN( [XCB was not found]) ])
 
 AC_ARG_WITH(,[Misc options:])
 

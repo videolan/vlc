@@ -1,7 +1,7 @@
 if HAVE_WIN32
 globalhotkeys_extra = win32.c
 else
-globalhotkeys_extra = x11.c
+globalhotkeys_extra = xcb.c
 endif
 
 SOURCES_globalhotkeys = \
