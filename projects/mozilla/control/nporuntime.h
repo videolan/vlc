@@ -127,6 +127,15 @@ protected:
 
     bool returnInvokeResult(InvokeResult result);
 
+    bool isPluginRunning()
+    {
+        return _instance->pdata;
+    }
+    template<class T> T *getPrivate()
+    {
+        return reinterpret_cast<T *>(_instance->pdata);
+    }
+
     NPP _instance;
 };
 
