@@ -51,7 +51,7 @@ public:
             instance = new PrefsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
         return instance;
     }
-    virtual ~PrefsDialog() {};
+    virtual ~PrefsDialog() { instance = NULL; }
 #if 0
     /*Called from extended settings, is not used anymore, but could be useful one day*/
     void showModulePrefs( char* );
