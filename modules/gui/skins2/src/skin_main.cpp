@@ -244,7 +244,7 @@ static void Close( vlc_object_t *p_this )
     // Destroy "singleton" objects
     OSFactory::instance( p_intf )->destroyOSLoop();
     ThemeRepository::destroy( p_intf );
-    Dialogs::destroy( p_intf );
+    //Dialogs::destroy( p_intf );
     Interpreter::destroy( p_intf );
     AsyncQueue::destroy( p_intf );
     VarManager::destroy( p_intf );
@@ -286,6 +286,10 @@ static void Run( intf_thread_t *p_intf )
         delete p_intf->p_sys->p_theme;
         p_intf->p_sys->p_theme = NULL;
     }
+
+    // cannot be called in "Close", because it refcounts skins2
+    Dialogs::destroy( p_intf );
+
     vlc_restorecancel(canc);
 }
 
