@@ -138,7 +138,7 @@ struct libvlc_media_list_view_t
     libvlc_media_list_view_item_at_index_func_t      pf_item_at_index;
     libvlc_media_list_view_children_at_index_func_t  pf_children_at_index;
 
-    libvlc_media_list_view_constructor_func_t         pf_constructor;
+    libvlc_media_list_view_constructor_func_t        pf_constructor;
     libvlc_media_list_view_release_func_t            pf_release;
 
     /* Notification callback */
@@ -151,9 +151,9 @@ struct libvlc_media_player_t
     int                i_refcount;
     vlc_mutex_t        object_lock;
     input_thread_t *   p_input_thread;
-    struct libvlc_instance_t *  p_libvlc_instance; /* Parent instance */
+    struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
     libvlc_media_t * p_md; /* current media descriptor */
-    libvlc_event_manager_t *    p_event_manager;
+    libvlc_event_manager_t * p_event_manager;
     struct
     {
         void *hwnd;
@@ -170,9 +170,9 @@ struct libvlc_media_list_player_t
     int                         i_refcount;
     vlc_mutex_t                 object_lock;
     libvlc_media_list_path_t    current_playing_item_path;
-    libvlc_media_t * p_current_playing_item;
+    libvlc_media_t *            p_current_playing_item;
     libvlc_media_list_t *       p_mlist;
-    libvlc_media_player_t *   p_mi;
+    libvlc_media_player_t *     p_mi;
 };
 
 struct libvlc_media_library_t
@@ -189,7 +189,7 @@ struct libvlc_media_discoverer_t
     libvlc_instance_t *      p_libvlc_instance;
     services_discovery_t *   p_sd;
     libvlc_media_list_t *    p_mlist;
-    bool               running;
+    bool                     running;
     vlc_dictionary_t         catname_to_submedialist;
 };
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * voutgl.m: MacOS X OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2004, 2007 the VideoLAN team
+ * Copyright (C) 2001-2004, 2007-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -61,18 +61,18 @@ struct vout_sys_t
     NSAutoreleasePool * o_pool;
     VLCGLView         * o_glview;
     VLCVoutView       * o_vout_view;
-    bool          b_saved_frame;
+    bool                b_saved_frame;
     NSRect              s_frame;
-    bool          b_got_frame;
+    bool                b_got_frame;
     /* Mozilla plugin-related variables */
-    bool          b_embedded;
+    bool                b_embedded;
     AGLContext          agl_ctx;
     AGLDrawable         agl_drawable;
     int                 i_offx, i_offy;
     int                 i_width, i_height;
     WindowRef           theWindow;
     WindowGroupRef      winGroup;
-    bool          b_clipped_out;
+    bool                b_clipped_out;
     Rect                clipBounds, viewBounds;
 };
 
@@ -110,7 +110,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-        return( 1 );
+        return VLC_ENOMEM;
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
@@ -174,7 +174,6 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         [o_pool release];
 
         /* Check to see if initVout: was successfull */
-
         if( !p_vout->p_sys->o_vout_view )
         {
             return VLC_EGENERIC;
