@@ -97,7 +97,7 @@ MediaControl_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
     {
         self->mc = mediacontrol_new( i_size, ppsz_args, exception );
         self->vlc_instance = PyObject_New( vlcInstance, &vlcInstance_Type );
-        self->vlc_instance->p_instance = mediacontrol_get_libvlc_instance( SELF->mc );
+        self->vlc_instance->p_instance = mediacontrol_get_libvlc_instance( LIBVLC_MC(self) );
     }
     MC_EXCEPT;
     Py_END_ALLOW_THREADS
@@ -110,7 +110,7 @@ static void
 MediaControl_dealloc( PyObject *self )
 {
     fprintf(stderr, "MC dealloc\n");
-    Py_DECREF( SELF->vlc_instance );
+    Py_DECREF( ((MediaControl*)self)->vlc_instance );
     PyObject_DEL( self );
 }
 
@@ -119,7 +119,7 @@ MediaControl_get_vlc_instance( PyObject *self, PyObject *args )
 {
     vlcInstance *p_ret;
 
-    p_ret = SELF->vlc_instance;
+    p_ret = ((MediaControl*)self)->vlc_instance;
     Py_INCREF( p_ret );
     return ( PyObject * )p_ret;
 }
@@ -130,7 +130,7 @@ MediaControl_get_mediaplayer( PyObject *self, PyObject *args )
     vlcMediaPlayer *p_ret;
 
     p_ret = PyObject_New( vlcMediaPlayer, &vlcMediaPlayer_Type );
-    p_ret->p_mp = mediacontrol_get_media_player( SELF->mc );
+    p_ret->p_mp = mediacontrol_get_media_player( LIBVLC_MC(self) );
     Py_INCREF( p_ret );
     return ( PyObject * )p_ret;
 }
@@ -159,7 +159,7 @@ MediaControl_get_media_position( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    pos = mediacontrol_get_media_position( SELF->mc, origin, key, exception );
+    pos = mediacontrol_get_media_position( LIBVLC_MC(self), origin, key, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -188,7 +188,7 @@ MediaControl_set_media_position( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_set_media_position( SELF->mc, a_position, exception );
+    mediacontrol_set_media_position( LIBVLC_MC(self), a_position, exception );
     free( a_position );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
@@ -216,7 +216,7 @@ MediaControl_start( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_start( SELF->mc, a_position, exception );
+    mediacontrol_start( LIBVLC_MC(self), a_position, exception );
     free( a_position );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
@@ -232,7 +232,7 @@ MediaControl_pause( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_pause( SELF->mc, exception );
+    mediacontrol_pause( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -247,7 +247,7 @@ MediaControl_resume( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_resume( SELF->mc, exception );
+    mediacontrol_resume( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -262,7 +262,7 @@ MediaControl_stop( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_stop( SELF->mc, exception );
+    mediacontrol_stop( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -273,7 +273,7 @@ MediaControl_stop( PyObject *self, PyObject *args )
 static PyObject *
 MediaControl_exit( PyObject *self, PyObject *args )
 {
-    mediacontrol_exit( SELF->mc );
+    mediacontrol_exit( LIBVLC_MC(self) );
     Py_INCREF( Py_None );
     return Py_None;
 }
@@ -289,7 +289,7 @@ MediaControl_set_mrl( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_set_mrl( SELF->mc, psz_file, exception );
+    mediacontrol_set_mrl( LIBVLC_MC(self), psz_file, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -306,7 +306,7 @@ MediaControl_get_mrl( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    psz_file = mediacontrol_get_mrl( SELF->mc, exception );
+    psz_file = mediacontrol_get_mrl( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -331,7 +331,7 @@ MediaControl_snapshot( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    p_retval = mediacontrol_snapshot( SELF->mc, a_position, exception );
+    p_retval = mediacontrol_snapshot( LIBVLC_MC(self), a_position, exception );
     free( a_position );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
@@ -378,7 +378,7 @@ MediaControl_display_text( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_display_text( SELF->mc, message, begin, end, exception );
+    mediacontrol_display_text( LIBVLC_MC(self), message, begin, end, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -399,7 +399,7 @@ MediaControl_get_stream_information( PyObject *self, PyObject *args )
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
     retval = mediacontrol_get_stream_information(
-        SELF->mc, mediacontrol_MediaTime, exception );
+        LIBVLC_MC(self), mediacontrol_MediaTime, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -431,7 +431,7 @@ MediaControl_sound_set_volume( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_sound_set_volume( SELF->mc, volume, exception );
+    mediacontrol_sound_set_volume( LIBVLC_MC(self), volume, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -448,7 +448,7 @@ MediaControl_sound_get_volume( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    volume = mediacontrol_sound_get_volume( SELF->mc, exception );
+    volume = mediacontrol_sound_get_volume( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -467,7 +467,7 @@ MediaControl_set_rate( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_set_rate( SELF->mc, rate, exception );
+    mediacontrol_set_rate( LIBVLC_MC(self), rate, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -484,7 +484,7 @@ MediaControl_get_rate( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    rate = mediacontrol_get_rate( SELF->mc, exception );
+    rate = mediacontrol_get_rate( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -503,7 +503,7 @@ MediaControl_set_fullscreen( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_set_fullscreen( SELF->mc, fs, exception );
+    mediacontrol_set_fullscreen( LIBVLC_MC(self), fs, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -520,7 +520,7 @@ MediaControl_get_fullscreen( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    fs = mediacontrol_get_fullscreen( SELF->mc, exception );
+    fs = mediacontrol_get_fullscreen( LIBVLC_MC(self), exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 
@@ -539,7 +539,7 @@ MediaControl_set_visual( PyObject *self, PyObject *args )
 
     Py_BEGIN_ALLOW_THREADS
     MC_TRY;
-    mediacontrol_set_visual( SELF->mc, visual, exception );
+    mediacontrol_set_visual( LIBVLC_MC(self), visual, exception );
     Py_END_ALLOW_THREADS
     MC_EXCEPT;
 

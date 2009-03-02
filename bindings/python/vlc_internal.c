@@ -110,10 +110,10 @@ static PyObject
 static PyObject *
 vlcObject_release(  PyObject *self, PyObject *p_args )
 {
-    if( VLCSELF->b_released == 0 )
+    if( (vlcObject*)self->b_released == 0 )
     {
-        vlc_object_release( VLCSELF->p_object );
-        VLCSELF->b_released = 1;
+        vlc_object_release( VLCOBJ(self) );
+        (vlcObject*)self->b_released = 1;
     }
     Py_INCREF(  Py_None );
     return Py_None;
@@ -239,7 +239,7 @@ vlcObject_find_object( PyObject *self, PyObject *args )
         return Py_None;
     }
 
-    p_obj = vlc_object_find( VLCSELF->p_object, i_object_type, FIND_ANYWHERE );
+    p_obj = vlc_object_find( VLCOBJ(self), i_object_type, FIND_ANYWHERE );
 
     if( !p_obj )
     {
@@ -264,7 +264,7 @@ vlcObject_find_name( PyObject *self, PyObject *args )
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
 
-    p_obj = vlc_object_find_name( VLCSELF->p_object, psz_name, FIND_ANYWHERE );
+    p_obj = vlc_object_find_name( VLCOBJ(self), psz_name, FIND_ANYWHERE );
 
     if( !p_obj )
     {
@@ -286,7 +286,7 @@ vlcObject_info( PyObject *self, PyObject *args )
     vlc_object_t *p_obj;
     vlc_object_internals_t *p_priv;
     
-    p_obj = VLCSELF->p_object;
+    p_obj = VLCOBJ(self);
     p_priv = vlc_internals( p_obj );
 
     /* Return information about the object as a dict. */
@@ -344,14 +344,14 @@ vlcObject_var_get( PyObject *self, PyObject *args )
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
 
-    if( var_Get( VLCSELF->p_object, psz_name, &value ) != VLC_SUCCESS )
+    if( var_Get( VLCOBJ(self), psz_name, &value ) != VLC_SUCCESS )
     {
         PyErr_SetString( PyExc_StandardError,
                          "Error: variable does not exist.\n" );
         return NULL;
     }
 
-    i_type = var_Type ( VLCSELF->p_object, psz_name );
+    i_type = var_Type ( VLCOBJ(self), psz_name );
 
     switch ( i_type )
     {
@@ -410,7 +410,7 @@ vlcObject_var_type( PyObject *self, PyObject *args )
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
 
-    i_type = var_Type( VLCSELF->p_object, psz_name );
+    i_type = var_Type( VLCOBJ(self), psz_name );
 
     switch ( i_type )
     {
@@ -475,7 +475,7 @@ vlcObject_var_set( PyObject *self, PyObject *args )
     if( !PyArg_ParseTuple( args, "sO", &psz_name, &py_value ) )
         return NULL;
 
-    p_obj = VLCSELF->p_object;
+    p_obj = VLCOBJ(self);
     i_type = var_Type( p_obj, psz_name );
 
     switch ( i_type )
@@ -530,7 +530,7 @@ vlcObject_var_list( PyObject *self, PyObject *args )
     Py_ssize_t i_index;
     vlc_object_internals_t *p_priv;
 
-    p_priv = vlc_internals( VLCSELF->p_object );
+    p_priv = vlc_internals( VLCOBJ(self) );
     i_size = p_priv->i_vars;
     p_retval = PyTuple_New( i_size );
 
@@ -556,7 +556,7 @@ vlcObject_config_get( PyObject *self, PyObject *args )
     if( !PyArg_ParseTuple( args, "s", &psz_name ) )
         return NULL;
 
-    p_config = config_FindConfig( VLCSELF->p_object, psz_name );
+    p_config = config_FindConfig( VLCOBJ(self), psz_name );
 
     if( !p_config )
     {
@@ -614,7 +614,7 @@ vlcObject_config_set( PyObject *self, PyObject *args )
     if( !PyArg_ParseTuple( args, "sO", &psz_name, &py_value ) )
         return NULL;
 
-    p_obj = VLCSELF->p_object;
+    p_obj = VLCOBJ(self);
     p_config = config_FindConfig( p_obj, psz_name );
     /* sanity checks */
     if( !p_config )
@@ -652,14 +652,13 @@ vlcObject_children( PyObject *self, PyObject *args )
     Py_ssize_t i_size;
     Py_ssize_t i_index;
 
-    i_size = VLCSELF->p_object->i_children;
+    i_size = VLCOBJ(self)->i_children;
     p_retval = PyTuple_New( i_size );
 
     for ( i_index = 0 ; i_index < i_size ; i_index++ )
     {
-        PyTuple_SetItem( p_retval, i_index,
-                         Py_BuildValue( "i",
-                                        VLCSELF->p_object->pp_children[i_index]->i_object_id ) );
+        PyTuple_SetItem( p_retval, i_index, Py_BuildValue( "i",
+            VLCOBJ(self)->pp_children[i_index]->i_object_id ) );
     }
 
     return p_retval;
