@@ -37,7 +37,7 @@ vlcMedia_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 static void
 vlcMedia_dealloc( PyObject *self )
 {
-    libvlc_media_release( LIBVLC_MEDIA->p_media );
+    libvlc_media_release( LIBVLC_MEDIA(self) );
     PyObject_DEL( self );
 }
 
@@ -51,7 +51,7 @@ vlcMedia_add_option( PyObject *self, PyObject *args )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_media_add_option( LIBVLC_MEDIA->p_media, psz_options, &ex);
+    libvlc_media_add_option( LIBVLC_MEDIA(self), psz_options, &ex);
     LIBVLC_EXCEPT;
     Py_INCREF( Py_None );
     return Py_None;
@@ -65,7 +65,7 @@ vlcMedia_get_mrl( PyObject *self, PyObject *args )
     PyObject * o_ret;
 
     LIBVLC_TRY;
-    psz_mrl = libvlc_media_get_mrl( LIBVLC_MEDIA->p_media, &ex);
+    psz_mrl = libvlc_media_get_mrl( LIBVLC_MEDIA(self), &ex);
     LIBVLC_EXCEPT;
 
     o_ret = Py_BuildValue( "s", psz_mrl );
@@ -80,7 +80,7 @@ vlcMedia_get_state( PyObject *self, PyObject *args )
     libvlc_state_t i_state;
 
     LIBVLC_TRY;
-    i_state = libvlc_media_get_state( LIBVLC_MEDIA->p_media, &ex);
+    i_state = libvlc_media_get_state( LIBVLC_MEDIA(self), &ex);
     LIBVLC_EXCEPT;
     /* FIXME: return the defined state constant */
     return Py_BuildValue( "i", i_state );
@@ -92,7 +92,7 @@ vlcMedia_get_duration( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     libvlc_time_t i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_get_duration( LIBVLC_MEDIA->p_media, &ex);
+    i_ret = libvlc_media_get_duration( LIBVLC_MEDIA(self), &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "L", i_ret );
 }
@@ -105,7 +105,7 @@ vlcMedia_media_player_new( PyObject *self, PyObject *args )
     vlcMediaPlayer *p_ret;
 
     LIBVLC_TRY;
-    p_mp = libvlc_media_player_new_from_media( LIBVLC_MEDIA->p_media, &ex);
+    p_mp = libvlc_media_player_new_from_media( LIBVLC_MEDIA(self), &ex);
     LIBVLC_EXCEPT;
 
     p_ret = PyObject_New( vlcMediaPlayer, &vlcMediaPlayer_Type );
@@ -120,7 +120,7 @@ vlcMedia_is_preparsed( PyObject *self, PyObject *args )
     libvlc_exception_t ex;
     int i_ret;
     LIBVLC_TRY;
-    i_ret = libvlc_media_is_preparsed( LIBVLC_MEDIA->p_media, &ex);
+    i_ret = libvlc_media_is_preparsed( LIBVLC_MEDIA(self), &ex);
     LIBVLC_EXCEPT;
     return Py_BuildValue( "L", i_ret );
 }
@@ -155,7 +155,7 @@ vlcMedia_get_meta( PyObject *self, PyObject *args )
     }
 
     LIBVLC_TRY;
-    psz_ret = libvlc_media_get_meta( LIBVLC_MEDIA->p_media, i_index, &ex);
+    psz_ret = libvlc_media_get_meta( LIBVLC_MEDIA(self), i_index, &ex);
     LIBVLC_EXCEPT;
 
     o_ret = Py_BuildValue( "s", psz_ret );
