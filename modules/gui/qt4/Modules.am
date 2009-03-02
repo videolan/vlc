@@ -31,6 +31,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/preferences.moc.cpp \
 		dialogs/interaction.moc.cpp \
 		dialogs/sout.moc.cpp \
+		dialogs/convert.moc.cpp \
 		dialogs/help.moc.cpp \
 		dialogs/gototime.moc.cpp \
 		dialogs/toolbar.moc.cpp \
@@ -202,6 +203,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/plugins.cpp \
 		dialogs/interaction.cpp \
 		dialogs/sout.cpp \
+		dialogs/convert.cpp \
 		dialogs/help.cpp \
 		dialogs/gototime.cpp \
 		dialogs/toolbar.cpp \
@@ -246,6 +248,7 @@ noinst_HEADERS = \
 	dialogs/preferences.hpp \
 	dialogs/interaction.hpp \
 	dialogs/sout.hpp \
+	dialogs/convert.hpp \
 	dialogs/help.hpp \
 	dialogs/gototime.hpp \
 	dialogs/toolbar.hpp \
