@@ -2,7 +2,7 @@
  * libvlc_internal.h : Definition of opaque structures for libvlc exported API
  * Also contains some internal utility functions
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -158,6 +158,7 @@ struct libvlc_media_player_t
     {
         void *hwnd;
         uint32_t xid;
+        uint32_t agl;
     } drawable;
 
     bool        b_own_its_input_thread;

@@ -242,6 +242,8 @@ void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d
         return; /* BOOM! we told you not to use this function! */
     val.p_address = (void *)(uintptr_t)d;
     var_Set( p_instance->p_libvlc_int, "drawable-hwnd", val );
+#elif defined(__APPLE__)
+    var_SetInteger( p_instance->p_libvlc_int, "drawable-agl", d );
 #else
     var_SetInteger( p_instance->p_libvlc_int, "drawable-xid", d );
 #endif
@@ -266,11 +268,12 @@ libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc
         return 0;
     var_Get( p_instance->p_libvlc_int, "drawable-hwnd", &val );
     return (uintptr_t)val.p_address;
+#elif defined(__APPLE__)
+    return var_GetInteger( p_instance->p_libvlc_int, "drawable-agl" );
 #else
     return var_GetInteger( p_instance->p_libvlc_int, "drawable-xid" );
 #endif
 }
-
 
 void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height,
                            libvlc_exception_t *p_e )

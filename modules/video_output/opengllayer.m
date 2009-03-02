@@ -3,7 +3,7 @@
  * a layer. The layer will register itself to the drawable object stored in 
  * the "drawable" variable. 
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Cyril Deguet <asmax@videolan.org>
@@ -185,8 +185,8 @@ static int Init( vout_thread_t *p_vout )
 
     /* We do need a drawable to work properly */
     vlc_value_t value_drawable;
-    var_Create( p_vout, "drawable", VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "drawable", &value_drawable );
+    var_Create( p_vout, "drawable-gl", VLC_VAR_DOINHERIT );
+    var_Get( p_vout, "drawable-gl", &value_drawable );
 
     p_vout->p_sys->o_cocoa_container = (id) value_drawable.i_int;
     

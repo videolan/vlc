@@ -94,6 +94,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
 
         var_Destroy( p_input_thread, "drawable-hwnd" );
         var_Destroy( p_input_thread, "drawable-xid" );
+        var_Destroy( p_input_thread, "drawable-agl" );
     }
 
     vlc_object_release( p_input_thread );
@@ -274,6 +275,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
         return NULL;
     }
     p_mi->p_md = NULL;
+    p_mi->drawable.agl = 0;
     p_mi->drawable.xid = 0;
     p_mi->drawable.hwnd = NULL;
     p_mi->p_libvlc_instance = p_libvlc_instance;
@@ -615,6 +617,10 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
 
     p_input_thread = p_mi->p_input_thread;
 
+    var_Create( p_input_thread, "drawable-agl", VLC_VAR_INTEGER );
+    if( p_mi->drawable.agl )
+        var_SetInteger( p_input_thread, "drawable-agl", p_mi->drawable.agl );
+
     var_Create( p_input_thread, "drawable-xid", VLC_VAR_INTEGER );
     if( p_mi->drawable.xid )
         var_SetInteger( p_input_thread, "drawable-xid", p_mi->drawable.xid );
@@ -729,6 +735,25 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 }
 
 /**************************************************************************
+ * set_agl
+ **************************************************************************/
+void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
+                                      uint32_t drawable,
+                                      libvlc_exception_t *p_e )
+{
+    (void) p_e;
+    p_mi->drawable.agl = drawable;
+}
+
+/**************************************************************************
+ * get_agl
+ **************************************************************************/
+uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
+{
+    return p_mi->drawable.agl;
+}
+
+/**************************************************************************
  * set_xwindow
  **************************************************************************/
 void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
@@ -778,6 +803,8 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
         p_mi->drawable.hwnd = (HWND)drawable;
     else
         libvlc_exception_raise(p_e, "Operation not supported");
+#elif defined(__APPLE__)
+    p_mi->drawable.agl = drawable;
 #else
     p_mi->drawable.xid = drawable;
 #endif
@@ -797,6 +824,8 @@ libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi,
         return (libvlc_drawable_t)p_mi->drawable.hwnd;
     else
         return 0;
+#elif defined(__APPLE__)
+    return p_mi->drawable.agl;
 #else
     return p_mi->drawable.xid;
 #endif

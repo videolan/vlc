@@ -114,7 +114,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
+    var_Get( p_vout->p_libvlc, "drawable-agl", &value_drawable );
     if( value_drawable.i_int != 0 )
     {
         static const GLint ATTRIBUTES[] = {
@@ -148,7 +148,8 @@ int OpenVideoGL  ( vlc_object_t * p_this )
             msg_Err( p_vout, "cannot create AGL context." );
             return VLC_EGENERIC;
         }
-        else {
+        else
+        {
             // tell opengl not to sync buffer swap with vertical retrace (too inefficient)
             GLint param = 0;
             aglSetInteger(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL, &param);
@@ -496,7 +497,7 @@ static int aglInit( vout_thread_t * p_vout )
     Rect viewBounds;
     Rect clipBounds;
  
-    var_Get( p_vout->p_libvlc, "drawable", &val );
+    var_Get( p_vout->p_libvlc, "drawable-agl", &val );
     p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
     aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
@@ -616,7 +617,7 @@ static int aglManage( vout_thread_t * p_vout )
             Rect viewBounds;
             Rect clipBounds;
 
-            var_Get( p_vout->p_libvlc, "drawable", &val );
+            var_Get( p_vout->p_libvlc, "drawable-agl", &val );
             p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
             aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout.m: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2001-2008 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -337,7 +337,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     }
     vlc_object_release( p_input );
 }
-
 
 - (void)setOnTop:(BOOL)b_on_top
 {
@@ -711,11 +710,11 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 + (id)voutView: (vout_thread_t *)p_vout subView: (NSView *)view
          frame: (NSRect *)s_frame
 {
-    vlc_value_t value_drawable;
+    int i_drawable_gl;
     int i_timeout;
     id o_return = nil;
 
-    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
+    i_drawable_gl = var_GetInteger( p_vout->p_libvlc, "drawable-gl" );
 
     var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -726,9 +725,9 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     /* We only wait for NSApp to initialise if we're not embedded (as in the
      * case of the Mozilla plugin).  We can tell whether we're embedded or not
-     * by examining the "drawable" value: if it's zero, we're running in the
+     * by examining the "drawable-gl" value: if it's zero, we're running in the
      * main Mac intf; if it's non-zero, we're embedded. */
-    if( value_drawable.i_int == 0 )
+    if( i_drawable_gl == 0 )
     {
         /* Wait for a MacOS X interface to appear. Timeout is 2 seconds. */
         for( i_timeout = 20 ; i_timeout-- ; )
