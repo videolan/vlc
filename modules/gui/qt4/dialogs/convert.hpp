@@ -37,12 +37,14 @@ public:
     ConvertDialog( QWidget *, intf_thread_t * );
     virtual ~ConvertDialog(){}
 
+    QString getMrl() {return mrl;}
+
 private:
     QLineEdit *fileLine;
 
-    QCheckBox *displayBox;
-    QCheckBox *deinterBox;
+    QCheckBox *displayBox, *deinterBox;
     VLCProfileSelector *profile;
+    QString mrl;
 private slots:
     virtual void close();
     virtual void cancel();

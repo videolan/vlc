@@ -44,6 +44,7 @@
 #include "dialogs/extended.hpp"
 #include "dialogs/vlm.hpp"
 #include "dialogs/sout.hpp"
+#include "dialogs/convert.hpp"
 #include "dialogs/open.hpp"
 #include "dialogs/openurl.hpp"
 #include "dialogs/help.hpp"
@@ -566,11 +567,21 @@ void DialogsProvider::saveAPlaylist()
 void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
                                        bool b_transcode_only )
 {
-    SoutDialog *s = SoutDialog::getInstance( parent, p_intf, b_transcode_only );
-
-    if( s->exec() == QDialog::Accepted )
+    const char *psz_option;
+    if( !b_transcode_only )
     {
-        const char *psz_option = qtu( s->getMrl() );
+        SoutDialog *s = SoutDialog::getInstance( parent, p_intf, b_transcode_only );
+        if( s->exec() == QDialog::Accepted )
+            psz_option = qtu( s->getMrl() );
+    }else {
+        ConvertDialog *s = new ConvertDialog( parent, p_intf );
+        if( s->exec() == QDialog::Accepted )
+            psz_option = qtu( s->getMrl() );
+    }
+
+
+    if( !EMPTY_STR( psz_option ) )
+    {
 
         msg_Dbg( p_intf, "Sout mrl %s", psz_option );
         playlist_AddExt( THEPL, qtu( mrl ), _("Streaming"),

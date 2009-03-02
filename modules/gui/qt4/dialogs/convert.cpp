@@ -140,7 +140,7 @@ void ConvertDialog::close()
 {
     hide();
 
-    QString mrl = "sout=#" + profile->getTranscode();
+    mrl = "sout=#" + profile->getTranscode();
     if( deinterBox->isChecked() )
     {
         mrl.remove( '}' );
