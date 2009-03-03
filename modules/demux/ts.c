@@ -1175,206 +1175,206 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     switch( i_query )
     {
-        case DEMUX_GET_POSITION:
-            pf = (double*) va_arg( args, double* );
-            i64 = stream_Size( p_demux->s );
-            if( i64 > 0 )
-            {
-                *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
-            }
+    case DEMUX_GET_POSITION:
+        pf = (double*) va_arg( args, double* );
+        i64 = stream_Size( p_demux->s );
+        if( i64 > 0 )
+        {
+            *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
+        }
+        else
+        {
+            int64_t i_time, i_length;
+            if( !DVBEventInformation( p_demux, &i_time, &i_length ) && i_length > 0 )
+                *pf = (double)i_time/(double)i_length;
             else
-            {
-                int64_t i_time, i_length;
-                if( !DVBEventInformation( p_demux, &i_time, &i_length ) && i_length > 0 )
-                    *pf = (double)i_time/(double)i_length;
-                else
-                    *pf = 0.0;
-            }
-            return VLC_SUCCESS;
-        case DEMUX_SET_POSITION:
-            f = (double) va_arg( args, double );
-            i64 = stream_Size( p_demux->s );
+                *pf = 0.0;
+        }
+        return VLC_SUCCESS;
+    case DEMUX_SET_POSITION:
+        f = (double) va_arg( args, double );
+        i64 = stream_Size( p_demux->s );
 
-            if( stream_Seek( p_demux->s, (int64_t)(i64 * f) ) )
-                return VLC_EGENERIC;
+        if( stream_Seek( p_demux->s, (int64_t)(i64 * f) ) )
+            return VLC_EGENERIC;
 
-            return VLC_SUCCESS;
+        return VLC_SUCCESS;
 #if 0
 
-        case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_time < 0 )
-            {
-                *pi64 = 0;
-                return VLC_EGENERIC;
-            }
-            *pi64 = p_sys->i_time;
-            return VLC_SUCCESS;
-
-        case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->i_mux_rate > 0 )
-            {
-                *pi64 = INT64_C(1000000) * ( stream_Size( p_demux->s ) / 50 ) /
-                        p_sys->i_mux_rate;
-                return VLC_SUCCESS;
-            }
+    case DEMUX_GET_TIME:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        if( p_sys->i_time < 0 )
+        {
             *pi64 = 0;
             return VLC_EGENERIC;
-#else
-        case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( DVBEventInformation( p_demux, pi64, NULL ) )
-                *pi64 = 0;
-            return VLC_SUCCESS;
+        }
+        *pi64 = p_sys->i_time;
+        return VLC_SUCCESS;
 
-        case DEMUX_GET_LENGTH:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( DVBEventInformation( p_demux, NULL, pi64 ) )
-                *pi64 = 0;
-            return VLC_SUCCESS;
-#endif
-        case DEMUX_SET_GROUP:
+    case DEMUX_GET_LENGTH:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        if( p_sys->i_mux_rate > 0 )
         {
-            uint16_t i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
-            ts_prg_psi_t *p_prg = NULL;
-            vlc_list_t *p_list;
-
-            i_int = (int)va_arg( args, int );
-            p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
-            msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, p_list );
-
-            if( p_sys->b_access_control && i_int > 0 && i_int != p_sys->i_current_program )
-            {
-                int i_pmt_pid = -1;
-
-                /* Search pmt to be unselected */
-                for( int i = 0; i < p_sys->i_pmt; i++ )
-                {
-                    ts_pid_t *pmt = p_sys->pmt[i];
-
-                    for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-                    {
-                        if( pmt->psi->prg[i_prg]->i_number == p_sys->i_current_program )
-                        {
-                            i_pmt_pid = p_sys->pmt[i]->i_pid;
-                            break;
-                        }
-                    }
-                    if( i_pmt_pid > 0 ) break;
-                }
-
-                if( i_pmt_pid > 0 )
-                {
-                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
-                                    false );
-                    /* All ES */
-                    for( int i = 2; i < 8192; i++ )
-                    {
-                        ts_pid_t *pid = &p_sys->pid[i];
-
-                        if( !pid->b_valid || pid->psi )
-                            continue;
-
-                        for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
-                        {
-                            if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
-                            {
-                                /* We only remove es that aren't defined by extra pmt */
-                                stream_Control( p_demux->s,
-                                                STREAM_CONTROL_ACCESS,
-                                                ACCESS_SET_PRIVATE_ID_STATE,
-                                                i, false );
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                /* select new program */
-                p_sys->i_current_program = i_int;
-                i_pmt_pid = -1;
-                for( int i = 0; i < p_sys->i_pmt; i++ )
-                {
-                    ts_pid_t *pmt = p_sys->pmt[i];
-
-                    for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
-                    {
-                        if( pmt->psi->prg[i_prg]->i_number == i_int )
-                        {
-                            i_pmt_pid = p_sys->pmt[i]->i_pid;
-                            p_prg = p_sys->pmt[i]->psi->prg[i_prg];
-                            break;
-                        }
-                    }
-                    if( i_pmt_pid > 0 )
-                        break;
-                }
-                if( i_pmt_pid > 0 )
-                {
-                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
-                                    true );
-                    stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                                    ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
-                                    true );
-
-                    for( int i = 2; i < 8192; i++ )
-                    {
-                        ts_pid_t *pid = &p_sys->pid[i];
-
-                        if( !pid->b_valid || pid->psi )
-                            continue;
-
-                        for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
-                        {
-                            if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
-                            {
-                                if ( pid->es->fmt.i_cat == VIDEO_ES && !i_vpid )
-                                    i_vpid = i;
-                                if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid1 )
-                                    i_apid1 = i;
-                                else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid2 )
-                                    i_apid2 = i;
-                                else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid3 )
-                                    i_apid3 = i;
-
-                                stream_Control( p_demux->s,
-                                                STREAM_CONTROL_ACCESS,
-                                                ACCESS_SET_PRIVATE_ID_STATE,
-                                                i, true );
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                p_sys->i_current_program = -1;
-                p_sys->p_programs_list = p_list;
-            }
+            *pi64 = INT64_C(1000000) * ( stream_Size( p_demux->s ) / 50 ) /
+                    p_sys->i_mux_rate;
             return VLC_SUCCESS;
         }
+        *pi64 = 0;
+        return VLC_EGENERIC;
+#else
+    case DEMUX_GET_TIME:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        if( DVBEventInformation( p_demux, pi64, NULL ) )
+            *pi64 = 0;
+        return VLC_SUCCESS;
 
-        case DEMUX_CAN_RECORD:
-            pb_bool = (bool*)va_arg( args, bool * );
-            *pb_bool = true;
-            return VLC_SUCCESS;
+    case DEMUX_GET_LENGTH:
+        pi64 = (int64_t*)va_arg( args, int64_t * );
+        if( DVBEventInformation( p_demux, NULL, pi64 ) )
+            *pi64 = 0;
+        return VLC_SUCCESS;
+#endif
+    case DEMUX_SET_GROUP:
+    {
+        uint16_t i_vpid = 0, i_apid1 = 0, i_apid2 = 0, i_apid3 = 0;
+        ts_prg_psi_t *p_prg = NULL;
+        vlc_list_t *p_list;
 
-        case DEMUX_SET_RECORD_STATE:
-            b_bool = (bool)va_arg( args, int );
+        i_int = (int)va_arg( args, int );
+        p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
+        msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, p_list );
 
-            if( !b_bool )
-                stream_Control( p_demux->s, STREAM_SET_RECORD_STATE, false );
-            p_sys->b_start_record = b_bool;
-            return VLC_SUCCESS;
+        if( p_sys->b_access_control && i_int > 0 && i_int != p_sys->i_current_program )
+        {
+            int i_pmt_pid = -1;
 
-        case DEMUX_GET_FPS:
-        case DEMUX_SET_TIME:
-        default:
-            return VLC_EGENERIC;
+            /* Search pmt to be unselected */
+            for( int i = 0; i < p_sys->i_pmt; i++ )
+            {
+                ts_pid_t *pmt = p_sys->pmt[i];
+
+                for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                {
+                    if( pmt->psi->prg[i_prg]->i_number == p_sys->i_current_program )
+                    {
+                        i_pmt_pid = p_sys->pmt[i]->i_pid;
+                        break;
+                    }
+                }
+                if( i_pmt_pid > 0 ) break;
+            }
+
+            if( i_pmt_pid > 0 )
+            {
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
+                                false );
+                /* All ES */
+                for( int i = 2; i < 8192; i++ )
+                {
+                    ts_pid_t *pid = &p_sys->pid[i];
+
+                    if( !pid->b_valid || pid->psi )
+                        continue;
+
+                    for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                    {
+                        if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
+                        {
+                            /* We only remove es that aren't defined by extra pmt */
+                            stream_Control( p_demux->s,
+                                            STREAM_CONTROL_ACCESS,
+                                            ACCESS_SET_PRIVATE_ID_STATE,
+                                            i, false );
+                            break;
+                        }
+                    }
+                }
+            }
+
+            /* select new program */
+            p_sys->i_current_program = i_int;
+            i_pmt_pid = -1;
+            for( int i = 0; i < p_sys->i_pmt; i++ )
+            {
+                ts_pid_t *pmt = p_sys->pmt[i];
+
+                for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                {
+                    if( pmt->psi->prg[i_prg]->i_number == i_int )
+                    {
+                        i_pmt_pid = p_sys->pmt[i]->i_pid;
+                        p_prg = p_sys->pmt[i]->psi->prg[i_prg];
+                        break;
+                    }
+                }
+                if( i_pmt_pid > 0 )
+                    break;
+            }
+            if( i_pmt_pid > 0 )
+            {
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
+                                true );
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
+                                true );
+
+                for( int i = 2; i < 8192; i++ )
+                {
+                    ts_pid_t *pid = &p_sys->pid[i];
+
+                    if( !pid->b_valid || pid->psi )
+                        continue;
+
+                    for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                    {
+                        if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
+                        {
+                            if ( pid->es->fmt.i_cat == VIDEO_ES && !i_vpid )
+                                i_vpid = i;
+                            if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid1 )
+                                i_apid1 = i;
+                            else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid2 )
+                                i_apid2 = i;
+                            else if ( pid->es->fmt.i_cat == AUDIO_ES && !i_apid3 )
+                                i_apid3 = i;
+
+                            stream_Control( p_demux->s,
+                                            STREAM_CONTROL_ACCESS,
+                                            ACCESS_SET_PRIVATE_ID_STATE,
+                                            i, true );
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            p_sys->i_current_program = -1;
+            p_sys->p_programs_list = p_list;
+        }
+        return VLC_SUCCESS;
+    }
+
+    case DEMUX_CAN_RECORD:
+        pb_bool = (bool*)va_arg( args, bool * );
+        *pb_bool = true;
+        return VLC_SUCCESS;
+
+    case DEMUX_SET_RECORD_STATE:
+        b_bool = (bool)va_arg( args, int );
+
+        if( !b_bool )
+            stream_Control( p_demux->s, STREAM_SET_RECORD_STATE, false );
+        p_sys->b_start_record = b_bool;
+        return VLC_SUCCESS;
+
+    case DEMUX_GET_FPS:
+    case DEMUX_SET_TIME:
+    default:
+        return VLC_EGENERIC;
     }
 }
 
@@ -1648,86 +1648,86 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     /* TODO check size */
     switch( header[3] )
     {
-        case 0xBC:  /* Program stream map */
-        case 0xBE:  /* Padding */
-        case 0xBF:  /* Private stream 2 */
-        case 0xF0:  /* ECM */
-        case 0xF1:  /* EMM */
-        case 0xFF:  /* Program stream directory */
-        case 0xF2:  /* DSMCC stream */
-        case 0xF8:  /* ITU-T H.222.1 type E stream */
-            i_skip = 6;
-            break;
-        default:
-            if( ( header[6]&0xC0 ) == 0x80 )
+    case 0xBC:  /* Program stream map */
+    case 0xBE:  /* Padding */
+    case 0xBF:  /* Private stream 2 */
+    case 0xF0:  /* ECM */
+    case 0xF1:  /* EMM */
+    case 0xFF:  /* Program stream directory */
+    case 0xF2:  /* DSMCC stream */
+    case 0xF8:  /* ITU-T H.222.1 type E stream */
+        i_skip = 6;
+        break;
+    default:
+        if( ( header[6]&0xC0 ) == 0x80 )
+        {
+            /* mpeg2 PES */
+            i_skip = header[8] + 9;
+
+            if( header[7]&0x80 )    /* has pts */
             {
-                /* mpeg2 PES */
-                i_skip = header[8] + 9;
+                i_pts = ((mtime_t)(header[ 9]&0x0e ) << 29)|
+                         (mtime_t)(header[10] << 22)|
+                        ((mtime_t)(header[11]&0xfe) << 14)|
+                         (mtime_t)(header[12] << 7)|
+                         (mtime_t)(header[13] >> 1);
 
-                if( header[7]&0x80 )    /* has pts */
+                if( header[7]&0x40 )    /* has dts */
                 {
-                    i_pts = ((mtime_t)(header[ 9]&0x0e ) << 29)|
-                             (mtime_t)(header[10] << 22)|
-                            ((mtime_t)(header[11]&0xfe) << 14)|
-                             (mtime_t)(header[12] << 7)|
-                             (mtime_t)(header[13] >> 1);
+                     i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
+                             (mtime_t)(header[15] << 22)|
+                            ((mtime_t)(header[16]&0xfe) << 14)|
+                             (mtime_t)(header[17] << 7)|
+                             (mtime_t)(header[18] >> 1);
+                }
+            }
+        }
+        else
+        {
+            i_skip = 6;
+            while( i_skip < 23 && header[i_skip] == 0xff )
+            {
+                i_skip++;
+            }
+            if( i_skip == 23 )
+            {
+                msg_Err( p_demux, "too much MPEG-1 stuffing" );
+                block_ChainRelease( p_pes );
+                return;
+            }
+            if( ( header[i_skip] & 0xC0 ) == 0x40 )
+            {
+                i_skip += 2;
+            }
 
-                    if( header[7]&0x40 )    /* has dts */
-                    {
-                         i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
-                                 (mtime_t)(header[15] << 22)|
-                                ((mtime_t)(header[16]&0xfe) << 14)|
-                                 (mtime_t)(header[17] << 7)|
-                                 (mtime_t)(header[18] >> 1);
-                    }
+            if(  header[i_skip]&0x20 )
+            {
+                 i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
+                          (mtime_t)(header[i_skip+1] << 22)|
+                         ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
+                          (mtime_t)(header[i_skip+3] << 7)|
+                          (mtime_t)(header[i_skip+4] >> 1);
+
+                if( header[i_skip]&0x10 )    /* has dts */
+                {
+                     i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
+                              (mtime_t)(header[i_skip+6] << 22)|
+                             ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
+                              (mtime_t)(header[i_skip+8] << 7)|
+                              (mtime_t)(header[i_skip+9] >> 1);
+                     i_skip += 10;
+                }
+                else
+                {
+                    i_skip += 5;
                 }
             }
             else
             {
-                i_skip = 6;
-                while( i_skip < 23 && header[i_skip] == 0xff )
-                {
-                    i_skip++;
-                }
-                if( i_skip == 23 )
-                {
-                    msg_Err( p_demux, "too much MPEG-1 stuffing" );
-                    block_ChainRelease( p_pes );
-                    return;
-                }
-                if( ( header[i_skip] & 0xC0 ) == 0x40 )
-                {
-                    i_skip += 2;
-                }
-
-                if(  header[i_skip]&0x20 )
-                {
-                     i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
-                              (mtime_t)(header[i_skip+1] << 22)|
-                             ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
-                              (mtime_t)(header[i_skip+3] << 7)|
-                              (mtime_t)(header[i_skip+4] >> 1);
-
-                    if( header[i_skip]&0x10 )    /* has dts */
-                    {
-                         i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
-                                  (mtime_t)(header[i_skip+6] << 22)|
-                                 ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
-                                  (mtime_t)(header[i_skip+8] << 7)|
-                                  (mtime_t)(header[i_skip+9] >> 1);
-                         i_skip += 10;
-                    }
-                    else
-                    {
-                        i_skip += 5;
-                    }
-                }
-                else
-                {
-                    i_skip += 1;
-                }
+                i_skip += 1;
             }
-            break;
+        }
+        break;
     }
 
     if( pid->es->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', 'b' ) ||
@@ -2031,65 +2031,65 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
 
     switch( i_stream_type )
     {
-        case 0x01:  /* MPEG-1 video */
-        case 0x02:  /* MPEG-2 video */
-        case 0x80:  /* MPEG-2 MOTO video */
-            es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
-            break;
-        case 0x03:  /* MPEG-1 audio */
-        case 0x04:  /* MPEG-2 audio */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
-            break;
-        case 0x11:  /* MPEG4 (audio) */
-        case 0x0f:  /* ISO/IEC 13818-7 Audio with ADTS transport syntax */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', '4', 'a' ) );
-            break;
-        case 0x10:  /* MPEG4 (video) */
-            es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', '4', 'v' ) );
-            pid->es->b_gather = true;
-            break;
-        case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
-            es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'h', '2', '6', '4' ) );
-            break;
+    case 0x01:  /* MPEG-1 video */
+    case 0x02:  /* MPEG-2 video */
+    case 0x80:  /* MPEG-2 MOTO video */
+        es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+        break;
+    case 0x03:  /* MPEG-1 audio */
+    case 0x04:  /* MPEG-2 audio */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+        break;
+    case 0x11:  /* MPEG4 (audio) */
+    case 0x0f:  /* ISO/IEC 13818-7 Audio with ADTS transport syntax */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', '4', 'a' ) );
+        break;
+    case 0x10:  /* MPEG4 (video) */
+        es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', '4', 'v' ) );
+        pid->es->b_gather = true;
+        break;
+    case 0x1B:  /* H264 <- check transport syntax/needed descriptor */
+        es_format_Init( fmt, VIDEO_ES, VLC_FOURCC( 'h', '2', '6', '4' ) );
+        break;
 
-        case 0x81:  /* A52 (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
-            break;
-        case 0x82:  /* DVD_SPU (sub) */
-            es_format_Init( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', ' ' ) );
-            break;
-        case 0x83:  /* LPCM (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'l', 'p', 'c', 'm' ) );
-            break;
-        case 0x84:  /* SDDS (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 's' ) );
-            break;
-        case 0x85:  /* DTS (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'd', 't', 's', ' ' ) );
-            break;
+    case 0x81:  /* A52 (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
+        break;
+    case 0x82:  /* DVD_SPU (sub) */
+        es_format_Init( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', ' ' ) );
+        break;
+    case 0x83:  /* LPCM (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'l', 'p', 'c', 'm' ) );
+        break;
+    case 0x84:  /* SDDS (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 's' ) );
+        break;
+    case 0x85:  /* DTS (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'd', 't', 's', ' ' ) );
+        break;
 
-        case 0x91:  /* A52 vls (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', 'b' ) );
-            break;
-        case 0x92:  /* DVD_SPU vls (sub) */
-            es_format_Init( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', 'b' ) );
-            break;
+    case 0x91:  /* A52 vls (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', 'b' ) );
+        break;
+    case 0x92:  /* DVD_SPU vls (sub) */
+        es_format_Init( fmt, SPU_ES, VLC_FOURCC( 's', 'p', 'u', 'b' ) );
+        break;
 
-        case 0x94:  /* SDDS (audio) */
-            es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 'b' ) );
-            break;
+    case 0x94:  /* SDDS (audio) */
+        es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 's', 'd', 'd', 'b' ) );
+        break;
 
-        case 0xa0:  /* MSCODEC vlc (video) (fixed later) */
-            es_format_Init( fmt, UNKNOWN_ES, 0 );
-            pid->es->b_gather = true;
-            break;
+    case 0xa0:  /* MSCODEC vlc (video) (fixed later) */
+        es_format_Init( fmt, UNKNOWN_ES, 0 );
+        pid->es->b_gather = true;
+        break;
 
-        case 0x06:  /* PES_PRIVATE  (fixed later) */
-        case 0x12:  /* MPEG-4 generic (sub/scene/...) (fixed later) */
-        case 0xEA:  /* Privately managed ES (VC-1) (fixed later */
-        default:
-            es_format_Init( fmt, UNKNOWN_ES, 0 );
-            break;
+    case 0x06:  /* PES_PRIVATE  (fixed later) */
+    case 0x12:  /* MPEG-4 generic (sub/scene/...) (fixed later) */
+    case 0xEA:  /* Privately managed ES (VC-1) (fixed later */
+    default:
+        es_format_Init( fmt, UNKNOWN_ES, 0 );
+        break;
     }
 
     /* PES packets usually contain truncated frames */
@@ -2284,175 +2284,175 @@ static iod_descriptor_t *IODNew( int i_data, uint8_t *p_data )
 
         switch( i_tag )
         {
-            case 0x03:
-                {
+        case 0x03:
+            {
 #define es_descr    p_iod->es_descr[i_es_index]
-                    int i_decoderConfigDescr_length;
+                int i_decoderConfigDescr_length;
 #ifdef TS_DEBUG
-                    fprintf( stderr, "\n* - ES_Descriptor length:%d", i_length );
+                fprintf( stderr, "\n* - ES_Descriptor length:%d", i_length );
 #endif
-                    es_descr.b_ok = 1;
+                es_descr.b_ok = 1;
 
-                    es_descr.i_es_id = IODGetWord( &i_data, &p_data );
-                    i_flags = IODGetByte( &i_data, &p_data );
-                    es_descr.b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
-                    b_url = ( i_flags >> 6 )&0x01;
-                    es_descr.b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
-                    es_descr.i_streamPriority = i_flags & 0x1f;
+                es_descr.i_es_id = IODGetWord( &i_data, &p_data );
+                i_flags = IODGetByte( &i_data, &p_data );
+                es_descr.b_streamDependenceFlag = ( i_flags >> 7 )&0x01;
+                b_url = ( i_flags >> 6 )&0x01;
+                es_descr.b_OCRStreamFlag = ( i_flags >> 5 )&0x01;
+                es_descr.i_streamPriority = i_flags & 0x1f;
 #ifdef TS_DEBUG
-                    fprintf( stderr, "\n*   * streamDependenceFlag:%d", es_descr.b_streamDependenceFlag );
-                    fprintf( stderr, "\n*   * OCRStreamFlag:%d", es_descr.b_OCRStreamFlag );
-                    fprintf( stderr, "\n*   * streamPriority:%d", es_descr.i_streamPriority );
+                fprintf( stderr, "\n*   * streamDependenceFlag:%d", es_descr.b_streamDependenceFlag );
+                fprintf( stderr, "\n*   * OCRStreamFlag:%d", es_descr.b_OCRStreamFlag );
+                fprintf( stderr, "\n*   * streamPriority:%d", es_descr.i_streamPriority );
 #endif
-                    if( es_descr.b_streamDependenceFlag )
-                    {
-                        es_descr.i_dependOn_es_id = IODGetWord( &i_data, &p_data );
+                if( es_descr.b_streamDependenceFlag )
+                {
+                    es_descr.i_dependOn_es_id = IODGetWord( &i_data, &p_data );
 #ifdef TS_DEBUG
-                        fprintf( stderr, "\n*   * dependOn_es_id:%d", es_descr.i_dependOn_es_id );
+                    fprintf( stderr, "\n*   * dependOn_es_id:%d", es_descr.i_dependOn_es_id );
 #endif
-                    }
+                }
 
-                    if( b_url )
-                    {
-                        es_descr.psz_url = IODGetURL( &i_data, &p_data );
+                if( b_url )
+                {
+                    es_descr.psz_url = IODGetURL( &i_data, &p_data );
 #ifdef TS_DEBUG
-                        fprintf( stderr, "\n* url string:%s", es_descr.psz_url );
+                    fprintf( stderr, "\n* url string:%s", es_descr.psz_url );
 #endif
-                    }
-                    else
-                    {
-                        es_descr.psz_url = NULL;
-                    }
+                }
+                else
+                {
+                    es_descr.psz_url = NULL;
+                }
 
-                    if( es_descr.b_OCRStreamFlag )
-                    {
-                        es_descr.i_OCR_es_id = IODGetWord( &i_data, &p_data );
+                if( es_descr.b_OCRStreamFlag )
+                {
+                    es_descr.i_OCR_es_id = IODGetWord( &i_data, &p_data );
 #ifdef TS_DEBUG
-                        fprintf( stderr, "\n*   * OCR_es_id:%d", es_descr.i_OCR_es_id );
+                    fprintf( stderr, "\n*   * OCR_es_id:%d", es_descr.i_OCR_es_id );
 #endif
-                    }
+                }
 
-                    if( IODGetByte( &i_data, &p_data ) != 0x04 )
-                    {
+                if( IODGetByte( &i_data, &p_data ) != 0x04 )
+                {
 #ifdef TS_DEBUG
-                        fprintf( stderr, "\n* ERR missing DecoderConfigDescr" );
+                    fprintf( stderr, "\n* ERR missing DecoderConfigDescr" );
 #endif
-                        es_descr.b_ok = 0;
-                        break;
-                    }
-                    i_decoderConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
+                    es_descr.b_ok = 0;
+                    break;
+                }
+                i_decoderConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
 #ifdef TS_DEBUG
-                    fprintf( stderr, "\n*   - DecoderConfigDesc length:%d", i_decoderConfigDescr_length );
+                fprintf( stderr, "\n*   - DecoderConfigDesc length:%d", i_decoderConfigDescr_length );
 #endif
 #define dec_descr   es_descr.dec_descr
-                    dec_descr.i_objectTypeIndication = IODGetByte( &i_data, &p_data );
-                    i_flags = IODGetByte( &i_data, &p_data );
-                    dec_descr.i_streamType = i_flags >> 2;
-                    dec_descr.b_upStream = ( i_flags >> 1 )&0x01;
-                    dec_descr.i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
-                    dec_descr.i_maxBitrate = IODGetDWord( &i_data, &p_data );
-                    dec_descr.i_avgBitrate = IODGetDWord( &i_data, &p_data );
+                dec_descr.i_objectTypeIndication = IODGetByte( &i_data, &p_data );
+                i_flags = IODGetByte( &i_data, &p_data );
+                dec_descr.i_streamType = i_flags >> 2;
+                dec_descr.b_upStream = ( i_flags >> 1 )&0x01;
+                dec_descr.i_bufferSizeDB = IODGet3Bytes( &i_data, &p_data );
+                dec_descr.i_maxBitrate = IODGetDWord( &i_data, &p_data );
+                dec_descr.i_avgBitrate = IODGetDWord( &i_data, &p_data );
 #ifdef TS_DEBUG
-                    fprintf( stderr, "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
-                    fprintf( stderr, "\n*     * streamType:0x%x", dec_descr.i_streamType );
-                    fprintf( stderr, "\n*     * upStream:%d", dec_descr.b_upStream );
-                    fprintf( stderr, "\n*     * bufferSizeDB:%d", dec_descr.i_bufferSizeDB );
-                    fprintf( stderr, "\n*     * maxBitrate:%d", dec_descr.i_maxBitrate );
-                    fprintf( stderr, "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
+                fprintf( stderr, "\n*     * objectTypeIndication:0x%x", dec_descr.i_objectTypeIndication  );
+                fprintf( stderr, "\n*     * streamType:0x%x", dec_descr.i_streamType );
+                fprintf( stderr, "\n*     * upStream:%d", dec_descr.b_upStream );
+                fprintf( stderr, "\n*     * bufferSizeDB:%d", dec_descr.i_bufferSizeDB );
+                fprintf( stderr, "\n*     * maxBitrate:%d", dec_descr.i_maxBitrate );
+                fprintf( stderr, "\n*     * avgBitrate:%d", dec_descr.i_avgBitrate );
 #endif
-                    if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
+                if( i_decoderConfigDescr_length > 13 && IODGetByte( &i_data, &p_data ) == 0x05 )
+                {
+                    int i;
+                    dec_descr.i_decoder_specific_info_len =
+                        IODDescriptorLength( &i_data, &p_data );
+                    if( dec_descr.i_decoder_specific_info_len > 0 )
                     {
-                        int i;
-                        dec_descr.i_decoder_specific_info_len =
-                            IODDescriptorLength( &i_data, &p_data );
-                        if( dec_descr.i_decoder_specific_info_len > 0 )
-                        {
-                            dec_descr.p_decoder_specific_info =
-                                malloc( dec_descr.i_decoder_specific_info_len );
-                        }
-                        for( i = 0; i < dec_descr.i_decoder_specific_info_len; i++ )
-                        {
-                            dec_descr.p_decoder_specific_info[i] = IODGetByte( &i_data, &p_data );
-                        }
+                        dec_descr.p_decoder_specific_info =
+                            malloc( dec_descr.i_decoder_specific_info_len );
                     }
-                    else
+                    for( i = 0; i < dec_descr.i_decoder_specific_info_len; i++ )
                     {
-                        dec_descr.i_decoder_specific_info_len = 0;
-                        dec_descr.p_decoder_specific_info = NULL;
+                        dec_descr.p_decoder_specific_info[i] = IODGetByte( &i_data, &p_data );
                     }
                 }
+                else
+                {
+                    dec_descr.i_decoder_specific_info_len = 0;
+                    dec_descr.p_decoder_specific_info = NULL;
+                }
+            }
 #undef  dec_descr
 #define sl_descr    es_descr.sl_descr
-                {
-                    int i_SLConfigDescr_length;
-                    int i_predefined;
+            {
+                int i_SLConfigDescr_length;
+                int i_predefined;
 
-                    if( IODGetByte( &i_data, &p_data ) != 0x06 )
-                    {
+                if( IODGetByte( &i_data, &p_data ) != 0x06 )
+                {
 #ifdef TS_DEBUG
-                        fprintf( stderr, "\n* ERR missing SLConfigDescr" );
+                    fprintf( stderr, "\n* ERR missing SLConfigDescr" );
 #endif
-                        es_descr.b_ok = 0;
-                        break;
-                    }
-                    i_SLConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
-#ifdef TS_DEBUG
-                    fprintf( stderr, "\n*   - SLConfigDescr length:%d", i_SLConfigDescr_length );
-#endif
-                    i_predefined = IODGetByte( &i_data, &p_data );
-#ifdef TS_DEBUG
-                    fprintf( stderr, "\n*     * i_predefined:0x%x", i_predefined  );
-#endif
-                    switch( i_predefined )
-                    {
-                        case 0x01:
-                            {
-                                sl_descr.b_useAccessUnitStartFlag   = 0;
-                                sl_descr.b_useAccessUnitEndFlag     = 0;
-                                sl_descr.b_useRandomAccessPointFlag = 0;
-                                //sl_descr.b_useRandomAccessUnitsOnlyFlag = 0;
-                                sl_descr.b_usePaddingFlag           = 0;
-                                sl_descr.b_useTimeStampsFlags       = 0;
-                                sl_descr.b_useIdleFlag              = 0;
-                                sl_descr.b_durationFlag     = 0;    // FIXME FIXME
-                                sl_descr.i_timeStampResolution      = 1000;
-                                sl_descr.i_OCRResolution    = 0;    // FIXME FIXME
-                                sl_descr.i_timeStampLength          = 32;
-                                sl_descr.i_OCRLength        = 0;    // FIXME FIXME
-                                sl_descr.i_AU_Length                = 0;
-                                sl_descr.i_instantBitrateLength= 0; // FIXME FIXME
-                                sl_descr.i_degradationPriorityLength= 0;
-                                sl_descr.i_AU_seqNumLength          = 0;
-                                sl_descr.i_packetSeqNumLength       = 0;
-                                if( sl_descr.b_durationFlag )
-                                {
-                                    sl_descr.i_timeScale            = 0;    // FIXME FIXME
-                                    sl_descr.i_accessUnitDuration   = 0;    // FIXME FIXME
-                                    sl_descr.i_compositionUnitDuration= 0;    // FIXME FIXME
-                                }
-                                if( !sl_descr.b_useTimeStampsFlags )
-                                {
-                                    sl_descr.i_startDecodingTimeStamp   = 0;    // FIXME FIXME
-                                    sl_descr.i_startCompositionTimeStamp= 0;    // FIXME FIXME
-                                }
-                            }
-                            break;
-                        default:
-#ifdef TS_DEBUG
-                            fprintf( stderr, "\n* ERR unsupported SLConfigDescr predefined" );
-#endif
-                            es_descr.b_ok = 0;
-                            break;
-                    }
+                    es_descr.b_ok = 0;
+                    break;
                 }
-                break;
+                i_SLConfigDescr_length = IODDescriptorLength( &i_data, &p_data );
+#ifdef TS_DEBUG
+                fprintf( stderr, "\n*   - SLConfigDescr length:%d", i_SLConfigDescr_length );
+#endif
+                i_predefined = IODGetByte( &i_data, &p_data );
+#ifdef TS_DEBUG
+                fprintf( stderr, "\n*     * i_predefined:0x%x", i_predefined  );
+#endif
+                switch( i_predefined )
+                {
+                case 0x01:
+                    {
+                        sl_descr.b_useAccessUnitStartFlag   = 0;
+                        sl_descr.b_useAccessUnitEndFlag     = 0;
+                        sl_descr.b_useRandomAccessPointFlag = 0;
+                        //sl_descr.b_useRandomAccessUnitsOnlyFlag = 0;
+                        sl_descr.b_usePaddingFlag           = 0;
+                        sl_descr.b_useTimeStampsFlags       = 0;
+                        sl_descr.b_useIdleFlag              = 0;
+                        sl_descr.b_durationFlag     = 0;    // FIXME FIXME
+                        sl_descr.i_timeStampResolution      = 1000;
+                        sl_descr.i_OCRResolution    = 0;    // FIXME FIXME
+                        sl_descr.i_timeStampLength          = 32;
+                        sl_descr.i_OCRLength        = 0;    // FIXME FIXME
+                        sl_descr.i_AU_Length                = 0;
+                        sl_descr.i_instantBitrateLength= 0; // FIXME FIXME
+                        sl_descr.i_degradationPriorityLength= 0;
+                        sl_descr.i_AU_seqNumLength          = 0;
+                        sl_descr.i_packetSeqNumLength       = 0;
+                        if( sl_descr.b_durationFlag )
+                        {
+                            sl_descr.i_timeScale            = 0;    // FIXME FIXME
+                            sl_descr.i_accessUnitDuration   = 0;    // FIXME FIXME
+                            sl_descr.i_compositionUnitDuration= 0;    // FIXME FIXME
+                        }
+                        if( !sl_descr.b_useTimeStampsFlags )
+                        {
+                            sl_descr.i_startDecodingTimeStamp   = 0;    // FIXME FIXME
+                            sl_descr.i_startCompositionTimeStamp= 0;    // FIXME FIXME
+                        }
+                    }
+                    break;
+                default:
+#ifdef TS_DEBUG
+                    fprintf( stderr, "\n* ERR unsupported SLConfigDescr predefined" );
+#endif
+                    es_descr.b_ok = 0;
+                    break;
+                }
+            }
+            break;
 #undef  sl_descr
 #undef  es_descr
-            default:
+        default:
 #ifdef TS_DEBUG
-                fprintf( stderr, "\n* - OD tag:0x%x length:%d (Unsupported)", i_tag, i_length );
+            fprintf( stderr, "\n* - OD tag:0x%x length:%d (Unsupported)", i_tag, i_length );
 #endif
-                break;
+            break;
         }
 
         p_data = p_data_sav + i_length;
@@ -3744,7 +3744,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                         pid->es->fmt.psz_language[3] = 0;
                         msg_Dbg( p_demux, "found language: %s", pid->es->fmt.psz_language);
                     }
-                    switch( p_decoded->code[0].i_audio_type ) {
+                    switch( p_decoded->code[0].i_audio_type )
+                    {
                     case 0:
                         pid->es->fmt.psz_description = NULL;
                         break;
@@ -3784,7 +3785,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                     p_decoded->code[i+1].iso_639_code, 3 );
                                 pid->es->fmt.p_extra_languages[i].psz_language[3] = '\0';
                             }
-                            switch( p_decoded->code[i].i_audio_type ) {
+                            switch( p_decoded->code[i].i_audio_type )
+                            {
                             case 0:
                                 pid->es->fmt.p_extra_languages[i].psz_description =
                                     NULL;
