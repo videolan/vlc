@@ -1292,7 +1292,9 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
 
         localtime_r( &t_start, &tm_start );
 
-        snprintf( psz_start, sizeof(psz_start), "%2.2d:%2.2d:%2.2d", tm_start.tm_hour, tm_start.tm_min, tm_start.tm_sec );
+        snprintf( psz_start, sizeof(psz_start), "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+                  1900 + tm_start.tm_year, 1 + tm_start.tm_mon, tm_start.tm_mday,
+                  tm_start.tm_hour, tm_start.tm_min, tm_start.tm_sec );
         if( p_evt->psz_short_description || p_evt->psz_description )
             input_Control( p_input, INPUT_ADD_INFO, psz_epg, psz_start, "%s (%2.2d:%2.2d) - %s",
                            p_evt->psz_name,
