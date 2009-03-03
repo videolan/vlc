@@ -161,7 +161,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (void)awakeFromNib
 {
     [o_panel setTitle: _NS("Open Source")];
-    [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
+    [o_mrl_lbl setStringValue: _NS("Media Resource Locator (MRL)")];
 
     [o_btn_ok setTitle: _NS("Open")];
     [o_btn_cancel setTitle: _NS("Cancel")];
@@ -446,6 +446,38 @@ static VLCOpen *_o_sharedMainInstance = nil;
     {
         [self openCaptureModeChanged: nil];
     }
+}
+
+- (IBAction)expandMRLfieldAction:(id)sender
+{
+    NSRect o_win_rect, o_view_rect;
+    o_win_rect = [o_panel frame];
+    o_view_rect = [o_mrl_view frame];
+
+    if( [o_mrl_btn state] == NSOffState )
+    {
+        /* we need to collaps, restore the panel size */
+        o_win_rect.size.height = o_win_rect.size.height - o_view_rect.size.height;
+        o_win_rect.origin.y = ( o_win_rect.origin.y + o_view_rect.size.height ) - o_view_rect.size.height;
+
+        /* remove the MRL view */
+        [o_mrl_view removeFromSuperviewWithoutNeedingDisplay];
+    } else {
+        /* we need to expand */
+        [o_mrl_view setFrame: NSMakeRect( 0,
+                                         [o_mrl_btn frame].origin.y,
+                                         o_view_rect.size.width,
+                                         o_view_rect.size.height )];
+        [o_mrl_view setNeedsDisplay: YES];
+        [o_mrl_view setAutoresizesSubviews: YES];
+
+        /* add the MRL view */
+        [[o_panel contentView] addSubview: o_mrl_view];
+        o_win_rect.size.height = o_win_rect.size.height + o_view_rect.size.height;
+    }
+
+    [o_panel setFrame: o_win_rect display:YES animate: YES];
+    [o_panel displayIfNeeded];
 }
 
 - (void)openFileGeneric

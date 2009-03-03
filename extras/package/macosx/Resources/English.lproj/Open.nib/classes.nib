@@ -16,6 +16,7 @@
         },
                 {
             ACTIONS =             {
+                expandMRLfieldAction = id;
                 eyetvGetPlugin = id;
                 eyetvLaunch = id;
                 eyetvSwitchChannel = id;
@@ -103,7 +104,9 @@
                 "o_file_sub_size_lbl" = id;
                 "o_file_sub_size_pop" = id;
                 "o_mrl" = id;
+                "o_mrl_btn" = id;
                 "o_mrl_lbl" = id;
+                "o_mrl_view" = id;
                 "o_net_help_lbl" = id;
                 "o_net_help_udp_lbl" = id;
                 "o_net_http_url" = id;

@@ -37,6 +37,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
     IBOutlet id o_mrl;
     IBOutlet id o_mrl_lbl;
+    IBOutlet id o_mrl_view;
+    IBOutlet id o_mrl_btn;
     IBOutlet id o_tabview;
 
     IBOutlet id o_btn_ok;
@@ -158,6 +160,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)openTarget:(int)i_type;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 - (void)textFieldWasClicked:(NSNotification *)o_notification;
+- (IBAction)expandMRLfieldAction:(id)sender;
 
 - (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
