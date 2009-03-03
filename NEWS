@@ -68,6 +68,8 @@ Linux/Windows interface:
 
 Mac OS X Interface:
  * Reveal-in-Finder functionality for locally stored items.
+ * Easy addition of Subtitles through the Video menu
+ * Additional usability improvements
 
 Stream output:
  * Restored the old mpeg2 transrating module.
@@ -82,6 +84,10 @@ Maemo Port:
 
 Windows CE Port:
  EXPERIMENTAL work for the winCE port has been done.
+
+Mac OS X Port:
+ * Support for Mac OS X 10.4.x was dropped due to its technical limitations
+ * Speed improvements by using llvm-gcc
 
 Audio output:
  * Removed obsolete Esound and aRts plugins
