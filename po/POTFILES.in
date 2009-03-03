@@ -465,7 +465,7 @@ modules/control/dbus.c
 modules/control/dbus.h
 modules/control/gestures.c
 modules/control/globalhotkeys/win32.c
-modules/control/globalhotkeys/x11.c
+modules/control/globalhotkeys/xcb.c
 modules/control/hotkeys.c
 modules/control/http/http.c
 modules/control/http/http.h
