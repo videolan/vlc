@@ -28,6 +28,7 @@
 #endif
 
 #include "input_manager.hpp"
+#include <vlc_keys.h>
 
 #include <QApplication>
 
@@ -777,6 +778,16 @@ void InputManager::faster()
 {
     if( hasInput() )
         var_SetVoid( p_input, "rate-faster" );
+}
+
+void InputManager::littlefaster()
+{
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_RATE_FASTER_FINE );
+}
+
+void InputManager::littleslower()
+{
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_RATE_SLOWER_FINE );
 }
 
 void InputManager::normalRate()

@@ -747,8 +747,16 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
     action->setIcon( QIcon( ":/faster") );
     action->setData( true );
 
+    action = menu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
+                              SLOT( littlefaster() ) );
+    action->setData( true );
+
     action = menu->addAction( qtr( "N&ormal Speed" ), THEMIM->getIM(),
                               SLOT( normalRate() ) );
+    action->setData( true );
+
+    action = menu->addAction( qtr( "Slower (fine)" ), THEMIM->getIM(),
+                              SLOT( littleslower() ) );
     action->setData( true );
 
     action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),

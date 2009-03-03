@@ -144,6 +144,8 @@ public slots:
     void reverse();
     void slower();
     void faster();
+    void littlefaster();
+    void littleslower();
     void normalRate();
     void setRate( int );
     /* Jumping */
