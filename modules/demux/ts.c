@@ -805,13 +805,17 @@ static void Close( vlc_object_t *p_this )
                 case 1: /* CAT */
                     free( pid->psi );
                     break;
-                case 0x11: /* SDT */
-                case 0x12: /* EIT */
-                    dvbpsi_DetachDemux( pid->psi->handle );
-                    free( pid->psi );
-                    break;
                 default:
-                    PIDClean( p_demux->out, pid );
+                    if( p_sys->b_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 ) )
+                    {
+                        /* SDT or EIT */
+                        dvbpsi_DetachDemux( pid->psi->handle );
+                        free( pid->psi );
+                    }
+                    else
+                    {
+                        PIDClean( p_demux->out, pid );
+                    }
                     break;
             }
         }
@@ -832,7 +836,6 @@ static void Close( vlc_object_t *p_this )
                             ACCESS_SET_PRIVATE_ID_STATE, pid->i_pid,
                             false );
         }
-
     }
 
     vlc_mutex_lock( &p_sys->csa_lock );
@@ -846,7 +849,7 @@ static void Close( vlc_object_t *p_this )
 
     TAB_CLEAN( p_sys->i_pmt, p_sys->pmt );
 
-    if ( p_sys->p_programs_list )
+    if( p_sys->p_programs_list )
     {
         vlc_value_t val;
         val.p_list = p_sys->p_programs_list;
@@ -1099,7 +1102,7 @@ static int Demux( demux_t *p_demux )
         {
             if( p_pid->psi )
             {
-                if( p_pid->i_pid == 0 || p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 )
+                if( p_pid->i_pid == 0 || ( p_sys->b_meta && ( p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 ) ) )
                 {
                     dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
                 }
@@ -2557,6 +2560,37 @@ static bool DVBProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
     return false;
 }
 
+static void DVBUpdateOnPID( demux_t *p_demux, int i_pid )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( !p_sys->b_meta || ( i_pid != 0x11 && i_pid != 0x12 ) )
+        return;
+
+    msg_Warn( p_demux, "Switching to non DVB mode" );
+
+    /* This doesn't look like a DVB stream so don't try
+     * parsing the SDT/EDT */
+
+    for( int i = 0x11; i <= 0x12; i++ )
+    {
+        ts_pid_t *p_pid = &p_sys->pid[i];
+        if( p_pid->psi )
+        {
+            dvbpsi_DetachDemux( p_pid->psi->handle );
+            free( p_pid->psi );
+            p_pid->psi = NULL;
+            p_pid->b_valid = false;
+        }
+        if( p_sys->b_dvb_control )
+            stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                            ACCESS_SET_PRIVATE_ID_STATE, i, false );
+
+    }
+    p_sys->b_meta = false;
+}
+
+
 #ifdef TS_USE_DVB_SI
 static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 {
@@ -3086,6 +3120,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     prg->i_pid_pcr = p_pmt->i_pcr_pid;
     prg->i_version = p_pmt->i_version;
 
+    DVBUpdateOnPID( p_demux, prg->i_pid_pcr );
     if( DVBProgramIsSelected( p_demux, prg->i_number ) )
     {
         /* Set demux filter */
@@ -3155,25 +3190,13 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 break;
             }
         }
+        DVBUpdateOnPID( p_demux, p_es->i_pid );
 
         if( !old_pid && p_sys->pid[p_es->i_pid].b_valid )
         {
-            ts_pid_t *pid = &p_sys->pid[p_es->i_pid];
-            if( ( pid->i_pid == 0x11 /* SDT */ ||
-                  pid->i_pid == 0x12 /* EDT */ ) && pid->psi )
-            {
-                /* This doesn't look like a DVB stream so don't try
-                 * parsing the SDT/EDT */
-                dvbpsi_DetachDemux( pid->psi->handle );
-                free( pid->psi );
-                pid->psi = NULL;
-            }
-            else
-            {
-                msg_Warn( p_demux, "pmt error: pid=%d already defined",
-                          p_es->i_pid );
-                continue;
-            }
+            msg_Warn( p_demux, "pmt error: pid=%d already defined",
+                      p_es->i_pid );
+            continue;
         }
 
         PIDInit( pid, false, pmt->psi );
@@ -4062,6 +4085,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         {
             ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
             bool b_add = true;
+
+            DVBUpdateOnPID( p_demux, p_program->i_pid );
 
             if( pmt->b_valid )
             {
