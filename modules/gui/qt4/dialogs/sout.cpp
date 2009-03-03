@@ -88,12 +88,10 @@ struct sout_gui_descr_t
 
 SoutDialog* SoutDialog::instance = NULL;
 
-SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
-                     bool _transcode_only ) : QVLCDialog( parent,  _p_intf )
+SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf )
+           : QVLCDialog( parent,  _p_intf )
 {
     setWindowTitle( qtr( "Stream Output" ) );
-
-    b_transcode_only = _transcode_only;
 
     /* UI stuff */
     ui.setupUi( this );
@@ -152,7 +150,6 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf,
     CONNECT( ui.UDPOutput, toggled( bool ), this, changeUDPandRTPmess( bool ) );
     CONNECT( ui.RTPOutput, clicked(bool), this, RTPtoggled( bool ) );
 
-    if( b_transcode_only ) toggleSout();
 }
 
 void SoutDialog::fileBrowse()
@@ -221,35 +218,6 @@ void SoutDialog::setOptions()
 
     /* Update the MRL !! */
     updateMRL();
-}
-
-void SoutDialog::toggleSout()
-{
-    //Toggle all the streaming options.
-#define HIDEORSHOW(x) if( b_transcode_only ) x->hide(); else x->show();
-    HIDEORSHOW( ui.HTTPOutput ) ; HIDEORSHOW( ui.RTPOutput ) ; HIDEORSHOW( ui.MMSHOutput ) ; HIDEORSHOW( ui.UDPOutput ) ;
-    HIDEORSHOW( ui.HTTPEdit ) ; HIDEORSHOW( ui.RTPEdit ) ; HIDEORSHOW( ui.MMSHEdit ) ; HIDEORSHOW( ui.UDPEdit ) ;
-    HIDEORSHOW( ui.HTTPLabel ) ; HIDEORSHOW( ui.RTPLabel ) ; HIDEORSHOW( ui.MMSHLabel ) ; HIDEORSHOW( ui.UDPLabel ) ;
-    HIDEORSHOW( ui.HTTPPortLabel ) ; HIDEORSHOW( ui.RTPPortLabel ) ; HIDEORSHOW( ui.MMSHPortLabel ) ; HIDEORSHOW( ui.UDPPortLabel )
-    HIDEORSHOW( ui.HTTPPort ) ; HIDEORSHOW( ui.RTPPort ) ; HIDEORSHOW( ui.MMSHPort ) ; HIDEORSHOW( ui.UDPPort ) ; HIDEORSHOW( ui.RTPPortLabel2 ); HIDEORSHOW( ui.RTPPort2 ); HIDEORSHOW( ui.UDPRTPLabel )
-
-    HIDEORSHOW( ui.sap ); HIDEORSHOW( ui.sapName );
-    HIDEORSHOW( ui.sapGroup ); HIDEORSHOW( ui.sapGroupLabel );
-    HIDEORSHOW( ui.ttlLabel ); HIDEORSHOW( ui.ttl );
-    HIDEORSHOW( ui.soutKeep );
-
-    HIDEORSHOW( ui.IcecastOutput ); HIDEORSHOW( ui.IcecastEdit );
-    HIDEORSHOW( ui.IcecastNamePassEdit ); HIDEORSHOW( ui.IcecastMountpointEdit );
-    HIDEORSHOW( ui.IcecastPort ); HIDEORSHOW( ui.IcecastLabel );
-    HIDEORSHOW( ui.IcecastPortLabel );
-    HIDEORSHOW( ui.IcecastMountpointLabel ); HIDEORSHOW( ui.IcecastNameLabel );
-#undef HIDEORSHOW
-
-    if( b_transcode_only ) okButton->setText( "&Save" );
-    else okButton->setText( "&Stream" );
-
-    setMinimumHeight( 500 );
-    resize( width(), sizeHint().height() );
 }
 
 void SoutDialog::changeUDPandRTPmess( bool b_udp )

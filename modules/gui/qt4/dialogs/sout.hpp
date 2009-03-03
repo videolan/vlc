@@ -112,17 +112,14 @@ class SoutDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static SoutDialog* getInstance( QWidget *parent, intf_thread_t *p_intf,
-                                    bool transcode_only )
+    static SoutDialog* getInstance( QWidget *parent, intf_thread_t *p_intf )
     {
         if( !instance )
-            instance = new SoutDialog( parent, p_intf, transcode_only );
+            instance = new SoutDialog( parent, p_intf );
         else
         {
             /* Recenter the dialog on the parent */
             instance->setParent( parent, Qt::Dialog );
-            instance->b_transcode_only = transcode_only;
-            instance->toggleSout();
         }
         return instance;
     }
@@ -134,11 +131,9 @@ public:
 private:
     Ui::Sout ui;
     static SoutDialog *instance;
-    SoutDialog( QWidget* parent, intf_thread_t *,
-                bool _transcode_only = false );
+    SoutDialog( QWidget* parent, intf_thread_t * );
     QPushButton *okButton;
     QString mrl;
-    bool b_transcode_only;
 
 public slots:
     void updateMRL();
@@ -146,7 +141,6 @@ public slots:
 private slots:
     void ok();
     void cancel();
-    void toggleSout();
     void setOptions();
     void fileBrowse();
     void setRawOptions( bool );

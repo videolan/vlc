@@ -570,7 +570,7 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
     const char *psz_option;
     if( !b_transcode_only )
     {
-        SoutDialog *s = SoutDialog::getInstance( parent, p_intf, b_transcode_only );
+        SoutDialog *s = SoutDialog::getInstance( parent, p_intf );
         if( s->exec() == QDialog::Accepted )
             psz_option = qtu( s->getMrl() );
     }else {
