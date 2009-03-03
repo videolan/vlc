@@ -1240,7 +1240,8 @@ static void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
         }
     }
     /* Update current */
-    vlc_epg_SetCurrent( p_dst, p_src->p_current ? p_src->p_current->i_start : -1 );
+    if( p_src->p_current )
+        vlc_epg_SetCurrent( p_dst, p_src->p_current->i_start );
 
     /* Keep only 1 old event  */
     if( p_dst->p_current )
@@ -1310,8 +1311,8 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     /* Update now playing */
     free( p_pgrm->psz_now_playing );
     p_pgrm->psz_now_playing = NULL;
-    if( p_epg->p_current && p_epg->p_current->psz_name && *p_epg->p_current->psz_name )
-        p_pgrm->psz_now_playing = strdup( p_epg->p_current->psz_name );
+    if( p_pgrm->p_epg->p_current && p_pgrm->p_epg->p_current->psz_name && *p_pgrm->p_epg->p_current->psz_name )
+        p_pgrm->psz_now_playing = strdup( p_pgrm->p_epg->p_current->psz_name );
 
     if( p_pgrm == p_sys->p_pgrm )
     {
