@@ -82,17 +82,6 @@
 #endif
 #undef TS_DEBUG
 
-/* TODO:
- *  - XXX: do not mark options message to be translated, they are too osbcure for now ...
- *  - test it
- *  - ...
- */
-
-/*****************************************************************************
- * Callback prototypes
- *****************************************************************************/
-static int ChangeKeyCallback    ( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -400,6 +389,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt );
 static void PSINewTableCallBack( demux_t *, dvbpsi_handle,
                                  uint8_t  i_table_id, uint16_t i_extension );
 #endif
+static int ChangeKeyCallback( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
 static inline int PIDGet( block_t *p )
 {
@@ -801,25 +791,25 @@ static void Close( vlc_object_t *p_this )
         {
             switch( pid->i_pid )
             {
-                case 0: /* PAT */
-                    dvbpsi_DetachPAT( pid->psi->handle );
+            case 0: /* PAT */
+                dvbpsi_DetachPAT( pid->psi->handle );
+                free( pid->psi );
+                break;
+            case 1: /* CAT */
+                free( pid->psi );
+                break;
+            default:
+                if( p_sys->b_dvb_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 ) )
+                {
+                    /* SDT or EIT */
+                    dvbpsi_DetachDemux( pid->psi->handle );
                     free( pid->psi );
-                    break;
-                case 1: /* CAT */
-                    free( pid->psi );
-                    break;
-                default:
-                    if( p_sys->b_dvb_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 ) )
-                    {
-                        /* SDT or EIT */
-                        dvbpsi_DetachDemux( pid->psi->handle );
-                        free( pid->psi );
-                    }
-                    else
-                    {
-                        PIDClean( p_demux->out, pid );
-                    }
-                    break;
+                }
+                else
+                {
+                    PIDClean( p_demux->out, pid );
+                }
+                break;
             }
         }
         else if( pid->b_valid && pid->es )
@@ -911,27 +901,19 @@ static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int DemuxFile( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    uint8_t     *p_buffer = p_sys->buffer; /* Put first on sync byte */
-    int i_diff= 0;
-    int i_data= 0;
-    int i_pos = 0;
-    int i_bufsize = p_sys->i_packet_size * p_sys->i_ts_read;
+    const int i_bufsize = p_sys->i_packet_size * p_sys->i_ts_read;
+    uint8_t   *p_buffer = p_sys->buffer; /* Put first on sync byte */
+    const int i_data = stream_Read( p_demux->s, p_sys->buffer, i_bufsize );
 
-    i_data = stream_Read( p_demux->s, p_sys->buffer, i_bufsize );
-    if( (i_data <= 0) && (i_data < p_sys->i_packet_size) )
+    if( i_data <= 0 && i_data < p_sys->i_packet_size )
     {
         msg_Dbg( p_demux, "error reading malformed packets" );
         return i_data;
     }
 
     /* Test continuity counter */
-    while( i_pos < i_data )
+    for( int i_pos = 0; i_pos < i_data;  )
     {
-        ts_pid_t *p_pid;   /* point to a PID structure */
-        bool      b_payload; /* indicates a packet with payload */
-        bool      b_adaptation; /* adaptation field */
-        int       i_cc  = 0;    /* continuity counter */
-
         if( p_sys->buffer[i_pos] != 0x47 )
         {
             msg_Warn( p_demux, "lost sync" );
@@ -951,12 +933,12 @@ static int DemuxFile( demux_t *p_demux )
          * diff == 0 and duplicate packet (playload != 0) <- should we
          *   test the content ?
          */
-        i_cc  = p_buffer[i_pos+3]&0x0f;
-        b_payload = p_buffer[i_pos+3]&0x10;
-        b_adaptation = p_buffer[i_pos+3]&0x20;
+        const int i_cc  = p_buffer[i_pos+3]&0x0f;
+        const bool b_payload = p_buffer[i_pos+3]&0x10;
+        const bool b_adaptation = p_buffer[i_pos+3]&0x20;
 
         /* Get the PID */
-        p_pid = &p_sys->pid[ ((p_buffer[i_pos+1]&0x1f)<<8)|p_buffer[i_pos+2] ];
+        ts_pid_t *p_pid = &p_sys->pid[ ((p_buffer[i_pos+1]&0x1f)<<8)|p_buffer[i_pos+2] ];
 
         /* Detect discontinuity indicator in adaptation field */
         if( b_adaptation && p_buffer[i_pos + 4] > 0 )
@@ -967,7 +949,7 @@ static int DemuxFile( demux_t *p_demux )
                 msg_Warn( p_demux, "random access indicator (pid=%d) ", p_pid->i_pid );
         }
 
-        i_diff = ( i_cc - p_pid->i_cc )&0x0f;
+        const int i_diff = ( i_cc - p_pid->i_cc )&0x0f;
         if( b_payload && i_diff == 1 )
         {
             p_pid->i_cc = ( p_pid->i_cc + 1 ) & 0xf;
@@ -1004,17 +986,14 @@ static int DemuxFile( demux_t *p_demux )
     }
 
     /* Then write */
-    i_data = fwrite( p_sys->buffer, 1, i_data, p_sys->p_file );
-    if( i_data < 0 )
+    const int i_write = fwrite( p_sys->buffer, 1, i_data, p_sys->p_file );
+    if( i_write < 0 )
     {
         msg_Err( p_demux, "failed to write data" );
         return -1;
     }
-#if 0
-    msg_Dbg( p_demux, "dumped %d bytes", i_data );
-#endif
 
-    p_sys->i_write += i_data;
+    p_sys->i_write += i_write;
     return 1;
 }
 
@@ -1024,14 +1003,12 @@ static int DemuxFile( demux_t *p_demux )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int          i_pkt;
 
     /* We read at most 100 TS packet or until a frame is completed */
-    for( i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
+    for( int i_pkt = 0; i_pkt < p_sys->i_ts_read; i_pkt++ )
     {
         bool         b_frame = false;
         block_t     *p_pkt;
-        ts_pid_t    *p_pid;
 
         /* Get a new TS packet */
         if( !( p_pkt = stream_Block( p_demux->s, p_sys->i_packet_size ) ) )
@@ -1099,7 +1076,7 @@ static int Demux( demux_t *p_demux )
         }
 
         /* Parse the TS packet */
-        p_pid = &p_sys->pid[PIDGet( p_pkt )];
+        ts_pid_t *p_pid = &p_sys->pid[PIDGet( p_pkt )];
 
         if( p_pid->b_valid )
         {
@@ -1111,8 +1088,7 @@ static int Demux( demux_t *p_demux )
                 }
                 else
                 {
-                    int i_prg;
-                    for( i_prg = 0; i_prg < p_pid->psi->i_prg; i_prg++ )
+                    for( int i_prg = 0; i_prg < p_pid->psi->i_prg; i_prg++ )
                     {
                         dvbpsi_PushPacket( p_pid->psi->prg[i_prg]->handle,
                                            p_pkt->p_buffer );
@@ -1143,9 +1119,7 @@ static int Demux( demux_t *p_demux )
         p_pid->b_seen = true;
 
         if( b_frame )
-        {
             break;
-        }
     }
 
     if( p_sys->b_udp_out )
@@ -1273,15 +1247,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->b_access_control && i_int > 0 && i_int != p_sys->i_current_program )
             {
                 int i_pmt_pid = -1;
-                int i;
 
                 /* Search pmt to be unselected */
-                for( i = 0; i < p_sys->i_pmt; i++ )
+                for( int i = 0; i < p_sys->i_pmt; i++ )
                 {
                     ts_pid_t *pmt = p_sys->pmt[i];
-                    int i_prg;
 
-                    for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                    for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                     {
                         if( pmt->psi->prg[i_prg]->i_number == p_sys->i_current_program )
                         {
@@ -1298,14 +1270,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                     ACCESS_SET_PRIVATE_ID_STATE, i_pmt_pid,
                                     false );
                     /* All ES */
-                    for( i = 2; i < 8192; i++ )
+                    for( int i = 2; i < 8192; i++ )
                     {
                         ts_pid_t *pid = &p_sys->pid[i];
-                        int i_prg;
 
-                        if( !pid->b_valid || pid->psi ) continue;
+                        if( !pid->b_valid || pid->psi )
+                            continue;
 
-                        for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                        for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                         {
                             if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
                             {
@@ -1323,12 +1295,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 /* select new program */
                 p_sys->i_current_program = i_int;
                 i_pmt_pid = -1;
-                for( i = 0; i < p_sys->i_pmt; i++ )
+                for( int i = 0; i < p_sys->i_pmt; i++ )
                 {
                     ts_pid_t *pmt = p_sys->pmt[i];
-                    int i_prg;
 
-                    for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                    for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                     {
                         if( pmt->psi->prg[i_prg]->i_number == i_int )
                         {
@@ -1337,7 +1308,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                             break;
                         }
                     }
-                    if( i_pmt_pid > 0 ) break;
+                    if( i_pmt_pid > 0 )
+                        break;
                 }
                 if( i_pmt_pid > 0 )
                 {
@@ -1348,14 +1320,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                     ACCESS_SET_PRIVATE_ID_STATE, p_prg->i_pid_pcr,
                                     true );
 
-                    for( i = 2; i < 8192; i++ )
+                    for( int i = 2; i < 8192; i++ )
                     {
                         ts_pid_t *pid = &p_sys->pid[i];
-                        int i_prg;
 
-                        if( !pid->b_valid || pid->psi ) continue;
+                        if( !pid->b_valid || pid->psi )
+                            continue;
 
-                        for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                        for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                         {
                             if( pid->p_owner->prg[i_prg]->i_pid_pmt == i_pmt_pid && pid->es->id )
                             {
@@ -1598,10 +1570,9 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
 {
     if( pid->psi )
     {
-        int i;
-
-        if( pid->psi->handle ) dvbpsi_DetachPMT( pid->psi->handle );
-        for( i = 0; i < pid->psi->i_prg; i++ )
+        if( pid->psi->handle )
+            dvbpsi_DetachPMT( pid->psi->handle );
+        for( int i = 0; i < pid->psi->i_prg; i++ )
         {
             if( pid->psi->prg[i]->iod )
                 IODFree( pid->psi->prg[i]->iod );
@@ -1614,8 +1585,6 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
     }
     else
     {
-        int i;
-
         if( pid->es->id )
             es_out_Del( out, pid->es->id );
 
@@ -1626,7 +1595,7 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
 
         free( pid->es );
 
-        for( i = 0; i < pid->i_extra_es; i++ )
+        for( int i = 0; i < pid->i_extra_es; i++ )
         {
             if( pid->extra_es[i]->id )
                 es_out_Del( out, pid->extra_es[i]->id );
@@ -1638,7 +1607,8 @@ static void PIDClean( es_out_t *out, ts_pid_t *pid )
 
             free( pid->extra_es[i] );
         }
-        if( pid->i_extra_es ) free( pid->extra_es );
+        if( pid->i_extra_es )
+            free( pid->extra_es );
     }
 
     pid->b_valid = false;
@@ -1656,7 +1626,6 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     mtime_t i_dts = -1;
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
-    int i_max;
 
     /* remove the pes from pid */
     pid->es->p_pes = NULL;
@@ -1665,8 +1634,7 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     pid->es->pp_last = &pid->es->p_pes;
 
     /* FIXME find real max size */
-    i_max = block_ChainExtract( p_pes, header, 34 );
-
+    const int i_max = block_ChainExtract( p_pes, header, 34 );
 
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
@@ -1874,20 +1842,17 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         ( p[5]&0x10 ) &&
         ( p[4] >= 7 ) )
     {
-        int i;
-        mtime_t i_pcr;  /* 33 bits */
-
-        i_pcr = ( (mtime_t)p[6] << 25 ) |
-                ( (mtime_t)p[7] << 17 ) |
-                ( (mtime_t)p[8] << 9 ) |
-                ( (mtime_t)p[9] << 1 ) |
-                ( (mtime_t)p[10] >> 7 );
+        /* PCR is 33 bits */
+        const mtime_t i_pcr = ( (mtime_t)p[6] << 25 ) |
+                              ( (mtime_t)p[7] << 17 ) |
+                              ( (mtime_t)p[8] << 9 ) |
+                              ( (mtime_t)p[9] << 1 ) |
+                              ( (mtime_t)p[10] >> 7 );
 
         /* Search program and set the PCR */
-        for( i = 0; i < p_sys->i_pmt; i++ )
+        for( int i = 0; i < p_sys->i_pmt; i++ )
         {
-            int i_prg;
-            for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
+            for( int i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
             {
                 if( pid->i_pid == p_sys->pmt[i]->psi->prg[i_prg]->i_pid_pcr )
                 {
@@ -1906,13 +1871,12 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     const bool b_unit_start = p[1]&0x40;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
-    const int  i_cc         = p[3]&0x0f;   /* continuity counter */
-    bool       b_discontinuity = false;/* discontinuity */
+    const int  i_cc         = p[3]&0x0f; /* continuity counter */
+    bool       b_discontinuity = false;  /* discontinuity */
 
     /* transport_scrambling_control is ignored */
     int         i_skip = 0;
-    bool  i_ret  = false;
-    int         i_diff;
+    bool        i_ret  = false;
 
 #if 0
     msg_Dbg( p_demux, "pid=%d unit_start=%d adaptation=%d payload=%d "
@@ -1973,7 +1937,7 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
         * diff == 0 and duplicate packet (playload != 0) <- should we
         *   test the content ?
      */
-    i_diff = ( i_cc - pid->i_cc )&0x0f;
+    const int i_diff = ( i_cc - pid->i_cc )&0x0f;
     if( b_payload && i_diff == 1 )
     {
         pid->i_cc = ( pid->i_cc + 1 ) & 0xf;
@@ -2949,7 +2913,6 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                 dvbpsi_extended_event_dr_t *pE = dvbpsi_DecodeExtendedEventDr( p_dr );
                 if( pE )
                 {
-                    int i;
                     msg_Dbg( p_demux, "    - extended event lang=%3.3s [%d/%d]",
                              pE->i_iso_639_code,
                              pE->i_descriptor_number, pE->i_last_descriptor_number );
@@ -2967,7 +2930,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
                         }
                     }
 
-                    for( i = 0; i < pE->i_entry_count; i++ )
+                    for( int i = 0; i < pE->i_entry_count; i++ )
                     {
                         char *psz_dsc = EITConvertToUTF8( pE->i_item_description[i],
                                                           pE->i_item_description_length[i] );
@@ -3066,13 +3029,13 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     ts_prg_psi_t         *prg = NULL;
 
     ts_pid_t             **pp_clean = NULL;
-    int                  i_clean = 0, i;
+    int                  i_clean = 0;
     bool                 b_hdmv = false;
 
     msg_Dbg( p_demux, "PMTCallBack called" );
 
     /* First find this PMT declared in PAT */
-    for( i = 0; i < p_sys->i_pmt; i++ )
+    for( int i = 0; i < p_sys->i_pmt; i++ )
     {
         int i_prg;
         for( i_prg = 0; i_prg < p_sys->pmt[i]->psi->i_prg; i_prg++ )
@@ -3085,7 +3048,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 break;
             }
         }
-        if( pmt ) break;
+        if( pmt )
+            break;
     }
 
     if( pmt == NULL )
@@ -3103,7 +3067,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     }
 
     /* Clean this program (remove all es) */
-    for( i = 0; i < 8192; i++ )
+    for( int i = 0; i < 8192; i++ )
     {
         ts_pid_t *pid = &p_sys->pid[i];
 
@@ -3186,7 +3150,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         ts_pid_t tmp_pid, *old_pid = 0, *pid = &tmp_pid;
 
         /* Find out if the PID was already declared */
-        for( i = 0; i < i_clean; i++ )
+        for( int i = 0; i < i_clean; i++ )
         {
             if( pp_clean[i] == &p_sys->pid[p_es->i_pid] )
             {
@@ -3225,7 +3189,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
                 pid->es->p_mpeg4desc = NULL;
 
-                for( i = 0; i < 255; i++ )
+                for( int i = 0; i < 255; i++ )
                 {
                     iod_descriptor_t *iod = prg->iod;
 
@@ -3809,7 +3773,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                                     pid->es->fmt.i_extra_languages );
                     if( pid->es->fmt.p_extra_languages )
                     {
-                        for( i = 0; i < pid->es->fmt.i_extra_languages; i++ )
+                        for( int i = 0; i < pid->es->fmt.i_extra_languages; i++ )
                         {
                             msg_Dbg( p_demux, "bang" );
                             pid->es->fmt.p_extra_languages[i].psz_language =
@@ -3887,7 +3851,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             {
                 pid->es->id = old_pid->es->id;
                 old_pid->es->id = NULL;
-                for( i = 0; i < pid->i_extra_es; i++ )
+                for( int i = 0; i < pid->i_extra_es; i++ )
                 {
                     pid->extra_es[i]->id = old_pid->extra_es[i]->id;
                     old_pid->extra_es[i]->id = NULL;
@@ -3903,7 +3867,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 }
 
                 pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
-                for( i = 0; i < pid->i_extra_es; i++ )
+                for( int i = 0; i < pid->i_extra_es; i++ )
                 {
                     pid->extra_es[i]->id =
                         es_out_Add( p_demux->out, &pid->extra_es[i]->fmt );
@@ -3952,7 +3916,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         dvbpsi_DeletePMT( p_pmt );
     }
 
-    for ( i = 0; i < i_clean; i++ )
+    for( int i = 0; i < i_clean; i++ )
     {
         if( ProgramIsSelected( p_demux, prg->i_number ) )
         {
@@ -3963,7 +3927,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
         PIDClean( p_demux->out, pp_clean[i] );
     }
-    if( i_clean ) free( pp_clean );
+    if( i_clean )
+        free( pp_clean );
 }
 
 static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
@@ -3971,7 +3936,6 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
     demux_sys_t          *p_sys = p_demux->p_sys;
     dvbpsi_pat_program_t *p_program;
     ts_pid_t             *pat = &p_sys->pid[0];
-    int                  i, j;
 
     msg_Dbg( p_demux, "PATCallBack called" );
 
@@ -3994,7 +3958,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         ts_pid_t **pmt_rm = NULL;
 
         /* Search pmt to be deleted */
-        for( i = 0; i < p_sys->i_pmt; i++ )
+        for( int i = 0; i < p_sys->i_pmt; i++ )
         {
             ts_pid_t *pmt = p_sys->pmt[i];
             bool b_keep = false;
@@ -4004,8 +3968,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             {
                 if( p_program->i_pid == pmt->i_pid )
                 {
-                    int i_prg;
-                    for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
+                    for( int i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                     {
                         if( p_program->i_number ==
                             pmt->psi->prg[i_prg]->i_number )
@@ -4014,7 +3977,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                             break;
                         }
                     }
-                    if( b_keep ) break;
+                    if( b_keep )
+                        break;
                 }
             }
 
@@ -4025,20 +3989,20 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         }
 
         /* Delete all ES attached to thoses PMT */
-        for( i = 2; i < 8192; i++ )
+        for( int i = 2; i < 8192; i++ )
         {
             ts_pid_t *pid = &p_sys->pid[i];
 
-            if( !pid->b_valid || pid->psi ) continue;
+            if( !pid->b_valid || pid->psi )
+                continue;
 
-            for( j = 0; j < i_pmt_rm && pid->b_valid; j++ )
+            for( int j = 0; j < i_pmt_rm && pid->b_valid; j++ )
             {
-                int i_prg;
-                for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
+                for( int i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                 {
                     /* We only remove es that aren't defined by extra pmt */
-                    if( pid->p_owner->prg[i_prg]->i_pid_pmt !=
-                        pmt_rm[j]->i_pid ) continue;
+                    if( pid->p_owner->prg[i_prg]->i_pid_pmt != pmt_rm[j]->i_pid )
+                        continue;
 
                     if( p_sys->b_access_control && pid->es->id )
                     {
@@ -4055,9 +4019,8 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         }
 
         /* Delete PMT pid */
-        for( i = 0; i < i_pmt_rm; i++ )
+        for( int i = 0; i < i_pmt_rm; i++ )
         {
-            int i_prg;
             if( p_sys->b_access_control )
             {
                 if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -4066,7 +4029,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     p_sys->b_access_control = false;
             }
 
-            for( i_prg = 0; i_prg < pmt_rm[i]->psi->i_prg; i_prg++ )
+            for( int i_prg = 0; i_prg < pmt_rm[i]->psi->i_prg; i_prg++ )
             {
                 const int i_number = pmt_rm[i]->psi->prg[i_prg]->i_number;
                 es_out_Control( p_demux->out, ES_OUT_DEL_GROUP, i_number );
