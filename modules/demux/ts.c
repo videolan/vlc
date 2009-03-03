@@ -364,10 +364,16 @@ struct demux_sys_t
     int         fd; /* udp socket */
     uint8_t     *buffer;
 
-    bool        b_dvb_control;
-    int         i_dvb_program;
+    /* */
+    bool        b_access_control;
+
+    /* */
+    bool        b_dvb_meta;
     int64_t     i_dvb_start;
     int64_t     i_dvb_length;
+
+    /* */
+    int         i_current_program;
     vlc_list_t  *p_programs_list;
 
     /* TS dump */
@@ -375,9 +381,6 @@ struct demux_sys_t
     FILE        *p_file;    /* filehandle */
     uint64_t    i_write;    /* bytes written */
     bool        b_file_out; /* dump mode enabled */
-
-    /* */
-    bool        b_meta;
 
     /* */
     bool        b_start_record;
@@ -626,9 +629,9 @@ static int Open( vlc_object_t *p_this )
     p_demux->pf_control = Control;
 
     /* Init p_sys field */
-    p_sys->b_meta = true;
-    p_sys->b_dvb_control = true;
-    p_sys->i_dvb_program = 0;
+    p_sys->b_dvb_meta = true;
+    p_sys->b_access_control = true;
+    p_sys->i_current_program = 0;
     p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
 
@@ -655,7 +658,7 @@ static int Open( vlc_object_t *p_this )
     pat->psi->handle = dvbpsi_AttachPAT( (dvbpsi_pat_callback)PATCallBack,
                                          p_demux );
 #ifdef TS_USE_DVB_SI
-    if( p_sys->b_meta )
+    if( p_sys->b_dvb_meta )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
         ts_pid_t *eit = &p_sys->pid[0x12];
@@ -668,13 +671,13 @@ static int Open( vlc_object_t *p_this )
         eit->psi->handle =
             dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
                                 p_demux );
-        if( p_sys->b_dvb_control )
+        if( p_sys->b_access_control )
         {
             if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                 ACCESS_SET_PRIVATE_ID_STATE, 0x11, true ) ||
                 stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                 ACCESS_SET_PRIVATE_ID_STATE, 0x12, true ) )
-                p_sys->b_dvb_control = false;
+                p_sys->b_access_control = false;
         }
     }
 #endif
@@ -806,7 +809,7 @@ static void Close( vlc_object_t *p_this )
                     free( pid->psi );
                     break;
                 default:
-                    if( p_sys->b_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 ) )
+                    if( p_sys->b_dvb_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 ) )
                     {
                         /* SDT or EIT */
                         dvbpsi_DetachDemux( pid->psi->handle );
@@ -829,7 +832,7 @@ static void Close( vlc_object_t *p_this )
             msg_Dbg( p_demux, "  - pid[%d] seen", pid->i_pid );
         }
 
-        if( p_sys->b_dvb_control && pid->i_pid > 0 )
+        if( p_sys->b_access_control && pid->i_pid > 0 )
         {
             /* too much */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -1102,7 +1105,7 @@ static int Demux( demux_t *p_demux )
         {
             if( p_pid->psi )
             {
-                if( p_pid->i_pid == 0 || ( p_sys->b_meta && ( p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 ) ) )
+                if( p_pid->i_pid == 0 || ( p_sys->b_dvb_meta && ( p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 ) ) )
                 {
                     dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
                 }
@@ -1167,7 +1170,7 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
         *pi_time = 0;
 
 #ifdef HAVE_TIME_H
-    if( p_sys->b_dvb_control && p_sys->i_dvb_length > 0 )
+    if( p_sys->b_access_control && p_sys->i_dvb_length > 0 )
     {
         /* FIXME we should not use time() but read the date from the tdt */
         const time_t t = time( NULL );
@@ -1267,7 +1270,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_list = (vlc_list_t *)va_arg( args, vlc_list_t * );
             msg_Dbg( p_demux, "DEMUX_SET_GROUP %d %p", i_int, p_list );
 
-            if( p_sys->b_dvb_control && i_int > 0 && i_int != p_sys->i_dvb_program )
+            if( p_sys->b_access_control && i_int > 0 && i_int != p_sys->i_current_program )
             {
                 int i_pmt_pid = -1;
                 int i;
@@ -1280,7 +1283,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
                     for( i_prg = 0; i_prg < pmt->psi->i_prg; i_prg++ )
                     {
-                        if( pmt->psi->prg[i_prg]->i_number == p_sys->i_dvb_program )
+                        if( pmt->psi->prg[i_prg]->i_number == p_sys->i_current_program )
                         {
                             i_pmt_pid = p_sys->pmt[i]->i_pid;
                             break;
@@ -1318,7 +1321,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
 
                 /* select new program */
-                p_sys->i_dvb_program = i_int;
+                p_sys->i_current_program = i_int;
                 i_pmt_pid = -1;
                 for( i = 0; i < p_sys->i_pmt; i++ )
                 {
@@ -1377,7 +1380,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else
             {
-                p_sys->i_dvb_program = -1;
+                p_sys->i_current_program = -1;
                 p_sys->p_programs_list = p_list;
             }
             return VLC_SUCCESS;
@@ -2538,33 +2541,34 @@ static void IODFree( iod_descriptor_t *p_iod )
  ** libdvbpsi callbacks
  ****************************************************************************
  ****************************************************************************/
-static bool DVBProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
+static bool ProgramIsSelected( demux_t *p_demux, uint16_t i_pgrm )
 {
     demux_sys_t          *p_sys = p_demux->p_sys;
 
-    if ( !p_sys->b_dvb_control ) return false;
-    if ( (p_sys->i_dvb_program == -1 && p_sys->p_programs_list == NULL)
-           || p_sys->i_dvb_program == 0 )
+    if( !p_sys->b_access_control )
+        return false;
+    if( ( p_sys->i_current_program == -1 && p_sys->p_programs_list == NULL ) ||
+        p_sys->i_current_program == 0 )
         return true;
-    if ( p_sys->i_dvb_program == i_pgrm ) return true;
+    if( p_sys->i_current_program == i_pgrm )
+        return true;
 
-    if ( p_sys->p_programs_list != NULL )
+    if( p_sys->p_programs_list != NULL )
     {
-        int i;
-        for ( i = 0; i < p_sys->p_programs_list->i_count; i++ )
+        for( int i = 0; i < p_sys->p_programs_list->i_count; i++ )
         {
-            if ( i_pgrm == p_sys->p_programs_list->p_values[i].i_int )
+            if( i_pgrm == p_sys->p_programs_list->p_values[i].i_int )
                 return true;
         }
     }
     return false;
 }
 
-static void DVBUpdateOnPID( demux_t *p_demux, int i_pid )
+static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( !p_sys->b_meta || ( i_pid != 0x11 && i_pid != 0x12 ) )
+    if( !p_sys->b_dvb_meta || ( i_pid != 0x11 && i_pid != 0x12 ) )
         return;
 
     msg_Warn( p_demux, "Switching to non DVB mode" );
@@ -2582,12 +2586,12 @@ static void DVBUpdateOnPID( demux_t *p_demux, int i_pid )
             p_pid->psi = NULL;
             p_pid->b_valid = false;
         }
-        if( p_sys->b_dvb_control )
+        if( p_sys->b_access_control )
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                             ACCESS_SET_PRIVATE_ID_STATE, i, false );
 
     }
-    p_sys->b_meta = false;
+    p_sys->b_dvb_meta = false;
 }
 
 
@@ -2627,7 +2631,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                  p_srv->b_eit_present, p_srv->i_running_status,
                  p_srv->b_free_ca );
 
-        if( p_sys->i_dvb_program != -1 && p_sys->i_dvb_program != p_srv->i_service_id )
+        if( p_sys->i_current_program != -1 && p_sys->i_current_program != p_srv->i_service_id )
             continue;
 
         p_meta = vlc_meta_New();
@@ -2895,7 +2899,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     vlc_epg_t *p_epg;
 
     msg_Dbg( p_demux, "EITCallBack called" );
-    if( !p_eit->b_current_next || ( p_sys->i_dvb_program != -1 && p_sys->i_dvb_program != p_eit->i_service_id ) )
+    if( !p_eit->b_current_next || ( p_sys->i_current_program != -1 && p_sys->i_current_program != p_eit->i_service_id ) )
     {
         dvbpsi_DeleteEIT( p_eit );
         return;
@@ -3006,7 +3010,7 @@ static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
     }
     if( p_epg->i_event > 0 )
     {
-        if( p_eit->i_service_id == p_sys->i_dvb_program )
+        if( p_eit->i_service_id == p_sys->i_current_program )
         {
             p_sys->i_dvb_length = 0;
             p_sys->i_dvb_start = 0;
@@ -3120,15 +3124,15 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
     prg->i_pid_pcr = p_pmt->i_pcr_pid;
     prg->i_version = p_pmt->i_version;
 
-    DVBUpdateOnPID( p_demux, prg->i_pid_pcr );
-    if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+    ValidateDVBMeta( p_demux, prg->i_pid_pcr );
+    if( ProgramIsSelected( p_demux, prg->i_number ) )
     {
         /* Set demux filter */
         stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                         ACCESS_SET_PRIVATE_ID_STATE, prg->i_pid_pcr,
                         true );
     }
-    else if ( p_sys->b_dvb_control )
+    else if ( p_sys->b_access_control )
     {
         msg_Warn( p_demux, "skipping program (not selected)" );
         dvbpsi_DeletePMT(p_pmt);
@@ -3190,7 +3194,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
                 break;
             }
         }
-        DVBUpdateOnPID( p_demux, p_es->i_pid );
+        ValidateDVBMeta( p_demux, p_es->i_pid );
 
         if( !old_pid && p_sys->pid[p_es->i_pid].b_valid )
         {
@@ -3927,8 +3931,8 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             }
         }
 
-        if( DVBProgramIsSelected( p_demux, prg->i_number )
-             && (pid->es->id != NULL || p_sys->b_udp_out) )
+        if( ProgramIsSelected( p_demux, prg->i_number ) &&
+            ( pid->es->id != NULL || p_sys->b_udp_out ) )
         {
             /* Set demux filter */
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -3937,7 +3941,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
     }
 
-    if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+    if( ProgramIsSelected( p_demux, prg->i_number ) )
     {
         /* Set CAM descrambling */
         stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
@@ -3950,7 +3954,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
 
     for ( i = 0; i < i_clean; i++ )
     {
-        if( DVBProgramIsSelected( p_demux, prg->i_number ) )
+        if( ProgramIsSelected( p_demux, prg->i_number ) )
         {
             stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                             ACCESS_SET_PRIVATE_ID_STATE, pp_clean[i]->i_pid,
@@ -4036,12 +4040,12 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     if( pid->p_owner->prg[i_prg]->i_pid_pmt !=
                         pmt_rm[j]->i_pid ) continue;
 
-                    if( p_sys->b_dvb_control && pid->es->id )
+                    if( p_sys->b_access_control && pid->es->id )
                     {
                         if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                             ACCESS_SET_PRIVATE_ID_STATE, i,
                                             false ) )
-                            p_sys->b_dvb_control = false;
+                            p_sys->b_access_control = false;
                     }
 
                     PIDClean( p_demux->out, pid );
@@ -4054,12 +4058,12 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         for( i = 0; i < i_pmt_rm; i++ )
         {
             int i_prg;
-            if( p_sys->b_dvb_control )
+            if( p_sys->b_access_control )
             {
                 if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                     ACCESS_SET_PRIVATE_ID_STATE,
                                     pmt_rm[i]->i_pid, false ) )
-                    p_sys->b_dvb_control = false;
+                    p_sys->b_access_control = false;
             }
 
             for( i_prg = 0; i_prg < pmt_rm[i]->psi->i_prg; i_prg++ )
@@ -4086,7 +4090,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
             ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
             bool b_add = true;
 
-            DVBUpdateOnPID( p_demux, p_program->i_pid );
+            ValidateDVBMeta( p_demux, p_program->i_pid );
 
             if( pmt->b_valid )
             {
@@ -4118,17 +4122,17 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                     p_program->i_pid;
 
                 /* Now select PID at access level */
-                if( p_sys->b_dvb_control )
+                if( p_sys->b_access_control )
                 {
-                    if( DVBProgramIsSelected( p_demux, p_program->i_number ) )
+                    if( ProgramIsSelected( p_demux, p_program->i_number ) )
                     {
-                        if( p_sys->i_dvb_program == 0 )
-                            p_sys->i_dvb_program = p_program->i_number;
+                        if( p_sys->i_current_program == 0 )
+                            p_sys->i_current_program = p_program->i_number;
 
                         if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                             ACCESS_SET_PRIVATE_ID_STATE,
                                             p_program->i_pid, true ) )
-                            p_sys->b_dvb_control = false;
+                            p_sys->b_access_control = false;
                     }
                 }
             }
