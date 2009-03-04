@@ -1062,50 +1062,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 
         return VLC_SUCCESS;
 
-    case VOUT_REPARENT:
-        /* Retrieve the window position */
-        point.x = point.y = 0;
-        ClientToScreen( p_vout->p_sys->hwnd, &point );
-
-        HWND d = 0;
-
-        if( i_query == VOUT_REPARENT ) d = (HWND)va_arg( args, int );
-        if( !d )
-        {
-            vlc_mutex_lock( &p_vout->p_sys->lock );
-            p_vout->p_sys->hparent = 0;
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
-            SetParent( p_vout->p_sys->hwnd, 0 );
-            p_vout->p_sys->i_window_style =
-                WS_CLIPCHILDREN | WS_OVERLAPPEDWINDOW | WS_SIZEBOX;
-            SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
-                           p_vout->p_sys->i_window_style | WS_VISIBLE);
-            SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW );
-            SetWindowPos( p_vout->p_sys->hwnd, 0, point.x, point.y, 0, 0,
-                          SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
-        }
-        else
-        {
-            vlc_mutex_lock( &p_vout->p_sys->lock );
-            p_vout->p_sys->hparent = d;
-            vlc_mutex_unlock( &p_vout->p_sys->lock );
-
-            SetParent( p_vout->p_sys->hwnd, d );
-            p_vout->p_sys->i_window_style = WS_CLIPCHILDREN;
-            SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE,
-                           p_vout->p_sys->i_window_style | WS_VISIBLE);
-            SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE, WS_EX_APPWINDOW );
-
-            /* Retrieve the parent size */
-            RECT  rect;
-            GetClientRect( d, &rect );
-            SetWindowPos( p_vout->p_sys->hwnd, d, point.x, point.y, rect.right, rect.bottom,
-                          SWP_FRAMECHANGED );
-        }
-
-        vout_ReleaseWindow( p_vout->p_sys->parent_window );
-        return VLC_SUCCESS;
-
     case VOUT_SET_STAY_ON_TOP:
         if( p_vout->p_sys->hparent && !var_GetBool( p_vout, "fullscreen" ) )
             return vaControlParentWindow( p_vout, i_query, args );

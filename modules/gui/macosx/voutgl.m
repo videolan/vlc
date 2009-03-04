@@ -779,17 +779,6 @@ static int aglControl( vout_thread_t *p_vout, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case VOUT_REPARENT:
-        {
-            AGLDrawable drawable = (AGLDrawable)va_arg( args, int);
-            if( !p_vout->b_fullscreen && drawable != p_vout->p_sys->agl_drawable )
-            {
-                p_vout->p_sys->agl_drawable = drawable;
-                aglSetDrawable(p_vout->p_sys->agl_ctx, drawable);
-            }
-            return VLC_SUCCESS;
-        }
-
         default:
             return VLC_EGENERIC;
     }

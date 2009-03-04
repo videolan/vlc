@@ -3150,30 +3150,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 #endif
             return VLC_SUCCESS;
 
-       case VOUT_REPARENT:
-            if( i_query == VOUT_REPARENT ) d = (Drawable)va_arg( args, int );
-            if( !d )
-            {
-#ifdef MODULE_NAME_IS_xvmc
-            xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
-#endif
-            XReparentWindow( p_vout->p_sys->p_display,
-                             p_vout->p_sys->original_window.base_window,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             0, 0 );
-            }
-            else
-            XReparentWindow( p_vout->p_sys->p_display,
-                             p_vout->p_sys->original_window.base_window,
-                             d, 0, 0);
-            XSync( p_vout->p_sys->p_display, False );
-#ifdef MODULE_NAME_IS_xvmc
-            xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
-#endif
-            vout_ReleaseWindow( p_vout->p_sys->p_win->owner_window );
-            p_vout->p_sys->original_window.owner_window = NULL;
-            return VLC_SUCCESS;
-
         case VOUT_SET_STAY_ON_TOP:
             if( p_vout->p_sys->p_win->owner_window )
                 return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,

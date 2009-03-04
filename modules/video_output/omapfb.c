@@ -373,14 +373,7 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    switch( i_query )
-    {
-       case VOUT_REPARENT:
-            vout_ReleaseWindow( p_vout->p_sys->owner_window );
-            return VLC_SUCCESS;
-       default:
-            return VLC_EGENERIC;
-    }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
