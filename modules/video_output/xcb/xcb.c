@@ -88,6 +88,7 @@ struct vout_sys_t
 
 static int Init (vout_thread_t *);
 static void Deinit (vout_thread_t *);
+static void Render (vout_thread_t *, picture_t *);
 static void Display (vout_thread_t *, picture_t *);
 static int Manage (vout_thread_t *);
 
@@ -234,6 +235,7 @@ static int Open (vlc_object_t *obj)
 
     vout->pf_init = Init;
     vout->pf_end = Deinit;
+    vout->pf_render = Render;
     vout->pf_display = Display;
     vout->pf_manage = Manage;
     return VLC_SUCCESS;
@@ -261,9 +263,10 @@ static void Close (vlc_object_t *obj)
 
 struct picture_sys_t
 {
-    xcb_connection_t *conn;
-    xcb_image_t *image;
-    xcb_shm_seg_t segment;
+    xcb_connection_t *conn; /* Shared connection to X server */
+    xcb_image_t *image;  /* Picture buffer */
+    xcb_image_t *native; /* Rendered picture buffer (in X server format) */
+    xcb_shm_seg_t segment; /* Shared memory segment X ID */
 };
 
 static void PictureRelease (picture_t *pic);
@@ -345,14 +348,11 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
         goto error;
     }
     if (shm != SHM_ERR && xcb_image_native (p_sys->conn, img, 0) == NULL)
-    {
-        msg_Err (vout, "incompatible X server image format");
-        xcb_image_destroy (img);
-        goto error;
-    }
+        msg_Warn (vout, "incompatible X server image format");
 
     priv->conn = p_sys->conn;
     priv->image = img;
+    priv->native = NULL;
     pic->p_sys = priv;
     pic->p->p_pixels = img->data;
     pic->pf_release = (shm != SHM_ERR) ? PictureShmRelease
@@ -376,6 +376,8 @@ static void PictureRelease (picture_t *pic)
 {
     struct picture_sys_t *p_sys = pic->p_sys;
 
+    if ((p_sys->native != NULL) && (p_sys->native != p_sys->image))
+        xcb_image_destroy (p_sys->native);
     xcb_image_destroy (p_sys->image);
     free (p_sys);
 }
@@ -507,15 +509,29 @@ static void Deinit (vout_thread_t *vout)
 }
 
 /**
+ * Prepares an image ahead of display.
+ */
+static void Render (vout_thread_t *vout, picture_t *pic)
+{
+    vout_sys_t *p_sys = vout->p_sys;
+    picture_sys_t *priv = pic->p_sys;
+
+    if ((priv->native != NULL) && (priv->native != priv->image))
+        xcb_image_destroy (priv->native);
+    priv->native = xcb_image_native (p_sys->conn, priv->image, 1);
+}
+
+
+/**
  * Sends an image to the X server.
  */
 static void Display (vout_thread_t *vout, picture_t *pic)
 {
     vout_sys_t *p_sys = vout->p_sys;
     picture_sys_t *priv = pic->p_sys;
-    xcb_image_t *img = priv->image;
+    xcb_image_t *img = priv->image, *native = priv->native;
 
-    if (img->base == NULL)
+    if ((native == img) && (img->base == NULL))
     {
         xcb_shm_segment_info_t info = {
             .shmseg = priv->segment,
@@ -527,16 +543,8 @@ static void Display (vout_thread_t *vout, picture_t *pic)
                         0, 0, 0, 0, img->width, img->height, 0);
     }
     else
-    {
-        xcb_image_t *native = xcb_image_native (p_sys->conn, img, 1);
-
-        if (native == NULL)
-            return;
-
+    if (native != NULL)
         xcb_image_put (p_sys->conn, p_sys->window, p_sys->gc, native, 0, 0, 0);
-        if (native != img)
-            xcb_image_destroy (native);
-    }
     xcb_flush (p_sys->conn);
 }
 
