@@ -211,22 +211,18 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
 
     /* First make sure that if item is a node it will be deleted.
      * XXX: Why don't we have a function to ensure that in the playlist code ? */
-    vlc_object_lock( p_parent->p_playlist );
+    playlist_Lock( p_parent->p_playlist );
     p_pl_item = playlist_ItemFindFromInputAndRoot( p_parent->p_playlist,
             p_input->i_id, p_parent, false );
 
     if( p_pl_item && p_pl_item->i_children > -1 )
-    {
         playlist_NodeDelete( p_parent->p_playlist, p_pl_item, true, false );
-        vlc_object_unlock( p_parent->p_playlist );
-        return;
-    }
+    else
+        /* Delete the non-node item normally */
+        playlist_DeleteFromInputInParent( p_parent->p_playlist, p_input->i_id,
+                                          p_parent, pl_Locked );
 
-    /* Delete the non-node item normally */
-    playlist_DeleteFromInputInParent( p_parent->p_playlist, p_input->i_id,
-                                      p_parent, pl_Locked );
-
-    vlc_object_unlock( p_parent->p_playlist );
+    playlist_Unlock( p_parent->p_playlist );
 }
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_module )
