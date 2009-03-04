@@ -584,7 +584,7 @@ static void *Thread ( void *data )
     playlist_t *p_playlist = data;
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    vlc_object_lock( p_playlist );
+    playlist_Lock( p_playlist );
     while( vlc_object_alive( p_playlist ) || p_sys->p_input )
     {
         /* FIXME: what's that ! */
@@ -603,7 +603,7 @@ static void *Thread ( void *data )
 
         LoopRequest( p_playlist );
     }
-    vlc_object_unlock( p_playlist );
+    playlist_Unlock( p_playlist );
 
     return NULL;
 }
