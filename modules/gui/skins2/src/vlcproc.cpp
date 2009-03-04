@@ -196,15 +196,12 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf(), "skin-to-load", onSkinToLoad, this );
 }
 
+#include <assert.h>
 
 void VlcProc::registerVoutWindow( void *pVoutWindow )
 {
     m_handleSet.insert( pVoutWindow );
-    // Reparent the vout window
-    if( m_pVout )
-    {
-        vout_Control( m_pVout, VOUT_REPARENT, 0 );
-    }
+    assert( !m_pVout );
 }
 
 
@@ -216,11 +213,7 @@ void VlcProc::unregisterVoutWindow( void *pVoutWindow )
 
 void VlcProc::dropVout()
 {
-    if( m_pVout )
-    {
-        vout_Control( m_pVout, VOUT_REPARENT, 0 );
-        m_pVout = NULL;
-    }
+    assert( !m_pVout );
 }
 
 

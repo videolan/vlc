@@ -5,7 +5,7 @@
  *
  * $Id$
  *
- * Authors: Cl�ent Stenac <zorglub@videolan.org>
+ * Authors: Clément Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *          Damien Fouilleul <damienf a_t videolan dot org>
@@ -190,14 +190,9 @@ int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
 int libvlc_video_reparent( libvlc_media_player_t *p_mi, libvlc_drawable_t d,
                            libvlc_exception_t *p_e )
 {
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-
-    if( p_vout )
-    {
-        vout_Control( p_vout , VOUT_REPARENT, d);
-        vlc_object_release( p_vout );
-    }
-    return 0;
+    (void) p_mi; (void) d;
+    libvlc_exception_raise(p_e, "Reparenting not supported");
+    return -1;
 }
 
 void libvlc_video_resize( libvlc_media_player_t *p_mi, int width, int height, libvlc_exception_t *p_e )

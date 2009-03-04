@@ -249,15 +249,7 @@ static void Run( intf_thread_t *p_intf )
     var_DelCallback( p_intf->p_sys->p_playlist, "activity",
                      activity_cb, p_intf );
 
-    // Asking the vout to close
-    vout_thread_t *p_vout = p_intf->p_sys->p_vout;
-
-    if( p_vout )
-    {
-        vout_Control( p_vout, VOUT_REPARENT, 0 );
-        vlc_object_release( p_vout );
-    }
-
+    assert( !p_intf->p_sys->p_vout ); /* too late */
     gtk_object_destroy( GTK_OBJECT( window ) );
 }
 

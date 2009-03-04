@@ -764,7 +764,6 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
                                        libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vout_thread_t *p_vout = NULL;
 
     p_mi->drawable.xid = drawable;
 
@@ -779,12 +778,6 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
         return;
     }
 
-    p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
-    if( p_vout )
-    {
-        vout_Control( p_vout , VOUT_REPARENT, drawable);
-        vlc_object_release( p_vout );
-    }
     vlc_object_release( p_input_thread );
 }
 
