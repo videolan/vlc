@@ -65,7 +65,7 @@ static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
 }
 
 /*
- * Release the associated input thread
+ * Release the associated input thread.
  *
  * Object lock is NOT held.
  */
@@ -78,12 +78,15 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
 
     p_input_thread = p_mi->p_input_thread;
 
-    /* No one is tracking this input_thread appart us. Destroy it */
+    /* No one is tracking this input_thread apart from us. Destroy it. */
     if( p_mi->b_own_its_input_thread )
     {
-        var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
-        var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
-        var_DelCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
+        var_DelCallback( p_input_thread, "can-seek",
+                         input_seekable_changed, p_mi );
+        var_DelCallback( p_input_thread, "can-pause",
+                         input_pausable_changed, p_mi );
+        var_DelCallback( p_input_thread, "intf-event",
+                         input_event_changed, p_mi );
 
         /* We owned this one */
         input_StopThread( p_input_thread );
@@ -102,7 +105,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
  * Retrieve the input thread. Be sure to release the object
  * once you are done with it. (libvlc Internal)
  *
- * Object lock is held.
+ * Function will lock the object.
  */
 input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
                                          libvlc_exception_t *p_e )
@@ -222,12 +225,14 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
         /* */
         event.type = libvlc_MediaPlayerPositionChanged;
-        event.u.media_player_position_changed.new_position = var_GetFloat( p_input, "position" );;
+        event.u.media_player_position_changed.new_position =
+                                          var_GetFloat( p_input, "position" );
         libvlc_event_send( p_mi->p_event_manager, &event );
 
         /* */
         event.type = libvlc_MediaPlayerTimeChanged;
-        event.u.media_player_time_changed.new_time = var_GetTime( p_input, "time" );
+        event.u.media_player_time_changed.new_time =
+                                               var_GetTime( p_input, "time" );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
 
@@ -237,7 +242,18 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
 
 /**************************************************************************
- * Create a Media Instance object
+ * Create a Media Instance object.
+ *
+ * Refcount strategy:
+ * - All items created by _new start with a refcount set to 1.
+ * - Accessor _release decrease the refcount by 1, if after that
+ *   operation the refcount is 0, the object is destroyed.
+ * - Accessor _retain increase the refcount by 1 (XXX: to implement)
+ *
+ * Object locking strategy:
+ * - No lock held while in constructor.
+ * - When accessing any member variable this lock is held. (XXX who locks?)
+ * - When attempting to destroy the object the lock is also held.
  **************************************************************************/
 libvlc_media_player_t *
 libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
@@ -262,17 +278,8 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     p_mi->drawable.hwnd = NULL;
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->p_input_thread = NULL;
-    /* refcount strategy:
-     * - All items created by _new start with a refcount set to 1
-     * - Accessor _release decrease the refcount by 1, if after that
-     *   operation the refcount is 0, the object is destroyed.
-     * - Accessor _retain increase the refcount by 1 (XXX: to implement) */
     p_mi->i_refcount = 1;
     p_mi->b_own_its_input_thread = true;
-    /* object_lock strategy:
-     * - No lock held in constructor
-     * - Lock when accessing all variable this lock is held
-     * - Lock when attempting to destroy the object the lock is also held */
     vlc_mutex_init( &p_mi->object_lock );
     p_mi->p_event_manager = libvlc_event_manager_new( p_mi,
             p_libvlc_instance, p_e );
@@ -321,14 +328,16 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
         vout_thread that generates the event and media_player that re-emits it
         with its own event manager
     */
-    var_Create( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken", SnapshotTakenCallback, p_mi );
+    var_Create( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken",
+                VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken",
+                     SnapshotTakenCallback, p_mi );
 
     return p_mi;
 }
 
 /**************************************************************************
- * Create a Media Instance object with a media descriptor
+ * Create a Media Instance object with a media descriptor.
  **************************************************************************/
 libvlc_media_player_t *
 libvlc_media_player_new_from_media(
@@ -348,7 +357,7 @@ libvlc_media_player_new_from_media(
 }
 
 /**************************************************************************
- * Create a new media instance object from an input_thread (Libvlc Internal)
+ * Create a new media instance object from an input_thread (Libvlc Internal).
  **************************************************************************/
 libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
                                    struct libvlc_instance_t *p_libvlc_instance,
@@ -390,7 +399,7 @@ libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
 /**************************************************************************
  * Destroy a Media Instance object (libvlc internal)
  *
- * Warning: No lock held here, but hey, this is internal.
+ * Warning: No lock held here, but hey, this is internal. Caller must lock.
  **************************************************************************/
 void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 {
@@ -403,7 +412,8 @@ void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
         return;
 
 	/* Detach Callback from the main libvlc object */
-    var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int, "vout-snapshottaken", SnapshotTakenCallback, p_mi );
+    var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
+                     "vout-snapshottaken", SnapshotTakenCallback, p_mi );
 
     p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
 
@@ -424,7 +434,9 @@ void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 }
 
 /**************************************************************************
- * Release a Media Instance object
+ * Release a Media Instance object.
+ *
+ * Function does the locking.
  **************************************************************************/
 void libvlc_media_player_release( libvlc_media_player_t *p_mi )
 {
@@ -453,7 +465,9 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
 }
 
 /**************************************************************************
- * Retain a Media Instance object
+ * Retain a Media Instance object.
+ *
+ * Caller must hold the lock.
  **************************************************************************/
 void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 {
@@ -464,7 +478,9 @@ void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 }
 
 /**************************************************************************
- * Set the Media descriptor associated with the instance
+ * Set the Media descriptor associated with the instance.
+ *
+ * Enter without lock -- function will lock the object.
  **************************************************************************/
 void libvlc_media_player_set_media(
                             libvlc_media_player_t *p_mi,
@@ -503,7 +519,7 @@ void libvlc_media_player_set_media(
 }
 
 /**************************************************************************
- * Get the Media descriptor associated with the instance
+ * Get the Media descriptor associated with the instance.
  **************************************************************************/
 libvlc_media_t *
 libvlc_media_player_get_media(
@@ -520,7 +536,7 @@ libvlc_media_player_get_media(
 }
 
 /**************************************************************************
- * Get the event Manager
+ * Get the event Manager.
  **************************************************************************/
 libvlc_event_manager_t *
 libvlc_media_player_event_manager(
@@ -533,7 +549,7 @@ libvlc_media_player_event_manager(
 }
 
 /**************************************************************************
- * Trigger a snapshot Taken Event
+ * Trigger a snapshot Taken Event.
  *************************************************************************/
 static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
@@ -547,15 +563,16 @@ static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
     event.u.media_player_snapshot_taken.psz_filename = newval.psz_string ;
     /* Snapshot psz data is a vlc_variable owned by libvlc object .
          Its memmory management is taken care by the obj*/
-    msg_Dbg( p_this, "about to emit libvlc_snapshot_taken.make psz_str=0x%p (%s)",
-          event.u.media_player_snapshot_taken.psz_filename ,event.u.media_player_snapshot_taken.psz_filename );
+    msg_Dbg( p_this, "about to emit libvlc_snapshot_taken.make psz_str=0x%p"
+             " (%s)", event.u.media_player_snapshot_taken.psz_filename,
+             event.u.media_player_snapshot_taken.psz_filename );
     libvlc_event_send( p_mi->p_event_manager, &event );
 
     return VLC_SUCCESS;
 }
 
 /**************************************************************************
- * Play
+ * Tell media player to start playing.
  **************************************************************************/
 void libvlc_media_player_play( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
@@ -582,8 +599,8 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         return;
     }
 
-    p_mi->p_input_thread = input_CreateThread( p_mi->p_libvlc_instance->p_libvlc_int,
-                      p_mi->p_md->p_input_item );
+    p_mi->p_input_thread = input_CreateThread(
+            p_mi->p_libvlc_instance->p_libvlc_int, p_mi->p_md->p_input_item );
 
 
     if( !p_mi->p_input_thread )
@@ -613,7 +630,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
 }
 
 /**************************************************************************
- * Pause
+ * Pause.
  **************************************************************************/
 void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
                                   libvlc_exception_t *p_e )
@@ -639,7 +656,9 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
 }
 
 /**************************************************************************
- * is_playing
+ * Tells whether the media player is currently playing.
+ *
+ * Enter with lock held.
  **************************************************************************/
 int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
@@ -662,7 +681,7 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
 
 
 /**************************************************************************
- * Stop
+ * Stop playing.
  **************************************************************************/
 void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
@@ -671,7 +690,8 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 
     if( state == libvlc_Playing || state == libvlc_Paused )
     {
-        /* Send a stop notification event only of we are in playing or paused states */
+        /* Send a stop notification event only of we are in playing or
+         * paused states */
         libvlc_media_set_state( p_mi->p_md, libvlc_Ended, p_e );
 
         /* Construct and send the event */
@@ -698,6 +718,9 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     }
 }
 
+/**************************************************************************
+ * set_xwindow
+ **************************************************************************/
 void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
                                       uint32_t drawable,
                                       libvlc_exception_t *p_e )
@@ -706,11 +729,17 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
     p_mi->drawable.xid = drawable;
 }
 
+/**************************************************************************
+ * get_xwindow
+ **************************************************************************/
 uint32_t libvlc_media_player_get_xwindow( libvlc_media_player_t *p_mi )
 {
     return p_mi->drawable.xid;
 }
 
+/**************************************************************************
+ * set_hwnd
+ **************************************************************************/
 void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
                                    void *drawable,
                                    libvlc_exception_t *p_e )
@@ -719,6 +748,9 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
     p_mi->drawable.hwnd = drawable;
 }
 
+/**************************************************************************
+ * get_hwnd
+ **************************************************************************/
 void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 {
     return p_mi->drawable.hwnd;
@@ -760,7 +792,8 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
  * Get Drawable
  **************************************************************************/
 libvlc_drawable_t
-libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
+libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi,
+                                   libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
     return p_mi->drawable.xid;
@@ -1174,7 +1207,8 @@ libvlc_track_description_t *
         malloc( sizeof( libvlc_track_description_t ) );
     if ( !p_track_description )
     {
-        var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list);
+        var_Change( p_input, psz_variable, VLC_VAR_FREELIST,
+                    &val_list, &text_list);
         vlc_object_release( p_input );
         libvlc_exception_raise( p_e, "no enough memory" );
         return NULL;
@@ -1190,7 +1224,8 @@ libvlc_track_description_t *
             if ( !p_actual )
             {
                 libvlc_track_description_release( p_track_description );
-                var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list);
+                var_Change( p_input, psz_variable, VLC_VAR_FREELIST,
+                            &val_list, &text_list);
                 vlc_object_release( p_input );
                 libvlc_exception_raise( p_e, "no enough memory" );
                 return NULL;
@@ -1210,10 +1245,10 @@ libvlc_track_description_t *
     return p_track_description;
 }
 
-void libvlc_track_description_release( libvlc_track_description_t *p_track_description )
+void libvlc_track_description_release( libvlc_track_description_t *p_td )
 {
     libvlc_track_description_t *p_actual, *p_before;
-    p_actual = p_track_description;
+    p_actual = p_td;
 
     while ( p_actual )
     {
