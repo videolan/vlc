@@ -645,6 +645,7 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
                                 int i_type )
 {
     libvlc_priv_t *priv = libvlc_priv (p_obj->p_libvlc);
+    static vlc_mutex_t input_id_lock = VLC_STATIC_MUTEX;
 
     input_item_t* p_input = malloc( sizeof(input_item_t ) );
     if( !p_input )
@@ -653,9 +654,9 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     input_item_Init( p_obj, p_input );
     vlc_gc_init( p_input, input_item_Destroy );
 
-    vlc_object_lock( p_obj->p_libvlc );
+    vlc_mutex_lock( &input_id_lock );
     p_input->i_id = ++priv->i_last_input_id;
-    vlc_object_unlock( p_obj->p_libvlc );
+    vlc_mutex_unlock( &input_id_lock );
 
     p_input->b_fixed_name = false;
 
