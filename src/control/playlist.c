@@ -75,7 +75,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
         if (! playlist_was_locked( p_instance ) )
         {
             playlist_mark_locked( p_instance, 1 );
-            vlc_object_lock( PL );
+            playlist_Lock( PL );
             did_lock = 1;
         }
 
@@ -85,7 +85,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
         {
             if( did_lock == 1 )
             {
-                vlc_object_unlock( PL );
+                playlist_Unlock( PL );
                 playlist_mark_locked( p_instance, 0 );
             }
             RAISEVOID( "Unable to find item" );
@@ -95,7 +95,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
                           PL->p_root_category, p_item );
         if( did_lock == 1 )
         {
-            vlc_object_unlock( PL );
+            playlist_Lock( PL );
             playlist_mark_locked( p_instance, 0 );
         }
     }
@@ -242,7 +242,7 @@ int libvlc_playlist_get_current_index ( libvlc_instance_t *p_instance,
 void libvlc_playlist_lock( libvlc_instance_t *p_instance )
 {
     assert( PL );
-    vlc_object_lock( PL );
+    playlist_Lock( PL );
     p_instance->b_playlist_locked = 1;
 }
 
@@ -250,7 +250,7 @@ void libvlc_playlist_unlock( libvlc_instance_t *p_instance )
 {
     assert( PL );
     p_instance->b_playlist_locked = 0;
-    vlc_object_unlock( PL );
+    playlist_Unlock( PL );
 }
 
 libvlc_media_player_t * libvlc_playlist_get_media_player(
