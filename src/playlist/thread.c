@@ -552,8 +552,7 @@ static void LoopRequest( playlist_t *p_playlist )
         else
         {
             if( vlc_object_alive( p_playlist ) )
-                vlc_cond_wait( &pl_priv(p_playlist)->signal,
-                               &vlc_internals(p_playlist)->lock );
+                vlc_cond_wait( &p_sys->signal, &p_sys->lock );
         }
         return;
     }
@@ -598,8 +597,7 @@ static void *Thread ( void *data )
 
         /* If there is an input, check that it doesn't need to die. */
         while( !LoopInput( p_playlist ) )
-            vlc_cond_wait( &pl_priv(p_playlist)->signal,
-                           &vlc_internals(p_playlist)->lock );
+            vlc_cond_wait( &p_sys->signal, &p_sys->lock );
 
         LoopRequest( p_playlist );
     }

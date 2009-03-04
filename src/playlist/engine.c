@@ -81,6 +81,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
 
     VariablesInit( p_playlist );
+    vlc_mutex_init( &p->lock );
     vlc_cond_init( &p->signal );
 
     /* Initialise data structures */
@@ -181,6 +182,7 @@ static void playlist_Destructor( vlc_object_t * p_this )
     assert( !p_sys->p_fetcher );
 
     vlc_cond_destroy( &p_sys->signal );
+    vlc_mutex_destroy( &p_sys->lock );
 
     /* Remove all remaining items */
     FOREACH_ARRAY( playlist_item_t *p_del, p_playlist->all_items )

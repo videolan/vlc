@@ -68,17 +68,17 @@ void __pl_Release( vlc_object_t *p_this )
 
 void playlist_Lock( playlist_t *pl )
 {
-    vlc_object_lock( pl );
+    vlc_mutex_lock( &pl_priv(pl)->lock );
 }
 
 void playlist_Unlock( playlist_t *pl )
 {
-    vlc_object_unlock( pl );
+    vlc_mutex_unlock( &pl_priv(pl)->lock );
 }
 
 void playlist_AssertLocked( playlist_t *pl )
 {
-    vlc_object_assert_locked( pl );
+    vlc_assert_locked( &pl_priv(pl)->lock );
 }
 
 int playlist_Control( playlist_t * p_playlist, int i_query,
