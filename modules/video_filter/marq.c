@@ -69,6 +69,8 @@ static const char *const ppsz_color_descriptions[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
+    vlc_mutex_t lock;
+
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
     int i_timeout;
@@ -201,6 +203,7 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
+    vlc_mutex_init( &p_sys->lock );
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
@@ -255,6 +258,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     DEL_VAR( "marq-opacity" );
     DEL_VAR( "marq-size" );
 
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -269,10 +273,9 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_t *p_spu = NULL;
     video_format_t fmt;
 
+    vlc_mutex_lock( &p_sys->lock );
     if( p_sys->last_time + p_sys->i_refresh > date )
-        return NULL;
-
-    vlc_object_lock( p_filter );
+        goto out;
     if( p_sys->b_need_update == false )
         goto out;
 
@@ -323,7 +326,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region->p_style = p_sys->p_style;
 
 out:
-    vlc_object_unlock( p_filter );
+    vlc_mutex_unlock( &p_sys->lock );
     return p_spu;
 }
 
@@ -334,10 +337,12 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
                             void *p_data )
 {
-    VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
 
-    vlc_object_lock( p_this );
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_this);
+
+    vlc_mutex_lock( &p_sys->lock );
     if( !strncmp( psz_var, "marq-marquee", 7 ) )
     {
         free( p_sys->psz_marquee );
@@ -378,6 +383,6 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
         p_sys->i_xoff = -1;       /* force to relative positioning */
     }
     p_sys->b_need_update = true;
-    vlc_object_unlock( p_this );
+    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
