@@ -57,7 +57,6 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
 static int vlclua_input_info( lua_State *L )
 {
     input_thread_t * p_input = vlclua_get_input_internal( L );
-    vlc_object_lock( p_input );
     int i_cat;
     int i;
     if( !p_input ) return vlclua_error( L );
@@ -80,7 +79,6 @@ static int vlclua_input_info( lua_State *L )
         }
         lua_settable( L, -3 );
     }
-    vlc_object_unlock( p_input );
     vlc_object_release( p_input );
     return 1;
 }
