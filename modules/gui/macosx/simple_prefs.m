@@ -25,6 +25,7 @@
 #import "prefs.h"
 #import <vlc_keys.h>
 #import <vlc_interface.h>
+#import <vlc_dialog.h>
 #import "misc.h"
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
@@ -717,7 +718,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Interface settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("Interface Settings not saved"),
+            dialog_Fatal( p_intf, _("Interface Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
@@ -789,7 +790,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Audio settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("Audio Settings not saved"),
+            dialog_Fatal( p_intf, _("Audio Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             
             i = 0;
@@ -822,7 +823,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Video settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("Video Settings not saved"),
+            dialog_Fatal( p_intf, _("Video Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
@@ -886,7 +887,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Input settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("Input Settings not saved"),
+            dialog_Fatal( p_intf, _("Input Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
@@ -914,7 +915,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the OSD/Subtitle settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("On Screen Display/Subtitle Settings not saved"),
+            dialog_Fatal( p_intf, _("On Screen Display/Subtitle Settings not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }
@@ -939,7 +940,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         if( i != 0 )
         {
             msg_Err( p_intf, "An error occurred while saving the Hotkey settings using SimplePrefs (%i)", i );
-            intf_UserFatal( p_intf, false, _("Hotkeys not saved"),
+            dialog_Fatal( p_intf, _("Hotkeys not saved"),
                         _("An error occured while saving your settings via SimplePrefs (%i)."), i );
             i = 0;
         }

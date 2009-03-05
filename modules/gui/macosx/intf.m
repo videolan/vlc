@@ -31,6 +31,7 @@
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
 #include <vlc_keys.h>
+#include <vlc_dialog.h>
 #include <unistd.h> /* execl() */
 
 #import "intf.h"
@@ -2126,7 +2127,7 @@ end:
     [o_update showUpdateWindow];
 #else
     msg_Err( VLCIntf, "Update checker wasn't enabled in this build" );
-    intf_UserFatal( VLCIntf, false, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
+    dialog_Fatal( VLCIntf, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
 #endif
 }
 
