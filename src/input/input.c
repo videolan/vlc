@@ -48,7 +48,7 @@
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"
 
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>
@@ -2389,9 +2389,8 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
                                                          msg_StackMsg() );
-            intf_UserFatal( VLC_OBJECT( p_input), false,
-                            _("Your input can't be opened"),
-                            _("VLC is unable to open the MRL '%s'."
+            dialog_Fatal( p_input, _("Your input can't be opened"),
+                          _("VLC is unable to open the MRL '%s'."
                             " Check the log for details."), psz_mrl );
             goto error;
         }
@@ -2521,9 +2520,9 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                      psz_access, psz_demux, psz_path );
-            intf_UserFatal( VLC_OBJECT( p_input ), false,
-                            _("VLC can't recognize the input's format"),
-                            _("The format of '%s' cannot be detected. "
+            dialog_Fatal( VLC_OBJECT( p_input ),
+                          _("VLC can't recognize the input's format"),
+                          _("The format of '%s' cannot be detected. "
                             "Have a look at the log for details."), psz_mrl );
             goto error;
         }

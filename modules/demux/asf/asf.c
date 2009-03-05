@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include <vlc_meta.h>
 #include <vlc_access.h>                /* GET_PRIVATE_ID_STATE */
@@ -175,7 +175,7 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
-                    intf_UserFatal( p_demux, false, _("Could not demux ASF stream"),
+                    dialog_Fatal( p_demux, _("Could not demux ASF stream"),
                                     _("VLC failed to load the ASF header.") );
                     return 0;
                 }

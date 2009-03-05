@@ -34,7 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_access.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -222,8 +222,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
             default:
                 msg_Err (p_access, "failed to read (%m)");
-                intf_UserFatal (p_access, false, _("File reading failed"),
-                                _("VLC could not read the file."));
+                dialog_Fatal (p_access, _("File reading failed"),
+                              _("VLC could not read the file."));
                 p_access->info.b_eof = true;
                 return 0;
         }
@@ -342,8 +342,8 @@ static int open_file (access_t *p_access, const char *path)
     if (fd == -1)
     {
         msg_Err (p_access, "cannot open file %s (%m)", path);
-        intf_UserFatal (p_access, false, _("File reading failed"),
-                        _("VLC could not open the file \"%s\"."), path);
+        dialog_Fatal (p_access, _("File reading failed"),
+                      _("VLC could not open the file \"%s\"."), path);
         return -1;
     }
 

@@ -28,7 +28,7 @@
 #include <vlc_access.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include <assert.h>
 
@@ -226,7 +226,7 @@ static block_t *Block (access_t *p_access)
     if (addr == MAP_FAILED)
     {
         msg_Err (p_access, "memory mapping failed (%m)");
-        intf_UserFatal (p_access, false, _("File reading failed"),
+        dialog_Fatal (p_access, _("File reading failed"),
                         _("VLC could not read the file."));
         goto fatal;
     }

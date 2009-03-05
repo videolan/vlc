@@ -36,7 +36,7 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -308,7 +308,7 @@ static int Open( vlc_object_t *p_this )
         if( dvdnav_title_play( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
         {
             msg_Err( p_demux, "cannot set title (can't decrypt DVD?)" );
-            intf_UserFatal( p_demux, false, _("Playback failure"),
+            dialog_Fatal( p_demux, _("Playback failure"),
                             _("VLC cannot set the DVD's title. It possibly "
                               "cannot decrypt the entire disc.") );
             dvdnav_close( p_sys->dvdnav );

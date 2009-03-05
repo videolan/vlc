@@ -35,8 +35,8 @@
 #include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_charset.h>
-
 #include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include <vlc_iso_lang.h>
 
@@ -248,7 +248,7 @@ static int Open( vlc_object_t *p_this )
     if( !(p_dvdread = DVDOpen( psz_name )) )
     {
         msg_Err( p_demux, "DVDRead cannot open source: %s", psz_name );
-        intf_UserFatal( p_demux, false, _("Playback failure"),
+        dialog_Fatal( p_demux, _("Playback failure"),
                         _("DVDRead could not open the disc \"%s\"."), psz_name );
         free( psz_name );
         return VLC_EGENERIC;
@@ -570,7 +570,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "read failed for %d/%d blocks at 0x%02x",
                  i_read, i_blocks_once, p_sys->i_cur_block );
-        intf_UserFatal( p_demux, false, _("Playback failure"),
+        dialog_Fatal( p_demux, _("Playback failure"),
                         _("DVDRead could not read %d/%d blocks at 0x%02x."),
                         i_read, i_blocks_once, p_sys->i_cur_block );
         return -1;

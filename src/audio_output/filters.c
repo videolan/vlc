@@ -29,7 +29,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
@@ -156,9 +156,9 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     if( *pi_nb_filters + 1 > AOUT_MAX_FILTERS )
     {
         msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
-        intf_UserFatal( p_aout, false, _("Audio filtering failed"),
-                        _("The maximum number of filters (%d) was reached."),
-                        AOUT_MAX_FILTERS );
+        dialog_Fatal( p_aout, _("Audio filtering failed"),
+                      _("The maximum number of filters (%d) was reached."),
+                      AOUT_MAX_FILTERS );
         return -1;
     }
 
@@ -203,9 +203,9 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     {
         ReleaseFilter( pp_filters[0] );
         msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
-        intf_UserFatal( p_aout, false, _("Audio filtering failed"),
-                        _("The maximum number of filters (%d) was reached."),
-                        AOUT_MAX_FILTERS );
+        dialog_Fatal( p_aout, _("Audio filtering failed"),
+                      _("The maximum number of filters (%d) was reached."),
+                      AOUT_MAX_FILTERS );
         return -1;
     }
     pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
@@ -226,9 +226,9 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         {
             ReleaseFilter( pp_filters[0] );
             msg_Err( p_aout, "max filter reached (%d)", AOUT_MAX_FILTERS );
-            intf_UserFatal( p_aout, false, _("Audio filtering failed"),
-                            _("The maximum number of filters (%d) was reached."),
-                            AOUT_MAX_FILTERS );
+            dialog_Fatal( p_aout, _("Audio filtering failed"),
+                          _("The maximum number of filters (%d) was reached."),
+                          AOUT_MAX_FILTERS );
             return -1;
         }
         pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,

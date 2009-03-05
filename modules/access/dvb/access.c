@@ -36,6 +36,7 @@
 #include <vlc_access.h>
 #include <vlc_input.h>
 #include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -982,7 +983,7 @@ static int ParseMRL( access_t *p_access )
             else
             {
                 msg_Err( p_access, "illegal polarization %c", *psz_parser );
-                intf_UserFatal( p_access, false, _("Illegal Polarization"),
+                dialog_Fatal( p_access, _("Invalid polarization"),
                                 _("The provided polarization \"%c\" is not valid."),
                                 *psz_parser );
                 free( psz_dup );

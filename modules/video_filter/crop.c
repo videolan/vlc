@@ -34,7 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include "filter_common.h"
 
@@ -375,7 +375,7 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        intf_UserFatal( p_vout, false, _("Cropping failed"),
+        dialog_Fatal( p_vout, _("Cropping failed"),
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
@@ -471,7 +471,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        intf_UserFatal( p_vout, false, _("Cropping failed"),
+        dialog_Fatal( p_vout, _("Cropping failed"),
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }

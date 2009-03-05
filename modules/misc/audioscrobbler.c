@@ -42,6 +42,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
+#include <vlc_dialog.h>
 #include <vlc_meta.h>
 #include <vlc_md5.h>
 #include <vlc_stream.h>
@@ -288,7 +289,7 @@ static void Run( intf_thread_t *p_intf )
 
                 case VLC_ENOVAR:
                     /* username not set */
-                    intf_UserFatal( p_intf, false,
+                    dialog_Fatal( p_intf,
                         _("Last.fm username not set"),
                         _("Please set a username or disable the "
                         "audioscrobbler plugin, and restart VLC.\n"
@@ -807,7 +808,7 @@ static int Handshake( intf_thread_t *p_this )
     if ( p_buffer_pos )
     {
         /* authentication failed, bad username/password combination */
-        intf_UserFatal( p_this, false,
+        dialog_Fatal( p_this,
             _("last.fm: Authentication failed"),
             _("last.fm username or password is incorrect. "
               "Please verify your settings and relaunch VLC." ) );

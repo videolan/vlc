@@ -40,8 +40,8 @@
 #include <vlc_codec.h>
 #include <vlc_osd.h>
 #include <vlc_meta.h>
+#include <vlc_dialog.h>
 
-#include <vlc_interface.h>
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "input_internal.h"
@@ -274,8 +274,8 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
-            intf_UserFatal( p_input, false, _("Streaming / Transcoding failed"),
-                            _("VLC could not open the packetizer module.") );
+            dialog_Fatal( p_input, _("Streaming / Transcoding failed"),
+                          _("VLC could not open the packetizer module.") );
             return NULL;
         }
     }
@@ -287,8 +287,8 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
-            intf_UserFatal( p_input, false, _("Streaming / Transcoding failed"),
-                            _("VLC could not open the decoder module.") );
+            dialog_Fatal( p_input, _("Streaming / Transcoding failed"),
+                          _("VLC could not open the decoder module.") );
             return NULL;
         }
     }
@@ -440,8 +440,8 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
-            intf_UserFatal( p_dec, false, _("Streaming / Transcoding failed"),
-                            _("VLC could not open the decoder module.") );
+            dialog_Fatal( p_dec, _("Streaming / Transcoding failed"),
+                          _("VLC could not open the decoder module.") );
             return VLC_EGENERIC;
         }
         else if( !p_cc->p_module )
@@ -674,9 +674,10 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
     msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
              "VLC probably does not support this sound or video format.",
              (char*)&codec );
-    intf_UserFatal( p_dec, false, _("No suitable decoder module"), 
-                    _("VLC does not support the audio or video format \"%4.4s\". "
-                      "Unfortunately there is no way for you to fix this."), (char*)&codec );
+    dialog_Fatal( p_dec, _("No suitable decoder module"),
+                 _("VLC does not support the audio or video format \"%4.4s\". "
+                  "Unfortunately there is no way for you to fix this."),
+                  (char*)&codec );
 }
 
 

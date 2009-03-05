@@ -33,7 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_sout.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -369,7 +369,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Err( p_stream, "no suitable sout access module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_dst );
-        intf_UserFatal( p_stream, false,
+        dialog_Fatal( p_stream,
                     _("Streaming / Transcoding failed"),
                     _("There is no suitable stream-output access module for \"%s/%s://%s\"."),
                           psz_access,
@@ -384,7 +384,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Err( p_stream, "no suitable sout mux module for `%s/%s://%s'",
                  psz_access, psz_mux, psz_dst );
-        intf_UserFatal( p_stream, false,
+        dialog_Fatal( p_stream,
                         _("Streaming / Transcoding failed"),
                         _("There is no suitable stream-output access module "\
                           "for \"%s/%s://%s\"."),
