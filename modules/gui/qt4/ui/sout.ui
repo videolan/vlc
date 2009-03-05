@@ -1,526 +1,567 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <author>Jean-Baptiste Kempf</author>
  <class>Sout</class>
- <widget class="QWidget" name="Sout" >
-  <property name="geometry" >
+ <widget class="QWidget" name="Sout">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>651</height>
+    <width>711</width>
+    <height>470</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>_("Stream Output")</string>
+  <property name="windowTitle">
+   <string>_(&quot;Stream Output&quot;)</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" >
-   <item row="0" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
-      <string>_("Outputs")</string>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QToolBox" name="toolBox">
+     <property name="currentIndex">
+      <number>2</number>
      </property>
-     <layout class="QHBoxLayout" >
-      <item>
-       <layout class="QGridLayout" >
-        <item row="0" column="1" colspan="2" >
-         <widget class="QCheckBox" name="localOutput" >
-          <property name="text" >
-           <string>_("Play locally")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2" >
-         <widget class="QCheckBox" name="fileOutput" >
-          <property name="contextMenuPolicy" >
-           <enum>Qt::NoContextMenu</enum>
-          </property>
-          <property name="text" >
-           <string>_("File")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" >
-         <widget class="QLabel" name="fileLabel" >
-          <property name="text" >
-           <string>_("Filename")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4" >
-         <widget class="QLineEdit" name="fileEdit" />
-        </item>
-        <item row="1" column="5" >
-         <widget class="QPushButton" name="fileSelectButton" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text" >
-           <string>_("Browse...")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="6" >
-         <widget class="QCheckBox" name="rawInput" >
-          <property name="text" >
-           <string>_("Dump raw input")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="2" >
-         <widget class="QCheckBox" name="HTTPOutput" >
-          <property name="text" >
-           <string>HTTP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3" >
-         <widget class="QLabel" name="HTTPLabel" >
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="4" >
-         <widget class="QLineEdit" name="HTTPEdit" />
-        </item>
-        <item row="2" column="5" >
-         <widget class="QLabel" name="HTTPPortLabel" >
-          <property name="text" >
-           <string>_("Port:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="6" >
-         <widget class="QSpinBox" name="HTTPPort" >
-          <property name="maximumSize" >
-           <size>
-            <width>90</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="minimum" >
-           <number>1</number>
-          </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-          <property name="singleStep" >
-           <number>1</number>
-          </property>
-          <property name="value" >
-           <number>8080</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2" >
-         <widget class="QCheckBox" name="MMSHOutput" >
-          <property name="text" >
-           <string>MMSH</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3" >
-         <widget class="QLabel" name="MMSHLabel" >
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4" >
-         <widget class="QLineEdit" name="MMSHEdit" />
-        </item>
-        <item row="3" column="5" >
-         <widget class="QLabel" name="MMSHPortLabel" >
-          <property name="text" >
-           <string>_("Port:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="6" >
-         <widget class="QSpinBox" name="MMSHPort" >
-          <property name="maximumSize" >
-           <size>
-            <width>90</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="minimum" >
-           <number>1</number>
-          </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-          <property name="value" >
-           <number>1234</number>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="2" >
-         <widget class="QCheckBox" name="RTPOutput" >
-          <property name="text" >
-           <string>RTP</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3" >
-         <widget class="QLabel" name="RTPLabel" >
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="4" >
-         <widget class="QLineEdit" name="RTPEdit" />
-        </item>
-        <item row="4" column="5" >
-         <widget class="QLabel" name="RTPPortLabel" >
-          <property name="text" >
-           <string>_("Port:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="6" >
-         <widget class="QSpinBox" name="RTPPort" >
-          <property name="maximumSize" >
-           <size>
-            <width>90</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="minimum" >
-           <number>1</number>
-          </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-          <property name="value" >
-           <number>1234</number>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3" >
-         <widget class="QLabel" name="UDPLabel" >
-          <property name="enabled" >
-           <bool>true</bool>
-          </property>
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="4" >
-         <widget class="QLineEdit" name="UDPEdit" />
-        </item>
-        <item row="5" column="5" >
-         <widget class="QLabel" name="UDPPortLabel" >
-          <property name="text" >
-           <string>_("Port")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="6" >
-         <widget class="QSpinBox" name="UDPPort" >
-          <property name="maximumSize" >
-           <size>
-            <width>90</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="accelerated" >
-           <bool>true</bool>
-          </property>
-          <property name="minimum" >
-           <number>1</number>
-          </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-          <property name="value" >
-           <number>1234</number>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="5" >
-         <widget class="QLabel" name="RTPPortLabel2" >
-          <property name="text" >
-           <string>_("Video Port")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="6" >
-         <widget class="QSpinBox" name="RTPPort2" >
-          <property name="maximumSize" >
-           <size>
-            <width>90</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="accelerated" >
-           <bool>true</bool>
-          </property>
-          <property name="maximum" >
-           <number>65355</number>
-          </property>
-          <property name="value" >
-           <number>1234</number>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1" colspan="2" >
-         <widget class="QCheckBox" name="IcecastOutput" >
-          <property name="text" >
-           <string>IceCast</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="3" >
-         <widget class="QLabel" name="IcecastLabel" >
-          <property name="text" >
-           <string>_("Address")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="4" >
-         <widget class="QLineEdit" name="IcecastEdit" />
-        </item>
-        <item row="7" column="5" >
-         <widget class="QLabel" name="IcecastPortLabel" >
-          <property name="text" >
-           <string>_("Port:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="6" >
-         <widget class="QSpinBox" name="IcecastPort" >
-          <property name="maximumSize" >
-           <size>
-            <width>90</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="maximum" >
-           <number>65535</number>
-          </property>
-          <property name="value" >
-           <number>1024</number>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="3" >
-         <widget class="QLabel" name="IcecastMountpointLabel" >
-          <property name="text" >
-           <string>_("Mount Point")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="4" >
-         <widget class="QLineEdit" name="IcecastMountpointEdit" />
-        </item>
-        <item row="8" column="5" >
-         <widget class="QLabel" name="IcecastNameLabel" >
-          <property name="text" >
-           <string>_("Login:pass:")</string>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="6" >
-         <widget class="QLineEdit" name="IcecastNamePassEdit" />
-        </item>
-        <item rowspan="2" row="5" column="2" >
-         <widget class="QLabel" name="UDPRTPLabel" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Preferred" hsizetype="Maximum" >
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize" >
-           <size>
-            <width>100</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text" >
-           <string>_("Prefer UDP over RTP")</string>
-          </property>
-          <property name="textFormat" >
-           <enum>Qt::PlainText</enum>
-          </property>
-          <property name="alignment" >
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-          </property>
-          <property name="wordWrap" >
-           <bool>true</bool>
-          </property>
-          <property name="buddy" >
-           <cstring>UDPOutput</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1" >
-         <widget class="QCheckBox" name="UDPOutput" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="toolTip" >
-           <string>_("Using this option is not recommended in most of the cases.")</string>
-          </property>
-          <property name="text" >
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+     <widget class="QWidget" name="page">
+      <attribute name="label">
+       <string>_(&quot;Source&quot;)</string>
+      </attribute>
+     </widget>
+     <widget class="QWidget" name="page_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>708</width>
+        <height>308</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string notr="true">_(&quot;Destination&quot;)</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="_3">
+         <item row="0" column="1" colspan="2">
+          <widget class="QCheckBox" name="localOutput">
+           <property name="text">
+            <string>_(&quot;Play locally&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" colspan="2">
+          <widget class="QCheckBox" name="fileOutput">
+           <property name="contextMenuPolicy">
+            <enum>Qt::NoContextMenu</enum>
+           </property>
+           <property name="text">
+            <string>_(&quot;File&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="fileLabel">
+           <property name="text">
+            <string>_(&quot;Filename&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="4">
+          <widget class="QLineEdit" name="fileEdit"/>
+         </item>
+         <item row="1" column="5">
+          <widget class="QPushButton" name="fileSelectButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>_(&quot;Browse...&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="6">
+          <widget class="QCheckBox" name="rawInput">
+           <property name="text">
+            <string>_(&quot;Dump raw input&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1" colspan="2">
+          <widget class="QCheckBox" name="HTTPOutput">
+           <property name="text">
+            <string>HTTP</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QLabel" name="HTTPLabel">
+           <property name="text">
+            <string>_(&quot;Address&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="4">
+          <widget class="QLineEdit" name="HTTPEdit"/>
+         </item>
+         <item row="2" column="5">
+          <widget class="QLabel" name="HTTPPortLabel">
+           <property name="text">
+            <string>_(&quot;Port:&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="6">
+          <widget class="QSpinBox" name="HTTPPort">
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>8080</number>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1" colspan="2">
+          <widget class="QCheckBox" name="MMSHOutput">
+           <property name="text">
+            <string>MMSH</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="3">
+          <widget class="QLabel" name="MMSHLabel">
+           <property name="text">
+            <string>_(&quot;Address&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="4">
+          <widget class="QLineEdit" name="MMSHEdit"/>
+         </item>
+         <item row="3" column="5">
+          <widget class="QLabel" name="MMSHPortLabel">
+           <property name="text">
+            <string>_(&quot;Port:&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="6">
+          <widget class="QSpinBox" name="MMSHPort">
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+           <property name="value">
+            <number>1234</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1" colspan="2">
+          <widget class="QCheckBox" name="RTPOutput">
+           <property name="text">
+            <string>RTP</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QLabel" name="RTPLabel">
+           <property name="text">
+            <string>_(&quot;Address&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="4">
+          <widget class="QLineEdit" name="RTPEdit"/>
+         </item>
+         <item row="4" column="5">
+          <widget class="QLabel" name="RTPPortLabel">
+           <property name="text">
+            <string>_(&quot;Port:&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="6">
+          <widget class="QSpinBox" name="RTPPort">
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+           <property name="value">
+            <number>1234</number>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="3">
+          <widget class="QLabel" name="UDPLabel">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>_(&quot;Address&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="4">
+          <widget class="QLineEdit" name="UDPEdit"/>
+         </item>
+         <item row="5" column="5">
+          <widget class="QLabel" name="UDPPortLabel">
+           <property name="text">
+            <string>_(&quot;Port&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="6">
+          <widget class="QSpinBox" name="UDPPort">
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+           <property name="value">
+            <number>1234</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="5">
+          <widget class="QLabel" name="RTPPortLabel2">
+           <property name="text">
+            <string>_(&quot;Video Port&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="6">
+          <widget class="QSpinBox" name="RTPPort2">
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="accelerated">
+            <bool>true</bool>
+           </property>
+           <property name="maximum">
+            <number>65355</number>
+           </property>
+           <property name="value">
+            <number>1234</number>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1" colspan="2">
+          <widget class="QCheckBox" name="IcecastOutput">
+           <property name="text">
+            <string>IceCast</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="3">
+          <widget class="QLabel" name="IcecastLabel">
+           <property name="text">
+            <string>_(&quot;Address&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="4">
+          <widget class="QLineEdit" name="IcecastEdit"/>
+         </item>
+         <item row="7" column="5">
+          <widget class="QLabel" name="IcecastPortLabel">
+           <property name="text">
+            <string>_(&quot;Port:&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="6">
+          <widget class="QSpinBox" name="IcecastPort">
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="maximum">
+            <number>65535</number>
+           </property>
+           <property name="value">
+            <number>1024</number>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="3">
+          <widget class="QLabel" name="IcecastMountpointLabel">
+           <property name="text">
+            <string>_(&quot;Mount Point&quot;)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="4">
+          <widget class="QLineEdit" name="IcecastMountpointEdit"/>
+         </item>
+         <item row="8" column="5">
+          <widget class="QLabel" name="IcecastNameLabel">
+           <property name="text">
+            <string>_(&quot;Login:pass:&quot;)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="6">
+          <widget class="QLineEdit" name="IcecastNamePassEdit"/>
+         </item>
+         <item row="5" column="2" rowspan="2">
+          <widget class="QLabel" name="UDPRTPLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>_(&quot;Prefer UDP over RTP&quot;)</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="buddy">
+            <cstring>UDPOutput</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="UDPOutput">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>_(&quot;Using this option is not recommended in most of the cases.&quot;)</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>693</width>
+        <height>330</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>_(&quot;Transcoding&quot;)</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="VLCProfileSelector" name="profileSelect" native="true"/>
+       </item>
+       <item row="2" column="0">
+        <widget class="Line" name="line_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>_(&quot;Miscellaneous&quot;)</string>
+         </property>
+         <layout class="QHBoxLayout" name="_5">
+          <item>
+           <layout class="QGridLayout" name="_6">
+            <item row="0" column="0">
+             <widget class="QCheckBox" name="sap">
+              <property name="text">
+               <string>_(&quot;SAP announce&quot;)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLabel" name="sapGroupLabel">
+              <property name="text">
+               <string>_(&quot;Group name&quot;)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLineEdit" name="sapGroup"/>
+            </item>
+            <item row="1" column="4">
+             <widget class="QSpinBox" name="ttl">
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="QLineEdit" name="sapName"/>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QCheckBox" name="soutAll">
+              <property name="text">
+               <string>_(&quot;Stream all elementary streams&quot;)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QLabel" name="ttlLabel">
+              <property name="text">
+               <string>_(&quot;Time-To-Live (TTL)&quot;)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0" colspan="2">
+             <widget class="QCheckBox" name="soutKeep">
+              <property name="text">
+               <string>_(&quot;Keep stream output open&quot;)</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>_(&quot;Generated stream output string&quot;)</string>
+         </property>
+         <layout class="QHBoxLayout" name="_4">
+          <item>
+           <widget class="QTextEdit" name="mrlEdit">
+            <property name="acceptRichText">
+             <bool>false</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2" >
-    <widget class="Line" name="line" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="Line" name="line_2" >
-     <property name="orientation" >
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox_3" >
-     <property name="title" >
-      <string>_("Miscellaneous")</string>
-     </property>
-     <layout class="QHBoxLayout" >
-      <item>
-       <layout class="QGridLayout" >
-        <item row="0" column="0" >
-         <widget class="QCheckBox" name="sap" >
-          <property name="text" >
-           <string>_("SAP announce")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" >
-         <widget class="QLabel" name="sapGroupLabel" >
-          <property name="text" >
-           <string>_("Group name")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="4" >
-         <widget class="QLineEdit" name="sapGroup" />
-        </item>
-        <item row="1" column="4" >
-         <widget class="QSpinBox" name="ttl" >
-          <property name="alignment" >
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="minimum" >
-           <number>1</number>
-          </property>
-          <property name="maximum" >
-           <number>255</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1" colspan="2" >
-         <widget class="QLineEdit" name="sapName" />
-        </item>
-        <item row="1" column="0" colspan="2" >
-         <widget class="QCheckBox" name="soutAll" >
-          <property name="text" >
-           <string>_("Stream all elementary streams")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3" >
-         <widget class="QLabel" name="ttlLabel" >
-          <property name="text" >
-           <string>_("Time-To-Live (TTL)")</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2" >
-         <widget class="QCheckBox" name="soutKeep" >
-          <property name="text" >
-           <string>_("Keep stream output open")</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox_4" >
-     <property name="title" >
-      <string>_("Generated stream output string")</string>
-     </property>
-     <layout class="QHBoxLayout" >
-      <item>
-       <widget class="QLineEdit" name="mrlEdit" />
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="2" >
-    <layout class="QHBoxLayout" >
+   <item>
+    <layout class="QHBoxLayout">
      <item>
       <spacer>
-       <property name="orientation" >
+       <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
          <height>20</height>
@@ -529,16 +570,13 @@
       </spacer>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="acceptButtonBox" >
-       <property name="standardButtons" >
+      <widget class="QDialogButtonBox" name="acceptButtonBox">
+       <property name="standardButtons">
         <set>QDialogButtonBox::NoButton</set>
        </property>
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="VLCProfileSelector" native="1" name="profileSelect" />
    </item>
   </layout>
  </widget>
@@ -551,518 +589,5 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>MMSHOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>MMSHLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>41</x>
-     <y>155</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>145</x>
-     <y>155</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>MMSHOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>MMSHEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>65</x>
-     <y>155</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>270</x>
-     <y>155</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>MMSHOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>MMSHPortLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>54</x>
-     <y>155</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>416</x>
-     <y>155</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>RTPPortLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>54</x>
-     <y>186</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>426</x>
-     <y>186</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>RTPPort</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>38</x>
-     <y>186</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>549</x>
-     <y>186</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>MMSHOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>MMSHPort</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>51</x>
-     <y>155</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>549</x>
-     <y>155</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sap</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>sapName</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>98</x>
-     <y>474</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>198</x>
-     <y>466</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sap</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>sapGroupLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>41</x>
-     <y>465</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>335</x>
-     <y>472</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sap</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>sapGroup</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>33</x>
-     <y>470</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>459</x>
-     <y>464</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>HTTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>HTTPLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>49</x>
-     <y>105</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>155</x>
-     <y>117</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>HTTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>HTTPEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>34</x>
-     <y>104</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>264</x>
-     <y>115</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>HTTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>HTTPPortLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>26</x>
-     <y>108</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>425</x>
-     <y>114</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>HTTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>HTTPPort</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>67</x>
-     <y>104</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>543</x>
-     <y>114</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fileOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>fileLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>108</x>
-     <y>92</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>120</x>
-     <y>95</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fileOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>fileEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>61</x>
-     <y>81</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>288</x>
-     <y>82</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fileOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>fileSelectButton</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>25</x>
-     <y>88</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>443</x>
-     <y>86</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fileOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>rawInput</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>25</x>
-     <y>79</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>552</x>
-     <y>90</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rawInput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>HTTPOutput</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>605</x>
-     <y>71</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>24</x>
-     <y>115</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rawInput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>groupBox_3</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>583</x>
-     <y>76</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>518</x>
-     <y>427</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>96</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>296</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>96</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>227</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastPortLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>96</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>377</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastPort</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>96</x>
-     <y>171</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>488</x>
-     <y>171</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastMountpointEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>91</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>306</x>
-     <y>175</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastMountpointLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>91</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>226</x>
-     <y>175</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastNameLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>91</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>388</x>
-     <y>175</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>IcecastOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>IcecastNamePassEdit</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>91</x>
-     <y>154</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>526</x>
-     <y>175</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>UDPOutput</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>110</x>
-     <y>190</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>110</x>
-     <y>225</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>UDPPort</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>110</x>
-     <y>190</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>597</x>
-     <y>225</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>UDPPortLabel</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>110</x>
-     <y>190</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>497</x>
-     <y>225</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>RTPPort2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>110</x>
-     <y>190</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>597</x>
-     <y>260</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>RTPOutput</sender>
-   <signal>clicked(bool)</signal>
-   <receiver>RTPPortLabel2</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>110</x>
-     <y>190</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>497</x>
-     <y>260</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

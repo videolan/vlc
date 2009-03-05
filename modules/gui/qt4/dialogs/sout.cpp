@@ -262,7 +262,7 @@ void SoutDialog::RTPtoggled( bool b_en )
 
 void SoutDialog::ok()
 {
-    mrl = ui.mrlEdit->text();
+    mrl = ui.mrlEdit->toPlainText();
     accept();
 }
 
@@ -484,7 +484,7 @@ void SoutDialog::updateMRL()
     if ( sout.b_sout_keep )
         mrl.append( " :sout-keep" );
 
-    ui.mrlEdit->setText( mrl );
+    ui.mrlEdit->setPlainText( mrl );
     free( sout.psz_file );free( sout.psz_http ); free( sout.psz_mms );
     free( sout.psz_rtp ); free( sout.psz_udp ); free( sout.psz_mux );
     free( sout.psz_name ); free( sout.psz_group );
