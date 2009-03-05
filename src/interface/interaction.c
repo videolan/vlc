@@ -155,7 +155,11 @@ __intf_Progress( vlc_object_t *p_this, const char *psz_title,
     else
         p_new->i_flags = DIALOG_INTF_PROGRESS;
 
-    DialogSend( p_new );
+    if( DialogSend( p_new ) == VLC_EGENERIC )
+    {
+        DialogDestroy( p_new );
+        return NULL;
+    }
     return p_new;
 }
 
