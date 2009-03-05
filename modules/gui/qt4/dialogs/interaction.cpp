@@ -240,7 +240,7 @@ void InteractionDialog::otherB()
 
 void InteractionDialog::Finish( int i_ret )
 {
-    vlc_object_lock( (vlc_object_t *)(p_dialog->p_interaction) );
+    vlc_mutex_lock( p_dialog->p_lock );
 
     /* Special cases when we have to return psz to the core */
     if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
@@ -262,7 +262,8 @@ void InteractionDialog::Finish( int i_ret )
         p_dialog->i_flags & DIALOG_INTF_PROGRESS )
         p_dialog->b_cancelled = true;
 
+    vlc_mutex_unlock( p_dialog->p_lock );
+
     hide();
-    vlc_object_unlock( (vlc_object_t *)(p_dialog->p_interaction) );
 }
 

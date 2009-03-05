@@ -221,10 +221,10 @@ struct interaction_dialog_t
     int             i_flags;            ///< Misc flags
     int             i_return;           ///< Return status
 
-    interaction_t  *p_interaction;      ///< Parent interaction object
     vlc_object_t   *p_parent;           ///< The vlc object that asked
                                         //for interaction
     intf_thread_t  *p_interface;
+    vlc_mutex_t    *p_lock;
 };
 
 /**
