@@ -148,6 +148,7 @@ private slots:
     void changeUDPandRTPmess( bool );
     void RTPtoggled( bool );
     void next();
+    void prev();
 };
 
 #endif

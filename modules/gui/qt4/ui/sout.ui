@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>715</width>
-    <height>507</height>
+    <width>651</width>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,15 +25,74 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>697</width>
-        <height>381</height>
+        <width>633</width>
+        <height>414</height>
        </rect>
       </property>
       <attribute name="label">
        <string>_(&quot;Source&quot;)</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="0">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0" colspan="2">
+        <widget class="QPlainTextEdit" name="helpEdit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>220</red>
+               <green>220</green>
+               <blue>220</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>220</red>
+               <green>220</green>
+               <blue>220</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>255</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="SoutInputBox" name="inputBox"/>
+       </item>
+       <item row="2" column="0" colspan="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -41,12 +100,12 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>581</width>
-           <height>321</height>
+           <height>10</height>
           </size>
          </property>
         </spacer>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -59,17 +118,10 @@
          </property>
         </spacer>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QPushButton" name="nextButton">
          <property name="text">
           <string>_(&quot;Next&quot;)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" colspan="2">
-        <widget class="SoutInputBox" name="inputBox">
-         <property name="title">
-          <string>GroupBox</string>
          </property>
         </widget>
        </item>
@@ -80,15 +132,15 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>653</width>
-        <height>367</height>
+        <width>649</width>
+        <height>399</height>
        </rect>
       </property>
       <attribute name="label">
        <string>_(&quot;Destination&quot;)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0" colspan="2">
+       <item row="0" column="0" colspan="3">
         <layout class="QGridLayout" name="_3">
          <item row="0" column="1" colspan="2">
           <widget class="QCheckBox" name="localOutput">
@@ -486,6 +538,13 @@
         </layout>
        </item>
        <item row="1" column="0">
+        <widget class="QPushButton" name="prevButton">
+         <property name="text">
+          <string>_(&quot;Previous&quot;)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -498,7 +557,7 @@
          </property>
         </spacer>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="2">
         <widget class="QPushButton" name="nextButton2">
          <property name="text">
           <string>_(&quot;Next&quot;)</string>
@@ -512,99 +571,95 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>604</width>
-        <height>310</height>
+        <width>633</width>
+        <height>414</height>
        </rect>
       </property>
       <attribute name="label">
        <string>_(&quot;Transcoding&quot;)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
+       <item row="0" column="0" colspan="2">
         <widget class="Line" name="line">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" colspan="2">
         <widget class="VLCProfileSelector" name="profileSelect" native="true"/>
        </item>
-       <item row="2" column="0">
+       <item row="2" column="0" colspan="2">
         <widget class="Line" name="line_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="3" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
           <string>_(&quot;Miscellaneous&quot;)</string>
          </property>
-         <layout class="QHBoxLayout" name="_5">
-          <item>
-           <layout class="QGridLayout" name="_6">
-            <item row="0" column="0">
-             <widget class="QCheckBox" name="sap">
-              <property name="text">
-               <string>_(&quot;SAP announce&quot;)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="3">
-             <widget class="QLabel" name="sapGroupLabel">
-              <property name="text">
-               <string>_(&quot;Group name&quot;)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="4">
-             <widget class="QLineEdit" name="sapGroup"/>
-            </item>
-            <item row="1" column="4">
-             <widget class="QSpinBox" name="ttl">
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1" colspan="2">
-             <widget class="QLineEdit" name="sapName"/>
-            </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QCheckBox" name="soutAll">
-              <property name="text">
-               <string>_(&quot;Stream all elementary streams&quot;)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
-             <widget class="QLabel" name="ttlLabel">
-              <property name="text">
-               <string>_(&quot;Time-To-Live (TTL)&quot;)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="QCheckBox" name="soutKeep">
-              <property name="text">
-               <string>_(&quot;Keep stream output open&quot;)</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="0" colspan="3">
+           <widget class="QCheckBox" name="soutAll">
+            <property name="text">
+             <string>_(&quot;Stream all elementary streams&quot;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3" rowspan="2" colspan="2">
+           <widget class="QCheckBox" name="soutKeep">
+            <property name="text">
+             <string>_(&quot;Keep stream output open&quot;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" rowspan="2">
+           <widget class="QCheckBox" name="sap">
+            <property name="text">
+             <string>_(&quot;SAP announce&quot;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1" rowspan="2" colspan="2">
+           <widget class="QLineEdit" name="sapName"/>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLabel" name="sapGroupLabel">
+            <property name="text">
+             <string>_(&quot;Group name&quot;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="4">
+           <widget class="QLineEdit" name="sapGroup"/>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QLabel" name="ttlLabel">
+            <property name="text">
+             <string>_(&quot;Time-To-Live (TTL)&quot;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="ttl">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>255</number>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="4" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
           <string>_(&quot;Generated stream output string&quot;)</string>
@@ -619,6 +674,26 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QPushButton" name="prevButton2">
+         <property name="text">
+          <string>_(&quot;Previous&quot;)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>507</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>

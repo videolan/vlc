@@ -97,6 +97,11 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, QString inputMR
     /* UI stuff */
     ui.setupUi( this );
     ui.inputBox->setMRL( inputMRL );
+    ui.helpEdit->setPlainText( "This dialog will allow you to stream or convert "
+            "your media, locally, on your private network or on the "
+            "Internet.\n"
+            "You should start by checking that your input matches what you "
+            "want and go on with the \"Next\" button.\n" );
 
     changeUDPandRTPmess( false );
 
@@ -154,12 +159,20 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, QString inputMR
 
     BUTTONACT( ui.nextButton, next() );
     BUTTONACT( ui.nextButton2, next() );
+    BUTTONACT( ui.prevButton, prev() );
+    BUTTONACT( ui.prevButton2, prev() );
 }
 
 void SoutDialog::next()
 {
     ui.toolBox->setCurrentIndex( ui.toolBox->currentIndex() + 1 );
 }
+
+void SoutDialog::prev()
+{
+    ui.toolBox->setCurrentIndex( ui.toolBox->currentIndex() - 1 );
+}
+
 
 void SoutDialog::fileBrowse()
 {
