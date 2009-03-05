@@ -1185,6 +1185,8 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     return VLC_SUCCESS;
 };
 
+static vlc_mutex_t exit_lock = VLC_STATIC_MUTEX;
+
 /**
  * Waits until the LibVLC instance gets an exit signal. Normally, this happens
  * when the user "exits" an interface plugin.
@@ -1192,12 +1194,11 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
 void libvlc_InternalWait( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv( p_libvlc );
-    vlc_object_internals_t *internals = vlc_internals( p_libvlc );
 
-    vlc_object_lock( p_libvlc );
+    vlc_mutex_lock( &exit_lock );
     while( vlc_object_alive( p_libvlc ) )
-        vlc_cond_wait( &priv->exiting, &internals->lock );
-    vlc_object_unlock( p_libvlc );
+        vlc_cond_wait( &priv->exiting, &exit_lock );
+    vlc_mutex_unlock( &exit_lock );
 }
 
 /**
@@ -1208,8 +1209,10 @@ void libvlc_Quit( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv( p_libvlc );
 
+    vlc_mutex_lock( &exit_lock );
     vlc_object_kill( p_libvlc );
-    vlc_cond_signal( &priv->exiting ); /* OK, kill took care of the lock */
+    vlc_cond_signal( &priv->exiting );
+    vlc_mutex_unlock( &exit_lock );
 }
 
 #if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
