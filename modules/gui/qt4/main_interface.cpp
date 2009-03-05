@@ -61,6 +61,7 @@
 
 #include <vlc_keys.h> /* Wheel event */
 #include <vlc_vout.h>
+#include <vlc_dialog.h>
 
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -69,6 +70,8 @@ static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param );
 static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
                              vlc_value_t, void *);
+static int DialogCallback( vlc_object_t *, const char *,
+                            vlc_value_t, vlc_value_t, void *);
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
@@ -203,6 +206,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     interaction_Register( p_intf );
 
+    var_Create( p_intf, "dialog-fatal", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-fatal", DialogCallback, this );
+    dialog_Register( p_intf );
+
     var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
@@ -316,6 +323,9 @@ MainInterface::~MainInterface()
 
     interaction_Unregister( p_intf );
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
+
+    dialog_Unregister( p_intf );
+    var_DelCallback( p_intf, "dialog-fatal", DialogCallback, this );
 
     p_intf->p_sys->p_mi = NULL;
 }
@@ -1209,6 +1219,21 @@ static int InteractCallback( vlc_object_t *p_this,
     p_arg->p_dialog = (interaction_dialog_t *)(new_val.p_address);
     DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
     QApplication::postEvent( THEDP, event );
+    return VLC_SUCCESS;
+}
+
+static int DialogCallback( vlc_object_t *p_this,
+                           const char *type, vlc_value_t previous,
+                           vlc_value_t value, void *data )
+{
+    MainInterface *self = (MainInterface *)data;
+    const dialog_fatal_t *dialog = (const dialog_fatal_t *)value.p_address;
+
+    if (!strcmp (type, "dialog-fatal"))
+        printf ("ERROR: %s\n %s\n", dialog->title, dialog->message);
+
+    /* FIXME!!! */
+    (void) previous;
     return VLC_SUCCESS;
 }
 
