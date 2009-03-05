@@ -572,8 +572,6 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
-        /* We have no children */
-        assert (internals->i_children == 0);
         parent = p_this->p_parent;
 
 #ifndef NDEBUG
@@ -607,6 +605,9 @@ void __vlc_object_release( vlc_object_t *p_this )
         if (parent)
             /* Detach from parent to protect against FIND_CHILDREN */
             vlc_object_detach_unlocked (p_this);
+
+        /* We have no children */
+        assert (internals->i_children == 0);
     }
     libvlc_unlock (p_this->p_libvlc);
 

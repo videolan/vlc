@@ -1134,6 +1134,12 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     vlc_mutex_destroy( &priv->config_lock );
     vlc_mutex_destroy( &priv->timer_lock );
 
+#ifndef NDEBUG /* Hack to dump leaked objects tree */
+    if( vlc_internals( p_libvlc )->i_refcount > 1 )
+        while( vlc_internals( p_libvlc )->i_refcount > 0 )
+            vlc_object_release( p_libvlc );
+#endif
+
     assert( vlc_internals( p_libvlc )->i_refcount == 1 );
     vlc_object_release( p_libvlc );
 }
