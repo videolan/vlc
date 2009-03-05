@@ -370,6 +370,8 @@ error:
 #define close( a )       closesocket (a)
 #endif /* WIN32 */
 
+static vlc_mutex_t pipe_lock = VLC_STATIC_MUTEX;
+
 /**
  * Returns the readable end of a pipe that becomes readable once termination
  * of the object is requested (vlc_object_kill()).
@@ -386,7 +388,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
 {
     vlc_object_internals_t *internals = vlc_internals( obj );
 
-    vlc_object_lock (obj);
+    vlc_mutex_lock (&pipe_lock);
     if (internals->pipes[0] == -1)
     {
         /* This can only ever happen if someone killed us without locking: */
@@ -407,7 +409,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
             write (internals->pipes[1], &(uint64_t){ 1 }, sizeof (uint64_t));
         }
     }
-    vlc_object_unlock (obj);
+    vlc_mutex_unlock (&pipe_lock);
     return internals->pipes[0];
 }
 
@@ -422,7 +424,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     int fd = -1;
 
     vlc_thread_cancel( p_this );
-    vlc_object_lock( p_this );
+    vlc_mutex_lock( &pipe_lock );
     if( !p_this->b_die )
     {
         fd = priv->pipes[1];
@@ -430,7 +432,7 @@ void __vlc_object_kill( vlc_object_t *p_this )
     }
 
     /* This also serves as a memory barrier toward vlc_object_alive(): */
-    vlc_object_unlock( p_this );
+    vlc_mutex_unlock( &pipe_lock );
 
     if (fd != -1)
     {
