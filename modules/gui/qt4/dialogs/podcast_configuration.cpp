@@ -72,7 +72,7 @@ void PodcastConfigDialog::accept()
         urls +=  ui.podcastList->item(i)->text();
         if( i != ui.podcastList->count()-1 ) urls += "|";
     }
-    const char *psz_urls = strdup( qtu( urls ) );
+    const char *psz_urls = qtu( urls );
     config_PutPsz( p_intf, "podcast-urls", psz_urls );
     vlc_object_t *p_obj = (vlc_object_t*)
                           vlc_object_find_name( p_intf->p_libvlc,
