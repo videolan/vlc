@@ -146,6 +146,7 @@ private slots:
     void setRawOptions( bool );
     void changeUDPandRTPmess( bool );
     void RTPtoggled( bool );
+    void next();
 };
 
 #endif

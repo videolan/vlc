@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>711</width>
-    <height>470</height>
+    <width>715</width>
+    <height>507</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,27 +18,77 @@
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="page">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>697</width>
+        <height>389</height>
+       </rect>
+      </property>
       <attribute name="label">
        <string>_(&quot;Source&quot;)</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="1" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>581</width>
+           <height>321</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>581</width>
+           <height>26</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="nextButton">
+         <property name="text">
+          <string>_(&quot;Next&quot;)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" colspan="2">
+        <widget class="SoutInputBox" name="groupBox">
+         <property name="title">
+          <string>GroupBox</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="page_3">
       <property name="geometry">
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>708</width>
-        <height>308</height>
+        <width>697</width>
+        <height>389</height>
        </rect>
       </property>
       <attribute name="label">
-       <string notr="true">_(&quot;Destination&quot;)</string>
+       <string>_(&quot;Destination&quot;)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
+       <item row="0" column="0" colspan="2">
         <layout class="QGridLayout" name="_3">
          <item row="0" column="1" colspan="2">
           <widget class="QCheckBox" name="localOutput">
@@ -435,6 +485,26 @@
          </item>
         </layout>
        </item>
+       <item row="1" column="0">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>581</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="nextButton2">
+         <property name="text">
+          <string>_(&quot;Next&quot;)</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_4">
@@ -442,8 +512,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>693</width>
-        <height>330</height>
+        <width>697</width>
+        <height>389</height>
        </rect>
       </property>
       <attribute name="label">
@@ -555,28 +625,11 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout">
-     <item>
-      <spacer>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="acceptButtonBox">
-       <property name="standardButtons">
-        <set>QDialogButtonBox::NoButton</set>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QDialogButtonBox" name="acceptButtonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::NoButton</set>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -585,6 +638,12 @@
    <class>VLCProfileSelector</class>
    <extends>QWidget</extends>
    <header>components/sout/profile_selector.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SoutInputBox</class>
+   <extends>QGroupBox</extends>
+   <header>components/sout/sout_widgets.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

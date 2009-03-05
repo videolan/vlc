@@ -26,11 +26,11 @@
 
 #include "qt4.hpp"
 
-#include <QWidget>
+#include <QGroupBox>
 
 #include "util/qvlcframe.hpp"
 
-class SoutInputBox : public QWidget
+class SoutInputBox : public QGroupBox
 {
     public:
         SoutInputBox( QWidget *);

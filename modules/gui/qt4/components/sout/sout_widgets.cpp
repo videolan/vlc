@@ -28,13 +28,13 @@
 #include <QLabel>
 #include <QLineEdit>
 
-SoutInputBox::SoutInputBox( QWidget *_parent ) : QWidget( _parent )
+SoutInputBox::SoutInputBox( QWidget *_parent ) : QGroupBox( _parent )
 {
     /**
      * Source Block
      **/
-    QGroupBox *sourceBox = new QGroupBox( qtr( "Source" ) );
-    QGridLayout *sourceLayout = new QGridLayout( sourceBox );
+    setTitle( qtr( "Source" ) );
+    QGridLayout *sourceLayout = new QGridLayout( this );
 
     QLabel *sourceLabel = new QLabel( qtr( "Source:" ) );
     sourceLayout->addWidget( sourceLabel, 0, 0 );

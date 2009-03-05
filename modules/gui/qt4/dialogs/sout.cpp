@@ -33,6 +33,7 @@
 
 #include "dialogs/sout.hpp"
 #include "util/qt_dirs.hpp"
+#include "components/sout/sout_widgets.hpp"
 
 #include <QString>
 #include <QFileDialog>
@@ -150,6 +151,13 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf )
     CONNECT( ui.UDPOutput, toggled( bool ), this, changeUDPandRTPmess( bool ) );
     CONNECT( ui.RTPOutput, clicked(bool), this, RTPtoggled( bool ) );
 
+    BUTTONACT( ui.nextButton, next() );
+    BUTTONACT( ui.nextButton2, next() );
+}
+
+void SoutDialog::next()
+{
+    ui.toolBox->setCurrentIndex( ui.toolBox->currentIndex() + 1 );
 }
 
 void SoutDialog::fileBrowse()
