@@ -278,6 +278,23 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
 #define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 
 /**
+ * Set the value of a pointer variable
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param ptr The new pointer value of this variable
+ */
+static inline
+int var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
+{
+    vlc_value_t val;
+    val.p_address = ptr;
+    return var_SetChecked( p_obj, psz_name, VLC_VAR_ADDRESS, val );
+}
+#define var_SetAddress(o, n, p) var_SetAddress(VLC_OBJECT(o), n, p)
+
+
+/**
  * __var_SetBool() with automatic casting
  */
 #define var_SetBool(a,b,c)   __var_SetBool( VLC_OBJECT(a),b,c)
