@@ -1594,12 +1594,10 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         free( psz_status );
     }
 
-    vlc_object_lock( p_udt );
     while( vlc_object_alive( p_udt ) &&
            ( i_read = stream_Read( p_stream, p_buffer, 1 << 10 ) ) &&
            !intf_ProgressIsCancelled( p_progress ) )
     {
-        vlc_object_unlock( p_udt );
         if( fwrite( p_buffer, i_read, 1, p_file ) < 1 )
         {
             msg_Err( p_udt, "Failed to write into %s", psz_destfile );
@@ -1618,7 +1616,6 @@ static void* update_DownloadReal( vlc_object_t *p_this )
             free( psz_status );
         }
         free( psz_downloaded );
-        vlc_object_lock( p_udt );
     }
 
     /* Finish the progress bar or delete the file if the user had canceled */
@@ -1628,7 +1625,6 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     if( vlc_object_alive( p_udt ) &&
         !intf_ProgressIsCancelled( p_progress ) )
     {
-        vlc_object_unlock( p_udt );
         if( asprintf( &psz_status, _("%s\nDone %s (100.0%%)"),
             p_update->release.psz_url, psz_size ) != -1 )
         {
@@ -1639,7 +1635,6 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     }
     else
     {
-        vlc_object_unlock( p_udt );
         utf8_unlink( psz_destfile );
         goto end;
     }
