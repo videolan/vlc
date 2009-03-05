@@ -224,18 +224,30 @@ static int UnInhibit( intf_thread_t *p_intf )
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
+static void vlc_cleanup_playlist( void *p_playlist )
+{
+    pl_Release( (playlist_t*)p_playlist );
+}
 static void Run( intf_thread_t *p_intf )
 {
+    int canc = vlc_savecancel();
 
     playlist_t *p_playlist = pl_Hold( p_intf );
-    input_thread_t *p_input;
+
+    vlc_cleanup_push( vlc_cleanup_playlist, p_intf );
 
     for( ;; )
     {
-        /* Check playing state every 30 seconds */
+        vlc_restorecancel( canc );
+
+        /* FIXME wake up on playlist event instead ?
+         * Check playing state every 30 seconds */
         msleep( 30 * CLOCK_FREQ );
 
-        p_input = playlist_CurrentInput( p_playlist );
+        canc = vlc_savecancel();
+
+        /* */
+        input_thread_t *p_input = playlist_CurrentInput( p_playlist );
         if( p_input )
         {
             const int i_state = var_GetInteger( p_input, "state" );
@@ -262,5 +274,7 @@ static void Run( intf_thread_t *p_intf )
         }
     }
 
-    pl_Release( p_intf );
+    /* */
+    vlc_cleanup_run();
+    vlc_restorecancel( canc );
 }
