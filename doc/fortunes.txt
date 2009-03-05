@@ -76,20 +76,6 @@
 
   -- #videolan
 %
-<sam> CHRISTIAN
-<sam> MARILLAT
-<sam> IS
-<sam> A
-<sam> COMPLETE
-<sam>  ____ ___ ____ _  ___   _ _____    _    ____    _ 
-<sam> |  _ \_ _/ ___| |/ / | | | ____|  / \  |  _ \  | |
-<sam> | | | | | |   | ' /| |_| |  _|   / _ \ | | | | | |
-<sam> | |_| | | |___| . \|  _  | |___ / ___ \| |_| | |_|
-<sam> |____/___\____|_|\_\_| |_|_____/_/   \_\____/  (_)
-<sam> 
-
-  -- #videolan
-%
 <bozo> you really shouldn't have touched a computer when you were a little boy
 <stef> _it_ came to me
 
