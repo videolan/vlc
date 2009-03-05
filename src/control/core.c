@@ -43,6 +43,8 @@ void libvlc_exception_init( libvlc_exception_t *p_exception )
 
 void libvlc_exception_clear( libvlc_exception_t *p_exception )
 {
+    if( NULL == p_exception )
+        return;
     if( p_exception->psz_message != nomemstr )
         free( p_exception->psz_message );
     p_exception->psz_message = NULL;
