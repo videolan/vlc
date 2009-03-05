@@ -182,12 +182,6 @@
         [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel]
         addError: o_title withMsg: o_description];
     }
-    else if( p_dialog->i_flags & DIALOG_WARNING )
-    {
-        msg_Dbg( p_intf, "addition to non-blocking warning panel received" );
-        [[[[VLCMain sharedInstance] getInteractionList] getErrorPanel]
-            addWarning: o_title withMsg: o_description];
-    }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );

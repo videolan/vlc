@@ -125,29 +125,6 @@ int __intf_UserFatal( vlc_object_t *p_this, bool b_blocking,
 }
 
 /**
- * Helper function to send a warning, which is always shown non-blocking
- *
- * \param p_this     Parent vlc_object
- * \param psz_title  Title for the dialog
- * \param psz_format The message to display
- * \return           VLC_SUCCESS or VLC_EGENERIC
- */
-int __intf_UserWarn( vlc_object_t *p_this,
-                     const char *psz_title,
-                     const char *psz_format, ... )
-{
-    va_list args;
-    DIALOG_INIT( ONEWAY, VLC_EGENERIC );
-
-    p_new->psz_title = strdup( psz_title );
-    FORMAT_DESC;
-
-    p_new->i_flags = DIALOG_WARNING;
-
-    return DialogFireForget( p_new );
-}
-
-/**
  * Helper function to ask a yes-no-cancel question
  *
  * \param p_this           Parent vlc_object

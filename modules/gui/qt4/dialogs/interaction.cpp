@@ -61,13 +61,6 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
                  qfu( p_dialog->psz_title ), qfu( p_dialog->psz_description ) );
         i_ret = QMessageBox::AcceptRole;
     }
-    else if( p_dialog->i_flags & DIALOG_WARNING )
-    {
-        if( config_GetInt( p_intf, "qt-error-dialogs" ) != 0 )
-            ErrorsDialog::getInstance( p_intf )->addWarning(
-                qfu( p_dialog->psz_title ),qfu( p_dialog->psz_description ) );
-        i_ret = QMessageBox::AcceptRole;
-    }
     else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         p_dialog->i_status = SENT_DIALOG;

@@ -44,7 +44,7 @@ public:
     virtual ~ErrorsDialog() {};
 
     void addError( QString, QString );
-    void addWarning( QString, QString );
+    /*void addWarning( QString, QString );*/
 private:
     ErrorsDialog( QWidget *parent, intf_thread_t * );
     static ErrorsDialog *instance;

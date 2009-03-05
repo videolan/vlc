@@ -72,10 +72,10 @@ void ErrorsDialog::addError( QString title, QString text )
     add( true, title, text );
 }
 
-void ErrorsDialog::addWarning( QString title, QString text )
+/*void ErrorsDialog::addWarning( QString title, QString text )
 {
     add( false, title, text );
-}
+}*/
 
 void ErrorsDialog::add( bool error, QString title, QString text )
 {

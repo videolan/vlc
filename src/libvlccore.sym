@@ -202,7 +202,6 @@ __intf_UserFatal
 intf_UserHide
 __intf_UserLoginPassword
 __intf_UserStringInput
-__intf_UserWarn
 __intf_UserYesNo
 IsUTF8
 libvlc_InternalAddIntf
