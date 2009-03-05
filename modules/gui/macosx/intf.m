@@ -30,6 +30,7 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include <string.h>
+#include <vlc_common.h>
 #include <vlc_keys.h>
 #include <vlc_dialog.h>
 #include <unistd.h> /* execl() */
