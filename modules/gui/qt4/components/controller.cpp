@@ -999,6 +999,8 @@ void FullscreenControllerWidget::setVoutList( vout_thread_t **pp_vout, int i_vou
         fullscreenChanged( p_vout, false, 0 );
         vout.removeAll( p_vout );
         vlc_mutex_unlock( &lock );
+
+        vlc_object_release( VLC_OBJECT(p_vout) );
     }
 
     /* Vout to track */
@@ -1012,7 +1014,7 @@ void FullscreenControllerWidget::setVoutList( vout_thread_t **pp_vout, int i_vou
 
     foreach( vout_thread_t *p_vout, add )
     {
-        vlc_object_hold( (vlc_object_t*)p_vout );
+        vlc_object_hold( VLC_OBJECT(p_vout) );
 
         vlc_mutex_lock( &lock );
         vout.append( p_vout );
