@@ -259,6 +259,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv = libvlc_priv (p_libvlc);
     priv->p_playlist = NULL;
     priv->p_interaction = NULL;
+    priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
     p_libvlc->psz_object_name = strdup( "libvlc" );
 

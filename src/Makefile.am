@@ -50,6 +50,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_config.h \
 	../include/vlc_config_cat.h \
 	../include/vlc_configuration.h \
+	../include/vlc_dialog.h \
 	../include/vlc_demux.h \
 	../include/vlc_epg.h \
 	../include/vlc_es.h \
@@ -264,6 +265,7 @@ SOURCES_libvlc_common = \
 	libvlc-module.c \
 	missing.c \
 	version.c \
+	interface/dialog.c \
 	interface/interface.h \
 	interface/interface.c \
 	interface/intf_eject.c \
