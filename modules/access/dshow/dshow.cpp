@@ -463,7 +463,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     if( !b_use_video && !b_use_audio )
     {
         msg_Err( p_this, "No video or audio device selected" );
-        intf_UserFatal( p_this, false, _("Capturing failed"),
+        dialog_Fatal( p_this, _("Capture failed"),
                         _("No video or audio device delected.") );
         return VLC_EGENERIC ;
     }
@@ -540,7 +540,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         ( b_use_video && !b_use_audio && b_err_video ) )
     {
         msg_Err( p_this, "FATAL: could not open ANY device" ) ;
-        intf_UserFatal( p_this, false, _("Capturing failed"),
+        dialog_Fatal( p_this,  _("Capture failed"),
                         _("VLC cannot open ANY capture device."
                           "Check the error log for details.") );
         return VLC_EGENERIC ;
