@@ -28,12 +28,18 @@
 
 #include <QGroupBox>
 
-#include "util/qvlcframe.hpp"
+class QLineEdit;
+class QLabel;
 
 class SoutInputBox : public QGroupBox
 {
     public:
-        SoutInputBox( QWidget *);
+        SoutInputBox( QWidget *_parent = NULL, QString mrl = "" );
+
+        void setMRL( QString );
+    private:
+        QLineEdit *sourceLine;
+        QLabel *sourceValueLabel;
 
 };
 

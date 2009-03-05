@@ -28,7 +28,7 @@
 #include <QLabel>
 #include <QLineEdit>
 
-SoutInputBox::SoutInputBox( QWidget *_parent ) : QGroupBox( _parent )
+SoutInputBox::SoutInputBox( QWidget *_parent, QString mrl ) : QGroupBox( _parent )
 {
     /**
      * Source Block
@@ -39,14 +39,15 @@ SoutInputBox::SoutInputBox( QWidget *_parent ) : QGroupBox( _parent )
     QLabel *sourceLabel = new QLabel( qtr( "Source:" ) );
     sourceLayout->addWidget( sourceLabel, 0, 0 );
 
-    QLineEdit *sourceLine = new QLineEdit;
+    sourceLine = new QLineEdit;
     sourceLine->setReadOnly( true );
+    sourceLine->setText( mrl );
     sourceLabel->setBuddy( sourceLine );
     sourceLayout->addWidget( sourceLine, 0, 1 );
 
     QLabel *sourceTypeLabel = new QLabel( qtr( "Type:" ) );
     sourceLayout->addWidget( sourceTypeLabel, 1, 0 );
-    QLabel *sourceValueLabel = new QLabel;
+    sourceValueLabel = new QLabel;
     sourceLayout->addWidget( sourceValueLabel, 1, 1 );
 
     /* Line */
@@ -55,3 +56,17 @@ SoutInputBox::SoutInputBox( QWidget *_parent ) : QGroupBox( _parent )
     sourceLayout->addWidget( line, 2, 0, 1, -1 );
 }
 
+void SoutInputBox::setMRL( QString mrl )
+{
+    sourceLine->setText( mrl );
+    QString type;
+    int i = mrl.indexOf( "://" );
+    if( i != -1 )
+    {
+        printf( "%i\n", i );
+        type = mrl.left( i );
+    }
+    else
+        type = qtr( "File/Directory" );
+    sourceValueLabel->setText( type );
+}

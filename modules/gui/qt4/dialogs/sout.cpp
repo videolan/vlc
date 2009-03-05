@@ -89,13 +89,14 @@ struct sout_gui_descr_t
 
 SoutDialog* SoutDialog::instance = NULL;
 
-SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf )
+SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, QString inputMRL )
            : QVLCDialog( parent,  _p_intf )
 {
     setWindowTitle( qtr( "Stream Output" ) );
 
     /* UI stuff */
     ui.setupUi( this );
+    ui.inputBox->setMRL( inputMRL );
 
     changeUDPandRTPmess( false );
 

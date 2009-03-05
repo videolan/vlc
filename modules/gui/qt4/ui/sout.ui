@@ -26,7 +26,7 @@
         <x>0</x>
         <y>0</y>
         <width>697</width>
-        <height>389</height>
+        <height>381</height>
        </rect>
       </property>
       <attribute name="label">
@@ -67,7 +67,7 @@
         </widget>
        </item>
        <item row="0" column="0" colspan="2">
-        <widget class="SoutInputBox" name="groupBox">
+        <widget class="SoutInputBox" name="inputBox">
          <property name="title">
           <string>GroupBox</string>
          </property>
@@ -80,8 +80,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>697</width>
-        <height>389</height>
+        <width>653</width>
+        <height>367</height>
        </rect>
       </property>
       <attribute name="label">
@@ -512,8 +512,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>697</width>
-        <height>389</height>
+        <width>604</width>
+        <height>310</height>
        </rect>
       </property>
       <attribute name="label">

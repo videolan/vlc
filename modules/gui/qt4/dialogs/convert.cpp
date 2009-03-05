@@ -37,13 +37,16 @@
 #include <QFileDialog>
 #include <QCheckBox>
 
-ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf)
+ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
+                              QString inputMRL )
               : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "Convert" ) );
 
     QGridLayout *mainLayout = new QGridLayout( this );
-    mainLayout->addWidget( new SoutInputBox( this ), 0, 0, 1, -1  );
+    SoutInputBox *inputBox = new SoutInputBox( this );
+    inputBox->setMRL( inputMRL );
+    mainLayout->addWidget( inputBox, 0, 0, 1, -1  );
 
     /**
      * Destination

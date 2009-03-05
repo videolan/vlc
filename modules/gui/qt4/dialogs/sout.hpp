@@ -112,10 +112,11 @@ class SoutDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static SoutDialog* getInstance( QWidget *parent, intf_thread_t *p_intf )
+    static SoutDialog* getInstance( QWidget *parent, intf_thread_t *p_intf,
+                                    QString mrl = "" )
     {
         if( !instance )
-            instance = new SoutDialog( parent, p_intf );
+            instance = new SoutDialog( parent, p_intf, mrl );
         else
         {
             /* Recenter the dialog on the parent */
@@ -131,7 +132,7 @@ public:
 private:
     Ui::Sout ui;
     static SoutDialog *instance;
-    SoutDialog( QWidget* parent, intf_thread_t * );
+    SoutDialog( QWidget* parent, intf_thread_t *, QString mrl );
     QPushButton *okButton;
     QString mrl;
 
