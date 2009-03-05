@@ -1133,6 +1133,7 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
     vlc_mutex_destroy( &priv->config_lock );
     vlc_mutex_destroy( &priv->timer_lock );
 
+    assert( vlc_internals( p_libvlc )->i_refcount == 1 );
     vlc_object_release( p_libvlc );
 }
 
