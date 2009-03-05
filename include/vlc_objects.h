@@ -111,14 +111,6 @@ VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
     __vlc_list_children( VLC_OBJECT(a) )
 
 /* Objects and threading */
-VLC_EXPORT( void, __vlc_object_lock, ( vlc_object_t * ) );
-#define vlc_object_lock( obj ) \
-    __vlc_object_lock( VLC_OBJECT( obj ) )
-
-VLC_EXPORT( void, __vlc_object_unlock, ( vlc_object_t * ) );
-#define vlc_object_unlock( obj ) \
-    __vlc_object_unlock( VLC_OBJECT( obj ) )
-
 VLC_EXPORT( void, __vlc_object_kill, ( vlc_object_t * ) );
 #define vlc_object_kill(a) \
     __vlc_object_kill( VLC_OBJECT(a) )

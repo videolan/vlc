@@ -166,7 +166,6 @@ typedef struct vlc_object_internals_t
     bool            b_thread;
 
     /* Objects thread synchronization */
-    vlc_mutex_t     lock;
     int             pipes[2];
 
     /* Objects management */

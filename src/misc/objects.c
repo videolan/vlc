@@ -163,7 +163,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_new->p_private = NULL;
 
     /* Initialize mutexes and condvars */
-    vlc_mutex_init( &p_priv->lock );
     vlc_mutex_init( &p_priv->var_lock );
     vlc_cond_init( &p_priv->var_wait );
     p_priv->pipes[0] = p_priv->pipes[1] = -1;
@@ -292,7 +291,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     FREENULL( p_this->psz_object_name );
 
     vlc_spin_destroy( &p_priv->ref_spin );
-    vlc_mutex_destroy( &p_priv->lock );
     if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
         close( p_priv->pipes[1] );
     if( p_priv->pipes[0] != -1 )
@@ -303,19 +301,6 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     free( p_priv );
 }
 
-
-/** Inter-object signaling */
-
-void __vlc_object_lock( vlc_object_t *obj )
-{
-    vlc_mutex_lock( &(vlc_internals(obj)->lock) );
-}
-
-void __vlc_object_unlock( vlc_object_t *obj )
-{
-    vlc_assert_locked( &(vlc_internals(obj)->lock) );
-    vlc_mutex_unlock( &(vlc_internals(obj)->lock) );
-}
 
 #ifdef WIN32
 # include <winsock2.h>
