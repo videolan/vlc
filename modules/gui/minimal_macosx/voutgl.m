@@ -36,7 +36,8 @@
 int OpenVideoGL  ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
-    vlc_value_t value_drawable;
+    int i_drawable_agl;
+    int i_drawable_gl;
 
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
@@ -53,9 +54,11 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
-    var_Get( p_vout->p_libvlc, "drawable", &value_drawable );
- 
-    if( 0 /* Are we in the mozilla plugin ? XXX: get that from drawable */ )
+    i_drawable_agl = var_GetInteger( p_vout->p_libvlc, "drawable-agl" );
+    i_drawable_gl = var_GetInteger( p_vout->p_libvlc, "drawable-gl" );
+
+    /* Are we in the mozilla plugin ? */
+    if( i_drawable_agl > 0 )
     {
         p_vout->pf_init             = aglInit;
         p_vout->pf_end              = aglEnd;
@@ -65,7 +68,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         p_vout->pf_lock             = aglLock;
         p_vout->pf_unlock           = aglUnlock;
     }
-    else
+    else /*if( i_drawable_gl > 0 )*/
     {
         /* Let's use the VLCOpenGLVoutView.m class */
         p_vout->pf_init   = cocoaglvoutviewInit;

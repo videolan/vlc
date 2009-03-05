@@ -77,14 +77,15 @@ int aglInit( vout_thread_t * p_vout )
         msg_Err( p_vout, "Cannot create AGL context." );
         return VLC_EGENERIC;
     }
-    else {
+    else
+    {
         // tell opengl not to sync buffer swap with vertical retrace (too inefficient)
         GLint param = 0;
         aglSetInteger(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL, &param);
         aglEnable(p_vout->p_sys->agl_ctx, AGL_SWAP_INTERVAL);
     }
 
-    var_Get( p_vout->p_libvlc, "drawable", &val );
+    var_Get( p_vout->p_libvlc, "drawable-agl", &val );
     p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
     aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
@@ -123,7 +124,8 @@ int aglInit( vout_thread_t * p_vout )
 void aglEnd( vout_thread_t * p_vout )
 {
     aglSetCurrentContext(NULL);
-    if( p_vout->p_sys->theWindow ) DisposeWindow( p_vout->p_sys->theWindow );
+    if( p_vout->p_sys->theWindow )
+        DisposeWindow( p_vout->p_sys->theWindow );
     aglDestroyContext(p_vout->p_sys->agl_ctx);
 }
 
@@ -205,7 +207,7 @@ int aglManage( vout_thread_t * p_vout )
             Rect viewBounds;
             Rect clipBounds;
 
-            var_Get( p_vout->p_libvlc, "drawable", &val );
+            var_Get( p_vout->p_libvlc, "drawable-agl", &val );
             p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
             aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
