@@ -142,6 +142,7 @@ public slots:
     void mediaCodecDialog();
     void prefsDialog();
     void extendedDialog();
+    void synchroDialog();
     void messagesDialog();
 #ifdef ENABLE_VLM
     void vlmDialog();

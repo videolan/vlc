@@ -28,6 +28,8 @@
 
 #include "components/extended_panels.hpp"
 
+class QTabWidget;
+
 class ExtendedDialog : public QVLCFrame
 {
     Q_OBJECT;
@@ -44,12 +46,15 @@ public:
         instance = NULL;
     }
     virtual ~ExtendedDialog();
+    void showTab( int i );
 private:
     ExtendedDialog( intf_thread_t * );
     static ExtendedDialog *instance;
+
     SyncControls *syncW;
     ExtVideo *videoEffect;
     Equalizer *equal;
+    QTabWidget *mainTabW;
 private slots:
     void changedItem( int );
 };

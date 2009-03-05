@@ -45,7 +45,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     layout->setLayoutMargins( 0, 2, 0, 1, 1 );
     layout->setSpacing( 3 );
 
-    QTabWidget *mainTabW = new QTabWidget( this );
+    mainTabW = new QTabWidget( this );
 
     /* AUDIO effects */
     QWidget *audioWidget = new QWidget;
@@ -105,6 +105,12 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 ExtendedDialog::~ExtendedDialog()
 {
     writeSettings( "EPanel" );
+}
+
+void ExtendedDialog::showTab( int i )
+{
+    mainTabW->setCurrentIndex( i );
+    show();
 }
 
 void ExtendedDialog::changedItem( int i_status )

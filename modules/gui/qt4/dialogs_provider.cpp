@@ -183,6 +183,11 @@ void DialogsProvider::extendedDialog()
     ExtendedDialog::getInstance( p_intf )->toggleVisible();
 }
 
+void DialogsProvider::synchroDialog()
+{
+    ExtendedDialog::getInstance( p_intf )->showTab( 2 );
+}
+
 void DialogsProvider::messagesDialog()
 {
     MessagesDialog::getInstance( p_intf )->toggleVisible();

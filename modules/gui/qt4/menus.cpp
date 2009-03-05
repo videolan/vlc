@@ -342,8 +342,11 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
  **/
 QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
 {
-    addDPStaticEntry( menu, qtr( I_MENU_EXT ), ":/settings",
+    addDPStaticEntry( menu, qtr( "&Effects and Filters"), ":/settings",
             SLOT( extendedDialog() ), "Ctrl+E" );
+
+    addDPStaticEntry( menu, qtr( "&Tracks Synchronisation"), ":/settings",
+            SLOT( synchroDialog() ), "" );
 
     addDPStaticEntry( menu, qtr( I_MENU_INFO ) , ":/info",
         SLOT( mediaInfoDialog() ), "Ctrl+I" );
