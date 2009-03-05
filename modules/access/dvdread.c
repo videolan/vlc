@@ -508,9 +508,9 @@ static int Demux( demux_t *p_demux )
                            1, p_buffer ) != 1 )
         {
             msg_Err( p_demux, "read failed for block %d", p_sys->i_next_vobu );
-            intf_UserWarn( p_demux, _("Playback failure"),
-                            _("DVDRead could not read block %d."),
-                           p_sys->i_next_vobu );
+            dialog_Fatal( p_demux, _("Playback failure"),
+                          _("DVDRead could not read block %d."),
+                          p_sys->i_next_vobu );
             return -1;
         }
 
