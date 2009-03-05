@@ -54,6 +54,7 @@ nodist_SOURCES_qt4 = \
 		components/playlist/panels.moc.cpp \
 		components/playlist/selector.moc.cpp \
 		components/sout/profile_selector.moc.cpp \
+		components/sout/sout_widgets.moc.cpp \
 		util/input_slider.moc.cpp \
 		util/customwidgets.moc.cpp \
 		resources.cpp \
@@ -226,6 +227,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/playlist/playlist.cpp \
 		components/playlist/selector.cpp \
 		components/sout/profile_selector.cpp \
+		components/sout/sout_widgets.cpp \
 		util/input_slider.cpp \
 		util/customwidgets.cpp \
 		util/registry.cpp
@@ -272,6 +274,7 @@ noinst_HEADERS = \
 	components/playlist/selector.hpp \
 	components/playlist/sorting.h \
 	components/sout/profile_selector.hpp \
+	components/sout/sout_widgets.hpp \
 	components/sout/profiles.hpp \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \

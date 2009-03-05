@@ -27,6 +27,7 @@
 
 #include "dialogs/sout.hpp"
 #include "dialogs/convert.hpp"
+#include "components/sout/sout_widgets.hpp"
 
 #include "util/qt_dirs.hpp"
 
@@ -42,32 +43,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf)
     setWindowTitle( qtr( "Convert" ) );
 
     QGridLayout *mainLayout = new QGridLayout( this );
-
-    /**
-     * Source Block
-     **/
-    QGroupBox *sourceBox = new QGroupBox( qtr( "Source" ) );
-    QGridLayout *sourceLayout = new QGridLayout( sourceBox );
-
-    QLabel *sourceLabel = new QLabel( qtr( "Source:" ) );
-    sourceLayout->addWidget( sourceLabel, 0, 0 );
-
-    QLineEdit *sourceLine = new QLineEdit;
-    sourceLine->setReadOnly( true );
-    sourceLabel->setBuddy( sourceLine );
-    sourceLayout->addWidget( sourceLine, 0, 1 );
-
-    QLabel *sourceTypeLabel = new QLabel( qtr( "Type:" ) );
-    sourceLayout->addWidget( sourceTypeLabel, 1, 0 );
-    QLabel *sourceValueLabel = new QLabel;
-    sourceLayout->addWidget( sourceValueLabel, 1, 1 );
-
-    /* Line */
-    QFrame *line = new QFrame;
-    line->setFrameStyle( QFrame::HLine |QFrame::Sunken );
-    sourceLayout->addWidget( line, 2, 0, 1, -1 );
-
-    mainLayout->addWidget( sourceBox, 0, 0, 1, -1  );
+    mainLayout->addWidget( new SoutInputBox( this ), 0, 0, 1, -1  );
 
     /**
      * Destination
