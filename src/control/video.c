@@ -432,6 +432,14 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     if( !p_input_thread ) return;
 
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+
+    if( val_list.p_list->i_count == 0 )
+    {
+        libvlc_exception_raise( p_e, "Subtitle value out of range" );
+        vlc_object_release( p_input_thread );
+        return;
+    }
+
     if( (i_spu < 0) && (i_spu > val_list.p_list->i_count) )
     {
         libvlc_exception_raise( p_e, "Subtitle value out of range" );
