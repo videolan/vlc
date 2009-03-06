@@ -5851,6 +5851,7 @@ AC_SUBST(VERSION_MESSAGE)
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(VERSION_MINOR)
 AC_SUBST(VERSION_REVISION)
+AC_SUBST(VERSION_EXTRA)
 AC_SUBST(COPYRIGHT_YEARS)
 AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure])
 if test "${build_os}" = "cygwin"
@@ -5933,6 +5934,7 @@ AC_CONFIG_FILES([
   projects/activex/axvlc_rc.rc
   projects/mozilla/npvlc_rc.rc
   projects/mozilla/vlc.r
+  projects/mozilla/install.js
   share/Makefile
   share/vlc_win32_rc.rc
   share/libvlc_win32_rc.rc
