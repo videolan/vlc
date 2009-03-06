@@ -487,6 +487,9 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
+        spu_Attach( p_vout->p_spu, p_vout, false );
+        spu_Destroy( p_vout->p_spu );
+        p_vout->p_spu = NULL;
         vlc_object_release( p_vout );
         return NULL;
     }
@@ -583,7 +586,8 @@ static void vout_Destructor( vlc_object_t * p_this )
     assert( !p_vout->p_module );
 
     /* */
-    spu_Destroy( p_vout->p_spu );
+    if( p_vout->p_spu )
+        spu_Destroy( p_vout->p_spu );
 
     /* Destroy the locks */
     vlc_cond_destroy( &p_vout->p->change_wait );
