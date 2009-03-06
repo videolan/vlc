@@ -1,9 +1,10 @@
 /*****************************************************************************
  * npolibvlc.cpp: official Javascript APIs
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jan Paul Dinger <jpd@m2x.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -914,11 +915,9 @@ LibvlcMessagesNPObject::invoke(int index, const NPVariant *args,
     return INVOKERESULT_GENERIC_ERROR;
 }
 
- 
 /*
 ** implementation of libvlc message object
 */
-
 
 LibvlcLogNPObject::~LibvlcLogNPObject()
 {
@@ -1133,7 +1132,6 @@ LibvlcPlaylistItemsNPObject::invoke(int index, const NPVariant *args,
 ** implementation of libvlc playlist object
 */
 
-
 LibvlcPlaylistNPObject::~LibvlcPlaylistNPObject()
 {
     if( isValid() )
@@ -1311,7 +1309,7 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
                     }
                     else
                     {
-		        free(url);
+                        free(url);
                         free(name);
                         return INVOKERESULT_INVALID_VALUE;
                     }

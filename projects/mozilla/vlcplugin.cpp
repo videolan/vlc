@@ -474,7 +474,6 @@ int  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
     return r;
 }
 
-
 /*****************************************************************************
  * VlcPlugin methods
  *****************************************************************************/
@@ -863,8 +862,6 @@ void VlcPlugin::redrawToolbar()
                    dst_y - (p_timeline->height >> 1),
                    (window.width-(dst_x+BTN_SPACE)), p_timeline->height );
 
-
-
     /* get movie position in % */
     if( playlist_isplaying(&ex) )
     {
@@ -884,15 +881,16 @@ void VlcPlugin::redrawToolbar()
 
 vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos )
 {
-    unsigned int i_dest = BTN_SPACE;//(i_tb_height >> 1);
+    unsigned int i_dest = BTN_SPACE;
     int is_playing = 0;
     bool b_mute = false;
     libvlc_exception_t ex;
 
+#ifndef NDEBUG
     fprintf( stderr, "ToolbarButtonClicked:: "
                      "trying to match (%d,%d) (%d,%d)\n",
              i_xpos, i_ypos, i_tb_height, i_tb_width );
-
+#endif
     if( i_ypos >= i_tb_width )
         return clicked_Unknown;
 

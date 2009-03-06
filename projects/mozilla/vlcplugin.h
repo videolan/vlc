@@ -1,12 +1,12 @@
 /*****************************************************************************
  * vlcplugin.h: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Damien Fouilleul <damienf@videolan.org>
- *         Jean-Paul Saman <jpsaman@videolan.org>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ public:
     {
         if( !libvlc_media_player )
         {
-             libvlc_exception_raise(ex,"null mediaplayer");
+             libvlc_exception_raise(ex,"no mediaplayer");
         }
         return libvlc_media_player;
     }
@@ -269,7 +269,5 @@ private:
     "audio/x-matroska:mka:Matroska audio;" \
     /* XSPF */ \
     "application/xspf+xml:xspf:Playlist xspf;"
-
-
 
 #endif

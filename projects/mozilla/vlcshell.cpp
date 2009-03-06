@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -410,7 +410,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         /* remember new window */
         p_plugin->setWindow(*window);
     }
-    else if( curwin.window ) {
+    else if( curwin.window )
+    {
         /* change/set parent */
         libvlc_video_set_parent(p_vlc, 0, NULL);
         curwin.window = NULL;
@@ -654,7 +655,6 @@ void NPP_URLNotify( NPP instance, const char* url,
         p_plugin = (PluginInstance*) instance->pdata;
     \*********************************************/
 }
-
 
 void NPP_Print( NPP instance, NPPrint* printInfo )
 {
