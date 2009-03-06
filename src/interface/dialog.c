@@ -98,6 +98,9 @@ void dialog_FatalVa (vlc_object_t *obj, const char *title,
 {
     char *text;
 
+    if (obj->i_flags & OBJECT_FLAGS_NOINTERACT)
+        return;
+
     vlc_object_t *provider = dialog_GetProvider (obj);
     if (provider == NULL)
     {
