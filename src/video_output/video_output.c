@@ -842,27 +842,7 @@ static int InitThread( vout_thread_t *p_vout )
 
     AspectRatio( p_vout->fmt_render.i_aspect, &i_aspect_x, &i_aspect_y );
 
-    msg_Dbg( p_vout, "picture in %ix%i (%i,%i,%ix%i), "
-             "chroma %4.4s, ar %i:%i, sar %i:%i",
-             p_vout->fmt_render.i_width, p_vout->fmt_render.i_height,
-             p_vout->fmt_render.i_x_offset, p_vout->fmt_render.i_y_offset,
-             p_vout->fmt_render.i_visible_width,
-             p_vout->fmt_render.i_visible_height,
-             (char*)&p_vout->fmt_render.i_chroma,
-             i_aspect_x, i_aspect_y,
-             p_vout->fmt_render.i_sar_num, p_vout->fmt_render.i_sar_den );
-
     AspectRatio( p_vout->fmt_in.i_aspect, &i_aspect_x, &i_aspect_y );
-
-    msg_Dbg( p_vout, "picture user %ix%i (%i,%i,%ix%i), "
-             "chroma %4.4s, ar %i:%i, sar %i:%i",
-             p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
-             p_vout->fmt_in.i_x_offset, p_vout->fmt_in.i_y_offset,
-             p_vout->fmt_in.i_visible_width,
-             p_vout->fmt_in.i_visible_height,
-             (char*)&p_vout->fmt_in.i_chroma,
-             i_aspect_x, i_aspect_y,
-             p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den );
 
     if( !p_vout->fmt_out.i_width || !p_vout->fmt_out.i_height )
     {
@@ -888,16 +868,6 @@ static int InitThread( vout_thread_t *p_vout )
 
     AspectRatio( p_vout->fmt_out.i_aspect, &i_aspect_x, &i_aspect_y );
 
-    msg_Dbg( p_vout, "picture out %ix%i (%i,%i,%ix%i), "
-             "chroma %4.4s, ar %i:%i, sar %i:%i",
-             p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
-             p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
-             p_vout->fmt_out.i_visible_width,
-             p_vout->fmt_out.i_visible_height,
-             (char*)&p_vout->fmt_out.i_chroma,
-             i_aspect_x, i_aspect_y,
-             p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den );
-
     /* FIXME removed the need of both fmt_* and heap infos */
     /* Calculate shifts from system-updated masks */
     PictureHeapFixRgb( &p_vout->render );
@@ -905,6 +875,38 @@ static int InitThread( vout_thread_t *p_vout )
 
     PictureHeapFixRgb( &p_vout->output );
     VideoFormatImportRgb( &p_vout->fmt_out, &p_vout->output );
+
+    /* print some usefull debug info about different vout formats
+     */
+    msg_Dbg( p_vout, "pic render sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, ar %i:%i, sar %i:%i, msk r0x%x g0x%x b0x%x",
+             p_vout->fmt_render.i_width, p_vout->fmt_render.i_height,
+             p_vout->fmt_render.i_x_offset, p_vout->fmt_render.i_y_offset,
+             p_vout->fmt_render.i_visible_width,
+             p_vout->fmt_render.i_visible_height,
+             (char*)&p_vout->fmt_render.i_chroma,
+             i_aspect_x, i_aspect_y,
+             p_vout->fmt_render.i_sar_num, p_vout->fmt_render.i_sar_den,
+             p_vout->fmt_render.i_rmask, p_vout->fmt_render.i_gmask, p_vout->fmt_render.i_bmask );
+
+    msg_Dbg( p_vout, "pic in sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, ar %i:%i, sar %i:%i, msk r0x%x g0x%x b0x%x",
+             p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
+             p_vout->fmt_in.i_x_offset, p_vout->fmt_in.i_y_offset,
+             p_vout->fmt_in.i_visible_width,
+             p_vout->fmt_in.i_visible_height,
+             (char*)&p_vout->fmt_in.i_chroma,
+             i_aspect_x, i_aspect_y,
+             p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den,
+             p_vout->fmt_in.i_rmask, p_vout->fmt_in.i_gmask, p_vout->fmt_in.i_bmask );
+
+    msg_Dbg( p_vout, "pic out sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, ar %i:%i, sar %i:%i, msk r0x%x g0x%x b0x%x",
+             p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
+             p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
+             p_vout->fmt_out.i_visible_width,
+             p_vout->fmt_out.i_visible_height,
+             (char*)&p_vout->fmt_out.i_chroma,
+             i_aspect_x, i_aspect_y,
+             p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den,
+             p_vout->fmt_out.i_rmask, p_vout->fmt_out.i_gmask, p_vout->fmt_out.i_bmask );
 
     /* Check whether we managed to create direct buffers similar to
      * the render buffers, ie same size and chroma */
@@ -1061,8 +1063,8 @@ static void* RunThread( void *p_this )
                 vout_UsePictureLocked( p_vout, p_pic );
                 p_vout->p->i_picture_lost++;
 
-                msg_Warn( p_vout, "late picture skipped (%"PRId64")",
-                                  current_date - p_pic->date );
+                msg_Warn( p_vout, "late picture skipped (%"PRId64" > %d)",
+                                  current_date - p_pic->date, - p_vout->p->render_time );
             }
             else if( ( !p_last || p_last->date < p_pic->date ) &&
                      ( p_picture == NULL || p_pic->date < p_picture->date ) )
@@ -1210,6 +1212,9 @@ static void* RunThread( void *p_this )
                 p_vout->p->render_time += current_render_time;
                 p_vout->p->render_time >>= 2;
             }
+            else
+                msg_Dbg( p_vout, "skipped big render time %d > %d", (int) current_render_time,
+                 (int) (p_vout->p->render_time +VOUT_DISPLAY_DELAY ) ) ;
         }
 
         /* Give back change lock */
