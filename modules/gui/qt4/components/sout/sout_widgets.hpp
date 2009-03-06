@@ -30,6 +30,7 @@
 
 class QLineEdit;
 class QLabel;
+class QSpinBox;
 
 class SoutInputBox : public QGroupBox
 {
@@ -42,5 +43,90 @@ class SoutInputBox : public QGroupBox
         QLabel *sourceValueLabel;
 
 };
+
+class VirtualDestBox : public QWidget
+{
+    Q_OBJECT;
+    public:
+        VirtualDestBox( QWidget *_parent = NULL ) : QWidget( _parent ){}
+        virtual QString getMRL( QString ) = 0;
+    protected:
+        QString mrl;
+    signals:
+        void mrlUpdated();
+};
+
+class FileDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        FileDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( QString );
+    private:
+        QLineEdit *fileEdit;
+    private slots:
+        void fileBrowse();
+};
+
+class HTTPDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        HTTPDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( QString );
+    private:
+        QLineEdit *HTTPEdit;
+        QSpinBox *HTTPPort;
+};
+
+class MMSHDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        MMSHDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( QString );
+    private:
+        QLineEdit *MMSHEdit;
+        QSpinBox *MMSHPort;
+};
+
+class UDPDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        UDPDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( QString );
+    private:
+        QLineEdit *UDPEdit;
+        QSpinBox *UDPPort;
+};
+
+class RTPDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        RTPDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( QString );
+    private:
+        QLineEdit *RTPEdit;
+        QSpinBox *RTPPort;
+        QSpinBox *RTPPortVideo;
+        QSpinBox *RTPPortAudio;
+};
+
+class ICEDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        ICEDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( QString );
+    private:
+        QLineEdit *ICEEdit;
+        QLineEdit *ICEMountEdit;
+        QLineEdit *ICEPassEdit;
+        QSpinBox *ICEPort;
+};
+
+
 
 #endif

@@ -198,6 +198,7 @@ void VLCProfileSelector::updateOptions( int i )
     }
     else
         transcode = "";
+    emit optionsChanged();
 }
 
 

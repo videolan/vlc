@@ -34,6 +34,7 @@
 #include "util/qvlcframe.hpp"
 
 class QPushButton;
+class QToolButton;
 class QCheckBox;
 class QGridLayout;
 class QTextEdit;
@@ -133,8 +134,10 @@ private:
     Ui::Sout ui;
     static SoutDialog *instance;
     SoutDialog( QWidget* parent, intf_thread_t *, QString mrl );
-    QPushButton *okButton;
+
     QString mrl;
+    QPushButton *okButton;
+    QToolButton *closeTabButton;
 
 public slots:
     void updateMRL();
@@ -142,13 +145,11 @@ public slots:
 private slots:
     void ok();
     void cancel();
-    void setOptions();
-    void fileBrowse();
-    void setRawOptions( bool );
-    void changeUDPandRTPmess( bool );
-    void RTPtoggled( bool );
     void next();
     void prev();
+    void closeTab();
+    void tabChanged( int );
+    void addDest();
 };
 
 #endif
