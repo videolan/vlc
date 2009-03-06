@@ -81,21 +81,15 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
 
         p_item = playlist_ItemGetByInputId( PL, i_id,
                                             PL->p_root_category );
-        if( !p_item )
-        {
-            if( did_lock == 1 )
-            {
-                playlist_Unlock( PL );
-                playlist_mark_locked( p_instance, 0 );
-            }
+        if( p_item )
+            playlist_Control( PL, PLAYLIST_VIEWPLAY, pl_Locked,
+                              PL->p_root_category, p_item );
+       else
             RAISEVOID( "Unable to find item" );
-        }
 
-        playlist_Control( PL, PLAYLIST_VIEWPLAY, pl_Locked,
-                          PL->p_root_category, p_item );
         if( did_lock == 1 )
         {
-            playlist_Lock( PL );
+            playlist_Unlock( PL );
             playlist_mark_locked( p_instance, 0 );
         }
     }
