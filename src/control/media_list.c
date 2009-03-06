@@ -343,7 +343,7 @@ void _libvlc_media_list_add_media(
                                    libvlc_media_t * p_md,
                                    libvlc_exception_t * p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     libvlc_media_retain( p_md );
 
     notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items ),
@@ -375,7 +375,7 @@ void _libvlc_media_list_insert_media(
                                    int index,
                                    libvlc_exception_t * p_e )
 {
-    (void)p_e;
+    VLC_UNUSED(p_e);
     libvlc_media_retain( p_md );
 
     notify_item_addition( p_mlist, p_md, index, EventWillHappen );
