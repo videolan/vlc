@@ -442,7 +442,7 @@ int VlcPlugin::playlist_isplaying( libvlc_exception_t *ex )
 {
     int is_playing = 0;
     if( libvlc_media_player )
-        libvlc_media_player_is_playing( libvlc_media_player, ex );
+        is_playing = libvlc_media_player_is_playing( libvlc_media_player, ex );
     return is_playing;
 }
 
