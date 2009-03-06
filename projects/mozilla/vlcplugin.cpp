@@ -74,6 +74,8 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
 #endif
 {
     memset(&npwindow, 0, sizeof(NPWindow));
+    memset(&npvideo, 0, sizeof(Window));
+    memset(&npcontrol, 0, sizeof(Window));
 }
 
 static bool boolValue(const char *value) {
@@ -279,7 +281,7 @@ void VlcPlugin::set_player_window( libvlc_exception_t *ex )
 {
 #ifdef XP_UNIX
     libvlc_media_player_set_xwindow(libvlc_media_player,
-                                    (libvlc_drawable_t)getWindow().window,
+                                    (libvlc_drawable_t)getVideoWindow(),
                                     ex);
 #endif
 #ifdef XP_MACOSX
@@ -287,7 +289,7 @@ void VlcPlugin::set_player_window( libvlc_exception_t *ex )
 #endif
 #ifdef XP_WIN
     libvlc_media_player_set_hwnd(libvlc_media_player,
-                                 getWindow().window,
+                                 getVideoWindow(),
                                  ex);
 #endif
 }
