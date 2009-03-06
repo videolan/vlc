@@ -462,9 +462,8 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     if( !b_use_video && !b_use_audio )
     {
-        msg_Err( p_this, "No video or audio device selected" );
         dialog_Fatal( p_this, _("Capture failed"),
-                        _("No video or audio device delected.") );
+                        _("No video or audio device selected.") );
         return VLC_EGENERIC ;
     }
 
