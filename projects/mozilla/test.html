@@ -16,25 +16,29 @@
 <SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/components/slider/Bs_Slider.class.js"></SCRIPT>
 
 <SCRIPT language="JavaScript"><!--
-function init(){
+function init()
+{
     inputTracker = new Bs_Slider();
-    inputTracker.attachOnChange(onInputTrackerChange);
-    inputTracker.attachOnSlideStart(onInputTrackerScrollStart);
-    inputTracker.attachOnSlideEnd(onInputTrackerScrollEnd);
-    inputTracker.width         = 530 ;
-    inputTracker.height        = 15;
-    inputTracker.minVal        = 0;
-    inputTracker.maxVal        = 1.0;
-    inputTracker.valueDefault  = 0;
-    inputTracker.valueInterval = 1/530;
-    inputTracker.setDisabled(true);
-    inputTracker.imgDir   = 'blueshoes-4.5/javascript/components/slider/img/';
-    inputTracker.setBackgroundImage('aluminumalloyvolcanic/horizontal_background.gif', 'repeat');
-    inputTracker.setArrowIconLeft('aluminumalloyvolcanic/horizontal_backgroundLeft.gif', 2, 19);
-    inputTracker.setArrowIconRight('aluminumalloyvolcanic/horizontal_backgroundRight.gif', 2, 19);
-    inputTracker.setSliderIcon('aluminumalloyvolcanic/horizontal_knob.gif', 15, 19);
-    inputTracker.useInputField = 0;
-    inputTracker.draw('inputTrackerDiv');
+    if (inputTracker)
+    {
+        inputTracker.attachOnChange(onInputTrackerChange);
+        inputTracker.attachOnSlideStart(onInputTrackerScrollStart);
+        inputTracker.attachOnSlideEnd(onInputTrackerScrollEnd);
+        inputTracker.width         = 530 ;
+        inputTracker.height        = 15;
+        inputTracker.minVal        = 0;
+        inputTracker.maxVal        = 1.0;
+        inputTracker.valueDefault  = 0;
+        inputTracker.valueInterval = 1/530;
+        inputTracker.setDisabled(true);
+        inputTracker.imgDir   = 'blueshoes-4.5/javascript/components/slider/img/';
+        inputTracker.setBackgroundImage('aluminumalloyvolcanic/horizontal_background.gif', 'repeat');
+        inputTracker.setArrowIconLeft('aluminumalloyvolcanic/horizontal_backgroundLeft.gif', 2, 19);
+        inputTracker.setArrowIconRight('aluminumalloyvolcanic/horizontal_backgroundRight.gif', 2, 19);
+        inputTracker.setSliderIcon('aluminumalloyvolcanic/horizontal_knob.gif', 15, 19);
+        inputTracker.useInputField = 0;
+        inputTracker.draw('inputTrackerDiv');
+    }
 
     if( navigator.appName.indexOf("Microsoft Internet")==-1 )
     {
@@ -47,7 +51,8 @@ function init(){
     else
     {
         /* Explorer loads plugins asynchronously */
-        document.onreadystatechange=function() {
+        document.onreadystatechange=function()
+        {
             if( document.readyState == 'complete' )
             {
                 onVLCPluginReady();
@@ -219,6 +224,7 @@ var rate = 0;
 var prevState = 0;
 var monitorTimerId = 0;
 var rateTimerId = 0;
+var inputTracker;
 var inputTrackerScrolling = false;
 var inputTrackerIgnoreChange = false;
 var telxState = false;
@@ -677,31 +683,37 @@ var liveFeedRoll = 0;
 
 function onPlaying()
 {
-    if( ! inputTrackerScrolling )
+    if( !inputTrackerScrolling )
     {
         var vlc = getVLC("vlc");
         var info = document.getElementById("info");
         var mediaLen = vlc.input.length;
-        inputTrackerIgnoreChange  = true;
+        inputTrackerIgnoreChange = true;
         if( mediaLen > 0 )
         {
             // seekable media
-            if( inputTracker.maxVal == 1.0 )
+            if( inputTracker )
             {
-                inputTracker.setDisabled(false);
-                inputTracker.maxVal = 1.0;
+                if( inputTracker.maxVal == 1.0 )
+                {
+                    inputTracker.setDisabled(false);
+                    inputTracker.maxVal = 1.0;
+                }
+                inputTracker.setValue(vlc.input.position);
             }
-            inputTracker.setValue(vlc.input.position);
             info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(mediaLen);
         }
         else
         {
             // non-seekable "live" media
-            if( inputTracker.maxVal != 0.0 )
+            if( inputTracker )
             {
-                inputTracker.maxVal = 0.0;
-                inputTracker.setValue(0.0);
-                inputTracker.setDisabled(true);
+                if( inputTracker.maxVal != 0.0 )
+                {
+                    inputTracker.maxVal = 0.0;
+                    inputTracker.setValue(0.0);
+                    inputTracker.setDisabled(true);
+                }
             }
             liveFeedRoll = liveFeedRoll & 3;
             info.innerHTML = liveFeedText[liveFeedRoll++];
@@ -721,10 +733,13 @@ function onStop()
     // disable logging
     vlc.log.verbosity = -1;
 
-    if( !inputTracker.disabled )
+    if( inputTracker )
     {
-        inputTracker.setValue(inputTracker.minVal);
-        inputTracker.setDisabled(true);
+        if( !inputTracker.disabled )
+        {
+            inputTracker.setValue(inputTracker.minVal);
+            inputTracker.setDisabled(true);
+        }
     }
     document.getElementById("info").innerHTML = "-:--:--/-:--:--";
     document.getElementById("state").innerHTML = "Stopped...";
