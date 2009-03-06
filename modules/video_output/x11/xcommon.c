@@ -1761,27 +1761,13 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                            p_win->base_window,
                            GCGraphicsExposures, &xgcvalues );
 
-    /* Send orders to server, and wait until window is displayed - three
-     * events must be received: a MapNotify event, an Expose event allowing
-     * drawing in the window, and a ConfigureNotify to get the window
-     * dimensions. Once those events have been received, only
-     * ConfigureNotify events need to be received. */
+    /* Wait till the window is mapped */
     XMapWindow( p_vout->p_sys->p_display, p_win->base_window );
     do
     {
         XWindowEvent( p_vout->p_sys->p_display, p_win->base_window,
-                      SubstructureNotifyMask | StructureNotifyMask |
-                      ExposureMask, &xevent);
-        if( (xevent.type == Expose)
-            && (xevent.xexpose.window == p_win->base_window) )
-        {
-            b_expose = true;
-            /* ConfigureNotify isn't sent if there isn't a window manager.
-             * Expose should be the last event to be received so it should
-             * be fine to assume we won't receive it anymore. */
-            b_configure_notify = true;
-        }
-        else if( (xevent.type == MapNotify)
+                      SubstructureNotifyMask | StructureNotifyMask, &xevent);
+        if( (xevent.type == MapNotify)
                  && (xevent.xmap.window == p_win->base_window) )
         {
             b_map_notify = true;
@@ -1789,11 +1775,10 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         else if( (xevent.type == ConfigureNotify)
                  && (xevent.xconfigure.window == p_win->base_window) )
         {
-            b_configure_notify = true;
             p_win->i_width = xevent.xconfigure.width;
             p_win->i_height = xevent.xconfigure.height;
         }
-    } while( !( b_expose && b_configure_notify && b_map_notify ) );
+    } while( !b_map_notify );
 
     /* key and mouse events handling depending on --vout-event option
      *      activated if:
