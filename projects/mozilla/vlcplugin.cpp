@@ -46,7 +46,10 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     b_autoplay(1),
     b_toolbar(0),
     psz_target(NULL),
+    playlist_index(-1),
     libvlc_instance(NULL),
+    libvlc_media_list(NULL),
+    libvlc_media_player(NULL),
     libvlc_log(NULL),
     p_scriptClass(NULL),
     p_browser(instance),
@@ -190,12 +193,19 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     libvlc_exception_init(&ex);
 
     libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv, &ex);
+
     if( libvlc_exception_raised(&ex) )
     {
         libvlc_exception_clear(&ex);
         return NPERR_GENERIC_ERROR;
     }
-    libvlc_exception_clear(&ex);
+
+    libvlc_media_list = libvlc_media_list_new(libvlc_instance,&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        libvlc_exception_clear(&ex);
+        return NPERR_GENERIC_ERROR;
+    }
 
     /*
     ** fetch plugin base URL, which is the URL of the page containing the plugin
@@ -254,9 +264,214 @@ VlcPlugin::~VlcPlugin()
     free(psz_target);
     if( libvlc_log )
         libvlc_log_close(libvlc_log, NULL);
+    if( libvlc_media_player )
+        libvlc_media_player_release( libvlc_media_player );
+    if( libvlc_media_list )
+        libvlc_media_list_release( libvlc_media_list );
     if( libvlc_instance )
         libvlc_release(libvlc_instance);
 }
+
+/*****************************************************************************
+ * VlcPlugin playlist replacement methods
+ *****************************************************************************/
+void VlcPlugin::set_player_window( libvlc_exception_t *ex )
+{
+#ifdef XP_UNIX
+    libvlc_media_player_set_xwindow(libvlc_media_player,
+                                    (libvlc_drawable_t)getWindow().window,
+                                    ex);
+#endif
+#ifdef XP_MACOSX
+    // XXX FIXME insert appropriate call here
+#endif
+#ifdef XP_WIN
+    libvlc_media_player_set_hwnd(libvlc_media_player,
+                                 getWindow().window,
+                                 ex);
+#endif
+}
+
+int VlcPlugin::playlist_add( const char *mrl, libvlc_exception_t *ex )
+{
+    int item = -1;
+    libvlc_media_t *p_m = libvlc_media_new(libvlc_instance,mrl,ex);
+    if( libvlc_exception_raised(ex) )
+        return -1;
+
+    libvlc_media_list_lock(libvlc_media_list);
+    libvlc_media_list_add_media(libvlc_media_list,p_m,ex);
+    if( !libvlc_exception_raised(ex) )
+        item = libvlc_media_list_count(libvlc_media_list,ex)-1;
+    libvlc_media_list_unlock(libvlc_media_list);
+
+    libvlc_media_release(p_m);
+
+    return item;
+}
+
+int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *name,
+                    int optc, const char **optv, libvlc_exception_t *ex )
+{
+    libvlc_media_t *p_m = libvlc_media_new(libvlc_instance, mrl,ex);
+    int item = -1;
+    if( libvlc_exception_raised(ex) )
+        return -1;
+
+    for( int i = 0; i < optc; ++i )
+    {
+        libvlc_media_add_option_untrusted(p_m, optv[i],ex);
+        if( libvlc_exception_raised(ex) )
+        {
+            libvlc_media_release(p_m);
+            return -1;
+        }
+    }
+
+    libvlc_media_list_lock(libvlc_media_list);
+    libvlc_media_list_add_media(libvlc_media_list,p_m,ex);
+    if( !libvlc_exception_raised(ex) )
+        item = libvlc_media_list_count(libvlc_media_list,ex)-1;
+    libvlc_media_list_unlock(libvlc_media_list);
+    libvlc_media_release(p_m);
+
+    return item;
+}
+
+void VlcPlugin::playlist_play( libvlc_exception_t *ex )
+{
+    if( libvlc_media_player||playlist_select(0,ex) )
+        libvlc_media_player_play(libvlc_media_player,ex);
+}
+
+void VlcPlugin::playlist_play_item( int idx, libvlc_exception_t *ex )
+{
+    if( playlist_select(idx,ex) )
+        libvlc_media_player_play(libvlc_media_player,ex);
+}
+
+void VlcPlugin::playlist_stop( libvlc_exception_t *ex )
+{
+    if( libvlc_media_player )
+        libvlc_media_player_stop(libvlc_media_player,ex);
+}
+
+bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
+{
+    libvlc_media_t *p_m = NULL;
+
+    libvlc_media_list_lock(libvlc_media_list);
+
+    int count = libvlc_media_list_count(libvlc_media_list,ex);
+    if( libvlc_exception_raised(ex) )
+        goto bad_unlock;
+
+    if( idx<0||idx>=count )
+        goto bad_unlock;
+
+    playlist_index = idx;
+
+    p_m = libvlc_media_list_item_at_index(libvlc_media_list,playlist_index,ex);
+    libvlc_media_list_unlock(libvlc_media_list);
+
+    if( libvlc_exception_raised(ex) )
+        return false;
+
+    if( libvlc_media_player )
+    {
+        libvlc_media_player_release( libvlc_media_player );
+        libvlc_media_player = NULL;
+    }
+
+    libvlc_media_player = libvlc_media_player_new_from_media(p_m,ex);
+    if( libvlc_media_player )
+        set_player_window(ex);
+
+    libvlc_media_release( p_m );
+    return !libvlc_exception_raised(ex);
+
+bad_unlock:
+    libvlc_media_list_unlock(libvlc_media_list);
+    return false;
+}
+
+void VlcPlugin::playlist_next( libvlc_exception_t *ex )
+{
+    if( playlist_select(playlist_index+1,ex) )
+        libvlc_media_player_play(libvlc_media_player,ex);
+}
+
+void VlcPlugin::playlist_prev( libvlc_exception_t *ex )
+{
+    if( playlist_select(playlist_index-1,ex) )
+        libvlc_media_player_play(libvlc_media_player,ex);
+}
+
+void VlcPlugin::playlist_pause( libvlc_exception_t *ex )
+{
+    if( libvlc_media_player )
+        libvlc_media_player_pause(libvlc_media_player,ex);
+}
+
+void VlcPlugin::playlist_delete_item( int idx, libvlc_exception_t *ex )
+{
+    libvlc_media_list_lock(libvlc_media_list);
+    libvlc_media_list_remove_index(libvlc_media_list,idx,ex);
+    libvlc_media_list_unlock(libvlc_media_list);
+}
+
+void VlcPlugin::playlist_clear( libvlc_exception_t *ex )
+{
+    if( libvlc_media_list )
+        libvlc_media_list_release(libvlc_media_list);
+    libvlc_media_list = libvlc_media_list_new(getVLC(),ex);
+}
+
+int VlcPlugin::playlist_count( libvlc_exception_t *ex )
+{
+    int items_count = 0;
+    libvlc_media_list_lock(libvlc_media_list);
+    items_count = libvlc_media_list_count(libvlc_media_list,ex);
+    libvlc_media_list_unlock(libvlc_media_list);
+    return items_count;
+}
+
+int VlcPlugin::playlist_isplaying( libvlc_exception_t *ex )
+{
+    int is_playing = 0;
+    if( libvlc_media_player )
+        libvlc_media_player_is_playing( libvlc_media_player, ex );
+    return is_playing;
+}
+
+void VlcPlugin::toggle_fullscreen( libvlc_exception_t *ex )
+{
+    if( playlist_isplaying(ex) )
+        libvlc_toggle_fullscreen(libvlc_media_player,ex);
+}
+
+void VlcPlugin::set_fullscreen( int yes, libvlc_exception_t *ex )
+{
+    if( playlist_isplaying(ex) )
+        libvlc_set_fullscreen(libvlc_media_player,yes,ex);
+}
+
+int  VlcPlugin::get_fullscreen( libvlc_exception_t *ex )
+{
+    int r = 0;
+    if( playlist_isplaying(ex) )
+        r = libvlc_get_fullscreen(libvlc_media_player,ex);
+    return r;
+}
+
+int  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
+{
+    int r = 0;
+    if( playlist_isplaying(ex) )
+        r = libvlc_media_player_has_vout(libvlc_media_player, ex);
+    return r;
+}
+
 
 /*****************************************************************************
  * VlcPlugin methods
@@ -559,9 +774,7 @@ void VlcPlugin::hideToolbar()
 
 void VlcPlugin::redrawToolbar()
 {
-    libvlc_media_player_t *p_md = NULL;
     libvlc_exception_t ex;
-    float f_position = 0.0;
     int is_playing = 0;
     bool b_mute = false;
     unsigned int dst_x, dst_y;
@@ -579,26 +792,7 @@ void VlcPlugin::redrawToolbar()
 
     getToolbarSize( &i_tb_width, &i_tb_height );
 
-    /* get media instance */
     libvlc_exception_init( &ex );
-    p_md = libvlc_playlist_get_media_player( getVLC(), &ex );
-    libvlc_exception_clear( &ex );
-    if( p_md )
-    {
-        /* get isplaying */
-        libvlc_playlist_lock( getVLC() );
-        is_playing = libvlc_playlist_isplaying( getVLC(), &ex );
-        libvlc_playlist_unlock( getVLC() );
-        libvlc_exception_clear( &ex );
-
-        /* get movie position in % */
-        if( is_playing == 1 )
-        {
-            f_position = libvlc_media_player_get_position( p_md, &ex ) * 100.0;
-            libvlc_exception_clear( &ex );
-        }
-        libvlc_media_player_release( p_md );
-    }
 
     /* get mute info */
     b_mute = libvlc_audio_get_mute( getVLC(), &ex );
@@ -667,9 +861,15 @@ void VlcPlugin::redrawToolbar()
                    dst_y - (p_timeline->height >> 1),
                    (window.width-(dst_x+BTN_SPACE)), p_timeline->height );
 
-    if( f_position > 0 )
-        i_last_position = (int)( f_position *
-                        ( ((float)(window.width-(dst_x+BTN_SPACE))) / 100.0 ));
+
+
+    /* get movie position in % */
+    if( playlist_isplaying(&ex) )
+    {
+        i_last_position = (int)((window.width-(dst_x+BTN_SPACE))*
+                   libvlc_media_player_get_position(libvlc_media_player,&ex));
+    }
+    libvlc_exception_clear( &ex );
 
     if( p_btnTime )
         XPutImage( p_display, control, gc, p_btnTime,
@@ -701,9 +901,7 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
 
     /* get isplaying */
     libvlc_exception_init( &ex );
-    libvlc_playlist_lock( getVLC() );
-    is_playing = libvlc_playlist_isplaying( getVLC(), &ex );
-    libvlc_playlist_unlock( getVLC() );
+    is_playing = playlist_isplaying( &ex );
     libvlc_exception_clear( &ex );
 
     /* get mute info */

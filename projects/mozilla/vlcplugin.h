@@ -88,6 +88,14 @@ public:
     NPError             init(int argc, char* const argn[], char* const argv[]);
     libvlc_instance_t*  getVLC()
                             { return libvlc_instance; };
+    libvlc_media_player_t* getMD(libvlc_exception_t *ex)
+    {
+        if( !libvlc_media_player )
+        {
+             libvlc_exception_raise(ex,"null mediaplayer");
+        }
+        return libvlc_media_player;
+    }
     NPP                 getBrowser()
                             { return p_browser; };
     char*               getAbsoluteURL(const char *url);
@@ -139,9 +147,37 @@ public:
     int      b_toolbar;
     char *   psz_target;
 
+    bool playlist_select(int,libvlc_exception_t *);
+
+    int playlist_add( const char *, libvlc_exception_t * );
+    int playlist_add_extended_untrusted( const char *, const char *, int,
+                                const char **, libvlc_exception_t * );
+    void playlist_play( libvlc_exception_t * );
+    void playlist_play_item( int, libvlc_exception_t * );
+    void playlist_stop( libvlc_exception_t * );
+    void playlist_next( libvlc_exception_t * );
+    void playlist_prev( libvlc_exception_t * );
+    void playlist_pause( libvlc_exception_t * );
+    void playlist_delete_item( int, libvlc_exception_t * );
+
+    void playlist_clear( libvlc_exception_t * );
+    int playlist_count( libvlc_exception_t * );
+    int playlist_isplaying( libvlc_exception_t * );
+
+    void toggle_fullscreen( libvlc_exception_t * );
+    void set_fullscreen( int, libvlc_exception_t * );
+    int  get_fullscreen( libvlc_exception_t * );
+
+    int  player_has_vout( libvlc_exception_t * );
+
 private:
+    void set_player_window( libvlc_exception_t * );
+
     /* VLC reference */
+    int                 playlist_index;
     libvlc_instance_t   *libvlc_instance;
+    libvlc_media_list_t *libvlc_media_list;
+    libvlc_media_player_t *libvlc_media_player;
     libvlc_log_t        *libvlc_log;
     NPClass             *p_scriptClass;
 
