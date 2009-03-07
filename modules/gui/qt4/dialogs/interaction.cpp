@@ -72,28 +72,6 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         i_ret = cancelBox.exec();
         msg_Dbg( p_intf, "Warning %i %i", i_ret, cancelBox.result() );
     }
-    else if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
-    {
-        dialog = new QWidget; layout = new QVBoxLayout( dialog );
-        layout->setMargin( 2 );
-        panel = new QWidget( dialog );
-        QGridLayout *grid = new QGridLayout;
-
-        description = new QLabel( qfu( p_dialog->psz_description ) );
-        grid->addWidget( description, 0, 0, 1, 2 );
-
-        grid->addWidget( new QLabel( qtr( "Login") ), 1, 0 );
-        loginEdit = new QLineEdit;
-        grid->addWidget( loginEdit, 1, 1 );
-
-        grid->addWidget( new QLabel( qtr("Password") ), 2, 0);
-        passwordEdit = new QLineEdit;
-        passwordEdit->setEchoMode( QLineEdit::Password );
-        grid->addWidget( passwordEdit, 2, 1 );
-
-        panel->setLayout( grid );
-        layout->addWidget( panel );
-    }
     else if( (p_dialog->i_flags & DIALOG_INTF_PROGRESS ) ||
              ( p_dialog->i_flags & DIALOG_USER_PROGRESS ) )
     {
@@ -223,12 +201,7 @@ void InteractionDialog::Finish( int i_ret )
     vlc_mutex_lock( p_dialog->p_lock );
 
     /* Special cases when we have to return psz to the core */
-    if( p_dialog->i_flags & DIALOG_LOGIN_PW_OK_CANCEL )
-    {
-        p_dialog->psz_returned[0] = strdup( qtu( loginEdit->text() ) );
-        p_dialog->psz_returned[1] = strdup( qtu( passwordEdit->text() ) );
-    }
-    else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
+    if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
     {
         p_dialog->psz_returned[0] = strdup( qtu( inputEdit->text() ) );
     }
