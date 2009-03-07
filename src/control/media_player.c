@@ -763,8 +763,6 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
                                        libvlc_drawable_t drawable,
                                        libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread;
-
 #ifdef WIN32
     if (sizeof (HWND) <= sizeof (libvlc_drawable_t))
         p_mi->drawable.hwnd = (HWND)drawable;
