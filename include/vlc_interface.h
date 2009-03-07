@@ -279,8 +279,6 @@ enum
  * Exported symbols
  ***************************************************************************/
 
-#define intf_UserLoginPassword( a, b, c, d, e... ) __intf_UserLoginPassword( VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( int, __intf_UserLoginPassword,( vlc_object_t*, const char*, const char*, char **, char **) );
 #define intf_UserYesNo( a, b, c, d, e, f ) __intf_UserYesNo( VLC_OBJECT(a),b,c, d, e, f )
 VLC_EXPORT( int, __intf_UserYesNo,( vlc_object_t*, const char*, const char*, const char*, const char*, const char*) );
 #define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )

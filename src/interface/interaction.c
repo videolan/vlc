@@ -213,46 +213,6 @@ bool intf_ProgressIsCancelled( interaction_dialog_t *p_dialog )
 }
 
 /**
- * Helper function to make a login/password dialogue
- *
- * \param p_this           Parent vlc_object
- * \param psz_title        Title for the dialog
- * \param psz_description  A description
- * \param ppsz_login       Returned login
- * \param ppsz_password    Returned password
- * \return                 Clicked button code
- */
-int __intf_UserLoginPassword( vlc_object_t *p_this,
-        const char *psz_title,
-        const char *psz_description,
-        char **ppsz_login,
-        char **ppsz_password )
-{
-    int i_ret;
-    DIALOG_INIT( TWOWAY, VLC_EGENERIC );
-    p_new->i_type = INTERACT_DIALOG_TWOWAY;
-    p_new->psz_title = strdup( psz_title );
-    p_new->psz_description = strdup( psz_description );
-    p_new->psz_default_button = strdup( _("OK" ) );
-    p_new->psz_alternate_button = strdup( _("Cancel" ) );
-
-    p_new->i_flags = DIALOG_LOGIN_PW_OK_CANCEL;
-
-    i_ret = DialogSend( p_new );
-
-    if( i_ret == VLC_EGENERIC )
-        DialogDestroy( p_new );
-    else if( i_ret != DIALOG_CANCELLED )
-    {
-        *ppsz_login = p_new->psz_returned[0]?
-            strdup( p_new->psz_returned[0] ) : NULL;
-        *ppsz_password = p_new->psz_returned[1]?
-            strdup( p_new->psz_returned[1] ) : NULL;
-    }
-    return i_ret;
-}
-
-/**
  * Helper function to make a dialogue asking the user for !password string
  *
  * \param p_this           Parent vlc_object

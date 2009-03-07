@@ -200,7 +200,6 @@ intf_ProgressUpdate
 intf_RunThread
 intf_StopThread
 intf_UserHide
-__intf_UserLoginPassword
 __intf_UserStringInput
 __intf_UserYesNo
 IsUTF8
