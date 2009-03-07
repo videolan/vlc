@@ -98,33 +98,6 @@ static inline int DialogFireForget( interaction_dialog_t *d )
 }
 
 /**
- * Send an error message, both in a blocking and non-blocking way
- *
- * \param p_this     Parent vlc_object
- * \param b_blocking Is this dialog blocking or not?
- * \param psz_title  Title for the dialog
- * \param psz_format The message to display
- * \return           VLC_SUCCESS or VLC_EGENERIC
- */
-int __intf_UserFatal( vlc_object_t *p_this, bool b_blocking,
-                       const char *psz_title,
-                       const char *psz_format, ... )
-{
-    va_list args;
-    DIALOG_INIT( ONEWAY, VLC_EGENERIC );
-
-    p_new->psz_title = strdup( psz_title );
-    FORMAT_DESC;
-
-    if( b_blocking )
-        p_new->i_flags = DIALOG_BLOCKING_ERROR;
-    else
-        p_new->i_flags = DIALOG_NONBLOCKING_ERROR;
-
-    return DialogFireForget( p_new );
-}
-
-/**
  * Helper function to ask a yes-no-cancel question
  *
  * \param p_this           Parent vlc_object
@@ -468,7 +441,8 @@ static int DialogSend( interaction_dialog_t *p_dialog )
     interaction_t *p_interaction;
     intf_thread_t *p_intf;
 
-    if( p_dialog->p_parent->i_flags & OBJECT_FLAGS_NOINTERACT )
+    if( ( p_dialog->p_parent->i_flags & OBJECT_FLAGS_NOINTERACT )
+     || !config_GetInt( p_interaction, "interact" ) )
         return VLC_EGENERIC;
 
     p_interaction = InteractionGet( p_dialog->p_parent );
@@ -489,61 +463,42 @@ static int DialogSend( interaction_dialog_t *p_dialog )
     }
     p_dialog->p_interface = p_intf;
 
-    if( config_GetInt( p_interaction, "interact" ) ||
-        p_dialog->i_flags & DIALOG_BLOCKING_ERROR ||
-        p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
+    p_dialog->i_action = INTERACT_NEW;
+    var_SetAddress( p_dialog->p_interface, "interaction", p_dialog );
+
+    /* Check if we have already added this dialog */
+    vlc_mutex_lock( &p_interaction->lock );
+    /* Add it to the queue, the main loop will send the orders to the
+     * interface */
+    INSERT_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs,
+                 p_interaction->i_dialogs,  p_dialog );
+
+    if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) /* Wait for answer */
     {
-        vlc_value_t val;
-
-        p_dialog->i_action = INTERACT_NEW;
-        val.p_address = p_dialog;
-        var_Set( p_dialog->p_interface, "interaction", val );
-
-        /* Check if we have already added this dialog */
-        vlc_mutex_lock( &p_interaction->lock );
-        /* Add it to the queue, the main loop will send the orders to the
-         * interface */
-        INSERT_ELEM( p_interaction->pp_dialogs, p_interaction->i_dialogs,
-                     p_interaction->i_dialogs,  p_dialog );
-
-        if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY ) /* Wait for answer */
+        vlc_cond_signal( &p_interaction->wait );
+        while( p_dialog->i_status != ANSWERED_DIALOG &&
+               p_dialog->i_status != HIDING_DIALOG &&
+               p_dialog->i_status != HIDDEN_DIALOG &&
+               !p_dialog->p_parent->b_die )
         {
-            vlc_cond_signal( &p_interaction->wait );
-            while( p_dialog->i_status != ANSWERED_DIALOG &&
-                   p_dialog->i_status != HIDING_DIALOG &&
-                   p_dialog->i_status != HIDDEN_DIALOG &&
-                   !p_dialog->p_parent->b_die )
-            {
-                vlc_mutex_unlock( &p_interaction->lock );
-                msleep( 100000 );
-                vlc_mutex_lock( &p_interaction->lock );
-            }
-            if( p_dialog->p_parent->b_die )
-            {
-                p_dialog->i_return = DIALOG_CANCELLED;
-                p_dialog->i_status = ANSWERED_DIALOG;
-            }
-            p_dialog->i_flags |= DIALOG_GOT_ANSWER;
-            vlc_cond_signal( &p_interaction->wait );
             vlc_mutex_unlock( &p_interaction->lock );
-            vlc_object_release( p_interaction );
-            return p_dialog->i_return;
+            msleep( 100000 );
+            vlc_mutex_lock( &p_interaction->lock );
         }
-        else
+        if( p_dialog->p_parent->b_die )
         {
-            /* Pretend we already retrieved the "answer" */
-            p_dialog->i_flags |=  DIALOG_GOT_ANSWER;
-            vlc_cond_signal( &p_interaction->wait );
-            vlc_mutex_unlock( &p_interaction->lock );
-            vlc_object_release( p_interaction );
-            return VLC_SUCCESS;
+            p_dialog->i_return = DIALOG_CANCELLED;
+            p_dialog->i_status = ANSWERED_DIALOG;
         }
     }
+    p_dialog->i_flags |= DIALOG_GOT_ANSWER;
+    vlc_cond_signal( &p_interaction->wait );
+    vlc_mutex_unlock( &p_interaction->lock );
+    vlc_object_release( p_interaction );
+    if( p_dialog->i_type == INTERACT_DIALOG_TWOWAY )
+        return p_dialog->i_return;
     else
-    {
-        vlc_object_release( p_interaction );
-        return VLC_EGENERIC;
-    }
+        return VLC_SUCCESS;
 }
 
 static void* InteractionLoop( void *p_this )

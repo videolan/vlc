@@ -198,7 +198,6 @@ intf_ProgressIsCancelled
 intf_ProgressUpdate
 intf_RunThread
 intf_StopThread
-__intf_UserFatal
 intf_UserHide
 __intf_UserLoginPassword
 __intf_UserStringInput
