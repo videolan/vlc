@@ -20,6 +20,7 @@
 
 #ifndef VLC_DIALOG_H_
 #define VLC_DIALOG_H_
+# include <stdarg.h>
 
 /**
  * \file vlc_dialog.h
@@ -34,11 +35,34 @@ typedef struct dialog_fatal_t
 {
     const char *title;
     const char *message;
+    bool modal;
 } dialog_fatal_t;
 
-VLC_EXPORT( void, dialog_Fatal, (vlc_object_t *, const char *, const char *, ...) ) LIBVLC_FORMAT(3, 4);
+VLC_EXPORT( void, dialog_VFatal, (vlc_object_t *, bool, const char *, const char *, va_list) );
+
+static inline LIBVLC_FORMAT(3, 4)
+void dialog_Fatal (vlc_object_t *obj, const char *title, const char *fmt, ...)
+{
+     va_list ap;
+
+     va_start (ap, fmt);
+     dialog_VFatal(obj, false, title, fmt, ap);
+     va_end (ap);
+}
 #define dialog_Fatal(o, t, ...) \
         dialog_Fatal(VLC_OBJECT(o), t, __VA_ARGS__)
+
+static inline LIBVLC_FORMAT(3, 4)
+void dialog_FatalWait (vlc_object_t *obj, const char *title,
+                       const char *fmt, ...){
+     va_list ap;
+
+     va_start (ap, fmt);
+     dialog_VFatal(obj, true, title, fmt, ap);
+     va_end (ap);
+}
+#define dialog_FatalWait(o, t, ...) \
+        dialog_FatalWait(VLC_OBJECT(o), t, __VA_ARGS__)
 
 VLC_EXPORT( int, dialog_Register, (vlc_object_t *) );
 VLC_EXPORT( int, dialog_Unregister, (vlc_object_t *) );

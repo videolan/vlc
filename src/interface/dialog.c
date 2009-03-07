@@ -92,9 +92,8 @@ static vlc_object_t *dialog_GetProvider (vlc_object_t *obj)
     return provider;
 }
 
-static
-void dialog_FatalVa (vlc_object_t *obj, const char *title,
-                     const char *fmt, va_list ap)
+void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
+                    const char *fmt, va_list ap)
 {
     char *text;
 
@@ -112,22 +111,8 @@ void dialog_FatalVa (vlc_object_t *obj, const char *title,
     if (vasprintf (&text, fmt, ap) == -1)
         return;
 
-    dialog_fatal_t dialog = { title, text, };
+    dialog_fatal_t dialog = { title, text, modal, };
     var_SetAddress (provider, "dialog-fatal", &dialog);
     free (text);
     vlc_object_release (provider);
-}
-
-#undef dialog_Fatal
-/**
- * Notify the user of some fatal error.
- * This is a fire and forget function.
- */
-void dialog_Fatal (vlc_object_t *obj, const char *title, const char *fmt, ...)
-{
-    va_list ap;
-
-    va_start (ap, fmt);
-    dialog_FatalVa (obj, title, fmt, ap);
-    va_end (ap);
 }
