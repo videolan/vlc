@@ -459,9 +459,9 @@ void vout_IntfInit( vout_thread_t *p_vout )
  * This function will inject a subpicture into the vout with the provided
  * picture
  */
-static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, picture_t *p_pic, const video_format_t *p_fmt_in )
+static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    video_format_t fmt_in = *p_fmt_in;
+    video_format_t fmt_in = p_pic->format;
     video_format_t fmt_out;
     picture_t *p_pip;
     subpicture_t *p_subpic;
@@ -472,12 +472,19 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, image_handler_t *p_image, pic
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
 
     /* */
+    image_handler_t *p_image = image_HandlerCreate( p_vout );
+    if( !p_image )
+        return VLC_EGENERIC;
+
     p_pip = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
+
+    image_HandlerDelete( p_image );
+
     if( !p_pip )
         return VLC_EGENERIC;
 
     p_subpic = subpicture_New();
-    if( p_subpic == NULL )
+    if( !p_subpic )
     {
          picture_Release( p_pip );
          return VLC_EGENERIC;
@@ -577,244 +584,204 @@ static char *VoutSnapshotGetDefaultDirectory( void )
     return psz_path;
 }
 
-int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
+int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_picture_private )
 {
-    image_handler_t *p_image = image_HandlerCreate( p_vout );
-    video_format_t fmt_in, fmt_out;
-    char *psz_filename = NULL;
-    vlc_value_t val, format;
-    DIR *path;
-    int i_ret;
-    bool b_embedded_snapshot;
-    void *p_obj;
+    /* FIXME find why it is sometimes needed (format being wrong/invalid) */
+    picture_t pic = *p_picture_private;
+    pic.format = p_vout->fmt_out;
+    picture_t *p_pic = &pic;
 
     /* */
-    val.psz_string = var_GetNonEmptyString( p_vout, "snapshot-path" );
+    char *psz_path = var_GetNonEmptyString( p_vout, "snapshot-path" );
 
     /* Embedded snapshot : if snapshot-path == object:object_ptr */
-    if( val.psz_string && sscanf( val.psz_string, "object:%p", &p_obj ) > 0 )
-        b_embedded_snapshot = true;
-    else
-        b_embedded_snapshot = false;
+    void *p_obj;
+    const bool b_embedded_snapshot = psz_path && sscanf( psz_path, "object:%p", &p_obj ) > 0;
 
-    /* */
-    memset( &fmt_in, 0, sizeof(video_format_t) );
-    fmt_in = p_vout->fmt_out;
-    if( fmt_in.i_sar_num <= 0 || fmt_in.i_sar_den <= 0 )
+    char *psz_format = NULL;
+    if( !b_embedded_snapshot )
     {
-        fmt_in.i_sar_num =
-        fmt_in.i_sar_den = 1;
-    }
-
-    /* */
-    memset( &fmt_out, 0, sizeof(video_format_t) );
-    fmt_out.i_sar_num =
-    fmt_out.i_sar_den = 1;
-    fmt_out.i_chroma = b_embedded_snapshot ? VLC_FOURCC('p','n','g',' ') : 0;
-    fmt_out.i_width = var_GetInteger( p_vout, "snapshot-width" );
-    fmt_out.i_height = var_GetInteger( p_vout, "snapshot-height" );
-
-    if( b_embedded_snapshot &&
-        fmt_out.i_width == 0 && fmt_out.i_height == 0 )
-    {
-        /* If snapshot-width and/or snapshot height were not specified,
-           use a default snapshot width of 320 */
-        fmt_out.i_width = 320;
-    }
-
-    if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
-    {
-        fmt_out.i_height = fmt_in.i_height * fmt_out.i_width / fmt_in.i_width;
-        const int i_height = fmt_out.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
-        if( i_height > 0 )
-            fmt_out.i_height = i_height;
-    }
-    else
-    {
-        if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
+        psz_format = var_GetNonEmptyString( p_vout, "snapshot-format" );
+        if( !psz_format )
+            psz_format = strdup( "png" );
+        if( !psz_format )
         {
-            fmt_out.i_width = fmt_in.i_width * fmt_out.i_height / fmt_in.i_height;
-        }
-        else
-        {
-            fmt_out.i_width = fmt_in.i_width;
-            fmt_out.i_height = fmt_in.i_height;
-        }
-        const int i_width = fmt_out.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
-        if( i_width > 0 )
-            fmt_out.i_width = i_width;
-    }
-
-    /* Embedded snapshot
-       create a snapshot_t* and store it in
-       object_ptr->p_private, then unlock and signal the
-       waiting object.
-     */
-    if( b_embedded_snapshot )
-    {
-        block_t *p_block;
-        snapshot_t *p_snapshot = p_obj;
-        size_t i_size;
-
-	vlc_mutex_lock( &p_snapshot->p_mutex );
-	p_snapshot->p_data = NULL;
-
-        /* Save the snapshot to a memory zone */
-        p_block = image_Write( p_image, p_pic, &fmt_in, &fmt_out );
-        if( !p_block )
-        {
-            msg_Err( p_vout, "Could not get snapshot" );
-            image_HandlerDelete( p_image );
-	    vlc_cond_signal( &p_snapshot->p_condvar );
-	    vlc_mutex_unlock( &p_snapshot->p_mutex );
-            return VLC_EGENERIC;
-        }
-
-        i_size = p_block->i_buffer;
-
-        p_snapshot->i_width = fmt_out.i_width;
-        p_snapshot->i_height = fmt_out.i_height;
-        p_snapshot->i_datasize = i_size;
-        p_snapshot->date = p_block->i_pts; /* FIXME ?? */
-        p_snapshot->p_data = malloc( i_size );
-        if( !p_snapshot->p_data )
-        {
-            block_Release( p_block );
-            image_HandlerDelete( p_image );
-	    vlc_cond_signal( &p_snapshot->p_condvar );
-	    vlc_mutex_unlock( &p_snapshot->p_mutex );
+            free( psz_path );
             return VLC_ENOMEM;
         }
-        memcpy( p_snapshot->p_data, p_block->p_buffer, p_block->i_buffer );
+    }
 
-        block_Release( p_block );
+    vlc_fourcc_t i_format = VLC_FOURCC('p','n','g',' ');
+    if( psz_format && image_Ext2Fourcc( psz_format ) )
+        i_format = image_Ext2Fourcc( psz_format );
 
-        /* Unlock the object */
-	vlc_cond_signal( &p_snapshot->p_condvar );
-	vlc_mutex_unlock( &p_snapshot->p_mutex );
+    int i_override_width  = var_GetInteger( p_vout, "snapshot-width" );
+    int i_override_height = var_GetInteger( p_vout, "snapshot-height" );
+    /* If snapshot-width and/or snapshot height were not specified for embed snapshot ,
+       use a default snapshot width of 320.
+     TODO removed that weird behavior */
 
-        image_HandlerDelete( p_image );
+    if( b_embedded_snapshot && !i_override_width && !i_override_height )
+        i_override_width = 320;
+
+    block_t *p_out;
+    video_format_t fmt_out;
+    if( picture_Export( VLC_OBJECT(p_vout), &p_out, &fmt_out,
+                        p_pic, i_format, i_override_width, i_override_height ) )
+    {
+        msg_Err( p_vout, "Failed to convert image for snapshot" );
+        p_out = NULL;
+    }
+
+    if( b_embedded_snapshot )
+    {
+        /* TODO fix that ugliness */
+        snapshot_t *p_snapshot = p_obj;
+
+        vlc_mutex_lock( &p_snapshot->p_mutex );
+        p_snapshot->i_width = fmt_out.i_width;
+        p_snapshot->i_height = fmt_out.i_height;
+        p_snapshot->date = p_pic->date;
+
+        p_snapshot->i_datasize = 0;
+        p_snapshot->p_data = NULL;
+        if( p_out )
+        {
+            p_snapshot->p_data = malloc( p_out->i_buffer );
+            if( p_snapshot->p_data )
+            {
+                p_snapshot->i_datasize = p_out->i_buffer;
+                memcpy( p_snapshot->p_data, p_out->p_buffer, p_out->i_buffer );
+            }
+        }
+
+	    vlc_cond_signal( &p_snapshot->p_condvar );
+	    vlc_mutex_unlock( &p_snapshot->p_mutex );
+
+        free( psz_path );
+        free( psz_format );
+
+        if( !p_out )
+            return VLC_EGENERIC;
+        block_Release( p_out );
         return VLC_SUCCESS;
     }
 
+    if( !p_out )
+        goto error;
+
     /* Get default directory if none provided */
-    if( !val.psz_string )
-        val.psz_string = VoutSnapshotGetDefaultDirectory( );
-    if( !val.psz_string )
+    if( !psz_path )
     {
-        msg_Err( p_vout, "no path specified for snapshots" );
-        image_HandlerDelete( p_image );
-        return VLC_EGENERIC;
+        psz_path = VoutSnapshotGetDefaultDirectory();
+        if( !psz_path )
+        {
+            msg_Err( p_vout, "no path specified for snapshots" );
+            goto error;
+        }
     }
 
-    /* Get snapshot format, default being "png" */
-    format.psz_string = var_GetNonEmptyString( p_vout, "snapshot-format" );
-    if( !format.psz_string )
-        format.psz_string = strdup( "png" );
-    if( !format.psz_string )
+    /* */
+    char *psz_filename;
+    DIR *p_path = utf8_opendir( psz_path );
+    if( p_path != NULL )
     {
-        free( val.psz_string );
-        image_HandlerDelete( p_image );
-        return VLC_ENOMEM;
-    }
+        /* The use specified a directory path */
+        closedir( p_path );
 
-    /*
-     * Did the user specify a directory? If not, path = NULL.
-     */
-    path = utf8_opendir ( (const char *)val.psz_string  );
-    if( path != NULL )
-    {
+        /* */
         char *psz_prefix = var_GetNonEmptyString( p_vout, "snapshot-prefix" );
-        if( psz_prefix == NULL )
-            psz_prefix = strdup( "vlcsnap-" );
-        else
+        if( psz_prefix )
         {
             char *psz_tmp = str_format( p_vout, psz_prefix );
-            filename_sanitize( psz_tmp );
             free( psz_prefix );
             psz_prefix = psz_tmp;
         }
+        if( !psz_prefix )
+        {
+            psz_prefix = strdup( "vlcsnap-" );
+            if( !psz_prefix )
+                goto error;
+        }
 
-        closedir( path );
         if( var_GetBool( p_vout, "snapshot-sequential" ) == true )
         {
             int i_num = var_GetInteger( p_vout, "snapshot-num" );
-            struct stat st;
-
-            do
+            for( ; ; i_num++ )
             {
-                free( psz_filename );
+                struct stat st;
+
                 if( asprintf( &psz_filename, "%s" DIR_SEP "%s%05d.%s",
-                              val.psz_string, psz_prefix, i_num++,
-                              format.psz_string ) == -1 )
+                              psz_path, psz_prefix, i_num++, psz_format ) < 0 )
                 {
-                    msg_Err( p_vout, "could not create snapshot" );
-                    image_HandlerDelete( p_image );
-                    return VLC_EGENERIC;
+                    free( psz_prefix );
+                    goto error;
                 }
+                if( utf8_stat( psz_filename, &st ) )
+                    break;
+                free( psz_filename );
             }
-            while( utf8_stat( psz_filename, &st ) == 0 );
 
             var_SetInteger( p_vout, "snapshot-num", i_num );
         }
         else
         {
             struct tm    curtime;
-            time_t        lcurtime ;
-            lcurtime = time( NULL ) ;
-            if ( ( localtime_r( &lcurtime, &curtime ) == NULL ) )
+            time_t       lcurtime = time( NULL ) ;
+
+            if( !localtime_r( &lcurtime, &curtime ) )
             {
+                const unsigned int i_id = (p_pic->date / 100000) & 0xFFFFFF;
+
                 msg_Warn( p_vout, "failed to get current time. Falling back to legacy snapshot naming" );
-                /* failed to get current time. Fallback to old format */
+
                 if( asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s",
-                          val.psz_string, psz_prefix,
-                          (unsigned int)(p_pic->date / 100000) & 0xFFFFFF,
-                          format.psz_string ) == -1 )
-                {
-                    msg_Err( p_vout, "could not create snapshot" );
-                    image_HandlerDelete( p_image );
-                    return VLC_EGENERIC;
-                }
+                              psz_path, psz_prefix, i_id, psz_format ) < 0 )
+                    psz_filename = NULL;
             }
             else
             {
-                char psz_curtime[15] ;
-                if( strftime( psz_curtime, 15, "%y%m%d-%H%M%S", &curtime ) == 0 )
-                {
-                    msg_Warn( p_vout, "snapshot date string truncated" ) ;
-                }
+                /* suffix with the last decimal digit in 10s of seconds resolution
+                 * FIXME gni ? */
+                const int i_id = (p_pic->date / (100*1000)) & 0xFF;
+                char psz_curtime[128];
+
+                if( !strftime( psz_curtime, sizeof(psz_curtime), "%Y-%m-%d-%Hh%Mm%Ss", &curtime ) )
+                    strcpy( psz_curtime, "error" );
+
                 if( asprintf( &psz_filename, "%s" DIR_SEP "%s%s%1u.%s",
-                      val.psz_string, psz_prefix, psz_curtime,
-                     /* suffix with the last decimal digit in 10s of seconds resolution */
-                     (unsigned int)(p_pic->date / (100*1000)) & 0xFF,
-                      format.psz_string ) == -1 )
-                {
-                    msg_Err( p_vout, "could not create snapshot" );
-                    image_HandlerDelete( p_image );
-                    return VLC_EGENERIC;
-                }
-            } //end if time() < 0
-        } //end snapshot sequential
+                              psz_path, psz_prefix, psz_curtime, i_id, psz_format ) < 0 )
+                    psz_filename = NULL;
+            }
+        }
         free( psz_prefix );
     }
-    else // The user specified a full path name (including file name)
+    else
     {
-        psz_filename = str_format( p_vout, val.psz_string );
+        /* The user specified a full path name (including file name) */
+        psz_filename = str_format( p_vout, psz_path );
         path_sanitize( psz_filename );
     }
 
-    free( val.psz_string );
-    free( format.psz_string );
+    if( !psz_filename )
+        goto error;
 
     /* Save the snapshot */
-    i_ret = image_WriteUrl( p_image, p_pic, &fmt_in, &fmt_out, psz_filename );
-    if( i_ret != VLC_SUCCESS )
+    FILE *p_file = utf8_fopen( psz_filename, "wb" );
+    if( !p_file )
     {
-        msg_Err( p_vout, "could not create snapshot %s", psz_filename );
+        msg_Err( p_vout, "Failed to open '%s'", psz_filename );
         free( psz_filename );
-        image_HandlerDelete( p_image );
-        return VLC_EGENERIC;
+        goto error;
     }
+    if( fwrite( p_out->p_buffer, p_out->i_buffer, 1, p_file ) != 1 )
+    {
+        msg_Err( p_vout, "Failed to write to '%s'", psz_filename );
+        fclose( p_file );
+        free( psz_filename );
+        goto error;
+    }
+    fclose( p_file );
 
     /* */
     msg_Dbg( p_vout, "snapshot taken (%s)", psz_filename );
@@ -824,21 +791,30 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     /* Generate a media player event  - Right now just trigger a global libvlc var
         CHECK: Could not find a more local object. The goal is to communicate
         vout_thread with libvlc_media_player or its input_thread*/
-    val.psz_string =  psz_filename  ;
+    var_SetString( p_vout->p_libvlc, "vout-snapshottaken", psz_filename );
 
-    var_Set( p_vout->p_libvlc, "vout-snapshottaken", val );
-    /* var_Set duplicates data for transport so we can free*/
     free( psz_filename );
 
     /* */
     if( var_GetBool( p_vout, "snapshot-preview" ) )
     {
-        if( VoutSnapshotPip( p_vout, p_image, p_pic, &fmt_in ) )
+        if( VoutSnapshotPip( p_vout, p_pic ) )
             msg_Warn( p_vout, "Failed to display snapshot" );
     }
-    image_HandlerDelete( p_image );
 
+    if( p_out )
+        block_Release( p_out );
+    free( psz_path );
+    free( psz_format );
     return VLC_SUCCESS;
+
+error:
+    msg_Err( p_vout, "could not create snapshot" );
+    if( p_out )
+        block_Release( p_out );
+    free( psz_path );
+    free( psz_format );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
