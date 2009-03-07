@@ -149,11 +149,14 @@ static void Close ( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    switch( i_query )
-    {
-    default:
-        return demux_vaControlHelper( p_demux->s, 0, -1,
-                                       8*CDG_FRAME_SIZE*CDG_FRAME_RATE, CDG_FRAME_SIZE, i_query, args );
-    }
+    int i_ret = demux_vaControlHelper( p_demux->s, 0, -1,
+                                       8*CDG_FRAME_SIZE*CDG_FRAME_RATE, CDG_FRAME_SIZE,
+                                       i_query, args );
+    if( !i_ret && ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
+        date_Set( &p_demux->p_sys->pts,
+                  stream_Tell( p_demux->s ) / CDG_FRAME_SIZE *
+                    INT64_C(1000000) / CDG_FRAME_RATE );
+
+    return i_ret;
 }
 
