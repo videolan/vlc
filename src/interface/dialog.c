@@ -115,7 +115,7 @@ void dialog_FatalVa (vlc_object_t *obj, const char *title,
     dialog_fatal_t dialog = { title, text, };
     var_SetAddress (provider, "dialog-fatal", &dialog);
     free (text);
-    vlc_object_release (obj);
+    vlc_object_release (provider);
 }
 
 #undef dialog_Fatal
