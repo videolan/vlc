@@ -51,6 +51,7 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include <gcrypt.h>
 #include <vlc_gcrypt.h>
@@ -1569,7 +1570,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     if( !p_file )
     {
         msg_Err( p_udt, "Failed to open %s for writing", psz_destfile );
-        intf_UserFatal( p_udt, true, _("Saving file failed"),
+        dialog_FatalWait( p_udt, _("Saving file failed"),
             _("Failed to open \"%s\" for writing"),
              psz_destfile );
         goto end;
@@ -1645,7 +1646,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     {
         utf8_unlink( psz_destfile );
 
-        intf_UserFatal( p_udt, true, _("File could not be verified"),
+        dialog_FatalWait( p_udt, _("File could not be verified"),
             _("It was not possible to download a cryptographic signature for "
               "the downloaded file \"%s\". Thus, it was deleted."),
             psz_destfile );
@@ -1657,7 +1658,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     {
         utf8_unlink( psz_destfile );
         msg_Err( p_udt, "Invalid signature issuer" );
-        intf_UserFatal( p_udt, true, _("Invalid signature"),
+        dialog_FatalWait( p_udt, _("Invalid signature"),
             _("The cryptographic signature for the downloaded file \"%s\" was "
               "invalid and could not be used to securely verify it. Thus, the "
               "file was deleted."),
@@ -1669,7 +1670,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     {
         utf8_unlink( psz_destfile );
         msg_Err( p_udt, "Invalid signature type" );
-        intf_UserFatal( p_udt, true, _("Invalid signature"),
+        dialog_FatalWait( p_udt, _("Invalid signature"),
             _("The cryptographic signature for the downloaded file \"%s\" was "
               "invalid and could not be used to securely verify it. Thus, the "
               "file was deleted."),
@@ -1682,7 +1683,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     {
         msg_Err( p_udt, "Unable to hash %s", psz_destfile );
         utf8_unlink( psz_destfile );
-        intf_UserFatal( p_udt, true, _("File not verifiable"),
+        dialog_FatalWait( p_udt, _("File not verifiable"),
             _("It was not possible to securely verify the downloaded file"
               " \"%s\". Thus, it was deleted."),
             psz_destfile );
@@ -1694,7 +1695,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         p_hash[1] != sign.hash_verification[1] )
     {
         utf8_unlink( psz_destfile );
-        intf_UserFatal( p_udt, true, _("File corrupted"),
+        dialog_FatalWait( p_udt, _("File corrupted"),
             _("Downloaded file \"%s\" was corrupted. Thus, it was deleted."),
              psz_destfile );
         msg_Err( p_udt, "Bad SHA1 hash for %s", psz_destfile );
@@ -1706,7 +1707,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
             != VLC_SUCCESS )
     {
         utf8_unlink( psz_destfile );
-        intf_UserFatal( p_udt, true, _("File corrupted"),
+        dialog_FatalWait( p_udt, _("File corrupted"),
             _("Downloaded file \"%s\" was corrupted. Thus, it was deleted."),
              psz_destfile );
         msg_Err( p_udt, "BAD SIGNATURE for %s", psz_destfile );
