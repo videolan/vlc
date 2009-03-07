@@ -64,6 +64,21 @@ void dialog_FatalWait (vlc_object_t *obj, const char *title,
 #define dialog_FatalWait(o, t, ...) \
         dialog_FatalWait(VLC_OBJECT(o), t, __VA_ARGS__)
 
+/**
+ * A login dialog.
+ */
+typedef struct dialog_login_t
+{
+    const char *title;
+    const char *message;
+    char **username;
+    char **password;
+} dialog_login_t;
+
+VLC_EXPORT( void, dialog_Login, (vlc_object_t *, char **, char **, const char *, const char *) );
+#define dialog_Login(o, u, p, t, m) \
+        dialog_Login(VLC_OBJECT(o), u, p, t, m)
+
 VLC_EXPORT( int, dialog_Register, (vlc_object_t *) );
 VLC_EXPORT( int, dialog_Unregister, (vlc_object_t *) );
 #define dialog_Register(o) dialog_Register(VLC_OBJECT(o))

@@ -92,6 +92,15 @@ static vlc_object_t *dialog_GetProvider (vlc_object_t *obj)
     return provider;
 }
 
+/**
+ * Sends an error message through the user interface (if any).
+ * @param obj the VLC object emitting the error
+ * @param modal whether to wait for user to acknowledge the error
+ *              before returning control to the caller
+ * @param title title of the error dialog
+ * @param fmt format string for the error message
+ * @param ap parameters list for the formatted error message
+ */
 void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
                     const char *fmt, va_list ap)
 {
@@ -108,11 +117,42 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
         return;
     }
 
-    if (vasprintf (&text, fmt, ap) == -1)
+    if (vasprintf (&text, fmt, ap) != -1)
+    {
+        dialog_fatal_t dialog = { title, text, modal, };
+        var_SetAddress (provider, "dialog-fatal", &dialog);
+        free (text);
+    }
+    vlc_object_release (provider);
+}
+
+#undef dialog_Login
+/**
+ * Requests a username and password through the user interface.
+ * @param obj the VLC object requesting credential informations
+ * @param username a pointer to the specified username [OUT]
+ * @param password a pointer to the specified password [OUT]
+ * @param title title for the dialog
+ * @param text text for the dialog
+ * @return Nothing. If a user name resp. a password was specified,
+ * it will be returned as a heap-allocated character array
+ * into the username resp password pointer. Those must be freed with free().
+ * Otherwise *username resp *password will be NULL.
+ */
+void dialog_Login (vlc_object_t *obj, char **username, char **password,
+                   const char *title, const char *text)
+{
+    assert ((username != NULL) && (password != NULL));
+
+    *username = *password = NULL;
+    if (obj->i_flags & OBJECT_FLAGS_NOINTERACT)
         return;
 
-    dialog_fatal_t dialog = { title, text, modal, };
-    var_SetAddress (provider, "dialog-fatal", &dialog);
-    free (text);
+    vlc_object_t *provider = dialog_GetProvider (obj);
+    if (provider == NULL)
+        return;
+
+    dialog_login_t dialog = { title, text, username, password, };
+    var_SetAddress (provider, "dialog-login", &dialog);
     vlc_object_release (provider);
 }
