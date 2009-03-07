@@ -39,6 +39,7 @@
 #include "components/interface_widgets.hpp"
 #include "components/controller.hpp"
 #include "components/playlist/playlist.hpp"
+#include "dialogs/external.hpp"
 
 #include "menus.hpp"
 #include "recents.hpp"
@@ -56,14 +57,11 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QMessageBox>
 
 #include <assert.h>
 
 #include <vlc_keys.h> /* Wheel event */
 #include <vlc_vout.h>
-#include <vlc_dialog.h>
-#include "dialogs/errors.hpp"
 
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
@@ -198,6 +196,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* END CONNECTS ON IM */
 
+    dialogHandler = new DialogHandler (p_intf);
 
     /************
      * Callbacks
@@ -205,13 +204,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "interaction", InteractCallback, this );
     interaction_Register( p_intf );
-
-    connect( this, SIGNAL(fatalDialog( const struct dialog_fatal_t * )),
-             this, SLOT(displayFatalDialog( const struct dialog_fatal_t * )),
-             Qt::BlockingQueuedConnection );
-    var_Create( p_intf, "dialog-fatal", VLC_VAR_ADDRESS );
-    var_AddCallback( p_intf, "dialog-fatal", DialogCallback, this );
-    dialog_Register( p_intf );
 
     var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
@@ -289,6 +281,8 @@ MainInterface::~MainInterface()
 {
     msg_Dbg( p_intf, "Destroying the main interface" );
 
+    delete dialogHandler;
+
     /* Unsure we hide the videoWidget before destroying it */
     if( videoIsActive ) videoWidget->hide();
 
@@ -331,9 +325,6 @@ MainInterface::~MainInterface()
 
     interaction_Unregister( p_intf );
     var_DelCallback( p_intf, "interaction", InteractCallback, this );
-
-    dialog_Unregister( p_intf );
-    var_DelCallback( p_intf, "dialog-fatal", DialogCallback, this );
 
     p_intf->p_sys->p_mi = NULL;
 }
@@ -1233,29 +1224,6 @@ static int InteractCallback( vlc_object_t *p_this,
     DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
     QApplication::postEvent( THEDP, event );
     return VLC_SUCCESS;
-}
-
-int MainInterface::DialogCallback( vlc_object_t *p_this,
-                                   const char *type, vlc_value_t previous,
-                                   vlc_value_t value, void *data )
-{
-    MainInterface *self = (MainInterface *)data;
-    const dialog_fatal_t *dialog = (const dialog_fatal_t *)value.p_address;
-    (void) previous;
-
-    emit self->fatalDialog (dialog);
-    return VLC_SUCCESS;
-}
-
-void MainInterface::displayFatalDialog (const dialog_fatal_t *dialog)
-{
-    if (dialog->modal)
-        QMessageBox::critical (NULL, qfu(dialog->title), qfu(dialog->message),
-                               QMessageBox::Ok);
-    else
-    if (config_GetInt (p_intf, "qt-error-dialogs"))
-        ErrorsDialog::getInstance (p_intf)->addError(qfu(dialog->title),
-                                                     qfu(dialog->message));
 }
 
 /*****************************************************************************

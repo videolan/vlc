@@ -27,6 +27,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/extended.moc.cpp \
 		dialogs/messages.moc.cpp \
 		dialogs/errors.moc.cpp \
+		dialogs/external.moc.cpp \
 		dialogs/plugins.moc.cpp \
 		dialogs/preferences.moc.cpp \
 		dialogs/interaction.moc.cpp \
@@ -201,6 +202,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/extended.cpp \
 		dialogs/messages.cpp \
 		dialogs/errors.cpp \
+		dialogs/external.cpp \
 		dialogs/plugins.cpp \
 		dialogs/interaction.cpp \
 		dialogs/sout.cpp \
@@ -246,6 +248,7 @@ noinst_HEADERS = \
 	dialogs/extended.hpp \
 	dialogs/messages.hpp \
 	dialogs/errors.hpp \
+	dialogs/external.hpp \
 	dialogs/plugins.hpp \
 	dialogs/preferences.hpp \
 	dialogs/interaction.hpp \

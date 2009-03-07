@@ -49,7 +49,7 @@ class FullscreenControllerWidget;
 class SpeedControlWidget;
 class QMenu;
 class QSize;
-struct dialog_fatal_t;
+class DialogHandler;
 
 enum {
     CONTROLS_VISIBLE = 0x1,
@@ -108,6 +108,7 @@ private:
     ControlsWidget      *controls;
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
+    DialogHandler       *dialogHandler;
 
     void handleMainUi( QSettings* );
     void askForPrivacy();
@@ -151,11 +152,6 @@ private:
     virtual void wheelEvent( QWheelEvent * );
     virtual void resizeEvent( QResizeEvent * event );
 
-    static int DialogCallback( vlc_object_t *, const char *, vlc_value_t,
-                               vlc_value_t, void * );
-private slots:
-    void displayFatalDialog( const struct dialog_fatal_t * );
-
 public slots:
     void undockPlaylist();
     void dockPlaylist( pl_dock_e i_pos = PL_BOTTOM );
@@ -194,7 +190,6 @@ signals:
     void askUpdate();
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
-    void fatalDialog( const struct dialog_fatal_t * );
 };
 
 #endif
