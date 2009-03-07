@@ -564,7 +564,6 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
     CONFIG_GENERIC( "album-art", IntegerList ); line++;
 #ifdef UPDATE_CHECK
     CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool ); line++;
-    CONFIG_GENERIC_NOBOOL( "qt-updates-days", Integer ); line++;
 #endif
 
     QPushButton *ok = new QPushButton( qtr( "OK" ) );
