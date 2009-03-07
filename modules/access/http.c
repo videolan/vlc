@@ -37,7 +37,7 @@
 
 #include <vlc_access.h>
 
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 #include <vlc_meta.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
@@ -433,8 +433,7 @@ connect:
 
     if( p_sys->i_code == 401 )
     {
-        char *psz_login = NULL, *psz_password = NULL;
-        char psz_msg[250];
+        char *psz_login, *psz_password;
         int i_ret;
         /* FIXME ? */
         if( p_sys->url.psz_username && p_sys->url.psz_password &&
@@ -443,21 +442,18 @@ connect:
             Disconnect( p_access );
             goto connect;
         }
-        snprintf( psz_msg, 250,
-            _("Please enter a valid login name and a password for realm %s."),
-            p_sys->auth.psz_realm );
         msg_Dbg( p_access, "authentication failed for realm %s",
-            p_sys->auth.psz_realm );
-        i_ret = intf_UserLoginPassword( p_access, _("HTTP authentication"),
-                                        psz_msg, &psz_login, &psz_password );
-        if( i_ret == DIALOG_OK_YES )
+                 p_sys->auth.psz_realm );
+        dialog_Login( p_access, &psz_login, &psz_password,
+                      _("HTTP authentication"),
+             _("Please enter a valid login name and a password for realm %s."),
+                      p_sys->auth.psz_realm );
+        if( psz_login != NULL && psz_password != NULL )
         {
             msg_Dbg( p_access, "retrying with user=%s, pwd=%s",
                         psz_login, psz_password );
-            if( psz_login ) p_sys->url.psz_username = strdup( psz_login );
-            if( psz_password ) p_sys->url.psz_password = strdup( psz_password );
-            free( psz_login );
-            free( psz_password );
+            p_sys->url.psz_username = psz_login;
+            p_sys->url.psz_password = psz_password;
             Disconnect( p_access );
             goto connect;
         }

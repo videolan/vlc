@@ -42,7 +42,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
 
@@ -604,17 +604,14 @@ describe:
 
         if( i_code == 401 )
         {
-            int i_result;
             msg_Dbg( p_demux, "authentication failed" );
 
             free( psz_user );
             free( psz_pwd );
-            psz_user = psz_pwd = NULL;
-
-            i_result = intf_UserLoginPassword( p_demux, _("RTSP authentication"),
-                           _("Please enter a valid login name and a password."),
-                                                   &psz_user, &psz_pwd );
-            if( i_result == DIALOG_OK_YES )
+            dialog_Login( p_demux, &psz_user, &psz_pwd,
+                          _("RTSP authentication"),
+                        _("Please enter a valid login name and a password.") );
+            if( psz_user != NULL && psz_pwd != NULL )
             {
                 msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
                          psz_user, psz_pwd );
