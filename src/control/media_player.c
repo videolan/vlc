@@ -765,7 +765,14 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
 {
     input_thread_t *p_input_thread;
 
+#ifdef WIN32
+    if (sizeof (HWND) <= sizeof (libvlc_drawable_t))
+        p_mi->drawable.hwnd = (HWND)drawable;
+    else
+        libvlc_exception_raise(p_e, "Operation not supported");
+#else
     p_mi->drawable.xid = drawable;
+#endif
 
     /* Allow on the fly drawable changing. This is tricky has this may
      * not be supported by every vout. We though can't disable it
@@ -789,7 +796,15 @@ libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi,
                                    libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
+
+#ifdef WIN32
+    if (sizeof (HWND) <= sizeof (libvlc_drawable_t))
+        return (libvlc_drawable_t)p_mi->drawable.hwnd;
+    else
+        return 0;
+#else
     return p_mi->drawable.xid;
+#endif
 }
 
 /**************************************************************************
