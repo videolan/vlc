@@ -258,7 +258,7 @@ static int AudioAutoMenuBuilder( aout_instance_t *p_object,
 
 #define ACT_ADDMENU( _menu, val, title ) { \
     QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
-    _action->setMenu( new QMenu() ); _menu->addAction( _action ); }
+    _action->setMenu( new QMenu( _menu ) ); _menu->addAction( _action ); }
 
 #define ACT_ADDCHECK( _menu, val, title ) { \
     QAction *_action = new QAction( title, _menu ); _action->setData( val ); \
