@@ -185,18 +185,19 @@ static bool CheckMimeHeader( demux_t *p_demux, int *p_header_size )
         *p_header_size = -1;
         return false;
     }
-    if( p_sys->i_data_peeked < 3)
+    if( p_sys->i_data_peeked < 5)
     {
         msg_Err( p_demux, "data shortage" );
         *p_header_size = -2;
         return false;
     }
-    if( strncmp( (char *)p_sys->p_peek, "--", 2 ) )
+    if( strncmp( (char *)p_sys->p_peek, "--", 2 ) != 0
+        && strncmp( (char *)p_sys->p_peek, "\r\n--", 4 ) != 0 )
     {
         *p_header_size = 0;
         return false;
     }
-    i_pos = 2;
+    i_pos = *p_sys->p_peek == '-' ? 2 : 4;
     psz_line = GetLine( p_demux, &i_pos );
     if( NULL == psz_line )
     {
