@@ -1598,8 +1598,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XGCValues               xgcvalues;
     XEvent                  xevent;
 
-    bool              b_expose = false;
-    bool              b_configure_notify = false;
     bool              b_map_notify = false;
     vlc_value_t             val;
 
@@ -1728,9 +1726,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                       &p_win->i_width,
                       &p_win->i_height,
                       &dummy4, &dummy5 );
-
-        /* We are already configured */
-        b_configure_notify = true;
 
         /* From man XSelectInput: only one client at a time can select a
          * ButtonPress event, so we need to open a new window anyway. */
