@@ -48,20 +48,7 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
     dialog = NULL;
     altButton = NULL;
 
-    if( p_dialog->i_flags & DIALOG_BLOCKING_ERROR )
-    {
-        i_ret = QMessageBox::critical( NULL, qfu( p_dialog->psz_title ),
-                                       qfu( p_dialog->psz_description ),
-                                       QMessageBox::Ok, QMessageBox::Ok );
-    }
-    else if( p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
-    {
-        if( config_GetInt( p_intf, "qt-error-dialogs" ) != 0 )
-            ErrorsDialog::getInstance( p_intf )->addError(
-                 qfu( p_dialog->psz_title ), qfu( p_dialog->psz_description ) );
-        i_ret = QMessageBox::AcceptRole;
-    }
-    else if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
+    if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
     {
         p_dialog->i_status = SENT_DIALOG;
 

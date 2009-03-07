@@ -714,8 +714,7 @@ void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
     case INTERACT_DESTROY:
         msg_Dbg( p_intf, "Destroy the Interaction Dialog" );
         qdialog = (InteractionDialog*)(p_dialog->p_private);
-        if( !p_dialog->i_flags & DIALOG_NONBLOCKING_ERROR )
-            delete qdialog;
+        delete qdialog;
         p_dialog->i_status = DESTROYED_DIALOG;
         break;
     }
