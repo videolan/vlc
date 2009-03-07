@@ -86,8 +86,15 @@ struct vout_thread_sys_t
     filter_chain_t *p_vf2_chain;
     char           *psz_vf2;
 
-    /* Misc */
-    bool            b_snapshot;     /**< take one snapshot on the next loop */
+    /* Snapshot interface */
+    struct
+    {
+        bool        b_available;
+        int         i_request;
+        picture_t   *p_picture;
+        vlc_mutex_t lock;
+        vlc_cond_t  wait;
+    } snapshot;
 
     /* Show media title on videoutput */
     bool            b_title_show;
@@ -106,8 +113,6 @@ picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
  * This function supposes that you call it with picture_lock taken.
  */
 void vout_UsePictureLocked( vout_thread_t *p_vout, picture_t *p_pic  );
-
-int vout_Snapshot( vout_thread_t *, picture_t *p_pic );
 
 #endif
 

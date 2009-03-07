@@ -584,13 +584,9 @@ static char *VoutSnapshotGetDefaultDirectory( void )
     return psz_path;
 }
 
-int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_picture_private )
+#warning "Remove vout_Snapshot"
+static int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    /* FIXME find why it is sometimes needed (format being wrong/invalid) */
-    picture_t pic = *p_picture_private;
-    pic.format = p_vout->fmt_out;
-    picture_t *p_pic = &pic;
-
     /* */
     char *psz_path = var_GetNonEmptyString( p_vout, "snapshot-path" );
 
@@ -815,6 +811,46 @@ error:
     free( psz_path );
     free( psz_format );
     return VLC_EGENERIC;
+}
+
+static picture_t *VoutGetSnapshot( vout_thread_t *p_vout, mtime_t i_timeout )
+{
+    vout_thread_sys_t *p_sys = p_vout->p;
+
+    vlc_mutex_lock( &p_sys->snapshot.lock );
+    p_sys->snapshot.i_request++;
+
+    const mtime_t i_deadline = mdate() + i_timeout;
+    while( p_sys->snapshot.b_available && !p_sys->snapshot.p_picture &&
+           mdate() < i_deadline )
+    {
+        vlc_cond_timedwait( &p_sys->snapshot.wait, &p_sys->snapshot.lock,
+                            i_timeout );
+    }
+
+    picture_t *p_picture = p_sys->snapshot.p_picture;
+    if( p_picture )
+        p_sys->snapshot.p_picture = p_picture->p_next;
+    else if( p_sys->snapshot.i_request > 0 )
+        p_sys->snapshot.i_request--;
+    vlc_mutex_unlock( &p_sys->snapshot.lock );
+
+    if( !p_picture )
+        msg_Err( p_vout, "Failed to grab a snapshot" );
+
+    return p_picture;
+}
+
+static void VoutSaveSnapshot( vout_thread_t *p_vout )
+{
+    /* 500ms timeout */
+    picture_t *p_picture = VoutGetSnapshot( p_vout, 500*1000 );
+
+    if( p_picture )
+    {
+        vout_Snapshot( p_vout, p_picture );
+        picture_Release( p_picture );
+    }
 }
 
 /*****************************************************************************
@@ -1222,11 +1258,10 @@ static int SnapshotCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-    /* FIXME: this is definitely not thread-safe */
-    p_vout->p->b_snapshot = true;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     VLC_UNUSED(newval); VLC_UNUSED(p_data);
+
+    VoutSaveSnapshot( p_vout );
     return VLC_SUCCESS;
 }
 

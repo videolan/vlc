@@ -399,6 +399,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->b_picture_empty = false;
     p_vout->p->i_picture_qtype = QTYPE_NONE;
 
+    p_vout->p->snapshot.b_available = true;
+    p_vout->p->snapshot.i_request = 0;
+    p_vout->p->snapshot.p_picture = NULL;
+    vlc_mutex_init( &p_vout->p->snapshot.lock );
+    vlc_cond_init( &p_vout->p->snapshot.wait );
+
     /* Initialize locks */
     vlc_mutex_init( &p_vout->picture_lock );
     vlc_cond_init( &p_vout->p->picture_wait );
@@ -575,6 +581,12 @@ void vout_Close( vout_thread_t *p_vout )
     p_vout->p->b_done = true;
     vlc_cond_signal( &p_vout->p->change_wait );
     vlc_mutex_unlock( &p_vout->change_lock );
+
+    vlc_mutex_lock( &p_vout->p->snapshot.lock );
+    p_vout->p->snapshot.b_available = false;
+    vlc_cond_broadcast( &p_vout->p->snapshot.wait );
+    vlc_mutex_unlock( &p_vout->p->snapshot.lock );
+
     vlc_join( p_vout->p->thread, NULL );
     module_unneed( p_vout, p_vout->p_module );
     p_vout->p_module = NULL;
@@ -599,6 +611,21 @@ static void vout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_vout->change_lock );
     vlc_mutex_destroy( &p_vout->p->vfilter_lock );
 
+    /* */
+    for( ;; )
+    {
+        picture_t *p_picture = p_vout->p->snapshot.p_picture;
+        if( !p_picture )
+            break;
+
+        p_vout->p->snapshot.p_picture = p_picture->p_next;
+
+        picture_Release( p_picture );
+    }
+    vlc_cond_destroy( &p_vout->p->snapshot.wait );
+    vlc_mutex_destroy( &p_vout->p->snapshot.lock );
+
+    /* */
     free( p_vout->p->psz_filter_chain );
     free( p_vout->p->psz_title );
 
@@ -1166,7 +1193,9 @@ static void* RunThread( void *p_this )
 
         /* FIXME it is ugly that b_snapshot is not locked but I do not
          * know which lock to use (here and in the snapshot callback) */
-        const bool b_snapshot = p_vout->p->b_snapshot && p_picture != NULL;
+        vlc_mutex_lock( &p_vout->p->snapshot.lock );
+        const bool b_snapshot = p_vout->p->snapshot.i_request > 0 && p_picture != NULL;
+        vlc_mutex_unlock( &p_vout->p->snapshot.lock );
 
         /*
          * Check for subpictures to display
@@ -1188,10 +1217,25 @@ static void* RunThread( void *p_this )
          */
         if( p_directbuffer && b_snapshot )
         {
-            /* FIXME lock (see b_snapshot) */
-            p_vout->p->b_snapshot = false;
+            vlc_mutex_lock( &p_vout->p->snapshot.lock );
+            assert( p_vout->p->snapshot.i_request > 0 );
+            while( p_vout->p->snapshot.i_request > 0 )
+            {
+                picture_t *p_pic = picture_New( p_vout->fmt_out.i_chroma,
+                                                p_vout->fmt_out.i_width,
+                                                p_vout->fmt_out.i_height,
+                                                p_vout->fmt_out.i_aspect  );
+                if( !p_pic )
+                    break;
 
-            vout_Snapshot( p_vout, p_directbuffer );
+                picture_Copy( p_pic, p_directbuffer );
+
+                p_pic->p_next = p_vout->p->snapshot.p_picture;
+                p_vout->p->snapshot.p_picture = p_pic;
+                p_vout->p->snapshot.i_request--;
+            }
+            vlc_cond_broadcast( &p_vout->p->snapshot.wait );
+            vlc_mutex_unlock( &p_vout->p->snapshot.lock );
         }
 
         /*
