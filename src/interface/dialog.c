@@ -133,14 +133,14 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
  * @param username a pointer to the specified username [OUT]
  * @param password a pointer to the specified password [OUT]
  * @param title title for the dialog
- * @param text text for the dialog
+ * @param text format string for the message in the dialog
  * @return Nothing. If a user name resp. a password was specified,
  * it will be returned as a heap-allocated character array
  * into the username resp password pointer. Those must be freed with free().
  * Otherwise *username resp *password will be NULL.
  */
 void dialog_Login (vlc_object_t *obj, char **username, char **password,
-                   const char *title, const char *text)
+                   const char *title, const char *fmt, ...)
 {
     assert ((username != NULL) && (password != NULL));
 
@@ -152,7 +152,16 @@ void dialog_Login (vlc_object_t *obj, char **username, char **password,
     if (provider == NULL)
         return;
 
-    dialog_login_t dialog = { title, text, username, password, };
-    var_SetAddress (provider, "dialog-login", &dialog);
+    char *text;
+    va_list ap;
+
+    va_start (ap, fmt);
+    if (vasprintf (&text, fmt, ap) != -1)
+    {
+        dialog_login_t dialog = { title, text, username, password, };
+        var_SetAddress (provider, "dialog-login", &dialog);
+        free (text);
+    }
+    va_end (ap);
     vlc_object_release (provider);
 }
