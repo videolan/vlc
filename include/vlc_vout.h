@@ -209,6 +209,21 @@ static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
 }
 
 /**
+ * This function will export a picture to an encoded bitstream.
+ *
+ * pp_image will contain the encoded bitstream in psz_format format.
+ *
+ * p_fmt can be NULL otherwise it will be set with the format used for the
+ * picture before encoding.
+ *
+ * i_override_width/height allow to override the width and/or the height of the
+ * picture to be encoded. If at most one of them is > 0 then the picture aspect
+ * ratio will be kept.
+ */
+VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height ) );
+
+
+/**
  * Video picture heap, either render (to store pictures used
  * by the decoder) or output (to store pictures displayed by the vout plugin)
  */

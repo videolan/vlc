@@ -271,6 +271,7 @@ __osd_Volume
 path_sanitize
 picture_CopyPixels
 picture_Delete
+picture_Export
 picture_New
 plane_CopyPixels
 playlist_Add

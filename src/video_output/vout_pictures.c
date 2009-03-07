@@ -36,6 +36,9 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_filter.h>
+#include <vlc_image.h>
+#include <vlc_block.h>
+
 #include "vout_pictures.h"
 #include "vout_internal.h"
 
@@ -1106,6 +1109,75 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
             p_out += p_dst->i_pitch;
         }
     }
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+int picture_Export( vlc_object_t *p_obj,
+                    block_t **pp_image,
+                    video_format_t *p_fmt,
+                    picture_t *p_picture,
+                    vlc_fourcc_t i_format,
+                    int i_override_width, int i_override_height )
+{
+    /* */
+    video_format_t fmt_in = p_picture->format;
+    if( fmt_in.i_sar_num <= 0 || fmt_in.i_sar_den <= 0 )
+    {
+        fmt_in.i_sar_num =
+        fmt_in.i_sar_den = 1;
+    }
+
+    /* */
+    video_format_t fmt_out;
+    memset( &fmt_out, 0, sizeof(fmt_out) );
+    fmt_out.i_sar_num =
+    fmt_out.i_sar_den = 1;
+    fmt_out.i_chroma  = i_format;
+    fmt_out.i_width   = i_override_width;
+    fmt_out.i_height  = i_override_height;
+
+    if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
+    {
+        fmt_out.i_height = fmt_in.i_height * fmt_out.i_width / fmt_in.i_width;
+        const int i_height = fmt_out.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
+        if( i_height > 0 )
+            fmt_out.i_height = i_height;
+    }
+    else
+    {
+        if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
+        {
+            fmt_out.i_width = fmt_in.i_width * fmt_out.i_height / fmt_in.i_height;
+        }
+        else
+        {
+            fmt_out.i_width = fmt_in.i_width;
+            fmt_out.i_height = fmt_in.i_height;
+        }
+        const int i_width = fmt_out.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
+        if( i_width > 0 )
+            fmt_out.i_width = i_width;
+    }
+
+    image_handler_t *p_image = image_HandlerCreate( p_obj );
+
+    block_t *p_block = image_Write( p_image, p_picture, &fmt_in, &fmt_out );
+
+    image_HandlerDelete( p_image );
+
+    if( !p_block )
+        return VLC_EGENERIC;
+
+    p_block->i_pts =
+    p_block->i_dts = p_picture->date;
+
+    if( p_fmt )
+        *p_fmt = fmt_out;
+    *pp_image = p_block;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
