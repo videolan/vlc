@@ -35,14 +35,18 @@ public:
 
 private:
     intf_thread_t *intf;
-    static int MessageCallback( vlc_object_t *, const char *, vlc_value_t,
-                                vlc_value_t, void * );
+    static int MessageCallback (vlc_object_t *, const char *,
+                                vlc_value_t, vlc_value_t, void *);
+    static int LoginCallback (vlc_object_t *obj, const char *,
+                              vlc_value_t, vlc_value_t, void *data);
 
 private slots:
     void displayMessage (const struct dialog_fatal_t *);
+    void requestLogin (struct dialog_login_t *data);
 
 signals:
     void message (const struct dialog_fatal_t *);
+    void authentication (struct dialog_login_t *);
 };
 
 #endif
