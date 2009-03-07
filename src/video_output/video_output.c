@@ -487,7 +487,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
-        spu_Attach( p_vout->p_spu, p_vout, false );
+        spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
         spu_Destroy( p_vout->p_spu );
         p_vout->p_spu = NULL;
         vlc_object_release( p_vout );
@@ -533,7 +533,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     {
         module_unneed( p_vout, p_vout->p_module );
         p_vout->p_module = NULL;
-        spu_Attach( p_vout->p_spu, p_vout, false );
+        spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
         spu_Destroy( p_vout->p_spu );
         p_vout->p_spu = NULL;
         vlc_object_release( p_vout );
