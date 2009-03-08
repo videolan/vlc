@@ -68,8 +68,6 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
 static int IntfShowCB( vlc_object_t *p_this, const char *psz_variable,
                        vlc_value_t old_val, vlc_value_t new_val, void *param );
-static int InteractCallback( vlc_object_t *, const char *, vlc_value_t,
-                             vlc_value_t, void *);
 
 MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 {
@@ -201,10 +199,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /************
      * Callbacks
      ************/
-    var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
-    var_AddCallback( p_intf, "interaction", InteractCallback, this );
-    interaction_Register( p_intf );
-
     var_AddCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
 
     /* Register callback for the intf-popupmenu variable */
@@ -322,9 +316,6 @@ MainInterface::~MainInterface()
     /* Unregister callbacks */
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
-
-    interaction_Unregister( p_intf );
-    var_DelCallback( p_intf, "interaction", InteractCallback, this );
 
     p_intf->p_sys->p_mi = NULL;
 }
@@ -1209,20 +1200,6 @@ void MainInterface::toggleFullScreen( void )
         emit fullscreenInterfaceToggled( true );
     }
 
-}
-
-/*****************************************************************************
- * Callbacks
- *****************************************************************************/
-static int InteractCallback( vlc_object_t *p_this,
-                             const char *psz_var, vlc_value_t old_val,
-                             vlc_value_t new_val, void *param )
-{
-    intf_dialog_args_t *p_arg = new intf_dialog_args_t;
-    p_arg->p_dialog = (interaction_dialog_t *)(new_val.p_address);
-    DialogEvent *event = new DialogEvent( INTF_DIALOG_INTERACTION, 0, p_arg );
-    QApplication::postEvent( THEDP, event );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

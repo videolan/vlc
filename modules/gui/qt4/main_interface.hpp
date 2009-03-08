@@ -68,7 +68,6 @@ class MainInterface : public QVLCMW
 {
     Q_OBJECT;
 
-    friend class InteractionDialog;
     friend class PlaylistWidget;
 
 public:

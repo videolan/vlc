@@ -133,7 +133,6 @@ private:
     void addFromSimple( bool, bool );
 
 public slots:
-    void doInteraction( intf_dialog_args_t * );
     void playMRL( const QString & );
 
     void playlistDialog();

@@ -52,7 +52,6 @@
 #include "dialogs/podcast_configuration.hpp"
 #include "dialogs/toolbar.hpp"
 #include "dialogs/plugins.hpp"
-#include "dialogs/interaction.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -140,8 +139,6 @@ void DialogsProvider::customEvent( QEvent *event )
         case INTF_DIALOG_VLM:
            vlmDialog(); break;
 #endif
-        case INTF_DIALOG_INTERACTION:
-           doInteraction( de->p_arg ); break;
         case INTF_DIALOG_POPUPMENU:
            QVLCMenu::PopupMenu( p_intf, (de->i_arg != 0) ); break;
         case INTF_DIALOG_AUDIOPOPUPMENU:
@@ -672,51 +669,3 @@ void DialogsProvider::playMRL( const QString &mrl )
 
     RecentsMRL::getInstance( p_intf )->addRecent( mrl );
 }
-
-/*************************************
- * Interactions
- *************************************/
-void DialogsProvider::doInteraction( intf_dialog_args_t *p_arg )
-{
-    InteractionDialog *qdialog;
-    interaction_dialog_t *p_dialog = p_arg->p_dialog;
-    switch( p_dialog->i_action )
-    {
-    case INTERACT_NEW:
-        qdialog = new InteractionDialog( p_intf, p_dialog );
-        p_dialog->p_private = (void*)qdialog;
-        if( !(p_dialog->i_status == ANSWERED_DIALOG) )
-            qdialog->show();
-        break;
-    case INTERACT_UPDATE:
-        qdialog = (InteractionDialog*)(p_dialog->p_private);
-        if( qdialog )
-            qdialog->update();
-        else
-        {
-            /* The INTERACT_NEW message was forgotten
-               so we must create the dialog and update it*/
-            qdialog = new InteractionDialog( p_intf, p_dialog );
-            p_dialog->p_private = (void*)qdialog;
-            if( !(p_dialog->i_status == ANSWERED_DIALOG) )
-                qdialog->show();
-            if( qdialog )
-                qdialog->update();
-        }
-        break;
-    case INTERACT_HIDE:
-        msg_Dbg( p_intf, "Hide the Interaction Dialog" );
-        qdialog = (InteractionDialog*)(p_dialog->p_private);
-        if( qdialog )
-            qdialog->hide();
-        p_dialog->i_status = HIDDEN_DIALOG;
-        break;
-    case INTERACT_DESTROY:
-        msg_Dbg( p_intf, "Destroy the Interaction Dialog" );
-        qdialog = (InteractionDialog*)(p_dialog->p_private);
-        delete qdialog;
-        p_dialog->i_status = DESTROYED_DIALOG;
-        break;
-    }
-}
-
