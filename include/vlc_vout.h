@@ -743,17 +743,6 @@ enum output_query_e
     VOUT_REDRAW_RECT,       /* arg1= area rect, res= */
 };
 
-typedef struct snapshot_t {
-  char *p_data;  /* Data area */
-
-  int i_width;       /* In pixels */
-  int i_height;      /* In pixels */
-  int i_datasize;    /* In bytes */
-  mtime_t date;      /* Presentation time */
-  vlc_cond_t p_condvar;
-  vlc_mutex_t p_mutex;
-} snapshot_t;
-
 /**@}*/
 
 #endif /* _VLC_VIDEO_H */

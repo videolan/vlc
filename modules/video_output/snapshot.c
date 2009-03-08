@@ -95,6 +95,16 @@ vlc_module_end ()
 /*****************************************************************************
  * vout_sys_t: video output descriptor
  *****************************************************************************/
+typedef struct snapshot_t
+{
+  uint8_t *p_data;   /* Data area */
+
+  int i_width;       /* In pixels */
+  int i_height;      /* In pixels */
+  int i_datasize;    /* In bytes */
+  mtime_t date;      /* Presentation time */
+} snapshot_t;
+
 struct vout_sys_t
 {
     snapshot_t **p_list;    /* List of available snapshots */
@@ -273,7 +283,7 @@ static int Init( vout_thread_t *p_vout )
         p_snapshot->i_height = i_height;
         p_snapshot->i_datasize = i_datasize;
         p_snapshot->date = 0;
-        p_snapshot->p_data = ( char* ) malloc( i_datasize );
+        p_snapshot->p_data = malloc( i_datasize );
         if( p_snapshot->p_data == NULL )
         {
             free( p_snapshot );
