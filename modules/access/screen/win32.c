@@ -64,6 +64,7 @@ int screen_InitCapture( demux_t *p_demux )
     if( !p_data->hdc_src )
     {
         msg_Err( p_demux, "cannot get device context" );
+        free( p_data );
         return VLC_EGENERIC;
     }
 
@@ -71,6 +72,7 @@ int screen_InitCapture( demux_t *p_demux )
     if( !p_data->hdc_dst )
     {
         msg_Err( p_demux, "cannot get compat device context" );
+        free( p_data );
         ReleaseDC( 0, p_data->hdc_src );
         return VLC_EGENERIC;
     }
@@ -90,8 +92,9 @@ int screen_InitCapture( demux_t *p_demux )
     default:
         msg_Err( p_demux, "unknown screen depth %i",
                  p_sys->fmt.video.i_bits_per_pixel );
+        DeleteDC( p_data->hdc_dst );
         ReleaseDC( 0, p_data->hdc_src );
-        ReleaseDC( 0, p_data->hdc_dst );
+        free( p_data );
         return VLC_EGENERIC;
     }
 
