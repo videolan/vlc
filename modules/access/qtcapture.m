@@ -36,6 +36,7 @@
 #include <vlc_vout.h>
 #include <vlc_demux.h>
 #include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #import <QTKit/QTKit.h>
 #import <CoreAudio/CoreAudio.h>
