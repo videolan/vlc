@@ -214,7 +214,7 @@ vlc_module_end ()
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    char *psz_host, *psz_unix_path;
+    char *psz_host, *psz_unix_path = NULL;
     int  *pi_socket = NULL;
 
 #ifndef WIN32
