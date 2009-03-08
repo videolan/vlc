@@ -195,8 +195,6 @@ __input_Read
 input_SplitMRL
 input_StopThread
 input_vaControl
-interaction_Register
-interaction_Unregister
 __intf_Create
 __intf_Eject
 intf_RunThread

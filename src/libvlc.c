@@ -42,7 +42,6 @@
 
 #include "modules/modules.h"
 #include "config/configuration.h"
-#include "interface/interface.h"
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
@@ -258,7 +257,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     priv->p_playlist = NULL;
-    priv->p_interaction = NULL;
     priv->p_dialog_provider = NULL;
     priv->p_vlm = NULL;
     p_libvlc->psz_object_name = strdup( "libvlc" );
@@ -805,9 +803,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_AddCallback( p_libvlc, "key-pressed", vlc_key_to_action,
                      p_libvlc->p_hotkeys );
 
-    /* Initialize interaction */
-    priv->p_interaction = interaction_Init( p_libvlc );
-
     /* Initialize playlist and get commandline files */
     p_playlist = playlist_Create( VLC_OBJECT(p_libvlc) );
     if( !p_playlist )
@@ -1062,10 +1057,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     barrier();  /* FIXME is that correct ? */
 
     vlc_object_release( p_playlist );
-
-    /* Free interaction */
-    msg_Dbg( p_libvlc, "removing interaction" );
-    interaction_Destroy( priv->p_interaction );
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );

@@ -92,7 +92,7 @@ struct intf_dialog_args_t
     bool b_multiple;
 
     /* Specific to INTF_DIALOG_INTERACTION */
-    interaction_dialog_t *p_dialog;
+    struct interaction_dialog_t *p_dialog;
 };
 
 /*****************************************************************************
@@ -107,9 +107,6 @@ VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
 
 VLC_EXPORT( void, libvlc_Quit, ( libvlc_int_t * ) );
-
-VLC_EXPORT( int, interaction_Register, ( intf_thread_t * ) );
-VLC_EXPORT( int, interaction_Unregister, ( intf_thread_t * ) );
 
 /*@}*/
 
@@ -198,7 +195,7 @@ typedef enum vlc_dialog {
 /**
  * This structure describes a piece of interaction with the user
  */
-struct interaction_dialog_t
+typedef struct interaction_dialog_t
 {
     int             i_type;             ///< Type identifier
     char           *psz_title;          ///< Title
@@ -225,7 +222,7 @@ struct interaction_dialog_t
                                         //for interaction
     intf_thread_t  *p_interface;
     vlc_mutex_t    *p_lock;
-};
+} interaction_dialog_t;
 
 /**
  * Possible flags . Dialog types
@@ -242,7 +239,6 @@ struct interaction_dialog_t
 /** Possible return codes */
 enum
 {
-    DIALOG_DEFAULT,
     DIALOG_OK_YES,
     DIALOG_NO,
     DIALOG_CANCELLED
@@ -251,19 +247,8 @@ enum
 /** Possible status  */
 enum
 {
-    SENT_DIALOG=1,                ///< Sent to interface
-    UPDATED_DIALOG,             ///< Update to send
     ANSWERED_DIALOG,            ///< Got "answer"
-    HIDING_DIALOG,              ///< Hiding requested
-    HIDDEN_DIALOG,              ///< Now hidden. Requesting destruction
     DESTROYED_DIALOG,           ///< Interface has destroyed it
-};
-
-/** Possible interaction types */
-enum
-{
-    INTERACT_DIALOG_ONEWAY,     ///< Dialog box without feedback
-    INTERACT_DIALOG_TWOWAY,     ///< Dialog box with feedback
 };
 
 /** Possible actions */
@@ -275,11 +260,10 @@ enum
     INTERACT_DESTROY
 };
 
-/***************************************************************************
- * Exported symbols
- ***************************************************************************/
-
 #define intf_UserStringInput( a, b, c, d ) (VLC_OBJECT(a),b,c,d, VLC_EGENERIC)
+#define interaction_Register( t ) (t, VLC_EGNERIC)
+#define interaction_Unregister( t ) (t, VLC_EGENERIC)
+
 
 /** @} */
 /** @} */

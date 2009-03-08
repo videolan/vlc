@@ -220,8 +220,6 @@ typedef struct libvlc_priv_t
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
     playlist_t        *p_playlist; //< the playlist singleton
     vlm_t             *p_vlm;  ///< the VLM singleton (or NULL)
-    interaction_t     *p_interaction;    ///< old interaction object
-    intf_thread_t     *p_interaction_intf; ///< old interface for interaction
     vlc_object_t      *p_dialog_provider; ///< dialog provider
     httpd_t           *p_httpd; ///< HTTP daemon (src/network/httpd.c)
 #ifdef ENABLE_SOUT
