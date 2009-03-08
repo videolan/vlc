@@ -53,6 +53,7 @@
 
 #include <vlc_charset.h>
 #include <vlc_url.h>
+#include <vlc_strings.h>
 
 /*****************************************************************************
  * Module descriptor
