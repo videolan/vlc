@@ -486,6 +486,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "signal-strength", VLC_VAR_FLOAT );
     var_SetFloat( p_input, "signal-strength", -1 );
 
+    var_Create( p_input, "program-scrambled", VLC_VAR_BOOL );
+    var_SetBool( p_input, "program-scrambled", false );
+
     var_Create( p_input, "cache", VLC_VAR_FLOAT );
     var_SetFloat( p_input, "cache", 0.0 );
 

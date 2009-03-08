@@ -597,6 +597,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_NEXT_DISPLAY_TIME:
     case ES_OUT_SET_GROUP_META:
     case ES_OUT_SET_GROUP_EPG:
+    case ES_OUT_SET_ES_SCRAMBLED_STATE:
     case ES_OUT_DEL_GROUP:
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
@@ -1306,6 +1307,11 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         p_cmd->control.int_i64.i_i64 = (int64_t)va_arg( args, int64_t );
         break;
 
+    case ES_OUT_SET_ES_SCRAMBLED_STATE:
+        p_cmd->control.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->control.es_bool.b_bool = (bool)va_arg( args, int );
+        break;
+
     case ES_OUT_RESET_PCR:           /* no arg */
         break;
 
@@ -1448,6 +1454,10 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=vlc_epg_t* */
         return es_out_Control( p_out, i_query, p_cmd->control.int_epg.i_int,
                                                p_cmd->control.int_epg.p_epg );
+
+    case ES_OUT_SET_ES_SCRAMBLED_STATE: /* arg1=int es_out_id_t* arg2=bool */
+        return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es,
+                                               p_cmd->control.es_bool.b_bool );
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */

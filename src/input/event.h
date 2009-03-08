@@ -58,6 +58,7 @@ void input_SendEventProgramAdd( input_thread_t *p_input,
                                 int i_program, const char *psz_text );
 void input_SendEventProgramDel( input_thread_t *p_input, int i_program );
 void input_SendEventProgramSelect( input_thread_t *p_input, int i_program );
+void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool b_scrambled );
 
 void input_SendEventEsDel( input_thread_t *p_input, int i_cat, int i_id );
 void input_SendEventEsAdd( input_thread_t *p_input, int i_cat, int i_id, const char *psz_text );

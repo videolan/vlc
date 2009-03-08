@@ -62,6 +62,7 @@ typedef struct
     int i_es;
 
     bool b_selected;
+    bool b_scrambled;
 
     /* Clock for this program */
     input_clock_t *p_clock;
@@ -78,6 +79,9 @@ struct es_out_id_t
     /* ES ID */
     int       i_id;
     es_out_pgrm_t *p_pgrm;
+
+    /* */
+    bool b_scrambled;
 
     /* Channel in the track type */
     int         i_channel;
@@ -984,6 +988,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     input_SendEventEsDel( p_input, VIDEO_ES, -1 );
     input_SendEventEsDel( p_input, SPU_ES, -1 );
     input_SendEventTeletextDel( p_input, -1 );
+    input_SendEventProgramScrambled( p_input, p_pgrm->i_id, p_pgrm->b_scrambled );
 
     /* TODO event */
     var_SetInteger( p_input, "teletext-es", -1 );
@@ -1018,6 +1023,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->i_id = i_group;
     p_pgrm->i_es = 0;
     p_pgrm->b_selected = false;
+    p_pgrm->b_scrambled = false;
     p_pgrm->psz_name = NULL;
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
@@ -1163,7 +1169,8 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 
             /* Remove old entries */
             input_Control( p_input, INPUT_DEL_INFO, psz_cat, NULL );
-            /* TODO update epg name */
+            /* TODO update epg name ?
+             * TODO update scrambled info name ? */
             free( psz_cat );
         }
         free( p_pgrm->psz_name );
@@ -1335,6 +1342,34 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     free( psz_cat );
 }
 
+static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm )
+{
+    es_out_sys_t    *p_sys = p_out->p_sys;
+    input_thread_t  *p_input = p_sys->p_input;
+    bool b_scrambled = false;
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        if( p_sys->es[i]->p_pgrm == p_pgrm && p_sys->es[i]->b_scrambled )
+        {
+            b_scrambled = true;
+            break;
+        }
+    }
+    if( !p_pgrm->b_scrambled == !b_scrambled )
+        return;
+
+    p_pgrm->b_scrambled = b_scrambled;
+    char *psz_cat = EsOutProgramGetMetaName( p_pgrm );
+
+    if( b_scrambled )
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Scrambled"), _("Yes") );
+    else
+        input_Control( p_input, INPUT_DEL_INFO, psz_cat, _("Scrambled") );
+
+    input_SendEventProgramScrambled( p_input, p_pgrm->i_id, b_scrambled );
+}
+
 /* EsOutAdd:
  *  Add an es_out
  */
@@ -1377,6 +1412,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
         es->fmt.i_id = out->p_sys->i_id;
     es->i_id = es->fmt.i_id;
     es->i_meta_id = out->p_sys->i_id;
+    es->b_scrambled = false;
 
     switch( es->fmt.i_cat )
     {
@@ -1455,6 +1491,9 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
     }
 
     EsOutUpdateInfo( out, es, &es->fmt, NULL );
+
+    if( es->b_scrambled )
+        EsOutProgramUpdateScrambled( out, es->p_pgrm );
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -1936,12 +1975,15 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
+    /* Update program */
     es->p_pgrm->i_es--;
     if( es->p_pgrm->i_es == 0 )
-    {
         msg_Dbg( p_sys->p_input, "Program doesn't contain anymore ES" );
-    }
 
+    if( es->b_scrambled )
+        EsOutProgramUpdateScrambled( out, es->p_pgrm );
+
+    /* */
     if( p_sys->p_es_audio == es || p_sys->p_es_video == es ||
         p_sys->p_es_sub == es ) b_reselect = true;
 
@@ -2245,6 +2287,19 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case ES_OUT_SET_ES_SCRAMBLED_STATE:
+        {
+            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            bool b_scrambled = (bool)va_arg( args, int );
+
+            if( !es->b_scrambled != !b_scrambled )
+            {
+                es->b_scrambled = b_scrambled;
+                EsOutProgramUpdateScrambled( out, es->p_pgrm );
+            }
+            return VLC_SUCCESS;
+        }
+
         case ES_OUT_SET_NEXT_DISPLAY_TIME:
         {
             const int64_t i_date = (int64_t)va_arg( args, int64_t );
@@ -2272,6 +2327,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             EsOutProgramEpg( out, i_group, p_epg );
             return VLC_SUCCESS;
         }
+
         case ES_OUT_DEL_GROUP:
         {
             int i_group = (int)va_arg( args, int );

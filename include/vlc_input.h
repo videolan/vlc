@@ -302,6 +302,7 @@ struct input_thread_t
  *                   variable value being the one currently selected, -1 if no teletext)
  *  - "signal-quality"
  *  - "signal-strength"
+ *  - "program-scrambled" (if the current program is scrambled)
  *  - "cache" (level of data cached [0 .. 1])
  *
  * The read-write variables are:
@@ -387,7 +388,8 @@ typedef enum input_event_type_e
     /* A chapter has been added or removed or selected. */
     INPUT_EVENT_CHAPTER,
 
-    /* A program has been added or removed or selected */
+    /* A program ("program") has been added or removed or selected,
+     * or "program-scrambled" has changed.*/
     INPUT_EVENT_PROGRAM,
     /* A ES has been added or removed or selected */
     INPUT_EVENT_ES,

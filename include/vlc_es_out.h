@@ -72,13 +72,16 @@ enum es_out_query_e
     ES_OUT_SET_ES_FMT,         /* arg1= es_out_id_t* arg2=es_format_t* */
 
     /* Allow preroll of data (data with dts/pts < i_pts for all ES will be decoded but not displayed */
-    ES_OUT_SET_NEXT_DISPLAY_TIME,   /* arg1=int64_t i_pts(microsecond) */
+    ES_OUT_SET_NEXT_DISPLAY_TIME,       /* arg1=int64_t i_pts(microsecond) */
     /* Set meta data for group (dynamic) */
     ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=vlc_meta_t */
     /* Set epg for group (dynamic) */
     ES_OUT_SET_GROUP_EPG,   /* arg1=int i_group arg2=vlc_epg_t */
     /* */
     ES_OUT_DEL_GROUP,       /* arg1=int i_group */
+
+    /* Set scrambled state for one es */
+    ES_OUT_SET_ES_SCRAMBLED_STATE,  /* arg1=int i_group arg2=es_out_id_t* */
 
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
