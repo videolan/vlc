@@ -281,13 +281,6 @@ enum
 
 #define intf_UserStringInput( a, b, c, d ) (VLC_OBJECT(a),b,c,d, VLC_EGENERIC)
 
-#define intf_IntfProgress( a, b, c ) __intf_Progress( VLC_OBJECT(a), NULL, b,c, -1 )
-#define intf_UserProgress( a, b, c, d, e ) __intf_Progress( VLC_OBJECT(a),b,c,d,e )
-VLC_EXPORT( interaction_dialog_t *, __intf_Progress,( vlc_object_t*, const char*, const char*, float, int) );
-VLC_EXPORT( void, intf_ProgressUpdate,( interaction_dialog_t *, const char*, float, int) );
-VLC_EXPORT( bool, intf_ProgressIsCancelled,( interaction_dialog_t * ) );
-VLC_EXPORT( void, intf_UserHide,( interaction_dialog_t * ));
-
 /** @} */
 /** @} */
 

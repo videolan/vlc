@@ -199,12 +199,8 @@ interaction_Register
 interaction_Unregister
 __intf_Create
 __intf_Eject
-__intf_Progress
-intf_ProgressIsCancelled
-intf_ProgressUpdate
 intf_RunThread
 intf_StopThread
-intf_UserHide
 IsUTF8
 libvlc_InternalAddIntf
 libvlc_InternalCleanup
