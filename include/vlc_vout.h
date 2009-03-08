@@ -683,6 +683,23 @@ static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
     vlc_object_release( p_vout );
 }
 
+/**
+ * This function will handle a snapshot request.
+ *
+ * pp_image, pp_picture and p_fmt can be NULL otherwise they will be
+ * set with returned value in case of success.
+ *
+ * pp_image will hold an encoded picture in psz_format format.
+ *
+ * i_timeout specifies the time the function will wait for a snapshot to be
+ * available.
+ *
+ */
+VLC_EXPORT( int, vout_GetSnapshot, ( vout_thread_t *p_vout,
+                                     block_t **pp_image, picture_t **pp_picture,
+                                     video_format_t *p_fmt,
+                                     const char *psz_format, mtime_t i_timeout ) );
+
 /* */
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 

@@ -745,13 +745,12 @@ static void VoutOsdSnapshot( vout_thread_t *p_vout, picture_t *p_pic, const char
             msg_Warn( p_vout, "Failed to display snapshot" );
     }
 }
-/**
- * This function will retreive a snapshot from vout
- */
-static int VoutGetSnapshot( vout_thread_t *p_vout,
-                            block_t **pp_image, picture_t **pp_picture,
-                            video_format_t *p_fmt,
-                            const char *psz_format, mtime_t i_timeout )
+
+/* */
+int vout_GetSnapshot( vout_thread_t *p_vout,
+                      block_t **pp_image, picture_t **pp_picture,
+                      video_format_t *p_fmt,
+                      const char *psz_format, mtime_t i_timeout )
 {
     vout_thread_sys_t *p_sys = p_vout->p;
 
@@ -779,22 +778,27 @@ static int VoutGetSnapshot( vout_thread_t *p_vout,
         return VLC_EGENERIC;
     }
 
-    vlc_fourcc_t i_format = VLC_FOURCC('p','n','g',' ');
-    if( psz_format && image_Ext2Fourcc( psz_format ) )
-        i_format = image_Ext2Fourcc( psz_format );
-
-    const int i_override_width  = var_GetInteger( p_vout, "snapshot-width" );
-    const int i_override_height = var_GetInteger( p_vout, "snapshot-height" );
-
-    if( picture_Export( VLC_OBJECT(p_vout), pp_image, p_fmt,
-                        p_picture, i_format, i_override_width, i_override_height ) )
+    if( pp_image )
     {
-        msg_Err( p_vout, "Failed to convert image for snapshot" );
-        picture_Release( p_picture );
-        return VLC_EGENERIC;
-    }
+        vlc_fourcc_t i_format = VLC_FOURCC('p','n','g',' ');
+        if( psz_format && image_Ext2Fourcc( psz_format ) )
+            i_format = image_Ext2Fourcc( psz_format );
 
-    *pp_picture = p_picture;
+        const int i_override_width  = var_GetInteger( p_vout, "snapshot-width" );
+        const int i_override_height = var_GetInteger( p_vout, "snapshot-height" );
+
+        if( picture_Export( VLC_OBJECT(p_vout), pp_image, p_fmt,
+                            p_picture, i_format, i_override_width, i_override_height ) )
+        {
+            msg_Err( p_vout, "Failed to convert image for snapshot" );
+            picture_Release( p_picture );
+            return VLC_EGENERIC;
+        }
+    }
+    if( pp_picture )
+        *pp_picture = p_picture;
+    else
+        picture_Release( p_picture );
     return VLC_SUCCESS;
 }
 
@@ -817,7 +821,7 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
 
     /* 500ms timeout
      * XXX it will cause trouble with low fps video (< 2fps) */
-    if( VoutGetSnapshot( p_vout, &p_image, &p_picture, &fmt, psz_format, 500*1000 ) )
+    if( vout_GetSnapshot( p_vout, &p_image, &p_picture, &fmt, psz_format, 500*1000 ) )
     {
         if( b_embedded )
             VoutMemorySnapshot( p_vout, p_obj, NULL, NULL );
