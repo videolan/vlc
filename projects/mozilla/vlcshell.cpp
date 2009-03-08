@@ -212,7 +212,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                         area.top = 0;
                         area.right = npwindow.width;
                         area.bottom = npwindow.height;
-                        libvlc_video_redraw_rectangle(p_md, &area, NULL);
+                        libvlc_video_redraw_rectangle(p_plugin->getMD(&ex), &area, NULL);
                     }
                 }
                 libvlc_exception_clear(&ex);
