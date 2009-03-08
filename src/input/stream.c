@@ -1102,7 +1102,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
         /* */
         p_sys->stream.i_used += i_copy;
 
-        if( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read - i_data )
+        if( tk->i_end - tk->i_start - p_sys->stream.i_offset <= i_read -i_data )
         {
             const int i_read_requested = __MAX( __MIN( i_read - i_data,
                                                        STREAM_READ_ATONCE * 10 ),
