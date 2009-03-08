@@ -62,13 +62,13 @@ DialogHandler::DialogHandler (intf_thread_t *intf)
       question (VLC_OBJECT(intf), "dialog-question", VLC_VAR_ADDRESS)
 {
     connect (&message, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             this, SLOT(displayMessage(vlc_object_t *, void *)),
+             SLOT(displayMessage(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
     connect (&login, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             this, SLOT(requestLogin(vlc_object_t *, void *)),
+             SLOT(requestLogin(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
     connect (&question, SIGNAL(pointerChanged(vlc_object_t *, void *)),
-             this, SLOT(requestAnswer(vlc_object_t *, void *)),
+             SLOT(requestAnswer(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
 
     dialog_Register (intf);
