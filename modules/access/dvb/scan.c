@@ -30,7 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_access.h>
-#include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -136,7 +136,7 @@ int scan_Init( vlc_object_t *p_obj, scan_t *p_scan, const scan_parameter_t *p_pa
 void scan_Clean( scan_t *p_scan )
 {
     if( p_scan->p_dialog != NULL )
-        intf_UserHide( p_scan->p_dialog );
+        dialog_ProgressDestroy( p_scan->p_dialog );
 
     for( int i = 0; i < p_scan->i_service; i++ )
         scan_service_Delete( p_scan->pp_service[i] );
@@ -318,9 +318,10 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
             msg_Info( p_scan->p_obj, "Scan ETA %s | %f", secstotimestr( psz_eta, i_eta/1000000 ), f_position * 100 );
 
         if( p_scan->p_dialog == NULL )
-            p_scan->p_dialog = intf_UserProgress( p_scan->p_obj, _("Scanning DVB-T"), psz_text, 100.0 * f_position, -1 );
-        else
-            intf_ProgressUpdate( p_scan->p_dialog, psz_text, 100 * f_position, -1 );
+            p_scan->p_dialog = dialog_ProgressCreate( p_scan->p_obj, _("Scanning DVB-T"), psz_text, _("Cancel") );
+        if( p_scan->p_dialog != NULL )
+            /* FIXME: update text, not just percentage */
+            dialog_ProgressSet( p_scan->p_dialog, /*psz_text, */100 * f_position );
         free( psz_text );
     }
 
@@ -330,7 +331,7 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
 
 bool scan_IsCancelled( scan_t *p_scan )
 {
-    return p_scan->p_dialog && intf_ProgressIsCancelled( p_scan->p_dialog );
+    return p_scan->p_dialog && dialog_ProgressCancelled( p_scan->p_dialog );
 }
 
 static scan_service_t *ScanFindService( scan_t *p_scan, int i_service_start, int i_program )

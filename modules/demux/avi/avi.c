@@ -32,7 +32,6 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 
-#include <vlc_interface.h>
 #include <vlc_dialog.h>
 
 #include <vlc_meta.h>
@@ -2373,7 +2372,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
     off_t i_movi_end;
 
     mtime_t i_dialog_update;
-    interaction_dialog_t *p_dialog = NULL;
+    dialog_progress_bar_t *p_dialog = NULL;
 
     p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
     p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
@@ -2400,7 +2399,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
     /* Only show dialog if AVI is > 10MB */
     i_dialog_update = mdate();
     if( stream_Size( p_demux->s ) > 10000000 )
-        p_dialog = intf_IntfProgress( p_demux, _("Fixing AVI Index..."), 0.0 );
+        p_dialog = dialog_ProgressCreate( p_demux, NULL,
+                                       _("Fixing AVI Index..."), _("Cancel") );
 
     for( ;; )
     {
@@ -2412,13 +2412,12 @@ static void AVI_IndexCreate( demux_t *p_demux )
         /* Don't update/check dialog too often */
         if( p_dialog && mdate() - i_dialog_update > 100000 )
         {
-            if( intf_ProgressIsCancelled( p_dialog ) )
+            if( dialog_ProgressCancelled( p_dialog ) )
                 break;
 
             double f_pos = 100.0 * stream_Tell( p_demux->s ) /
                            stream_Size( p_demux->s );
-            intf_ProgressUpdate( p_dialog,
-                                 _( "Fixing AVI Index..." ), f_pos, -1 );
+            dialog_ProgressSet( p_dialog, f_pos );
 
             i_dialog_update = mdate();
         }
@@ -2482,7 +2481,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
 print_stat:
     if( p_dialog != NULL )
-        intf_UserHide( p_dialog );
+        dialog_ProgressDestroy( p_dialog );
 
     for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
