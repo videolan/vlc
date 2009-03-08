@@ -383,11 +383,17 @@ static block_t *Block (access_t *p_access)
             if (old_xspf_extension == NULL)
                 goto fatal;
 
-            int len2 = asprintf( &p_sys->psz_xspf_extension, "%s  <vlc:node title=\"%s\">\n", old_xspf_extension, entry );
-            if (len2 == -1)
+            char *title = convert_xml_special_chars (entry);
+            if (title == NULL
+             || asprintf (&p_sys->psz_xspf_extension, "%s"
+                          "  <vlc:node title=\"%s\">\n", old_xspf_extension,
+                          title) == -1)
+            {
+                free (title);
                 goto fatal;
-            free( old_xspf_extension );
-
+            }
+            free (title);
+            free (old_xspf_extension);
             return NULL;
         }
         else
