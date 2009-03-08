@@ -103,6 +103,10 @@ demux_PacketizerDestroy
 demux_PacketizerNew
 demux_vaControlHelper
 dialog_Login
+dialog_ProgressCancelled
+dialog_ProgressCreate
+dialog_ProgressDestroy
+dialog_ProgressSet
 dialog_Question
 dialog_Register
 dialog_Unregister

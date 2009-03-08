@@ -96,6 +96,26 @@ VLC_EXPORT( int, dialog_Question, (vlc_object_t *, const char *, const char *, c
 #define dialog_Question(o, t, m, y, n, c) \
         dialog_Question(VLC_OBJECT(o), t, m, y, n, c)
 
+typedef struct dialog_progress_bar_t
+{   /* Request-time parameters */
+    const char *title;
+    const char *message;
+    const char *cancel;
+    /* Permanent parameters */
+    vlc_mutex_t lock;
+    void (*pf_update) (void *, float);
+    bool (*pf_check) (void *);
+    void (*pf_destroy) (void *);
+    void *p_sys;
+} dialog_progress_bar_t;
+
+VLC_EXPORT( dialog_progress_bar_t *, dialog_ProgressCreate, (vlc_object_t *, const char *, const char *, const char *) );
+#define dialog_ProgressCreate(o, t, m, c) \
+        dialog_ProgressCreate(VLC_OBJECT(o), t, m, c)
+VLC_EXPORT( void, dialog_ProgressDestroy, (dialog_progress_bar_t *) );
+VLC_EXPORT( void, dialog_ProgressSet, (dialog_progress_bar_t *, float) );
+VLC_EXPORT( bool, dialog_ProgressCancelled, (dialog_progress_bar_t *) );
+
 VLC_EXPORT( int, dialog_Register, (vlc_object_t *) );
 VLC_EXPORT( int, dialog_Unregister, (vlc_object_t *) );
 #define dialog_Register(o) dialog_Register(VLC_OBJECT(o))
