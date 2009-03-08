@@ -125,6 +125,8 @@ struct access_sys_t
     DIR *handle;
     char *ignored_exts;
     int mode;
+    int i_item_count;
+    char *psz_xspf_extension;
 };
 
 static block_t *Block( access_t * );
@@ -171,6 +173,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->current = NULL;
     p_sys->handle = handle;
     p_sys->ignored_exts = var_CreateGetString (p_access, "ignore-filetypes");
+    p_sys->i_item_count = 0;
+    p_sys->psz_xspf_extension = strdup( "" );
 
     /* Handle mode */
     char *psz = var_CreateGetString( p_access, "recursive" );
@@ -211,6 +215,7 @@ static void Close( vlc_object_t * p_this )
     }
     if (p_sys->handle != NULL)
         closedir (p_sys->handle); /* corner case,:Block() not called ever */
+    free (p_sys->psz_xspf_extension);
     free (p_sys->ignored_exts);
     free (p_sys);
 }
@@ -264,7 +269,7 @@ static block_t *Block (access_t *p_access)
     {   /* Startup: send the XSPF header */
         static const char header[] =
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\">\n"
+            "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\" xmlns:vlc=\"http://www.videolan.org/vlc/playlist/ns/0/\">\n"
             " <trackList>\n";
         block_t *block = block_Alloc (sizeof (header) - 1);
         if (!block)
@@ -305,16 +310,35 @@ static block_t *Block (access_t *p_access)
 
         if (p_sys->current == NULL)
         {   /* End of XSPF playlist */
-            static const char footer[] =
-                " </trackList>\n"
-                "</playlist>\n";
+            char *footer;
+            int len = asprintf( &footer, " </trackList>\n" \
+                " <extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" \
+                "%s" \
+                " </extension>\n" \
+                "</playlist>\n", p_sys->psz_xspf_extension );
+            if( len < 0 )
+                goto fatal;
 
-            block_t *block = block_Alloc (sizeof (footer) - 1);
+            block_t *block = block_Alloc ( len );
             if (!block)
                 goto fatal;
-            memcpy (block->p_buffer, footer, sizeof (footer) - 1);
+            memcpy (block->p_buffer, footer, len);
+            free( footer );
             p_access->info.b_eof = true;
             return block;
+        }
+        else
+        {
+            /* This was the end of a "subnode" */
+            /* Write the ID to the extension */
+            char *old_xspf_extension = p_sys->psz_xspf_extension;
+            if (old_xspf_extension == NULL)
+                goto fatal;
+
+            int len2 = asprintf( &p_sys->psz_xspf_extension, "%s  </vlc:node>\n", old_xspf_extension );
+            if (len2 == -1)
+                goto fatal;
+            free( old_xspf_extension );
         }
         return NULL;
     }
@@ -353,6 +377,17 @@ static block_t *Block (access_t *p_access)
                 return NULL;
             }
             p_sys->current = sub;
+
+            /* Add node to xspf extension */
+            char *old_xspf_extension = p_sys->psz_xspf_extension;
+            if (old_xspf_extension == NULL)
+                goto fatal;
+
+            int len2 = asprintf( &p_sys->psz_xspf_extension, "%s  <vlc:node title=\"%s\">\n", old_xspf_extension, entry );
+            if (len2 == -1)
+                goto fatal;
+            free( old_xspf_extension );
+
             return NULL;
         }
         else
@@ -388,11 +423,26 @@ static block_t *Block (access_t *p_access)
     if (encoded == NULL)
         goto fatal;
     int len = asprintf (&entry,
-                        "  <track><location>file://%s/%s</location></track>\n",
-                        current->uri, encoded);
+                        "  <track><location>file://%s/%s</location>\n" \
+                        "   <extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" \
+                        "    <vlc:id>%d</vlc:id>\n" \
+                        "   </extension>\n" \
+                        "  </track>\n",
+                        current->uri, encoded, p_sys->i_item_count++);
     free (encoded);
     if (len == -1)
         goto fatal;
+
+    /* Write the ID to the extension */
+    char *old_xspf_extension = p_sys->psz_xspf_extension;
+    if (old_xspf_extension == NULL)
+        goto fatal;
+
+    int len2 = asprintf( &p_sys->psz_xspf_extension, "%s   <vlc:item tid=\"%i\" />\n",
+                            old_xspf_extension, p_sys->i_item_count-1 );
+    if (len2 == -1)
+        goto fatal;
+    free( old_xspf_extension );
 
     /* TODO: new block allocator for malloc()ated data */
     block_t *block = block_Alloc (len);
