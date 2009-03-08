@@ -1093,6 +1093,20 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     return VLC_SUCCESS;
 }
 
+/* EsOutProgramFind
+ */
+static es_out_pgrm_t *EsOutProgramFind( es_out_t *p_out, int i_group )
+{
+    es_out_sys_t *p_sys = p_out->p_sys;
+
+    for( int i = 0; i < p_sys->i_pgrm; i++ )
+    {
+        if( p_sys->pgrm[i]->i_id == i_group )
+            return p_sys->pgrm[i];
+    }
+    return EsOutProgramAdd( p_out, i_group );
+}
+
 /* EsOutProgramMeta:
  */
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
@@ -1114,7 +1128,7 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
 static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
 {
     es_out_sys_t      *p_sys = out->p_sys;
-    es_out_pgrm_t     *p_pgrm = NULL;
+    es_out_pgrm_t     *p_pgrm;
     input_thread_t    *p_input = p_sys->p_input;
     char              *psz_cat;
     const char        *psz_title = NULL;
@@ -1132,16 +1146,9 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
         return;
     }
     /* Find program */
-    for( i = 0; i < p_sys->i_pgrm; i++ )
-    {
-        if( p_sys->pgrm[i]->i_id == i_group )
-        {
-            p_pgrm = p_sys->pgrm[i];
-            break;
-        }
-    }
-    if( p_pgrm == NULL )
-        p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
+    p_pgrm = EsOutProgramFind( out, i_group );
+    if( !p_pgrm )
+        return;
 
     /* */
     psz_title = vlc_meta_Get( p_meta, vlc_meta_Title);
@@ -1255,21 +1262,14 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
-    es_out_pgrm_t     *p_pgrm = NULL;
+    es_out_pgrm_t     *p_pgrm;
     char *psz_cat;
     int i;
 
     /* Find program */
-    for( i = 0; i < p_sys->i_pgrm; i++ )
-    {
-        if( p_sys->pgrm[i]->i_id == i_group )
-        {
-            p_pgrm = p_sys->pgrm[i];
-            break;
-        }
-    }
-    if( p_pgrm == NULL )
-        p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
+    p_pgrm = EsOutProgramFind( out, i_group );
+    if( !p_pgrm )
+        return;
 
     /* Merge EPG */
     if( !p_pgrm->p_epg )
@@ -1349,8 +1349,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
         return NULL;
     }
 
-    es_out_id_t       *es = malloc( sizeof( *es ) );
-    es_out_pgrm_t     *p_pgrm = NULL;
+    es_out_id_t   *es = malloc( sizeof( *es ) );
+    es_out_pgrm_t *p_pgrm;
     int i;
 
     if( !es )
@@ -1359,18 +1359,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
     vlc_mutex_lock( &p_sys->lock );
 
     /* Search the program */
-    for( i = 0; i < p_sys->i_pgrm; i++ )
+    p_pgrm = EsOutProgramFind( out, fmt->i_group );
+    if( !p_pgrm )
     {
-        if( fmt->i_group == p_sys->pgrm[i]->i_id )
-        {
-            p_pgrm = p_sys->pgrm[i];
-            break;
-        }
-    }
-    if( p_pgrm == NULL )
-    {
-        /* Create a new one */
-        p_pgrm = EsOutProgramAdd( out, fmt->i_group );
+        vlc_mutex_unlock( &p_sys->lock );
+        free( es );
+        return NULL;
     }
 
     /* Increase ref count for program */
@@ -2173,22 +2167,16 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             if( i_query == ES_OUT_SET_PCR )
             {
                 p_pgrm = p_sys->p_pgrm;
+                if( !p_pgrm )
+                    p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
             }
             else
             {
-                int i;
                 i_group = (int)va_arg( args, int );
-                for( i = 0; i < p_sys->i_pgrm; i++ )
-                {
-                    if( p_sys->pgrm[i]->i_id == i_group )
-                    {
-                        p_pgrm = p_sys->pgrm[i];
-                        break;
-                    }
-                }
+                p_pgrm = EsOutProgramFind( out, i_group );
             }
-            if( p_pgrm == NULL )
-                p_pgrm = EsOutProgramAdd( out, i_group );   /* Create it */
+            if( !p_pgrm )
+                return VLC_EGENERIC;
 
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program
