@@ -33,6 +33,7 @@
 #include <vlc_demux.h>
 
 #include <vlc_interface.h>
+#include <vlc_dialog.h>
 
 #include <vlc_meta.h>
 #include <vlc_codecs.h>
@@ -675,23 +676,20 @@ aviindex:
                 b_index = true;
                 goto aviindex;
             }
-            int i_create;
-            i_create = intf_UserYesNo( p_demux, _("AVI Index") ,
-                        _( "This AVI file is broken. Seeking will not "
-                        "work correctly.\nDo you want to "
-                        "try to repair it?\n\nThis might take a long time." ),
-                        _( "Repair" ), _( "Don't repair" ), _( "Cancel") );
-            if( i_create == DIALOG_OK_YES )
+            switch( dialog_Question( p_demux, _("AVI Index") ,
+               _( "This AVI file is broken. Seeking will not work correctly.\n"
+                  "Do you want to try to fix it?\n\n"
+                  "This might take a long time." ),
+                  _( "Repair" ), _( "Don't repair" ), _( "Cancel") ) )
             {
-                b_index = true;
-                msg_Dbg( p_demux, "Fixing AVI index" );
-                goto aviindex;
-            }
-            else if( i_create == DIALOG_CANCELLED )
-            {
-                /* Kill input */
-                vlc_object_kill( p_demux->p_parent );
-                goto error;
+                case 1:
+                    b_index = true;
+                    msg_Dbg( p_demux, "Fixing AVI index" );
+                    goto aviindex;
+                case 3:
+                    /* Kill input */
+                    vlc_object_kill( p_demux->p_parent );
+                    goto error;
             }
         }
     }
