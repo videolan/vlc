@@ -32,6 +32,7 @@
 
 #include <vlc_vout.h>
 #include <vlc_osd.h>
+#include <vlc_block.h>
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
@@ -39,6 +40,7 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
+#include "../video_output/vout_control.h"
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
@@ -58,20 +60,11 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     (void)a_position;
     vout_thread_t* p_vout;
     input_thread_t *p_input;
-    mediacontrol_RGBPicture *p_pic = NULL;
-    char path[256];
-    snapshot_t *p_snapshot;
+    mediacontrol_RGBPicture *p_pic;
     libvlc_exception_t ex;
 
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
-
-
-    p_snapshot = malloc( sizeof( snapshot_t ) );
-    if( ! p_snapshot )
-    {
-        RAISE_NULL( mediacontrol_InternalException, "Cannot allocate snapshot" );
-    }
 
     p_input = libvlc_get_input_thread( self->p_media_player, &ex );
     if( ! p_input )
@@ -79,62 +72,42 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
         RAISE_NULL( mediacontrol_InternalException, "No input" );
     }
 
-    p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    p_vout = input_GetVout( p_input );
     vlc_object_release( p_input );
     if( ! p_vout )
     {
         RAISE_NULL( mediacontrol_InternalException, "No video output" );
     }
 
-    snprintf( path, 255, "object:%p", p_snapshot );
-    var_SetString( p_vout, "snapshot-path", path );
-    var_SetString( p_vout, "snapshot-format", "png" );
+    block_t *p_image;
+    video_format_t fmt;
 
-    vlc_mutex_init( &p_snapshot->p_mutex );
-    vlc_cond_init( &p_snapshot->p_condvar );
-
-    vlc_mutex_lock( &p_snapshot->p_mutex );
-    mutex_cleanup_push( &p_snapshot->p_mutex );
-
-    /* Use p_snapshot address as sentinel against spurious vlc_object_wait wakeups.
-
-       If a legitimate wakeup occurs, then p_snapshot->p_data will hold either
-       NULL (in case of error) or a pointer to valid data. */
-    p_snapshot->p_data = ( char* )p_snapshot;
-
-    var_TriggerCallback( p_vout, "video-snapshot" );
-    while ( p_snapshot->p_data == ( char* )p_snapshot )
+    if( vout_GetSnapshot( p_vout, &p_image, NULL, &fmt, "png", 500*1000 ) )
     {
-        vlc_cond_wait( &p_snapshot->p_condvar, &p_snapshot->p_mutex );
+        RAISE_NULL( mediacontrol_InternalException, "Snapshot exception" );
+        return NULL;
     }
-    vlc_cleanup_pop();
 
-    vlc_object_release( p_vout );
-
-    vlc_mutex_unlock( &p_snapshot->p_mutex );
-    vlc_cond_destroy( &p_snapshot->p_condvar );
-    vlc_mutex_destroy( &p_snapshot->p_mutex );
-
-    if( p_snapshot->p_data )
+    /* */
+    char *p_data = malloc( p_image->i_buffer );
+    if( p_data )
     {
-        /* Note: p_snapshot->p_data is directly used, not copied. Thus
-           do not free it here. */
-        p_pic = private_mediacontrol_createRGBPicture( p_snapshot->i_width,
-                                                       p_snapshot->i_height,
-                                                       VLC_FOURCC( 'p','n','g',' ' ),
-                                                       p_snapshot->date,
-                                                       p_snapshot->p_data,
-                                                       p_snapshot->i_datasize );
-        if( !p_pic )
-        {
-            free( p_snapshot );
-            RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
-        }
+        memcpy( p_data, p_image->p_buffer, p_image->i_buffer );
+        p_pic = private_mediacontrol_createRGBPicture( fmt.i_width,
+                                                       fmt.i_height,
+                                                       fmt.i_chroma,
+                                                       p_image->i_pts,
+                                                       p_data,
+                                                       p_image->i_buffer );
     }
     else
     {
-        RAISE_NULL( mediacontrol_InternalException, "Snapshot exception" );
+        p_pic = NULL;
     }
+    block_Release( p_image );
+
+    if( !p_pic )
+        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     return p_pic;
 }
 
@@ -175,7 +148,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
     {
         RAISE_VOID( mediacontrol_InternalException, "No input" );
     }
-    p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    p_vout = input_GetVout( p_input );
     if( ! p_vout )
     {
         RAISE_VOID( mediacontrol_InternalException, "No video output" );
