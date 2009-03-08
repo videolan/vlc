@@ -43,36 +43,11 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
 {
     QVBoxLayout *layout = NULL;
     description = NULL;
-    int i_ret = -1;
     panel = NULL;
     dialog = NULL;
     altButton = NULL;
 
-    if( p_dialog->i_flags & DIALOG_YES_NO_CANCEL )
-    {
-        p_dialog->i_status = SENT_DIALOG;
-
-        QMessageBox cancelBox;
-
-        cancelBox.setWindowTitle( qfu( p_dialog->psz_title) );
-        cancelBox.setText( qfu( p_dialog->psz_description ) );
-
-        if( p_dialog->psz_default_button )
-            cancelBox.addButton( "&" + qfu( p_dialog->psz_default_button ),
-                                 QMessageBox::AcceptRole );
-
-        if( p_dialog->psz_alternate_button )
-            cancelBox.addButton( "&" + qfu( p_dialog->psz_alternate_button ),
-                                 QMessageBox::RejectRole );
-
-        if( p_dialog->psz_other_button )
-            cancelBox.addButton( "&" + qfu( p_dialog->psz_other_button ),
-                                 QMessageBox::ActionRole );
-
-        i_ret = cancelBox.exec();
-        msg_Dbg( p_intf, "Warning %i %i", i_ret, cancelBox.result() );
-    }
-    else if( (p_dialog->i_flags & DIALOG_INTF_PROGRESS ) ||
+    if( (p_dialog->i_flags & DIALOG_INTF_PROGRESS ) ||
              ( p_dialog->i_flags & DIALOG_USER_PROGRESS ) )
     {
         dialog = new QWidget; layout = new QVBoxLayout( dialog );
@@ -92,48 +67,23 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         return;
     }
 
-    msg_Dbg( p_intf, "Warning %i", i_ret );
-    /* We used a QMessageBox */
-    if( i_ret != -1 )
-    {
-        if( i_ret == QMessageBox::AcceptRole || i_ret == QMessageBox::Ok )
-            Finish( DIALOG_OK_YES );
-        else if ( i_ret == QMessageBox::RejectRole ) Finish( DIALOG_NO );
-        else Finish( DIALOG_CANCELLED );
-    }
-    else
     /* Custom dialog, finish it */
     {
         assert( dialog );
         /* Start the DialogButtonBox config */
         QDialogButtonBox *buttonBox = new QDialogButtonBox;
 
-        if( p_dialog->psz_default_button )
-        {
-            defaultButton = new QPushButton;
-            defaultButton->setFocus();
-            defaultButton->setText( "&" + qfu( p_dialog->psz_default_button ) );
-            buttonBox->addButton( defaultButton, QDialogButtonBox::AcceptRole );
-        }
         if( p_dialog->psz_alternate_button )
         {
             altButton = new QPushButton;
             altButton->setText( "&" + qfu( p_dialog->psz_alternate_button ) );
             buttonBox->addButton( altButton, QDialogButtonBox::RejectRole );
         }
-        if( p_dialog->psz_other_button )
-        {
-            otherButton = new QPushButton;
-            otherButton->setText( "&" + qfu( p_dialog->psz_other_button ) );
-            buttonBox->addButton( otherButton, QDialogButtonBox::ActionRole );
-        }
         layout->addWidget( buttonBox );
         /* End the DialogButtonBox */
 
         /* CONNECTs */
-        if( p_dialog->psz_default_button ) BUTTONACT( defaultButton, defaultB() );
         if( p_dialog->psz_alternate_button ) BUTTONACT( altButton, altB() );
-        if( p_dialog->psz_other_button ) BUTTONACT( otherButton, otherB() );
 
         /* set the layouts and thte title */
         dialog->setLayout( layout );
