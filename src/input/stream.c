@@ -1101,11 +1101,15 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
 
         /* */
         p_sys->stream.i_used += i_copy;
-        if( tk->i_start + p_sys->stream.i_offset >= tk->i_end ||
-            p_sys->stream.i_used >= p_sys->stream.i_read_size )
+
+        if( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read - i_data )
         {
-            if( p_sys->stream.i_used < i_read - i_data )
-                p_sys->stream.i_used = __MIN( i_read - i_data, STREAM_READ_ATONCE * 10 );
+            const int i_read_requested = __MAX( __MIN( i_read - i_data,
+                                                       STREAM_READ_ATONCE * 10 ),
+                                                STREAM_READ_ATONCE / 2 );
+
+            if( p_sys->stream.i_used < i_read_requested )
+                p_sys->stream.i_used = i_read_requested;
 
             if( AStreamRefillStream( s ) )
             {
@@ -1258,8 +1262,8 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
             p_sys->stream.i_tk = i;
             p_sys->stream.i_offset = i_pos - tk->i_start;
 
-            if( p_sys->stream.i_used < 1024 )
-                p_sys->stream.i_used = 1024;
+            if( p_sys->stream.i_used < STREAM_READ_ATONCE )
+                p_sys->stream.i_used = STREAM_READ_ATONCE;
 
             if( AStreamRefillStream( s ) && i_pos == tk->i_end )
                 return VLC_EGENERIC;
