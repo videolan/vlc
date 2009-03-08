@@ -40,8 +40,8 @@
 #include <libvcd/logging.h>
 
 static inline void
-MetaInfoAddStr(access_t *p_access, char *psz_cat,
-               char *title, const char *psz)
+MetaInfoAddStr( access_t *p_access, char *psz_cat,
+                const char *title, const char *psz )
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
   if ( psz ) {
@@ -53,7 +53,7 @@ MetaInfoAddStr(access_t *p_access, char *psz_cat,
 
 
 static inline void
-MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
+MetaInfoAddNum(access_t *p_access, char *psz_cat, const char *title, int num)
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
   dbg_print( INPUT_DBG_META, "cat %s, field %s: %d", psz_cat,  title, num);
@@ -62,7 +62,7 @@ MetaInfoAddNum(access_t *p_access, char *psz_cat, char *title, int num)
 }
 
 static inline void
-MetaInfoAddHex(access_t *p_access, char *psz_cat, char *title, int hex)
+MetaInfoAddHex(access_t *p_access, char *psz_cat, const char *title, int hex)
 {
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *) p_access->p_sys;
   dbg_print( INPUT_DBG_META, "cat %s, field %s: %d", psz_cat, title, hex);
