@@ -169,40 +169,6 @@ bool intf_ProgressIsCancelled( interaction_dialog_t *p_dialog )
 }
 
 /**
- * Helper function to make a dialogue asking the user for !password string
- *
- * \param p_this           Parent vlc_object
- * \param psz_title        Title for the dialog
- * \param psz_description  A description
- * \param ppsz_usersString Returned login
- * \return                 Clicked button code
- */
-int __intf_UserStringInput( vlc_object_t *p_this,
-        const char *psz_title,
-        const char *psz_description,
-        char **ppsz_usersString )
-{
-    int i_ret;
-    DIALOG_INIT( TWOWAY, VLC_EGENERIC );
-    p_new->i_type = INTERACT_DIALOG_TWOWAY;
-    p_new->psz_title = strdup( psz_title );
-    p_new->psz_description = strdup( psz_description );
-
-    p_new->i_flags = DIALOG_PSZ_INPUT_OK_CANCEL;
-
-    i_ret = DialogSend( p_new );
-
-    if( i_ret == VLC_EGENERIC )
-        DialogDestroy( p_new );
-    else if( i_ret != DIALOG_CANCELLED )
-    {
-        *ppsz_usersString = p_new->psz_returned[0]?
-            strdup( p_new->psz_returned[0] ) : NULL;
-    }
-    return i_ret;
-}
-
-/**
  * Hide an interaction dialog
  *
  * \param p_dialog the dialog to hide

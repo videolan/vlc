@@ -201,7 +201,6 @@ intf_ProgressUpdate
 intf_RunThread
 intf_StopThread
 intf_UserHide
-__intf_UserStringInput
 IsUTF8
 libvlc_InternalAddIntf
 libvlc_InternalCleanup

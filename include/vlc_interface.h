@@ -279,8 +279,7 @@ enum
  * Exported symbols
  ***************************************************************************/
 
-#define intf_UserStringInput( a, b, c, d ) __intf_UserStringInput( VLC_OBJECT(a),b,c,d )
-VLC_EXPORT( int, __intf_UserStringInput,(vlc_object_t*, const char*, const char*, char **) );
+#define intf_UserStringInput( a, b, c, d ) (VLC_OBJECT(a),b,c,d, VLC_EGENERIC)
 
 #define intf_IntfProgress( a, b, c ) __intf_Progress( VLC_OBJECT(a), NULL, b,c, -1 )
 #define intf_UserProgress( a, b, c, d, e ) __intf_Progress( VLC_OBJECT(a),b,c,d,e )
