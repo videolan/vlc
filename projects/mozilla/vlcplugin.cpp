@@ -291,7 +291,7 @@ void VlcPlugin::set_player_window( libvlc_exception_t *ex )
 #endif
 #ifdef XP_WIN
     libvlc_media_player_set_hwnd(libvlc_media_player,
-                                 getVideoWindow(),
+                                 getWindow().window,
                                  ex);
 #endif
 }
