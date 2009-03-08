@@ -261,7 +261,7 @@ enum
 };
 
 #define intf_UserStringInput( a, b, c, d ) (VLC_OBJECT(a),b,c,d, VLC_EGENERIC)
-#define interaction_Register( t ) (t, VLC_EGNERIC)
+#define interaction_Register( t ) (t, VLC_EGENERIC)
 #define interaction_Unregister( t ) (t, VLC_EGENERIC)
 
 
