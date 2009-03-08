@@ -83,50 +83,6 @@ static int DialogSend( interaction_dialog_t * );
         p_new->psz_returned[0] = NULL;                  \
         p_new->psz_returned[1] = NULL
 
-#define FORMAT_DESC \
-        va_start( args, psz_format ); \
-        if( vasprintf( &p_new->psz_description, psz_format, args ) == -1 ) \
-            return VLC_EGENERIC; \
-        va_end( args )
-
-static inline int DialogFireForget( interaction_dialog_t *d )
-{
-    int ret = DialogSend( d );
-    if( ret == VLC_EGENERIC )
-        DialogDestroy( d );
-    return ret;
-}
-
-/**
- * Helper function to ask a yes-no-cancel question
- *
- * \param p_this           Parent vlc_object
- * \param psz_title        Title for the dialog
- * \param psz_description  A description
- * \param psz_default      caption for the default button
- * \param psz_alternate    caption for the alternate button
- * \param psz_other        caption for the optional 3rd button (== cancel)
- * \return                 Clicked button code
- */
-int __intf_UserYesNo( vlc_object_t *p_this,
-                      const char *psz_title,
-                      const char *psz_description,
-                      const char *psz_default,
-                      const char *psz_alternate,
-                      const char *psz_other )
-{
-    DIALOG_INIT( TWOWAY, VLC_EGENERIC );
-
-    p_new->psz_title = strdup( psz_title );
-    p_new->psz_description = strdup( psz_description );
-    p_new->i_flags = DIALOG_YES_NO_CANCEL;
-    p_new->psz_default_button = strdup( psz_default );
-    p_new->psz_alternate_button = strdup( psz_alternate );
-    p_new->psz_other_button = psz_other ? strdup( psz_other ) : NULL;
-
-    return DialogFireForget( p_new );
-}
-
 /**
  * Helper function to create a dialogue showing a progress-bar with some info
  *
@@ -391,9 +347,7 @@ static void DialogDestroy( interaction_dialog_t *p_dialog )
 {
     free( p_dialog->psz_title );
     free( p_dialog->psz_description );
-    free( p_dialog->psz_default_button );
     free( p_dialog->psz_alternate_button );
-    free( p_dialog->psz_other_button );
     vlc_object_release( p_dialog->p_parent );
     free( p_dialog );
 }
@@ -406,7 +360,7 @@ static int DialogSend( interaction_dialog_t *p_dialog )
     intf_thread_t *p_intf;
 
     if( ( p_dialog->p_parent->i_flags & OBJECT_FLAGS_NOINTERACT )
-     || !config_GetInt( p_interaction, "interact" ) )
+     || !config_GetInt( p_dialog->p_parent, "interact" ) )
         return VLC_EGENERIC;
 
     p_interaction = InteractionGet( p_dialog->p_parent );

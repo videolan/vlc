@@ -86,16 +86,6 @@ InteractionDialog::InteractionDialog( intf_thread_t *_p_intf,
         progressBar->setOrientation( Qt::Horizontal );
         layout->addWidget( progressBar );
     }
-    else if( p_dialog->i_flags & DIALOG_PSZ_INPUT_OK_CANCEL )
-    {
-        dialog = new QWidget; layout = new QVBoxLayout( dialog );
-        layout->setMargin( 2 );
-        description = new QLabel( qfu( p_dialog->psz_description ) );
-        layout->addWidget( description );
-
-        inputEdit = new QLineEdit;
-        layout->addWidget( inputEdit );
-    }
     else
     {
         msg_Err( p_intf, "Unknown dialog type %i", p_dialog->i_flags );
