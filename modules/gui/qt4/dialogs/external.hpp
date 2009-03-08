@@ -42,10 +42,14 @@ signals:
 };
 
 struct intf_thread_t;
+class QProgressDialog;
 
 class DialogHandler : public QObject
 {
     Q_OBJECT
+
+    friend class QVLCProgressDialog;
+
 public:
     DialogHandler (intf_thread_t *);
     ~DialogHandler (void);
@@ -55,11 +59,42 @@ private:
     QVLCVariable message;
     QVLCVariable login;
     QVLCVariable question;
+    QVLCVariable progressBar;
+signals:
+    void progressBarDestroyed (QWidget *);
 
 private slots:
     void displayMessage (vlc_object_t *, void *);
     void requestLogin (vlc_object_t *, void *);
     void requestAnswer (vlc_object_t *, void *);
+    void startProgressBar (vlc_object_t *, void *);
+    void stopProgressBar (QWidget *);
+};
+
+/* Put here instead of .cpp because of MOC */
+#include <QProgressDialog>
+
+class QVLCProgressDialog : public QProgressDialog
+{
+    Q_OBJECT
+public:
+    QVLCProgressDialog (DialogHandler *parent,
+                        struct dialog_progress_bar_t *);
+    virtual ~QVLCProgressDialog (void);
+
+private:
+    DialogHandler *handler;
+    bool cancelled;
+
+    static void update (void *, float);
+    static bool check (void *);
+    static void destroy (void *);
+private slots:
+    void saveCancel (void);
+
+signals:
+    void progressed (int);
+    void destroyed (void);
 };
 
 #endif

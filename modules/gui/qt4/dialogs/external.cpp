@@ -33,6 +33,8 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QProgressDialog>
+#include <QMutex>
 
 QVLCVariable::QVLCVariable (vlc_object_t *obj, const char *varname, int type)
     : object (obj), name (qfu(varname))
@@ -59,7 +61,8 @@ DialogHandler::DialogHandler (intf_thread_t *intf)
     : intf (intf),
       message (VLC_OBJECT(intf), "dialog-fatal", VLC_VAR_ADDRESS),
       login (VLC_OBJECT(intf), "dialog-login", VLC_VAR_ADDRESS),
-      question (VLC_OBJECT(intf), "dialog-question", VLC_VAR_ADDRESS)
+      question (VLC_OBJECT(intf), "dialog-question", VLC_VAR_ADDRESS),
+      progressBar (VLC_OBJECT(intf), "dialog-progress-bar", VLC_VAR_ADDRESS)
 {
     connect (&message, SIGNAL(pointerChanged(vlc_object_t *, void *)),
              SLOT(displayMessage(vlc_object_t *, void *)),
@@ -70,6 +73,12 @@ DialogHandler::DialogHandler (intf_thread_t *intf)
     connect (&question, SIGNAL(pointerChanged(vlc_object_t *, void *)),
              SLOT(requestAnswer(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
+    connect (&progressBar, SIGNAL(pointerChanged(vlc_object_t *, void *)),
+             SLOT(startProgressBar(vlc_object_t *, void *)),
+             Qt::BlockingQueuedConnection);
+    connect (this,
+             SIGNAL(progressBarDestroyed(QWidget *)),
+             SLOT(stopProgressBar(QWidget *)));
 
     dialog_Register (intf);
 }
@@ -167,4 +176,70 @@ void DialogHandler::requestAnswer (vlc_object_t *, void *value)
 
     delete box;
     data->answer = answer;
+}
+
+
+QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
+                                        struct dialog_progress_bar_t *data)
+    : QProgressDialog (qfu(data->message),
+                       data->cancel ? ("&" + qfu(data->cancel)) : 0, 0, 1000),
+      cancelled (false),
+      handler (parent)
+{
+    if (data->title != NULL)
+        setWindowTitle (qfu(data->title));
+    setMinimumDuration (0);
+
+    connect (this, SIGNAL(progressed(int)), SLOT(setValue(int)));
+    connect (this, SIGNAL(canceled(void)), SLOT(saveCancel(void)));
+
+    data->pf_update = update;
+    data->pf_check = check;
+    data->pf_destroy = destroy;
+    data->p_sys = this;
+}
+
+QVLCProgressDialog::~QVLCProgressDialog (void)
+{
+}
+
+void QVLCProgressDialog::update (void *priv, float value)
+{
+    QVLCProgressDialog *self = static_cast<QVLCProgressDialog *>(priv);
+    emit self->progressed ((int)(value * 1000.));
+}
+
+static QMutex cancel_mutex;
+
+bool QVLCProgressDialog::check (void *priv)
+{
+    QVLCProgressDialog *self = static_cast<QVLCProgressDialog *>(priv);
+    QMutexLocker locker (&cancel_mutex);
+    return self->cancelled;
+}
+
+void QVLCProgressDialog::destroy (void *priv)
+{
+    QVLCProgressDialog *self = static_cast<QVLCProgressDialog *>(priv);
+
+    emit self->handler->progressBarDestroyed (self);
+}
+
+void QVLCProgressDialog::saveCancel (void)
+{
+    QMutexLocker locker (&cancel_mutex);
+    cancelled = true;
+}
+
+void DialogHandler::startProgressBar (vlc_object_t *, void *value)
+{
+    dialog_progress_bar_t *data = (dialog_progress_bar_t *)value;
+    QWidget *dlg = new QVLCProgressDialog (this, data);
+
+    dlg->show ();
+}
+
+void DialogHandler::stopProgressBar (QWidget *dlg)
+{
+    delete dlg;
 }
