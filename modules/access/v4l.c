@@ -320,8 +320,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_video_pts  = -1;
     p_sys->i_brightness = var_CreateGetInteger( p_demux, "v4l-brightness" );
 
-    var_Create( p_demux, "v4l-hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    p_sys->i_hue        = -1;
+    p_sys->i_hue        = var_CreateGetInteger( p_demux, "v4l-hue" );
     p_sys->i_colour     = var_CreateGetInteger( p_demux, "v4l-colour" );
     p_sys->i_contrast   = var_CreateGetInteger( p_demux, "v4l-contrast" );
 
