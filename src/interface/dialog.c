@@ -165,3 +165,32 @@ void dialog_Login (vlc_object_t *obj, char **username, char **password,
     va_end (ap);
     vlc_object_release (provider);
 }
+
+
+#undef dialog_Question
+/**
+ * Asks a total (Yes/No/Cancel) question through the user interface.
+ * @param obj VLC object emitting the question
+ * @param title dialog box title
+ * @param text dialog box text
+ * @param yes first choice/button text
+ * @param no second choice/button text
+ * @param cancel third answer/button text, or NULL if no third option
+ * @return 0 if the user could not answer the question (e.g. there is no UI),
+ * 1, 2 resp. 3 if the user pressed the first, second resp. third button.
+ */
+int dialog_Question (vlc_object_t *obj, const char *title, const char *text,
+                     const char *yes, const char *no, const char *cancel)
+{
+    if (obj->i_flags & OBJECT_FLAGS_NOINTERACT)
+        return 0;
+
+    vlc_object_t *provider = dialog_GetProvider (obj);
+    if (provider == NULL)
+        return 0;
+
+    dialog_question_t dialog = { title, text, yes, no, cancel, 0, };
+    var_SetAddress (provider, "dialog-question", &dialog);
+    vlc_object_release (provider);
+    return dialog.answer;
+}

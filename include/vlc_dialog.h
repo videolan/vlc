@@ -79,6 +79,23 @@ VLC_EXPORT( void, dialog_Login, (vlc_object_t *, char **, char **, const char *,
 #define dialog_Login(o, u, p, t, ...) \
         dialog_Login(VLC_OBJECT(o), u, p, t, __VA_ARGS__)
 
+/**
+ * A question dialog.
+ */
+typedef struct dialog_question_t
+{
+    const char *title;
+    const char *message;
+    const char *yes;
+    const char *no;
+    const char *cancel;
+    int answer;
+} dialog_question_t;
+
+VLC_EXPORT( int, dialog_Question, (vlc_object_t *, const char *, const char *, const char *, const char *, const char *) );
+#define dialog_Question(o, t, m, y, n, c) \
+        dialog_Question(VLC_OBJECT(o), t, m, y, n, c)
+
 VLC_EXPORT( int, dialog_Register, (vlc_object_t *) );
 VLC_EXPORT( int, dialog_Unregister, (vlc_object_t *) );
 #define dialog_Register(o) dialog_Register(VLC_OBJECT(o))
