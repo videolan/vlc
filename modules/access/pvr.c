@@ -547,7 +547,6 @@ static int Open( vlc_object_t * p_this )
     access_sys_t * p_sys;
     char * psz_tofree;
     char * psz_parser;
-    vlc_value_t val;
     struct v4l2_capability device_capability;
     int result;
 
@@ -561,76 +560,29 @@ static int Open( vlc_object_t * p_this )
     /* defaults values */
     var_Create( p_access, "pvr-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
-    var_Create( p_access, "pvr-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-device" , &val);
-    p_sys->psz_videodev = val.psz_string;
-
-    var_Create( p_access, "pvr-radio-device", VLC_VAR_STRING |
-                                              VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-radio-device" , &val);
-    p_sys->psz_radiodev = val.psz_string;
-
-    var_Create( p_access, "pvr-norm", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-norm" , &val);
-    p_sys->i_standard = val.i_int;
-
-    var_Create( p_access, "pvr-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-width" , &val);
-    p_sys->i_width = val.i_int;
-
-    var_Create( p_access, "pvr-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-height" , &val);
-    p_sys->i_height = val.i_int;
-
-    var_Create( p_access, "pvr-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-frequency" , &val);
-    p_sys->i_frequency = val.i_int;
-
-    var_Create( p_access, "pvr-framerate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-framerate" , &val);
-    p_sys->i_framerate = val.i_int;
-
-    var_Create( p_access, "pvr-keyint", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-keyint" , &val);
-    p_sys->i_keyint = val.i_int;
-
-    var_Create( p_access, "pvr-bframes", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-bframes" , &val);
-    p_sys->i_bframes = val.b_bool;
-
-    var_Create( p_access, "pvr-bitrate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-bitrate" , &val);
-    p_sys->i_bitrate = val.i_int;
-
-    var_Create( p_access, "pvr-bitrate-peak", VLC_VAR_INTEGER |
-                                              VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-bitrate-peak" , &val);
-    p_sys->i_bitrate_peak = val.i_int;
-
-    var_Create( p_access, "pvr-bitrate-mode", VLC_VAR_INTEGER |
-                                              VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-bitrate-mode" , &val);
-    p_sys->i_bitrate_mode = val.i_int;
-
-    var_Create( p_access, "pvr-audio-bitmask", VLC_VAR_INTEGER |
-                                              VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-audio-bitmask" , &val);
-    p_sys->i_audio_bitmask = val.i_int;
-
-    var_Create( p_access, "pvr-audio-volume", VLC_VAR_INTEGER |
-                                              VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-audio-volume" , &val);
-    p_sys->i_volume = val.i_int;
-
-    var_Create( p_access, "pvr-channel", VLC_VAR_INTEGER |
-                                              VLC_VAR_DOINHERIT );
-    var_Get( p_access, "pvr-channel" , &val);
-    p_sys->i_input = val.i_int;
+    p_sys->psz_videodev = var_CreateGetString( p_access, "pvr-device" );
+    p_sys->psz_radiodev = var_CreateGetString( p_access, "pvr-radio-device" );
+    p_sys->i_standard   = var_CreateGetInteger( p_access, "pvr-norm" );
+    p_sys->i_width      = var_CreateGetInteger( p_access, "pvr-width" );
+    p_sys->i_height     = var_CreateGetInteger( p_access, "pvr-height" );
+    p_sys->i_frequency  = var_CreateGetInteger( p_access, "pvr-frequency" );
+    p_sys->i_framerate  = var_CreateGetInteger( p_access, "pvr-framerate" );
+    p_sys->i_keyint     = var_CreateGetInteger( p_access, "pvr-keyint" );
+    p_sys->i_bframes    = var_CreateGetInteger( p_access, "pvr-bframes" );
+    p_sys->i_bitrate    = var_CreateGetInteger( p_access, "pvr-bitrate" );
+    p_sys->i_bitrate_peak  = var_CreateGetInteger( p_access, "pvr-bitrate-peak" );
+    p_sys->i_bitrate_mode  = var_CreateGetInteger( p_access, "pvr-bitrate-mode" );
+    p_sys->i_audio_bitmask = var_CreateGetInteger( p_access, "pvr-audio-bitmask" );
+    p_sys->i_volume     = var_CreateGetInteger( p_access, "pvr-audio-volume" );
+    p_sys->i_input      = var_CreateGetInteger( p_access, "pvr-channel" );
 
     /* parse command line options */
     psz_tofree = strdup( p_access->psz_path );
     if( !psz_tofree )
-        return VLC_ENOMEM; /* <-- FIXME MEMORY LEAK */
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
 
     psz_parser = psz_tofree;
     while( *psz_parser )
