@@ -366,6 +366,7 @@ $Id$
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x11: video output module using the X11 API
+ * x11_screen: Screen capture module
  * x264: H264 video decoder using X264
  * xa: XA demuxer
  * xml: LibXML xml parser
