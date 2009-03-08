@@ -310,6 +310,7 @@ typedef struct
     bool        b_seen;
     bool        b_valid;
     int         i_cc;   /* countinuity counter */
+    bool        b_scrambled;
 
     /* PSI owner (ie PMT -> PAT, ES -> PMT */
     ts_psi_t   *p_owner;
@@ -1507,6 +1508,7 @@ static void PIDInit( ts_pid_t *pid, bool b_psi, ts_psi_t *p_owner )
 
     pid->b_valid    = true;
     pid->i_cc       = 0xff;
+    pid->b_scrambled = false;
     pid->p_owner    = p_owner;
     pid->i_owner_number = 0;
 
@@ -1867,6 +1869,7 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
 {
     const uint8_t *p = p_bk->p_buffer;
     const bool b_unit_start = p[1]&0x40;
+    const bool b_scrambled  = p[3]&0x80;
     const bool b_adaptation = p[3]&0x20;
     const bool b_payload    = p[3]&0x10;
     const int  i_cc         = p[3]&0x0f; /* continuity counter */
@@ -1969,6 +1972,23 @@ static bool GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     {
         block_Release( p_bk );
         return i_ret;
+    }
+
+    /* */
+    if( !pid->b_scrambled != !b_scrambled )
+    {
+        msg_Warn( p_demux, "scrambled state changed on pid %d (%d->%d)",
+                  pid->i_pid, pid->b_scrambled, b_scrambled );
+
+        pid->b_scrambled = b_scrambled;
+
+        for( int i = 0; i < pid->i_extra_es; i++ )
+        {
+            es_out_Control( p_demux->out, ES_OUT_SET_ES_SCRAMBLED_STATE,
+                            pid->extra_es[i]->id, b_scrambled );
+        }
+        es_out_Control( p_demux->out, ES_OUT_SET_ES_SCRAMBLED_STATE,
+                        pid->es->id, b_scrambled );
     }
 
     /* We have to gather it */
