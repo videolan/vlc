@@ -87,6 +87,29 @@ typedef struct
 } vlm_schedule_t
 #endif
 
+/** VLM events
+ * You can catch vlm event by adding a callback on the variable "intf-event"
+ * of the VLM object.
+ * This variable is an address that will hold a vlm_event_t* value.
+ */
+enum vlm_event_type_e
+{
+    /* */
+    VLM_EVENT_MEDIA_ADDED   = 0x100,
+    VLM_EVENT_MEDIA_REMOVED,
+    VLM_EVENT_MEDIA_CHANGED,
+
+    /* */
+    VLM_EVENT_MEDIA_INSTANCE_STARTED    = 0x200,
+    VLM_EVENT_MEDIA_INSTANCE_STOPPED,
+};
+
+typedef struct
+{
+    int     i_type;     /* a vlm_event_type_e value */
+    int64_t id;         /* Media ID */
+} vlm_event_t;
+
 /** VLM control query */
 enum vlm_query_e
 {

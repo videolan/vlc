@@ -310,6 +310,7 @@ SOURCES_libvlc_common = \
 	input/input_internal.h \
 	input/input_interface.h \
 	input/vlm_internal.h \
+	input/vlm_event.h \
 	input/resource.h \
 	input/resource.c \
 	input/stream.c \
@@ -403,6 +404,7 @@ SOURCES_libvlc_sout = \
 
 SOURCES_libvlc_vlm = \
 	input/vlm.c \
+	input/vlm_event.c \
 	input/vlmshell.c \
 	$(NULL)
 
