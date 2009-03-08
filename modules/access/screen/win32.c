@@ -172,7 +172,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
 
     if( p_data->bmi.bmiHeader.biSize == 0 )
     {
-        vlc_value_t val;
+        int i_val;
         /* Create the bitmap info header */
         p_data->bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
         p_data->bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
@@ -186,14 +186,11 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         p_data->bmi.bmiHeader.biClrUsed = 0;
         p_data->bmi.bmiHeader.biClrImportant = 0;
 
-        var_Create( p_demux, "screen-fragment-size",
-                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-        var_Get( p_demux, "screen-fragment-size", &val );
-        p_data->i_fragment_size =
-            val.i_int > 0 ? val.i_int : p_sys->fmt.video.i_height;
-        p_data->i_fragment_size =
-            val.i_int > p_sys->fmt.video.i_height ? p_sys->fmt.video.i_height :
-            p_data->i_fragment_size;
+        i_val = var_CreateGetInteger( p_demux, "screen-fragment-size" );
+        p_data->i_fragment_size = i_val > 0 ? i_val : p_sys->fmt.video.i_height;
+        p_data->i_fragment_size = i_val > p_sys->fmt.video.i_height ?
+                                            p_sys->fmt.video.i_height :
+                                            p_data->i_fragment_size;
         p_sys->f_fps *= (p_sys->fmt.video.i_height/p_data->i_fragment_size);
         p_sys->i_incr = 1000000 / p_sys->f_fps;
         p_data->i_fragment = 0;
@@ -250,7 +247,7 @@ block_t *screen_Capture( demux_t *p_demux )
         if( !( p_data->p_block = CaptureBlockNew( p_demux ) ) )
         {
             msg_Warn( p_demux, "cannot get block" );
-            return 0;
+            return NULL;
         }
     }
 
