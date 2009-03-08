@@ -50,12 +50,19 @@ DialogHandler::DialogHandler (intf_thread_t *intf)
      var_Create (intf, "dialog-login", VLC_VAR_ADDRESS);
      var_AddCallback (intf, "dialog-login", LoginCallback, this);
 
+    connect (this, SIGNAL(question(struct dialog_question_t *)),
+             this, SLOT(requestAnswer(struct dialog_question_t *)),
+             Qt::BlockingQueuedConnection);
+     var_Create (intf, "dialog-question", VLC_VAR_ADDRESS);
+     var_AddCallback (intf, "dialog-question", QuestionCallback, this);
+
      dialog_Register (intf);
 }
 
 DialogHandler::~DialogHandler (void)
 {
     dialog_Unregister (intf);
+    var_DelCallback (intf, "dialog-question", QuestionCallback, this);
     var_DelCallback (intf, "dialog-login", LoginCallback, this);
     var_DelCallback (intf, "dialog-fatal", MessageCallback, this);
 }
@@ -137,4 +144,41 @@ void DialogHandler::requestLogin (struct dialog_login_t *data)
         *data->username = *data->password = NULL;
 
     delete dialog;
+}
+
+int DialogHandler::QuestionCallback (vlc_object_t *obj, const char *var,
+                                     vlc_value_t, vlc_value_t value, void *data)
+{
+     DialogHandler *self = (DialogHandler *)data;
+     dialog_question_t *dialog = (dialog_question_t *)value.p_address;
+
+     emit self->question (dialog);
+     return VLC_SUCCESS;
+}
+
+void DialogHandler::requestAnswer (struct dialog_question_t *data)
+{
+    QMessageBox *box = new QMessageBox (QMessageBox::Question,
+                                        qfu(data->title), qfu(data->message));
+    QAbstractButton *yes = (data->yes != NULL)
+        ? box->addButton ("&" + qfu(data->yes), QMessageBox::YesRole) : NULL;
+    QAbstractButton *no = (data->no != NULL)
+        ? box->addButton ("&" + qfu(data->no), QMessageBox::NoRole) : NULL;
+    QAbstractButton *cancel = (data->cancel != NULL)
+        ? box->addButton ("&" + qfu(data->cancel), QMessageBox::RejectRole)
+        : NULL;
+
+    box->exec ();
+
+    int answer;
+    if (box->clickedButton () == yes)
+        answer = 1;
+    else
+    if (box->clickedButton () == no)
+        answer = 2;
+    else
+        answer = 3;
+
+    delete box;
+    data->answer = answer;
 }

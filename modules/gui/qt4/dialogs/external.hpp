@@ -38,15 +38,19 @@ private:
     static int MessageCallback (vlc_object_t *, const char *,
                                 vlc_value_t, vlc_value_t, void *);
     static int LoginCallback (vlc_object_t *obj, const char *,
-                              vlc_value_t, vlc_value_t, void *data);
+                              vlc_value_t, vlc_value_t, void *);
+    static int QuestionCallback (vlc_object_t *obj, const char *,
+                                 vlc_value_t, vlc_value_t, void *);
 
 private slots:
     void displayMessage (const struct dialog_fatal_t *);
-    void requestLogin (struct dialog_login_t *data);
+    void requestLogin (struct dialog_login_t *);
+    void requestAnswer (struct dialog_question_t *);
 
 signals:
     void message (const struct dialog_fatal_t *);
     void authentication (struct dialog_login_t *);
+    void question (struct dialog_question_t *);
 };
 
 #endif
