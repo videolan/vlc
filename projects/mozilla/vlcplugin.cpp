@@ -74,8 +74,10 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
 #endif
 {
     memset(&npwindow, 0, sizeof(NPWindow));
+#if XP_UNIX
     memset(&npvideo, 0, sizeof(Window));
     memset(&npcontrol, 0, sizeof(Window));
+#endif
 }
 
 static bool boolValue(const char *value) {
