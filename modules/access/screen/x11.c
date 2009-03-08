@@ -150,7 +150,7 @@ block_t *screen_Capture( demux_t *p_demux )
     if( !image )
     {
         msg_Warn( p_demux, "cannot get image" );
-        return 0;
+        return NULL;
     }
 
     i_size = image->bytes_per_line * image->height;
@@ -159,7 +159,7 @@ block_t *screen_Capture( demux_t *p_demux )
     {
         msg_Warn( p_demux, "cannot get block" );
         XDestroyImage( image );
-        return 0;
+        return NULL;
     }
 
     vlc_memcpy( p_block->p_buffer, image->data, i_size );

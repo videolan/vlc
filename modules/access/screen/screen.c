@@ -137,7 +137,6 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_value_t val;
 
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
@@ -149,10 +148,8 @@ static int Open( vlc_object_t *p_this )
     /* Update default_pts to a suitable value for screen access */
     var_Create( p_demux, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
-    var_Create( p_demux, "screen-fps", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "screen-fps", &val );
-    p_sys->f_fps = val.f_float;
-    p_sys->i_incr = 1000000 / val.f_float;
+    p_sys->f_fps = var_CreateGetFloat( p_demux, "screen-fps" );
+    p_sys->i_incr = 1000000 / p_sys->f_fps;;
     p_sys->i_next_date = 0;
 
 #ifdef SCREEN_SUBSCREEN

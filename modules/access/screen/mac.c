@@ -186,7 +186,7 @@ block_t *screen_Capture( demux_t *p_demux )
     if( !( p_block = block_New( p_demux, i_size ) ) )
     {
         msg_Warn( p_demux, "cannot get block" );
-        return 0;
+        return NULL;
     }
     
     CGPoint cursor_pos;
