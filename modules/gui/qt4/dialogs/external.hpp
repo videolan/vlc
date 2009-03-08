@@ -24,6 +24,23 @@
 #include <QObject>
 #include <vlc_common.h>
 
+class QVLCVariable : public QObject
+{
+    Q_OBJECT
+private:
+    static int callback (vlc_object_t *, const char *,
+                         vlc_value_t, vlc_value_t, void *);
+    vlc_object_t *object;
+    QString name;
+
+public:
+    QVLCVariable (vlc_object_t *, const char *, int);
+    virtual ~QVLCVariable (void);
+
+signals:
+    void pointerChanged (vlc_object_t *, void *);
+};
+
 struct intf_thread_t;
 
 class DialogHandler : public QObject
@@ -35,22 +52,14 @@ public:
 
 private:
     intf_thread_t *intf;
-    static int MessageCallback (vlc_object_t *, const char *,
-                                vlc_value_t, vlc_value_t, void *);
-    static int LoginCallback (vlc_object_t *obj, const char *,
-                              vlc_value_t, vlc_value_t, void *);
-    static int QuestionCallback (vlc_object_t *obj, const char *,
-                                 vlc_value_t, vlc_value_t, void *);
+    QVLCVariable message;
+    QVLCVariable login;
+    QVLCVariable question;
 
 private slots:
-    void displayMessage (const struct dialog_fatal_t *);
-    void requestLogin (struct dialog_login_t *);
-    void requestAnswer (struct dialog_question_t *);
-
-signals:
-    void message (const struct dialog_fatal_t *);
-    void authentication (struct dialog_login_t *);
-    void question (struct dialog_question_t *);
+    void displayMessage (vlc_object_t *, void *);
+    void requestLogin (vlc_object_t *, void *);
+    void requestAnswer (vlc_object_t *, void *);
 };
 
 #endif

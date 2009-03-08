@@ -34,52 +34,55 @@
 #include <QLineEdit>
 #include <QMessageBox>
 
-DialogHandler::DialogHandler (intf_thread_t *intf)
+QVLCVariable::QVLCVariable (vlc_object_t *obj, const char *varname, int type)
+    : object (obj), name (qfu(varname))
 {
-    this->intf = intf;
+    var_Create (object, qtu(name), type);
+    var_AddCallback (object, qtu(name), callback, this);
+}
 
-    connect (this, SIGNAL(message(const struct dialog_fatal_t *)),
-             this, SLOT(displayMessage(const struct dialog_fatal_t *)),
+QVLCVariable::~QVLCVariable (void)
+{
+    var_DelCallback (object, qtu(name), callback, this);
+    var_Destroy (object, qtu(name));
+}
+
+int QVLCVariable::callback (vlc_object_t *object, const char *,
+                            vlc_value_t, vlc_value_t cur, void *data)
+{
+    QVLCVariable *self = (QVLCVariable *)data;
+    emit self->pointerChanged (object, cur.p_address);
+}
+
+
+DialogHandler::DialogHandler (intf_thread_t *intf)
+    : intf (intf),
+      message (VLC_OBJECT(intf), "dialog-fatal", VLC_VAR_ADDRESS),
+      login (VLC_OBJECT(intf), "dialog-login", VLC_VAR_ADDRESS),
+      question (VLC_OBJECT(intf), "dialog-question", VLC_VAR_ADDRESS)
+{
+    connect (&message, SIGNAL(pointerChanged(vlc_object_t *, void *)),
+             this, SLOT(displayMessage(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
-     var_Create (intf, "dialog-fatal", VLC_VAR_ADDRESS);
-     var_AddCallback (intf, "dialog-fatal", MessageCallback, this);
-
-    connect (this, SIGNAL(authentication(struct dialog_login_t *)),
-             this, SLOT(requestLogin(struct dialog_login_t *)),
+    connect (&login, SIGNAL(pointerChanged(vlc_object_t *, void *)),
+             this, SLOT(requestLogin(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
-     var_Create (intf, "dialog-login", VLC_VAR_ADDRESS);
-     var_AddCallback (intf, "dialog-login", LoginCallback, this);
-
-    connect (this, SIGNAL(question(struct dialog_question_t *)),
-             this, SLOT(requestAnswer(struct dialog_question_t *)),
+    connect (&question, SIGNAL(pointerChanged(vlc_object_t *, void *)),
+             this, SLOT(requestAnswer(vlc_object_t *, void *)),
              Qt::BlockingQueuedConnection);
-     var_Create (intf, "dialog-question", VLC_VAR_ADDRESS);
-     var_AddCallback (intf, "dialog-question", QuestionCallback, this);
 
-     dialog_Register (intf);
+    dialog_Register (intf);
 }
 
 DialogHandler::~DialogHandler (void)
 {
     dialog_Unregister (intf);
-    var_DelCallback (intf, "dialog-question", QuestionCallback, this);
-    var_DelCallback (intf, "dialog-login", LoginCallback, this);
-    var_DelCallback (intf, "dialog-fatal", MessageCallback, this);
 }
 
-int DialogHandler::MessageCallback (vlc_object_t *obj, const char *var,
-                                    vlc_value_t, vlc_value_t value,
-                                    void *data)
+void DialogHandler::displayMessage (vlc_object_t *, void *value)
 {
-     DialogHandler *self = (DialogHandler *)data;
-     const dialog_fatal_t *dialog = (const dialog_fatal_t *)value.p_address;
+     const dialog_fatal_t *dialog = (const dialog_fatal_t *)value;
 
-     emit self->message (dialog);
-     return VLC_SUCCESS;
-}
-
-void DialogHandler::displayMessage (const struct dialog_fatal_t *dialog)
-{
     if (dialog->modal)
         QMessageBox::critical (NULL, qfu(dialog->title), qfu(dialog->message),
                                QMessageBox::Ok);
@@ -89,18 +92,9 @@ void DialogHandler::displayMessage (const struct dialog_fatal_t *dialog)
                                                    qfu(dialog->message));
 }
 
-int DialogHandler::LoginCallback (vlc_object_t *obj, const char *var,
-                                  vlc_value_t, vlc_value_t value, void *data)
+void DialogHandler::requestLogin (vlc_object_t *, void *value)
 {
-     DialogHandler *self = (DialogHandler *)data;
-     dialog_login_t *dialog = (dialog_login_t *)value.p_address;
-
-     emit self->authentication (dialog);
-     return VLC_SUCCESS;
-}
-
-void DialogHandler::requestLogin (struct dialog_login_t *data)
-{
+    dialog_login_t *data = (dialog_login_t *)value;
     QDialog *dialog = new QDialog;
     QLayout *layout = new QVBoxLayout (dialog);
 
@@ -146,18 +140,10 @@ void DialogHandler::requestLogin (struct dialog_login_t *data)
     delete dialog;
 }
 
-int DialogHandler::QuestionCallback (vlc_object_t *obj, const char *var,
-                                     vlc_value_t, vlc_value_t value, void *data)
+void DialogHandler::requestAnswer (vlc_object_t *, void *value)
 {
-     DialogHandler *self = (DialogHandler *)data;
-     dialog_question_t *dialog = (dialog_question_t *)value.p_address;
+    dialog_question_t *data = (dialog_question_t *)value;
 
-     emit self->question (dialog);
-     return VLC_SUCCESS;
-}
-
-void DialogHandler::requestAnswer (struct dialog_question_t *data)
-{
     QMessageBox *box = new QMessageBox (QMessageBox::Question,
                                         qfu(data->title), qfu(data->message));
     QAbstractButton *yes = (data->yes != NULL)
