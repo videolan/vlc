@@ -182,8 +182,7 @@
               <item row="0" column="0" colspan="3">
                <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>_(&quot;Add destinations following the streaming methods you need.
-Be sure to check with transcoding that the format is compatible with the method used.&quot;)</string>
+                 <string>_(&quot;Add destinations following the streaming methods you need. Be sure to check with transcoding that the format is compatible with the method used.&quot;)</string>
                 </property>
                 <property name="textFormat">
                  <enum>Qt::PlainText</enum>
