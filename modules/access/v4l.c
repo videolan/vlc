@@ -293,7 +293,6 @@ static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
-    vlc_value_t val;
 
     /* Only when selected */
     if( *p_demux->psz_access == '\0' )
@@ -309,70 +308,26 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    var_Create( p_demux, "v4l-audio", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-audio", &val );
-    p_sys->i_audio          = val.i_int;
+    p_sys->i_audio      = var_CreateGetInteger( p_demux, "v4l-audio" );
+    p_sys->i_channel    = var_CreateGetInteger( p_demux, "v4l-channel" );
+    p_sys->i_norm       = var_CreateGetInteger( p_demux, "v4l-norm" );
+    p_sys->i_tuner      = var_CreateGetInteger( p_demux, "v4l-tuner" );
+    p_sys->i_frequency  = var_CreateGetInteger( p_demux, "v4l-frequency" );
 
-    var_Create( p_demux, "v4l-channel", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-channel", &val );
-    p_sys->i_channel        = val.i_int;
-
-    var_Create( p_demux, "v4l-norm", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-norm", &val );
-    p_sys->i_norm           = val.i_int;
-
-    var_Create( p_demux, "v4l-tuner", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-tuner", &val );
-    p_sys->i_tuner          = val.i_int;
-
-    var_Create( p_demux, "v4l-frequency",
-                                    VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-frequency", &val );
-    p_sys->i_frequency      = val.i_int;
-
-    var_Create( p_demux, "v4l-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-fps", &val );
-    p_sys->f_fps            = val.f_float;
-
-    var_Create( p_demux, "v4l-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-width", &val );
-    p_sys->i_width          = val.i_int;
-
-    var_Create( p_demux, "v4l-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-height", &val );
-    p_sys->i_height         = val.i_int;
-
-    p_sys->i_video_pts      = -1;
-
-    var_Create( p_demux, "v4l-brightness", VLC_VAR_INTEGER |
-                                                        VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-brightness", &val );
-    p_sys->i_brightness     = val.i_int;
+    p_sys->f_fps        = var_CreateGetFloat( p_demux, "v4l-fps" );
+    p_sys->i_width      = var_CreateGetInteger( p_demux, "v4l-width" );
+    p_sys->i_height     = var_CreateGetInteger( p_demux, "v4l-height" );
+    p_sys->i_video_pts  = -1;
+    p_sys->i_brightness = var_CreateGetInteger( p_demux, "v4l-brightness" );
 
     var_Create( p_demux, "v4l-hue", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-hue", &val );
-    p_sys->i_hue            = -1;
+    p_sys->i_hue        = -1;
+    p_sys->i_colour     = var_CreateGetInteger( p_demux, "v4l-colour" );
+    p_sys->i_contrast   = var_CreateGetInteger( p_demux, "v4l-contrast" );
 
-    var_Create( p_demux, "v4l-colour", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-colour", &val );
-    p_sys->i_colour         = val.i_int;
-
-    var_Create( p_demux, "v4l-contrast", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-contrast", &val );
-    p_sys->i_contrast       = val.i_int;
-
-    var_Create( p_demux, "v4l-mjpeg", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-mjpeg", &val );
-    p_sys->b_mjpeg     = val.b_bool;
-
-    var_Create( p_demux, "v4l-decimation", VLC_VAR_INTEGER |
-                                                            VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-decimation", &val );
-    p_sys->i_decimation = val.i_int;
-
-    var_Create( p_demux, "v4l-quality", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "v4l-quality", &val );
-    p_sys->i_quality = val.i_int;
+    p_sys->b_mjpeg      = var_CreateGetBool( p_demux, "v4l-mjpeg" );
+    p_sys->i_decimation = var_CreateGetInteger( p_demux, "v4l-decimation" );
+    p_sys->i_quality    = var_CreateGetInteger( p_demux, "v4l-quality" );
 
     p_sys->psz_device = NULL;
     p_sys->i_fd = -1;
