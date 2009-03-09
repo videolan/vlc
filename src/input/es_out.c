@@ -219,9 +219,6 @@ static inline bool EsFmtIsTeletext( const es_format_t *p_fmt )
  *****************************************************************************/
 es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 {
-    vlc_value_t  val;
-    int i;
-
     es_out_t     *out = malloc( sizeof( *out ) );
     if( !out )
         return NULL;
@@ -261,35 +258,35 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->i_sub   = 0;
 
     /* */
-    var_Get( p_input, "audio-track", &val );
-    p_sys->i_audio_last = val.i_int;
+    p_sys->i_audio_last = var_GetInteger( p_input, "audio-track" );
 
-    var_Get( p_input, "sub-track", &val );
-    p_sys->i_sub_last = val.i_int;
+    p_sys->i_sub_last = var_GetInteger( p_input, "sub-track" );
 
     p_sys->i_default_sub_id   = -1;
 
     if( !p_input->b_preparsing )
     {
-        var_Get( p_input, "audio-language", &val );
-        p_sys->ppsz_audio_language = LanguageSplit(val.psz_string);
+        char *psz_string;
+
+        psz_string = var_GetString( p_input, "audio-language" );
+        p_sys->ppsz_audio_language = LanguageSplit( psz_string );
         if( p_sys->ppsz_audio_language )
         {
-            for( i = 0; p_sys->ppsz_audio_language[i]; i++ )
+            for( int i = 0; p_sys->ppsz_audio_language[i]; i++ )
                 msg_Dbg( p_input, "selected audio language[%d] %s",
                          i, p_sys->ppsz_audio_language[i] );
         }
-        free( val.psz_string );
+        free( psz_string );
 
-        var_Get( p_input, "sub-language", &val );
-        p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
+        psz_string = var_GetString( p_input, "sub-language" );
+        p_sys->ppsz_sub_language = LanguageSplit( psz_string );
         if( p_sys->ppsz_sub_language )
         {
-            for( i = 0; p_sys->ppsz_sub_language[i]; i++ )
+            for( int i = 0; p_sys->ppsz_sub_language[i]; i++ )
                 msg_Dbg( p_input, "selected subtitle language[%d] %s",
                          i, p_sys->ppsz_sub_language[i] );
         }
-        free( val.psz_string );
+        free( psz_string );
     }
     else
     {
@@ -297,11 +294,9 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
         p_sys->ppsz_audio_language = NULL;
     }
 
-    var_Get( p_input, "audio-track-id", &val );
-    p_sys->i_audio_id = val.i_int;
+    p_sys->i_audio_id = var_GetInteger( p_input, "audio-track-id" );
 
-    var_Get( p_input, "sub-track-id", &val );
-    p_sys->i_sub_id = val.i_int;
+    p_sys->i_sub_id = var_GetInteger( p_input, "sub-track-id" );
 
     p_sys->p_es_audio = NULL;
     p_sys->p_es_video = NULL;
@@ -1560,7 +1555,6 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
-    vlc_value_t    val;
 
     if( EsIsSelected( es ) )
     {
@@ -1591,7 +1585,6 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         }
         else if( es->fmt.i_cat == AUDIO_ES )
         {
-            var_Get( p_input, "audio", &val );
             if( !var_GetBool( p_input, out->b_sout ? "sout-audio" : "audio" ) )
             {
                 msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
@@ -1601,7 +1594,6 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
         }
         if( es->fmt.i_cat == SPU_ES )
         {
-            var_Get( p_input, "spu", &val );
             if( !var_GetBool( p_input, out->b_sout ? "sout-spu" : "spu" ) )
             {
                 msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
