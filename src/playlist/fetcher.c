@@ -318,7 +318,8 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     playlist_fetcher_t *p_fetcher = p_data;
 
-    if( newval.i_int == INPUT_EVENT_ITEM_META )
+    if( newval.i_int == INPUT_EVENT_ITEM_META ||
+        newval.i_int == INPUT_EVENT_DEAD )
         vlc_cond_signal( &p_fetcher->wait );
 
     return VLC_SUCCESS;
