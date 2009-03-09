@@ -120,6 +120,8 @@ private:
     QTreeWidgetItem *input_bitrate_stat;
     QTreeWidgetItem *demuxed_stat;
     QTreeWidgetItem *stream_bitrate_stat;
+    QTreeWidgetItem *corrupted_stat;
+    QTreeWidgetItem *discontinuity_stat;
 
     QTreeWidgetItem *video;
     QTreeWidgetItem *vdecoded_stat;

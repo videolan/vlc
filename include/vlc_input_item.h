@@ -228,6 +228,8 @@ struct input_stats_t
     int i_demux_read_bytes;
     float f_demux_bitrate;
     float f_average_demux_bitrate;
+    int i_demux_corrupted;
+    int i_demux_discontinuity;
 
     /* Decoders */
     int i_decoded_audio;

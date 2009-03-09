@@ -526,6 +526,10 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed"), "0", input, "kB") ;
     CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, qtr("Stream bitrate"),
                            "0", input, "kb/s" );
+    CREATE_AND_ADD_TO_CAT( corrupted_stat, qtr("Corrupted"),
+                           "0", input, "" );
+    CREATE_AND_ADD_TO_CAT( discontinuity_stat, qtr("Discontinuities"),
+                           "0", input, "" );
 
     CREATE_AND_ADD_TO_CAT( vdecoded_stat, qtr("Decoded blocks"),
                            "0", video, "" );
@@ -576,6 +580,8 @@ void InputStatsPanel::update( input_item_t *p_item )
                     (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
     UPDATE( stream_bitrate_stat, "%6.0f",
                     (float)(p_item->p_stats->f_demux_bitrate * 8000 ));
+    UPDATE( corrupted_stat, "%5i", p_item->p_stats->i_demux_corrupted );
+    UPDATE( discontinuity_stat, "%5i", p_item->p_stats->i_demux_discontinuity );
 
     /* Video */
     UPDATE( vdecoded_stat, "%5i", p_item->p_stats->i_decoded_video );

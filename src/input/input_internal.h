@@ -139,6 +139,8 @@ struct input_thread_private_t
         counter_t *p_input_bitrate;
         counter_t *p_demux_read;
         counter_t *p_demux_bitrate;
+        counter_t *p_demux_corrupted;
+        counter_t *p_demux_discontinuity;
         counter_t *p_decoded_audio;
         counter_t *p_decoded_video;
         counter_t *p_decoded_sub;

@@ -801,6 +801,8 @@ static void InitStatistics( input_thread_t * p_input )
         INIT_COUNTER( demux_read, INTEGER, COUNTER );
         INIT_COUNTER( input_bitrate, FLOAT, DERIVATIVE );
         INIT_COUNTER( demux_bitrate, FLOAT, DERIVATIVE );
+        INIT_COUNTER( demux_corrupted, INTEGER, COUNTER );
+        INIT_COUNTER( demux_discontinuity, INTEGER, COUNTER );
         INIT_COUNTER( played_abuffers, INTEGER, COUNTER );
         INIT_COUNTER( lost_abuffers, INTEGER, COUNTER );
         INIT_COUNTER( displayed_pictures, INTEGER, COUNTER );

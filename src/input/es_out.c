@@ -1863,6 +1863,19 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
                              p_block->i_buffer, &i_total );
         stats_UpdateFloat( p_input , p_input->p->counters.p_demux_bitrate,
                            (float)i_total, NULL );
+
+        /* Update number of corrupted data packats */
+        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            stats_UpdateInteger( p_input, p_input->p->counters.p_demux_corrupted,
+                                 1, NULL );
+        }
+        /* Update number of discontinuities */
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+        {
+            stats_UpdateInteger( p_input, p_input->p->counters.p_demux_discontinuity,
+                                 1, NULL );
+        }
         vlc_mutex_unlock( &p_input->p->counters.counters_lock );
     }
 

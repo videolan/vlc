@@ -171,6 +171,10 @@ void stats_ComputeInputStats( input_thread_t *p_input, input_stats_t *p_stats )
                       &p_stats->i_demux_read_bytes );
     stats_GetFloat( p_input, p_input->p->counters.p_demux_bitrate,
                     &p_stats->f_demux_bitrate );
+    stats_GetInteger( p_input, p_input->p->counters.p_demux_corrupted,
+                      &p_stats->i_demux_corrupted );
+    stats_GetInteger( p_input, p_input->p->counters.p_demux_discontinuity,
+                      &p_stats->i_demux_discontinuity );
 
     /* Decoders */
     stats_GetInteger( p_input, p_input->p->counters.p_decoded_video,
@@ -212,6 +216,7 @@ void stats_ReinitInputStats( input_stats_t *p_stats )
     p_stats->f_input_bitrate = p_stats->f_average_input_bitrate =
     p_stats->i_demux_read_packets = p_stats->i_demux_read_bytes =
     p_stats->f_demux_bitrate = p_stats->f_average_demux_bitrate =
+    p_stats->i_demux_corrupted = p_stats->i_demux_discontinuity =
     p_stats->i_displayed_pictures = p_stats->i_lost_pictures =
     p_stats->i_played_abuffers = p_stats->i_lost_abuffers =
     p_stats->i_decoded_video = p_stats->i_decoded_audio =
