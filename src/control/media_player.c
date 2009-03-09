@@ -215,7 +215,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                 return VLC_SUCCESS;
         }
 
-        libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL);
+        libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_TIMES )
@@ -676,7 +676,7 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
 
     vlc_object_release( p_input_thread );
-    
+
     if( state == libvlc_Playing )
     {
         return 1;
@@ -695,7 +695,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 
     if( state == libvlc_Playing || state == libvlc_Paused )
     {
-        /* Send a stop notification event only of we are in playing or
+        /* Send a stop notification event only if we are in playing or
          * paused states */
         libvlc_media_set_state( p_mi->p_md, libvlc_Ended, p_e );
 
@@ -1146,21 +1146,30 @@ libvlc_state_t libvlc_media_player_get_state(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
+    libvlc_state_t state = libvlc_Ended;
     vlc_value_t val;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
-    if ( !p_input_thread )
+    if( !p_input_thread )
     {
         /* We do return the right value, no need to throw an exception */
         if( libvlc_exception_raised( p_e ) )
             libvlc_exception_clear( p_e );
-        return libvlc_Ended;
+        return state;
     }
 
     var_Get( p_input_thread, "state", &val );
-    vlc_object_release( p_input_thread );
+    state = vlc_to_libvlc_state(val.i_int);
 
-    return vlc_to_libvlc_state(val.i_int);
+    if( state == PLAYING_S )
+    {
+        float caching;
+        caching = var_GetFloat( p_input_thread, "cache" );
+        if( caching > 0.0 && caching < 100.0 )
+            state = libvlc_Buffering;
+    }
+    vlc_object_release( p_input_thread );
+    return state;
 }
 
 int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
