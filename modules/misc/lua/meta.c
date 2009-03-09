@@ -191,12 +191,16 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
  *****************************************************************************/
 int FindArt( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t *)p_this;
-    input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
-    lua_State *L = vlclua_meta_init( p_this, p_item );
+    playlist_t *p_playlist = pl_Hold( p_this );
+    if( !p_playlist )
+        return VLC_EGENERIC;
 
+    input_item_t *p_item = (input_item_t *)p_this->p_private;
+    lua_State *L = vlclua_meta_init( p_this, p_item );
     int i_ret = vlclua_scripts_batch_execute( p_this, "meta", &fetch_art, L, p_item );
     lua_close( L );
+
+    pl_Release( p_this );
     return i_ret;
 }
 

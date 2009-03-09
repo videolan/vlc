@@ -63,8 +63,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int FindMeta( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t *)p_this;
-    input_item_t *p_item = (input_item_t *)(p_playlist->p_private);
+    input_item_t *p_item = (input_item_t *)p_this->p_private;
     bool b_have_art = false;
 
     int i = 0;

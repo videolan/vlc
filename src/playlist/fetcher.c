@@ -40,6 +40,8 @@
  *****************************************************************************/
 struct playlist_fetcher_t
 {
+    VLC_COMMON_MEMBERS;
+
     playlist_t      *p_playlist;
 
     vlc_thread_t    thread;
@@ -60,7 +62,10 @@ static void *Thread( void * );
  *****************************************************************************/
 playlist_fetcher_t *playlist_fetcher_New( playlist_t *p_playlist )
 {
-    playlist_fetcher_t *p_fetcher = malloc( sizeof(*p_fetcher) );
+    playlist_fetcher_t *p_fetcher =
+        vlc_custom_create( p_playlist, sizeof(*p_fetcher),
+                           VLC_OBJECT_GENERIC, "playlist fetcher" );
+
     if( !p_fetcher )
         return NULL;
 
@@ -75,7 +80,7 @@ playlist_fetcher_t *playlist_fetcher_New( playlist_t *p_playlist )
     if( vlc_clone( &p_fetcher->thread, Thread, p_fetcher,
                    VLC_THREAD_PRIORITY_LOW ) )
     {
-        msg_Err( p_playlist, "cannot spawn secondary preparse thread" );
+        msg_Err( p_fetcher, "cannot spawn secondary preparse thread" );
         free( p_fetcher );
         return NULL;
     }
@@ -107,7 +112,7 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
     }
     vlc_cond_destroy( &p_fetcher->wait );
     vlc_mutex_destroy( &p_fetcher->lock );
-    free( p_fetcher );
+    vlc_object_release( p_fetcher );
 }
 
 
@@ -123,8 +128,7 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
  */
 static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
-    playlist_t *p_playlist = p_fetcher->p_playlist;
-    int i_ret = VLC_EGENERIC;
+    int i_ret;
     module_t *p_module;
     char *psz_title, *psz_artist, *psz_album;
 
@@ -146,7 +150,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
             if( !strcmp( album.psz_artist, psz_artist ) &&
                 !strcmp( album.psz_album, psz_album ) )
             {
-                msg_Dbg( p_playlist, " %s - %s has already been searched",
+                msg_Dbg( p_fetcher, " %s - %s has already been searched",
                          psz_artist, psz_album );
                 /* TODO-fenrir if we cache art filename too, we can go faster */
                 free( psz_artist );
@@ -187,8 +191,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         return 1;
     }
 
-    PL_LOCK;
-    p_playlist->p_private = p_item;
+    /* */
     psz_album = input_item_GetAlbum( p_item );
     psz_artist = input_item_GetArtist( p_item );
     psz_title = input_item_GetTitle( p_item );
@@ -197,22 +200,31 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 
     if( psz_album && psz_artist )
     {
-        msg_Dbg( p_playlist, "searching art for %s - %s",
+        msg_Dbg( p_fetcher, "searching art for %s - %s",
              psz_artist, psz_album );
     }
     else
     {
-        msg_Dbg( p_playlist, "searching art for %s",
+        msg_Dbg( p_fetcher, "searching art for %s",
              psz_title );
     }
     free( psz_title );
 
-    p_module = module_need( p_playlist, "art finder", NULL, false );
+    /* Fetch the art url */
+    p_fetcher->p_private = p_item;
+
+    p_module = module_need( p_fetcher, "art finder", NULL, false );
 
     if( p_module )
+    {
+        module_unneed( p_fetcher, p_module );
         i_ret = 1;
+    }
     else
-        msg_Dbg( p_playlist, "unable to find art" );
+    {
+        msg_Dbg( p_fetcher, "unable to find art" );
+        i_ret = VLC_EGENERIC;
+    }
 
     /* Record this album */
     if( psz_artist && psz_album )
@@ -230,11 +242,6 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         free( psz_album );
     }
 
-    if( p_module )
-        module_unneed( p_playlist, p_module );
-    p_playlist->p_private = NULL;
-    PL_UNLOCK;
-
     return i_ret;
 }
 
@@ -242,25 +249,25 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
  * Download the art using the URL or an art downloaded
  * This function should be called only if data is not already in cache
  */
-static int DownloadArt( playlist_t *p_playlist, input_item_t *p_item )
+static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
     char *psz_arturl = input_item_GetArtURL( p_item );
     assert( *psz_arturl );
 
     if( !strncmp( psz_arturl , "file://", 7 ) )
     {
-        msg_Dbg( p_playlist, "Album art is local file, no need to cache" );
+        msg_Dbg( p_fetcher, "Album art is local file, no need to cache" );
         free( psz_arturl );
         return VLC_SUCCESS;
     }
 
     if( !strncmp( psz_arturl , "APIC", 4 ) )
     {
-        msg_Warn( p_playlist, "APIC fetch not supported yet" );
+        msg_Warn( p_fetcher, "APIC fetch not supported yet" );
         goto error;
     }
 
-    stream_t *p_stream = stream_UrlNew( p_playlist, psz_arturl );
+    stream_t *p_stream = stream_UrlNew( p_fetcher, psz_arturl );
     if( !p_stream )
         goto error;
 
@@ -291,7 +298,7 @@ static int DownloadArt( playlist_t *p_playlist, input_item_t *p_item )
         if( psz_type && strlen( psz_type ) > 5 )
             psz_type = NULL; /* remove extension if it's > to 4 characters */
 
-        playlist_SaveArt( p_playlist, p_item, p_data, i_data, psz_type );
+        playlist_SaveArt( p_fetcher->p_playlist, p_item, p_data, i_data, psz_type );
     }
 
     free( p_data );
@@ -325,12 +332,10 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
  */
 static void WaitPreparsed( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
-    playlist_t *p_playlist = p_fetcher->p_playlist;
-
     if( input_item_IsPreparsed( p_item ) )
         return;
 
-    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+    input_thread_t *p_input = playlist_CurrentInput( p_fetcher->p_playlist );
     if( !p_input )
         return;
 
@@ -393,7 +398,7 @@ static void *Thread( void *p_data )
         /* Find art, and download it if needed */
         int i_ret = FindArt( p_fetcher, p_item );
         if( i_ret == 1 )
-            i_ret = DownloadArt( p_playlist, p_item );
+            i_ret = DownloadArt( p_fetcher, p_item );
 
         /* */
         char *psz_name = input_item_GetName( p_item );
