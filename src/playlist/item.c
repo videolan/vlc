@@ -823,7 +823,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         pl_priv(p_playlist)->request.i_skip = 0;
         pl_priv(p_playlist)->request.p_item = p_toplay;
         if( pl_priv(p_playlist)->p_input )
-            input_StopThread( pl_priv(p_playlist)->p_input );
+            input_StopThread( pl_priv(p_playlist)->p_input, true );
         pl_priv(p_playlist)->request.i_status = PLAYLIST_RUNNING;
         vlc_cond_signal( &pl_priv(p_playlist)->signal );
     }

@@ -69,7 +69,7 @@ static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
  *
  * Object lock is NOT held.
  */
-static void release_input_thread( libvlc_media_player_t *p_mi )
+static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abort )
 {
     input_thread_t * p_input_thread;
 
@@ -89,7 +89,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
                          input_event_changed, p_mi );
 
         /* We owned this one */
-        input_StopThread( p_input_thread );
+        input_StopThread( p_input_thread, b_input_abort );
         vlc_thread_join( p_input_thread );
 
         var_Destroy( p_input_thread, "drawable-hwnd" );
@@ -455,7 +455,7 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
     vlc_mutex_unlock( &p_mi->object_lock );
     vlc_mutex_destroy( &p_mi->object_lock );
 
-    release_input_thread( p_mi );
+    release_input_thread( p_mi, true );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
 
@@ -494,7 +494,12 @@ void libvlc_media_player_set_media(
 
     vlc_mutex_lock( &p_mi->object_lock );
 
-    release_input_thread( p_mi );
+    /* FIXME I am not sure if it is a user request or on die(eof/error)
+     * request here */
+    release_input_thread( p_mi,
+                          p_mi->p_input_thread &&
+                          !p_mi->p_input_thread->b_eof &&
+                          !p_mi->p_input_thread->b_error );
 
     if( p_mi->p_md )
         libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, p_e );
@@ -703,7 +708,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     if( p_mi->b_own_its_input_thread )
     {
         vlc_mutex_lock( &p_mi->object_lock );
-        release_input_thread( p_mi ); /* This will stop the input thread */
+        release_input_thread( p_mi, true ); /* This will stop the input thread */
         vlc_mutex_unlock( &p_mi->object_lock );
     }
     else
@@ -713,7 +718,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
         if( !p_input_thread )
             return;
 
-        input_StopThread( p_input_thread );
+        input_StopThread( p_input_thread, true );
         vlc_object_release( p_input_thread );
     }
 }

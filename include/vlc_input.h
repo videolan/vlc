@@ -375,6 +375,8 @@ typedef enum input_event_type_e
     INPUT_EVENT_STATE,
     /* b_dead is true */
     INPUT_EVENT_DEAD,
+    /* a *user* abort has been requested */
+    INPUT_EVENT_ABORT,
 
     /* "rate" has changed */
     INPUT_EVENT_RATE,
@@ -435,12 +437,22 @@ typedef enum input_event_type_e
  * Prototypes
  *****************************************************************************/
 
-/* input_CreateThread
- * Release the returned input_thread_t using vlc_object_release() */
+/**
+ * It will create a new input thread.
+ *
+ * You must call input_StopThread() on it and then vlc_object_release().
+ */
 #define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
 VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item_t * ) );
 
-VLC_EXPORT( void,             input_StopThread,     ( input_thread_t * ) );
+/**
+ * It will ask a input_thread_t to stop.
+ *
+ * b_abort must be true when a user stop is requested and not because you have
+ * detected an error or an eof. It will be used to properly send the
+ * INPUT_EVENT_ABORT event.
+ */
+VLC_EXPORT( void,             input_StopThread,     ( input_thread_t *, bool b_abort ) );
 
 #define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
 VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );

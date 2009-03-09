@@ -430,7 +430,7 @@ int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
  *
  * \param the input thread to stop
  */
-void input_StopThread( input_thread_t *p_input )
+void input_StopThread( input_thread_t *p_input, bool b_abort )
 {
     /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
      * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
@@ -438,6 +438,8 @@ void input_StopThread( input_thread_t *p_input )
     ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
+    if( b_abort )
+        input_SendEventAbort( p_input );
 }
 
 input_resource_t *input_DetachResource( input_thread_t *p_input )

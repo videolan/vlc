@@ -158,7 +158,7 @@ static void Close( vlc_object_t *p_this )
     {
         if( p_sd->p_sys->pp_input[i] )
         {
-            input_StopThread( p_sd->p_sys->pp_input[i] );
+            input_StopThread( p_sd->p_sys->pp_input[i], true );
             vlc_object_release( p_sd->p_sys->pp_input[i] );
             p_sd->p_sys->pp_input[i] = NULL;
         }
@@ -197,7 +197,7 @@ static void *Run( void *data )
             if( p_sd->p_sys->pp_input[i]->b_eof
                 || p_sd->p_sys->pp_input[i]->b_error )
             {
-                input_StopThread( p_sd->p_sys->pp_input[i] );
+                input_StopThread( p_sd->p_sys->pp_input[i], false );
                 vlc_object_release( p_sd->p_sys->pp_input[i] );
                 p_sd->p_sys->pp_input[i] = NULL;
                 REMOVE_ELEM( p_sys->pp_input, p_sys->i_input, i );

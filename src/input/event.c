@@ -55,6 +55,10 @@ void input_SendEventDead( input_thread_t *p_input )
 
     Trigger( p_input, INPUT_EVENT_DEAD );
 }
+void input_SendEventAbort( input_thread_t *p_input )
+{
+    Trigger( p_input, INPUT_EVENT_ABORT );
+}
 
 void input_SendEventTimes( input_thread_t *p_input,
                            double f_position, mtime_t i_time, mtime_t i_length )

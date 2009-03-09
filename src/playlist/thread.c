@@ -473,7 +473,7 @@ static int LoopInput( playlist_t *p_playlist )
     if( ( p_sys->request.b_request || !vlc_object_alive( p_playlist ) ) && !p_input->b_die )
     {
         PL_DEBUG( "incoming request - stopping current input" );
-        input_StopThread( p_input );
+        input_StopThread( p_input, true );
     }
 
     /* This input is dead. Remove it ! */
@@ -514,7 +514,7 @@ static int LoopInput( playlist_t *p_playlist )
     else if( p_input->b_error || p_input->b_eof )
     {
         PL_DEBUG( "finished input" );
-        input_StopThread( p_input );
+        input_StopThread( p_input, false );
     }
     return VLC_SUCCESS;
 }
