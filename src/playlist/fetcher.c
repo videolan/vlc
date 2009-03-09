@@ -101,6 +101,9 @@ void playlist_fetcher_Push( playlist_fetcher_t *p_fetcher, input_item_t *p_item 
 
 void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
 {
+    /* */
+    vlc_object_kill( p_fetcher );
+
     /* Destroy the item meta-infos fetcher */
     vlc_cancel( p_fetcher->thread );
     vlc_join( p_fetcher->thread, NULL );
@@ -396,8 +399,17 @@ static void *Thread( void *p_data )
         /* Wait that the input item is preparsed if it is being played */
         WaitPreparsed( p_fetcher, p_item );
 
+        /* */
+        if( !vlc_object_alive( p_fetcher ) )
+            goto end;
+
         /* Find art, and download it if needed */
         int i_ret = FindArt( p_fetcher, p_item );
+
+        /* */
+        if( !vlc_object_alive( p_fetcher ) )
+            goto end;
+
         if( i_ret == 1 )
             i_ret = DownloadArt( p_fetcher, p_item );
 
@@ -415,6 +427,8 @@ static void *Thread( void *p_data )
             input_item_SetArtNotFound( p_item, true );
         }
         free( psz_name );
+
+    end:
         vlc_gc_decref( p_item );
 
         vlc_restorecancel( canc );
