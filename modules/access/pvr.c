@@ -580,6 +580,8 @@ static int Open( vlc_object_t * p_this )
     psz_tofree = strdup( p_access->psz_path );
     if( !psz_tofree )
     {
+        free( p_sys->psz_radiodev );
+        free( p_sys->psz_videodev );
         free( p_sys );
         return VLC_ENOMEM;
     }
