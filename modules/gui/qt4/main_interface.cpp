@@ -360,7 +360,9 @@ void MainInterface::showCryptedLabel( bool b_show )
     if( cryptedLabel == NULL )
     {
         cryptedLabel = new QLabel;
-        cryptedLabel->setPixmap( QPixmap( ":/lock" ) );
+        // The lock icon is not the right one for DRM protection/scrambled.
+        //cryptedLabel->setPixmap( QPixmap( ":/lock" ) );
+        cryptedLabel->setText( "DRM" );
         statusBar()->addWidget( cryptedLabel );
     }
 
