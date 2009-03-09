@@ -42,9 +42,40 @@ static inline char *strdup (const char *str)
 /* Windows' printf doesn't support %z modifiers, thus we need to rewrite
  * the format string in a wrapper. */
 # include <string.h>
+# include <stdlib.h>
 static inline char *vlc_fix_format_string (const char *format)
 {
-    char *fmt, *f;
+    char *fmt;
+# ifdef WIN64
+    const char *src = format, *tmp;
+    char *dst;
+    size_t n = 0;
+    while ((tmp = strstr (src, "%z")) != NULL)
+    {
+        n++;
+        src = tmp + 2;
+    }
+    if (n == 0)
+        return NULL;
+
+    fmt = (char*)malloc (strlen (format) + n + 1);
+    if (fmt == NULL)
+        return NULL;
+
+    src = format;
+    dst = fmt;
+    while ((tmp = strstr (src, "%z")) != NULL)
+    {
+        size_t d = tmp - src;
+        memcpy (dst, src, d);
+        dst += d;
+        memcpy (dst, "%ll", 3);
+        dst += 3;
+        src = tmp + 2;
+    }
+    strcpy (dst, src);
+# else
+    char *f;
     if (strstr (format, "%z") == NULL)
         return NULL;
 
@@ -56,10 +87,10 @@ static inline char *vlc_fix_format_string (const char *format)
     {
        f[1] = 'l';
     }
+# endif
     return fmt;
 }
 
-# include <stdlib.h>
 # include <stdio.h>
 # include <stdarg.h>
 
