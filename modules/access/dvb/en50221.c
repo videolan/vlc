@@ -1834,7 +1834,7 @@ static int InitSlot( access_t * p_access, int i_slot )
             break;
         }
 
-        if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, NULL )
+        if ( TPDUSend( p_access, i_slot, T_CREATE_TC, NULL, 0 )
                 != VLC_SUCCESS )
         {
             msg_Err( p_access,
@@ -2030,7 +2030,7 @@ int en50221_Poll( access_t * p_access )
 
         if ( !p_sys->pb_tc_has_data[i_slot] )
         {
-            if ( TPDUSend( p_access, i_slot, T_DATA_LAST, NULL, NULL ) !=
+            if ( TPDUSend( p_access, i_slot, T_DATA_LAST, NULL, 0 ) !=
                     VLC_SUCCESS )
             {
                 msg_Err( p_access,
