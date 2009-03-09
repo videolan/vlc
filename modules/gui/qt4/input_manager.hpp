@@ -58,8 +58,8 @@ enum {
     CachingEvent_Type,
     BookmarksChanged_Type,
     RecordingEvent_Type,
-/*    ProgramChanged_Type,
-    SignalChanged_Type, */
+    ProgramChanged_Type,
+/*    SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
@@ -135,7 +135,7 @@ private:
     void UpdateStats();
     void UpdateCaching();
     void UpdateRecord();
-
+    void UpdateProgramEvent();
 
 public slots:
     void setInput( input_thread_t * ); ///< Our controlled input changed
@@ -197,9 +197,8 @@ signals:
     void synchroChanged();
     void bookmarksChanged();
     void cachingChanged( float );
-#if 0
+    /// Program Event changes
     void encryptionChanged( bool );
-#endif
 };
 
 class MainInputManager : public QObject

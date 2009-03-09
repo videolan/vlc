@@ -138,9 +138,8 @@ void InputManager::delInput()
     emit artChanged( NULL );
     emit infoChanged( NULL );
     emit metaChanged( (input_item_t *)NULL );
-#if 0
+
     emit encryptionChanged( false );
-#endif
 }
 
 /* Convert the event from the callbacks in actions */
@@ -228,6 +227,9 @@ void InputManager::customEvent( QEvent *event )
         break;
     case RecordingEvent_Type:
         UpdateRecord();
+        break;
+    case ProgramChanged_Type:
+        UpdateProgramEvent();
         break;
     default:
         msg_Warn( p_intf, "This shouldn't happen: %i", i_type );
@@ -328,8 +330,9 @@ static int InputEvent( vlc_object_t *p_this, const char *,
 
     case INPUT_EVENT_PROGRAM:
         /* This is for PID changes */
-        /* event = new IMEvent( ProgramChanged_Type, 0 );
-        break; */
+        event = new IMEvent( ProgramChanged_Type, 0 );
+        break;
+
     case INPUT_EVENT_SIGNAL:
         /* This is for capture-card signals */
         /* event = new IMEvent( SignalChanged_Type, 0 );
@@ -625,6 +628,15 @@ void InputManager::UpdateRecord()
     if( hasInput() )
     {
         emit recordingStateChanged( var_GetBool( p_input, "record" ) );
+    }
+}
+
+void InputManager::UpdateProgramEvent()
+{
+    if( hasInput() )
+    {
+        bool b_scrambled = var_GetBool( p_input, "program-scrambled" );
+        emit encryptionChanged( b_scrambled );
     }
 }
 
