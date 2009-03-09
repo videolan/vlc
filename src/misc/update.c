@@ -1612,7 +1612,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
                       p_update->release.psz_url, psz_downloaded, psz_size,
                       f_progress ) != -1 )
         {
-            dialog_ProgressSet( p_progress, /*FIXME psz_status,*/ f_progress );
+            dialog_ProgressSet( p_progress, psz_status, f_progress );
             free( psz_status );
         }
         free( psz_downloaded );

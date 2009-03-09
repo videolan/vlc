@@ -103,7 +103,7 @@ typedef struct dialog_progress_bar_t
     const char *cancel;
     /* Permanent parameters */
     vlc_mutex_t lock;
-    void (*pf_update) (void *, float);
+    void (*pf_update) (void *, const char *, float);
     bool (*pf_check) (void *);
     void (*pf_destroy) (void *);
     void *p_sys;
@@ -113,7 +113,7 @@ VLC_EXPORT( dialog_progress_bar_t *, dialog_ProgressCreate, (vlc_object_t *, con
 #define dialog_ProgressCreate(o, t, m, c) \
         dialog_ProgressCreate(VLC_OBJECT(o), t, m, c)
 VLC_EXPORT( void, dialog_ProgressDestroy, (dialog_progress_bar_t *) );
-VLC_EXPORT( void, dialog_ProgressSet, (dialog_progress_bar_t *, float) );
+VLC_EXPORT( void, dialog_ProgressSet, (dialog_progress_bar_t *, const char *, float) );
 VLC_EXPORT( bool, dialog_ProgressCancelled, (dialog_progress_bar_t *) );
 
 VLC_EXPORT( int, dialog_Register, (vlc_object_t *) );

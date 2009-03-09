@@ -320,8 +320,7 @@ int scan_Next( scan_t *p_scan, scan_configuration_t *p_cfg )
         if( p_scan->p_dialog == NULL )
             p_scan->p_dialog = dialog_ProgressCreate( p_scan->p_obj, _("Scanning DVB-T"), psz_text, _("Cancel") );
         if( p_scan->p_dialog != NULL )
-            /* FIXME: update text, not just percentage */
-            dialog_ProgressSet( p_scan->p_dialog, /*psz_text, */100 * f_position );
+            dialog_ProgressSet( p_scan->p_dialog, psz_text, 100 * f_position );
         free( psz_text );
     }
 

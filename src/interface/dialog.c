@@ -243,11 +243,12 @@ void dialog_ProgressDestroy (dialog_progress_bar_t *dialog)
     free (dialog);
 }
 
-void dialog_ProgressSet (dialog_progress_bar_t *dialog, float value)
+void dialog_ProgressSet (dialog_progress_bar_t *dialog, const char *text,
+                         float value)
 {
     assert (dialog);
 
-    dialog->pf_update (dialog->p_sys, value);
+    dialog->pf_update (dialog->p_sys, text, value);
 }
 
 bool dialog_ProgressCancelled (dialog_progress_bar_t *dialog)

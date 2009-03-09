@@ -191,6 +191,8 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
     setMinimumDuration (0);
 
     connect (this, SIGNAL(progressed(int)), SLOT(setValue(int)));
+    connect (this, SIGNAL(described(const QString&)),
+                   SLOT(setLabelText(const QString&)));
     connect (this, SIGNAL(canceled(void)), SLOT(saveCancel(void)));
 
     data->pf_update = update;
@@ -203,9 +205,12 @@ QVLCProgressDialog::~QVLCProgressDialog (void)
 {
 }
 
-void QVLCProgressDialog::update (void *priv, float value)
+void QVLCProgressDialog::update (void *priv, const char *text, float value)
 {
     QVLCProgressDialog *self = static_cast<QVLCProgressDialog *>(priv);
+
+    if (text != NULL)
+        emit self->described (qfu(text));
     emit self->progressed ((int)(value * 1000.));
 }
 

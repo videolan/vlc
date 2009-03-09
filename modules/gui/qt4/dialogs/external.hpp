@@ -86,7 +86,7 @@ private:
     DialogHandler *handler;
     bool cancelled;
 
-    static void update (void *, float);
+    static void update (void *, const char *, float);
     static bool check (void *);
     static void destroy (void *);
 private slots:
@@ -94,6 +94,7 @@ private slots:
 
 signals:
     void progressed (int);
+    void described (const QString&);
     void destroyed (void);
 };
 
