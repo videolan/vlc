@@ -121,7 +121,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 {
     static const char input_name[] = "input";
     input_thread_t *p_input = NULL;                 /* thread descriptor */
-    vlc_value_t val;
     int i;
 
     /* Allocate descriptor */
@@ -228,12 +227,12 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* */
     if( !p_input->b_preparsing )
     {
-        var_Get( p_input, "bookmarks", &val );
-        if( val.psz_string )
+        char *psz_bookmarks = var_GetNonEmptyString( p_input, "bookmarks" );
+        if( psz_bookmarks )
         {
             /* FIXME: have a common cfg parsing routine used by sout and others */
             char *psz_parser, *psz_start, *psz_end;
-            psz_parser = val.psz_string;
+            psz_parser = psz_bookmarks;
             while( (psz_start = strchr( psz_parser, '{' ) ) )
             {
                  seekpoint_t *p_seekpoint;
@@ -272,7 +271,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
                 vlc_seekpoint_Delete( p_seekpoint );
                 *psz_parser = backup;
             }
-            free( val.psz_string );
+            free( psz_bookmarks );
         }
     }
 
@@ -584,10 +583,8 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
 
     if( i_ret == 0 )    /* EOF */
     {
-        vlc_value_t repeat;
-
-        var_Get( p_input, "input-repeat", &repeat );
-        if( repeat.i_int == 0 )
+        int i_repeat = var_GetInteger( p_input, "input-repeat" );
+        if( i_repeat == 0 )
         {
             /* End of file - we do not set b_die because only the
              * playlist is allowed to do so. */
@@ -598,12 +595,11 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
         {
             vlc_value_t val;
 
-            msg_Dbg( p_input, "repeating the same input (%d)",
-                     repeat.i_int );
-            if( repeat.i_int > 0 )
+            msg_Dbg( p_input, "repeating the same input (%d)", i_repeat );
+            if( i_repeat > 0 )
             {
-                repeat.i_int--;
-                var_Set( p_input, "input-repeat", repeat );
+                i_repeat--;
+                var_SetInteger( p_input, "input-repeat", i_repeat );
             }
 
             /* Seek to start title/seekpoint */
@@ -1065,8 +1061,7 @@ static void InitPrograms( input_thread_t * p_input )
     val.p_list = NULL;
     if( p_input->p->p_sout )
     {
-        var_Get( p_input, "sout-all", &val );
-        if( val.b_bool )
+        if( var_GetBool( p_input, "sout-all" ) )
         {
             i_es_out_mode = ES_OUT_MODE_ALL;
             val.p_list = NULL;
@@ -2271,7 +2266,6 @@ static int InputSourceInit( input_thread_t *p_input,
     const char *psz_access;
     const char *psz_demux;
     char *psz_path;
-    vlc_value_t val;
     double f_fps;
 
     strcpy( psz_dup, psz_mrl );
@@ -2367,11 +2361,10 @@ static int InputSourceInit( input_thread_t *p_input,
         var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
         var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control );
 
-        int ret = demux_Control( in->p_demux, DEMUX_CAN_SEEK,
-                        &val.b_bool );
-        if( ret != VLC_SUCCESS )
-            val.b_bool = false;
-        var_Set( p_input, "can-seek", val );
+        bool b_can_seek;
+        if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
+            b_can_seek = false;
+        var_SetBool( p_input, "can-seek", b_can_seek );
     }
     else
     {
@@ -2758,14 +2751,12 @@ static void SlaveSeek( input_thread_t *p_input )
  *****************************************************************************/
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
-    vlc_value_t val;
-
     /* Get meta information from user */
 #define GET_META( field, s ) do { \
-    var_Get( p_input, (s), &val );  \
-    if( val.psz_string && *val.psz_string ) \
-        vlc_meta_Set( p_meta, vlc_meta_ ## field, val.psz_string ); \
-    free( val.psz_string ); } while(0)
+    char *psz_string = var_GetNonEmptyString( p_input, (s) );  \
+    if( psz_string ) \
+        vlc_meta_Set( p_meta, vlc_meta_ ## field, psz_string ); \
+    free( psz_string ); } while(0)
 
     GET_META( Title, "meta-title" );
     GET_META( Artist, "meta-artist" );
