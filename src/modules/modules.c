@@ -555,14 +555,8 @@ found_shortcut:
 
     /* Sort candidates by descending score */
     qsort (p_list, count, sizeof (p_list[0]), modulecmp);
-#ifdef WIN32
-    /* FIXME: Remove this hack after finding a general solution for %z's */
-    msg_Dbg( p_this, "looking for %s module: %u candidate%s", psz_capability,
-             count, count == 1 ? "" : "s" );
-#else
     msg_Dbg( p_this, "looking for %s module: %zu candidate%s", psz_capability,
              count, count == 1 ? "" : "s" );
-#endif
 
     /* Parse the linked list and use the first successful module */
     p_module = NULL;
