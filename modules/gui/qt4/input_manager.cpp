@@ -346,14 +346,14 @@ static int InputEvent( vlc_object_t *p_this, const char *,
         QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
+
 static int VbiEvent( vlc_object_t *, const char *,
                      vlc_value_t, vlc_value_t, void *param )
 {
     InputManager *im = (InputManager*)param;
     IMEvent *event = new IMEvent( ItemTeletextChanged_Type, 0 );
 
-    if( event )
-        QApplication::postEvent( im, event );
+    QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
 
