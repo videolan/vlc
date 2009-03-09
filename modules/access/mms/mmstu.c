@@ -253,7 +253,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
     bool    b_bool;
     int64_t      *pi_64;
     int           i_int;
-    vlc_value_t  val;
 
     switch( i_query )
     {
