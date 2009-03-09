@@ -355,7 +355,7 @@ inline void MainInterface::createStatusBar()
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ) , this, showCryptedLabel( bool ) );
 }
 
-void MainInterface::showCryptedLabel( bool )
+void MainInterface::showCryptedLabel( bool b_show )
 {
     if( cryptedLabel == NULL )
     {
@@ -364,7 +364,7 @@ void MainInterface::showCryptedLabel( bool )
         statusBar()->addWidget( cryptedLabel );
     }
 
-    cryptedLabel->show();
+    cryptedLabel->setVisible( b_show );
 }
 
 inline void MainInterface::initSystray()
