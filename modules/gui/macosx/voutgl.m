@@ -414,13 +414,11 @@ static void Unlock( vout_thread_t * p_vout )
 - (void) reshape
 {
     int x, y;
-    vlc_value_t val;
 
     Lock( p_vout );
     NSRect bounds = [self bounds];
 
-    var_Get( p_vout, "macosx-stretch", &val );
-    if( val.b_bool )
+    if( var_GetBool( p_vout, "macosx-stretch" ) )
     {
         x = bounds.size.width;
         y = bounds.size.height;
@@ -494,31 +492,21 @@ static OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, EventRef eve
 
 static int aglInit( vout_thread_t * p_vout )
 {
-    vlc_value_t val;
-
     Rect viewBounds;
     Rect clipBounds;
  
-    var_Get( p_vout->p_libvlc, "drawable-agl", &val );
-    p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
+    p_vout->p_sys->agl_drawable = (AGLDrawable)
+            var_GetInteger( p_vout->p_libvlc, "drawable-agl" );
     aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
-    var_Get( p_vout->p_libvlc, "drawable-view-top", &val );
-    viewBounds.top = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-view-left", &val );
-    viewBounds.left = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-view-bottom", &val );
-    viewBounds.bottom = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-view-right", &val );
-    viewBounds.right = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-clip-top", &val );
-    clipBounds.top = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-clip-left", &val );
-    clipBounds.left = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-clip-bottom", &val );
-    clipBounds.bottom = val.i_int;
-    var_Get( p_vout->p_libvlc, "drawable-clip-right", &val );
-    clipBounds.right = val.i_int;
+    viewBounds.top = var_GetInteger( p_vout->p_libvlc, "drawable-view-top" );
+    viewBounds.left = var_GetInteger( p_vout->p_libvlc, "drawable-view-left" );
+    viewBounds.bottom = var_GetInteger( p_vout->p_libvlc, "drawable-view-bottom" );
+    viewBounds.right = var_GetInteger( p_vout->p_libvlc, "drawable-view-right" );
+    clipBounds.top = var_GetInteger( p_vout->p_libvlc, "drawable-clip-top" );
+    clipBounds.left = var_GetInteger( p_vout->p_libvlc, "drawable-clip-left" );
+    clipBounds.bottom = var_GetInteger( p_vout->p_libvlc, "drawable-clip-bottom" );
+    clipBounds.right = var_GetInteger( p_vout->p_libvlc, "drawable-clip-right" );
 
     p_vout->p_sys->b_clipped_out = (clipBounds.top == clipBounds.bottom)
                                  || (clipBounds.left == clipBounds.right);
@@ -615,30 +603,22 @@ static int aglManage( vout_thread_t * p_vout )
         if( p_vout->b_fullscreen )
         {
             /* Close the fullscreen window and resume normal drawing */
-            vlc_value_t val;
             Rect viewBounds;
             Rect clipBounds;
 
-            var_Get( p_vout->p_libvlc, "drawable-agl", &val );
-            p_vout->p_sys->agl_drawable = (AGLDrawable)val.i_int;
+            p_vout->p_sys->agl_drawable = (AGLDrawable)
+                    var_GetInteger( p_vout->p_libvlc, "drawable-agl" );
+
             aglSetDrawable(p_vout->p_sys->agl_ctx, p_vout->p_sys->agl_drawable);
 
-            var_Get( p_vout->p_libvlc, "drawable-view-top", &val );
-            viewBounds.top = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-view-left", &val );
-            viewBounds.left = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-view-bottom", &val );
-            viewBounds.bottom = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-view-right", &val );
-            viewBounds.right = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-clip-top", &val );
-            clipBounds.top = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-clip-left", &val );
-            clipBounds.left = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-clip-bottom", &val );
-            clipBounds.bottom = val.i_int;
-            var_Get( p_vout->p_libvlc, "drawable-clip-right", &val );
-            clipBounds.right = val.i_int;
+            viewBounds.top = var_GetInteger( p_vout->p_libvlc, "drawable-view-top" );
+            viewBounds.left = var_GetInteger( p_vout->p_libvlc, "drawable-view-left" );
+            viewBounds.bottom = var_GetInteger( p_vout->p_libvlc, "drawable-view-bottom" );
+            viewBounds.right = var_GetInteger( p_vout->p_libvlc, "drawable-view-right" );
+            clipBounds.top = var_GetInteger( p_vout->p_libvlc, "drawable-clip-top" );
+            clipBounds.left = var_GetInteger( p_vout->p_libvlc, "drawable-clip-left" );
+            clipBounds.bottom = var_GetInteger( p_vout->p_libvlc, "drawable-clip-bottom" );
+            clipBounds.right = var_GetInteger( p_vout->p_libvlc, "drawable-clip-right" );
 
             aglSetCurrentContext(p_vout->p_sys->agl_ctx);
             aglSetViewport(p_vout, viewBounds, clipBounds);
@@ -823,6 +803,7 @@ static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBou
             - clipBounds.bottom;                // from window bottom edge
     rect[2] = clipBounds.right-clipBounds.left; // width
     rect[3] = clipBounds.bottom-clipBounds.top; // height
+
     aglSetInteger(p_vout->p_sys->agl_ctx, AGL_BUFFER_RECT, rect);
     aglEnable(p_vout->p_sys->agl_ctx, AGL_BUFFER_RECT);
 
@@ -1067,5 +1048,4 @@ static void aglUnlock( vout_thread_t * p_vout )
         CGLUnlockContext( cglContext );
     }
 }
-
 
