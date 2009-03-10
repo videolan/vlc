@@ -1606,7 +1606,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
 
         l_downloaded += i_read;
         psz_downloaded = size_str( l_downloaded );
-        f_progress = 100.0*(float)l_downloaded/(float)l_size;
+        f_progress = (float)l_downloaded/(float)l_size;
 
         if( asprintf( &psz_status, _( "%s\nDownloading... %s/%s %.1f%% done" ),
                       p_update->release.psz_url, psz_downloaded, psz_size,
