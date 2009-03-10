@@ -1468,6 +1468,17 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
  ****************************************************************************/
 static void* ThreadSend( vlc_object_t *p_this )
 {
+#ifdef WIN32
+# define ECONNREFUSED WSAECONNREFUSED
+# define ENOPROTOOPT  WSAENOPROTOOPT
+# define EPROTO       WSAEPROTO
+# define EHOSTUNREACH WSAEHOSTUNREACH
+# define ENETUNREACH  WSAEHOSTUNREACH
+# define ENETDOWN     WSAENETDOWN
+# define ENOBUFS      WSAENOBUFS
+# define EAGAIN       WSAEGAIN
+# define EWOULDBLOCK  WSAEWOULDBLOCK
+#endif
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
     unsigned i_caching = id->i_caching;
 
@@ -1516,9 +1527,25 @@ static void* ThreadSend( vlc_object_t *p_this )
 
             if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
                 continue;
-            /* Retry sending to root out soft-errors */
-            if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )
-                continue;
+            switch( net_errno )
+            {
+                /* Soft errors (e.g. ICMP): */
+                case ECONNREFUSED: /* Port unreachable */
+                case ENOPROTOOPT:
+                case EPROTO:       /* Protocol unreachable */
+                case EHOSTUNREACH: /* Host unreachable */
+                case ENETUNREACH:  /* Network unreachable */
+                case ENETDOWN:     /* Entire network down */
+                    send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 );
+                /* Transient congestion: */
+                case ENOMEM: /* out of socket buffers */
+                case ENOBUFS:
+                case EAGAIN:
+#if (EAGAIN != EWOULDBLOCK)
+                case EWOULDBLOCK:
+#endif
+                    continue;
+            }
 
             deadv[deadc++] = id->sinkv[i].rtp_fd;
         }
