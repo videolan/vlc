@@ -424,7 +424,8 @@ static int GetFilesInZip( stream_t *p_this, unzFile file,
 
         if( !p_fileInfo || !psz_fileName )
         {
-            msg_Warn( p_this, "not enough memory" );
+            free( psz_fileName );
+            free( p_fileInfo );
             return VLC_ENOMEM;
         }
 
