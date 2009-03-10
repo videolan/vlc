@@ -138,6 +138,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         if( NULL == pixFormat )
         {
             msg_Err( p_vout, "no screen renderer available for required attributes." );
+            free( p_vout->p_sys );
             return VLC_EGENERIC;
         }
  
@@ -146,6 +147,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         if( NULL == p_vout->p_sys->agl_ctx )
         {
             msg_Err( p_vout, "cannot create AGL context." );
+            free( p_vout->p_sys );
             return VLC_EGENERIC;
         }
         else
@@ -177,6 +179,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         /* Check to see if initVout: was successfull */
         if( !p_vout->p_sys->o_vout_view )
         {
+            free( p_vout->p_sys );
             return VLC_EGENERIC;
         }
 
