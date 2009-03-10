@@ -1,7 +1,7 @@
 /*****************************************************************************
  r playlistinfo.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Benjamin Pracht <bigben at videolan dot org>
@@ -45,9 +45,12 @@ static VLCInfo *_o_sharedInstance = nil;
 
 - (id)init
 {
-    if( _o_sharedInstance ) {
+    if( _o_sharedInstance )
+    {
         [self dealloc];
-    } else {
+    }
+    else
+    {
         _o_sharedInstance = [super init];
         
         if( _o_sharedInstance != nil )
@@ -302,7 +305,6 @@ static VLCInfo *_o_sharedInstance = nil;
 
     /* update the stats once to display p_item change faster */
     [self updateStatistics: nil];
-
 }
 
 - (void)setMeta: (char *)psz_meta forLabel: (id)theItem
@@ -483,7 +485,6 @@ error:
         return (item == nil) ? @"" : (id)[item value];
     }
 }
-
 
 @end
 

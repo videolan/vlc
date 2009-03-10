@@ -79,9 +79,7 @@ int OpenIntf ( vlc_object_t *p_this )
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-    {
-        return( 1 );
-    }
+        return VLC_ENOMEM;
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
@@ -92,7 +90,7 @@ int OpenIntf ( vlc_object_t *p_this )
     p_intf->pf_run = Run;
     p_intf->b_should_run_on_first_thread = true;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -184,10 +182,13 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_intf_update = true;
-    p_intf->p_sys->b_playlist_update = true;
-    p_intf->p_sys->b_playmode_update = true;
-    p_intf->p_sys->b_current_title_update = true;
+    if( p_intf && p_intf->p_sys )
+    {
+        p_intf->p_sys->b_intf_update = true;
+        p_intf->p_sys->b_playlist_update = true;
+        p_intf->p_sys->b_playmode_update = true;
+        p_intf->p_sys->b_current_title_update = true;
+    }
     return VLC_SUCCESS;
 }
 
@@ -200,7 +201,8 @@ static int ShowController( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_intf_show = true;
+    if( p_intf && p_intf->p_sys )
+        p_intf->p_sys->b_intf_show = true;
     return VLC_SUCCESS;
 }
 
@@ -212,7 +214,8 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t * p_intf = VLCIntf;
-    p_intf->p_sys->b_fullscreen_update = true;
+    if( p_intf && p_intf->p_sys )
+        p_intf->p_sys->b_fullscreen_update = true;
     return VLC_SUCCESS;
 }
 
@@ -1538,7 +1541,8 @@ static void * manage_cleanup( void * args )
         bool b_chapters = false;
 
         playlist_t * p_playlist = pl_Hold( p_intf );
-    /* TODO: fix i_size use */
+
+        /* TODO: fix i_size use */
         b_plmul = p_playlist->items.i_size > 1;
 
         p_input = playlist_CurrentInput( p_playlist );
