@@ -164,8 +164,7 @@ VLC_PUBLIC_API void libvlc_release( libvlc_instance_t * );
 VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
 
 /**
- * Try to start a user interface for the libvlc instance, and wait until the
- * user exits.
+ * Try to start a user interface for the libvlc instance.
  *
  * \param p_instance the instance
  * \param name interface name, or NULL for default
