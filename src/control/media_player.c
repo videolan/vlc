@@ -1162,7 +1162,7 @@ libvlc_state_t libvlc_media_player_get_state(
     {
         float caching;
         caching = var_GetFloat( p_input_thread, "cache" );
-        if( caching > 0.0 && caching < 100.0 )
+        if( caching > 0.0 && caching < 1.0 )
             state = libvlc_Buffering;
     }
     vlc_object_release( p_input_thread );
