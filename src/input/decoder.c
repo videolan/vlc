@@ -1029,10 +1029,10 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
 {
     if( p->i_flags & (BLOCK_FLAG_PREROLL|BLOCK_FLAG_DISCONTINUITY) )
         *pi_preroll = INT64_MAX;
-    else if( p->i_pts > 0 )
-        *pi_preroll = __MIN( *pi_preroll, p->i_pts );
     else if( p->i_dts > 0 )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
+    else if( p->i_pts > 0 )
+        *pi_preroll = __MIN( *pi_preroll, p->i_pts );
 }
 
 static mtime_t DecoderTeletextFixTs( mtime_t i_ts )
