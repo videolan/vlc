@@ -58,7 +58,6 @@
 
 struct vout_sys_t
 {
-    NSAutoreleasePool * o_pool;
     VLCGLView         * o_glview;
     VLCVoutView       * o_vout_view;
     bool                b_saved_frame;
