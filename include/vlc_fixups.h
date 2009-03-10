@@ -38,6 +38,116 @@ static inline char *strdup (const char *str)
 }
 #endif
 
+#ifdef WIN32
+/* Windows' printf doesn't support %z modifiers, thus we need to rewrite
+ * the format string in a wrapper. */
+# include <string.h>
+static inline char *vlc_fix_format_string (const char *format)
+{
+    char *fmt, *f;
+    if (strstr (format, "%z") == NULL)
+        return NULL;
+
+    fmt = strdup (format);
+    if (fmt == NULL)
+        return NULL;
+
+    while ((f = strstr (fmt, "%z")) != NULL)
+    {
+       f[1] = 'l';
+    }
+    return fmt;
+}
+
+# include <stdlib.h>
+# include <stdio.h>
+# include <stdarg.h>
+
+static inline int vlc_vprintf (const char *format, va_list ap)
+{
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vprintf (fmt ? fmt : format, ap);
+    free (fmt);
+    return ret;
+}
+# define vprintf vlc_vprintf
+
+static inline int vlc_vfprintf (FILE *stream, const char *format, va_list ap)
+{
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vfprintf (stream, fmt ? fmt : format, ap);
+    free (fmt);
+    return ret;
+}
+# define vfprintf vlc_vfprintf
+
+static inline int vlc_vsprintf (char *str, const char *format, va_list ap)
+{
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vsprintf (str, fmt ? fmt : format, ap);
+    free (fmt);
+    return ret;
+}
+# define vsprintf vlc_vsprintf
+
+static inline int vlc_vsnprintf (char *str, size_t size, const char *format, va_list ap)
+{
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vsnprintf (str, size, fmt ? fmt : format, ap);
+    free (fmt);
+    return ret;
+}
+# define vsnprintf vlc_vsnprintf
+
+static inline int vlc_printf (const char *format, ...)
+{
+    va_list ap;
+    int ret;
+    va_start (ap, format);
+    ret = vprintf (format, ap);
+    va_end (ap);
+    return ret;
+}
+# define printf(...) vlc_printf(__VA_ARGS__)
+
+static inline int vlc_fprintf (FILE *stream, const char *format, ...)
+{
+    va_list ap;
+    int ret;
+    va_start (ap, format);
+    ret = vfprintf (stream, format, ap);
+    va_end (ap);
+    return ret;
+}
+# define fprintf vlc_fprintf
+
+static inline int vlc_sprintf (char *str, const char *format, ...)
+{
+    va_list ap;
+    int ret;
+    va_start (ap, format);
+    ret = vsprintf (str, format, ap);
+    va_end (ap);
+    return ret;
+}
+# define sprintf vlc_sprintf
+
+static inline int vlc_snprintf (char *str, size_t size, const char *format, ...)
+{
+    va_list ap;
+    int ret;
+    va_start (ap, format);
+    ret = vsnprintf (str, size, format, ap);
+    va_end (ap);
+    return ret;
+}
+# define snprintf vlc_snprintf
+
+/* Make sure we don't use flawed vasprintf or asprintf either */
+# undef HAVE_VASPRINTF
+# undef HAVE_ASPRINTF
+#endif
+
 #ifndef HAVE_VASPRINTF
 # include <stdio.h>
 # include <stdlib.h>
