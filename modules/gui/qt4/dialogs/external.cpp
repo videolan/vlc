@@ -53,7 +53,9 @@ int QVLCVariable::callback (vlc_object_t *object, const char *,
                             vlc_value_t, vlc_value_t cur, void *data)
 {
     QVLCVariable *self = (QVLCVariable *)data;
+
     emit self->pointerChanged (object, cur.p_address);
+    return VLC_SUCCESS;
 }
 
 
