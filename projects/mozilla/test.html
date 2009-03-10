@@ -570,7 +570,7 @@ function doAdd(targetURL)
     var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
     if( vlc )
     {
-        vlc.playlist.add(targetURL);
+        vlc.playlist.add(targetURL, "", options);
         doItemCount();
     }
 }
