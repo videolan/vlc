@@ -1192,7 +1192,7 @@ libvlc_state_t libvlc_media_player_get_state(
     var_Get( p_input_thread, "state", &val );
     state = vlc_to_libvlc_state(val.i_int);
 
-    if( state == PLAYING_S )
+    if( state == libvlc_Playing )
     {
         float caching;
         caching = var_GetFloat( p_input_thread, "cache" );
