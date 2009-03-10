@@ -206,6 +206,9 @@ VLCPlugin::VLCPlugin(VLCPluginClass *p_class, LPUNKNOWN pUnkOuter) :
     _p_class(p_class),
     _i_ref(1UL),
     _p_libvlc(NULL),
+    _p_mlist(NULL),
+    _p_mplayer(NULL),
+    _i_midx(-1),
     _i_codepage(CP_ACP),
     _b_usermode(TRUE)
 {
@@ -266,6 +269,10 @@ VLCPlugin::~VLCPlugin()
 
     SysFreeString(_bstr_mrl);
     SysFreeString(_bstr_baseurl);
+
+    if( _p_mplayer ) { libvlc_media_player_release(_p_mplayer); _p_mplayer=NULL; }
+    if( _p_mlist )   { libvlc_media_list_release(_p_mlist); _p_mlist=NULL; }
+    if( _p_libvlc )  { libvlc_release(_p_libvlc); _p_libvlc=NULL; }
 
     _p_class->Release();
 };
@@ -411,138 +418,137 @@ HRESULT VLCPlugin::onLoad(void)
     return S_OK;
 };
 
-HRESULT VLCPlugin::getVLC(libvlc_instance_t** pp_libvlc)
+
+void VLCPlugin::initVLC()
 {
     extern HMODULE DllGetModule();
 
-    if( ! isRunning() )
-    {
-        /*
-        ** default initialization options
-        */
-        const char *ppsz_argv[32] = { };
-        int   ppsz_argc = 0;
+    /*
+    ** default initialization options
+    */
+    const char *ppsz_argv[32] = { };
+    int   ppsz_argc = 0;
 
-        char p_progpath[MAX_PATH];
+    char p_progpath[MAX_PATH];
+    {
+        TCHAR w_progpath[MAX_PATH];
+        DWORD len = GetModuleFileName(DllGetModule(), w_progpath, MAX_PATH);
+        if( len > 0 )
         {
-            TCHAR w_progpath[MAX_PATH];
-            DWORD len = GetModuleFileName(DllGetModule(), w_progpath, MAX_PATH);
+            len = WideCharToMultiByte(CP_UTF8, 0, w_progpath, len, p_progpath,
+                       sizeof(p_progpath)-1, NULL, NULL);
             if( len > 0 )
             {
-                len = WideCharToMultiByte(CP_UTF8, 0, w_progpath, len, p_progpath,
-                           sizeof(p_progpath)-1, NULL, NULL);
-                if( len > 0 )
-                {
-                    p_progpath[len] = '\0';
-                    ppsz_argv[0] = p_progpath;
-                }
-            }
-        }
-
-        ppsz_argv[ppsz_argc++] = "-vv";
-
-        HKEY h_key;
-        char p_pluginpath[MAX_PATH];
-        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, TEXT("Software\\VideoLAN\\VLC"),
-                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
-        {
-            DWORD i_type, i_data = MAX_PATH;
-            TCHAR w_pluginpath[MAX_PATH];
-            if( RegQueryValueEx( h_key, TEXT("InstallDir"), 0, &i_type,
-                                 (LPBYTE)w_pluginpath, &i_data ) == ERROR_SUCCESS )
-            {
-                if( i_type == REG_SZ )
-                {
-                    if( WideCharToMultiByte(CP_UTF8, 0, w_pluginpath, -1, p_pluginpath,
-                             sizeof(p_pluginpath)-sizeof("\\plugins")+1, NULL, NULL) )
-                    {
-                        strcat( p_pluginpath, "\\plugins" );
-                        ppsz_argv[ppsz_argc++] = "--plugin-path";
-                        ppsz_argv[ppsz_argc++] = p_pluginpath;
-                    }
-                }
-            }
-            RegCloseKey( h_key );
-        }
-
-        // make sure plugin isn't affected with VLC single instance mode
-        ppsz_argv[ppsz_argc++] = "--no-one-instance";
-
-        /* common settings */
-        ppsz_argv[ppsz_argc++] = "--no-stats";
-        ppsz_argv[ppsz_argc++] = "--no-media-library";
-        ppsz_argv[ppsz_argc++] = "--ignore-config";
-        ppsz_argv[ppsz_argc++] = "--intf=dummy";
-
-        // loop mode is a configuration option only
-        if( _b_autoloop )
-            ppsz_argv[ppsz_argc++] = "--loop";
-
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            *pp_libvlc = NULL;
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-
-        // initial volume setting
-        libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
-        if( _b_mute )
-        {
-            libvlc_audio_set_mute(_p_libvlc, TRUE, NULL);
-        }
-
-        // initial playlist item
-        if( SysStringLen(_bstr_mrl) > 0 )
-        {
-            char *psz_mrl = NULL;
-
-            if( SysStringLen(_bstr_baseurl) > 0 )
-            {
-                /*
-                ** if the MRL a relative URL, we should end up with an absolute URL
-                */
-                LPWSTR abs_url = CombineURL(_bstr_baseurl, _bstr_mrl);
-                if( NULL != abs_url )
-                {
-                    psz_mrl = CStrFromWSTR(CP_UTF8, abs_url, wcslen(abs_url));
-                    CoTaskMemFree(abs_url);
-                }
-                else
-                {
-                    psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
-                }
-            }
-            else
-            {
-                /*
-                ** baseURL is empty, assume MRL is absolute
-                */
-                psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
-            }
-            if( NULL != psz_mrl )
-            {
-                const char *options[1];
-                int i_options = 0;
-
-                char timeBuffer[32];
-                if( _i_time )
-                {
-                    snprintf(timeBuffer, sizeof(timeBuffer), ":start-time=%d", _i_time);
-                    options[i_options++] = timeBuffer;
-                }
-                // add default target to playlist
-                libvlc_playlist_add_extended_untrusted(_p_libvlc, psz_mrl, NULL, i_options, options, NULL);
-                CoTaskMemFree(psz_mrl);
+                p_progpath[len] = '\0';
+                ppsz_argv[0] = p_progpath;
             }
         }
     }
-    *pp_libvlc = _p_libvlc;
-    return S_OK;
+
+    ppsz_argv[ppsz_argc++] = "-vv";
+
+    HKEY h_key;
+    char p_pluginpath[MAX_PATH];
+    if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, TEXT("Software\\VideoLAN\\VLC"),
+                      0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+    {
+        DWORD i_type, i_data = MAX_PATH;
+        TCHAR w_pluginpath[MAX_PATH];
+        if( RegQueryValueEx( h_key, TEXT("InstallDir"), 0, &i_type,
+                             (LPBYTE)w_pluginpath, &i_data ) == ERROR_SUCCESS )
+        {
+            if( i_type == REG_SZ )
+            {
+                if( WideCharToMultiByte(CP_UTF8, 0, w_pluginpath, -1, p_pluginpath,
+                         sizeof(p_pluginpath)-sizeof("\\plugins")+1, NULL, NULL) )
+                {
+                    strcat( p_pluginpath, "\\plugins" );
+                    ppsz_argv[ppsz_argc++] = "--plugin-path";
+                    ppsz_argv[ppsz_argc++] = p_pluginpath;
+                }
+            }
+        }
+        RegCloseKey( h_key );
+    }
+
+    // make sure plugin isn't affected with VLC single instance mode
+    ppsz_argv[ppsz_argc++] = "--no-one-instance";
+
+    /* common settings */
+    ppsz_argv[ppsz_argc++] = "--no-stats";
+    ppsz_argv[ppsz_argc++] = "--no-media-library";
+    ppsz_argv[ppsz_argc++] = "--ignore-config";
+    ppsz_argv[ppsz_argc++] = "--intf=dummy";
+
+    // loop mode is a configuration option only
+    if( _b_autoloop )
+        ppsz_argv[ppsz_argc++] = "--loop";
+
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, &ex);
+    if( libvlc_exception_raised(&ex) )
+        return;
+
+    _p_mlist = libvlc_media_list_new(_p_libvlc, &ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        libvlc_release(_p_libvlc);
+        return;
+    }
+
+    // initial volume setting
+    libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
+    if( _b_mute )
+    {
+        libvlc_audio_set_mute(_p_libvlc, TRUE, NULL);
+    }
+
+    // initial playlist item
+    if( SysStringLen(_bstr_mrl) > 0 )
+    {
+        char *psz_mrl = NULL;
+
+        if( SysStringLen(_bstr_baseurl) > 0 )
+        {
+            /*
+            ** if the MRL a relative URL, we should end up with an absolute URL
+            */
+            LPWSTR abs_url = CombineURL(_bstr_baseurl, _bstr_mrl);
+            if( NULL != abs_url )
+            {
+                psz_mrl = CStrFromWSTR(CP_UTF8, abs_url, wcslen(abs_url));
+                CoTaskMemFree(abs_url);
+            }
+            else
+            {
+                psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
+            }
+        }
+        else
+        {
+            /*
+            ** baseURL is empty, assume MRL is absolute
+            */
+            psz_mrl = CStrFromBSTR(CP_UTF8, _bstr_mrl);
+        }
+        if( NULL != psz_mrl )
+        {
+            const char *options[1];
+            int i_options = 0;
+
+            char timeBuffer[32];
+            if( _i_time )
+            {
+                snprintf(timeBuffer, sizeof(timeBuffer), ":start-time=%d", _i_time);
+                options[i_options++] = timeBuffer;
+            }
+            // add default target to playlist
+            playlist_add_extended_untrusted(psz_mrl, i_options, options, NULL);
+            CoTaskMemFree(psz_mrl);
+        }
+    }
 };
 
 void VLCPlugin::setErrorInfo(REFIID riid, const char *description)
@@ -729,16 +735,10 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
         libvlc_video_set_parent(p_libvlc,
             reinterpret_cast<libvlc_drawable_t>(_inplacewnd), NULL);
 
-        if( _b_autoplay )
+        if( _b_autoplay && playlist_select(0,NULL) )
         {
-            libvlc_playlist_lock(p_libvlc);
-            unsigned count = libvlc_playlist_items_count(p_libvlc, &ex);
-            if( count > 0 )
-            {
-              libvlc_playlist_play(p_libvlc, 0, 0, NULL, NULL);
-              fireOnPlayEvent();
-            }
-            libvlc_playlist_unlock(p_libvlc);
+            libvlc_media_player_play(_p_mplayer,NULL);
+            fireOnPlayEvent();
         }
     }
 
@@ -750,9 +750,9 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
 HRESULT VLCPlugin::onInPlaceDeactivate(void)
 {
-    if( isRunning() )
+    if( isPlaying(NULL) )
     {
-        libvlc_playlist_stop(_p_libvlc, NULL);
+        playlist_stop(NULL);
         fireOnStopEvent();
     }
 
@@ -817,14 +817,9 @@ void VLCPlugin::setTime(int seconds)
     if( seconds != _i_time )
     {
         setStartTime(_i_time);
-        if( isRunning() )
+        if( NULL != _p_mplayer )
         {
-            libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(_p_libvlc, NULL);
-            if( NULL != p_md )
-            {
-                libvlc_media_player_set_time(p_md, _i_time, NULL);
-                libvlc_media_player_release(p_md);
-            }
+            libvlc_media_player_set_time(_p_mplayer, _i_time, NULL);
         }
     }
 };
@@ -1036,3 +1031,77 @@ void VLCPlugin::fireOnStopEvent(void)
     DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
     vlcConnectionPointContainer->fireEvent(DISPID_StopEvent, &dispparamsNoArgs);
 };
+
+bool VLCPlugin::playlist_select( int idx, libvlc_exception_t *ex )
+{
+    libvlc_media_t *p_m = NULL;
+
+    libvlc_media_list_lock(_p_mlist);
+
+    int count = libvlc_media_list_count(_p_mlist,ex);
+    if( libvlc_exception_raised(ex) )
+        goto bad_unlock;
+
+    if( idx<0||idx>=count )
+        goto bad_unlock;
+
+    _i_midx = idx;
+
+    p_m = libvlc_media_list_item_at_index(_p_mlist,_i_midx,ex);
+    libvlc_media_list_unlock(_p_mlist);
+
+    if( libvlc_exception_raised(ex) )
+        return false;
+
+    if( _p_mplayer )
+    {
+        libvlc_media_player_release( _p_mplayer );
+        _p_mplayer = NULL;
+    }
+
+    _p_mplayer = libvlc_media_player_new_from_media(p_m,ex);
+    if( _p_mplayer )
+        set_player_window(ex);
+
+    libvlc_media_release( p_m );
+    return !libvlc_exception_raised(ex);
+
+bad_unlock:
+    libvlc_media_list_unlock(_p_mlist);
+    return false;
+}
+
+void VLCPlugin::set_player_window(libvlc_exception_t *ex)
+{
+    // XXX FIXME no idea if this is correct or not
+    libvlc_media_player_set_hwnd(_p_mplayer,getInPlaceWindow(),ex);
+}
+
+int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const char **optv, libvlc_exception_t *ex)
+{
+    int item = -1;
+    libvlc_media_t *p_m = libvlc_media_new(_p_libvlc,mrl,ex);
+    if( libvlc_exception_raised(ex) )
+        return -1;
+
+    for( int i = 0; i < optc; ++i )
+    {
+        libvlc_media_add_option_untrusted(p_m, optv[i],ex);
+        if( libvlc_exception_raised(ex) )
+        {
+            libvlc_media_release(p_m);
+            return -1;
+        }
+    }
+
+    libvlc_media_list_lock(_p_mlist);
+    libvlc_media_list_add_media(_p_mlist,p_m,ex);
+    if( !libvlc_exception_raised(ex) )
+        item = libvlc_media_list_count(_p_mlist,ex)-1;
+    libvlc_media_list_unlock(_p_mlist);
+    libvlc_media_release(p_m);
+
+    return item;
+}
+
+

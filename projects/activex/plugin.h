@@ -193,7 +193,20 @@ public:
     inline void setDirty(BOOL dirty) { _b_dirty = dirty; };
 
     inline BOOL isRunning(void) { return NULL != _p_libvlc; };
-    HRESULT getVLC(libvlc_instance_t** p_vlc);
+
+    HRESULT getVLC(libvlc_instance_t** pp_libvlc)
+    {
+        if( !isRunning() )
+            initVLC();
+        *pp_libvlc = _p_libvlc;
+        return _p_libvlc?S_OK:E_FAIL;
+    }
+    HRESULT getMD(libvlc_media_player_t **pp_md)
+    {
+        *pp_md = _p_mplayer;
+        return _p_mplayer?S_OK:E_FAIL;
+    }
+
     void setErrorInfo(REFIID riid, const char *description);
 
     // control geometry within container
@@ -227,11 +240,81 @@ public:
     // controlling IUnknown interface
     LPUNKNOWN pUnkOuter;
 
+    /*
+    ** libvlc interface
+    */
+    bool isPlaying(libvlc_exception_t *ex)
+    {
+        return _p_mplayer && libvlc_media_player_is_playing(_p_mplayer,ex);
+    }
+    int  playlist_get_current_index(libvlc_exception_t *) { return _i_midx; }
+    int  playlist_add_extended_untrusted(const char *, int, const char **, libvlc_exception_t *);
+    void playlist_delete_item(int idx, libvlc_exception_t *ex)
+    {
+        if( _p_mlist )
+            libvlc_media_list_remove_index(_p_mlist,idx,ex);
+    }
+    void playlist_clear(libvlc_exception_t *ex)
+    {
+        if( !_p_libvlc )
+            return;
+        if( _p_mlist )
+            libvlc_media_list_release(_p_mlist);
+        _p_mlist = libvlc_media_list_new(_p_libvlc,ex);
+    }
+    int  playlist_count(libvlc_exception_t *ex)
+    {
+         int r = 0;
+         if( !_p_mlist )
+             return 0;
+         libvlc_media_list_lock(_p_mlist);
+         r = libvlc_media_list_count(_p_mlist,ex);
+         libvlc_media_list_unlock(_p_mlist);
+         return r;
+    }
+    void playlist_pause(libvlc_exception_t *ex)
+    {
+        if( isPlaying(ex) )
+            libvlc_media_player_pause(_p_mplayer,ex);
+    }
+    void playlist_play(libvlc_exception_t *ex)
+    {
+        if( !_p_libvlc )
+            initVLC();
+        if( _p_mplayer||playlist_select(0,ex) )
+            libvlc_media_player_play(_p_mplayer,ex);
+    }
+    void playlist_play_item(int idx,libvlc_exception_t *ex)
+    {
+        if( !_p_libvlc )
+            initVLC();
+        if( playlist_select(idx,ex) )
+            libvlc_media_player_play(_p_mplayer,ex);
+    }
+    void playlist_stop(libvlc_exception_t *ex)
+    {
+        if( _p_mplayer )
+            libvlc_media_player_stop(_p_mplayer,ex);
+    }
+    void playlist_next(libvlc_exception_t *ex)
+    {
+        if( playlist_select( _i_midx+1, ex) )
+            libvlc_media_player_play(_p_mplayer,ex);
+    }
+    void playlist_prev(libvlc_exception_t *ex)
+    {
+        if( playlist_select( _i_midx-1, ex) )
+            libvlc_media_player_play(_p_mplayer,ex);
+    }
+
 protected:
 
     virtual ~VLCPlugin();
 
 private:
+    void initVLC();
+    bool playlist_select(int i,libvlc_exception_t *);
+    void set_player_window(libvlc_exception_t *);
 
     //implemented interfaces
     class VLCOleObject *vlcOleObject;
@@ -256,7 +339,11 @@ private:
     VLCPluginClass* _p_class;
     ULONG _i_ref;
 
-    libvlc_instance_t* _p_libvlc;
+    libvlc_instance_t     *_p_libvlc;
+    libvlc_media_list_t   *_p_mlist;
+    libvlc_media_player_t *_p_mplayer;
+    int  _i_midx;
+
     UINT _i_codepage;
     BOOL _b_usermode;
     RECT _posRect;

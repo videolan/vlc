@@ -211,17 +211,14 @@ STDMETHODIMP VLCAudio::get_track(long* track)
     if( NULL == track )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t* p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
         *track = libvlc_audio_get_track(p_md, &ex);
-        libvlc_media_player_release(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio,
@@ -236,17 +233,14 @@ STDMETHODIMP VLCAudio::get_track(long* track)
 
 STDMETHODIMP VLCAudio::put_track(long track)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
         libvlc_audio_set_track(p_md, track, &ex);
-        libvlc_media_player_release(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCAudio,
@@ -413,23 +407,17 @@ STDMETHODIMP VLCInput::get_length(double* length)
         return E_POINTER;
     *length = 0;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *length = (double)libvlc_media_player_get_length(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *length = (double)libvlc_media_player_get_length(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -445,23 +433,17 @@ STDMETHODIMP VLCInput::get_position(double* position)
         return E_POINTER;
 
     *position = 0.0f;
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *position = libvlc_media_player_get_position(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *position = libvlc_media_player_get_position(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -473,23 +455,17 @@ STDMETHODIMP VLCInput::get_position(double* position)
 
 STDMETHODIMP VLCInput::put_position(double position)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        libvlc_media_player_set_position(p_md, position, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_media_player_set_position(p_md, position, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -504,23 +480,17 @@ STDMETHODIMP VLCInput::get_time(double* time)
     if( NULL == time )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *time = (double)libvlc_media_player_get_time(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *time = (double)libvlc_media_player_get_time(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -532,23 +502,17 @@ STDMETHODIMP VLCInput::get_time(double* time)
 
 STDMETHODIMP VLCInput::put_time(double time)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        libvlc_media_player_set_time(p_md, (int64_t)time, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_media_player_set_time(p_md, (int64_t)time, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -563,23 +527,17 @@ STDMETHODIMP VLCInput::get_state(long* state)
     if( NULL == state )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *state = libvlc_media_player_get_state(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *state = libvlc_media_player_get_state(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         libvlc_exception_clear(&ex);
         // don't fail, just return the idle state
@@ -594,23 +552,17 @@ STDMETHODIMP VLCInput::get_rate(double* rate)
     if( NULL == rate )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *rate = libvlc_media_player_get_rate(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *rate = libvlc_media_player_get_rate(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -622,23 +574,17 @@ STDMETHODIMP VLCInput::get_rate(double* rate)
 
 STDMETHODIMP VLCInput::put_rate(double rate)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        libvlc_media_player_set_rate(p_md, rate, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_media_player_set_rate(p_md, rate, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -654,23 +600,17 @@ STDMETHODIMP VLCInput::get_fps(double* fps)
         return E_POINTER;
 
     *fps = 0.0;
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *fps = libvlc_media_player_get_fps(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *fps = libvlc_media_player_get_fps(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -685,24 +625,18 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
     if( NULL == hasVout )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md;
-        p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *hasVout = libvlc_media_player_has_vout(p_md, &ex) ?
+                                VARIANT_TRUE : VARIANT_FALSE;
         if( ! libvlc_exception_raised(&ex) )
         {
-            *hasVout = libvlc_media_player_has_vout(p_md, &ex) ?
-                                    VARIANT_TRUE : VARIANT_FALSE;
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCInput,
                      libvlc_exception_get_message(&ex));
@@ -1520,26 +1454,18 @@ STDMETHODIMP VLCPlaylistItems::get_count(long* count)
     if( NULL == count )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_lock(p_libvlc);
-        *count = libvlc_playlist_items_count(p_libvlc, &ex);
-        libvlc_playlist_unlock(p_libvlc);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
-                         libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    *count = _p_instance->playlist_count(&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
+            libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylistItems::clear()
@@ -1551,7 +1477,7 @@ STDMETHODIMP VLCPlaylistItems::clear()
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_playlist_clear(p_libvlc, &ex);
+        _p_instance->playlist_clear(&ex);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
@@ -1573,7 +1499,7 @@ STDMETHODIMP VLCPlaylistItems::remove(long item)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_playlist_delete_item(p_libvlc, item, &ex);
+        _p_instance->playlist_delete_item(item, &ex);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCPlaylistItems,
@@ -1672,26 +1598,18 @@ STDMETHODIMP VLCPlaylist::get_itemCount(long* count)
         return E_POINTER;
 
     *count = 0;
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_lock(p_libvlc);
-        *count = libvlc_playlist_items_count(p_libvlc, &ex);
-        libvlc_playlist_unlock(p_libvlc);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCPlaylist,
-                         libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    *count = _p_instance->playlist_count(&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCPlaylist,
+            libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
@@ -1699,25 +1617,22 @@ STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
     if( NULL == isPlaying )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_playlist_lock( p_libvlc );
-        *isPlaying = libvlc_playlist_isplaying(p_libvlc, &ex) ?
+        *isPlaying = libvlc_media_player_is_playing(p_md, &ex) ?
                                     VARIANT_TRUE: VARIANT_FALSE;
         if( libvlc_exception_raised(&ex) )
         {
-            libvlc_playlist_unlock( p_libvlc );
             _p_instance->setErrorInfo(IID_IVLCPlaylist,
                          libvlc_exception_get_message(&ex));
             libvlc_exception_clear(&ex);
             return E_FAIL;
         }
-        libvlc_playlist_unlock( p_libvlc );
         return NOERROR;
     }
     return hr;
@@ -1789,12 +1704,8 @@ STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, long* ite
             VariantClear(&v_name);
         }
 
-        *item = libvlc_playlist_add_extended(p_libvlc,
-                    psz_uri,
-                    psz_name,
-                    i_options,
-                    const_cast<const char **>(ppsz_options),
-                    &ex);
+        *item = _p_instance->playlist_add_extended_untrusted(psz_uri,
+                    i_options, const_cast<const char **>(ppsz_options), &ex);
 
         VLCControl::FreeTargetOptions(ppsz_options, i_options);
         CoTaskMemFree(psz_uri);
@@ -1814,56 +1725,44 @@ STDMETHODIMP VLCPlaylist::add(BSTR uri, VARIANT name, VARIANT options, long* ite
 
 STDMETHODIMP VLCPlaylist::play()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_play(p_libvlc, -1, 0, NULL, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    _p_instance->playlist_play(&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylist::playItem(long item)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_play(p_libvlc, item, 0, NULL, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCPlaylist,
-                libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    _p_instance->playlist_play_item(item,&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCPlaylist,
+            libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylist::togglePause()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t* p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_playlist_pause(p_libvlc, &ex);
+        libvlc_media_player_pause(p_md, &ex);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCPlaylist,
@@ -1878,14 +1777,14 @@ STDMETHODIMP VLCPlaylist::togglePause()
 
 STDMETHODIMP VLCPlaylist::stop()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_playlist_stop(p_libvlc, &ex);
+        libvlc_media_player_stop(p_md, &ex);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCPlaylist,
@@ -1900,68 +1799,50 @@ STDMETHODIMP VLCPlaylist::stop()
 
 STDMETHODIMP VLCPlaylist::next()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_next(p_libvlc, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCPlaylist,
-                libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    _p_instance->playlist_next(&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCPlaylist,
+            libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylist::prev()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_prev(p_libvlc, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCPlaylist,
-                libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    _p_instance->playlist_prev(&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCPlaylist,
+            libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylist::clear()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
 
-        libvlc_playlist_clear(p_libvlc, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCPlaylist,
-                libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+    _p_instance->playlist_clear(&ex);
+    if( libvlc_exception_raised(&ex) )
+    {
+        _p_instance->setErrorInfo(IID_IVLCPlaylist,
+            libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
     }
-    return hr;
+    return NOERROR;
 };
 
 STDMETHODIMP VLCPlaylist::removeItem(long item)
@@ -1973,7 +1854,7 @@ STDMETHODIMP VLCPlaylist::removeItem(long item)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_playlist_delete_item(p_libvlc, item, &ex);
+        _p_instance->playlist_delete_item(item, &ex);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCPlaylist,
@@ -2084,22 +1965,17 @@ STDMETHODIMP VLCVideo::get_fullscreen(VARIANT_BOOL* fullscreen)
     if( NULL == fullscreen )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *fullscreen = libvlc_get_fullscreen(p_md, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
         if( ! libvlc_exception_raised(&ex) )
         {
-            *fullscreen = libvlc_get_fullscreen(p_md, &ex) ? VARIANT_TRUE : VARIANT_FALSE;
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2110,22 +1986,17 @@ STDMETHODIMP VLCVideo::get_fullscreen(VARIANT_BOOL* fullscreen)
 
 STDMETHODIMP VLCVideo::put_fullscreen(VARIANT_BOOL fullscreen)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        libvlc_set_fullscreen(p_md, VARIANT_FALSE != fullscreen, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_set_fullscreen(p_md, VARIANT_FALSE != fullscreen, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2139,22 +2010,17 @@ STDMETHODIMP VLCVideo::get_width(long* width)
     if( NULL == width )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *width = libvlc_video_get_width(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *width = libvlc_video_get_width(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2168,22 +2034,17 @@ STDMETHODIMP VLCVideo::get_height(long* height)
     if( NULL == height )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *height = libvlc_video_get_height(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *height = libvlc_video_get_height(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2197,32 +2058,28 @@ STDMETHODIMP VLCVideo::get_aspectRatio(BSTR* aspect)
     if( NULL == aspect )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        char *psz_aspect = libvlc_video_get_aspect_ratio(p_md, &ex);
+
         if( ! libvlc_exception_raised(&ex) )
         {
-            char *psz_aspect = libvlc_video_get_aspect_ratio(p_md, &ex);
+            if( NULL == psz_aspect )
+                return E_OUTOFMEMORY;
 
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                if( NULL == psz_aspect )
-                    return E_OUTOFMEMORY;
-
-                *aspect = BSTRFromCStr(CP_UTF8, psz_aspect);
-                free( psz_aspect );
-                psz_aspect = NULL;
-                return (NULL == *aspect) ? E_OUTOFMEMORY : NOERROR;
-            }
+            *aspect = BSTRFromCStr(CP_UTF8, psz_aspect);
             free( psz_aspect );
             psz_aspect = NULL;
+            return (NULL == *aspect) ? E_OUTOFMEMORY : NOERROR;
         }
+        free( psz_aspect );
+        psz_aspect = NULL;
+
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
         return E_FAIL;
@@ -2238,33 +2095,28 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
     if( 0 == SysStringLen(aspect) )
         return E_INVALIDARG;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
-        if( ! libvlc_exception_raised(&ex) )
+        char *psz_aspect = CStrFromBSTR(CP_UTF8, aspect);
+        if( NULL == psz_aspect )
         {
-            char *psz_aspect = CStrFromBSTR(CP_UTF8, aspect);
-            if( NULL == psz_aspect )
-            {
-                return E_OUTOFMEMORY;
-            }
+            return E_OUTOFMEMORY;
+        }
 
-            libvlc_video_set_aspect_ratio(p_md, psz_aspect, &ex);
+        libvlc_video_set_aspect_ratio(p_md, psz_aspect, &ex);
 
-            CoTaskMemFree(psz_aspect);
-            libvlc_media_player_release(p_md);
-            if( libvlc_exception_raised(&ex) )
-            {
-                _p_instance->setErrorInfo(IID_IVLCVideo,
-                    libvlc_exception_get_message(&ex));
-                libvlc_exception_clear(&ex);
-                return E_FAIL;
-            }
+        CoTaskMemFree(psz_aspect);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCVideo,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
         }
         return NOERROR;
     }
@@ -2276,22 +2128,17 @@ STDMETHODIMP VLCVideo::get_subtitle(long* spu)
     if( NULL == spu )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *spu = libvlc_video_get_spu(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *spu = libvlc_video_get_spu(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2302,16 +2149,14 @@ STDMETHODIMP VLCVideo::get_subtitle(long* spu)
 
 STDMETHODIMP VLCVideo::put_subtitle(long spu)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
         libvlc_video_set_spu(p_md, spu, &ex);
-        libvlc_media_player_release(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
@@ -2328,32 +2173,27 @@ STDMETHODIMP VLCVideo::get_crop(BSTR* geometry)
     if( NULL == geometry )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        char *psz_geometry = libvlc_video_get_crop_geometry(p_md, &ex);
+
         if( ! libvlc_exception_raised(&ex) )
         {
-            char *psz_geometry = libvlc_video_get_crop_geometry(p_md, &ex);
+            if( NULL == psz_geometry )
+                return E_OUTOFMEMORY;
 
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                if( NULL == psz_geometry )
-                    return E_OUTOFMEMORY;
-
-                *geometry = BSTRFromCStr(CP_UTF8, psz_geometry);
-                free( psz_geometry );
-                psz_geometry = NULL;
-                return (NULL == geometry) ? E_OUTOFMEMORY : NOERROR;
-            }
+            *geometry = BSTRFromCStr(CP_UTF8, psz_geometry);
             free( psz_geometry );
             psz_geometry = NULL;
+            return (NULL == geometry) ? E_OUTOFMEMORY : NOERROR;
         }
+        free( psz_geometry );
+        psz_geometry = NULL;
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
         return E_FAIL;
@@ -2369,33 +2209,28 @@ STDMETHODIMP VLCVideo::put_crop(BSTR geometry)
     if( 0 == SysStringLen(geometry) )
         return E_INVALIDARG;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
-        if( ! libvlc_exception_raised(&ex) )
+        char *psz_geometry = CStrFromBSTR(CP_UTF8, geometry);
+        if( NULL == psz_geometry )
         {
-            char *psz_geometry = CStrFromBSTR(CP_UTF8, geometry);
-            if( NULL == psz_geometry )
-            {
-                return E_OUTOFMEMORY;
-            }
+            return E_OUTOFMEMORY;
+        }
 
-            libvlc_video_set_crop_geometry(p_md, psz_geometry, &ex);
+        libvlc_video_set_crop_geometry(p_md, psz_geometry, &ex);
 
-            CoTaskMemFree(psz_geometry);
-            libvlc_media_player_release(p_md);
-            if( libvlc_exception_raised(&ex) )
-            {
-                _p_instance->setErrorInfo(IID_IVLCVideo,
-                    libvlc_exception_get_message(&ex));
-                libvlc_exception_clear(&ex);
-                return E_FAIL;
-            }
+        CoTaskMemFree(psz_geometry);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCVideo,
+                libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
         }
         return NOERROR;
     }
@@ -2407,22 +2242,17 @@ STDMETHODIMP VLCVideo::get_teletext(long* page)
     if( NULL == page )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        *page = libvlc_video_get_teletext(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            *page = libvlc_video_get_teletext(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2433,16 +2263,14 @@ STDMETHODIMP VLCVideo::get_teletext(long* page)
 
 STDMETHODIMP VLCVideo::put_teletext(long page)
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
         libvlc_video_set_teletext(p_md, page, &ex);
-        libvlc_media_player_release(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
@@ -2459,100 +2287,92 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
     if( NULL == picture )
         return E_POINTER;
 
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
-        if( ! libvlc_exception_raised(&ex) )
+        static int uniqueId = 0;
+        TCHAR path[MAX_PATH+1];
+
+        int pathlen = GetTempPath(MAX_PATH-24, path);
+        if( (0 == pathlen) || (pathlen > (MAX_PATH-24)) )
+            return E_FAIL;
+
+        /* check temp directory path by openning it */
         {
-            static int uniqueId = 0;
-            TCHAR path[MAX_PATH+1];
-
-            int pathlen = GetTempPath(MAX_PATH-24, path);
-            if( (0 == pathlen) || (pathlen > (MAX_PATH-24)) )
-                return E_FAIL;
-
-            /* check temp directory path by openning it */
+            HANDLE dirHandle = CreateFile(path, GENERIC_READ,
+                       FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
+                       NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+            if( INVALID_HANDLE_VALUE == dirHandle )
             {
-                HANDLE dirHandle = CreateFile(path,
-                                              GENERIC_READ,
-                                              FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
-                                              NULL,
-                                              OPEN_EXISTING,
-                                              FILE_FLAG_BACKUP_SEMANTICS, NULL);
-                if( INVALID_HANDLE_VALUE == dirHandle )
+                _p_instance->setErrorInfo(IID_IVLCVideo,
+                        "Invalid temporary directory for snapshot images, check values of TMP, TEMP envars.");
+                return E_FAIL;
+            }
+            else
+            {
+                BY_HANDLE_FILE_INFORMATION bhfi;
+                BOOL res = GetFileInformationByHandle(dirHandle, &bhfi);
+                CloseHandle(dirHandle);
+                if( !res || !(bhfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
                 {
                     _p_instance->setErrorInfo(IID_IVLCVideo,
                             "Invalid temporary directory for snapshot images, check values of TMP, TEMP envars.");
                     return E_FAIL;
                 }
-                else
-                {
-                    BY_HANDLE_FILE_INFORMATION bhfi;
-                    BOOL res = GetFileInformationByHandle(dirHandle, &bhfi);
-                    CloseHandle(dirHandle);
-                    if( !res || !(bhfi.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
-                    {
-                        _p_instance->setErrorInfo(IID_IVLCVideo,
-                                "Invalid temporary directory for snapshot images, check values of TMP, TEMP envars.");
-                        return E_FAIL;
-                    }
-                }
             }
+        }
 
-            TCHAR filepath[MAX_PATH+1];
+        TCHAR filepath[MAX_PATH+1];
 
-            _stprintf(filepath, TEXT("%sAXVLC%lXS%lX.bmp"),
-                     path, GetCurrentProcessId(), ++uniqueId);
+        _stprintf(filepath, TEXT("%sAXVLC%lXS%lX.bmp"),
+                 path, GetCurrentProcessId(), ++uniqueId);
 
 #ifdef _UNICODE
-            /* reuse path storage for UTF8 string */
-            char *psz_filepath = (char *)path;
-            WCHAR* wpath = filepath;
+        /* reuse path storage for UTF8 string */
+        char *psz_filepath = (char *)path;
+        WCHAR* wpath = filepath;
 #else
-            char *psz_filepath = path;
-            /* first convert to unicode using current code page */
-            WCHAR wpath[MAX_PATH+1];
-            if( 0 == MultiByteToWideChar(CP_ACP, 0, filepath, -1, wpath, sizeof(wpath)/sizeof(WCHAR)) )
-                return E_FAIL;
+        char *psz_filepath = path;
+        /* first convert to unicode using current code page */
+        WCHAR wpath[MAX_PATH+1];
+        if( 0 == MultiByteToWideChar(CP_ACP, 0, filepath, -1, wpath, sizeof(wpath)/sizeof(WCHAR)) )
+            return E_FAIL;
 #endif
-            /* convert to UTF8 */
-            pathlen = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, psz_filepath, sizeof(path), NULL, NULL);
-            // fail if path is 0 or too short (i.e pathlen is the same as storage size)
-            if( (0 == pathlen) || (sizeof(path) == pathlen) )
-                return E_FAIL;
+        /* convert to UTF8 */
+        pathlen = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, psz_filepath, sizeof(path), NULL, NULL);
+        // fail if path is 0 or too short (i.e pathlen is the same as storage size)
+        if( (0 == pathlen) || (sizeof(path) == pathlen) )
+            return E_FAIL;
 
-            /* take snapshot into file */
-            libvlc_video_take_snapshot(p_md, psz_filepath, 0, 0, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
+        /* take snapshot into file */
+        libvlc_video_take_snapshot(p_md, psz_filepath, 0, 0, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            hr = E_FAIL;
+            /* open snapshot file */
+            HANDLE snapPic = LoadImage(NULL, filepath, IMAGE_BITMAP,0, 0, LR_CREATEDIBSECTION|LR_LOADFROMFILE);
+            if( snapPic )
             {
-                hr = E_FAIL;
-                /* open snapshot file */
-                HANDLE snapPic = LoadImage(NULL, filepath, IMAGE_BITMAP,0, 0, LR_CREATEDIBSECTION|LR_LOADFROMFILE);
-                if( snapPic )
+                PICTDESC snapDesc;
+
+                snapDesc.cbSizeofstruct = sizeof(PICTDESC);
+                snapDesc.picType        = PICTYPE_BITMAP;
+                snapDesc.bmp.hbitmap    = (HBITMAP)snapPic;
+                snapDesc.bmp.hpal       = NULL;
+
+                hr = OleCreatePictureIndirect(&snapDesc, IID_IPictureDisp, TRUE, (LPVOID*)picture);
+                if( FAILED(hr) )
                 {
-                    PICTDESC snapDesc;
-
-                    snapDesc.cbSizeofstruct = sizeof(PICTDESC);
-                    snapDesc.picType        = PICTYPE_BITMAP;
-                    snapDesc.bmp.hbitmap    = (HBITMAP)snapPic;
-                    snapDesc.bmp.hpal       = NULL;
-
-                    hr = OleCreatePictureIndirect(&snapDesc, IID_IPictureDisp, TRUE, (LPVOID*)picture);
-                    if( FAILED(hr) )
-                    {
-                        *picture = NULL;
-                        DeleteObject(snapPic);
-                    }
+                    *picture = NULL;
+                    DeleteObject(snapPic);
                 }
-                DeleteFile(filepath);
-                return hr;
             }
+            DeleteFile(filepath);
+            return hr;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2563,22 +2383,17 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
 
 STDMETHODIMP VLCVideo::toggleFullscreen()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        libvlc_toggle_fullscreen(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_toggle_fullscreen(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
@@ -2589,22 +2404,17 @@ STDMETHODIMP VLCVideo::toggleFullscreen()
 
 STDMETHODIMP VLCVideo::toggleTeletext()
 {
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = _p_instance->getVLC(&p_libvlc);
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_t *p_md = libvlc_playlist_get_media_player(p_libvlc, &ex);
+        libvlc_toggle_teletext(p_md, &ex);
         if( ! libvlc_exception_raised(&ex) )
         {
-            libvlc_toggle_teletext(p_md, &ex);
-            libvlc_media_player_release(p_md);
-            if( ! libvlc_exception_raised(&ex) )
-            {
-                return NOERROR;
-            }
+            return NOERROR;
         }
         _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
         libvlc_exception_clear(&ex);
