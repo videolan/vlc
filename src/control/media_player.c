@@ -1097,15 +1097,12 @@ void libvlc_media_player_set_rate(
     vlc_value_t val;
     bool b_can_rewind;
 
-    if( rate != 0 )
-        RAISEVOID( "Rate value is invalid" );
-
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return;
 
     b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
-    if( (rate < 0) && !b_can_rewind )
+    if( (rate < 0.0) && !b_can_rewind )
     {
         vlc_object_release( p_input_thread );
         libvlc_exception_raise( p_e, "Rate value is invalid" );
