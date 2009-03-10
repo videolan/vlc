@@ -147,22 +147,51 @@ public:
     int      b_toolbar;
     char *   psz_target;
 
-    bool playlist_select(int,libvlc_exception_t *);
+    void playlist_play(libvlc_exception_t *ex)
+    {
+        if( libvlc_media_player||playlist_select(0,ex) )
+            libvlc_media_player_play(libvlc_media_player,ex);
+    }
+    void playlist_play_item(int idx,libvlc_exception_t *ex)
+    {
+        if( playlist_select(idx,ex) )
+            libvlc_media_player_play(libvlc_media_player,ex);
+    }
+    void playlist_stop(libvlc_exception_t *ex)
+    {
+        if( libvlc_media_player )
+            libvlc_media_player_stop(libvlc_media_player,ex);
+    }
+    void playlist_next(libvlc_exception_t *ex)
+    {
+        if( playlist_select(playlist_index+1,ex) )
+            libvlc_media_player_play(libvlc_media_player,ex);
+    }
+    void playlist_prev(libvlc_exception_t *ex)
+    {
+        if( playlist_select(playlist_index-1,ex) )
+            libvlc_media_player_play(libvlc_media_player,ex);
+    }
+    void playlist_pause(libvlc_exception_t *ex)
+    {
+        if( libvlc_media_player )
+            libvlc_media_player_pause(libvlc_media_player,ex);
+    }
+    int playlist_isplaying(libvlc_exception_t *ex)
+    {
+        int is_playing = 0;
+        if( libvlc_media_player )
+            is_playing = libvlc_media_player_is_playing(
+                                libvlc_media_player, ex );
+        return is_playing;
+    }
 
     int playlist_add( const char *, libvlc_exception_t * );
     int playlist_add_extended_untrusted( const char *, const char *, int,
                                 const char **, libvlc_exception_t * );
-    void playlist_play( libvlc_exception_t * );
-    void playlist_play_item( int, libvlc_exception_t * );
-    void playlist_stop( libvlc_exception_t * );
-    void playlist_next( libvlc_exception_t * );
-    void playlist_prev( libvlc_exception_t * );
-    void playlist_pause( libvlc_exception_t * );
     void playlist_delete_item( int, libvlc_exception_t * );
-
     void playlist_clear( libvlc_exception_t * );
-    int playlist_count( libvlc_exception_t * );
-    int playlist_isplaying( libvlc_exception_t * );
+    int  playlist_count( libvlc_exception_t * );
 
     void toggle_fullscreen( libvlc_exception_t * );
     void set_fullscreen( int, libvlc_exception_t * );
@@ -171,6 +200,7 @@ public:
     int  player_has_vout( libvlc_exception_t * );
 
 private:
+    bool playlist_select(int,libvlc_exception_t *);
     void set_player_window( libvlc_exception_t * );
 
     /* VLC reference */

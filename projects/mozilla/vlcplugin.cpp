@@ -344,24 +344,6 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
     return item;
 }
 
-void VlcPlugin::playlist_play( libvlc_exception_t *ex )
-{
-    if( libvlc_media_player||playlist_select(0,ex) )
-        libvlc_media_player_play(libvlc_media_player,ex);
-}
-
-void VlcPlugin::playlist_play_item( int idx, libvlc_exception_t *ex )
-{
-    if( playlist_select(idx,ex) )
-        libvlc_media_player_play(libvlc_media_player,ex);
-}
-
-void VlcPlugin::playlist_stop( libvlc_exception_t *ex )
-{
-    if( libvlc_media_player )
-        libvlc_media_player_stop(libvlc_media_player,ex);
-}
-
 bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 {
     libvlc_media_t *p_m = NULL;
@@ -401,24 +383,6 @@ bad_unlock:
     return false;
 }
 
-void VlcPlugin::playlist_next( libvlc_exception_t *ex )
-{
-    if( playlist_select(playlist_index+1,ex) )
-        libvlc_media_player_play(libvlc_media_player,ex);
-}
-
-void VlcPlugin::playlist_prev( libvlc_exception_t *ex )
-{
-    if( playlist_select(playlist_index-1,ex) )
-        libvlc_media_player_play(libvlc_media_player,ex);
-}
-
-void VlcPlugin::playlist_pause( libvlc_exception_t *ex )
-{
-    if( libvlc_media_player )
-        libvlc_media_player_pause(libvlc_media_player,ex);
-}
-
 void VlcPlugin::playlist_delete_item( int idx, libvlc_exception_t *ex )
 {
     libvlc_media_list_lock(libvlc_media_list);
@@ -442,26 +406,16 @@ int VlcPlugin::playlist_count( libvlc_exception_t *ex )
     return items_count;
 }
 
-int VlcPlugin::playlist_isplaying( libvlc_exception_t *ex )
-{
-    int is_playing = 0;
-    if( libvlc_media_player )
-        is_playing = libvlc_media_player_is_playing( libvlc_media_player, ex );
-    return is_playing;
-}
-
 void VlcPlugin::toggle_fullscreen( libvlc_exception_t *ex )
 {
     if( playlist_isplaying(ex) )
         libvlc_toggle_fullscreen(libvlc_media_player,ex);
 }
-
 void VlcPlugin::set_fullscreen( int yes, libvlc_exception_t *ex )
 {
     if( playlist_isplaying(ex) )
         libvlc_set_fullscreen(libvlc_media_player,yes,ex);
 }
-
 int  VlcPlugin::get_fullscreen( libvlc_exception_t *ex )
 {
     int r = 0;
