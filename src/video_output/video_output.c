@@ -1191,11 +1191,13 @@ static void* RunThread( void *p_this )
             p_filtered_picture = filter_chain_VideoFilter( p_vout->p->p_vf2_chain,
                                                            p_picture );
 
-        /* FIXME it is ugly that b_snapshot is not locked but I do not
-         * know which lock to use (here and in the snapshot callback) */
-        vlc_mutex_lock( &p_vout->p->snapshot.lock );
-        const bool b_snapshot = p_vout->p->snapshot.i_request > 0 && p_picture != NULL;
-        vlc_mutex_unlock( &p_vout->p->snapshot.lock );
+        bool b_snapshot = false;
+        if( vlc_mutex_trylock( &p_vout->p->snapshot.lock ) == 0 )
+        {
+             b_snapshot = p_vout->p->snapshot.i_request > 0
+                       && p_picture != NULL;
+             vlc_mutex_unlock( &p_vout->p->snapshot.lock );
+        }
 
         /*
          * Check for subpictures to display
