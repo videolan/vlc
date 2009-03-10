@@ -1471,12 +1471,11 @@ static void* ThreadSend( vlc_object_t *p_this )
 #ifdef WIN32
 # define ECONNREFUSED WSAECONNREFUSED
 # define ENOPROTOOPT  WSAENOPROTOOPT
-# define EPROTO       WSAEPROTO
 # define EHOSTUNREACH WSAEHOSTUNREACH
-# define ENETUNREACH  WSAEHOSTUNREACH
+# define ENETUNREACH  WSAENETUNREACH
 # define ENETDOWN     WSAENETDOWN
 # define ENOBUFS      WSAENOBUFS
-# define EAGAIN       WSAEGAIN
+# define EAGAIN       WSAEWOULDBLOCK
 # define EWOULDBLOCK  WSAEWOULDBLOCK
 #endif
     sout_stream_id_t *id = (sout_stream_id_t *)p_this;
@@ -1532,7 +1531,9 @@ static void* ThreadSend( vlc_object_t *p_this )
                 /* Soft errors (e.g. ICMP): */
                 case ECONNREFUSED: /* Port unreachable */
                 case ENOPROTOOPT:
+#ifdef EPROTO
                 case EPROTO:       /* Protocol unreachable */
+#endif
                 case EHOSTUNREACH: /* Host unreachable */
                 case ENETUNREACH:  /* Network unreachable */
                 case ENETDOWN:     /* Entire network down */
