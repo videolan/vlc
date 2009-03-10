@@ -16,25 +16,29 @@
 <SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/components/slider/Bs_Slider.class.js"></SCRIPT>
 
 <SCRIPT language="JavaScript"><!--
-function init(){
+function init()
+{
     inputTracker = new Bs_Slider();
-    inputTracker.attachOnChange(onInputTrackerChange);
-    inputTracker.attachOnSlideStart(onInputTrackerScrollStart);
-    inputTracker.attachOnSlideEnd(onInputTrackerScrollEnd);
-    inputTracker.width         = 530 ;
-    inputTracker.height        = 15;
-    inputTracker.minVal        = 0;
-    inputTracker.maxVal        = 1.0;
-    inputTracker.valueDefault  = 0;
-    inputTracker.valueInterval = 1/530;
-    inputTracker.setDisabled(true);
-    inputTracker.imgDir   = 'blueshoes-4.5/javascript/components/slider/img/';
-    inputTracker.setBackgroundImage('aluminumalloyvolcanic/horizontal_background.gif', 'repeat');
-    inputTracker.setArrowIconLeft('aluminumalloyvolcanic/horizontal_backgroundLeft.gif', 2, 19);
-    inputTracker.setArrowIconRight('aluminumalloyvolcanic/horizontal_backgroundRight.gif', 2, 19);
-    inputTracker.setSliderIcon('aluminumalloyvolcanic/horizontal_knob.gif', 15, 19);
-    inputTracker.useInputField = 0;
-    inputTracker.draw('inputTrackerDiv');
+    if (inputTracker)
+    {
+        inputTracker.attachOnChange(onInputTrackerChange);
+        inputTracker.attachOnSlideStart(onInputTrackerScrollStart);
+        inputTracker.attachOnSlideEnd(onInputTrackerScrollEnd);
+        inputTracker.width         = 530 ;
+        inputTracker.height        = 15;
+        inputTracker.minVal        = 0;
+        inputTracker.maxVal        = 1.0;
+        inputTracker.valueDefault  = 0;
+        inputTracker.valueInterval = 1/530;
+        inputTracker.setDisabled(true);
+        inputTracker.imgDir   = 'blueshoes-4.5/javascript/components/slider/img/';
+        inputTracker.setBackgroundImage('aluminumalloyvolcanic/horizontal_background.gif', 'repeat');
+        inputTracker.setArrowIconLeft('aluminumalloyvolcanic/horizontal_backgroundLeft.gif', 2, 19);
+        inputTracker.setArrowIconRight('aluminumalloyvolcanic/horizontal_backgroundRight.gif', 2, 19);
+        inputTracker.setSliderIcon('aluminumalloyvolcanic/horizontal_knob.gif', 15, 19);
+        inputTracker.useInputField = 0;
+        inputTracker.draw('inputTrackerDiv');
+    }
 
     if( navigator.appName.indexOf("Microsoft Internet")==-1 )
     {
@@ -47,36 +51,37 @@ function init(){
     else
     {
         /* Explorer loads plugins asynchronously */
-        document.onreadystatechange=function() {
+        document.onreadystatechange=function()
+        {
             if( document.readyState == 'complete' )
             {
                 onVLCPluginReady();
             }
         }
     }
-};
+}
 
 function getVLC(name)
 {
-    if (window.document[name]) 
+    if (window.document[name])
     {
         return window.document[name];
     }
     if (navigator.appName.indexOf("Microsoft Internet")==-1)
     {
         if (document.embeds && document.embeds[name])
-            return document.embeds[name]; 
+            return document.embeds[name];
     }
     else // if (navigator.appName.indexOf("Microsoft Internet")!=-1)
     {
         return document.getElementById(name);
     }
-};
+}
 
 function onVLCPluginReady()
 {
     updateVolume(0);
-};
+}
 
 //--></SCRIPT>
 
@@ -90,7 +95,7 @@ MRL:
 </TD></TR>
 <TR><TD align="center" colspan="2">
 <!--
-Insert VideoLAN.VLCPlugin.2 
+Insert VideoLAN.VLCPlugin.2
 -->
 <OBJECT classid="clsid:9BE31822-FDAD-461B-AD51-BE1D1C159921"
         width="640"
@@ -102,12 +107,14 @@ Insert VideoLAN.VLCPlugin.2
 <param name="AutoLoop" value="False" />
 <param name="AutoPlay" value="False" />
 <param name="Volume" value="50" />
+<param name="toolbar" value="true" />
 <param name="StartTime" value="0" />
 <EMBED pluginspage="http://www.videolan.org"
        type="application/x-vlc-plugin"
        version="VideoLAN.VLCPlugin.2"
        width="640"
        height="480"
+       toolbar="true"
        name="vlc">
 </EMBED>
 </OBJECT>
@@ -129,13 +136,13 @@ Insert Slider widget
 <INPUT type=button value="Stop" onClick='doStop();'>
 &nbsp;
 <INPUT type=button value=" << " onClick='doPlaySlower();'>
+<INPUT type=button value="Reverse" onClick='doReverse();'>
 <INPUT type=button value=" >> " onClick='doPlayFaster();'>
-<INPUT type=button value="Backward" onClick='doBackwardPlay(500);'>
-<INPUT type=button value="Forward" onClick='doForwardPlay(500);'>
+&nbsp;
 <INPUT type=button value="Fullscreen" onClick='getVLC("vlc").video.toggleFullscreen();'>
 <INPUT type=button value="Version" onClick='alert("vlc " + getVLC("vlc").VersionInfo);'>
-<INPUT type=button value=" State " onClick='doState();'>
-</TD><TD align="right"> 
+<INPUT type=button value=" State " onClick='alert("state: " + getVLC("vlc").input.state);'>
+</TD><TD align="right">
 <SPAN style="text-align:center">Volume:</SPAN>
 <INPUT type=button value=" - " onClick='updateVolume(-10)'>
 <SPAN id="volumeTextField" style="text-align:center">--</SPAN>
@@ -143,11 +150,19 @@ Insert Slider widget
 <INPUT type=button value="Mute" onClick='getVLC("vlc").audio.toggleMute();'>
 </TD>
 </TR>
-<TR><TD>Playlist: 
+<TR><TD>Playlist:
 <INPUT type=button value="Prev" onClick='getVLC("vlc").playlist.prev();'>
 <INPUT type=button value="Next" onClick='getVLC("vlc").playlist.next();'>
 <INPUT type=button value="Clear All" onClick='getVLC("vlc").playlist.clear(); doItemCount();'>
-<INPUT size=4 value="1:1" id="aspect"><INPUT type=submit value="AspectRatio" onClick="doAspectRatio(document.getElementById('aspect').value);">
+    Aspect Ratio:
+    <SELECT readonly onChange='doAspectRatio(this.value)'>
+      <OPTION value="default">Default</OPTION>
+      <OPTION value="1:1">1:1</OPTION>
+      <OPTION value="4:3">4:3</OPTION>
+      <OPTION value="16:9">16:9</OPTION>
+      <OPTION value="221:100">221:100</OPTION>
+      <OPTION value="5:4">5:4</OPTION>
+    </SELECT>
 </TD><TD align="right">
 <INPUT type=button id="itemCount" value=" Items 0 " onClick='doItemCount();'>
 <INPUT size=4 value="" id="removeid"><INPUT type=submit value="Delete" onClick="doRemoveItem(document.getElementById('removeid').value);">
@@ -187,6 +202,20 @@ Verbosity:
 <INPUT type=button value="get position" onClick='doGetPosition();'>
 </TD>
 </TR>
+<TR>
+<TD>Video Subtitle:
+    <INPUT type=button value=" + " onClick='doSubtitle(1);'>
+    <SPAN id="spuTextField" style="text-align:center">--</SPAN>
+    <INPUT type=button value=" - " onClick='doSubtitle(-1);'>
+</TD>
+</TR>
+<TR>
+<TD>
+    <INPUT type=button id="telx" value="Teletext off" onClick='doToggleTeletext();'>
+    Teletext page:
+    <INPUT size=4 value="100" id="telxPage" onClick='doTelxPage(document.getElementById("telxPage").value);'>
+</TD>
+</TR>
 </TABLE>
 <SCRIPT language="javascript">
 <!--
@@ -194,128 +223,157 @@ Verbosity:
 var rate = 0;
 var prevState = 0;
 var monitorTimerId = 0;
-var rateTimerId = 0;
+var inputTracker;
 var inputTrackerScrolling = false;
 var inputTrackerIgnoreChange = false;
+var telxState = false;
 
 function doSetSlider()
 {
-   var vlc = getVLC("vlc");
+    var vlc = getVLC("vlc");
 
-   if (vlc.input)
-   {
-     // set slider to new position
-     vlc.input.time = (vlc.input.length/2);
-   }
-};
+    // set slider to new position
+    if( vlc )
+        vlc.input.time = (vlc.input.length/2);
+}
 
 function doGetPosition()
 {
-   var vlc = getVLC("vlc");
+    var vlc = getVLC("vlc");
 
-   if (vlc.input)
-   {
-     // set slider to new position
-     alert( "position is " + vlc.input.time);
-   }
-};
+    // set slider to new position
+    if (vlc)
+        alert( "position is " + vlc.input.time);
+}
 
-function doForwardPlay(speed)
+function doReverse(rate)
 {
-   if (rateTimerId == 0)
-   {
-       rateTimerId = setInterval("ratechange()", speed);
-       rate = speed;
-   }
-   else rate = rate + speed;
-};
-
-function doBackwardPlay(speed)
-{
-   if (rateTimerId == 0)
-   {
-       rateTimerId = setInterval("ratechange()", speed);
-       rate = -speed;
-   }
-   else rate = rate - speed;
-};
-
-function ratechange()
-{
-    if (rateTimerId != 0)
-    {
-        var vlc = getVLC("vlc");
-        vlc.input.time = vlc.input.time + rate;
-    }
-};
+    var vlc = getVLC("vlc");
+    if( vlc )
+        vlc.input.rate = -1.0 * vlc.input.rate;
+}
 
 function doVerbosity(value)
 {
     var vlc = getVLC("vlc");
-    vlc.log.verbosity = vlc.log.verbosity + value;
-    document.getElementById("verbosity").value = vlc.log.verbosity;
-};
+    if( vlc )
+    {
+        vlc.log.verbosity = vlc.log.verbosity + value;
+        document.getElementById("verbosity").value = vlc.log.verbosity;
+    }
+}
 
 function doAudioChannel(value)
 {
     var vlc = getVLC("vlc");
-    vlc.audio.channel = parseInt(value);
-};
+    if( vlc )
+        vlc.audio.channel = parseInt(value);
+}
 
 function doAudioTrack(value)
 {
     var vlc = getVLC("vlc");
-    vlc.audio.track = vlc.audio.track + value;
-    document.getElementById("trackTextField").innerHTML = vlc.audio.track;
-};
+    if( vlc )
+    {
+        vlc.audio.track = vlc.audio.track + value;
+        document.getElementById("trackTextField").innerHTML = vlc.audio.track;
+    }
+}
 
 function doAspectRatio(value)
 {
-   var vlc = getVLC("vlc");
-   vlc.video.aspectRatio = value;
-   document.getElementById("aspect").value = vlc.video.aspectRatio;
+    var vlc = getVLC("vlc");
+    if( vlc )
+        vlc.video.aspectRatio = value;
+}
+
+function doSubtitle(value)
+{
+    var vlc = getVLC("vlc");
+    if( vlc )
+    {
+        vlc.video.subtitle = vlc.video.subtitle + value;
+        document.getElementById("spuTextField").innerHTML = vlc.video.subtitle;
+    }
+}
+
+function doTelxPage(value)
+{
+    var vlc = getVLC("vlc");
+    if( vlc )
+        vlc.video.teletext = parseInt(value);
+}
+
+function doToggleTeletext()
+{
+    var vlc = getVLC("vlc");
+
+    if( vlc )
+    {
+        vlc.video.toggleTeletext();
+        if (telxState)
+        {
+            document.getElementById("telx").innerHTML = "Teletext on";
+            telxState = true;
+        }
+        else
+        {
+            document.getElementById("telx").innerHTML = "Teletext off";
+            telxState = false;
+        }
+    }
 }
 
 function doItemCount()
 {
-   var vlc = getVLC("vlc");
-   var count = vlc.playlist.itemCount;
-   document.getElementById("itemCount").value = " Items " + count + " ";
-};
+    var vlc = getVLC("vlc");
+    if( vlc )
+    {
+        var count = vlc.playlist.itemCount;
+        document.getElementById("itemCount").value = " Items " + count + " ";
+    }
+}
 
 function doRemoveItem(item)
 {
-   var vlc = getVLC("vlc");
-   vlc.playlist.removeItem(item);
-};
+    var vlc = getVLC("vlc");
+    if( vlc )
+        vlc.playlist.removeItem(item);
+}
 
 function doMessages()
 {
     var vlc = getVLC("vlc");
 
-    if( vlc.log.messages.count > 0 )
+    if( vlc )
     {
-        // there is one or more messages in the log
-        var iter = vlc.log.messages.iterator();
-        while( iter.hasNext )
+        if( vlc.log.messages.count > 0 )
         {
-            var msg = iter.next();
-            if( msg.severity <= 1 )
+            // there is one or more messages in the log
+            var iter = vlc.log.messages.iterator();
+            while( iter.hasNext )
             {
-                document.getElementById("message").innerHTML = msg.message;
+                var msg = iter.next();
+                if( msg.severity <= 1 )
+                {
+                    document.getElementById("message").innerHTML = msg.message;
+                }
             }
+            // clear the log once finished to avoid clogging
+            vlc.log.messages.clear();
         }
-        // clear the log once finished to avoid clogging
-        vlc.log.messages.clear();
     }
-};
+}
 
 function updateVolume(deltaVol)
 {
     var vlc = getVLC("vlc");
-    vlc.audio.volume += deltaVol;
-    document.getElementById("volumeTextField").innerHTML = vlc.audio.volume+"%";
-};
+    if( vlc )
+    {
+        vlc.audio.volume += deltaVol;
+        document.getElementById("volumeTextField").innerHTML = vlc.audio.volume+"%";
+    }
+}
 
 function formatTime(timeVal)
 {
@@ -332,16 +390,19 @@ function formatTime(timeVal)
         return timeHour+":"+timeMin+":"+timeSec;
     else
         return timeMin+":"+timeSec;
-};
+}
 
 function doState()
 {
     var vlc = getVLC("vlc");
-    var newState = vlc.input.state;
+    var newState = 0;
+
+    if( vlc )
+        newState = vlc.input.state;
 
     if( newState == 0 )
     {
-        // current media has stopped 
+        // current media has stopped
         onEnd();
     }
     else if( newState == 1 )
@@ -371,53 +432,48 @@ function doState()
     }
     else if( newState == 6 )
     {
-        // current media is playing forward
-	onForward();
+        // current media has ended
+        onEnd();
     }
     else if( newState == 7 )
-    {
-        // current media is playing backward
-	onBackward();
-    }
-    else if( newState == 8 )
-    {
-	// current media has ended
-	onEnd();
-    }
-    else if( newState == 9 )
     {
         // current media encountered error
         onError();
     }
-};
+}
 
 function monitor()
 {
     var vlc = getVLC("vlc");
-    var newState = vlc.input.state;
+    var newState = 0;
 
-    if( vlc.log.messages.count > 0 )
+    if( vlc )
     {
-        // there is one or more messages in the log
-        var iter = vlc.log.messages.iterator();
-        while( iter.hasNext )
+        newState = vlc.input.state;
+
+        if( vlc.log.messages.count > 0 )
         {
-            var msg = iter.next();
-            if( msg.severity == 1 )
+            // there is one or more messages in the log
+            var iter = vlc.log.messages.iterator();
+            while( iter.hasNext )
             {
-                alert( msg.message );
+                var msg = iter.next();
+                if( msg.severity == 1 )
+                {
+                    alert( msg.message );
+                }
+                document.getElementById("message").innerHTML = msg.message;
             }
-	    document.getElementById("message").innerHTML = msg.message;
+            // clear the log once finished to avoid clogging
+            vlc.log.messages.clear();
         }
-        // clear the log once finished to avoid clogging
-        vlc.log.messages.clear();
     }
 
     if( prevState != newState )
     {
         if( newState == 0 )
         {
-            // current media has stopped 
+            // current media has stopped
             onEnd();
         }
         else if( newState == 1 )
@@ -440,27 +496,17 @@ function monitor()
             // current media is now paused
             onPause();
         }
-	else if( newState == 5 )
-	{
-	    // current media has stopped
-            onStop();
-	}
-	else if( newState == 6 )
-	{
-	    // current media is playing forward
-	    onForward();
-	}
-	else if( newState == 7 )
-	{
-	    // current media is playing backward
-	    onBackward();
-	}
-	else if( newState == 8 )
-	{
-	    // current media has ended
+        else if( newState == 5 )
+        {
+            // current media has stopped
+                onStop();
+        }
+        else if( newState == 6 )
+        {
+            // current media has ended
             onEnd();
         }
-	else if( newState == 9 )
+        else if( newState == 7 )
         {
             // current media encountered error
             onError();
@@ -484,102 +530,106 @@ function doGo(targetURL)
 {
     var vlc = getVLC("vlc");
 
-    vlc.playlist.clear();
-    while( vlc.playlist.itemCount > 0 )
+    if( vlc )
     {
-        // clear() may return before the playlist has actually been cleared
-        // just wait for it to finish its job
-    }
-    //vlc.playlist.add(targetURL);
-    //vlc.playlist.play();
-
-    var itemId = vlc.playlist.add(targetURL);
-    if( itemId != -1 )
-    {
-        // clear the message log and enable error logging
-        vlc.log.verbosity = 1;
-        vlc.log.messages.clear();
-        // play MRL
-        vlc.playlist.play();
-        if( monitorTimerId == 0 )
+        vlc.playlist.clear();
+        while( vlc.playlist.itemCount > 0 )
         {
-            monitor();
+            // clear() may return before the playlist has actually been cleared
+            // just wait for it to finish its job
         }
-    }
-    else
-    {
-        // disable log
-        vlc.log.verbosity = -1;
-        alert("cannot play at the moment !");
-    }
-    doItemCount();
+        //vlc.playlist.add(targetURL);
+        //vlc.playlist.play();
 
-    if (rateTimerId != 0)
-    {
-        clearInterval("ratechange()");
+        var itemId = vlc.playlist.add(targetURL);
+        if( itemId != -1 )
+        {
+            // clear the message log and enable error logging
+            vlc.log.verbosity = 1;
+            vlc.log.messages.clear();
+            // play MRL
+            vlc.playlist.play();
+            if( monitorTimerId == 0 )
+            {
+                monitor();
+            }
+        }
+        else
+        {
+            // disable log
+            vlc.log.verbosity = -1;
+            alert("cannot play at the moment !");
+        }
+        doItemCount();
     }
-    rateTimerId = 0;
-};
+}
 
 function doAdd(targetURL)
 {
     var vlc = getVLC("vlc");
     var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
-    vlc.playlist.add(targetURL);
-    doItemCount();
-};
+    if( vlc )
+    {
+        vlc.playlist.add(targetURL);
+        doItemCount();
+    }
+}
 
 function doPlayOrPause()
 {
     var vlc = getVLC("vlc");
-    if( vlc.playlist.isPlaying )
+    if( vlc )
     {
-        vlc.playlist.togglePause();
-	monitor();
+        if( vlc.playlist.isPlaying )
+        {
+            vlc.playlist.togglePause();
+            monitor();
+        }
+        else if( vlc.playlist.itemCount > 0 )
+        {
+            // clear the message log and enable error logging
+            vlc.log.verbosity = 1;
+            vlc.log.messages.clear();
+            vlc.playlist.play();
+            monitor();
+        }
+        else
+        {
+            // disable log
+            vlc.log.verbosity = -1;
+            alert('nothing to play !');
+        }
     }
-    else if( vlc.playlist.itemCount > 0 )
-    {
-	// clear the message log and enable error logging
-        vlc.log.verbosity = 1;
-        vlc.log.messages.clear();
-        vlc.playlist.play();
-        monitor();
-    }
-    else
-    {
-	// disable log
-        vlc.log.verbosity = -1;
-        alert('nothing to play !');
-    }
-    if (rateTimerId != 0)
-    {
-        clearInterval("ratechange()");
-    }
-    rateTimerId = 0;
-};
+}
 
 function doStop()
 {
-    getVLC("vlc").playlist.stop();
+    var vlc = getVLC("vlc");
+
+    if( vlc )
+        vlc.playlist.stop();
+
     if( monitorTimerId != 0 )
     {
         clearInterval(monitorTimerId);
         monitorTimerId = 0;
     }
     onStop();
-};
+}
 
 function doPlaySlower()
 {
     var vlc = getVLC("vlc");
-    vlc.input.rate = vlc.input.rate / 2;
-};
+    if( vlc )
+        vlc.input.rate = vlc.input.rate / 2;
+}
 
 function doPlayFaster()
 {
     var vlc = getVLC("vlc");
-    vlc.input.rate = vlc.input.rate * 2;
-};
+    if( vlc )
+        vlc.input.rate = vlc.input.rate * 2;
+}
 
 /* events */
 
@@ -587,142 +637,153 @@ function onOpen()
 {
     document.getElementById("state").innerHTML = "Opening...";
     document.getElementById("PlayOrPause").value = "Pause";
-};
+}
 
 function onBuffer()
 {
     document.getElementById("state").innerHTML = "Buffering...";
     document.getElementById("PlayOrPause").value = "Pause";
-};
+}
 
 function onPlay()
 {
     document.getElementById("state").innerHTML = "Playing...";
     document.getElementById("PlayOrPause").value = "Pause";
     onPlaying();
-};
-
-function onForward()
-{   // Event is reserved for future enhancements
-    document.getElementById("state").innerHTML = "Forward playing...";
-};
-
-function onBackward()
-{   // Event is reserved for future enhancements
-    document.getElementById("state").innerHTML = "Backward playing...";
-};
+}
 
 function onEnd()
 {
     document.getElementById("state").innerHTML = "End...";
-};
-
+}
 
 var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
 var liveFeedRoll = 0;
 
 function onPlaying()
 {
-    if( ! inputTrackerScrolling )
+    if( !inputTrackerScrolling )
     {
         var vlc = getVLC("vlc");
         var info = document.getElementById("info");
-        var mediaLen = vlc.input.length;
-        inputTrackerIgnoreChange  = true;
-        if( mediaLen > 0 )
+        if( vlc )
         {
-            // seekable media
-            if( inputTracker.maxVal == 1.0 )
+            var mediaLen = vlc.input.length;
+            inputTrackerIgnoreChange = true;
+            if( mediaLen > 0 )
             {
-                inputTracker.setDisabled(false);
-                inputTracker.maxVal = 1.0;
+                // seekable media
+                if( inputTracker )
+                {
+                    if( inputTracker.maxVal == 1.0 )
+                    {
+                        inputTracker.setDisabled(false);
+                        inputTracker.maxVal = 1.0;
+                    }
+                    inputTracker.setValue(vlc.input.position);
+                }
+                info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(mediaLen);
             }
-            inputTracker.setValue(vlc.input.position);
-            info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(mediaLen);
-        }
-        else
-        {
-            // non-seekable "live" media
-            if( inputTracker.maxVal != 0.0 )
+            else
             {
-                inputTracker.maxVal = 0.0;
-                inputTracker.setValue(0.0);
-                inputTracker.setDisabled(true);
+                // non-seekable "live" media
+                if( inputTracker )
+                {
+                    if( inputTracker.maxVal != 0.0 )
+                    {
+                        inputTracker.maxVal = 0.0;
+                        inputTracker.setValue(0.0);
+                        inputTracker.setDisabled(true);
+                    }
+                }
+                liveFeedRoll = liveFeedRoll & 3;
+                info.innerHTML = liveFeedText[liveFeedRoll++];
             }
-            liveFeedRoll = liveFeedRoll & 3;
-            info.innerHTML = liveFeedText[liveFeedRoll++];
+            inputTrackerIgnoreChange  = false;
         }
-        inputTrackerIgnoreChange  = false;
     }
-};
+}
 
 function onPause()
 {
     document.getElementById("state").innerHTML = "Paused...";
     document.getElementById("PlayOrPause").value = " Play ";
-};
+}
 
 function onStop()
 {
     // disable logging
-    vlc.log.verbosity = -1;
+    var vlc = getVLC("vlc");
+    if( vlc )
+        vlc.log.verbosity = -1;
 
-    if( ! inputTracker.disabled )
+    if( inputTracker )
     {
-        inputTracker.setValue(inputTracker.minVal);
-        inputTracker.setDisabled(true);
+        if( !inputTracker.disabled )
+        {
+            inputTracker.setValue(inputTracker.minVal);
+            inputTracker.setDisabled(true);
+        }
     }
+
     document.getElementById("info").innerHTML = "-:--:--/-:--:--";
     document.getElementById("state").innerHTML = "Stopped...";
     document.getElementById("PlayOrPause").value = " Play ";
-};
+}
 
 function onError()
 {
     var vlc = getVLC("vlc");
 
     document.getElementById("state").innerHTML = "Error...";
-    if( vlc.log.messages.count > 0 )
+    if( vlc )
     {
-        // there is one or more messages in the log
-        var iter = vlc.log.messages.iterator();
-        while( iter.hasNext )
+        if( vlc.log.messages.count > 0 )
         {
-            var msg = iter.next();
-            if( msg.severity <= 1 )
+            // there is one or more messages in the log
+            var iter = vlc.log.messages.iterator();
+            while( iter.hasNext )
             {
-                alert( msg.message );
+                var msg = iter.next();
+                if( msg.severity <= 1 )
+                {
+                    alert( msg.message );
+                }
+                document.getElementById("message").innerHTML = msg.message;
             }
-            document.getElementById("message").innerHTML = msg.message;
+            // clear the log once finished to avoid clogging
+            vlc.log.messages.clear();
         }
-        // clear the log once finished to avoid clogging
-        vlc.log.messages.clear();
     }
-};
+}
 
 function onInputTrackerScrollStart()
 {
     inputTrackerScrolling = true;
-};
+}
 
 function onInputTrackerScrollEnd(inputTracker, value, pos)
 {
     inputTrackerScrolling = false;
-};
+}
 
 function onInputTrackerChange(inputTracker, value, pos)
 {
-    if( ! inputTrackerIgnoreChange )
+    if( !inputTrackerIgnoreChange )
     {
         var vlc = getVLC("vlc");
-        if( (vlc.input.state == 3) && (vlc.input.position != value) )
+        if( vlc )
         {
-            var info = document.getElementById("info");
-            vlc.input.position = value;
-            info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
+            if( (vlc.input.state == 3) && (vlc.input.position != value) )
+            {
+                var info = document.getElementById("info");
+                vlc.input.position = value;
+                info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
+            }
         }
     }
-};
+}
+
 //-->
 </SCRIPT>
 </BODY>
