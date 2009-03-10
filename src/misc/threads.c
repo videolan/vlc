@@ -356,6 +356,7 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
  * Acquires a mutex. If needed, waits for any other thread to release it.
  * Beware of deadlocks when locking multiple mutexes at the same time,
  * or when using mutexes from callbacks.
+ * This function is not a cancellation-point.
  *
  * @param p_mutex mutex initialized with vlc_mutex_init() or
  *                vlc_mutex_init_recursive()
@@ -383,6 +384,46 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 #endif
 }
 
+/**
+ * Acquires a mutex if and only if it is not currently held by another thread.
+ * This function never sleeps and can be used in delay-critical code paths.
+ * This function is not a cancellation-point.
+ *
+ * <b>Beware</b>: If this function fails, then the mutex is held... by another
+ * thread. The calling thread must deal with the error appropriately. That
+ * typically implies postponing the operations that would have required the
+ * mutex. If the thread cannot defer those operations, then it must use
+ * vlc_mutex_lock(). If in doubt, use vlc_mutex_lock() instead.
+ *
+ * @param p_mutex mutex initialized with vlc_mutex_init() or
+ *                vlc_mutex_init_recursive()
+ * @return 0 if the mutex could be acquired, an error code otherwise.
+ */
+int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    int val = pthread_mutex_trylock( p_mutex );
+
+    if (val != EBUSY)
+        VLC_THREAD_ASSERT ("locking mutex");
+    return val;
+
+#elif defined( WIN32 )
+    if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
+    { /* ^^ We could also lock super_mutex all the time... sluggish */
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
+
+        vlc_mutex_lock (&super_mutex);
+        if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
+            vlc_mutex_init (p_mutex);
+        /* FIXME: destroy the mutex some time... */
+        vlc_mutex_unlock (&super_mutex);
+    }
+    assert (InterlockedExchange (&p_mutex->initialized, 1) == 1);
+    return TryEnterCriticalSection (&p_mutex->mutex) ? 0 : EBUSY;
+
+#endif
+}
 
 /**
  * Releases a mutex (or crashes if the mutex is not locked by the caller).

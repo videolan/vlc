@@ -143,6 +143,7 @@ VLC_EXPORT( int,  vlc_mutex_init,    ( vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
 VLC_EXPORT( void, vlc_mutex_destroy, ( vlc_mutex_t * ) );
 VLC_EXPORT( void, vlc_mutex_lock, ( vlc_mutex_t * ) );
+VLC_EXPORT( int, vlc_mutex_trylock, ( vlc_mutex_t * ) );
 VLC_EXPORT( void, vlc_mutex_unlock, ( vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_cond_init,     ( vlc_cond_t * ) );
 VLC_EXPORT( void, vlc_cond_destroy,  ( vlc_cond_t * ) );

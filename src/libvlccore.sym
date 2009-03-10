@@ -458,6 +458,7 @@ vlc_mutex_destroy
 vlc_mutex_init
 vlc_mutex_init_recursive
 vlc_mutex_lock
+vlc_mutex_trylock
 vlc_mutex_unlock
 __vlc_object_attach
 __vlc_object_create
