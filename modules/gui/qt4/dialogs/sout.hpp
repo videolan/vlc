@@ -42,7 +42,7 @@ class QTextEdit;
 class SoutMrl
 {
 public:
-    SoutMrl( const QString head = "")
+    SoutMrl( const QString& head = "")
     {
         mrl = head;
         b_first = true;
@@ -54,7 +54,7 @@ public:
         return mrl;
     }
 
-    void begin( QString module )
+    void begin( const QString& module )
     {
         if( !b_first )
             mrl += ":";
@@ -68,7 +68,7 @@ public:
         if( b_has_bracket )
             mrl += "}";
     }
-    void option( const QString option, const QString value = "" )
+    void option( const QString& option, const QString& value = "" )
     {
         if( !b_has_bracket )
             mrl += "{";
@@ -88,16 +88,16 @@ public:
             }
         }
     }
-    void option( const QString name, const int i_value, const int i_precision = 10 )
+    void option( const QString& name, const int i_value, const int i_precision = 10 )
     {
         option( name, QString::number( i_value, i_precision ) );
     }
-    void option( const QString name, const double f_value )
+    void option( const QString& name, const double f_value )
     {
         option( name, QString::number( f_value ) );
     }
 
-    void option( const QString name, const QString base, const int i_value, const int i_precision = 10 )
+    void option( const QString& name, const QString& base, const int i_value, const int i_precision = 10 )
     {
         option( name, base + ":" + QString::number( i_value, i_precision ) );
     }
