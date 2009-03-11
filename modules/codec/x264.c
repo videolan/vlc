@@ -434,9 +434,13 @@ vlc_module_begin ()
                  SCENE_LONGTEXT, false )
         change_integer_range( -1, 100 )
 
-#if X264_BUILD >= 55 /* r607 */ && X264_BUILD < 67 /* r1117 */
+#if X264_BUILD >= 55 /* r607 */
+#  if X264_BUILD < 67 /* r1117 */
     add_bool( SOUT_CFG_PREFIX "pre-scenecut", 0, NULL, PRESCENE_TEXT,
               PRESCENE_LONGTEXT, false )
+#  else
+    add_obsolete_bool( "pre-scenecut" )
+#  endif
 #endif
 
     add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
