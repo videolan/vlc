@@ -152,6 +152,7 @@ static inline int vlc_fprintf (FILE *stream, const char *format, ...)
 }
 # define fprintf vlc_fprintf
 
+#if 0
 static inline int vlc_sprintf (char *str, const char *format, ...)
 {
     va_list ap;
@@ -162,6 +163,7 @@ static inline int vlc_sprintf (char *str, const char *format, ...)
     return ret;
 }
 # define sprintf vlc_sprintf
+#endif
 
 static inline int vlc_snprintf (char *str, size_t size, const char *format, ...)
 {
