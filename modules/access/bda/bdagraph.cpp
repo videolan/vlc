@@ -426,7 +426,8 @@ int BDAGraph::SubmitDVBCTuneRequest()
         IDVBCLocator* p_dvbc_locator;
         IDVBTuningSpace2* p_dvb_tuning_space;
 
-        localComPtr(): p_dvbc_tune_request(NULL), p_dvbc_locator(NULL) {};
+        localComPtr(): p_dvbc_tune_request(NULL), p_dvbc_locator(NULL),
+                       p_dvb_tuning_space(NULL) {};
         ~localComPtr()
         {
             if( p_dvbc_tune_request )
