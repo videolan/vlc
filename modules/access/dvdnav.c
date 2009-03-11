@@ -129,6 +129,9 @@ struct demux_sys_t
 {
     dvdnav_t    *dvdnav;
 
+    /* */
+    bool        b_reset_pcr;
+
     /* track */
     ps_track_t  tk[PS_TK_COUNT];
     int         i_mux_rate;
@@ -220,6 +223,7 @@ static int Open( vlc_object_t *p_this )
     /* Fill p_demux field */
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     p_sys->dvdnav = p_dvdnav;
+    p_sys->b_reset_pcr = false;
 
     ps_track_init( p_sys->tk );
     p_sys->i_aspect = -1;
@@ -618,6 +622,11 @@ static int Demux( demux_t *p_demux )
     {
     case DVDNAV_BLOCK_OK:   /* mpeg block */
         p_sys->p_ev->b_still = false;
+        if( p_sys->b_reset_pcr )
+        {
+            es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            p_sys->b_reset_pcr = false;
+        }
         DemuxBlock( p_demux, packet, i_len );
         break;
 
@@ -628,8 +637,24 @@ static int Demux( demux_t *p_demux )
     case DVDNAV_STILL_FRAME:
     {
         dvdnav_still_event_t *event = (dvdnav_still_event_t*)packet;
+        bool b_still_init = false;
+
         vlc_mutex_lock( &p_sys->p_ev->lock );
         if( !p_sys->p_ev->b_still )
+        {
+            msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
+            msg_Dbg( p_demux, "     - length=0x%x", event->length );
+            p_sys->p_ev->b_still = true;
+            b_still_init = true;
+            if( event->length == 0xff )
+                p_sys->p_ev->i_still_end = 0;
+            else
+                p_sys->p_ev->i_still_end = mdate() +
+                                           event->length * INT64_C(1000000);
+        }
+        vlc_mutex_unlock( &p_sys->p_ev->lock );
+
+        if( b_still_init )
         {
             /* We send a dummy mpeg2 end of sequence to force still frame display */
             static const uint8_t buffer[] = {
@@ -639,20 +664,10 @@ static int Demux( demux_t *p_demux )
             };
             DemuxBlock( p_demux, buffer, sizeof(buffer) );
 
-            msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
-            msg_Dbg( p_demux, "     - length=0x%x", event->length );
-            p_sys->p_ev->b_still = true;
-            if( event->length == 0xff )
-            {
-                p_sys->p_ev->i_still_end = 0;
-            }
-            else
-            {
-                p_sys->p_ev->i_still_end = (int64_t)event->length *
-                    1000000 + mdate();
-            }
+            bool b_empty;
+            es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
+            p_sys->b_reset_pcr = true;
         }
-        vlc_mutex_unlock( &p_sys->p_ev->lock );
         msleep( 40000 );
         break;
     }
@@ -827,15 +842,23 @@ static int Demux( demux_t *p_demux )
 
     case DVDNAV_HOP_CHANNEL:
         msg_Dbg( p_demux, "DVDNAV_HOP_CHANNEL" );
-        /* We should try to flush all our internal buffer */
+        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
         break;
 
     case DVDNAV_WAIT:
         msg_Dbg( p_demux, "DVDNAV_WAIT" );
 
-        /* reset PCR */
-        es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
-        dvdnav_wait_skip( p_sys->dvdnav );
+        bool b_empty;
+        es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
+        if( !b_empty )
+        {
+            msleep( 40*1000 );
+        }
+        else
+        {
+            dvdnav_wait_skip( p_sys->dvdnav );
+            p_sys->b_reset_pcr = true;
+        }
         break;
 
     default:
@@ -1109,7 +1132,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *pkt, int i_pkt )
             int i_mux_rate;
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr );
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, i_scr + 1 );
                 if( i_mux_rate > 0 ) p_sys->i_mux_rate = i_mux_rate;
             }
             block_Release( p_pkt );
@@ -1280,7 +1303,7 @@ static void* EventThread( vlc_object_t *p_this )
     var_AddCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
 
     /* main loop */
-    while( vlc_object_alive (p_ev) )
+    while( vlc_object_alive( p_ev ) )
     {
         bool b_activated = false;
 
