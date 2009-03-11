@@ -512,7 +512,7 @@ VCDLIDs( access_t * p_access )
 
       vcdinfo_visit_lot (p_vcdplayer->vcd, false);
 
-#if FIXED
+#ifdef FIXED
     /*
        We need to change libvcdinfo to be more robust when there are
        problems reading the extended PSD. Given that area-highlighting and
@@ -544,7 +544,7 @@ VCDLIDs( access_t * p_access )
         TAB_APPEND( t->i_seekpoint, t->seekpoint, s );
     }
 
-#if DYNAMICALLY_ALLOCATED
+#ifdef DYNAMICALLY_ALLOCATED
     TAB_APPEND( p_vcdplayer->i_titles, p_vcdplayer->p_title, t );
 #else
     p_vcdplayer->p_title[p_vcdplayer->i_titles] = t;
@@ -958,13 +958,13 @@ VCDOpen ( vlc_object_t *p_this )
     free( p_access->psz_demux );
     p_access->psz_demux = strdup( "ps" );
 
-#if FIXED
+#ifdef FIXED
     if (play_single_item)
       VCDFixupPlayList( p_access, p_vcd, psz_source, &itemid,
                         play_single_item );
 #endif
 
-#if FIXED
+#ifdef FIXED
     p_vcdplayer->p_intf = intf_Create( p_access, "vcdx" );
     p_vcdplayer->p_intf->b_block = false;
 #endif

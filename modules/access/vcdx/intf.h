@@ -38,7 +38,7 @@ struct intf_sys_t
   mtime_t         m_still_time;      /* Time in microseconds remaining
                                          to wait in still frame.
                      */
-#if FINISHED
+#ifdef FINISHED
   vcdplay_ctrl_t      control;
 #else
   int                 control;
