@@ -51,9 +51,6 @@ enum es_out_query_private_e
     /* Get buffering state */
     ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
 
-    /* Check if es_out has still data to play */
-    ES_OUT_GET_EMPTY,                               /* arg1=bool*               res=cannot fail */
-
     /* Set delay for a ES category */
     ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=can fail */
 

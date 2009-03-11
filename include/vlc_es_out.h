@@ -83,6 +83,13 @@ enum es_out_query_e
     /* Set scrambled state for one es */
     ES_OUT_SET_ES_SCRAMBLED_STATE,  /* arg1=int i_group arg2=es_out_id_t* */
 
+    /* Stop any buffering being done, and ask if es_out has no more data to
+     * play.
+     * It will not block and so MUST be used carrefully. The only good reason
+     * is for interactive playback (like for DVD menu).
+     * XXX You SHALL call ES_OUT_RESET_PCR before any other es_out_Control/Send calls. */
+    ES_OUT_GET_EMPTY,       /* arg1=bool*   res=cannot fail */
+
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
 };
