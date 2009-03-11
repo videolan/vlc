@@ -204,7 +204,7 @@ void CAtmoZoneDefinition::UpdateWeighting(int *destWeight,
 
   int index = 0;
   for(int row=0; row < CAP_HEIGHT; row++) {
-      for(int col=0; col < CAP_HEIGHT; col++) {
+      for(int col=0; col < CAP_WIDTH; col++) {
           if ((WidescreenMode == 1) && ((row <= CAP_HEIGHT/8) || (row >= (7*CAP_HEIGHT)/8)))
           {
              destWeight[index] = 0;
