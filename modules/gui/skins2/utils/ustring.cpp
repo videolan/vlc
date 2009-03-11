@@ -249,19 +249,6 @@ const UString UString::operator +( const char *pString ) const
 }
 
 
-void UString::debug() const
-{
-    char *s = new char[size() + 1];
-    for( uint32_t i = 0; i < size(); i++ )
-    {
-        s[i] = (char)m_pString[i];
-    }
-    s[size()] = '\0';
-    msg_Err( getIntf(), "%s", s );
-    delete[] s;
-}
-
-
 uint32_t UString::find( const UString &str, uint32_t position ) const
 {
     uint32_t pos;

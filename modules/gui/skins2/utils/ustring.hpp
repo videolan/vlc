@@ -85,9 +85,6 @@ class UString: public SkinObject
         /// Build a string from an integer
         static UString fromInt(intf_thread_t *pIntf, int number);
 
-        /// XXX: temporary
-        void debug() const;
-
     private:
         /// Unicode string
         uint32_t *m_pString;
