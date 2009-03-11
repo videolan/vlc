@@ -199,8 +199,11 @@ bool UString::operator >=( const UString &rOther ) const
 }
 
 
-void UString::operator =( const UString &rOther )
+UString& UString::operator =( const UString &rOther )
 {
+    if( this == &rOther )
+        return *this;
+
     m_length = rOther.m_length;
     delete[] m_pString;
     m_pString = new uint32_t[size() + 1];
@@ -208,15 +211,20 @@ void UString::operator =( const UString &rOther )
     {
         m_pString[i] = rOther.m_pString[i];
     }
+
+    return *this;
 }
 
 
-void UString::operator +=( const UString &rOther )
+UString& UString::operator +=( const UString &rOther )
 {
+    if( this == &rOther )
+        return *this;
+
     int tempLength = this->length() + rOther.length();
     uint32_t *pTempString = new uint32_t[tempLength + 1];
     // Copy the first string
-    memcpy( pTempString, this->m_pString, 4 * this->size() );
+    memcpy( pTempString, this->m_pString, sizeof(uint32_t) * this->size() );
     // Append the second string
 //     memcpy( pTempString + 4 * size(), rOther.m_pString,
 //             4 * rOther.size() );
@@ -230,6 +238,8 @@ void UString::operator +=( const UString &rOther )
     delete[] m_pString;
     m_pString = pTempString;
     m_length = tempLength;
+
+    return *this;
 }
 
 

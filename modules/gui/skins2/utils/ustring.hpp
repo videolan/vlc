@@ -58,9 +58,9 @@ class UString: public SkinObject
         bool operator >( const UString &rOther ) const;
         bool operator >=( const UString &rOther ) const;
         /// Assignment
-        void operator =( const UString &rOther );
+        UString& operator =( const UString &rOther );
         /// Concatenation with assignment
-        void operator +=( const UString &rOther );
+        UString& operator +=( const UString &rOther );
         /// Concatenation
         const UString operator +( const UString &rOther ) const;
         const UString operator +( const char *pString ) const;
