@@ -36,6 +36,7 @@
 #include <vlc_meta.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>
+#include <vlc_avcodec.h>
 
 /* ffmpeg header */
 #if defined(HAVE_LIBAVFORMAT_AVFORMAT_H)
@@ -205,13 +206,16 @@ int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    vlc_avcodec_lock(); /* avformat calls avcodec behind our back!!! */
     if( av_find_stream_info( p_sys->ic ) < 0 )
     {
+        vlc_avcodec_unlock();
         msg_Err( p_demux, "av_find_stream_info failed" );
         if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
         CloseDemux( p_this );
         return VLC_EGENERIC;
     }
+    vlc_avcodec_unlock();
     if( !b_avfmt_nofile ) p_sys->fmt->flags ^= AVFMT_NOFILE;
 
     for( i = 0; i < p_sys->ic->nb_streams; i++ )
