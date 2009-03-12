@@ -186,7 +186,7 @@ void VLMDialog::selectVLMItem( int i )
         ui.vlmItemScroll->ensureWidgetVisible( vlmItems.at( i ) );
 }
 
-bool VLMDialog::isNameGenuine( QString name )
+bool VLMDialog::isNameGenuine( const QString& name )
 {
     for( int i = 0; i < vlmItems.size(); i++ )
     {
@@ -480,9 +480,9 @@ void VLMDialog::saveModifications()
  * VLMAWidget - Abstract class
  ********************************/
 
-VLMAWidget::VLMAWidget( QString _name,
-                        QString _input,
-                        QString _output,
+VLMAWidget::VLMAWidget( const QString& _name,
+                        const QString& _input,
+                        const QString& _output,
                         bool _enabled,
                         VLMDialog *_parent,
                         int _type )
@@ -538,8 +538,9 @@ void VLMAWidget::toggleEnabled( bool b_enable )
 /****************
  * VLMBroadcast
  ****************/
-VLMBroadcast::VLMBroadcast( QString _name, QString _input, QString _output,
-                            bool _enabled, bool _looped, VLMDialog *_parent)
+VLMBroadcast::VLMBroadcast( const QString& _name, const QString& _input,
+                            const QString& _output, bool _enabled,
+                            bool _looped, VLMDialog *_parent )
                           : VLMAWidget( _name, _input, _output,
                                         _enabled, _parent, QVLM_Broadcast )
 {
@@ -605,10 +606,10 @@ void VLMBroadcast::stop()
 /****************
  * VLMSchedule
  ****************/
-VLMSchedule::VLMSchedule( QString name, QString input, QString output,
-                          QDateTime _schetime, QDateTime _schedate,
-                          int _scherepeatnumber, int _repeatDays,
-                          bool enabled, VLMDialog *parent )
+VLMSchedule::VLMSchedule( const QString& name, const QString& input,
+                          const QString& output, QDateTime _schetime,
+                          QDateTime _schedate, int _scherepeatnumber,
+                          int _repeatDays, bool enabled, VLMDialog *parent )
             : VLMAWidget( name, input, output, enabled, parent, QVLM_Schedule )
 {
     nameLabel->setText( qtr("Schedule: ") + name );
@@ -629,8 +630,8 @@ void VLMSchedule::update()
 /****************
  * VLMVOD
  ****************/
-VLMVod::VLMVod( QString name, QString input, QString output,
-                bool enabled, QString _mux, VLMDialog *parent)
+VLMVod::VLMVod( const QString& name, const QString& input, const QString& output,
+                bool enabled, const QString& _mux, VLMDialog *parent)
        : VLMAWidget( name, input, output, enabled, parent, QVLM_VOD )
 {
     nameLabel->setText( qtr("VOD: ") + name );
@@ -664,8 +665,8 @@ VLMWrapper::~VLMWrapper()
     p_vlm = NULL;
 }
 
-void VLMWrapper::AddBroadcast( const QString name, QString input,
-                               QString output,
+void VLMWrapper::AddBroadcast( const QString& name, const QString& input,
+                               const QString& output,
                                bool b_enabled, bool b_loop  )
 {
     vlm_message_t *message;
@@ -675,8 +676,8 @@ void VLMWrapper::AddBroadcast( const QString name, QString input,
     EditBroadcast( name, input, output, b_enabled, b_loop );
 }
 
-void VLMWrapper::EditBroadcast( const QString name, const QString input,
-                                const QString output,
+void VLMWrapper::EditBroadcast( const QString& name, const QString& input,
+                                const QString& output,
                                 bool b_enabled, bool b_loop  )
 {
     vlm_message_t *message;
@@ -708,7 +709,7 @@ void VLMWrapper::EditBroadcast( const QString name, const QString input,
     }
 }
 
-void VLMWrapper::EnableItem( const QString name, bool b_enable )
+void VLMWrapper::EnableItem( const QString& name, bool b_enable )
 {
     vlm_message_t *message;
     QString command = "setup \"" + name + ( b_enable ? " enable" : " disable" );
@@ -716,7 +717,7 @@ void VLMWrapper::EnableItem( const QString name, bool b_enable )
     vlm_MessageDelete( message );
 }
 
-void VLMWrapper::ControlBroadcast( const QString name, int BroadcastStatus,
+void VLMWrapper::ControlBroadcast( const QString& name, int BroadcastStatus,
                                    unsigned int seek )
 {
     vlm_message_t *message;
@@ -741,9 +742,9 @@ void VLMWrapper::ControlBroadcast( const QString name, int BroadcastStatus,
     vlm_MessageDelete( message );
 }
 
-void VLMWrapper::AddVod( const QString name, const QString input,
-                         const QString output,
-                         bool b_enabled, const QString mux )
+void VLMWrapper::AddVod( const QString& name, const QString& input,
+                         const QString& output,
+                         bool b_enabled, const QString& mux )
 {
     vlm_message_t *message;
     QString command = "new \"" + name + "\" vod";
@@ -752,10 +753,10 @@ void VLMWrapper::AddVod( const QString name, const QString input,
     EditVod(  name, input, output, b_enabled, mux );
 }
 
-void VLMWrapper::EditVod( const QString name, const QString input,
-                          const QString output,
+void VLMWrapper::EditVod( const QString& name, const QString& input,
+                          const QString& output,
                           bool b_enabled,
-                          const QString mux )
+                          const QString& mux )
 {
     vlm_message_t *message;
     QString command = "setup \"" + name + "\" input \"" + input + "\"";
@@ -783,11 +784,11 @@ void VLMWrapper::EditVod( const QString name, const QString input,
     }
 }
 
-void VLMWrapper::AddSchedule( const QString name, const QString input,
-                              const QString output, QDateTime _schetime,
+void VLMWrapper::AddSchedule( const QString& name, const QString& input,
+                              const QString& output, QDateTime _schetime,
                               QDateTime _schedate,
                               int _scherepeatnumber, int _repeatDays,
-                              bool b_enabled, const QString mux )
+                              bool b_enabled, const QString& mux )
 {
     vlm_message_t *message;
     QString command = "new \"" + name + "\" schedule";
@@ -797,11 +798,11 @@ void VLMWrapper::AddSchedule( const QString name, const QString input,
             _scherepeatnumber, _repeatDays, b_enabled, mux );
 }
 
-void VLMWrapper::EditSchedule( const QString name, const QString input,
-                          const QString output, QDateTime _schetime,
-                          QDateTime _schedate, int _scherepeatnumber,
-                          int _repeatDays, bool b_enabled,
-                          const QString mux )
+void VLMWrapper::EditSchedule( const QString& name, const QString& input,
+                               const QString& output, QDateTime _schetime,
+                               QDateTime _schedate, int _scherepeatnumber,
+                               int _repeatDays, bool b_enabled,
+                               const QString& mux )
 {
     vlm_message_t *message;
     QString command = "setup \"" + name + "\" input \"" + input + "\"";
