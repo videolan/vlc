@@ -511,7 +511,11 @@ static void *Run( vlc_object_t *p_this )
 
 exit:
     /* Tell we're dead */
-    if( p_input->p->b_abort )
+    vlc_mutex_lock( &p_input->p->lock_control );
+    const bool b_abort = p_input->p->b_abort;
+    vlc_mutex_unlock( &p_input->p->lock_control );
+
+    if( b_abort )
         input_SendEventAbort( p_input );
     input_SendEventDead( p_input );
 
