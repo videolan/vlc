@@ -2130,3 +2130,15 @@ static void InitDeviceValues( libvlc_int_t *p_vlc )
     (void)p_vlc;
 #endif /* HAVE_HAL */
 }
+
+#include <vlc_avcodec.h>
+
+void vlc_avcodec_mutex (bool acquire)
+{
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+
+    if (acquire)
+        vlc_mutex_lock (&lock);
+    else
+        vlc_mutex_unlock (&lock);
+}

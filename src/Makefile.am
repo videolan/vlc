@@ -41,6 +41,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_acl.h \
 	../include/vlc_aout.h \
 	../include/vlc_arrays.h \
+	../include/vlc_avcodec.h \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
 	../include/vlc_block_helper.h \
