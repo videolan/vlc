@@ -3048,6 +3048,23 @@ static dvbpsi_descriptor_t *PMTEsFindDescriptor( const dvbpsi_pmt_es_t *p_es,
         p_dr = p_dr->p_next;
     return p_dr;
 }
+static bool PMTEsHasRegistration( demux_t *p_demux,
+                                  const dvbpsi_pmt_es_t *p_es,
+                                  const char *psz_tag )
+{
+    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x05 );
+    if( !p_dr )
+        return false;
+
+    if( p_dr->i_length < 4 )
+    {
+        msg_Warn( p_demux, "invalid Registration Descriptor" );
+        return false;
+    }
+
+    assert( strlen(psz_tag) == 4 );
+    return !memcmp( p_dr->p_data, psz_tag, 4 );
+}
 static void PMTSetupEsISO14496( demux_t *p_demux, ts_pid_t *pid,
                                 const ts_prg_psi_t *prg, const dvbpsi_pmt_es_t *p_es )
 {
@@ -3464,71 +3481,40 @@ static void PMTSetupEs0xEA( demux_t *p_demux, ts_pid_t *pid,
                            const dvbpsi_pmt_es_t *p_es )
 {
     /* Registration Descriptor */
-    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x05 );
-    if( !p_dr )
+    if( !PMTEsHasRegistration( p_demux, p_es, "VC-1" ) )
     {
-        msg_Err( p_demux, "Registration descriptor not found" );
+        msg_Err( p_demux, "Registration descriptor not found or invalid" );
         return;
     }
 
-    if( p_dr->i_length < 4 ) // XXX VC-1 has extended this descriptor with sub-descriptor
-    {
-        msg_Warn( p_demux, "invalid Registration Descriptor" );
-        return;
-    }
+    es_format_t *p_fmt = &pid->es->fmt;
 
-    if( !memcmp( p_dr->p_data, "VC-1", 4 ) )
-    {
-        es_format_t *p_fmt = &pid->es->fmt;
+    /* registration descriptor for VC-1 (SMPTE rp227) */
+    p_fmt->i_cat = VIDEO_ES;
+    p_fmt->i_codec = VLC_FOURCC('W','V','C','1');
 
-        /* registration descriptor for VC-1 (SMPTE rp227) */
-        p_fmt->i_cat = VIDEO_ES;
-        p_fmt->i_codec = VLC_FOURCC('W','V','C','1');
-
-        /* XXX With Simple and Main profile the SEQUENCE
-         * header is modified: video width and height are
-         * inserted just after the start code as 2 int16_t
-         * The packetizer will take care of that. */
-    }
-    else
-    {
-        msg_Warn( p_demux,
-                  "unknown Registration Descriptor (%4.4s)",
-                  p_dr->p_data );
-    }
+    /* XXX With Simple and Main profile the SEQUENCE
+     * header is modified: video width and height are
+     * inserted just after the start code as 2 int16_t
+     * The packetizer will take care of that. */
 }
 
 static void PMTSetupEs0xD1( demux_t *p_demux, ts_pid_t *pid,
                            const dvbpsi_pmt_es_t *p_es )
 {
     /* Registration Descriptor */
-    dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, 0x05 );
-    if( !p_dr )
+    if( !PMTEsHasRegistration( p_demux, p_es, "drac" ) )
     {
-        msg_Err( p_demux, "Registration descriptor not found" );
-        return;
-    }
-    if( p_dr->i_length < 4 )
-    {
-        msg_Warn( p_demux, "invalid Registration Descriptor" );
+        msg_Err( p_demux, "Registration descriptor not found or invalid" );
         return;
     }
 
-    if( !memcmp( p_dr->p_data, "drac", 4 ) )
-    {
-        es_format_t *p_fmt = &pid->es->fmt;
+    es_format_t *p_fmt = &pid->es->fmt;
 
-        /* registration descriptor for Dirac
-         * (backwards compatable with VC-2 (SMPTE Sxxxx:2008)) */
-        p_fmt->i_cat = VIDEO_ES;
-        p_fmt->i_codec = VLC_FOURCC('d','r','a','c');
-    }
-    else
-    {
-        msg_Warn( p_demux,
-                  "unknown Registration Descriptor (%4.4s)",
-                  p_dr->p_data );
-    }
+    /* registration descriptor for Dirac
+     * (backwards compatable with VC-2 (SMPTE Sxxxx:2008)) */
+    p_fmt->i_cat = VIDEO_ES;
+    p_fmt->i_codec = VLC_FOURCC('d','r','a','c');
 }
 
 static void PMTSetupEs0xA0( demux_t *p_demux, ts_pid_t *pid,
