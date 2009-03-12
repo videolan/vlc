@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
+#include <vlc_avcodec.h>
 
 /* ffmpeg header */
 #define HAVE_MMX 1
@@ -201,8 +202,6 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-vlc_mutex_t avcodec_lock = VLC_STATIC_MUTEX;
-
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
@@ -311,9 +310,9 @@ static void CloseDecoder( vlc_object_t *p_this )
 
         if( !p_sys->b_delayed_open )
         {
-            vlc_mutex_lock( &avcodec_lock );
+            vlc_avcodec_lock();
             avcodec_close( p_sys->p_context );
-            vlc_mutex_unlock( &avcodec_lock );
+            vlc_avcodec_unlock();
         }
         msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
         av_free( p_sys->p_context );
@@ -326,7 +325,7 @@ void InitLibavcodec( vlc_object_t *p_object )
 {
     static bool b_ffmpeginit = false;
 
-    vlc_mutex_lock( &avcodec_lock );
+    vlc_avcodec_lock();
 
     /* *** init ffmpeg library (libavcodec) *** */
     if( !b_ffmpeginit )
@@ -344,5 +343,5 @@ void InitLibavcodec( vlc_object_t *p_object )
         msg_Dbg( p_object, "libavcodec already initialized" );
     }
 
-    vlc_mutex_unlock( &avcodec_lock );
+    vlc_avcodec_unlock();
 }

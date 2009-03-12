@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_codec.h>
+#include <vlc_avcodec.h>
 
 /* ffmpeg header */
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
@@ -188,17 +189,17 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
 
     /* ***** Open the codec ***** */
-    vlc_mutex_lock( &avcodec_lock );
-
-    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
+    int ret;
+    vlc_avcodec_lock();
+    ret = avcodec_open( p_sys->p_context, p_sys->p_codec );
+    vlc_avcodec_unlock();
+    if( ret < 0 )
     {
-        vlc_mutex_unlock( &avcodec_lock );
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         free( p_sys->p_context->extradata );
         free( p_sys );
         return VLC_EGENERIC;
     }
-    vlc_mutex_unlock( &avcodec_lock );
 
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 

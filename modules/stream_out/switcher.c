@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_vout.h>
+#include <vlc_avcodec.h>
 
 #include <vlc_block.h>
 
@@ -384,13 +385,16 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->ff_enc_c->channels    = p_fmt->audio.i_channels;
         id->ff_enc_c->bit_rate    = p_fmt->i_bitrate;
 
+        vlc_avcodec_lock();
         if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
         {
+            avcodec_unlock();
             msg_Err( p_stream, "cannot open encoder" );
             av_free( id->ff_enc_c );
             free( id );
             return NULL;
         }
+        avcodec_unlock();
 
         id->p_buffer_out = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE * 2 );
         id->p_samples = calloc( id->ff_enc_c->frame_size * p_fmt->audio.i_channels,
@@ -428,7 +432,9 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return id;
 
 error:
+    vlc_avcodec_lock();
     avcodec_close( id->ff_enc_c );
+    vlc_avcodec_unlock();
     free( id->p_samples );
     free( id->p_buffer_out );
     av_free( id->ff_enc_c );
@@ -458,7 +464,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if ( id->ff_enc )
     {
+        vlc_avcodec_lock();
         avcodec_close( id->ff_enc_c );
+        vlc_avcodec_unlock();
         av_free( id->ff_enc_c );
         av_free( id->p_frame );
         free( id->p_buffer_out );
@@ -708,7 +716,9 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if ( id->ff_enc )
     {
+        vlc_avcodec_lock();
         avcodec_close( id->ff_enc_c );
+        vlc_avcodec_unlock();
         av_free( id->ff_enc_c );
         av_free( id->p_frame );
         free( id->p_buffer_out );
@@ -785,11 +795,14 @@ static mtime_t VideoCommand( sout_stream_t *p_stream, sout_stream_id_t *id )
         id->ff_enc_c->mb_decision = FF_MB_DECISION_SIMPLE;
         id->ff_enc_c->pix_fmt = PIX_FMT_YUV420P;
 
+        avcodec_lock();
         if( avcodec_open( id->ff_enc_c, id->ff_enc ) )
         {
+            avcodec_unlock();
             msg_Err( p_stream, "cannot open encoder" );
             return 0;
         }
+        avcodec_unlock();
 
         id->p_buffer_out = malloc( id->ff_enc_c->width * id->ff_enc_c->height * 3 );
         id->p_frame = avcodec_alloc_frame();

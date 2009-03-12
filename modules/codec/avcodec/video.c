@@ -33,6 +33,7 @@
 #include <vlc_codec.h>
 #include <vlc_vout.h>
 #include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
+#include <vlc_avcodec.h>
 
 /* ffmpeg header */
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
@@ -809,13 +810,12 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.video.i_bits_per_pixel;
 #endif
 
-    vlc_mutex_lock( &avcodec_lock );
-    if( avcodec_open( p_sys->p_context, p_sys->p_codec ) < 0 )
-    {
-        vlc_mutex_unlock( &avcodec_lock );
+    int ret;
+    vlc_avcodec_lock();
+    ret = avcodec_open( p_sys->p_context, p_sys->p_codec );
+    vlc_avcodec_unlock();
+    if( ret < 0 )
         return VLC_EGENERIC;
-    }
-    vlc_mutex_unlock( &avcodec_lock );
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
     p_sys->b_delayed_open = false;

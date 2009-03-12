@@ -58,9 +58,6 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
                   AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
 void EndAudioDec( decoder_t *p_dec );
 
-/* Avcodec global lock */
-extern vlc_mutex_t avcodec_lock;
-
 /*****************************************************************************
  * Module descriptor help strings
  *****************************************************************************/
