@@ -1768,8 +1768,7 @@ end:
         if( [o_mi_videotrack isEnabled] == YES )
             [o_mi_subtitle setEnabled: YES];
 
-        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                    FIND_ANYWHERE );
+        aout_instance_t * p_aout = input_GetAout( p_input );
         if( p_aout != NULL )
         {
             [o_controls setupVarMenuItem: o_mi_channels target: (vlc_object_t *)p_aout
@@ -1783,8 +1782,7 @@ end:
             vlc_object_release( (vlc_object_t *)p_aout );
         }
 
-        vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                                            FIND_ANYWHERE );
+        vout_thread_t * p_vout = input_GetVout( p_input );
 
         if( p_vout != NULL )
         {
@@ -1802,6 +1800,8 @@ end:
             [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
                 var: "deinterlace" selector: @selector(toggleVar:)];
 
+#if 0
+/* FIXME Post processing. */
             p_dec_obj = (vlc_object_t *)vlc_object_find(
                                                  (vlc_object_t *)p_vout,
                                                  VLC_OBJECT_DECODER,
@@ -1814,6 +1814,7 @@ end:
 
                 vlc_object_release(p_dec_obj);
             }
+#endif
             vlc_object_release( (vlc_object_t *)p_vout );
         }
         vlc_object_release( p_input );
