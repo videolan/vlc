@@ -706,6 +706,7 @@ static VLCExtended *_o_sharedInstance = nil;
         }
         else
         {
+            if( p_aout ) vlc_object_release( p_aout );
             return;
         }
     }
@@ -725,6 +726,7 @@ static VLCExtended *_o_sharedInstance = nil;
          else
          {
              free( psz_string );
+             if( p_aout ) vlc_object_release( p_aout );
              return;
          }
     }
