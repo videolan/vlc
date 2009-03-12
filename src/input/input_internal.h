@@ -165,6 +165,7 @@ struct input_thread_private_t
         int         i_type;
         vlc_value_t val;
     } control[INPUT_CONTROL_FIFO_SIZE];
+    bool b_abort;
 };
 
 /***************************************************************************

@@ -209,6 +209,7 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     vlc_mutex_init( &p_input->p->lock_control );
     vlc_cond_init( &p_input->p->wait_control );
     p_input->p->i_control = 0;
+    p_input->p->b_abort = false;
 
     /* Parse input options */
     vlc_mutex_lock( &p_item->lock );
@@ -436,9 +437,11 @@ void input_StopThread( input_thread_t *p_input, bool b_abort )
      * unlock the control loop */
     ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
 
+    vlc_mutex_lock( &p_input->p->lock_control );
+    p_input->p->b_abort |= b_abort;
+    vlc_mutex_unlock( &p_input->p->lock_control );
+
     input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
-    if( b_abort )
-        input_SendEventAbort( p_input );
 }
 
 input_resource_t *input_DetachResource( input_thread_t *p_input )
@@ -508,7 +511,10 @@ static void *Run( vlc_object_t *p_this )
 
 exit:
     /* Tell we're dead */
+    if( p_input->p->b_abort )
+        input_SendEventAbort( p_input );
     input_SendEventDead( p_input );
+
     vlc_restorecancel( canc );
     return NULL;
 }
