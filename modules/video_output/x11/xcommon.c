@@ -1863,6 +1863,20 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
     XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
 
+    /* make sure base window is destroyed before proceeding further */
+    bool b_destroy_notify = false;
+    do
+    {
+        XEvent      xevent;
+        XWindowEvent( p_vout->p_sys->p_display, p_win->base_window,
+                      SubstructureNotifyMask | StructureNotifyMask, &xevent);
+        if( (xevent.type == DestroyNotify)
+                 && (xevent.xmap.window == p_win->base_window) )
+        {
+            b_destroy_notify = true;
+        }
+    } while( !b_destroy_notify );
+
     vout_ReleaseWindow( p_win->owner_window );
 }
 
