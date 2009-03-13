@@ -4,10 +4,11 @@
 
 MOSTLYCLEANFILES = 
 CLEANFILES = $(BUILT_SOURCES)
-EXTRA_DIST = $(DIST_sources) install.js npvlc_rc.rc.in vlc.r
+EXTRA_DIST = $(DIST_sources) install.js npvlc_rc.rc.in vlc.r COPYING
 
 SOURCES_mozilla_common = \
 	vlcshell.cpp \
+	vlcshell.h \
 	vlcplugin.cpp \
 	vlcplugin.h \
 	control/npolibvlc.cpp \
