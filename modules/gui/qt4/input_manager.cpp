@@ -942,7 +942,7 @@ void MainInputManager::customEvent( QEvent *event )
         vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || !vlc_object_alive (p_input) ) )
         {
-            emit inputChanged( p_input );
+            emit inputChanged( NULL );
             var_DelCallback( p_input, "state", PLItemChanged, this );
             vlc_object_release( p_input );
             p_input = NULL;
@@ -963,13 +963,18 @@ void MainInputManager::customEvent( QEvent *event )
     }
     else
     {
+        /* remove previous stored p_input */
+        if( p_input )
+        {
+            vlc_object_release( p_input );
+            p_input = NULL;
+        }
         /* we are working as a dialogs provider */
         playlist_t *p_playlist = pl_Hold( p_intf );
         p_input = playlist_CurrentInput( p_playlist );
         if( p_input )
         {
             emit inputChanged( p_input );
-            vlc_object_release( p_input );
         }
         pl_Release( p_intf );
     }
