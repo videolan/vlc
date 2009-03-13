@@ -394,20 +394,18 @@ QStringList PLModel::selectedURIs()
         PL_LOCK;
         PLItem *item = static_cast<PLItem*>
                     (current_selection[i].internalPointer());
-        if( !item )
-            continue;
-
-        input_item_t *p_item = NULL;
-        if( !p_item )
-            continue;
-
-        char *psz = input_item_GetURI( p_item );
-        if( !psz )
-            continue;
-        else
+        if( item )
         {
-            lst.append( QString( psz ) );
-            free( psz );
+            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+            if( p_item )
+            {
+                char *psz = input_item_GetURI( p_item->p_input );
+                if( psz )
+                {
+                    lst.append( QString( psz ) );
+                    free( psz );
+                }
+            }
         }
         PL_UNLOCK;
     }
