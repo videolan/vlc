@@ -65,6 +65,7 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     CONNECT( profileBox, activated( int ),
              this, updateOptions( int ) );
 
+    updateOptions( 0 );
 }
 
 inline void VLCProfileSelector::fillProfilesCombo()
