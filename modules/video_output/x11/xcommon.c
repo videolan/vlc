@@ -2908,6 +2908,20 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
         return NULL;
     }
 
+    /* For too bug image, the buffer returned is sometimes too low, prevent
+     * VLC to segfault because of it
+     * FIXME is it normal ? Is there a way to detect it
+     * before (XvQueryBestSize did not) ? */
+    if( p_image->width < i_width || p_image->height < i_height )
+    {
+        msg_Err( p_vout, "cannot allocate shared image data with the right size "
+                         "(%dx%d instead of %dx%d)",
+                         p_image->width, p_image->height,
+                         i_width, i_height );
+        IMAGE_FREE( p_image );
+        return NULL;
+    }
+
     /* Allocate shared memory segment - 0776 set the access permission
      * rights (like umask), they are not yet supported by all X servers */
     p_shm->shmid = shmget( IPC_PRIVATE, DATA_SIZE(p_image), IPC_CREAT | 0776 );
