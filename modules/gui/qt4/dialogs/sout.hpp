@@ -83,7 +83,7 @@ public:
             char *psz = config_StringEscape( qtu(value) );
             if( psz )
             {
-                mrl += "=\"" + qfu( psz ) + "\"";
+                mrl += "=" + qfu( psz );
                 free( psz );
             }
         }
