@@ -1,341 +1,326 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SPrefsInterface</class>
- <widget class="QWidget" name="SPrefsInterface" >
-  <property name="geometry" >
+ <widget class="QWidget" name="SPrefsInterface">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>701</width>
+    <width>732</width>
     <height>604</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3" >
-   <item row="0" column="0" >
-    <widget class="QLabel" name="languageLabel" >
-     <property name="text" >
-      <string>_("Language")</string>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
+    <widget class="QLabel" name="languageLabel">
+     <property name="text">
+      <string>_(&quot;Language&quot;)</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" >
-    <widget class="QComboBox" name="language" />
+   <item row="0" column="1">
+    <widget class="QComboBox" name="language"/>
    </item>
-   <item row="1" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
-      <string>_("Interface Type")</string>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="OneInterfaceBox">
+     <property name="title">
+      <string>_(&quot;Instances&quot;)</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout" >
-      <item row="0" column="0" >
-       <widget class="QRadioButton" name="qt4" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="OneInterfaceMode">
+        <property name="text">
+         <string>_(&quot;Allow only one instance&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="assoName">
+        <property name="text">
+         <string>_(&quot;File associations:&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
+        <property name="text">
+         <string>_(&quot;Enqueue files when in one instance mode&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="assoButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>_("Native")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <spacer name="horizontalSpacer" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType" >
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0" >
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="2" colspan="4" >
-       <widget class="QLabel" name="defaultLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape" >
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="text" >
-         <string>_("This is VLC's default interface, with a native look and feel.")</string>
-        </property>
-        <property name="textFormat" >
-         <enum>Qt::RichText</enum>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-        <property name="margin" >
-         <number>10</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" >
-       <widget class="QLabel" name="displayLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>_("Display mode")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3" colspan="3" >
-       <widget class="QComboBox" name="displayModeBox" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="2" >
-       <widget class="QCheckBox" name="embedVideo" >
-        <property name="text" >
-         <string>_("Integrate video in interface")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2" colspan="2" >
-       <widget class="QCheckBox" name="fsController" >
-        <property name="text" >
-         <string>_("Show a controller in fullscreen")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" >
-       <widget class="QRadioButton" name="skins" >
-        <property name="text" >
-         <string>_("Skins")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2" colspan="4" >
-       <widget class="QLabel" name="skinsLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="frameShape" >
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="text" >
-         <string/>
-        </property>
-        <property name="textFormat" >
-         <enum>Qt::RichText</enum>
-        </property>
-        <property name="scaledContents" >
-         <bool>false</bool>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-        </property>
-        <property name="wordWrap" >
-         <bool>true</bool>
-        </property>
-        <property name="margin" >
-         <number>5</number>
-        </property>
-        <property name="openExternalLinks" >
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0" colspan="2" >
-       <widget class="QLabel" name="skinFileLabel" >
-        <property name="text" >
-         <string>_("Skin file")</string>
-        </property>
-        <property name="alignment" >
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="buddy" >
-         <cstring>fileSkin</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2" colspan="3" >
-       <widget class="QLineEdit" name="fileSkin" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="5" >
-       <widget class="QPushButton" name="skinBrowse" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>_("Browse...")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="6" >
-       <widget class="Line" name="line" >
-        <property name="orientation" >
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4" colspan="2" >
-       <widget class="QCheckBox" name="systrayBox" >
-        <property name="text" >
-         <string>_("Systray icon")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4" colspan="2" >
-       <widget class="QCheckBox" name="resizingBox" >
-        <property name="text" >
-         <string>_("Resize interface to video size")</string>
+        <property name="text">
+         <string>_(&quot;Association Setup&quot;)</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2" >
-    <widget class="QGroupBox" name="OneInterfaceBox" >
-     <property name="title" >
-      <string>_("Instances")</string>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>_(&quot;Privacy / Network Interaction&quot;)</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" >
-      <item row="0" column="0" >
-       <widget class="QCheckBox" name="OneInterfaceMode" >
-        <property name="text" >
-         <string>_("Allow only one instance")</string>
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="artFetchLabel">
+        <property name="text">
+         <string>_(&quot;Album art download policy&quot;)</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="assoName" >
-        <property name="text" >
-         <string>_("File associations:")</string>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="updatesBox">
+        <property name="text">
+         <string>_(&quot;Activate update notifier&quot;)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="QCheckBox" name="EnqueueOneInterfaceMode" >
-        <property name="text" >
-         <string>_("Enqueue files when in one instance mode")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" >
-       <widget class="QPushButton" name="assoButton" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text" >
-         <string>_("Association Setup")</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2" >
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
-      <string>_("Privacy / Network Interaction")</string>
-     </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="artFetchLabel" >
-        <property name="text" >
-         <string>_("Album art download policy")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" >
-       <widget class="QCheckBox" name="updatesBox" >
-        <property name="text" >
-         <string>_("Activate update notifier")</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" >
-       <widget class="QSpinBox" name="updatesDays" >
-        <property name="alignment" >
+      <item row="1" column="2">
+       <widget class="QSpinBox" name="updatesDays">
+        <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
-        <property name="suffix" >
+        <property name="suffix">
          <string> days</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" >
-       <widget class="QCheckBox" name="saveRecentlyPlayed" >
-        <property name="text" >
-         <string>_("Save recently played items")</string>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="saveRecentlyPlayed">
+        <property name="text">
+         <string>_(&quot;Save recently played items&quot;)</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2" >
-       <widget class="QComboBox" name="artFetcher" />
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="artFetcher"/>
       </item>
-      <item row="2" column="1" colspan="2" >
-       <layout class="QHBoxLayout" name="horizontalLayout" >
+      <item row="2" column="1" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLabel" name="filterLabel" >
-          <property name="text" >
-           <string>_("Filter")</string>
+         <widget class="QLabel" name="filterLabel">
+          <property name="text">
+           <string>_(&quot;Filter&quot;)</string>
           </property>
-          <property name="alignment" >
+          <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="margin">
+           <number>5</number>
+          </property>
+          <property name="indent">
+           <number>10</number>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="recentlyPlayedFilters" >
-          <property name="sizePolicy" >
-           <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
+         <widget class="QLineEdit" name="recentlyPlayedFilters">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="toolTip" >
-           <string>_("Separate words by | (without space)")</string>
+          <property name="toolTip">
+           <string>_(&quot;Separate words by | (without space)&quot;)</string>
           </property>
          </widget>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>_(&quot;Interface Type&quot;)</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" colspan="2">
+       <widget class="QRadioButton" name="qt4">
+        <property name="text">
+         <string>_(&quot;Native&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="4">
+       <widget class="QLabel" name="defaultLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>_(&quot;This is VLC's default interface, with a native look and feel.&quot;)</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="displayLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>_(&quot;Display mode&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" colspan="3">
+       <widget class="QComboBox" name="displayModeBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="2">
+       <widget class="QCheckBox" name="embedVideo">
+        <property name="text">
+         <string>_(&quot;Integrate video in interface&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="2">
+       <widget class="QCheckBox" name="fsController">
+        <property name="text">
+         <string>_(&quot;Show a controller in fullscreen&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QRadioButton" name="skins">
+        <property name="text">
+         <string>_(&quot;Skins&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2" colspan="4">
+       <widget class="QLabel" name="skinsLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::RichText</enum>
+        </property>
+        <property name="scaledContents">
+         <bool>false</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="margin">
+         <number>5</number>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0" colspan="2">
+       <widget class="QLabel" name="skinFileLabel">
+        <property name="text">
+         <string>_(&quot;Skin file&quot;)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>fileSkin</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2" colspan="3">
+       <widget class="QLineEdit" name="fileSkin">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="5">
+       <widget class="QPushButton" name="skinBrowse">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>_(&quot;Browse...&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="6">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4" colspan="2">
+       <widget class="QCheckBox" name="systrayBox">
+        <property name="text">
+         <string>_(&quot;Systray icon&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4" colspan="2">
+       <widget class="QCheckBox" name="resizingBox">
+        <property name="text">
+         <string>_(&quot;Resize interface to video size&quot;)</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
