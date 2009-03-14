@@ -164,26 +164,32 @@ void VLCProfileSelector::updateOptions( int i )
     mux = options[0];
 
     SoutMrl smrl;
-    if( options[1].toInt() || options[2].toInt() )
+    if( options[1].toInt() || options[2].toInt() || options[3].toInt() )
     {
         smrl.begin( "transcode" );
 
         if( options[1].toInt() )
         {
             smrl.option( "vcodec", options[4] );
-            smrl.option( "vb", options[5].toInt() );
-            smrl.option( "scale", options[6] );
-            smrl.option( "fps", options[7] );
-            smrl.option( "width", options[8].toInt() );
-            smrl.option( "height", options[9].toInt() );
+            if( options[4] != "none" )
+            {
+                smrl.option( "vb", options[5].toInt() );
+                smrl.option( "scale", options[6] );
+                smrl.option( "fps", options[7] );
+                smrl.option( "width", options[8].toInt() );
+                smrl.option( "height", options[9].toInt() );
+            }
         }
 
         if( options[2].toInt() )
         {
             smrl.option( "acodec", options[10] );
-            smrl.option( "ab", options[11].toInt() );
-            smrl.option( "channels", options[12].toInt() );
-            smrl.option( "samplerate", options[13].toInt() );
+            if( options[10] != "none" )
+            {
+                smrl.option( "ab", options[11].toInt() );
+                smrl.option( "channels", options[12].toInt() );
+                smrl.option( "samplerate", options[13].toInt() );
+            }
         }
 
         if( options[3].toInt() )
@@ -293,8 +299,10 @@ void VLCProfileEditor::fillProfile( QString qs )
     if( options.size() < 16 )
         return;
 
-    ui.transcodeVideo->setChecked( options[1].toInt() );
-    ui.transcodeAudio->setChecked( options[2].toInt() );
+    ui.keepVideo->setChecked( !options[1].toInt() );
+    ui.transcodeVideo->setChecked( ( options[4] != "none" ) );
+    ui.keepAudio->setChecked( !options[2].toInt() );
+    ui.transcodeAudio->setChecked( ( options[10] != "none" ) );
     ui.transcodeSubs->setChecked( options[3].toInt() );
 
     ui.vCodecBox->setCurrentIndex( ui.vCodecBox->findData( options[4] ) );
@@ -327,6 +335,7 @@ void VLCProfileEditor::setVTranscodeOptions( bool b_trans )
     ui.widthLabel->setEnabled( b_trans );
     ui.vFrameBox->setEnabled( b_trans );
     ui.vFrameLabel->setEnabled( b_trans );
+    ui.keepVideo->setEnabled( b_trans );
 }
 
 void VLCProfileEditor::setATranscodeOptions( bool b_trans )
@@ -339,6 +348,7 @@ void VLCProfileEditor::setATranscodeOptions( bool b_trans )
     ui.aChannelsSpin->setEnabled( b_trans );
     ui.aSampleLabel->setEnabled( b_trans );
     ui.aSampleBox->setEnabled( b_trans );
+    ui.keepAudio->setEnabled( b_trans );
 }
 
 void VLCProfileEditor::setSTranscodeOptions( bool b_trans )
@@ -378,22 +388,28 @@ QString VLCProfileEditor::transcodeValue()
     SMUX( MJPEGMux, "mjpg" );
 
 #define currentData( box ) box->itemData( box->currentIndex() )
+    QString qs_acodec, qs_vcodec;
+
+    qs_vcodec = ( ui.transcodeVideo->isChecked() ) ? currentData( ui.vCodecBox ).toString()
+                                                   : "none";
+    qs_acodec = ( ui.transcodeAudio->isChecked() ) ? currentData( ui.aCodecBox ).toString()
+                                                   : "none";
     QStringList transcodeMRL;
     transcodeMRL
             << muxValue
 
-            << QString::number( ui.transcodeVideo->isChecked() )
-            << QString::number( ui.transcodeAudio->isChecked() )
+            << QString::number( !ui.keepVideo->isChecked() )
+            << QString::number( !ui.keepAudio->isChecked() )
             << QString::number( ui.transcodeSubs->isChecked() )
 
-            << currentData( ui.vCodecBox ).toString()
+            << qs_vcodec
             << QString::number( ui.vBitrateSpin->value() )
             << ui.vScaleBox->currentText()
             << QString::number( ui.vFrameBox->value() )
             << ui.widthBox->text()
             << ui.heightBox->text()
 
-            << currentData( ui.aCodecBox ).toString()
+            << qs_acodec
             << QString::number( ui.aBitrateSpin->value() )
             << QString::number( ui.aChannelsSpin->value() )
             << ui.aSampleBox->currentText()
