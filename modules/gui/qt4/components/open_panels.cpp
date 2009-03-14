@@ -1057,8 +1057,8 @@ void CaptureOpenPanel::updateMRL()
         break;
     case DSHOW_DEVICE:
         fileList << "dshow://";
-        mrl+= " :dshow-vdev=" + QString("\"%1\"").arg( vdevDshowW->getValue() );
-        mrl+= " :dshow-adev=" + QString("\"%1\"").arg( adevDshowW->getValue() );
+        mrl+= " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
+        mrl+= " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
         if( dshowVSizeLine->isModified() )
             mrl += " :dshow-size=" + dshowVSizeLine->text();
         break;
@@ -1252,7 +1252,7 @@ void CaptureOpenPanel::advancedDialog()
                 case CONFIG_ITEM_FILE:
                 case CONFIG_ITEM_DIRECTORY:
                 case CONFIG_ITEM_MODULE:
-                    tempMRL += QString("=\"%1\"").arg( qobject_cast<VStringConfigControl *>(control)->getValue() );
+                    tempMRL += QString("=%1").arg( qobject_cast<VStringConfigControl *>(control)->getValue() );
                     break;
                 case CONFIG_ITEM_INTEGER:
                     tempMRL += QString("=%1").arg( qobject_cast<VIntConfigControl *>(control)->getValue() );

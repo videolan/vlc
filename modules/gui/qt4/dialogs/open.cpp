@@ -36,6 +36,8 @@
 #include <QRegExp>
 #include <QMenu>
 
+#define DEBUG_QT 1
+
 OpenDialog *OpenDialog::instance = NULL;
 
 OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
@@ -359,7 +361,9 @@ void OpenDialog::finish( bool b_enqueue = false )
                 if( !qs.isEmpty() )
                 {
                     input_item_AddOption( p_input, qtu( qs ), VLC_INPUT_OPTION_TRUSTED );
-                    //  msg_Err( p_intf, "Here %s", qtu( qs ));
+#ifdef DEBUG_QT
+                    msg_Warn( p_intf, "Input option: %s", qtu( qs ) );
+#endif
                 }
             }
         }
