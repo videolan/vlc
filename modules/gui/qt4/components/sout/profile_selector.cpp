@@ -306,7 +306,7 @@ void VLCProfileEditor::fillProfile( QString qs )
     ui.aCodecBox->setCurrentIndex( ui.aCodecBox->findData( options[10] ) );
     ui.aBitrateSpin->setValue( options[11].toInt() );
     ui.aChannelsSpin->setValue( options[12].toInt() );
-    ui.aSampleBox->setCurrentIndex( ui.aSampleBox->findData( options[13] ) );
+    ui.aSampleBox->setCurrentIndex( ui.aSampleBox->findText( options[13] ) );
 
     ui.subsCodecBox->setCurrentIndex( ui.subsCodecBox->findData( options[14] ) );
     ui.subsOverlay->setChecked( options[15].toInt() );
@@ -387,7 +387,7 @@ QString VLCProfileEditor::transcodeValue()
 
             << currentData( ui.vCodecBox ).toString()
             << QString::number( ui.vBitrateSpin->value() )
-            << ui.vScaleBox->currentText() 
+            << ui.vScaleBox->currentText()
             << QString::number( ui.vFrameBox->value() )
             << QString::number( ui.widthBox->value() )
             << QString::number( ui.heightBox->value() )
