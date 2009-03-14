@@ -175,7 +175,6 @@ void X11Loop::handleX11Event()
 
     if( !pWin )
     {
-        msg_Warn( getIntf(), "no associated generic window" );
         return;
     }
 

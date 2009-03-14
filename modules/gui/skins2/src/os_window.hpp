@@ -56,6 +56,12 @@ class OSWindow: public SkinObject
         /// Toggle the window on top
         virtual void toggleOnTop( bool onTop ) const = 0;
 
+        /// getter for handler
+        virtual void* getOSHandle( ) const = 0;
+
+        /// reparent the window
+        virtual void reparent( void* OSHandle, int x, int y, int w, int h ) = 0;
+
     protected:
         OSWindow( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
 };

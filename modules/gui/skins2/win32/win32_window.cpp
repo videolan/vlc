@@ -54,18 +54,19 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     if( pParentWindow )
     {
         // Child window (for vout)
-        HWND hParent = pParentWindow->getHandle();
+        m_hWnd_parent = pParentWindow->getHandle();
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
             "default name", WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT,
-            CW_USEDEFAULT, CW_USEDEFAULT, hParent, 0, hInst, NULL );
+            CW_USEDEFAULT, CW_USEDEFAULT, m_hWnd_parent, 0, hInst, NULL );
     }
     else
     {
         // Normal window
+        m_hWnd_parent = hParentWindow;
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
             CW_USEDEFAULT, CW_USEDEFAULT,
-            CW_USEDEFAULT, CW_USEDEFAULT, hParentWindow, 0, hInst, NULL );
+            CW_USEDEFAULT, CW_USEDEFAULT, m_hWnd_parent, 0, hInst, NULL );
     }
 
     if( !m_hWnd )
@@ -86,22 +87,11 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         // Register the window as a drop target
         RegisterDragDrop( m_hWnd, m_pDropTarget );
     }
-
-    // Set this window as a vout
-    if( m_pParent )
-    {
-        VlcProc::instance( getIntf() )->registerVoutWindow( (void*)m_hWnd );
-    }
 }
 
 
 Win32Window::~Win32Window()
 {
-    if( m_pParent )
-    {
-        VlcProc::instance( getIntf() )->unregisterVoutWindow( (void*)m_hWnd );
-    }
-
     Win32Factory *pFactory = (Win32Factory*)Win32Factory::instance( getIntf() );
     pFactory->m_windowMap[m_hWnd] = NULL;
 
@@ -116,6 +106,14 @@ Win32Window::~Win32Window()
 
         DestroyWindow( m_hWnd );
     }
+}
+
+
+void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
+{
+    // Reparent the window
+    SetParent( m_hWnd, (HWND)OSHandle );
+    MoveWindow( m_hWnd, x, y, w, h, true );
 }
 
 

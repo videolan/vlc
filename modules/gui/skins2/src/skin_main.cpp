@@ -42,6 +42,8 @@
 #include "theme_loader.hpp"
 #include "theme.hpp"
 #include "theme_repository.hpp"
+#include "vout_window.hpp"
+#include "vout_manager.hpp"
 #include "../parser/interpreter.hpp"
 #include "../commands/async_queue.hpp"
 #include "../commands/cmd_quit.hpp"
@@ -115,6 +117,7 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_osFactory = NULL;
     p_intf->p_sys->p_osLoop = NULL;
     p_intf->p_sys->p_varManager = NULL;
+    p_intf->p_sys->p_voutManager = NULL;
     p_intf->p_sys->p_vlcProc = NULL;
     p_intf->p_sys->p_repository = NULL;
 
@@ -168,6 +171,12 @@ static int Open( vlc_object_t *p_this )
 #if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
+        return VLC_EGENERIC;
+    }
+    if( VoutManager::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instanciate VoutManager" );
+        vlc_object_release( p_intf->p_sys->p_playlist );
         return VLC_EGENERIC;
     }
     vlc_mutex_lock( &skin_load.mutex );
@@ -237,13 +246,23 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
+    msg_Dbg( p_intf, "closing skins2 module" );
+
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = NULL;
     vlc_mutex_unlock( &skin_load.mutex);
 
+    if( p_intf->p_sys->p_theme )
+    {
+        delete p_intf->p_sys->p_theme;
+        p_intf->p_sys->p_theme = NULL;
+        msg_Dbg( p_intf, "current theme deleted" );
+    }
+
     // Destroy "singleton" objects
     OSFactory::instance( p_intf )->destroyOSLoop();
     ThemeRepository::destroy( p_intf );
+    VoutManager::destroy( p_intf );
     //Dialogs::destroy( p_intf );
     Interpreter::destroy( p_intf );
     AsyncQueue::destroy( p_intf );
@@ -283,8 +302,6 @@ static void Run( intf_thread_t *p_intf )
     if( p_intf->p_sys->p_theme )
     {
         p_intf->p_sys->p_theme->saveConfig();
-        delete p_intf->p_sys->p_theme;
-        p_intf->p_sys->p_theme = NULL;
     }
 
     // cannot be called in "Close", because it refcounts skins2
@@ -304,15 +321,14 @@ static int WindowOpen( vlc_object_t *p_this )
     if( pIntf == NULL )
         return VLC_EGENERIC;
 
-    /* FIXME: most probably not thread-safe,
-     * albeit no worse than ever before */
-    pWnd->handle.hwnd = VlcProc::getWindow( pIntf, pWnd->vout,
-                                       &pWnd->pos_x, &pWnd->pos_y,
-                                       &pWnd->width, &pWnd->height );
+    vlc_object_release( pIntf );
+
+    pWnd->handle.hwnd = VoutManager::getWindow( pIntf, pWnd );
+
     if( pWnd->handle.hwnd )
     {
         pWnd->p_private = pIntf;
-        pWnd->control = &VlcProc::controlWindow;
+        pWnd->control = &VoutManager::controlWindow;
         return VLC_SUCCESS;
     }
     else
@@ -326,7 +342,7 @@ static void WindowClose( vlc_object_t *p_this )
     vout_window_t *pWnd = (vout_window_t *)p_this;
     intf_thread_t *pIntf = (intf_thread_t *)p_this->p_private;
 
-    VlcProc::releaseWindow( pIntf, pWnd->handle.hwnd );
+    VoutManager::releaseWindow( pIntf, pWnd );
 }
 
 //---------------------------------------------------------------------------

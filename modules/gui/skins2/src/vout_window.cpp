@@ -22,38 +22,49 @@
  *****************************************************************************/
 
 #include "vout_window.hpp"
+#include "vout_manager.hpp"
 #include "vlcproc.hpp"
+#include "theme.hpp"
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
 #include "os_window.hpp"
 
+int VoutWindow::count = 0;
 
-VoutWindow::VoutWindow( intf_thread_t *pIntf, int left, int top,
-                        bool dragDrop, bool playOnDrop,
-                        GenericWindow &rParent ):
-    GenericWindow( pIntf, left, top, dragDrop, playOnDrop,
-                   &rParent ), m_pImage( NULL )
+VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_thread_t* pVout,
+                        int width, int height, GenericWindow* pParent ) :
+      GenericWindow( pIntf, 0, 0, false, false, pParent ),
+      m_pVout( pVout ), original_width( width ), original_height( height ),
+      m_pParentWindow( pParent ), m_pImage( NULL )
 {
+    // counter for debug
+    count++;
+
+    if( m_pVout )
+        vlc_object_hold( m_pVout );
+
+    // needed on MS-Windows to prevent vlc hanging
+    show();
 }
 
 
 VoutWindow::~VoutWindow()
 {
     delete m_pImage;
+    if( m_pVout )
+        vlc_object_release( m_pVout );
 
-    // Get the VlcProc
-    VlcProc *pVlcProc = getIntf()->p_sys->p_vlcProc;
-
-    // Reparent the video output
-    if( pVlcProc && pVlcProc->isVoutUsed() )
-    {
-        pVlcProc->dropVout();
-    }
+    count--;
+    msg_Dbg( getIntf(), "VoutWindow count = %d", count );
 }
 
 
 void VoutWindow::resize( int width, int height )
 {
+    // don't try to resize with zero value
+    if( !width || !height )
+        return;
+
     // Get the OSFactory
     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
 
@@ -72,15 +83,35 @@ void VoutWindow::refresh( int left, int top, int width, int height )
 {
     if( m_pImage )
     {
-        // Get the VlcProc
-        VlcProc *pVlcProc = getIntf()->p_sys->p_vlcProc;
-
-        // Refresh only when there is no video!
-        if( pVlcProc && !pVlcProc->isVoutUsed() )
+        if( !m_pCtrlVideo )
         {
             m_pImage->copyToWindow( *getOSWindow(), left, top,
                                     width, height, left, top );
         }
     }
+}
+
+void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
+{
+    if( pCtrlVideo )
+    {
+        const Position *pPos = pCtrlVideo->getPosition();
+        int x = pPos->getLeft();
+        int y = pPos->getTop();
+        int w = pPos->getWidth();
+        int h = pPos->getHeight();
+
+        setParent( pCtrlVideo->getWindow(), x, y, w, h );
+        m_pParentWindow = pCtrlVideo->getWindow();
+    }
+    else
+    {
+        setParent( VoutManager::instance( getIntf() )->getVoutMainWindow(),
+                   0, 0, 0, 0 );
+        m_pParentWindow =
+                  VoutManager::instance( getIntf() )->getVoutMainWindow();
+    }
+
+    m_pCtrlVideo = pCtrlVideo;
 }
 

@@ -44,6 +44,7 @@ class OSFactory;
 class OSLoop;
 class VarManager;
 class VlcProc;
+class VoutManager;
 class Theme;
 class ThemeRepository;
 
@@ -132,6 +133,8 @@ struct intf_sys_t
     VarManager *p_varManager;
     /// VLC state handler
     VlcProc *p_vlcProc;
+    /// Vout manager
+    VoutManager *p_voutManager;
     /// Theme repository
     ThemeRepository *p_repository;
 

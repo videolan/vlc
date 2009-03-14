@@ -26,9 +26,12 @@
 #define CMD_RESIZE_HPP
 
 #include "cmd_generic.hpp"
+#include <vlc_vout.h>
 
 class WindowManager;
 class GenericLayout;
+class CtrlVideo;
+class VoutWindow;
 
 
 /// Command to resize a layout
@@ -73,5 +76,23 @@ class CmdResizeVout: public CmdGeneric
         int m_width, m_height;
 };
 
+
+/// Command to resize the inner vout window
+class CmdResizeInnerVout: public CmdGeneric
+{
+    public:
+        /// Resize the given layout
+        CmdResizeInnerVout( intf_thread_t *pIntf, CtrlVideo* pCtrlVideo );
+        virtual ~CmdResizeInnerVout() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "resize inner vout"; }
+
+    private:
+        CtrlVideo* m_pCtrlVideo;
+};
 
 #endif

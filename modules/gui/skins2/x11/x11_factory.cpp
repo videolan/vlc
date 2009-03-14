@@ -55,6 +55,10 @@ X11Factory::~X11Factory()
 
 bool X11Factory::init()
 {
+    // make sure xlib is safe-thread
+    if( !XInitThreads() )
+        msg_Err( getIntf(), "initializing xlib for multi-threading failed" );
+
     // Create the X11 display
     m_pDisplay = new X11Display( getIntf() );
 

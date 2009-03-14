@@ -27,34 +27,64 @@
 #include "generic_window.hpp"
 
 class OSGraphics;
+class CtrlVideo;
 
 
 /// Class to handle a video output window
 class VoutWindow: private GenericWindow
 {
     public:
-        VoutWindow( intf_thread_t *pIntf, int xPos, int yPos,
-                    bool dragDrop, bool playOnDrop, GenericWindow &rParent );
+
+        VoutWindow( intf_thread_t *pIntf, vout_thread_t* pVout,
+                    int width, int height, GenericWindow* pParent = NULL );
         virtual ~VoutWindow();
+
+        // counter used for debugging purpose
+        static int count;
 
         /// Make some functions public
         //@{
         using GenericWindow::show;
         using GenericWindow::hide;
         using GenericWindow::move;
+        using GenericWindow::getOSHandle;
         //@}
 
         /// Resize the window
         virtual void resize( int width, int height );
 
+        /// get the parent  window
+        virtual GenericWindow* getWindow( ) { return m_pParentWindow; }
+
         /// Refresh an area of the window
         virtual void refresh( int left, int top, int width, int height );
+
+        /// set Video Control for VoutWindow
+        virtual void setCtrlVideo( CtrlVideo* pCtrlVideo );
+
+        /// get original size of vout
+        virtual int getOriginalWidth( ) { return original_width; }
+        virtual int getOriginalHeight( ) { return original_height; }
 
         virtual string getType() const { return "Vout"; }
 
     private:
+
         /// Image when there is no video
         OSGraphics *m_pImage;
+
+        /// vout thread
+        vout_thread_t* m_pVout;
+
+        /// original width and height
+        int original_width;
+        int original_height;
+
+        /// VideoControl attached to it
+        CtrlVideo* m_pCtrlVideo;
+
+        /// Parent Window
+        GenericWindow* m_pParentWindow;
 };
 
 typedef CountedPtr<VoutWindow> VoutWindowPtr;

@@ -98,6 +98,10 @@ void GenericWindow::move( int left, int top )
 
 void GenericWindow::resize( int width, int height )
 {
+    // don't try when value is 0 (may crash)
+    if( !width || ! height )
+        return;
+
     // Update the window size
     m_width = width;
     m_height = height;
@@ -157,3 +161,15 @@ void GenericWindow::innerHide()
     }
 }
 
+
+void* GenericWindow::getOSHandle() const
+{
+    return m_pOsWindow->getOSHandle();
+}
+
+
+void GenericWindow::setParent( GenericWindow* pParent, int x, int y, int w, int h )
+{
+    void* handle = pParent ? pParent->getOSHandle() : NULL;
+    m_pOsWindow->reparent( handle, x, y, w, h );
+}

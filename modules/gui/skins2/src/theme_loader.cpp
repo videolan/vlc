@@ -116,9 +116,6 @@ bool ThemeLoader::load( const string &fileName )
     }
     free( skin_last );
 
-    // The new theme cannot embed a video output yet
-    VlcProc::instance( getIntf() )->dropVout();
-
     return true;
 }
 

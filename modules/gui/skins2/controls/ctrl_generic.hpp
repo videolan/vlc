@@ -125,18 +125,21 @@ class CtrlGeneric: public SkinObject, public Observer<VarBool>
         /// Overload this method to get notified of bool variable changes
         virtual void onVarBoolUpdate( VarBool &rVar ) {}
 
-    private:
+        /// Method called when an observed bool variable is changed
+        virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+
         /// Associated layout
         GenericLayout *m_pLayout;
+
+        /// Visibility variable
+        VarBool *m_pVisible;
+
+    private:
         /// Position in the layout
         Position *m_pPosition;
         /// Help text
         UString m_help;
-        /// Visibilty variable
-        VarBool *m_pVisible;
 
-        /// Method called when an observed bool variable is changed
-        virtual void onUpdate( Subject<VarBool> &rVariable , void* );
 };
 
 typedef CountedPtr<CtrlGeneric> CtrlGenericPtr;

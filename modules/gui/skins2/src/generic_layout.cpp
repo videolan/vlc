@@ -31,6 +31,7 @@
 #include "../controls/ctrl_generic.hpp"
 #include "../controls/ctrl_video.hpp"
 #include "../utils/var_bool.hpp"
+#include <set>
 
 
 GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
@@ -38,7 +39,7 @@ GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
                               int maxHeight ):
     SkinObject( pIntf ), m_pWindow( NULL ), m_rect( 0, 0, width, height ),
     m_minWidth( minWidth ), m_maxWidth( maxWidth ),
-    m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoControl( NULL ),
+    m_minHeight( minHeight ), m_maxHeight( maxHeight ), m_pVideoCtrlSet(),
     m_visible( false ), m_pVarActive( NULL )
 {
     // Get the OSFactory
@@ -122,7 +123,7 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
         // Check if it is a video control
         if( pControl->getType() == "video" )
         {
-            m_pVideoControl = (CtrlVideo*)pControl;
+            m_pVideoCtrlSet.insert( (CtrlVideo*)pControl );
         }
     }
     else
@@ -233,38 +234,126 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
             height = m_rect.getHeight() - y;
 
         // Refresh the window... but do not paint on a visible video control!
-        if( !m_pVideoControl || !m_pVideoControl->isVisible() )
+        if( !m_pVideoCtrlSet.size() )
         {
             // No video control, we can safely repaint the rectangle
             pWindow->refresh( x, y, width, height );
         }
         else
         {
-            // Bad luck, there is a video control somewhere (not necessarily
-            // in the repainting zone, btw).
-            // We will divide the repainting into 4 regions (top, left, bottom
-            // and right). The overlapping parts (i.e. the corners) of these
-            // regions will be painted twice, because otherwise the algorithm
-            // becomes a real mess :)
+            // video control(s) present, we need more calculations
+            computeRefresh( x, y, width, height );
+        }
+    }
+}
 
-            // Use short variable names for convenience
-            int xx = m_pVideoControl->getPosition()->getLeft();
-            int yy = m_pVideoControl->getPosition()->getTop();
-            int ww = m_pVideoControl->getPosition()->getWidth();
-            int hh = m_pVideoControl->getPosition()->getHeight();
+class rect
+{
+public:
+  rect( int v_x = 0, int v_y = 0,
+          int v_width = 0, int v_height = 0 )
+     : x( v_x), y( v_y ), width( v_width), height( v_height)
+    {}
+    ~rect(){}
+    int x;
+    int y;
+    int width;
+    int height;
 
-            // Top part:
-            if( y < yy )
-                pWindow->refresh( x, y, width, yy - y );
-            // Left part:
-            if( x < xx )
-                pWindow->refresh( x, y, xx - x, height );
-            // Bottom part
-            if( y + height > yy + hh )
-                pWindow->refresh( x, yy + hh, width, y + height - (yy + hh) );
-            // Right part
-            if( x + width > xx + ww )
-                pWindow->refresh( xx + ww, y, x + width - (xx + ww), height );
+    static bool isIncluded( rect& rect2, rect& rect1 )
+    {
+        int x1 = rect1.x;
+        int y1 = rect1.y;
+        int w1 = rect1.width;
+        int h1 = rect1.height;
+
+        int x2 = rect2.x;
+        int y2 = rect2.y;
+        int w2 = rect2.width;
+        int h2 = rect2.height;
+
+        return  x2 >= x1 && x2 < x1 + w1
+            &&  y2 >= y1 && y2 < y1 + h1
+            &&  w2 <= w1
+            &&  h2 <= h1;
+    }
+};
+
+void GenericLayout::computeRefresh( int x, int y, int width, int height )
+{
+    int w = width;
+    int h = height;
+    TopWindow *pWindow = getWindow();
+
+    set<int> x_set;
+    set<int> y_set;
+    vector<rect> rect_set;
+
+    x_set.insert( x + w );
+    y_set.insert( y + h );
+
+    // retrieve video controls being used
+    // and remember their rectangles
+    set<CtrlVideo*>::const_iterator it;
+    for( it = m_pVideoCtrlSet.begin(); it != m_pVideoCtrlSet.end(); it++ )
+    {
+        if( (*it)->isUsed() )
+        {
+            int xx = (*it)->getPosition()->getLeft();
+            int yy = (*it)->getPosition()->getTop();
+            int ww = (*it)->getPosition()->getWidth();
+            int hh = (*it)->getPosition()->getHeight();
+
+            rect r(xx, yy, ww, hh );
+            rect_set.push_back( r );
+
+            if( xx > x && xx < x + w )
+                x_set.insert( xx );
+            if( xx + ww > x && xx + ww < x + w )
+                x_set.insert( xx + ww );
+            if( yy > y && yy < y + h )
+                y_set.insert( yy );
+            if( yy + hh > y && yy + hh < y + h )
+                y_set.insert( yy + hh );
+        }
+    }
+
+    // for each subregion, test whether they are part
+    // of the video control(s) or not
+    set<int>::const_iterator it_x;
+    set<int>::const_iterator it_y;
+    int x_prev, y_prev;
+
+    for( x_prev = x, it_x = x_set.begin();
+         it_x != x_set.end(); x_prev = *it_x, it_x++ )
+    {
+        int x0 = x_prev;
+        int w0 = *it_x - x_prev;
+
+        for( y_prev = y, it_y = y_set.begin();
+             it_y != y_set.end(); y_prev = *it_y, it_y++ )
+        {
+            int y0 = y_prev;
+            int h0 = *it_y - y_prev;
+
+            rect r( x0, y0, w0, h0 );
+            bool b_refresh = true;
+
+            vector<rect>::iterator it;
+            for( it = rect_set.begin(); it != rect_set.end(); it++ )
+            {
+                rect r_ctrl = *it;
+                if( rect::isIncluded( r, r_ctrl ) )
+                {
+                    b_refresh = false;
+                    break;
+                }
+            }
+
+            // subregion is not part of a video control
+            // needs to be refreshed
+            if( b_refresh )
+                pWindow->refresh( x0, y0, w0 ,h0 );
         }
     }
 }
@@ -287,22 +376,11 @@ void GenericLayout::onShow()
     m_visible = true;
 
     refreshAll();
-    // TODO find a better way to handle the vout ?
-    if( m_pVideoControl )
-    {
-        m_pVideoControl->setVisible( true );
-    }
 }
 
 
 void GenericLayout::onHide()
 {
     m_visible = false;
-
-    // TODO find a better way to handle the vout ?
-    if( m_pVideoControl )
-    {
-        m_pVideoControl->setVisible( false );
-    }
 }
 

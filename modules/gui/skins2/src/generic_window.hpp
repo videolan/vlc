@@ -46,6 +46,8 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
 {
     private:
         friend class WindowManager;
+        friend class VoutManager;
+        friend class CtrlVideo;
     public:
         GenericWindow( intf_thread_t *pIntf, int xPos, int yPos,
                        bool dragDrop, bool playOnDrop,
@@ -80,6 +82,12 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
 
         /// Window type, mainly useful when overloaded (for VoutWindow)
         virtual string getType() const { return "Generic"; }
+
+        /// windows handle
+        void* getOSHandle() const;
+
+        /// reparent
+        void setParent( GenericWindow* pParent, int x, int y, int w, int h );
 
     protected:
         /// Get the OS window

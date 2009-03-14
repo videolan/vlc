@@ -27,6 +27,7 @@
 
 #include <set>
 
+#include <vlc_vout.h>
 #include "../vars/equalizer.hpp"
 #include "../vars/playtree.hpp"
 #include "../vars/time.hpp"
@@ -34,6 +35,7 @@
 #include "../utils/position.hpp"
 #include "../utils/var_text.hpp"
 #include "../commands/cmd_generic.hpp"
+#include "../controls/ctrl_video.hpp"
 
 class OSTimer;
 class VarBool;
@@ -80,18 +82,8 @@ class VlcProc: public SkinObject
         /// Getter for the vout size variable
         VarBox &getVoutSizeVar() { return m_varVoutSize; }
 
-        /// Set the vout window handle
-        void registerVoutWindow( void *pVoutWindow );
-
-        /// Unset the vout window handle
-        void unregisterVoutWindow( void *pVoutWindow );
-
         /// Indicate whether the embedded video output is currently used
         bool isVoutUsed() const { return m_pVout != NULL; }
-
-        /// If an embedded video output is used, drop it (i.e. tell it to stop
-        /// using our window handle)
-        void dropVout();
 
     protected:
         // Protected because it is a singleton
@@ -135,12 +127,6 @@ class VlcProc: public SkinObject
         /// Variable for DVD detection
         VariablePtr m_cVarDvdActive;
 
-        /// Set of handles of vout windows
-        /**
-         * When changing the skin, the handles of the 2 skins coexist in the
-         * set (but this is temporary, until the old theme is destroyed).
-         */
-        set<void *> m_handleSet;
         /// Vout thread
         vout_thread_t *m_pVout;
         /// Audio output
@@ -208,21 +194,6 @@ class VlcProc: public SkinObject
         static int onInteraction( vlc_object_t *pObj, const char *pVariable,
                                   vlc_value_t oldVal, vlc_value_t newVal,
                                   void *pParam );
-
-    public: /* FIXME: these used to be private for a reason */
-        /// Callback to request a vout window
-        static void *getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
-                                int *pXHint, int *pYHint,
-                                unsigned int *pWidthHint,
-                                unsigned int *pHeightHint );
-
-        /// Callback to release a vout window
-        static void releaseWindow( intf_thread_t *pIntf, void *pWindow );
-
-        /// Callback to change a vout window
-        static int controlWindow( struct vout_window_t *pWnd,
-                                  int query, va_list args );
-    private: /* end of FIXME */
 
         /// Callback for equalizer-bands variable
         static int onEqBandsChange( vlc_object_t *pObj, const char *pVariable,

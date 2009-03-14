@@ -26,8 +26,9 @@
 
 #include "ctrl_generic.hpp"
 #include "../utils/position.hpp"
+#include "../src/vout_window.hpp"
+#include <vlc_vout.h>
 
-class VoutWindow;
 
 /// Control video
 class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
@@ -58,16 +59,52 @@ class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
         /// Method called when the vout size is updated
         virtual void onUpdate( Subject<VarBox> &rVoutSize, void* );
 
-        /// Called by the layout when the control is show/hidden
-        void setVisible( bool visible );
+        /// Method called when visibility or ActiveLayout is updated
+        virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+
+        // Attach a voutWindow to a Video Control
+        void attachVoutWindow( VoutWindow* pVoutWindow );
+
+        // Detach a voutWindow from a Video Control
+        void detachVoutWindow( );
+
+        // Update the inner part of the Video Control
+        void resizeInnerVout( );
+
+        // Get TopWindow associated with the video control
+        virtual TopWindow* getWindow() { return CtrlGeneric::getWindow(); }
+
+        // Get the VoutWindow associated with the video control
+        virtual VoutWindow* getVoutWindow() { return m_pVoutWindow; }
+
+        /// Set the position and the associated layout of the control
+        virtual void setLayout( GenericLayout *pLayout,
+                                const Position &rPosition );
+
+        // resize the video Control
+        virtual void resizeControl( int width, int height );
+
+        // Is this control useable (visibility requirements)
+        virtual bool isUseable() { return m_bIsUseable; }
+
+        // Is this control used
+        virtual bool isUsed() { return m_pVoutWindow ? true : false; }
 
     private:
-        /// Vout window
-        VoutWindow *m_pVout;
         /// Associated layout
         GenericLayout &m_rLayout;
+
+        /// Autoresize parameter
+        bool m_bAutoResize;
+
         /// Difference between layout size and video size
         int m_xShift, m_yShift;
+
+        /// Is the video Control useable
+        bool m_bIsUseable;
+
+        /// Vout window
+        VoutWindow *m_pVoutWindow;
 };
 
 #endif

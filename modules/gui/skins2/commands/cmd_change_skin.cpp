@@ -29,6 +29,8 @@
 #include "../src/theme.hpp"
 #include "../src/theme_loader.hpp"
 #include "../src/window_manager.hpp"
+#include "../src/vout_manager.hpp"
+#include "../src/vlcproc.hpp"
 
 
 void CmdChangeSkin::execute()
@@ -42,6 +44,9 @@ void CmdChangeSkin::execute()
         pOldTheme->getWindowManager().hideAll();
     }
 
+    VoutManager::instance( getIntf() )->lockVout();
+    VoutManager::instance( getIntf() )->saveVoutConfig();
+
     ThemeLoader loader( getIntf() );
     if( loader.load( m_file ) )
     {
@@ -49,16 +54,23 @@ void CmdChangeSkin::execute()
         msg_Info( getIntf(), "new theme successfully loaded (%s)",
                  m_file.c_str() );
         delete pOldTheme;
+
+        // restore vout config
+        VoutManager::instance( getIntf() )->restoreVoutConfig( true );
+        VoutManager::instance( getIntf() )->unlockVout();
     }
     else if( pOldTheme )
     {
         msg_Warn( getIntf(), "a problem occurred when loading the new theme,"
                   " restoring the previous one" );
         getIntf()->p_sys->p_theme = pOldTheme;
+        VoutManager::instance( getIntf() )->restoreVoutConfig( false );
+        VoutManager::instance( getIntf() )->unlockVout();
         pOldTheme->getWindowManager().restoreVisibility();
     }
     else
     {
+        VoutManager::instance( getIntf() )->unlockVout();
         msg_Err( getIntf(), "cannot load the theme, aborting" );
         // Quit
         CmdQuit cmd( getIntf() );

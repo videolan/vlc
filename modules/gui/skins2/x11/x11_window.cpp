@@ -41,20 +41,36 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
     m_dragDrop( dragDrop )
 {
-    Window parent;
     if (pParentWindow)
     {
-        parent = pParentWindow->m_wnd;
+        m_wnd_parent = pParentWindow->m_wnd;
     }
     else
     {
-        parent = DefaultRootWindow( XDISPLAY );
+        m_wnd_parent = DefaultRootWindow( XDISPLAY );
     }
     XSetWindowAttributes attr;
+    attr.event_mask = ExposureMask | StructureNotifyMask;
 
     // Create the window
-    m_wnd = XCreateWindow( XDISPLAY, parent, 0, 0, 1, 1, 0, 0,
-                           InputOutput, CopyFromParent, 0, &attr );
+    m_wnd = XCreateWindow( XDISPLAY, m_wnd_parent, -10, 0, 1, 1, 0, 0,
+                           InputOutput, CopyFromParent, CWEventMask, &attr );
+
+    // Make sure window is created before returning
+    XMapWindow( XDISPLAY, m_wnd );
+    bool b_map_notify = false;
+    do
+    {
+        XEvent xevent;
+        XWindowEvent( XDISPLAY, m_wnd, SubstructureNotifyMask |
+                      StructureNotifyMask, &xevent);
+        if( (xevent.type == MapNotify)
+             && (xevent.xmap.window == m_wnd ) )
+        {
+            b_map_notify = true;
+        }
+    } while( ! b_map_notify );
+    XUnmapWindow( XDISPLAY, m_wnd );
 
     // Set the colormap for 8bpp mode
     if( XPIXELSIZE == 1 )
@@ -109,22 +125,11 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Associate the window to the main "parent" window
     XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
 
-    // Set this window as a vout
-    if( m_pParent )
-    {
-        VlcProc::instance( getIntf() )->registerVoutWindow( (void*)m_wnd );
-    }
-
 }
 
 
 X11Window::~X11Window()
 {
-    if( m_pParent )
-    {
-        VlcProc::instance( getIntf() )->unregisterVoutWindow( (void*)m_wnd );
-    }
-
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
     pFactory->m_windowMap[m_wnd] = NULL;
     pFactory->m_dndMap[m_wnd] = NULL;
@@ -135,6 +140,19 @@ X11Window::~X11Window()
     }
     XDestroyWindow( XDISPLAY, m_wnd );
     XSync( XDISPLAY, False );
+}
+
+void X11Window::reparent( void* OSHandle, int x, int y, int w, int h )
+{
+    // Reparent the window
+    Window new_parent =
+           OSHandle ? (Window) OSHandle : DefaultRootWindow( XDISPLAY );
+
+    if( w && h )
+        XResizeWindow( XDISPLAY, m_wnd, w, h );
+
+    XReparentWindow( XDISPLAY, m_wnd, new_parent, x, y);
+    m_wnd_parent = new_parent;
 }
 
 
@@ -155,7 +173,10 @@ void X11Window::hide() const
 
 void X11Window::moveResize( int left, int top, int width, int height ) const
 {
-    XMoveResizeWindow( XDISPLAY, m_wnd, left, top, width, height );
+    if( width && height )
+        XMoveResizeWindow( XDISPLAY, m_wnd, left, top, width, height );
+    else
+        XMoveWindow( XDISPLAY, m_wnd, left, top );
 }
 
 

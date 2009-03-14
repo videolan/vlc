@@ -105,6 +105,9 @@ class GenericLayout: public SkinObject
         virtual int getMinHeight() const { return m_minHeight; }
         virtual int getMaxHeight() const { return m_maxHeight; }
 
+        /// specific refresh window (if video controls)
+        virtual void computeRefresh( int x, int y, int width, int height );
+
         /// Resize the layout
         virtual void resize( int width, int height );
 
@@ -156,8 +159,8 @@ class GenericLayout: public SkinObject
         OSGraphics *m_pImage;
         /// List of the controls in the layout
         list<LayeredControl> m_controlList;
-        /// Video control
-        CtrlVideo *m_pVideoControl;
+        /// Video control(s)
+        set<CtrlVideo *> m_pVideoCtrlSet;
         /// List of the anchors in the layout
         list<Anchor*> m_anchorList;
         /// Flag to know if the layout is visible

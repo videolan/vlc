@@ -177,6 +177,7 @@ VlcProc::~VlcProc()
     if( getIntf()->p_sys->p_input )
     {
         vlc_object_release( getIntf()->p_sys->p_input );
+        getIntf()->p_sys->p_input = NULL;
     }
 
     interaction_Unregister( getIntf() );
@@ -195,27 +196,6 @@ VlcProc::~VlcProc()
                      onItemChange, this );
     var_DelCallback( getIntf(), "skin-to-load", onSkinToLoad, this );
 }
-
-#include <assert.h>
-
-void VlcProc::registerVoutWindow( void *pVoutWindow )
-{
-    m_handleSet.insert( pVoutWindow );
-    assert( !m_pVout );
-}
-
-
-void VlcProc::unregisterVoutWindow( void *pVoutWindow )
-{
-    m_handleSet.erase( pVoutWindow );
-}
-
-
-void VlcProc::dropVout()
-{
-    assert( !m_pVout );
-}
-
 
 void VlcProc::manage()
 {
@@ -555,73 +535,6 @@ void VlcProc::updateStreamName()
     AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
     pQueue->push( CmdGenericPtr( pCmdItem ) );
 }
-
-void *VlcProc::getWindow( intf_thread_t *pIntf, vout_thread_t *pVout,
-                          int *pXHint, int *pYHint,
-                          unsigned int *pWidthHint,
-                          unsigned int *pHeightHint )
-{
-    VlcProc *pThis = pIntf->p_sys->p_vlcProc;
-    if( pThis->m_handleSet.empty() )
-    {
-        return NULL;
-    }
-    else
-    {
-        pThis->m_pVout = pVout;
-        // Get the window handle
-        void *pWindow = *pThis->m_handleSet.begin();
-        // Post a resize vout command
-        CmdResizeVout *pCmd = new CmdResizeVout( pThis->getIntf(), pWindow,
-                                                 *pWidthHint, *pHeightHint );
-        AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-        pQueue->push( CmdGenericPtr( pCmd ) );
-        return pWindow;
-    }
-}
-
-
-void VlcProc::releaseWindow( intf_thread_t *pIntf, void *pWindow )
-{
-    VlcProc *pThis = pIntf->p_sys->p_vlcProc;
-    pThis->m_pVout = NULL;
-}
-
-
-int VlcProc::controlWindow( struct vout_window_t *pWnd,
-                            int query, va_list args )
-{
-    intf_thread_t *pIntf = (intf_thread_t *)pWnd->p_private;
-    VlcProc *pThis = pIntf->p_sys->p_vlcProc;
-
-    switch( query )
-    {
-        case VOUT_SET_SIZE:
-        {
-            if( pThis->m_pVout )
-            {
-                unsigned int i_width  = va_arg( args, unsigned int );
-                unsigned int i_height = va_arg( args, unsigned int );
-                if( !i_width ) i_width = pThis->m_pVout->i_window_width;
-                if( !i_height ) i_height = pThis->m_pVout->i_window_height;
-
-                // Post a resize vout command
-                CmdResizeVout *pCmd =
-                    new CmdResizeVout( pThis->getIntf(), pWnd->handle.hwnd,
-                                       i_width, i_height );
-                AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-                pQueue->push( CmdGenericPtr( pCmd ) );
-            }
-        }
-
-        default:
-            msg_Dbg( pWnd, "control query not supported" );
-            break;
-    }
-
-    return VLC_SUCCESS;
-}
-
 
 int VlcProc::onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
                               vlc_value_t oldVal, vlc_value_t newVal,
