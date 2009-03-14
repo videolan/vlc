@@ -18,7 +18,7 @@
    <item>
     <widget class="QToolBox" name="toolBox">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="sourcePage">
       <property name="geometry">
@@ -34,7 +34,7 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0" colspan="2">
-        <widget class="QPlainTextEdit" name="helpEdit">
+        <widget class="QTextEdit" name="helpEdit">
          <property name="enabled">
           <bool>true</bool>
          </property>
