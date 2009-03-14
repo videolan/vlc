@@ -569,7 +569,7 @@ void DialogsProvider::saveAPlaylist()
 void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
                                        bool b_transcode_only )
 {
-    const char *psz_option;
+    char *psz_option;
     if( !b_transcode_only )
     {
         SoutDialog *s = SoutDialog::getInstance( parent, p_intf, mrl );
@@ -599,8 +599,7 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
 
     if( !EMPTY_STR( psz_option ) )
     {
-
-        msg_Dbg( p_intf, "Sout mrl %s", psz_option );
+        msg_Dbg( p_intf, "Streaming MRL is: %s", psz_option );
         playlist_AddExt( THEPL, qtu( mrl ), _("Streaming"),
                          PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
                         -1, 1, &psz_option, VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
