@@ -392,7 +392,7 @@ void DiscOpenPanel::updateMRL()
     } else {
         mrl = "cdda://" + ui.deviceCombo->currentText();
         if( ui.titleSpin->value() > 0 ) {
-            mrl += QString("@%1").arg( ui.titleSpin->value() );
+            mrl += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
         }
     }
 
