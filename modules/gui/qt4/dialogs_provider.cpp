@@ -574,13 +574,28 @@ void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
     {
         SoutDialog *s = SoutDialog::getInstance( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
-            psz_option = qtu( s->getMrl() );
-    }else {
+        {
+            psz_option = strdup( qtu( s->getMrl() ) );
+            delete s;
+        }
+        else
+        {
+            delete s;
+            return;
+        }
+    } else {
         ConvertDialog *s = new ConvertDialog( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
-            psz_option = qtu( s->getMrl() );
+        {
+            psz_option = strdup( qtu( s->getMrl() ) );
+            delete s;
+        }
+        else
+        {
+            delete s;
+            return;
+        }
     }
-
 
     if( !EMPTY_STR( psz_option ) )
     {

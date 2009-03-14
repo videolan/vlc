@@ -112,7 +112,7 @@ void ConvertDialog::fileBrowse()
 
 void ConvertDialog::cancel()
 {
-    hide();
+    reject();
 }
 
 void ConvertDialog::close()
@@ -131,4 +131,5 @@ void ConvertDialog::close()
             ",dst='" + fileLine->text() + "'}";
 
     msg_Dbg( p_intf, "Transcode MRL: %s", qtu( mrl ) );
+    accept();
 }

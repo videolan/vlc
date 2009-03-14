@@ -1,16 +1,12 @@
 /*****************************************************************************
  * sout.cpp : Stream output dialog ( old-style )
  ****************************************************************************
- * Copyright (C) 2007-2008 the VideoLAN team
- * Copyright (C) 2007 Société des arts technologiques
- * Copyright (C) 2007 Savoir-faire Linux
+ * Copyright (C) 2007-2009 the VideoLAN team
  *
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>
- *          Jean-François Massol <jf.massol -at- gmail.com>
- *          Pierre-Luc Beaudoin <pierre-luc.beaudoin@savoirfairelinux.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
