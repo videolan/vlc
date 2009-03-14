@@ -30,13 +30,26 @@
 
 class QVLCApp : public QApplication
 {
+    Q_OBJECT
+
 public:
-    QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true ) { }
+    QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true )
+    {
+        connect( this, SIGNAL(quitSignal()), this, SLOT(quit()) );
+    }
+
+    static void triggerQuit()
+    {
+         QVLCApp *app = qobject_cast<QVLCApp*>( instance() );
+         if ( app )
+             emit app->quitSignal();
+    }
 
 #if defined (Q_WS_X11)
      QVLCApp( Display *dp, int & argc, char ** argv )
          : QApplication( dp, argc, argv )
      {
+        connect( this, SIGNAL(quitSignal()), this, SLOT(quit()) );
      }
 #endif
 
@@ -54,6 +67,11 @@ protected:
         return false;
     }
 #endif
+
+
+signals:
+    void quitSignal();
+
 };
 
 #endif

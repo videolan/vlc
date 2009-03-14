@@ -52,7 +52,7 @@ enum {
     MsgEventType    = 300,
 };
 
-class QApplication;
+class QVLCApp;
 class QMenu;
 class MainInterface;
 class QSettings;
@@ -61,7 +61,7 @@ struct intf_sys_t
 {
     vlc_thread_t thread;
 
-    QApplication *p_app;     /* Main Qt Application */
+    QVLCApp *p_app;          /* Main Qt Application */
     MainInterface *p_mi;     /* Main Interface, NULL if DialogProvider Mode */
 
     QSettings *mainSettings; /* Qt State settings not messing main VLC ones */

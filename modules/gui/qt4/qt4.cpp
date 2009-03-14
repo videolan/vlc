@@ -329,7 +329,7 @@ static void Close( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     var_Destroy (p_this->p_libvlc, "qt4-iface");
-    QApplication::quit();
+    QVLCApp::triggerQuit();
 
     vlc_join (p_sys->thread, NULL);
 #ifdef Q_WS_X11

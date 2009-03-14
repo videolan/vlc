@@ -57,6 +57,7 @@ nodist_SOURCES_qt4 = \
 		components/sout/sout_widgets.moc.cpp \
 		util/input_slider.moc.cpp \
 		util/customwidgets.moc.cpp \
+		util/qvlcapp.moc.cpp \
 		resources.cpp \
 		ui/equalizer.h \
 		ui/v4l2.h \
