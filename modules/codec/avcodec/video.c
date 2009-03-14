@@ -498,6 +498,11 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->p_context->skip_frame = p_sys->i_skip_frame;
         b_null_size = true;
     }
+    else if( !b_drawpicture )
+    {
+        p_sys->p_context->skip_frame = __MAX( p_sys->p_context->skip_frame,
+                                              AVDISCARD_NONREF );
+    }
 
     /*
      * Do the actual decoding now
@@ -562,8 +567,9 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
         if( i_used < 0 )
         {
-            msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
-                      p_sys->i_buffer );
+            if( b_drawpicture )
+                msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
+                          p_sys->i_buffer );
             block_Release( p_block );
             return NULL;
         }
