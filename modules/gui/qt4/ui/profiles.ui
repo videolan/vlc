@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>628</width>
-    <height>413</height>
+    <width>584</width>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -153,7 +153,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="vCodecLabel">
          <property name="enabled">
           <bool>true</bool>
@@ -166,14 +166,14 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1" colspan="2">
+       <item row="2" column="1" colspan="2">
         <widget class="QComboBox" name="vCodecBox">
          <property name="editable">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="3" column="0" colspan="2">
         <widget class="QLabel" name="vBitrateLabel">
          <property name="text">
           <string>_(&quot;Bitrate&quot;)</string>
@@ -183,7 +183,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
+       <item row="3" column="2">
         <widget class="QSpinBox" name="vBitrateSpin">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -205,7 +205,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2">
+       <item row="4" column="0" colspan="2">
         <widget class="QLabel" name="vFrameLabel">
          <property name="text">
           <string>_(&quot;Frame Rate&quot;)</string>
@@ -215,7 +215,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
+       <item row="4" column="2">
         <widget class="QDoubleSpinBox" name="vFrameBox">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -228,7 +228,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="3">
+       <item row="5" column="0" colspan="3">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string>Resolution</string>
@@ -344,6 +344,13 @@
          </layout>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QCheckBox" name="keepVideo">
+         <property name="text">
+          <string>_(&quot;Keep original video track&quot;)</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="audioCodec">
@@ -351,14 +358,21 @@
        <string>_(&quot;Audio codec&quot;)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0" colspan="2">
+       <item row="0" column="0">
         <widget class="QCheckBox" name="transcodeAudio">
          <property name="text">
           <string>_(&quot;Audio&quot;)</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="keepAudio">
+         <property name="text">
+          <string>_(&quot;Keep original audio track&quot;)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
         <widget class="QLabel" name="aCodecLabel">
          <property name="text">
           <string>_(&quot;Codec&quot;)</string>
@@ -368,10 +382,10 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1" colspan="2">
+       <item row="2" column="2" colspan="2">
         <widget class="QComboBox" name="aCodecBox"/>
        </item>
-       <item row="2" column="0" colspan="2">
+       <item row="3" column="0">
         <widget class="QLabel" name="aBitrateLabel">
          <property name="text">
           <string>_(&quot;Bitrate&quot;)</string>
@@ -381,7 +395,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
+       <item row="3" column="3">
         <widget class="QSpinBox" name="aBitrateSpin">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -400,7 +414,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0" colspan="2">
+       <item row="4" column="0">
         <widget class="QLabel" name="aChannelsLabel">
          <property name="text">
           <string>_(&quot;Channels&quot;)</string>
@@ -410,7 +424,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
+       <item row="4" column="3">
         <widget class="QSpinBox" name="aChannelsSpin">
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -426,7 +440,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="2">
+       <item row="5" column="0">
         <widget class="QLabel" name="aSampleLabel">
          <property name="text">
           <string>_(&quot;Sample Rate&quot;)</string>
@@ -436,10 +450,10 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="5" column="3">
         <widget class="QComboBox" name="aSampleBox"/>
        </item>
-       <item row="5" column="2">
+       <item row="6" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -480,7 +494,7 @@
      </widget>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="2" column="1">
     <widget class="QDialogButtonBox" name="buttonBox"/>
    </item>
   </layout>
