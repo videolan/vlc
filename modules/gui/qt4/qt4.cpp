@@ -1,7 +1,7 @@
 /*****************************************************************************
  * qt4.cpp : QT4 interface
  ****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -35,15 +35,16 @@
 #include <QWaitCondition>
 
 #include "qt4.hpp"
+
 #include "input_manager.hpp"    /* THEMIM creation */
 #include "dialogs_provider.hpp" /* THEDP creation */
 #include "main_interface.hpp"   /* MainInterface creation */
 #include "dialogs/help.hpp"     /* Launch Update */
 #include "recents.hpp"          /* Recents Item destruction */
-#include "util/qvlcapp.hpp"
+#include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 
 #ifdef HAVE_X11_XLIB_H
-#include <X11/Xlib.h>
+ #include <X11/Xlib.h>
 #endif
 
 #include "../../../share/vlc32x32.xpm"
@@ -154,11 +155,14 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 #define QT_FULLSCREEN_TEXT N_( "Show a controller in fullscreen mode" )
 
+/* Various modes definition */
 static const int i_mode_list[] =
     { QT_NORMAL_MODE, QT_ALWAYS_VIDEO_MODE, QT_MINIMAL_MODE };
 static const char *const psz_mode_list_text[] =
     { QT_NORMAL_MODE_TEXT, QT_ALWAYS_VIDEO_MODE_TEXT, QT_MINIMAL_MODE_TEXT };
 
+
+/**********************************************************************/
 vlc_module_begin ()
     set_shortname( "Qt" )
     set_description( N_("Qt interface") )
@@ -244,6 +248,8 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
+/*****************************************/
+
 /* Ugly, but the Qt4 interface assumes single instance anyway */
 static struct
 {
@@ -254,10 +260,11 @@ static struct
 /*****************************************************************************
  * Module callbacks
  *****************************************************************************/
+
+/* Open Interface */
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t *p_sys;
 
 #ifdef Q_WS_X11
     char *psz_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
@@ -270,16 +277,17 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 
-    /* Allocations */
-    p_sys = p_intf->p_sys = new intf_sys_t;
+    /* Allocations of p_sys */
+    intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
     p_sys->b_isDialogProvider = false;
-    p_sys->p_popup_menu = NULL; /* ??? */
-    p_sys->p_playlist = pl_Hold( p_intf );
+    p_sys->p_popup_menu = NULL;
     p_sys->p_mi = NULL;
+    p_sys->p_playlist = pl_Hold( p_intf );
 #ifdef Q_WS_X11
     p_sys->display = p_display;
 #endif
 
+    /* */
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         pl_Release (p_sys->p_playlist);
@@ -302,6 +310,7 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+/* Open Dialog Provider */
 static int OpenDialogs( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
@@ -329,8 +338,6 @@ static void Close( vlc_object_t *p_this )
     pl_Release (p_this);
     delete p_sys;
 }
-
-
 
 static QMutex windowLock;
 static QWaitCondition windowWait;
@@ -364,6 +371,8 @@ static void *Thread( void *obj )
 #endif
     p_intf->p_sys->p_app = &app;
 
+
+    /* All the settings are in the .conf/.ini style */
     p_intf->p_sys->mainSettings = new QSettings(
 #ifdef WIN32
             QSettings::IniFormat,
@@ -373,7 +382,7 @@ static void *Thread( void *obj )
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
 
     /* Icon setting */
-    if( QDate::currentDate().dayOfYear() >= 354 )
+    if( QDate::currentDate().dayOfYear() >= 352 ) /* One Week before Xmas */
         app.setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
     else
         app.setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
