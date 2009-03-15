@@ -312,7 +312,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
         "Ctrl+C" );
 
     menu->addSeparator();
-    addDPStaticEntry( menu, qtr( "Paste &Location" ),
+    addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
     recentsMenu = new QMenu( qtr( "&Recent Media" ), menu );
