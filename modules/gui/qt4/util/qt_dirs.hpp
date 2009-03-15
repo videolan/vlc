@@ -47,5 +47,13 @@ static inline QString removeTrailingSlash( QString s )
 
 #define toNativeSepNoSlash( a ) toNativeSeparators( removeTrailingSlash( a ) )
 
+static inline QString colon_escape( QString s )
+{
+    return s.replace( ":", "\\:" );
+}
+static inline QString colon_unescape( QString s )
+{
+    return s.replace( "\\:", ":" ).trimmed();
+}
 #endif
 

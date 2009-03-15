@@ -192,7 +192,7 @@ void FileOpenPanel::updateMRL()
         fileList << ui.fileListWidg->item( i )->text();
 
     if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
-        mrl.append( " :sub-file=\"" + ui.subInput->text() + "\"" );
+        mrl.append( " :sub-file=" + colon_escape( ui.subInput->text() ) );
         int align = ui.alignSubComboBox->itemData(
                     ui.alignSubComboBox->currentIndex() ).toInt();
         mrl.append( " :subsdec-align=" + QString().setNum( align ) );
@@ -1057,8 +1057,10 @@ void CaptureOpenPanel::updateMRL()
         break;
     case DSHOW_DEVICE:
         fileList << "dshow://";
-        mrl+= " :dshow-vdev=" + QString("%1").arg( vdevDshowW->getValue() );
-        mrl+= " :dshow-adev=" + QString("%1").arg( adevDshowW->getValue() );
+        mrl+= " :dshow-vdev=" +
+            colon_escape( QString("%1").arg( vdevDshowW->getValue() ) );
+        mrl+= " :dshow-adev=" +
+            colon_escape( QString("%1").arg( adevDshowW->getValue() ) );
         if( dshowVSizeLine->isModified() )
             mrl += " :dshow-size=" + dshowVSizeLine->text();
         break;
@@ -1252,7 +1254,7 @@ void CaptureOpenPanel::advancedDialog()
                 case CONFIG_ITEM_FILE:
                 case CONFIG_ITEM_DIRECTORY:
                 case CONFIG_ITEM_MODULE:
-                    tempMRL += QString("=%1").arg( qobject_cast<VStringConfigControl *>(control)->getValue() );
+                    tempMRL += colon_escape( QString("=%1").arg( qobject_cast<VStringConfigControl *>(control)->getValue() ) );
                     break;
                 case CONFIG_ITEM_INTEGER:
                     tempMRL += QString("=%1").arg( qobject_cast<VIntConfigControl *>(control)->getValue() );

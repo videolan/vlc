@@ -30,6 +30,7 @@
 #include "dialogs_provider.hpp"
 
 #include "recents.hpp"
+#include "util/qt_dirs.hpp"
 
 #include <QTabWidget>
 #include <QGridLayout>
@@ -352,12 +353,12 @@ void OpenDialog::finish( bool b_enqueue = false )
         if( i == 0 )
         {
             /* Take options from the UI, not from what we stored */
-            QStringList optionsList = ui.advancedLineInput->text().split( ":" );
+            QStringList optionsList = ui.advancedLineInput->text().split( " :" );
 
             /* Insert options */
             for( int j = 0; j < optionsList.size(); j++ )
             {
-                QString qs = optionsList[j].trimmed();
+                QString qs = colon_unescape( optionsList[j] );
                 if( !qs.isEmpty() )
                 {
                     input_item_AddOption( p_input, qtu( qs ),

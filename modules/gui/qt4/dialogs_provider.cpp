@@ -611,7 +611,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         /* Add normal Options */
         for( int j = 0; j < options.size(); j++ )
         {
-            QString qs = options[j].trimmed();
+            QString qs = colon_unescape( options[j] );
             if( !qs.isEmpty() )
             {
                 input_item_AddOption( p_input, qtu( qs ),
