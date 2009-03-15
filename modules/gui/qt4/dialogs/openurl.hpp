@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
 
-#ifndef _OPEN_URL_H
-#define _OPEN_URL_H_
+#ifndef QVLC_OPEN_URL_H_
+#define QVLC_OPEN_URL_H_ 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

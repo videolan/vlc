@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  ******************************************************************************/
 
-#ifndef _MEDIAINFO_DIALOG_H_
-#define _MEDIAINFO_DIALOG_H_
+#ifndef QVLC_MEDIAINFO_DIALOG_H_
+#define QVLC_MEDIAINFO_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
 #include "components/info_panels.hpp"

@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _PODCAST_CONFIGURATION_DIALOG_H_
-#define _PODCAST_CONFIGURATION_DIALOG_H_
+#ifndef QVLC_PODCAST_CONFIGURATION_DIALOG_H_
+#define QVLC_PODCAST_CONFIGURATION_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
 #include "ui/podcast_configuration.h"

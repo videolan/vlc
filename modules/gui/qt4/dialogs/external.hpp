@@ -18,8 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_QT4_DIALOGS_EXTERNAL_H_
-# define VLC_QT4_DIALOGS_EXTERNAL_H 1
+#ifndef QVLC_DIALOGS_EXTERNAL_H_
+#define QVLC_DIALOGS_EXTERNAL_H_ 1
 
 #include <QObject>
 #include <vlc_common.h>

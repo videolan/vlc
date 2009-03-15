@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _SOUT_DIALOG_H_
-#define _SOUT_DIALOG_H_
+#ifndef QVLC_SOUT_DIALOG_H_
+#define QVLC_SOUT_DIALOG_H_ 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

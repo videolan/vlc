@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _ACTIONS_MANAGER_H_
-#define _ACTIONS_MANAGER_H_
+#ifndef QVLC_ACTIONS_MANAGER_H_
+#define QVLC_ACTIONS_MANAGER_H_ 1
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"

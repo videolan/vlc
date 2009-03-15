@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _MENUS_H_
-#define _MENUS_H_
+#ifndef QVLC_MENUS_H_
+#define QVLC_MENUS_H_
 
 #include "qt4.hpp"
 

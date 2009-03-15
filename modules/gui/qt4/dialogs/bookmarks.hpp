@@ -22,8 +22,8 @@
  *****************************************************************************/
 
 
-#ifndef _BOOKMARKS_H_
-#define _BOOKMARKS_H
+#ifndef QVLC_BOOKMARKS_H_
+#define QVLC_BOOKMARKS_H_ 1
 
 #include "util/qvlcframe.hpp"
 #include <QStandardItemModel>
