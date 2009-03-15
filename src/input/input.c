@@ -1244,6 +1244,8 @@ error_stats:
         EXIT_COUNTER( demux_read );
         EXIT_COUNTER( input_bitrate );
         EXIT_COUNTER( demux_bitrate );
+        EXIT_COUNTER( demux_corrupted );
+        EXIT_COUNTER( demux_discontinuity );
         EXIT_COUNTER( played_abuffers );
         EXIT_COUNTER( lost_abuffers );
         EXIT_COUNTER( displayed_pictures );
@@ -1318,6 +1320,8 @@ static void End( input_thread_t * p_input )
             CL_CO( demux_read );
             CL_CO( input_bitrate );
             CL_CO( demux_bitrate );
+            CL_CO( demux_corrupted );
+            CL_CO( demux_discontinuity );
             CL_CO( played_abuffers );
             CL_CO( lost_abuffers );
             CL_CO( displayed_pictures );
