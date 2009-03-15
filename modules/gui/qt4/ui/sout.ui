@@ -137,7 +137,7 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>_(&quot;Destination&quot;)</string>
+       <string>_(&quot;Destinations&quot;)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0" colspan="3">
@@ -270,13 +270,13 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>_(&quot;Transcoding&quot;)</string>
+       <string>_(&quot;Options&quot;)</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>_(&quot;Miscellaneous&quot;)</string>
+          <string>_(&quot;Miscellaneous Options&quot;)</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0" colspan="3">

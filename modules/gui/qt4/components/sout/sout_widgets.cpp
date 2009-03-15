@@ -86,7 +86,7 @@ FileDestBox::FileDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     QGridLayout *layout = new QGridLayout( this );
 
     QLabel *fileOutput = new QLabel(
-         qtr( "This modules outputs to a file on your disk."), this );
+         qtr( "This module writes the transcoded stream to a file."), this );
     layout->addWidget(fileOutput, 0, 0, 1, -1);
 
     QLabel *fileLabel = new QLabel( qtr( "Filename"), this );
@@ -134,7 +134,8 @@ HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     QGridLayout *layout = new QGridLayout( this );
 
     QLabel *httpOutput = new QLabel(
-         qtr( "This modules streams on the networks with the HTTP protocol."), this );
+        qtr( "This module outputs the transcoded stream to a network via HTTP."),
+        this );
     layout->addWidget(httpOutput, 0, 0, 1, -1);
 
     QLabel *HTTPLabel = new QLabel( qtr("Address"), this );
@@ -177,7 +178,8 @@ MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     QGridLayout *layout = new QGridLayout( this );
 
     QLabel *mmshOutput = new QLabel(
-         qtr( "This modules streams on the networks with the mms: protocol."), this );
+        qtr( "This module outputs the transcoded stream to a network "
+             " via the mms protocol." ), this );
     layout->addWidget(mmshOutput, 0, 0, 1, -1);
 
     QLabel *MMSHLabel = new QLabel( qtr("Address"), this );
@@ -220,7 +222,8 @@ UDPDestBox::UDPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     QGridLayout *layout = new QGridLayout( this );
 
     QLabel *udpOutput = new QLabel(
-         qtr( "This modules streams on the networks with the UDP protocol."), this );
+        qtr( "This module outputs the transcoded stream to a network via UDP."),
+        this );
     layout->addWidget(udpOutput, 0, 0, 1, -1);
 
     QLabel *UDPLabel = new QLabel( qtr("Address"), this );
@@ -265,7 +268,8 @@ RTPDestBox::RTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     QGridLayout *layout = new QGridLayout( this );
 
     QLabel *rtpOutput = new QLabel(
-         qtr( "This modules streams on the networks with the RTP protocol."), this );
+        qtr( "This module outputs the transcoded stream to a network via RTP."),
+        this );
     layout->addWidget(rtpOutput, 0, 0, 1, -1);
 
     QLabel *RTPLabel = new QLabel( qtr("Address"), this );
@@ -340,7 +344,8 @@ ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     QGridLayout *layout = new QGridLayout( this );
 
     QLabel *iceOutput = new QLabel(
-         qtr( "This modules streams using IceCast."), this );
+        qtr( "This module outputs the transcoded stream to an Icecast server."),
+        this );
     layout->addWidget(iceOutput, 0, 0, 1, -1);
 
     QLabel *ICELabel = new QLabel( qtr("Address"), this );
