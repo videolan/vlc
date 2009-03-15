@@ -4310,41 +4310,17 @@ dnl  libxml2 module
 dnl
 AC_ARG_ENABLE(libxml2,
   [  --enable-libxml2        libxml2 support (default enabled)])
-if test "${enable_libxml2}" != "no"
-then
-  XML2_PATH="${PATH}"
-  AC_ARG_WITH(xml2-config-path,
-    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
-    [ if test "${with_xml2_config_path}" != "no"; then
-        XML2_PATH="${with_xml2_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
-  if test "${XML2_CONFIG}" != "no"; then
-    VLC_ADD_CPPFLAGS([xml],[`${XML2_CONFIG} --cflags`])
-    VLC_ADD_LIBS([xml],[`${XML2_CONFIG} --libs`])
-    dnl depends on the xmlTextReader extension
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xml}"
-    LDFLAGS="${LDFLAGS_save} ${LIBS_xml}"
-    AC_CHECK_LIB(xml2,xmlTextReaderConstName,[
-      AC_EGREP_HEADER(xmlTextReaderConstName,libxml/xmlreader.h,[
-        VLC_ADD_PLUGIN([xml]) ],[
-          AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
-          if test "${enable_xml2}" = "yes"; then
-            AC_MSG_ERROR([libxml2 missing the xmlTextReader extension])
-          fi])
-       ],[
-      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
-      if test "${enable_xml2}" = "yes"; then
-        AC_MSG_ERROR([libxml2 missing the xmlTextReader extension])
-      fi])
-    LDFLAGS="${LDFLAGS_save}"
-    CPPFLAGS="${CPPFLAGS_save}"
-  else
-    if test "${enable_xml2}" = "yes"; then
+AS_IF([test "${enable_libxml2}" != "no"], [
+  PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.5], [
+    VLC_ADD_CPPFLAGS([xml],[${XML2_CFLAGS}])
+    VLC_ADD_LIBS([xml],[${XML2_LIBS}])
+    VLC_ADD_PLUGIN([xml])
+  ], [
+    AS_IF([test "x${enable_xml2}" != "x"], [
       AC_MSG_ERROR([Could not find libxml2])
-    fi
-  fi
-fi
+    ])
+  ])
+])
 
 dnl
 dnl  SVG module
