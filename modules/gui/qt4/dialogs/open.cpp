@@ -360,7 +360,8 @@ void OpenDialog::finish( bool b_enqueue = false )
                 QString qs = optionsList[j].trimmed();
                 if( !qs.isEmpty() )
                 {
-                    input_item_AddOption( p_input, qtu( qs ), VLC_INPUT_OPTION_TRUSTED );
+                    input_item_AddOption( p_input, qtu( qs ),
+                                          VLC_INPUT_OPTION_TRUSTED );
 #ifdef DEBUG_QT
                     msg_Warn( p_intf, "Input option: %s", qtu( qs ) );
 #endif
@@ -387,13 +388,14 @@ void OpenDialog::transcode()
 
 void OpenDialog::stream( bool b_transcode_only )
 {
-    QString soutMRL = getMRL();
+    QString soutMRL = getMRL( false );
     if( soutMRL.isEmpty() ) return;
     toggleVisible();
 
     /* Dbg and send :D */
     msg_Dbg( p_intf, "MRL passed to the Sout: %s", qtu( soutMRL ) );
-    THEDP->streamingDialog( this, soutMRL, b_transcode_only );
+    THEDP->streamingDialog( this, soutMRL, b_transcode_only,
+                            ui.advancedLineInput->text().split( ":" ) );
 }
 
 /* Update the MRL */

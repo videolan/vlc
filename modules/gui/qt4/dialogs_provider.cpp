@@ -566,43 +566,68 @@ void DialogsProvider::saveAPlaylist()
  * Sout emulation
  ****************************************************************************/
 
-void DialogsProvider::streamingDialog( QWidget *parent, QString mrl,
-                                       bool b_transcode_only )
+void DialogsProvider::streamingDialog( QWidget *parent,
+                                       QString mrl,
+                                       bool b_transcode_only,
+                                       QStringList options )
 {
-    char *psz_option;
+    char *psz_soutoption;
+
+    /* Stream */
     if( !b_transcode_only )
     {
         SoutDialog *s = SoutDialog::getInstance( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
         {
-            psz_option = strdup( qtu( s->getMrl() ) );
+            psz_soutoption = strdup( qtu( s->getMrl() ) );
             delete s;
         }
         else
         {
-            delete s;
-            return;
+            delete s; return;
         }
     } else {
+    /* Convert */
         ConvertDialog *s = new ConvertDialog( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
         {
-            psz_option = strdup( qtu( s->getMrl() ) );
+            psz_soutoption = strdup( qtu( s->getMrl() ) );
             delete s;
         }
         else
         {
-            delete s;
-            return;
+            delete s; return;
         }
     }
 
-    if( !EMPTY_STR( psz_option ) )
+    /* Get SoutMRL */
+    if( !EMPTY_STR( psz_soutoption ) )
     {
-        msg_Dbg( p_intf, "Streaming MRL is: %s", psz_option );
-        playlist_AddExt( THEPL, qtu( mrl ), _("Streaming"),
-                         PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END,
-                        -1, 1, &psz_option, VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
+        /* Create Input */
+        input_item_t *p_input;
+        p_input = input_item_New( p_intf, qtu( mrl ), _("Streaming") );
+
+        /* Add normal Options */
+        for( int j = 0; j < options.size(); j++ )
+        {
+            QString qs = options[j].trimmed();
+            if( !qs.isEmpty() )
+            {
+                input_item_AddOption( p_input, qtu( qs ),
+                        VLC_INPUT_OPTION_TRUSTED );
+            }
+        }
+
+        /* Add SoutMRL */
+        msg_Dbg( p_intf, "Streaming MRL is: %s", psz_soutoption );
+        input_item_AddOption( p_input, psz_soutoption, VLC_INPUT_OPTION_TRUSTED );
+
+        /* Switch between enqueuing and starting the item */
+        /* FIXME: playlist_AddInput() can fail */
+        playlist_AddInput( THEPL, p_input,
+                PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, true, pl_Unlocked );
+        vlc_gc_decref( p_input );
+
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
     }
 }

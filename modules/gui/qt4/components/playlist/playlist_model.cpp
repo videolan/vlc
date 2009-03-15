@@ -903,7 +903,7 @@ void PLModel::popupSave()
 {
     QStringList mrls = selectedURIs();
     if( !mrls.isEmpty() )
-        THEDP->streamingDialog( NULL, mrls[0], true );
+        THEDP->streamingDialog( NULL, mrls[0] );
 }
 
 #include <QUrl>

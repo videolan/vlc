@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _DIALOGS_PROVIDER_H_
-#define _DIALOGS_PROVIDER_H_
+#ifndef QVLC_DIALOGS_PROVIDER_H_
+#define QVLC_DIALOGS_PROVIDER_H_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -82,6 +82,7 @@ enum {
 class QEvent;
 class QSignalMapper;
 class QVLCMenu;
+#include <QStringList>
 
 class DialogsProvider : public QObject
 {
@@ -176,8 +177,8 @@ public slots:
     void PLAppendDir();
     void MLAppendDir();
 
-    void streamingDialog( QWidget *parent, QString mrl = "",
-            bool b_stream = true );
+    void streamingDialog( QWidget *parent, QString mrl, bool b_stream = true,
+                          QStringList options = QStringList("") );
     void openAndStreamingDialogs();
     void openAndTranscodingDialogs();
 
