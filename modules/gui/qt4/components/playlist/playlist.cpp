@@ -33,13 +33,6 @@
 #include "input_manager.hpp" /* art signal */
 #include "main_interface.hpp" /* DropEvent TODO remove this*/
 
-#include <QSettings>
-#include <QLabel>
-#include <QSpacerItem>
-#include <QCursor>
-#include <QPushButton>
-#include <QVBoxLayout>
-
 /**********************************************************************
  * Playlist Widget. The embedded playlist
  **********************************************************************/

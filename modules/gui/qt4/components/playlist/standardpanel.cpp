@@ -34,14 +34,12 @@
 
 #include <vlc_intf_strings.h>
 
-#include <QTreeView>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QModelIndexList>
-#include <QToolBar>
 #include <QLabel>
 #include <QSpacerItem>
 #include <QMenu>
