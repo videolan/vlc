@@ -416,18 +416,15 @@ QStringList PLModel::selectedURIs()
 
 bool PLModel::hasRandom()
 {
-    if( var_GetBool( p_playlist, "random" ) ) return true;
-    return false;
+    return var_GetBool( p_playlist, "random" );
 }
 bool PLModel::hasRepeat()
 {
-    if( var_GetBool( p_playlist, "repeat" ) ) return true;
-    return false;
+    return var_GetBool( p_playlist, "repeat" );
 }
 bool PLModel::hasLoop()
 {
-    if( var_GetBool( p_playlist, "loop" ) ) return true;
-    return false;
+    return var_GetBool( p_playlist, "loop" );
 }
 void PLModel::setLoop( bool on )
 {
