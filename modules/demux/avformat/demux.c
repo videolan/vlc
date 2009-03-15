@@ -298,7 +298,7 @@ int OpenDemux( vlc_object_t *p_this )
             msg_Warn( p_demux, "unsupported track type in ffmpeg demux" );
             break;
         }
-        fmt.psz_language = strdup( p_sys->ic->streams[i]->language );
+        fmt.psz_language = p_sys->ic->streams[i]->language;
 
 #ifdef HAVE_FFMPEG_CODEC_ATTACHMENT
         if( cc->codec_type != CODEC_TYPE_ATTACHMENT )
