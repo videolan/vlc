@@ -34,8 +34,6 @@
 #include <QFrame>
 #include <QToolButton>
 
-#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
-
 class QLabel;
 class QSpinBox;
 class QAbstractSlider;

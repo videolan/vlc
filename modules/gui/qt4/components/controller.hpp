@@ -21,8 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _CONTROLLER_H_
-#define _CONTROLLER_H_
+#ifndef QVLC_CONTROLLER_H_
+#define QVLC_CONTROLLER_H_
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -33,14 +33,13 @@
 #include <QFrame>
 #include <QString>
 
-#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
-
 #define MAIN_TB1_DEFAULT "64;39;64;38;65"
 #define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;10;9;64-4;37;65;35-4"
 #define ADV_TB_DEFAULT "12;11;13;14"
 #define INPT_TB_DEFAULT "5-1;15-1;33;6-1"
 #define FSC_TB_DEFAULT "0-2;64;3;1;4;64;37;64;38;64;8;65;35-4;34"
 
+#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
 
 class QPixmap;
 class QLabel;

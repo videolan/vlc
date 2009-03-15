@@ -1,8 +1,9 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <author>Jean-Baptiste Kempf</author>
  <class>OpenCapture</class>
- <widget class="QWidget" name="OpenCapture" >
-  <property name="geometry" >
+ <widget class="QWidget" name="OpenCapture">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -10,57 +11,57 @@
     <height>134</height>
    </rect>
   </property>
-  <layout class="QGridLayout" >
-   <item row="0" column="0" >
-    <widget class="QLabel" name="label" >
-     <property name="text" >
-      <string>_("Capture mode")</string>
+  <layout class="QGridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>_(&quot;Capture mode&quot;)</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2" colspan="2" >
-    <widget class="QComboBox" name="deviceCombo" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
+   <item row="0" column="2" colspan="2">
+    <widget class="QComboBox" name="deviceCombo">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="toolTip" >
-      <string>_("Select the capture device type")</string>
+     <property name="toolTip">
+      <string>_(&quot;Select the capture device type&quot;)</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="4" >
-    <widget class="Line" name="line" >
-     <property name="orientation" >
+   <item row="1" column="0" colspan="4">
+    <widget class="Line" name="line">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="4" >
-    <widget class="QGroupBox" name="cardBox" >
-     <property name="title" >
-      <string>_("Card Selection")</string>
+   <item row="2" column="0" colspan="4">
+    <widget class="QGroupBox" name="cardBox">
+     <property name="title">
+      <string>_(&quot;Device Selection&quot;)</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="4" >
-    <widget class="QGroupBox" name="optionsBox" >
-     <property name="title" >
-      <string>_("Options")</string>
+   <item row="3" column="0" colspan="4">
+    <widget class="QGroupBox" name="optionsBox">
+     <property name="title">
+      <string>_(&quot;Options&quot;)</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="4" >
+   <item row="5" column="0" colspan="4">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::MinimumExpanding</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
        <height>0</height>
@@ -68,13 +69,13 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="3" >
-    <widget class="QPushButton" name="advancedButton" >
-     <property name="toolTip" >
-      <string>_("Access advanced options to tweak the device")</string>
+   <item row="4" column="3">
+    <widget class="QPushButton" name="advancedButton">
+     <property name="toolTip">
+      <string>_(&quot;Access advanced options to tweak the device&quot;)</string>
      </property>
-     <property name="text" >
-      <string>_("Advanced options...")</string>
+     <property name="text">
+      <string>_(&quot;Advanced options...&quot;)</string>
      </property>
     </widget>
    </item>

@@ -54,7 +54,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     QGroupBox *destBox = new QGroupBox( qtr( "Destination" ) );
     QGridLayout *destLayout = new QGridLayout( destBox );
 
-    QLabel *destLabel = new QLabel( qtr( "Target file:" ) );
+    QLabel *destLabel = new QLabel( qtr( "Destination file:" ) );
     destLayout->addWidget( destLabel, 0, 0);
 
     fileLine = new QLineEdit;

@@ -26,6 +26,7 @@
 #endif
 
 #include "controller_widget.hpp"
+#include "controller.hpp"
 
 #include "input_manager.hpp"         /* Get notification of Volume Change */
 #include "util/input_slider.hpp"     /* SoundSlider */

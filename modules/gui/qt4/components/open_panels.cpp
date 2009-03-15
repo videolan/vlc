@@ -996,8 +996,8 @@ void CaptureOpenPanel::initialize()
      * Screen *
      **********/
     addModuleAndLayouts( SCREEN_DEVICE, screen, "Desktop" );
-    QLabel *screenLabel = new QLabel( "This option will open your own "
-            "desktop in order to save or stream it.");
+    QLabel *screenLabel = new QLabel( "Your display will will be "
+            "opened and played in order to stream or save it." );
     screenLabel->setWordWrap( true );
     screenDevLayout->addWidget( screenLabel, 0, 0 );
 
