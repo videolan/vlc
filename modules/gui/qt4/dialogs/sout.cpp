@@ -35,8 +35,6 @@
 #include <QFileDialog>
 #include <QToolButton>
 
-SoutDialog* SoutDialog::instance = NULL;
-
 SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, QString inputMRL )
            : QVLCDialog( parent,  _p_intf )
 {

@@ -576,7 +576,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     /* Stream */
     if( !b_transcode_only )
     {
-        SoutDialog *s = SoutDialog::getInstance( parent, p_intf, mrl );
+        SoutDialog *s = new SoutDialog( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
         {
             psz_soutoption = strdup( qtu( s->getMrl() ) );

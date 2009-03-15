@@ -399,7 +399,7 @@ void VLMDialog::selectInput()
 
 void VLMDialog::selectOutput()
 {
-    SoutDialog *s = SoutDialog::getInstance( this, p_intf );
+    SoutDialog *s = new SoutDialog( this, p_intf );
     if( s->exec() == QDialog::Accepted )
         ui.outputLedit->setText( s->getMrl() );
 }
