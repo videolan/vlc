@@ -35,6 +35,10 @@
 #include <libxml/xmlreader.h>
 #include <libxml/catalog.h>
 
+#if !defined (LIBXML_VERSION) || (LIBXML_VERSION > 20700)
+# error Stale config.cache detected. Erase it and re-run configure.
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
