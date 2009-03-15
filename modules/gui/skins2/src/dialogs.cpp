@@ -216,7 +216,7 @@ void Dialogs::showFileGeneric( const string &rTitle, const string &rExtensions,
 void Dialogs::showChangeSkin()
 {
     showFileGeneric( _("Open a skin file"),
-                     _("Skin files (*.vlt;*.wsz)|*.vlt;*.wsz|Skin files (*.xml)|*.xml"),
+                     _("Skin files |*.vlt;*.wsz;*.xml"),
                      showChangeSkinCB, kOPEN );
 }
 
