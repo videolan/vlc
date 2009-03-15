@@ -1047,12 +1047,12 @@ void CaptureOpenPanel::updateMRL()
         else return;
         fileList << mrl; mrl = "";
 
-        mrl += " :dvb-frequency=" + QString("%1").arg( bdaFreq->value() );
+        mrl += " :dvb-frequency=" + QString::number( bdaFreq->value() );
         if( bdas->isChecked() || bdac->isChecked() )
-            mrl += " :dvb-srate=" + QString("%1").arg( bdaSrate->value() );
+            mrl += " :dvb-srate=" + QString::number( bdaSrate->value() );
         else if( bdat->isChecked() )
             mrl += " :dvb-bandwidth=" +
-                QString("%1").arg( bdaBandBox->itemData(
+                QString::number( bdaBandBox->itemData(
                     bdaBandBox->currentIndex() ).toInt() );
         break;
     case DSHOW_DEVICE:
@@ -1069,22 +1069,22 @@ void CaptureOpenPanel::updateMRL()
         fileList << "v4l://";
         mrl += " :v4l-vdev=" + v4lVideoDevice->text();
         mrl += " :v4l-adev=" + v4lAudioDevice->text();
-        mrl += " :v4l-norm=" + QString("%1").arg( v4lNormBox->currentIndex() );
-        mrl += " :v4l-frequency=" + QString("%1").arg( v4lFreq->value() );
+        mrl += " :v4l-norm=" + QString::number( v4lNormBox->currentIndex() );
+        mrl += " :v4l-frequency=" + QString::number( v4lFreq->value() );
         break;
     case V4L2_DEVICE:
         fileList << "v4l2://";
         mrl += " :v4l2-dev=" + v4l2VideoDevice->text();
         mrl += " :v4l2-adev=" + v4l2AudioDevice->text();
-        mrl += " :v4l2-standard=" + QString("%1").arg( v4l2StdBox->currentIndex() );
+        mrl += " :v4l2-standard=" + QString::number( v4l2StdBox->currentIndex() );
         break;
     case JACK_DEVICE:
         mrl = "jack://";
-        mrl += "channels=" + QString("%1").arg( jackChannels->value() );
+        mrl += "channels=" + QString::number( jackChannels->value() );
         mrl += ":ports=" + jackPortsSelected->text();
         fileList << mrl; mrl = "";
 
-        mrl += " :jack-input-caching=" + QString("%1").arg( jackCaching->value() );
+        mrl += " :jack-input-caching=" + QString::number( jackCaching->value() );
         if ( jackPace->isChecked() )
         {
                 mrl += " :jack-input-use-vlc-pace";
@@ -1098,22 +1098,22 @@ void CaptureOpenPanel::updateMRL()
         fileList << "pvr://";
         mrl += " :pvr-device=" + pvrDevice->text();
         mrl += " :pvr-radio-device=" + pvrRadioDevice->text();
-        mrl += " :pvr-norm=" + QString("%1").arg( pvrNormBox->currentIndex() );
+        mrl += " :pvr-norm=" + QString::number( pvrNormBox->currentIndex() );
         if( pvrFreq->value() )
-            mrl += " :pvr-frequency=" + QString("%1").arg( pvrFreq->value() );
+            mrl += " :pvr-frequency=" + QString::number( pvrFreq->value() );
         if( pvrBitr->value() )
-            mrl += " :pvr-bitrate=" + QString("%1").arg( pvrBitr->value() );
+            mrl += " :pvr-bitrate=" + QString::number( pvrBitr->value() );
         break;
     case DVB_DEVICE:
         fileList << "dvb://";
-        mrl += " :dvb-adapter=" + QString("%1").arg( dvbCard->value() );
-        mrl += " :dvb-frequency=" + QString("%1").arg( dvbFreq->value() );
-        mrl += " :dvb-srate=" + QString("%1").arg( dvbSrate->value() );
+        mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
+        mrl += " :dvb-frequency=" + QString::number( dvbFreq->value() );
+        mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
         break;
 #endif
     case SCREEN_DEVICE:
         fileList << "screen://";
-        mrl = " :screen-fps=" + QString("%1").arg( screenFPS->value() );
+        mrl = " :screen-fps=" + QString::number( screenFPS->value() );
         updateButtons();
         break;
     }
