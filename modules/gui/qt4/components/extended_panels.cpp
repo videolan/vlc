@@ -615,8 +615,7 @@ ExtV4l2::ExtV4l2( intf_thread_t *_p_intf, QWidget *_parent )
 
 ExtV4l2::~ExtV4l2()
 {
-    if( box )
-        delete box;
+    delete box;
 }
 
 void ExtV4l2::showEvent( QShowEvent *event )

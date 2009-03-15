@@ -48,12 +48,12 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
-    virtual ~PlaylistDialog();
 private:
     PlaylistDialog( intf_thread_t * );
+    virtual ~PlaylistDialog();
 
     void dropEvent( QDropEvent *);
     void dragEnterEvent( QDragEnterEvent * );

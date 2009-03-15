@@ -64,10 +64,9 @@ public:
 
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
-    virtual ~OpenDialog();
 
     void showTab( int = OPEN_FILE_TAB );
     QString getMRL( bool b = true );
@@ -82,6 +81,7 @@ public slots:
 private:
     OpenDialog( QWidget *parent, intf_thread_t *, bool b_selectMode,
                 int _action_flag = 0, bool b_pl = true );
+    virtual ~OpenDialog();
 
     static OpenDialog *instance;
     input_thread_t *p_input;

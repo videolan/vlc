@@ -50,12 +50,14 @@ public:
         return instance;
     }
     static void killInstance()
-    { if( instance ) delete instance; instance = NULL;}
-    virtual ~HelpDialog();
+    { delete instance; instance = NULL;}
 
 private:
     HelpDialog( intf_thread_t * );
+    virtual ~HelpDialog();
+
     static HelpDialog *instance;
+
 public slots:
     void close();
 };
@@ -99,7 +101,7 @@ public:
         return instance;
     }
     static void killInstance()
-    { if( instance ) delete instance; instance = NULL;}
+    { delete instance; instance = NULL;}
 
     void updateNotify( bool );
 

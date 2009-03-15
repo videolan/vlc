@@ -103,14 +103,13 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
     static bool isAlive()
     {
         return ( instance != NULL );
     }
-    virtual ~DialogsProvider();
 
     QStringList showSimpleOpen( QString help = QString(),
                                 int filters = EXT_FILTER_MEDIA |
@@ -126,8 +125,10 @@ protected:
 
 private:
     DialogsProvider( intf_thread_t *);
-    intf_thread_t *p_intf;
+    virtual ~DialogsProvider();
     static DialogsProvider *instance;
+
+    intf_thread_t *p_intf;
     bool b_isDying;
 
     void openDialog( int );

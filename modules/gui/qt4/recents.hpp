@@ -47,10 +47,9 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
-    virtual ~RecentsMRL();
 
     void addRecent( const QString & );
     QList<QString> recents();
@@ -58,9 +57,12 @@ public:
 
 private:
     RecentsMRL( intf_thread_t* _p_intf );
+    virtual ~RecentsMRL();
+
+    static RecentsMRL *instance;
+
     void load();
     void save();
-    static RecentsMRL *instance;
     intf_thread_t* p_intf;
     QList<QString> *stack;
     bool isActive;

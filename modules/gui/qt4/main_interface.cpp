@@ -291,7 +291,7 @@ MainInterface::~MainInterface()
     ActionsManager::killInstance();
 
     /* Delete the FSC controller */
-    if( fullscreenControls ) delete fullscreenControls;
+    delete fullscreenControls;
 
     /* Save states */
     settings->beginGroup( "MainWindow" );

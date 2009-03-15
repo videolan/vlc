@@ -42,12 +42,13 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
-    virtual ~BookmarksDialog();
 private:
     BookmarksDialog( intf_thread_t * );
+    virtual ~BookmarksDialog();
+
     static BookmarksDialog *instance;
     void update();
     QTreeWidget *bookmarksList;

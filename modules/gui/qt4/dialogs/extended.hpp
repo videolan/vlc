@@ -42,13 +42,14 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
-    virtual ~ExtendedDialog();
     void showTab( int i );
 private:
     ExtendedDialog( intf_thread_t * );
+    virtual ~ExtendedDialog();
+
     static ExtendedDialog *instance;
 
     SyncControls *syncW;

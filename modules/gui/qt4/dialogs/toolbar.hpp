@@ -69,13 +69,14 @@ public:
         return instance;
     }
     static void killInstance()
-    { if( instance ) delete instance; instance = NULL;}
-    virtual ~ToolbarEditDialog();
+    { delete instance; instance = NULL;}
     int getOptions() { return flatBox->isChecked() * WIDGET_FLAT +
                         bigBox->isChecked() * WIDGET_BIG +
                         !shinyBox->isChecked() * WIDGET_SHINY; }
 private:
     ToolbarEditDialog( intf_thread_t * );
+    virtual ~ToolbarEditDialog();
+
     static ToolbarEditDialog *instance;
 
     QCheckBox *flatBox, *bigBox, *shinyBox;

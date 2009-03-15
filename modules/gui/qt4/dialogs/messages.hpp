@@ -47,14 +47,15 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
 
-    virtual ~MessagesDialog();
 
 private:
     MessagesDialog( intf_thread_t * );
+    virtual ~MessagesDialog();
+
     static MessagesDialog *instance;
     QTabWidget *mainTab;
     QSpinBox *verbosityBox;

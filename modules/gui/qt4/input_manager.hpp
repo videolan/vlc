@@ -213,9 +213,9 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
+        instance = NULL;
     }
-    virtual ~MainInputManager();
 
     input_thread_t *getInput() { return p_input; };
     InputManager *getIM() { return im; };
@@ -225,6 +225,8 @@ public:
 
 private:
     MainInputManager( intf_thread_t * );
+    virtual ~MainInputManager();
+
     static MainInputManager *instance;
 
     void customEvent( QEvent * );

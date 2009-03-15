@@ -45,11 +45,9 @@ public:
 
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
         instance = NULL;
     }
-
-    virtual ~MediaInfoDialog();
 
     void showTab( int );
 #if 0
@@ -57,6 +55,8 @@ public:
 #endif
 
 private:
+    virtual ~MediaInfoDialog();
+
     static MediaInfoDialog *instance;
     bool isMainInputInfo;
 

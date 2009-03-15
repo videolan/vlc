@@ -66,11 +66,13 @@ public:
     }
     static void killInstance()
     {
-        if( instance ) delete instance;
+        delete instance;
+        instance = NULL;
     }
-    virtual ~ActionsManager();
 
 private:
+    virtual ~ActionsManager();
+
     static ActionsManager *instance;
     ActionsManager( intf_thread_t  *_p_i, QObject *_parent );
     intf_thread_t       *p_intf;
