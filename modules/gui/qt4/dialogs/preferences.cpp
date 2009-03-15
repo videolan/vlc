@@ -39,8 +39,6 @@
 #include <QMessageBox>
 #include <QDialogButtonBox>
 
-PrefsDialog *PrefsDialog::instance = NULL;
-
 PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
             : QVLCDialog( parent, _p_intf )
 {
@@ -294,56 +292,13 @@ void PrefsDialog::save()
 
     /* Save to file */
     config_SaveConfigFile( p_intf, NULL );
-
-    destroyPanels();
-
-    hide();
+    accept();
 }
-
-void PrefsDialog::destroyPanels()
-{
-    msg_Dbg( p_intf, "Destroying the Panels" );
-    /* Delete the other panel in order to force its reload after clicking
-       on apply. In fact, if we don't do that, the preferences from the other
-       panels won't be accurate, so we would have to recreate the whole dialog,
-       and we don't want that.*/
-    if( small->isChecked() && advanced_panel )
-    {
-        /* Deleting only the active panel from the advanced config doesn't work
-           because the data records of PrefsItemData  contains still a
-           reference to it only cleanAll() is sure to remove all Panels! */
-        advanced_tree->cleanAll();
-        advanced_panel = NULL;
-    }
-    if( all->isChecked() && current_simple_panel )
-    {
-        for( int i = 0 ; i< SPrefsMax; i++ )
-        {
-            if( simple_panels[i] )
-            {
-               delete simple_panels[i];
-               simple_panels[i] = NULL;
-            }
-        }
-        current_simple_panel  = NULL;
-    }
-}
-
 
 /* Clean the preferences, dunno if it does something really */
 void PrefsDialog::cancel()
 {
-    if( small->isChecked() && simple_tree )
-    {
-        for( int i = 0 ; i< SPrefsMax; i++ )
-            if( simple_panels[i] ) simple_panels[i]->clean();
-    }
-    else if( all->isChecked() && advanced_tree )
-    {
-        advanced_tree->cleanAll();
-        advanced_panel = NULL;
-    }
-    hide();
+    reject();
 }
 
 /* Reset all the preferences, when you click the button */
@@ -362,8 +317,6 @@ void PrefsDialog::reset()
         config_SaveConfigFile( p_intf, NULL );
         getSettings()->clear();
 
-        close();
-        instance = NULL;
-        PrefsDialog::getInstance( p_intf )->show();
+        accept();
     }
 }

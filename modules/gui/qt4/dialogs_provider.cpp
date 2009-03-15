@@ -172,7 +172,8 @@ void DialogsProvider::playlistDialog()
 
 void DialogsProvider::prefsDialog()
 {
-    PrefsDialog::getInstance( p_intf )->toggleVisible();
+    PrefsDialog *p = new PrefsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
+    p->toggleVisible();
 }
 
 void DialogsProvider::extendedDialog()

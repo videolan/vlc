@@ -45,23 +45,15 @@ class PrefsDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static PrefsDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance )
-            instance = new PrefsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
-        return instance;
-    }
-    virtual ~PrefsDialog() { instance = NULL; }
+    PrefsDialog( QWidget *, intf_thread_t * );
+    virtual ~PrefsDialog() {}
 #if 0
     /*Called from extended settings, is not used anymore, but could be useful one day*/
     void showModulePrefs( char* );
 #endif
 
 private:
-    PrefsDialog( QWidget *, intf_thread_t * );
     QGridLayout *main_layout;
-
-    void destroyPanels();
 
     QWidget *main_panel;
     QHBoxLayout *main_panel_l;
@@ -78,8 +70,6 @@ private:
 
     QGroupBox *types;
     QRadioButton *small,*all;
-
-    static PrefsDialog *instance;
 
     bool b_small;
 
