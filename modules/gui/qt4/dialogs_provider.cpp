@@ -631,6 +631,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
 
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
     }
+    free( psz_soutoption );
 }
 
 void DialogsProvider::openAndStreamingDialogs()
