@@ -35,10 +35,6 @@
 #include <libxml/xmlreader.h>
 #include <libxml/catalog.h>
 
-#if !defined (LIBXML_VERSION) || (LIBXML_VERSION > 20700)
-# error Stale config.cache detected. Erase it and re-run configure.
-#endif
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -71,7 +67,6 @@ static void CatalogLoad( xml_t *, const char * );
 static void CatalogAdd( xml_t *, const char *, const char *, const char * );
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer );
 
-static unsigned refs = 0;
 static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
 /*****************************************************************************
@@ -85,8 +80,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     vlc_mutex_lock( &lock );
-    if( refs++ == 0 )
-        xmlInitParser();
+    xmlInitParser();
     vlc_mutex_unlock( &lock );
 
     p_xml->pf_reader_create = ReaderCreate;
@@ -103,11 +97,11 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
+#ifdef LIBXML_GETS_A_CLUE_ABOUT_REENTRANCY_AND_MEMORY_LEAKS
     vlc_mutex_lock( &lock );
-    if( --refs == 0 )
-        xmlCleanupParser();
+    xmlCleanupParser();
     vlc_mutex_unlock( &lock );
-
+#endif
     VLC_UNUSED(p_this);
     return;
 }

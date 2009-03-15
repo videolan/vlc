@@ -4311,13 +4311,13 @@ dnl
 AC_ARG_ENABLE(libxml2,
   [  --enable-libxml2        libxml2 support (default enabled)])
 AS_IF([test "${enable_libxml2}" != "no"], [
-  PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.5 libxml-2.0 < 2.7], [
+  PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.5], [
     VLC_ADD_CPPFLAGS([xml],[${XML2_CFLAGS}])
     VLC_ADD_LIBS([xml],[${XML2_LIBS}])
     VLC_ADD_PLUGIN([xml])
   ], [
     AS_IF([test "x${enable_xml2}" != "x"], [
-      AC_MSG_ERROR([Could not find libxml version 2.5 or 2.6])
+      AC_MSG_ERROR([Could not find libxml version 2.5 or higher])
     ])
   ])
 ])
