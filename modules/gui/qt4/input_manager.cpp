@@ -650,13 +650,12 @@ void InputManager::sliderUpdate( float new_pos )
 /* User togglePlayPause */
 void InputManager::togglePlayPause()
 {
-    vlc_value_t state;
     if( hasInput() )
     {
-        var_Get( p_input, "state", &state );
-        state.i_int = ( state.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S;
-        var_Set( p_input, "state", state );
-        emit statusChanged( state.i_int );
+        int state = var_GetInteger( p_input, "state" );
+        state = ( state != PLAYING_S ) ? PLAYING_S : PAUSE_S;
+        var_SetInteger( p_input, "state", state );
+        emit statusChanged( state );
     }
 }
 
@@ -665,9 +664,8 @@ void InputManager::sectionPrev()
     if( hasInput() )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        vlc_value_t val; val.b_bool = true;
-        var_Set( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "prev-chapter":"prev-title", val );
+        var_SetBool( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "prev-chapter":"prev-title", true );
     }
 }
 
@@ -676,9 +674,8 @@ void InputManager::sectionNext()
     if( hasInput() )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        vlc_value_t val; val.b_bool = true;
-        var_Set( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "next-chapter":"next-title", val );
+        var_SetBool( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "next-chapter":"next-title", true );
     }
 }
 
@@ -687,21 +684,20 @@ void InputManager::sectionMenu()
     if( hasInput() )
     {
         vlc_value_t val, text;
-        vlc_value_t root;
 
         if( var_Change( p_input, "title  0", VLC_VAR_GETLIST, &val, &text ) < 0 )
             return;
 
         /* XXX is it "Root" or "Title" we want here ?" (set 0 by default) */
-        root.i_int = 0;
+        int root = 0;
         for( int i = 0; i < val.p_list->i_count; i++ )
         {
             if( !strcmp( text.p_list->p_values[i].psz_string, "Title" ) )
-                root.i_int = i;
+                root = i;
         }
         var_Change( p_input, "title  0", VLC_VAR_FREELIST, &val, &text );
 
-        var_Set( p_input, "title  0", root );
+        var_SetInteger( p_input, "title  0", root );
     }
 }
 
@@ -819,9 +815,8 @@ void InputManager::jumpFwd()
     int i_interval = config_GetInt( p_input, "short-jump-size" );
     if( i_interval > 0 )
     {
-        vlc_value_t val;
-        val.i_time = (mtime_t)(i_interval) * 1000000L;
-        var_Set( p_input, "time-offset", val );
+        mtime_t val = (mtime_t)(i_interval) * 1000000L;
+        var_SetTime( p_input, "time-offset", val );
     }
 }
 
@@ -830,9 +825,8 @@ void InputManager::jumpBwd()
     int i_interval = config_GetInt( p_input, "short-jump-size" );
     if( i_interval > 0 )
     {
-        vlc_value_t val;
-        val.i_time = -1 *(mtime_t)(i_interval) * 1000000L;
-        var_Set( p_input, "time-offset", val );
+        mtime_t val = -1 *(mtime_t)(i_interval) * 1000000L;
+        var_SetTime( p_input, "time-offset", val );
     }
 }
 
