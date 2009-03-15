@@ -42,7 +42,7 @@ public:
 private:
     QLineEdit *fileLine;
 
-    QCheckBox *displayBox, *deinterBox;
+    QCheckBox *displayBox, *deinterBox, *dumpBox;
     VLCProfileSelector *profile;
     QString mrl;
 private slots:

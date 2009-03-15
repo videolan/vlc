@@ -80,10 +80,13 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
     QGridLayout *settingLayout = new QGridLayout( settingBox );
 
     profile = new VLCProfileSelector( this );
-    settingLayout->addWidget( profile, 0, 0 );
+    settingLayout->addWidget( profile, 0, 0, 1, -1 );
 
     deinterBox = new QCheckBox( qtr( "Deinterlace" ) );
     settingLayout->addWidget( deinterBox, 1, 0 );
+
+    dumpBox = new QCheckBox( qtr( "Dump raw input" ) );
+    settingLayout->addWidget( dumpBox, 1, 1 );
 
     mainLayout->addWidget( settingBox, 3, 0, 1, -1  );
 
@@ -119,16 +122,23 @@ void ConvertDialog::close()
 {
     hide();
 
-    mrl = "sout=#" + profile->getTranscode();
-    if( deinterBox->isChecked() )
+    if( dumpBox->isChecked() )
     {
-        mrl.remove( '}' );
-        mrl += ",deinterlace}";
+        mrl = "demux=dump :demuxdump-file" + fileLine->text();
     }
-    mrl += ":duplicate{";
-    if( displayBox->isChecked() ) mrl += "dst=display,";
-    mrl += "dst=std{access=file,mux=" + profile->getMux() +
+    else
+    {
+        mrl = "sout=#" + profile->getTranscode();
+        if( deinterBox->isChecked() )
+        {
+            mrl.remove( '}' );
+            mrl += ",deinterlace}";
+        }
+        mrl += ":duplicate{";
+        if( displayBox->isChecked() ) mrl += "dst=display,";
+        mrl += "dst=std{access=file,mux=" + profile->getMux() +
             ",dst='" + fileLine->text() + "'}";
+    }
 
     msg_Dbg( p_intf, "Transcode MRL: %s", qtu( mrl ) );
     accept();
