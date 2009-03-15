@@ -87,7 +87,7 @@ OpenDialog::OpenDialog( QWidget *parent,
 
     /* Basic Creation of the Window */
     ui.setupUi( this );
-    setWindowTitle( qtr( "Open a Media" ) );
+    setWindowTitle( qtr( "Open Media" ) );
 
     /* Tab definition and creation */
     fileOpenPanel    = new FileOpenPanel( this, p_intf );

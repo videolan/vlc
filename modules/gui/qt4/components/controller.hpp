@@ -33,7 +33,7 @@
 #include <QFrame>
 #include <QString>
 
-#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a media")
+#define I_PLAY_TOOLTIP N_("Play\nIf the playlist is empty, open a medium")
 
 #define MAIN_TB1_DEFAULT "64;39;64;38;65"
 #define MAIN_TB2_DEFAULT "0-2;64;3;1;4;64;7;10;9;64-4;37;65;35-4"
@@ -104,7 +104,7 @@ static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
     "Frame By Frame", "Trickplay Reverse", "Step backward" , "Step forward",
     "Quit" };
 static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
-    _("Stop playback"), _("Open a media"),
+    _("Stop playback"), _("Open a medium"),
     _("Previous media in the playlist"),
     _("Next media in the playlist"), _("Slower"), _("Faster"),
     _("Toggle the video in fullscreen"), _("Toggle the video out fullscreen"),
