@@ -126,8 +126,8 @@
             "<p>If you are unsure about terminology, please consult the <a href=\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</p>" \
             "<p>To understand the main keyboard shortcuts, read the <a href=\"http://wiki.videolan.org/Hotkeys\">shortcuts</a> page.</p>" \
         "<h3>Help</h3>" \
-            "<p>Before asking any question, please refer yourself to the <a href=\"http://wiki.videolan.org/Frequently_Asked_Questions\">FAQ</a>.</p>" \
-            "<p>You might then get (and give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC channel ( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> on irc.freenode.net ).</p>" \
+            "<p>Before asking any question, please refer yourself to the <a href=\"http://www.videolan.org/support/faq.html\">FAQ</a>.</p>" \
+            "<p>You might then get (and give) help on the <a href=\"http://forum.videolan.org\">Forums</a>, the <a href=\"http://www.videolan.org/vlc/lists.html\">mailing-lists</a> or our IRC channel (<em>#videolan</em> on irc.freenode.net).</p>" \
         "<h3>Contribute to the project</h3>" \
             "<p>You can help the VideoLAN project giving some of your time to help the community, to design skins, to translate the documentation, to test and to code. You can also give funds and material to help us. And of course, you can <b>promote</b> VLC media player.</p>" \
     "</body></html>")
