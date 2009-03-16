@@ -68,7 +68,7 @@ static int CmpAddress( vlc_value_t v, vlc_value_t w ) { return v.p_address == w.
  * Local duplication functions, and local deallocation functions
  *****************************************************************************/
 static void DupDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
-static void DupString( vlc_value_t *p_val ) { if( p_val->psz_string ) p_val->psz_string = strdup( p_val->psz_string ); }
+static void DupString( vlc_value_t *p_val ) { p_val->psz_string = strdup( p_val->psz_string ?: ""); }
 
 static void DupList( vlc_value_t *p_val )
 {
