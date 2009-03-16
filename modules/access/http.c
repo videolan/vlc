@@ -434,7 +434,6 @@ connect:
     if( p_sys->i_code == 401 )
     {
         char *psz_login, *psz_password;
-        int i_ret;
         /* FIXME ? */
         if( p_sys->url.psz_username && p_sys->url.psz_password &&
             p_sys->auth.psz_nonce && p_sys->auth.i_nonce == 0 )
