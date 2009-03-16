@@ -103,8 +103,8 @@ static void CloseFilter( vlc_object_t *p_this );
 /*****************************************************************************
  * Callback prototypes
  *****************************************************************************/
-static int FilterCallback ( vlc_object_t *, char const *,
-                            vlc_value_t, vlc_value_t, void * );
+static int FilterCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -321,6 +321,43 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
     msg_Dbg( p_vout, "using %s deinterlace method", psz_method );
 }
 
+static void GetOutputFormat( vout_thread_t *p_vout,
+                             video_format_t *p_dst, const video_format_t *p_src )
+{
+    *p_dst = *p_src;
+
+    if( p_vout->p_sys->b_half_height )
+    {
+        p_dst->i_height /= 2;
+        p_dst->i_visible_height /= 2;
+        p_dst->i_y_offset /= 2;
+        p_dst->i_sar_den *= 2;
+    }
+
+    if( p_src->i_chroma == VLC_FOURCC('I','4','2','2') )
+    {
+        switch( p_vout->p_sys->i_mode )
+        {
+        case DEINTERLACE_MEAN:
+        case DEINTERLACE_LINEAR:
+        case DEINTERLACE_X:
+            p_dst->i_chroma = VLC_FOURCC('I','4','2','2');
+            break;
+        default:
+            p_dst->i_chroma = VLC_FOURCC('I','4','2','0');
+            break;
+        }
+    }
+}
+
+static bool IsChromaSupported( vlc_fourcc_t i_chroma )
+{
+    return i_chroma == VLC_FOURCC('I','4','2','0') ||
+           i_chroma == VLC_FOURCC('I','Y','U','V') ||
+           i_chroma == VLC_FOURCC('Y','V','1','2') ||
+           i_chroma == VLC_FOURCC('I','4','2','2');
+}
+
 /*****************************************************************************
  * Init: initialize Deinterlace video thread output method
  *****************************************************************************/
@@ -331,25 +368,16 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
+    if( !IsChromaSupported( p_vout->render.i_chroma ) )
+        return VLC_EGENERIC; /* unknown chroma */
+
     /* Initialize the output structure, full of directbuffers since we want
      * the decoder to output directly to our structures. */
-    switch( p_vout->render.i_chroma )
-    {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','4','2','2'):
-            p_vout->output.i_chroma = p_vout->render.i_chroma;
-            p_vout->output.i_width  = p_vout->render.i_width;
-            p_vout->output.i_height = p_vout->render.i_height;
-            p_vout->output.i_aspect = p_vout->render.i_aspect;
-            p_vout->fmt_out = p_vout->fmt_in;
-            break;
-
-        default:
-            return VLC_EGENERIC; /* unknown chroma */
-            break;
-    }
+    p_vout->output.i_chroma = p_vout->render.i_chroma;
+    p_vout->output.i_width  = p_vout->render.i_width;
+    p_vout->output.i_height = p_vout->render.i_height;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
+    p_vout->fmt_out = p_vout->fmt_in;
 
     /* Try to open the real video output */
     p_vout->p_sys->p_vout = SpawnRealVout( p_vout );
@@ -378,47 +406,12 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
 {
-    vout_thread_t *p_real_vout = NULL;
-    video_format_t fmt;
-    memset( &fmt, 0, sizeof( video_format_t ) );
-
     msg_Dbg( p_vout, "spawning the real video output" );
 
-    fmt = p_vout->fmt_out;
-    if( p_vout->p_sys->b_half_height )
-    {
-        fmt.i_height /= 2; fmt.i_visible_height /= 2; fmt.i_y_offset /= 2;
-        fmt.i_sar_den *= 2;
-    }
+    video_format_t fmt;
+    GetOutputFormat( p_vout, &fmt, &p_vout->fmt_out );
 
-    switch( p_vout->render.i_chroma )
-    {
-    case VLC_FOURCC('I','4','2','0'):
-    case VLC_FOURCC('I','Y','U','V'):
-    case VLC_FOURCC('Y','V','1','2'):
-        p_real_vout = vout_Create( p_vout, &fmt );
-        break;
-
-    case VLC_FOURCC('I','4','2','2'):
-        switch( p_vout->p_sys->i_mode )
-        {
-        case DEINTERLACE_MEAN:
-        case DEINTERLACE_LINEAR:
-        case DEINTERLACE_X:
-            fmt.i_chroma = VLC_FOURCC('I','4','2','2');
-            break;
-        default:
-            fmt.i_chroma = VLC_FOURCC('I','4','2','0');
-            break;
-        }
-        p_real_vout = vout_Create( p_vout, &fmt );
-        break;
-
-    default:
-        break;
-    }
-
-    return p_real_vout;
+    return vout_Create( p_vout, &fmt );
 }
 
 /*****************************************************************************
@@ -1766,17 +1759,15 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
     /* Request output picture */
     p_pic_dst = filter_NewPicture( p_filter );
     if( p_pic_dst == NULL )
-        return p_pic;
+    {
+        picture_Release( p_pic );
+        return NULL;
+    }
 
     switch( p_vout->p_sys->i_mode )
     {
         case DEINTERLACE_DISCARD:
-#if 0
             RenderDiscard( p_vout, p_pic_dst, p_pic, 0 );
-#endif
-            msg_Err( p_vout, "discarding lines is not supported yet" );
-            picture_Release( p_pic_dst );
-            return p_pic;
             break;
 
         case DEINTERLACE_BOB:
@@ -1793,8 +1784,8 @@ static picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 #endif
             msg_Err( p_vout, "doubling the frame rate is not supported yet" );
             picture_Release( p_pic_dst );
-            return p_pic;
-            break;
+            picture_Release( p_pic );
+            return NULL;
 
         case DEINTERLACE_MEAN:
             RenderMean( p_vout, p_pic_dst, p_pic );
@@ -1825,13 +1816,8 @@ static int OpenFilter( vlc_object_t *p_this )
     vout_thread_t *p_vout;
     vlc_value_t val;
 
-    if( ( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0') &&
-          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V') &&
-          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2') ) ||
-        p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
-    {
+    if( !IsChromaSupported( p_filter->fmt_in.video.i_chroma ) )
         return VLC_EGENERIC;
-    }
 
     /* Impossible to use VLC_OBJECT_VOUT here because it would be used
      * by spu filters */
@@ -1843,17 +1829,29 @@ static int OpenFilter( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_CFG_PREFIX, ppsz_filter_options,
                    p_filter->p_cfg );
     var_Get( p_filter, FILTER_CFG_PREFIX "mode", &val );
+
     var_Create( p_filter, "deinterlace-mode", VLC_VAR_STRING );
     var_Set( p_filter, "deinterlace-mode", val );
     free( val.psz_string );
 
-    if ( Create( VLC_OBJECT(p_vout) ) != VLC_SUCCESS )
+    if( Create( VLC_OBJECT(p_vout) ) != VLC_SUCCESS )
     {
         vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         return VLC_EGENERIC;
     }
 
+    video_format_t fmt;
+    GetOutputFormat( p_vout, &fmt, &p_filter->fmt_in.video );
+    if( !p_filter->b_allow_fmt_out_change &&
+        ( fmt.i_chroma != p_filter->fmt_in.video.i_chroma ||
+          fmt.i_height != p_filter->fmt_in.video.i_height ) )
+    {
+        CloseFilter( VLC_OBJECT(p_filter) );
+        return VLC_EGENERIC;
+    }
+    p_filter->fmt_out.video = fmt;
+    p_filter->fmt_out.i_codec = fmt.i_chroma;
     p_filter->pf_video_filter = Deinterlace;
 
     msg_Dbg( p_filter, "deinterlacing" );
