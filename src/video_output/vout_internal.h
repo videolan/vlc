@@ -79,6 +79,7 @@ struct vout_thread_sys_t
     mtime_t         i_pause_date;
 
     /* Filter chain */
+    bool           b_first_vout;  /* True if it is the first vout of the filter chain */
     char           *psz_filter_chain;
     bool            b_filter_change;
 
