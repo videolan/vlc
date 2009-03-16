@@ -503,8 +503,6 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     }
 
     p_input = THEMIM->getInput();
-    if( p_input )
-        vlc_object_hold( p_input );
     p_aout = THEMIM->getAout();
     EnableStaticEntries( current, ( p_aout != NULL ) );
     AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
@@ -512,8 +510,6 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
     {
         vlc_object_release( p_aout );
     }
-    if( p_input )
-        vlc_object_release( p_input );
 
     return Populate( p_intf, current, varnames, objects );
 }
@@ -565,17 +561,12 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
     }
 
     p_input = THEMIM->getInput();
-    if( p_input )
-        vlc_object_hold( p_input );
 
     p_vout = THEMIM->getVout();
     VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
 
     if( p_vout )
         vlc_object_release( p_vout );
-
-    if( p_input )
-        vlc_object_release( p_input );
 
     return Populate( p_intf, current, varnames, objects );
 }
@@ -621,8 +612,6 @@ QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     /* Get the input and hold it */
     p_object = THEMIM->getInput();
-    if( p_object )
-        vlc_object_hold( p_object );
 
     InputAutoMenuBuilder( p_object, objects, varnames );
 
@@ -633,9 +622,6 @@ QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
     PUSH_VAR( "next-title" );
     PUSH_VAR( "prev-chapter" );
     PUSH_VAR( "next-chapter" );
-
-    if( p_object )
-        vlc_object_release( p_object );
 
     EnableStaticEntries( menu, (p_object != NULL ) );
     return Populate( p_intf, menu, varnames, objects );
@@ -829,14 +815,12 @@ void QVLCMenu::VideoPopupMenu( intf_thread_t *p_intf )
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_hold( p_input );
         vout_thread_t *p_vout = THEMIM->getVout();
         if( p_vout )
         {
             VideoAutoMenuBuilder( p_vout, p_input, objects, varnames );
             vlc_object_release( p_vout );
         }
-        vlc_object_release( p_input );
     }
     QMenu *menu = new QMenu();
     CREATE_POPUP;
@@ -848,12 +832,10 @@ void QVLCMenu::AudioPopupMenu( intf_thread_t *p_intf )
     POPUP_BOILERPLATE;
     if( p_input )
     {
-        vlc_object_hold( p_input );
         aout_instance_t *p_aout = THEMIM->getAout();
         AudioAutoMenuBuilder( p_aout, p_input, objects, varnames );
         if( p_aout )
             vlc_object_release( p_aout );
-        vlc_object_release( p_input );
     }
     QMenu *menu = new QMenu();
     CREATE_POPUP;
@@ -866,7 +848,6 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 
     if( p_input )
     {
-        vlc_object_hold( p_input );
         varnames.push_back( "audio-es" );
         InputAutoMenuBuilder( p_input, objects, varnames );
         PUSH_SEPARATOR;
@@ -938,9 +919,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         }
 
         /* Input menu */
-        vlc_object_hold( p_input );
         InputAutoMenuBuilder( p_input, objects, varnames );
-        vlc_object_release( p_input );
 
         /* Audio menu */
         submenu = new QMenu( menu );
