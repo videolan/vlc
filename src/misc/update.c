@@ -1381,6 +1381,14 @@ void update_Check( update_t *p_update, void (*pf_callback)( void*, bool ), void 
 {
     assert( p_update );
 
+    // If the object already exist, destroy it
+    if( p_update->p_check )
+    {
+        vlc_object_kill( p_update->p_check );
+        vlc_thread_join( p_update->p_check );
+        vlc_object_release( p_update->p_check );
+    }
+
     update_check_thread_t *p_uct =
         vlc_custom_create( p_update->p_libvlc, sizeof( *p_uct ),
                            VLC_OBJECT_GENERIC, "update check" );
@@ -1473,10 +1481,12 @@ static char *size_str( long int l_size )
 
 void update_WaitDownload( update_t *p_update )
 {
-    if(p_update->p_download)
+    if( p_update->p_download )
+    {
         vlc_thread_join( p_update->p_download );
-    vlc_object_release( p_update->p_download );
-    p_update->p_download = NULL;
+        vlc_object_release( p_update->p_download );
+        p_update->p_download = NULL;
+    }
 }
 
 static void* update_DownloadReal( vlc_object_t *p_this );
@@ -1493,6 +1503,14 @@ static void* update_DownloadReal( vlc_object_t *p_this );
 void update_Download( update_t *p_update, const char *destination )
 {
     assert( p_update );
+
+    // If the object already exist, destroy it
+    if( p_update->p_download )
+    {
+        vlc_object_kill( p_update->p_download );
+        vlc_thread_join( p_update->p_download );
+        vlc_object_release( p_update->p_download );
+    }
 
     update_download_thread_t *p_udt =
         vlc_custom_create( p_update->p_libvlc, sizeof( *p_udt ),
