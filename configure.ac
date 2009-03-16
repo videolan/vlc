@@ -1802,7 +1802,7 @@ dnl
 AC_ARG_ENABLE(taglib,
   [  --disable-taglib        Taglib support (default enabled) ])
   AS_IF([test "${enable_taglib}" != "no"],[
-    PKG_CHECK_MODULES(TAGLIB, taglib,
+    PKG_CHECK_MODULES(TAGLIB, taglib >= 1.5,
       [ AC_DEFINE( HAVE_TAGLIB, 1, [Define if you have taglib plugin built] )
         VLC_ADD_PLUGIN([taglib])
         VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
