@@ -120,7 +120,7 @@ Dialogs::~Dialogs()
     }
 
     /* Unregister callbacks */
-    var_DelCallback( getIntf()->p_sys->p_playlist, "intf-popupmenu",
+    var_DelCallback( getIntf()->p_libvlc, "intf-popupmenu",
                      PopupMenuCB, this );
 }
 
@@ -183,7 +183,7 @@ bool Dialogs::init()
     }
 
     /* Register callback for the intf-popupmenu variable */
-    var_AddCallback( getIntf()->p_sys->p_playlist, "intf-popupmenu",
+    var_AddCallback( getIntf()->p_libvlc, "intf-popupmenu",
                      PopupMenuCB, this );
 
     return true;
