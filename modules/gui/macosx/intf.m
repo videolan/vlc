@@ -1418,7 +1418,7 @@ struct manage_cleanup_stack {
     id self;
 };
 
-static void * manage_cleanup( void * args )
+static void manage_cleanup( void * args )
 {
     struct manage_cleanup_stack * manage_cleanup_stack = args;
     intf_thread_t * p_intf = manage_cleanup_stack->p_intf;
@@ -1435,7 +1435,6 @@ static void * manage_cleanup( void * args )
     pl_Release( p_intf );
 
     if( p_input ) vlc_object_release( p_input );
-    return NULL;
 }
 
 - (void)manage
