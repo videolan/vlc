@@ -758,7 +758,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
             p_pic = OutputPicture( p_dec );
 
         /* Parse SEI for CC support */
-        ParseSei( p_dec, p_frag );
+        if( i_nal_type == NAL_SEI )
+            ParseSei( p_dec, p_frag );
     }
 
     /* Append the block */
