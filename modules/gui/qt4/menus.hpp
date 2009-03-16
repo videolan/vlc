@@ -53,6 +53,8 @@ public:
                   vlc_value_t _val, const char *_var ) : QObject( parent )
     {
         p_obj = _p_obj;
+        if( p_obj )
+            vlc_object_hold( p_obj );
         i_val_type = _i_type;
         val = _val;
         psz_var = strdup( _var );
@@ -62,6 +64,8 @@ public:
         free( psz_var );
         if( ( i_val_type & VLC_VAR_TYPE) == VLC_VAR_STRING )
             free( val.psz_string );
+        if( p_obj )
+            vlc_object_release( p_obj );
     }
 
     vlc_object_t *p_obj;
