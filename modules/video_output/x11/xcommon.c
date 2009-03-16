@@ -3131,8 +3131,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     bool b_arg;
     unsigned int i_width, i_height;
-    unsigned int *pi_width, *pi_height;
-    Drawable d = 0;
 
     switch( i_query )
     {
