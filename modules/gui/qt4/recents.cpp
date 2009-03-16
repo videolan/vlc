@@ -53,7 +53,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
     free( psz_tmp );
 
     load();
-    if ( !isActive ) clear();
+    if( !isActive ) clear();
 }
 
 RecentsMRL::~RecentsMRL()
@@ -89,7 +89,7 @@ void RecentsMRL::clear()
     if ( stack->isEmpty() )
         return;
     stack->clear();
-    QVLCMenu::updateRecents( p_intf );
+    if( !isActive ) QVLCMenu::updateRecents( p_intf );
     save();
 }
 
