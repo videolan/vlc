@@ -200,7 +200,7 @@ void SoutDialog::updateMRL()
     QString qs_mux = ui.profileSelect->getMux();
 
     SoutMrl smrl( ":sout=#" );
-    if( !ui.profileSelect->getTranscode().isEmpty() )
+    if( !ui.profileSelect->getTranscode().isEmpty() && ui.transcodeBox->isChecked() )
     {
         smrl.begin( ui.profileSelect->getTranscode() );
         smrl.end();
