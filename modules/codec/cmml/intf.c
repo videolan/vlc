@@ -61,6 +61,7 @@
  *****************************************************************************/
 struct intf_sys_t
 {
+    vlc_mutex_t         lock;
     decoder_t *         p_cmml_decoder;
     input_thread_t *    p_input;
 
@@ -123,6 +124,7 @@ int OpenIntf ( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_intf->pf_run = RunIntf;
+    vlc_mutex_init( &p_intf->p_sys->lock );
 
     var_AddCallback( p_intf->p_libvlc, "key-action", KeyEvent, p_intf );
     /* we also need to add the callback for "mouse-clicked", but do that later
@@ -166,6 +168,7 @@ void CloseIntf ( vlc_object_t *p_this )
 
     vlc_object_release( p_intf->p_sys->p_cmml_decoder );
 
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
     free( p_intf->p_sys );
 }
 
@@ -212,7 +215,7 @@ static void RunIntf( intf_thread_t *p_intf )
             }
         }
 
-        vlc_mutex_lock( &p_intf->change_lock );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
 
         /*
          * keyboard event
@@ -232,7 +235,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
         }
         p_intf->p_sys->i_key_action = 0;
-        vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
 
         (void) DisplayPendingAnchor( p_intf, p_vout );
 
@@ -334,14 +337,14 @@ static int InitThread( intf_thread_t * p_intf )
             return VLC_EGENERIC;
         }
 
-        vlc_mutex_lock( &p_intf->change_lock );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
 
         p_intf->p_sys->p_input = p_input;
         p_intf->p_sys->p_cmml_decoder = p_cmml_decoder;
 
         p_intf->p_sys->i_key_action = 0;
 
-        vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
 
         return VLC_SUCCESS;
     }
@@ -374,11 +377,13 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
     VLC_UNUSED(oldval); VLC_UNUSED(newval);
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    vlc_mutex_lock( &p_intf->change_lock );
 
+
+    vlc_mutex_lock( &p_intf->p_sys->lock );
+    /* FIXME: key presses might get lost here... */
     p_intf->p_sys->i_key_action = newval.i_int;
 
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     return VLC_SUCCESS;
 }
