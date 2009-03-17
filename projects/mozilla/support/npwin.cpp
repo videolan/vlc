@@ -449,7 +449,7 @@ NPError NPN_GetURL(NPP instance, const char *url, const char *target)
     return g_pNavigatorFuncs->geturl(instance, url, target);
 }
 
-NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file, void* notifyData)
+NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32_t len, const char* buf, NPBool file, void* notifyData)
 {
     int navMinorVers = g_pNavigatorFuncs->version & 0xFF;
     NPError err;
@@ -463,7 +463,7 @@ NPError NPN_PostURLNotify(NPP instance, const char* url, const char* window, uin
 }
 
 
-NPError NPN_PostURL(NPP instance, const char* url, const char* window, uint32 len, const char* buf, NPBool file)
+NPError NPN_PostURL(NPP instance, const char* url, const char* window, uint32_t len, const char* buf, NPBool file)
 {
     return g_pNavigatorFuncs->posturl(instance, url, window, len, buf, file);
 }
@@ -497,11 +497,11 @@ NPError NPN_NewStream(NPP instance, NPMIMEType type,
 
 /* Provides len bytes of data.
  */
-int32 NPN_Write(NPP instance, NPStream *stream,
-                int32 len, void *buffer)
+int32_t NPN_Write(NPP instance, NPStream *stream,
+                int32_t len, void *buffer)
 {
     int navMinorVersion = g_pNavigatorFuncs->version & 0xFF;
-    int32 result;
+    int32_t result;
 
     if( navMinorVersion >= NPVERS_HAS_STREAMOUTPUT ) {
         result = g_pNavigatorFuncs->write(instance, stream, len, buffer);
@@ -546,7 +546,7 @@ const char* NPN_UserAgent(NPP instance)
 /* allocates memory from the Navigator's memory space.  Necessary so that
  * saved instance data may be freed by Navigator when exiting.
  */
-void* NPN_MemAlloc(uint32 size)
+void *NPN_MemAlloc(uint32 size)
 {
     return g_pNavigatorFuncs->memalloc(size);
 }
