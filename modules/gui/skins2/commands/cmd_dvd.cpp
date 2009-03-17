@@ -31,9 +31,7 @@ void CmdDvdNextTitle::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val;
-        val.b_bool = true;
-        var_Set( p_input, "next-title", val );
+        var_SetVoid( p_input, "next-title" );
         vlc_object_release( p_input );
     }
 }
@@ -46,9 +44,7 @@ void CmdDvdPreviousTitle::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val;
-        val.b_bool = true;
-        var_Set( p_input, "prev-title", val );
+        var_SetVoid( p_input, "prev-title" );
         vlc_object_release( p_input );
     }
 }
@@ -61,9 +57,7 @@ void CmdDvdNextChapter::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val;
-        val.b_bool = true;
-        var_Set( p_input, "next-chapter", val );
+        var_SetVoid( p_input, "next-chapter" );
         vlc_object_release( p_input );
     }
 }
@@ -76,9 +70,7 @@ void CmdDvdPreviousChapter::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        vlc_value_t val;
-        val.b_bool = true;
-        var_Set( p_input, "prev-chapter", val );
+        var_SetVoid( p_input, "prev-chapter" );
         vlc_object_release( p_input );
     }
 }

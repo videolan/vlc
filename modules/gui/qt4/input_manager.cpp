@@ -664,8 +664,8 @@ void InputManager::sectionPrev()
     if( hasInput() )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        var_SetBool( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "prev-chapter":"prev-title", true );
+        var_SetVoid( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "prev-chapter":"prev-title" );
     }
 }
 
@@ -674,8 +674,8 @@ void InputManager::sectionNext()
     if( hasInput() )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        var_SetBool( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "next-chapter":"next-title", true );
+        var_SetVoid( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "next-chapter":"next-title" );
     }
 }
 

@@ -1168,34 +1168,22 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
         case '[':
             if( p_sys->p_input )
-            {
-                val.b_bool = true;
-                var_Set( p_sys->p_input, "prev-title", val );
-            }
+                var_SetVoid( p_sys->p_input, "prev-title" );
             ReturnTrue;
 
         case ']':
             if( p_sys->p_input )
-            {
-                val.b_bool = true;
-                var_Set( p_sys->p_input, "next-title", val );
-            }
+                var_SetVoid( p_sys->p_input, "next-title" );
             ReturnTrue;
 
         case '<':
             if( p_sys->p_input )
-            {
-                val.b_bool = true;
-                var_Set( p_sys->p_input, "prev-chapter", val );
-            }
+                var_SetVoid( p_sys->p_input, "prev-chapter" );
             ReturnTrue;
 
         case '>':
             if( p_sys->p_input )
-            {
-                val.b_bool = true;
-                var_Set( p_sys->p_input, "next-chapter", val );
-            }
+                var_SetVoid( p_sys->p_input, "next-chapter" );
             ReturnTrue;
 
         case 'p':

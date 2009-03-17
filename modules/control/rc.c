@@ -1157,15 +1157,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
         else if( !strcmp( psz_cmd, "chapter_n" ) )
-        {
-            val.b_bool = true;
-            var_Set( p_input, "next-chapter", val );
-        }
+            var_SetVoid( p_input, "next-chapter" );
         else if( !strcmp( psz_cmd, "chapter_p" ) )
-        {
-            val.b_bool = true;
-            var_Set( p_input, "prev-chapter", val );
-        }
+            var_SetVoid( p_input, "prev-chapter" );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -1196,15 +1190,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
         else if( !strcmp( psz_cmd, "title_n" ) )
-        {
-            val.b_bool = true;
-            var_Set( p_input, "next-title", val );
-        }
+            var_SetVoid( p_input, "next-title" );
         else if( !strcmp( psz_cmd, "title_p" ) )
-        {
-            val.b_bool = true;
-            var_Set( p_input, "prev-title", val );
-        }
+            var_SetVoid( p_input, "prev-title" );
 
         vlc_object_release( p_input );
         return VLC_SUCCESS;
