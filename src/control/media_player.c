@@ -607,7 +607,6 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     p_mi->p_input_thread = input_CreateThread(
             p_mi->p_libvlc_instance->p_libvlc_int, p_mi->p_md->p_input_item );
 
-
     if( !p_mi->p_input_thread )
     {
         vlc_mutex_unlock( &p_mi->object_lock );
@@ -671,7 +670,12 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
     input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
 
     if( !p_input_thread )
+    {
+        /* We do return the right value, no need to throw an exception */
+        if( libvlc_exception_raised( p_e ) )
+            libvlc_exception_clear( p_e );
         return 0;
+    }
 
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
 
@@ -720,6 +724,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 
         input_StopThread( p_input_thread, true );
         vlc_object_release( p_input_thread );
+        p_mi->p_input_thread = NULL;
     }
 }
 
