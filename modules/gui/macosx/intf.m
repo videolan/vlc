@@ -1460,7 +1460,6 @@ static void manage_cleanup( void * args )
     while( true )
     {
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-        vlc_mutex_lock( &p_intf->change_lock );
 
         if( !p_input )
         {
@@ -1489,8 +1488,6 @@ static void manage_cleanup( void * args )
 
         /* Manage volume status */
         [self manageVolumeSlider];
-
-        vlc_mutex_unlock( &p_intf->change_lock );
 
         msleep( INTF_IDLE_SLEEP );
 
