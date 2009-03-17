@@ -673,25 +673,8 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
 int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
-    input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-
-    if( !p_input_thread )
-    {
-        /* We do return the right value, no need to throw an exception */
-        if( libvlc_exception_raised( p_e ) )
-            libvlc_exception_clear( p_e );
-        return 0;
-    }
-
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
-
-    vlc_object_release( p_input_thread );
-
-    if( state == libvlc_Playing )
-    {
-        return 1;
-    }
-    return 0;
+    return libvlc_Playing == state;
 }
 
 
