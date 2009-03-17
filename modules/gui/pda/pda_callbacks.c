@@ -346,9 +346,7 @@ gboolean onPDADeleteEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
-    vlc_mutex_lock( &p_intf->change_lock );
     libvlc_Quit( p_intf->p_libvlc );
-    vlc_mutex_unlock( &p_intf->change_lock );
     msg_Dbg( p_intf, "about to exit vlc ... signaled" );
 
     return TRUE;
@@ -437,9 +435,7 @@ gboolean SliderRelease(GtkWidget *widget, GdkEventButton *event, gpointer user_d
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
     msg_Dbg( p_intf, "SliderButton Release" );
-    vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->b_slider_free = 1;
-    vlc_mutex_unlock( &p_intf->change_lock );
 
     return TRUE;
 }
@@ -449,9 +445,7 @@ gboolean SliderPress(GtkWidget *widget, GdkEventButton *event, gpointer user_dat
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
     msg_Dbg( p_intf, "SliderButton Press" );
-    vlc_mutex_lock( &p_intf->change_lock );
     p_intf->p_sys->b_slider_free = 0;
-    vlc_mutex_unlock( &p_intf->change_lock );
 
     return FALSE;
 }

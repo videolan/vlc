@@ -397,7 +397,6 @@ void GtkAutoPlayFile( vlc_object_t *p_this )
 static int Manage( intf_thread_t *p_intf )
 {
     GtkListStore *p_liststore;
-    vlc_mutex_lock( &p_intf->change_lock );
 
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
@@ -522,16 +521,12 @@ static int Manage( intf_thread_t *p_intf )
 #ifndef NEED_GTK2_MAIN
     if( !vlc_object_alive( p_intf ) )
     {
-        vlc_mutex_unlock( &p_intf->change_lock );
-
         /* Prepare to die, young Skywalker */
         gtk_main_quit();
 
         return FALSE;
     }
 #endif
-
-    vlc_mutex_unlock( &p_intf->change_lock );
 
     return TRUE;
 }
