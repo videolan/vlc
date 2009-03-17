@@ -69,7 +69,6 @@ static void intf_Destroy( vlc_object_t *obj )
 
     free( p_intf->psz_intf );
     config_ChainDestroy( p_intf->p_cfg );
-    vlc_mutex_destroy( &p_intf->change_lock );
 }
 
 
@@ -111,9 +110,6 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
         vlc_object_release( p_intf );
         return NULL;
     }
-
-    /* Initialize mutexes */
-    vlc_mutex_init( &p_intf->change_lock );
 
     /* Attach interface to its parent object */
     vlc_object_attach( p_intf, p_this );

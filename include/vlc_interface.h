@@ -66,8 +66,6 @@ struct intf_thread_t
     void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
                                intf_dialog_args_t * );
 
-    vlc_mutex_t  change_lock;
-
     config_chain_t *p_cfg;
 };
 
