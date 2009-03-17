@@ -939,14 +939,12 @@ void MainInputManager::customEvent( QEvent *event )
     /* Should be PLItemChanged Event */
     if( !p_intf->p_sys->b_isDialogProvider )
     {
-        vlc_mutex_lock( &p_intf->change_lock );
         if( p_input && ( p_input->b_dead || !vlc_object_alive (p_input) ) )
         {
             emit inputChanged( p_input );
             var_DelCallback( p_input, "state", PLItemChanged, this );
             vlc_object_release( p_input );
             p_input = NULL;
-            vlc_mutex_unlock( &p_intf->change_lock );
             return;
         }
 
@@ -959,7 +957,6 @@ void MainInputManager::customEvent( QEvent *event )
                 emit inputChanged( p_input );
             }
         }
-        vlc_mutex_unlock( &p_intf->change_lock );
     }
     else
     {
