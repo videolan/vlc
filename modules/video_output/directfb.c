@@ -1,7 +1,7 @@
 /*****************************************************************************
  * directfb.c: DirectFB video output display method
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  *
  * Authors: Iuri Diniz <iuri@digizap.com.br>
  *
@@ -101,6 +101,7 @@ static int Create( vlc_object_t *p_this )
     if( DirectFBInit(NULL,NULL) != DFB_OK )
     {
         msg_Err(p_vout, "Cannot init DirectFB");
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
