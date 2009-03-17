@@ -101,7 +101,11 @@ static int Open( vlc_object_t *p_this )
 
     /* Get the root windows of the default screen */
     memset( &p_sys->root, 0, sizeof( p_sys->root ) );
-    xcb_screen_iterator_t iter = xcb_setup_roots_iterator( xcb_get_setup( p_sys->p_connection ) );
+
+    const xcb_setup_t* xcbsetup = xcb_get_setup( p_sys->p_connection );
+    if( !xcbsetup )
+        goto error;
+    xcb_screen_iterator_t iter = xcb_setup_roots_iterator( xcbsetup );
     for( int i = 0; i < i_screen_default; i++ )
     {
         if( !iter.rem )
