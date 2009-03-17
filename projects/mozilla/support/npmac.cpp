@@ -1,3 +1,23 @@
+/* -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
+ *
+ * Safari/Mozilla/Firefox plugin for VLC
+ * Copyright (C) 2009, Jean-Paul Saman <jpsaman@videolan.org>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 // npmac.cpp
@@ -204,9 +224,7 @@ static void* SetupTVtoFPGlue(TTVtoFPGlue* functionGlue, void* tvp)
 
 #endif /* XP_MACOSX */
 
-
 #pragma mark -
-
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -228,7 +246,6 @@ NPNetscapeFuncs    gNetscapeFuncs;      // Function table for procs in Netscape 
 // about the function table and call macros in npupp.h.
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 
 void NPN_Version(int* plugin_major, int* plugin_minor, int* netscape_major, int* netscape_minor)
 {
