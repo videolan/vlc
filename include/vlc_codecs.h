@@ -393,31 +393,4 @@ static inline void sf_tag_to_fourcc( GUID *guid_tag,
     if( ppsz_name ) *ppsz_name = sub_format_tag_to_fourcc[i].psz_name;
 }
 
-/**
- * Structure to hold information concerning subtitles.
- * Used between demuxers and decoders of subtitles.
- */
-typedef struct es_sys_t
-{
-    char               *psz_header; /* for 'ssa ' and 'subt' */
-
-    /* for spudec */
-    unsigned int        i_orig_height;
-    unsigned int        i_orig_width;
-    unsigned int        i_origin_x;
-    unsigned int        i_origin_y;
-    unsigned int        i_scale_h;
-    unsigned int        i_scale_v;
-    unsigned int        i_alpha;
-    bool          b_smooth;
-    mtime_t             i_fade_in;
-    mtime_t             i_fade_out;
-    unsigned int        i_align;
-    mtime_t             i_time_offset;
-    bool          b_forced_subs;
-    unsigned int        palette[16];
-    unsigned int        colors[4];
-
-} subtitle_data_t;
-
 #endif /* "codecs.h" */
