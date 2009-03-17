@@ -146,15 +146,15 @@ static void * load_syms(decoder_t *p_dec, const char *path)
 {
     void *handle;
 
-    msg_Dbg( p_dec, "opening win32 dll '%s'\n", path);
+    msg_Dbg( p_dec, "opening win32 dll '%s'", path);
 #ifdef LOADER
     Setup_LDT_Keeper();
 #endif
     handle = LoadLibraryA(path);
-    msg_Dbg( p_dec, "win32 real codec handle=%p  \n",handle);
+    msg_Dbg( p_dec, "win32 real codec handle=%p",handle);
     if (!handle)
     {
-        msg_Err( p_dec, "Error loading dll\n");
+        msg_Err( p_dec, "Error loading dll");
         return NULL;
     }
 
@@ -168,7 +168,7 @@ static void * load_syms(decoder_t *p_dec, const char *path)
         dll_type = 1;
         return handle;
     }
-    msg_Err( p_dec, "Error resolving symbols! (version incompatibility?)\n");
+    msg_Err( p_dec, "Error resolving symbols! (version incompatibility?)");
     FreeLibrary(handle);
     return NULL; // error
 }
@@ -177,12 +177,12 @@ static void * load_syms_linux(decoder_t *p_dec, const char *path)
 {
     void *handle;
 
-    msg_Dbg( p_dec, "opening shared obj '%s'\n", path);
+    msg_Dbg( p_dec, "opening shared obj '%s'", path);
 
     handle = dlopen (path, RTLD_LAZY);
     if (!handle) 
     {
-        msg_Err( p_dec,"Error: %s\n",dlerror());
+        msg_Err( p_dec,"Error: %s",dlerror());
         return NULL;
     }
 
@@ -197,7 +197,7 @@ static void * load_syms_linux(decoder_t *p_dec, const char *path)
         return handle;
     }
 
-    msg_Err( p_dec,"Error resolving symbols! (version incompatibility?)\n");
+    msg_Err( p_dec,"Error resolving symbols! (version incompatibility?)");
     dlclose(handle);
     return 0;
 }
@@ -513,7 +513,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
              || p_dec->fmt_in.video.i_height  != transform_out[4] )
             {
                 msg_Warn(p_dec, "Warning, Real's Header give a wrong "
-                         "information about media's width and height!\n"
+                         "information about media's width and height!"
                          "\tRealHeader: \t %d X %d  \t %d X %d",
                          p_dec->fmt_in.video.i_width,
                          p_dec->fmt_in.video.i_height,
