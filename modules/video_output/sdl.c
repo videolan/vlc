@@ -408,9 +408,7 @@ static int Manage( vout_thread_t *p_vout )
                 val.i_int = p_vout->fmt_in.i_visible_height;
 
             var_Set( p_vout, "mouse-y", val );
-
-            val.b_bool = true;
-            var_Set( p_vout, "mouse-moved", val );
+            var_SetBool( p_vout, "mouse-moved", true );
 
             if( p_vout->p_sys->b_cursor )
             {
@@ -437,9 +435,7 @@ static int Manage( vout_thread_t *p_vout )
                     var_Set( p_vout, "mouse-button-down", val );
 
                     var_SetBool( p_vout, "mouse-clicked", true );
-
-                    val.b_bool = false;
-                    var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
+                    var_SetBool( p_vout->p_libvlc, "intf-popupmenu", false );
                 }
                 break;
 
@@ -449,7 +445,6 @@ static int Manage( vout_thread_t *p_vout )
                     val.i_int &= ~2;
                     var_Set( p_vout, "mouse-button-down", val );
 
-                    vlc_value_t val;
                     var_Get( p_vout->p_libvlc, "intf-show", &val );
                     val.b_bool = !val.b_bool;
                     var_Set( p_vout->p_libvlc, "intf-show", val );
@@ -462,8 +457,7 @@ static int Manage( vout_thread_t *p_vout )
                     val.i_int &= ~4;
                     var_Set( p_vout, "mouse-button-down", val );
 
-                    val.b_bool = true;
-                    var_Set( p_vout->p_libvlc, "intf-popupmenu", val );
+                    var_SetBool( p_vout->p_libvlc, "intf-popupmenu", true );
                 }
                 break;
             }
