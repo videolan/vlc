@@ -67,10 +67,6 @@ static void intf_Destroy( vlc_object_t *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
 
-    /* Unlock module if present (a switch may have failed) */
-    if( p_intf->p_module )
-        module_unneed( p_intf, p_intf->p_module );
-
     free( p_intf->psz_intf );
     config_ChainDestroy( p_intf->p_cfg );
     vlc_mutex_destroy( &p_intf->change_lock );
@@ -182,6 +178,8 @@ void intf_StopThread( intf_thread_t *p_intf )
     /* Tell the interface to die */
     vlc_object_kill( p_intf );
     vlc_thread_join( p_intf );
+
+    module_unneed( p_intf, p_intf->p_module );
 }
 
 
