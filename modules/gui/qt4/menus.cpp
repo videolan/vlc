@@ -877,21 +877,18 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 /* Main Menu that sticks everything together  */
 void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 {
-    /* Destroy popup menu if there is one */
+    /* Delete old popup if there is one */
+    if( p_intf->p_sys->p_popup_menu )
+        delete p_intf->p_sys->p_popup_menu;
+
     if( !show )
     {
-        delete p_intf->p_sys->p_popup_menu;
         p_intf->p_sys->p_popup_menu = NULL;
         return;
     }
 
-    /* Delete and recreate a popup if there is one */
-    if( p_intf->p_sys->p_popup_menu )
-        delete p_intf->p_sys->p_popup_menu;
-
     /* */
     QMenu *menu = new QMenu();
-    QMenu *submenu;
     QAction *action;
     bool b_isFullscreen = false;
     MainInterface *mi = p_intf->p_sys->p_mi;
@@ -904,6 +901,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 
     if( p_input )
     {
+        QMenu *submenu;
         vout_thread_t *p_vout = THEMIM->getVout();
 
         /* Add a fullscreen switch button, since it is the most used function */
@@ -951,7 +949,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
     /* Add some special entries for windowed mode: Interface Menu */
     if( !b_isFullscreen )
     {
-        submenu = new QMenu( qtr( "Interface" ), menu );
+        QMenu *submenu = new QMenu( qtr( "Interface" ), menu );
         QMenu *tools = ToolsMenu( submenu );
         submenu->addSeparator();
 
