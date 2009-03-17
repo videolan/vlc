@@ -128,14 +128,14 @@ NPN_GetURLNotify(NPP instance, const char* url, const char* window, void* notify
 
 NPError
 NPN_PostURL(NPP instance, const char* url, const char* window,
-         uint32 len, const char* buf, NPBool file)
+         uint32_t len, const char* buf, NPBool file)
 {
     return CallNPN_PostURLProc(gNetscapeFuncs.posturl, instance,
                     url, window, len, buf, file);
 }
 
 NPError
-NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32 len,
+NPN_PostURLNotify(NPP instance, const char* url, const char* window, uint32_t len,
                   const char* buf, NPBool file, void* notifyData)
 {
     return CallNPN_PostURLNotifyProc(gNetscapeFuncs.posturlnotify,
@@ -157,8 +157,8 @@ NPN_NewStream(NPP instance, NPMIMEType type, const char *window,
                     type, window, stream_ptr);
 }
 
-int32
-NPN_Write(NPP instance, NPStream* stream, int32 len, void* buffer)
+int32_t
+NPN_Write(NPP instance, NPStream* stream, int32_t len, void* buffer)
 {
     return CallNPN_WriteProc(gNetscapeFuncs.write, instance,
                     stream, len, buffer);
@@ -183,8 +183,7 @@ NPN_UserAgent(NPP instance)
     return CallNPN_UserAgentProc(gNetscapeFuncs.uagent, instance);
 }
 
-void*
-NPN_MemAlloc(uint32 size)
+void *NPN_MemAlloc(uint32_t size)
 {
     return CallNPN_MemAllocProc(gNetscapeFuncs.memalloc, size);
 }
@@ -194,7 +193,7 @@ void NPN_MemFree(void* ptr)
     CallNPN_MemFreeProc(gNetscapeFuncs.memfree, ptr);
 }
 
-uint32 NPN_MemFlush(uint32 size)
+uint32_t NPN_MemFlush(uint32_t size)
 {
     return CallNPN_MemFlushProc(gNetscapeFuncs.memflush, size);
 }
@@ -443,15 +442,15 @@ void NPN_SetException(NPObject* obj, const NPUTF8 *message)
  ***********************************************************************/
 
 /* Function prototypes */
-NPError Private_New(NPMIMEType pluginType, NPP instance, uint16 mode,
-        int16 argc, char* argn[], char* argv[], NPSavedData* saved);
+NPError Private_New(NPMIMEType pluginType, NPP instance, uint16_t mode,
+        int16_t argc, char* argn[], char* argv[], NPSavedData* saved);
 NPError Private_Destroy(NPP instance, NPSavedData** save);
 NPError Private_SetWindow(NPP instance, NPWindow* window);
 NPError Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream,
-                          NPBool seekable, uint16* stype);
-int32 Private_WriteReady(NPP instance, NPStream* stream);
-int32 Private_Write(NPP instance, NPStream* stream, int32 offset,
-                    int32 len, void* buffer);
+                          NPBool seekable, uint16_t* stype);
+int32_t Private_WriteReady(NPP instance, NPStream* stream);
+int32_t Private_Write(NPP instance, NPStream* stream, int32_t offset,
+                    int32_t len, void* buffer);
 void Private_StreamAsFile(NPP instance, NPStream* stream, const char* fname);
 NPError Private_DestroyStream(NPP instance, NPStream* stream, NPError reason);
 void Private_URLNotify(NPP instance, const char* url,
@@ -465,8 +464,8 @@ JRIGlobalRef Private_GetJavaClass(void);
 
 /* function implementations */
 NPError
-Private_New(NPMIMEType pluginType, NPP instance, uint16 mode,
-        int16 argc, char* argn[], char* argv[], NPSavedData* saved)
+Private_New(NPMIMEType pluginType, NPP instance, uint16_t mode,
+        int16_t argc, char* argn[], char* argv[], NPSavedData* saved)
 {
     NPError ret;
     PLUGINDEBUGSTR("New");
@@ -492,7 +491,7 @@ Private_SetWindow(NPP instance, NPWindow* window)
 
 NPError
 Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream,
-            NPBool seekable, uint16* stype)
+            NPBool seekable, uint16_t* stype)
 {
     NPError err;
     PLUGINDEBUGSTR("NewStream");
@@ -500,7 +499,7 @@ Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream,
     return err;
 }
 
-int32
+int32_t
 Private_WriteReady(NPP instance, NPStream* stream)
 {
     unsigned int result;
@@ -509,8 +508,8 @@ Private_WriteReady(NPP instance, NPStream* stream)
     return result;
 }
 
-int32
-Private_Write(NPP instance, NPStream* stream, int32 offset, int32 len,
+int32_t
+Private_Write(NPP instance, NPStream* stream, int32_t offset, int32_t len,
         void* buffer)
 {
     unsigned int result;
