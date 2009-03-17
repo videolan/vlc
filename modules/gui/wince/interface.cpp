@@ -733,7 +733,6 @@ void Interface::OnVideoOnTop( void )
 
 void Interface::OnSliderUpdate( int wp )
 {
-    vlc_mutex_lock( &p_intf->change_lock );
     input_thread_t *p_input = p_intf->p_sys->p_input;
 
     int dwPos = SendMessage( hwndSlider, TBM_GETPOS, 0, 0 );
@@ -770,8 +769,6 @@ void Interface::OnSliderUpdate( int wp )
                          (LPARAM)_FROMMB(psz_time) );
         }
     }
-
-    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void Interface::OnChange( int wp )

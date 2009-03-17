@@ -90,8 +90,6 @@ void Timer::Notify( void )
     vlc_value_t val;
     char *shortname;
 
-    vlc_mutex_lock( &p_intf->change_lock );
-
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
     {
@@ -219,14 +217,10 @@ void Timer::Notify( void )
 
     if( !vlc_object_alive( p_intf ) )
     {
-        vlc_mutex_unlock( &p_intf->change_lock );
-
         /* Prepare to die, young Skywalker */
 /*        p_main_interface->Close(TRUE);*/
         return;
     }
-
-    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 /*****************************************************************************
