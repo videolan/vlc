@@ -2276,13 +2276,15 @@ static int InputSourceInit( input_thread_t *p_input,
                             input_source_t *in, const char *psz_mrl,
                             const char *psz_forced_demux )
 {
-    char psz_dup[strlen(psz_mrl) + 1];
     const char *psz_access;
     const char *psz_demux;
     char *psz_path;
     double f_fps;
 
-    strcpy( psz_dup, psz_mrl );
+    char *psz_dup = strdup( psz_mrl );
+
+    if( psz_dup == NULL )
+        goto error;
 
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
@@ -2553,6 +2555,8 @@ static int InputSourceInit( input_thread_t *p_input,
         }
     }
 
+    free( psz_dup );
+
     /* Set record capabilities */
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
         in->b_can_stream_record = false;
@@ -2600,6 +2604,7 @@ error:
 
     if( in->p_access )
         access_Delete( in->p_access );
+    free( psz_dup );
 
     return VLC_EGENERIC;
 }
