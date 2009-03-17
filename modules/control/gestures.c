@@ -45,6 +45,7 @@
  *****************************************************************************/
 struct intf_sys_t
 {
+    vlc_mutex_t         lock;
     vlc_object_t *      p_vout;
     bool                b_got_gesture;
     bool                b_button_pressed;
@@ -119,6 +120,7 @@ int Open ( vlc_object_t *p_this )
     // Configure the module
     p_intf->pf_run = RunIntf;
 
+    vlc_mutex_init( &p_sys->lock );
     p_sys->p_vout = NULL;
     p_sys->b_got_gesture = false;
     p_sys->b_button_pressed = false;
@@ -166,6 +168,7 @@ void Close ( vlc_object_t *p_this )
     }
 
     /* Destroy structure */
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
     free( p_intf->p_sys );
 }
 
@@ -182,7 +185,7 @@ static void RunIntf( intf_thread_t *p_intf )
     /* Main loop */
     while( vlc_object_alive( p_intf ) )
     {
-        vlc_mutex_lock( &p_intf->change_lock );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
 
         /*
          * mouse cursor
@@ -443,7 +446,7 @@ static void RunIntf( intf_thread_t *p_intf )
             }
         }
 
-        vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
 
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
@@ -465,12 +468,12 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     signed int i_horizontal, i_vertical;
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
 
-    vlc_mutex_lock( &p_intf->change_lock );
+    vlc_mutex_lock( &p_intf->p_sys->lock );
 
     /* don't process new gestures before the last events are processed */
     if( p_intf->p_sys->b_got_gesture )
     {
-        vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
         return VLC_SUCCESS;
     }
 
@@ -539,7 +542,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         p_intf->p_sys->b_got_gesture = true;
     }
 
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     return VLC_SUCCESS;
 }
