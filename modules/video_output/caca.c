@@ -164,7 +164,9 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
+#if defined( WIN32 ) && !defined( UNDER_CE )
         FreeConsole();
+#endif
         return VLC_ENOMEM;
     }
 
@@ -172,7 +174,9 @@ static int Create( vlc_object_t *p_this )
     if( !p_vout->p_sys->p_cv )
     {
         msg_Err( p_vout, "cannot initialize libcucul" );
+#if defined( WIN32 ) && !defined( UNDER_CE )
         FreeConsole();
+#endif
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
@@ -182,6 +186,9 @@ static int Create( vlc_object_t *p_this )
     {
         msg_Err( p_vout, "cannot initialize libcaca" );
         cucul_free_canvas( p_vout->p_sys->p_cv );
+#if defined( WIN32 ) && !defined( UNDER_CE )
+        FreeConsole();
+#endif
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
