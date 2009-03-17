@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -90,7 +90,7 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-        return( 1 );
+        return VLC_ENOMEM;
 
     /* Don't parse any options, but take $AAOPTS into account */
     aa_parseoptions( NULL, NULL, NULL, NULL );
@@ -98,7 +98,8 @@ static int Create( vlc_object_t *p_this )
     if (!(p_vout->p_sys->aa_context = aa_autoinit(&aa_defparams)))
     {
         msg_Err( p_vout, "cannot initialize aalib" );
-        return( 1 );
+        free( p_vout->p_sys );
+        return VLC_EGENERIC;
     }
 
     p_vout->pf_init = Init;
@@ -112,7 +113,8 @@ static int Create( vlc_object_t *p_this )
     aa_autoinitkbd( p_vout->p_sys->aa_context, 0 );
     aa_autoinitmouse( p_vout->p_sys->aa_context, AA_MOUSEPRESSMASK );
     aa_hidemouse( p_vout->p_sys->aa_context );
-    return( 0 );
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -143,9 +145,7 @@ static int Init( vout_thread_t *p_vout )
     }
 
     if( p_pic == NULL )
-    {
-        return -1;
-    }
+        return VLC_EGENERIC;
 
     /* Allocate the picture */
     p_pic->p->p_pixels = aa_image( p_vout->p_sys->aa_context );
@@ -162,7 +162,7 @@ static int Init( vout_thread_t *p_vout )
     PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
     I_OUTPUTPICTURES++;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -212,7 +212,7 @@ static int Manage( vout_thread_t *p_vout )
     default:
         break;
     }
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
