@@ -53,10 +53,7 @@ gboolean delete_event_cb( GtkWidget *widget,
     (void)event; (void)user_data;
     intf_thread_t *p_intf = get_intf_from_widget( widget );
 
-    vlc_mutex_lock( &p_intf->change_lock );
     libvlc_Quit( p_intf->p_libvlc );
-    vlc_mutex_unlock( &p_intf->change_lock );
-
     gtk_main_quit();
 
     return TRUE;

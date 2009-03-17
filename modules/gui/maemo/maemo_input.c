@@ -90,12 +90,10 @@ void delete_input( intf_thread_t *p_intf )
 
 void item_changed_pl( intf_thread_t *p_intf )
 {
-    vlc_mutex_lock( &p_intf->change_lock );
     if( p_intf->p_sys->p_input &&
         ( p_intf->p_sys->p_input->b_dead || p_intf->p_sys->p_input->b_die ) )
     {
         delete_input( p_intf );
-        vlc_mutex_unlock( &p_intf->change_lock );
         return;
     }
 
@@ -103,7 +101,6 @@ void item_changed_pl( intf_thread_t *p_intf )
     {
         set_input( p_intf, playlist_CurrentInput( p_intf->p_sys->p_playlist ) );
     }
-    vlc_mutex_unlock( &p_intf->change_lock );
     return;
 }
 
