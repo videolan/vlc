@@ -538,8 +538,6 @@ function doGo(targetURL)
             // clear() may return before the playlist has actually been cleared
             // just wait for it to finish its job
         }
-        //vlc.playlist.add(targetURL);
-        //vlc.playlist.play();
 
         var itemId = vlc.playlist.add(targetURL);
         if( itemId != -1 )
