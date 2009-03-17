@@ -64,6 +64,7 @@ int VCDOpenIntf ( vlc_object_t *p_this )
     {
         return( VLC_EGENERIC );
     };
+    vlc_mutex_init( &p_intf->p_sys->lock );
 
     p_intf->pf_run = RunIntf;
 
@@ -84,6 +85,7 @@ void VCDCloseIntf ( vlc_object_t *p_this )
     var_DelCallback( p_intf->p_libvlc, "key-pressed", KeyEvent, p_intf );
 
     /* Destroy structure */
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
     free( p_intf->p_sys );
 }
 
@@ -128,7 +130,7 @@ RunIntf( intf_thread_t *p_intf )
     /* Main loop */
     while( vlc_object_alive (p_intf) )
     {
-      vlc_mutex_lock( &p_intf->change_lock );
+      vlc_mutex_lock( &p_intf->p_sys->lock );
 
         /*
          * Have we timed-out in showing a still frame?
@@ -287,7 +289,7 @@ RunIntf( intf_thread_t *p_intf )
         }
 
 
-      vlc_mutex_unlock( &p_intf->change_lock );
+      vlc_mutex_unlock( &p_intf->p_sys->lock );
 
       if( p_vout == NULL )
         {
@@ -328,7 +330,7 @@ static int InitThread( intf_thread_t * p_intf )
     if( p_input == NULL )
         return VLC_EGENERIC;
 
-    vlc_mutex_lock( &p_intf->change_lock );
+    vlc_mutex_lock( &p_intf->p_sys->lock );
 
     p_intf->p_sys->p_input     = p_input;
     p_intf->p_sys->p_vcdplayer = NULL;
@@ -337,7 +339,7 @@ static int InitThread( intf_thread_t * p_intf )
     p_intf->p_sys->b_click = false;
     p_intf->p_sys->b_key_pressed = false;
 
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
     /* make sure we return a value */
     return 0;
 }
@@ -349,11 +351,11 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    vlc_mutex_lock( &p_intf->change_lock );
+    vlc_mutex_lock( &p_intf->p_sys->lock );
 
     p_intf->p_sys->b_key_pressed = true;
 
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -364,7 +366,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
  *****************************************************************************/
 int vcdIntfStillTime( intf_thread_t *p_intf, uint8_t i_sec )
 {
-    vlc_mutex_lock( &p_intf->change_lock );
+    vlc_mutex_lock( &p_intf->p_sys->lock );
 
     p_intf->p_sys->b_still = 1;
     if( 255 == i_sec )
@@ -375,7 +377,7 @@ int vcdIntfStillTime( intf_thread_t *p_intf, uint8_t i_sec )
     {
         p_intf->p_sys->m_still_time = MILLISECONDS_PER_SEC * i_sec;
     }
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -385,10 +387,10 @@ int vcdIntfStillTime( intf_thread_t *p_intf, uint8_t i_sec )
  *****************************************************************************/
 int vcdIntfResetStillTime( intf_thread_t *p_intf )
 {
-    vlc_mutex_lock( &p_intf->change_lock );
+    vlc_mutex_lock( &p_intf->p_sys->lock );
     p_intf->p_sys->m_still_time = 0;
     var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     return VLC_SUCCESS;
 }

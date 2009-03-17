@@ -44,6 +44,7 @@ struct intf_sys_t
   int                 control;
 #endif
   bool          b_click, b_move, b_key_pressed;
+  vlc_mutex_t lock;
 };
 
 int vcdIntfStillTime( struct intf_thread_t * p_intf, uint8_t wait_time);
