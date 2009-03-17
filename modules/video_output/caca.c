@@ -1,7 +1,7 @@
 /*****************************************************************************
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
- * Copyright (C) 2003, 2004 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
@@ -163,12 +163,16 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
+    {
+        FreeConsole();
         return VLC_ENOMEM;
+    }
 
     p_vout->p_sys->p_cv = cucul_create_canvas(0, 0);
     if( !p_vout->p_sys->p_cv )
     {
         msg_Err( p_vout, "cannot initialize libcucul" );
+        FreeConsole();
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
@@ -362,8 +366,7 @@ static int Manage( vout_thread_t *p_vout )
                 * p_vout->render.i_height
                          / cucul_get_canvas_height( p_vout->p_sys->p_cv );
             var_Set( p_vout, "mouse-y", val );
-            val.b_bool = true;
-            var_Set( p_vout, "mouse-moved", val );
+            var_SetBool( p_vout, "mouse-moved", true );
             break;
         case CACA_EVENT_MOUSE_RELEASE:
             var_SetBool( p_vout, "mouse-clicked", true );
