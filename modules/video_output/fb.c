@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 the VideoLAN team
+ * Copyright (C) 2000-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -186,10 +186,9 @@ static int Create( vlc_object_t *p_this )
     struct termios      new_termios;
 
     /* Allocate instance and initialize some members */
-    p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
+    p_vout->p_sys = p_sys = calloc( 1, sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(vout_sys_t) );
 
     p_sys->p_video = MAP_FAILED;
 
@@ -212,6 +211,7 @@ static int Create( vlc_object_t *p_this )
     if( p_sys->b_tty && !isatty( 0 ) )
     {
         msg_Warn( p_vout, "fd 0 is not a TTY" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
     else
@@ -239,7 +239,6 @@ static int Create( vlc_object_t *p_this )
                       psz_chroma );
         }
         free( psz_chroma );
-        psz_chroma = NULL;
     }
 
     p_sys->i_aspect = -1;
@@ -258,7 +257,6 @@ static int Create( vlc_object_t *p_this )
                   atoi( psz_aspect ), atoi( psz_parser ) );
 
         free( psz_aspect );
-        psz_aspect = NULL;
     }
 
     p_sys->b_auto = false;
@@ -284,7 +282,6 @@ static int Create( vlc_object_t *p_this )
         case 4:
         default:
             p_sys->b_auto = true;
-            break;
      }
 
     /* tty handling */
@@ -783,7 +780,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
     free( psz_device );
-    psz_device = NULL;
 
     /* Get framebuffer device information */
     if( ioctl( p_sys->i_fd, FBIOGET_VSCREENINFO, &p_sys->var_info ) )
