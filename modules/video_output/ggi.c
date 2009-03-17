@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 the VideoLAN team
+ * Copyright (C) 2000-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -104,14 +104,14 @@ static int Create( vlc_object_t *p_this )
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
-        return( 1 );
+        return VLC_ENOMEM;
 
     /* Open and initialize device */
     if( OpenDisplay( p_vout ) )
     {
         msg_Err( p_vout, "cannot initialize GGI display" );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     p_vout->pf_init = Init;
@@ -120,7 +120,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -159,7 +159,7 @@ static int Init( vout_thread_t *p_vout )
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->i_bits_per_pixel );
-            return 0;
+            return VLC_EGENERIC;
     }
 
     /* Only useful for bits_per_pixel != 8 */
@@ -181,7 +181,7 @@ static int Init( vout_thread_t *p_vout )
 
     if( p_pic == NULL )
     {
-        return 0;
+        return VLC_EGENERIC;
     }
 
     /* We know the chroma, allocate a buffer which will be used
@@ -229,7 +229,7 @@ static int Init( vout_thread_t *p_vout )
     /* Set asynchronous display mode -- usually quite faster */
     ggiAddFlags( p_vout->p_sys->p_display, GGIFLAG_ASYNC );
 
-    return( 0 );
+    return VLC_SUCCESS;
 #undef p_b
 }
 
@@ -376,7 +376,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ggiInit() )
     {
         msg_Err( p_vout, "cannot initialize GGI library" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Open display */
@@ -389,7 +389,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot open GGI default display" );
         ggiExit();
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Find most appropriate mode */
@@ -413,7 +413,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         msg_Err( p_vout, "cannot set GGI mode" );
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Check buffers properties */
@@ -429,7 +429,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
             msg_Err( p_vout, "double buffering is not possible" );
             ggiClose( p_vout->p_sys->p_display );
             ggiExit();
-            return( 1 );
+            return VLC_EGENERIC;
         }
 
         /* Check buffer properties */
@@ -442,7 +442,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
             msg_Err( p_vout, "incorrect video memory type" );
             ggiClose( p_vout->p_sys->p_display );
             ggiExit();
-            return( 1 );
+            return VLC_EGENERIC;
         }
 
         /* Check if buffer needs to be acquired before write */
@@ -463,7 +463,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         msg_Err( p_vout, "cannot set colors" );
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Set clipping for text */
@@ -474,13 +474,13 @@ static int OpenDisplay( vout_thread_t *p_vout )
         msg_Err( p_vout, "cannot set clipping" );
         ggiClose( p_vout->p_sys->p_display );
         ggiExit();
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* FIXME: set palette in 8bpp */
     p_vout->p_sys->i_bits_per_pixel = p_b[ 0 ]->buffer.plb.pixelformat->depth;
 
-    return( 0 );
+    return VLC_SUCCESS;
 #undef p_b
 }
 
