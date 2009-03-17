@@ -203,7 +203,11 @@ void CloseVideoGL ( vlc_object_t * p_this )
 
     if( p_vout->p_sys->b_embedded )
     {
-        aglDestroyContext(p_vout->p_sys->agl_ctx);
+        if( p_vout->p_sys->agl_ctx )
+        {
+            aglEnd( p_vout );
+            aglDestroyContext(p_vout->p_sys->agl_ctx);
+        }
     }
     else if(VLCIntf && vlc_object_alive (VLCIntf))
     {
@@ -526,7 +530,11 @@ static int aglInit( vout_thread_t * p_vout )
 static void aglEnd( vout_thread_t * p_vout )
 {
     aglSetCurrentContext(NULL);
-    if( p_vout->p_sys->theWindow ) DisposeWindow( p_vout->p_sys->theWindow );
+    if( p_vout->p_sys->theWindow )
+    {
+        DisposeWindow( p_vout->p_sys->theWindow );
+        p_vout->p_sys->theWindow = NULL;
+    }
 }
 
 static void aglReshape( vout_thread_t * p_vout )
@@ -623,11 +631,17 @@ static int aglManage( vout_thread_t * p_vout )
             aglSetCurrentContext(p_vout->p_sys->agl_ctx);
             aglSetViewport(p_vout, viewBounds, clipBounds);
 
-            /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty update to the main thread */
-            sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow), kEventClassVLCPlugin, kEventVLCPluginHideFullscreen);
+            if( p_vout->p_sys->theWindow )
+            {
+                /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty
+                 * update to the main thread */
+                sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow),
+                                      kEventClassVLCPlugin, kEventVLCPluginHideFullscreen);
+            }
         }
         else
         {
+            /* Go into fullscreen */
             Rect deviceRect;
  
             GDHandle deviceHdl = GetMainDevice();
@@ -685,8 +699,13 @@ static int aglManage( vout_thread_t * p_vout )
             aglSetViewport(p_vout, deviceRect, deviceRect);
             //aglSetFullScreen(p_vout->p_sys->agl_ctx, device_width, device_height, 0, 0);
 
-            /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty update to the main thread */
-            sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow), kEventClassVLCPlugin, kEventVLCPluginShowFullscreen);
+            if( p_vout->p_sys->theWindow )
+            {
+                /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty
+                 * update to the main thread */
+                sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow),
+                                      kEventClassVLCPlugin, kEventVLCPluginShowFullscreen);
+            }
         }
         aglReshape(p_vout);
         aglUnlock( p_vout );
