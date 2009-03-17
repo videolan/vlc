@@ -44,6 +44,7 @@
  *****************************************************************************/
 struct intf_sys_t
 {
+    vlc_mutex_t lock;
     vlc_object_t * p_vout;
     bool     b_button_pressed;
     bool     b_triggered;
@@ -89,6 +90,7 @@ int Open( vlc_object_t *p_this )
         return( 1 );
     };
 
+    vlc_mutex_init( &p_intf->p_sys->lock );
     p_intf->pf_run = RunIntf;
 
     return( 0 );
@@ -102,6 +104,7 @@ void Close( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     /* Destroy structure */
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
     free( p_intf->p_sys );
 }
 
@@ -123,7 +126,7 @@ static void RunIntf( intf_thread_t *p_intf )
     /* Main loop */
     while( vlc_object_alive( p_intf ) )
     {
-        vlc_mutex_lock( &p_intf->change_lock );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
 
         /* Notify the interfaces */
         if( p_intf->p_sys->b_triggered )
@@ -132,7 +135,7 @@ static void RunIntf( intf_thread_t *p_intf )
             p_intf->p_sys->b_triggered = false;
         }
 
-        vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
 
 
         /* Take care of the video output */
@@ -181,14 +184,14 @@ static int InitThread( intf_thread_t * p_intf )
 {
     if( vlc_object_alive( p_intf ) )
     {
-        vlc_mutex_lock( &p_intf->change_lock );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
 
         p_intf->p_sys->b_triggered = false;
         p_intf->p_sys->b_button_pressed = false;
         p_intf->p_sys->i_threshold =
             config_GetInt( p_intf, "showintf-threshold" );
 
-        vlc_mutex_unlock( &p_intf->change_lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
 
         return 0;
     }
@@ -219,7 +222,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     if( !val.i_int )
         return VLC_SUCCESS;
 
-    vlc_mutex_lock( &p_intf->change_lock );
+    vlc_mutex_lock( &p_intf->p_sys->lock );
     if( !strcmp( psz_var, "mouse-moved" ) && !p_intf->p_sys->b_button_pressed )
     {
         var_Get( p_intf->p_sys->p_vout, "mouse-x", &val );
@@ -248,7 +251,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         p_intf->p_sys->b_button_pressed = false;
     }
 
-    vlc_mutex_unlock( &p_intf->change_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
 
     return VLC_SUCCESS;
 }
