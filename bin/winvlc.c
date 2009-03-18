@@ -260,7 +260,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
     }
 
     fwprintf( fd, L"\n\n[CONTEXT]\nEDI:%08x\nESI:%08x\n" \
-                "EBX:%08x\nEDX:%08xn\nECX:%08x\nEAX:%08x\n" \
+                "EBX:%08x\nEDX:%08x\nECX:%08x\nEAX:%08x\n" \
                 "EBP:%08x\nEIP:%08x\nESP:%08x\n",
                     pContext->Edi,pContext->Esi,pContext->Ebx,
                     pContext->Edx,pContext->Ecx,pContext->Eax,
