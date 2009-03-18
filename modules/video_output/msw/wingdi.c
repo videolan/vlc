@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -145,11 +145,9 @@ vlc_module_end ()
 static int OpenVideo ( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
 
-    p_vout->p_sys = (vout_sys_t *)malloc( sizeof(vout_sys_t) );
+    p_vout->p_sys = (vout_sys_t *)calloc( 1, sizeof(vout_sys_t) );
     if( !p_vout->p_sys ) return VLC_ENOMEM;
-    memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
 #ifdef MODULE_NAME_IS_wingapi
     /* Load GAPI */
@@ -268,15 +266,13 @@ static int OpenVideo ( vlc_object_t *p_this )
 #ifndef UNDER_CE
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
-    var_Get( p_vout, "video-on-top", &val );
-    var_Set( p_vout, "video-on-top", val );
+    var_TriggerCallback( p_vout, "video-on-top" );
 
     /* disable screensaver by temporarily changing system settings */
     p_vout->p_sys->i_spi_lowpowertimeout = 0;
     p_vout->p_sys->i_spi_powerofftimeout = 0;
     p_vout->p_sys->i_spi_screensavetimeout = 0;
-    var_Get( p_vout, "disable-screensaver", &val);
-    if( val.b_bool ) {
+    if( var_GetBool( p_vout, "disable-screensaver" ) ) {
         msg_Dbg(p_vout, "disabling screen saver");
         SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT,
             0, &(p_vout->p_sys->i_spi_lowpowertimeout), 0);

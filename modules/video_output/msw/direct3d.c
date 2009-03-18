@@ -1,7 +1,7 @@
 /*****************************************************************************
  * direct3d.c: Windows Direct3D video output module
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  *$Id$
  *
  * Authors: Damien Fouilleul <damienf@videolan.org>
@@ -158,14 +158,11 @@ typedef struct
 static int OpenVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
+    p_vout->p_sys = calloc( 1, sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
-
-    memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     if( VLC_SUCCESS != Direct3DVoutCreate( p_vout ) )
     {
@@ -238,15 +235,13 @@ static int OpenVideo( vlc_object_t *p_this )
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
-    var_Get( p_vout, "video-on-top", &val );
-    var_Set( p_vout, "video-on-top", val );
+    var_TriggerCallback( p_vout, "video-on-top" );
 
     /* disable screensaver by temporarily changing system settings */
     p_vout->p_sys->i_spi_lowpowertimeout = 0;
     p_vout->p_sys->i_spi_powerofftimeout = 0;
     p_vout->p_sys->i_spi_screensavetimeout = 0;
-    var_Get( p_vout, "disable-screensaver", &val);
-    if( val.b_bool ) {
+    if( var_GetBool( p_vout, "disable-screensaver" ) ) {
         msg_Dbg(p_vout, "disabling screen saver");
         SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT,
             0, &(p_vout->p_sys->i_spi_lowpowertimeout), 0);
@@ -266,7 +261,7 @@ static int OpenVideo( vlc_object_t *p_this )
     }
     return VLC_SUCCESS;
 
- error:
+error:
     CloseVideo( VLC_OBJECT(p_vout) );
     return VLC_EGENERIC;
 }
@@ -334,10 +329,8 @@ static void CloseVideo( vlc_object_t *p_this )
 static int Init( vout_thread_t *p_vout )
 {
     int i_ret;
-    vlc_value_t val;
 
-    var_Get( p_vout, "directx-hw-yuv", &val );
-    p_vout->p_sys->b_hw_yuv = val.b_bool;
+    p_vout->p_sys->b_hw_yuv = var_GetBool( p_vout, "directx-hw-yuv" );
 
     /* Initialise Direct3D */
     if( VLC_SUCCESS != Direct3DVoutOpen( p_vout ) )

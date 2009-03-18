@@ -1,7 +1,7 @@
 /*****************************************************************************
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -176,8 +176,7 @@ void* EventThread( vlc_object_t *p_this )
                     p_event->p_vout->fmt_in.i_y_offset;
                 var_Set( p_event->p_vout, "mouse-y", val );
 
-                val.b_bool = true;
-                var_Set( p_event->p_vout, "mouse-moved", val );
+                var_SetBool( p_event->p_vout, "mouse-moved", true );
             }
 
         case WM_NCMOUSEMOVE:
@@ -1208,8 +1207,6 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
         PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
     }
 
-    vlc_value_t val;
     /* Update the object variable and trigger callback */
-    val.b_bool = p_vout->b_fullscreen;
-    var_Set( p_vout, "fullscreen", val );
+    var_SetBool( p_vout, "fullscreen", p_vout->b_fullscreen );
 }

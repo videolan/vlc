@@ -1,7 +1,7 @@
 /*****************************************************************************
  * glwin32.c: Windows OpenGL provider
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -91,13 +91,11 @@ vlc_module_end ()
 static int OpenVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
 
     /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
+    p_vout->p_sys = calloc( 1, sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
-    memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
     /* Initialisations */
     p_vout->pf_init = Init;
@@ -159,8 +157,7 @@ static int OpenVideo( vlc_object_t *p_this )
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
-    var_Get( p_vout, "video-on-top", &val );
-    var_Set( p_vout, "video-on-top", val );
+    var_TriggerCallback( p_vout, "video-on-top" );
 
     return VLC_SUCCESS;
 
