@@ -1,7 +1,7 @@
 /*****************************************************************************
 * omapfb.c : omap framebuffer plugin for vlc
 *****************************************************************************
-* Copyright (C) 2008 the VideoLAN team
+* Copyright (C) 2008-2009 the VideoLAN team
 * $Id$
 *
 * Authors: Antoine Lejeune <phytos @ videolan.org>
@@ -191,10 +191,9 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Allocate instance and initialize some members */
-    p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
+    p_vout->p_sys = p_sys = calloc( 1, sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(vout_sys_t) );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -556,7 +555,6 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
     free( psz_device );
-    psz_device = NULL;
 
     // Get caps, try older interface if needed
     if( ioctl( p_sys->i_fd, OMAPFB_GET_CAPS, &p_sys->caps ) != 0 )
@@ -575,11 +573,13 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( ioctl( p_sys->i_fd, FBIOGET_VSCREENINFO, &p_sys->fb_vinfo ) )
     {
         msg_Err( p_vout, "Can't get VSCREENINFO: %s", strerror(errno) );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
     if( ioctl( p_sys->i_fd, FBIOGET_FSCREENINFO, &p_sys->fb_finfo ) )
     {
         msg_Err( p_vout, "Can't get FSCREENINFO: %s", strerror(errno) );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
@@ -591,6 +591,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                                             p_sys->i_fd, 0 )) == MAP_FAILED )
     {
         msg_Err( p_vout, "Can't mmap: %s", strerror(errno) );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
@@ -601,6 +602,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( p_sys->i_null_fd == -1 )
     {
         msg_Err( p_vout, "cannot open /dev/zero (%m)" );
+        munmap( p_sys->p_video, p_sys->i_page_size );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
@@ -608,6 +611,9 @@ static int OpenDisplay( vout_thread_t *p_vout )
                                           MAP_PRIVATE, p_sys->i_null_fd, 0 )) == MAP_FAILED )
     {
         msg_Err( p_vout, "Can't mmap 2: %s", strerror(errno) );
+        munmap( p_sys->p_video, p_sys->i_page_size );
+        close( p_sys->i_null_fd );
+        close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
 
