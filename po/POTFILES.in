@@ -136,9 +136,7 @@ src/input/var.c
 src/input/vlm.c
 src/input/vlm_internal.h
 src/input/vlmshell.c
-src/interface/interaction.c
 src/interface/interface.c
-src/interface/interface.h
 src/interface/intf_eject.c
 src/libvlc.c
 src/libvlc.h
@@ -710,8 +708,6 @@ modules/gui/qt4/dialogs/gototime.cpp
 modules/gui/qt4/dialogs/gototime.hpp
 modules/gui/qt4/dialogs/help.cpp
 modules/gui/qt4/dialogs/help.hpp
-modules/gui/qt4/dialogs/interaction.cpp
-modules/gui/qt4/dialogs/interaction.hpp
 modules/gui/qt4/dialogs/mediainfo.cpp
 modules/gui/qt4/dialogs/mediainfo.hpp
 modules/gui/qt4/dialogs/messages.cpp
