@@ -549,7 +549,7 @@ static int Open( vlc_object_t * p_this )
                 else
                 {
                     es_format_Init( &fmt, VIDEO_ES, p_vids->p_bih->biCompression );
-                    if( tk->i_codec == FOURCC_mp4v &&
+                    if( tk->i_codec == VLC_CODEC_MP4V &&
                         !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
                     {
                         fmt.i_codec = VLC_FOURCC( 'X', 'V', 'I', 'D' );
@@ -1858,7 +1858,7 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
 {
     switch( i_fourcc )
     {
-        case FOURCC_DIV1:
+        case VLC_CODEC_DIV1:
             /* we have:
              *  startcode:      0x00000100   32bits
              *  framenumber     ?             5bits
@@ -1871,13 +1871,14 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
             }
             return p_byte[4] & 0x06 ? 0 : AVIIF_KEYFRAME;
 
-        case FOURCC_DIV2:
-        case FOURCC_DIV3:   /* wmv1 also */
+        case VLC_CODEC_DIV2:
+        case VLC_CODEC_DIV3:
+        case VLC_CODEC_WMV1:
             /* we have
              *  picture type    0(I),1(P)     2bits
              */
             return p_byte[0] & 0xC0 ? 0 : AVIIF_KEYFRAME;
-        case FOURCC_mp4v:
+        case VLC_CODEC_MP4V:
             /* we should find first occurrence of 0x000001b6 (32bits)
              *  startcode:      0x000001b6   32bits
              *  piture type     0(I),1(P)     2bits
@@ -1902,60 +1903,8 @@ vlc_fourcc_t AVI_FourccGetCodec( unsigned int i_cat, vlc_fourcc_t i_codec )
         case AUDIO_ES:
             wf_tag_to_fourcc( i_codec, &i_codec, NULL );
             return i_codec;
-
         case VIDEO_ES:
-            /* XXX DIV1 <- msmpeg4v1, DIV2 <- msmpeg4v2, DIV3 <- msmpeg4v3, mp4v for mpeg4 */
-            switch( i_codec )
-            {
-                case FOURCC_1:
-                    return VLC_FOURCC('m','r','l','e');
-                case FOURCC_DIV1:
-                case FOURCC_div1:
-                case FOURCC_MPG4:
-                case FOURCC_mpg4:
-                    return FOURCC_DIV1;
-                case FOURCC_DIV2:
-                case FOURCC_div2:
-                case FOURCC_MP42:
-                case FOURCC_mp42:
-                case FOURCC_MPG3:
-                case FOURCC_mpg3:
-                    return FOURCC_DIV2;
-                case FOURCC_div3:
-                case FOURCC_MP43:
-                case FOURCC_mp43:
-                case FOURCC_DIV3:
-                case FOURCC_DIV4:
-                case FOURCC_div4:
-                case FOURCC_DIV5:
-                case FOURCC_div5:
-                case FOURCC_DIV6:
-                case FOURCC_div6:
-                case FOURCC_AP41:
-                case FOURCC_3IV1:
-                case FOURCC_3iv1:
-                case FOURCC_3IVD:
-                case FOURCC_3ivd:
-                case FOURCC_3VID:
-                case FOURCC_3vid:
-                    return FOURCC_DIV3;
-                case FOURCC_DIVX:
-                case FOURCC_divx:
-                case FOURCC_MP4S:
-                case FOURCC_mp4s:
-                case FOURCC_M4S2:
-                case FOURCC_m4s2:
-                case FOURCC_xvid:
-                case FOURCC_XVID:
-                case FOURCC_XviD:
-                case FOURCC_DX50:
-                case FOURCC_dx50:
-                case FOURCC_mp4v:
-                case FOURCC_4:
-                case FOURCC_3IV2:
-                case FOURCC_3iv2:
-                    return FOURCC_mp4v;
-            }
+            return vlc_fourcc_GetCodec( i_cat, i_codec );
         default:
             return VLC_FOURCC( 'u', 'n', 'd', 'f' );
     }
