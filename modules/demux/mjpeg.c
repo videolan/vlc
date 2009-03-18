@@ -147,9 +147,9 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
             {
                 return NULL;
             }
+            p_buf = p_sys->p_peek + *p_pos;
+            i_size = p_sys->i_data_peeked - *p_pos;
         }
-        p_buf = p_sys->p_peek + *p_pos;
-        i_size = p_sys->i_data_peeked - *p_pos;
     }
     *p_pos += ( i + 1 );
     if( i > 0 && '\r' == p_buf[i - 1] )
