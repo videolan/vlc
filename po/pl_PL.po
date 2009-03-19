@@ -1,0 +1,4 @@
+
+#: linux/vlc-1.0.0-git/share/applications/vlc.desktop.in:5
+msgid "Read, capture, broadcast your multimedia streams"
+msgstr "Odtwarzacz multimediów VLC"

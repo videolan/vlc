@@ -48,6 +48,7 @@ static const char *const ppsz_language[] =
     "auto",
     "en",
     "ar",
+    "bn"
     "pt_BR",
     "en_GB",
     "bg",
@@ -63,6 +64,7 @@ static const char *const ppsz_language[] =
     "de",
     "he",
     "hu",
+    "id",
     "it",
     "ja",
     "ko",
@@ -81,6 +83,7 @@ static const char *const ppsz_language[] =
     "es",
     "sv",
     "tr",
+    "uk",
 };
 
 static const char *const ppsz_language_text[] =
@@ -88,6 +91,7 @@ static const char *const ppsz_language_text[] =
     N_("Auto"),
     "American English",
     "ﻉﺮﺒﻳ",
+    "বাংলা",
     "Português Brasileiro",
     "British English",
     "български език",
@@ -103,6 +107,7 @@ static const char *const ppsz_language_text[] =
     "Deutsch",
     "עברית",
     "Magyar",
+    "Bahasa Indonesia",
     "Italiano",
     "日本語",
     "한국어",
@@ -121,6 +126,7 @@ static const char *const ppsz_language_text[] =
     "Español",
     "Svenska",
     "Türkçe",
+    "украї́нська мо́ва",
 };
 #endif
 
