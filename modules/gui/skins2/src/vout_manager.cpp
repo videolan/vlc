@@ -199,7 +199,7 @@ void* VoutManager::acceptVout( vout_thread_t* pVout, int width, int height )
     // save vout characteristics
     m_SavedVoutVec.push_back( SavedVout( pVout, pVoutWindow, pCtrlVideo ) );
 
-    msg_Dbg( getIntf(), "New incoming vout=0x%x, handle=0x%x, VideoCtrl=0x%x",
+    msg_Dbg( getIntf(), "New incoming vout=0x%p, handle=0x%p, VideoCtrl=0x%p",
                         pVout, handle, pCtrlVideo );
 
     return handle;
@@ -249,7 +249,7 @@ void VoutManager::releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd )
     {
         if( (*it).pVout == pVout )
         {
-            msg_Dbg( pIntf, "vout released vout=0x%x, VideoCtrl=0x%x",
+            msg_Dbg( pIntf, "vout released vout=0x%p, VideoCtrl=0x%p",
                              pVout, (*it).pCtrlVideo );
 
             // if a video control was being used, detach from it

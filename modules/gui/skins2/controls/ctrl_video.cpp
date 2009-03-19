@@ -118,7 +118,7 @@ void CtrlVideo::setLayout( GenericLayout *pLayout,
     // register Video Control
     VoutManager::instance( getIntf() )->registerCtrlVideo( this );
 
-    msg_Dbg( getIntf(),"New VideoControl detected(%x), useability=%s",
+    msg_Dbg( getIntf(),"New VideoControl detected(%p), useability=%s",
                            this, m_bIsUseable ? "true" : "false" );
 }
 
