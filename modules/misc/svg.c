@@ -72,12 +72,12 @@ static char *svg_GetTemplate( vlc_object_t *p_this );
         "for automatic string conversion" )
 
 vlc_module_begin ()
- set_category( CAT_INPUT)
- set_category( SUBCAT_INPUT_SCODEC )
- set_capability( "text renderer", 99 )
- add_shortcut( "svg" )
- add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
- set_callbacks( Create, Destroy )
+    set_category( CAT_INPUT )
+    set_category( SUBCAT_INPUT_SCODEC )
+    set_capability( "text renderer", 99 )
+    add_shortcut( "svg" )
+    add_string( "svg-template-file", "", NULL, TEMPLATE_TEXT, TEMPLATE_LONGTEXT, true )
+    set_callbacks( Create, Destroy )
 vlc_module_end ()
 
 /**
@@ -115,7 +115,6 @@ struct filter_sys_t
     /* Default size for rendering. Initialized to the output size. */
     int            i_width;
     int            i_height;
-    vlc_mutex_t   *lock;
 };
 
 /*****************************************************************************
@@ -445,7 +444,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     psz_string = p_region_in->psz_text;
     if( !psz_string || !*psz_string ) return VLC_EGENERIC;
 
-    p_svg = ( svg_rendition_t * )malloc( sizeof( svg_rendition_t ) );
+    p_svg = malloc( sizeof( svg_rendition_t ) );
     if( !p_svg )
         return VLC_ENOMEM;
 
