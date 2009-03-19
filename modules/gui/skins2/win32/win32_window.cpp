@@ -55,9 +55,10 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     {
         // Child window (for vout)
         m_hWnd_parent = pParentWindow->getHandle();
-        m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
-            "default name", WS_CHILD, CW_USEDEFAULT, CW_USEDEFAULT,
-            CW_USEDEFAULT, CW_USEDEFAULT, m_hWnd_parent, 0, hInst, NULL );
+        m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_NOPARENTNOTIFY,
+                     "SkinWindowClass", "default name", WS_CHILD,
+                     CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                     m_hWnd_parent, 0, hInst, NULL );
     }
     else
     {
