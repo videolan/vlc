@@ -2932,7 +2932,7 @@ static int Control( vlc_object_t *p_obj, int i_fd,
 
     int i_ret = -1;
 
-    if( i_value >= 0 )
+    if( i_value >= queryctrl.minimum && i_value <= queryctrl.maximum )
     {
         ext_control.value = i_value;
         if( v4l2_ioctl( i_fd, VIDIOC_S_EXT_CTRLS, &ext_controls ) < 0 )
