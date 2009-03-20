@@ -554,13 +554,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
     #define ReturnTrue \
     do { \
-    vlc_object_release( p_playlist ); \
+    pl_Release( p_intf ); \
     return 1; \
     } while(0)
 
     #define ReturnFalse \
     do { \
-    vlc_object_release( p_playlist ); \
+    pl_Release( p_intf ); \
     return 0; \
     } while(0)
 
@@ -2212,7 +2212,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     refresh();
 
     *t_last_refresh = time( 0 );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
@@ -2229,7 +2229,7 @@ static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
         default:
             p_item = p_playlist->p_root_onelevel;
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     return p_item;
 }
 
@@ -2250,7 +2250,7 @@ static void PlaylistRebuild( intf_thread_t *p_intf )
 
     PL_UNLOCK;
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
@@ -2314,7 +2314,7 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     playlist_t *p_playlist = pl_Hold( p_intf );
     p_intf->p_sys->b_need_update = true;
     p_intf->p_sys->p_node = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     return VLC_SUCCESS;
 }
 
@@ -2389,7 +2389,7 @@ static void Eject( intf_thread_t *p_intf )
     if( playlist_CurrentPlayingItem(p_playlist) == NULL )
     {
         PL_UNLOCK;
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -2449,6 +2449,7 @@ static void Eject( intf_thread_t *p_intf )
 
     if( psz_device == NULL )
     {
+        pl_Release( p_intf );
         return;
     }
 
@@ -2472,7 +2473,7 @@ static void Eject( intf_thread_t *p_intf )
     }
 
     free( psz_device );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     return;
 }
 
@@ -2610,7 +2611,7 @@ static void PlayPause( intf_thread_t *p_intf )
     else
         playlist_Play( p_playlist );
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /****************************************************************************
