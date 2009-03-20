@@ -35,8 +35,6 @@
 #endif
 
 
-const char *ThemeRepository::kOpenDialog = "{openSkin}";
-
 
 ThemeRepository *ThemeRepository::instance( intf_thread_t *pIntf )
 {
@@ -78,14 +76,19 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
         parseDirectory( *it );
     }
 
-    // Add an entry for the "open skin" dialog
-    val.psz_string = (char*)kOpenDialog;
-    text.psz_string = _("Open skin...");
-    var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
-                &text );
-
     // Set the callback
     var_AddCallback( pIntf, "intf-skins", changeSkin, this );
+
+
+    // variable for opening a dialog box to change skins
+    var_Create( pIntf, "intf-skins-interactive", VLC_VAR_VOID |
+                VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Open skin ...");
+    var_Change( pIntf, "intf-skins-interactive", VLC_VAR_SETTEXT, &text, NULL );
+
+    // Set the callback
+    var_AddCallback( pIntf, "intf-skins-interactive", changeSkin, this );
+
 }
 
 
@@ -147,19 +150,18 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
 
 
 
-int ThemeRepository::changeSkin( vlc_object_t *pIntf, char const *pCmd,
+int ThemeRepository::changeSkin( vlc_object_t *pIntf, char const *pVariable,
                                  vlc_value_t oldval, vlc_value_t newval,
                                  void *pData )
 {
     ThemeRepository *pThis = (ThemeRepository*)(pData);
 
-    // Special menu entry for the open skin dialog
-    if( !strcmp( newval.psz_string, kOpenDialog ) )
+    if( !strcmp( pVariable, "intf-skins-interactive" ) )
     {
         CmdDlgChangeSkin cmd( pThis->getIntf() );
         cmd.execute();
     }
-    else
+    else if( !strcmp( pVariable, "intf-skins" ) )
     {
         // Try to load the new skin
         CmdChangeSkin *pCmd = new CmdChangeSkin( pThis->getIntf(),
