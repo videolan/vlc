@@ -335,7 +335,7 @@ DBUS_METHOD( GetCurrentMetadata )
     playlist_t* p_playlist = pl_Hold( (vlc_object_t*) p_this );
     PL_LOCK;
     playlist_item_t* p_item =  playlist_CurrentPlayingItem( p_playlist );
-    if(  p_item )
+    if( p_item )
         GetInputMeta( p_item->p_input, &args );
     PL_UNLOCK;
     pl_Release( (vlc_object_t*) p_this );
@@ -431,9 +431,7 @@ DBUS_METHOD( GetMetadata )
     dbus_error_init( &error );
 
     dbus_int32_t i_position;
-
-    playlist_t *p_playlist = pl_Hold( (vlc_object_t*) p_this );
-    PL_LOCK;
+    playlist_t *p_playlist;
 
     dbus_message_get_args( p_from, &error,
            DBUS_TYPE_INT32, &i_position,
@@ -441,14 +439,14 @@ DBUS_METHOD( GetMetadata )
 
     if( dbus_error_is_set( &error ) )
     {
-        PL_UNLOCK;
-        pl_Release( (vlc_object_t*) p_this );
         msg_Err( (vlc_object_t*) p_this, "D-Bus message reading : %s",
                 error.message );
         dbus_error_free( &error );
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
+    p_playlist = pl_Hold( (vlc_object_t*) p_this );
+    PL_LOCK;
     if( i_position < p_playlist->current.i_size )
     {
         GetInputMeta( p_playlist->current.p_elems[i_position]->p_input, &args );
@@ -480,7 +478,7 @@ DBUS_METHOD( DelTrack )
     dbus_error_init( &error );
 
     dbus_int32_t i_position;
-    playlist_t *p_playlist = pl_Hold( (vlc_object_t*) p_this );
+    playlist_t *p_playlist;
 
     dbus_message_get_args( p_from, &error,
             DBUS_TYPE_INT32, &i_position,
@@ -494,6 +492,7 @@ DBUS_METHOD( DelTrack )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
+    p_playlist = pl_Hold( (vlc_object_t*) p_this );
     PL_LOCK;
     if( i_position < p_playlist->current.i_size )
     {
@@ -515,8 +514,7 @@ DBUS_METHOD( SetLoop )
 
     DBusError error;
     dbus_bool_t b_loop;
-    vlc_value_t val;
-    playlist_t* p_playlist = NULL;
+    playlist_t* p_playlist;
 
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
@@ -531,9 +529,8 @@ DBUS_METHOD( SetLoop )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    val.b_bool = ( b_loop == TRUE ) ? true : false ;
     p_playlist = pl_Hold( (vlc_object_t*) p_this );
-    var_Set ( p_playlist, "loop", val );
+    var_SetBool( p_playlist, "loop", ( b_loop == TRUE ) );
     pl_Release( ((vlc_object_t*) p_this) );
 
     REPLY_SEND;
@@ -546,8 +543,7 @@ DBUS_METHOD( Repeat )
 
     DBusError error;
     dbus_bool_t b_repeat;
-    vlc_value_t val;
-    playlist_t* p_playlist = NULL;
+    playlist_t* p_playlist;
 
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
@@ -562,10 +558,8 @@ DBUS_METHOD( Repeat )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    val.b_bool = ( b_repeat == TRUE ) ? true : false ;
-
     p_playlist = pl_Hold( (vlc_object_t*) p_this );
-    var_Set ( p_playlist, "repeat", val );
+    var_SetBool( p_playlist, "repeat", ( b_repeat == TRUE ) );
     pl_Release( ((vlc_object_t*) p_this) );
 
     REPLY_SEND;
@@ -578,8 +572,7 @@ DBUS_METHOD( SetRandom )
 
     DBusError error;
     dbus_bool_t b_random;
-    vlc_value_t val;
-    playlist_t* p_playlist = NULL;
+    playlist_t* p_playlist;
 
     dbus_error_init( &error );
     dbus_message_get_args( p_from, &error,
@@ -594,10 +587,8 @@ DBUS_METHOD( SetRandom )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    val.b_bool = ( b_random == TRUE ) ? true : false ;
-
     p_playlist = pl_Hold( (vlc_object_t*) p_this );
-    var_Set ( p_playlist, "random", val );
+    var_SetBool( p_playlist, "random", ( b_random == TRUE ) );
     pl_Release( ((vlc_object_t*) p_this) );
 
     REPLY_SEND;
