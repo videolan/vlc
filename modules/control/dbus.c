@@ -69,14 +69,11 @@ static void Run     ( intf_thread_t * );
 static int StateChange( vlc_object_t *, const char *, vlc_value_t,
                         vlc_value_t, void * );
 
-static int TrackChange( vlc_object_t *, const char *, vlc_value_t,
-                        vlc_value_t, void * );
+static int TrackChange( intf_thread_t * );
+static int StatusChangeEmit( intf_thread_t *);
+static int TrackListChangeEmit( intf_thread_t *, int, int );
 
-static int StatusChangeEmit( vlc_object_t *, const char *, vlc_value_t,
-                        vlc_value_t, void * );
-
-static int TrackListChangeEmit( vlc_object_t *, const char *, vlc_value_t,
-                        vlc_value_t, void * );
+static int AllCallback( vlc_object_t*, const char*, vlc_value_t, vlc_value_t, void* );
 
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
 static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, bool );
@@ -95,13 +92,34 @@ enum
      CAPS_CAN_HAS_TRACKLIST     = 1 << 6
 };
 
+// The signal that can be get from the callbacks
+enum
+{
+    SIGNAL_ITEM_CURRENT,
+    SIGNAL_INTF_CHANGE,
+    SIGNAL_PLAYLIST_ITEM_APPEND,
+    SIGNAL_PLAYLIST_ITEM_DELETED,
+    SIGNAL_RANDOM,
+    SIGNAL_LOOP,
+    SIGNAL_STATE
+};
+
 struct intf_sys_t
 {
     DBusConnection *p_conn;
-    bool      b_meta_read;
+    bool            b_meta_read;
     dbus_int32_t    i_caps;
-    bool       b_dead;
+    bool            b_dead;
+    vlc_array_t    *p_events;
+    vlc_mutex_t     lock;
 };
+
+typedef struct
+{
+    int signal;
+    int i_node;
+} callback_info_t;
+
 
 /*****************************************************************************
  * Module descriptor
@@ -748,19 +766,21 @@ static int Open( vlc_object_t *p_this )
 
     p_playlist = pl_Hold( p_intf );
     PL_LOCK;
-    var_AddCallback( p_playlist, "item-current", TrackChange, p_intf );
-    var_AddCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "playlist-item-append", TrackListChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "playlist-item-deleted", TrackListChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "random", StatusChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
-    var_AddCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
+    var_AddCallback( p_playlist, "item-current", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "intf-change", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "playlist-item-deleted", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "random", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "repeat", AllCallback, p_intf );
+    var_AddCallback( p_playlist, "loop", AllCallback, p_intf );
     PL_UNLOCK;
     pl_Release( p_intf );
 
     p_intf->pf_run = Run;
     p_intf->p_sys = p_sys;
     p_sys->p_conn = p_conn;
+    p_sys->p_events = vlc_array_new();
+    vlc_mutex_init( &p_sys->lock );
 
     UpdateCaps( p_intf, false );
 
@@ -777,13 +797,13 @@ static void Close   ( vlc_object_t *p_this )
     playlist_t      *p_playlist = pl_Hold( p_intf );;
     input_thread_t  *p_input;
 
-    var_DelCallback( p_playlist, "item-current", TrackChange, p_intf );
-    var_DelCallback( p_playlist, "intf-change", TrackListChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "playlist-item-append", TrackListChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "playlist-item-deleted", TrackListChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "random", StatusChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "repeat", StatusChangeEmit, p_intf );
-    var_DelCallback( p_playlist, "loop", StatusChangeEmit, p_intf );
+    var_DelCallback( p_playlist, "item-current", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "intf-change", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "playlist-item-deleted", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "random", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "repeat", AllCallback, p_intf );
+    var_DelCallback( p_playlist, "loop", AllCallback, p_intf );
 
     p_input = playlist_CurrentInput( p_playlist );
     if ( p_input )
@@ -796,6 +816,8 @@ static void Close   ( vlc_object_t *p_this )
 
     dbus_connection_unref( p_intf->p_sys->p_conn );
 
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
+    vlc_array_destroy( p_intf->p_sys->p_events );
     free( p_intf->p_sys );
 }
 
@@ -810,8 +832,77 @@ static void Run          ( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
         int canc = vlc_savecancel();
         dbus_connection_read_write_dispatch( p_intf->p_sys->p_conn, 0 );
+
+        // Get the messages
+        vlc_mutex_lock( &p_intf->p_sys->lock );
+        for( int i = vlc_array_count( p_intf->p_sys->p_events ) - 1; i >= 0; i-- )
+        {
+            callback_info_t* info = vlc_array_item_at_index( p_intf->p_sys->p_events, i );
+            switch( info->signal )
+            {
+            case SIGNAL_ITEM_CURRENT:
+                TrackChange( p_intf );
+                break;
+            case SIGNAL_INTF_CHANGE:
+            case SIGNAL_PLAYLIST_ITEM_APPEND:
+            case SIGNAL_PLAYLIST_ITEM_DELETED:
+                TrackListChangeEmit( p_intf, info->signal, info->i_node );
+                break;
+            case SIGNAL_RANDOM:
+            case SIGNAL_LOOP:
+            case SIGNAL_STATE:
+                StatusChangeEmit( p_intf );
+                break;
+            default:
+                assert(0);
+            }
+            free( info );
+            vlc_array_remove( p_intf->p_sys->p_events, i );
+        }
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
         vlc_restorecancel( canc );
     }
+}
+
+
+// Get all the callbacks
+static int AllCallback( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    (void)p_this;
+    (void)oldval;
+    intf_thread_t *p_intf = (intf_thread_t*)p_data;
+
+    callback_info_t *info = malloc( sizeof( callback_info_t ) );
+    if( !info )
+        return VLC_ENOMEM;
+
+    // Wich event is it ?
+    if( !strcmp( "item-current", psz_var ) )
+        info->signal = SIGNAL_ITEM_CURRENT;
+    else if( !strcmp( "intf-change", psz_var ) )
+        info->signal = SIGNAL_INTF_CHANGE;
+    else if( !strcmp( "playlist-item-append", psz_var ) )
+    {
+        info->signal = SIGNAL_PLAYLIST_ITEM_APPEND;
+        info->i_node = ((playlist_add_t*)newval.p_address)->i_node;
+    }
+    else if( !strcmp( "playlist-item-deleted", psz_var ) )
+        info->signal = SIGNAL_PLAYLIST_ITEM_DELETED;
+    else if( !strcmp( "random", psz_var ) )
+        info->signal = SIGNAL_RANDOM;
+    else if( !strcmp( "loop", psz_var ) )
+        info->signal = SIGNAL_LOOP;
+    else if( !strcmp( "state", psz_var ) )
+        info->signal = SIGNAL_STATE;
+    else
+        assert(0);
+
+    // Append the event
+    vlc_mutex_lock( &p_intf->p_sys->lock );
+    vlc_array_append( p_intf->p_sys->p_events, info );
+    vlc_mutex_unlock( &p_intf->p_sys->lock );
+    return VLC_SUCCESS;
 }
 
 /******************************************************************************
@@ -846,31 +937,33 @@ DBUS_SIGNAL( TrackListChangeSignal )
  * TrackListChangeEmit: Emits the TrackListChange signal
  *****************************************************************************/
 /* FIXME: It is not called on tracklist reordering */
-static int TrackListChangeEmit( vlc_object_t *p_this, const char *psz_var,
-            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int TrackListChangeEmit( intf_thread_t *p_intf, int signal, int i_node )
 {
-    VLC_UNUSED(oldval);
-    intf_thread_t *p_intf = p_data;
-
-    if( !strcmp( psz_var, "playlist-item-append" ) )
+    // "playlist-item-append"
+    if( signal == SIGNAL_PLAYLIST_ITEM_APPEND )
     {
         /* don't signal when items are added/removed in p_category */
-        playlist_t *p_playlist = (playlist_t*)p_this;
-        playlist_add_t *p_add = newval.p_address;
-        playlist_item_t *p_item;
-        p_item = playlist_ItemGetById( p_playlist, p_add->i_node );
+        playlist_t *p_playlist = pl_Hold( p_intf );
+        PL_LOCK;
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_node );
         assert( p_item );
         while( p_item->p_parent )
             p_item = p_item->p_parent;
         if( p_item == p_playlist->p_root_category )
+        {
+            PL_UNLOCK;
+            pl_Release( p_intf );
             return VLC_SUCCESS;
+        }
+        PL_UNLOCK;
+        pl_Release( p_intf );
     }
 
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, true );
-    TrackListChangeSignal( p_intf->p_sys->p_conn, p_data );
+    UpdateCaps( p_intf, pl_Unlocked );
+    TrackListChangeSignal( p_intf->p_sys->p_conn, p_intf );
     return VLC_SUCCESS;
 }
 /*****************************************************************************
@@ -941,34 +1034,25 @@ static int StateChange( vlc_object_t *p_this, const char* psz_var,
 /*****************************************************************************
  * StatusChangeEmit: Emits the StatusChange signal
  *****************************************************************************/
-static int StatusChangeEmit( vlc_object_t *p_this, const char *psz_var,
-            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int StatusChangeEmit( intf_thread_t * p_intf )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_var);
-    VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    intf_thread_t *p_intf = p_data;
-
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, false );
-    StatusChangeSignal( p_intf->p_sys->p_conn, p_data );
+    UpdateCaps( p_intf, pl_Unlocked );
+    StatusChangeSignal( p_intf->p_sys->p_conn, p_intf );
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * TrackChange: callback on playlist "item-current"
  *****************************************************************************/
-static int TrackChange( vlc_object_t *p_this, const char *psz_var,
-            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int TrackChange( intf_thread_t *p_intf )
 {
-    intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
     playlist_t          *p_playlist;
     input_thread_t      *p_input    = NULL;
     input_item_t        *p_item     = NULL;
-    VLC_UNUSED( p_this ); VLC_UNUSED( psz_var );
-    VLC_UNUSED( oldval ); VLC_UNUSED( newval );
 
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
