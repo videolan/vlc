@@ -780,11 +780,13 @@ void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
         if (!p_model)
         {
             msg_Err(p_intf, "PDA: Playlist model contains a NULL pointer" );
+            pl_Release( p_intf );
             return;
         }
         if (!gtk_tree_model_get_iter(p_model, &iter, path))
         {
             msg_Err( p_intf, "PDA: Playlist could not get iter from model" );
+            pl_Release( p_intf );
             return;
         }
 
@@ -1027,6 +1029,7 @@ void onAddTranscodeToPlaylist(GtkButton *button, gpointer user_data)
     /* Update the playlist */
     playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
+    pl_Release( p_intf );
 
     /* Get all the options. */
     i_pos = snprintf( &mrl[0], VLC_MAX_MRL, "sout");
