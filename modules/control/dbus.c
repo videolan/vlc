@@ -3,6 +3,7 @@
  *****************************************************************************
  * Copyright © 2006-2008 Rafaël Carré
  * Copyright © 2007-2008 Mirsal Ennaime
+ * Copyright © 2009 The VideoLAN team
  * $Id$
  *
  * Authors:    Rafaël Carré <funman at videolanorg>
@@ -50,8 +51,6 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_interface.h>
-#include <vlc_meta.h>
-#include <vlc_input.h>
 #include <vlc_playlist.h>
 
 #include <math.h>
@@ -100,6 +99,7 @@ enum
     SIGNAL_PLAYLIST_ITEM_APPEND,
     SIGNAL_PLAYLIST_ITEM_DELETED,
     SIGNAL_RANDOM,
+    SIGNAL_REPEAT,
     SIGNAL_LOOP,
     SIGNAL_STATE
 };
@@ -849,8 +849,8 @@ static void Run          ( intf_thread_t *p_intf )
                 TrackListChangeEmit( p_intf, info->signal, info->i_node );
                 break;
             case SIGNAL_RANDOM:
+            case SIGNAL_REPEAT:
             case SIGNAL_LOOP:
-            case SIGNAL_STATE:
                 StatusChangeEmit( p_intf );
                 break;
             default:
@@ -891,10 +891,10 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
         info->signal = SIGNAL_PLAYLIST_ITEM_DELETED;
     else if( !strcmp( "random", psz_var ) )
         info->signal = SIGNAL_RANDOM;
+    else if( !strcmp( "repeat", psz_var ) )
+        info->signal = SIGNAL_REPEAT;
     else if( !strcmp( "loop", psz_var ) )
         info->signal = SIGNAL_LOOP;
-    else if( !strcmp( "state", psz_var ) )
-        info->signal = SIGNAL_STATE;
     else
         assert(0);
 
