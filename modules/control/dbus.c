@@ -65,9 +65,7 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
-static int StateChange( vlc_object_t *, const char *, vlc_value_t,
-                        vlc_value_t, void * );
-
+static int StateChange( intf_thread_t *, int );
 static int TrackChange( intf_thread_t * );
 static int StatusChangeEmit( intf_thread_t *);
 static int TrackListChangeEmit( intf_thread_t *, int, int );
@@ -118,6 +116,7 @@ typedef struct
 {
     int signal;
     int i_node;
+    int i_input_state;
 } callback_info_t;
 
 
@@ -808,7 +807,7 @@ static void Close   ( vlc_object_t *p_this )
     p_input = playlist_CurrentInput( p_playlist );
     if ( p_input )
     {
-        var_DelCallback( p_input, "state", StateChange, p_intf );
+        var_DelCallback( p_input, "state", AllCallback, p_intf );
         vlc_object_release( p_input );
     }
 
@@ -853,6 +852,9 @@ static void Run          ( intf_thread_t *p_intf )
             case SIGNAL_LOOP:
                 StatusChangeEmit( p_intf );
                 break;
+            case SIGNAL_STATE:
+                StateChange( p_intf, info->i_input_state );
+                break;
             default:
                 assert(0);
             }
@@ -895,6 +897,11 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
         info->signal = SIGNAL_REPEAT;
     else if( !strcmp( "loop", psz_var ) )
         info->signal = SIGNAL_LOOP;
+    else if( !strcmp( "state", psz_var ) )
+    {
+        info->signal = SIGNAL_STATE;
+        info->i_input_state = newval.i_int;
+    }
     else
         assert(0);
 
@@ -1000,32 +1007,41 @@ DBUS_SIGNAL( StatusChangeSignal )
 /*****************************************************************************
  * StateChange: callback on input "state"
  *****************************************************************************/
-static int StateChange( vlc_object_t *p_this, const char* psz_var,
-            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+//static int StateChange( vlc_object_t *p_this, const char* psz_var,
+//            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int StateChange( intf_thread_t *p_intf, int i_input_state )
 {
-    VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
-    intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
+    playlist_t          *p_playlist;
+    input_thread_t      *p_input;
+    input_item_t        *p_item;
 
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, true );
+    UpdateCaps( p_intf, pl_Unlocked );
 
-    if( !p_sys->b_meta_read && newval.i_int == PLAYING_S )
+    if( !p_sys->b_meta_read && i_input_state == PLAYING_S )
     {
-        input_item_t *p_item = input_GetItem( (input_thread_t*)p_this );
-        if( p_item )
+        p_playlist = pl_Hold( p_intf );
+        p_input = playlist_CurrentInput( p_playlist );
+        if( p_input )
         {
-            p_sys->b_meta_read = true;
-            TrackChangeSignal( p_sys->p_conn, p_item );
+            p_item = input_GetItem( p_input );
+            if( p_item )
+            {
+                p_sys->b_meta_read = true;
+                TrackChangeSignal( p_sys->p_conn, p_item );
+            }
+            vlc_object_release( p_input );
         }
+        pl_Release( p_intf );
     }
 
-    if( newval.i_int == PLAYING_S || newval.i_int == PAUSE_S ||
-        newval.i_int == END_S )
+    if( i_input_state == PLAYING_S || i_input_state == PAUSE_S ||
+        i_input_state == END_S )
     {
-        StatusChangeSignal( p_sys->p_conn, (void*) p_intf );
+        StatusChangeSignal( p_sys->p_conn, p_intf );
     }
 
     return VLC_SUCCESS;
@@ -1082,7 +1098,7 @@ static int TrackChange( intf_thread_t *p_intf )
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
 
-    var_AddCallback( p_input, "state", StateChange, p_intf );
+    var_AddCallback( p_input, "state", AllCallback, p_intf );
 
     vlc_object_release( p_input );
     return VLC_SUCCESS;
