@@ -977,7 +977,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
                  devicename.c_str() );
         dialog_Fatal( p_this, _("Capture failed"),
                         _("VLC cannot use the device \"%s\", because its "
-                          "type is not supported.") );
+                          "type is not supported."), devicename.c_str() );
         return VLC_EGENERIC;
     }
 
