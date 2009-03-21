@@ -420,7 +420,10 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
              p_filter->psz_object_name, p_filter );
 
     /* Destroy the filter object */
-    AllocatorClean( &p_chain->allocator, p_filter );
+    if( IsInternalVideoAllocator( p_filter ) )
+        AllocatorClean( &internal_video_allocator, p_filter );
+    else
+        AllocatorClean( &p_chain->allocator, p_filter );
 
     vlc_object_detach( p_filter );
     if( p_filter->p_module )
