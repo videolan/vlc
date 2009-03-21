@@ -117,9 +117,6 @@ struct demux_sys_t
 
     /* Used for the pause command */
     mtime_t expiration;
- 
-    /* The command to run */
-    char* psz_command;
 };
 enum
 {
