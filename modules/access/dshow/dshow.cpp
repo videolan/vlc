@@ -40,6 +40,7 @@
 #include <vlc_demux.h>
 #include <vlc_vout.h>
 #include <vlc_dialog.h>
+#include <vlc_charset.h>
 
 #include "common.h"
 #include "filter.h"
@@ -1205,16 +1206,8 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
             p_bag->Release();
             if( SUCCEEDED(hr) )
             {
-                int i_convert = WideCharToMultiByte(CP_ACP, 0, var.bstrVal,
-                        SysStringLen(var.bstrVal), NULL, 0, NULL, NULL);
-                char *p_buf = (char *)alloca( i_convert+1 ); p_buf[0] = 0;
-                WideCharToMultiByte( CP_ACP, 0, var.bstrVal,
-                        SysStringLen(var.bstrVal), p_buf, i_convert, NULL, NULL );
-                SysFreeString(var.bstrVal);
-                p_buf[i_convert] = '\0';
-
+                char *p_buf = FromWide( var.bstrVal );
                 string devname = string(p_buf);
-
                 free( p_buf) ;
 
                 int dup = 0;
