@@ -622,6 +622,37 @@ int input_item_DelInfo( input_item_t *p_i,
     return VLC_SUCCESS;
 }
 
+void input_item_SetEpg( input_item_t *p_item,
+                        const char *psz_epg, const vlc_epg_t *p_epg )
+{
+    input_item_DelInfo( p_item, psz_epg, NULL );
+
+#ifdef HAVE_LOCALTIME_R
+    for( int i = 0; i < p_epg->i_event; i++ )
+    {
+        const vlc_epg_event_t *p_evt = p_epg->pp_event[i];
+        time_t t_start = (time_t)p_evt->i_start;
+        struct tm tm_start;
+        char psz_start[128];
+
+        localtime_r( &t_start, &tm_start );
+
+        snprintf( psz_start, sizeof(psz_start), "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
+                  1900 + tm_start.tm_year, 1 + tm_start.tm_mon, tm_start.tm_mday,
+                  tm_start.tm_hour, tm_start.tm_min, tm_start.tm_sec );
+        if( p_evt->psz_short_description || p_evt->psz_description )
+            input_item_AddInfo( p_item, psz_epg, psz_start, "%s (%2.2d:%2.2d) - %s",
+                                p_evt->psz_name,
+                                p_evt->i_duration/60/60, (p_evt->i_duration/60)%60,
+                                p_evt->psz_short_description ? p_evt->psz_short_description : p_evt->psz_description );
+        else
+            input_item_AddInfo( p_item, psz_epg, psz_start, "%s (%2.2d:%2.2d)",
+                                p_evt->psz_name,
+                                p_evt->i_duration/60/60, (p_evt->i_duration/60)%60 );
+    }
+#endif
+}
+
 
 input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,

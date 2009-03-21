@@ -1266,7 +1266,6 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     input_thread_t    *p_input = p_sys->p_input;
     es_out_pgrm_t     *p_pgrm;
     char *psz_cat;
-    int i;
 
     /* Find program */
     p_pgrm = EsOutProgramFind( out, i_group );
@@ -1279,37 +1278,17 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
     vlc_epg_Merge( p_pgrm->p_epg, p_epg );
 
     /* Update info */
-    psz_cat = EsOutProgramGetMetaName( p_pgrm );
-#ifdef HAVE_LOCALTIME_R
-    char *psz_epg;
-    if( asprintf( &psz_epg, "EPG %s", psz_cat ) == -1 )
-        psz_epg = NULL;
-    input_Control( p_input, INPUT_DEL_INFO, psz_epg, NULL );
     msg_Dbg( p_input, "EsOutProgramEpg: number=%d name=%s", i_group, p_pgrm->p_epg->psz_name );
-    for( i = 0; i < p_pgrm->p_epg->i_event; i++ )
+
+    psz_cat = EsOutProgramGetMetaName( p_pgrm );
+
+    char *psz_epg;
+    if( asprintf( &psz_epg, "EPG %s", psz_cat ) >= 0 )
     {
-        const vlc_epg_event_t *p_evt = p_pgrm->p_epg->pp_event[i];
-        time_t t_start = (time_t)p_evt->i_start;
-        struct tm tm_start;
-        char psz_start[128];
-
-        localtime_r( &t_start, &tm_start );
-
-        snprintf( psz_start, sizeof(psz_start), "%4.4d-%2.2d-%2.2d %2.2d:%2.2d:%2.2d",
-                  1900 + tm_start.tm_year, 1 + tm_start.tm_mon, tm_start.tm_mday,
-                  tm_start.tm_hour, tm_start.tm_min, tm_start.tm_sec );
-        if( p_evt->psz_short_description || p_evt->psz_description )
-            input_Control( p_input, INPUT_ADD_INFO, psz_epg, psz_start, "%s (%2.2d:%2.2d) - %s",
-                           p_evt->psz_name,
-                           p_evt->i_duration/60/60, (p_evt->i_duration/60)%60,
-                           p_evt->psz_short_description ? p_evt->psz_short_description : p_evt->psz_description );
-        else
-            input_Control( p_input, INPUT_ADD_INFO, psz_epg, psz_start, "%s (%2.2d:%2.2d)",
-                           p_evt->psz_name,
-                           p_evt->i_duration/60/60, (p_evt->i_duration/60)%60 );
+        input_item_SetEpg( p_input->p->p_item, psz_epg, p_pgrm->p_epg );
+        free( psz_epg );
     }
-    free( psz_epg );
-#endif
+
     /* Update now playing */
     free( p_pgrm->psz_now_playing );
     p_pgrm->psz_now_playing = NULL;
