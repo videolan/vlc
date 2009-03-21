@@ -74,7 +74,7 @@ static int AllCallback( vlc_object_t*, const char*, vlc_value_t, vlc_value_t, vo
 
 static int GetInputMeta ( input_item_t *, DBusMessageIter * );
 static int MarshalStatus ( intf_thread_t *, DBusMessageIter *, bool );
-static int UpdateCaps( intf_thread_t*, bool );
+static int UpdateCaps( intf_thread_t* );
 
 /* GetCaps() capabilities */
 enum
@@ -763,6 +763,12 @@ static int Open( vlc_object_t *p_this )
 
     dbus_connection_flush( p_conn );
 
+    p_intf->pf_run = Run;
+    p_intf->p_sys = p_sys;
+    p_sys->p_conn = p_conn;
+    p_sys->p_events = vlc_array_new();
+    vlc_mutex_init( &p_sys->lock );
+
     p_playlist = pl_Hold( p_intf );
     PL_LOCK;
     var_AddCallback( p_playlist, "item-current", AllCallback, p_intf );
@@ -775,13 +781,7 @@ static int Open( vlc_object_t *p_this )
     PL_UNLOCK;
     pl_Release( p_intf );
 
-    p_intf->pf_run = Run;
-    p_intf->p_sys = p_sys;
-    p_sys->p_conn = p_conn;
-    p_sys->p_events = vlc_array_new();
-    vlc_mutex_init( &p_sys->lock );
-
-    UpdateCaps( p_intf, false );
+    UpdateCaps( p_intf );
 
     return VLC_SUCCESS;
 }
@@ -969,7 +969,7 @@ static int TrackListChangeEmit( intf_thread_t *p_intf, int signal, int i_node )
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, pl_Unlocked );
+    UpdateCaps( p_intf );
     TrackListChangeSignal( p_intf->p_sys->p_conn, p_intf );
     return VLC_SUCCESS;
 }
@@ -1019,7 +1019,7 @@ static int StateChange( intf_thread_t *p_intf, int i_input_state )
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, pl_Unlocked );
+    UpdateCaps( p_intf );
 
     if( !p_sys->b_meta_read && i_input_state == PLAYING_S )
     {
@@ -1055,7 +1055,7 @@ static int StatusChangeEmit( intf_thread_t * p_intf )
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
-    UpdateCaps( p_intf, pl_Unlocked );
+    UpdateCaps( p_intf );
     StatusChangeSignal( p_intf->p_sys->p_conn, p_intf );
     return VLC_SUCCESS;
 }
@@ -1106,17 +1106,18 @@ static int TrackChange( intf_thread_t *p_intf )
 
 /*****************************************************************************
  * UpdateCaps: update p_sys->i_caps
+ * This function have to be called with the playlist unlocked
  ****************************************************************************/
-static int UpdateCaps( intf_thread_t* p_intf, bool b_playlist_locked )
+static int UpdateCaps( intf_thread_t* p_intf )
 {
     intf_sys_t* p_sys = p_intf->p_sys;
     dbus_int32_t i_caps = CAPS_CAN_HAS_TRACKLIST;
     playlist_t* p_playlist = pl_Hold( p_intf );
-    if( !b_playlist_locked ) PL_LOCK;
     
+    PL_LOCK;
     if( p_playlist->current.i_size > 0 )
         i_caps |= CAPS_CAN_PLAY | CAPS_CAN_GO_PREV | CAPS_CAN_GO_NEXT;
-    if( !b_playlist_locked ) PL_UNLOCK;
+    PL_UNLOCK;
 
     input_thread_t* p_input = playlist_CurrentInput( p_playlist );
     if( p_input )
