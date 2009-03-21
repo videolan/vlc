@@ -180,6 +180,6 @@ void ActionsManager::AudioUp()
 
 void ActionsManager::AudioDown()
 {
-    aout_VolumeDown( p_intf, 2, NULL );
+    aout_VolumeDown( p_intf, 1, NULL );
 }
 
