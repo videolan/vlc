@@ -50,9 +50,10 @@ private:
     virtual ~BookmarksDialog();
 
     static BookmarksDialog *instance;
-    void update();
     QTreeWidget *bookmarksList;
+
 private slots:
+    void update();
     void add();
     void del();
     void clear();
