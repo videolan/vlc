@@ -2,26 +2,27 @@
 # Copyright (C) 2006 VideoLAN
 # This file is distributed under the same license as the VLC media player package.
 # $Id  $
+#
 # Miroslav Oujeský <oujesky@mail.muni.cz>, 2006.
 # Tomáš Chvátal <scarabeus@gentoo.org>, 2008, 2009.
 # Kamil Páral <ripper42@gmail.com>, 2009.
 # Vojtěch Smejkal <smejkalv@gmail.com>, 2009.
 # Jakub Žáček <dawon.cz@gmail.com>, 2009.
-#
 msgid ""
 msgstr ""
 "Project-Id-Version: cs\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2009-03-19 00:22+0000\n"
-"PO-Revision-Date: 2009-02-17 20:50+0100\n"
-"Last-Translator: Kamil Páral <ripper42@gmail.com>\n"
-"Language-Team: Czech <kde-i18n-doc@lists.kde.org>\n"
+"POT-Creation-Date: 2009-03-22 19:16+0000\n"
+"PO-Revision-Date: 2009-03-19 12:11+0100\n"
+"Last-Translator: Tomáš Chvátal <scarabeus@gentoo.org>\n"
+"Language-Team: Czech <kde-czech-apps@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-Language: Czech\n"
 "X-Poedit-Country: CZECH REPUBLIC\n"
+"X-Generator: Lokalize 0.3\n"
 
 #: include/vlc_common.h:879
 msgid ""
@@ -54,9 +55,8 @@ msgid "Settings for VLC's interfaces"
 msgstr "Nastavení pro rozhraní VLC"
 
 #: include/vlc_config_cat.h:40
-#, fuzzy
 msgid "Main interfaces settings"
-msgstr "Obecná nastavení sdílení Windows"
+msgstr "Nastavení hlavního rozhraní"
 
 #: include/vlc_config_cat.h:42
 msgid "Main interfaces"
@@ -79,7 +79,7 @@ msgstr "Nastavení VLC ovládacích rozhraní"
 msgid "Hotkeys settings"
 msgstr "Nastavení klávesových zkratek"
 
-#: include/vlc_config_cat.h:52 src/input/es_out.c:2649 src/input/es_out.c:2683
+#: include/vlc_config_cat.h:52 src/input/es_out.c:2628 src/input/es_out.c:2662
 #: src/libvlc-module.c:1500 modules/gui/beos/InterfaceWindow.cpp:283
 #: modules/gui/macosx/intf.m:597 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:113 modules/gui/macosx/simple_prefs.m:178
@@ -104,10 +104,8 @@ msgid "Filters"
 msgstr "Filtry"
 
 #: include/vlc_config_cat.h:58
-#, fuzzy
 msgid "Audio filters are used to process the audio stream."
-msgstr ""
-"Zvukové filtry jsou použiti k následnému zpracování (postprocessing) zvuku."
+msgstr "Zvukové filtry jsou použiti pro zpracování zvuku."
 
 #: include/vlc_config_cat.h:60 src/audio_output/input.c:112
 #: modules/gui/macosx/intf.m:607 modules/gui/macosx/intf.m:608
@@ -123,11 +121,10 @@ msgid "Output modules"
 msgstr "Výstupní moduly"
 
 #: include/vlc_config_cat.h:64
-#, fuzzy
 msgid "General settings for audio output modules."
-msgstr "Toto jsou obecná nastavení pro moduly zvukového výstupu"
+msgstr "Obecná nastavení pro moduly zvukového výstupu"
 
-#: include/vlc_config_cat.h:66 src/libvlc-module.c:1923
+#: include/vlc_config_cat.h:66 src/libvlc-module.c:1931
 #: modules/stream_out/transcode.c:232
 msgid "Miscellaneous"
 msgstr "Různé"
@@ -136,7 +133,7 @@ msgstr "Různé"
 msgid "Miscellaneous audio settings and modules."
 msgstr "Různá nastavení a moduly pro zvuk"
 
-#: include/vlc_config_cat.h:70 src/input/es_out.c:2652 src/input/es_out.c:2732
+#: include/vlc_config_cat.h:70 src/input/es_out.c:2631 src/input/es_out.c:2711
 #: src/libvlc-module.c:1553 modules/gui/macosx/intf.m:610
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:102
 #: modules/gui/macosx/simple_prefs.m:182 modules/gui/macosx/wizard.m:381
@@ -160,20 +157,17 @@ msgid "Choose your preferred video output and configure it here."
 msgstr "Vyberte a nastavte si zde váš preferovaný video výstup."
 
 #: include/vlc_config_cat.h:81
-#, fuzzy
 msgid "Video filters are used to process the video stream."
-msgstr ""
-"Video filtry jsou použiti k následnému zpracování (postprocessing) videa."
+msgstr "Video filtry jsou použiti pro zpracování videa."
 
 #: include/vlc_config_cat.h:83
 msgid "Subtitles/OSD"
 msgstr "Titulky/OSD"
 
 #: include/vlc_config_cat.h:84
-#, fuzzy
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
-msgstr "Různá nastavení vztahující se k OSD, titulkům a \"překrývání obrazu\"."
+msgstr "Nastavení vztahující se k OSD, titulkům a \"překrývání obrazu\"."
 
 #: include/vlc_config_cat.h:93
 msgid "Input / Codecs"
@@ -189,14 +183,13 @@ msgid "Access modules"
 msgstr "Přístupové moduly"
 
 #: include/vlc_config_cat.h:99
-#, fuzzy
 msgid ""
 "Settings related to the various access methods. Common settings you may want "
 "to alter are HTTP proxy or caching settings."
 msgstr ""
-"Nastavení vztahující se k různým přístupovým metodám užívaným VLC. Obecné "
-"nastavení, které pravděpodobně chcete změnit, je HTTP proxy a nastavení "
-"vyrovnávací paměti."
+"Nastavení vztahující se k různým přístupovým metodám. Obecné nastavení, "
+"které pravděpodobně chcete změnit, je HTTP proxy a nastavení vyrovnávací "
+"paměti."
 
 #: include/vlc_config_cat.h:103
 #, fuzzy
@@ -251,11 +244,10 @@ msgid "General Input"
 msgstr "Obecné"
 
 #: include/vlc_config_cat.h:121
-#, fuzzy
 msgid "General input settings. Use with care..."
-msgstr "Obecná nastavení vstupů (používejte opatrně!)."
+msgstr "Obecná nastavení vstupů. Používejte opatrně..."
 
-#: include/vlc_config_cat.h:124 src/libvlc-module.c:1850
+#: include/vlc_config_cat.h:124 src/libvlc-module.c:1858
 msgid "Stream output"
 msgstr "Výstup streamu"
 
@@ -352,7 +344,7 @@ msgstr "Video On Demand"
 msgid "VLC's implementation of Video On Demand"
 msgstr "VLC implementace Video Na Požádání"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:1984
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:1992
 #: src/playlist/engine.c:119 modules/demux/playlist/playlist.c:66
 #: modules/demux/playlist/playlist.c:67
 #: modules/gui/beos/InterfaceWindow.cpp:232
@@ -390,7 +382,7 @@ msgstr ""
 "Moduly \"prohledávání služeb\" jsou určeny k automatickému přidávání položek "
 "do seznamu stop."
 
-#: include/vlc_config_cat.h:186 src/libvlc-module.c:1800
+#: include/vlc_config_cat.h:186 src/libvlc-module.c:1808
 msgid "Advanced"
 msgstr "Rozšířené"
 
@@ -643,7 +635,7 @@ msgstr "Vyhledávací filtr"
 #: include/vlc_intf_strings.h:84
 #, fuzzy
 msgid "&Services Discovery"
-msgstr "Služby online"
+msgstr "Prohledávání služeb"
 
 #: include/vlc_intf_strings.h:88
 msgid ""
@@ -993,109 +985,106 @@ msgstr "%s [%s %d]"
 msgid "Program"
 msgstr "Program"
 
-#: src/input/es_out.c:1361 src/input/es_out.c:1363
-#, fuzzy
+#: src/input/es_out.c:1340 src/input/es_out.c:1342
 msgid "Scrambled"
-msgstr "Velikost"
+msgstr "Zakódovaný"
 
-#: src/input/es_out.c:1361 modules/gui/macosx/update.m:102
+#: src/input/es_out.c:1340 modules/gui/macosx/update.m:102
 msgid "Yes"
 msgstr "Ano"
 
-#: src/input/es_out.c:1937
+#: src/input/es_out.c:1916
 #, fuzzy, c-format
 msgid "Closed captions %u"
 msgstr "Dekodér selhal, chyba %d"
 
 # stream?
-#: src/input/es_out.c:2638
+#: src/input/es_out.c:2617
 #, c-format
 msgid "Stream %d"
 msgstr "Proud %d"
 
-#: src/input/es_out.c:2655 src/input/es_out.c:2763
+#: src/input/es_out.c:2634 src/input/es_out.c:2742
 msgid "Subtitle"
 msgstr "Titulky"
 
-#: src/input/es_out.c:2663 src/input/es_out.c:2683 src/input/es_out.c:2732
-#: src/input/es_out.c:2763 modules/gui/macosx/output.m:153
+#: src/input/es_out.c:2642 src/input/es_out.c:2662 src/input/es_out.c:2711
+#: src/input/es_out.c:2742 modules/gui/macosx/output.m:153
 #: modules/gui/qt4/ui/sprefs_audio.ui:186
 msgid "Type"
 msgstr "Typ"
 
-#: src/input/es_out.c:2666
+#: src/input/es_out.c:2645
 #, fuzzy
 msgid "Original ID"
-msgstr "Orginální zvuk"
+msgstr "1:1 Originál"
 
-#: src/input/es_out.c:2669 modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2648 modules/gui/macosx/wizard.m:385
 msgid "Codec"
 msgstr "Kodek"
 
-#: src/input/es_out.c:2673 src/input/meta.c:50 src/libvlc-module.c:193
+#: src/input/es_out.c:2652 src/input/meta.c:50 src/libvlc-module.c:193
 #: modules/gui/beos/InterfaceWindow.cpp:279
 #: modules/gui/macosx/simple_prefs.m:262
 msgid "Language"
 msgstr "Jazyk"
 
-#: src/input/es_out.c:2676 src/input/meta.c:45
+#: src/input/es_out.c:2655 src/input/meta.c:45
 #: modules/gui/macosx/bookmarks.m:94 modules/gui/qt4/dialogs/bookmarks.cpp:66
 msgid "Description"
 msgstr "Popis"
 
-#: src/input/es_out.c:2686 src/input/es_out.c:2689
+#: src/input/es_out.c:2665 src/input/es_out.c:2668
 #: modules/gui/macosx/output.m:176
 msgid "Channels"
 msgstr "Kanály"
 
-#: src/input/es_out.c:2694
+#: src/input/es_out.c:2673
 msgid "Sample rate"
 msgstr "Vzorkovací kmitočet"
 
-#: src/input/es_out.c:2695
+#: src/input/es_out.c:2674
 #, c-format
 msgid "%u Hz"
 msgstr "%u Hz"
 
-#: src/input/es_out.c:2705
+#: src/input/es_out.c:2684
 msgid "Bits per sample"
 msgstr "Bitů na vzorek"
 
-#: src/input/es_out.c:2710 modules/access/pvr.c:97
+#: src/input/es_out.c:2689 modules/access/pvr.c:97
 #: modules/access_output/shout.c:91
 #: modules/gui/qt4/components/open_panels.cpp:913
 msgid "Bitrate"
 msgstr "Bitrate"
 
-#: src/input/es_out.c:2711
+#: src/input/es_out.c:2690
 #, c-format
 msgid "%u kb/s"
 msgstr "%u kb/s"
 
-#: src/input/es_out.c:2722
-#, fuzzy
+#: src/input/es_out.c:2701
 msgid "Track replay gain"
-msgstr "Výchozí požadovaná síla signálu odpovědi"
+msgstr "Požadovaná síla signálu odpovědi stopy"
 
-#: src/input/es_out.c:2724
-#, fuzzy
+#: src/input/es_out.c:2703
 msgid "Album replay gain"
-msgstr "Výchozí požadovaná síla signálu odpovědi"
+msgstr "Požadovaná síla signálu odpovědi alba"
 
-#: src/input/es_out.c:2726
-#, fuzzy, c-format
+#: src/input/es_out.c:2705
+#, c-format
 msgid "%.2f dB"
-msgstr "%.1f·GB"
+msgstr "%.2f·GB"
 
-#: src/input/es_out.c:2736
+#: src/input/es_out.c:2715
 msgid "Resolution"
 msgstr "Rozlišení"
 
-#: src/input/es_out.c:2742
+#: src/input/es_out.c:2721
 msgid "Display resolution"
 msgstr "Rozlišení zobrazovacího zařízení"
 
-#: src/input/es_out.c:2753 src/input/es_out.c:2757
+#: src/input/es_out.c:2732 src/input/es_out.c:2736
 #: modules/access/screen/screen.c:44
 msgid "Frame rate"
 msgstr "Snímkovací frekvence"
@@ -1355,7 +1344,7 @@ msgstr ""
 "Stiskněte klávesu ENTER pro pokračování...\n"
 
 #: src/libvlc.h:182 src/libvlc-module.c:1394 src/libvlc-module.c:1395
-#: src/libvlc-module.c:2510 src/video_output/vout_intf.c:278
+#: src/libvlc-module.c:2518 src/video_output/vout_intf.c:278
 msgid "Zoom"
 msgstr "Zvětšit"
 
@@ -1435,7 +1424,7 @@ msgstr ""
 
 #: src/libvlc-module.c:175
 msgid "Choose which objects should print debug message"
-msgstr ""
+msgstr "Vyberte které objekty by měly vypisovat ladící zprávy"
 
 #: src/libvlc-module.c:178
 msgid ""
@@ -4021,9 +4010,8 @@ msgid "Cycle through a predefined list of crop formats."
 msgstr ""
 
 #: src/libvlc-module.c:1368
-#, fuzzy
 msgid "Toggle autoscaling"
-msgstr "Rozhraní"
+msgstr ""
 
 #: src/libvlc-module.c:1369
 msgid "Activate or deactivate autoscaling."
@@ -4300,101 +4288,101 @@ msgstr "SOCKS proxy"
 msgid "Metadata"
 msgstr "Metadata"
 
-#: src/libvlc-module.c:1822
+#: src/libvlc-module.c:1830
 msgid "Decoders"
 msgstr ""
 
-#: src/libvlc-module.c:1829 modules/access/v4l2.c:84
+#: src/libvlc-module.c:1837 modules/access/v4l2.c:84
 #: modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/qt4/components/info_panels.cpp:519
 msgid "Input"
 msgstr "Vstup"
 
-#: src/libvlc-module.c:1868
+#: src/libvlc-module.c:1876
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:1900
+#: src/libvlc-module.c:1908
 msgid "CPU"
 msgstr "Procesor"
 
-#: src/libvlc-module.c:1922
+#: src/libvlc-module.c:1930
 msgid "Special modules"
 msgstr "Speciální moduly"
 
-#: src/libvlc-module.c:1928
+#: src/libvlc-module.c:1936
 msgid "Plugins"
 msgstr "Zásuvné moduly"
 
-#: src/libvlc-module.c:1936
+#: src/libvlc-module.c:1944
 msgid "Performance options"
 msgstr "Možnosti výkonu"
 
-#: src/libvlc-module.c:2082
+#: src/libvlc-module.c:2090
 msgid "Hot keys"
 msgstr "Klávesové zkratky"
 
-#: src/libvlc-module.c:2520
+#: src/libvlc-module.c:2528
 msgid "Jump sizes"
 msgstr "Délky skoků"
 
-#: src/libvlc-module.c:2597
+#: src/libvlc-module.c:2605
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2600
+#: src/libvlc-module.c:2608
 msgid "Exhaustive help for VLC and its modules"
 msgstr "Vyčerpávající nápověda pro VLC a jeho moduly"
 
-#: src/libvlc-module.c:2602
+#: src/libvlc-module.c:2610
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2605
+#: src/libvlc-module.c:2613
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc-module.c:2607
+#: src/libvlc-module.c:2615
 msgid "print a list of available modules"
 msgstr "vypsání seznamu dostupných modulů"
 
-#: src/libvlc-module.c:2609
+#: src/libvlc-module.c:2617
 msgid "print a list of available modules with extra detail"
 msgstr "vypsání seznamu dostupných modulů s extra detaily"
 
-#: src/libvlc-module.c:2611
+#: src/libvlc-module.c:2619
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strictmatches."
 msgstr ""
 
-#: src/libvlc-module.c:2615
+#: src/libvlc-module.c:2623
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 
-#: src/libvlc-module.c:2617
+#: src/libvlc-module.c:2625
 msgid "save the current command line options in the config"
 msgstr ""
 
-#: src/libvlc-module.c:2619
+#: src/libvlc-module.c:2627
 msgid "reset the current config to the default values"
 msgstr "vrátit současné nastavení na výchozí hodnoty"
 
-#: src/libvlc-module.c:2621
+#: src/libvlc-module.c:2629
 msgid "use alternate config file"
 msgstr "použije alternativní konfigurační soubor"
 
-#: src/libvlc-module.c:2623
+#: src/libvlc-module.c:2631
 msgid "resets the current plugins cache"
 msgstr ""
 
-#: src/libvlc-module.c:2625
+#: src/libvlc-module.c:2633
 msgid "print version information"
 msgstr "vypsání informací o verzi"
 
-#: src/libvlc-module.c:2681
+#: src/libvlc-module.c:2689
 msgid "main program"
 msgstr "hlavní program"
 
@@ -4582,9 +4570,8 @@ msgstr ""
 "milisekundách."
 
 #: modules/access/alsa.c:87
-#, fuzzy
 msgid "Alsa"
-msgstr "Vždy navrchu"
+msgstr ""
 
 #: modules/access/alsa.c:88
 #, fuzzy
@@ -6095,11 +6082,11 @@ msgstr "HTTP vstup"
 msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
-#: modules/access/http.c:447
+#: modules/access/http.c:448
 msgid "HTTP authentication"
 msgstr "HTTP autentikace"
 
-#: modules/access/http.c:448
+#: modules/access/http.c:449
 #, fuzzy, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Zadejte prosím název uzlu"
@@ -6438,9 +6425,8 @@ msgid "How long to wait for late RTP packets (and delay the performance)."
 msgstr ""
 
 #: modules/access/rtp/rtp.c:45
-#, fuzzy
 msgid "RTCP (local) port"
-msgstr "TCP vstup"
+msgstr ""
 
 #: modules/access/rtp/rtp.c:47
 msgid ""
@@ -8167,7 +8153,7 @@ msgstr ""
 #: modules/audio_output/directx.c:233
 #, fuzzy
 msgid "Select speaker configuration"
-msgstr "Uložit nastavení"
+msgstr "Nahrát nastavení"
 
 #: modules/audio_output/directx.c:234
 msgid ""
@@ -9513,7 +9499,7 @@ msgstr ""
 #: modules/codec/kate.c:226
 #, fuzzy
 msgid "Default font effect"
-msgstr "Rozhraní"
+msgstr "Sluchátkový efekt"
 
 #: modules/codec/kate.c:227
 msgid ""
@@ -9522,9 +9508,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/kate.c:231
-#, fuzzy
 msgid "Default font effect strength"
-msgstr "Rozhraní"
+msgstr ""
 
 #: modules/codec/kate.c:232
 msgid "How pronounced to make the chosen font effect (effect dependent)."
@@ -9556,7 +9541,7 @@ msgstr ""
 #: modules/codec/kate.c:247
 #, fuzzy
 msgid "Default font alpha"
-msgstr "Rozhraní"
+msgstr "Základní stream"
 
 #: modules/codec/kate.c:248
 msgid ""
@@ -10824,11 +10809,11 @@ msgstr "Space"
 msgid "Page"
 msgstr "Taneční hudba"
 
-#: modules/control/dbus.c:111
+#: modules/control/dbus.c:128
 msgid "dbus"
 msgstr "dbus"
 
-#: modules/control/dbus.c:114
+#: modules/control/dbus.c:131
 msgid "D-Bus control interface"
 msgstr "D-Bus ovládací rozhraní"
 
@@ -10950,7 +10935,7 @@ msgstr "Pře_sunout na obrazovku..."
 #: modules/control/hotkeys.c:628
 #, fuzzy
 msgid "Original Size"
-msgstr "Orginální zvuk"
+msgstr "Zachovat původní velikost"
 
 #: modules/control/hotkeys.c:670
 #, c-format
@@ -10968,9 +10953,9 @@ msgid "1.00x"
 msgstr "100%"
 
 #: modules/control/hotkeys.c:788
-#, fuzzy, c-format
+#, c-format
 msgid "%.2fx"
-msgstr "%.1f·GB"
+msgstr ""
 
 #: modules/control/hotkeys.c:824 modules/control/hotkeys.c:834
 #, c-format
@@ -11996,9 +11981,8 @@ msgid "Textual audio descriptions"
 msgstr "Zpřístupněný popis"
 
 #: modules/demux/kate_categories.c:43
-#, fuzzy
 msgid "Karaoke"
-msgstr "Kazachština"
+msgstr ""
 
 #: modules/demux/kate_categories.c:44
 #, fuzzy
@@ -16211,9 +16195,8 @@ msgid "QNX RTOS video and audio output"
 msgstr "zpoždění zvukového výstupu OSS (upraví synchronizaci zvuku a videa)"
 
 #: modules/gui/qt4/components/controller.cpp:323
-#, fuzzy
 msgid "Shift+L"
-msgstr "Shift"
+msgstr ""
 
 #: modules/gui/qt4/components/controller.cpp:455
 msgid "Previous Chapter/Title"
@@ -16678,7 +16661,7 @@ msgid "Errors"
 msgstr "Chyby"
 
 #: modules/gui/qt4/dialogs/errors.cpp:51
-#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1405
+#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1408
 msgid "&Clear"
 msgstr "&Vyčistit"
 
@@ -17090,9 +17073,8 @@ msgid "M3U playlist (*.m3u);; "
 msgstr "M3U·playlist·(*.m3u);;·Jakýkoliv·(*.*)·"
 
 #: modules/gui/qt4/dialogs_provider.cpp:517
-#, fuzzy
 msgid "HTML playlist (*.html)"
-msgstr "Následující položka seznamu skladeb"
+msgstr ""
 
 #: modules/gui/qt4/dialogs_provider.cpp:663
 msgid "Open subtitles..."
@@ -17186,7 +17168,7 @@ msgstr "Otevřít &disk..."
 #: modules/gui/qt4/menus.cpp:308
 #, fuzzy
 msgid "Open &Network Stream..."
-msgstr "nelze otevřít `%i' pro proud"
+msgstr "Otevřít &síť..."
 
 #: modules/gui/qt4/menus.cpp:310 modules/gui/qt4/menus.cpp:800
 msgid "Open &Capture Device..."
@@ -17441,10 +17423,9 @@ msgstr "VLC media player"
 msgid "&Open Media"
 msgstr "Otevřít médium"
 
-#: modules/gui/qt4/menus.cpp:1390
-#, fuzzy
+#: modules/gui/qt4/menus.cpp:1393
 msgid " - Empty - "
-msgstr "Prázdný"
+msgstr ""
 
 #: modules/gui/qt4/menus.hpp:36
 msgid "Open &Folder..."
@@ -19666,9 +19647,8 @@ msgid "H.264 video packetizer"
 msgstr "Začít _videokonferenci"
 
 #: modules/packetizer/mlp.c:48
-#, fuzzy
 msgid "MLP/TrueHD parser"
-msgstr "Portugalština"
+msgstr ""
 
 #: modules/packetizer/mpeg4audio.c:182
 #, fuzzy
@@ -23298,7 +23278,7 @@ msgstr ""
 msgid "DirectX video output"
 msgstr "DirectX video výstup"
 
-#: modules/video_output/msw/directx.c:325
+#: modules/video_output/msw/directx.c:323
 msgid "Wallpaper"
 msgstr "Tapeta pracovní plochy"
 
@@ -23330,9 +23310,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_output/omapfb.c:96
-#, fuzzy
 msgid "Embed the overlay"
-msgstr "Vzorek (překrytí)"
+msgstr ""
 
 #: modules/video_output/omapfb.c:98
 msgid "Embed the framebuffer overlay into a X11 window"
@@ -23821,2440 +23800,3 @@ msgstr "Vizualizační filtr"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Spektrální analyzátor"
-
-#, fuzzy
-#~ msgid "&Extended Settings"
-#~ msgstr "&Rozšířené nastavení..."
-
-#~ msgid "Cancelled"
-#~ msgstr "Zrušeno"
-
-#, fuzzy
-#~ msgid "Illegal Polarization"
-#~ msgstr "Normalizace hlasitosti"
-
-#, fuzzy
-#~ msgid "Define playlist bookmarks."
-#~ msgstr "Smazat všechny bookmarky"
-
-#, fuzzy
-#~ msgid "1x"
-#~ msgstr "1"
-
-#~ msgid "HTTP/FTP/MMS/RTSP"
-#~ msgstr "HTTP/FTP/MMS/RTSP"
-
-#~ msgid "Allow timeshifting"
-#~ msgstr "Povolit posunutí času"
-
-#, fuzzy
-#~ msgid "Skip backward"
-#~ msgstr "Posunout vzad"
-
-#, fuzzy
-#~ msgid "Skip forward"
-#~ msgstr "Posunout vpřed"
-
-#, fuzzy
-#~ msgid "Login"
-#~ msgstr "Přihlašovací jméno: "
-
-#, fuzzy
-#~ msgid "Open a Media"
-#~ msgstr "Otevřít médium"
-
-#~ msgid "Save file..."
-#~ msgstr "Uložit soubor..."
-
-#~ msgid "Audio Port:"
-#~ msgstr "Port zvuku:"
-
-#, fuzzy
-#~ msgid "Paste &MRL"
-#~ msgstr "Vložit"
-
-#~ msgid "Show Playlist"
-#~ msgstr "Zobrazit seznam stop"
-
-#~ msgid "Minimal View"
-#~ msgstr "Minimální zobrazení"
-
-#, fuzzy
-#~ msgid "Fullscreen Interface"
-#~ msgstr "&Režim celé obrazovky"
-
-#~ msgid "Capture mode"
-#~ msgstr "Režim zachycování"
-
-#~ msgid "Select the capture device type"
-#~ msgstr "Vyberte typ zachycovacího zařízení"
-
-#~ msgid "Card Selection"
-#~ msgstr "Výběr karty"
-
-#~ msgid "Options"
-#~ msgstr "Nastavení"
-
-#~ msgid "Access advanced options to tweak the device"
-#~ msgstr "Zpřístupnit pokročilá nastavení pro vyladění zařízení"
-
-#~ msgid "Advanced options..."
-#~ msgstr "Pokročilá nastavení..."
-
-#, fuzzy
-#~ msgid "Disc Type Selection"
-#~ msgstr "Výběr disku"
-
-#~ msgid "Disable DVD Menus (for compatibility)"
-#~ msgstr "Vypnout nabídky DVD (kvůli kompatibilitě)"
-
-#~ msgid "Disc device"
-#~ msgstr "Diskové zařízení"
-
-#~ msgid "Starting Position"
-#~ msgstr "Počáteční pozice"
-
-#~ msgid "Audio and Subtitles"
-#~ msgstr "Zvuk a titulky"
-
-#~ msgid "Outputs"
-#~ msgstr "Výstupy"
-
-#~ msgid "Play locally"
-#~ msgstr "Přehrát lokálně"
-
-#~ msgid "Video Port"
-#~ msgstr "Port videa:"
-
-#~ msgid "Mount Point"
-#~ msgstr "Přípojný bod"
-
-#~ msgid "Login:pass:"
-#~ msgstr "Jméno:heslo: "
-
-#~ msgid "Prefer UDP over RTP"
-#~ msgstr "Preferovat UDP před RTP"
-
-#~ msgid "Group name"
-#~ msgstr "Jméno skupiny"
-
-#~ msgid "Stream all elementary streams"
-#~ msgstr "Spustit všechny dílčí proudy"
-
-#~ msgid "Generated stream output string"
-#~ msgstr "Vygenerovaný řetězec pro proudové vysílání"
-
-#~ msgid "Interface Type"
-#~ msgstr "Typ rozhraní"
-
-#~ msgid "Native"
-#~ msgstr "Nativní"
-
-#~ msgid "This is VLC's default interface, with a native look and feel."
-#~ msgstr "Toto je výchozí rozhraní VLC s nativním vzhledem a chováním."
-
-#~ msgid "Display mode"
-#~ msgstr "Režim zobrazení"
-
-#~ msgid "Integrate video in interface"
-#~ msgstr "Začlenit video do rozhraní"
-
-#~ msgid "Show a controller in fullscreen"
-#~ msgstr "Zobrazit ovladač v režimu celé obrazovky"
-
-#~ msgid "Skin file"
-#~ msgstr "Soubor s motivem"
-
-#, fuzzy
-#~ msgid "Resize interface to video size"
-#~ msgstr "<b>Videokonference</b>"
-
-#~ msgid "Instances"
-#~ msgstr "Instance"
-
-#~ msgid "Allow only one instance"
-#~ msgstr "Povolit pouze jednu instanci"
-
-#, fuzzy
-#~ msgid "File associations:"
-#~ msgstr "Popis"
-
-#, fuzzy
-#~ msgid "Enqueue files when in one instance mode"
-#~ msgstr "V režimu jedné instance řadit soubory do fronty"
-
-#~ msgid "Filter"
-#~ msgstr "Filtr"
-
-#~ msgid "RRD output file"
-#~ msgstr "RRD výstupní soubor"
-
-#~ msgid "Output data for RRDTool in this file."
-#~ msgstr "Uložit výstupní data RRDTool do tohoto souboru."
-
-#~ msgid "General interface settings"
-#~ msgstr "Obecná nastavení rozhraní"
-
-#~ msgid ""
-#~ "These are the settings for the input, demultiplexing and decoding parts "
-#~ "of VLC. Encoder settings can also be found here."
-#~ msgstr ""
-#~ "Toto je nastavení pro vstup, demultiplex a dekódovací části VLC. "
-#~ "Nastavení enkódování lze též nalézt zde."
-
-#~ msgid "Access filters"
-#~ msgstr "Přístupové filtry"
-
-#~ msgid "Other advanced settings"
-#~ msgstr "Ostatní pokročilá nastavení"
-
-#~ msgid "Media &Information..."
-#~ msgstr "&Informace o médiu..."
-
-#~ msgid "&Messages..."
-#~ msgstr "&Zprávy..."
-
-#~ msgid "&Bookmarks..."
-#~ msgstr "&Záložky..."
-
-#~ msgid "&About..."
-#~ msgstr "&O programu..."
-
-#~ msgid "&Load Playlist File..."
-#~ msgstr "&Načíst seznam stop ze souboru..."
-
-#~ msgid "Additional &Sources"
-#~ msgstr "Doplňující &zdroje"
-
-#~ msgid "Based upon Git commit [%s]\n"
-#~ msgstr "Založeno na Git commitu  [%s]\n"
-
-#~ msgid "American English"
-#~ msgstr "Americká angličtina"
-
-#~ msgid "Arabic"
-#~ msgstr "Arabština"
-
-#~ msgid "Brazilian Portuguese"
-#~ msgstr "Brazilská portugalština"
-
-#~ msgid "British English"
-#~ msgstr "Britská angličtina"
-
-#~ msgid "Bulgarian"
-#~ msgstr "Bulharština"
-
-#~ msgid "Catalan"
-#~ msgstr "Katalánština"
-
-#~ msgid "Chinese Traditional"
-#~ msgstr "Čínsky (tradičně)"
-
-#~ msgid "Czech"
-#~ msgstr "Čeština"
-
-#~ msgid "Danish"
-#~ msgstr "Dánština"
-
-#~ msgid "Dutch"
-#~ msgstr "Holandština"
-
-#~ msgid "Finnish"
-#~ msgstr "Finština"
-
-#~ msgid "French"
-#~ msgstr "Francouzština"
-
-#~ msgid "Galician"
-#~ msgstr "Galština"
-
-#~ msgid "Georgian"
-#~ msgstr "Gruzínština"
-
-#~ msgid "German"
-#~ msgstr "Němčina"
-
-#~ msgid "Hebrew"
-#~ msgstr "Hebrejština"
-
-#~ msgid "Hungarian"
-#~ msgstr "Maďarština"
-
-#~ msgid "Italian"
-#~ msgstr "Italština"
-
-#~ msgid "Japanese"
-#~ msgstr "Japonština"
-
-#~ msgid "Korean"
-#~ msgstr "Korejština"
-
-#~ msgid "Malay"
-#~ msgstr "Malajština"
-
-#~ msgid "Occitan"
-#~ msgstr "Okcitánština"
-
-#~ msgid "Persian"
-#~ msgstr "Perština"
-
-#~ msgid "Polish"
-#~ msgstr "Polština"
-
-#~ msgid "Portuguese"
-#~ msgstr "Portugalština"
-
-#~ msgid "Punjabi"
-#~ msgstr "Pandžábština"
-
-#~ msgid "Romanian"
-#~ msgstr "Rumunština"
-
-#~ msgid "Russian"
-#~ msgstr "Ruština"
-
-#~ msgid "Simplified Chinese"
-#~ msgstr "Zjednodušená čínština"
-
-#~ msgid "Serbian"
-#~ msgstr "Srbština"
-
-#~ msgid "Slovak"
-#~ msgstr "Slovenština"
-
-#~ msgid "Slovenian"
-#~ msgstr "Slovinština"
-
-#~ msgid "Spanish"
-#~ msgstr "Španělština"
-
-#~ msgid "Swedish"
-#~ msgstr "Švédština"
-
-#~ msgid "Turkish"
-#~ msgstr "Turečtina"
-
-#, fuzzy
-#~ msgid "Access filter module"
-#~ msgstr "nastavit název modulu"
-
-#~ msgid "16"
-#~ msgstr "16"
-
-#~ msgid "32"
-#~ msgstr "32"
-
-#~ msgid "64"
-#~ msgstr "64"
-
-#~ msgid "dv"
-#~ msgstr "dv"
-
-#, fuzzy
-#~ msgid "EyeTV access module"
-#~ msgstr "Adresáře s moduly"
-
-#~ msgid "Bandwidth limiter"
-#~ msgstr "Omezení propustnosti"
-
-#, fuzzy
-#~ msgid "Force use of dump module"
-#~ msgstr "Snížení hlasitosti na konci modulu"
-
-#, fuzzy
-#~ msgid "Force use of the timeshift module"
-#~ msgstr "Snížení hlasitosti na konci modulu"
-
-#~ msgid "Timeshift"
-#~ msgstr "Posunutí času"
-
-#, fuzzy
-#~ msgid ""
-#~ "Name of the device to use. If you don't specify anything, /dev/video0 "
-#~ "will be used."
-#~ msgstr ""
-#~ "Toto je výchozí VCD zařízení. Pokud zde nic neuvedete, zkusíme nalézt "
-#~ "vhodnou CD-ROM mechaniku."
-
-#, fuzzy
-#~ msgid ""
-#~ "Name of the audio device to use. If you don't specify anything, \"/dev/dsp"
-#~ "\" will be used for OSS."
-#~ msgstr ""
-#~ "Toto je výchozí VCD zařízení. Pokud zde nic neuvedete, zkusíme nalézt "
-#~ "vhodnou CD-ROM mechaniku."
-
-#, fuzzy
-#~ msgid ""
-#~ "Name of the audio device to use. If you don't specify anything, \"/dev/dsp"
-#~ "\" will be used for OSS, \"hw\" for Alsa."
-#~ msgstr ""
-#~ "Toto je výchozí VCD zařízení. Pokud zde nic neuvedete, zkusíme nalézt "
-#~ "vhodnou CD-ROM mechaniku."
-
-#~ msgid "Audio method"
-#~ msgstr "Zvuková metoda"
-
-#~ msgid "Audio method to use: 0 to disable audio, 1 for OSS."
-#~ msgstr "Kterou zvukovou metodu použít: 0 pro zakázání zvuku, 1 pro OSS."
-
-#~ msgid ""
-#~ "Audio method to use: 0 to disable audio, 1 for OSS, 2 for ALSA, 3 for "
-#~ "ALSA or OSS (ALSA is preferred)."
-#~ msgstr ""
-#~ "Kterou zvukovou metodu použít: 0 pro zakázání zvuku, 1 pro OSS, 2 pro "
-#~ "ALSA, 3 pro ALSA nebo OSS (ALSA je preferována)."
-
-#, fuzzy
-#~ msgid ""
-#~ "Name of the audio device to use. If you don't specify anything, no audio "
-#~ "device will be used."
-#~ msgstr ""
-#~ "Toto je výchozí VCD zařízení. Pokud zde nic neuvedete, zkusíme nalézt "
-#~ "vhodnou CD-ROM mechaniku."
-
-#~ msgid "The above message had unknown log level"
-#~ msgstr "Výše uvedená zpráva má neznámou logovací úroveň"
-
-#~ msgid "The above message had unknown vcdimager log level"
-#~ msgstr "Výše uvedená zpráva má neznámou logovací úroveň vcdimageru"
-
-#, fuzzy
-#~ msgid "spatializer"
-#~ msgstr "Reprezentace prostoru"
-
-#~ msgid "aRts audio output"
-#~ msgstr "Zvukový výstup aRts"
-
-#~ msgid "EsounD audio output"
-#~ msgstr "Zvukový výstup EsounD"
-
-#, fuzzy
-#~ msgid "Esound server"
-#~ msgstr "Komunikační server"
-
-#, fuzzy
-#~ msgid "Dirac video decoder"
-#~ msgstr "Falešný video dekodér"
-
-#, fuzzy
-#~ msgid "Dirac video encoder"
-#~ msgstr "Začít _videokonferenci"
-
-#~ msgid "%d Hz"
-#~ msgstr "%d Hz"
-
-#, fuzzy
-#~ msgid "Kate text subtitles decoder"
-#~ msgstr "Dekodér titulků"
-
-#, fuzzy
-#~ msgid "Kate comment"
-#~ msgstr "Seznam poznámek"
-
-#, fuzzy
-#~ msgid "Speex comment"
-#~ msgstr "Seznam poznámek"
-
-#, fuzzy
-#~ msgid "Theora comment"
-#~ msgstr "Seznam poznámek"
-
-#, fuzzy
-#~ msgid "Vorbis comment"
-#~ msgstr "Seznam poznámek"
-
-#, fuzzy
-#~ msgid "Buffer"
-#~ msgstr "Jednoduchý buffer"
-
-#, fuzzy
-#~ msgid "Backward"
-#~ msgstr "Posunout vzad"
-
-#, fuzzy
-#~ msgid "Compiled by %s, based on Git commit %s"
-#~ msgstr "Založeno na SVN revizi:"
-
-#~ msgid "Quick Open File..."
-#~ msgstr "Rychlé otevření souboru..."
-
-#~ msgid "Access Filter"
-#~ msgstr "Přístupový filtr"
-
-#~ msgid " State    : Stopped %s"
-#~ msgstr "Stav     : Zastaveno %s"
-
-#~ msgid " State    : Buffering %s"
-#~ msgstr "Stav     : Tvorba vyrovnávací paměti %s"
-
-#~ msgid "Unmute"
-#~ msgstr "Zapnout zvuk"
-
-#~ msgid ""
-#~ "Loop from point A to point B continuously\n"
-#~ "Click to set point A"
-#~ msgstr ""
-#~ "Nepřetržitá smyčka z bodu A do bodu B\n"
-#~ "Kliknutím nastavíte bod A"
-
-#~ msgid "Click to set point B"
-#~ msgstr "Kliknutím nastavíte bod B"
-
-#~ msgid "Stop the A to B loop"
-#~ msgstr "Zastavit smyčku z A do B"
-
-#~ msgid "Based on Git commit: "
-#~ msgstr "Založeno na Git commit: "
-
-#~ msgid "Recently played"
-#~ msgstr "Nedávno přehrané"
-
-#~ msgid "&Preferences..."
-#~ msgstr "&Nastavení..."
-
-#~ msgid "Play&list..."
-#~ msgstr "Seznam sto&p..."
-
-#~ msgid "Tools"
-#~ msgstr "Nástroje"
-
-#~ msgid "Toggle Fullscreen Interface"
-#~ msgstr "Přepnout režim celé obrazovky"
-
-#~ msgid "Use non native buttons and volume slider"
-#~ msgstr "Nepoužívat původní tlačítka a posuvníky hlasitosti"
-
-#~ msgid "Customize"
-#~ msgstr "Upravit"
-
-#~ msgid "Encapsulation"
-#~ msgstr "Zapouzdření"
-
-#~ msgid "Video codec"
-#~ msgstr "Kodek videa"
-
-#~ msgid "Audio codec"
-#~ msgstr "Kodek zvuku"
-
-#~ msgid "Overlay subtitles on the video"
-#~ msgstr "Vykreslit titulky do videa"
-
-#, fuzzy
-#~ msgid ""
-#~ "All playlists|*.pls;*.m3u;*.asx;*.b4s;*.xspf|M3U files|*.m3u|XSPF "
-#~ "playlist|*.xspf"
-#~ msgstr "Soubor M3U|*.m3u|Seznam skladeb XSPF|*.xspf"
-
-#, fuzzy
-#~ msgid "WinCE interface module"
-#~ msgstr "nastavit název modulu"
-
-#~ msgid "Bonjour"
-#~ msgstr "Bonjour"
-
-#~ msgid "Devices"
-#~ msgstr "Zařízení"
-
-#~ msgid ""
-#~ "This automatically enables timeshifting for streams discovered through "
-#~ "SAP announcements."
-#~ msgstr ""
-#~ "Automaticky povolí posunutí času pro proudy objevené pomocí SAP oznámení."
-
-#~ msgid "Cube"
-#~ msgstr "Krychle"
-
-#~ msgid "Transparent Cube"
-#~ msgstr "Průhledná krychle"
-
-#, fuzzy
-#~ msgid "Cylinder"
-#~ msgstr "Bilineární"
-
-#, fuzzy
-#~ msgid "Torus"
-#~ msgstr "House"
-
-#, fuzzy
-#~ msgid "Sphere"
-#~ msgstr "Rychlost"
-
-#~ msgid "SQUAREXY"
-#~ msgstr "SQUAREXY"
-
-#~ msgid "SQUARER"
-#~ msgstr "SQUARER"
-
-#~ msgid "ASINXY"
-#~ msgstr "ASINXY"
-
-#~ msgid "ASINR"
-#~ msgstr "ASINR"
-
-#~ msgid "SINEXY"
-#~ msgstr "SINEXY"
-
-#~ msgid "SINER"
-#~ msgstr "SINER"
-
-#, fuzzy
-#~ msgid "Point of view x-coordinate"
-#~ msgstr "Maximální souřadnice X"
-
-#, fuzzy
-#~ msgid "Point of view y-coordinate"
-#~ msgstr "Maximální souřadnice X"
-
-#, fuzzy
-#~ msgid "Point of view z-coordinate"
-#~ msgstr "Maximální souřadnice X"
-
-#~ msgid "OpenGL cube rotation speed"
-#~ msgstr "Rychlost otáčení OpenGL krychle"
-
-#, fuzzy
-#~ msgid "Number of bands"
-#~ msgstr "Počet pruhů"
-
-#~ msgid "Minimize number of threads"
-#~ msgstr "Minimalizovat počet vláken"
-
-#~ msgid "Afar"
-#~ msgstr "Afarština"
-
-#~ msgid "Abkhazian"
-#~ msgstr "Abchazajština"
-
-#~ msgid "Afrikaans"
-#~ msgstr "Afrikánština"
-
-#~ msgid "Albanian"
-#~ msgstr "Albánština"
-
-#~ msgid "Amharic"
-#~ msgstr "Amharština"
-
-#~ msgid "Armenian"
-#~ msgstr "Arménština"
-
-#~ msgid "Assamese"
-#~ msgstr "Ásámština"
-
-#~ msgid "Avestan"
-#~ msgstr "Avestština"
-
-#~ msgid "Aymara"
-#~ msgstr "Aymárština"
-
-#~ msgid "Azerbaijani"
-#~ msgstr "Ázerbajdžánština"
-
-#~ msgid "Bashkir"
-#~ msgstr "Baskirština"
-
-#~ msgid "Basque"
-#~ msgstr "Baskičtina"
-
-#~ msgid "Belarusian"
-#~ msgstr "Běloruština"
-
-#~ msgid "Bengali"
-#~ msgstr "Bengálština"
-
-#~ msgid "Bihari"
-#~ msgstr "Bihárština"
-
-#~ msgid "Bislama"
-#~ msgstr "Bislámština"
-
-#~ msgid "Bosnian"
-#~ msgstr "Bosenština"
-
-#~ msgid "Breton"
-#~ msgstr "Bretonština"
-
-#~ msgid "Burmese"
-#~ msgstr "Barmština"
-
-#~ msgid "Chechen"
-#~ msgstr "Čečenština"
-
-#~ msgid "Chinese"
-#~ msgstr "Čínština"
-
-#~ msgid "Church Slavic"
-#~ msgstr "Slovanština (jiná)"
-
-#~ msgid "Cornish"
-#~ msgstr "Kornština"
-
-#~ msgid "Corsican"
-#~ msgstr "Korsičtina"
-
-#~ msgid "Dzongkha"
-#~ msgstr "Bhútánština"
-
-#~ msgid "English"
-#~ msgstr "Angličtina"
-
-#~ msgid "Esperanto"
-#~ msgstr "Esperanto"
-
-#~ msgid "Estonian"
-#~ msgstr "Estonština"
-
-#~ msgid "Faroese"
-#~ msgstr "Faerština"
-
-#~ msgid "Fijian"
-#~ msgstr "Fidži"
-
-#~ msgid "Frisian"
-#~ msgstr "Fríština"
-
-#~ msgid "Gaelic (Scots)"
-#~ msgstr "Skotská galština"
-
-#~ msgid "Irish"
-#~ msgstr "Irština"
-
-#~ msgid "Gallegan"
-#~ msgstr "Gallegan"
-
-#~ msgid "Manx"
-#~ msgstr "Manština"
-
-#~ msgid "Greek, Modern ()"
-#~ msgstr "Řečtina (moderní)"
-
-#~ msgid "Guarani"
-#~ msgstr "Guaranština"
-
-#~ msgid "Gujarati"
-#~ msgstr "Gudžarátština"
-
-#~ msgid "Hindi"
-#~ msgstr "Hindština"
-
-#~ msgid "Icelandic"
-#~ msgstr "Islandština"
-
-#~ msgid "Inuktitut"
-#~ msgstr "Inuktitutština"
-
-#~ msgid "Interlingue"
-#~ msgstr "Interlingue"
-
-#~ msgid "Interlingua"
-#~ msgstr "Interlingua"
-
-#~ msgid "Indonesian"
-#~ msgstr "Indonézština"
-
-#~ msgid "Inupiaq"
-#~ msgstr "Inupiakština"
-
-#~ msgid "Javanese"
-#~ msgstr "Jávština"
-
-#~ msgid "Kalaallisut (Greenlandic)"
-#~ msgstr "Grónština (Kalaallisut)"
-
-#~ msgid "Kannada"
-#~ msgstr "Kannadština"
-
-#~ msgid "Kashmiri"
-#~ msgstr "Kašmírština"
-
-#~ msgid "Khmer"
-#~ msgstr "Kambodžština"
-
-#~ msgid "Kinyarwanda"
-#~ msgstr "Kinyarwandština"
-
-#~ msgid "Kirghiz"
-#~ msgstr "Kirgizština"
-
-#~ msgid "Kurdish"
-#~ msgstr "Kurdština"
-
-#~ msgid "Lao"
-#~ msgstr "Laoština"
-
-#~ msgid "Latin"
-#~ msgstr "Latina"
-
-#~ msgid "Latvian"
-#~ msgstr "Lotyština"
-
-#~ msgid "Lingala"
-#~ msgstr "Lingalština"
-
-#~ msgid "Lithuanian"
-#~ msgstr "Litevština"
-
-#~ msgid "Macedonian"
-#~ msgstr "Makedonština"
-
-#~ msgid "Marshall"
-#~ msgstr "Marshallovy ostrovy"
-
-#~ msgid "Malayalam"
-#~ msgstr "Malabarština"
-
-#~ msgid "Maori"
-#~ msgstr "Maorština"
-
-#~ msgid "Marathi"
-#~ msgstr "Maráthština"
-
-#~ msgid "Malagasy"
-#~ msgstr "Malgaština"
-
-#~ msgid "Maltese"
-#~ msgstr "Maltézština"
-
-#~ msgid "Moldavian"
-#~ msgstr "Moldavština"
-
-#~ msgid "Mongolian"
-#~ msgstr "Mongolština"
-
-#~ msgid "Nauru"
-#~ msgstr "Naurština"
-
-#~ msgid "Ndebele, South"
-#~ msgstr "Jižní Ndebele"
-
-#~ msgid "Ndebele, North"
-#~ msgstr "Severní Ndebele"
-
-#~ msgid "Nepali"
-#~ msgstr "Nepálština"
-
-#~ msgid "Norwegian"
-#~ msgstr "Norština"
-
-#~ msgid "Norwegian Nynorsk"
-#~ msgstr "Norština (Nynorsk)"
-
-#~ msgid "Norwegian Bokmaal"
-#~ msgstr "Norština (Bokmål)"
-
-#~ msgid "Oriya"
-#~ msgstr "Oriya"
-
-#~ msgid "Oromo"
-#~ msgstr "Oromo (Afan)"
-
-#~ msgid "Panjabi"
-#~ msgstr "Pandžábština"
-
-#~ msgid "Pali"
-#~ msgstr "Páli"
-
-#~ msgid "Quechua"
-#~ msgstr "Kečuánština"
-
-#~ msgid "Rundi"
-#~ msgstr "Kirundi"
-
-#~ msgid "Sango"
-#~ msgstr "Sangho"
-
-#~ msgid "Sanskrit"
-#~ msgstr "Sanskrt"
-
-#~ msgid "Croatian"
-#~ msgstr "Chorvatština"
-
-#~ msgid "Northern Sami"
-#~ msgstr "Severní Sami"
-
-#~ msgid "Samoan"
-#~ msgstr "Samoyština"
-
-#~ msgid "Shona"
-#~ msgstr "Shona"
-
-#~ msgid "Sindhi"
-#~ msgstr "Sindhština"
-
-#~ msgid "Somali"
-#~ msgstr "Somálština"
-
-#~ msgid "Sotho, Southern"
-#~ msgstr "Jižní Sotho"
-
-#~ msgid "Sardinian"
-#~ msgstr "Sardinština"
-
-#~ msgid "Swati"
-#~ msgstr "Siswatština"
-
-#~ msgid "Sundanese"
-#~ msgstr "Sundanština"
-
-#~ msgid "Swahili"
-#~ msgstr "Svahilština"
-
-#~ msgid "Tahitian"
-#~ msgstr "Tahitština"
-
-#~ msgid "Tamil"
-#~ msgstr "Tamilština"
-
-#~ msgid "Tatar"
-#~ msgstr "Tatarština"
-
-#~ msgid "Telugu"
-#~ msgstr "Telugština"
-
-#~ msgid "Tajik"
-#~ msgstr "Tádžičtina"
-
-#~ msgid "Tagalog"
-#~ msgstr "Tagalog"
-
-#~ msgid "Thai"
-#~ msgstr "Thajština"
-
-#~ msgid "Tibetan"
-#~ msgstr "Tibetština"
-
-#~ msgid "Tigrinya"
-#~ msgstr "Tigrinijština"
-
-#~ msgid "Tonga (Tonga Islands)"
-#~ msgstr "Tonga"
-
-#~ msgid "Tswana"
-#~ msgstr "Setswanština"
-
-#~ msgid "Tsonga"
-#~ msgstr "Tsonga"
-
-#~ msgid "Turkmen"
-#~ msgstr "Turkmenistánština"
-
-#~ msgid "Twi"
-#~ msgstr "Twi"
-
-#~ msgid "Uighur"
-#~ msgstr "Uighurština"
-
-#~ msgid "Ukrainian"
-#~ msgstr "Ukrajinština"
-
-#~ msgid "Urdu"
-#~ msgstr "Urdština"
-
-#~ msgid "Uzbek"
-#~ msgstr "Uzbečtina"
-
-#~ msgid "Vietnamese"
-#~ msgstr "Vietnamština"
-
-#~ msgid "Welsh"
-#~ msgstr "Velština"
-
-#~ msgid "Wolof"
-#~ msgstr "Wolof"
-
-#~ msgid "Xhosa"
-#~ msgstr "Xhosa"
-
-#~ msgid "Yiddish"
-#~ msgstr "Jidiš"
-
-#~ msgid "Yoruba"
-#~ msgstr "Yoruba"
-
-#~ msgid "Zulu"
-#~ msgstr "Zulu"
-
-#, fuzzy
-#~ msgid "Record directory"
-#~ msgstr "Odstraňuji adresář %s.\n"
-
-#, fuzzy
-#~ msgid "Cinepak video decoder"
-#~ msgstr "Falešný video dekodér"
-
-#, fuzzy
-#~ msgid "Raw A/52 demuxer"
-#~ msgstr "Bulharská leva A/52"
-
-#, fuzzy
-#~ msgid "Raw DTS demuxer"
-#~ msgstr "režim scan-kódů (RAW)"
-
-#, fuzzy
-#~ msgid "MPEG-4 audio demuxer"
-#~ msgstr "Zásuvný modul zvuku v textu"
-
-#, fuzzy
-#~ msgid "MPEG audio / MP3 demuxer"
-#~ msgstr "Zásuvný modul zvuku v textu"
-
-#, fuzzy
-#~ msgid "4:3 subtitles"
-#~ msgstr "SVCD titulky"
-
-#, fuzzy
-#~ msgid "16:9 subtitles"
-#~ msgstr "SVCD titulky"
-
-#, fuzzy
-#~ msgid "2.21:1 subtitles"
-#~ msgstr "SVCD titulky"
-
-#, fuzzy
-#~ msgid "Quartz video"
-#~ msgstr "<b>Videokonference</b>"
-
-#~ msgid "Choose the font to display your Subtitles with."
-#~ msgstr "Vyberte font kterým se budou vykreslovat titulky."
-
-#, fuzzy
-#~ msgid "Select a name for the logs file"
-#~ msgstr "Vyberte soubor k uložení"
-
-#, fuzzy
-#~ msgid "Open playlist file"
-#~ msgstr "Otevřít seznam skladeb"
-
-#, fuzzy
-#~ msgid "Choose a filename to save playlist"
-#~ msgstr "Pro instalaci musíte vybrat jeden z nich.\n"
-
-#, fuzzy
-#~ msgid "Choose a filename to save the VLM configuration..."
-#~ msgstr "Pro instalaci musíte vybrat jeden z nich.\n"
-
-#~ msgid "Open a VLM Configuration File"
-#~ msgstr "Otevřít VLM konfigurační soubor"
-
-#~ msgid "&Playlist"
-#~ msgstr "&Seznam stop"
-
-#~ msgid "Show P&laylist"
-#~ msgstr "Zobrazit seznam sto&p"
-
-#~ msgid "Load File..."
-#~ msgstr "Načíst soubor..."
-
-#~ msgid "Use a sub&titles file"
-#~ msgstr "Použít soubor s &titulky"
-
-#, fuzzy
-#~ msgid "MusicBrainz"
-#~ msgstr "Muzikál"
-
-#, fuzzy
-#~ msgid "MusicBrainz meta data"
-#~ msgstr "<b>Jiná metadata</b>"
-
-#~ msgid "Image video output"
-#~ msgstr "Výstup videa do obrázku"
-
-#~ msgid "Audio CD - Track "
-#~ msgstr "Audio CD - Stopa"
-
-#, fuzzy
-#~ msgid "VLC"
-#~ msgstr "VCD"
-
-#~ msgid "M3U file|*.m3u|XSPF playlist|*.xspf"
-#~ msgstr "Soubor M3U|*.m3u|Seznam skladeb XSPF|*.xspf"
-
-#, fuzzy
-#~ msgid "Seam Carving video filter"
-#~ msgstr "Horní propust"
-
-#, fuzzy
-#~ msgid "Seam Carving"
-#~ msgstr "Streamování"
-
-#~ msgid "VLC - Controller"
-#~ msgstr "VLC - Ovladač"
-
-#, fuzzy
-#~ msgid "A to B"
-#~ msgstr " do "
-
-#, fuzzy
-#~ msgid "Extended settings"
-#~ msgstr "Nastavení sendmailu"
-
-#, fuzzy
-#~ msgid "Open a device or a VIDEO_TS directory"
-#~ msgstr "GnomeIconSelection: nemohu otevřít adresář '%s'"
-
-#, fuzzy
-#~ msgid "&Update List"
-#~ msgstr "Aktualizace"
-
-#, fuzzy
-#~ msgid "Choose subtitles file"
-#~ msgstr "Používat bezpečné ukládání souborů"
-
-#, fuzzy
-#~ msgid "&Equalizer"
-#~ msgstr "Ekvalizér"
-
-#, fuzzy
-#~ msgid "&Title"
-#~ msgstr "Titul"
-
-#, fuzzy
-#~ msgid "Undock from Interface"
-#~ msgstr "IDE rozhraní"
-
-#, fuzzy
-#~ msgid "Ctrl+U"
-#~ msgstr "Ctrl"
-
-#, fuzzy
-#~ msgid "Add Interfaces"
-#~ msgstr "Přidat rozhraní"
-
-#~ msgid "Add node"
-#~ msgstr "Přidat uzel"
-
-#~ msgid "%s: unrecognized option `--%s'\n"
-#~ msgstr "%s: neznámý přepínač `--%s'\n"
-
-#, fuzzy
-#~ msgid "Subscreen height."
-#~ msgstr "Výška videa"
-
-#, fuzzy
-#~ msgid "Get Stream Information"
-#~ msgstr "Získat informace o uživateli"
-
-#~ msgid "%i items in the playlist"
-#~ msgstr "%i položek v seznamu skladeb"
-
-#~ msgid "1 item in the playlist"
-#~ msgstr "1 položka v seznamu skladeb"
-
-#, fuzzy
-#~ msgid "Input and Codecs"
-#~ msgstr "Vstup / Kodeky"
-
-#, fuzzy
-#~ msgid "close"
-#~ msgstr "Zavřít"
-
-#, fuzzy
-#~ msgid "Choose a filename to save the logs under..."
-#~ msgstr "Pro instalaci musíte vybrat jeden z nich.\n"
-
-#, fuzzy
-#~ msgid "Choose a VLM configuration file to open..."
-#~ msgstr "hlavní soubor nastavení"
-
-#, fuzzy
-#~ msgid "Check for updates..."
-#~ msgstr "Kontrolovat aktualizace..."
-
-#, fuzzy
-#~ msgid "No DVD Menus"
-#~ msgstr "DVD s menu"
-
-#, fuzzy
-#~ msgid "Disk Device"
-#~ msgstr "Zařízení"
-
-#, fuzzy
-#~ msgid "Native or Skins"
-#~ msgstr "Původní Americká"
-
-#, fuzzy
-#~ msgid "Subtitles languages"
-#~ msgstr "Jazyk titulků"
-
-#, fuzzy
-#~ msgid "Skip Frames"
-#~ msgstr "Zobrazovat rámce"
-
-#, fuzzy
-#~ msgid "Display Device"
-#~ msgstr "Zobrazit"
-
-#, fuzzy
-#~ msgid "Enable Wallpaper Mode"
-#~ msgstr "Povolit/zakázat režim kurzoru"
-
-#, fuzzy
-#~ msgid "use Pause Color"
-#~ msgstr "Jen pozastavit"
-
-#, fuzzy
-#~ msgid "Strict rate control"
-#~ msgstr "Ovládací centrum GNOME"
-
-#, fuzzy
-#~ msgid "Enable the strict rate control algorithm."
-#~ msgstr "Ovládací centrum GNOME"
-
-#, fuzzy
-#~ msgid "Subpicture Filters"
-#~ msgstr "Použít _filtry"
-
-#~ msgid "Enabled"
-#~ msgstr "Zapnuto"
-
-#, fuzzy
-#~ msgid "Image:"
-#~ msgstr "Obrázek"
-
-#, fuzzy
-#~ msgid "Position:"
-#~ msgstr "Pozice"
-
-#, fuzzy
-#~ msgid "Timestamp:"
-#~ msgstr "Časová značka"
-
-#, fuzzy
-#~ msgid "Color:"
-#~ msgstr "Barva"
-
-#, fuzzy
-#~ msgid "Opaqueness:"
-#~ msgstr "Otevřít:"
-
-#~ msgid "(in pixels)"
-#~ msgstr "(v pixelech)"
-
-#, fuzzy
-#~ msgid "Marquee:"
-#~ msgstr "Marquee"
-
-#, fuzzy
-#~ msgid "Timeout:"
-#~ msgstr "Timeout"
-
-#~ msgid "ms"
-#~ msgstr "ms"
-
-#, fuzzy
-#~ msgid "Not Available"
-#~ msgstr "Nápověda není k dispozici"
-
-#~ msgid "Previous track"
-#~ msgstr "Předchozí stopa"
-
-#, fuzzy
-#~ msgid "Subtitles & OSD settings"
-#~ msgstr "Zobrazit nastaveni hran"
-
-#, fuzzy
-#~ msgid "Go to time:"
-#~ msgstr "Přejít na titul"
-
-#, fuzzy
-#~ msgid "2 pass"
-#~ msgstr "Průchod 1"
-
-#~ msgid "3dfx Glide video output"
-#~ msgstr "3dfx Glide video výstup"
-
-#~ msgid "&OK"
-#~ msgstr "&OK"
-
-#~ msgid "&Delete"
-#~ msgstr "&Smazat"
-
-#, fuzzy
-#~ msgid "Removes all the bookmarks for that stream"
-#~ msgstr "nelze otevřít `%i' pro proud"
-
-#, fuzzy
-#~ msgid "You must select two bookmarks"
-#~ msgstr "Musíte vybrat nějaké zákazy"
-
-#, fuzzy
-#~ msgid "Input has changed "
-#~ msgstr "Vstup se změnil"
-
-#, fuzzy
-#~ msgid "Stream and Media Info"
-#~ msgstr "Nastavení mechanik a médií"
-
-#, fuzzy
-#~ msgid "Advanced information"
-#~ msgstr "Rozšířené informace"
-
-#~ msgid "&No"
-#~ msgstr "&Ne"
-
-#~ msgid "Don't show further errors"
-#~ msgstr "Nezobrazovat další chyby"
-
-#, fuzzy
-#~ msgid "Playlist item info"
-#~ msgstr "1 položka v seznamu skladeb"
-
-#~ msgid "Save &As..."
-#~ msgstr "Uložit &jako..."
-
-#~ msgid "Save Messages As..."
-#~ msgstr "Uložit zprávu jako..."
-
-#~ msgid "Options:"
-#~ msgstr "Nastavení:"
-
-#~ msgid "Open..."
-#~ msgstr "Otevřít..."
-
-#, fuzzy
-#~ msgid "Stream/Save"
-#~ msgstr "Uložit stream na disk"
-
-#, fuzzy
-#~ msgid "Change the default caching value (in milliseconds)"
-#~ msgstr "ve tvaru \"<název> <hodnota>\""
-
-#~ msgid "Customize:"
-#~ msgstr "Upravit:"
-
-#, fuzzy
-#~ msgid "Use an external subtitles file."
-#~ msgstr "font externích titulků"
-
-#~ msgid "Advanced Settings..."
-#~ msgstr "Pokročilá nastavení..."
-
-#~ msgid "File:"
-#~ msgstr "Soubor:"
-
-#, fuzzy
-#~ msgid "DVD (menus)"
-#~ msgstr "DVD s menu"
-
-#~ msgid "Disc type"
-#~ msgstr "Typ disku"
-
-#, fuzzy
-#~ msgid "Probe Disc(s)"
-#~ msgstr "ID disku"
-
-#~ msgid "HTTP/HTTPS/FTP/MMS"
-#~ msgstr "HTTP/HTTPS/FTP/MMS"
-
-#~ msgid "RTSP"
-#~ msgstr "RTSP"
-
-#, fuzzy
-#~ msgid "DVD device to use"
-#~ msgstr "Zařízení CD, které použít"
-
-#, fuzzy
-#~ msgid "CD-ROM device to use"
-#~ msgstr "Název použitého zařízení xinput"
-
-#~ msgid "Title number."
-#~ msgstr "Číslo titulu."
-
-#, fuzzy
-#~ msgid "Track number."
-#~ msgstr "Číslo stopy."
-
-#, fuzzy
-#~ msgid "&Simple Add File..."
-#~ msgstr "Soubor obsahující jednoduchý seznam skladeb"
-
-#~ msgid "Add &Directory..."
-#~ msgstr "Přidat &složku..."
-
-#~ msgid "&Add URL..."
-#~ msgstr "&Přidat URL"
-
-#~ msgid "&Save Playlist..."
-#~ msgstr "&Uložit seznam skladeb..."
-
-#~ msgid "Sort by &Title"
-#~ msgstr "Seřadit podle &titulu"
-
-#~ msgid "&Reverse Sort by Title"
-#~ msgstr "&Seřadit pozpátku podle titulu"
-
-#~ msgid "&Shuffle"
-#~ msgstr "&Zamíchat"
-
-#~ msgid "D&elete"
-#~ msgstr "O&dstranit"
-
-#~ msgid "&Manage"
-#~ msgstr "&Spravovat"
-
-#~ msgid "S&ort"
-#~ msgstr "&Třídit"
-
-#~ msgid "&Selection"
-#~ msgstr "&Výběr"
-
-#~ msgid "&View items"
-#~ msgstr "&Zobrazit položky"
-
-#~ msgid "Play this Branch"
-#~ msgstr "Přehrát tuto větev"
-
-#~ msgid "Sort this Branch"
-#~ msgstr "Seřadit tuto větev"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid "%i items in playlist"
-#~ msgstr "%i položek v seznamu skladeb"
-
-#~ msgid "root"
-#~ msgstr "root"
-
-#, fuzzy
-#~ msgid "XSPF playlist"
-#~ msgstr "Soubor M3U|*.m3u|Seznam skladeb XSPF|*.xspf"
-
-#~ msgid "Playlist is empty"
-#~ msgstr "Seznam skladeb je prázdný"
-
-#~ msgid "Can't save"
-#~ msgstr "Nemohu uložit"
-
-#~ msgid "One level"
-#~ msgstr "Jedna úroveň"
-
-#~ msgid "Please enter node name"
-#~ msgstr "Zadejte prosím název uzlu"
-
-#~ msgid "New node"
-#~ msgstr "Nový uzel"
-
-#~ msgid "Alt"
-#~ msgstr "Alt"
-
-#~ msgid "Ctrl"
-#~ msgstr "Ctrl"
-
-#, fuzzy
-#~ msgid "Stream output MRL"
-#~ msgstr "rtsp: špatné MRL: %s\n"
-
-#~ msgid "Target:"
-#~ msgstr "Cíl:"
-
-#~ msgid "MMSH"
-#~ msgstr "MMSH"
-
-#, fuzzy
-#~ msgid "Channel name"
-#~ msgstr "Jméno kanálu"
-
-#, fuzzy
-#~ msgid "Select all elementary streams"
-#~ msgstr "Vybrat všechny viditelné zprávy"
-
-#~ msgid "Subtitles codec"
-#~ msgstr "Kodek titulků"
-
-#, fuzzy
-#~ msgid "Subtitles overlay"
-#~ msgstr "Vzorek (překrytí)"
-
-#~ msgid "Subtitle options"
-#~ msgstr "Nastavení titulků"
-
-#~ msgid "Subtitles file"
-#~ msgstr "Soubor s titulky"
-
-#, fuzzy
-#~ msgid "Set subtitle delay (in 1/10s)"
-#~ msgstr "Zvýšit zpoždění titulků"
-
-#~ msgid "Open file"
-#~ msgstr "Otevřít soubor"
-
-#~ msgid "Updates"
-#~ msgstr "Aktualizace"
-
-#~ msgid "Check for updates"
-#~ msgstr "Kontrolovat aktualizace"
-
-#~ msgid "Load"
-#~ msgstr "Načíst"
-
-#~ msgid "Load Configuration"
-#~ msgstr "Nahrát nastavení"
-
-#, fuzzy
-#~ msgid "New broadcast"
-#~ msgstr "<b>Broadcasty</b>"
-
-#, fuzzy
-#~ msgid "VLM stream"
-#~ msgstr "Inicializuji proud"
-
-#, fuzzy
-#~ msgid "Use this to stream on a network."
-#~ msgstr "Jít na umístění počítače"
-
-#, fuzzy
-#~ msgid "Use this to re-encode a stream and save it to a file."
-#~ msgstr "Jít na umístění počítače"
-
-#, fuzzy
-#~ msgid "Use this to stream on a network"
-#~ msgstr "Jít na umístění počítače"
-
-#, fuzzy
-#~ msgid "You must choose a stream"
-#~ msgstr "Musíte vybrat datum."
-
-#~ msgid "Unable to find playlist"
-#~ msgstr "Nelze najít seznam skladeb"
-
-#, fuzzy
-#~ msgid "Transcode video (if available)"
-#~ msgstr "Používat TLS, pokud je k dispozici"
-
-#, fuzzy
-#~ msgid "Please enter an address"
-#~ msgstr "Uveďte prosím platnou e-mailovou adresu."
-
-#, fuzzy
-#~ msgid "You must choose a file to save to"
-#~ msgstr "Pro instalaci musíte vybrat jeden z nich.\n"
-
-#, fuzzy
-#~ msgid "Defines a few additional parameters for the stream."
-#~ msgstr "Metoda autentizace, kterou používat pro připojování"
-
-#~ msgid "More information"
-#~ msgstr "Více informací"
-
-#~ msgid "Save to file"
-#~ msgstr "Uložit do souboru"
-
-#, fuzzy
-#~ msgid "Transcode audio (if available)"
-#~ msgstr "Používat TLS, pokud je k dispozici"
-
-#, fuzzy
-#~ msgid "Creates several clones of the image"
-#~ msgstr "Nasátí barvy z obrázku"
-
-#, fuzzy
-#~ msgid "Cartoon effect"
-#~ msgstr "Zdířka s dvojitým efektem"
-
-#, fuzzy
-#~ msgid "Gradient effects (cartoon) on the image"
-#~ msgstr "Zvětší část obrázku"
-
-#, fuzzy
-#~ msgid "Image inversion"
-#~ msgstr "Inverze barev"
-
-#, fuzzy
-#~ msgid "Blurring"
-#~ msgstr "Rozostřuji..."
-
-#, fuzzy
-#~ msgid "Adds water effect to the image"
-#~ msgstr "Zvětší část obrázku"
-
-#, fuzzy
-#~ msgid "Wave effect"
-#~ msgstr "Sluchátkový efekt"
-
-#, fuzzy
-#~ msgid "Adds wave effect to the image"
-#~ msgstr "Zvětší část obrázku"
-
-#~ msgid "Magnifies part of the image"
-#~ msgstr "Zvětší část obrázku"
-
-#, fuzzy
-#~ msgid "Image adjustment"
-#~ msgstr "Vodorovné zarovnání"
-
-#~ msgid "Video Options"
-#~ msgstr "Nastavení videa"
-
-#~ msgid "Aspect Ratio"
-#~ msgstr "Poměr stran"
-
-#, fuzzy
-#~ msgid ""
-#~ "Preamp\n"
-#~ "12.0dB"
-#~ msgstr "PREAMP"
-
-#~ msgid "More Information"
-#~ msgstr "Více informací"
-
-#~ msgid "Stopped"
-#~ msgstr "Zastaveno"
-
-#~ msgid "Playing"
-#~ msgstr "Přehrává se"
-
-#~ msgid "Quick &Open File...\tCtrl-O"
-#~ msgstr "Rychlé &otevření souboru...\tCtrl-O"
-
-#~ msgid "Open &File...\tCtrl-F"
-#~ msgstr "Otevřít &soubor...\tCtrl-F"
-
-#~ msgid "Open Dir&ectory...\tCtrl-E"
-#~ msgstr "Otevřít s&ložku...\tCtrl-E"
-
-#~ msgid "Open &Disc...\tCtrl-D"
-#~ msgstr "Otevřít &disk...\tCtrl-D"
-
-#, fuzzy
-#~ msgid "Open &Network Stream...\tCtrl-N"
-#~ msgstr "Rychlé &otevření souboru...\tCtrl-O"
-
-#, fuzzy
-#~ msgid "Open C&apture Device...\tCtrl-A"
-#~ msgstr "Rychlé &otevření souboru...\tCtrl-O"
-
-#~ msgid "&Wizard...\tCtrl-W"
-#~ msgstr "&Průvodce...\tCtrl-W"
-
-#~ msgid "E&xit\tCtrl-X"
-#~ msgstr "&Konec\tCtrl-X"
-
-#~ msgid "&Playlist...\tCtrl-P"
-#~ msgstr "&Seznam skladeb...\tCtrl-P"
-
-#~ msgid "&Messages...\tCtrl-M"
-#~ msgstr "&Zprávy...\tCtrl-M"
-
-#, fuzzy
-#~ msgid "Stream and Media &Info...\tCtrl-I"
-#~ msgstr "Nastavení mechanik a médií"
-
-#, fuzzy
-#~ msgid "VLM Control...\tCtrl-V"
-#~ msgstr "Otevřít &soubor...\tCtrl-F"
-
-#, fuzzy
-#~ msgid "VideoLAN's Website"
-#~ msgstr "Internetová stránka VideoLAN"
-
-#, fuzzy
-#~ msgid "Online Help"
-#~ msgstr "Diskuzní fórum"
-
-#~ msgid "&Settings"
-#~ msgstr "&Nastavení"
-
-#, fuzzy
-#~ msgid "Embedded playlist"
-#~ msgstr "Seznam skladeb SHOUTcast"
-
-#~ msgid "Previous playlist item"
-#~ msgstr "předchozí položka seznamu skladeb"
-
-#~ msgid "Play slower"
-#~ msgstr "Přehrávat pomaleji"
-
-#~ msgid "Play faster"
-#~ msgstr "Přehrávat rychleji"
-
-#, fuzzy
-#~ msgid "Extended &GUI\tCtrl-G"
-#~ msgstr "Otevřít &soubor...\tCtrl-F"
-
-#~ msgid "&Bookmarks...\tCtrl-B"
-#~ msgstr "&Záložky...\tCtrl-B"
-
-#~ msgid "Preference&s...\tCtrl-S"
-#~ msgstr "&Nastavení...\tCtrl-S"
-
-#, fuzzy
-#~ msgid ""
-#~ " (wxWidgets interface)\n"
-#~ "\n"
-#~ msgstr "Uživatelské rozhraní"
-
-#~ msgid ""
-#~ "The VideoLAN team <videolan@videolan.org>\n"
-#~ "http://www.videolan.org/\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Tým VideoLAN <videolan@videolan.org>\n"
-#~ "http://www.videolan.org/\n"
-#~ "\n"
-
-#~ msgid "About %s"
-#~ msgstr "O %s"
-
-#~ msgid "Show/Hide Interface"
-#~ msgstr "Zobrazit/Skrýt rozhraní"
-
-#~ msgid "Open &File..."
-#~ msgstr "Otevřít &soubor..."
-
-#~ msgid "Media &Info..."
-#~ msgstr "Informace o &médiu..."
-
-#~ msgid "RTP Unicast"
-#~ msgstr "RTP Unicast"
-
-#, fuzzy
-#~ msgid "Stream to a single computer."
-#~ msgstr "Jít na umístění počítače"
-
-#~ msgid "RTP Multicast"
-#~ msgstr "RTP Multicast"
-
-#~ msgid "Bookmarks dialog"
-#~ msgstr "Okno záložek"
-
-#~ msgid "Show bookmarks dialog at startup"
-#~ msgstr "Otevřít okno záložek při spuštění"
-
-#~ msgid "Extended GUI"
-#~ msgstr "Rozšířené GUI"
-
-#, fuzzy
-#~ msgid "Taskbar"
-#~ msgstr "Přeskočit lištu úloh"
-
-#~ msgid "Minimal interface"
-#~ msgstr "Minimální rozhraní"
-
-#, fuzzy
-#~ msgid "Size to video"
-#~ msgstr "Změnit velikost na velikost videa"
-
-#, fuzzy
-#~ msgid "Show labels in toolbar"
-#~ msgstr "Zobrazovat v liště nástrojů pouze ikony"
-
-#, fuzzy
-#~ msgid "Show labels below the icons in the toolbar."
-#~ msgstr "Zobrazovat v liště nástrojů text pod každou ikonou"
-
-#, fuzzy
-#~ msgid "Playlist view"
-#~ msgstr "Sestavuji pohled"
-
-#, fuzzy
-#~ msgid "Embedded"
-#~ msgstr "Vložen"
-
-#~ msgid "Both"
-#~ msgstr "Obojí"
-
-#, fuzzy
-#~ msgid "wxWidgets interface module"
-#~ msgstr "nastavit název modulu"
-
-#, fuzzy
-#~ msgid "wxWidgets dialogs provider"
-#~ msgstr "Otvírat dialogy v:"
-
-#, fuzzy
-#~ msgid "Distortion"
-#~ msgstr "chyba \"%mode:1\""
-
-#, fuzzy
-#~ msgid "Adds distortion effects"
-#~ msgstr "Efekty se s_klem"
-
-#, fuzzy
-#~ msgid "RTP reordering timeout in ms"
-#~ msgstr "<b>Interval dvojitého kliknutí</b>"
-
-#, fuzzy
-#~ msgid "FFmpeg crop padd filter"
-#~ msgstr "Horní propust"
-
-#, fuzzy
-#~ msgid "FFmpeg chroma conversion"
-#~ msgstr "Převod indexované barvy"
-
-#, fuzzy
-#~ msgid "FFmpeg audio/video decoders/encoders"
-#~ msgstr "metoda synchronizace zvuku a videa"
-
-#, fuzzy
-#~ msgid "Video canvas width"
-#~ msgstr "Šířka widgetu videa"
-
-#, fuzzy
-#~ msgid "Video canvas height"
-#~ msgstr "Výška widgetu videa"
-
-#, fuzzy
-#~ msgid "Video canvas aspect ratio"
-#~ msgstr "Určuje poměr stran stopy"
-
-#, fuzzy
-#~ msgid "Block"
-#~ msgstr "Černá"
-
-#, fuzzy
-#~ msgid "Allow"
-#~ msgstr "Vše"
-
-#, fuzzy
-#~ msgid "Prompt"
-#~ msgstr "Pop"
-
-#, fuzzy
-#~ msgid "Authorise meta information fetching"
-#~ msgstr "Získat informace o uživateli"
-
-#, fuzzy
-#~ msgid "Never"
-#~ msgstr "Nová vlna"
-
-#, fuzzy
-#~ msgid "Security options"
-#~ msgstr "Nastavení titulků"
-
-#~ msgid "Track Number"
-#~ msgstr "Číslo stopy"
-
-#, fuzzy
-#~ msgid "Automatic multicast streaming"
-#~ msgstr "Automatická stahování"
-
-#~ msgid "Video Device"
-#~ msgstr "Video zařízení"
-
-#~ msgid "Advanced Information"
-#~ msgstr "Rozšířené informace"
-
-#, fuzzy
-#~ msgid "Interfaces"
-#~ msgstr "Rozhraní"
-
-#, fuzzy
-#~ msgid "Network policy"
-#~ msgstr "Síť:"
-
-#, fuzzy
-#~ msgid "Some random name"
-#~ msgstr "Zpřístupněný název"
-
-#, fuzzy
-#~ msgid "Find a name"
-#~ msgstr "Název souboru"
-
-#, fuzzy
-#~ msgid "Lua Meta"
-#~ msgstr "Metal"
-
-#, fuzzy
-#~ msgid "About VLC media player..."
-#~ msgstr "O programu VLC media player"
-
-#~ msgid "Switch interface"
-#~ msgstr "Přepnout rozhraní"
-
-#, fuzzy
-#~ msgid "France"
-#~ msgstr "Trance"
-
-#, fuzzy
-#~ msgid "Concatenate with additional files"
-#~ msgstr "Otevřít vybrané soubory aplikací"
-
-#, fuzzy
-#~ msgid "Embedded video output"
-#~ msgstr "Šířka video výstupu."
-
-#~ msgid "Based on SVN revision: "
-#~ msgstr "Založeno na SVN revizi:"
-
-#, fuzzy
-#~ msgid "Distribution License"
-#~ msgstr "Horní propust"
-
-#, fuzzy
-#~ msgid "Always show video area"
-#~ msgstr "Uložit snímek aktuálního videa"
-
-#, fuzzy
-#~ msgid "Video Codec"
-#~ msgstr "Kodek videa:"
-
-#, fuzzy
-#~ msgid "Visualisation"
-#~ msgstr "Vizualizace"
-
-#, fuzzy
-#~ msgid "Always display the video"
-#~ msgstr "Uložit snímek aktuálního videa"
-
-#, fuzzy
-#~ msgid "Subtitles preferred language"
-#~ msgstr "Jazyk titulků"
-
-#, fuzzy
-#~ msgid "Color invert"
-#~ msgstr "Inverze barev"
-
-#, fuzzy
-#~ msgid "DCCP transport"
-#~ msgstr "UDP port"
-
-#, fuzzy
-#~ msgid "UDP-Lite transport"
-#~ msgstr "UDP port"
-
-#~ msgid "Codec Name"
-#~ msgstr "Název kodeku"
-
-#~ msgid "Codec Description"
-#~ msgstr "Popis kodeku"
-
-#~ msgid "Help options"
-#~ msgstr "Volby nápovědy"
-
-#~ msgid "print help for the advanced options"
-#~ msgstr "vypsání nápovědy pro rozšířené nastavení"
-
-#~ msgid "Charset"
-#~ msgstr "Znaková sada"
-
-#~ msgid "Remember wizard options"
-#~ msgstr "Zapamatovat nastavení průvodce"
-
-#, fuzzy
-#~ msgid "Video Device Name "
-#~ msgstr "Název video zařízení"
-
-#, fuzzy
-#~ msgid "Audio Device Name "
-#~ msgstr "Název zvukového zařízení"
-
-#, fuzzy
-#~ msgid "Video Adjustments and Effects"
-#~ msgstr "Video kodeky"
-
-#~ msgid ""
-#~ "\n"
-#~ "Available updates and related downloads.\n"
-#~ "(Double click on a file to download it)\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Dostupné aktualizace a související soubory.\n"
-#~ "(Dvakrát klikněte na soubor pro jeho stažení)\n"
-
-#, fuzzy
-#~ msgid "Session descriptipn"
-#~ msgstr "Zpřístupněný popis"
-
-#, fuzzy
-#~ msgid "No random"
-#~ msgstr "Náhodně"
-
-#, fuzzy
-#~ msgid "Album/movie/show title"
-#~ msgstr "Zobrazovat jen sloupec nadpisu"
-
-#, fuzzy
-#~ msgid "Track number/position in set"
-#~ msgstr "Nastavit počáteční bod na současnout pozici"
-
-#, fuzzy
-#~ msgid "Raw write"
-#~ msgstr "Zapsat animaci"
-
-#, fuzzy
-#~ msgid "RTCP destination port number"
-#~ msgstr "Název sezení"
-
-#~ msgid "Autodetection of MTU"
-#~ msgstr "Autodetekce MTU"
-
-#, fuzzy
-#~ msgid "goto is deprecated"
-#~ msgstr "Vstup se změnil"
-
-#, fuzzy
-#~ msgid "Replay Gain type"
-#~ msgstr "Neznámá akce: %s"
-
-#~ msgid "Report a Bug"
-#~ msgstr "Poslat hlášení o chybě"
-
-#, fuzzy
-#~ msgid "Use DVD menus"
-#~ msgstr "DVD s menu"
-
-#, fuzzy
-#~ msgid "Track number/Position"
-#~ msgstr "Nastavit počáteční bod na současnout pozici"
-
-#, fuzzy
-#~ msgid "&Stats"
-#~ msgstr "&Nastavení"
-
-#, fuzzy
-#~ msgid "Manage"
-#~ msgstr "&Spravovat"
-
-#, fuzzy
-#~ msgid "Ctrl+X"
-#~ msgstr "Ctrl"
-
-#, fuzzy
-#~ msgid "Dock playlist"
-#~ msgstr "seznam skladeb"
-
-#, fuzzy
-#~ msgid "Open Directory..."
-#~ msgstr "Otevřít &složku..."
-
-#, fuzzy
-#~ msgid "Show columns"
-#~ msgstr "Showtunes"
-
-#, fuzzy
-#~ msgid "OSS Device"
-#~ msgstr "jméno zvukového zařízení OSS"
-
-#, fuzzy
-#~ msgid "DirectX Device"
-#~ msgstr "Video zařízení"
-
-#, fuzzy
-#~ msgid "Alsa Device"
-#~ msgstr "Zařízení"
-
-#~ msgid "&View"
-#~ msgstr "&Zobrazení"
-
-#~ msgid "(no title)"
-#~ msgstr "(žádný titul)"
-
-#~ msgid "(no artist)"
-#~ msgstr "(žádný umělec)"
-
-#~ msgid "(no album)"
-#~ msgstr "(žádné album)"
-
-#, fuzzy
-#~ msgid "no artist"
-#~ msgstr "(žádný umělec)"
-
-#, fuzzy
-#~ msgid "no album"
-#~ msgstr "(žádné album)"
-
-#, fuzzy
-#~ msgid "Multipart separator string"
-#~ msgstr "Varování: %s Přeskakuji řetězec.\n"
-
-#, fuzzy
-#~ msgid "SAP sessions"
-#~ msgstr "Nastavení sezení."
-
-#, fuzzy
-#~ msgid "Ctrl+Z"
-#~ msgstr "Ctrl"
-
-#, fuzzy
-#~ msgid "Growl server"
-#~ msgstr "Komunikační server"
-
-#, fuzzy
-#~ msgid "Growl password"
-#~ msgstr "text hesla"
-
-#, fuzzy
-#~ msgid "Growl UDP port"
-#~ msgstr "Rozsah portů UDP"
-
-#, fuzzy
-#~ msgid "Halve sample rate"
-#~ msgstr "Vzorkovací kmitočet"
-
-#, fuzzy
-#~ msgid "Video monitoring filter"
-#~ msgstr "zakázat veškeré změny měřítka"
-
-#, fuzzy
-#~ msgid "Video Monitor"
-#~ msgstr "<b>Video filtr</b>"
-
-#, fuzzy
-#~ msgid "Statistics input file"
-#~ msgstr "Statistiky"
-
-#, fuzzy
-#~ msgid "Statistics output file"
-#~ msgstr "Volby výstupu souborů:"
-
-#, fuzzy
-#~ msgid "VC-1 decoder module"
-#~ msgstr "nastavit název modulu"
-
-#, fuzzy
-#~ msgid "Video filters settings"
-#~ msgstr "Zobrazit nastavení videa"
-
-#, fuzzy
-#~ msgid "CDDB Artist"
-#~ msgstr "Umělec"
-
-#, fuzzy
-#~ msgid "CDDB Category"
-#~ msgstr "port serveru CDDB"
-
-#, fuzzy
-#~ msgid "CDDB Extended Data"
-#~ msgstr "Rozšířené GUI"
-
-#, fuzzy
-#~ msgid "CDDB Genre"
-#~ msgstr "CDDB server"
-
-#, fuzzy
-#~ msgid "CDDB Year"
-#~ msgstr "CDDB server"
-
-#, fuzzy
-#~ msgid "CDDB Title"
-#~ msgstr "Titul"
-
-#, fuzzy
-#~ msgid "CD-Text Arranger"
-#~ msgstr "Vykreslovač textu"
-
-#, fuzzy
-#~ msgid "CD-Text Composer"
-#~ msgstr "Nečíst text"
-
-#, fuzzy
-#~ msgid "CD-Text Genre"
-#~ msgstr "Vykreslovač textu"
-
-#, fuzzy
-#~ msgid "CD-Text Message"
-#~ msgstr "Zprávy"
-
-#, fuzzy
-#~ msgid "CD-Text Performer"
-#~ msgstr "Vykreslovač textu"
-
-#, fuzzy
-#~ msgid "CD-Text Title"
-#~ msgstr "Následující titul"
-
-#, fuzzy
-#~ msgid "ISO-9660 Application ID"
-#~ msgstr "Aplikace"
-
-#, fuzzy
-#~ msgid "ISO-9660 Publisher"
-#~ msgstr "Vydavatel"
-
-#, fuzzy
-#~ msgid "ISO-9660 Volume Set"
-#~ msgstr "Nastavit úroveň hlasitosti"
-
-#, fuzzy
-#~ msgid "Linux OSS audio output"
-#~ msgstr "zpoždění zvukového výstupu OSS (upraví synchronizaci zvuku a videa)"
-
-#, fuzzy
-#~ msgid "Corba control"
-#~ msgstr "Téma ovládacích prvků"
-
-#, fuzzy
-#~ msgid "corba control module"
-#~ msgstr "nastavit název modulu"
-
-#, fuzzy
-#~ msgid "| time-x X . . . . . . . . . . . .offset from left"
-#~ msgstr "Zleva doprava"
-
-#, fuzzy
-#~ msgid "| time-y Y . . . . . . . . . . . . offset from top"
-#~ msgstr "Vyberte čas ze seznamu"
-
-#, fuzzy
-#~ msgid "| time-position #. . . . . . . . relative position"
-#~ msgstr "s časem vztahujícím se k současnému času"
-
-#, fuzzy
-#~ msgid "| time-color # . . . . . . . . . . font color, RGB"
-#~ msgstr "Implicitní barva písma"
-
-#, fuzzy
-#~ msgid "| time-opacity # . . . . . . . . . . . . . opacity"
-#~ msgstr "Krytí vyplňování:"
-
-#, fuzzy
-#~ msgid "| time-size # . . . . . . . . font size, in pixels"
-#~ msgstr "Velikost písma v jednotkách Pango"
-
-#, fuzzy
-#~ msgid "Fixing AVI Index"
-#~ msgstr "demux_avi: index avi je porušen\n"
-
-#, fuzzy
-#~ msgid "Creating AVI Index ..."
-#~ msgstr "demux_avi: index avi je porušen\n"
-
-#, fuzzy
-#~ msgid "Playlist metademux"
-#~ msgstr "Seznam skladeb SHOUTcast"
-
-#, fuzzy
-#~ msgid "Segment filename"
-#~ msgstr "Název souboru se záznamem"
-
-#, fuzzy
-#~ msgid "Muxing application"
-#~ msgstr "Aplikace"
-
-#, fuzzy
-#~ msgid "Writing application"
-#~ msgstr "Aplikace"
-
-#, fuzzy
-#~ msgid "Native playlist import"
-#~ msgstr "import seznamu skladeb M3U"
-
-#, fuzzy
-#~ msgid "Podcast Link"
-#~ msgstr "Vybraný odkaz"
-
-#, fuzzy
-#~ msgid "Podcast Copyright"
-#~ msgstr "Poznámka o autorských právech"
-
-#, fuzzy
-#~ msgid "Podcast Keywords"
-#~ msgstr "Žádné klíčové slovo."
-
-#, fuzzy
-#~ msgid "Podcast Subtitle"
-#~ msgstr "velikost titulků"
-
-#, fuzzy
-#~ msgid "Podcast Publication Date"
-#~ msgstr "datum nelze nastavit"
-
-#, fuzzy
-#~ msgid "Podcast Author"
-#~ msgstr "původní autor"
-
-#, fuzzy
-#~ msgid "Podcast Duration"
-#~ msgstr "Trvání souboru:"
-
-#, fuzzy
-#~ msgid "Podcast Type"
-#~ msgstr "Typ spojení"
-
-#~ msgid "Mime type"
-#~ msgstr "Typ MIME"
-
-#~ msgid "Open Messages Window"
-#~ msgstr "Otevřít okno zpráv"
-
-#~ msgid "Dismiss"
-#~ msgstr "Zavřít"
-
-#~ msgid "Do not display further errors"
-#~ msgstr "Nezobrazovat další chyby"
-
-#, fuzzy
-#~ msgid "Enable skinned playlist"
-#~ msgstr "Nelze najít seznam skladeb"
-
-#, fuzzy
-#~ msgid "%i items in playlist (%i not shown)"
-#~ msgstr "%i položek v seznamu skladeb"
-
-#~ msgid "M3U file"
-#~ msgstr "Soubor M3U"
-
-#, fuzzy
-#~ msgid "Sorted by Artist"
-#~ msgstr "Seřadit podle &titulu"
-
-#, fuzzy
-#~ msgid "Sorted by Album"
-#~ msgstr "Třídit podle názvu"
-
-#, fuzzy
-#~ msgid "Playlist stress tests"
-#~ msgstr "_Včetně vzdálených testů"
-
-#, fuzzy
-#~ msgid "DAAP shares"
-#~ msgstr "Sdílí soubory po internetu"
-
-#, fuzzy
-#~ msgid "DAAP access"
-#~ msgstr "nelze přistoupit k %s"
-
-#, fuzzy
-#~ msgid "Distort video filter"
-#~ msgstr "Horní propust"
-
-#, fuzzy
-#~ msgid "Marquee text to display."
-#~ msgstr "Zobrazený text v náhledu"
-
-#~ msgid "A file containing a simple playlist"
-#~ msgstr "Soubor obsahující jednoduchý seznam skladeb"
-
-#, fuzzy
-#~ msgid "History parameter"
-#~ msgstr "Data parametrů"
-
-#, fuzzy
-#~ msgid "Time format string (%Y%m%d %H%M%S)"
-#~ msgstr "ref_řetězec,formát"
-
-#, fuzzy
-#~ msgid "Y offset, down from the top"
-#~ msgstr "Odshora zleva dolů doprava"
-
-#, fuzzy
-#~ msgid "Time display sub filter"
-#~ msgstr "Filtr podle _předmětu"
-
-#, fuzzy
-#~ msgid "Standard Play"
-#~ msgstr "Zahrát si minové ^pole"
-
-#, fuzzy
-#~ msgid "MSN"
-#~ msgstr "MSN"
-
-#~ msgid "Vertical border width"
-#~ msgstr "Šířka svislého okraje"
-
-#~ msgid "Horizontal border width"
-#~ msgstr "Šířka vodorovného okraje"
-
-#~ msgid "%s"
-#~ msgstr "%s"
-
-#~ msgid "Image"
-#~ msgstr "Obrázek"
-
-#~ msgid "Center-Center"
-#~ msgstr "Střed-Střed"
-
-#~ msgid "Left-Center"
-#~ msgstr "Vlevo-Střed"
-
-#~ msgid "Right-Center"
-#~ msgstr "Vpravo-Střed"
-
-#~ msgid "Center-Top"
-#~ msgstr "Střed-Nahoře"
-
-#~ msgid "Left-Top"
-#~ msgstr "Vlevo-Nahoře"
-
-#~ msgid "Right-Top"
-#~ msgstr "Vpravo-Nahoře"
-
-#~ msgid "Center-Bottom"
-#~ msgstr "Střed-Dole"
-
-#~ msgid "Left-Bottom"
-#~ msgstr "Vlevo-Dole"
-
-#~ msgid "Right-Bottom"
-#~ msgstr "Vpravo-Dole"
-
-#, fuzzy
-#~ msgid "Password: "
-#~ msgstr "Heslo:"
-
-#, fuzzy
-#~ msgid "Big"
-#~ msgstr "Bridge"
-
-#, fuzzy
-#~ msgid "Extra Audio File"
-#~ msgstr "Použít _filtry"
-
-#, fuzzy
-#~ msgid "Media File"
-#~ msgstr "Médium: %s"
-
-#, fuzzy
-#~ msgid "QWidget"
-#~ msgstr "Šířka"
-
-#, fuzzy
-#~ msgid "margin"
-#~ msgstr "Amharština"
-
-#, fuzzy
-#~ msgid "spacing"
-#~ msgstr "cache souboru klíčů `%s'\n"
-
-#, fuzzy
-#~ msgid "Line"
-#~ msgstr "Lineární"
-
-#, fuzzy
-#~ msgid "line"
-#~ msgstr "Obrys"
-
-#, fuzzy
-#~ msgid "orientation"
-#~ msgstr "Více informací"
-
-#, fuzzy
-#~ msgid "QGroupBox"
-#~ msgstr "Skupina"
-
-#, fuzzy
-#~ msgid "enabled"
-#~ msgstr "zapnout"
-
-#, fuzzy
-#~ msgid "checkable"
-#~ msgstr "zapnout"
-
-#, fuzzy
-#~ msgid "horizontalLayout_3"
-#~ msgstr "Překlopit vodorovně"
-
-#, fuzzy
-#~ msgid "Disk"
-#~ msgstr "Disk"
-
-#, fuzzy
-#~ msgid "Audioscrobbler username"
-#~ msgstr "Název zvukového zařízení"
-
-#, fuzzy
-#~ msgid "Audioscrobbler password"
-#~ msgstr "text hesla"
-
-#, fuzzy
-#~ msgid "Connecting..."
-#~ msgstr "Nastavení..."
-
-#, fuzzy
-#~ msgid "Dummy video filter"
-#~ msgstr "Horní propust"
-
-#, fuzzy
-#~ msgid "Dummy VF"
-#~ msgstr "prázdné"
