@@ -179,7 +179,7 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
 
-    add_file( "fbosd-dev", "/dev/fb1", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+    add_file( "fbosd-dev", "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               false )
     add_string( "fbosd-aspect-ratio", "", NULL, ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, true )
@@ -306,10 +306,9 @@ static int Create( vlc_object_t *p_this )
     int i;
 
     /* Allocate instance and initialize some members */
-    p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
+    p_intf->p_sys = p_sys = calloc( 1, sizeof( intf_sys_t ) );
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(intf_sys_t) );
 
     p_sys->p_style = malloc( sizeof( text_style_t ) );
     if( !p_sys->p_style )
@@ -324,8 +323,8 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_image = image_HandlerCreate( p_this );
     if( !p_sys->p_image )
     {
-        free( p_intf->p_sys->p_style );
-        free( p_intf->p_sys );
+        free( p_sys->p_style );
+        free( p_sys );
         return VLC_ENOMEM;
     }
 
@@ -350,7 +349,6 @@ static int Create( vlc_object_t *p_this )
                   atoi( psz_aspect ), atoi( psz_parser ) );
 
         free( psz_aspect );
-        psz_aspect = NULL;
     }
 
     /* Use PAL by default */
@@ -467,8 +465,9 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     int i;
+
 
     p_sys->b_need_update = false;
     p_sys->b_render = false;
@@ -673,7 +672,7 @@ static void DeAllocatePicture( picture_t *p_pic, video_format_t *p_fmt )
 static void SetOverlayTransparency( intf_thread_t *p_intf,
                                     bool b_transparent )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     size_t i_size = p_sys->fmt_out.i_width * p_sys->fmt_out.i_height
                         * p_sys->i_bytes_per_pixel;
     size_t i_page_size = (p_sys->i_page_size > i_size) ?
@@ -698,7 +697,7 @@ static int BlendPicture( intf_thread_t *p_intf, video_format_t *p_fmt_src,
                          video_format_t *p_fmt_dst, picture_t *p_pic_src,
                          picture_t *p_pic_dst )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     if( p_sys->p_blend && p_sys->p_blend->p_module )
     {
         int i_x_offset = p_sys->i_x;
@@ -838,7 +837,7 @@ static int RenderPicture( intf_thread_t *p_intf, int i_x_offset, int i_y_offset,
 static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
                               text_style_t *p_style, video_format_t *p_fmt )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     subpicture_region_t *p_region;
     picture_t *p_dest = NULL;
 
@@ -893,7 +892,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             picture_Copy( p_dest, p_region->p_picture );
 #else
             fmt_out.i_chroma = p_fmt->i_chroma;
-            p_dest = ConvertImage( p_intf, &p_region->p_picture,
+            p_dest = ConvertImage( p_intf, p_region->p_picture,
                                    &p_region->fmt, &fmt_out );
 #endif
             subpicture_region_Delete( p_region );
@@ -937,7 +936,7 @@ static picture_t *LoadImage( intf_thread_t *p_intf, video_format_t *p_fmt,
 static picture_t *ConvertImage( intf_thread_t *p_intf, picture_t *p_pic,
                          video_format_t *p_fmt_in, video_format_t *p_fmt_out )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     picture_t  *p_old = NULL;
 
     if( p_sys->p_image )
@@ -957,7 +956,7 @@ static picture_t *ConvertImage( intf_thread_t *p_intf, picture_t *p_pic,
  *****************************************************************************/
 static int Init( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     /* Initialize the output structure: RGB with square pixels, whatever
      * the input format is, since it's the only format we know */
@@ -1029,7 +1028,7 @@ static int Init( intf_thread_t *p_intf )
  *****************************************************************************/
 static void End( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     /* CleanUp */
     SetOverlayTransparency( p_intf, false );
@@ -1052,7 +1051,7 @@ static void End( intf_thread_t *p_intf )
  *****************************************************************************/
 static int OpenDisplay( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     char *psz_device;                             /* framebuffer device path */
     struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
 
@@ -1157,7 +1156,7 @@ static int OpenDisplay( intf_thread_t *p_intf )
  *****************************************************************************/
 static void CloseDisplay( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = (intf_sys_t *) p_intf;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     /* Restore palette */
     if( p_sys->var_info.bits_per_pixel == 8 )
@@ -1173,7 +1172,7 @@ static void CloseDisplay( intf_thread_t *p_intf )
 
 static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
 {
-    intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     if( render->i_state != FBOSD_STATE_RENDER ) return;
     if( !render->psz_string ) return;
@@ -1219,7 +1218,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
 
 static void RenderClear( intf_thread_t *p_intf, struct fbosd_render_t *render )
 {
-    intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
     vlc_memcpy( &render->text_style, &default_text_style,
                 sizeof( text_style_t ) );
@@ -1236,7 +1235,7 @@ static void RenderClear( intf_thread_t *p_intf, struct fbosd_render_t *render )
 
 static bool isRendererReady( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     int i;
 
     /* Check if there are more items to render */
@@ -1256,7 +1255,7 @@ static bool isRendererReady( intf_thread_t *p_intf )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     int canc = vlc_savecancel();
 
     while( vlc_object_alive( p_intf ) )
@@ -1314,7 +1313,7 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *) p_this;
-    intf_sys_t *p_sys = (intf_sys_t*) p_intf->p_sys;
+    intf_sys_t *p_sys = p_intf->p_sys;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strncmp( psz_cmd, "fbosd-display", 13 ) )
