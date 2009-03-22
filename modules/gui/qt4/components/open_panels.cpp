@@ -135,6 +135,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Connects  */
     BUTTONACT( ui.fileBrowseButton, browseFile() );
+    BUTTONACT( ui.delFileButton, deleteFile() );
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
 
@@ -158,6 +159,18 @@ void FileOpenPanel::browseFile()
         item->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled );
         ui.fileListWidg->addItem( item );
     }
+    updateMRL();
+}
+
+void FileOpenPanel::deleteFile()
+{
+    int i = ui.fileListWidg->currentRow();
+    if( i != -1 )
+    {
+        QListWidgetItem *temp = ui.fileListWidg->takeItem( i );
+        delete temp;
+    }
+
     updateMRL();
 }
 

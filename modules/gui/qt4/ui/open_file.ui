@@ -1,112 +1,118 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <author>Jean-Baptiste Kempf</author>
  <class>OpenFile</class>
- <widget class="QWidget" name="OpenFile" >
-  <property name="geometry" >
+ <widget class="QWidget" name="OpenFile">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>571</width>
-    <height>271</height>
+    <width>566</width>
+    <height>344</height>
    </rect>
   </property>
-  <property name="sizePolicy" >
-   <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle" >
-   <string>_("Open File")</string>
+  <property name="windowTitle">
+   <string>_(&quot;Open File&quot;)</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
-   <item>
-    <widget class="QGroupBox" name="tempWidget" >
-     <property name="toolTip" >
-      <string>_("Choose one or more media file to open")</string>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="tempWidget">
+     <property name="toolTip">
+      <string>_(&quot;Choose one or more media file to open&quot;)</string>
      </property>
-     <property name="title" >
-      <string>_("Select one or more files")</string>
+     <property name="title">
+      <string>_(&quot;File Selection&quot;)</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout" >
-      <item rowspan="2" row="0" column="0" >
-       <widget class="QListWidget" name="fileListWidg" >
-        <property name="maximumSize" >
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>_(&quot;You can select local files with the following list and buttons.&quot;)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="3" colspan="2">
+       <widget class="QListWidget" name="fileListWidg">
+        <property name="maximumSize">
          <size>
           <width>16777215</width>
           <height>100</height>
          </size>
         </property>
-        <property name="contextMenuPolicy" >
+        <property name="contextMenuPolicy">
          <enum>Qt::DefaultContextMenu</enum>
         </property>
-        <property name="verticalScrollBarPolicy" >
+        <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
-        <property name="horizontalScrollBarPolicy" >
+        <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
-        <property name="editTriggers" >
+        <property name="editTriggers">
          <set>QAbstractItemView::AllEditTriggers</set>
         </property>
-        <property name="alternatingRowColors" >
+        <property name="alternatingRowColors">
          <bool>true</bool>
-        </property>
-        <property name="selectionMode" >
-         <enum>QAbstractItemView::NoSelection</enum>
-        </property>
-        <property name="selectionBehavior" >
-         <enum>QAbstractItemView::SelectItems</enum>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QPushButton" name="fileBrowseButton" >
-        <property name="minimumSize" >
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="fileBrowseButton">
+        <property name="text">
+         <string>_(&quot;Add...&quot;)</string>
         </property>
-        <property name="toolTip" >
-         <string>_("Select the subtitles file")</string>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="delFileButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="text" >
-         <string>_("Browse...")</string>
+        <property name="text">
+         <string>_(&quot;Delete&quot;)</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QCheckBox" name="subCheckBox" >
-     <property name="toolTip" >
-      <string>_("Add a subtitles file")</string>
+   <item row="1" column="0">
+    <widget class="QCheckBox" name="subCheckBox">
+     <property name="toolTip">
+      <string>_(&quot;Add a subtitles file&quot;)</string>
      </property>
-     <property name="text" >
-      <string>_("Use a sub&amp;titles file")</string>
+     <property name="text">
+      <string>_(&quot;Use a sub&amp;titles file&quot;)</string>
      </property>
     </widget>
    </item>
-   <item>
-    <widget class="QFrame" name="subFrame" >
-     <property name="sizePolicy" >
-      <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
+   <item row="2" column="0">
+    <widget class="QFrame" name="subFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="frameShape" >
+     <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" >
-      <item row="1" column="0" >
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>16</width>
           <height>20</height>
@@ -114,12 +120,12 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="3" >
+      <item row="1" column="3">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>30</width>
           <height>26</height>
@@ -127,12 +133,12 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="7" >
+      <item row="1" column="7">
        <spacer>
-        <property name="orientation" >
+        <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0" >
+        <property name="sizeHint" stdset="0">
          <size>
           <width>16</width>
           <height>20</height>
@@ -140,25 +146,25 @@
         </property>
        </spacer>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLabel" name="sizeSubLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+      <item row="1" column="1">
+       <widget class="QLabel" name="sizeSubLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>_("Size:")</string>
+        <property name="text">
+         <string>_(&quot;Size:&quot;)</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>sizeSubComboBox</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" >
-       <widget class="QComboBox" name="sizeSubComboBox" >
-        <property name="minimumSize" >
+      <item row="1" column="2">
+       <widget class="QComboBox" name="sizeSubComboBox">
+        <property name="minimumSize">
          <size>
           <width>100</width>
           <height>0</height>
@@ -166,25 +172,25 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="4" >
-       <widget class="QLabel" name="alignSubLabel" >
-        <property name="sizePolicy" >
-         <sizepolicy vsizetype="Preferred" hsizetype="Minimum" >
+      <item row="1" column="4">
+       <widget class="QLabel" name="alignSubLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="text" >
-         <string>_("Alignment:")</string>
+        <property name="text">
+         <string>_(&quot;Alignment:&quot;)</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>alignSubComboBox</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="5" colspan="2" >
-       <widget class="QComboBox" name="alignSubComboBox" >
-        <property name="minimumSize" >
+      <item row="1" column="5" colspan="2">
+       <widget class="QComboBox" name="alignSubComboBox">
+        <property name="minimumSize">
          <size>
           <width>100</width>
           <height>0</height>
@@ -192,37 +198,37 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" colspan="6" >
-       <widget class="QLineEdit" name="subInput" />
+      <item row="0" column="0" colspan="6">
+       <widget class="QLineEdit" name="subInput"/>
       </item>
-      <item row="0" column="6" colspan="2" >
-       <widget class="QPushButton" name="subBrowseButton" >
-        <property name="minimumSize" >
+      <item row="0" column="6" colspan="2">
+       <widget class="QPushButton" name="subBrowseButton">
+        <property name="minimumSize">
          <size>
           <width>100</width>
           <height>0</height>
          </size>
         </property>
-        <property name="toolTip" >
-         <string>_("Select the subtitles file")</string>
+        <property name="toolTip">
+         <string>_(&quot;Select the subtitles file&quot;)</string>
         </property>
-        <property name="text" >
-         <string>_("Browse...")</string>
+        <property name="text">
+         <string>_(&quot;Browse...&quot;)</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item>
+   <item row="3" column="0">
     <spacer>
-     <property name="orientation" >
+     <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <property name="sizeType" >
+     <property name="sizeType">
       <enum>QSizePolicy::MinimumExpanding</enum>
      </property>
-     <property name="sizeHint" stdset="0" >
+     <property name="sizeHint" stdset="0">
       <size>
        <width>273</width>
        <height>16</height>
@@ -235,6 +241,7 @@
  <tabstops>
   <tabstop>fileListWidg</tabstop>
   <tabstop>fileBrowseButton</tabstop>
+  <tabstop>delFileButton</tabstop>
   <tabstop>subCheckBox</tabstop>
   <tabstop>subInput</tabstop>
   <tabstop>subBrowseButton</tabstop>
