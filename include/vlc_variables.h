@@ -399,7 +399,7 @@ static inline char *__var_GetNonEmptyString( vlc_object_t *p_obj, const char *ps
     vlc_value_t val;
     if( var_GetChecked( p_obj, psz_name, VLC_VAR_STRING, &val ) )
         return NULL;
-    if( *val.psz_string )
+    if( val.psz_string && *val.psz_string )
         return val.psz_string;
     free( val.psz_string );
     return NULL;
