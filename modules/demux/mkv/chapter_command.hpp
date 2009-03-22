@@ -122,7 +122,7 @@ public:
 
     uint16 GetGPRM( size_t index ) const
     {
-        if ( index >= 0 && index < 16 )
+        if ( index < 16 )
             return p_PRMs[ index ];
         else return 0;
     }
@@ -137,7 +137,7 @@ public:
 
     bool SetPRM( size_t index, uint16 value )
     {
-        if ( index >= 0 && index < 16 )
+        if ( index < 16 )
         {
             p_PRMs[ index ] = value;
             return true;
@@ -147,7 +147,7 @@ public:
  
     bool SetGPRM( size_t index, uint16 value )
     {
-        if ( index >= 0 && index < 16 )
+        if ( index < 16 )
         {
             p_PRMs[ index ] = value;
             return true;
