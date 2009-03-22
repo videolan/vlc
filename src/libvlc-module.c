@@ -1782,20 +1782,28 @@ vlc_module_begin ()
     set_section( N_("Metadata" ) , NULL )
     add_string( "meta-title", NULL, NULL, META_TITLE_TEXT,
                 META_TITLE_LONGTEXT, true )
+        change_safe()
     add_string( "meta-author", NULL, NULL, META_AUTHOR_TEXT,
                 META_AUTHOR_LONGTEXT, true )
+        change_safe()
     add_string( "meta-artist", NULL, NULL, META_ARTIST_TEXT,
                 META_ARTIST_LONGTEXT, true )
+        change_safe()
     add_string( "meta-genre", NULL, NULL, META_GENRE_TEXT,
                 META_GENRE_LONGTEXT, true )
+        change_safe()
     add_string( "meta-copyright", NULL, NULL, META_CPYR_TEXT,
                 META_CPYR_LONGTEXT, true )
+        change_safe()
     add_string( "meta-description", NULL, NULL, META_DESCR_TEXT,
                 META_DESCR_LONGTEXT, true )
+        change_safe()
     add_string( "meta-date", NULL, NULL, META_DATE_TEXT,
                 META_DATE_LONGTEXT, true )
+        change_safe()
     add_string( "meta-url", NULL, NULL, META_URL_TEXT,
                 META_URL_LONGTEXT, true )
+        change_safe()
 
     set_section( N_( "Advanced" ), NULL )
 
