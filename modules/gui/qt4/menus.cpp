@@ -1030,6 +1030,9 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     mi->getSysTray()->setContextMenu( sysMenu );
 }
 
+#undef CREATE_POPUP
+#undef POPUP_BOILERPLATE
+
 #undef PUSH_VAR
 #undef PUSH_SEPARATOR
 
