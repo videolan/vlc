@@ -980,6 +980,7 @@ VCDOpen ( vlc_object_t *p_this )
  err_exit:
     if( p_vcdplayer->p_input ) vlc_object_release( p_vcdplayer->p_input );
     free( psz_source );
+    free( p_vcdplayer->psz_source );
     free( p_vcdplayer );
     return VLC_EGENERIC;
 }
