@@ -2773,8 +2773,10 @@ static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
     /* Get meta information from user */
 #define GET_META( field, s ) do { \
     char *psz_string = var_GetNonEmptyString( p_input, (s) );  \
-    if( psz_string ) \
+    if( psz_string ) {\
+        EnsureUTF8( psz_string ); \
         vlc_meta_Set( p_meta, vlc_meta_ ## field, psz_string ); \
+    } \
     free( psz_string ); } while(0)
 
     GET_META( Title, "meta-title" );
