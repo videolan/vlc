@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.9.0-test2\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2009-03-19 00:22+0000\n"
-"PO-Revision-Date: 2008-09-26 16:45+0200\n"
-"Last-Translator: Ivo Ivanov (ivo88) <bestran@mail.bg>\n"
+"POT-Creation-Date: 2009-03-22 19:16+0000\n"
+"PO-Revision-Date: 2009-03-19 16:52+0200\n"
+"Last-Translator: Ivo Ivanov\n"
 "Language-Team: Bulgarian <bestran@mail.bg>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -73,7 +73,7 @@ msgstr "Настройки на VLC за управление на интерф�
 msgid "Hotkeys settings"
 msgstr "Настройки на клавишните комбинации"
 
-#: include/vlc_config_cat.h:52 src/input/es_out.c:2649 src/input/es_out.c:2683
+#: include/vlc_config_cat.h:52 src/input/es_out.c:2628 src/input/es_out.c:2662
 #: src/libvlc-module.c:1500 modules/gui/beos/InterfaceWindow.cpp:283
 #: modules/gui/macosx/intf.m:597 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:113 modules/gui/macosx/simple_prefs.m:178
@@ -86,11 +86,11 @@ msgstr "Аудио"
 
 #: include/vlc_config_cat.h:53
 msgid "Audio settings"
-msgstr "Аудио настройки "
+msgstr "Настройки на аудиото"
 
 #: include/vlc_config_cat.h:55
 msgid "General audio settings"
-msgstr "Основни аудио настройки"
+msgstr "Основни настройки на аудиото"
 
 #: include/vlc_config_cat.h:57 include/vlc_config_cat.h:79
 #: src/video_output/video_output.c:512
@@ -120,7 +120,7 @@ msgstr "Модули за извеждане"
 msgid "General settings for audio output modules."
 msgstr "Общи настройки на модулите за аудио извеждане."
 
-#: include/vlc_config_cat.h:66 src/libvlc-module.c:1923
+#: include/vlc_config_cat.h:66 src/libvlc-module.c:1931
 #: modules/stream_out/transcode.c:232
 msgid "Miscellaneous"
 msgstr "Разни"
@@ -129,7 +129,7 @@ msgstr "Разни"
 msgid "Miscellaneous audio settings and modules."
 msgstr "Различни настройки за звука и модулите."
 
-#: include/vlc_config_cat.h:70 src/input/es_out.c:2652 src/input/es_out.c:2732
+#: include/vlc_config_cat.h:70 src/input/es_out.c:2631 src/input/es_out.c:2711
 #: src/libvlc-module.c:1553 modules/gui/macosx/intf.m:610
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:102
 #: modules/gui/macosx/simple_prefs.m:182 modules/gui/macosx/wizard.m:381
@@ -142,11 +142,11 @@ msgstr "Видео"
 
 #: include/vlc_config_cat.h:71
 msgid "Video settings"
-msgstr "Видео настройки"
+msgstr "Настройки на видеото"
 
 #: include/vlc_config_cat.h:73
 msgid "General video settings"
-msgstr "Основни видео настройки"
+msgstr "Основни настройки на видеото"
 
 #: include/vlc_config_cat.h:77
 msgid "Choose your preferred video output and configure it here."
@@ -167,7 +167,8 @@ msgstr "Субтитри/OSD (Екранно меню)"
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
-"Различни настройки свързани с OSD, субтитрите и \"поставяне на слоеве\"."
+"Различни настройки свързани с екранното меню, субтитрите и \"поставяне на "
+"слоеве\"."
 
 #: include/vlc_config_cat.h:93
 msgid "Input / Codecs"
@@ -250,7 +251,7 @@ msgstr "Общи"
 msgid "General input settings. Use with care..."
 msgstr "Основни входящи настройки. Използвайте ги внимателно."
 
-#: include/vlc_config_cat.h:124 src/libvlc-module.c:1850
+#: include/vlc_config_cat.h:124 src/libvlc-module.c:1858
 msgid "Stream output"
 msgstr "Извеждане на поток"
 
@@ -355,7 +356,7 @@ msgstr ""
 msgid "VLC's implementation of Video On Demand"
 msgstr "Осъществяване на видео по поръчка (Video On Demand) с VLC."
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:1984
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:1992
 #: src/playlist/engine.c:119 modules/demux/playlist/playlist.c:66
 #: modules/demux/playlist/playlist.c:67
 #: modules/gui/beos/InterfaceWindow.cpp:232
@@ -392,7 +393,7 @@ msgid ""
 msgstr ""
 "Модулите за откриване на услуги автоматично добавят елементи в плейлиста."
 
-#: include/vlc_config_cat.h:186 src/libvlc-module.c:1800
+#: include/vlc_config_cat.h:186 src/libvlc-module.c:1808
 msgid "Advanced"
 msgstr "Допълнителни"
 
@@ -601,7 +602,7 @@ msgstr "Без повторение"
 #: include/vlc_intf_strings.h:68 src/libvlc-module.c:1391
 #: modules/gui/macosx/controls.m:1014 modules/gui/macosx/intf.m:584
 msgid "Random"
-msgstr "Разбъркано"
+msgstr "Разбъркано възпроизвеждане"
 
 #: include/vlc_intf_strings.h:69
 msgid "Random off"
@@ -613,7 +614,7 @@ msgstr "Добавяне към плейлист"
 
 #: include/vlc_intf_strings.h:72
 msgid "Add to media library"
-msgstr "Добавяне към медия библиотека"
+msgstr "Добавяне към медия библиотеката"
 
 #: include/vlc_intf_strings.h:74
 msgid "Add file..."
@@ -667,7 +668,7 @@ msgstr "Клониране на изображение"
 
 #: include/vlc_intf_strings.h:96
 msgid "Magnification"
-msgstr "Увеличаване част от изображението"
+msgstr "Лупа на екрана"
 
 #: include/vlc_intf_strings.h:97
 msgid ""
@@ -972,108 +973,108 @@ msgstr ""
 msgid "Program"
 msgstr "Програма"
 
-#: src/input/es_out.c:1361 src/input/es_out.c:1363
+#: src/input/es_out.c:1340 src/input/es_out.c:1342
 #, fuzzy
 msgid "Scrambled"
 msgstr "Мащаб"
 
-#: src/input/es_out.c:1361 modules/gui/macosx/update.m:102
+#: src/input/es_out.c:1340 modules/gui/macosx/update.m:102
 msgid "Yes"
 msgstr "Да"
 
-#: src/input/es_out.c:1937
+#: src/input/es_out.c:1916
 #, fuzzy, c-format
 msgid "Closed captions %u"
 msgstr "Затворени заглавия 1"
 
-#: src/input/es_out.c:2638
+#: src/input/es_out.c:2617
 #, c-format
 msgid "Stream %d"
 msgstr "Поток %d"
 
-#: src/input/es_out.c:2655 src/input/es_out.c:2763
+#: src/input/es_out.c:2634 src/input/es_out.c:2742
 msgid "Subtitle"
 msgstr "Субтитри"
 
-#: src/input/es_out.c:2663 src/input/es_out.c:2683 src/input/es_out.c:2732
-#: src/input/es_out.c:2763 modules/gui/macosx/output.m:153
+#: src/input/es_out.c:2642 src/input/es_out.c:2662 src/input/es_out.c:2711
+#: src/input/es_out.c:2742 modules/gui/macosx/output.m:153
 #: modules/gui/qt4/ui/sprefs_audio.ui:186
 msgid "Type"
 msgstr "Тип"
 
-#: src/input/es_out.c:2666
+#: src/input/es_out.c:2645
 #, fuzzy
 msgid "Original ID"
 msgstr "Мащаб 1:1 (оригинален)"
 
-#: src/input/es_out.c:2669 modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2648 modules/gui/macosx/wizard.m:385
 msgid "Codec"
 msgstr "Кодек"
 
-#: src/input/es_out.c:2673 src/input/meta.c:50 src/libvlc-module.c:193
+#: src/input/es_out.c:2652 src/input/meta.c:50 src/libvlc-module.c:193
 #: modules/gui/beos/InterfaceWindow.cpp:279
 #: modules/gui/macosx/simple_prefs.m:262
 msgid "Language"
 msgstr "Език"
 
-#: src/input/es_out.c:2676 src/input/meta.c:45
+#: src/input/es_out.c:2655 src/input/meta.c:45
 #: modules/gui/macosx/bookmarks.m:94 modules/gui/qt4/dialogs/bookmarks.cpp:66
 msgid "Description"
 msgstr "Описание"
 
-#: src/input/es_out.c:2686 src/input/es_out.c:2689
+#: src/input/es_out.c:2665 src/input/es_out.c:2668
 #: modules/gui/macosx/output.m:176
 msgid "Channels"
 msgstr "Канали"
 
-#: src/input/es_out.c:2694
+#: src/input/es_out.c:2673
 msgid "Sample rate"
 msgstr "Честота"
 
-#: src/input/es_out.c:2695
+#: src/input/es_out.c:2674
 #, c-format
 msgid "%u Hz"
 msgstr ""
 
-#: src/input/es_out.c:2705
+#: src/input/es_out.c:2684
 msgid "Bits per sample"
 msgstr ""
 
-#: src/input/es_out.c:2710 modules/access/pvr.c:97
+#: src/input/es_out.c:2689 modules/access/pvr.c:97
 #: modules/access_output/shout.c:91
 #: modules/gui/qt4/components/open_panels.cpp:913
 msgid "Bitrate"
 msgstr "Битрейт"
 
-#: src/input/es_out.c:2711
+#: src/input/es_out.c:2690
 #, c-format
 msgid "%u kb/s"
 msgstr ""
 
-#: src/input/es_out.c:2722
+#: src/input/es_out.c:2701
 #, fuzzy
 msgid "Track replay gain"
 msgstr "Replay gain по подразбиране"
 
-#: src/input/es_out.c:2724
+#: src/input/es_out.c:2703
 #, fuzzy
 msgid "Album replay gain"
 msgstr "Replay gain по подразбиране"
 
-#: src/input/es_out.c:2726
+#: src/input/es_out.c:2705
 #, c-format
 msgid "%.2f dB"
 msgstr ""
 
-#: src/input/es_out.c:2736
+#: src/input/es_out.c:2715
 msgid "Resolution"
 msgstr "Резолюция"
 
-#: src/input/es_out.c:2742
+#: src/input/es_out.c:2721
 msgid "Display resolution"
 msgstr "Резолюция при показване"
 
-#: src/input/es_out.c:2753 src/input/es_out.c:2757
+#: src/input/es_out.c:2732 src/input/es_out.c:2736
 #: modules/access/screen/screen.c:44
 msgid "Frame rate"
 msgstr "Честота на кадри"
@@ -1085,7 +1086,7 @@ msgstr "Потока не може да се отвори"
 #: src/input/input.c:2406
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
-msgstr "VLC не може да отвори MRL '%s'. Вижде лога за подробности."
+msgstr "VLC не може да отвори MRL '%s'. Вижте лога за подробности."
 
 #: src/input/input.c:2536
 msgid "VLC can't recognize the input's format"
@@ -1333,7 +1334,7 @@ msgstr ""
 "Натиснете клавиша RETURN, за да продължите\n"
 
 #: src/libvlc.h:182 src/libvlc-module.c:1394 src/libvlc-module.c:1395
-#: src/libvlc-module.c:2510 src/video_output/vout_intf.c:278
+#: src/libvlc-module.c:2518 src/video_output/vout_intf.c:278
 msgid "Zoom"
 msgstr "Мащабиране"
 
@@ -1777,7 +1778,7 @@ msgstr ""
 #: modules/stream_out/mosaic_bridge.c:139 modules/stream_out/transcode.c:77
 #: modules/visualization/visual/visual.c:46
 msgid "Video width"
-msgstr "Видео широчина"
+msgstr "Широчина на видеото"
 
 #: src/libvlc-module.c:368
 msgid ""
@@ -1791,7 +1792,7 @@ msgstr ""
 #: modules/stream_out/mosaic_bridge.c:142 modules/stream_out/transcode.c:80
 #: modules/visualization/visual/visual.c:50
 msgid "Video height"
-msgstr "Видео височина"
+msgstr "Височина на видеото"
 
 #: src/libvlc-module.c:373
 msgid ""
@@ -1803,7 +1804,7 @@ msgstr ""
 
 #: src/libvlc-module.c:376
 msgid "Video X coordinate"
-msgstr "Видео Х координата"
+msgstr "Координата Х на видеото"
 
 #: src/libvlc-module.c:378
 msgid ""
@@ -1814,7 +1815,7 @@ msgstr ""
 
 #: src/libvlc-module.c:381
 msgid "Video Y coordinate"
-msgstr "Видео Y координата"
+msgstr "Координата Y на видеото"
 
 #: src/libvlc-module.c:383
 msgid ""
@@ -1927,7 +1928,7 @@ msgstr ""
 
 #: src/libvlc-module.c:410
 msgid "Embedded video"
-msgstr "Вградено видео"
+msgstr "Вграждане на видеото в интерфейса"
 
 #: src/libvlc-module.c:412
 msgid "Embed the video output in the main interface."
@@ -1961,11 +1962,11 @@ msgstr "Винаги най-отгоре"
 
 #: src/libvlc-module.c:425
 msgid "Always place the video window on top of other windows."
-msgstr "Винаги поставя видео прозореца най-отгоре над другите прозорци."
+msgstr "Поставяне на видео прозореца най-отгоре над другите прозорци."
 
 #: src/libvlc-module.c:427 modules/gui/qt4/ui/sprefs_subtitles.ui:35
 msgid "Show media title on video"
-msgstr "Показване заглавието на медията върху видеото."
+msgstr "Показване заглавието на медията върху видеото"
 
 #: src/libvlc-module.c:429
 msgid "Display the title of the video on top of the movie."
@@ -1974,7 +1975,7 @@ msgstr "Показване заглавието на видеото върху �
 #: src/libvlc-module.c:431
 #, fuzzy
 msgid "Show video title for x milliseconds"
-msgstr "Показване заглавието на видеото за x милисекунди."
+msgstr "Показване заглавието на видеото за x милисекунди"
 
 #: src/libvlc-module.c:433
 #, fuzzy
@@ -1996,7 +1997,7 @@ msgstr ""
 #: src/libvlc-module.c:439
 #, fuzzy
 msgid "Hide cursor and fullscreen controller after x milliseconds"
-msgstr "Скриване на курсора и регулаторите при цял екран след х милисекунди."
+msgstr "Скриване на курсора и регулаторите при цял екран след х милисекунди"
 
 #: src/libvlc-module.c:442
 #, fuzzy
@@ -2004,8 +2005,8 @@ msgid ""
 "Hide mouse cursor and fullscreen controller after n milliseconds, default is "
 "3000 ms (3 sec.)"
 msgstr ""
-"Скриване на курсора и регулаторите при цял екран след х милисекунди, по "
-"подразбиране е 3000 ms (3 сек.)"
+"Скриване на курсора и регулаторите, когато е на цял екран след х "
+"милисекунди, по подразбиране е 1500 ms (1.5 сек.)"
 
 #: src/libvlc-module.c:450
 msgid "Disable screensaver"
@@ -2286,7 +2287,7 @@ msgstr ""
 #: src/libvlc-module.c:574
 #, fuzzy
 msgid "Fullscreen-Only"
-msgstr "Цял екран"
+msgstr "На цял екран"
 
 #: src/libvlc-module.c:582
 msgid ""
@@ -2556,7 +2557,7 @@ msgstr ""
 
 #: src/libvlc-module.c:705
 msgid "Input slave (experimental)"
-msgstr "Няколко входящи потока (екпериментално)"
+msgstr "Няколко входящи потока (експериментално)"
 
 #: src/libvlc-module.c:707
 msgid ""
@@ -3299,7 +3300,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1059
 msgid "(Experimental) Don't do caching at the access level."
-msgstr "(Експериментално) Без кеширане на входящото ниво."
+msgstr "(Експериментално) Без кеширане на входящия поток"
 
 #: src/libvlc-module.c:1061
 msgid ""
@@ -3392,9 +3393,9 @@ msgid ""
 "running instance or enqueue it."
 msgstr ""
 "Разрешаване пускането само на едно копие на VLC понякога е полезно, например "
-"ако сте асоциирали VLC с някои медия типове и не искате ново копие на VLC да "
-"се отваря всеки път, когато щракнете на файл в експлорер. Тази опция ще ви "
-"позволи да възпроизвеждате файла с вече стартираното копие или да го "
+"ако сте асоциирали VLC с някои медия типове и не искате да се отваря ново "
+"копие на VLC всеки път, когато щракнете на файл в експлорер. Тази опция ще "
+"ви позволи да възпроизвеждате файла с вече стартираното копие или да го "
 "поставите на опашката за изчакване в плейлиста."
 
 #: src/libvlc-module.c:1107
@@ -3425,7 +3426,7 @@ msgstr "Указва, че VLC е стартиран от асоцииран ф�
 
 #: src/libvlc-module.c:1121
 msgid "One instance when started from file"
-msgstr "Едно копие при стартиране от файл"
+msgstr "Едно копие на VLC при стартиране от файл"
 
 #: src/libvlc-module.c:1123
 msgid "Allow only one running instance when started from file."
@@ -3433,7 +3434,7 @@ msgstr "Разрешаване пускането само на едно коп�
 
 #: src/libvlc-module.c:1125
 msgid "Increase the priority of the process"
-msgstr "Увеличаване приоритета на процеса"
+msgstr "Увеличаване приоритета на процеса на VLC"
 
 #: src/libvlc-module.c:1127
 msgid ""
@@ -3588,7 +3589,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:679 modules/gui/macosx/simple_prefs.m:282
 #: modules/gui/qt4/ui/sprefs_video.ui:58
 msgid "Fullscreen"
-msgstr "Цял екран"
+msgstr "На цял екран"
 
 #: src/libvlc-module.c:1211
 msgid "Select the hotkey to use to swap fullscreen state."
@@ -4308,55 +4309,55 @@ msgstr ""
 
 #: src/libvlc-module.c:1425 src/libvlc-module.c:1426
 msgid "Display OSD menu on top of video output"
-msgstr "Показване на OSD меню върху видеото"
+msgstr "Показване на екранно меню върху видеото"
 
 #: src/libvlc-module.c:1427
 msgid "Do not display OSD menu on video output"
-msgstr "Скриване на OSD менюто от видеото"
+msgstr "Скриване на екранното меню от видеото"
 
 #: src/libvlc-module.c:1428
 msgid "Do not display OSD menu on top of video output"
-msgstr "Скриване на OSD менюто от видеото"
+msgstr "Скриване на екранното меню от видеото"
 
 #: src/libvlc-module.c:1429
 msgid "Highlight widget on the right"
-msgstr "Маркиране на приспособлението отдясно"
+msgstr "Маркиране на елемента отдясно в екранното меню"
 
 #: src/libvlc-module.c:1431
 msgid "Move OSD menu highlight to the widget on the right"
-msgstr "Преместване на маркираното в OSD менюто в приспособлението отдясно"
+msgstr "Маркиране на елемента отдясно в екранното меню"
 
 #: src/libvlc-module.c:1432
 msgid "Highlight widget on the left"
-msgstr "Маркиране на приспособлението отляво"
+msgstr "Маркиране на елемента отляво в екранното меню"
 
 #: src/libvlc-module.c:1434
 msgid "Move OSD menu highlight to the widget on the left"
-msgstr "Преместване на маркираното в OSD менюто в приспособлението отляво"
+msgstr "Маркиране на елемента отляво в екранното меню"
 
 #: src/libvlc-module.c:1435
 msgid "Highlight widget on top"
-msgstr "Маркиране на приспособлението отгоре"
+msgstr "Маркиране на елемента отгоре в екранното меню"
 
 #: src/libvlc-module.c:1437
 msgid "Move OSD menu highlight to the widget on top"
-msgstr "Преместване на маркираното в OSD менюто в приспособлението отгоре"
+msgstr "Маркиране на елемента отгоре в екранното меню"
 
 #: src/libvlc-module.c:1438
 msgid "Highlight widget below"
-msgstr "Маркиране на приспособлението отдолу"
+msgstr "Маркиране на елемента отдолу в екранното меню"
 
 #: src/libvlc-module.c:1440
 msgid "Move OSD menu highlight to the widget below"
-msgstr "Преместване на маркираното в OSD менюто в приспособлението отдолу"
+msgstr "Маркиране на елемента отдолу в екранното меню"
 
 #: src/libvlc-module.c:1441
 msgid "Select current widget"
-msgstr "Избор на текущото приспособление"
+msgstr "Избор на текущия елемент в екранното меню"
 
 #: src/libvlc-module.c:1443
 msgid "Selecting current widget performs the associated action."
-msgstr "Избор на текущото приспособление изпълняващо асоциираното действие."
+msgstr "Избор на текущия елемент изпълняващ асоциираното действие."
 
 #: src/libvlc-module.c:1445
 msgid "Cycle through audio devices"
@@ -4408,7 +4409,7 @@ msgstr ""
 #: modules/gui/macosx/intf.m:617 modules/gui/macosx/intf.m:680
 #: modules/video_output/snapshot.c:81
 msgid "Snapshot"
-msgstr "Снимане на видеото"
+msgstr "Снимки на видеото"
 
 #: src/libvlc-module.c:1612
 msgid "Window properties"
@@ -4452,109 +4453,110 @@ msgstr "Socks прокси сървър"
 msgid "Metadata"
 msgstr "Мета-данни"
 
-#: src/libvlc-module.c:1822
+#: src/libvlc-module.c:1830
 msgid "Decoders"
 msgstr "Декодери"
 
-#: src/libvlc-module.c:1829 modules/access/v4l2.c:84
+#: src/libvlc-module.c:1837 modules/access/v4l2.c:84
 #: modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/qt4/components/info_panels.cpp:519
 msgid "Input"
 msgstr "Въвеждане"
 
-#: src/libvlc-module.c:1868
+#: src/libvlc-module.c:1876
 msgid "VLM"
 msgstr ""
 
-#: src/libvlc-module.c:1900
+#: src/libvlc-module.c:1908
 msgid "CPU"
 msgstr ""
 
-#: src/libvlc-module.c:1922
+#: src/libvlc-module.c:1930
 msgid "Special modules"
 msgstr "Специални модули"
 
-#: src/libvlc-module.c:1928
+#: src/libvlc-module.c:1936
 msgid "Plugins"
 msgstr "Плъгини"
 
-#: src/libvlc-module.c:1936
+#: src/libvlc-module.c:1944
 msgid "Performance options"
 msgstr "Настройки на производителността"
 
-#: src/libvlc-module.c:2082
+#: src/libvlc-module.c:2090
 msgid "Hot keys"
 msgstr "Клавишни комбинации"
 
-#: src/libvlc-module.c:2520
+#: src/libvlc-module.c:2528
 msgid "Jump sizes"
 msgstr "Размери на преходите"
 
-#: src/libvlc-module.c:2597
+#: src/libvlc-module.c:2605
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
-"покажи помощ за VLC (може да се комбинира с --advanced and --help-verbose)"
+"показване на помощ за VLC (може да се комбинира с --advanced and --help-"
+"verbose)"
 
-#: src/libvlc-module.c:2600
+#: src/libvlc-module.c:2608
 msgid "Exhaustive help for VLC and its modules"
 msgstr "Изчерпателна помощ за VLC и неговите модули"
 
-#: src/libvlc-module.c:2602
+#: src/libvlc-module.c:2610
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
-"покажи помощ за VLC и всички негови модули (може да се комбинира с --"
+"показване на помощ за VLC и всички негови модули (може да се комбинира с --"
 "advanced and --help-verbose)"
 
-#: src/libvlc-module.c:2605
+#: src/libvlc-module.c:2613
 msgid "ask for extra verbosity when displaying help"
 msgstr "искане за допълнителни обяснения, когато се показва помощ"
 
-#: src/libvlc-module.c:2607
+#: src/libvlc-module.c:2615
 msgid "print a list of available modules"
 msgstr "показване на списък с наличните модули"
 
-#: src/libvlc-module.c:2609
+#: src/libvlc-module.c:2617
 msgid "print a list of available modules with extra detail"
-msgstr "покажи списък на наличните модули с допълнителни подробности"
+msgstr "показване на списък на наличните модули с допълнителни подробности"
 
-#: src/libvlc-module.c:2611
+#: src/libvlc-module.c:2619
 #, fuzzy
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strictmatches."
 msgstr ""
-"покажи помощ за специфичен модул (може да се комбинира с --advanced and --"
-"help-verbose)"
+"показване на помощ за специфичен модул (може да се комбинира с --advanced "
+"and --help-verbose)"
 
-#: src/libvlc-module.c:2615
+#: src/libvlc-module.c:2623
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 "Няма да бъдат заредени конфигурационни опции, тъй като не са записани в "
 "конфигурационния файл"
 
-#: src/libvlc-module.c:2617
+#: src/libvlc-module.c:2625
 msgid "save the current command line options in the config"
 msgstr "Записване на текущите опции в командния ред в конфигурационния файл"
 
-#: src/libvlc-module.c:2619
+#: src/libvlc-module.c:2627
 msgid "reset the current config to the default values"
 msgstr "Възстановяване на текущата конфигурация към стандартните стойности"
 
-#: src/libvlc-module.c:2621
+#: src/libvlc-module.c:2629
 msgid "use alternate config file"
 msgstr "използване на алтернативен конфигурационен файл"
 
-#: src/libvlc-module.c:2623
+#: src/libvlc-module.c:2631
 msgid "resets the current plugins cache"
 msgstr "нулиране на кеша за текущите плъгини"
 
-#: src/libvlc-module.c:2625
+#: src/libvlc-module.c:2633
 msgid "print version information"
 msgstr "показване на инфо за версията"
 
-#: src/libvlc-module.c:2681
+#: src/libvlc-module.c:2689
 msgid "main program"
 msgstr "основна програма"
 
@@ -4574,9 +4576,9 @@ msgid "%.1f kB"
 msgstr ""
 
 #: src/misc/update.c:1477
-#, fuzzy, c-format
+#, c-format
 msgid "%ld B"
-msgstr "%d Хц"
+msgstr "%ld B"
 
 #: src/misc/update.c:1590
 #, fuzzy
@@ -4596,9 +4598,8 @@ msgid ""
 msgstr ""
 
 #: src/misc/update.c:1610
-#, fuzzy
 msgid "Downloading ..."
-msgstr "Изтегляне на плъгина"
+msgstr "Изтегляне ..."
 
 #: src/misc/update.c:1611 modules/access/dvb/scan.c:321
 #: modules/demux/avi/avi.c:682 modules/demux/avi/avi.c:2403
@@ -4795,15 +4796,15 @@ msgstr "Номер на устройството, което да се изпо�
 #: modules/gui/qt4/components/open_panels.cpp:697
 #: modules/gui/qt4/components/open_panels.cpp:962
 msgid "Transponder/multiplex frequency"
-msgstr "Transponder/multiplex честота"
+msgstr "Честота на транспондера/мултиплексирането"
 
 #: modules/access/bda/bda.c:53 modules/access/dvb/access.c:96
 msgid "In kHz for DVB-S or Hz for DVB-C/T"
-msgstr ""
+msgstr "В kHz за DVB-S или Hz за DVB-C/T"
 
 #: modules/access/bda/bda.c:55
 msgid "In kHz for DVB-C/S/T"
-msgstr ""
+msgstr "В kHz за DVB-C/S/T"
 
 #: modules/access/bda/bda.c:58 modules/access/dvb/access.c:98
 msgid "Inversion mode"
@@ -4831,7 +4832,7 @@ msgstr "Бюджетен режим"
 
 #: modules/access/bda/bda.c:70 modules/access/dvb/access.c:105
 msgid "This allows you to stream an entire transponder with a \"budget\" card."
-msgstr "Позволява да се разпространява целия траснпондер с \"бюджетна\" карта."
+msgstr "Позволява да се разпространява целия транспондер с \"бюджетна\" карта."
 
 #: modules/access/bda/bda.c:75
 msgid "Network Identifier"
@@ -4851,7 +4852,7 @@ msgstr ""
 
 #: modules/access/bda/bda.c:83 modules/access/dvb/access.c:112
 msgid "In Volts [0, 13=vertical, 18=horizontal]."
-msgstr ""
+msgstr "Във волтове  [0, 13=вертикално, 18=хоризонтално]."
 
 #: modules/access/bda/bda.c:85 modules/access/dvb/access.c:114
 msgid "High LNB voltage"
@@ -4875,7 +4876,7 @@ msgstr "[0=изкл., 1=вкл., -1=авто]."
 
 #: modules/access/bda/bda.c:92 modules/access/dvb/access.c:121
 msgid "Transponder FEC"
-msgstr "Траснпондер FEC"
+msgstr "Транспондер FEC"
 
 #: modules/access/bda/bda.c:93 modules/access/dvb/access.c:122
 msgid "FEC=Forward Error Correction mode [9=auto]."
@@ -4883,31 +4884,36 @@ msgstr "Режим Forward Error Correction (FEC) [9=авто]."
 
 #: modules/access/bda/bda.c:95 modules/access/dvb/access.c:124
 msgid "Transponder symbol rate in kHz"
-msgstr "Transponder честота на символа в kHz"
+msgstr "Символна честота на транспондера в kHz"
 
 #: modules/access/bda/bda.c:98 modules/access/dvb/access.c:127
 msgid "Antenna lnb_lof1 (kHz)"
 msgstr "Антена lnb_lof1 (kHz)"
 
 #: modules/access/bda/bda.c:99
+#, fuzzy
 msgid "Low Band Local Osc Freq in kHz (usually 9.75GHz)"
-msgstr ""
+msgstr "Ниска честота на локалния генератор в kHz, обикновенно 9.75GHz"
 
 #: modules/access/bda/bda.c:101 modules/access/dvb/access.c:130
 msgid "Antenna lnb_lof2 (kHz)"
 msgstr "Антена lnb_lof2 (kHz)"
 
 #: modules/access/bda/bda.c:102
+#, fuzzy
 msgid "High Band Local Osc Freq in kHz (usually 10.6GHz)"
-msgstr ""
+msgstr "Висока честота на локалния генератор в kHz, обикновенно 10.6GHz"
 
 #: modules/access/bda/bda.c:104 modules/access/dvb/access.c:133
 msgid "Antenna lnb_slof (kHz)"
 msgstr "Антена lnb_slof (kHz)"
 
 #: modules/access/bda/bda.c:106
+#, fuzzy
 msgid "Low Noise Block switch freq in kHz (usually 11.7GHz)"
 msgstr ""
+"Честота на превключване за блокиране на слаби шумове в kHz, обикновенно "
+"11.7GHz"
 
 #: modules/access/bda/bda.c:109 modules/access/dvb/access.c:137
 msgid "Modulation type"
@@ -4998,11 +5004,13 @@ msgstr ""
 
 #: modules/access/bda/bda.c:133 modules/access/dvb/access.c:144
 msgid "Terrestrial low priority stream code rate (FEC)"
-msgstr "Нисък приоритет на наземната кодова честота на потока (FEC)"
+msgstr "Наземна скорост на кодиране (FEC), нисък приоритет"
 
 #: modules/access/bda/bda.c:134
 msgid "Low Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
-msgstr "Нисък приоритет на FEC честотата [Неопределено,1/2,2/3,3/4,5/6,7/8]"
+msgstr ""
+"Нисък приоритет на FEC (ускорено поправяне на грешки) "
+"[Неопределено,1/2,2/3,3/4,5/6,7/8]"
 
 #: modules/access/bda/bda.c:140 modules/access/dvb/access.c:147
 msgid "Terrestrial bandwidth"
@@ -5070,7 +5078,7 @@ msgstr "Наземен режим на йерархия"
 
 #: modules/access/bda/bda.c:159
 msgid "Hierarchy alpha value [Undefined,1,2,4]"
-msgstr "Йерерхическа алфа стойност [Неопределена,1,2,4]"
+msgstr "Алфа стойност на йерархията [Неопределена,1,2,4]"
 
 #: modules/access/bda/bda.c:162
 msgid "1"
@@ -5090,7 +5098,7 @@ msgstr "Сателитен азимут"
 
 #: modules/access/bda/bda.c:166
 msgid "Satellite Azimuth in tenths of degree"
-msgstr "Сателитен азимут в една десета от градуса"
+msgstr "Сателитен азимут с точност до една десета от градуса"
 
 #: modules/access/bda/bda.c:167
 msgid "Satellite Elevation"
@@ -5098,7 +5106,7 @@ msgstr "Височина на сателита"
 
 #: modules/access/bda/bda.c:168
 msgid "Satellite Elevation in tenths of degree"
-msgstr "Височина на сателита в една десета от градуса"
+msgstr "Височина на сателита с точност до една десета от градуса"
 
 #: modules/access/bda/bda.c:169
 msgid "Satellite Longitude"
@@ -5106,7 +5114,8 @@ msgstr "Географска дължина на сателита"
 
 #: modules/access/bda/bda.c:171
 msgid "Satellite Longitude in 10ths of degree, -ve=West"
-msgstr "Географска дължина на сателита в една десета от градуса, -ve=West"
+msgstr ""
+"Географска дължина на сателита с точност до една десета от градуса, -ve=West"
 
 #: modules/access/bda/bda.c:172
 msgid "Satellite Polarisation"
@@ -5353,7 +5362,7 @@ msgid ""
 "overlap: do only overlap detection - not generally recommended.\n"
 "full: complete jitter and error correction detection - slowest.\n"
 msgstr ""
-"Използване на CD Paranoia за поправка на грешки и джиттера.\n"
+"Използване на CD Paranoia за поправяне на грешки и джиттера.\n"
 "  - Не: без използване на поправка - най-бързо.\n"
 "  - Застъпване: използване само на определено застъпване - не се "
 "препоръчва.\n"
@@ -5844,7 +5853,7 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:543
 #, fuzzy
 msgid "VLC cannot open ANY capture device.Check the error log for details."
-msgstr "VLC не може да отвори MRL '%s'. Вижде лога за подробности."
+msgstr "VLC не може да отвори MRL '%s'. Вижте лога за подробности."
 
 #: modules/access/dshow/dshow.cpp:978
 #, c-format
@@ -5878,7 +5887,7 @@ msgstr "Тип на модулацията за предното-крайно у
 
 #: modules/access/dvb/access.c:141
 msgid "Terrestrial high priority stream code rate (FEC)"
-msgstr "Висок приоритет на наземната кодова честота на потока (FEC)"
+msgstr "Наземна скорост на кодиране (FEC), висок приоритет"
 
 #: modules/access/dvb/access.c:159
 msgid "HTTP Host address"
@@ -6373,11 +6382,11 @@ msgstr "Въвеждане от HTTP"
 msgid "HTTP(S)"
 msgstr ""
 
-#: modules/access/http.c:447
+#: modules/access/http.c:448
 msgid "HTTP authentication"
 msgstr "HTTP достоверност"
 
-#: modules/access/http.c:448
+#: modules/access/http.c:449
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Моля, въведете валидно име и парола за realm %s."
@@ -7799,7 +7808,7 @@ msgstr "Информация за битрейта на кодирания по�
 
 #: modules/access_output/shout.c:95
 msgid "Samplerate information of the transcoded stream. "
-msgstr "Информация за честотата на дискредитация на кодирания поток"
+msgstr "Информация за честотата на дискретизация на кодирания поток"
 
 #: modules/access_output/shout.c:97
 msgid "Number of channels"
@@ -8320,7 +8329,7 @@ msgstr ""
 #: modules/audio_filter/spatializer/spatializer.cpp:52
 #, fuzzy
 msgid "Room width"
-msgstr "Видео широчина"
+msgstr "Широчина на видеото"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:53
 #, fuzzy
@@ -9530,12 +9539,12 @@ msgstr "Презареждане на файла с изображение пр�
 #: modules/codec/fake.c:61 modules/stream_out/mosaic_bridge.c:141
 #: modules/stream_out/transcode.c:79
 msgid "Output video width."
-msgstr "Изходна видео широчина."
+msgstr "Изходна широчина на видеото."
 
 #: modules/codec/fake.c:64 modules/stream_out/mosaic_bridge.c:144
 #: modules/stream_out/transcode.c:82
 msgid "Output video height."
-msgstr "Изходна видео височина."
+msgstr "Изходна височина на видеото."
 
 #: modules/codec/fake.c:65 modules/video_filter/mosaic.c:136
 msgid "Keep aspect ratio"
@@ -10845,7 +10854,6 @@ msgid "Subpixel motion estimation and partition decision quality"
 msgstr "Субпикселна оценка на движенията и качество на дяловете"
 
 #: modules/codec/x264.c:280
-#, fuzzy
 msgid ""
 "This parameter controls quality versus speed tradeoffs involved in the "
 "motion estimation decision process (lower = quicker and higher = better "
@@ -10853,7 +10861,7 @@ msgid ""
 msgstr ""
 "Този параметър контролира качеството в зависимост от скоростта в процеса за "
 "оценка на движенията (по-малка стойност = по-бързо и по-високо, което значи "
-"по-добро качество). В обхвата от 1 до 7."
+"по-добро качество). В обхвата от 1 до 9."
 
 #: modules/codec/x264.c:285
 msgid ""
@@ -11169,7 +11177,7 @@ msgid ""
 "You can enforce the teletext position on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg. "
 "6 = top-right)."
-msgstr "Задаване позицията на телетекст върху видеото"
+msgstr "Позиция на телетекста върху видеото"
 
 #: modules/codec/zvbi.c:73
 msgid "Teletext text subtitles"
@@ -11196,11 +11204,11 @@ msgstr ""
 msgid "Page"
 msgstr "Пауза"
 
-#: modules/control/dbus.c:111
+#: modules/control/dbus.c:128
 msgid "dbus"
 msgstr ""
 
-#: modules/control/dbus.c:114
+#: modules/control/dbus.c:131
 msgid "D-Bus control interface"
 msgstr "Управляващ интерфейс D-Bus"
 
@@ -11268,8 +11276,9 @@ msgid "Hotkeys management interface"
 msgstr "Управление на интерфейса с клавишни комбинации"
 
 #: modules/control/hotkeys.c:109
+#, fuzzy
 msgid "MouseWheel x-axis Control"
-msgstr ""
+msgstr "Управление на мултиплексора"
 
 #: modules/control/hotkeys.c:110
 msgid ""
@@ -11526,7 +11535,8 @@ msgid ""
 "configured."
 msgstr ""
 "Параметри използвани от услугата (например  --foo=bar --no-foobar). Трябва "
-"да бъдат определени преди инсталирането на услугата за правилна настройка."
+"да бъдат определени преди инсталирането на услугата, за да е правилна "
+"настройката."
 
 #: modules/control/ntservice.c:59
 msgid ""
@@ -11535,9 +11545,9 @@ msgid ""
 "list of interface modules. (common values are: logger, sap, rc, http)"
 msgstr ""
 "Допълнителни интерфейси пуснати от услугата. Трябва да бъдат определени "
-"преди инсталирането на услугата за правилна настройка. Задайте списък на "
-"модули за интерфейс разделени със запетая. (обикновенно стойностите са: "
-"logger, sap, rc, http)."
+"преди инсталирането на услугата, за да е правилна настройката. Задайте "
+"списък на модули за интерфейс разделени със запетая. (обикновенно "
+"стойностите са: logger, sap, rc, http)."
 
 #: modules/control/ntservice.c:65
 msgid "NT Service"
@@ -11622,7 +11632,7 @@ msgid ""
 msgstr ""
 "По подразбиране интерфейса RC отваря прозорец за въвеждане на DOS команди. "
 "Включването на тих режим няма да показва този прозорец, но това може да бъде "
-"досадно, когато искате да спрете VLC и не се отваря видео прозорец."
+"неудобно, когато искате да спрете VLC и не се отваря видео прозорец."
 
 #: modules/control/rc.c:190
 msgid "RC"
@@ -12181,7 +12191,7 @@ msgstr "Задаване на \"слоев\" режим на възпроизв�
 
 #: modules/demux/avi/avi.c:50
 msgid "Force index creation"
-msgstr "Задаване създаване на индексите"
+msgstr "Повторно създаване на индексите"
 
 #: modules/demux/avi/avi.c:52
 msgid ""
@@ -13395,7 +13405,7 @@ msgid ""
 "You can enforce the picture position on the overlay (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
 "g. 6=top-right)."
-msgstr "Задаване позицията на изображението върху слоя."
+msgstr "Позиция на изображението върху слоя."
 
 #: modules/gui/fbosd.c:133 modules/misc/freetype.c:90
 #: modules/misc/win32text.c:64 modules/video_filter/marq.c:117
@@ -13920,9 +13930,8 @@ msgid "1:File"
 msgstr "1:Файл"
 
 #: modules/gui/macosx/intf.m:561 modules/gui/qt4/menus.cpp:302
-#, fuzzy
 msgid "Advanced Open File..."
-msgstr "Разширено отваряне..."
+msgstr "Разширено отваряне на файл..."
 
 #: modules/gui/macosx/intf.m:563
 msgid "Open Disc..."
@@ -13930,7 +13939,7 @@ msgstr "Отваряне на диск..."
 
 #: modules/gui/macosx/intf.m:564
 msgid "Open Network..."
-msgstr "Отваряне на мрежа..."
+msgstr "Отваряне на мрежов поток..."
 
 #: modules/gui/macosx/intf.m:565
 msgid "Open Capture Device..."
@@ -14598,7 +14607,6 @@ msgid "Expand Node"
 msgstr "Разгъване на възела"
 
 #: modules/gui/macosx/playlist.m:448
-#, fuzzy
 msgid "Download Cover Art"
 msgstr "Изтегляне на обложка за албум"
 
@@ -14819,11 +14827,11 @@ msgstr "Настройки на интерфейса"
 
 #: modules/gui/macosx/simple_prefs.m:178
 msgid "General Audio Settings"
-msgstr "Основни аудио настройки"
+msgstr "Основни настройки на аудиото"
 
 #: modules/gui/macosx/simple_prefs.m:182
 msgid "General Video Settings"
-msgstr "Основни видео настройки "
+msgstr "Основни настройки на видеото"
 
 #: modules/gui/macosx/simple_prefs.m:186
 msgid "Subtitles & OSD"
@@ -14905,7 +14913,7 @@ msgstr "Клавиш"
 
 #: modules/gui/macosx/simple_prefs.m:246
 msgid "Repair AVI Files"
-msgstr "Поправка на AVI файлове"
+msgstr "Поправяне на AVI файлове"
 
 #: modules/gui/macosx/simple_prefs.m:247
 msgid "Default Caching Level"
@@ -14994,7 +15002,7 @@ msgstr "Предпочитан език за субтитрите"
 #: modules/gui/macosx/simple_prefs.m:275
 #: modules/gui/qt4/ui/sprefs_subtitles.ui:28
 msgid "Enable OSD"
-msgstr "Включване на OSD"
+msgstr "Включване на екранно меню"
 
 #: modules/gui/macosx/simple_prefs.m:278
 msgid "Black screens in Fullscreen mode"
@@ -15097,7 +15105,7 @@ msgstr "Въведените настройки не са записани"
 
 #: modules/gui/macosx/simple_prefs.m:918
 msgid "On Screen Display/Subtitle Settings not saved"
-msgstr "Настройките на OSD/Субтитрите не са записани"
+msgstr "Настройките на Екранното меню/Субтитрите не са запазени"
 
 #: modules/gui/macosx/simple_prefs.m:943
 msgid "Hotkeys not saved"
@@ -15172,16 +15180,15 @@ msgstr "Текущата версия е %d.%d.%d%c."
 #: modules/gui/macosx/vlm.m:98
 #, fuzzy
 msgid "Video On Demand"
-msgstr "Модул на видео кодера"
+msgstr "Видео по поръчка ( VOD )"
 
 #: modules/gui/macosx/vlm.m:102 modules/gui/qt4/dialogs/vlm.cpp:76
-#, fuzzy
 msgid "Schedule"
-msgstr "Настройки за разписание"
+msgstr "График"
 
 #: modules/gui/macosx/vlm.m:106 modules/gui/qt4/dialogs/vlm.cpp:75
 msgid "Broadcast"
-msgstr ""
+msgstr "Разпространение"
 
 #: modules/gui/macosx/wizard.m:113
 msgid "MPEG-1 Video codec (usable with MPEG PS, MPEG TS, MPEG1, OGG and RAW)"
@@ -16397,7 +16404,7 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:931
 msgid "Video Bitrate:"
-msgstr "Видео битрейт:"
+msgstr "Битрейт на видеото:"
 
 #: modules/gui/pda/pda_interface.c:940
 msgid "Bitrate Tolerance:"
@@ -16505,7 +16512,7 @@ msgstr ""
 
 #: modules/gui/pda/pda_interface.c:1132
 msgid "Audio Bitrate :"
-msgstr "Аудио битрейт :"
+msgstr "Битрейт на аудиото :"
 
 #: modules/gui/pda/pda_interface.c:1155
 msgid "SAP Announce:"
@@ -16692,7 +16699,7 @@ msgstr "Аудио/Видео"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1272
 msgid "Advance of audio over video:"
-msgstr "Настройка на аудиото спрямо видеото"
+msgstr "Синхронизиране на аудиото спрямо видеото"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1281
 msgid ""
@@ -16708,7 +16715,7 @@ msgstr "Субтитри/Видео"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1305
 msgid "Advance of subtitles over video:"
-msgstr "Настройка на субтитрите спрямо видеото"
+msgstr "Синхронизиране на субтитрите спрямо видеото"
 
 #: modules/gui/qt4/components/extended_panels.cpp:1314
 msgid ""
@@ -16727,9 +16734,8 @@ msgid "Force update of this dialog's values"
 msgstr "Обновяване на стойностите в този прозорец"
 
 #: modules/gui/qt4/components/info_panels.cpp:129
-#, fuzzy
 msgid "Comments"
-msgstr "Коментар"
+msgstr "Коментари"
 
 #: modules/gui/qt4/components/info_panels.cpp:336
 msgid "Extra metadata and other information are shown in this panel.\n"
@@ -16930,12 +16936,12 @@ msgstr "Въвеждане / Кодеци "
 #: modules/gui/qt4/components/simple_preferences.cpp:183
 #, fuzzy
 msgid "Video Settings"
-msgstr "Видео настройки"
+msgstr "Настройки на видеото"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:218
 #, fuzzy
 msgid "Audio Settings"
-msgstr "Аудио настройки "
+msgstr "Настройки на аудиото"
 
 #: modules/gui/qt4/components/simple_preferences.cpp:227
 msgid "Device:"
@@ -17037,7 +17043,7 @@ msgid "Errors"
 msgstr "Грешки"
 
 #: modules/gui/qt4/dialogs/errors.cpp:51
-#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1405
+#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1408
 msgid "&Clear"
 msgstr "Изчистване"
 
@@ -17384,7 +17390,7 @@ msgstr ""
 
 #: modules/gui/qt4/dialogs/vlm.cpp:77
 msgid "Video On Demand ( VOD )"
-msgstr ""
+msgstr "Видео по поръчка ( VOD )"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:82
 msgid "Hours / Minutes / Seconds:"
@@ -17431,14 +17437,12 @@ msgid "Open VLM configuration..."
 msgstr "Конфигуриране на VLM..."
 
 #: modules/gui/qt4/dialogs/vlm.cpp:547
-#, fuzzy
 msgid "Broadcast: "
-msgstr "Инфо на Podcast"
+msgstr "Разпространение:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:615
-#, fuzzy
 msgid "Schedule: "
-msgstr "Настройки за разписание"
+msgstr "График:"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:637
 msgid "VOD: "
@@ -17556,7 +17560,7 @@ msgstr "Отваряне на диск..."
 #: modules/gui/qt4/menus.cpp:308
 #, fuzzy
 msgid "Open &Network Stream..."
-msgstr "Отваряне на мрежа..."
+msgstr "Отваряне на мрежов поток..."
 
 #: modules/gui/qt4/menus.cpp:310 modules/gui/qt4/menus.cpp:800
 msgid "Open &Capture Device..."
@@ -17669,7 +17673,7 @@ msgstr "Пътека със субтитри"
 
 #: modules/gui/qt4/menus.cpp:549
 msgid "&Fullscreen"
-msgstr "Цял екран"
+msgstr "На цял екран"
 
 #: modules/gui/qt4/menus.cpp:550
 msgid "Always &On Top"
@@ -17784,7 +17788,7 @@ msgstr "Следващ"
 
 #: modules/gui/qt4/menus.cpp:798
 msgid "Open &Network..."
-msgstr "Отваряне на мрежа..."
+msgstr "Отваряне на мрежов поток..."
 
 #: modules/gui/qt4/menus.cpp:915
 msgid "Leave Fullscreen"
@@ -17806,7 +17810,7 @@ msgstr "Показване на VLC media player"
 msgid "&Open Media"
 msgstr "Отваряне на медия"
 
-#: modules/gui/qt4/menus.cpp:1390
+#: modules/gui/qt4/menus.cpp:1393
 msgid " - Empty - "
 msgstr ""
 
@@ -17877,7 +17881,7 @@ msgstr "Път, който да се използва в прозореца за
 
 #: modules/gui/qt4/qt4.cpp:100
 msgid "Show notification popup on track change"
-msgstr "Показване на изскачащо съобщение при промяна на пътека"
+msgstr "Показване на изскачащо съобщение при сменяне на пътека"
 
 #: modules/gui/qt4/qt4.cpp:102
 msgid ""
@@ -18042,7 +18046,7 @@ msgstr "Време за стартиране на медията"
 #: modules/gui/qt4/ui/open.ui:132
 msgid "Play another media synchronously (extra audio file, ...)"
 msgstr ""
-"Синхронизирано възпроизвеждане на друга медия (допълнителен аудио файл, ...)"
+"Синхронно възпроизвеждане на друга медия (допълнителен аудио файл, ...)"
 
 #: modules/gui/qt4/ui/open.ui:139
 msgid "Extra media"
@@ -18109,7 +18113,9 @@ msgstr "Изберете порт, който да се използва"
 
 #: modules/gui/qt4/ui/open_net.ui:85
 msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr "Въведете URL на мрежовия поток, с или без протокол."
+msgstr ""
+"Въведете URL на мрежовия поток, като зададете\n"
+"протокол или без задаване на протокол."
 
 #: modules/gui/qt4/ui/podcast_configuration.ui:19
 #: modules/services_discovery/podcast.c:61
@@ -18162,7 +18168,7 @@ msgstr "Качество на допълнителната обработка"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:151
 msgid "Repair AVI files"
-msgstr "Поправка на AVI файлове"
+msgstr "Поправяне на AVI файлове"
 
 #: modules/gui/qt4/ui/sprefs_input.ui:164
 msgid "Use system codecs if available (better quality)"
@@ -18239,11 +18245,11 @@ msgstr "Управление"
 
 #: modules/gui/qt4/ui/streampanel.ui:64
 msgid "Run manually"
-msgstr "Стартиране ръчно"
+msgstr "Ръчно стартиране"
 
 #: modules/gui/qt4/ui/streampanel.ui:71
 msgid "Setup schedule"
-msgstr "Настройки за разписание"
+msgstr "Настройка на разписание"
 
 #: modules/gui/qt4/ui/streampanel.ui:78
 msgid "Run on schedule"
@@ -18308,7 +18314,7 @@ msgstr "Геометрия"
 #: modules/gui/qt4/ui/video_effects.ui:340
 #, fuzzy
 msgid "Magnification/Zoom"
-msgstr "Увеличаване част от изображението"
+msgstr "Лупа на екрана"
 
 #: modules/gui/qt4/ui/video_effects.ui:347
 msgid "Puzzle game"
@@ -18395,7 +18401,7 @@ msgstr "Видео стена"
 
 #: modules/gui/qt4/ui/video_effects.ui:725
 msgid "Add text"
-msgstr "Добавяне на текст"
+msgstr "Показване на скриващ се текст"
 
 #: modules/gui/qt4/ui/video_effects.ui:760 modules/video_filter/panoramix.c:97
 msgid "Panoramix"
@@ -18485,7 +18491,7 @@ msgstr "Управление на времето"
 
 #: modules/gui/qt4/ui/vlm.ui:127
 msgid "Mux Control"
-msgstr ""
+msgstr "Управление на мултиплексора"
 
 #: modules/gui/qt4/ui/vlm.ui:169
 msgid "Loop"
@@ -18522,7 +18528,7 @@ msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:491
 msgid "Skin to use"
-msgstr "Скин, който да се използва"
+msgstr "Избор на файл със скин"
 
 #: modules/gui/skins2/src/skin_main.cpp:492
 msgid "Path to the skin to use."
@@ -19261,7 +19267,7 @@ msgstr "Запис на лог във файл"
 
 #: modules/misc/logger.c:134
 msgid "File logging"
-msgstr "Запис на лог съобщение във файл"
+msgstr "Запис на лог съобщенията във файл"
 
 #: modules/misc/logger.c:140
 msgid "Log filename"
@@ -19372,7 +19378,7 @@ msgid ""
 "Format of the string to send to MSN {0} Artist, {1} Title, {2} Album. "
 "Defaults to \"Artist - Title\" ({0} - {1})."
 msgstr ""
-"Формат на низа изпращан до MSN {0} Изпълнител, {1} Заглавие, {2} Албум. По "
+"Формат на низа изпращан до MSN: {0} Изпълнител, {1} Заглавие, {2} Албум. По "
 "подразбиране \"Изпълнител - Заглавие\" ({0} - {1})."
 
 #: modules/misc/notify/msn.c:75
@@ -19461,11 +19467,11 @@ msgstr "Интерфейс XOSD"
 
 #: modules/misc/osd/parser.c:54
 msgid "OSD configuration importer"
-msgstr "Внасяне на настройки за OSD"
+msgstr "Внасяне на настройки за екранното меню"
 
 #: modules/misc/osd/parser.c:60
 msgid "XML OSD configuration importer"
-msgstr "Внасяне на настройки за XML OSD"
+msgstr "Внасяне на настройки за екранното меню от XML"
 
 #: modules/misc/playlist/export.c:50
 #, fuzzy
@@ -19688,8 +19694,8 @@ msgid ""
 "in bytes"
 msgstr ""
 "Без опит за отгатване на ASF битрейта. Като настроите това ще можете да "
-"управлявате как Windows Media Player ще кешира съдържанието на поток. "
-"Настройка на аудио+видео битрейта в байта."
+"управлявате как Windows Media Player ще кешира съдържанието на потока. "
+"Настройване на битрейта на аудиото+видео то в байта."
 
 #: modules/mux/asf.c:69
 msgid "ASF muxer"
@@ -20063,7 +20069,7 @@ msgid ""
 "The SAP module normally chooses itself the right addresses to listen to. "
 "However, you can specify a specific address."
 msgstr ""
-"SAP модула обикновенно сам избира нужния адрес, който да слуша, но вие  "
+"SAP модула обикновенно сам избира нужния адрес на който да слуша, но вие  "
 "можете да изберете друг."
 
 #: modules/services_discovery/sap.c:89
@@ -20168,7 +20174,7 @@ msgstr ""
 
 #: modules/services_discovery/shout.c:73
 msgid "Shoutcast Radio"
-msgstr "Shoutcast радио"
+msgstr "Shoutcast радиостанция"
 
 #: modules/services_discovery/shout.c:74
 msgid "Shoutcast TV"
@@ -20185,7 +20191,7 @@ msgstr ""
 
 #: modules/services_discovery/shout.c:110
 msgid "Shoutcast radio listings"
-msgstr "Списък с Shoutcast радио"
+msgstr "Списък с Shoutcast радиостанции"
 
 #: modules/services_discovery/shout.c:117
 msgid "Shoutcast TV listings"
@@ -20835,7 +20841,7 @@ msgstr "Видео кодек, който ще бъде използван."
 #: modules/stream_out/transcode.c:62
 #: modules/stream_out/transrate/transrate.c:60
 msgid "Video bitrate"
-msgstr "Видео битрейт:"
+msgstr "Битрейт на видеото:"
 
 #: modules/stream_out/transcode.c:64
 msgid "Target bitrate of the transcoded video stream."
@@ -20909,7 +20915,7 @@ msgstr "Аудио кодек, който ще бъде използван."
 
 #: modules/stream_out/transcode.c:101
 msgid "Audio bitrate"
-msgstr "Аудио битрейт :"
+msgstr "Битрейт на аудиото :"
 
 #: modules/stream_out/transcode.c:103
 msgid "Target bitrate of the transcoded audio stream."
@@ -20972,7 +20978,7 @@ msgstr ""
 
 #: modules/stream_out/transcode.c:130 modules/video_filter/osdmenu.c:135
 msgid "OSD menu"
-msgstr "OSD меню"
+msgstr "Екранно меню"
 
 #: modules/stream_out/transcode.c:132
 msgid ""
@@ -21236,7 +21242,7 @@ msgid ""
 "Set the color to show if the user pauses the video. (Have light to get "
 "another beer?)"
 msgstr ""
-"Задаване на цвят, който да се показва, ако потребителя даде на пауза видеото."
+"Задаване на цвят, който да се показва, ако потребителя даде видеото на пауза."
 
 #: modules/video_filter/atmo/atmo.cpp:153
 msgid "Pause-Red"
@@ -21317,8 +21323,7 @@ msgstr "Използване на софтуерна настройка на б�
 msgid ""
 "Should the buildin driver do a white adjust or your LED stripes? recommend."
 msgstr ""
-"Вградения драйвер ли да настройва бялото и светодиодните светлинни шарки? "
-"(препоръчително)."
+"Вградения драйвер ли да настройва бялото или светодиодите? (препоръчително)."
 
 #: modules/video_filter/atmo/atmo.cpp:177
 msgid "White Red"
@@ -21326,7 +21331,7 @@ msgstr "Бяло - Червен компонент"
 
 #: modules/video_filter/atmo/atmo.cpp:178
 msgid "Red value of a pure white on your LED stripes."
-msgstr "Стойност на червеното за чисто бяло на светодиодните светлинни шарки."
+msgstr "Стойност на червеното за чисто бяла светлина на светодиодите."
 
 #: modules/video_filter/atmo/atmo.cpp:180
 msgid "White Green"
@@ -21334,7 +21339,7 @@ msgstr "Бяло - Зелен компонент"
 
 #: modules/video_filter/atmo/atmo.cpp:181
 msgid "Green value of a pure white on your LED stripes."
-msgstr "Стойност на зеленото за чисто бяло на светодиодните светлинни шарки."
+msgstr "Стойност на зеленото за чисто бяла светлина на светодиодите."
 
 #: modules/video_filter/atmo/atmo.cpp:183
 msgid "White Blue"
@@ -21342,7 +21347,7 @@ msgstr "Бяло - Син компонент"
 
 #: modules/video_filter/atmo/atmo.cpp:184
 msgid "Blue value of a pure white on your LED stripes."
-msgstr "Стойност на синьото за чисто бяло на светодиодните светлинни шарки."
+msgstr "Стойност на синьото за чисто бяла светлина на светодиодите."
 
 #: modules/video_filter/atmo/atmo.cpp:187
 msgid "Serial Port/Device"
@@ -21370,7 +21375,7 @@ msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:197
 msgid "Overall brightness of your LED stripes"
-msgstr "Пълна яркост на светодиодните светлинни шарки"
+msgstr "Пълна яркост на светлината на светодиодите"
 
 #: modules/video_filter/atmo/atmo.cpp:198
 msgid "Darkness Limit"
@@ -21454,7 +21459,7 @@ msgid ""
 "20ms should do the trick."
 msgstr ""
 "Помага да се получи синхрон между извежданото видео и светлинните ефекти. "
-"Със стойности около 20ms могат да се направят трикове."
+"Можете да направите проби със стойности около 20ms."
 
 #: modules/video_filter/atmo/atmo.cpp:237
 msgid "Channel summary"
@@ -21536,7 +21541,7 @@ msgstr ""
 
 #: modules/video_filter/atmo/atmo.cpp:271
 msgid "Filename of AtmoWinA.exe"
-msgstr "Име на файла на AtmoWinA.exe"
+msgstr "Път до файла AtmoWinA.exe"
 
 #: modules/video_filter/atmo/atmo.cpp:272
 msgid ""
@@ -21592,7 +21597,7 @@ msgstr "Промяна работата на канал (поправя греш
 
 #: modules/video_filter/atmo/atmo.cpp:422
 msgid "Adjust the white light to your LED stripes"
-msgstr "Настройка на бялата светлина на светодиодните светлинни шарки"
+msgstr "Настройка на бялата светлина на светодиодите"
 
 #: modules/video_filter/atmo/atmo.cpp:444
 msgid "Change gradients"
@@ -21620,7 +21625,7 @@ msgstr "Алфа стойност с която смесеното изобра�
 
 #: modules/video_filter/blendbench.c:58
 msgid "Image to be blended onto"
-msgstr "Изображение, което да бъде смесено"
+msgstr "Основно изображение при смесването"
 
 #: modules/video_filter/blendbench.c:59
 msgid "The image which will be used to blend onto"
@@ -21757,7 +21762,7 @@ msgstr "Настройка на пропорцията на видео плат�
 #: modules/video_filter/canvas.c:56
 #, fuzzy
 msgid "Padd video"
-msgstr "Вградено видео"
+msgstr "Вграждане на видеото в интерфейса"
 
 #: modules/video_filter/canvas.c:58
 msgid ""
@@ -22199,7 +22204,7 @@ msgstr "Инвертиране на цвета"
 
 #: modules/video_filter/logo.c:71
 msgid "Logo filenames"
-msgstr "Име на файла за лого"
+msgstr "Път до файла за лого"
 
 #: modules/video_filter/logo.c:72
 msgid ""
@@ -22253,17 +22258,17 @@ msgstr ""
 
 #: modules/video_filter/logo.c:90
 msgid "Logo position"
-msgstr "Задаване позицията на логото върху видеото."
+msgstr "Позиция на логото върху видеото."
 
 #: modules/video_filter/logo.c:92
 msgid ""
 "Enforce the logo position on the video (0=center, 1=left, 2=right, 4=top, "
 "8=bottom, you can also use combinations of these values, eg 6 = top-right)."
-msgstr "Задаване позицията на логото върху видеото."
+msgstr "Позиция на логото върху видеото."
 
 #: modules/video_filter/logo.c:106
 msgid "Logo sub filter"
-msgstr "Лого"
+msgstr "Лого върху видеото"
 
 #: modules/video_filter/logo.c:107
 msgid "Logo overlay"
@@ -22275,7 +22280,7 @@ msgstr "Лого върху видеото"
 
 #: modules/video_filter/magnify.c:50
 msgid "Magnify/Zoom interactive video filter"
-msgstr "Увеличаване/Мащабиране"
+msgstr "Лупа на екрана"
 
 #: modules/video_filter/magnify.c:51
 msgid "Magnify"
@@ -22293,16 +22298,16 @@ msgid ""
 "position (in %), $R = rate, $S = audio sample rate (in kHz), $T = time, $U = "
 "publisher, $V = volume, $_ = new line) "
 msgstr ""
-"Текст, който да се показва в скриващия се текст. (Налични са следните "
-"формати за низ: Отнасящи се до време: %Y = година, %m = месец, %d = ден, %H "
-"= час, %M = минута, %S = секунда, ... Отнасящи се до мета-данни: $a = "
-"изпълнител, $b = албум, $c = авторски права, $d = описание, $e = кодирано "
-"от, $g = жанр, $l = език, $n = номер на пътека, $p = сега се възпроизвежда, "
-"$r = рейтинг, $s = език за субтитрите, $t = заглавие, $u = url, $A = дата, "
-"$B = аудио битрейт (в kb/s), $C = глава,$D = времетраене, $F = пълното име с "
-"пътя, $I = заглавие, $L = изминало време, $N = име, $O = език за аудиото, $P "
-"= позиция (в %), $R = честота, $S = честота на дискретизация на аудиото (в "
-"kHz), $T = време, $U = издател, $V = том, $_ = нов ред) "
+"Текст който да се показва на екрана. (Налични са следните формати за низ: "
+"Отнасящи се до време: %Y = година, %m = месец, %d = ден, %H = час, %M = "
+"минута, %S = секунда, ... Отнасящи се до мета-данни: $a = изпълнител, $b = "
+"албум, $c = авторски права, $d = описание, $e = кодирано от, $g = жанр, $l = "
+"език, $n = номер на пътека, $p = сега се възпроизвежда, $r = рейтинг, $s = "
+"език за субтитрите, $t = заглавие, $u = url, $A = дата, $B = битрейт на "
+"аудиото (в kb/s), $C = глава,$D = времетраене, $F = пълното име с пътя, $I = "
+"заглавие, $L = изминало време, $N = име, $O = език за аудиото, $P = позиция "
+"(в %), $R = честота, $S = честота на дискретизация на аудиото (в kHz), $T = "
+"време, $U = издател, $V = том, $_ = нов ред) "
 
 #: modules/video_filter/marq.c:106 modules/video_filter/rss.c:143
 msgid "X offset, from the left screen edge."
@@ -22314,15 +22319,15 @@ msgstr "Отместване по Y, отгоре-надолу."
 
 #: modules/video_filter/marq.c:109
 msgid "Timeout"
-msgstr "Прекъсване"
+msgstr "Скриване на текста"
 
 #: modules/video_filter/marq.c:110
 msgid ""
 "Number of milliseconds the marquee must remain displayed. Default value is 0 "
 "(remains forever)."
 msgstr ""
-"Брой милисекунди, през които скриващия се текст трябва да се показва. По "
-"подразбиране е 0 (показва се винаги)."
+"Брой милисекунди, през които текста да се показва. По подразбиране е 0 "
+"(показва се винаги)."
 
 #: modules/video_filter/marq.c:113
 msgid "Refresh period in ms"
@@ -22334,7 +22339,7 @@ msgid ""
 "using meta data or time format string sequences."
 msgstr ""
 "Брой милисекунди между обновяванията на низа. Това е полезно, когато се "
-"използват мета-данни или низ за формата на времето."
+"използват мета-данни или низ с формат на времето."
 
 #: modules/video_filter/marq.c:130
 msgid "Marquee position"
@@ -22345,7 +22350,7 @@ msgid ""
 "You can enforce the marquee position on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
-msgstr "Задаване позицията на скриващия се текст върху видеото."
+msgstr "Позиция на скриващия се текст върху видеото."
 
 #: modules/video_filter/marq.c:148
 msgid "Marquee"
@@ -22665,24 +22670,24 @@ msgstr "Конфигурационен файл"
 
 #: modules/video_filter/osdmenu.c:45
 msgid "Configuration file for the OSD Menu."
-msgstr "Конфигурационен файл за OSD менюто."
+msgstr "Конфигурационен файл за екранното меню."
 
 #: modules/video_filter/osdmenu.c:46
 msgid "Path to OSD menu images"
-msgstr "Път до изображения за OSD менюто"
+msgstr "Път до изображения за екранното меню"
 
 #: modules/video_filter/osdmenu.c:48
 msgid ""
 "Path to the OSD menu images. This will override the path defined in the OSD "
 "configuration file."
 msgstr ""
-"Път до изображения за OSD менюто. Това ще подмени зададения в "
+"Път до изображения за екранното меню. Това ще подмени зададения в "
 "конфигурационния файл път."
 
 #: modules/video_filter/osdmenu.c:52 modules/video_filter/osdmenu.c:55
 msgid "You can move the OSD menu by left-clicking on it."
 msgstr ""
-"Можете да преместите OSD менюто, като щракнете с левия бутон върху него."
+"Можете да преместите екранното меню, като щракнете с левия бутон върху него."
 
 #: modules/video_filter/osdmenu.c:57
 msgid "Menu position"
@@ -22693,7 +22698,7 @@ msgid ""
 "You can enforce the OSD menu position on the video (0=center, 1=left, "
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg. "
 "6 = top-right)."
-msgstr "Задаване позицията на OSD менюто върху видеото."
+msgstr "Позиция на екранното меню върху видеото."
 
 #: modules/video_filter/osdmenu.c:63
 msgid "Menu timeout"
@@ -22705,9 +22710,9 @@ msgid ""
 "remaining time. This will ensure that they are at least the specified time "
 "visible."
 msgstr ""
-"Изображенията на OSD менюто стандартно прекъсват след 15 секунди добавени "
-"към оставащото им време. Това ще осигури, че те ще са видими и при най-"
-"малкото зададено време."
+"Изображенията на екранното меню стандартно прекъсват след 15 секунди "
+"добавени към оставащото им време. Това ще осигури, че те ще са видими и при "
+"най-малкото зададено време."
 
 #: modules/video_filter/osdmenu.c:69
 msgid "Menu update interval"
@@ -22720,8 +22725,8 @@ msgid ""
 "careful with this option as encoding OSD menu pictures is very computing "
 "intensive. The range is 0 - 1000 ms."
 msgstr ""
-"По подразбиране обновяването на изображението с OSD менюто е на всеки 200 "
-"ms. Задайте по-кратко време за обновяване, ако забележите грешки в "
+"По подразбиране обновяването на изображението с екранното меню е на всеки "
+"200 ms. Задайте по-кратко време за обновяване, ако забележите грешки в "
 "изображението. Бъдете внимателни, тъй като тази опция може силно да натовари "
 "процесора. Допустимите стойности са в обхвата от 0 до 1000 ms."
 
@@ -22736,10 +22741,10 @@ msgid ""
 "transparency. The default is being not transparent (value 255) the minimum "
 "is fully transparent (value 0)."
 msgstr ""
-"Прозрачността на OSD менюто може да бъде променена, като се зададе стойност "
-"между 0 и 255. По-малките стойности задават по-голяма прозрачност, по-"
-"големите стойности означават по-малка прозрачност. По подразбиране е да не е "
-"прозрачно (стойност 255), минимума е напълно прозрачно (стойност 0)."
+"Прозрачността на екранното меню може да бъде променена, като се зададе "
+"стойност между 0 и 255. По-малките стойности задават по-голяма прозрачност, "
+"по-големите стойности означават по-малка прозрачност. По подразбиране е да "
+"не е прозрачно (стойност 255), минимума е напълно прозрачно (стойност 0)."
 
 #: modules/video_filter/osdmenu.c:134
 msgid "On Screen Display menu"
@@ -23037,11 +23042,11 @@ msgstr "Халюцинация"
 
 #: modules/video_filter/puzzle.c:65 modules/video_filter/puzzle.c:66
 msgid "Number of puzzle rows"
-msgstr "Брой редове за пъзела"
+msgstr "Брой редове на пъзела"
 
 #: modules/video_filter/puzzle.c:67 modules/video_filter/puzzle.c:68
 msgid "Number of puzzle columns"
-msgstr "Брой колони за пъзела"
+msgstr "Брой колони на пъзела"
 
 #: modules/video_filter/puzzle.c:69
 msgid "Make one tile a black slot"
@@ -23109,22 +23114,22 @@ msgstr ""
 
 #: modules/video_filter/remoteosd.c:94
 msgid "Mouse events"
-msgstr "Събития с мишката"
+msgstr "Действия с мишката"
 
 #: modules/video_filter/remoteosd.c:96
 msgid ""
 "Send mouse events to VNC host. Not needed for use as VDR ffnetdev client."
 msgstr ""
-"Изпращане на събития с мишката до хоста на VNC. Не е нужно за използване "
+"Изпращане на действия с мишката до хоста на VNC. Не е нужно за използване "
 "като VDR ffnetdev клиент."
 
 #: modules/video_filter/remoteosd.c:98
 msgid "Key events"
-msgstr "Събития с клавиш"
+msgstr "Действия с клавиш"
 
 #: modules/video_filter/remoteosd.c:100
 msgid "Send key events to VNC host."
-msgstr "Изпращане на събития с клавиш до хоста на VNC."
+msgstr "Изпращане на действия с клавиш до хоста на VNC."
 
 #: modules/video_filter/remoteosd.c:104
 msgid ""
@@ -23133,18 +23138,18 @@ msgid ""
 "transparency. The default is being not transparent (value 255) the minimum "
 "is fully transparent (value 0)."
 msgstr ""
-"Прозрачността на OSD менюто може да бъде променена, като се зададе стойност "
-"между 0 и 255. По-малките стойности задават по-голяма прозрачност, по-"
-"големите стойности означават по-малка прозрачност. По подразбиране е да не е "
-"прозрачно (стойност 255), минимума е напълно прозрачно (стойност 0)."
+"Прозрачността на екранното меню може да бъде променена, като се зададе "
+"стойност между 0 и 255. По-малките стойности задават по-голяма прозрачност, "
+"по-големите стойности означават по-малка прозрачност. По подразбиране е да "
+"не е прозрачно (стойност 255), минимума е напълно прозрачно (стойност 0)."
 
 #: modules/video_filter/remoteosd.c:119
 msgid "Remote-OSD over VNC"
-msgstr "Отдалечено-OSD през VNC"
+msgstr "Дистанционно-Екранно меню през VNC"
 
 #: modules/video_filter/remoteosd.c:121
 msgid "Remote-OSD"
-msgstr "Отдалечено-OSD"
+msgstr "Дистанционно-Екранно меню"
 
 #: modules/video_filter/ripple.c:53
 msgid "Ripple video filter"
@@ -23223,7 +23228,7 @@ msgid ""
 "You can enforce the text position on the video (0=center, 1=left, 2=right, "
 "4=top, 8=bottom; you can also use combinations of these values, eg 6 = top-"
 "right)."
-msgstr "Задаване позицията на текста върху видеото."
+msgstr "Позиция на текста върху видеото."
 
 #: modules/video_filter/rss.c:166
 msgid "Title display mode"
@@ -23507,12 +23512,12 @@ msgstr "Изключване"
 #: modules/video_output/drawable.c:44
 #, fuzzy
 msgid "Embedded X window video"
-msgstr "Вградено видео"
+msgstr "Вграждане на видеото в интерфейса"
 
 #: modules/video_output/drawable.c:51
 #, fuzzy
 msgid "Embedded Windows video"
-msgstr "Вградено видео"
+msgstr "Вграждане на видеото в интерфейса"
 
 #: modules/video_output/fb.c:83
 msgid "Run fb on current tty."
@@ -23651,7 +23656,7 @@ msgstr ""
 msgid "DirectX video output"
 msgstr "Извеждане на видеото чрез DirectX"
 
-#: modules/video_output/msw/directx.c:325
+#: modules/video_output/msw/directx.c:323
 msgid "Wallpaper"
 msgstr "Възпроизвеждане на Десктоп"
 
@@ -24330,6 +24335,9 @@ msgstr "Анализатор на спектъра"
 #~ msgid "Turkish"
 #~ msgstr "Турски"
 
+#~ msgid "Ukrainian"
+#~ msgstr "Украински"
+
 #~ msgid "Access filter module"
 #~ msgstr "Модул за филтриране на въвеждането"
 
@@ -24341,15 +24349,16 @@ msgstr "Анализатор на спектъра"
 
 #~ msgid "(Experimental) Minimize latency whenreading live stream."
 #~ msgstr ""
-#~ "(Експериментално) Минимално задържането в кеша при четене на поток в "
-#~ "реално време."
+#~ "(Експериментално) Минимално задържане в кеша при четене на поток в реално "
+#~ "време"
 
-#, fuzzy
 #~ msgid "Cancelled"
-#~ msgstr "Отказ"
+#~ msgstr "Отменен"
 
 #~ msgid "High Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
-#~ msgstr "Висок приоритет на FEC честотата [Неопределено,1/2,2/3,3/4,5/6,7/8]"
+#~ msgstr ""
+#~ "Висок приоритет на FEC (ускорено поправяне на грешки) "
+#~ "[Неопределено,1/2,2/3,3/4,5/6,7/8]"
 
 #~ msgid "Illegal Polarization"
 #~ msgstr "Невалидна поляризация"
@@ -24554,9 +24563,8 @@ msgstr "Анализатор на спектъра"
 #~ msgid "Access Filter"
 #~ msgstr "Филтър за въвеждане"
 
-#, fuzzy
 #~ msgid "Save As:"
-#~ msgstr "Запис"
+#~ msgstr "Запис като:"
 
 #~ msgid " State    : Stopped %s"
 #~ msgstr " Състояние    : Спрян %s"
