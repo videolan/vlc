@@ -122,7 +122,7 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
     }
     else
     {
-        menu->addAction( text, THEMIM, member );
+        action = menu->addAction( text, THEMIM, member );
     }
     action->setData( "ignore" );
 }
