@@ -126,7 +126,7 @@ void BookmarksDialog::update()
     {
         // List with the differents elements of the row
         QStringList row;
-        row << QString( pp_bookmarks[i]->psz_name );
+        row << QString( qfu( pp_bookmarks[i]->psz_name ) );
         row << QString( "%1" ).arg( pp_bookmarks[i]->i_byte_offset );
         int total = pp_bookmarks[i]->i_time_offset/ 1000000;
         int hour = total / (60*60);
