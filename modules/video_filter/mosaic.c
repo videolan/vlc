@@ -288,6 +288,7 @@ static int CreateFilter( vlc_object_t *p_this )
     char *psz_offsets;
     int i_index;
     vlc_value_t val;
+    int i_command;
 
     /* The mosaic thread is more important than the decoder threads */
     vlc_thread_set_priority( p_this, VLC_THREAD_PRIORITY_OUTPUT );
@@ -310,8 +311,8 @@ static int CreateFilter( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
 #define GET_VAR( name, min, max )                                           \
-    p_sys->i_##name = __MIN( max, __MAX( min,                               \
-        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name ) ) );      \
+    i_command = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name );  \
+    p_sys->i_##name = __MIN( max, __MAX( min, i_command ) );                \
     var_AddCallback( p_filter, CFG_PREFIX #name, MosaicCallback, p_sys );
 
     GET_VAR( width, 0, INT_MAX );
@@ -330,6 +331,7 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( alpha, 0, 255 );
     GET_VAR( position, 0, 2 );
     GET_VAR( delay, 100, INT_MAX );
+#undef GET_VAR
     p_sys->i_delay *= 1000;
 
     p_sys->b_ar = var_CreateGetBoolCommand( p_filter,
