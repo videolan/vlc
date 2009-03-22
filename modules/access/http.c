@@ -114,6 +114,7 @@ vlc_module_begin ()
               RECONNECT_LONGTEXT, true )
     add_bool( "http-continuous", 0, NULL, CONTINUOUS_TEXT,
               CONTINUOUS_LONGTEXT, true )
+        change_safe()
     add_bool( "http-forward-cookies", true, NULL, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
     add_obsolete_string("http-user")
