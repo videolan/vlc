@@ -189,7 +189,10 @@ void FileOpenPanel::updateMRL()
     QString mrl;
 
     for( int i = 0; i < ui.fileListWidg->count(); i++ )
-        fileList << ui.fileListWidg->item( i )->text();
+    {
+        if( !ui.fileListWidg->item( i )->text().isEmpty() )
+            fileList << ui.fileListWidg->item( i )->text();
+    }
 
     if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
         mrl.append( " :sub-file=" + colon_escape( ui.subInput->text() ) );
