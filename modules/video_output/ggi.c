@@ -274,7 +274,6 @@ static int Manage( vout_thread_t *p_vout )
     struct timeval tv = { 0, 1000 };                        /* 1 millisecond */
     gii_event_mask mask;
     gii_event      event;
-    vlc_value_t    val;
 
     mask = emKeyboard | emPtrButtonPress | emPtrButtonRelease;
 
@@ -380,7 +379,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Open display */
-    psz_display = config_GetPsz( p_vout, "ggi_display" );
+    psz_display = config_GetPsz( p_vout, "ggi-display" );
 
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     free( psz_display );
