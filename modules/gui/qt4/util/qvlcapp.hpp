@@ -28,6 +28,10 @@
 #include <QApplication>
 #include <QEvent>
 
+#if defined(Q_WS_WIN)
+#   include <windows.h>
+#endif
+
 class QVLCApp : public QApplication
 {
     Q_OBJECT
