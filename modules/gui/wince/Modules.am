@@ -1,6 +1,7 @@
 SUFFIXES += .rc
-.rc.o:
-	$(WINDRES) -DUNDER_CE -D__MINGW32__ -I. -I$(srcdir) -i $< -o $@
+
+wince_rc.o: $(top_srcdir)/modules/gui/wince/wince_rc.rc
+	$(WINDRES) --include-dir $(top_srcdir)/modules/gui/wince/ -i $< -o $@
 
 SOURCES_wince = \
 	wince.cpp \
@@ -19,12 +20,13 @@ SOURCES_wince = \
 	subtitles.cpp \
 	timer.cpp \
 	video.cpp \
-	wince_rc.rc \
 	$(NULL)
 
 EXTRA_DIST += \
-    wince_rc.rc \
+	wince_rc.rc \
 	bitmaps/vlc16x16.ico \
 	bitmaps/toolbar1.bmp \
 	bitmaps/toolbar2.bmp \
 	bitmaps/toolbar3.bmp
+
+BUILT_SOURCES += wince_rc.o
