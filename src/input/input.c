@@ -1341,12 +1341,14 @@ static void End( input_thread_t * p_input )
 #undef CL_CO
     }
 
+    vlc_mutex_lock( &p_input->p->p_item->lock );
     if( p_input->p->i_attachment > 0 )
     {
         for( i = 0; i < p_input->p->i_attachment; i++ )
             vlc_input_attachment_Delete( p_input->p->attachment[i] );
         TAB_CLEAN( p_input->p->i_attachment, p_input->p->attachment );
     }
+    vlc_mutex_unlock( &p_input->p->p_item->lock );
 
     /* */
     input_resource_RequestSout( p_input->p->p_resource,
