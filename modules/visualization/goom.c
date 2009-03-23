@@ -133,8 +133,8 @@ static int Open( vlc_object_t *p_this )
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
     goom_thread_t     *p_thread;
-    vlc_value_t       width, height;
-    video_format_t    fmt;
+    int                width, height;
+    video_format_t     fmt;
 
 
     if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
@@ -160,17 +160,15 @@ static int Open( vlc_object_t *p_this )
         vlc_object_create( p_filter, sizeof( goom_thread_t ) );
     vlc_object_attach( p_thread, p_this );
 
-    var_Create( p_thread, "goom-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_thread, "goom-width", &width );
-    var_Create( p_thread, "goom-height", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_thread, "goom-height", &height );
+    width = var_CreateGetInteger( p_thread, "goom-width" );
+    height = var_CreateGetInteger( p_thread, "goom-height" );
 
     memset( &fmt, 0, sizeof(video_format_t) );
 
-    fmt.i_width = fmt.i_visible_width = width.i_int;
-    fmt.i_height = fmt.i_visible_height = height.i_int;
+    fmt.i_width = fmt.i_visible_width = width;
+    fmt.i_height = fmt.i_visible_height = height;
     fmt.i_chroma = VLC_FOURCC('R','V','3','2');
-    fmt.i_aspect = VOUT_ASPECT_FACTOR * width.i_int/height.i_int;
+    fmt.i_aspect = VOUT_ASPECT_FACTOR * width/height;
     fmt.i_sar_num = fmt.i_sar_den = 1;
 
     p_thread->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );
@@ -324,22 +322,21 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
 static void* Thread( vlc_object_t *p_this )
 {
     goom_thread_t *p_thread = (goom_thread_t*)p_this;
-    vlc_value_t width, height, speed;
+    int width, height, speed;
     audio_date_t i_pts;
     int16_t p_data[2][512];
     int i_data = 0, i_count = 0;
     PluginInfo *p_plugin_info;
     int canc = vlc_savecancel ();
 
-    var_Get( p_this, "goom-width", &width );
-    var_Get( p_this, "goom-height", &height );
+    width = var_GetInteger( p_this, "goom-width" );
+    height = var_GetInteger( p_this, "goom-height" );
 
-    var_Create( p_thread, "goom-speed", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_thread, "goom-speed", &speed );
-    speed.i_int = MAX_SPEED - speed.i_int;
-    if( speed.i_int < 0 ) speed.i_int = 0;
+    speed = var_CreateGetInteger( p_thread, "goom-speed" );
+    speed = MAX_SPEED - speed;
+    if( speed < 0 ) speed = 0;
 
-    p_plugin_info = goom_init( width.i_int, height.i_int );
+    p_plugin_info = goom_init( width, height );
 
     while( vlc_object_alive (p_thread) )
     {
@@ -354,7 +351,7 @@ static void* Thread( vlc_object_t *p_this )
         vlc_mutex_unlock( &p_thread->lock );
 
         /* Speed selection */
-        if( speed.i_int && (++i_count % (speed.i_int+1)) ) continue;
+        if( speed && (++i_count % (speed+1)) ) continue;
 
         /* Frame dropping if necessary */
         if( aout_DateGet( &i_pts ) + GOOM_DELAY <= mdate() ) continue;
@@ -373,7 +370,7 @@ static void* Thread( vlc_object_t *p_this )
 
         if( p_pic == NULL ) break;
 
-        memcpy( p_pic->p[0].p_pixels, plane, width.i_int * height.i_int * 4 );
+        memcpy( p_pic->p[0].p_pixels, plane, width * height * 4 );
 
         p_pic->date = aout_DateGet( &i_pts ) + GOOM_DELAY;
         vout_DisplayPicture( p_thread->p_vout, p_pic );
