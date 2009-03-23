@@ -1,17 +1,17 @@
 Index: configure
 ===================================================================
---- configure	(révision 17381)
-+++ configure	(copie de travail)
-@@ -1359,7 +1359,7 @@
+--- configure.orig	2009-03-23 18:20:30.339627360 +0000
++++ configure	2009-03-23 18:25:12.457447960 +0000
+@@ -1438,7 +1438,7 @@
      die "C compiler test failed."
  fi
  
 -check_cflags -std=c99
 +#check_cflags -std=c99
- 
- case "$arch" in
-     i386|i486|i586|i686|i86pc|BePC)
-@@ -1531,8 +1531,8 @@
+ check_cc -D_FILE_OFFSET_BITS=64 <<EOF && add_cflags -D_FILE_OFFSET_BITS=64
+ #include <stdlib.h>
+ EOF
+@@ -1611,8 +1611,8 @@
          objformat="win32"
          enable dos_paths
          if ! enabled x86_64; then
