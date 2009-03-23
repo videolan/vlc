@@ -320,8 +320,10 @@ static void Destructor( input_thread_t * p_input )
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
 
     for( int i = 0; i < p_input->p->i_control; i++ )
-        ControlRelease( p_input->p->control[i].i_type,
-                        p_input->p->control[i].val );
+    {
+        input_control_t *p_ctrl = &p_input->p->control[i];
+        ControlRelease( p_ctrl->i_type, p_ctrl->val );
+    }
 
     vlc_cond_destroy( &p_input->p->wait_control );
     vlc_mutex_destroy( &p_input->p->lock_control );
@@ -1370,15 +1372,16 @@ void input_ControlPush( input_thread_t *p_input,
     vlc_mutex_lock( &p_input->p->lock_control );
     if( i_type == INPUT_CONTROL_SET_DIE )
     {
-        for( int i = 0; i < p_input->p->i_control; i++ )
-            ControlRelease( p_input->p->control[i].i_type,
-                            p_input->p->control[i].val );
         /* Special case, empty the control */
-        p_input->p->i_control = 1;
-        p_input->p->control[0].i_type = i_type;
-        memset( &p_input->p->control[0].val, 0, sizeof( vlc_value_t ) );
+        for( int i = 0; i < p_input->p->i_control; i++ )
+        {
+            input_control_t *p_ctrl = &p_input->p->control[i];
+            ControlRelease( p_ctrl->i_type, p_ctrl->val );
+        }
+        p_input->p->i_control = 0;
     }
-    else if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
+
+    if( p_input->p->i_control >= INPUT_CONTROL_FIFO_SIZE )
     {
         msg_Err( p_input, "input control fifo overflow, trashing type=%d",
                  i_type );
@@ -1387,14 +1390,14 @@ void input_ControlPush( input_thread_t *p_input,
     }
     else
     {
-        p_input->p->control[p_input->p->i_control].i_type = i_type;
+        input_control_t c;
+        c.i_type = i_type;
         if( p_val )
-            p_input->p->control[p_input->p->i_control].val = *p_val;
+            c.val = *p_val;
         else
-            memset( &p_input->p->control[p_input->p->i_control].val, 0,
-                    sizeof( vlc_value_t ) );
+            memset( &c, 0, sizeof(c) );
 
-        p_input->p->i_control++;
+        p_input->p->control[p_input->p->i_control++] = c;
     }
     vlc_cond_signal( &p_input->p->wait_control );
     vlc_mutex_unlock( &p_input->p->lock_control );

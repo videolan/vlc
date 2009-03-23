@@ -75,6 +75,12 @@ typedef struct
 
 } input_source_t;
 
+typedef struct
+{
+    int         i_type;
+    vlc_value_t val;
+} input_control_t;
+
 /** Private input fields */
 struct input_thread_private_t
 {
@@ -158,13 +164,8 @@ struct input_thread_private_t
     vlc_mutex_t lock_control;
     vlc_cond_t  wait_control;
     int i_control;
-    struct
-    {
-        /* XXX for string value you have to allocate it before calling
-         * input_ControlPush */
-        int         i_type;
-        vlc_value_t val;
-    } control[INPUT_CONTROL_FIFO_SIZE];
+    input_control_t control[INPUT_CONTROL_FIFO_SIZE];
+
     bool b_abort;
 };
 
@@ -215,6 +216,10 @@ enum input_control_e
 };
 
 /* Internal helpers */
+
+/* XXX for string value you have to allocate it before calling
+ * input_ControlPush
+ */
 void input_ControlPush( input_thread_t *, int i_type, vlc_value_t * );
 
 /**********************************************************************
