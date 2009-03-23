@@ -500,9 +500,13 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     }
     else if( !b_drawpicture )
     {
+        /* It creates broken picture
+         * FIXME either our parser or ffmpeg is broken */
+#if 0
         if( p_sys->b_hurry_up )
             p_sys->p_context->skip_frame = __MAX( p_sys->p_context->skip_frame,
                                                   AVDISCARD_NONREF );
+#endif
     }
 
     /*
