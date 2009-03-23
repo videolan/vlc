@@ -75,7 +75,8 @@ static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
 
 static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
 static void       ControlReduce( input_thread_t * );
-static bool Control( input_thread_t *, int, vlc_value_t );
+static void       ControlRelease( int i_type, vlc_value_t val );
+static bool       Control( input_thread_t *, int, vlc_value_t );
 
 static int  UpdateTitleSeekpointFromAccess( input_thread_t * );
 static void UpdateGenericFromAccess( input_thread_t * );
@@ -317,6 +318,10 @@ static void Destructor( input_thread_t * p_input )
     vlc_gc_decref( p_input->p->p_item );
 
     vlc_mutex_destroy( &p_input->p->counters.counters_lock );
+
+    for( int i = 0; i < p_input->p->i_control; i++ )
+        ControlRelease( p_input->p->control[i].i_type,
+                        p_input->p->control[i].val );
 
     vlc_cond_destroy( &p_input->p->wait_control );
     vlc_mutex_destroy( &p_input->p->lock_control );
@@ -1365,6 +1370,9 @@ void input_ControlPush( input_thread_t *p_input,
     vlc_mutex_lock( &p_input->p->lock_control );
     if( i_type == INPUT_CONTROL_SET_DIE )
     {
+        for( int i = 0; i < p_input->p->i_control; i++ )
+            ControlRelease( p_input->p->control[i].i_type,
+                            p_input->p->control[i].val );
         /* Special case, empty the control */
         p_input->p->i_control = 1;
         p_input->p->control[0].i_type = i_type;
@@ -1374,6 +1382,8 @@ void input_ControlPush( input_thread_t *p_input,
     {
         msg_Err( p_input, "input control fifo overflow, trashing type=%d",
                  i_type );
+        if( p_val )
+            ControlRelease( i_type, *p_val );
     }
     else
     {
@@ -1468,6 +1478,21 @@ static void ControlReduce( input_thread_t *p_input )
     }
     vlc_mutex_unlock( &p_input->p->lock_control );
 }
+
+static void ControlRelease( int i_type, vlc_value_t val )
+{
+    switch( i_type )
+    {
+    case INPUT_CONTROL_ADD_SUBTITLE:
+    case INPUT_CONTROL_ADD_SLAVE:
+        free( val.psz_string );
+        break;
+
+    default:
+        break;
+    }
+}
+
 /* Pause input */
 static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
 {
@@ -1534,8 +1559,8 @@ static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
         es_out_SetPauseState( p_input->p->p_es_out, false, false, i_control_date );
 }
 
-static bool Control( input_thread_t *p_input, int i_type,
-                           vlc_value_t val )
+static bool Control( input_thread_t *p_input,
+                     int i_type, vlc_value_t val )
 {
     const mtime_t i_control_date = mdate();
     /* FIXME b_force_update is abused, it should be carefully checked */
@@ -1977,10 +2002,7 @@ static bool Control( input_thread_t *p_input, int i_type,
 
         case INPUT_CONTROL_ADD_SUBTITLE:
             if( val.psz_string )
-            {
                 SubtitleAdd( p_input, val.psz_string, true );
-                free( val.psz_string );
-            }
             break;
 
         case INPUT_CONTROL_ADD_SLAVE:
@@ -2032,8 +2054,6 @@ static bool Control( input_thread_t *p_input, int i_type,
                     msg_Warn( p_input, "failed to add %s as slave",
                               val.psz_string );
                 }
-
-                free( val.psz_string );
             }
             break;
 
@@ -2120,6 +2140,7 @@ static bool Control( input_thread_t *p_input, int i_type,
             break;
     }
 
+    ControlRelease( i_type, val );
     return b_force_update;
 }
 
