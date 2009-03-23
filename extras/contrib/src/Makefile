@@ -1316,6 +1316,7 @@ ifneq ($(DARWIN_COMPILER),LLVMGCC)
 	patch -p0 < Patches/goom2k4-0-mmx.patch
 endif
 endif
+patch -p0 < Patches/goom2k4-0-memleaks.patch
 
 .goom2k4: goom
 ifdef HAVE_DARWIN_OS
