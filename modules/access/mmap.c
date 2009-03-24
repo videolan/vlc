@@ -226,7 +226,7 @@ static block_t *Block (access_t *p_access)
     if (addr == MAP_FAILED)
     {
         msg_Err (p_access, "memory mapping failed (%m)");
-        dialog_Fatal (p_access, _("File reading failed"),
+        dialog_Fatal (p_access, _("File reading failed"), "%s",
                         _("VLC could not read the file."));
         goto fatal;
     }

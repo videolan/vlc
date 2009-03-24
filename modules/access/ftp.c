@@ -133,7 +133,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( fd == -1 )
     {
         msg_Err( p_access, "connection failed" );
-        dialog_Fatal( p_access, _("Network interaction failed"),
+        dialog_Fatal( p_access, _("Network interaction failed"), "%s",
                         _("VLC could not connect with the given server.") );
         return -1;
     }
@@ -143,7 +143,7 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
     if( i_answer / 100 != 2 )
     {
         msg_Err( p_access, "connection rejected" );
-        dialog_Fatal( p_access, _("Network interaction failed"),
+        dialog_Fatal( p_access, _("Network interaction failed"), "%s",
                         _("VLC's connection to the given server was rejected.") );
         return -1;
     }
@@ -208,8 +208,8 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                     {
                         msg_Err( p_access, "account rejected" );
                         dialog_Fatal( p_access,
-                                        _("Network interaction failed"),
-                                        _("Your account was rejected.") );
+                                      _("Network interaction failed"),
+                                      "%s", _("Your account was rejected.") );
                         return -1;
                     }
                     msg_Dbg( p_access, "account accepted" );
@@ -218,13 +218,13 @@ static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
                 default:
                     msg_Err( p_access, "password rejected" );
                     dialog_Fatal( p_access, _("Network interaction failed"),
-                                    _("Your password was rejected.") );
+                                  "%s",  _("Your password was rejected.") );
                     return -1;
             }
             break;
         default:
             msg_Err( p_access, "user rejected" );
-            dialog_Fatal( p_access, _("Network interaction failed"),
+            dialog_Fatal( p_access, _("Network interaction failed"), "%s",
                         _("Your connection attempt to the server was rejected.") );
             return -1;
     }
