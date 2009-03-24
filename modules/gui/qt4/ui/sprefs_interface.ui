@@ -23,7 +23,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="languageLabel">
      <property name="text">
-      <string>_(&quot;Language&quot;)</string>
+      <string>Language</string>
      </property>
     </widget>
    </item>
@@ -33,27 +33,27 @@
    <item row="2" column="0" colspan="2">
     <widget class="QGroupBox" name="OneInterfaceBox">
      <property name="title">
-      <string>_(&quot;Instances&quot;)</string>
+      <string>Instances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
        <widget class="QCheckBox" name="OneInterfaceMode">
         <property name="text">
-         <string>_(&quot;Allow only one instance&quot;)</string>
+         <string>Allow only one instance</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="assoName">
         <property name="text">
-         <string>_(&quot;File associations:&quot;)</string>
+         <string>File associations:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1" colspan="2">
        <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
         <property name="text">
-         <string>_(&quot;Enqueue files when in one instance mode&quot;)</string>
+         <string>Enqueue files when in one instance mode</string>
         </property>
        </widget>
       </item>
@@ -66,7 +66,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>_(&quot;Association Setup&quot;)</string>
+         <string>Association Setup</string>
         </property>
        </widget>
       </item>
@@ -76,20 +76,20 @@
    <item row="3" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>_(&quot;Privacy / Network Interaction&quot;)</string>
+      <string>Privacy / Network Interaction</string>
      </property>
      <layout class="QGridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="artFetchLabel">
         <property name="text">
-         <string>_(&quot;Album art download policy&quot;)</string>
+         <string>Album art download policy</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="updatesBox">
         <property name="text">
-         <string>_(&quot;Activate update notifier&quot;)</string>
+         <string>Activate update notifier</string>
         </property>
        </widget>
       </item>
@@ -106,7 +106,7 @@
       <item row="2" column="0">
        <widget class="QCheckBox" name="saveRecentlyPlayed">
         <property name="text">
-         <string>_(&quot;Save recently played items&quot;)</string>
+         <string>Save recently played items</string>
         </property>
        </widget>
       </item>
@@ -118,7 +118,7 @@
         <item>
          <widget class="QLabel" name="filterLabel">
           <property name="text">
-           <string>_(&quot;Filter&quot;)</string>
+           <string>Filter</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -140,7 +140,7 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>_(&quot;Separate words by | (without space)&quot;)</string>
+           <string>Separate words by | (without space)</string>
           </property>
          </widget>
         </item>
@@ -152,13 +152,13 @@
    <item row="1" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>_(&quot;Interface Type&quot;)</string>
+      <string>Interface Type</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="2">
        <widget class="QRadioButton" name="qt4">
         <property name="text">
-         <string>_(&quot;Native&quot;)</string>
+         <string>Native</string>
         </property>
        </widget>
       </item>
@@ -174,7 +174,7 @@
          <enum>QFrame::NoFrame</enum>
         </property>
         <property name="text">
-         <string>_(&quot;This is VLC's default interface, with a native look and feel.&quot;)</string>
+         <string>This is VLC's default interface, with a native look and feel.</string>
         </property>
         <property name="textFormat">
          <enum>Qt::RichText</enum>
@@ -196,7 +196,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>_(&quot;Display mode&quot;)</string>
+         <string>Display mode</string>
         </property>
        </widget>
       </item>
@@ -213,21 +213,21 @@
       <item row="2" column="2" colspan="2">
        <widget class="QCheckBox" name="embedVideo">
         <property name="text">
-         <string>_(&quot;Integrate video in interface&quot;)</string>
+         <string>Integrate video in interface</string>
         </property>
        </widget>
       </item>
       <item row="3" column="2" colspan="2">
        <widget class="QCheckBox" name="fsController">
         <property name="text">
-         <string>_(&quot;Show a controller in fullscreen&quot;)</string>
+         <string>Show a controller in fullscreen</string>
         </property>
        </widget>
       </item>
       <item row="5" column="0" colspan="2">
        <widget class="QRadioButton" name="skins">
         <property name="text">
-         <string>_(&quot;Skins&quot;)</string>
+         <string>Skins</string>
         </property>
        </widget>
       </item>
@@ -268,7 +268,7 @@
       <item row="6" column="0" colspan="2">
        <widget class="QLabel" name="skinFileLabel">
         <property name="text">
-         <string>_(&quot;Skin file&quot;)</string>
+         <string>Skin file</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -297,7 +297,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>_(&quot;Browse...&quot;)</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>
@@ -311,14 +311,14 @@
       <item row="3" column="4" colspan="2">
        <widget class="QCheckBox" name="systrayBox">
         <property name="text">
-         <string>_(&quot;Systray icon&quot;)</string>
+         <string>Systray icon</string>
         </property>
        </widget>
       </item>
       <item row="2" column="4" colspan="2">
        <widget class="QCheckBox" name="resizingBox">
         <property name="text">
-         <string>_(&quot;Resize interface to video size&quot;)</string>
+         <string>Resize interface to video size</string>
         </property>
        </widget>
       </item>

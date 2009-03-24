@@ -16,7 +16,7 @@
    <item row="0" column="0" colspan="2" >
     <widget class="QLabel" name="label" >
      <property name="text" >
-      <string>_("Podcast URLs list")</string>
+      <string>Podcast URLs list</string>
      </property>
     </widget>
    </item>
@@ -36,7 +36,7 @@
    <item row="2" column="0" >
     <widget class="QLabel" name="label2" >
      <property name="text" >
-      <string>_("URL")</string>
+      <string>URL</string>
      </property>
     </widget>
    </item>
@@ -46,7 +46,7 @@
    <item row="2" column="2" >
     <widget class="QPushButton" name="podcastAdd" >
      <property name="text" >
-      <string>_("Add")</string>
+      <string>Add</string>
      </property>
      <property name="icon" >
       <iconset resource="../vlc.qrc" >:/pixmaps/play.png</iconset>
@@ -56,7 +56,7 @@
    <item row="2" column="3" >
     <widget class="QPushButton" name="podcastDelete" >
      <property name="text" >
-      <string>_("Delete")</string>
+      <string>Delete</string>
      </property>
      <property name="icon" >
       <iconset resource="../vlc.qrc" >:/pixmaps/vlc_quit_16px.png</iconset>

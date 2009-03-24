@@ -12,7 +12,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>_(&quot;Stream Output&quot;)</string>
+   <string>Stream Output</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -30,7 +30,7 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>_(&quot;Source&quot;)</string>
+       <string>Source</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0" colspan="2">
@@ -121,7 +121,7 @@
        <item row="3" column="1">
         <widget class="QPushButton" name="nextButton">
          <property name="text">
-          <string>_(&quot;Next&quot;)</string>
+          <string>Next</string>
          </property>
         </widget>
        </item>
@@ -137,13 +137,13 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>_(&quot;Destinations&quot;)</string>
+       <string>Destinations</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0" colspan="3">
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
-          <string>_(&quot;Destinations&quot;)</string>
+          <string>Destinations</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_7">
           <item row="0" column="0">
@@ -159,7 +159,7 @@
               <item row="1" column="0">
                <widget class="QLabel" name="label">
                 <property name="text">
-                 <string>_(&quot;New destination&quot;)</string>
+                 <string>New destination</string>
                 </property>
                </widget>
               </item>
@@ -175,14 +175,14 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>_(&quot;Add&quot;)</string>
+                 <string>Add</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="0" colspan="3">
                <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>_(&quot;Add destinations following the streaming methods you need. Be sure to check with transcoding that the format is compatible with the method used.&quot;)</string>
+                 <string>Add destinations following the streaming methods you need. Be sure to check with transcoding that the format is compatible with the method used.</string>
                 </property>
                 <property name="textFormat">
                  <enum>Qt::PlainText</enum>
@@ -195,7 +195,7 @@
               <item row="2" column="0">
                <widget class="QCheckBox" name="localOutput">
                 <property name="text">
-                 <string>_(&quot;Display locally&quot;)</string>
+                 <string>Display locally</string>
                 </property>
                </widget>
               </item>
@@ -209,7 +209,7 @@
        <item row="1" column="0" colspan="3">
         <widget class="QGroupBox" name="groupBox_2">
          <property name="title">
-          <string>_(&quot;Transcoding options&quot;)</string>
+          <string>Transcoding options</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="1" column="0">
@@ -218,7 +218,7 @@
           <item row="0" column="0">
            <widget class="QCheckBox" name="transcodeBox">
             <property name="text">
-             <string>_(&quot;Activate Transcoding&quot;)</string>
+             <string>Activate Transcoding</string>
             </property>
             <property name="checked">
              <bool>true</bool>
@@ -231,7 +231,7 @@
        <item row="3" column="0">
         <widget class="QPushButton" name="prevButton">
          <property name="text">
-          <string>_(&quot;Previous&quot;)</string>
+          <string>Previous</string>
          </property>
         </widget>
        </item>
@@ -251,7 +251,7 @@
        <item row="3" column="2">
         <widget class="QPushButton" name="nextButton2">
          <property name="text">
-          <string>_(&quot;Next&quot;)</string>
+          <string>Next</string>
          </property>
         </widget>
        </item>
@@ -280,33 +280,33 @@
        </rect>
       </property>
       <attribute name="label">
-       <string>_(&quot;Options&quot;)</string>
+       <string>Options</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_3">
          <property name="title">
-          <string>_(&quot;Miscellaneous Options&quot;)</string>
+          <string>Miscellaneous Options</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0" colspan="3">
            <widget class="QCheckBox" name="soutAll">
             <property name="text">
-             <string>_(&quot;Stream all elementary streams&quot;)</string>
+             <string>Stream all elementary streams</string>
             </property>
            </widget>
           </item>
           <item row="0" column="3" rowspan="2" colspan="2">
            <widget class="QCheckBox" name="soutKeep">
             <property name="text">
-             <string>_(&quot;Keep stream output open&quot;)</string>
+             <string>Keep stream output open</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0" rowspan="2">
            <widget class="QCheckBox" name="sap">
             <property name="text">
-             <string>_(&quot;SAP announce&quot;)</string>
+             <string>SAP announce</string>
             </property>
            </widget>
           </item>
@@ -316,7 +316,7 @@
           <item row="2" column="3">
            <widget class="QLabel" name="sapGroupLabel">
             <property name="text">
-             <string>_(&quot;Group name&quot;)</string>
+             <string>Group name</string>
             </property>
            </widget>
           </item>
@@ -326,7 +326,7 @@
           <item row="3" column="0" colspan="2">
            <widget class="QLabel" name="ttlLabel">
             <property name="text">
-             <string>_(&quot;Time-To-Live (TTL)&quot;)</string>
+             <string>Time-To-Live (TTL)</string>
             </property>
            </widget>
           </item>
@@ -349,7 +349,7 @@
        <item row="1" column="0" colspan="2">
         <widget class="QGroupBox" name="groupBox_4">
          <property name="title">
-          <string>_(&quot;Generated stream output string&quot;)</string>
+          <string>Generated stream output string</string>
          </property>
          <layout class="QHBoxLayout" name="_4">
           <item>
@@ -365,7 +365,7 @@
        <item row="2" column="0">
         <widget class="QPushButton" name="prevButton2">
          <property name="text">
-          <string>_(&quot;Previous&quot;)</string>
+          <string>Previous</string>
          </property>
         </widget>
        </item>

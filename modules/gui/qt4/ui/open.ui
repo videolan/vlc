@@ -35,10 +35,10 @@
    <item row="1" column="0" colspan="4" >
     <widget class="QCheckBox" name="advancedCheckBox" >
      <property name="toolTip" >
-      <string>_("Show extended options")</string>
+      <string>Show extended options</string>
      </property>
      <property name="text" >
-      <string>_("Show &amp;more options")</string>
+      <string>Show &amp;more options</string>
      </property>
     </widget>
    </item>
@@ -48,7 +48,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="cacheLabel" >
         <property name="text" >
-         <string>_("Caching")</string>
+         <string>Caching</string>
         </property>
         <property name="buddy" >
          <cstring>cacheSpinBox</cstring>
@@ -58,7 +58,7 @@
       <item row="0" column="2" >
        <widget class="QSpinBox" name="cacheSpinBox" >
         <property name="toolTip" >
-         <string>_("Change the caching for the media")</string>
+         <string>Change the caching for the media</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight</set>
@@ -87,7 +87,7 @@
       <item row="0" column="4" >
        <widget class="QLabel" name="label_3" >
         <property name="text" >
-         <string>_("Start Time")</string>
+         <string>Start Time</string>
         </property>
         <property name="buddy" >
          <cstring>startTimeSpinBox</cstring>
@@ -97,7 +97,7 @@
       <item row="0" column="5" colspan="2" >
        <widget class="QSpinBox" name="startTimeSpinBox" >
         <property name="toolTip" >
-         <string>_("Change the start time for the media")</string>
+         <string>Change the start time for the media</string>
         </property>
         <property name="alignment" >
          <set>Qt::AlignRight</set>
@@ -129,14 +129,14 @@
       <item row="2" column="0" colspan="8" >
        <widget class="QCheckBox" name="slaveCheckbox" >
         <property name="text" >
-         <string>_("Play another media synchronously (extra audio file, ...)")</string>
+         <string>Play another media synchronously (extra audio file, ...)</string>
         </property>
        </widget>
       </item>
       <item row="3" column="0" >
        <widget class="QLabel" name="slaveLabel" >
         <property name="text" >
-         <string>_("Extra media")</string>
+         <string>Extra media</string>
         </property>
         <property name="buddy" >
          <cstring>slaveText</cstring>
@@ -149,10 +149,10 @@
       <item row="3" column="6" colspan="2" >
        <widget class="QPushButton" name="slaveBrowseButton" >
         <property name="toolTip" >
-         <string>_("Select the file")</string>
+         <string>Select the file</string>
         </property>
         <property name="text" >
-         <string>_("Browse...")</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>
@@ -162,7 +162,7 @@
       <item row="5" column="0" >
        <widget class="QLabel" name="advancedLabel" >
         <property name="text" >
-         <string>_("MRL")</string>
+         <string>MRL</string>
         </property>
         <property name="buddy" >
          <cstring>advancedLineInput</cstring>
@@ -179,14 +179,14 @@
       <item row="6" column="2" colspan="6" >
        <widget class="QLineEdit" name="advancedLineInput" >
         <property name="toolTip" >
-         <string>_("Complete MRL for VLC internal")</string>
+         <string>Complete MRL for VLC internal</string>
         </property>
        </widget>
       </item>
       <item row="6" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>_("Edit Options")</string>
+         <string>Edit Options</string>
         </property>
        </widget>
       </item>
@@ -224,7 +224,7 @@
       <enum>Qt::ClickFocus</enum>
      </property>
      <property name="toolTip" >
-      <string>_("Select play mode")</string>
+      <string>Select play mode</string>
      </property>
      <property name="popupMode" >
       <enum>QToolButton::InstantPopup</enum>

@@ -30,7 +30,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>_(&quot;Disc Selection&quot;)</string>
+      <string>Disc Selection</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0">
@@ -75,7 +75,7 @@
       <item row="0" column="3">
        <widget class="QRadioButton" name="audioCDRadioButton">
         <property name="text">
-         <string>_(&quot;Audio CD&quot;)</string>
+         <string>Audio CD</string>
         </property>
        </widget>
       </item>
@@ -115,10 +115,10 @@
       <item row="1" column="1" colspan="3">
        <widget class="QCheckBox" name="dvdsimple">
         <property name="toolTip">
-         <string>_(&quot;Disable DVD Menus (for compatibility)&quot;)</string>
+         <string>Disable DVD Menus (for compatibility)</string>
         </property>
         <property name="text">
-         <string>_(&quot;No DVD menus&quot;)</string>
+         <string>No DVD menus</string>
         </property>
        </widget>
       </item>
@@ -134,7 +134,7 @@
         <item>
          <widget class="QLabel" name="deviceLabel">
           <property name="text">
-           <string>_(&quot;Disc device&quot;)</string>
+           <string>Disc device</string>
           </property>
           <property name="buddy">
            <cstring>deviceCombo</cstring>
@@ -173,7 +173,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>_(&quot;Browse...&quot;)</string>
+           <string>Browse...</string>
           </property>
          </widget>
         </item>
@@ -185,13 +185,13 @@
    <item>
     <widget class="QGroupBox" name="diskOptionBox">
      <property name="title">
-      <string>_(&quot;Starting Position&quot;)</string>
+      <string>Starting Position</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QLabel" name="titleLabel">
         <property name="text">
-         <string>_(&quot;Title&quot;)</string>
+         <string>Title</string>
         </property>
         <property name="buddy">
          <cstring>titleSpin</cstring>
@@ -236,7 +236,7 @@
       <item>
        <widget class="QLabel" name="chapterLabel">
         <property name="text">
-         <string>_(&quot;Chapter&quot;)</string>
+         <string>Chapter</string>
         </property>
         <property name="buddy">
          <cstring>chapterSpin</cstring>
@@ -262,13 +262,13 @@
    <item>
     <widget class="QGroupBox" name="diskOptionBox_2">
      <property name="title">
-      <string>_(&quot;Audio and Subtitles&quot;)</string>
+      <string>Audio and Subtitles</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
        <widget class="QLabel" name="audioLabel">
         <property name="text">
-         <string>_(&quot;Audio track&quot;)</string>
+         <string>Audio track</string>
         </property>
         <property name="buddy">
          <cstring>audioSpin</cstring>
@@ -316,7 +316,7 @@
       <item row="0" column="3">
        <widget class="QLabel" name="subtitlesLabel">
         <property name="text">
-         <string>_(&quot;Subtitles track&quot;)</string>
+         <string>Subtitles track</string>
         </property>
         <property name="buddy">
          <cstring>subtitlesSpin</cstring>

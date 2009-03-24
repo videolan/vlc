@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>_(&quot;Profile Name&quot;)</string>
+      <string>Profile Name</string>
      </property>
      <property name="margin">
       <number>10</number>
@@ -43,7 +43,7 @@
      </property>
      <widget class="QWidget" name="muxer">
       <attribute name="title">
-       <string>_(&quot;Encapsulation&quot;)</string>
+       <string>Encapsulation</string>
       </attribute>
       <layout class="QGridLayout">
        <item row="2" column="0">
@@ -140,7 +140,7 @@
        <bool>true</bool>
       </property>
       <attribute name="title">
-       <string>_(&quot;Video codec&quot;)</string>
+       <string>Video codec</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
        <property name="spacing">
@@ -149,7 +149,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QCheckBox" name="transcodeVideo">
          <property name="text">
-          <string>_(&quot;Video&quot;)</string>
+          <string>Video</string>
          </property>
         </widget>
        </item>
@@ -159,7 +159,7 @@
           <bool>true</bool>
          </property>
          <property name="text">
-          <string>_(&quot;Codec&quot;)</string>
+          <string>Codec</string>
          </property>
          <property name="buddy">
           <cstring>vCodecBox</cstring>
@@ -176,7 +176,7 @@
        <item row="3" column="0" colspan="2">
         <widget class="QLabel" name="vBitrateLabel">
          <property name="text">
-          <string>_(&quot;Bitrate&quot;)</string>
+          <string>Bitrate</string>
          </property>
          <property name="buddy">
           <cstring>vBitrateSpin</cstring>
@@ -208,7 +208,7 @@
        <item row="4" column="0" colspan="2">
         <widget class="QLabel" name="vFrameLabel">
          <property name="text">
-          <string>_(&quot;Frame Rate&quot;)</string>
+          <string>Frame Rate</string>
          </property>
          <property name="buddy">
           <cstring>vFrameBox</cstring>
@@ -237,7 +237,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="vScaleLabel">
             <property name="text">
-             <string>_(&quot;Scale&quot;)</string>
+             <string>Scale</string>
             </property>
             <property name="buddy">
              <cstring>vScaleBox</cstring>
@@ -254,7 +254,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="heightLabel">
             <property name="text">
-             <string>_(&quot;Height&quot;)</string>
+             <string>Height</string>
             </property>
             <property name="buddy">
              <cstring>heightBox</cstring>
@@ -299,7 +299,7 @@
           <item row="2" column="3">
            <widget class="QLabel" name="widthLabel">
             <property name="text">
-             <string>_(&quot;Width&quot;)</string>
+             <string>Width</string>
             </property>
             <property name="buddy">
              <cstring>widthBox</cstring>
@@ -334,7 +334,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>_(&quot;You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio&quot;)</string>
+             <string>You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio</string>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -347,7 +347,7 @@
        <item row="1" column="0">
         <widget class="QCheckBox" name="keepVideo">
          <property name="text">
-          <string>_(&quot;Keep original video track&quot;)</string>
+          <string>Keep original video track</string>
          </property>
         </widget>
        </item>
@@ -355,27 +355,27 @@
      </widget>
      <widget class="QWidget" name="audioCodec">
       <attribute name="title">
-       <string>_(&quot;Audio codec&quot;)</string>
+       <string>Audio codec</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
         <widget class="QCheckBox" name="transcodeAudio">
          <property name="text">
-          <string>_(&quot;Audio&quot;)</string>
+          <string>Audio</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" colspan="2">
         <widget class="QCheckBox" name="keepAudio">
          <property name="text">
-          <string>_(&quot;Keep original audio track&quot;)</string>
+          <string>Keep original audio track</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="aCodecLabel">
          <property name="text">
-          <string>_(&quot;Codec&quot;)</string>
+          <string>Codec</string>
          </property>
          <property name="buddy">
           <cstring>aCodecBox</cstring>
@@ -388,7 +388,7 @@
        <item row="3" column="0">
         <widget class="QLabel" name="aBitrateLabel">
          <property name="text">
-          <string>_(&quot;Bitrate&quot;)</string>
+          <string>Bitrate</string>
          </property>
          <property name="buddy">
           <cstring>aBitrateSpin</cstring>
@@ -417,7 +417,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="aChannelsLabel">
          <property name="text">
-          <string>_(&quot;Channels&quot;)</string>
+          <string>Channels</string>
          </property>
          <property name="buddy">
           <cstring>aChannelsSpin</cstring>
@@ -443,7 +443,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="aSampleLabel">
          <property name="text">
-          <string>_(&quot;Sample Rate&quot;)</string>
+          <string>Sample Rate</string>
          </property>
          <property name="buddy">
           <cstring>aSampleBox</cstring>
@@ -470,13 +470,13 @@
      </widget>
      <widget class="QWidget" name="subtitles">
       <attribute name="title">
-       <string>_(&quot;Subtitles&quot;)</string>
+       <string>Subtitles</string>
       </attribute>
       <layout class="QGridLayout" name="_4">
        <item row="0" column="0">
         <widget class="QCheckBox" name="transcodeSubs">
          <property name="text">
-          <string>_(&quot;Subtitles&quot;)</string>
+          <string>Subtitles</string>
          </property>
         </widget>
        </item>
@@ -486,7 +486,7 @@
        <item row="1" column="1">
         <widget class="QCheckBox" name="subsOverlay">
          <property name="text">
-          <string>_(&quot;Overlay subtitles on the video&quot;)</string>
+          <string>Overlay subtitles on the video</string>
          </property>
         </widget>
        </item>

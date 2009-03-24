@@ -17,13 +17,13 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>_("Disc Devices")</string>
+      <string>Disc Devices</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>_("Default disc device")</string>
+         <string>Default disc device</string>
         </property>
         <property name="buddy" >
          <cstring>DVDDevice</cstring>
@@ -36,7 +36,7 @@
       <item row="0" column="2" >
        <widget class="QPushButton" name="DVDBrowse" >
         <property name="text" >
-         <string>_("Browse...")</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>
@@ -46,13 +46,13 @@
    <item>
     <widget class="QGroupBox" name="groupBox_2" >
      <property name="title" >
-      <string>_("Network")</string>
+      <string>Network</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="portLabel" >
         <property name="text" >
-         <string>_("Server default port")</string>
+         <string>Server default port</string>
         </property>
         <property name="buddy" >
          <cstring>UDPPort</cstring>
@@ -78,7 +78,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="httpProxyLabel" >
         <property name="text" >
-         <string>_("HTTP proxy")</string>
+         <string>HTTP proxy</string>
         </property>
         <property name="buddy" >
          <cstring>proxy</cstring>
@@ -94,13 +94,13 @@
    <item>
     <widget class="QGroupBox" name="groupBox_5" >
      <property name="title" >
-      <string>_("Caching")</string>
+      <string>Caching</string>
      </property>
      <layout class="QHBoxLayout" >
       <item>
        <widget class="QLabel" name="label_2" >
         <property name="text" >
-         <string>_("Default caching level")</string>
+         <string>Default caching level</string>
         </property>
         <property name="buddy" >
          <cstring>cachingCombo</cstring>
@@ -116,13 +116,13 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>_("Codecs / Muxers")</string>
+      <string>Codecs / Muxers</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="ppLabel" >
         <property name="text" >
-         <string>_("Post-Processing quality")</string>
+         <string>Post-Processing quality</string>
         </property>
         <property name="buddy" >
          <cstring>PostProcLevel</cstring>
@@ -148,7 +148,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="aviLabel" >
         <property name="text" >
-         <string>_("Repair AVI files")</string>
+         <string>Repair AVI files</string>
         </property>
         <property name="buddy" >
          <cstring>AviRepair</cstring>
@@ -161,14 +161,14 @@
       <item row="3" column="0" colspan="2" >
        <widget class="QCheckBox" name="systemCodecBox" >
         <property name="text" >
-         <string>_("Use system codecs if available (better quality)")</string>
+         <string>Use system codecs if available (better quality)</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" colspan="2" >
        <widget class="QCheckBox" name="RTSP_TCPBox" >
         <property name="text" >
-         <string>_("Use RTP over RTSP (TCP)")</string>
+         <string>Use RTP over RTSP (TCP)</string>
         </property>
        </widget>
       </item>

@@ -17,20 +17,20 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>_("Network Protocol")</string>
+      <string>Network Protocol</string>
      </property>
      <layout class="QGridLayout" >
       <item row="1" column="0" >
        <widget class="QComboBox" name="protocolCombo" >
         <property name="toolTip" >
-         <string>_("Select the protocol for the URL.")</string>
+         <string>Select the protocol for the URL.</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0" >
        <widget class="QLabel" name="label" >
         <property name="text" >
-         <string>_("Protocol")</string>
+         <string>Protocol</string>
         </property>
         <property name="buddy" >
          <cstring>protocolCombo</cstring>
@@ -40,7 +40,7 @@
       <item row="1" column="2" >
        <widget class="QSpinBox" name="portSpin" >
         <property name="toolTip" >
-         <string>_("Select the port used")</string>
+         <string>Select the port used</string>
         </property>
         <property name="accelerated" >
          <bool>true</bool>
@@ -62,7 +62,7 @@
          </sizepolicy>
         </property>
         <property name="text" >
-         <string>_("Address")</string>
+         <string>Address</string>
         </property>
         <property name="buddy" >
          <cstring>addressText</cstring>
@@ -72,7 +72,7 @@
       <item row="0" column="2" >
        <widget class="QLabel" name="label_4" >
         <property name="text" >
-         <string>_("Port")</string>
+         <string>Port</string>
         </property>
         <property name="buddy" >
          <cstring>portSpin</cstring>
@@ -82,7 +82,7 @@
       <item row="1" column="1" >
        <widget class="QLineEdit" name="addressText" >
         <property name="toolTip" >
-         <string>_("Enter the URL of the network stream here, with or without the protocol.")</string>
+         <string>Enter the URL of the network stream here, with or without the protocol.</string>
         </property>
        </widget>
       </item>

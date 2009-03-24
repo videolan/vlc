@@ -24,14 +24,14 @@
      <item>
       <widget class="QCheckBox" name="enableCheck" >
        <property name="text" >
-        <string>_("Enable")</string>
+        <string>Enable</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="eq2PassCheck" >
        <property name="text" >
-        <string>_("2 Pass")</string>
+        <string>2 Pass</string>
        </property>
       </widget>
      </item>
@@ -51,7 +51,7 @@
      <item>
       <widget class="QLabel" name="presetLabel" >
        <property name="text" >
-        <string>_("Preset")</string>
+        <string>Preset</string>
        </property>
       </widget>
      </item>
@@ -75,7 +75,7 @@
      <item row="1" column="0" colspan="2" >
       <widget class="QLabel" name="preampLabel" >
        <property name="text" >
-        <string>_("Preamp")</string>
+        <string>Preamp</string>
        </property>
       </widget>
      </item>

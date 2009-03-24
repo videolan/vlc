@@ -19,7 +19,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle" >
-   <string>_("VLM configurator")</string>
+   <string>VLM configurator</string>
   </property>
   <layout class="QGridLayout" >
    <item rowspan="5" row="0" column="0" colspan="3" >
@@ -31,7 +31,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>_("Media Manager Edition")</string>
+      <string>Media Manager Edition</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" colspan="3" >
@@ -54,7 +54,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="nameLabel" >
         <property name="text" >
-         <string>_("Name:")</string>
+         <string>Name:</string>
         </property>
         <property name="buddy" >
          <cstring>nameLedit</cstring>
@@ -67,7 +67,7 @@
       <item row="2" column="2" >
        <widget class="QCheckBox" name="enableCheck" >
         <property name="text" >
-         <string>_("Enable")</string>
+         <string>Enable</string>
         </property>
         <property name="checked" >
          <bool>true</bool>
@@ -77,7 +77,7 @@
       <item row="3" column="0" >
        <widget class="QLabel" name="inputLabel" >
         <property name="text" >
-         <string>_("Input:")</string>
+         <string>Input:</string>
         </property>
         <property name="buddy" >
          <cstring>inputLedit</cstring>
@@ -90,14 +90,14 @@
       <item row="3" column="2" >
        <widget class="QPushButton" name="inputButton" >
         <property name="text" >
-         <string>_("Select Input")</string>
+         <string>Select Input</string>
         </property>
        </widget>
       </item>
       <item row="4" column="0" >
        <widget class="QLabel" name="outputLabel" >
         <property name="text" >
-         <string>_("Output:")</string>
+         <string>Output:</string>
         </property>
         <property name="buddy" >
          <cstring>outputLedit</cstring>
@@ -110,21 +110,21 @@
       <item row="4" column="2" >
        <widget class="QPushButton" name="outputButton" >
         <property name="text" >
-         <string>_("Select Output")</string>
+         <string>Select Output</string>
         </property>
        </widget>
       </item>
       <item row="5" column="0" colspan="3" >
        <widget class="QGroupBox" name="schedBox" >
         <property name="title" >
-         <string>_("Time Control")</string>
+         <string>Time Control</string>
         </property>
        </widget>
       </item>
       <item row="6" column="0" colspan="3" >
        <widget class="QGroupBox" name="vodBox" >
         <property name="title" >
-         <string>_("Mux Control")</string>
+         <string>Mux Control</string>
         </property>
         <layout class="QHBoxLayout" >
          <item>
@@ -166,7 +166,7 @@
       <item row="7" column="0" colspan="2" >
        <widget class="QCheckBox" name="loopBCast" >
         <property name="text" >
-         <string>_("Loop")</string>
+         <string>Loop</string>
         </property>
        </widget>
       </item>
@@ -192,21 +192,21 @@
    <item row="1" column="3" >
     <widget class="QPushButton" name="addButton" >
      <property name="text" >
-      <string>_("Add")</string>
+      <string>Add</string>
      </property>
     </widget>
    </item>
    <item row="2" column="3" >
     <widget class="QPushButton" name="clearButton" >
      <property name="text" >
-      <string>_("Clear")</string>
+      <string>Clear</string>
      </property>
     </widget>
    </item>
    <item row="3" column="3" >
     <widget class="QPushButton" name="saveButton" >
      <property name="text" >
-      <string>_("Save")</string>
+      <string>Save</string>
      </property>
     </widget>
    </item>
@@ -232,7 +232,7 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>_("Media Manager List")</string>
+      <string>Media Manager List</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >

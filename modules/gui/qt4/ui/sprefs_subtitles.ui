@@ -19,20 +19,20 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3" >
      <property name="title" >
-      <string>_("On Screen Display")</string>
+      <string>On Screen Display</string>
      </property>
      <layout class="QVBoxLayout" >
       <item>
        <widget class="QCheckBox" name="OSDBox" >
         <property name="text" >
-         <string>_("Enable OSD")</string>
+         <string>Enable OSD</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="OSDTitleBox" >
         <property name="text" >
-         <string>_("Show media title on video")</string>
+         <string>Show media title on video</string>
         </property>
        </widget>
       </item>
@@ -48,13 +48,13 @@
       </sizepolicy>
      </property>
      <property name="title" >
-      <string>_("Subtitles Language")</string>
+      <string>Subtitles Language</string>
      </property>
      <layout class="QGridLayout" >
       <item row="0" column="0" >
        <widget class="QLabel" name="subLangLabel" >
         <property name="text" >
-         <string>_("Preferred subtitles language")</string>
+         <string>Preferred subtitles language</string>
         </property>
         <property name="buddy" >
          <cstring>preferredLanguage</cstring>
@@ -74,7 +74,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="encodLabel" >
         <property name="text" >
-         <string>_("Default encoding")</string>
+         <string>Default encoding</string>
         </property>
         <property name="buddy" >
          <cstring>encoding</cstring>
@@ -87,7 +87,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox" >
      <property name="title" >
-      <string>_("Display Settings")</string>
+      <string>Display Settings</string>
      </property>
      <layout class="QGridLayout" >
       <item row="3" column="1" colspan="2" >
@@ -96,7 +96,7 @@
       <item row="3" column="0" >
        <widget class="QLabel" name="fontEffectLabel" >
         <property name="text" >
-         <string>_("Effect")</string>
+         <string>Effect</string>
         </property>
         <property name="buddy" >
          <cstring>effect</cstring>
@@ -109,7 +109,7 @@
       <item row="2" column="0" >
        <widget class="QLabel" name="fontColorLabel" >
         <property name="text" >
-         <string>_("Font color")</string>
+         <string>Font color</string>
         </property>
         <property name="buddy" >
          <cstring>fontColor</cstring>
@@ -122,7 +122,7 @@
       <item row="1" column="0" >
        <widget class="QLabel" name="fontSizeLabel" >
         <property name="text" >
-         <string>_("Font size")</string>
+         <string>Font size</string>
         </property>
         <property name="buddy" >
          <cstring>fontSize</cstring>
@@ -132,7 +132,7 @@
       <item row="0" column="2" >
        <widget class="QPushButton" name="fontBrowse" >
         <property name="text" >
-         <string>_("Browse...")</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>
@@ -142,7 +142,7 @@
       <item row="0" column="0" >
        <widget class="QLabel" name="fontLabel" >
         <property name="text" >
-         <string>_("Font")</string>
+         <string>Font</string>
         </property>
         <property name="buddy" >
          <cstring>font</cstring>
@@ -168,7 +168,7 @@
       <item row="4" column="0" >
        <widget class="QLabel" name="subsPosLabel" >
         <property name="text" >
-         <string>_("Force subtitle position")</string>
+         <string>Force subtitle position</string>
         </property>
         <property name="buddy" >
          <cstring>subsPosition</cstring>

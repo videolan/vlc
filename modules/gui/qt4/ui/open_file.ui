@@ -18,22 +18,22 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>_(&quot;Open File&quot;)</string>
+   <string>Open File</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0">
     <widget class="QGroupBox" name="tempWidget">
      <property name="toolTip">
-      <string>_(&quot;Choose one or more media file to open&quot;)</string>
+      <string>Choose one or more media file to open</string>
      </property>
      <property name="title">
-      <string>_(&quot;File Selection&quot;)</string>
+      <string>File Selection</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="0" colspan="3">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>_(&quot;You can select local files with the following list and buttons.&quot;)</string>
+         <string>You can select local files with the following list and buttons.</string>
         </property>
        </widget>
       </item>
@@ -65,7 +65,7 @@
       <item row="1" column="2">
        <widget class="QPushButton" name="fileBrowseButton">
         <property name="text">
-         <string>_(&quot;Add...&quot;)</string>
+         <string>Add...</string>
         </property>
        </widget>
       </item>
@@ -78,7 +78,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>_(&quot;Delete&quot;)</string>
+         <string>Delete</string>
         </property>
        </widget>
       </item>
@@ -88,10 +88,10 @@
    <item row="1" column="0">
     <widget class="QCheckBox" name="subCheckBox">
      <property name="toolTip">
-      <string>_(&quot;Add a subtitles file&quot;)</string>
+      <string>Add a subtitles file</string>
      </property>
      <property name="text">
-      <string>_(&quot;Use a sub&amp;titles file&quot;)</string>
+      <string>Use a sub&amp;titles file</string>
      </property>
     </widget>
    </item>
@@ -155,7 +155,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>_(&quot;Size:&quot;)</string>
+         <string>Size:</string>
         </property>
         <property name="buddy">
          <cstring>sizeSubComboBox</cstring>
@@ -181,7 +181,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>_(&quot;Alignment:&quot;)</string>
+         <string>Alignment:</string>
         </property>
         <property name="buddy">
          <cstring>alignSubComboBox</cstring>
@@ -210,10 +210,10 @@
          </size>
         </property>
         <property name="toolTip">
-         <string>_(&quot;Select the subtitles file&quot;)</string>
+         <string>Select the subtitles file</string>
         </property>
         <property name="text">
-         <string>_(&quot;Browse...&quot;)</string>
+         <string>Browse...</string>
         </property>
        </widget>
       </item>

@@ -14,13 +14,13 @@
   </property>
   <widget class="QWidget" name="tab" >
    <attribute name="title" >
-    <string>_("Basic")</string>
+    <string>Basic</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="1" column="1" >
      <widget class="QGroupBox" name="transformEnable" >
       <property name="title" >
-       <string>_("Transform")</string>
+       <string>Transform</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -38,7 +38,7 @@
     <item row="0" column="1" >
      <widget class="QGroupBox" name="sharpenEnable" >
       <property name="title" >
-       <string>_("Sharpen")</string>
+       <string>Sharpen</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -50,7 +50,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_29" >
          <property name="text" >
-          <string>_("Sigma")</string>
+          <string>Sigma</string>
          </property>
         </widget>
        </item>
@@ -85,7 +85,7 @@
        <bool>true</bool>
       </property>
       <property name="title" >
-       <string>_("Image adjust")</string>
+       <string>Image adjust</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -180,42 +180,42 @@
        <item row="4" column="0" >
         <widget class="QLabel" name="label_5" >
          <property name="text" >
-          <string>_("Gamma")</string>
+          <string>Gamma</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" >
         <widget class="QLabel" name="label_2" >
          <property name="text" >
-          <string>_("Contrast")</string>
+          <string>Contrast</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0" >
         <widget class="QLabel" name="label_3" >
          <property name="text" >
-          <string>_("Brightness")</string>
+          <string>Brightness</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0" >
         <widget class="QLabel" name="label_4" >
          <property name="text" >
-          <string>_("Saturation")</string>
+          <string>Saturation</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0" >
         <widget class="QLabel" name="label" >
          <property name="text" >
-          <string>_("Hue")</string>
+          <string>Hue</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1" >
         <widget class="QCheckBox" name="brightnessThresholdCheck" >
          <property name="text" >
-          <string>_("Brightness threshold")</string>
+          <string>Brightness threshold</string>
          </property>
         </widget>
        </item>
@@ -226,13 +226,13 @@
   </widget>
   <widget class="QWidget" name="tab_3" >
    <attribute name="title" >
-    <string>_("Crop")</string>
+    <string>Crop</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="0" column="2" >
      <widget class="QLabel" name="label_10" >
       <property name="text" >
-       <string>_("Top")</string>
+       <string>Top</string>
       </property>
      </widget>
     </item>
@@ -249,7 +249,7 @@
     <item row="1" column="0" >
      <widget class="QLabel" name="label_11" >
       <property name="text" >
-       <string>_("Left")</string>
+       <string>Left</string>
       </property>
      </widget>
     </item>
@@ -266,7 +266,7 @@
     <item row="1" column="4" >
      <widget class="QLabel" name="label_12" >
       <property name="text" >
-       <string>_("Right")</string>
+       <string>Right</string>
       </property>
      </widget>
     </item>
@@ -283,7 +283,7 @@
     <item row="2" column="2" >
      <widget class="QLabel" name="label_7" >
       <property name="text" >
-       <string>_("Bottom")</string>
+       <string>Bottom</string>
       </property>
      </widget>
     </item>
@@ -300,14 +300,14 @@
     <item row="3" column="0" colspan="6" >
      <widget class="QCheckBox" name="topBotCropSync" >
       <property name="text" >
-       <string>_("Synchronize top and bottom")</string>
+       <string>Synchronize top and bottom</string>
       </property>
      </widget>
     </item>
     <item row="4" column="0" colspan="6" >
      <widget class="QCheckBox" name="leftRightCropSync" >
       <property name="text" >
-       <string>_("Synchronize left and right")</string>
+       <string>Synchronize left and right</string>
       </property>
      </widget>
     </item>
@@ -331,20 +331,20 @@
   </widget>
   <widget class="QWidget" name="tab_5" >
    <attribute name="title" >
-    <string>_("Geometry")</string>
+    <string>Geometry</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="0" column="0" >
      <widget class="QCheckBox" name="magnifyEnable" >
       <property name="text" >
-       <string>_("Magnification/Zoom")</string>
+       <string>Magnification/Zoom</string>
       </property>
      </widget>
     </item>
     <item rowspan="2" row="0" column="1" >
      <widget class="QGroupBox" name="puzzleEnable" >
       <property name="title" >
-       <string>_("Puzzle game")</string>
+       <string>Puzzle game</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -382,21 +382,21 @@
        <item row="2" column="0" colspan="2" >
         <widget class="QCheckBox" name="puzzleBlackSlotCheck" >
          <property name="text" >
-          <string>_("Black slot")</string>
+          <string>Black slot</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" >
         <widget class="QLabel" name="label_26" >
          <property name="text" >
-          <string>_("Columns")</string>
+          <string>Columns</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0" >
         <widget class="QLabel" name="label_27" >
          <property name="text" >
-          <string>_("Rows")</string>
+          <string>Rows</string>
          </property>
         </widget>
        </item>
@@ -406,7 +406,7 @@
     <item row="1" column="0" >
      <widget class="QGroupBox" name="rotateEnable" >
       <property name="title" >
-       <string>_("Rotate")</string>
+       <string>Rotate</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -431,7 +431,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_28" >
          <property name="text" >
-          <string>_("Angle")</string>
+          <string>Angle</string>
          </property>
         </widget>
        </item>
@@ -442,13 +442,13 @@
   </widget>
   <widget class="QWidget" name="tab_2" >
    <attribute name="title" >
-    <string>_("Color fun")</string>
+    <string>Color fun</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="1" column="1" >
      <widget class="QGroupBox" name="extractEnable" >
       <property name="title" >
-       <string>_("Color extraction")</string>
+       <string>Color extraction</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -460,7 +460,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_6" >
          <property name="text" >
-          <string>_("Color")</string>
+          <string>Color</string>
          </property>
         </widget>
        </item>
@@ -477,14 +477,14 @@
     <item row="0" column="1" >
      <widget class="QCheckBox" name="invertEnable" >
       <property name="text" >
-       <string>_("Invert colors")</string>
+       <string>Invert colors</string>
       </property>
      </widget>
     </item>
     <item rowspan="2" row="0" column="0" >
      <widget class="QGroupBox" name="colorthresEnable" >
       <property name="title" >
-       <string>_("Color threshold")</string>
+       <string>Color threshold</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -496,7 +496,7 @@
        <item row="2" column="0" >
         <widget class="QLabel" name="label_14" >
          <property name="text" >
-          <string>_("Similarity")</string>
+          <string>Similarity</string>
          </property>
         </widget>
        </item>
@@ -517,14 +517,14 @@
        <item row="1" column="0" >
         <widget class="QLabel" name="label_13" >
          <property name="text" >
-          <string>_("Saturation")</string>
+          <string>Saturation</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0" >
         <widget class="QLabel" name="label_8" >
          <property name="text" >
-          <string>_("Color")</string>
+          <string>Color</string>
          </property>
         </widget>
        </item>
@@ -542,48 +542,48 @@
   </widget>
   <widget class="QWidget" name="tab_7" >
    <attribute name="title" >
-    <string>_("Image modification")</string>
+    <string>Image modification</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="2" column="0" >
      <widget class="QCheckBox" name="waveEnable" >
       <property name="text" >
-       <string>_("Waves")</string>
+       <string>Waves</string>
       </property>
      </widget>
     </item>
     <item row="3" column="0" >
      <widget class="QCheckBox" name="rippleEnable" >
       <property name="text" >
-       <string>_("Water effect")</string>
+       <string>Water effect</string>
       </property>
      </widget>
     </item>
     <item row="3" column="1" >
      <widget class="QCheckBox" name="psychedelicEnable" >
       <property name="text" >
-       <string>_("Psychedelic")</string>
+       <string>Psychedelic</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1" >
      <widget class="QCheckBox" name="noiseEnable" >
       <property name="text" >
-       <string>_("Noise")</string>
+       <string>Noise</string>
       </property>
      </widget>
     </item>
     <item row="1" column="1" >
      <widget class="QCheckBox" name="motiondetectEnable" >
       <property name="text" >
-       <string>_("Motion detect")</string>
+       <string>Motion detect</string>
       </property>
      </widget>
     </item>
     <item row="0" column="1" >
      <widget class="QGroupBox" name="motionblurEnable" >
       <property name="title" >
-       <string>_("Motion blur")</string>
+       <string>Motion blur</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -595,7 +595,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_25" >
          <property name="text" >
-          <string>_("Factor")</string>
+          <string>Factor</string>
          </property>
         </widget>
        </item>
@@ -627,7 +627,7 @@
     <item rowspan="2" row="0" column="0" >
      <widget class="QGroupBox" name="gradientEnable" >
       <property name="title" >
-       <string>_("Gradient")</string>
+       <string>Gradient</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -639,21 +639,21 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_18" >
          <property name="text" >
-          <string>_("Mode")</string>
+          <string>Mode</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" colspan="2" >
         <widget class="QCheckBox" name="gradientTypeCheck" >
          <property name="text" >
-          <string>_("Color")</string>
+          <string>Color</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0" colspan="2" >
         <widget class="QCheckBox" name="gradientCartoonCheck" >
          <property name="text" >
-          <string>_("Cartoon")</string>
+          <string>Cartoon</string>
          </property>
         </widget>
        </item>
@@ -667,13 +667,13 @@
   </widget>
   <widget class="QWidget" name="tab_9" >
    <attribute name="title" >
-    <string>_("Vout/Overlay")</string>
+    <string>Vout/Overlay</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="0" column="0" >
      <widget class="QGroupBox" name="wallEnable" >
       <property name="title" >
-       <string>_("Wall")</string>
+       <string>Wall</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -685,14 +685,14 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_31" >
          <property name="text" >
-          <string>_("Rows")</string>
+          <string>Rows</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" >
         <widget class="QLabel" name="label_30" >
          <property name="text" >
-          <string>_("Columns")</string>
+          <string>Columns</string>
          </property>
         </widget>
        </item>
@@ -722,7 +722,7 @@
     <item row="0" column="1" >
      <widget class="QGroupBox" name="marqEnable" >
       <property name="title" >
-       <string>_("Add text")</string>
+       <string>Add text</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -734,14 +734,14 @@
        <item row="1" column="0" >
         <widget class="QLabel" name="label_24" >
          <property name="text" >
-          <string>_("Position")</string>
+          <string>Position</string>
          </property>
         </widget>
        </item>
        <item row="0" column="0" >
         <widget class="QLabel" name="label_23" >
          <property name="text" >
-          <string>_("Text")</string>
+          <string>Text</string>
          </property>
         </widget>
        </item>
@@ -757,7 +757,7 @@
     <item row="1" column="0" >
      <widget class="QGroupBox" name="panoramixEnable" >
       <property name="title" >
-       <string>_("Panoramix")</string>
+       <string>Panoramix</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -769,7 +769,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_36" >
          <property name="text" >
-          <string>_("Rows")</string>
+          <string>Rows</string>
          </property>
         </widget>
        </item>
@@ -786,7 +786,7 @@
        <item row="1" column="0" >
         <widget class="QLabel" name="label_35" >
          <property name="text" >
-          <string>_("Columns")</string>
+          <string>Columns</string>
          </property>
         </widget>
        </item>
@@ -806,7 +806,7 @@
     <item row="1" column="1" >
      <widget class="QGroupBox" name="cloneEnable" >
       <property name="title" >
-       <string>_("Clone")</string>
+       <string>Clone</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -818,7 +818,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_9" >
          <property name="text" >
-          <string>_("Number of clones")</string>
+          <string>Number of clones</string>
          </property>
         </widget>
        </item>
@@ -839,13 +839,13 @@
   </widget>
   <widget class="QWidget" name="tab_8" >
    <attribute name="title" >
-    <string>_("Logo")</string>
+    <string>Logo</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="0" column="0" >
      <widget class="QGroupBox" name="logoEnable" >
       <property name="title" >
-       <string>_("Add logo")</string>
+       <string>Add logo</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -857,21 +857,21 @@
        <item row="3" column="0" >
         <widget class="QLabel" name="label_22" >
          <property name="text" >
-          <string>_("Transparency")</string>
+          <string>Transparency</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0" colspan="2" >
         <widget class="QLabel" name="label_21" >
          <property name="text" >
-          <string>_("Left")</string>
+          <string>Left</string>
          </property>
         </widget>
        </item>
        <item row="1" column="0" colspan="2" >
         <widget class="QLabel" name="label_20" >
          <property name="text" >
-          <string>_("Top")</string>
+          <string>Top</string>
          </property>
         </widget>
        </item>
@@ -900,7 +900,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_19" >
          <property name="text" >
-          <string>_("Logo")</string>
+          <string>Logo</string>
          </property>
         </widget>
        </item>
@@ -913,7 +913,7 @@
     <item row="0" column="1" >
      <widget class="QGroupBox" name="eraseEnable" >
       <property name="title" >
-       <string>_("Logo erase")</string>
+       <string>Logo erase</string>
       </property>
       <property name="checkable" >
        <bool>true</bool>
@@ -925,14 +925,14 @@
        <item row="1" column="0" >
         <widget class="QLabel" name="label_16" >
          <property name="text" >
-          <string>_("Top")</string>
+          <string>Top</string>
          </property>
         </widget>
        </item>
        <item row="2" column="0" >
         <widget class="QLabel" name="label_17" >
          <property name="text" >
-          <string>_("Left")</string>
+          <string>Left</string>
          </property>
         </widget>
        </item>
@@ -948,7 +948,7 @@
        <item row="0" column="0" >
         <widget class="QLabel" name="label_15" >
          <property name="text" >
-          <string>_("Mask")</string>
+          <string>Mask</string>
          </property>
         </widget>
        </item>
@@ -959,7 +959,7 @@
   </widget>
   <widget class="QWidget" name="tab_6" >
    <attribute name="title" >
-    <string>_("Advanced video filter controls")</string>
+    <string>Advanced video filter controls</string>
    </attribute>
    <layout class="QGridLayout" >
     <item row="2" column="1" colspan="2" >
@@ -968,7 +968,7 @@
     <item row="2" column="0" >
      <widget class="QLabel" name="label_34" >
       <property name="text" >
-       <string>_("Subpicture filters")</string>
+       <string>Subpicture filters</string>
       </property>
      </widget>
     </item>
@@ -978,28 +978,28 @@
     <item row="1" column="0" >
      <widget class="QLabel" name="label_33" >
       <property name="text" >
-       <string>_("Video filters")</string>
+       <string>Video filters</string>
       </property>
      </widget>
     </item>
     <item row="0" column="0" >
      <widget class="QLabel" name="label_32" >
       <property name="text" >
-       <string>_("Vout filters")</string>
+       <string>Vout filters</string>
       </property>
      </widget>
     </item>
     <item row="3" column="0" colspan="2" >
      <widget class="QPushButton" name="filtersResetButton" >
       <property name="text" >
-       <string>_("Reset")</string>
+       <string>Reset</string>
       </property>
      </widget>
     </item>
     <item row="3" column="2" >
      <widget class="QPushButton" name="filtersUpdateButton" >
       <property name="text" >
-       <string>_("Update")</string>
+       <string>Update</string>
       </property>
      </widget>
     </item>
