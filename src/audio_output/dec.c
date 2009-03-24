@@ -42,7 +42,7 @@
 /*****************************************************************************
  * aout_DecNew : create a decoder
  *****************************************************************************/
-static aout_input_t * DecNew( vlc_object_t * p_this, aout_instance_t * p_aout,
+static aout_input_t * DecNew( aout_instance_t * p_aout,
                               audio_sample_format_t *p_format,
                               const audio_replay_gain_t *p_replay_gain,
                               const aout_request_vout_t *p_request_vout )
@@ -183,7 +183,7 @@ aout_input_t * __aout_DecNew( vlc_object_t * p_this,
         *pp_aout = p_aout;
     }
 
-    return DecNew( p_this, p_aout, p_format, p_replay_gain, p_request_video );
+    return DecNew( p_aout, p_format, p_replay_gain, p_request_video );
 }
 
 /*****************************************************************************
