@@ -121,8 +121,7 @@ static void Close( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t * )p_this;
 
-    if( p_sd->p_sys->psz_name != NULL )
-        free( p_sd->p_sys->psz_name );
+    free( p_sd->p_sys->psz_name );
     vlc_cancel (p_sd->p_sys->thread);
     vlc_join (p_sd->p_sys->thread, NULL);
     free( p_sd->p_sys );
@@ -198,7 +197,10 @@ static int AddDevice( services_discovery_t *p_sd,
         {
             if( !( p_sd->p_sys->pp_items = calloc( p_sd->p_sys->i_tracks_num,
                                                    sizeof( input_item_t * ) ) ) )
+            {
+                free( psz_name );
                 return VLC_ENOMEM;
+            }
             p_sd->p_sys->i_count = 0;
             while( p_track != NULL )
             {
@@ -240,12 +242,14 @@ static void AddTrack( services_discovery_t *p_sd, LIBMTP_track_t *p_track )
                                     p_track->title ) ) == NULL )
     {
         msg_Err( p_sd, "Error adding %s, skipping it", p_track->filename );
+        free( psz_string );
         return;
     }
+    free( psz_string );
+
     input_item_SetArtist( p_input, p_track->artist );
     input_item_SetGenre( p_input, p_track->genre );
     input_item_SetAlbum( p_input, p_track->album );
-    free( psz_string );
     if( asprintf( &psz_string, "%d", p_track->tracknumber ) != -1 )
     {
         input_item_SetTrackNum( p_input, psz_string );
