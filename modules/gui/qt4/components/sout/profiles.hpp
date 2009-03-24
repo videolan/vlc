@@ -2,17 +2,17 @@
 #define NB_PROFILE 12
 
 static const char *const video_profile_name_list[] = {
-    "Video - H.264 + AAC",
-    "Video - Dirac + AAC",
-    "Video - Theora + Vorbis",
-    "Video - Theora + Flac",
-    "Video - MPEG-4 + AAC",
-    "Video - MPEG-2 + MPGA",
-    "Video - WMV + WMA",
-    "Video - DIV3 + MP3",
-    "Audio - Vorbis",
+    "Video - H.264 + AAC (TS)",
+    "Video - Dirac + AAC (TS)",
+    "Video - Theora + Vorbis (OGG)",
+    "Video - Theora + Flac (OGG)",
+    "Video - MPEG-4 + AAC (MP4)",
+    "Video - MPEG-2 + MPGA (TS)",
+    "Video - WMV + WMA (ASF)",
+    "Video - DIV3 + MP3 (ASF)",
+    "Audio - Vorbis (OGG)",
     "Audio - MP3",
-    "Audio - AAC",
+    "Audio - AAC (MP4)",
     "Audio - FLAC",
 };
 
