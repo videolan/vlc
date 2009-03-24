@@ -2442,7 +2442,7 @@ vlc_module_begin ()
              AUDIODELAY_DOWN_KEY_TEXT, AUDIODELAY_DOWN_KEY_LONGTEXT, true )
     add_key( "key-audio-track", KEY_AUDIO_TRACK, NULL, AUDIO_TRACK_KEY_TEXT,
              AUDIO_TRACK_KEY_LONGTEXT, false )
-    add_key( "key-audiodevice-cycle", KEY_STOP, NULL, AUDI_DEVICE_CYCLE_KEY_TEXT,
+    add_key( "key-audiodevice-cycle", KEY_AUDIODEVICE_CYCLE, NULL, AUDI_DEVICE_CYCLE_KEY_TEXT,
              AUDI_DEVICE_CYCLE_KEY_LONGTEXT, false )
     add_key( "key-subtitle-track", KEY_SUBTITLE_TRACK, NULL,
              SUBTITLE_TRACK_KEY_TEXT, SUBTITLE_TRACK_KEY_LONGTEXT, false )
