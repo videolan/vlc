@@ -1,3 +1,4 @@
+/* Increase this value if you add a new profile */
 #define NB_PROFILE 12
 
 static const char *const video_profile_name_list[] = {
@@ -14,7 +15,13 @@ static const char *const video_profile_name_list[] = {
     "Audio - AAC",
     "Audio - FLAC",
 };
+
 static const char *const video_profile_value_list[] = {
+    /* Container(string), transcode video(bool), transcode audio(bool), */
+    /* use subtitles(bool), video codec(string), video bitrate(integer), */
+    /* scale(float), fps(float), width(integer, height(integer), */
+    /* audio codec(string), audio bitrate(integer), channels(integer), */
+    /* samplerate(integer), subtitle codec(string), subtitle overlay(bool) */
     "ts;1;1;0;h264;800;1;0;0;0;mp4a;128;2;44100;0;0",
     "ts;1;1;0;drac;800;1;0;0;0;mp4a;128;2;44100;0;0",
     "ogg;1;1;0;theo;800;1;0;0;0;vorb;128;2;44100;0;0",
