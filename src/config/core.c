@@ -406,6 +406,7 @@ void __config_PutFloat( vlc_object_t *p_this,
  *****************************************************************************
  * FIXME: This function really needs to be optimized.
  * FIXME: And now even more.
+ * FIXME: remove p_this pointer parameter (or use it)
  *****************************************************************************/
 module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 {
