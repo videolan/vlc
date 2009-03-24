@@ -1,7 +1,7 @@
 /*****************************************************************************
  * podcast.c:  Podcast services discovery module
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -132,6 +132,9 @@ static int Open( vlc_object_t *p_this )
 
     if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
     {
+        var_DelCallback( p_sd, "podcast-urls", UrlsChange, p_sys );
+        vlc_cond_destroy( &p_sys->wait );
+        vlc_mutex_destroy( &p_sys->lock );
         free (p_sys);
         return VLC_EGENERIC;
     }
