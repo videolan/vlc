@@ -275,7 +275,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create packetizer" );
-            dialog_Fatal( p_input, _("Streaming / Transcoding failed"),
+            dialog_Fatal( p_input, _("Streaming / Transcoding failed"), "%s",
                           _("VLC could not open the packetizer module.") );
             return NULL;
         }
@@ -288,7 +288,7 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         if( p_dec == NULL )
         {
             msg_Err( p_input, "could not create decoder" );
-            dialog_Fatal( p_input, _("Streaming / Transcoding failed"),
+            dialog_Fatal( p_input, _("Streaming / Transcoding failed"), "%s",
                           _("VLC could not open the decoder module.") );
             return NULL;
         }
@@ -441,7 +441,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
-            dialog_Fatal( p_dec, _("Streaming / Transcoding failed"),
+            dialog_Fatal( p_dec, _("Streaming / Transcoding failed"), "%s",
                           _("VLC could not open the decoder module.") );
             return VLC_EGENERIC;
         }

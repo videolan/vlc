@@ -1158,7 +1158,9 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
                 psz_module = "dummy";
             else
 #endif
-                msg_Info( p_libvlc, _("Running vlc with the default interface. Use 'cvlc' to use vlc without interface.") );
+                msg_Info( p_libvlc, "%s",
+                          _("Running vlc with the default interface. "
+                            "Use 'cvlc' to use vlc without interface.") );
         }
         free( psz_interface );
     }
@@ -1974,7 +1976,7 @@ static void Version( void )
     utf8_fprintf( stdout, _("Compiled by %s@%s.%s\n"),
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
     utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
-    utf8_fprintf( stdout, LICENSE_MSG );
+    utf8_fprintf( stdout, "%s", LICENSE_MSG );
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
     PauseConsole();
