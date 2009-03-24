@@ -56,29 +56,64 @@ static const char *psz_devModule[] = { "v4l", "v4l2", "pvr", "dvb", "bda",
  * Open Files and subtitles                                               *
  **************************************************************************/
 FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
-                                OpenPanel( _parent, _p_intf )
+                                OpenPanel( _parent, _p_intf ), dialogBox( NULL )
 {
     /* Classic UI Setup */
     ui.setupUi( this );
 
-#if 0
-    /** BEGIN QFileDialog tweaking **/
-    /* Use a QFileDialog and customize it because we don't want to
-       rewrite it all. Be careful to your eyes cause there are a few hacks.
-       Be very careful and test correctly when you modify this. */
-
     /* Set Filters for file selection */
-    QString fileTypes = "";
+/*    QString fileTypes = "";
     ADD_FILTER_MEDIA( fileTypes );
     ADD_FILTER_VIDEO( fileTypes );
     ADD_FILTER_AUDIO( fileTypes );
     ADD_FILTER_PLAYLIST( fileTypes );
     ADD_FILTER_ALL( fileTypes );
-    fileTypes.replace( QString(";*"), QString(" *"));
+    fileTypes.replace( QString(";*"), QString(" *")); */
 
-    // Make this QFileDialog a child of tempWidget from the ui.
+
+/*    lineFileEdit = ui.fileEdit;
+    //TODO later: fill the fileCompleteList with previous items played.
+    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
+    fileCompleter->setModel( new QDirModel( fileCompleter ) );
+    lineFileEdit->setCompleter( fileCompleter );*/
+    if( config_GetInt( p_intf, "qt-embedded-open" ) )
+    {
+        ui.tempWidget->hide();
+        BuildOldPanel();
+    }
+
+    /* Subtitles */
+    /* Deactivate the subtitles control by default. */
+    ui.subFrame->setEnabled( false );
+    /* Build the subs size combo box */
+    setfillVLCConfigCombo( "freetype-rel-fontsize" , p_intf,
+                            ui.sizeSubComboBox );
+    /* Build the subs align combo box */
+    setfillVLCConfigCombo( "subsdec-align", p_intf, ui.alignSubComboBox );
+
+    /* Connects  */
+    BUTTONACT( ui.fileBrowseButton, browseFile() );
+    BUTTONACT( ui.delFileButton, deleteFile() );
+
+    BUTTONACT( ui.subBrowseButton, browseFileSub() );
+    CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
+
+    CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
+    CONNECT( ui.subInput, textChanged( QString ), this, updateMRL() );
+    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
+    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
+}
+
+inline void FileOpenPanel::BuildOldPanel()
+{
+    /** BEGIN QFileDialog tweaking **/
+    /* Use a QFileDialog and customize it because we don't want to
+       rewrite it all. Be careful to your eyes cause there are a few hacks.
+       Be very careful and test correctly when you modify this. */
+
+    /* Make this QFileDialog a child of tempWidget from the ui. */
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-            qfu( p_intf->p_sys->psz_filepath ), fileTypes );
+            qfu( p_intf->p_sys->psz_filepath ), "" );
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
@@ -99,7 +134,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Ugly hacks to get the good Widget */
     //This lineEdit is the normal line in the fileDialog.
-    lineFileEdit = dialogBox->findChildren<QLineEdit*>()[0];
+    QLineEdit *lineFileEdit = dialogBox->findChildren<QLineEdit*>()[0];
     /* Make a list of QLabel inside the QFileDialog to access the good ones */
     QList<QLabel *> listLabel = dialogBox->findChildren<QLabel*>();
 
@@ -114,40 +149,16 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /** END of QFileDialog tweaking **/
 
     // Add the DialogBox to the layout
-    ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
-#endif
+    ui.gridLayout_3->addWidget( dialogBox, 0, 0, 1, 3 );
 
-/*    lineFileEdit = ui.fileEdit;
-    //TODO later: fill the fileCompleteList with previous items played.
-    QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
-    fileCompleter->setModel( new QDirModel( fileCompleter ) );
-    lineFileEdit->setCompleter( fileCompleter );*/
-
-    // Hide the subtitles control by default.
-    ui.subFrame->setEnabled( false );
-
-    /* Build the subs size combo box */
-    setfillVLCConfigCombo( "freetype-rel-fontsize" , p_intf,
-                            ui.sizeSubComboBox );
-
-    /* Build the subs align combo box */
-    setfillVLCConfigCombo( "subsdec-align", p_intf, ui.alignSubComboBox );
-
-    /* Connects  */
-    BUTTONACT( ui.fileBrowseButton, browseFile() );
-    BUTTONACT( ui.delFileButton, deleteFile() );
-    BUTTONACT( ui.subBrowseButton, browseFileSub() );
-    CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
-
-    CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
-    CONNECT( ui.subInput, textChanged( QString ), this, updateMRL() );
-    CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
-    CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
+    CONNECT( lineFileEdit, textChanged( QString ), this, updateMRL() );
+    dialogBox->installEventFilter( this );
 }
 
 FileOpenPanel::~FileOpenPanel()
 {
-//  getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
+    if( dialogBox )
+        getSettings()->setValue( "file-dialog-state", dialogBox->saveState() );
 }
 
 void FileOpenPanel::browseFile()
@@ -201,12 +212,17 @@ void FileOpenPanel::updateMRL()
     QStringList fileList;
     QString mrl;
 
-    for( int i = 0; i < ui.fileListWidg->count(); i++ )
-    {
-        if( !ui.fileListWidg->item( i )->text().isEmpty() )
-            fileList << ui.fileListWidg->item( i )->text();
-    }
+    /* File Listing */
+    if( dialogBox == NULL )
+        for( int i = 0; i < ui.fileListWidg->count(); i++ )
+        {
+            if( !ui.fileListWidg->item( i )->text().isEmpty() )
+                fileList << ui.fileListWidg->item( i )->text();
+        }
+    else
+        fileList = dialogBox->selectedFiles();
 
+    /* Options */
     if( ui.subCheckBox->isChecked() &&  !ui.subInput->text().isEmpty() ) {
         mrl.append( " :sub-file=" + colon_escape( ui.subInput->text() ) );
         int align = ui.alignSubComboBox->itemData(

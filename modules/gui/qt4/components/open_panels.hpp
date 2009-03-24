@@ -95,6 +95,19 @@ signals:
     void methodChanged( QString method );
 };
 
+class FileOpenBox: public QFileDialog
+{
+    Q_OBJECT;
+public:
+    FileOpenBox( QWidget *parent, const QString &caption,
+                 const QString &directory, const QString &filter ):
+                QFileDialog( parent, caption, directory, filter ) {}
+public slots:
+    void accept(){}
+    void reject(){}
+};
+
+
 class FileOpenPanel: public OpenPanel
 {
     Q_OBJECT;
@@ -103,8 +116,22 @@ public:
     virtual ~FileOpenPanel();
     virtual void clear() ;
     virtual void accept() ;
+protected:
+    bool eventFilter(QObject *obj, QEvent *event)
+    {
+        if( event->type() == QEvent::Hide ||
+            event->type() == QEvent::HideToParent )
+        {
+            msg_Warn( p_intf, "here" );
+            event->accept();
+            return true;
+        }
+        return false;
+    }
 private:
     Ui::OpenFile ui;
+    FileOpenBox *dialogBox;
+    void BuildOldPanel();
 public slots:
     virtual void updateMRL();
 private slots:
