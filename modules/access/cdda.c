@@ -398,7 +398,6 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     const char *psz_genre = NULL;
     const char *psz_artist = NULL;
     const char *psz_description = NULL;
-    char psz_year_buffer[4+1];
 
 /* Return true if the given string is not NULL and not empty */
 #define NONEMPTY( psz ) ( (psz) && *(psz) )
@@ -407,6 +406,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 
     /* Retreive CDDB informations */
 #ifdef HAVE_LIBCDDB
+    char psz_year_buffer[4+1];
     cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     if( p_disc )
     {
