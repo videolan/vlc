@@ -2021,6 +2021,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     free( psz_old );
 
+    (void)psz_cmd; (void) oldval; (void) p_data;
     return VLC_SUCCESS;
 }
 
