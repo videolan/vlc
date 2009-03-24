@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bonjour.c: Bonjour services discovery module
  *****************************************************************************
- * Copyright (C) 2005-2008 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon@nanocrew.net>
@@ -31,8 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
-#include <vlc_arrays.h>
 #include <vlc_services_discovery.h>
 
 #include <avahi-client/client.h>
@@ -170,13 +168,12 @@ static void resolve_callback(
             }
         }
 
-        if( psz_addr != NULL )
-            free( (void *)psz_addr );
+        free( psz_addr );
 
         if( psz_uri != NULL )
         {
             p_input = input_item_New( p_sd, psz_uri, name );
-            free( (void *)psz_uri );
+            free( psz_uri );
         }
         if( p_input != NULL )
         {
@@ -247,13 +244,9 @@ static int Open( vlc_object_t *p_this )
     services_discovery_sys_t *p_sys;
     int err;
 
-    p_sd->p_sys = p_sys = (services_discovery_sys_t *)malloc(
-        sizeof( services_discovery_sys_t ) );
-
+    p_sd->p_sys = p_sys = calloc( 1, sizeof( services_discovery_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
-
-    memset( p_sys, 0, sizeof(*p_sys) );
 
     vlc_dictionary_init( &p_sys->services_name_to_input_item, 1 );
 
