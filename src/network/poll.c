@@ -25,9 +25,12 @@
 # include "config.h"
 #endif
 
-#ifdef HAVE_POLL
+#include <vlc_common.h>
 #include <stdlib.h>
+#include <vlc_network.h>
 
+
+#ifdef HAVE_POLL
 struct pollfd;
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
@@ -37,10 +40,7 @@ int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 }
 #else /* !HAVE_POLL */
 
-#include <vlc_common.h>
 #include <string.h>
-#include <stdlib.h>
-#include <vlc_network.h>
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 {
