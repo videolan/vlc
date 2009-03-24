@@ -788,8 +788,10 @@ void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
         libvlc_exception_raise(p_e, "Operation not supported");
 #elif defined(__APPLE__)
     p_mi->drawable.agl = drawable;
+    (void) p_e;
 #else
     p_mi->drawable.xid = drawable;
+    (void) p_e;
 #endif
 }
 
