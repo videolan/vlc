@@ -501,7 +501,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
 
         free( psz_uri_to_load );
 
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
     }
 }
 
@@ -631,7 +631,7 @@ void GoBack( intf_thread_t *p_intf )
     {
         /* History doesn't exist yet: ignore user's request */
         msg_Warn( p_intf, "can't go back: no history exists yet" );
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -646,7 +646,7 @@ void GoBack( intf_thread_t *p_intf )
     if( history_CanGoBack( p_history ) == false )
     {
         msg_Warn( p_intf, "can't go back: already at beginning of history" );
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -662,7 +662,7 @@ void GoBack( intf_thread_t *p_intf )
 #ifdef CMML_INTF_DEBUG
         msg_Dbg( p_intf, "back: could not initialise new history item" );
 #endif
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -677,7 +677,7 @@ void GoBack( intf_thread_t *p_intf )
 #endif
 
     ReplacePlaylistItem( p_playlist, p_history_item->psz_uri );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 static
@@ -703,7 +703,7 @@ void GoForward( intf_thread_t *p_intf )
     {
         /* History doesn't exist yet: ignore user's request */
         msg_Warn( p_intf, "can't go back: no history exists yet" );
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -718,7 +718,7 @@ void GoForward( intf_thread_t *p_intf )
     if( history_CanGoForward( p_history ) == false )
     {
         msg_Warn( p_intf, "can't go forward: already at end of history" );
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -729,7 +729,7 @@ void GoForward( intf_thread_t *p_intf )
 #ifdef CMML_INTF_DEBUG
         msg_Dbg( p_intf, "forward: could not initialise new history item" );
 #endif
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
     p_current_item = playlist_CurrentPlayingItem( p_playlist );
@@ -748,7 +748,7 @@ void GoForward( intf_thread_t *p_intf )
 #endif
 
     ReplacePlaylistItem( p_playlist, p_history_item->psz_uri );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 static void ReplacePlaylistItem( playlist_t *p_playlist, char *psz_uri )
