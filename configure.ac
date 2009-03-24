@@ -111,15 +111,20 @@ dnl
 dnl  Check for the contrib directory
 dnl
 AC_ARG_WITH(contrib,
-    [  --without-contrib       do not use the libraries in extras/contrib],[],[])
+    [  --without-contrib       do not use the libraries in CONTRIB_DIR],[],[])
   AS_IF([test "${with_contrib}" != "no"],[
-    AC_MSG_CHECKING([for libs in extras/contrib])
-    topdir="`dirname $0`"
-    if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
-       topdir="`pwd`/$topdir"
+    AC_ARG_VAR([CONTRIB_DIR], [directory containing pre-built contrib, overriding extras/contrib])
+    if test -z "$CONTRIB_DIR"
+    then
+      topdir="`dirname $0`"
+      if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
+         topdir="`pwd`/$topdir"
+      fi
+      CONTRIB_DIR=${topdir}/extras/contrib
     fi
-  AS_IF([test -d ${topdir}/extras/contrib/lib],[
-   AS_IF([test "`grep HOST ${topdir}/extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"],[
+    AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
+  AS_IF([test -d ${CONTRIBDIR}/lib],[
+   AS_IF([test "`grep HOST ${CONTRIB_DIR}/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"],[
       if test "${with_contrib}" = "yes"; then
         AC_MSG_RESULT([no])
         AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
@@ -129,36 +134,36 @@ AC_ARG_WITH(contrib,
       fi
      ],[
     AC_MSG_RESULT([yes])
-    export PATH=${topdir}/extras/contrib/bin:$PATH
-    CPPFLAGS="${CPPFLAGS} -I${topdir}/extras/contrib/include"
-    CPPFLAGS_save="${CPPFLAGS_save} -I${topdir}/extras/contrib/include"
-    CFLAGS="${CFLAGS} -I${topdir}/extras/contrib/include"
-    CFLAGS_save="${CFLAGS_save} -I${topdir}/extras/contrib/include"
-    CXXFLAGS="${CXXFLAGS} -I${topdir}/extras/contrib/include"
-    CXXFLAGS_save="${CXXFLAGS_save} -I${topdir}/extras/contrib/include"
-    OBJCFLAGS="${OBJCFLAGS} -I${topdir}/extras/contrib/include"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -I${topdir}/extras/contrib/include"
+    export PATH=${CONTRIBDIR}/bin:$PATH
+    CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
+    CPPFLAGS_save="${CPPFLAGS_save} -I${CONTRIB_DIR}/include"
+    CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
+    CFLAGS_save="${CFLAGS_save} -I${CONTRIB_DIR}/include"
+    CXXFLAGS="${CXXFLAGS} -I${CONTRIB_DIR}/include"
+    CXXFLAGS_save="${CXXFLAGS_save} -I${CONTRIB_DIR}/include"
+    OBJCFLAGS="${OBJCFLAGS} -I${CONTRIB_DIR}/include"
+    OBJCFLAGS_save="${OBJCFLAGS_save} -I${CONTRIB_DIR}/include"
     if test $build = $host -o "$PKG_CONFIG_LIBDIR"; then
-        export PKG_CONFIG_PATH=${topdir}/extras/contrib/lib/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=${CONTRIB_DIR}/lib/pkgconfig:$PKG_CONFIG_PATH
     else
-        export PKG_CONFIG_LIBDIR=${topdir}/extras/contrib/lib/pkgconfig
+        export PKG_CONFIG_LIBDIR=${CONTRIB_DIR}/lib/pkgconfig
     fi
-    LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
-    LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
+    LDFLAGS="${LDFLAGS} -L${CONTRIB_DIR}/lib"
+    LDFLAGS_save="${LDFLAGS_save} -L${CONTRIB_DIR}/lib"
 
     if test -z $with_mozilla_sdk_path; then
-       with_mozilla_sdk_path=${topdir}/extras/contrib/gecko-sdk
+       with_mozilla_sdk_path=${CONTRIB_DIR}/gecko-sdk
     fi
     if test -z $with_cyberlink_tree; then
-       with_cyberlink_tree=${topdir}/extras/contrib/src/clinkcc
+       with_cyberlink_tree=${CONTRIB_DIR}/src/clinkcc
     fi
 
     if test ".`uname -s`" = ".Darwin"; then
-      export LD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$LD_LIBRARY_PATH
-      export DYLD_LIBRARY_PATH=${topdir}/extras/contrib/lib:$DYLD_LIBRARY_PATH
+      export LD_LIBRARY_PATH=${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH
+      export DYLD_LIBRARY_PATH=${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH
     elif test ".`uname -s`" = ".BeOS"; then
-      export LIBRARY_PATH=${topdir}/extras/contrib/lib:$LIBRARY_PATH
-      export BELIBRARIES=${topdir}/extras/contrib/lib:$BELIBRARIES
+      export LIBRARY_PATH=${CONTRIB_DIR}/lib:$LIBRARY_PATH
+      export BELIBRARIES=${CONTRIB_DIR}/lib:$BELIBRARIES
     fi
     ])
   ],[
