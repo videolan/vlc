@@ -1,7 +1,7 @@
 /*****************************************************************************
  * effects.c : Effects for the visualization system
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
@@ -124,15 +124,15 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     if( !p_data )
     {
         p_effect->p_data = p_data = malloc( sizeof( spectrum_data ) );
-
-        p_data->peaks = calloc( 80, sizeof(int) );
-        p_data->prev_heights = calloc( 80, sizeof(int) );
-
-        if( !p_data)
+        if( !p_data )
         {
             free( p_s16_buff );
             return -1;
         }
+
+        p_data->peaks = calloc( 80, sizeof(int) );
+        p_data->prev_heights = calloc( 80, sizeof(int) );
+
         peaks = ( int * )p_data->peaks;
         prev_heights = ( int * )p_data->prev_heights;
     }
