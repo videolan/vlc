@@ -815,6 +815,12 @@ static void Close   ( vlc_object_t *p_this )
 
     dbus_connection_unref( p_intf->p_sys->p_conn );
 
+    // Free the events array
+    for( int i = 0; i < vlc_array_count( p_intf->p_sys->p_events ); i++ )
+    {
+        callback_info_t* info = vlc_array_item_at_index( p_intf->p_sys->p_events, i );
+        free( info );
+    }
     vlc_mutex_destroy( &p_intf->p_sys->lock );
     vlc_array_destroy( p_intf->p_sys->p_events );
     free( p_intf->p_sys );
