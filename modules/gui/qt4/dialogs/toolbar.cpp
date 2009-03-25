@@ -284,7 +284,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     for( int i = 0; i < BUTTON_MAX; i++ )
     {
         QListWidgetItem *widgetItem = new QListWidgetItem( this );
-        widgetItem->setText( nameL[i] );
+        widgetItem->setText( qtr( nameL[i] ) );
         widgetItem->setIcon( QIcon( iconL[i] ) );
         widgetItem->setData( Qt::UserRole, QVariant( i ) );
         addItem( widgetItem );

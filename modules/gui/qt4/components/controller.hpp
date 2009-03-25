@@ -97,20 +97,20 @@ typedef enum buttonType_e
 } buttonType_e;
 
 
-static const QString nameL[BUTTON_MAX] = { "Play", "Stop", "Open",
-    "Previous", "Next", "Slower", "Faster", "Fullscreen", "De-Fullscreen",
-    "Extended panel", "Playlist", "Snapshot", "Record", "A->B Loop",
-    "Frame By Frame", "Trickplay Reverse", "Step backward" , "Step forward",
-    "Quit" };
-static const QString tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
-    _("Stop playback"), _("Open a medium"),
-    _("Previous media in the playlist"),
-    _("Next media in the playlist"), _("Slower"), _("Faster"),
-    _("Toggle the video in fullscreen"), _("Toggle the video out fullscreen"),
-    _("Show extended settings" ), _( "Show playlist" ), _( "Take a snapshot" ),
-    _( "Record" ), _( "Loop from point A to point B continuously." ),
-    _("Frame by frame"), _("Reverse"), _("Step backward"), _("Step forward"),
-    _("Quit") };
+static const char* nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"),
+    N_("Previous"), N_("Next"), N_("Slower"), N_("Faster"), N_("Fullscreen"),
+   N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
+   N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
+   N_("Step backward" ), N_("Step forward"), N_("Quit") };
+static const char* tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
+    N_("Stop playback"), N_("Open a medium"),
+    N_("Previous media in the playlist"),
+    N_("Next media in the playlist"), N_("Slower"), N_("Faster"),
+    N_("Toggle the video in fullscreen"), N_("Toggle the video out fullscreen"),
+    N_("Show extended settings" ), N_( "Show playlist" ),
+    N_( "Take a snapshot" ), N_( "Record" ),
+    N_( "Loop from point A to point B continuously." ), N_("Frame by frame"),
+    N_("Reverse"), N_("Step backward"), N_("Step forward"), N_("Quit") };
 static const QString iconL[BUTTON_MAX] ={ ":/play_b", ":/stop_b", ":/eject",
     ":/previous_b", ":/next_b", ":/slower", ":/faster", ":/fullscreen",
     ":/defullscreen", ":/extended", ":/playlist", ":/snapshot", ":/record",

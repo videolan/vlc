@@ -166,7 +166,7 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
     CONNECT_MAP( a ); \
     SET_MAPPING( a, b );
 #define BUTTON_SET_BAR( a_button ) \
-    a_button->setToolTip( tooltipL[button] );          \
+    a_button->setToolTip( qtr( tooltipL[button] ) ); \
     a_button->setIcon( QIcon( iconL[button] ) );
 #define BUTTON_SET_BAR2( button, image, tooltip ) \
     button->setToolTip( tooltip );          \
