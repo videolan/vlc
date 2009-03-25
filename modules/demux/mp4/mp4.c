@@ -77,8 +77,8 @@ typedef struct
     uint32_t     i_sample_count; /* how many samples in this chunk */
     uint32_t     i_sample_first; /* index of the first sample in this chunk */
 
-    /* now provide way to calculate pts, dts, and offset without to
-        much memory and with fast acces */
+    /* now provide way to calculate pts, dts, and offset without too
+        much memory and with fast access */
 
     /* with this we can calculate dts/pts without waste memory */
     uint64_t     i_first_dts;
@@ -756,7 +756,7 @@ static void MP4_UpdateSeekpoint( demux_t *p_demux )
     }
 }
 /*****************************************************************************
- * Seek: Got to i_date
+ * Seek: Go to i_date
 ******************************************************************************/
 static int Seek( demux_t *p_demux, mtime_t i_date )
 {
