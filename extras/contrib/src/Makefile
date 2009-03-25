@@ -2404,7 +2404,7 @@ pthreads: pthreads-w32-$(PTHREADS_VERSION)-release.tar.gz
 	(cd $@; patch -p0 < ../Patches/pthreads-detach.patch)
 
 .pthreads: pthreads
-	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.{a,dll} $(PREFIX)/lib/)
+	(cd $<; $(HOSTCC) make $(PTHREADSCONF) GC GC-static && mkdir -p $(PREFIX)/include && cp -v pthread.h sched.h semaphore.h $(PREFIX)/include/ && mkdir -p $(PREFIX)/lib && cp -v *.a *.dll $(PREFIX)/lib/)
 	$(INSTALL_NAME)
 	touch $@
 
