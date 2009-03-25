@@ -46,7 +46,7 @@
 struct intf_sys_t
 {
     vlc_mutex_t         lock;
-    vlc_object_t *      p_vout;
+    vout_thread_t      *p_vout;
     bool                b_got_gesture;
     bool                b_button_pressed;
     int                 i_mouse_x, i_mouse_y;
@@ -178,6 +178,7 @@ void Close ( vlc_object_t *p_this )
  *****************************************************************************/
 static void RunIntf( intf_thread_t *p_intf )
 {
+    intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t * p_playlist = NULL;
     int canc = vlc_savecancel();
     input_thread_t *p_input;
@@ -185,12 +186,12 @@ static void RunIntf( intf_thread_t *p_intf )
     /* Main loop */
     while( vlc_object_alive( p_intf ) )
     {
-        vlc_mutex_lock( &p_intf->p_sys->lock );
+        vlc_mutex_lock( &p_sys->lock );
 
         /*
          * mouse cursor
          */
-        if( p_intf->p_sys->b_got_gesture )
+        if( p_sys->b_got_gesture )
         {
             vlc_value_t val;
             int i_interval = 0;
@@ -198,7 +199,7 @@ static void RunIntf( intf_thread_t *p_intf )
             /* If you modify this, please try to follow this convention:
                Start with LEFT, RIGHT for playback related commands
                and UP, DOWN, for other commands */
-            switch( p_intf->p_sys->i_pattern )
+            switch( p_sys->i_pattern )
             {
             case LEFT:
                 msg_Dbg( p_intf, "Go backward in the movie!" );
@@ -299,7 +300,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case GESTURE(UP,DOWN,NONE,NONE):
             case GESTURE(DOWN,UP,NONE,NONE):
-                msg_Dbg(p_intf, "Mute sound");
+                msg_Dbg( p_intf, "Mute sound" );
                 aout_VolumeMute( p_intf, NULL );
                 break;
 
@@ -390,11 +391,11 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
 
             case GESTURE(UP,LEFT,NONE,NONE):
-                if (p_intf->p_sys->p_vout )
+                if( p_sys->p_vout )
                 {
-                    var_Get( p_intf->p_sys->p_vout, "fullscreen", &val );
+                    var_Get( p_sys->p_vout, "fullscreen", &val );
                     val.b_bool = !val.b_bool;
-                    var_Set( p_intf->p_sys->p_vout, "fullscreen", val );
+                    var_Set( p_sys->p_vout, "fullscreen", val );
                 }
                 break;
 
@@ -404,49 +405,49 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
             case GESTURE(DOWN,LEFT,UP,RIGHT):
             case GESTURE(UP,RIGHT,DOWN,LEFT):
-                msg_Dbg(p_intf, "a square was drawn!" );
+                msg_Dbg( p_intf, "a square was drawn!" );
                 break;
             default:
                 break;
             }
-            p_intf->p_sys->i_num_gestures = 0;
-            p_intf->p_sys->i_pattern = 0;
-            p_intf->p_sys->b_got_gesture = false;
+            p_sys->i_num_gestures = 0;
+            p_sys->i_pattern = 0;
+            p_sys->b_got_gesture = false;
         }
 
         /*
          * video output
          */
-        if( p_intf->p_sys->p_vout && !vlc_object_alive (p_intf->p_sys->p_vout) )
+        if( p_sys->p_vout && !vlc_object_alive( p_sys->p_vout ) )
         {
-            var_DelCallback( p_intf->p_sys->p_vout, "mouse-moved",
+            var_DelCallback( p_sys->p_vout, "mouse-moved",
                              MouseEvent, p_intf );
-            var_DelCallback( p_intf->p_sys->p_vout, "mouse-button-down",
+            var_DelCallback( p_sys->p_vout, "mouse-button-down",
                              MouseEvent, p_intf );
-            vlc_object_release( p_intf->p_sys->p_vout );
-            p_intf->p_sys->p_vout = NULL;
+            vlc_object_release( p_sys->p_vout );
+            p_sys->p_vout = NULL;
         }
 
-        if( p_intf->p_sys->p_vout == NULL )
+        if( p_sys->p_vout == NULL )
         {
             p_playlist = pl_Hold( p_intf );
             p_input = playlist_CurrentInput( p_playlist );
             pl_Release( p_intf );
             if( p_input )
             {
-                p_intf->p_sys->p_vout = input_GetVout( p_input );
+                p_sys->p_vout = input_GetVout( p_input );
                 vlc_object_release( p_input );
             }
-            if( p_intf->p_sys->p_vout )
+            if( p_sys->p_vout )
             {
-                var_AddCallback( p_intf->p_sys->p_vout, "mouse-moved",
+                var_AddCallback( p_sys->p_vout, "mouse-moved",
                                  MouseEvent, p_intf );
-                var_AddCallback( p_intf->p_sys->p_vout, "mouse-button-down",
+                var_AddCallback( p_sys->p_vout, "mouse-button-down",
                                  MouseEvent, p_intf );
             }
         }
 
-        vlc_mutex_unlock( &p_intf->p_sys->lock );
+        vlc_mutex_unlock( &p_sys->lock );
 
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );
@@ -462,33 +463,29 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    vlc_value_t val;
     int pattern = 0;
 
     signed int i_horizontal, i_vertical;
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
+    intf_sys_t    *p_sys = p_intf->p_sys;
 
-    vlc_mutex_lock( &p_intf->p_sys->lock );
+    vlc_mutex_lock( &p_sys->lock );
 
     /* don't process new gestures before the last events are processed */
-    if( p_intf->p_sys->b_got_gesture )
+    if( p_sys->b_got_gesture )
     {
-        vlc_mutex_unlock( &p_intf->p_sys->lock );
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
 
-    if( !strcmp(psz_var, "mouse-moved" ) && p_intf->p_sys->b_button_pressed )
+    if( !strcmp( psz_var, "mouse-moved" ) && p_sys->b_button_pressed )
     {
-        var_Get( p_intf->p_sys->p_vout, "mouse-x", &val );
-        p_intf->p_sys->i_mouse_x = val.i_int;
-        var_Get( p_intf->p_sys->p_vout, "mouse-y", &val );
-        p_intf->p_sys->i_mouse_y = val.i_int;
-        i_horizontal = p_intf->p_sys->i_mouse_x -
-            p_intf->p_sys->i_last_x;
-        i_horizontal = i_horizontal / p_intf->p_sys->i_threshold;
-        i_vertical = p_intf->p_sys->i_mouse_y
-            - p_intf->p_sys->i_last_y;
-        i_vertical = i_vertical / p_intf->p_sys->i_threshold;
+        p_sys->i_mouse_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
+        p_sys->i_mouse_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
+        i_horizontal = p_sys->i_mouse_x - p_sys->i_last_x;
+        i_horizontal = i_horizontal / p_sys->i_threshold;
+        i_vertical = p_sys->i_mouse_y - p_sys->i_last_y;
+        i_vertical = i_vertical / p_sys->i_threshold;
 
         if( i_horizontal < 0 )
         {
@@ -512,37 +509,33 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         }
         if( pattern )
         {
-            p_intf->p_sys->i_last_y = p_intf->p_sys->i_mouse_y;
-            p_intf->p_sys->i_last_x = p_intf->p_sys->i_mouse_x;
-            if( gesture( p_intf->p_sys->i_pattern,
-                         p_intf->p_sys->i_num_gestures - 1 ) != pattern )
+            p_sys->i_last_y = p_sys->i_mouse_y;
+            p_sys->i_last_x = p_sys->i_mouse_x;
+            if( gesture( p_sys->i_pattern, p_sys->i_num_gestures - 1 )
+                    != pattern )
             {
-                p_intf->p_sys->i_pattern |=
-                    pattern << ( p_intf->p_sys->i_num_gestures * 4 );
-                p_intf->p_sys->i_num_gestures++;
+                p_sys->i_pattern |= pattern << ( p_sys->i_num_gestures * 4 );
+                p_sys->i_num_gestures++;
             }
         }
 
     }
-    if( !strcmp( psz_var, "mouse-button-down" )
-        && newval.i_int & p_intf->p_sys->i_button_mask
-        && !p_intf->p_sys->b_button_pressed )
+    else if( !strcmp( psz_var, "mouse-button-down" ) )
     {
-        p_intf->p_sys->b_button_pressed = true;
-        var_Get( p_intf->p_sys->p_vout, "mouse-x", &val );
-        p_intf->p_sys->i_last_x = val.i_int;
-        var_Get( p_intf->p_sys->p_vout, "mouse-y", &val );
-        p_intf->p_sys->i_last_y = val.i_int;
-    }
-    if( !strcmp( psz_var, "mouse-button-down" )
-        && !( newval.i_int & p_intf->p_sys->i_button_mask )
-        && p_intf->p_sys->b_button_pressed )
-    {
-        p_intf->p_sys->b_button_pressed = false;
-        p_intf->p_sys->b_got_gesture = true;
+        if( (newval.i_int & p_sys->i_button_mask) && !p_sys->b_button_pressed )
+        {
+            p_sys->b_button_pressed = true;
+            p_sys->i_last_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
+            p_sys->i_last_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
+        }
+        else if( !( newval.i_int & p_sys->i_button_mask ) && p_sys->b_button_pressed )
+        {
+            p_sys->b_button_pressed = false;
+            p_sys->b_got_gesture = true;
+        }
     }
 
-    vlc_mutex_unlock( &p_intf->p_sys->lock );
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
