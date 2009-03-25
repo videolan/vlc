@@ -260,6 +260,8 @@ static int Open( vlc_object_t *p_this )
                 if( ( psz_eoa = strchr( psz_parser, '}') ) == NULL )
                 {
                    msg_Err( p_filter, "unable to parse effect list. Aborting");
+                   free( p_effect->psz_name );
+                   free( p_effect );
                    break;
                 }
                 p_effect->psz_args =
@@ -309,6 +311,13 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
+        for( int i = 0; i < p_sys->i_effect; i++ )
+        {
+            free( p_sys->effect[i]->psz_name );
+            free( p_sys->effect[i]->psz_args );
+            free( p_sys->effect[i] );
+        }
+        free( p_sys->effect );
         free( p_sys );
         return VLC_EGENERIC;
     }
