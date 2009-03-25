@@ -189,11 +189,9 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
-    vlc_value_t        val;
 
     char *psz_effects, *psz_parser;
     video_format_t fmt;
-
 
     if( ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2') &&
           p_filter->input.i_format != VLC_FOURCC('f','i','3','2') ) )
@@ -217,11 +215,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->effect   = NULL;
 
     /* Parse the effect list */
-    var_Create( p_filter, "effect-list", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "effect-list", &val);
-    psz_parser = psz_effects = strdup( val.psz_string );
-    free( val.psz_string );
-
+    psz_parser = psz_effects = var_CreateGetString( p_filter, "effect-list" );
     var_AddCallback( p_filter, "effect-list", FilterCallback, NULL );
 
     while( psz_parser && *psz_parser != '\0' )
