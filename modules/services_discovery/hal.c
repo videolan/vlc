@@ -315,6 +315,7 @@ static void *Run( void *data )
             ParseDevice( p_sd, devices[ i ] );
             libhal_free_string( devices[ i ] );
         }
+        free( devices );
     }
 
     /* FIXME: Totally lame. There are DBus watch functions to do this properly.
