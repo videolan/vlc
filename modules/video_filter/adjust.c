@@ -189,7 +189,17 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    free( p_filter->p_sys );
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    var_DelCallback( p_filter, "contrast",   AdjustCallback, p_sys );
+    var_DelCallback( p_filter, "brightness", AdjustCallback, p_sys );
+    var_DelCallback( p_filter, "hue",        AdjustCallback, p_sys );
+    var_DelCallback( p_filter, "saturation", AdjustCallback, p_sys );
+    var_DelCallback( p_filter, "gamma",      AdjustCallback, p_sys );
+    var_DelCallback( p_filter, "brightness-threshold",
+                                             AdjustCallback, p_sys );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
