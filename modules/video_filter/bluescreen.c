@@ -140,6 +140,7 @@ static int Create( vlc_object_t *p_this )
     GET_VAR( ut, 0x00, 0xff );
     GET_VAR( vt, 0x00, 0xff );
     p_sys->p_at = NULL;
+#undef GET_VAR
 
     p_filter->pf_video_filter = Filter;
 
@@ -149,9 +150,15 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    free( p_filter->p_sys->p_at );
-    free( p_filter->p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "u", BluescreenCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "v", BluescreenCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "ut", BluescreenCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "vt", BluescreenCallback, p_sys );
+
+    free( p_sys->p_at );
+    free( p_sys );
 }
 
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
