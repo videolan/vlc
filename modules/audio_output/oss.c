@@ -321,6 +321,7 @@ static int Open( vlc_object_t *p_this )
     if ( var_Get( p_aout, "audio-device", &val ) < 0 )
     {
         /* Probe() has failed. */
+        close( p_sys->i_fd );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -359,12 +360,12 @@ static int Open( vlc_object_t *p_this )
     {
         /* This should not happen ! */
         msg_Err( p_aout, "internal: can't find audio-device (%i)", val.i_int );
+        close( p_sys->i_fd );
         free( p_sys );
         return VLC_EGENERIC;
     }
 
-    val.b_bool = true;
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
 
     /* Reset the DSP device */
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
