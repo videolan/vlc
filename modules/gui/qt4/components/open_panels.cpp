@@ -149,7 +149,7 @@ inline void FileOpenPanel::BuildOldPanel()
     /** END of QFileDialog tweaking **/
 
     // Add the DialogBox to the layout
-    ui.gridLayout_3->addWidget( dialogBox, 0, 0, 1, 3 );
+    ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
 
     CONNECT( lineFileEdit, textChanged( QString ), this, updateMRL() );
     dialogBox->installEventFilter( this );

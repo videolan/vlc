@@ -20,7 +20,7 @@
   <property name="windowTitle">
    <string>Open File</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QGroupBox" name="tempWidget">
      <property name="toolTip">
@@ -29,7 +29,7 @@
      <property name="title">
       <string>File Selection</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout1">
       <item row="0" column="0" colspan="3">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -106,7 +106,7 @@
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout2">
       <item row="1" column="0">
        <spacer>
         <property name="orientation">
