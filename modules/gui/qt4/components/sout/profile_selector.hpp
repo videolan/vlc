@@ -43,7 +43,7 @@ public:
 private:
     QComboBox *profileBox;
     void fillProfilesCombo();
-    void editProfile( QString, QString );
+    void editProfile( const QString&, const QString& );
     void saveProfiles();
     QString mux;
     QString transcode;
@@ -62,14 +62,14 @@ class VLCProfileEditor : public QVLCDialog
 
     Ui::Profiles ui;
 public:
-    VLCProfileEditor( QString, QString, QWidget * );
+    VLCProfileEditor( const QString&, const QString&, QWidget * );
 
     QString name;
     QString muxValue;
     QString transcodeValue();
 private:
     void registerCodecs();
-    void fillProfile( QString qs );
+    void fillProfile( const QString& qs );
 protected slots:
     virtual void close();
 private slots:

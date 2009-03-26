@@ -143,7 +143,7 @@ protected:
 
     AdvControlsWidget   *advControls;
 
-    void parseAndCreate( QString config, QBoxLayout *controlLayout );
+    void parseAndCreate( const QString& config, QBoxLayout *controlLayout );
 
     virtual void createAndAddWidget( QBoxLayout *controlLayout, int i_index,
                                      buttonType_e i_type, int i_option );

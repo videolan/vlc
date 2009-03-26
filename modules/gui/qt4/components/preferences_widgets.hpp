@@ -460,7 +460,7 @@ private slots:
 class KeyInputDialog : public QDialog
 {
 public:
-    KeyInputDialog( QTreeWidget *, QString, QWidget * );
+    KeyInputDialog( QTreeWidget *, const QString&, QWidget * );
     int keyValue;
     bool conflicts;
 private:

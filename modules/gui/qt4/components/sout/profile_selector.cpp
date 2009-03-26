@@ -109,7 +109,7 @@ void VLCProfileSelector::editProfile()
                  profileBox->itemData( profileBox->currentIndex() ).toString() );
 }
 
-void VLCProfileSelector::editProfile( QString qs, QString value )
+void VLCProfileSelector::editProfile( const QString& qs, const QString& value )
 {
     VLCProfileEditor *editor = new VLCProfileEditor( qs, value, this );
 
@@ -212,7 +212,7 @@ void VLCProfileSelector::updateOptions( int i )
 /**
  * VLCProfileEditor
  **/
-VLCProfileEditor::VLCProfileEditor( QString qs_name, QString value,
+VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value,
         QWidget *_parent )
                  : QVLCDialog( _parent, NULL )
 {
@@ -293,7 +293,7 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_SCODEC( "T.140", "t140" )
 }
 
-void VLCProfileEditor::fillProfile( QString qs )
+void VLCProfileEditor::fillProfile( const QString& qs )
 {
     QStringList options = qs.split( ";" );
     if( options.size() < 16 )

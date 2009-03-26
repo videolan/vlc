@@ -402,7 +402,7 @@ QStringList PLModel::selectedURIs()
                 char *psz = input_item_GetURI( p_item->p_input );
                 if( psz )
                 {
-                    lst.append( QString( psz ) );
+                    lst.append( psz );
                     free( psz );
                 }
             }
@@ -763,7 +763,7 @@ next:
     rebuild();
 }
 
-void PLModel::search( QString search_text )
+void PLModel::search( const QString& search_text )
 {
     /** \todo Fire the search with a small delay ? */
     PL_LOCK;
@@ -771,7 +771,7 @@ void PLModel::search( QString search_text )
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         rootItem->i_id );
         assert( p_root );
-        char *psz_name = search_text.toUtf8().data();
+        const char *psz_name = search_text.toUtf8().data();
         playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
     }
     PL_UNLOCK;

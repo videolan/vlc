@@ -113,7 +113,7 @@ public:
     /* Actions made by the views */
     void popup( QModelIndex & index, QPoint &point, QModelIndexList list );
     void doDelete( QModelIndexList selected );
-    void search( QString search );
+    void search( const QString& search_text );
     void sort( int column, Qt::SortOrder order );
     void removeItem( int );
 

@@ -1311,7 +1311,7 @@ void KeySelectorControl::doApply()
 }
 
 KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
-                                QString keyToChange,
+                                const QString& keyToChange,
                                 QWidget *_parent ) :
                                 QDialog( _parent ), keyValue(0)
 {

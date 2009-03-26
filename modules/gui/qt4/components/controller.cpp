@@ -99,7 +99,7 @@ void AbstractController::setupButton( QAbstractButton *aButton )
 
 /* Open the generic config line for the toolbar, parse it
  * and create the widgets accordingly */
-void AbstractController::parseAndCreate( QString config,
+void AbstractController::parseAndCreate( const QString& config,
                                          QBoxLayout *controlLayout )
 {
     QStringList list = config.split( ";", QString::SkipEmptyParts ) ;

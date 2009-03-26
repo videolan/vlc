@@ -34,7 +34,7 @@
 #include <QLineEdit>
 #include <QFileDialog>
 
-SoutInputBox::SoutInputBox( QWidget *_parent, QString mrl ) : QGroupBox( _parent )
+SoutInputBox::SoutInputBox( QWidget *_parent, const QString& mrl ) : QGroupBox( _parent )
 {
     /**
      * Source Block
@@ -62,7 +62,7 @@ SoutInputBox::SoutInputBox( QWidget *_parent, QString mrl ) : QGroupBox( _parent
     sourceLayout->addWidget( line, 2, 0, 1, -1 );
 }
 
-void SoutInputBox::setMRL( QString mrl )
+void SoutInputBox::setMRL( const QString& mrl )
 {
     sourceLine->setText( mrl );
     QString type;
@@ -104,7 +104,7 @@ FileDestBox::FileDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     BUTTONACT( fileSelectButton, fileBrowse() );
 }
 
-QString FileDestBox::getMRL( QString mux )
+QString FileDestBox::getMRL( const QString& mux )
 {
     if( fileEdit->text().isEmpty() ) return "";
 
@@ -158,7 +158,7 @@ HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( HTTPEdit );
 }
 
-QString HTTPDestBox::getMRL( QString mux )
+QString HTTPDestBox::getMRL( const QString& mux )
 {
     if( HTTPEdit->text().isEmpty() ) return "";
 
@@ -202,7 +202,7 @@ MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( MMSHEdit );
 }
 
-QString MMSHDestBox::getMRL( QString mux )
+QString MMSHDestBox::getMRL( const QString& mux )
 {
     if( MMSHEdit->text().isEmpty() ) return "";
 
@@ -246,7 +246,7 @@ UDPDestBox::UDPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( UDPEdit );
 }
 
-QString UDPDestBox::getMRL( QString mux )
+QString UDPDestBox::getMRL( const QString& mux )
 {
     if( UDPEdit->text().isEmpty() ) return "";
 
@@ -317,7 +317,7 @@ RTPDestBox::RTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( RTPEdit );
 }
 
-QString RTPDestBox::getMRL( QString mux )
+QString RTPDestBox::getMRL( const QString& mux )
 {
     if( RTPEdit->text().isEmpty() ) return "";
 
@@ -380,7 +380,7 @@ ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( ICEPassEdit );
 }
 
-QString ICEDestBox::getMRL( QString mux )
+QString ICEDestBox::getMRL( const QString& mux )
 {
     if( ICEEdit->text().isEmpty() ) return "";
 
