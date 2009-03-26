@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.8.6b1\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2009-03-19 00:22+0000\n"
+"POT-Creation-Date: 2009-03-26 21:58+0000\n"
 "PO-Revision-Date: 2008-12-08 12:41+0330\n"
 "Last-Translator: SalarSoft <salarsoftwares@gmail.com>\n"
 "Language-Team: Persian\n"
@@ -73,7 +73,7 @@ msgstr "تنظیمات واسط‌های کنترلی وی‌ال‌سی"
 msgid "Hotkeys settings"
 msgstr "تنظیمات میان‌برها"
 
-#: include/vlc_config_cat.h:52 src/input/es_out.c:2649 src/input/es_out.c:2683
+#: include/vlc_config_cat.h:52 src/input/es_out.c:2628 src/input/es_out.c:2662
 #: src/libvlc-module.c:1500 modules/gui/beos/InterfaceWindow.cpp:283
 #: modules/gui/macosx/intf.m:597 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:113 modules/gui/macosx/simple_prefs.m:178
@@ -120,7 +120,7 @@ msgstr "پیمانه‌های خروجی"
 msgid "General settings for audio output modules."
 msgstr "اینها تنظیمات عمومی پیمانه‌های خروجی صدا هستند."
 
-#: include/vlc_config_cat.h:66 src/libvlc-module.c:1923
+#: include/vlc_config_cat.h:66 src/libvlc-module.c:1931
 #: modules/stream_out/transcode.c:232
 msgid "Miscellaneous"
 msgstr "متفرقه"
@@ -129,14 +129,14 @@ msgstr "متفرقه"
 msgid "Miscellaneous audio settings and modules."
 msgstr "تنظیمات و پیمانه‌های صوتی متفرقه"
 
-#: include/vlc_config_cat.h:70 src/input/es_out.c:2652 src/input/es_out.c:2732
+#: include/vlc_config_cat.h:70 src/input/es_out.c:2631 src/input/es_out.c:2711
 #: src/libvlc-module.c:1553 modules/gui/macosx/intf.m:610
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:102
 #: modules/gui/macosx/simple_prefs.m:182 modules/gui/macosx/wizard.m:381
 #: modules/gui/qt4/components/info_panels.cpp:518
 #: modules/gui/qt4/components/simple_preferences.cpp:80
-#: modules/gui/qt4/ui/sprefs_video.ui:150 modules/misc/dummy/dummy.c:104
-#: modules/stream_out/es.c:101 modules/stream_out/transcode.c:169
+#: modules/misc/dummy/dummy.c:104 modules/stream_out/es.c:101
+#: modules/stream_out/transcode.c:169
 msgid "Video"
 msgstr "ویدئو"
 
@@ -247,7 +247,7 @@ msgstr "عمومی"
 msgid "General input settings. Use with care..."
 msgstr "تنظیمات عمومی ورودی. با احتیاط استفاده شود."
 
-#: include/vlc_config_cat.h:124 src/libvlc-module.c:1850
+#: include/vlc_config_cat.h:124 src/libvlc-module.c:1858
 msgid "Stream output"
 msgstr "خروجی جاری"
 
@@ -335,12 +335,13 @@ msgstr "ویدئوی درخواستی"
 msgid "VLC's implementation of Video On Demand"
 msgstr "پیاده‌سازی ویدئوی درخواستی برای وی‌ال‌سی"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:1984
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:1992
 #: src/playlist/engine.c:119 modules/demux/playlist/playlist.c:66
 #: modules/demux/playlist/playlist.c:67
 #: modules/gui/beos/InterfaceWindow.cpp:232
 #: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:540
 #: modules/gui/pda/pda_interface.c:1262
+#: modules/gui/qt4/components/controller.hpp:102
 #: modules/gui/qt4/components/playlist/playlist.cpp:114
 #: modules/gui/qt4/dialogs/playlist.cpp:43
 #: modules/gui/qt4/main_interface.cpp:142
@@ -372,7 +373,7 @@ msgstr ""
 "پیمانه‌های کشف سرویس وسایلی هستند که به طور خودکار مواردی به فهرست پخش اضافه "
 "می‌کنند."
 
-#: include/vlc_config_cat.h:186 src/libvlc-module.c:1800
+#: include/vlc_config_cat.h:186 src/libvlc-module.c:1808
 msgid "Advanced"
 msgstr "پیشرفته"
 
@@ -399,7 +400,7 @@ msgstr "تنظیمات پیشرفته"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:171
 #: modules/gui/macosx/open.m:441 modules/gui/macosx/simple_prefs.m:253
-#: modules/gui/pda/pda_interface.c:546 modules/gui/qt4/ui/sprefs_input.ui:49
+#: modules/gui/pda/pda_interface.c:546
 msgid "Network"
 msgstr "شبکه"
 
@@ -526,7 +527,7 @@ msgstr "درباره"
 #: modules/gui/macosx/intf.m:1905 modules/gui/macosx/intf.m:1906
 #: modules/gui/macosx/intf.m:1907 modules/gui/macosx/playlist.m:443
 #: modules/gui/pda/pda_interface.c:260 modules/gui/pda/pda_interface.c:261
-#: modules/gui/qt4/menus.cpp:721
+#: modules/gui/qt4/components/controller.hpp:100 modules/gui/qt4/menus.cpp:721
 msgid "Play"
 msgstr "پخش"
 
@@ -538,8 +539,6 @@ msgstr "گرفتن اطلاعات"
 #: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:444
 #: modules/gui/pda/pda_interface.c:1252
 #: modules/gui/qt4/dialogs/bookmarks.cpp:46
-#: modules/gui/qt4/ui/podcast_configuration.ui:59
-#: modules/gui/qt4/ui/streampanel.ui:41
 msgid "Delete"
 msgstr "حذف"
 
@@ -657,7 +656,7 @@ msgid ""
 msgstr ""
 "بزرگ‌نمایی بخشی از تصویر. می‌توانید انتخاب کنید کدام قسمت تصویر بزرگ‌نمایی شود."
 
-#: include/vlc_intf_strings.h:100 modules/gui/qt4/ui/video_effects.ui:551
+#: include/vlc_intf_strings.h:100
 msgid "Waves"
 msgstr "موج"
 
@@ -793,11 +792,9 @@ msgstr "استریو"
 #: modules/audio_filter/channel_mixer/mono.c:101 modules/codec/dvbsub.c:75
 #: modules/codec/subtitles/subsdec.c:102 modules/codec/zvbi.c:79
 #: modules/control/gestures.c:91 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:252
-#: modules/gui/qt4/ui/video_effects.ui:867
-#: modules/gui/qt4/ui/video_effects.ui:935 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Left"
 msgstr "چپ"
 
@@ -806,9 +803,9 @@ msgstr "چپ"
 #: modules/audio_filter/channel_mixer/mono.c:101 modules/codec/dvbsub.c:75
 #: modules/codec/subtitles/subsdec.c:102 modules/codec/zvbi.c:79
 #: modules/control/gestures.c:91 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:269 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Right"
 msgstr "راست"
 
@@ -937,7 +934,7 @@ msgstr ""
 #: src/input/es_out.c:911 src/input/es_out.c:916 src/libvlc-module.c:342
 #: modules/access/cdda/info.c:393 modules/access/vcdx/access.c:477
 #: modules/access/vcdx/info.c:290 modules/access/vcdx/info.c:291
-#: modules/gui/qt4/components/open_panels.cpp:349
+#: modules/gui/qt4/components/open_panels.cpp:381
 msgid "Track"
 msgstr "قطعه"
 
@@ -952,126 +949,125 @@ msgstr "%s [%s %Id]"
 msgid "Program"
 msgstr "برنامه"
 
-#: src/input/es_out.c:1361 src/input/es_out.c:1363
+#: src/input/es_out.c:1340 src/input/es_out.c:1342
 #, fuzzy
 msgid "Scrambled"
 msgstr "مقیاس"
 
-#: src/input/es_out.c:1361 modules/gui/macosx/update.m:102
+#: src/input/es_out.c:1340 modules/gui/macosx/update.m:102
 msgid "Yes"
 msgstr "بله"
 
-#: src/input/es_out.c:1937
+#: src/input/es_out.c:1916
 #, fuzzy, c-format
 msgid "Closed captions %u"
 msgstr "کدگشای صدای وُربیس"
 
-#: src/input/es_out.c:2638
+#: src/input/es_out.c:2617
 #, c-format
 msgid "Stream %d"
 msgstr "جریان %Id"
 
-#: src/input/es_out.c:2655 src/input/es_out.c:2763
+#: src/input/es_out.c:2634 src/input/es_out.c:2742
 msgid "Subtitle"
 msgstr "زیرنویس"
 
-#: src/input/es_out.c:2663 src/input/es_out.c:2683 src/input/es_out.c:2732
-#: src/input/es_out.c:2763 modules/gui/macosx/output.m:153
-#: modules/gui/qt4/ui/sprefs_audio.ui:186
+#: src/input/es_out.c:2642 src/input/es_out.c:2662 src/input/es_out.c:2711
+#: src/input/es_out.c:2742 modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "نوع"
 
-#: src/input/es_out.c:2666
+#: src/input/es_out.c:2645
 #, fuzzy
 msgid "Original ID"
 msgstr "صدای اصلی"
 
-#: src/input/es_out.c:2669 modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2648 modules/gui/macosx/wizard.m:385
 msgid "Codec"
 msgstr "کُدک"
 
-#: src/input/es_out.c:2673 src/input/meta.c:50 src/libvlc-module.c:193
+#: src/input/es_out.c:2652 src/input/meta.c:50 src/libvlc-module.c:193
 #: modules/gui/beos/InterfaceWindow.cpp:279
 #: modules/gui/macosx/simple_prefs.m:262
 msgid "Language"
 msgstr "زبان"
 
-#: src/input/es_out.c:2676 src/input/meta.c:45
+#: src/input/es_out.c:2655 src/input/meta.c:45
 #: modules/gui/macosx/bookmarks.m:94 modules/gui/qt4/dialogs/bookmarks.cpp:66
 msgid "Description"
 msgstr "شرح"
 
-#: src/input/es_out.c:2686 src/input/es_out.c:2689
+#: src/input/es_out.c:2665 src/input/es_out.c:2668
 #: modules/gui/macosx/output.m:176
 msgid "Channels"
 msgstr "کانال‌ها"
 
-#: src/input/es_out.c:2694
+#: src/input/es_out.c:2673
 msgid "Sample rate"
 msgstr "نرخ نمونه"
 
-#: src/input/es_out.c:2695
+#: src/input/es_out.c:2674
 #, fuzzy, c-format
 msgid "%u Hz"
 msgstr "%Id هرتز"
 
-#: src/input/es_out.c:2705
+#: src/input/es_out.c:2684
 msgid "Bits per sample"
 msgstr "بیت بر نمونه"
 
-#: src/input/es_out.c:2710 modules/access/pvr.c:97
+#: src/input/es_out.c:2689 modules/access/pvr.c:97
 #: modules/access_output/shout.c:91
-#: modules/gui/qt4/components/open_panels.cpp:913
+#: modules/gui/qt4/components/open_panels.cpp:945
 msgid "Bitrate"
 msgstr "نرخ بیتی"
 
-#: src/input/es_out.c:2711
+#: src/input/es_out.c:2690
 #, fuzzy, c-format
 msgid "%u kb/s"
 msgstr "%Id کیلوبیت بر ثانیه"
 
-#: src/input/es_out.c:2722
+#: src/input/es_out.c:2701
 #, fuzzy
 msgid "Track replay gain"
 msgstr "جریان پیش‌فرض"
 
-#: src/input/es_out.c:2724
+#: src/input/es_out.c:2703
 #, fuzzy
 msgid "Album replay gain"
 msgstr "جریان پیش‌فرض"
 
-#: src/input/es_out.c:2726
+#: src/input/es_out.c:2705
 #, c-format
 msgid "%.2f dB"
 msgstr ""
 
-#: src/input/es_out.c:2736
+#: src/input/es_out.c:2715
 msgid "Resolution"
 msgstr "تفکیک‌پذیری"
 
-#: src/input/es_out.c:2742
+#: src/input/es_out.c:2721
 msgid "Display resolution"
 msgstr "تفکیک‌پذیری نمایش"
 
-#: src/input/es_out.c:2753 src/input/es_out.c:2757
+#: src/input/es_out.c:2732 src/input/es_out.c:2736
 #: modules/access/screen/screen.c:44
 msgid "Frame rate"
 msgstr "سرعت فریم‌ها"
 
-#: src/input/input.c:2405
+#: src/input/input.c:2431
 msgid "Your input can't be opened"
 msgstr "ورودی شما باز نمی‌شود"
 
-#: src/input/input.c:2406
+#: src/input/input.c:2432
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr ""
 
-#: src/input/input.c:2536
+#: src/input/input.c:2562
 msgid "VLC can't recognize the input's format"
 msgstr ""
 
-#: src/input/input.c:2537
+#: src/input/input.c:2563
 #, fuzzy, c-format
 msgid ""
 "The format of '%s' cannot be detected. Have a look at the log for details."
@@ -1081,7 +1077,7 @@ msgstr "قالب «%s» تشخیص داده نشد. برای جزئیات بیش
 #: modules/gui/beos/MediaControlView.cpp:1236 modules/gui/macosx/intf.m:592
 #: modules/gui/macosx/intf.m:593 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/playlistinfo.m:75 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:323 modules/mux/asf.c:52
+#: modules/gui/qt4/components/open_panels.cpp:355 modules/mux/asf.c:52
 msgid "Title"
 msgstr "عنوان"
 
@@ -1120,7 +1116,6 @@ msgid "Setting"
 msgstr "محیط"
 
 #: src/input/meta.c:49 modules/gui/macosx/open.m:191
-#: modules/gui/qt4/ui/podcast_configuration.ui:39
 msgid "URL"
 msgstr "نشانی"
 
@@ -1308,7 +1303,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc.h:182 src/libvlc-module.c:1394 src/libvlc-module.c:1395
-#: src/libvlc-module.c:2510 src/video_output/vout_intf.c:278
+#: src/libvlc-module.c:2519 src/video_output/vout_intf.c:278
 msgid "Zoom"
 msgstr "زوم"
 
@@ -1495,8 +1490,7 @@ msgstr ""
 "این روش خروجی صدای مورد استفادهٔ وی‌ال‌سی است. رفتار پیش‌فرض انتخاب خودکار "
 "بهترین روش موجود است."
 
-#: src/libvlc-module.c:238 modules/gui/qt4/ui/sprefs_audio.ui:20
-#: modules/stream_out/display.c:41
+#: src/libvlc-module.c:238 modules/stream_out/display.c:41
 msgid "Enable audio"
 msgstr "به کار انداختن صدا"
 
@@ -1601,7 +1595,6 @@ msgstr ""
 "حال پخش پشتیبانی کند)."
 
 #: src/libvlc-module.c:287 modules/gui/macosx/simple_prefs.m:231
-#: modules/gui/qt4/ui/sprefs_audio.ui:99
 msgid "Use S/PDIF when available"
 msgstr "استفاده از S/PDIF در صورت وجود"
 
@@ -1614,7 +1607,6 @@ msgstr ""
 "صورت پیش‌فرض از S/PDIF استفاده کرد."
 
 #: src/libvlc-module.c:292 modules/gui/macosx/simple_prefs.m:221
-#: modules/gui/qt4/ui/sprefs_audio.ui:113
 msgid "Force detection of Dolby Surround"
 msgstr "اجبار به تشخیص دالبی سراند"
 
@@ -1651,7 +1643,7 @@ msgstr "تصویرسازی‌های صوتی "
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr "این گزینه پیمانه‌های تصویرسازی (تحلیل‌گر طیفی و غیره) را اضافه می‌کند."
 
-#: src/libvlc-module.c:315 modules/gui/qt4/ui/sprefs_audio.ui:283
+#: src/libvlc-module.c:315
 msgid "Replay gain mode"
 msgstr ""
 
@@ -1726,8 +1718,7 @@ msgstr ""
 "این روش خروجی ویدئوی مورد استفادهٔ وی‌ال‌سی است. رفتار پیش‌فرض انتخاب خودکار "
 "بهترین روش موجود است."
 
-#: src/libvlc-module.c:361 modules/gui/qt4/ui/sprefs_video.ui:26
-#: modules/stream_out/display.c:43
+#: src/libvlc-module.c:361 modules/stream_out/display.c:43
 msgid "Enable video"
 msgstr "به کار انداختن ویدئو"
 
@@ -1828,19 +1819,17 @@ msgstr "وسط"
 
 #: src/libvlc-module.c:398 src/libvlc-module.c:447 modules/codec/dvbsub.c:75
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:235
-#: modules/gui/qt4/ui/video_effects.ui:874
-#: modules/gui/qt4/ui/video_effects.ui:928 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Top"
 msgstr "بالا"
 
 #: src/libvlc-module.c:398 src/libvlc-module.c:447 modules/codec/dvbsub.c:75
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:286 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Bottom"
 msgstr "پایین"
 
@@ -1925,7 +1914,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:423 src/video_output/vout_intf.c:421
-#: modules/gui/macosx/simple_prefs.m:283 modules/gui/qt4/ui/sprefs_video.ui:65
+#: modules/gui/macosx/simple_prefs.m:283
 msgid "Always on top"
 msgstr "همیشه در بالا"
 
@@ -1933,7 +1922,7 @@ msgstr "همیشه در بالا"
 msgid "Always place the video window on top of other windows."
 msgstr "پنجرهٔ ویدئو همیشه روی دیگر پنجره‌ها قرار بگیرد."
 
-#: src/libvlc-module.c:427 modules/gui/qt4/ui/sprefs_subtitles.ui:35
+#: src/libvlc-module.c:427
 #, fuzzy
 msgid "Show media title on video"
 msgstr "کدگذاری متنی زیرنویس‌ها"
@@ -1992,7 +1981,7 @@ msgid ""
 "computer being suspended because of inactivity."
 msgstr "از کار انداختن محافظ صفحهٔ نمایش هنگام پخش ویدئو."
 
-#: src/libvlc-module.c:457 modules/gui/qt4/ui/sprefs_video.ui:48
+#: src/libvlc-module.c:457
 msgid "Window decorations"
 msgstr "تزئینات پنجره"
 
@@ -2179,7 +2168,6 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:551 modules/gui/macosx/simple_prefs.m:285
-#: modules/gui/qt4/ui/sprefs_video.ui:95
 msgid "Skip frames"
 msgstr ""
 
@@ -2282,7 +2270,6 @@ msgstr "پیش‌فرض"
 
 #: src/libvlc-module.c:604 modules/gui/macosx/equalizer.m:157
 #: modules/gui/macosx/extended.m:96 modules/gui/macosx/wizard.m:354
-#: modules/gui/qt4/ui/equalizer.ui:27 modules/gui/qt4/ui/vlm.ui:70
 msgid "Enable"
 msgstr "روشن"
 
@@ -2537,7 +2524,7 @@ msgid ""
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
 
-#: src/libvlc-module.c:743 modules/gui/qt4/ui/sprefs_subtitles.ui:171
+#: src/libvlc-module.c:743
 msgid "Force subtitle position"
 msgstr "تعیین اجباری موقعیت زیرنویس"
 
@@ -2558,9 +2545,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr ""
 
 #: src/libvlc-module.c:752 src/libvlc-module.c:1663
-#: modules/gui/macosx/simple_prefs.m:274
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:22
-#: modules/stream_out/transcode.c:228
+#: modules/gui/macosx/simple_prefs.m:274 modules/stream_out/transcode.c:228
 msgid "On Screen Display"
 msgstr "نمایش روی صفحه"
 
@@ -3409,7 +3394,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/embeddedwindow.m:50
 #: modules/gui/macosx/intf.m:537 modules/gui/macosx/intf.m:615
 #: modules/gui/macosx/intf.m:679 modules/gui/macosx/simple_prefs.m:282
-#: modules/gui/qt4/ui/sprefs_video.ui:58
+#: modules/gui/qt4/components/controller.hpp:101
 msgid "Fullscreen"
 msgstr "تمام‌صفحه"
 
@@ -3452,6 +3437,7 @@ msgstr "میان‌بر مورد استفاده برای پخش را انتخا�
 
 #: src/libvlc-module.c:1220 modules/control/hotkeys.c:750
 #: modules/gui/macosx/controls.m:986 modules/gui/macosx/intf.m:580
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/gui/qt4/components/controller.hpp:108
 msgid "Faster"
 msgstr "سریع‌تر"
@@ -3462,6 +3448,7 @@ msgstr "میان‌بر مورد استفاده برای پخش با حرکت س
 
 #: src/libvlc-module.c:1222 modules/control/hotkeys.c:756
 #: modules/gui/macosx/controls.m:987 modules/gui/macosx/intf.m:581
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/gui/qt4/components/controller.hpp:108
 msgid "Slower"
 msgstr "آهسته‌تر"
@@ -3495,7 +3482,8 @@ msgstr "آهسته‌تر"
 #: modules/gui/macosx/intf.m:536 modules/gui/macosx/intf.m:583
 #: modules/gui/macosx/intf.m:667 modules/gui/macosx/intf.m:675
 #: modules/gui/macosx/wizard.m:309 modules/gui/macosx/wizard.m:321
-#: modules/gui/macosx/wizard.m:1626 modules/gui/qt4/ui/streampanel.ui:108
+#: modules/gui/macosx/wizard.m:1626
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/misc/notify/notify.c:329
 msgid "Next"
 msgstr "بعدی"
@@ -3509,6 +3497,7 @@ msgstr ""
 #: modules/gui/macosx/about.m:186 modules/gui/macosx/controls.m:1006
 #: modules/gui/macosx/intf.m:531 modules/gui/macosx/intf.m:582
 #: modules/gui/macosx/intf.m:668 modules/gui/macosx/intf.m:674
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/misc/notify/notify.c:327
 msgid "Previous"
 msgstr "قبلی"
@@ -3522,7 +3511,8 @@ msgstr ""
 #: modules/gui/macosx/intf.m:534 modules/gui/macosx/intf.m:579
 #: modules/gui/macosx/intf.m:666 modules/gui/macosx/intf.m:673
 #: modules/gui/pda/pda_interface.c:272 modules/gui/pda/pda_interface.c:273
-#: modules/gui/qt4/ui/streampanel.ui:101 modules/misc/notify/xosd.c:257
+#: modules/gui/qt4/components/controller.hpp:100
+#: modules/misc/notify/xosd.c:257
 msgid "Stop"
 msgstr "توقف"
 
@@ -3533,8 +3523,7 @@ msgstr "میان‌بر مورد استفاده برای توقف پخش را ا
 #: src/libvlc-module.c:1236 modules/gui/fbosd.c:127 modules/gui/fbosd.c:195
 #: modules/gui/macosx/bookmarks.m:96 modules/gui/macosx/bookmarks.m:105
 #: modules/gui/macosx/embeddedwindow.m:52 modules/gui/macosx/intf.m:539
-#: modules/gui/qt4/ui/video_effects.ui:737 modules/video_filter/marq.c:155
-#: modules/video_filter/rss.c:197
+#: modules/video_filter/marq.c:155 modules/video_filter/rss.c:197
 msgid "Position"
 msgstr "موقعیت"
 
@@ -3650,6 +3639,7 @@ msgstr "طول پرش بلند، به ثانیه"
 
 #: src/libvlc-module.c:1277 modules/control/hotkeys.c:214
 #: modules/gui/beos/InterfaceWindow.cpp:277 modules/gui/macosx/intf.m:340
+#: modules/gui/qt4/components/controller.hpp:104
 #: modules/gui/qt4/components/controller.hpp:113 modules/gui/qt4/menus.cpp:811
 #: modules/gui/skins2/commands/cmd_quit.cpp:40
 msgid "Quit"
@@ -4044,7 +4034,8 @@ msgstr "عکس گرفتن از ویدئو"
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "یک عکس از ویدئو می‌گیرد و آن را در دیسک ذخیره می‌کند."
 
-#: src/libvlc-module.c:1383 modules/gui/qt4/components/controller.hpp:111
+#: src/libvlc-module.c:1383 modules/gui/qt4/components/controller.hpp:103
+#: modules/gui/qt4/components/controller.hpp:111
 #: modules/stream_out/record.c:60
 msgid "Record"
 msgstr "ضبط"
@@ -4255,6 +4246,7 @@ msgstr ""
 #: src/libvlc-module.c:1595 src/video_output/vout_intf.c:440
 #: modules/gui/macosx/controls.m:492 modules/gui/macosx/controls.m:1055
 #: modules/gui/macosx/intf.m:617 modules/gui/macosx/intf.m:680
+#: modules/gui/qt4/components/controller.hpp:102
 #: modules/video_output/snapshot.c:81
 msgid "Snapshot"
 msgstr "عکس"
@@ -4301,101 +4293,101 @@ msgstr "پیشکار SOCKS"
 msgid "Metadata"
 msgstr "متاداده"
 
-#: src/libvlc-module.c:1822
+#: src/libvlc-module.c:1830
 msgid "Decoders"
 msgstr "کدگشاها"
 
-#: src/libvlc-module.c:1829 modules/access/v4l2.c:84
+#: src/libvlc-module.c:1837 modules/access/v4l2.c:84
 #: modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/qt4/components/info_panels.cpp:519
 msgid "Input"
 msgstr "ورودی"
 
-#: src/libvlc-module.c:1868
+#: src/libvlc-module.c:1876
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:1900
+#: src/libvlc-module.c:1908
 msgid "CPU"
 msgstr "پردازنده"
 
-#: src/libvlc-module.c:1922
+#: src/libvlc-module.c:1930
 msgid "Special modules"
 msgstr "پیمانه‌های ویژه"
 
-#: src/libvlc-module.c:1928
+#: src/libvlc-module.c:1936
 msgid "Plugins"
 msgstr "متصل شونده‌ها"
 
-#: src/libvlc-module.c:1936
+#: src/libvlc-module.c:1944
 msgid "Performance options"
 msgstr "گزینه‌های کارآیی"
 
-#: src/libvlc-module.c:2082
+#: src/libvlc-module.c:2090
 msgid "Hot keys"
 msgstr "میان‌برها"
 
-#: src/libvlc-module.c:2520
+#: src/libvlc-module.c:2529
 msgid "Jump sizes"
 msgstr "اندازهٔ پرش‌ها"
 
-#: src/libvlc-module.c:2597
+#: src/libvlc-module.c:2606
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2600
+#: src/libvlc-module.c:2609
 msgid "Exhaustive help for VLC and its modules"
 msgstr ""
 
-#: src/libvlc-module.c:2602
+#: src/libvlc-module.c:2611
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
 
-#: src/libvlc-module.c:2605
+#: src/libvlc-module.c:2614
 msgid "ask for extra verbosity when displaying help"
 msgstr ""
 
-#: src/libvlc-module.c:2607
+#: src/libvlc-module.c:2616
 msgid "print a list of available modules"
 msgstr ""
 
-#: src/libvlc-module.c:2609
+#: src/libvlc-module.c:2618
 msgid "print a list of available modules with extra detail"
 msgstr ""
 
-#: src/libvlc-module.c:2611
+#: src/libvlc-module.c:2620
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strictmatches."
 msgstr ""
 
-#: src/libvlc-module.c:2615
+#: src/libvlc-module.c:2624
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 
-#: src/libvlc-module.c:2617
+#: src/libvlc-module.c:2626
 msgid "save the current command line options in the config"
 msgstr ""
 
-#: src/libvlc-module.c:2619
+#: src/libvlc-module.c:2628
 msgid "reset the current config to the default values"
 msgstr ""
 
-#: src/libvlc-module.c:2621
+#: src/libvlc-module.c:2630
 msgid "use alternate config file"
 msgstr ""
 
-#: src/libvlc-module.c:2623
+#: src/libvlc-module.c:2632
 msgid "resets the current plugins cache"
 msgstr ""
 
-#: src/libvlc-module.c:2625
+#: src/libvlc-module.c:2634
 msgid "print version information"
 msgstr ""
 
-#: src/libvlc-module.c:2681
+#: src/libvlc-module.c:2690
 msgid "main program"
 msgstr "برنامهٔ اصلی"
 
@@ -4450,7 +4442,7 @@ msgstr "بارگیری فوری"
 #: modules/gui/macosx/prefs.m:185 modules/gui/macosx/prefs.m:206
 #: modules/gui/macosx/simple_prefs.m:238 modules/gui/macosx/simple_prefs.m:296
 #: modules/gui/macosx/simple_prefs.m:617 modules/gui/macosx/wizard.m:320
-#: modules/gui/qt4/components/open_panels.cpp:1220
+#: modules/gui/qt4/components/open_panels.cpp:1252
 #: modules/gui/qt4/components/preferences_widgets.cpp:1330
 msgid "Cancel"
 msgstr "انصراف"
@@ -4521,9 +4513,8 @@ msgid "Deinterlace"
 msgstr "نادرهم‌بافی"
 
 #: src/video_output/vout_intf.c:311 modules/gui/macosx/intf.m:622
-#: modules/gui/macosx/intf.m:623 modules/gui/qt4/ui/video_effects.ui:229
-#: modules/video_filter/crop.c:105 modules/video_filter/croppadd.c:83
-#: modules/video_output/x11/xvmc.c:133
+#: modules/gui/macosx/intf.m:623 modules/video_filter/crop.c:105
+#: modules/video_filter/croppadd.c:83 modules/video_output/x11/xvmc.c:133
 msgid "Crop"
 msgstr "حاشیه‌گیری"
 
@@ -4612,7 +4603,7 @@ msgstr ""
 "مقدار حافظهٔ نهان برای جریان‌های DV. این مقدار باید به میلی‌ثانیه وارد شود."
 
 #: modules/access/bda/bda.c:44 modules/access/dvb/access.c:89
-#: modules/gui/qt4/components/open_panels.cpp:940
+#: modules/gui/qt4/components/open_panels.cpp:972
 msgid "Adapter card to tune"
 msgstr ""
 
@@ -4627,8 +4618,8 @@ msgid "Device number to use on adapter"
 msgstr ""
 
 #: modules/access/bda/bda.c:51 modules/access/dvb/access.c:95
-#: modules/gui/qt4/components/open_panels.cpp:697
-#: modules/gui/qt4/components/open_panels.cpp:962
+#: modules/gui/qt4/components/open_panels.cpp:729
+#: modules/gui/qt4/components/open_panels.cpp:994
 msgid "Transponder/multiplex frequency"
 msgstr ""
 
@@ -5309,7 +5300,7 @@ msgstr ""
 msgid "Tracks"
 msgstr "قطعه"
 
-#: modules/access/cdda/info.c:400 modules/gui/qt4/ui/open.ui:165
+#: modules/access/cdda/info.c:400
 #, fuzzy
 msgid "MRL"
 msgstr "نشانی"
@@ -5356,7 +5347,7 @@ msgid ""
 "instance. Use a comma-separated list of extensions."
 msgstr ""
 
-#: modules/access/directory.c:84 modules/gui/qt4/ui/sprefs_video.ui:201
+#: modules/access/directory.c:84
 msgid "Directory"
 msgstr "شاخه"
 
@@ -5399,8 +5390,8 @@ msgstr ""
 "مقدار حافظهٔ نهان برای جریان‌های دیرکت‌شو. این مقدار باید به میلی‌ثانیه داده شود."
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:77
-#: modules/gui/qt4/components/open_panels.cpp:750
-#: modules/gui/qt4/components/open_panels.cpp:785
+#: modules/gui/qt4/components/open_panels.cpp:782
+#: modules/gui/qt4/components/open_panels.cpp:817
 msgid "Video device name"
 msgstr "نام دستگاه ویدئو"
 
@@ -5413,8 +5404,8 @@ msgstr ""
 "دستگاه پیش‌فرض استفاده خواهد شد."
 
 #: modules/access/dshow/dshow.cpp:107
-#: modules/gui/qt4/components/open_panels.cpp:756
-#: modules/gui/qt4/components/open_panels.cpp:791
+#: modules/gui/qt4/components/open_panels.cpp:788
+#: modules/gui/qt4/components/open_panels.cpp:823
 msgid "Audio device name"
 msgstr "نام دستگاه صدا"
 
@@ -5428,7 +5419,7 @@ msgstr ""
 "دستگاه پیش‌فرض استفاده خواهد شد."
 
 #: modules/access/dshow/dshow.cpp:112
-#: modules/gui/qt4/components/open_panels.cpp:660
+#: modules/gui/qt4/components/open_panels.cpp:692
 msgid "Video size"
 msgstr "اندازهٔ ویدئو"
 
@@ -5951,7 +5942,6 @@ msgstr "ورودی پرونده"
 #: modules/gui/macosx/open.m:433 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:364 modules/gui/qt4/dialogs/sout.cpp:72
-#: modules/gui/qt4/ui/sprefs_audio.ui:224
 msgid "File"
 msgstr "پرونده"
 
@@ -6051,7 +6041,6 @@ msgid "GnomeVFS input"
 msgstr "ورودی GnomeVFS"
 
 #: modules/access/http.c:65 modules/access/mms/mms.c:63
-#: modules/gui/qt4/ui/sprefs_input.ui:81
 msgid "HTTP proxy"
 msgstr "پیشکار HTTP"
 
@@ -6130,11 +6119,11 @@ msgstr "ورودی HTTP"
 msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
-#: modules/access/http.c:447
+#: modules/access/http.c:448
 msgid "HTTP authentication"
 msgstr ""
 
-#: modules/access/http.c:448
+#: modules/access/http.c:449
 #, fuzzy, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr "لطفاً نام گره را وارد کنید"
@@ -6292,8 +6281,8 @@ msgid "PVR radio device"
 msgstr "دستگاه رادیوی PVR‏"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:92
-#: modules/gui/qt4/components/open_panels.cpp:798
-#: modules/gui/qt4/components/open_panels.cpp:897
+#: modules/gui/qt4/components/open_panels.cpp:830
+#: modules/gui/qt4/components/open_panels.cpp:929
 #, fuzzy
 msgid "Norm"
 msgstr "عادی"
@@ -6323,8 +6312,8 @@ msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "ارتفاع جریانی که ضبط می‌شود (‎-۱ برای تشخیص خودکار)."
 
 #: modules/access/pvr.c:83 modules/access/v4l.c:85 modules/access/v4l2.c:195
-#: modules/gui/qt4/components/open_panels.cpp:805
-#: modules/gui/qt4/components/open_panels.cpp:904
+#: modules/gui/qt4/components/open_panels.cpp:837
+#: modules/gui/qt4/components/open_panels.cpp:936
 msgid "Frequency"
 msgstr "بسامد"
 
@@ -6596,7 +6585,7 @@ msgstr ""
 "شود."
 
 #: modules/access/screen/screen.c:46
-#: modules/gui/qt4/components/open_panels.cpp:1005
+#: modules/gui/qt4/components/open_panels.cpp:1037
 msgid "Desired frame rate for the capture."
 msgstr ""
 
@@ -6766,8 +6755,7 @@ msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr "ارتفاع جریانی که ضبط می‌شود (‎-۱ برای تشخیص خودکار)"
 
 #: modules/access/v4l.c:104 modules/access/v4l2.c:106
-#: modules/gui/macosx/extended.m:97 modules/gui/qt4/ui/video_effects.ui:197
-#: modules/video_filter/atmo/atmo.cpp:196
+#: modules/gui/macosx/extended.m:97 modules/video_filter/atmo/atmo.cpp:196
 msgid "Brightness"
 msgstr "روشنی"
 
@@ -6776,7 +6764,7 @@ msgid "Brightness of the video input."
 msgstr "روشنی ورودی ویدئو."
 
 #: modules/access/v4l.c:107 modules/access/v4l2.c:115
-#: modules/gui/macosx/extended.m:100 modules/gui/qt4/ui/video_effects.ui:211
+#: modules/gui/macosx/extended.m:100
 msgid "Hue"
 msgstr "فام"
 
@@ -6785,11 +6773,8 @@ msgid "Hue of the video input."
 msgstr "فام ورودی ویدئو."
 
 #: modules/access/v4l.c:110 modules/gui/fbosd.c:141
-#: modules/gui/qt4/ui/video_effects.ui:463
-#: modules/gui/qt4/ui/video_effects.ui:527
-#: modules/gui/qt4/ui/video_effects.ui:649 modules/misc/notify/xosd.c:85
-#: modules/video_filter/colorthres.c:54 modules/video_filter/marq.c:124
-#: modules/video_filter/rss.c:154
+#: modules/misc/notify/xosd.c:85 modules/video_filter/colorthres.c:54
+#: modules/video_filter/marq.c:124 modules/video_filter/rss.c:154
 msgid "Color"
 msgstr "رنگ"
 
@@ -6798,7 +6783,7 @@ msgid "Color of the video input."
 msgstr "رنگ ورودی ویدئو."
 
 #: modules/access/v4l.c:113 modules/access/v4l2.c:109
-#: modules/gui/macosx/extended.m:98 modules/gui/qt4/ui/video_effects.ui:190
+#: modules/gui/macosx/extended.m:98
 msgid "Contrast"
 msgstr "کنتراست"
 
@@ -6855,7 +6840,7 @@ msgstr "ویدئو"
 msgid "Video4Linux input"
 msgstr ""
 
-#: modules/access/v4l2.c:75 modules/gui/qt4/components/open_panels.cpp:763
+#: modules/access/v4l2.c:75 modules/gui/qt4/components/open_panels.cpp:795
 #: modules/stream_out/standard.c:100
 msgid "Standard"
 msgstr "استاندارد"
@@ -6930,8 +6915,6 @@ msgid "Contrast of the video input (if supported by the v4l2 driver)."
 msgstr "کنتراست ورودی ویدئو"
 
 #: modules/access/v4l2.c:112 modules/gui/macosx/extended.m:101
-#: modules/gui/qt4/ui/video_effects.ui:204
-#: modules/gui/qt4/ui/video_effects.ui:520
 msgid "Saturation"
 msgstr "غلظت"
 
@@ -6989,7 +6972,6 @@ msgid "Blue balance of the video input (if supported by the v4l2 driver)."
 msgstr ""
 
 #: modules/access/v4l2.c:135 modules/gui/macosx/extended.m:99
-#: modules/gui/qt4/ui/video_effects.ui:183
 msgid "Gamma"
 msgstr "گاما"
 
@@ -7246,7 +7228,7 @@ msgstr "[cdda:][device][@[track]]"
 #: modules/access/vcdx/access.c:286 modules/access/vcdx/access.c:369
 #: modules/access/vcdx/access.c:696 modules/access/vcdx/info.c:294
 #: modules/access/vcdx/info.c:295
-#: modules/gui/qt4/components/open_panels.cpp:336
+#: modules/gui/qt4/components/open_panels.cpp:368
 msgid "Entry"
 msgstr "مدخل"
 
@@ -7430,8 +7412,7 @@ msgstr ""
 msgid "File stream output"
 msgstr "خروجی جاری"
 
-#: modules/access_output/http.c:65 modules/gui/qt4/ui/sprefs_audio.ui:319
-#: modules/misc/audioscrobbler.c:133
+#: modules/access_output/http.c:65 modules/misc/audioscrobbler.c:133
 #, fuzzy
 msgid "Username"
 msgstr "نام کاربری FTP"
@@ -7442,8 +7423,7 @@ msgid "User name that will be requested to access the stream."
 msgstr "نام کاربری که برای اتصال استفاده می‌شود."
 
 #: modules/access_output/http.c:68 modules/control/telnet.c:87
-#: modules/gui/macosx/simple_prefs.m:228
-#: modules/gui/qt4/ui/sprefs_audio.ui:332 modules/misc/audioscrobbler.c:135
+#: modules/gui/macosx/simple_prefs.m:228 modules/misc/audioscrobbler.c:135
 #: modules/misc/notify/growl_udp.c:64
 msgid "Password"
 msgstr "گذرواژه"
@@ -7957,7 +7937,6 @@ msgstr ""
 
 #: modules/audio_filter/normvol.c:83 modules/audio_filter/normvol.c:84
 #: modules/gui/macosx/simple_prefs.m:230
-#: modules/gui/qt4/ui/sprefs_audio.ui:266
 msgid "Volume normalizer"
 msgstr "متعادل‌سازی صدا"
 
@@ -9741,7 +9720,6 @@ msgid "MP3 fixed point audio encoder"
 msgstr "کدگذار صدای وُربیس"
 
 #: modules/codec/speex.c:56 modules/codec/speex.c:844
-#: modules/gui/qt4/ui/video_effects.ui:642
 #, fuzzy
 msgid "Mode"
 msgstr "کُدک"
@@ -10682,7 +10660,6 @@ msgid "Quiet mode."
 msgstr "حالت نرخ بیتی)"
 
 #: modules/codec/x264.c:374 modules/gui/macosx/playlistinfo.m:81
-#: modules/gui/qt4/ui/streampanel.ui:28
 #, fuzzy
 msgid "Statistics"
 msgstr "جمع‌آوری آمار"
@@ -10833,11 +10810,11 @@ msgstr "رقص"
 msgid "Page"
 msgstr "رقص"
 
-#: modules/control/dbus.c:111
+#: modules/control/dbus.c:128
 msgid "dbus"
 msgstr ""
 
-#: modules/control/dbus.c:114
+#: modules/control/dbus.c:131
 #, fuzzy
 msgid "D-Bus control interface"
 msgstr "واسط‌های کنترلی"
@@ -11759,7 +11736,7 @@ msgstr ""
 
 #: modules/control/telnet.c:83 modules/gui/macosx/open.m:188
 #: modules/gui/macosx/open.m:190 modules/gui/macosx/output.m:147
-#: modules/gui/qt4/ui/open_net.ui:75 modules/stream_out/rtp.c:109
+#: modules/stream_out/rtp.c:109
 #, fuzzy
 msgid "Port"
 msgstr "مرتب‌سازی"
@@ -12047,7 +12024,6 @@ msgstr ""
 
 #: modules/demux/live555.cpp:109 modules/demux/live555.cpp:110
 #: modules/gui/macosx/simple_prefs.m:255
-#: modules/gui/qt4/ui/sprefs_input.ui:171
 msgid "Use RTP over RTSP (TCP)"
 msgstr ""
 
@@ -12805,6 +12781,7 @@ msgstr "پرونده‌های همهٔ زیرپوشه‌ها هم باز شون�
 #: modules/gui/macosx/open.m:195 modules/gui/macosx/open.m:545
 #: modules/gui/macosx/open.m:736 modules/gui/macosx/open.m:901
 #: modules/gui/macosx/open.m:1137
+#: modules/gui/qt4/components/controller.hpp:100
 msgid "Open"
 msgstr "باز کردن"
 
@@ -12825,7 +12802,6 @@ msgstr "پیغام‌ها"
 #: modules/gui/beos/InterfaceWindow.cpp:266
 #: modules/gui/beos/PlayListWindow.cpp:90 modules/gui/macosx/open.m:544
 #: modules/gui/macosx/open.m:900 modules/gui/macosx/open.m:1136
-#: modules/gui/qt4/ui/open_file.ui:20
 msgid "Open File"
 msgstr "باز کردن پرونده"
 
@@ -12883,7 +12859,7 @@ msgstr "پنجره"
 #: modules/gui/macosx/wizard.m:1681 modules/gui/macosx/wizard.m:1689
 #: modules/gui/macosx/wizard.m:1870 modules/gui/macosx/wizard.m:1881
 #: modules/gui/macosx/wizard.m:1894
-#: modules/gui/qt4/components/open_panels.cpp:1219
+#: modules/gui/qt4/components/open_panels.cpp:1251
 #: modules/gui/qt4/components/preferences_widgets.cpp:1329
 #: modules/gui/qt4/main_interface.cpp:557
 msgid "OK"
@@ -12968,7 +12944,7 @@ msgstr "اِعمال"
 
 #: modules/gui/beos/PreferencesWindow.cpp:257 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:716 modules/gui/macosx/prefs.m:184
-#: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/vlm.ui:209
+#: modules/gui/macosx/simple_prefs.m:298
 msgid "Save"
 msgstr "ذخیره"
 
@@ -13042,8 +13018,8 @@ msgid ""
 "fully opaque (255). (from 0 for full transparency to 255 for full opacity)"
 msgstr ""
 
-#: modules/gui/fbosd.c:118 modules/gui/qt4/ui/video_effects.ui:744
-#: modules/misc/logger.c:116 modules/video_filter/marq.c:88
+#: modules/gui/fbosd.c:118 modules/misc/logger.c:116
+#: modules/video_filter/marq.c:88
 msgid "Text"
 msgstr "متن"
 
@@ -13146,10 +13122,9 @@ msgid ""
 msgstr ""
 
 #: modules/gui/fbosd.c:203 modules/gui/macosx/simple_prefs.m:271
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:145 modules/misc/freetype.c:83
-#: modules/misc/notify/xosd.c:83 modules/misc/quartztext.c:85
-#: modules/misc/win32text.c:57 modules/video_filter/marq.c:161
-#: modules/video_filter/rss.c:203
+#: modules/misc/freetype.c:83 modules/misc/notify/xosd.c:83
+#: modules/misc/quartztext.c:85 modules/misc/win32text.c:57
+#: modules/video_filter/marq.c:161 modules/video_filter/rss.c:203
 msgid "Font"
 msgstr "قلم"
 
@@ -13196,15 +13171,13 @@ msgid "Bookmarks"
 msgstr "نشانک‌ها"
 
 #: modules/gui/macosx/bookmarks.m:88
-#: modules/gui/qt4/ui/podcast_configuration.ui:49
-#: modules/gui/qt4/ui/vlm.ui:195
 msgid "Add"
 msgstr "اضافه"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:574
 #: modules/gui/macosx/simple_prefs.m:240
 #: modules/gui/qt4/components/preferences_widgets.cpp:1155
-#: modules/gui/qt4/dialogs/bookmarks.cpp:48 modules/gui/qt4/ui/vlm.ui:202
+#: modules/gui/qt4/dialogs/bookmarks.cpp:48
 #: modules/gui/qt4/util/customwidgets.cpp:136
 msgid "Clear"
 msgstr "پاک‌سازی"
@@ -13346,7 +13319,7 @@ msgstr "برگرداندن به عقی"
 msgid "Fast Forward"
 msgstr "یک قدم به جلو"
 
-#: modules/gui/macosx/equalizer.m:154 modules/gui/qt4/ui/equalizer.ui:34
+#: modules/gui/macosx/equalizer.m:154
 msgid "2 Pass"
 msgstr ""
 
@@ -13358,7 +13331,7 @@ msgstr ""
 msgid "Enable the equalizer. Bands can be set manually or using a preset."
 msgstr ""
 
-#: modules/gui/macosx/equalizer.m:160 modules/gui/qt4/ui/equalizer.ui:78
+#: modules/gui/macosx/equalizer.m:160
 #, fuzzy
 msgid "Preamp"
 msgstr "جریان"
@@ -13380,14 +13353,14 @@ msgstr "موج"
 msgid "Ripple"
 msgstr "ساده"
 
-#: modules/gui/macosx/extended.m:71 modules/gui/qt4/ui/video_effects.ui:565
-#: modules/meta_engine/id3genres.h:95 modules/video_filter/psychedelic.c:55
+#: modules/gui/macosx/extended.m:71 modules/meta_engine/id3genres.h:95
+#: modules/video_filter/psychedelic.c:55
 #, fuzzy
 msgid "Psychedelic"
 msgstr "صافی ویدئوی دیوار"
 
-#: modules/gui/macosx/extended.m:72 modules/gui/qt4/ui/video_effects.ui:630
-#: modules/video_filter/gradient.c:75 modules/video_filter/gradient.c:81
+#: modules/gui/macosx/extended.m:72 modules/video_filter/gradient.c:75
+#: modules/video_filter/gradient.c:81
 msgid "Gradient"
 msgstr "طیف"
 
@@ -13423,7 +13396,7 @@ msgstr "حاشیه‌گیری تصویر"
 msgid "Crops a defined part of the image"
 msgstr "قسمتی از تصویر را بزرگ‌نمایی می‌کند"
 
-#: modules/gui/macosx/extended.m:82 modules/gui/qt4/ui/video_effects.ui:480
+#: modules/gui/macosx/extended.m:82
 #, fuzzy
 msgid "Invert colors"
 msgstr "رنگ"
@@ -13988,11 +13961,6 @@ msgstr "باز کردن دستگاه &ضبط..."
 #: modules/gui/macosx/simple_prefs.m:287
 #: modules/gui/qt4/components/preferences_widgets.cpp:264
 #: modules/gui/qt4/components/simple_preferences.cpp:243
-#: modules/gui/qt4/ui/open.ui:155 modules/gui/qt4/ui/open_file.ui:75
-#: modules/gui/qt4/ui/open_file.ui:210 modules/gui/qt4/ui/sprefs_audio.ui:237
-#: modules/gui/qt4/ui/sprefs_input.ui:39
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:135
-#: modules/gui/qt4/ui/sprefs_video.ui:194
 #: modules/gui/wince/preferences_widgets.cpp:510
 msgid "Browse..."
 msgstr "مرور..."
@@ -14002,7 +13970,7 @@ msgid "Treat as a pipe rather than as a file"
 msgstr "به عنوان لوله برخورد شود نه پرونده"
 
 #: modules/gui/macosx/open.m:177
-#: modules/gui/qt4/components/open_panels.cpp:884
+#: modules/gui/qt4/components/open_panels.cpp:916
 msgid "Device name"
 msgstr "نام دستگاه"
 
@@ -14152,7 +14120,7 @@ msgstr "‏EPS"
 msgid "Subtitles encoding"
 msgstr "کدگذاری زیرنویس"
 
-#: modules/gui/macosx/open.m:300 modules/gui/qt4/ui/sprefs_subtitles.ui:125
+#: modules/gui/macosx/open.m:300
 msgid "Font size"
 msgstr "اندازهٔ قلم"
 
@@ -14226,7 +14194,7 @@ msgstr "جریان"
 msgid "Dump raw input"
 msgstr "تخلیهٔ ورودی خام"
 
-#: modules/gui/macosx/output.m:146 modules/gui/qt4/ui/open_net.ui:65
+#: modules/gui/macosx/output.m:146
 msgid "Address"
 msgstr "نشانی"
 
@@ -14484,7 +14452,6 @@ msgid "Reset All"
 msgstr "برگرداندن همه به مقادیر اولیه"
 
 #: modules/gui/macosx/prefs.m:187 modules/gui/macosx/simple_prefs.m:294
-#: modules/gui/qt4/ui/video_effects.ui:17
 #, fuzzy
 msgid "Basic"
 msgstr "باشغیری"
@@ -14548,7 +14515,6 @@ msgid "Input & Codec settings"
 msgstr "ورودی ها و کُدک‌ها"
 
 #: modules/gui/macosx/simple_prefs.m:222
-#: modules/gui/qt4/ui/sprefs_audio.ui:250
 msgid "Effects"
 msgstr "جلوه ها"
 
@@ -14556,12 +14522,11 @@ msgstr "جلوه ها"
 msgid "Enable Audio"
 msgstr "به کار انداختن صدا"
 
-#: modules/gui/macosx/simple_prefs.m:224 modules/gui/qt4/ui/sprefs_audio.ui:30
+#: modules/gui/macosx/simple_prefs.m:224
 msgid "General Audio"
 msgstr "عمومی"
 
 #: modules/gui/macosx/simple_prefs.m:225
-#: modules/gui/qt4/ui/sprefs_audio.ui:259
 msgid "Headphone surround effect"
 msgstr ""
 
@@ -14579,7 +14544,6 @@ msgid "User name"
 msgstr "نام کاربری FTP"
 
 #: modules/gui/macosx/simple_prefs.m:232
-#: modules/gui/qt4/ui/sprefs_audio.ui:273
 msgid "Visualization"
 msgstr "جلوه ها"
 
@@ -14621,8 +14585,7 @@ msgstr ""
 msgid "Default Caching Level"
 msgstr "زاویهٔ پیش‌فرض دی‌وی‌دی."
 
-#: modules/gui/macosx/simple_prefs.m:248 modules/gui/qt4/ui/open.ui:51
-#: modules/gui/qt4/ui/sprefs_input.ui:97
+#: modules/gui/macosx/simple_prefs.m:248
 msgid "Caching"
 msgstr "حافظهٔ نهان"
 
@@ -14643,7 +14606,6 @@ msgid "Password for HTTP Proxy"
 msgstr "پیشکار HTTP"
 
 #: modules/gui/macosx/simple_prefs.m:252
-#: modules/gui/qt4/ui/sprefs_input.ui:119
 msgid "Codecs / Muxers"
 msgstr ""
 
@@ -14679,7 +14641,6 @@ msgid "Default Encoding"
 msgstr "کدگشای پیش فرش"
 
 #: modules/gui/macosx/simple_prefs.m:267
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:90
 msgid "Display Settings"
 msgstr "تنظیمات نمایش"
 
@@ -14706,7 +14667,6 @@ msgid "Preferred Subtitle Language"
 msgstr "زبان پیش فرض زیر نویس"
 
 #: modules/gui/macosx/simple_prefs.m:275
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:28
 msgid "Enable OSD"
 msgstr "زیر نویس فعال"
 
@@ -14714,8 +14674,8 @@ msgstr "زیر نویس فعال"
 msgid "Black screens in Fullscreen mode"
 msgstr "صفحهٔ سیاه در حالت تمام‌صفحه"
 
-#: modules/gui/macosx/simple_prefs.m:280 modules/gui/qt4/ui/sprefs_video.ui:36
-#: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:132
+#: modules/gui/macosx/simple_prefs.m:280 modules/stream_out/display.c:54
+#: modules/video_filter/deinterlace.c:132
 #, fuzzy
 msgid "Display"
 msgstr "تأخیر"
@@ -14731,7 +14691,6 @@ msgid "Output module"
 msgstr "پیمانه‌های خروجی"
 
 #: modules/gui/macosx/simple_prefs.m:286
-#: modules/gui/qt4/ui/sprefs_video.ui:179
 #, fuzzy
 msgid "Video snapshots"
 msgstr "قالب عکس‌های تصویر"
@@ -14742,19 +14701,16 @@ msgid "Folder"
 msgstr "خالی کردن پوشه"
 
 #: modules/gui/macosx/simple_prefs.m:289
-#: modules/gui/qt4/ui/sprefs_video.ui:228
 #, fuzzy
 msgid "Format"
 msgstr "قالب وی‌سی‌دی"
 
 #: modules/gui/macosx/simple_prefs.m:290
-#: modules/gui/qt4/ui/sprefs_video.ui:211
 #, fuzzy
 msgid "Prefix"
 msgstr "قبلی"
 
 #: modules/gui/macosx/simple_prefs.m:291
-#: modules/gui/qt4/ui/sprefs_video.ui:241
 msgid "Sequential numbering"
 msgstr ""
 
@@ -15996,7 +15952,7 @@ msgstr "کانال:"
 msgid "Norm:"
 msgstr "عادی"
 
-#: modules/gui/pda/pda_interface.c:609 modules/gui/qt4/ui/open_file.ui:152
+#: modules/gui/pda/pda_interface.c:609
 msgid "Size:"
 msgstr "اندازه:"
 
@@ -16266,7 +16222,6 @@ msgid "Announce Channel:"
 msgstr "کانال تلویزیونی تیونر"
 
 #: modules/gui/pda/pda_interface.c:1247
-#: modules/gui/qt4/ui/video_effects.ui:1002
 msgid "Update"
 msgstr "به‌هنگام‌سازی"
 
@@ -16349,6 +16304,43 @@ msgid ""
 "If the playlist is empty, open a medium"
 msgstr ""
 
+#: modules/gui/qt4/components/controller.hpp:102
+#, fuzzy
+msgid "De-Fullscreen"
+msgstr "تمام‌صفحه"
+
+#: modules/gui/qt4/components/controller.hpp:102
+#, fuzzy
+msgid "Extended panel"
+msgstr "کنترل‌های بیشتر"
+
+#: modules/gui/qt4/components/controller.hpp:103
+#, fuzzy
+msgid "A->B Loop"
+msgstr "حلقهٔ"
+
+#: modules/gui/qt4/components/controller.hpp:103
+#, fuzzy
+msgid "Frame By Frame"
+msgstr "سرعت فریم‌ها"
+
+#: modules/gui/qt4/components/controller.hpp:103
+#, fuzzy
+msgid "Trickplay Reverse"
+msgstr "ترتیب معکوس"
+
+#: modules/gui/qt4/components/controller.hpp:104
+#: modules/gui/qt4/components/controller.hpp:113
+#, fuzzy
+msgid "Step backward"
+msgstr "یک قدم به عقی"
+
+#: modules/gui/qt4/components/controller.hpp:104
+#: modules/gui/qt4/components/controller.hpp:113
+#, fuzzy
+msgid "Step forward"
+msgstr "یک قدم به جلو"
+
 #: modules/gui/qt4/components/controller.hpp:106
 #, fuzzy
 msgid "Stop playback"
@@ -16389,11 +16381,11 @@ msgstr "نمایش گزینه‌های پیشرفته"
 msgid "Show playlist"
 msgstr "فهرست پخش XSPF"
 
-#: modules/gui/qt4/components/controller.hpp:110
+#: modules/gui/qt4/components/controller.hpp:111
 msgid "Take a snapshot"
 msgstr "عکس گرفتن"
 
-#: modules/gui/qt4/components/controller.hpp:111
+#: modules/gui/qt4/components/controller.hpp:112
 msgid "Loop from point A to point B continuously."
 msgstr ""
 
@@ -16402,20 +16394,10 @@ msgstr ""
 msgid "Frame by frame"
 msgstr "سرعت فریم‌ها"
 
-#: modules/gui/qt4/components/controller.hpp:112
+#: modules/gui/qt4/components/controller.hpp:113
 #, fuzzy
 msgid "Reverse"
 msgstr "هرگز"
-
-#: modules/gui/qt4/components/controller.hpp:112
-#, fuzzy
-msgid "Step backward"
-msgstr "یک قدم به عقی"
-
-#: modules/gui/qt4/components/controller.hpp:112
-#, fuzzy
-msgid "Step forward"
-msgstr "یک قدم به جلو"
 
 #: modules/gui/qt4/components/extended_panels.cpp:962
 #: modules/gui/qt4/components/extended_panels.cpp:1026
@@ -16536,79 +16518,79 @@ msgstr ""
 msgid "Select the device or the VIDEO_TS directory"
 msgstr "باز کردن شاخهٔ VIDEO_TS"
 
-#: modules/gui/qt4/components/open_panels.cpp:92
+#: modules/gui/qt4/components/open_panels.cpp:127
 #, fuzzy
 msgid "Select one or multiple files"
 msgstr "یک یا چند پرونده انتخاب کنید تا باز شوند"
 
-#: modules/gui/qt4/components/open_panels.cpp:107
+#: modules/gui/qt4/components/open_panels.cpp:142
 #, fuzzy
 msgid "File names:"
 msgstr "پرونده:"
 
-#: modules/gui/qt4/components/open_panels.cpp:109
+#: modules/gui/qt4/components/open_panels.cpp:144
 #, fuzzy
 msgid "Filter:"
 msgstr "صافی‌ها"
 
-#: modules/gui/qt4/components/open_panels.cpp:168
+#: modules/gui/qt4/components/open_panels.cpp:192
 msgid "Open subtitles file"
 msgstr "باز کردن پروندهٔ زیرنویس"
 
-#: modules/gui/qt4/components/open_panels.cpp:273
+#: modules/gui/qt4/components/open_panels.cpp:305
 #, fuzzy
 msgid "Eject the disc"
 msgstr "یک پرونده انتخاب کنید"
 
-#: modules/gui/qt4/components/open_panels.cpp:681
-#: modules/gui/qt4/components/open_panels.cpp:941
+#: modules/gui/qt4/components/open_panels.cpp:713
+#: modules/gui/qt4/components/open_panels.cpp:973
 #, fuzzy
 msgid "DVB Type:"
 msgstr "نوع"
 
-#: modules/gui/qt4/components/open_panels.cpp:707
-#: modules/gui/qt4/components/open_panels.cpp:971
+#: modules/gui/qt4/components/open_panels.cpp:739
+#: modules/gui/qt4/components/open_panels.cpp:1003
 msgid "Transponder symbol rate"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:716
+#: modules/gui/qt4/components/open_panels.cpp:748
 msgid "Bandwidth"
 msgstr "پهنای باند"
 
-#: modules/gui/qt4/components/open_panels.cpp:831
+#: modules/gui/qt4/components/open_panels.cpp:863
 #, fuzzy
 msgid "Channels:"
 msgstr "کانال‌ها"
 
-#: modules/gui/qt4/components/open_panels.cpp:842
+#: modules/gui/qt4/components/open_panels.cpp:874
 #, fuzzy
 msgid "Selected ports:"
 msgstr "ورودی صفحهٔ نمایش"
 
-#: modules/gui/qt4/components/open_panels.cpp:845
+#: modules/gui/qt4/components/open_panels.cpp:877
 msgid ".*"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:852
+#: modules/gui/qt4/components/open_panels.cpp:884
 #, fuzzy
 msgid "Input caching:"
 msgstr "ورودی تغییر کرد "
 
-#: modules/gui/qt4/components/open_panels.cpp:862
+#: modules/gui/qt4/components/open_panels.cpp:894
 msgid "Use VLC pace"
 msgstr ""
 
-#: modules/gui/qt4/components/open_panels.cpp:866
+#: modules/gui/qt4/components/open_panels.cpp:898
 #, fuzzy
 msgid "Auto connnection"
 msgstr "اتصال مجدد خودکار"
 
-#: modules/gui/qt4/components/open_panels.cpp:890
+#: modules/gui/qt4/components/open_panels.cpp:922
 #, fuzzy
 msgid "Radio device name"
 msgstr "نام دستگاه صدا"
 
-#: modules/gui/qt4/components/open_panels.cpp:1194
+#: modules/gui/qt4/components/open_panels.cpp:1226
 #, fuzzy
 msgid "Advanced Options"
 msgstr "گزینه‌های پیشرفته"
@@ -16800,7 +16782,7 @@ msgid "Errors"
 msgstr "خطاها"
 
 #: modules/gui/qt4/dialogs/errors.cpp:51
-#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1405
+#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1414
 msgid "&Clear"
 msgstr "&پاک‌سازی"
 
@@ -17355,7 +17337,7 @@ msgstr "تبدیل و ذخیره"
 msgid "&Streaming..."
 msgstr "جریان داده ها"
 
-#: modules/gui/qt4/menus.cpp:338 modules/gui/qt4/menus.cpp:1026
+#: modules/gui/qt4/menus.cpp:338 modules/gui/qt4/menus.cpp:1032
 msgid "&Quit"
 msgstr "خروج"
 
@@ -17575,19 +17557,19 @@ msgstr "خروج از تمام ‌صفحه"
 msgid "&Playback"
 msgstr "پخش"
 
-#: modules/gui/qt4/menus.cpp:1008
+#: modules/gui/qt4/menus.cpp:1014
 msgid "Hide VLC media player in taskbar"
 msgstr "VLC مخفی کردن پخش کننده"
 
-#: modules/gui/qt4/menus.cpp:1014
+#: modules/gui/qt4/menus.cpp:1020
 msgid "Show VLC media player"
 msgstr "VLC نمایش پخش کننده"
 
-#: modules/gui/qt4/menus.cpp:1024
+#: modules/gui/qt4/menus.cpp:1030
 msgid "&Open Media"
 msgstr "باز کردن رسانه"
 
-#: modules/gui/qt4/menus.cpp:1390
+#: modules/gui/qt4/menus.cpp:1399
 msgid " - Empty - "
 msgstr ""
 
@@ -17776,563 +17758,14 @@ msgstr ""
 msgid "Show a controller in fullscreen mode"
 msgstr "آغاز ویدئو در حالت تمام‌صفحه"
 
-#: modules/gui/qt4/qt4.cpp:168
+#: modules/gui/qt4/qt4.cpp:157
+msgid "Integrate the file browser in open dialog"
+msgstr ""
+
+#: modules/gui/qt4/qt4.cpp:169
 #, fuzzy
 msgid "Qt interface"
 msgstr "تعویض واسط"
-
-#: modules/gui/qt4/ui/equalizer.ui:54
-#, fuzzy
-msgid "Preset"
-msgstr "پیش‌تجزیه"
-
-#: modules/gui/qt4/ui/open.ui:38
-#, fuzzy
-msgid "Show extended options"
-msgstr "نمایش گزینه‌های پیشرفته"
-
-#: modules/gui/qt4/ui/open.ui:41
-#, fuzzy
-msgid "Show &amp;more options"
-msgstr "نمایش گزینه‌های پیشرفته"
-
-#: modules/gui/qt4/ui/open.ui:61
-msgid "Change the caching for the media"
-msgstr ""
-
-#: modules/gui/qt4/ui/open.ui:90
-#, fuzzy
-msgid "Start Time"
-msgstr "زمان آغاز"
-
-#: modules/gui/qt4/ui/open.ui:100
-msgid "Change the start time for the media"
-msgstr ""
-
-#: modules/gui/qt4/ui/open.ui:132
-msgid "Play another media synchronously (extra audio file, ...)"
-msgstr ""
-
-#: modules/gui/qt4/ui/open.ui:139
-#, fuzzy
-msgid "Extra media"
-msgstr "متاداده"
-
-#: modules/gui/qt4/ui/open.ui:152
-#, fuzzy
-msgid "Select the file"
-msgstr "یک پرونده انتخاب کنید"
-
-#: modules/gui/qt4/ui/open.ui:182
-msgid "Complete MRL for VLC internal"
-msgstr ""
-
-#: modules/gui/qt4/ui/open.ui:189
-#, fuzzy
-msgid "Edit Options"
-msgstr "گزینه‌ها"
-
-#: modules/gui/qt4/ui/open.ui:227
-#, fuzzy
-msgid "Select play mode"
-msgstr "یک پرونده انتخاب کنید"
-
-#: modules/gui/qt4/ui/open_file.ui:26
-#, fuzzy
-msgid "Choose one or more media file to open"
-msgstr "یک یا چند پرونده انتخاب کنید تا باز شوند"
-
-#: modules/gui/qt4/ui/open_file.ui:29
-#, fuzzy
-msgid "Select one or more files"
-msgstr "یک یا چند پرونده انتخاب کنید تا باز شوند"
-
-#: modules/gui/qt4/ui/open_file.ui:72 modules/gui/qt4/ui/open_file.ui:207
-#, fuzzy
-msgid "Select the subtitles file"
-msgstr "تشخیص خودکار پرونده‌های زیرنویس"
-
-#: modules/gui/qt4/ui/open_file.ui:85
-#, fuzzy
-msgid "Add a subtitles file"
-msgstr "استفاده از پروندهٔ زیرنویس"
-
-#: modules/gui/qt4/ui/open_file.ui:88
-#, fuzzy
-msgid "Use a sub&amp;titles file"
-msgstr "استفاده از پروندهٔ زیرنویس"
-
-#: modules/gui/qt4/ui/open_file.ui:178
-#, fuzzy
-msgid "Alignment:"
-msgstr "چینش ویدئو"
-
-#: modules/gui/qt4/ui/open_net.ui:20
-#, fuzzy
-msgid "Network Protocol"
-msgstr "همگام‌سازی شبکه"
-
-#: modules/gui/qt4/ui/open_net.ui:26
-#, fuzzy
-msgid "Select the protocol for the URL."
-msgstr "یک شاخه انتخاب کنید"
-
-#: modules/gui/qt4/ui/open_net.ui:33
-#, fuzzy
-msgid "Protocol"
-msgstr "همگام‌سازی شبکه"
-
-#: modules/gui/qt4/ui/open_net.ui:43
-#, fuzzy
-msgid "Select the port used"
-msgstr "یک پرونده انتخاب کنید"
-
-#: modules/gui/qt4/ui/open_net.ui:85
-msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr ""
-
-#: modules/gui/qt4/ui/podcast_configuration.ui:19
-#: modules/services_discovery/podcast.c:61
-msgid "Podcast URLs list"
-msgstr "فهرست نشانی پادکَست‌ها"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:36
-msgid "Default volume"
-msgstr "بلندی صدای پیش‌فرض"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:77
-msgid "256 corresponds to 100%, 1024 to 400%"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:106
-msgid "Save volume on exit"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:142
-msgid "Preferred audio language"
-msgstr "زبان صدای ترجیهی"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:306
-msgid "last.fm"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:312
-msgid "Enable last.fm submission"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.ui:20
-#, fuzzy
-msgid "Disc Devices"
-msgstr "دستگاه‌ها"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:26
-#, fuzzy
-msgid "Default disc device"
-msgstr "دستگاه‌های پیش‌فرض"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:55
-#, fuzzy
-msgid "Server default port"
-msgstr "بازگرداندن مقادیر پیش‌فرض"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:103
-#, fuzzy
-msgid "Default caching level"
-msgstr "زاویهٔ پیش‌فرض دی‌وی‌دی."
-
-#: modules/gui/qt4/ui/sprefs_input.ui:125
-#, fuzzy
-msgid "Post-Processing quality"
-msgstr "کیفیت کدگذاری"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:151
-msgid "Repair AVI files"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_input.ui:164
-msgid "Use system codecs if available (better quality)"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_interface.ui:179
-#, fuzzy
-msgid "textFormat"
-msgstr "قالب وی‌سی‌دی"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:51
-msgid "Subtitles Language"
-msgstr "زبان زیرنویس"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:57
-msgid "Preferred subtitles language"
-msgstr "زبان زیرنویس ترجیهی"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:77
-#, fuzzy
-msgid "Default encoding"
-msgstr "کدگشایی"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:99
-msgid "Effect"
-msgstr "جلوه"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:112
-msgid "Font color"
-msgstr "رنگ متن"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:75
-msgid "Output"
-msgstr "خروجی"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:85
-#, fuzzy
-msgid "Accelerated video output (Overlay)"
-msgstr "خروجی ویدئوی تصویر"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:105
-#: modules/video_output/msw/directx.c:131
-msgid "Use hardware YUV->RGB conversions"
-msgstr ""
-
-#: modules/gui/qt4/ui/sprefs_video.ui:115
-#, fuzzy
-msgid "DirectX"
-msgstr "شاخه"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:130
-#, fuzzy
-msgid "Display device"
-msgstr "پیش‌نمایش عکس‌های ویدئو"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:140
-#, fuzzy
-msgid "Enable wallpaper mode"
-msgstr "کاغذ دیواری"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:159
-#, fuzzy
-msgid "Deinterlacing Mode"
-msgstr "حالت نادرهم‌بافی"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:166
-#, fuzzy
-msgid "Force Aspect Ratio"
-msgstr "نسبت طول و عرض"
-
-#: modules/gui/qt4/ui/streampanel.ui:48
-#, fuzzy
-msgid "Edit settings"
-msgstr "تنظیمات صدا"
-
-#: modules/gui/qt4/ui/streampanel.ui:58
-#, fuzzy
-msgid "Control"
-msgstr "کنترل کننده"
-
-#: modules/gui/qt4/ui/streampanel.ui:64
-msgid "Run manually"
-msgstr ""
-
-#: modules/gui/qt4/ui/streampanel.ui:71
-msgid "Setup schedule"
-msgstr ""
-
-#: modules/gui/qt4/ui/streampanel.ui:78
-msgid "Run on schedule"
-msgstr ""
-
-#: modules/gui/qt4/ui/streampanel.ui:88
-#, fuzzy
-msgid "Status"
-msgstr "تن&ظیمات"
-
-#: modules/gui/qt4/ui/streampanel.ui:94
-#, fuzzy
-msgid "P/P"
-msgstr "‏‎UDP/RTP‏"
-
-#: modules/gui/qt4/ui/streampanel.ui:115
-#, fuzzy
-msgid "Prev"
-msgstr "قبلی"
-
-#: modules/gui/qt4/ui/streampanel.ui:132
-#, fuzzy
-msgid "Add Input"
-msgstr "بدون ورودی"
-
-#: modules/gui/qt4/ui/streampanel.ui:139
-#, fuzzy
-msgid "Edit Input"
-msgstr "ورودی پرونده"
-
-#: modules/gui/qt4/ui/streampanel.ui:146
-#, fuzzy
-msgid "Clear List"
-msgstr "فهرست پخش"
-
-#: modules/gui/qt4/ui/video_effects.ui:23
-#, fuzzy
-msgid "Transform"
-msgstr "تبدیل"
-
-#: modules/gui/qt4/ui/video_effects.ui:41
-#, fuzzy
-msgid "Sharpen"
-msgstr "صفحهٔ نمایش"
-
-#: modules/gui/qt4/ui/video_effects.ui:53
-#, fuzzy
-msgid "Sigma"
-msgstr "ریز"
-
-#: modules/gui/qt4/ui/video_effects.ui:88 modules/video_filter/adjust.c:83
-msgid "Image adjust"
-msgstr "تنظیم تصویر"
-
-#: modules/gui/qt4/ui/video_effects.ui:218 modules/video_filter/adjust.c:66
-msgid "Brightness threshold"
-msgstr "آستانهٔ روشنی"
-
-#: modules/gui/qt4/ui/video_effects.ui:303
-#, fuzzy
-msgid "Synchronize top and bottom"
-msgstr "چرخش در شیار صوتی"
-
-#: modules/gui/qt4/ui/video_effects.ui:310
-#, fuzzy
-msgid "Synchronize left and right"
-msgstr "چرخش در شیار صوتی"
-
-#: modules/gui/qt4/ui/video_effects.ui:334
-#, fuzzy
-msgid "Geometry"
-msgstr "طیف نما"
-
-#: modules/gui/qt4/ui/video_effects.ui:340
-#, fuzzy
-msgid "Magnification/Zoom"
-msgstr "بزرگ‌نمایی"
-
-#: modules/gui/qt4/ui/video_effects.ui:347
-#, fuzzy
-msgid "Puzzle game"
-msgstr "بنفش"
-
-#: modules/gui/qt4/ui/video_effects.ui:385
-#, fuzzy
-msgid "Black slot"
-msgstr "سیاه"
-
-#: modules/gui/qt4/ui/video_effects.ui:392
-#: modules/gui/qt4/ui/video_effects.ui:695
-#: modules/gui/qt4/ui/video_effects.ui:789
-#, fuzzy
-msgid "Columns"
-msgstr "بلندی صدا"
-
-#: modules/gui/qt4/ui/video_effects.ui:399
-#: modules/gui/qt4/ui/video_effects.ui:688
-#: modules/gui/qt4/ui/video_effects.ui:772
-msgid "Rows"
-msgstr ""
-
-#: modules/gui/qt4/ui/video_effects.ui:409 modules/video_filter/rotate.c:68
-#, fuzzy
-msgid "Rotate"
-msgstr "نرخ بیتی"
-
-#: modules/gui/qt4/ui/video_effects.ui:434
-msgid "Angle"
-msgstr ""
-
-#: modules/gui/qt4/ui/video_effects.ui:445
-#, fuzzy
-msgid "Color fun"
-msgstr "رنگ"
-
-#: modules/gui/qt4/ui/video_effects.ui:451
-#, fuzzy
-msgid "Color extraction"
-msgstr "استوانه"
-
-#: modules/gui/qt4/ui/video_effects.ui:487
-#: modules/video_filter/colorthres.c:69
-#, fuzzy
-msgid "Color threshold"
-msgstr "آستانهٔ روشنی"
-
-#: modules/gui/qt4/ui/video_effects.ui:499
-#, fuzzy
-msgid "Similarity"
-msgstr "آستانهٔ روشنی"
-
-#: modules/gui/qt4/ui/video_effects.ui:545
-#, fuzzy
-msgid "Image modification"
-msgstr "بزرگ‌نمایی"
-
-#: modules/gui/qt4/ui/video_effects.ui:558
-#, fuzzy
-msgid "Water effect"
-msgstr "جلوهٔ قلم"
-
-#: modules/gui/qt4/ui/video_effects.ui:572 modules/meta_engine/id3genres.h:67
-#: modules/video_filter/noise.c:54
-#, fuzzy
-msgid "Noise"
-msgstr "هیچ‌کدام"
-
-#: modules/gui/qt4/ui/video_effects.ui:579
-#, fuzzy
-msgid "Motion detect"
-msgstr "تشخیص حرکت"
-
-#: modules/gui/qt4/ui/video_effects.ui:586
-#: modules/video_filter/motionblur.c:60
-msgid "Motion blur"
-msgstr ""
-
-#: modules/gui/qt4/ui/video_effects.ui:598
-#, fuzzy
-msgid "Factor"
-msgstr "سریع‌تر"
-
-#: modules/gui/qt4/ui/video_effects.ui:656
-#, fuzzy
-msgid "Cartoon"
-msgstr "قهوه‌ای"
-
-#: modules/gui/qt4/ui/video_effects.ui:670
-#, fuzzy
-msgid "Vout/Overlay"
-msgstr "هم‌پوشانی"
-
-#: modules/gui/qt4/ui/video_effects.ui:676
-#, fuzzy
-msgid "Wall"
-msgstr "همه"
-
-#: modules/gui/qt4/ui/video_effects.ui:725
-#, fuzzy
-msgid "Add text"
-msgstr "اضافه کردن گره"
-
-#: modules/gui/qt4/ui/video_effects.ui:760 modules/video_filter/panoramix.c:97
-#, fuzzy
-msgid "Panoramix"
-msgstr "برنامه"
-
-#: modules/gui/qt4/ui/video_effects.ui:809 modules/video_filter/clone.c:71
-#, fuzzy
-msgid "Clone"
-msgstr "بستن"
-
-#: modules/gui/qt4/ui/video_effects.ui:821 modules/video_filter/clone.c:58
-#, fuzzy
-msgid "Number of clones"
-msgstr "تعداد ستون‌ها"
-
-#: modules/gui/qt4/ui/video_effects.ui:842
-#: modules/gui/qt4/ui/video_effects.ui:903
-#, fuzzy
-msgid "Logo"
-msgstr "حلقهٔ"
-
-#: modules/gui/qt4/ui/video_effects.ui:848
-#, fuzzy
-msgid "Add logo"
-msgstr "اضافه کردن گره"
-
-#: modules/gui/qt4/ui/video_effects.ui:860
-#: modules/stream_out/mosaic_bridge.c:158 modules/video_filter/mosaic.c:89
-msgid "Transparency"
-msgstr "شفافیت"
-
-#: modules/gui/qt4/ui/video_effects.ui:916
-#, fuzzy
-msgid "Logo erase"
-msgstr "نام پرونده‌های نشان"
-
-#: modules/gui/qt4/ui/video_effects.ui:951
-msgid "Mask"
-msgstr ""
-
-#: modules/gui/qt4/ui/video_effects.ui:962
-#, fuzzy
-msgid "Advanced video filter controls"
-msgstr "صافی ویدئوی دیوار"
-
-#: modules/gui/qt4/ui/video_effects.ui:971
-#, fuzzy
-msgid "Subpicture filters"
-msgstr "پروندهٔ زیرنویس"
-
-#: modules/gui/qt4/ui/video_effects.ui:981
-msgid "Video filters"
-msgstr "صافی‌های ویدئو"
-
-#: modules/gui/qt4/ui/video_effects.ui:988
-#, fuzzy
-msgid "Vout filters"
-msgstr "صافی‌های ویدئو"
-
-#: modules/gui/qt4/ui/video_effects.ui:995
-#, fuzzy
-msgid "Reset"
-msgstr "پیش‌تجزیه"
-
-#: modules/gui/qt4/ui/vlm.ui:22
-#, fuzzy
-msgid "VLM configurator"
-msgstr "پروندهٔ پیکربندی VLM"
-
-#: modules/gui/qt4/ui/vlm.ui:34
-#, fuzzy
-msgid "Media Manager Edition"
-msgstr "اطلاعات متا"
-
-#: modules/gui/qt4/ui/vlm.ui:57
-#, fuzzy
-msgid "Name:"
-msgstr "نام"
-
-#: modules/gui/qt4/ui/vlm.ui:80
-#, fuzzy
-msgid "Input:"
-msgstr "ورودی"
-
-#: modules/gui/qt4/ui/vlm.ui:93
-#, fuzzy
-msgid "Select Input"
-msgstr "ورودی صفحهٔ نمایش"
-
-#: modules/gui/qt4/ui/vlm.ui:100
-#, fuzzy
-msgid "Output:"
-msgstr "خروجی"
-
-#: modules/gui/qt4/ui/vlm.ui:113
-#, fuzzy
-msgid "Select Output"
-msgstr "خروجی جاری"
-
-#: modules/gui/qt4/ui/vlm.ui:120
-#, fuzzy
-msgid "Time Control"
-msgstr "کنترل کننده"
-
-#: modules/gui/qt4/ui/vlm.ui:127
-#, fuzzy
-msgid "Mux Control"
-msgstr "کنترل کننده"
-
-#: modules/gui/qt4/ui/vlm.ui:169
-msgid "Loop"
-msgstr "حلقهٔ"
-
-#: modules/gui/qt4/ui/vlm.ui:235
-msgid "Media Manager List"
-msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:218
 #, fuzzy
@@ -18420,14 +17853,14 @@ msgstr "واسط وبی"
 msgid "Skins loader demux"
 msgstr ""
 
-#: modules/gui/skins2/src/theme_repository.cpp:69
+#: modules/gui/skins2/src/theme_repository.cpp:67
 #, fuzzy
 msgid "Select skin"
 msgstr "&انتخاب"
 
-#: modules/gui/skins2/src/theme_repository.cpp:83
+#: modules/gui/skins2/src/theme_repository.cpp:86
 #, fuzzy
-msgid "Open skin..."
+msgid "Open skin ..."
 msgstr "باز کردن پرونده..."
 
 #: modules/gui/wince/interface.cpp:506
@@ -18642,6 +18075,11 @@ msgstr "صدا:"
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
 msgstr ""
+
+#: modules/meta_engine/id3genres.h:67 modules/video_filter/noise.c:54
+#, fuzzy
+msgid "Noise"
+msgstr "هیچ‌کدام"
 
 #: modules/meta_engine/id3genres.h:68
 #, fuzzy
@@ -19870,9 +19308,13 @@ msgstr "ویدئو"
 msgid "VC-1 packetizer"
 msgstr "اندازهٔ بسته"
 
-#: modules/services_discovery/bonjour.c:55
+#: modules/services_discovery/bonjour.c:53
 msgid "Bonjour services"
 msgstr ""
+
+#: modules/services_discovery/podcast.c:61
+msgid "Podcast URLs list"
+msgstr "فهرست نشانی پادکَست‌ها"
 
 #: modules/services_discovery/podcast.c:62
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
@@ -20313,6 +19755,10 @@ msgid ""
 "Force the use of a specific chroma. Use YUVA if you're planning to use the "
 "Alphamask or Bluescreen video filter."
 msgstr ""
+
+#: modules/stream_out/mosaic_bridge.c:158 modules/video_filter/mosaic.c:89
+msgid "Transparency"
+msgstr "شفافیت"
 
 #: modules/stream_out/mosaic_bridge.c:160
 #, fuzzy
@@ -20943,6 +20389,10 @@ msgstr ""
 msgid "AltiVec conversions from "
 msgstr ""
 
+#: modules/video_filter/adjust.c:66
+msgid "Brightness threshold"
+msgstr "آستانهٔ روشنی"
+
 #: modules/video_filter/adjust.c:67
 msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
@@ -20995,6 +20445,10 @@ msgstr "تنظیم گامای تصویر، بین ۰٫۰۱ و ۱۰. پیش‌ف�
 #, fuzzy
 msgid "Image properties filter"
 msgstr "ویژگی‌های تیونر"
+
+#: modules/video_filter/adjust.c:83
+msgid "Image adjust"
+msgstr "تنظیم تصویر"
 
 #: modules/video_filter/alphamask.c:40
 msgid "Use an image's alpha channel as a transparency mask."
@@ -21630,6 +21084,11 @@ msgstr "بررسی وجود به‌هنگام‌سازی"
 msgid "Video filtering using a chain of video filter modules"
 msgstr ""
 
+#: modules/video_filter/clone.c:58
+#, fuzzy
+msgid "Number of clones"
+msgstr "تعداد ستون‌ها"
+
 #: modules/video_filter/clone.c:59
 #, fuzzy
 msgid "Number of video windows in which to clone the video."
@@ -21651,6 +21110,11 @@ msgstr ""
 msgid "Clone video filter"
 msgstr "صافی ویدئوی حاشیه‌گیری"
 
+#: modules/video_filter/clone.c:71
+#, fuzzy
+msgid "Clone"
+msgstr "بستن"
+
 #: modules/video_filter/colorthres.c:55
 msgid ""
 "Colors similar to this will be kept, others will be grayscaled. This must be "
@@ -21663,6 +21127,11 @@ msgstr ""
 #, fuzzy
 msgid "Color threshold filter"
 msgstr "صافی ویدئوی حاشیه‌گیری"
+
+#: modules/video_filter/colorthres.c:69
+#, fuzzy
+msgid "Color threshold"
+msgstr "آستانهٔ روشنی"
 
 #: modules/video_filter/colorthres.c:77
 #, fuzzy
@@ -22401,6 +21870,10 @@ msgstr ""
 msgid "The degree of blurring from 1 to 127."
 msgstr ""
 
+#: modules/video_filter/motionblur.c:60
+msgid "Motion blur"
+msgstr ""
+
 #: modules/video_filter/motionblur.c:61
 #, fuzzy
 msgid "Motion blur filter"
@@ -22635,6 +22108,11 @@ msgstr ""
 #: modules/video_filter/panoramix.c:96
 msgid "Panoramix: wall with overlap video filter"
 msgstr ""
+
+#: modules/video_filter/panoramix.c:97
+#, fuzzy
+msgid "Panoramix"
+msgstr "برنامه"
 
 #: modules/video_filter/panoramix.c:108
 msgid "Offset X offset (automatic compensation)"
@@ -23009,6 +22487,11 @@ msgstr ""
 #, fuzzy
 msgid "Rotate video filter"
 msgstr "صافی ویدئوی حاشیه‌گیری"
+
+#: modules/video_filter/rotate.c:68
+#, fuzzy
+msgid "Rotate"
+msgstr "نرخ بیتی"
 
 #: modules/video_filter/rss.c:129
 msgid "Feed URLs"
@@ -23433,6 +22916,10 @@ msgstr "خروجی ویدئوی بی‌رنگ"
 msgid "DirectX 3D video output"
 msgstr "خروجی صدای دیرکت‌اکس"
 
+#: modules/video_output/msw/directx.c:131
+msgid "Use hardware YUV->RGB conversions"
+msgstr ""
+
 #: modules/video_output/msw/directx.c:133
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
@@ -23489,7 +22976,7 @@ msgstr ""
 msgid "DirectX video output"
 msgstr "خروجی صدای دیرکت‌اکس"
 
-#: modules/video_output/msw/directx.c:325
+#: modules/video_output/msw/directx.c:323
 msgid "Wallpaper"
 msgstr "کاغذ دیواری"
 
@@ -24008,6 +23495,334 @@ msgstr "صافی تصویرساز"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "تحلیل‌گر طیفی"
+
+#, fuzzy
+#~ msgid "Preset"
+#~ msgstr "پیش‌تجزیه"
+
+#, fuzzy
+#~ msgid "Show extended options"
+#~ msgstr "نمایش گزینه‌های پیشرفته"
+
+#, fuzzy
+#~ msgid "Show &amp;more options"
+#~ msgstr "نمایش گزینه‌های پیشرفته"
+
+#, fuzzy
+#~ msgid "Start Time"
+#~ msgstr "زمان آغاز"
+
+#, fuzzy
+#~ msgid "Extra media"
+#~ msgstr "متاداده"
+
+#, fuzzy
+#~ msgid "Select the file"
+#~ msgstr "یک پرونده انتخاب کنید"
+
+#, fuzzy
+#~ msgid "Edit Options"
+#~ msgstr "گزینه‌ها"
+
+#, fuzzy
+#~ msgid "Select play mode"
+#~ msgstr "یک پرونده انتخاب کنید"
+
+#, fuzzy
+#~ msgid "Choose one or more media file to open"
+#~ msgstr "یک یا چند پرونده انتخاب کنید تا باز شوند"
+
+#, fuzzy
+#~ msgid "Select one or more files"
+#~ msgstr "یک یا چند پرونده انتخاب کنید تا باز شوند"
+
+#, fuzzy
+#~ msgid "Select the subtitles file"
+#~ msgstr "تشخیص خودکار پرونده‌های زیرنویس"
+
+#, fuzzy
+#~ msgid "Add a subtitles file"
+#~ msgstr "استفاده از پروندهٔ زیرنویس"
+
+#, fuzzy
+#~ msgid "Use a sub&amp;titles file"
+#~ msgstr "استفاده از پروندهٔ زیرنویس"
+
+#, fuzzy
+#~ msgid "Alignment:"
+#~ msgstr "چینش ویدئو"
+
+#, fuzzy
+#~ msgid "Network Protocol"
+#~ msgstr "همگام‌سازی شبکه"
+
+#, fuzzy
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "یک شاخه انتخاب کنید"
+
+#, fuzzy
+#~ msgid "Protocol"
+#~ msgstr "همگام‌سازی شبکه"
+
+#, fuzzy
+#~ msgid "Select the port used"
+#~ msgstr "یک پرونده انتخاب کنید"
+
+#~ msgid "Default volume"
+#~ msgstr "بلندی صدای پیش‌فرض"
+
+#~ msgid "Preferred audio language"
+#~ msgstr "زبان صدای ترجیهی"
+
+#, fuzzy
+#~ msgid "Disc Devices"
+#~ msgstr "دستگاه‌ها"
+
+#, fuzzy
+#~ msgid "Default disc device"
+#~ msgstr "دستگاه‌های پیش‌فرض"
+
+#, fuzzy
+#~ msgid "Server default port"
+#~ msgstr "بازگرداندن مقادیر پیش‌فرض"
+
+#, fuzzy
+#~ msgid "Default caching level"
+#~ msgstr "زاویهٔ پیش‌فرض دی‌وی‌دی."
+
+#, fuzzy
+#~ msgid "Post-Processing quality"
+#~ msgstr "کیفیت کدگذاری"
+
+#, fuzzy
+#~ msgid "textFormat"
+#~ msgstr "قالب وی‌سی‌دی"
+
+#~ msgid "Subtitles Language"
+#~ msgstr "زبان زیرنویس"
+
+#~ msgid "Preferred subtitles language"
+#~ msgstr "زبان زیرنویس ترجیهی"
+
+#, fuzzy
+#~ msgid "Default encoding"
+#~ msgstr "کدگشایی"
+
+#~ msgid "Effect"
+#~ msgstr "جلوه"
+
+#~ msgid "Font color"
+#~ msgstr "رنگ متن"
+
+#~ msgid "Output"
+#~ msgstr "خروجی"
+
+#, fuzzy
+#~ msgid "Accelerated video output (Overlay)"
+#~ msgstr "خروجی ویدئوی تصویر"
+
+#, fuzzy
+#~ msgid "DirectX"
+#~ msgstr "شاخه"
+
+#, fuzzy
+#~ msgid "Display device"
+#~ msgstr "پیش‌نمایش عکس‌های ویدئو"
+
+#, fuzzy
+#~ msgid "Enable wallpaper mode"
+#~ msgstr "کاغذ دیواری"
+
+#, fuzzy
+#~ msgid "Deinterlacing Mode"
+#~ msgstr "حالت نادرهم‌بافی"
+
+#, fuzzy
+#~ msgid "Force Aspect Ratio"
+#~ msgstr "نسبت طول و عرض"
+
+#, fuzzy
+#~ msgid "Edit settings"
+#~ msgstr "تنظیمات صدا"
+
+#, fuzzy
+#~ msgid "Control"
+#~ msgstr "کنترل کننده"
+
+#, fuzzy
+#~ msgid "Status"
+#~ msgstr "تن&ظیمات"
+
+#, fuzzy
+#~ msgid "P/P"
+#~ msgstr "‏‎UDP/RTP‏"
+
+#, fuzzy
+#~ msgid "Prev"
+#~ msgstr "قبلی"
+
+#, fuzzy
+#~ msgid "Add Input"
+#~ msgstr "بدون ورودی"
+
+#, fuzzy
+#~ msgid "Edit Input"
+#~ msgstr "ورودی پرونده"
+
+#, fuzzy
+#~ msgid "Clear List"
+#~ msgstr "فهرست پخش"
+
+#, fuzzy
+#~ msgid "Transform"
+#~ msgstr "تبدیل"
+
+#, fuzzy
+#~ msgid "Sharpen"
+#~ msgstr "صفحهٔ نمایش"
+
+#, fuzzy
+#~ msgid "Sigma"
+#~ msgstr "ریز"
+
+#, fuzzy
+#~ msgid "Synchronize top and bottom"
+#~ msgstr "چرخش در شیار صوتی"
+
+#, fuzzy
+#~ msgid "Synchronize left and right"
+#~ msgstr "چرخش در شیار صوتی"
+
+#, fuzzy
+#~ msgid "Geometry"
+#~ msgstr "طیف نما"
+
+#, fuzzy
+#~ msgid "Magnification/Zoom"
+#~ msgstr "بزرگ‌نمایی"
+
+#, fuzzy
+#~ msgid "Puzzle game"
+#~ msgstr "بنفش"
+
+#, fuzzy
+#~ msgid "Black slot"
+#~ msgstr "سیاه"
+
+#, fuzzy
+#~ msgid "Columns"
+#~ msgstr "بلندی صدا"
+
+#, fuzzy
+#~ msgid "Color fun"
+#~ msgstr "رنگ"
+
+#, fuzzy
+#~ msgid "Color extraction"
+#~ msgstr "استوانه"
+
+#, fuzzy
+#~ msgid "Similarity"
+#~ msgstr "آستانهٔ روشنی"
+
+#, fuzzy
+#~ msgid "Image modification"
+#~ msgstr "بزرگ‌نمایی"
+
+#, fuzzy
+#~ msgid "Water effect"
+#~ msgstr "جلوهٔ قلم"
+
+#, fuzzy
+#~ msgid "Motion detect"
+#~ msgstr "تشخیص حرکت"
+
+#, fuzzy
+#~ msgid "Factor"
+#~ msgstr "سریع‌تر"
+
+#, fuzzy
+#~ msgid "Cartoon"
+#~ msgstr "قهوه‌ای"
+
+#, fuzzy
+#~ msgid "Vout/Overlay"
+#~ msgstr "هم‌پوشانی"
+
+#, fuzzy
+#~ msgid "Wall"
+#~ msgstr "همه"
+
+#, fuzzy
+#~ msgid "Add text"
+#~ msgstr "اضافه کردن گره"
+
+#, fuzzy
+#~ msgid "Logo"
+#~ msgstr "حلقهٔ"
+
+#, fuzzy
+#~ msgid "Add logo"
+#~ msgstr "اضافه کردن گره"
+
+#, fuzzy
+#~ msgid "Logo erase"
+#~ msgstr "نام پرونده‌های نشان"
+
+#, fuzzy
+#~ msgid "Advanced video filter controls"
+#~ msgstr "صافی ویدئوی دیوار"
+
+#, fuzzy
+#~ msgid "Subpicture filters"
+#~ msgstr "پروندهٔ زیرنویس"
+
+#~ msgid "Video filters"
+#~ msgstr "صافی‌های ویدئو"
+
+#, fuzzy
+#~ msgid "Vout filters"
+#~ msgstr "صافی‌های ویدئو"
+
+#, fuzzy
+#~ msgid "Reset"
+#~ msgstr "پیش‌تجزیه"
+
+#, fuzzy
+#~ msgid "VLM configurator"
+#~ msgstr "پروندهٔ پیکربندی VLM"
+
+#, fuzzy
+#~ msgid "Media Manager Edition"
+#~ msgstr "اطلاعات متا"
+
+#, fuzzy
+#~ msgid "Name:"
+#~ msgstr "نام"
+
+#, fuzzy
+#~ msgid "Input:"
+#~ msgstr "ورودی"
+
+#, fuzzy
+#~ msgid "Select Input"
+#~ msgstr "ورودی صفحهٔ نمایش"
+
+#, fuzzy
+#~ msgid "Output:"
+#~ msgstr "خروجی"
+
+#, fuzzy
+#~ msgid "Select Output"
+#~ msgstr "خروجی جاری"
+
+#, fuzzy
+#~ msgid "Time Control"
+#~ msgstr "کنترل کننده"
+
+#, fuzzy
+#~ msgid "Mux Control"
+#~ msgstr "کنترل کننده"
 
 #~ msgid ""
 #~ "These are the settings for the input, demultiplexing and decoding parts "

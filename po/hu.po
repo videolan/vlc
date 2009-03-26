@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Videolan\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2009-03-19 00:22+0000\n"
+"POT-Creation-Date: 2009-03-26 21:58+0000\n"
 "PO-Revision-Date: 2008-09-02 22:23+0200\n"
 "Last-Translator: Gabor Kelemen <kelemeng@gnome.hu>\n"
 "Language-Team: Hungarian <gnome@fsf.hu>\n"
@@ -77,7 +77,7 @@ msgstr "A VLC kezelőfelületeinek beállításai"
 msgid "Hotkeys settings"
 msgstr "Forróbillentyűk beállításai"
 
-#: include/vlc_config_cat.h:52 src/input/es_out.c:2649 src/input/es_out.c:2683
+#: include/vlc_config_cat.h:52 src/input/es_out.c:2628 src/input/es_out.c:2662
 #: src/libvlc-module.c:1500 modules/gui/beos/InterfaceWindow.cpp:283
 #: modules/gui/macosx/intf.m:597 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:113 modules/gui/macosx/simple_prefs.m:178
@@ -124,7 +124,7 @@ msgstr "Kimeneti modulok"
 msgid "General settings for audio output modules."
 msgstr "Ezek a hangkimeneti modulok általános beállításai."
 
-#: include/vlc_config_cat.h:66 src/libvlc-module.c:1923
+#: include/vlc_config_cat.h:66 src/libvlc-module.c:1931
 #: modules/stream_out/transcode.c:232
 msgid "Miscellaneous"
 msgstr "Egyéb"
@@ -133,14 +133,14 @@ msgstr "Egyéb"
 msgid "Miscellaneous audio settings and modules."
 msgstr "Egyéb hangbeállítások és modulok."
 
-#: include/vlc_config_cat.h:70 src/input/es_out.c:2652 src/input/es_out.c:2732
+#: include/vlc_config_cat.h:70 src/input/es_out.c:2631 src/input/es_out.c:2711
 #: src/libvlc-module.c:1553 modules/gui/macosx/intf.m:610
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:102
 #: modules/gui/macosx/simple_prefs.m:182 modules/gui/macosx/wizard.m:381
 #: modules/gui/qt4/components/info_panels.cpp:518
 #: modules/gui/qt4/components/simple_preferences.cpp:80
-#: modules/gui/qt4/ui/sprefs_video.ui:150 modules/misc/dummy/dummy.c:104
-#: modules/stream_out/es.c:101 modules/stream_out/transcode.c:169
+#: modules/misc/dummy/dummy.c:104 modules/stream_out/es.c:101
+#: modules/stream_out/transcode.c:169
 msgid "Video"
 msgstr "Videó"
 
@@ -254,7 +254,7 @@ msgstr "Általános"
 msgid "General input settings. Use with care..."
 msgstr "Általános bemeneti beállítások. Óvatosan használja."
 
-#: include/vlc_config_cat.h:124 src/libvlc-module.c:1850
+#: include/vlc_config_cat.h:124 src/libvlc-module.c:1858
 msgid "Stream output"
 msgstr "Műsorkimenet"
 
@@ -364,12 +364,13 @@ msgstr "VOD"
 msgid "VLC's implementation of Video On Demand"
 msgstr "A Video On Demand VLC-féle megvalósítása"
 
-#: include/vlc_config_cat.h:175 src/libvlc-module.c:1984
+#: include/vlc_config_cat.h:175 src/libvlc-module.c:1992
 #: src/playlist/engine.c:119 modules/demux/playlist/playlist.c:66
 #: modules/demux/playlist/playlist.c:67
 #: modules/gui/beos/InterfaceWindow.cpp:232
 #: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:540
 #: modules/gui/pda/pda_interface.c:1262
+#: modules/gui/qt4/components/controller.hpp:102
 #: modules/gui/qt4/components/playlist/playlist.cpp:114
 #: modules/gui/qt4/dialogs/playlist.cpp:43
 #: modules/gui/qt4/main_interface.cpp:142
@@ -402,7 +403,7 @@ msgstr ""
 "A szolgáltatásfelismerési modulok automatikusan elemeket adnak hozzá a "
 "lejátszólistához."
 
-#: include/vlc_config_cat.h:186 src/libvlc-module.c:1800
+#: include/vlc_config_cat.h:186 src/libvlc-module.c:1808
 msgid "Advanced"
 msgstr "Speciális"
 
@@ -429,7 +430,7 @@ msgstr "Speciális beállítások"
 
 #: include/vlc_config_cat.h:198 modules/gui/macosx/open.m:171
 #: modules/gui/macosx/open.m:441 modules/gui/macosx/simple_prefs.m:253
-#: modules/gui/pda/pda_interface.c:546 modules/gui/qt4/ui/sprefs_input.ui:49
+#: modules/gui/pda/pda_interface.c:546
 msgid "Network"
 msgstr "Hálózat"
 
@@ -555,7 +556,7 @@ msgstr "Névjegy"
 #: modules/gui/macosx/intf.m:1905 modules/gui/macosx/intf.m:1906
 #: modules/gui/macosx/intf.m:1907 modules/gui/macosx/playlist.m:443
 #: modules/gui/pda/pda_interface.c:260 modules/gui/pda/pda_interface.c:261
-#: modules/gui/qt4/menus.cpp:721
+#: modules/gui/qt4/components/controller.hpp:100 modules/gui/qt4/menus.cpp:721
 msgid "Play"
 msgstr "Lejátszás"
 
@@ -566,8 +567,6 @@ msgstr "Információk lekérése"
 #: include/vlc_intf_strings.h:54 modules/gui/macosx/playlist.m:444
 #: modules/gui/pda/pda_interface.c:1252
 #: modules/gui/qt4/dialogs/bookmarks.cpp:46
-#: modules/gui/qt4/ui/podcast_configuration.ui:59
-#: modules/gui/qt4/ui/streampanel.ui:41
 msgid "Delete"
 msgstr "Törlés"
 
@@ -685,7 +684,7 @@ msgid ""
 msgstr ""
 "A videó egy részének nagyítása. Kiválaszthatja a kép nagyítandó részét."
 
-#: include/vlc_intf_strings.h:100 modules/gui/qt4/ui/video_effects.ui:551
+#: include/vlc_intf_strings.h:100
 msgid "Waves"
 msgstr "Hullámok"
 
@@ -854,11 +853,9 @@ msgstr "Sztereó"
 #: modules/audio_filter/channel_mixer/mono.c:101 modules/codec/dvbsub.c:75
 #: modules/codec/subtitles/subsdec.c:102 modules/codec/zvbi.c:79
 #: modules/control/gestures.c:91 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:252
-#: modules/gui/qt4/ui/video_effects.ui:867
-#: modules/gui/qt4/ui/video_effects.ui:935 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Left"
 msgstr "Bal"
 
@@ -867,9 +864,9 @@ msgstr "Bal"
 #: modules/audio_filter/channel_mixer/mono.c:101 modules/codec/dvbsub.c:75
 #: modules/codec/subtitles/subsdec.c:102 modules/codec/zvbi.c:79
 #: modules/control/gestures.c:91 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:269 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Right"
 msgstr "Jobb"
 
@@ -993,7 +990,7 @@ msgstr ""
 #: src/input/es_out.c:911 src/input/es_out.c:916 src/libvlc-module.c:342
 #: modules/access/cdda/info.c:393 modules/access/vcdx/access.c:477
 #: modules/access/vcdx/info.c:290 modules/access/vcdx/info.c:291
-#: modules/gui/qt4/components/open_panels.cpp:349
+#: modules/gui/qt4/components/open_panels.cpp:381
 msgid "Track"
 msgstr "Szám"
 
@@ -1008,126 +1005,125 @@ msgstr "%s [%s %d]"
 msgid "Program"
 msgstr "Program"
 
-#: src/input/es_out.c:1361 src/input/es_out.c:1363
+#: src/input/es_out.c:1340 src/input/es_out.c:1342
 #, fuzzy
 msgid "Scrambled"
 msgstr "Átméretezés"
 
-#: src/input/es_out.c:1361 modules/gui/macosx/update.m:102
+#: src/input/es_out.c:1340 modules/gui/macosx/update.m:102
 msgid "Yes"
 msgstr "Igen"
 
-#: src/input/es_out.c:1937
+#: src/input/es_out.c:1916
 #, fuzzy, c-format
 msgid "Closed captions %u"
 msgstr "Zárt fejezetek 1"
 
-#: src/input/es_out.c:2638
+#: src/input/es_out.c:2617
 #, c-format
 msgid "Stream %d"
 msgstr "%d. műsor"
 
-#: src/input/es_out.c:2655 src/input/es_out.c:2763
+#: src/input/es_out.c:2634 src/input/es_out.c:2742
 msgid "Subtitle"
 msgstr "Felirat"
 
-#: src/input/es_out.c:2663 src/input/es_out.c:2683 src/input/es_out.c:2732
-#: src/input/es_out.c:2763 modules/gui/macosx/output.m:153
-#: modules/gui/qt4/ui/sprefs_audio.ui:186
+#: src/input/es_out.c:2642 src/input/es_out.c:2662 src/input/es_out.c:2711
+#: src/input/es_out.c:2742 modules/gui/macosx/output.m:153
 msgid "Type"
 msgstr "Típus"
 
-#: src/input/es_out.c:2666
+#: src/input/es_out.c:2645
 #, fuzzy
 msgid "Original ID"
 msgstr "Eredeti hang"
 
-#: src/input/es_out.c:2669 modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2648 modules/gui/macosx/wizard.m:385
 msgid "Codec"
 msgstr "Kodek"
 
-#: src/input/es_out.c:2673 src/input/meta.c:50 src/libvlc-module.c:193
+#: src/input/es_out.c:2652 src/input/meta.c:50 src/libvlc-module.c:193
 #: modules/gui/beos/InterfaceWindow.cpp:279
 #: modules/gui/macosx/simple_prefs.m:262
 msgid "Language"
 msgstr "Nyelv"
 
-#: src/input/es_out.c:2676 src/input/meta.c:45
+#: src/input/es_out.c:2655 src/input/meta.c:45
 #: modules/gui/macosx/bookmarks.m:94 modules/gui/qt4/dialogs/bookmarks.cpp:66
 msgid "Description"
 msgstr "Leírás"
 
-#: src/input/es_out.c:2686 src/input/es_out.c:2689
+#: src/input/es_out.c:2665 src/input/es_out.c:2668
 #: modules/gui/macosx/output.m:176
 msgid "Channels"
 msgstr "Csatornák"
 
-#: src/input/es_out.c:2694
+#: src/input/es_out.c:2673
 msgid "Sample rate"
 msgstr "Mintavételi frekvencia"
 
-#: src/input/es_out.c:2695
+#: src/input/es_out.c:2674
 #, c-format
 msgid "%u Hz"
 msgstr "%u Hz"
 
-#: src/input/es_out.c:2705
+#: src/input/es_out.c:2684
 msgid "Bits per sample"
 msgstr "Bitek mintánként"
 
-#: src/input/es_out.c:2710 modules/access/pvr.c:97
+#: src/input/es_out.c:2689 modules/access/pvr.c:97
 #: modules/access_output/shout.c:91
-#: modules/gui/qt4/components/open_panels.cpp:913
+#: modules/gui/qt4/components/open_panels.cpp:945
 msgid "Bitrate"
 msgstr "Bitsebesség"
 
-#: src/input/es_out.c:2711
+#: src/input/es_out.c:2690
 #, c-format
 msgid "%u kb/s"
 msgstr "%u kb/mp"
 
-#: src/input/es_out.c:2722
+#: src/input/es_out.c:2701
 #, fuzzy
 msgid "Track replay gain"
 msgstr "Alapértelmezett visszhangerősítés"
 
-#: src/input/es_out.c:2724
+#: src/input/es_out.c:2703
 #, fuzzy
 msgid "Album replay gain"
 msgstr "Alapértelmezett visszhangerősítés"
 
-#: src/input/es_out.c:2726
+#: src/input/es_out.c:2705
 #, fuzzy, c-format
 msgid "%.2f dB"
 msgstr "%.1f GB"
 
-#: src/input/es_out.c:2736
+#: src/input/es_out.c:2715
 msgid "Resolution"
 msgstr "Felbontás"
 
-#: src/input/es_out.c:2742
+#: src/input/es_out.c:2721
 msgid "Display resolution"
 msgstr "Képernyő felbontása"
 
-#: src/input/es_out.c:2753 src/input/es_out.c:2757
+#: src/input/es_out.c:2732 src/input/es_out.c:2736
 #: modules/access/screen/screen.c:44
 msgid "Frame rate"
 msgstr "Frissítési sebesség"
 
-#: src/input/input.c:2405
+#: src/input/input.c:2431
 msgid "Your input can't be opened"
 msgstr "A bemenet nem nyitható meg"
 
-#: src/input/input.c:2406
+#: src/input/input.c:2432
 #, c-format
 msgid "VLC is unable to open the MRL '%s'. Check the log for details."
 msgstr "A VLC nem képes megnyitni a(z) „%s” MRL-t."
 
-#: src/input/input.c:2536
+#: src/input/input.c:2562
 msgid "VLC can't recognize the input's format"
 msgstr "A VLC nem ismerte fel a bemenet formátumát"
 
-#: src/input/input.c:2537
+#: src/input/input.c:2563
 #, fuzzy, c-format
 msgid ""
 "The format of '%s' cannot be detected. Have a look at the log for details."
@@ -1138,7 +1134,7 @@ msgstr ""
 #: modules/gui/beos/MediaControlView.cpp:1236 modules/gui/macosx/intf.m:592
 #: modules/gui/macosx/intf.m:593 modules/gui/macosx/open.m:178
 #: modules/gui/macosx/playlistinfo.m:75 modules/gui/macosx/wizard.m:348
-#: modules/gui/qt4/components/open_panels.cpp:323 modules/mux/asf.c:52
+#: modules/gui/qt4/components/open_panels.cpp:355 modules/mux/asf.c:52
 msgid "Title"
 msgstr "Cím"
 
@@ -1176,7 +1172,6 @@ msgid "Setting"
 msgstr "Beállítás"
 
 #: src/input/meta.c:49 modules/gui/macosx/open.m:191
-#: modules/gui/qt4/ui/podcast_configuration.ui:39
 msgid "URL"
 msgstr "URL"
 
@@ -1371,7 +1366,7 @@ msgstr ""
 "Nyomja meg az ENTER-t a folytatáshoz...\n"
 
 #: src/libvlc.h:182 src/libvlc-module.c:1394 src/libvlc-module.c:1395
-#: src/libvlc-module.c:2510 src/video_output/vout_intf.c:278
+#: src/libvlc-module.c:2519 src/video_output/vout_intf.c:278
 msgid "Zoom"
 msgstr "Nagyítás"
 
@@ -1569,8 +1564,7 @@ msgstr ""
 "Itt adható meg a VLC által használandó hangkimeneti mód. Alapesetben a VLC "
 "kiválasztja az elérhető legjobb módot."
 
-#: src/libvlc-module.c:238 modules/gui/qt4/ui/sprefs_audio.ui:20
-#: modules/stream_out/display.c:41
+#: src/libvlc-module.c:238 modules/stream_out/display.c:41
 msgid "Enable audio"
 msgstr "Hang engedélyezése"
 
@@ -1676,7 +1670,6 @@ msgstr ""
 "az lehetséges (azaz mind a hardver, mind a lejátszott hangfolyam támogatja)."
 
 #: src/libvlc-module.c:287 modules/gui/macosx/simple_prefs.m:231
-#: modules/gui/qt4/ui/sprefs_audio.ui:99
 msgid "Use S/PDIF when available"
 msgstr "S/PDIF hangkimenet használata, ha elérhető"
 
@@ -1689,7 +1682,6 @@ msgstr ""
 "mind a lejátszott hangfolyam támogatja."
 
 #: src/libvlc-module.c:292 modules/gui/macosx/simple_prefs.m:221
-#: modules/gui/qt4/ui/sprefs_audio.ui:113
 msgid "Force detection of Dolby Surround"
 msgstr "A Dolby Surround felismerésének kényszerítése"
 
@@ -1726,7 +1718,7 @@ msgstr "Hangvizualizációk "
 msgid "This adds visualization modules (spectrum analyzer, etc.)."
 msgstr "Ez vizualizációs modulokat ad hozzá (spektrumanalizátor, stb.)."
 
-#: src/libvlc-module.c:315 modules/gui/qt4/ui/sprefs_audio.ui:283
+#: src/libvlc-module.c:315
 msgid "Replay gain mode"
 msgstr "Visszhangerősítés módja"
 
@@ -1808,8 +1800,7 @@ msgstr ""
 "Itt adható meg a VLC által használt videokimeneti mód. Alapesetben a VLC "
 "kiválasztja a legjobb módot."
 
-#: src/libvlc-module.c:361 modules/gui/qt4/ui/sprefs_video.ui:26
-#: modules/stream_out/display.c:43
+#: src/libvlc-module.c:361 modules/stream_out/display.c:43
 msgid "Enable video"
 msgstr "Video engedélyezése"
 
@@ -1910,19 +1901,17 @@ msgstr "Középre"
 
 #: src/libvlc-module.c:398 src/libvlc-module.c:447 modules/codec/dvbsub.c:75
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:235
-#: modules/gui/qt4/ui/video_effects.ui:874
-#: modules/gui/qt4/ui/video_effects.ui:928 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Top"
 msgstr "Fent"
 
 #: src/libvlc-module.c:398 src/libvlc-module.c:447 modules/codec/dvbsub.c:75
 #: modules/codec/zvbi.c:79 modules/gui/fbosd.c:162
-#: modules/gui/qt4/ui/video_effects.ui:286 modules/video_filter/logo.c:100
-#: modules/video_filter/marq.c:138 modules/video_filter/mosaic.c:172
-#: modules/video_filter/osdmenu.c:85 modules/video_filter/rss.c:171
+#: modules/video_filter/logo.c:100 modules/video_filter/marq.c:138
+#: modules/video_filter/mosaic.c:172 modules/video_filter/osdmenu.c:85
+#: modules/video_filter/rss.c:171
 msgid "Bottom"
 msgstr "Lent"
 
@@ -2008,7 +1997,7 @@ msgstr ""
 "használni."
 
 #: src/libvlc-module.c:423 src/video_output/vout_intf.c:421
-#: modules/gui/macosx/simple_prefs.m:283 modules/gui/qt4/ui/sprefs_video.ui:65
+#: modules/gui/macosx/simple_prefs.m:283
 msgid "Always on top"
 msgstr "Mindig felül"
 
@@ -2016,7 +2005,7 @@ msgstr "Mindig felül"
 msgid "Always place the video window on top of other windows."
 msgstr "A videoablakot mindig a többi ablak felett helyezze el."
 
-#: src/libvlc-module.c:427 modules/gui/qt4/ui/sprefs_subtitles.ui:35
+#: src/libvlc-module.c:427
 msgid "Show media title on video"
 msgstr "A média címének megjelenítése a videón"
 
@@ -2079,7 +2068,7 @@ msgstr ""
 "Korlátozza az energiakezelő démont lejátszáskor, így megakadályozza a "
 "számítógép inaktivitás miatti felfüggesztését."
 
-#: src/libvlc-module.c:457 modules/gui/qt4/ui/sprefs_video.ui:48
+#: src/libvlc-module.c:457
 msgid "Window decorations"
 msgstr "Ablakdekorációk"
 
@@ -2279,7 +2268,6 @@ msgstr ""
 "akkor ezt módosítsa 4:3-ra az arányok megtartása érdekében."
 
 #: src/libvlc-module.c:551 modules/gui/macosx/simple_prefs.m:285
-#: modules/gui/qt4/ui/sprefs_video.ui:95
 msgid "Skip frames"
 msgstr "Képkockák kihagyása"
 
@@ -2399,7 +2387,6 @@ msgstr "Alapértelmezett"
 
 #: src/libvlc-module.c:604 modules/gui/macosx/equalizer.m:157
 #: modules/gui/macosx/extended.m:96 modules/gui/macosx/wizard.m:354
-#: modules/gui/qt4/ui/equalizer.ui:27 modules/gui/qt4/ui/vlm.ui:70
 msgid "Enable"
 msgstr "Engedélyezés"
 
@@ -2681,7 +2668,7 @@ msgstr ""
 "Ezeket a szűrőket itt engedélyezheti és az „alkép szűrő” modulok között "
 "állíthatja be. Ezen kívül sok egyéb alkép-opciót is beállíthat."
 
-#: src/libvlc-module.c:743 modules/gui/qt4/ui/sprefs_subtitles.ui:171
+#: src/libvlc-module.c:743
 msgid "Force subtitle position"
 msgstr "Felirat pozíciójának kényszerítése"
 
@@ -2702,9 +2689,7 @@ msgid "You can completely disable the sub-picture processing."
 msgstr "Teljesen letilthatja az alkép-feldolgozást."
 
 #: src/libvlc-module.c:752 src/libvlc-module.c:1663
-#: modules/gui/macosx/simple_prefs.m:274
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:22
-#: modules/stream_out/transcode.c:228
+#: modules/gui/macosx/simple_prefs.m:274 modules/stream_out/transcode.c:228
 msgid "On Screen Display"
 msgstr "Képernyőkijelzés"
 
@@ -3642,7 +3627,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/embeddedwindow.m:50
 #: modules/gui/macosx/intf.m:537 modules/gui/macosx/intf.m:615
 #: modules/gui/macosx/intf.m:679 modules/gui/macosx/simple_prefs.m:282
-#: modules/gui/qt4/ui/sprefs_video.ui:58
+#: modules/gui/qt4/components/controller.hpp:101
 msgid "Fullscreen"
 msgstr "Teljes képernyő"
 
@@ -3687,6 +3672,7 @@ msgstr "Válassza ki a lejátszásra használandó gyorsbillentyűt."
 
 #: src/libvlc-module.c:1220 modules/control/hotkeys.c:750
 #: modules/gui/macosx/controls.m:986 modules/gui/macosx/intf.m:580
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/gui/qt4/components/controller.hpp:108
 msgid "Faster"
 msgstr "Gyorsabban"
@@ -3698,6 +3684,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1222 modules/control/hotkeys.c:756
 #: modules/gui/macosx/controls.m:987 modules/gui/macosx/intf.m:581
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/gui/qt4/components/controller.hpp:108
 msgid "Slower"
 msgstr "Lassabban"
@@ -3733,7 +3720,8 @@ msgstr "Lassabban"
 #: modules/gui/macosx/intf.m:536 modules/gui/macosx/intf.m:583
 #: modules/gui/macosx/intf.m:667 modules/gui/macosx/intf.m:675
 #: modules/gui/macosx/wizard.m:309 modules/gui/macosx/wizard.m:321
-#: modules/gui/macosx/wizard.m:1626 modules/gui/qt4/ui/streampanel.ui:108
+#: modules/gui/macosx/wizard.m:1626
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/misc/notify/notify.c:329
 msgid "Next"
 msgstr "Következő"
@@ -3748,6 +3736,7 @@ msgstr ""
 #: modules/gui/macosx/about.m:186 modules/gui/macosx/controls.m:1006
 #: modules/gui/macosx/intf.m:531 modules/gui/macosx/intf.m:582
 #: modules/gui/macosx/intf.m:668 modules/gui/macosx/intf.m:674
+#: modules/gui/qt4/components/controller.hpp:101
 #: modules/misc/notify/notify.c:327
 msgid "Previous"
 msgstr "Előző"
@@ -3762,7 +3751,8 @@ msgstr ""
 #: modules/gui/macosx/intf.m:534 modules/gui/macosx/intf.m:579
 #: modules/gui/macosx/intf.m:666 modules/gui/macosx/intf.m:673
 #: modules/gui/pda/pda_interface.c:272 modules/gui/pda/pda_interface.c:273
-#: modules/gui/qt4/ui/streampanel.ui:101 modules/misc/notify/xosd.c:257
+#: modules/gui/qt4/components/controller.hpp:100
+#: modules/misc/notify/xosd.c:257
 msgid "Stop"
 msgstr "Állj"
 
@@ -3773,8 +3763,7 @@ msgstr "Válassza ki a lejátszás megállításához használandó gyorsbillent
 #: src/libvlc-module.c:1236 modules/gui/fbosd.c:127 modules/gui/fbosd.c:195
 #: modules/gui/macosx/bookmarks.m:96 modules/gui/macosx/bookmarks.m:105
 #: modules/gui/macosx/embeddedwindow.m:52 modules/gui/macosx/intf.m:539
-#: modules/gui/qt4/ui/video_effects.ui:737 modules/video_filter/marq.c:155
-#: modules/video_filter/rss.c:197
+#: modules/video_filter/marq.c:155 modules/video_filter/rss.c:197
 msgid "Position"
 msgstr "Pozíció"
 
@@ -3892,6 +3881,7 @@ msgstr "Hosszú ugrás hossza, másodpercekben."
 
 #: src/libvlc-module.c:1277 modules/control/hotkeys.c:214
 #: modules/gui/beos/InterfaceWindow.cpp:277 modules/gui/macosx/intf.m:340
+#: modules/gui/qt4/components/controller.hpp:104
 #: modules/gui/qt4/components/controller.hpp:113 modules/gui/qt4/menus.cpp:811
 #: modules/gui/skins2/commands/cmd_quit.cpp:40
 msgid "Quit"
@@ -4305,7 +4295,8 @@ msgstr "Videó pillanatkép készítése"
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "Készít egy képet a videóról és azt a lemezre írja."
 
-#: src/libvlc-module.c:1383 modules/gui/qt4/components/controller.hpp:111
+#: src/libvlc-module.c:1383 modules/gui/qt4/components/controller.hpp:103
+#: modules/gui/qt4/components/controller.hpp:111
 #: modules/stream_out/record.c:60
 msgid "Record"
 msgstr "Felvétel"
@@ -4520,6 +4511,7 @@ msgstr ""
 #: src/libvlc-module.c:1595 src/video_output/vout_intf.c:440
 #: modules/gui/macosx/controls.m:492 modules/gui/macosx/controls.m:1055
 #: modules/gui/macosx/intf.m:617 modules/gui/macosx/intf.m:680
+#: modules/gui/qt4/components/controller.hpp:102
 #: modules/video_output/snapshot.c:81
 msgid "Snapshot"
 msgstr "Pillanatkép"
@@ -4566,55 +4558,55 @@ msgstr "Socks proxy"
 msgid "Metadata"
 msgstr "Metaadatok"
 
-#: src/libvlc-module.c:1822
+#: src/libvlc-module.c:1830
 msgid "Decoders"
 msgstr "Dekódolók"
 
-#: src/libvlc-module.c:1829 modules/access/v4l2.c:84
+#: src/libvlc-module.c:1837 modules/access/v4l2.c:84
 #: modules/gui/macosx/playlistinfo.m:96
 #: modules/gui/qt4/components/info_panels.cpp:519
 msgid "Input"
 msgstr "Bemenet"
 
-#: src/libvlc-module.c:1868
+#: src/libvlc-module.c:1876
 msgid "VLM"
 msgstr "VLM"
 
-#: src/libvlc-module.c:1900
+#: src/libvlc-module.c:1908
 msgid "CPU"
 msgstr "CPU"
 
-#: src/libvlc-module.c:1922
+#: src/libvlc-module.c:1930
 msgid "Special modules"
 msgstr "Speciális modulok"
 
-#: src/libvlc-module.c:1928
+#: src/libvlc-module.c:1936
 msgid "Plugins"
 msgstr "Bővítmények"
 
-#: src/libvlc-module.c:1936
+#: src/libvlc-module.c:1944
 msgid "Performance options"
 msgstr "Teljesítménybeállítások"
 
-#: src/libvlc-module.c:2082
+#: src/libvlc-module.c:2090
 msgid "Hot keys"
 msgstr "Gyorsbillentyűk"
 
-#: src/libvlc-module.c:2520
+#: src/libvlc-module.c:2529
 msgid "Jump sizes"
 msgstr "Ugrási méretek"
 
-#: src/libvlc-module.c:2597
+#: src/libvlc-module.c:2606
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
 msgstr ""
 "a VLC súgójának kiírása (kombinálható az --advanced és a --help-verbose "
 "kapcsolókkal)"
 
-#: src/libvlc-module.c:2600
+#: src/libvlc-module.c:2609
 msgid "Exhaustive help for VLC and its modules"
 msgstr "Részletes súgó a VLC-hez és moduljaihoz"
 
-#: src/libvlc-module.c:2602
+#: src/libvlc-module.c:2611
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
@@ -4622,19 +4614,19 @@ msgstr ""
 "a VLC súgójának és az összes moduljának kiírása (kombinálható az --advanced "
 "és a --help-verbose kapcsolókkal)"
 
-#: src/libvlc-module.c:2605
+#: src/libvlc-module.c:2614
 msgid "ask for extra verbosity when displaying help"
 msgstr "rákérdezés az extra részletességre a súgó megjelenítésekor"
 
-#: src/libvlc-module.c:2607
+#: src/libvlc-module.c:2616
 msgid "print a list of available modules"
 msgstr "elérhető modulok kilistázása"
 
-#: src/libvlc-module.c:2609
+#: src/libvlc-module.c:2618
 msgid "print a list of available modules with extra detail"
 msgstr "az elérhető modulok kilistázása extra részletességgel"
 
-#: src/libvlc-module.c:2611
+#: src/libvlc-module.c:2620
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strictmatches."
@@ -4643,32 +4635,32 @@ msgstr ""
 "verbose kapcsolókkal). A modul nevét megelőző = jel pontos egyezést követel "
 "meg."
 
-#: src/libvlc-module.c:2615
+#: src/libvlc-module.c:2624
 msgid "no configuration option will be loaded nor saved to config file"
 msgstr ""
 "a konfigurációs beállítások nem lesznek sem betöltve, sem fájlba mentve"
 
-#: src/libvlc-module.c:2617
+#: src/libvlc-module.c:2626
 msgid "save the current command line options in the config"
 msgstr "a jelenlegi parancssori beállítások mentése a konfigurációban"
 
-#: src/libvlc-module.c:2619
+#: src/libvlc-module.c:2628
 msgid "reset the current config to the default values"
 msgstr "jelenlegi konfiguráció visszaállítása az alapértelmezett értékekre"
 
-#: src/libvlc-module.c:2621
+#: src/libvlc-module.c:2630
 msgid "use alternate config file"
 msgstr "alternatív beállítófájl használata"
 
-#: src/libvlc-module.c:2623
+#: src/libvlc-module.c:2632
 msgid "resets the current plugins cache"
 msgstr "aktuális bővítmény gyorsítótárának visszaállítása"
 
-#: src/libvlc-module.c:2625
+#: src/libvlc-module.c:2634
 msgid "print version information"
 msgstr "verzió információjának kiírása"
 
-#: src/libvlc-module.c:2681
+#: src/libvlc-module.c:2690
 msgid "main program"
 msgstr "főprogram"
 
@@ -4724,7 +4716,7 @@ msgstr "Letöltés..."
 #: modules/gui/macosx/prefs.m:185 modules/gui/macosx/prefs.m:206
 #: modules/gui/macosx/simple_prefs.m:238 modules/gui/macosx/simple_prefs.m:296
 #: modules/gui/macosx/simple_prefs.m:617 modules/gui/macosx/wizard.m:320
-#: modules/gui/qt4/components/open_panels.cpp:1220
+#: modules/gui/qt4/components/open_panels.cpp:1252
 #: modules/gui/qt4/components/preferences_widgets.cpp:1330
 msgid "Cancel"
 msgstr "Mégsem"
@@ -4800,9 +4792,8 @@ msgid "Deinterlace"
 msgstr "Váltottsorosság megszüntetése"
 
 #: src/video_output/vout_intf.c:311 modules/gui/macosx/intf.m:622
-#: modules/gui/macosx/intf.m:623 modules/gui/qt4/ui/video_effects.ui:229
-#: modules/video_filter/crop.c:105 modules/video_filter/croppadd.c:83
-#: modules/video_output/x11/xvmc.c:133
+#: modules/gui/macosx/intf.m:623 modules/video_filter/crop.c:105
+#: modules/video_filter/croppadd.c:83 modules/video_output/x11/xvmc.c:133
 msgid "Crop"
 msgstr "Levágás"
 
@@ -4893,7 +4884,7 @@ msgstr ""
 "megadni."
 
 #: modules/access/bda/bda.c:44 modules/access/dvb/access.c:89
-#: modules/gui/qt4/components/open_panels.cpp:940
+#: modules/gui/qt4/components/open_panels.cpp:972
 msgid "Adapter card to tune"
 msgstr "Beállítani kívánt adapter"
 
@@ -4910,8 +4901,8 @@ msgid "Device number to use on adapter"
 msgstr "Az adapteren használni kívánt eszköz száma"
 
 #: modules/access/bda/bda.c:51 modules/access/dvb/access.c:95
-#: modules/gui/qt4/components/open_panels.cpp:697
-#: modules/gui/qt4/components/open_panels.cpp:962
+#: modules/gui/qt4/components/open_panels.cpp:729
+#: modules/gui/qt4/components/open_panels.cpp:994
 msgid "Transponder/multiplex frequency"
 msgstr "Adóvevő/multiplex frekvencia"
 
@@ -5639,7 +5630,7 @@ msgstr "Média katalógusszáma (MCN)"
 msgid "Tracks"
 msgstr "Számok"
 
-#: modules/access/cdda/info.c:400 modules/gui/qt4/ui/open.ui:165
+#: modules/access/cdda/info.c:400
 msgid "MRL"
 msgstr "MRL"
 
@@ -5693,7 +5684,7 @@ msgstr ""
 "Ez akkor hasznos például, ha lejátszólistafájlokat tartalmazó könyvtárakat "
 "használ. A kiterjesztések veszővel elválasztott listáját használhatja."
 
-#: modules/access/directory.c:84 modules/gui/qt4/ui/sprefs_video.ui:201
+#: modules/access/directory.c:84
 msgid "Directory"
 msgstr "Könyvtár"
 
@@ -5735,8 +5726,8 @@ msgstr ""
 "állítandó be."
 
 #: modules/access/dshow/dshow.cpp:102 modules/access/v4l.c:77
-#: modules/gui/qt4/components/open_panels.cpp:750
-#: modules/gui/qt4/components/open_panels.cpp:785
+#: modules/gui/qt4/components/open_panels.cpp:782
+#: modules/gui/qt4/components/open_panels.cpp:817
 msgid "Video device name"
 msgstr "Videóeszköz neve"
 
@@ -5749,8 +5740,8 @@ msgstr ""
 "akkor az alapértelmezett eszköz kerül felhasználásra."
 
 #: modules/access/dshow/dshow.cpp:107
-#: modules/gui/qt4/components/open_panels.cpp:756
-#: modules/gui/qt4/components/open_panels.cpp:791
+#: modules/gui/qt4/components/open_panels.cpp:788
+#: modules/gui/qt4/components/open_panels.cpp:823
 msgid "Audio device name"
 msgstr "Hangeszköz neve"
 
@@ -5763,7 +5754,7 @@ msgstr ""
 "akkor az alapértelmezett eszköz kerül felhasználásra."
 
 #: modules/access/dshow/dshow.cpp:112
-#: modules/gui/qt4/components/open_panels.cpp:660
+#: modules/gui/qt4/components/open_panels.cpp:692
 msgid "Video size"
 msgstr "Videóméret"
 
@@ -6328,7 +6319,6 @@ msgstr "Fájl bemenet"
 #: modules/gui/macosx/open.m:433 modules/gui/macosx/output.m:142
 #: modules/gui/macosx/output.m:230 modules/gui/macosx/output.m:369
 #: modules/gui/pda/pda_interface.c:364 modules/gui/qt4/dialogs/sout.cpp:72
-#: modules/gui/qt4/ui/sprefs_audio.ui:224
 msgid "File"
 msgstr "Fájl"
 
@@ -6423,7 +6413,6 @@ msgid "GnomeVFS input"
 msgstr "GnomeVFS bemenet"
 
 #: modules/access/http.c:65 modules/access/mms/mms.c:63
-#: modules/gui/qt4/ui/sprefs_input.ui:81
 msgid "HTTP proxy"
 msgstr "HTTP proxy"
 
@@ -6501,11 +6490,11 @@ msgstr "HTTP bemenet"
 msgid "HTTP(S)"
 msgstr "HTTP(S)"
 
-#: modules/access/http.c:447
+#: modules/access/http.c:448
 msgid "HTTP authentication"
 msgstr "HTTP hitelesítés"
 
-#: modules/access/http.c:448
+#: modules/access/http.c:449
 #, c-format
 msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
@@ -6671,8 +6660,8 @@ msgid "PVR radio device"
 msgstr "PVR rádióeszköz"
 
 #: modules/access/pvr.c:71 modules/access/v4l.c:92
-#: modules/gui/qt4/components/open_panels.cpp:798
-#: modules/gui/qt4/components/open_panels.cpp:897
+#: modules/gui/qt4/components/open_panels.cpp:830
+#: modules/gui/qt4/components/open_panels.cpp:929
 msgid "Norm"
 msgstr "Norma"
 
@@ -6701,8 +6690,8 @@ msgid "Height of the stream to capture (-1 for autodetection)."
 msgstr "A felveendő műsor magassága (-1 esetén automatikus)."
 
 #: modules/access/pvr.c:83 modules/access/v4l.c:85 modules/access/v4l2.c:195
-#: modules/gui/qt4/components/open_panels.cpp:805
-#: modules/gui/qt4/components/open_panels.cpp:904
+#: modules/gui/qt4/components/open_panels.cpp:837
+#: modules/gui/qt4/components/open_panels.cpp:936
 msgid "Frequency"
 msgstr "Frekvencia"
 
@@ -6975,7 +6964,7 @@ msgstr ""
 "kell megadni."
 
 #: modules/access/screen/screen.c:46
-#: modules/gui/qt4/components/open_panels.cpp:1005
+#: modules/gui/qt4/components/open_panels.cpp:1037
 msgid "Desired frame rate for the capture."
 msgstr "A felvétel kívánt képkockasebessége."
 
@@ -7144,8 +7133,7 @@ msgid "Height of the stream to capture (-1 for autodetect)."
 msgstr "A felveendő műsor magassága (-1 esetén automatikus)."
 
 #: modules/access/v4l.c:104 modules/access/v4l2.c:106
-#: modules/gui/macosx/extended.m:97 modules/gui/qt4/ui/video_effects.ui:197
-#: modules/video_filter/atmo/atmo.cpp:196
+#: modules/gui/macosx/extended.m:97 modules/video_filter/atmo/atmo.cpp:196
 msgid "Brightness"
 msgstr "Fényerő"
 
@@ -7154,7 +7142,7 @@ msgid "Brightness of the video input."
 msgstr "A videobemenet fényereje."
 
 #: modules/access/v4l.c:107 modules/access/v4l2.c:115
-#: modules/gui/macosx/extended.m:100 modules/gui/qt4/ui/video_effects.ui:211
+#: modules/gui/macosx/extended.m:100
 msgid "Hue"
 msgstr "Színárnyalat"
 
@@ -7163,11 +7151,8 @@ msgid "Hue of the video input."
 msgstr "A videobemenet színárnyalata."
 
 #: modules/access/v4l.c:110 modules/gui/fbosd.c:141
-#: modules/gui/qt4/ui/video_effects.ui:463
-#: modules/gui/qt4/ui/video_effects.ui:527
-#: modules/gui/qt4/ui/video_effects.ui:649 modules/misc/notify/xosd.c:85
-#: modules/video_filter/colorthres.c:54 modules/video_filter/marq.c:124
-#: modules/video_filter/rss.c:154
+#: modules/misc/notify/xosd.c:85 modules/video_filter/colorthres.c:54
+#: modules/video_filter/marq.c:124 modules/video_filter/rss.c:154
 msgid "Color"
 msgstr "Szín"
 
@@ -7176,7 +7161,7 @@ msgid "Color of the video input."
 msgstr "A videobemenet színe."
 
 #: modules/access/v4l.c:113 modules/access/v4l2.c:109
-#: modules/gui/macosx/extended.m:98 modules/gui/qt4/ui/video_effects.ui:190
+#: modules/gui/macosx/extended.m:98
 msgid "Contrast"
 msgstr "Kontraszt"
 
@@ -7230,7 +7215,7 @@ msgstr "Kép menü"
 msgid "Video4Linux input"
 msgstr "Kép menü"
 
-#: modules/access/v4l2.c:75 modules/gui/qt4/components/open_panels.cpp:763
+#: modules/access/v4l2.c:75 modules/gui/qt4/components/open_panels.cpp:795
 #: modules/stream_out/standard.c:100
 msgid "Standard"
 msgstr "Szabványos"
@@ -7305,8 +7290,6 @@ msgid "Contrast of the video input (if supported by the v4l2 driver)."
 msgstr "A videobemenet kontrasztja (ha a v4l2 meghajtó támogatja)."
 
 #: modules/access/v4l2.c:112 modules/gui/macosx/extended.m:101
-#: modules/gui/qt4/ui/video_effects.ui:204
-#: modules/gui/qt4/ui/video_effects.ui:520
 msgid "Saturation"
 msgstr "Telítettség"
 
@@ -7367,7 +7350,6 @@ msgid "Blue balance of the video input (if supported by the v4l2 driver)."
 msgstr "A videobemenet kékegyensúlya (ha a v4l2 meghajtó támogatja)."
 
 #: modules/access/v4l2.c:135 modules/gui/macosx/extended.m:99
-#: modules/gui/qt4/ui/video_effects.ui:183
 msgid "Gamma"
 msgstr "Gamma"
 
@@ -7613,7 +7595,7 @@ msgstr "[vcd:][eszköz][@[rész][,[fejezet]]]"
 #: modules/access/vcdx/access.c:286 modules/access/vcdx/access.c:369
 #: modules/access/vcdx/access.c:696 modules/access/vcdx/info.c:294
 #: modules/access/vcdx/info.c:295
-#: modules/gui/qt4/components/open_panels.cpp:336
+#: modules/gui/qt4/components/open_panels.cpp:368
 msgid "Entry"
 msgstr "Üres"
 
@@ -7789,8 +7771,7 @@ msgstr "Ha létezik a fájl, akkor hozzáfűzi felülírás helyett."
 msgid "File stream output"
 msgstr "Fájl műsor kimenet"
 
-#: modules/access_output/http.c:65 modules/gui/qt4/ui/sprefs_audio.ui:319
-#: modules/misc/audioscrobbler.c:133
+#: modules/access_output/http.c:65 modules/misc/audioscrobbler.c:133
 msgid "Username"
 msgstr "Felhasználónév"
 
@@ -7799,8 +7780,7 @@ msgid "User name that will be requested to access the stream."
 msgstr "A műsor eléréséhez bekérendő felhasználónév."
 
 #: modules/access_output/http.c:68 modules/control/telnet.c:87
-#: modules/gui/macosx/simple_prefs.m:228
-#: modules/gui/qt4/ui/sprefs_audio.ui:332 modules/misc/audioscrobbler.c:135
+#: modules/gui/macosx/simple_prefs.m:228 modules/misc/audioscrobbler.c:135
 #: modules/misc/notify/growl_udp.c:64
 msgid "Password"
 msgstr "Jelszó"
@@ -8326,7 +8306,6 @@ msgstr ""
 
 #: modules/audio_filter/normvol.c:83 modules/audio_filter/normvol.c:84
 #: modules/gui/macosx/simple_prefs.m:230
-#: modules/gui/qt4/ui/sprefs_audio.ui:266
 msgid "Volume normalizer"
 msgstr "Hangerő normalizálása"
 
@@ -10128,7 +10107,6 @@ msgid "MP3 fixed point audio encoder"
 msgstr "A(z) „%s” nem egy hangkódoló."
 
 #: modules/codec/speex.c:56 modules/codec/speex.c:844
-#: modules/gui/qt4/ui/video_effects.ui:642
 msgid "Mode"
 msgstr "Mód"
 
@@ -11188,7 +11166,6 @@ msgid "Quiet mode."
 msgstr "Csendes üzemmód."
 
 #: modules/codec/x264.c:374 modules/gui/macosx/playlistinfo.m:81
-#: modules/gui/qt4/ui/streampanel.ui:28
 msgid "Statistics"
 msgstr "Statisztika"
 
@@ -11331,11 +11308,11 @@ msgstr "Űr"
 msgid "Page"
 msgstr "Sebesség"
 
-#: modules/control/dbus.c:111
+#: modules/control/dbus.c:128
 msgid "dbus"
 msgstr "dbus"
 
-#: modules/control/dbus.c:114
+#: modules/control/dbus.c:131
 msgid "D-Bus control interface"
 msgstr "D-Bus vezérlőfelület"
 
@@ -12247,7 +12224,7 @@ msgstr ""
 
 #: modules/control/telnet.c:83 modules/gui/macosx/open.m:188
 #: modules/gui/macosx/open.m:190 modules/gui/macosx/output.m:147
-#: modules/gui/qt4/ui/open_net.ui:75 modules/stream_out/rtp.c:109
+#: modules/stream_out/rtp.c:109
 msgid "Port"
 msgstr "Port"
 
@@ -12527,7 +12504,6 @@ msgstr "RTSP/RTP hozzáférés és szétválasztás"
 
 #: modules/demux/live555.cpp:109 modules/demux/live555.cpp:110
 #: modules/gui/macosx/simple_prefs.m:255
-#: modules/gui/qt4/ui/sprefs_input.ui:171
 msgid "Use RTP over RTSP (TCP)"
 msgstr "RTSP feletti RTP használata (TCP)"
 
@@ -13274,6 +13250,7 @@ msgstr "Megnyitja a fájlokat az összes alkönyvtárban is?"
 #: modules/gui/macosx/open.m:195 modules/gui/macosx/open.m:545
 #: modules/gui/macosx/open.m:736 modules/gui/macosx/open.m:901
 #: modules/gui/macosx/open.m:1137
+#: modules/gui/qt4/components/controller.hpp:100
 msgid "Open"
 msgstr "Megnyitás"
 
@@ -13294,7 +13271,6 @@ msgstr "Üzenetek"
 #: modules/gui/beos/InterfaceWindow.cpp:266
 #: modules/gui/beos/PlayListWindow.cpp:90 modules/gui/macosx/open.m:544
 #: modules/gui/macosx/open.m:900 modules/gui/macosx/open.m:1136
-#: modules/gui/qt4/ui/open_file.ui:20
 msgid "Open File"
 msgstr "Fájl megnyitása"
 
@@ -13352,7 +13328,7 @@ msgstr "Ablak"
 #: modules/gui/macosx/wizard.m:1681 modules/gui/macosx/wizard.m:1689
 #: modules/gui/macosx/wizard.m:1870 modules/gui/macosx/wizard.m:1881
 #: modules/gui/macosx/wizard.m:1894
-#: modules/gui/qt4/components/open_panels.cpp:1219
+#: modules/gui/qt4/components/open_panels.cpp:1251
 #: modules/gui/qt4/components/preferences_widgets.cpp:1329
 #: modules/gui/qt4/main_interface.cpp:557
 msgid "OK"
@@ -13435,7 +13411,7 @@ msgstr "Alkalmazás"
 
 #: modules/gui/beos/PreferencesWindow.cpp:257 modules/gui/macosx/output.m:526
 #: modules/gui/macosx/playlist.m:716 modules/gui/macosx/prefs.m:184
-#: modules/gui/macosx/simple_prefs.m:298 modules/gui/qt4/ui/vlm.ui:209
+#: modules/gui/macosx/simple_prefs.m:298
 msgid "Save"
 msgstr "Mentés"
 
@@ -13510,8 +13486,8 @@ msgstr ""
 "teljesen átlátszatlan (255) (0 = teljes átlátszóság, 255 = teljes "
 "átlátszatlanság)."
 
-#: modules/gui/fbosd.c:118 modules/gui/qt4/ui/video_effects.ui:744
-#: modules/misc/logger.c:116 modules/video_filter/marq.c:88
+#: modules/gui/fbosd.c:118 modules/misc/logger.c:116
+#: modules/video_filter/marq.c:88
 msgid "Text"
 msgstr "Szöveg"
 
@@ -13618,10 +13594,9 @@ msgstr ""
 "Minden megjelenített kép és szöveg az átfedési framebufferen jelenik meg."
 
 #: modules/gui/fbosd.c:203 modules/gui/macosx/simple_prefs.m:271
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:145 modules/misc/freetype.c:83
-#: modules/misc/notify/xosd.c:83 modules/misc/quartztext.c:85
-#: modules/misc/win32text.c:57 modules/video_filter/marq.c:161
-#: modules/video_filter/rss.c:203
+#: modules/misc/freetype.c:83 modules/misc/notify/xosd.c:83
+#: modules/misc/quartztext.c:85 modules/misc/win32text.c:57
+#: modules/video_filter/marq.c:161 modules/video_filter/rss.c:203
 msgid "Font"
 msgstr "Betűkészlet"
 
@@ -13665,15 +13640,13 @@ msgid "Bookmarks"
 msgstr "Könyvjelzők"
 
 #: modules/gui/macosx/bookmarks.m:88
-#: modules/gui/qt4/ui/podcast_configuration.ui:49
-#: modules/gui/qt4/ui/vlm.ui:195
 msgid "Add"
 msgstr "Hozzáadás"
 
 #: modules/gui/macosx/bookmarks.m:89 modules/gui/macosx/intf.m:574
 #: modules/gui/macosx/simple_prefs.m:240
 #: modules/gui/qt4/components/preferences_widgets.cpp:1155
-#: modules/gui/qt4/dialogs/bookmarks.cpp:48 modules/gui/qt4/ui/vlm.ui:202
+#: modules/gui/qt4/dialogs/bookmarks.cpp:48
 #: modules/gui/qt4/util/customwidgets.cpp:136
 msgid "Clear"
 msgstr "Törlés"
@@ -13815,7 +13788,7 @@ msgstr "Visszatekerés"
 msgid "Fast Forward"
 msgstr "Előretekerés"
 
-#: modules/gui/macosx/equalizer.m:154 modules/gui/qt4/ui/equalizer.ui:34
+#: modules/gui/macosx/equalizer.m:154
 msgid "2 Pass"
 msgstr "2 menet"
 
@@ -13829,7 +13802,7 @@ msgstr ""
 "A hangszínszabályzó engedélyezése. A sávok módosíthatók saját kezűleg, vagy "
 "használható előre beállított érték."
 
-#: modules/gui/macosx/equalizer.m:160 modules/gui/qt4/ui/equalizer.ui:78
+#: modules/gui/macosx/equalizer.m:160
 msgid "Preamp"
 msgstr "Előerősítés"
 
@@ -13849,13 +13822,13 @@ msgstr "Hullám"
 msgid "Ripple"
 msgstr "Fodrozódás"
 
-#: modules/gui/macosx/extended.m:71 modules/gui/qt4/ui/video_effects.ui:565
-#: modules/meta_engine/id3genres.h:95 modules/video_filter/psychedelic.c:55
+#: modules/gui/macosx/extended.m:71 modules/meta_engine/id3genres.h:95
+#: modules/video_filter/psychedelic.c:55
 msgid "Psychedelic"
 msgstr "Pszichedelikus"
 
-#: modules/gui/macosx/extended.m:72 modules/gui/qt4/ui/video_effects.ui:630
-#: modules/video_filter/gradient.c:75 modules/video_filter/gradient.c:81
+#: modules/gui/macosx/extended.m:72 modules/video_filter/gradient.c:75
+#: modules/video_filter/gradient.c:81
 msgid "Gradient"
 msgstr "Átmenet"
 
@@ -13887,7 +13860,7 @@ msgstr "Kép levágása"
 msgid "Crops a defined part of the image"
 msgstr "Levágja a kép egy megadott részét"
 
-#: modules/gui/macosx/extended.m:82 modules/gui/qt4/ui/video_effects.ui:480
+#: modules/gui/macosx/extended.m:82
 msgid "Invert colors"
 msgstr "Színek megfordítása"
 
@@ -14447,11 +14420,6 @@ msgstr "Felvétel"
 #: modules/gui/macosx/simple_prefs.m:287
 #: modules/gui/qt4/components/preferences_widgets.cpp:264
 #: modules/gui/qt4/components/simple_preferences.cpp:243
-#: modules/gui/qt4/ui/open.ui:155 modules/gui/qt4/ui/open_file.ui:75
-#: modules/gui/qt4/ui/open_file.ui:210 modules/gui/qt4/ui/sprefs_audio.ui:237
-#: modules/gui/qt4/ui/sprefs_input.ui:39
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:135
-#: modules/gui/qt4/ui/sprefs_video.ui:194
 #: modules/gui/wince/preferences_widgets.cpp:510
 msgid "Browse..."
 msgstr "Tallózás..."
@@ -14461,7 +14429,7 @@ msgid "Treat as a pipe rather than as a file"
 msgstr "Kezelés adatcsatornaként és nem fájlként"
 
 #: modules/gui/macosx/open.m:177
-#: modules/gui/qt4/components/open_panels.cpp:884
+#: modules/gui/qt4/components/open_panels.cpp:916
 msgid "Device name"
 msgstr "Eszköz neve"
 
@@ -14607,7 +14575,7 @@ msgstr "FPS"
 msgid "Subtitles encoding"
 msgstr "Feliratok kódolása"
 
-#: modules/gui/macosx/open.m:300 modules/gui/qt4/ui/sprefs_subtitles.ui:125
+#: modules/gui/macosx/open.m:300
 msgid "Font size"
 msgstr "Betűméret"
 
@@ -14685,7 +14653,7 @@ msgstr "Műsor"
 msgid "Dump raw input"
 msgstr "Nyers bemenet kiírása"
 
-#: modules/gui/macosx/output.m:146 modules/gui/qt4/ui/open_net.ui:65
+#: modules/gui/macosx/output.m:146
 msgid "Address"
 msgstr "Cím"
 
@@ -14933,7 +14901,6 @@ msgid "Reset All"
 msgstr "Összes alaphelyzetbe"
 
 #: modules/gui/macosx/prefs.m:187 modules/gui/macosx/simple_prefs.m:294
-#: modules/gui/qt4/ui/video_effects.ui:17
 msgid "Basic"
 msgstr "Alap"
 
@@ -14997,7 +14964,6 @@ msgid "Input & Codec settings"
 msgstr "Bemenet és kodekek beállításai"
 
 #: modules/gui/macosx/simple_prefs.m:222
-#: modules/gui/qt4/ui/sprefs_audio.ui:250
 msgid "Effects"
 msgstr "Effektek"
 
@@ -15005,12 +14971,11 @@ msgstr "Effektek"
 msgid "Enable Audio"
 msgstr "Hang engedélyezése"
 
-#: modules/gui/macosx/simple_prefs.m:224 modules/gui/qt4/ui/sprefs_audio.ui:30
+#: modules/gui/macosx/simple_prefs.m:224
 msgid "General Audio"
 msgstr "Általános hang"
 
 #: modules/gui/macosx/simple_prefs.m:225
-#: modules/gui/qt4/ui/sprefs_audio.ui:259
 msgid "Headphone surround effect"
 msgstr "Fejhallgató térbeli hanghatása"
 
@@ -15027,7 +14992,6 @@ msgid "User name"
 msgstr "Felhasználónév"
 
 #: modules/gui/macosx/simple_prefs.m:232
-#: modules/gui/qt4/ui/sprefs_audio.ui:273
 msgid "Visualization"
 msgstr "Vizualizáció"
 
@@ -15064,8 +15028,7 @@ msgstr "AVI fájlok javítása"
 msgid "Default Caching Level"
 msgstr "Alapértelmezett gyorsítótárazási szint"
 
-#: modules/gui/macosx/simple_prefs.m:248 modules/gui/qt4/ui/open.ui:51
-#: modules/gui/qt4/ui/sprefs_input.ui:97
+#: modules/gui/macosx/simple_prefs.m:248
 msgid "Caching"
 msgstr "Gyorsítótárazás"
 
@@ -15086,7 +15049,6 @@ msgid "Password for HTTP Proxy"
 msgstr "HTTP proxy jelszava"
 
 #: modules/gui/macosx/simple_prefs.m:252
-#: modules/gui/qt4/ui/sprefs_input.ui:119
 msgid "Codecs / Muxers"
 msgstr "Kodekek / egyesítők"
 
@@ -15119,7 +15081,6 @@ msgid "Default Encoding"
 msgstr "Alapértelmezett kódolás"
 
 #: modules/gui/macosx/simple_prefs.m:267
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:90
 msgid "Display Settings"
 msgstr "Megjelenítési beállítások"
 
@@ -15145,7 +15106,6 @@ msgid "Preferred Subtitle Language"
 msgstr "Felirat előnyben részesített nyelve"
 
 #: modules/gui/macosx/simple_prefs.m:275
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:28
 msgid "Enable OSD"
 msgstr "Képernyőkijelzés (OSD) engedélyezése"
 
@@ -15153,8 +15113,8 @@ msgstr "Képernyőkijelzés (OSD) engedélyezése"
 msgid "Black screens in Fullscreen mode"
 msgstr "Fekete képernyő teljes képernyőn"
 
-#: modules/gui/macosx/simple_prefs.m:280 modules/gui/qt4/ui/sprefs_video.ui:36
-#: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:132
+#: modules/gui/macosx/simple_prefs.m:280 modules/stream_out/display.c:54
+#: modules/video_filter/deinterlace.c:132
 msgid "Display"
 msgstr "Megjelenítés"
 
@@ -15167,7 +15127,6 @@ msgid "Output module"
 msgstr "Kimeneti modul"
 
 #: modules/gui/macosx/simple_prefs.m:286
-#: modules/gui/qt4/ui/sprefs_video.ui:179
 msgid "Video snapshots"
 msgstr "Videó pillanatképek"
 
@@ -15176,17 +15135,14 @@ msgid "Folder"
 msgstr "Mappa"
 
 #: modules/gui/macosx/simple_prefs.m:289
-#: modules/gui/qt4/ui/sprefs_video.ui:228
 msgid "Format"
 msgstr "Formátum"
 
 #: modules/gui/macosx/simple_prefs.m:290
-#: modules/gui/qt4/ui/sprefs_video.ui:211
 msgid "Prefix"
 msgstr "Előtag"
 
 #: modules/gui/macosx/simple_prefs.m:291
-#: modules/gui/qt4/ui/sprefs_video.ui:241
 msgid "Sequential numbering"
 msgstr "Egymást követő számozás"
 
@@ -16437,7 +16393,7 @@ msgstr "Csatorna:"
 msgid "Norm:"
 msgstr "Norma:"
 
-#: modules/gui/pda/pda_interface.c:609 modules/gui/qt4/ui/open_file.ui:152
+#: modules/gui/pda/pda_interface.c:609
 msgid "Size:"
 msgstr "Méret:"
 
@@ -16686,7 +16642,6 @@ msgid "Announce Channel:"
 msgstr "Bejelentési csatorna:"
 
 #: modules/gui/pda/pda_interface.c:1247
-#: modules/gui/qt4/ui/video_effects.ui:1002
 msgid "Update"
 msgstr "Frissítés"
 
@@ -16774,6 +16729,43 @@ msgstr ""
 "Lejátszás\n"
 "Ha a lejátszólista üres, média megnyitása"
 
+#: modules/gui/qt4/components/controller.hpp:102
+#, fuzzy
+msgid "De-Fullscreen"
+msgstr "Teljes képernyő"
+
+#: modules/gui/qt4/components/controller.hpp:102
+#, fuzzy
+msgid "Extended panel"
+msgstr "További vezérlők"
+
+#: modules/gui/qt4/components/controller.hpp:103
+#, fuzzy
+msgid "A->B Loop"
+msgstr "Ismétlés"
+
+#: modules/gui/qt4/components/controller.hpp:103
+#, fuzzy
+msgid "Frame By Frame"
+msgstr "Képkockáról képkockára"
+
+#: modules/gui/qt4/components/controller.hpp:103
+#, fuzzy
+msgid "Trickplay Reverse"
+msgstr "Sorrend megfordítása"
+
+#: modules/gui/qt4/components/controller.hpp:104
+#: modules/gui/qt4/components/controller.hpp:113
+#, fuzzy
+msgid "Step backward"
+msgstr "Visszaléptetés"
+
+#: modules/gui/qt4/components/controller.hpp:104
+#: modules/gui/qt4/components/controller.hpp:113
+#, fuzzy
+msgid "Step forward"
+msgstr "Előreléptetés"
+
 #: modules/gui/qt4/components/controller.hpp:106
 msgid "Stop playback"
 msgstr "Lejátszás leállítása"
@@ -16808,11 +16800,11 @@ msgstr "Bővített beállítások megjelenítése"
 msgid "Show playlist"
 msgstr "Lejátszólista megjelenítése"
 
-#: modules/gui/qt4/components/controller.hpp:110
+#: modules/gui/qt4/components/controller.hpp:111
 msgid "Take a snapshot"
 msgstr "Pillanatkép készítése"
 
-#: modules/gui/qt4/components/controller.hpp:111
+#: modules/gui/qt4/components/controller.hpp:112
 #, fuzzy
 msgid "Loop from point A to point B continuously."
 msgstr ""
@@ -16823,20 +16815,10 @@ msgstr ""
 msgid "Frame by frame"
 msgstr "Képkockáról képkockára"
 
-#: modules/gui/qt4/components/controller.hpp:112
+#: modules/gui/qt4/components/controller.hpp:113
 #, fuzzy
 msgid "Reverse"
 msgstr "Visszhang"
-
-#: modules/gui/qt4/components/controller.hpp:112
-#, fuzzy
-msgid "Step backward"
-msgstr "Visszaléptetés"
-
-#: modules/gui/qt4/components/controller.hpp:112
-#, fuzzy
-msgid "Step forward"
-msgstr "Előreléptetés"
 
 #: modules/gui/qt4/components/extended_panels.cpp:962
 #: modules/gui/qt4/components/extended_panels.cpp:1026
@@ -16958,69 +16940,69 @@ msgstr "Váltás az eltelt és hátralévő idő között"
 msgid "Select the device or the VIDEO_TS directory"
 msgstr "Válassza ki az eszközt vagy a VIDEO_TS könyvtárat"
 
-#: modules/gui/qt4/components/open_panels.cpp:92
+#: modules/gui/qt4/components/open_panels.cpp:127
 msgid "Select one or multiple files"
 msgstr "Válasszon ki legalább egy fájlt"
 
-#: modules/gui/qt4/components/open_panels.cpp:107
+#: modules/gui/qt4/components/open_panels.cpp:142
 msgid "File names:"
 msgstr "Fájlnevek:"
 
-#: modules/gui/qt4/components/open_panels.cpp:109
+#: modules/gui/qt4/components/open_panels.cpp:144
 msgid "Filter:"
 msgstr "Szűrő:"
 
-#: modules/gui/qt4/components/open_panels.cpp:168
+#: modules/gui/qt4/components/open_panels.cpp:192
 msgid "Open subtitles file"
 msgstr "Feliratfájl megnyitása"
 
-#: modules/gui/qt4/components/open_panels.cpp:273
+#: modules/gui/qt4/components/open_panels.cpp:305
 msgid "Eject the disc"
 msgstr "Lemez kiadása"
 
-#: modules/gui/qt4/components/open_panels.cpp:681
-#: modules/gui/qt4/components/open_panels.cpp:941
+#: modules/gui/qt4/components/open_panels.cpp:713
+#: modules/gui/qt4/components/open_panels.cpp:973
 msgid "DVB Type:"
 msgstr "DVB típus:"
 
-#: modules/gui/qt4/components/open_panels.cpp:707
-#: modules/gui/qt4/components/open_panels.cpp:971
+#: modules/gui/qt4/components/open_panels.cpp:739
+#: modules/gui/qt4/components/open_panels.cpp:1003
 msgid "Transponder symbol rate"
 msgstr "Adóvevő jelsebessége"
 
-#: modules/gui/qt4/components/open_panels.cpp:716
+#: modules/gui/qt4/components/open_panels.cpp:748
 msgid "Bandwidth"
 msgstr "Sávszélesség"
 
-#: modules/gui/qt4/components/open_panels.cpp:831
+#: modules/gui/qt4/components/open_panels.cpp:863
 msgid "Channels:"
 msgstr "Csatornák:"
 
-#: modules/gui/qt4/components/open_panels.cpp:842
+#: modules/gui/qt4/components/open_panels.cpp:874
 msgid "Selected ports:"
 msgstr "Kiválasztott portok:"
 
-#: modules/gui/qt4/components/open_panels.cpp:845
+#: modules/gui/qt4/components/open_panels.cpp:877
 msgid ".*"
 msgstr ".*"
 
-#: modules/gui/qt4/components/open_panels.cpp:852
+#: modules/gui/qt4/components/open_panels.cpp:884
 msgid "Input caching:"
 msgstr "Bemenet gyorsítótárazása:"
 
-#: modules/gui/qt4/components/open_panels.cpp:862
+#: modules/gui/qt4/components/open_panels.cpp:894
 msgid "Use VLC pace"
 msgstr "VLC sebesség használata"
 
-#: modules/gui/qt4/components/open_panels.cpp:866
+#: modules/gui/qt4/components/open_panels.cpp:898
 msgid "Auto connnection"
 msgstr "Automatikus csatlakozás"
 
-#: modules/gui/qt4/components/open_panels.cpp:890
+#: modules/gui/qt4/components/open_panels.cpp:922
 msgid "Radio device name"
 msgstr "Rádióeszköz neve"
 
-#: modules/gui/qt4/components/open_panels.cpp:1194
+#: modules/gui/qt4/components/open_panels.cpp:1226
 msgid "Advanced Options"
 msgstr "Speciális beállítások"
 
@@ -17206,7 +17188,7 @@ msgid "Errors"
 msgstr "Hibák"
 
 #: modules/gui/qt4/dialogs/errors.cpp:51
-#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1405
+#: modules/gui/qt4/dialogs/messages.cpp:170 modules/gui/qt4/menus.cpp:1414
 msgid "&Clear"
 msgstr "&Törlés"
 
@@ -17762,7 +17744,7 @@ msgstr "Át&alakítás/mentés..."
 msgid "&Streaming..."
 msgstr "&Műsorszórás..."
 
-#: modules/gui/qt4/menus.cpp:338 modules/gui/qt4/menus.cpp:1026
+#: modules/gui/qt4/menus.cpp:338 modules/gui/qt4/menus.cpp:1032
 msgid "&Quit"
 msgstr "&Kilépés"
 
@@ -17977,19 +17959,19 @@ msgstr "Teljes képernyő elhagyása"
 msgid "&Playback"
 msgstr "&Lejátszás"
 
-#: modules/gui/qt4/menus.cpp:1008
+#: modules/gui/qt4/menus.cpp:1014
 msgid "Hide VLC media player in taskbar"
 msgstr "VLC médialejátszó elrejtése"
 
-#: modules/gui/qt4/menus.cpp:1014
+#: modules/gui/qt4/menus.cpp:1020
 msgid "Show VLC media player"
 msgstr "VLC médialejátszó megjelenítése"
 
-#: modules/gui/qt4/menus.cpp:1024
+#: modules/gui/qt4/menus.cpp:1030
 msgid "&Open Media"
 msgstr "&Média megnyitása"
 
-#: modules/gui/qt4/menus.cpp:1390
+#: modules/gui/qt4/menus.cpp:1399
 msgid " - Empty - "
 msgstr ""
 
@@ -18194,489 +18176,14 @@ msgstr "Minimális felület menük nélkül"
 msgid "Show a controller in fullscreen mode"
 msgstr "Vezérlő megjelenítése teljes képernyős módban"
 
-#: modules/gui/qt4/qt4.cpp:168
+#: modules/gui/qt4/qt4.cpp:157
+#, fuzzy
+msgid "Integrate the file browser in open dialog"
+msgstr "A fájl megnyitása párbeszédablakban használandó útvonal"
+
+#: modules/gui/qt4/qt4.cpp:169
 msgid "Qt interface"
 msgstr "QT felület"
-
-#: modules/gui/qt4/ui/equalizer.ui:54
-msgid "Preset"
-msgstr "Beállítás"
-
-#: modules/gui/qt4/ui/open.ui:38
-msgid "Show extended options"
-msgstr "Speciális beállítások megjelenítése"
-
-#: modules/gui/qt4/ui/open.ui:41
-#, fuzzy
-msgid "Show &amp;more options"
-msgstr "&További beállítások megjelenítése"
-
-#: modules/gui/qt4/ui/open.ui:61
-msgid "Change the caching for the media"
-msgstr "A média gyorsítótárazásának módosítása"
-
-#: modules/gui/qt4/ui/open.ui:90
-msgid "Start Time"
-msgstr "Kezdési idő"
-
-#: modules/gui/qt4/ui/open.ui:100
-msgid "Change the start time for the media"
-msgstr "A média indítási idejének módosítása"
-
-#: modules/gui/qt4/ui/open.ui:132
-msgid "Play another media synchronously (extra audio file, ...)"
-msgstr "Másik média lejátszása szinkronban (másik hangfájl...)"
-
-#: modules/gui/qt4/ui/open.ui:139
-msgid "Extra media"
-msgstr "Extra média"
-
-#: modules/gui/qt4/ui/open.ui:152
-msgid "Select the file"
-msgstr "Válassza ki a fájlt"
-
-#: modules/gui/qt4/ui/open.ui:182
-msgid "Complete MRL for VLC internal"
-msgstr "Teljes MRL a VLC belső használatára"
-
-#: modules/gui/qt4/ui/open.ui:189
-#, fuzzy
-msgid "Edit Options"
-msgstr "Beállítások"
-
-#: modules/gui/qt4/ui/open.ui:227
-msgid "Select play mode"
-msgstr "Válassza ki a lejátszási módot"
-
-#: modules/gui/qt4/ui/open_file.ui:26
-msgid "Choose one or more media file to open"
-msgstr "Válassza ki a megnyitandó médiafájlokat"
-
-#: modules/gui/qt4/ui/open_file.ui:29
-#, fuzzy
-msgid "Select one or more files"
-msgstr "Válassza ki a megnyitandó fájlokat"
-
-#: modules/gui/qt4/ui/open_file.ui:72 modules/gui/qt4/ui/open_file.ui:207
-msgid "Select the subtitles file"
-msgstr "Válassza ki a feliratfájlt"
-
-#: modules/gui/qt4/ui/open_file.ui:85
-msgid "Add a subtitles file"
-msgstr "Feliratfájl hozzáadása"
-
-#: modules/gui/qt4/ui/open_file.ui:88
-#, fuzzy
-msgid "Use a sub&amp;titles file"
-msgstr "&Feliratfájl használata"
-
-#: modules/gui/qt4/ui/open_file.ui:178
-msgid "Alignment:"
-msgstr "Igazítás:"
-
-#: modules/gui/qt4/ui/open_net.ui:20
-msgid "Network Protocol"
-msgstr "Hálózati protokoll"
-
-#: modules/gui/qt4/ui/open_net.ui:26
-msgid "Select the protocol for the URL."
-msgstr "Adja meg az URL protokollját."
-
-#: modules/gui/qt4/ui/open_net.ui:33
-msgid "Protocol"
-msgstr "Protokoll"
-
-#: modules/gui/qt4/ui/open_net.ui:43
-msgid "Select the port used"
-msgstr "Válassza ki a használt portot"
-
-#: modules/gui/qt4/ui/open_net.ui:85
-msgid "Enter the URL of the network stream here, with or without the protocol."
-msgstr "Adja meg a hálózati műsor URL címét, a protokollal vagy anélkül."
-
-#: modules/gui/qt4/ui/podcast_configuration.ui:19
-#: modules/services_discovery/podcast.c:61
-msgid "Podcast URLs list"
-msgstr "Podcast URL címek listája"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:36
-msgid "Default volume"
-msgstr "Alapértelmezett hangerő"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:77
-msgid "256 corresponds to 100%, 1024 to 400%"
-msgstr "A 256 100 százaléknak, az 1024 400 százaléknak felel meg"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:106
-msgid "Save volume on exit"
-msgstr "Hangerő mentése kilépéskor"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:142
-msgid "Preferred audio language"
-msgstr "Hang előnyben részesített nyelve"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:306
-msgid "last.fm"
-msgstr "Last.fm"
-
-#: modules/gui/qt4/ui/sprefs_audio.ui:312
-msgid "Enable last.fm submission"
-msgstr "A last.fm beküldés engedélyezése"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:20
-msgid "Disc Devices"
-msgstr "Lemezeszközök"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:26
-msgid "Default disc device"
-msgstr "Alapértelmezett lemezeszköz"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:55
-msgid "Server default port"
-msgstr "Kiszolgáló alapértelmezett portja"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:103
-msgid "Default caching level"
-msgstr "Alapértelmezett gyorsítótárazási szint"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:125
-msgid "Post-Processing quality"
-msgstr "Utófeldogozás minősége"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:151
-msgid "Repair AVI files"
-msgstr "AVI fájlok javítása"
-
-#: modules/gui/qt4/ui/sprefs_input.ui:164
-msgid "Use system codecs if available (better quality)"
-msgstr "A rendszer kodekjeinek használata (jobb minőség)"
-
-#: modules/gui/qt4/ui/sprefs_interface.ui:179
-#, fuzzy
-msgid "textFormat"
-msgstr "Formátum"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:51
-msgid "Subtitles Language"
-msgstr "Feliratok nyelve"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:57
-msgid "Preferred subtitles language"
-msgstr "Feliratok előnyben részesített nyelve"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:77
-msgid "Default encoding"
-msgstr "Alapértelmezett kódolás"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:99
-msgid "Effect"
-msgstr "Effekt"
-
-#: modules/gui/qt4/ui/sprefs_subtitles.ui:112
-msgid "Font color"
-msgstr "Szövegszín"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:75
-msgid "Output"
-msgstr "Kimenet"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:85
-#, fuzzy
-msgid "Accelerated video output (Overlay)"
-msgstr "Gyorsított videokimenet"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:105
-#: modules/video_output/msw/directx.c:131
-msgid "Use hardware YUV->RGB conversions"
-msgstr "Hardveres YUV->RGB átalakítások használata"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:115
-msgid "DirectX"
-msgstr "DirectX"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:130
-msgid "Display device"
-msgstr "Megjelenítőeszköz"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:140
-msgid "Enable wallpaper mode"
-msgstr "Háttérkép mód engedélyezése"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:159
-#, fuzzy
-msgid "Deinterlacing Mode"
-msgstr "Váltottsorosság-mentesítési mód"
-
-#: modules/gui/qt4/ui/sprefs_video.ui:166
-#, fuzzy
-msgid "Force Aspect Ratio"
-msgstr "Méretarány kiigazítása"
-
-#: modules/gui/qt4/ui/streampanel.ui:48
-msgid "Edit settings"
-msgstr "Beállítások szerkesztése"
-
-#: modules/gui/qt4/ui/streampanel.ui:58
-msgid "Control"
-msgstr "Vezérlő"
-
-#: modules/gui/qt4/ui/streampanel.ui:64
-msgid "Run manually"
-msgstr "Futtatás saját kezűleg"
-
-#: modules/gui/qt4/ui/streampanel.ui:71
-msgid "Setup schedule"
-msgstr "Ütemezés beállítása"
-
-#: modules/gui/qt4/ui/streampanel.ui:78
-msgid "Run on schedule"
-msgstr "Futtatás ütemezve"
-
-#: modules/gui/qt4/ui/streampanel.ui:88
-msgid "Status"
-msgstr "Állapot"
-
-#: modules/gui/qt4/ui/streampanel.ui:94
-msgid "P/P"
-msgstr "P/P"
-
-#: modules/gui/qt4/ui/streampanel.ui:115
-msgid "Prev"
-msgstr "Előző"
-
-#: modules/gui/qt4/ui/streampanel.ui:132
-msgid "Add Input"
-msgstr "Bemenet hozzáadása"
-
-#: modules/gui/qt4/ui/streampanel.ui:139
-msgid "Edit Input"
-msgstr "Bemenet szerkesztése"
-
-#: modules/gui/qt4/ui/streampanel.ui:146
-msgid "Clear List"
-msgstr "Lista törlése"
-
-#: modules/gui/qt4/ui/video_effects.ui:23
-msgid "Transform"
-msgstr "Átalakítás"
-
-#: modules/gui/qt4/ui/video_effects.ui:41
-msgid "Sharpen"
-msgstr "Élesítés"
-
-#: modules/gui/qt4/ui/video_effects.ui:53
-msgid "Sigma"
-msgstr "Szigma"
-
-#: modules/gui/qt4/ui/video_effects.ui:88 modules/video_filter/adjust.c:83
-msgid "Image adjust"
-msgstr "Kép igazítása"
-
-#: modules/gui/qt4/ui/video_effects.ui:218 modules/video_filter/adjust.c:66
-msgid "Brightness threshold"
-msgstr "Fényerőküszöb"
-
-#: modules/gui/qt4/ui/video_effects.ui:303
-msgid "Synchronize top and bottom"
-msgstr "Szinkronizálás fent és lent"
-
-#: modules/gui/qt4/ui/video_effects.ui:310
-msgid "Synchronize left and right"
-msgstr "Szinkronizálás balra és jobbra"
-
-#: modules/gui/qt4/ui/video_effects.ui:334
-msgid "Geometry"
-msgstr "Geometria"
-
-#: modules/gui/qt4/ui/video_effects.ui:340
-#, fuzzy
-msgid "Magnification/Zoom"
-msgstr "Nagyítás"
-
-#: modules/gui/qt4/ui/video_effects.ui:347
-msgid "Puzzle game"
-msgstr "Kirakójáték"
-
-#: modules/gui/qt4/ui/video_effects.ui:385
-msgid "Black slot"
-msgstr "Fekete hely"
-
-#: modules/gui/qt4/ui/video_effects.ui:392
-#: modules/gui/qt4/ui/video_effects.ui:695
-#: modules/gui/qt4/ui/video_effects.ui:789
-msgid "Columns"
-msgstr "Oszlopok"
-
-#: modules/gui/qt4/ui/video_effects.ui:399
-#: modules/gui/qt4/ui/video_effects.ui:688
-#: modules/gui/qt4/ui/video_effects.ui:772
-msgid "Rows"
-msgstr "Sorok"
-
-#: modules/gui/qt4/ui/video_effects.ui:409 modules/video_filter/rotate.c:68
-msgid "Rotate"
-msgstr "Forgatás"
-
-#: modules/gui/qt4/ui/video_effects.ui:434
-msgid "Angle"
-msgstr "Szög"
-
-#: modules/gui/qt4/ui/video_effects.ui:445
-msgid "Color fun"
-msgstr "Színes móka"
-
-#: modules/gui/qt4/ui/video_effects.ui:451
-msgid "Color extraction"
-msgstr "Színek kivonása"
-
-#: modules/gui/qt4/ui/video_effects.ui:487
-#: modules/video_filter/colorthres.c:69
-msgid "Color threshold"
-msgstr "Színküszöb"
-
-#: modules/gui/qt4/ui/video_effects.ui:499
-msgid "Similarity"
-msgstr "Hasonlóság"
-
-#: modules/gui/qt4/ui/video_effects.ui:545
-msgid "Image modification"
-msgstr "Képmódosítás"
-
-#: modules/gui/qt4/ui/video_effects.ui:558
-msgid "Water effect"
-msgstr "Víz effekt"
-
-#: modules/gui/qt4/ui/video_effects.ui:572 modules/meta_engine/id3genres.h:67
-#: modules/video_filter/noise.c:54
-msgid "Noise"
-msgstr "Zaj"
-
-#: modules/gui/qt4/ui/video_effects.ui:579
-msgid "Motion detect"
-msgstr "Mozgásérzékelés"
-
-#: modules/gui/qt4/ui/video_effects.ui:586
-#: modules/video_filter/motionblur.c:60
-msgid "Motion blur"
-msgstr "Mozgási elmosás"
-
-#: modules/gui/qt4/ui/video_effects.ui:598
-msgid "Factor"
-msgstr "Tényező"
-
-#: modules/gui/qt4/ui/video_effects.ui:656
-msgid "Cartoon"
-msgstr "Rajzfilm"
-
-#: modules/gui/qt4/ui/video_effects.ui:670
-msgid "Vout/Overlay"
-msgstr "Videokimenet/Átfedés"
-
-#: modules/gui/qt4/ui/video_effects.ui:676
-msgid "Wall"
-msgstr "Fal"
-
-#: modules/gui/qt4/ui/video_effects.ui:725
-msgid "Add text"
-msgstr "Szöveg hozzáadása"
-
-#: modules/gui/qt4/ui/video_effects.ui:760 modules/video_filter/panoramix.c:97
-msgid "Panoramix"
-msgstr "Panoramix"
-
-#: modules/gui/qt4/ui/video_effects.ui:809 modules/video_filter/clone.c:71
-msgid "Clone"
-msgstr "Klónozás"
-
-#: modules/gui/qt4/ui/video_effects.ui:821 modules/video_filter/clone.c:58
-msgid "Number of clones"
-msgstr "Klónok száma"
-
-#: modules/gui/qt4/ui/video_effects.ui:842
-#: modules/gui/qt4/ui/video_effects.ui:903
-msgid "Logo"
-msgstr "Logó"
-
-#: modules/gui/qt4/ui/video_effects.ui:848
-msgid "Add logo"
-msgstr "Logó hozzáadása"
-
-#: modules/gui/qt4/ui/video_effects.ui:860
-#: modules/stream_out/mosaic_bridge.c:158 modules/video_filter/mosaic.c:89
-msgid "Transparency"
-msgstr "Átlátszóság"
-
-#: modules/gui/qt4/ui/video_effects.ui:916
-msgid "Logo erase"
-msgstr "Logótörlés"
-
-#: modules/gui/qt4/ui/video_effects.ui:951
-msgid "Mask"
-msgstr "Maszk"
-
-#: modules/gui/qt4/ui/video_effects.ui:962
-msgid "Advanced video filter controls"
-msgstr "Speciális videoszűrő-vezérlők"
-
-#: modules/gui/qt4/ui/video_effects.ui:971
-msgid "Subpicture filters"
-msgstr "Alképszűrők"
-
-#: modules/gui/qt4/ui/video_effects.ui:981
-msgid "Video filters"
-msgstr "Videoszűrők"
-
-#: modules/gui/qt4/ui/video_effects.ui:988
-msgid "Vout filters"
-msgstr "Videokimenet-szűrők"
-
-#: modules/gui/qt4/ui/video_effects.ui:995
-msgid "Reset"
-msgstr "Alaphelyzetbe"
-
-#: modules/gui/qt4/ui/vlm.ui:22
-msgid "VLM configurator"
-msgstr "VLM beállító"
-
-#: modules/gui/qt4/ui/vlm.ui:34
-msgid "Media Manager Edition"
-msgstr "Médiakezelő kiadás"
-
-#: modules/gui/qt4/ui/vlm.ui:57
-msgid "Name:"
-msgstr "Név:"
-
-#: modules/gui/qt4/ui/vlm.ui:80
-msgid "Input:"
-msgstr "Bemenet:"
-
-#: modules/gui/qt4/ui/vlm.ui:93
-msgid "Select Input"
-msgstr "Válasszon bemenetet"
-
-#: modules/gui/qt4/ui/vlm.ui:100
-msgid "Output:"
-msgstr "Kimenet:"
-
-#: modules/gui/qt4/ui/vlm.ui:113
-msgid "Select Output"
-msgstr "Válasszon kimenetet"
-
-#: modules/gui/qt4/ui/vlm.ui:120
-msgid "Time Control"
-msgstr "Idő felügyelete"
-
-#: modules/gui/qt4/ui/vlm.ui:127
-msgid "Mux Control"
-msgstr "Egyesítés felügyelete"
-
-#: modules/gui/qt4/ui/vlm.ui:169
-msgid "Loop"
-msgstr "Ismétlés"
-
-#: modules/gui/qt4/ui/vlm.ui:235
-msgid "Media Manager List"
-msgstr "Médiakezelési lista"
 
 #: modules/gui/skins2/src/dialogs.cpp:218
 msgid "Open a skin file"
@@ -18763,12 +18270,13 @@ msgstr "Sminkelhető felület"
 msgid "Skins loader demux"
 msgstr "Sminkbetöltő szétválasztó"
 
-#: modules/gui/skins2/src/theme_repository.cpp:69
+#: modules/gui/skins2/src/theme_repository.cpp:67
 msgid "Select skin"
 msgstr "Válasszon sminket"
 
-#: modules/gui/skins2/src/theme_repository.cpp:83
-msgid "Open skin..."
+#: modules/gui/skins2/src/theme_repository.cpp:86
+#, fuzzy
+msgid "Open skin ..."
 msgstr "Smink megnyitása..."
 
 #: modules/gui/wince/interface.cpp:506
@@ -18980,6 +18488,10 @@ msgstr "Hang klip"
 #: modules/meta_engine/id3genres.h:66
 msgid "Gospel"
 msgstr "Gospel"
+
+#: modules/meta_engine/id3genres.h:67 modules/video_filter/noise.c:54
+msgid "Noise"
+msgstr "Zaj"
 
 #: modules/meta_engine/id3genres.h:68
 msgid "Alternative rock"
@@ -20246,9 +19758,13 @@ msgstr "Videó"
 msgid "VC-1 packetizer"
 msgstr "VC-1 daraboló"
 
-#: modules/services_discovery/bonjour.c:55
+#: modules/services_discovery/bonjour.c:53
 msgid "Bonjour services"
 msgstr "Bonjour szolgáltatások"
+
+#: modules/services_discovery/podcast.c:61
+msgid "Podcast URLs list"
+msgstr "Podcast URL címek listája"
 
 #: modules/services_discovery/podcast.c:62
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
@@ -20672,6 +20188,10 @@ msgid ""
 msgstr ""
 "Adott színesség használatának kényszerítése. Használja a YUVA lehetőséget, "
 "ha az Alfa maszk vagy a Kék doboz videoszűrőt tervezi használni."
+
+#: modules/stream_out/mosaic_bridge.c:158 modules/video_filter/mosaic.c:89
+msgid "Transparency"
+msgstr "Átlátszóság"
 
 #: modules/stream_out/mosaic_bridge.c:160
 msgid "Transparency of the mosaic picture."
@@ -21304,6 +20824,10 @@ msgstr "SSE2 átalakítások erről: "
 msgid "AltiVec conversions from "
 msgstr "AltiVec átalakítások erről:"
 
+#: modules/video_filter/adjust.c:66
+msgid "Brightness threshold"
+msgstr "Fényerőküszöb"
+
 #: modules/video_filter/adjust.c:67
 msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
@@ -21358,6 +20882,10 @@ msgstr ""
 #: modules/video_filter/adjust.c:82
 msgid "Image properties filter"
 msgstr "Kép tulajdonságai szűrő"
+
+#: modules/video_filter/adjust.c:83
+msgid "Image adjust"
+msgstr "Kép igazítása"
 
 #: modules/video_filter/alphamask.c:40
 msgid "Use an image's alpha channel as a transparency mask."
@@ -21986,6 +21514,10 @@ msgstr "Videó automatikus átméretezése és kitöltése"
 msgid "Video filtering using a chain of video filter modules"
 msgstr "Videoszűrés videoszűrő modulok láncának segítségével"
 
+#: modules/video_filter/clone.c:58
+msgid "Number of clones"
+msgstr "Klónok száma"
+
 #: modules/video_filter/clone.c:59
 msgid "Number of video windows in which to clone the video."
 msgstr "A videó klónozásához használandó videoablakok száma."
@@ -22006,6 +21538,10 @@ msgstr ""
 msgid "Clone video filter"
 msgstr "Klónozás videoszűrő"
 
+#: modules/video_filter/clone.c:71
+msgid "Clone"
+msgstr "Klónozás"
+
 #: modules/video_filter/colorthres.c:55
 msgid ""
 "Colors similar to this will be kept, others will be grayscaled. This must be "
@@ -22022,6 +21558,10 @@ msgstr ""
 #: modules/video_filter/colorthres.c:68
 msgid "Color threshold filter"
 msgstr "Színküszöb-szűrő"
+
+#: modules/video_filter/colorthres.c:69
+msgid "Color threshold"
+msgstr "Színküszöb"
 
 #: modules/video_filter/colorthres.c:77
 msgid "Saturaton threshold"
@@ -22745,6 +22285,10 @@ msgstr "Elmosási tényező (1-127)"
 msgid "The degree of blurring from 1 to 127."
 msgstr "Az elmosás foka 1 és 127 között."
 
+#: modules/video_filter/motionblur.c:60
+msgid "Motion blur"
+msgstr "Mozgási elmosás"
+
 #: modules/video_filter/motionblur.c:61
 msgid "Motion blur filter"
 msgstr "Mozgási elmosás szűrő"
@@ -22981,6 +22525,10 @@ msgstr ""
 #: modules/video_filter/panoramix.c:96
 msgid "Panoramix: wall with overlap video filter"
 msgstr "Panoramix: átfedő videoszűrőket tartalmazó fal"
+
+#: modules/video_filter/panoramix.c:97
+msgid "Panoramix"
+msgstr "Panoramix"
 
 #: modules/video_filter/panoramix.c:108
 msgid "Offset X offset (automatic compensation)"
@@ -23371,6 +22919,10 @@ msgstr "Szög fokban (0 - 359)"
 #: modules/video_filter/rotate.c:67
 msgid "Rotate video filter"
 msgstr "Forgatás videoszűrő"
+
+#: modules/video_filter/rotate.c:68
+msgid "Rotate"
+msgstr "Forgatás"
 
 #: modules/video_filter/rss.c:129
 msgid "Feed URLs"
@@ -23795,6 +23347,10 @@ msgstr "Matrox Graphic Array videokimenet"
 msgid "DirectX 3D video output"
 msgstr "DirectX 3D videokimenet"
 
+#: modules/video_output/msw/directx.c:131
+msgid "Use hardware YUV->RGB conversions"
+msgstr "Hardveres YUV->RGB átalakítások használata"
+
 #: modules/video_output/msw/directx.c:133
 msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
@@ -23863,7 +23419,7 @@ msgstr ""
 msgid "DirectX video output"
 msgstr "DirectX videokimenet"
 
-#: modules/video_output/msw/directx.c:325
+#: modules/video_output/msw/directx.c:323
 msgid "Wallpaper"
 msgstr "Háttérkép"
 
@@ -24399,6 +23955,322 @@ msgstr "Vizualizáló szűrő"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Spektrumanalizátor"
+
+#~ msgid "Preset"
+#~ msgstr "Beállítás"
+
+#~ msgid "Show extended options"
+#~ msgstr "Speciális beállítások megjelenítése"
+
+#, fuzzy
+#~ msgid "Show &amp;more options"
+#~ msgstr "&További beállítások megjelenítése"
+
+#~ msgid "Change the caching for the media"
+#~ msgstr "A média gyorsítótárazásának módosítása"
+
+#~ msgid "Start Time"
+#~ msgstr "Kezdési idő"
+
+#~ msgid "Change the start time for the media"
+#~ msgstr "A média indítási idejének módosítása"
+
+#~ msgid "Play another media synchronously (extra audio file, ...)"
+#~ msgstr "Másik média lejátszása szinkronban (másik hangfájl...)"
+
+#~ msgid "Extra media"
+#~ msgstr "Extra média"
+
+#~ msgid "Select the file"
+#~ msgstr "Válassza ki a fájlt"
+
+#~ msgid "Complete MRL for VLC internal"
+#~ msgstr "Teljes MRL a VLC belső használatára"
+
+#, fuzzy
+#~ msgid "Edit Options"
+#~ msgstr "Beállítások"
+
+#~ msgid "Select play mode"
+#~ msgstr "Válassza ki a lejátszási módot"
+
+#~ msgid "Choose one or more media file to open"
+#~ msgstr "Válassza ki a megnyitandó médiafájlokat"
+
+#, fuzzy
+#~ msgid "Select one or more files"
+#~ msgstr "Válassza ki a megnyitandó fájlokat"
+
+#~ msgid "Select the subtitles file"
+#~ msgstr "Válassza ki a feliratfájlt"
+
+#~ msgid "Add a subtitles file"
+#~ msgstr "Feliratfájl hozzáadása"
+
+#, fuzzy
+#~ msgid "Use a sub&amp;titles file"
+#~ msgstr "&Feliratfájl használata"
+
+#~ msgid "Alignment:"
+#~ msgstr "Igazítás:"
+
+#~ msgid "Network Protocol"
+#~ msgstr "Hálózati protokoll"
+
+#~ msgid "Select the protocol for the URL."
+#~ msgstr "Adja meg az URL protokollját."
+
+#~ msgid "Protocol"
+#~ msgstr "Protokoll"
+
+#~ msgid "Select the port used"
+#~ msgstr "Válassza ki a használt portot"
+
+#~ msgid ""
+#~ "Enter the URL of the network stream here, with or without the protocol."
+#~ msgstr "Adja meg a hálózati műsor URL címét, a protokollal vagy anélkül."
+
+#~ msgid "Default volume"
+#~ msgstr "Alapértelmezett hangerő"
+
+#~ msgid "256 corresponds to 100%, 1024 to 400%"
+#~ msgstr "A 256 100 százaléknak, az 1024 400 százaléknak felel meg"
+
+#~ msgid "Save volume on exit"
+#~ msgstr "Hangerő mentése kilépéskor"
+
+#~ msgid "Preferred audio language"
+#~ msgstr "Hang előnyben részesített nyelve"
+
+#~ msgid "last.fm"
+#~ msgstr "Last.fm"
+
+#~ msgid "Enable last.fm submission"
+#~ msgstr "A last.fm beküldés engedélyezése"
+
+#~ msgid "Disc Devices"
+#~ msgstr "Lemezeszközök"
+
+#~ msgid "Default disc device"
+#~ msgstr "Alapértelmezett lemezeszköz"
+
+#~ msgid "Server default port"
+#~ msgstr "Kiszolgáló alapértelmezett portja"
+
+#~ msgid "Default caching level"
+#~ msgstr "Alapértelmezett gyorsítótárazási szint"
+
+#~ msgid "Post-Processing quality"
+#~ msgstr "Utófeldogozás minősége"
+
+#~ msgid "Repair AVI files"
+#~ msgstr "AVI fájlok javítása"
+
+#~ msgid "Use system codecs if available (better quality)"
+#~ msgstr "A rendszer kodekjeinek használata (jobb minőség)"
+
+#, fuzzy
+#~ msgid "textFormat"
+#~ msgstr "Formátum"
+
+#~ msgid "Subtitles Language"
+#~ msgstr "Feliratok nyelve"
+
+#~ msgid "Preferred subtitles language"
+#~ msgstr "Feliratok előnyben részesített nyelve"
+
+#~ msgid "Default encoding"
+#~ msgstr "Alapértelmezett kódolás"
+
+#~ msgid "Effect"
+#~ msgstr "Effekt"
+
+#~ msgid "Font color"
+#~ msgstr "Szövegszín"
+
+#~ msgid "Output"
+#~ msgstr "Kimenet"
+
+#, fuzzy
+#~ msgid "Accelerated video output (Overlay)"
+#~ msgstr "Gyorsított videokimenet"
+
+#~ msgid "DirectX"
+#~ msgstr "DirectX"
+
+#~ msgid "Display device"
+#~ msgstr "Megjelenítőeszköz"
+
+#~ msgid "Enable wallpaper mode"
+#~ msgstr "Háttérkép mód engedélyezése"
+
+#, fuzzy
+#~ msgid "Deinterlacing Mode"
+#~ msgstr "Váltottsorosság-mentesítési mód"
+
+#, fuzzy
+#~ msgid "Force Aspect Ratio"
+#~ msgstr "Méretarány kiigazítása"
+
+#~ msgid "Edit settings"
+#~ msgstr "Beállítások szerkesztése"
+
+#~ msgid "Control"
+#~ msgstr "Vezérlő"
+
+#~ msgid "Run manually"
+#~ msgstr "Futtatás saját kezűleg"
+
+#~ msgid "Setup schedule"
+#~ msgstr "Ütemezés beállítása"
+
+#~ msgid "Run on schedule"
+#~ msgstr "Futtatás ütemezve"
+
+#~ msgid "Status"
+#~ msgstr "Állapot"
+
+#~ msgid "P/P"
+#~ msgstr "P/P"
+
+#~ msgid "Prev"
+#~ msgstr "Előző"
+
+#~ msgid "Add Input"
+#~ msgstr "Bemenet hozzáadása"
+
+#~ msgid "Edit Input"
+#~ msgstr "Bemenet szerkesztése"
+
+#~ msgid "Clear List"
+#~ msgstr "Lista törlése"
+
+#~ msgid "Transform"
+#~ msgstr "Átalakítás"
+
+#~ msgid "Sharpen"
+#~ msgstr "Élesítés"
+
+#~ msgid "Sigma"
+#~ msgstr "Szigma"
+
+#~ msgid "Synchronize top and bottom"
+#~ msgstr "Szinkronizálás fent és lent"
+
+#~ msgid "Synchronize left and right"
+#~ msgstr "Szinkronizálás balra és jobbra"
+
+#~ msgid "Geometry"
+#~ msgstr "Geometria"
+
+#, fuzzy
+#~ msgid "Magnification/Zoom"
+#~ msgstr "Nagyítás"
+
+#~ msgid "Puzzle game"
+#~ msgstr "Kirakójáték"
+
+#~ msgid "Black slot"
+#~ msgstr "Fekete hely"
+
+#~ msgid "Columns"
+#~ msgstr "Oszlopok"
+
+#~ msgid "Rows"
+#~ msgstr "Sorok"
+
+#~ msgid "Angle"
+#~ msgstr "Szög"
+
+#~ msgid "Color fun"
+#~ msgstr "Színes móka"
+
+#~ msgid "Color extraction"
+#~ msgstr "Színek kivonása"
+
+#~ msgid "Similarity"
+#~ msgstr "Hasonlóság"
+
+#~ msgid "Image modification"
+#~ msgstr "Képmódosítás"
+
+#~ msgid "Water effect"
+#~ msgstr "Víz effekt"
+
+#~ msgid "Motion detect"
+#~ msgstr "Mozgásérzékelés"
+
+#~ msgid "Factor"
+#~ msgstr "Tényező"
+
+#~ msgid "Cartoon"
+#~ msgstr "Rajzfilm"
+
+#~ msgid "Vout/Overlay"
+#~ msgstr "Videokimenet/Átfedés"
+
+#~ msgid "Wall"
+#~ msgstr "Fal"
+
+#~ msgid "Add text"
+#~ msgstr "Szöveg hozzáadása"
+
+#~ msgid "Logo"
+#~ msgstr "Logó"
+
+#~ msgid "Add logo"
+#~ msgstr "Logó hozzáadása"
+
+#~ msgid "Logo erase"
+#~ msgstr "Logótörlés"
+
+#~ msgid "Mask"
+#~ msgstr "Maszk"
+
+#~ msgid "Advanced video filter controls"
+#~ msgstr "Speciális videoszűrő-vezérlők"
+
+#~ msgid "Subpicture filters"
+#~ msgstr "Alképszűrők"
+
+#~ msgid "Video filters"
+#~ msgstr "Videoszűrők"
+
+#~ msgid "Vout filters"
+#~ msgstr "Videokimenet-szűrők"
+
+#~ msgid "Reset"
+#~ msgstr "Alaphelyzetbe"
+
+#~ msgid "VLM configurator"
+#~ msgstr "VLM beállító"
+
+#~ msgid "Media Manager Edition"
+#~ msgstr "Médiakezelő kiadás"
+
+#~ msgid "Name:"
+#~ msgstr "Név:"
+
+#~ msgid "Input:"
+#~ msgstr "Bemenet:"
+
+#~ msgid "Select Input"
+#~ msgstr "Válasszon bemenetet"
+
+#~ msgid "Output:"
+#~ msgstr "Kimenet:"
+
+#~ msgid "Select Output"
+#~ msgstr "Válasszon kimenetet"
+
+#~ msgid "Time Control"
+#~ msgstr "Idő felügyelete"
+
+#~ msgid "Mux Control"
+#~ msgstr "Egyesítés felügyelete"
+
+#~ msgid "Media Manager List"
+#~ msgstr "Médiakezelési lista"
 
 #~ msgid ""
 #~ "These are the settings for the input, demultiplexing and decoding parts "
