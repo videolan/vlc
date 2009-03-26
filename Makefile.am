@@ -1208,37 +1208,12 @@ package-translations:
 
 ###############################################################################
 # PO translation files update
-# Generate po/POTFILES.in which lists all the files containing translatable
-# strings. Find all source files and remove the generated files
 ###############################################################################
 .PHONY: update-po
 
 update-po:
-	rm -f $(top_srcdir)/po/POTFILES.in
-	{ \
-	  cd $(top_srcdir) && \
-	  echo "# automatically created by make update-po" ; \
-	  echo "" ; \
-	  echo "# main sources" ; \
-	  find include src -name '*.[chm]' -o -name '*.[ch]pp' \
-	    | grep -v '\(misc/modules_\|src/misc/revision.c\|modules/builtin.h\|include/vlc_about.h\)' \
-	    | sort ; \
-	  echo "" ; \
-	  echo "# modules" ; \
-	  find modules -name '*.[chm]' -o -name '*.[ch]pp' -o -name '*.ui' \
-	    | grep -v '\(\.moc\.\|gui/gtk2/\)' \
-	    | grep -vE 'qt4/ui/.*.h' \
-	    | grep -v 'qt4/resources.cpp\|qt4/dialogs/about.hpp' \
-	    | grep -v 'gui/opie' \
-	    | grep -v 'wxwidgets' \
-	    | grep -v 'mux/rtp/' \
-	    | grep -v 'demux/rtpxiph.c' \
-	    | sort ; \
-	} > $(top_srcdir)/po/POTFILES.in
-	rm -f $(top_srcdir)/po/vlc.pot
 	cd po && $(MAKE) POTFILES vlc.pot update-po
 
-#cd po && $(MAKE) update-po
 
 ###############################################################################
 # Enforce Mac OS X deployment target environment variable
