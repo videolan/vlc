@@ -42,7 +42,7 @@ private:
     QTreeWidget *treePlugins;
     SearchLineEdit *edit;
 private slots:
-    void search( const QString );
+    void search( const QString& );
 };
 
 #endif

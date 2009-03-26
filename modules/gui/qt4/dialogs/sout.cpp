@@ -35,7 +35,7 @@
 #include <QFileDialog>
 #include <QToolButton>
 
-SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, QString inputMRL )
+SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& inputMRL )
            : QVLCDialog( parent,  _p_intf )
 {
     setWindowTitle( qtr( "Stream Output" ) );

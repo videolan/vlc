@@ -102,7 +102,7 @@ private:
 
 public slots:
     void toggle(){ TOGGLEV( this ); }
-    void updateArt( QString );
+    void updateArt( const QString& );
 };
 
 #if 0
@@ -208,7 +208,7 @@ public slots:
 
 private slots:
     void doUpdate();
-    void doUpdate(QString);
+    void doUpdate( const QString& );
 
 signals:
     void updateRequested();

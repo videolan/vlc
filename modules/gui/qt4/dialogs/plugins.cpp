@@ -77,7 +77,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     layout->addWidget( label, 1, 0 );
     layout->addWidget( edit, 1, 1, 1, -1 );
     CONNECT( edit, textChanged( QString ),
-            this, search( QString ) );
+            this, search( const QString& ) );
 
     QDialogButtonBox *box = new QDialogButtonBox;
     QPushButton *okButton = new QPushButton( qtr( "&Close" ), this );
@@ -110,7 +110,7 @@ inline void PluginDialog::FillTree()
     }
 }
 
-void PluginDialog::search( const QString qs )
+void PluginDialog::search( const QString& qs )
 {
     QList<QTreeWidgetItem *> items = treePlugins->findItems( qs, Qt::MatchContains );
     items += treePlugins->findItems( qs, Qt::MatchContains, 1 );

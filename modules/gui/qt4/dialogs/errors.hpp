@@ -43,12 +43,12 @@ public:
     }
     virtual ~ErrorsDialog() {};
 
-    void addError( QString, QString );
+    void addError( const QString&, const QString& );
     /*void addWarning( QString, QString );*/
 private:
     ErrorsDialog( QWidget *parent, intf_thread_t * );
     static ErrorsDialog *instance;
-    void add( bool, QString, QString );
+    void add( bool, const QString&, const QString& );
 
     QCheckBox *stopShowing;
     QTextEdit *messages;

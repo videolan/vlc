@@ -197,13 +197,13 @@ void MetaPanel::update( input_item_t *p_item )
     /* URL / URI */
     psz_meta = input_item_GetURL( p_item );
     if( !EMPTY_STR( psz_meta ) )
-        emit uriSet( QString( psz_meta ) );
+        emit uriSet( psz_meta );
     else
     {
         free( psz_meta );
         psz_meta = input_item_GetURI( p_item );
         if( !EMPTY_STR( psz_meta ) )
-            emit uriSet( QString( psz_meta ) );
+            emit uriSet( psz_meta );
     }
     free( psz_meta );
 

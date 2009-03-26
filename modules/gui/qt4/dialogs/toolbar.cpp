@@ -461,7 +461,7 @@ void WidgetListing::startDrag( Qt::DropActions /*supportedActions*/ )
  * to propagate there too
  */
 DroppingController::DroppingController( intf_thread_t *_p_intf,
-                                        QString line,
+                                        const QString& line,
                                         QWidget *_parent )
                    : AbstractController( _p_intf, _parent )
 {
@@ -477,7 +477,7 @@ DroppingController::DroppingController( intf_thread_t *_p_intf,
     parseAndCreate( line, controlLayout );
 }
 
-void DroppingController::resetLine( QString line )
+void DroppingController::resetLine( const QString& line )
 {
     hide();
     QLayoutItem *child;

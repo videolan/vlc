@@ -67,7 +67,7 @@ ErrorsDialog::ErrorsDialog( QWidget *parent, intf_thread_t *_p_intf )
     BUTTONACT( stopShowing, dontShow() );
 }
 
-void ErrorsDialog::addError( QString title, QString text )
+void ErrorsDialog::addError( const QString& title, const QString& text )
 {
     add( true, title, text );
 }
@@ -77,7 +77,7 @@ void ErrorsDialog::addError( QString title, QString text )
     add( false, title, text );
 }*/
 
-void ErrorsDialog::add( bool error, QString title, QString text )
+void ErrorsDialog::add( bool error, const QString& title, const QString& text )
 {
     if( stopShowing->isChecked() ) return;
     messages->textCursor().movePosition( QTextCursor::End );

@@ -98,7 +98,7 @@ private:
 
     int i_action_flag;
     bool b_pl;
-    QStringList SeparateEntries( QString );
+    QStringList SeparateEntries( const QString& );
 
     QPushButton *cancelButton, *selectButton;
     QPushButton *playButton;
@@ -110,9 +110,9 @@ private slots:
     void cancel();
     void close();
     void toggleAdvancedPanel();
-    void updateMRL( QStringList, QString );
+    void updateMRL( const QStringList&, const QString& );
     void updateMRL();
-    void newCachingMethod( QString );
+    void newCachingMethod( const QString& );
     void signalCurrent( int );
     void browseInputSlave();
 };

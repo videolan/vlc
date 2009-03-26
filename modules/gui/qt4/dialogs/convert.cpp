@@ -38,7 +38,7 @@
 #include <QCheckBox>
 
 ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
-                              QString inputMRL )
+                              const QString& inputMRL )
               : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "Convert" ) );

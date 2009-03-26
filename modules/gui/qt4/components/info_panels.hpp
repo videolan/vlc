@@ -89,7 +89,7 @@ private slots:
     void enterEditMode();
 
 signals:
-    void uriSet( QString );
+    void uriSet( const QString& );
     void editing();
 };
 

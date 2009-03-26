@@ -185,7 +185,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     backgroundLayout->setColumnStretch( 2, 1 );
 
     CONNECT( THEMIM->getIM(), artChanged( QString ),
-             this, updateArt( QString ) );
+             this, updateArt( const QString& ) );
 }
 
 BackgroundWidget::~BackgroundWidget()
@@ -199,7 +199,7 @@ void BackgroundWidget::resizeEvent( QResizeEvent * event )
         label->show();
 }
 
-void BackgroundWidget::updateArt( QString url )
+void BackgroundWidget::updateArt( const QString& url )
 {
     if( url.isEmpty() )
     {
@@ -409,7 +409,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     setContextMenuPolicy( Qt::ActionsContextMenu );
     CONNECT( this, updateRequested(), this, doUpdate() );
     CONNECT( THEMIM->getIM(), artChanged( QString ),
-             this, doUpdate( QString ) );
+             this, doUpdate( const QString& ) );
 
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
@@ -431,7 +431,7 @@ CoverArtLabel::~CoverArtLabel()
         removeAction( act );
 }
 
-void CoverArtLabel::doUpdate( QString url )
+void CoverArtLabel::doUpdate( const QString& url )
 {
     QPixmap pix;
     if( !url.isEmpty()  && pix.load( url ) )

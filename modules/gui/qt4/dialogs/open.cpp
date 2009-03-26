@@ -143,22 +143,22 @@ OpenDialog::OpenDialog( QWidget *parent,
     CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent( int ) );
 
     CONNECT( fileOpenPanel, mrlUpdated( QStringList, QString ),
-             this, updateMRL( QStringList, QString ) );
+             this, updateMRL( const QStringList&, const QString& ) );
     CONNECT( netOpenPanel, mrlUpdated( QStringList, QString ),
-             this, updateMRL( QStringList, QString ) );
+             this, updateMRL( const QStringList&, const QString& ) );
     CONNECT( discOpenPanel, mrlUpdated( QStringList, QString ),
-             this, updateMRL( QStringList, QString ) );
+             this, updateMRL( const QStringList&, const QString& ) );
     CONNECT( captureOpenPanel, mrlUpdated( QStringList, QString ),
-             this, updateMRL( QStringList, QString ) );
+             this, updateMRL( const QStringList&, const QString& ) );
 
     CONNECT( fileOpenPanel, methodChanged( QString ),
-             this, newCachingMethod( QString ) );
+             this, newCachingMethod( const QString& ) );
     CONNECT( netOpenPanel, methodChanged( QString ),
-             this, newCachingMethod( QString ) );
+             this, newCachingMethod( const QString& ) );
     CONNECT( discOpenPanel, methodChanged( QString ),
-             this, newCachingMethod( QString ) );
+             this, newCachingMethod( const QString& ) );
     CONNECT( captureOpenPanel, methodChanged( QString ),
-             this, newCachingMethod( QString ) );
+             this, newCachingMethod( const QString& ) );
 
     /* Advanced frame Connects */
     CONNECT( ui.slaveCheckbox, toggled( bool ), this, updateMRL() );
@@ -400,7 +400,7 @@ void OpenDialog::stream( bool b_transcode_only )
 }
 
 /* Update the MRL */
-void OpenDialog::updateMRL( QStringList item, QString tempMRL )
+void OpenDialog::updateMRL( const QStringList& item, const QString& tempMRL )
 {
     optionsMRL = tempMRL;
     itemsMRL = item;
@@ -425,7 +425,7 @@ void OpenDialog::updateMRL() {
     ui.mrlLine->setText( itemsMRL.join( " " ) );
 }
 
-void OpenDialog::newCachingMethod( QString method )
+void OpenDialog::newCachingMethod( const QString& method )
 {
     if( method != storedMethod ) {
         storedMethod = method;
@@ -434,7 +434,7 @@ void OpenDialog::newCachingMethod( QString method )
     }
 }
 
-QStringList OpenDialog::SeparateEntries( QString entries )
+QStringList OpenDialog::SeparateEntries( const QString& entries )
 {
     bool b_quotes_mode = false;
 

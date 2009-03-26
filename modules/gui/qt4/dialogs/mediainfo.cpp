@@ -87,7 +87,7 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
     BUTTONACT( saveMetaButton, saveMeta() );
 
     /* Let the MetaData Panel update the URI */
-    CONNECT( MP, uriSet( QString ), uriLine, setText( QString ) );
+    CONNECT( MP, uriSet( const QString& ), uriLine, setText( const QString& ) );
     CONNECT( MP, editing(), saveMetaButton, show() );
 
     /* Display the buttonBar according to the Tab selected */
