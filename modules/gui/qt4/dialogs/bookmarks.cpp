@@ -127,7 +127,7 @@ void BookmarksDialog::update()
         // List with the differents elements of the row
         QStringList row;
         row << QString( qfu( pp_bookmarks[i]->psz_name ) );
-        row << QString( "%1" ).arg( pp_bookmarks[i]->i_byte_offset );
+        row << QString::number( pp_bookmarks[i]->i_byte_offset );
         int total = pp_bookmarks[i]->i_time_offset/ 1000000;
         int hour = total / (60*60);
         int min = (total - hour*60*60) / 60;
@@ -153,7 +153,7 @@ void BookmarksDialog::add()
     if( !input_Control( p_input, INPUT_GET_BOOKMARK, &bookmark ) )
     {
         bookmark.psz_name = const_cast<char *>qtu( THEMIM->getIM()->getName() +
-                   QString("_%1" ).arg( bookmarksList->topLevelItemCount() ) );
+                   QString::number( bookmarksList->topLevelItemCount() ) );
 
         input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
     }
