@@ -79,8 +79,6 @@ struct decoder_sys_t
     SchroVideoFormat *p_format;
 };
 
-//#define TRACE
-
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
  *****************************************************************************/
@@ -302,9 +300,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* reset the decoder when seeking as the decode in progress is invalid */
         /* discard the block as it is just a null magic block */
         if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) {
-#ifdef TRACE
-            msg_Dbg( p_dec, "SCHRO_DECODER_RESET" );
-#endif
             schro_decoder_reset( p_sys->p_schro );
 
             p_sys->i_lastpts = -1;
@@ -345,15 +340,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             break;
 
         case SCHRO_DECODER_NEED_BITS:
-#ifdef TRACE
-            msg_Dbg( p_dec, "SCHRO_DECODER_NEED_BITS" );
-#endif
             return NULL;
 
         case SCHRO_DECODER_NEED_FRAME:
-#ifdef TRACE
-            msg_Dbg( p_dec, "SCHRO_DECODER_NEED_FRAME" );
-#endif
             p_schroframe = CreateSchroFrameFromPic( p_dec );
 
             if( !p_schroframe )
@@ -401,23 +390,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_lastpts = p_pic->date;
 
             schro_frame_unref( p_schroframe );
-#ifdef TRACE
-            msg_Dbg( p_dec, "SCHRO_DECODER_OK num=%u date=%"PRId64,
-                     u_pnum, p_pic->date);
-#endif
             return p_pic;
         }
         case SCHRO_DECODER_EOS:
             /* NB, the new api will not emit _EOS, it handles the reset internally */
-#ifdef TRACE
-            msg_Dbg( p_dec, "SCHRO_DECODER_EOS");
-#endif
             break;
 
         case SCHRO_DECODER_ERROR:
-#ifdef TRACE
-            msg_Dbg( p_dec, "SCHRO_DECODER_ERROR");
-#endif
+            msg_Err( p_dec, "SCHRO_DECODER_ERROR");
             return NULL;
         }
     }
