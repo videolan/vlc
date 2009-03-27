@@ -42,6 +42,7 @@ Audrey Prevost <fee . clochette007 at wanadoo dot fr> - Help on french translati
 Aurélien Nephtali <aurelien at sitadelle dot com> - Patch for modules/stream_output/rtp.c proper test for NULL. Fix crash in video filters error handling code in transcode. Fix telnet crash.
 Basil Achermann <vlc at acherma dot com> - Patch to handle esc and space key events from VLCControl (OSX)
 Barak Ori <barakori at gmail dot com> - Bidi fixes
+Bayarsaikhan Enkhtaivan Баярсайхан Энхтайван <ebayaraa qt gmail d0t com> - Mongolian translation
 Benjamin Mironer <bmironer at noos.fr> - Mac OS X fixes
 Benoit Steiner <benny at via.ecp.fr> - MPEG system input, network input
 Bernie Purcell <b dot purcell at adbglobal dot com> - MKV USF subtitles support,HTML tags for subtitles and subtitles renderer enhancements
@@ -264,6 +265,7 @@ Thomas Parmelan <tom+vlc at ankh.fr.EU.org> - mosaic user-defined offsets for su
 Tom Bigelajzen <tombigel at yahoo d0t com> - Interface icons and help with web design
 Tomáš Chvátal <tomas d0t chvatal 4t gmail d0t com> - Czech Localisation
 Tong Ka Man <kmtong at cwbase dot com> - playlist_Clear addition
+Tòni Galhard <tony.gaillard at supinfo dot com> - Occitan translation
 Torsten Spindler <spindler at tspindler dot de> - Script to set vlc as default player on GNOME desktops.
 Udo Richter <udo underscore richter at gmx dot de> - Trancode padding / cropping
 Valek Filippov <frob at df.ru> - Russian translation
