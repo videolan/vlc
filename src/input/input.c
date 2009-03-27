@@ -2796,23 +2796,28 @@ static void SlaveSeek( input_thread_t *p_input )
  *****************************************************************************/
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta )
 {
-    /* Get meta information from user */
-#define GET_META( field, s ) do { \
-    char *psz_string = var_GetNonEmptyString( p_input, (s) );  \
-    if( psz_string ) {\
-        EnsureUTF8( psz_string ); \
-        vlc_meta_Set( p_meta, vlc_meta_ ## field, psz_string ); \
-    } \
-    free( psz_string ); } while(0)
+    static const struct { int i_meta; const char *psz_name; } p_list[] = {
+        { vlc_meta_Title,       "meta-title" },
+        { vlc_meta_Artist,      "meta-artist" },
+        { vlc_meta_Genre,       "meta-genre" },
+        { vlc_meta_Copyright,   "meta-copyright" },
+        { vlc_meta_Description, "meta-description" },
+        { vlc_meta_Date,        "meta-date" },
+        { vlc_meta_URL,         "meta-url" },
+        { 0, NULL }
+    };
 
-    GET_META( Title, "meta-title" );
-    GET_META( Artist, "meta-artist" );
-    GET_META( Genre, "meta-genre" );
-    GET_META( Copyright, "meta-copyright" );
-    GET_META( Description, "meta-description" );
-    GET_META( Date, "meta-date" );
-    GET_META( URL, "meta-url" );
-#undef GET_META
+    /* Get meta information from user */
+    for( int i = 0; p_list[i].psz_name; i++ )
+    {
+        char *psz_string = var_GetNonEmptyString( p_input, p_list[i].psz_name );
+        if( !psz_string )
+            continue;
+
+        EnsureUTF8( psz_string );
+        vlc_meta_Set( p_meta, p_list[i].i_meta, psz_string );
+        free( psz_string );
+    }
 }
 
 /*****************************************************************************
