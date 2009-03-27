@@ -3692,7 +3692,7 @@ dnl
 AC_ARG_ENABLE(schroedinger,
 [  --disable-schroedinger  high performance dirac codec (default enabled)])
 if test "${enable_schroedinger}" != "no"; then
-  PKG_CHECK_MODULES(SCHROEDINGER,[schroedinger-1.0 >= 1.0], [
+  PKG_CHECK_MODULES(SCHROEDINGER,[schroedinger-1.0 >= 1.0.6], [
       VLC_ADD_PLUGIN([schroedinger])
       VLC_ADD_CFLAGS([schroedinger],[$SCHROEDINGER_CFLAGS])
       VLC_ADD_LIBS([schroedinger],[$SCHROEDINGER_LIBS]) ], [
