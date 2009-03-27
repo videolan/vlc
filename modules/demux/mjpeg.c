@@ -302,7 +302,7 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     int         i_size;
-    int         b_matched = false;
+    bool        b_matched = false;
     vlc_value_t val;
 
     p_demux->pf_control = Control;
