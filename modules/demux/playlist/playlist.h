@@ -34,6 +34,9 @@ void Close_Native ( vlc_object_t * );
 int Import_M3U ( vlc_object_t * );
 void Close_M3U ( vlc_object_t * );
 
+int Import_RAM ( vlc_object_t * );
+void Close_RAM ( vlc_object_t * );
+
 int Import_PLS ( vlc_object_t * );
 void Close_PLS ( vlc_object_t * );
 
