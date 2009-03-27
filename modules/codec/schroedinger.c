@@ -290,7 +290,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint32_t u_pnum;
 
     if( !pp_block ) return NULL;
 
@@ -356,7 +355,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         case SCHRO_DECODER_OK: {
             SchroTag *p_tag = schro_decoder_get_picture_tag( p_sys->p_schro );
-            u_pnum = schro_decoder_get_picture_number( p_sys->p_schro );
             p_schroframe = schro_decoder_pull( p_sys->p_schro );
             if( !p_schroframe->priv )
             {
@@ -369,23 +367,20 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_pic = ((struct picture_free_t*) p_schroframe->priv)->p_pic;
             p_schroframe->priv = NULL;
 
-            /* solve presentation time stamp for picture.  If this picture
-             * was not tagged with a pts when presented to decoder, interpolate
-             * one
-             * This means no need to set p_pic->b_force, as we have a pts on
-             * each picture */
             if( p_tag )
             {
                 /* free is handled by schro_frame_unref */
                 p_pic->date = *(mtime_t*) p_tag->value;
                 schro_tag_free( p_tag );
-                msg_Err(p_dec, "pts out: %"PRId64, p_pic->date);
             }
             else if( p_sys->i_lastpts >= 0 )
             {
+                /* NB, this shouldn't happen since the packetizer does a
+                 * very thorough job of inventing timestamps.  The
+                 * following is just a very rough fall back incase packetizer
+                 * is missing. */
+                /* maybe it would be better to set p_pic->b_force ? */
                 p_pic->date = p_sys->i_lastpts + p_sys->i_frame_pts_delta;
-                /* fixme */
-                msg_Err(p_dec, "no pts");
             }
             p_sys->i_lastpts = p_pic->date;
 
