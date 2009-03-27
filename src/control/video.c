@@ -42,7 +42,7 @@ static vout_thread_t *GetVout( libvlc_media_player_t *p_mi,
 
     if( p_input_thread )
     {
-        p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
+        p_vout = input_GetVout( p_input_thread );
         if( !p_vout )
         {
             libvlc_exception_raise( p_exception, "No active video output" );
@@ -176,7 +176,7 @@ int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
     {
         vout_thread_t *p_vout;
 
-        p_vout = vlc_object_find( p_input_thread, VLC_OBJECT_VOUT, FIND_CHILD );
+        p_vout = input_GetVout( p_input_thread );
         if( p_vout )
         {
             has_vout = true;
