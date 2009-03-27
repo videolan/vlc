@@ -153,10 +153,12 @@ static void SetVideoFormat( decoder_t *p_dec )
         break;
     }
 
-    p_dec->fmt_out.video.i_visible_width =
+    p_dec->fmt_out.video.i_visible_width = p_sys->p_format->clean_width;
+    p_dec->fmt_out.video.i_x_offset = p_sys->p_format->left_offset;
     p_dec->fmt_out.video.i_width = p_sys->p_format->width;
 
-    p_dec->fmt_out.video.i_visible_height =
+    p_dec->fmt_out.video.i_visible_height = p_sys->p_format->clean_height;
+    p_dec->fmt_out.video.i_y_offset = p_sys->p_format->top_offset;
     p_dec->fmt_out.video.i_height = p_sys->p_format->height;
 
     /* aspect_ratio_[numerator|denominator] describes the pixel aspect ratio */
