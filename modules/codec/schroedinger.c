@@ -90,7 +90,6 @@ struct decoder_sys_t
     SchroDecoder *p_schro;
     SchroVideoFormat *p_format;
     struct picture_pts_t pts_tlb[PTS_TLB_SIZE];
-    int i_ts_resync_hack;
 };
 
 //#define TRACE
@@ -141,9 +140,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->p_format = NULL;
     p_sys->i_lastpts = -1;
     p_sys->i_frame_pts_delta = 0;
-    p_sys->i_ts_resync_hack = 0;
 
     ResetPTStlb(p_dec);
+
+    /* request packetizer */
+    p_dec->b_need_packetized = true;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -384,9 +385,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if ( p_block ) do {
         /* prepare block for submission */
 
-        if (p_sys->i_ts_resync_hack && p_sys->i_ts_resync_hack--)
-            return NULL;
-
         if( !p_block->i_buffer ) {
             msg_Err( p_dec, "block is of zero size" );
             break;
@@ -403,10 +401,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             ResetPTStlb( p_dec );
 
             p_sys->i_lastpts = -1;
-
-            /* The ts layer manages to corrupt the next packet we are to receive
-             * Since schro has no sync support, we need to drop it */
-            p_sys->i_ts_resync_hack = 1;
 
             block_Release( p_block );
             *pp_block = NULL;
