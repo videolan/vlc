@@ -528,6 +528,11 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case SCHRO_DECODER_OK:
             u_pnum = schro_decoder_get_picture_number( p_sys->p_schro );
             p_schroframe = schro_decoder_pull( p_sys->p_schro );
+            if( !p_schroframe->priv )
+            {
+                schro_frame_unref( p_schroframe );
+                break;
+            }
             p_pic = ((struct picture_free_t*) p_schroframe->priv)->p_pic;
             p_schroframe->priv = NULL;
             schro_frame_unref( p_schroframe );
