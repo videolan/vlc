@@ -2482,7 +2482,6 @@ liboil-$(OIL_VERSION).tar.gz:
 
 liboil: liboil-$(OIL_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -d liboil -p1 < Patches/liboil-noshared.patch
 
 .liboil: liboil
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2" && make && make install)
@@ -2501,6 +2500,7 @@ schroedinger-$(SCHROED_VERSION).tar.gz:
 
 schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -d schroedinger -p1 < Patches/schroedinger-1.0.6-fixes.patch
 
 .schroedinger: schroedinger .liboil
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
