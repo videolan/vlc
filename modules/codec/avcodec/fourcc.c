@@ -1046,7 +1046,7 @@ static const struct
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 34, 0 )
     { VLC_FOURCC('g','s','m',' '), CODEC_ID_GSM,
       AUDIO_ES, "GSM Audio" },
-    { VLC_FOURCC('g','s','m','s'), CODEC_ID_GSM_MS,
+    { VLC_FOURCC('a','g','s','m'), CODEC_ID_GSM_MS, /* According to http://wiki.multimedia.cx/index.php?title=GSM */
       AUDIO_ES, "Microsoft GSM Audio" },
 #endif
 

@@ -78,6 +78,7 @@ static int ChunkFind( demux_t *, const char *, unsigned int * );
 static void FrameInfo_IMA_ADPCM( demux_t *, unsigned int *, int * );
 static void FrameInfo_MS_ADPCM ( demux_t *, unsigned int *, int * );
 static void FrameInfo_PCM      ( demux_t *, unsigned int *, int * );
+static void FrameInfo_MSGSM    ( demux_t *, unsigned int *, int * );
 
 static const uint32_t pi_channels_src[] =
     { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
@@ -263,6 +264,10 @@ static int Open( vlc_object_t * p_this )
     case VLC_FOURCC( 'a', '5', '2', ' ' ):
         /* FIXME set end of area FIXME */
         goto error;
+    case VLC_FOURCC( 'a', 'g', 's', 'm' ):
+        FrameInfo_MSGSM( p_demux, &p_sys->i_frame_size,
+                            &p_sys->i_frame_samples );
+        break;
     default:
         msg_Err( p_demux, "unsupported codec (%4.4s)",
                  (char*)&p_sys->fmt.i_codec );
@@ -452,5 +457,15 @@ static void FrameInfo_IMA_ADPCM( demux_t *p_demux, unsigned int *pi_size,
     *pi_samples = 2 * ( p_sys->fmt.audio.i_blockalign -
         4 * p_sys->fmt.audio.i_channels ) / p_sys->fmt.audio.i_channels;
 
+    *pi_size = p_sys->fmt.audio.i_blockalign;
+}
+
+static void FrameInfo_MSGSM( demux_t *p_demux, unsigned int *pi_size,
+                                 int *pi_samples )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    *pi_samples = ( p_sys->fmt.audio.i_blockalign * p_sys->fmt.audio.i_rate * 8)
+                    / p_sys->fmt.i_bitrate;
     *pi_size = p_sys->fmt.audio.i_blockalign;
 }
