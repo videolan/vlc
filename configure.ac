@@ -123,7 +123,7 @@ AC_ARG_WITH(contrib,
       CONTRIB_DIR=${topdir}/extras/contrib
     fi
     AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
-  AS_IF([test -d ${CONTRIBDIR}/lib],[
+  AS_IF([test -d ${CONTRIB_DIR}/lib],[
    AS_IF([test "`grep HOST ${CONTRIB_DIR}/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"],[
       if test "${with_contrib}" = "yes"; then
         AC_MSG_RESULT([no])
@@ -134,7 +134,7 @@ AC_ARG_WITH(contrib,
       fi
      ],[
     AC_MSG_RESULT([yes])
-    export PATH=${CONTRIBDIR}/bin:$PATH
+    export PATH=${CONTRIB_DIR}/bin:$PATH
     CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
     CPPFLAGS_save="${CPPFLAGS_save} -I${CONTRIB_DIR}/include"
     CFLAGS="${CFLAGS} -I${CONTRIB_DIR}/include"
