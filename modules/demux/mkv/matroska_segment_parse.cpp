@@ -184,6 +184,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
     tk->i_extra_data = 0;
     tk->p_extra_data = NULL;
     tk->psz_codec = NULL;
+    tk->b_dts_only = false;
     tk->i_default_duration = 0;
     tk->f_timecodescale = 1.0;
 

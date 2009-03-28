@@ -664,6 +664,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                     memcpy( tracks[i_track]->fmt.p_extra, &p_bih[1], tracks[i_track]->fmt.i_extra );
                 }
             }
+            p_tk->b_dts_only = true;
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "V_MPEG1" ) ||
                  !strcmp( tracks[i_track]->psz_codec, "V_MPEG2" ) )
@@ -760,6 +761,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                     memcpy( p_fmt->p_extra, &p_tk->p_extra_data[26], p_fmt->i_extra );
                 }
             }
+            p_tk->b_dts_only = true;
         }
         else if( !strncmp( tracks[i_track]->psz_codec, "V_DIRAC", 7 ) )
         {

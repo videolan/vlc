@@ -194,6 +194,7 @@ typedef struct
     uint8_t      *p_extra_data;
 
     char         *psz_codec;
+    bool         b_dts_only;
 
     uint64_t     i_default_duration;
     float        f_timecodescale;

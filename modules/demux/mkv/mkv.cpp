@@ -578,9 +578,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
         }
         else
         {
-            if( !strcmp( tk->psz_codec, "V_MS/VFW/FOURCC" ) )
+            if( tk->b_dts_only )
             {
-                // in VFW we have no idea about B frames
                 p_block->i_pts = 0;
                 p_block->i_dts = i_pts;
             }
