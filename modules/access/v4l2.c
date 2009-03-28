@@ -54,13 +54,6 @@
 
 #ifdef HAVE_LIBV4L2
 #   include <libv4l2.h>
-#else
-#   define v4l2_close close
-#   define v4l2_dup dup
-#   define v4l2_ioctl ioctl
-#   define v4l2_read read
-#   define v4l2_mmap mmap
-#   define v4l2_munmap munmap
 #endif
 
 /*****************************************************************************
@@ -99,6 +92,12 @@ static void AccessClose( vlc_object_t * );
 #define FPS_TEXT N_( "Framerate" )
 #define FPS_LONGTEXT N_( "Framerate to capture, if applicable " \
     "(0 for autodetect)." )
+
+#ifdef HAVE_LIBV4L2
+#define LIBV4L2_TEXT N_( "Use libv4l2" )
+#define LIBV4L2_LONGTEXT N_( \
+    "Force usage of the libv4l2 wrapper." )
+#endif
 
 #define CTRL_RESET_TEXT N_( "Reset v4l2 controls" )
 #define CTRL_RESET_LONGTEXT N_( \
@@ -261,6 +260,9 @@ vlc_module_begin ()
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, true )
+#ifdef HAVE_LIBV4L2
+    add_bool( CFG_PREFIX "use-libv4l2", false, NULL, LIBV4L2_TEXT, LIBV4L2_LONGTEXT, true );
+#endif
 
     set_section( N_( "Tuner" ), NULL )
     add_integer( CFG_PREFIX "tuner", 0, NULL, TUNER_TEXT, TUNER_LONGTEXT,
@@ -370,8 +372,8 @@ static int OpenVideoDev( vlc_object_t *, demux_sys_t *, bool );
 static bool ProbeVideoDev( vlc_object_t *, demux_sys_t *,
                                  const char *psz_device );
 
-static int ControlList( vlc_object_t *, int , bool, bool );
-static int Control( vlc_object_t *, int i_fd,
+static int ControlList( vlc_object_t *, demux_sys_t *, int , bool, bool );
+static int Control( vlc_object_t *, demux_sys_t *, int i_fd,
                     const char *psz_name, int i_cid, int i_value );
 
 static int DemuxControlCallback( vlc_object_t *p_this, const char *psz_var,
@@ -534,7 +536,54 @@ struct demux_sys_t
 
     /* Controls */
     char *psz_set_ctrls;
+
+
+#ifdef HAVE_LIBV4L2
+    /* */
+    int (*pf_close)( int );
+    int (*pf_dup)( int );
+    int (*pf_ioctl)( int, unsigned long int, ... );
+    ssize_t (*pf_read)( int, void *, size_t );
+    void *(*pf_mmap)( void *, size_t, int, int, int, off_t );
+    int (*pf_munmap)( void *, size_t );
+#endif
 };
+
+#ifdef HAVE_LIBV4L2
+static void use_kernel_v4l2( demux_sys_t *p_sys )
+{
+    p_sys->pf_close = close;
+    p_sys->pf_dup = dup;
+    p_sys->pf_ioctl = ioctl;
+    p_sys->pf_read = read;
+    p_sys->pf_mmap = mmap;
+    p_sys->pf_munmap = munmap;
+}
+
+static void use_libv4l2( demux_sys_t *p_sys )
+{
+    p_sys->pf_close = v4l2_close;
+    p_sys->pf_dup = v4l2_dup;
+    p_sys->pf_ioctl = v4l2_ioctl;
+    p_sys->pf_read = v4l2_read;
+    p_sys->pf_mmap = v4l2_mmap;
+    p_sys->pf_munmap = v4l2_munmap;
+}
+
+#   define v4l2_close (p_sys->pf_close)
+#   define v4l2_dup (p_sys->pf_dup)
+#   define v4l2_ioctl (p_sys->pf_ioctl)
+#   define v4l2_read (p_sys->pf_read)
+#   define v4l2_mmap (p_sys->pf_mmap)
+#   define v4l2_munmap (p_sys->pf_munmap)
+#else
+#   define v4l2_close close
+#   define v4l2_dup dup
+#   define v4l2_ioctl ioctl
+#   define v4l2_read read
+#   define v4l2_mmap mmap
+#   define v4l2_munmap munmap
+#endif
 
 static int FindMainDevice( vlc_object_t *p_this, demux_sys_t *p_sys,
                            bool b_demux )
@@ -582,13 +631,23 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     ParseMRL( p_sys, p_demux->psz_path, (vlc_object_t *) p_demux );
 
-    if( FindMainDevice( p_this, p_sys, true ) != VLC_SUCCESS)
+#ifdef HAVE_LIBV4L2
+    if( !config_GetInt( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
-        DemuxClose( p_this );
-        return VLC_EGENERIC;
+        msg_Dbg( p_this, "Trying direct kernel v4l2" );
+        use_kernel_v4l2( p_sys );
+        if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
+            return VLC_SUCCESS;
     }
 
-    return VLC_SUCCESS;
+    msg_Dbg( p_this, "Trying libv4l2 wrapper" );
+    use_libv4l2( p_sys );
+#endif
+    if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
+        return VLC_SUCCESS;
+
+    DemuxClose( p_this );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -1001,13 +1060,23 @@ static int AccessOpen( vlc_object_t * p_this )
 
     ParseMRL( p_sys, p_access->psz_path, (vlc_object_t *) p_access );
 
-    if( FindMainDevice( p_this, p_sys, false ) != VLC_SUCCESS )
+#ifdef HAVE_LIBV4L2
+    if( !config_GetInt( p_this, CFG_PREFIX "use-libv4l2" ) )
     {
-        AccessClose( p_this );
-        return VLC_EGENERIC;
+        msg_Dbg( p_this, "Trying direct kernel v4l2" );
+        use_kernel_v4l2( p_sys );
+        if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
+            return VLC_SUCCESS;
     }
 
-    return VLC_SUCCESS;
+    msg_Dbg( p_this, "Trying libv4l2 wrapper" );
+    use_libv4l2( p_sys );
+#endif
+    if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS )
+        return VLC_SUCCESS;
+
+    AccessClose( p_this );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -1482,6 +1551,9 @@ static float GetMaxFrameRate( demux_t *p_demux, int i_fd,
 {
     (void)p_demux;
 #ifdef VIDIOC_ENUM_FRAMEINTERVALS
+#ifdef HAVE_LIBV4L2
+    demux_sys_t *p_sys = p_demux->p_sys;
+#endif
     /* This is new in Linux 2.6.19 */
     struct v4l2_frmivalenum frmival;
     frmival.index = 0;
@@ -1522,6 +1594,9 @@ static float GetAbsoluteMaxFrameRate( demux_t *p_demux, int i_fd,
 {
     float f_fps_max = -1.;
 #ifdef VIDIOC_ENUM_FRAMESIZES
+#ifdef HAVE_LIBV4L2
+    demux_sys_t *p_sys = p_demux->p_sys;
+#endif
     /* This is new in Linux 2.6.19 */
     struct v4l2_frmsizeenum frmsize;
     frmsize.index = 0;
@@ -1580,6 +1655,9 @@ static void GetMaxDimensions( demux_t *p_demux, int i_fd,
     *pi_width = 0;
     *pi_height = 0;
 #ifdef VIDIOC_ENUM_FRAMESIZES
+#ifdef HAVE_LIBV4L2
+    demux_sys_t *p_sys = p_demux->p_sys;
+#endif
     /* This is new in Linux 2.6.19 */
     struct v4l2_frmsizeenum frmsize;
     frmsize.index = 0;
@@ -1769,7 +1847,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     /* TODO: Move the resolution stuff up here */
     /* if MPEG encoder card, no need to do anything else after this */
-    ControlList( p_obj, i_fd,
+    ControlList( p_obj, p_sys, i_fd,
                   var_GetBool( p_obj, "v4l2-controls-reset" ), b_demux );
     SetAvailControlsByString( p_obj, p_sys, i_fd );
     if( false == b_demux)
@@ -2444,7 +2522,7 @@ static void name2var( unsigned char *name )
  * Print a user-class v4l2 control's details, create the relevant variable,
  * change the value if needed.
  *****************************************************************************/
-static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
+static void ControlListPrint( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd,
                               struct v4l2_queryctrl queryctrl,
                               bool b_reset, bool b_demux )
 {
@@ -2563,14 +2641,14 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
                     if( b_reset && queryctrl.default_value != control.value )
                     {
                         msg_Dbg( p_obj, "    reset value to default" );
-                        Control( p_obj, i_fd, psz_name,
-                                      queryctrl.id, queryctrl.default_value );
+                        Control( p_obj, p_sys, i_fd, psz_name,
+                                 queryctrl.id, queryctrl.default_value );
                     }
                 }
                 else
                 {
-                    Control( p_obj, i_fd, psz_name,
-                                  queryctrl.id, i_val );
+                    Control( p_obj, p_sys, i_fd, psz_name,
+                             queryctrl.id, i_val );
                 }
             }
             break;
@@ -2618,7 +2696,7 @@ static void ControlListPrint( vlc_object_t *p_obj, int i_fd,
  * List all user-class v4l2 controls, set them to the user specified
  * value and create the relevant variables to enable runtime changes
  *****************************************************************************/
-static int ControlList( vlc_object_t *p_obj, int i_fd,
+static int ControlList( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd,
                         bool b_reset, bool b_demux )
 {
     struct v4l2_queryctrl queryctrl;
@@ -2680,7 +2758,7 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
                              queryctrl.name, queryctrl.id );
                     break;
             }
-            ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
+            ControlListPrint( p_obj, p_sys, i_fd, queryctrl, b_reset, b_demux );
             queryctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
         }
     }
@@ -2700,7 +2778,8 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
                     continue;
                 msg_Dbg( p_obj, "Available control: %s (%x)",
                          queryctrl.name, queryctrl.id );
-                ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
+                ControlListPrint( p_obj, p_sys, i_fd, queryctrl,
+                                  b_reset, b_demux );
             }
         }
 
@@ -2716,7 +2795,8 @@ static int ControlList( vlc_object_t *p_obj, int i_fd,
                     continue;
                 msg_Dbg( p_obj, "Available private control: %s (%x)",
                          queryctrl.name, queryctrl.id );
-                ControlListPrint( p_obj, i_fd, queryctrl, b_reset, b_demux );
+                ControlListPrint( p_obj, p_sys, i_fd, queryctrl,
+                                  b_reset, b_demux );
             }
             else
                 break;
@@ -2784,7 +2864,7 @@ static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
             if( !strncasecmp( psz_name, psz_parser, i_maxstrlen ) )
             {
-                Control( p_obj, i_fd, psz_name, i_cid,
+                Control( p_obj, p_sys, i_fd, psz_name, i_cid,
                          strtol( ++psz_assign, &psz_parser, 0) );
             }
         }
@@ -2802,7 +2882,7 @@ static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
 /*****************************************************************************
  * Reset all user-class v4l2 controls to their default value
  *****************************************************************************/
-static int ControlReset( vlc_object_t *p_obj, int i_fd )
+static int ControlReset( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd )
 {
     struct v4l2_queryctrl queryctrl;
     int i_cid;
@@ -2831,7 +2911,7 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                 for( i = 0; controls[i].psz_name != NULL; i++ )
                     if( controls[i].i_cid == queryctrl.id ) break;
                 name2var( queryctrl.name );
-                Control( p_obj, i_fd,
+                Control( p_obj, p_sys, i_fd,
                          controls[i].psz_name ? : (const char *)queryctrl.name,
                          queryctrl.id, queryctrl.default_value );
             }
@@ -2861,7 +2941,7 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                     for( i = 0; controls[i].psz_name != NULL; i++ )
                         if( controls[i].i_cid == queryctrl.id ) break;
                     name2var( queryctrl.name );
-                    Control( p_obj, i_fd,
+                    Control( p_obj, p_sys, i_fd,
                              controls[i].psz_name ? : (const char *)queryctrl.name,
                              queryctrl.id, queryctrl.default_value );
                 }
@@ -2885,7 +2965,7 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
                  && queryctrl.default_value != control.value )
                 {
                     name2var( queryctrl.name );
-                    Control( p_obj, i_fd, (const char *)queryctrl.name,
+                    Control( p_obj, p_sys, i_fd, (const char *)queryctrl.name,
                              queryctrl.id, queryctrl.default_value );
                 }
             }
@@ -2899,9 +2979,10 @@ static int ControlReset( vlc_object_t *p_obj, int i_fd )
 /*****************************************************************************
  * Issue user-class v4l2 controls
  *****************************************************************************/
-static int Control( vlc_object_t *p_obj, int i_fd,
+static int Control( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd,
                     const char *psz_name, int i_cid, int i_value )
 {
+    (void)p_sys;
     struct v4l2_queryctrl queryctrl;
     struct v4l2_control control;
     struct v4l2_ext_control ext_control;
@@ -2991,7 +3072,7 @@ static int DemuxControlCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    Control( p_this, i_fd, psz_var, i_cid, newval.i_int );
+    Control( p_this, p_sys, i_fd, psz_var, i_cid, newval.i_int );
 
     return VLC_EGENERIC;
 }
@@ -3008,7 +3089,7 @@ static int DemuxControlResetCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    ControlReset( p_this, i_fd );
+    ControlReset( p_this, p_sys, i_fd );
 
     return VLC_EGENERIC;
 }
@@ -3027,7 +3108,7 @@ static int AccessControlCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    Control( p_this, i_fd, psz_var, i_cid, newval.i_int );
+    Control( p_this, p_sys, i_fd, psz_var, i_cid, newval.i_int );
 
     return VLC_EGENERIC;
 }
@@ -3044,7 +3125,7 @@ static int AccessControlResetCallback( vlc_object_t *p_this,
     if( i_fd < 0 )
         return VLC_EGENERIC;
 
-    ControlReset( p_this, i_fd );
+    ControlReset( p_this, p_sys, i_fd );
 
     return VLC_EGENERIC;
 }
