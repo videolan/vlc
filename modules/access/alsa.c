@@ -151,6 +151,46 @@ static int FindMainDevice( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+static void ListAvailableDevices( demux_t *p_demux )
+{
+    snd_ctl_card_info_t *p_info = NULL;
+    snd_ctl_card_info_alloca( &p_info );
+
+    snd_pcm_info_t *p_pcminfo = NULL;
+    snd_pcm_info_alloca( &p_pcminfo );
+
+    msg_Dbg( p_demux, "Available alsa capture devices:" );
+    int i_card = -1;
+    while( !snd_card_next( &i_card ) && i_card >= 0 )
+    {
+        char psz_devname[10];
+        snprintf( psz_devname, 10, "hw:%d", i_card );
+
+        snd_ctl_t *p_ctl = NULL;
+        if( snd_ctl_open( &p_ctl, psz_devname, 0 ) < 0 ) continue;
+
+        snd_ctl_card_info( p_ctl, p_info );
+        msg_Dbg( p_demux, "  %s (%s)",
+                 snd_ctl_card_info_get_id( p_info ),
+                 snd_ctl_card_info_get_name( p_info ) );
+
+        int i_dev = -1;
+        while( !snd_ctl_pcm_next_device( p_ctl, &i_dev ) && i_dev >= 0 )
+        {
+            snd_pcm_info_set_device( p_pcminfo, i_dev );
+            snd_pcm_info_set_subdevice( p_pcminfo, 0 );
+            snd_pcm_info_set_stream( p_pcminfo, SND_PCM_STREAM_CAPTURE );
+            if( snd_ctl_pcm_info( p_ctl, p_pcminfo ) < 0 ) continue;
+
+            msg_Dbg( p_demux, "    hw:%d,%d : %s (%s)", i_card, i_dev,
+                     snd_pcm_info_get_id( p_pcminfo ),
+                     snd_pcm_info_get_name( p_pcminfo ) );
+        }
+
+        snd_ctl_close( p_ctl );
+    }
+}
+
 /*****************************************************************************
  * DemuxOpen: opens alsa device, access_demux callback
  *****************************************************************************
@@ -186,7 +226,10 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( p_demux->psz_path && *p_demux->psz_path )
         p_sys->psz_device = p_demux->psz_path;
     else
+    {
         p_sys->psz_device = ALSA_DEFAULT;
+        ListAvailableDevices( p_demux );
+    }
 
     if( FindMainDevice( p_demux ) != VLC_SUCCESS )
     {
