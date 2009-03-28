@@ -105,6 +105,7 @@ InstType $Name_InstTypeFull
   !insertmacro MUI_LANGUAGE "Greek"
   !insertmacro MUI_LANGUAGE "Russian"
   !insertmacro MUI_LANGUAGE "Portuguese"
+  !insertmacro MUI_LANGUAGE "PortugueseBR"
   !insertmacro MUI_LANGUAGE "Arabic"
   !insertmacro MUI_LANGUAGE "Polish"
   !insertmacro MUI_LANGUAGE "Romanian"
@@ -645,7 +646,8 @@ Function .onInit
   StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
-  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
+  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
+  StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
   Goto EndLanguageCmp
@@ -678,6 +680,9 @@ Function .onInit
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
+  Goto EndLanguageCmp
+  Brazilian:
+  !include "languages\brazilian_portuguese.nsh"
   EndLanguageCmp:
 
   ReadRegStr $R0  ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
@@ -889,7 +894,8 @@ Function un.onInit
   StrCmp $LANGUAGE ${LANG_POLISH} Polish 0
   StrCmp $LANGUAGE ${LANG_DUTCH} Dutch 0
   StrCmp $LANGUAGE ${LANG_SIMPCHINESE} SChinese 0
-  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish EndLanguageCmp
+  StrCmp $LANGUAGE ${LANG_FINNISH} Finnish 0
+  StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
   Goto EndLanguageCmp
@@ -922,6 +928,9 @@ Function un.onInit
   Goto EndLanguageCmp
   Finnish:
   !include "languages\finnish.nsh"
+  Goto EndLanguageCmp
+  Brazilian:
+  !include "languages\brazilian_portuguese.nsh"
   EndLanguageCmp:
   
 FunctionEnd
