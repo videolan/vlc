@@ -1,6 +1,11 @@
 Changes between 0.9.8a and 1.0.0-pre1:
 --------------------------------------
 
+Important notes:
+----------------
+ * Alsa and OSS audio capture has been removed from the v4l and v4l2 accesses.
+   See 'Access:' for more info.
+
 Playback:
  * Instantaneous pausing
  * Frame-by-Frame playback
