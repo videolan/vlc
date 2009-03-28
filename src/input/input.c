@@ -1395,7 +1395,7 @@ void input_ControlPush( input_thread_t *p_input,
         if( p_val )
             c.val = *p_val;
         else
-            memset( &c, 0, sizeof(c) );
+            memset( &c.val, 0, sizeof(c.val) );
 
         p_input->p->control[p_input->p->i_control++] = c;
     }
