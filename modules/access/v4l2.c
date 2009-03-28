@@ -1556,7 +1556,7 @@ static float GetMaxFrameRate( demux_t *p_demux, int i_fd,
 #endif
     /* This is new in Linux 2.6.19 */
     struct v4l2_frmivalenum frmival;
-    frmival.index = 0;
+    memset( &frmival, 0, sizeof(frmival) );
     frmival.pixel_format = i_pixel_format;
     frmival.width = i_width;
     frmival.height = i_height;
@@ -1599,7 +1599,7 @@ static float GetAbsoluteMaxFrameRate( demux_t *p_demux, int i_fd,
 #endif
     /* This is new in Linux 2.6.19 */
     struct v4l2_frmsizeenum frmsize;
-    frmsize.index = 0;
+    memset( &frmsize, 0, sizeof(frmsize) );
     frmsize.pixel_format = i_pixel_format;
     if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 )
     {
@@ -1660,7 +1660,7 @@ static void GetMaxDimensions( demux_t *p_demux, int i_fd,
 #endif
     /* This is new in Linux 2.6.19 */
     struct v4l2_frmsizeenum frmsize;
-    frmsize.index = 0;
+    memset( &frmsize, 0, sizeof(frmsize) );
     frmsize.pixel_format = i_pixel_format;
     if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) >= 0 )
     {
@@ -2031,7 +2031,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* This is new in Linux 2.6.19 */
     /* List supported frame rates */
     struct v4l2_frmivalenum frmival;
-    frmival.index = 0;
+    memset( &frmival, 0, sizeof(frmival) );
     frmival.pixel_format = fmt.fmt.pix.pixelformat;
     frmival.width = p_sys->i_width;
     frmival.height = p_sys->i_height;
@@ -2247,7 +2247,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE )
     {
         struct v4l2_input t_input;
-        t_input.index = 0;
+        memset( &t_input, 0, sizeof(t_input) );
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
         {
             p_sys->i_input++;
@@ -2453,7 +2453,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                     /* This is new in Linux 2.6.19 */
                     /* List valid frame sizes for this format */
                     struct v4l2_frmsizeenum frmsize;
-                    frmsize.index = 0;
+                    memset( &frmsize, 0, sizeof(frmsize) );
                     frmsize.pixel_format = p_sys->p_codecs[i_index].pixelformat;
                     if( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMESIZES, &frmsize ) < 0 )
                     {
