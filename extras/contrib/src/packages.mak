@@ -228,3 +228,5 @@ SCHROED_VERSION=1.0.4
 SCHROED_URL=http://www.diracvideo.org/download/schroedinger/schroedinger-$(SCHROED_VERSION).tar.gz
 ASS_VERSION=0.9.5
 ASS_URL=$(SF)/libass/libass-$(ASS_VERSION).tar.bz2
+GSM_VERSION=1.0.12
+GSM_URL=http://user.cs.tu-berlin.de/~jutta/gsm/gsm-$(GSM_VERSION).tar.gz

@@ -1,0 +1,38 @@
+diff -ruN gsm/Makefile gsm.new/Makefile
+--- gsm/Makefile	2006-04-26 21:14:26.000000000 +0200
++++ gsm.new/Makefile	2009-03-29 20:12:39.000000000 +0200
+@@ -43,10 +43,8 @@
+ # CC		= /usr/lang/acc
+ # CCFLAGS 	= -c -O
+ 
+-CC		= gcc -ansi -pedantic
+ CCFLAGS 	= -c -O2 -DNeedFunctionPrototypes=1
+ 
+-LD 		= $(CC)
+ 
+ # LD		= gcc
+ # LDFLAGS 	=
+@@ -98,14 +96,11 @@
+ SHELL		= /bin/sh
+ LN		= ln
+ BASENAME 	= basename
+-AR		= ar
+ ARFLAGS		= cr
+ RMFLAGS		=
+ FIND		= find
+ COMPRESS 	= compress
+ COMPRESSFLAGS 	= 
+-# RANLIB 	= true
+-RANLIB	 	= ranlib
+ 
+ #
+ #    You shouldn't have to configure below this line if you're porting.
+@@ -279,7 +274,7 @@
+ 
+ # Target rules
+ 
+-all:		$(LIBGSM) $(TOAST) $(TCAT) $(UNTOAST)
++all:		$(LIBGSM)
+ 		@-echo $(ROOT): Done.
+ 
+ tst:		$(TST)/lin2cod $(TST)/cod2lin $(TOAST) $(TST)/test-result

@@ -133,7 +133,7 @@ endif
 FFMPEGCONF+= --enable-small --disable-debug --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
-FFMPEGCONF+= --enable-libmp3lame --enable-libfaac
+FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-libgsm
 endif
 
 ifdef HAVE_BEOS
@@ -1117,7 +1117,7 @@ else
 ifdef HAVE_UCLIBC
 .ffmpeg: ffmpeg
 else
-.ffmpeg: ffmpeg .faac .lame
+.ffmpeg: ffmpeg .faac .lame .gsm
 endif
 endif
 	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
@@ -2548,6 +2548,29 @@ libupnp: libupnp-$(UPNP_VERSION).tar.bz2
 CLEAN_FILE += .libupnp
 CLEAN_PKG += libupnp
 DISTCLEAN_PKG += libupnp-$(UPNP_VERSION).tar.bz2
+
+# *********
+# GSM
+# *********
+gsm-$(GSM_VERSION).tar.gz:
+	$(WGET) $(GSM_URL)
+
+gsm: gsm-$(GSM_VERSION).tar.gz
+	rm -rf $@ || true
+	gunzip -c $< | tar xf - --exclude='[*?:<>\|]'
+	mv gsm-1.0-* gsm || true
+ifneq ($(HOST),$(BUILD))
+	(patch -p0 < Patches/gsm-cross.patch)
+endif
+
+.gsm: gsm
+	(cd $<; $(HOSTCC) make && cp inc/gsm.h $(PREFIX)/include && cp lib/libgsm.a  $(PREFIX)/lib)
+	touch $@
+
+CLEAN_FILE += .gsm
+CLEAN_PKG += gsm
+DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
+
 
 
 # ***************************************************************************
