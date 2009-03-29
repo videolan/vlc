@@ -546,6 +546,7 @@ struct demux_sys_t
     ssize_t (*pf_read)( int, void *, size_t );
     void *(*pf_mmap)( void *, size_t, int, int, int, off_t );
     int (*pf_munmap)( void *, size_t );
+    bool b_libv4l2;
 #endif
 };
 
@@ -558,6 +559,7 @@ static void use_kernel_v4l2( demux_sys_t *p_sys )
     p_sys->pf_read = read;
     p_sys->pf_mmap = mmap;
     p_sys->pf_munmap = munmap;
+    p_sys->b_libv4l2 = false;
 }
 
 static void use_libv4l2( demux_sys_t *p_sys )
@@ -568,6 +570,7 @@ static void use_libv4l2( demux_sys_t *p_sys )
     p_sys->pf_read = v4l2_read;
     p_sys->pf_mmap = v4l2_mmap;
     p_sys->pf_munmap = v4l2_munmap;
+    p_sys->b_libv4l2 = true;
 }
 
 #   define v4l2_close (p_sys->pf_close)
@@ -1751,9 +1754,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
        custom cam format to normal formats conversion). Chances are big we will
        still fail then though, as normally v4l2_fd_open only fails if the
        device is not a v4l2 device. */
-    libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
-    if( libv4l2_fd != -1 )
-        i_fd = libv4l2_fd;
+    if( p_sys->b_libv4l2 )
+    {
+        libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
+        if( libv4l2_fd != -1 )
+            i_fd = libv4l2_fd;
+    }
+    else
 #else
     libv4l2_fd = i_fd;
 #endif
@@ -2203,9 +2210,13 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
        custom cam format to normal formats conversion). Chances are big we will
        still fail then though, as normally v4l2_fd_open only fails if the
        device is not a v4l2 device. */
-    libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
-    if( libv4l2_fd != -1 )
-        i_fd = libv4l2_fd;
+    if( p_sys->b_libv4l2 )
+    {
+        libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
+        if( libv4l2_fd != -1 )
+            i_fd = libv4l2_fd;
+    }
+    else
 #else
     libv4l2_fd = i_fd;
 #endif
