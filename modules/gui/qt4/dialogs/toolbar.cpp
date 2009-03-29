@@ -502,7 +502,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
-        QLabel *label = new QLabel;
+        QLabel *label = new QLabel( this );
         label->setPixmap( QPixmap( ":/space" ) );
         if( i_type == WIDGET_SPACER_EXTEND )
         {
@@ -530,6 +530,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
         if( !widg ) return;
 
         /* Install the Event Filter in order to catch the drag */
+        widg->setParent( this );
         widg->installEventFilter( this );
 
         /* We are in a complex widget, we need to stop events on children too */
