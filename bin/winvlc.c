@@ -241,7 +241,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
     osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
     GetVersionEx( &osvi );
 
-    fwprintf( fd, L"[Version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE, osvi.dwMajorVersion,
+    fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE, osvi.dwMajorVersion,
                                                            osvi.dwMinorVersion,
                                                            osvi.dwBuildNumber,
                                                            osvi.dwPlatformId,
@@ -250,7 +250,7 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
     const CONTEXT *const pContext = (const CONTEXT *)lpExceptionInfo->ContextRecord;
     const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)lpExceptionInfo->ExceptionRecord;
     /*No nested exceptions for now*/
-    fwprintf( fd, L"\n\n[Exceptions]\n%08x at %08x",pException->ExceptionCode,
+    fwprintf( fd, L"\n\n[exceptions]\n%08x at %08x",pException->ExceptionCode,
                                             pException->ExceptionAddress );
     if( pException->NumberParameters > 0 )
     {
@@ -259,27 +259,31 @@ LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
             fprintf( fd, " | %08x", pException->ExceptionInformation[i] );
     }
 
-    fwprintf( fd, L"\n\n[CONTEXT]\nEDI:%08x\nESI:%08x\n" \
+    fwprintf( fd, L"\n\n[context]\nEDI:%08x\nESI:%08x\n" \
                 "EBX:%08x\nEDX:%08x\nECX:%08x\nEAX:%08x\n" \
                 "EBP:%08x\nEIP:%08x\nESP:%08x\n",
                     pContext->Edi,pContext->Esi,pContext->Ebx,
                     pContext->Edx,pContext->Ecx,pContext->Eax,
                     pContext->Ebp,pContext->Eip,pContext->Esp );
 
-    fwprintf( fd, L"\n\n[STACKTRACE]\n#EIP|base|module\n" );
-
-    DWORD pEbp = pContext->Ebp;
-    DWORD caller = *((DWORD*)pEbp + 1) ;
+    fwprintf( fd, L"\n[stacktrace]\n#EIP|base|module\n" );
 
     wchar_t module[ 256 ];
+	MEMORY_BASIC_INFORMATION mbi ;
+	VirtualQuery( (DWORD *)pContext->Eip, &mbi, sizeof( mbi ) ) ;
+	HINSTANCE hInstance = mbi.AllocationBase;
+	GetModuleFileName( hInstance, module, 256 ) ;
+	fwprintf( fd, L"%08x|%s\n", pContext->Eip, module );
+
+	DWORD pEbp = pContext->Ebp;
+    DWORD caller = *((DWORD*)pEbp + 1);
 
     do
     {
-        MEMORY_BASIC_INFORMATION mbi ;
         VirtualQuery( (DWORD *)caller, &mbi, sizeof( mbi ) ) ;
         HINSTANCE hInstance = mbi.AllocationBase;
         GetModuleFileName( hInstance, module, 256 ) ;
-        fwprintf( fd, L"%08x|%08x|%s\n", caller, hInstance, module );
+        fwprintf( fd, L"%08x|%s\n", caller, module );
         pEbp = *(DWORD*)pEbp ;
         caller = *((DWORD*)pEbp + 1) ;
         /*The last EBP points to NULL!*/
