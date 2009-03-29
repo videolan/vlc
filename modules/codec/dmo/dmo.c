@@ -296,6 +296,8 @@ found:
     vlc_cond_init( &p_sys->wait_output );
     p_sys->b_works =
     p_sys->b_ready = false;
+    p_sys->pp_input = NULL;
+    p_sys->p_output = NULL;
 
     if( vlc_clone( &p_sys->thread, DecoderThread, p_dec,
                    VLC_THREAD_PRIORITY_INPUT ) )
@@ -347,9 +349,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_sys->pp_input = pp_block;
     vlc_cond_signal( &p_sys->wait_input );
 
-    while( !(p_ret = p_sys->p_output) )
+    while( p_sys->pp_input )
         vlc_cond_wait( &p_sys->wait_output, &p_sys->lock );
-    p_sys->p_output = NULL;
+    p_ret = p_sys->p_output;
     vlc_mutex_unlock( &p_sys->lock );
 
     return p_ret;
@@ -1039,6 +1041,7 @@ static void *DecoderThread( void *data )
 
         p_sys->p_output = DecBlock( p_dec, p_sys->pp_input );
         p_sys->pp_input = NULL;
+        vlc_cond_signal( &p_sys->wait_output );
     }
     vlc_mutex_unlock( &p_sys->lock );
 
