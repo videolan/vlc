@@ -138,9 +138,9 @@ struct decoder_sys_t
     vlc_thread_t thread;
     vlc_mutex_t  lock;
     vlc_cond_t   wait_input, wait_output;
-    bool         ready, works;
-    block_t    **input;
-    void        *output;
+    bool         b_ready, b_works;
+    block_t    **pp_input;
+    void        *p_output;
 };
 
 const GUID IID_IWMCodecPrivateData = {0x73f0be8e, 0x57f7, 0x4f01, {0xaa, 0x66, 0x9f, 0x57, 0x34, 0xc, 0xfe, 0xe}};
@@ -294,18 +294,19 @@ found:
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait_input );
     vlc_cond_init( &p_sys->wait_output );
-    p_sys->works = p_sys->ready = false;
+    p_sys->b_works =
+    p_sys->b_ready = false;
 
     if( vlc_clone( &p_sys->thread, DecoderThread, p_dec,
                    VLC_THREAD_PRIORITY_INPUT ) )
         goto error;
 
     vlc_mutex_lock( &p_sys->lock );
-    while( !p_sys->ready )
+    while( !p_sys->b_ready )
         vlc_cond_wait( &p_sys->wait_output, &p_sys->lock );
     vlc_mutex_unlock( &p_sys->lock );
 
-    if( p_sys->works )
+    if( p_sys->b_works )
         return VLC_SUCCESS;
 
     vlc_join( p_sys->thread, NULL );
@@ -326,7 +327,7 @@ static void DecoderClose( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->ready = false;
+    p_sys->b_ready = false;
     vlc_cond_signal( &p_sys->wait_input );
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -340,18 +341,18 @@ static void DecoderClose( vlc_object_t *p_this )
 static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    void *ret;
+    void *p_ret;
 
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->input = pp_block;
+    p_sys->pp_input = pp_block;
     vlc_cond_signal( &p_sys->wait_input );
 
-    while( !(ret = p_sys->output) )
+    while( !(p_ret = p_sys->p_output) )
         vlc_cond_wait( &p_sys->wait_output, &p_sys->lock );
-    p_sys->output = NULL;
+    p_sys->p_output = NULL;
     vlc_mutex_unlock( &p_sys->lock );
 
-    return ret;
+    return p_ret;
 }
 
 /*****************************************************************************
@@ -614,7 +615,8 @@ static int DecOpen( decoder_t *p_dec )
     free( p_wf );
 
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->ready = p_sys->works = true;
+    p_sys->b_ready =
+    p_sys->b_works = true;
     vlc_cond_signal( &p_sys->wait_output );
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -636,7 +638,7 @@ static int DecOpen( decoder_t *p_dec )
     free( p_wf );
 
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->ready = true;
+    p_sys->b_ready = true;
     vlc_cond_signal( &p_sys->wait_output );
     vlc_mutex_unlock( &p_sys->lock );
     return VLC_EGENERIC;
@@ -833,7 +835,7 @@ static void DecClose( decoder_t *p_dec )
 /****************************************************************************
  * DecodeBlock: the whole thing
  ****************************************************************************
- * This function must be fed with ogg packets.
+ * This function must be fed with packets.
  ****************************************************************************/
 static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
 {
@@ -903,13 +905,13 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
         else
         {
             //msg_Dbg( p_dec, "ProcessInput(): successful" );
-            *pp_block = 0;
+            *pp_block = NULL;
         }
     }
     else if( p_block && !p_block->i_buffer )
     {
         block_Release( p_block );
-        *pp_block = 0;
+        *pp_block = NULL;
     }
 
     /* Get output from the DMO */
@@ -1030,13 +1032,13 @@ static void *DecoderThread( void *data )
     vlc_mutex_lock( &p_sys->lock );
     for( ;; )
     {
-        while( p_sys->ready && !p_sys->input )
+        while( p_sys->b_ready && !p_sys->pp_input )
             vlc_cond_wait( &p_sys->wait_input, &p_sys->lock );
-        if( !p_sys->ready )
+        if( !p_sys->b_ready )
             break;
 
-        p_sys->output = DecBlock( p_dec, p_sys->input );
-        p_sys->input = NULL;
+        p_sys->p_output = DecBlock( p_dec, p_sys->pp_input );
+        p_sys->pp_input = NULL;
     }
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -1409,8 +1411,7 @@ static int EncOpen( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_enc->p_sys = p_sys =
-          (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
+    if( ( p_enc->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
     {
         goto error;
     }
