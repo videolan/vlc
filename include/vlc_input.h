@@ -278,7 +278,7 @@ struct input_thread_t
  * Record prefix string.
  * TODO make it configurable.
  */
-#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%H:%M:%S-$ N-$ p"
+#define INPUT_RECORD_PREFIX "vlc-record-%Y-%m-%d-%Hh%Mm%Ss-$ N-$ p"
 
 /*****************************************************************************
  * Input events and variables
