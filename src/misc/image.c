@@ -71,6 +71,7 @@ static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
                                video_format_t *, const char * );
 static void DeleteFilter( filter_t * );
 
+vlc_fourcc_t image_Type2Fourcc( const char * );
 vlc_fourcc_t image_Ext2Fourcc( const char * );
 /*static const char *Fourcc2Ext( vlc_fourcc_t );*/
 
@@ -534,26 +535,31 @@ static const struct
     { 0, NULL }
 };
 
-vlc_fourcc_t image_Ext2Fourcc( const char *psz_name )
+vlc_fourcc_t image_Type2Fourcc( const char *psz_type )
 {
     int i;
-
-    psz_name = strrchr( psz_name, '.' );
-    if( !psz_name ) return 0;
-    psz_name++;
 
     for( i = 0; ext_table[i].i_codec; i++ )
     {
         int j;
-        for( j = 0; toupper(ext_table[i].psz_ext[j]) == toupper(psz_name[j]);
+        for( j = 0; toupper(ext_table[i].psz_ext[j]) == toupper(psz_type[j]);
              j++ )
         {
-            if( !ext_table[i].psz_ext[j] && !psz_name[j] )
+            if( !ext_table[i].psz_ext[j] && !psz_type[j] )
                 return ext_table[i].i_codec;
         }
     }
 
     return 0;
+}
+
+vlc_fourcc_t image_Ext2Fourcc( const char *psz_name )
+{
+    psz_name = strrchr( psz_name, '.' );
+    if( !psz_name ) return 0;
+    psz_name++;
+
+    return image_Type2Fourcc( psz_name );
 }
 
 /*

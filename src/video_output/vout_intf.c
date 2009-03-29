@@ -753,8 +753,8 @@ int vout_GetSnapshot( vout_thread_t *p_vout,
     if( pp_image )
     {
         vlc_fourcc_t i_format = VLC_FOURCC('p','n','g',' ');
-        if( psz_format && image_Ext2Fourcc( psz_format ) )
-            i_format = image_Ext2Fourcc( psz_format );
+        if( psz_format && image_Type2Fourcc( psz_format ) )
+            i_format = image_Type2Fourcc( psz_format );
 
         const int i_override_width  = var_GetInteger( p_vout, "snapshot-width" );
         const int i_override_height = var_GetInteger( p_vout, "snapshot-height" );
