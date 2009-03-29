@@ -55,7 +55,7 @@ vlc_module_begin ()
             N_("Chapter codecs"),
             N_("Use chapter codecs found in the segment."), true );
 
-    add_bool( "mkv-preload-local-dir", 1, NULL,
+    add_bool( "mkv-preload-local-dir", 0, NULL,
             N_("Preload Directory"),
             N_("Preload matroska files from the same family in the same directory (not good for broken files)."), true );
 
