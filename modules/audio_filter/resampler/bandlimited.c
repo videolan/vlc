@@ -570,8 +570,10 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
                   p_filter->fmt_out.audio.i_bitspersample / 8;
 
-    i_out_size = i_bytes_per_frame * ( 1 + (p_block->i_samples *
-        p_filter->fmt_out.audio.i_rate / p_filter->fmt_in.audio.i_rate));
+    i_out_size = i_bytes_per_frame * ( 1 + ( p_block->i_samples *
+                                             p_filter->fmt_out.audio.i_rate /
+                                             p_filter->fmt_in.audio.i_rate) ) +
+                 p_filter->p_sys->i_buf_size;
 
     p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
     if( !p_out )
