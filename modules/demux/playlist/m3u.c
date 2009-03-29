@@ -60,8 +60,6 @@ int Import_M3U( vlc_object_t *p_this )
 
     if(! ( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
            demux_IsPathExtension( p_demux, ".m3u" ) || demux_IsPathExtension( p_demux, ".vlc" ) ||
-           /* A .ram file can contain a single rtsp link */
-           demux_IsPathExtension( p_demux, ".ram" ) || demux_IsPathExtension( p_demux, ".rm" ) ||
            demux_IsForced( p_demux,  "m3u" ) || ContainsURL( p_demux ) ) )
         return VLC_EGENERIC;
 
