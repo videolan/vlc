@@ -78,7 +78,8 @@ int Import_RAM( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
     CHECK_PEEK( p_peek, 8 );
-    if(! demux_IsPathExtension( p_demux, ".ram" ) )
+    if(! demux_IsPathExtension( p_demux, ".ram" ) ||
+         demux_IsPathExtension( p_demux, ".rm" ) )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid RAM playlist" );
