@@ -89,7 +89,7 @@ void RecentsMRL::clear()
     if ( stack->isEmpty() )
         return;
     stack->clear();
-    if( !isActive ) QVLCMenu::updateRecents( p_intf );
+    if( isActive ) QVLCMenu::updateRecents( p_intf );
     save();
 }
 
