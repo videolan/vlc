@@ -194,7 +194,9 @@ static int SendToMSN( const char *psz_msg )
 
     wchar_t buffer[MSN_MAX_LENGTH];
 
-    mbstowcs( buffer, psz_msg, MSN_MAX_LENGTH );
+    //mbstowcs( buffer, psz_msg, MSN_MAX_LENGTH );
+    int nLen = MultiByteToWideChar(CP_ACP, 0, psz_msg, -1, NULL, NULL);
+    MultiByteToWideChar(CP_ACP, 0, psz_msg, -1, &buffer, nLen);
 
     msndata.dwData = 0x547;
     msndata.lpData = &buffer;
