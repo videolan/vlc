@@ -1739,7 +1739,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     enum v4l2_buf_type buf_type;
     const char *psz_device = p_sys->psz_device;
     es_format_t es_fmt;
-    int libv4l2_fd;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
@@ -1756,13 +1755,11 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
        device is not a v4l2 device. */
     if( p_sys->b_libv4l2 )
     {
+        int libv4l2_fd;
         libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
         if( libv4l2_fd != -1 )
             i_fd = libv4l2_fd;
     }
-    else
-#else
-    libv4l2_fd = i_fd;
 #endif
 
     /* Tune the tuner */
@@ -2195,7 +2192,6 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     int i_standard;
 
     int i_fd;
-    int libv4l2_fd;
 
     if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
     {
@@ -2212,13 +2208,11 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
        device is not a v4l2 device. */
     if( p_sys->b_libv4l2 )
     {
+        int libv4l2_fd;
         libv4l2_fd = v4l2_fd_open( i_fd, V4L2_ENABLE_ENUM_FMT_EMULATION );
         if( libv4l2_fd != -1 )
             i_fd = libv4l2_fd;
     }
-    else
-#else
-    libv4l2_fd = i_fd;
 #endif
 
     /* Get device capabilites */
