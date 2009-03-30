@@ -456,7 +456,7 @@ static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
     }
 
     *pi_size = i_bytes;
-    return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
