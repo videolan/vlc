@@ -1078,6 +1078,10 @@ static const struct
     { VLC_FOURCC('m','l','p',' '), CODEC_ID_MLP,
       AUDIO_ES, "MLP/TrueHD Audio" },
 #endif
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 22, 0 )
+    { VLC_FOURCC('t','r','h','d'), CODEC_ID_TRUEHD,
+      AUDIO_ES, "TrueHD Audio" },
+#endif
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 6, 0 )
     { VLC_FOURCC('Q','c','l','p'), CODEC_ID_QCELP,
       AUDIO_ES, "QCELP Audio" },
