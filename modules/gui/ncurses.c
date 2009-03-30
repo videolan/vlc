@@ -384,7 +384,6 @@ static void Run( intf_thread_t *p_intf )
     PlaylistRebuild( p_intf );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
     var_AddCallback( p_playlist, "playlist-item-append", PlaylistChanged, p_intf );
-    var_AddCallback( p_playlist, "item-change", PlaylistChanged, p_intf );
 
     while( vlc_object_alive( p_intf ) )
     {
@@ -441,7 +440,6 @@ static void Run( intf_thread_t *p_intf )
     }
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, p_intf );
     var_DelCallback( p_playlist, "playlist-item-append", PlaylistChanged, p_intf );
-    var_DelCallback( p_playlist, "item-change", PlaylistChanged, p_intf );
     vlc_restorecancel( canc );
 }
 
@@ -2010,7 +2008,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             SHOW_ACS( 1, ACS_VLINE ); l++;
             MainBoxWrite( p_intf, l, 1, _("| demux bitrate    :   %6.0f kb/s"),
                     (float)(p_item->p_stats->f_demux_bitrate)*8000 );
-            SHOW_ACS( 1, ACS_VLINE ); l++; SHOW_ACS( 1, ACS_VLINE ); l++;
+            SHOW_ACS( 1, ACS_VLINE ); l++;
+            DrawEmptyLine( p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2 );
+            SHOW_ACS( 1, ACS_VLINE ); l++;
 
             /* Video */
             if( i_video )
@@ -2027,7 +2027,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 SHOW_ACS( 1, ACS_VLINE ); l++;
                 MainBoxWrite( p_intf, l, 1, _("| frames lost      :    %5i"),
                         p_item->p_stats->i_lost_pictures );
-                SHOW_ACS( 1, ACS_VLINE ); l++; SHOW_ACS( 1, ACS_VLINE ); l++;
+                SHOW_ACS( 1, ACS_VLINE ); l++;
+                DrawEmptyLine( p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2 );
+                SHOW_ACS( 1, ACS_VLINE ); l++;
             }
             /* Audio*/
             if( i_audio )
@@ -2044,7 +2046,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 SHOW_ACS( 1, ACS_VLINE ); l++;
                 MainBoxWrite( p_intf, l, 1, _("| buffers lost     :    %5i"),
                         p_item->p_stats->i_lost_abuffers );
-                SHOW_ACS( 1, ACS_VLINE ); l++; SHOW_ACS( 1, ACS_VLINE ); l++;
+                SHOW_ACS( 1, ACS_VLINE ); l++;
+                DrawEmptyLine( p_sys->w, p_sys->i_box_y + l - p_sys->i_box_start, 1, COLS - 2 );
+                SHOW_ACS( 1, ACS_VLINE ); l++;
             }
             /* Sout */
             if( p_sys->b_color ) wcolor_set( p_sys->w, C_CATEGORY, NULL );
@@ -2155,6 +2159,9 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                         PlaylistIsPlaying( p_playlist, p_item ) ) )
                 c = '>';
             PL_UNLOCK;
+
+            if( p_input2 )
+                vlc_object_release( p_input2 );
 
             if( y >= y_end ) break;
             if( b_selected )
@@ -2540,7 +2547,12 @@ static void ReadDir( intf_thread_t *p_intf )
                 continue;
             }
 
-            asprintf( &psz_uri, "%s/%s", p_sys->psz_current_dir, psz_entry );
+            if( asprintf( &psz_uri, "%s/%s", p_sys->psz_current_dir,
+                        psz_entry ) == -1)
+            {
+                free( psz_entry );
+                continue;
+            }
 
             if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
             {
