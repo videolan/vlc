@@ -114,11 +114,15 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
 int playlist_MLLoad( playlist_t *p_playlist )
 {
-    char *psz_datadir = config_GetUserDataDir();
+    char *psz_datadir;
     char *psz_uri = NULL;
     input_item_t *p_input;
 
-    if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
+    if( !config_GetInt( p_playlist, "media-library") )
+        return VLC_SUCCESS;
+
+    psz_datadir = config_GetUserDataDir();
+
     if( !psz_datadir ) /* XXX: This should never happen */
     {
         msg_Err( p_playlist, "no data directory, cannot load media library") ;
@@ -195,8 +199,13 @@ error:
 
 int playlist_MLDump( playlist_t *p_playlist )
 {
-    char *psz_datadir = config_GetUserDataDir();
-    if( !config_GetInt( p_playlist, "media-library") ) return VLC_SUCCESS;
+    char *psz_datadir;
+
+    if( !config_GetInt( p_playlist, "media-library") )
+        return VLC_SUCCESS;
+
+    psz_datadir = config_GetUserDataDir();
+
     if( !psz_datadir ) /* XXX: This should never happen */
     {
         msg_Err( p_playlist, "no data directory, cannot save media library") ;
