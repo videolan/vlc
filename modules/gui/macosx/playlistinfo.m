@@ -252,7 +252,9 @@ static VLCInfo *_o_sharedInstance = nil;
         if( !input_item_IsPreparsed( p_item ) )
         {
             playlist_t * p_playlist = pl_Hold( VLCIntf );
+            PL_LOCK;
             playlist_PreparseEnqueue( p_playlist, p_item, pl_Locked );
+            PL_UNLOCK;
             pl_Release( VLCIntf );
         }
 
