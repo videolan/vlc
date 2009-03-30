@@ -15929,7 +15929,7 @@ msgstr "     x           Afficher/Cacher les objets"
 
 #: modules/gui/ncurses.c:1623
 msgid "     S           Show/Hide statistics box"
-msgstr "     P           Afficher/Cacher les statistiques"
+msgstr "     S           Afficher/Cacher les statistiques"
 
 #: modules/gui/ncurses.c:1624
 msgid "     c           Switch color on/off"
@@ -16121,7 +16121,7 @@ msgstr "Statistiques"
 #: modules/gui/ncurses.c:2059
 #, c-format
 msgid "\\ sending bitrate  :   %6.0f kb/s"
-msgstr ""
+msgstr "\\ débit émission       : %6.0f kO/s"
 
 #: modules/gui/ncurses.c:2092
 msgid " Playlist (All, one level) "
