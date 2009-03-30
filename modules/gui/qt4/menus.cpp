@@ -1393,7 +1393,15 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
         RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
         QList<QString> l = rmrl->recents();
 
+#if QT_VERSION == 0x040500
+        //Workaround for Qt bug #176201
+        QList<QAction*> actions = recentsMenu->actions();
+        for(int i = 0; i < actions.size(); ++i)
+            actions.at(i)->deleteLater();
+#else
         recentsMenu->clear();
+#endif
+
         if( !l.size() )
         {
             action = recentsMenu->addAction( qtr(" - Empty - ") );
