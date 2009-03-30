@@ -194,9 +194,12 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_net_udp_cancel_btn setTitle: _NS("Cancel")];
     [o_net_udp_ok_btn setTitle: _NS("Open")];
     [o_net_openUDP_btn setTitle: _NS("Open RTP/UDP Stream")];
+    [o_net_udp_mode_lbl setStringValue: _NS("Mode")];
+    [o_net_udp_protocol_lbl setStringValue: _NS("Protocol")];
+    [o_net_udp_address_lbl setStringValue: _NS("Address")];
 
-    [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
-    [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
+    [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("Unicast")];
+    [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("Multicast")];
 
     [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
     [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
@@ -759,13 +762,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (IBAction)openNetModeChanged:(id)sender
 {
-    if( [[sender selectedCell] tag] == 0 )
-        [o_panel makeFirstResponder: o_net_udp_port];
-    else if ( [[sender selectedCell] tag] == 1 )
-        [o_panel makeFirstResponder: o_net_udpm_addr];
-    else
-        msg_Warn( p_intf, "Unknown sender tried to change UDP/RTP mode" );
-
+    if( sender == o_net_mode )
+    {
+        if( [[sender selectedCell] tag] == 0 )
+            [o_panel makeFirstResponder: o_net_udp_port];
+        else if ( [[sender selectedCell] tag] == 1 )
+            [o_panel makeFirstResponder: o_net_udpm_addr];
+        else
+            msg_Warn( p_intf, "Unknown sender tried to change UDP/RTP mode" );
+    }
 
     [self openNetInfoChanged: nil];
 }
@@ -801,11 +806,14 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSString *o_mode;
         o_mode = [[o_net_mode selectedCell] title];
 
-        if( [o_mode isEqualToString: _NS("UDP/RTP")] )
+        if( [o_mode isEqualToString: _NS("Unicast")] )
         {
             int i_port = [o_net_udp_port intValue];
 
-            o_mrl_string = [NSString stringWithString: @"udp://"];
+            if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
+                o_mrl_string = [NSString stringWithString: @"udp://"];
+            else
+                o_mrl_string = [NSString stringWithString: @"rtp://"];
 
             if( i_port != config_GetInt( p_intf, "server-port" ) )
             {
@@ -813,12 +821,15 @@ static VLCOpen *_o_sharedMainInstance = nil;
                     [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
             }
         }
-        else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] )
+        else if( [o_mode isEqualToString: _NS("Multicast")] )
         {
             NSString *o_addr = [o_net_udpm_addr stringValue];
             int i_port = [o_net_udpm_port intValue];
 
-            o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
+            if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
+                o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
+            else
+                o_mrl_string = [NSString stringWithFormat: @"rtp://@%@", o_addr];
 
             if( i_port != config_GetInt( p_intf, "server-port" ) )
             {
@@ -849,6 +860,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
             modalDelegate: self
            didEndSelector: NULL
               contextInfo: nil];
+        [self openNetInfoChanged: nil];
     }
     else if( sender == o_net_udp_cancel_btn )
     {
@@ -858,25 +870,31 @@ static VLCOpen *_o_sharedMainInstance = nil;
     else if( sender == o_net_udp_ok_btn )
     {
         NSString *o_mrl_string = [NSString string];
-        if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("UDP/RTP")] )
+        if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("Unicast")] )
         {
             int i_port = [o_net_udp_port intValue];
             
-            o_mrl_string = [NSString stringWithString: @"udp://"];
-            
+            if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
+                o_mrl_string = [NSString stringWithString: @"udp://"];
+            else
+                o_mrl_string = [NSString stringWithString: @"rtp://"];
+
             if( i_port != config_GetInt( p_intf, "server-port" ) )
             {
                 o_mrl_string =
                 [o_mrl_string stringByAppendingFormat: @"@:%i", i_port];
             }
         }
-        else if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("UDP/RTP Multicast")] )
+        else if( [[[o_net_mode selectedCell] title] isEqualToString: _NS("Multicast")] )
         {
             NSString *o_addr = [o_net_udpm_addr stringValue];
             int i_port = [o_net_udpm_port intValue];
             
-            o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
-            
+            if( [[o_net_udp_protocol_mat selectedCell] tag] == 0 )
+                o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr];
+            else
+                o_mrl_string = [NSString stringWithFormat: @"rtp://@%@", o_addr];
+
             if( i_port != config_GetInt( p_intf, "server-port" ) )
             {
                 o_mrl_string =

@@ -113,12 +113,16 @@
                 "o_net_http_url_lbl" = id;
                 "o_net_mode" = id;
                 "o_net_openUDP_btn" = id;
+                "o_net_udp_address_lbl" = id;
                 "o_net_udp_cancel_btn" = id;
+                "o_net_udp_mode_lbl" = id;
                 "o_net_udp_ok_btn" = id;
                 "o_net_udp_panel" = id;
                 "o_net_udp_port" = id;
                 "o_net_udp_port_lbl" = id;
                 "o_net_udp_port_stp" = id;
+                "o_net_udp_protocol_lbl" = id;
+                "o_net_udp_protocol_mat" = id;
                 "o_net_udpm_addr" = id;
                 "o_net_udpm_addr_lbl" = id;
                 "o_net_udpm_port" = id;

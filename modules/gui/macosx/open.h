@@ -67,10 +67,16 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_disc_dvd_menus;
 
     /* open network */
-    IBOutlet id o_net_help_lbl;
-    IBOutlet id o_net_help_udp_lbl;
     IBOutlet id o_net_http_url;
     IBOutlet id o_net_http_url_lbl;
+    IBOutlet id o_net_help_lbl;
+
+    /* open UDP stuff panel */
+    IBOutlet id o_net_help_udp_lbl;
+    IBOutlet id o_net_udp_protocol_mat;
+    IBOutlet id o_net_udp_protocol_lbl;
+    IBOutlet id o_net_udp_address_lbl;
+    IBOutlet id o_net_udp_mode_lbl;
     IBOutlet id o_net_mode;
     IBOutlet id o_net_openUDP_btn;
     IBOutlet id o_net_udp_cancel_btn;
