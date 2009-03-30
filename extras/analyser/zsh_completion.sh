@@ -38,6 +38,13 @@ function find_libvlc {
     return 1
 }
 
+function find_libvlccore {
+    for i in $BUILDDIR/src/.libs/libvlccore.$SUFFIX $BUILDDIR/src/libvlccore.$SUFFIX; do
+        test -e $i && LIBVLCCORE=$i && return 0
+    done
+    return 1
+}
+
 while test -z "$LIBVLC"; do
     if ! find_libvlc; then
         /bin/echo -n "Please enter the directory where you built vlc: "
@@ -46,6 +53,10 @@ while test -z "$LIBVLC"; do
 done
 
 echo "libvlc found !"
+
+if ! find_libvlccore; then
+    /bin/echo -n "libvlccore not found ! Linking will fail !"
+fi
 
 LD_LIBRARY_PATH=$BUILDDIR/src/.libs
 
@@ -58,7 +69,7 @@ if test -z "$CXX"; then
     CXX=g++
 fi
 
-ZSH_BUILD="$CXX $CPPFLAGS $CXXFLAGS -D__LIBVLC__ -DHAVE_CONFIG_H -I$BUILDDIR -I$BUILDDIR/include -I../../include zsh.cpp $LIBVLC -o zsh_gen"
+ZSH_BUILD="$CXX $CPPFLAGS $CXXFLAGS -D__LIBVLC__ -DHAVE_CONFIG_H -I$BUILDDIR -I$BUILDDIR/include -I../../include zsh.cpp $LIBVLC $LIBVLCCORE -o zsh_gen"
 
 echo "Building zsh completion generator ...  "
 echo $ZSH_BUILD
