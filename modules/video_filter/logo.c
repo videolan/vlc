@@ -909,34 +909,33 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     logo_list_t *p_logo_list = p_sys->p_logo_list;
 
-    if( !strncmp( psz_var, "logo-file", 6 ) )
+    if( !strcmp( psz_var, "logo-file" ) )
     {
         vlc_mutex_lock( &p_logo_list->lock );
         FreeLogoList( p_logo_list );
         p_logo_list->psz_filename = strdup( newval.psz_string );
         LoadLogoList( p_this, p_logo_list );
         vlc_mutex_unlock( &p_logo_list->lock );
-        p_sys->b_need_update = true;
     }
-    else if ( !strncmp( psz_var, "logo-x", 6 ) )
+    else if ( !strcmp( psz_var, "logo-x" ) )
     {
         p_sys->posx = newval.i_int;
     }
-    else if ( !strncmp( psz_var, "logo-y", 6 ) )
+    else if ( !strncmp( psz_var, "logo-y" ) )
     {
         p_sys->posy = newval.i_int;
     }
-    else if ( !strncmp( psz_var, "logo-position", 12 ) )
+    else if ( !strcmp( psz_var, "logo-position" ) )
     {
         p_sys->pos = newval.i_int;
     }
-    else if ( !strncmp( psz_var, "logo-transparency", 9 ) )
+    else if ( !strcmp( psz_var, "logo-transparency" ) )
     {
         vlc_mutex_lock( &p_logo_list->lock );
         p_logo_list->i_alpha = __MAX( __MIN( newval.i_int, 255 ), 0 );
         vlc_mutex_unlock( &p_logo_list->lock );
     }
-    else if ( !strncmp( psz_var, "logo-repeat", 11 ) )
+    else if ( !strcmp( psz_var, "logo-repeat" ) )
     {
         vlc_mutex_lock( &p_logo_list->lock );
         p_logo_list->i_repeat = newval.i_int;
