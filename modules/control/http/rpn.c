@@ -365,7 +365,8 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             SSPush( st, value );
             free( value );
         }
-        else if( !strcmp( s, "xml_encode" ) )
+        else if( !strcmp( s, "xml_encode" )
+              || !strcmp( s, "htmlspecialchars" ) )
         {
             char *url = SSPop( st );
             char *value = convert_xml_special_chars( url );
@@ -413,17 +414,6 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
                 *p++ = *str++;
             }
             *p = '\0';
-
-            SSPush( st, psz_dest );
-            free( psz_src );
-            free( psz_dest );
-        }
-        else if( !strcmp( s, "htmlspecialchars" ) )
-        {
-            char *psz_src = SSPop( st );
-            char *psz_dest;
-
-            psz_dest = convert_xml_special_chars( psz_src );
 
             SSPush( st, psz_dest );
             free( psz_src );
