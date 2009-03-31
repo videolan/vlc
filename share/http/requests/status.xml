@@ -117,9 +117,9 @@
   <repeat><vlc id="value" param1="'repeat' 'VLC_OBJECT_PLAYLIST' vlc_var_get" /></repeat>
   <information>
     <vlc id="foreach" param1="inf" param2="information" />
-      <category name="<vlc id="value" param1="inf.name xml_encode" />">
+      <category name="<vlc id="value" param1="inf.name value xml_encode" />">
         <vlc id="foreach" param1="subinf" param2="inf.info" />
-          <info name="<vlc id="value" param1="subinf.name xml_encode" />"><vlc id="value" param1="subinf.value xml_encode" /></info>
+          <info name="<vlc id="value" param1="subinf.name value xml_encode" />"><vlc id="value" param1="subinf.value value xml_encode" /></info>
         <vlc id="end" />
       </category>
     <vlc id="end" />
