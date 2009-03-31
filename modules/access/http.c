@@ -583,6 +583,18 @@ error:
     free( p_sys->psz_user_agent );
 
     Disconnect( p_access );
+
+    if( p_sys->cookies )
+    {
+        int i;
+        for( i = 0; i < vlc_array_count( p_sys->cookies ); i++ )
+            free(vlc_array_item_at_index( p_sys->cookies, i ));
+        vlc_array_destroy( p_sys->cookies );
+    }
+
+#ifdef HAVE_ZLIB_H
+    inflateEnd( &p_sys->inflate.stream );
+#endif
     free( p_sys );
     return VLC_EGENERIC;
 }
