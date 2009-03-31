@@ -142,27 +142,27 @@ OpenDialog::OpenDialog( QWidget *parent,
     /* Force MRL update on tab change */
     CONNECT( ui.Tab, currentChanged( int ), this, signalCurrent( int ) );
 
-    CONNECT( fileOpenPanel, mrlUpdated( QStringList, QString ),
+    CONNECT( fileOpenPanel, mrlUpdated( const QStringList&, const QString& ),
              this, updateMRL( const QStringList&, const QString& ) );
-    CONNECT( netOpenPanel, mrlUpdated( QStringList, QString ),
+    CONNECT( netOpenPanel, mrlUpdated( const QStringList&, const QString& ),
              this, updateMRL( const QStringList&, const QString& ) );
-    CONNECT( discOpenPanel, mrlUpdated( QStringList, QString ),
+    CONNECT( discOpenPanel, mrlUpdated( const QStringList&, const QString& ),
              this, updateMRL( const QStringList&, const QString& ) );
-    CONNECT( captureOpenPanel, mrlUpdated( QStringList, QString ),
+    CONNECT( captureOpenPanel, mrlUpdated( const QStringList&, const QString& ),
              this, updateMRL( const QStringList&, const QString& ) );
 
-    CONNECT( fileOpenPanel, methodChanged( QString ),
+    CONNECT( fileOpenPanel, methodChanged( const QString& ),
              this, newCachingMethod( const QString& ) );
-    CONNECT( netOpenPanel, methodChanged( QString ),
+    CONNECT( netOpenPanel, methodChanged( const QString& ),
              this, newCachingMethod( const QString& ) );
-    CONNECT( discOpenPanel, methodChanged( QString ),
+    CONNECT( discOpenPanel, methodChanged( const QString& ),
              this, newCachingMethod( const QString& ) );
-    CONNECT( captureOpenPanel, methodChanged( QString ),
+    CONNECT( captureOpenPanel, methodChanged( const QString& ),
              this, newCachingMethod( const QString& ) );
 
     /* Advanced frame Connects */
     CONNECT( ui.slaveCheckbox, toggled( bool ), this, updateMRL() );
-    CONNECT( ui.slaveText, textChanged( QString ), this, updateMRL() );
+    CONNECT( ui.slaveText, textChanged( const QString& ), this, updateMRL() );
     CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.startTimeSpinBox, valueChanged( int ), this, updateMRL() );
     BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );

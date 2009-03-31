@@ -91,8 +91,8 @@ protected:
 public slots:
     virtual void updateMRL() = 0;
 signals:
-    void mrlUpdated( QStringList, QString );
-    void methodChanged( QString method );
+    void mrlUpdated( const QStringList&, const QString& );
+    void methodChanged( const QString& method );
 };
 
 class FileOpenBox: public QFileDialog

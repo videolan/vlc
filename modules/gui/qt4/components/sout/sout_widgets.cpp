@@ -76,7 +76,7 @@ void SoutInputBox::setMRL( const QString& mrl )
     sourceValueLabel->setText( type );
 }
 
- #define CT( x ) connect( x, SIGNAL( textChanged( const QString ) ), this, SIGNAL( mrlUpdated() ) );
+ #define CT( x ) connect( x, SIGNAL( textChanged( const QString& ) ), this, SIGNAL( mrlUpdated() ) );
  #define CS( x ) connect( x, SIGNAL( valueChanged( int ) ), this, SIGNAL( mrlUpdated() ) );
 
 /* FileDest Box */

@@ -125,8 +125,8 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QFrame( parent )
     searchLine->setFrame( false );
     searchLine->setMinimumWidth( 80 );
 
-    CONNECT( searchLine, textChanged( const QString ),
-             this, updateText( const QString ) );
+    CONNECT( searchLine, textChanged( const QString& ),
+             this, updateText( const QString& ) );
     frameLayout->addWidget( searchLine );
 
     clearButton = new QToolButton;
@@ -140,7 +140,7 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QFrame( parent )
     frameLayout->addWidget( clearButton );
 }
 
-void SearchLineEdit::updateText( const QString text )
+void SearchLineEdit::updateText( const QString& text )
 {
     clearButton->setVisible( !text.isEmpty() );
     emit textChanged( text );

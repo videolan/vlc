@@ -162,7 +162,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     SearchLineEdit *search = new SearchLineEdit( this );
     buttons->addWidget( search );
     filter->setBuddy( search );
-    CONNECT( search, textChanged( QString ), this, search( QString ) );
+    CONNECT( search, textChanged( const QString& ), this, search( const QString& ) );
 
     /* Finish the layout */
     layout->addWidget( view );
@@ -278,7 +278,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 }
 
 /* Search in the playlist */
-void StandardPLPanel::search( QString searchText )
+void StandardPLPanel::search( const QString& searchText )
 {
     model->search( searchText );
 }

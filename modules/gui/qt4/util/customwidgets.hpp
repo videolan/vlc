@@ -68,10 +68,10 @@ private:
     QToolButton   *clearButton;
 
 private slots:
-    void updateText( const QString );
+    void updateText( const QString& );
 
 signals:
-    void textChanged( const QString );
+    void textChanged( const QString& );
 };
 
 /*****************************************************************

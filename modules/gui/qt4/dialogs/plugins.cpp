@@ -76,7 +76,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
     layout->addWidget( label, 1, 0 );
     layout->addWidget( edit, 1, 1, 1, -1 );
-    CONNECT( edit, textChanged( QString ),
+    CONNECT( edit, textChanged( const QString& ),
             this, search( const QString& ) );
 
     QDialogButtonBox *box = new QDialogButtonBox;

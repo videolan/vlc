@@ -133,10 +133,10 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( brightnessThresholdCheck, stateChanged( int ) )
 
     SETUP_VFILTER( extract )
-    SETUP_VFILTER_OPTION( extractComponentText, textChanged( QString ) )
+    SETUP_VFILTER_OPTION( extractComponentText, textChanged( const QString& ) )
 
     SETUP_VFILTER( colorthres )
-    SETUP_VFILTER_OPTION( colorthresColorText, textChanged( QString ) )
+    SETUP_VFILTER_OPTION( colorthresColorText, textChanged( const QString& ) )
     SETUP_VFILTER_OPTION( colorthresSaturationthresSlider, valueChanged( int ) )
     SETUP_VFILTER_OPTION( colorthresSimilaritythresSlider, valueChanged( int ) )
 
@@ -196,7 +196,7 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( eraseXSpin, valueChanged( int ) )
 
     SETUP_VFILTER( marq )
-    SETUP_VFILTER_OPTION( marqMarqueeText, textChanged( QString ) )
+    SETUP_VFILTER_OPTION( marqMarqueeText, textChanged( const QString& ) )
     SETUP_VFILTER_OPTION( marqPositionCombo, currentIndexChanged( QString ) )
 
     SETUP_VFILTER( logo )

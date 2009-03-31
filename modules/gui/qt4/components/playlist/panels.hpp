@@ -86,7 +86,7 @@ private slots:
     void toggleRepeat();
     void gotoPlayingItem();
     void doPopup( QModelIndex index, QPoint point );
-    void search( QString search );
+    void search( const QString& searchText );
     void setCurrentRootId( int );
     void popupAdd();
     void popupSelectColumn( QPoint );

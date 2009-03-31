@@ -99,7 +99,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
 
     CONNECT( ui.fileListWidg, itemChanged( QListWidgetItem * ), this, updateMRL() );
-    CONNECT( ui.subInput, textChanged( QString ), this, updateMRL() );
+    CONNECT( ui.subInput, textChanged( const QString& ), this, updateMRL() );
     CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
 }
@@ -151,7 +151,7 @@ inline void FileOpenPanel::BuildOldPanel()
     // Add the DialogBox to the layout
     ui.gridLayout->addWidget( dialogBox, 0, 0, 1, 3 );
 
-    CONNECT( lineFileEdit, textChanged( QString ), this, updateMRL() );
+    CONNECT( lineFileEdit, textChanged( const QString& ), this, updateMRL() );
     dialogBox->installEventFilter( this );
 }
 
@@ -474,7 +474,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.protocolCombo, activated( int ),
              this, updateProtocol( int ) );
     CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
-    CONNECT( ui.addressText, textChanged( QString ), this, updateMRL());
+    CONNECT( ui.addressText, textChanged( const QString& ), this, updateMRL());
 
     ui.protocolCombo->addItem( "" );
     ui.protocolCombo->addItem("HTTP", QVariant("http"));
@@ -700,7 +700,7 @@ void CaptureOpenPanel::initialize()
     /* dshow CONNECTs */
     CuMRL( vdevDshowW->combo, currentIndexChanged ( int ) );
     CuMRL( adevDshowW->combo, currentIndexChanged ( int ) );
-    CuMRL( dshowVSizeLine, textChanged( QString ) );
+    CuMRL( dshowVSizeLine, textChanged( const QString& ) );
     }
 
     /**************
@@ -802,8 +802,8 @@ void CaptureOpenPanel::initialize()
             1, 0, 3, 1 );
 
     /* v4l2 CONNECTs */
-    CuMRL( v4l2VideoDevice, textChanged( QString ) );
-    CuMRL( v4l2AudioDevice, textChanged( QString ) );
+    CuMRL( v4l2VideoDevice, textChanged( const QString& ) );
+    CuMRL( v4l2AudioDevice, textChanged( const QString& ) );
     CuMRL( v4l2StdBox,  currentIndexChanged ( int ) );
     }
 
@@ -846,8 +846,8 @@ void CaptureOpenPanel::initialize()
             2, 0, 2, 1 );
 
     /* v4l CONNECTs */
-    CuMRL( v4lVideoDevice, textChanged( QString ) );
-    CuMRL( v4lAudioDevice, textChanged( QString ) );
+    CuMRL( v4lVideoDevice, textChanged( const QString& ) );
+    CuMRL( v4lAudioDevice, textChanged( const QString& ) );
     CuMRL( v4lFreq, valueChanged ( int ) );
     CuMRL( v4lNormBox,  currentIndexChanged ( int ) );
     }
@@ -903,7 +903,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( jackCaching, valueChanged( int ) );
     CuMRL( jackPace, stateChanged( int ) );
     CuMRL( jackConnect, stateChanged( int ) );
-    CuMRL( jackPortsSelected, textChanged( QString ) );
+    CuMRL( jackPortsSelected, textChanged( const QString& ) );
     }
 
     /************
@@ -954,8 +954,8 @@ void CaptureOpenPanel::initialize()
             3, 0, 1, 1 );
 
     /* PVR CONNECTs */
-    CuMRL( pvrDevice, textChanged( QString ) );
-    CuMRL( pvrRadioDevice, textChanged( QString ) );
+    CuMRL( pvrDevice, textChanged( const QString& ) );
+    CuMRL( pvrRadioDevice, textChanged( const QString& ) );
 
     CuMRL( pvrFreq, valueChanged ( int ) );
     CuMRL( pvrBitr, valueChanged ( int ) );
