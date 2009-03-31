@@ -202,24 +202,32 @@ static int Open( vlc_object_t * p_this )
                 if( i_channel_mask & pi_channels_src[i] )
                     p_sys->i_channel_mask |= pi_channels_in[i];
             }
+        }
+    }
+    else if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_PCM &&
+             p_sys->fmt.audio.i_channels > 2 && p_sys->fmt.audio.i_channels <= 9 )
+    {
+        for( int i = 0; i < p_sys->fmt.audio.i_channels; i++ )
+            p_sys->i_channel_mask |= pi_channels_in[i];
+    }
 
-            if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
-                p_sys->fmt.i_codec == VLC_FOURCC('p','c','m',' ') ||
-                p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
-
+    if( p_sys->i_channel_mask )
+    {
+        if( p_sys->fmt.i_codec == VLC_FOURCC('a','r','a','w') ||
+            p_sys->fmt.i_codec == VLC_FOURCC('p','c','m',' ') ||
+            p_sys->fmt.i_codec == VLC_FOURCC('a','f','l','t') )
             p_sys->b_chan_reorder =
                 aout_CheckChannelReorder( pi_channels_in, NULL,
                                           p_sys->i_channel_mask,
                                           p_sys->fmt.audio.i_channels,
                                           p_sys->pi_chan_table );
 
-            msg_Dbg( p_demux, "channel mask: %x, reordering: %i",
-                     p_sys->i_channel_mask, (int)p_sys->b_chan_reorder );
-        }
-        p_sys->fmt.audio.i_physical_channels =
-            p_sys->fmt.audio.i_original_channels =
-                p_sys->i_channel_mask;
+        msg_Dbg( p_demux, "channel mask: %x, reordering: %i",
+                 p_sys->i_channel_mask, (int)p_sys->b_chan_reorder );
     }
+
+    p_sys->fmt.audio.i_physical_channels =
+    p_sys->fmt.audio.i_original_channels = p_sys->i_channel_mask;
 
     if( p_sys->fmt.i_extra > 0 )
     {
