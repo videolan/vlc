@@ -75,6 +75,11 @@ static char *ArtCacheGetSanitizedFileName( const char *psz )
     {
         if( dup[i] == DIR_SEP_CHAR )
             dup[i] = ' ';
+        // "<>:\"/?*" are forbidden for win filenames
+#if defined( WIN32 ) || defined( UNDER_CE )
+        else if( strchr( "<>:\"/?*", dup[i] ) )
+            dup[i] = '_';
+#endif
     }
     return dup;
 }
