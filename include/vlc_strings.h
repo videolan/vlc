@@ -50,7 +50,7 @@ VLC_EXPORT( char *, __str_format_meta, ( vlc_object_t *, const char * ) );
 #define str_format( a, b ) __str_format( VLC_OBJECT( a ), b )
 VLC_EXPORT( char *, __str_format, ( vlc_object_t *, const char * ) );
 
-VLC_EXPORT( void, filename_sanitize, ( char * ) );
+VLC_EXPORT( char *, filename_sanitize, ( const char * ) );
 VLC_EXPORT( void, path_sanitize, ( char * ) );
 
 /**

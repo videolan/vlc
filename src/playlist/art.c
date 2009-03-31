@@ -61,29 +61,6 @@ static void ArtCacheCreateDir( const char *psz_dir )
     utf8_mkdir( psz_dir, 0700 );
 }
 
-static char *ArtCacheGetSanitizedFileName( const char *psz )
-{
-    char *dup = strdup(psz);
-    int i;
-
-    filename_sanitize( dup );
-
-    /* Doesn't create a filename with invalid characters
-     * TODO: several filesystems forbid several characters: list them all
-     */
-    for( i = 0; dup[i] != '\0'; i++ )
-    {
-        if( dup[i] == DIR_SEP_CHAR )
-            dup[i] = ' ';
-        // "<>:\"/?*" are forbidden for win filenames
-#if defined( WIN32 ) || defined( UNDER_CE )
-        else if( strchr( "<>:\"/?*", dup[i] ) )
-            dup[i] = '_';
-#endif
-    }
-    return dup;
-}
-
 static void ArtCacheGetDirPath( char *psz_dir,
                                 const char *psz_title,
                                 const char *psz_artist, const char *psz_album )
@@ -92,8 +69,8 @@ static void ArtCacheGetDirPath( char *psz_dir,
 
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
-        char * psz_album_sanitized = ArtCacheGetSanitizedFileName( psz_album );
-        char * psz_artist_sanitized = ArtCacheGetSanitizedFileName( psz_artist );
+        char *psz_album_sanitized = filename_sanitize( psz_album );
+        char *psz_artist_sanitized = filename_sanitize( psz_artist );
         snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
                   "art" DIR_SEP "artistalbum" DIR_SEP "%s" DIR_SEP "%s",
                   psz_cachedir, psz_artist_sanitized, psz_album_sanitized );
@@ -102,7 +79,7 @@ static void ArtCacheGetDirPath( char *psz_dir,
     }
     else
     {
-        char * psz_title_sanitized = ArtCacheGetSanitizedFileName( psz_title );
+        char * psz_title_sanitized = filename_sanitize( psz_title );
         snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
                   "art" DIR_SEP "title" DIR_SEP "%s",
                   psz_cachedir, psz_title_sanitized );
@@ -153,9 +130,7 @@ static char *ArtCacheName( input_item_t *p_item, const char *psz_type )
 
     ArtCacheCreateDir( psz_path );
 
-    char *psz_ext = strdup( psz_type ? psz_type : "" );
-    filename_sanitize( psz_ext );
-
+    char *psz_ext = filename_sanitize( psz_type ? psz_type : "" );
     char *psz_filename;
     if( asprintf( &psz_filename, "file://%s" DIR_SEP "art%s", psz_path, psz_ext ) < 0 )
         psz_filename = NULL;

@@ -1020,8 +1020,10 @@ char *__str_format( vlc_object_t *p_this, const char *psz_src )
 /**
  * Remove forbidden characters from filenames (including slashes)
  */
-void filename_sanitize( char *str )
+char* filename_sanitize( const char *str_origin )
 {
+    char *str = strdup( str_origin );
+    char *str_base = str;
     if( *str == '.' && (str[1] == '\0' || (str[1] == '.' && str[2] == '\0' ) ) )
     {
         while( *str )
@@ -1029,7 +1031,7 @@ void filename_sanitize( char *str )
             *str = '_';
             str++;
         }
-        return;
+        return str_base;
     }
 
     while( *str )
@@ -1048,11 +1050,13 @@ void filename_sanitize( char *str )
             case '|':
             case '<':
             case '>':
+            case ' ':
 #endif
                 *str = '_';
         }
         str++;
     }
+    return str_base;
 }
 
 /**
