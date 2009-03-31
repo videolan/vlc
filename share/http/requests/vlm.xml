@@ -31,7 +31,7 @@
       <output><vlc id="value" param1="el.output" /></output>
       <inputs>
         <vlc id="foreach" param1="in" param2="el.inputs" />
-          <input><vlc id="value" param1="in value htmlspecialchars" /></input>
+          <input><vlc id="value" param1="in value xml_encode" /></input>
         <vlc id="end" />
       </inputs>
       <options>
@@ -51,7 +51,7 @@
         <output><vlc id="value" param1="el.output" /></output>
         <inputs>
           <vlc id="foreach" param1="in" param2="el.inputs" />
-            <input><vlc id="value" param1="in value htmlspecialchars" /></input>
+            <input><vlc id="value" param1="in value xml_encode" /></input>
           <vlc id="end" />
         </inputs>
         <options>
