@@ -1018,7 +1018,6 @@ httpd_host_t *httpd_TLSHostNew( vlc_object_t *p_this, const char *psz_hostname,
 
         ptrval.p_address = httpd;
         libvlc_priv (p_this->p_libvlc)->p_httpd = httpd;
-        vlc_object_hold( httpd );
         vlc_object_attach( httpd, p_this->p_libvlc );
     }
 
@@ -1127,7 +1126,6 @@ error:
     if( httpd->i_host <= 0 )
     {
         libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
-        vlc_object_release( httpd );
         vlc_object_detach( httpd );
         vlc_object_release( httpd );
     }
@@ -1199,7 +1197,6 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_mutex_destroy( &host->lock );
     vlc_object_release( host );
 
-    vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
         msg_Dbg( httpd, "no hosts left, stopping httpd" );
