@@ -921,7 +921,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     {
         p_sys->posx = newval.i_int;
     }
-    else if ( !strncmp( psz_var, "logo-y" ) )
+    else if ( !strcmp( psz_var, "logo-y" ) )
     {
         p_sys->posy = newval.i_int;
     }
