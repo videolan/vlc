@@ -51,7 +51,7 @@ class QVLCTools
          settings->setValue("geometry", widget->saveGeometry());
        }
        static void saveWidgetPosition( intf_thread_t *p_intf,
-                                       QString configName,
+                                       const QString& configName,
                                        QWidget *widget)
        {
          getSettings()->beginGroup( configName );
@@ -83,7 +83,7 @@ class QVLCTools
        }
 
        static bool restoreWidgetPosition( intf_thread_t *p_intf,
-                                           QString configName,
+                                           const QString& configName,
                                            QWidget *widget,
                                            QSize defSize = QSize( 0, 0 ),
                                            QPoint defPos = QPoint( 0, 0 ) )
@@ -131,14 +131,14 @@ public:
 protected:
     intf_thread_t *p_intf;
 
-    void readSettings( QString name,
+    void readSettings( const QString& name,
                        QSize defSize = QSize( 1, 1 ),
                        QPoint defPos = QPoint( 0, 0 ) )
     {
         QVLCTools::restoreWidgetPosition(p_intf, name, this, defSize, defPos);
     }
 
-    void writeSettings( QString name )
+    void writeSettings( const QString& name )
     {
         QVLCTools::saveWidgetPosition( p_intf, name, this);
     }
@@ -218,12 +218,12 @@ protected:
     intf_thread_t *p_intf;
     QSize mainSize;
 
-    void readSettings( QString name, QSize defSize )
+    void readSettings( const QString& name, QSize defSize )
     {
         QVLCTools::restoreWidgetPosition( p_intf, name, this, defSize);
     }
 
-    void readSettings( QString name )
+    void readSettings( const QString& name )
     {
         QVLCTools::restoreWidgetPosition( p_intf, name, this);
     }
@@ -237,7 +237,7 @@ protected:
         QVLCTools::restoreWidgetPosition(settings, this, defSize);
     }
 
-    void writeSettings(QString name )
+    void writeSettings( const QString& name )
     {
         QVLCTools::saveWidgetPosition( p_intf, name, this);
     }
