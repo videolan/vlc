@@ -1164,7 +1164,7 @@ void httpd_HostDelete( httpd_host_t *host )
     {
         /* still used */
         vlc_mutex_unlock( &httpd_mutex );
-        msg_Dbg( host, "httpd_HostDelete: host still used" );
+        msg_Dbg( host, "httpd_HostDelete: host still in use" );
         return;
     }
     TAB_REMOVE( httpd->i_host, httpd->host, host );
@@ -1202,12 +1202,11 @@ void httpd_HostDelete( httpd_host_t *host )
     vlc_object_release( httpd );
     if( httpd->i_host <= 0 )
     {
-        msg_Dbg( httpd, "no host left, stopping httpd" );
+        msg_Dbg( httpd, "no hosts left, stopping httpd" );
 
         libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
         vlc_object_detach( httpd );
         vlc_object_release( httpd );
-
     }
     vlc_mutex_unlock( &httpd_mutex );
 }
