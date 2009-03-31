@@ -106,8 +106,9 @@ enum vlm_event_type_e
 
 typedef struct
 {
-    int     i_type;     /* a vlm_event_type_e value */
-    int64_t id;         /* Media ID */
+    int         i_type;     /* a vlm_event_type_e value */
+    int64_t     id;         /* Media ID */
+    const char *psz_name;   /* Media name */
 } vlm_event_t;
 
 /** VLM control query */
