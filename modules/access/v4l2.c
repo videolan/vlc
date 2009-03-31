@@ -1940,7 +1940,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     fmt.fmt.pix.width = p_sys->i_width;
     fmt.fmt.pix.height = p_sys->i_height;
-    fmt.fmt.pix.field = V4L2_FIELD_INTERLACED;
+    fmt.fmt.pix.field = V4L2_FIELD_NONE;
 
     /* Test and set Chroma */
     fmt.fmt.pix.pixelformat = 0;
@@ -2007,6 +2007,45 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Reassign width, height and chroma incase driver override */
     p_sys->i_width = fmt.fmt.pix.width;
     p_sys->i_height = fmt.fmt.pix.height;
+
+    /* Check interlacing */
+    if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 ) {;}
+    switch( fmt.fmt.pix.field )
+    {
+        case V4L2_FIELD_NONE:
+            msg_Dbg( p_demux, "Interlacing setting: progressive" );
+            break;
+        case V4L2_FIELD_TOP:
+            msg_Dbg( p_demux, "Interlacing setting: top field only" );
+            break;
+        case V4L2_FIELD_BOTTOM:
+            msg_Dbg( p_demux, "Interlacing setting: bottom field only" );
+            break;
+        case V4L2_FIELD_INTERLACED:
+            msg_Dbg( p_demux, "Interlacing setting: interleaved (bottom top if M/NTSC, top bottom otherwise)" );
+            break;
+        case V4L2_FIELD_SEQ_TB:
+            msg_Dbg( p_demux, "Interlacing setting: sequential top bottom" );
+            break;
+        case V4L2_FIELD_SEQ_BT:
+            msg_Dbg( p_demux, "Interlacing setting: sequential bottom top" );
+            break;
+        case V4L2_FIELD_ALTERNATE:
+            msg_Dbg( p_demux, "Interlacing setting: alternate fields" );
+            break;
+        case V4L2_FIELD_INTERLACED_TB:
+            msg_Dbg( p_demux, "Interlacing setting: interleaved top bottom" );
+            break;
+        case V4L2_FIELD_INTERLACED_BT:
+            msg_Dbg( p_demux, "Interlacing setting: interleaved bottom top" );
+            break;
+        default:
+            msg_Warn( p_demux, "Interlacing setting: unknown type (%d)",
+                      fmt.fmt.pix.field );
+            break;
+    }
+    if( fmt.fmt.pix.field != V4L2_FIELD_NONE )
+        msg_Warn( p_demux, "Interlaced inputs haven't been tested. Please report any issue." );
 
     /* Look up final fourcc */
     p_sys->i_fourcc = 0;
