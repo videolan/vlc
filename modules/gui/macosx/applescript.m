@@ -1,7 +1,7 @@
 /*****************************************************************************
  * applescript.m: MacOS X AppleScript support
  *****************************************************************************
- * Copyright (C) 2002-2003, 2005, 2007-2008 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -69,7 +69,7 @@
                     noteNewRecentDocumentURL: o_url];
             }
         }
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
     }
     return nil;
 }
@@ -103,45 +103,37 @@
         if ( [o_command isEqualToString:@"play"] )
         {
             [o_controls play:self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"stop"] )
         {
             [o_controls stop:self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"previous"] )
         {
             [o_controls prev:self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"next"] )
         {
             [o_controls next:self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"fullscreen"] )
         {
             [o_controls toogleFullscreen: self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"mute"] )
         {
             [o_controls mute:self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"volumeUp"] )
         {
             [o_controls volumeUp:self];
-            return nil;
         }
         else if ( [o_command isEqualToString:@"volumeDown"] )
         {
             [o_controls volumeDown:self];
-            return nil;
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     return nil;
 }
 
