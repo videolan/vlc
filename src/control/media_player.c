@@ -859,14 +859,12 @@ void libvlc_media_player_set_time(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t value;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return;
 
-    value.i_time = time*1000LL;
-    var_Set( p_input_thread, "time", value );
+    var_SetTime( p_input_thread, "time", time*1000LL );
     vlc_object_release( p_input_thread );
 }
 
@@ -876,14 +874,12 @@ void libvlc_media_player_set_position(
                                 libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
-    val.f_float = position;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
     if( !p_input_thread )
         return;
 
-    var_Set( p_input_thread, "position", val );
+    var_SetFloat( p_input_thread, "position", position );
     vlc_object_release( p_input_thread );
 }
 
@@ -910,14 +906,12 @@ void libvlc_media_player_set_chapter(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
-    val.i_int = chapter;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
     if( !p_input_thread )
         return;
 
-    var_Set( p_input_thread, "chapter", val );
+    var_SetInteger( p_input_thread, "chapter", chapter );
     vlc_object_release( p_input_thread );
 }
 
@@ -986,14 +980,12 @@ void libvlc_media_player_set_title(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
-    val.i_int = i_title;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
     if( !p_input_thread )
         return;
 
-    var_Set( p_input_thread, "title", val );
+    var_SetInteger( p_input_thread, "title", i_title );
     vlc_object_release( p_input_thread );
 
     //send event
@@ -1048,10 +1040,8 @@ void libvlc_media_player_next_chapter(
         return;
 
     int i_type = var_Type( p_input_thread, "next-chapter" );
-    vlc_value_t val;
-    val.b_bool = true;
-    var_Set( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "next-chapter":"next-title", val );
+    var_SetBool( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "next-chapter":"next-title", true );
 
     vlc_object_release( p_input_thread );
 }
@@ -1067,10 +1057,8 @@ void libvlc_media_player_previous_chapter(
         return;
 
     int i_type = var_Type( p_input_thread, "next-chapter" );
-    vlc_value_t val;
-    val.b_bool = true;
-    var_Set( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "prev-chapter":"prev-title", val );
+    var_SetBool( p_input_thread, (i_type & VLC_VAR_TYPE) != 0 ?
+                            "prev-chapter":"prev-title", true );
 
     vlc_object_release( p_input_thread );
 }
@@ -1114,7 +1102,6 @@ void libvlc_media_player_set_rate(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
     bool b_can_rewind;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
@@ -1129,8 +1116,7 @@ void libvlc_media_player_set_rate(
         return;
     }
 
-    val.i_int = 1000.0f/rate;
-    var_Set( p_input_thread, "rate", val );
+    var_SetInteger( p_input_thread, "rate", 1000.0f/rate );
     vlc_object_release( p_input_thread );
 }
 
