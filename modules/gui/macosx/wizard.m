@@ -1322,7 +1322,7 @@ static VLCWizard *_o_sharedInstance = nil;
             x += 1;
         }
 
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
 
         /* close the window, since we are done */
         [o_wizard_window close];

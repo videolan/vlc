@@ -160,7 +160,7 @@
     playlist_t * p_playlist = pl_Hold( VLCIntf );
 
     playlist_Stop( p_playlist );
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     return YES;
 }
 

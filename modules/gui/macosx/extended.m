@@ -435,7 +435,7 @@ static VLCExtended *_o_sharedInstance = nil;
     /* store to prefs */
     config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 
     o_config_changed = YES;
 }
@@ -784,7 +784,7 @@ static VLCExtended *_o_sharedInstance = nil;
             "extended control attribute '%s' (%i)",
             [[theModules objectAtIndex: x] UTF8String] , returnedValue);
             [theModules release];
-            vlc_object_release( p_playlist );
+            pl_Release( VLCIntf );
  
             return;
         }
@@ -795,6 +795,6 @@ static VLCExtended *_o_sharedInstance = nil;
     msg_Dbg( VLCIntf, "VLCExtended: saved certain preferences successfully" );
  
     [theModules release];
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 @end

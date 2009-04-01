@@ -235,7 +235,7 @@
 
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 /* three little ugly helpers */
@@ -260,7 +260,7 @@
     playlist_t *p_playlist = pl_Hold( VLCIntf );
     var_Get( p_playlist, "random", &val );
     [o_btn_shuffle setState: val.b_bool];
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (IBAction)repeatButtonAction:(id)sender
@@ -327,7 +327,7 @@
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 
@@ -357,7 +357,7 @@
  
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 - (IBAction)loop:(id)sender
@@ -386,7 +386,7 @@
 
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 - (IBAction)forward:(id)sender
@@ -1107,7 +1107,7 @@
     }
 
     if( p_input ) vlc_object_release( p_input );
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 
     return( bEnabled );
 }

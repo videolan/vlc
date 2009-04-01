@@ -119,7 +119,7 @@
     [o_outline_view setAllowsEmptySelection: NO];
     [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     [self initStrings];
 }
 
@@ -187,7 +187,7 @@
         p_return = p_item->pp_children[index];
     PL_UNLOCK;
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 
     o_value = [o_outline_dict objectForKey:[NSString stringWithFormat: @"%p", p_return]];
 
@@ -390,7 +390,7 @@
     char ** ppsz_services = vlc_sd_GetNames( &ppsz_name );
     if( !ppsz_services )
     {
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return;
     }
     
@@ -427,7 +427,7 @@
     free( ppsz_services );
     free( ppsz_name );
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (void)searchfieldChanged:(NSNotification *)o_notification
@@ -498,7 +498,7 @@
             [o_status_field setStringValue: _NS("1 item")];
     }
     PL_UNLOCK;
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 
     [self outlineViewSelectionDidChange: nil];
 }
@@ -518,7 +518,7 @@
 
     [[[VLCMain sharedInstance] getControls] shuffle];
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
@@ -621,13 +621,13 @@
 
     if( p_node == p_item )
     {
-        vlc_object_release(p_playlist);
+        pl_Release( VLCIntf );
         return YES;
     }
 
     if( p_node->i_children < 1)
     {
-        vlc_object_release(p_playlist);
+        pl_Release( VLCIntf );
         return NO;
     }
 
@@ -647,7 +647,7 @@
                 else if ( i == p_playlist->all_items.i_size - 1 )
                 {
                     if(!b_locked) PL_UNLOCK;
-                    vlc_object_release( p_playlist );
+                    pl_Release( VLCIntf );
                     return NO;
                 }
             }
@@ -659,14 +659,14 @@
             if( p_temp_item == p_node )
             {
                 if(!b_locked) PL_UNLOCK;
-                vlc_object_release( p_playlist );
+                pl_Release( VLCIntf );
                 return YES;
             }
         }
         if(!b_locked) PL_UNLOCK;
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     return NO;
 }
 
@@ -762,7 +762,7 @@
                 p_playlist->p_local_category, "export-m3u" );
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 /* When called retrieves the selected outlineview row and plays that node or item */
@@ -797,7 +797,7 @@
         }
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked, p_node, p_item );
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 - (IBAction)revealItemInFinder:(id)sender
@@ -856,7 +856,7 @@
             }
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     [self playlistUpdated];
 }
 
@@ -887,7 +887,7 @@
             playlist_AskForArtEnqueue( p_playlist, p_item->p_input, pl_Unlocked );
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     [self playlistUpdated];
 }
 
@@ -904,7 +904,7 @@
     [o_mi setState: playlist_IsServicesDiscoveryLoaded( p_playlist,
                                           [o_string UTF8String] ) ? YES : NO];
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     [self playlistUpdated];
     return;
 }
@@ -960,7 +960,7 @@
     PL_UNLOCK;
 
     [self playlistUpdated];
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
 }
 
 - (IBAction)sortNodeByName:(id)sender
@@ -1001,7 +1001,7 @@
                 p_item->p_parent, i_mode, ORDER_NORMAL );
         PL_UNLOCK;
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     [self playlistUpdated];
 }
 
@@ -1070,7 +1070,10 @@
 
     p_input = input_item_New( p_playlist, [o_uri fileSystemRepresentation], [o_name UTF8String] );
     if( !p_input )
-       return NULL;
+    {
+        pl_Release( p_intf );
+        return NULL;
+    }
 
     if( o_options )
     {
@@ -1089,7 +1092,7 @@
             noteNewRecentDocumentURL: o_true_file];
     }
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     return p_input;
 }
 
@@ -1144,7 +1147,7 @@
     PL_UNLOCK;
 
     [self playlistUpdated];
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue
@@ -1183,7 +1186,7 @@
         vlc_gc_decref( p_input );
     }
     [self playlistUpdated];
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
@@ -1221,7 +1224,7 @@
         else if( p_selected_item == p_item->pp_children[i_current] &&
                     b_selected_item_met == YES )
         {
-            vlc_object_release( p_playlist );
+            pl_Release( VLCIntf );
             return NULL;
         }
         else if( b_selected_item_met == YES &&
@@ -1230,7 +1233,7 @@
                       [o_current_author rangeOfString:[o_search_field
                         stringValue] options:NSCaseInsensitiveSearch].length ) )
         {
-            vlc_object_release( p_playlist );
+            pl_Release( VLCIntf );
             /*Adds the parent items in the result array as well, so that we can
             expand the tree*/
             return [NSMutableArray arrayWithObject: [NSValue
@@ -1242,14 +1245,14 @@
                                             p_item->pp_children[i_current]];
             if( o_result != NULL )
             {
-                vlc_object_release( p_playlist );
+                pl_Release( VLCIntf );
                 [o_result insertObject: [NSValue valueWithPointer:
                                 p_item->pp_children[i_current]] atIndex:0];
                 return o_result;
             }
         }
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     return NULL;
 }
 
@@ -1296,7 +1299,7 @@
         [o_outline_view selectRow:i_row byExtendingSelection: NO];
         [o_outline_view scrollRowToVisible: i_row];
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (IBAction)recursiveExpandNode:(id)sender
@@ -1356,7 +1359,7 @@
        sortable table column*/
     if( !( o_tc == o_tc_name || o_tc == o_tc_author ) )
     {
-        vlc_object_release( p_playlist );
+        pl_Release( p_intf );
         return;
     }
 
@@ -1391,7 +1394,7 @@
     playlist_RecursiveNodeSort( p_playlist, p_playlist->p_root_category, i_mode, i_type );
     PL_UNLOCK;
 
-    vlc_object_release( p_playlist );
+    pl_Release( p_intf );
     [self playlistUpdated];
 
     o_tc_sortColumn = o_tc;
@@ -1434,7 +1437,7 @@
     {
         [cell setFont: [[NSFontManager sharedFontManager] convertFont:[cell font] toNotHaveTrait:NSBoldFontMask]];
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 }
 
 - (IBAction)addNode:(id)sender
@@ -1508,7 +1511,7 @@
     }
     PL_UNLOCK;
 
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
 
     [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",
                                                     [o_value pointerValue]]];
@@ -1541,7 +1544,7 @@
             [o_item pointerValue] == p_playlist->p_local_category ||
             [o_item pointerValue] == p_playlist->p_ml_category )
         {
-            vlc_object_release(p_playlist);
+            pl_Release( VLCIntf );
             return NO;
         }
         /* Fill the items and nodes to move in 2 different arrays */
@@ -1563,7 +1566,7 @@
         @"VLCPlaylistItemPboardType", nil] owner: self];
     [pboard setData:[NSData data] forType:@"VLCPlaylistItemPboardType"];
 
-    vlc_object_release(p_playlist);
+    pl_Release( VLCIntf );
     return YES;
 }
 
@@ -1580,7 +1583,7 @@
         if( index == NSOutlineViewDropOnItemIndex &&
                 ((playlist_item_t *)[item pointerValue])->i_children == -1 )
         {
-            vlc_object_release( p_playlist );
+            pl_Release( VLCIntf );
             return NSDragOperationNone;
         }
     }
@@ -1588,7 +1591,7 @@
     /* Don't allow on drop on playlist root element's child */
     if( !item && index != NSOutlineViewDropOnItemIndex)
     {
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return NSDragOperationNone;
     }
 
@@ -1598,7 +1601,7 @@
     if( !( ([self isItem: [item pointerValue] inNode: p_playlist->p_local_category checkItemExistence: NO] || 
         ( var_CreateGetBool( p_playlist, "media-library" ) && [self isItem: [item pointerValue] inNode: p_playlist->p_ml_category checkItemExistence: NO] ) ) || item == nil ) )
     {
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return NSDragOperationNone;
     }
 
@@ -1613,21 +1616,21 @@
                     [[o_nodes_array objectAtIndex: i] pointerValue]
                     checkItemExistence: NO] )
             {
-                vlc_object_release( p_playlist );
+                pl_Release( VLCIntf );
                 return NSDragOperationNone;
             }
         }
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return NSDragOperationMove;
     }
 
     /* Drop from the Finder */
     else if( [[o_pasteboard types] containsObject: NSFilenamesPboardType] )
     {
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return NSDragOperationGeneric;
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     return NSDragOperationNone;
 }
 
@@ -1654,7 +1657,7 @@
            (This should never be true) */
         if( p_new_parent->i_children < 0 )
         {
-            vlc_object_release( p_playlist );
+            pl_Release( VLCIntf );
             return NO;
         }
 
@@ -1721,7 +1724,7 @@
         [o_outline_view selectRow: i_row byExtendingSelection: NO];
         [o_outline_view scrollRowToVisible: i_row];
 
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return YES;
     }
 
@@ -1754,10 +1757,10 @@
             [self appendNodeArray:o_array inNode: p_node
                 atPos:index enqueue:YES];
         }
-        vlc_object_release( p_playlist );
+        pl_Release( VLCIntf );
         return YES;
     }
-    vlc_object_release( p_playlist );
+    pl_Release( VLCIntf );
     return NO;
 }
 @end
