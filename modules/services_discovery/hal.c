@@ -103,7 +103,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     DBusError           dbus_error;
-    DBusConnection      *p_connection;
+    DBusConnection      *p_connection = NULL;
 
     p_sd_global = p_sd;
     p_sys->i_devices_number = 0;
@@ -124,10 +124,7 @@ static int Open( vlc_object_t *p_this )
     if( dbus_error_is_set( &dbus_error ) )
     {
         msg_Err( p_sd, "unable to connect to DBUS: %s", dbus_error.message );
-        dbus_error_free( &dbus_error );
-        libhal_ctx_free( p_sys->p_ctx );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     libhal_ctx_set_dbus_connection( p_sys->p_ctx, p_connection );
     p_sys->p_connection = p_connection;
@@ -149,6 +146,8 @@ static int Open( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 error:
+    if( p_connection )
+        dbus_connection_unref( p_connection );
     dbus_error_free( &dbus_error );
     libhal_ctx_free( p_sys->p_ctx );
     free( p_sys );
