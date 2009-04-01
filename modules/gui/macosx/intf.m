@@ -34,6 +34,7 @@
 #include <vlc_keys.h>
 #include <vlc_dialog.h>
 #include <unistd.h> /* execl() */
+#import <vlc_dialog.h>
 
 #import "intf.h"
 #import "fspanel.h"
@@ -220,20 +221,26 @@ static int FullscreenChanged( vlc_object_t *p_this, const char *psz_variable,
 }
 
 /*****************************************************************************
- * InteractCallback: Callback triggered by the interaction
- * variable, to let the intf display error and interaction dialogs
+ * DialogCallback: Callback triggered by the "dialog-*" variables 
+ * to let the intf display error and interaction dialogs
  *****************************************************************************/
-static int InteractCallback( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data )
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    VLCMain *interface = (VLCMain *)param;
-    interaction_dialog_t *p_dialog = (interaction_dialog_t *)(new_val.p_address);
-    NSValue *o_value = [NSValue valueWithPointer:p_dialog];
- 
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewInteractionEventNotification" object:[interface getInteractionList]
-     userInfo:[NSDictionary dictionaryWithObject:o_value forKey:@"VLCDialogPointer"]];
- 
+    VLCMain *interface = (VLCMain *)data;
+    
+    NSLog( @"dialog callback triggered; type of dialogue is '%s'", type );
+    if(!strcmp (type, "dialog-fatal"))
+    {
+        const dialog_fatal_t *p_dialog = (const dialog_fatal_t *)value.p_address;
+        NSLog( @"fatal dialogue with title '%s' and message '%s'", p_dialog->title, p_dialog->message );
+#if 0
+        NSValue *o_value = [NSValue valueWithPointer:p_dialog];
+
+        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewInteractionEventNotification" object:[interface getInteractionList] userInfo:[NSDictionary dictionaryWithObject:o_value forKey:@"VLCDialogPointer"]];
+#endif
+    }
+
     [o_pool release];
     return VLC_SUCCESS;
 }
@@ -460,10 +467,11 @@ static VLCMain *_o_sharedMainInstance = nil;
     var_AddCallback( p_intf->p_libvlc, "intf-show", ShowController, self);
 
     pl_Release( p_intf );
- 
-    var_Create( p_intf, "interaction", VLC_VAR_ADDRESS );
-    var_AddCallback( p_intf, "interaction", InteractCallback, self );
-    interaction_Register( p_intf );
+
+    /* subscribe to various interactive dialogues */
+    var_Create( p_intf, "dialog-fatal", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-fatal", DialogCallback, self );
+    dialog_Register( p_intf );
 
     /* update the playmode stuff */
     p_intf->p_sys->b_playmode_update = true;
@@ -473,16 +481,16 @@ static VLCMain *_o_sharedMainInstance = nil;
                                                  name: NSApplicationDidChangeScreenParametersNotification
                                                object: nil];
 
+    /* take care of tint changes during runtime */
     o_img_play = [NSImage imageNamed: @"play"];
     o_img_pause = [NSImage imageNamed: @"pause"];    
-    
     [self controlTintChanged];
-
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector( controlTintChanged )
                                                  name: NSControlTintDidChangeNotification
                                                object: nil];
-    
+
+    /* yeah, we are done */
     nib_main_loaded = TRUE;
 }
 
@@ -722,9 +730,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     {
         [o_extended savePrefs];
     }
- 
-    interaction_Unregister( p_intf );
-    var_DelCallback( p_intf, "interaction", InteractCallback, self );
+
+    /* unsubscribe from the interactive dialogues */
+    dialog_Unregister( p_intf );
+    var_DelCallback( p_intf, "dialog-fatal", DialogCallback, self );
 
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
@@ -733,7 +742,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
-
     if( nib_about_loaded )
         [o_about release];
 
@@ -2093,6 +2101,9 @@ end:
 
 - (IBAction)showBookmarks:(id)sender
 {
+    dialog_Fatal( p_intf, _("Video Settings not saved"),
+                 _("An error occured while saving your settings via SimplePrefs.") );
+
     /* we need the wizard-nib for the bookmarks's extract functionality */
     if( !nib_wizard_loaded )
     {
