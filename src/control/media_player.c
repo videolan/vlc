@@ -287,6 +287,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
             p_libvlc_instance, p_e );
     if( libvlc_exception_raised( p_e ) )
     {
+        vlc_mutex_destroy( &p_mi->object_lock );
         free( p_mi );
         return NULL;
     }
