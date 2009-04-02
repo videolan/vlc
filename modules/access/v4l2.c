@@ -1068,7 +1068,7 @@ static int AccessOpen( vlc_object_t * p_this )
     {
         msg_Dbg( p_this, "Trying direct kernel v4l2" );
         use_kernel_v4l2( p_sys );
-        if( FindMainDevice( p_this, p_sys, true ) == VLC_SUCCESS)
+        if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS)
             return VLC_SUCCESS;
     }
 
@@ -1854,6 +1854,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     ControlList( p_obj, p_sys, i_fd,
                   var_GetBool( p_obj, "v4l2-controls-reset" ), b_demux );
     SetAvailControlsByString( p_obj, p_sys, i_fd );
+
     if( false == b_demux)
     {
         return i_fd;
@@ -1867,7 +1868,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         case IO_METHOD_READ:
             if( !(p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE) )
             {
-                msg_Err( p_demux, "device does not support read i/o" );
+                msg_Err( p_obj, "device does not support read i/o" );
                 goto open_failed;
             }
             break;
@@ -1876,13 +1877,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         case IO_METHOD_USERPTR:
             if( !(p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING) )
             {
-                msg_Err( p_demux, "device does not support streaming i/o" );
+                msg_Err( p_obj, "device does not support streaming i/o" );
                 goto open_failed;
             }
             break;
 
         default:
-            msg_Err( p_demux, "io method not supported" );
+            msg_Err( p_obj, "io method not supported" );
             goto open_failed;
     }
 
