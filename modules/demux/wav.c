@@ -123,7 +123,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     p_sys->p_es         = NULL;
-    p_sys->b_chan_reorder = 0;
+    p_sys->b_chan_reorder = false;
     p_sys->i_channel_mask = 0;
 
     /* skip riff header */
@@ -197,10 +197,20 @@ static int Open( vlc_object_t * p_this )
         i_channel_mask = GetDWLE( &p_wf_ext->dwChannelMask );
         if( i_channel_mask )
         {
+            int i_match = 0;
             for( i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
             {
                 if( i_channel_mask & pi_channels_src[i] )
+                {
+                    if( !( p_sys->i_channel_mask & pi_channels_in[i] ) )
+                        i_match++;
                     p_sys->i_channel_mask |= pi_channels_in[i];
+                }
+            }
+            if( i_match != p_sys->fmt.audio.i_channels )
+            {
+                msg_Err( p_demux, "Invalid/unsupported channel mask" );
+                p_sys->i_channel_mask = 0;
             }
         }
     }
