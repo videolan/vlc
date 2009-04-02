@@ -21,86 +21,120 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#define ALLOCATE_DIRECTBUFFERS( i_max ) \
-    /* Try to initialize i_max direct buffers */                              \
-    while( I_OUTPUTPICTURES < ( i_max ) )                                     \
-    {                                                                         \
-        p_pic = NULL;                                                         \
-                                                                              \
-        /* Find an empty picture slot */                                      \
-        for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )          \
-        {                                                                     \
-            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )       \
-            {                                                                 \
-                p_pic = p_vout->p_picture + i_index;                          \
-                break;                                                        \
-            }                                                                 \
-        }                                                                     \
-                                                                              \
-        if( p_pic == NULL )                                                   \
-        {                                                                     \
-            break;                                                            \
-        }                                                                     \
-                                                                              \
-        /* Allocate the picture */                                            \
-        vout_AllocatePicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma, \
-                              p_vout->output.i_width,                         \
-                              p_vout->output.i_height,                        \
-                              p_vout->output.i_aspect );                      \
-                                                                              \
-        if( !p_pic->i_planes )                                                \
-        {                                                                     \
-            break;                                                            \
-        }                                                                     \
-                                                                              \
-        p_pic->i_status = DESTROYED_PICTURE;                                  \
-        p_pic->i_type   = DIRECT_PICTURE;                                     \
-                                                                              \
-        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;                         \
-                                                                              \
-        I_OUTPUTPICTURES++;                                                   \
-    }                                                                         \
-
-/*****************************************************************************
- * SetParentVal: forward variable value to parent whithout triggering the
- *               callback
- *****************************************************************************/
-static int SetParentVal( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+/**
+ * Initialize i_max direct buffers for a vout_thread_t.
+ */
+static inline void vout_filter_AllocateDirectBuffers( vout_thread_t *p_vout, int i_max )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    var_Change( (vlc_object_t *)p_data, psz_var, VLC_VAR_SETVALUE,
-                 &newval, NULL );
-    return VLC_SUCCESS;
+    I_OUTPUTPICTURES = 0;
+
+    /* Try to initialize i_max direct buffers */
+    while( I_OUTPUTPICTURES < i_max )
+    {
+        picture_t *p_pic = NULL;
+
+        /* Find an empty picture slot */
+        for( int i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+        {
+            if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+            {
+                p_pic = p_vout->p_picture + i_index;
+                break;
+            }
+        }
+
+        if( p_pic == NULL )
+            break;
+
+        /* Allocate the picture */
+        vout_AllocatePicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
+                              p_vout->output.i_width,
+                              p_vout->output.i_height,
+                              p_vout->output.i_aspect );
+
+        if( !p_pic->i_planes )
+            break;
+
+        p_pic->i_status = DESTROYED_PICTURE;
+        p_pic->i_type   = DIRECT_PICTURE;
+
+        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+        I_OUTPUTPICTURES++;
+    }
 }
 
-#define ADD_CALLBACKS( newvout, handler ) \
-    var_AddCallback( newvout, "fullscreen", SetParentVal, p_vout );           \
-    var_AddCallback( newvout, "mouse-x", SendEvents, p_vout );                \
-    var_AddCallback( newvout, "mouse-y", SendEvents, p_vout );                \
-    var_AddCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
-    var_AddCallback( newvout, "mouse-clicked", SendEvents, p_vout );
+static inline void vout_filter_ReleaseDirectBuffers( vout_thread_t *p_vout )
+{
+    for( int i_index = I_OUTPUTPICTURES-1; i_index >= 0; i_index-- )
+        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
+}
 
-#define DEL_CALLBACKS( newvout, handler ) \
-    var_DelCallback( newvout, "fullscreen", SetParentVal, p_vout );           \
-    var_DelCallback( newvout, "mouse-x", SendEvents, p_vout );                \
-    var_DelCallback( newvout, "mouse-y", SendEvents, p_vout );                \
-    var_DelCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
-    var_DelCallback( newvout, "mouse-clicked", SendEvents, p_vout );
+/**
+ * Internal helper to forward an event from p_this to p_data
+ */
+static inline int ForwardEvent( vlc_object_t *p_this, char const *psz_var,
+                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    vlc_object_t *p_dst = (vlc_object_t*)p_data;
 
-#define ADD_PARENT_CALLBACKS( handler ) \
-    var_AddCallback( p_vout, "fullscreen", handler, NULL );                   \
-    var_AddCallback( p_vout, "autoscale", handler, NULL );                    \
-    var_AddCallback( p_vout, "scale", handler, NULL );                 \
-    var_AddCallback( p_vout, "aspect-ratio", handler, NULL );                 \
-    var_AddCallback( p_vout, "crop", handler, NULL );
+    return var_Set( p_dst, psz_var, newval );
+}
+/**
+ * Internal helper to forward fullscreen event from p_this to p_data.
+ */
+static inline int ForwardFullscreen( vlc_object_t *p_this, char const *psz_var,
+                                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+    vlc_object_t *p_dst = (vlc_object_t*)p_data;
 
-#define DEL_PARENT_CALLBACKS( handler ) \
-    var_DelCallback( p_vout, "fullscreen", handler, NULL );                   \
-    var_DelCallback( p_vout, "autoscale", handler, NULL );                    \
-    var_DelCallback( p_vout, "scale", handler, NULL );                 \
-    var_DelCallback( p_vout, "aspect-ratio", handler, NULL );                 \
-    var_DelCallback( p_vout, "crop", handler, NULL );
+    if( !var_GetBool( p_dst, "fullscreen" ) != !newval.b_bool )
+        return var_SetBool( p_dst, psz_var, newval.b_bool );
+    return VLC_SUCCESS;
+}
+/**
+ * Install/remove all callbacks needed for proper event handling inside
+ * a vout-filter.
+ */
+static inline void vout_filter_SetupChild( vout_thread_t *p_parent, vout_thread_t *p_child,
+                                           vlc_callback_t pf_mouse_event,
+                                           vlc_callback_t pf_fullscreen_up,
+                                           vlc_callback_t pf_fullscreen_down,
+                                           bool b_init )
+{
+    int (*pf_execute)( vlc_object_t *, const char *, vlc_callback_t, void * );
 
-static int  SendEventsToChild( vlc_object_t *, char const *,
-                               vlc_value_t, vlc_value_t, void * );
+    if( b_init )
+        pf_execute = __var_AddCallback;
+    else
+        pf_execute = __var_DelCallback;
+
+    /* */
+    if( !pf_mouse_event )
+        pf_mouse_event = ForwardEvent;
+    pf_execute( VLC_OBJECT(p_child), "mouse-x",           pf_mouse_event, p_parent );
+    pf_execute( VLC_OBJECT(p_child), "mouse-y",           pf_mouse_event, p_parent );
+    pf_execute( VLC_OBJECT(p_child), "mouse-moved",       pf_mouse_event, p_parent );
+    pf_execute( VLC_OBJECT(p_child), "mouse-clicked",     pf_mouse_event, p_parent );
+    pf_execute( VLC_OBJECT(p_child), "mouse-button-down", pf_mouse_event, p_parent );
+
+    /* */
+    pf_execute( VLC_OBJECT(p_parent), "autoscale",    ForwardEvent, p_child );
+    pf_execute( VLC_OBJECT(p_parent), "scale",        ForwardEvent, p_child );
+    pf_execute( VLC_OBJECT(p_parent), "aspect-ratio", ForwardEvent, p_child );
+    pf_execute( VLC_OBJECT(p_parent), "crop",         ForwardEvent, p_child );
+
+    /* */
+    if( !pf_fullscreen_up )
+        pf_fullscreen_up = ForwardFullscreen;
+    if( !pf_fullscreen_down )
+        pf_fullscreen_down = ForwardFullscreen;
+    pf_execute( VLC_OBJECT(p_child),  "fullscreen", pf_fullscreen_up,   p_parent );
+    pf_execute( VLC_OBJECT(p_parent), "fullscreen", pf_fullscreen_down, p_child );
+}
+
+#define vout_filter_AddChild( a, b, c ) vout_filter_SetupChild( a, b, c, NULL, NULL, true )
+#define vout_filter_DelChild( a, b, c ) vout_filter_SetupChild( a, b, c, NULL, NULL, false )
+

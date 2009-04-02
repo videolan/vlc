@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
+#include <assert.h>
 
 #include "vlc_filter.h"
 #include "filter_common.h"
@@ -53,8 +54,6 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
-static int  SendEvents( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
 static int  MouseEvent( vlc_object_t *, char const *,
                         vlc_value_t , vlc_value_t , void * );
 static int  Control   ( vout_thread_t *, int, va_list );
@@ -364,7 +363,6 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     picture_t *p_pic;
-    int i_index;
     video_format_t fmt;
     logo_list_t *p_logo_list = p_sys->p_logo_list;
 
@@ -459,12 +457,9 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    var_AddCallback( p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
-    var_AddCallback( p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-    ADD_CALLBACKS( p_sys->p_vout, SendEvents );
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AddChild( p_vout, p_sys->p_vout, MouseEvent );
 
     return VLC_SUCCESS;
 }
@@ -475,23 +470,11 @@ static int Init( vout_thread_t *p_vout )
 static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    int i_index;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    DEL_CALLBACKS( p_sys->p_vout, SendEvents );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-
-    var_DelCallback( p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
-    var_DelCallback( p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
-
+    vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
     vout_CloseAndRelease( p_sys->p_vout );
+
+    vout_filter_ReleaseDirectBuffers( p_vout );
 
     if( p_sys->p_blend->p_module )
         module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
@@ -595,65 +578,57 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
 }
 
 /*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * MouseEvent: callback for mouse events
  *****************************************************************************/
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t*)p_data;
+    vout_thread_t *p_vout = p_data;
+    assert( p_this == VLC_OBJECT(p_vout->p_sys->p_vout) );
+    VLC_UNUSED(oldval);
+
     vout_sys_t *p_sys = p_vout->p_sys;
-    vlc_value_t valb;
-    int i_delta;
+    const int i_delta = newval.i_int - oldval.i_int;
+    const int i_bdown = var_GetInteger( p_sys->p_vout, "mouse-button-down" );
 
-    var_Get( p_vout->p_sys->p_vout, "mouse-button-down", &valb );
+    if( (i_bdown & 0x1) == 0 )
+        goto forward;
 
-    i_delta = newval.i_int - oldval.i_int;
-
-    if( (valb.i_int & 0x1) == 0 )
-    {
-        return VLC_SUCCESS;
-    }
-
+    int i_x, i_y;
+    int i_dx = 0;
+    int i_dy = 0;
     if( psz_var[6] == 'x' )
     {
-        vlc_value_t valy;
-        var_Get( p_vout->p_sys->p_vout, "mouse-y", &valy );
-        if( newval.i_int >= (int)p_sys->posx &&
-            valy.i_int >= (int)p_sys->posy &&
-            newval.i_int <= (int)(p_sys->posx + p_sys->i_width) &&
-            valy.i_int <= (int)(p_sys->posy + p_sys->i_height) )
-        {
-            p_sys->posx = __MIN( __MAX( p_sys->posx + i_delta, 0 ),
-                          p_vout->output.i_width - p_sys->i_width );
-        }
+        i_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
+        i_x = newval.i_int;
+        i_dx = i_delta;
     }
     else if( psz_var[6] == 'y' )
     {
-        vlc_value_t valx;
-        var_Get( p_vout->p_sys->p_vout, "mouse-x", &valx );
-        if( valx.i_int >= (int)p_sys->posx &&
-            newval.i_int >= (int)p_sys->posy &&
-            valx.i_int <= (int)(p_sys->posx + p_sys->i_width) &&
-            newval.i_int <= (int)(p_sys->posy + p_sys->i_height) )
-        {
-            p_sys->posy = __MIN( __MAX( p_sys->posy + i_delta, 0 ),
-                          p_vout->output.i_height - p_sys->i_height );
-        }
+        i_y = newval.i_int;
+        i_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
+        i_dy = i_delta;
+    }
+    else
+    {
+        goto forward;
     }
 
+    /* FIXME missing lock */
+    if( i_x < (int)p_sys->posx ||
+        i_y < (int)p_sys->posy ||
+        i_x > (int)(p_sys->posx + p_sys->i_width) ||
+        i_y > (int)(p_sys->posy + p_sys->i_height) )
+        goto forward;
+
+    p_sys->posx = __MIN( __MAX( p_sys->posx + i_dx, 0 ),
+                         p_vout->output.i_width - p_sys->i_width );
+    p_sys->posy = __MIN( __MAX( p_sys->posy + i_dy, 0 ),
+                         p_vout->output.i_height - p_sys->i_height );
     return VLC_SUCCESS;
+
+forward:
+    return var_Set( p_vout, psz_var, newval );
 }
 
 /*****************************************************************************
@@ -662,18 +637,6 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -769,11 +732,6 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_destroy( &p_sys->p_logo_list->lock );
-    FreeLogoList( p_sys->p_logo_list );
-    free( p_sys->p_logo_list );
-    free( p_sys );
-
     /* Delete the logo variables from INPUT */
     var_Destroy( p_filter->p_libvlc, "logo-file" );
     var_Destroy( p_filter->p_libvlc, "logo-x" );
@@ -782,6 +740,11 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_filter->p_libvlc, "logo-repeat" );
     var_Destroy( p_filter->p_libvlc, "logo-position" );
     var_Destroy( p_filter->p_libvlc, "logo-transparency" );
+
+    vlc_mutex_destroy( &p_sys->p_logo_list->lock );
+    FreeLogoList( p_sys->p_logo_list );
+    free( p_sys->p_logo_list );
+    free( p_sys );
 }
 
 /*****************************************************************************

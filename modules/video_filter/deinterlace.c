@@ -64,6 +64,9 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
+static int  MouseEvent( vlc_object_t *p_this, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
+
 static void RenderDiscard( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderBob    ( vout_thread_t *, picture_t *, picture_t *, int );
 static void RenderMean   ( vout_thread_t *, picture_t *, picture_t * );
@@ -90,9 +93,6 @@ static void EndMMX       ( void );
 #if defined(CAN_COMPILE_3DNOW)
 static void End3DNow     ( void );
 #endif
-
-static int  SendEvents   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
 
 static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method );
 static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout );
@@ -363,9 +363,6 @@ static bool IsChromaSupported( vlc_fourcc_t i_chroma )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
-    picture_t *p_pic;
-
     I_OUTPUTPICTURES = 0;
 
     if( !IsChromaSupported( p_vout->render.i_chroma ) )
@@ -392,11 +389,9 @@ static int Init( vout_thread_t *p_vout )
 
     var_AddCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     return VLC_SUCCESS;
 }
@@ -419,22 +414,15 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
+    vout_sys_t *p_sys = p_vout->p_sys;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    if( p_vout->p_sys->p_vout )
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
+    if( p_sys->p_vout )
     {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
+        vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
+        vout_CloseAndRelease( p_sys->p_vout );
     }
 
-    if( p_vout->p_sys->p_vout )
-        vout_CloseAndRelease( p_vout->p_sys->p_vout );
+    vout_filter_ReleaseDirectBuffers( p_vout );
 }
 
 /*****************************************************************************
@@ -447,6 +435,21 @@ static void Destroy( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vlc_mutex_destroy( &p_vout->p_sys->filter_lock );
     free( p_vout->p_sys );
+}
+
+/**
+ * Forward mouse event with proper conversion.
+ */
+static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+
+    if( !strcmp( psz_var, "mouse-y" ) && p_vout->p_sys->b_half_height )
+        newval.i_int *= 2;
+
+    return var_Set( p_vout, psz_var, newval );
 }
 
 /*****************************************************************************
@@ -1670,24 +1673,6 @@ static void RenderX( picture_t *p_outpic, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
-    vlc_value_t sentval = newval;
-
-    if( !strcmp( psz_var, "mouse-y" ) && p_vout->p_sys->b_half_height )
-        sentval.i_int *= 2;
-
-    var_Set( p_vout, psz_var, sentval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * FilterCallback: called when changing the deinterlace method on the fly.
  *****************************************************************************/
 static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -1713,7 +1698,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     /* We need to kill the old vout */
     if( p_vout->p_sys->p_vout )
     {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+        vout_filter_DelChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
         vout_CloseAndRelease( p_vout->p_sys->p_vout );
     }
 
@@ -1729,24 +1714,11 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_EGENERIC;
     }
 
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     vlc_mutex_unlock( &p_vout->p_sys->filter_lock );
     return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
-}
-
 
 /*****************************************************************************
  * video filter2 functions

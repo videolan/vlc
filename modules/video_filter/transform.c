@@ -56,7 +56,7 @@ static void FilterPlanar( vout_thread_t *, const picture_t *, picture_t * );
 static void FilterI422( vout_thread_t *, const picture_t *, picture_t * );
 static void FilterYUYV( vout_thread_t *, const picture_t *, picture_t * );
 
-static int  SendEvents( vlc_object_t *, char const *,
+static int  MouseEvent( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
@@ -216,8 +216,6 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
-    picture_t *p_pic;
     video_format_t fmt;
 
     I_OUTPUTPICTURES = 0;
@@ -260,11 +258,9 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     return VLC_SUCCESS;
 }
@@ -274,20 +270,12 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
+    vout_sys_t *p_sys = p_vout->p_sys;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
+    vout_CloseAndRelease( p_sys->p_vout );
 
-    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-
-    vout_CloseAndRelease( p_vout->p_sys->p_vout );
+    vout_filter_ReleaseDirectBuffers( p_vout );
 }
 
 /*****************************************************************************
@@ -334,32 +322,32 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+/**
+ * Forward mouse event with proper conversion.
+ */
+static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    vout_thread_t *p_vout = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
-    vlc_value_t sentval = newval;
 
-    /* Translate the mouse coordinates */
+    /* Translate the mouse coordinates
+     * FIXME missing lock */
     if( !strcmp( psz_var, "mouse-x" ) )
     {
         switch( p_vout->p_sys->i_mode )
         {
         case TRANSFORM_MODE_270:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
-                             - sentval.i_int;
+            newval.i_int = p_vout->p_sys->p_vout->output.i_width
+                             - newval.i_int;
         case TRANSFORM_MODE_90:
-            var_Set( p_vout, "mouse-y", sentval );
-            return VLC_SUCCESS;
+            psz_var = "mouse-y";
+            break;
 
         case TRANSFORM_MODE_180:
         case TRANSFORM_MODE_HFLIP:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_width
-                             - sentval.i_int;
+            newval.i_int = p_vout->p_sys->p_vout->output.i_width
+                             - newval.i_int;
             break;
 
         case TRANSFORM_MODE_VFLIP:
@@ -372,16 +360,16 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
         switch( p_vout->p_sys->i_mode )
         {
         case TRANSFORM_MODE_90:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
-                             - sentval.i_int;
+            newval.i_int = p_vout->p_sys->p_vout->output.i_height
+                             - newval.i_int;
         case TRANSFORM_MODE_270:
-            var_Set( p_vout, "mouse-x", sentval );
-            return VLC_SUCCESS;
+            psz_var = "mouse-x";
+            break;
 
         case TRANSFORM_MODE_180:
         case TRANSFORM_MODE_VFLIP:
-            sentval.i_int = p_vout->p_sys->p_vout->output.i_height
-                             - sentval.i_int;
+            newval.i_int = p_vout->p_sys->p_vout->output.i_height
+                             - newval.i_int;
             break;
 
         case TRANSFORM_MODE_HFLIP:
@@ -390,21 +378,7 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
         }
     }
 
-    var_Set( p_vout, psz_var, sentval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
+    return var_Set( p_vout, psz_var, newval );
 }
 
 static void FilterPlanar( vout_thread_t *p_vout,

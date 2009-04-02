@@ -56,7 +56,7 @@ static void Render    ( vout_thread_t *, picture_t * );
 
 static void UpdateStats    ( vout_thread_t *, picture_t * );
 
-static int  SendEvents( vlc_object_t *, char const *,
+static int  MouseEvent( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
 
 #ifdef BEST_AUTOCROP
@@ -200,9 +200,7 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int   i_index;
     char *psz_var;
-    picture_t *p_pic;
     video_format_t fmt;
 
     I_OUTPUTPICTURES = 0;
@@ -384,11 +382,9 @@ static int Init( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "ratio-crop", FilterCallback, NULL );
 #endif
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     return VLC_SUCCESS;
 }
@@ -398,21 +394,15 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
+    vout_sys_t *p_sys = p_vout->p_sys;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-    if( p_vout->p_sys->p_vout )
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
+    if( p_sys->p_vout )
     {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
+        vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
+        vout_CloseAndRelease( p_sys->p_vout );
     }
 
-    if( p_vout->p_sys->p_vout )
-        vout_CloseAndRelease( p_vout->p_sys->p_vout );
+    vout_filter_ReleaseDirectBuffers( p_vout );
 }
 
 /*****************************************************************************
@@ -455,7 +445,7 @@ static int Manage( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_vout )
     {
-        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+        vout_filter_DelChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
         vout_CloseAndRelease( p_vout->p_sys->p_vout );
     }
 
@@ -475,7 +465,7 @@ static int Manage( vout_thread_t *p_vout )
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     p_vout->p_sys->b_changed = false;
     p_vout->p_sys->i_lastchange = 0;
@@ -829,41 +819,23 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->p_sys->b_changed = true;
 }
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
-    vlc_value_t sentval = newval;
-
-    /* Translate the mouse coordinates */
-    if( !strcmp( psz_var, "mouse-x" ) )
-    {
-        sentval.i_int += p_vout->p_sys->i_x;
-    }
-    else if( !strcmp( psz_var, "mouse-y" ) )
-    {
-        sentval.i_int += p_vout->p_sys->i_y;
-    }
-
-    var_Set( p_vout, psz_var, sentval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
+/**
+ * Forward mouse event with proper conversion.
+ */
+static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
+    vout_thread_t *p_vout = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
+
+    /* Translate the mouse coordinates
+     * FIXME missing lock */
+    if( !strcmp( psz_var, "mouse-x" ) )
+        newval.i_int += p_vout->p_sys->i_x;
+    else if( !strcmp( psz_var, "mouse-y" ) )
+        newval.i_int += p_vout->p_sys->i_y;
+
+    return var_Set( p_vout, psz_var, newval );
 }
 
 #ifdef BEST_AUTOCROP

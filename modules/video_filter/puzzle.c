@@ -50,8 +50,6 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
-static int  SendEvents   ( vlc_object_t *, char const *,
-                           vlc_value_t, vlc_value_t, void * );
 static int  MouseEvent   ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
@@ -242,8 +240,6 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
-    picture_t *p_pic;
     video_format_t fmt;
     memset( &fmt, 0, sizeof( video_format_t ) );
 
@@ -270,14 +266,9 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    var_AddCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout );
-    var_AddCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout );
-    var_AddCallback( p_vout->p_sys->p_vout, "mouse-clicked",
-                     MouseEvent, p_vout);
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     return VLC_SUCCESS;
 }
@@ -287,24 +278,12 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
+    vout_sys_t *p_sys = p_vout->p_sys;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
+    vout_CloseAndRelease( p_sys->p_vout );
 
-    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-
-    var_DelCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
-    var_DelCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
-    var_DelCallback( p_vout->p_sys->p_vout, "mouse-clicked", MouseEvent, p_vout);
-
-    vout_CloseAndRelease( p_vout->p_sys->p_vout );
+    vout_filter_ReleaseDirectBuffers( p_vout );
 }
 
 #define SHUFFLE_WIDTH 81
@@ -458,41 +437,17 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * MouseEvent: callback for mouse events
  *****************************************************************************/
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    vout_thread_t *p_vout = (vout_thread_t*)p_data;
+    vout_thread_t *p_vout = p_data;
+    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     int i_x, i_y;
     int i_v;
 
+    /* FIXME missing lock */
 #define MOUSE_DOWN    1
 #define MOUSE_CLICKED 2
 #define MOUSE_MOVE_X  4
@@ -552,6 +507,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
             p_vout->p_sys->b_finished = finished( p_vout->p_sys );
         }
     }
+    /* FIXME do we want to forward it or not ? */
+    var_Set( p_vout, psz_var, newval );
     return VLC_SUCCESS;
 }
 

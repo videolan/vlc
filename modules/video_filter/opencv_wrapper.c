@@ -57,8 +57,6 @@ static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 
-static int  SendEvents( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
 static void ReleaseImages( vout_thread_t *p_vout );
 static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in );
 
@@ -297,8 +295,6 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int i_index;
-    picture_t *p_pic;
     video_format_t fmt;
     vout_sys_t *p_sys = p_vout->p_sys;
     I_OUTPUTPICTURES = 0;
@@ -358,11 +354,9 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    ADD_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, NULL, NULL, true );
 
     return VLC_SUCCESS;
 }
@@ -372,30 +366,22 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
+    vout_sys_t *p_sys = p_vout->p_sys;
 
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_DelChild( p_vout, p_sys->p_vout, NULL, NULL, true );
+    vout_CloseAndRelease( p_sys->p_vout );
 
-    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+    vout_filter_ReleaseDirectBuffers( p_vout );
 
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-
-    if ( p_vout->p_sys->p_opencv )
+    if( p_sys->p_opencv )
     {
         //release the internal opencv filter
-        if( p_vout->p_sys->p_opencv->p_module )
-            module_unneed( p_vout->p_sys->p_opencv, p_vout->p_sys->p_opencv->p_module );
-        vlc_object_detach( p_vout->p_sys->p_opencv );
-        vlc_object_release( p_vout->p_sys->p_opencv );
-        p_vout->p_sys->p_opencv = NULL;
+        if( p_sys->p_opencv->p_module )
+            module_unneed( p_sys->p_opencv, p_sys->p_opencv->p_module );
+        vlc_object_detach( p_sys->p_opencv );
+        vlc_object_release( p_sys->p_opencv );
+        p_sys->p_opencv = NULL;
     }
-
-    vout_CloseAndRelease( p_vout->p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -595,24 +581,3 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 }
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    var_Set( p_vout->p_sys->p_vout, psz_var, newval );
-    return VLC_SUCCESS;
-}

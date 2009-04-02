@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
+#include <assert.h>
 
 #include "filter_common.h"
 
@@ -72,8 +73,12 @@ static void RenderPackedRGB   ( vout_thread_t *, picture_t * );
 
 static void RemoveAllVout  ( vout_thread_t *p_vout );
 
-static int  SendEvents( vlc_object_t *, char const *,
+static int  MouseEvent( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
+static int  FullscreenEventUp( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
+static int  FullscreenEventDown( vlc_object_t *, char const *,
+                                 vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -646,7 +651,6 @@ static int AdjustHeight( vout_thread_t *p_vout )
 static int Init( vout_thread_t *p_vout )
 {
     int i_index, i_row, i_col;
-    picture_t *p_pic;
 
     I_OUTPUTPICTURES = 0;
 
@@ -839,7 +843,9 @@ static int Init( vout_thread_t *p_vout )
                 RemoveAllVout( p_vout );
                 return VLC_EGENERIC;
             }
-            ADD_CALLBACKS( p_entry->p_vout, SendEvents );
+            vout_filter_SetupChild( p_vout, p_entry->p_vout,
+                                    MouseEvent, FullscreenEventUp, FullscreenEventDown, true );
+
 #ifdef OVERLAP
             p_entry->p_vout->i_alignment = 0;
             if (i_col == 0)
@@ -867,9 +873,7 @@ static int Init( vout_thread_t *p_vout )
         }
     }
 
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
     return VLC_SUCCESS;
 }
@@ -879,18 +883,9 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-
     RemoveAllVout( p_vout );
+
+    vout_filter_ReleaseDirectBuffers( p_vout );
 
 #ifdef OVERLAP
     var_SetInteger( p_vout, "bz-length", p_vout->p_sys->bz_length);
@@ -1841,13 +1836,16 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void RemoveAllVout( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
+
     for( int i = 0; i < p_vout->p_sys->i_vout; i++ )
     {
-        if( p_vout->p_sys->pp_vout[i].b_active )
+        if( p_sys->pp_vout[i].b_active )
         {
-            DEL_CALLBACKS( p_vout->p_sys->pp_vout[i].p_vout, SendEvents );
-            vout_CloseAndRelease( p_vout->p_sys->pp_vout[i].p_vout );
-            p_vout->p_sys->pp_vout[i].p_vout = NULL;
+            vout_filter_SetupChild( p_vout, p_sys->pp_vout[i].p_vout,
+                                    MouseEvent, FullscreenEventUp, FullscreenEventDown, true );
+            vout_CloseAndRelease( p_sys->pp_vout[i].p_vout );
+            p_sys->pp_vout[i].p_vout = NULL;
         }
     }
 }
@@ -1855,78 +1853,102 @@ static void RemoveAllVout( vout_thread_t *p_vout )
 /*****************************************************************************
  * SendEvents: forward mouse and keyboard events to the parent p_vout
  *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *_p_vout )
+static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    vout_thread_t *p_vout = p_data;
+    vout_sys_t *p_sys = p_vout->p_sys;
     VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)_p_vout;
     int i_vout;
-    vlc_value_t sentval = newval;
 
     /* Find the video output index */
-    for( i_vout = 0; i_vout < p_vout->p_sys->i_vout; i_vout++ )
+    for( i_vout = 0; i_vout < p_sys->i_vout; i_vout++ )
     {
-        if( p_this == (vlc_object_t *)p_vout->p_sys->pp_vout[ i_vout ].p_vout )
-        {
+        if( p_sys->pp_vout[i_vout].b_active &&
+            p_this == VLC_OBJECT(p_sys->pp_vout[i_vout].p_vout) )
             break;
-        }
     }
-
-    if( i_vout == p_vout->p_sys->i_vout )
-    {
-        return VLC_EGENERIC;
-    }
+    assert( i_vout < p_vout->p_sys->i_vout );
 
     /* Translate the mouse coordinates */
     if( !strcmp( psz_var, "mouse-x" ) )
     {
 #ifdef OVERLAP
-        int i_overlap = ((p_vout->p_sys->i_col > 2) ? 0 : 2 * p_vout->p_sys->i_halfLength);
-           sentval.i_int += (p_vout->output.i_width - i_overlap)
+        int i_overlap = ((p_sys->i_col > 2) ? 0 : 2 * p_sys->i_halfLength);
+           newval.i_int += (p_vout->output.i_width - i_overlap)
 #else
-           sentval.i_int += p_vout->output.i_width
+           newval.i_int += p_vout->output.i_width
 #endif
-                         * (i_vout % p_vout->p_sys->i_col)
-                          / p_vout->p_sys->i_col;
+                         * (i_vout % p_sys->i_col)
+                          / p_sys->i_col;
     }
     else if( !strcmp( psz_var, "mouse-y" ) )
     {
 #ifdef OVERLAP
-        int i_overlap = ((p_vout->p_sys->i_row > 2) ? 0 : 2 * p_vout->p_sys->i_halfHeight);
-           sentval.i_int += (p_vout->output.i_height - i_overlap)
+        int i_overlap = ((p_sys->i_row > 2) ? 0 : 2 * p_sys->i_halfHeight);
+           newval.i_int += (p_vout->output.i_height - i_overlap)
 #else
-           sentval.i_int += p_vout->output.i_height
+           newval.i_int += p_vout->output.i_height
 #endif
 //bug fix in Wall plug-in
 //                         * (i_vout / p_vout->p_sys->i_row)
-                         * (i_vout / p_vout->p_sys->i_col)
-                          / p_vout->p_sys->i_row;
+                         * (i_vout / p_sys->i_col)
+                          / p_sys->i_row;
     }
 
-    var_Set( p_vout, psz_var, sentval );
-
-    return VLC_SUCCESS;
+    return var_Set( p_vout, psz_var, newval );
 }
 
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+/**
+ * Forward fullscreen event to/from the childrens.
+ * FIXME pretty much duplicated from wall.c
+ */
+static bool IsFullscreenActive( vout_thread_t *p_vout )
 {
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    int i_row, i_col, i_vout = 0;
-
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    vout_sys_t *p_sys = p_vout->p_sys;
+    for( int i = 0; i < p_sys->i_vout; i++ )
     {
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        if( p_sys->pp_vout[i].b_active &&
+            var_GetBool( p_sys->pp_vout[i].p_vout, "fullscreen" ) )
+            return true;
+    }
+    return false;
+}
+static int FullscreenEventUp( vlc_object_t *p_this, char const *psz_var,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(newval);
+
+    const bool b_fullscreen = IsFullscreenActive( p_vout );
+    if( !var_GetBool( p_vout, "fullscreen" ) != !b_fullscreen )
+        return var_SetBool( p_vout, "fullscreen", b_fullscreen );
+    return VLC_SUCCESS;
+}
+static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
+                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t*)p_this;
+    vout_sys_t *p_sys = p_vout->p_sys;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(psz_var);
+
+    const bool b_fullscreen = IsFullscreenActive( p_vout );
+    if( !b_fullscreen != !newval.b_bool )
+    {
+        for( int i = 0; i < p_sys->i_vout; i++ )
         {
-            var_Set( p_vout->p_sys->pp_vout[ i_vout ].p_vout, psz_var, newval);
-            if( !strcmp( psz_var, "fullscreen" ) ) break;
-            i_vout++;
+            if( !p_sys->pp_vout[i].b_active )
+                continue;
+
+            vout_thread_t *p_child = p_sys->pp_vout[i].p_vout;
+            if( !var_GetBool( p_child, "fullscreen" ) != !newval.b_bool )
+            {
+                var_SetBool( p_child, "fullscreen", newval.b_bool );
+                if( newval.b_bool )
+                    return VLC_SUCCESS;
+            }
         }
     }
-
     return VLC_SUCCESS;
 }
+

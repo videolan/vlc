@@ -49,8 +49,10 @@ static void Render    ( vout_thread_t *, picture_t * );
 
 static void RemoveAllVout  ( vout_thread_t *p_vout );
 
-static int  SendEvents( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
+static int  FullscreenEventUp( vlc_object_t *, char const *,
+                               vlc_value_t, vlc_value_t, void * );
+static int  FullscreenEventDown( vlc_object_t *, char const *,
+                                 vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -213,8 +215,7 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
-    int   i_index, i_vout;
-    picture_t *p_pic;
+    int   i_vout;
     char *psz_default_vout;
     video_format_t fmt;
 
@@ -265,14 +266,12 @@ static int Init( vout_thread_t *p_vout )
             RemoveAllVout( p_vout );
             return VLC_EGENERIC;
         }
-
-        ADD_CALLBACKS( p_vout->p_sys->pp_vout[ i_vout ], SendEvents );
+        vout_filter_SetupChild( p_vout, p_vout->p_sys->pp_vout[i_vout],
+                                NULL, FullscreenEventUp, FullscreenEventDown, true );
     }
 
     free( psz_default_vout );
-    ALLOCATE_DIRECTBUFFERS( VOUT_MAX_PICTURES );
-
-    ADD_PARENT_CALLBACKS( SendEventsToChild );
+    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
     return VLC_SUCCESS;
 }
@@ -282,18 +281,9 @@ static int Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void End( vout_thread_t *p_vout )
 {
-    int i_index;
-
-    DEL_PARENT_CALLBACKS( SendEventsToChild );
-
-    /* Free the fake output buffers we allocated */
-    for( i_index = I_OUTPUTPICTURES ; i_index ; )
-    {
-        i_index--;
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data_orig );
-    }
-
     RemoveAllVout( p_vout );
+
+    vout_filter_ReleaseDirectBuffers( p_vout );
 }
 
 /*****************************************************************************
@@ -380,43 +370,64 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void RemoveAllVout( vout_thread_t *p_vout )
 {
-    while( p_vout->p_sys->i_clones )
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    while( p_sys->i_clones )
     {
-         --p_vout->p_sys->i_clones;
-         DEL_CALLBACKS( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones],
-                        SendEvents );
-         vout_CloseAndRelease( p_vout->p_sys->pp_vout[p_vout->p_sys->i_clones] );
+         p_sys->i_clones--;
+
+         vout_filter_SetupChild( p_vout, p_sys->pp_vout[p_sys->i_clones],
+                                 NULL, FullscreenEventUp, FullscreenEventDown, false );
+         vout_CloseAndRelease( p_sys->pp_vout[p_sys->i_clones] );
     }
 }
 
-/*****************************************************************************
- * SendEvents: forward mouse and keyboard events to the parent p_vout
- *****************************************************************************/
-static int SendEvents( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+/**
+ * Forward fullscreen event to/from the childrens.
+ * FIXME pretty much duplicated from wall.c
+ */
+static bool IsFullscreenActive( vout_thread_t *p_vout )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    var_Set( (vlc_object_t *)p_data, psz_var, newval );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SendEventsToChild: forward events to the child/children vout
- *****************************************************************************/
-static int SendEventsToChild( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_data); VLC_UNUSED(oldval);
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    int i_vout;
-
-    for( i_vout = 0; i_vout < p_vout->p_sys->i_clones; i_vout++ )
+    vout_sys_t *p_sys = p_vout->p_sys;
+    for( int i = 0; i < p_sys->i_clones; i++ )
     {
-        var_Set( p_vout->p_sys->pp_vout[ i_vout ], psz_var, newval );
-
-        if( !strcmp( psz_var, "fullscreen" ) ) break;
+        if( var_GetBool( p_sys->pp_vout[i], "fullscreen" ) )
+            return true;
     }
+    return false;
+}
+static int FullscreenEventUp( vlc_object_t *p_this, char const *psz_var,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = p_data;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(newval);
 
+    const bool b_fullscreen = IsFullscreenActive( p_vout );
+    if( !var_GetBool( p_vout, "fullscreen" ) != !b_fullscreen )
+        return var_SetBool( p_vout, "fullscreen", b_fullscreen );
     return VLC_SUCCESS;
 }
+static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
+                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t*)p_this;
+    vout_sys_t *p_sys = p_vout->p_sys;
+    VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(psz_var);
+
+    const bool b_fullscreen = IsFullscreenActive( p_vout );
+    if( !b_fullscreen != !newval.b_bool )
+    {
+        for( int i = 0; i < p_sys->i_clones; i++ )
+        {
+            vout_thread_t *p_child = p_sys->pp_vout[i];
+            if( !var_GetBool( p_child, "fullscreen" ) != !newval.b_bool )
+            {
+                var_SetBool( p_child, "fullscreen", newval.b_bool );
+                if( newval.b_bool )
+                    return VLC_SUCCESS;
+            }
+        }
+    }
+    return VLC_SUCCESS;
+}
+
