@@ -204,7 +204,14 @@ static const struct
       VIDEO_ES, "MPEG-4 Video" },
     { VLC_FOURCC('D','M','K','2'), CODEC_ID_MPEG4,
       VIDEO_ES, "MPEG-4 Video" },
-
+    { VLC_FOURCC('D','I','G','I'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('I','N','M','C'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('S','N','4','0'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('E','P','H','V'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
 
     /* MSMPEG4 v1 */
     { VLC_FOURCC('D','I','V','1'), CODEC_ID_MSMPEG4V1,
@@ -456,6 +463,8 @@ static const struct
       VIDEO_ES, "DV Video" },
     { VLC_FOURCC('c','d','v','c'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('C','D','V','H'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "Canopus DV Video" },
     { VLC_FOURCC('d','v','5','p'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video C Pro 50 PAL" },
     { VLC_FOURCC('d','v','5','n'), CODEC_ID_DVVIDEO,
