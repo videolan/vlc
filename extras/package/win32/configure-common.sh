@@ -1,6 +1,5 @@
       $CONFIG \
       --without-contrib \
-      --enable-shared-libvlc \
       --enable-update-check \
       --enable-lua \
       --enable-faad \
@@ -10,7 +9,7 @@
       --enable-quicktime \
       --enable-real \
       --enable-realrtsp \
-      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
+      --enable-avcodec \
       --enable-live555 --with-live555-tree=/usr/win32/live.com \
       --enable-dca \
       --enable-mpc \
@@ -23,8 +22,6 @@
       --enable-portaudio \
       --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-qt4 \
-      --with-freetype-config-path=/usr/win32/bin \
-      --with-xml2-config-path=/usr/win32/bin \
       --enable-mozilla --with-mozilla-sdk-path=/usr/win32/gecko-sdk \
       --enable-activex \
       --enable-sse --enable-mmx \
