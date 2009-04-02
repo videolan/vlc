@@ -181,17 +181,13 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     /* If we now have a video output, check it has the right properties */
     if( p_vout )
     {
-        char *psz_filter_chain;
-        vlc_value_t val;
-
         vlc_mutex_lock( &p_vout->change_lock );
 
         /* We don't directly check for the "vout-filter" variable for obvious
          * performance reasons. */
         if( p_vout->p->b_filter_change )
         {
-            var_Get( p_vout, "vout-filter", &val );
-            psz_filter_chain = val.psz_string;
+            char *psz_filter_chain = var_GetString( p_vout, "vout-filter" );
 
             if( psz_filter_chain && !*psz_filter_chain )
             {
@@ -302,7 +298,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 {
     vout_thread_t  * p_vout;                            /* thread descriptor */
     int              i_index;                               /* loop variable */
-    vlc_value_t      val, text;
+    vlc_value_t      text;
 
     unsigned int i_width = p_fmt->i_width;
     unsigned int i_height = p_fmt->i_height;
@@ -475,9 +471,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Choose the video output module */
     if( !p_vout->p->psz_filter_chain || !*p_vout->p->psz_filter_chain )
     {
-        var_Create( p_vout, "vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        var_Get( p_vout, "vout", &val );
-        psz_parser = val.psz_string;
+        psz_parser = var_CreateGetString( p_vout, "vout" );
     }
     else
     {
@@ -1682,7 +1676,6 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     input_thread_t *p_input;
-    vlc_value_t val;
     (void)psz_cmd; (void)oldval; (void)p_data;
 
     p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT,
@@ -1690,17 +1683,14 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     if (!p_input)
     {
         msg_Err( p_vout, "Input not found" );
-        return( VLC_EGENERIC );
+        return VLC_EGENERIC;
     }
 
-    val.b_bool = true;
-    var_Set( p_vout, "intf-change", val );
+    var_SetBool( p_vout, "intf-change", true );
 
     /* Modify input as well because the vout might have to be restarted */
-    val.psz_string = newval.psz_string;
     var_Create( p_input, "vout-filter", VLC_VAR_STRING );
-
-    var_Set( p_input, "vout-filter", val );
+    var_SetString( p_input, "vout-filter", newval.psz_string );
 
     /* Now restart current video stream */
     input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
@@ -1775,7 +1765,10 @@ static int PostProcessCallback( vlc_object_t *p_this, char const *psz_cmd,
         }
     }
     if( psz_vf2 )
+    {
         var_SetString( p_vout, "video-filter", psz_vf2 );
+        free( psz_vf2 );
+    }
 
     return VLC_SUCCESS;
 }
