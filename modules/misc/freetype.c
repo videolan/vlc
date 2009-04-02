@@ -532,7 +532,7 @@ static void* FontBuilderThread( vlc_object_t *p_this )
         t2 = mdate();
 
         msg_Dbg( p_this, "Finished building font database." );
-        msg_Dbg( p_this, "Took %ld seconds", (long)((t2 - t1)/1000000) );
+        msg_Dbg( p_this, "Took %ld microseconds", (long)((t2 - t1)) );
 
         vlc_mutex_lock( &fb_lock );
         p_this->p_private = p_fontconfig;
