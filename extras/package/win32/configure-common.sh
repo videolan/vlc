@@ -8,13 +8,14 @@
       --enable-twolame \
       --enable-quicktime \
       --enable-real \
-      --enable-realrtsp \
       --enable-avcodec \
-      --enable-live555 --with-live555-tree=/usr/win32/live.com \
       --enable-dca \
       --enable-mpc \
       --enable-libass \
       --enable-x264 \
+      --enable-schroedinger --enable-dirac \
+      --enable-realrtsp \
+      --enable-live555 --with-live555-tree=/usr/win32/live.com \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
       --enable-goom \
@@ -26,6 +27,6 @@
       --enable-activex \
       --enable-sse --enable-mmx \
       --disable-gnomevfs --disable-hal \
-      --disable-cddax --disable-vcdx \
+      --disable-cddax --disable-vcdx --disable-libcdio --disable-vcdinfo \
       --disable-libcddb --disable-dvb --disable-zvbi --enable-telx \
       --disable-pulse
