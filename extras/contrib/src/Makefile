@@ -669,6 +669,9 @@ libmad-$(LIBMAD_VERSION).tar.gz:
 
 libmad: libmad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_DARWIN_OS
+	( cd $@; sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' -i.orig  configure )
+endif
 
 .mad: libmad
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
