@@ -44,8 +44,6 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 
-#include <poll.h>
-
 /* From GStreamer's v4l plugin:
  * Because of some really cool feature in video4linux1, also known as
  * 'not including sys/types.h and sys/time.h', we had to include it
@@ -457,24 +455,16 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    struct pollfd fd;
-    fd.fd = p_sys->i_fd;
-    fd.events = POLLIN|POLLPRI;
-    fd.revents = 0;
+    block_t *p_block = GrabVideo( p_demux );
 
-    /* Wait for data */
-    if( poll( &fd, 1, 500 ) )
+    if( !p_block )
     {
-        if( fd.revents & (POLLIN|POLLPRI) )
-        {
-            block_t *p_block = GrabVideo( p_demux );
-            if( p_block )
-            {
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
-                es_out_Send( p_demux->out, p_sys->p_es, p_block );
-            }
-        }
+        msleep( 10000 ); /* Unfortunately v4l doesn't allow polling */
+        return 1;
     }
+
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
+    es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     return 1;
 }
