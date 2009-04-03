@@ -95,7 +95,6 @@ typedef void (*block_free_t) (block_t *);
 struct block_t
 {
     block_t     *p_next;
-    block_t     *p_prev;
 
     uint32_t    i_flags;
 
