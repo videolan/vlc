@@ -424,7 +424,6 @@ float libvlc_vlm_get_media_instance_position( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get position attribute" );
     return result;
 }
 
@@ -441,7 +440,6 @@ int libvlc_vlm_get_media_instance_time( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get time attribute" );
     return result;
 }
 
@@ -459,7 +457,6 @@ int libvlc_vlm_get_media_instance_length( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get length attribute" );
     return result;
 }
 
@@ -476,7 +473,6 @@ int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get rate attribute" );
     return result;
 }
 
@@ -492,7 +488,6 @@ int libvlc_vlm_get_media_instance_title( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get title attribute" );
     return result;
 }
 
@@ -509,7 +504,6 @@ int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get chapter attribute" );
     return result;
 }
 
@@ -526,6 +520,5 @@ int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
         return result;
     }
-    libvlc_exception_raise( p_exception, "Unable to get seekable attribute" );
     return result;
 }
