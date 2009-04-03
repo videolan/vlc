@@ -34,11 +34,6 @@
 # define trace( ... )
 #endif
 
-struct libvlc_media_list_view_private_t
-{
-    vlc_array_t array;
-};
-
 /*
  * Private functions
  */
