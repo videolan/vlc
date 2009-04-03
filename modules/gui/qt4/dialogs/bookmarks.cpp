@@ -233,17 +233,12 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     }
 
     // Send the modification
-    if( input_Control( p_input, INPUT_CHANGE_BOOKMARK, p_seekpoint, i_edit ) !=
-        VLC_SUCCESS )
-        goto clear;
+    input_Control( p_input, INPUT_CHANGE_BOOKMARK, p_seekpoint, i_edit );
 
-// Clear the bookmark list
 clear:
+    // Clear the bookmark list
     for( int i = 0; i < i_bookmarks; i++)
-    {
-        if( p_seekpoint != pp_bookmarks[i] )
-            vlc_seekpoint_Delete( pp_bookmarks[i] );
-    }
+        vlc_seekpoint_Delete( pp_bookmarks[i] );
     free( pp_bookmarks );
 }
 
