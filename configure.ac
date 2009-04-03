@@ -3748,7 +3748,7 @@ if test "${enable_x264}" != "no"; then
       VLC_ADD_LIBS([x264],[-L${real_x264_tree}])
       PKG_CHECK_MODULES(X264,x264, [
         VLC_ADD_PLUGIN([x264])
-        VLC_ADD_LDFLAGS([x264],[${X264_LIBS} -Wl,-Bsymbolic])
+        VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
         if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
           VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
@@ -3764,7 +3764,18 @@ if test "${enable_x264}" != "no"; then
   else
       PKG_CHECK_MODULES(X264,x264, [
         VLC_ADD_PLUGIN([x264])
-        VLC_ADD_LDFLAGS([x264],[${X264_LIBS} -Wl,-Bsymbolic])
+        VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
+
+        AC_CACHE_CHECK([if linker supports -Bsymbolic],
+          [ac_cv_ld_bsymbolic],
+          [LDFLAGS="${LDFLAGS_vlc} -Wl,-Bsymbolic"
+            AC_TRY_LINK([],,ac_cv_ld_bsymbolic=yes,ac_cv_ld_bsymbolic=no)
+            LDFLAGS="${LDFLAGS_save}"
+          ])
+        AS_IF([test "${ac_cv_ld_bsymbolic}" != "no"], [
+          VLC_ADD_LDFLAGS([x264],[-Wl,-Bsymbolic])
+        ])
+
         VLC_ADD_CFLAGS([x264],[${X264_CFLAGS}])
         if echo ${X264_LIBS} |grep -q 'pthreadGC2'; then
           VLC_ADD_CFLAGS([x264], [-DPTW32_STATIC_LIB])
