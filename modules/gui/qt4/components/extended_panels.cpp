@@ -870,7 +870,7 @@ void Equalizer::clean()
 /* Write down initial values */
 void Equalizer::updateUIFromCore()
 {
-    char *psz_af;
+    char *psz_af, *psz_pres;
     float f_preamp;
     int i_preset;
 
@@ -878,21 +878,21 @@ void Equalizer::updateUIFromCore()
     if( p_aout )
     {
         psz_af = var_GetNonEmptyString( p_aout, "audio-filter" );
+        psz_pres = var_GetString( p_aout, "equalizer-preset" );
         if( var_GetBool( p_aout, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
         f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
-        i_preset = presetsComboBox->findData( QVariant(
-                    var_GetString( p_aout, "equalizer-preset" ) ) );
+        i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
         vlc_object_release( p_aout );
     }
     else
     {
         psz_af = config_GetPsz( p_intf, "audio-filter" );
+        psz_pres = config_GetPsz( p_intf, "equalizer-preset" );
         if( config_GetInt( p_intf, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
         f_preamp = config_GetFloat( p_intf, "equalizer-preamp" );
-        i_preset = presetsComboBox->findData( QVariant(
-                    config_GetPsz( p_intf, "equalizer-preset" ) ) );
+        i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
     }
     if( psz_af && strstr( psz_af, "equalizer" ) != NULL )
         ui.enableCheck->setChecked( true );
@@ -901,6 +901,7 @@ void Equalizer::updateUIFromCore()
     presetsComboBox->setCurrentIndex( i_preset );
 
     free( psz_af );
+    free( psz_pres );
 }
 
 /* Functin called when enableButton is toggled */
