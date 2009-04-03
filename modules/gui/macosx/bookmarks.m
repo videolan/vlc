@@ -158,28 +158,22 @@ static VLCBookmarks *_o_sharedInstance = nil;
     int row;
     row = [o_tbl_dataTable selectedRow];
  
-    if( !p_input )
-    {
+    if( !p_input && row < 0 )
         return;
-    }
-    else if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
+
+    if( input_Control( p_input, INPUT_GET_BOOKMARKS, &pp_bookmarks,
         &i_bookmarks ) != VLC_SUCCESS )
     {
         vlc_object_release( p_input );
         return;
     }
-    else if(row < 0)
-    {
-        vlc_object_release( p_input );
-        return;
-    } else {
-        [o_edit_fld_name setStringValue: [NSString stringWithUTF8String:
+
+    [o_edit_fld_name setStringValue: [NSString stringWithUTF8String:
             pp_bookmarks[row]->psz_name]];
-        [o_edit_fld_time setStringValue: [[NSNumber numberWithInt:
+    [o_edit_fld_time setStringValue: [[NSNumber numberWithInt:
             (pp_bookmarks[row]->i_time_offset / 1000000)] stringValue]];
-        [o_edit_fld_bytes setStringValue: [[NSNumber numberWithInt:
+    [o_edit_fld_bytes setStringValue: [[NSNumber numberWithInt:
             pp_bookmarks[row]->i_byte_offset] stringValue]];
-    }
  
     /* Just keep the pointer value to check if it
      * changes. Note, we don't need to keep a reference to the object.
@@ -192,6 +186,12 @@ static VLCBookmarks *_o_sharedInstance = nil;
         modalDelegate: o_edit_window
         didEndSelector: nil
         contextInfo: nil];
+
+    // Clear the bookmark list
+    for( int i = 0; i < i_bookmarks; i++)
+        vlc_seekpoint_Delete( pp_bookmarks[i] );
+    free( pp_bookmarks );
+
 }
 
 - (IBAction)edit_cancel:(id)sender
@@ -246,8 +246,7 @@ static VLCBookmarks *_o_sharedInstance = nil;
         != VLC_SUCCESS )
     {
         msg_Warn( VLCIntf, "Unable to change the bookmark");
-        vlc_object_release( p_input );
-        return;
+        goto clear;
     }
  
     [o_tbl_dataTable reloadData];
@@ -256,6 +255,12 @@ static VLCBookmarks *_o_sharedInstance = nil;
  
     [NSApp endSheet: o_edit_window];
     [o_edit_window close];
+
+clear:
+    // Clear the bookmark list
+    for( int i = 0; i < i_bookmarks; i++)
+        vlc_seekpoint_Delete( pp_bookmarks[i] );
+    free( pp_bookmarks );
 }
 
 - (IBAction)extract:(id)sender
@@ -322,6 +327,11 @@ static VLCBookmarks *_o_sharedInstance = nil;
     free( psz_uri );
     vlc_object_release( p_input );
     msg_Dbg( VLCIntf, "released input");
+
+    // Clear the bookmark list
+    for( int i = 0; i < i_bookmarks; i++)
+        vlc_seekpoint_Delete( pp_bookmarks[i] );
+    free( pp_bookmarks );
 }
 
 - (IBAction)goToBookmark:(id)sender
@@ -381,6 +391,10 @@ static VLCBookmarks *_o_sharedInstance = nil;
     }
     else {
         vlc_object_release( p_input );
+        // Clear the bookmark list
+        for( int i = 0; i < i_bookmarks; i++)
+            vlc_seekpoint_Delete( pp_bookmarks[i] );
+        free( pp_bookmarks );
         return i_bookmarks;
     }
 }
@@ -428,6 +442,11 @@ static VLCBookmarks *_o_sharedInstance = nil;
                 UTF8String] );
             ret = @"unknown identifier";
         }
+
+        // Clear the bookmark list
+        for( int i = 0; i < i_bookmarks; i++)
+            vlc_seekpoint_Delete( pp_bookmarks[i] );
+        free( pp_bookmarks );
     }
     vlc_object_release( p_input );
     return ret;
