@@ -89,6 +89,8 @@ void libvlc_exception_raise( libvlc_exception_t *p_exception,
         /* Print something, so that lazy third-parties can easily
          * notice that something may have gone unnoticedly wrong */
         libvlc_exception_not_handled( psz );
+        if( psz != nomemstr )
+            free( psz );
         return;
     }
 
