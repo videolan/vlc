@@ -623,7 +623,8 @@ void NetOpenPanel::updateCompleter()
 {
     assert( mrlList );
     QStringList tempL = mrlList->stringList();
-    tempL.append( ui.addressText->text() );
+    if( !tempL.contains( ui.addressText->text() ) )
+        tempL.append( ui.addressText->text() );
     mrlList->setStringList( tempL );
 }
 
