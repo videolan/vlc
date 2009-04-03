@@ -700,6 +700,19 @@ static VLCMain *_o_sharedMainInstance = nil;
 #pragma mark -
 #pragma mark Termination
 
+- (void)releaseRepresentedObjects:(NSMenu *)the_menu
+{
+    NSArray *menuitems_array = [the_menu itemArray];
+    for( int i=0; i<[menuitems_array count]; i++ )
+    {
+        NSMenuItem *one_item = [menuitems_array objectAtIndex: i];
+        if( [one_item hasSubmenu] )
+            [self releaseRepresentedObjects: [one_item submenu]];
+
+        [one_item setRepresentedObject:NULL];
+    }
+}
+
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
     playlist_t * p_playlist;
@@ -793,6 +806,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
+
+    /* Make sure the Menu doesn't have any references to vlc objects anymore */
+    [self releaseRepresentedObjects:[NSApp mainMenu]];
 
     /* Kill the playlist, so that it doesn't accept new request
      * such as the play request from vlc.c (we are a blocking interface). */
