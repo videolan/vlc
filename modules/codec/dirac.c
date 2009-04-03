@@ -806,7 +806,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
         }
         date_Init( &date, p_enc->fmt_in.video.i_frame_rate, p_enc->fmt_in.video.i_frame_rate_base );
 #if DIRAC_RESEARCH_VERSION_ATLEAST(1,0,2)
-        int i_delayinpics = dirac_encoder_ptsoffset( p_sys->p_dirac );
+        int i_delayinpics = dirac_encoder_pts_offset( p_sys->p_dirac );
         i_delayinpics /= p_sys->ctx.enc_params.picture_coding_mode + 1;
         date_Increment( &date, i_delayinpics );
 #else
