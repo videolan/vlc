@@ -93,7 +93,7 @@ QString OptionFromWidgetName( QObject *obj )
 }
 
 ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
-                           p_intf( _p_intf )
+            QObject( _parent ), p_intf( _p_intf )
 {
     ui.setupUi( _parent );
     p_vout = NULL;
