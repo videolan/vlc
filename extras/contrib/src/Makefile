@@ -2204,7 +2204,6 @@ dirac-$(DIRAC_VERSION).tar.gz:
 
 dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	patch -p1 -d dirac <Patches/dirac-cross.patch
 ifdef HAVE_CYGWIN
 	# incorrect compile warning with cygwin compiler 3.4.4
 	patch -p0 <Patches/dirac-cygwin.patch
