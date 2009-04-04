@@ -54,7 +54,7 @@ static bool IsSpace( char c  )
     return c == ' ' || c == '\t';
 }
 
-#define SKIPSPACE( p ) do { while( *p && IsSpace( *p ) ) p++; } while(0)
+#define SKIPSPACE( p ) p += strspn( p, " \t" )
 #define SKIPTRAILINGSPACE( p, e ) \
     do { while( e > p && IsSpace( *(e-1) ) ) e--; } while(0)
 
@@ -174,107 +174,71 @@ static char *ChainGetValue( const char **ppsz_string )
     return psz_value;
 }
 
-char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_chain )
+char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
+                          const char *psz_chain )
 {
-    config_chain_t *p_cfg = NULL;
-    const char *p = psz_chain;
+    config_chain_t **pp_next = pp_cfg;
+    size_t len;
 
     *ppsz_name = NULL;
     *pp_cfg    = NULL;
 
-    if( !p )
+    if( !psz_chain )
         return NULL;
+    psz_chain += strspn( psz_chain, " \t" );
 
-    /* Look for parameter(either a {...} or :...) or the end of name (space or nul) */
-    SKIPSPACE( p );
-
-    while( *p && *p != '{' && *p != ':' && !IsSpace( *p ) )
-        p++;
-
-    if( p == psz_chain )
+    /* Look for parameter (a {...} or :...) or end of name (space or nul) */
+    len = strcspn( psz_chain, "{: \t" );
+    if( len == 0 )
         return NULL;
 
     /* Extract the name */
-    *ppsz_name = strndup( psz_chain, p - psz_chain );
+    *ppsz_name = strndup( psz_chain, len );
+    psz_chain += len;
 
     /* Parse the parameters */
-    SKIPSPACE( p );
-
-    if( *p == '{' )
+    psz_chain += strspn( psz_chain, " \t" );
+    if( *psz_chain == '{' )
     {
-        const char *psz_name;
-
-        /* Skip the opening '{' */
-        p++;
-
-        /* parse all name=value[,] elements */
-        for( ;; )
+        /* Parse all name=value[,] elements */
+        do
         {
-            SKIPSPACE( p );
-
-            psz_name = p;
+            psz_chain++; /* skip previous delimiter */
+            psz_chain += strspn( psz_chain, " \t" );
 
             /* Look for the end of the name (,={}_space_) */
-            while( *p && *p != '=' && *p != ',' && *p != '{' && *p != '}' && !IsSpace( *p ) )
-                p++;
+            len = strcspn( psz_chain, "=,{} \t" );
+            if( len == 0 )
+                continue; /* ignore empty parameter */
 
-            // fprintf( stderr, "name=%s - rest=%s\n", psz_name, p );
-            if( p == psz_name )
-            {
-                fprintf( stderr, "config_ChainCreate: invalid options (empty) \n" );
+            /* Append the new parameter */
+            config_chain_t *p_cfg = malloc( sizeof(*p_cfg) );
+            if( !p_cfg )
                 break;
-            }
+            p_cfg->psz_name = strndup( psz_chain, len );
+            psz_chain += len;
+            p_cfg->psz_value = NULL;
+            p_cfg->p_next = NULL;
 
-            /* */
-            config_chain_t cfg;
-            cfg.psz_name = strndup( psz_name, p - psz_name );
-            cfg.psz_value = NULL;
-            cfg.p_next = NULL;
+            *pp_next = p_cfg;
+            pp_next = &p_cfg->p_next;
 
-            /* Parse the option name parameter */
-            SKIPSPACE( p );
-
-            if( *p == '=' || *p == '{' )
+            /* Extract the option value */
+            psz_chain += strspn( psz_chain, " \t" );
+            if( strchr( "={", *psz_chain ) )
             {
-                cfg.psz_value = ChainGetValue( &p );
-
-                SKIPSPACE( p );
-            }
-
-            /* Append the new option */
-            config_chain_t *p_new = malloc( sizeof(*p_new) );
-            if( !p_new )
-            {
-                free( cfg.psz_name );
-                free( cfg.psz_value );
-                break;
-            }
-            *p_new = cfg;
-
-            if( p_cfg )
-            {
-                p_cfg->p_next = p_new;
-                p_cfg = p_cfg->p_next;
-            }
-            else
-            {
-                *pp_cfg = p_cfg = p_new;
-            }
-
-            /* */
-            if( *p == ',' )
-                p++;
-
-            if( *p == '}' )
-            {
-                p++;
-                break;
+                p_cfg->psz_value = ChainGetValue( &psz_chain );
+                psz_chain += strspn( psz_chain, " \t" );
             }
         }
+        while( !memchr( "}", *psz_chain, 2 ) );
+
+        if( *psz_chain ) psz_chain++; /* skip '}' */;
+        psz_chain += strspn( psz_chain, " \t" );
     }
 
-    if( *p == ':' )
-        return strdup( &p[1] );
+    if( *psz_chain == ':' )
+        return strdup( psz_chain + 1 );
 
     return NULL;
 }
