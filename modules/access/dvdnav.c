@@ -172,6 +172,9 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 
 static int ControlInternal( demux_t *, int, ... );
 
+static int EventKey( vlc_object_t *, char const *,
+                     vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -352,6 +355,15 @@ static int Open( vlc_object_t *p_this )
     /* Now create our event thread catcher */
     p_sys->p_ev = vlc_object_create( p_demux, sizeof( event_thread_t ) );
     p_sys->p_ev->p_demux = p_demux;
+    vlc_mutex_init( &p_sys->p_ev->lock );
+    p_sys->p_ev->b_moved   = false;
+    p_sys->p_ev->b_clicked = false;
+    p_sys->p_ev->i_key_action = 0;
+    p_sys->p_ev->b_still   = false;
+
+    /* catch all key event */
+    var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, p_sys->p_ev );
+
     vlc_thread_create( p_sys->p_ev, "dvdnav event thread handler", EventThread,
                        VLC_THREAD_PRIORITY_LOW );
 
@@ -369,7 +381,9 @@ static void Close( vlc_object_t *p_this )
 
     /* stop the event handler */
     vlc_object_kill( p_sys->p_ev );
+    var_DelCallback( p_demux->p_libvlc, "key-action", EventKey, p_sys->p_ev );
     vlc_thread_join( p_sys->p_ev );
+    vlc_mutex_destroy( &p_sys->p_ev->lock );
     vlc_object_release( p_sys->p_ev );
 
     var_Destroy( p_sys->p_input, "highlight-mutex" );
@@ -1282,25 +1296,13 @@ static void ESNew( demux_t *p_demux, int i_id )
  *****************************************************************************/
 static int  EventMouse( vlc_object_t *, char const *,
                         vlc_value_t, vlc_value_t, void * );
-static int  EventKey  ( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
 
 static void* EventThread( vlc_object_t *p_this )
 {
     event_thread_t *p_ev = (event_thread_t*)p_this;
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
     vlc_object_t   *p_vout = NULL;
-
-    vlc_mutex_init( &p_ev->lock );
-    p_ev->b_moved   = false;
-    p_ev->b_clicked = false;
-    p_ev->i_key_action = 0;
-    p_ev->b_still   = false;
-
     int canc = vlc_savecancel ();
-
-    /* catch all key event */
-    var_AddCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
 
     /* main loop */
     while( vlc_object_alive( p_ev ) )
@@ -1408,9 +1410,7 @@ static void* EventThread( vlc_object_t *p_this )
         var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
         vlc_object_release( p_vout );
     }
-    var_DelCallback( p_ev->p_libvlc, "key-action", EventKey, p_ev );
     vlc_restorecancel (canc);
-    vlc_mutex_destroy( &p_ev->lock );
 
     return NULL;
 }
