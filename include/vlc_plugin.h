@@ -119,8 +119,8 @@ enum vlc_module_properties
 /**
  * Current plugin ABI version
  */
-# define MODULE_SYMBOL 1_0_0d
-# define MODULE_SUFFIX "__1_0_0d"
+# define MODULE_SYMBOL 1_0_0e
+# define MODULE_SUFFIX "__1_0_0e"
 
 /*****************************************************************************
  * Add a few defines. You do not want to read this section. Really.
