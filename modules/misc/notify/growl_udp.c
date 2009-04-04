@@ -143,11 +143,11 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     input_item_t *p_item = input_GetItem( p_input );
 
     psz_title = input_item_GetTitle( p_item );
-    if( psz_title == NULL || EMPTY_STR( psz_title ) )
+    if( EMPTY_STR( psz_title ) )
     {
         free( psz_title );
         psz_title = input_item_GetName( input_GetItem( p_input ) );
-        if( psz_title == NULL || EMPTY_STR( psz_title ) )
+        if( EMPTY_STR( psz_title ) )
         {
             free( psz_title );
             vlc_object_release( p_input );
