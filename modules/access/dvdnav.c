@@ -116,7 +116,6 @@ typedef struct
 
     bool      b_moved;
     bool      b_clicked;
-    int             i_key_action;
 
     bool      b_still;
     int64_t         i_still_end;
@@ -140,6 +139,7 @@ struct demux_sys_t
     input_thread_t *p_input;
 
     /* event */
+    vlc_object_t *p_vout;
     event_thread_t *p_ev;
 
     /* palette for menus */
@@ -358,11 +358,10 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->p_ev->lock );
     p_sys->p_ev->b_moved   = false;
     p_sys->p_ev->b_clicked = false;
-    p_sys->p_ev->i_key_action = 0;
     p_sys->p_ev->b_still   = false;
 
     /* catch all key event */
-    var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, p_sys->p_ev );
+    var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, p_demux );
 
     vlc_thread_create( p_sys->p_ev, "dvdnav event thread handler", EventThread,
                        VLC_THREAD_PRIORITY_LOW );
@@ -381,7 +380,7 @@ static void Close( vlc_object_t *p_this )
 
     /* stop the event handler */
     vlc_object_kill( p_sys->p_ev );
-    var_DelCallback( p_demux->p_libvlc, "key-action", EventKey, p_sys->p_ev );
+    var_DelCallback( p_demux->p_libvlc, "key-action", EventKey, p_demux );
     vlc_thread_join( p_sys->p_ev );
     vlc_mutex_destroy( &p_sys->p_ev->lock );
     vlc_object_release( p_sys->p_ev );
@@ -1307,37 +1306,6 @@ static void* EventThread( vlc_object_t *p_this )
     /* main loop */
     while( vlc_object_alive( p_ev ) )
     {
-        /* KEY part */
-        if( p_ev->i_key_action != 0 )
-        {
-            pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
-
-            vlc_mutex_lock( &p_ev->lock );
-            switch( p_ev->i_key_action )
-            {
-            case ACTIONID_NAV_LEFT:
-                dvdnav_left_button_select( p_sys->dvdnav, pci );
-                break;
-            case ACTIONID_NAV_RIGHT:
-                dvdnav_right_button_select( p_sys->dvdnav, pci );
-                break;
-            case ACTIONID_NAV_UP:
-                dvdnav_upper_button_select( p_sys->dvdnav, pci );
-                break;
-            case ACTIONID_NAV_DOWN:
-                dvdnav_lower_button_select( p_sys->dvdnav, pci );
-                break;
-            case ACTIONID_NAV_ACTIVATE:
-                ButtonUpdate( p_ev->p_demux, true );
-                dvdnav_button_activate( p_sys->dvdnav, pci );
-                break;
-            default:
-                break;
-            }
-            p_ev->i_key_action = 0;
-            vlc_mutex_unlock( &p_ev->lock );
-        }
-
         /* VOUT part */
         if( p_vout && ( p_ev->b_moved || p_ev->b_clicked ) )
         {
@@ -1428,12 +1396,35 @@ static int EventMouse( vlc_object_t *p_this, char const *psz_var,
 static int EventKey( vlc_object_t *p_this, char const *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    (void)p_this;    (void)psz_var;    (void)oldval;
-    event_thread_t *p_ev = p_data;
-    vlc_mutex_lock( &p_ev->lock );
-    p_ev->i_key_action = newval.i_int;
-    vlc_mutex_unlock( &p_ev->lock );
+    demux_t *p_demux = p_data;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
+    /* FIXME: thread-safe ? */
+    pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
+
+    vlc_mutex_lock( &p_sys->p_ev->lock );
+    switch( newval.i_int )
+    {
+    case ACTIONID_NAV_LEFT:
+        dvdnav_left_button_select( p_sys->dvdnav, pci );
+        break;
+    case ACTIONID_NAV_RIGHT:
+        dvdnav_right_button_select( p_sys->dvdnav, pci );
+        break;
+    case ACTIONID_NAV_UP:
+        dvdnav_upper_button_select( p_sys->dvdnav, pci );
+        break;
+    case ACTIONID_NAV_DOWN:
+        dvdnav_lower_button_select( p_sys->dvdnav, pci );
+        break;
+    case ACTIONID_NAV_ACTIVATE:
+        ButtonUpdate( p_demux, true );
+        dvdnav_button_activate( p_sys->dvdnav, pci );
+        break;
+    }
+    vlc_mutex_unlock( &p_sys->p_ev->lock );
+
+    (void)p_this;    (void)psz_var;    (void)oldval;
     return VLC_SUCCESS;
 }
 
