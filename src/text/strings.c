@@ -1034,6 +1034,12 @@ char* filename_sanitize( const char *str_origin )
         return str_base;
     }
 
+#if defined( WIN32 )
+    // Change leading spaces into underscores
+    while( *str && *str == ' ' )
+        *str++ = '_';
+#endif
+
     while( *str )
     {
         switch( *str )
@@ -1050,12 +1056,23 @@ char* filename_sanitize( const char *str_origin )
             case '|':
             case '<':
             case '>':
-            case ' ':
 #endif
                 *str = '_';
         }
         str++;
     }
+
+#if defined( WIN32 )
+    // Change trailing spaces into underscores
+    str--;
+    while( str != str_base )
+    {
+        if( *str != ' ' )
+            break;
+        *str-- = '_';
+    }
+#endif
+
     return str_base;
 }
 
