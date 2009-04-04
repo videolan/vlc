@@ -499,7 +499,7 @@ int libvlc_vlm_get_media_instance_title( libvlc_instance_t *p_instance,
                                           i_instance, p_exception );
     if( p_mi )
         vlm_media_instance_Delete( p_mi );
-    return 0;
+    return p_mi ? 0 : -1;
 }
 
 int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *p_instance,
@@ -513,7 +513,7 @@ int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *p_instance,
                                           i_instance, p_exception );
     if( p_mi )
         vlm_media_instance_Delete( p_mi );
-    return 0;
+    return p_mi ? 0 : -1;
 }
 
 int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
@@ -527,5 +527,5 @@ int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
                                           i_instance, p_exception );
     if( p_mi )
         vlm_media_instance_Delete( p_mi );
-    return 0;
+    return p_mi ? 0 : -1;
 }
