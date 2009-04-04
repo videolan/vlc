@@ -87,9 +87,9 @@ void addDPStaticEntry( QMenu *menu,
                        const char *shortcut = NULL )
 {
     QAction *action = NULL;
-    if( !EMPTY_STR( icon ) > 0 )
+    if( !EMPTY_STR( icon ) )
     {
-        if( !EMPTY_STR( shortcut ) > 0 )
+        if( !EMPTY_STR( shortcut ) )
             action = menu->addAction( QIcon( icon ), text, THEDP,
                                       member, qtr( shortcut ) );
         else
@@ -97,7 +97,7 @@ void addDPStaticEntry( QMenu *menu,
     }
     else
     {
-        if( !EMPTY_STR( shortcut ) > 0 )
+        if( !EMPTY_STR( shortcut ) )
             action = menu->addAction( text, THEDP, member, qtr( shortcut ) );
         else
             action = menu->addAction( text, THEDP, member );
