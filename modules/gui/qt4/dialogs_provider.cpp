@@ -222,7 +222,7 @@ void DialogsProvider::aboutDialog()
 
 void DialogsProvider::mediaInfoDialog()
 {
-    MediaInfoDialog::getInstance( p_intf )->toggleVisible();
+    MediaInfoDialog::getInstance( p_intf )->showTab( 0 );
 }
 
 void DialogsProvider::mediaCodecDialog()
