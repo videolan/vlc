@@ -65,7 +65,6 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static bool ContainsURL( demux_t *p_demux );
 static void ParseClipInfo( char * psz_clipinfo, char **ppsz_artist, char **ppsz_title,
                            char **ppsz_album, char **ppsz_genre, char **ppsz_year,
                            char **ppsz_cdnum, char **ppsz_comments );
@@ -328,24 +327,20 @@ static int Demux( demux_t *p_demux )
                     else if( !strcmp( psz_param, "start" ) )
                     {
                         i_start = ParseTime( strdup( psz_value ),strlen( psz_value ) );
-                        char * temp = NULL;
+                        char *temp;
                         if( i_start )
                         {
-                            if( asprintf( &temp, ":start-time=%d", i_start ) == -1 )
-                                *(temp) = NULL;
-                            if( temp && *temp )
+                            if( asprintf( &temp, ":start-time=%d", i_start ) != -1 )
                                 INSERT_ELEM( ppsz_options, i_options, i_options, temp );
                         }
                     }
                     else if( !strcmp( psz_param, "end" ) )
                     {
                         i_stop = ParseTime( strdup( psz_value ), strlen( psz_value ) );
-                        char * temp = NULL;
+                        char *temp;
                         if( i_stop )
                         {
-                            if( asprintf( &temp, ":stop-time=%d", i_stop ) == -1 )
-                                *(temp) = NULL;
-                            if( temp && *temp )
+                            if( asprintf( &temp, ":stop-time=%d", i_stop ) != -1 )
                                 INSERT_ELEM( ppsz_options, i_options, i_options, temp );
                         }
                     }
@@ -369,15 +364,15 @@ static int Demux( demux_t *p_demux )
             /* Create the input item and pump in all the options into playlist item */
             p_input = input_item_NewExt( p_demux, psz_mrl, psz_title, i_options, ppsz_options, 0, i_duration );
 
-            if( psz_artist && *psz_artist ) input_item_SetArtist( p_input, psz_artist );
-            if( psz_author && *psz_author ) input_item_SetPublisher( p_input, psz_author );
-            if( psz_title && *psz_title ) input_item_SetTitle( p_input, psz_title );
-            if( psz_copyright && *psz_copyright ) input_item_SetCopyright( p_input, psz_copyright );
-            if( psz_album && *psz_album ) input_item_SetAlbum( p_input, psz_album );
-            if( psz_genre && *psz_genre ) input_item_SetGenre( p_input, psz_genre );
-            if( psz_year && *psz_year ) input_item_SetDate( p_input, psz_copyright );
-            if( psz_cdnum && *psz_cdnum ) input_item_SetTrackNum( p_input, psz_cdnum );
-            if( psz_comments && *psz_comments ) input_item_SetDescription( p_input, psz_comments );
+            if( !EMPTY_STR( psz_artist ) ) input_item_SetArtist( p_input, psz_artist );
+            if( !EMPTY_STR( psz_author ) ) input_item_SetPublisher( p_input, psz_author );
+            if( !EMPTY_STR( psz_title ) ) input_item_SetTitle( p_input, psz_title );
+            if( !EMPTY_STR( psz_copyright ) ) input_item_SetCopyright( p_input, psz_copyright );
+            if( !EMPTY_STR( psz_album ) ) input_item_SetAlbum( p_input, psz_album );
+            if( !EMPTY_STR( psz_genre ) ) input_item_SetGenre( p_input, psz_genre );
+            if( !EMPTY_STR( psz_year ) ) input_item_SetDate( p_input, psz_copyright );
+            if( !EMPTY_STR( psz_cdnum ) ) input_item_SetTrackNum( p_input, psz_cdnum );
+            if( !EMPTY_STR( psz_comments ) ) input_item_SetDescription( p_input, psz_comments );
 
             input_item_AddSubItem( p_current_input, p_input );
             vlc_gc_decref( p_input );
