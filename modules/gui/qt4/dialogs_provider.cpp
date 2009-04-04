@@ -178,7 +178,7 @@ void DialogsProvider::prefsDialog()
 
 void DialogsProvider::extendedDialog()
 {
-    ExtendedDialog::getInstance( p_intf )->toggleVisible();
+    ExtendedDialog::getInstance( p_intf )->showTab( 0 );
 }
 
 void DialogsProvider::synchroDialog()
