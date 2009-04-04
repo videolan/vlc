@@ -1307,8 +1307,6 @@ static void* EventThread( vlc_object_t *p_this )
     /* main loop */
     while( vlc_object_alive( p_ev ) )
     {
-        bool b_activated = false;
-
         /* KEY part */
         if( p_ev->i_key_action != 0 )
         {
@@ -1330,7 +1328,6 @@ static void* EventThread( vlc_object_t *p_this )
                 dvdnav_lower_button_select( p_sys->dvdnav, pci );
                 break;
             case ACTIONID_NAV_ACTIVATE:
-                b_activated = true;
                 ButtonUpdate( p_ev->p_demux, true );
                 dvdnav_button_activate( p_sys->dvdnav, pci );
                 break;
@@ -1358,7 +1355,6 @@ static void* EventThread( vlc_object_t *p_this )
             }
             if( p_ev->b_clicked )
             {
-                b_activated = true;
                 ButtonUpdate( p_ev->p_demux, true );
                 dvdnav_mouse_activate( p_sys->dvdnav, pci, valx.i_int,
                                        valy.i_int );
@@ -1390,8 +1386,7 @@ static void* EventThread( vlc_object_t *p_this )
         vlc_mutex_lock( &p_ev->lock );
         if( p_ev->b_still )
         {
-            if( /* b_activated || // This breaks menus */
-                ( p_ev->i_still_end > 0 && p_ev->i_still_end < mdate() ))
+            if( p_ev->i_still_end > 0 && p_ev->i_still_end < mdate() )
             {
                 p_ev->b_still = false;
                 dvdnav_still_skip( p_sys->dvdnav );
