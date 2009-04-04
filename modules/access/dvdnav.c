@@ -174,6 +174,10 @@ static int ControlInternal( demux_t *, int, ... );
 
 static int EventKey( vlc_object_t *, char const *,
                      vlc_value_t, vlc_value_t, void * );
+static int EventMouse( vlc_object_t *, char const *,
+                       vlc_value_t, vlc_value_t, void * );
+static int EventIntf( vlc_object_t *, char const *,
+                      vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * DemuxOpen:
@@ -362,6 +366,8 @@ static int Open( vlc_object_t *p_this )
 
     /* catch all key event */
     var_AddCallback( p_demux->p_libvlc, "key-action", EventKey, p_demux );
+    /* catch vout creation event */
+    var_AddCallback( p_sys->p_input, "intf-event", EventIntf, p_sys );
 
     vlc_thread_create( p_sys->p_ev, "dvdnav event thread handler", EventThread,
                        VLC_THREAD_PRIORITY_LOW );
@@ -377,6 +383,16 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;
+
+    var_DelCallback( p_sys->p_input, "intf-event", EventIntf, p_sys );
+    if( p_sys->p_vout != NULL )
+    {   /* Should not happen, but better be safe than sorry. */
+        msg_Warn( p_sys->p_vout, "removing dangling mouse DVD callbacks" );
+        var_DelCallback( p_sys->p_vout, "mouse-moved", EventMouse,
+                         p_sys->p_ev );
+        var_DelCallback( p_sys->p_vout, "mouse-clicked", EventMouse,
+                         p_sys->p_ev );
+    }
 
     /* stop the event handler */
     vlc_object_kill( p_sys->p_ev );
@@ -1293,28 +1309,24 @@ static void ESNew( demux_t *p_demux, int i_id )
 /*****************************************************************************
  * Event handler code
  *****************************************************************************/
-static int  EventMouse( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
-
 static void* EventThread( vlc_object_t *p_this )
 {
     event_thread_t *p_ev = (event_thread_t*)p_this;
     demux_sys_t    *p_sys = p_ev->p_demux->p_sys;
-    vlc_object_t   *p_vout = NULL;
     int canc = vlc_savecancel ();
 
     /* main loop */
     while( vlc_object_alive( p_ev ) )
     {
+        vlc_mutex_lock( &p_ev->lock );
         /* VOUT part */
-        if( p_vout && ( p_ev->b_moved || p_ev->b_clicked ) )
+        if( p_sys->p_vout && ( p_ev->b_moved || p_ev->b_clicked ) )
         {
             pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
             vlc_value_t valx, valy;
 
-            vlc_mutex_lock( &p_ev->lock );
-            var_Get( p_vout, "mouse-x", &valx );
-            var_Get( p_vout, "mouse-y", &valy );
+            var_Get( p_sys->p_vout, "mouse-x", &valx );
+            var_Get( p_sys->p_vout, "mouse-y", &valy );
 
             if( p_ev->b_moved )
             {
@@ -1330,28 +1342,9 @@ static void* EventThread( vlc_object_t *p_this )
 
             p_ev->b_moved = false;
             p_ev->b_clicked = false;
-            vlc_mutex_unlock( &p_ev->lock );
-        }
-        if( p_vout && !vlc_object_alive (p_vout) )
-        {
-            var_DelCallback( p_vout, "mouse-moved", EventMouse, p_ev );
-            var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
-            vlc_object_release( p_vout );
-            p_vout = NULL;
-        }
-        if( p_vout == NULL )
-        {
-            p_vout = vlc_object_find( p_sys->p_input, VLC_OBJECT_VOUT,
-                                      FIND_CHILD );
-            if( p_vout)
-            {
-                var_AddCallback( p_vout, "mouse-moved", EventMouse, p_ev );
-                var_AddCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
-            }
         }
 
         /* Still part */
-        vlc_mutex_lock( &p_ev->lock );
         if( p_ev->b_still )
         {
             if( p_ev->i_still_end > 0 && p_ev->i_still_end < mdate() )
@@ -1364,14 +1357,6 @@ static void* EventThread( vlc_object_t *p_this )
 
         /* Wait a bit */
         msleep( 10000 );
-    }
-
-    /* Release callback */
-    if( p_vout )
-    {
-        var_DelCallback( p_vout, "mouse-moved", EventMouse, p_ev );
-        var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_ev );
-        vlc_object_release( p_vout );
     }
     vlc_restorecancel (canc);
 
@@ -1425,6 +1410,39 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_unlock( &p_sys->p_ev->lock );
 
     (void)p_this;    (void)psz_var;    (void)oldval;
+    return VLC_SUCCESS;
+}
+
+static int EventIntf( vlc_object_t *p_input, char const *psz_var,
+                      vlc_value_t oldval, vlc_value_t val, void *p_data )
+{
+    demux_sys_t *p_sys = p_data;
+
+    if (val.i_int == INPUT_EVENT_VOUT)
+    {
+        vlc_object_t *p_vout;
+
+        vlc_mutex_lock( &p_sys->p_ev->lock );
+        p_vout = p_sys->p_vout;
+        if( p_vout != NULL )
+        {
+            var_DelCallback( p_vout, "mouse-moved", EventMouse, p_sys->p_ev );
+            var_DelCallback( p_vout, "mouse-clicked", EventMouse, p_sys->p_ev );
+            vlc_object_release( p_vout );
+        }
+
+        p_vout = (vlc_object_t *)input_GetVout( (input_thread_t *)p_input );
+        p_sys->p_vout = p_vout;
+        if( p_vout != NULL )
+        {
+            var_AddCallback( p_vout, "mouse-moved", EventMouse,
+                             p_sys->p_ev );
+            var_AddCallback( p_vout, "mouse-clicked", EventMouse,
+                             p_sys->p_ev );
+        }
+        vlc_mutex_unlock( &p_sys->p_ev->lock );
+    }
+    (void) psz_var; (void) oldval;
     return VLC_SUCCESS;
 }
 
