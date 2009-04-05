@@ -69,8 +69,9 @@ static const char *const ppsz_encodings[] = {
     "UTF-7", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-32", "UTF-32BE", "UTF-32LE",
     "UCS-2", "UCS-2BE", "UCS-2LE", "UCS-4", "UCS-4BE", "UCS-4LE", "",
     "GBK", "GB18030", "JOHAB", "ARMSCII-8",
-    "Georgian-Academy", "Georgian-PS", "TIS-620", "MuleLao-1", "VISCII", "TCVN",
-    "HPROMAN8", "NEXTSTEP" };
+    "Georgian-Academy", "Georgian-PS", "TIS-620", "VISCII", "TCVN",
+    "HPROMAN8",
+};
 /*
 SSA supports charset selection.
 The following known charsets are used:
