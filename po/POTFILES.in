@@ -1,5 +1,3 @@
-# automatically created by make update-po
-
 # main sources
 include/mmx.h
 include/vlc_access.h
@@ -737,23 +735,23 @@ modules/gui/qt4/qt4.cpp
 modules/gui/qt4/qt4.hpp
 modules/gui/qt4/recents.cpp
 modules/gui/qt4/recents.hpp
-modules/gui/qt4/ui/equalizer.ui
-modules/gui/qt4/ui/open.ui
-modules/gui/qt4/ui/open_capture.ui
-modules/gui/qt4/ui/open_disk.ui
-modules/gui/qt4/ui/open_file.ui
-modules/gui/qt4/ui/open_net.ui
-modules/gui/qt4/ui/podcast_configuration.ui
-modules/gui/qt4/ui/sout.ui
-modules/gui/qt4/ui/sprefs_audio.ui
-modules/gui/qt4/ui/sprefs_input.ui
-modules/gui/qt4/ui/sprefs_interface.ui
-modules/gui/qt4/ui/sprefs_subtitles.ui
-modules/gui/qt4/ui/sprefs_video.ui
-modules/gui/qt4/ui/streampanel.ui
-modules/gui/qt4/ui/v4l2.ui
-modules/gui/qt4/ui/video_effects.ui
-modules/gui/qt4/ui/vlm.ui
+modules/gui/qt4/ui/equalizer.h
+modules/gui/qt4/ui/open.h
+modules/gui/qt4/ui/open_capture.h
+modules/gui/qt4/ui/open_disk.h
+modules/gui/qt4/ui/open_file.h
+modules/gui/qt4/ui/open_net.h
+modules/gui/qt4/ui/podcast_configuration.h
+modules/gui/qt4/ui/sout.h
+modules/gui/qt4/ui/sprefs_audio.h
+modules/gui/qt4/ui/sprefs_input.h
+modules/gui/qt4/ui/sprefs_interface.h
+modules/gui/qt4/ui/sprefs_subtitles.h
+modules/gui/qt4/ui/sprefs_video.h
+modules/gui/qt4/ui/streampanel.h
+modules/gui/qt4/ui/v4l2.h
+modules/gui/qt4/ui/video_effects.h
+modules/gui/qt4/ui/vlm.h
 modules/gui/qt4/util/customwidgets.cpp
 modules/gui/qt4/util/customwidgets.hpp
 modules/gui/qt4/util/input_slider.cpp
