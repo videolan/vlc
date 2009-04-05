@@ -64,6 +64,9 @@
   Just before one of those menus are aboutToShow(), they are rebuild.
   */
 
+#define STATIC_ENTRY "__static__"
+#define ENTRY_ALWAYS_ENABLED "__ignore__"
+
 enum
 {
     ITEM_NORMAL,
@@ -102,7 +105,7 @@ void addDPStaticEntry( QMenu *menu,
         else
             action = menu->addAction( text, THEDP, member );
     }
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 }
 
 /***
@@ -112,7 +115,8 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
                         QMenu *menu,
                         const QString text,
                         const char *icon,
-                        const char *member )
+                        const char *member,
+                        bool bStatic = false )
 {
     QAction *action;
     if( strlen( icon ) > 0 )
@@ -124,7 +128,7 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
     {
         action = menu->addAction( text, THEMIM, member );
     }
-    action->setData( "ignore" );
+    action->setData( bStatic ? STATIC_ENTRY : ENTRY_ALWAYS_ENABLED );
 }
 
 /**
@@ -138,9 +142,10 @@ void EnableStaticEntries( QMenu *menu, bool enable = true )
     QList< QAction* > actions = menu->actions();
     for( int i = 0; i < actions.size(); ++i )
     {
-        actions[i]->setEnabled( actions[i]->data().toString() == "ignore" ||
-                /* Be careful here, because data("string").toBool is true */
-                ( enable && (actions[i]->data().toString() == "true" ) ) );
+        actions[i]->setEnabled( actions[i]->data().toString()
+                                == ENTRY_ALWAYS_ENABLED ||
+            /* Be careful here, because data("string").toBool is true */
+            ( enable && (actions[i]->data().toString() == STATIC_ENTRY ) ) );
     }
 }
 
@@ -156,7 +161,7 @@ int DeleteNonStaticEntries( QMenu *menu )
     QList< QAction* > actions = menu->actions();
     for( int i = 0; i < actions.size(); ++i )
     {
-        if( !actions[i]->data().toBool() )
+        if( actions[i]->data().toString() != STATIC_ENTRY )
             delete actions[i];
         else
             i_ret++;
@@ -496,13 +501,13 @@ QMenu *QVLCMenu::AudioMenu( intf_thread_t *p_intf, QMenu * current )
 
         QAction *action = current->addAction( qtr( "Increase Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioUp() ) );
-        action->setData( true );
+        action->setData( STATIC_ENTRY );
         action = current->addAction( qtr( "Decrease Volume" ),
                 ActionsManager::getInstance( p_intf ), SLOT( AudioDown() ) );
-        action->setData( true );
+        action->setData( STATIC_ENTRY );
         action = current->addAction( qtr( "Mute" ),
                 ActionsManager::getInstance( p_intf ), SLOT( toggleMuteAudio() ) );
-        action->setData( true );
+        action->setData( STATIC_ENTRY );
     }
 
     p_input = THEMIM->getInput();
@@ -737,36 +742,36 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
     action = menu->addAction( qtr( "&Faster" ), THEMIM->getIM(),
                               SLOT( faster() ) );
     action->setIcon( QIcon( ":/faster") );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "Faster (fine)" ), THEMIM->getIM(),
                               SLOT( littlefaster() ) );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "N&ormal Speed" ), THEMIM->getIM(),
                               SLOT( normalRate() ) );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "Slower (fine)" ), THEMIM->getIM(),
                               SLOT( littleslower() ) );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "Slo&wer" ), THEMIM->getIM(),
                               SLOT( slower() ) );
     action->setIcon( QIcon( ":/slower") );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 
     menu->addSeparator();
 
     action = menu->addAction( qtr( "&Jump Forward" ), THEMIM->getIM(),
              SLOT( jumpFwd() ) );
     action->setIcon( QIcon( ":/skip_fw") );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
 
     action = menu->addAction( qtr( "Jump Bac&kward" ), THEMIM->getIM(),
              SLOT( jumpBwd() ) );
     action->setIcon( QIcon( ":/skip_back") );
-    action->setData( true );
+    action->setData( STATIC_ENTRY );
     addDPStaticEntry( menu, qtr( I_MENU_GOTOTIME ),"",
                       SLOT( gotoTimeDialog() ), "Ctrl+T" );
     menu->addSeparator();
@@ -776,13 +781,15 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
 void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
                                                 intf_thread_t *p_intf )
 {
-    addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/stop", SLOT( stop() ) );
+    addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/stop", SLOT( stop() ),
+                       true );
 
     /* Next / Previous */
+    bool bEnable = THEMIM->getInput() != NULL;
     addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
-            ":/previous", SLOT( prev() ) );
+        ":/previous", SLOT( prev() ), true );
     addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
-            ":/next", SLOT( next() ) );
+        ":/next", SLOT( next() ), true );
     menu->addSeparator();
 }
 
@@ -965,12 +972,12 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 objects.push_back( p_object );
                 varnames.push_back( "intf-skins" );
                 Populate( p_intf, submenu, varnames, objects );
- 
+
                 objects.clear(); varnames.clear();
                 objects.push_back( p_object );
                 varnames.push_back( "intf-skins-interactive" );
                 Populate( p_intf, submenu, varnames, objects );
-              
+
                 vlc_object_release( p_object );
             }
             else
