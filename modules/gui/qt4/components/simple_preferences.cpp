@@ -558,6 +558,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             controls.append( control );
 
             line++;
+
+            QFrame *sepline = new QFrame;
+            sepline->setFrameStyle(QFrame::HLine | QFrame::Sunken);
+            gLayout->addWidget( sepline, line, 0, 1, -1 );
+
+            line++;
+
             p_config = config_FindConfig( VLC_OBJECT(p_intf), "hotkeys-mousewheel-mode" );
             control = new IntegerListConfigControl( VLC_OBJECT(p_intf),
                     p_config, false, this, gLayout, line );
