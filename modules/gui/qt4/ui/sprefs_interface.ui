@@ -213,7 +213,7 @@
       <item row="2" column="2" colspan="2">
        <widget class="QCheckBox" name="embedVideo">
         <property name="text">
-         <string>Integrate video in interface</string>
+         <string>Embed video in interface</string>
         </property>
        </widget>
       </item>
