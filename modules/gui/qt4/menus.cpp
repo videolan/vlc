@@ -111,12 +111,12 @@ void addDPStaticEntry( QMenu *menu,
 /***
  * Same for MIM
  ***/
-void addMIMStaticEntry( intf_thread_t *p_intf,
-                        QMenu *menu,
-                        const QString text,
-                        const char *icon,
-                        const char *member,
-                        bool bStatic = false )
+QAction* addMIMStaticEntry( intf_thread_t *p_intf,
+                            QMenu *menu,
+                            const QString text,
+                            const char *icon,
+                            const char *member,
+                            bool bStatic = false )
 {
     QAction *action;
     if( strlen( icon ) > 0 )
@@ -129,6 +129,7 @@ void addMIMStaticEntry( intf_thread_t *p_intf,
         action = menu->addAction( text, THEMIM, member );
     }
     action->setData( bStatic ? STATIC_ENTRY : ENTRY_ALWAYS_ENABLED );
+    return action;
 }
 
 /**
@@ -608,7 +609,8 @@ QMenu *QVLCMenu::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     PopupMenuPlaylistControlEntries( menu, p_intf );
     PopupMenuControlEntries( menu, p_intf );
 
-    return menu;
+    EnableStaticEntries( menu, ( THEMIM->getInput() != NULL ) );
+    return RebuildNavigMenu( p_intf, menu );
 }
 
 QMenu *QVLCMenu::RebuildNavigMenu( intf_thread_t *p_intf, QMenu *menu )
@@ -781,15 +783,19 @@ void QVLCMenu::PopupMenuControlEntries( QMenu *menu, intf_thread_t *p_intf )
 void QVLCMenu::PopupMenuPlaylistControlEntries( QMenu *menu,
                                                 intf_thread_t *p_intf )
 {
-    addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/stop", SLOT( stop() ),
-                       true );
+    bool bEnable = THEMIM->getInput() != NULL;
+    QAction *action =
+            addMIMStaticEntry( p_intf, menu, qtr( "&Stop" ), ":/stop",
+                               SLOT( stop() ), true );
+    /* Disable Stop in the right-click popup menu */
+    if( !bEnable )
+        action->setEnabled( false );
 
     /* Next / Previous */
-    bool bEnable = THEMIM->getInput() != NULL;
     addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
-        ":/previous", SLOT( prev() ), true );
+        ":/previous", SLOT( prev() ) );
     addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
-        ":/next", SLOT( next() ), true );
+        ":/next", SLOT( next() ) );
     menu->addSeparator();
 }
 
