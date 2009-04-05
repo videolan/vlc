@@ -1,41 +1,42 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <author>Jean-Baptiste Kempf</author>
  <class>SPrefsInputAndCodecs</class>
- <widget class="QWidget" name="SPrefsInputAndCodecs" >
-  <property name="geometry" >
+ <widget class="QWidget" name="SPrefsInputAndCodecs">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>512</width>
-    <height>516</height>
+    <width>616</width>
+    <height>480</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QGroupBox" name="groupBox" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
       <string>Disc Devices</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
          <string>Default disc device</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>DVDDevice</cstring>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QLineEdit" name="DVDDevice" />
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="DVDDevice"/>
       </item>
-      <item row="0" column="2" >
-       <widget class="QPushButton" name="DVDBrowse" >
-        <property name="text" >
+      <item row="0" column="2">
+       <widget class="QPushButton" name="DVDBrowse">
+        <property name="text">
          <string>Browse...</string>
         </property>
        </widget>
@@ -44,133 +45,146 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
       <string>Network</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="portLabel" >
-        <property name="text" >
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="portLabel">
+        <property name="text">
          <string>Server default port</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>UDPPort</cstring>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QSpinBox" name="UDPPort" >
-        <property name="alignment" >
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="UDPPort">
+        <property name="alignment">
          <set>Qt::AlignRight</set>
         </property>
-        <property name="minimum" >
+        <property name="minimum">
          <number>1</number>
         </property>
-        <property name="maximum" >
+        <property name="maximum">
          <number>65535</number>
         </property>
-        <property name="value" >
+        <property name="value">
          <number>1234</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="httpProxyLabel" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="httpProxyLabel">
+        <property name="text">
          <string>HTTP proxy</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>proxy</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLineEdit" name="proxy" />
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="proxy"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_5" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_5">
+     <property name="title">
       <string>Caching</string>
      </property>
-     <layout class="QHBoxLayout" >
+     <layout class="QHBoxLayout">
       <item>
-       <widget class="QLabel" name="label_2" >
-        <property name="text" >
+       <widget class="QLabel" name="label_2">
+        <property name="text">
          <string>Default caching level</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>cachingCombo</cstring>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="cachingCombo" />
+       <widget class="QComboBox" name="cachingCombo"/>
       </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_3" >
-     <property name="title" >
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
       <string>Codecs / Muxers</string>
      </property>
-     <layout class="QGridLayout" >
-      <item row="0" column="0" >
-       <widget class="QLabel" name="ppLabel" >
-        <property name="text" >
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="ppLabel">
+        <property name="text">
          <string>Post-Processing quality</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>PostProcLevel</cstring>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" >
-       <widget class="QSpinBox" name="PostProcLevel" >
-        <property name="alignment" >
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="PostProcLevel">
+        <property name="alignment">
          <set>Qt::AlignRight</set>
         </property>
-        <property name="minimum" >
+        <property name="minimum">
          <number>1</number>
         </property>
-        <property name="maximum" >
+        <property name="maximum">
          <number>65535</number>
         </property>
-        <property name="value" >
+        <property name="value">
          <number>6</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="0" >
-       <widget class="QLabel" name="aviLabel" >
-        <property name="text" >
+      <item row="1" column="0">
+       <widget class="QLabel" name="aviLabel">
+        <property name="text">
          <string>Repair AVI files</string>
         </property>
-        <property name="buddy" >
+        <property name="buddy">
          <cstring>AviRepair</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QComboBox" name="AviRepair" />
+      <item row="1" column="1">
+       <widget class="QComboBox" name="AviRepair"/>
       </item>
-      <item row="3" column="0" colspan="2" >
-       <widget class="QCheckBox" name="systemCodecBox" >
-        <property name="text" >
+      <item row="2" column="0" colspan="2">
+       <widget class="QCheckBox" name="systemCodecBox">
+        <property name="text">
          <string>Use system codecs if available (better quality)</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2" >
-       <widget class="QCheckBox" name="RTSP_TCPBox" >
-        <property name="text" >
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="RTSP_TCPBox">
+        <property name="text">
          <string>Use RTP over RTSP (TCP)</string>
         </property>
        </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="filterLabel">
+        <property name="text">
+         <string>Skip the loop filter for H.264 decoding</string>
+        </property>
+        <property name="buddy">
+         <cstring>loopFilterBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QComboBox" name="loopFilterBox"/>
       </item>
      </layout>
     </widget>
