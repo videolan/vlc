@@ -124,6 +124,7 @@ static int Open( vlc_object_t *p_this )
         msg_Dbg( p_access, "using stdout" );
 #else
 #warning stdout is not supported on Windows Mobile, but may be used on Windows CE
+        fd = -1;
 #endif
     }
     else
