@@ -503,6 +503,24 @@ AC_LANG_PUSH(C++)
 AC_LANG_POP(C++)
 fi
 
+dnl
+dnl Buggy glibc prevention. Purposedly not cached.
+dnl Ubuntu alone has 20 bug numbers for this...
+dnl
+AC_MSG_CHECKING(for buggy GNU/libc versions)
+AC_PREPROC_IFELSE([
+#include <limits.h>
+#if defined (__GLIBC__) && (__GLIBC__ == 2) \
+  && (__GLIBC_MINOR__ >= 5) && (__GLIBC_MINOR__ <= 7)
+# error GNU/libc with dcgettext killer bug!
+#endif
+], [
+  AC_MSG_RESULT([not present])
+], [
+  AC_MSG_RESULT([found])
+  AC_MSG_ERROR([Buggy GNU/libc (version 2.5 - 2.7) present. VLC would crash; there is no viable work-around for this. Check with your distribution vendor on how to update the glibc run-time.])
+])
+
 dnl Plugin compilation stuff
 
 VLC_LIBRARY_SUFFIX
