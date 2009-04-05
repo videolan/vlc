@@ -1,5 +1,5 @@
 #
-# Default access-list for VLC HTTP interface
+# Access-list for VLC HTTP interface
 # $Id$
 #
 
@@ -16,9 +16,9 @@
 #10.0.0.0/8
 #172.16.0.0/12
 #192.168.0.0/16
+#169.254.0.0/16
 
-# The world
-# (comment this out to obtain a safe default)
-::/0
-0.0.0.0/0
+# The world (uncommenting these 2 lines is not quite safe)
+#::/0
+#0.0.0.0/0
 
