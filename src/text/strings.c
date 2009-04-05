@@ -384,23 +384,42 @@ void resolve_xml_special_chars( char *psz_value )
     {
         if( *psz_value == '&' )
         {
-            const char *psz_value1 = psz_value + 1;
-            if( *psz_value1 == '#' )
-            {
+            if( psz_value[1] == '#' )
+            {   /* &#xxx; Unicode code point */
                 char *psz_end;
-                int i = strtol( psz_value+2, &psz_end, 10 );
+                unsigned long cp = strtoul( psz_value+2, &psz_end, 10 );
                 if( *psz_end == ';' )
                 {
-                    if( i >= 32 && i <= 126 )
+                    psz_value = psz_end + 1;
+                    if( cp == 0 )
+                        (void)0; /* skip nuls */
+                    else
+                    if( cp <= 0x7F )
                     {
-                        *p_pos = (char)i;
-                        psz_value = psz_end+1;
+                        *p_pos =            cp;
                     }
                     else
+                    /* Unicode code point outside ASCII.
+                     * &#xxx; representation is longer than UTF-8 :) */
+                    if( cp <= 0x7FF )
                     {
-                        /* Unhandled code, FIXME */
-                        *p_pos = *psz_value;
-                        psz_value++;
+                        *p_pos++ = 0xC0 |  (cp >>  6);
+                        *p_pos   = 0x80 |  (cp        & 0x3F);
+                    }
+                    else
+                    if( cp <= 0xFFFF )
+                    {
+                        *p_pos++ = 0xE0 |  (cp >> 12);
+                        *p_pos++ = 0x80 | ((cp >>  6) & 0x3F);
+                        *p_pos   = 0x80 |  (cp        & 0x3F);
+                    }
+                    else
+                    if( cp <= 0x1FFFFF ) /* Outside the BMP */
+                    {   /* Unicode stops at 10FFFF, but who cares? */
+                        *p_pos++ = 0xF0 |  (cp >> 18);
+                        *p_pos++ = 0x80 | ((cp >> 12) & 0x3F);
+                        *p_pos++ = 0x80 | ((cp >>  6) & 0x3F);
+                        *p_pos   = 0x80 |  (cp        & 0x3F);
                     }
                 }
                 else
@@ -411,10 +430,10 @@ void resolve_xml_special_chars( char *psz_value )
                 }
             }
             else
-            {
+            {   /* Well-known XML entity */
                 const struct xml_entity_s *ent;
 
-                ent = bsearch (psz_value1, xml_entities,
+                ent = bsearch (psz_value + 1, xml_entities,
                                sizeof (xml_entities) / sizeof (*ent),
                                sizeof (*ent), cmp_entity);
                 if (ent != NULL)
