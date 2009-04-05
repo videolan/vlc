@@ -50,27 +50,111 @@ static char           *CreateHtmlSubtitle( int *pi_align, char * );
  * Module descriptor.
  *****************************************************************************/
 static const char *const ppsz_encodings[] = {
-    DEFAULT_NAME, "UTF-8", "",
-    "ISO-8859-1", "CP1252", "MacRoman", "MacIceland","ISO-8859-15", "",
-    "ISO-8859-2", "CP1250", "MacCentralEurope", "MacCroatian", "MacRomania", "",
-    "ISO-8859-5", "CP1251", "MacCyrillic", "MacUkraine", "KOI8-R", "KOI8-U", "KOI8-RU", "",
-    "ISO-8859-6", "CP1256", "MacArabic", "",
-    "ISO-8859-7", "CP1253", "MacGreek", "",
-    "ISO-8859-8", "CP1255", "MacHebrew", "",
-    "ISO-8859-9", "CP1254", "MacTurkish", "",
-    "ISO-8859-13", "CP1257", "",
-    "ISO-2022-JP", "ISO-2022-JP-1", "ISO-2022-JP-2", "EUC-JP", "SHIFT_JIS", "",
-    "ISO-2022-CN", "ISO-2022-CN-EXT", "EUC-CN", "EUC-TW", "BIG5", "BIG5-HKSCS", "",
-    "ISO-2022-KR", "EUC-KR", "",
-    "MacThai", "KOI8-T", "",
-    "ISO-8859-3", "ISO-8859-4", "ISO-8859-10", "ISO-8859-14", "ISO-8859-16", "",
-    "CP850", "CP862", "CP866", "CP874", "CP932", "CP949", "CP950", "CP1133", "CP1258", "",
-    "Macintosh", "",
-    "UTF-7", "UTF-16", "UTF-16BE", "UTF-16LE", "UTF-32", "UTF-32BE", "UTF-32LE",
-    "UCS-2", "UCS-2BE", "UCS-2LE", "UCS-4", "UCS-4BE", "UCS-4LE", "",
-    "GBK", "GB18030", "JOHAB", "ARMSCII-8",
-    "Georgian-Academy", "Georgian-PS", "TIS-620", "VISCII", "TCVN",
-    "HPROMAN8",
+    "",
+    "UTF-8",
+    "UTF-16",
+    "UTF-16BE",
+    "UTF-16LE",
+    "GB18030",
+    "ISO-8859-15",
+    "Windows-1252",
+    "ISO-8859-2",
+    "Windows-1250",
+    "ISO-8859-3",
+    "ISO-8859-10",
+    "Windows-1251",
+    "KOI8-R",
+    "KOI8-U",
+    "ISO-8859-6",
+    "Windows-1256",
+    "ISO-8859-7",
+    "Windows-1256",
+    "ISO-8859-8",
+    "Windows-1255",
+    "ISO-8859-9",
+    "Windows-1254",
+    "ISO-8859-11",
+    "Windows-874",
+    "ISO-8859-13",
+    "Windows-1257",
+    "ISO-8859-14",
+    "ISO-8859-16",
+    "ISO-2022-CN-EXT",
+    "EUC-CN",
+    "ISO-2022-JP-2",
+    "EUC-JP",
+    "Shift_JIS",
+    "ISO-2022-KR",
+    "EUC-KR",
+    "Big5",
+    "ISO-2022-TW",
+    "Big5-HKSCS",
+    "VISCII",
+    "Windows-1258",
+};
+
+static const char *const ppsz_encoding_names[] = {
+    N_("Autodetect"),
+    N_("Universal (UTF-8)"),
+    N_("Universal (UTF-16)"),
+    N_("Universal (big endian UTF-16)"),
+    N_("Universal (little endian UTF-16)"),
+    N_("Universal, Chinese (GB18030)"),
+
+  /* ISO 8859 and the likes */
+    /* 1 */
+    N_("Western European (Latin-9)"), /* mostly superset of Latin-1 */
+    N_("Western European (Windows-1252)"),
+    /* 2 */
+    N_("Eastern European (Latin-2)"),
+    N_("Eastern European (Windows-1250)"),
+    /* 3 */
+    N_("Esperanto (Latin-3)"),
+    /* 4 */
+    N_("Nordic (Latin-6)"), /* Latin 6 supersedes Latin 4 */
+    /* 5 */
+    N_("Cyrillic (Windows-1251)"), /* ISO 8859-5 is not practically used */
+    N_("Russian (KOI8-R)"),
+    N_("Ukrainian (KOI8-U)"),
+    /* 6 */
+    N_("Arabic (ISO 8859-6)"),
+    N_("Arabic (Windows-1256)"),
+    /* 7 */
+    N_("Greek (ISO 8859-7)"),
+    N_("Greek (Windows-1256)"),
+    /* 8 */
+    N_("Hebrew (ISO 8859-8)"),
+    N_("Hebrew (Windows-1255)"),
+    /* 9 */
+    N_("Turkish (ISO 8859-9)"),
+    N_("Turkish (Windows-1254)"),
+    /* 10 -> 4 */
+    /* 11 */
+    N_("Thai (TIS 620-2533/ISO 8859-11)"),
+    N_("Thai (Windows-874)"),
+    /* 13 */
+    N_("Baltic (Latin-7)"),
+    N_("Baltic (Windows-1257)"),
+    /* 12 -> /dev/null */
+    /* 14 */
+    N_("Celtic (Latin-8)"),
+    /* 15 -> 1 */
+    /* 16 */
+    N_("South-Eastern European (Latin-10)"),
+  /* CJK families */
+    N_("Simplified Chinese (ISO-2022-CN-EXT)"),
+    N_("Simplified Chinese Unix (EUC-CN)"),
+    N_("Japanese (7-bits JIS/ISO-2022-JP-2)"),
+    N_("Japanese Unix (EUC-JP)"),
+    N_("Japanese (Shift JIS)"),
+    N_("Korean (ISO-2022-KR)"),
+    N_("Korean Unix (EUC-KR)"),
+    N_("Traditional Chinese (Big5)"),
+    N_("Traditional Chinese Unix (EUC-TW)"),
+    N_("Hong-Kong Supplementary (HKSCS)"),
+  /* Other */
+    N_("Vietnamese (VISCII)"),
+    N_("Vietnamese (Windows-1258)"),
 };
 /*
 SSA supports charset selection.
@@ -125,9 +209,9 @@ vlc_module_begin ()
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  false )
         change_integer_list( pi_justification, ppsz_justification_text, NULL )
-    add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
+    add_string( "subsdec-encoding", "", NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, false )
-        change_string_list( ppsz_encodings, 0, 0 )
+        change_string_list( ppsz_encodings, ppsz_encoding_names, 0 )
     add_bool( "subsdec-autodetect-utf8", true, NULL,
               AUTODETECT_UTF8_TEXT, AUTODETECT_UTF8_LONGTEXT, false )
     add_bool( "subsdec-formatted", true, NULL, FORMAT_TEXT, FORMAT_LONGTEXT,
@@ -192,12 +276,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     if (psz_charset == NULL)
     {
         psz_charset = var_CreateGetNonEmptyString (p_dec, "subsdec-encoding");
-        if ((psz_charset != NULL) && !strcasecmp (psz_charset, DEFAULT_NAME))
-        {
-            free (psz_charset);
-            psz_charset = NULL;
-        }
-
         msg_Dbg (p_dec, "trying configured character encoding: %s",
                  psz_charset ?: "not specified");
     }
