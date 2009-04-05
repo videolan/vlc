@@ -1100,16 +1100,10 @@ char* filename_sanitize( const char *str_origin )
  */
 void path_sanitize( char *str )
 {
-#if 0
-    /*
-     * Uncomment the two blocks to prevent /../ or /./, i'm not sure that we
-     * want to.
-     */
-    char *prev = str - 1;
-#endif
 #ifdef WIN32
     /* check drive prefix if path is absolute */
-    if( isalpha(*str) && (':' == *(str+1)) )
+    if( (((unsigned char)(str[0] - 'A') < 26)
+      || ((unsigned char)(str[0] - 'a') < 26)) && (':' == str[1]) )
         str += 2;
 #endif
     while( *str )
@@ -1118,36 +1112,10 @@ void path_sanitize( char *str )
         if( *str == ':' )
             *str = '_';
 #elif defined( WIN32 )
-        switch( *str )
-        {
-            case '*':
-            case '"':
-            case '?':
-            case ':':
-            case '|':
-            case '<':
-            case '>':
-                *str = '_';
-        }
-#endif
-#if 0
-        if( *str == '/'
-#ifdef WIN32
-            || *str == '\\'
-#endif
-            )
-        {
-            if( str - prev == 2 && prev[1] == '.' )
-            {
-                prev[1] = '.';
-            }
-            else if( str - prev == 3 && prev[1] == '.' && prev[2] == '.' )
-            {
-                prev[1] = '_';
-                prev[2] = '_';
-            }
-            prev = str;
-        }
+        if( strchr( "*\"?:|<>", *str ) )
+            *str = '_';
+        if( *str == '/' )
+            *str = DIR_SEP_CHAR;
 #endif
         str++;
     }
