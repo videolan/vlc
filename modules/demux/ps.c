@@ -491,9 +491,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 int64_t i_now = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track].i_first_pts;
                 int64_t i_pos = stream_Tell( p_demux->s );
-                int64_t i_offset = i_pos / (i_now / 1000000) * ((i64 - i_now) / 1000000);
-                stream_Seek( p_demux->s, i_pos + i_offset);
 
+                if( !i_now )
+                    return i64 ? VLC_EGENERIC : VLC_SUCCESS;
+
+                i_pos *= (float)i64 / (float)i_now;
+                stream_Seek( p_demux->s, i_pos );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
