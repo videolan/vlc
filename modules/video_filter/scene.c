@@ -55,7 +55,7 @@ static void SavePicture( filter_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 #define FORMAT_TEXT N_( "Image format" )
-#define FORMAT_LONGTEXT N_( "Format of the output images (png or jpg)." )
+#define FORMAT_LONGTEXT N_( "Format of the output images (png, jpeg, ...)." )
 
 #define WIDTH_TEXT N_( "Image width" )
 #define WIDTH_LONGTEXT N_( "You can enforce the image width. By default " \
@@ -86,9 +86,6 @@ static void SavePicture( filter_t *, picture_t * );
                             "creating one file per image. In this case, " \
                              "the number is not appended to the filename." )
 
-static const char *const psz_format_list[] = { "png", "jpeg" };
-static const char *const psz_format_list_text[] = { "PNG", "JPEG" };
-
 #define CFG_PREFIX "scene-"
 
 vlc_module_begin ()
@@ -101,10 +98,9 @@ vlc_module_begin ()
     /* General options */
     add_string(  CFG_PREFIX "format", "png", NULL,
                  FORMAT_TEXT, FORMAT_LONGTEXT, false )
-    change_string_list( psz_format_list, psz_format_list_text, 0 )
-    add_integer( CFG_PREFIX "width", 288, NULL,
+    add_integer( CFG_PREFIX "width", -1, NULL,
                  WIDTH_TEXT, WIDTH_LONGTEXT, true )
-    add_integer( CFG_PREFIX "height", 160, NULL,
+    add_integer( CFG_PREFIX "height", -1, NULL,
                  HEIGHT_TEXT, HEIGHT_LONGTEXT, true )
     add_string(  CFG_PREFIX "prefix", "scene", NULL,
                  PREFIX_TEXT, PREFIX_LONGTEXT, false )
@@ -140,6 +136,7 @@ struct filter_sys_t
     char *psz_path;
     char *psz_prefix;
     char *psz_format;
+    vlc_fourcc_t i_format;
     int32_t i_width;
     int32_t i_height;
     int32_t i_ratio;  /* save every n-th frame */
@@ -180,6 +177,22 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_sys->psz_format = var_CreateGetString( p_this, CFG_PREFIX "format" );
+    p_sys->i_format = image_Type2Fourcc( p_sys->psz_format );
+    if( !p_sys->i_format )
+    {
+        msg_Err( p_filter, "Could not find FOURCC for image type '%s'",
+                 p_sys->psz_format );
+        image_HandlerDelete( p_sys->p_image );
+        free( p_sys->p_scene );
+        free( p_sys->psz_format );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+    p_sys->i_width = var_CreateGetInteger( p_this, CFG_PREFIX "width" );
+    p_sys->i_height = var_CreateGetInteger( p_this, CFG_PREFIX "height" );
+    p_sys->i_ratio = var_CreateGetInteger( p_this, CFG_PREFIX "ratio" );
+    p_sys->b_replace = var_CreateGetBool( p_this, CFG_PREFIX "replace" );
     p_sys->psz_prefix = var_CreateGetString( p_this, CFG_PREFIX "prefix" );
     p_sys->psz_path = var_GetNonEmptyString( p_this, CFG_PREFIX "path" );
     if( p_sys->psz_path == NULL )
@@ -189,11 +202,6 @@ static int Create( vlc_object_t *p_this )
         if( i_ret == -1 )
             p_sys->psz_path = NULL;
     }
-    p_sys->psz_format = var_CreateGetString( p_this, CFG_PREFIX "format" );
-    p_sys->i_width = var_CreateGetInteger( p_this, CFG_PREFIX "width" );
-    p_sys->i_height = var_CreateGetInteger( p_this, CFG_PREFIX "height" );
-    p_sys->i_ratio = var_CreateGetInteger( p_this, CFG_PREFIX "ratio" );
-    p_sys->b_replace = var_CreateGetBool( p_this, CFG_PREFIX "replace" );
 
     p_filter->pf_video_filter = Filter;
 
@@ -246,6 +254,20 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
     {
         if( p_sys->p_scene->p_pic )
             picture_Release( p_sys->p_scene->p_pic );
+
+        if( (p_sys->i_width <= 0) && (p_sys->i_height > 0) )
+        {
+            p_sys->i_width = (p_pic->format.i_width * p_sys->i_height) / p_pic->format.i_height;
+        }
+        else if( (p_sys->i_height <= 0) && (p_sys->i_width > 0) )
+        {
+            p_sys->i_height = (p_pic->format.i_height * p_sys->i_width) / p_pic->format.i_width;
+        }
+        else if( (p_sys->i_width <= 0) && (p_sys->i_height <= 0) )
+        {
+            p_sys->i_width = p_pic->format.i_width;
+            p_sys->i_height = p_pic->format.i_height;
+        }
         p_sys->p_scene->p_pic = picture_New( p_pic->format.i_chroma,
            p_pic->format.i_width, p_pic->format.i_height,
            p_pic->format.i_sar_num );
@@ -276,24 +298,7 @@ static void SavePicture( filter_t *p_filter, picture_t *p_pic )
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width = p_sys->i_width;
     fmt_out.i_height = p_sys->i_height;
-    if( strlen( p_sys->psz_format ) == 3 )
-        fmt_out.i_chroma = VLC_FOURCC('p','n','g',' ');
-    else
-        fmt_out.i_chroma = VLC_FOURCC('j','p','e','g');
-
-    if( (fmt_out.i_width == 0) && (fmt_out.i_height > 0) )
-    {
-        fmt_out.i_width = (fmt_in.i_width * fmt_out.i_height) / fmt_in.i_height;
-    }
-    else if( (fmt_out.i_height == 0) && (fmt_out.i_width > 0) )
-    {
-        fmt_out.i_height = (fmt_in.i_height * fmt_out.i_width) / fmt_in.i_width;
-    }
-    else if( (fmt_out.i_width == 0) && (fmt_out.i_height == 0) )
-    {
-        fmt_out.i_width = fmt_in.i_width;
-        fmt_out.i_height = fmt_in.i_height;
-    }
+    fmt_out.i_chroma = p_sys->i_format;
 
     /*
      * Save the snapshot to a temporary file and
