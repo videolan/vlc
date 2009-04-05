@@ -50,7 +50,7 @@ static char           *CreateHtmlSubtitle( int *pi_align, char * );
  * Module descriptor.
  *****************************************************************************/
 static const char *const ppsz_encodings[] = {
-    DEFAULT_NAME, "ASCII", "UTF-8", "",
+    DEFAULT_NAME, "UTF-8", "",
     "ISO-8859-1", "CP1252", "MacRoman", "MacIceland","ISO-8859-15", "",
     "ISO-8859-2", "CP1250", "MacCentralEurope", "MacCroatian", "MacRomania", "",
     "ISO-8859-5", "CP1251", "MacCyrillic", "MacUkraine", "KOI8-R", "KOI8-U", "KOI8-RU", "",
