@@ -451,7 +451,13 @@ connect:
         if( psz_login != NULL && psz_password != NULL )
         {
             msg_Dbg( p_access, "retrying with user=%s, pwd=%s",
-                        psz_login, psz_password );
+                     psz_login,
+#if 1
+                     "yeah right, like we're going to print a password."
+#else
+                     psz_password
+#endif
+                );
             p_sys->url.psz_username = psz_login;
             p_sys->url.psz_password = psz_password;
             Disconnect( p_access );
