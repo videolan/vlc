@@ -549,15 +549,8 @@ vlc_fourcc_t image_Type2Fourcc( const char *psz_type )
     int i;
 
     for( i = 0; ext_table[i].i_codec; i++ )
-    {
-        int j;
-        for( j = 0; toupper(ext_table[i].psz_ext[j]) == toupper(psz_type[j]);
-             j++ )
-        {
-            if( !ext_table[i].psz_ext[j] && !psz_type[j] )
-                return ext_table[i].i_codec;
-        }
-    }
+        if( !strcasecmp( ext_table[i].psz_ext, psz_type ) )
+            return ext_table[i].i_codec;
 
     return 0;
 }
