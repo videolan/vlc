@@ -82,6 +82,8 @@ struct decoder_sys_t
     mtime_t         i_cc_pts;
     mtime_t         i_cc_dts;
     cc_data_t       cc;
+    uint8_t        *p_gop_user_data;
+    uint32_t        i_gop_user_data;
 };
 
 /*****************************************************************************
@@ -154,6 +156,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_get_cc = GetCc;
     cc_Init( &p_sys->cc );
 #endif
+    p_sys->p_gop_user_data = NULL;
+    p_sys->i_gop_user_data = 0;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
     if( vlc_CPU() & CPU_CAPABILITY_MMX )
@@ -464,7 +468,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
                 mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
             }
-            if( p_sys->p_info->user_data_len > 2 )
+            if( p_sys->p_info->user_data_len > 2 || p_sys->i_gop_user_data > 2 )
             {
                 p_sys->i_cc_pts = i_pts;
                 p_sys->i_cc_dts = i_dts;
@@ -476,10 +480,33 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     p_sys->i_cc_flags = BLOCK_FLAG_TYPE_B;
                 else p_sys->i_cc_flags = BLOCK_FLAG_TYPE_I;
 
-                cc_Extract( &p_sys->cc, &p_sys->p_info->user_data[0], p_sys->p_info->user_data_len );
+                if( p_sys->i_gop_user_data > 2 )
+                {
+                    /* We now have picture info for any cached user_data out of the gop */
+                    cc_Extract( &p_sys->cc, &p_sys->p_gop_user_data[0], p_sys->i_gop_user_data );
+                    p_sys->i_gop_user_data = 0;
+                }
+
+                /* Extract the CC from the user_data of the picture */
+                if( p_sys->p_info->user_data_len > 2 )
+                    cc_Extract( &p_sys->cc, &p_sys->p_info->user_data[0], p_sys->p_info->user_data_len );
             }
         }
         break;
+
+        case STATE_GOP:
+            /* There can be userdata in a GOP. It needs to be remembered for the next picture. */
+            if( p_sys->p_info->user_data_len > 2 )
+            {
+                free( p_sys->p_gop_user_data );
+                p_sys->p_gop_user_data = calloc( p_sys->p_info->user_data_len, sizeof(uint8_t) );
+                if( p_sys->p_gop_user_data )
+                {
+                    p_sys->i_gop_user_data = p_sys->p_info->user_data_len;
+                    memcpy( p_sys->p_gop_user_data, p_sys->p_info->user_data, p_sys->p_info->user_data_len );
+                }
+            }
+            break;
 
         case STATE_END:
         case STATE_SLICE:
@@ -599,6 +626,8 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    free( p_sys->p_gop_user_data );
 
     if( p_sys->p_synchro ) decoder_SynchroRelease( p_sys->p_synchro );
 
