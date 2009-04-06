@@ -460,36 +460,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
     {
         input_attachment_t *p_attach = pp_attachments[k];
 
-        vlc_fourcc_t  type  = 0;
-
-        if( ( !strcmp( p_attach->psz_mime, "image/bmp" ) )      || /* BMP */
-            ( !strcmp( p_attach->psz_mime, "image/x-bmp" ) )    ||
-            ( !strcmp( p_attach->psz_mime, "image/x-bitmap" ) ) ||
-            ( !strcmp( p_attach->psz_mime, "image/x-ms-bmp" ) ) )
-        {
-             type = VLC_FOURCC('b','m','p',' ');
-        }
-        else if( ( !strcmp( p_attach->psz_mime, "image/x-portable-anymap" ) )  || /* PNM */
-                 ( !strcmp( p_attach->psz_mime, "image/x-portable-bitmap" ) )  || /* PBM */
-                 ( !strcmp( p_attach->psz_mime, "image/x-portable-graymap" ) ) || /* PGM */
-                 ( !strcmp( p_attach->psz_mime, "image/x-portable-pixmap" ) ) )   /* PPM */
-        {
-            type = VLC_FOURCC('p','n','m',' ');
-        }
-        else if ( !strcmp( p_attach->psz_mime, "image/gif" ) )         /* GIF */
-            type = VLC_FOURCC('g','i','f',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/jpeg" ) )        /* JPG, JPEG */
-            type = VLC_FOURCC('j','p','e','g');
-        else if ( !strcmp( p_attach->psz_mime, "image/pcx" ) )         /* PCX */
-            type = VLC_FOURCC('p','c','x',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/png" ) )         /* PNG */
-            type = VLC_FOURCC('p','n','g',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/tiff" ) )        /* TIF, TIFF */
-            type = VLC_FOURCC('t','i','f','f');
-        else if ( !strcmp( p_attach->psz_mime, "image/x-tga" ) )       /* TGA */
-            type = VLC_FOURCC('t','g','a',' ');
-        else if ( !strcmp( p_attach->psz_mime, "image/x-xpixmap") )    /* XPM */
-            type = VLC_FOURCC('x','p','m',' ');
+        vlc_fourcc_t type = image_Mime2Fourcc( p_attach->psz_mime );
 
         if( ( type != 0 ) &&
             ( p_attach->i_data > 0 ) &&
