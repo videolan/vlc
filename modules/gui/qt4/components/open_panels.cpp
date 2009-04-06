@@ -1294,7 +1294,8 @@ void CaptureOpenPanel::advancedDialog()
         module_config_t *p_item = p_config + n;
         ConfigControl *config = ConfigControl::createControl(
                         VLC_OBJECT( p_intf ), p_item, advFrame, gLayout, n );
-        controls.append( config );
+        if ( config )
+            controls.append( config );
     }
 
     /* Button stuffs */
@@ -1317,11 +1318,6 @@ void CaptureOpenPanel::advancedDialog()
         for( int i = 0; i < controls.size(); i++ )
         {
             ConfigControl *control = controls[i];
-            if( !control )
-            {
-                msg_Dbg( p_intf, "This shouldn't happen, please report" );
-                continue;
-            }
 
             tempMRL += (i ? " :" : ":");
 
@@ -1350,6 +1346,11 @@ void CaptureOpenPanel::advancedDialog()
         advMRL = tempMRL;
         updateMRL();
         msg_Dbg( p_intf, "%s", qtu( advMRL ) );
+    }
+    for( int i = 0; i < controls.size(); i++ )
+    {
+        ConfigControl *control = controls[i];
+        delete control ;
     }
     delete adv;
     module_config_free( p_config );
