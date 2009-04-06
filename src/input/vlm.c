@@ -531,7 +531,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
 
-            if( (p_input = input_CreateThreadExtended( p_vlm, p_media->vod.p_item, psz_header, NULL ) ) )
+            if( (p_input = input_CreateThreadExtended( p_vlm->p_libvlc, p_media->vod.p_item, psz_header, NULL ) ) )
             {
                 while( !p_input->b_eof && !p_input->b_error )
                     msleep( 100000 );
@@ -881,7 +881,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
-        p_instance->p_input = input_CreateThreadExtended( p_vlm, p_instance->p_item,
+        p_instance->p_input = input_CreateThreadExtended( p_vlm->p_libvlc, p_instance->p_item,
                                                           psz_log, p_instance->p_input_resource );
         p_instance->p_input_resource = NULL;
 
