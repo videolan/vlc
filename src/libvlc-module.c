@@ -48,7 +48,7 @@ static const char *const ppsz_language[] =
     "auto",
     "en",
     "ar",
-    "bn"
+    "bn",
     "pt_BR",
     "en_GB",
     "bg",
