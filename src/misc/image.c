@@ -236,6 +236,15 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     p_block = block_New( p_image->p_parent, i_size );
 
     stream_Read( p_stream, p_block->p_buffer, i_size );
+
+    if( !p_fmt_in->i_chroma )
+    {
+        char *psz_mime = NULL;
+        stream_Control( p_stream, STREAM_GET_CONTENT_TYPE, &psz_mime );
+        if( psz_mime )
+            p_fmt_in->i_chroma = image_Mime2Fourcc( psz_mime );
+        free( psz_mime );
+    }
     stream_Delete( p_stream );
 
     if( !p_fmt_in->i_chroma )
@@ -575,6 +584,40 @@ static const char *Fourcc2Ext( vlc_fourcc_t i_codec )
     return NULL;
 }
 */
+
+static const struct
+{
+    vlc_fourcc_t i_codec;
+    const char *psz_mime;
+} mime_table[] =
+{
+    { VLC_FOURCC('b','m','p',' '), "image/bmp" },
+    { VLC_FOURCC('b','m','p',' '), "image/x-bmp" },
+    { VLC_FOURCC('b','m','p',' '), "image/x-bitmap" },
+    { VLC_FOURCC('b','m','p',' '), "image/x-ms-bmp" },
+    { VLC_FOURCC('p','n','m',' '), "image/x-portable-anymap" },
+    { VLC_FOURCC('p','n','m',' '), "image/x-portable-bitmap" },
+    { VLC_FOURCC('p','n','m',' '), "image/x-portable-graymap" },
+    { VLC_FOURCC('p','n','m',' '), "image/x-portable-pixmap" },
+    { VLC_FOURCC('g','i','f',' '), "image/gif" },
+    { VLC_FOURCC('j','p','e','g'), "image/jpeg" },
+    { VLC_FOURCC('p','c','x',' '), "image/pcx" },
+    { VLC_FOURCC('p','n','g',' '), "image/png" },
+    { VLC_FOURCC('t','i','f','f'), "image/tiff" },
+    { VLC_FOURCC('t','g','a',' '), "iamge/x-tga" },
+    { VLC_FOURCC('x','p','m',' '), "image/x-xpixmap" },
+    { 0, NULL }
+};
+
+vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime )
+{
+    int i;
+    for( i = 0; mime_table[i].i_codec; i++ )
+        if( !strcmp( psz_mime, mime_table[i].psz_mime ) )
+            return mime_table[i].i_codec;
+    return 0;
+}
+
 
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
