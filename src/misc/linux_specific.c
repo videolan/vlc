@@ -22,11 +22,13 @@
 # include "config.h"
 #endif
 
+#include <stdio.h>
+#include <string.h>
+
 #include <vlc_common.h>
 #include "../libvlc.h"
 
 #if 0
-#include <stdio.h>
 #include <assert.h>
 #include <pthread.h>
 
@@ -70,8 +72,28 @@ static void set_libvlc_path (void)
 }
 #endif
 
+#ifdef __GLIBC__
+# include <gnu/libc-version.h>
+# include <stdlib.h>
+#endif
+
 void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
 {
+#ifdef __GLIBC__
+    const char *glcv = gnu_get_libc_version ();
+
+    /* gettext in glibc 2.5-2.7 is not thread-safe. LibVLC keeps crashing,
+     * especially in sterror_r(). Even if we have NLS disabled, the calling
+     * process might have called setlocale(). */
+    if (strverscmp (glcv, "2.5") >= 0 && strverscmp (glcv, "2.8") < 0)
+    {
+        fputs ("LibVLC has detected an unusable buggy GNU/libc version.\n"
+               "Please update to version 2.8 or newer.\n", stderr);
+        fflush (stderr);
+        abort ();
+    }
+#endif
+
 #if 0
     static pthread_once_t once = PTHREAD_ONCE_INIT;
     pthread_once (&once, set_libvlc_path);
