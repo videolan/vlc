@@ -474,14 +474,13 @@ static void Run( intf_thread_t *p_intf )
                     if( !strncmp( cl->buffer_read, "help", 4 ) )
                     {
                         vlm_message_t *p_my_help =
-                            vlm_MessageNew( "Telnet Specific Commands:", NULL );
+                            vlm_MessageSimpleNew( "Telnet Specific Commands:" );
                         vlm_MessageAdd( p_my_help,
-                            vlm_MessageNew( "logout, quit, exit" , NULL ) );
+                            vlm_MessageSimpleNew( "logout, quit, exit" ) );
                         vlm_MessageAdd( p_my_help,
-                            vlm_MessageNew( "shutdown" , NULL ) );
+                            vlm_MessageSimpleNew( "shutdown" ) );
                         vlm_MessageAdd( p_my_help,
-                            vlm_MessageNew( "@moduleinstance command argument",
-                                             NULL) );
+                            vlm_MessageSimpleNew( "@moduleinstance command argument" ) );
                         vlm_MessageAdd( message, p_my_help );
                     }
                     Write_message( cl, message, NULL, WRITE_MODE_CMD );
