@@ -31,9 +31,16 @@
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"
-#ifndef ENABLE_NLS
-# define dgettext(d, m) ((char *)(m))
+
+static const char *mdgettext (const char *domain, const char *msg)
+{
+    assert (msg);
+#ifdef ENABLE_NLS
+    if (*msg) /* Do not translate ""! */
+        return dgettext (domain, msg);
 #endif
+    return msg;
+}
 
 static void vlc_module_destruct (gc_object_t *obj)
 {
@@ -232,7 +239,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             const char *domain = va_arg (ap, const char *);
             if (domain == NULL)
                 domain = PACKAGE;
-            module->psz_shortname = dgettext (domain, va_arg (ap, char *));
+            module->psz_shortname = mdgettext (domain, va_arg (ap, char *));
             break;
         }
 
@@ -241,7 +248,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             const char *domain = va_arg (ap, const char *);
             if (domain == NULL)
                 domain = PACKAGE;
-            module->psz_longname = dgettext (domain, va_arg (ap, char *));
+            module->psz_longname = mdgettext (domain, va_arg (ap, char *));
             break;
         }
 
@@ -250,7 +257,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             const char *domain = va_arg (ap, const char *);
             if (domain == NULL)
                 domain = PACKAGE;
-            module->psz_help = dgettext (domain, va_arg (ap, char *));
+            module->psz_help = mdgettext (domain, va_arg (ap, char *));
             break;
         }
 
@@ -361,9 +368,9 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
             if (domain == NULL)
                 domain = PACKAGE;
-            item->psz_text = text ? strdup (dgettext (domain, text)) : NULL;
+            item->psz_text = text ? strdup (mdgettext (domain, text)) : NULL;
             item->psz_longtext =
-                longtext ? strdup (dgettext (domain, longtext)) : NULL;
+                longtext ? strdup (mdgettext (domain, longtext)) : NULL;
             break;
         }
 
@@ -414,7 +421,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 {
                     for (size_t i = 0; i < len; i++)
                         dtext[i] = text[i] ?
-                                        strdup( dgettext( domain, text[i] ) ) :
+                                        strdup (mdgettext( domain, text[i] )) :
                                         NULL;
                     dtext[len] = NULL;
                 }
@@ -452,7 +459,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             if (domain == NULL)
                 domain = PACKAGE;
             if (name)
-                tabtext[item->i_action] = strdup (dgettext (domain, name));
+                tabtext[item->i_action] = strdup (mdgettext (domain, name));
             else
                 tabtext[item->i_action] = NULL;
             tabtext[item->i_action + 1] = NULL;
