@@ -18337,14 +18337,12 @@ msgid "Run manually"
 msgstr "Spustit ručně"
 
 #: modules/gui/qt4/ui/streampanel.h:175
-#, fuzzy
 msgid "Setup schedule"
-msgstr "Plánování"
+msgstr ""
 
 #: modules/gui/qt4/ui/streampanel.h:176
-#, fuzzy
 msgid "Run on schedule"
-msgstr "Plánování"
+msgstr ""
 
 #: modules/gui/qt4/ui/streampanel.h:177
 #, fuzzy
@@ -18608,9 +18606,8 @@ msgid "AAAA; "
 msgstr ""
 
 #: modules/gui/qt4/ui/vlm.h:300
-#, fuzzy
 msgid "Loop"
-msgstr "[Smyčka]"
+msgstr "Smyčka"
 
 #: modules/gui/qt4/ui/vlm.h:304
 msgid "Media Manager List"
