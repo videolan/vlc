@@ -228,18 +228,13 @@ static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t p
 {
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     VLCMain *interface = (VLCMain *)data;
-    
-    NSLog( @"dialog callback triggered; type of dialogue is '%s'", type );
-    if(!strcmp (type, "dialog-fatal"))
-    {
-        const dialog_fatal_t *p_dialog = (const dialog_fatal_t *)value.p_address;
-        NSLog( @"fatal dialogue with title '%s' and message '%s'", p_dialog->title, p_dialog->message );
-#if 0
-        NSValue *o_value = [NSValue valueWithPointer:p_dialog];
 
-        [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewInteractionEventNotification" object:[interface getInteractionList] userInfo:[NSDictionary dictionaryWithObject:o_value forKey:@"VLCDialogPointer"]];
-#endif
-    }
+    const dialog_fatal_t *p_dialog = (const dialog_fatal_t *)value.p_address;
+
+    NSLog( @"dialog callback triggered; type of dialogue is '%s'", type );
+    
+    NSValue *o_value = [NSValue valueWithPointer:p_dialog];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface getInteractionList] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -290,7 +285,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     o_embedded_list = [[VLCEmbeddedList alloc] init];
-    o_interaction_list = [[VLCInteractionList alloc] init];
+    o_interaction_list = [[VLCCoreDialogSupport alloc] init];
     o_info = [[VLCInfo alloc] init];
 #ifdef UPDATE_CHECK
     o_update = [[VLCUpdate alloc] init];
@@ -471,6 +466,12 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* subscribe to various interactive dialogues */
     var_Create( p_intf, "dialog-fatal", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "dialog-fatal", DialogCallback, self );
+    var_Create( p_intf, "dialog-login", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-login", DialogCallback, self );
+    var_Create( p_intf, "dialog-question", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-question", DialogCallback, self );
+    var_Create( p_intf, "dialog-progress-bar", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-progress-bar", DialogCallback, self );
     dialog_Register( p_intf );
 
     /* update the playmode stuff */
@@ -747,6 +748,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister( p_intf );
     var_DelCallback( p_intf, "dialog-fatal", DialogCallback, self );
+    var_DelCallback( p_intf, "dialog-login", DialogCallback, self );
+    var_DelCallback( p_intf, "dialog-question", DialogCallback, self );
+    var_DelCallback( p_intf, "dialog-progress-bar", DialogCallback, self );
 
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
@@ -2117,8 +2121,8 @@ end:
 
 - (IBAction)showBookmarks:(id)sender
 {
-    dialog_Fatal( p_intf, _("Video Settings not saved"),
-                 _("An error occured while saving your settings via SimplePrefs.") );
+    dialog_Question( p_intf, _("Video Settings not saved"),
+                 _("An error occured while saving your settings via SimplePrefs."), "Yes", "No", "Cancel" );
 
     /* we need the wizard-nib for the bookmarks's extract functionality */
     if( !nib_wizard_loaded )
@@ -2156,7 +2160,7 @@ end:
     [o_update showUpdateWindow];
 #else
     msg_Err( VLCIntf, "Update checker wasn't enabled in this build" );
-    dialog_Fatal( VLCIntf, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
+    dialog_FatalWait( VLCIntf, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
 #endif
 }
 

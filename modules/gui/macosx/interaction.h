@@ -1,11 +1,11 @@
 /*****************************************************************************
  * interaction.h: Mac OS X interaction dialogs
  *****************************************************************************
- * Copyright (C) 2005-2006 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Derk-Jan Hartman <hartman at videolan dot org>
- *          Felix Kühne <fkuehne at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,63 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include <vlc_common.h>
-#include <vlc_interface.h>
-#include <Cocoa/Cocoa.h>
+#import <vlc_common.h>
+#import <vlc_dialog.h>
+#import <Cocoa/Cocoa.h>
+
+
+/*****************************************************************************
+ * VLCErrorPanel interface
+ *****************************************************************************/
+
+@interface VLCErrorPanel : NSObject
+{
+    IBOutlet id o_window;
+    IBOutlet id o_cleanup_button;
+    IBOutlet id o_error_table;
+    IBOutlet id o_messages_btn;
+    
+    NSMutableArray * o_errors;
+    NSMutableArray * o_icons;
+    
+    BOOL nib_interact_errpanel_loaded;
+}
+- (IBAction)cleanupTable:(id)sender;
+- (IBAction)showMessages:(id)sender;
+
+-(void)showPanel;
+-(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg;
+
+@end
+
+
+/*****************************************************************************
+ * VLCCoreDialogSupport interface
+ *****************************************************************************/
+@interface VLCCoreDialogSupport : NSObject
+{
+    NSMutableArray *o_interaction_list;
+    VLCErrorPanel *o_error_panel;
+}
+
+-(void)newInteractionEvent: (NSNotification *)o_notification;
+#if 0
+-(void)addInteraction: (interaction_dialog_t *)p_dialog;
+-(void)removeInteraction: (VLCInteraction *)p_interaction;
+#endif
+
+-(void)showFatalDialog: (NSValue *)o_value;
+-(void)showQuestionDialog: (NSValue *)o_value;
+
+-(id)getErrorPanel;
+
+@end
 
 /*****************************************************************************
  * VLCInteraction interface
  *****************************************************************************/
 
+#if 0
 @interface VLCInteraction : NSObject
 {
     /* progress dialogue */
@@ -50,66 +99,20 @@
     IBOutlet id o_auth_title;
     IBOutlet id o_auth_win;
 
-    /* string input dialogue */
-    IBOutlet id o_input_cancel_btn;
-    IBOutlet id o_input_description;
-    IBOutlet id o_input_fld;
-    IBOutlet id o_input_ok_btn;
-    IBOutlet id o_input_title;
-    IBOutlet id o_input_win;
-
-    interaction_dialog_t * p_dialog;
+    vlc_object_t * p_dialog;
     intf_thread_t * p_intf;
     NSProgressIndicator * o_mainIntfPgbar;
     BOOL nib_interact_loaded;
 }
 
-- (IBAction)cancelAndClose:(id)sender;
 - (IBAction)okayAndClose:(id)sender;
 - (IBAction)cancelDialog:(id)sender;
 
--(id)initDialog: (interaction_dialog_t *)_p_dialog;
+-(id)initDialog: (vlc_object_t *)_p_dialog;
 -(void)runDialog;
 -(void)updateDialog;
 -(void)hideDialog;
 -(void)destroyDialog;
 
 @end
-
-@interface VLCErrorInteractionPanel : NSObject
-{
-    IBOutlet id o_window;
-    IBOutlet id o_cleanup_button;
-    IBOutlet id o_error_table;
-    IBOutlet id o_messages_btn;
-
-    NSMutableArray * o_errors;
-    NSMutableArray * o_icons;
-
-    BOOL nib_interact_errpanel_loaded;
-}
-- (IBAction)cleanupTable:(id)sender;
-- (IBAction)showMessages:(id)sender;
-
--(void)showPanel;
--(void)addError: (NSString *)o_error withMsg:(NSString *)o_msg;
--(void)addWarning: (NSString *)o_warning withMsg:(NSString *)o_msg;
-
-@end
-
-/*****************************************************************************
- * VLCInteractionList interface
- *****************************************************************************/
-@interface VLCInteractionList : NSObject
-{
-    NSMutableArray *o_interaction_list;
-    VLCErrorInteractionPanel *o_error_panel;
-}
-
--(void)newInteractionEvent: (NSNotification *)o_notification;
--(void)addInteraction: (interaction_dialog_t *)p_dialog;
--(void)removeInteraction: (VLCInteraction *)p_interaction;
-
--(id)getErrorPanel;
-
-@end
+#endif
