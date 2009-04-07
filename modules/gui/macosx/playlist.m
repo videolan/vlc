@@ -1458,23 +1458,9 @@
     playlist_t * p_playlist = pl_Hold( VLCIntf );
     vlc_thread_set_priority( p_playlist, VLC_THREAD_PRIORITY_LOW );
 
-    int ret_v;
-    char *psz_name = NULL;
-    ret_v = intf_UserStringInput( p_playlist, _("New Node"),
-        _("Please enter a name for the new node."), &psz_name );
-
     PL_LOCK;
-    if( ret_v != DIALOG_CANCELLED && psz_name )
-    {
-        playlist_NodeCreate( p_playlist, psz_name,
+    playlist_NodeCreate( p_playlist, _("Empty Folder"),
                                       p_playlist->p_local_category, 0, NULL );
-    }
-    else if(! config_GetInt( p_playlist, "interact" ) )
-    {
-        /* in case that the interaction is disabled, just give it a bogus name */
-        playlist_NodeCreate( p_playlist, _("Empty Folder"),
-                                      p_playlist->p_local_category, 0, NULL );
-    }
     PL_UNLOCK;
 
     free( psz_name );
