@@ -2211,7 +2211,11 @@ ifdef HAVE_CYGWIN
 	# incorrect compile warning with cygwin compiler 3.4.4
 	patch -p0 <Patches/dirac-cygwin.patch
 endif
+ifndef HAVE_DARWIN_OS
 	(cd $@; aclocal -I m4 && autoconf && automake)
+else
+	(cd $@; ./bootstrap)
+endif
 
 DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
 
@@ -2486,7 +2490,12 @@ liboil: liboil-$(OIL_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .liboil: liboil
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2" && make && make install)
+ifdef HAVE_DARWIN_OS
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --disable-glib --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O4")
+else
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2")
+endif
+	(cd $<; make && make install)
 	touch $@
 
 CLEAN_FILE += .liboil
