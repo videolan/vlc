@@ -1318,7 +1318,7 @@ ifdef HAVE_WIN32
 	(cd $@; dos2unix configure.in)
 	patch -p0 < Patches/goom2k4-0-win32.patch
 else
-ifneq ($(DARWIN_COMPILER),LLVMGCC)
+ifndef HAVE_DARWIN_OS
 	patch -p0 < Patches/goom2k4-0-mmx.patch
 endif
 endif

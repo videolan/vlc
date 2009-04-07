@@ -1,7 +1,7 @@
 # ***************************************************************************
 # src/packages.mak : Archive locations
 # ***************************************************************************
-# Copyright (C) 2003 - 2008 the VideoLAN team
+# Copyright (C) 2003 - 2009 the VideoLAN team
 # $Id$
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
