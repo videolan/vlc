@@ -151,7 +151,7 @@ static int Open( vlc_object_t * p_this )
     if( p_wf_ext == NULL )
          goto error;
 
-    p_wf = (WAVEFORMATEX *)p_wf_ext;
+    p_wf = &p_wf_ext->Format;
     p_wf->cbSize = 0;
     i_size -= 2;
     if( stream_Read( p_demux->s, p_wf, i_size ) != (int)i_size ||
@@ -198,16 +198,59 @@ static int Open( vlc_object_t * p_this )
         if( i_channel_mask )
         {
             int i_match = 0;
-            for( i = 0; i < sizeof(pi_channels_src)/sizeof(uint32_t); i++ )
+            for( i = 0; i < sizeof(pi_channels_src)/sizeof(*pi_channels_src); i++ )
             {
                 if( i_channel_mask & pi_channels_src[i] )
                 {
                     if( !( p_sys->i_channel_mask & pi_channels_in[i] ) )
                         i_match++;
+
+                    i_channel_mask &= ~pi_channels_src[i];
                     p_sys->i_channel_mask |= pi_channels_in[i];
+
+                    if( i_match >= p_sys->fmt.audio.i_channels )
+                        break;
                 }
             }
-            if( i_match != p_sys->fmt.audio.i_channels )
+            if( i_channel_mask )
+                msg_Warn( p_demux, "Some channels are unrecognized or uselessly specified (0x%x)", i_channel_mask );
+            if( i_match < p_sys->fmt.audio.i_channels )
+            {
+                int i_missing = p_sys->fmt.audio.i_channels - i_match;
+                msg_Warn( p_demux, "Trying to fill up unspecified position for %d channels", p_sys->fmt.audio.i_channels - i_match );
+
+                static const uint32_t pi_pair[] = { AOUT_CHAN_REARLEFT|AOUT_CHAN_REARRIGHT,
+                                                    AOUT_CHAN_MIDDLELEFT|AOUT_CHAN_MIDDLERIGHT,
+                                                    AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT };
+                static const uint32_t pi_center[] = { AOUT_CHAN_REARCENTER,
+                                                      0,
+                                                      AOUT_CHAN_CENTER };
+
+                /* Try to complete with pair */
+                for( unsigned i = 0; i < sizeof(pi_pair)/sizeof(*pi_pair); i++ )
+                {
+                    if( i_missing >= 2 && !(p_sys->i_channel_mask & pi_pair[i] ) )
+                    {
+                        i_missing -= 2;
+                        p_sys->i_channel_mask |= pi_pair[i];
+                    }
+                }
+                /* Well fill up with what we can */
+                for( unsigned i = 0; i < sizeof(pi_channels_in)/sizeof(*pi_channels_in) && i_missing > 0; i++ )
+                {
+                    if( !( p_sys->i_channel_mask & pi_channels_in[i] ) )
+                    {
+                        p_sys->i_channel_mask |= pi_channels_in[i];
+                        i_missing--;
+
+                        if( i_missing <= 0 )
+                            break;
+                    }
+                }
+
+                i_match = p_sys->fmt.audio.i_channels - i_missing;
+            }
+            if( i_match < p_sys->fmt.audio.i_channels )
             {
                 msg_Err( p_demux, "Invalid/unsupported channel mask" );
                 p_sys->i_channel_mask = 0;
