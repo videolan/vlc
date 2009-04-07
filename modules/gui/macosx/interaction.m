@@ -30,25 +30,47 @@
 #import <ApplicationServices/ApplicationServices.h>
 
 /*****************************************************************************
- * VLCCoreDialogSupport implementation
+ * VLCCoreDialogProvider implementation
  *****************************************************************************/
-@implementation VLCCoreDialogSupport
+@implementation VLCCoreDialogProvider
+
+static VLCCoreDialogProvider *_o_sharedInstance = nil;
+
++ (VLCCoreDialogProvider *)sharedInstance
+{
+    return _o_sharedInstance ? _o_sharedInstance : [[self alloc] init];
+}
 
 -(id)init
 {
-    [super init];
-    o_interaction_list = [[NSMutableArray alloc] initWithCapacity:1];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-        selector:@selector(newInteractionEvent:)
-        name: @"VLCNewCoreDialogEventNotification"
-        object:self];
-
-    o_error_panel = [[VLCErrorPanel alloc] init];
-
-    return self;
+    if( _o_sharedInstance )
+        [self dealloc];
+    else
+    {
+        _o_sharedInstance = [super init];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(performDialogEvent:)
+                                                     name: @"VLCNewCoreDialogEventNotification"
+                                                   object:self];
+        
+        o_error_panel = [[VLCErrorPanel alloc] init];
+    }
+    
+    return _o_sharedInstance;
 }
 
--(void)newInteractionEvent: (NSNotification *)o_notification
+-(void)awakeFromNib
+{
+    [o_auth_login_txt setStringValue: _NS("User name")];
+    [o_auth_pw_txt setStringValue: _NS("Password")];
+    [o_auth_cancel_btn setTitle: _NS("Cancel")];
+    [o_auth_ok_btn setTitle: _NS("OK")];
+    [o_prog_cancel_btn setTitle: _NS("Cancel")];
+    [o_prog_bar setUsesThreadedAnimation: YES];
+
+}    
+
+-(void)performDialogEvent: (NSNotification *)o_notification
 {
     NSValue *o_value = [[o_notification userInfo] objectForKey:@"VLCDialogPointer"];
     NSString *o_type = [[o_notification userInfo] objectForKey:@"VLCDialogType"];
@@ -57,31 +79,10 @@
         [self showFatalDialog: o_value];
     else if( [o_type isEqualToString: @"dialog-question"] )
         [self showQuestionDialog: o_value];
+    else if( [o_type isEqualToString: @"dialog-login"] )
+        [self showLoginDialog: o_value];
     else
         msg_Err( VLCIntf, "unhandled dialog type: '%s'", [o_type UTF8String] );
-
-#if 0
-    switch( p_dialog->i_action )
-    {
-    case INTERACT_NEW:
-        [self addInteraction: p_dialog];
-        break;
-    case INTERACT_UPDATE:
-        o_interaction = (VLCInteraction *)p_dialog->p_private;
-        [o_interaction updateDialog];
-        break;
-    case INTERACT_HIDE:
-        o_interaction = (VLCInteraction *)p_dialog->p_private;
-        [o_interaction hideDialog];
-        break;
-    case INTERACT_DESTROY:
-        o_interaction = (VLCInteraction *)p_dialog->p_private;
-        [o_interaction destroyDialog];
-        [self removeInteraction:o_interaction];
-        p_dialog->i_status = DESTROYED_DIALOG;
-        break;
-    }
-#endif
 }
 
 -(void)showFatalDialog: (NSValue *)o_value
@@ -128,21 +129,38 @@
         p_dialog->answer = 3;
 }
 
-#if 0
--(void)addInteraction: (interaction_dialog_t *)p_dialog
+-(void)showLoginDialog: (NSValue *)o_value
 {
-    VLCInteraction *o_interaction = [[VLCInteraction alloc] initDialog: p_dialog];
- 
-    p_dialog->p_private = (void *)o_interaction;
-    [o_interaction_list addObject:[o_interaction autorelease]];
-    [o_interaction runDialog];
+    dialog_login_t *p_dialog = [o_value pointerValue];
+    NSInteger i_returnValue = 0;
+
+    [o_auth_title_txt setStringValue: [NSString stringWithUTF8String: p_dialog->title]];
+    [o_auth_win setTitle: [NSString stringWithUTF8String: p_dialog->title]];
+    [o_auth_description_txt setStringValue: [NSString stringWithUTF8String: p_dialog->message]];
+    [o_auth_login_fld setStringValue: @""];
+    [o_auth_pw_fld setStringValue: @""];
+
+    [o_auth_win center];
+    i_returnValue = [NSApp runModalForWindow: o_auth_win];
+    [o_auth_win close];
+    if( i_returnValue )
+    {
+        *p_dialog->username = strdup( [[o_auth_login_fld stringValue] UTF8String] );
+        *p_dialog->password = strdup( [[o_auth_pw_fld stringValue] UTF8String] );
+    }
+    else
+    {
+         *p_dialog->username = *p_dialog->password = NULL;
+    }
 }
 
--(void)removeInteraction: (VLCInteraction *)o_interaction
+-(IBAction)loginDialogAction:(id)sender
 {
-    [o_interaction_list removeObject:o_interaction];
+    if( [[sender title] isEqualToString: _NS("OK")] )
+        [NSApp stopModalWithCode: 1];
+    else
+        [NSApp stopModalWithCode: 0];
 }
-#endif
 
 -(id)getErrorPanel
 {
@@ -152,95 +170,11 @@
 -(void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [o_interaction_list removeAllObjects];
-    [o_interaction_list release];
     [super dealloc];
 }
 @end
 
-/*****************************************************************************
- * VLCInteraction implementation
- *****************************************************************************/
 #if 0
-@implementation VLCInteraction
-
--(id)initDialog: (vlc_object_t *)_p_dialog
-{
-    p_intf = VLCIntf;
-    [super init];
-    p_dialog = _p_dialog;
-    return self;
-}
-
--(void)runDialog
-{
-    id o_window = NULL;
-    if( !p_dialog )
-        msg_Err( p_intf, "no available interaction framework" );
-
-    if( !nib_interact_loaded )
-    {
-        nib_interact_loaded = [NSBundle loadNibNamed:@"Interaction" owner:self];
-        [o_prog_cancel_btn setTitle: _NS("Cancel")];
-        [o_prog_bar setUsesThreadedAnimation: YES];
-        [o_auth_login_txt setStringValue: _NS("Login:")];
-        [o_auth_pw_txt setStringValue: _NS("Password:")];
-        [o_auth_cancel_btn setTitle: _NS("Cancel")];
-        [o_auth_ok_btn setTitle: _NS("OK")];
-        o_mainIntfPgbar = [[VLCMain sharedInstance] getMainIntfPgbar];
-    }
-
-    NSString *o_title = [NSString stringWithUTF8String:p_dialog->psz_title ? p_dialog->psz_title : _("Error")];
-    NSString *o_description = [NSString stringWithUTF8String:p_dialog->psz_description ? p_dialog->psz_description : ""];
-    NSString *o_defaultButton = p_dialog->psz_default_button ? [NSString stringWithUTF8String:p_dialog->psz_default_button] : nil;
-    NSString *o_alternateButton = p_dialog->psz_alternate_button ? [NSString stringWithUTF8String:p_dialog->psz_alternate_button] : nil;
-    NSString *o_otherButton = p_dialog->psz_other_button ? [NSString stringWithUTF8String:p_dialog->psz_other_button] : nil;
-
-    vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout != NULL )
-    {
-        NSEnumerator * o_enum = [[NSApp orderedWindows] objectEnumerator];
-
-        while( ( o_window = [o_enum nextObject] ) )
-        {
-            if( [[o_window className] isEqualToString: @"VLCVoutWindow"] )
-            {
-                vlc_object_release( (vlc_object_t *)p_vout );
-                break;
-            }
-        }
-        vlc_object_release( (vlc_object_t *)p_vout );
-    }
-    else
-    {
-        o_window = [NSApp mainWindow];
-    }
-
-    msg_Dbg( p_intf, "Title: %s", [o_title UTF8String] );
-    msg_Dbg( p_intf, "Description: %s", [o_description UTF8String] );
-
-#if 0
-    dialog_question_t
-    {
-        msg_Dbg( p_intf, "yes-no-cancel-dialog requested" );
-        NSBeginInformationalAlertSheet( o_title, o_defaultButton,
-            o_alternateButton, o_otherButton, o_window, self,
-            @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
-            o_description );
-    }
-
-    dialog_login_t
-    {
-        msg_Dbg( p_intf, "dialog for login and pw requested" );
-        [o_auth_title setStringValue: o_title];
-        [o_auth_description setStringValue: o_description];
-        [o_auth_login_fld setStringValue: @""];
-        [o_auth_pw_fld setStringValue: @""];
-        [NSApp beginSheet: o_auth_win modalForWindow: o_window
-            modalDelegate: self didEndSelector: nil contextInfo: nil];
-        [o_auth_win makeKeyWindow];
-    }
-
     dialog_progress_bar_t
     {
         msg_Dbg( p_intf, "user progress dialog requested" );
@@ -256,19 +190,6 @@
             modalDelegate: self didEndSelector: nil contextInfo: nil];
         [o_prog_win makeKeyWindow];
     }
-
-    DIALOG_INTF_PROGRESS
-    {
-        msg_Dbg( p_intf, "progress-bar in main intf requested" );
-        [[VLCMain sharedInstance] setScrollField: o_description stopAfter: -1];
-        [o_mainIntfPgbar setDoubleValue: (double)p_dialog->val.f_float];
-        [o_mainIntfPgbar setHidden: NO];
-        [[[VLCMain sharedInstance] getControllerWindow] makeKeyWindow];
-        [o_mainIntfPgbar setIndeterminate: NO];
-    }
-#endif
-}
-
 -(void)updateDialog
 {
     if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
@@ -292,56 +213,8 @@
         return;
     }
 }
-
--(void)hideDialog
-{
-    msg_Dbg( p_intf, "hide event %p", self );
-    if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
-    {
-        if([o_prog_win isVisible])
-        {
-            [NSApp endSheet: o_prog_win];
-            [o_prog_win close];
-        }
-    }
-}
-
--(void)destroyDialog
-{
-    msg_Dbg( p_intf, "destroy event" );
-    if( o_mainIntfPgbar )
-        [o_mainIntfPgbar release];
-}
-
-- (IBAction)cancelDialog:(id)sender
-{
-    /* tell core that the user wishes to cancel the dialogue
-     * Use this function if cancelling is optionally like in the progress-dialogue */
-    vlc_mutex_lock( p_dialog->p_lock );
-    p_dialog->b_cancelled = true;
-    vlc_mutex_unlock( p_dialog->p_lock );
-    msg_Dbg( p_intf, "cancelling dialog, will close it later on" );
-}
-
-- (IBAction)okayAndClose:(id)sender
-{
-    msg_Dbg( p_intf, "running okayAndClose" );
-    vlc_mutex_lock( p_dialog->p_lock );
-    if( p_dialog->i_flags == DIALOG_LOGIN_PW_OK_CANCEL )
-    {
-        p_dialog->psz_returned[0] = strdup( [[o_auth_login_fld stringValue] UTF8String] );
-        p_dialog->psz_returned[1] = strdup( [[o_auth_pw_fld stringValue] UTF8String] );
-    }
-    else if( p_dialog->i_flags == DIALOG_PSZ_INPUT_OK_CANCEL )
-        p_dialog->psz_returned[0] = strdup( [[o_input_fld stringValue] UTF8String] );
-    p_dialog->i_return = DIALOG_OK_YES;
-    p_dialog->i_status = ANSWERED_DIALOG;
-    vlc_mutex_unlock( p_dialog->p_lock );
-    msg_Dbg( p_intf, "dialog acknowledged" );
-}
-
-@end
 #endif
+
 /*****************************************************************************
  * VLCErrorPanel implementation
  *****************************************************************************/
@@ -350,8 +223,7 @@
 {
     [super init];
 
-    /* load the nib */
-    nib_interact_errpanel_loaded = [NSBundle loadNibNamed:@"InteractionErrorPanel" owner:self];
+    nib_loaded = [NSBundle loadNibNamed:@"InteractionErrorPanel" owner:self];
 
     /* init strings */
     [o_window setTitle: _NS("Errors and Warnings")];

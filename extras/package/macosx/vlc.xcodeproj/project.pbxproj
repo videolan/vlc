@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */; };
 		CC402EB00E00ABBB006A4BA4 /* vlc.icns in Resources */ = {isa = PBXBuildFile; fileRef = F74F13DF02C2A53401EE194C /* vlc.icns */; };
 		CC402EB10E00ABBB006A4BA4 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = F74F13EA02C2A79C01EE194C /* MainMenu.nib */; };
 		CC402EB20E00ABBB006A4BA4 /* divx.icns in Resources */ = {isa = PBXBuildFile; fileRef = F6E4F90A02D2648B01A80112 /* divx.icns */; };
@@ -84,7 +85,6 @@
 		CC402EFB0E00ABBB006A4BA4 /* skip_forward_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */; };
 		CC402EFC0E00ABBB006A4BA4 /* skip_previous_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */; };
 		CC402EFD0E00ABBB006A4BA4 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
-		CC402EFE0E00ABBB006A4BA4 /* Interaction.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */; };
 		CC402EFF0E00ABBB006A4BA4 /* InteractionErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC1AC1BA0A7BDA41002478C3 /* InteractionErrorPanel.nib */; };
 		CC402F000E00ABBB006A4BA4 /* add_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */; };
 		CC402F010E00ABBB006A4BA4 /* add_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */; };
@@ -260,9 +260,9 @@
 		CC0B723A0D54F2B000448E00 /* spref_cone_Interface_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Interface_64.png; path = Resources/spref_cone_Interface_64.png; sourceTree = "<group>"; };
 		CC0B723B0D54F2B000448E00 /* spref_cone_Subtitles_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Subtitles_64.png; path = Resources/spref_cone_Subtitles_64.png; sourceTree = "<group>"; };
 		CC0B723C0D54F2B000448E00 /* spref_cone_Video_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Video_64.png; path = Resources/spref_cone_Video_64.png; sourceTree = "<group>"; };
+		CC0FB34B0F8BED1100F057F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/CoreDialogs.nib; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1AC1BB0A7BDA41002478C3 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/InteractionErrorPanel.nib; sourceTree = "<group>"; };
-		CC1B4B4C09A8CF9E0078AD2E /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Interaction.nib; sourceTree = "<group>"; };
 		CC1B4C1409A8EC690078AD2E /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../../modules/gui/macosx/interaction.h; sourceTree = "<group>"; };
 		CC1B4C1509A8EC690078AD2E /* interaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = interaction.m; path = ../../../modules/gui/macosx/interaction.m; sourceTree = "<group>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
@@ -755,6 +755,7 @@
 		DCF358BC077F1236007DB450 /* nibs */ = {
 			isa = PBXGroup;
 			children = (
+				CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */,
 				CCB60A400E6E5E3F00407004 /* VLM.nib */,
 				CCC896B80D9AA9E8005AE59C /* MediaInfo.nib */,
 				DCA00AA7075F948800E6BF46 /* About.nib */,
@@ -765,7 +766,6 @@
 				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
 				CC26BF2A09A7A05000E94D62 /* Update.nib */,
-				CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */,
 				CC1AC1BA0A7BDA41002478C3 /* InteractionErrorPanel.nib */,
 			);
 			name = nibs;
@@ -891,7 +891,6 @@
 				CC402EFB0E00ABBB006A4BA4 /* skip_forward_embedded_blue.png in Resources */,
 				CC402EFC0E00ABBB006A4BA4 /* skip_previous_embedded_blue.png in Resources */,
 				CC402EFD0E00ABBB006A4BA4 /* Update.nib in Resources */,
-				CC402EFE0E00ABBB006A4BA4 /* Interaction.nib in Resources */,
 				CC402EFF0E00ABBB006A4BA4 /* InteractionErrorPanel.nib in Resources */,
 				CC402F000E00ABBB006A4BA4 /* add_embedded_blue.png in Resources */,
 				CC402F010E00ABBB006A4BA4 /* add_embedded.png in Resources */,
@@ -961,6 +960,7 @@
 				CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */,
 				CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */,
 				CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */,
+				CC0FB34C0F8BED1100F057F7 /* CoreDialogs.nib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -977,20 +977,20 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		CC0FB34A0F8BED1100F057F7 /* CoreDialogs.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CC0FB34B0F8BED1100F057F7 /* English */,
+			);
+			name = CoreDialogs.nib;
+			sourceTree = "<group>";
+		};
 		CC1AC1BA0A7BDA41002478C3 /* InteractionErrorPanel.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				CC1AC1BB0A7BDA41002478C3 /* English */,
 			);
 			name = InteractionErrorPanel.nib;
-			sourceTree = "<group>";
-		};
-		CC1B4B4B09A8CF9E0078AD2E /* Interaction.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CC1B4B4C09A8CF9E0078AD2E /* English */,
-			);
-			name = Interaction.nib;
 			sourceTree = "<group>";
 		};
 		CC26BF2A09A7A05000E94D62 /* Update.nib */ = {

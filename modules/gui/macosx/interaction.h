@@ -40,7 +40,7 @@
     NSMutableArray * o_errors;
     NSMutableArray * o_icons;
     
-    BOOL nib_interact_errpanel_loaded;
+    BOOL nib_loaded;
 }
 - (IBAction)cleanupTable:(id)sender;
 - (IBAction)showMessages:(id)sender;
@@ -52,34 +52,23 @@
 
 
 /*****************************************************************************
- * VLCCoreDialogSupport interface
+ * VLCCoreDialogProvider interface
  *****************************************************************************/
-@interface VLCCoreDialogSupport : NSObject
+@interface VLCCoreDialogProvider : NSObject
 {
-    NSMutableArray *o_interaction_list;
     VLCErrorPanel *o_error_panel;
-}
 
--(void)newInteractionEvent: (NSNotification *)o_notification;
-#if 0
--(void)addInteraction: (interaction_dialog_t *)p_dialog;
--(void)removeInteraction: (VLCInteraction *)p_interaction;
-#endif
+    /* authentication dialogue */
+    IBOutlet id o_auth_cancel_btn;
+    IBOutlet id o_auth_description_txt;
+    IBOutlet id o_auth_login_fld;
+    IBOutlet id o_auth_login_txt;
+    IBOutlet id o_auth_ok_btn;
+    IBOutlet id o_auth_pw_fld;
+    IBOutlet id o_auth_pw_txt;
+    IBOutlet id o_auth_title_txt;
+    IBOutlet id o_auth_win;
 
--(void)showFatalDialog: (NSValue *)o_value;
--(void)showQuestionDialog: (NSValue *)o_value;
-
--(id)getErrorPanel;
-
-@end
-
-/*****************************************************************************
- * VLCInteraction interface
- *****************************************************************************/
-
-#if 0
-@interface VLCInteraction : NSObject
-{
     /* progress dialogue */
     IBOutlet id o_prog_bar;
     IBOutlet id o_prog_cancel_btn;
@@ -87,32 +76,16 @@
     IBOutlet id o_prog_title;
     IBOutlet id o_prog_win;
     IBOutlet id o_prog_timeToGo;
-
-    /* authentication dialogue */
-    IBOutlet id o_auth_cancel_btn;
-    IBOutlet id o_auth_description;
-    IBOutlet id o_auth_login_fld;
-    IBOutlet id o_auth_login_txt;
-    IBOutlet id o_auth_ok_btn;
-    IBOutlet id o_auth_pw_fld;
-    IBOutlet id o_auth_pw_txt;
-    IBOutlet id o_auth_title;
-    IBOutlet id o_auth_win;
-
-    vlc_object_t * p_dialog;
-    intf_thread_t * p_intf;
-    NSProgressIndicator * o_mainIntfPgbar;
-    BOOL nib_interact_loaded;
 }
++ (VLCCoreDialogProvider *)sharedInstance;
 
-- (IBAction)okayAndClose:(id)sender;
-- (IBAction)cancelDialog:(id)sender;
+-(void)performDialogEvent: (NSNotification *)o_notification;
 
--(id)initDialog: (vlc_object_t *)_p_dialog;
--(void)runDialog;
--(void)updateDialog;
--(void)hideDialog;
--(void)destroyDialog;
+-(void)showFatalDialog: (NSValue *)o_value;
+-(void)showQuestionDialog: (NSValue *)o_value;
+-(void)showLoginDialog: (NSValue *)o_value;
+-(IBAction)loginDialogAction:(id)sender;
+
+-(id)getErrorPanel;
 
 @end
-#endif

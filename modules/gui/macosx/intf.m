@@ -234,7 +234,7 @@ static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t p
     NSLog( @"dialog callback triggered; type of dialogue is '%s'", type );
     
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface getInteractionList] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface getCoreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -285,7 +285,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     o_embedded_list = [[VLCEmbeddedList alloc] init];
-    o_interaction_list = [[VLCCoreDialogSupport alloc] init];
+    o_coredialogs = [[VLCCoreDialogProvider alloc] init];
     o_info = [[VLCInfo alloc] init];
 #ifdef UPDATE_CHECK
     o_update = [[VLCUpdate alloc] init];
@@ -463,6 +463,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     pl_Release( p_intf );
 
+    /* load our Core Dialogs nib */
+    nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
+    
     /* subscribe to various interactive dialogues */
     var_Create( p_intf, "dialog-fatal", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "dialog-fatal", DialogCallback, self );
@@ -792,7 +795,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [crashLogURLConnection release];
  
     [o_embedded_list release];
-    [o_interaction_list release];
+    [o_coredialogs release];
     [o_eyetv release];
 
     [o_img_pause_pressed release];
@@ -1388,10 +1391,10 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getInteractionList
+- (id)getCoreDialogProvider
 {
-    if( o_interaction_list )
-        return o_interaction_list;
+    if( o_coredialogs )
+        return o_coredialogs;
 
     return nil;
 }
@@ -2121,8 +2124,7 @@ end:
 
 - (IBAction)showBookmarks:(id)sender
 {
-    dialog_Question( p_intf, _("Video Settings not saved"),
-                 _("An error occured while saving your settings via SimplePrefs."), "Yes", "No", "Cancel" );
+    dialog_Fatal( p_intf, "Title", "Message" );
 
     /* we need the wizard-nib for the bookmarks's extract functionality */
     if( !nib_wizard_loaded )
@@ -2431,7 +2433,7 @@ end:
 
 - (IBAction)viewErrorsAndWarnings:(id)sender
 {
-    [[[self getInteractionList] getErrorPanel] showPanel];
+    [[[self getCoreDialogProvider] getErrorPanel] showPanel];
 }
 
 - (IBAction)showMessagesPanel:(id)sender

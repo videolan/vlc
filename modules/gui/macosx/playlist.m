@@ -1442,19 +1442,6 @@
 
 - (IBAction)addNode:(id)sender
 {
-    /* we have to create a new thread here because otherwise we would block the
-     * interface since the interaction-stuff and this code would run in the same
-     * thread */
-    [NSThread detachNewThreadSelector: @selector(addNodeThreadedly)
-        toTarget: self withObject:nil];
-    [self playlistUpdated];
-}
-
-- (void)addNodeThreadedly
-{
-    NSAutoreleasePool * ourPool = [[NSAutoreleasePool alloc] init];
-
-    /* simply adds a new node to the end of the playlist */
     playlist_t * p_playlist = pl_Hold( VLCIntf );
     vlc_thread_set_priority( p_playlist, VLC_THREAD_PRIORITY_LOW );
 
@@ -1463,11 +1450,10 @@
                                       p_playlist->p_local_category, 0, NULL );
     PL_UNLOCK;
 
-    free( psz_name );
     pl_Release( VLCIntf );
-    [ourPool release];
-}
 
+    [self playlistUpdated];
+}
 @end
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)

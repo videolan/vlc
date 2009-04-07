@@ -106,7 +106,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     id o_bookmarks;             /* VLCBookmarks   */
     id o_vlm;                   /* VLCVLMController */
     id o_embedded_list;         /* VLCEmbeddedList*/
-    id o_interaction_list;      /* VLCInteractionList*/
+    id o_coredialogs;           /* VLCCoreDialogProvider */
     VLCInformation * o_info;                  /* VLCInformation */
 #ifdef UPDATE_CHECK
     id o_update;                /* VLCUpdate      */
@@ -122,6 +122,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     BOOL nib_update_loaded;     /* update nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_vlm_loaded;        /* VLM Panel nibfile */
+    BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
 
     IBOutlet VLControllerWindow * o_window;                     /* main window */
     IBOutlet NSView * o_playlist_view;                          /* playlist view  */
@@ -354,7 +355,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 - (id)getWizard;
 - (id)getBookmarks;
 - (id)getEmbeddedList;
-- (id)getInteractionList;
+- (id)getCoreDialogProvider;
 - (id)getMainIntfPgbar;
 - (id)getControllerWindow;
 - (id)getVoutMenu;

@@ -120,9 +120,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Update.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/Update.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/Update.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Interaction.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Interaction.nib/info.nib \
-	extras/package/macosx/Resources/English.lproj/Interaction.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/keyedobjects.nib \
