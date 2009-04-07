@@ -1,14 +1,5 @@
 Copyright (C) 2008 Rémi Denis-Courmont, adaptation by Felix Kühne (C) 2009.
 Licensed under GNU General Public License version 2 or higher.
-diff -urN live.orig/config.mingw live/config.mingw
---- live.orig/config.mingw	2009-03-23 01:26:16 +0300
-+++ live/config.mingw	2009-03-26 19:17:43 +0300
-@@ -1,4 +1,4 @@
--COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int
-+COMPILE_OPTS =         $(INCLUDES) -I. -O -DSOCKLEN_T=int -DLOCALE_NOT_USED
- C =                    c
- C_COMPILER =           $(CC)
- C_FLAGS =              $(COMPILE_OPTS) -DUSE_OUR_BZERO=1 -D__MINGW32__
 diff -urN live.orig/liveMedia/include/Locale.hh live/liveMedia/include/Locale.hh
 --- live.orig/liveMedia/include/Locale.hh	2009-03-23 01:26:16 +0300
 +++ live/liveMedia/include/Locale.hh	2009-03-26 19:17:43 +0300
