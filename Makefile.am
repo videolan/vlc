@@ -123,9 +123,9 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/info.nib \
-	extras/package/macosx/Resources/English.lproj/InteractionErrorPanel.nib/keyedobjects.nib \
+	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/classes.nib \
+	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
 	extras/package/macosx/Resources/a52.icns \
 	extras/package/macosx/Resources/aac.icns \
@@ -466,8 +466,8 @@ VLC-release.app: vlc
 	    bookmarks.m \
 	    update.h \
 	    update.m \
-	    interaction.h \
-	    interaction.m \
+	    coredialogs.h \
+	    coredialogs.m \
 	    embeddedwindow.h \
 	    embeddedwindow.m \
 	    fspanel.h \
@@ -633,8 +633,8 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	    bookmarks.m \
 	    update.h \
 	    update.m \
-	    interaction.h \
-	    interaction.m \
+	    coredialogs.h \
+	    coredialogs.m \
 	    embeddedwindow.h \
 	    embeddedwindow.m \
 	    fspanel.h \
