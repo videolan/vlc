@@ -1087,6 +1087,9 @@ endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
 endif
+ifdef HAVE_DARWIN_OS
+	(cd $@; patch -p0 < ../Patches/ffmpeg-swscale.patch)
+endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
@@ -2491,7 +2494,7 @@ liboil: liboil-$(OIL_VERSION).tar.gz
 
 .liboil: liboil
 ifdef HAVE_DARWIN_OS
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --disable-glib --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O4")
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)")
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2")
 endif

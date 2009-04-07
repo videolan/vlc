@@ -1,0 +1,24 @@
+diff -ruN libswscale/swscale.c libswscale/swscale.c
+--- libswscale/swscale.c	2009-04-03 19:36:49.000000000 +0200
++++ libswscale/swscale.c	2009-04-03 19:40:06.000000000 +0200
+@@ -1101,8 +1101,7 @@
+ #endif
+ 
+ #if ARCH_PPC
+-#if (HAVE_ALTIVEC || defined (RUNTIME_CPUDETECT)) && CONFIG_GPL
+-#undef COMPILE_C
++#if HAVE_ALTIVEC || defined (RUNTIME_CPUDETECT)
+ #define COMPILE_ALTIVEC
+ #endif
+ #endif //ARCH_PPC
+@@ -1778,8 +1777,8 @@
+ 
+ static SwsFunc getSwsFunc(int flags){
+ 
+-#if defined(RUNTIME_CPUDETECT) && CONFIG_GPL
+-#if ARCH_X86
++#if defined(RUNTIME_CPUDETECT)
++#if ARCH_X86 && CONFIG_GPL
+     // ordered per speed fastest first
+     if (flags & SWS_CPU_CAPS_MMX2)
+         return swScale_MMX2;
