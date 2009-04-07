@@ -48,7 +48,7 @@
 #import "wizard.h"
 #import "extended.h"
 #import "bookmarks.h"
-#import "interaction.h"
+#import "coredialogs.h"
 #import "embeddedwindow.h"
 #import "update.h"
 #import "AppleRemote.h"

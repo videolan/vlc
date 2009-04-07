@@ -14,8 +14,8 @@ SOURCES_macosx = \
 	controls.m \
 	equalizer.m \
 	equalizer.h \
-	interaction.m \
-	interaction.h \
+	coredialogs.m \
+	coredialogs.h \
 	intf.m \
 	intf.h \
 	macosx.m \
