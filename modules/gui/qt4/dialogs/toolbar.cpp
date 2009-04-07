@@ -346,7 +346,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
         case VOLUME_SPECIAL:
             {
                 QListWidgetItem *widgetItem = new QListWidgetItem( this );
-                widgetItem->setText( "Small Volume" );
+                widgetItem->setText( qtr("Small Volume") );
                 widgetItem->setIcon( QIcon( ":/volume-medium" ) );
                 widgetItem->setData( Qt::UserRole, QVariant( i ) );
                 addItem( widgetItem );

@@ -43,12 +43,12 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     /* UI stuff */
     ui.setupUi( this );
     ui.inputBox->setMRL( inputMRL );
-    ui.helpEdit->setPlainText( "This dialog will allow you to stream or "
+    ui.helpEdit->setPlainText( qtr("This dialog will allow you to stream or "
             "convert your media for use locally, on your private network, "
             "or on the Internet.\n"
             "You should start by checking that source matches what you want "
             "your input to be and then press the \"Next\" "
-            "button to continue.\n" );
+            "button to continue.\n") );
 
     ui.mrlEdit->setToolTip ( qtr( "Stream output string.\n"
                 "This is automatically generated "
