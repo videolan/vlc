@@ -1,5 +1,5 @@
 /*****************************************************************************
- * interaction.h: Mac OS X interaction dialogs
+ * coredialogs.h: Mac OS X Core Dialogs
  *****************************************************************************
  * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * interaction.h: Mac OS X interaction dialogs
+ * coredialogs.m: Mac OS X Core Dialogs
  *****************************************************************************
  * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import "intf.h"
-#import "interaction.h"
+#import "coredialogs.h"
 #import "misc.h"
 
 /* for the icons in our custom error panel */
