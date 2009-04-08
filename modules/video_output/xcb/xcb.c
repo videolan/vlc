@@ -417,12 +417,13 @@ static int Init (vout_thread_t *vout)
                                             &width, &height);
         if (p_sys->embed == NULL)
         {
-            msg_Err (vout, "cannot get window");
+            msg_Err (vout, "cannot get parent window");
             return VLC_EGENERIC;
         }
         p_sys->parent = p_sys->embed->handle.xid;
     }
 
+    /* FIXME: incorrect placement if resize now */
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
 
     /* FIXME: I don't get the subtlety between output and fmt_out here */
@@ -446,7 +447,7 @@ static int Init (vout_thread_t *vout)
     /* Create window */
     const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK
                         | XCB_CW_COLORMAP;
-    uint32_t values[] = {
+    const uint32_t values[] = {
         /* XCB_CW_BACK_PIXEL */
         screen->black_pixel,
         /* XCB_CW_EVENT_MASK */

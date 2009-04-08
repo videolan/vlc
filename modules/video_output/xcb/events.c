@@ -110,7 +110,7 @@ int ProcessEvent (vout_thread_t *vout, xcb_generic_event_t *ev)
             break;
 
         default:
-            msg_Dbg (vout, "unhandled event %02x", (unsigned)ev->response_type);
+            msg_Dbg (vout, "unhandled event %"PRIu8, ev->response_type);
     }
 
     free (ev);

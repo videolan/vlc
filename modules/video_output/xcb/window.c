@@ -183,6 +183,7 @@ static void *Thread (void *data)
         {
             if (ProcessKeyEvent (p_sys->keys, ev) == 0)
                 continue;
+            msg_Dbg (wnd, "unhandled event: %"PRIu8, ev->response_type);
             free (ev);
         }
         vlc_restorecancel (canc);
