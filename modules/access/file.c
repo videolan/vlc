@@ -235,8 +235,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     p_sys->i_nb_reads++;
 
 #ifdef HAVE_SYS_STAT_H
-    if( p_access->info.i_size != 0 &&
-        (p_sys->i_nb_reads % INPUT_FSTAT_NB_READS) == 0 )
+    if ((p_access->info.i_size && !(p_sys->i_nb_reads % INPUT_FSTAT_NB_READS))
+     || (p_access->info.i_pos > p_access->info.i_size))
     {
         struct stat st;
 
