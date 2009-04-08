@@ -127,11 +127,7 @@ static int Open( vlc_object_t *p_this )
 
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
-
-    if (!strcasecmp (p_access->psz_access, "stream"))
-        p_sys->b_pace_control = false;
-    else
-        p_sys->b_pace_control = true;
+    p_sys->b_pace_control = true;
 
     /* Open file */
     int fd = -1;
@@ -166,7 +162,10 @@ static int Open( vlc_object_t *p_this )
     if (S_ISREG (st.st_mode))
         p_access->info.i_size = st.st_size;
     else if (!S_ISBLK (st.st_mode))
+    {
         p_access->pf_seek = NoSeek;
+        p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
+    }
 #else
 # warning File size not known!
 #endif
