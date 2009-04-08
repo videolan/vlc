@@ -2399,8 +2399,8 @@ static void AVI_IndexCreate( demux_t *p_demux )
     /* Only show dialog if AVI is > 10MB */
     i_dialog_update = mdate();
     if( stream_Size( p_demux->s ) > 10000000 )
-        p_dialog = dialog_ProgressCreate( p_demux, NULL,
-                                       _("Fixing AVI Index..."), _("Cancel") );
+        p_dialog = dialog_ProgressCreate( p_demux, _("Fixing AVI Index..."),
+                                       NULL, _("Cancel") );
 
     for( ;; )
     {
