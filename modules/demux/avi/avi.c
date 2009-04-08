@@ -106,7 +106,7 @@ typedef struct
     uint32_t     i_flags;
     off_t        i_pos;
     uint32_t     i_length;
-    uint32_t     i_lengthtotal;
+    int64_t      i_lengthtotal;
 
 } avi_entry_t;
 
