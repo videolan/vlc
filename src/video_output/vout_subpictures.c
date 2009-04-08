@@ -300,7 +300,8 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     vlc_object_t *p_input;
 
     p_input = vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
-    if( !p_input ) return;
+    if( !p_input )
+        return;
 
     if( b_attach )
     {

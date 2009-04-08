@@ -271,10 +271,11 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         {
             msg_Dbg( p_this, "reusing provided vout" );
 
-            spu_Attach( p_vout->p_spu, p_this, true );
-
+            spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
             vlc_object_detach( p_vout );
+
             vlc_object_attach( p_vout, p_this );
+            spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), true );
         }
     }
 
@@ -418,12 +419,14 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     /* Initialize subpicture unit */
     p_vout->p_spu = spu_Create( p_vout );
-    spu_Attach( p_vout->p_spu, p_parent, true );
 
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
 
+    /* */
     spu_Init( p_vout->p_spu );
+
+    spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), true );
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit( p_vout );
