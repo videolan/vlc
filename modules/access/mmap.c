@@ -116,7 +116,7 @@ static int Open (vlc_object_t *p_this)
 
     if (!S_ISREG (st.st_mode) && !S_ISBLK (st.st_mode))
     {
-        msg_Dbg (p_access, "skipping non regular file %s", path);
+        msg_Dbg (p_access, "skipping non-regular file %s", path);
         goto error;
     }
 
