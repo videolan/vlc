@@ -50,7 +50,6 @@
 
 @end
 
-
 /*****************************************************************************
  * VLCCoreDialogProvider interface
  *****************************************************************************/
@@ -72,19 +71,21 @@
     /* progress dialogue */
     IBOutlet id o_prog_bar;
     IBOutlet id o_prog_cancel_btn;
-    IBOutlet id o_prog_description;
-    IBOutlet id o_prog_title;
+    IBOutlet id o_prog_description_txt;
+    IBOutlet id o_prog_title_txt;
     IBOutlet id o_prog_win;
-    IBOutlet id o_prog_timeToGo;
 }
 + (VLCCoreDialogProvider *)sharedInstance;
 
 -(void)performDialogEvent: (NSNotification *)o_notification;
+-(void)performProgressBarEvent: (NSNotification *)o_notification;
 
 -(void)showFatalDialog: (NSValue *)o_value;
 -(void)showQuestionDialog: (NSValue *)o_value;
 -(void)showLoginDialog: (NSValue *)o_value;
 -(IBAction)loginDialogAction:(id)sender;
+-(void)showProgressDialog: (NSValue *)o_value;
+-(IBAction)progDialogAction:(id)sender;
 
 -(id)getErrorPanel;
 

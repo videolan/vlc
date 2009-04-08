@@ -26,8 +26,18 @@
 #import "coredialogs.h"
 #import "misc.h"
 
-/* for the icons in our custom error panel */
+/* for the icon in our custom error panel */
 #import <ApplicationServices/ApplicationServices.h>
+
+
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
+
+bool b_progress_cancelled;
+static void updateProgressPanel (void *, const char *, float);
+static bool checkProgressPanel (void *);
+static void destroyProgressPanel (void *);
 
 /*****************************************************************************
  * VLCCoreDialogProvider implementation
@@ -52,8 +62,16 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
                                                  selector:@selector(performDialogEvent:)
                                                      name: @"VLCNewCoreDialogEventNotification"
                                                    object:self];
-        
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector:@selector(performProgressBarEvent:)
+                                                     name:@"VLCCoreDialogProgressBarUpdateNotification" 
+                                                   object: self];
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector:@selector(performProgressBarEvent:)
+                                                     name:@"VLCCoreDialogProgressBarDestroyNotification" 
+                                                   object: self];
         o_error_panel = [[VLCErrorPanel alloc] init];
+        b_progress_cancelled = NO;
     }
     
     return _o_sharedInstance;
@@ -81,6 +99,8 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
         [self showQuestionDialog: o_value];
     else if( [o_type isEqualToString: @"dialog-login"] )
         [self showLoginDialog: o_value];
+    else if( [o_type isEqualToString: @"dialog-progress-bar"] )
+        [self showProgressDialog: o_value];
     else
         msg_Err( VLCIntf, "unhandled dialog type: '%s'", [o_type UTF8String] );
 }
@@ -162,6 +182,82 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
         [NSApp stopModalWithCode: 0];
 }
 
+-(void)showProgressDialog: (NSValue *)o_value
+{
+    dialog_progress_bar_t *p_dialog = [o_value pointerValue];
+
+    if( p_dialog->title != NULL )
+    {
+        [o_prog_win setTitle: [NSString stringWithUTF8String: p_dialog->title]];
+        [o_prog_title_txt setStringValue: [NSString stringWithUTF8String: p_dialog->title]];
+    }
+    else
+    {
+        [o_prog_win setTitle: @""];
+        [o_prog_title_txt setStringValue: @""];
+    }
+    if( p_dialog->cancel != NULL )
+        [o_prog_cancel_btn setTitle: [NSString stringWithUTF8String: p_dialog->cancel]];
+    else
+        [o_prog_cancel_btn setTitle: _NS("Cancel")];
+    if( p_dialog->message != NULL )
+        [o_prog_description_txt setStringValue: [NSString stringWithUTF8String: p_dialog->message]];
+    else
+        [o_prog_description_txt setStringValue: @""];
+    [o_prog_bar setDoubleValue: 0];
+
+    p_dialog->pf_update = updateProgressPanel;
+    p_dialog->pf_check = checkProgressPanel;
+    p_dialog->pf_destroy = destroyProgressPanel;
+    p_dialog->p_sys = self;
+
+    [NSApp runModalForWindow: o_prog_win];
+}
+
+-(void)performProgressBarEvent: (NSNotification *)o_notification
+{
+    NSLog( @"%@ received", [o_notification name] );
+    if( [[o_notification name] isEqualToString: @"VLCCoreDialogProgressBarUpdateNotification"] )
+    {
+        NSNumber *o_number = [[o_notification userInfo] objectForKey:@"IntValue"];
+        NSString *o_text = [[o_notification userInfo] objectForKey:@"Text"];
+        [o_prog_description_txt setStringValue: o_text];
+        [o_prog_bar setDoubleValue: [o_number doubleValue]];
+    }
+    if( [[o_notification name] isEqualToString: @"VLCCoreDialogProgressBarDestroyNotification"] )
+    {
+        [NSApp stopModalWithCode: 0];
+        [o_prog_win close];
+    }
+}
+
+void updateProgressPanel (void *priv, const char *text, float value)
+{
+    NSLog( @"we were updated with %s (%f)", text, value );
+    NSString *o_txt;
+    if( text != NULL )
+        o_txt = [NSString stringWithUTF8String: text];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarUpdateNotification" object:[[VLCMain sharedInstance] getCoreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_txt, @"Text", [NSNumber numberWithInt: ((int)(value * 1000.))], @"IntValue", nil]];
+}
+
+void destroyProgressPanel (void *priv)
+{
+    NSLog( @"we should destroy" );
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarDestroyNotification" object:[[VLCMain sharedInstance] getCoreDialogProvider] userInfo: nil];
+}
+
+bool checkProgressPanel (void *priv)
+{
+    NSLog( @"we were checked" );
+    return b_progress_cancelled;
+}
+
+-(IBAction)progDialogAction:(id)sender
+{
+    NSLog( @"buttonAction!" );
+    b_progress_cancelled = YES;
+}
+
 -(id)getErrorPanel
 {
     return o_error_panel;
@@ -173,47 +269,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     [super dealloc];
 }
 @end
-
-#if 0
-    dialog_progress_bar_t
-    {
-        msg_Dbg( p_intf, "user progress dialog requested" );
-        [o_prog_title setStringValue: o_title];
-        [o_prog_description setStringValue: o_description];
-        [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
-        if( p_dialog->i_timeToGo < 1 )
-            [o_prog_timeToGo setStringValue: @""];
-        else
-            [o_prog_timeToGo setStringValue: [NSString stringWithFormat:
-                _NS("Remaining time: %i seconds"), p_dialog->i_timeToGo]];
-        [NSApp beginSheet: o_prog_win modalForWindow: o_window
-            modalDelegate: self didEndSelector: nil contextInfo: nil];
-        [o_prog_win makeKeyWindow];
-    }
--(void)updateDialog
-{
-    if( p_dialog->i_flags & DIALOG_USER_PROGRESS )
-    {
-        [o_prog_description setStringValue:
-            [NSString stringWithUTF8String: p_dialog->psz_description]];
-        [o_prog_bar setDoubleValue: (double)p_dialog->val.f_float];
-
-        if( [o_prog_bar doubleValue] == 100.0 )
-        {
-            /* we are done, let's hide */
-            [self hideDialog];
-        }
-
-        if( p_dialog->i_timeToGo < 1 )
-            [o_prog_timeToGo setStringValue: @""];
-        else
-            [o_prog_timeToGo setStringValue: [NSString stringWithFormat:
-                    _NS("Remaining time: %i seconds"), p_dialog->i_timeToGo]];
-
-        return;
-    }
-}
-#endif
 
 /*****************************************************************************
  * VLCErrorPanel implementation

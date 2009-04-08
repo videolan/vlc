@@ -262,8 +262,6 @@
 		CC0B723C0D54F2B000448E00 /* spref_cone_Video_64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spref_cone_Video_64.png; path = Resources/spref_cone_Video_64.png; sourceTree = "<group>"; };
 		CC0FB34B0F8BED1100F057F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/CoreDialogs.nib; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
-		CC1B4C1409A8EC690078AD2E /* interaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interaction.h; path = ../../../modules/gui/macosx/interaction.h; sourceTree = "<group>"; };
-		CC1B4C1509A8EC690078AD2E /* interaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = interaction.m; path = ../../../modules/gui/macosx/interaction.m; sourceTree = "<group>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
 		CC26BF2B09A7A05000E94D62 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Update.nib; sourceTree = "<group>"; };
 		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
@@ -289,6 +287,8 @@
 		CC33C2500D2578F5008C4683 /* fullscreen_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fullscreen_graphite.png; path = Resources/fullscreen_graphite.png; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
+		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
 		CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded_blue.png; path = Resources/add_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded.png; path = Resources/add_embedded.png; sourceTree = "<group>"; };
 		CC4ED9AE0ABE07C800CA4CC5 /* repeat_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_embedded_blue.png; path = Resources/repeat_embedded_blue.png; sourceTree = "<group>"; };
@@ -446,8 +446,8 @@
 				8ED6C27E03E2EB1C0059A3A7 /* macosx.m */,
 				8ED6C27C03E2EB1C0059A3A7 /* intf.h */,
 				8ED6C27D03E2EB1C0059A3A7 /* intf.m */,
-				CC1B4C1409A8EC690078AD2E /* interaction.h */,
-				CC1B4C1509A8EC690078AD2E /* interaction.m */,
+				CC4A33220F8CB017000FC4A7 /* coredialogs.h */,
+				CC4A33210F8CB017000FC4A7 /* coredialogs.m */,
 				8E6BC6FA041684EC0059A3A7 /* controls.h */,
 				8ED6C27B03E2EB1C0059A3A7 /* controls.m */,
 				8E6BC6F6041643860059A3A7 /* applescript.h */,

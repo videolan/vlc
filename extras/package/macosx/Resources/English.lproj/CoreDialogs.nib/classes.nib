@@ -8,6 +8,7 @@
                 {
             ACTIONS =             {
                 loginDialogAction = id;
+                progDialogAction = id;
             };
             CLASS = VLCCoreDialogProvider;
             LANGUAGE = ObjC;
@@ -23,9 +24,8 @@
                 "o_auth_win" = id;
                 "o_prog_bar" = id;
                 "o_prog_cancel_btn" = id;
-                "o_prog_description" = id;
-                "o_prog_timeToGo" = id;
-                "o_prog_title" = id;
+                "o_prog_description_txt" = id;
+                "o_prog_title_txt" = id;
                 "o_prog_win" = id;
             };
             SUPERCLASS = NSObject;

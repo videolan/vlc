@@ -231,8 +231,6 @@ static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t p
 
     const dialog_fatal_t *p_dialog = (const dialog_fatal_t *)value.p_address;
 
-    NSLog( @"dialog callback triggered; type of dialogue is '%s'", type );
-    
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface getCoreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
 
@@ -2124,8 +2122,6 @@ end:
 
 - (IBAction)showBookmarks:(id)sender
 {
-    dialog_Fatal( p_intf, "Title", "Message" );
-
     /* we need the wizard-nib for the bookmarks's extract functionality */
     if( !nib_wizard_loaded )
     {
