@@ -79,6 +79,8 @@
     IBOutlet id o_input_postproc_fld;
     IBOutlet id o_input_postproc_txt;
     IBOutlet id o_input_rtsp_ckb;
+    IBOutlet id o_input_skipLoop_txt;
+    IBOutlet id o_input_skipLoop_pop;
     IBOutlet id o_input_serverport_fld;
     IBOutlet id o_input_serverport_txt;
     IBOutlet id o_input_view;

@@ -106,6 +106,8 @@
                 "o_input_rtsp_ckb" = id;
                 "o_input_serverport_fld" = id;
                 "o_input_serverport_txt" = id;
+                "o_input_skipLoop_pop" = id;
+                "o_input_skipLoop_txt" = id;
                 "o_input_view" = id;
                 "o_intf_art_pop" = id;
                 "o_intf_art_txt" = id;

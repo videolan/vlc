@@ -253,6 +253,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_input_net_box setTitle: _NS("Network")];
     [o_input_postproc_txt setStringValue: _NS("Post-Processing Quality")];
     [o_input_rtsp_ckb setTitle: _NS("Use RTP over RTSP (TCP)")];
+    [o_input_skipLoop_txt setStringValue: _NS("Skip the loop filter for H.264 decoding")];
     [o_input_serverport_txt setStringValue: _NS("Default Server Port")];
 
     /* interface */
@@ -495,11 +496,12 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
         [o_input_httpproxy_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy" ) ?: ""]];
     if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
         [o_input_httpproxypwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy-pwd" ) ?: ""]];
-    [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "ffmpeg-pp-q" )];
+    [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "postproc-q" )];
 
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
 
     [o_input_rtsp_ckb setState: config_GetInt( p_intf, "rtsp-tcp" )];
+    [self setupButton: o_input_skipLoop_pop forIntList: "ffmpeg-skiploopfilter"];
 
     [o_input_cachelevel_pop removeAllItems];
     [o_input_cachelevel_pop addItemsWithTitles: 
@@ -838,11 +840,12 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         config_PutInt( p_intf, "server-port", [o_input_serverport_fld intValue] );
         config_PutPsz( p_intf, "http-proxy", [[o_input_httpproxy_fld stringValue] UTF8String] );
         config_PutPsz( p_intf, "http-proxy-pwd", [[o_input_httpproxypwd_sfld stringValue] UTF8String] );
-        config_PutInt( p_intf, "ffmpeg-pp-q", [o_input_postproc_fld intValue] );
+        config_PutInt( p_intf, "postproc-q", [o_input_postproc_fld intValue] );
 
         SaveIntList( o_input_avi_pop, "avi-index" );
 
         config_PutInt( p_intf, "rtsp-tcp", [o_input_rtsp_ckb state] );
+        SaveIntList( o_input_skipLoop_pop, "ffmpeg-skiploopfilter" );
 
         #define CaCi( name, int ) config_PutInt( p_intf, name, int * [[o_input_cachelevel_pop selectedItem] tag] )
         #define CaC( name ) CaCi( name, 1 )
@@ -871,7 +874,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
         CaCi( "mms-caching", 19 );
 
         i = config_SaveConfigFile( p_intf, "main" );
-        i = i + config_SaveConfigFile( p_intf, "ffmpeg" );
+        i = i + config_SaveConfigFile( p_intf, "avcodec" );
+        i = i + config_SaveConfigFile( p_intf, "postproc" );
         i = i + config_SaveConfigFile( p_intf, "access_http" );
         i = i + config_SaveConfigFile( p_intf, "access_file" );
         i = i + config_SaveConfigFile( p_intf, "access_tcp" );
