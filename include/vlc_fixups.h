@@ -123,7 +123,6 @@ static inline int vlc_vsprintf (char *str, const char *format, va_list ap)
 }
 # define vsprintf vlc_vsprintf
 
-static inline int vasprintf (char **strp, const char *fmt, va_list ap);
 static inline int vlc_vsnprintf (char *str, size_t size, const char *format, va_list ap)
 {
     int must_free = vlc_fix_format_string (&format);
@@ -131,18 +130,7 @@ static inline int vlc_vsnprintf (char *str, size_t size, const char *format, va_
      * to 'aid' portability/standards compliance, mingw provides a
      * static version of vsnprintf that is buggy.  Be sure to use
      * MSVCRT version, at least it behaves as expected */
-    /* MSVCRT _vsnprintf does not:
-     *  - null terminate string if insufficient storage
-     *  - return the number of characters that would've been written
-     */
-    int ret = _vsnprintf (str, size-1, format, ap);
-    str[size-1] = 0; /* ensure the null gets written */
-    if (ret == -1)
-    {
-        /* work out the number of chars that should've been written */
-        ret = vasprintf (&str, format, ap);
-        if (ret >= 0 && str) free (str);
-    }
+    int ret = _vsnprintf (str, size, format, ap);
     if (must_free) free ((char *)format);
     return ret;
 }
@@ -207,7 +195,7 @@ static inline int vlc_snprintf (char *str, size_t size, const char *format, ...)
 # include <stdarg.h>
 static inline int vasprintf (char **strp, const char *fmt, va_list ap)
 {
-#ifndef WIN32
+#ifndef UNDER_CE
     int len = vsnprintf (NULL, 0, fmt, ap) + 1;
     char *res = (char *)malloc (len);
     if (res == NULL)
@@ -215,31 +203,27 @@ static inline int vasprintf (char **strp, const char *fmt, va_list ap)
     *strp = res;
     return vsnprintf (res, len, fmt, ap);
 #else
-    /* HACK: vsnprintf in the Win32 API behaves like
+    /* HACK: vsnprintf in the WinCE API behaves like
      * the one in glibc 2.0 and doesn't return the number of characters
      * it needed to copy the string.
      * cf http://msdn.microsoft.com/en-us/library/1kt27hek.aspx
      * and cf the man page of vsnprintf
-     */
-    int must_free = vlc_fix_format_string (&fmt);
-    int n, size = 2 * strlen (fmt);
+     *
+     Guess we need no more than 50 bytes. */
+    int n, size = 50;
     char *res, *np;
 
     if ((res = (char *) malloc (size)) == NULL)
-    {
-        if (must_free) free ((char *)fmt);
         return -1;
-    }
 
     while (1)
     {
-        n = _vsnprintf (res, size, fmt, ap);
+        n = vsnprintf (res, size, fmt, ap);
 
         /* If that worked, return the string. */
         if (n > -1 && n < size)
         {
             *strp = res;
-            if (must_free) free ((char *)fmt);
             return n;
         }
 
@@ -249,7 +233,6 @@ static inline int vasprintf (char **strp, const char *fmt, va_list ap)
         if ((np = (char *) realloc (res, size)) == NULL)
         {
             free(res);
-            if (must_free) free ((char *)fmt);
             return -1;
         }
         else
@@ -258,7 +241,7 @@ static inline int vasprintf (char **strp, const char *fmt, va_list ap)
         }
 
     }
-#endif /* WIN32 */
+#endif /* UNDER_CE */
 }
 #endif
 
