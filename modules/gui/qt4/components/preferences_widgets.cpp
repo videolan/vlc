@@ -1248,7 +1248,6 @@ void KeySelectorControl::finish()
 void KeySelectorControl::select1Key()
 {
     QTreeWidgetItem *keyItem = table->currentItem();
-    if( !keyItem ) return;
     shortcutValue->setText( keyItem->text( 1 ) );
     shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toInt() );
 }
@@ -1294,7 +1293,6 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
 
 void KeySelectorControl::setTheKey()
 {
-    if( !table->currentItem() ) return;
     table->currentItem()->setText( 1, shortcutValue->text() );
     table->currentItem()->setData( 1, Qt::UserRole, shortcutValue->getValue() );
 }
