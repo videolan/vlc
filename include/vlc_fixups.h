@@ -39,58 +39,56 @@ static inline char *strdup (const char *str)
 #endif
 
 #ifdef WIN32
+/* Windows' printf doesn't support %z modifiers, thus we need to rewrite
+ * the format string in a wrapper. */
 # include <string.h>
 # include <stdlib.h>
-/**
- * vlc_fix_format_string:
- * @format: address of format string to fix (format string is not modified)
- *
- * Windows' printf doesn't support %z size modifiers.
- * Fix a *printf format string to make it safe for mingw/MSVCRT run times:
- *  %z* (not supported in MSVCRT) -> either %I64* or %I32.
- *
- * Returns: 1 if *format must be free()d; 0 otherwise
- */
-static inline int vlc_fix_format_string (const char **format)
+static inline char *vlc_fix_format_string (const char *format)
 {
-    int n = 0;
-    const char *tmp = *format;
-    while ((tmp = strstr (tmp, "%z")) != NULL)
-    {
-        n++;
-        tmp += 2;
-    }
-    if (!n)
-        return 0;
-
-    char *dst = (char*)malloc (strlen (*format) + 2*n + 1);
-    if (!dst)
-    {
-        *format = "vlc_fix_format_string: due to malloc failure, unable to fix unsafe string";
-        return 0;
-    }
-
-    const char *src = *format;
-    *format = dst;
+    char *fmt;
+# ifdef WIN64
+    const char *src = format, *tmp;
+    char *dst;
+    size_t n = 0;
     while ((tmp = strstr (src, "%z")) != NULL)
     {
-        /* NB, don't use %l*, as this is buggy in mingw*/
+        n++;
+        src = tmp + 2;
+    }
+    if (n == 0)
+        return NULL;
+
+    fmt = (char*)malloc (strlen (format) + n + 1);
+    if (fmt == NULL)
+        return NULL;
+
+    src = format;
+    dst = fmt;
+    while ((tmp = strstr (src, "%z")) != NULL)
+    {
         size_t d = tmp - src;
         memcpy (dst, src, d);
         dst += d;
-        *dst++ = '%';
-# ifdef WIN64
-        *dst++ = 'I';
-        *dst++ = '6';
-        *dst++ = '4';
-# else /* ie: WIN32 */
-        /* on win32, since the default size is 32bit, dont specify
-         * a modifer.  (I32 isn't on wince, l doesn't work on mingw) */
-# endif
+        memcpy (dst, "%ll", 3);
+        dst += 3;
         src = tmp + 2;
     }
     strcpy (dst, src);
-    return 1;
+# else
+    char *f;
+    if (strstr (format, "%z") == NULL)
+        return NULL;
+
+    fmt = strdup (format);
+    if (fmt == NULL)
+        return NULL;
+
+    while ((f = strstr (fmt, "%z")) != NULL)
+    {
+       f[1] = 'l';
+    }
+# endif
+    return fmt;
 }
 
 # include <stdio.h>
@@ -98,40 +96,40 @@ static inline int vlc_fix_format_string (const char **format)
 
 static inline int vlc_vprintf (const char *format, va_list ap)
 {
-    int must_free = vlc_fix_format_string (&format);
-    int ret = vprintf (format, ap);
-    if (must_free) free ((char *)format);
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vprintf (fmt ? fmt : format, ap);
+    free (fmt);
     return ret;
 }
 # define vprintf vlc_vprintf
 
 static inline int vlc_vfprintf (FILE *stream, const char *format, va_list ap)
 {
-    int must_free = vlc_fix_format_string (&format);
-    int ret = vfprintf (stream, format, ap);
-    if (must_free) free ((char *)format);
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vfprintf (stream, fmt ? fmt : format, ap);
+    free (fmt);
     return ret;
 }
 # define vfprintf vlc_vfprintf
 
 static inline int vlc_vsprintf (char *str, const char *format, va_list ap)
 {
-    int must_free = vlc_fix_format_string (&format);
-    int ret = vsprintf (str, format, ap);
-    if (must_free) free ((char *)format);
+    char *fmt = vlc_fix_format_string (format);
+    int ret = vsprintf (str, fmt ? fmt : format, ap);
+    free (fmt);
     return ret;
 }
 # define vsprintf vlc_vsprintf
 
 static inline int vlc_vsnprintf (char *str, size_t size, const char *format, va_list ap)
 {
-    int must_free = vlc_fix_format_string (&format);
+    char *fmt = vlc_fix_format_string (format);
     /* traditionally, MSVCRT has provided vsnprintf as _vsnprintf;
      * to 'aid' portability/standards compliance, mingw provides a
      * static version of vsnprintf that is buggy.  Be sure to use
      * MSVCRT version, at least it behaves as expected */
-    int ret = _vsnprintf (str, size, format, ap);
-    if (must_free) free ((char *)format);
+    int ret = _vsnprintf (str, size, fmt ? fmt : format, ap);
+    free (fmt);
     return ret;
 }
 # define vsnprintf vlc_vsnprintf
