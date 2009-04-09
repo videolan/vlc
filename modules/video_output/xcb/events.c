@@ -25,6 +25,7 @@
 #endif
 
 #include <inttypes.h>
+#include <assert.h>
 
 #include <xcb/xcb.h>
 
@@ -136,7 +137,7 @@ int ProcessEvent (vout_thread_t *vout, xcb_connection_t *conn,
             xcb_configure_notify_event_t *cn =
                 (xcb_configure_notify_event_t *)ev;
 
-            assert (cn->window != window)
+            assert (cn->window != window);
             HandleParentStructure (vout, conn, window, cn);
             break;
         }
