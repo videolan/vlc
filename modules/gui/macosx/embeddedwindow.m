@@ -41,6 +41,22 @@
 
 @implementation VLCEmbeddedWindow
 
+- (id)initWithContentRect:(NSRect)contentRect styleMask: (NSUInteger)windowStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
+{
+    BOOL b_useTextured = YES;
+    if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
+    {
+        b_useTextured = NO;
+        windowStyle ^= NSTexturedBackgroundWindowMask;
+    }
+    self = [super initWithContentRect:contentRect styleMask:windowStyle backing:bufferingType defer:deferCreation];
+    if(! b_useTextured )
+    {
+        [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
+    }
+    return self;
+}
+
 - (void)awakeFromNib
 {
     [self setDelegate: self];

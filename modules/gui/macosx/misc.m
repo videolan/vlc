@@ -406,12 +406,23 @@ static NSMutableArray *blackoutWindows = NULL;
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
     backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
+    BOOL b_useTextured = YES;
+    if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
+    {
+        b_useTextured = NO;
+        styleMask ^= NSTexturedBackgroundWindowMask;
+    }
+
     self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
     backing:backingType defer:flag];
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
 
-    return( self );
+    if(! b_useTextured )
+    {
+        [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
+    }
+    return self;
 }
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
