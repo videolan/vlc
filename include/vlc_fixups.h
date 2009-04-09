@@ -124,11 +124,7 @@ static inline int vlc_vsprintf (char *str, const char *format, va_list ap)
 static inline int vlc_vsnprintf (char *str, size_t size, const char *format, va_list ap)
 {
     char *fmt = vlc_fix_format_string (format);
-    /* traditionally, MSVCRT has provided vsnprintf as _vsnprintf;
-     * to 'aid' portability/standards compliance, mingw provides a
-     * static version of vsnprintf that is buggy.  Be sure to use
-     * MSVCRT version, at least it behaves as expected */
-    int ret = _vsnprintf (str, size, fmt ? fmt : format, ap);
+    int ret = vsnprintf (str, size, fmt ? fmt : format, ap);
     free (fmt);
     return ret;
 }
@@ -139,7 +135,7 @@ static inline int vlc_printf (const char *format, ...)
     va_list ap;
     int ret;
     va_start (ap, format);
-    ret = vlc_vprintf (format, ap);
+    ret = vprintf (format, ap);
     va_end (ap);
     return ret;
 }
@@ -150,7 +146,7 @@ static inline int vlc_fprintf (FILE *stream, const char *format, ...)
     va_list ap;
     int ret;
     va_start (ap, format);
-    ret = vlc_vfprintf (stream, format, ap);
+    ret = vfprintf (stream, format, ap);
     va_end (ap);
     return ret;
 }
@@ -162,7 +158,7 @@ static inline int vlc_sprintf (char *str, const char *format, ...)
     va_list ap;
     int ret;
     va_start (ap, format);
-    ret = vlc_vsprintf (str, format, ap);
+    ret = vsprintf (str, format, ap);
     va_end (ap);
     return ret;
 }
@@ -174,12 +170,10 @@ static inline int vlc_snprintf (char *str, size_t size, const char *format, ...)
     va_list ap;
     int ret;
     va_start (ap, format);
-    ret = vlc_vsnprintf (str, size, format, ap);
+    ret = vsnprintf (str, size, format, ap);
     va_end (ap);
     return ret;
 }
-/* win32: snprintf must always be vlc_snprintf or _snprintf,
- * see comment in vlc_vsnprintf */
 # define snprintf vlc_snprintf
 
 /* Make sure we don't use flawed vasprintf or asprintf either */
