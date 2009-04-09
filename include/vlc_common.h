@@ -785,6 +785,14 @@ VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) LIBVLC_US
 #       define alloca _alloca
 #   endif
 
+    /* These two are not defined in mingw32 (bug?) */
+#   ifndef snprintf
+#       define snprintf _snprintf
+#   endif
+#   ifndef vsnprintf
+#       define vsnprintf _vsnprintf
+#   endif
+
 #   include <tchar.h>
 #endif
 
