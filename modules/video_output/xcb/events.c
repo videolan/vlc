@@ -90,10 +90,32 @@ static void HandleMotionNotify (vout_thread_t *vout,
     var_SetInteger (vout, "mouse-y", v);
 }
 
+static void
+HandleParentStructure (vout_thread_t *vout, xcb_connection_t *conn,
+                       xcb_window_t xid, xcb_configure_notify_event_t *ev)
+{
+    unsigned width, height, x, y;
+
+    vout_PlacePicture (vout, ev->width, ev->height, &x, &y, &width, &height);
+    if (width != vout->fmt_out.i_visible_width
+     || height != vout->fmt_out.i_visible_height)
+    {
+        vout->i_changes |= VOUT_SIZE_CHANGE;
+        return; /* vout will be reinitialized */
+    }
+
+    /* Move the picture within the window */
+    const uint32_t values[] = { x, y, };
+    xcb_configure_window (conn, xid,
+                          XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
+                          values);
+}
+
 /**
  * Process an X11 event.
  */
-int ProcessEvent (vout_thread_t *vout, xcb_generic_event_t *ev)
+int ProcessEvent (vout_thread_t *vout, xcb_connection_t *conn,
+                  xcb_window_t window, xcb_generic_event_t *ev)
 {
     switch (ev->response_type & 0x7f)
     {
@@ -108,6 +130,16 @@ int ProcessEvent (vout_thread_t *vout, xcb_generic_event_t *ev)
         case XCB_MOTION_NOTIFY:
             HandleMotionNotify (vout, (xcb_motion_notify_event_t *)ev);
             break;
+
+        case XCB_CONFIGURE_NOTIFY:
+        {
+            xcb_configure_notify_event_t *cn =
+                (xcb_configure_notify_event_t *)ev;
+
+            assert (cn->window != window)
+            HandleParentStructure (vout, conn, window, cn);
+            break;
+        }
 
         default:
             msg_Dbg (vout, "unhandled event %"PRIu8, ev->response_type);

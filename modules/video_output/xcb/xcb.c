@@ -233,6 +233,16 @@ static int Open (vlc_object_t *obj)
         }
     }
 
+    /* Get window */
+    /* FIXME: WTH to put as initial width/height values??? */
+    p_sys->embed = vout_RequestXWindow (vout, &(int){ 0 }, &(int){ 0 },
+                                        &(unsigned){ 0 }, &(unsigned){ 0 });
+    if (p_sys->embed == NULL)
+    {
+        msg_Err (vout, "parent window not available");
+        goto error;
+    }
+
     vout->pf_init = Init;
     vout->pf_end = Deinit;
     vout->pf_render = Render;
@@ -254,7 +264,8 @@ static void Close (vlc_object_t *obj)
     vout_thread_t *vout = (vout_thread_t *)obj;
     vout_sys_t *p_sys = vout->p_sys;
 
-    assert (p_sys->embed == NULL);
+    if (p_sys->embed)
+        vout_ReleaseWindow (p_sys->embed);
     /* colormap is garbage-ollected by X (?) */
     if (p_sys->conn)
         xcb_disconnect (p_sys->conn);
@@ -403,27 +414,33 @@ static int Init (vout_thread_t *vout)
     const xcb_screen_t *screen = p_sys->screen;
     unsigned x, y, width, height;
 
-    /* Determine parent window */
+    /* Determine parent window and size */
     if (vout->b_fullscreen)
     {
-        p_sys->embed = NULL;
         p_sys->parent = screen->root;
         width = screen->width_in_pixels;
         height = screen->height_in_pixels;
     }
     else
     {
-        p_sys->embed = vout_RequestXWindow (vout, &(int){ 0 }, &(int){ 0 },
-                                            &width, &height);
-        if (p_sys->embed == NULL)
-        {
-            msg_Err (vout, "cannot get parent window");
-            return VLC_EGENERIC;
-        }
         p_sys->parent = p_sys->embed->handle.xid;
+
+        /* Subscribe to parent window resize events */
+        const uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+        xcb_change_window_attributes (p_sys->conn, p_sys->parent,
+                                      XCB_CW_EVENT_MASK, &value);
+
+        xcb_get_geometry_cookie_t ck;
+        ck = xcb_get_geometry (p_sys->conn, p_sys->parent);
+
+        xcb_get_geometry_reply_t *geo;
+        xcb_generic_error_t *err;
+        geo = xcb_get_geometry_reply (p_sys->conn, ck, &err);
+        width = geo->width;
+        height = geo->height;
+        free (geo);
     }
 
-    /* FIXME: incorrect placement if resize now */
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
 
     /* FIXME: I don't get the subtlety between output and fmt_out here */
@@ -505,8 +522,6 @@ static void Deinit (vout_thread_t *vout)
 
     xcb_unmap_window (p_sys->conn, p_sys->window);
     xcb_destroy_window (p_sys->conn, p_sys->window);
-    vout_ReleaseWindow (p_sys->embed);
-    p_sys->embed = NULL;
 }
 
 /**
@@ -558,7 +573,7 @@ static int Manage (vout_thread_t *vout)
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (p_sys->conn)) != NULL)
-        ProcessEvent (vout, ev);
+        ProcessEvent (vout, p_sys->conn, p_sys->window, ev);
 
     if (xcb_connection_has_error (p_sys->conn))
     {
