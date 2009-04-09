@@ -2517,7 +2517,7 @@ schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	patch -d schroedinger -p1 < Patches/schroedinger-1.0.6-fixes.patch
 
 .schroedinger: schroedinger .liboil
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
 CLEAN_FILE += .schroedinger
