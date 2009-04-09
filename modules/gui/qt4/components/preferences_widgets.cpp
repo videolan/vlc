@@ -1293,6 +1293,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
 
 void KeySelectorControl::setTheKey()
 {
+    if( !table->currentItem() ) return;
     table->currentItem()->setText( 1, shortcutValue->text() );
     table->currentItem()->setData( 1, Qt::UserRole, shortcutValue->getValue() );
 }
