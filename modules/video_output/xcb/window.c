@@ -197,11 +197,32 @@ static void *Thread (void *data)
     return NULL;
 }
 
+#include <vlc_vout.h>
 
 static int Control (vout_window_t *wnd, int cmd, va_list ap)
 {
-    msg_Err (wnd, "request %d not implemented", cmd);
-    (void)ap;
-    return VLC_EGENERIC;
+    vout_window_sys_t *p_sys = wnd->p_sys;
+    xcb_connection_t *conn = p_sys->conn;
+
+    switch (cmd)
+    {
+        case VOUT_SET_SIZE:
+        {
+            unsigned width = va_arg (ap, unsigned);
+            unsigned height = va_arg (ap, unsigned);
+            const uint32_t values[] = { width, height, };
+
+            xcb_configure_window (conn, wnd->handle.xid,
+                                  XCB_CONFIG_WINDOW_WIDTH |
+                                  XCB_CONFIG_WINDOW_HEIGHT, values);
+            xcb_flush (conn);
+            break;
+        }
+
+        default:
+            msg_Err (wnd, "request %d not implemented", cmd);
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
