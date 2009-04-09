@@ -360,9 +360,14 @@ void vlm_MessageDelete (vlm_message_t *m)
     assert (0);
 }
 
-vlm_message_t *vlm_MessageNew (const char *a, const char *fmt, ...)
+vlm_message_t *vlm_MessageSimpleNew (const char *a)
 {
     return NULL;
+}
+
+vlm_message_t *vlm_MessageNew (const char *a, const char *fmt, ...)
+{
+    return vlm_MessageSimpleNew (a);
 }
 
 vlm_t *__vlm_New (vlc_object_t *obj)
