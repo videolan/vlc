@@ -30,6 +30,11 @@
             SUPERCLASS = NSImageView;
         },
                 {
+            CLASS = VLCApplication;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSApplication;
+        },
+                {
             CLASS = VLCControllerView;
             LANGUAGE = ObjC;
             SUPERCLASS = NSView;
@@ -195,6 +200,7 @@
                 "o_btn_rewind" = NSButton;
                 "o_btn_stop" = NSButton;
                 "o_controls" = VLCControls;
+                "o_coredialogs" = id;
                 "o_crashrep_desc_txt" = NSTextField;
                 "o_crashrep_dontSend_btn" = NSButton;
                 "o_crashrep_fld" = NSTextView;
@@ -215,7 +221,7 @@
                 "o_info" = id;
                 "o_interaction_list" = id;
                 "o_main_pgbar" = NSProgressIndicator;
-                "o_messages" = id;
+                "o_messages" = NSTextView;
                 "o_mi_about" = NSMenuItem;
                 "o_mi_addSub" = NSMenuItem;
                 "o_mi_add_intf" = NSMenuItem;
@@ -289,6 +295,7 @@
                 "o_mi_show_all" = NSMenuItem;
                 "o_mi_slower" = NSMenuItem;
                 "o_mi_snapshot" = NSMenuItem;
+                "o_mi_sprefs" = NSMenuItem;
                 "o_mi_stop" = NSMenuItem;
                 "o_mi_subtitle" = NSMenuItem;
                 "o_mi_teletext" = NSMenuItem;
@@ -305,8 +312,8 @@
                 "o_mi_vol_up" = NSMenuItem;
                 "o_mi_website" = NSMenuItem;
                 "o_msgs_crashlog_btn" = NSButton;
-                "o_msgs_panel" = id;
-                "o_msgs_save_btn" = id;
+                "o_msgs_panel" = NSWindow;
+                "o_msgs_save_btn" = NSButton;
                 "o_mu_add_intf" = NSMenu;
                 "o_mu_aspect_ratio" = NSMenu;
                 "o_mu_audio" = NSMenu;
@@ -318,10 +325,10 @@
                 "o_mu_deinterlace" = NSMenu;
                 "o_mu_device" = NSMenu;
                 "o_mu_edit" = NSMenu;
-                "o_mu_ffmpeg_pp" = NSMenuItem;
+                "o_mu_ffmpeg_pp" = NSMenu;
                 "o_mu_file" = NSMenu;
                 "o_mu_help" = NSMenu;
-                "o_mu_program" = NSMenuItem;
+                "o_mu_program" = NSMenu;
                 "o_mu_screen" = NSMenu;
                 "o_mu_subtitle" = NSMenu;
                 "o_mu_title" = NSMenu;
@@ -350,7 +357,7 @@
                 "o_vmi_volup" = NSMenuItem;
                 "o_volumeslider" = NSSlider;
                 "o_vout_menu" = NSMenu;
-                "o_window" = VLControllerWindow;
+                "o_window" = VLCControllerWindow;
                 "o_wizard" = id;
                 toolbarMediaControl = NSView;
             };
