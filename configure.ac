@@ -830,7 +830,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
 
 dnl Check for headers
 AC_CHECK_HEADERS(time.h stdint.h getopt.h strings.h locale.h)
-AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h xlocale.h)
+AC_CHECK_HEADERS(fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat.h xlocale.h)
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h netinet/udplite.h sys/eventfd.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
   [
