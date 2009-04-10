@@ -34,11 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#ifdef HAVE_STDINT_H
-#   include <stdint.h>                                         /* int16_t .. */
-#else
-#   include <inttypes.h>                                       /* int16_t .. */
-#endif
+#include <stdint.h>                                         /* int16_t .. */
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
