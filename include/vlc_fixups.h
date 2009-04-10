@@ -105,69 +105,30 @@ static inline char *getenv (const char *name)
 #endif
 
 #ifndef HAVE_STRCASECMP
-# ifndef HAVE_STRICMP
-#  include <ctype.h>
-static inline int strcasecmp (const char *s1, const char *s2)
-{
-    for (size_t i = 0;; i++)
-    {
-        int d = tolower (s1[i]) - tolower (s2[i]);
-        if (d || !s1[i]) return d;
-    }
-    return 0;
-}
-# else
-#  define strcasecmp stricmp
-# endif
+int strcasecmp (const char *, const char *);
 #endif
 
 #ifndef HAVE_STRNCASECMP
-# ifndef HAVE_STRNICMP
-#  include <ctype.h>
-static inline int strncasecmp (const char *s1, const char *s2, size_t n)
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        int d = tolower (s1[i]) - tolower (s2[i]);
-        if (d || !s1[i]) return d;
-    }
-    return 0;
-}
-# else
-#  define strncasecmp strnicmp
-# endif
+int strncasecmp (const char *, const char *, size_t);
 #endif
 
 #ifndef HAVE_STRCASESTR
-# ifndef HAVE_STRISTR
-#  define strcasestr vlc_strcasestr
-# else
-#  define strcasestr stristr
-# endif
+char *strcasestr (const char *, const char *
+#endif
+
+#ifndef HAVE_GMTIME_R
+# include <time.h>
+struct tm *gmtime_r (const time_t *, struct tm *);
 #endif
 
 #ifndef HAVE_LOCALTIME_R
-/* If localtime_r() is not provided, we assume localtime() uses
- * thread-specific storage. */
 # include <time.h>
-static inline struct tm *localtime_r (const time_t *timep, struct tm *result)
-{
-    struct tm *s = localtime (timep);
-    if (s == NULL)
-        return NULL;
+struct tm *localtime_r (const time_t *, struct tm *);
+#endif
 
-    *result = *s;
-    return result;
-}
-static inline struct tm *gmtime_r (const time_t *timep, struct tm *result)
-{
-    struct tm *s = gmtime (timep);
-    if (s == NULL)
-        return NULL;
-
-    *result = *s;
-    return result;
-}
+#ifndef HAVE_REWIND
+# include <stdio.h>
+void rewind (FILE *);
 #endif
 
 /* Alignment of critical static data structures */
@@ -200,13 +161,5 @@ typedef void *locale_t;
 
 #define N_(str) gettext_noop (str)
 #define gettext_noop(str) (str)
-
-#ifdef UNDER_CE
-static inline void rewind ( FILE *stream )
-{
-    fseek(stream, 0L, SEEK_SET);
-    clearerr(stream);
-}
-#endif
 
 #endif /* !LIBVLC_FIXUPS_H */

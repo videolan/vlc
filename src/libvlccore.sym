@@ -485,7 +485,6 @@ vlc_sdp_Start
 vlc_sd_Start
 vlc_sd_Stop
 vlc_sendmsg
-vlc_strcasestr
 vlc_testcancel
 vlc_thread_create
 __vlc_thread_join

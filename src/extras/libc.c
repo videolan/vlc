@@ -68,39 +68,6 @@
 #   include <windows.h>
 #endif
 
-/******************************************************************************
- * strcasestr: find a substring (little) in another substring (big)
- * Case sensitive. Return NULL if not found, return big if little == null
- *****************************************************************************/
-char * vlc_strcasestr( const char *psz_big, const char *psz_little )
-{
-#if defined (HAVE_STRCASESTR) || defined (HAVE_STRISTR)
-    return strcasestr (psz_big, psz_little);
-#else
-    char *p_pos = (char *)psz_big;
-
-    if( !psz_big || !psz_little || !*psz_little ) return p_pos;
- 
-    while( *p_pos )
-    {
-        if( toupper( *p_pos ) == toupper( *psz_little ) )
-        {
-            char * psz_cur1 = p_pos + 1;
-            char * psz_cur2 = (char *)psz_little + 1;
-            while( *psz_cur1 && *psz_cur2 &&
-                   toupper( *psz_cur1 ) == toupper( *psz_cur2 ) )
-            {
-                psz_cur1++;
-                psz_cur2++;
-            }
-            if( !*psz_cur2 ) return p_pos;
-        }
-        p_pos++;
-    }
-    return NULL;
-#endif
-}
-
 /*****************************************************************************
  * vlc_*dir_wrapper: wrapper under Windows to return the list of drive letters
  * when called with an empty argument or just '\'

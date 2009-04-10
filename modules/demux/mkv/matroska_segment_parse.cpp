@@ -767,7 +767,6 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
             msg_Dbg( &sys.demuxer, "|   |   + family=%d", *(uint32*)uid->GetBuffer() );
         }
-#if defined( HAVE_GMTIME_R )
         else if( MKV_IS_ID( l, KaxDateUTC ) )
         {
             KaxDateUTC &date = *(KaxDateUTC*)l;
@@ -785,7 +784,6 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 msg_Dbg( &sys.demuxer, "|   |   + Date=%s", psz_date_utc );
             }
         }
-#endif
         else if( MKV_IS_ID( l, KaxChapterTranslate ) )
         {
             KaxChapterTranslate *p_trans = static_cast<KaxChapterTranslate*>( l );
