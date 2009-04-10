@@ -1040,7 +1040,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 *(p_extra++) = pi_size[i] & 0xFF;
                 memcpy( p_extra, tracks[i_track]->p_extra_data + i_offset + i_extra-1,
                         pi_size[i] );
-#endif
+
                 p_extra += pi_size[i];
                 i_extra += pi_size[i];
             }
