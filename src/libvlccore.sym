@@ -494,7 +494,6 @@ vlc_threadvar_delete
 vlc_ureduce
 VLC_Version
 vlc_wclosedir
-vlc_wraptext
 vlm_Control
 vlm_Delete
 vlm_ExecuteCommand
