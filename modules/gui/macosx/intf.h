@@ -424,3 +424,17 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 @interface VLCMain (Internal)
 - (void)handlePortMessage:(NSPortMessage *)o_msg;
 @end
+
+/*****************************************************************************
+ * VLCApplication interface
+ *****************************************************************************/
+
+@interface VLCApplication : NSApplication
+{
+    BOOL b_justJumped;
+}
+
+- (void)sendEvent: (NSEvent*)event;
+- (void)resetJump;
+
+@end

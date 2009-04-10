@@ -56,7 +56,8 @@
 #import "simple_prefs.h"
 #import "vlm.h"
 
-#import <AddressBook/AddressBook.h>
+#import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
+#import <IOKit/hidsystem/ev_keymap.h>         /* for the media key support */
 
 /*****************************************************************************
  * Local prototypes.
@@ -132,7 +133,7 @@ static void Run( intf_thread_t *p_intf )
 
     /* Install a jmpbuffer to where we can go back before the NSApp exit
      * see applicationWillTerminate: */
-    [NSApplication sharedApplication];
+    [VLCApplication sharedApplication];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
@@ -2763,6 +2764,69 @@ end:
     [o_lock lock];
     [o_inv invoke];
     [o_lock unlockWithCondition: 1];
+}
+
+@end
+
+/*****************************************************************************
+ * VLCApplication interface
+ * exclusively used to implement media key support on Al Apple keyboards
+ *   b_justJumped is required as the keyboard send its events faster than
+ *    the user can actually jump through his media
+ *****************************************************************************/
+
+@implementation VLCApplication
+
+- (void)sendEvent: (NSEvent*)event
+{
+    if( [event type] == NSSystemDefined && [event subtype] == 8 )
+	{
+		int keyCode = (([event data1] & 0xFFFF0000) >> 16);
+		int keyFlags = ([event data1] & 0x0000FFFF);
+		int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
+        int keyRepeat = (keyFlags & 0x1);
+
+        if( keyCode == NX_KEYTYPE_PLAY && keyState == 0 )
+            var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+
+        if( keyCode == NX_KEYTYPE_FAST && !b_justJumped )
+        {
+            if( keyState == 0 && keyRepeat == 0 )
+            {
+                    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_NEXT );
+            }
+            else if( keyRepeat == 1 )
+            {
+                var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+                b_justJumped = YES;
+                [self performSelector:@selector(resetJump)
+                           withObject: NULL
+                           afterDelay:0.25];
+            }
+        }
+
+        if( keyCode == NX_KEYTYPE_REWIND && !b_justJumped )
+        {
+            if( keyState == 0 && keyRepeat == 0 )
+            {
+                var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PREV );
+            }
+            else if( keyRepeat == 1 )
+            {
+                var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
+                b_justJumped = YES;
+                [self performSelector:@selector(resetJump)
+                           withObject: NULL
+                           afterDelay:0.25];
+            }
+        }
+	}
+	[super sendEvent: event];
+}
+
+- (void)resetJump
+{
+    b_justJumped = NO;
 }
 
 @end
