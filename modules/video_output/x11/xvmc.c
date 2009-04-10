@@ -1304,7 +1304,7 @@ void xxmc_do_update_frame( picture_t *picture, uint32_t width, uint32_t height,
     /* Wait a little till frame is being displayed */
     while( status & XVMC_DISPLAYING )
     {
-        msleep(1);
+        /* msleep(1); */
 
         XvMCGetSurfaceStatus( p_vout->p_sys->p_display,
                               picture->p_sys->xvmc_surf,

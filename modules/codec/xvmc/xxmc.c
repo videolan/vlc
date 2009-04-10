@@ -41,9 +41,9 @@
 #endif
 
 #include "mpeg2.h"
-#include "attributes.h"
+//#include "attributes.h"
 #include "mpeg2_internal.h"
-#include "xvmc_vld.h"
+//#include "xvmc_vld.h"
 
 /* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */
@@ -277,7 +277,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     if ( p_sys->b_slice_i )
                     {
                         decoder_SynchroNewPicture( p_sys->p_synchro,
-                            I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                            I_CODING_TYPE, 2, 0, 0,
                             p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                         decoder_SynchroDecode( p_sys->p_synchro );
                         decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
@@ -396,7 +396,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 decoder_SynchroNewPicture( p_sys->p_synchro,
                         p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                         p_sys->p_info->current_picture->nb_fields,
-                        0, 0, p_sys->i_current_rate,
+                        0, 0,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
 
                 if( p_sys->b_skip )
@@ -422,7 +422,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     /* Intra-slice refresh. Simulate a blank I picture. */
                     msg_Dbg( p_dec, "intra-slice refresh stream" );
                     decoder_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                        I_CODING_TYPE, 2, 0, 0,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                     decoder_SynchroDecode( p_sys->p_synchro );
                     decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
@@ -457,7 +457,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 decoder_SynchroNewPicture( p_sys->p_synchro,
                     p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                     p_sys->p_info->current_picture->nb_fields, i_pts,
-                    0, p_sys->i_current_rate,
+                    0,
                     p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
 
                 if ( !(p_sys->b_slice_i
@@ -486,8 +486,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                         return NULL;
                     }
 
-                    p_sys->p_mpeg2dec->ptr_forward_ref_picture = p_sys->p_mpeg2dec->fbuf[2]->id;
-                    p_sys->p_mpeg2dec->ptr_backward_ref_picture = p_sys->p_mpeg2dec->fbuf[1]->id;
+                    //p_sys->p_mpeg2dec->ptr_forward_ref_picture = p_sys->p_mpeg2dec->fbuf[2]->id;
+                    //p_sys->p_mpeg2dec->ptr_backward_ref_picture = p_sys->p_mpeg2dec->fbuf[1]->id;
 
                     if ((p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE) != B_CODING_TYPE)
                     {
@@ -495,9 +495,9 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                         //    p_sys->p_mpeg2dec->ptr_forward_ref_picture != picture->backward_reference_frame)
                         //    p_pic->forward_reference_frame->free (p_pic->forward_reference_frame);
 
-                        p_sys->p_mpeg2dec->ptr_forward_ref_picture =
-                                    p_sys->p_mpeg2dec->ptr_backward_ref_picture;
-                        p_sys->p_mpeg2dec->ptr_backward_ref_picture = (void *)p_pic;
+                        //p_sys->p_mpeg2dec->ptr_forward_ref_picture =
+                        //            p_sys->p_mpeg2dec->ptr_backward_ref_picture;
+                        //p_sys->p_mpeg2dec->ptr_backward_ref_picture = (void *)p_pic;
                     }
                     mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
                 }
@@ -595,7 +595,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( p_sys->b_slice_i )
                 {
                     decoder_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate,
+                        I_CODING_TYPE, 2, 0, 0,
                         p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                     decoder_SynchroDecode( p_sys->p_synchro );
                     decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
@@ -644,7 +644,7 @@ static double get_aspect_ratio( decoder_t *p_dec )
     {
         /* these hardcoded values are defined on mpeg2 standard for
         * aspect ratio. other values are reserved or forbidden.  */
-        switch( p_sys->p_mpeg2dec->decoder.aspect_ratio_information )
+        /*switch( p_sys->p_mpeg2dec->decoder.aspect_ratio_information )
         {
             case 2:
                 ratio = 4.0/3.0;
@@ -656,16 +656,16 @@ static double get_aspect_ratio( decoder_t *p_dec )
                 ratio = 2.11/1.0;
                 break;
             case 1:
-                default:
+                default:*/
                 ratio = (double)p_sys->p_mpeg2dec->decoder.width/(double)p_sys->p_mpeg2dec->decoder.height;
-            break;
-        }
+        /*    break;
+        }*/
     }
     else
     {
         /* mpeg1 constants refer to pixel aspect ratio */
         ratio = (double)p_sys->p_mpeg2dec->decoder.width/(double)p_sys->p_mpeg2dec->decoder.height;
-        ratio /= mpeg1_pel_ratio[p_sys->p_mpeg2dec->decoder.aspect_ratio_information];
+        /* ratio /= mpeg1_pel_ratio[p_sys->p_mpeg2dec->decoder.aspect_ratio_information]; */
     }
     return ratio;
 }
@@ -730,8 +730,8 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
                                        p_dec->fmt_out.video.i_height,
                                        p_dec->fmt_out.video.i_aspect,
                                        format, flags);
-#endif
     mpeg2_xxmc_choose_coding( p_dec, &p_sys->p_mpeg2dec->decoder, p_pic,
                               get_aspect_ratio(p_dec), 0 );
+#endif
     return p_pic;
 }

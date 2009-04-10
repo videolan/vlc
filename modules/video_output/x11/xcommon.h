@@ -395,4 +395,12 @@ typedef struct mwmhints_t
 #   define MAX_DIRECTBUFFERS 2
 #endif
 
+#ifndef MODULE_NAME_IS_glx
+static IMAGE_TYPE *CreateImage    ( vout_thread_t *,
+                                    Display *, EXTRA_ARGS, int, int );
+#ifdef HAVE_SYS_SHM_H
+IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
+                                    Display *, EXTRA_ARGS_SHM, int, int );
+#endif
+#endif
 

@@ -116,16 +116,7 @@ static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
 
-#ifndef MODULE_NAME_IS_glx
-static IMAGE_TYPE *CreateImage    ( vout_thread_t *,
-                                    Display *, EXTRA_ARGS, int, int );
-#endif
-
 #ifdef HAVE_SYS_SHM_H
-#ifndef MODULE_NAME_IS_glx
-IMAGE_TYPE *CreateShmImage ( vout_thread_t *,
-                                    Display *, EXTRA_ARGS_SHM, int, int );
-#endif
 static int i_shm_major = 0;
 #endif
 
@@ -428,7 +419,7 @@ int Activate ( vlc_object_t *p_this )
     if( checkXvMCCap( p_vout ) == VLC_EGENERIC )
     {
         msg_Err( p_vout, "no XVMC capability found" );
-        Deactivate( p_vout );
+        Deactivate( p_this );
         return VLC_EGENERIC;
     }
     subpicture_t sub_pic;
@@ -1076,7 +1067,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     if( p_vout->p_sys->i_shm_opcode )
     {
         /* Display rendered image using shared memory extension */
-#   if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
         XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
                        p_vout->p_sys->p_win->video_window,
                        p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
@@ -1086,7 +1077,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                        p_vout->fmt_out.i_visible_height,
                        0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                        False /* Don't put True here or you'll waste your CPU */ );
-#   else
+#else
         XShmPutImage( p_vout->p_sys->p_display,
                       p_vout->p_sys->p_win->video_window,
                       p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
@@ -1096,7 +1087,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                       p_vout->fmt_out.i_visible_width,
                       p_vout->fmt_out.i_visible_height,
                       False /* Don't put True here ! */ );
-#   endif
+#endif
     }
     else
 #endif /* HAVE_SYS_SHM_H */
@@ -1922,13 +1913,13 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* Create image using XShm extension */
         p_pic->p_sys->p_image =
             CreateShmImage( p_vout, p_vout->p_sys->p_display,
-#   if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
                             p_vout->p_sys->i_xvport,
                             VLC2X11_FOURCC(p_vout->output.i_chroma),
-#   else
+#else
                             p_vout->p_sys->p_visual,
                             p_vout->p_sys->i_screen_depth,
-#   endif
+#endif
                             &p_pic->p_sys->shminfo,
                             p_vout->output.i_width, p_vout->output.i_height );
     }
