@@ -183,11 +183,7 @@ static void    Close  ( vlc_object_t * );
     "encrypting." )
 
 #define SOUT_CFG_PREFIX "sout-ts-"
-#ifdef HAVE_BSEARCH
-#   define MAX_PMT 64       /* Maximum number of programs. FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
-#else
-#   define MAX_PMT 1
-#endif
+#define MAX_PMT 64       /* Maximum number of programs. FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
 #define MAX_PMT_PID 64       /* Maximum pids in each pmt.  FIXME: I just chose an arbitary number. Where is the maximum in the spec? */
 
 vlc_module_begin ()
@@ -2610,7 +2606,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                     GetDescriptorLength24b( bits.i_data -
                                             bits_fix_IOD.i_data - 3 ) );
 
-#if 0//def HAVE_BSEARCH /* FIXME!!! This can't possibly work */
+#if 0 /* FIXME!!! This can't possibly work */
         i_pidinput = p_mux->pp_inputs[i]->p_fmt->i_id;
         p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
                             sizeof(pmt_map_t), intcompare );
@@ -2634,7 +2630,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
 
         p_stream = (ts_stream_t *)p_mux->pp_inputs[i_stream]->p_sys;
 
-#ifdef HAVE_BSEARCH
         i_pidinput = p_mux->pp_inputs[i_stream]->p_fmt->i_id;
         p_usepid = bsearch( &i_pidinput, p_sys->pmtmap, p_sys->i_pmtslots,
                             sizeof(pmt_map_t), intcompare );
@@ -2645,7 +2640,6 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                     p_stream->i_stream_type, p_stream->i_pid );
         else
             /* If there's an error somewhere, dump it to the first pmt */
-#endif
             p_es = dvbpsi_PMTAddES( &p_sys->dvbpmt[0], p_stream->i_stream_type,
                                     p_stream->i_pid );
 
