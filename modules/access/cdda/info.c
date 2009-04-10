@@ -36,9 +36,7 @@
 #include <cdio/cd_types.h>
 #include "info.h"
 
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#endif
+#include <errno.h>
 #include <assert.h>
 
 static char *CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,

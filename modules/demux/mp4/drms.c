@@ -41,9 +41,7 @@
 #   include <stdio.h>
 #endif
 
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#endif
+#include <errno.h>
 
 #ifdef WIN32
 #   if !defined( UNDER_CE )
@@ -1573,14 +1571,10 @@ static int WriteUserKey( void *_p_drms, uint32_t *p_user_key )
     snprintf( psz_path, PATH_MAX - 1,
               "%s/" DRMS_DIRNAME, p_drms->psz_homedir );
 
-#if defined( HAVE_ERRNO_H )
-#   if defined( WIN32 )
+#if defined( WIN32 )
     if( !mkdir( psz_path ) || errno == EEXIST )
-#   else
-    if( !mkdir( psz_path, 0755 ) || errno == EEXIST )
-#   endif
 #else
-    if( !mkdir( psz_path ) )
+    if( !mkdir( psz_path, 0755 ) || errno == EEXIST )
 #endif
     {
         snprintf( psz_path, PATH_MAX - 1, "%s/" DRMS_DIRNAME "/%08X.%03d",

@@ -20,17 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef HAVE_ERRNO_H
-#   include <errno.h>
-#else
-    static int errno;
-    /* FIXME: anything clever to put here? */
-#   define EFAULT 12
-#   define ENOTDIR 12
-#   define ENOENT 12
-#   define ENOMEM 12
-#   define EINVAL 12
-#endif
+#include <errno.h>
 #include <string.h>
 #ifndef UNDER_CE
 #   include <io.h>
