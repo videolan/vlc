@@ -158,11 +158,6 @@ static inline lldiv_t lldiv (long long numer, long long denom)
 }
 #endif
 
-#ifndef HAVE_SCANDIR
-# define scandir vlc_scandir
-# define alphasort vlc_alphasort
-#endif
-
 #ifndef HAVE_GETENV
 static inline char *getenv (const char *name)
 {
