@@ -40,109 +40,51 @@
 #endif
 
 #ifndef HAVE_STRDUP
-# include <string.h>
-# include <stdlib.h>
-static inline char *strdup (const char *str)
-{
-    size_t len = strlen (str) + 1;
-    char *res = (char *)malloc (len);
-    if (res) memcpy (res, str, len);
-    return res;
-}
+char *strdup (const char *);
 #endif
 
 #ifndef HAVE_VASPRINTF
-# include <stdio.h>
-# include <stdlib.h>
 # include <stdarg.h>
-static inline int vasprintf (char **strp, const char *fmt, va_list ap)
-{
-    int len = vsnprintf (NULL, 0, fmt, ap) + 1;
-    char *res = (char *)malloc (len);
-    if (res == NULL)
-        return -1;
-    *strp = res;
-    return vsnprintf (res, len, fmt, ap);
-}
+int vasprintf (char **, const char *, va_list);
 #endif
 
 #ifndef HAVE_ASPRINTF
-# include <stdio.h>
-# include <stdarg.h>
-static inline int asprintf (char **strp, const char *fmt, ...)
-{
-    va_list ap;
-    int ret;
-    va_start (ap, fmt);
-    ret = vasprintf (strp, fmt, ap);
-    va_end (ap);
-    return ret;
-}
+int asprintf (char **, const char *, ...);
 #endif
 
 #ifndef HAVE_STRNLEN
-# include <string.h>
-static inline size_t strnlen (const char *str, size_t max)
-{
-    const char *end = (const char *) memchr (str, 0, max);
-    return end ? (size_t)(end - str) : max;
-}
+# include <stddef.h>
+size_t strnlen (const char *, size_t);
 #endif
 
 #ifndef HAVE_STRNDUP
-# include <string.h>
-# include <stdlib.h>
-static inline char *strndup (const char *str, size_t max)
-{
-    size_t len = strnlen (str, max);
-    char *res = (char *) malloc (len + 1);
-    if (res)
-    {
-        memcpy (res, str, len);
-        res[len] = '\0';
-    }
-    return res;
-}
+# include <stddef.h>
+char *strndup (const char *, size_t);
 #endif
 
 #ifndef HAVE_STRLCPY
-# define strlcpy vlc_strlcpy
+# include <stddef.h>
+size_t strlcpy (char *, const char *, size_t);
 #endif
 
 #ifndef HAVE_STRTOF
-# define strtof( a, b ) ((float)strtod (a, b))
+float strtof (const char *, char **);
 #endif
 
 #ifndef HAVE_ATOF
-# define atof( str ) (strtod ((str), (char **)NULL, 10))
+double atof (const char *);
 #endif
 
 #ifndef HAVE_STRTOLL
-# define strtoll vlc_strtoll
+long long int strtoll (const char *, char **, int);
 #endif
 
 #ifndef HAVE_STRSEP
-static inline char *strsep( char **ppsz_string, const char *psz_delimiters )
-{
-    char *psz_string = *ppsz_string;
-    if( !psz_string )
-        return NULL;
-
-    char *p = strpbrk( psz_string, psz_delimiters );
-    if( !p )
-    {
-        *ppsz_string = NULL;
-        return psz_string;
-    }
-    *p++ = '\0';
-
-    *ppsz_string = p;
-    return psz_string;
-}
+char *strsep (char **, const char *);
 #endif
 
 #ifndef HAVE_ATOLL
-# define atoll( str ) (strtoll ((str), (char **)NULL, 10))
+long long atoll (const char *);
 #endif
 
 #ifndef HAVE_LLDIV
@@ -151,11 +93,7 @@ typedef struct {
     long long rem;  /* Remainder. */
 } lldiv_t;
 
-static inline lldiv_t lldiv (long long numer, long long denom)
-{
-    lldiv_t d = { .quot = numer / denom, .rem = numer % denom };
-    return d;
-}
+lldiv_t lldiv (long long, long long);
 #endif
 
 #ifndef HAVE_GETENV

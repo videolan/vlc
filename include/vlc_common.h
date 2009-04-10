@@ -731,9 +731,6 @@ static inline uint64_t ntoh64 (uint64_t ll)
 #define VLC_UNUSED(x) (void)(x)
 
 /* Stuff defined in src/extras/libc.c */
-VLC_EXPORT( size_t, vlc_strlcpy, ( char *, const char *, size_t ) );
-VLC_EXPORT( long long, vlc_strtoll, ( const char *nptr, char **endptr, int base ) LIBVLC_USED );
-
 VLC_EXPORT( char *, vlc_strcasestr, ( const char *s1, const char *s2 ) LIBVLC_USED );
 
 #if defined(WIN32) || defined(UNDER_CE)

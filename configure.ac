@@ -18,6 +18,7 @@ AC_PREREQ(2.59c)
 AC_CONFIG_SRCDIR(src/libvlc.c)
 AC_CONFIG_AUX_DIR(autotools)
 AC_CONFIG_MACRO_DIR(m4)
+AC_CONFIG_LIBOBJ_DIR(compat)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
@@ -550,12 +551,13 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS([gettimeofday strtod strtol strtof strtoll strtoull strsep isatty vasprintf asprintf swab sigrelse getpwuid_r memalign posix_memalign if_nametoindex atoll getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon fork bsearch lstat strlcpy strdup strndup strnlen atof lldiv posix_fadvise posix_madvise uselocale])
+AC_CHECK_FUNCS([gettimeofday isatty swab sigrelse getpwuid_r memalign posix_memalign if_nametoindex getenv putenv setenv gmtime_r ctime_r localtime_r lrintf daemon fork bsearch lstat posix_fadvise posix_madvise uselocale])
 AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp)])
 AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp)])
 AC_CHECK_FUNCS(strcasestr,,[AC_CHECK_FUNCS(stristr)])
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(fcntl)
+AC_REPLACE_FUNCS([asprintf atof atoll lldiv strdup strlcpy strndup strnlen strsep strtof strtoll vasprintf])
 
 dnl Check for Linux system calls
 AC_CHECK_FUNCS([vmsplice])
@@ -5964,6 +5966,7 @@ AC_CONFIG_FILES([
   share/Makefile
   share/vlc_win32_rc.rc
   share/libvlc_win32_rc.rc
+  compat/Makefile
   src/Makefile
   src/test/Makefile
   bin/Makefile

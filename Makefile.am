@@ -7,13 +7,13 @@
 # which have makefiles with distribution information.
 #  - src (libvlc) is nedeed by modules, mozilla and bindings
 #  - libs/* are needed by modules
-BASE_SUBDIRS = po src bin modules share doc test
+BASE_SUBDIRS = po compat src bin modules share doc test
 EXTRA_SUBDIRS = m4 extras/package/ipkg \
 	libs/loader libs/srtp libs/unzip \
 	projects/mozilla projects/activex
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
 
-SUBDIRS = po src
+SUBDIRS = po compat src
 if LOADER
 SUBDIRS += libs/loader
 endif

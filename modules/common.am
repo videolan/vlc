@@ -23,7 +23,8 @@ AM_LDFLAGS = -rpath '$(libvlcdir)' \
 	-shrext $(LIBEXT) \
 	-no-undefined \
 	 `$(VLC_CONFIG) --ldflags plugin $@`
-AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` $(LTLIBVLCCORE)
+AM_LIBADD = `$(VLC_CONFIG) -libs plugin $@` \
+	$(LTLIBVLCCORE) $(top_builddir)/compat/libcompat.la
 
 include $(srcdir)/Modules.am
 
