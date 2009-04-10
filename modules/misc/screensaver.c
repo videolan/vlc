@@ -40,10 +40,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-#ifdef HAVE_SIGNAL_H
-#   include <signal.h>
-#endif
+#include <signal.h>
 
 #ifdef HAVE_DBUS
 

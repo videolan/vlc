@@ -32,10 +32,8 @@
 
 #include <vlc_common.h>
 
-#ifdef HAVE_SIGNAL_H
-#   include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
-#   include <setjmp.h>                                    /* longjmp, setjmp */
-#endif
+#include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
+#include <setjmp.h>                                    /* longjmp, setjmp */
 
 #include "libvlc.h"
 
@@ -46,19 +44,15 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#ifdef HAVE_SIGNAL_H
 static void SigHandler   ( int );
-#endif
 
 /*****************************************************************************
  * Global variables - they're needed for signal handling
  *****************************************************************************/
-#ifdef HAVE_SIGNAL_H
 static jmp_buf env;
 static int     i_illegal;
 #if defined( __i386__ ) || defined( __x86_64__ )
 static const char *psz_capability;
-#endif
 #endif
 
 /*****************************************************************************
@@ -112,8 +106,7 @@ uint32_t CPUCapabilities( void )
                          : "cc" );
 #   endif
 
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-     && defined( HAVE_SIGNAL_H )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
     void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 #   endif
 
@@ -139,8 +132,7 @@ uint32_t CPUCapabilities( void )
 
     if( i_eax == i_ebx )
     {
-#       if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-            && defined( HAVE_SIGNAL_H )
+#       if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, pf_sigill );
 #       endif
         return i_capabilities;
@@ -156,8 +148,7 @@ uint32_t CPUCapabilities( void )
 
     if( !i_eax )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-     && defined( HAVE_SIGNAL_H )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -175,8 +166,7 @@ uint32_t CPUCapabilities( void )
 
     if( ! (i_edx & 0x00800000) )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-     && defined( HAVE_SIGNAL_H )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -231,8 +221,7 @@ uint32_t CPUCapabilities( void )
 
     if( i_eax < 0x80000001 )
     {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-     && defined( HAVE_SIGNAL_H )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, pf_sigill );
 #   endif
         return i_capabilities;
@@ -265,15 +254,14 @@ uint32_t CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
 
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW ) \
-     && defined( HAVE_SIGNAL_H )
+#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
     signal( SIGILL, pf_sigill );
 #   endif
     return i_capabilities;
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
 
-#   ifdef CAN_COMPILE_ALTIVEC && defined( HAVE_SIGNAL_H )
+#   ifdef CAN_COMPILE_ALTIVEC
     void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 
     i_capabilities |= CPU_CAPABILITY_FPU;
@@ -322,7 +310,6 @@ uint32_t CPUCapabilities( void )
  * This function is called when an illegal instruction signal is received by
  * the program. We use this function to test OS and CPU capabilities
  *****************************************************************************/
-#if defined( HAVE_SIGNAL_H )
 static void SigHandler( int i_signal )
 {
     /* Acknowledge the signal received */
@@ -346,7 +333,6 @@ static void SigHandler( int i_signal )
 
     longjmp( env, 1 );
 }
-#endif
 
 
 uint32_t cpu_flags = 0;

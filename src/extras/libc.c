@@ -47,9 +47,7 @@
 #   include <dirent.h>
 #endif
 
-#ifdef HAVE_SIGNAL_H
-#   include <signal.h>
-#endif
+#include <signal.h>
 
 #ifdef HAVE_FORK
 #   include <sys/time.h>
