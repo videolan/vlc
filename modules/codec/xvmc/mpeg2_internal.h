@@ -21,6 +21,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifndef LIBMPEG2_MPEG2_INTERNAL_H
+#define LIBMPEG2_MPEG2_INTERNAL_H
+
+#define STATE_INTERNAL_NORETURN ((mpeg2_state_t)-1)
+
 /* macroblock modes */
 #define MACROBLOCK_INTRA 1
 #define MACROBLOCK_PATTERN 2
@@ -48,20 +53,18 @@
 
 typedef void mpeg2_mc_fct (uint8_t *, const uint8_t *, int, int);
 
-typedef struct
-{
+typedef struct {
     uint8_t * ref[2][3];
     uint8_t ** ref2[2];
     int pmv[2][2];
     int f_code[2];
 } motion_t;
 
-typedef void motion_parser_t( mpeg2_decoder_t * decoder,
-                              motion_t * motion,
-                             mpeg2_mc_fct * const * table );
+typedef void motion_parser_t (mpeg2_decoder_t * decoder,
+			      motion_t * motion,
+			      mpeg2_mc_fct * const * table);
 
-struct mpeg2_decoder_s
-{
+struct mpeg2_decoder_s {
     /* first, state that carries information from one macroblock to the */
     /* next inside a slice, and is never used outside of mpeg2_slice() */
 
@@ -98,7 +101,7 @@ struct mpeg2_decoder_s
 
     uint8_t * picture_dest[3];
     void (* convert) (void * convert_id, uint8_t * const * src,
-                      unsigned int v_offset);
+		      unsigned int v_offset);
     void * convert_id;
 
     int dmv_offset;
@@ -110,8 +113,6 @@ struct mpeg2_decoder_s
     uint16_t * quantizer_matrix[4];
     uint16_t (* chroma_quantizer[2])[64];
     uint16_t quantizer_prescale[4][32][64];
-    int load_intra_quantizer_matrix;
-    int load_non_intra_quantizer_matrix;
 
     /* The width and height of the picture snapped to macroblock units */
     int width;
@@ -135,8 +136,6 @@ struct mpeg2_decoder_s
     /* bool to indicate whether intra blocks have motion vectors */
     /* (for concealment) */
     int concealment_motion_vectors;
-    /* bit to indicate which quantization table to use */
-    int q_scale_type;
     /* bool to use different vlc tables */
     int intra_vlc_format;
     /* used for DMV MC */
@@ -151,17 +150,15 @@ struct mpeg2_decoder_s
 
     int mpeg1;
 
-    int aspect_ratio_information;
-    int progressive_sequence;
+    /* XXX: stuff due to xine shit */
+    int8_t q_scale_type;
 };
 
-typedef struct
-{
+typedef struct {
     mpeg2_fbuf_t fbuf;
 } fbuf_alloc_t;
 
-struct mpeg2dec_s
-{
+struct mpeg2dec_s {
     mpeg2_decoder_t decoder;
 
     mpeg2_info_t info;
@@ -178,10 +175,8 @@ struct mpeg2dec_s
     uint8_t * chunk_start;
     /* pointer to current position in chunk_buffer */
     uint8_t * chunk_ptr;
-    uint32_t chunk_size;
     /* last start code ? */
     uint8_t code;
-    uint8_t prev_code;
 
     /* picture tags */
     uint32_t tag_current, tag2_current, tag_previous, tag2_previous;
@@ -215,8 +210,8 @@ struct mpeg2dec_s
     unsigned int convert_id_size;
     int convert_stride;
     void (* convert_start) (void * id, const mpeg2_fbuf_t * fbuf,
-                            const mpeg2_picture_t * picture,
-                            const mpeg2_gop_t * gop);
+			    const mpeg2_picture_t * picture,
+			    const mpeg2_gop_t * gop);
 
     uint8_t * buf_start;
     uint8_t * buf_end;
@@ -224,21 +219,13 @@ struct mpeg2dec_s
     int16_t display_offset_x, display_offset_y;
 
     int copy_matrix;
-    int8_t q_scale_type, scaled[4];
+    int8_t scaled[4]; /* XXX: MOVED */
+    //int8_t q_scale_type, scaled[4];
     uint8_t quantizer_matrix[4][64];
     uint8_t new_quantizer_matrix[4][64];
-
-    /* a spu decoder for possible closed captions */
-    //spu_decoder_t *cc_dec;
-    int xvmc_last_slice_code;
-    unsigned xxmc_mb_pic_height;
-
-    void *ptr_forward_ref_picture;
-    void *ptr_backward_ref_picture;
 };
 
-typedef struct
-{
+typedef struct {
 #ifdef ARCH_PPC
     uint8_t regv[12*16];
 #endif
@@ -246,7 +233,7 @@ typedef struct
 } cpu_state_t;
 
 /* cpu_accel.c */
-uint32_t mpeg2_detect_accel (void);
+uint32_t mpeg2_detect_accel (uint32_t accel);
 
 /* cpu_state.c */
 void mpeg2_cpu_state_init (uint32_t accel);
@@ -256,8 +243,6 @@ mpeg2_state_t mpeg2_seek_header (mpeg2dec_t * mpeg2dec);
 mpeg2_state_t mpeg2_parse_header (mpeg2dec_t * mpeg2dec);
 
 /* header.c */
-extern uint8_t mpeg2_scan_norm[64];
-extern uint8_t mpeg2_scan_alt[64];
 void mpeg2_header_state_init (mpeg2dec_t * mpeg2dec);
 void mpeg2_reset_info (mpeg2_info_t * info);
 int mpeg2_header_sequence (mpeg2dec_t * mpeg2dec);
@@ -272,6 +257,38 @@ void mpeg2_header_picture_finalize (mpeg2dec_t * mpeg2dec, uint32_t accels);
 mpeg2_state_t mpeg2_header_slice_start (mpeg2dec_t * mpeg2dec);
 mpeg2_state_t mpeg2_header_end (mpeg2dec_t * mpeg2dec);
 void mpeg2_set_fbuf (mpeg2dec_t * mpeg2dec, int b_type);
+
+/* idct.c */
+extern void mpeg2_idct_init (uint32_t accel);
+extern uint8_t mpeg2_scan_norm[64];
+extern uint8_t mpeg2_scan_alt[64];
+
+/* idct_mmx.c */
+void mpeg2_idct_copy_sse2 (int16_t * block, uint8_t * dest, int stride);
+void mpeg2_idct_add_sse2 (int last, int16_t * block,
+			  uint8_t * dest, int stride);
+void mpeg2_idct_copy_mmxext (int16_t * block, uint8_t * dest, int stride);
+void mpeg2_idct_add_mmxext (int last, int16_t * block,
+			    uint8_t * dest, int stride);
+void mpeg2_idct_copy_mmx (int16_t * block, uint8_t * dest, int stride);
+void mpeg2_idct_add_mmx (int last, int16_t * block,
+			 uint8_t * dest, int stride);
+void mpeg2_idct_mmx_init (void);
+
+/* idct_altivec.c */
+void mpeg2_idct_copy_altivec (int16_t * block, uint8_t * dest, int stride);
+void mpeg2_idct_add_altivec (int last, int16_t * block,
+			     uint8_t * dest, int stride);
+void mpeg2_idct_altivec_init (void);
+
+/* idct_alpha.c */
+void mpeg2_idct_copy_mvi (int16_t * block, uint8_t * dest, int stride);
+void mpeg2_idct_add_mvi (int last, int16_t * block,
+			 uint8_t * dest, int stride);
+void mpeg2_idct_copy_alpha (int16_t * block, uint8_t * dest, int stride);
+void mpeg2_idct_add_alpha (int last, int16_t * block,
+			   uint8_t * dest, int stride);
+void mpeg2_idct_alpha_init (void);
 
 /* motion_comp.c */
 void mpeg2_mc_init (uint32_t accel);
@@ -295,3 +312,6 @@ extern mpeg2_mc_t mpeg2_mc_3dnow;
 extern mpeg2_mc_t mpeg2_mc_altivec;
 extern mpeg2_mc_t mpeg2_mc_alpha;
 extern mpeg2_mc_t mpeg2_mc_vis;
+extern mpeg2_mc_t mpeg2_mc_arm;
+
+#endif /* LIBMPEG2_MPEG2_INTERNAL_H */
