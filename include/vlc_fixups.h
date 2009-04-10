@@ -26,6 +26,19 @@
 #ifndef LIBVLC_FIXUPS_H
 # define LIBVLC_FIXUPS_H 1
 
+#ifdef __MINGW32_VERSION
+# if __MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION < 14
+#  error This mingw-runtime is too old, it has a broken vsnprintf
+# endif
+/* mingw-runtime provides the whole printf family in a c99 compliant way. */
+/* the way to enable this is to define __USE_MINGW_ANSI_STDIO, or something
+ * such as _ISOC99_SOURCE; the former is done by configure.ac */
+/* This isn't done here, since some modules don't include config.h and
+ * therefore this as the first include file */
+#elif defined UNDER_CE
+# error Window CE support for *printf needs fixing.
+#endif
+
 #ifndef HAVE_STRDUP
 # include <string.h>
 # include <stdlib.h>
