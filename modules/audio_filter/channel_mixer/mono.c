@@ -32,7 +32,7 @@
 
 #ifdef HAVE_STDINT_H
 #   include <stdint.h>                                         /* int16_t .. */
-#elif defined(HAVE_INTTYPES_H)
+#else
 #   include <inttypes.h>                                       /* int16_t .. */
 #endif
 
