@@ -417,9 +417,7 @@ private:
         if( 0 == len )
             return E_INVALIDARG;
 
-        LPWSTR propName = (LPOLESTR)::alloca((len+1)*sizeof(WCHAR));
-        if( NULL == propName )
-            return E_OUTOFMEMORY;
+        WCHAR propName[len + 1];
 
         result = pStm->Read(propName, len*sizeof(WCHAR), NULL);
         if( FAILED(result) )
