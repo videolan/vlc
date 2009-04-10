@@ -90,7 +90,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
  *****************************************************************************/
 @class AppleRemote;
 @class VLCInformation;
-@class VLControllerWindow;
+@class VLCControllerWindow;
 @class VLCEmbeddedWindow;
 @class VLCControls;
 @class VLCPlaylist;
