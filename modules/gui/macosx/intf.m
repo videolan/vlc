@@ -157,19 +157,20 @@ static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned int i )
 {
     int canc = vlc_savecancel();
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    
-    NSDictionary *o_dict = [NSDictionary dictionaryWithObjects: 
-                            [NSArray arrayWithObjects: 
-                             [NSString stringWithUTF8String: item->psz_module],
-                             [NSString stringWithUTF8String: item->psz_msg],
-                             [NSNumber numberWithInt: item->i_type], nil] 
-                                                       forKeys:
-                            [NSArray arrayWithObjects: @"Module", @"Message", @"Type", nil]];
-    
+
+    /* this may happen from time to time, let's bail out as info would be useless anyway */ 
+    if( !item->psz_module || !item->psz_msg )
+        return;
+
+    NSDictionary *o_dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSString stringWithUTF8String: item->psz_module], @"Module",
+                                [NSString stringWithUTF8String: item->psz_msg], @"Message",
+                                [NSNumber numberWithInt: item->i_type], @"Type", nil];
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreMessageReceived" 
                                                         object: nil 
                                                       userInfo: o_dict];
-    
+
     [o_pool release];
     vlc_restorecancel( canc );
 }
