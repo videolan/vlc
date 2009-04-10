@@ -184,7 +184,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-    float *p_in, *p_in_orig, *p_out = (float *)p_out_buf->p_buffer;
+    float *p_out = (float *)p_out_buf->p_buffer;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
@@ -253,17 +253,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     /* Prepare the source buffer */
     i_in_nb += (p_sys->i_old_wing * 2);
-#ifdef HAVE_ALLOCA
-    p_in = p_in_orig = (float *)alloca( i_in_nb *
-                                        p_filter->input.i_bytes_per_frame );
-#else
-    p_in = p_in_orig = (float *)malloc( i_in_nb *
-                                        p_filter->input.i_bytes_per_frame );
-#endif
-    if( p_in == NULL )
-    {
-        return;
-    }
+
+    float p_in_orig[i_in_nb * p_filter->input.i_bytes_per_frame / 4],
+         *p_in = p_in_orig;
 
     /* Copy all our samples in p_in */
     if( p_sys->i_old_wing )
@@ -458,11 +450,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #if 0
     msg_Err( p_filter, "p_out size: %i, nb bytes out: %i", p_out_buf->i_size,
              i_out * p_filter->input.i_bytes_per_frame );
-#endif
-
-    /* Free the temp buffer */
-#ifndef HAVE_ALLOCA
-    free( p_in_orig );
 #endif
 
     /* Finalize aout buffer */

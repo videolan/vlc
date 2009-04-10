@@ -40,10 +40,6 @@
 #   include <unistd.h>
 #endif
 
-#ifdef HAVE_ALLOCA_H
-#   include <alloca.h>
-#endif
-
 #include <vlc_aout.h>
 
 /*****************************************************************************
@@ -556,13 +552,9 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
     float * p_out = (float *)p_out_buf->p_buffer + i - 1;
 
 #ifdef HAVE_SWAB
-#   ifdef HAVE_ALLOCA
-    int16_t * p_swabbed = alloca( i * sizeof(int16_t) );
-#   else
-    int16_t * p_swabbed = malloc( i * sizeof(int16_t) );
-#   endif
+    int16_t p_swabbed[i];
 
-    swab( p_in_buf->p_buffer, (void *)p_swabbed, i * sizeof(int16_t) );
+    swab( p_in_buf->p_buffer, p_swabbed, i * sizeof(int16_t) );
     p_in = p_swabbed + i - 1;
 
 #else
@@ -581,12 +573,6 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #endif
         p_in--; p_out--;
     }
-
-#ifdef HAVE_SWAB
-#   ifndef HAVE_ALLOCA
-    free( p_swabbed );
-#   endif
-#endif
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 2;

@@ -137,10 +137,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
-#ifndef HAVE_ALLOCA
-    float *p_in_orig;
-#endif
-    float *p_in, *p_out = (float *)p_out_buf->p_buffer;
+    float *p_out = (float *)p_out_buf->p_buffer;
     float *p_prev_sample = (float *)p_sys->p_prev_sample;
 
     int i_nb_channels = p_filter->input.i_channels;
@@ -164,15 +161,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         return;
     }
 
-#ifdef HAVE_ALLOCA
-    p_in = (float *)alloca( p_in_buf->i_nb_bytes );
-#else
-    p_in_orig = p_in = (float *)malloc( p_in_buf->i_nb_bytes );
-#endif
-    if( p_in == NULL )
-    {
-        return;
-    }
+    float p_in_orig[p_in_buf->i_nb_bytes / 4], *p_in = p_in_orig;
 
     vlc_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
 
@@ -247,11 +236,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
         i_nb_channels * sizeof(int32_t);
-
-#ifndef HAVE_ALLOCA
-    free( p_in_orig );
-#endif
-
 }
 
 /*****************************************************************************
