@@ -44,10 +44,7 @@
 #   include <sys/time.h>                                   /* gettimeofday() */
 #endif
 
-#ifdef HAVE_TIME_H
-#   include <time.h>                                              /* ctime() */
-#   include <sys/timeb.h>                                         /* ftime() */
-#endif
+#include <time.h>                                                 /* ctime() */
 
 #include <vlc_input.h>
 #include "input_internal.h"

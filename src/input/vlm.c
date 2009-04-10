@@ -46,9 +46,9 @@
 #include <sys/time.h>                                      /* gettimeofday() */
 #endif
 
-#ifdef HAVE_TIME_H
-#   include <time.h>                                              /* ctime() */
-#   include <sys/timeb.h>                                         /* ftime() */
+#include <time.h>                                                 /* ctime() */
+#if defined (WIN32) && !defined (UNDER_CE)
+#include <sys/timeb.h>                                            /* ftime() */
 #endif
 
 #include <vlc_input.h>

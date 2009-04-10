@@ -77,9 +77,7 @@
 #       include "tables/eit.h"
 #   endif
 #endif
-#ifdef HAVE_TIME_H
-#   include <time.h>
-#endif
+#include <time.h>
 #undef TS_DEBUG
 
 /*****************************************************************************
@@ -1142,7 +1140,6 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
     if( pi_time )
         *pi_time = 0;
 
-#ifdef HAVE_TIME_H
     if( p_sys->b_access_control && p_sys->i_dvb_length > 0 )
     {
         /* FIXME we should not use time() but read the date from the tdt */
@@ -1156,7 +1153,6 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
             return VLC_SUCCESS;
         }
     }
-#endif
     return VLC_EGENERIC;
 }
 
