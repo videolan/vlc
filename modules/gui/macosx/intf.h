@@ -124,7 +124,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     BOOL nib_vlm_loaded;        /* VLM Panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
 
-    IBOutlet VLControllerWindow * o_window;                     /* main window */
+    IBOutlet VLCControllerWindow * o_window;                     /* main window */
     IBOutlet NSView * o_playlist_view;                          /* playlist view  */
     IBOutlet id o_scrollfield;                                  /* info field */
     IBOutlet NSTextField * o_timefield;                         /* time field */
@@ -223,7 +223,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     IBOutlet NSMenuItem * o_mi_fwd5m;
     IBOutlet NSMenuItem * o_mi_bwd5m;
     IBOutlet NSMenuItem * o_mi_program;
-    IBOutlet NSMenuItem * o_mu_program;
+    IBOutlet NSMenu * o_mu_program;
     IBOutlet NSMenuItem * o_mi_title;
     IBOutlet NSMenu * o_mu_title;
     IBOutlet NSMenuItem * o_mi_chapter;
@@ -264,7 +264,7 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
     IBOutlet NSMenuItem * o_mi_deinterlace;
     IBOutlet NSMenu * o_mu_deinterlace;
     IBOutlet NSMenuItem * o_mi_ffmpeg_pp;
-    IBOutlet NSMenuItem * o_mu_ffmpeg_pp;
+    IBOutlet NSMenu * o_mu_ffmpeg_pp;
     IBOutlet NSMenuItem * o_mi_teletext;
     IBOutlet NSMenuItem * o_mi_teletext_transparent;
     IBOutlet NSMenuItem * o_mi_teletext_index;
