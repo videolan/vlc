@@ -1,5 +1,5 @@
 /*****************************************************************************
- * strlcpy.c: BSD strlcpy replacement
+ * strlcpy.c: BSD strlcpy() replacement
  *****************************************************************************
  * Copyright © 2006 Rémi Denis-Courmont
  *

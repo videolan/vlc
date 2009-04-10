@@ -1,5 +1,5 @@
 /*****************************************************************************
- * strndup.c: strndup replacement
+ * strndup.c: POSIX strndup() replacement
  *****************************************************************************
  * Copyright © 1998-2008 the VideoLAN project
  *

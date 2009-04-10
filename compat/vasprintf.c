@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vasprintf.c: vasprintf replacement
+ * vasprintf.c: GNU vasprintf() replacement
  *****************************************************************************
  * Copyright © 1998-2008 the VideoLAN project
  *

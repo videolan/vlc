@@ -1,5 +1,5 @@
 /*****************************************************************************
- * asprintf.c: asprintf() replacement
+ * asprintf.c: GNU asprintf() replacement
  *****************************************************************************
  * Copyright © 1998-2008 the VideoLAN project
  *

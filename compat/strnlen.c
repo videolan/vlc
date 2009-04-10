@@ -1,5 +1,5 @@
 /*****************************************************************************
- * strnlen.c: strnlen replacement
+ * strnlen.c: POSIX strnlen() replacement
  *****************************************************************************
  * Copyright © 1998-2008 the VideoLAN project
  *
