@@ -562,6 +562,22 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_e
  * \param drawable the agl handler
  * \param p_e an initialized exception pointer
  */
+VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable, libvlc_exception_t *p_e );
+
+/**
+ * Get the agl handler previously set with libvlc_media_player_set_agl().
+ *
+ * \return the agl handler or 0 if none where set
+ */
+VLC_PUBLIC_API uint32_t libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
+	
+/**
+ * Set the agl handler where the media player should render its video output.
+ *
+ * \param p_mi the Media Player
+ * \param drawable the agl handler
+ * \param p_e an initialized exception pointer
+ */
 VLC_PUBLIC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable, libvlc_exception_t *p_e );
 
 /**

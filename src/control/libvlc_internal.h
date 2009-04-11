@@ -157,6 +157,7 @@ struct libvlc_media_player_t
     struct
     {
         void *hwnd;
+        void *nsobject;
         uint32_t xid;
         uint32_t agl;
     } drawable;
