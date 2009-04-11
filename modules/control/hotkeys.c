@@ -162,6 +162,7 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     vout_thread_t *p_vout = NULL;
+    aout_instance_t *p_aout = NULL;
     vlc_value_t val;
     playlist_t *p_playlist = pl_Hold( p_intf );
     int canc = vlc_savecancel();
@@ -193,6 +194,9 @@ static void Run( intf_thread_t *p_intf )
         /* Update the vout */
         p_last_vout = p_vout;
         p_vout = p_input ? input_GetVout( p_input ) : NULL;
+
+        /* Update the aout */
+        p_aout = p_input ? input_GetAout( p_input ) : NULL;
 
         /* Register OSD channels */
         if( p_vout && p_vout != p_last_vout )
@@ -371,13 +375,11 @@ static void Run( intf_thread_t *p_intf )
                 playlist_Play( p_playlist );
             }
         }
-        else if( i_action == ACTIONID_AUDIODEVICE_CYCLE )
+        else if( ( i_action == ACTIONID_AUDIODEVICE_CYCLE ) && p_aout )
         {
             vlc_value_t val, list, list2;
             int i_count, i;
 
-            aout_instance_t *p_aout =
-                vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
             var_Get( p_aout, "audio-device", &val );
             var_Change( p_aout, "audio-device", VLC_VAR_GETCHOICES,
                     &list, &list2 );
@@ -417,7 +419,6 @@ static void Run( intf_thread_t *p_intf )
             vout_OSDMessage( p_intf, DEFAULT_CHAN,
                     _("Audio Device: %s"),
                     list2.p_list->p_values[i].psz_string);
-            vlc_object_release( p_aout );
         }
         /* Input options */
         else if( p_input )
@@ -912,6 +913,8 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
+        if( p_aout )
+            vlc_object_release( p_aout );
         if( p_vout )
             vlc_object_release( p_vout );
         if( p_input )
