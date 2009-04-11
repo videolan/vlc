@@ -246,7 +246,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Enable the popup menu in the MI */
     setContextMenuPolicy( Qt::CustomContextMenu );
     CONNECT( this, customContextMenuRequested( const QPoint& ),
-             this, popupMenu() );
+             this, popupMenu( const QPoint& ) );
 
     /* Final sizing and showing */
     setMinimumWidth( __MAX( controls->sizeHint().width(),
@@ -633,9 +633,13 @@ void MainInterface::toggleFSC()
    QApplication::postEvent( fullscreenControls, eShow );
 }
 
-void MainInterface::popupMenu()
+void MainInterface::popupMenu( const QPoint &p )
 {
-    QVLCMenu::PopupMenu( p_intf, true );
+    /* Ow, that's ugly: don't show the popup menu if cursor over
+     * the main menu bar or the status bar */
+    if( !childAt( p ) || ( ( childAt( p ) != menuBar() )
+                        && ( childAt( p )->parentWidget() != statusBar() ) ) )
+        QVLCMenu::PopupMenu( p_intf, true );
 }
 
 void MainInterface::debug()

@@ -158,7 +158,7 @@ public slots:
     void toggleAdvanced();
     void toggleFullScreen();
     void toggleFSC();
-    void popupMenu();
+    void popupMenu( const QPoint& );
 
     /* Manage the Video Functions from the vout threads */
     void releaseVideoSlot( void );
