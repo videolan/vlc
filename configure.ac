@@ -455,22 +455,23 @@ VLC_ADD_CFLAGS([libvlc],[${INCICONV}])
 VLC_ADD_LIBS([libvlc],[${LTLIBICONV}])
 
 dnl Check for broken versions of mingw-runtime compatability library
-if test "${SYS}" = "mingw32"
-then
+AS_IF([test "${SYS}" = "mingw32"], [
     AC_MSG_CHECKING(for broken mingw-runtime)
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    AC_PREPROC_IFELSE([
 #include <_mingw.h>
 #if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 14)
 # error Attempting to use mingw-runtime with broken vsnprintf support
 #endif
-        ]])],
-        [AC_MSG_RESULT([Ok])],
-        [AC_MSG_ERROR([Broken mingw-runtime, need > 3.13])],
+], [
+        AC_MSG_RESULT([ok])
+], [
+        AC_MSG_RESULT([present])
+        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.13 or higher!])
 ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
     CPPFLAGS_save="${CPPFLAGS_save} -D__USE_MINGW_ANSI_STDIO=1"
-fi
+])
 
 dnl Check for the need to include the mingwex lib for mingw32
 if test "${SYS}" = "mingw32"
