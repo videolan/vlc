@@ -94,6 +94,7 @@ static inline unsigned long vlc_threadid (void)
 #endif
 }
 
+#ifndef NDEBUG
 /*****************************************************************************
  * vlc_thread_fatal: Report an error from the threading layer
  *****************************************************************************
@@ -136,7 +137,6 @@ vlc_thread_fatal (const char *action, int error,
     abort ();
 }
 
-#ifndef NDEBUG
 # define VLC_THREAD_ASSERT( action ) \
     if (val) vlc_thread_fatal (action, val, __func__, __FILE__, __LINE__)
 #else
