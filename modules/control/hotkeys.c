@@ -216,6 +216,8 @@ static void Run( intf_thread_t *p_intf )
 
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
+            if( p_aout )
+                vlc_object_release( p_aout );
             if( p_vout )
                 vlc_object_release( p_vout );
             if( p_input )
@@ -385,40 +387,39 @@ static void Run( intf_thread_t *p_intf )
                     &list, &list2 );
             i_count = list.p_list->i_count;
 
-            /* Not enough device to switch between */
-            if( i_count <= 1 )
-                continue;
-
-            for( i = 0; i < i_count; i++ )
+            if( i_count > 1 )
             {
-                if( val.i_int == list.p_list->p_values[i].i_int )
+                for( i = 0; i < i_count; i++ )
                 {
-                    break;
+                    if( val.i_int == list.p_list->p_values[i].i_int )
+                    {
+                        break;
+                    }
                 }
+                if( i == i_count )
+                {
+                    msg_Warn( p_aout,
+                            "invalid current audio device, selecting 0" );
+                    var_Set( p_aout, "audio-device",
+                            list.p_list->p_values[0] );
+                    i = 0;
+                }
+                else if( i == i_count -1 )
+                {
+                    var_Set( p_aout, "audio-device",
+                            list.p_list->p_values[0] );
+                    i = 0;
+                }
+                else
+                {
+                    var_Set( p_aout, "audio-device",
+                            list.p_list->p_values[i+1] );
+                    i++;
+                }
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                        _("Audio Device: %s"),
+                        list2.p_list->p_values[i].psz_string);
             }
-            if( i == i_count )
-            {
-                msg_Warn( p_aout,
-                        "invalid current audio device, selecting 0" );
-                var_Set( p_aout, "audio-device",
-                        list.p_list->p_values[0] );
-                i = 0;
-            }
-            else if( i == i_count -1 )
-            {
-                var_Set( p_aout, "audio-device",
-                        list.p_list->p_values[0] );
-                i = 0;
-            }
-            else
-            {
-                var_Set( p_aout, "audio-device",
-                        list.p_list->p_values[i+1] );
-                i++;
-            }
-            vout_OSDMessage( p_intf, DEFAULT_CHAN,
-                    _("Audio Device: %s"),
-                    list2.p_list->p_values[i].psz_string);
         }
         /* Input options */
         else if( p_input )
@@ -487,32 +488,31 @@ static void Run( intf_thread_t *p_intf )
                 var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
                             &list, &list2 );
                 i_count = list.p_list->i_count;
-                if( i_count <= 1 )
+                if( i_count > 1 )
                 {
-                    continue;
-                }
-                for( i = 0; i < i_count; i++ )
-                {
-                    if( val.i_int == list.p_list->p_values[i].i_int )
+                    for( i = 0; i < i_count; i++ )
                     {
-                        break;
+                        if( val.i_int == list.p_list->p_values[i].i_int )
+                        {
+                            break;
+                        }
                     }
+                    /* value of audio-es was not in choices list */
+                    if( i == i_count )
+                    {
+                        msg_Warn( p_input,
+                                  "invalid current audio track, selecting 0" );
+                        i = 0;
+                    }
+                    else if( i == i_count - 1 )
+                        i = 1;
+                    else
+                        i++;
+                    var_Set( p_input, "audio-es", list.p_list->p_values[i] );
+                    vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                     _("Audio track: %s"),
+                                     list2.p_list->p_values[i].psz_string );
                 }
-                /* value of audio-es was not in choices list */
-                if( i == i_count )
-                {
-                    msg_Warn( p_input,
-                              "invalid current audio track, selecting 0" );
-                    i = 0;
-                }
-                else if( i == i_count - 1 )
-                    i = 1;
-                else
-                    i++;
-                var_Set( p_input, "audio-es", list.p_list->p_values[i] );
-                vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
-                                 _("Audio track: %s"),
-                                 list2.p_list->p_values[i].psz_string );
             }
             else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
