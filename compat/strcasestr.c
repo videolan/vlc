@@ -26,7 +26,7 @@
 #include <ctype.h>
 #include <assert.h>
 
-int strcasecmp (const char *psz_big, const char *psz_little)
+char *strcasestr (const char *psz_big, const char *psz_little)
 {
     char *p_pos = (char *)psz_big;
 
