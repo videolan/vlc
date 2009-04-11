@@ -2922,7 +2922,7 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
         return NULL;
     }
 
-    /* For too bug image, the buffer returned is sometimes too low, prevent
+    /* For too big image, the buffer returned is sometimes too small, prevent
      * VLC to segfault because of it
      * FIXME is it normal ? Is there a way to detect it
      * before (XvQueryBestSize did not) ? */
