@@ -49,12 +49,12 @@ int cocoaglvoutviewInit( vout_thread_t * p_vout )
 
     msg_Dbg( p_vout, "Mac OS X Vout is opening" );
 
-    var_Create( p_vout, "drawable-gl", VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "drawabl-gl", &value_drawable );
+    var_Create( p_vout, "drawable-nsobject", VLC_VAR_DOINHERIT );
+    var_Get( p_vout, "drawable-nsobject", &value_drawable );
 
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    o_cocoaglview_container = (id) value_drawable.i_int;
+    o_cocoaglview_container = (id) value_drawable.p_address;
     if (!o_cocoaglview_container)
     {
         msg_Warn( p_vout, "No drawable!, spawing a window" );
@@ -81,7 +81,7 @@ void cocoaglvoutviewEnd( vout_thread_t * p_vout )
     id <VLCOpenGLVoutEmbedding> o_cocoaglview_container;
 
     msg_Dbg( p_vout, "Mac OS X Vout is closing" );
-    var_Destroy( p_vout, "drawable-gl" );
+    var_Destroy( p_vout, "drawable-nsobject" );
 
     o_cocoaglview_container = [p_vout->p_sys->o_glview container];
 
