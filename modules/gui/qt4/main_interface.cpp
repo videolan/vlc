@@ -83,6 +83,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     fullscreenControls   = NULL;
     cryptedLabel         = NULL;
 
+    bgWasVisible         = false;
+    i_bg_height          = 0;
+
     /* Ask for privacy */
     askForPrivacy();
 
@@ -606,13 +609,16 @@ QSize MainInterface::sizeHint() const
 
     if( VISIBLE( bgWidget ) )
     {
-        nheight += bgWidget->size().height();
-        nwidth  = bgWidget->size().width();
+        if( i_bg_height )
+            nheight += i_bg_height;
+        else
+            nheight += bgWidget->size().height();
+        nwidth  = __MAX( nwidth, bgWidget->size().width() );
     }
     else if( videoIsActive && videoWidget->isVisible() )
     {
         nheight += videoWidget->sizeHint().height();
-        nwidth  = videoWidget->sizeHint().width();
+        nwidth  = __MAX( nwidth, videoWidget->sizeHint().width() );
     }
 #if 0
     if( !dockPL->isFloating() && dockPL->isVisible() && dockPL->widget()  )
@@ -820,7 +826,10 @@ void MainInterface::toggleMinimalView( bool b_switch )
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
     { /* NORMAL MODE then */
-        if( !videoWidget || videoWidget->isHidden() ) emit askBgWidgetToToggle();
+        if( !videoWidget || videoWidget->isHidden() )
+        {
+            emit askBgWidgetToToggle();
+        }
         else
         {
             /* If video is visible, then toggle the status of bgWidget */
@@ -828,10 +837,13 @@ void MainInterface::toggleMinimalView( bool b_switch )
         }
     }
 
+    i_bg_height = bgWidget->height();
+
     menuBar()->setVisible( !b_switch );
     controls->setVisible( !b_switch );
     statusBar()->setVisible( !b_switch );
     inputC->setVisible( !b_switch );
+
     doComponentsUpdate();
 
     emit minimalViewToggled( b_switch );

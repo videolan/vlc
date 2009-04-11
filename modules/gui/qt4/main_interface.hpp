@@ -139,6 +139,7 @@ private:
     int                  i_visualmode;        ///< Visual Mode
     pl_dock_e            i_pl_dock;
     bool                 isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
+    int                  i_bg_height;         ///< Save height of bgWidget
 
     /* Status Bar */
     QLabel              *nameLabel;
