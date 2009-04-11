@@ -153,8 +153,7 @@ if test "${ACTION}" = "build"; then
         esac
     done
 
-    #install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" ${target_lib} "library"
-    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.2.dylib" ${target_lib} "library"
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" ${target_lib} "library"
     install_library "${VLC_BUILD_DIR}/src/${prefix}libvlccore.dylib" ${target_lib} "library"
 
     ##########################

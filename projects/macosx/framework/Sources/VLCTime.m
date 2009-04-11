@@ -75,7 +75,7 @@
     if (value)
     {
         long long duration = [value longLongValue] / 1000000;
-        return [NSString stringWithFormat:@"%02d:%02d:%02d",
+        return [NSString stringWithFormat:@"%01d:%02d:%02d",
             (long) (duration / 3600),
             (long)((duration / 60) % 60),
             (long) (duration % 60)];
@@ -83,7 +83,7 @@
     else
     {
         // Return a string that represents an undefined time.
-        return @"--:--:--";
+        return @"-:--:--";
     }
 }
 

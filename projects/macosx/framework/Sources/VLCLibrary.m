@@ -91,8 +91,10 @@ void * DestroySharedLibraryAtExit( void )
         libvlc_exception_init( &ex );
         
         const char * lib_vlc_params[] = { 
-            "-I", "dummy", "--vout=opengllayer", 
-            "--no-video-title-show", "--no-sout-keep", "--ignore-config"
+            "-I", "dummy", "--vout=minimal_macosx", 
+            "--no-video-title-show", "--no-sout-keep", "--ignore-config",
+			"--opengl-provider=minimal_macosx",
+			"-verbose=-1"
             //, "--control=motion", "--motion-use-rotate", "--video-filter=rotate"
         };
         

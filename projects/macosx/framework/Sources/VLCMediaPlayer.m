@@ -63,7 +63,6 @@ static void HandleMediaInstanceVolumeChanged(const libvlc_event_t * event, void 
 static void HandleMediaTimeChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
     [[VLCEventManager sharedManager] callOnMainThreadObject:self 
                                                  withMethod:@selector(mediaPlayerTimeChanged:) 
                                        withArgumentAsObject:[NSNumber numberWithLongLong:event->u.media_player_time_changed.new_time]];
@@ -224,8 +223,8 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     // Make sure that this instance has been associated with the drawing canvas.
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    libvlc_media_player_set_drawable ((libvlc_media_player_t *)instance, 
-                                        (libvlc_drawable_t)aDrawable, 
+    libvlc_media_player_set_nsobject ((libvlc_media_player_t *)instance, 
+                                        aDrawable, 
                                         &ex);
     catch_exception( &ex );
 }
@@ -664,15 +663,14 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     [self willChangeValueForKey:@"time"];
     [cachedTime release];
     cachedTime = [[VLCTime timeWithNumber:newTime] retain];
+
     [self didChangeValueForKey:@"time"];
 }
 
 - (void)mediaPlayerPositionChanged:(NSNumber *)newPosition
 {
-    if( [newPosition floatValue] - position < 0.005 && position - [newPosition floatValue] < 0.005 )
-        return; /* Forget that, this is too much precision for our uses */
     [self willChangeValueForKey:@"position"];
-    position = ((float)((int)([newPosition floatValue]*1000)))/1000.;
+    position = [newPosition floatValue];
     [self didChangeValueForKey:@"position"];
 }
 
