@@ -94,7 +94,7 @@ static const char *const ppsz_encodings[] = {
 };
 
 static const char *const ppsz_encoding_names[] = {
-    N_("Autodetect"),
+    N_("Auto"),
     N_("Universal (UTF-8)"),
     N_("Universal (UTF-16)"),
     N_("Universal (big endian UTF-16)"),
