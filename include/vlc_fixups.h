@@ -113,7 +113,7 @@ int strncasecmp (const char *, const char *, size_t);
 #endif
 
 #ifndef HAVE_STRCASESTR
-char *strcasestr (const char *, const char *
+char *strcasestr (const char *, const char *);
 #endif
 
 #ifndef HAVE_GMTIME_R
