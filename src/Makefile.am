@@ -172,7 +172,7 @@ libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
-libvlc_la_LIBADD = libvlccore.la
+libvlc_la_LIBADD = libvlccore.la ../compat/libcompat.la
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DMODULE_STRING=\"control\"
 libvlc_la_LDFLAGS = $(AM_LDFLAGS) \
