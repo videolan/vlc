@@ -491,6 +491,8 @@ __vlc_thread_join
 __vlc_thread_set_priority
 vlc_threadvar_create
 vlc_threadvar_delete
+vlc_threadvar_get
+vlc_threadvar_set
 vlc_ureduce
 VLC_Version
 vlc_wclosedir

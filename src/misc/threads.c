@@ -170,7 +170,7 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR dummy);
 static DWORD vlc_cancelable_wait (DWORD count, const HANDLE *handles,
                                   DWORD delay)
 {
-    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
     if (nfo == NULL)
     {
         /* Main thread - cannot be cancelled anyway */
@@ -674,6 +674,40 @@ void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 #endif
 }
 
+/**
+ * Sets a thread-local variable.
+ * @param key thread-local variable key (created with vlc_threadvar_create())
+ * @param value new value for the variable for the calling thread
+ * @return 0 on success, a system error code otherwise.
+ */
+int vlc_threadvar_set (vlc_threadvar_t key, void *value)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    return pthread_setspecific (key, value);
+#elif defined( UNDER_CE ) || defined( WIN32 )
+    return TlsSetValue (key, p_value) ? ENOMEM : 0;
+#else
+# error Unimplemented!
+#endif
+}
+
+/**
+ * Gets the value of a thread-local variable for the calling thread.
+ * This function cannot fail.
+ * @return the value associated with the given variable for the calling
+ * or NULL if there is no value.
+ */
+void *vlc_threadvar_get (vlc_threadvar_t key)
+{
+#if defined(LIBVLC_USE_PTHREAD)
+    return pthread_getspecific (key);
+#elif defined( UNDER_CE ) || defined( WIN32 )
+    return TlsGetValue (key);
+#else
+# error Unimplemented!
+#endif
+}
+
 #if defined (LIBVLC_USE_PTHREAD)
 #elif defined (WIN32)
 static unsigned __stdcall vlc_entry (void *data)
@@ -684,7 +718,7 @@ static unsigned __stdcall vlc_entry (void *data)
     cancel_data.cancel_event = self->cancel_event;
 #endif
 
-    vlc_threadvar_set (&cancel_key, &cancel_data);
+    vlc_threadvar_set (cancel_key, &cancel_data);
     self->data = self->entry (self->data);
     return 0;
 }
@@ -904,7 +938,7 @@ int vlc_savecancel (void)
     VLC_THREAD_ASSERT ("saving cancellation");
 
 #else
-    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
     if (nfo == NULL)
         return false; /* Main thread - cannot be cancelled anyway */
 
@@ -938,7 +972,7 @@ void vlc_restorecancel (int state)
 # endif
 
 #else
-    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
     assert (state == false || state == true);
 
     if (nfo == NULL)
@@ -963,7 +997,7 @@ void vlc_testcancel (void)
     pthread_testcancel ();
 
 #else
-    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
     if (nfo == NULL)
         return; /* Main thread - cannot be cancelled anyway */
 
@@ -1199,7 +1233,7 @@ void vlc_control_cancel (int cmd, ...)
 #else
     va_list ap;
 
-    vlc_cancel_t *nfo = vlc_threadvar_get (&cancel_key);
+    vlc_cancel_t *nfo = vlc_threadvar_get (cancel_key);
     if (nfo == NULL)
     {
 #ifdef WIN32
@@ -1210,7 +1244,7 @@ void vlc_control_cancel (int cmd, ...)
         if (nfo == NULL)
             return; /* Uho! Expect problems! */
         *nfo = VLC_CANCEL_INIT;
-        vlc_threadvar_set (&cancel_key, nfo);
+        vlc_threadvar_set (cancel_key, nfo);
 #endif
     }
 
