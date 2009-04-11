@@ -244,7 +244,8 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
 #endif
 
 #ifdef WIN32
-static vlc_mutex_t super_mutex;
+static vlc_mutex_t super_mutex, tls_mutex;
+static struct vlc_threadvar *tls_list = NULL;
 
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -255,11 +256,14 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     {
         case DLL_PROCESS_ATTACH:
             vlc_mutex_init (&super_mutex);
+            vlc_mutex_init (&tls_mutex);
             vlc_threadvar_create (&cancel_key, free);
             break;
 
         case DLL_PROCESS_DETACH:
             vlc_threadvar_delete( &cancel_key );
+            assert (tls_list == NULL);
+            vlc_mutex_destroy (&tls_mutex);
             vlc_mutex_destroy (&super_mutex);
             break;
     }
@@ -644,31 +648,83 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 #endif
 }
 
+
+#if defined (LIBVLC_USE_PTHREAD)
+#elif defined (WIN32)
+struct vlc_threadvar
+{
+    DWORD handle;
+    void (*cleanup) (void *);
+    struct vlc_threadvar *prev, *next;
+};
+
+static void vlc_threadvar_cleanup (void)
+{
+    struct vlc_threadvar *p;
+
+    vlc_mutex_lock (&tls_mutex);
+    for (p = tls_list; p != NULL; p = p->next)
+    {
+        void *value = TlsGetValue (p->handle);
+        if (value)
+            p->cleanup (value);
+    }
+    vlc_mutex_unlock (&tls_mutex);
+}
+#endif
+
 /*****************************************************************************
  * vlc_tls_create: create a thread-local variable
  *****************************************************************************/
 int vlc_threadvar_create( vlc_threadvar_t *p_tls, void (*destr) (void *) )
 {
-    int i_ret;
-
 #if defined( LIBVLC_USE_PTHREAD )
-    i_ret =  pthread_key_create( p_tls, destr );
+    return pthread_key_create( p_tls, destr );
+
 #elif defined( WIN32 )
-    /* FIXME: remember/use the destr() callback and stop leaking whatever */
-    *p_tls = TlsAlloc();
-    i_ret = (*p_tls == TLS_OUT_OF_INDEXES) ? EAGAIN : 0;
+    struct vlc_threadvar *tls = malloc (sizeof (*tls));
+    if (tls == NULL)
+       return ENOMEM;
+
+    tls->handle = TlsAlloc();
+    if (tls->handle == TLS_OUT_OF_INDEXES)
+    {
+        free (tls);
+        return EAGAIN;
+    }
+    tls->cleanup = destr;
+    tls->prev = NULL;
+    vlc_mutex_lock (&tls_mutex);
+    tls->next = tls_list;
+    if (tls_list)
+        tls_list->prev = tls;
+    tls_list = tls;
+    vlc_mutex_unlock (&tls_mutex);
+    *p_tls = tls;
+    return 0;
+
 #else
 # error Unimplemented!
 #endif
-    return i_ret;
 }
 
 void vlc_threadvar_delete (vlc_threadvar_t *p_tls)
 {
 #if defined( LIBVLC_USE_PTHREAD )
     pthread_key_delete (*p_tls);
+
 #elif defined( WIN32 )
-    TlsFree (*p_tls);
+    struct vlc_threadvar *tls = *p_tls;
+
+    TlsFree (tls->handle);
+    vlc_mutex_lock (&tls_mutex);
+    if (tls->prev)
+        tls->prev->next = tls->next;
+    if (tls->next)
+        tls->next->prev = tls->prev;
+    vlc_mutex_unlock (&tls_mutex);
+    free (tls);
+
 #else
 # error Unimplemented!
 #endif
@@ -685,7 +741,7 @@ int vlc_threadvar_set (vlc_threadvar_t key, void *value)
 #if defined(LIBVLC_USE_PTHREAD)
     return pthread_setspecific (key, value);
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    return TlsSetValue (key, p_value) ? ENOMEM : 0;
+    return TlsSetValue (key->handle, value) ? ENOMEM : 0;
 #else
 # error Unimplemented!
 #endif
@@ -702,7 +758,7 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 #if defined(LIBVLC_USE_PTHREAD)
     return pthread_getspecific (key);
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    return TlsGetValue (key);
+    return TlsGetValue (key->handle);
 #else
 # error Unimplemented!
 #endif
@@ -720,6 +776,7 @@ static unsigned __stdcall vlc_entry (void *data)
 
     vlc_threadvar_set (cancel_key, &cancel_data);
     self->data = self->entry (self->data);
+    vlc_threadvar_cleanup ();
     return 0;
 }
 #endif
@@ -1008,8 +1065,10 @@ void vlc_testcancel (void)
 # if defined (LIBVLC_USE_PTHREAD)
         pthread_exit (PTHREAD_CANCELLED);
 # elif defined (UNDER_CE)
+        vlc_threadvar_cleanup ();
         ExitThread(0);
 # elif defined (WIN32)
+        vlc_threadvar_cleanup ();
         _endthread ();
 # else
 #  error Not implemented!
