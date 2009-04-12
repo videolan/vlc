@@ -48,6 +48,25 @@ typedef struct
     int i_y;
 } spu_properties_t;
 
+typedef struct
+{
+    mtime_t i_pts;                                 /* presentation timestamp */
+
+    int   pi_offset[2];                              /* byte offsets to data */
+    uint16_t *p_data;
+
+    /* Color information */
+    bool b_palette;
+    uint8_t    pi_alpha[4];
+    uint8_t    pi_yuv[4][3];
+
+    /* Auto crop fullscreen subtitles */
+    bool b_auto_crop;
+    int i_y_top_offset;
+    int i_y_bottom_offset;
+
+} subpicture_data_t;
+
 static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *,
                              spu_properties_t * );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
@@ -80,32 +99,28 @@ static inline unsigned int AddNibble( unsigned int i_code,
 subpicture_t * ParsePacket( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    subpicture_data_t *p_spu_data;
     subpicture_t *p_spu;
+    subpicture_data_t spu_data;
     spu_properties_t spu_properties;
 
     /* Allocate the subpicture internal data. */
     p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu ) return NULL;
 
-    /* Rationale for the "p_spudec->i_rle_size * 4": we are going to
-     * expand the RLE stuff so that we won't need to read nibbles later
-     * on. This will speed things up a lot. Plus, we'll only need to do
-     * this stupid interlacing stuff once. */
-    p_spu_data = malloc( sizeof(subpicture_data_t) + 4 * p_sys->i_rle_size );
-    p_spu_data->p_data = (uint8_t *)p_spu_data + sizeof(subpicture_data_t);
-    p_spu_data->b_palette = false;
-    p_spu_data->b_auto_crop = false;
-    p_spu_data->i_y_top_offset = 0;
-    p_spu_data->i_y_bottom_offset = 0;
+    /* */
+    spu_data.p_data = NULL;
+    spu_data.b_palette = false;
+    spu_data.b_auto_crop = false;
+    spu_data.i_y_top_offset = 0;
+    spu_data.i_y_bottom_offset = 0;
 
-    p_spu_data->pi_alpha[0] = 0x00;
-    p_spu_data->pi_alpha[1] = 0x0f;
-    p_spu_data->pi_alpha[2] = 0x0f;
-    p_spu_data->pi_alpha[3] = 0x0f;
+    spu_data.pi_alpha[0] = 0x00;
+    spu_data.pi_alpha[1] = 0x0f;
+    spu_data.pi_alpha[2] = 0x0f;
+    spu_data.pi_alpha[3] = 0x0f;
 
     /* Get display time now. If we do it later, we may miss the PTS. */
-    p_spu_data->i_pts = p_sys->i_pts;
+    spu_data.i_pts = p_sys->i_pts;
 
     p_spu->i_original_picture_width =
         p_dec->fmt_in.subs.spu.i_original_frame_width;
@@ -115,31 +130,40 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     memset( &spu_properties, 0, sizeof(spu_properties) );
 
     /* Getting the control part */
-    if( ParseControlSeq( p_dec, p_spu, p_spu_data, &spu_properties ) )
+    if( ParseControlSeq( p_dec, p_spu, &spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
         decoder_DeleteSubpicture( p_dec, p_spu );
-        free( p_spu_data );
         return NULL;
     }
 
+    /* we are going to expand the RLE stuff so that we won't need to read
+     * nibbles later on. This will speed things up a lot. Plus, we'll only
+     * need to do this stupid interlacing stuff once.
+     *
+     * Rationale for the "p_spudec->i_rle_size * 4*sizeof(*spu_data.p_data)":
+     *  one byte gaves two nibbles and may be used twice (once per field)
+     * generating 4 codes.
+     */
+    spu_data.p_data = malloc( sizeof(*spu_data.p_data) * 2 * 2 * p_sys->i_rle_size );
+
     /* We try to display it */
-    if( ParseRLE( p_dec, p_spu_data, &spu_properties ) )
+    if( ParseRLE( p_dec, &spu_data, &spu_properties ) )
     {
         /* There was a parse error, delete the subpicture */
         decoder_DeleteSubpicture( p_dec, p_spu );
-        free( p_spu_data );
+        free( spu_data.p_data );
         return NULL;
     }
 
 #ifdef DEBUG_SPUDEC
     msg_Dbg( p_dec, "total size: 0x%x, RLE offsets: 0x%x 0x%x",
              p_sys->i_spu_size,
-             p_spu_data->pi_offset[0], p_spu_data->pi_offset[1] );
+             spu_data.pi_offset[0], spu_data.pi_offset[1] );
 #endif
 
-    Render( p_dec, p_spu, p_spu_data, &spu_properties );
-    free( p_spu_data );
+    Render( p_dec, p_spu, &spu_data, &spu_properties );
+    free( spu_data.p_data );
 
     return p_spu;
 }
@@ -412,7 +436,7 @@ static int ParseRLE( decoder_t *p_dec,
     unsigned int i_height = p_spu_properties->i_height;
     unsigned int i_x, i_y;
 
-    uint16_t *p_dest = (uint16_t *)p_spu_data->p_data;
+    uint16_t *p_dest = p_spu_data->p_data;
 
     /* The subtitles are interlaced, we need two offsets */
     unsigned int  i_id = 0;                   /* Start on the even SPU layer */
@@ -656,7 +680,7 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
 {
     uint8_t *p_p;
     int i_x, i_y, i_len, i_color, i_pitch;
-    uint16_t *p_source = (uint16_t *)p_spu_data->p_data;
+    const uint16_t *p_source = p_spu_data->p_data;
     video_format_t fmt;
     video_palette_t palette;
 
