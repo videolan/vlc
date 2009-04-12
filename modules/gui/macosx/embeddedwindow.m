@@ -27,7 +27,7 @@
  *****************************************************************************/
 
 /* DisableScreenUpdates, SetSystemUIMode, ... */
-#import <QuickTime/QuickTime.h>
+#import <Carbon/Carbon.h>
 
 #import "intf.h"
 #import "controls.h"
@@ -308,12 +308,16 @@
         }
  
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
-        DisableScreenUpdates();
-        [[self contentView] replaceSubview:o_view with:o_temp_view];
+		#ifndef __x86_64__
+			DisableScreenUpdates();
+		#endif
+		[[self contentView] replaceSubview:o_view with:o_temp_view];
         [o_temp_view setFrame:[o_view frame]];
         [o_fullscreen_window setContentView:o_view];
         [o_fullscreen_window makeKeyAndOrderFront:self];
-        EnableScreenUpdates();
+		#ifndef __x86_64__
+			EnableScreenUpdates();
+		#endif
     }
 
     /* We are in fullscreen (and no animation is running) */
@@ -500,7 +504,9 @@
 {
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_view disappearing of the screen during this operation */
-    DisableScreenUpdates();
+	#ifndef __x86_64__
+		DisableScreenUpdates();
+	#endif
     [o_view retain];
     [o_view removeFromSuperviewWithoutNeedingDisplay];
     [[self contentView] replaceSubview:o_temp_view with:o_view];
@@ -510,7 +516,9 @@
     if ([self isVisible])
         [super makeKeyAndOrderFront:self]; /* our version contains a workaround */
     [o_fullscreen_window orderOut: self];
-    EnableScreenUpdates();
+	#ifndef __x86_64__
+		EnableScreenUpdates();
+	#endif
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;

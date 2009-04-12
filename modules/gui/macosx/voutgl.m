@@ -63,8 +63,10 @@ struct vout_sys_t
     bool                b_saved_frame;
     NSRect              s_frame;
     bool                b_got_frame;
-    /* Mozilla plugin-related variables */
+
+    /* Mozilla plugin-related variables (not 64bit compatible) */
     bool                b_embedded;
+#ifndef __x86_64__
     AGLContext          agl_ctx;
     AGLDrawable         agl_drawable;
     int                 i_offx, i_offy;
@@ -73,6 +75,7 @@ struct vout_sys_t
     WindowGroupRef      winGroup;
     bool                b_clipped_out;
     Rect                clipBounds, viewBounds;
+#endif
 };
 
 /*****************************************************************************
@@ -87,6 +90,7 @@ static void Swap   ( vout_thread_t * p_vout );
 static int  Lock   ( vout_thread_t * p_vout );
 static void Unlock ( vout_thread_t * p_vout );
 
+#ifndef __x86_64__
 static int  aglInit   ( vout_thread_t * p_vout );
 static void aglEnd    ( vout_thread_t * p_vout );
 static int  aglManage ( vout_thread_t * p_vout );
@@ -94,6 +98,7 @@ static int  aglControl( vout_thread_t *, int, va_list );
 static void aglSwap   ( vout_thread_t * p_vout );
 static int  aglLock   ( vout_thread_t * p_vout );
 static void aglUnlock ( vout_thread_t * p_vout );
+#endif
 
 int OpenVideoGL  ( vlc_object_t * p_this )
 {
@@ -113,6 +118,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
+#ifndef __x86_64__
     var_Get( p_vout->p_libvlc, "drawable-agl", &value_drawable );
     if( value_drawable.i_int != 0 )
     {
@@ -167,6 +173,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
     }
     else
     {
+#endif
         NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
         p_vout->p_sys->b_embedded = false;
@@ -189,7 +196,9 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         p_vout->pf_swap   = Swap;
         p_vout->pf_lock   = Lock;
         p_vout->pf_unlock = Unlock;
+#ifndef __x86_64__
     }
+#endif
     p_vout->p_sys->b_got_frame = false;
 
     return VLC_SUCCESS;
@@ -201,6 +210,7 @@ void CloseVideoGL ( vlc_object_t * p_this )
 
     msg_Dbg( p_this, "Closing" );
 
+#ifndef __x86_64__
     if( p_vout->p_sys->b_embedded )
     {
         if( p_vout->p_sys->agl_ctx )
@@ -218,6 +228,17 @@ void CloseVideoGL ( vlc_object_t * p_this )
 
         [o_pool release];
     }
+#else
+	if(VLCIntf && vlc_object_alive (VLCIntf))
+    {
+        NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+        /* Close the window */
+        [p_vout->p_sys->o_vout_view performSelectorOnMainThread:@selector(closeVout) withObject:NULL waitUntilDone:YES];
+
+        [o_pool release];
+    }
+#endif
     /* Clean up */
     free( p_vout->p_sys );
 }
@@ -489,6 +510,8 @@ static void Unlock( vout_thread_t * p_vout )
 /*****************************************************************************
  * embedded AGL context implementation
  *****************************************************************************/
+
+#ifndef __x86_64__
 
 static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBounds );
 static void aglReshape( vout_thread_t * p_vout );
@@ -1068,3 +1091,4 @@ static void aglUnlock( vout_thread_t * p_vout )
     }
 }
 
+#endif

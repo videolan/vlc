@@ -34,11 +34,12 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>
 
-/* BeginFullScreen, EndFullScreen */
-#include <QuickTime/QuickTime.h>
-
 /* prevent system sleep */
 #import <CoreServices/CoreServices.h>
+#import <CoreServices/../Frameworks/OSServices.framework/Headers/Power.h>
+
+/* SystemUIMode */
+#import <Carbon/Carbon.h>
 
 #include <vlc_keys.h>
 

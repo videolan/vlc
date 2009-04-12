@@ -32,9 +32,10 @@
 #include "voutagl.h"
 
 /*****************************************************************************
- * embedded AGL context implementation
+ * embedded AGL context implementation (not 64bit compatible)
  *****************************************************************************/
 
+#ifndef __x86_64__
 static void aglSetViewport( vout_thread_t *p_vout, Rect viewBounds, Rect clipBounds );
 static void aglReshape( vout_thread_t * p_vout );
 static OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, EventRef event, void *userData);
@@ -672,3 +673,5 @@ void aglUnlock( vout_thread_t * p_vout )
     }
 #endif
 }
+
+#endif

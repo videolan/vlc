@@ -30,7 +30,7 @@
 #include "VLCMinimalVoutWindow.h"
 
 /* SetSystemUIMode, ... */
-#import <QuickTime/QuickTime.h>
+#import <Carbon/Carbon.h>
 
 #import <Cocoa/Cocoa.h>
 

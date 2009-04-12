@@ -23,7 +23,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
-#import <QuickTime/QuickTime.h>
+#import <Carbon/Carbon.h>
 
 #import "intf.h"                                          /* VLCApplication */
 #import "misc.h"
@@ -157,7 +157,7 @@ static NSMutableArray *blackoutWindows = NULL;
 
 - (CGDirectDisplayID)displayID
 {
-    return (CGDirectDisplayID)_screenNumber;
+	return (CGDirectDisplayID)[[[self deviceDescription] objectForKey: @"NSScreenNumber"] intValue];
 }
 
 - (void)blackoutOtherScreens
@@ -689,7 +689,7 @@ void _drawFrameInRect(NSRect frameRect)
         [newCell setNumberOfTickMarks:[oldCell numberOfTickMarks]];
         [newCell setEditable:[oldCell isEditable]];
         [newCell setEnabled:[oldCell isEnabled]];
-        [newCell setEntryType:[oldCell entryType]];
+        [newCell setFormatter:[oldCell formatter]];
         [newCell setHighlighted:[oldCell isHighlighted]];
         [newCell setTickMarkPosition:[oldCell tickMarkPosition]];
         [self setCell:newCell];

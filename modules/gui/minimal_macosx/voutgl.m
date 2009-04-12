@@ -57,7 +57,8 @@ int OpenVideoGL  ( vlc_object_t * p_this )
     i_drawable_agl = var_GetInteger( p_vout->p_libvlc, "drawable-agl" );
     i_drawable_gl = var_GetInteger( p_vout->p_libvlc, "drawable-gl" );
 
-    /* Are we in the mozilla plugin ? */
+    /* Are we in the mozilla plugin, which isn't 64bit compatible ? */
+#ifndef __x86_64__
     if( i_drawable_agl > 0 )
     {
         p_vout->pf_init             = aglInit;
@@ -79,6 +80,16 @@ int OpenVideoGL  ( vlc_object_t * p_this )
         p_vout->pf_lock   = cocoaglvoutviewLock;
         p_vout->pf_unlock = cocoaglvoutviewUnlock;
     }
+#else
+	/* Let's use the VLCOpenGLVoutView.m class */
+	p_vout->pf_init   = cocoaglvoutviewInit;
+	p_vout->pf_end    = cocoaglvoutviewEnd;
+	p_vout->pf_manage = cocoaglvoutviewManage;
+	p_vout->pf_control= cocoaglvoutviewControl;
+	p_vout->pf_swap   = cocoaglvoutviewSwap;
+	p_vout->pf_lock   = cocoaglvoutviewLock;
+	p_vout->pf_unlock = cocoaglvoutviewUnlock;
+#endif
     p_vout->p_sys->b_got_frame = false;
 
     return VLC_SUCCESS;

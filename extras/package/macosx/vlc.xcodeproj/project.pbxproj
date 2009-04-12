@@ -154,6 +154,7 @@
 		CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
 		CCB60A420E6E5E3F00407004 /* VLM.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCB60A400E6E5E3F00407004 /* VLM.nib */; };
+		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4B0E87C86D0034564A /* add_schedule.png */; };
 		CCD90F4F0E87C86D0034564A /* add_vod.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4C0E87C86D0034564A /* add_vod.png */; };
 		CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4D0E87C86D0034564A /* add_broadcast.png */; };
@@ -325,6 +326,7 @@
 		CCB60A3E0E6E5DD900407004 /* vlm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vlm.m; path = ../../../modules/gui/macosx/vlm.m; sourceTree = SOURCE_ROOT; };
 		CCB60A3F0E6E5DD900407004 /* vlm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vlm.h; path = ../../../modules/gui/macosx/vlm.h; sourceTree = SOURCE_ROOT; };
 		CCB60A410E6E5E3F00407004 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/VLM.nib; sourceTree = "<group>"; };
+		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
 		CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = embeddedwindow.m; path = ../../../modules/gui/macosx/embeddedwindow.m; sourceTree = SOURCE_ROOT; };
 		CCC895830D9A8A82005AE59C /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/access/eyetv.m; sourceTree = SOURCE_ROOT; };
@@ -393,6 +395,7 @@
 				CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */,
 				CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */,
 				CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */,
+				CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,6 +503,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CCBE999E0F922C51000705F8 /* CoreServices.framework */,
 				CC962E2C0CC7992800A56695 /* WebKit.framework */,
 				CC1941240B9C1F8400635F6B /* QTKit.framework */,
 				CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */,

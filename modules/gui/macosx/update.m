@@ -98,7 +98,7 @@ static VLCUpdate *_o_sharedInstance = nil;
     if( ![[NSUserDefaults standardUserDefaults] objectForKey: kPrefUpdateOnStartup] )
     {
         /* We don't have any preferences stored, ask the user. */
-        int res = NSRunInformationalAlertPanel( _NS("Do you want VLC to check for updates automatically?"),
+        NSInteger res = NSRunInformationalAlertPanel( _NS("Do you want VLC to check for updates automatically?"),
               _NS("You can change this option in VLC's update window later on."), _NS("Yes"), _NS("No"), nil );
         [self setShouldCheckUpdate: res];
     }
