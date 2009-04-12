@@ -43,7 +43,11 @@ src: using-src
 
 ifdef HAVE_DARWIN_OS
 
+ifdef HAVE_DARWIN_OS_ON_INTEL
+CONTRIBREV=6
+else
 CONTRIBREV=5
+endif
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	$(WGET) ftp://ftp.videolan.org/pub/videolan/testing/contrib/$@
 
