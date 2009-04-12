@@ -26,9 +26,6 @@
  * Preamble
  *****************************************************************************/
 
-/* DisableScreenUpdates, SetSystemUIMode, ... */
-#import <Carbon/Carbon.h>
-
 #import "intf.h"
 #import "controls.h"
 #import "vout.h"
@@ -287,7 +284,7 @@
             CGDisplayFade( token, 0.5, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
  
             if ([screen isMainScreen])
-                SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+                [NSMenu setMenuBarVisible:NO];
  
             [[self contentView] replaceSubview:o_view with:o_temp_view];
             [o_temp_view setFrame:[o_view frame]];
@@ -308,16 +305,12 @@
         }
  
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
-		#ifndef __x86_64__
-			DisableScreenUpdates();
-		#endif
+        NSEnableScreenUpdates();
 		[[self contentView] replaceSubview:o_view with:o_temp_view];
         [o_temp_view setFrame:[o_view frame]];
         [o_fullscreen_window setContentView:o_view];
         [o_fullscreen_window makeKeyAndOrderFront:self];
-		#ifndef __x86_64__
-			EnableScreenUpdates();
-		#endif
+        NSDisableScreenUpdates();
     }
 
     /* We are in fullscreen (and no animation is running) */
@@ -341,7 +334,7 @@
     }
  
     if ([screen isMainScreen])
-        SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+        [NSMenu setMenuBarVisible:NO];
 
     dict1 = [[NSMutableDictionary alloc] initWithCapacity:2];
     dict2 = [[NSMutableDictionary alloc] initWithCapacity:3];
@@ -431,7 +424,7 @@
         CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
 
         [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
-        SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+        [NSMenu setMenuBarVisible:YES];
 
         /* Will release the lock */
         [self hasEndedFullscreen];
@@ -449,7 +442,7 @@
     [self orderFront: self];
 
     [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
-    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    [NSMenu setMenuBarVisible:YES];
 
     if (o_fullscreen_anim1)
     {
@@ -504,9 +497,7 @@
 {
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_view disappearing of the screen during this operation */
-	#ifndef __x86_64__
-		DisableScreenUpdates();
-	#endif
+    NSDisableScreenUpdates();
     [o_view retain];
     [o_view removeFromSuperviewWithoutNeedingDisplay];
     [[self contentView] replaceSubview:o_temp_view with:o_view];
@@ -516,9 +507,7 @@
     if ([self isVisible])
         [super makeKeyAndOrderFront:self]; /* our version contains a workaround */
     [o_fullscreen_window orderOut: self];
-	#ifndef __x86_64__
-		EnableScreenUpdates();
-	#endif
+    NSEnableScreenUpdates();
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;

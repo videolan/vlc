@@ -29,9 +29,6 @@
 #include "VLCOpenGLVoutView.h"
 #include "VLCMinimalVoutWindow.h"
 
-/* SetSystemUIMode, ... */
-#import <Carbon/Carbon.h>
-
 #import <Cocoa/Cocoa.h>
 
 @implementation VLCMinimalVoutWindow
@@ -67,14 +64,14 @@
 {
     fullscreen = YES;
     initialFrame = [self frame];
-    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
+    [NSMenu setMenuBarVisible:NO];
     [self setFrame:[[self screen] frame] display:YES animate:YES];
 }
 
 - (void)leaveFullscreen
 {
     fullscreen = NO;
-    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
+    [NSMenu setMenuBarVisible:YES];
     [self setFrame:initialFrame display:YES animate:YES];
 }
 
