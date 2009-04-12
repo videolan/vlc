@@ -31,11 +31,11 @@
 #import <vlc_about.h>
 
 #ifdef __x86_64__
-#define PLATFORM "Intel"
+#define PLATFORM "Intel 64bit"
 #elif __i386__
-#define PLATFORM "Intel"
+#define PLATFORM "Intel 32bit"
 #else
-#define PLATFORM "PowerPC"
+#define PLATFORM "PowerPC 32bit"
 #endif
 
 /*****************************************************************************
