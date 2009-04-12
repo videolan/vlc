@@ -110,7 +110,7 @@
 
 - (IBAction)goToSpecificTime:(id)sender;
 
-- (id)getFSPanel;
+- (id)fspanel;
 
 @end
 

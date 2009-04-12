@@ -228,7 +228,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_prefs_window orderOut: self];
     [[o_basicFull_matrix cellAtRow:0 column:0] setState: NSOnState];
     [[o_basicFull_matrix cellAtRow:0 column:1] setState: NSOffState];
-    [[[VLCMain sharedInstance] getSimplePreferences] showSimplePrefs];
+    [[[VLCMain sharedInstance] simplePreferences] showSimplePrefs];
 }
 
 - (void)loadConfigTree
@@ -505,15 +505,15 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     NSRect frame;
 
     while( ( widget = [enumerator nextObject] ) )
-        if( i_max_label < [widget getLabelSize] )
-            i_max_label = [widget getLabelSize];
+        if( i_max_label < [widget labelSize] )
+            i_max_label = [widget labelSize];
 
     enumerator = [_subviews objectEnumerator];
     while( ( widget = [enumerator nextObject] ) )
     {
         int i_widget;
 
-        i_widget = [widget getViewType];
+        i_widget = [widget viewType];
         i_yPos += [VLCConfigControl calcVerticalMargin:i_widget lastItem:i_lastItem];
         [widget setYPos:i_yPos];
         frame = [widget frame];

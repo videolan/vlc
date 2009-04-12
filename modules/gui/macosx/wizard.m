@@ -477,7 +477,7 @@ static VLCWizard *_o_sharedInstance = nil;
     [o_wizard_window close];
 }
 
-- (id)getPlaylistWizard
+- (id)playlistWizard
 {
     return o_playlist_wizard;
 }
@@ -1665,7 +1665,7 @@ static VLCWizard *_o_sharedInstance = nil;
         @"Input"])
     {
         /* reset the wizard before going backwards. Otherwise, we might get
-         * unwanted behaviours in the Encap-Selection */
+         * unwanted behaviour in the Encap-Selection */
         [self resetWizard];
         /* show "Hello" */
         [o_tab_pageHolder selectTabViewItemAtIndex:0];

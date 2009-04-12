@@ -457,7 +457,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 }
 
 
-- (id)getSliderByIndex:(int)index
+- (id)sliderByIndex:(int)index
 {
     switch(index)
     {
@@ -495,7 +495,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 
 - (void)setValue:(float)value forSlider:(int)index
 {
-    id slider = [self getSliderByIndex:index];
+    id slider = [self sliderByIndex:index];
 
     if (slider != nil)
     {

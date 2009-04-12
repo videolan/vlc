@@ -318,7 +318,7 @@ clear:
     msg_Dbg( VLCIntf, "calling wizard");
 
     char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
-    [[[VLCMain sharedInstance] getWizard] initWithExtractValuesFrom:
+    [[[VLCMain sharedInstance] wizard] initWithExtractValuesFrom:
             [[NSNumber numberWithInt:
             (pp_bookmarks[i_first]->i_time_offset/1000000)] stringValue]
             to: [[NSNumber numberWithInt:
@@ -366,7 +366,7 @@ clear:
  * callback stuff
  *****************************************************************************/
 
--(id)getDataTable
+-(id)dataTable
 {
     return o_tbl_dataTable;
 }

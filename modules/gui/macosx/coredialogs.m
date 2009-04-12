@@ -237,13 +237,13 @@ void updateProgressPanel (void *priv, const char *text, float value)
     NSString *o_txt;
     if( text != NULL )
         o_txt = [NSString stringWithUTF8String: text];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarUpdateNotification" object:[[VLCMain sharedInstance] getCoreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_txt, @"Text", [NSNumber numberWithInt: ((int)(value * 1000.))], @"IntValue", nil]];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarUpdateNotification" object:[[VLCMain sharedInstance] coreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_txt, @"Text", [NSNumber numberWithInt: ((int)(value * 1000.))], @"IntValue", nil]];
 }
 
 void destroyProgressPanel (void *priv)
 {
     NSLog( @"we should destroy" );
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarDestroyNotification" object:[[VLCMain sharedInstance] getCoreDialogProvider] userInfo: nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarDestroyNotification" object:[[VLCMain sharedInstance] coreDialogProvider] userInfo: nil];
 }
 
 bool checkProgressPanel (void *priv)
@@ -258,7 +258,7 @@ bool checkProgressPanel (void *priv)
     b_progress_cancelled = YES;
 }
 
--(id)getErrorPanel
+-(id)errorPanel
 {
     return o_error_panel;
 }

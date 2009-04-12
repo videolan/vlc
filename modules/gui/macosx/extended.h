@@ -95,7 +95,7 @@
 - (IBAction)moreInfoVideoFilters:(id)sender;
 
 + (VLCExtended *)sharedInstance;
-- (BOOL)getConfigChanged;
+- (BOOL)configChanged;
 
 - (void)showPanel;
 - (void)initStrings;

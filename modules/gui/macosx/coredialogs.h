@@ -87,6 +87,6 @@
 -(void)showProgressDialog: (NSValue *)o_value;
 -(IBAction)progDialogAction:(id)sender;
 
--(id)getErrorPanel;
+-(id)errorPanel;
 
 @end

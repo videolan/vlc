@@ -84,7 +84,7 @@
 }
 
 - (void)setMRL:(NSArray *)o_mrl_string;
-- (NSArray *)getMRL;
+- (NSArray *)mrl;
 - (void)setTranscode:(NSString *)o_transcode_string;
 
 - (void)initStrings;

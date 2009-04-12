@@ -82,7 +82,7 @@
 
         case NSEnterCharacter:
         case NSCarriageReturnCharacter:
-            [(VLCPlaylist *)[[VLCMain sharedInstance] getPlaylist] playItem:self];
+            [(VLCPlaylist *)[[VLCMain sharedInstance] playlist] playItem:self];
             break;
 
         default:
@@ -478,8 +478,8 @@
     // TODO Find a way to keep the dict size to a minimum
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
-    [[[[VLCMain sharedInstance] getWizard] getPlaylistWizard] reloadOutlineView];
-    [[[[VLCMain sharedInstance] getBookmarks] getDataTable] reloadData];
+    [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
+    [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
     playlist_t *p_playlist = pl_Hold( VLCIntf );
 
@@ -510,13 +510,13 @@
     bool loop = var_GetBool( p_playlist, "loop" );
     bool repeat = var_GetBool( p_playlist, "repeat" );
     if( repeat )
-        [[[VLCMain sharedInstance] getControls] repeatOne];
+        [[[VLCMain sharedInstance] controls] repeatOne];
     else if( loop )
-        [[[VLCMain sharedInstance] getControls] repeatAll];
+        [[[VLCMain sharedInstance] controls] repeatAll];
     else
-        [[[VLCMain sharedInstance] getControls] repeatOff];
+        [[[VLCMain sharedInstance] controls] repeatOff];
 
-    [[[VLCMain sharedInstance] getControls] shuffle];
+    [[[VLCMain sharedInstance] controls] shuffle];
 
     pl_Release( VLCIntf );
 }
@@ -553,7 +553,7 @@
         if( [[VLCMain sharedInstance] isPlaylistCollapsed] == NO )
         {
             /* update our info-panel to reflect the new item, if we aren't collapsed */
-            [[[VLCMain sharedInstance] getInfo] updatePanelWithItem:p_item->p_input];
+            [[[VLCMain sharedInstance] info] updatePanelWithItem:p_item->p_input];
         }
     }
 }

@@ -379,18 +379,18 @@
 
 - (void)hasBecomeFullscreen
 {
-    [o_fullscreen_window makeFirstResponder: [[[VLCMain sharedInstance] getControls] voutView]];
+    [o_fullscreen_window makeFirstResponder: [[[VLCMain sharedInstance] controls] voutView]];
 
     [o_fullscreen_window makeKeyWindow];
     [o_fullscreen_window setAcceptsMouseMovedEvents: TRUE];
 
     /* tell the fspanel to move itself to front next time it's triggered */
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
+    [[[[VLCMain sharedInstance] controls] fspanel] setVoutWasUpdated: (int)[[o_fullscreen_window screen] displayID]];
 
     if([self isVisible])
         [super orderOut: self];
 
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setActive: nil];
+    [[[[VLCMain sharedInstance] controls] fspanel] setActive: nil];
 
     b_fullscreen = YES;
     [self unlockFullscreenAnimation];
@@ -430,7 +430,7 @@
         CGAcquireDisplayFadeReservation(kCGMaxDisplayReservationInterval, &token);
         CGDisplayFade( token, 0.3, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, 0, 0, 0, YES );
 
-        [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
+        [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
         SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
         /* Will release the lock */
@@ -448,7 +448,7 @@
     [self setAlphaValue: 0.0];
     [self orderFront: self];
 
-    [[[[VLCMain sharedInstance] getControls] getFSPanel] setNonActive: nil];
+    [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
     SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
     if (o_fullscreen_anim1)

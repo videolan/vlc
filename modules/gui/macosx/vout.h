@@ -34,11 +34,11 @@
     NSMutableArray * o_embedded_array;
 }
 
-- (id)getEmbeddedVout;
+- (id)embeddedVout;
 - (void)releaseEmbeddedVout: (id)o_vout_view;
 - (void)addEmbeddedVout: (id)o_vout_view;
 - (BOOL)windowContainsEmbedded: (id)o_window;
-- (id)getViewForWindow: (id)o_window;
+- (id)viewForWindow: (id)o_window;
 
 @end
 
@@ -70,11 +70,11 @@
 - (void)toggleFullscreen;
 - (BOOL)isFullscreen;
 - (void)snapshot;
-- (id)getWindow;
+- (id)voutWindow;
 
 + (id)voutView: (vout_thread_t *)p_vout subView: (NSView *) view
          frame: (NSRect *) s_frame;
-+ (vout_thread_t *)getRealVout: (vout_thread_t *)p_vout;
++ (vout_thread_t *)realVout: (vout_thread_t *)p_vout;
 
 - (void)enterFullscreen;
 - (void)leaveFullscreen;

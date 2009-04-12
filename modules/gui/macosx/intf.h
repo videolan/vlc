@@ -42,7 +42,7 @@
  *****************************************************************************/
 unsigned int CocoaKeyToVLC( unichar i_key );
 
-#define VLCIntf [[VLCMain sharedInstance] getIntf]
+#define VLCIntf [[VLCMain sharedInstance] intf]
 
 #define _NS(s) [[VLCMain sharedInstance] localizedString: _(s)]
 /* Get an alternate version of the string.
@@ -341,25 +341,25 @@ static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
 
 + (VLCMain *)sharedInstance;
 
-- (intf_thread_t *)getIntf;
+- (intf_thread_t *)intf;
 - (void)setIntf:(intf_thread_t *)p_mainintf;
 
 - (void)controlTintChanged;
 
-- (id)getControls;
-- (id)getSimplePreferences;
-- (id)getPreferences;
-- (id)getPlaylist;
+- (id)controls;
+- (id)simplePreferences;
+- (id)preferences;
+- (id)playlist;
 - (BOOL)isPlaylistCollapsed;
-- (id)getInfo;
-- (id)getWizard;
-- (id)getBookmarks;
-- (id)getEmbeddedList;
-- (id)getCoreDialogProvider;
-- (id)getMainIntfPgbar;
-- (id)getControllerWindow;
-- (id)getVoutMenu;
-- (id)getEyeTVController;
+- (id)info;
+- (id)wizard;
+- (id)bookmarks;
+- (id)embeddedList;
+- (id)coreDialogProvider;
+- (id)mainIntfPgbar;
+- (id)controllerWindow;
+- (id)voutMenu;
+- (id)eyeTVController;
 - (void)applicationWillTerminate:(NSNotification *)notification;
 - (NSString *)localizedString:(const char *)psz;
 - (char *)delocalizeString:(NSString *)psz;

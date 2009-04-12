@@ -64,5 +64,5 @@
 
 - (void)initStrings;
 - (void)showBookmarks;
-- (id)getDataTable;
+- (id)dataTable;
 @end

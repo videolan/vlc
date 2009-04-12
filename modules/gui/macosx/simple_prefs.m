@@ -626,7 +626,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
         [o_sprefs_win orderOut: self];
         [[o_sprefs_basicFull_matrix cellAtRow:0 column:0] setState: NSOffState];
         [[o_sprefs_basicFull_matrix cellAtRow:0 column:1] setState: NSOnState];
-        [[[VLCMain sharedInstance] getPreferences] showPrefs];
+        [[[VLCMain sharedInstance] preferences] showPrefs];
     }
     else
         msg_Warn( p_intf, "unknown buttonAction sender" );
@@ -1276,7 +1276,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( key )
     {
         i_key |= CocoaKeyToVLC( key );
-        return [[[VLCMain sharedInstance] getSimplePreferences] changeHotkeyTo: i_key];
+        return [[[VLCMain sharedInstance] simplePreferences] changeHotkeyTo: i_key];
     }
     return FALSE;
 }
@@ -1292,6 +1292,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (void)changeFont:(id)sender
 {
-    [[[VLCMain sharedInstance] getSimplePreferences] changeFont: sender];
+    [[[VLCMain sharedInstance] simplePreferences] changeFont: sender];
 }
 @end

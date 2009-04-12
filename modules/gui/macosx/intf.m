@@ -234,7 +234,7 @@ static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t p
     const dialog_fatal_t *p_dialog = (const dialog_fatal_t *)value.p_address;
 
     NSValue *o_value = [NSValue valueWithPointer:p_dialog];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface getCoreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface coreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
 
     [o_pool release];
     return VLC_SUCCESS;
@@ -314,7 +314,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     p_intf = p_mainintf;
 }
 
-- (intf_thread_t *)getIntf {
+- (intf_thread_t *)intf {
     return p_intf;
 }
 
@@ -745,7 +745,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     config_PutInt( p_intf->p_libvlc, "volume", i_lastShownVolume );
 
     /* save the prefs if they were changed in the extended panel */
-    if(o_extended && [o_extended getConfigChanged])
+    if(o_extended && [o_extended configChanged])
     {
         [o_extended savePrefs];
     }
@@ -1315,9 +1315,8 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 #pragma mark -
 #pragma mark Other objects getters
-// FIXME: this is ugly and does not respect cocoa naming scheme
 
-- (id)getControls
+- (id)controls
 {
     if( o_controls )
         return o_controls;
@@ -1325,7 +1324,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getSimplePreferences
+- (id)simplePreferences
 {
     if( !o_sprefs )
         return nil;
@@ -1336,7 +1335,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return o_sprefs;
 }
 
-- (id)getPreferences
+- (id)preferences
 {
     if( !o_prefs )
         return nil;
@@ -1347,7 +1346,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return o_prefs;
 }
 
-- (id)getPlaylist
+- (id)playlist
 {
     if( o_playlist )
         return o_playlist;
@@ -1360,7 +1359,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return ![o_btn_playlist state];
 }
 
-- (id)getInfo
+- (id)info
 {
     if( o_info )
         return o_info;
@@ -1368,7 +1367,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getWizard
+- (id)wizard
 {
     if( o_wizard )
         return o_wizard;
@@ -1376,12 +1375,12 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getVLM
+- (id)vlm
 {
     return o_vlm;
 }
 
-- (id)getBookmarks
+- (id)bookmarks
 {
     if( o_bookmarks )
         return o_bookmarks;
@@ -1389,7 +1388,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getEmbeddedList
+- (id)embeddedList
 {
     if( o_embedded_list )
         return o_embedded_list;
@@ -1397,7 +1396,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getCoreDialogProvider
+- (id)coreDialogProvider
 {
     if( o_coredialogs )
         return o_coredialogs;
@@ -1405,7 +1404,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getMainIntfPgbar
+- (id)mainIntfPgbar
 {
     if( o_main_pgbar )
         return o_main_pgbar;
@@ -1413,19 +1412,19 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)getControllerWindow
+- (id)controllerWindow
 {
     if( o_window )
         return o_window;
     return nil;
 }
 
-- (id)getVoutMenu
+- (id)voutMenu
 {
     return o_vout_menu;
 }
 
-- (id)getEyeTVController
+- (id)eyeTVController
 {
     if( o_eyetv )
         return o_eyetv;
@@ -1596,7 +1595,7 @@ static void manage_cleanup( void * args )
             if( [self isPlaylistCollapsed] == YES )
             {
                 PL_LOCK;
-                [[self getInfo] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
+                [[self info] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
                 PL_UNLOCK;
             }
 
@@ -1633,8 +1632,8 @@ static void manage_cleanup( void * args )
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
         [o_timefield setStringValue: @"00:00"];
-        [[[self getControls] getFSPanel] setStreamPos: 0 andTime: @"00:00"];
-        [[[self getControls] getFSPanel] setSeekable: b_seekable];
+        [[[self controls] fspanel] setStreamPos: 0 andTime: @"00:00"];
+        [[[self controls] fspanel] setSeekable: b_seekable];
 
         [o_embedded_window setSeekable: b_seekable];
 
@@ -1662,7 +1661,7 @@ static void manage_cleanup( void * args )
     if( p_intf->p_sys->b_intf_show )
     {
         if( [[o_controls voutView] isFullscreen] && config_GetInt( VLCIntf, "macosx-fspanel" ) )
-            [[o_controls getFSPanel] fadeIn];
+            [[o_controls fspanel] fadeIn];
         else
             [o_window makeKeyAndOrderFront: self];
 
@@ -1688,7 +1687,7 @@ static void manage_cleanup( void * args )
             free(name);
 
             [self setScrollField: aString stopAfter:-1];
-            [[[self getControls] getFSPanel] setStreamTitle: aString];
+            [[[self controls] fspanel] setStreamTitle: aString];
 
             [[o_controls voutView] updateTitle];
  
@@ -1720,7 +1719,7 @@ static void manage_cleanup( void * args )
                 o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
 
             [o_timefield setStringValue: o_time];
-            [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
+            [[[self controls] fspanel] setStreamPos: f_updated andTime: o_time];
             [o_embedded_window setTime: o_time position: f_updated];
         }
 
@@ -1756,7 +1755,7 @@ static void manage_cleanup( void * args )
         i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
         [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
         [o_volumeslider setEnabled: TRUE];
-        [[[self getControls] getFSPanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
+        [[[self controls] fspanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
         p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
         p_intf->p_sys->b_volume_update = FALSE;
     }
@@ -1912,7 +1911,7 @@ end:
             o_temp = [NSString stringWithUTF8String:p_item->p_input->psz_name];
         PL_UNLOCK;
         [self setScrollField: o_temp stopAfter:-1];
-        [[[self getControls] getFSPanel] setStreamTitle: o_temp];
+        [[[self controls] fspanel] setStreamTitle: o_temp];
         vlc_object_release( p_input );
         pl_Release( p_intf );
         return;
@@ -1925,7 +1924,7 @@ end:
 {
     if( i_status == PLAYING_S )
     {
-        [[[self getControls] getFSPanel] setPause];
+        [[[self controls] fspanel] setPause];
         [o_btn_play setImage: o_img_pause];
         [o_btn_play setAlternateImage: o_img_pause_pressed];
         [o_btn_play setToolTip: _NS("Pause")];
@@ -1935,7 +1934,7 @@ end:
     }
     else
     {
-        [[[self getControls] getFSPanel] setPlay];
+        [[[self controls] fspanel] setPlay];
         [o_btn_play setImage: o_img_play];
         [o_btn_play setAlternateImage: o_img_play_pressed];
         [o_btn_play setToolTip: _NS("Play")];
@@ -2005,7 +2004,7 @@ end:
             o_time = [NSString stringWithUTF8String: secstotimestr( psz_time, (time.i_time / 1000000) )];
 
         [o_timefield setStringValue: o_time];
-        [[[self getControls] getFSPanel] setStreamPos: f_updated andTime: o_time];
+        [[[self controls] fspanel] setStreamPos: f_updated andTime: o_time];
         [o_embedded_window setTime: o_time position: f_updated];
         vlc_object_release( p_input );
     }
@@ -2437,7 +2436,7 @@ end:
 
 - (IBAction)viewErrorsAndWarnings:(id)sender
 {
-    [[[self getCoreDialogProvider] getErrorPanel] showPanel];
+    [[[self coreDialogProvider] errorPanel] showPanel];
 }
 
 - (IBAction)showMessagesPanel:(id)sender
@@ -2633,7 +2632,7 @@ end:
     else
         [o_btn_playlist setState: YES];
 
-    [[self getPlaylist] outlineViewSelectionDidChange: NULL];
+    [[self playlist] outlineViewSelectionDidChange: NULL];
 }
 
 - (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)proposedFrameSize

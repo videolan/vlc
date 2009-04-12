@@ -357,7 +357,7 @@ static void Unlock( vout_thread_t * p_vout )
         p_vout->p_sys->s_frame.size =
             [p_vout->p_sys->o_vout_view frame].size;
         p_vout->p_sys->s_frame.origin =
-            [[p_vout->p_sys->o_vout_view getWindow ]frame].origin;
+            [[p_vout->p_sys->o_vout_view voutWindow]frame].origin;
         p_vout->p_sys->b_saved_frame = true;
     }
 
@@ -673,7 +673,7 @@ static int aglManage( vout_thread_t * p_vout )
             if( !p_vout->p_sys->theWindow )
             {
                 /* Create a window */
-                WindowAttributes    windowAttrs;
+                WindowAttributes windowAttrs;
 
                 windowAttrs = kWindowStandardDocumentAttributes
                             | kWindowStandardHandlerAttribute

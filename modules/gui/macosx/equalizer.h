@@ -56,7 +56,7 @@
 - (void)awakeFromNib;
 
 - (void)setValue: (float)value forSlider: (int)index;
-- (id)getSliderByIndex: (int)index;
+- (id)sliderByIndex: (int)index;
 - (void)setBandSlidersValues: (float *)values;
 - (void)initBandSliders;
 

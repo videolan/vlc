@@ -178,7 +178,7 @@
 - (void)resetWizard;
 - (void)createOpts;
 - (void)rebuildCodecMenus;
-- (id)getPlaylistWizard;
+- (id)playlistWizard;
 - (void)initWithExtractValuesFrom: (NSString *)from to: (NSString *)to ofItem: (NSString *)item;
 
 @end

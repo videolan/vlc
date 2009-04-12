@@ -863,17 +863,17 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     return p_control;
 }
 
-- (NSString *)getName
+- (NSString *)name
 {
     return [[VLCMain sharedInstance] localizedString: psz_name];
 }
 
-- (int)getType
+- (int)type
 {
     return i_type;
 }
 
-- (int)getViewType
+- (int)viewType
 {
     return i_view_type;
 }
@@ -926,7 +926,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     }
 }
 
-- (int)getLabelSize
+- (int)labelSize
 {
     return [o_label frame].size.width;
 }
@@ -1132,7 +1132,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                                         localizedString: (char *)p_item->psz_longtext ] toWidth: PREFS_WRAP];
 
         /* is it a directory */
-        b_directory = ( [self getType] == CONFIG_ITEM_DIRECTORY ) ? YES : NO;
+        b_directory = ( [self type] == CONFIG_ITEM_DIRECTORY ) ? YES : NO;
 
         /* add the label */
         if( p_item->psz_text )

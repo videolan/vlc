@@ -433,7 +433,7 @@ static NSMutableArray *blackoutWindows = NULL;
         return TRUE;
 
     return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event] ||
-           [(VLCControls *)[[VLCMain sharedInstance] getControls] keyEvent:o_event];
+           [(VLCControls *)[[VLCMain sharedInstance] controls] keyEvent:o_event];
 }
 
 @end
@@ -498,7 +498,7 @@ static NSMutableArray *blackoutWindows = NULL;
                 o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
-            [(VLCPlaylist *)[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            [(VLCPlaylist *)[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
             return YES;
         }
     }
@@ -578,9 +578,9 @@ static NSMutableArray *blackoutWindows = NULL;
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
             if( b_autoplay )
-                [[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:NO];
             else
-                [[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:YES];
+                [[[VLCMain sharedInstance] playlist] appendArray: o_array atPos: -1 enqueue:YES];
             return YES;
         }
     }

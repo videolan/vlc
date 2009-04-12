@@ -162,14 +162,14 @@
 {
     id window;
     id voutView = nil;
-    id embeddedViewList = [[VLCMain sharedInstance] getEmbeddedList];
+    id embeddedViewList = [[VLCMain sharedInstance] embeddedList];
     NSEnumerator *enumerator = [[NSApp orderedWindows] objectEnumerator];
     while( !voutView && ( window = [enumerator nextObject] ) )
     {
         /* We have an embedded vout */
         if( [embeddedViewList windowContainsEmbedded: window] )
         {
-            voutView = [embeddedViewList getViewForWindow: window];
+            voutView = [embeddedViewList viewForWindow: window];
         }
         /* We have a detached vout */
         else if( [[window className] isEqualToString: @"VLCVoutWindow"] )
@@ -485,7 +485,7 @@
                 [o_vout_view toggleFloatOnTop];
             else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
             {
-                id o_window = [o_vout_view getWindow];
+                id o_window = [o_vout_view voutWindow];
                 if( ![o_window isZoomed] )
                     [o_window performZoom:self];
             }
@@ -960,7 +960,7 @@
     }
 }
 
-- (id)getFSPanel
+- (id)fspanel
 {
     if( o_fs_panel )
         return o_fs_panel;
@@ -1074,7 +1074,7 @@
             while( (o_window = [o_enumerator nextObject]))
             {
                 if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
-                            [[[VLCMain sharedInstance] getEmbeddedList]
+                            [[[VLCMain sharedInstance] embeddedList]
                             windowContainsEmbedded: o_window])
                 {
                     bEnabled = TRUE;
@@ -1179,7 +1179,7 @@
 - (void)mouseDown: (NSEvent *)ourEvent
 {
     if( [ourEvent clickCount] > 1 )
-        [[[VLCMain sharedInstance] getControls] goToSpecificTime: nil];
+        [[[VLCMain sharedInstance] controls] goToSpecificTime: nil];
     else
         [[VLCMain sharedInstance] timeFieldWasClicked: self];
 }

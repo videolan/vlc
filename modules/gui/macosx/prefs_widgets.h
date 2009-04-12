@@ -40,16 +40,16 @@
 + (VLCConfigControl *)newControl: (module_config_t *)_p_item
         withView: (NSView *)o_parent_view;
 - (id)initWithFrame: (NSRect)frame item: (module_config_t *)p_item;
-- (NSString *)getName;
-- (int)getType;
-- (int)getViewType;
+- (NSString *)name;
+- (int)type;
+- (int)viewType;
 - (BOOL)isAdvanced;
 - (void)setYPos:(int)i_yPos;
 - (int)intValue;
 - (float)floatValue;
 - (char *)stringValue;
 - (void)applyChanges;
-- (int)getLabelSize;
+- (int)labelSize;
 - (void) alignWithXPosition:(int)i_xPos;
 static NSMenu   *o_keys_menu = nil;
 

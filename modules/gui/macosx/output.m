@@ -59,7 +59,7 @@
     o_mrl = [o_mrl_array copy];
 }
 
-- (NSArray *)getMRL
+- (NSArray *)mrl
 {
     return [o_mrl copy];
 }

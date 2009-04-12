@@ -180,7 +180,7 @@ static VLCExtended *_o_sharedInstance = nil;
     [self initStrings];
 }
 
-- (BOOL)getConfigChanged
+- (BOOL)configChanged
 {
     return o_config_changed;
 }
@@ -416,13 +416,13 @@ static VLCExtended *_o_sharedInstance = nil;
 
     if( p_vout != NULL )
     {
-        p_real_vout = [VLCVoutView getRealVout: p_vout];
+        p_real_vout = [VLCVoutView realVout: p_vout];
         var_Set( p_real_vout, "macosx-opaqueness", val );
 
         while ((o_window = [o_enumerator nextObject]))
         {
             if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
-                [[[VLCMain sharedInstance] getEmbeddedList]
+                [[[VLCMain sharedInstance] embeddedList]
                                     windowContainsEmbedded: o_window])
             {
                 [o_window setAlphaValue: val.f_float];
