@@ -39,12 +39,41 @@
 # error Window CE support for *printf needs fixing.
 #endif
 
+#if !defined (HAVE_GMTIME_R) || !defined (HAVE_LOCALTIME_R)
+# include <time.h> /* time_t */
+#endif
+
+#ifndef HAVE_LLDIV
+typedef struct
+{
+    long long quot; /* Quotient. */
+    long long rem;  /* Remainder. */
+} lldiv_t;
+#endif
+
+#ifndef HAVE_REWIND
+# include <stdio.h> /* FILE */
+#endif
+
+#if !defined (HAVE_STRLCPY) || \
+    !defined (HAVE_STRNDUP) || \
+    !defined (HAVE_STRNLEN)
+# include <stddef.h> /* size_t */
+#endif
+
+#ifndef HAVE_VASPRINTF
+# include <stdarg.h> /* va_list */
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef HAVE_STRDUP
 char *strdup (const char *);
 #endif
 
 #ifndef HAVE_VASPRINTF
-# include <stdarg.h>
 int vasprintf (char **, const char *, va_list);
 #endif
 
@@ -53,17 +82,14 @@ int asprintf (char **, const char *, ...);
 #endif
 
 #ifndef HAVE_STRNLEN
-# include <stddef.h>
 size_t strnlen (const char *, size_t);
 #endif
 
 #ifndef HAVE_STRNDUP
-# include <stddef.h>
 char *strndup (const char *, size_t);
 #endif
 
 #ifndef HAVE_STRLCPY
-# include <stddef.h>
 size_t strlcpy (char *, const char *, size_t);
 #endif
 
@@ -88,20 +114,7 @@ long long atoll (const char *);
 #endif
 
 #ifndef HAVE_LLDIV
-typedef struct {
-    long long quot; /* Quotient. */
-    long long rem;  /* Remainder. */
-} lldiv_t;
-
 lldiv_t lldiv (long long, long long);
-#endif
-
-#ifndef HAVE_GETENV
-static inline char *getenv (const char *name)
-{
-    (void)name;
-    return NULL;
-}
 #endif
 
 #ifndef HAVE_STRCASECMP
@@ -117,18 +130,27 @@ char *strcasestr (const char *, const char *);
 #endif
 
 #ifndef HAVE_GMTIME_R
-# include <time.h>
 struct tm *gmtime_r (const time_t *, struct tm *);
 #endif
 
 #ifndef HAVE_LOCALTIME_R
-# include <time.h>
 struct tm *localtime_r (const time_t *, struct tm *);
 #endif
 
 #ifndef HAVE_REWIND
-# include <stdio.h>
 void rewind (FILE *);
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
+
+#ifndef HAVE_GETENV
+static inline char *getenv (const char *name)
+{
+    (void)name;
+    return NULL;
+}
 #endif
 
 /* Alignment of critical static data structures */
