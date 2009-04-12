@@ -305,12 +305,12 @@
         }
  
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
-        NSEnableScreenUpdates();
+        NSDisableScreenUpdates();
 		[[self contentView] replaceSubview:o_view with:o_temp_view];
         [o_temp_view setFrame:[o_view frame]];
         [o_fullscreen_window setContentView:o_view];
         [o_fullscreen_window makeKeyAndOrderFront:self];
-        NSDisableScreenUpdates();
+        NSEnableScreenUpdates();
     }
 
     /* We are in fullscreen (and no animation is running) */
