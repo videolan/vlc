@@ -270,26 +270,6 @@ case "${host_os}" in
         enable_xvideo="no"
         echo "  Assuming --disable-xvideo"
     fi
-    if test ".`uname -p`" = ".i386"; then
-        dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
-        dnl without hacking it a lot, we disable mmx and sse.
-        dnl (that bug is about ld being unable to handle
-        dnl text relocation)
-        save_cflags="$CFLAGS"
-        CFLAGS="$CFLAGS -dynamiclib -single_module -read_only_relocs suppress"
-        AC_TRY_LINK(
-            [int a;], [asm("movq _a,%mm0\n");],
-            ac_ld_does_not_support_text_reloc=no,
-            ac_ld_does_not_support_text_reloc=yes)
-        CFLAGS="$save_cflags"
-
-        if test "x$ac_ld_does_not_support_text_reloc" = "xyes"; then
-            enable_mmx="no"
-            echo "  Assuming --disable-mmx (due to a bug in ld)"
-            enable_sse="no"
-            echo "  Assuming --disable-sse (due to a bug in ld)"
-        fi
-    fi
     dnl
     dnl  Check for Mac OS X SDK settings
     dnl
@@ -315,6 +295,28 @@ case "${host_os}" in
         OBJCFLAGS_save="${OBJCFLAGS_save} -DMACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}"; OBJCFLAGS="${OBJCFLAGS_save}"
         MACOSX_DEPLOYMENT_TARGET=${with_macosx_version_min}
         export MACOSX_DEPLOYMENT_TARGET
+    fi
+    ;;
+  darwin9*)
+    if (test ".`uname -p`" = ".i386"); then
+        dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
+        dnl without hacking it a lot, we disable mmx and sse.
+        dnl (that bug is about ld being unable to handle
+        dnl text relocation)
+        save_cflags="$CFLAGS"
+        CFLAGS="$CFLAGS -dynamiclib -single_module -read_only_relocs suppress"
+        AC_TRY_LINK(
+            [int a;], [asm("movq _a,%mm0\n");],
+            ac_ld_does_not_support_text_reloc=no,
+            ac_ld_does_not_support_text_reloc=yes)
+        CFLAGS="$save_cflags"
+
+        if test "x$ac_ld_does_not_support_text_reloc" = "xyes"; then
+            enable_mmx="no"
+            echo "  Assuming --disable-mmx (due to a bug in ld)"
+            enable_sse="no"
+            echo "  Assuming --disable-sse (due to a bug in ld)"
+        fi
     fi
     ;;
   *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
@@ -3304,10 +3306,8 @@ dnl
 dnl  QuickTime plugin
 dnl
 AC_ARG_ENABLE(quicktime,
-  [  --enable-quicktime      QuickTime module (default enabled on MacOS X)])
-if test "${enable_quicktime}" != "no" &&
-  (test "${SYS}" = "darwin" || test "${enable_quicktime}" = "yes")
-then
+  [  --enable-quicktime      QuickTime module (deprecated)])
+if test "${enable_quicktime}" = "yes"; then
   if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([quicktime])
   else
@@ -5150,9 +5150,9 @@ then
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer qtcapture],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
-  VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,QuickTime])
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
   VLC_ADD_LDFLAGS([macosx qtcapture],                 [-Wl,-framework,QTKit])
