@@ -221,18 +221,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->codec.b_use_word && !p_sys->b_big_endian && p_block_in->i_buffer > 0 )
     {
         /* Convert to big endian */
-#ifdef HAVE_SWAB
         swab( p_block_in->p_buffer, p_block_in->p_buffer, p_block_in->i_buffer );
-#else
-        uint8_t *p_tmp = p_block_in->p_buffer;
-        for( int i = p_block_in->i_buffer / 2 ; i-- ; )
-        {
-            uint8_t tmp = p_tmp[0];
-            p_tmp[0] = p_tmp[1];
-            p_tmp[1] = tmp;
-            p_tmp += 2;
-        }
-#endif
     }
 
     p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? 1 : 0;

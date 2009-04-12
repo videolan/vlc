@@ -551,28 +551,14 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int16_t * p_in;
     float * p_out = (float *)p_out_buf->p_buffer + i - 1;
 
-#ifdef HAVE_SWAB
     int16_t p_swabbed[i];
 
     swab( p_in_buf->p_buffer, p_swabbed, i * sizeof(int16_t) );
     p_in = p_swabbed + i - 1;
 
-#else
-    uint8_t p_tmp[2];
-    p_in = (int16_t *)p_in_buf->p_buffer + i - 1;
-#endif
 
     while( i-- )
-    {
-#ifndef HAVE_SWAB
-        p_tmp[0] = ((uint8_t *)p_in)[1];
-        p_tmp[1] = ((uint8_t *)p_in)[0];
-        *p_out = (float)( *(int16_t *)p_tmp ) / 32768.0;
-#else
-        *p_out = (float)*p_in / 32768.0;
-#endif
-        p_in--; p_out--;
-    }
+        *p_out-- = (float)*p_in-- / 32768.0;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 2;

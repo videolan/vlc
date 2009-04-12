@@ -191,20 +191,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             /* We are dealing with a big endian bitstream and a little endian output
              * or a little endian bitstream and a big endian output.
              * Byteswap the stream */
-#ifdef HAVE_SWAB
             swab( p_in, p_out + 8, i_length );
-#else
-            uint16_t i;
-            uint8_t * p_tmp, tmp;
-            p_tmp = p_out + 8;
-            for( i = i_length / 2 ; i-- ; )
-            {
-                tmp = p_in[0]; /* in-place filter */
-                p_tmp[0] = p_in[1];
-                p_tmp[1] = tmp;
-                p_tmp += 2; p_in += 2;
-            }
-#endif
+
             /* If i_length is odd, we have to adjust swapping a bit.. */
             if( i_length & 1 )
             {
