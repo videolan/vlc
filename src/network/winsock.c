@@ -148,6 +148,7 @@ const char *net_strerror( int value )
     return "Unknown network stack error";
 }
 
+#if 0
 ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
 {
     /* WSASendMsg would be more straightforward, and would support ancilliary
@@ -208,3 +209,4 @@ ssize_t vlc_recvmsg (int s, struct msghdr *hdr, int flags)
 #endif
     return -1;
 }
+#endif

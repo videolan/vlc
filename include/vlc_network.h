@@ -60,9 +60,6 @@ struct msghdr
     int           msg_flags;
 };
 
-#define sendmsg vlc_sendmsg
-#define recvmsg vlc_recvmsg
-
 #   ifndef IPV6_V6ONLY
 #       define IPV6_V6ONLY 27
 #   endif
@@ -79,9 +76,6 @@ struct msghdr
 #   include <netdb.h>
 #   define net_errno errno
 #endif
-
-VLC_EXPORT( ssize_t, vlc_sendmsg, ( int, struct msghdr *, int ) );
-VLC_EXPORT( ssize_t, vlc_recvmsg, ( int, struct msghdr *, int ) );
 
 # ifdef __cplusplus
 extern "C" {

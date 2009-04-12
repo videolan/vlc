@@ -564,18 +564,3 @@ ssize_t __net_vaPrintf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
 
     return i_ret;
 }
-
-#ifdef WIN32
-    /* vlc_sendmsg, vlc_recvmsg Defined in winsock.c */
-#else /* !WIN32 */
-ssize_t vlc_sendmsg (int s, struct msghdr *hdr, int flags)
-{
-    return sendmsg (s, hdr, flags);
-}
-
-ssize_t vlc_recvmsg (int s, struct msghdr *hdr, int flags)
-{
-    return recvmsg (s, hdr, flags);
-}
-#endif /* WIN32 */
-
