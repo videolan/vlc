@@ -552,10 +552,10 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS([gettimeofday isatty swab sigrelse getpwuid_r memalign posix_memalign if_nametoindex getenv putenv setenv ctime_r lrintf daemon fork lstat posix_fadvise posix_madvise uselocale])
+AC_CHECK_FUNCS([gettimeofday isatty sigrelse getpwuid_r memalign posix_memalign if_nametoindex getenv putenv setenv ctime_r lrintf daemon fork lstat posix_fadvise posix_madvise uselocale])
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(fcntl)
-AC_REPLACE_FUNCS([asprintf atof atoll gmtime_r lldiv localtime_r rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtoll vasprintf])
+AC_REPLACE_FUNCS([asprintf atof atoll gmtime_r lldiv localtime_r rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtoll vasprintf swab])
 AC_CHECK_FUNCS([stricmp strnicmp])
 
 dnl Check for Linux system calls

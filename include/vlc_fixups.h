@@ -184,4 +184,8 @@ typedef void *locale_t;
 #define N_(str) gettext_noop (str)
 #define gettext_noop(str) (str)
 
+#ifndef HAVE_SWAB
+void swab (const void *, void *, ssize_t);
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
