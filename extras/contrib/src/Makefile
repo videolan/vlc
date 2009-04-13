@@ -1432,7 +1432,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" --enable-pthread && make && make install)
   endif
 else
-ifdef HAVE_DARWIN_OS_ON_INTEL
+ifdef HAVE_DARWIN_OS
   .x264: x264 .yasm
 	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
