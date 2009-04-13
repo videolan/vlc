@@ -98,6 +98,7 @@ enum
     SUB_TYPE_UNKNOWN = -1,
     SUB_TYPE_MICRODVD,
     SUB_TYPE_SUBRIP,
+    SUB_TYPE_SUBRIP_DOT, /* Invalid SubRip file (dot instead of comma) */
     SUB_TYPE_SSA1,
     SUB_TYPE_SSA2_4,
     SUB_TYPE_ASS,
@@ -172,6 +173,7 @@ struct demux_sys_t
 
 static int  ParseMicroDvd   ( demux_t *, subtitle_t *, int );
 static int  ParseSubRip     ( demux_t *, subtitle_t *, int );
+static int  ParseSubRipDot  ( demux_t *, subtitle_t *, int );
 static int  ParseSubViewer  ( demux_t *, subtitle_t *, int );
 static int  ParseSSA        ( demux_t *, subtitle_t *, int );
 static int  ParseVplayer    ( demux_t *, subtitle_t *, int );
@@ -197,6 +199,7 @@ static const struct
 {
     { "microdvd",   SUB_TYPE_MICRODVD,    "MicroDVD",    ParseMicroDvd },
     { "subrip",     SUB_TYPE_SUBRIP,      "SubRIP",      ParseSubRip },
+    { "subrip-dot", SUB_TYPE_SUBRIP_DOT,  "SubRIP(Dot)", ParseSubRipDot },
     { "subviewer",  SUB_TYPE_SUBVIEWER,   "SubViewer",   ParseSubViewer },
     { "ssa1",       SUB_TYPE_SSA1,        "SSA-1",       ParseSSA },
     { "ssa2-4",     SUB_TYPE_SSA2_4,      "SSA-2/3/4",   ParseSSA },
@@ -327,6 +330,15 @@ static int Open ( vlc_object_t *p_this )
                              &i_dummy,&i_dummy,&i_dummy,&i_dummy ) == 8 )
             {
                 p_sys->i_type = SUB_TYPE_SUBRIP;
+                break;
+            }
+            else if( sscanf( s,
+                             "%d:%d:%d.%d --> %d:%d:%d.%d",
+                             &i_dummy,&i_dummy,&i_dummy,&i_dummy,
+                             &i_dummy,&i_dummy,&i_dummy,&i_dummy ) == 8 )
+            {
+                msg_Err( p_demux, "Detected invalid SubRip file, playing anyway" );
+                p_sys->i_type = SUB_TYPE_SUBRIP_DOT;
                 break;
             }
             else if( !strncasecmp( s, "!: This is a Sub Station Alpha v1", 33 ) )
@@ -945,6 +957,17 @@ static int  ParseSubRip( demux_t *p_demux, subtitle_t *p_subtitle,
     VLC_UNUSED( i_idx );
     return ParseSubRipSubViewer( p_demux, p_subtitle,
                                  "%d:%d:%d,%d --> %d:%d:%d,%d",
+                                 false );
+}
+/* ParseSubRipDot
+ * Special version for buggy file using '.' instead of ','
+ */
+static int  ParseSubRipDot( demux_t *p_demux, subtitle_t *p_subtitle,
+                            int i_idx )
+{
+    VLC_UNUSED( i_idx );
+    return ParseSubRipSubViewer( p_demux, p_subtitle,
+                                 "%d:%d:%d.%d --> %d:%d:%d.%d",
                                  false );
 }
 /* ParseSubViewer
