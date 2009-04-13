@@ -1,0 +1,12 @@
+Index: configure
+===================================================================
+--- configure	(revision 18349)
++++ configure	(working copy)
+@@ -1758,7 +1758,6 @@
+         add_cflags -pipe
+         check_cflags -force_cpusubtype_ALL
+         check_cflags -Wno-sign-compare
+-        enabled shared || check_cflags -mdynamic-no-pic
+     fi
+ fi
+ 
