@@ -1090,7 +1090,7 @@ endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
 else
-    (cd $@; patch -p0 < ../Patches/ffmpeg-darwin-ppc-mdynamic.patch) 
+	(cd $@; patch -p0 < ../Patches/ffmpeg-darwin-ppc-mdynamic.patch) 
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
