@@ -1,5 +1,5 @@
---- libcaca/configure	2007-11-29 11:36:50.000000000 +0100
-+++ libcaca/configure	2009-01-04 00:06:45.000000000 +0100
+--- libcaca-0.99.beta13b/configure	2007-11-29 11:36:50.000000000 +0100
++++ libcaca/configure	2009-04-13 19:21:25.000000000 +0200
 @@ -23283,26 +23283,9 @@
  done
  
@@ -24,7 +24,7 @@
 -    esac
 -    CC=gcc-${GCC_VERSION}
 -    CXX=g++-${GCC_VERSION}
-+    MACOSX_SDK=/Developer/SDKs/MacOSX10.4u.sdk
++    MACOSX_SDK=/Developer/SDKs/MacOSX10.5.sdk
 +    MACOSX_SDK_CFLAGS="-isysroot ${MACOSX_SDK}"
 +    MACOSX_SDK_CXXFLAGS="${MACOSX_SDK_CFLAGS}"
      MACOSX_SDK_FRAMEWORKS="-F${MACOSX_SDK}/System/Library/Frameworks"
