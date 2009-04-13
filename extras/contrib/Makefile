@@ -1,13 +1,14 @@
 # ***************************************************************************
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
-# Copyright (C) 2003-2006 the VideoLAN team
+# Copyright (C) 2003-2009 the VideoLAN team
 # $Id$
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
 #          Christophe Mutricy <xtophe at videolan dot org>
-# 
+#          Felix Paul Kühne <fkuehne at videolan dot org>
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or    
@@ -43,11 +44,7 @@ src: using-src
 
 ifdef HAVE_DARWIN_OS
 
-ifdef HAVE_DARWIN_OS_ON_INTEL
 CONTRIBREV=6
-else
-CONTRIBREV=5
-endif
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	$(WGET) ftp://ftp.videolan.org/pub/videolan/testing/contrib/$@
 
