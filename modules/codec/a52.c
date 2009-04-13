@@ -149,6 +149,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = i_codec;
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
+    p_dec->fmt_out.audio.i_bytes_per_frame = 0;
 
     /* Set callback */
     if( b_packetizer )
@@ -364,7 +365,8 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
+    if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->i_frame_size )
+        p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
     p_dec->fmt_out.audio.i_frame_length = A52_FRAME_NB;
 
     p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
