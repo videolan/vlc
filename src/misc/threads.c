@@ -357,8 +357,16 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 }
 
 #if defined(LIBVLC_USE_PTHREAD) && !defined(NDEBUG)
+# ifdef HAVE_VALGRIND_VALGRIND_H
+#  include <valgrind/valgrind.h>
+# else
+#  define RUNNING_ON_VALGRIND (0)
+# endif
+
 void vlc_assert_locked (vlc_mutex_t *p_mutex)
 {
+    if (RUNNING_ON_VALGRIND > 0)
+        return;
     assert (pthread_mutex_lock (p_mutex) == EDEADLK);
 }
 #endif
