@@ -356,6 +356,13 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 #endif
 }
 
+#if defined(LIBVLC_USE_PTHREAD) && !defined(NDEBUG)
+void vlc_assert_locked (vlc_mutex_t *p_mutex)
+{
+    assert (pthread_mutex_lock (p_mutex) == EDEADLK);
+}
+#endif
+
 /**
  * Acquires a mutex. If needed, waits for any other thread to release it.
  * Beware of deadlocks when locking multiple mutexes at the same time,
