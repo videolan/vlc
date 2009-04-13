@@ -1,0 +1,18 @@
+--- liboil/liboil/liboil-stdint.h	2009-04-13 17:19:59.000000000 +0200
++++ liboil.new/liboil/liboil-stdint.h	2009-04-13 17:09:12.000000000 +0200
+@@ -60,6 +60,7 @@
+ #endif
+ #endif
+ 
++/*
+ #ifndef _STDINT_HAVE_INT_LEAST32_T
+ #define _STDINT_NEED_INT_LEAST_T
+ #endif
+@@ -67,6 +68,7 @@
+ #ifndef _STDINT_HAVE_INT_FAST32_T
+ #define _STDINT_NEED_INT_FAST_T
+ #endif
++*/
+ 
+ #ifndef _STDINT_HEADER_INTPTR
+ #define _STDINT_NEED_INTPTR_T

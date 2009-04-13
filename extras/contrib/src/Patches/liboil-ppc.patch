@@ -1,0 +1,74 @@
+diff -ru liboil.orig/configure liboil/configure
+--- liboil.orig/configure	2009-04-13 16:30:02.000000000 +0200
++++ liboil/configure	2009-04-13 16:30:58.000000000 +0200
+@@ -11928,6 +11928,11 @@
+   HAVE_GCC_ASM_POWERPC_FPU_FALSE=
+ fi
+ 
++if test "$build_os-$host_cpu" = "darwin9-powerpc" ; then                    
++        cat >>confdefs.h <<\_ACEOF
++        #define HAVE_SYMBOL_UNDERSCORE 1
++        _ACEOF  
++fi
+ 
+ { echo "$as_me:$LINENO: checking whether byte ordering is bigendian" >&5
+ echo $ECHO_N "checking whether byte ordering is bigendian... $ECHO_C" >&6; }
+diff -ru liboil.orig/examples/videoscale/vs_image.h liboil/examples/videoscale/vs_image.h
+--- liboil.orig/examples/videoscale/vs_image.h	2009-04-13 16:30:03.000000000 +0200
++++ liboil/examples/videoscale/vs_image.h	2009-04-13 16:56:56.000000000 +0200
+@@ -28,6 +28,7 @@
+ #ifndef __VS_IMAGE_H__
+ #define __VS_IMAGE_H__
+ 
++#import <stdint.h>
+ #include <liboil/liboil-stdint.h>
+ 
+ typedef struct _VSImage VSImage;
+diff -ru liboil.orig/examples/videoscale/vs_scanline.h liboil/examples/videoscale/vs_scanline.h
+--- liboil.orig/examples/videoscale/vs_scanline.h	2009-04-13 16:30:03.000000000 +0200
++++ liboil/examples/videoscale/vs_scanline.h	2009-04-13 16:57:24.000000000 +0200
+@@ -28,6 +28,7 @@
+ #ifndef __VS_SCANLINE_H__
+ #define __VS_SCANLINE_H__
+ 
++#import <stdint.h>
+ #include <liboil/liboil-stdint.h>
+ 
+ void vs_scanline_downsample_Y (uint8_t *dest, uint8_t *src, int n);
+diff -ru liboil.orig/liboil/c/wavelet.c liboil/liboil/c/wavelet.c
+--- liboil.orig/liboil/c/wavelet.c	2009-04-13 16:30:03.000000000 +0200
++++ liboil/liboil/c/wavelet.c	2009-04-13 16:48:24.000000000 +0200
+@@ -1,11 +1,9 @@
+ 
+ #include <liboil/liboilfunction.h>
+ #include <liboil/liboilclasses.h>
++#import <stdint.h>
+ 
+-
+-void
+-multiply_and_acc_6xn_s16_u8_c (int16_t *i1, int is1, int16_t *s1,
+-    int ss1, uint8_t *s2, int ss2, int n)
++void multiply_and_acc_6xn_s16_u8_c (int16_t *i1, int is1, int16_t *s1, int ss1, uint8_t *s2, int ss2, int n)
+ {
+   int j;
+   for(j=0;j<n;j++){
+diff -ru liboil.orig/liboil/liboilfuncs.h liboil/liboil/liboilfuncs.h
+--- liboil.orig/liboil/liboilfuncs.h	2009-04-13 16:30:03.000000000 +0200
++++ liboil/liboil/liboilfuncs.h	2009-04-13 16:50:35.000000000 +0200
+@@ -30,6 +30,7 @@
+ #ifndef _LIBOIL_FUNCS_H_
+ #define _LIBOIL_FUNCS_H_
+ 
++#import <stdint.h>
+ #include <liboil/liboiltypes.h>
+ 
+ #ifdef __cplusplus
+diff -ru liboil.orig/liboil/ref/addc.c liboil/liboil/ref/addc.c
+--- liboil.orig/liboil/ref/addc.c	2009-04-13 16:30:03.000000000 +0200
++++ liboil/liboil/ref/addc.c	2009-04-13 16:49:57.000000000 +0200
+@@ -1,4 +1,5 @@
+ 
++#import <stdint.h>
+ #include <liboil/liboilfunction.h>
+ #include <liboil/liboiltest.h>
+ #include <liboil/liboilrandom.h>
