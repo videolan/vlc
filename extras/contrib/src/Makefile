@@ -1089,8 +1089,6 @@ ifdef HAVE_BEOS
 endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
-else
-	(cd $@; patch -p0 < ../Patches/ffmpeg-swscale-ppc.patch)
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
