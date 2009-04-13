@@ -36,6 +36,8 @@
 #include <vlc_codec.h>
 #include <vlc_input.h>
 
+#include "../../codec/a52.h"
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -639,7 +641,7 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip )
 
 static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
                          const char * ppsz_name[],
-                         bool (*pf_check)( const uint8_t * ), int i_check_size )
+                         int (*pf_check)( const uint8_t * ), int i_check_size )
 {
     bool   b_forced_demux;
 
@@ -679,8 +681,20 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
                 return VLC_EGENERIC;
             break;
         }
-        if( pf_check( &p_peek[i_skip] ) )
-            break;
+        const int i_size = pf_check( &p_peek[i_skip] );
+        if( i_size >= 0 )
+        {
+            if( i_size == 0 || 1)
+                break;
+
+            /* If we have the frame size, check the next frame for
+             * extra robustness */
+            if( i_skip + i_check_size + i_size <= i_peek )
+            {
+                if( pf_check( &p_peek[i_skip+i_size] ) >= 0 )
+                    break;
+            }
+        }
         i_skip++;
     }
 
@@ -691,28 +705,26 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
 /*****************************************************************************
  * A52
  *****************************************************************************/
-static bool A52CheckSync( const uint8_t *p_peek, bool *p_big_endian, bool b_eac3 )
+static int A52CheckSync( const uint8_t *p_peek, bool *p_big_endian, bool b_eac3 )
 {
-    /* bsid: 0-8 11-16 */
+    vlc_a52_header_t header;
+    uint8_t p_tmp[VLC_A52_HEADER_SIZE];
 
-    /* Little endian version of the bitstream */
-    if( p_peek[0] == 0x77 && p_peek[1] == 0x0b &&
-        ( p_peek[4] >> 3 ) <= ( b_eac3 ? 16 : 10 ) /* bsid */ )
+    *p_big_endian =  p_peek[0] == 0x0b && p_peek[1] == 0x77;
+    if( !*p_big_endian )
     {
-        *p_big_endian = false;
-        return true;
-    }
-    /* Big endian version of the bitstream */
-    else if( p_peek[0] == 0x0b && p_peek[1] == 0x77 &&
-             ( p_peek[5] >> 3 ) <= ( b_eac3 ? 16 : 10 ) /* bsid */ )
-    {
-        *p_big_endian = true;
-        return true;
+        swab( p_peek, p_tmp, VLC_A52_HEADER_SIZE );
+        p_peek = p_tmp;
     }
 
-    return false;
+    if( vlc_a52_header_Parse( &header, p_peek, VLC_A52_HEADER_SIZE ) )
+        return VLC_EGENERIC;
+
+    if( !header.b_eac3 != !b_eac3 )
+        return VLC_EGENERIC;
+    return header.i_size;
 }
-static bool EA52CheckSyncProbe( const uint8_t *p_peek )
+static int EA52CheckSyncProbe( const uint8_t *p_peek )
 {
     bool b_dummy;
     return A52CheckSync( p_peek, &b_dummy, true );
@@ -722,10 +734,10 @@ static int EA52Probe( demux_t *p_demux, int64_t *pi_offset )
 {
     const char *ppsz_name[] = { "eac3", NULL };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe, 10 );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe, VLC_A52_HEADER_SIZE );
 }
 
-static bool A52CheckSyncProbe( const uint8_t *p_peek )
+static int A52CheckSyncProbe( const uint8_t *p_peek )
 {
     bool b_dummy;
     return A52CheckSync( p_peek, &b_dummy, false );
@@ -735,7 +747,7 @@ static int A52Probe( demux_t *p_demux, int64_t *pi_offset )
 {
     const char *ppsz_name[] = { "a52", "ac3", NULL };
 
-    return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe, 10 );
+    return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe, VLC_A52_HEADER_SIZE );
 }
 
 static int A52Init( demux_t *p_demux )
@@ -747,8 +759,8 @@ static int A52Init( demux_t *p_demux )
 
     const uint8_t *p_peek;
 
-    /* peek the begining (10 is for a52 header) */
-    if( stream_Peek( p_demux->s, &p_peek, 10 ) >= 10 )
+    /* peek the begining */
+    if( stream_Peek( p_demux->s, &p_peek, VLC_A52_HEADER_SIZE ) >= VLC_A52_HEADER_SIZE )
     {
         A52CheckSync( p_peek, &p_sys->b_big_endian, true );
     }
@@ -758,36 +770,38 @@ static int A52Init( demux_t *p_demux )
 /*****************************************************************************
  * DTS
  *****************************************************************************/
-static bool DtsCheckSync( const uint8_t *p_peek )
+static int DtsCheckSync( const uint8_t *p_peek )
 {
+    /* TODO return frame size for robustness */
+
     /* 14 bits, little endian version of the bitstream */
     if( p_peek[0] == 0xff && p_peek[1] == 0x1f &&
         p_peek[2] == 0x00 && p_peek[3] == 0xe8 &&
         (p_peek[4] & 0xf0) == 0xf0 && p_peek[5] == 0x07 )
     {
-        return true;
+        return 0;
     }
     /* 14 bits, big endian version of the bitstream */
     else if( p_peek[0] == 0x1f && p_peek[1] == 0xff &&
              p_peek[2] == 0xe8 && p_peek[3] == 0x00 &&
              p_peek[4] == 0x07 && (p_peek[5] & 0xf0) == 0xf0)
     {
-        return true;
+        return 0;
     }
     /* 16 bits, big endian version of the bitstream */
     else if( p_peek[0] == 0x7f && p_peek[1] == 0xfe &&
              p_peek[2] == 0x80 && p_peek[3] == 0x01 )
     {
-        return true;
+        return 0;
     }
     /* 16 bits, little endian version of the bitstream */
     else if( p_peek[0] == 0xfe && p_peek[1] == 0x7f &&
              p_peek[2] == 0x01 && p_peek[3] == 0x80 )
     {
-        return true;
+        return 0;
     }
 
-    return false;
+    return VLC_EGENERIC;
 }
 
 static int DtsProbe( demux_t *p_demux, int64_t *pi_offset )
@@ -808,17 +822,16 @@ static int DtsInit( demux_t *p_demux )
 /*****************************************************************************
  * MLP
  *****************************************************************************/
-static bool MlpCheckSync( const uint8_t *p_peek )
+static int MlpCheckSync( const uint8_t *p_peek )
 {
     if( p_peek[4+0] != 0xf8 || p_peek[4+1] != 0x72 || p_peek[4+2] != 0x6f )
-        return false;
+        return -1;
 
     if( p_peek[4+3] != 0xba && p_peek[4+3] != 0xbb )
-        return false;
+        return -1;
 
-    /* TODO checksum */
-
-    return true;
+    /* TODO checksum and real size for robustness */
+    return 0;
 }
 static int MlpProbe( demux_t *p_demux, int64_t *pi_offset )
 {
