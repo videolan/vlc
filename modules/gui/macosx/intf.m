@@ -1574,10 +1574,12 @@ static void manage_cleanup( void * args )
 
         playlist_t * p_playlist = pl_Hold( p_intf );
 
-        /* TODO: fix i_size use */
-        b_plmul = p_playlist->items.i_size > 1;
+        PL_LOCK;
+        b_plmul = playlist_CurrentSize( p_playlist ) > 1;
+        PL_UNLOCK;
 
         p_input = playlist_CurrentInput( p_playlist );
+
         bool b_buffering = NO;
     
         if( ( b_input = ( p_input != NULL ) ) )
@@ -2500,13 +2502,11 @@ end:
 
     [o_msg_lock lock];
 
-    if( [o_msg_arr count] + 2 > 400 )
+    if( [o_msg_arr count] + 2 > 600 )
     {
-        NSUInteger rid[] = { 0, 1 };
-		/* FIXME: THIS METHOD WILL BE DEPRECATED */
-        [o_msg_arr removeObjectsFromIndices: (NSUInteger *)&rid
-                                 numIndices: sizeof(rid)/sizeof(rid[0])];
-    }
+		[o_msg_arr removeObjectAtIndex: 0];
+        [o_msg_arr removeObjectAtIndex: 1];
+   }
 
     o_attr = [NSDictionary dictionaryWithObject: o_gray
                                          forKey: NSForegroundColorAttributeName];
