@@ -750,7 +750,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             }
         }
     }
-    else if( i_read == 0 )
+    else if( i_read <= 0 )
     {
         /*
          * I very much doubt that this will work.
@@ -781,7 +781,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             }
         }
 
-        if( i_read == 0 ) p_access->info.b_eof = true;
+        if( i_read == 0 )
+            p_access->info.b_eof = true;
+        else if( i_read < 0 )
+            p_access->b_error = true;
     }
 
     if( p_access->info.i_size != -1 )
