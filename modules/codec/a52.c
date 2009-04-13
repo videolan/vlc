@@ -35,7 +35,8 @@
 #include <vlc_codec.h>
 #include <vlc_aout.h>
 #include <vlc_block_helper.h>
-#include <vlc_bits.h>
+
+#include "a52.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -61,8 +62,6 @@ vlc_module_end ()
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
 
-#define A52_HEADER_SIZE 7
-
 struct decoder_sys_t
 {
     /* Module mode */
@@ -81,8 +80,8 @@ struct decoder_sys_t
     audio_date_t   end_date;
 
     mtime_t i_pts;
-    int i_frame_size, i_bit_rate;
-    unsigned int i_rate, i_channels, i_channels_conf;
+
+    vlc_a52_header_t frame;
 };
 
 enum {
@@ -99,9 +98,6 @@ enum {
  * Local prototypes
  ****************************************************************************/
 static void *DecodeBlock  ( decoder_t *, block_t ** );
-
-static int  SyncInfo      ( const uint8_t *, unsigned int *, unsigned int *,
-                            unsigned int *, int * );
 
 static uint8_t       *GetOutBuffer ( decoder_t *, void ** );
 static aout_buffer_t *GetAoutBuffer( decoder_t * );
@@ -179,7 +175,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t p_header[A52_HEADER_SIZE];
+    uint8_t p_header[VLC_A52_HEADER_SIZE];
     uint8_t *p_buf;
     void *p_out_buffer;
 
@@ -240,27 +236,23 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_HEADER;
 
         case STATE_HEADER:
-            /* Get A/52 frame header (A52_HEADER_SIZE bytes) */
+            /* Get A/52 frame header (VLC_A52_HEADER_SIZE bytes) */
             if( block_PeekBytes( &p_sys->bytestream, p_header,
-                                 A52_HEADER_SIZE ) != VLC_SUCCESS )
+                                 VLC_A52_HEADER_SIZE ) != VLC_SUCCESS )
             {
                 /* Need more data */
                 return NULL;
             }
 
             /* Check if frame is valid and get frame info */
-            p_sys->i_frame_size = SyncInfo( p_header,
-                                            &p_sys->i_channels,
-                                            &p_sys->i_channels_conf,
-                                            &p_sys->i_rate,
-                                            &p_sys->i_bit_rate );
-            if( !p_sys->i_frame_size )
+            if( vlc_a52_header_Parse( &p_sys->frame, p_header, VLC_A52_HEADER_SIZE ) )
             {
                 msg_Dbg( p_dec, "emulated sync word" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
                 break;
             }
+
             p_sys->i_state = STATE_NEXT_SYNC;
 
         case STATE_NEXT_SYNC:
@@ -269,7 +261,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Check if next expected frame contains the sync word */
             if( block_PeekOffsetBytes( &p_sys->bytestream,
-                                       p_sys->i_frame_size, p_header, 2 )
+                                       p_sys->frame.i_size, p_header, 2 )
                 != VLC_SUCCESS )
             {
                 /* Need more data */
@@ -299,7 +291,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* Make sure we have enough data.
              * (Not useful if we went through NEXT_SYNC) */
             if( block_WaitBytes( &p_sys->bytestream,
-                                 p_sys->i_frame_size ) != VLC_SUCCESS )
+                                 p_sys->frame.i_size ) != VLC_SUCCESS )
             {
                 /* Need more data */
                 return NULL;
@@ -315,7 +307,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Copy the whole frame into the buffer. When we reach this point
              * we already know we have enough data available. */
-            block_GetBytes( &p_sys->bytestream, p_buf, p_sys->i_frame_size );
+            block_GetBytes( &p_sys->bytestream, p_buf, p_sys->frame.i_size );
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
@@ -354,26 +346,26 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint8_t *p_buf;
 
-    if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate )
+    if( p_dec->fmt_out.audio.i_rate != p_sys->frame.i_rate )
     {
         msg_Info( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
-                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
+                  p_sys->frame.i_channels, p_sys->frame.i_rate, p_sys->frame.i_bitrate );
 
-        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
+        aout_DateInit( &p_sys->end_date, p_sys->frame.i_rate );
         aout_DateSet( &p_sys->end_date, p_sys->i_pts );
     }
 
-    p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
-    p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->i_frame_size )
-        p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
+    p_dec->fmt_out.audio.i_rate     = p_sys->frame.i_rate;
+    p_dec->fmt_out.audio.i_channels = p_sys->frame.i_channels;
+    if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->frame.i_size )
+        p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->frame.i_size;
     p_dec->fmt_out.audio.i_frame_length = A52_FRAME_NB;
 
-    p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
+    p_dec->fmt_out.audio.i_original_channels = p_sys->frame.i_channels_conf;
     p_dec->fmt_out.audio.i_physical_channels =
-        p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
+        p_sys->frame.i_channels_conf & AOUT_CHAN_PHYSMASK;
 
-    p_dec->fmt_out.i_bitrate = p_sys->i_bit_rate;
+    p_dec->fmt_out.i_bitrate = p_sys->frame.i_bitrate;
 
     if( p_sys->b_packetizer )
     {
@@ -416,7 +408,7 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
 
-    p_block = block_New( p_dec, p_sys->i_frame_size );
+    p_block = block_New( p_dec, p_sys->frame.i_size );
     if( p_block == NULL ) return NULL;
 
     p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
@@ -425,169 +417,5 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
         aout_DateIncrement( &p_sys->end_date, A52_FRAME_NB ) - p_block->i_pts;
 
     return p_block;
-}
-
-/* Tables */
-static const struct
-{
-    unsigned int i_count;
-    unsigned int i_configuration;
-} p_acmod[8] = {
-    { 2, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DUALMONO },   /* Dual-channel 1+1 */
-    { 1, AOUT_CHAN_CENTER },                                        /* Mono 1/0 */
-    { 2, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT },                        /* Stereo 2/0 */
-    { 3, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER },     /* 3F 3/0 */
-    { 3, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER }, /* 2F1R 2/1 */
-    { 4, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-         AOUT_CHAN_REARCENTER },                                    /* 3F1R 3/1 */
-    { 5, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
-         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT },                /* 2F2R 2/2 */
-    { 6, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
-         AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT },                /* 3F2R 3/2 */
-};
-
-/**
- * It parse AC3 sync info.
- *
- * This code is borrowed from liba52 by Aaron Holtzman & Michel Lespinasse,
- * since we don't want to oblige S/PDIF people to use liba52 just to get
- * their SyncInfo...
- */
-static int SyncInfoAC3( const uint8_t *p_buf,
-                        unsigned int *pi_channels,
-                        unsigned int *pi_channels_conf,
-                        unsigned int *pi_sample_rate, int *pi_bit_rate )
-{
-    static const uint8_t halfrate[12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3 };
-    static const int rate[] = { 32,  40,  48,  56,  64,  80,  96, 112,
-                                128, 160, 192, 224, 256, 320, 384, 448,
-                                512, 576, 640 };
-    static const uint8_t lfeon[8] = { 0x10, 0x10, 0x04, 0x04,
-                                      0x04, 0x01, 0x04, 0x01 };
-    int frmsizecod;
-    int bitrate;
-    int half;
-    int acmod;
-
-    /* */
-    half = halfrate[p_buf[5] >> 3];
-
-    /* acmod, dsurmod and lfeon */
-    acmod = p_buf[6] >> 5;
-    if ( (p_buf[6] & 0xf8) == 0x50 )
-    {
-        /* Dolby surround = stereo + Dolby */
-        *pi_channels = 2;
-        *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                            | AOUT_CHAN_DOLBYSTEREO;
-    }
-    else
-    {
-        *pi_channels      = p_acmod[acmod].i_count;
-        *pi_channels_conf = p_acmod[acmod].i_configuration;
-    }
-
-    if ( p_buf[6] & lfeon[acmod] )
-    {
-        (*pi_channels)++;
-        *pi_channels_conf |= AOUT_CHAN_LFE;
-    }
-
-    frmsizecod = p_buf[4] & 63;
-    if (frmsizecod >= 38)
-        return 0;
-    bitrate = rate [frmsizecod >> 1];
-    *pi_bit_rate = (bitrate * 1000) >> half;
-
-    switch (p_buf[4] & 0xc0) {
-    case 0:
-        *pi_sample_rate = 48000 >> half;
-        return 4 * bitrate;
-    case 0x40:
-        *pi_sample_rate = 44100 >> half;
-        return 2 * (320 * bitrate / 147 + (frmsizecod & 1));
-    case 0x80:
-        *pi_sample_rate = 32000 >> half;
-        return 6 * bitrate;
-    default:
-        return 0;
-    }
-}
-
-/**
- * It parse E-AC3 sync info
- */
-static int SyncInfoEAC3( const uint8_t *p_buf,
-                         unsigned int *pi_channels,
-                         unsigned int *pi_channels_conf,
-                         unsigned int *pi_sample_rate, int *pi_bit_rate )
-{
-    static const int pi_samplerate[3] = { 48000, 44100, 32000 };
-    bs_t s;
-    int i_frame_size;
-    int i_fscod, i_fscod2;
-    int i_numblkscod;
-    int i_acmod, i_lfeon;
-    int i_bytes;
-
-
-    bs_init( &s, (void*)p_buf, A52_HEADER_SIZE );
-    bs_skip( &s, 16 +   /* start code */
-                 2 +    /* stream type */
-                 3 );   /* substream id */
-    i_frame_size = bs_read( &s, 11 );
-    if( i_frame_size < 2 )
-        return 0;
-    i_bytes = 2 * ( i_frame_size + 1 );
-
-    i_fscod = bs_read( &s, 2 );
-    if( i_fscod == 0x03 )
-    {
-        i_fscod2 = bs_read( &s, 2 );
-        if( i_fscod2 == 0X03 )
-            return 0;
-        *pi_sample_rate = pi_samplerate[i_fscod2] / 2;
-        i_numblkscod = 6;
-    }
-    else
-    {
-        static const int pi_blocks[4] = { 1, 2, 3, 6 };
-
-        *pi_sample_rate = pi_samplerate[i_fscod];
-        i_numblkscod = pi_blocks[bs_read( &s, 2 )];
-    }
-
-    i_acmod = bs_read( &s, 3 );
-    i_lfeon = bs_read1( &s );
-
-    *pi_channels      = p_acmod[i_acmod].i_count + i_lfeon;
-    *pi_channels_conf = p_acmod[i_acmod].i_configuration | ( i_lfeon ? AOUT_CHAN_LFE : 0);
-    *pi_bit_rate = 8 * i_bytes * (*pi_sample_rate) / (i_numblkscod * 256);
-
-    return i_bytes;
-}
-
-static int SyncInfo( const uint8_t *p_buf,
-                     unsigned int *pi_channels,
-                     unsigned int *pi_channels_conf,
-                     unsigned int *pi_sample_rate, int *pi_bit_rate )
-{
-    int bsid;
-
-    /* Check synword */
-    if( p_buf[0] != 0x0b || p_buf[1] != 0x77 )
-        return 0;
-
-    /* Check bsid */
-    bsid = p_buf[5] >> 3;
-    if( bsid > 16 )
-        return 0;
-
-    if( bsid <= 10 )
-        return SyncInfoAC3( p_buf, pi_channels, pi_channels_conf,
-                            pi_sample_rate, pi_bit_rate );
-    else
-        return SyncInfoEAC3( p_buf, pi_channels, pi_channels_conf,
-                             pi_sample_rate, pi_bit_rate );
 }
 
