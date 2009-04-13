@@ -25,7 +25,7 @@
 # ***************************************************************************
 
 PENGUIN=http://ftp.penguin.cz/pub/users/utx/amr
-GNU=ftp://ftp.esat.net/pub/gnu
+GNU=ftp://ftp.gnu.org/gnu
 SF=http://heanet.dl.sourceforge.net/sourceforge
 VIDEOLAN=http://downloads.videolan.org/pub/videolan
 PERL_VERSION=5.8.8
