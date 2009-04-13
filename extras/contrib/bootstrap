@@ -129,7 +129,7 @@ case $HOST in
         HAVE_DARWIN_9=1
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
+        EXTRA_LDFLAGS=" -arch ppc -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         CC="/Developer/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
         CXX="/Developer/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK}"
@@ -155,11 +155,11 @@ case $HOST in
         fi
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
-        CFLAGS_TUNING=" -march=pentium-m -mtune=prescott"
+        CFLAGS_TUNING=" -march=pentium-m -mtune=prescott -arch i386"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
-        CC="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-gcc-4.2"
-        CXX="/Developer/usr/llvm-gcc-4.2/bin/i686-apple-darwin9-llvm-g++-4.2"
+        EXTRA_LDFLAGS=" -arch i386 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
+        CC="/Developer/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
+        CXX="/Developer/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
         if test -e /Developer/SDKs; then
