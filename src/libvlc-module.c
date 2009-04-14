@@ -571,7 +571,7 @@ static const char *const ppsz_pos_descriptions[] =
 
 static const int pi_vout_event_values[] = { 1, 2, 3 };
 static const char *const ppsz_vout_event_descriptions[] =
-     { N_("FullSupport"), N_("Fullscreen-Only"), N_("None") };
+     { N_("Full support"), N_("Fullscreen-only"), N_("None") };
 
 /*****************************************************************************
  * Input
