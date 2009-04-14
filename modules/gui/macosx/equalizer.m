@@ -215,11 +215,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     for( i = 0; i < 10; i++ )
     {
         /* Read dB -20/20 */
-#ifdef HAVE_STRTOF
         f_band[i] = strtof( psz_bands, &p_next );
-#else
-        f_band[i] = (float)strtod( psz_bands, &p_next );
-#endif
         if( !p_next || p_next == psz_bands ) break; /* strtof() failed */
     
         if( !*psz_bands ) break; /* end of line */
