@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_charset.h>
 
 #include "vlc_aout.h"
 
@@ -588,7 +589,8 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
             break;
 
         /* Read dB -20/20 */
-        f = strtof( p, &psz_next );
+        f = us_strtof( p, &psz_next );
+
         if( psz_next == p )
             break; /* no conversion */
 
