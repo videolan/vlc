@@ -500,7 +500,13 @@ static int Open( vlc_object_t * p_this )
                 tk->i_cat   = VIDEO_ES;
                 tk->i_codec = AVI_FourccGetCodec( VIDEO_ES,
                                                   p_vids->p_bih->biCompression );
-                if( p_vids->p_bih->biCompression == 0x00 )
+                if( p_vids->p_bih->biCompression == VLC_FOURCC( 'D', 'X', 'S', 'B' ) )
+                {
+                   msg_Dbg( p_demux, "stream[%d] subtitles", i );
+                   es_format_Init( &fmt, SPU_ES, p_vids->p_bih->biCompression );
+                   break;
+                }
+                else if( p_vids->p_bih->biCompression == 0x00 )
                 {
                     switch( p_vids->p_bih->biBitCount )
                     {
