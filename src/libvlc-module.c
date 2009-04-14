@@ -1574,6 +1574,7 @@ vlc_module_begin ()
               QUIET_SYNCHRO_LONGTEXT, true )
     add_integer( "vout-event", 1, NULL, VOUT_EVENT_TEXT, VOUT_EVENT_LONGTEXT, true )
         change_integer_list( pi_vout_event_values, ppsz_vout_event_descriptions, NULL )
+        add_deprecated_alias( "x11-event" ) /* renamed since 1.0.0 */
 #ifndef __APPLE__
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, false )
 #endif
