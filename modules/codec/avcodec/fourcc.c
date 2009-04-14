@@ -1141,7 +1141,7 @@ static const struct
       SPU_ES, "DVB Subtitles" },
     { VLC_FOURCC('s','u','b','t'), CODEC_ID_TEXT,
       SPU_ES, "Plain text subtitles" },
-    { VLC_FOURCC('x','s','u','b'), CODEC_ID_XSUB,
+    { VLC_FOURCC('D','X','S','B'), CODEC_ID_XSUB,
       SPU_ES, "DivX XSUB subtitles" },
 #endif
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 50, 0 )
