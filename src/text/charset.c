@@ -91,6 +91,26 @@ double us_strtod( const char *str, char **end )
     return res;
 }
 
+
+/**
+ * us_strtof() has the same prototype as ANSI C strtof() but it uses the
+ * POSIX/C decimal format, regardless of the current numeric locale.
+ */
+float us_strtof( const char *str, char **end )
+{
+    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
+    locale_t oldloc = uselocale (loc);
+    float res = strtof (str, end);
+
+    if (loc != (locale_t)0)
+    {
+        uselocale (oldloc);
+        freelocale (loc);
+    }
+    return res;
+}
+
+
 /**
  * us_atof() has the same prototype as ANSI C atof() but it expects a dot
  * as decimal separator, regardless of the system locale.

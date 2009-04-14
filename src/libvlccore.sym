@@ -385,6 +385,7 @@ update_WaitDownload
 us_asprintf
 us_atof
 us_strtod
+us_strtof
 utf8_fopen
 utf8_fprintf
 utf8_loaddir
