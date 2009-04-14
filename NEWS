@@ -82,6 +82,7 @@ Stream output:
  * Multiple bridge-in instances are now possible.
  * bridge-in can be used to configure a placeholder stream.
  * Remote Audio Output Protocol (AirTunes) module.
+ * Fixed mosaic memleak. Mosaics are now usable again.
 
 Maemo Port:
  * New Maemo port with:
