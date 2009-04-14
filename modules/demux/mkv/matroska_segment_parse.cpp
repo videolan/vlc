@@ -772,16 +772,15 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
             KaxDateUTC &date = *(KaxDateUTC*)l;
             time_t i_date;
             struct tm tmres;
-            char   buffer[256];
+            char   buffer[25];
 
             i_date = date.GetEpochDate();
-            memset( buffer, 0, 256 );
             if( gmtime_r( &i_date, &tmres ) &&
-                asctime_r( &tmres, buffer ) )
+                strftime( buffer, sizeof(buffer), "%a %b %d %H:%M:%S %Y",
+                          &tmres ) )
             {
-                buffer[strlen( buffer)-1]= '\0';
                 psz_date_utc = strdup( buffer );
-                msg_Dbg( &sys.demuxer, "|   |   + Date=%s", psz_date_utc );
+                msg_Dbg( &sys.demuxer, "|   |   + Date=%s", buffer );
             }
         }
         else if( MKV_IS_ID( l, KaxChapterTranslate ) )
