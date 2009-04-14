@@ -17,8 +17,8 @@ VLC defines a global vlc object with the following members:
  * vlc.access: the access used ("http" for http://, "file" for file://, etc.)
  * vlc.peek( <int> ): return the first <int> characters from the playlist file.
  * vlc.read( <int> ): read <int> characters from the playlist file.
-                      THIS FUNCTION CANNOT BE USED IN peek().
+                      THIS FUNCTION CANNOT BE USED IN probe().
  * vlc.readline(): return a new line of playlist data on each call.
-                   THIS FUNCTION CANNOT BE USED IN peek().
+                   THIS FUNCTION CANNOT BE USED IN probe().
 
 Available VLC specific Lua modules: msg and strings. See lua/README.txt.
