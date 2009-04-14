@@ -854,6 +854,16 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'd', 't', 's', ' ' );
         }
+        else if( !strcmp( tracks[i_track]->psz_codec, "A_MLP" ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC('m', 'l', 'p', ' ' );
+        }
+        else if( !strcmp( tracks[i_track]->psz_codec, "A_TRUEHD" ) )
+        {
+            /* FIXME when more samples arrive */
+            tracks[i_track]->fmt.i_codec = VLC_FOURCC('t', 'r', 'h', 'd' );
+            p_fmt->b_packetized = false;
+        }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_FLAC" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_FOURCC( 'f', 'l', 'a', 'c' );
