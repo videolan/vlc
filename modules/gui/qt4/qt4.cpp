@@ -368,10 +368,15 @@ static void *Thread( void *obj )
 
     /* Start the QApplication here */
 #ifdef Q_WS_X11
-    QVLCApp app( (Display *)p_intf->p_sys->display, argc, argv );
-#else
-    QVLCApp app( argc, argv );
+    char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
+    if( display )
+    {
+        argv[argc++] = const_cast<char *>("-display");
+        argv[argc++] = display;
+        argv[argc] = NULL;
+    }
 #endif
+    QVLCApp app( argc, argv );
     p_intf->p_sys->p_app = &app;
 
 
@@ -505,6 +510,7 @@ static void *Thread( void *obj )
     free( psz_path );
 
     /* Delete the application automatically */
+    free( display );
     return NULL;
 }
 
