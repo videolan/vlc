@@ -827,6 +827,12 @@ VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
  *****************************************************************************/
 VLC_EXPORT( char *, vlc_gettext, ( const char *msgid ) LIBVLC_USED );
 
+static inline const char *vlc_pgettext( const char *ctx, const char *id )
+{
+    const char *tr = vlc_gettext( id );
+    return (tr == ctx) ? id : tr;
+}
+
 /*****************************************************************************
  * libvlc features
  *****************************************************************************/

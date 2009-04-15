@@ -175,7 +175,9 @@ typedef void *locale_t;
 #endif
 
 /* libintl support */
-#define _(str) vlc_gettext (str)
+#define _(str)           gettext(str)
+#define gettext(str)     vlc_gettext (str)
+#define pgettext(ctx,id) vlc_pgettext(ctx,id)
 
 #if defined (ENABLE_NLS)
 # include <libintl.h>
