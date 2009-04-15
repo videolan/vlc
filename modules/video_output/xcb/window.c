@@ -27,6 +27,8 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <poll.h>
+#include <unistd.h> /* gethostname() */
+#include <limits.h> /* HOST_NAME_MAX */
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_aux.h>
@@ -79,6 +81,19 @@ void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, atom,
                          XA_STRING, 8, strlen (value), value);
 }
+
+static inline
+void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
+{
+    char hostname[HOST_NAME_MAX];
+
+    if (gethostname (hostname, sizeof (hostname)) == 0)
+    {
+        hostname[sizeof (hostname) - 1] = '\0';
+        set_ascii_prop (conn, window, XA_WM_CLIENT_MACHINE, hostname);
+    }
+}
+
 
 /**
  * Create an X11 window.
@@ -133,6 +148,7 @@ static int Open (vlc_object_t *obj)
                     pgettext ("ASCII VLC", "VLC"));
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
                          XA_STRING, 8, 8, "vlc\0VLC");
+    set_hostname_prop (conn, window);
 
     wnd->handle.xid = window;
     wnd->p_sys = p_sys;
