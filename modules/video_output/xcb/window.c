@@ -30,6 +30,8 @@
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_aux.h>
+typedef xcb_atom_t Atom;
+#include <X11/Xatom.h> /* XA_WM_NAME */
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -69,6 +71,14 @@ struct vout_window_sys_t
     key_handler_t *keys;
     vlc_thread_t thread;
 };
+
+static inline
+void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
+                     xcb_atom_t atom, const char *value)
+{
+    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, atom,
+                         XA_STRING, 8, strlen (value), value);
+}
 
 /**
  * Create an X11 window.
@@ -113,6 +123,12 @@ static int Open (vlc_object_t *obj)
         msg_Err (wnd, "creating window: X11 error %d", err->error_code);
         goto error;
     }
+
+    /* Plain ASCII localization of VLC for ICCCM window name */
+    set_ascii_prop (conn, window, XA_WM_NAME,
+                    pgettext ("ASCII VLC media player", "VLC media player"));
+    set_ascii_prop (conn, window, XA_WM_ICON_NAME,
+                    pgettext ("ASCII VLC", "VLC"));
 
     wnd->handle.xid = window;
     wnd->p_sys = p_sys;
