@@ -479,7 +479,6 @@ static int Connect( demux_t *p_demux )
     char *p_sdp       = NULL;
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
-    int timeout;
 
     if( p_sys->url.i_port == 0 ) p_sys->url.i_port = 554;
     if( p_sys->url.psz_username || p_sys->url.psz_password )
@@ -542,12 +541,16 @@ describe:
     authenticator.setUsernameAndPassword( (const char*)psz_user,
                                           (const char*)psz_pwd );
 
-    timeout = var_CreateGetInteger(p_demux, "ipv4-timeout");
-    timeout /= 1000;
+#if defined(WIN32)
+#   warning "Disabled live555 timeout because of buggy library"
+    const int i_timeout = 0;
+#else
+    const int i_timeout = var_CreateGetInteger(p_demux, "ipv4-timeout") / 1000;
+#endif
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
-                                               &authenticator, timeout );
+                                               &authenticator, i_timeout );
 #else
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
@@ -557,7 +560,7 @@ describe:
         // try again, with the realm set this time
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
-                                               &authenticator, timeout );
+                                               &authenticator, i_timeout );
 #else
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator );
@@ -569,7 +572,7 @@ describe:
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
     p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
-                                          var_GetBool( p_demux, "rtsp-kasenna" ), timeout );
+                                          var_GetBool( p_demux, "rtsp-kasenna" ), i_timeout );
 #else
     p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
                                           var_GetBool( p_demux, "rtsp-kasenna" ) );
@@ -1482,6 +1485,8 @@ static int RollOverTcp( demux_t *p_demux )
     p_sys->rtsp = NULL;
     p_sys->track = NULL;
     p_sys->i_track = 0;
+    p_sys->b_no_data = true;
+    p_sys->i_no_data_ti = 0;
 
     /* Reopen rtsp client */
     if( ( i_return = Connect( p_demux ) ) != VLC_SUCCESS )
