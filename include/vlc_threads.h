@@ -128,7 +128,7 @@ typedef struct
 #define VLC_STATIC_MUTEX { 0, }
 
 typedef HANDLE  vlc_cond_t;
-typedef struct vlc_threadvar *vlc_threadvar_t;
+typedef DWORD   vlc_threadvar_t;
 
 #endif
 
