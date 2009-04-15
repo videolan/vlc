@@ -508,7 +508,9 @@ static void *Thread( void *obj )
                    qtu(p_intf->p_sys->filepath) );
 
     /* Delete the application automatically */
+#ifdef Q_WS_X11
     free( display );
+#endif
     return NULL;
 }
 
