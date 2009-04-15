@@ -124,11 +124,15 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
+    /* ICCCM
+     * No cut&paste nor drag&drop, only Window Manager communication. */
     /* Plain ASCII localization of VLC for ICCCM window name */
     set_ascii_prop (conn, window, XA_WM_NAME,
                     pgettext ("ASCII VLC media player", "VLC media player"));
     set_ascii_prop (conn, window, XA_WM_ICON_NAME,
                     pgettext ("ASCII VLC", "VLC"));
+    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
+                         XA_STRING, 8, 8, "vlc\0VLC");
 
     wnd->handle.xid = window;
     wnd->p_sys = p_sys;
