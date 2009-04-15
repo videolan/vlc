@@ -278,6 +278,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_intf, "Could not connect to X server" );
         return VLC_EGENERIC;
     }
+    XCloseDisplay( p_display );
 #endif
 
     /* Allocations of p_sys */
@@ -286,9 +287,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_popup_menu = NULL;
     p_sys->p_mi = NULL;
     p_sys->p_playlist = pl_Hold( p_intf );
-#ifdef Q_WS_X11
-    p_sys->display = p_display;
-#endif
 
     /* */
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
@@ -335,9 +333,6 @@ static void Close( vlc_object_t *p_this )
     QVLCApp::triggerQuit();
 
     vlc_join (p_sys->thread, NULL);
-#ifdef Q_WS_X11
-    XCloseDisplay ((Display *)p_sys->display);
-#endif
     pl_Release (p_this);
     delete p_sys;
 }

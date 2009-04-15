@@ -75,9 +75,6 @@ struct intf_sys_t
     const char *psz_filepath; /* Last path used in dialogs */
 
     QMenu * p_popup_menu;    /* The right click menu */
-#ifdef Q_WS_X11 /* WTH is this included in ALL files? :( */
-    void *display;
-#endif
 };
 
 #define THEPL p_intf->p_sys->p_playlist
