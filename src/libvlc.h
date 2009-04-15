@@ -29,9 +29,14 @@ typedef struct variable_t variable_t;
 
 extern const char vlc_usage[];
 
-/* Hotkey stuff */
-extern const struct hotkey libvlc_hotkeys[];
-extern const size_t libvlc_hotkeys_size;
+/* Actions (hot keys) */
+typedef struct action
+{
+    char name[24];
+    int  value;
+} action_t;
+extern const struct action libvlc_actions[];
+extern const size_t libvlc_actions_count;
 extern int vlc_key_to_action (vlc_object_t *, const char *,
                               vlc_value_t, vlc_value_t, void *);
 

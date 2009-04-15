@@ -169,14 +169,6 @@ static void Run( intf_thread_t *p_intf )
 
     vlc_cleanup_push( __pl_Release, p_intf );
 
-    /* Initialize hotkey structure */
-    for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
-         p_hotkey->psz_action != NULL;
-         p_hotkey++ )
-    {
-        p_hotkey->i_key = config_GetInt( p_intf, p_hotkey->psz_action );
-    }
-
     for( ;; )
     {
         input_thread_t *p_input;

@@ -797,11 +797,25 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      */
     var_Create( p_libvlc, "key-pressed", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "key-action", VLC_VAR_INTEGER );
-    p_libvlc->p_hotkeys = malloc( libvlc_hotkeys_size );
-    /* Do a copy (we don't need to modify the strings) */
-    memcpy( p_libvlc->p_hotkeys, libvlc_hotkeys, libvlc_hotkeys_size );
-    var_AddCallback( p_libvlc, "key-pressed", vlc_key_to_action,
-                     p_libvlc->p_hotkeys );
+    {
+        struct hotkey *p_keys =
+            malloc( (libvlc_actions_count + 1) * sizeof (*p_keys) );
+
+	/* Initialize from configuration */
+        for( size_t i = 0; i < libvlc_actions_count; i++ )
+        {
+            p_keys[i].psz_action = libvlc_actions[i].name;
+            p_keys[i].i_key = config_GetInt( p_libvlc,
+                                             libvlc_actions[i].name );
+            p_keys[i].i_action = libvlc_actions[i].value;
+        }
+        p_keys[libvlc_actions_count].psz_action = NULL;
+        p_keys[libvlc_actions_count].i_key = 0;
+        p_keys[libvlc_actions_count].i_action = 0;
+        p_libvlc->p_hotkeys = p_keys;
+        var_AddCallback( p_libvlc, "key-pressed", vlc_key_to_action,
+                         p_keys );
+    }
 
     /* Initialize playlist and get commandline files */
     p_playlist = playlist_Create( VLC_OBJECT(p_libvlc) );
@@ -1093,8 +1107,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     FREENULL( priv->psz_configfile );
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
-                     p_libvlc->p_hotkeys );
-    FREENULL( p_libvlc->p_hotkeys );
+                     (void *)p_libvlc->p_hotkeys );
+    free( (void *)p_libvlc->p_hotkeys );
 }
 
 /**
