@@ -1028,7 +1028,13 @@ static int SessionsSetup( demux_t *p_demux )
     /* Retrieve the duration if possible */
     p_sys->i_npt_length = p_sys->ms->playEndTime();
 
+    /* */
     msg_Dbg( p_demux, "setup start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
+
+    /* */
+    p_sys->b_no_data = true;
+    p_sys->i_no_data_ti = 0;
+
     return i_return;
 }
 
