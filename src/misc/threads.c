@@ -700,7 +700,7 @@ int vlc_threadvar_set (vlc_threadvar_t key, void *value)
 #if defined(LIBVLC_USE_PTHREAD)
     return pthread_setspecific (key, value);
 #elif defined( UNDER_CE ) || defined( WIN32 )
-    return TlsSetValue (key, p_value) ? ENOMEM : 0;
+    return TlsSetValue (key, value) ? ENOMEM : 0;
 #else
 # error Unimplemented!
 #endif
