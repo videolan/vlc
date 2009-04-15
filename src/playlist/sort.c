@@ -89,8 +89,6 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
 {
     int i_position;
     playlist_item_t *p_temp;
-    vlc_value_t val;
-    val.b_bool = true;
     sort_mode = i_mode;
     sort_type = i_type;
 
@@ -170,9 +168,9 @@ static int playlist_cmp(const void *first, const void *second)
     int i_test = 0;
 
     if( sort_mode == SORT_TITLE )
-        {
-            META_STRCASECMP_NAME( );
-        }
+    {
+        META_STRCASECMP_NAME( );
+    }
     else if( sort_mode == SORT_TITLE_NUMERIC )
     {
         char *psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input );
@@ -235,23 +233,7 @@ static int playlist_cmp(const void *first, const void *second)
         }
         else
         {
-            if ( (*(playlist_item_t **)first)->p_input->psz_name != NULL &&
-                 (*(playlist_item_t **)second)->p_input->psz_name != NULL )
-            {
-                i_test = strcasecmp( (*(playlist_item_t **)first)->p_input->psz_name,
-                                 (*(playlist_item_t **)second)->p_input->psz_name );
-            }
-            else if ( (*(playlist_item_t **)first)->p_input->psz_name != NULL &&
-                 (*(playlist_item_t **)second)->p_input->psz_name == NULL )
-            {
-                i_test = 1;
-            }
-            else if ( (*(playlist_item_t **)first)->p_input->psz_name == NULL &&
-                 (*(playlist_item_t **)second)->p_input->psz_name != NULL )
-            {
-                i_test = -1;
-            }
-            else i_test = 0;
+            META_STRCASECMP_NAME();
         }
     }
     else if( sort_mode == SORT_URI )
