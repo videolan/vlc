@@ -34,6 +34,7 @@
 #include <vlc_playlist.h>  /* playlist_t */
 
 #include <QEvent>
+#include <QString>
 
 #if ( QT_VERSION < 0x040300 )
 # error Update your Qt version
@@ -72,7 +73,7 @@ struct intf_sys_t
 
     playlist_t *p_playlist;  /* Core Playlist discussion */
 
-    const char *psz_filepath; /* Last path used in dialogs */
+    QString filepath;        /* Last path used in dialogs */
 
     QMenu * p_popup_menu;    /* The right click menu */
 };

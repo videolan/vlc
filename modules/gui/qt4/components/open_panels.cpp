@@ -113,7 +113,7 @@ inline void FileOpenPanel::BuildOldPanel()
 
     /* Make this QFileDialog a child of tempWidget from the ui. */
     dialogBox = new FileOpenBox( ui.tempWidget, NULL,
-            qfu( p_intf->p_sys->psz_filepath ), "" );
+                                 p_intf->p_sys->filepath, "" );
 
     dialogBox->setFileMode( QFileDialog::ExistingFiles );
     dialogBox->setAcceptMode( QFileDialog::AcceptOpen );
@@ -190,7 +190,7 @@ void FileOpenPanel::browseFileSub()
 {
     // TODO Handle selection of more than one subtitles file
     QStringList files = THEDP->showSimpleOpen( qtr("Open subtitles file"),
-                           EXT_FILTER_SUBTITLE, p_intf->p_sys->psz_filepath );
+                           EXT_FILTER_SUBTITLE, p_intf->p_sys->filepath );
 
     if( files.isEmpty() ) return;
     ui.subInput->setText( files.join(" ") );
@@ -240,8 +240,7 @@ void FileOpenPanel::updateMRL()
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
-    //FIXME
- //   p_intf->p_sys->psz_filepath = qtu( dialogBox->directory().absolutePath() );
+    p_intf->p_sys->filepath = dialogBox->directory().absolutePath();
     ui.fileListWidg->clear();
 }
 

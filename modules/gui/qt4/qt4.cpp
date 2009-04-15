@@ -460,9 +460,12 @@ static void *Thread( void *obj )
     app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
-    char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
-    p_intf->p_sys->psz_filepath = EMPTY_STR( psz_path ) ? config_GetHomeDir()
-                                                        : psz_path;
+    {
+        char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
+        p_intf->p_sys->filepath =
+            EMPTY_STR(psz_path) ? config_GetHomeDir() : qfu(psz_path);
+        free( psz_path );
+    }
 
     /* Launch */
     app.exec();
@@ -501,8 +504,8 @@ static void *Thread( void *obj )
 
 
     /* Save the path */
-    config_PutPsz( p_intf, "qt-filedialog-path", p_intf->p_sys->psz_filepath );
-    free( psz_path );
+    config_PutPsz( p_intf, "qt-filedialog-path",
+                   qtu(p_intf->p_sys->filepath) );
 
     /* Delete the application automatically */
     free( display );

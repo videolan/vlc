@@ -277,7 +277,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     if( p_arg->b_save )
     {
         QString file = QFileDialog::getSaveFileName( NULL, p_arg->psz_title,
-                            qfu( p_intf->p_sys->psz_filepath ), extensions );
+                                        p_intf->p_sys->filepath, extensions );
         if( !file.isEmpty() )
         {
             p_arg->i_results = 1;
@@ -290,7 +290,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     else /* non-save mode */
     {
         QStringList files = QFileDialog::getOpenFileNames( NULL,
-                p_arg->psz_title, qfu( p_intf->p_sys->psz_filepath ),
+                p_arg->psz_title, p_intf->p_sys->filepath,
                 extensions );
         p_arg->i_results = files.count();
         p_arg->psz_results = (char **)malloc( p_arg->i_results * sizeof( char * ) );
@@ -386,7 +386,7 @@ QStringList DialogsProvider::showSimpleOpen( QString help,
 
     return QFileDialog::getOpenFileNames( NULL,
         help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
-        path.isEmpty() ? qfu( p_intf->p_sys->psz_filepath ) : path,
+        path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
 }
 
@@ -512,7 +512,7 @@ void DialogsProvider::saveAPlaylist()
 {
     QFileDialog *qfd = new QFileDialog( NULL,
                                    qtr( "Save playlist as..." ),
-                                   qfu( p_intf->p_sys->psz_filepath ),
+                                   p_intf->p_sys->filepath,
                                    qtr( "XSPF playlist (*.xspf);; " ) +
                                    qtr( "M3U playlist (*.m3u);; " ) +
                                    qtr( "HTML playlist (*.html)" ) );
