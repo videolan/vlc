@@ -163,7 +163,6 @@ static void Run( intf_thread_t *p_intf )
 {
     vout_thread_t *p_vout = NULL;
     aout_instance_t *p_aout = NULL;
-    vlc_value_t val;
     playlist_t *p_playlist = pl_Hold( p_intf );
     int canc = vlc_savecancel();
 
@@ -259,18 +258,10 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( i_action == ACTIONID_TOGGLE_FULLSCREEN )
         {
-            if( p_vout )
-            {
-                var_Get( p_vout, "fullscreen", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_vout, "fullscreen", val );
-            }
-            else
-            {
-                var_Get( p_playlist, "fullscreen", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_playlist, "fullscreen", val );
-            }
+            vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
+                                       : VLC_OBJECT(p_playlist);
+            bool b = var_GetBool( obj, "fullscreen" );
+            var_SetBool( obj, "fullscreen", !b );
         }
         else if( i_action == ACTIONID_LEAVE_FULLSCREEN )
         {
@@ -286,83 +277,67 @@ static void Run( intf_thread_t *p_intf )
         {
             if( p_vout )
             {
-                if( i_action == ACTIONID_ZOOM_QUARTER )
-                    val.f_float = 0.25;
-                if( i_action == ACTIONID_ZOOM_HALF )
-                    val.f_float = 0.5;
-                if( i_action == ACTIONID_ZOOM_ORIGINAL )
-                    val.f_float = 1;
-                if( i_action == ACTIONID_ZOOM_DOUBLE )
-                    val.f_float = 2;
-                var_Set( p_vout, "zoom", val );
+                float f;
+                switch( i_action )
+                {
+                    case ACTIONID_ZOOM_QUARTER:  f = 0.25; break;
+                    case ACTIONID_ZOOM_HALF:     f = 0.5;  break;
+                    case ACTIONID_ZOOM_ORIGINAL: f = 1.;   break;
+                     /*case ACTIONID_ZOOM_DOUBLE:*/
+                    default:                     f = 2.;   break;
+                }
+                var_SetFloat( p_vout, "zoom", f );
             }
         }
+#ifdef WIN32
         else if( i_action == ACTIONID_WALLPAPER )
-        {
-            if( p_vout )
-            {
-                var_Get( p_vout, "directx-wallpaper", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_vout, "directx-wallpaper", val );
-            }
-            else
-            {
-                var_Get( p_playlist, "directx-wallpaper", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_playlist, "directx-wallpaper", val );
-            }
+        {   /* FIXME: this is invalid if not using DirectX output!!! */
+            vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
+                                       : VLC_OBJECT(p_playlist);
+            bool b = var_GetBool( obj, "directx-wallpaper" );
+            var_SetBool( obj, "directx-wallpaper", !b );
         }
+#endif
         /* Playlist actions */
         else if( i_action == ACTIONID_LOOP )
         {
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */
-            vlc_value_t val2;
-            var_Get( p_playlist, "loop", &val );
-            var_Get( p_playlist, "repeat", &val2 );
-            if( val2.b_bool == true )
-            {
-                val.b_bool = false;
-                val2.b_bool = false;
-            }
-            else if( val.b_bool == true )
-            {
-                val.b_bool = false;
-                val2.b_bool = true;
+            if( var_GetBool( p_playlist, "repeat" ) )
+                var_SetBool( p_playlist, "repeat", false );
+            else
+            if( var_GetBool( p_playlist, "loop" ) )
+            { /* FIXME: this is not atomic, we should use a real tristate */
+                var_SetBool( p_playlist, "loop", false );
+                var_SetBool( p_playlist, "repeat", true );
             }
             else
-            {
-                val.b_bool = true;
-            }
-            var_Set( p_playlist, "loop", val );
-            var_Set( p_playlist, "repeat", val2 );
+                var_SetBool( p_playlist, "loop", true );
         }
         else if( i_action == ACTIONID_RANDOM )
         {
-            var_Get( p_playlist, "random", &val );
-            val.b_bool = !val.b_bool;
-            var_Set( p_playlist, "random", val );
+            bool b = var_GetBool( p_playlist, "random" );
+            var_SetBool( p_playlist, "random", !b );
         }
         else if( i_action == ACTIONID_PLAY_PAUSE )
         {
-            val.i_int = PLAYING_S;
             if( p_input )
             {
                 ClearChannels( p_intf, p_vout );
 
-                var_Get( p_input, "state", &val );
-                if( val.i_int != PAUSE_S )
+                int state = var_GetInteger( p_input, "state" );
+                if( state != PAUSE_S )
                 {
                     vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
                                   OSD_PAUSE_ICON );
-                    val.i_int = PAUSE_S;
+                    state = PAUSE_S;
                 }
                 else
                 {
                     vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
                                   OSD_PLAY_ICON );
-                    val.i_int = PLAYING_S;
+                    state = PLAYING_S;
                 }
-                var_Set( p_input, "state", val );
+                var_SetInteger( p_input, "state", state );
             }
             else
             {
@@ -421,14 +396,12 @@ static void Run( intf_thread_t *p_intf )
 
             if( i_action == ACTIONID_PAUSE )
             {
-                var_Get( p_input, "state", &val );
-                if( val.i_int != PAUSE_S )
+                if( var_GetInteger( p_input, "state" ) != PAUSE_S )
                 {
                     ClearChannels( p_intf, p_vout );
                     vout_OSDIcon( VLC_OBJECT( p_intf ), DEFAULT_CHAN,
                                   OSD_PAUSE_ICON );
-                    val.i_int = PAUSE_S;
-                    var_Set( p_input, "state", val );
+                    var_SetInteger( p_input, "state", PAUSE_S );
                 }
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_EXTRASHORT
@@ -437,8 +410,8 @@ static void Run( intf_thread_t *p_intf )
 #define SET_TIME( a, b ) \
     i_interval = config_GetInt( p_input, a "-jump-size" ); \
     if( i_interval > 0 ) { \
-        val.i_time = (mtime_t)(i_interval * b) * 1000000L; \
-        var_Set( p_input, "time-offset", val ); \
+        mtime_t i_time = (mtime_t)(i_interval * b) * 1000000L; \
+        var_SetTime( p_input, "time-offset", i_time ); \
         DisplayPosition( p_intf, p_vout, p_input ); \
     }
                 SET_TIME( "extrashort", -1 );
@@ -849,12 +822,9 @@ static void Run( intf_thread_t *p_intf )
             }
             else if( i_action == ACTIONID_PLAY )
             {
-                var_Get( p_input, "rate", &val );
-                if( val.i_int != INPUT_RATE_DEFAULT )
-                {
+                if( var_GetInteger( p_input, "rate" ) != INPUT_RATE_DEFAULT )
                     /* Return to normal speed */
                     var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
-                }
                 else
                 {
                     ClearChannels( p_intf, p_vout );
