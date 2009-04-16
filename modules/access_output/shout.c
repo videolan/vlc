@@ -109,7 +109,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_description( N_("IceCAST output") )
     set_shortname( "Shoutcast" )
-    set_capability( "sout access", 50 )
+    set_capability( "sout access", 0 )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_ACO )
     add_shortcut( "shout" )

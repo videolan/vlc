@@ -87,7 +87,7 @@ vlc_module_begin ()
     add_obsolete_integer( SOUT_CFG_PREFIX "late" )
     add_obsolete_bool( SOUT_CFG_PREFIX "raw" )
 
-    set_capability( "sout access", 100 )
+    set_capability( "sout access", 0 )
     add_shortcut( "udp" )
     set_callbacks( Open, Close )
 vlc_module_end ()
