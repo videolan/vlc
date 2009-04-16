@@ -203,6 +203,7 @@ int rtp_process (demux_t *demux)
 {
     demux_sys_t *p_sys = demux->p_sys;
     mtime_t deadline = INT64_MAX;
+    int ret;
 
     vlc_mutex_lock (&p_sys->lock);
     if (rtp_dequeue (demux, p_sys->session, &deadline))
@@ -210,7 +211,8 @@ int rtp_process (demux_t *demux)
         vlc_cond_timedwait (&p_sys->wait, &p_sys->lock, deadline);
     else
         vlc_cond_wait (&p_sys->wait, &p_sys->lock);
+    ret = p_sys->dead ? -1 : 0;
     vlc_mutex_unlock (&p_sys->lock);
 
-    return p_sys->dead ? -1 : 0;
+    return ret;
 }
