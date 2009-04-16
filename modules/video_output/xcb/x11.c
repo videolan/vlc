@@ -120,9 +120,7 @@ static int Open (vlc_object_t *obj)
 
     vout->p_sys = p_sys;
     p_sys->conn = NULL;
-#ifndef NDEBUG
     p_sys->embed = NULL;
-#endif
 
     /* Connect to X */
     char *display = var_CreateGetNonEmptyString (vout, "x11-display");
