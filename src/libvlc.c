@@ -66,6 +66,11 @@
 #   include <locale.h>
 #endif
 
+#ifdef ENABLE_NLS
+# undef gettext
+# include <libintl.h> /* bindtextdomain */
+#endif
+
 #ifdef HAVE_DBUS
 /* used for one-instance mode */
 #   include <dbus/dbus.h>

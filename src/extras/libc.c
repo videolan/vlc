@@ -191,6 +191,11 @@ int vlc_wclosedir( void *_p_dir )
 #endif
 }
 
+#ifdef ENABLE_NLS
+# undef gettext
+# include <libintl.h>
+#endif
+
 /**
  * In-tree plugins share their gettext domain with LibVLC.
  */

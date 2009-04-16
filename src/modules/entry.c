@@ -28,6 +28,11 @@
 #include <assert.h>
 #include <stdarg.h>
 
+#ifdef ENABLE_NLS
+# undef gettext
+# include <libintl.h>
+#endif
+
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"

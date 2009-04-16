@@ -179,10 +179,6 @@ typedef void *locale_t;
 #define gettext(str)     vlc_gettext (str)
 #define pgettext(ctx,id) vlc_pgettext(ctx,id)
 
-#if defined (ENABLE_NLS)
-# include <libintl.h>
-#endif
-
 #define N_(str) gettext_noop (str)
 #define gettext_noop(str) (str)
 
