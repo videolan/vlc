@@ -300,6 +300,8 @@ sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
     psz_next = config_ChainCreate( &p_access->psz_access, &p_access->p_cfg,
                                    psz_access );
     free( psz_next );
+    if( !p_access->psz_access )
+        p_access->psz_access = strdup( "" );
     p_access->psz_path   = strdup( psz_name ? psz_name : "" );
     p_access->p_sys      = NULL;
     p_access->pf_seek    = NULL;
