@@ -156,6 +156,7 @@ static int Open( vlc_object_t *p_this )
                           p_dec->fmt_in.i_extra,
                           &i_rate, &i_channels ) < 0 )
         {
+            msg_Err( p_dec, "Failed to initialize faad using extra data" );
             return VLC_EGENERIC;
         }
 
