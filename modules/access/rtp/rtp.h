@@ -66,7 +66,6 @@ struct demux_sys_t
     uint16_t      max_dropout; /**< Max packet forward misordering */
     uint16_t      max_misorder; /**< Max packet backward misordering */
     uint8_t       max_src; /**< Max simultaneous RTP sources */
-    bool          autodetect; /**< Payload format autodetection */
     bool          framed_rtp; /**< Framed RTP packets over TCP */
     bool          dead; /**< End of stream */
 };

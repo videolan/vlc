@@ -164,6 +164,7 @@ void *rtp_thread (void *data)
 {
     demux_t *demux = data;
     demux_sys_t *p_sys = demux->p_sys;
+    bool autodetect = true;
 
     do
     {
@@ -174,7 +175,7 @@ void *rtp_thread (void *data)
             p_sys->dead = true; /* Fatal error: abort */
         else
         {
-            if (p_sys->autodetect)
+            if (autodetect)
             {   /* Autodetect payload type, _before_ rtp_queue() */
                 if (rtp_autodetect (demux, p_sys->session, block))
                 {
@@ -182,7 +183,7 @@ void *rtp_thread (void *data)
                     block_Release (block);
                     continue;
                 }
-                p_sys->autodetect = false;
+                autodetect = false;
             }
             rtp_queue (demux, p_sys->session, block);
         }
