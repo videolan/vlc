@@ -280,8 +280,6 @@ struct picture_sys_t
     xcb_shm_seg_t segment; /* Shared memory segment X ID */
 };
 
-static void PictureRelease (picture_t *pic);
-static void PictureShmRelease (picture_t *pic);
 #define SHM_ERR ((void *)(intptr_t)(-1))
 
 static int PictureInit (vout_thread_t *vout, picture_t *pic)
@@ -333,6 +331,8 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
             shm = SHM_ERR;
         }
     }
+    else
+        priv->segment = 0;
 
     const unsigned real_width = pic->p->i_pitch / (p_sys->bpp >> 3);
     /* FIXME: anyway to getthing more intuitive than that?? */
@@ -366,8 +366,6 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     priv->native = NULL;
     pic->p_sys = priv;
     pic->p->p_pixels = img->data;
-    pic->pf_release = (shm != SHM_ERR) ? PictureShmRelease
-                                       : PictureRelease;
     pic->i_status = DESTROYED_PICTURE;
     pic->i_type = DIRECT_PICTURE;
     return VLC_SUCCESS;
@@ -383,26 +381,19 @@ error:
 /**
  * Release picture private data
  */
-static void PictureRelease (picture_t *pic)
+static void PictureDeinit (picture_t *pic)
 {
     struct picture_sys_t *p_sys = pic->p_sys;
 
+    if (p_sys->segment != 0)
+    {
+        xcb_shm_detach (p_sys->conn, p_sys->segment);
+        shmdt (p_sys->image->data);
+    }
     if ((p_sys->native != NULL) && (p_sys->native != p_sys->image))
         xcb_image_destroy (p_sys->native);
     xcb_image_destroy (p_sys->image);
     free (p_sys);
-}
-
-/**
- * Release shared memory picture private data
- */
-static void PictureShmRelease (picture_t *pic)
-{
-    struct picture_sys_t *p_sys = pic->p_sys;
-
-    xcb_shm_detach (p_sys->conn, p_sys->segment);
-    shmdt (p_sys->image->data);
-    PictureRelease (pic);
 }
 
 /**
@@ -518,7 +509,7 @@ static void Deinit (vout_thread_t *vout)
     vout_sys_t *p_sys = vout->p_sys;
 
     while (I_OUTPUTPICTURES > 0)
-        picture_Release (PP_OUTPUTPICTURE[--I_OUTPUTPICTURES]);
+        PictureDeinit (PP_OUTPUTPICTURE[--I_OUTPUTPICTURES]);
 
     xcb_unmap_window (p_sys->conn, p_sys->window);
     xcb_destroy_window (p_sys->conn, p_sys->window);
