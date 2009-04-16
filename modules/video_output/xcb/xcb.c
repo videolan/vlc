@@ -84,6 +84,7 @@ struct vout_sys_t
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
     uint8_t bpp; /* bits per pixel */
+    uint8_t pad; /* scanline pad */
 };
 
 static int Init (vout_thread_t *);
@@ -136,6 +137,8 @@ static int Open (vlc_object_t *obj)
     }
     free (display);
 
+    const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
+
     /* Get the preferred screen */
     xcb_screen_t *scr = xcb_aux_get_screen (p_sys->conn, snum);
     p_sys->screen = scr;
@@ -165,43 +168,63 @@ static int Open (vlc_object_t *obj)
     }
     else
     {
-        vt = xcb_aux_find_visual_by_id (scr, scr->root_visual);
-        assert (vt);
-        msg_Err (vout, "unsupported visual class %"PRIu8, vt->_class);
+        msg_Err (vout, "no supported visual class");
         goto error;
     }
     p_sys->vid = vt->visual_id;
 
     /* Determine our input format (normally, done in Init() but X11
      * never changes its format) */
-    p_sys->bpp = scr->root_depth;
-    switch (scr->root_depth)
+    vout->output.i_chroma = 0;
+    for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
+             *end = fmt + xcb_setup_pixmap_formats_length (setup);
+         fmt < end; fmt++)
     {
-        case 24:
-            p_sys->bpp = 32;
-        case 32: /* FIXME: untested */
-            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '3', '2');
-            break;
+        if (fmt->depth != scr->root_depth)
+            continue;
 
-        case 16:
+        switch (fmt->depth)
+        {
+          case 24:
+            if (fmt->bits_per_pixel == 32)
+                vout->output.i_chroma = VLC_FOURCC ('R', 'V', '3', '2');
+            else if (fmt->bits_per_pixel == 24)
+                vout->output.i_chroma = VLC_FOURCC ('R', 'V', '2', '4');
+            else
+                continue;
+            break;
+          case 16:
+            if (fmt->bits_per_pixel != 16)
+                continue;
             vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '6');
             break;
-
-        case 15:
-            p_sys->bpp = 16;
+          case 15:
+            if (fmt->bits_per_pixel != 16)
+                continue;
             vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '5');
             break;
-
-        case 8: /* FIXME: VLC cannot convert */
+          case 8:
+            if (fmt->bits_per_pixel != 8)
+                continue;
             vout->output.i_chroma = gray ? VLC_FOURCC ('G', 'R', 'E', 'Y')
                                          : VLC_FOURCC ('R', 'G', 'B', '2');
             break;
-
-        default:
-            msg_Err (vout, "unsupported %"PRIu8"-bits screen depth",
-                     scr->root_depth);
-            goto error;
+        }
+        if ((fmt->bits_per_pixel << 4) % fmt->scanline_pad)
+            continue; /* VLC pads lines to 16 pixels internally */
+        p_sys->bpp = fmt->bits_per_pixel;
+        p_sys->pad = fmt->scanline_pad;
+        msg_Dbg (vout, "using %"PRIu8" bits per pixels (line pad: %"PRIu8")",
+                 p_sys->bpp, p_sys->pad);
+        break;
     }
+
+    if (!vout->output.i_chroma)
+    {
+        msg_Err (vout, "no supported pixmap formats");
+        goto error;
+    }
+
     vout->fmt_out.i_chroma = vout->output.i_chroma;
     if (!gray)
     {
@@ -337,10 +360,9 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     const unsigned real_width = pic->p->i_pitch / (p_sys->bpp >> 3);
     /* FIXME: anyway to getthing more intuitive than that?? */
 
-    /* NOTE: 32-bits scanline_pad assumed, FIXME? (see xdpyinfo) */
     xcb_image_t *img;
     img = xcb_image_create (real_width, pic->p->i_lines,
-                            XCB_IMAGE_FORMAT_Z_PIXMAP, 32,
+                            XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->pad,
                             p_sys->screen->root_depth, p_sys->bpp, p_sys->bpp,
 #ifdef WORDS_BIGENDIAN
                             XCB_IMAGE_ORDER_MSB_FIRST,
