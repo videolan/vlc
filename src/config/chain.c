@@ -189,10 +189,6 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
 
     /* Look for parameter (a {...} or :...) or end of name (space or nul) */
     len = strcspn( psz_chain, "{: \t" );
-    if( len == 0 )
-        return NULL;
-
-    /* Extract the name */
     *ppsz_name = strndup( psz_chain, len );
     psz_chain += len;
 
