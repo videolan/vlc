@@ -427,6 +427,8 @@ static int Init (vout_thread_t *vout)
     const xcb_screen_t *screen = p_sys->screen;
     unsigned x, y, width, height;
 
+    I_OUTPUTPICTURES = 0;
+
     /* Determine parent window and size */
     if (vout->b_fullscreen)
     {
@@ -534,8 +536,8 @@ static void Deinit (vout_thread_t *vout)
 {
     vout_sys_t *p_sys = vout->p_sys;
 
-    while (I_OUTPUTPICTURES > 0)
-        PictureDeinit (PP_OUTPUTPICTURE[--I_OUTPUTPICTURES]);
+    for (int i = 0; i < I_OUTPUTPICTURES; i++)
+        PictureDeinit (PP_OUTPUTPICTURE[i]);
 
     xcb_unmap_window (p_sys->conn, p_sys->window);
     xcb_destroy_window (p_sys->conn, p_sys->window);
