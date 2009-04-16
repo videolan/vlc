@@ -63,6 +63,7 @@ typedef struct
     int i_samplerate;
     int i_channel;
     int i_sbr;          // 0: no sbr, 1: sbr, -1: unknown
+    int i_ps;           // 0: no ps,  1: ps,  -1: unknown
 
     struct
     {
@@ -527,7 +528,7 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
         "ER AAC LTP", "ER AAC Scalable", "ER TwinVQ", "ER BSAC", "ER AAC LD",
         "ER CELP", "ER HVXC", "ER HILN", "ER Parametric",
         "SSC",
-        "Reserved", "Reserved", "Escape",
+        "PS", "Reserved", "Escape",
         "Layer 1", "Layer 2", "Layer 3",
         "DST",
     };
@@ -550,12 +551,15 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
         p_cfg->i_channel = -1;
 
     p_cfg->i_sbr = -1;
+    p_cfg->i_ps  = -1;
     p_cfg->extension.i_object_type = 0;
     p_cfg->extension.i_samplerate = 0;
-    if( p_cfg->i_object_type == 5 )
+    if( p_cfg->i_object_type == 5 || p_cfg->i_object_type == 29 )
     {
         p_cfg->i_sbr = 1;
-        p_cfg->extension.i_object_type = p_cfg->i_object_type;
+        if( p_cfg->i_object_type == 29 )
+           p_cfg->i_ps = 1;
+        p_cfg->extension.i_object_type = 5;
         p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate( s );
 
         p_cfg->i_object_type = Mpeg4ReadAudioObjectType( s );
@@ -598,6 +602,9 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
     case 35:
         // DSTSpecificConfig();
         break;
+    case 36:
+        // ALSSpecificConfig();
+        break;
     default:
         // error
         break;
@@ -626,7 +633,7 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
         break;
     }
 
-    if( p_cfg->extension.i_object_type != 5 && i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 16 && 
+    if( p_cfg->extension.i_object_type != 5 && i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 16 &&
         bs_read( s, 11 ) == 0x2b7 )
     {
         p_cfg->extension.i_object_type = Mpeg4ReadAudioObjectType( s );
@@ -634,7 +641,13 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
         {
             p_cfg->i_sbr  = bs_read1( s );
             if( p_cfg->i_sbr == 1 )
+            {
                 p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate( s );
+                if( i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 12 && bs_read( s, 11 ) == 0x548 )
+                {
+                   p_cfg->i_ps = bs_read1( s );
+                }
+            }
         }
     }
 
@@ -643,8 +656,8 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
 
     i_bits = bs_pos(s) - i_pos_start;
 
-    *pi_extra = ( i_bits + 7 ) / 8;
-    for( i = 0; i < __MIN( LATM_MAX_EXTRA_SIZE, *pi_extra ); i++ )
+    *pi_extra = __MIN( ( i_bits + 7 ) / 8, LATM_MAX_EXTRA_SIZE );
+    for( i = 0; i < *pi_extra; i++ )
     {
         const int i_read = __MIN( 8, i_bits - 8*i );
         p_extra[i] = bs_read( &s_sav, i_read ) << (8-i_read);
