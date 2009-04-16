@@ -624,7 +624,7 @@ static void Eia608ParseChannel( eia608_t *h, uint8_t d[2] )
         h->i_channel = 1;
     else if( d1 == 0x1c )
         h->i_channel = 2;
-    else if( ( d1 >= 0x01 && d1 <= 0x0f ) || d1 == 0x15 )
+    else if( d1 == 0x15 )
         h->i_channel = 3;
     else if( d1 == 0x1d )
         h->i_channel = 4;
