@@ -604,8 +604,22 @@ static void Eia608RollUp( eia608_t *h )
     /* Reset current row */
     Eia608ClearScreenRow( h, i_screen, h->cursor.i_row );
 }
-static void Eia608ParseChannel( eia608_t *h, uint8_t d1 )
+static void Eia608ParseChannel( eia608_t *h, uint8_t d[2] )
 {
+    /* Check odd parity */
+    static const int p4[16] = {
+        0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0
+    };
+    if( p4[d[0] & 0xf] == p4[d[0] >> 4] ||
+        p4[d[1] & 0xf] == p4[ d[1] >> 4] )
+    {
+        h->i_channel = -1;
+        return;
+    }
+
+    /* */
+    const int d1 = d[0] & 0x7f;
+    const int d2 = d[1] & 0x7f;
     if( d1 == 0x14 )
         h->i_channel = 1;
     else if( d1 == 0x1c )
@@ -1069,14 +1083,14 @@ static void Eia608Init( eia608_t *h )
 }
 static bool Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] )
 {
-    const uint8_t d1 = data[0] & 0x7f; /* Removed parity bit TODO we might want to check them */
+    const uint8_t d1 = data[0] & 0x7f; /* Removed parity bit */
     const uint8_t d2 = data[1] & 0x7f;
     bool b_screen_changed = false;
 
     if( d1 == 0 && d2 == 0 )
-        return false;   /* Ignore padding */
+        return false;   /* Ignore padding (parity check are sometimes invalid on them) */
 
-    Eia608ParseChannel( h, d1 );
+    Eia608ParseChannel( h, data );
     if( h->i_channel != i_channel_selected )
         return false;
     //fprintf( stderr, "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC %x %x\n", data[0], data[1] );
