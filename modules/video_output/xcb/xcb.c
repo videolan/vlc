@@ -484,15 +484,19 @@ static int Init (vout_thread_t *vout)
     xcb_flush (p_sys->conn);
 
     /* Allocate picture buffers */
-    do
+    I_OUTPUTPICTURES = 0;
+    for (size_t index = 0; I_OUTPUTPICTURES < 2; index++)
     {
-        picture_t *pic = vout->p_picture + I_OUTPUTPICTURES;
+        picture_t *pic = vout->p_picture + index;
 
+        if (index > sizeof (vout->p_picture) / sizeof (pic))
+            break;
+        if (pic->i_status != FREE_PICTURE)
+            continue;
         if (PictureInit (vout, pic))
             break;
         PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
     }
-    while (I_OUTPUTPICTURES < 2);
 
     return VLC_SUCCESS;
 
