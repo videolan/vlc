@@ -482,7 +482,7 @@ AS_IF([test "${SYS}" = "mingw32"], [
         AC_MSG_RESULT([ok])
 ], [
         AC_MSG_RESULT([present])
-        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.13 or higher!])
+        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.14 or higher!])
 ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
