@@ -287,7 +287,7 @@ static const muxer_properties_t p_muxers[] = {
     M( "mp4", "mp4", INT_MAX,   VLC_FOURCC('m','p','4','a'), VLC_FOURCC('h','2','6','4'), VLC_FOURCC('m','p','4','v'),
                                 VLC_FOURCC('s','u','b','t') ),
 
-    M( "ps", "ps", 16/* FIXME*/,VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'),
+    M( "ps", "mpg", 16/* FIXME*/,VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'),
                                 VLC_FOURCC('m','p','g','a'), VLC_FOURCC('l','p','c','m'), VLC_FOURCC('a','5','2',' '),
                                 VLC_FOURCC('d','t','s',' '),
                                 VLC_FOURCC('s','p','u',' ') ),
@@ -392,7 +392,7 @@ static void OutputStart( sout_stream_t *p_stream )
     {
         static const char *ppsz_muxers[][2] = {
             { "avi", "avi" }, { "mp4", "mp4" }, { "ogg", "ogg" },
-            { "asf", "asf" }, {  "ts",  "ts" }, {  "ps",  "ps" },
+            { "asf", "asf" }, {  "ts",  "ts" }, {  "ps", "mpg" },
 #if 0
             // XXX ffmpeg sefault really easily if you try an unsupported codec
             // mov and avi at least segfault
