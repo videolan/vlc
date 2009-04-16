@@ -22,7 +22,7 @@ SOURCES_yuv = yuv.c
 
 libxcb_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
-	xcb/xcb.c \
+	xcb/x11.c \
 	xcb/events.c
 libxcb_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM) \

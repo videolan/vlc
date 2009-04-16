@@ -1,5 +1,5 @@
 /**
- * @file xcb.c
+ * @file x11.c
  * @brief X C Bindings video output module for VLC media player
  */
 /*****************************************************************************
