@@ -259,9 +259,14 @@ static int Open (vlc_object_t *obj)
              p_sys->bpp, p_sys->pad);
 
     /* Create colormap (needed to select non-default visual) */
-    p_sys->cmap = xcb_generate_id (p_sys->conn);
-    xcb_create_colormap (p_sys->conn, XCB_COLORMAP_ALLOC_NONE,
-                         p_sys->cmap, scr->root, p_sys->vid);
+    if (p_sys->vid != scr->root_visual)
+    {
+        p_sys->cmap = xcb_generate_id (p_sys->conn);
+        xcb_create_colormap (p_sys->conn, XCB_COLORMAP_ALLOC_NONE,
+                             p_sys->cmap, scr->root, p_sys->vid);
+    }
+    else
+        p_sys->cmap = scr->default_colormap;
 
     /* Check shared memory support */
     p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
