@@ -475,14 +475,14 @@ AS_IF([test "${SYS}" = "mingw32"], [
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([
 #include <_mingw.h>
-#if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 14)
+#if (__MINGW32_MAJOR_VERSION == 3) && (__MINGW32_MINOR_VERSION < 15)
 # error Attempting to use mingw-runtime with broken vsnprintf support
 #endif
 ], [
         AC_MSG_RESULT([ok])
 ], [
         AC_MSG_RESULT([present])
-        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.14 or higher!])
+        AC_MSG_ERROR([LibVLC requires mingw-runtime version 3.15 or higher!])
 ])
     dnl force use of mingw provided c99 *printf over msvcrt
     CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=1"
