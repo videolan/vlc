@@ -1,5 +1,5 @@
-Changes between 0.9.8a and 1.0.0-pre1:
---------------------------------------
+Changes between 0.9.9 and 1.0.0-pre2:
+-------------------------------------
 
 Important notes:
 ----------------
@@ -25,7 +25,7 @@ New Decoders:
  * Close Caption under SCTE-20 standard
 
 Demuxers:
- * Support for Dirac and RealVideo in Matroska files
+ * Support for Dirac, MLP and RealVideo in Matroska files
  * Major improvements in RealMedia files opening (.rm and .rmvb)
  * Improvements of the TS demuxer for M2TS files from Blu-Ray and AVCHD
 
@@ -107,6 +107,37 @@ Video output:
 
 Miscellanous:
  * Invmem, a fake codec to display images from external applications
+
+Changes between 0.9.8a and 0.9.9:
+---------------------------------
+
+Decoders:
+ * Experimental new decoder for Real Video 3.0 & 4.0
+
+Demuxers:
+ * Various fixes related to real demuxer
+
+Mac OS X Interface:
+ * Fixed circumstances, which could lead to an empty Information panel
+   - Note that VLC will show information on the currently _selected_ item 
+     instead of the currently _playing_ item, if the playlist is visible in the 
+     main controller window.
+ * Fixed multiple UTF8 issues in the Streaming / Exporting Wizard
+
+Mac OS X Port:
+ * Improved video playback performance on Intel-based Macs
+
+New Localizations:
+ * Indonesian
+ * Bengali
+ * Updates of other localizations
+
+Various bugfixes:
+ * Support for receiving RTP packets on odd port numbers.
+ * Lots of small bugfixes.
+ * Correct Fullscreen behaviour on Multi-Screen setups on Windows
+ * Telnet fixes on Windows
+ * Resampling fixes when transcoding
 
 Changes between 0.9.6 and 0.9.8a:
 ---------------------------------
