@@ -462,6 +462,7 @@
     [o_save_accessory_text setStringValue: _NS("File Format:")];
     [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
     [[o_save_accessory_popup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
+    [[o_save_accessory_popup itemAtIndex:2] setTitle: _NS("HTML playlist")];
 }
 
 - (void)playlistUpdated
@@ -534,12 +535,12 @@
         if( psz_uri )
         {
             o_mrl = [NSMutableString stringWithUTF8String: psz_uri];
-        
+
             /* perform some checks whether it is a file and if it is local at all... */
             NSRange prefix_range = [o_mrl rangeOfString: @"file:"];
             if( prefix_range.location != NSNotFound )
                 [o_mrl deleteCharactersInRange: prefix_range];
-            
+
             if( [o_mrl characterAtIndex:0] == '/' )
             {
                 [o_mi_revealInFinder setEnabled: YES];
@@ -721,7 +722,27 @@
     {
         NSString *o_filename = [o_save_panel filename];
 
-        if( [o_save_accessory_popup indexOfSelectedItem] == 1 )
+        if( [o_save_accessory_popup indexOfSelectedItem] == 0 )
+        {
+            NSString * o_real_filename;
+            NSRange range;
+            range.location = [o_filename length] - [@".m3u" length];
+            range.length = [@".m3u" length];
+
+            if( [o_filename compare:@".m3u" options: NSCaseInsensitiveSearch
+                                             range: range] != NSOrderedSame )
+            {
+                o_real_filename = [NSString stringWithFormat: @"%@.m3u", o_filename];
+            }
+            else
+            {
+                o_real_filename = o_filename;
+            }
+            playlist_Export( p_playlist,
+                [o_real_filename fileSystemRepresentation],
+                p_playlist->p_local_category, "export-m3u" );
+        }
+        else if( [o_save_accessory_popup indexOfSelectedItem] == 1 )
         {
             NSString * o_real_filename;
             NSRange range;
@@ -745,13 +766,13 @@
         {
             NSString * o_real_filename;
             NSRange range;
-            range.location = [o_filename length] - [@".m3u" length];
-            range.length = [@".m3u" length];
+            range.location = [o_filename length] - [@".html" length];
+            range.length = [@".html" length];
 
-            if( [o_filename compare:@".m3u" options: NSCaseInsensitiveSearch
+            if( [o_filename compare:@".html" options: NSCaseInsensitiveSearch
                                              range: range] != NSOrderedSame )
             {
-                o_real_filename = [NSString stringWithFormat: @"%@.m3u", o_filename];
+                o_real_filename = [NSString stringWithFormat: @"%@.html", o_filename];
             }
             else
             {
@@ -759,7 +780,7 @@
             }
             playlist_Export( p_playlist,
                 [o_real_filename fileSystemRepresentation],
-                p_playlist->p_local_category, "export-m3u" );
+                p_playlist->p_local_category, "export-html" );
         }
     }
     pl_Release( VLCIntf );
