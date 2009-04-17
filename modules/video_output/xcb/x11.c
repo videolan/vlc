@@ -141,97 +141,122 @@ static int Open (vlc_object_t *obj)
     xcb_screen_t *scr = xcb_aux_get_screen (p_sys->conn, snum);
     p_sys->screen = scr;
     assert (p_sys->screen);
-    msg_Dbg (vout, "using screen %d (depth %"PRIu8")", snum, scr->root_depth);
+    msg_Dbg (vout, "using screen %d", snum);
 
-    /* Determine the visual (color depth and palette) */
-    xcb_visualtype_t *vt = NULL;
-    bool gray = false;
-
-    if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_TRUE_COLOR,
-                                            scr->root_depth)) != NULL)
-        msg_Dbg (vout, "using TrueColor visual ID %d", (int)vt->visual_id);
-    else
-#if 0
-    if ((vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_COLOR,
-                                            scr->root_depth)) != NULL)
-        msg_Dbg (vout, "using static color visual ID %d", (int)vt->visual_id);
-    else
-#endif
-    if ((scr->root_depth == 8)
-     && (vt = xcb_aux_find_visual_by_attrs (scr, XCB_VISUAL_CLASS_STATIC_GRAY,
-                                            scr->root_depth)) != NULL)
-    {
-        msg_Dbg (vout, "using static gray visual ID %d", (int)vt->visual_id);
-        gray = true;
-    }
-    else
-    {
-        msg_Err (vout, "no supported visual class");
-        goto error;
-    }
-    p_sys->vid = vt->visual_id;
-
-    /* Determine our input format (normally, done in Init() but X11
-     * never changes its format) */
-    vout->output.i_chroma = 0;
+    /* Determine our video format. Normally, this is done in pf_init(), but
+     * this plugin always uses the same format for a given X11 screen. */
+    uint8_t depth = 0;
+    bool gray = true;
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
          fmt < end; fmt++)
     {
-        if (fmt->depth != scr->root_depth)
-            continue;
+        vlc_fourcc_t chroma = 0;
 
+        if (fmt->depth < depth)
+            continue; /* We already found a better format! */
+
+        /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
         {
           case 24:
             if (fmt->bits_per_pixel == 32)
-                vout->output.i_chroma = VLC_FOURCC ('R', 'V', '3', '2');
+                chroma = VLC_FOURCC ('R', 'V', '3', '2');
             else if (fmt->bits_per_pixel == 24)
-                vout->output.i_chroma = VLC_FOURCC ('R', 'V', '2', '4');
+                chroma = VLC_FOURCC ('R', 'V', '2', '4');
             else
                 continue;
             break;
           case 16:
             if (fmt->bits_per_pixel != 16)
                 continue;
-            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '6');
+            chroma = VLC_FOURCC ('R', 'V', '1', '6');
             break;
           case 15:
             if (fmt->bits_per_pixel != 16)
                 continue;
-            vout->output.i_chroma = VLC_FOURCC ('R', 'V', '1', '5');
+            chroma = VLC_FOURCC ('R', 'V', '1', '5');
             break;
           case 8:
             if (fmt->bits_per_pixel != 8)
                 continue;
-            vout->output.i_chroma = gray ? VLC_FOURCC ('G', 'R', 'E', 'Y')
-                                         : VLC_FOURCC ('R', 'G', 'B', '2');
+            chroma = VLC_FOURCC ('R', 'G', 'B', '2');
             break;
           default:
             continue;
         }
         if ((fmt->bits_per_pixel << 4) % fmt->scanline_pad)
             continue; /* VLC pads lines to 16 pixels internally */
+
+        /* Byte sex is a non-issue for 8-bits. It can be worked around with
+         * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
+#ifdef WORDS_BIGENDIAN
+# define ORDER XCB_IMAGE_ORDER_MSB_FIRST
+#else
+# define ORDER XCB_IMAGE_ORDER_LSB_FIRST
+#endif
+        if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
+            continue;
+
+        /* Check that the selected screen supports this depth */
+        xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator (scr);
+        while (it.rem > 0 && it.data->depth != fmt->depth)
+             xcb_depth_next (&it);
+        if (!it.rem)
+            continue; /* Depth not supported on this screen */
+
+        /* Find a visual type for the selected depth */
+        const xcb_visualtype_t *vt = xcb_depth_visuals (it.data);
+        xcb_visualid_t vid = 0;
+        for (int i = xcb_depth_visuals_length (it.data); (i > 0) && !vid; i--)
+        {
+            if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
+            {
+                msg_Dbg (vout,
+                         "using TrueColor %"PRIu8"-bits visual ID 0x%0"PRIx32,
+                         fmt->depth, vt->visual_id);
+                vid = vt->visual_id;
+                gray = false;
+                break;
+            }
+            if (fmt->depth == 8 && vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
+            {
+                if (!gray)
+                    continue; /* Prefer color over gray scale */
+                vid = vt->visual_id;
+                chroma = VLC_FOURCC ('G', 'R', 'E', 'Y');
+                msg_Dbg (vout,
+                         "using static gray 8-bits visual ID 0x%x"PRIx32,
+                         vt->visual_id);
+                break;
+            }
+        }
+
+        if (!vid)
+            continue; /* The screen does not *really* support this depth */
+
+        vout->fmt_out.i_chroma = vout->output.i_chroma = chroma;
+        if (!gray)
+        {
+            vout->output.i_rmask = vt->red_mask;
+            vout->output.i_gmask = vt->green_mask;
+            vout->output.i_bmask = vt->blue_mask;
+        }
+        p_sys->vid = vid;
         p_sys->bpp = fmt->bits_per_pixel;
         p_sys->pad = fmt->scanline_pad;
-        msg_Dbg (vout, "using %"PRIu8" bits per pixels (line pad: %"PRIu8")",
-                 p_sys->bpp, p_sys->pad);
-        break;
+
+        depth = fmt->depth;
     }
 
-    if (!vout->output.i_chroma)
+    if (depth == 0)
     {
         msg_Err (vout, "no supported pixmap formats");
         goto error;
     }
 
-    vout->fmt_out.i_chroma = vout->output.i_chroma;
-    if (!gray)
-    {
-        vout->output.i_rmask = vt->red_mask;
-        vout->output.i_gmask = vt->green_mask;
-        vout->output.i_bmask = vt->blue_mask;
-    }
+    msg_Dbg (vout, "using %"PRIu8" bits per pixels (line pad: %"PRIu8")",
+             p_sys->bpp, p_sys->pad);
 
     /* Create colormap (needed to select non-default visual) */
     p_sys->cmap = xcb_generate_id (p_sys->conn);
