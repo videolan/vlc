@@ -207,6 +207,8 @@ static int Open (vlc_object_t *obj)
             vout->output.i_chroma = gray ? VLC_FOURCC ('G', 'R', 'E', 'Y')
                                          : VLC_FOURCC ('R', 'G', 'B', '2');
             break;
+          default:
+            continue;
         }
         if ((fmt->bits_per_pixel << 4) % fmt->scanline_pad)
             continue; /* VLC pads lines to 16 pixels internally */
