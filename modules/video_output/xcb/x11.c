@@ -85,6 +85,7 @@ struct vout_sys_t
     bool shm; /* whether to use MIT-SHM */
     uint8_t bpp; /* bits per pixel */
     uint8_t pad; /* scanline pad */
+    uint8_t byte_order; /* server byte order */
 };
 
 static int Init (vout_thread_t *);
@@ -136,6 +137,7 @@ static int Open (vlc_object_t *obj)
     free (display);
 
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
+    p_sys->byte_order = setup->image_byte_order;
 
     /* Get the preferred screen */
     xcb_screen_t *scr = xcb_aux_get_screen (p_sys->conn, snum);
@@ -394,12 +396,7 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     img = xcb_image_create (real_width, pic->p->i_lines,
                             XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->pad,
                             p_sys->screen->root_depth, p_sys->bpp, p_sys->bpp,
-#ifdef WORDS_BIGENDIAN
-                            XCB_IMAGE_ORDER_MSB_FIRST,
-#else
-                            XCB_IMAGE_ORDER_LSB_FIRST,
-#endif
-                            XCB_IMAGE_ORDER_MSB_FIRST,
+                            p_sys->byte_order, XCB_IMAGE_ORDER_MSB_FIRST,
                             NULL,
                             (shm != SHM_ERR) ? size : 0,
                             (shm != SHM_ERR) ? shm : NULL);
