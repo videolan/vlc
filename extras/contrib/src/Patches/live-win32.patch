@@ -1,0 +1,170 @@
+Copyright (C) 2009 Laurent Aimar.
+Licensed under GNU General Public License version 2 or higher.
+diff -ur live/BasicUsageEnvironment/BasicTaskScheduler.cpp live-fix/BasicUsageEnvironment/BasicTaskScheduler.cpp
+--- live/BasicUsageEnvironment/BasicTaskScheduler.cpp	2009-04-07 04:18:59.000000000 +0200
++++ live-fix/BasicUsageEnvironment/BasicTaskScheduler.cpp	2009-04-16 00:33:19.000000000 +0200
+@@ -80,7 +80,7 @@
+       int dummySocketNum = socket(AF_INET, SOCK_DGRAM, 0);
+       FD_SET((unsigned)dummySocketNum, &fReadSet);
+     }
+-    if (err != 0) {
++    if (err != EINTR) {
+ #else
+     if (errno != EINTR && errno != EAGAIN) {
+ #endif
+diff -ur live/BasicUsageEnvironment/BasicUsageEnvironment.cpp live-fix/BasicUsageEnvironment/BasicUsageEnvironment.cpp
+--- live/BasicUsageEnvironment/BasicUsageEnvironment.cpp	2009-04-07 04:18:59.000000000 +0200
++++ live-fix/BasicUsageEnvironment/BasicUsageEnvironment.cpp	2009-04-16 00:30:33.000000000 +0200
+@@ -61,6 +61,20 @@
+ #endif
+ }
+ 
++int BasicUsageEnvironment::getNetErrno() const {
++#if defined(__WIN32__) || defined(_WIN32)
++#ifndef _WIN32_WCE
++    errno = WSAGetLastError();
++#endif
++#endif
++#if defined(_WIN32_WCE)
++  return WSAGetLastError();
++#else
++  return errno;
++#endif
++}
++
++
+ UsageEnvironment& BasicUsageEnvironment::operator<<(char const* str) {
+ 	fprintf(stderr, "%s", str);
+ 	return *this;
+diff -ur live/BasicUsageEnvironment/include/BasicUsageEnvironment.hh live-fix/BasicUsageEnvironment/include/BasicUsageEnvironment.hh
+--- live/BasicUsageEnvironment/include/BasicUsageEnvironment.hh	2009-04-07 04:18:59.000000000 +0200
++++ live-fix/BasicUsageEnvironment/include/BasicUsageEnvironment.hh	2009-04-16 00:30:33.000000000 +0200
+@@ -30,6 +30,7 @@
+ 
+   // redefined virtual functions:
+   virtual int getErrno() const;
++  virtual int getNetErrno() const;
+ 
+   virtual UsageEnvironment& operator<<(char const* str);
+   virtual UsageEnvironment& operator<<(int i);
+diff -ur live/groupsock/GroupsockHelper.cpp live-fix/groupsock/GroupsockHelper.cpp
+--- live/groupsock/GroupsockHelper.cpp	2009-04-07 04:18:59.000000000 +0200
++++ live-fix/groupsock/GroupsockHelper.cpp	2009-04-16 00:30:33.000000000 +0200
+@@ -230,10 +230,13 @@
+     if (timeout != NULL && result == 0) {
+       break; // this is OK - timeout occurred
+     } else if (result <= 0) {
++      if (env.getNetErrno() == EINTR ||
+ #if defined(__WIN32__) || defined(_WIN32)
++          env.getNetErrno() == EWOULDBLOCK
+ #else
+-      if (errno == EINTR || errno == EAGAIN) continue;
++          env.getNetErrno() == EAGAIN
+ #endif
++         ) continue;
+       socketErr(env, "select() error: ");
+       break;
+     }
+@@ -271,7 +274,7 @@
+ 			 &addressSize);
+     if (bytesRead < 0) {
+       //##### HACK to work around bugs in Linux and Windows:
+-      int err = env.getErrno();
++      int err = env.getNetErrno();
+       if (err == 111 /*ECONNREFUSED (Linux)*/
+ #if defined(__WIN32__) || defined(_WIN32)
+ 	  // What a piece of crap Windows is.  Sometimes
+@@ -432,7 +435,7 @@
+   if (setsockopt(socket, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+ 		 (const char*)&imr, sizeof (struct ip_mreq)) < 0) {
+ #if defined(__WIN32__) || defined(_WIN32)
+-    if (env.getErrno() != 0) {
++    if (env.getNetErrno() != 0) {
+       // That piece-of-shit toy operating system (Windows) sometimes lies
+       // about setsockopt() failing!
+ #endif
+diff -ur live/groupsock/include/NetCommon.h live-fix/groupsock/include/NetCommon.h
+--- live/groupsock/include/NetCommon.h	2009-04-07 04:18:59.000000000 +0200
++++ live-fix/groupsock/include/NetCommon.h	2009-04-16 00:30:33.000000000 +0200
+@@ -36,6 +36,8 @@
+ 
+ #define closeSocket closesocket
+ #define EWOULDBLOCK WSAEWOULDBLOCK
++#define EINPROGRESS WSAEWOULDBLOCK
++#define EINTR WSAEINTR
+ 
+ #if defined(_WIN32_WCE)
+ #define NO_STRSTREAM 1
+diff -ur live/liveMedia/HTTPSink.cpp live-fix/liveMedia/HTTPSink.cpp
+--- live/liveMedia/HTTPSink.cpp	2009-04-07 04:19:00.000000000 +0200
++++ live-fix/liveMedia/HTTPSink.cpp	2009-04-16 00:30:33.000000000 +0200
+@@ -107,7 +107,7 @@
+     fClientSocket = accept(fSocket, (struct sockaddr*)&clientAddr,
+ 			   &clientAddrLen);
+     if (fClientSocket < 0) {
+-      int err = envir().getErrno();
++      int err = envir().getNetErrno();
+       if (err != EWOULDBLOCK) {
+ 	envir().setResultErrMsg("accept() failed: ");
+ 	return False;
+@@ -158,7 +158,7 @@
+     int sendResult
+       = send(fClientSocket, (char*)(&fBuffer[0]), frameSize, 0);
+     if (sendResult < 0) {
+-      int err = envir().getErrno();
++      int err = envir().getNetErrno();
+       if (err != EWOULDBLOCK) {
+ 	// The client appears to have gone; close him down,
+ 	// and consider ourselves done:
+diff -ur live/liveMedia/RTSPClient.cpp live-fix/liveMedia/RTSPClient.cpp
+--- live/liveMedia/RTSPClient.cpp	2009-04-16 00:31:40.000000000 +0200
++++ live-fix/liveMedia/RTSPClient.cpp	2009-04-16 00:30:33.000000000 +0200
+@@ -1834,11 +1834,7 @@
+         makeSocketNonBlocking(fInputSocketNum);
+       }
+       if (connect(fInputSocketNum, (struct sockaddr*) &remoteName, sizeof remoteName) != 0) {
+-#if defined(__WIN32__) || defined(_WIN32)
+-        if (errno != WSAEINPROGRESS && errno != WSAEWOULDBLOCK) {
+-#else
+-        if (errno != EINPROGRESS) {
+-#endif
++        if (envir().getNetErrno() != EINPROGRESS && envir().getNetErrno() != EWOULDBLOCK) {
+           envir().setResultErrMsg("connect() failed: ");
+           break;
+         }
+diff -ur live/liveMedia/RTSPOverHTTPServer.cpp live-fix/liveMedia/RTSPOverHTTPServer.cpp
+--- live/liveMedia/RTSPOverHTTPServer.cpp	2009-04-07 04:19:00.000000000 +0200
++++ live-fix/liveMedia/RTSPOverHTTPServer.cpp	2009-04-16 00:30:33.000000000 +0200
+@@ -119,7 +119,7 @@
+   int clientSocket = accept(fServerSocket, (struct sockaddr*)&clientAddr,
+                             &clientAddrLen);
+   if (clientSocket < 0) {
+-    int err = envir().getErrno();
++    int err = envir().getNetErrno();
+     if (err != EWOULDBLOCK) {
+       envir().setResultErrMsg("accept() failed: ");
+     }
+diff -ur live/liveMedia/RTSPServer.cpp live-fix/liveMedia/RTSPServer.cpp
+--- live/liveMedia/RTSPServer.cpp	2009-04-07 04:19:00.000000000 +0200
++++ live-fix/liveMedia/RTSPServer.cpp	2009-04-16 00:30:33.000000000 +0200
+@@ -226,7 +226,7 @@
+   int clientSocket = accept(fServerSocket, (struct sockaddr*)&clientAddr,
+ 			    &clientAddrLen);
+   if (clientSocket < 0) {
+-    int err = envir().getErrno();
++    int err = envir().getNetErrno();
+     if (err != EWOULDBLOCK) {
+         envir().setResultErrMsg("accept() failed: ");
+     }
+diff -ur live/UsageEnvironment/include/UsageEnvironment.hh live-fix/UsageEnvironment/include/UsageEnvironment.hh
+--- live/UsageEnvironment/include/UsageEnvironment.hh	2009-04-07 04:18:59.000000000 +0200
++++ live-fix/UsageEnvironment/include/UsageEnvironment.hh	2009-04-16 00:30:33.000000000 +0200
+@@ -71,6 +71,7 @@
+ 
+   // 'errno'
+   virtual int getErrno() const = 0;
++  virtual int getNetErrno() const = 0;
+ 
+   // 'console' output:
+   virtual UsageEnvironment& operator<<(char const* str) = 0;
+
