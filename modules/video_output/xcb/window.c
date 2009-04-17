@@ -72,6 +72,11 @@ struct vout_window_sys_t
     xcb_connection_t *conn;
     key_handler_t *keys;
     vlc_thread_t thread;
+
+    xcb_window_t root;
+    xcb_atom_t wm_state;
+    xcb_atom_t wm_state_above;
+    /*xcb_atom_t wmstate_fullscreen;*/
 };
 
 static inline
@@ -94,6 +99,20 @@ void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
     }
 }
 
+static
+xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
+{
+    xcb_intern_atom_reply_t *reply;
+    xcb_atom_t atom;
+
+    reply = xcb_intern_atom_reply (conn, ck, NULL);
+    if (reply == NULL)
+        return 0;
+
+    atom = reply->atom;
+    free (reply);
+    return atom;
+}
 
 /**
  * Create an X11 window.
@@ -156,7 +175,19 @@ static int Open (vlc_object_t *obj)
 
     p_sys->conn = conn;
     p_sys->keys = CreateKeyHandler (obj, conn);
+    p_sys->root = scr->root;
 
+    /* Cache any EWMH atom we may need later */
+    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck;
+
+    wm_state_ck = xcb_intern_atom (conn, 0, 13, "_NET_WM_STATE");
+    wm_state_above_ck = xcb_intern_atom (conn, 0, 18, "_NET_WM_STATE_ABOVE");
+
+    p_sys->wm_state = get_atom (conn, wm_state_ck);
+    p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
+
+    /* Create the event thread. It will dequeue all events, so any checked
+     * request from this thread must be completed at this point. */
     if ((p_sys->keys != NULL)
      && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         DestroyKeyHandler (p_sys->keys);
@@ -253,6 +284,30 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
                                   XCB_CONFIG_WINDOW_HEIGHT, values);
             xcb_flush (conn);
             break;
+        }
+
+        case VOUT_SET_STAY_ON_TOP:
+        {   /* From EWMH "_WM_STATE" */
+            xcb_client_message_event_t ev = {
+                .response_type = 0x80 | XCB_CLIENT_MESSAGE,
+                .format = 32,
+                .window = wnd->handle.xid,
+                .type = p_sys->wm_state,
+            };
+            bool on = va_arg (ap, int);
+
+            ev.data.data32[0] = on;
+            ev.data.data32[1] = p_sys->wm_state_above;
+            ev.data.data32[1] = 289;
+            ev.data.data32[3] = 1;
+
+            /* From ICCCM "Changing Window State" */
+            xcb_send_event (p_sys->conn, 0, p_sys->root,
+                            XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                            XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                            (const char *)&ev);
+            xcb_flush (p_sys->conn);
+            return VLC_SUCCESS;
         }
 
         default:
