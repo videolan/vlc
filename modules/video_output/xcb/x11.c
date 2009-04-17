@@ -275,16 +275,16 @@ static int Open (vlc_object_t *obj)
     {
         xcb_shm_query_version_cookie_t ck;
         xcb_shm_query_version_reply_t *r;
-        xcb_generic_error_t *err;
 
         ck = xcb_shm_query_version (p_sys->conn);
-        r = xcb_shm_query_version_reply (p_sys->conn, ck, &err);
+        r = xcb_shm_query_version_reply (p_sys->conn, ck, NULL);
         if (!r)
         {
             msg_Err (vout, "shared memory (MIT-SHM) not available");
             msg_Warn (vout, "display will be slow");
             p_sys->shm = false;
         }
+        free (r);
     }
 
     /* Get window */
@@ -468,8 +468,7 @@ static int Init (vout_thread_t *vout)
         ck = xcb_get_geometry (p_sys->conn, p_sys->parent);
 
         xcb_get_geometry_reply_t *geo;
-        xcb_generic_error_t *err;
-        geo = xcb_get_geometry_reply (p_sys->conn, ck, &err);
+        geo = xcb_get_geometry_reply (p_sys->conn, ck, NULL);
         width = geo->width;
         height = geo->height;
         free (geo);
