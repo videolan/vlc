@@ -3153,7 +3153,7 @@ then
       VLC_ADD_CFLAGS([swscale],[$SWSCALE_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_WARN([Could not find libswscale. Trying to enable imgresample.])
+      AC_MSG_WARN([Could not find libswscale. Trying to enable imgresample.  Use --disable-swscale to ignore this error.])
       enable_imgresample=yes
   ])
 fi
@@ -3218,7 +3218,7 @@ then
       VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_ERROR([Could not find libpostproc.])
+      AC_MSG_ERROR([Could not find libpostproc. Use --disable-postproc to ignore this error.])
   ])
 fi
 
