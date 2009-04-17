@@ -8,6 +8,8 @@
 	<dict>
 		<key>2197</key>
 		<string>342 506 596 123 0 0 1280 778 </string>
+		<key>2709</key>
+		<string>386 537 508 82 0 0 1280 778 </string>
 		<key>29</key>
 		<string>391 728 438 44 0 0 1280 778 </string>
 		<key>3568</key>
@@ -28,6 +30,7 @@
 		<integer>29</integer>
 		<integer>21</integer>
 		<integer>2197</integer>
+		<integer>2709</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9G55</string>

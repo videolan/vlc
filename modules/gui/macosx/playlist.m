@@ -1,7 +1,7 @@
 /*****************************************************************************
  * playlist.m: MacOS X interface module
  *****************************************************************************
-* Copyright (C) 2002-2008 the VideoLAN team
+* Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -193,7 +193,7 @@
 
     if( o_value == nil )
     {
-        /* Why is there a warning if that happens all the time and seems
+        /* FIXME: Why is there a warning if that happens all the time and seems
          * to be normal? Add an assert and fix it. 
          * msg_Warn( VLCIntf, "playlist item misses pointer value, adding one" ); */
         o_value = [[NSValue valueWithPointer: p_return] retain];
@@ -462,7 +462,7 @@
     [o_save_accessory_text setStringValue: _NS("File Format:")];
     [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
     [[o_save_accessory_popup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
-    [[o_save_accessory_popup itemAtIndex:2] setTitle: _NS("HTML playlist")];
+    [[o_save_accessory_popup itemAtIndex:2] setTitle: _NS("HTML Playlist")];
 }
 
 - (void)playlistUpdated
@@ -712,7 +712,6 @@
     NSSavePanel *o_save_panel = [NSSavePanel savePanel];
     NSString * o_name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
 
-    //[o_save_panel setAllowedFileTypes: [NSArray arrayWithObjects: @"m3u", @"xpf", nil] ];
     [o_save_panel setTitle: _NS("Save Playlist")];
     [o_save_panel setPrompt: _NS("Save")];
     [o_save_panel setAccessoryView: o_save_accessory_view];
