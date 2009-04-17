@@ -541,12 +541,8 @@ describe:
     authenticator.setUsernameAndPassword( (const char*)psz_user,
                                           (const char*)psz_pwd );
 
-#if defined(WIN32)
-#   warning "Disabled live555 timeout because of buggy library"
-    const int i_timeout = 0;
-#else
+    /* */
     const int i_timeout = var_CreateGetInteger(p_demux, "ipv4-timeout") / 1000;
-#endif
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
