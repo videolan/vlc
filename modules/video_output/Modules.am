@@ -25,11 +25,11 @@ libxcb_plugin_la_SOURCES = \
 	xcb/x11.c \
 	xcb/events.c
 libxcb_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS) $(XCB_SHM) \
+	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) \
 	$(XPROTO_CFLAGS) \
 	$(XCB_IMAGE_CFLAGS)
 libxcb_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS) $(XCB_SHM) \
+	$(XCB_LIBS) $(XCB_SHM_LIBS) \
 	$(XPROTO_LIBS) \
 	$(XCB_IMAGE_LIBS)
 libxcb_plugin_la_DEPENDENCIES =
