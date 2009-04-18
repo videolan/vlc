@@ -33,8 +33,6 @@
 #include <xcb/xcb.h>
 #include <xcb/shm.h>
 
-#include <xcb/xcb_image.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
@@ -377,7 +375,6 @@ static void Close (vlc_object_t *obj)
 struct picture_sys_t
 {
     xcb_connection_t *conn; /* Shared connection to X server */
-    xcb_image_t *image;  /* Picture buffer */
     xcb_shm_seg_t segment; /* Shared memory segment X ID */
 };
 
@@ -399,72 +396,48 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     void *shm = SHM_ERR;
     const size_t size = pic->p->i_pitch * pic->p->i_lines;
 
+    /* Allocate shared memory segment */
+    int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
+    if (id == -1)
+    {
+        msg_Err (vout, "shared memory allocation error: %m");
+        goto error;
+    }
+
+    /* Attach the segment to VLC */
+    shm = shmat (id, NULL, 0 /* read/write */);
+    if (shm == SHM_ERR)
+    {
+        msg_Err (vout, "shared memory attachment error: %m");
+        shmctl (id, IPC_RMID, 0);
+        goto error;
+    }
+
     if (p_sys->shm)
-    {   /* Allocate shared memory segment */
-        int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
-
-        if (id == -1)
-        {
-            msg_Err (vout, "shared memory allocation error: %m");
-            goto error;
-        }
-
-        /* Attach the segment to VLC */
-        shm = shmat (id, NULL, 0 /* read/write */);
-        if (shm == SHM_ERR)
-        {
-            msg_Err (vout, "shared memory attachment error: %m");
-            shmctl (id, IPC_RMID, 0);
-            goto error;
-        }
-
+    {
         /* Attach the segment to X */
         xcb_void_cookie_t ck;
-
         priv->segment = xcb_generate_id (p_sys->conn);
         ck = xcb_shm_attach_checked (p_sys->conn, priv->segment, id, 1);
-        shmctl (id, IPC_RMID, 0);
 
         if (CheckError (vout, "shared memory server-side error", ck))
         {
-            msg_Info (vout, "using buggy X (remote) server? SSH?");
-            shmdt (shm);
-            shm = SHM_ERR;
+            msg_Info (vout, "using buggy X11 server - SSH proxying?");
+            priv->segment = 0;
         }
     }
     else
         priv->segment = 0;
 
-    const unsigned real_width = pic->p->i_pitch / (p_sys->bpp >> 3);
-    /* FIXME: anyway to getthing more intuitive than that?? */
-
-    xcb_image_t *img;
-    img = xcb_image_create (real_width, pic->p->i_lines,
-                            XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->pad,
-                            p_sys->depth, p_sys->bpp, p_sys->bpp,
-                            p_sys->byte_order, XCB_IMAGE_ORDER_MSB_FIRST,
-                            NULL,
-                            (shm != SHM_ERR) ? size : 0,
-                            (shm != SHM_ERR) ? shm : NULL);
-
-    if (img == NULL)
-    {
-        if (shm != SHM_ERR)
-            xcb_shm_detach (p_sys->conn, priv->segment);
-        goto error;
-    }
-
+    shmctl (id, IPC_RMID, 0);
     priv->conn = p_sys->conn;
-    priv->image = img;
     pic->p_sys = priv;
-    pic->p->p_pixels = img->data;
+    pic->p->p_pixels = shm;
     pic->i_status = DESTROYED_PICTURE;
     pic->i_type = DIRECT_PICTURE;
     return VLC_SUCCESS;
 
 error:
-    if (shm != SHM_ERR)
-        shmdt (shm);
     free (priv);
     return VLC_EGENERIC;
 }
@@ -480,9 +453,8 @@ static void PictureDeinit (picture_t *pic)
     if (p_sys->segment != 0)
     {
         xcb_shm_detach (p_sys->conn, p_sys->segment);
-        shmdt (p_sys->image->data);
+        shmdt (pic->p->p_pixels);
     }
-    xcb_image_destroy (p_sys->image);
     free (p_sys);
 }
 
@@ -571,21 +543,21 @@ static void Display (vout_thread_t *vout, picture_t *pic)
 {
     vout_sys_t *p_sys = vout->p_sys;
     picture_sys_t *priv = pic->p_sys;
-    xcb_image_t *img = priv->image;
 
-    if (img->base == NULL)
-    {
-        xcb_shm_segment_info_t info = {
-            .shmseg = priv->segment,
-            .shmid = -1, /* lost track of it, unimportant */
-            .shmaddr = img->data,
-        };
-
-        xcb_image_shm_put (p_sys->conn, p_sys->window, p_sys->gc, img, info,
-                        0, 0, 0, 0, img->width, img->height, 0);
-    }
+    if (priv->segment)
+        xcb_shm_put_image (p_sys->conn, p_sys->window, p_sys->gc,
+          /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
+         /* real height */ pic->p->i_lines, /* x */ 0, /* y */ 0,
+               /* width */ pic->p->i_visible_pitch / pic->p->i_pixel_pitch,
+              /* height */ pic->p->i_visible_lines, /* x */ 0, /* y */ 0,
+                           p_sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
+                           0, priv->segment, 0);
     else
-        xcb_image_put (p_sys->conn, p_sys->window, p_sys->gc, img, 0, 0, 0);
+        xcb_put_image (p_sys->conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
+                       p_sys->window, p_sys->gc,
+                       pic->p->i_pitch / pic->p->i_pixel_pitch,
+                       pic->p->i_lines, 0, 0, 0, p_sys->depth,
+                       pic->p->i_pitch * pic->p->i_lines, pic->p->p_pixels);
     xcb_flush (p_sys->conn);
 }
 
