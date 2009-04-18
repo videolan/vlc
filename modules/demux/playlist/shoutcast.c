@@ -403,11 +403,11 @@ static int DemuxStation( demux_t *p_demux )
                     free( psz_mrl );
 
 #define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
-                    p_input, _("Shoutcast"), _(type), "%s", field ) ; }
-                    SADD_INFO( "Mime type", psz_mt );
-                    SADD_INFO( "Bitrate", psz_br );
-                    SADD_INFO( "Listeners", psz_lc );
-                    SADD_INFO( "Load", psz_load );
+                    p_input, _("Shoutcast"), gettext(type), "%s", field ) ; }
+                    SADD_INFO( N_("Mime"), psz_mt );
+                    SADD_INFO( N_("Bitrate"), psz_br );
+                    SADD_INFO( N_("Listeners"), psz_lc );
+                    SADD_INFO( N_("Load"), psz_load );
                     if( psz_genre )
                         input_item_SetGenre( p_input, psz_genre );
                     if( psz_ct )
