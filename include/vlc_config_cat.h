@@ -288,7 +288,7 @@ static inline const char *config_CategoryNameGet( int i_value )
     {
         if( categories_array[i].i_id == i_value )
         {
-            return _(categories_array[i].psz_name);
+            return gettext(categories_array[i].psz_name);
         }
         i++;
     }
@@ -303,7 +303,7 @@ static inline const char *config_CategoryHelpGet( int i_value )
     {
         if( categories_array[i].i_id == i_value )
         {
-            return _(categories_array[i].psz_help);
+            return gettext(categories_array[i].psz_help);
         }
         i++;
     }

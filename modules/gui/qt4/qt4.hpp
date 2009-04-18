@@ -86,7 +86,7 @@ struct intf_sys_t
 #define THEMIM MainInputManager::getInstance( p_intf )
 
 #define qfu( i ) QString::fromUtf8( i )
-#define qtr( i ) QString::fromUtf8( _(i) )
+#define qtr( i ) QString::fromUtf8( gettext(i) )
 #define qtu( i ) ((i).toUtf8().constData())
 
 #define CONNECT( a, b, c, d ) connect( a, SIGNAL( b ), c, SLOT(d) )

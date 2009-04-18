@@ -780,7 +780,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             continue;
 
         es_format_Init( &fmt, SPU_ES, fcc[i] );
-        fmt.psz_description = strdup( _(ppsz_description[i]) );
+        fmt.psz_description = strdup( gettext(ppsz_description[i]) );
         fmt.i_group = TY_ES_GROUP;
         p_sys->p_cc[i] = es_out_Add( p_demux->out, &fmt );
         es_format_Clean( &fmt );
