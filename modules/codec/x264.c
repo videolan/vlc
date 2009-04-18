@@ -439,7 +439,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "pre-scenecut", 0, NULL, PRESCENE_TEXT,
               PRESCENE_LONGTEXT, false )
 #  else
-    add_obsolete_bool( "pre-scenecut" )
+    add_obsolete_bool( SOUT_CFG_PREFIX "pre-scenecut" )
 #  endif
 #endif
 
@@ -610,9 +610,13 @@ vlc_module_begin ()
         change_integer_range( 1, SUBME_MAX )
         add_deprecated_alias( SOUT_CFG_PREFIX "subpel" ) /* Deprecated since 0.8.5 */
 
-#if X264_BUILD >= 41 && X264_BUILD < 65 /* r368 */
+#if X264_BUILD >= 41
+# if X264_BUILD < 65 /* r368 */
     add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
               B_RDO_LONGTEXT, false )
+# else
+    add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
+# endif
 #endif
 
 #if X264_BUILD >= 36 /* r318 */
@@ -625,9 +629,13 @@ vlc_module_begin ()
               CHROMA_ME_LONGTEXT, false )
 #endif
 
-#if X264_BUILD >= 43 && X264_BUILD < 65 /* r390 */
+#if X264_BUILD >= 43
+# if X264_BUILD < 65 /* r390 */
     add_bool( SOUT_CFG_PREFIX "bime", 0, NULL, BIME_TEXT,
               BIME_LONGTEXT, false )
+# else
+    add_obsolete_bool( SOUT_CFG_PREFIX "bime" )
+# endif
 #endif
 
 #if X264_BUILD >= 30 /* r251 */
