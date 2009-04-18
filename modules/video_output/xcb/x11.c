@@ -78,7 +78,6 @@ struct vout_sys_t
     vout_window_t *embed; /* VLC window (when windowed) */
 
     xcb_visualid_t vid; /* selected visual */
-    xcb_window_t parent; /* parent X window */
     xcb_colormap_t cmap; /* colormap for selected visual */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
@@ -296,6 +295,9 @@ static int Open (vlc_object_t *obj)
         msg_Err (vout, "parent window not available");
         goto error;
     }
+    /* Subscribe to parent window resize events */
+    xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
+        XCB_CW_EVENT_MASK, &(uint32_t){ XCB_EVENT_MASK_STRUCTURE_NOTIFY });
 
     vout->pf_init = Init;
     vout->pf_end = Deinit;
@@ -437,6 +439,22 @@ static void PictureDeinit (picture_t *pic)
     free (p_sys);
 }
 
+static void get_window_size (xcb_connection_t *conn, xcb_window_t win,
+                             unsigned *width, unsigned *height)
+{
+    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, win);
+    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, ck, NULL);
+
+    if (geo)
+    {
+        *width = geo->width;
+        *height = geo->height;
+        free (geo);
+    }
+    else
+        *width = *height = 0;
+}
+
 /**
  * Allocate drawable window and picture buffers.
  */
@@ -445,35 +463,11 @@ static int Init (vout_thread_t *vout)
     vout_sys_t *p_sys = vout->p_sys;
     const xcb_screen_t *screen = p_sys->screen;
     unsigned x, y, width, height;
+    xcb_window_t parent = p_sys->embed->handle.xid;
 
     I_OUTPUTPICTURES = 0;
 
-    /* Determine parent window and size */
-    if (vout->b_fullscreen)
-    {
-        p_sys->parent = screen->root;
-        width = screen->width_in_pixels;
-        height = screen->height_in_pixels;
-    }
-    else
-    {
-        p_sys->parent = p_sys->embed->handle.xid;
-
-        /* Subscribe to parent window resize events */
-        const uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-        xcb_change_window_attributes (p_sys->conn, p_sys->parent,
-                                      XCB_CW_EVENT_MASK, &value);
-
-        xcb_get_geometry_cookie_t ck;
-        ck = xcb_get_geometry (p_sys->conn, p_sys->parent);
-
-        xcb_get_geometry_reply_t *geo;
-        geo = xcb_get_geometry_reply (p_sys->conn, ck, NULL);
-        width = geo->width;
-        height = geo->height;
-        free (geo);
-    }
-
+    get_window_size (p_sys->conn, parent, &width, &height);
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
 
     /* FIXME: I don't get the subtlety between output and fmt_out here */
@@ -510,7 +504,7 @@ static int Init (vout_thread_t *vout)
     xcb_window_t window = xcb_generate_id (p_sys->conn);
 
     c = xcb_create_window_checked (p_sys->conn, screen->root_depth, window,
-                                   p_sys->parent, x, y, width, height, 0,
+                                   parent, x, y, width, height, 0,
                                    XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                    p_sys->vid, mask, values);
     if (CheckError (vout, "cannot create X11 window", c))
