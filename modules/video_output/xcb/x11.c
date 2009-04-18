@@ -123,8 +123,7 @@ static int Open (vlc_object_t *obj)
 
     /* Connect to X */
     char *display = var_CreateGetNonEmptyString (vout, "x11-display");
-    int snum;
-    p_sys->conn = xcb_connect (display, &snum);
+    p_sys->conn = xcb_connect (display, NULL);
     if (xcb_connection_has_error (p_sys->conn) /*== NULL*/)
     {
         msg_Err (vout, "cannot connect to X server %s",
@@ -134,14 +133,54 @@ static int Open (vlc_object_t *obj)
     }
     free (display);
 
+    /* Get window */
+    p_sys->embed = vout_RequestXWindow (vout, &(int){ 0 }, &(int){ 0 },
+                                        &(unsigned){ 0 }, &(unsigned){ 0 });
+    if (p_sys->embed == NULL)
+    {
+        msg_Err (vout, "parent window not available");
+        goto error;
+    }
+    xcb_window_t root;
+    {
+        xcb_get_geometry_reply_t *geo;
+        xcb_get_geometry_cookie_t ck;
+
+        ck = xcb_get_geometry (p_sys->conn, p_sys->embed->handle.xid);
+        geo = xcb_get_geometry_reply (p_sys->conn, ck, NULL);
+        if (geo == NULL)
+        {
+            msg_Err (vout, "parent window not valid");
+            goto error;
+        }
+        root = geo->root;
+        free (geo);
+
+        /* Subscribe to parent window resize events */
+        const uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
+                                      XCB_CW_EVENT_MASK, &value);
+    }
+
+    /* Find the selected screen */
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
     p_sys->byte_order = setup->image_byte_order;
 
-    /* Get the preferred screen */
-    xcb_screen_t *scr = xcb_aux_get_screen (p_sys->conn, snum);
+    xcb_screen_t *scr = NULL;
+    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
+         i.rem > 0 && scr == NULL; xcb_screen_next (&i))
+    {
+        if (i.data->root == root)
+            scr = i.data;
+    }
+
+    if (scr == NULL)
+    {
+        msg_Err (vout, "parent window screen not found");
+        goto error;
+    }
     p_sys->screen = scr;
-    assert (p_sys->screen);
-    msg_Dbg (vout, "using screen %d", snum);
+    msg_Dbg (vout, "using screen 0x%"PRIx32, scr->root);
 
     /* Determine our video format. Normally, this is done in pf_init(), but
      * this plugin always uses the same format for a given X11 screen. */
@@ -285,19 +324,6 @@ static int Open (vlc_object_t *obj)
         }
         free (r);
     }
-
-    /* Get window */
-    /* FIXME: WTH to put as initial width/height values??? */
-    p_sys->embed = vout_RequestXWindow (vout, &(int){ 0 }, &(int){ 0 },
-                                        &(unsigned){ 0 }, &(unsigned){ 0 });
-    if (p_sys->embed == NULL)
-    {
-        msg_Err (vout, "parent window not available");
-        goto error;
-    }
-    /* Subscribe to parent window resize events */
-    xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
-        XCB_CW_EVENT_MASK, &(uint32_t){ XCB_EVENT_MASK_STRUCTURE_NOTIFY });
 
     vout->pf_init = Init;
     vout->pf_end = Deinit;
