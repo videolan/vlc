@@ -73,16 +73,14 @@ vlc_module_end ()
 struct vout_sys_t
 {
     xcb_connection_t *conn;
-    xcb_screen_t *screen;
     vout_window_t *embed; /* VLC window (when windowed) */
 
-    xcb_visualid_t vid; /* selected visual */
-    xcb_colormap_t cmap; /* colormap for selected visual */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
     uint8_t bpp; /* bits per pixel */
     uint8_t pad; /* scanline pad */
+    uint8_t depth; /* useful bits per pixel */
     uint8_t byte_order; /* server byte order */
 };
 
@@ -178,11 +176,11 @@ static int Open (vlc_object_t *obj)
         msg_Err (vout, "parent window screen not found");
         goto error;
     }
-    p_sys->screen = scr;
     msg_Dbg (vout, "using screen 0x%"PRIx32, scr->root);
 
     /* Determine our video format. Normally, this is done in pf_init(), but
      * this plugin always uses the same format for a given X11 screen. */
+    xcb_visualid_t vid = 0;
     uint8_t depth = 0;
     bool gray = true;
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
@@ -245,14 +243,10 @@ static int Open (vlc_object_t *obj)
 
         /* Find a visual type for the selected depth */
         const xcb_visualtype_t *vt = xcb_depth_visuals (it.data);
-        xcb_visualid_t vid = 0;
-        for (int i = xcb_depth_visuals_length (it.data); (i > 0) && !vid; i--)
+        for (int i = xcb_depth_visuals_length (it.data); i > 0; i--)
         {
             if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
             {
-                msg_Dbg (vout,
-                         "using TrueColor %"PRIu8"-bits visual ID 0x%0"PRIx32,
-                         fmt->depth, vt->visual_id);
                 vid = vt->visual_id;
                 gray = false;
                 break;
@@ -263,10 +257,6 @@ static int Open (vlc_object_t *obj)
                     continue; /* Prefer color over gray scale */
                 vid = vt->visual_id;
                 chroma = VLC_FOURCC ('G', 'R', 'E', 'Y');
-                msg_Dbg (vout,
-                         "using static gray 8-bits visual ID 0x%x"PRIx32,
-                         vt->visual_id);
-                break;
             }
         }
 
@@ -280,31 +270,64 @@ static int Open (vlc_object_t *obj)
             vout->output.i_gmask = vt->green_mask;
             vout->output.i_bmask = vt->blue_mask;
         }
-        p_sys->vid = vid;
         p_sys->bpp = fmt->bits_per_pixel;
         p_sys->pad = fmt->scanline_pad;
-
-        depth = fmt->depth;
+        p_sys->depth = depth = fmt->depth;
     }
 
     if (depth == 0)
     {
-        msg_Err (vout, "no supported pixmap formats");
+        msg_Err (vout, "no supported pixmap formats or visual types");
         goto error;
     }
 
-    msg_Dbg (vout, "using %"PRIu8" bits per pixels (line pad: %"PRIu8")",
+    msg_Dbg (vout, "using X11 visual ID 0x%"PRIx32, vid);
+    msg_Dbg (vout, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
              p_sys->bpp, p_sys->pad);
 
     /* Create colormap (needed to select non-default visual) */
-    if (p_sys->vid != scr->root_visual)
+    xcb_colormap_t cmap;
+    if (vid != scr->root_visual)
     {
-        p_sys->cmap = xcb_generate_id (p_sys->conn);
+        cmap = xcb_generate_id (p_sys->conn);
         xcb_create_colormap (p_sys->conn, XCB_COLORMAP_ALLOC_NONE,
-                             p_sys->cmap, scr->root, p_sys->vid);
+                             cmap, scr->root, vid);
     }
     else
-        p_sys->cmap = scr->default_colormap;
+        cmap = scr->default_colormap;
+
+    /* Create window */
+    {
+        const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK
+                            | XCB_CW_COLORMAP;
+        const uint32_t values[] = {
+            /* XCB_CW_BACK_PIXEL */
+            scr->black_pixel,
+            /* XCB_CW_EVENT_MASK */
+            XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
+            XCB_EVENT_MASK_POINTER_MOTION,
+            /* XCB_CW_COLORMAP */
+            cmap,
+        };
+        xcb_void_cookie_t c;
+        xcb_window_t window = xcb_generate_id (p_sys->conn);
+
+        c = xcb_create_window_checked (p_sys->conn, depth, window,
+                                       p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
+                                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
+                                       vid, mask, values);
+        if (CheckError (vout, "cannot create X11 window", c))
+            goto error;
+        p_sys->window = window;
+        msg_Dbg (vout, "using X11 window %08"PRIx32, p_sys->window);
+        xcb_map_window (p_sys->conn, window);
+    }
+
+    /* Create graphic context (I wonder why the heck do we need this) */
+    p_sys->gc = xcb_generate_id (p_sys->conn);
+    xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
+    msg_Dbg (vout, "using X11 graphic context %08"PRIx32, p_sys->gc);
+    xcb_flush (p_sys->conn);
 
     /* Check shared memory support */
     p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
@@ -346,7 +369,7 @@ static void Close (vlc_object_t *obj)
 
     if (p_sys->embed)
         vout_ReleaseWindow (p_sys->embed);
-    /* colormap is garbage-ollected by X (?) */
+    /* colormap and window are garbage-collected by X */
     if (p_sys->conn)
         xcb_disconnect (p_sys->conn);
     free (p_sys);
@@ -419,7 +442,7 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     xcb_image_t *img;
     img = xcb_image_create (real_width, pic->p->i_lines,
                             XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->pad,
-                            p_sys->screen->root_depth, p_sys->bpp, p_sys->bpp,
+                            p_sys->depth, p_sys->bpp, p_sys->bpp,
                             p_sys->byte_order, XCB_IMAGE_ORDER_MSB_FIRST,
                             NULL,
                             (shm != SHM_ERR) ? size : 0,
@@ -486,14 +509,16 @@ static void get_window_size (xcb_connection_t *conn, xcb_window_t win,
 static int Init (vout_thread_t *vout)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    const xcb_screen_t *screen = p_sys->screen;
     unsigned x, y, width, height;
-    xcb_window_t parent = p_sys->embed->handle.xid;
 
-    I_OUTPUTPICTURES = 0;
-
-    get_window_size (p_sys->conn, parent, &width, &height);
+    get_window_size (p_sys->conn, p_sys->embed->handle.xid, &width, &height);
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
+
+    const uint32_t values[] = { x, y, width, height, };
+    xcb_configure_window (p_sys->conn, p_sys->window,
+                          XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
+                          XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                          values);
 
     /* FIXME: I don't get the subtlety between output and fmt_out here */
     vout->fmt_out.i_visible_width = width;
@@ -513,37 +538,6 @@ static int Init (vout_thread_t *vout)
     vout->output.i_aspect = vout->fmt_out.i_aspect =
         width * VOUT_ASPECT_FACTOR / height;
 
-    /* Create window */
-    const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK
-                        | XCB_CW_COLORMAP;
-    const uint32_t values[] = {
-        /* XCB_CW_BACK_PIXEL */
-        screen->black_pixel,
-        /* XCB_CW_EVENT_MASK */
-        XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
-        XCB_EVENT_MASK_POINTER_MOTION,
-        /* XCB_CW_COLORMAP */
-        p_sys->cmap,
-    };
-    xcb_void_cookie_t c;
-    xcb_window_t window = xcb_generate_id (p_sys->conn);
-
-    c = xcb_create_window_checked (p_sys->conn, screen->root_depth, window,
-                                   parent, x, y, width, height, 0,
-                                   XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                                   p_sys->vid, mask, values);
-    if (CheckError (vout, "cannot create X11 window", c))
-        goto error;
-    p_sys->window = window;
-    msg_Dbg (vout, "using X11 window %08"PRIx32, p_sys->window);
-    xcb_map_window (p_sys->conn, window);
-
-    /* Create graphic context (I wonder why the heck do we need this) */
-    p_sys->gc = xcb_generate_id (p_sys->conn);
-    xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
-    msg_Dbg (vout, "using X11 graphic context %08"PRIx32, p_sys->gc);
-    xcb_flush (p_sys->conn);
-
     /* Allocate picture buffers */
     I_OUTPUTPICTURES = 0;
     for (size_t index = 0; I_OUTPUTPICTURES < 2; index++)
@@ -560,10 +554,6 @@ static int Init (vout_thread_t *vout)
     }
 
     return VLC_SUCCESS;
-
-error:
-    Deinit (vout);
-    return VLC_EGENERIC;
 }
 
 /**
@@ -571,13 +561,8 @@ error:
  */
 static void Deinit (vout_thread_t *vout)
 {
-    vout_sys_t *p_sys = vout->p_sys;
-
     for (int i = 0; i < I_OUTPUTPICTURES; i++)
         PictureDeinit (PP_OUTPUTPICTURE[i]);
-
-    xcb_unmap_window (p_sys->conn, p_sys->window);
-    xcb_destroy_window (p_sys->conn, p_sys->window);
 }
 
 /**
