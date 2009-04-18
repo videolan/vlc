@@ -1094,7 +1094,7 @@
     }
 
     /* Special case for telx menu */
-    if( [[o_mi title] isEqualToString: _NS("Normal Size")] );
+    if( [[o_mi title] isEqualToString: _NS("Normal Size")] )
     {
         NSMenuItem *item = [[o_mi menu] itemWithTitle:_NS("Teletext")];
 		bool b_telx = p_input && var_GetInteger( p_input, "teletext-es" ) >= 0;

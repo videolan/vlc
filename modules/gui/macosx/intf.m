@@ -760,7 +760,9 @@ static VLCMain *_o_sharedMainInstance = nil;
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
+#ifdef UPDATE_CHECK
     [o_update end];
+#endif
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
