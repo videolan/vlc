@@ -327,7 +327,6 @@ static int Open (vlc_object_t *obj)
     p_sys->gc = xcb_generate_id (p_sys->conn);
     xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
     msg_Dbg (vout, "using X11 graphic context %08"PRIx32, p_sys->gc);
-    xcb_flush (p_sys->conn);
 
     /* Check shared memory support */
     p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
@@ -552,7 +551,7 @@ static int Init (vout_thread_t *vout)
             break;
         PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
     }
-
+    xcb_flush (p_sys->conn);
     return VLC_SUCCESS;
 }
 
