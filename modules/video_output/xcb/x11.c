@@ -33,7 +33,6 @@
 #include <xcb/xcb.h>
 #include <xcb/shm.h>
 
-#include <xcb/xcb_aux.h>
 #include <xcb/xcb_image.h>
 
 #include <vlc_common.h>
