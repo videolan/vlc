@@ -341,7 +341,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Announce who we are - Do it only for first instance ? */
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
-    /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
+    /*xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
     msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
     /* Check for short help option */
