@@ -1273,6 +1273,7 @@ modules/video_output/x11/xcommon.h
 modules/video_output/x11/xvideo.c
 modules/video_output/x11/xvmc.c
 modules/video_output/xcb/x11.c
+modules/video_output/xcb/window.c
 modules/video_output/yuv.c
 modules/visualization/galaktos/PCM.c
 modules/visualization/galaktos/PCM.h
