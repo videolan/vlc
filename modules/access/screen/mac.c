@@ -25,7 +25,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#import <stdlib.h>
 
 #ifdef HAVE_CONFIG_H
 # import "config.h"
@@ -36,6 +35,7 @@
 #import <ApplicationServices/ApplicationServices.h>
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/gl.h>
+#import <stdlib.h>
 
 typedef int CGSConnectionRef;
 extern CGError CGSNewConnection( void *, CGSConnectionRef * );
