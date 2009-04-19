@@ -113,68 +113,23 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     vout->p_sys = p_sys;
-    p_sys->conn = NULL;
-    p_sys->embed = NULL;
 
     /* Connect to X */
-    char *display = var_CreateGetNonEmptyString (vout, "x11-display");
-    p_sys->conn = xcb_connect (display, NULL);
-    if (xcb_connection_has_error (p_sys->conn) /*== NULL*/)
-    {
-        msg_Err (vout, "cannot connect to X server %s",
-                 display ? display : "");
-        free (display);
-        goto error;
-    }
-    free (display);
+    p_sys->conn = Connect (obj);
+    if (p_sys->conn == NULL)
+        return VLC_EGENERIC;
 
     /* Get window */
-    p_sys->embed = vout_RequestXWindow (vout, &(int){ 0 }, &(int){ 0 },
-                                        &(unsigned){ 0 }, &(unsigned){ 0 });
+    const xcb_screen_t *scr;
+    p_sys->embed = GetWindow (vout, p_sys->conn, &scr, &p_sys->shm);
     if (p_sys->embed == NULL)
     {
-        msg_Err (vout, "parent window not available");
-        goto error;
-    }
-    xcb_window_t root;
-    {
-        xcb_get_geometry_reply_t *geo;
-        xcb_get_geometry_cookie_t ck;
-
-        ck = xcb_get_geometry (p_sys->conn, p_sys->embed->handle.xid);
-        geo = xcb_get_geometry_reply (p_sys->conn, ck, NULL);
-        if (geo == NULL)
-        {
-            msg_Err (vout, "parent window not valid");
-            goto error;
-        }
-        root = geo->root;
-        free (geo);
-
-        /* Subscribe to parent window resize events */
-        const uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
-                                      XCB_CW_EVENT_MASK, &value);
+        xcb_disconnect (p_sys->conn);
+        return VLC_EGENERIC;
     }
 
-    /* Find the selected screen */
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
     p_sys->byte_order = setup->image_byte_order;
-
-    xcb_screen_t *scr = NULL;
-    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
-         i.rem > 0 && scr == NULL; xcb_screen_next (&i))
-    {
-        if (i.data->root == root)
-            scr = i.data;
-    }
-
-    if (scr == NULL)
-    {
-        msg_Err (vout, "parent window screen not found");
-        goto error;
-    }
-    msg_Dbg (vout, "using screen 0x%"PRIx32, scr->root);
 
     /* Determine our video format. Normally, this is done in pf_init(), but
      * this plugin always uses the same format for a given X11 screen. */
@@ -224,11 +179,6 @@ static int Open (vlc_object_t *obj)
 
         /* Byte sex is a non-issue for 8-bits. It can be worked around with
          * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
-#ifdef WORDS_BIGENDIAN
-# define ORDER XCB_IMAGE_ORDER_MSB_FIRST
-#else
-# define ORDER XCB_IMAGE_ORDER_LSB_FIRST
-#endif
         if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
             continue;
 
@@ -323,24 +273,6 @@ static int Open (vlc_object_t *obj)
     xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
     msg_Dbg (vout, "using X11 graphic context %08"PRIx32, p_sys->gc);
 
-    /* Check shared memory support */
-    p_sys->shm = var_CreateGetBool (vout, "x11-shm") > 0;
-    if (p_sys->shm)
-    {
-        xcb_shm_query_version_cookie_t ck;
-        xcb_shm_query_version_reply_t *r;
-
-        ck = xcb_shm_query_version (p_sys->conn);
-        r = xcb_shm_query_version_reply (p_sys->conn, ck, NULL);
-        if (!r)
-        {
-            msg_Err (vout, "shared memory (MIT-SHM) not available");
-            msg_Warn (vout, "display will be slow");
-            p_sys->shm = false;
-        }
-        free (r);
-    }
-
     vout->pf_init = Init;
     vout->pf_end = Deinit;
     vout->pf_display = Display;
@@ -361,11 +293,9 @@ static void Close (vlc_object_t *obj)
     vout_thread_t *vout = (vout_thread_t *)obj;
     vout_sys_t *p_sys = vout->p_sys;
 
-    if (p_sys->embed)
-        vout_ReleaseWindow (p_sys->embed);
+    vout_ReleaseWindow (p_sys->embed);
     /* colormap and window are garbage-collected by X */
-    if (p_sys->conn)
-        xcb_disconnect (p_sys->conn);
+    xcb_disconnect (p_sys->conn);
     free (p_sys);
 }
 
@@ -438,22 +368,6 @@ static void PictureDeinit (vout_thread_t *vout, picture_t *pic)
     shmdt (pic->p->p_pixels);
 }
 
-static void get_window_size (xcb_connection_t *conn, xcb_window_t win,
-                             unsigned *width, unsigned *height)
-{
-    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, win);
-    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, ck, NULL);
-
-    if (geo)
-    {
-        *width = geo->width;
-        *height = geo->height;
-        free (geo);
-    }
-    else
-        *width = *height = 0;
-}
-
 /**
  * Allocate drawable window and picture buffers.
  */
@@ -462,7 +376,8 @@ static int Init (vout_thread_t *vout)
     vout_sys_t *p_sys = vout->p_sys;
     unsigned x, y, width, height;
 
-    get_window_size (p_sys->conn, p_sys->embed->handle.xid, &width, &height);
+    if (GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
+        return VLC_EGENERIC;
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
 
     const uint32_t values[] = { x, y, width, height, };

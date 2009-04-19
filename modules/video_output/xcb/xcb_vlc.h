@@ -20,6 +20,12 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  ****************************************************************************/
 
+#ifdef WORDS_BIGENDIAN
+# define ORDER XCB_IMAGE_ORDER_MSB_FIRST
+#else
+# define ORDER XCB_IMAGE_ORDER_LSB_FIRST
+#endif
+
 int CheckError (vout_thread_t *, const char *str, xcb_void_cookie_t);
 int ProcessEvent (vout_thread_t *, xcb_connection_t *, xcb_window_t,
                   xcb_generic_event_t *);
@@ -28,3 +34,14 @@ typedef struct key_handler_t key_handler_t;
 key_handler_t *CreateKeyHandler (vlc_object_t *, xcb_connection_t *);
 void DestroyKeyHandler (key_handler_t *);
 int ProcessKeyEvent (key_handler_t *, xcb_generic_event_t *);
+
+/* common.c */
+struct vout_window_t;
+
+xcb_connection_t *Connect (vlc_object_t *obj);
+struct vout_window_t *GetWindow (vout_thread_t *obj,
+                                 xcb_connection_t *pconn,
+                                 const xcb_screen_t **restrict pscreen,
+                                 bool *restrict pshm);
+int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
+                   unsigned *restrict width, unsigned *restrict height);
