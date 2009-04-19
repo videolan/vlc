@@ -89,7 +89,6 @@ DialogsProvider::~DialogsProvider()
 #ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
 #endif
-    ToolbarEditDialog::killInstance();
 
     delete menusMapper;
     delete menusUpdateMapper;
@@ -242,7 +241,8 @@ void DialogsProvider::podcastConfigureDialog()
 
 void DialogsProvider::toolbarDialog()
 {
-    ToolbarEditDialog::getInstance( p_intf )->toggleVisible();
+    ToolbarEditDialog *toolbarEditor = new ToolbarEditDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
+    toolbarEditor->exec();
 }
 
 void DialogsProvider::pluginDialog()

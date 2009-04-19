@@ -58,26 +58,16 @@ private:
     ToolbarEditDialog *parent;
 };
 
-class ToolbarEditDialog : public QVLCFrame
+class ToolbarEditDialog : public QVLCDialog
 {
     Q_OBJECT;
 public:
-    static ToolbarEditDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance)
-            instance = new ToolbarEditDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    { delete instance; instance = NULL;}
+    ToolbarEditDialog( QWidget *, intf_thread_t * );
     int getOptions() { return flatBox->isChecked() * WIDGET_FLAT +
                         bigBox->isChecked() * WIDGET_BIG +
                         !shinyBox->isChecked() * WIDGET_SHINY; }
-private:
-    ToolbarEditDialog( intf_thread_t * );
     virtual ~ToolbarEditDialog();
-
-    static ToolbarEditDialog *instance;
+private:
 
     QCheckBox *flatBox, *bigBox, *shinyBox;
     QComboBox *positionCombo, *profileCombo;

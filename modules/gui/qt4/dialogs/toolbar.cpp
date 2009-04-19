@@ -41,14 +41,13 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 
-ToolbarEditDialog *ToolbarEditDialog::instance = NULL;
-
-ToolbarEditDialog::ToolbarEditDialog( intf_thread_t *_p_intf)
-                  : QVLCFrame(  _p_intf )
+ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
+                  : QVLCDialog( _w,  _p_intf )
 {
     setWindowTitle( qtr( "Toolbars Editor" ) );
     QGridLayout *mainLayout = new QGridLayout( this );
     setMinimumWidth( 600 );
+    setAttribute( Qt::WA_DeleteOnClose );
 
     /* main GroupBox */
     QGroupBox *widgetBox = new QGroupBox( qtr( "Toolbar Elements") , this );
