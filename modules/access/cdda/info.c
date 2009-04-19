@@ -868,7 +868,6 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
         for( i = 0 ; i < p_cdda->i_tracks ; i++ )
         {
-            playlist_item_t *p_child;
             const track_t i_track = i_first_track + i;
             unsigned int i_track_frames =
                 cdio_get_track_sec_count(p_cdda->p_cdio, i_track);

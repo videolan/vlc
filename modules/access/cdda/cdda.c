@@ -156,7 +156,7 @@ vlc_module_begin ()
               false )
 
     add_bool( MODULE_STRING "-navigation-mode", true,
-#if FIXED
+#ifdef FIXED
           CDDANavModeCB,
 #else
           NULL,
