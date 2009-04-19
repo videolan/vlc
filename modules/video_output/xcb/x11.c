@@ -296,11 +296,8 @@ static int Open (vlc_object_t *obj)
 
     /* Create window */
     {
-        const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK
-                            | XCB_CW_COLORMAP;
+        const uint32_t mask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
         const uint32_t values[] = {
-            /* XCB_CW_BACK_PIXEL */
-            scr->black_pixel,
             /* XCB_CW_EVENT_MASK */
             XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
             XCB_EVENT_MASK_POINTER_MOTION,
