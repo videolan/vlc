@@ -27,6 +27,8 @@
 #define LEFTMARGIN  18
 #define RIGHTMARGIN 18
 
+static NSMenu   *o_keys_menu = nil;
+
 @interface VLCConfigControl : NSView
 {
     module_config_t *p_item;
@@ -51,7 +53,6 @@
 - (void)applyChanges;
 - (int)labelSize;
 - (void) alignWithXPosition:(int)i_xPos;
-static NSMenu   *o_keys_menu = nil;
 
 + (int)calcVerticalMargin: (int)i_curItem lastItem:(int)i_lastItem;
 

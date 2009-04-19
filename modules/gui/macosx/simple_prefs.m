@@ -315,7 +315,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
         NSMenuItem *mi;
         if( p_item->ppsz_list_text != NULL )
             mi = [[NSMenuItem alloc] initWithTitle: _NS( p_item->ppsz_list_text[i] ) action:NULL keyEquivalent: @""];
-        else if( p_item->ppsz_list[i] && p_item->ppsz_list[i] == "" )
+        else if( p_item->ppsz_list[i] && strcmp(p_item->ppsz_list[i],"") == 0 )
         {
             [[object menu] addItem: [NSMenuItem separatorItem]];
             continue;
