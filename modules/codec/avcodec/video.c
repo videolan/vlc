@@ -943,10 +943,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_ff_pic->linesize[2] = p_pic->p[2].i_pitch;
     p_ff_pic->linesize[3] = 0;
 
-    if( p_ff_pic->reference != 0 )
-    {
-        decoder_LinkPicture( p_dec, p_pic );
-    }
+    decoder_LinkPicture( p_dec, p_pic );
 
     /* FIXME what is that, should give good value */
     p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
@@ -1010,7 +1007,6 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
                                     AVFrame *p_ff_pic )
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
-    picture_t *p_pic;
 
     if( !p_ff_pic->opaque )
     {
@@ -1018,17 +1014,13 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
         return;
     }
 
-    p_pic = (picture_t*)p_ff_pic->opaque;
+    picture_t *p_pic = (picture_t*)p_ff_pic->opaque;
+    decoder_UnlinkPicture( p_dec, p_pic );
 
     p_ff_pic->data[0] = NULL;
     p_ff_pic->data[1] = NULL;
     p_ff_pic->data[2] = NULL;
     p_ff_pic->data[3] = NULL;
-
-    if( p_ff_pic->reference != 0 )
-    {
-        decoder_UnlinkPicture( p_dec, p_pic );
-    }
 }
 
 static void ffmpeg_NextPts( decoder_t *p_dec )
