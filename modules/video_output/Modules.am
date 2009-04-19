@@ -33,6 +33,19 @@ libxcb_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XPROTO_LIBS)
 libxcb_plugin_la_DEPENDENCIES =
 
+libxcb_xv_plugin_la_SOURCES = \
+	xcb/xcb_vlc.h \
+	xcb/xvideo.c \
+	xcb/common.c \
+	xcb/events.c
+libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS) \
+	$(XPROTO_CFLAGS)
+libxcb_xv_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS) \
+	$(XPROTO_LIBS)
+libxcb_xv_plugin_la_DEPENDENCIES =
+
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) \
@@ -42,8 +55,14 @@ libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_AUX_LIBS) $(XCB_KEYSYMS_LIBS)
 libxcb_window_plugin_la_DEPENDENCIES =
 
-EXTRA_LTLIBRARIES += libxcb_plugin.la libxcb_window_plugin.la
-libvlc_LTLIBRARIES += $(LTLIBxcb) $(LTLIBxcb_window)
+EXTRA_LTLIBRARIES += \
+	libxcb_plugin.la \
+	libxcb_xv_plugin.la \
+	libxcb_window_plugin.la
+libvlc_LTLIBRARIES += \
+	$(LTLIBxcb) \
+	$(LTLIBxcb_xv) \
+	$(LTLIBxcb_window)
 
 # XXX: do we need yet another modules/ subdirectory?
 libdrawable_plugin_la_SOURCES = drawable.c
