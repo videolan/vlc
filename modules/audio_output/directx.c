@@ -285,11 +285,7 @@ static int OpenAudio( vlc_object_t *p_this )
     /* Retrieve config values */
     var_Create( p_aout, "directx-audio-float32",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
-    var_Create( p_aout, "directx-audio-speaker",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "directx-audio-speaker", &val );
-    psz_speaker = val.psz_string;
+    psz_speaker = var_CreateGetString( p_aout, "directx-audio-speaker" );
 
     while ( *ppsz_compare != NULL )
     {
@@ -307,12 +303,11 @@ static int OpenAudio( vlc_object_t *p_this )
         msg_Err( p_aout, "Defaulting to Windows default speaker config");
         i = 0;
     }
+    free( psz_speaker );
     p_aout->output.p_sys->i_speaker_setup = i;
 
-    var_Create( p_aout, "directx-audio-device",
-                VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_aout, "directx-audio-device", &val );
-    p_aout->output.p_sys->i_device_id = val.i_int;
+    p_aout->output.p_sys->i_device_id = var_CreateGetInteger( p_aout,
+                                               "directx-audio-device" );
     p_aout->output.p_sys->p_device_guid = 0;
 
     /* Initialise DirectSound */
@@ -678,9 +673,7 @@ static void Probe( aout_instance_t * p_aout )
     }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-
-    val.b_bool = true;
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
 }
 
 /*****************************************************************************
@@ -995,13 +988,9 @@ static int CreateDSBufferPCM( aout_instance_t *p_aout, int *i_format,
                               int i_channels, int i_nb_channels, int i_rate,
                               bool b_probe )
 {
-    vlc_value_t val;
-
-    var_Get( p_aout, "directx-audio-float32", &val );
-
     /* Float32 audio samples are not supported for 5.1 output on the emu101k */
-
-    if( !val.b_bool || i_nb_channels > 2 ||
+    if( !var_GetBool( p_aout, "directx-audio-float32" ) ||
+        i_nb_channels > 2 ||
         CreateDSBuffer( p_aout, VLC_FOURCC('f','l','3','2'),
                         i_channels, i_nb_channels, i_rate,
                         FRAME_SIZE * 4 * i_nb_channels, b_probe )

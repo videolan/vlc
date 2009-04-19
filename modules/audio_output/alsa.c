@@ -274,8 +274,7 @@ static void Probe( aout_instance_t * p_aout,
 
     /* Add final settings to the variable */
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-    val.b_bool = true;
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
 }
 
 /*****************************************************************************

@@ -138,12 +138,9 @@ static int Open( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     char * psz_name, * psz_format;
     const char * const * ppsz_compare = format_list;
-    vlc_value_t val;
     int i_channels, i = 0;
 
-    var_Create( p_this, "audiofile-file", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-    var_Get( p_this, "audiofile-file", &val );
-    psz_name = val.psz_string;
+    psz_name = var_CreateGetString( p_this, "audiofile-file" );
     if( !psz_name || !*psz_name )
     {
         msg_Err( p_aout, "you need to specify an output file name" );
@@ -171,9 +168,7 @@ static int Open( vlc_object_t * p_this )
     p_aout->output.pf_play = Play;
 
     /* Audio format */
-    var_Create( p_this, "audiofile-format", VLC_VAR_STRING|VLC_VAR_DOINHERIT );
-    var_Get( p_this, "audiofile-format", &val );
-    psz_format = val.psz_string;
+    psz_format = var_CreateGetString( p_this, "audiofile-format" );
 
     while ( *ppsz_compare != NULL )
     {
@@ -211,10 +206,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Channels number */
-    var_Create( p_this, "audiofile-channels",
-                VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_this, "audiofile-channels", &val );
-    i_channels = val.i_int;
+    i_channels = var_CreateGetInteger( p_this, "audiofile-channels" );
 
     if( i_channels > 0 && i_channels <= CHANNELS_MAX )
     {
@@ -223,9 +215,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* WAV header */
-    var_Create( p_this, "audiofile-wav", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Get( p_this, "audiofile-wav", &val );
-    p_aout->output.p_sys->b_add_wav_header = val.b_bool;
+    p_aout->output.p_sys->b_add_wav_header = var_CreateGetBool( p_this,
+                                                        "audiofile-wav" );
 
     if( p_aout->output.p_sys->b_add_wav_header )
     {

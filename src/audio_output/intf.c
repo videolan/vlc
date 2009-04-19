@@ -98,14 +98,11 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
  *****************************************************************************/
 int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 {
-    vlc_value_t val;
     aout_instance_t *p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT, FIND_ANYWHERE );
     int i_result = 0;
 
     config_PutInt( p_object, "volume", i_volume );
-
-    val.b_bool = true;
-    var_Set( p_object->p_libvlc, "volume-change", val );
+    var_SetBool( p_object->p_libvlc, "volume-change", true );
 
     if ( p_aout == NULL ) return 0;
 
@@ -116,7 +113,7 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
     }
     aout_unlock_mixer( p_aout );
 
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
     vlc_object_release( p_aout );
     return i_result;
 }
@@ -157,7 +154,6 @@ int __aout_VolumeInfos( vlc_object_t * p_object, audio_volume_t * pi_soft )
 int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
-    vlc_value_t val;
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     int i_result = 0, i_volume = 0, i_volume_step = 0;
@@ -175,8 +171,7 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                     (audio_volume_t) i_volume );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t) i_volume;
 
-    val.b_bool = true;
-    var_Set( p_object->p_libvlc, "volume-change", val );
+    var_SetBool( p_object->p_libvlc, "volume-change", true );
 
     if ( p_aout == NULL ) return 0;
 
@@ -201,7 +196,6 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
 int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
                      audio_volume_t * pi_volume )
 {
-    vlc_value_t val;
     aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
     int i_result = 0, i_volume = 0, i_volume_step = 0;
@@ -218,8 +212,7 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
     var_SetInteger( p_object->p_libvlc, "saved-volume", (audio_volume_t) i_volume );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t) i_volume;
 
-    val.b_bool = true;
-    var_Set( p_object->p_libvlc, "volume-change", val );
+    var_SetBool( p_object->p_libvlc, "volume-change", true );
 
     if ( p_aout == NULL ) return 0;
 

@@ -341,27 +341,25 @@ static int Open( vlc_object_t *p_this )
     {
         WAVEOUTCAPS wocaps;
 
-        if( val.i_int == AOUT_VAR_5_1 )
+        switch( val.i_int )
         {
+        case AOUT_VAR_5_1:
             p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-                   | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
-                   | AOUT_CHAN_LFE;
-        }
-        else if( val.i_int == AOUT_VAR_2F2R )
-        {
+                    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                      | AOUT_CHAN_LFE;
+            break;
+        case AOUT_VAR_2F2R:
             p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                   | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        }
-        else if( val.i_int == AOUT_VAR_MONO )
-        {
+                    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                      | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+            break;
+        case AOUT_VAR_MONO:
             p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
-        }
-        else
-        {
+            break;
+        default:
             p_aout->output.output.i_physical_channels
-                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+                    = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
         }
 
         if( OpenWaveOutPCM( p_aout,
@@ -410,7 +408,7 @@ static int Open( vlc_object_t *p_this )
     if( p_aout->output.p_sys->p_silence_buffer == NULL )
     {
         free( p_aout->output.p_sys );
-        return 1;
+        return VLC_ENOMEM;
     }
     p_aout->output.p_sys->i_repeat_counter = 0;
 
@@ -448,7 +446,7 @@ static int Open( vlc_object_t *p_this )
         p_aout->output.p_sys->waveheader[i].dwUser = 0;
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -566,9 +564,7 @@ static void Probe( aout_instance_t * p_aout )
     }
 
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-
-    val.b_bool = true;
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
 }
 
 /*****************************************************************************

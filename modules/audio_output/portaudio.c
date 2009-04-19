@@ -169,13 +169,12 @@ static int Open( vlc_object_t * p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
-    vlc_value_t val;
     int i_err;
 
     msg_Dbg( p_aout, "entering Open()");
 
     /* Allocate p_sys structure */
-    p_sys = (aout_sys_t *)malloc( sizeof(aout_sys_t) );
+    p_sys = malloc( sizeof(aout_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_sys->p_aout = p_aout;
@@ -184,9 +183,7 @@ static int Open( vlc_object_t * p_this )
     p_aout->output.pf_play = Play;
 
     /* Retrieve output device id from config */
-    var_Create( p_aout, "portaudio-audio-device", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
-    var_Get( p_aout, "portaudio-audio-device", &val );
-    p_sys->i_device_id = val.i_int;
+    p_sys->i_device_id = var_CreateGetInteger( p_aout, "portaudio-audio-device" );
 
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
     if( !b_init )
@@ -434,9 +431,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
         }
 
         var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
-
-        val.b_bool = true;
-        var_Set( p_aout, "intf-change", val );
+        var_SetBool( p_aout, "intf-change", true );
     }
 
     /* Audio format is paFloat32 (always supported by portaudio v19) */
