@@ -388,9 +388,9 @@ typedef struct mwmhints_t
  * Chroma defines
  *****************************************************************************/
 #ifdef MODULE_NAME_IS_xvideo
-#   define MAX_DIRECTBUFFERS 10
+#   define MAX_DIRECTBUFFERS (VOUT_MAX_PICTURES)
 #elif defined(MODULE_NAME_IS_xvmc)
-#   define MAX_DIRECTBUFFERS 12
+#   define MAX_DIRECTBUFFERS (VOUT_MAX_PICTURES+2)
 #else
 #   define MAX_DIRECTBUFFERS 2
 #endif
