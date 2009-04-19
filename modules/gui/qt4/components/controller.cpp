@@ -426,19 +426,35 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     /* Customize Buttons */
     if( b_flat || b_big )
     {
-        QToolButton *tmpButton = qobject_cast<QToolButton *>(widget);
-        if( tmpButton )
+        QFrame *frame = qobject_cast<QFrame *>(widget);
+        if( frame )
         {
-            if( b_flat )
-                tmpButton->setAutoRaise( b_flat );
-            if( b_big )
-            {
-                tmpButton->setFixedSize( QSize( 32, 32 ) );
-                tmpButton->setIconSize( QSize( 26, 26 ) );
-            }
+            QList<QToolButton *> allTButtons = frame->findChildren<QToolButton *>();
+            for( int i = 0; i < allTButtons.size(); i++ )
+                applyAttributes( allTButtons[i], b_flat, b_big );
+        }
+        else
+        {
+            QToolButton *tmpButton = qobject_cast<QToolButton *>(widget);
+            if( tmpButton )
+                applyAttributes( tmpButton, b_flat, b_big );
         }
     }
     return widget;
+}
+
+void AbstractController::applyAttributes( QToolButton *tmpButton, bool b_flat, bool b_big )
+{
+    if( tmpButton )
+    {
+        if( b_flat )
+            tmpButton->setAutoRaise( b_flat );
+        if( b_big )
+        {
+            tmpButton->setFixedSize( QSize( 32, 32 ) );
+            tmpButton->setIconSize( QSize( 26, 26 ) );
+        }
+    }
 }
 
 QFrame *AbstractController::discFrame()

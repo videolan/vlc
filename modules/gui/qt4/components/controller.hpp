@@ -51,6 +51,7 @@ class QBoxLayout;
 class QAbstractSlider;
 class QAbstractButton;
 class InputSlider;
+class QToolButton;
 
 class VolumeClickHandler;
 class WidgetListing;
@@ -153,7 +154,7 @@ private:
     static void setupButton( QAbstractButton * );
     QFrame *discFrame();
     QFrame *telexFrame();
-
+    void applyAttributes( QToolButton *, bool b_flat, bool b_big );
 protected slots:
     virtual void setStatus( int );
 
