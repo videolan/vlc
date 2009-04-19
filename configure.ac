@@ -5208,19 +5208,12 @@ AC_ARG_ENABLE(xosd,
   [  --enable-xosd           xosd interface support (default disabled)])
 if test "${enable_xosd}" = "yes"
 then
-  AC_CHECK_HEADER(xosd.h, have_xosd="true", have_xosd="false")
-  AC_CHECK_LIB(xosd,xosd_set_offset,
-      AC_DEFINE(HAVE_XOSD_VERSION_1, 1, Define if <xosd.h> is 1.0.x),
-    AC_CHECK_LIB(xosd,xosd_set_horizontal_offset,
-        AC_DEFINE(HAVE_XOSD_VERSION_2, 1, Define if <xosd.h> is 2.0.x),
-      AC_TRY_COMPILE([#include <xosd.h>],
-         [xosd_init("foo","bar",12,XOSD_top,2,12,42);],,
-          AC_DEFINE(HAVE_XOSD_VERSION_0, 1, Define if <xosd.h> is pre-1.0.0))))
-  if test "${have_xosd}" = "true"
-  then
-    VLC_ADD_PLUGIN([xosd])
-    VLC_ADD_LIBS([xosd],[-lxosd])
-  fi
+  AC_CHECK_HEADERS(xosd.h,
+    AC_CHECK_LIB(xosd, xosd_set_horizontal_offset, [
+      VLC_ADD_PLUGIN([xosd])
+      VLC_ADD_LIBS([xosd],[-lxosd])
+    ])
+  )
 fi
 
 dnl

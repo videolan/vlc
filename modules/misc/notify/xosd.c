@@ -125,15 +125,7 @@ static int Open( vlc_object_t *p_this )
     psz_font = config_GetPsz( p_intf, "xosd-font" );
     psz_colour = config_GetPsz( p_intf, "xosd-colour" );
 
-#if defined(HAVE_XOSD_VERSION_0) || defined(HAVE_XOSD_VERSION_1)
-    p_osd = xosd_init( psz_font, psz_colour, 3,
-                       config_GetInt( p_intf, "xosd-position" ) ? XOSD_bottom :
-                                                                  XOSD_top,
-                       config_GetInt( p_intf, "xosd-text-offset" ),
-                       config_GetInt( p_intf, "xosd-shadow-offset" ), 1 );
-#else
     p_osd = xosd_create( 1 );
-#endif
     if( p_osd == NULL )
     {
         msg_Err( p_intf, "couldn't initialize libxosd" );
@@ -146,7 +138,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Set user preferences */
     xosd_set_outline_colour( p_osd, "black" );
-#ifdef HAVE_XOSD_VERSION_2
     xosd_set_font( p_osd, psz_font );
     xosd_set_colour( p_osd, psz_colour );
     xosd_set_timeout( p_osd, 3 );
@@ -158,7 +149,7 @@ static int Open( vlc_object_t *p_this )
                     config_GetInt( p_intf, "xosd-text-offset" ) );
     xosd_set_shadow_offset( p_osd,
                     config_GetInt( p_intf, "xosd-shadow-offset" ));
-#endif
+
     /* Initialize to NULL */
     xosd_display( p_osd, 0, XOSD_string, "XOSD interface initialized" );
 
