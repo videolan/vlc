@@ -27,7 +27,8 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
-#include "vlc_keys.h"
+#include <vlc_keys.h>
+#include <vlc_charset.h>
 
 #ifdef HAVE_GETOPT_LONG
 #   ifdef HAVE_GETOPT_H
@@ -297,7 +298,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                         config_PutInt( p_this, psz_name, strtol(optarg, 0, 0));
                         break;
                     case CONFIG_ITEM_FLOAT:
-                        config_PutFloat( p_this, psz_name, (float)atof(optarg) );
+                        config_PutFloat( p_this, psz_name, us_atof(optarg) );
                         break;
                     case CONFIG_ITEM_KEY:
                         config_PutInt( p_this, psz_name, ConfigStringToKey( optarg ) );
