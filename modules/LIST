@@ -158,7 +158,6 @@ $Id$
  * id3: ID3 tag skipper
  * id3tag: ID3 tag parser/skipper using libid3tag
  * image: Image file video output
- * imgresample: FFmpeg video filter
  * inhibit: preventing the computer from suspending
  * invert: inverse video filter
  * invmem: module for VLC to display images from an external application

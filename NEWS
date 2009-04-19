@@ -102,8 +102,12 @@ Audio output:
 
 Video output:
  * Effects (cube, torus, etc.) removed from OpenGL video output
- * Video is able to stay in original size and to zoom in fullscreen (hotkey 'o') while keeping black borders
- * Image video output has been rewritten into a video-filter named 'scene'. The old image video output has been removed.
+ * Video is able to stay in original size and to zoom in fullscreen
+   (hotkey 'o') while keeping black borders
+ * Image video output has been rewritten into a video-filter named 'scene'.
+   The old image video output has been removed.
+ * Support for scaling and converting video chromas with FFMPEG imgresample was
+   withdrawn due to bugs. Please use the newer FFMPEG swscale instead.
 
 Miscellanous:
  * Invmem, a fake codec to display images from external applications
