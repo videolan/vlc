@@ -25,7 +25,6 @@
  * Preamble
  *****************************************************************************/
 
-#include <xosd.h>
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -36,9 +35,7 @@
 #include <vlc_input.h>
 #include <vlc_interface.h>
 
-#ifdef HAVE_UNISTD_H
-#    include <unistd.h>
-#endif
+#include <xosd.h>
 
 /*****************************************************************************
  * intf_sys_t: description and status of rc interface
@@ -109,87 +106,76 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t *p_sys;
     xosd *p_osd;
     char *psz_font, *psz_colour;
-
-    /* Allocate instance and initialize some members */
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-        return VLC_ENOMEM;
 
     if( getenv( "DISPLAY" ) == NULL )
     {
         msg_Err( p_intf, "no display, please set the DISPLAY variable" );
-        free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
+
+    /* Allocate instance and initialize some members */
+    p_sys = p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( p_sys == NULL )
+        return VLC_ENOMEM;
 
     /* Initialize library */
-#if defined(HAVE_XOSD_VERSION_0) || defined(HAVE_XOSD_VERSION_1)
     psz_font = config_GetPsz( p_intf, "xosd-font" );
-    psz_colour = config_GetPsz( p_intf,"xosd-colour" );
-    p_osd  = p_intf->p_sys->p_osd = xosd_init( psz_font, psz_colour, 3,
-                                               XOSD_top, 0, 1 );
-    free( psz_font );
-    free( psz_colour );
+    psz_colour = config_GetPsz( p_intf, "xosd-colour" );
 
-    if( p_intf->p_sys->p_osd == NULL )
-    {
-        msg_Err( p_intf, "couldn't initialize libxosd" );
-        free( p_intf->p_sys );
-        return VLC_EGENERIC;
-    }
+#if defined(HAVE_XOSD_VERSION_0) || defined(HAVE_XOSD_VERSION_1)
+    p_osd = xosd_init( psz_font, psz_colour, 3,
+                       config_GetInt( p_intf, "xosd-position" ) ? XOSD_bottom :
+                                                                  XOSD_top,
+                       config_GetInt( p_intf, "xosd-text-offset" ),
+                       config_GetInt( p_intf, "xosd-shadow-offset" ), 1 );
 #else
-    p_osd = p_intf->p_sys->p_osd = xosd_create( 1 );
+    p_osd = xosd_create( 1 );
+#endif
     if( p_osd == NULL )
     {
         msg_Err( p_intf, "couldn't initialize libxosd" );
-        free( p_intf->p_sys );
+        free( psz_colour );
+        free( psz_font );
+        free( p_sys );
         return VLC_EGENERIC;
     }
+    p_sys->p_osd = p_osd;
 
-    psz_colour = config_GetPsz( p_intf, "xosd-colour" );
+    /* Set user preferences */
+    xosd_set_outline_colour( p_osd, "black" );
+#ifdef HAVE_XOSD_VERSION_2
+    xosd_set_font( p_osd, psz_font );
     xosd_set_colour( p_osd, psz_colour );
     xosd_set_timeout( p_osd, 3 );
-    free( psz_colour );
+    xosd_set_pos( p_osd, config_GetInt( p_intf, "xosd-position" ) ?
+                                        XOSD_bottom: XOSD_top );
+    xosd_set_horizontal_offset( p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+    xosd_set_vertical_offset( p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+    xosd_set_shadow_offset( p_osd,
+                    config_GetInt( p_intf, "xosd-shadow-offset" ));
 #endif
+    /* Initialize to NULL */
+    xosd_display( p_osd, 0, XOSD_string, "XOSD interface initialized" );
+
+    free( psz_colour );
+    free( psz_font );
 
     // Initialize mutex and condition variable before adding the callbacks
-    vlc_mutex_init( &p_intf->p_sys->lock );
-    vlc_cond_init( &p_intf->p_sys->cond );
+    vlc_mutex_init( &p_sys->lock );
+    vlc_cond_init( &p_sys->cond );
     // Add the callbacks
     playlist_t *p_playlist = pl_Hold( p_intf );
     var_AddCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_AddCallback( p_playlist, "item-change", PlaylistNext, p_this );
     pl_Release( p_intf );
 
-    /* Set user preferences */
-    psz_font = config_GetPsz( p_intf, "xosd-font" );
-    xosd_set_font( p_intf->p_sys->p_osd, psz_font );
-    free( psz_font );
-    xosd_set_outline_colour( p_intf->p_sys->p_osd,"black" );
-#ifdef HAVE_XOSD_VERSION_2
-    xosd_set_horizontal_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
-    xosd_set_vertical_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
-#else
-    xosd_set_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
-#endif
-    xosd_set_shadow_offset( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-shadow-offset" ));
-    xosd_set_pos( p_intf->p_sys->p_osd,
-                    config_GetInt( p_intf, "xosd-position" ) ?
-                                         XOSD_bottom: XOSD_top );
-
-    /* Initialize to NULL */
-    xosd_display( p_osd, 0, XOSD_string, "XOSD interface initialized" );
-
+    p_sys->b_need_update = true;
     p_intf->pf_run = Run;
-
-    p_intf->p_sys->b_need_update = true;
-
     return VLC_SUCCESS;
 }
 
@@ -255,20 +241,17 @@ static void Run( intf_thread_t *p_intf )
         if( i_status == PLAYLIST_STOPPED )
         {
             psz_display = strdup(_("Stop"));
-            PL_UNLOCK;
-            pl_Release( p_intf );
         }
         else if( i_status == PLAYLIST_PAUSED )
         {
             psz_display = strdup(_("Pause"));
-            PL_UNLOCK;
-            pl_Release( p_intf );
         }
         else
         {
             p_item = playlist_CurrentPlayingItem( p_playlist );
             if( !p_item )
             {
+                psz_display = NULL;
                 PL_UNLOCK;
                 pl_Release( p_intf );
                 continue;
@@ -285,10 +268,9 @@ static void Run( intf_thread_t *p_intf )
             }
             else
                 psz_display = strdup( p_input->psz_name );
-
-            PL_UNLOCK;
-            pl_Release( p_intf );
         }
+        PL_UNLOCK;
+        pl_Release( p_intf );
 
         /* Display */
         xosd_display( p_intf->p_sys->p_osd, 0, /* first line */
