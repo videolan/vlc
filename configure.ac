@@ -3105,7 +3105,7 @@ then
       VLC_ADD_CFLAGS([avcodec],[$AVCODEC_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_FAILURE([Could not find libavcodec or libavutil. Use --disable-avcodec to ignore this error.])
+      AC_MSG_ERROR([Could not find libavcodec or libavutil. Use --disable-avcodec to ignore this error.])
   ])
 fi
 
@@ -3129,7 +3129,7 @@ then
       VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
-      AC_MSG_FAILURE([Could not find libavformat or libavutil. Use --disable-avformat to ignore this error.])
+      AC_MSG_ERROR([Could not find libavformat or libavutil. Use --disable-avformat to ignore this error.])
   ])
 fi
 
