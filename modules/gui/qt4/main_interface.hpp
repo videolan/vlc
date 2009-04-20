@@ -166,6 +166,7 @@ public slots:
 
 private slots:
     void debug();
+    void recreateToolbars();
     void doComponentsUpdate();
     void setName( QString );
     void setVLCWindowsTitle( QString title = "" );

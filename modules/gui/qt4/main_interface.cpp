@@ -221,6 +221,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     }
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
+    CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
 
     /* Size and placement of interface */
     settings->beginGroup( "MainWindow" );
@@ -408,6 +409,24 @@ void MainInterface::setVLCWindowsTitle( QString aTitle )
     }
 }
 
+void MainInterface::recreateToolbars()
+{
+    settings->beginGroup( "MainWindow" );
+    delete controls;
+    delete inputC;
+    controls = new ControlsWidget( p_intf, false, this ); /* FIXME */
+    CONNECT( controls, advancedControlsToggled( bool ),
+             this, doComponentsUpdate() );
+    CONNECT( controls, sizeChanged(),
+             this, doComponentsUpdate() );
+    inputC = new InputControlsWidget( p_intf, this );
+
+    mainLayout->insertWidget( 2, inputC, 0, Qt::AlignBottom );
+    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                              controls, 0, Qt::AlignBottom );
+    settings->endGroup();
+}
+
 void MainInterface::handleMainUi( QSettings *settings )
 {
     /* Create the main Widget and the mainLayout */
@@ -421,16 +440,7 @@ void MainInterface::handleMainUi( QSettings *settings )
     mainLayout->setSpacing( 0 );
     mainLayout->setMargin( 0 );
 
-    /* Create the CONTROLS Widget */
-    controls = new ControlsWidget( p_intf,
-                   settings->value( "adv-controls", false ).toBool(), this );
-    CONNECT( controls, advancedControlsToggled( bool ),
-             this, doComponentsUpdate() );
-    CONNECT( controls, sizeChanged(),
-             this, doComponentsUpdate() );
-    inputC = new InputControlsWidget( p_intf, this );
-
-        /* Visualisation */
+    /* Visualisation */
     /* Disabled for now, they SUCK */
     #if 0
     visualSelector = new VisualSelector( p_intf );
@@ -454,6 +464,16 @@ void MainInterface::handleMainUi( QSettings *settings )
     /* And video Outputs */
     if( videoEmbeddedFlag )
         videoWidget = new VideoWidget( p_intf );
+
+    /* Create the CONTROLS Widget */
+    controls = new ControlsWidget( p_intf,
+                   settings->value( "adv-controls", false ).toBool(), this );
+    CONNECT( controls, advancedControlsToggled( bool ),
+             this, doComponentsUpdate() );
+    CONNECT( controls, sizeChanged(),
+             this, doComponentsUpdate() );
+    inputC = new InputControlsWidget( p_intf, this );
+
 
     /* Add the controls Widget to the main Widget */
     mainLayout->insertWidget( 0, bgWidget );

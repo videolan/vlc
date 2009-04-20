@@ -193,6 +193,8 @@ private slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject * );
     void SDMenuAction( QString );
+signals:
+    void  toolBarConfUpdated();
 };
 
 class DialogEvent : public QEvent

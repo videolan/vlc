@@ -247,7 +247,6 @@ void ToolbarEditDialog::changeProfile( int i )
 void ToolbarEditDialog::close()
 {
     msg_Dbg( p_intf, "Close and save" );
-    hide();
     getSettings()->setValue( "MainWindow/ToolbarPos",
             positionCombo->itemData( positionCombo->currentIndex() ).toInt() );
     getSettings()->setValue( "MainWindow/MainToolbar1", controller1->getValue() );
@@ -255,11 +254,13 @@ void ToolbarEditDialog::close()
     getSettings()->setValue( "MainWindow/AdvToolbar", controllerA->getValue() );
     getSettings()->setValue( "MainWindow/InputToolbar", controller->getValue() );
     getSettings()->setValue( "MainWindow/FSCtoolbar", controllerFSC->getValue() );
+    getSettings()->sync();
+    accept();
 }
 
 void ToolbarEditDialog::cancel()
 {
-    hide();
+    reject();
 }
 
 /************************************************

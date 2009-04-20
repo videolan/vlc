@@ -242,7 +242,8 @@ void DialogsProvider::podcastConfigureDialog()
 void DialogsProvider::toolbarDialog()
 {
     ToolbarEditDialog *toolbarEditor = new ToolbarEditDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
-    toolbarEditor->exec();
+    if( toolbarEditor->exec() == QDialog::Accepted )
+        emit toolBarConfUpdated();
 }
 
 void DialogsProvider::pluginDialog()
