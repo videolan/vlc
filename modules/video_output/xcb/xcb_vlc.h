@@ -45,3 +45,5 @@ struct vout_window_t *GetWindow (vout_thread_t *obj,
                                  bool *restrict pshm);
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);
+int PictureInit (vout_thread_t *vout, picture_t *pic, xcb_connection_t *conn);
+void PictureDeinit (picture_t *pic, xcb_connection_t *conn);

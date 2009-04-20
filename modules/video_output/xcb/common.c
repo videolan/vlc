@@ -158,3 +158,75 @@ int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
     free (geo);
     return 0;
 }
+
+/**
+ * Initialize a picture buffer as shared memory, according to the video output
+ * format. If a XCB connection pointer is supplied, the segment is attached to
+ * the X server (MIT-SHM extension).
+ */
+int PictureInit (vout_thread_t *vout, picture_t *pic, xcb_connection_t *conn)
+{
+    assert (pic->i_status == FREE_PICTURE);
+    vout_InitPicture (vout, pic, vout->output.i_chroma,
+                      vout->output.i_width, vout->output.i_height,
+                      vout->output.i_aspect);
+
+    const size_t size = pic->p->i_pitch * pic->p->i_lines;
+
+    /* Allocate shared memory segment */
+    int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
+    if (id == -1)
+    {
+        msg_Err (vout, "shared memory allocation error: %m");
+        return VLC_EGENERIC;
+    }
+
+    /* Attach the segment to VLC */
+    void *shm = shmat (id, NULL, 0 /* read/write */);
+    if (-1 == (intptr_t)shm)
+    {
+        msg_Err (vout, "shared memory attachment error: %m");
+        shmctl (id, IPC_RMID, 0);
+        return VLC_EGENERIC;
+    }
+
+    xcb_shm_seg_t segment;
+    if (conn != NULL)
+    {
+        /* Attach the segment to X */
+        xcb_void_cookie_t ck;
+
+        segment = xcb_generate_id (conn);
+        ck = xcb_shm_attach_checked (conn, segment, id, 1);
+
+        if (CheckError (vout, "shared memory server-side error", ck))
+        {
+            msg_Info (vout, "using buggy X11 server - SSH proxying?");
+            segment = 0;
+        }
+    }
+    else
+        segment = 0;
+
+    shmctl (id, IPC_RMID, 0);
+    pic->p_sys = (void *)(uintptr_t)segment;
+    pic->p->p_pixels = shm;
+    pic->i_status = DESTROYED_PICTURE;
+    pic->i_type = DIRECT_PICTURE;
+    return VLC_SUCCESS;
+}
+
+/**
+ * Release picture private data: detach the shared memory segment.
+ */
+void PictureDeinit (picture_t *pic, xcb_connection_t *conn)
+{
+    xcb_shm_seg_t segment = (uintptr_t)pic->p_sys;
+
+    if (segment != 0)
+    {
+        assert (conn != NULL);
+        xcb_shm_detach (conn, segment);
+    }
+    shmdt (pic->p->p_pixels);
+}

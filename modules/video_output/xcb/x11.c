@@ -27,9 +27,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include <sys/types.h>
-#include <sys/shm.h>
-
 #include <xcb/xcb.h>
 #include <xcb/shm.h>
 
@@ -299,74 +296,6 @@ static void Close (vlc_object_t *obj)
     free (p_sys);
 }
 
-#define SHM_ERR ((void *)(intptr_t)(-1))
-
-static int PictureInit (vout_thread_t *vout, picture_t *pic)
-{
-    vout_sys_t *p_sys = vout->p_sys;
-
-    assert (pic->i_status == FREE_PICTURE);
-    vout_InitPicture (vout, pic, vout->output.i_chroma,
-                      vout->output.i_width, vout->output.i_height,
-                      vout->output.i_aspect);
-
-    void *shm = SHM_ERR;
-    const size_t size = pic->p->i_pitch * pic->p->i_lines;
-
-    /* Allocate shared memory segment */
-    int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
-    if (id == -1)
-    {
-        msg_Err (vout, "shared memory allocation error: %m");
-        return VLC_EGENERIC;
-    }
-
-    /* Attach the segment to VLC */
-    shm = shmat (id, NULL, 0 /* read/write */);
-    if (shm == SHM_ERR)
-    {
-        msg_Err (vout, "shared memory attachment error: %m");
-        shmctl (id, IPC_RMID, 0);
-        return VLC_EGENERIC;
-    }
-
-    xcb_shm_seg_t segment;
-    if (p_sys->shm)
-    {
-        /* Attach the segment to X */
-        xcb_void_cookie_t ck;
-        segment = xcb_generate_id (p_sys->conn);
-        ck = xcb_shm_attach_checked (p_sys->conn, segment, id, 1);
-
-        if (CheckError (vout, "shared memory server-side error", ck))
-        {
-            msg_Info (vout, "using buggy X11 server - SSH proxying?");
-            segment = 0;
-        }
-    }
-    else
-        segment = 0;
-
-    shmctl (id, IPC_RMID, 0);
-    pic->p_sys = (void *)(uintptr_t)segment;
-    pic->p->p_pixels = shm;
-    pic->i_status = DESTROYED_PICTURE;
-    pic->i_type = DIRECT_PICTURE;
-    return VLC_SUCCESS;
-}
-
-
-/**
- * Release picture private data
- */
-static void PictureDeinit (vout_thread_t *vout, picture_t *pic)
-{
-    xcb_shm_seg_t segment = (uintptr_t)pic->p_sys;
-
-    if (segment != 0)
-        xcb_shm_detach (vout->p_sys->conn, segment);
-    shmdt (pic->p->p_pixels);
-}
 
 /**
  * Allocate drawable window and picture buffers.
@@ -414,7 +343,7 @@ static int Init (vout_thread_t *vout)
             break;
         if (pic->i_status != FREE_PICTURE)
             continue;
-        if (PictureInit (vout, pic))
+        if (PictureInit (vout, pic, p_sys->shm ? p_sys->conn : NULL))
             break;
         PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
     }
@@ -428,7 +357,7 @@ static int Init (vout_thread_t *vout)
 static void Deinit (vout_thread_t *vout)
 {
     for (int i = 0; i < I_OUTPUTPICTURES; i++)
-        PictureDeinit (vout, PP_OUTPUTPICTURE[i]);
+        PictureDeinit (PP_OUTPUTPICTURE[i], vout->p_sys->conn);
 }
 
 /**
