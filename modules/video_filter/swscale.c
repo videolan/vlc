@@ -301,6 +301,17 @@ static int GetParameters( ScalerConfiguration *p_cfg,
         b_has_ao = true;
     }
 
+    /* FIXME TODO removed when ffmpeg is fixed
+     * Without SWS_ACCURATE_RND the quality is really bad for some conversions */
+    switch( i_fmto )
+    {
+    case PIX_FMT_ARGB:
+    case PIX_FMT_RGBA:
+    case PIX_FMT_ABGR:
+        i_sws_flags |= SWS_ACCURATE_RND;
+        break;
+    }
+
     if( p_cfg )
     {
         p_cfg->i_fmti = i_fmti;
