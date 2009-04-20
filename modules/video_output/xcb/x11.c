@@ -369,21 +369,11 @@ static void Close (vlc_object_t *obj)
     free (p_sys);
 }
 
-struct picture_sys_t
-{
-    xcb_connection_t *conn; /* Shared connection to X server */
-    xcb_shm_seg_t segment; /* Shared memory segment X ID */
-};
-
 #define SHM_ERR ((void *)(intptr_t)(-1))
 
 static int PictureInit (vout_thread_t *vout, picture_t *pic)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    picture_sys_t *priv = malloc (sizeof (*p_sys));
-
-    if (priv == NULL)
-        return VLC_ENOMEM;
 
     assert (pic->i_status == FREE_PICTURE);
     vout_InitPicture (vout, pic, vout->output.i_chroma,
@@ -398,7 +388,7 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     if (id == -1)
     {
         msg_Err (vout, "shared memory allocation error: %m");
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /* Attach the segment to VLC */
@@ -407,50 +397,45 @@ static int PictureInit (vout_thread_t *vout, picture_t *pic)
     {
         msg_Err (vout, "shared memory attachment error: %m");
         shmctl (id, IPC_RMID, 0);
-        goto error;
+        return VLC_EGENERIC;
     }
 
+    xcb_shm_seg_t segment;
     if (p_sys->shm)
     {
         /* Attach the segment to X */
         xcb_void_cookie_t ck;
-        priv->segment = xcb_generate_id (p_sys->conn);
-        ck = xcb_shm_attach_checked (p_sys->conn, priv->segment, id, 1);
+        segment = xcb_generate_id (p_sys->conn);
+        ck = xcb_shm_attach_checked (p_sys->conn, segment, id, 1);
 
         if (CheckError (vout, "shared memory server-side error", ck))
         {
             msg_Info (vout, "using buggy X11 server - SSH proxying?");
-            priv->segment = 0;
+            segment = 0;
         }
     }
     else
-        priv->segment = 0;
+        segment = 0;
 
     shmctl (id, IPC_RMID, 0);
-    priv->conn = p_sys->conn;
-    pic->p_sys = priv;
+    pic->p_sys = (void *)(uintptr_t)segment;
     pic->p->p_pixels = shm;
     pic->i_status = DESTROYED_PICTURE;
     pic->i_type = DIRECT_PICTURE;
     return VLC_SUCCESS;
-
-error:
-    free (priv);
-    return VLC_EGENERIC;
 }
 
 
 /**
  * Release picture private data
  */
-static void PictureDeinit (picture_t *pic)
+static void PictureDeinit (vout_thread_t *vout, picture_t *pic)
 {
-    struct picture_sys_t *p_sys = pic->p_sys;
+    xcb_shm_seg_t segment = (uintptr_t)pic->p_sys;
 
-    if (p_sys->segment != 0)
-        xcb_shm_detach (p_sys->conn, p_sys->segment);
+    if (segment != 0)
+        xcb_shm_detach (vout->p_sys->conn, segment);
     shmdt (pic->p->p_pixels);
-    free (p_sys);
 }
 
 static void get_window_size (xcb_connection_t *conn, xcb_window_t win,
@@ -528,7 +513,7 @@ static int Init (vout_thread_t *vout)
 static void Deinit (vout_thread_t *vout)
 {
     for (int i = 0; i < I_OUTPUTPICTURES; i++)
-        PictureDeinit (PP_OUTPUTPICTURE[i]);
+        PictureDeinit (vout, PP_OUTPUTPICTURE[i]);
 }
 
 /**
@@ -537,16 +522,16 @@ static void Deinit (vout_thread_t *vout)
 static void Display (vout_thread_t *vout, picture_t *pic)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    picture_sys_t *priv = pic->p_sys;
+    xcb_shm_seg_t segment = (uintptr_t)pic->p_sys;
 
-    if (priv->segment)
+    if (segment != 0)
         xcb_shm_put_image (p_sys->conn, p_sys->window, p_sys->gc,
           /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
          /* real height */ pic->p->i_lines, /* x */ 0, /* y */ 0,
                /* width */ pic->p->i_visible_pitch / pic->p->i_pixel_pitch,
               /* height */ pic->p->i_visible_lines, /* x */ 0, /* y */ 0,
                            p_sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
-                           0, priv->segment, 0);
+                           0, segment, 0);
     else
         xcb_put_image (p_sys->conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
                        p_sys->window, p_sys->gc,
