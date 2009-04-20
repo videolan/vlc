@@ -90,13 +90,16 @@ public:
     virtual QSize sizeHint() const;
 
 protected:
-//    void resizeEvent( QResizeEvent * );
-    void dropEvent( QDropEvent *);
     void dropEventPlay( QDropEvent *, bool);
-    void dragEnterEvent( QDragEnterEvent * );
-    void dragMoveEvent( QDragMoveEvent * );
-    void dragLeaveEvent( QDragLeaveEvent * );
-    void closeEvent( QCloseEvent *);
+    virtual void dropEvent( QDropEvent *);
+    virtual void dragEnterEvent( QDragEnterEvent * );
+    virtual void dragMoveEvent( QDragMoveEvent * );
+    virtual void dragLeaveEvent( QDragLeaveEvent * );
+    virtual void closeEvent( QCloseEvent *);
+    virtual void customEvent( QEvent *);
+    virtual void keyPressEvent( QKeyEvent *);
+    virtual void wheelEvent( QWheelEvent * );
+    virtual void resizeEvent( QResizeEvent * event );
 
 private:
     QSettings           *settings;
@@ -111,6 +114,7 @@ private:
 
     void createMainWidget( QSettings* );
     void createStatusBar();
+
     void askForPrivacy();
     int  privacyDialog( QList<ConfigControl *> *controls );
 
@@ -144,11 +148,6 @@ private:
     /* Status Bar */
     QLabel              *nameLabel;
     QLabel              *cryptedLabel;
-
-    virtual void customEvent( QEvent *);
-    virtual void keyPressEvent( QKeyEvent *);
-    virtual void wheelEvent( QWheelEvent * );
-    virtual void resizeEvent( QResizeEvent * event );
 
 public slots:
     void undockPlaylist();
