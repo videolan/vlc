@@ -751,7 +751,7 @@ next:
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         rootItem->i_id );
-        if( p_root )
+        if( p_root && i_flag )
         {
             playlist_RecursiveNodeSort( p_playlist, p_root,
                                         i_column_sorting( i_flag ),
