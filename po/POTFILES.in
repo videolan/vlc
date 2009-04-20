@@ -1211,7 +1211,6 @@ modules/video_filter/filter_picture.h
 modules/video_filter/gaussianblur.c
 modules/video_filter/gradient.c
 modules/video_filter/grain.c
-modules/video_filter/imgresample.c
 modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/magnify.c
