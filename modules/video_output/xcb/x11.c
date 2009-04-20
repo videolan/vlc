@@ -448,10 +448,8 @@ static void PictureDeinit (picture_t *pic)
     struct picture_sys_t *p_sys = pic->p_sys;
 
     if (p_sys->segment != 0)
-    {
         xcb_shm_detach (p_sys->conn, p_sys->segment);
-        shmdt (pic->p->p_pixels);
-    }
+    shmdt (pic->p->p_pixels);
     free (p_sys);
 }
 
