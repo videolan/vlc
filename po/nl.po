@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2009-04-16 00:05+0100\n"
-"PO-Revision-Date: 2009-04-13 22:12+0100\n"
+"POT-Creation-Date: 2009-04-20 23:30+0100\n"
+"PO-Revision-Date: 2009-04-20 21:45+0100\n"
 "Last-Translator: Myckel Habets <myckel@sdf.lonestar.org>\n"
 "Language-Team: De Vrije CD <leiden@losc.nl>\n"
 "MIME-Version: 1.0\n"
@@ -77,7 +77,7 @@ msgstr "Instellingen voor VLC's besturingsinterfaces"
 msgid "Hotkeys settings"
 msgstr "Sneltoetsen"
 
-#: include/vlc_config_cat.h:52 src/input/es_out.c:2628 src/input/es_out.c:2662
+#: include/vlc_config_cat.h:52 src/input/es_out.c:2630 src/input/es_out.c:2664
 #: src/libvlc-module.c:1500 modules/gui/beos/InterfaceWindow.cpp:283
 #: modules/gui/macosx/intf.m:611 modules/gui/macosx/output.m:170
 #: modules/gui/macosx/playlistinfo.m:113 modules/gui/macosx/simple_prefs.m:178
@@ -132,7 +132,7 @@ msgstr "Overige"
 msgid "Miscellaneous audio settings and modules."
 msgstr "Overige audio-instellingen en modules."
 
-#: include/vlc_config_cat.h:70 src/input/es_out.c:2631 src/input/es_out.c:2711
+#: include/vlc_config_cat.h:70 src/input/es_out.c:2633 src/input/es_out.c:2713
 #: src/libvlc-module.c:1553 modules/gui/macosx/intf.m:624
 #: modules/gui/macosx/output.m:160 modules/gui/macosx/playlistinfo.m:102
 #: modules/gui/macosx/simple_prefs.m:182 modules/gui/macosx/wizard.m:381
@@ -168,7 +168,7 @@ msgstr "Ondertiteling/OSD"
 msgid ""
 "Settings related to On-Screen-Display, subtitles and \"overlay subpictures\""
 msgstr ""
-"Instellingen betreffende On-Screen-Display, ondertitelingen en \"overlap "
+"Instellingen betreffende On-Screen-Display, ondertitelingen en \"overlay "
 "subafbeeldingen\""
 
 #: include/vlc_config_cat.h:93
@@ -201,8 +201,8 @@ msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"Streamfilters zijn speciale modules die geavanceerde handelingen aan de "
-"invoerkant van VLC toestaan. Voorzichtig met deze instellingen... "
+"Streamfilters zijn speciale modules voor geavanceerde handelingen aan de "
+"invoerkant van VLC. Wees voorzichtig... "
 
 #: include/vlc_config_cat.h:108
 msgid "Demuxers"
@@ -316,12 +316,12 @@ msgid ""
 msgstr ""
 "Packetizers worden gebruikt om elementaire streams voor te bewerken alvorens "
 "ze te muxen. Met deze instelling kunt u een bepaalde packetizer forceren. U "
-"kan dit beter niet doen.\n"
+"kunt dit beter niet doen.\n"
 "U kunt ook standaardparameters voor iedere packetizer instellen."
 
 #: include/vlc_config_cat.h:159
 msgid "Sout stream"
-msgstr "Sout stream"
+msgstr "Sout-stream"
 
 #: include/vlc_config_cat.h:160
 msgid ""
@@ -358,10 +358,10 @@ msgstr "VLC's Video On Demand-implementatie"
 #: modules/gui/beos/InterfaceWindow.cpp:232
 #: modules/gui/beos/InterfaceWindow.cpp:326 modules/gui/macosx/intf.m:554
 #: modules/gui/pda/pda_interface.c:1262
-#: modules/gui/qt4/components/controller.hpp:102
+#: modules/gui/qt4/components/controller.hpp:103
 #: modules/gui/qt4/components/playlist/playlist.cpp:114
 #: modules/gui/qt4/dialogs/playlist.cpp:43
-#: modules/gui/qt4/main_interface.cpp:145
+#: modules/gui/qt4/main_interface.cpp:147
 msgid "Playlist"
 msgstr "Afspeellijst"
 
@@ -465,7 +465,7 @@ msgid ""
 "In this section you can force the behavior of the subtitle demuxer, for "
 "example by setting the subtitles type or file name."
 msgstr ""
-"In deze sectie kunt u het gedrag van de ondertiteling demuxer aanpassen. "
+"In deze sectie kunt u het gedrag van de ondertitelingdemuxer aanpassen. "
 "Bijvoorbeeld het type ondertiteling en de bestandsnaam."
 
 #: include/vlc_config_cat.h:227
@@ -535,11 +535,11 @@ msgstr "&Over"
 #: modules/gui/macosx/embeddedwindow.m:64
 #: modules/gui/macosx/embeddedwindow.m:154 modules/gui/macosx/intf.m:547
 #: modules/gui/macosx/intf.m:592 modules/gui/macosx/intf.m:679
-#: modules/gui/macosx/intf.m:686 modules/gui/macosx/intf.m:1942
-#: modules/gui/macosx/intf.m:1943 modules/gui/macosx/intf.m:1944
-#: modules/gui/macosx/intf.m:1945 modules/gui/macosx/playlist.m:443
+#: modules/gui/macosx/intf.m:686 modules/gui/macosx/intf.m:1944
+#: modules/gui/macosx/intf.m:1945 modules/gui/macosx/intf.m:1946
+#: modules/gui/macosx/intf.m:1947 modules/gui/macosx/playlist.m:443
 #: modules/gui/pda/pda_interface.c:260 modules/gui/pda/pda_interface.c:261
-#: modules/gui/qt4/components/controller.hpp:100 modules/gui/qt4/menus.cpp:728
+#: modules/gui/qt4/components/controller.hpp:101 modules/gui/qt4/menus.cpp:728
 #: modules/gui/qt4/ui/open.h:287
 msgid "Play"
 msgstr "Afspelen"
@@ -762,7 +762,7 @@ msgstr ""
 "raadpleeg a.u.b. de <a href=\"http://wiki.videolan.org/"
 "Frequently_Asked_Questions\">FAQ</a>.</p><p>U kunt ondersteuning krijgen (en "
 "geven) op de  <a href=\"http://forum.videolan.org\">Forums</a>, de <a href="
-"\"http://www.videolan.org/vlc/lists.html\">mailinglijsten</a> of ons IRC "
+"\"http://www.videolan.org/vlc/lists.html\">mailinglijsten</a> of ons IRC-"
 "kanaal ( <a href=\"http://www.videolan.org/webirc/\"><em>#videolan</em></a> "
 "op irc.freenode.net ).</p><h3>Bijdragen aan het project</h3><p>U kunt het "
 "VideoLAN project helpen door tijd aan de gemeenschap te geven, thema's te "
@@ -803,7 +803,7 @@ msgstr "Spectrum"
 msgid "Vu meter"
 msgstr "Vu meter"
 
-#: src/audio_output/input.c:157 modules/audio_filter/equalizer.c:74
+#: src/audio_output/input.c:157 modules/audio_filter/equalizer.c:75
 #: modules/gui/macosx/equalizer.m:153 modules/gui/macosx/equalizer.m:167
 msgid "Equalizer"
 msgstr "Equalizer"
@@ -866,21 +866,21 @@ msgstr "Omgekeerde stereo"
 
 #: src/config/file.c:579
 msgid "key"
-msgstr "toets"
+msgstr "sleutel"
 
 #: src/config/file.c:588
 msgid "boolean"
 msgstr "boolean"
 
-#: src/config/file.c:588 src/libvlc.c:1657
+#: src/config/file.c:588 src/libvlc.c:1662
 msgid "integer"
-msgstr "integer"
+msgstr "geheel getal"
 
-#: src/config/file.c:597 src/libvlc.c:1686
+#: src/config/file.c:597 src/libvlc.c:1691
 msgid "float"
-msgstr "float"
+msgstr "drijvendekommagetal"
 
-#: src/config/file.c:620 src/libvlc.c:1636
+#: src/config/file.c:620 src/libvlc.c:1641
 msgid "string"
 msgstr "string"
 
@@ -991,107 +991,107 @@ msgstr "%s [%s %d]"
 msgid "Program"
 msgstr "Programma"
 
-#: src/input/es_out.c:1340 src/input/es_out.c:1342
+#: src/input/es_out.c:1342 src/input/es_out.c:1344
 msgid "Scrambled"
 msgstr "Gecodeerd"
 
-#: src/input/es_out.c:1340 modules/gui/macosx/update.m:102
+#: src/input/es_out.c:1342 modules/gui/macosx/update.m:102
 msgid "Yes"
 msgstr "Ja"
 
-#: src/input/es_out.c:1916
+#: src/input/es_out.c:1918
 #, c-format
 msgid "Closed captions %u"
 msgstr "Gesloten onderschriften %u"
 
-#: src/input/es_out.c:2617
+#: src/input/es_out.c:2619
 #, c-format
 msgid "Stream %d"
 msgstr "Stream %d"
 
-#: src/input/es_out.c:2634 src/input/es_out.c:2742
+#: src/input/es_out.c:2636 src/input/es_out.c:2744
 msgid "Subtitle"
 msgstr "Ondertiteling"
 
-#: src/input/es_out.c:2642 src/input/es_out.c:2662 src/input/es_out.c:2711
-#: src/input/es_out.c:2742 modules/gui/macosx/output.m:153
+#: src/input/es_out.c:2644 src/input/es_out.c:2664 src/input/es_out.c:2713
+#: src/input/es_out.c:2744 modules/gui/macosx/output.m:153
 #: modules/gui/qt4/ui/sprefs_audio.h:348
 msgid "Type"
 msgstr "Type"
 
-#: src/input/es_out.c:2645
+#: src/input/es_out.c:2647
 msgid "Original ID"
 msgstr "Originele ID"
 
-#: src/input/es_out.c:2648 modules/gui/macosx/wizard.m:385
+#: src/input/es_out.c:2650 modules/gui/macosx/wizard.m:385
 #: modules/gui/qt4/ui/profiles.h:469 modules/gui/qt4/ui/profiles.h:488
 msgid "Codec"
 msgstr "Codec"
 
-#: src/input/es_out.c:2652 src/input/meta.c:50 src/libvlc-module.c:193
+#: src/input/es_out.c:2654 src/input/meta.c:50 src/libvlc-module.c:193
 #: modules/gui/beos/InterfaceWindow.cpp:279
 #: modules/gui/macosx/simple_prefs.m:263
 #: modules/gui/qt4/ui/sprefs_interface.h:315
 msgid "Language"
 msgstr "Taal"
 
-#: src/input/es_out.c:2655 src/input/meta.c:45
+#: src/input/es_out.c:2657 src/input/meta.c:45
 #: modules/gui/macosx/bookmarks.m:94 modules/gui/qt4/dialogs/bookmarks.cpp:66
 msgid "Description"
 msgstr "Beschrijving"
 
-#: src/input/es_out.c:2665 src/input/es_out.c:2668
+#: src/input/es_out.c:2667 src/input/es_out.c:2670
 #: modules/gui/macosx/output.m:176 modules/gui/qt4/ui/profiles.h:491
 msgid "Channels"
 msgstr "Kanalen"
 
-#: src/input/es_out.c:2673
+#: src/input/es_out.c:2675
 msgid "Sample rate"
 msgstr "Samplesnelheid"
 
-#: src/input/es_out.c:2674
+#: src/input/es_out.c:2676
 #, c-format
 msgid "%u Hz"
 msgstr "%u Hz"
 
-#: src/input/es_out.c:2684
+#: src/input/es_out.c:2686
 msgid "Bits per sample"
 msgstr "Aantal bits per sample"
 
-#: src/input/es_out.c:2689 modules/access/pvr.c:97
-#: modules/access_output/shout.c:91
+#: src/input/es_out.c:2691 modules/access/pvr.c:97
+#: modules/access_output/shout.c:91 modules/demux/playlist/shoutcast.c:408
 #: modules/gui/qt4/components/open_panels.cpp:945
 #: modules/gui/qt4/ui/profiles.h:470 modules/gui/qt4/ui/profiles.h:489
 msgid "Bitrate"
 msgstr "Bitsnelheid"
 
-#: src/input/es_out.c:2690
+#: src/input/es_out.c:2692
 #, c-format
 msgid "%u kb/s"
-msgstr "%u Kb/s"
+msgstr "%u kb/s"
 
-#: src/input/es_out.c:2701
+#: src/input/es_out.c:2703
 msgid "Track replay gain"
 msgstr "Volumenormalisatie op nummer"
 
-#: src/input/es_out.c:2703
+#: src/input/es_out.c:2705
 msgid "Album replay gain"
 msgstr "Volumenormalisatie op album"
 
-#: src/input/es_out.c:2705
+#: src/input/es_out.c:2707
 #, c-format
 msgid "%.2f dB"
 msgstr "%.2f dB"
 
-#: src/input/es_out.c:2715 modules/gui/qt4/ui/profiles.h:475
+#: src/input/es_out.c:2717 modules/gui/qt4/ui/profiles.h:475
 msgid "Resolution"
 msgstr "Resolutie"
 
-#: src/input/es_out.c:2721
+#: src/input/es_out.c:2723
 msgid "Display resolution"
 msgstr "Weergaveresolutie"
 
-#: src/input/es_out.c:2732 src/input/es_out.c:2736
+#: src/input/es_out.c:2734 src/input/es_out.c:2738
 #: modules/access/screen/screen.c:44
 msgid "Frame rate"
 msgstr "Beeldsnelheid"
@@ -1126,7 +1126,7 @@ msgstr ""
 msgid "Title"
 msgstr "Titel"
 
-#: src/input/meta.c:40 modules/gui/macosx/playlist.m:1214
+#: src/input/meta.c:40 modules/gui/macosx/playlist.m:1234
 #: modules/gui/macosx/playlistinfo.m:76
 msgid "Artist"
 msgstr "Artiest"
@@ -1279,12 +1279,13 @@ msgstr "Muisbewegingen"
 
 # ? waar komt deze vertaling vandaan
 # C is vaak de aanduiding voor de onvertaalde (Engelstalige) teksten (weet niet zeker of dit hiervoor is). nl is de vertaalde taalcode
-#: src/libvlc.c:340 src/libvlc.c:455 src/modules/cache.c:212
+#. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
+#: src/libvlc.c:345 src/libvlc.c:460 src/modules/cache.c:212
 #: src/modules/cache.c:532
 msgid "C"
 msgstr "nl"
 
-#: src/libvlc.c:1176
+#: src/libvlc.c:1181
 msgid ""
 "Running vlc with the default interface. Use 'cvlc' to use vlc without "
 "interface."
@@ -1292,28 +1293,28 @@ msgstr ""
 "Start vlc met standaardinterface. Gebruik 'cvlc' om vlc zonder interface te "
 "gebruiken."
 
-#: src/libvlc.c:1353
+#: src/libvlc.c:1358
 msgid "To get exhaustive help, use '-H'."
 msgstr "Voor meer hulp, gebruik '-H'."
 
-#: src/libvlc.c:1701
+#: src/libvlc.c:1706
 msgid " (default enabled)"
 msgstr " (standaard actief)"
 
-#: src/libvlc.c:1702
+#: src/libvlc.c:1707
 msgid " (default disabled)"
 msgstr " (standaard inactief)"
 
-#: src/libvlc.c:1861 src/libvlc.c:1864 src/libvlc.c:1872 src/libvlc.c:1877
+#: src/libvlc.c:1866 src/libvlc.c:1869 src/libvlc.c:1877 src/libvlc.c:1882
 msgid "Note:"
 msgstr "Opmerking:"
 
-#: src/libvlc.c:1862 src/libvlc.c:1865
+#: src/libvlc.c:1867 src/libvlc.c:1870
 msgid "add --advanced to your command line to see advanced options."
 msgstr ""
 "voeg --advanced aan uw commandoregel toe om de geavanceerde opties te zien."
 
-#: src/libvlc.c:1873 src/libvlc.c:1878
+#: src/libvlc.c:1878 src/libvlc.c:1883
 #, c-format
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
@@ -1321,7 +1322,7 @@ msgstr ""
 "%d module(s) werd(en) niet weergegeven omdat ze alleen geavanceerde opties "
 "hebben.\n"
 
-#: src/libvlc.c:1885 src/libvlc.c:1889
+#: src/libvlc.c:1890 src/libvlc.c:1894
 msgid ""
 "No matching module found. Use --list or--list-verbose to list available "
 "modules."
@@ -1329,22 +1330,22 @@ msgstr ""
 "Geen overeenkomende module gevonden. Gebruik --list of --list-verbose voor "
 "een lijst van alle beschikbare modules."
 
-#: src/libvlc.c:1989
+#: src/libvlc.c:1994
 #, c-format
 msgid "VLC version %s\n"
 msgstr "VLC versie %s\n"
 
-#: src/libvlc.c:1990
+#: src/libvlc.c:1995
 #, c-format
 msgid "Compiled by %s@%s.%s\n"
 msgstr "Gecompileerd door %s@%s.%s\n"
 
-#: src/libvlc.c:1992
+#: src/libvlc.c:1997
 #, c-format
 msgid "Compiler: %s\n"
 msgstr "Compiler: %s\n"
 
-#: src/libvlc.c:2027
+#: src/libvlc.c:2032
 msgid ""
 "\n"
 "Dumped content to vlc-help.txt file.\n"
@@ -1353,7 +1354,7 @@ msgstr ""
 "Inhoud tijdelijk opgeslagen in het bestand vlc-help.txt.\n"
 
 # Enter en Return zijn twee verschillende toetsen
-#: src/libvlc.c:2047
+#: src/libvlc.c:2052
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -1431,7 +1432,7 @@ msgstr "U kunt bedieningsinterfaces voor VLC selecteren."
 
 #: src/libvlc-module.c:170
 msgid "Verbosity (0,1,2)"
-msgstr "Informatie in terminal (0,1,2)"
+msgstr "Informatieniveau (0,1,2)"
 
 #: src/libvlc-module.c:172
 msgid ""
@@ -1500,7 +1501,7 @@ msgstr ""
 
 #: src/libvlc-module.c:203
 msgid "Show advanced options"
-msgstr "Toon geavanceerde opties"
+msgstr "Geavanceerde opties weergeven"
 
 #: src/libvlc-module.c:205
 msgid ""
@@ -1510,9 +1511,9 @@ msgstr ""
 "Indien actief worden standaard alle opties in de voorkeuren en/of interfaces "
 "weergegeven, ook opties die de meeste gebruikers beter niet kunnen wijzigen."
 
-#: src/libvlc-module.c:209 modules/control/showintf.c:73
+#: src/libvlc-module.c:209 modules/control/showintf.c:72
 msgid "Show interface with mouse"
-msgstr "Interface tonen met muis"
+msgstr "Interface weergeven met muis"
 
 #: src/libvlc-module.c:211
 msgid ""
@@ -1705,7 +1706,7 @@ msgstr "Uit"
 msgid "This adds audio post processing filters, to modify the sound rendering."
 msgstr ""
 "Hier kunnen audionabewerkingsfilters worden toegevoegd om het geluid te "
-"bewerken."
+"wijzigen."
 
 #: src/libvlc-module.c:309
 msgid "Audio visualizations "
@@ -1985,16 +1986,15 @@ msgstr "Start video in schermvullende weergave"
 
 #: src/libvlc-module.c:418
 msgid "Overlay video output"
-msgstr "Overlap video-uitvoer"
+msgstr "Overlay video-uitvoer"
 
 #: src/libvlc-module.c:420
 msgid ""
 "Overlay is the hardware acceleration capability of your video card (ability "
 "to render video directly). VLC will try to use it by default."
 msgstr ""
-"Overlay is de hardwareversnelling functionaliteit van uw videokaart "
-"(mogelijkheid om video direct te renderen). VLC zal standaard proberen dit "
-"te gebruiken."
+"Overlay is de hardwareversnellingsfunctie van uw videokaart (mogelijkheid om "
+"video direct weer te geven). VLC zal standaard proberen deze te gebruiken."
 
 #: src/libvlc-module.c:423 src/video_output/vout_intf.c:421
 #: modules/gui/macosx/simple_prefs.m:284 modules/gui/qt4/ui/sprefs_video.h:284
@@ -2320,12 +2320,10 @@ msgstr ""
 "is de standaardwaarde."
 
 #: src/libvlc-module.c:574
-#, fuzzy
 msgid "Full support"
-msgstr "VolledigeOndersteuning"
+msgstr "Volledige ondersteuning"
 
 #: src/libvlc-module.c:574
-#, fuzzy
 msgid "Fullscreen-only"
 msgstr "Alleen schermvullende modus"
 
@@ -2711,7 +2709,7 @@ msgid ""
 "VLC normally uses Freetype for rendering, but this allows you to use svg for "
 "instance."
 msgstr ""
-"VLC gebruikt normaal Freetype voor rendering, maar hiermee kunt u "
+"VLC gebruikt normaal Freetype voor weergave, maar hiermee kunt u "
 "bijvoorbeeld svg gebruiken."
 
 #: src/libvlc-module.c:761
@@ -2723,7 +2721,7 @@ msgid ""
 "This adds so-called \"subpicture filters\". These filters overlay some "
 "images or text over the video (like a logo, arbitrary text, ...)."
 msgstr ""
-"Dit voegt zogenaamde \"subafbeeldingsfilters\" toe. Deze filters leggen "
+"Dit voegt zogenaamde \"subafbeeldingsfilters\" toe. Deze filters plaatsen "
 "afbeeldingen of tekst over de video (zoals een logo, arbitraire tekst, ...)."
 
 #: src/libvlc-module.c:766
@@ -3082,7 +3080,7 @@ msgstr ""
 
 #: src/libvlc-module.c:945
 msgid "Stream output muxer caching (ms)"
-msgstr "Streamuitvoer muxerbuffer (ms)."
+msgstr "Streamuitvoer muxerbuffer (ms)"
 
 #: src/libvlc-module.c:947
 msgid ""
@@ -3267,8 +3265,9 @@ msgid ""
 "option unless you really know what you are doing."
 msgstr ""
 "Hiermee kunt u VLC forceren een specifieke toegangsmodule te gebruiken. U "
-"kan dit gebruiken als de juiste toegang niet automatisch gedetecteerd wordt. "
-"U moet dit niet als algemene optie instellen, tenzij u zeker weet wat u doet."
+"kunt dit gebruiken als de juiste toegang niet automatisch gedetecteerd "
+"wordt. U moet dit niet als algemene optie instellen, tenzij u zeker weet wat "
+"u doet."
 
 #: src/libvlc-module.c:1034
 msgid "Stream filter module"
@@ -3475,7 +3474,7 @@ msgstr ""
 "Het verhogen van de prioriteit van het proces verbetert zeer waarschijnlijk "
 "de prestaties van VLC omdat het niet zo snel gestoord zal worden door andere "
 "applicaties die anders teveel processorkracht zouden gebruiken.\n"
-"Maar in bepaalde omstandigheden (bugs) kan VLC de volledige processor in "
+"Maar onder bepaalde omstandigheden (bugs) kan VLC de volledige processor in "
 "beslag nemen en de computer erg traag maken. Herstarten van de computer kan "
 "noodzakelijk zijn."
 
@@ -3618,7 +3617,7 @@ msgstr ""
 #: modules/gui/macosx/controls.m:1087 modules/gui/macosx/embeddedwindow.m:63
 #: modules/gui/macosx/intf.m:551 modules/gui/macosx/intf.m:629
 #: modules/gui/macosx/intf.m:693 modules/gui/macosx/simple_prefs.m:283
-#: modules/gui/qt4/components/controller.hpp:101
+#: modules/gui/qt4/components/controller.hpp:102
 #: modules/gui/qt4/ui/sprefs_video.h:283
 msgid "Fullscreen"
 msgstr "Schermvullend"
@@ -3661,8 +3660,8 @@ msgstr "Selecteer de sneltoets om af te spelen"
 
 #: src/libvlc-module.c:1220 modules/control/hotkeys.c:716
 #: modules/gui/macosx/controls.m:986 modules/gui/macosx/intf.m:594
-#: modules/gui/qt4/components/controller.hpp:101
-#: modules/gui/qt4/components/controller.hpp:108
+#: modules/gui/qt4/components/controller.hpp:102
+#: modules/gui/qt4/components/controller.hpp:109
 msgid "Faster"
 msgstr "Sneller"
 
@@ -3672,8 +3671,8 @@ msgstr "Selecteer de sneltoets om op hogere snelheid af te spelen"
 
 #: src/libvlc-module.c:1222 modules/control/hotkeys.c:722
 #: modules/gui/macosx/controls.m:987 modules/gui/macosx/intf.m:595
-#: modules/gui/qt4/components/controller.hpp:101
-#: modules/gui/qt4/components/controller.hpp:108
+#: modules/gui/qt4/components/controller.hpp:102
+#: modules/gui/qt4/components/controller.hpp:109
 msgid "Slower"
 msgstr "Langzamer"
 
@@ -3703,7 +3702,7 @@ msgstr "Langzamer (fijn)"
 #: modules/gui/macosx/intf.m:681 modules/gui/macosx/intf.m:689
 #: modules/gui/macosx/wizard.m:309 modules/gui/macosx/wizard.m:321
 #: modules/gui/macosx/wizard.m:1626
-#: modules/gui/qt4/components/controller.hpp:101 modules/gui/qt4/ui/sout.h:332
+#: modules/gui/qt4/components/controller.hpp:102 modules/gui/qt4/ui/sout.h:332
 #: modules/gui/qt4/ui/sout.h:343 modules/gui/qt4/ui/streampanel.h:180
 #: modules/misc/notify/notify.c:329
 msgid "Next"
@@ -3719,7 +3718,7 @@ msgstr ""
 #: modules/gui/macosx/about.m:186 modules/gui/macosx/controls.m:1006
 #: modules/gui/macosx/intf.m:545 modules/gui/macosx/intf.m:596
 #: modules/gui/macosx/intf.m:682 modules/gui/macosx/intf.m:688
-#: modules/gui/qt4/components/controller.hpp:101 modules/gui/qt4/ui/sout.h:342
+#: modules/gui/qt4/components/controller.hpp:102 modules/gui/qt4/ui/sout.h:342
 #: modules/gui/qt4/ui/sout.h:352 modules/misc/notify/notify.c:327
 msgid "Previous"
 msgstr "Vorige"
@@ -3734,8 +3733,8 @@ msgstr ""
 #: modules/gui/macosx/intf.m:548 modules/gui/macosx/intf.m:593
 #: modules/gui/macosx/intf.m:680 modules/gui/macosx/intf.m:687
 #: modules/gui/pda/pda_interface.c:272 modules/gui/pda/pda_interface.c:273
-#: modules/gui/qt4/components/controller.hpp:100
-#: modules/gui/qt4/ui/streampanel.h:179 modules/misc/notify/xosd.c:257
+#: modules/gui/qt4/components/controller.hpp:101
+#: modules/gui/qt4/ui/streampanel.h:179 modules/misc/notify/xosd.c:234
 msgid "Stop"
 msgstr "Stop"
 
@@ -3861,8 +3860,8 @@ msgstr "Grote spronglengte, in seconden."
 
 #: src/libvlc-module.c:1277 modules/control/hotkeys.c:209
 #: modules/gui/beos/InterfaceWindow.cpp:277 modules/gui/macosx/intf.m:344
-#: modules/gui/qt4/components/controller.hpp:104
-#: modules/gui/qt4/components/controller.hpp:113 modules/gui/qt4/menus.cpp:824
+#: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/components/controller.hpp:114 modules/gui/qt4/menus.cpp:824
 #: modules/gui/skins2/commands/cmd_quit.cpp:40
 msgid "Quit"
 msgstr "Afsluiten"
@@ -4259,8 +4258,8 @@ msgstr "Maak videomomentopname"
 msgid "Takes a video snapshot and writes it to disk."
 msgstr "Maak een momentopname van het huidige beeld en sla dit op."
 
-#: src/libvlc-module.c:1383 modules/gui/qt4/components/controller.hpp:103
-#: modules/gui/qt4/components/controller.hpp:111
+#: src/libvlc-module.c:1383 modules/gui/qt4/components/controller.hpp:104
+#: modules/gui/qt4/components/controller.hpp:112
 #: modules/stream_out/record.c:60
 msgid "Record"
 msgstr "Opnemen"
@@ -4471,7 +4470,7 @@ msgstr ""
 #: src/libvlc-module.c:1596 src/video_output/vout_intf.c:440
 #: modules/gui/macosx/controls.m:492 modules/gui/macosx/controls.m:1055
 #: modules/gui/macosx/intf.m:631 modules/gui/macosx/intf.m:694
-#: modules/gui/qt4/components/controller.hpp:102
+#: modules/gui/qt4/components/controller.hpp:103
 #: modules/video_output/snapshot.c:81
 msgid "Snapshot"
 msgstr "Momentopname"
@@ -4493,7 +4492,7 @@ msgstr "Ondertitelingen"
 
 #: src/libvlc-module.c:1690 modules/stream_out/transcode.c:123
 msgid "Overlays"
-msgstr "Overlappingen"
+msgstr "Overlays"
 
 #: src/libvlc-module.c:1698
 msgid "Track settings"
@@ -7085,7 +7084,7 @@ msgstr "Tint van de video-invoer."
 #: modules/access/v4l.c:108 modules/gui/fbosd.c:141
 #: modules/gui/qt4/ui/video_effects.h:902
 #: modules/gui/qt4/ui/video_effects.h:908
-#: modules/gui/qt4/ui/video_effects.h:920 modules/misc/notify/xosd.c:85
+#: modules/gui/qt4/ui/video_effects.h:920 modules/misc/notify/xosd.c:82
 #: modules/video_filter/colorthres.c:54 modules/video_filter/marq.c:124
 #: modules/video_filter/rss.c:154
 msgid "Color"
@@ -7751,7 +7750,8 @@ msgstr "Wachtwoord"
 msgid "Password that will be requested to access the stream."
 msgstr "Wachtwoord dat gevraagd zal worden om de stream te bereiken."
 
-#: modules/access_output/http.c:71
+#: modules/access_output/http.c:71 modules/demux/playlist/qtl.c:356
+#: modules/demux/playlist/shoutcast.c:407
 msgid "Mime"
 msgstr "MIME"
 
@@ -7924,7 +7924,7 @@ msgid ""
 "the scheduling load on heavily-loaded systems."
 msgstr ""
 "Paketten kunnen een voor een op de juiste tijd verzonden worden of per "
-"groep. U kan kiezen hoeveel pakketten per keer verzonden worden. Dit helpt "
+"groep. U kunt kiezen hoeveel pakketten per keer verzonden worden. Dit helpt "
 "de belasting op zwaarbelaste systemen te reduceren."
 
 #: modules/access_output/udp.c:80
@@ -7998,7 +7998,7 @@ msgstr "Koptelefoon-effect"
 
 #: modules/audio_filter/channel_mixer/mono.c:84
 msgid "Use downmix algorithm"
-msgstr "Gebruik downmix-algoritme."
+msgstr "Gebruik downmix-algoritme"
 
 #: modules/audio_filter/channel_mixer/mono.c:85
 msgid ""
@@ -8112,19 +8112,19 @@ msgstr "Floating-point-audioformaat conversies"
 msgid "MPEG audio decoder"
 msgstr "MPEG audiodecoder"
 
-#: modules/audio_filter/equalizer.c:56
+#: modules/audio_filter/equalizer.c:57
 msgid "Equalizer preset"
 msgstr "Equalizer voorkeuren"
 
-#: modules/audio_filter/equalizer.c:57
+#: modules/audio_filter/equalizer.c:58
 msgid "Preset to use for the equalizer."
 msgstr "Voorinstelling om in de equalizer te gebruiken."
 
-#: modules/audio_filter/equalizer.c:59
+#: modules/audio_filter/equalizer.c:60
 msgid "Bands gain"
 msgstr "Bandversterking"
 
-#: modules/audio_filter/equalizer.c:61
+#: modules/audio_filter/equalizer.c:62
 msgid ""
 "Don't use presets, but manually specified bands. You need to provide 10 "
 "values between -20dB and 20dB, separated by spaces, e.g. \"0 2 4 2 0 -2 -4 -"
@@ -8134,23 +8134,23 @@ msgstr ""
 "10 waarden tussen -20dB en 20dB opgeven, gescheiden door spaties, bijv \"0 2 "
 "4 2 0 -2 -4 -2 0\"."
 
-#: modules/audio_filter/equalizer.c:65
+#: modules/audio_filter/equalizer.c:66
 msgid "Two pass"
 msgstr "Dubbelverwerking"
 
-#: modules/audio_filter/equalizer.c:66
+#: modules/audio_filter/equalizer.c:67
 msgid "Filter the audio twice. This provides a more intense effect."
 msgstr "Filter het geluid tweemaal. Dit geeft een meer intens effect."
 
-#: modules/audio_filter/equalizer.c:69
+#: modules/audio_filter/equalizer.c:70
 msgid "Global gain"
 msgstr "Algemene versterking"
 
-#: modules/audio_filter/equalizer.c:70
+#: modules/audio_filter/equalizer.c:71
 msgid "Set the global gain in dB (-20 ... 20)."
 msgstr "Zet de algemene versterking in dB (-20 ... 20)."
 
-#: modules/audio_filter/equalizer.c:73
+#: modules/audio_filter/equalizer.c:74
 msgid "Equalizer with 10 bands"
 msgstr "Equalizer met 10 banden"
 
@@ -8393,6 +8393,20 @@ msgstr "Kamerbreedte"
 #: modules/audio_filter/spatializer/spatializer.cpp:53
 msgid "Width of the virtual room"
 msgstr "Breedte van de virtuele ruimte"
+
+#: modules/audio_filter/spatializer/spatializer.cpp:55
+#, fuzzy
+msgid "Wet"
+msgstr "Instellen"
+
+#: modules/audio_filter/spatializer/spatializer.cpp:58
+msgid "Dry"
+msgstr ""
+
+#: modules/audio_filter/spatializer/spatializer.cpp:61
+#, fuzzy
+msgid "Damp"
+msgstr "Dumpen"
 
 #: modules/audio_filter/spatializer/spatializer.cpp:65
 msgid "Audio Spatializer"
@@ -8668,16 +8682,16 @@ msgid "PORTAUDIO audio output"
 msgstr "PORTAUDIO audio-uitvoer"
 
 #: modules/audio_output/pulse.c:61 modules/gui/macosx/intf.m:541
-#: modules/gui/macosx/intf.m:542 modules/gui/macosx/intf.m:1922
+#: modules/gui/macosx/intf.m:542 modules/gui/macosx/intf.m:1924
 #: modules/gui/pda/pda_interface.c:210 modules/gui/pda/pda_interface.c:1353
-#: modules/gui/qt4/main_interface.cpp:403
-#: modules/gui/qt4/main_interface.cpp:407
-#: modules/gui/qt4/main_interface.cpp:936
-#: modules/gui/qt4/main_interface.cpp:938
-#: modules/gui/qt4/main_interface.cpp:1006
-#: modules/gui/qt4/main_interface.cpp:1023
-#: modules/gui/qt4/main_interface.cpp:1030
-#: modules/gui/qt4/main_interface.cpp:1049
+#: modules/gui/qt4/main_interface.cpp:920
+#: modules/gui/qt4/main_interface.cpp:924
+#: modules/gui/qt4/main_interface.cpp:958
+#: modules/gui/qt4/main_interface.cpp:960
+#: modules/gui/qt4/main_interface.cpp:1028
+#: modules/gui/qt4/main_interface.cpp:1045
+#: modules/gui/qt4/main_interface.cpp:1052
+#: modules/gui/qt4/main_interface.cpp:1071
 msgid "VLC media player"
 msgstr "VLC mediaspeler"
 
@@ -8811,7 +8825,7 @@ msgstr "FFmpeg deïnterlacevideofilter"
 
 #: modules/codec/avcodec/avcodec.h:64 modules/codec/avcodec/avcodec.h:66
 msgid "Direct rendering"
-msgstr "Direct renderen"
+msgstr "Directe weergave"
 
 #: modules/codec/avcodec/avcodec.h:68
 msgid "Error resilience"
@@ -8917,11 +8931,11 @@ msgid ""
 "To visualize all vectors, the value should be 7."
 msgstr ""
 "U kunt de bewegingsvectoren (pijlen die aantonen hoe de beelden bewegen) "
-"over het beeld leggen.  Deze waarde is een masker, gebaseerd op onderstaande "
-"waarden:\n"
-" 1 - visualiseer voorwaarts voorspelde MV's van P beelden\n"
-"2 - visualiseer voorwaarts voorspelde MV's van B beelden\n"
-"4 - visualiseer achterwaarts voorspelde MV's van B beelden\n"
+"over het beeld plaatsen.  Deze waarde is een masker, gebaseerd op "
+"onderstaande waarden:\n"
+" 1 - visualiseer voorwaarts voorspelde MV's van P-beelden\n"
+"2 - visualiseer voorwaarts voorspelde MV's van B-beelden\n"
+"4 - visualiseer achterwaarts voorspelde MV's van B-beelden\n"
 "Om alle vectoren te visualiseren moet de waarde gelijk zijn aan 7."
 
 #: modules/codec/avcodec/avcodec.h:117
@@ -8939,7 +8953,7 @@ msgstr ""
 #: modules/codec/avcodec/avcodec.h:121 modules/gui/macosx/simple_prefs.m:256
 #: modules/gui/qt4/ui/sprefs_input.h:231
 msgid "Skip the loop filter for H.264 decoding"
-msgstr "Loop-filter voor H.264 decodering overslaan."
+msgstr "Loop-filter voor H.264 decodering overslaan"
 
 #: modules/codec/avcodec/avcodec.h:122
 msgid ""
@@ -8960,7 +8974,7 @@ msgstr "Aantal beelden dat gecodeerd zal worden voor een sleutelbeeld."
 
 #: modules/codec/avcodec/avcodec.h:135
 msgid "Ratio of B frames"
-msgstr "Verhouding B beelden"
+msgstr "Verhouding B-beelden"
 
 #: modules/codec/avcodec/avcodec.h:136
 msgid "Number of B frames that will be coded between two reference frames."
@@ -9268,15 +9282,15 @@ msgstr "Ondertiteling (geavanceerd)"
 
 #: modules/codec/csri.c:53
 msgid "Wrapper for subtitle renderers using CSRI/asa"
-msgstr "Wrapper voor ondertitelingsrenderers die CSRI/asa gebruiken"
+msgstr "Wrapper voor ondertitelingweergave met CSRI/asa"
 
 #: modules/codec/cvdsub.c:51
 msgid "CVD subtitle decoder"
-msgstr "CVD ondertitelingdecoder"
+msgstr "CVD-ondertitelingdecoder"
 
 #: modules/codec/cvdsub.c:56
 msgid "Chaoji VCD subtitle packetizer"
-msgstr "Chaoji VCD ondertitelingpacketizer"
+msgstr "Chaoji VCD-ondertitelingpacketizer"
 
 #: modules/codec/dirac.c:62
 msgid "Constant quality factor"
@@ -9356,11 +9370,11 @@ msgstr "4:4:4:"
 
 #: modules/codec/dirac.c:97
 msgid "Distance between 'P' frames"
-msgstr "Afstand tussen 'P' beelden."
+msgstr "Afstand tussen 'P'-beelden."
 
 #: modules/codec/dirac.c:101
 msgid "Number of 'P' frames per GOP"
-msgstr "Aantal 'P' beelden per GOP"
+msgstr "Aantal 'P'-beelden per GOP"
 
 #: modules/codec/dirac.c:105
 msgid "Picture coding mode"
@@ -9371,8 +9385,8 @@ msgid ""
 "Field coding is where interlaced fields are coded seperately as opposed to a "
 "pseudo-progressive frame"
 msgstr ""
-"Veldcodering is waar geinterlacede velden afzonderling gecodeerd worden i.t."
-"t. pseudo-progressieve frame."
+"Veldcodering is waar geïnterlacede velden afzonderling gecodeerd worden i.t."
+"t. pseudo-progressieve beeld."
 
 #: modules/codec/dirac.c:111
 msgid "auto - let encoder decide based upon input (Best)"
@@ -9380,11 +9394,11 @@ msgstr "auto - laat codeerder bepalen gebaseerd op de invoer (beste)"
 
 #: modules/codec/dirac.c:112
 msgid "force coding frame as single picture"
-msgstr "forceer codering van beeld als een enkele afbeelding"
+msgstr "forceer beeldcodering als een enkele afbeelding"
 
 #: modules/codec/dirac.c:113
 msgid "force coding frame as seperate interlaced fields"
-msgstr "dwing coderingsframe in afzonderlijke geïnterlacede velden"
+msgstr "dwing beeldcodering in afzonderlijke geïnterlacede velden"
 
 #: modules/codec/dirac.c:117
 msgid "Width of motion compensation blocks"
@@ -9568,7 +9582,7 @@ msgstr "DVB ondertitelingcodeerder"
 msgid "AAC audio decoder (using libfaad2)"
 msgstr "AAC audiodecoder (gebruikt libfaad2)"
 
-#: modules/codec/faad.c:378
+#: modules/codec/faad.c:379
 msgid "AAC extension"
 msgstr "AAC-extensie"
 
@@ -9693,7 +9707,7 @@ msgid ""
 "memory address for use by the video renderer."
 msgstr ""
 "Adres van de locking callback-functie. Deze functie moet een geldig "
-"geheugenadres teruggeven voor gebruik door de videorenderer."
+"geheugenadres teruggeven voor gebruik door de videoweergave."
 
 #: modules/codec/invmem.c:64 modules/video_output/vmem.c:68
 msgid "Unlock function"
@@ -9720,11 +9734,10 @@ msgid ""
 "video output module."
 msgstr ""
 "Deze module maakt het mogelijk videostreams te maken van raw-afbeeldingen "
-"gegenereerd (naar geheugen) door een renderingsprogramma die libvlc "
-"gebruikt. Om deze module vanuit libvlc te gebruiken zet codec naar invmem, "
-"zet alle --invmem-* opties in vlc-argv en gebruik libvlc_media_nieuw "
-"(libvlc, \"fake://\", &ex);. Voor de rest is het vergelijkbaar met de vmem "
-"video uitvoermodule."
+"gegenereerd (naar geheugen) door een weergaveprogramma dat libvlc gebruikt. "
+"Om deze module vanuit libvlc te gebruiken zet codec naar invmem, zet alle --"
+"invmem-* opties in vlc-argv en gebruik libvlc_media_nieuw (libvlc, \"fake://"
+"\", &ex);. Voor de rest is het vergelijkbaar met de vmem video-uitvoermodule."
 
 #: modules/codec/invmem.c:79 modules/codec/invmem.c:80
 msgid "Memory video decoder"
@@ -9740,9 +9753,9 @@ msgid ""
 "can choose to disable all formatting.Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"Kate streams staan tekstopmaak toe. VLC implementeert dit gedeeltelijk, maar "
+"Kate-streams staan tekstopmaak toe. VLC implementeert dit gedeeltelijk, maar "
 "u kunt ervoor kiezen om alle opmaak te deactiveren. NB: dit heeft geen "
-"effect als rendering via Tiger loopt."
+"effect als weergave via Tiger loopt."
 
 #: modules/codec/kate.c:204
 msgid "Shadow"
@@ -9870,27 +9883,28 @@ msgstr "Aqua"
 
 #: modules/codec/kate.c:216
 msgid "Use Tiger for rendering"
-msgstr "Gebruik Tiger voor renderen"
+msgstr "Gebruik Tiger voor weergave"
 
 #: modules/codec/kate.c:217
 msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
-"Kate streams kunnen met de Tiger bibliotheek gerendered worden. Dit "
-"deactiveren zal alleen statische tekst en bitmap gebaseerde streams renderen."
+"Kate-streams kunnen met de Tiger-bibliotheek worden weergegeven. Dit "
+"deactiveren zal alleen statische tekst en bitmap-gebaseerde streams "
+"weergeven."
 
 #: modules/codec/kate.c:221
 msgid "Rendering quality"
-msgstr "Kwaliteit rendering"
+msgstr "Kwaliteit weergave"
 
 #: modules/codec/kate.c:222
 msgid ""
 "Select rendering quality, at the expense of speed. 0 is fastest, 1 is "
 "highest quality."
 msgstr ""
-"Selecteer renderingkwaliteit, ten koste van snelheid. 0 is het snelst, 1 "
-"heeft de hoogste kwaliteit."
+"Selecteer weergavekwaliteit, ten koste van snelheid. 0 is het snelst, 1 is "
+"de hoogste kwaliteit."
 
 #: modules/codec/kate.c:226
 msgid "Default font effect"
@@ -9985,13 +9999,12 @@ msgid ""
 "Note that changing settings below will not take effect until a new stream is "
 "played. This will hopefully be fixed soon."
 msgstr ""
-"Kate is een codec voor tekst- en afbeeldinggebaseerde overlappen.\n"
-"De Tiger rendering-bibliotheek is nodig om complexe Kate streams weer te "
-"geven, maar VLC kan nog steeds statische tekst en afbeeldinggebaseerde "
-"ondertitelingen weergeven als deze niet beschikbaar is.\n"
-"Let op dat veranderingen in instellingen hierbeneden pas actief worden als "
-"een nieuwe stream afgespeeld wordt. Dit wordt hopelijk binnenkort "
-"gerepareerd."
+"Kate is een codec voor tekst- en afbeeldinggebaseerde overlays.\n"
+"De Tiger-weergavebibliotheek is nodig voor weergave van complexe Kate-"
+"streams, maar VLC kan zonder nog steeds statische tekst en afbeelding-"
+"gebaseerde ondertiteling weergeven.\n"
+"Let op dat veranderingen in instellingen hier onder pas actief worden als "
+"een nieuwe stream afgespeeld wordt. Dit wordt hopelijk binnenkort opgelost."
 
 #: modules/codec/kate.c:273
 msgid "Kate"
@@ -9999,19 +10012,19 @@ msgstr "Kate"
 
 #: modules/codec/kate.c:274
 msgid "Kate overlay decoder"
-msgstr "Kate overlegdecoder"
+msgstr "Kate-overlaydecoder"
 
 #: modules/codec/kate.c:293
 msgid "Tiger rendering defaults"
-msgstr "Tiger rendering standaarden"
+msgstr "Tiger weergavestandaarden"
 
 #: modules/codec/kate.c:329
 msgid "Kate text subtitles packetizer"
-msgstr "Kate tekst ondertitelingspacketizer"
+msgstr "Kate-tekst ondertitelingpacketizer"
 
 #: modules/codec/libass.c:58
 msgid "Subtitle renderers using libass"
-msgstr "Ondertitelingsweergave gebruikmakend van libass"
+msgstr "Ondertitelingweergave met libass"
 
 #: modules/codec/libmpeg2.c:105
 msgid "MPEG I/II video decoder (using libmpeg2)"
@@ -10027,7 +10040,7 @@ msgstr "Lineaire PCM audiopacketizer"
 
 #: modules/codec/mash.cpp:71
 msgid "Video decoder using openmash"
-msgstr "Video decoder gebruikmakend van openmash"
+msgstr "Videodecoder met openmash"
 
 #: modules/codec/mpeg_audio.c:113
 msgid "MPEG audio layer I/II/III decoder"
@@ -10043,7 +10056,7 @@ msgstr "PNG videodecoder"
 
 #: modules/codec/quicktime.c:68
 msgid "QuickTime library decoder"
-msgstr "QuickTime bibliotheekdecoder"
+msgstr "QuickTime-bibliotheekdecoder"
 
 #: modules/codec/rawvideo.c:72
 msgid "Pseudo raw video decoder"
@@ -10055,11 +10068,11 @@ msgstr "Pseudo ruwe videopacketizer"
 
 #: modules/codec/realaudio.c:65
 msgid "RealAudio library decoder"
-msgstr "RealAudio bibliotheekdecoder"
+msgstr "RealAudio-bibliotheekdecoder"
 
 #: modules/codec/realvideo.c:132
 msgid "RealVideo library decoder"
-msgstr "RealVideo bibliotheekdecoder"
+msgstr "RealVide-bibliotheekdecoder"
 
 #: modules/codec/schroedinger.c:51
 msgid "Schroedinger video decoder"
@@ -10067,11 +10080,11 @@ msgstr "Schroedinger videodecoder"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
-msgstr "SDL Image videodecoder"
+msgstr "SDL Image-videodecoder"
 
 #: modules/codec/sdl_image.c:61
 msgid "SDL_image video decoder"
-msgstr "SDL_image videodecoder"
+msgstr "SDL_image-videodecoder"
 
 #: modules/codec/shine/shine_mod.c:66
 msgid "MP3 fixed point audio encoder"
@@ -10105,11 +10118,11 @@ msgstr "Forceer de complexiteit van de codeerder."
 
 #: modules/codec/speex.c:68
 msgid "Maximal bitrate"
-msgstr "Maximale bitrate"
+msgstr "Maximum bitsnelheid"
 
 #: modules/codec/speex.c:70
 msgid "Enforce the maximal VBR bitrate"
-msgstr "Forceer de maximale VBR bitrate"
+msgstr "Forceer de maximale VBR bitsnelheid"
 
 #: modules/codec/speex.c:72 modules/codec/vorbis.c:175
 msgid "CBR encoding"
@@ -10120,8 +10133,8 @@ msgid ""
 "Enforce a constant bitrate encoding (CBR) instead of default variable "
 "bitrate encoding (VBR)."
 msgstr ""
-"Forceer een constante bitrate codering (CBR) in plaats van de standaard "
-"variabele bitsnelheid codering (VBR)."
+"Forceer een constante bitsnelheidcodering (CBR) in plaats van de standaard "
+"variabele bitsnelheidcodering (VBR)."
 
 #: modules/codec/speex.c:77
 msgid "Voice activity detection"
@@ -10530,27 +10543,28 @@ msgstr "Libtwolame audiocodeerder"
 
 #: modules/codec/vorbis.c:169
 msgid "Maximum encoding bitrate"
-msgstr "Maximale codering bitsnelheid"
+msgstr "Maximum codering bitsnelheid"
 
 #: modules/codec/vorbis.c:171
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
-msgstr "Maximale bitratio in kbps. Dit is handig voor streaming toepassingen."
+msgstr ""
+"Maximum bitsnelheid in kbps. Dit is handig voor streaming toepassingen."
 
 #: modules/codec/vorbis.c:172
 msgid "Minimum encoding bitrate"
-msgstr "Minimum codering bitrate"
+msgstr "Minimum codering bitsnelheid"
 
 #: modules/codec/vorbis.c:174
 msgid ""
 "Minimum bitrate in kbps. This is useful for encoding for a fixed-size "
 "channel."
 msgstr ""
-"Minimale bitratio in kbps. Dit is handig voor encoden van een kanaal met "
+"Minimum bitsnelheid in kbps. Dit is handig voor encoden van een kanaal met "
 "vaste grotte."
 
 #: modules/codec/vorbis.c:177
 msgid "Force a constant bitrate encoding (CBR)."
-msgstr "Dwing een constante bitratio codering (CBR)."
+msgstr "Dwing een constante bitsnelheidcodering (CBR)."
 
 #: modules/codec/vorbis.c:181
 msgid "Vorbis audio decoder"
@@ -10577,9 +10591,9 @@ msgid ""
 "Sets maximum interval between IDR-frames.Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision."
 msgstr ""
-"Zet maximale interval tussen IDR-frames. Grotere waardes besparen bits, wat "
-"ervoor zorgt dat de kwaliteit verbeterd voor een bepaalde bitratio, ten "
-"koste van zoekprecisie."
+"Zet maximale interval tussen IDR-beelden. Grotere waarden besparen bits, wat "
+"zorgt voor verbeterde kwaliteit bij een bepaalde bitsnelheid, ten koste van "
+"zoekprecisie."
 
 #: modules/codec/x264.c:57
 msgid "Minimum GOP size"
@@ -10596,17 +10610,17 @@ msgid ""
 "If scenecuts appear within this interval, they are still encoded as I-"
 "frames, but do not start a new GOP."
 msgstr ""
-"Zet minimum interval tussen IDR-frames. In H.264, I-frames binden niet per "
-"se aan een gesloten GOP, omdat een P-frame voorspeld mag worden meer frames "
-"dan net een frame ervoor (ziek ook referentie-frame optie). Daarom zijn I-"
-"frames niet per se zoekbaar. IDR-frames beperken opeenvolgende P-frames van "
-"refereren naar iedere frame voor de IDR-frame.\n"
-"Als scenecuts binnen deze interval plaatsvinden, worden ze nog steeds als I-"
-"frames gecodeerd, maar starten niet een nieuwe GOP."
+"Zet minimuminterval tussen IDR-beelden. In H.264 betekenen I-beelden niet "
+"per sé een gesloten GOP, omdat een P-beeld voorspeld mag worden meer beelden "
+"dan het beeld ervoor (zie ook optie referentiebeeld). Daarom zijn I-beelden "
+"niet per sé zoekbaar. P-beelden na IDR-beelden kunnen niet verwijzen naar "
+"ieder beeld voor het IDR-beeld.\n"
+"Als scene-cuts binnen deze interval plaatsvinden, worden ze nog steeds als I-"
+"beelden gecodeerd, maar starten ze geen nieuwe GOP."
 
 #: modules/codec/x264.c:67
 msgid "Extra I-frames aggressivity"
-msgstr "Extra I-frames agressiviteit"
+msgstr "Extra agressiviteit I-beelden"
 
 #: modules/codec/x264.c:68
 msgid ""
@@ -10618,13 +10632,13 @@ msgid ""
 "other keyint frames, which probably leads to ugly encoding artifacts. Range "
 "1 to 100."
 msgstr ""
-"Scene-cut detectie. Stelt in hoe agressief extra I-frames ingevoegd worden. "
-"Bij kleine scenecut-waardes moet de codec dikwijls een I-frame forceren "
-"wanneer het key-interval zou overschreden worden. Goede scenecut-waardes "
-"zouden een betere locatie voor het I-frame kunnen vinden. Grote waardes "
-"gebruiken meer I-frames dan nodig, waardoor teveel bits nodig zijn. -1 "
-"deactiveert scene-cut detectie, zodat I-frames slechts om de key-interval "
-"frames ingevoegd worden, wat waarschijnlijk tot coderings-artifacts leidt. "
+"Scene-cutdetectie. Stelt in hoe agressief extra I-beelden ingevoegd worden. "
+"Bij kleine scene-cutwaarden moet de codec dikwijls een I-beeld forceren "
+"wanneer het sleutelinterval overschreden zou worden. Goede scene-cutwaarden "
+"zouden een betere lokatie voor het I-beeld kunnen vinden. Grote waarden "
+"gebruiken meer I-beelden dan nodig, waardoor teveel bits nodig zijn. -1 "
+"deactiveert scene-cutdetectie, zodat I-beelden slechts om de sleutelinterval "
+"beelden ingevoegd worden, wat waarschijnlijk tot coderingsartifacts leidt. "
 "Bereik: 1 tot 100."
 
 #: modules/codec/x264.c:79
@@ -10641,48 +10655,48 @@ msgstr ""
 
 #: modules/codec/x264.c:84
 msgid "B-frames between I and P"
-msgstr "B-frames tussen I en P"
+msgstr "B-beelden tussen I en P"
 
 #: modules/codec/x264.c:85
 msgid "Number of consecutive B-frames between I and P-frames. Range 1 to 16."
 msgstr ""
-"Aantal opeenvolgende B-frames tussen I en P-frames. Bereik van 1 tot 16."
+"Aantal opeenvolgende B-beelden tussen I en P-beelden. Bereik van 1 tot 16."
 
 #: modules/codec/x264.c:88
 msgid "Adaptive B-frame decision"
-msgstr "Aanpassend B-frame besluit"
+msgstr "Adaptief B-beeld besluit"
 
 #: modules/codec/x264.c:90
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame.Range 0 to 2."
 msgstr ""
-"Forceer het gebruik van het ingestelde aantal opeenvolgende B-frames, "
-"behalve misschien vlak voor een I-frame. Bereik 0 tot 2."
+"Forceer het gebruik van het ingestelde aantal opeenvolgende B-beelden, "
+"behalve misschien vlak voor een I-beeld. Bereik 0 tot 2."
 
 #: modules/codec/x264.c:94
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame."
 msgstr ""
-"Forceer het gebruik van het ingestelde aantal opeenvolgende B-frames, "
-"behalve (misschien) vlak voor een I-frame."
+"Forceer het gebruik van het ingestelde aantal opeenvolgende B-beelden, "
+"behalve (misschien) vlak voor een I-beeld."
 
 #: modules/codec/x264.c:98
 msgid "Influence (bias) B-frames usage"
-msgstr "Beinvloed (bias) B-frame gebruik"
+msgstr "Beinvloed (bias) gebruik B-beelden"
 
 #: modules/codec/x264.c:99
 msgid ""
 "Bias the choice to use B-frames. Positive values cause more B-frames, "
 "negative values cause less B-frames."
 msgstr ""
-"Beinvloed de keuze om B-frames te gebruiken. Positieve waarden zorgen voor "
-"meer B-frames, negatieve waarden zorgen voor minder B-frames."
+"Beinvloed de keuze voor B-beelden. Positieve waarden zorgen voor meer B-"
+"beelden, negatieve waarden zorgen voor minder B-beelden."
 
 #: modules/codec/x264.c:102
 msgid "Keep some B-frames as references"
-msgstr "Behoud enkele B-frames als referentie"
+msgstr "Behoud enkele B-beelden ter referentie"
 
 #: modules/codec/x264.c:103
 msgid ""
@@ -10690,9 +10704,9 @@ msgid ""
 "the middle of 2+ consecutive B-frames as a reference, and reorders frame "
 "appropriately."
 msgstr ""
-"Staat toe dat B-frames gebruikt worden als referenties om andere frames te "
-"voorspellen. Houdt het midden van 2+ opeenvolgende B-frames als een "
-"referentie, en herorganiseert de frame op een geschikte manier."
+"Hiermee worden B-beelden gebruikt ter referentie voor de voorspelling van "
+"andere beelden. Houdt het midden van 2+ opeenvolgende B-beelden ter "
+"referentie en reorganiseert het beeld conform."
 
 #: modules/codec/x264.c:107
 msgid "CABAC"
@@ -10704,12 +10718,12 @@ msgid ""
 "encoding and decoding, but should save 10 to 15% bitrate."
 msgstr ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Zorgt voor een kleine "
-"vertraging bij coderen en decoderen, maar vermindert de bitrate met 10 tot "
-"15 %."
+"vertraging bij coderen en decoderen, maar vermindert de bitsnelheid met 10 "
+"tot 15 %."
 
 #: modules/codec/x264.c:112
 msgid "Number of reference frames"
-msgstr "Aantal referentieframes"
+msgstr "Aantal referentiebeelden"
 
 #: modules/codec/x264.c:113
 msgid ""
@@ -10717,10 +10731,10 @@ msgid ""
 "but seems to make little difference in live-action source material. Some "
 "decoders are unable to deal with large frameref values. Range 1 to 16."
 msgstr ""
-"Aantal vorige frames te gebruiken bij voorspelling. Dit is effectief bij "
+"Aantal vorige beelden te gebruiken bij voorspelling. Dit is effectief bij "
 "Anime, maar lijkt weinig verschil te maken bij live-action bronmateriaal. "
-"Sommige decoders zijn niet in staat om met grote frameref waarden te "
-"werken.  Bereik van 1 tot 16."
+"Sommige decoders zijn niet in staat om met grote beelrdefwaarden te werken.  "
+"Bereik van 1 tot 16."
 
 #: modules/codec/x264.c:118
 msgid "Skip loop filter"
@@ -10774,8 +10788,8 @@ msgid ""
 "This selects the quantizer to use. Lower values result in better fidelity, "
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
 msgstr ""
-"Dit selecteert de te gebruiken quantizer. Lagere waarden geven een betere "
-"correctheid, maar hogere framerates. 26 is een goede standaard waarde. "
+"Hiermee selecteert u de quantizer. Lagere waarden geven meer "
+"betrouwbaarheid, maar hogere bitsnelheden. 26 is een goede standaardwaarde. "
 "Bereik 0 (verliesloos) tot 51."
 
 #: modules/codec/x264.c:147
@@ -10808,23 +10822,23 @@ msgstr "Max QP stap"
 
 #: modules/codec/x264.c:158
 msgid "Max QP step between frames."
-msgstr "Maximale QP stap tussen frames."
+msgstr "Maximale QP stap tussen beelden."
 
 #: modules/codec/x264.c:160
 msgid "Average bitrate tolerance"
-msgstr "Gemiddelde bitrate tolerantie"
+msgstr "Gemiddelde bitsnelheidtolerantie"
 
 #: modules/codec/x264.c:161
 msgid "Allowed variance in average bitrate (in kbits/s)."
-msgstr "Toegestaande variantie in gemiddelde bitrate (in kbits/s)."
+msgstr "Toegestaande variantie in gemiddelde bitsnelheid (in kbits/s)."
 
 #: modules/codec/x264.c:164
 msgid "Max local bitrate"
-msgstr "Maximale lokale bitrate"
+msgstr "Maximale lokale bitsnelheid"
 
 #: modules/codec/x264.c:165
 msgid "Sets a maximum local bitrate (in kbits/s)."
-msgstr "Stelt een maximale lokale bitrate (in kbits/s) in."
+msgstr "Stelt een maximale lokale bitsnelheid (in kbits/s) in."
 
 #: modules/codec/x264.c:167
 msgid "VBV buffer"
@@ -10832,7 +10846,7 @@ msgstr "VBV buffer"
 
 #: modules/codec/x264.c:168
 msgid "Averaging period for the maximum local bitrate (in kbits)."
-msgstr "Middelingsperiode voor de maximale lokale bitrate (in kbits)."
+msgstr "Middelingsperiode voor de maximale lokale bitsnelheid (in kbits)."
 
 #: modules/codec/x264.c:171
 msgid "Initial VBV buffer occupancy"
@@ -10859,8 +10873,8 @@ msgid ""
 msgstr ""
 "Definieert bitspreidingsmodus voor AQ, standaard 2\n"
 " - 0: Gedeactiveerd\n"
-" - 1: Voorkom dat bits tussen frames verplaatsen\n"
-" - 2: Verplaats bits tussen frames"
+" - 1: Voorkom verplaatsen bits tussen beelden\n"
+" - 2: Verplaats bits tussen beelden"
 
 #: modules/codec/x264.c:182
 msgid "Strength of AQ"
@@ -10905,7 +10919,7 @@ msgstr "QP-verschil tussen chroma en luma."
 
 #: modules/codec/x264.c:200
 msgid "Multipass ratecontrol"
-msgstr "Multipass ratecontrol"
+msgstr "Meervoudige snelheidscontrole"
 
 #: modules/codec/x264.c:201
 msgid ""
@@ -10914,10 +10928,10 @@ msgid ""
 " - 2: Last pass, does not overwrite stats file\n"
 " - 3: Nth pass, overwrites stats file\n"
 msgstr ""
-"Multipass ratecontrol:\n"
-" - 1: Eerste pass, maakt een stats-bestand aan\n"
-" - 2: Laatste pass, overschrijft het stats-bestand niet\n"
-" - 3: Nde pass, overschrijft stats-bestand\n"
+"Meervoudige snelheidsecontrole:\n"
+" - 1: Eerste keer, maakt een stats-bestand aan\n"
+" - 2: Laatste keer, overschrijft het stats-bestand niet\n"
+" - 3: Nde keer, overschrijft stats-bestand\n"
 
 #: modules/codec/x264.c:206
 msgid "QP curve compression"
@@ -10993,11 +11007,11 @@ msgstr ""
 
 #: modules/codec/x264.c:239
 msgid "Weighted prediction for B-frames"
-msgstr "Gewogen voorspelling voor B-frames"
+msgstr "Gewogen voorspelling voor B-beelden"
 
 #: modules/codec/x264.c:240
 msgid "Weighted prediction for B-frames."
-msgstr "Gewogen voorspelling voor B-frames."
+msgstr "Gewogen voorspelling voor B-beelden."
 
 #: modules/codec/x264.c:242
 msgid "Integer pixel motion estimation method"
@@ -11120,24 +11134,24 @@ msgstr ""
 
 #: modules/codec/x264.c:300
 msgid "RD based mode decision for B-frames"
-msgstr "RD-gebaseerde modusbepaling voor B-frames"
+msgstr "RD-gebaseerde modusbepaling voor B-beelden"
 
 #: modules/codec/x264.c:301
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
-"RD-gebaseerde modusbepaling voor B-frames. Dit vereist subbs 6 (of hoger)."
+"RD-gebaseerde modusbepaling voor B-beelden. Dit vereist subme 6 (of hoger)."
 
 #: modules/codec/x264.c:304
 msgid "Decide references on a per partition basis"
-msgstr "Kies referenties op een per partitie basis"
+msgstr "Kies referenties per partitie"
 
 #: modules/codec/x264.c:305
 msgid ""
 "Allows each 8x8 or 16x8 partition to independently select a reference frame, "
 "as opposed to only one ref per macroblock."
 msgstr ""
-"Laat iedere 8x8 of 16x8 partitie onafhankelijk een referentieframe "
-"selecteren, in tegenstelling tot alleen een referentie per macroblock."
+"Laat iedere 8x8 of 16x8 partitie onafhankelijk een referentiebeeld "
+"selecteren, in tegenstelling tot alleen een referentie per macroblok."
 
 #: modules/codec/x264.c:309
 msgid "Chroma in motion estimation"
@@ -11145,11 +11159,11 @@ msgstr "Chroma in bewegingsschatting"
 
 #: modules/codec/x264.c:310
 msgid "Chroma ME for subpel and mode decision in P-frames."
-msgstr "Chroma ME voor subpel en modusbepaling in P-frames."
+msgstr "Chroma ME voor subpel en modusbepaling in P-beelden."
 
 #: modules/codec/x264.c:313
 msgid "Jointly optimize both MVs in B-frames"
-msgstr "Gezamenlijke optimalisatie van beide MV's in B-frames"
+msgstr "Gezamenlijke optimalisatie van beide MV's in B-beelden"
 
 #: modules/codec/x264.c:314
 msgid "Joint bidirectional motion refinement."
@@ -11183,22 +11197,22 @@ msgstr ""
 
 #: modules/codec/x264.c:327
 msgid "Early SKIP detection on P-frames"
-msgstr "Vroege SKIP detectie op P-frames"
+msgstr "Vroege SKIP detectie op P-beelden"
 
 #: modules/codec/x264.c:328
 msgid "Early SKIP detection on P-frames."
-msgstr "Vroege SKIP detectie op P-frames."
+msgstr "Vroege SKIP detectie op P-beelden."
 
 #: modules/codec/x264.c:330
 msgid "Coefficient thresholding on P-frames"
-msgstr "Drempelcoëfficiënt voor P-frames"
+msgstr "Drempelcoëfficiënt voor P-beelden"
 
 #: modules/codec/x264.c:331
 msgid ""
 "Coefficient thresholding on P-frames.Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
-"Drempelcoëfficiënt voor P-frames. Elimineer dct-blocks die slechts 1 kleine "
+"Drempelcoëfficiënt voor P-beelden. Elimineer dct-blocks die slechts 1 kleine "
 "coëfficiënt bevatten."
 
 #: modules/codec/x264.c:336
@@ -11293,7 +11307,7 @@ msgstr "Statistieken"
 
 #: modules/codec/x264.c:375
 msgid "Print stats for each frame."
-msgstr "Druk status voor ieder frame af."
+msgstr "Druk status voor ieder beeld af."
 
 #: modules/codec/x264.c:378
 msgid "SPS and PPS id numbers"
@@ -11480,7 +11494,7 @@ msgstr "Volumeaansturing"
 msgid "Position Control"
 msgstr "Positieaansturing"
 
-#: modules/control/hotkeys.c:100 modules/gui/macosx/intf.m:2406
+#: modules/control/hotkeys.c:100 modules/gui/macosx/intf.m:2408
 msgid "Ignore"
 msgstr "Negeren"
 
@@ -11784,10 +11798,10 @@ msgid "Opening"
 msgstr "Openen"
 
 #: modules/control/rc.c:76 modules/gui/macosx/embeddedwindow.m:148
-#: modules/gui/macosx/intf.m:1932 modules/gui/macosx/intf.m:1933
 #: modules/gui/macosx/intf.m:1934 modules/gui/macosx/intf.m:1935
+#: modules/gui/macosx/intf.m:1936 modules/gui/macosx/intf.m:1937
 #: modules/gui/pda/pda_interface.c:248 modules/gui/pda/pda_interface.c:249
-#: modules/gui/qt4/menus.cpp:734 modules/misc/notify/xosd.c:263
+#: modules/gui/qt4/menus.cpp:734 modules/misc/notify/xosd.c:238
 msgid "Pause"
 msgstr "Pauze"
 
@@ -11833,7 +11847,7 @@ msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr ""
-"Accepteer commando's over een socket i.p.v. standaard invoer. U kan het "
+"Accepteer commando's over een socket i.p.v. standaard invoer. U kunt het "
 "adres en de poort waaraan de interface zal binden instellen."
 
 #: modules/control/rc.c:181 modules/misc/dummy/dummy.c:52
@@ -11959,11 +11973,11 @@ msgstr "| pause  . . . . . . . . . . . . . . . .  pause switch"
 
 #: modules/control/rc.c:873
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
-msgstr "| fastforward  . . . . . . . .  .  zet naar maximale afspeelratio"
+msgstr "| fastforward  . . . . . . . .  .  zet naar maximum afspeelsnelheid"
 
 #: modules/control/rc.c:874
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
-msgstr "| rewind  . . . . . . . . . . . .  zet naar minimale afspeelratio"
+msgstr "| rewind  . . . . . . . . . . . .  zet naar minimum afspeelsnelheid"
 
 #: modules/control/rc.c:875
 msgid "| faster . . . . . . . . . .  faster playing of stream"
@@ -12063,7 +12077,7 @@ msgstr "| menu . . [on|off|up|down|left|right|select] gebruik menu"
 
 #: modules/control/rc.c:904
 msgid "| @name marq-marquee  STRING  . . overlay STRING in video"
-msgstr "| @name marq-marquee  REGEL  . . overleg REGEL in de video"
+msgstr "| @name marq-marquee  REGEL  . . overlay REGEL in de video"
 
 #: modules/control/rc.c:905
 msgid "| @name marq-x X . . . . . . . . . . . .offset from left"
@@ -12095,7 +12109,7 @@ msgstr "| @name marq-size # . . . . . . . . lettertype grootte, in pixels"
 
 #: modules/control/rc.c:913
 msgid "| @name logo-file STRING . . .the overlay file path/name"
-msgstr "| @name logo-file REGEL . . .de overlap bestandspad/naam"
+msgstr "| @name logo-file REGEL . . .het overlaybestandspad/naam"
 
 #: modules/control/rc.c:914
 msgid "| @name logo-x X . . . . . . . . . . . .offset from left"
@@ -12228,7 +12242,7 @@ msgstr "| invoer bytes gelezen : %8.0f kB"
 #: modules/control/rc.c:2007 modules/gui/ncurses.c:2004
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
-msgstr "| invoer bitratio    :   %6.0f kb/s"
+msgstr "| invoer bitsnelheid    :   %6.0f kb/s"
 
 #: modules/control/rc.c:2009 modules/gui/ncurses.c:2006
 #, c-format
@@ -12238,7 +12252,7 @@ msgstr "| demux bytes gelezen : %8.0f kB"
 #: modules/control/rc.c:2011 modules/gui/ncurses.c:2009
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
-msgstr "| demux bitratio    :   %6.0f kb/s"
+msgstr "| demux bitsnelheid    :   %6.0f kb/s"
 
 #: modules/control/rc.c:2015 modules/gui/ncurses.c:2019
 msgid "+-[Video Decoding]"
@@ -12295,13 +12309,13 @@ msgstr "| bytes verzonden       : %8.0f kB"
 #: modules/control/rc.c:2037
 #, c-format
 msgid "| sending bitrate  :   %6.0f kb/s"
-msgstr "| verzend bitrate  :   %6.0f kb/s"
+msgstr "| verzend bitsnelheid  :   %6.0f kb/s"
 
-#: modules/control/showintf.c:67
+#: modules/control/showintf.c:66
 msgid "Threshold"
 msgstr "Drempelwaarde"
 
-#: modules/control/showintf.c:68
+#: modules/control/showintf.c:67
 msgid "Height of the zone triggering the interface."
 msgstr "Hoogte van het gebied dat de interface activeert."
 
@@ -12631,11 +12645,11 @@ msgstr "HTTP tunnel poort"
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "Poort om te gebruiken voor het tunnellen van de RTSP/RTP over HTTP."
 
-#: modules/demux/live555.cpp:615
+#: modules/demux/live555.cpp:611
 msgid "RTSP authentication"
 msgstr "RTSP authentificatie"
 
-#: modules/demux/live555.cpp:616
+#: modules/demux/live555.cpp:612
 msgid "Please enter a valid login name and a password."
 msgstr "Voer a.u.b. een geldige gebruikersnaam en wachtwoord in."
 
@@ -12650,8 +12664,9 @@ msgid ""
 "This is the desired frame rate when playing MJPEG from a file. Use 0 (this "
 "is the default value) for a live stream (from a camera)."
 msgstr ""
-"Dit is de gewenste frameratio voor het afspelen van MJPEG van een bestand. "
-"Gebruik 0 (dit is de standaard waarde) voor een live stream (van een camera)."
+"Dit is de gewenste beeldsnelheid voor het afspelen van MJPEG van een "
+"bestand. Gebruik 0 (dit is de standaardwaarde) voor een live stream (van een "
+"camera)."
 
 #: modules/demux/mjpeg.c:54
 msgid "M-JPEG camera demuxer"
@@ -12822,7 +12837,7 @@ msgstr "MPEG-I/II/4 / A52 / DTS/MLP audio"
 
 #: modules/demux/mpeg/h264.c:44
 msgid "Desired frame rate for the H264 stream."
-msgstr "Gewenste framerate voor de H264 stream."
+msgstr "Gewenste beeldsnelheid voor de H264-stream."
 
 #: modules/demux/mpeg/h264.c:51
 msgid "H264 video demuxer"
@@ -12832,8 +12847,8 @@ msgstr "H264 video demuxer"
 msgid ""
 "This is the desired frame rate when playing MPEG4 video elementary streams."
 msgstr ""
-"Dit is de gewenste framerate bij het afspelen van elementaire MPEG4 video "
-"streams."
+"Dit is de gewenste beeldsnelheid bij het afspelen van elementaire MPEG4 "
+"videostreams."
 
 #: modules/demux/mpeg/m4v.c:50
 msgid "MPEG-4 video demuxer"
@@ -12882,8 +12897,8 @@ msgstr "Geeft shoutcast volwassen inhoud weer"
 #: modules/demux/playlist/playlist.c:45
 msgid "Show NC17 rated video streams when using shoutcast video playlists."
 msgstr ""
-"Geef NC17-geclassificeerde video streams weer bij gebruik van shoutcast "
-"video afspeellijsten."
+"Toon NC17-geclassificeerde videostreams bij gebruik van shoutcast video-"
+"afspeellijsten."
 
 #: modules/demux/playlist/playlist.c:48
 msgid "Skip ads"
@@ -12971,6 +12986,15 @@ msgstr "Podcast grootte"
 msgid "Shoutcast"
 msgstr "Shoutcast"
 
+#: modules/demux/playlist/shoutcast.c:409
+#, fuzzy
+msgid "Listeners"
+msgstr "Lineair"
+
+#: modules/demux/playlist/shoutcast.c:410
+msgid "Load"
+msgstr ""
+
 #: modules/demux/ps.c:43
 msgid "Trust MPEG timestamps"
 msgstr "Vertrouw MPEG tijdsaanduidingen"
@@ -12981,9 +13005,9 @@ msgid ""
 "duration. However sometimes this might not be usable. Disable this option to "
 "calculate from the bitrate instead."
 msgstr ""
-"Normaal gebruiken we tijdsaanduidingen in de MPEG bestanden om de positie en "
+"Normaal gebruiken we tijdsaanduidingen in de MPEG-bestanden om de positie en "
 "duur te berekenen. Echter, soms is dit niet bruikbaar. Deactiveer deze optie "
-"om deze waarden vanuit de bitrate te berekenen."
+"om deze waarden vanuit de bitsnelheid te berekenen."
 
 #: modules/demux/ps.c:56 modules/demux/ps.c:68
 msgid "MPEG-PS demuxer"
@@ -12995,14 +13019,14 @@ msgstr "PS"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
-msgstr "PVA demuxer"
+msgstr "PVA-demuxer"
 
 #: modules/demux/rawdv.c:41
 msgid ""
 "The demuxer will advance timestamps if the input can't keep up with the rate."
 msgstr ""
-"De demuxer zal tijdsaaduidingen voor laten lopen als de invoer de rate niet "
-"bij kan houden."
+"De demuxer zal tijdsaaduidingen vooruit zetten als de invoer de snelheid "
+"niet bij kan houden."
 
 #: modules/demux/rawdv.c:49
 msgid "DV (Digital Video) demuxer"
@@ -13013,16 +13037,16 @@ msgid ""
 "This is the desired frame rate when playing raw video streams.  In the form "
 "30000/1001 or 29.97"
 msgstr ""
-"Dit is de gewenste framerate bij het afspelen van ruwe video streams. In de "
-"vorm 30000/1001 of 29.97"
+"Dit is de gewenste beeldnselheid bij het afspelen van ruwe videostreams. In "
+"de vorm 30000/1001 of 29.97"
 
 #: modules/demux/rawvid.c:50
 msgid "This specifies the width in pixels of the raw video stream."
-msgstr "Dit specificeert de breedte in pixels van de ruwe video stream."
+msgstr "Dit specificeert de breedte in pixels van de ruwe videostream."
 
 #: modules/demux/rawvid.c:54
 msgid "This specifies the height in pixels of the raw video stream."
-msgstr "Dit specificeert de hoogte in pixels van de ruwe video stream."
+msgstr "Dit specificeert de hoogte in pixels van de ruwe videostream."
 
 #: modules/demux/rawvid.c:57
 msgid "Force chroma (Use carefully)"
@@ -13064,7 +13088,7 @@ msgid ""
 "Override the normal frames per second settings. This will only work with "
 "MicroDVD and SubRIP (SRT) subtitles."
 msgstr ""
-"Overschrijf de normale frames per seconde instelling. Dit zal alleen werken "
+"Overschrijf de normale instelling voor beelden per seconde. Dit werkt alleen "
 "met MicroDVD en SubRIP (SRT) ondertitelingen."
 
 #: modules/demux/subtitle.c:59
@@ -13102,9 +13126,8 @@ msgid ""
 "Override the normal frames per second settings. This will only affect frame-"
 "based subtitle formats without a fixed value."
 msgstr ""
-"Overschrijf de normale instellingen voor frames per seconde. Dit zal alleen "
-"invloed hebben op  frame-gebaseerde ondertitelformaten zonder vastgelegde "
-"waardes."
+"Overschrijf de normale instellingen voor beelden per seconde. Dit zal alleen "
+"invloed hebben op beeld-gebaseerde ondertiteling zonder vaste waarden."
 
 #: modules/demux/subtitle_asa.c:61
 msgid ""
@@ -13311,7 +13334,7 @@ msgstr "Gesloten onderschriften 4"
 
 #: modules/demux/vc1.c:44
 msgid "Desired frame rate for the VC-1 stream."
-msgstr "Gewenste framerate voor de VC-1 stream."
+msgstr "Gewenste beeldsnelheid voor de VC-1 stream."
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
@@ -13349,7 +13372,7 @@ msgstr "Ook bestanden van alle onderliggende mappen openen?"
 #: modules/gui/macosx/open.m:195 modules/gui/macosx/open.m:548
 #: modules/gui/macosx/open.m:739 modules/gui/macosx/open.m:920
 #: modules/gui/macosx/open.m:1156
-#: modules/gui/qt4/components/controller.hpp:100
+#: modules/gui/qt4/components/controller.hpp:101
 msgid "Open"
 msgstr "Openen"
 
@@ -13418,7 +13441,7 @@ msgstr "Venster"
 #: modules/gui/macosx/bookmarks.m:213 modules/gui/macosx/bookmarks.m:221
 #: modules/gui/macosx/bookmarks.m:271 modules/gui/macosx/bookmarks.m:279
 #: modules/gui/macosx/controls.m:84 modules/gui/macosx/extended.m:519
-#: modules/gui/macosx/intf.m:2279 modules/gui/macosx/open.m:307
+#: modules/gui/macosx/intf.m:2281 modules/gui/macosx/open.m:307
 #: modules/gui/macosx/output.m:138 modules/gui/macosx/playlistinfo.m:429
 #: modules/gui/macosx/simple_prefs.m:239 modules/gui/macosx/update.m:65
 #: modules/gui/macosx/wizard.m:600 modules/gui/macosx/wizard.m:664
@@ -13428,7 +13451,7 @@ msgstr "Venster"
 #: modules/gui/macosx/wizard.m:1881 modules/gui/macosx/wizard.m:1894
 #: modules/gui/qt4/components/open_panels.cpp:1251
 #: modules/gui/qt4/components/preferences_widgets.cpp:1330
-#: modules/gui/qt4/main_interface.cpp:560
+#: modules/gui/qt4/main_interface.cpp:552
 msgid "OK"
 msgstr "OK"
 
@@ -13553,13 +13576,11 @@ msgstr "Neem een screenshot"
 
 #: modules/gui/fbosd.c:101 modules/video_output/fb.c:79
 msgid "Framebuffer device"
-msgstr "Framebuffer apparaat"
+msgstr "Beeldbufferapparaat"
 
 #: modules/gui/fbosd.c:103 modules/video_output/fb.c:81
 msgid "Framebuffer device to use for rendering (usually /dev/fb0)."
-msgstr ""
-"Framebuffer apparaat dat voor renderen gebruikt moet worden (meestal /dev/"
-"fb0)."
+msgstr "Beeldbufferapparaat voor weergave (meestal /dev/fb0)."
 
 #: modules/gui/fbosd.c:105 modules/video_output/fb.c:92
 msgid "Video aspect ratio"
@@ -13574,8 +13595,8 @@ msgstr ""
 #: modules/gui/fbosd.c:111
 msgid "Filename of image file to use on the overlay framebuffer."
 msgstr ""
-"Bestandsnaam van het afbeeldingsbestand om te gebruiken in de overlap "
-"framebuffer."
+"Bestandsnaam van het afbeeldingsbestand om te gebruiken in de overlay-"
+"beeldbuffer."
 
 #: modules/gui/fbosd.c:113
 msgid "Transparency of the image"
@@ -13597,7 +13618,7 @@ msgstr "Tekst"
 
 #: modules/gui/fbosd.c:119
 msgid "Text to display on the overlay framebuffer."
-msgstr "tekst om op de overlap-framebuffer weer te geven."
+msgstr "Tekst op de overlay-beeldbuffer."
 
 #: modules/gui/fbosd.c:121 modules/video_filter/erase.c:58
 #: modules/video_filter/logo.c:80 modules/video_filter/osdmenu.c:51
@@ -13623,9 +13644,9 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, e."
 "g. 6=top-right)."
 msgstr ""
-"De oriëntatie/positionering van de afbeelding op de video kan hier bepaald "
-"worden. (0=midden, 1=links, 2=rechts, 4=boven, 8=beneden. Combinaties van "
-"deze waarden zijn ook mogelijk, zoals 6 = rechts-boven)."
+"Hier bepaalt u afbeeldingspositie op de overlay. (0=midden, 1=links, "
+"2=rechts, 4=boven, 8=beneden. Combinaties van deze waarden zijn ook "
+"mogelijk, bijv. 6=rechts-boven)."
 
 #: modules/gui/fbosd.c:133 modules/misc/freetype.c:90
 #: modules/misc/win32text.c:64 modules/video_filter/marq.c:117
@@ -13638,8 +13659,8 @@ msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque. "
 msgstr ""
-"Opaciteit (inverse van transparantie) van overlaptekst. 0 = transparant, 255 "
-"= totale opaciteit"
+"Ondoorzichtig (omgekeerde van transparantie) van overlaytekst. 0 = "
+"transparant, 255 = totaal ondoorzichtig"
 
 #: modules/gui/fbosd.c:137 modules/video_filter/marq.c:120
 #: modules/video_filter/rss.c:150
@@ -13661,14 +13682,14 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
-"Kleu van de tekst die op de video zal worden geprojecteerd. Dit moet een "
-"hexadecimale waarde zijn (zoald HTML kleuren). De eerste 2 tekens zijn voor "
+"Kleur van de tekst die op de video wordt geprojecteerd. Dit moet een "
+"hexadecimale waarde zijn (zoals HTML-kleuren). De eerste 2 tekens zijn voor "
 "rood, dan groen, dan blauw. #000000 = zwart, #FF0000 = rood, #00FF00 = "
 "groen, #FFFF00 = geel (rood + groen), #FFFFFF = wit"
 
 #: modules/gui/fbosd.c:147
 msgid "Clear overlay framebuffer"
-msgstr "Overlap framebuffer wissen"
+msgstr "Overlay-beeldbuffer wissen"
 
 #: modules/gui/fbosd.c:148
 msgid ""
@@ -13676,8 +13697,8 @@ msgid ""
 "transparent. All previously rendered images and text will be cleared from "
 "the cache."
 msgstr ""
-"De weergegeven overlap afbeeldingen worden gewist door de overlap volledig "
-"transparant te maken. Alle vorige voorbereide afbeeldingen en tekst worden "
+"De weergegeven overlay-afbeeldingen worden gewist door de overlay volledig "
+"transparant te maken. Alle vorige weergegeven afbeeldingen en tekst worden "
 "van de buffer gewist."
 
 #: modules/gui/fbosd.c:152
@@ -13686,22 +13707,22 @@ msgstr "Tekst of afbeelding weergeven"
 
 #: modules/gui/fbosd.c:153
 msgid "Render the image or text in current overlay buffer."
-msgstr "Projecteer de afbeelding of tekst in de huisige overlap buffer."
+msgstr "Geef de afbeelding of tekst weer in de huidige overlaybuffer."
 
 #: modules/gui/fbosd.c:156
 msgid "Display on overlay framebuffer"
-msgstr "Weergeven op overlap framebuffer"
+msgstr "Weergeven op overlay-beeldbuffer"
 
 #: modules/gui/fbosd.c:157
 msgid ""
 "All rendered images and text will be displayed on the overlay framebuffer."
 msgstr ""
-"Alle voorbereide afbeeldingen en tekst worde weergegeven op de overlap "
-"framebuffer."
+"Alle weergegeven afbeeldingen en tekst worden getoond op de overlay-"
+"beeldbuffer."
 
 #: modules/gui/fbosd.c:203 modules/gui/macosx/simple_prefs.m:272
 #: modules/gui/qt4/ui/sprefs_subtitles.h:220 modules/misc/freetype.c:83
-#: modules/misc/notify/xosd.c:83 modules/misc/quartztext.c:85
+#: modules/misc/notify/xosd.c:80 modules/misc/quartztext.c:85
 #: modules/misc/win32text.c:57 modules/video_filter/marq.c:161
 #: modules/video_filter/rss.c:203
 msgid "Font"
@@ -13713,7 +13734,7 @@ msgstr "Commando's"
 
 #: modules/gui/fbosd.c:217
 msgid "GNU/Linux osd/overlay framebuffer interface"
-msgstr "GNU/Linux osd/overleg framebuffer interface"
+msgstr "GNU/Linux osd/overlay-beeldbufferinterface"
 
 #: modules/gui/macosx/about.m:86 modules/gui/macosx/intf.m:562
 msgid "About VLC media player"
@@ -13771,7 +13792,7 @@ msgstr "Uitlezen"
 msgid "Time"
 msgstr "Tijd"
 
-#: modules/gui/macosx/bookmarks.m:126 modules/gui/macosx/playlist.m:712
+#: modules/gui/macosx/bookmarks.m:126 modules/gui/macosx/playlist.m:713
 msgid "Untitled"
 msgstr "Zonder titel"
 
@@ -14154,7 +14175,7 @@ msgstr "Opnameapparaat openen..."
 msgid "Open Recent"
 msgstr "Open laatste"
 
-#: modules/gui/macosx/intf.m:581 modules/gui/macosx/intf.m:2695
+#: modules/gui/macosx/intf.m:581 modules/gui/macosx/intf.m:2697
 msgid "Clear Menu"
 msgstr "Wis menu"
 
@@ -14321,57 +14342,57 @@ msgstr ""
 "Alleen uw standaard e-mailadres zal opgestuurd worden, inclusief geen "
 "verdere informatie."
 
-#: modules/gui/macosx/intf.m:1754
+#: modules/gui/macosx/intf.m:1756
 #, c-format
 msgid "Volume: %d%%"
 msgstr "Volume: %d%%"
 
-#: modules/gui/macosx/intf.m:2170
+#: modules/gui/macosx/intf.m:2172
 msgid "Update check failed"
 msgstr "Controle voor nieuwere versie is mislukt"
 
-#: modules/gui/macosx/intf.m:2170
+#: modules/gui/macosx/intf.m:2172
 msgid "Checking for updates was not enabled in this build."
 msgstr "Controleren op nieuwere versies was niet geactiveert in deze versie."
 
-#: modules/gui/macosx/intf.m:2277
+#: modules/gui/macosx/intf.m:2279
 msgid "Crash Report successfully sent"
 msgstr "Crash-rapport succesvol verzonden"
 
-#: modules/gui/macosx/intf.m:2278
+#: modules/gui/macosx/intf.m:2280
 msgid "Thanks for your report!"
 msgstr "Bedankt voor uw rapport!"
 
-#: modules/gui/macosx/intf.m:2286
+#: modules/gui/macosx/intf.m:2288
 msgid "Error when sending the Crash Report"
 msgstr "Fout tijdens het aanmaken van een crash-rapport"
 
-#: modules/gui/macosx/intf.m:2377
+#: modules/gui/macosx/intf.m:2379
 msgid "No CrashLog found"
 msgstr "Geen CrashLog gevonden"
 
-#: modules/gui/macosx/intf.m:2377 modules/gui/macosx/prefs.m:207
+#: modules/gui/macosx/intf.m:2379 modules/gui/macosx/prefs.m:207
 #: modules/gui/macosx/simple_prefs.m:620
 msgid "Continue"
 msgstr "Doorgaan"
 
-#: modules/gui/macosx/intf.m:2377
+#: modules/gui/macosx/intf.m:2379
 msgid "Couldn't find any trace of a previous crash."
 msgstr "Kan geen trace-bestand van een vorige crash vinden."
 
-#: modules/gui/macosx/intf.m:2404
+#: modules/gui/macosx/intf.m:2406
 msgid "Remove old preferences?"
 msgstr "Oude voorkeuren verwijderen?"
 
-#: modules/gui/macosx/intf.m:2405
+#: modules/gui/macosx/intf.m:2407
 msgid "We just found an older version of VLC's preferences files."
 msgstr "We vonden net een oudere versie van VLC's voorkeurenbestanden."
 
-#: modules/gui/macosx/intf.m:2406
+#: modules/gui/macosx/intf.m:2408
 msgid "Move To Trash and Relaunch VLC"
 msgstr "Verplaats naar Prullenbak en herstart VLC"
 
-#: modules/gui/macosx/intf.m:2540
+#: modules/gui/macosx/intf.m:2542
 #, c-format
 msgid "VLC Debug Log (%s).rtfd"
 msgstr "VLC debug log (%s).rtfd"
@@ -14783,7 +14804,7 @@ msgstr "Transcoding opties"
 #: modules/gui/macosx/output.m:163 modules/gui/macosx/output.m:173
 #: modules/gui/macosx/wizard.m:384
 msgid "Bitrate (kb/s)"
-msgstr "Bitratio (kb/s)"
+msgstr "Bisnelheid (kb/s)"
 
 #: modules/gui/macosx/output.m:166 modules/gui/qt4/ui/profiles.h:476
 msgid "Scale"
@@ -14854,8 +14875,8 @@ msgstr "Sorteer subgroep op naam"
 msgid "Sort Node by Author"
 msgstr "Sorteer subgroep op auteur"
 
-#: modules/gui/macosx/playlist.m:457 modules/gui/macosx/playlist.m:496
-#: modules/gui/macosx/playlist.m:1477
+#: modules/gui/macosx/playlist.m:457 modules/gui/macosx/playlist.m:497
+#: modules/gui/macosx/playlist.m:1497
 msgid "No items in the playlist"
 msgstr "Geen items in de afspeellijst"
 
@@ -14879,13 +14900,18 @@ msgstr "Uitgebreid M3U bestand"
 msgid "XML Shareable Playlist Format (XSPF)"
 msgstr "XML Uitwisselbare Afspeellijst Formaat (XSPF)"
 
-#: modules/gui/macosx/playlist.m:490 modules/gui/macosx/playlist.m:1470
+#: modules/gui/macosx/playlist.m:465
+#, fuzzy
+msgid "HTML Playlist"
+msgstr "Lua afspeellijst"
+
+#: modules/gui/macosx/playlist.m:491 modules/gui/macosx/playlist.m:1490
 #: modules/gui/macosx/wizard.m:1368
 #, c-format
 msgid "%i items"
 msgstr "%i items"
 
-#: modules/gui/macosx/playlist.m:498 modules/gui/macosx/playlist.m:1481
+#: modules/gui/macosx/playlist.m:499 modules/gui/macosx/playlist.m:1501
 msgid "1 item"
 msgstr "1 item"
 
@@ -14893,11 +14919,11 @@ msgstr "1 item"
 msgid "Save Playlist"
 msgstr "Afspeellijst opslaan"
 
-#: modules/gui/macosx/playlist.m:1214 modules/gui/ncurses.c:1763
+#: modules/gui/macosx/playlist.m:1234 modules/gui/ncurses.c:1763
 msgid "Meta-information"
 msgstr "Metadata"
 
-#: modules/gui/macosx/playlist.m:1449
+#: modules/gui/macosx/playlist.m:1469
 msgid "Empty Folder"
 msgstr "Lege map"
 
@@ -14931,7 +14957,7 @@ msgstr "Lees van media"
 #: modules/gui/macosx/playlistinfo.m:98
 #: modules/gui/qt4/components/info_panels.cpp:524
 msgid "Input bitrate"
-msgstr "Invoer bitratio"
+msgstr "Invoer bitsnelheid"
 
 #: modules/gui/macosx/playlistinfo.m:99
 #: modules/gui/qt4/components/info_panels.cpp:526
@@ -14941,7 +14967,7 @@ msgstr "Gedemuxed"
 #: modules/gui/macosx/playlistinfo.m:100
 #: modules/gui/qt4/components/info_panels.cpp:527
 msgid "Stream bitrate"
-msgstr "Stream bitratio"
+msgstr "Stream bitsnelheid"
 
 #: modules/gui/macosx/playlistinfo.m:103 modules/gui/macosx/playlistinfo.m:114
 #: modules/gui/qt4/components/info_panels.cpp:534
@@ -14952,7 +14978,7 @@ msgstr "Gedecodeerde blokken"
 #: modules/gui/macosx/playlistinfo.m:104
 #: modules/gui/qt4/components/info_panels.cpp:536
 msgid "Displayed frames"
-msgstr "Weergegeven frames"
+msgstr "Weergegeven beelden"
 
 #: modules/gui/macosx/playlistinfo.m:105
 #: modules/gui/qt4/components/info_panels.cpp:538
@@ -14961,7 +14987,7 @@ msgstr "Verloren frames"
 
 #: modules/gui/macosx/playlistinfo.m:108 modules/gui/macosx/wizard.m:363
 #: modules/gui/qt4/components/info_panels.cpp:520
-#: modules/gui/qt4/dialogs_provider.cpp:610
+#: modules/gui/qt4/dialogs_provider.cpp:611
 #: modules/video_filter/deinterlace.c:142
 msgid "Streaming"
 msgstr "Streaming"
@@ -15370,7 +15396,7 @@ msgstr "Wilt u dat VLC automatisch naar nieuwere versies zoekt?"
 
 #: modules/gui/macosx/update.m:102
 msgid "You can change this option in VLC's update window later on."
-msgstr "U kan deze optie later in VLC's update venster aanpassen."
+msgstr "U kunt deze optie later in VLC's updatevenster wijzigen."
 
 #: modules/gui/macosx/update.m:102
 msgid "No"
@@ -15434,8 +15460,8 @@ msgid ""
 "H263 is a video codec optimized for videoconference (low rates, useable with "
 "MPEG TS)"
 msgstr ""
-"H263 is een video codec geoptimaliseerd voor videoconferentie (lage rates, "
-"bruikbaar met MPEG TS)"
+"H263 is een videocodec geoptimaliseerd voor videoconferentie (lage "
+"snelheden, bruikbaar met MPEG TS)"
 
 #: modules/gui/macosx/wizard.m:141
 msgid "H264 is a new video codec (useable with MPEG TS and MP4)"
@@ -16344,7 +16370,7 @@ msgstr "Status"
 #: modules/gui/ncurses.c:2063
 #, c-format
 msgid "\\ sending bitrate  :   %6.0f kb/s"
-msgstr "\\ verzend bitrate  :   %6.0f kb/s"
+msgstr "\\ verzend bitsnelheid  :   %6.0f kb/s"
 
 #: modules/gui/ncurses.c:2096
 msgid " Playlist (All, one level) "
@@ -16512,7 +16538,7 @@ msgstr "Frequentie:"
 
 #: modules/gui/pda/pda_interface.c:627
 msgid "Samplerate:"
-msgstr "Samplerate:"
+msgstr "Samplesnelheid:"
 
 #: modules/gui/pda/pda_interface.c:636
 msgid "Quality:"
@@ -16628,15 +16654,15 @@ msgstr "WMV2"
 
 #: modules/gui/pda/pda_interface.c:931
 msgid "Video Bitrate:"
-msgstr "Video-bitrate:"
+msgstr "Video-bitsnelheid:"
 
 #: modules/gui/pda/pda_interface.c:940
 msgid "Bitrate Tolerance:"
-msgstr "Bitrate tolerantie:"
+msgstr "Bitsnelheidtolerantie:"
 
 #: modules/gui/pda/pda_interface.c:949
 msgid "Keyframe Interval:"
-msgstr "Keyframe interval:"
+msgstr "Sleutelbeeldinterval:"
 
 #: modules/gui/pda/pda_interface.c:958
 msgid "Audio Codec:"
@@ -16736,7 +16762,7 @@ msgstr "bits/s"
 
 #: modules/gui/pda/pda_interface.c:1132
 msgid "Audio Bitrate :"
-msgstr "Audio Bitratio :"
+msgstr "Audio bitsnelheid :"
 
 #: modules/gui/pda/pda_interface.c:1155
 msgid "SAP Announce:"
@@ -16805,23 +16831,23 @@ msgstr "QNX RTOS video en audio uitvoer"
 msgid "Shift+L"
 msgstr "Shift+L"
 
-#: modules/gui/qt4/components/controller.cpp:455
+#: modules/gui/qt4/components/controller.cpp:471
 msgid "Previous Chapter/Title"
 msgstr "Vorige hoofdstuk/titel"
 
-#: modules/gui/qt4/components/controller.cpp:461
+#: modules/gui/qt4/components/controller.cpp:477
 msgid "Menu"
 msgstr "Menu"
 
-#: modules/gui/qt4/components/controller.cpp:467
+#: modules/gui/qt4/components/controller.cpp:483
 msgid "Next Chapter/Title"
 msgstr "Volgende hoofdstuk/titel"
 
-#: modules/gui/qt4/components/controller.cpp:504
+#: modules/gui/qt4/components/controller.cpp:520
 msgid "Teletext Activation"
 msgstr "Teletekst activatie"
 
-#: modules/gui/qt4/components/controller.cpp:520
+#: modules/gui/qt4/components/controller.cpp:536
 msgid "Toggle Transparency "
 msgstr "Transparantie wisselen"
 
@@ -16833,81 +16859,81 @@ msgstr ""
 "Afspelen\n"
 "Als de afspeellijst leeg is open een medium"
 
-#: modules/gui/qt4/components/controller.hpp:102
+#: modules/gui/qt4/components/controller.hpp:103
 msgid "De-Fullscreen"
 msgstr "De-schermvullend"
 
-#: modules/gui/qt4/components/controller.hpp:102
+#: modules/gui/qt4/components/controller.hpp:103
 msgid "Extended panel"
 msgstr "Uitgebreid paneel"
 
-#: modules/gui/qt4/components/controller.hpp:103
+#: modules/gui/qt4/components/controller.hpp:104
 msgid "A->B Loop"
 msgstr "A->B herhalen"
 
-#: modules/gui/qt4/components/controller.hpp:103
+#: modules/gui/qt4/components/controller.hpp:104
 msgid "Frame By Frame"
 msgstr "Beeld voor beeld"
 
-#: modules/gui/qt4/components/controller.hpp:103
+#: modules/gui/qt4/components/controller.hpp:104
 msgid "Trickplay Reverse"
 msgstr "Trickplay omkeren"
 
-#: modules/gui/qt4/components/controller.hpp:104
-#: modules/gui/qt4/components/controller.hpp:113
+#: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/components/controller.hpp:114
 msgid "Step backward"
 msgstr "Stap terug"
 
-#: modules/gui/qt4/components/controller.hpp:104
-#: modules/gui/qt4/components/controller.hpp:113
+#: modules/gui/qt4/components/controller.hpp:105
+#: modules/gui/qt4/components/controller.hpp:114
 msgid "Step forward"
 msgstr "Stap vooruit"
 
-#: modules/gui/qt4/components/controller.hpp:106
+#: modules/gui/qt4/components/controller.hpp:107
 msgid "Stop playback"
 msgstr "Afspelen stoppen"
 
-#: modules/gui/qt4/components/controller.hpp:106
+#: modules/gui/qt4/components/controller.hpp:107
 msgid "Open a medium"
 msgstr "Een medium openen"
 
-#: modules/gui/qt4/components/controller.hpp:107
+#: modules/gui/qt4/components/controller.hpp:108
 msgid "Previous media in the playlist"
 msgstr "Vorige media in de afspeellijst"
 
-#: modules/gui/qt4/components/controller.hpp:108
+#: modules/gui/qt4/components/controller.hpp:109
 msgid "Next media in the playlist"
 msgstr "Volgende media in de afspeellijst"
 
-#: modules/gui/qt4/components/controller.hpp:109
+#: modules/gui/qt4/components/controller.hpp:110
 msgid "Toggle the video in fullscreen"
 msgstr "Wissel video in schermvullende modus"
 
-#: modules/gui/qt4/components/controller.hpp:109
+#: modules/gui/qt4/components/controller.hpp:110
 msgid "Toggle the video out fullscreen"
 msgstr "Wissel video uit schermvullende modus"
 
-#: modules/gui/qt4/components/controller.hpp:110
+#: modules/gui/qt4/components/controller.hpp:111
 msgid "Show extended settings"
 msgstr "Uitgebreide opties weergeven"
 
-#: modules/gui/qt4/components/controller.hpp:110
+#: modules/gui/qt4/components/controller.hpp:111
 msgid "Show playlist"
 msgstr "Afspeellijst weergeven"
 
-#: modules/gui/qt4/components/controller.hpp:111
+#: modules/gui/qt4/components/controller.hpp:112
 msgid "Take a snapshot"
 msgstr "Maak video snapshot"
 
-#: modules/gui/qt4/components/controller.hpp:112
+#: modules/gui/qt4/components/controller.hpp:113
 msgid "Loop from point A to point B continuously."
 msgstr "Herhaal continue van punt A naar punt B."
 
-#: modules/gui/qt4/components/controller.hpp:112
+#: modules/gui/qt4/components/controller.hpp:113
 msgid "Frame by frame"
 msgstr "Beeld voor beeld"
 
-#: modules/gui/qt4/components/controller.hpp:113
+#: modules/gui/qt4/components/controller.hpp:114
 msgid "Reverse"
 msgstr "Omkeren"
 
@@ -16916,9 +16942,8 @@ msgid "Unmute"
 msgstr "Ontdempen"
 
 #: modules/gui/qt4/components/controller_widget.cpp:198
-#, fuzzy
 msgid "Pause the playback"
-msgstr "Afsluiten na afspelen"
+msgstr "Het afspelen pauzeren"
 
 #: modules/gui/qt4/components/controller_widget.cpp:207
 msgid ""
@@ -17020,7 +17045,7 @@ msgstr "Onderbrekingen"
 
 #: modules/gui/qt4/components/info_panels.cpp:544
 msgid "Sent bitrate"
-msgstr "Verstuurde bitrate"
+msgstr "Verstuurde bitsnelheid"
 
 #: modules/gui/qt4/components/interface_widgets.cpp:241
 msgid "Current visualization"
@@ -17078,7 +17103,7 @@ msgstr "DVB type:"
 #: modules/gui/qt4/components/open_panels.cpp:739
 #: modules/gui/qt4/components/open_panels.cpp:1003
 msgid "Transponder symbol rate"
-msgstr "Transponder-symboolratio in KHz"
+msgstr "Transponder-symboolsnelheid in KHz"
 
 #: modules/gui/qt4/components/open_panels.cpp:748
 msgid "Bandwidth"
@@ -17210,12 +17235,12 @@ msgid ""
 msgstr ""
 "Als dit veld leeg is, dan heeft u verschillende\n"
 "waarden voor dvd, vcd en CDDA.\n"
-"U kan een unieke definiëren of ze individueel in \n"
+"U kunt een unieke definiëren of ze individueel in \n"
 "de geavanceerde instellingen instellen."
 
 #: modules/gui/qt4/components/simple_preferences.cpp:457
 msgid "This is VLC's skinnable interface. You can download other skins at"
-msgstr "Dit is VLCs thema interface. U kan andere thema's downloaden van "
+msgstr "Dit is VLCs thema interface. U kunt andere thema's downloaden van "
 
 #: modules/gui/qt4/components/simple_preferences.cpp:556
 msgid "Configure Hotkeys"
@@ -17246,39 +17271,34 @@ msgstr "Toep&assen"
 #: modules/gui/qt4/dialogs/help.cpp:207 modules/gui/qt4/dialogs/open.cpp:116
 #: modules/gui/qt4/dialogs/podcast_configuration.cpp:39
 #: modules/gui/qt4/dialogs/preferences.cpp:83
-#: modules/gui/qt4/dialogs/sout.cpp:93 modules/gui/qt4/dialogs/toolbar.cpp:186
+#: modules/gui/qt4/dialogs/sout.cpp:93 modules/gui/qt4/dialogs/toolbar.cpp:185
 msgid "&Cancel"
 msgstr "&Annuleren"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:39
-#: modules/gui/qt4/dialogs/toolbar.cpp:139
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:138
 msgid "Profile"
-msgstr "Prefilter"
+msgstr "Profiel"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:47
-#, fuzzy
 msgid "Edit selected profile"
-msgstr "Geselecteerd bestand automatisch afspelen"
+msgstr "Geselecteerd profiel bewerken"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:52
-#, fuzzy
 msgid "Delete selected profile"
-msgstr "Het geselecteerde item verwijderen"
+msgstr "Geselecteerd profiel verwijderen"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:57
-#, fuzzy
 msgid "Create a new profile"
-msgstr "Maak nieuwe bladwijzer aan"
+msgstr "Maak een nieuw profiel aan"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:364
 msgid " Profile Name Missing"
-msgstr ""
+msgstr "Profielnaam ontbreekt"
 
 #: modules/gui/qt4/components/sout/profile_selector.cpp:365
-#, fuzzy
 msgid "You must set a name for the profile."
-msgstr "Selecteer een naam voor het logboekbestand"
+msgstr "Geef een naam voor het profiel op."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:42
 #: modules/gui/qt4/ui/sout.h:140 modules/gui/qt4/ui/sout.h:333
@@ -17286,23 +17306,20 @@ msgid "Source"
 msgstr "Bron"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:45
-#, fuzzy
 msgid "Source:"
-msgstr "Bron"
+msgstr "Bron:"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:54
-#, fuzzy
 msgid "Type:"
-msgstr "Type"
+msgstr "Type:"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:75
-#, fuzzy
 msgid "File/Directory"
-msgstr "Map"
+msgstr "Bestand/Map"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:89
 msgid "This module writes the transcoded stream to a file."
-msgstr ""
+msgstr "Deze module schrijft de getranscodeerde stream naar een bestand."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:124
 #: modules/gui/qt4/dialogs/convert.cpp:110
@@ -17317,29 +17334,30 @@ msgstr ""
 "flv)"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:137
-#, fuzzy
 msgid "This module outputs the transcoded stream to a network via HTTP."
-msgstr "Gebruik dit om naar een netwerk te streamen."
+msgstr ""
+"Deze module schrijft de getranscodeerde stream naar een netwerk via HTTP."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:181
 msgid ""
 "This module outputs the transcoded stream to a network  via the mms protocol."
 msgstr ""
+"Deze module schrijft de getranscodeerde stream naar een netwerk via het mms "
+"protocol."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:225
-#, fuzzy
 msgid "This module outputs the transcoded stream to a network via UDP."
-msgstr "Gebruik dit om naar een netwerk te streamen."
+msgstr ""
+"Deze module schrijft de getranscodeerde stream naar een netwerk via UDP."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:271
-#, fuzzy
 msgid "This module outputs the transcoded stream to a network via RTP."
-msgstr "Gebruik dit om naar een netwerk te streamen."
+msgstr ""
+"Deze module schrijft de getranscodeerde stream naar een netwerk via RTP."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:306
-#, fuzzy
 msgid "Audio Port"
-msgstr "Audiopoort:"
+msgstr "Audiopoort"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:307
 msgid "Video Port"
@@ -17348,15 +17366,15 @@ msgstr "Videopoort"
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:347
 msgid "This module outputs the transcoded stream to an Icecast server."
 msgstr ""
+"Deze module schrijft de getranscodeerde stream naar een Icecast server."
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:368
 msgid "Mount Point"
 msgstr "Aankoppelingspunt"
 
 #: modules/gui/qt4/components/sout/sout_widgets.cpp:369
-#, fuzzy
 msgid "Login:pass"
-msgstr "Login:wachtwoord:"
+msgstr "Login:wachtwoord"
 
 #: modules/gui/qt4/dialogs/bookmarks.cpp:40
 msgid "Edit Bookmarks"
@@ -17395,38 +17413,32 @@ msgid "Bytes"
 msgstr "Bytes"
 
 #: modules/gui/qt4/dialogs/convert.cpp:44
-#, fuzzy
 msgid "Convert"
-msgstr "&Converteren"
+msgstr "Converteren"
 
 #: modules/gui/qt4/dialogs/convert.cpp:57
-#, fuzzy
 msgid "Destination file:"
-msgstr "Doelprefix"
+msgstr "Doelbestand:"
 
 #: modules/gui/qt4/dialogs/convert.cpp:65
-#, fuzzy
 msgid "Browse"
 msgstr "Bladeren"
 
 #: modules/gui/qt4/dialogs/convert.cpp:70
-#, fuzzy
 msgid "Display the output"
-msgstr "Streamuitvoer weergeven"
+msgstr "Uitvoer weergeven"
 
 #: modules/gui/qt4/dialogs/convert.cpp:71
 msgid "This display the resulting media, but can slow things down."
-msgstr ""
+msgstr "Geef de resulterende media weer, maar kan dingen trager maken."
 
 #: modules/gui/qt4/dialogs/convert.cpp:79
-#, fuzzy
 msgid "Settings"
-msgstr "Instelling"
+msgstr "Instellingen"
 
 #: modules/gui/qt4/dialogs/convert.cpp:94
-#, fuzzy
 msgid "&Start"
-msgstr "Statistieken"
+msgstr "&Start"
 
 #: modules/gui/qt4/dialogs/errors.cpp:42
 msgid "Errors"
@@ -17701,17 +17713,16 @@ msgid "&Convert / Save"
 msgstr "&Converteren / Opslaan"
 
 #: modules/gui/qt4/dialogs/openurl.cpp:62
-#, fuzzy
 msgid "Open URL"
-msgstr "Openen"
+msgstr "URL openen"
 
 #: modules/gui/qt4/dialogs/openurl.cpp:77
 msgid "Enter URL here..."
-msgstr ""
+msgstr "Geef hier de URL op..."
 
 #: modules/gui/qt4/dialogs/openurl.cpp:79
 msgid "Please enter the URL or path to the media you want to play"
-msgstr ""
+msgstr "Geef hier de URL of pad naar de media die u wilt afspelen"
 
 #: modules/gui/qt4/dialogs/openurl.cpp:83
 msgid ""
@@ -17719,6 +17730,9 @@ msgid ""
 "or the path to a file on your computer,\n"
 "it will be automatically selected."
 msgstr ""
+"Als uw klembord een geldige URL of het\n"
+"pad naar een bestand op uw computer bevat,\n"
+"zal deze automatisch geselecteerd worden."
 
 #: modules/gui/qt4/dialogs/plugins.cpp:45
 msgid "Plugins and extensions"
@@ -17784,6 +17798,8 @@ msgid ""
 "You should start by checking that source matches what you want your input to "
 "be and then press the \"Next\" button to continue.\n"
 msgstr ""
+"Met dit dialoogvenster laat u uw media streamen of converteren voor lokaal "
+"gebruik , gebruik op een privé netwerk of op het internet.\n"
 
 #: modules/gui/qt4/dialogs/sout.cpp:53
 msgid ""
@@ -17794,128 +17810,107 @@ msgstr ""
 "Stream-uitvoerregel.\n"
 "Deze wordt automatisch aangemaakt als u de bovenstaande instellingen "
 "aanpast,\n"
-"maar u kan het ook handmatig aanpassen."
+"maar u kunt het ook handmatig aanpassen."
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:49
+#: modules/gui/qt4/dialogs/toolbar.cpp:47
 msgid "Toolbars Editor"
-msgstr ""
+msgstr "Gereedschapbalk aanpassen"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:54
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:53
 msgid "Toolbar Elements"
-msgstr "Dummy-elementen"
+msgstr "Gereedschapbalkelementen"
+
+#: modules/gui/qt4/dialogs/toolbar.cpp:58
+msgid "Next widget style:"
+msgstr "Volgende widgetstijl"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:59
-#, fuzzy
-msgid "Next widget style:"
-msgstr "Volgende titel"
+msgid "Flat Button"
+msgstr "Platte knop"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:60
-#, fuzzy
-msgid "Flat Button"
-msgstr "Vette omtrek"
+msgid "Big Button"
+msgstr "Grote knop"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:61
-#, fuzzy
-msgid "Big Button"
-msgstr "Activatieknop"
-
-#: modules/gui/qt4/dialogs/toolbar.cpp:62
-#, fuzzy
 msgid "Native Slider"
-msgstr "Native American"
+msgstr "Oorspronkelijke schuiver"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:73
+#: modules/gui/qt4/dialogs/toolbar.cpp:72
 msgid "Main Toolbar"
-msgstr ""
+msgstr "Hoofdgereedschapsbalk"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:76
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:75
 msgid "Toolbar position:"
-msgstr "Logo positie"
+msgstr "Gereedschapsbalkpositie:"
+
+#: modules/gui/qt4/dialogs/toolbar.cpp:79
+msgid "Under the Video"
+msgstr "Onder de video"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:80
-#, fuzzy
-msgid "Under the Video"
-msgstr "Kloon de afbeelding"
-
-#: modules/gui/qt4/dialogs/toolbar.cpp:81
-#, fuzzy
 msgid "Above the Video"
-msgstr "Over de videofilters"
+msgstr "Boven de video"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:103
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:102
 msgid "Advanced Widget toolbar:"
-msgstr "Geavanceerde videofilter-instellingen"
+msgstr "Geavanceerde widgetgereedschapsbalk:"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:114
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:113
 msgid "Time Toolbar"
-msgstr "Tijdsbediening"
+msgstr "Tijdgereedschapsbalk"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:126
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:125
 msgid "Fullscreen Controller"
-msgstr "Schermvullende besturing weergeven"
+msgstr "Schermvullende besturing"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:143
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:142
 msgid "Select profile:"
-msgstr "Selecteer een bestand"
+msgstr "Selecteer profiel:"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:149
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:148
 msgid "Delete the current profile"
-msgstr "leeg de huidige pluginscache"
+msgstr "Verwijder het huidige profiel"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:184
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:183
 msgid "Cl&ose"
-msgstr "Sluiten"
+msgstr "&Sluiten"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:214 modules/gui/qt4/ui/profiles.h:454
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:213 modules/gui/qt4/ui/profiles.h:454
 msgid "Profile Name"
-msgstr "Log bestandsnaam"
+msgstr "Profielnaam"
 
-#: modules/gui/qt4/dialogs/toolbar.cpp:215
-#, fuzzy
+#: modules/gui/qt4/dialogs/toolbar.cpp:214
 msgid "Please enter the new profile name."
-msgstr "Geef een naam op voor de nieuwe subgroep"
+msgstr "Geef een naam voor het nieuwe profiel op."
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:295
-#, fuzzy
 msgid "Spacer"
-msgstr "Space"
+msgstr "Scheiding"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:300
 msgid "Expanding Spacer"
-msgstr ""
+msgstr "Uitschuivende scheiding"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:329
-#, fuzzy
 msgid "Splitter"
-msgstr "Spatializer"
+msgstr "Splitser"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:336
 msgid "Time Slider"
-msgstr ""
+msgstr "Tijdschuiver"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:349
-#, fuzzy
 msgid "Small Volume"
-msgstr "Standaard volume"
+msgstr "Klein volume"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:383
-#, fuzzy
 msgid "DVD menus"
-msgstr "Geen dvd-menu's"
+msgstr "Dvd-menu's"
 
 #: modules/gui/qt4/dialogs/toolbar.cpp:411
-#, fuzzy
 msgid "Advanced Buttons"
-msgstr "Geavanceerde opties"
+msgstr "Geavanceerde knoppen"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:77
 msgid "Video On Demand ( VOD )"
@@ -17974,31 +17969,31 @@ msgstr "Programmering:"
 msgid "VOD: "
 msgstr "VOD: "
 
-#: modules/gui/qt4/dialogs_provider.cpp:464
+#: modules/gui/qt4/dialogs_provider.cpp:465
 msgid "Open Directory"
 msgstr "Map openen"
 
-#: modules/gui/qt4/dialogs_provider.cpp:503
+#: modules/gui/qt4/dialogs_provider.cpp:504
 msgid "Open playlist..."
 msgstr "Afspeellijst openen..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:514
+#: modules/gui/qt4/dialogs_provider.cpp:515
 msgid "Save playlist as..."
 msgstr "Afspeellijst opslaan als..."
 
-#: modules/gui/qt4/dialogs_provider.cpp:516
+#: modules/gui/qt4/dialogs_provider.cpp:517
 msgid "XSPF playlist (*.xspf);; "
 msgstr "XSPF-afspeellijst (.xspf);;"
 
-#: modules/gui/qt4/dialogs_provider.cpp:517
+#: modules/gui/qt4/dialogs_provider.cpp:518
 msgid "M3U playlist (*.m3u);; "
 msgstr "M3U afspeellijst (*.m3u);; "
 
-#: modules/gui/qt4/dialogs_provider.cpp:518
+#: modules/gui/qt4/dialogs_provider.cpp:519
 msgid "HTML playlist (*.html)"
 msgstr "HTML afspeellijst (*.html)"
 
-#: modules/gui/qt4/dialogs_provider.cpp:664
+#: modules/gui/qt4/dialogs_provider.cpp:665
 msgid "Open subtitles..."
 msgstr "Ondertitelingen openen..."
 
@@ -18014,15 +18009,15 @@ msgstr "Ondertitelingsbestanden"
 msgid "All Files"
 msgstr "Alle bestanden"
 
-#: modules/gui/qt4/main_interface.cpp:507
+#: modules/gui/qt4/main_interface.cpp:499
 msgid "Privacy and Network Policies"
 msgstr "Privacy- en netwerkbeleiden"
 
-#: modules/gui/qt4/main_interface.cpp:511
+#: modules/gui/qt4/main_interface.cpp:503
 msgid "Privacy and Network Warning"
 msgstr "Privacy- en netwerkwaarschuwing"
 
-#: modules/gui/qt4/main_interface.cpp:514
+#: modules/gui/qt4/main_interface.cpp:506
 msgid ""
 "<p>The <i>VideoLAN Team</i> doesn't like when an application goes online "
 "without authorization.</p>\n"
@@ -18042,11 +18037,11 @@ msgstr ""
 "<p>Daarom, controleer de volgende opties. Standaard zal er bijna geen "
 "verbinding met internet gemaakt worden.</p>\n"
 
-#: modules/gui/qt4/main_interface.cpp:1007
+#: modules/gui/qt4/main_interface.cpp:1029
 msgid "Control menu for the player"
 msgstr "Besturingsmenu voor de speler"
 
-#: modules/gui/qt4/main_interface.cpp:1060
+#: modules/gui/qt4/main_interface.cpp:1082
 msgid "Paused"
 msgstr "Gepauzeerd"
 
@@ -18381,7 +18376,7 @@ msgstr ""
 
 #: modules/gui/qt4/qt4.cpp:94
 msgid "Show playing item name in window title"
-msgstr "Geef de naam van het afspelende item in de venstertitel."
+msgstr "Geef de naam van het afspelende item in de venstertitel"
 
 #: modules/gui/qt4/qt4.cpp:95
 msgid "Show the name of the song or video in the controler window title."
@@ -18667,7 +18662,7 @@ msgstr "Bestandselectie"
 
 #: modules/gui/qt4/ui/open_file.h:208
 msgid "You can select local files with the following list and buttons."
-msgstr "U kan lokale bestanden met de volgende lijst en knoppen selecteren."
+msgstr "U kunt lokale bestanden met de volgende lijst en knoppen selecteren."
 
 #: modules/gui/qt4/ui/open_file.h:209
 msgid "Add..."
@@ -18711,99 +18706,86 @@ msgid "Podcast URLs list"
 msgstr "Podcast webadressenlijst"
 
 #: modules/gui/qt4/ui/profiles.h:455
-#, fuzzy
 msgid "MPEG-TS"
-msgstr "MJPEG"
+msgstr "MPEG-TS"
 
 #: modules/gui/qt4/ui/profiles.h:456
-#, fuzzy
 msgid "MPEG-PS"
-msgstr "MJPEG"
+msgstr "MPEG-PS"
 
 #: modules/gui/qt4/ui/profiles.h:457
-#, fuzzy
 msgid "WAV"
-msgstr "AVI"
+msgstr "WAV"
 
 #: modules/gui/qt4/ui/profiles.h:458
-#, fuzzy
 msgid "ASF/WMV"
-msgstr "ASF"
+msgstr "ASF/WMV"
 
 #: modules/gui/qt4/ui/profiles.h:459
-#, fuzzy
 msgid "Ogg/Ogm"
-msgstr "Ogg/OGM muxer"
+msgstr "Ogg/Ogm"
 
 #: modules/gui/qt4/ui/profiles.h:460
 msgid "RAW"
-msgstr ""
+msgstr "RAW"
 
 #: modules/gui/qt4/ui/profiles.h:461
-#, fuzzy
 msgid "MPEG 1"
-msgstr "MPEG1"
+msgstr "MPEG 1"
 
 #: modules/gui/qt4/ui/profiles.h:462
 msgid "FLV"
-msgstr ""
+msgstr "FLV"
 
 #: modules/gui/qt4/ui/profiles.h:464
-#, fuzzy
 msgid "MP4/MOV"
-msgstr "MP4/MOV demuxer"
+msgstr "MP4/MOV"
 
 #: modules/gui/qt4/ui/profiles.h:466
-#, fuzzy
 msgid "MKV"
-msgstr "MOV"
+msgstr "MKV"
 
 #: modules/gui/qt4/ui/profiles.h:467
 msgid "Encapsulation"
 msgstr "Inkapselen"
 
 #: modules/gui/qt4/ui/profiles.h:471 modules/gui/qt4/ui/profiles.h:490
-#, fuzzy
 msgid " kb/s"
-msgstr "%u Kb/s"
+msgstr "kb/s"
 
 #: modules/gui/qt4/ui/profiles.h:472
-#, fuzzy
 msgid "Frame Rate"
 msgstr "Beeldsnelheid"
 
 #: modules/gui/qt4/ui/profiles.h:474
-#, fuzzy
 msgid " fps"
-msgstr " s"
+msgstr " fps"
 
 #: modules/gui/qt4/ui/profiles.h:478 modules/gui/qt4/ui/profiles.h:481
-#, fuzzy
 msgid "00000; "
-msgstr "00:00:00"
+msgstr "00000; "
 
 #: modules/gui/qt4/ui/profiles.h:483
 msgid ""
 "You just need to fill one of the three following parameters, VLC will "
 "autodetect the other using the original aspect ratio"
 msgstr ""
+"U hoeft maar een van de volgende drie parameters in te vullen, VLC zal "
+"automatisch de anderen detecteren door de beeldverhouding te gebruiken"
 
 #: modules/gui/qt4/ui/profiles.h:484
-#, fuzzy
 msgid "Keep original video track"
-msgstr "Behoud originele grootte"
+msgstr "Behoud origineel videospoor"
 
 #: modules/gui/qt4/ui/profiles.h:485
 msgid "Video codec"
 msgstr "Video codec"
 
 #: modules/gui/qt4/ui/profiles.h:487
-#, fuzzy
 msgid "Keep original audio track"
-msgstr "Behoud originele grootte"
+msgstr "Behoud origineel audiospoor"
 
 #: modules/gui/qt4/ui/profiles.h:492
-#, fuzzy
 msgid "Sample Rate"
 msgstr "Samplesnelheid"
 
@@ -18813,7 +18795,7 @@ msgstr "Audio codec"
 
 #: modules/gui/qt4/ui/profiles.h:495
 msgid "Overlay subtitles on the video"
-msgstr "Overlap ondertitelingen op de video"
+msgstr "Plaats ondertiteling op de video"
 
 #: modules/gui/qt4/ui/sout.h:231 modules/gui/qt4/ui/sout.h:334
 #: modules/gui/qt4/ui/sout.h:344
@@ -18922,7 +18904,7 @@ msgstr "Opstartbeleid"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:317
 msgid "Allow only one instance"
-msgstr "VLC niet nogmaals starten als VLC al draait."
+msgstr "VLC niet nogmaals starten als VLC al draait"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:318
 msgid "File associations:"
@@ -18950,7 +18932,7 @@ msgstr "Filter"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:329
 msgid "Separate words by | (without space)"
-msgstr "Scheid woorden door | (zonder spatie)"
+msgstr "Scheid woorden met | (zonder spatie)"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:332
 msgid "Interface Type"
@@ -19020,7 +19002,7 @@ msgstr " px"
 
 #: modules/gui/qt4/ui/sprefs_video.h:286
 msgid "Accelerated video output (Overlay)"
-msgstr "Hardwarematig versnelde video-uitvoer (Overlap)"
+msgstr "Versnelde video-uitvoer (Overlay)"
 
 #: modules/gui/qt4/ui/sprefs_video.h:288
 #: modules/video_output/msw/directx.c:131
@@ -19245,7 +19227,7 @@ msgstr "Aantal klonen"
 
 #: modules/gui/qt4/ui/video_effects.h:934
 msgid "Vout/Overlay"
-msgstr "Vout/Overlap"
+msgstr "Vout/Overlay"
 
 #: modules/gui/qt4/ui/video_effects.h:935
 msgid "Add logo"
@@ -19481,15 +19463,16 @@ msgstr "Kies bestand"
 msgid ""
 "Embed the video inside the interface instead of having it in a separate "
 "window."
-msgstr "Geef video in de interface weer in plaats van in een apart venster."
+msgstr ""
+"Geef video binnen de interface weer in plaats van in een apart venster."
 
 #: modules/gui/wince/wince.cpp:67
 msgid "WinCE interface"
-msgstr "WinCE interface"
+msgstr "WinCE-interface"
 
 #: modules/gui/wince/wince.cpp:78
 msgid "WinCE dialogs provider"
-msgstr "WinCE dialoog voorziening"
+msgstr "WinCE-dialoogvoorziening"
 
 #: modules/meta_engine/folder.c:56
 msgid "Folder meta data"
@@ -19923,8 +19906,8 @@ msgid ""
 "set to something different than 0 this option will override the relative "
 "font size."
 msgstr ""
-"Dit is de standaard grootte voor de lettertypes die worden weergegeven op de "
-"video. Als u dit naar iets anders dan 0 zet, zal deze optie de relatieve "
+"Dit is de standaardgrootte voor de lettertypen die worden weergegeven op de "
+"video. Als u iets anders dan 0 instelt, zal deze optie de relatieve "
 "lettergrootte overschrijven."
 
 #: modules/misc/freetype.c:91 modules/misc/win32text.c:65
@@ -19938,7 +19921,7 @@ msgstr ""
 #: modules/misc/freetype.c:94 modules/misc/quartztext.c:91
 #: modules/misc/win32text.c:68
 msgid "Text default color"
-msgstr "Standaard tekstkleur"
+msgstr "Standaardtekstkleur"
 
 #: modules/misc/freetype.c:95 modules/misc/quartztext.c:92
 #: modules/misc/win32text.c:69
@@ -19948,8 +19931,8 @@ msgid ""
 "then blue. #000000 = black, #FF0000 = red, #00FF00 = green, #FFFF00 = yellow "
 "(red + green), #FFFFFF = white"
 msgstr ""
-"De kleur van de tekst die zal worden weergegeven op de video. Dit moet een "
-"hexadecimale waarde (zoals HTML kleuren) zijn. De eerste twee tekens zijn "
+"De kleur van de tekst die wordt weergegeven op de video. Dit moet een "
+"hexadecimale waarde (zoals HTML-kleuren) zijn. De eerste twee tekens zijn "
 "voor rood, dan groen, dan blauw. #000000 = zwart, #FF0000 = rood, #00FF00 = "
 "groen, #FFFF00 = geel (rood + groen), #FFFFFF = wit"
 
@@ -19964,7 +19947,7 @@ msgid ""
 "This is the relative default size of the fonts that will be rendered on the "
 "video. If absolute font size is set, relative size will be overriden."
 msgstr ""
-"Dit is de relatieve standaardgrootte van de lettertypes die op de video "
+"Dit is de relatieve standaardgrootte van de lettertypen die op de video "
 "weergegeven zullen worden. Als de absolute lettertypegrootte ingesteld is, "
 "zal de relatieve grootte overschreven worden."
 
@@ -19990,15 +19973,15 @@ msgstr "Groter"
 
 #: modules/misc/freetype.c:107
 msgid "Use YUVP renderer"
-msgstr "Gebruik YUVP renderer"
+msgstr "Gebruik YUVP-weergave"
 
 #: modules/misc/freetype.c:108
 msgid ""
 "This renders the font using \"paletized YUV\". This option is only needed if "
 "you want to encode into DVB subtitles"
 msgstr ""
-"Dit tekent het lettertype door \"gepaletizeerd YUV\" te gebruiken. Deze "
-"optie is alleen nodig als u naar DVB ondertitelingen wilt coderen."
+"Dit geeft het lettertype weer door \"YUV met paletten\" te gebruiken. Deze "
+"optie is alleen nodig als u wilt coderen als DVB-ondertiteling."
 
 #: modules/misc/freetype.c:110
 msgid "Font Effect"
@@ -20009,8 +19992,8 @@ msgid ""
 "It is possible to apply effects to the rendered text to improve its "
 "readability."
 msgstr ""
-"Het is mogelijk effecten op de getekende tekst toe te passen om de "
-"leesbaarheid te vergroten."
+"Het is mogelijk effecten op de weergegeven tekst toe te passen voor "
+"verbeterde leesbaarheid."
 
 #: modules/misc/freetype.c:120
 msgid "Background"
@@ -20022,27 +20005,27 @@ msgstr "Vette omtrek"
 
 #: modules/misc/freetype.c:132 modules/misc/win32text.c:92
 msgid "Text renderer"
-msgstr "Tekst renderer"
+msgstr "Tekstweergave"
 
 #: modules/misc/freetype.c:133
 msgid "Freetype2 font renderer"
-msgstr "Freetype2 lettertype renderer"
+msgstr "Freetype2 lettertypeweergave"
 
 #: modules/misc/gnutls.c:78
 msgid "Expiration time for resumed TLS sessions"
-msgstr "Verlooptijd voor hervatte TLS sessies"
+msgstr "Verlooptijd voor hervatte TLS-sessies"
 
 #: modules/misc/gnutls.c:80
 msgid ""
 "It is possible to cache the resumed TLS sessions. This is the expiration "
 "time of the sessions stored in this cache, in seconds."
 msgstr ""
-"Het is mogelijk hervatte TLS sessies te buffferen. Dit is de verlooptijd van "
+"Het is mogelijk hervatte TLS-sessies te buffferen. Dit is de verlooptijd van "
 "de sessie opgeslagen in de buffer, in seconden."
 
 #: modules/misc/gnutls.c:83
 msgid "Number of resumed TLS sessions"
-msgstr "Aantal hervatte TLS sessies"
+msgstr "Aantal hervatte TLS-sessies"
 
 #: modules/misc/gnutls.c:85
 msgid ""
@@ -20241,31 +20224,31 @@ msgid ""
 "$N Name, $O Audio language, $P Position, $R Rate, $S Sample rate, $T Time "
 "elapsed, $U Publisher, $V Volume"
 msgstr ""
-"Formaat van de regel  om naar Telepathy.Defaults te zenden voor \"Artiest - "
-"Titel\" ($a - $t). U kan de volgende substituties gebruiken: $a Artiest, $b "
+"Structuur van de regel om naar Telepathy.Defaults te zenden voor \"Artiest - "
+"Titel\" ($a - $t). U kunt de volgende substituties gebruiken: $a Artiest, $b "
 "Album, $c Copyright, $d Beschrijving, $e codeerder, $g Genre, $l Taal, $n "
 "nummer, $p Nu speelt, $r Score, $s Ondertitelingstaal, $t Titel, $u URL, $A "
-"Datum, $B Bitrate, $C Hoofdstuk, $D Duur, $F URI, $I Video Titel, $L Tijd "
-"resterend, $N Naam, $O Audiotaal, $P Positie, $R Rate, $S Sample rate, $T "
-"Tijd verstreken, $U Uitgever, $V Volume"
+"Datum, $B Bitsnelheid, $C Hoofdstuk, $D Duur, $F URI, $I Video Titel, $L "
+"Resterende tijd, $N Naam, $O Audiotaal, $P Positie, $R Rate, $S "
+"Samplesnelheid, $T Tijd verstreken, $U Uitgever, $V Volume"
 
 #: modules/misc/notify/telepathy.c:81
 msgid "Telepathy \"Now Playing\" (MissionControl)"
 msgstr "Telepathy \"Nu speelt\" (MissionControl)"
 
-#: modules/misc/notify/xosd.c:70
+#: modules/misc/notify/xosd.c:67
 msgid "Flip vertical position"
 msgstr "Verticale positie spiegelen"
 
-#: modules/misc/notify/xosd.c:71
+#: modules/misc/notify/xosd.c:68
 msgid "Display XOSD output at the bottom of the screen instead of the top."
 msgstr "Geef XOSD uitvoer beneden in het scherm weer in plaats van bovenaan."
 
-#: modules/misc/notify/xosd.c:74
+#: modules/misc/notify/xosd.c:71
 msgid "Vertical offset"
 msgstr "Verticale uitlijning"
 
-#: modules/misc/notify/xosd.c:75
+#: modules/misc/notify/xosd.c:72
 msgid ""
 "Vertical offset between the border of the screen and the displayed text (in "
 "pixels, defaults to 30 pixels)."
@@ -20273,26 +20256,26 @@ msgstr ""
 "Verticale uitlijning tussen de rand van het scherm en de weergegeven tekst "
 "(in pixels, standaard naar 30 pixels)."
 
-#: modules/misc/notify/xosd.c:79
+#: modules/misc/notify/xosd.c:76
 msgid "Shadow offset"
 msgstr "Schaduw offset"
 
-#: modules/misc/notify/xosd.c:80
+#: modules/misc/notify/xosd.c:77
 msgid ""
 "Offset between the text and the shadow (in pixels, defaults to 2 pixels)."
 msgstr ""
 "Uitlijning tussen de tekst en de schaduw (in pixels, standaard naar 2 "
 "pixels)."
 
-#: modules/misc/notify/xosd.c:84
+#: modules/misc/notify/xosd.c:81
 msgid "Font used to display text in the XOSD output."
 msgstr "Gebruik dit lettertype voor tekst in xosd uitvoer."
 
-#: modules/misc/notify/xosd.c:86
+#: modules/misc/notify/xosd.c:83
 msgid "Color used to display text in the XOSD output."
 msgstr "Gebruik deze kleur voor tekst in xosd uitvoer."
 
-#: modules/misc/notify/xosd.c:91
+#: modules/misc/notify/xosd.c:88
 msgid "XOSD interface"
 msgstr "XOSD interface"
 
@@ -20322,23 +20305,23 @@ msgstr "HTML afspeellijst exporteerder"
 
 #: modules/misc/probe/hal.c:58 modules/services_discovery/hal.c:84
 msgid "HAL devices detection"
-msgstr "HAL apparaten detectie"
+msgstr "HAL apparatendetectie"
 
 #: modules/misc/qte_main.cpp:70
 msgid "Run as standalone Qt/Embedded GUI Server"
-msgstr "Draai als standalone Qt/Embedded GUI server"
+msgstr "Draai als alleenstaande Qt/Embedded GUI server"
 
 #: modules/misc/qte_main.cpp:71
 msgid ""
 "Use this option to run as standalone Qt/Embedded GUI Server. This option is "
 "equivalent to the -qws option from normal Qt."
 msgstr ""
-"Gebruik deze optie om als standalone Qt/Embedded GUI server te draaien. Deze "
-"optie is gelijk aan de -qws optie bij normaal Qt."
+"Gebruik deze optie om als alleenstaande Qt/Embedded GUI server te draaien. "
+"Deze optie is gelijk aan de -qws optie bij normaal Qt."
 
 #: modules/misc/qte_main.cpp:76
 msgid "Qt Embedded GUI helper"
-msgstr "Qt Embedded GUI helper"
+msgstr "Qt geïntegreerde GUI helper"
 
 #: modules/misc/qte_main.cpp:180
 msgid "video"
@@ -20346,15 +20329,15 @@ msgstr "video"
 
 #: modules/misc/quartztext.c:86
 msgid "Name for the font you want to use"
-msgstr "Naam van het te gebruiken lettertype"
+msgstr "Naam van lettertype dat u wilt gebruiken"
 
 #: modules/misc/quartztext.c:112
 msgid "Mac Text renderer"
-msgstr "Mac tekstrenderer"
+msgstr "Mac Tekstweergave"
 
 #: modules/misc/quartztext.c:113
 msgid "Quartz font renderer"
-msgstr "Quartz lettertyperenderer"
+msgstr "Quartz-lettertypeweergave"
 
 #: modules/misc/rtsp.c:62
 msgid "RTSP host address"
@@ -20471,7 +20454,7 @@ msgstr "Verschillende stress tests"
 
 #: modules/misc/win32text.c:93
 msgid "Win32 font renderer"
-msgstr "Win32 lettertype renderer"
+msgstr "Win32-lettertypeweergave"
 
 #: modules/misc/xml/libxml.c:45
 msgid "XML Parser (using libxml2)"
@@ -20515,7 +20498,7 @@ msgstr "ASF pakketgrootte -- standaard is 4096 bytes"
 
 #: modules/mux/asf.c:64
 msgid "Bitrate override"
-msgstr "Bitrate overschrijven"
+msgstr "Bitsnelheid overschrijven"
 
 #: modules/mux/asf.c:65
 msgid ""
@@ -20523,9 +20506,9 @@ msgid ""
 "Windows Media Player will cache streamed content. Set to audio+video bitrate "
 "in bytes"
 msgstr ""
-"Probeer ASF bitrate niet te raden. Zet dit om te bepalen hoe Windows "
-"Mediaspeler gestreamde inhoud moet bufferen. Zet naar audio+video bitrate in "
-"bytes."
+"Probeer ASF bitsnelheid niet te raden. Zet dit om te bepalen hoe Windows "
+"Mediaspeler gestreamde inhoud moet bufferen. Zet naar audio+video "
+"bitsnelheid in bytes."
 
 #: modules/mux/asf.c:69
 msgid "ASF muxer"
@@ -20711,13 +20694,13 @@ msgid ""
 "bitrate between the two boundaries. This avoids having huge bitrate peaks, "
 "especially for reference frames."
 msgstr ""
-"Snijd de stream in stukken van opgegeven duur en verzekert een constante "
-"bitrate tussen de twee grenzen. Dit voorkomt het krijgen van gigantische "
-"bitrate pieken, voornamelijk voor referentieframes."
+"Snijd de stream in stukken van opgegeven duur en zorg voor een constante "
+"bitsnelheid tussen de twee grenzen. Dit voorkomt enorme pieken in de "
+"bitsnelheid, met name voor referentiebeelden."
 
 #: modules/mux/mpeg/ts.c:138
 msgid "Use keyframes"
-msgstr "Gebruik keyframes"
+msgstr "Gebruik sleutelbeelden"
 
 #: modules/mux/mpeg/ts.c:139
 msgid ""
@@ -20727,23 +20710,22 @@ msgid ""
 "enhances the efficiency of the shaping algorithm, since I frames are usually "
 "the biggest frames in the stream."
 msgstr ""
-"Indien actief, en vorming is opgegeven, zal de TS muxer grenzen bij het "
-"einde van I afbeeldingen plaatsen. In dat geval zal de vormingsduur "
-"opgegeven door de gebruiker een ergste geval zijn als er geen "
-"referentieframe beschikbaar is. Dit verhoogt de efficientie van de "
-"vormingsalgoritme, omdat I frames meestal de grootste frames in een stream "
-"zijn."
+"Indien actief en als vorming is opgegeven, zal de TS-muxer randen plaatsen "
+"aan het eind van I-beelden. In dat geval zal de opgegeven vormingsduur "
+"opgegeven een ergste geval zijn als er geen referentiebeeld beschikbaar is. "
+"Dit verhoogt de efficientie van het vormingsalgoritme, omdat I-beelden "
+"meestal de grootste beelden in een stream zijn."
 
 #: modules/mux/mpeg/ts.c:146
 msgid "PCR delay (ms)"
-msgstr "PCR vertraging (ms)"
+msgstr "PCR-vertraging (ms)"
 
 #: modules/mux/mpeg/ts.c:147
 msgid ""
 "Set at which interval PCRs (Program Clock Reference) will be sent (in "
 "milliseconds). This value should be below 100ms. (default is 70ms)."
 msgstr ""
-"Zet op welke interval PCR's (Program Clock Reference) verzonden zal worden "
+"Stel in op welk interval PCR's (Program Clock Reference) worden verzonden "
 "(in milliseconden). Deze waarde moet onder de 100ms zijn. (standaard is "
 "70ms)."
 
@@ -20810,7 +20792,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:180
 msgid "Packet size in bytes to encrypt"
-msgstr "Pakketgrootte in bytes om te versleutelen."
+msgstr "Pakketgrootte in bytes om te versleutelen"
 
 #: modules/mux/mpeg/ts.c:181
 msgid ""
@@ -20848,7 +20830,7 @@ msgstr "H.264 video packetizer"
 msgid "MLP/TrueHD parser"
 msgstr "MLP/TrueHD verwerker"
 
-#: modules/packetizer/mpeg4audio.c:182
+#: modules/packetizer/mpeg4audio.c:183
 msgid "MPEG4 audio packetizer"
 msgstr "MPEG4 audio packetizer"
 
@@ -20858,20 +20840,20 @@ msgstr "MPEG4 video packetizer"
 
 #: modules/packetizer/mpegvideo.c:56
 msgid "Sync on Intra Frame"
-msgstr "Synchronizeer op intra-frame"
+msgstr "Synchronizeer op intra-beeld"
 
 #: modules/packetizer/mpegvideo.c:57
 msgid ""
 "Normally the packetizer would sync on the next full frame. This flags "
 "instructs the packetizer to sync on the first Intra Frame found."
 msgstr ""
-"Gewoonlijk zal de packetizer op de volgende volle frame synchroniseren. Deze "
-"optie vertelt de packetizer om op de eerst-gevonden Intra Frame te "
+"Gewoonlijk synchroniseert de packetizer op het volgende hele beeld. Deze "
+"optie vertelt de packetizer om op het eerst-gevonden Intra Beeld te "
 "synchroniseren."
 
 #: modules/packetizer/mpegvideo.c:70
 msgid "MPEG-I/II video packetizer"
-msgstr "MPEG I/II video packetizer"
+msgstr "MPEG I/II videopacketizer"
 
 #: modules/packetizer/mpegvideo.c:71
 msgid "MPEG Video"
@@ -20905,7 +20887,7 @@ msgid ""
 "However, you can specify a specific address."
 msgstr ""
 "De SAP module kiest normaal zelf de juiste adressen om naar te luisteren. "
-"Maar, u kan ook een specifiek adres opgeven."
+"Maar u kunt ook een specifiek adres opgeven."
 
 #: modules/services_discovery/sap.c:89
 msgid "IPv4 SAP"
@@ -20977,15 +20959,15 @@ msgid ""
 "time, but you could end up with items corresponding to legacy streams."
 msgstr ""
 "Dit activeert een SAP buffermechanisme. Dit resulteert in langzamere SAP "
-"opstarttijd, maar u kan items krijgen die corresponderen met oudere streams."
+"opstarttijd, maar u kunt items krijgen die corresponderen met oudere streams."
 
 #: modules/services_discovery/sap.c:125
 msgid "SAP Announcements"
-msgstr "SAP Aankondigingen"
+msgstr "SAP-aankondigingen"
 
 #: modules/services_discovery/sap.c:151
 msgid "SDP Descriptions parser"
-msgstr "SDP omschrijving inlezer"
+msgstr "SDP-omschrijving inlezer"
 
 #: modules/services_discovery/sap.c:895 modules/services_discovery/sap.c:899
 msgid "Session"
@@ -21141,7 +21123,7 @@ msgstr "Vertraging (in ms) voordat de plaatshouder start."
 
 #: modules/stream_out/bridge.c:76
 msgid "Wait for I frame before toggling placholder"
-msgstr "Wacht op I-frame voor aanzetten plaatshouder"
+msgstr "Wacht op I-beeld voor aanzetten plaatshouder"
 
 #: modules/stream_out/bridge.c:78
 msgid ""
@@ -21151,9 +21133,9 @@ msgid ""
 "frames in the streams."
 msgstr ""
 "Indien actief zal het wisselen tussen plaatshouder en de normale stream "
-"alleen plaatsvinden op I frames. Dit voorkomt onjuistheden bij "
+"alleen plaatsvinden op I-beelden. Dit voorkomt onjuistheden bij "
 "streamwisselen ten koste van een kleine vertraging, afhankelijk van de "
-"frequentie van I frames in de streams."
+"frequentie van I-beelden in de streams."
 
 #: modules/stream_out/bridge.c:92
 msgid "Bridge"
@@ -21177,11 +21159,11 @@ msgstr "Beschrijving streamuitvoer"
 
 #: modules/stream_out/display.c:42
 msgid "Enable/disable audio rendering."
-msgstr "Audio rendering (de)activeren."
+msgstr "Audio afspelen (de)activeren."
 
 #: modules/stream_out/display.c:44
 msgid "Enable/disable video rendering."
-msgstr "Video rendering (de)activeren."
+msgstr "Videoweergave (de)activeren."
 
 #: modules/stream_out/display.c:46
 msgid "Introduces a delay in the display of the stream."
@@ -21205,7 +21187,7 @@ msgstr "Dit is de standaard uitvoer toegangsmethode die gebruikt zal worden."
 
 #: modules/stream_out/es.c:45
 msgid "Audio output access method"
-msgstr "Audio uitvoer toegangsmethode"
+msgstr "Audio-uitvoertoegangsmethode"
 
 #: modules/stream_out/es.c:47
 msgid "This is the output access method that will be used for audio."
@@ -21213,7 +21195,7 @@ msgstr "Dit is de uitvoer-toegangs methode dat voor audio gebruikt zal worden."
 
 #: modules/stream_out/es.c:48
 msgid "Video output access method"
-msgstr "Video-uitvoer toegangsmethode"
+msgstr "Video-uitvoertoegangsmethode"
 
 #: modules/stream_out/es.c:50
 msgid "This is the output access method that will be used for video."
@@ -21646,7 +21628,7 @@ msgstr "GOP grootte"
 
 #: modules/stream_out/switcher.c:106
 msgid "Number of P frames between two I frames."
-msgstr "Aantal P beelden tussen 2 I beelden."
+msgstr "Aantal P beelden tussen 2 I-beelden."
 
 #: modules/stream_out/switcher.c:107
 msgid "Quantizer scale"
@@ -21691,11 +21673,11 @@ msgstr "Dit is de video codec die gebruikt zal worden."
 #: modules/stream_out/transcode.c:62
 #: modules/stream_out/transrate/transrate.c:60
 msgid "Video bitrate"
-msgstr "Video-bitrate"
+msgstr "Video-bitsnelheid"
 
 #: modules/stream_out/transcode.c:64
 msgid "Target bitrate of the transcoded video stream."
-msgstr "Doel bitrate van de transcoded video stream."
+msgstr "Doel bitsnelheid van de transcoded video stream."
 
 #: modules/stream_out/transcode.c:65
 msgid "Video scaling"
@@ -21707,11 +21689,11 @@ msgstr "Schalingsfactor om toe te passen tijdens transcoding (bijv.: 0.25)"
 
 #: modules/stream_out/transcode.c:68
 msgid "Video frame-rate"
-msgstr "Video frame-rate"
+msgstr "Videobeeldsnelheid"
 
 #: modules/stream_out/transcode.c:70
 msgid "Target output frame rate for the video stream."
-msgstr "Doel uitvoer framerate voor de videostream."
+msgstr "Doel uitvoer beeldsnelheid voor de videostream."
 
 #: modules/stream_out/transcode.c:73
 msgid "Deinterlace the video before encoding."
@@ -21719,7 +21701,7 @@ msgstr "Deïnterlace de video voor de codering."
 
 #: modules/stream_out/transcode.c:76
 msgid "Specify the deinterlace module to use."
-msgstr "Geeft de deïnterlace-module om te gebruiken op."
+msgstr "Stel de deïnterlacemodule in."
 
 #: modules/stream_out/transcode.c:83
 msgid "Maximum video width"
@@ -21742,7 +21724,7 @@ msgid ""
 "Video filters will be applied to the video streams (after overlays are "
 "applied). You must enter a comma-separated list of filters."
 msgstr ""
-"Videofilters die (na de overlapfilters) op de videostreams toegepast worden. "
+"Videofilters die (na de overlayfilters) op de videostreams toegepast worden. "
 "U moet een door komma's gescheiden lijst van filters opgeven."
 
 #: modules/stream_out/transcode.c:94
@@ -21754,8 +21736,8 @@ msgid ""
 "This is the audio encoder module that will be used (and its associated "
 "options)."
 msgstr ""
-"Dit is de audiocodeermodule (en zijn bijbehorende instellingen) die gebruikt "
-"zal worden."
+"Dit is de audiocodeermodule (en zijn bijbehorende instellingen) die wordt "
+"gebruikt."
 
 #: modules/stream_out/transcode.c:98
 msgid "Destination audio codec"
@@ -21767,7 +21749,7 @@ msgstr "Dit is de audiocodec die gebruikt zal worden."
 
 #: modules/stream_out/transcode.c:101
 msgid "Audio bitrate"
-msgstr "Audio bitratio"
+msgstr "Audio-bitsnelheid"
 
 #: modules/stream_out/transcode.c:103
 msgid "Target bitrate of the transcoded audio stream."
@@ -21829,12 +21811,12 @@ msgid ""
 msgstr ""
 "Dit staat u toe om overlays (ook bekend als \"ondertitels\" toe te voegen "
 "aan de getranscodeerde videostream. De ondertitels geproduceerd door de "
-"filters zullen direct op de video gelegd worden. U moet een lijst met door "
-"komma's gescheiden waardes van ondertitelings-modules specifiëren."
+"filters zullen direct op de video geplaatst worden. U moet een lijst van "
+"door komma's gescheiden ondertitelmodules opgeven."
 
 #: modules/stream_out/transcode.c:130 modules/video_filter/osdmenu.c:135
 msgid "OSD menu"
-msgstr "OSD menu"
+msgstr "OSD-menu"
 
 #: modules/stream_out/transcode.c:132
 msgid ""
@@ -21870,7 +21852,7 @@ msgid ""
 "This option will drop/duplicate video frames to synchronise the video track "
 "on the audio track."
 msgstr ""
-"Deze optie dupliceert of verwijdert videobeelden om het videospoor te "
+"Deze optie verwijdert/dupliceert videobeelden om het videospoor te "
 "synchroniseren met het audiospoor."
 
 #: modules/stream_out/transcode.c:148
@@ -21878,8 +21860,8 @@ msgid ""
 "The transcoder will drop frames if your CPU can't keep up with the encoding "
 "rate."
 msgstr ""
-"De transcoder zal frames laten vallen als uw CPU de coderingssnelheid niet "
-"bij kan houden."
+"De transcoder zal beelden verliezen als uw CPU de coderingssnelheid niet bij "
+"kan houden."
 
 #: modules/stream_out/transcode.c:163
 msgid "Transcode stream output"
@@ -21887,15 +21869,15 @@ msgstr "Transcode stream uitvoer"
 
 #: modules/stream_out/transcode.c:217
 msgid "Overlays/Subtitles"
-msgstr "Overlapping/Ondertiteling"
+msgstr "Overlays/ondertiteling"
 
 #: modules/stream_out/transrate/transrate.c:63
 #, no-c-format
 msgid ""
 "New target video bitrate. Quality is ok for -10/15\\% of the originalbitrate."
 msgstr ""
-"Nieuwe bitrate van doelvideo. Kwaliteit is goed bij -10/15\\% van de "
-"originele bitrate."
+"Nieuwe bitsnelheid van doelvideo. Kwaliteit is goed bij -10/15\\% van de "
+"originele bitsnelheid."
 
 #: modules/stream_out/transrate/transrate.c:66
 msgid "Shaping delay"
@@ -22048,25 +22030,25 @@ msgstr ""
 "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n"
 " http://www.vdr-wiki.de/wiki/index.php/AtmoWin\n"
 "\n"
-"U kan daar gedetailleerde informatie vinden over hoe u zelf een AtmoLight "
+"U kunt daar gedetailleerde informatie vinden over hoe u zelf een AtmoLight "
 "bouwt en waar u de benodigde onderdelen kunt krijgen.\n"
-"U kan ook afbeeldingen en video's van een apparaat in actie zien."
+"U kunt ook afbeeldingen en video's van een apparaat in actie zien."
 
 #: modules/video_filter/atmo/atmo.cpp:134
 msgid "Save Debug Frames"
-msgstr "Debugframes opslaan"
+msgstr "Debugbeelden opslaan"
 
 #: modules/video_filter/atmo/atmo.cpp:135
 msgid "Write every 128th miniframe to a folder."
-msgstr "Schrijf elke 128ste miniframe naar een map."
+msgstr "Bewaar elke 128ste minibeeld in een map."
 
 #: modules/video_filter/atmo/atmo.cpp:136
 msgid "Debug Frame Folder"
-msgstr "Debugframe map"
+msgstr "Debugbeeldenmap"
 
 #: modules/video_filter/atmo/atmo.cpp:137
 msgid "The path where the debugframes should be saved"
-msgstr "Het pad waar de debug frames naartoe moeten worden opgeslagen"
+msgstr "Het pad waarin de debugbeelden moeten worden opgeslagen"
 
 #: modules/video_filter/atmo/atmo.cpp:141
 msgid "Extracted Image Width"
@@ -22226,12 +22208,12 @@ msgid ""
 "Increasing this value will result in color more depending on the border of "
 "the frame."
 msgstr ""
-"Een toenemende waarde zal resulteren in een kleur die meer afhangt van de "
-"rand van de frame."
+"Verhogen van deze waarde geeft een kleur die meer afhangt van de rand van "
+"het beeld."
 
 #: modules/video_filter/atmo/atmo.cpp:197
 msgid "Overall brightness of your LED stripes"
-msgstr "Algehele helderheid van uw LED strips"
+msgstr "Algehele helderheid van uw LED-strepen"
 
 #: modules/video_filter/atmo/atmo.cpp:198
 msgid "Darkness Limit"
@@ -22296,7 +22278,7 @@ msgstr "Te gebruiken filter om de kleur-uitvoer te berekenen."
 
 #: modules/video_filter/atmo/atmo.cpp:226
 msgid "No Filtering"
-msgstr "Geen filteren"
+msgstr "Niet filteren"
 
 #: modules/video_filter/atmo/atmo.cpp:227
 msgid "Combined"
@@ -22308,7 +22290,7 @@ msgstr "Percentage"
 
 #: modules/video_filter/atmo/atmo.cpp:231
 msgid "Frame delay"
-msgstr "Framevertraging"
+msgstr "Beeldvertraging"
 
 #: modules/video_filter/atmo/atmo.cpp:232
 msgid ""
@@ -22541,7 +22523,7 @@ msgid ""
 msgstr ""
 "Dit effect, ook bekend als \"greenscreen\" of \"chroma key\", mengt de "
 "\"blauwe delen\" van de voorgrondafbeelding van de mozaïek met de "
-"achtergrond (zoals bij weersvoorspellingen). U kan de \"sleutel\"-kleur "
+"achtergrond (zoals bij weersvoorspellingen). U kunt de \"sleutel\"-kleur "
 "kiezen om te mengen (blauw is standaard)."
 
 #: modules/video_filter/bluescreen.c:44
@@ -22648,8 +22630,8 @@ msgid ""
 "You can use specific video output modules for the clones. Use a comma-"
 "separated list of modules."
 msgstr ""
-"U kan specifieke video-uitvoermodules gebruiken voor de klonen. Gebruik een "
-"lijst van met komma's gescheiden waardes met modules."
+"U kunt specifieke video-uitvoermodules gebruiken voor de klonen. Gebruik een "
+"lijst van modules gescheiden door komma's."
 
 #: modules/video_filter/clone.c:71
 msgid "Clone video filter"
@@ -22915,7 +22897,7 @@ msgstr "Invoer FIFO"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:59
 msgid "FIFO which will be read for commands"
-msgstr "FIFO zal voor commando's gelezen worden"
+msgstr "FIFO die voor commando's wordt gelezen"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:61
 msgid "Output FIFO"
@@ -22923,15 +22905,15 @@ msgstr "Uitvoer FIFO"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:62
 msgid "FIFO which will be written to for responses"
-msgstr "FIFO zal worden geschreven voor antwoorden"
+msgstr "FIFO die voor antwoorden wordt geschreven"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:65
 msgid "Dynamic video overlay"
-msgstr "Dynamische video-overlap"
+msgstr "Dynamische video-overlay"
 
 #: modules/video_filter/dynamicoverlay/dynamicoverlay.c:66
 msgid "Overlay"
-msgstr "Overlap"
+msgstr "Overlay"
 
 #: modules/video_filter/erase.c:55
 msgid "Image mask"
@@ -22940,7 +22922,7 @@ msgstr "Afbeeldingsmasker"
 #: modules/video_filter/erase.c:56
 msgid "Image mask. Pixels with an alpha value greater than 50% will be erased."
 msgstr ""
-"Afbeeldingsmasker. Pixels met een alpha-waarde groter dan 50% worden gewist."
+"Afbeeldingsmasker. Pixels met een hogere alpha-waarde dan 50% worden gewist."
 
 #: modules/video_filter/erase.c:59
 msgid "X coordinate of the mask."
@@ -22969,7 +22951,7 @@ msgstr ""
 
 #: modules/video_filter/extract.c:75
 msgid "Extract RGB component video filter"
-msgstr "Extraheer RGB component videofilter."
+msgstr "Extraheer RGB component videofilter"
 
 #: modules/video_filter/filter_event_info.h:27
 msgid "video-filter-event"
@@ -23045,10 +23027,6 @@ msgstr "Korrel-videofilter"
 msgid "Grain"
 msgstr "Korrel"
 
-#: modules/video_filter/imgresample.c:63
-msgid "FFmpeg video filter"
-msgstr "FFmpeg videofilter"
-
 #: modules/video_filter/invert.c:51
 msgid "Invert video filter"
 msgstr "Inversie videofilter"
@@ -23092,13 +23070,13 @@ msgstr "Weergavetijd van individuele afbeelding van 0 - 60000 ms."
 #: modules/video_filter/logo.c:81
 msgid "X coordinate of the logo. You can move the logo by left-clicking it."
 msgstr ""
-"X-coördinaat van het logo. U kan het logo verplaatsen door erop te links-"
+"X-coördinaat van het logo. U kunt het logo verplaatsen door erop te links-"
 "klikken."
 
 #: modules/video_filter/logo.c:84
 msgid "Y coordinate of the logo. You can move the logo by left-clicking it."
 msgstr ""
-"Y-coördinaat van het logo. U kan het logo verplaatsen door erop te links-"
+"Y-coördinaat van het logo. U kunt het logo verplaatsen door erop te links-"
 "klikken."
 
 #: modules/video_filter/logo.c:86
@@ -23123,7 +23101,7 @@ msgid ""
 "8=bottom, you can also use combinations of these values, eg 6 = top-right)."
 msgstr ""
 "De positie van het logo op de video kan hier bepaald worden. (0=midden, "
-"1=links, 2=rechts, 4=boven, 8=beneden, u kan ook combinaties van deze "
+"1=links, 2=rechts, 4=boven, 8=beneden, u kunt ook combinaties van deze "
 "waarden gebruiken, bijv. 6 = boven-rechts)."
 
 #: modules/video_filter/logo.c:105
@@ -23132,7 +23110,7 @@ msgstr "Logo subfilter"
 
 #: modules/video_filter/logo.c:106
 msgid "Logo overlay"
-msgstr "Logo overlap"
+msgstr "Logo overlay"
 
 #: modules/video_filter/logo.c:126
 msgid "Logo video filter"
@@ -23158,15 +23136,15 @@ msgid ""
 "position (in %), $R = rate, $S = audio sample rate (in kHz), $T = time, $U = "
 "publisher, $V = volume, $_ = new line) "
 msgstr ""
-"Lichtkrant tekst om weer te geven. (Beschikbare formaat opties: Tijd "
+"Lichtkranttekst om weer te geven. (Beschikbare opmaakopties: Tijd "
 "gerelateerd: %Y = jaar, %m = maand, %d = dag, %H = uren, %M = minuten, %S = "
 "seconden, ... Metagegevens gerelateerd: $a = artiest, $b = album, $c = "
 "copyright, $d = beschrijving, $e = gecodeerd door, $g = genre, $l = taal, $n "
 "= spoornummer, $p = nu speelt, $r = score, $s = ondertitelingstaal, $t = "
-"titel, $u = url, $A = datum, $B = audio bitrate (in kb/s), $C = hoofdstuk, "
-"$D = duur, $F = volledige naam met pad, $I = titel, $L = tijd over, $N = "
-"naam, $O = audiotaal, $P = positie (in %), $R = snelheid, $S = audio "
-"bemonsteringsratio (in kHz), $T = tijd, $U = uitgever, $V = volume, $_ = "
+"titel, $u = url, $A = datum, $B = audiobitsnelheid (in kb/s), $C = "
+"hoofdstuk, $D = duur, $F = volledige naam met pad, $I = titel, $L = tijd "
+"over, $N = naam, $O = audiotaal, $P = positie (in %), $R = snelheid, $S = "
+"audio samplesnelheid (in kHz), $T = tijd, $U = uitgever, $V = volume, $_ = "
 "nieuwe regel) "
 
 #: modules/video_filter/marq.c:106 modules/video_filter/rss.c:143
@@ -23211,7 +23189,7 @@ msgid ""
 "2=right, 4=top, 8=bottom, you can also use combinations of these values, eg "
 "6 = top-right)."
 msgstr ""
-"U kan de positie van de lichtkrant op de video hier bepalen (0=midden, "
+"U kunt de positie van de lichtkrant op de video hier bepalen (0=midden, "
 "1=links, 2=rechts, 4=boven, 8=beneden; combinaties van deze waarden zijn ook "
 "mogelijk, zoals 6 = boven-rechts)"
 
@@ -23352,9 +23330,9 @@ msgid ""
 "comma-separated list of picture ID(s).These IDs are assigned in the \"mosaic-"
 "bridge\" module."
 msgstr ""
-"U kan de element-volgorde van de mozaïek forceren. U moet een lijst met door "
-"komma's gescheiden waarden van afbeelding-ID's ingeven. Deze ID's worden "
-"toegewezen in de  \"mozaïek-bridge\"-module."
+"U kunt de element-volgorde van de mozaïek forceren. U moet een lijst met "
+"door komma's gescheiden waarden van afbeelding-ID's ingeven. Deze ID's "
+"worden toegewezen in de  \"mozaïek-bridge\"-module."
 
 #: modules/video_filter/mosaic.c:150
 msgid "Offsets in order"
@@ -23366,7 +23344,7 @@ msgid ""
 "if positioning method is set to \"offsets\"). You must give a comma-"
 "separated list of coordinates (eg: 10,10,150,10)."
 msgstr ""
-"U kan de (x,y)-afstanden forceren van de elementen op de mozaïek (alleen "
+"U kunt de (x,y)-afstanden forceren van de elementen op de mozaïek (alleen "
 "gebruikt indien de positioneringsmethode ingesteld is op \"offsets\"). U "
 "moet een lijst met door komma's gescheiden waardes van coördinaten geven "
 "(bijvoorbeeld: 10,10,150,10)."
@@ -23552,7 +23530,7 @@ msgstr ""
 
 #: modules/video_filter/osdmenu.c:52 modules/video_filter/osdmenu.c:55
 msgid "You can move the OSD menu by left-clicking on it."
-msgstr "U kan het OSD menu verplaatsen door erop te links-klikken."
+msgstr "U kunt het OSD menu verplaatsen door erop te links-klikken."
 
 #: modules/video_filter/osdmenu.c:57
 msgid "Menu position"
@@ -23609,11 +23587,10 @@ msgid ""
 "transparency. The default is being not transparent (value 255) the minimum "
 "is fully transparent (value 0)."
 msgstr ""
-"De transparantie van het OSD-menu kan aangepast worden door een waarde "
-"tussen 0 en 255 in te geven. Een lagere waarde zorgt voor meer "
-"transparantie, een hogere betekent minder transparantie. Standaardwaarde is "
-"ingesteld op niet transparant (waarde 255), het minimum is volledig "
-"transparant (waarde 0)."
+"De transparantie van het OSD-menu kan worden ingesteld met een waarde tussen "
+"0 en 255. Een lagere waarde zorgt voor meer transparantie, een hogere "
+"betekent minder transparantie. Standaardwaarde is ingesteld op niet "
+"transparant (waarde 255), het minimum is volledig transparant (waarde 0)."
 
 #: modules/video_filter/osdmenu.c:134
 msgid "On Screen Display menu"
@@ -23673,8 +23650,7 @@ msgstr "hoogte van overlappend gebied (in %)"
 #: modules/video_filter/panoramix.c:122
 msgid "Select in percent the height of the blended zone (case of 2x2 wall)"
 msgstr ""
-"Selecteer in procent de hoogte van de gemengde zone (in geval van een 2 x 2 "
-"muur)"
+"Selecteer de procentuele hoogte van de gemengde zone (met een 2 x 2 muur)"
 
 #: modules/video_filter/panoramix.c:125
 msgid "Attenuation"
@@ -23763,7 +23739,7 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:157
 msgid "Black Crush for Red"
-msgstr "Zwarte drukking voor rood"
+msgstr "Zwart-onderdrukking voor rood"
 
 #: modules/video_filter/panoramix.c:158
 msgid "Select the Black Crush of blended zone (Red or Y component)"
@@ -23772,7 +23748,7 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:159
 msgid "Black Crush for Green"
-msgstr "Zwarte drukking voor groen"
+msgstr "Zwart-onderdrukking voor groen"
 
 #: modules/video_filter/panoramix.c:160
 msgid "Select the Black Crush of blended zone (Green or U component)"
@@ -23781,7 +23757,7 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:161
 msgid "Black Crush for Blue"
-msgstr "Zwarte drukking voor blauw"
+msgstr "Zwart-onderdrukking voor blauw"
 
 #: modules/video_filter/panoramix.c:162
 msgid "Select the Black Crush of blended zone (Blue or V component)"
@@ -23790,7 +23766,7 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:164
 msgid "White Crush for Red"
-msgstr "Witte drukking voor rood"
+msgstr "Wit-onderdrukking voor rood"
 
 #: modules/video_filter/panoramix.c:165
 msgid "Select the White Crush of blended zone (Red or Y component)"
@@ -23799,7 +23775,7 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:166
 msgid "White Crush for Green"
-msgstr "Witte drukking voor groen"
+msgstr "Wit-onderdrukking voor groen"
 
 #: modules/video_filter/panoramix.c:167
 msgid "Select the White Crush of blended zone (Green or U component)"
@@ -23808,7 +23784,7 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:168
 msgid "White Crush for Blue"
-msgstr "Witte drukking voor blauw"
+msgstr "Wit-onderdrukking voor blauw"
 
 #: modules/video_filter/panoramix.c:169
 msgid "Select the White Crush of blended zone (Blue or V component)"
@@ -23817,51 +23793,51 @@ msgstr ""
 
 #: modules/video_filter/panoramix.c:171
 msgid "Black Level for Red"
-msgstr "Zwart niveau voor rood"
+msgstr "Zwartniveau voor rood"
 
 #: modules/video_filter/panoramix.c:172
 msgid "Select the Black Level of blended zone (Red or Y component)"
-msgstr "Selecteer het Zwart-niveau van de gemengde zone (Rood of Y-component)"
+msgstr "Selecteer het Zwartniveau van de gemengde zone (Rood of Y-component)"
 
 #: modules/video_filter/panoramix.c:173
 msgid "Black Level for Green"
-msgstr "Zwart niveau voor groen"
+msgstr "Zwartniveau voor groen"
 
 #: modules/video_filter/panoramix.c:174
 msgid "Select the Black Level of blended zone (Green or U component)"
-msgstr "Selecteer het Zwart-niveau van de gemengde zone (Groen of U-component)"
+msgstr "Selecteer het Zwartniveau van de gemengde zone (Groen of U-component)"
 
 #: modules/video_filter/panoramix.c:175
 msgid "Black Level for Blue"
-msgstr "Zwart niveau voor blauw"
+msgstr "Zwartniveau voor blauw"
 
 #: modules/video_filter/panoramix.c:176
 msgid "Select the Black Level of blended zone (Blue or V component)"
-msgstr "Selecteer het Zwart-niveau van de gemengde zone (Blauw of V-component)"
+msgstr "Selecteer het Zwartniveau van de gemengde zone (Blauw of V-component)"
 
 #: modules/video_filter/panoramix.c:178
 msgid "White Level for Red"
-msgstr "Wit niveau voor rood"
+msgstr "Witniveau voor rood"
 
 #: modules/video_filter/panoramix.c:179
 msgid "Select the White Level of blended zone (Red or Y component)"
-msgstr "Selecteer het Wit-niveau van de gemengde zone (Rood of Y-component)"
+msgstr "Selecteer het Witniveau van de gemengde zone (Rood of Y-component)"
 
 #: modules/video_filter/panoramix.c:180
 msgid "White Level for Green"
-msgstr "Wit niveau voor groen"
+msgstr "Witniveau voor groen"
 
 #: modules/video_filter/panoramix.c:181
 msgid "Select the White Level of blended zone (Green or U component)"
-msgstr "Selecteer het Wit-niveau van de gemengde zone (Groen of U-component)"
+msgstr "Selecteer het Witniveau van de gemengde zone (Groen of U-component)"
 
 #: modules/video_filter/panoramix.c:182
 msgid "White Level for Blue"
-msgstr "Wit niveau voor blauw"
+msgstr "Witniveau voor blauw"
 
 #: modules/video_filter/panoramix.c:183
 msgid "Select the White Level of blended zone (Blue or V component)"
-msgstr "Selecteer het Wit-niveau van de gemengde zone (Blauw of V-component)"
+msgstr "Selecteer het Witniveau van de gemengde zone (Blauw of V-component)"
 
 #: modules/video_filter/panoramix.c:197
 msgid "Xinerama option"
@@ -23869,7 +23845,7 @@ msgstr "Xinerama optie"
 
 #: modules/video_filter/panoramix.c:198
 msgid "Uncheck if you have not used xinerama"
-msgstr "Verwijder vink als u geen xinerama gebruikt hebt"
+msgstr "Verwijder selectie als u geen xinerama gebruikt hebt"
 
 #: modules/video_filter/postproc.c:59
 msgid "Post processing quality"
@@ -23888,11 +23864,11 @@ msgstr ""
 
 #: modules/video_filter/postproc.c:65
 msgid "FFmpeg post processing filter chains"
-msgstr "FFmper naverwerking-filterketens"
+msgstr "FFmper nabewerkingfilterketens"
 
 #: modules/video_filter/postproc.c:74
 msgid "Video post processing filter"
-msgstr "Video naverwerkingsfilter"
+msgstr "Video nabewerkingsfilter"
 
 #: modules/video_filter/postproc.c:75
 msgid "Postproc"
@@ -23908,7 +23884,7 @@ msgstr "Hoogste"
 
 #: modules/video_filter/psychedelic.c:54
 msgid "Psychedelic video filter"
-msgstr "Psychedelische videofilter"
+msgstr "Psychedelisch videofilter"
 
 #: modules/video_filter/puzzle.c:63 modules/video_filter/puzzle.c:64
 msgid "Number of puzzle rows"
@@ -23920,14 +23896,14 @@ msgstr "Aantal puzzelkolommen"
 
 #: modules/video_filter/puzzle.c:67
 msgid "Make one tile a black slot"
-msgstr "Maak van een tegel een zwart vak"
+msgstr "Maak één stukje zwart"
 
 #: modules/video_filter/puzzle.c:68
 msgid ""
 "Make one slot black. Other tiles can only be swapped with the black slot."
 msgstr ""
-"Maak een tegel zwart. Andere tegels kunnen alleen met deze zwarte tegel "
-"omgewisseld worden."
+"Maak één stukje zwart. Andere tegels kunnen alleen wisselen met dit zwarte "
+"stukje."
 
 #: modules/video_filter/puzzle.c:73
 msgid "Puzzle interactive game video filter"
@@ -23939,31 +23915,31 @@ msgstr "Puzzel"
 
 #: modules/video_filter/remoteosd.c:74
 msgid "VNC Host"
-msgstr "VNC Host"
+msgstr "VNC-host"
 
 #: modules/video_filter/remoteosd.c:76
 msgid "VNC hostname or IP address."
-msgstr "VNC hostnaam of IP adres."
+msgstr "VNC-hostnaam of ipadres."
 
 #: modules/video_filter/remoteosd.c:78
 msgid "VNC Port"
-msgstr "VNC Poort"
+msgstr "VNC-poort"
 
 #: modules/video_filter/remoteosd.c:80
 msgid "VNC portnumber."
-msgstr "VNC poortnummer."
+msgstr "VNC-poortnummer."
 
 #: modules/video_filter/remoteosd.c:82
 msgid "VNC Password"
-msgstr "VNC Wachtwoord"
+msgstr "VNC-wachtwoord"
 
 #: modules/video_filter/remoteosd.c:84
 msgid "VNC password."
-msgstr "VNC wachtwoord."
+msgstr "VNC-wachtwoord."
 
 #: modules/video_filter/remoteosd.c:86
 msgid "VNC poll interval"
-msgstr "VNC poll interval"
+msgstr "VNC-pollinterval"
 
 #: modules/video_filter/remoteosd.c:88
 msgid ""
@@ -23973,31 +23949,31 @@ msgstr ""
 
 #: modules/video_filter/remoteosd.c:90
 msgid "VNC polling"
-msgstr "VNC polling"
+msgstr "VNC-polling"
 
 #: modules/video_filter/remoteosd.c:92
 msgid "Activate VNC polling. Do NOT activate for use as VDR ffnetdev client."
 msgstr ""
-"Activeer VNC polling. Activeer dit NIET bij gebruik als VDR ffnetdev client."
+"Activeer VNC-polling. Activeer dit NIET bij gebruik als VDR ffnetdev client."
 
 #: modules/video_filter/remoteosd.c:94
 msgid "Mouse events"
-msgstr "Muisgebeurtenissen"
+msgstr "Muisacties"
 
 #: modules/video_filter/remoteosd.c:96
 msgid ""
 "Send mouse events to VNC host. Not needed for use as VDR ffnetdev client."
 msgstr ""
-"Zend muisgebeurtenissen naar VNC-host. Dit is niet nodig bij gebruik als VDR "
+"Stuur muisacties naar VNC-host. Dit is niet nodig bij gebruik als VDR "
 "ffnetdev-client."
 
 #: modules/video_filter/remoteosd.c:98
 msgid "Key events"
-msgstr "Toetsgebeurtenissen"
+msgstr "Toetsaanslagen"
 
 #: modules/video_filter/remoteosd.c:100
 msgid "Send key events to VNC host."
-msgstr "Stuur toetsgebeurtenissen naar VNC host."
+msgstr "Stuur toetsaanslagen naar VNC-host."
 
 #: modules/video_filter/remoteosd.c:104
 msgid ""
@@ -24006,14 +23982,14 @@ msgid ""
 "transparency. The default is being not transparent (value 255) the minimum "
 "is fully transparent (value 0)."
 msgstr ""
-"De transparantie van de OSD VNC kan veranderd worden door een waarde tussen "
-"0 en 255 in te geven. Een lagere waarde resulteert in meer transparantie, "
-"een hogere waarde betekent minder transparantie. Standaard is niet-"
-"transparant (waarde 255), het minimum is volledig transparant (waarde 0)"
+"De transparantie van de OSD VNC kan worden ingesteld met een waarde tussen 0 "
+"en 255. Een lagere waarde betekent meer transparantie, een hogere waarde "
+"betekent minder transparantie. Standaard is niet-transparant (waarde 255), "
+"het minimum is volledig transparant (waarde 0)."
 
 #: modules/video_filter/remoteosd.c:119
 msgid "Remote-OSD over VNC"
-msgstr "Extern-OSD over VNC"
+msgstr "Externe-OSD over VNC"
 
 #: modules/video_filter/remoteosd.c:121
 msgid "Remote-OSD"
@@ -24037,11 +24013,11 @@ msgstr "Rotatie videofilter"
 
 #: modules/video_filter/rss.c:129
 msgid "Feed URLs"
-msgstr "Feed webadressen"
+msgstr "Feed URL's"
 
 #: modules/video_filter/rss.c:130
 msgid "RSS/Atom feed '|' (pipe) seperated URLs."
-msgstr "RSS/Atom feed \"|\" (pijp) gescheiden URL's."
+msgstr "RSS/Atom-feed \"|\" (pijp) gescheiden URL's."
 
 #: modules/video_filter/rss.c:131
 msgid "Speed of feeds"
@@ -24049,11 +24025,11 @@ msgstr "Snelheid van feeds"
 
 #: modules/video_filter/rss.c:132
 msgid "Speed of the RSS/Atom feeds in microseconds (bigger is slower)."
-msgstr "Snelheid van de RSS/Atom feeds in microseconden (groter is langzamer)."
+msgstr "Snelheid van de RSS/Atom-feeds in microseconden (groter is langzamer)."
 
 #: modules/video_filter/rss.c:133
 msgid "Max length"
-msgstr "Maximale lengte"
+msgstr "Maximumlengte"
 
 #: modules/video_filter/rss.c:134
 msgid "Maximum number of characters displayed on the screen."
@@ -24084,7 +24060,7 @@ msgid ""
 "Opacity (inverse of transparency) of overlay text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
-"Opaciteit (omgekeerde van transparantie) van de overlap tekst. 0 = "
+"Ondoorzichtigheid (omgekeerde van transparantie) van de overlaytekst. 0 = "
 "transparant, 255 = totaal ondoorzichtig."
 
 #: modules/video_filter/rss.c:160
@@ -24097,7 +24073,7 @@ msgid ""
 "4=top, 8=bottom; you can also use combinations of these values, eg 6 = top-"
 "right)."
 msgstr ""
-"U kan hier de tekstpositionering op de video kan hier instellen. (0=midden, "
+"U kunt hier de tekstpositionering op de video kan hier instellen. (0=midden, "
 "1=links, 2=rechts, 4=boven, 8=beneden; combinaties van deze waarden zijn ook "
 "mogelijk, bijvoorbeeld 6 = rechts-boven)."
 
@@ -24123,11 +24099,11 @@ msgstr "Altijd zichtbaar"
 
 #: modules/video_filter/rss.c:182
 msgid "Scroll with feed"
-msgstr "Scrollen met feed"
+msgstr "Schuiven met feed"
 
 #: modules/video_filter/rss.c:222
 msgid "RSS and Atom feed display"
-msgstr "RSS en Atom feed weergave"
+msgstr "Weergave RSS en Atom-feed"
 
 #: modules/video_filter/rv32.c:57
 msgid "RV32 conversion filter"
@@ -24159,7 +24135,7 @@ msgstr ""
 
 #: modules/video_filter/scene.c:70
 msgid "Recording ratio"
-msgstr "Opnameratio"
+msgstr "Opnameverhouding"
 
 #: modules/video_filter/scene.c:71
 msgid ""
@@ -24170,7 +24146,7 @@ msgstr ""
 
 #: modules/video_filter/scene.c:74
 msgid "Filename prefix"
-msgstr "Bestandsnaam prefix"
+msgstr "Prefix bestandsnaam"
 
 #: modules/video_filter/scene.c:75
 msgid ""
@@ -24178,11 +24154,11 @@ msgid ""
 "\"prefixNUMBER.format\" form if replace is not true."
 msgstr ""
 "Prefix van de bestandsnamen van de uitvoerafbeeldingen. Uitvoerbestandsnamen "
-"hebben de \"prefixNUMMER.formaat\"-vorm als vervangen niet waar is."
+"hebben de \"prefixNUMMER.formaat\"-vorm als 'vervangen' niet waar is."
 
 #: modules/video_filter/scene.c:79
 msgid "Directory path prefix"
-msgstr "Mappadprefix"
+msgstr "Prefix mappad"
 
 #: modules/video_filter/scene.c:80
 msgid ""
@@ -24190,8 +24166,8 @@ msgid ""
 "will be automatically saved in users homedir."
 msgstr ""
 "Mappad waar de afbeeldingen opgeslagen moeten worden. Indien dit niet "
-"ingesteld is zullen de afbeeldingen automatisch in de gebruiker's "
-"thuisdirectory opgeslagen worden."
+"ingesteld is zullen de afbeeldingen automatisch in de gebruiker's thuismap "
+"opgeslagen worden."
 
 #: modules/video_filter/scene.c:84
 msgid "Always write to the same file"
@@ -24332,7 +24308,7 @@ msgstr "Lijst van actieve vensters, gescheiden door komma's, standaard alles"
 
 #: modules/video_filter/wall.c:73
 msgid "Element aspect ratio"
-msgstr "Schermelementen-beeldverhouding"
+msgstr "Beeldverhouding elementen"
 
 #: modules/video_filter/wall.c:74
 msgid "Aspect ratio of the individual displays building the wall."
@@ -24392,24 +24368,24 @@ msgid ""
 "Run framebuffer on current TTY device (default enabled). (disable tty "
 "handling with caution)"
 msgstr ""
-"Start framebuffer op huidig TTY apparaat (standaard actief). (pas op met tty "
+"Start beeldbuffer op huidig TTY apparaat (standaard actief). (pas op met tty "
 "gebruik deactiveren)"
 
 #: modules/video_output/fb.c:96
 msgid "Framebuffer resolution to use."
-msgstr "Framebufferresolutie om te gebruiken."
+msgstr "Te gebruiken beeldbufferresolutie."
 
 #: modules/video_output/fb.c:98
 msgid ""
 "Select the resolution for the framebuffer. Currently it supports the values "
 "0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)"
 msgstr ""
-"Selecteer de resolutie voor de framebuffer. Momenteel ondersteunt het de "
+"Selecteer de resolutie voor de beeldbuffer. Momenteel ondersteunt het de "
 "volgende waarden 0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (standaard 4=auto)"
 
 #: modules/video_output/fb.c:101
 msgid "Framebuffer uses hw acceleration."
-msgstr "Framebuffer gebruikt hw versnelling."
+msgstr "Beeldbuffer gebruikt hw-versnelling."
 
 #: modules/video_output/fb.c:103
 msgid ""
@@ -24417,17 +24393,17 @@ msgid ""
 "in hardware then you must disable this option. It then does double buffering "
 "in software."
 msgstr ""
-"Als uw framebuffer hardwareversnelling ondersteunt of dubbele buffering in "
-"hardware heeft, moet u deze  optie uitschakelen. Dan doet het softwarematige "
+"Als uw beeldbuffer hardwareversnelling ondersteunt of dubbele buffering in "
+"hardware heeft, moet u deze optie uitschakelen. Dan doet het softwarematige "
 "dubbele buffering."
 
 #: modules/video_output/fb.c:122
 msgid "GNU/Linux framebuffer video output"
-msgstr "GNU/Linux framebuffer video-uitvoer"
+msgstr "GNU/Linux beeldbuffer video-uitvoer"
 
 #: modules/video_output/ggi.c:59 modules/video_output/x11/glx.c:104
 #: modules/video_output/x11/x11.c:55 modules/video_output/x11/xvideo.c:61
-#: modules/video_output/xcb/xcb.c:46
+#: modules/video_output/xcb/x11.c:43 modules/video_output/xcb/window.c:44
 msgid "X11 display"
 msgstr "X11 weergave"
 
@@ -24456,7 +24432,7 @@ msgid ""
 "Try to use hardware acceleration for YUV->RGB conversions. This option "
 "doesn't have any effect when using overlays."
 msgstr ""
-"Probeer hardware versnelling voor YUV->RGB conversies te gebruiken. Deze "
+"Probeer hardwareversnelling voor YUV->RGB conversies te gebruiken. Deze "
 "optie heeft geen effect als overlays gebruikt worden."
 
 #: modules/video_output/msw/directx.c:136
@@ -24485,7 +24461,7 @@ msgid ""
 "Try to use triple buffering when using YUV overlays. That results in much "
 "better video quality (no flickering)."
 msgstr ""
-"Probeer drievoudige buffering te gebruiken bij YUV overlays. Dat resulteert "
+"Probeer drievoudige buffering te gebruiken bij YUV-overlays. Dat resulteert "
 "in veel hogere beeldkwaliteit (geen geflikker)."
 
 #: modules/video_output/msw/directx.c:148
@@ -24498,7 +24474,7 @@ msgid ""
 "of the display that you want the video window to open on. For example, \"\\"
 "\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
 msgstr ""
-"In een multimonitor configuratie kan de Windows apparaatnaam van het "
+"In een multimonitorconfiguratie kan de Windows-apparaatnaam van het "
 "beeldscherm waarop u de video wilt zien opgegeven worden. Bijvoorbeeld: \"\\"
 "\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"."
 
@@ -24513,7 +24489,7 @@ msgid ""
 "desktop must not already have a wallpaper."
 msgstr ""
 "Met deze modus kan de video worden afgebeeld als bureaubladachtergrond. Dit "
-"werkt enkel in overlay modus en als het bureaublad nog geen andere "
+"werkt alleen in overlaymodus en als het bureaublad nog geen andere "
 "achtergrond heeft."
 
 #: modules/video_output/msw/directx.c:182
@@ -24538,12 +24514,12 @@ msgstr "Windows GDI video-uitvoer"
 
 #: modules/video_output/omapfb.c:88
 msgid "OMAP Framebuffer device"
-msgstr "OMAP framebufferapparaat"
+msgstr "OMAP-beeldbufferapparaat"
 
 #: modules/video_output/omapfb.c:90
 msgid "OMAP Framebuffer device to use for rendering (usually /dev/fb0)."
 msgstr ""
-"OMAP Framebufferapparaat dat voor renderen gebruikt moet worden (meestal /"
+"OMAP-beeldbufferapparaat dat voor weergave gebruikt moet worden (meestal /"
 "dev/fb0)."
 
 #: modules/video_output/omapfb.c:94
@@ -24556,19 +24532,19 @@ msgstr ""
 
 #: modules/video_output/omapfb.c:96
 msgid "Embed the overlay"
-msgstr "Overlap inleggen"
+msgstr "Overlay integreren"
 
 #: modules/video_output/omapfb.c:98
 msgid "Embed the framebuffer overlay into a X11 window"
-msgstr "Leg de framebuffer overlap in een X11 venster in"
+msgstr "Plaats de beeldbuffer overlay binnen een X11-venster"
 
 #: modules/video_output/omapfb.c:110
 msgid "OMAP framebuffer video output"
-msgstr "OMAP framebuffer video-uitvoer"
+msgstr "OMAP-beeldbuffer video-uitvoer"
 
 #: modules/video_output/opengl.c:111
 msgid "OpenGL Provider"
-msgstr "OpenGL provider"
+msgstr "OpenGL-provider"
 
 #: modules/video_output/opengl.c:112
 msgid "Allows you to modify what OpenGL provider should be used"
@@ -24603,8 +24579,8 @@ msgid ""
 "Force the SDL renderer to use a specific chroma format instead of trying to "
 "improve performances by using the most efficient one."
 msgstr ""
-"Forceer de SDL renderer om een specifiek chroma formaat te gebruiken in "
-"plaats van de meest efficiënte."
+"Forceer de SDL-weergave om een specifieke chromastructuur te gebruiken voor "
+"betere prestaties in plaats van de meest efficiënte."
 
 #: modules/video_output/sdl.c:127
 msgid "Simple DirectMedia Layer video output"
@@ -24612,11 +24588,11 @@ msgstr "Simple DirectMedia Layer video-uitvoer"
 
 #: modules/video_output/snapshot.c:65
 msgid "Snapshot width"
-msgstr "Snapshot breedte"
+msgstr "Mmomentopname-breedte"
 
 #: modules/video_output/snapshot.c:66
 msgid "Width of the snapshot image."
-msgstr "Breedte van de snapshot afbeelding."
+msgstr "Breedte van de momentopname-afbeelding."
 
 #: modules/video_output/snapshot.c:68
 msgid "Snapshot height"
@@ -24673,12 +24649,12 @@ msgid ""
 "Address of the locking callback function. This function must fill in valid "
 "plane memory address information for use by the video renderer."
 msgstr ""
-"Adres van de locking terugroepfunctie. Deze functie moet een geldig "
-"geheugenadres invullen voor gebruik door de videorenderer."
+"Adres van de locking callback-functie. Deze functie moet een geldig "
+"geheugenadres invullen voor gebruik door de videorweergave."
 
 #: modules/video_output/vmem.c:75
 msgid "Video memory output"
-msgstr "Videogeheugen uitvoer"
+msgstr "Videogeheugenuitvoer"
 
 #: modules/video_output/vmem.c:76
 msgid "Video memory"
@@ -24686,7 +24662,7 @@ msgstr "Videogeheugen"
 
 #: modules/video_output/x11/glx.c:90 modules/video_output/x11/xvideo.c:47
 msgid "XVideo adaptor number"
-msgstr "XVideo adaptor nummer"
+msgstr "XVideo-adaptornummer"
 
 #: modules/video_output/x11/glx.c:92
 msgid ""
@@ -24713,14 +24689,14 @@ msgid ""
 msgstr ""
 "Er zijn twee manieren om een volledig scherm te gebruiken. Jammer genoeg "
 "hebben beiden hun nadelen.\n"
-"1) Laat de window manager het volledig scherm beheren (standaard). Echter "
-"dingen zoals taakbalken zullen waarschijnlijk bovenop de video te zien "
-"zijn.\n"
-"2) Omzeil de window manager compleet, echter dan zal er niks boven de video "
+"1) Laat de window manager het volledige scherm beheren (standaard), maar "
+"dingen zoals taakbalken zullen waarschijnlijk boven de video te zien zijn.\n"
+"2) Omzeil de window manager volledig, maar dan zal er niets boven de video "
 "te zien zijn."
 
 #: modules/video_output/x11/glx.c:106 modules/video_output/x11/x11.c:57
-#: modules/video_output/x11/xvideo.c:63 modules/video_output/xcb/xcb.c:48
+#: modules/video_output/x11/xvideo.c:63 modules/video_output/xcb/x11.c:45
+#: modules/video_output/xcb/window.c:46
 msgid ""
 "X11 hardware display to use. By default VLC will use the value of the "
 "DISPLAY environment variable."
@@ -24730,13 +24706,13 @@ msgstr ""
 
 #: modules/video_output/x11/glx.c:109 modules/video_output/x11/x11.c:60
 #: modules/video_output/x11/xvideo.c:71 modules/video_output/x11/xvmc.c:121
-#: modules/video_output/xcb/xcb.c:51
+#: modules/video_output/xcb/x11.c:48
 msgid "Use shared memory"
 msgstr "Gebruik gedeeld geheugen"
 
 #: modules/video_output/x11/glx.c:111 modules/video_output/x11/x11.c:62
 #: modules/video_output/x11/xvideo.c:73 modules/video_output/x11/xvmc.c:123
-#: modules/video_output/xcb/xcb.c:53
+#: modules/video_output/xcb/x11.c:50
 msgid "Use shared memory to communicate between VLC and the X server."
 msgstr ""
 "Gebruik gedeeld geheugen voor het communiceren tussen VLC en de X server"
@@ -24768,7 +24744,7 @@ msgid ""
 "If your graphics card provides several adaptors, you need to choose which "
 "one will be used (you shouldn't have to change this)."
 msgstr ""
-"Als uw grafische kaart meerdere adaptors heeft, moet u kiezen welke gebruikt "
+"Als uw grafische kaart meerdere adapters heeft, moet u kiezen welke gebruikt "
 "moet worden (normaal hoeft u dit niet te veranderen)."
 
 #: modules/video_output/x11/xvideo.c:66 modules/video_output/x11/xvmc.c:116
@@ -24780,8 +24756,8 @@ msgid ""
 "Force the XVideo renderer to use a specific chroma format instead of trying "
 "to improve performances by using the most efficient one."
 msgstr ""
-"Forceer de XVideo renderer om een specifiek chromaformaat te gebruiken in "
-"plaats van de meest efficiënte."
+"Forceer XVideo-weergave om een specifieke chroma-structuur te gebruiken en "
+"probeer geen prestaties te verbeteren met de meest efficiënte."
 
 #: modules/video_output/x11/xvideo.c:95
 msgid "XVideo extension video output"
@@ -24796,7 +24772,7 @@ msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
 msgstr ""
-"Als uw grafische kaart meerdere adaptors heeft, moet u kiezen welke gebruikt "
+"Als uw grafische kaart meerdere adapters heeft, moet u kiezen welke gebruikt "
 "moet worden (normaal hoeft u dit niet te veranderen)."
 
 #: modules/video_output/x11/xvmc.c:111
@@ -24825,23 +24801,45 @@ msgstr ""
 
 #: modules/video_output/x11/xvmc.c:131
 msgid "You can choose the default deinterlace mode"
-msgstr "U kan kiezen voor de standaard deïnterlacemodus"
+msgstr "U kunt kiezen voor de standaard deïnterlacemodus"
 
 #: modules/video_output/x11/xvmc.c:134
 msgid "You can choose the crop style to apply."
-msgstr "U kan kiezen welke snij-stijl u wilt toepassen."
+msgstr "U kunt kiezen welke snij-stijl u wilt toepassen."
 
 #: modules/video_output/x11/xvmc.c:151
 msgid "XVMC extension video output"
 msgstr "XVMC extensie video-uitvoer"
 
-#: modules/video_output/xcb/xcb.c:62
+#: modules/video_output/xcb/x11.c:59
 msgid "XCB"
 msgstr "XCB"
 
-#: modules/video_output/xcb/xcb.c:63
+#: modules/video_output/xcb/x11.c:60
 msgid "(Experimental) XCB video output"
 msgstr "(Experimenteel) XCB video-uitvoer"
+
+#: modules/video_output/xcb/window.c:56
+#, fuzzy
+msgid "XCB window"
+msgstr "Venster sluiten"
+
+#: modules/video_output/xcb/window.c:57
+#, fuzzy
+msgid "(Experimental) XCB video window"
+msgstr "(Experimenteel) XCB video-uitvoer"
+
+#: modules/video_output/xcb/window.c:165
+#, fuzzy
+msgctxt "ASCII VLC media player"
+msgid "VLC media player"
+msgstr "VLC mediaspeler"
+
+#: modules/video_output/xcb/window.c:167
+#, fuzzy
+msgctxt "ASCII VLC"
+msgid "VLC"
+msgstr "VLM"
 
 #: modules/video_output/yuv.c:51
 msgid "device, fifo or filename"
@@ -24849,7 +24847,7 @@ msgstr "apparaat, fifo of bestandsnaam"
 
 #: modules/video_output/yuv.c:52
 msgid "device, fifo or filename to write yuv frames too."
-msgstr "apparaat, fifo of bestandsnaam om yuv frames naar te schrijven."
+msgstr "apparaat, fifo of bestandsnaam om yuv-beelden naar te schrijven."
 
 #: modules/video_output/yuv.c:58
 msgid "YUV4MPEG2 header (default disabled)"
@@ -24863,27 +24861,27 @@ msgid ""
 msgstr ""
 "De YUV4MPEG2 header is compatibel met de mplayer yuv video-uitvoer en "
 "vereist YV12/I420 fourcc. Standaard schrijft vlc de fourcc van de "
-"afbeeldingsframe naar het uitvoerdoel."
+"afbeeldingsrand naar het uitvoerdoel."
 
 #: modules/video_output/yuv.c:66
 msgid "YUV output"
-msgstr "YUV uitvoer"
+msgstr "YUV-uitvoer"
 
 #: modules/video_output/yuv.c:67
 msgid "YUV video output"
-msgstr "YUV video-uitvoer"
+msgstr "YUV-video-uitvoer"
 
 #: modules/visualization/galaktos/plugin.c:48
 msgid "GaLaktos visualization"
-msgstr "GaLaktos visualizatie"
+msgstr "GaLaktos-visualisatie"
 
 #: modules/visualization/goom.c:61
 msgid "Goom display width"
-msgstr "Breedte goomvideo"
+msgstr "Breedte Goom-weergave"
 
 #: modules/visualization/goom.c:62
 msgid "Goom display height"
-msgstr "Hoogte goomvideo"
+msgstr "Hoogte Goom-weergave"
 
 #: modules/visualization/goom.c:63
 msgid ""
@@ -25051,6 +25049,9 @@ msgstr "Visuele effectenfilter"
 #: modules/visualization/visual/visual.c:123
 msgid "Spectrum analyser"
 msgstr "Spectrum analyser"
+
+#~ msgid "FFmpeg video filter"
+#~ msgstr "FFmpeg videofilter"
 
 #~ msgid "Autodetect"
 #~ msgstr "Automatisch detecteren"
@@ -25660,7 +25661,8 @@ msgstr "Spectrum analyser"
 #~ msgstr "64"
 
 #~ msgid "High Priority FEC Rate [Undefined,1/2,2/3,3/4,5/6,7/8]"
-#~ msgstr "Hoge prioriteit FEC-Ratio [Undefined,1/2,2/3,3/4,5/6,7/8]"
+#~ msgstr ""
+#~ "Hoge prioriteit FEC-snelheid [Niet-gedefinieerd,1/2,2/3,3/4,5/6,7/8]"
 
 #~ msgid "Illegal Polarization"
 #~ msgstr "Ongeldige polarizatie"
@@ -25767,14 +25769,14 @@ msgstr "Spectrum analyser"
 #~ msgid ""
 #~ "Samplerate of the captured audio stream, in Hz (eg: 11025, 22050, 44100)"
 #~ msgstr ""
-#~ "Samplerate van de opgenomen audio stream, in Hz (bijvoorbeeld: 11025, "
+#~ "Samplesnelheid van de opgenomen audiostream, in Hz (bijvoorbeeld: 11025, "
 #~ "22050, 44100)"
 
 #~ msgid "The above message had unknown log level"
-#~ msgstr "Bovenstaand bericht heeft een onbekend log niveau"
+#~ msgstr "Bovenstaand bericht had een onbekend logingniveau"
 
 #~ msgid "The above message had unknown vcdimager log level"
-#~ msgstr "Bovenstaand bericht had een onbekend vcdimage log niveau"
+#~ msgstr "Bovenstaand bericht had een onbekend vcdimage loggingniveau"
 
 #~ msgid "spatializer"
 #~ msgstr "spatializer"
@@ -25919,13 +25921,13 @@ msgstr "Spectrum analyser"
 #~ msgstr "Bestand opslaan"
 
 #~ msgid "Choose a filename to save the VLM configuration..."
-#~ msgstr "Kies een bestandsnaam om de VLM configuratie naar op te slaan..."
+#~ msgstr "Kies een bestandsnaam om de VLM-configuratie naar op te slaan..."
 
 #~ msgid "VLM conf (*.vlm) ;; All (*.*)"
 #~ msgstr "VLM configuratie (*.vlm) ;; Alles (*.*)"
 
 #~ msgid "Open a VLM Configuration File"
-#~ msgstr "Open een VLM configuratiebestand"
+#~ msgstr "Open een VLM-configuratiebestand"
 
 #~ msgid "&Playlist"
 #~ msgstr "Afspeel&lijst"
