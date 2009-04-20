@@ -153,7 +153,7 @@ Insert Slider widget
 <TR><TD>Playlist:
 <INPUT type=button value="Prev" onClick='getVLC("vlc").playlist.prev();'>
 <INPUT type=button value="Next" onClick='getVLC("vlc").playlist.next();'>
-<INPUT type=button value="Clear All" onClick='getVLC("vlc").playlist.clear(); doItemCount();'>
+<INPUT type=button value="Clear All" onClick='doPlaylistClearAll();'>
     Aspect Ratio:
     <SELECT readonly onChange='doAspectRatio(this.value)'>
       <OPTION value="default">Default</OPTION>
@@ -329,7 +329,7 @@ function doItemCount()
     var vlc = getVLC("vlc");
     if( vlc )
     {
-        var count = vlc.playlist.itemCount;
+        var count = vlc.playlist.items.count;
         document.getElementById("itemCount").value = " Items " + count + " ";
     }
 }
@@ -338,7 +338,21 @@ function doRemoveItem(item)
 {
     var vlc = getVLC("vlc");
     if( vlc )
-        vlc.playlist.removeItem(item);
+        vlc.playlist.items.remove(item);
+}
+
+function doPlaylistClearAll()
+{
+    var vlc = getVLC("vlc");
+    if( vlc )
+    {
+        vlc.playlist.items.clear();
+        while( vlc.playlist.items.count > 0)
+        {
+            // wait till playlist empties.
+        }
+        doItemCount();
+    }
 }
 
 function doMessages()
@@ -532,8 +546,8 @@ function doGo(targetURL)
 
     if( vlc )
     {
-        vlc.playlist.clear();
-        while( vlc.playlist.itemCount > 0 )
+        vlc.playlist.items.clear();
+        while( vlc.playlist.items.count > 0 )
         {
             // clear() may return before the playlist has actually been cleared
             // just wait for it to finish its job
@@ -546,7 +560,7 @@ function doGo(targetURL)
             vlc.log.verbosity = 1;
             vlc.log.messages.clear();
             // play MRL
-            vlc.playlist.play();
+            vlc.playlist.playItem(itemId);
             if( monitorTimerId == 0 )
             {
                 monitor();
@@ -583,7 +597,7 @@ function doPlayOrPause()
             vlc.playlist.togglePause();
             monitor();
         }
-        else if( vlc.playlist.itemCount > 0 )
+        else if( vlc.playlist.items.count > 0 )
         {
             // clear the message log and enable error logging
             vlc.log.verbosity = 1;
