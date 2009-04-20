@@ -498,8 +498,8 @@ static int Mpeg4GASpecificConfig( mpeg4_cfg_t *p_cfg, bs_t *s )
 static int Mpeg4ReadAudioObjectType( bs_t *s )
 {
     int i_type = bs_read( s, 5 );
-    if( i_type == 0x1f )
-        i_type += bs_read( s, 6 );
+    if( i_type == 31 )
+        i_type = 32 + bs_read( s, 6 );
     return i_type;
 }
 
