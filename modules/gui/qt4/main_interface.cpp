@@ -1,7 +1,7 @@
 /*****************************************************************************
  * main_interface.cpp : Main interface
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -82,6 +82,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     input_name           = "";
     fullscreenControls   = NULL;
     cryptedLabel         = NULL;
+    controls             = NULL;
+    inputC               = NULL;
 
     bgWasVisible         = false;
     i_bg_height          = 0;
@@ -133,7 +135,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      *  UI and Widgets design
      **************************/
     setVLCWindowsTitle();
-    handleMainUi( settings );
+    createMainWidget( settings );
 
     /************
      * Menu Bar *
@@ -325,90 +327,6 @@ MainInterface::~MainInterface()
 /*****************************
  *   Main UI handling        *
  *****************************/
-
-inline void MainInterface::createStatusBar()
-{
-    /****************
-     *  Status Bar  *
-     ****************/
-    /* Widgets Creation*/
-    QStatusBar *statusBarr = statusBar();
-
-    TimeLabel *timeLabel = new TimeLabel( p_intf );
-    nameLabel = new QLabel( this );
-    nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
-                                      | Qt::TextSelectableByKeyboard );
-    SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x", this );
-
-    /* Styling those labels */
-    timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
-    nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
-
-    /* and adding those */
-    statusBarr->addWidget( nameLabel, 8 );
-    statusBarr->addPermanentWidget( speedLabel, 0 );
-    statusBarr->addPermanentWidget( timeLabel, 0 );
-
-    /* timeLabel behaviour:
-       - double clicking opens the goto time dialog
-       - right-clicking and clicking just toggle between remaining and
-         elapsed time.*/
-    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
-
-    CONNECT( THEMIM->getIM(), encryptionChanged( bool ) , this, showCryptedLabel( bool ) );
-}
-
-void MainInterface::showCryptedLabel( bool b_show )
-{
-    if( cryptedLabel == NULL )
-    {
-        cryptedLabel = new QLabel;
-        // The lock icon is not the right one for DRM protection/scrambled.
-        //cryptedLabel->setPixmap( QPixmap( ":/lock" ) );
-        cryptedLabel->setText( "DRM" );
-        statusBar()->addWidget( cryptedLabel );
-    }
-
-    cryptedLabel->setVisible( b_show );
-}
-
-inline void MainInterface::initSystray()
-{
-    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
-    bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
-
-    if( config_GetInt( p_intf, "qt-start-minimized") > 0 )
-    {
-        if( b_systrayAvailable )
-        {
-            b_systrayWanted = true;
-            hide();
-        }
-        else
-            msg_Err( p_intf, "cannot start minimized without system tray bar" );
-    }
-
-    if( b_systrayAvailable && b_systrayWanted )
-            createSystray();
-}
-
-/**
- * Give the decorations of the Main Window a correct Name.
- * If nothing is given, set it to VLC...
- **/
-void MainInterface::setVLCWindowsTitle( QString aTitle )
-{
-    if( aTitle.isEmpty() )
-    {
-        setWindowTitle( qtr( "VLC media player" ) );
-    }
-    else
-    {
-        setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
-    }
-}
-
 void MainInterface::recreateToolbars()
 {
     settings->beginGroup( "MainWindow" );
@@ -427,7 +345,7 @@ void MainInterface::recreateToolbars()
     settings->endGroup();
 }
 
-void MainInterface::handleMainUi( QSettings *settings )
+void MainInterface::createMainWidget( QSettings *settings )
 {
     /* Create the main Widget and the mainLayout */
     QWidget *main = new QWidget;
@@ -494,6 +412,60 @@ void MainInterface::handleMainUi( QSettings *settings )
     {
         fullscreenControls = new FullscreenControllerWidget( p_intf );
     }
+}
+
+inline void MainInterface::createStatusBar()
+{
+    /****************
+     *  Status Bar  *
+     ****************/
+    /* Widgets Creation*/
+    QStatusBar *statusBarr = statusBar();
+
+    TimeLabel *timeLabel = new TimeLabel( p_intf );
+    nameLabel = new QLabel( this );
+    nameLabel->setTextInteractionFlags( Qt::TextSelectableByMouse
+                                      | Qt::TextSelectableByKeyboard );
+    SpeedLabel *speedLabel = new SpeedLabel( p_intf, "1.00x", this );
+
+    /* Styling those labels */
+    timeLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    speedLabel->setFrameStyle( QFrame::Sunken | QFrame::Panel );
+    nameLabel->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel);
+
+    /* and adding those */
+    statusBarr->addWidget( nameLabel, 8 );
+    statusBarr->addPermanentWidget( speedLabel, 0 );
+    statusBarr->addPermanentWidget( timeLabel, 0 );
+
+    /* timeLabel behaviour:
+       - double clicking opens the goto time dialog
+       - right-clicking and clicking just toggle between remaining and
+         elapsed time.*/
+    CONNECT( timeLabel, timeLabelDoubleClicked(), THEDP, gotoTimeDialog() );
+
+    CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
+             this, showCryptedLabel( bool ) );
+}
+
+inline void MainInterface::initSystray()
+{
+    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
+    bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
+
+    if( config_GetInt( p_intf, "qt-start-minimized") > 0 )
+    {
+        if( b_systrayAvailable )
+        {
+            b_systrayWanted = true;
+            hide();
+        }
+        else
+            msg_Err( p_intf, "cannot start minimized without system tray bar" );
+    }
+
+    if( b_systrayAvailable && b_systrayWanted )
+            createSystray();
 }
 
 inline void MainInterface::askForPrivacy()
@@ -651,6 +623,39 @@ QSize MainInterface::sizeHint() const
     return QSize( nwidth, nheight );
 }
 
+/* Video widget cannot do this synchronously as it runs in another thread */
+/* Well, could it, actually ? Probably dangerous ... */
+
+/* This function is called:
+   - toggling of minimal View
+   - through askUpdate() by Vout thread request video and resize video (zoom)
+   - Advanced buttons toggled
+ */
+void MainInterface::doComponentsUpdate()
+{
+    msg_Dbg( p_intf, "Updating the geometry" );
+    /* Here we resize to sizeHint() and not adjustsize because we want
+       the videoWidget to be exactly the correctSize */
+    resize( sizeHint() );
+    //    adjustSize()  ;
+#ifndef NDEBUG
+    debug();
+#endif
+}
+
+void MainInterface::debug()
+{
+#ifndef NDEBUG
+    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
+    if( videoWidget && videoWidget->isVisible() )
+    {
+        msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
+        msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
+    }
+#endif
+}
+
 void MainInterface::toggleFSC()
 {
    if( !fullscreenControls ) return;
@@ -666,19 +671,6 @@ void MainInterface::popupMenu( const QPoint &p )
     if( !childAt( p ) || ( ( childAt( p ) != menuBar() )
                         && ( childAt( p )->parentWidget() != statusBar() ) ) )
         QVLCMenu::PopupMenu( p_intf, true );
-}
-
-void MainInterface::debug()
-{
-#ifndef NDEBUG
-    msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
-    msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    if( videoWidget && videoWidget->isVisible() )
-    {
-        msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
-        msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
-    }
-#endif
 }
 
 /****************************************************************************
@@ -869,26 +861,6 @@ void MainInterface::toggleMinimalView( bool b_switch )
     emit minimalViewToggled( b_switch );
 }
 
-/* Video widget cannot do this synchronously as it runs in another thread */
-/* Well, could it, actually ? Probably dangerous ... */
-
-/* This function is called:
-   - toggling of minimal View
-   - through askUpdate() by Vout thread request video and resize video (zoom)
-   - Advanced buttons toggled
- */
-void MainInterface::doComponentsUpdate()
-{
-    msg_Dbg( p_intf, "Updating the geometry" );
-    /* Here we resize to sizeHint() and not adjustsize because we want
-       the videoWidget to be exactly the correctSize */
-    resize( sizeHint() );
-    //    adjustSize()  ;
-#ifndef NDEBUG
-    debug();
-#endif
-}
-
 /* toggling advanced controls buttons */
 void MainInterface::toggleAdvanced()
 {
@@ -935,6 +907,36 @@ void MainInterface::setName( QString name )
        fit in the label */
     nameLabel->setText( " " + name + " " );
     nameLabel->setToolTip( " " + name +" " );
+}
+
+/**
+ * Give the decorations of the Main Window a correct Name.
+ * If nothing is given, set it to VLC...
+ **/
+void MainInterface::setVLCWindowsTitle( QString aTitle )
+{
+    if( aTitle.isEmpty() )
+    {
+        setWindowTitle( qtr( "VLC media player" ) );
+    }
+    else
+    {
+        setWindowTitle( aTitle + " - " + qtr( "VLC media player" ) );
+    }
+}
+
+void MainInterface::showCryptedLabel( bool b_show )
+{
+    if( cryptedLabel == NULL )
+    {
+        cryptedLabel = new QLabel;
+        // The lock icon is not the right one for DRM protection/scrambled.
+        //cryptedLabel->setPixmap( QPixmap( ":/lock" ) );
+        cryptedLabel->setText( "DRM" );
+        statusBar()->addWidget( cryptedLabel );
+    }
+
+    cryptedLabel->setVisible( b_show );
 }
 
 /*****************************************************************************

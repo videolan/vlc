@@ -109,7 +109,8 @@ private:
     FullscreenControllerWidget *fullscreenControls;
     DialogHandler       *dialogHandler;
 
-    void handleMainUi( QSettings* );
+    void createMainWidget( QSettings* );
+    void createStatusBar();
     void askForPrivacy();
     int  privacyDialog( QList<ConfigControl *> *controls );
 
@@ -118,7 +119,6 @@ private:
     void createSystray();
     void initSystray();
 
-    void createStatusBar();
 
     /* Video */
     VideoWidget         *videoWidget;
