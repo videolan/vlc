@@ -472,8 +472,13 @@ static int ReadNSVs( demux_t *p_demux )
     switch( ( fcc = VLC_FOURCC( header[4], header[5], header[6], header[7] ) ) )
     {
         case VLC_FOURCC( 'V', 'P', '3', ' ' ):
+        case VLC_FOURCC( 'V', 'P', '3', '0' ):
         case VLC_FOURCC( 'V', 'P', '3', '1' ):
             fcc = VLC_FOURCC( 'V', 'P', '3', '1' );
+            break;
+        case VLC_FOURCC( 'V', 'P', '5', ' ' ):
+        case VLC_FOURCC( 'V', 'P', '5', '0' ):
+            fcc = VLC_FOURCC( 'V', 'P', '5', '0' );
             break;
         case VLC_FOURCC( 'V', 'P', '6', '0' ):
         case VLC_FOURCC( 'V', 'P', '6', '1' ):
@@ -514,6 +519,9 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'A', 'A', 'C', ' ' ):
         case VLC_FOURCC( 'A', 'A', 'C', 'P' ):
             fcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
+            break;
+        case VLC_FOURCC( 'S', 'P', 'X', ' ' ):
+            fcc = VLC_FOURCC( 's', 'p', 'x', ' ' );
             break;
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
