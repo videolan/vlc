@@ -869,6 +869,7 @@ AC_CHECK_HEADERS(fcntl.h sys/types.h sys/time.h sys/times.h sys/ioctl.h sys/stat
 AC_CHECK_HEADERS([arpa/inet.h netinet/in.h netinet/udplite.h sys/eventfd.h])
 AC_CHECK_HEADERS([net/if.h], [], [],
   [
+    #include <sys/types.h>
     #include <sys/socket.h>
   ])
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
