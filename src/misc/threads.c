@@ -779,6 +779,8 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         sigaddset (&set, SIGPIPE); /* We don't want this one, really! */
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
+
+#if (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
     {
         struct sched_param sp = { .sched_priority = priority, };
         int policy;
@@ -791,6 +793,9 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         pthread_attr_setschedpolicy (&attr, policy);
         pthread_attr_setschedparam (&attr, &sp);
     }
+#else
+    (void) priority;
+#endif
 
     /* The thread stack size.
      * The lower the value, the less address space per thread, the highest
