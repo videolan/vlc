@@ -175,11 +175,8 @@ typedef void *locale_t;
 #endif
 
 /* libintl support */
-#define _(str)           gettext(str)
-#define gettext(str)     vlc_gettext (str)
-#define pgettext(ctx,id) vlc_pgettext(ctx,id)
-
-#define N_(str) gettext_noop (str)
+#define _(str)            vlc_gettext (str)
+#define N_(str)           gettext_noop (str)
 #define gettext_noop(str) (str)
 
 #ifndef HAVE_SWAB

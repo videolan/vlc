@@ -2038,7 +2038,7 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     for( int i = 0; p_deinterlace_mode[i].psz_mode; i++ )
     {
         val.psz_string  = (char*)p_deinterlace_mode[i].psz_mode;
-        text.psz_string = (char*)gettext(p_deinterlace_mode[i].psz_description);
+        text.psz_string = (char*)vlc_gettext(p_deinterlace_mode[i].psz_description);
         var_Change( p_vout, "deinterlace", VLC_VAR_ADDCHOICE, &val, &text );
     }
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );

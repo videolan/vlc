@@ -192,7 +192,6 @@ int vlc_wclosedir( void *_p_dir )
 }
 
 #ifdef ENABLE_NLS
-# undef gettext
 # include <libintl.h>
 #endif
 

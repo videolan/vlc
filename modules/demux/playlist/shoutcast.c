@@ -402,8 +402,10 @@ static int DemuxStation( demux_t *p_demux )
                     input_item_CopyOptions( p_sys->p_current_input, p_input );
                     free( psz_mrl );
 
-#define SADD_INFO( type, field ) if( field ) { input_item_AddInfo( \
-                    p_input, _("Shoutcast"), gettext(type), "%s", field ) ; }
+#define SADD_INFO( type, field ) \
+                    if( field ) \
+                        input_item_AddInfo( p_input, _("Shoutcast"), \
+                                            vlc_gettext(type), "%s", field )
                     SADD_INFO( N_("Mime"), psz_mt );
                     SADD_INFO( N_("Bitrate"), psz_br );
                     SADD_INFO( N_("Listeners"), psz_lc );

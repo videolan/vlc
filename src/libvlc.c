@@ -67,7 +67,6 @@
 #endif
 
 #ifdef ENABLE_NLS
-# undef gettext
 # include <libintl.h> /* bindtextdomain */
 #endif
 

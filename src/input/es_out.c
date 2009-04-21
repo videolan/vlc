@@ -1206,7 +1206,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
     for( i = 0; ppsz_all_keys[i]; i++ )
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                       gettext(ppsz_all_keys[i]),
+                       vlc_gettext(ppsz_all_keys[i]),
                        vlc_dictionary_value_for_key( &p_meta->extra_tags,
                        ppsz_all_keys[i] ) );
         free( ppsz_all_keys[i] );
@@ -2759,7 +2759,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
 
             if( psz_value )
                 input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                               gettext(psz_key), gettext(psz_value) );
+                               vlc_gettext(psz_key), vlc_gettext(psz_value) );
             free( psz_key );
         }
         free( ppsz_all_keys );

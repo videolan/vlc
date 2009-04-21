@@ -29,7 +29,6 @@
 #include <stdarg.h>
 
 #ifdef ENABLE_NLS
-# undef gettext
 # include <libintl.h>
 #endif
 

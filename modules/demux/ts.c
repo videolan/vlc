@@ -3265,7 +3265,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     {
         p_fmt->subs.teletext.i_magazine = -1;
         p_fmt->subs.teletext.i_page = 0;
-        p_fmt->psz_description = strdup( gettext(ppsz_teletext_type[1]) );
+        p_fmt->psz_description = strdup( vlc_gettext(ppsz_teletext_type[1]) );
 
         dvbpsi_descriptor_t *p_dr;
         p_dr = PMTEsFindDescriptor( p_es, 0x46 );
@@ -3320,7 +3320,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
             /* */
             const ts_teletext_page_t *p = &p_page[i];
             p_es->fmt.psz_language = strndup( p->p_iso639, 3 );
-            p_es->fmt.psz_description = strdup(gettext(ppsz_teletext_type[p->i_type]));
+            p_es->fmt.psz_description = strdup(vlc_gettext(ppsz_teletext_type[p->i_type]));
             p_es->fmt.subs.teletext.i_magazine = p->i_magazine;
             p_es->fmt.subs.teletext.i_page = p->i_page;
 

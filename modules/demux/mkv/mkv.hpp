@@ -38,7 +38,6 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#undef gettext
 
 #include <inttypes.h>
 
