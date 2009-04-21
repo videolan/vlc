@@ -58,7 +58,7 @@
 #   include <IOKit/storage/IOCDMedia.h>
 #   include <IOKit/storage/IOCDMediaBSDClient.h>
 #elif defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
-#   include <sys/inttypes.h>
+#   include <inttypes.h>
 #   include <sys/cdio.h>
 #   include <sys/scsiio.h>
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
@@ -724,7 +724,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         sc.flags = SCCMD_READ;
         sc.timeout = 10000;
 
-        i_ret = ioctl( i_fd, SCIOCCOMMAND, &sc );
+        i_ret = ioctl( p_vcddev->i_device_handle, SCIOCCOMMAND, &sc );
         if( i_ret == -1 )
         {
             msg_Err( p_this, "SCIOCCOMMAND failed" );

@@ -147,10 +147,6 @@ typedef struct _CDROM_READ_TOC_EX {
 #define SRB_EVENT_NOTIFY    0x40
 
 #define READ_CD 0xbe
-#define SECTOR_TYPE_MODE2_FORM2 0x14
-#define SECTOR_TYPE_CDDA 0x04
-#define READ_CD_RAW_MODE2 0xF0
-#define READ_CD_USERDATA 0x10
 
 #define READ_TOC 0x43
 #define READ_TOC_FORMAT_TOC 0x0
@@ -211,6 +207,10 @@ struct SRB_ExecSCSICmd
 #pragma pack()
 #endif /* WIN32 */
 
+#define SECTOR_TYPE_MODE2_FORM2 0x14
+#define SECTOR_TYPE_CDDA 0x04
+#define READ_CD_RAW_MODE2 0xF0
+#define READ_CD_USERDATA 0x10
 
 /*****************************************************************************
  * Local Prototypes
