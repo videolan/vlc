@@ -79,6 +79,7 @@ void InputSlider::mouseReleaseEvent( QMouseEvent *event )
 {
     b_isSliding = false;
     event->accept();
+    QSlider::mouseReleaseEvent( event );
 }
 
 void InputSlider::mousePressEvent(QMouseEvent* event)
