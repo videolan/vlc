@@ -1973,25 +1973,25 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
         p_cmvd->data.p_cmvd->p_data == NULL )
     {
         msg_Warn( p_stream, "read box: \"cmov\" incomplete" );
-        return 1;
+        return 0;
     }
 
     if( p_dcom->data.p_dcom->i_algorithm != FOURCC_zlib )
     {
         msg_Dbg( p_stream, "read box: \"cmov\" compression algorithm : %4.4s "
                  "not supported", (char*)&p_dcom->data.p_dcom->i_algorithm );
-        return 1;
+        return 0;
     }
 
 #ifndef HAVE_ZLIB_H
     msg_Dbg( p_stream, "read box: \"cmov\" zlib unsupported" );
-    return 1;
+    return 0;
 
 #else
     /* decompress data */
     /* allocate a new buffer */
     if( !( p_data = malloc( p_cmvd->data.p_cmvd->i_uncompressed_size ) ) )
-        return 1;
+        return 0;
     /* init default structures */
     z_data.next_in   = p_cmvd->data.p_cmvd->p_data;
     z_data.avail_in  = p_cmvd->data.p_cmvd->i_compressed_size;
@@ -2006,7 +2006,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     {
         msg_Err( p_stream, "read box: \"cmov\" error while uncompressing" );
         free( p_data );
-        return 1;
+        return 0;
     }
 
     /* uncompress */
@@ -2015,7 +2015,7 @@ static int MP4_ReadBox_cmov( stream_t *p_stream, MP4_Box_t *p_box )
     {
         msg_Err( p_stream, "read box: \"cmov\" error while uncompressing" );
         free( p_data );
-        return 1;
+        return 0;
     }
 
     if( p_cmvd->data.p_cmvd->i_uncompressed_size != z_data.total_out )
