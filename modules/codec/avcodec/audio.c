@@ -72,6 +72,7 @@ struct decoder_sys_t
     FFMPEG_COMMON_MEMBERS
 
     /* Temporary buffer for libavcodec */
+    int     i_output_max;
     uint8_t *p_output;
 
     /*
@@ -203,7 +204,24 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
-    p_sys->p_output = malloc( AVCODEC_MAX_AUDIO_FRAME_SIZE );
+    switch( i_codec_id )
+    {
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 16, 0 )
+    case CODEC_ID_WAVPACK:
+        p_sys->i_output_max = 8 * sizeof(int32_t) * 131072;
+        break;
+#endif
+    case CODEC_ID_FLAC:
+        p_sys->i_output_max = 8 * sizeof(int32_t) * 65535;
+        break;
+    default:
+        p_sys->i_output_max = 0;
+        break;
+    }
+    if( p_sys->i_output_max < AVCODEC_MAX_AUDIO_FRAME_SIZE )
+        p_sys->i_output_max = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+    msg_Dbg( p_dec, "Using %d bytes output buffer", p_sys->i_output_max );
+    p_sys->p_output = malloc( p_sys->i_output_max );
     p_sys->p_samples = NULL;
     p_sys->i_samples = 0;
     p_sys->i_reject_count = 0;
@@ -292,7 +310,8 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         return NULL;
     }
-    if( p_block->i_buffer > AVCODEC_MAX_AUDIO_FRAME_SIZE )
+    i_output = __MAX( p_block->i_buffer, p_sys->i_output_max );
+    if( i_output < p_sys->i_output_max )
     {
         /* Grow output buffer if necessary (eg. for PCM data) */
         p_sys->p_output = realloc(p_sys->p_output, p_block->i_buffer);
@@ -305,7 +324,6 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
 
 #if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
-    i_output = __MAX( AVCODEC_MAX_AUDIO_FRAME_SIZE, p_block->i_buffer );
     i_used = avcodec_decode_audio2( p_sys->p_context,
                                    (int16_t*)p_sys->p_output, &i_output,
                                    p_block->p_buffer, p_block->i_buffer );
