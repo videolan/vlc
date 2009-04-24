@@ -253,6 +253,7 @@ private slots:
     void planHideFSC();
     void hideFSC();
     void slowHideFSC();
+    void centerFSC( int );
 
 private:
     virtual void customEvent( QEvent *event );

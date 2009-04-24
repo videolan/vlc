@@ -714,7 +714,23 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
 
     vlc_mutex_init_recursive( &lock );
 
-    CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ), this, setVoutList( vout_thread_t **, int ) );
+    CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
+             this, setVoutList( vout_thread_t **, int ) );
+
+    /* First Move */
+    QPoint pos1 = getSettings()->value( "FullScreen/pos" ).toPoint();
+    int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+    if( QApplication::desktop()->screenGeometry( number ).contains( pos1, true ) )
+    {
+        move( pos1 );
+        i_screennumber = number;
+        screenRes = QApplication::desktop()->screenGeometry(number);
+    }
+    else
+    {
+        centerFSC( number );
+    }
+
 }
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
@@ -724,24 +740,29 @@ FullscreenControllerWidget::~FullscreenControllerWidget()
     vlc_mutex_destroy( &lock );
 }
 
+void FullscreenControllerWidget::centerFSC( int number )
+{
+    screenRes = QApplication::desktop()->screenGeometry(number);
+    /* screen has changed, calculate new position */
+    QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
+            screenRes.y() + screenRes.height() - height());
+    move( pos );
+    i_screennumber = number;
+}
+
 /**
  * Show fullscreen controller
  */
 void FullscreenControllerWidget::showFSC()
 {
     adjustSize();
-    /* center down */
+
     int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+
     if( number != i_screennumber ||
         screenRes != QApplication::desktop()->screenGeometry(number) )
     {
-        screenRes = QApplication::desktop()->screenGeometry(number);
-        msg_Dbg( p_intf, "Calculation fullscreen controllers center");
-        /* screen has changed, calculate new position */
-        QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
-                             screenRes.y() + screenRes.height() - height());
-        move( pos );
-        i_screennumber = number;
+        centerFSC( number );
     }
 #ifdef WIN32TRICK
     // after quiting and going to fs, we need to call show()
