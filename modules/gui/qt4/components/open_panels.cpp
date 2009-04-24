@@ -422,9 +422,6 @@ void DiscOpenPanel::updateMRL()
     /* CDDA */
     } else {
         mrl = "cdda://" + ui.deviceCombo->currentText();
-        if( ui.titleSpin->value() > 0 ) {
-            mrl += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
-        }
     }
 
     fileList << mrl; mrl = "";
@@ -439,6 +436,11 @@ void DiscOpenPanel::updateMRL()
             mrl += " :sub-track=" +
                 QString("%1").arg( ui.subtitlesSpin->value() );
         }
+    }
+    else
+    {
+        if( ui.titleSpin->value() > 0 )
+            mrl += QString(" :cdda-track=%1").arg( ui.titleSpin->value() );
     }
     emit mrlUpdated( fileList, mrl );
 }
