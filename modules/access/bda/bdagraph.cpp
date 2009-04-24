@@ -1284,24 +1284,35 @@ HRESULT BDAGraph::Build()
             "Cannot QI Sample Grabber Filter: hr=0x%8lx", hr );
         return hr;
     }
-    ZeroMemory( &grabber_media_type, sizeof( AM_MEDIA_TYPE ) );
-    grabber_media_type.majortype = MEDIATYPE_Stream;
-    grabber_media_type.subtype   = MEDIASUBTYPE_MPEG2_TRANSPORT;
-    hr = p_grabber->SetMediaType( &grabber_media_type );
-    if( FAILED( hr ) )
-    {
-        msg_Warn( p_access, "Build: "\
-            "Cannot set media type on grabber filter: hr=0x%8lx", hr );
-        return hr;
-    }
 
-    hr = Connect( p_capture_device, p_sample_grabber );
-    if( FAILED( hr ) )
+    /* Try the possible stream type */
+    hr = E_FAIL;
+    for( int i = 0; i < 2; i++ )
     {
-        msg_Warn( p_access, "Build: "\
-            "Cannot connect Sample Grabber to Capture device: hr=0x%8lx", hr );
-        return hr;
+        ZeroMemory( &grabber_media_type, sizeof( AM_MEDIA_TYPE ) );
+        grabber_media_type.majortype = MEDIATYPE_Stream;
+        grabber_media_type.subtype   =  i == 0 ? MEDIASUBTYPE_MPEG2_TRANSPORT : KSDATAFORMAT_SUBTYPE_BDA_MPEG2_TRANSPORT;
+        msg_Dbg( p_access, "Build: "
+                           "Trying connecting with subtype %s",
+                           i == 0 ? "MEDIASUBTYPE_MPEG2_TRANSPORT" : "KSDATAFORMAT_SUBTYPE_BDA_MPEG2_TRANSPORT" );
+        hr = p_grabber->SetMediaType( &grabber_media_type );
+        if( SUCCEEDED( hr ) )
+        {
+            hr = Connect( p_capture_device, p_sample_grabber );
+            if( SUCCEEDED( hr ) )
+                break;
+            msg_Warn( p_access, "Build: "\
+                "Cannot connect Sample Grabber to Capture device: hr=0x%8lx (try %d/2)", hr, 1+i );
+        }
+        else
+        {
+            msg_Warn( p_access, "Build: "\
+                "Cannot set media type on grabber filter: hr=0x%8lx (try %d/2", hr, 1+i );
+        }
     }
+    if( hr )
+        return hr;
+
     /* We need the MPEG2 Demultiplexer even though we are going to use the VLC
      * TS demuxer. The TIF filter connects to the MPEG2 demux and works with
      * the Network Provider filter to set up the stream */
