@@ -633,6 +633,8 @@ QSize MainInterface::sizeHint() const
  */
 void MainInterface::doComponentsUpdate()
 {
+    if( isFullScreen() ) return;
+
     msg_Dbg( p_intf, "Updating the geometry" );
     /* Here we resize to sizeHint() and not adjustsize because we want
        the videoWidget to be exactly the correctSize */
