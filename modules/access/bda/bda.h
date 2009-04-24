@@ -79,8 +79,5 @@ long dvb_ReadBuffer( access_t* p_access, long* l_buffer_len, BYTE* p_buff );
  ****************************************************************************/
 struct access_sys_t
 {
-    /* These 2 must be left at the beginning */
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
     BDAGraph *p_bda_module;
 };

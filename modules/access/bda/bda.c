@@ -511,9 +511,6 @@ static void Close( vlc_object_t *p_this )
 
     dvb_deleteBDAGraph( p_access );
 
-    vlc_mutex_destroy( &p_sys->lock );
-    vlc_cond_destroy( &p_sys->wait );
-
     free( p_sys );
 }
 
