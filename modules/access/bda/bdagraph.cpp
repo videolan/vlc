@@ -285,7 +285,7 @@ int BDAGraph::SubmitDVBTTuneRequest()
     TransmissionMode          i_transmission;
     HierarchyAlpha            i_hierarchy;
 
-    l_frequency    = var_GetInteger( p_access, "dvb-frequency" );
+    l_frequency    = var_GetInteger( p_access, "dvb-frequency" ) / 1000;
     l_bandwidth    = var_GetInteger( p_access, "dvb-bandwidth" );
     l_hp_fec       = var_GetInteger( p_access, "dvb-code-rate-hp" );
     l_lp_fec       = var_GetInteger( p_access, "dvb-code-rate-lp" );
@@ -481,7 +481,7 @@ int BDAGraph::SubmitDVBCTuneRequest()
     int  i_qam;
     ModulationType i_qam_mod;
 
-    l_frequency  = var_GetInteger( p_access, "dvb-frequency" );
+    l_frequency  = var_GetInteger( p_access, "dvb-frequency" ) / 1000;
     l_symbolrate = var_GetInteger( p_access, "dvb-srate" );
     i_qam        = var_GetInteger( p_access, "dvb-modulation" );
 
