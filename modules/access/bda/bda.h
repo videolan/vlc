@@ -67,8 +67,7 @@ int dvb_SubmitATSCTuneRequest( access_t* p_access );
 int dvb_SubmitDVBTTuneRequest( access_t* p_access );
 int dvb_SubmitDVBCTuneRequest( access_t* p_access );
 int dvb_SubmitDVBSTuneRequest( access_t* p_access );
-long dvb_GetBufferSize( access_t* p_access );
-long dvb_ReadBuffer( access_t* p_access, long* l_buffer_len, BYTE* p_buff );
+block_t *dvb_Pop( access_t* p_access );
 
 #ifdef __cplusplus
 }

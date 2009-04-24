@@ -69,21 +69,59 @@ extern "C" {
         return VLC_EGENERIC;
     };
 
-    long dvb_GetBufferSize( access_t* p_access )
+    block_t *dvb_Pop( access_t* p_access )
     {
         if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->GetBufferSize();
-        return -1;
-    };
-
-    long dvb_ReadBuffer( access_t* p_access, long* l_buffer_len, BYTE* p_buff )
-    {
-        if( p_access->p_sys->p_bda_module )
-            return p_access->p_sys->p_bda_module->ReadBuffer( l_buffer_len,
-                p_buff );
-        return -1;
+            return p_access->p_sys->p_bda_module->Pop();
+        return NULL;
     };
 };
+
+/*****************************************************************************
+* BDAOutput
+*****************************************************************************/
+BDAOutput::BDAOutput( access_t *p_access ) :
+    p_access(p_access), p_first(NULL), pp_next(&p_first)
+{
+    vlc_mutex_init( &lock );
+    vlc_cond_init( &wait );
+}
+BDAOutput::~BDAOutput()
+{
+    Empty();
+    vlc_mutex_destroy( &lock );
+    vlc_cond_destroy( &wait );
+}
+void BDAOutput::Push( block_t *p_block )
+{
+    vlc_mutex_locker l( &lock );
+
+    block_ChainLastAppend( &pp_next, p_block );
+    vlc_cond_signal( &wait );
+}
+block_t *BDAOutput::Pop()
+{
+    vlc_mutex_locker l( &lock );
+
+    if( !p_first )
+        vlc_cond_timedwait( &wait, &lock, mdate() + 250*1000 );
+
+    block_t *p_ret = p_first;
+
+    p_first = NULL;
+    pp_next = &p_first;
+
+    return p_ret;
+}
+void BDAOutput::Empty()
+{
+    vlc_mutex_locker l( &lock );
+
+    if( p_first )
+        block_ChainRelease( p_first );
+    p_first = NULL;
+    pp_next = &p_first;
+}
 
 /*****************************************************************************
 * Constructor
@@ -92,9 +130,9 @@ BDAGraph::BDAGraph( access_t* p_this ):
     p_access( p_this ),
     guid_network_type(GUID_NULL),
     l_tuner_used(-1),
-    d_graph_register( 0 )
+    d_graph_register( 0 ),
+    output( p_this )
 {
-    b_ready = false;
     p_tuning_space = NULL;
     p_tune_request = NULL;
     p_media_control = NULL;
@@ -1746,61 +1784,11 @@ HRESULT BDAGraph::Start()
 }
 
 /*****************************************************************************
-* Read the stream of data - query the buffer size required
+* Pop the stream of data
 *****************************************************************************/
-long BDAGraph::GetBufferSize()
+block_t *BDAGraph::Pop()
 {
-    long l_buffer_size = 0;
-    long l_queue_size;
-
-    b_ready = true;
-
-    for( int i_timer = 0; queue_sample.empty() && i_timer < 200; i_timer++ )
-        Sleep( 10 );
-
-    l_queue_size = queue_sample.size();
-    if( l_queue_size <= 0 )
-    {
-        msg_Warn( p_access, "BDA GetBufferSize: Timed Out waiting for sample" );
-        return -1;
-    }
-
-    /* Establish the length of the queue as it grows quickly. If the queue
-     * size is checked dynamically there is a risk of not exiting the loop */
-    for( long l_queue_count=0; l_queue_count < l_queue_size; l_queue_count++ )
-    {
-        l_buffer_size += queue_sample.front()->GetActualDataLength();
-        queue_buffer.push( queue_sample.front() );
-        queue_sample.pop();
-    }
-    return l_buffer_size;
-}
-
-/*****************************************************************************
-* Read the stream of data - Retrieve from the buffer queue
-******************************************************************************/
-long BDAGraph::ReadBuffer( long* pl_buffer_len, BYTE* p_buffer )
-{
-    HRESULT hr = S_OK;
-
-    *pl_buffer_len = 0;
-    BYTE *p_buff_temp;
-
-    while( !queue_buffer.empty() )
-    {
-        queue_buffer.front()->GetPointer( &p_buff_temp );
-        hr = queue_buffer.front()->IsDiscontinuity();
-        if( hr == S_OK )
-            msg_Warn( p_access,
-                "BDA ReadBuffer: Sample Discontinuity. 0x%8lx", hr );
-        memcpy( p_buffer + *pl_buffer_len, p_buff_temp,
-            queue_buffer.front()->GetActualDataLength() );
-        *pl_buffer_len += queue_buffer.front()->GetActualDataLength();
-        queue_buffer.front()->Release();
-        queue_buffer.pop();
-    }
-
-    return *pl_buffer_len;
+    return output.Pop();
 }
 
 /******************************************************************************
@@ -1808,16 +1796,24 @@ long BDAGraph::ReadBuffer( long* pl_buffer_len, BYTE* p_buffer )
 ******************************************************************************/
 STDMETHODIMP BDAGraph::SampleCB( double d_time, IMediaSample *p_sample )
 {
-    if( b_ready )
+    if( p_sample->IsDiscontinuity() == S_OK )
+        msg_Warn( p_access, "BDA SampleCB: Sample Discontinuity.");
+
+    const size_t i_sample_size = p_sample->GetActualDataLength();
+    BYTE *p_sample_data;
+    p_sample->GetPointer( &p_sample_data );
+
+    if( i_sample_size > 0 && p_sample_data )
     {
-        p_sample->AddRef();
-        queue_sample.push( p_sample );
-    }
-    else
-    {
-        msg_Warn( p_access, "BDA SampleCB: Not ready - dropped sample" );
-    }
-    return S_OK;
+        block_t *p_block = block_New( p_access, i_sample_size );
+
+        if( p_block )
+        {
+            memcpy( p_block->p_buffer, p_sample_data, i_sample_size );
+            output.Push( p_block );
+        }
+     }
+     return S_OK;
 }
 
 STDMETHODIMP BDAGraph::BufferCB( double d_time, BYTE* p_buffer,
@@ -1842,23 +1838,8 @@ HRESULT BDAGraph::Destroy()
         Deregister();
     }
 
-/* We need to empty the buffers of any unprocessed data */
-    msg_Dbg( p_access, "Queue sample size = %d", queue_sample.size() );
-    while( !queue_sample.empty() )
-    {
-        ul_refcount = queue_sample.front()->Release();
-        queue_sample.pop();
-        if( ul_refcount )
-            msg_Warn( p_access, "BDAGraph: Non-zero Ref: %d", ul_refcount );
-    }
-    msg_Dbg( p_access, "Queue buffer size = %d", queue_buffer.size() );
-    while( !queue_buffer.empty() )
-    {
-        ul_refcount = queue_buffer.front()->Release();
-        queue_buffer.pop();
-        if( ul_refcount )
-            msg_Warn( p_access, "BDAGraph: Non-zero Ref: %d", ul_refcount );
-    }
+    output.Empty();
+
     if( p_grabber )
     {
         p_grabber->Release();

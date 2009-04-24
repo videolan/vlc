@@ -565,25 +565,5 @@ static int Control( access_t *p_access, int i_query, va_list args )
  *****************************************************************************/
 static block_t *Block( access_t *p_access )
 {
-    block_t *p_block;
-    long l_buffer_len;
-
-    if( !vlc_object_alive (p_access) )
-        return NULL;
-
-    l_buffer_len = dvb_GetBufferSize( p_access );
-    if( l_buffer_len < 0 )
-    {
-        p_access->info.b_eof = true;
-        return NULL;
-    }
-
-    p_block = block_New( p_access, l_buffer_len );
-    if( dvb_ReadBuffer( p_access, &l_buffer_len, p_block->p_buffer ) < 0 )
-    {
-        p_access->info.b_eof = true;
-        return NULL;
-    }
-
-    return p_block;
+    return dvb_Pop( p_access );
 }

@@ -52,6 +52,24 @@ using namespace std;
 #include "bdadefs.h"
 #include "bda.h"
 
+class BDAOutput
+{
+public:
+    BDAOutput( access_t * );
+    ~BDAOutput();
+
+    void    Push( block_t * );
+    block_t *Pop();
+    void    Empty();
+
+private:
+    access_t    *p_access;
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+    block_t     *p_first;
+    block_t     **pp_next;
+};
+
 /* The main class for building the filter graph */
 class BDAGraph : public ISampleGrabberCB
 {
@@ -59,12 +77,14 @@ public:
     BDAGraph( access_t* p_access );
     virtual ~BDAGraph();
 
+    /* */
     int SubmitATSCTuneRequest();
     int SubmitDVBTTuneRequest();
     int SubmitDVBCTuneRequest();
     int SubmitDVBSTuneRequest();
-    long GetBufferSize();
-    long ReadBuffer( long* l_buffer_len, BYTE* p_buff );
+
+    /* */
+    block_t *Pop();
 
 private:
     /* ISampleGrabberCB methods */
@@ -82,9 +102,7 @@ private:
     /* registration number for the RunningObjectTable */
     DWORD     d_graph_register;
 
-    queue<IMediaSample*> queue_sample;
-    queue<IMediaSample*> queue_buffer;
-    BOOL b_ready;
+    BDAOutput       output;
 
     IMediaControl*  p_media_control;
     IGraphBuilder*  p_filter_graph;
