@@ -124,7 +124,7 @@ void ConvertDialog::close()
 
     if( dumpBox->isChecked() )
     {
-        mrl = "demux=dump :demuxdump-file" + fileLine->text();
+        mrl = "demux=dump :demuxdump-file=" + fileLine->text();
     }
     else
     {

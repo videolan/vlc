@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dialogs_provider.cpp : Dialog Provider
  *****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -606,6 +606,8 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     /* Get SoutMRL */
     if( !EMPTY_STR( psz_soutoption ) )
     {
+        options += QString( psz_soutoption ).split( " :");
+
         /* Create Input */
         input_item_t *p_input;
         p_input = input_item_New( p_intf, qtu( mrl ), _("Streaming") );
@@ -618,12 +620,9 @@ void DialogsProvider::streamingDialog( QWidget *parent,
             {
                 input_item_AddOption( p_input, qtu( qs ),
                         VLC_INPUT_OPTION_TRUSTED );
+                msg_Dbg( p_intf, "Adding option: %s", qtu( qs ) );
             }
         }
-
-        /* Add SoutMRL */
-        msg_Dbg( p_intf, "Streaming MRL is: %s", psz_soutoption );
-        input_item_AddOption( p_input, psz_soutoption, VLC_INPUT_OPTION_TRUSTED );
 
         /* Switch between enqueuing and starting the item */
         /* FIXME: playlist_AddInput() can fail */
