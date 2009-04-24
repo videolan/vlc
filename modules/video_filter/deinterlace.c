@@ -133,6 +133,7 @@ vlc_module_begin ()
     add_string( "deinterlace-mode", "discard", NULL, MODE_TEXT,
                 MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 )
+        change_safe ()
 
     add_shortcut( "deinterlace" )
     set_callbacks( Create, Destroy )
