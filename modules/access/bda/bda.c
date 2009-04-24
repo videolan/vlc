@@ -399,9 +399,11 @@ static int Open( vlc_object_t *p_this )
         i_ret = dvb_SubmitATSCTuneRequest( p_access );
     }
 
-    if( i_ret != VLC_SUCCESS )
+    if( !i_ret )
+        p_access->psz_demux = strdup( "ts" );
+    else
         msg_Warn( p_access, "DVB_Open: Unsupported Network %s",
-            p_access->psz_access);
+                  p_access->psz_access);
     return i_ret;
 }
 
