@@ -704,6 +704,7 @@ WId MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
                                  unsigned int *pi_height )
 {
     /* Request the videoWidget */
+    if( !videoWidget ) return 0;
     WId ret = videoWidget->request( p_nvout,pi_x, pi_y,
                                     pi_width, pi_height, b_keep_size );
     if( ret ) /* The videoWidget is available */
