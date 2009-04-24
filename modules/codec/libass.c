@@ -1,7 +1,7 @@
 /*****************************************************************************
  * SSA/ASS subtitle decoder using libass.
  *****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
+ * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
@@ -617,6 +617,7 @@ static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img )
 
 static void SubpictureReleaseRegions( spu_t *p_spu, subpicture_t *p_subpic )
 {
+    VLC_UNUSED( p_spu );
     subpicture_region_ChainDelete( p_subpic->p_region );
     p_subpic->p_region = NULL;
 }
@@ -685,6 +686,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     char *psz_font_dir = NULL;
 
 #if defined(WIN32)
+    /* This makes Windows build of VLC hang */
     const UINT uPath = GetSystemWindowsDirectoryW( NULL, 0 );
     if( uPath > 0 )
     {
@@ -709,6 +711,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
     if( !psz_font_dir )
         goto error;
+    msg_Dbg( p_dec, "Setting libass fontdir: %s", psz_font_dir );
     ass_set_fonts_dir( p_library, psz_font_dir );
     free( psz_font_dir );
 
@@ -750,6 +753,8 @@ error:
         ass_renderer_done( p_renderer );
     if( p_library )
         ass_library_done( p_library );
+
+    msg_Warn( p_dec, "Libass creation failed" );
 
     free( p_ass );
     vlc_mutex_unlock( &libass_lock );
