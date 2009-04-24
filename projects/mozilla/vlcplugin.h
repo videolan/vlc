@@ -141,6 +141,7 @@ public:
     int      b_stream;
     int      b_autoplay;
     int      b_toolbar;
+    char *   psz_text;
     char *   psz_target;
 
     void playlist_play(libvlc_exception_t *ex)

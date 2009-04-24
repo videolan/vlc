@@ -47,8 +47,6 @@
 /* Enable/disable debugging printf's for X11 resizing */
 #undef X11_RESIZE_DEBUG
 
-#define WINDOW_TEXT "Waiting for video"
-
 /*****************************************************************************
  * Unix-only declarations
 ******************************************************************************/
@@ -243,7 +241,8 @@ int16 NPP_HandleEvent( NPP instance, void * event )
 
                     ForeColor(whiteColor);
                     MoveTo( (npwindow.width-80)/ 2  , npwindow.height / 2 );
-                    DrawText( WINDOW_TEXT , 0 , strlen(WINDOW_TEXT) );
+                    if( p_plugin->psz_text )
+                        DrawText( p_plugin->psz_text, 0, strlen(p_plugin->psz_text) );
                 }
             }
             return true;
@@ -746,8 +745,9 @@ static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpa
             FillRect( hdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH) );
             SetTextColor(hdc, RGB(255, 255, 255));
             SetBkColor(hdc, RGB(0, 0, 0));
-            DrawText( hdc, WINDOW_TEXT, strlen(WINDOW_TEXT), &rect,
-                      DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+            if( p_plugin->psz_text )
+                DrawText( hdc, p_plugin->psz_text, strlen(p_plugin->psz_text), &rect,
+                          DT_CENTER|DT_VCENTER|DT_SINGLELINE);
 
             EndPaint( p_hwnd, &paintstruct );
             return 0L;
@@ -790,9 +790,10 @@ static void Redraw( Widget w, XtPointer closure, XEvent *event )
     gcv.foreground = WhitePixel( p_display, 0 );
     XChangeGC( p_display, gc, GCForeground, &gcv );
 
-    XDrawString( p_display, video, gc,
-                 window.width / 2 - 40, (window.height - i_control_height) / 2,
-                 WINDOW_TEXT, strlen(WINDOW_TEXT) );
+    if( p_plugin->psz_text )
+        XDrawString( p_display, video, gc,
+                     window.width / 2 - 40, (window.height - i_control_height) / 2,
+                     p_plugin->psz_text, strlen(p_plugin->psz_text) );
     XFreeGC( p_display, gc );
 
     p_plugin->redrawToolbar();

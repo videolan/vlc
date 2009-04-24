@@ -45,6 +45,7 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     b_stream(0),
     b_autoplay(1),
     b_toolbar(0),
+    psz_text(NULL),
     psz_target(NULL),
     playlist_index(-1),
     libvlc_instance(NULL),
@@ -143,6 +144,10 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
          || !strcmp( argn[i], "src") )
         {
             psz_target = argv[i];
+        }
+        else if( !strcmp( argn[i], "text" ) )
+        {
+            psz_text = strdup( argv[i] );
         }
         else if( !strcmp( argn[i], "autoplay")
               || !strcmp( argn[i], "autostart") )
@@ -266,6 +271,7 @@ VlcPlugin::~VlcPlugin()
 {
     free(psz_baseURL);
     free(psz_target);
+    free(psz_text);
     if( libvlc_media_player )
         libvlc_media_player_release( libvlc_media_player );
     if( libvlc_media_list )
