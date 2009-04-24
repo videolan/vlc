@@ -398,6 +398,18 @@ static int Open( vlc_object_t *p_this )
     {
         i_ret = dvb_SubmitATSCTuneRequest( p_access );
     }
+    if( !strcmp( p_access->psz_access, "dvb" ) )
+    {
+        /* Try to auto detect */
+        if( i_ret )
+            i_ret = dvb_SubmitDVBSTuneRequest( p_access );
+        if( i_ret )
+            i_ret = dvb_SubmitDVBCTuneRequest( p_access );
+        if( i_ret )
+            i_ret = dvb_SubmitDVBTTuneRequest( p_access );
+        if( i_ret )
+            i_ret = dvb_SubmitATSCTuneRequest( p_access );
+    }
 
     if( !i_ret )
         p_access->psz_demux = strdup( "ts" );
