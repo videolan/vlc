@@ -164,19 +164,19 @@ input_clock_t *input_clock_New( int i_rate )
 
     vlc_mutex_init( &cl->lock );
     cl->b_has_reference = false;
-    cl->ref = clock_point_Create( 0, 0 );
+    cl->ref = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
 
-    cl->last = clock_point_Create( 0, 0 );
+    cl->last = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
 
-    cl->i_ts_max = 0;
+    cl->i_ts_max = VLC_TS_INVALID;
 
-    cl->i_next_drift_update = 0;
+    cl->i_next_drift_update = VLC_TS_INVALID;
     AvgInit( &cl->drift, 10 );
 
     cl->i_rate = i_rate;
     cl->i_pts_delay = 0;
     cl->b_paused = false;
-    cl->i_pause_date = 0;
+    cl->i_pause_date = VLC_TS_INVALID;
 
     return cl;
 }
@@ -206,12 +206,12 @@ void input_clock_Update( input_clock_t *cl,
     vlc_mutex_lock( &cl->lock );
 
     if( ( !cl->b_has_reference ) ||
-        ( i_ck_stream == 0 && cl->last.i_stream != 0 ) )
+        ( i_ck_stream <= VLC_TS_INVALID && cl->last.i_stream > VLC_TS_INVALID ) )
     {
         /* */
         b_reset_reference= true;
     }
-    else if( cl->last.i_stream != 0 &&
+    else if( cl->last.i_stream > VLC_TS_INVALID &&
              ( (cl->last.i_stream - i_ck_stream) > CR_MAX_GAP ||
                (cl->last.i_stream - i_ck_stream) < -CR_MAX_GAP ) )
     {
@@ -219,7 +219,7 @@ void input_clock_Update( input_clock_t *cl,
          * warning from the stream control facilities (dd-edited
          * stream ?). */
         msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
-        cl->i_ts_max = 0;
+        cl->i_ts_max = VLC_TS_INVALID;
 
         /* */
         msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
@@ -227,7 +227,7 @@ void input_clock_Update( input_clock_t *cl,
     }
     if( b_reset_reference )
     {
-        cl->i_next_drift_update = 0;
+        cl->i_next_drift_update = VLC_TS_INVALID;
         AvgReset( &cl->drift );
 
         /* Feed synchro with a new reference point. */
@@ -257,8 +257,8 @@ void input_clock_Reset( input_clock_t *cl )
     vlc_mutex_lock( &cl->lock );
 
     cl->b_has_reference = false;
-    cl->ref = clock_point_Create( 0, 0 );
-    cl->i_ts_max = 0;
+    cl->ref = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
+    cl->i_ts_max = VLC_TS_INVALID;
 
     vlc_mutex_unlock( &cl->lock );
 }
@@ -342,14 +342,14 @@ int input_clock_ConvertTS( input_clock_t *cl,
     if( !cl->b_has_reference )
     {
         vlc_mutex_unlock( &cl->lock );
-        *pi_ts0 = 0;
+        *pi_ts0 = VLC_TS_INVALID;
         if( pi_ts1 )
-            *pi_ts1 = 0;
+            *pi_ts1 = VLC_TS_INVALID;
         return VLC_EGENERIC;
     }
 
     /* */
-    if( *pi_ts0 > 0 )
+    if( *pi_ts0 > VLC_TS_INVALID )
     {
         *pi_ts0 = ClockStreamToSystem( cl, *pi_ts0 + AvgGet( &cl->drift ) );
         if( *pi_ts0 > cl->i_ts_max )
@@ -358,7 +358,7 @@ int input_clock_ConvertTS( input_clock_t *cl,
     }
 
     /* XXX we do not ipdate i_ts_max on purpose */
-    if( pi_ts1 && *pi_ts1 > 0 )
+    if( pi_ts1 && *pi_ts1 > VLC_TS_INVALID )
     {
         *pi_ts1 = ClockStreamToSystem( cl, *pi_ts1 + AvgGet( &cl->drift ) ) +
                   cl->i_pts_delay;
@@ -369,7 +369,7 @@ int input_clock_ConvertTS( input_clock_t *cl,
 
     /* Check ts validity */
     if( i_ts_bound != INT64_MAX &&
-        *pi_ts0 > 0 && *pi_ts0 >= mdate() + cl->i_pts_delay + i_ts_bound )
+        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + cl->i_pts_delay + i_ts_bound )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -452,7 +452,7 @@ void input_clock_SetJitter( input_clock_t *cl,
 static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_stream )
 {
     if( !cl->b_has_reference )
-        return 0;
+        return VLC_TS_INVALID;
 
     return ( i_stream - cl->ref.i_stream ) * cl->i_rate / INPUT_RATE_DEFAULT +
            cl->ref.i_system;
