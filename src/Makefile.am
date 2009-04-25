@@ -156,11 +156,11 @@ libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DDATA_PATH=\"$(vlcdatadir)\" \
 	-DLIBDIR=\"$(libdir)\" \
 	-DPLUGIN_PATH=\"$(vlclibdir)\"
-libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlc` $(AM_LDFLAGS) \
+libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlccore` $(AM_LDFLAGS) \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
 	-version-info 2:0:0
-libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` $(AM_LIBADD) \
+libvlccore_la_LIBADD = `$(VLC_CONFIG) -libs libvlccore` $(AM_LIBADD) \
 	$(LTLIBINTL) ../compat/libcompat.la
 libvlccore_la_DEPENDENCIES = libvlccore.sym
 if HAVE_WIN32
@@ -172,10 +172,11 @@ libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
-libvlc_la_LIBADD = libvlccore.la ../compat/libcompat.la
+libvlc_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` \
+	libvlccore.la ../compat/libcompat.la
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
 	-DMODULE_STRING=\"control\"
-libvlc_la_LDFLAGS = $(AM_LDFLAGS) \
+libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --ldflags libvlc` \
 	-version-info 4:0:2 \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym libvlccore.la
