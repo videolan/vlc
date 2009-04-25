@@ -1577,44 +1577,9 @@ static void ChromaDestroy( vout_thread_t *p_vout )
 }
 
 /* following functions are local */
-static int ReduceHeight( int i_ratio )
-{
-    int i_dummy = VOUT_ASPECT_FACTOR;
-    int i_pgcd  = 1;
-
-    if( !i_ratio )
-    {
-        return i_pgcd;
-    }
-
-    /* VOUT_ASPECT_FACTOR is (2^7 * 3^3 * 5^3), we just check for 2, 3 and 5 */
-    while( !(i_ratio & 1) && !(i_dummy & 1) )
-    {
-        i_ratio >>= 1;
-        i_dummy >>= 1;
-        i_pgcd  <<= 1;
-    }
-
-    while( !(i_ratio % 3) && !(i_dummy % 3) )
-    {
-        i_ratio /= 3;
-        i_dummy /= 3;
-        i_pgcd  *= 3;
-    }
-
-    while( !(i_ratio % 5) && !(i_dummy % 5) )
-    {
-        i_ratio /= 5;
-        i_dummy /= 5;
-        i_pgcd  *= 5;
-    }
-
-    return i_pgcd;
-}
-
 static void AspectRatio( int i_aspect, int *i_aspect_x, int *i_aspect_y )
 {
-    unsigned int i_pgcd = ReduceHeight( i_aspect );
+    const int i_pgcd = i_aspect ? GCD( i_aspect, VOUT_ASPECT_FACTOR ) : 1;
     *i_aspect_x = i_aspect / i_pgcd;
     *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
 }
