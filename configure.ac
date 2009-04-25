@@ -5439,7 +5439,7 @@ AC_MSG_CHECKING([whether to enable RAOP plugin])
 AS_IF([test "${have_libgcrypt}" = "yes"], [
   AC_MSG_RESULT(yes)
   VLC_ADD_PLUGIN([stream_out_raop])
-  VLC_ADD_LIBS([stream_out_raop], [${LIBGCRYPT_LIBS}])
+  VLC_ADD_LIBS([stream_out_raop], [${LIBGCRYPT_LIBS} -lgpg-error])
   VLC_ADD_CFLAGS([stream_out_raop], [${LIBGCRYPT_CFLAGS}])
 ], [
   AC_MSG_RESULT(no)
