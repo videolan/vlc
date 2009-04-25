@@ -554,7 +554,12 @@ AC_PREPROC_IFELSE([
   AC_MSG_RESULT([not present])
 ], [
   AC_MSG_RESULT([found])
-  AC_MSG_ERROR([Buggy GNU/libc (version 2.5 - 2.7) present. VLC would crash; there is no viable work-around for this. Check with your distribution vendor on how to update the glibc run-time.])
+  AS_IF([test "x${enable_nls}" != "xno" || test "x${enable_mozilla}" != "xno"], [
+    AC_MSG_ERROR([Buggy GNU/libc (version 2.5 - 2.7) present. VLC would crash; there is no viable
+work-around for this. Check with your distribution vendor on how to update the
+glibc run-time. Alternatively, build with --disable-nls --disable-mozilla and
+be sure to not use LibVLC from other applications/wrappers.])
+  ])
 ])
 
 dnl Plugin compilation stuff
