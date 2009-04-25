@@ -119,8 +119,10 @@ static int playlist_cmp(const void *first, const void *second)
 {
 
 #define META_STRCASECMP_NAME( ) { \
-    char *psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input ); \
-    char *psz_ismall = input_item_GetName( (*(playlist_item_t **)second)->p_input ); \
+    char *psz_i = input_item_GetTitle( (*(playlist_item_t **)first)->p_input ); \
+    char *psz_ismall = input_item_GetTitle( (*(playlist_item_t **)second)->p_input ); \
+    if(EMPTY_STR(psz_i)) {free(psz_i); psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input ); }\
+    if(EMPTY_STR(psz_ismall)) {free(psz_ismall); psz_ismall = input_item_GetName( (*(playlist_item_t **)second)->p_input ); }\
     if( psz_i != NULL && psz_ismall != NULL ) i_test = strcasecmp( psz_i, psz_ismall ); \
     else if ( psz_i == NULL && psz_ismall != NULL ) i_test = 1; \
     else if ( psz_ismall == NULL && psz_i != NULL ) i_test = -1; \
