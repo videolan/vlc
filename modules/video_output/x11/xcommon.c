@@ -1501,12 +1501,11 @@ static int ManageVideo( vout_thread_t *p_vout )
     {
         unsigned int i_width, i_height, i_x, i_y;
 
-        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-
 #ifdef MODULE_NAME_IS_x11
         /* We need to signal the vout thread about the size change because it
          * is doing the rescaling */
-        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+#else
+        p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 #endif
 
         vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
