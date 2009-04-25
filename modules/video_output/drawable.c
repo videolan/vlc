@@ -36,6 +36,11 @@ static int  OpenXID (vlc_object_t *);
 static int  OpenHWND (vlc_object_t *);
 static void Close (vlc_object_t *);
 
+#define XID_TEXT N_("ID of the video output X window")
+#define XID_LONGTEXT N_( \
+    "VLC can embed its video output in an existing X11 window. " \
+    "This is the X identifier of that window (0 means none).")
+
 /*
  * Module descriptor
  */
@@ -46,6 +51,9 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("xwindow", 70)
     set_callbacks (OpenXID, Close)
+    add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
+        change_unsaveable ()
+        /*change_integer_range (0, 0xffffffff)*/
 
     add_submodule ()
         set_description (N_("Embedded Windows video"))
