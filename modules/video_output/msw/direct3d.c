@@ -167,7 +167,9 @@ static int OpenVideo( vlc_object_t *p_this )
     if( VLC_SUCCESS != Direct3DVoutCreate( p_vout ) )
     {
         msg_Err( p_vout, "Direct3D could not be initialized !");
-        goto error;
+        Direct3DVoutRelease( p_vout );
+        free( p_vout->p_sys );
+        return VLC_EGENERIC;
     }
 
     /* Initialisations */
