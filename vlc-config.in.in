@@ -213,7 +213,7 @@ while test $# -gt 0; do
     -*)
       usage 1 1>&1
       ;;
-    libvlc)
+    libvlccore)
       cppflags="${cppflags} -D__LIBVLC__ -I${top_builddir}src/misc"
       ;;
     plugin)

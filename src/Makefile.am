@@ -149,7 +149,7 @@ AM_LDFLAGS += -avoid-version
 endif
 
 libvlccore_la_SOURCES = $(SOURCES_libvlc)
-libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
+libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlccore` \
 	-DMODULE_STRING=\"main\" \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
