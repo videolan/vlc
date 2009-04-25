@@ -37,7 +37,7 @@
  * - i_flags may not always be set (ie could be 0, even for a key frame
  *      it depends where you receive the buffer (before/after a packetizer
  *      and the demux/packetizer implementations.
- * - i_dts/i_pts could be 0, it means no pts
+ * - i_dts/i_pts could be BLOCK_TS_INVALID, it means no pts/dts
  * - i_length: length in microseond of the packet, can be null except in the
  *      sout where it is mandatory.
  * - i_rate 0 or a valid input rate, look at vlc_input.h
@@ -89,6 +89,10 @@ typedef struct block_sys_t block_sys_t;
 /* These are for module private usage only */
 #define BLOCK_FLAG_PRIVATE_MASK  0xff000000
 #define BLOCK_FLAG_PRIVATE_SHIFT 24
+
+/* All timestamp below or equal to this define are invalid/unset
+ * XXX the numerical value is 0 because of historical reason and will change.*/
+#define BLOCK_TS_INVALID (0)
 
 typedef void (*block_free_t) (block_t *);
 

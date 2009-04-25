@@ -59,7 +59,8 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
     /* Fill all fields to their default */
     b->p_next = NULL;
     b->i_flags = 0;
-    b->i_pts = b->i_dts = b->i_length = 0;
+    b->i_pts = b->i_dts = BLOCK_TS_INVALID;
+    b->i_length = 0;
     b->i_rate = 0;
     b->p_buffer = buf;
     b->i_buffer = size;
