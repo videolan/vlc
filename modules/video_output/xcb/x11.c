@@ -403,3 +403,24 @@ static int Manage (vout_thread_t *vout)
     }
     return VLC_SUCCESS;
 }
+
+void
+HandleParentStructure (vout_thread_t *vout, xcb_connection_t *conn,
+                       xcb_window_t xid, xcb_configure_notify_event_t *ev)
+{
+    unsigned width, height, x, y;
+
+    vout_PlacePicture (vout, ev->width, ev->height, &x, &y, &width, &height);
+    if (width != vout->fmt_out.i_visible_width
+     || height != vout->fmt_out.i_visible_height)
+    {
+        vout->i_changes |= VOUT_SIZE_CHANGE;
+        return; /* vout will be reinitialized */
+    }
+
+    /* Move the picture within the window */
+    const uint32_t values[] = { x, y, };
+    xcb_configure_window (conn, xid,
+                          XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
+                          values);
+}
