@@ -142,17 +142,12 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     /* Playing something ... */
     input_item_t *p_item = input_GetItem( p_input );
 
-    psz_title = input_item_GetTitle( p_item );
+    psz_title = input_item_GetTitleFbName( p_item );
     if( EMPTY_STR( psz_title ) )
     {
         free( psz_title );
-        psz_title = input_item_GetName( input_GetItem( p_input ) );
-        if( EMPTY_STR( psz_title ) )
-        {
-            free( psz_title );
-            vlc_object_release( p_input );
-            return VLC_SUCCESS;
-        }
+        vlc_object_release( p_input );
+        return VLC_SUCCESS;
     }
 
     psz_artist = input_item_GetArtist( p_item );

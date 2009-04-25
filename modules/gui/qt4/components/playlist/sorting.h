@@ -63,7 +63,6 @@ static const char * psz_column_title( uint32_t i_column )
  * Returned value has to be freed */
 static char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
 {
-    char *psz;
     int i_duration;
     char psz_duration[MSTRTIME_MAX_SIZE];
     switch( i_column )
@@ -71,10 +70,7 @@ static char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
     case COLUMN_NUMBER:
         return NULL;
     case COLUMN_TITLE:
-        psz = input_item_GetTitle( p_item );
-        if( !psz )
-            psz = input_item_GetName( p_item );
-        return psz;
+        return input_item_GetTitleFbName( p_item );
     case COLUMN_DURATION:
         i_duration = input_item_GetDuration( p_item ) / 1000000;
         secstotimestr( psz_duration, i_duration );

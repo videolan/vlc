@@ -571,8 +571,7 @@ static int WriteMeta( vlc_object_t *p_this )
 
     // Saving all common fields
     // If the title is empty, use the name
-    psz_meta = input_item_GetTitle( p_item );
-    if( !psz_meta ) psz_meta = input_item_GetName( p_item );
+    psz_meta = input_item_GetTitleFbName( p_item );
     SET( Title, psz_meta );
     free( psz_meta );
 

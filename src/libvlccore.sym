@@ -181,6 +181,7 @@ input_item_GetDuration
 input_item_GetInfo
 input_item_GetMeta
 input_item_GetName
+input_item_GetTitleFbName
 input_item_GetURI
 input_item_HasErrorWhenReading
 input_item_IsArtFetched

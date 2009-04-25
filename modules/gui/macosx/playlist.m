@@ -265,19 +265,12 @@
     if( [[o_tc identifier] isEqualToString:@"name"] )
     {
         /* sanity check to prevent the NSString class from crashing */
-        char *psz_title =  input_item_GetTitle( p_item->p_input );
-        if( !EMPTY_STR( psz_title ) )
+        char *psz_title =  input_item_GetTitleFbName( p_item->p_input );
+        if( psz_title )
         {
             o_value = [NSString stringWithUTF8String: psz_title];
+            free( psz_title );
         }
-        else
-        {
-            char *psz_name = input_item_GetName( p_item->p_input );
-            if( psz_name )
-                o_value = [NSString stringWithUTF8String: psz_name];
-            free( psz_name );
-        }
-        free( psz_title );
     }
     else if( [[o_tc identifier] isEqualToString:@"artist"] )
     {

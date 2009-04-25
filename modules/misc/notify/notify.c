@@ -182,12 +182,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     input_item_t *p_input_item = input_GetItem( p_input );
     psz_artist = input_item_GetArtist( p_input_item );
     psz_album = input_item_GetAlbum( p_input_item );
-    psz_title = input_item_GetTitle( p_input_item );
-    if( EMPTY_STR( psz_title ) )
-    {
-        free( psz_title );
-        psz_title = input_item_GetName( p_input_item );
-    }
+    psz_title = input_item_GetTitleFbName( p_input_item );
+
     if( EMPTY_STR( psz_title ) )
     {  /* Not enough metadata ... */
         free( psz_title );

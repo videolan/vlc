@@ -2271,12 +2271,7 @@ static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
     {
         char *psz_display;
         p_child = p_node->pp_children[k];
-        char *psz_name = input_item_GetTitle( p_child->p_input );
-        if( !psz_name || !*psz_name )
-        {
-            free( psz_name );
-            psz_name = input_item_GetName( p_child->p_input );
-        }
+        char *psz_name = input_item_GetTitleFbName( p_child->p_input );
 
         if( c && *c )
         {

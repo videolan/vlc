@@ -298,6 +298,28 @@ char *input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
     return psz;
 }
 
+/* Get the title of a given item or fallback to the name if the title is empty */
+char *input_item_GetTitleFbName( input_item_t *p_item )
+{
+    char *psz_ret;
+    vlc_mutex_lock( &p_item->lock );
+
+    if( !p_item->p_meta )
+    {
+        vlc_mutex_unlock( &p_item->lock );
+        return NULL;
+    }
+
+    const char *psz_meta = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+    if( !EMPTY_STR( psz_meta ) )
+        psz_ret = strdup( psz_meta );
+    else
+        psz_ret = p_item->psz_name ? strdup( p_item->psz_name ) : NULL;
+
+    vlc_mutex_unlock( &p_item->lock );
+    return psz_ret;
+}
+
 char *input_item_GetName( input_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->lock );

@@ -184,15 +184,14 @@ void MetaPanel::update( input_item_t *p_item )
     free( psz_meta );
 
     /* Name / Title */
-    psz_meta = input_item_GetTitle( p_item );
-    char *psz_name = input_item_GetName( p_item );
-    if( !EMPTY_STR( psz_meta ) )
+    psz_meta = input_item_GetTitleFbName( p_item );
+    if( psz_meta )
+    {
         title_text->setText( qfu( psz_meta ) );
-    else if( !EMPTY_STR( psz_name ) )
-        title_text->setText( qfu( psz_name ) );
-    else title_text->setText( "" );
-    free( psz_meta );
-    free( psz_name );
+        free( psz_meta );
+    }
+    else
+        title_text->setText( "" );
 
     /* URL / URI */
     psz_meta = input_item_GetURL( p_item );

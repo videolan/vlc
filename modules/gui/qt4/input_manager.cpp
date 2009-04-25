@@ -420,12 +420,7 @@ void InputManager::UpdateName()
     QString text;
 
     /* Try to get the Title, then the Name */
-    char *psz_name = input_item_GetTitle( input_GetItem( p_input ) );
-    if( EMPTY_STR( psz_name ) )
-    {
-        free( psz_name );
-        psz_name = input_item_GetName( input_GetItem( p_input ) );
-    }
+    char *psz_name = input_item_GetTitleFbName( input_GetItem( p_input ) );
 
     /* Try to get the nowplaying */
     char *psz_nowplaying =
