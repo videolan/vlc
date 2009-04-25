@@ -38,8 +38,11 @@
  * General configuration
  *****************************************************************************/
 
-#define CLOCK_FREQ 1000000
+/* All timestamp below or equal to this define are invalid/unset
+ * XXX the numerical value is 0 because of historical reason and will change.*/
+#define VLC_TS_INVALID (0)
 
+#define CLOCK_FREQ 1000000
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
  * status */
