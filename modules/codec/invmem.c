@@ -151,7 +151,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Set output properties */
-    p_dec->fmt_out.i_cat = VIDEO_ES;
     //p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
     p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','2','4');
     p_dec->fmt_out.video.i_width = p_dec->p_sys->i_width;
@@ -164,8 +163,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_sys->i_pitch = p_sys->i_width*3 + p_sys->i_width%4;
 
-    // create new picture
-    p_sys->p_pic = p_dec->pf_vout_buffer_new( p_dec );
+    p_sys->p_pic = NULL;
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
@@ -181,16 +179,21 @@ static int OpenDecoder( vlc_object_t *p_this )
 static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    block_t *p_block;
 
     if( !pp_block || !*pp_block ) return NULL;
 
+    p_block = *pp_block;
+
     // create new picture
-    picture_Release( p_sys->p_pic );
+    if( p_sys->p_pic != NULL )
+        picture_Release( p_sys->p_pic );
+    p_sys->p_pic = decoder_NewPicture( p_dec );
     p_sys->p_pic = p_dec->pf_vout_buffer_new( p_dec );
     p_sys->p_pic->b_force = true;
     p_sys->p_pic->p->i_pitch = p_dec->p_sys->i_pitch;
 
-   // lock input and copy to picture
+    // lock input and copy to picture
     p_sys->p_pic->p->p_pixels = p_sys->pf_lock( p_dec->p_sys->p_data );
 
     // unlock input
@@ -207,6 +210,9 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_pic != NULL )
+        picture_Release( p_sys->p_pic );
 
     free( p_sys );
 }
