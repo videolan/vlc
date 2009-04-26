@@ -910,8 +910,11 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
  */
 void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
 {
-    if ( event->buttons() == Qt::LeftButton )
+    if( event->buttons() == Qt::LeftButton )
     {
+        if( i_mouse_last_x == -1 || i_mouse_last_y == -1 )
+            return;
+
         int i_moveX = event->globalX() - i_mouse_last_x;
         int i_moveY = event->globalY() - i_mouse_last_y;
 
@@ -930,6 +933,12 @@ void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 {
     i_mouse_last_x = event->globalX();
     i_mouse_last_y = event->globalY();
+}
+
+void FullscreenControllerWidget::mouseReleaseEvent( QMouseEvent *event )
+{
+    i_mouse_last_x = -1;
+    i_mouse_last_y = -1;
 }
 
 /**
@@ -1095,6 +1104,7 @@ void FullscreenControllerWidget::fullscreenChanged( vout_thread_t *p_vout,
     }
     vlc_mutex_unlock( &lock );
 }
+
 /**
  * Mouse change callback (show/hide the controller on mouse movement)
  */
