@@ -174,8 +174,7 @@ libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)
 libvlc_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` \
 	libvlccore.la ../compat/libcompat.la
-libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc` \
-	-DMODULE_STRING=\"control\"
+libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --ldflags libvlc` \
 	-version-info 4:0:2 \
 	-export-symbols $(srcdir)/libvlc.sym

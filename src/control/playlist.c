@@ -28,6 +28,7 @@
 
 #include <assert.h>
 
+#define __LIBVLC__
 #include "../playlist/playlist_internal.h"
 
 #define PL (libvlc_priv (p_instance->p_libvlc_int)->p_playlist)
