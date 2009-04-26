@@ -40,8 +40,6 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
-#define __LIBVLC__ /* WTF? */
-#include "../video_output/vout_control.h"
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
