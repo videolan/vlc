@@ -765,16 +765,18 @@ char ** module_GetModulesNamesForCapability( const char *psz_capability,
 
     module_t **list = module_list_get (NULL);
 
-    /* Do it in two passes : count the number of modules before */
+    /* Proceed in two passes: count the number of modules first */
     for (size_t i = 0; list[i]; i++)
     {
         module_t *p_module = list[i];
         const char *psz_module_capability = p_module->psz_capability;
 
-        if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
+        if( psz_module_capability
+         && !strcmp( psz_module_capability, psz_capability ) )
             count++;
     }
 
+    /* Then get the names */
     psz_ret = malloc( sizeof(char*) * (count+1) );
     if( pppsz_longname )
         *pppsz_longname = malloc( sizeof(char*) * (count+1) );
@@ -795,16 +797,17 @@ char ** module_GetModulesNamesForCapability( const char *psz_capability,
         module_t *p_module = list[i];
         const char *psz_module_capability = p_module->psz_capability;
 
-        if( psz_module_capability && !strcmp( psz_module_capability, psz_capability ) )
+        if( psz_module_capability
+         && !strcmp( psz_module_capability, psz_capability ) )
         {
-            int k = -1; /* hack to handle submodules properly */
-            if( p_module->b_submodule )
-            {
-                while( p_module->pp_shortcuts[++k] != NULL );
-                k--;
-            }
-            psz_ret[j] = strdup( k>=0?p_module->pp_shortcuts[k]
-                                     :p_module->psz_object_name );
+            /* Explicit hack: Use the last shortcut. It _should_ be
+             * different from the object name, at least if the object
+             * contains multiple submodules with the same capability. */
+            unsigned k = 0;
+            while( p_module->pp_shortcuts[k] != NULL )
+                k++;
+            assert( k > 0); /* pp_shortcuts[0] is always set */
+            psz_ret[j] = strdup( p_module->pp_shortcuts[k - 1] );
             if( pppsz_longname )
                 (*pppsz_longname)[j] = strdup( module_get_name( p_module, true ) );
             j++;
