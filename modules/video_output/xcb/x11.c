@@ -211,9 +211,9 @@ static int Open (vlc_object_t *obj)
         vout->fmt_out.i_chroma = vout->output.i_chroma = chroma;
         if (!gray)
         {
-            vout->output.i_rmask = vt->red_mask;
-            vout->output.i_gmask = vt->green_mask;
-            vout->output.i_bmask = vt->blue_mask;
+            vout->fmt_out.i_rmask = vout->output.i_rmask = vt->red_mask;
+            vout->fmt_out.i_gmask = vout->output.i_gmask = vt->green_mask;
+            vout->fmt_out.i_bmask = vout->output.i_bmask = vt->blue_mask;
         }
         p_sys->bpp = fmt->bits_per_pixel;
         p_sys->pad = fmt->scanline_pad;
