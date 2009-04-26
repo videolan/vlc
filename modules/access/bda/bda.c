@@ -541,7 +541,7 @@ static void Close( vlc_object_t *p_this )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     bool   *pb_bool, b_bool;
-    int          *pi_int, i_int;
+    int          i_int;
     int64_t      *pi_64;
 
     switch( i_query )
