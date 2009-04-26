@@ -141,6 +141,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Menu Bar *
      ************/
     QVLCMenu::createMenuBar( this, p_intf );
+    CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
+             this, destroyPopupMenu() );
 
 #if 0
     /* Create a Dock to get the playlist */
@@ -657,6 +659,12 @@ void MainInterface::debug()
     }
 #endif
 }
+
+void MainInterface::destroyPopupMenu()
+{
+    QVLCMenu::PopupMenu(p_intf, false );
+}
+
 
 void MainInterface::toggleFSC()
 {

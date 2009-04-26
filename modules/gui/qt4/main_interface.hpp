@@ -165,6 +165,7 @@ public slots:
 
 private slots:
     void debug();
+    void destroyPopupMenu();
     void recreateToolbars();
     void doComponentsUpdate();
     void setName( QString );
