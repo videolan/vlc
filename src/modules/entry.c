@@ -121,8 +121,9 @@ module_t *vlc_submodule_create (module_t *module)
     module->submodule_count++;
 
     /* Muahahaha! Heritage! Polymorphism! Ugliness!! */
-    memcpy (submodule->pp_shortcuts, module->pp_shortcuts,
-            sizeof (submodule->pp_shortcuts));
+    submodule->pp_shortcuts[0] = module->pp_shortcuts[0]; /* object name */
+    for (unsigned i = 1; i < MODULE_SHORTCUT_MAX; i++)
+        submodule->pp_shortcuts[i] = NULL;
 
     submodule->psz_object_name = strdup( module->psz_object_name );
     submodule->psz_shortname = module->psz_shortname;
