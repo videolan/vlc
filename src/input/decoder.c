@@ -239,7 +239,7 @@ int decoder_GetInputAttachments( decoder_t *p_dec,
 mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 {
     if( !p_dec->pf_get_display_date )
-        return 0;
+        return VLC_TS_INVALID;
 
     return p_dec->pf_get_display_date( p_dec, i_ts );
 }
@@ -649,14 +649,14 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
 
     vlc_mutex_lock( &p_owner->lock );
     if( p_owner->b_buffering || p_owner->b_paused )
-        i_ts = 0;
+        i_ts = VLC_TS_INVALID;
     vlc_mutex_unlock( &p_owner->lock );
 
-    if( !p_owner->p_clock || !i_ts )
+    if( !p_owner->p_clock || i_ts <= VLC_TS_INVALID )
         return i_ts;
 
     if( input_clock_ConvertTS( p_owner->p_clock, NULL, &i_ts, NULL, INT64_MAX ) )
-        return 0;
+        return VLC_TS_INVALID;
 
     return i_ts;
 }
@@ -725,7 +725,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
         vlc_object_release( p_dec );
         return NULL;
     }
-    p_dec->p_owner->i_preroll_end = -1;
+    p_dec->p_owner->i_preroll_end = VLC_TS_INVALID;
     p_dec->p_owner->i_last_rate = INPUT_RATE_DEFAULT;
     p_dec->p_owner->p_input = p_input;
     p_dec->p_owner->p_aout = NULL;
@@ -825,7 +825,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_owner->p_description = NULL;
 
     p_owner->b_paused = false;
-    p_owner->pause.i_date = 0;
+    p_owner->pause.i_date = VLC_TS_INVALID;
     p_owner->pause.i_ignore = 0;
 
     p_owner->b_buffering = false;
@@ -1016,9 +1016,9 @@ static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
 {
     if( p->i_flags & (BLOCK_FLAG_PREROLL|BLOCK_FLAG_DISCONTINUITY) )
         *pi_preroll = INT64_MAX;
-    else if( p->i_dts > 0 )
+    else if( p->i_dts > VLC_TS_INVALID )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
-    else if( p->i_pts > 0 )
+    else if( p->i_pts > VLC_TS_INVALID )
         *pi_preroll = __MIN( *pi_preroll, p->i_pts );
 }
 
@@ -1027,7 +1027,7 @@ static mtime_t DecoderTeletextFixTs( mtime_t i_ts )
     mtime_t current_date = mdate();
 
     /* FIXME I don't really like that, es_out SHOULD do it using the video pts */
-    if( !i_ts || i_ts > current_date + 10000000 || i_ts < current_date )
+    if( i_ts <= VLC_TS_INVALID || i_ts > current_date + 10000000 || i_ts < current_date )
     {
         /* ETSI EN 300 472 Annex A : do not take into account the PTS
          * for teletext streams. */
@@ -1051,13 +1051,13 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
         const bool b_ephemere = pi_ts1 && *pi_ts0 == *pi_ts1;
         int i_rate;
 
-        if( *pi_ts0 > 0 )
+        if( *pi_ts0 > VLC_TS_INVALID )
         {
             *pi_ts0 += i_es_delay;
-            if( pi_ts1 && *pi_ts1 > 0 )
+            if( pi_ts1 && *pi_ts1 > VLC_TS_INVALID )
                 *pi_ts1 += i_es_delay;
             if( input_clock_ConvertTS( p_clock, &i_rate, pi_ts0, pi_ts1, i_ts_bound ) )
-                *pi_ts0 = 0;
+                *pi_ts0 = VLC_TS_INVALID;
         }
         else
         {
@@ -1078,7 +1078,7 @@ static void DecoderFixTs( decoder_t *p_dec, mtime_t *pi_ts0, mtime_t *pi_ts1,
         if( b_telx )
         {
             *pi_ts0 = DecoderTeletextFixTs( *pi_ts0 );
-            if( pi_ts1 && *pi_ts1 <= 0 )
+            if( pi_ts1 && *pi_ts1 <= VLC_TS_INVALID )
                 *pi_ts1 = *pi_ts0;
         }
     }
@@ -1092,7 +1092,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
     aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
     /* */
-    if( p_audio->start_date <= 0 )
+    if( p_audio->start_date <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
     {
         msg_Warn( p_dec, "non-dated audio buffer received" );
         *pi_lost_sum += 1;
@@ -1145,7 +1145,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
 
         /* */
-        const bool b_dated = p_audio->start_date > 0;
+        const bool b_dated = p_audio->start_date > VLC_TS_INVALID;
         int i_rate = INPUT_RATE_DEFAULT;
 
         DecoderFixTs( p_dec, &p_audio->start_date, &p_audio->end_date, NULL,
@@ -1154,7 +1154,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         vlc_mutex_unlock( &p_owner->lock );
 
         if( !p_aout || !p_aout_input ||
-            p_audio->start_date <= 0 ||
+            p_audio->start_date <= VLC_TS_INVALID ||
             i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE ||
             i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
             b_reject = true;
@@ -1227,19 +1227,20 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         }
         i_decoded++;
 
-        if( p_aout_buf->start_date < p_owner->i_preroll_end )
+        if( p_owner->i_preroll_end > VLC_TS_INVALID &&
+            p_aout_buf->start_date < p_owner->i_preroll_end )
         {
             aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
             continue;
         }
 
-        if( p_owner->i_preroll_end > 0 )
+        if( p_owner->i_preroll_end > VLC_TS_INVALID )
         {
             msg_Dbg( p_dec, "End of audio preroll" );
             if( p_owner->p_aout && p_owner->p_aout_input )
                 aout_DecFlush( p_owner->p_aout, p_owner->p_aout_input );
             /* */
-            p_owner->i_preroll_end = -1;
+            p_owner->i_preroll_end = VLC_TS_INVALID;
         }
 
         DecoderPlayAudio( p_dec, p_aout_buf, &i_played, &i_lost );
@@ -1307,7 +1308,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     vout_thread_t  *p_vout = p_owner->p_vout;
     bool b_first_buffered;
 
-    if( p_picture->date <= 0 )
+    if( p_picture->date <= VLC_TS_INVALID )
     {
         msg_Warn( p_vout, "non-dated video buffer received" );
         *pi_lost_sum += 1;
@@ -1373,7 +1374,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             p_picture->b_force = true;
         }
 
-        const bool b_dated = p_picture->date > 0;
+        const bool b_dated = p_picture->date > VLC_TS_INVALID;
         int i_rate = INPUT_RATE_DEFAULT;
         DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
                       &i_rate, DECODER_BOGUS_VIDEO_DELAY, false );
@@ -1381,7 +1382,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         vlc_mutex_unlock( &p_owner->lock );
 
         /* */
-        if( !p_picture->b_force && p_picture->date <= 0 )
+        if( !p_picture->b_force && p_picture->date <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify video_output/*
             b_reject = true;
 
         if( !b_reject )
@@ -1446,19 +1447,19 @@ static void DecoderDecodeVideo( decoder_t *p_dec, block_t *p_block )
 
         i_decoded++;
 
-        if( p_pic->date < p_owner->i_preroll_end )
+        if( p_owner->i_preroll_end > VLC_TS_INVALID && p_pic->date < p_owner->i_preroll_end )
         {
             vout_DropPicture( p_vout, p_pic );
             continue;
         }
 
-        if( p_owner->i_preroll_end > 0 )
+        if( p_owner->i_preroll_end > VLC_TS_INVALID )
         {
             msg_Dbg( p_dec, "End of video preroll" );
             if( p_vout )
-                vout_Flush( p_vout, 1 );
+                vout_Flush( p_vout, VLC_TS_INVALID+1 );
             /* */
-            p_owner->i_preroll_end = -1;
+            p_owner->i_preroll_end = VLC_TS_INVALID;
         }
 
         if( p_dec->pf_get_cc &&
@@ -1490,7 +1491,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
     vout_thread_t *p_vout = p_owner->p_spu_vout;
 
     /* */
-    if( p_subpic->i_start <= 0 )
+    if( p_subpic->i_start <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "non-dated spu buffer received" );
         subpicture_Delete( p_subpic );
@@ -1619,7 +1620,7 @@ static void DecoderPlaySout( decoder_t *p_dec, block_t *p_sout_block,
         vlc_mutex_unlock( &p_owner->lock );
 
         if( !b_reject )
-            sout_InputSendBuffer( p_owner->p_sout_input, p_sout_block );
+            sout_InputSendBuffer( p_owner->p_sout_input, p_sout_block ); // FIXME --VLC_TS_INVALID inspect stream_output/*
         else
             block_Release( p_sout_block );
 
@@ -1807,7 +1808,7 @@ static void DecoderProcessVideo( decoder_t *p_dec, block_t *p_block, bool b_flus
     }
 
     if( b_flush && p_owner->p_vout )
-        vout_Flush( p_owner->p_vout, 1 );
+        vout_Flush( p_owner->p_vout, VLC_TS_INVALID+1 );
 }
 
 /* This function process a audio block
@@ -1879,9 +1880,9 @@ static void DecoderProcessSpu( decoder_t *p_dec, block_t *p_block, bool b_flush 
         if( p_vout && p_owner->p_spu_vout == p_vout )
         {
             /* Preroll does not work very well with subtitle */
-            if( p_spu->i_start > 0 &&
+            if( p_spu->i_start > VLC_TS_INVALID &&
                 p_spu->i_start < p_owner->i_preroll_end &&
-                ( p_spu->i_stop <= 0 || p_spu->i_stop < p_owner->i_preroll_end ) )
+                ( p_spu->i_stop <= VLC_TS_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
             {
                 subpicture_Delete( p_spu );
             }
