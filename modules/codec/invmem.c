@@ -192,6 +192,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_sys->p_pic = p_dec->pf_vout_buffer_new( p_dec );
     p_sys->p_pic->b_force = true;
     p_sys->p_pic->p->i_pitch = p_dec->p_sys->i_pitch;
+    p_sys->p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
 
     // lock input and copy to picture
     p_sys->p_pic->p->p_pixels = p_sys->pf_lock( p_dec->p_sys->p_data );
