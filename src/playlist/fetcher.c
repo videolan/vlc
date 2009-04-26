@@ -197,10 +197,6 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     /* */
     psz_album = input_item_GetAlbum( p_item );
     psz_artist = input_item_GetArtist( p_item );
-    psz_title = input_item_GetTitle( p_item );
-    if( !psz_title )
-        psz_title = input_item_GetName( p_item );
-
     if( psz_album && psz_artist )
     {
         msg_Dbg( p_fetcher, "searching art for %s - %s",
@@ -208,10 +204,13 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     }
     else
     {
-        msg_Dbg( p_fetcher, "searching art for %s",
-             psz_title );
+        psz_title = input_item_GetTitle( p_item );
+        if( !psz_title )
+            psz_title = input_item_GetName( p_item );
+
+        msg_Dbg( p_fetcher, "searching art for %s", psz_title );
+        free( psz_title );
     }
-    free( psz_title );
 
     /* Fetch the art url */
     p_fetcher->p_private = p_item;
