@@ -681,7 +681,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Minimum );
 
     QVBoxLayout *controlLayout2 = new QVBoxLayout( this );
-    controlLayout2->setLayoutMargins( 5, 2, 5, 2, 5 );
+    controlLayout2->setLayoutMargins( 4, 6, 4, 2, 5 );
 
     /* First line */
     InputControlsWidget *inputC = new InputControlsWidget( p_intf, this );
