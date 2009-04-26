@@ -356,7 +356,7 @@ static int Init( vout_thread_t *p_vout )
 
     vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
-    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, NULL, NULL, true );
+    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, NULL );
 
     return VLC_SUCCESS;
 }
@@ -368,7 +368,7 @@ static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    vout_filter_DelChild( p_vout, p_sys->p_vout, NULL, NULL, true );
+    vout_filter_DelChild( p_vout, p_sys->p_vout, NULL );
     vout_CloseAndRelease( p_sys->p_vout );
 
     vout_filter_ReleaseDirectBuffers( p_vout );
