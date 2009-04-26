@@ -372,7 +372,8 @@ FindFormat (vout_thread_t *vout, vlc_fourcc_t chroma, xcb_xv_port_t port,
 static int Init (vout_thread_t *vout)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    xcb_xv_query_image_attributes_reply_t *att;
+    xcb_xv_query_image_attributes_reply_t *att = NULL;
+    bool swap_planes = false; /* whether X wants V before U */
 
     /* FIXME: check max image size */
     xcb_xv_adaptor_info_iterator_t it;
@@ -427,6 +428,9 @@ static int Init (vout_thread_t *vout)
             vout->fmt_out.i_gmask = vout->output.i_gmask = fmt->green_mask;
             vout->fmt_out.i_bmask = vout->output.i_bmask = fmt->blue_mask;
         }
+        else
+        if (fmt->num_planes == 3)
+            swap_planes = !strcmp ((const char *)fmt->vcomp_order, "YVU");
         free (r);
         goto found_adaptor;
     }
@@ -457,7 +461,8 @@ found_adaptor:
         /* Allocate further planes as specified by XVideo */
         /* We assume that offsets[0] is zero */
         for (int i = 1; i < pic->i_planes; i++)
-             pic->p[i].p_pixels = pic->p->p_pixels + offsets[i];
+             pic->p[i].p_pixels =
+                 pic->p->p_pixels + offsets[swap_planes ? (3 - i) : i];
         PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
     }
     free (att);
