@@ -162,9 +162,9 @@ static int Open (vlc_object_t *obj)
      * No cut&paste nor drag&drop, only Window Manager communication. */
     /* Plain ASCII localization of VLC for ICCCM window name */
     set_ascii_prop (conn, window, XA_WM_NAME,
-                  vlc_pgettext ("ASCII VLC media player", "VLC media player"));
+                  vlc_pgettext ("ASCII", "VLC media player"));
     set_ascii_prop (conn, window, XA_WM_ICON_NAME,
-                    vlc_pgettext ("ASCII VLC", "VLC"));
+                    vlc_pgettext ("ASCII", "VLC"));
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
                          XA_STRING, 8, 8, "vlc\0Vlc");
     set_hostname_prop (conn, window);
