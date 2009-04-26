@@ -250,6 +250,7 @@ vlc_module_begin ()
 
     add_submodule ()
     set_description( N_("DirectShow input") )
+    add_shortcut( "dshow" )
     set_capability( "access", 0 )
     set_callbacks( AccessOpen, AccessClose )
 

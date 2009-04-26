@@ -131,6 +131,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     /* encoder submodule */
     add_submodule ()
+    add_shortcut( "ffmpeg" )
     set_section( N_("Encoding") , NULL )
     set_description( N_("FFmpeg audio/video encoder") )
     set_capability( "encoder", 100 )

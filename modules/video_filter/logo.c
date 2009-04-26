@@ -124,6 +124,7 @@ vlc_module_begin ()
     set_capability( "video filter", 0 )
     set_callbacks( Create, Destroy )
     set_description( N_("Logo video filter") )
+    add_shortcut( "logo" )
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {

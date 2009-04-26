@@ -68,6 +68,7 @@ vlc_module_begin ()
     set_description( N_("MPEG-PS demuxer") )
     set_capability( "demux", 8 )
     set_callbacks( Open, Close )
+    add_shortcut( "ps" )
 vlc_module_end ()
 
 /*****************************************************************************

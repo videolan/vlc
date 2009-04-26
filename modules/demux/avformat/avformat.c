@@ -57,6 +57,7 @@ vlc_module_begin ()
 #ifdef ENABLE_SOUT
     /* mux submodule */
     add_submodule ()
+    add_shortcut( "ffmpeg" )
     set_description( N_("FFmpeg muxer" ) )
     set_capability( "sout mux", 2 )
     add_string( "ffmpeg-mux", NULL, NULL, MUX_TEXT,

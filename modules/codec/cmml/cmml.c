@@ -78,6 +78,7 @@ vlc_module_begin ()
     add_submodule ()
         set_capability( "interface", 0 )
         set_callbacks( OpenIntf, CloseIntf )
+        add_shortcut( "cmml" )
 vlc_module_end ()
 
 /*****************************************************************************

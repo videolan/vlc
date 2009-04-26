@@ -109,6 +109,7 @@ vlc_module_begin ()
 #   define ENC_CFG_PREFIX "sout-dmo-"
     add_submodule ()
     set_description( N_("DirectMedia Object encoder") )
+    add_shortcut( "dmo" )
     set_capability( "encoder", 10 )
     set_callbacks( EncoderOpen, EncoderClose )
 

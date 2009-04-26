@@ -110,11 +110,13 @@ vlc_module_begin ()
     set_description( N_("Theora video packetizer") )
     set_capability( "packetizer", 100 )
     set_callbacks( OpenPacketizer, CloseDecoder )
+    add_shortcut( "theora" )
 
     add_submodule ()
     set_description( N_("Theora video encoder") )
     set_capability( "encoder", 150 )
     set_callbacks( OpenEncoder, CloseEncoder )
+    add_shortcut( "theora" )
 
 #   define ENC_CFG_PREFIX "sout-theora-"
     add_integer( ENC_CFG_PREFIX "quality", 2, NULL, ENC_QUALITY_TEXT,

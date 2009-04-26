@@ -91,6 +91,7 @@ vlc_module_begin ()
         set_capability( "sout access", 0 )
         set_category( CAT_SOUT )
         set_subcategory( SUBCAT_SOUT_ACO )
+        add_shortcut( "ftp" )
         set_callbacks( OutOpen, OutClose )
 vlc_module_end ()
 

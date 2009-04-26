@@ -125,6 +125,7 @@ vlc_module_begin ()
 
     add_submodule()
         set_capability( "video output", 150 )
+        add_shortcut( "direct3d" )
         set_callbacks( OpenVideoVista, CloseVideo )
 vlc_module_end ()
 

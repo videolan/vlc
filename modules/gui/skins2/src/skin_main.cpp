@@ -543,5 +543,6 @@ vlc_module_begin ()
         set_description( N_("Skins loader demux") )
         set_capability( "demux", 5 )
         set_callbacks( DemuxOpen, NULL )
+        add_shortcut( "skins" )
 
 vlc_module_end ()

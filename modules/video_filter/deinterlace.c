@@ -144,6 +144,7 @@ vlc_module_begin ()
     add_string( FILTER_CFG_PREFIX "mode", "blend", NULL, SOUT_MODE_TEXT,
                 SOUT_MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 )
+    add_shortcut( "deinterlace" )
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 

@@ -1775,7 +1775,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                         );
     if ( b_vout_event )
         XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                      StructureNotifyMask | KeyPressMask |
+                      StructureNotifyMask /*| KeyPressMask*/ |
                       ButtonPressMask | ButtonReleaseMask |
                       PointerMotionMask );
 

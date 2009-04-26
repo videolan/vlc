@@ -188,11 +188,13 @@ vlc_module_begin ()
     set_callbacks( OpenDecoder, CloseDecoder )
 
     add_submodule ()
+    add_shortcut( "flac" )
     set_description( N_("Flac audio encoder") )
     set_capability( "encoder", 100 )
     set_callbacks( OpenEncoder, CloseEncoder )
 
     add_submodule ()
+    add_shortcut( "flac" )
 #endif
     set_description( N_("Flac audio packetizer") )
     set_capability( "packetizer", 100 )
