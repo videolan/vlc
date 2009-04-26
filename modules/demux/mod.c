@@ -401,8 +401,10 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
         { 20, "!SCREAM!" },             /* STM */
         { 20, "!Scream!" },             /* STM */
         { 20, "BMOD2STM" },             /* STM */
-        {  0, "MMD0" },                 /* MED */
-        {  0, "MMD1" },                 /* MED */
+        {  0, "MMD0" },                 /* MED v0 */
+        {  0, "MMD1" },                 /* MED v1 */
+        {  0, "MMD2" },                 /* MED v2 */
+        {  0, "MMD3" },                 /* MED v3 */
         {  0, "MTM" },                  /* MTM */
         {  0, "DMDL" },                 /* MDL */
         {  0, "DBM0" },                 /* DBM */
@@ -416,7 +418,8 @@ static int Validate( demux_t *p_demux, const char *psz_ext )
         {  0, "DDMF" },                 /* DMF */
         {  8, "DSMFSONG" },             /* DSM */
         {  0, "\xc1\x83\x2a\x9e" },     /* UMX */
-        {  0, "ASYLUM Music Format V1.0" }, /* AMF */
+        {  0, "ASYLUM Music Format V1.0" }, /* AMF Type 0 */
+        {  0, "AMF" },                  /* AMF */
         {  0, "PSM\xfe" },              /* PSM */
         {  0, "PSM " },                 /* PSM */
         {  0, "MT20" },                 /* MT2 */
