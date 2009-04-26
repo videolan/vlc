@@ -279,7 +279,6 @@ static void Close ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     aout_sys_t *p_sys = p_aout->output.p_sys;
-    int i_err;
 
     msg_Dbg( p_aout, "closing portaudio");
 
@@ -300,7 +299,7 @@ static void Close ( vlc_object_t *p_this )
 
 #else
 
-    i_err = Pa_StopStream( p_sys->p_stream );
+    int i_err = Pa_StopStream( p_sys->p_stream );
     if( i_err != paNoError )
     {
         msg_Err( p_aout, "Pa_StopStream: %d (%s)", i_err,
@@ -556,6 +555,7 @@ static int PAOpenStream( aout_instance_t *p_aout )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
+    VLC_UNUSED( p_aout );
 }
 
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
