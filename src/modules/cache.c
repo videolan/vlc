@@ -84,7 +84,7 @@ static int    CacheSaveConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 3
+#define CACHE_SUBVERSION_NUM 4
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
