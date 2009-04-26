@@ -230,30 +230,6 @@ static void Close (vlc_object_t *obj)
     free (p_sys);
 }
 
-static int QueryBestSize (vout_thread_t *vout,
-                          unsigned *restrict width, unsigned *restrict height)
-{
-    vout_sys_t *p_sys = vout->p_sys;
-    xcb_xv_query_best_size_reply_t *r;
-    xcb_xv_query_best_size_cookie_t ck;
-
-    ck = xcb_xv_query_best_size (p_sys->conn, p_sys->port,
-                                 vout->fmt_in.i_visible_width,
-                                 vout->fmt_in.i_visible_height,
-                                 *width, *height, false);
-    r = xcb_xv_query_best_size_reply (p_sys->conn, ck, NULL);
-    if (r == NULL)
-       return VLC_EGENERIC;
-
-    msg_Dbg (vout, "best size: %ux%u -> %ux%u", *width, *height,
-             r->actual_width, r->actual_height);
-    *width = r->actual_width;
-    *height = r->actual_height;
-    free (r);
-    return VLC_SUCCESS;
-}
-
-
 static vlc_fourcc_t ParseFormat (vout_thread_t *vout,
                                  const xcb_xv_image_format_info_t *restrict f)
 {
@@ -353,13 +329,50 @@ static vlc_fourcc_t ParseFormat (vout_thread_t *vout,
 }
 
 
+static const xcb_xv_image_format_info_t *
+FindFormat (vout_thread_t *vout, vlc_fourcc_t chroma, xcb_xv_port_t port,
+            const xcb_xv_list_image_formats_reply_t *list,
+            xcb_xv_query_image_attributes_reply_t **restrict pa)
+{
+    xcb_connection_t *conn = vout->p_sys->conn;
+    const xcb_xv_image_format_info_t *f, *end;
+
+    f = xcb_xv_list_image_formats_format (list);
+    end = f + xcb_xv_list_image_formats_format_length (list);
+    for (; f < end; f++)
+    {
+        if (chroma != ParseFormat (vout, f))
+            continue;
+
+        xcb_xv_query_image_attributes_reply_t *i;
+        i = xcb_xv_query_image_attributes_reply (conn,
+            xcb_xv_query_image_attributes (conn, port, f->id,
+                vout->fmt_in.i_width, vout->fmt_in.i_height), NULL);
+        if (i == NULL)
+            continue;
+
+        if (i->width != vout->fmt_in.i_width
+         || i->height != vout->fmt_in.i_height)
+        {
+            msg_Warn (vout, "incompatible size %ux%u -> %"PRIu32"x%"PRIu32,
+                      vout->fmt_in.i_width, vout->fmt_in.i_height,
+                      i->width, i->height);
+            free (i);
+            continue;
+        }
+        *pa = i;
+        return f;
+    }
+    return NULL;
+}
+
 /**
  * Allocate drawable window and picture buffers.
  */
 static int Init (vout_thread_t *vout)
 {
     vout_sys_t *p_sys = vout->p_sys;
-    unsigned x, y, width, height;
+    xcb_xv_query_image_attributes_reply_t *att;
 
     /* FIXME: check max image size */
     xcb_xv_adaptor_info_iterator_t it;
@@ -379,48 +392,88 @@ static int Init (vout_thread_t *vout)
         if (r == NULL)
             continue;
 
-        const xcb_xv_image_format_info_t *f, *end;
-        f = xcb_xv_list_image_formats_format (r);
-        end = f + xcb_xv_list_image_formats_format_length (r);
-        for (; f < end; f++)
-        {
-            vlc_fourcc_t chroma = ParseFormat (vout, f);
-            if (!chroma)
-                continue;
+        const xcb_xv_image_format_info_t *fmt;
 
-            if (chroma == vout->fmt_in.i_chroma)
+        /* Video chroma in preference order */
+        const vlc_fourcc_t chromas[] = {
+            vout->fmt_in.i_chroma,
+            VLC_FOURCC ('Y', 'U', 'Y', '2'),
+            VLC_FOURCC ('R', 'V', '2', '4'),
+            VLC_FOURCC ('R', 'V', '1', '5'),
+        };
+        for (size_t i = 0; i < sizeof (chromas) / sizeof (chromas[0]); i++)
+        {
+            vlc_fourcc_t chroma = chromas[i];
+            fmt = FindFormat (vout, chroma, a->base_id, r, &att);
+            if (fmt != NULL)
             {
                 vout->output.i_chroma = chroma;
-                p_sys->id = f->id;
-                break;
+                goto found_format;
             }
-            /* TODO: RGB masks */
         }
-
         free (r);
-        /* TODO: grab port */
+        continue;
 
-        msg_Dbg (vout, "using image format 0x%"PRIx32, p_sys->id);
+    found_format:
+        /* TODO: grab port */
         p_sys->port = a->base_id;
         msg_Dbg (vout, "using port %"PRIu32, p_sys->port);
-        break;
-    }
 
-    /* TODO: fallback to RV24 or I420 */
-    if (!vout->output.i_chroma)
-        return VLC_EGENERIC; /* no usable adaptor */
+        p_sys->id = fmt->id;
+        msg_Dbg (vout, "using image format 0x%"PRIx32, p_sys->id);
+        if (fmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
+        {
+            vout->fmt_out.i_rmask = vout->output.i_rmask = fmt->red_mask;
+            vout->fmt_out.i_gmask = vout->output.i_gmask = fmt->green_mask;
+            vout->fmt_out.i_bmask = vout->output.i_bmask = fmt->blue_mask;
+        }
+        free (r);
+        goto found_adaptor;
+    }
+    msg_Err (vout, "no available XVideo adaptor");
+    return VLC_EGENERIC; /* no usable adaptor */
+
+    /* Allocate picture buffers */
+    const uint32_t *offsets;
+found_adaptor:
+    offsets = xcb_xv_query_image_attributes_offsets (att);
+
+    I_OUTPUTPICTURES = 0;
+    for (size_t index = 0; I_OUTPUTPICTURES < 2; index++)
+    {
+        picture_t *pic = vout->p_picture + index;
+
+        if (index > sizeof (vout->p_picture) / sizeof (pic))
+            break;
+        if (pic->i_status != FREE_PICTURE)
+            continue;
+
+        vout_InitPicture (vout, pic, vout->output.i_chroma,
+                          att->width, att->height,
+                          vout->fmt_in.i_aspect);
+        if (PictureAlloc (vout, pic, att->data_size,
+                          p_sys->shm ? p_sys->conn : NULL))
+            break;
+        /* Allocate further planes as specified by XVideo */
+        /* We assume that offsets[0] is zero */
+        for (int i = 1; i < pic->i_planes; i++)
+             pic->p[i].p_pixels = pic->p->p_pixels + offsets[i];
+        PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
+    }
+    free (att);
+
+    unsigned x, y, width, height;
 
     if (GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
         return VLC_EGENERIC;
     vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
-    if (QueryBestSize (vout, &width, &height))
-        return VLC_EGENERIC;
 
     const uint32_t values[] = { x, y, width, height, };
     xcb_configure_window (p_sys->conn, p_sys->window,
                           XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
                           XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                           values);
+    xcb_flush (p_sys->conn);
     p_sys->height = height;
     p_sys->width = width;
 
@@ -438,26 +491,6 @@ static int Init (vout_thread_t *vout)
     vout->output.i_aspect = vout->fmt_out.i_aspect =
         width * VOUT_ASPECT_FACTOR / height;
 
-    /* Allocate picture buffers */
-    I_OUTPUTPICTURES = 0;
-    for (size_t index = 0; I_OUTPUTPICTURES < 2; index++)
-    {
-        picture_t *pic = vout->p_picture + index;
-
-        if (index > sizeof (vout->p_picture) / sizeof (pic))
-            break;
-        if (pic->i_status != FREE_PICTURE)
-            continue;
-
-        vout_InitPicture (vout, pic, vout->output.i_chroma,
-                          vout->output.i_width, vout->output.i_height,
-                          vout->output.i_aspect);
-        if (PictureAlloc (vout, pic, pic->p->i_pitch * pic->p->i_lines,
-                          p_sys->shm ? p_sys->conn : NULL))
-            break;
-        PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
-    }
-    xcb_flush (p_sys->conn);
     return VLC_SUCCESS;
 }
 
