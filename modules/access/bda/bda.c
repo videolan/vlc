@@ -1,7 +1,7 @@
 /*****************************************************************************
  * bda.c : BDA access module for vlc
  *****************************************************************************
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2009 the VideoLAN team
  *
  * Author: Ken Self <kenself(at)optusnet(dot)com(dot)au>
  *
@@ -28,9 +28,9 @@
 # include "config.h"
 #endif
 
-#include <vlc_plugin.h>
-
 #include "bda.h"
+
+#include <vlc_plugin.h>
 
 
 /*****************************************************************************
