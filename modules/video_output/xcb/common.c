@@ -164,14 +164,10 @@ int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
  * format. If a XCB connection pointer is supplied, the segment is attached to
  * the X server (MIT-SHM extension).
  */
-int PictureInit (vout_thread_t *vout, picture_t *pic, xcb_connection_t *conn)
+int PictureAlloc (vout_thread_t *vout, picture_t *pic, size_t size,
+                  xcb_connection_t *conn)
 {
     assert (pic->i_status == FREE_PICTURE);
-    vout_InitPicture (vout, pic, vout->output.i_chroma,
-                      vout->output.i_width, vout->output.i_height,
-                      vout->output.i_aspect);
-
-    const size_t size = pic->p->i_pitch * pic->p->i_lines;
 
     /* Allocate shared memory segment */
     int id = shmget (IPC_PRIVATE, size, IPC_CREAT | 0700);
@@ -219,7 +215,7 @@ int PictureInit (vout_thread_t *vout, picture_t *pic, xcb_connection_t *conn)
 /**
  * Release picture private data: detach the shared memory segment.
  */
-void PictureDeinit (picture_t *pic, xcb_connection_t *conn)
+void PictureFree (picture_t *pic, xcb_connection_t *conn)
 {
     xcb_shm_seg_t segment = (uintptr_t)pic->p_sys;
 

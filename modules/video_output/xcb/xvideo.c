@@ -448,7 +448,12 @@ static int Init (vout_thread_t *vout)
             break;
         if (pic->i_status != FREE_PICTURE)
             continue;
-        if (PictureInit (vout, pic, p_sys->shm ? p_sys->conn : NULL))
+
+        vout_InitPicture (vout, pic, vout->output.i_chroma,
+                          vout->output.i_width, vout->output.i_height,
+                          vout->output.i_aspect);
+        if (PictureAlloc (vout, pic, pic->p->i_pitch * pic->p->i_lines,
+                          p_sys->shm ? p_sys->conn : NULL))
             break;
         PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
     }
@@ -464,7 +469,7 @@ static void Deinit (vout_thread_t *vout)
     vout_sys_t *p_sys = vout->p_sys;
 
     for (int i = 0; i < I_OUTPUTPICTURES; i++)
-        PictureDeinit (PP_OUTPUTPICTURE[i], p_sys->conn);
+        PictureFree (PP_OUTPUTPICTURE[i], p_sys->conn);
 }
 
 /**
