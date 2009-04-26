@@ -420,6 +420,7 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
     /* Note that ordering matters (on the client side) */
     static const int protos[] =
     {
+        /*GNUTLS_TLS1_2, as of GnuTLS 2.6.5, still not ratified */
         GNUTLS_TLS1_1,
         GNUTLS_TLS1_0,
         GNUTLS_SSL3,
@@ -433,6 +434,9 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
     };
     static const int macs[] =
     {
+        GNUTLS_MAC_SHA512,
+        GNUTLS_MAC_SHA384,
+        GNUTLS_MAC_SHA256,
         GNUTLS_MAC_SHA1,
         GNUTLS_MAC_RMD160, // RIPEMD
         GNUTLS_MAC_MD5,
@@ -446,6 +450,7 @@ gnutls_SessionPrioritize (vlc_object_t *obj, gnutls_session_t session)
         GNUTLS_CIPHER_AES_128_CBC,
         GNUTLS_CIPHER_3DES_CBC,
         GNUTLS_CIPHER_ARCFOUR_128,
+        // TODO? Camellia ciphers?
         //GNUTLS_CIPHER_DES_CBC,
         //GNUTLS_CIPHER_ARCFOUR_40,
         //GNUTLS_CIPHER_RC2_40_CBC,
