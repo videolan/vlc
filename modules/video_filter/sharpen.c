@@ -171,8 +171,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     const int v2 = 3; /* 2^3 = 8 */
 
     if( !p_pic ) return NULL;
-    if( !p_filter ) return NULL;
-    if( !p_filter->p_sys ) return NULL;
 
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
@@ -184,13 +182,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     /* process the Y plane */
     p_src = p_pic->p[Y_PLANE].p_pixels;
     p_out = p_outpic->p[Y_PLANE].p_pixels;
-    if( !p_src || !p_out )
-    {
-        msg_Warn( p_filter, "can't get Y plane" );
-        picture_Release( p_pic );
-        return NULL;
-    }
-
     i_src_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
 
     /* perform convolution only on Y plane. Avoid border line. */
