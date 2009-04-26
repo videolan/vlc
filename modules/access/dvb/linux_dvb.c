@@ -414,7 +414,7 @@ static int ScanParametersDvbC( access_t *p_access, scan_parameter_t *p_scan )
     /* */
     p_scan->frequency.i_min = p_frontend->info.frequency_min;
     p_scan->frequency.i_max = p_frontend->info.frequency_max;
-    p_scan->frequency.i_step = p_frontend->info.frequency_stepsize;
+    p_scan->frequency.i_step = p_frontend->info.frequency_stepsize ?: 166667;
     p_scan->frequency.i_count = (p_scan->frequency.i_max-p_scan->frequency.i_min)/p_scan->frequency.i_step;
 
     /* */
@@ -436,7 +436,7 @@ static int ScanParametersDvbT( access_t *p_access, scan_parameter_t *p_scan )
     /* */
     p_scan->frequency.i_min = p_frontend->info.frequency_min;
     p_scan->frequency.i_max = p_frontend->info.frequency_max;
-    p_scan->frequency.i_step = p_frontend->info.frequency_stepsize;
+    p_scan->frequency.i_step = p_frontend->info.frequency_stepsize ?: 166667;
     p_scan->frequency.i_count = (p_scan->frequency.i_max-p_scan->frequency.i_min)/p_scan->frequency.i_step;
 
     /* */
