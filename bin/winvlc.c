@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <windows.h>
 
-#if !defined(UNDER_CE) && defined ( NDEBUG )
+#if !defined(UNDER_CE)
 #   define  _WIN32_IE 0x500
 #   include <shlobj.h>
 #   include <tlhelp32.h>
@@ -137,7 +137,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     libvlc_exception_init (&ex);
     libvlc_exception_init (&dummy);
 
-#if !defined( UNDER_CE ) && defined ( NDEBUG )
+#if !defined( UNDER_CE )
     check_crashdump();
     SetUnhandledExceptionFilter(vlc_exception_filter);
 #endif
@@ -164,7 +164,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return ret;
 }
 
-#if !defined( UNDER_CE ) && defined ( NDEBUG )
+#if !defined( UNDER_CE )
 
 static void get_crashdump_path(wchar_t * wdir)
 {
@@ -223,74 +223,82 @@ static void check_crashdump()
  *****************************************************************************/
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo)
 {
-    fprintf( stderr, "unhandled vlc exception\n" );
-
-    wchar_t * wdir = (wchar_t *)malloc(sizeof(wchar_t)*MAX_PATH);
-    get_crashdump_path(wdir);
-    FILE * fd = _wfopen ( wdir, L"w, ccs=UTF-8" );
-    free((void *)wdir);
-
-    if( !fd )
+    if(IsDebuggerPresent())
     {
-        fprintf( stderr, "\nerror while opening file" );
-        exit( 1 );
+        //If a debugger is present, pass the exception to the debugger with EXCEPTION_CONTINUE_SEARCH
+        return EXCEPTION_CONTINUE_SEARCH;
     }
-
-    OSVERSIONINFO osvi;
-    ZeroMemory( &osvi, sizeof(OSVERSIONINFO) );
-    osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-    GetVersionEx( &osvi );
-
-    fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE, osvi.dwMajorVersion,
-                                                           osvi.dwMinorVersion,
-                                                           osvi.dwBuildNumber,
-                                                           osvi.dwPlatformId,
-                                                           osvi.szCSDVersion);
-
-    const CONTEXT *const pContext = (const CONTEXT *)lpExceptionInfo->ContextRecord;
-    const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)lpExceptionInfo->ExceptionRecord;
-    /*No nested exceptions for now*/
-    fwprintf( fd, L"\n\n[exceptions]\n%08x at %08x",pException->ExceptionCode,
-                                            pException->ExceptionAddress );
-    if( pException->NumberParameters > 0 )
+    else
     {
-        unsigned int i;
-        for( i = 0; i < pException->NumberParameters; i++ )
-            fprintf( fd, " | %08x", pException->ExceptionInformation[i] );
-    }
+        fprintf( stderr, "unhandled vlc exception\n" );
 
-    fwprintf( fd, L"\n\n[context]\nEDI:%08x\nESI:%08x\n" \
-                "EBX:%08x\nEDX:%08x\nECX:%08x\nEAX:%08x\n" \
-                "EBP:%08x\nEIP:%08x\nESP:%08x\n",
-                    pContext->Edi,pContext->Esi,pContext->Ebx,
-                    pContext->Edx,pContext->Ecx,pContext->Eax,
-                    pContext->Ebp,pContext->Eip,pContext->Esp );
+        wchar_t * wdir = (wchar_t *)malloc(sizeof(wchar_t)*MAX_PATH);
+        get_crashdump_path(wdir);
+        FILE * fd = _wfopen ( wdir, L"w, ccs=UTF-8" );
+        free((void *)wdir);
 
-    fwprintf( fd, L"\n[stacktrace]\n#EIP|base|module\n" );
+        if( !fd )
+        {
+            fprintf( stderr, "\nerror while opening file" );
+            exit( 1 );
+        }
 
-    wchar_t module[ 256 ];
-	MEMORY_BASIC_INFORMATION mbi ;
-	VirtualQuery( (DWORD *)pContext->Eip, &mbi, sizeof( mbi ) ) ;
-	HINSTANCE hInstance = mbi.AllocationBase;
-	GetModuleFileName( hInstance, module, 256 ) ;
-	fwprintf( fd, L"%08x|%s\n", pContext->Eip, module );
+        OSVERSIONINFO osvi;
+        ZeroMemory( &osvi, sizeof(OSVERSIONINFO) );
+        osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+        GetVersionEx( &osvi );
 
-	DWORD pEbp = pContext->Ebp;
-    DWORD caller = *((DWORD*)pEbp + 1);
+        fwprintf( fd, L"[version]\nOS=%d.%d.%d.%d.%s\nVLC=" VERSION_MESSAGE, osvi.dwMajorVersion,
+                                                               osvi.dwMinorVersion,
+                                                               osvi.dwBuildNumber,
+                                                               osvi.dwPlatformId,
+                                                               osvi.szCSDVersion);
 
-    do
-    {
-        VirtualQuery( (DWORD *)caller, &mbi, sizeof( mbi ) ) ;
+        const CONTEXT *const pContext = (const CONTEXT *)lpExceptionInfo->ContextRecord;
+        const EXCEPTION_RECORD *const pException = (const EXCEPTION_RECORD *)lpExceptionInfo->ExceptionRecord;
+        /*No nested exceptions for now*/
+        fwprintf( fd, L"\n\n[exceptions]\n%08x at %08x",pException->ExceptionCode,
+                                                pException->ExceptionAddress );
+        if( pException->NumberParameters > 0 )
+        {
+            unsigned int i;
+            for( i = 0; i < pException->NumberParameters; i++ )
+                fprintf( fd, " | %08x", pException->ExceptionInformation[i] );
+        }
+
+        fwprintf( fd, L"\n\n[context]\nEDI:%08x\nESI:%08x\n" \
+                    "EBX:%08x\nEDX:%08x\nECX:%08x\nEAX:%08x\n" \
+                    "EBP:%08x\nEIP:%08x\nESP:%08x\n",
+                        pContext->Edi,pContext->Esi,pContext->Ebx,
+                        pContext->Edx,pContext->Ecx,pContext->Eax,
+                        pContext->Ebp,pContext->Eip,pContext->Esp );
+
+        fwprintf( fd, L"\n[stacktrace]\n#EIP|base|module\n" );
+
+        wchar_t module[ 256 ];
+        MEMORY_BASIC_INFORMATION mbi ;
+        VirtualQuery( (DWORD *)pContext->Eip, &mbi, sizeof( mbi ) ) ;
         HINSTANCE hInstance = mbi.AllocationBase;
         GetModuleFileName( hInstance, module, 256 ) ;
-        fwprintf( fd, L"%08x|%s\n", caller, module );
-        pEbp = *(DWORD*)pEbp ;
-        caller = *((DWORD*)pEbp + 1) ;
-        /*The last EBP points to NULL!*/
-    }while(caller);
+        fwprintf( fd, L"%08x|%s\n", pContext->Eip, module );
 
-    fclose( fd );
-    fflush( stderr );
-    exit( 1 );
+        DWORD pEbp = pContext->Ebp;
+        DWORD caller = *((DWORD*)pEbp + 1);
+
+        do
+        {
+            VirtualQuery( (DWORD *)caller, &mbi, sizeof( mbi ) ) ;
+            HINSTANCE hInstance = mbi.AllocationBase;
+            GetModuleFileName( hInstance, module, 256 ) ;
+            fwprintf( fd, L"%08x|%s\n", caller, module );
+            pEbp = *(DWORD*)pEbp ;
+            caller = *((DWORD*)pEbp + 1) ;
+            /*The last EBP points to NULL!*/
+        }while(caller);
+
+        fclose( fd );
+        fflush( stderr );
+        exit( 1 );
+    }
 }
 #endif
