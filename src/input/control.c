@@ -140,7 +140,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             char *psz_format = (char *)va_arg( args, char * );
 
             char *psz_value;
-            
+
             if( vasprintf( &psz_value, psz_format, args ) == -1 )
                 return VLC_EGENERIC;
 

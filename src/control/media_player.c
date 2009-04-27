@@ -719,7 +719,6 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     else
     {
         input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-
         if( !p_input_thread )
             return;
 
@@ -733,8 +732,8 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
  * set_nsobject
  **************************************************************************/
 void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
-								 void * drawable,
-								 libvlc_exception_t *p_e )
+                                        void * drawable,
+                                        libvlc_exception_t *p_e )
 {
     (void) p_e;
     p_mi->drawable.nsobject = drawable;
