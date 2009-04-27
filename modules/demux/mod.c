@@ -368,10 +368,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         vlc_meta_t *p_meta = (vlc_meta_t *)va_arg( args, vlc_meta_t* );
         unsigned i_num_samples = ModPlug_NumSamples( p_sys->f ),
-            i_num_instruments = ModPlug_NumInstruments( p_sys->f );
+                 i_num_instruments = ModPlug_NumInstruments( p_sys->f );
         unsigned i_num_patterns = ModPlug_NumPatterns( p_sys->f ),
-            i_num_channels = ModPlug_NumChannels( p_sys->f );
-//      unsigned modType = ModPlug_GetModuleType( p_sys->f );
+                 i_num_channels = ModPlug_NumChannels( p_sys->f );
+        //      unsigned modType = ModPlug_GetModuleType( p_sys->f );
+
         char psz_temp[2048]; /* 32 * 240 max, but only need start  */
         char *psz_module_info, *psz_instrument_info;
         unsigned i_temp_index = 0;
@@ -379,19 +380,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( psz_name && *psz_name )
             vlc_meta_SetTitle( p_meta, psz_name );
 
-    /* Comment field from artist - not in every type of MOD */
-    psz_name = ModPlug_GetMessage( p_sys->f );
-    if (psz_name && *psz_name )
-        vlc_meta_SetDescription( p_meta, psz_name );
+        /* Comment field from artist - not in every type of MOD */
+        psz_name = ModPlug_GetMessage( p_sys->f );
+        if (psz_name && *psz_name )
+            vlc_meta_SetDescription( p_meta, psz_name );
 
         /* Instruments only in newer MODs - so don't show if 0 */
-    if ( asprintf( &psz_instrument_info, ", %i Instruments", i_num_instruments ) )
-    {
+        if ( asprintf( &psz_instrument_info, ", %i Instruments",
+                       i_num_instruments ) )
+        {
             if ( asprintf( &psz_module_info, "%i Channels, %i Patterns\n"
                 "%i Samples%s\n",
-                i_num_channels, i_num_patterns, i_num_samples, ( i_num_instruments ? psz_instrument_info : "" ) ))
+                i_num_channels, i_num_patterns, i_num_samples,
+                ( i_num_instruments ? psz_instrument_info : "" ) ))
             {
-                vlc_meta_AddExtra( p_meta, "Module Information", psz_module_info );
+                vlc_meta_AddExtra( p_meta, "Module Information",
+                        psz_module_info );
                 free( psz_module_info );
             }
 
