@@ -216,7 +216,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             else
                 p_buffer->i_pts += p_sys->i_delay;
 
-            input_DecoderDecode( id->p_dec, p_buffer );
+            input_DecoderDecode( id->p_dec, p_buffer, false );
         }
 
         p_buffer = p_next;

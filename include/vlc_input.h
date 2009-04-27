@@ -587,7 +587,7 @@ static inline aout_instance_t *input_GetAout( input_thread_t *p_input )
 typedef struct input_clock_t input_clock_t;
 VLC_EXPORT( decoder_t *, input_DecoderNew, ( input_thread_t *, es_format_t *, input_clock_t *, sout_instance_t * ) );
 VLC_EXPORT( void, input_DecoderDelete, ( decoder_t * ) );
-VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t * ) );
+VLC_EXPORT( void, input_DecoderDecode,( decoder_t *, block_t *, bool b_do_pace ) );
 
 /**
  * This function allows to split a MRL into access, demux and path part.

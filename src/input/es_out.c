@@ -1897,9 +1897,11 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     {
         block_t *p_dup = block_Duplicate( p_block );
         if( p_dup )
-            input_DecoderDecode( es->p_dec_record, p_dup );
+            input_DecoderDecode( es->p_dec_record, p_dup,
+                                 p_input->p->b_out_pace_control );
     }
-    input_DecoderDecode( es->p_dec, p_block );
+    input_DecoderDecode( es->p_dec, p_block,
+                         p_input->p->b_out_pace_control );
 
     es_format_t fmt_dsc;
     vlc_meta_t  *p_meta_dsc;
