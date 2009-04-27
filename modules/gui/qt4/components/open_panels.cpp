@@ -1181,12 +1181,22 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->hide();
             bdaBandLabel->hide();
         }
-        else if( bdat->isChecked() )
+        else if( bdat->isChecked() || bdaa->isChecked() )
         {
             bdaSrate->hide();
             bdaSrateLabel->hide();
             bdaBandBox->show();
             bdaBandLabel->show();
+        }
+        if( bdas->isChecked() )
+        {
+            bdaFreq->setSuffix(" kHz");
+            bdaFreq->setSingleStep( 1000 );
+        }
+        if( bdac->isChecked() || bdat->isChecked() || bdaa->isChecked( ) )
+        {
+            bdaFreq->setSuffix(" Hz");
+            bdaFreq->setSingleStep( 100000 );
         }
         break;
 #else
