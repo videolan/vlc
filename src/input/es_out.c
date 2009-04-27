@@ -1874,6 +1874,24 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
         return VLC_SUCCESS;
     }
 
+    /* Check for sout mode */
+    if( out->b_sout )
+    {
+        /* FIXME review this, proper lock may be missing */
+        if( p_input->p->p_sout->i_out_pace_nocontrol > 0 &&
+            p_input->p->b_out_pace_control )
+        {
+            msg_Dbg( p_input, "switching to sync mode" );
+            p_input->p->b_out_pace_control = false;
+        }
+        else if( p_input->p->p_sout->i_out_pace_nocontrol <= 0 &&
+                 !p_input->p->b_out_pace_control )
+        {
+            msg_Dbg( p_input, "switching to async mode" );
+            p_input->p->b_out_pace_control = true;
+        }
+    }
+
     /* Decode */
     if( es->p_dec_record )
     {

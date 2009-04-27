@@ -1744,20 +1744,6 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             p_sout_block = p_next;
         }
-
-        /* For now it's enough, as only sout impact on this flag */
-        if( p_owner->p_sout->i_out_pace_nocontrol > 0 &&
-            p_owner->p_input->p->b_out_pace_control )
-        {
-            msg_Dbg( p_dec, "switching to sync mode" );
-            p_owner->p_input->p->b_out_pace_control = false;
-        }
-        else if( p_owner->p_sout->i_out_pace_nocontrol <= 0 &&
-                 !p_owner->p_input->p->b_out_pace_control )
-        {
-            msg_Dbg( p_dec, "switching to async mode" );
-            p_owner->p_input->p->b_out_pace_control = true;
-        }
     }
 }
 
