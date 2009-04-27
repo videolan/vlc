@@ -596,6 +596,8 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
     }
     while (result == WAIT_IO_COMPLETION);
 
+    assert (result != WAIT_ABANDONED); /* another thread failed to cleanup! */
+    assert (result != WAIT_FAILED);
     ResetEvent (*p_condvar);
 
 #endif
@@ -652,6 +654,8 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     }
     while (result == WAIT_IO_COMPLETION);
 
+    assert (result != WAIT_ABANDONED);
+    assert (result != WAIT_FAILED);
     ResetEvent (*p_condvar);
 
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
