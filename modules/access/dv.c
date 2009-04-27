@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_name );
         return VLC_EGENERIC;
     }
- 
+
     p_sys->p_ev->p_frame = NULL;
     p_sys->p_ev->pp_last = &p_sys->p_ev->p_frame;
     p_sys->p_ev->p_access = p_access;
@@ -340,14 +340,6 @@ static block_t *Block( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     block_t *p_block = NULL;
 
-#if 0
-    if( !p_access->psz_demux )
-    {
-        free( p_access->psz_demux );
-        p_access->psz_demux = strdup( "rawdv" );
-    }
-#endif
-
     vlc_mutex_lock( &p_sys->lock );
     p_block = p_sys->p_frame;
     //msg_Dbg( p_access, "sending frame %p",p_block );
@@ -401,7 +393,7 @@ static int Raw1394Handler( raw1394handle_t handle, int channel, size_t length, q
     p_sys = p_access->p_sys;
 
     /* skip empty packets */
-    if ( length > 16 )
+    if( length > 16 )
     {
         unsigned char * p = ( unsigned char* ) &data[ 3 ];
         int section_type = p[ 0 ] >> 5;           /* section type is in bits 5 - 7 */
@@ -476,13 +468,13 @@ static int Raw1394GetNumPorts( access_t *p_access )
     raw1394handle_t handle;
 
     /* get a raw1394 handle */
-    if ( !( handle = raw1394_new_handle() ) )
+    if( !( handle = raw1394_new_handle() ) )
     {
         msg_Err( p_access, "raw1394 - failed to get handle: %m." );
         return VLC_EGENERIC;
     }
 
-    if ( ( n_ports = raw1394_get_port_info( handle, pinf, 16 ) ) < 0 )
+    if( ( n_ports = raw1394_get_port_info( handle, pinf, 16 ) ) < 0 )
     {
         msg_Err( p_access, "raw1394 - failed to get port info: %m." );
         raw1394_destroy_handle( handle );
@@ -500,21 +492,14 @@ static raw1394handle_t Raw1394Open( access_t *p_access, int port )
     raw1394handle_t handle;
 
     /* get a raw1394 handle */
-#ifdef RAW1394_V_0_8
-
-    handle = raw1394_get_handle();
-#else
-
     handle = raw1394_new_handle();
-#endif
-
-    if ( !handle )
+    if( !handle )
     {
         msg_Err( p_access, "raw1394 - failed to get handle: %m." );
         return NULL;
     }
 
-    if ( ( n_ports = raw1394_get_port_info( handle, pinf, 16 ) ) < 0 )
+    if( ( n_ports = raw1394_get_port_info( handle, pinf, 16 ) ) < 0 )
     {
         msg_Err( p_access, "raw1394 - failed to get port info: %m." );
         raw1394_destroy_handle( handle );
@@ -522,7 +507,7 @@ static raw1394handle_t Raw1394Open( access_t *p_access, int port )
     }
 
     /* tell raw1394 which host adapter to use */
-    if ( raw1394_set_port( handle, port ) < 0 )
+    if( raw1394_set_port( handle, port ) < 0 )
     {
         msg_Err( p_access, "raw1394 - failed to set set port: %m." );
         return NULL;
@@ -598,8 +583,8 @@ static int DiscoverAVC( access_t *p_access, int* port, uint64_t guid )
 static raw1394handle_t AVCOpen( access_t *p_access, int port )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int numcards;
     struct raw1394_portinfo pinf[ 16 ];
+    int numcards;
 
     p_sys->p_avc1394 = raw1394_new_handle();
     if( !p_sys->p_avc1394 )
@@ -626,7 +611,6 @@ static void AVCClose( access_t *p_access )
         p_sys->p_avc1394 = NULL;
     }
 }
-
 
 static int AVCResetHandler( raw1394handle_t handle, unsigned int generation )
 {
