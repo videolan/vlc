@@ -216,7 +216,8 @@ void MetaPanel::update( input_item_t *p_item )
     UPDATE_META( NowPlaying, nowplaying_text );
     UPDATE_META( Publisher, publisher_text );
 //    UPDATE_META( Setting, setting_text );
-//    UPDATE_META( EncodedBy, encodedby_text );
+//FIXME this is wrong if has Publisher and EncodedBy fields
+    UPDATE_META( EncodedBy, publisher_text );
 
     UPDATE_META( Date, date_text );
     UPDATE_META( TrackNum, seqnum_text );
