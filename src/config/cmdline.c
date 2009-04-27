@@ -273,15 +273,14 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
 
                     psz_name = p_conf->psz_name;
                 }
-
-               if( p_conf->i_type != CONFIG_ITEM_BOOL && !optarg )
-               {
-                   fprintf( stderr, "Warning: missing argument for option --%s\n", p_conf->psz_name );
-                   fprintf( stderr, "Try specifying options as '--optionname=value' instead of '--optionname value'\n" );
-                   continue;
-               }
-
-
+#ifdef __APPLE__
+                if( p_conf->i_type != CONFIG_ITEM_BOOL && !optarg )
+                {
+                    fprintf( stderr, "Warning: missing argument for option --%s\n", p_conf->psz_name );
+                    fprintf( stderr, "Try specifying options as '--optionname=value' instead of '--optionname value'\n" );
+                    continue;
+                }
+#endif
                 switch( p_conf->i_type )
                 {
                     case CONFIG_ITEM_STRING:
