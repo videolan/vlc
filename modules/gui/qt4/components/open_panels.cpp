@@ -999,10 +999,11 @@ void CaptureOpenPanel::initialize()
     dvbFreq = new QSpinBox;
     dvbFreq->setAlignment( Qt::AlignRight );
     dvbFreq->setSuffix(" kHz");
+    dvbFreq->setSingleStep( 1000 );
     setSpinBoxFreq( dvbFreq  );
     dvbPropLayout->addWidget( dvbFreq, 0, 1 );
 
-    QLabel *dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
+    dvbSrateLabel = new QLabel( qtr( "Transponder symbol rate" ) );
     dvbPropLayout->addWidget( dvbSrateLabel, 1, 0 );
 
     dvbSrate = new QSpinBox;
@@ -1010,6 +1011,24 @@ void CaptureOpenPanel::initialize()
     dvbSrate->setSuffix(" kHz");
     setSpinBoxFreq( dvbSrate );
     dvbPropLayout->addWidget( dvbSrate, 1, 1 );
+
+    dvbBandLabel = new QLabel( qtr( "Bandwidth" ) );
+    dvbPropLayout->addWidget( dvbBandLabel, 2, 0 );
+
+    dvbBandBox = new QComboBox;
+    /* This doesn't work since dvb-bandwidth doesn't seem to be a
+       list of Integers
+       setfillVLCConfigCombo( "dvb-bandwidth", p_intf, bdaBandBox );
+     */
+    dvbBandBox->addItem( qtr( "Auto" ), 0 );
+    dvbBandBox->addItem( qtr( "6 MHz" ), 6 );
+    dvbBandBox->addItem( qtr( "7 MHz" ), 7 );
+    dvbBandBox->addItem( qtr( "8 MHz" ), 8 );
+    dvbPropLayout->addWidget( dvbBandBox, 2, 1 );
+
+    dvbBandLabel->hide();
+    dvbBandBox->hide();
+
     dvbPropLayout->addItem( new QSpacerItem( 20, 20, QSizePolicy::Expanding ),
             2, 0, 2, 1 );
 
@@ -1084,7 +1103,7 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :dvb-frequency=" + QString::number( bdaFreq->value() );
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString::number( bdaSrate->value() );
-        else if( bdat->isChecked() )
+        else if( bdat->isChecked() || bdaa->isChecked() )
             mrl += " :dvb-bandwidth=" +
                 QString::number( bdaBandBox->itemData(
                     bdaBandBox->currentIndex() ).toInt() );
@@ -1142,7 +1161,13 @@ void CaptureOpenPanel::updateMRL()
         fileList << "dvb://";
         mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
         mrl += " :dvb-frequency=" + QString::number( dvbFreq->value() );
-        mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
+        if( dvbs->isChecked() || dvbc->isChecked() )
+            mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
+        else if( dvbt->isChecked() )
+            mrl += " :dvb-bandwidth=" +
+                QString::number( dvbBandBox->itemData(
+                    dvbBandBox->currentIndex() ).toInt() );
+
         break;
 #endif
     case SCREEN_DEVICE:
@@ -1201,6 +1226,20 @@ void CaptureOpenPanel::updateButtons()
         break;
 #else
     case DVB_DEVICE:
+        if( dvbs->isChecked() || dvbc->isChecked() )
+        {
+            dvbSrate->show();
+            dvbSrateLabel->show();
+            dvbBandBox->hide();
+            dvbBandLabel->hide();
+        }
+        else if( dvbt->isChecked() )
+        {
+            dvbSrate->hide();
+            dvbSrateLabel->hide();
+            dvbBandBox->show();
+            dvbBandLabel->show();
+        }
         if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
         if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
         break;

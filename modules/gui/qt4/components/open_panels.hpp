@@ -201,11 +201,12 @@ private:
     QLineEdit *dshowVSizeLine;
 #else
     QRadioButton *dvbs, *dvbt, *dvbc;
+    QLabel *dvbBandLabel, *dvbSrateLabel;
     QSpinBox  *v4lFreq, *pvrFreq, *pvrBitr;
     QLineEdit *v4lVideoDevice, *v4lAudioDevice;
     QLineEdit *v4l2VideoDevice, *v4l2AudioDevice;
     QLineEdit *pvrDevice, *pvrRadioDevice;
-    QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox;
+    QComboBox *v4lNormBox, *v4l2StdBox, *pvrNormBox, *dvbBandBox;
     QSpinBox *dvbCard, *dvbFreq, *dvbSrate;
     QSpinBox *jackChannels, *jackCaching;
     QCheckBox *jackPace, *jackConnect;
