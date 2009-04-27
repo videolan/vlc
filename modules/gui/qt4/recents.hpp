@@ -32,7 +32,7 @@
 #include <QRegExp>
 #include <QSignalMapper>
 
-#define RECENTS_LIST_SIZE 8
+#define RECENTS_LIST_SIZE 10
 
 class RecentsMRL : public QObject
 {
