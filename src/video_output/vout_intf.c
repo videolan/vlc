@@ -1032,6 +1032,13 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
                 i_crop_top = strtol( psz_end, &psz_end, 10 );
                 if( *psz_end != '\0' ) goto crop_end;
 
+                if( i_crop_top + i_crop_height >= p_vout->fmt_render.i_visible_height ||
+                    i_crop_left + i_crop_width >= p_vout->fmt_render.i_visible_width )
+                {
+                    msg_Err( p_vout, "Unable to crop over picture boundaries");
+                    return VLC_EGENERIC;
+                }
+
                 i_width = i_crop_width;
                 p_vout->fmt_in.i_visible_width = i_width;
 
@@ -1062,6 +1069,13 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
                 i_crop_bottom = strtol( psz_end, &psz_end, 10 );
                 if( *psz_end != '\0' ) goto crop_end;
 
+                if( i_crop_top + i_crop_bottom >= p_vout->fmt_render.i_visible_height ||
+                    i_crop_right + i_crop_left >= p_vout->fmt_render.i_visible_width )
+                {
+                    msg_Err( p_vout, "Unable to crop over picture boundaries" );
+                    return VLC_EGENERIC;
+                }
+
                 i_width = p_vout->fmt_render.i_visible_width
                           - i_crop_left - i_crop_right;
                 p_vout->fmt_in.i_visible_width = i_width;
@@ -1086,6 +1100,13 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
         i_crop_left = var_GetInteger( p_vout, "crop-left" );
         i_crop_right = var_GetInteger( p_vout, "crop-right" );
         i_crop_bottom = var_GetInteger( p_vout, "crop-bottom" );
+
+        if( i_crop_top + i_crop_bottom >= p_vout->fmt_render.i_visible_height ||
+            i_crop_right + i_crop_left >= p_vout->fmt_render.i_visible_width )
+        {
+            msg_Err( p_vout, "Unable to crop over picture boundaries" );
+            return VLC_EGENERIC;
+        }
 
         i_width = p_vout->fmt_render.i_visible_width
                   - i_crop_left - i_crop_right;
