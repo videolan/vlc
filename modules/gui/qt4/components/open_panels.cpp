@@ -510,6 +510,8 @@ NetOpenPanel::~NetOpenPanel()
     while( tempL.size() > 8 ) tempL.removeFirst();
 
     getSettings()->setValue( "Open/netMRL", tempL );
+
+    delete mrlList;
 }
 
 void NetOpenPanel::clear()
