@@ -173,9 +173,10 @@ static int playlist_cmp(const void *first, const void *second)
     }
     else if( sort_mode == SORT_TITLE_NUMERIC )
     {
-        char *psz_i = input_item_GetName( (*(playlist_item_t **)first)->p_input );
-        char *psz_ismall =
-                input_item_GetName( (*(playlist_item_t **)second)->p_input );
+        char *psz_i = input_item_GetTitleFbName(
+                                (*(playlist_item_t **)first)->p_input );
+        char *psz_ismall = input_item_GetTitleFbName(
+                                (*(playlist_item_t **)second)->p_input );
         i_test = atoi( psz_i ) - atoi( psz_ismall );
         free( psz_i );
         free( psz_ismall );
