@@ -387,13 +387,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         /* Instruments only in newer MODs - so don't show if 0 */
         if( asprintf( &psz_instrument_info, ", %i Instruments",
-                      i_num_instruments ) )
+                      i_num_instruments ) >= 0 )
         {
             if( asprintf( &psz_module_info,
                           "%i Channels, %i Patterns\n"
                           "%i Samples%s\n",
                           i_num_channels, i_num_patterns, i_num_samples,
-                          ( i_num_instruments ? psz_instrument_info : "" ) ))
+                          ( i_num_instruments ? psz_instrument_info : "" ) ) >= 0 )
             {
                 vlc_meta_AddExtra( p_meta, "Module Information",
                                    psz_module_info );
