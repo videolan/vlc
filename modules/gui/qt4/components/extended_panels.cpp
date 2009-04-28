@@ -1065,6 +1065,7 @@ void Equalizer::setCorePreset( int i_preset )
     config_PutPsz( p_intf, "equalizer-preset", preset_list[i_preset] );
     config_PutFloat( p_intf, "equalizer-preamp",
                     eqz_preset_10b[i_preset]->f_preamp );
+    free( psz_values );
 }
 
 static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
