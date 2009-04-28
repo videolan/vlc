@@ -41,6 +41,7 @@ typedef struct
     int i_state;
     block_bytestream_t bytestream;
     size_t i_offset;
+    bool   b_flushing;
 
     int i_startcode;
     const uint8_t *p_startcode;
@@ -66,6 +67,7 @@ static inline void packetizer_Init( packetizer_t *p_pack,
     p_pack->i_state = STATE_NOSYNC;
     p_pack->bytestream = block_BytestreamInit();
     p_pack->i_offset = 0;
+    p_pack->b_flushing = false;
 
     p_pack->i_au_prepend = i_au_prepend;
     p_pack->p_au_prepend = p_au_prepend;
@@ -134,7 +136,19 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
             /* Find the next startcode */
             if( block_FindStartcodeFromOffset( &p_pack->bytestream, &p_pack->i_offset,
                                                p_pack->p_startcode, p_pack->i_startcode ) )
-                return NULL; /* Need more data */
+            {
+                if( !p_pack->b_flushing || !p_pack->bytestream.p_chain )
+                    return NULL; /* Need more data */
+
+                /* When flusing and we don't find a startcode, suppose that
+                 * the data extend up to the end */
+                block_ChainProperties( p_pack->bytestream.p_chain,
+                                       NULL, &p_pack->i_offset, NULL );
+                p_pack->i_offset -= p_pack->bytestream .i_offset;
+
+                if( p_pack->i_offset <= (size_t)p_pack->i_startcode )
+                    return NULL;
+            }
 
             block_BytestreamFlush( &p_pack->bytestream );
 
@@ -191,9 +205,16 @@ static inline void packetizer_Header( packetizer_t *p_pack,
 
     memcpy( p_init->p_buffer, p_header, i_header );
 
+    p_pack->b_flushing = true;
+
     block_t *p_pic;
     while( ( p_pic = packetizer_Packetize( p_pack, &p_init ) ) )
         block_Release( p_pic ); /* Should not happen (only sequence header) */
+
+    p_pack->i_state = STATE_NOSYNC;
+    block_BytestreamEmpty( &p_pack->bytestream );
+    p_pack->i_offset = 0;
+    p_pack->b_flushing = false;
 }
 
 #endif
