@@ -52,6 +52,7 @@
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
 #include "../codec/cc.h"
+#include "packetizer_helper.h"
 
 #define SYNC_INTRAFRAME_TEXT N_("Sync on Intra Frame")
 #define SYNC_INTRAFRAME_LONGTEXT N_("Normally the packetizer would " \
@@ -79,19 +80,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static block_t *Packetize( decoder_t *, block_t ** );
-static block_t *ParseMPEGBlock( decoder_t *, block_t * );
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
-
 struct decoder_sys_t
 {
     /*
      * Input properties
      */
-    block_bytestream_t bytestream;
-    int i_state;
-    size_t i_offset;
-    uint8_t p_startcode[3];
+    packetizer_t packetizer;
 
     /* Sequence header and extension */
     block_t *p_seq;
@@ -140,10 +134,16 @@ struct decoder_sys_t
     cc_data_t cc;
 };
 
-enum {
-    STATE_NOSYNC,
-    STATE_NEXT_SYNC
-};
+static block_t *Packetize( decoder_t *, block_t ** );
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
+
+static void PacketizeReset( void *p_private, bool b_broken );
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
+static int PacketizeValidate( void *p_private, block_t * );
+
+static block_t *ParseMPEGBlock( decoder_t *, block_t * );
+
+static const uint8_t p_mp2v_startcode[3] = { 0x00, 0x00, 0x01 };
 
 /*****************************************************************************
  * Open:
@@ -170,12 +170,10 @@ static int Open( vlc_object_t *p_this )
     memset( p_dec->p_sys, 0, sizeof( decoder_sys_t ) );
 
     /* Misc init */
-    p_sys->i_state = STATE_NOSYNC;
-    p_sys->bytestream = block_BytestreamInit();
-    p_sys->p_startcode[0] = 0;
-    p_sys->p_startcode[1] = 0;
-    p_sys->p_startcode[2] = 1;
-    p_sys->i_offset = 0;
+    packetizer_Init( &p_sys->packetizer,
+                     p_mp2v_startcode, sizeof(p_mp2v_startcode),
+                     NULL, 0,
+                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 
     p_sys->p_seq = NULL;
     p_sys->p_ext = NULL;
@@ -225,8 +223,6 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    block_BytestreamRelease( &p_sys->bytestream );
-
     if( p_sys->p_seq )
     {
         block_Release( p_sys->p_seq );
@@ -239,6 +235,7 @@ static void Close( vlc_object_t *p_this )
     {
         block_ChainRelease( p_sys->p_frame );
     }
+    packetizer_Clean( &p_sys->packetizer );
 
     var_Destroy( p_dec, "packetizer-mpegvideo-sync-iframe" );
 
@@ -251,147 +248,8 @@ static void Close( vlc_object_t *p_this )
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_pic;
 
-    if( pp_block == NULL || *pp_block == NULL )
-    {
-        return NULL;
-    }
-
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
-        {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
-
-            p_sys->b_discontinuity = true;
-            if( p_sys->p_frame )
-                block_ChainRelease( p_sys->p_frame );
-            p_sys->p_frame = NULL;
-            p_sys->pp_last = &p_sys->p_frame;
-            p_sys->b_frame_slice = false;
-        }
-        p_sys->i_dts = 0;
-        p_sys->i_pts = 0;
-        p_sys->i_interpolated_dts = 0;
-        p_sys->i_last_ref_pts = 0;
-
-        block_Release( *pp_block );
-        return NULL;
-    }
-
-
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
-
-    while( 1 )
-    {
-        switch( p_sys->i_state )
-        {
-
-        case STATE_NOSYNC:
-            if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                    &p_sys->i_offset, p_sys->p_startcode, 3 ) == VLC_SUCCESS )
-            {
-                p_sys->i_state = STATE_NEXT_SYNC;
-            }
-
-            if( p_sys->i_offset )
-            {
-                block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
-                p_sys->i_offset = 0;
-                block_BytestreamFlush( &p_sys->bytestream );
-            }
-
-            if( p_sys->i_state != STATE_NEXT_SYNC )
-            {
-                /* Need more data */
-                return NULL;
-            }
-
-            p_sys->i_offset = 1; /* To find next startcode */
-
-        case STATE_NEXT_SYNC:
-            /* TODO: If p_block == NULL, flush the buffer without checking the
-             * next sync word */
-
-            /* Find the next startcode */
-            if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                    &p_sys->i_offset, p_sys->p_startcode, 3 ) != VLC_SUCCESS )
-            {
-                /* Need more data */
-                return NULL;
-            }
-
-            /* Get the new fragment and set the pts/dts */
-            p_pic = block_New( p_dec, p_sys->i_offset );
-            block_BytestreamFlush( &p_sys->bytestream );
-            p_pic->i_pts = p_sys->bytestream.p_block->i_pts;
-            p_pic->i_dts = p_sys->bytestream.p_block->i_dts;
-
-            block_GetBytes( &p_sys->bytestream, p_pic->p_buffer,
-                            p_pic->i_buffer );
-
-            /* don't reuse the same timestamps several times */
-            if( p_pic->i_buffer >= 4 && p_pic->p_buffer[3] == 0x00 )
-            {
-                /* We have a picture start code */
-                p_sys->bytestream.p_block->i_pts = 0;
-                p_sys->bytestream.p_block->i_dts = 0;
-            }
-
-            p_sys->i_offset = 0;
-
-            /* Get picture if any */
-            if( !( p_pic = ParseMPEGBlock( p_dec, p_pic ) ) )
-            {
-                p_sys->i_state = STATE_NOSYNC;
-                break;
-            }
-
-            /* If a discontinuity has been encountered, then wait till
-             * the next Intra frame before continuing with packetizing */
-            if( p_sys->b_discontinuity &&
-                p_sys->b_sync_on_intra_frame )
-            {
-                if( p_pic->i_flags & BLOCK_FLAG_TYPE_I )
-                {
-                    msg_Dbg( p_dec, "synced on intra frame" );
-                    p_sys->b_discontinuity = false;
-                    p_pic->i_flags |= BLOCK_FLAG_DISCONTINUITY;
-                }
-                else
-                {
-                    msg_Dbg( p_dec, "waiting on intra frame" );
-                    p_sys->i_state = STATE_NOSYNC;
-                    block_Release( p_pic );
-                    break;
-                }
-            }
-
-            /* We've just started the stream, wait for the first PTS.
-             * We discard here so we can still get the sequence header. */
-            if( p_sys->i_dts <= 0 && p_sys->i_pts <= 0 &&
-                p_sys->i_interpolated_dts <= 0 )
-            {
-                msg_Dbg( p_dec, "need a starting pts/dts" );
-                p_sys->i_state = STATE_NOSYNC;
-                block_Release( p_pic );
-                break;
-            }
-
-            /* When starting the stream we can have the first frame with
-             * a null DTS (i_interpolated_pts is initialized to 0) */
-            if( !p_pic->i_dts ) p_pic->i_dts = p_pic->i_pts;
-
-            /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop( &p_sys->bytestream );
-
-            p_sys->i_state = STATE_NOSYNC;
-
-            return p_pic;
-        }
-    }
+    return packetizer_Packetize( &p_sys->packetizer, pp_block );
 }
 
 /*****************************************************************************
@@ -421,6 +279,76 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
     return p_cc;
 }
 
+/*****************************************************************************
+ * Helpers:
+ *****************************************************************************/
+static void PacketizeReset( void *p_private, bool b_broken )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( b_broken )
+    {
+        p_sys->b_discontinuity = true;
+        if( p_sys->p_frame )
+            block_ChainRelease( p_sys->p_frame );
+        p_sys->p_frame = NULL;
+        p_sys->pp_last = &p_sys->p_frame;
+        p_sys->b_frame_slice = false;
+    }
+    p_sys->i_dts = 0;
+    p_sys->i_pts = 0;
+    p_sys->i_interpolated_dts = 0;
+    p_sys->i_last_ref_pts = 0;
+}
+
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
+{
+    decoder_t *p_dec = p_private;
+
+    /* Check if we have a picture start code */
+    *pb_ts_used = p_block->i_buffer >= 4 && p_block->p_buffer[3] == 0x00;
+
+    return ParseMPEGBlock( p_dec, p_block );
+}
+
+
+static int PacketizeValidate( void *p_private, block_t *p_au )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* If a discontinuity has been encountered, then wait till
+     * the next Intra frame before continuing with packetizing */
+    if( p_sys->b_discontinuity &&
+        p_sys->b_sync_on_intra_frame )
+    {
+        if( (p_au->i_flags & BLOCK_FLAG_TYPE_I) == 0 )
+        {
+            msg_Dbg( p_dec, "waiting on intra frame" );
+            return VLC_EGENERIC;
+        }
+        msg_Dbg( p_dec, "synced on intra frame" );
+        p_sys->b_discontinuity = false;
+        p_au->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+    }
+
+    /* We've just started the stream, wait for the first PTS.
+     * We discard here so we can still get the sequence header. */
+    if( p_sys->i_dts <= 0 && p_sys->i_pts <= 0 &&
+        p_sys->i_interpolated_dts <= 0 )
+    {
+        msg_Dbg( p_dec, "need a starting pts/dts" );
+        return VLC_EGENERIC;
+    }
+
+    /* When starting the stream we can have the first frame with
+     * a null DTS (i_interpolated_pts is initialized to 0) */
+    if( !p_au->i_dts )
+        p_au->i_dts = p_au->i_pts;
+
+    return VLC_SUCCESS;
+}
 /*****************************************************************************
  * ParseMPEGBlock: Re-assemble fragments into a block containing a picture
  *****************************************************************************/

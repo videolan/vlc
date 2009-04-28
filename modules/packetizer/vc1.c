@@ -37,6 +37,7 @@
 
 #include "vlc_bits.h"
 #include "vlc_block_helper.h"
+#include "packetizer_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -60,10 +61,7 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    block_bytestream_t bytestream;
-    int i_state;
-    size_t i_offset;
-    uint8_t p_startcode[3];
+    packetizer_t packetizer;
 
     /* Current sequence header */
     bool b_sequence_header;
@@ -93,12 +91,6 @@ struct decoder_sys_t
     mtime_t i_interpolated_dts;
 };
 
-enum
-{
-    STATE_NOSYNC,
-    STATE_NEXT_SYNC
-};
-
 typedef enum
 {
     IDU_TYPE_SEQUENCE_HEADER = 0x0f,
@@ -117,6 +109,13 @@ typedef enum
 
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block );
 
+static void PacketizeReset( void *p_private, bool b_broken );
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
+static int PacketizeValidate( void *p_private, block_t * );
+
+static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag );
+
+static const uint8_t p_vc1_startcode[3] = { 0x00, 0x00, 0x01 };
 /*****************************************************************************
  * Open: probe the packetizer and return score
  *****************************************************************************
@@ -137,12 +136,10 @@ static int Open( vlc_object_t *p_this )
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
 
-    p_sys->i_state = STATE_NOSYNC;
-    p_sys->bytestream = block_BytestreamInit();
-    p_sys->p_startcode[0] = 0x00;
-    p_sys->p_startcode[1] = 0x00;
-    p_sys->p_startcode[2] = 0x01;
-    p_sys->i_offset = 0;
+    packetizer_Init( &p_sys->packetizer,
+                     p_vc1_startcode, sizeof(p_vc1_startcode),
+                     NULL, 0,
+                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
 
     p_sys->b_sequence_header = false;
     p_sys->sh.p_sh = NULL;
@@ -155,7 +152,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_interpolated_dts = -1;
 
-    /* */
     if( p_dec->fmt_out.i_extra > 0 )
     {
         uint8_t *p_extra = p_dec->fmt_out.p_extra;
@@ -192,7 +188,7 @@ static void Close( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    block_BytestreamRelease( &p_sys->bytestream );
+    packetizer_Clean( &p_sys->packetizer );
     if( p_sys->p_frame )
         block_Release( p_sys->p_frame );
     free( p_sys );
@@ -201,111 +197,49 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Packetize: packetize an access unit
  *****************************************************************************/
-static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag );
-
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_pic;
 
-    if( pp_block == NULL || *pp_block == NULL )
-        return NULL;
-
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
-        {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
-
-            if( p_sys->p_frame )
-                block_ChainRelease( p_sys->p_frame );
-            p_sys->p_frame = NULL;
-            p_sys->pp_last = &p_sys->p_frame;
-            p_sys->b_frame = false;
-        }
-        p_sys->i_interpolated_dts = 0;
-        block_Release( *pp_block );
-        return NULL;
-    }
-
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
-
-    for( ;; )
-    {
-        bool b_used_ts;
-
-        switch( p_sys->i_state )
-        {
-
-        case STATE_NOSYNC:
-            if( block_FindStartcodeFromOffset( &p_sys->bytestream, &p_sys->i_offset, p_sys->p_startcode, 3 ) == VLC_SUCCESS )
-                p_sys->i_state = STATE_NEXT_SYNC;
-
-            if( p_sys->i_offset )
-            {
-                block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
-                p_sys->i_offset = 0;
-                block_BytestreamFlush( &p_sys->bytestream );
-            }
-
-            if( p_sys->i_state != STATE_NEXT_SYNC )
-                return NULL; /* Need more data */
-
-            p_sys->i_offset = 4; /* To find next startcode */
-
-        case STATE_NEXT_SYNC:
-            /* TODO: If p_block == NULL, flush the buffer without checking the
-             * next sync word */
-
-            /* Find the next startcode */
-            if( block_FindStartcodeFromOffset( &p_sys->bytestream, &p_sys->i_offset, p_sys->p_startcode, 3 ) != VLC_SUCCESS )
-                return NULL; /* Need more data */
-
-            /* Get the new fragment and set the pts/dts */
-            p_pic = block_New( p_dec, p_sys->i_offset );
-            block_BytestreamFlush( &p_sys->bytestream );
-            p_pic->i_pts = p_sys->bytestream.p_block->i_pts;
-            p_pic->i_dts = p_sys->bytestream.p_block->i_dts;
-
-            block_GetBytes( &p_sys->bytestream, p_pic->p_buffer, p_pic->i_buffer );
-
-            p_sys->i_offset = 0;
-
-            /* Parse and return complete frame */
-            p_pic = ParseIDU( p_dec, &b_used_ts, p_pic );
-
-            /* Don't reuse the same timestamps several times */
-            if( b_used_ts )
-            {
-                p_sys->bytestream.p_block->i_pts = -1;
-                p_sys->bytestream.p_block->i_dts = -1;
-            }
-
-            /* */
-            if( !p_pic )
-            {
-                p_sys->i_state = STATE_NOSYNC;
-                break;
-            }
-            /* */
-            if( p_sys->i_interpolated_dts < 0 )
-            {
-                msg_Dbg( p_dec, "need a starting pts/dts" );
-                p_sys->i_state = STATE_NOSYNC;
-                block_Release( p_pic );
-                break;
-            }
-
-            /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop( &p_sys->bytestream );
-
-            p_sys->i_state = STATE_NOSYNC;
-
-            return p_pic;
-        }
-    }
+    return packetizer_Packetize( &p_sys->packetizer, pp_block );
 }
+
+static void PacketizeReset( void *p_private, bool b_broken )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( b_broken )
+    {
+        if( p_sys->p_frame )
+            block_ChainRelease( p_sys->p_frame );
+        p_sys->p_frame = NULL;
+        p_sys->pp_last = &p_sys->p_frame;
+        p_sys->b_frame = false;
+    }
+    p_sys->i_interpolated_dts = 0;
+}
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
+{
+    decoder_t *p_dec = p_private;
+
+    return ParseIDU( p_dec, pb_ts_used, p_block );
+}
+
+static int PacketizeValidate( void *p_private, block_t *p_au )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->i_interpolated_dts < 0 )
+    {
+        msg_Dbg( p_dec, "need a starting pts/dts" );
+        return VLC_EGENERIC;
+    }
+    VLC_UNUSED(p_au);
+    return VLC_SUCCESS;
+}
+
 
 /* DecodeRIDU: decode the startcode emulation prevention (same than h264) */
 static void DecodeRIDU( uint8_t *p_ret, int *pi_ret, uint8_t *src, int i_src )

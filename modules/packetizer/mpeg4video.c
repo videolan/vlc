@@ -39,6 +39,7 @@
 
 #include "vlc_bits.h"
 #include "vlc_block_helper.h"
+#include "packetizer_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -57,17 +58,12 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static block_t *Packetize( decoder_t *, block_t ** );
-
 struct decoder_sys_t
 {
     /*
      * Input properties
      */
-    block_bytestream_t bytestream;
-    int i_state;
-    size_t i_offset;
-    uint8_t p_startcode[3];
+    packetizer_t packetizer;
 
     /*
      * Common properties
@@ -94,10 +90,11 @@ struct decoder_sys_t
     block_t    **pp_last;
 };
 
-enum {
-    STATE_NOSYNC,
-    STATE_NEXT_SYNC
-};
+static block_t *Packetize( decoder_t *, block_t ** );
+
+static void PacketizeReset( void *p_private, bool b_broken );
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
+static int PacketizeValidate( void *p_private, block_t * );
 
 static block_t *ParseMPEGBlock( decoder_t *, block_t * );
 static int ParseVOL( decoder_t *, es_format_t *, uint8_t *, int );
@@ -123,6 +120,8 @@ static int vlc_log2( unsigned int );
 #define STILL_TEXTURE_OBJECT_START_CODE         0x1be
 #define TEXTURE_SPATIAL_LAYER_START_CODE        0x1bf
 #define TEXTURE_SNR_LAYER_START_CODE            0x1c0
+
+static const uint8_t p_mp4v_startcode[3] = { 0x00, 0x00, 0x01 };
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -163,12 +162,11 @@ static int Open( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     /* Misc init */
-    p_sys->i_state = STATE_NOSYNC;
-    p_sys->bytestream = block_BytestreamInit();
-    p_sys->p_startcode[0] = 0;
-    p_sys->p_startcode[1] = 0;
-    p_sys->p_startcode[2] = 1;
-    p_sys->i_offset = 0;
+    packetizer_Init( &p_sys->packetizer,
+                     p_mp4v_startcode, sizeof(p_mp4v_startcode),
+                     NULL, 0,
+                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
+
     p_sys->p_frame = NULL;
     p_sys->pp_last = &p_sys->p_frame;
 
@@ -207,10 +205,12 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    block_BytestreamRelease( &p_dec->p_sys->bytestream );
-    if( p_dec->p_sys->p_frame ) block_ChainRelease( p_dec->p_sys->p_frame );
-    free( p_dec->p_sys );
+    packetizer_Clean( &p_sys->packetizer );
+    if( p_sys->p_frame )
+        block_ChainRelease( p_sys->p_frame );
+    free( p_sys );
 }
 
 /****************************************************************************
@@ -219,125 +219,68 @@ static void Close( vlc_object_t *p_this )
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_pic;
-    mtime_t       i_pts, i_dts;
 
-    if( pp_block == NULL || *pp_block == NULL ) return NULL;
+    return packetizer_Packetize( &p_sys->packetizer, pp_block );
+}
 
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+/*****************************************************************************
+ * Helpers:
+ *****************************************************************************/
+static void PacketizeReset( void *p_private, bool b_broken )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( b_broken )
     {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
-        {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
-
-            if( p_sys->p_frame )
-                block_ChainRelease( p_sys->p_frame );
-            p_sys->p_frame = NULL;
-            p_sys->pp_last = &p_sys->p_frame;
-        }
-        p_sys->i_interpolated_pts =
-        p_sys->i_interpolated_dts =
-        p_sys->i_last_ref_pts =
-        p_sys->i_last_time_ref =
-        p_sys->i_time_ref =
-        p_sys->i_last_time =
-        p_sys->i_last_timeincr = 0;
-
-        block_Release( *pp_block );
-        return NULL;
+        if( p_sys->p_frame )
+            block_ChainRelease( p_sys->p_frame );
+        p_sys->p_frame = NULL;
+        p_sys->pp_last = &p_sys->p_frame;
     }
 
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
+    p_sys->i_interpolated_pts =
+    p_sys->i_interpolated_dts =
+    p_sys->i_last_ref_pts =
+    p_sys->i_last_time_ref =
+    p_sys->i_time_ref =
+    p_sys->i_last_time =
+    p_sys->i_last_timeincr = 0;
+}
 
-    while( 1 )
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
+{
+    decoder_t *p_dec = p_private;
+    const mtime_t i_dts = p_block->i_dts;
+    const mtime_t i_pts = p_block->i_pts;
+
+    block_t *p_au = ParseMPEGBlock( p_dec, p_block );
+
+    *pb_ts_used = p_au &&  p_au->i_dts == i_dts && p_au->i_pts == i_pts;
+
+    return p_au;
+}
+
+
+static int PacketizeValidate( void *p_private, block_t *p_au )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* We've just started the stream, wait for the first PTS.
+     * We discard here so we can still get the sequence header. */
+    if( p_sys->i_interpolated_pts <= 0 &&
+        p_sys->i_interpolated_dts <= 0 )
     {
-        switch( p_sys->i_state )
-        {
-
-        case STATE_NOSYNC:
-            if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                    &p_sys->i_offset, p_sys->p_startcode, 3 ) == VLC_SUCCESS )
-            {
-                p_sys->i_state = STATE_NEXT_SYNC;
-            }
-
-            if( p_sys->i_offset )
-            {
-                block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
-                p_sys->i_offset = 0;
-                block_BytestreamFlush( &p_sys->bytestream );
-            }
-
-            if( p_sys->i_state != STATE_NEXT_SYNC )
-            {
-                /* Need more data */
-                return NULL;
-            }
-
-            p_sys->i_offset = 1; /* To find next startcode */
-
-        case STATE_NEXT_SYNC:
-            /* TODO: If p_block == NULL, flush the buffer without checking the
-             * next sync word */
-
-            /* Find the next startcode */
-            if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                    &p_sys->i_offset, p_sys->p_startcode, 3 ) != VLC_SUCCESS )
-            {
-                /* Need more data */
-                return NULL;
-            }
-
-            /* Get the new fragment and set the pts/dts */
-            p_pic = block_New( p_dec, p_sys->i_offset );
-            block_BytestreamFlush( &p_sys->bytestream );
-            p_pic->i_pts = i_pts = p_sys->bytestream.p_block->i_pts;
-            p_pic->i_dts = i_dts = p_sys->bytestream.p_block->i_dts;
-
-            block_GetBytes( &p_sys->bytestream, p_pic->p_buffer,
-                            p_pic->i_buffer );
-
-            p_sys->i_offset = 0;
-
-            /* Get picture if any */
-            if( !( p_pic = ParseMPEGBlock( p_dec, p_pic ) ) )
-            {
-                p_sys->i_state = STATE_NOSYNC;
-                break;
-            }
-
-            /* don't reuse the same timestamps several times */
-            if( i_pts == p_sys->bytestream.p_block->i_pts &&
-                i_dts == p_sys->bytestream.p_block->i_dts )
-            {
-                p_sys->bytestream.p_block->i_pts = 0;
-                p_sys->bytestream.p_block->i_dts = 0;
-            }
-
-            /* We've just started the stream, wait for the first PTS.
-             * We discard here so we can still get the sequence header. */
-            if( p_sys->i_interpolated_pts <= 0 &&
-                p_sys->i_interpolated_dts <= 0 )
-            {
-                msg_Dbg( p_dec, "need a starting pts/dts" );
-                p_sys->i_state = STATE_NOSYNC;
-                block_Release( p_pic );
-                break;
-            }
-
-            /* When starting the stream we can have the first frame with
-             * a null DTS (i_interpolated_pts is initialized to 0) */
-            if( !p_pic->i_dts ) p_pic->i_dts = p_pic->i_pts;
-
-            /* So p_block doesn't get re-added several times */
-            *pp_block = block_BytestreamPop( &p_sys->bytestream );
-
-            p_sys->i_state = STATE_NOSYNC;
-
-            return p_pic;
-        }
+        msg_Dbg( p_dec, "need a starting pts/dts" );
+        return VLC_EGENERIC;
     }
+
+    /* When starting the stream we can have the first frame with
+     * a null DTS (i_interpolated_pts is initialized to 0) */
+    if( !p_au->i_dts )
+        p_au->i_dts = p_au->i_pts;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

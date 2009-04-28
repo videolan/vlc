@@ -41,6 +41,7 @@
 #include "vlc_block_helper.h"
 #include "vlc_bits.h"
 #include "../codec/cc.h"
+#include "packetizer_helper.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -60,10 +61,6 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-static block_t *Packetize( decoder_t *, block_t ** );
-static block_t *PacketizeAVC1( decoder_t *, block_t ** );
-static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
-
 typedef struct
 {
     int i_nal_type;
@@ -89,12 +86,10 @@ typedef struct
 #define PPS_MAX (256)
 struct decoder_sys_t
 {
-    block_bytestream_t bytestream;
+    /* */
+    packetizer_t packetizer;
 
-    int     i_state;
-    size_t  i_offset;
-    uint8_t startcode[4];
-
+    /* */
     bool    b_slice;
     block_t *p_frame;
 
@@ -133,12 +128,6 @@ struct decoder_sys_t
     cc_data_t cc_next;
 };
 
-enum
-{
-    STATE_NOSYNC,
-    STATE_NEXT_SYNC,
-};
-
 enum nal_unit_type_e
 {
     NAL_UNKNOWN = 0,
@@ -162,8 +151,15 @@ enum nal_priority_e
     NAL_PRIORITY_HIGHEST    = 3,
 };
 
-static block_t *ParseNALBlock( decoder_t *, bool *pb_used_ts, block_t * );
+static block_t *Packetize( decoder_t *, block_t ** );
+static block_t *PacketizeAVC1( decoder_t *, block_t ** );
+static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] );
 
+static void PacketizeReset( void *p_private, bool b_broken );
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t * );
+static int PacketizeValidate( void *p_private, block_t * );
+
+static block_t *ParseNALBlock( decoder_t *, bool *pb_used_ts, block_t * );
 static block_t *CreateAnnexbNAL( decoder_t *, const uint8_t *p, int );
 
 static block_t *OutputPicture( decoder_t *p_dec );
@@ -173,6 +169,8 @@ static void ParseSlice( decoder_t *p_dec, bool *pb_new_picture, slice_t *p_slice
                         int i_nal_ref_idc, int i_nal_type, const block_t *p_frag );
 static void ParseSei( decoder_t *, block_t * );
 
+
+static const uint8_t p_h264_startcode[3] = { 0x00, 0x00, 0x01 };
 
 /*****************************************************************************
  * Open: probe the packetizer and return score
@@ -203,13 +201,12 @@ static int Open( vlc_object_t *p_this )
     {
         return VLC_ENOMEM;
     }
-    p_sys->i_state = STATE_NOSYNC;
-    p_sys->i_offset = 0;
-    p_sys->startcode[0] = 0;
-    p_sys->startcode[1] = 0;
-    p_sys->startcode[2] = 0;
-    p_sys->startcode[3] = 1;
-    p_sys->bytestream = block_BytestreamInit();
+
+    packetizer_Init( &p_sys->packetizer,
+                     p_h264_startcode, sizeof(p_h264_startcode),
+                     p_h264_startcode, 1,
+                     PacketizeReset, PacketizeParse, PacketizeValidate, p_dec );
+
     p_sys->b_slice = false;
     p_sys->p_frame = NULL;
     p_sys->b_header= false;
@@ -397,7 +394,8 @@ static void Close( vlc_object_t *p_this )
         if( p_sys->pp_pps[i] )
             block_Release( p_sys->pp_pps[i] );
     }
-    block_BytestreamRelease( &p_sys->bytestream );
+    packetizer_Clean( &p_sys->packetizer );
+
     if( p_dec->pf_get_cc )
     {
          cc_Exit( &p_sys->cc_next );
@@ -415,117 +413,8 @@ static void Close( vlc_object_t *p_this )
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    block_t       *p_pic;
 
-    if( !pp_block || !*pp_block )
-        return NULL;
-
-    if( (*pp_block)->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
-    {
-        if( (*pp_block)->i_flags&BLOCK_FLAG_CORRUPTED )
-        {
-            p_sys->i_state = STATE_NOSYNC;
-            block_BytestreamEmpty( &p_sys->bytestream );
-
-            if( p_sys->p_frame )
-                block_ChainRelease( p_sys->p_frame );
-            p_sys->p_frame = NULL;
-            p_sys->slice.i_frame_type = 0;
-            p_sys->b_slice = false;
-        }
-        p_sys->i_frame_pts = -1;
-        p_sys->i_frame_dts = -1;
-
-        block_Release( *pp_block );
-        return NULL;
-    }
-
-    block_BytestreamPush( &p_sys->bytestream, *pp_block );
-
-    for( ;; )
-    {
-        bool b_used_ts;
-
-        switch( p_sys->i_state )
-        {
-            case STATE_NOSYNC:
-                /* Skip until 3 byte startcode 0 0 1 */
-                if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                      &p_sys->i_offset, p_sys->startcode+1, 3 ) == VLC_SUCCESS)
-                {
-                    p_sys->i_state = STATE_NEXT_SYNC;
-                }
-
-                if( p_sys->i_offset )
-                {
-                    /* skip the data */
-                    block_SkipBytes( &p_sys->bytestream, p_sys->i_offset );
-                    p_sys->i_offset = 0;
-                    block_BytestreamFlush( &p_sys->bytestream );
-                }
-
-                if( p_sys->i_state != STATE_NEXT_SYNC )
-                {
-                    /* Need more data */
-                    return NULL;
-                }
-
-                p_sys->i_offset = 1; /* To find next startcode */
-
-            case STATE_NEXT_SYNC:
-                /* Find the next 3 byte startcode 0 0 1*/
-                if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                      &p_sys->i_offset, p_sys->startcode+1, 3 ) != VLC_SUCCESS)
-                {
-                    /* Need more data */
-                    return NULL;
-                }
-                block_BytestreamFlush( &p_sys->bytestream );
-
-                /* Get the new fragment and set the pts/dts */
-                block_t *p_block_bytestream = p_sys->bytestream.p_block;
-
-                p_pic = block_New( p_dec, p_sys->i_offset +1 );
-                p_pic->i_pts = p_block_bytestream->i_pts;
-                p_pic->i_dts = p_block_bytestream->i_dts;
-
-                /* Force 4 byte startcode 0 0 0 1 */
-                p_pic->p_buffer[0] = 0;
-
-                block_GetBytes( &p_sys->bytestream, &p_pic->p_buffer[1],
-                                p_pic->i_buffer-1 );
-
-                /* Remove trailing 0 bytes */
-                while( p_pic->i_buffer && (!p_pic->p_buffer[p_pic->i_buffer-1] ) )
-                    p_pic->i_buffer--;
-                p_sys->i_offset = 0;
-
-                /* Parse the NAL */
-                p_pic = ParseNALBlock( p_dec, &b_used_ts, p_pic );
-                if( b_used_ts )
-                {
-                    p_block_bytestream->i_dts = -1;
-                    p_block_bytestream->i_pts = -1;
-                }
-
-                if( !p_pic )
-                {
-                    p_sys->i_state = STATE_NOSYNC;
-                    break;
-                }
-#if 0
-                msg_Dbg( p_dec, "pts=%"PRId64" dts=%"PRId64,
-                         p_pic->i_pts, p_pic->i_dts );
-#endif
-
-                /* So p_block doesn't get re-added several times */
-                *pp_block = block_BytestreamPop( &p_sys->bytestream );
-
-                p_sys->i_state = STATE_NOSYNC;
-
-                return p_pic;
-        }
-    }
+    return packetizer_Packetize( &p_sys->packetizer, pp_block );
 }
 
 /****************************************************************************
@@ -618,6 +507,39 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
 /****************************************************************************
  * Helpers
  ****************************************************************************/
+static void PacketizeReset( void *p_private, bool b_broken )
+{
+    decoder_t *p_dec = p_private;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( b_broken )
+    {
+        if( p_sys->p_frame )
+            block_ChainRelease( p_sys->p_frame );
+        p_sys->p_frame = NULL;
+        p_sys->slice.i_frame_type = 0;
+        p_sys->b_slice = false;
+    }
+    p_sys->i_frame_pts = -1;
+    p_sys->i_frame_dts = -1;
+}
+static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
+{
+    decoder_t *p_dec = p_private;
+
+    /* Remove trailing 0 bytes */
+    while( p_block->i_buffer && p_block->p_buffer[p_block->i_buffer-1] == 0x00 )
+        p_block->i_buffer--;
+
+    return ParseNALBlock( p_dec, pb_ts_used, p_block );
+}
+static int PacketizeValidate( void *p_private, block_t *p_au )
+{
+    VLC_UNUSED(p_private);
+    VLC_UNUSED(p_au);
+    return VLC_SUCCESS;
+}
+
 static block_t *CreateAnnexbNAL( decoder_t *p_dec, const uint8_t *p, int i_size )
 {
     block_t *p_nal;
