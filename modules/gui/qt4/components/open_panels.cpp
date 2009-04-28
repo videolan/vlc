@@ -1103,6 +1103,8 @@ void CaptureOpenPanel::updateMRL()
         fileList << mrl; mrl = "";
 
         mrl += " :dvb-frequency=" + QString::number( bdaFreq->value() );
+        if( bdac->isChecked() || bdat->isChecked() || bdaa->isChecked() )
+            mrl +="000";
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString::number( bdaSrate->value() );
         else if( bdat->isChecked() || bdaa->isChecked() )
@@ -1163,6 +1165,8 @@ void CaptureOpenPanel::updateMRL()
         fileList << "dvb://";
         mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
         mrl += " :dvb-frequency=" + QString::number( dvbFreq->value() );
+        if( dvbc->isChecked() || dvbt->isChecked() )
+            mrl +="000";
         if( dvbs->isChecked() || dvbc->isChecked() )
             mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
         else if( dvbt->isChecked() )
@@ -1215,16 +1219,6 @@ void CaptureOpenPanel::updateButtons()
             bdaBandBox->show();
             bdaBandLabel->show();
         }
-        if( bdas->isChecked() )
-        {
-            bdaFreq->setSuffix(" kHz");
-            bdaFreq->setSingleStep( 1000 );
-        }
-        if( bdac->isChecked() || bdat->isChecked() || bdaa->isChecked( ) )
-        {
-            bdaFreq->setSuffix(" Hz");
-            bdaFreq->setSingleStep( 100000 );
-        }
         break;
 #else
     case DVB_DEVICE:
@@ -1242,8 +1236,6 @@ void CaptureOpenPanel::updateButtons()
             dvbBandBox->show();
             dvbBandLabel->show();
         }
-        if( dvbs->isChecked() ) dvbFreq->setSuffix(" kHz");
-        if( dvbc->isChecked() || dvbt->isChecked() ) dvbFreq->setSuffix(" Hz");
         break;
 #endif
     case SCREEN_DEVICE:
