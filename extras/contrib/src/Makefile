@@ -1289,6 +1289,7 @@ else
 endif
 endif
 endif
+	mkdir -p $(PREFIX)/lib $(PREFIX)/include
 	cp $</groupsock/libgroupsock.a $(PREFIX)/lib
 	cp $</liveMedia/libliveMedia.a $(PREFIX)/lib
 	cp $</UsageEnvironment/libUsageEnvironment.a $(PREFIX)/lib
