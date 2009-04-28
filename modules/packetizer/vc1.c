@@ -529,6 +529,9 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
             block_Release( p_sys->ep.p_ep );
         p_sys->ep.p_ep = block_Duplicate( p_frag );
 
+        if( !p_sys->b_entry_point )
+            msg_Dbg( p_dec, "found entry point" );
+
         p_sys->b_entry_point = true;
         BuildExtraData( p_dec );
     }
