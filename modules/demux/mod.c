@@ -382,20 +382,21 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         /* Comment field from artist - not in every type of MOD */
         psz_name = ModPlug_GetMessage( p_sys->f );
-        if (psz_name && *psz_name )
+        if( psz_name && *psz_name )
             vlc_meta_SetDescription( p_meta, psz_name );
 
         /* Instruments only in newer MODs - so don't show if 0 */
-        if ( asprintf( &psz_instrument_info, ", %i Instruments",
-                       i_num_instruments ) )
+        if( asprintf( &psz_instrument_info, ", %i Instruments",
+                      i_num_instruments ) )
         {
-            if ( asprintf( &psz_module_info, "%i Channels, %i Patterns\n"
-                "%i Samples%s\n",
-                i_num_channels, i_num_patterns, i_num_samples,
-                ( i_num_instruments ? psz_instrument_info : "" ) ))
+            if( asprintf( &psz_module_info,
+                          "%i Channels, %i Patterns\n"
+                          "%i Samples%s\n",
+                          i_num_channels, i_num_patterns, i_num_samples,
+                          ( i_num_instruments ? psz_instrument_info : "" ) ))
             {
                 vlc_meta_AddExtra( p_meta, "Module Information",
-                        psz_module_info );
+                                   psz_module_info );
                 free( psz_module_info );
             }
 
@@ -403,10 +404,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         /* Make list of instruments (XM, IT, etc) */
-        if ( i_num_instruments )
+        if( i_num_instruments )
         {
             i_temp_index = 0;
-            for ( int i = 0; i < i_num_instruments && i_temp_index < sizeof(psz_temp); i++ )
+            for( int i = 0; i < i_num_instruments && i_temp_index < sizeof(psz_temp); i++ )
             {
                 char lBuffer[33];
                 ModPlug_InstrumentName( p_sys->f, i, lBuffer );
@@ -418,12 +419,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         /* Make list of samples */
-        for ( int i = 0; i < i_num_samples && i_temp_index < sizeof(psz_temp); i++ )
+        for( int i = 0; i < i_num_samples && i_temp_index < sizeof(psz_temp); i++ )
         {
-            char lBuffer[33];
-            ModPlug_SampleName( p_sys->f, i, lBuffer );
-            if ( !lBuffer[0] ) continue; // don't add empty fields.
-            i_temp_index += snprintf( &psz_temp[i_temp_index], sizeof(psz_temp) - i_temp_index, "%s\n", lBuffer );
+            char psz_buffer[33];
+            ModPlug_SampleName( p_sys->f, i, psz_buffer );
+            if ( !psz_buffer[0] ) continue; // don't add empty fields.
+            i_temp_index += snprintf( &psz_temp[i_temp_index], sizeof(psz_temp) - i_temp_index, "%s\n", psz_buffer );
         }
 
         vlc_meta_AddExtra( p_meta, "Samples", psz_temp );
