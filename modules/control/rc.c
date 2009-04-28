@@ -1,7 +1,7 @@
 /*****************************************************************************
  * rc.c : remote control stdin/stdout module for vlc
  *****************************************************************************
- * Copyright (C) 2004-2007 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
@@ -25,6 +25,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -955,8 +956,8 @@ static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input )
     {
-        msg_rc( STATUS_CHANGE "( time-offset: %d )",
-                var_GetInteger( p_input, "time-offset" ) );
+        msg_rc( STATUS_CHANGE "( time-offset: %"PRId64"s )",
+                (var_GetTime( p_input, "time-offset" )/1000000) );
         vlc_object_release( p_input );
     }
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
