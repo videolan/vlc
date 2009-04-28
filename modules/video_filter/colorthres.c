@@ -121,7 +121,7 @@ static int Create( vlc_object_t *p_this )
                        p_filter->p_cfg );
     var_Create( p_filter, CFG_PREFIX "color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     var_Create( p_filter, CFG_PREFIX "similaritythres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Create( p_filter, CFG_PREFIX "saturationthes", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+    var_Create( p_filter, CFG_PREFIX "saturationthres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 
     /* Allocate structure */
     p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
