@@ -165,16 +165,8 @@ static int Open( vlc_object_t *p_this )
 
         /* */
         if( p_dec->fmt_out.i_extra > 0 )
-        {
-            block_t *p_init = block_New( p_dec, p_dec->fmt_out.i_extra );
-
-            memcpy( p_init->p_buffer, p_dec->fmt_out.p_extra,
-                    p_dec->fmt_out.i_extra );
-
-            block_t *p_pic;
-            while( ( p_pic = Packetize( p_dec, &p_init ) ) )
-                block_Release( p_pic ); /* Should not happen (only sequence header) */
-        }
+            packetizer_Header( &p_sys->packetizer,
+                               p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
     }
 
     return VLC_SUCCESS;

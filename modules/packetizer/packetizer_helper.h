@@ -182,5 +182,19 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
     }
 }
 
+static inline void packetizer_Header( packetizer_t *p_pack,
+                                      const uint8_t *p_header, int i_header )
+{
+    block_t *p_init = block_Alloc( i_header );
+    if( !p_init )
+        return;
+
+    memcpy( p_init->p_buffer, p_header, i_header );
+
+    block_t *p_pic;
+    while( ( p_pic = packetizer_Packetize( p_pack, &p_init ) ) )
+        block_Release( p_pic ); /* Should not happen (only sequence header) */
+}
+
 #endif
 
