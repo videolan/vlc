@@ -155,17 +155,30 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_interpolated_dts = -1;
 
-
-    if( p_dec->fmt_in.i_extra > 0 )
+    /* */
+    if( p_dec->fmt_out.i_extra > 0 )
     {
-        block_t *p_init = block_New( p_dec, p_dec->fmt_in.i_extra );
-        block_t *p_pic;
+        uint8_t *p_extra = p_dec->fmt_out.p_extra;
 
-        memcpy( p_init->p_buffer, p_dec->fmt_in.p_extra,
-                p_dec->fmt_in.i_extra );
+        /* With (some) ASF the first byte has to be stripped */
+        if( p_extra[0] != 0x00 )
+        {
+            memcpy( &p_extra[0], &p_extra[1], p_dec->fmt_out.i_extra - 1 );
+            p_dec->fmt_out.i_extra--;
+        }
 
-        while( ( p_pic = Packetize( p_dec, &p_init ) ) )
-            block_Release( p_pic ); /* Should not happen (only sequence header) */
+        /* */
+        if( p_dec->fmt_out.i_extra > 0 )
+        {
+            block_t *p_init = block_New( p_dec, p_dec->fmt_out.i_extra );
+
+            memcpy( p_init->p_buffer, p_dec->fmt_out.p_extra,
+                    p_dec->fmt_out.i_extra );
+
+            block_t *p_pic;
+            while( ( p_pic = Packetize( p_dec, &p_init ) ) )
+                block_Release( p_pic ); /* Should not happen (only sequence header) */
+        }
     }
 
     return VLC_SUCCESS;
