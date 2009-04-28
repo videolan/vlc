@@ -306,13 +306,14 @@ char *input_item_GetTitleFbName( input_item_t *p_item )
 
     if( !p_item->p_meta )
     {
+        psz_ret = p_item->psz_name ? strdup( p_item->psz_name ) : NULL;
         vlc_mutex_unlock( &p_item->lock );
-        return NULL;
+        return psz_ret;
     }
 
-    const char *psz_meta = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
-    if( !EMPTY_STR( psz_meta ) )
-        psz_ret = strdup( psz_meta );
+    const char *psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+    if( !EMPTY_STR( psz_title ) )
+        psz_ret = strdup( psz_title );
     else
         psz_ret = p_item->psz_name ? strdup( p_item->psz_name ) : NULL;
 
