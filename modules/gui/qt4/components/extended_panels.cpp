@@ -212,6 +212,8 @@ ExtVideo::ExtVideo( intf_thread_t *_p_intf, QTabWidget *_parent ) :
     CONNECT( ui.cropBotPx, valueChanged( int ), this, cropChange() );
     CONNECT( ui.cropLeftPx, valueChanged( int ), this, cropChange() );
     CONNECT( ui.cropRightPx, valueChanged( int ), this, cropChange() );
+    CONNECT( ui.leftRightCropSync, toggled ( bool ), this, cropChange() );
+    CONNECT( ui.topBotCropSync, toggled ( bool ), this, cropChange() );
     CONNECT( ui.topBotCropSync, toggled( bool ),
              ui.cropBotPx, setDisabled( bool ) );
     CONNECT( ui.leftRightCropSync, toggled( bool ),
@@ -224,6 +226,11 @@ ExtVideo::~ExtVideo()
 
 void ExtVideo::cropChange()
 {
+    if( ui.topBotCropSync->isChecked() )
+        ui.cropBotPx->setValue( ui.cropTopPx->value() );
+    if( ui.leftRightCropSync->isChecked() )
+        ui.cropRightPx->setValue( ui.cropLeftPx->value() );
+
     p_vout = THEMIM->getVout();
     if( p_vout )
     {
