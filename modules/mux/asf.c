@@ -902,7 +902,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     /* size of the metadata object */
     for( i = 0; i < p_sys->i_track; i++ )
     {
-        if( p_sys->track[i].i_cat == VIDEO_ES )
+        const asf_track_t *p_track = &p_sys->track[i];
+        if( p_track->i_cat == VIDEO_ES && p_track->fmt.video.i_aspect != 0 )
         {
             i_cm_size = 26 + 2 * (16 + 2 * sizeof("AspectRatio?"));
             break;
