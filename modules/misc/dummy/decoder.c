@@ -144,7 +144,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( !pp_block || !*pp_block ) return NULL;
     p_block = *pp_block;
 
-    if( p_sys->i_fd >= 0 && p_block->i_buffer )
+    if( p_sys->i_fd >= 0 &&
+        p_block->i_buffer > 0 &&
+        (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) == 0 )
     {
 #ifndef UNDER_CE
         write( p_sys->i_fd, p_block->p_buffer, p_block->i_buffer );
