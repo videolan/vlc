@@ -81,11 +81,10 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     es_format_t fmt;
 
-    if( stream_Peek( p_demux->s, &p_peek, 5 ) < 5 ) return VLC_EGENERIC;
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 ) return VLC_EGENERIC;
 
     if( p_peek[0] != 0x00 || p_peek[1] != 0x00 ||
-        p_peek[2] != 0x00 || p_peek[3] != 0x01 ||
-        p_peek[4] != 0x0f ) /* Sequence header */
+        p_peek[2] != 0x01 || p_peek[3] != 0x0f ) /* Sequence header */
     {
         if( !p_demux->b_force )
         {
