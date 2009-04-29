@@ -307,6 +307,7 @@ decoder_t *demux_PacketizerNew( demux_t *p_demux, es_format_t *p_fmt, const char
         es_format_Clean( p_fmt );
         return NULL;
     }
+    p_fmt->b_packetized = false;
 
     p_packetizer->pf_decode_audio = NULL;
     p_packetizer->pf_decode_video = NULL;
