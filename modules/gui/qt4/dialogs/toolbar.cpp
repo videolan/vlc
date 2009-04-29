@@ -64,8 +64,8 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     boxLayout->addWidget( styleLabel, 1, 0 );
     boxLayout->addWidget( flatBox, 1, 1 );
     boxLayout->addWidget( bigBox, 1, 2 );
-    boxLayout->addWidget( shinyBox, 1, 3 );
-    mainLayout->addWidget( widgetBox, 0, 0, 1, -1 );
+    boxLayout->addWidget( shinyBox, 2, 1 );
+    mainLayout->addWidget( widgetBox, 0, 0, 5, 1 );
 
 
     /* Main ToolBar */
@@ -107,7 +107,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     mainTboxLayout->addWidget( advLabel, 3, 0, 1, 2 );
     mainTboxLayout->addWidget( controllerA, 3, 2, 1, 1 );
 
-    mainLayout->addWidget( mainToolbarBox, 1, 0, 1, -1 );
+    mainLayout->addWidget( mainToolbarBox, 0, 1, 1, -1 );
 
     /* TimeToolBar */
     QGroupBox *timeToolbarBox = new QGroupBox( qtr( "Time Toolbar" ) , this );
@@ -119,7 +119,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
             this );
     timeTboxLayout->addWidget( controller, 0, 0, 1, -1 );
 
-    mainLayout->addWidget( timeToolbarBox, 2, 0, 1, -1 );
+    mainLayout->addWidget( timeToolbarBox, 1, 1, 1, -1 );
 
     /* FSCToolBar */
     QGroupBox *FSCToolbarBox = new QGroupBox( qtr( "Fullscreen Controller" ),
@@ -132,7 +132,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
             lineFSC, this );
     FSCTboxLayout->addWidget( controllerFSC, 0, 0, 1, -1 );
 
-    mainLayout->addWidget( FSCToolbarBox, 3, 0, 1, -1 );
+    mainLayout->addWidget( FSCToolbarBox, 2, 1, 1, -1 );
 
     /* Profile */
     QGroupBox *profileBox = new QGroupBox( qtr( "Profile" ), this );
@@ -152,7 +152,7 @@ ToolbarEditDialog::ToolbarEditDialog( QWidget *_w, intf_thread_t *_p_intf)
     profileBoxLayout->addWidget( newButton, 0, 2 );
     profileBoxLayout->addWidget( deleteButton, 0, 3 );
 
-    mainLayout->addWidget( profileBox, 4, 0, 1, -1 );
+    mainLayout->addWidget( profileBox, 3, 1, 1, -1 );
 
     /* Fill combos */
     int i_size = getSettings()->beginReadArray( "ToolbarProfiles" );
@@ -278,7 +278,6 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
     setViewMode( QListView::IconMode );
     setSpacing( 20 );
     setDragEnabled( true );
-    setMinimumHeight( 250 );
 
     /* All the buttons do not need a special rendering */
     for( int i = 0; i < BUTTON_MAX; i++ )
