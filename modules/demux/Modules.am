@@ -5,6 +5,7 @@ SOURCES_demuxdump = demuxdump.c
 SOURCES_rawdv = rawdv.c
 SOURCES_rawvid = rawvid.c
 SOURCES_au = au.c
+SOURCES_rawaud = rawaud.c
 SOURCES_wav = wav.c
 SOURCES_live555 = live555.cpp ../access/mms/asf.c ../access/mms/buffer.c
 SOURCES_nsv = nsv.c
@@ -33,6 +34,7 @@ SOURCES_smf = smf.c
 libvlc_LTLIBRARIES += \
 	libaiff_plugin.la \
 	libau_plugin.la \
+	librawaud_plugin.la \
 	libdemux_cdg_plugin.la \
 	libdemuxdump_plugin.la \
 	libflacsys_plugin.la \
