@@ -76,8 +76,8 @@ void SoutInputBox::setMRL( const QString& mrl )
     sourceValueLabel->setText( type );
 }
 
- #define CT( x ) connect( x, SIGNAL( textChanged( const QString& ) ), this, SIGNAL( mrlUpdated() ) );
- #define CS( x ) connect( x, SIGNAL( valueChanged( int ) ), this, SIGNAL( mrlUpdated() ) );
+#define CT( x ) connect( x, SIGNAL( textChanged( const QString& ) ), this, SIGNAL( mrlUpdated() ) );
+#define CS( x ) connect( x, SIGNAL( valueChanged( int ) ), this, SIGNAL( mrlUpdated() ) );
 
 /* FileDest Box */
 FileDestBox::FileDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
@@ -379,6 +379,9 @@ ICEDestBox::ICEDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( ICEMountEdit );
     CT( ICEPassEdit );
 }
+
+#undef CS
+#undef CT
 
 QString ICEDestBox::getMRL( const QString& mux )
 {

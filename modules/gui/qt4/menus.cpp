@@ -1253,6 +1253,8 @@ void QVLCMenu::UpdateItem( intf_thread_t *p_intf, QMenu *menu,
     FREENULL( text.psz_string );
 }
 
+#undef TEXT_OR_VAR
+
 
 int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         vlc_object_t *p_object, bool b_root )

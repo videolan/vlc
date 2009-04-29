@@ -79,10 +79,10 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     BUTTONACT( ui.addButton, addDest() );
 
 //     /* Connect everything to the updateMRL function */
- #define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
- #define CT( x ) CONNECT( ui.x, textChanged( const QString& ), this, updateMRL() );
- #define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
- #define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
+#define CB( x ) CONNECT( ui.x, toggled( bool ), this, updateMRL() );
+#define CT( x ) CONNECT( ui.x, textChanged( const QString& ), this, updateMRL() );
+#define CS( x ) CONNECT( ui.x, valueChanged( int ), this, updateMRL() );
+#define CC( x ) CONNECT( ui.x, currentIndexChanged( int ), this, updateMRL() );
 
     /* Misc */
     CB( soutAll ); CB( soutKeep );  CS( ttl ); CT( sapName ); CT( sapGroup );
@@ -103,6 +103,11 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     BUTTONACT( ui.nextButton2, next() );
     BUTTONACT( ui.prevButton, prev() );
     BUTTONACT( ui.prevButton2, prev() );
+
+#undef CC
+#undef CS
+#undef CT
+#undef CB
 }
 
 void SoutDialog::next()

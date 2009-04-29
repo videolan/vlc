@@ -550,6 +550,10 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
                            "0", audio, "" );
     CREATE_AND_ADD_TO_CAT( alost_stat, qtr("Lost buffers"), "0", audio, "" );
 
+#undef CREATE_AND_ADD_TO_CAT
+#undef CREATE_CATEGORY
+#undef CREATE_TREE_ITEM
+
     input->setExpanded( true );
     video->setExpanded( true );
     streaming->setExpanded( true );
@@ -599,6 +603,8 @@ void InputStatsPanel::update( input_item_t *p_item )
     UPDATE( adecoded_stat, "%5i", p_item->p_stats->i_decoded_audio );
     UPDATE( aplayed_stat, "%5i", p_item->p_stats->i_played_abuffers );
     UPDATE( alost_stat, "%5i", p_item->p_stats->i_lost_abuffers );
+
+#undef UPDATE
 
     vlc_mutex_unlock(& p_item->p_stats->lock );
 }

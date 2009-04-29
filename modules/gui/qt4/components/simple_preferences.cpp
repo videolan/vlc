@@ -84,6 +84,8 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
                   spref_cone_Input_64.png, 4 );
     ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png, 5 );
 
+#undef ADD_CATEGORY
+
     SPrefsInterface->setChecked( true );
     layout->setMargin( 0 );
     layout->setSpacing( 1 );
@@ -279,6 +281,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 optionWidgets.append( NULL );
 #endif
 
+#undef audioControl2
+#undef audioControl
+#undef audioCommon
+
             /* Audio Options */
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
@@ -407,6 +413,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             addToCachingBox( N_("Normal"), CachingNormal );
             addToCachingBox( N_("High latency"), CachingHigh );
             addToCachingBox( N_("Higher latency"), CachingHigher );
+            #undef addToCachingBox
 
 #define TestCaC( name ) \
     b_cache_equal =  b_cache_equal && \
@@ -446,6 +453,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             TestCaCi( "mms-caching", 19 );
             if( b_cache_equal ) ui.cachingCombo->setCurrentIndex(
                 ui.cachingCombo->findData( QVariant( i_cache ) ) );
+#undef TestCaCi
+#undef TestCaC
 
         END_SPREFS_CAT;
         /*******************
@@ -593,6 +602,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
     }
 
     setLayout( panel_layout );
+
+#undef END_SPREFS_CAT
+#undef START_SPREFS_CAT
+#undef CONFIG_GENERIC_FILE
+#undef CONFIG_GENERIC_NO_BOOL
+#undef CONFIG_GENERIC2
+#undef CONFIG_GENERIC
 }
 
 void SPrefsPanel::updateAudioOptions( int number)
@@ -685,6 +701,8 @@ void SPrefsPanel::apply()
             //CaCi( "dv-caching" ) too short...
         }
         break;
+#undef CaC
+#undef CaCi
     }
 
     /* Interfaces */
@@ -816,6 +834,10 @@ void SPrefsPanel::assoDialog()
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
                             : Qt::Unchecked );
+
+#undef aTo
+#undef aTv
+#undef aTa
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox( d );
     QPushButton *closeButton = new QPushButton( qtr( "&Apply" ) );

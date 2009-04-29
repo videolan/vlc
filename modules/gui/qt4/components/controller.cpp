@@ -571,6 +571,7 @@ QFrame *AbstractController::telexFrame()
 #undef SET_MAPPING
 #undef CONNECT_MAP_SET
 #undef BUTTON_SET_BAR
+#undef BUTTON_SET_BAR2
 #undef ENABLE_ON_VIDEO
 #undef ENABLE_ON_INPUT
 

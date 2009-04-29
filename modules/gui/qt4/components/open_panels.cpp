@@ -387,6 +387,8 @@ void DiscOpenPanel::updateButtons()
     updateMRL();
 }
 
+#undef setDrive
+
 /* Update the current MRL */
 void DiscOpenPanel::updateMRL()
 {
@@ -1073,7 +1075,8 @@ void CaptureOpenPanel::initialize()
     CONNECT( ui.deviceCombo, activated( int ), this, updateMRL() );
     CONNECT( ui.deviceCombo, activated( int ), this, updateButtons() );
 
-#undef addModule
+#undef CuMRL
+#undef addModuleAndLayouts
 }
 
 CaptureOpenPanel::~CaptureOpenPanel()

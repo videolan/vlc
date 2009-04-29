@@ -260,6 +260,7 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_VCODEC( "M-JPEG", "MJPG" )
     ADD_VCODEC( "Theora", "theo" )
     ADD_VCODEC( "Dirac", "drac" )
+#undef ADD_VCODEC
 
 #define ADD_ACODEC( name, fourcc ) ui.aCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_ACODEC( "MPEG Audio", "mpga" )
@@ -271,6 +272,7 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_ACODEC( "Speex", "spx" )
     ADD_ACODEC( "WAV", "s16l" )
     ADD_ACODEC( "WMA", "wma" )
+#undef ADD_ACODEC
 
 #define ADD_SCALING( factor ) ui.vScaleBox->addItem( factor );
     ADD_SCALING( "1" )
@@ -281,16 +283,19 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_SCALING( "1.5" )
     ADD_SCALING( "1.75" )
     ADD_SCALING( "2" )
+#undef ADD_SCALING
 
 #define ADD_SAMPLERATE( sample ) ui.aSampleBox->addItem( sample );
     ADD_SAMPLERATE( "11250" )
     ADD_SAMPLERATE( "22500" )
     ADD_SAMPLERATE( "44100" )
     ADD_SAMPLERATE( "48000" )
+#undef ADD_SAMPLERATE
 
 #define ADD_SCODEC( name, fourcc ) ui.subsCodecBox->addItem( name, QVariant( fourcc ) );
     ADD_SCODEC( "DVB subtitle", "dvbs" )
     ADD_SCODEC( "T.140", "t140" )
+#undef ADD_SCODEC
 }
 
 void VLCProfileEditor::fillProfile( const QString& qs )
@@ -385,7 +390,8 @@ QString VLCProfileEditor::transcodeValue()
     SMUX( FLVMux, "flv" )
     SMUX( MKVMux, "mkv" )
     SMUX( AVIMux, "avi" )
-    SMUX( MJPEGMux, "mjpg" );
+    SMUX( MJPEGMux, "mjpg" ){}
+#undef SMUX
 
 #define currentData( box ) box->itemData( box->currentIndex() )
     QString qs_acodec, qs_vcodec;
@@ -416,6 +422,7 @@ QString VLCProfileEditor::transcodeValue()
 
             << currentData( ui.subsCodecBox ).toString()
             << QString::number( ui.subsOverlay->isChecked() );
+#undef currentData
 
     return transcodeMRL.join( ";" );
 }
