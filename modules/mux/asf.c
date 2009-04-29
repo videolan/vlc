@@ -910,7 +910,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         }
     }
 
-    i_header_ext_size = i_cm_size ? i_cm_size + 46 : 0;
+    i_header_ext_size = i_cm_size ? i_cm_size + 46 : 46;
     i_size += i_ci_size + i_cd_size + i_header_ext_size ;
 
     if( p_sys->b_asf_http )
@@ -952,14 +952,11 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     bo_addle_u32( &bo, p_sys->i_bitrate );      /* maxbitrate */
 
     /* header extension */
-    if( i_header_ext_size )
-    {
-        bo_add_guid ( &bo, &asf_object_header_extension_guid );
-        bo_addle_u64( &bo, i_header_ext_size );
-        bo_add_guid ( &bo, &asf_guid_reserved_1 );
-        bo_addle_u16( &bo, 6 );
-        bo_addle_u32( &bo, i_header_ext_size - 46 );
-    }
+    bo_add_guid ( &bo, &asf_object_header_extension_guid );
+    bo_addle_u64( &bo, i_header_ext_size );
+    bo_add_guid ( &bo, &asf_guid_reserved_1 );
+    bo_addle_u16( &bo, 6 );
+    bo_addle_u32( &bo, i_header_ext_size - 46 );
 
     /* metadata object (part of header extension) */
     if( i_cm_size )
