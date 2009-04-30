@@ -122,6 +122,7 @@ void VLCProfileSelector::editProfile( const QString& qs, const QString& value )
             int i_profile = profileBox->findText( qs );
             profileBox->setItemText( i_profile, editor->name );
             profileBox->setItemData( i_profile, QVariant( editor->transcodeValue() ) );
+            updateOptions( i_profile );
         }
     }
     delete editor;
