@@ -1729,14 +1729,14 @@ vlc_module_begin ()
     add_integer( "input-repeat", 0, NULL,
                  INPUT_REPEAT_TEXT, INPUT_REPEAT_LONGTEXT, false )
         change_safe ()
-    add_integer( "start-time", 0, NULL,
-                 START_TIME_TEXT, START_TIME_LONGTEXT, true )
+    add_float( "start-time", 0, NULL,
+               START_TIME_TEXT, START_TIME_LONGTEXT, true )
         change_safe ()
-    add_integer( "stop-time", 0, NULL,
-                 STOP_TIME_TEXT, STOP_TIME_LONGTEXT, true )
+    add_float( "stop-time", 0, NULL,
+               STOP_TIME_TEXT, STOP_TIME_LONGTEXT, true )
         change_safe ()
-    add_integer( "run-time", 0, NULL,
-                 RUN_TIME_TEXT, RUN_TIME_LONGTEXT, true )
+    add_float( "run-time", 0, NULL,
+               RUN_TIME_TEXT, RUN_TIME_LONGTEXT, true )
         change_safe ()
     add_bool( "input-fast-seek", false, NULL,
               INPUT_FAST_SEEK_TEXT, INPUT_FAST_SEEK_LONGTEXT, false )

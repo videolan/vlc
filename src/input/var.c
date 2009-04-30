@@ -443,9 +443,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
 
         var_Create( p_input, "input-repeat",
                     VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-        var_Create( p_input, "start-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-        var_Create( p_input, "stop-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-        var_Create( p_input, "run-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "start-time", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "stop-time", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
+        var_Create( p_input, "run-time", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT );
         var_Create( p_input, "input-fast-seek", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
 
         var_Create( p_input, "input-slave",

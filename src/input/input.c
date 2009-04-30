@@ -918,9 +918,12 @@ static void StartTitle( input_thread_t * p_input )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
-    p_input->p->i_start = INT64_C(1000000) * var_GetInteger( p_input, "start-time" );
-    p_input->p->i_stop  = INT64_C(1000000) * var_GetInteger( p_input, "stop-time" );
-    p_input->p->i_run   = INT64_C(1000000) * var_GetInteger( p_input, "run-time" );
+    p_input->p->i_start = (int64_t)(1000000.0
+                                     * var_GetFloat( p_input, "start-time" ));
+    p_input->p->i_stop  = (int64_t)(1000000.0
+                                     * var_GetFloat( p_input, "stop-time" ));
+    p_input->p->i_run   = (int64_t)(1000000.0
+                                     * var_GetFloat( p_input, "run-time" ));
     if( p_input->p->i_run < 0 )
     {
         msg_Warn( p_input, "invalid run-time ignored" );
