@@ -203,10 +203,11 @@ void input_clock_Update( input_clock_t *cl,
 {
     bool b_reset_reference = false;
 
+    assert( i_ck_stream > VLC_TS_INVALID && i_ck_system > VLC_TS_INVALID );
+
     vlc_mutex_lock( &cl->lock );
 
-    if( ( !cl->b_has_reference ) ||
-        ( i_ck_stream <= VLC_TS_INVALID && cl->last.i_stream > VLC_TS_INVALID ) )
+    if( !cl->b_has_reference )
     {
         /* */
         b_reset_reference= true;
