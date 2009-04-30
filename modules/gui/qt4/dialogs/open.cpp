@@ -164,7 +164,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     CONNECT( ui.slaveCheckbox, toggled( bool ), this, updateMRL() );
     CONNECT( ui.slaveText, textChanged( const QString& ), this, updateMRL() );
     CONNECT( ui.cacheSpinBox, valueChanged( int ), this, updateMRL() );
-    CONNECT( ui.startTimeSpinBox, valueChanged( int ), this, updateMRL() );
+    CONNECT( ui.startTimeDoubleSpinBox, valueChanged( double ), this, updateMRL() );
     BUTTONACT( ui.advancedCheckBox, toggleAdvancedPanel() );
     BUTTONACT( ui.slaveBrowseButton, browseInputSlave() );
 
@@ -417,9 +417,8 @@ void OpenDialog::updateMRL() {
         mrl += QString( " :%1=%2" ).arg( storedMethod ).
                                   arg( ui.cacheSpinBox->value() );
     }
-    if( ui.startTimeSpinBox->value() ) {
-        mrl += " :start-time=" + QString( "%1" ).
-            arg( ui.startTimeSpinBox->value() );
+    if( ui.startTimeDoubleSpinBox->value() ) {
+        mrl += " :start-time=" + QString::number( ui.startTimeDoubleSpinBox->value() );
     }
     ui.advancedLineInput->setText( mrl );
     ui.mrlLine->setText( itemsMRL.join( " " ) );
