@@ -30,6 +30,9 @@
    <item row="0" column="1">
     <widget class="QLineEdit" name="profileLine"/>
    </item>
+   <item row="2" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox"/>
+   </item>
    <item row="1" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
@@ -234,6 +237,22 @@
           <string>Resolution</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0" colspan="4">
+           <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="0">
            <widget class="QLabel" name="vScaleLabel">
             <property name="text">
@@ -252,17 +271,17 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="heightLabel">
+           <widget class="QLabel" name="widthLabel">
             <property name="text">
-             <string>Height</string>
+             <string>Width</string>
             </property>
             <property name="buddy">
-             <cstring>heightBox</cstring>
+             <cstring>widthBox</cstring>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLineEdit" name="heightBox">
+           <widget class="QLineEdit" name="widthBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -297,17 +316,17 @@
            </spacer>
           </item>
           <item row="2" column="3">
-           <widget class="QLabel" name="widthLabel">
+           <widget class="QLabel" name="heightLabel">
             <property name="text">
-             <string>Width</string>
+             <string>Height</string>
             </property>
             <property name="buddy">
-             <cstring>widthBox</cstring>
+             <cstring>heightBox</cstring>
             </property>
            </widget>
           </item>
           <item row="2" column="4">
-           <widget class="QLineEdit" name="widthBox">
+           <widget class="QLineEdit" name="heightBox">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -322,22 +341,6 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="5">
-           <widget class="QLabel" name="label">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>You just need to fill one of the three following parameters, VLC will autodetect the other using the original aspect ratio</string>
-            </property>
-            <property name="wordWrap">
-             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -493,9 +496,6 @@
       </layout>
      </widget>
     </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox"/>
    </item>
   </layout>
  </widget>
