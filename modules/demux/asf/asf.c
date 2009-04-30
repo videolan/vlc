@@ -245,6 +245,24 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
     return stream_Seek( p_demux->s, p_sys->i_data_begin + i_pos );
 }
 
+static void SeekPrepare( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_time = -1;
+    for( int i = 0; i < 128 ; i++ )
+    {
+        asf_track_t *tk = p_sys->track[i];
+        if( !tk )
+            continue;
+
+        tk->i_time = 1;
+        if( tk->p_frame )
+            block_ChainRelease( tk->p_frame );
+        tk->p_frame = NULL;
+    }
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -254,7 +272,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     vlc_meta_t  *p_meta;
     int64_t     i64, *pi64;
     double      f, *pf;
-    int         i;
 
     switch( i_query )
     {
@@ -270,9 +287,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case DEMUX_SET_TIME:
-        p_sys->i_time = -1;
-        for( i = 0; i < 128 ; i++ )
-            if( p_sys->track[i] ) p_sys->track[i]->i_time = -1;
+        SeekPrepare( p_demux );
 
         if( p_sys->b_index && p_sys->i_length > 0 )
         {
@@ -301,9 +316,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                                        i_query, args );
 
     case DEMUX_SET_POSITION:
-        p_sys->i_time = -1;
-        for( i = 0; i < 128 ; i++ )
-            if( p_sys->track[i] ) p_sys->track[i]->i_time = -1;
+        SeekPrepare( p_demux );
 
         if( p_sys->b_index && p_sys->i_length > 0 )
         {
