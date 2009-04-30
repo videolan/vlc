@@ -362,9 +362,14 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         /* we should probably show a splash screen here */
         return NPERR_NO_ERROR;
     }
+
 #if defined(XP_UNIX) && !defined(__APPLE__)
     control = p_plugin->getControlWindow();
 #endif
+
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
     libvlc_instance_t *p_vlc = p_plugin->getVLC();
 
     /*
@@ -386,7 +391,10 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         if( !curwin.window || drawable != (((NP_Port*) (curwin.window))->port) )
         {
             /* set/change parent window */
-            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
+            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, &ex);
+            if( libvlc_exception_raised(&ex) )
+                fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+            libvlc_exception_clear(&ex);
         }
 
         /* as MacOS X video output is windowless, set viewport */
@@ -401,13 +409,17 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         view.left    = ((NP_Port*) (window->window))->portx;
         view.bottom  = window->height+view.top;
         view.right   = window->width+view.left;
+
         /* clipRect coordinates are also relative to GrafPort */
         clip.top     = window->clipRect.top;
         clip.left    = window->clipRect.left;
         clip.bottom  = window->clipRect.bottom;
         clip.right   = window->clipRect.right;
 
-        libvlc_video_set_viewport(p_vlc, &view, &clip, NULL);
+        libvlc_video_set_viewport(p_vlc, &view, &clip, &ex);
+        if( libvlc_exception_raised(&ex) )
+            fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+        libvlc_exception_clear(&ex);
 
         /* remember new window */
         p_plugin->setWindow(*window);
@@ -415,7 +427,12 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     else if( curwin.window )
     {
         /* change/set parent */
-        libvlc_video_set_parent(p_vlc, 0, NULL);
+        libvlc_video_set_parent(p_vlc, 0, &ex);
+
+        if( libvlc_exception_raised(&ex) )
+            fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+        libvlc_exception_clear(&ex);
+
         curwin.window = NULL;
     }
 #endif /* XP_MACOSX */
@@ -449,7 +466,10 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             SetWindowLong((HWND)drawable, GWL_STYLE, style);
 
             /* change/set parent */
-            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, NULL);
+            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, &ex);
+            if( libvlc_exception_raised(&ex) )
+                fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+            libvlc_exception_clear(&ex);
 
             /* remember new window */
             p_plugin->setWindow(*window);
@@ -459,14 +479,19 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             UpdateWindow( (HWND)drawable );
         }
     }
-    else if ( curwin.window )
+    else if( curwin.window )
     {
         /* reset WNDPROC */
         HWND oldwin = (HWND)curwin.window;
         SetWindowLong( oldwin, GWL_WNDPROC, (LONG)(p_plugin->getWindowProc()) );
         p_plugin->setWindowProc(NULL);
+
         /* change/set parent */
-        libvlc_video_set_parent(p_vlc, 0, NULL);
+        libvlc_video_set_parent(p_vlc, 0, &ex);
+        if( libvlc_exception_raised(&ex) )
+            fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+        libvlc_exception_clear(&ex);
+
         curwin.window = NULL;
     }
 #endif /* XP_WIN */
@@ -520,8 +545,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 /*
             libvlc_media_player_t *p_md;
 
-            libvlc_exception_t ex;
-            libvlc_exception_init(& ex );
             p_md = p_plugin->getMD( &ex );
             libvlc_exception_clear( &ex );
             libvlc_event_attach( libvlc_media_player_event_manager( p_md, &ex ),
@@ -529,12 +552,19 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
 */
 
             /* set/change parent window */
-            libvlc_video_set_parent( p_vlc, (libvlc_drawable_t) video, NULL );
+            libvlc_video_set_parent( p_vlc, (libvlc_drawable_t) video, &ex );
+            if( libvlc_exception_raised(&ex) )
+                fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+            libvlc_exception_clear(&ex);
 
             /* remember window */
             p_plugin->setWindow( *window );
             p_plugin->setVideoWindow( video );
-            if( controls ) { p_plugin->setControlWindow( controls ); }
+
+            if( controls )
+            {
+                p_plugin->setControlWindow( controls );
+            }
 
             Redraw( w, (XtPointer)p_plugin, NULL );
 
@@ -545,10 +575,13 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             }
         }
     }
-    else if ( curwin.window )
+    else if( curwin.window )
     {
         /* change/set parent */
-        libvlc_video_set_parent(p_vlc, 0, NULL);
+        libvlc_video_set_parent(p_vlc, 0, &ex);
+        if( libvlc_exception_raised(&ex) )
+            fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
+        libvlc_exception_clear(&ex);
         curwin.window = NULL;
     }
 #endif /* XP_UNIX */
