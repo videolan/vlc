@@ -110,6 +110,9 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
 
 static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO fix name */
 
+/* Do not let a pts_delay from access/demux go beyong 60s */
+#define INPUT_PTS_DELAY_MAX INT64_C(601000000)
+
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
@@ -2370,6 +2373,8 @@ static int InputSourceInit( input_thread_t *p_input,
         /* Get infos from access_demux */
         demux_Control( in->p_demux,
                         DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
+        in->i_pts_delay = __MAX( 0, __MIN( in->i_pts_delay, INPUT_PTS_DELAY_MAX ) );
+
 
         in->b_title_demux = true;
         if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
@@ -2440,6 +2445,7 @@ static int InputSourceInit( input_thread_t *p_input,
             bool b_can_seek;
             access_Control( in->p_access,
                              ACCESS_GET_PTS_DELAY, &in->i_pts_delay );
+            in->i_pts_delay = __MAX( 0, __MIN( in->i_pts_delay, INPUT_PTS_DELAY_MAX ) );
 
             in->b_title_demux = false;
             if( access_Control( in->p_access, ACCESS_GET_TITLE_INFO,
