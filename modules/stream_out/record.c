@@ -283,7 +283,8 @@ static const muxer_properties_t p_muxers[] = {
 
     M( "asf", "asf", 127,       VLC_FOURCC('w','m','a','1'), VLC_FOURCC('w','m','a','2'), VLC_FOURCC('w','m','a',' '),
                                 VLC_FOURCC('w','m','a','p'), VLC_FOURCC('w','m','a','l'),
-                                VLC_FOURCC('W','M','V','1'), VLC_FOURCC('W','M','V','2'), VLC_FOURCC('W','M','V','3') ),
+                                VLC_FOURCC('W','M','V','1'), VLC_FOURCC('W','M','V','2'), VLC_FOURCC('W','M','V','3'),
+                                VLC_FOURCC('W','V','C','1')),
 
     M( "mp4", "mp4", INT_MAX,   VLC_FOURCC('m','p','4','a'), VLC_FOURCC('h','2','6','4'), VLC_FOURCC('m','p','4','v'),
                                 VLC_FOURCC('s','u','b','t') ),
