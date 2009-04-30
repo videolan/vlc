@@ -2227,6 +2227,12 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 return VLC_EGENERIC;
 
             i_pcr = (int64_t)va_arg( args, int64_t );
+            if( i_pcr <= VLC_TS_INVALID )
+            {
+                msg_Err( p_sys->p_input, "Invalid PCR value in ES_OUT_SET_(GROUP_)PCR !" );
+                return VLC_EGENERIC;
+            }
+
             /* search program
              * TODO do not use mdate() but proper stream acquisition date */
             input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
