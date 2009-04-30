@@ -184,10 +184,13 @@ void VLCProfileSelector::updateOptions( int i )
             if( options[4] != "none" )
             {
                 smrl.option( "vb", options[5].toInt() );
-                smrl.option( "scale", options[6] );
                 smrl.option( "fps", options[7] );
-                smrl.option( "width", options[8].toInt() );
-                smrl.option( "height", options[9].toInt() );
+                if( !options[6].isEmpty() )
+                    smrl.option( "scale", options[6] );
+                if( !options[8].isEmpty() )
+                    smrl.option( "width", options[8].toInt() );
+                if( !options[9].isEmpty() )
+                    smrl.option( "height", options[9].toInt() );
             }
         }
 
