@@ -116,7 +116,7 @@ static const uint8_t ty_AC3AudioPacket[] = { 0x00, 0x00, 0x01, 0xbd };
 typedef struct
 {
   long l_rec_size;
-  uint8_t ex1, ex2;
+  uint8_t ex[2];
   uint8_t rec_type;
   uint8_t subrec_type;
   bool b_ext;
@@ -1016,7 +1016,6 @@ static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_field;
-    int i_channel;
 
     if( p_block_in )
         block_Release(p_block_in);
@@ -1030,19 +1029,12 @@ static int DemuxRecCc( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block
 
     /* XDS data (extract programs infos) transmitted on field 2 only */
     if( i_field == 1 )
-        DemuxDecodeXds( p_demux, rec_hdr->ex1, rec_hdr->ex2 );
+        DemuxDecodeXds( p_demux, rec_hdr->ex[0], rec_hdr->ex[1] );
 
     if( p_sys->cc.i_data + 3 > CC_MAX_DATA_SIZE )
         return 0;
 
-    p_sys->cc.p_data[p_sys->cc.i_data+0] = i_field;
-    p_sys->cc.p_data[p_sys->cc.i_data+1] = rec_hdr->ex1;
-    p_sys->cc.p_data[p_sys->cc.i_data+2] = rec_hdr->ex2;
-    p_sys->cc.i_data += 3;
-
-    i_channel = cc_Channel( i_field, &p_sys->cc.p_data[p_sys->cc.i_data-3 + 1] );
-    if( i_channel >= 0 && i_channel < 4 )
-        p_sys->cc.pb_present[i_channel] = true;
+    cc_AppendData( &p_sys->cc, i_field, rec_hdr->ex );
     return 0;
 }
 
@@ -1942,13 +1934,11 @@ static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
             /* marker bit 2 set, so read extended data */
             b1 = ( ( ( record_header[ 0 ] & 0x0f ) << 4 ) | 
                    ( ( record_header[ 1 ] & 0xf0 ) >> 4 ) );
-            b1 &= 0x7f;
             b2 = ( ( ( record_header[ 1 ] & 0x0f ) << 4 ) | 
                    ( ( record_header[ 2 ] & 0xf0 ) >> 4 ) );
-            b2 &= 0x7f;
 
-            p_rec_hdr->ex1 = b1;
-            p_rec_hdr->ex2 = b2;
+            p_rec_hdr->ex[0] = b1;
+            p_rec_hdr->ex[1] = b2;
             p_rec_hdr->l_rec_size = 0;
             p_rec_hdr->l_ty_pts = 0;
             p_rec_hdr->b_ext = true;

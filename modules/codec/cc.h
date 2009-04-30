@@ -45,18 +45,6 @@ typedef struct
     uint8_t p_data[CC_MAX_DATA_SIZE];
 } cc_data_t;
 
-static inline int cc_Channel( int i_field, const uint8_t p_data[2] )
-{
-    const uint8_t d = p_data[0] & 0x7f;
-    if( i_field != 0 && i_field != 1 )
-        return -1;
-    if( d == 0x14 )
-        return 2*i_field + 0;
-    else if( d == 0x1c )
-        return 2*i_field + 1;
-    /* unknown(middle of a command)  or not cc channel */
-    return -1;
-}
 static inline void cc_Init( cc_data_t *c )
 {
     int i;
@@ -75,6 +63,20 @@ static inline void cc_Flush( cc_data_t *c )
 {
     c->i_data = 0;
 }
+
+static inline void cc_AppendData( cc_data_t *c, int i_field, const uint8_t cc[2] )
+{
+    if( i_field == 0 || i_field == 1 )
+    {
+        c->pb_present[2*i_field+0] =
+        c->pb_present[2*i_field+1] = true;
+    }
+
+    c->p_data[c->i_data++] = i_field;
+    c->p_data[c->i_data++] = cc[0];
+    c->p_data[c->i_data++] = cc[1];
+}
+
 static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
 {
     static const uint8_t p_cc_ga94[4] = { 0x47, 0x41, 0x39, 0x34 };
@@ -129,7 +131,6 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
         for( i = 0; i < i_count_cc; i++, cc += 3 )
         {
             int i_field = cc[0] & 0x03;
-            int i_channel;
             if( ( cc[0] & 0xfc ) != 0xfc )
                 continue;
             if( i_field != 0 && i_field != 1 )
@@ -137,13 +138,7 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
             if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                 continue;
 
-            i_channel = cc_Channel( i_field, &cc[1] );
-            if( i_channel >= 0 && i_channel < 4 )
-                c->pb_present[i_channel] = true;
-
-            c->p_data[c->i_data++] = i_field;
-            c->p_data[c->i_data++] = cc[1];
-            c->p_data[c->i_data++] = cc[2];
+            cc_AppendData( c, i_field, &cc[1] );
         }
         c->b_reorder = true;
     }
@@ -164,7 +159,6 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
             for( j = 0; j < 2; j++, cc += 3 )
             {
                 const int i_field = j == i_field_first ? 0 : 1;
-                int i_channel;
 
                 if( b_truncate && i == i_count_cc2 - 1 && j == 1 )
                     break;
@@ -173,12 +167,7 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
                 if( c->i_data + 3 > CC_MAX_DATA_SIZE )
                     continue;
 
-                i_channel = cc_Channel( i_field, &cc[1] );
-                if( i_channel >= 0 && i_channel < 4 )
-                    c->pb_present[i_channel] = true;
-                c->p_data[c->i_data++] = i_field;
-                c->p_data[c->i_data++] = cc[1];
-                c->p_data[c->i_data++] = cc[2];
+                cc_AppendData( c, i_field, &cc[1] );
             }
         }
         c->b_reorder = false;
@@ -196,12 +185,8 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
         for( i = 0; i < 2; i++, cc += 4 )
         {
             const int i_field = i == 0 ? 1 : 0;
-            int i_channel = cc_Channel( i_field, &cc[2] );
-            if( i_channel >= 0 && i_channel < 4 )
-                c->pb_present[i_channel] = true;
-            c->p_data[c->i_data++] = i_field;
-            c->p_data[c->i_data++] = cc[2];
-            c->p_data[c->i_data++] = cc[3];
+
+            cc_AppendData( c, i_field, &cc[2] );
         }
         c->b_reorder = false;
     }
@@ -231,13 +216,8 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
                 continue;
 
             const int i_field = i_field_idx - 1;
-            const int i_channel = cc_Channel( i_field, cc );
-            if( i_channel >= 0 && i_channel < 4 )
-                c->pb_present[i_channel] = true;
 
-            c->p_data[c->i_data++] = i_field;
-            c->p_data[c->i_data++] = cc[0];
-            c->p_data[c->i_data++] = cc[1];
+            cc_AppendData( c, i_field, &cc[0] );
         }
         c->b_reorder = true;
     }
