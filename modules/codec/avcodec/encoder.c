@@ -693,13 +693,39 @@ int OpenEncoder( vlc_object_t *p_this )
         }
     }
 
-    p_enc->fmt_out.i_extra = p_context->extradata_size;
-    if( p_enc->fmt_out.i_extra )
+    if( i_codec_id == CODEC_ID_FLAC )
     {
+        p_enc->fmt_out.i_extra = 4 + 1 + 3 + p_context->extradata_size;
         p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
-        memcpy( p_enc->fmt_out.p_extra, p_context->extradata,
-                p_enc->fmt_out.i_extra );
+        if( p_enc->fmt_out.p_extra )
+        {
+            uint8_t *p = p_enc->fmt_out.p_extra;
+            p[0] = 0x66;
+            p[1] = 0x4C;
+            p[2] = 0x61;
+            p[3] = 0x43;
+            p[4] = 0x00;
+            p[5] = ( p_context->extradata_size >> 16 ) & 0xff;
+            p[6] = ( p_context->extradata_size >>  8 ) & 0xff;
+            p[7] = ( p_context->extradata_size       ) & 0xff;
+            memcpy( &p[8], p_context->extradata, p_context->extradata_size );
+        }
+        else
+        {
+            p_enc->fmt_out.i_extra = 0;
+        }
     }
+    else
+    {
+        p_enc->fmt_out.i_extra = p_context->extradata_size;
+        if( p_enc->fmt_out.i_extra )
+        {
+            p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+            memcpy( p_enc->fmt_out.p_extra, p_context->extradata,
+                    p_enc->fmt_out.i_extra );
+        }
+    }
+
     p_context->flags &= ~CODEC_FLAG_GLOBAL_HEADER;
 
     if( p_enc->fmt_in.i_cat == AUDIO_ES )
