@@ -32,6 +32,8 @@
 #include <QLabel>
 #include <QMessageBox>
 
+#include <assert.h>
+
 VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
 {
     QHBoxLayout *layout = new QHBoxLayout( this );
@@ -111,17 +113,24 @@ void VLCProfileSelector::editProfile()
 
 void VLCProfileSelector::editProfile( const QString& qs, const QString& value )
 {
+    /* Create the Profile Editor */
     VLCProfileEditor *editor = new VLCProfileEditor( qs, value, this );
 
+    /* Show it */
     if( QDialog::Accepted == editor->exec() )
     {
+        /* New Profile */
         if( qs.isEmpty() )
             profileBox->addItem( editor->name, QVariant( editor->transcodeValue() ) );
+        /* Update old profile */
         else
         {
+            /* Look for the profile */
             int i_profile = profileBox->findText( qs );
+            assert( i_profile != -1 );
             profileBox->setItemText( i_profile, editor->name );
             profileBox->setItemData( i_profile, QVariant( editor->transcodeValue() ) );
+            /* Force mrl recreation */
             updateOptions( i_profile );
         }
     }
