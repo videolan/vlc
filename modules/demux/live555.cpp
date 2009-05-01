@@ -110,6 +110,7 @@ vlc_module_begin ()
         add_bool( "rtsp-tcp", 0, NULL,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), true )
+            change_safe()
         add_integer( "rtp-client-port", -1, NULL,
                   N_("Client port"),
                   N_("Port to use for the RTP source of the session"), true )
