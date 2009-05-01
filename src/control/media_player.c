@@ -1,7 +1,7 @@
 /*****************************************************************************
  * media_player.c: Libvlc API Media Instance management functions
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -241,7 +241,6 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
 }
 
-
 /**************************************************************************
  * Create a Media Instance object.
  *
@@ -317,7 +316,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
             libvlc_MediaPlayerPositionChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerTimeChanged, p_e );
-     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerTitleChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerSeekableChanged, p_e );
@@ -685,7 +684,6 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
     return libvlc_Playing == state;
 }
 
-
 /**************************************************************************
  * Stop playing.
  **************************************************************************/
@@ -737,7 +735,7 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
 }
 
 /**************************************************************************
- * get_agl
+ * get_nsobject
  **************************************************************************/
 uint32_t libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 {
