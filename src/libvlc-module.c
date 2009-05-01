@@ -1585,10 +1585,13 @@ vlc_module_begin ()
 
     add_bool( "video-title-show", 1, NULL, VIDEO_TITLE_SHOW_TEXT,
               VIDEO_TITLE_SHOW_LONGTEXT, false )
+        change_safe()
     add_integer( "video-title-timeout", 5000, NULL, VIDEO_TITLE_TIMEOUT_TEXT,
                  VIDEO_TITLE_TIMEOUT_LONGTEXT, false )
+        change_safe()
     add_integer( "video-title-position", 8, NULL, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT, false )
+        change_safe()
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
     // autohide after 1.5s
     add_integer( "mouse-hide-timeout", 1500, NULL, MOUSE_HIDE_TIMEOUT_TEXT,
