@@ -1040,7 +1040,7 @@ void CaptureOpenPanel::initialize()
     CuMRL( dvbCard, valueChanged ( int ) );
     CuMRL( dvbFreq, valueChanged ( int ) );
     CuMRL( dvbSrate, valueChanged ( int ) );
-    CuMRL( dvbBandBox, activated ( int ) );
+    CuMRL( dvbBandBox, currentIndexChanged ( int ) );
 
     BUTTONACT( dvbs, updateButtons() );
     BUTTONACT( dvbt, updateButtons() );
