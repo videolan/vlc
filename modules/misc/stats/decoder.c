@@ -53,6 +53,12 @@ int OpenDecoder ( vlc_object_t *p_this )
     p_dec->pf_decode_audio = NULL;
     p_dec->pf_decode_sub = NULL;
 
+    /* */
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC('I','4','2','0') );
+    p_dec->fmt_out.video.i_width = 100;
+    p_dec->fmt_out.video.i_height = 100;
+    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
+
     return VLC_SUCCESS;
 }
 
@@ -66,11 +72,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     if( !pp_block || !*pp_block ) return NULL;
     p_block = *pp_block;
-
-    p_dec->fmt_out.video.i_width = 100;
-    p_dec->fmt_out.video.i_height = 100;
-    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
 
     p_pic = decoder_NewPicture( p_dec );
 
