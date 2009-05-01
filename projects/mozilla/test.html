@@ -552,8 +552,8 @@ function doGo(targetURL)
             // clear() may return before the playlist has actually been cleared
             // just wait for it to finish its job
         }
-
-        var itemId = vlc.playlist.add(targetURL);
+        var options = new Array(":rtsp-tcp");
+        var itemId = vlc.playlist.add(targetURL,"",options);
         if( itemId != -1 )
         {
             // clear the message log and enable error logging
