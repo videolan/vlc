@@ -318,6 +318,21 @@ void VLCProfileEditor::fillProfile( const QString& qs )
     if( options.size() < 16 )
         return;
 
+    const QString mux = options[0];
+#define CHECKMUX( button, text) if( text == mux ) ui.button->setChecked( true ); else
+    CHECKMUX( PSMux, "ps" )
+    CHECKMUX( TSMux, "ts" )
+    CHECKMUX( MPEG1Mux, "mpeg1" )
+    CHECKMUX( OggMux, "ogg" )
+    CHECKMUX( ASFMux, "asf" )
+    CHECKMUX( MOVMux, "mp4" )
+    CHECKMUX( WAVMux, "wav" )
+    CHECKMUX( RAWMux, "raw" )
+    CHECKMUX( FLVMux, "flv" )
+    CHECKMUX( MKVMux, "mkv" )
+    CHECKMUX( AVIMux, "avi" )
+    CHECKMUX( MJPEGMux, "mjpg" ){}
+
     ui.keepVideo->setChecked( !options[1].toInt() );
     ui.transcodeVideo->setChecked( ( options[4] != "none" ) );
     ui.keepAudio->setChecked( !options[2].toInt() );
