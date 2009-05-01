@@ -28,6 +28,8 @@ Demuxers:
  * Support for Dirac, MLP and RealVideo in Matroska files
  * Major improvements in RealMedia files opening (.rm and .rmvb)
  * Improvements of the TS demuxer for M2TS files from Blu-Ray and AVCHD
+ * Metadata for mod files are supported
+ * GSM codecs in Wav files are supported
 
 Encoders:
  * Dirac encoding using libdirac (supported in Ogg and in TS)
@@ -46,6 +48,7 @@ Access:
  * Opening of any file descriptor using 'fd://'
  * MTP device access on Unix
  * CD-Text support on the cdda module (CD-Audio)
+ * :start-time and :stop-time can handle sub-second values
 
 Inputs:
  * Mouse cursor support in x11 and win32 screen modules
