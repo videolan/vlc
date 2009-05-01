@@ -74,6 +74,7 @@ vlc_module_begin ()
     add_usage_hint( N_("[cdda:][device][@[track]]") )
     add_integer( "cdda-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
+        change_safe()
 
     add_integer( "cdda-track", 0 , NULL, NULL, NULL, true )
         change_internal ()

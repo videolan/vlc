@@ -91,6 +91,7 @@ vlc_module_begin ()
     add_integer ("rtp-caching", 1000, NULL, RTP_CACHING_TEXT,
                  RTP_CACHING_LONGTEXT, true)
         change_integer_range (0, 65535)
+        change_safe()
     add_integer ("rtcp-port", 0, NULL, RTCP_PORT_TEXT,
                  RTCP_PORT_LONGTEXT, false)
         change_integer_range (0, 65535)

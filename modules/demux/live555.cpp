@@ -125,6 +125,7 @@ vlc_module_begin ()
                   true )
         add_integer("rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                     CACHING_TEXT, CACHING_LONGTEXT, true )
+            change_safe()
         add_bool(   "rtsp-kasenna", false, NULL, KASENNA_TEXT,
                     KASENNA_LONGTEXT, true )
         add_string( "rtsp-user", NULL, NULL, USER_TEXT,

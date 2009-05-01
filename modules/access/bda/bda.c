@@ -198,6 +198,7 @@ vlc_module_begin ()
 
     add_integer( "dvb-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
+        change_safe()
     add_integer( "dvb-frequency", 0, NULL, FREQ_TEXT, FREQ_LONGTEXT,
                  false )
 #   if defined(WIN32) || defined(WINCE)

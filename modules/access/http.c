@@ -108,6 +108,7 @@ vlc_module_begin ()
                   PROXY_PASS_TEXT, PROXY_PASS_LONGTEXT, false )
     add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
+        change_safe()
     add_string( "http-user-agent", COPYRIGHT_MESSAGE , NULL, AGENT_TEXT,
                 AGENT_LONGTEXT, true )
     add_bool( "http-reconnect", 0, NULL, RECONNECT_TEXT,

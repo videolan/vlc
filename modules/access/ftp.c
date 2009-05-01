@@ -76,6 +76,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_ACCESS )
     add_integer( "ftp-caching", 2 * DEFAULT_PTS_DELAY / 1000, NULL,
                  CACHING_TEXT, CACHING_LONGTEXT, true )
+        change_safe()
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
                 false )
     add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
