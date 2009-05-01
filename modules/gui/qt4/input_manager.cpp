@@ -140,6 +140,7 @@ void InputManager::delInput()
     emit metaChanged( (input_item_t *)NULL );
 
     emit encryptionChanged( false );
+    emit recordingStateChanged( false );
 }
 
 /* Convert the event from the callbacks in actions */

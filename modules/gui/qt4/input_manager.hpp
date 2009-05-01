@@ -72,8 +72,8 @@ class IMEvent : public QEvent
 friend class InputManager;
     public:
     IMEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
-    { i_id = id ; } ;
-    virtual ~IMEvent() {};
+    { i_id = id ; }
+    virtual ~IMEvent() {}
 
 private:
     int i_id;
