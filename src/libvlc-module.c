@@ -1652,7 +1652,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT, false )
-       add_deprecated_alias( "filter" ) /*deprecated since 0.8.2 */
+        add_deprecated_alias( "filter" ) /*deprecated since 0.8.2 */
     add_module_list_cat( "vout-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                         VOUT_FILTER_TEXT, VOUT_FILTER_LONGTEXT, false )
 #if 0
