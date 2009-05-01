@@ -1427,7 +1427,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             /* Retrieve the starttime if possible */
-            p_sys->i_npt = p_sys->i_npt_start = p_sys->ms->playStartTime();
+            p_sys->i_npt_start = p_sys->ms->playStartTime();
 
             /* Retrieve the duration if possible */
             p_sys->i_npt_length = p_sys->ms->playEndTime();
