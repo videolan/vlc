@@ -516,13 +516,15 @@
   <tabstop>AVIMux</tabstop>
   <tabstop>buttonBox</tabstop>
   <tabstop>transcodeVideo</tabstop>
+  <tabstop>keepVideo</tabstop>
   <tabstop>vCodecBox</tabstop>
   <tabstop>vBitrateSpin</tabstop>
   <tabstop>vFrameBox</tabstop>
   <tabstop>vScaleBox</tabstop>
-  <tabstop>heightBox</tabstop>
   <tabstop>widthBox</tabstop>
+  <tabstop>heightBox</tabstop>
   <tabstop>transcodeAudio</tabstop>
+  <tabstop>keepAudio</tabstop>
   <tabstop>aCodecBox</tabstop>
   <tabstop>aBitrateSpin</tabstop>
   <tabstop>aChannelsSpin</tabstop>
