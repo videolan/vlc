@@ -416,7 +416,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         clip.bottom  = window->clipRect.bottom;
         clip.right   = window->clipRect.right;
 
-        libvlc_video_set_viewport(p_vlc, &view, &clip, &ex);
+        libvlc_video_set_viewport(p_vlc, p_plugin->getMD(&ex), &view, &clip, &ex);
         if( libvlc_exception_raised(&ex) )
             fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
         libvlc_exception_clear(&ex);

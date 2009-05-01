@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc.h:  libvlc external API
  *****************************************************************************
- * Copyright (C) 1998-2005 the VideoLAN team
+ * Copyright (C) 1998-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -1059,7 +1059,7 @@ VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc
  * If i_width AND i_height is 0, original size is used.
  * If i_width XOR i_height is 0, original aspect-ratio is preserved.
  *
- * \param p_mediaplayer the media player
+ * \param p_mi media player instance
  * \param psz_filepath the path where to save the screenshot to
  * \param i_width the snapshot's width
  * \param i_height the snapshot's height
@@ -1070,7 +1070,7 @@ VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, char *,
 /**
  * Resize the current video output window.
  *
- * \param p_instance libvlc instance
+ * \param p_mi media player instance
  * \param width new width for video output window
  * \param height new height for video output window
  * \param p_e an initialized exception pointer
@@ -1081,7 +1081,7 @@ VLC_PUBLIC_API void libvlc_video_resize( libvlc_media_player_t *, int, int, libv
 /**
  * Tell windowless video output to redraw rectangular area (MacOS X only).
  *
- * \param p_instance libvlc instance
+ * \param p_mi media player instance
  * \param area coordinates within video drawable
  * \param p_e an initialized exception pointer
  */
@@ -1106,11 +1106,12 @@ VLC_PUBLIC_API void libvlc_video_set_size( libvlc_instance_t *, int, int, libvlc
  * This setting will be used as default for all video outputs.
  *
  * \param p_instance libvlc instance
+ * \param p_mi media player instance
  * \param view coordinates within video drawable
  * \param clip coordinates within video drawable
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, const libvlc_rectangle_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, libvlc_media_player_t *, const libvlc_rectangle_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
 
 /** @} video */
 
