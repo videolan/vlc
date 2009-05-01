@@ -1103,11 +1103,11 @@ void CaptureOpenPanel::updateMRL()
         else if(  bdac->isChecked() ) mrl = "dvb-c://";
         else if(  bdaa->isChecked() ) mrl = "atsc://";
         else return;
-        fileList << mrl; mrl = "";
-
-        mrl += " :dvb-frequency=" + QString::number( bdaFreq->value() );
+        mrl += "frequency=" + QString::number( bdaFreq->value() );
         if( bdac->isChecked() || bdat->isChecked() || bdaa->isChecked() )
             mrl +="000";
+        fileList << mrl; mrl = "";
+
         if( bdas->isChecked() || bdac->isChecked() )
             mrl += " :dvb-srate=" + QString::number( bdaSrate->value() );
         else if( bdat->isChecked() || bdaa->isChecked() )
@@ -1165,11 +1165,13 @@ void CaptureOpenPanel::updateMRL()
             mrl += " :pvr-bitrate=" + QString::number( pvrBitr->value() );
         break;
     case DVB_DEVICE:
-        fileList << "dvb://";
-        mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
-        mrl += " :dvb-frequency=" + QString::number( dvbFreq->value() );
+        mrl = "dvb://";
+        mrl += "frequency=" + QString::number( dvbFreq->value() );
         if( dvbc->isChecked() || dvbt->isChecked() )
             mrl +="000";
+        fileList << mrl; mrl= "";
+
+        mrl += " :dvb-adapter=" + QString::number( dvbCard->value() );
         if( dvbs->isChecked() || dvbc->isChecked() )
             mrl += " :dvb-srate=" + QString::number( dvbSrate->value() );
         else if( dvbt->isChecked() )
