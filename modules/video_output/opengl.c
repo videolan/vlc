@@ -207,6 +207,7 @@ static int CreateVout( vlc_object_t *p_this )
         msg_Warn( p_vout, "No OpenGL provider found" );
         vlc_object_detach( p_sys->p_vout );
         vlc_object_release( p_sys->p_vout );
+        free( p_sys );
         return VLC_ENOOBJ;
     }
 
