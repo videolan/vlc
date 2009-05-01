@@ -221,6 +221,7 @@ Paul Corke <paul.corke at datatote dot co do uk> - dv patch to keep up with the 
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Pauline Castets <pcastets at actech-innovation dot com> - NSIS fixes and i18n
 Petr Vacek - FTP cleartext authentication
+Philippe A. aka "Lotesdelère" - Numerous testing and bug reporting
 Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
 Pierre d'Herbemont <pdherbemont at free dot fr> - Compile fix
 Pierre-Luc Beaudoin - Vorbis 9 channels patch, Jack input fixes.
