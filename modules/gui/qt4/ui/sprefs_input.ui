@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>616</width>
-    <height>480</height>
+    <width>622</width>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,6 +36,23 @@
       </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="DVDBrowse">
+        <property name="text">
+         <string>Browse...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="recordLabel">
+        <property name="text">
+         <string>Record directory or filename</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="recordPath"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="recordBrowse">
         <property name="text">
          <string>Browse...</string>
         </property>

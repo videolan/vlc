@@ -386,6 +386,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 free( psz_dvddiscpath );
                 free( psz_vcddiscpath );
             }
+            CONFIG_GENERIC_FILE( "input-record-path", Directory, ui.recordLabel,
+                                 ui.recordPath, ui.recordBrowse );
 
             CONFIG_GENERIC_NO_BOOL( "server-port", Integer, ui.portLabel,
                                     UDPPort );
