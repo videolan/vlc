@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
- * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -25,6 +25,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
