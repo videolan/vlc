@@ -534,11 +534,10 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
             if( b_strict )
                 continue;
         }
-        /* If we didn't require a shortcut, trash <= 0 scored plugins */
-        else if( p_module->i_score <= 0 )
-        {
+
+        /* Trash <= 0 scored plugins (they can only be selected by shortcut) */
+        if( p_module->i_score <= 0 )
             continue;
-        }
 
 found_shortcut:
         /* Store this new module */
