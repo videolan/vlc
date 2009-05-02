@@ -60,11 +60,13 @@ vlc_module_end ()
 #define AOUT_CHANS_STEREO_REAR   ( AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT )
 #define AOUT_CHANS_STEREO_MIDDLE (AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT )
 
-#define AOUT_CHANS_2_0 AOUT_CHANS_STEREO_FRONT
-#define AOUT_CHANS_4_0 (AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR )
-#define AOUT_CHANS_5_0 ( AOUT_CHANS_4_0 | AOUT_CHAN_CENTER )
-#define AOUT_CHANS_6_0 (AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR | AOUT_CHANS_STEREO_MIDDLE )
-#define AOUT_CHANS_7_0 ( AOUT_CHANS_6_0 | AOUT_CHAN_CENTER )
+#define AOUT_CHANS_2_0          AOUT_CHANS_STEREO_FRONT
+#define AOUT_CHANS_4_0          ( AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR )
+#define AOUT_CHANS_4_0_MIDDLE   ( AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_MIDDLE )
+#define AOUT_CHANS_5_0          ( AOUT_CHANS_4_0 | AOUT_CHAN_CENTER )
+#define AOUT_CHANS_5_0_MIDDLE   ( AOUT_CHANS_4_0_MIDDLE | AOUT_CHAN_CENTER )
+#define AOUT_CHANS_6_0          ( AOUT_CHANS_STEREO_FRONT | AOUT_CHANS_STEREO_REAR | AOUT_CHANS_STEREO_MIDDLE )
+#define AOUT_CHANS_7_0          ( AOUT_CHANS_6_0 | AOUT_CHAN_CENTER )
 
 static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output );
 
@@ -96,6 +98,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
+    const unsigned i_input_physical = p_filter->input.i_physical_channels;
+
+    const bool b_input_7_0 = (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
+    const bool b_input_5_0 = !b_input_7_0 &&
+                             (i_input_physical & (AOUT_CHANS_5_0|AOUT_CHANS_5_0_MIDDLE));
     int i_input_nb = aout_FormatNbChannels( &p_filter->input );
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
     float *p_dest = (float *)p_out_buf->p_buffer;
@@ -107,7 +114,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     if( p_filter->output.i_physical_channels == AOUT_CHANS_2_0 )
     {
-        if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
+        if( b_input_7_0 )
         for( i = p_in_buf->i_nb_samples; i--; )
         {
             *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 4 + p_src[4] / 4;
@@ -134,7 +141,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
     else if( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
     {
-        if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
+        if( b_input_7_0 )
         for( i = p_in_buf->i_nb_samples; i--; )
         {
             *p_dest = p_src[6] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 8 + p_src[3] / 8 + p_src[4] / 8 + p_src[5] / 8;
@@ -144,7 +151,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
             if( p_filter->input.i_physical_channels & AOUT_CHAN_LFE ) p_src++;
         }
-        else if( p_filter->input.i_physical_channels & AOUT_CHAN_REARLEFT )
+        else if( b_input_5_0 )
         for( i = p_in_buf->i_nb_samples; i--; )
         {
             *p_dest = p_src[4] + p_src[0] / 4 + p_src[1] / 4 + p_src[2] / 6 + p_src[3] / 6;
@@ -165,7 +172,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
     else
     {
-        if( p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT )
+        if( b_input_7_0 )
         for( i = p_in_buf->i_nb_samples; i--; )
         {
             *p_dest = p_src[6] + 0.5 * p_src[0] + p_src[2] / 6;
@@ -302,9 +309,11 @@ static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_
         return false;
     }
 
-    /* Only from 7/7.1/5/5.1/2.0 */
+    /* Only from 7/7.1/5/5.1/2.0
+     * XXX 5.X rear and middle are handled the same way */
     if( (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_7_0 &&
         (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0 &&
+        (p_input->i_physical_channels & ~AOUT_CHAN_LFE) != AOUT_CHANS_5_0_MIDDLE &&
          p_input->i_physical_channels != AOUT_CHANS_2_0 )
     {
         return false;
