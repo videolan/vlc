@@ -1138,9 +1138,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     label = new QLabel(
             qtr( "Select an action to change the associated hotkey") );
 
-    /* Deactivated for now
     QLabel *searchLabel = new QLabel( qtr( "Search" ) );
-    QLineEdit *actionSearch = new QLineEdit;*/
+    actionSearch = new SearchLineEdit( keyContainer );
 
     table = new QTreeWidget;
     table->setColumnCount(3);
@@ -1158,9 +1157,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     finish();
 
     gLayout->addWidget( label, 0, 0, 1, 4 );
-  /* deactivated for now
     gLayout->addWidget( searchLabel, 1, 0, 1, 2 );
-    gLayout->addWidget( actionSearch, 1, 2, 1, 2 ); */
+    gLayout->addWidget( actionSearch, 1, 2, 1, 2 );
     gLayout->addWidget( table, 2, 0, 1, 4 );
     gLayout->addWidget( clearButton, 3, 0, 1, 1 );
     gLayout->addWidget( shortcutValue, 3, 1, 1, 2 );
@@ -1171,6 +1169,8 @@ KeySelectorControl::KeySelectorControl( vlc_object_t *_p_this,
     CONNECT( clearButton, clicked(), shortcutValue, clear() );
     CONNECT( clearButton, clicked(), this, setTheKey() );
     BUTTONACT( setButton, setTheKey() );
+    CONNECT( actionSearch, textChanged( const QString& ),
+             this, filter( const QString& ) );
 }
 
 void KeySelectorControl::finish()
@@ -1242,6 +1242,17 @@ void KeySelectorControl::finish()
              this, select1Key() );
 
     CONNECT( shortcutValue, pressed(), this, selectKey() );
+}
+
+void KeySelectorControl::filter( const QString &qs_search )
+{
+    QList<QTreeWidgetItem *> resultList =
+            table->findItems( qs_search, Qt::MatchContains, 0 );
+    for( int i = 0; i < table->topLevelItemCount(); i++ )
+    {
+        table->topLevelItem( i )->setHidden(
+                !resultList.contains( table->topLevelItem( i ) ) );
+    }
 }
 
 /* Show the key selected from the table in the keySelector */
@@ -1354,7 +1365,7 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
         /* Avoid 0 or -1 that are the "Unset" states */
     {
         warning->setText( qtr("Warning: the key is already assigned to \"") +
-          conflictList[0]->text( 0 ) + "\"" );
+                          conflictList[0]->text( 0 ) + "\"" );
         warning->show();
         buttonBox->show();
 

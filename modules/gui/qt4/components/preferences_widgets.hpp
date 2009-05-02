@@ -434,6 +434,7 @@ signals:
     void pressed();
 };
 
+class SearchLineEdit;
 class KeySelectorControl : public ConfigControl
 {
     Q_OBJECT;
@@ -451,10 +452,12 @@ private:
     QTreeWidget *table;
     KeyShortcutEdit *shortcutValue;
     QList<module_config_t *> values;
+    SearchLineEdit *actionSearch;
 private slots:
     void setTheKey();
     void selectKey( QTreeWidgetItem * = NULL );
     void select1Key();
+    void filter( const QString & );
 };
 
 class KeyInputDialog : public QDialog
