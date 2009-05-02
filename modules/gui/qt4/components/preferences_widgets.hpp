@@ -468,7 +468,7 @@ private:
     void checkForConflicts( int i_vlckey );
     void keyPressEvent( QKeyEvent *);
     void wheelEvent( QWheelEvent *);
-    QLabel *selected;
+    QLabel *selected, *warning;
     QVBoxLayout *vLayout;
     QDialogButtonBox *buttonBox;
 };

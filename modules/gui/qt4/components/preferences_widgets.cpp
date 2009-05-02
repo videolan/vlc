@@ -1326,6 +1326,10 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     selected = new QLabel( qtr( "Press the new keys for " ) + keyToChange );
     vLayout->addWidget( selected , Qt::AlignCenter );
 
+    warning = new QLabel;
+    warning->hide();
+    vLayout->insertWidget( 1, warning );
+
     buttonBox = new QDialogButtonBox;
     QPushButton *ok = new QPushButton( qtr("OK") );
     QPushButton *cancel = new QPushButton( qtr("Cancel") );
@@ -1347,12 +1351,11 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
 
     if( conflictList.size() &&
         conflictList[0]->data( 1, Qt::UserRole ).toInt() > 1 )
-        /* Avoid 0 or -1 that are the "Unset" states*/
+        /* Avoid 0 or -1 that are the "Unset" states */
     {
-        QLabel *warning = new QLabel(
-          qtr("Warning: the key is already assigned to \"") +
+        warning->setText( qtr("Warning: the key is already assigned to \"") +
           conflictList[0]->text( 0 ) + "\"" );
-        vLayout->insertWidget( 1, warning );
+        warning->show();
         buttonBox->show();
 
         conflicts = true;
