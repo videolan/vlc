@@ -236,9 +236,15 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT:
         return "2F2R";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+          | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT:
+        return "2F2M";
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT:
         return "3F2R";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT:
+        return "3F2M";
 
     case AOUT_CHAN_CENTER | AOUT_CHAN_LFE:
         if ( (p_format->i_original_channels & AOUT_CHAN_CENTER)
@@ -271,9 +277,15 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE:
         return "2F2R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+          | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE:
+        return "2F2M/LFE";
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE:
         return "3F2R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE:
+        return "3F2M/LFE";
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
           | AOUT_CHAN_MIDDLERIGHT:
