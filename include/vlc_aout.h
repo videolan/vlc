@@ -412,6 +412,34 @@ VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t
 VLC_EXPORT( int, aout_CheckChannelReorder, ( const uint32_t *pi_chan_order_in, const uint32_t *pi_chan_order_out, uint32_t i_channel_mask, int i_channels, int *pi_chan_table ) );
 VLC_EXPORT( void, aout_ChannelReorder, ( uint8_t *, int, int, const int *, int ) );
 
+/**
+ * This fonction will compute the extraction parameter into pi_selection to go
+ * from i_channels with their type given by pi_order_src[] into the order
+ * describe by pi_order_dst.
+ * It will also set :
+ * - *pi_channels as the number of channels that will be extracted which is
+ * lower (in case of non understood channels type) or equal to i_channels.
+ * - the layout of the channels (*pi_layout).
+ *
+ * It will return true if channel extraction is really needed, in which case
+ * aout_ChannelExtract must be used
+ *
+ * XXX It must be used when the source may have channel type not understood
+ * by VLC. In this case the channel type pi_order_src[] must be set to 0.
+ * XXX It must also be used if multiple channels have the same type.
+ */
+VLC_EXPORT( bool, aout_CheckChannelExtraction, ( int *pi_selection, uint32_t *pi_layout, int *pi_channels, const uint32_t pi_order_dst[AOUT_CHAN_MAX], const uint32_t *pi_order_src, int i_channels ) );
+
+/**
+ * Do the actual channels extraction using the parameters created by
+ * aout_CheckChannelExtraction.
+ *
+ * XXX this function does not work in place (p_dst and p_src must not overlap).
+ * XXX Only 8, 16, 24, 32, 64 bits per sample are supported.
+ */
+VLC_EXPORT( void, aout_ChannelExtract, ( void *p_dst, int i_dst_channels, const void *p_src, int i_src_channels, int i_sample_count, const int *pi_selection, int i_bits_per_sample ) );
+
+/* */
 VLC_EXPORT( unsigned int, aout_FormatNbChannels, ( const audio_sample_format_t * p_format ) LIBVLC_USED );
 VLC_EXPORT( unsigned int, aout_BitsPerSample, ( vlc_fourcc_t i_format ) LIBVLC_USED );
 VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );

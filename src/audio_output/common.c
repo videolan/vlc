@@ -648,3 +648,105 @@ void aout_ChannelReorder( uint8_t *p_buf, int i_buffer,
         }
     }
 }
+
+/*****************************************************************************
+ * aout_ChannelExtract:
+ *****************************************************************************/
+static inline void ExtractChannel( uint8_t *pi_dst, int i_dst_channels,
+                                   const uint8_t *pi_src, int i_src_channels,
+                                   int i_sample_count,
+                                   const int *pi_selection, int i_bytes )
+{
+    for( int i = 0; i < i_sample_count; i++ )
+    {
+        for( int j = 0; j < i_dst_channels; j++ )
+            memcpy( &pi_dst[j * i_bytes], &pi_src[pi_selection[j] * i_bytes], i_bytes );
+        pi_dst += i_dst_channels * i_bytes;
+        pi_src += i_src_channels * i_bytes;
+    }
+}
+
+void aout_ChannelExtract( void *p_dst, int i_dst_channels,
+                          const void *p_src, int i_src_channels,
+                          int i_sample_count, const int *pi_selection, int i_bits_per_sample )
+{
+    /* It does not work in place */
+    assert( p_dst != p_src );
+
+    /* Force the compiler to inline for the specific cases so it can optimize */
+    if( i_bits_per_sample == 8 )
+        ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 1 );
+    else  if( i_bits_per_sample == 16 )
+        ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 2 );
+    else  if( i_bits_per_sample == 24 )
+        ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 3 );
+    else  if( i_bits_per_sample == 32 )
+        ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 4 );
+    else  if( i_bits_per_sample == 64 )
+        ExtractChannel( p_dst, i_dst_channels, p_src, i_src_channels, i_sample_count, pi_selection, 8 );
+}
+
+bool aout_CheckChannelExtraction( int *pi_selection,
+                                  uint32_t *pi_layout, int *pi_channels,
+                                  const uint32_t pi_order_dst[AOUT_CHAN_MAX],
+                                  const uint32_t *pi_order_src, int i_channels )
+{
+    const uint32_t pi_order_dual_mono[] = { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT };
+    uint32_t i_layout = 0;
+    int i_out = 0;
+    int pi_index[AOUT_CHAN_MAX];
+
+    /* */
+    if( !pi_order_dst )
+        pi_order_dst = pi_vlc_chan_order_wg4;
+
+    /* Detect special dual mono case */
+    if( i_channels == 2 &&
+        pi_order_src[0] == AOUT_CHAN_CENTER && pi_order_src[1] == AOUT_CHAN_CENTER )
+    {
+        i_layout |= AOUT_CHAN_DUALMONO;
+        pi_order_src = pi_order_dual_mono;
+    }
+
+    /* */
+    for( int i = 0; i < i_channels; i++ )
+    {
+        /* Ignore unknown or duplicated channels or not present in output */
+        if( !pi_order_src[i] || (i_layout & pi_order_src[i]) )
+            continue;
+
+        for( int j = 0; j < AOUT_CHAN_MAX; j++ )
+        {
+            if( pi_order_dst[j] == pi_order_src[i] )
+            {
+                assert( i_out < AOUT_CHAN_MAX );
+                pi_index[i_out++] = i;
+                i_layout |= pi_order_src[i];
+                break;
+            }
+        }
+    }
+
+    /* */
+    for( int i = 0, j = 0; i < AOUT_CHAN_MAX; i++ )
+    {
+        for( int k = 0; k < i_out; k++ )
+        {
+            if( pi_order_dst[i] == pi_order_src[pi_index[k]] )
+            {
+                pi_selection[j++] = pi_index[k];
+                break;
+            }
+        }
+    }
+
+    *pi_layout = i_layout;
+    *pi_channels = i_out;
+
+    for( int i = 0; i < i_out; i++ )
+    {
+        if( pi_selection[i] != i )
+            return true;
+    }
+    return i_out == i_channels;
+}
