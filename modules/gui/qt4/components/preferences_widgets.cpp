@@ -1345,7 +1345,9 @@ void KeyInputDialog::checkForConflicts( int i_vlckey )
      QList<QTreeWidgetItem *> conflictList =
          table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly, 1 );
 
-    if( conflictList.size() )
+    if( conflictList.size() &&
+        conflictList[0]->data( 1, Qt::UserRole ).toInt() > 1 )
+        /* Avoid 0 or -1 that are the "Unset" states*/
     {
         QLabel *warning = new QLabel(
           qtr("Warning: the key is already assigned to \"") +
