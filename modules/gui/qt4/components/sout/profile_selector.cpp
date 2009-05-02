@@ -332,6 +332,7 @@ void VLCProfileEditor::fillProfile( const QString& qs )
     CHECKMUX( MKVMux, "mkv" )
     CHECKMUX( AVIMux, "avi" )
     CHECKMUX( MJPEGMux, "mjpg" ){}
+#undef CHECKMUX
 
     ui.keepVideo->setChecked( !options[1].toInt() );
     ui.transcodeVideo->setChecked( ( options[4] != "none" ) );
