@@ -406,22 +406,27 @@ static NSMutableArray *blackoutWindows = NULL;
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSUInteger)styleMask
     backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    BOOL b_useTextured = YES;
+    /* FIXME: this should enable the SnowLeopard window style, however, it leads to ugly artifacts
+     *        needs some further investigation! -- feepk
+     BOOL b_useTextured = YES;
+
     if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
     {
         b_useTextured = NO;
         styleMask ^= NSTexturedBackgroundWindowMask;
-    }
+    } */
 
     self = [super initWithContentRect:contentRect styleMask:styleMask //& ~NSTitledWindowMask
     backing:backingType defer:flag];
 
     [[VLCMain sharedInstance] updateTogglePlaylistState];
 
+    /* FIXME: see above...
     if(! b_useTextured )
     {
         [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
     }
+    */
     return self;
 }
 
