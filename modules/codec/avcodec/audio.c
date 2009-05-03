@@ -297,10 +297,10 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     }
 
     i_output = __MAX( p_block->i_buffer, p_sys->i_output_max );
-    if( i_output < p_sys->i_output_max )
+    if( i_output > p_sys->i_output_max )
     {
         /* Grow output buffer if necessary (eg. for PCM data) */
-        p_sys->p_output = realloc(p_sys->p_output, p_block->i_buffer);
+        p_sys->p_output = realloc( p_sys->p_output, i_output );
     }
 
     *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
