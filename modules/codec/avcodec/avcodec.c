@@ -121,6 +121,7 @@ vlc_module_begin ()
     add_integer ( "ffmpeg-lowres", 0, NULL, LOWRES_TEXT, LOWRES_LONGTEXT,
         true )
         change_integer_range( 0, 2 )
+    add_bool( "ffmpeg-fast", 0, NULL, FAST_TEXT, FAST_LONGTEXT, true )
     add_integer ( "ffmpeg-skiploopfilter", 0, NULL, SKIPLOOPF_TEXT,
                   SKIPLOOPF_LONGTEXT, true )
         change_safe ()

@@ -228,6 +228,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( val.i_int > 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
     if( val.i_int > 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
 
+    bool b_fast = var_CreateGetBool( p_dec, "ffmpeg-fast" );
+    if( b_fast ) p_sys->p_context->flags2 |= CODEC_FLAG2_FAST;
+
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-hurry-up", &val );
