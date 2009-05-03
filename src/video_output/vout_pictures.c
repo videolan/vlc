@@ -955,72 +955,42 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
  */
 int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 {
+    static const vlc_fourcc_t p_I420[] = {
+        FOURCC_I420, FOURCC_IYUV, FOURCC_YV12, 0
+    };
+    static const vlc_fourcc_t p_UYVY[] = {
+        FOURCC_UYVY, FOURCC_UYNV, FOURCC_Y422, 0
+    };
+    static const vlc_fourcc_t p_YUYV[] = {
+        FOURCC_YUY2, FOURCC_YUNV, 0
+    };
+    static const vlc_fourcc_t p_GREY[] = {
+        FOURCC_GREY, FOURCC_Y800, FOURCC_Y8, 0
+    };
+    static const vlc_fourcc_t *pp_fcc[] = {
+        p_I420, p_UYVY, p_YUYV, p_GREY, NULL
+    };
+
     /* If they are the same, they are the same ! */
     if( i_chroma == i_amorhc )
-    {
         return 1;
-    }
 
     /* Check for equivalence classes */
-    switch( i_chroma )
+    for( int i = 0; pp_fcc[i] != NULL; i++ )
     {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-            switch( i_amorhc )
-            {
-                case FOURCC_I420:
-                case FOURCC_IYUV:
-                case FOURCC_YV12:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        case FOURCC_UYVY:
-        case FOURCC_UYNV:
-        case FOURCC_Y422:
-            switch( i_amorhc )
-            {
-                case FOURCC_UYVY:
-                case FOURCC_UYNV:
-                case FOURCC_Y422:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        case FOURCC_YUY2:
-        case FOURCC_YUNV:
-            switch( i_amorhc )
-            {
-                case FOURCC_YUY2:
-                case FOURCC_YUNV:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        case FOURCC_GREY:
-        case FOURCC_Y800:
-        case FOURCC_Y8:
-            switch( i_amorhc )
-            {
-                case FOURCC_GREY:
-                case FOURCC_Y800:
-                case FOURCC_Y8:
-                    return 1;
-
-                default:
-                    return 0;
-            }
-
-        default:
-            return 0;
+        bool b_fcc1 = false;
+        bool b_fcc2 = false;
+        for( int j = 0; pp_fcc[i][j] != 0; j++ )
+        {
+            if( i_chroma == pp_fcc[i][j] )
+                b_fcc1 = true;
+            if( i_amorhc == pp_fcc[i][j] )
+                b_fcc2 = true;
+        }
+        if( b_fcc1 && b_fcc2 )
+            return 1;
     }
+    return 0;
 }
 
 /*****************************************************************************
