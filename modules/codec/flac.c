@@ -160,11 +160,11 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
                                   void *client_data);
 
 static void Interleave32( int32_t *p_out, const int32_t * const *pp_in,
-                          int i_nb_channels, int i_samples );
+                          const int *pi_order, int i_nb_channels, int i_samples );
 static void Interleave24( int8_t *p_out, const int32_t * const *pp_in,
-                          int i_nb_channels, int i_samples );
+                          const int *pi_order, int i_nb_channels, int i_samples );
 static void Interleave16( int16_t *p_out, const int32_t * const *pp_in,
-                          int i_nb_channels, int i_samples );
+                          const int *pi_order, int i_nb_channels, int i_samples );
 
 static void decoder_state_error( decoder_t *p_dec,
                                  FLAC__StreamDecoderState state );
@@ -617,9 +617,28 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
                       const FLAC__Frame *frame,
                       const FLAC__int32 *const buffer[], void *client_data )
 {
+    /* XXX it supposes our internal format is WG4 */
+    static const int ppi_reorder[1+8][8] = {
+        {-1},
+        { 0, },
+        { 0, 1 },
+        { 0, 1, 2 },
+        { 0, 1, 2, 3 },
+        { 0, 1, 3, 4, 2 },
+        { 0, 1, 4, 5, 2, 3 },
+
+        { 0, 1, 6, 2, 3, 4, 5 },    /* 7.0 Unspecified by flac */
+        { 0, 1, 6, 7, 2, 3, 4, 5 }, /* 7.1 Unspecified by flac */
+    };
+
     VLC_UNUSED(decoder);
     decoder_t *p_dec = (decoder_t *)client_data;
     decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_dec->fmt_out.audio.i_channels <= 0 ||
+        p_dec->fmt_out.audio.i_channels > 8 )
+        return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+    const int * const pi_reorder = ppi_reorder[p_dec->fmt_out.audio.i_channels];
 
     p_sys->p_aout_buffer =
         decoder_NewAudioBuffer( p_dec, frame->header.blocksize );
@@ -630,15 +649,15 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     switch( frame->header.bits_per_sample )
     {
     case 16:
-        Interleave16( (int16_t *)p_sys->p_aout_buffer->p_buffer, buffer,
+        Interleave16( (int16_t *)p_sys->p_aout_buffer->p_buffer, buffer, pi_reorder,
                       frame->header.channels, frame->header.blocksize );
         break;
     case 24:
-        Interleave24( (int8_t *)p_sys->p_aout_buffer->p_buffer, buffer,
+        Interleave24( (int8_t *)p_sys->p_aout_buffer->p_buffer, buffer, pi_reorder,
                       frame->header.channels, frame->header.blocksize );
         break;
     default:
-        Interleave32( (int32_t *)p_sys->p_aout_buffer->p_buffer, buffer,
+        Interleave32( (int32_t *)p_sys->p_aout_buffer->p_buffer, buffer, pi_reorder,
                       frame->header.channels, frame->header.blocksize );
     }
 
@@ -738,6 +757,7 @@ static void DecoderErrorCallback( const FLAC__StreamDecoder *decoder,
  * Interleave: helper function to interleave channels
  *****************************************************************************/
 static void Interleave32( int32_t *p_out, const int32_t * const *pp_in,
+                          const int pi_index[],
                           int i_nb_channels, int i_samples )
 {
     int i, j;
@@ -745,12 +765,13 @@ static void Interleave32( int32_t *p_out, const int32_t * const *pp_in,
     {
         for ( i = 0; i < i_nb_channels; i++ )
         {
-            p_out[j * i_nb_channels + i] = pp_in[i][j];
+            p_out[j * i_nb_channels + i] = pp_in[pi_index[i]][j];
         }
     }
 }
 
 static void Interleave24( int8_t *p_out, const int32_t * const *pp_in,
+                          const int pi_index[],
                           int i_nb_channels, int i_samples )
 {
     int i, j;
@@ -758,20 +779,22 @@ static void Interleave24( int8_t *p_out, const int32_t * const *pp_in,
     {
         for ( i = 0; i < i_nb_channels; i++ )
         {
+            const int i_index = pi_index[i];
 #ifdef WORDS_BIGENDIAN
-            p_out[3*(j * i_nb_channels + i)+0] = (pp_in[i][j] >> 16) & 0xff;
-            p_out[3*(j * i_nb_channels + i)+1] = (pp_in[i][j] >> 8 ) & 0xff;
-            p_out[3*(j * i_nb_channels + i)+2] = (pp_in[i][j] >> 0 ) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+0] = (pp_in[i_index][j] >> 16) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+1] = (pp_in[i_index][j] >> 8 ) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+2] = (pp_in[i_index][j] >> 0 ) & 0xff;
 #else
-            p_out[3*(j * i_nb_channels + i)+2] = (pp_in[i][j] >> 16) & 0xff;
-            p_out[3*(j * i_nb_channels + i)+1] = (pp_in[i][j] >> 8 ) & 0xff;
-            p_out[3*(j * i_nb_channels + i)+0] = (pp_in[i][j] >> 0 ) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+2] = (pp_in[i_index][j] >> 16) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+1] = (pp_in[i_index][j] >> 8 ) & 0xff;
+            p_out[3*(j * i_nb_channels + i)+0] = (pp_in[i_index][j] >> 0 ) & 0xff;
 #endif
         }
     }
 }
 
 static void Interleave16( int16_t *p_out, const int32_t * const *pp_in,
+                          const int pi_index[],
                           int i_nb_channels, int i_samples )
 {
     int i, j;
@@ -779,7 +802,7 @@ static void Interleave16( int16_t *p_out, const int32_t * const *pp_in,
     {
         for ( i = 0; i < i_nb_channels; i++ )
         {
-            p_out[j * i_nb_channels + i] = (int32_t)(pp_in[i][j]);
+            p_out[j * i_nb_channels + i] = (int32_t)(pp_in[pi_index[i]][j]);
         }
     }
 }
