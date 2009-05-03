@@ -88,6 +88,7 @@ static void *SigThread (void *data)
 {
     intf_thread_t *obj = data;
     sigset_t set;
+    int signum;
 
     sigemptyset (&set);
     sigaddset (&set, SIGHUP);
@@ -97,10 +98,8 @@ static void *SigThread (void *data)
 
     sigaddset (&set, SIGCHLD);
 
-    for (;;)
+    do
     {
-        int signum;
-
         sigwait (&set, &signum);
 
 #ifdef __APPLE__
@@ -108,17 +107,15 @@ static void *SigThread (void *data)
          * cancellation point */
         vlc_testcancel();
 #endif
-
-        switch (signum)
-        {
-            case SIGINT:
-            case SIGHUP:
-            case SIGTERM:
-            case SIGQUIT:
-                msg_Err (obj, "Caught %s signal, exiting...",
-                         strsignal (signum));
-                libvlc_Quit (obj->p_libvlc);
-                break;
-        }
     }
+    while (signum == SIGCHLD);
+
+    msg_Err (obj, "Caught %s signal, exiting...", strsignal (signum));
+    libvlc_Quit (obj->p_libvlc);
+
+    /* After 3 seconds, fallback to normal signal handling */
+    msleep (3 * CLOCK_FREQ);
+    pthread_sigmask (SIG_UNBLOCK, &set, NULL);
+    for (;;)
+        pause ();
 }
