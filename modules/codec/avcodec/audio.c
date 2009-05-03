@@ -78,7 +78,7 @@ struct decoder_sys_t
     int64_t i_previous_layout;
 };
 
-static void SetupOutputFormat( decoder_t *p_dec );
+static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
 
 /*****************************************************************************
  * InitAudioDec: initialize audio decoder
@@ -211,7 +211,9 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         aout_DateInit( &p_sys->end_date, p_dec->fmt_in.audio.i_rate );
 
     /* */
-    es_format_Init( &p_dec->fmt_out, AUDIO_ES, 0 );
+    p_dec->fmt_out.i_cat = AUDIO_ES;
+    /* Try to set as much informations as possible but do not trust it */
+    SetupOutputFormat( p_dec, false );
 
     return VLC_SUCCESS;
 }
@@ -350,7 +352,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* **** Set audio output parameters **** */
-    SetupOutputFormat( p_dec );
+    SetupOutputFormat( p_dec, true );
 
     if( p_block->i_pts != 0 &&
         p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
@@ -412,7 +414,7 @@ static const uint64_t pi_channels_map[][2] =
     { CH_STEREO_RIGHT,      0 },
 };
 
-static void SetupOutputFormat( decoder_t *p_dec )
+static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -453,8 +455,11 @@ static void SetupOutputFormat( decoder_t *p_dec )
     if( p_sys->i_previous_channels == p_sys->p_context->channels &&
         p_sys->i_previous_layout == p_sys->p_context->channel_layout )
         return;
-    p_sys->i_previous_channels = p_sys->p_context->channels;
-    p_sys->i_previous_layout = p_sys->p_context->channel_layout;
+    if( b_trust )
+    {
+        p_sys->i_previous_channels = p_sys->p_context->channels;
+        p_sys->i_previous_layout = p_sys->p_context->channel_layout;
+    }
 
     /* Specified order
      * FIXME should we use fmt_in.audio.i_physical_channels or not ?
@@ -474,14 +479,15 @@ static void SetupOutputFormat( decoder_t *p_dec )
     else
     {
         /* Create default order  */
-        msg_Warn( p_dec, "Physical channel configuration not set : guessing" );
+        if( b_trust )
+            msg_Warn( p_dec, "Physical channel configuration not set : guessing" );
         for( unsigned int i = 0; i < __MIN( i_order_max, (unsigned)p_sys->p_context->channels ); i++ )
         {
             if( i < sizeof(pi_channels_map)/sizeof(*pi_channels_map) )
                 pi_order_src[i_channels_src++] = pi_channels_map[i][1];
         }
     }
-    if( i_channels_src != p_sys->p_context->channels )
+    if( i_channels_src != p_sys->p_context->channels && b_trust )
         msg_Err( p_dec, "Channel layout not understood" );
 
     uint32_t i_layout_dst;
@@ -489,7 +495,7 @@ static void SetupOutputFormat( decoder_t *p_dec )
     p_sys->b_extract = aout_CheckChannelExtraction( p_sys->pi_extraction,
                                                     &i_layout_dst, &i_channels_dst,
                                                     NULL, pi_order_src, i_channels_src );
-    if( i_channels_dst != i_channels_src )
+    if( i_channels_dst != i_channels_src && b_trust )
         msg_Warn( p_dec, "%d channels are dropped", i_channels_src - i_channels_dst );
 
     p_dec->fmt_out.audio.i_physical_channels =
