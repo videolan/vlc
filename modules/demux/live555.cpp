@@ -117,9 +117,11 @@ vlc_module_begin ()
         add_bool( "rtsp-mcast", false, NULL,
                   N_("Force multicast RTP via RTSP"),
                   N_("Force multicast RTP via RTSP"), true )
+            change_safe()
         add_bool( "rtsp-http", 0, NULL,
                   N_("Tunnel RTSP and RTP over HTTP"),
                   N_("Tunnel RTSP and RTP over HTTP"), true )
+            change_safe()
         add_integer( "rtsp-http-port", 80, NULL,
                   N_("HTTP tunnel port"),
                   N_("Port to use for tunneling the RTSP/RTP over HTTP."),
