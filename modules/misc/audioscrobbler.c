@@ -792,16 +792,21 @@ static int Handshake( intf_thread_t *p_this )
     psz_scrobbler_url = strdup( "post.audioscrobbler.com" );
 #endif
     if( !psz_scrobbler_url )
+    {
+        free( psz_username );
         return VLC_ENOMEM;
+    }
 
     if( !asprintf( &psz_handshake_url,
     "http://%s/?hs=true&p=1.2&c=%s&v=%s&u=%s&t=%s&a=%s", psz_scrobbler_url,
         CLIENT_NAME, CLIENT_VERSION, psz_username, psz_timestamp,
         p_sys->psz_auth_token ) )
     {
+        free( psz_scrobbler_url );
         free( psz_username );
         return VLC_ENOMEM;
     }
+    free( psz_scrobbler_url );
     free( psz_username );
 
     /* send the http handshake request */
