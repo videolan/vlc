@@ -552,6 +552,7 @@ static void Ogg_UpdatePCR( logical_stream_t *p_stream,
                               / p_stream->f_rate;
         }
 
+        p_stream->i_pcr += 1;
         p_stream->i_interpolated_pcr = p_stream->i_pcr;
     }
     else
