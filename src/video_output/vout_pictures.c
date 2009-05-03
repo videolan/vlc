@@ -956,7 +956,16 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
 int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 {
     static const vlc_fourcc_t p_I420[] = {
-        FOURCC_I420, FOURCC_IYUV, FOURCC_YV12, 0
+        FOURCC_I420, FOURCC_IYUV, FOURCC_YV12, FOURCC_J420, 0
+    };
+    static const vlc_fourcc_t p_I422[] = {
+        FOURCC_I422, FOURCC_J422, 0
+    };
+    static const vlc_fourcc_t p_I440[] = {
+        FOURCC_I440, FOURCC_J440, 0
+    };
+    static const vlc_fourcc_t p_I444[] = {
+        FOURCC_I444, FOURCC_J444, 0
     };
     static const vlc_fourcc_t p_UYVY[] = {
         FOURCC_UYVY, FOURCC_UYNV, FOURCC_Y422, 0
@@ -968,7 +977,7 @@ int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
         FOURCC_GREY, FOURCC_Y800, FOURCC_Y8, 0
     };
     static const vlc_fourcc_t *pp_fcc[] = {
-        p_I420, p_UYVY, p_YUYV, p_GREY, NULL
+        p_I420, p_I422, p_I440, p_I444, p_UYVY, p_YUYV, p_GREY, NULL
     };
 
     /* If they are the same, they are the same ! */
