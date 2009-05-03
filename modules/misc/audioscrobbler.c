@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audioscrobbler.c : audioscrobbler submission plugin
  *****************************************************************************
- * Copyright © 2006-2008 the VideoLAN team
+ * Copyright © 2006-2009 the VideoLAN team
  * $Id$
  *
  * Author: Rafaël Carré <funman at videolanorg>
@@ -134,6 +134,10 @@ static void HandleInterval  ( mtime_t *, unsigned int * );
 #define USERNAME_LONGTEXT   N_("The username of your last.fm account")
 #define PASSWORD_TEXT       N_("Password")
 #define PASSWORD_LONGTEXT   N_("The password of your last.fm account")
+#if 0
+    #define URL_TEXT       N_("Scrobbler URL")
+    #define URL_LONGTEXT   N_("The URL set for an alternative scrobbler engine")
+#endif
 
 /* This error value is used when last.fm plugin has to be unloaded. */
 #define VLC_AUDIOSCROBBLER_EFATAL -69
@@ -149,7 +153,7 @@ static void HandleInterval  ( mtime_t *, unsigned int * );
                         "Connection: close\n"                               \
                         "Content-type: application/x-www-form-urlencoded\n" \
                         "Host: %s\n"                                        \
-                        "User-agent: VLC Media Player/%s\r\n"               \
+                        "User-agent: VLC media player/%s\r\n"               \
                         "\r\n"                                              \
                         "%s\r\n"                                            \
                         "\r\n"
@@ -163,6 +167,10 @@ vlc_module_begin ()
                 USERNAME_TEXT, USERNAME_LONGTEXT, false )
     add_password( "lastfm-password", "", NULL,
                 PASSWORD_TEXT, PASSWORD_LONGTEXT, false )
+#if 0
+    add_string( "scrobbler-url", "post.audioscrobbler.com", NULL,
+                URL_TEXT, URL_LONGTEXT, false )*/
+#endif
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -391,7 +399,7 @@ static void Run( intf_thread_t *p_intf )
         i_net_ret = net_Printf(
             VLC_OBJECT( p_intf ), i_post_socket, NULL,
             POST_REQUEST, p_sys->psz_submit_file,
-            (unsigned)strlen( psz_submit ), p_sys->psz_submit_file,
+            (unsigned)strlen( psz_submit ), p_sys->psz_submit_host,
             VERSION, psz_submit
         );
 
@@ -654,26 +662,34 @@ static int ParseURL( char *psz_url, char **psz_host, char **psz_file,
 {
     int i_pos;
     int i_len = strlen( psz_url );
+    bool b_no_port = false;
     FREENULL( *psz_host );
     FREENULL( *psz_file );
 
     i_pos = strcspn( psz_url, ":" );
     if( i_pos == i_len )
-        return VLC_EGENERIC;
+    {
+        *i_port = 80;
+        i_pos = strcspn( psz_url, "/" );
+        b_no_port = true;
+    }
 
     *psz_host = strndup( psz_url, i_pos );
     if( !*psz_host )
         return VLC_ENOMEM;
 
-    i_pos++; /* skip the ':' */
-    *i_port = atoi( psz_url + i_pos );
-    if( *i_port <= 0 )
+    if( !b_no_port )
     {
-        FREENULL( *psz_host );
-        return VLC_EGENERIC;
-    }
+        i_pos++; /* skip the ':' */
+        *i_port = atoi( psz_url + i_pos );
+        if( *i_port <= 0 )
+        {
+            FREENULL( *psz_host );
+            return VLC_EGENERIC;
+        }
 
-    i_pos = strcspn( psz_url, "/" );
+        i_pos = strcspn( psz_url, "/" );
+    }
 
     if( i_pos == i_len )
         return VLC_EGENERIC;
@@ -696,6 +712,7 @@ static int ParseURL( char *psz_url, char **psz_host, char **psz_file,
 static int Handshake( intf_thread_t *p_this )
 {
     char                *psz_username, *psz_password;
+    char                *psz_scrobbler_url;
     time_t              timestamp;
     char                psz_timestamp[21];
 
@@ -769,8 +786,16 @@ static int Handshake( intf_thread_t *p_this )
     strncpy( p_sys->psz_auth_token, psz_auth_token, 33 );
     free( psz_auth_token );
 
+#if 0
+    psz_scrobbler_url = config_GetPsz( p_this, "scrobbler-url" );
+#else
+    psz_scrobbler_url = strdup( "post.audioscrobbler.com" );
+#endif
+    if( !psz_scrobbler_url )
+        return VLC_ENOMEM;
+
     if( !asprintf( &psz_handshake_url,
-    "http://post.audioscrobbler.com/?hs=true&p=1.2&c=%s&v=%s&u=%s&t=%s&a=%s",
+    "http://%s/?hs=true&p=1.2&c=%s&v=%s&u=%s&t=%s&a=%s", psz_scrobbler_url,
         CLIENT_NAME, CLIENT_VERSION, psz_username, psz_timestamp,
         p_sys->psz_auth_token ) )
     {
