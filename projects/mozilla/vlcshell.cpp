@@ -428,7 +428,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     {
         /* change/set parent */
         libvlc_video_set_parent(p_vlc, 0, &ex);
-
         if( libvlc_exception_raised(&ex) )
             fprintf( stderr, "Exception: %s\n", libvlc_exception_get_message(&ex) );
         libvlc_exception_clear(&ex);
@@ -540,16 +539,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
                                (XtEventHandler)Resize, p_plugin );
             XtAddEventHandler( w, ButtonReleaseMask, FALSE,
                                (XtEventHandler)ControlHandler, p_plugin );
-
-            /* callback */
-/*
-            libvlc_media_player_t *p_md;
-
-            p_md = p_plugin->getMD( &ex );
-            libvlc_exception_clear( &ex );
-            libvlc_event_attach( libvlc_media_player_event_manager( p_md, &ex ),
-                                 libvlc_MediaPlayerPositionChanged, Redraw, NULL, &ex );
-*/
 
             /* set/change parent window */
             libvlc_video_set_parent( p_vlc, (libvlc_drawable_t) video, &ex );
