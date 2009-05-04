@@ -442,13 +442,13 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
     stream_sys_t *p_sys = s->p_sys;
     const uint8_t *p_peek;
 
-    if( stream_Peek( s->p_source, &p_peek, p_hdr->i_size ) < p_hdr->i_size )
-        return VLC_EGENERIC;
-
     int i_min_size = 7+21;
     if( p_hdr->i_flags & RAR_BLOCK_FILE_HAS_HIGH )
         i_min_size += 8;
     if( p_hdr->i_size < i_min_size )
+        return VLC_EGENERIC;
+
+    if( stream_Peek( s->p_source, &p_peek, i_min_size ) < i_min_size )
         return VLC_EGENERIC;
 
     /* */
@@ -465,7 +465,15 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
 
     const int i_name_offset = (p_hdr->i_flags & RAR_BLOCK_FILE_HAS_HIGH) ? (7+33) : (7+25);
     if( i_name_offset + i_name_size <= p_hdr->i_size )
+    {
+        const int i_max_size = i_name_offset + i_name_size;
+        if( stream_Peek( s->p_source, &p_peek, i_max_size ) < i_max_size )
+        {
+            free( psz_name );
+            return VLC_EGENERIC;
+        }
         memcpy( psz_name, &p_peek[i_name_offset], i_name_size );
+    }
 
     if( i_method != 0x30 )
     {
