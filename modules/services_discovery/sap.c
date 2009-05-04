@@ -1491,6 +1491,7 @@ static int Decompress( const unsigned char *psz_src, unsigned char **_dst, int i
         if( ( i_result != Z_OK ) && ( i_result != Z_STREAM_END ) )
         {
             inflateEnd( &d_stream );
+            free( psz_dst );
             return( -1 );
         }
     }
