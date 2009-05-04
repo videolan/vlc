@@ -1058,14 +1058,10 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
         stream_sys_t *p_sys = s->p_sys;
         access_t     *p_access = p_sys->p_access;
 
-        /* seeking after EOF is not what we want */
-        if( !( p_access->info.b_eof ) )
-        {
-            bool   b_aseek;
-            access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
-            if( b_aseek )
-                return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
-        }
+        bool   b_aseek;
+        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
+        if( b_aseek )
+            return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
     }
 
 #ifdef STREAM_DEBUG
