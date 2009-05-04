@@ -362,6 +362,9 @@ static int Seek( access_t * p_access, int64_t i_pos )
         i_packet = ( i_pos - p_sys->i_header ) / p_sys->i_packet_length;
         i_offset = ( i_pos - p_sys->i_header ) % p_sys->i_packet_length;
     }
+    if( p_sys->b_seekable && i_packet >= p_sys->i_packet_count )
+        return VLC_EGENERIC;
+
     msg_Dbg( p_access, "seeking to %"PRId64 " (packet:%d)", i_pos, i_packet );
 
     MMSStop( p_access );
