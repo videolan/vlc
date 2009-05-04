@@ -588,7 +588,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             tk->i_extra = 11 + sizeof( BITMAPINFOHEADER ) + i_codec_extra;
             tk->p_extra = malloc( tk->i_extra );
             if( !tk->p_extra )
+            {
+                free( p_codec_extra );
                 return VLC_ENOMEM;
+            }
             bo_init( &bo, tk->p_extra, tk->i_extra );
             bo_addle_u32( &bo, p_input->p_fmt->video.i_width );
             bo_addle_u32( &bo, p_input->p_fmt->video.i_height );
@@ -606,7 +609,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             bo_addle_u32( &bo, 0 );
             bo_addle_u32( &bo, 0 );
             if( i_codec_extra > 0 )
+            {
                 bo_add_mem( &bo, p_codec_extra, i_codec_extra );
+                free( p_codec_extra );
+            }
 
             if( p_input->p_fmt->i_bitrate > 50000 )
             {
