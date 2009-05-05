@@ -123,8 +123,8 @@ vlc_module_begin ()
 #endif
     add_shortcut( "opengl" )
     /* Allow opengl provider plugin selection */
-    add_string( "opengl-provider", "default", NULL, PROVIDER_TEXT, 
-                    PROVIDER_LONGTEXT, true )
+    add_module( "opengl-provider", "opengl provider", NULL, NULL,
+                PROVIDER_TEXT, PROVIDER_LONGTEXT, true )
     set_callbacks( CreateVout, DestroyVout )
 vlc_module_end ()
 
@@ -194,11 +194,7 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->i_zoom = p_vout->i_zoom;
     p_sys->p_vout->i_alignment = p_vout->i_alignment;
 
-    psz = config_GetPsz( p_vout, "opengl-provider" );
-
-    msg_Dbg( p_vout, "requesting \"%s\" opengl provider",
-                      psz ? psz : "default" );
-
+    psz = var_CreateGetString( p_vout, "opengl-provider" );
     p_sys->p_vout->p_module =
         module_need( p_sys->p_vout, "opengl provider", psz, false );
     free( psz );
