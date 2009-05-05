@@ -653,13 +653,11 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
                                   libvlc_exception_t *p_e )
 {
     input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-
     if( !p_input_thread )
         return;
 
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
-
-    if( state == libvlc_Playing )
+    if( state == libvlc_Playing || state == libvlc_Buffering )
     {
         if( libvlc_media_player_can_pause( p_mi, p_e ) )
             input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
@@ -681,7 +679,7 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
-    return libvlc_Playing == state;
+    return (libvlc_Playing == state) || (libvlc_Buffering == state);
 }
 
 /**************************************************************************
@@ -692,10 +690,12 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 {
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
 
-    if( state == libvlc_Playing || state == libvlc_Paused )
+    if( state == libvlc_Playing ||
+        state == libvlc_Paused ||
+        state == libvlc_Buffering )
     {
-        /* Send a stop notification event only if we are in playing or
-         * paused states */
+        /* Send a stop notification event only if we are in playing,
+         * buffering or paused states */
         libvlc_media_set_state( p_mi->p_md, libvlc_Ended, p_e );
 
         /* Construct and send the event */
