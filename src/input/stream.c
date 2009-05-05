@@ -1061,7 +1061,16 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
         bool   b_aseek;
         access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
         if( b_aseek )
-            return AStreamSeekStream( s, p_sys->i_pos + i_read ) ? 0 : i_read;
+        {
+            const int64_t i_pos_wanted = p_sys->i_pos + i_read;
+
+            if( AStreamSeekStream( s, i_pos_wanted ) )
+            {
+                if( p_sys->i_pos != i_pos_wanted )
+                    return 0;
+            }
+            return i_read;
+        }
     }
 
 #ifdef STREAM_DEBUG
