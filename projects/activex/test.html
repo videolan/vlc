@@ -391,6 +391,9 @@ function updateVolume(deltaVol)
 
 function formatTime(timeVal)
 {
+    if( typeof timeVal != 'number' )
+        return "-:--:--";
+
     var timeHour = Math.round(timeVal / 1000);
     var timeSec = timeHour % 60;
     if( timeSec < 10 )
