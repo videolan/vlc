@@ -100,8 +100,6 @@ static int Open( vlc_object_t *p_this )
         goto error;
 
     /* Get the root windows of the default screen */
-    memset( &p_sys->root, 0, sizeof( p_sys->root ) );
-
     const xcb_setup_t* xcbsetup = xcb_get_setup( p_sys->p_connection );
     if( !xcbsetup )
         goto error;
