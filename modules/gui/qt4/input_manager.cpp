@@ -589,7 +589,7 @@ void InputManager::UpdateArt()
     if( hasInput() )
     {
         char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
-        url = psz_art;
+        url = qfu( psz_art );
         free( psz_art );
     }
     url = url.replace( "file://", QString("" ) );
