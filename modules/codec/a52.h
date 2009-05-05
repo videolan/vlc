@@ -192,9 +192,9 @@ static inline int vlc_a52_header_Parse( vlc_a52_header_t *p_header,
         { 3, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER }, /* 2F1R 2/1 */
         { 4, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
              AOUT_CHAN_REARCENTER },                                    /* 3F1R 3/1 */
-        { 5, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+        { 4, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
              AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT },                /* 2F2R 2/2 */
-        { 6, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
+        { 5, AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER |
              AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT },                /* 3F2R 3/2 */
     };
 
