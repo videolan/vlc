@@ -457,10 +457,12 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
 
     /* */
-    if( p_sys->i_previous_channels == p_sys->p_context->channels )
-        return;
 #if defined(LIBAVCODEC_AUDIO_LAYOUT)
-    if( p_sys->i_previous_layout == p_sys->p_context->channel_layout )
+    if( p_sys->i_previous_channels == p_sys->p_context->channels &&
+        p_sys->i_previous_layout == p_sys->p_context->channel_layout )
+        return;
+#else
+    if( p_sys->i_previous_channels == p_sys->p_context->channels )
         return;
 #endif
     if( b_trust )
