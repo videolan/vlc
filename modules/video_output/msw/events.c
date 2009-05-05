@@ -44,6 +44,7 @@
 #include <vlc_window.h>
 
 #include <windows.h>
+#include <tchar.h>
 #include <windowsx.h>
 #include <shellapi.h>
 

@@ -36,6 +36,8 @@
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 
+#include <windows.h>
+#include <tchar.h>
 #include <commctrl.h>
 
 /*#ifdef MODULE_NAME_IS_wingapi

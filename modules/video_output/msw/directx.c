@@ -47,6 +47,7 @@
 #include <vlc_vout.h>
 
 #include <windows.h>
+#include <tchar.h>
 #include <ddraw.h>
 #include <commctrl.h>
 
