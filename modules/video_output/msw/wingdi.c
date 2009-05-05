@@ -69,7 +69,7 @@
 #       define kfDirect444      0x200
 #       define kfDirectInverted 0x400
 #   endif
-#endif /* MODULE_NAME_IS_wingapi */
+#endif */ /* MODULE_NAME_IS_wingapi */
 
 #include "vout.h"
 
