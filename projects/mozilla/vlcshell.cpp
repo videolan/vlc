@@ -167,8 +167,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
         return false;
     }
 
-    VlcPlugin *p_plugin = (VlcPlugin*)instance->pdata;
-
+    VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(instance->pdata);
     if( p_plugin == NULL )
     {
         return false;
