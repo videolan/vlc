@@ -359,7 +359,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
     p_dec->fmt_out.audio.i_channels = p_sys->frame.i_channels;
     if( p_dec->fmt_out.audio.i_bytes_per_frame < p_sys->frame.i_size )
         p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->frame.i_size;
-    p_dec->fmt_out.audio.i_frame_length = A52_FRAME_NB;
+    p_dec->fmt_out.audio.i_frame_length = p_sys->frame.i_samples;
 
     p_dec->fmt_out.audio.i_original_channels = p_sys->frame.i_channels_conf;
     p_dec->fmt_out.audio.i_physical_channels =
@@ -391,11 +391,11 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     aout_buffer_t *p_buf;
 
-    p_buf = decoder_NewAudioBuffer( p_dec, A52_FRAME_NB  );
+    p_buf = decoder_NewAudioBuffer( p_dec, p_sys->frame.i_samples );
     if( p_buf == NULL ) return NULL;
 
     p_buf->start_date = aout_DateGet( &p_sys->end_date );
-    p_buf->end_date = aout_DateIncrement( &p_sys->end_date, A52_FRAME_NB );
+    p_buf->end_date = aout_DateIncrement( &p_sys->end_date, p_sys->frame.i_samples );
 
     return p_buf;
 }
@@ -414,7 +414,7 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
     p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
 
     p_block->i_length =
-        aout_DateIncrement( &p_sys->end_date, A52_FRAME_NB ) - p_block->i_pts;
+        aout_DateIncrement( &p_sys->end_date, p_sys->frame.i_samples ) - p_block->i_pts;
 
     return p_block;
 }

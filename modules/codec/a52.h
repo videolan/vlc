@@ -54,6 +54,7 @@ typedef struct
     unsigned int i_bitrate;
 
     unsigned int i_size;
+    unsigned int i_samples;
 
 } vlc_a52_header_t;
 
@@ -122,6 +123,8 @@ static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
     default:
         return VLC_EGENERIC;
     }
+    p_header->i_samples = 6*256;
+
     p_header->b_eac3 = false;
     return VLC_SUCCESS;
 }
@@ -170,6 +173,7 @@ static inline int vlc_a52_header_ParseEac3( vlc_a52_header_t *p_header,
     p_header->i_channels      = p_acmod[i_acmod].i_count + i_lfeon;
     p_header->i_channels_conf = p_acmod[i_acmod].i_configuration | ( i_lfeon ? AOUT_CHAN_LFE : 0);
     p_header->i_bitrate = 8 * p_header->i_size * (p_header->i_rate) / (i_numblkscod * 256);
+    p_header->i_samples = i_numblkscod * 256;
 
     p_header->b_eac3 = true;
     return VLC_SUCCESS;
