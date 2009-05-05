@@ -414,11 +414,16 @@ static const uint64_t pi_channels_map[][2] =
     { CH_STEREO_RIGHT,      0 },
 };
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 2, 0 )
+#   define LIBAVCODEC_AUDIO_LAYOUT
+#else
+#   warning "Audio channel layout is unsupported by your avcodec version."
+#endif
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-#if defined(AV_VERSION_INT) && LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 65, 0 )
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 65, 0 )
     switch( p_sys->p_context->sample_fmt )
     {
     case SAMPLE_FMT_U8:
@@ -452,22 +457,32 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
 
     /* */
-    if( p_sys->i_previous_channels == p_sys->p_context->channels &&
-        p_sys->i_previous_layout == p_sys->p_context->channel_layout )
+    if( p_sys->i_previous_channels == p_sys->p_context->channels )
         return;
+#if defined(LIBAVCODEC_AUDIO_LAYOUT)
+    if( p_sys->i_previous_layout == p_sys->p_context->channel_layout )
+        return;
+#endif
     if( b_trust )
     {
         p_sys->i_previous_channels = p_sys->p_context->channels;
+#if defined(LIBAVCODEC_AUDIO_LAYOUT)
         p_sys->i_previous_layout = p_sys->p_context->channel_layout;
+#endif
     }
 
     /* Specified order
      * FIXME should we use fmt_in.audio.i_physical_channels or not ?
      */
+#if defined(LIBAVCODEC_AUDIO_LAYOUT)
     const unsigned i_order_max = 8 * sizeof(p_sys->p_context->channel_layout);
+#else
+    const unsigned i_order_max = 64;
+#endif
     uint32_t pi_order_src[i_order_max];
     int i_channels_src = 0;
 
+#if defined(LIBAVCODEC_AUDIO_LAYOUT)
     if( p_sys->p_context->channel_layout )
     {
         for( unsigned i = 0; i < sizeof(pi_channels_map)/sizeof(*pi_channels_map); i++ )
@@ -477,6 +492,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         }
     }
     else
+#endif
     {
         /* Create default order  */
         if( b_trust )
