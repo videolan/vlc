@@ -136,7 +136,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     /* parse plugin arguments */
     for( int i = 0; i < argc ; i++ )
     {
-        fprintf(stderr, "argn=%s, argv=%s\n", argn[i], argv[i]);
+       /* fprintf(stderr, "argn=%s, argv=%s\n", argn[i], argv[i]); */
 
         if( !strcmp( argn[i], "target" )
          || !strcmp( argn[i], "mrl")
@@ -187,7 +187,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         }
         else if( !strcmp( argn[i], "toolbar" ) )
         {
-/* FIXME: Remove this when toolbar functionality has been implemented on\
+/* FIXME: Remove this when toolbar functionality has been implemented on
  * MacOS X and Win32 for Firefox/Mozilla/Safari. */
 #ifdef XP_UNIX
             b_toolbar = boolValue(argv[i]);
@@ -199,7 +199,6 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     libvlc_exception_init(&ex);
 
     libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv, &ex);
-
     if( libvlc_exception_raised(&ex) )
     {
         libvlc_exception_clear(&ex);
