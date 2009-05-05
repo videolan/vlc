@@ -123,7 +123,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     input_thread_t *p_input;
     playlist_t *p_playlist = pl_Hold( p_this );
 
-    p_input = p_playlist->p_input;
+    p_input = playlist_CurrentInput( p_playlist );
     pl_Release( p_this );
 
     if( !p_input ) return VLC_SUCCESS;
