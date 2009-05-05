@@ -61,6 +61,11 @@ static aout_input_t * DecNew( aout_instance_t * p_aout,
         msg_Err( p_aout, "no audio channels" );
         return NULL;
     }
+    if( p_format->i_channels != aout_FormatNbChannels( p_format ) )
+    {
+        msg_Err( p_aout, "incompatible audio channels count with layout mask" );
+        return NULL;
+    }
 
     if( p_format->i_rate > 192000 )
     {
