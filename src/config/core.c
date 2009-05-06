@@ -26,7 +26,6 @@
 #endif
 
 #include <vlc_common.h>
-#include "../libvlc.h"
 #include "vlc_keys.h"
 #include "vlc_charset.h"
 #include "vlc_configuration.h"
@@ -534,13 +533,8 @@ void config_UnsetCallbacks( module_config_t *p_new, size_t n )
  *****************************************************************************/
 void __config_ResetAll( vlc_object_t *p_this )
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     module_t *p_module;
     module_t **list = module_list_get (NULL);
-
-    /* Acquire config file lock */
-    vlc_mutex_lock( &priv->config_lock );
-
 
     for (size_t j = 0; (p_module = list[j]) != NULL; j++)
     {
@@ -568,5 +562,4 @@ void __config_ResetAll( vlc_object_t *p_this )
     }
 
     module_list_free (list);
-    vlc_mutex_unlock( &priv->config_lock );
 }

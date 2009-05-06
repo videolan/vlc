@@ -152,15 +152,11 @@ static int strtoi (const char *str)
  *****************************************************************************/
 int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     FILE *file;
 
     file = config_OpenConfigFile (p_this, "rt");
     if (file == NULL)
         return VLC_EGENERIC;
-
-    /* Acquire config file lock */
-    vlc_mutex_lock( &priv->config_lock );
 
     /* Look for the selected module, if NULL then save everything */
     module_t **list = module_list_get (NULL);
@@ -314,8 +310,6 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         uselocale (baseloc);
         freelocale (loc);
     }
-
-    vlc_mutex_unlock( &priv->config_lock );
     return 0;
 }
 
@@ -703,14 +697,12 @@ error:
 
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     size_t i_index;
     bool save = false;
 
     assert( p_this );
 
     /* Check if there's anything to save */
-    vlc_mutex_lock( &priv->config_lock );
     module_t **list = module_list_get (NULL);
     for( i_index = 0; list[i_index] && !save; i_index++ )
     {
@@ -729,7 +721,6 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         }
     }
     module_list_free (list);
-    vlc_mutex_unlock( &priv->config_lock );
 
     return save ? VLC_SUCCESS : SaveConfigFile( p_this, NULL, true );
 }
