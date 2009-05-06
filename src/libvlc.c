@@ -358,9 +358,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         i_ret = VLC_EEXITSUCCESS;
     }
 
-    /* Set the config file stuff */
-    priv->psz_configfile = config_GetCustomConfigFile( p_libvlc );
-
     /* Check for plugins cache options */
     bool b_cache_delete = config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0;
 
@@ -431,7 +428,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        free( priv->psz_configfile );
         module_EndBank( p_libvlc, false );
         return i_ret;
     }
@@ -543,7 +539,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
     if( b_exit )
     {
-        free( priv->psz_configfile );
         module_EndBank( p_libvlc, true );
         return i_ret;
     }
@@ -571,7 +566,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                  "that they are valid.\n" );
         PauseConsole();
 #endif
-        free( priv->psz_configfile );
         module_EndBank( p_libvlc, true );
         return VLC_EGENERIC;
     }
@@ -831,7 +825,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             module_unneed( p_libvlc, priv->p_memcpy_module );
         }
         module_EndBank( p_libvlc, true );
-        free( priv->psz_configfile );
         return VLC_EGENERIC;
     }
     playlist_Activate( p_playlist );
@@ -1107,7 +1100,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank( p_libvlc, true );
 
-    FREENULL( priv->psz_configfile );
     var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
                      (void *)p_libvlc->p_hotkeys );
     free( (void *)p_libvlc->p_hotkeys );

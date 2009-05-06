@@ -65,13 +65,12 @@ static char *config_GetConfigFile( void )
 
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
-    char *psz_filename = libvlc_priv (p_obj->p_libvlc)->psz_configfile;
+    char *psz_filename;
     FILE *p_stream;
 
+    psz_filename = config_GetCustomConfigFile( p_obj->p_libvlc );
     if( !psz_filename )
-    {
         psz_filename = config_GetConfigFile();
-    }
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
 
@@ -121,11 +120,6 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
         }
     }
 #endif
-    else if( p_stream != NULL )
-    {
-        libvlc_priv (p_obj->p_libvlc)->psz_configfile = psz_filename;
-    }
-
     return p_stream;
 }
 
@@ -391,6 +385,17 @@ config_Write (FILE *file, const char *type, const char *desc,
 }
 
 
+static int config_PrepareDir (vlc_object_t *obj)
+{
+    char *psz_configdir = config_GetUserConfDir ();
+    if (psz_configdir == NULL) /* XXX: This should never happen */
+        return -1;
+
+    int ret = config_CreateDir (obj, psz_configdir);
+    free (psz_configdir);
+    return ret;
+}
+
 /*****************************************************************************
  * config_SaveConfigFile: Save a module's config options.
  *****************************************************************************
@@ -425,18 +430,11 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     /* Acquire config file lock */
     vlc_mutex_lock( &priv->config_lock );
 
-    if( libvlc_priv (p_this->p_libvlc)->psz_configfile == NULL )
+    if( config_PrepareDir( p_this ) )
     {
-        char *psz_configdir = config_GetUserConfDir();
-        if( !psz_configdir ) /* XXX: This should never happen */
-        {
-            msg_Err( p_this, "no configuration directory defined" );
-            vlc_mutex_unlock( &priv->config_lock );
-            return -1;
-        }
-
-        config_CreateDir( p_this, psz_configdir );
-        free( psz_configdir );
+        msg_Err( p_this, "no configuration directory" );
+        vlc_mutex_unlock( &priv->config_lock );
+        return -1;
     }
 
     file = config_OpenConfigFile( p_this, "rt" );
