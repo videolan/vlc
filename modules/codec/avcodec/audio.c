@@ -390,6 +390,12 @@ void EndAudioDec( decoder_t *p_dec )
 /*****************************************************************************
  *
  *****************************************************************************/
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 2, 0 )
+#   define LIBAVCODEC_AUDIO_LAYOUT
+#else
+#   warning "Audio channel layout is unsupported by your avcodec version."
+#endif
+
 #if defined(LIBAVCODEC_AUDIO_LAYOUT)
 static const uint64_t pi_channels_map[][2] =
 {
@@ -440,11 +446,6 @@ static const uint64_t pi_channels_map[][2] =
 };
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 2, 0 )
-#   define LIBAVCODEC_AUDIO_LAYOUT
-#else
-#   warning "Audio channel layout is unsupported by your avcodec version."
-#endif
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
