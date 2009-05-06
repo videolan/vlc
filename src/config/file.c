@@ -462,7 +462,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     /* backup file into memory, we only need to backup the sections we won't
      * save later on */
-    b_backup = 0;
+    b_backup = false;
     while( file && fgets( p_line, 1024, file ) )
     {
         if( (p_line[0] == '[') && (p_index2 = strchr(p_line,']')))
@@ -495,11 +495,11 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 #endif
                 *p_index2 = ']';
 
-                b_backup = 1;
+                b_backup = true;
             }
             else
             {
-                b_backup = 0;
+                b_backup = false;
             }
         }
 
