@@ -67,7 +67,7 @@ static char *config_GetConfigFile( vlc_object_t *obj )
     return psz_file;
 }
 
-static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
+static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
 {
     char *psz_filename = config_GetConfigFile( p_obj );
     if( psz_filename == NULL )
@@ -75,7 +75,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
 
-    FILE *p_stream = utf8_fopen( psz_filename, mode );
+    FILE *p_stream = utf8_fopen( psz_filename, "rt" );
     if( p_stream == NULL && errno != ENOENT )
     {
         msg_Err( p_obj, "cannot open config file (%s): %m",
@@ -83,7 +83,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 
     }
 #if !( defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS) )
-    else if( p_stream == NULL && errno == ENOENT && mode[0] == 'r' )
+    else if( p_stream == NULL && errno == ENOENT )
     {
         /* This is the fallback for pre XDG Base Directory
          * Specification configs */
@@ -91,7 +91,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
         if( asprintf( &psz_old, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
                       config_GetHomeDir() ) != -1 )
         {
-            p_stream = utf8_fopen( psz_old, mode );
+            p_stream = utf8_fopen( psz_old, "rt" );
             if( p_stream )
             {
                 /* Old config file found. We want to write it at the
@@ -154,7 +154,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     FILE *file;
 
-    file = config_OpenConfigFile (p_this, "rt");
+    file = config_OpenConfigFile (p_this);
     if (file == NULL)
         return VLC_EGENERIC;
 
@@ -425,7 +425,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         goto error;
     }
 
-    file = config_OpenConfigFile( p_this, "rt" );
+    file = config_OpenConfigFile( p_this );
     if( file != NULL )
     {
         /* look for file size */
