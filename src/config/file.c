@@ -410,7 +410,6 @@ static int config_PrepareDir (vlc_object_t *obj)
 static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
                            bool b_autosave )
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     module_t *p_parser;
     FILE *file = NULL;
     char *permanent = NULL, *temporary = NULL;
@@ -419,9 +418,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     char *p_bigbuffer = NULL, *p_index;
     bool b_backup;
     int i_index;
-
-    /* Acquire config file lock */
-    vlc_mutex_lock( &priv->config_lock );
 
     if( config_PrepareDir( p_this ) )
     {
@@ -521,9 +517,15 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         goto error;
     }
 
+    /* The temporary configuration file is per-PID. Therefore SaveConfigFile()
+     * should be serialized against itself within a given process. */
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+    vlc_mutex_lock (&lock);
+
     int fd = utf8_open (temporary, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
     if (fd == -1)
     {
+        vlc_mutex_unlock (&lock);
         module_list_free (list);
         goto error;
     }
@@ -531,6 +533,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     if (file == NULL)
     {
         close (fd);
+        vlc_mutex_unlock (&lock);
         module_list_free (list);
         goto error;
     }
@@ -672,13 +675,14 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     rename (temporary, permanent);
     /* (...then synchronize the directory, err, TODO...) */
     /* ...and finally close the file */
+    vlc_mutex_unlock (&lock);
 #endif
-    vlc_mutex_unlock (&priv->config_lock);
     fclose (file);
 #ifdef WIN32
     /* Windows cannot remove open files nor overwrite existing ones */
     remove (permanent);
     rename (temporary, permanent);
+    vlc_mutex_unlock (&lock);
 #endif
 
     free (temporary);
@@ -688,7 +692,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 error:
     if( file )
         fclose( file );
-    vlc_mutex_unlock( &priv->config_lock );
     free (temporary);
     free (permanent);
     free( p_bigbuffer );

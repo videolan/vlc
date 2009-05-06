@@ -282,7 +282,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     /* Initialize mutexes */
     vlc_mutex_init( &priv->timer_lock );
-    vlc_mutex_init( &priv->config_lock );
     vlc_cond_init( &priv->exiting );
 
     return p_libvlc;
@@ -1130,7 +1129,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     /* Destroy mutexes */
     vlc_cond_destroy( &priv->exiting );
-    vlc_mutex_destroy( &priv->config_lock );
     vlc_mutex_destroy( &priv->timer_lock );
 
 #ifndef NDEBUG /* Hack to dump leaked objects tree */
