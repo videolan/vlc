@@ -548,18 +548,22 @@ void __config_ResetAll( vlc_object_t *p_this )
 
         for (size_t i = 0; i < p_module->confsize; i++ )
         {
-            if (IsConfigIntegerType (p_module->p_config[i].i_type))
-                p_module->p_config[i].value.i = p_module->p_config[i].orig.i;
+            module_config_t *p_config = p_module->p_config + i;
+
+            vlc_mutex_lock (p_config->p_lock);
+            if (IsConfigIntegerType (p_config->i_type))
+                p_config->value.i = p_config->orig.i;
             else
-            if (IsConfigFloatType (p_module->p_config[i].i_type))
-                p_module->p_config[i].value.f = p_module->p_config[i].orig.f;
+            if (IsConfigFloatType (p_config->i_type))
+                p_config->value.f = p_config->orig.f;
             else
-            if (IsConfigStringType (p_module->p_config[i].i_type))
+            if (IsConfigStringType (p_config->i_type))
             {
-                free ((char *)p_module->p_config[i].value.psz);
-                p_module->p_config[i].value.psz =
-                        strdupnull (p_module->p_config[i].orig.psz);
+                free ((char *)p_config->value.psz);
+                p_config->value.psz =
+                        strdupnull (p_config->orig.psz);
             }
+            vlc_mutex_unlock (p_config->p_lock);
         }
     }
 

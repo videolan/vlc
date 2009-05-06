@@ -258,6 +258,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
             /* We found it */
             errno = 0;
 
+            vlc_mutex_lock( p_item->p_lock );
             switch( p_item->i_type )
             {
                 case CONFIG_ITEM_BOOL:
@@ -287,19 +288,15 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     break;
 
                 default:
-                    vlc_mutex_lock( p_item->p_lock );
-
                     /* free old string */
                     free( (char*) p_item->value.psz );
                     free( (char*) p_item->saved.psz );
 
                     p_item->value.psz = convert (psz_option_value);
                     p_item->saved.psz = strdupnull (p_item->value.psz);
-
-                    vlc_mutex_unlock( p_item->p_lock );
                     break;
             }
-
+            vlc_mutex_unlock( p_item->p_lock );
             break;
         }
     }
@@ -577,14 +574,16 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
              p_item < p_end;
              p_item++ )
         {
-            /* Do not save the new value in the configuration file
-             * if doing an autosave, and the item is not an "autosaved" one. */
-            bool b_retain = b_autosave && !p_item->b_autosave;
-
             if ((p_item->i_type & CONFIG_HINT) /* ignore hint */
              || p_item->b_removed              /* ignore deprecated option */
              || p_item->b_unsaveable)          /* ignore volatile option */
                 continue;
+
+            vlc_mutex_lock (p_item->p_lock);
+
+            /* Do not save the new value in the configuration file
+             * if doing an autosave, and the item is not an "autosaved" one. */
+            bool b_retain = b_autosave && !p_item->b_autosave;
 
             if (IsConfigIntegerType (p_item->i_type))
             {
@@ -652,6 +651,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             if (!b_retain)
                 p_item->b_dirty = false;
+            vlc_mutex_unlock (p_item->p_lock);
         }
     }
 
@@ -705,14 +705,14 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     size_t i_index;
-    bool done;
+    bool save = false;
 
     assert( p_this );
 
     /* Check if there's anything to save */
     vlc_mutex_lock( &priv->config_lock );
     module_t **list = module_list_get (NULL);
-    for( i_index = 0; list[i_index]; i_index++ )
+    for( i_index = 0; list[i_index] && !save; i_index++ )
     {
         module_t *p_parser = list[i_index];
         module_config_t *p_item, *p_end;
@@ -720,18 +720,18 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
         if( !p_parser->i_config_items ) continue;
 
         for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
-             p_item < p_end;
+             p_item < p_end && !save;
              p_item++ )
         {
-            if( p_item->b_autosave && p_item->b_dirty ) break;
+            vlc_mutex_lock (p_item->p_lock);
+            save = p_item->b_autosave && p_item->b_dirty;
+            vlc_mutex_unlock (p_item->p_lock);
         }
-        if( p_item < p_end ) break;
     }
-    done = list[i_index] == NULL;
     module_list_free (list);
     vlc_mutex_unlock( &priv->config_lock );
 
-    return done ? VLC_SUCCESS : SaveConfigFile( p_this, NULL, true );
+    return save ? VLC_SUCCESS : SaveConfigFile( p_this, NULL, true );
 }
 
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
