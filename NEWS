@@ -10,19 +10,22 @@ Playback:
  * Instantaneous pausing
  * Frame-by-Frame playback
  * Finer speed control
- * Timeshift for most medias
  * On-the-fly recording for all medias
+ * Timeshift for most medias
  * RTSP trickplay support
+ * Subtitles core improvements and fixes
 
-New Decoders:
- * AES3 (SMPTE 302M)
- * Dolby Digital Plus - E-AC-3 (A/52b)
- * True HD/MLP
- * Blu-Ray Linear PCM
- * QCELP (Qualcomm PureVoice)
- * Real Video 3.0 & 4.0
- * WMA v1/2 fixed point integer
- * Close Caption under SCTE-20 standard
+Decoders:
+ * New AES3 (SMPTE 302M) decoder
+ * New Dolby Digital Plus - E-AC-3 (A/52b) decoder
+ * New True HD/MLP decoder and parser
+ * New Blu-Ray Linear PCM decoder
+ * New QCELP (Qualcomm PureVoice) decoder
+ * Improved Real Video 3.0 & 4.0 decoder
+ * New WMA v1/2 fixed point integer decoder
+ * Close Caption under SCTE-20 standard are now correctly decoded
+ * Improvement of WavPack decoder to support all integer modes and float mode
+ * Corrections on 5.1 and 7.1 channel decoding and ordering
 
 Demuxers:
  * Support for Dirac, MLP and RealVideo in Matroska files
