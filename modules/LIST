@@ -258,6 +258,7 @@ $Id$
  * qte_main: a QT Embedded GUI wrapper module
  * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
+ * rawaud: raw video input module for vlc
  * rawdv: Raw DV demuxer
  * rawvid: raw video input module for vlc
  * rawvideo: Pseudo audio-decoder for raw video
