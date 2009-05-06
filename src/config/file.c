@@ -43,7 +43,6 @@
 #include "modules/modules.h"
 
 static char *ConfigKeyToString( int );
-static char *config_GetCustomConfigFile( libvlc_int_t * );
 
 static inline char *strdupnull (const char *src)
 {
@@ -66,16 +65,13 @@ static char *config_GetConfigFile( void )
 
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
-    char *psz_filename;
-    FILE *p_stream;
-
-    psz_filename = config_GetCustomConfigFile( p_obj->p_libvlc );
+    char *psz_filename = config_GetPsz( p_obj, "config" );
     if( !psz_filename )
         psz_filename = config_GetConfigFile();
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
 
-    p_stream = utf8_fopen( psz_filename, mode );
+    FILE *p_stream = utf8_fopen( psz_filename, mode );
     if( p_stream == NULL && errno != ENOENT )
     {
         msg_Err( p_obj, "cannot open config file (%s): %m",
@@ -693,31 +689,6 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     return SaveConfigFile( p_this, psz_module_name, false );
-}
-
-/**
- * Get the user's configuration file when given with the --config option
- */
-static char *config_GetCustomConfigFile( libvlc_int_t *p_libvlc )
-{
-    char *psz_configfile = config_GetPsz( p_libvlc, "config" );
-    if( psz_configfile != NULL )
-    {
-        if( psz_configfile[0] == '~' && psz_configfile[1] == '/' )
-        {
-            /* This is incomplete: we should also support the ~cmassiot/ syntax */
-            char *psz_buf;
-            if( asprintf( &psz_buf, "%s/%s", config_GetHomeDir(),
-                          psz_configfile + 2 ) == -1 )
-            {
-                free( psz_configfile );
-                return NULL;
-            }
-            free( psz_configfile );
-            psz_configfile = psz_buf;
-        }
-    }
-    return psz_configfile;
 }
 
 int ConfigStringToKey( const char *psz_key )
