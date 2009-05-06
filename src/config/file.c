@@ -422,7 +422,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     module_t *p_parser;
     FILE *file;
     char p_line[1024], *p_index2;
-    int i_sizebuf = 0;
+    unsigned long i_sizebuf = 0;
     char *p_bigbuffer, *p_index;
     bool b_backup;
     int i_index;
@@ -444,6 +444,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         fseek( file, 0L, SEEK_END );
         i_sizebuf = ftell( file );
         fseek( file, 0L, SEEK_SET );
+        if( i_sizebuf >= LONG_MAX )
+            i_sizebuf = 0;
     }
 
     p_bigbuffer = p_index = malloc( i_sizebuf+1 );
