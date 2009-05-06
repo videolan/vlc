@@ -904,8 +904,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Always load the hotkeys interface if it exists
      */
     libvlc_InternalAddIntf( p_libvlc, "hotkeys,none" );
-    if( module_exists( "globalhotkeys" ) )
-        libvlc_InternalAddIntf( p_libvlc, "globalhotkeys,none" );
 
 #ifdef HAVE_DBUS
     /* loads dbus control interface if in one-instance mode
