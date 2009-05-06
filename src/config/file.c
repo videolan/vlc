@@ -33,6 +33,7 @@
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
 #include <limits.h>
+#include <fcntl.h>
 #ifdef __APPLE__
 #   include <xlocale.h>
 #else
@@ -420,10 +421,11 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     module_t *p_parser;
-    FILE *file;
+    FILE *file = NULL;
+    char *permanent = NULL, *temporary = NULL;
     char p_line[1024], *p_index2;
     unsigned long i_sizebuf = 0;
-    char *p_bigbuffer, *p_index;
+    char *p_bigbuffer = NULL, *p_index;
     bool b_backup;
     int i_index;
 
@@ -433,8 +435,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     if( config_PrepareDir( p_this ) )
     {
         msg_Err( p_this, "no configuration directory" );
-        vlc_mutex_unlock( &priv->config_lock );
-        return -1;
+        goto error;
     }
 
     file = config_OpenConfigFile( p_this, "rt" );
@@ -450,11 +451,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
     p_bigbuffer = p_index = malloc( i_sizebuf+1 );
     if( !p_bigbuffer )
-    {
-        if( file ) fclose( file );
-        vlc_mutex_unlock( &priv->config_lock );
-        return -1;
-    }
+        goto error;
     p_bigbuffer[0] = 0;
 
     /* List all available modules */
@@ -512,20 +509,39 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
             p_index += strlen( p_line );
         }
     }
-    if( file ) fclose( file );
-
+    if( file )
+        fclose( file );
+    file = NULL;
 
     /*
      * Save module config in file
      */
-
-    file = config_OpenConfigFile (p_this, "wt");
-    if( !file )
+    permanent = config_GetConfigFile (p_this);
+    if (!permanent)
     {
         module_list_free (list);
-        free( p_bigbuffer );
-        vlc_mutex_unlock( &priv->config_lock );
-        return -1;
+        goto error;
+    }
+
+    if (asprintf (&temporary, "%s.%u", permanent, getpid ()) == -1)
+    {
+        temporary = NULL;
+        module_list_free (list);
+        goto error;
+    }
+
+    int fd = utf8_open (temporary, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
+    if (fd == -1)
+    {
+        module_list_free (list);
+        goto error;
+    }
+    file = fdopen (fd, "wt");
+    if (file == NULL)
+    {
+        close (fd);
+        module_list_free (list);
+        goto error;
     }
 
     fprintf( file, "\xEF\xBB\xBF###\n###  " COPYRIGHT_MESSAGE "\n###\n\n"
@@ -652,10 +668,37 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     fputs( p_bigbuffer, file );
     free( p_bigbuffer );
 
-    fclose( file );
-    vlc_mutex_unlock( &priv->config_lock );
+    /*
+     * Flush to disk and replace atomically
+     */
+    fflush (file); /* Flush from run-time */
+#ifndef WIN32
+    fdatasync (fd); /* Flush from OS */
+    /* Atomically replace the file... */
+    rename (temporary, permanent);
+    /* (...then synchronize the directory, err, TODO...) */
+    /* ...and finally close the file */
+#endif
+    vlc_mutex_unlock (&priv->config_lock);
+    fclose (file);
+#ifdef WIN32
+    /* Windows cannot remove open files nor overwrite existing ones */
+    remove (permanent);
+    rename (temporary, permanent);
+#endif
 
+    free (temporary);
+    free (permanent);
     return 0;
+
+error:
+    if( file )
+        fclose( file );
+    vlc_mutex_unlock( &priv->config_lock );
+    free (temporary);
+    free (permanent);
+    free( p_bigbuffer );
+    return -1;
 }
 
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
