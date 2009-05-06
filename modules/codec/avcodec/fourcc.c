@@ -80,6 +80,13 @@ static const struct
       VIDEO_ES, "FCP HDV (MPEG-2 Video)" },
     { VLC_FOURCC('h','d','v','5'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "HDV 720p25 (MPEG-2 Video)" },
+    { VLC_FOURCC('h','d','v','6'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "HDV 1080p24 (MPEG-2 Video)" },
+    { VLC_FOURCC('h','d','v','7'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "HDV 1080p25 (MPEG-2 Video)" },
+    { VLC_FOURCC('h','d','v','8'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "HDV 1080p30 (MPEG-2 Video)" },
+
     { VLC_FOURCC('m','x','5','n'), CODEC_ID_MPEG2VIDEO,
       VIDEO_ES, "MPEG2 IMX NTSC 525/60 50mb/s (FCP)" },
     { VLC_FOURCC('m','x','5','p'), CODEC_ID_MPEG2VIDEO,
