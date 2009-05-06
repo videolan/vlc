@@ -43,6 +43,7 @@
 #include "modules/modules.h"
 
 static char *ConfigKeyToString( int );
+static char *config_GetCustomConfigFile( libvlc_int_t * );
 
 static inline char *strdupnull (const char *src)
 {
@@ -697,7 +698,7 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 /**
  * Get the user's configuration file when given with the --config option
  */
-char *config_GetCustomConfigFile( libvlc_int_t *p_libvlc )
+static char *config_GetCustomConfigFile( libvlc_int_t *p_libvlc )
 {
     char *psz_configfile = config_GetPsz( p_libvlc, "config" );
     if( psz_configfile != NULL )
