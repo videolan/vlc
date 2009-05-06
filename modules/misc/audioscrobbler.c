@@ -134,10 +134,8 @@ static void HandleInterval  ( mtime_t *, unsigned int * );
 #define USERNAME_LONGTEXT   N_("The username of your last.fm account")
 #define PASSWORD_TEXT       N_("Password")
 #define PASSWORD_LONGTEXT   N_("The password of your last.fm account")
-#if 0
-    #define URL_TEXT       N_("Scrobbler URL")
-    #define URL_LONGTEXT   N_("The URL set for an alternative scrobbler engine")
-#endif
+#define URL_TEXT            N_("Scrobbler URL")
+#define URL_LONGTEXT        N_("The URL set for an alternative scrobbler engine")
 
 /* This error value is used when last.fm plugin has to be unloaded. */
 #define VLC_AUDIOSCROBBLER_EFATAL -69
@@ -167,10 +165,8 @@ vlc_module_begin ()
                 USERNAME_TEXT, USERNAME_LONGTEXT, false )
     add_password( "lastfm-password", "", NULL,
                 PASSWORD_TEXT, PASSWORD_LONGTEXT, false )
-#if 0
     add_string( "scrobbler-url", "post.audioscrobbler.com", NULL,
-                URL_TEXT, URL_LONGTEXT, false )*/
-#endif
+                URL_TEXT, URL_LONGTEXT, false )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()
@@ -786,11 +782,7 @@ static int Handshake( intf_thread_t *p_this )
     strncpy( p_sys->psz_auth_token, psz_auth_token, 33 );
     free( psz_auth_token );
 
-#if 0
     psz_scrobbler_url = config_GetPsz( p_this, "scrobbler-url" );
-#else
-    psz_scrobbler_url = strdup( "post.audioscrobbler.com" );
-#endif
     if( !psz_scrobbler_url )
     {
         free( psz_username );
