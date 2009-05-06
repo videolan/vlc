@@ -52,22 +52,25 @@ static inline char *strdupnull (const char *src)
 /**
  * Get the user's configuration file
  */
-static char *config_GetConfigFile( void )
+static char *config_GetConfigFile( vlc_object_t *obj )
 {
-    char *psz_dir = config_GetUserConfDir();
-    char *psz_configfile;
+    char *psz_file = config_GetPsz( obj, "config" );
+    if( psz_file == NULL )
+    {
+        char *psz_dir = config_GetUserConfDir();
 
-    if( asprintf( &psz_configfile, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
-        psz_configfile = NULL;
-    free( psz_dir );
-    return psz_configfile;
+        if( asprintf( &psz_file, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
+            psz_file = NULL;
+        free( psz_dir );
+    }
+    return psz_file;
 }
 
 static FILE *config_OpenConfigFile( vlc_object_t *p_obj, const char *mode )
 {
-    char *psz_filename = config_GetPsz( p_obj, "config" );
-    if( !psz_filename )
-        psz_filename = config_GetConfigFile();
+    char *psz_filename = config_GetConfigFile( p_obj );
+    if( psz_filename == NULL )
+        return NULL;
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
 
