@@ -390,6 +390,7 @@ void EndAudioDec( decoder_t *p_dec )
 /*****************************************************************************
  *
  *****************************************************************************/
+#if defined(LIBAVCODEC_AUDIO_LAYOUT)
 static const uint64_t pi_channels_map[][2] =
 {
     { CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
@@ -413,6 +414,31 @@ static const uint64_t pi_channels_map[][2] =
     { CH_STEREO_LEFT,       0 },
     { CH_STEREO_RIGHT,      0 },
 };
+#else
+static const uint64_t pi_channels_map[][2] =
+{
+    { 0, AOUT_CHAN_LEFT },
+    { 0, AOUT_CHAN_RIGHT },
+    { 0, AOUT_CHAN_CENTER },
+    { 0, AOUT_CHAN_LFE },
+    { 0, AOUT_CHAN_REARLEFT },
+    { 0, AOUT_CHAN_REARRIGHT },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, AOUT_CHAN_REARCENTER },
+    { 0, AOUT_CHAN_MIDDLELEFT },
+    { 0, AOUT_CHAN_MIDDLERIGHT },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+    { 0, 0 },
+};
+#endif
 
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 2, 0 )
 #   define LIBAVCODEC_AUDIO_LAYOUT
