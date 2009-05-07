@@ -536,6 +536,33 @@ mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
     return p_date->date;
 }
 
+/**
+ * Decrement the date and return the result, taking into account
+ * rounding errors.
+ *
+ * \param date to decrement
+ * \param decrementation in number of samples
+ * \return date value
+ */
+mtime_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
+{
+    mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000 * p_date->i_divider_den;
+    p_date->date -= i_dividend / p_date->i_divider_num;
+    unsigned i_rem_adjust = i_dividend % p_date->i_divider_num;
+
+    if( p_date->i_remainder < i_rem_adjust )
+    {
+        /* This is Bresenham algorithm. */
+        assert( p_date->i_remainder > -p_date->i_divider_num);
+        p_date->date -= 1;
+        p_date->i_remainder += p_date->i_divider_num;
+    }
+
+    p_date->i_remainder -= i_rem_adjust;
+
+    return p_date->date;
+}
+
 #ifndef HAVE_GETTIMEOFDAY
 
 #ifdef WIN32

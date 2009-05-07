@@ -136,5 +136,6 @@ VLC_EXPORT( void,    date_Set,       ( date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, date_Get,       ( const date_t * ) );
 VLC_EXPORT( void,    date_Move,      ( date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, date_Increment, ( date_t *, uint32_t ) );
+VLC_EXPORT( mtime_t, date_Decrement, ( date_t *, uint32_t ) );
 VLC_EXPORT( uint64_t, NTPtime64,     ( void ) );
 #endif /* !__VLC_MTIME_ */

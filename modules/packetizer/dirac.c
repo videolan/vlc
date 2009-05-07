@@ -266,26 +266,6 @@ static dirac_block_encap_t *dirac_GetBlockEncap( block_t *p_block )
  * General utility funcions
  */
 
-/* decrement a date. opposite to date_Increment */
-static mtime_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
-{
-    mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000 * p_date->i_divider_den;
-    p_date->date -= i_dividend / p_date->i_divider_num;
-    unsigned u_rem_adjust = i_dividend % p_date->i_divider_num;
-
-    if( p_date->i_remainder < u_rem_adjust )
-    {
-        /* This is Bresenham algorithm. */
-        assert( p_date->i_remainder > -p_date->i_divider_num);
-        p_date->date -= 1;
-        p_date->i_remainder += p_date->i_divider_num;
-    }
-
-    p_date->i_remainder -= u_rem_adjust;
-
-    return p_date->date;
-}
-
 /**
  * given a chain of block_t, allocate and return an array containing
  * pointers to all the blocks. (Acts as a replacement for the old p_prev

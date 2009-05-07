@@ -74,6 +74,7 @@ config_StringEscape
 config_StringUnescape
 convert_xml_special_chars
 date_Change
+date_Decrement
 date_Get
 date_Increment
 date_Init
