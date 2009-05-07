@@ -303,6 +303,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY ) {
             schro_decoder_reset( p_sys->p_schro );
 
+            p_sys->i_lastpts = -1;
             block_Release( p_block );
             *pp_block = NULL;
             return NULL;
