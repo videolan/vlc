@@ -170,7 +170,7 @@ static int Demux( demux_t *p_demux)
         block_t *p_null = block_Alloc( 128 );
         if( p_null )
         {
-            p_null->i_flags = BLOCK_FLAG_DISCONTINUITY;
+            p_null->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
             p_null->p_next = p_block_in;
         }
         p_block_in = p_null;
