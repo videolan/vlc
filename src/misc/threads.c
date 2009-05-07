@@ -784,7 +784,9 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         pthread_sigmask (SIG_BLOCK, &set, &oldset);
     }
 
-#if (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
+#if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
+ && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
+ && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
     {
         struct sched_param sp = { .sched_priority = priority, };
         int policy;
