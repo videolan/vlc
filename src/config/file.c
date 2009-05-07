@@ -121,6 +121,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
         }
     }
 #endif
+    free( psz_filename );
     return p_stream;
 }
 
