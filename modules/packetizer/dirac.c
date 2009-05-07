@@ -185,7 +185,6 @@ enum {
 };
 
 enum {
-    DIRAC_EOS = 0x02000000,
     DIRAC_NON_DATED = 0x04000000,
     DIRAC_DISCARD = 0x08000000,
 };
@@ -854,7 +853,7 @@ static int dirac_InspectDataUnit( decoder_t *p_dec, block_t **pp_block, block_t 
             return DIRAC_DU_IN_EU;
         }
         /* p_block is an EOS packet */
-        p_eu->i_flags |= DIRAC_EOS;
+        p_eu->i_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
         /* for the moment, let this end an encapsulation unit */
         /* seeing an eos packet requires a flush of the packetizer
          * this is detected by the caller of this function */
@@ -1063,7 +1062,7 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
     decoder_sys_t *p_sys = p_dec->p_sys;
     dirac_block_encap_t *dbe;
 
-    if( p_block_in->i_flags & DIRAC_EOS )
+    if( p_block_in->i_flags & BLOCK_FLAG_END_OF_SEQUENCE )
     {
         /* NB, this test occurs after the timegen push, so as to
          * push the block into the output queue */
