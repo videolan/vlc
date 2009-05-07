@@ -184,10 +184,7 @@ static int Demux( demux_t *p_demux)
             p_block_out->p_next = NULL;
 
             if( p_sys->p_es == NULL )
-            {
-                p_sys->p_packetizer->fmt_out.b_packetized = true;
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
-            }
 
             p_block_out->i_dts += p_sys->i_dtsoffset;
             p_sys->i_dts = p_block_out->i_dts;
