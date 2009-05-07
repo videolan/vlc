@@ -682,7 +682,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     fclose (file);
 #ifdef WIN32
     /* Windows cannot remove open files nor overwrite existing ones */
-    remove (permanent);
+    utf8_unlink (permanent);
     rename (temporary, permanent);
     vlc_mutex_unlock (&lock);
 #endif

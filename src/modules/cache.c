@@ -608,7 +608,7 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
     rename (psz_tmpname, psz_filename); /* atomically replace old cache */
     fclose (file);
 #else
-    remove (psz_filename);
+    utf8_unlink (psz_filename);
     fclose (file);
     rename (psz_tmpname, psz_filename);
 #endif
