@@ -124,6 +124,7 @@ vlc_module_begin ()
     add_shortcut( "https" )
     add_shortcut( "unsv" )
     add_shortcut( "itpc" ) /* iTunes Podcast */
+    add_shortcut( "icyx" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
