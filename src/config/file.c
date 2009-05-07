@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 #ifdef __APPLE__
 #   include <xlocale.h>
 #else
