@@ -79,6 +79,7 @@ struct vout_sys_t
     uint32_t id;         /* XVideo format */
     uint16_t width;      /* display width */
     uint16_t height;     /* display height */
+    uint32_t data_size;  /* picture byte size (for non-SHM) */
     bool shm;            /* whether to use MIT-SHM */
 };
 
@@ -443,6 +444,7 @@ static int Init (vout_thread_t *vout)
     const uint32_t *offsets;
 found_adaptor:
     offsets = xcb_xv_query_image_attributes_offsets (att);
+    p_sys->data_size = att->data_size;
 
     I_OUTPUTPICTURES = 0;
     for (size_t index = 0; I_OUTPUTPICTURES < 2; index++)
@@ -537,9 +539,8 @@ static void Display (vout_thread_t *vout, picture_t *pic)
                           pic->p->i_visible_pitch / pic->p->i_pixel_pitch,
                           pic->p->i_visible_lines,
                           0, 0, p_sys->width, p_sys->height,
-                          pic->p->i_pitch / pic->p->i_pixel_pitch,
-                          pic->p->i_lines,
-                          pic->p->i_pitch * pic->p->i_lines, pic->p->p_pixels);
+                          vout->fmt_out.i_width, vout->fmt_out.i_height,
+                          p_sys->data_size, pic->p->p_pixels);
     xcb_flush (p_sys->conn);
 }
 
