@@ -314,11 +314,13 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_schrobuffer = schro_buffer_new_with_data( p_block->p_buffer, p_block->i_buffer );
         p_schrobuffer->free = SchroBufferFree;
         p_schrobuffer->priv = p_block;
-        mtime_t *p_pts = malloc( sizeof(*p_pts) );
-        if( p_pts ) {
-            *p_pts = p_block->i_pts;
-            /* if this call fails, p_pts is freed automatically */
-            p_schrobuffer->tag = schro_tag_new( p_pts, free );
+        if( p_block->i_pts != VLC_TS_INVALID ) {
+            mtime_t *p_pts = malloc( sizeof(*p_pts) );
+            if( p_pts ) {
+                *p_pts = p_block->i_pts;
+                /* if this call fails, p_pts is freed automatically */
+                p_schrobuffer->tag = schro_tag_new( p_pts, free );
+            }
         }
 
         /* this stops the same block being fed back into this function if
