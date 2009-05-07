@@ -300,10 +300,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* reset the decoder when seeking as the decode in progress is invalid */
         /* discard the block as it is just a null magic block */
-        if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) ) {
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY ) {
             schro_decoder_reset( p_sys->p_schro );
-
-            p_sys->i_lastpts = -1;
 
             block_Release( p_block );
             *pp_block = NULL;
