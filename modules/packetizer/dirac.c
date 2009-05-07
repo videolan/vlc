@@ -222,11 +222,11 @@ typedef struct {
 static dirac_block_encap_t *dirac_RemoveBlockEncap( block_t *p_block )
 {
     fake_block_t *p_fake = (fake_block_t *)p_block;
-    dirac_block_encap_t *dbe = p_fake->p_priv;
-    if( !dbe ) return NULL;
+    dirac_block_encap_t *p_dbe = p_fake->p_priv;
+    if( !p_dbe ) return NULL;
     p_fake->p_priv = NULL;
-    dbe->pf_blk_release = NULL;
-    return dbe;
+    p_dbe->pf_blk_release = NULL;
+    return p_dbe;
 }
 
 static void dirac_ReleaseBlockAndEncap( block_t *p_block )
@@ -252,9 +252,9 @@ static void dirac_AddBlockEncap( block_t **pp_block, dirac_block_encap_t *p_dbe 
 
 static dirac_block_encap_t *dirac_NewBlockEncap( block_t **pp_block )
 {
-    dirac_block_encap_t *dbe = calloc( 1, sizeof( *dbe ) );
-    if( dbe ) dirac_AddBlockEncap( pp_block, dbe );
-    return dbe;
+    dirac_block_encap_t *p_dbe = calloc( 1, sizeof( *p_dbe ) );
+    if( p_dbe ) dirac_AddBlockEncap( pp_block, p_dbe );
+    return p_dbe;
 }
 
 static dirac_block_encap_t *dirac_GetBlockEncap( block_t *p_block )
@@ -275,19 +275,19 @@ static int block_ChainToArray( block_t *p_block, block_t ***ppp_array)
     if( !ppp_array )
         return 0;
 
-    int num_blocks;
-    block_ChainProperties( p_block, &num_blocks, NULL, NULL );
+    int i_num_blocks;
+    block_ChainProperties( p_block, &i_num_blocks, NULL, NULL );
 
-    *ppp_array = malloc( sizeof( block_t* ) * num_blocks );
+    *ppp_array = calloc( i_num_blocks, sizeof( block_t* ) );
     if( !ppp_array ) return 0;
 
-    for( int i = 0; i < num_blocks; i++ )
+    for( int i = 0; i < i_num_blocks; i++ )
     {
         (*ppp_array)[i] = p_block;
         p_block = p_block->p_next;
     }
 
-    return num_blocks;
+    return i_num_blocks;
 }
 
 /**
@@ -397,9 +397,8 @@ static void dirac_ReorderInit( struct dirac_reorder_buffer *p_rb )
     p_rb->p_empty = p_rb->p_entries;
     p_rb->p_entries[31].p_next = NULL;
 
-    for( int i = 0; i < 31; i++ ) {
+    for( int i = 0; i < 31; i++ )
         p_rb->p_entries[i].p_next = &p_rb->p_entries[i+1];
-    }
 }
 
 /* simulate the dirac picture reorder buffer */
@@ -487,15 +486,14 @@ static bool dirac_UnpackParseInfo( parse_info_t *p_pi, block_bytestream_t *p_bs,
 
 static uint32_t dirac_uint( bs_t *p_bs )
 {
-  uint32_t count = 0, value = 0;
-  while( !bs_eof( p_bs ) && !bs_read( p_bs, 1 ) )
-  {
-    count++;
-    value <<= 1;
-    value |= bs_read( p_bs, 1 );
-  }
-
-  return (1 << count) - 1 + value;
+    uint32_t u_count = 0, u_value = 0;
+    while( !bs_eof( p_bs ) && !bs_read( p_bs, 1 ) )
+    {
+        u_count++;
+        u_value <<= 1;
+        u_value |= bs_read( p_bs, 1 );
+    }
+    return (1 << u_count) - 1 + u_value;
 }
 
 static int dirac_bool( bs_t *p_bs )
@@ -647,11 +645,11 @@ static bool dirac_UnpackSeqHdr( struct seq_hdr_t *p_sh, block_t *p_block )
 
 static block_t *dirac_EmitEOS( decoder_t *p_dec, uint32_t i_prev_parse_offset )
 {
-    const uint8_t eos[] = { 'B','B','C','D',0x10,0,0,0,13,0,0,0,0 };
+    const uint8_t p_eos[] = { 'B','B','C','D',0x10,0,0,0,13,0,0,0,0 };
     block_t *p_block = block_New( p_dec, 13 );
     if( !p_block )
         return NULL;
-    memcpy( p_block->p_buffer, eos, 13 );
+    memcpy( p_block->p_buffer, p_eos, 13 );
 
     SetDWBE( p_block->p_buffer + 9, i_prev_parse_offset );
 
@@ -675,7 +673,8 @@ static block_t *dirac_DoSync( decoder_t *p_dec )
     do {
         switch( p_sys->i_state )
         {
-        case NOT_SYNCED: {
+        case NOT_SYNCED:
+        {
             if( VLC_SUCCESS !=
                 block_FindStartcodeFromOffset( &p_sys->bytestream, &p_sys->i_offset, p_parsecode, 4 ) )
             {
@@ -734,18 +733,18 @@ static block_t *dirac_DoSync( decoder_t *p_dec )
             /* attempt to syncronise backwards from pu.u_next_offset */
             p_sys->i_offset = pu.u_next_offset;
             /* fall through */
-        case TRY_SYNC: { /* -> SYNCED | NOT_SYNCED */
-            if( !p_sys->i_offset ) {
+        case TRY_SYNC: /* -> SYNCED | NOT_SYNCED */
+        {
+            if( !p_sys->i_offset )
                 goto sync_fail; /* if a is at start of bytestream, b can't be in buffer */
-            }
 
             parse_info_t pu_a;
             bool a = dirac_UnpackParseInfo( &pu_a, &p_sys->bytestream, p_sys->i_offset );
-            if( !a || (pu_a.u_prev_offset > p_sys->i_offset) ) {
+            if( !a || (pu_a.u_prev_offset > p_sys->i_offset) )
                 goto sync_fail; /* b lies beyond start of bytestream: can't sync */
-            }
 
-            if( !pu_a.u_prev_offset ) {
+            if( !pu_a.u_prev_offset )
+            {
                 if( p_sys->i_state == TRY_SYNC )
                 {
                     goto sync_fail; /* can't find different pu_b from pu_a */
@@ -758,7 +757,8 @@ static block_t *dirac_DoSync( decoder_t *p_dec )
 
             parse_info_t *pu_b = &pu;
             bool b = dirac_UnpackParseInfo( pu_b, &p_sys->bytestream, p_sys->i_offset - pu_a.u_prev_offset );
-            if( !b || (pu_b->u_next_offset && pu_a.u_prev_offset != pu_b->u_next_offset) ) {
+            if( !b || (pu_b->u_next_offset && pu_a.u_prev_offset != pu_b->u_next_offset) )
+            {
                 /* if pu_b->u_next_offset = 0, have to assume we've synced, ie,
                  * just rely on finding a valid pu_b from pu_a. */
                 goto sync_fail;
@@ -806,8 +806,8 @@ sync_fail:
     block_GetBytes( &p_sys->bytestream, p_block->p_buffer, p_block->i_buffer );
 
     /* save parse offset in private area for later use */
-    dirac_block_encap_t *dbe = dirac_NewBlockEncap( &p_block );
-    if( dbe ) dbe->u_last_next_offset = pu.u_next_offset;
+    dirac_block_encap_t *p_dbe = dirac_NewBlockEncap( &p_block );
+    if( p_dbe ) p_dbe->u_last_next_offset = pu.u_next_offset;
 
     return p_block;
 }
@@ -874,12 +874,12 @@ static int dirac_InspectDataUnit( decoder_t *p_dec, block_t **pp_block, block_t 
              * random access point flags are not set */
             p_eu->i_flags &= ~BLOCK_FLAG_TYPE_I;
         }
-        dirac_block_encap_t *dbe = dirac_GetBlockEncap( p_block );
-        if( dbe && p_block->i_buffer > 13+4 )
+        dirac_block_encap_t *p_dbe = dirac_GetBlockEncap( p_block );
+        if( p_dbe && p_block->i_buffer > 13+4 )
         {
             /* record the picture number to save the time gen functions
              * from having to inspect the data for it */
-            dbe->u_picture_number = GetDWBE( p_block->p_buffer + 13 );
+            p_dbe->u_picture_number = GetDWBE( p_block->p_buffer + 13 );
         }
         return DIRAC_DU_ENDS_EU;
     }
@@ -906,8 +906,8 @@ static int dirac_InspectDataUnit( decoder_t *p_dec, block_t **pp_block, block_t 
                    , p_sys->seq_hdr.u_fps_num, p_sys->seq_hdr.u_fps_den, 0 );
 
         /* when field coding, dts needs to be incremented in terms of field periods */
-        int u_pics_per_sec = p_sys->seq_hdr.u_fps_num;
-        if (p_sys->seq_hdr.u_picture_coding_mode == DIRAC_FIELD_CODING)
+        unsigned u_pics_per_sec = p_sys->seq_hdr.u_fps_num;
+        if( p_sys->seq_hdr.u_picture_coding_mode == DIRAC_FIELD_CODING )
         {
             u_pics_per_sec *= 2;
         }
@@ -988,14 +988,14 @@ static block_t *dirac_BuildEncapsulationUnit( decoder_t *p_dec, block_t *p_block
 
     block_ChainLastAppend( &p_sys->pp_eu_last, p_block );
 
-    dirac_block_encap_t *dbe = dirac_GetBlockEncap( p_block );
+    dirac_block_encap_t *p_dbe = dirac_GetBlockEncap( p_block );
 #ifdef SANITIZE_PREV_PARSE_OFFSET
     /* fixup prev_parse_offset to point to the last data unit
      * to arrive */
-    if( dbe )
+    if( p_dbe )
     {
         SetDWBE( p_block->p_buffer + 9, p_sys->u_eu_last_npo );
-        p_sys->u_eu_last_npo = dbe->u_last_next_offset;
+        p_sys->u_eu_last_npo = p_dbe->u_last_next_offset;
     }
 #endif
 
@@ -1008,7 +1008,7 @@ static block_t *dirac_BuildEncapsulationUnit( decoder_t *p_dec, block_t *p_block
     /* gather up encapsulation unit, reassociating the final
      * private state with the gathered block */
     block_t *p_eu_last = (block_t*) p_sys->pp_eu_last - offsetof( block_t, p_next );
-    dbe = dirac_RemoveBlockEncap( p_eu_last );
+    p_dbe = dirac_RemoveBlockEncap( p_eu_last );
 
     uint8_t u_parse_code = p_block->p_buffer[4];
 
@@ -1017,9 +1017,9 @@ static block_t *dirac_BuildEncapsulationUnit( decoder_t *p_dec, block_t *p_block
     assert( p_block ); /* block_ChainGather doesn't define when it frees chain */
 
     p_block->i_flags |= DIRAC_NON_DATED;
-    if( dbe )
+    if( p_dbe )
     {
-        dirac_AddBlockEncap( &p_block, dbe );
+        dirac_AddBlockEncap( &p_block, p_dbe );
         if( dirac_isPicture( u_parse_code ) ) p_block->i_flags &= ~DIRAC_NON_DATED;
     }
     p_sys->p_eu = NULL;
@@ -1040,7 +1040,7 @@ static block_t *dirac_BuildEncapsulationUnit( decoder_t *p_dec, block_t *p_block
 static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    dirac_block_encap_t *dbe;
+    dirac_block_encap_t *p_dbe;
 
     if( p_block_in->i_flags & BLOCK_FLAG_END_OF_SEQUENCE )
     {
@@ -1056,8 +1056,8 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
         return 0;
     }
 
-    dbe = dirac_GetBlockEncap( p_block_in );
-    uint32_t u_picnum = dbe ? dbe->u_picture_number : 0;
+    p_dbe = dirac_GetBlockEncap( p_block_in );
+    uint32_t u_picnum = p_dbe ? p_dbe->u_picture_number : 0;
     /*
      * Simple DTS regeneration:
      *  - DTS values linearly increase in stream order.
@@ -1152,8 +1152,8 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
      * the first packet is output -- interpolate the past and freewheel for
      * the future */
 
-    dbe = dirac_GetBlockEncap( p_block );
-    u_picnum = dbe ? dbe->u_picture_number : 0;
+    p_dbe = dirac_GetBlockEncap( p_block );
+    u_picnum = p_dbe ? p_dbe->u_picture_number : 0;
     if( p_sys->b_tg_last_picnum )
     {
         if( dirac_PictureNbeforeM( u_picnum, p_sys->u_tg_last_picnum ) )
@@ -1165,8 +1165,8 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
              * a discontinuity, some pictures will get stuck in the RoB.
              * flush the RoB. */
             /* this could be a bit less indiscriminate */
-            dbe = dirac_GetBlockEncap( p_sys->p_outqueue );
-            uint32_t u_prev_parse_offset = dbe ? dbe->u_last_next_offset : 0;
+            p_dbe = dirac_GetBlockEncap( p_sys->p_outqueue );
+            uint32_t u_prev_parse_offset = p_dbe ? p_dbe->u_last_next_offset : 0;
             block_ChainRelease( p_sys->p_outqueue );
             p_sys->p_outqueue = dirac_EmitEOS( p_dec, u_prev_parse_offset );
             if( p_sys->p_outqueue )
@@ -1319,12 +1319,9 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
      *  the output queue would grow bounded by the stream length.
      * If there are 10 data units in the output queue, assume this
      * has happened and purge all blocks that fail extraction criteria */
-    unsigned count = 0;
-    for( p_block = p_sys->p_outqueue; p_block; p_block = p_block->p_next )
-    {
-        count++;
-    }
-    if( count > 9 )
+    int i_count;
+    block_ChainProperties( p_sys->p_outqueue, &i_count, NULL, NULL );
+    if( i_count > 9 )
     {
         p_block = p_sys->p_outqueue;
         while( p_block )
