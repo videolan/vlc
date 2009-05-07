@@ -1223,12 +1223,14 @@ void KeySelectorControl::finish()
         {
             QList<QTreeWidgetItem *> list =
                 table->findItems( qtr( p_item->psz_text ), Qt::MatchExactly );
-            if( list.count() > 1 )
+            if( list.count() >= 1 )
             {
                 list[0]->setText( 2, VLCKeyToString( p_item->value.i ) );
                 list[0]->setData( 2, Qt::UserRole,
                                   QVariant( p_item->value.i ) );
             }
+            if( list.count() >= 2 )
+                msg_Dbg( p_this, "This is probably wrong, %s", p_item->psz_text );
         }
     }
     module_config_free (p_config);
