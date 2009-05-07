@@ -559,6 +559,8 @@ AC_PREPROC_IFELSE([
 work-around for this. Check with your distribution vendor on how to update the
 glibc run-time. Alternatively, build with --disable-nls --disable-mozilla and
 be sure to not use LibVLC from other applications/wrappers.])
+  ], [
+    AC_DEFINE(DISABLE_BUGGY_GLIBC_CHECK, 1, [Disables runtime check for buggy glibc.])
   ])
 ])
 
