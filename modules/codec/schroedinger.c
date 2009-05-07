@@ -358,12 +358,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case SCHRO_DECODER_OK: {
             SchroTag *p_tag = schro_decoder_get_picture_tag( p_sys->p_schro );
             p_schroframe = schro_decoder_pull( p_sys->p_schro );
-            if( !p_schroframe->priv )
+            if( !p_schroframe || !p_schroframe->priv )
             {
                 /* frame can't be one that was allocated by us
                  *   -- no private data: discard */
                 if( p_tag ) schro_tag_free( p_tag );
-                schro_frame_unref( p_schroframe );
+                if( p_schroframe ) schro_frame_unref( p_schroframe );
                 break;
             }
             p_pic = ((struct picture_free_t*) p_schroframe->priv)->p_pic;
