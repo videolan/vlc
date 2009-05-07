@@ -605,12 +605,12 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
         goto error;
 
 #ifndef WIN32
-    rename (psz_tmpname, psz_filename); /* atomically replace old cache */
+    utf8_rename (psz_tmpname, psz_filename); /* atomically replace old cache */
     fclose (file);
 #else
     utf8_unlink (psz_filename);
     fclose (file);
-    rename (psz_tmpname, psz_filename);
+    utf8_rename (psz_tmpname, psz_filename);
 #endif
     return; /* success! */
 

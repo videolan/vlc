@@ -674,7 +674,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 #ifndef WIN32
     fdatasync (fd); /* Flush from OS */
     /* Atomically replace the file... */
-    rename (temporary, permanent);
+    utf8_rename (temporary, permanent);
     /* (...then synchronize the directory, err, TODO...) */
     /* ...and finally close the file */
     vlc_mutex_unlock (&lock);
@@ -683,7 +683,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 #ifdef WIN32
     /* Windows cannot remove open files nor overwrite existing ones */
     utf8_unlink (permanent);
-    rename (temporary, permanent);
+    utf8_rename (temporary, permanent);
     vlc_mutex_unlock (&lock);
 #endif
 
