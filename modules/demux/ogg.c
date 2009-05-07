@@ -339,6 +339,18 @@ static int Demux( demux_t * p_demux )
         /* if we've just pulled page, look for the right logical stream */
         if( !p_sys->b_page_waiting )
         {
+            if( p_sys->i_streams == 1 &&
+                ogg_page_serialno( &oggpage ) != p_stream->os.serialno )
+            {
+                msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
+                ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &oggpage ) );
+
+                p_stream->b_reinit = true;
+                p_stream->i_pcr = -1;
+                p_stream->i_interpolated_pcr = -1;
+                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+            }
+
             if( ogg_stream_pagein( &p_stream->os, &oggpage ) != 0 )
                 continue;
         }
