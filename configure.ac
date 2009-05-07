@@ -4708,10 +4708,10 @@ if test "${enable_oss}" != "no" &&
   (test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" ||
    test "${enable_oss}" = "yes")
 then
-  AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
+  AC_CHECK_HEADERS([soundcard.h sys/soundcard.h], [
     VLC_ADD_PLUGIN([oss])
     VLC_ADD_PLUGIN([access_oss])
-    AC_CHECK_LIB(ossaudio,main,VLC_ADD_LIBS([oss],[-lossaudio]))
+    AC_CHECK_LIB(ossaudio,main,[VLC_ADD_LIBS([oss],[-lossaudio])])
   ])
 fi
 

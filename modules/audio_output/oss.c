@@ -51,8 +51,6 @@
 #   include <soundcard.h>
 #elif defined( HAVE_SYS_SOUNDCARD_H )
 #   include <sys/soundcard.h>
-#elif defined( HAVE_MACHINE_SOUNDCARD_H )
-#   include <machine/soundcard.h>
 #endif
 
 /* Patches for ignorant OSS versions */
