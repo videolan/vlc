@@ -51,3 +51,4 @@ int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);
 int PictureAlloc (vout_thread_t *, picture_t *, size_t, xcb_connection_t *);
 void PictureFree (picture_t *pic, xcb_connection_t *conn);
+void CommonManage (vout_thread_t *);

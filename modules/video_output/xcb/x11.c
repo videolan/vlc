@@ -408,6 +408,8 @@ static int Manage (vout_thread_t *vout)
         msg_Err (vout, "X server failure");
         return VLC_EGENERIC;
     }
+
+    CommonManage (vout); /* FIXME: <-- move that to core */
     return VLC_SUCCESS;
 }
 

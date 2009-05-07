@@ -226,3 +226,46 @@ void PictureFree (picture_t *pic, xcb_connection_t *conn)
     }
     shmdt (pic->p->p_pixels);
 }
+
+/**
+ * Video output thread management stuff.
+ * FIXME: Much of this should move to core
+ */
+void CommonManage (vout_thread_t *vout)
+{
+    if (vout->i_changes & VOUT_SCALE_CHANGE)
+    {
+        vout->b_autoscale = var_GetBool (vout, "autoscale");
+        vout->i_zoom = ZOOM_FP_FACTOR;
+        vout->i_changes &= ~VOUT_SCALE_CHANGE;
+        vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    if (vout->i_changes & VOUT_ZOOM_CHANGE)
+    {
+        vout->b_autoscale = false;
+        vout->i_zoom = var_GetFloat (vout, "scale") * ZOOM_FP_FACTOR;
+        vout->i_changes &= ~VOUT_ZOOM_CHANGE;
+        vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    if (vout->i_changes & VOUT_CROP_CHANGE)
+    {
+        vout->fmt_out.i_x_offset = vout->fmt_in.i_x_offset;
+        vout->fmt_out.i_y_offset = vout->fmt_in.i_y_offset;
+        vout->fmt_out.i_visible_width = vout->fmt_in.i_visible_width;
+        vout->fmt_out.i_visible_height = vout->fmt_in.i_visible_height;
+        vout->i_changes &= ~VOUT_CROP_CHANGE;
+        vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+
+    if (vout->i_changes & VOUT_ASPECT_CHANGE)
+    {
+        vout->fmt_out.i_aspect = vout->fmt_in.i_aspect;
+        vout->fmt_out.i_sar_num = vout->fmt_in.i_sar_num;
+        vout->fmt_out.i_sar_den = vout->fmt_in.i_sar_den;
+        vout->output.i_aspect = vout->fmt_in.i_aspect;
+        vout->i_changes &= ~VOUT_ASPECT_CHANGE;
+        vout->i_changes |= VOUT_SIZE_CHANGE;
+    }
+}
