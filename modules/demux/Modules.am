@@ -30,11 +30,13 @@ SOURCES_tta = tta.c
 SOURCES_vc1 = vc1.c
 SOURCES_demux_cdg = cdg.c
 SOURCES_smf = smf.c
+SOURCES_dirac = dirac.c
 
 libvlc_LTLIBRARIES += \
 	libaiff_plugin.la \
 	libau_plugin.la \
 	librawaud_plugin.la \
+	libdirac_plugin.la \
 	libdemux_cdg_plugin.la \
 	libdemuxdump_plugin.la \
 	libflacsys_plugin.la \
