@@ -494,7 +494,7 @@ found_adaptor:
     vout->output.i_width = vout->fmt_out.i_width = vout->fmt_in.i_width;
     vout->output.i_height = vout->fmt_out.i_height = vout->fmt_in.i_height;
     vout->fmt_out.i_x_offset = vout->fmt_in.i_x_offset;
-    p_vout->fmt_out.i_y_offset = vout->fmt_in.i_y_offset;
+    vout->fmt_out.i_y_offset = vout->fmt_in.i_y_offset;
 
     assert (height > 0);
     vout->output.i_aspect = vout->fmt_out.i_aspect =
@@ -525,9 +525,10 @@ static void Display (vout_thread_t *vout, picture_t *pic)
     if (segment)
         xcb_xv_shm_put_image (p_sys->conn, p_sys->port, p_sys->window,
                               p_sys->gc, segment, p_sys->id, 0,
-                              /* Src: */ 0, 0,
-                              pic->p->i_visible_pitch / pic->p->i_pixel_pitch,
-                              pic->p->i_visible_lines,
+                              /* Src: */ vout->fmt_out.i_x_offset,
+                              vout->fmt_out.i_y_offset,
+                              vout->fmt_out.i_visible_width,
+                              vout->fmt_out.i_visible_height,
                               /* Dst: */ 0, 0, p_sys->width, p_sys->height,
                               /* Memory: */
                               pic->p->i_pitch / pic->p->i_pixel_pitch,
@@ -535,9 +536,9 @@ static void Display (vout_thread_t *vout, picture_t *pic)
     else
         xcb_xv_put_image (p_sys->conn, p_sys->port, p_sys->window,
                           p_sys->gc, p_sys->id,
-                          0, 0,
-                          pic->p->i_visible_pitch / pic->p->i_pixel_pitch,
-                          pic->p->i_visible_lines,
+                          vout->fmt_out.i_x_offset, vout->fmt_out.i_y_offset,
+                          vout->fmt_out.i_visible_width,
+                          vout->fmt_out.i_visible_height,
                           0, 0, p_sys->width, p_sys->height,
                           vout->fmt_out.i_width, vout->fmt_out.i_height,
                           p_sys->data_size, pic->p->p_pixels);
@@ -559,6 +560,24 @@ static int Manage (vout_thread_t *vout)
     {
         msg_Err (vout, "X server failure");
         return VLC_EGENERIC;
+    }
+
+    CommonManage (vout);
+    if (vout->i_changes & VOUT_SIZE_CHANGE)
+    {   /* TODO: factor this code with XV and X11 Init() */
+        unsigned x, y, width, height;
+
+        if (GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
+            return VLC_EGENERIC;
+        vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
+
+        const uint32_t values[] = { x, y, width, height, };
+        xcb_configure_window (p_sys->conn, p_sys->window, XCB_CONFIG_WINDOW_X |
+                              XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH |
+                              XCB_CONFIG_WINDOW_HEIGHT, values);
+        vout->p_sys->width = width; // XXX: <-- this is useless, as the zoom is
+        vout->p_sys->height = height; // handled with VOUT_SET_SIZE anyway.
+        vout->i_changes &= ~VOUT_SIZE_CHANGE;
     }
     return VLC_SUCCESS;
 }
