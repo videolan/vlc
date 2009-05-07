@@ -1230,21 +1230,11 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     block_t *p_block = NULL;
     int i_flushing = 0;
 
-    while( pp_block && *pp_block )
+    if( pp_block && *pp_block )
     {
         p_block = *pp_block;
-        *pp_block = p_block->p_next;
-        p_block->p_next = NULL;
+        *pp_block = NULL;
 
-        if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
-        {
-            /* silently discard corruption sentinels,
-             * synchronizer will then discard affected data units.
-             * do not produce an EOS data unit as this is very
-             * disruptive to the stream (and may make a larger error). */
-            block_Release( p_block );
-            continue;
-        }
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
             /* pre-emptively insert an EOS at a discontinuity, protects
@@ -1258,7 +1248,17 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                  * duplicates get discarded in forming encapsulation unit */
             }
         }
-        block_BytestreamPush( &p_sys->bytestream, p_block );
+        else if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
+        {
+            /* silently discard corruption sentinels,
+             * synchronizer will then discard affected data units.
+             * do not produce an EOS data unit as this is very
+             * disruptive to the stream (and may make a larger error). */
+            block_Release( p_block );
+            p_block = NULL;
+        }
+        if( p_block )
+            block_BytestreamPush( &p_sys->bytestream, p_block );
     }
 
     /* form as many encapsulation units as possible, give up
@@ -1437,9 +1437,6 @@ static void Close( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( !p_sys )
-        return;
 
     block_BytestreamRelease( &p_sys->bytestream );
     if( p_sys->p_outqueue )
