@@ -450,6 +450,41 @@ int utf8_unlink( const char *filename )
     return ret;
 }
 
+/**
+ * Moves a file atomically. This only works within a single file system.
+ *
+ * @param oldpath path to the file before the move
+ * @param newpath intended path to the file after the move
+ * @return A 0 return value indicates success. A -1 return value indicates an
+ *        error, and an error code is stored in errno
+ */
+int utf8_rename (const char *oldpath, const char *newpath)
+{
+#if defined (WIN32)
+    CONVERT_PATH (oldpath, wold, -1);
+    CONVERT_PATH (newpath, wnew, -1);
+    return _wrename (wold, wnew);
+
+#endif
+    const char *lo = ToLocale (oldpath);
+    if (lo == NULL)
+        goto error;
+
+    const char *ln = ToLocale (newpath);
+    if (ln == NULL)
+    {
+        LocaleFree (lo);
+error:
+        errno = ENOENT;
+        return -1;
+    }
+
+    int ret = rename (lo, ln);
+    LocaleFree (lo);
+    LocaleFree (ln);
+    return ret;
+}
+
 int utf8_mkstemp( char *template )
 {
     static const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
