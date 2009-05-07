@@ -1237,8 +1237,8 @@ void KeySelectorControl::finish()
     table->resizeColumnToContents( 0 );
 
     CONNECT( table, itemDoubleClicked( QTreeWidgetItem *, int ),
-             this, selectKey( QTreeWidgetItem * ) );
-    CONNECT( table, itemSelectionChanged (),
+             this, selectKey( QTreeWidgetItem *, int ) );
+    CONNECT( table, itemSelectionChanged(),
              this, select1Key() );
 
     CONNECT( shortcutValue, pressed(), this, selectKey() );
@@ -1261,9 +1261,10 @@ void KeySelectorControl::select1Key()
     QTreeWidgetItem *keyItem = table->currentItem();
     shortcutValue->setText( keyItem->text( 1 ) );
     shortcutValue->setValue( keyItem->data( 1, Qt::UserRole ).toInt() );
+    shortcutValue->setGlobal( false );
 }
 
-void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
+void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem, int column )
 {
     /* This happens when triggered by ClickEater */
     if( keyItem == NULL ) keyItem = table->currentItem();
@@ -1272,8 +1273,13 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
        and the shortcutValue is clicked */
     if( !keyItem ) return;
 
+    /* If clicked on the first column, assuming user wants the normal hotkey */
+    if( column == 0 ) column = 1;
+
+    bool b_global = ( column == 2 );
+
     /* Launch a small dialog to ask for a new key */
-    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), widget );
+    KeyInputDialog *d = new KeyInputDialog( table, keyItem->text( 0 ), widget, b_global );
     d->exec();
 
     if( d->result() == QDialog::Accepted )
@@ -1281,6 +1287,7 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
         int newValue = d->keyValue;
         shortcutValue->setText( VLCKeyToString( newValue ) );
         shortcutValue->setValue( newValue );
+        shortcutValue->setGlobal( b_global );
 
         if( d->conflicts )
         {
@@ -1288,11 +1295,11 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
             for( int i = 0; i < table->topLevelItemCount() ; i++ )
             {
                 it = table->topLevelItem(i);
-                if( ( keyItem != it )
-                        && ( it->data( 1, Qt::UserRole ).toInt() == newValue ) )
+                if( ( keyItem != it ) &&
+                    ( it->data( b_global ? 2: 1, Qt::UserRole ).toInt() == newValue ) )
                 {
-                    it->setData( 1, Qt::UserRole, QVariant( -1 ) );
-                    it->setText( 1, qtr( "Unset" ) );
+                    it->setData( b_global ? 2 : 1, Qt::UserRole, QVariant( -1 ) );
+                    it->setText( b_global ? 2 : 1, qtr( "Unset" ) );
                 }
             }
             /* We already made an OK once. */
@@ -1305,8 +1312,10 @@ void KeySelectorControl::selectKey( QTreeWidgetItem *keyItem )
 void KeySelectorControl::setTheKey()
 {
     if( !table->currentItem() ) return;
-    table->currentItem()->setText( 1, shortcutValue->text() );
-    table->currentItem()->setData( 1, Qt::UserRole, shortcutValue->getValue() );
+    table->currentItem()->setText( shortcutValue->getGlobal() ? 2 : 1,
+                                   shortcutValue->text() );
+    table->currentItem()->setData( shortcutValue->getGlobal() ? 2 : 1,
+                                   Qt::UserRole, shortcutValue->getValue() );
 }
 
 void KeySelectorControl::doApply()
@@ -1319,19 +1328,29 @@ void KeySelectorControl::doApply()
             config_PutInt( p_this,
                            qtu( it->data( 0, Qt::UserRole ).toString() ),
                            it->data( 1, Qt::UserRole ).toInt() );
+        if( it->data( 2, Qt::UserRole ).toInt() >= 0 )
+            config_PutInt( p_this,
+                           qtu( "global-" + it->data( 0, Qt::UserRole ).toString() ),
+                           it->data( 2, Qt::UserRole ).toInt() );
+
     }
 }
 
+/**
+ * Class KeyInputDialog
+ **/
 KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
                                 const QString& keyToChange,
-                                QWidget *_parent ) :
-                                QDialog( _parent ), keyValue(0)
+                                QWidget *_parent,
+                                bool _b_global ) :
+                                QDialog( _parent ), keyValue(0), b_global( _b_global )
 {
     setModal( true );
     conflicts = false;
 
     table = _table;
-    setWindowTitle( qtr( "Hotkey for " ) + keyToChange );
+    setWindowTitle( b_global ? qtr( "Global" ): ""
+                    + qtr( "Hotkey for " ) + keyToChange );
 
     vLayout = new QVBoxLayout( this );
     selected = new QLabel( qtr( "Press the new keys for " ) + keyToChange );
@@ -1358,10 +1377,11 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
 void KeyInputDialog::checkForConflicts( int i_vlckey )
 {
      QList<QTreeWidgetItem *> conflictList =
-         table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly, 1 );
+         table->findItems( VLCKeyToString( i_vlckey ), Qt::MatchExactly,
+                           b_global ? 2 : 1 );
 
     if( conflictList.size() &&
-        conflictList[0]->data( 1, Qt::UserRole ).toInt() > 1 )
+        conflictList[0]->data( b_global ? 2 : 1, Qt::UserRole ).toInt() > 1 )
         /* Avoid 0 or -1 that are the "Unset" states */
     {
         warning->setText( qtr("Warning: the key is already assigned to \"") +

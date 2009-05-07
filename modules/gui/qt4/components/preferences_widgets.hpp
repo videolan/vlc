@@ -421,14 +421,18 @@ private slot:
  **********************************************************************/
 class KeyShortcutEdit: public QLineEdit
 {
-    Q_OBJECT
+    Q_OBJECT;
 public:
     void setValue( int _value ){ value = _value; }
     int getValue() const { return value; }
+
+    void setGlobal( bool _value ) { b_global = _value; }
+    bool getGlobal()  const { return b_global; }
 public slots:
-    virtual void clear(void) { value = 0; QLineEdit::clear(); }
+    virtual void clear(void) { value = 0; QLineEdit::clear(); b_global = false;}
 private:
     int value;
+    bool b_global;
     virtual void mousePressEvent( QMouseEvent *event );
 signals:
     void pressed();
@@ -455,7 +459,7 @@ private:
     SearchLineEdit *actionSearch;
 private slots:
     void setTheKey();
-    void selectKey( QTreeWidgetItem * = NULL );
+    void selectKey( QTreeWidgetItem * = NULL, int column = 1 );
     void select1Key();
     void filter( const QString & );
 };
@@ -463,7 +467,7 @@ private slots:
 class KeyInputDialog : public QDialog
 {
 public:
-    KeyInputDialog( QTreeWidget *, const QString&, QWidget * );
+    KeyInputDialog( QTreeWidget *, const QString&, QWidget *, bool b_global = false);
     int keyValue;
     bool conflicts;
 private:
@@ -474,5 +478,6 @@ private:
     QLabel *selected, *warning;
     QVBoxLayout *vLayout;
     QDialogButtonBox *buttonBox;
+    bool b_global;
 };
 #endif
