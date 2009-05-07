@@ -332,7 +332,7 @@ static void dirac_RecoverTimestamps ( decoder_t *p_dec, size_t i_length )
     i_offset += i_length;
     for(; p_block != NULL; p_block = p_block->p_next )
     {
-        if( p_sys->i_sync_pts == VLC_TS_INVALID && p_sys->i_sync_dts == VLC_TS_INVALID )
+        if( p_sys->i_sync_pts <= VLC_TS_INVALID && p_sys->i_sync_dts <= VLC_TS_INVALID )
         {
             /* oldest timestamp wins */
             p_sys->i_sync_pts = p_block->i_pts;
@@ -359,7 +359,7 @@ static void dirac_BackdateDTS( block_t *p_block, block_t *p_last, date_t *p_dts 
     {
         if( pp_array[n]->i_flags & DIRAC_NON_DATED )
             continue;
-        if( pp_array[n]->i_dts == VLC_TS_INVALID )
+        if( pp_array[n]->i_dts <= VLC_TS_INVALID )
             pp_array[n]->i_dts = date_Decrement( p_dts, 1 );
     }
     free( pp_array );
@@ -377,7 +377,7 @@ static void dirac_BackdatePTS( block_t *p_block, block_t *p_last, date_t *p_pts,
     {
         if( pp_array[n]->i_flags & DIRAC_NON_DATED )
             continue;
-        if( pp_array[n]->i_dts != VLC_TS_INVALID )
+        if( pp_array[n]->i_dts > VLC_TS_INVALID )
             continue;
         dirac_block_encap_t *dbe = dirac_GetBlockEncap( pp_array[n] );
         int32_t u_pic_num = dbe ? dbe->u_picture_number : 0;
@@ -978,12 +978,12 @@ static block_t *dirac_BuildEncapsulationUnit( decoder_t *p_dec, block_t *p_block
 
     assert(p_block->i_buffer >= 13 && 0x42424344 == GetDWBE( p_block->p_buffer ));
 
-    if( p_sys->i_eu_pts == VLC_TS_INVALID && p_sys->i_eu_dts == VLC_TS_INVALID )
+    if( p_sys->i_eu_pts <= VLC_TS_INVALID && p_sys->i_eu_dts <= VLC_TS_INVALID )
     {
         /* earliest block with pts/dts gets to set the pts/dts for the dated
          * encapsulation unit as a whole */
         /* NB, the 'earliest block' criteria is aribtary */
-        if( p_block->i_pts != VLC_TS_INVALID || p_block->i_dts != VLC_TS_INVALID )
+        if( p_block->i_pts > VLC_TS_INVALID || p_block->i_dts > VLC_TS_INVALID )
         {
             p_sys->i_eu_pts = p_block->i_pts;
             p_sys->i_eu_dts = p_block->i_dts;
@@ -1100,7 +1100,7 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
      * Stage 1, sync to input timestamps, backdate timestamps for old
      * EUs that are in the outqueue with missing dates
      */
-    if( p_block_in->i_dts != VLC_TS_INVALID )
+    if( p_block_in->i_dts > VLC_TS_INVALID )
     do {
         /* if timestamps exist, sync to them */
         if( p_sys->b_dts )
@@ -1111,7 +1111,7 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
         dirac_BackdateDTS( p_sys->p_outqueue, p_block_in, &dts );
     } while( 0 );
 
-    if( p_block_in->i_pts != VLC_TS_INVALID )
+    if( p_block_in->i_pts > VLC_TS_INVALID )
     do {
         /* if timestamps exist, sync to them */
         p_sys->u_pts_picnum = u_picnum;
@@ -1137,13 +1137,13 @@ static int dirac_TimeGenPush( decoder_t *p_dec, block_t *p_block_in )
     /*
      * Stage 3, for block_in, interpolate any missing timestamps
      */
-    if( p_sys->b_dts && p_block_in->i_dts == VLC_TS_INVALID )
+    if( p_sys->b_dts && p_block_in->i_dts <= VLC_TS_INVALID )
     {
         /* dts has previously been seen, but not this time, interpolate */
         p_block_in->i_dts = date_Increment( &p_sys->dts, 1 );
     }
 
-    if( p_sys->b_pts && p_block_in->i_pts == VLC_TS_INVALID )
+    if( p_sys->b_pts && p_block_in->i_pts <= VLC_TS_INVALID )
     {
         /* pts has previously been seen, but not this time, interpolate */
         date_t pts = p_sys->dts;
@@ -1298,8 +1298,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             p_block->i_dts = p_sys->i_dts_last_out;
             p_block->i_pts = p_sys->i_pts_last_out;
         }
-        else if( p_block->i_pts == VLC_TS_INVALID ) break;
-        else if( p_block->i_dts == VLC_TS_INVALID ) break;
+        else if( p_block->i_pts <= VLC_TS_INVALID ) break;
+        else if( p_block->i_dts <= VLC_TS_INVALID ) break;
 
         p_sys->i_dts_last_out = p_block->i_dts;
         p_sys->i_pts_last_out = p_block->i_pts;
@@ -1351,7 +1351,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         while( p_block )
         {
             block_t *p_block_next = p_block->p_next;
-            if( p_block->i_pts != VLC_TS_INVALID && p_block->i_dts != VLC_TS_INVALID )
+            if( p_block->i_pts > VLC_TS_INVALID && p_block->i_dts > VLC_TS_INVALID )
                 break;
             block_Release( p_block );
             p_sys->p_outqueue = p_block = p_block_next;
