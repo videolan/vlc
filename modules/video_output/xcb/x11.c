@@ -83,6 +83,7 @@ static int Init (vout_thread_t *);
 static void Deinit (vout_thread_t *);
 static void Display (vout_thread_t *, picture_t *);
 static int Manage (vout_thread_t *);
+static int Control (vout_thread_t *, int, va_list);
 
 int CheckError (vout_thread_t *vout, const char *str, xcb_void_cookie_t ck)
 {
@@ -274,6 +275,7 @@ static int Open (vlc_object_t *obj)
     vout->pf_end = Deinit;
     vout->pf_display = Display;
     vout->pf_manage = Manage;
+    vout->pf_control = Control;
     return VLC_SUCCESS;
 
 error:
@@ -428,4 +430,9 @@ HandleParentStructure (vout_thread_t *vout, xcb_connection_t *conn,
     xcb_configure_window (conn, xid,
                           XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
                           values);
+}
+
+static int Control (vout_thread_t *vout, int query, va_list ap)
+{
+    return vout_ControlWindow (vout->p_sys->embed, query, ap);
 }
