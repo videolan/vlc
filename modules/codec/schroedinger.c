@@ -115,9 +115,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_lastpts = -1;
     p_sys->i_frame_pts_delta = 0;
 
-    /* request packetizer */
-    p_dec->b_need_packetized = true;
-
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
     p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
