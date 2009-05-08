@@ -65,7 +65,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static void ParseClipInfo( char * psz_clipinfo, char **ppsz_artist, char **ppsz_title,
+static void ParseClipInfo( const char * psz_clipinfo, char **ppsz_artist, char **ppsz_title,
                            char **ppsz_album, char **ppsz_genre, char **ppsz_year,
                            char **ppsz_cdnum, char **ppsz_comments );
 
@@ -133,7 +133,7 @@ static inline void MaybeFromLocaleRep (char **str)
  * @param s: input string
  * @param i_strlen: length of the buffer
  */
-static char *SkipBlanks(char *s, size_t i_strlen )
+static const char *SkipBlanks( const char *s, size_t i_strlen )
 {
     while( i_strlen > 0 ) {
         switch( *s )
@@ -158,7 +158,7 @@ static char *SkipBlanks(char *s, size_t i_strlen )
  * @param i_strlen: length of the buffer
  * @return time in seconds
  */
-static int ParseTime(char *s, size_t i_strlen)
+static int ParseTime( const char *s, size_t i_strlen)
 {
     // need to parse hour:minutes:sec.fraction string
     int result = 0;
@@ -326,7 +326,7 @@ static int Demux( demux_t *p_demux )
                         psz_author = strdup(psz_value);
                     else if( !strcmp( psz_param, "start" ) )
                     {
-                        i_start = ParseTime( strdup( psz_value ),strlen( psz_value ) );
+                        i_start = ParseTime( psz_value, strlen( psz_value ) );
                         char *temp;
                         if( i_start )
                         {
@@ -336,7 +336,7 @@ static int Demux( demux_t *p_demux )
                     }
                     else if( !strcmp( psz_param, "end" ) )
                     {
-                        i_stop = ParseTime( strdup( psz_value ), strlen( psz_value ) );
+                        i_stop = ParseTime( psz_value, strlen( psz_value ) );
                         char *temp;
                         if( i_stop )
                         {
@@ -435,16 +435,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * @param ppsz_cdnum: Buffer to store cdnum
  * @param ppsz_comments: Buffer to store comments
  */
-static void ParseClipInfo( char *psz_clipinfo, char **ppsz_artist, char **ppsz_title,
+static void ParseClipInfo( const char *psz_clipinfo, char **ppsz_artist, char **ppsz_title,
                            char **ppsz_album, char **ppsz_genre, char **ppsz_year,
                            char **ppsz_cdnum, char **ppsz_comments )
 {
     char *psz_option_next, *psz_option_start, *psz_param, *psz_value, *psz_suboption;
     char *psz_temp_clipinfo = strdup( psz_clipinfo );
-    psz_option_start = psz_clipinfo;
     psz_option_start = strchr( psz_temp_clipinfo, '"' );
     if( !psz_option_start )
+    {
+        free( psz_temp_clipinfo );
         return;
+    }
 
     psz_option_start++;
     psz_option_next = psz_option_start;
