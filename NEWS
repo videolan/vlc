@@ -33,7 +33,8 @@ Demuxers:
  * Improvements of the TS demuxer for M2TS files from Blu-Ray and AVCHD
  * Metadata for mod files are supported
  * GSM codecs in Wav files are supported
- * A new rawaud demuxer supports raw PCM streams
+ * New raw audio demuxer supporting raw PCM streams
+ * New dirac demuxer for raw dirac streams
 
 Encoders:
  * Dirac encoding using libdirac (supported in Ogg and in TS)
