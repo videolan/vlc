@@ -2,11 +2,11 @@ dnl Autoconf settings for vlc
 
 AC_COPYRIGHT([Copyright 2002-2009 the VideoLAN team])
 
-AC_INIT(vlc, 1.0.0-pre2)
+AC_INIT(vlc, 1.0.0-rc1)
 VERSION_MAJOR="1"
 VERSION_MINOR="0"
 VERSION_REVISION="0"
-VERSION_EXTRA="-pre2"
+VERSION_EXTRA="-rc1"
 PKGDIR="vlc"
 AC_SUBST(PKGDIR)
 

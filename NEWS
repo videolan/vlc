@@ -1,5 +1,5 @@
-Changes between 0.9.9 and 1.0.0-pre2:
--------------------------------------
+Changes between 0.9.9a and 1.0.0-rc1:
+------------------------------------
 
 Important notes:
 ----------------
@@ -119,6 +119,15 @@ Video output:
 
 Miscellanous:
  * Invmem, a fake codec to display images from external applications
+
+
+Changes between 0.9.9 and 0.9.9a:
+---------------------------------
+
+Mac OS X:
+ * Updated multiple 3rd party libraries to keep in sync with the Win32 port
+ * Playback fixes for PowerPC-based Macs
+
 
 Changes between 0.9.8a and 0.9.9:
 ---------------------------------
