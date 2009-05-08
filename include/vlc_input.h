@@ -248,13 +248,15 @@ static inline void vlc_input_attachment_Delete( input_attachment_t *a )
 #define INPUT_UPDATE_META       0x0040
 #define INPUT_UPDATE_SIGNAL     0x0080
 
-/** Get the input item for an input thread
- * FIXME see src/input/item.c but is is unsafe unless
- * you hold p_input
+/**
+ * This defines private core storage for an input.
  */
-VLC_EXPORT(input_item_t*, input_GetItem, (input_thread_t*));
-
 typedef struct input_thread_private_t input_thread_private_t;
+
+/**
+ * This defines an opaque input resource handler.
+ */
+typedef struct input_resource_t input_resource_t;
 
 /**
  * Main structure representing an input thread. This structure is mostly
@@ -431,32 +433,9 @@ typedef enum input_event_type_e
 
 } input_event_type_e;
 
-/** @}*/
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-
 /**
- * It will create a new input thread.
- *
- * You must call input_StopThread() on it and then vlc_object_release().
+ * Input queries
  */
-#define input_CreateThread(a,b) __input_CreateThread(VLC_OBJECT(a),b)
-VLC_EXPORT( input_thread_t *, __input_CreateThread, ( vlc_object_t *, input_item_t * ) );
-
-/**
- * It will ask a input_thread_t to stop.
- *
- * b_abort must be true when a user stop is requested and not because you have
- * detected an error or an eof. It will be used to properly send the
- * INPUT_EVENT_ABORT event.
- */
-VLC_EXPORT( void,             input_StopThread,     ( input_thread_t *, bool b_abort ) );
-
-#define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
-VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );
-
 enum input_query_e
 {
     /* input variable "position" */
@@ -526,8 +505,36 @@ enum input_query_e
     INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, int *        res=can fail */
 };
 
+/** @}*/
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+
+#define input_Create(a,b,c,d) __input_Create(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( input_thread_t *, __input_Create, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) );
+
+#define input_CreateAndStart(a,b,c) __input_CreateAndStart(VLC_OBJECT(a),b,c)
+VLC_EXPORT( input_thread_t *, __input_CreateAndStart, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) );
+
+VLC_EXPORT( int,  input_Start, ( input_thread_t * ) );
+
+VLC_EXPORT( void, input_Stop, ( input_thread_t *, bool b_abort ) );
+
+#define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
+VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );
+
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
+
 VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
+
+/**
+ * Get the input item for an input thread
+ *
+ * You have to keep a reference to the input or to the input_item_t until
+ * you do not need it anymore.
+ */
+VLC_EXPORT( input_item_t*, input_GetItem, ( input_thread_t * ) );
 
 /**
  * It will return the current state of the input.
@@ -567,7 +574,7 @@ static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
          vlc_object_release( (vlc_object_t *)(pp_vout[i]) );
 
      p_vout = (i_vout >= 1) ? pp_vout[0] : NULL;
-     free (pp_vout);
+     free( pp_vout );
      return p_vout;
 }
 

@@ -47,11 +47,6 @@ int input_Preparse( vlc_object_t *, input_item_t * );
 input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 
 /**
- * This defines an opaque input resource handler.
- */
-typedef struct input_resource_t input_resource_t;
-
-/**
  * This function releases an input_resource_t and all associated resources.
  */
 void input_resource_Delete( input_resource_t * );
@@ -74,8 +69,6 @@ void input_resource_TerminateVout( input_resource_t *p_resource );
 bool input_resource_HasVout( input_resource_t *p_resource );
 
 /* input.c */
-#define input_CreateThreadExtended(a,b,c,d) __input_CreateThreadExtended(VLC_OBJECT(a),b,c,d)
-input_thread_t *__input_CreateThreadExtended ( vlc_object_t *, input_item_t *, const char *, input_resource_t * );
 
 /**
  * This function detaches resources from a dead input.

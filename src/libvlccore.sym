@@ -169,8 +169,9 @@ image_Mime2Fourcc
 image_Type2Fourcc
 InitMD5
 input_Control
+__input_Create
+__input_CreateAndStart
 input_CreateFilename
-__input_CreateThread
 input_DecoderDecode
 input_DecoderDelete
 input_DecoderNew
@@ -199,7 +200,8 @@ input_item_SetURI
 input_MetaTypeToLocalizedString
 __input_Read
 input_SplitMRL
-input_StopThread
+input_Start
+input_Stop
 input_vaControl
 __intf_Create
 __intf_Eject

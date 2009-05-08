@@ -113,6 +113,200 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
 /* Do not let a pts_delay from access/demux go beyong 60s */
 #define INPUT_PTS_DELAY_MAX INT64_C(60000000)
 
+/**
+ * Create a new input_thread_t.
+ *
+ * You need to call input_Start on it when you are done
+ * adding callback on the variables/events you want to monitor.
+ *
+ * \param p_parent a vlc_object
+ * \param p_item an input item
+ * \param psz_log an optional prefix for this input logs
+ * \param p_resource an optional input ressource
+ * \return a pointer to the spawned input thread
+ */
+
+input_thread_t *__input_Create( vlc_object_t *p_parent,
+                                input_item_t *p_item,
+                                const char *psz_log, input_resource_t *p_resource )
+{
+
+    return Create( p_parent, p_item, psz_log, false, p_resource );
+}
+
+/**
+ * Create a new input_thread_t and start it.
+ *
+ * Provided for convenience.
+ *
+ * \see input_Create
+ */
+input_thread_t *__input_CreateAndStart( vlc_object_t *p_parent,
+                                        input_item_t *p_item, const char *psz_log )
+{
+    input_thread_t *p_input = __input_Create( p_parent, p_item, psz_log, NULL );
+
+    if( input_Start( p_input ) )
+    {
+        vlc_object_release( p_input );
+        return NULL;
+    }
+    return p_input;
+}
+
+/**
+ * Initialize an input thread and run it. This thread will clean after itself,
+ * you can forget about it. It can work either in blocking or non-blocking mode
+ *
+ * \param p_parent a vlc_object
+ * \param p_item an input item
+ * \param b_block should we block until read is finished ?
+ * \return an error code, VLC_SUCCESS on success
+ */
+int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
+                   bool b_block )
+{
+    input_thread_t *p_input;
+
+    p_input = Create( p_parent, p_item, NULL, false, NULL );
+    if( !p_input )
+        return VLC_EGENERIC;
+
+    if( b_block )
+    {
+        RunAndDestroy( VLC_OBJECT(p_input) );
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        if( vlc_thread_create( p_input, "input", RunAndDestroy,
+                               VLC_THREAD_PRIORITY_INPUT ) )
+        {
+            input_ChangeState( p_input, ERROR_S );
+            msg_Err( p_input, "cannot create input thread" );
+            vlc_object_release( p_input );
+            return VLC_EGENERIC;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+/**
+ * Initialize an input and initialize it to preparse the item
+ * This function is blocking. It will only accept parsing regular files.
+ *
+ * \param p_parent a vlc_object_t
+ * \param p_item an input item
+ * \return VLC_SUCCESS or an error
+ */
+int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
+{
+    input_thread_t *p_input;
+
+    /* Allocate descriptor */
+    p_input = Create( p_parent, p_item, NULL, true, NULL );
+    if( !p_input )
+        return VLC_EGENERIC;
+
+    if( !Init( p_input ) )
+        End( p_input );
+
+    vlc_object_release( p_input );
+
+    return VLC_SUCCESS;
+}
+
+/**
+ * Start a input_thread_t created by input_Create.
+ *
+ * You must not start an already running input_thread_t.
+ *
+ * \param the input thread to start
+ */
+int input_Start( input_thread_t *p_input )
+{
+    /* Create thread and wait for its readiness. */
+    if( vlc_thread_create( p_input, "input", Run,
+                           VLC_THREAD_PRIORITY_INPUT ) )
+    {
+        input_ChangeState( p_input, ERROR_S );
+        msg_Err( p_input, "cannot create input thread" );
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+/**
+ * Request a running input thread to stop and die
+ *
+ * b_abort must be true when a user stop is requested and not because you have
+ * detected an error or an eof. It will be used to properly send the
+ * INPUT_EVENT_ABORT event.
+ *
+ * \param p_input the input thread to stop
+ * \param b_abort true if the input has been aborted by a user request
+ */
+void input_Stop( input_thread_t *p_input, bool b_abort )
+{
+    /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
+     * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
+     * unlock the control loop */
+    ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
+
+    vlc_mutex_lock( &p_input->p->lock_control );
+    p_input->p->b_abort |= b_abort;
+    vlc_mutex_unlock( &p_input->p->lock_control );
+
+    input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
+}
+
+input_resource_t *input_DetachResource( input_thread_t *p_input )
+{
+    assert( p_input->b_dead );
+
+    input_resource_SetInput( p_input->p->p_resource, NULL );
+
+    input_resource_t *p_resource = input_resource_Detach( p_input->p->p_resource );
+    p_input->p->p_sout = NULL;
+
+    return p_resource;
+}
+
+/**
+ * Get the item from an input thread
+ * FIXME it does not increase ref count of the item.
+ * if it is used after p_input is destroyed nothing prevent it from
+ * being freed.
+ */
+input_item_t *input_GetItem( input_thread_t *p_input )
+{
+    assert( p_input && p_input->p );
+    return p_input->p->p_item;
+}
+
+/*****************************************************************************
+ * ObjectKillChildrens
+ *****************************************************************************/
+static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
+{
+    vlc_list_t *p_list;
+    int i;
+
+    /* FIXME ObjectKillChildrens seems a very bad idea in fact */
+    i = vlc_internals( p_obj )->i_object_type;
+    if( i == VLC_OBJECT_VOUT ||i == VLC_OBJECT_AOUT ||
+        p_obj == VLC_OBJECT(p_input->p->p_sout) ||
+        i == VLC_OBJECT_DECODER || i == VLC_OBJECT_PACKETIZER )
+        return;
+
+    vlc_object_kill( p_obj );
+
+    p_list = vlc_list_children( p_obj );
+    for( i = 0; i < p_list->i_count; i++ )
+        ObjectKillChildrens( p_input, p_list->p_values[i].p_object );
+    vlc_list_release( p_list );
+}
+
 /*****************************************************************************
  * This function creates a new input, and returns a pointer
  * to its description. On error, it returns NULL.
@@ -331,174 +525,6 @@ static void Destructor( input_thread_t * p_input )
     vlc_cond_destroy( &p_input->p->wait_control );
     vlc_mutex_destroy( &p_input->p->lock_control );
     free( p_input->p );
-}
-
-/**
- * Initialize an input thread and run it. You will need to monitor the
- * thread to clean up after it is done
- *
- * \param p_parent a vlc_object
- * \param p_item an input item
- * \return a pointer to the spawned input thread
- */
-input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
-                                      input_item_t *p_item )
-{
-    return __input_CreateThreadExtended( p_parent, p_item, NULL, NULL );
-}
-
-/* */
-input_thread_t *__input_CreateThreadExtended( vlc_object_t *p_parent,
-                                              input_item_t *p_item,
-                                              const char *psz_log, input_resource_t *p_resource )
-{
-    input_thread_t *p_input;
-
-    p_input = Create( p_parent, p_item, psz_log, false, p_resource );
-    if( !p_input )
-        return NULL;
-
-    /* Create thread and wait for its readiness. */
-    if( vlc_thread_create( p_input, "input", Run,
-                           VLC_THREAD_PRIORITY_INPUT ) )
-    {
-        input_ChangeState( p_input, ERROR_S );
-        msg_Err( p_input, "cannot create input thread" );
-        vlc_object_detach( p_input );
-        vlc_object_release( p_input );
-        return NULL;
-    }
-
-    return p_input;
-}
-
-/**
- * Initialize an input thread and run it. This thread will clean after itself,
- * you can forget about it. It can work either in blocking or non-blocking mode
- *
- * \param p_parent a vlc_object
- * \param p_item an input item
- * \param b_block should we block until read is finished ?
- * \return an error code, VLC_SUCCESS on success
- */
-int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
-                   bool b_block )
-{
-    input_thread_t *p_input;
-
-    p_input = Create( p_parent, p_item, NULL, false, NULL );
-    if( !p_input )
-        return VLC_EGENERIC;
-
-    if( b_block )
-    {
-        RunAndDestroy( VLC_OBJECT(p_input) );
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        if( vlc_thread_create( p_input, "input", RunAndDestroy,
-                               VLC_THREAD_PRIORITY_INPUT ) )
-        {
-            input_ChangeState( p_input, ERROR_S );
-            msg_Err( p_input, "cannot create input thread" );
-            vlc_object_release( p_input );
-            return VLC_EGENERIC;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
-/**
- * Initialize an input and initialize it to preparse the item
- * This function is blocking. It will only accept parsing regular files.
- *
- * \param p_parent a vlc_object_t
- * \param p_item an input item
- * \return VLC_SUCCESS or an error
- */
-int input_Preparse( vlc_object_t *p_parent, input_item_t *p_item )
-{
-    input_thread_t *p_input;
-
-    /* Allocate descriptor */
-    p_input = Create( p_parent, p_item, NULL, true, NULL );
-    if( !p_input )
-        return VLC_EGENERIC;
-
-    if( !Init( p_input ) )
-        End( p_input );
-
-    vlc_object_detach( p_input );
-    vlc_object_release( p_input );
-
-    return VLC_SUCCESS;
-}
-
-/**
- * Request a running input thread to stop and die
- *
- * \param the input thread to stop
- */
-void input_StopThread( input_thread_t *p_input, bool b_abort )
-{
-    /* Set die for input and ALL of this childrens (even (grand-)grand-childrens)
-     * It is needed here even if it is done in INPUT_CONTROL_SET_DIE handler to
-     * unlock the control loop */
-    ObjectKillChildrens( p_input, VLC_OBJECT(p_input) );
-
-    vlc_mutex_lock( &p_input->p->lock_control );
-    p_input->p->b_abort |= b_abort;
-    vlc_mutex_unlock( &p_input->p->lock_control );
-
-    input_ControlPush( p_input, INPUT_CONTROL_SET_DIE, NULL );
-}
-
-input_resource_t *input_DetachResource( input_thread_t *p_input )
-{
-    assert( p_input->b_dead );
-
-    input_resource_SetInput( p_input->p->p_resource, NULL );
-
-    input_resource_t *p_resource = input_resource_Detach( p_input->p->p_resource );
-    p_input->p->p_sout = NULL;
-
-    return p_resource;
-}
-
-/**
- * Get the item from an input thread
- * FIXME it does not increase ref count of the item.
- * if it is used after p_input is destroyed nothing prevent it from
- * being freed.
- */
-input_item_t *input_GetItem( input_thread_t *p_input )
-{
-    assert( p_input && p_input->p );
-    return p_input->p->p_item;
-}
-
-/*****************************************************************************
- * ObjectKillChildrens
- *****************************************************************************/
-static void ObjectKillChildrens( input_thread_t *p_input, vlc_object_t *p_obj )
-{
-    vlc_list_t *p_list;
-    int i;
-
-    /* FIXME ObjectKillChildrens seems a very bad idea in fact */
-    i = vlc_internals( p_obj )->i_object_type;
-    if( i == VLC_OBJECT_VOUT ||i == VLC_OBJECT_AOUT ||
-        p_obj == VLC_OBJECT(p_input->p->p_sout) ||
-        i == VLC_OBJECT_DECODER || i == VLC_OBJECT_PACKETIZER )
-        return;
-
-    vlc_object_kill( p_obj );
-
-    p_list = vlc_list_children( p_obj );
-    for( i = 0; i < p_list->i_count; i++ )
-        ObjectKillChildrens( p_input, p_list->p_values[i].p_object );
-    vlc_list_release( p_list );
 }
 
 /*****************************************************************************

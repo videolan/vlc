@@ -159,12 +159,15 @@ static void Close( vlc_object_t *p_this )
 
     for( i = 0; i < p_sys->i_input; i++ )
     {
-        if( p_sd->p_sys->pp_input[i] )
-        {
-            input_StopThread( p_sd->p_sys->pp_input[i], true );
-            vlc_object_release( p_sd->p_sys->pp_input[i] );
-            p_sd->p_sys->pp_input[i] = NULL;
-        }
+        input_thread_t *p_input = p_sd->p_sys->pp_input[i];
+        if( !p_input )
+            continue;
+
+        input_Stop( p_input, true );
+        vlc_thread_join( p_input );
+        vlc_object_release( p_input );
+
+        p_sd->p_sys->pp_input[i] = NULL;
     }
     free( p_sd->p_sys->pp_input );
     for( i = 0; i < p_sys->i_urls; i++ ) free( p_sys->ppsz_urls[i] );
@@ -197,11 +200,14 @@ static void *Run( void *data )
 
         for( int i = 0; i < p_sd->p_sys->i_input; i++ )
         {
-            if( p_sd->p_sys->pp_input[i]->b_eof
-                || p_sd->p_sys->pp_input[i]->b_error )
+            input_thread_t *p_input = p_sd->p_sys->pp_input[i];
+
+            if( p_input->b_eof || p_input->b_error )
             {
-                input_StopThread( p_sd->p_sys->pp_input[i], false );
-                vlc_object_release( p_sd->p_sys->pp_input[i] );
+                input_Stop( p_input, false );
+                vlc_thread_join( p_input );
+                vlc_object_release( p_input );
+
                 p_sd->p_sys->pp_input[i] = NULL;
                 REMOVE_ELEM( p_sys->pp_input, p_sys->i_input, i );
                 i--;
@@ -253,7 +259,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
             services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
             vlc_gc_decref( p_input );
             INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
-                         input_CreateThread( p_sd, p_input ) );
+                         input_CreateAndStart( p_sd, p_input, NULL ) );
         }
         if( psz_tok )  psz_urls = psz_tok+1;
         else           return;

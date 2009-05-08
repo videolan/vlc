@@ -251,14 +251,17 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     assert( p_sys->p_input == NULL );
 
-    input_thread_t *p_input_thread =
-        input_CreateThreadExtended( p_playlist, p_input, NULL, p_sys->p_input_resource );
-
+    input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL, p_sys->p_input_resource );
     if( p_input_thread )
     {
         p_sys->p_input = p_input_thread;
-
         var_AddCallback( p_input_thread, "intf-event", InputEvent, p_playlist );
+
+        if( input_Start( p_sys->p_input ) )
+        {
+            vlc_object_release( p_input_thread );
+            p_sys->p_input = p_input_thread = NULL;
+        }
     }
 
     p_sys->p_input_resource = NULL;
@@ -473,7 +476,7 @@ static int LoopInput( playlist_t *p_playlist )
     if( ( p_sys->request.b_request || !vlc_object_alive( p_playlist ) ) && !p_input->b_die )
     {
         PL_DEBUG( "incoming request - stopping current input" );
-        input_StopThread( p_input, true );
+        input_Stop( p_input, true );
     }
 
     /* This input is dead. Remove it ! */
@@ -514,7 +517,7 @@ static int LoopInput( playlist_t *p_playlist )
     else if( p_input->b_error || p_input->b_eof )
     {
         PL_DEBUG( "finished input" );
-        input_StopThread( p_input, false );
+        input_Stop( p_input, false );
     }
     return VLC_SUCCESS;
 }

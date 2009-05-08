@@ -531,12 +531,12 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
 
-            if( (p_input = input_CreateThreadExtended( p_vlm->p_libvlc, p_media->vod.p_item, psz_header, NULL ) ) )
+            if( (p_input = input_CreateAndStart( p_vlm->p_libvlc, p_media->vod.p_item, psz_header ) ) )
             {
                 while( !p_input->b_eof && !p_input->b_error )
                     msleep( 100000 );
 
-                input_StopThread( p_input, false );
+                input_Stop( p_input, false );
                 vlc_thread_join( p_input );
                 vlc_object_release( p_input );
             }
@@ -778,7 +778,7 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
     {
         input_resource_t *p_resource;
 
-        input_StopThread( p_input, true );
+        input_Stop( p_input, true );
         vlc_thread_join( p_input );
 
         p_resource = input_DetachResource( p_input );
@@ -861,7 +861,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             return VLC_SUCCESS;
         }
 
-        input_StopThread( p_input, !p_input->b_eof && !p_input->b_error );
+        input_Stop( p_input, !p_input->b_eof && !p_input->b_error );
         vlc_thread_join( p_input );
 
         p_instance->p_input_resource = input_DetachResource( p_input );
@@ -881,8 +881,13 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
-        p_instance->p_input = input_CreateThreadExtended( p_vlm->p_libvlc, p_instance->p_item,
-                                                          psz_log, p_instance->p_input_resource );
+        p_instance->p_input = input_Create( p_vlm->p_libvlc, p_instance->p_item,
+                                            psz_log, p_instance->p_input_resource );
+        if( p_instance->p_input && input_Start( p_instance->p_input ) )
+        {
+            vlc_object_release( p_instance->p_input );
+            p_instance->p_input = NULL;
+        }
         p_instance->p_input_resource = NULL;
 
         if( !p_instance->p_input )
