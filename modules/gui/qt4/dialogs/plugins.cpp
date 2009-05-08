@@ -57,7 +57,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     treePlugins->setColumnWidth( 0, 200 );
 
     QStringList headerNames;
-    headerNames << _("Name") << _("Capability" ) << _( "Score" );
+    headerNames << qtr("Name") << qtr("Capability" ) << qtr( "Score" );
     treePlugins->setHeaderLabels( headerNames );
 
     FillTree();
@@ -70,7 +70,7 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     treePlugins->setSortingEnabled( true );
     treePlugins->sortByColumn( 1, Qt::AscendingOrder );
 
-    QLabel *label = new QLabel( _("&Search:"), this );
+    QLabel *label = new QLabel( qtr("&Search:"), this );
     edit = new SearchLineEdit( this );
     label->setBuddy( edit );
 
