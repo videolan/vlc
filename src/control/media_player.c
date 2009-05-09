@@ -327,6 +327,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     /* Snapshot initialization */
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
            libvlc_MediaPlayerSnapshotTaken, p_e );
+
     /* Attach a var callback to the global object to provide the glue between
         vout_thread that generates the event and media_player that re-emits it
         with its own event manager
@@ -348,8 +349,8 @@ libvlc_media_player_new_from_media(
                                     libvlc_exception_t *p_e )
 {
     libvlc_media_player_t * p_mi;
-    p_mi = libvlc_media_player_new( p_md->p_libvlc_instance, p_e );
 
+    p_mi = libvlc_media_player_new( p_md->p_libvlc_instance, p_e );
     if( !p_mi )
         return NULL;
 
@@ -376,14 +377,12 @@ libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
     }
 
     p_mi = libvlc_media_player_new( p_libvlc_instance, p_e );
-
     if( !p_mi )
         return NULL;
 
     p_mi->p_md = libvlc_media_new_from_input_item(
                     p_libvlc_instance,
                     input_GetItem( p_input ), p_e );
-
     if( !p_mi->p_md )
     {
         libvlc_media_player_destroy( p_mi );
@@ -409,10 +408,10 @@ void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     input_thread_t *p_input_thread;
     libvlc_exception_t p_e;
 
-    libvlc_exception_init( &p_e );
-
     if( !p_mi )
         return;
+
+    libvlc_exception_init( &p_e );
 
 	/* Detach Callback from the main libvlc object */
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
