@@ -176,16 +176,15 @@ static int Open ( vlc_object_t *p_this )
         goto fail;
     }
 
-    a.maxlength = pa_bytes_per_second(&ss)/4/pa_frame_size(&ss);
-    a.tlength = a.maxlength*9/10;
-    a.prebuf = a.tlength/2;
-    a.minreq = a.tlength/10;
+    /* Reduce overall latency to 200mS to reduce audible clicks
+     * Also pulse minreq and internal buffers are now 20mS which reduces resampling
+     */
+    a.tlength = pa_bytes_per_second(&ss)/5;
+    a.maxlength = a.tlength * 2;
+    a.prebuf = a.tlength;
+    a.minreq = a.tlength / 10;
 
-    a.maxlength *= pa_frame_size(&ss);
-    a.tlength *= pa_frame_size(&ss);
-    a.prebuf *= pa_frame_size(&ss);
-    a.minreq *= pa_frame_size(&ss);
-
+    /* Buffer size is 20mS */
     p_sys->buffer_size = a.minreq;
 
     /* Initialise the speaker map setup above */
@@ -240,7 +239,7 @@ static int Open ( vlc_object_t *p_this )
     pa_stream_set_write_callback(p_sys->stream, stream_request_cb, p_aout);
     pa_stream_set_latency_update_callback(p_sys->stream, stream_latency_update_cb, p_aout);
 
-    if (pa_stream_connect_playback(p_sys->stream, NULL, &a, PA_STREAM_INTERPOLATE_TIMING|PA_STREAM_AUTO_TIMING_UPDATE, NULL, NULL) < 0) {
+    if (pa_stream_connect_playback(p_sys->stream, NULL, &a, PA_STREAM_INTERPOLATE_TIMING|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_ADJUST_LATENCY, NULL, NULL) < 0) {
         msg_Err(p_aout, "Failed to connect stream: %s", pa_strerror(pa_context_errno(p_sys->context)));
         goto unlock_and_fail;
     }
@@ -448,16 +447,11 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
                 latency = 0;
 
             }
+
             PULSE_DEBUG( "Pulse stream request latency=%"PRId64"", latency);
             next_date = mdate() + latency;
 
-
             if(p_sys->start_date < next_date + AOUT_PTS_TOLERANCE ){
-    /*
-                  vlc_mutex_lock( &p_aout->output_fifo_lock );
-                p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
-                vlc_mutex_unlock( &p_aout->output_fifo_lock );
-    */
                 p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0);
             }
         }
