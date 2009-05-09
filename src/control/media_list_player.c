@@ -295,7 +295,31 @@ libvlc_media_list_player_new( libvlc_instance_t * p_instance,
  **************************************************************************/
 void libvlc_media_list_player_release( libvlc_media_list_player_t * p_mlp )
 {
-    free(p_mlp);
+    if( !p_mlp )
+        return;
+
+    vlc_mutex_lock( &p_mlp->object_lock );
+
+    p_mlp->i_refcount--;
+    if( p_mlp->i_refcount > 0 )
+    {
+        vlc_mutex_unlock( &p_mlp->object_lock );
+        return;
+    }
+    vlc_mutex_unlock( &p_mlp->object_lock );
+    vlc_mutex_destroy( &p_mlp->object_lock );
+
+    libvlc_event_manager_release( p_mlp->p_event_manager );
+    libvlc_media_player_release( p_mlp->p_mi );
+
+    if( p_mlp->p_mlist )
+    {
+        uninstall_playlist_observer( p_mlp );
+        libvlc_media_list_release( p_mlp->p_mlist );
+    }
+
+    free( p_mlp->current_playing_item_path );
+    free( p_mlp );
 }
 
 /**************************************************************************
