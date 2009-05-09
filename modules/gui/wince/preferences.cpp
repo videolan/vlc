@@ -403,7 +403,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                     psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
                     {
-                        config_data->psz_help = wraptext( strdup( psz_help ), 72 );
+                        config_data->psz_help = strdup( psz_help );
                     }
                     else
                     {
@@ -447,7 +447,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                         const char *psz_help = config_CategoryHelpGet( p_item->value.i );
                         if( psz_help )
                         {
-                            config_data->psz_help = wraptext( strdup( psz_help ), 72 );
+                            config_data->psz_help = strdup( psz_help );
                         }
                         else
                         {
@@ -462,7 +462,7 @@ PrefsTreeCtrl::PrefsTreeCtrl( intf_thread_t *_p_intf,
                     psz_help = config_CategoryHelpGet( p_item->value.i );
                     if( psz_help )
                     {
-                        config_data->psz_help = wraptext( strdup( psz_help ), 72 );
+                        config_data->psz_help = strdup( psz_help );
                     }
                     else
                     {
