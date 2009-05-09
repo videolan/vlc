@@ -7,6 +7,8 @@ SOURCES_packetizer_vc1 = vc1.c
 SOURCES_packetizer_mlp = mlp.c
 SOURCES_packetizer_dirac = dirac.c
 
+noinst_HEADERS = packetizer_helper.h
+
 libvlc_LTLIBRARIES += \
 	libpacketizer_mpegvideo_plugin.la \
 	libpacketizer_mpeg4video_plugin.la \
