@@ -376,7 +376,6 @@ static int Manage( intf_thread_t *p_intf )
         input_thread_t *p_input = p_intf->p_sys->p_input;
         int64_t i_time = 0, i_length = 0;
 
-        vlc_object_lock( p_input );
         if( vlc_object_alive (p_input) )
         {
             playlist_t *p_playlist;
@@ -427,9 +426,7 @@ static int Manage( intf_thread_t *p_intf )
                         double f_pos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_object_unlock( p_input );
                         var_SetFloat( p_input, "position", f_pos );
-                        vlc_object_lock( p_input );
 
                         /* Update the old value */
                         p_intf->p_sys->f_adj_oldvalue = newvalue;
@@ -461,9 +458,7 @@ static int Manage( intf_thread_t *p_intf )
                         double f_pos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_object_unlock( p_input );
                         var_SetFloat( p_input, "position", f_pos );
-                        vlc_object_lock( p_input );
 
                         /* Update the old value */
                         p_intf->p_sys->i_adj_oldvalue = newvalue;
@@ -471,7 +466,6 @@ static int Manage( intf_thread_t *p_intf )
                 }
             }
         }
-        vlc_object_unlock( p_input );
     }
     else if( p_intf->p_sys->b_playing && vlc_object_alive( p_intf ) )
     {
