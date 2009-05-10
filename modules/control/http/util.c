@@ -120,14 +120,6 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
     int           i_dirlen;
 
-    char sep;
-
-#if defined( WIN32 )
-    sep = '\\';
-#else
-    sep = '/';
-#endif
-
     if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
     {
         if( errno != ENOENT && errno != ENOTDIR )
@@ -145,7 +137,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
     msg_Dbg( p_intf, "dir=%s", psz_dir );
 
-    snprintf( dir, sizeof( dir ), "%s%c.access", psz_dir, sep );
+    snprintf( dir, sizeof( dir ), "%s"DIR_SEP".access", psz_dir );
     if( ( file = utf8_fopen( dir, "r" ) ) != NULL )
     {
         char line[1024];
@@ -179,7 +171,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         fclose( file );
     }
 
-    snprintf( dir, sizeof( dir ), "%s%c.hosts", psz_dir, sep );
+    snprintf( dir, sizeof( dir ), "%s"DIR_SEP".hosts", psz_dir );
     p_acl = ACL_Create( p_intf, false );
     if( ACL_LoadFile( p_acl, dir ) )
     {
@@ -210,7 +202,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             continue;
         }
 
-        snprintf( dir, sizeof( dir ), "%s%c%s", psz_dir, sep, psz_filename );
+        snprintf( dir, sizeof( dir ), "%s"DIR_SEP"%s", psz_dir, psz_filename );
         free( psz_filename );
 
         if( ParseDirectory( p_intf, psz_root, dir ) )
@@ -912,13 +904,12 @@ char *RealPath( const char *psz_src )
     char *psz_dir;
     char *p;
     int i_len = strlen(psz_src);
-    const char sep = DIR_SEP_CHAR;
 
     psz_dir = malloc( i_len + 2 );
     strcpy( psz_dir, psz_src );
 
     /* Add a trailing sep to ease the .. step */
-    psz_dir[i_len] = sep;
+    psz_dir[i_len] = DIR_SEP_CHAR;
     psz_dir[i_len + 1] = '\0';
 
 #if (DIR_SEP_CHAR != '/')
@@ -926,18 +917,18 @@ char *RealPath( const char *psz_src )
     p = psz_dir;
     while( (p = strchr( p, '/' )) != NULL )
     {
-        *p = sep;
+        *p = DIR_SEP_CHAR;
     }
 #endif
 
     /* FIXME: this could be O(N) rather than O(N²)... */
     /* Remove multiple separators and /./ */
     p = psz_dir;
-    while( (p = strchr( p, sep )) != NULL )
+    while( (p = strchr( p, DIR_SEP_CHAR )) != NULL )
     {
-        if( p[1] == sep )
+        if( p[1] == DIR_SEP_CHAR )
             memmove( &p[1], &p[2], strlen(&p[2]) + 1 );
-        else if( p[1] == '.' && p[2] == sep )
+        else if( p[1] == '.' && p[2] == DIR_SEP_CHAR )
             memmove( &p[1], &p[3], strlen(&p[3]) + 1 );
         else
             p++;
@@ -955,13 +946,13 @@ char *RealPath( const char *psz_src )
     {
         /* Fix all .. dir */
         p = psz_dir + 3;
-        while( (p = strchr( p, sep )) != NULL )
+        while( (p = strchr( p, DIR_SEP_CHAR )) != NULL )
         {
-            if( p[-1] == '.' && p[-2] == '.' && p[-3] == sep )
+            if( p[-1] == '.' && p[-2] == '.' && p[-3] == DIR_SEP_CHAR )
             {
                 char *q;
                 p[-3] = '\0';
-                if( (q = strrchr( psz_dir, sep )) != NULL )
+                if( (q = strrchr( psz_dir, DIR_SEP_CHAR )) != NULL )
                 {
                     memmove( q + 1, p + 1, strlen(p + 1) + 1 );
                     p = q + 1;
@@ -979,8 +970,8 @@ char *RealPath( const char *psz_src )
 
     /* Remove trailing sep if there are at least 2 sep in the string
      * (handles the C:\ stuff) */
-    p = strrchr( psz_dir, sep );
-    if( p != NULL && p[1] == '\0' && p != strchr( psz_dir, sep ) )
+    p = strrchr( psz_dir, DIR_SEP_CHAR );
+    if( p != NULL && p[1] == '\0' && p != strchr( psz_dir, DIR_SEP_CHAR ) )
         *p = '\0';
 
     return psz_dir;
