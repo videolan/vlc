@@ -34,10 +34,13 @@
 #include <vlc_playlist.h>
 #include <vlc_input.h>
 #include <vlc_strings.h>
-#include <vlc_charset.h>
+#include <vlc_url.h>
 #include "xspf.h"
 
 #include <assert.h>
+
+static void xspf_export_item( playlist_item_t *, FILE *, int * );
+static void xspf_extension_item( playlist_item_t *, FILE *, int * );
 
 /**
  * \brief Prints the XSPF header to file, writes each item by xspf_export_item()
@@ -139,7 +142,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 
     if( psz_uri && *psz_uri )
     {
-        psz = assertUTF8URI( psz_uri );
+        psz = make_URI( psz_uri );
         fprintf( p_file, "\t\t\t<location>%s</location>\n", psz );
         free( psz );
     }
@@ -209,7 +212,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     if( psz == NULL ) psz = strdup( "" );
     if( !EMPTY_STR( psz ) )
     {
-        psz_uri = assertUTF8URI( psz );
+        psz_uri = make_URI( psz );
         fprintf( p_file, "\t\t\t<image>%s</image>\n", psz_uri );
         free( psz_uri );
     }
@@ -283,90 +286,4 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
     ( *p_i_count )++;
 
     return;
-}
-
-/**
- * \param psz_name the location of the media ressource (e.g. local file,
- *        device, network stream, etc.)
- * \return a new char buffer which asserts that the location is valid UTF-8
- *         and a valid URI
- * \note the returned buffer must be freed, when it isn't used anymore
- */
-static char *assertUTF8URI( char *psz_name )
-{
-    char *psz_ret = NULL;              /**< the new result buffer to return */
-    char *psz_s = NULL, *psz_d = NULL; /**< src & dest pointers for URI conversion */
-    bool b_uri_is_file = false; /**< we do additional %-encoding if the URI is a file:// one */
-
-    if( !psz_name || !*psz_name )
-        return NULL;
-
-    /* check that string is valid UTF-8 */
-    /* XXX: Why do we even need to do that ? (all strings in core are UTF-8 encoded */
-    if( !( psz_s = EnsureUTF8( psz_name ) ) )
-        return NULL;
-
-    /* max. 3x for URI conversion (percent escaping) and
-       8 bytes for "file://" and NULL-termination */
-    psz_ret = (char *)malloc( strlen(psz_name)*6*3+8 );
-    if( !psz_ret )
-        return NULL;
-
-    /** \todo check for a valid scheme part preceding the colon */
-    if( strstr( psz_s, "://") != NULL )
-    {
-        size_t i_delim = strcspn( psz_s, ":" );
-        i_delim++; /* skip the ':' */
-        strncpy( psz_ret, psz_s, i_delim );
-        psz_d = psz_ret + i_delim;
-
-        if( !strncmp( psz_s, "file://", 7 ) )
-            b_uri_is_file = true;
-
-        psz_s += i_delim;
-    }
-    /* assume "file" scheme if no scheme-part is included */
-    else
-    {
-        strcpy( psz_ret, "file://" );
-        psz_d = psz_ret + 7;
-        b_uri_is_file = true;
-    }
-
-    while( *psz_s )
-    {
-        /* percent-encode all non-ASCII and the XML special characters and the percent sign itself */
-        if( *psz_s & B10000000 ||
-            *psz_s == '<' ||
-            *psz_s == '>' ||
-            *psz_s == '&' ||
-            *psz_s == ' ' ||
-            *psz_s == '+' ||
-            *psz_s == '%' ||
-            *psz_s == '\\' ||
-            ( b_uri_is_file && (
-            *psz_s == ':' ||
-            *psz_s == '"' ||
-            *psz_s == '?' ||
-            *psz_s == '#' ||
-            *psz_s == '[' ||
-            *psz_s == ']' ||
-            *psz_s == '@' )
-            )
-          )
-        {
-            *psz_d++ = '%';
-            *psz_d++ = hexchars[(*psz_s >> 4) & B00001111];
-            *psz_d++ = hexchars[*psz_s & B00001111];
-        }
-        else
-        {
-            *psz_d++ = *psz_s;
-        }
-
-        psz_s++;
-    }
-    *psz_d = '\0';
-
-    return (char *)realloc( psz_ret, strlen( psz_ret ) + 1 );
 }
