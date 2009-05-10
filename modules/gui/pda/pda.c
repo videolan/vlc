@@ -51,7 +51,6 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Run          ( intf_thread_t * );
 
-void GtkAutoPlayFile     ( vlc_object_t * );
 static int Manage        ( intf_thread_t *p_intf );
 void GtkDisplayDate  ( GtkAdjustment *p_adj, gpointer userdata );
 gint GtkModeManage   ( intf_thread_t * p_intf );
@@ -70,7 +69,6 @@ vlc_module_begin ()
     set_description( N_("PDA Linux Gtk2+ interface") )
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
-//    add_bool( "pda-autoplayfile", 1, GtkAutoPlayFile, AUTOPLAYFILE_TEXT, AUTOPLAYFILE_LONGTEXT, true )
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
     add_shortcut( "pda" )
@@ -349,43 +347,6 @@ static void Run( intf_thread_t *p_intf )
     vlc_restorecancel(canc);
 }
 
-/*****************************************************************************
- * GtkAutoplayFile: Autoplay file depending on configuration settings
- *****************************************************************************/
-void GtkAutoPlayFile( vlc_object_t *p_this )
-{
-    GtkWidget *cbautoplay;
-    intf_thread_t *p_intf;
-    int i_index;
-    vlc_list_t *p_list = vlc_list_find( p_this, VLC_OBJECT_INTF,
-                                        FIND_ANYWHERE );
-
-    for( i_index = 0; i_index < p_list->i_count; i_index++ )
-    {
-        p_intf = (intf_thread_t *)p_list->p_values[i_index].p_object ;
-
-        if( strcmp( MODULE_STRING, module_get_object(p_intf->p_module) ) )
-        {
-            continue;
-        }
-        cbautoplay = GTK_WIDGET( gtk_object_get_data(
-                            GTK_OBJECT( p_intf->p_sys->p_window ),
-                            "cbautoplay" ) );
-
-        if( !config_GetInt( p_this, "pda-autoplayfile" ) )
-        {
-            p_intf->p_sys->b_autoplayfile = false;
-        }
-        else
-        {
-            p_intf->p_sys->b_autoplayfile = true;
-        }
-        gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( cbautoplay ),
-                                      p_intf->p_sys->b_autoplayfile );
-    }
-    vlc_list_release( p_list );
-}
-
 /* following functions are local */
 
 /*****************************************************************************
@@ -415,7 +376,6 @@ static int Manage( intf_thread_t *p_intf )
         input_thread_t *p_input = p_intf->p_sys->p_input;
         int64_t i_time = 0, i_length = 0;
 
-        vlc_object_lock( p_input );
         if( vlc_object_alive (p_input) )
         {
             playlist_t *p_playlist;
@@ -466,9 +426,7 @@ static int Manage( intf_thread_t *p_intf )
                         double f_pos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_object_unlock( p_input );
                         var_SetFloat( p_input, "position", f_pos );
-                        vlc_object_lock( p_input );
 
                         /* Update the old value */
                         p_intf->p_sys->f_adj_oldvalue = newvalue;
@@ -500,9 +458,7 @@ static int Manage( intf_thread_t *p_intf )
                         double f_pos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
-                        vlc_object_unlock( p_input );
                         var_SetFloat( p_input, "position", f_pos );
-                        vlc_object_lock( p_input );
 
                         /* Update the old value */
                         p_intf->p_sys->i_adj_oldvalue = newvalue;
@@ -510,7 +466,6 @@ static int Manage( intf_thread_t *p_intf )
                 }
             }
         }
-        vlc_object_unlock( p_input );
     }
     else if( p_intf->p_sys->b_playing && vlc_object_alive( p_intf ) )
     {

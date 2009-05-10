@@ -555,17 +555,10 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     int i_env = 0;
     char **ppsz_env = NULL;
     char *psz_tmp;
-    char sep;
     size_t i_buffer;
     char *p_buffer;
     char *psz_cwd, *psz_file = NULL;
     int i_ret;
-
-#ifdef WIN32
-    sep = '\\';
-#else
-    sep = '/';
-#endif
 
     /* Create environment for the CGI */
     TAB_APPEND( i_env, ppsz_env, strdup("GATEWAY_INTERFACE=CGI/1.1") );
@@ -677,7 +670,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
         }
     }
 
-    psz_file = strrchr( p_args->file.file, sep );
+    psz_file = strrchr( p_args->file.file, DIR_SEP_CHAR );
     if( psz_file != NULL )
     {
         psz_file++;
@@ -694,7 +687,7 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
                 NULL );
 
     psz_tmp = strdup( p_args->file.file );
-    p = strrchr( psz_tmp, sep );
+    p = strrchr( psz_tmp, DIR_SEP_CHAR );
     if( p != NULL )
     {
         *p = '\0';

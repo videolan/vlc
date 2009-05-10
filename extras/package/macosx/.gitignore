@@ -2,3 +2,4 @@
 *.mode*
 *.pbxuser
 build
+Info.plist
