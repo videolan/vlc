@@ -41,7 +41,7 @@
 
 static void xspf_export_item( playlist_item_t *, FILE *, int * );
 static void xspf_extension_item( playlist_item_t *, FILE *, int * );
-static char *assertUTF8URI( char * );
+static char *assertUTF8URI( const char * );
 
 /**
  * \brief Prints the XSPF header to file, writes each item by xspf_export_item()
@@ -296,19 +296,11 @@ static void xspf_extension_item( playlist_item_t *p_item, FILE *p_file,
  *         and a valid URI
  * \note the returned buffer must be freed, when it isn't used anymore
  */
-static char *assertUTF8URI( char *psz_name )
+static char *assertUTF8URI( const char *psz_name )
 {
     char *psz_ret = NULL;              /**< the new result buffer to return */
     char *psz_s = NULL, *psz_d = NULL; /**< src & dest pointers for URI conversion */
     bool b_uri_is_file = false; /**< we do additional %-encoding if the URI is a file:// one */
-
-    if( !psz_name || !*psz_name )
-        return NULL;
-
-    /* check that string is valid UTF-8 */
-    /* XXX: Why do we even need to do that ? (all strings in core are UTF-8 encoded */
-    if( !( psz_s = EnsureUTF8( psz_name ) ) )
-        return NULL;
 
     /* max. 3x for URI conversion (percent escaping) and
        8 bytes for "file://" and NULL-termination */
