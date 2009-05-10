@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 typedef char * (*conv_t) (const char *);
 
@@ -60,8 +61,15 @@ static inline void test_b64 (const char *in, const char *out)
     test (vlc_b64_encode, in, out);
 }
 
+static inline void test_path (const char *in, const char *out)
+{
+    test (make_URI, in, out);
+}
+
 int main (void)
 {
+    int val;
+
     (void)setvbuf (stdout, NULL, _IONBF, 0);
     test_decode ("this_should_not_be_modified_1234",
                  "this_should_not_be_modified_1234");
@@ -92,6 +100,25 @@ int main (void)
     test_b64 ("foob", "Zm9vYg==");
     test_b64 ("fooba", "Zm9vYmE=");
     test_b64 ("foobar", "Zm9vYmFy");
+
+    /* Path test */
+    test_path ("file:///", "file:///");
+    test_path ("http://www.example.com/%7Ejohn/",
+               "http://www.example.com/%7Ejohn/");
+    test_path ("/", "file:///");
+    test_path ("/home/john/", "file:///home/john/");
+    test_path ("/home/john/music.ogg", "file:///home/john/music.ogg");
+    //test_path ("\\\\server/pub/music.ogg", "file://server/pub/music.ogg");
+
+    /*int fd = open (".", O_RDONLY);
+    assert (fd != -1);*/
+    val = chdir ("/tmp");
+    assert (val != -1);
+    test_path ("movie.ogg", "file:///tmp/movie.ogg");
+    test_path (".", "file:///tmp/.");
+    test_path ("", "file:///tmp/");
+    /*val = fchdir (fd);
+    assert (val != -1);*/
 
     return 0;
 }
