@@ -455,6 +455,11 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
         return;
     }
     vlc_mutex_unlock( &p_mi->object_lock );
+
+    /* Detach Callback from the main libvlc object */
+    var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
+                     "vout-snapshottaken", SnapshotTakenCallback, p_mi );
+
     vlc_mutex_destroy( &p_mi->object_lock );
 
     release_input_thread( p_mi, true );
