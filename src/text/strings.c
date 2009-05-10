@@ -130,7 +130,7 @@ void unescape_URI( char *psz )
 }
 
 /**
- * Decode encoded URI string
+ * Decode encoded URI component. See also decode_URI().
  * \return decoded duplicated string
  */
 char *decode_URI_duplicate( const char *psz )
@@ -141,14 +141,23 @@ char *decode_URI_duplicate( const char *psz )
 }
 
 /**
- * Decode encoded URI string in place
- * \return nothing
+ * Decode an encoded URI component in place.
+ * <b>This function does NOT decode entire URIs.</b>
+ * It decodes components (e.g. host name, directory, file name).
+ * Decoded URIs do not exist in the real world (see RFC3986 §2.4).
+ * Complete URIs are always "encoded" (or they are syntaxically invalid).
+ *
+ * Note that URI encoding is different from Javascript escaping. Especially,
+ * white spaces and Unicode non-ASCII code points are encoded differently.
+ *
+ * \return psz on success, NULL if it was not properly encoded
  */
-void decode_URI( char *psz )
+char *decode_URI( char *psz )
 {
     unsigned char *in = (unsigned char *)psz, *out = in, c;
+
     if( psz == NULL )
-        return;
+        return NULL;
 
     while( ( c = *in++ ) != '\0' )
     {
@@ -160,14 +169,14 @@ void decode_URI( char *psz )
 
                 if( ( ( hex[0] = *in++ ) == 0 )
                  || ( ( hex[1] = *in++ ) == 0 ) )
-                    return;
+                    return NULL;
 
                 hex[2] = '\0';
                 *out++ = (unsigned char)strtoul( hex, NULL, 0x10 );
                 break;
             }
 
-            case '+':
+            case '+': /* This is HTTP forms, not URI decoding... */
                 *out++ = ' ';
                 break;
 
@@ -182,6 +191,7 @@ void decode_URI( char *psz )
     }
     *out = '\0';
     EnsureUTF8( psz );
+    return psz;
 }
 
 static inline bool isurisafe( int c )
