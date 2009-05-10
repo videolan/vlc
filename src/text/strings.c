@@ -2,6 +2,7 @@
  * strings.c: String related functions
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2008-2009 Rémi Denis-Courmont
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan dot org>
@@ -203,23 +204,13 @@ static inline bool isurisafe( int c )
             || ( strchr( "-._~", c ) != NULL );
 }
 
-/**
- * Encodes an URI component (RFC3986 §2).
- *
- * @param psz_uri nul-terminated UTF-8 representation of the component.
- * Obviously, you can't pass an URI containing a nul character, but you don't
- * want to do that, do you?
- *
- * @return encoded string (must be free()'d), or NULL for ENOMEM.
- */
-char *encode_URI_component( const char *psz_uri )
+static char *encode_URI_bytes (const char *psz_uri, size_t len)
 {
-    char *psz_enc = malloc ((3 * strlen (psz_uri)) + 1), *out = psz_enc;
-
+    char *psz_enc = malloc (3 * len + 1), *out = psz_enc;
     if (psz_enc == NULL)
         return NULL;
 
-    while (*psz_uri)
+    for (size_t i = 0; i < len; i++)
     {
         static const char hex[16] = "0123456789ABCDEF";
         uint8_t c = *psz_uri;
@@ -241,6 +232,21 @@ char *encode_URI_component( const char *psz_uri )
     out = realloc (psz_enc, out - psz_enc);
     return out ? out : psz_enc; /* realloc() can fail (safe) */
 }
+
+/**
+ * Encodes an URI component (RFC3986 §2).
+ *
+ * @param psz_uri nul-terminated UTF-8 representation of the component.
+ * Obviously, you can't pass an URI containing a nul character, but you don't
+ * want to do that, do you?
+ *
+ * @return encoded string (must be free()'d), or NULL for ENOMEM.
+ */
+char *encode_URI_component( const char *psz_uri )
+{
+    return encode_URI_bytes (psz_uri, strlen (psz_uri));
+}
+
 
 static const struct xml_entity_s
 {
@@ -1128,5 +1134,80 @@ void path_sanitize( char *str )
             *str = DIR_SEP_CHAR;
 #endif
         str++;
+    }
+}
+
+#include <vlc_url.h>
+
+/**
+ * Convert a file path to an URI. If already an URI, do nothing.
+ */
+char *make_URI (const char *path)
+{
+    if (path == NULL)
+        return NULL;
+    if (strstr (path, "://") != NULL)
+        return strdup (path); /* Already an URI */
+    /* Note: VLC cannot handle URI schemes without double slash after the
+     * scheme name (such as mailto: or news:). */
+
+    char *buf;
+#ifdef WIN32
+    if (isalpha (path[0]) && (path[1] == ':'))
+    {
+        if (asprintf (&buf, "file:///%c:", path[0]) == -1)
+            buf = NULL;
+        path += 2;
+    }
+    else
+#endif
+#if 0
+    /* Windows UNC paths (file://host/share/path instead of file:///path) */
+    if (!strncmp (path, "\\\\", 2))
+    {
+        path += 2;
+        buf = strdup ("file://");
+    }
+    else
+#endif
+    if (path[0] != DIR_SEP_CHAR)
+    {   /* Relative path: prepend the current working directory */
+        char cwd[PATH_MAX];
+
+        if (getcwd (cwd, sizeof (cwd)) == NULL) /* FIXME: UTF8? */
+            return NULL;
+        if (asprintf (&buf, "%s/%s", cwd, path) == -1)
+            return NULL;
+        char *ret = make_URI (buf);
+        free (buf);
+        return ret;
+    }
+    else
+        buf = strdup ("file://");
+    if (buf == NULL)
+        return NULL;
+
+    assert (path[0] == DIR_SEP_CHAR);
+
+    /* Absolute file path */
+    for (const char *ptr = path + 1;; ptr++)
+    {
+        size_t len = strcspn (ptr, DIR_SEP);
+        char *component = encode_URI_bytes (ptr, len);
+        if (component == NULL)
+        {
+            free (buf);
+            return NULL;
+        }
+        char *uri;
+        int val = asprintf (&uri, "%s/%s", buf, component);
+        free (component);
+        free (buf);
+        if (val == -1)
+            return NULL;
+        buf = uri;
+        ptr += len;
+        if (*ptr == '\0')
+            return buf;
     }
 }

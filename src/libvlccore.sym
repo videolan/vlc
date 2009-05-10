@@ -216,6 +216,7 @@ libvlc_InternalInit
 libvlc_InternalWait
 libvlc_Quit
 LocaleFree
+make_URI
 mdate
 module_config_free
 module_config_get
