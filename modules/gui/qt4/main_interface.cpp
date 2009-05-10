@@ -637,7 +637,7 @@ QSize MainInterface::sizeHint() const
  */
 void MainInterface::doComponentsUpdate()
 {
-    if( isFullScreen() ) return;
+    if( isFullScreen() || isMaximized() ) return;
 
     msg_Dbg( p_intf, "Updating the geometry" );
     /* Here we resize to sizeHint() and not adjustsize because we want
