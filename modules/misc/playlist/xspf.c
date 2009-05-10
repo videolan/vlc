@@ -39,6 +39,10 @@
 
 #include <assert.h>
 
+static void xspf_export_item( playlist_item_t *, FILE *, int * );
+static void xspf_extension_item( playlist_item_t *, FILE *, int * );
+static char *assertUTF8URI( char * );
+
 /**
  * \brief Prints the XSPF header to file, writes each item by xspf_export_item()
  * and closes the open xml elements
