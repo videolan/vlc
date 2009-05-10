@@ -1065,7 +1065,7 @@ VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc
  * \param i_height the snapshot's height
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, char *,unsigned int, unsigned int, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, const char *,unsigned int, unsigned int, libvlc_exception_t * );
 
 /**
  * Resize the current video output window.
