@@ -182,7 +182,6 @@ signals:
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoToShow( unsigned int, unsigned int );
-    void askVideoToToggle();
     void askBgWidgetToToggle();
     void askUpdate();
     void minimalViewToggled( bool );
