@@ -27,6 +27,7 @@
 /* FIXME: i'm not too sure about this include but it fixes compilation of
  * video chromas -- dionoea */
 #include "vlc_common.h"
+#include <vlc_fourcc.h>
 
 /**
  * \file
@@ -227,8 +228,9 @@ typedef struct extra_languages_t
  */
 struct es_format_t
 {
-    int             i_cat;      /**< ES category @see es_format_category_e */
-    vlc_fourcc_t    i_codec;    /**< FOURCC value as used in vlc */
+    int             i_cat;              /**< ES category @see es_format_category_e */
+    vlc_fourcc_t    i_codec;            /**< FOURCC value as used in vlc */
+    vlc_fourcc_t    i_original_fourcc;  /**< original FOURCC from the container */
 
     int             i_id;       /**< es identifier, where means
                                     -1: let the core mark the right id
