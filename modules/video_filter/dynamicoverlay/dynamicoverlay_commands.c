@@ -437,7 +437,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
     }
     i_size = shminfo.shm_segsz;
 
-    if( p_params->fourcc == VLC_FOURCC('T','E','X','T') )
+    if( p_params->fourcc == VLC_CODEC_TEXT )
     {
         char *p_data;
 
@@ -465,7 +465,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
             return VLC_ENOMEM;
         }
 
-        vout_InitFormat( &p_ovl->format, VLC_FOURCC('T','E','X','T'),
+        vout_InitFormat( &p_ovl->format, VLC_CODEC_TEXT,
                          0, 0, 0 );
 
         p_data = shmat( p_params->i_shmid, NULL, SHM_RDONLY );

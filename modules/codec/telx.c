@@ -175,7 +175,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t    val;
     int            i;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','e','l','x'))
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT)
     {
         return VLC_EGENERIC;
     }
@@ -701,7 +701,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
  
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_chroma = VLC_CODEC_TEXT;
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;

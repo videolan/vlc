@@ -816,10 +816,10 @@ static bool ChromaIsEqual( const picture_heap_t *p_output, const picture_heap_t 
      if( !vout_ChromaCmp( p_output->i_chroma, p_render->i_chroma ) )
          return false;
 
-     if( p_output->i_chroma != FOURCC_RV15 &&
-         p_output->i_chroma != FOURCC_RV16 &&
-         p_output->i_chroma != FOURCC_RV24 &&
-         p_output->i_chroma != FOURCC_RV32 )
+     if( p_output->i_chroma != VLC_CODEC_RGB15 &&
+         p_output->i_chroma != VLC_CODEC_RGB16 &&
+         p_output->i_chroma != VLC_CODEC_RGB24 &&
+         p_output->i_chroma != VLC_CODEC_RGB32 )
          return true;
 
      return p_output->i_rmask == p_render->i_rmask &&

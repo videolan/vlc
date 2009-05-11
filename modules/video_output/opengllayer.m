@@ -170,10 +170,10 @@ static int Init( vout_thread_t *p_vout )
     vlc_value_t val;
 
 #if ( defined( WORDS_BIGENDIAN ) && VLCGL_FORMAT == GL_YCBCR_422_APPLE ) || (VLCGL_FORMAT == YCBCR_MESA)
-    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+    p_vout->output.i_chroma = VLC_CODEC_YUYV;
     i_pixel_pitch = 2;
 #elif (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
-    p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+    p_vout->output.i_chroma = VLC_CODEC_UYVY;
     i_pixel_pitch = 2;
 #endif
 

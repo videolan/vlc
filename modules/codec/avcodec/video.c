@@ -128,7 +128,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
         /* we are doomed, but not really, because most codecs set their pix_fmt much later */
-        p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
@@ -340,7 +340,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
         /* we are doomed. but not really, because most codecs set their pix_fmt later on */
-        p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 

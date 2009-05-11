@@ -478,11 +478,11 @@ static int Open( vlc_object_t *p_this )
     i_height = p_sys->camera.frame_height;
 
     i_aspect = vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic,
-                    VLC_FOURCC('U', 'Y', 'V', 'Y'),
+                    VLC_CODEC_UYVY,
                     i_width, i_height,
                     i_width * VOUT_ASPECT_FACTOR / i_height );
 
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC('U', 'Y', 'V', 'Y') );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_UYVY );
 
     fmt.video.i_width = i_width;
     fmt.video.i_height = i_height;
@@ -498,11 +498,11 @@ static int Open( vlc_object_t *p_this )
         if( p_sys->fd_audio >= 0 )
         {
             es_format_t fmt;
-            es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('a','r','a','w') );
+            es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_S16L ); /* FIXME: hmm, ?? */
 
             fmt.audio.i_channels = p_sys->channels ? p_sys->channels : 1;
             fmt.audio.i_rate = p_sys->i_sample_rate;
-            fmt.audio.i_bitspersample = 16; /* FIXME: hmm, ?? */
+            fmt.audio.i_bitspersample = 16;
             fmt.audio.i_blockalign = fmt.audio.i_channels *
                                      fmt.audio.i_bitspersample / 8;
             fmt.i_bitrate = fmt.audio.i_channels * fmt.audio.i_rate *

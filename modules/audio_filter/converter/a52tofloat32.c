@@ -122,11 +122,11 @@ static int Create( vlc_object_t *p_this )
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     int i_ret;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('a','5','2',' ')
+    if ( p_filter->input.i_format != VLC_CODEC_A52
 #ifdef LIBA52_FIXED
-          || p_filter->output.i_format != VLC_FOURCC('f','i','3','2') )
+          || p_filter->output.i_format != VLC_CODEC_FI32 )
 #else
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
 #endif
     {
         return -1;
@@ -416,16 +416,16 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret;
 
-    if( p_filter->fmt_in.i_codec != VLC_FOURCC('a','5','2',' ')  )
+    if( p_filter->fmt_in.i_codec != VLC_CODEC_A52  )
     {
         return VLC_EGENERIC;
     }
 
     p_filter->fmt_out.audio.i_format =
 #ifdef LIBA52_FIXED
-        p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+        p_filter->fmt_out.i_codec = VLC_CODEC_FI32;
 #else
-        p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_filter->fmt_out.i_codec = VLC_CODEC_FL32;
 #endif
     p_filter->fmt_out.audio.i_bitspersample =
         aout_BitsPerSample( p_filter->fmt_out.i_codec );

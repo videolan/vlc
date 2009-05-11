@@ -145,12 +145,12 @@ static int Create( vlc_object_t *p_this )
     switch( p_vout->fmt_in.i_chroma )
     {
         CASE_PLANAR_YUV_SQUARE
-        case VLC_FOURCC('G','R','E','Y'):
+        case VLC_CODEC_GREY:
             p_vout->p_sys->pf_filter = FilterPlanar;
             break;
 
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
+        case VLC_CODEC_I422:
+        case VLC_CODEC_J422:
             p_vout->p_sys->pf_filter = FilterI422;
             break;
 

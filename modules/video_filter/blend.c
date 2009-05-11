@@ -56,19 +56,19 @@ struct filter_sys_t
     int i_dummy;
 };
 
-#define FCC_YUVA VLC_FOURCC('Y','U','V','A')
-#define FCC_YUVP VLC_FOURCC('Y','U','V','P')
-#define FCC_RGBA VLC_FOURCC('R','G','B','A')
+#define FCC_YUVA VLC_CODEC_YUVA
+#define FCC_YUVP VLC_CODEC_YUVP
+#define FCC_RGBA VLC_CODEC_RGBA
 
-#define FCC_I420 VLC_FOURCC('I','4','2','0')
-#define FCC_YV12 VLC_FOURCC('Y','V','1','2')
-#define FCC_YUY2 VLC_FOURCC('Y','U','Y','2')
-#define FCC_UYVY VLC_FOURCC('U','Y','V','Y')
-#define FCC_YVYU VLC_FOURCC('Y','V','Y','U')
-#define FCC_RV15 VLC_FOURCC('R','V','1','5')
-#define FCC_RV16 VLC_FOURCC('R','V','1','6')
-#define FCC_RV24 VLC_FOURCC('R','V','2','4')
-#define FCC_RV32 VLC_FOURCC('R','V','3','2')
+#define FCC_I420 VLC_CODEC_I420
+#define FCC_YV12 VLC_CODEC_YV12
+#define FCC_YUY2 VLC_CODEC_YUYV
+#define FCC_UYVY VLC_CODEC_UYVY
+#define FCC_YVYU VLC_CODEC_YVYU
+#define FCC_RV15 VLC_CODEC_RGB15
+#define FCC_RV16 VLC_CODEC_RGB16
+#define FCC_RV24 VLC_CODEC_RGB24
+#define FCC_RV32 VLC_CODEC_RGB32
 
 /****************************************************************************
  * Local prototypes

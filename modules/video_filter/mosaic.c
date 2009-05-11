@@ -598,11 +598,11 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             fmt_in.i_height = p_es->p_picture->format.i_height;
             fmt_in.i_width = p_es->p_picture->format.i_width;
 
-            if( fmt_in.i_chroma == VLC_FOURCC('Y','U','V','A') ||
-                fmt_in.i_chroma == VLC_FOURCC('R','G','B','A') )
-                fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+            if( fmt_in.i_chroma == VLC_CODEC_YUVA ||
+                fmt_in.i_chroma == VLC_CODEC_RGBA )
+                fmt_out.i_chroma = VLC_CODEC_YUVA;
             else
-                fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
+                fmt_out.i_chroma = VLC_CODEC_I420;
             fmt_out.i_width = col_inner_width;
             fmt_out.i_height = row_inner_height;
 

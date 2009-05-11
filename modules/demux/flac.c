@@ -144,7 +144,7 @@ static int Open( vlc_object_t * p_this )
     /* Load the FLAC packetizer */
     /* Store STREAMINFO for the decoder and packetizer */
     p_streaminfo[4] |= 0x80; /* Fake this as the last metadata block */
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', 'a', 'c' ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_FLAC );
     fmt.i_extra = i_streaminfo;
     fmt.p_extra = p_streaminfo;
 

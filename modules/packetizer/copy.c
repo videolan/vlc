@@ -103,26 +103,26 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'D', 'X', '5', '0'):
         case VLC_FOURCC( 0x04, 0,   0,   0):
         case VLC_FOURCC( '3', 'I', 'V', '2'):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v');
+            p_dec->fmt_out.i_codec = VLC_CODEC_MP4V;
             break;
 
         case VLC_FOURCC( 'm', 'p', 'g', '1' ):
         case VLC_FOURCC( 'm', 'p', 'g', '2' ):
-        case VLC_FOURCC( 'm', 'p', '1', 'v' ):
-        case VLC_FOURCC( 'm', 'p', '2', 'v' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
+        case VLC_CODEC_MP1V:
+        case VLC_CODEC_MP2V:
+            p_dec->fmt_out.i_codec = VLC_CODEC_MPGV;
             break;
 
         case VLC_FOURCC( 'd', 'i', 'v', '1' ):
         case VLC_FOURCC( 'M', 'P', 'G', '4' ):
         case VLC_FOURCC( 'm', 'p', 'g', '4' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'D', 'I', 'V', '1' );
+            p_dec->fmt_out.i_codec = VLC_CODEC_DIV1;
             break;
 
         case VLC_FOURCC( 'd', 'i', 'v', '2' ):
         case VLC_FOURCC( 'M', 'P', '4', '2' ):
         case VLC_FOURCC( 'm', 'p', '4', '2' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'D', 'I', 'V', '2' );
+            p_dec->fmt_out.i_codec = VLC_CODEC_DIV2;
             break;
 
         case VLC_FOURCC( 'd', 'i', 'v', '3' ):
@@ -137,25 +137,25 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'm', 'p', 'g', '3' ):
         case VLC_FOURCC( 'M', 'P', 'G', '3' ):
         case VLC_FOURCC( 'A', 'P', '4', '1' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'D', 'I', 'V', '3' );
+            p_dec->fmt_out.i_codec = VLC_CODEC_DIV3;
             break;
 
-        case VLC_FOURCC( 'h', '2', '6', '3' ):
+        case VLC_CODEC_H263:
         case VLC_FOURCC( 'U', '2', '6', '3' ):
         case VLC_FOURCC( 'u', '2', '6', '3' ):
             p_dec->fmt_out.i_codec = VLC_FOURCC( 'H', '2', '6', '3' );
             break;
 
         case VLC_FOURCC( 'i', '2', '6', '3' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'I', '2', '6', '3' );
+            p_dec->fmt_out.i_codec = VLC_CODEC_H263I;
             break;
 
         case VLC_FOURCC( 'm', 'j', 'p', 'g' ):
         case VLC_FOURCC( 'm', 'j', 'p', 'a' ):
-        case VLC_FOURCC( 'j', 'p', 'e', 'g' ):
+        case VLC_CODEC_JPEG:
         case VLC_FOURCC( 'J', 'P', 'E', 'G' ):
         case VLC_FOURCC( 'J', 'F', 'I', 'F' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'M', 'J', 'P', 'G' );
+            p_dec->fmt_out.i_codec = VLC_CODEC_MJPG;
             break;
 
         case VLC_FOURCC( 'd', 'v', 's', 'd' ):
@@ -169,16 +169,16 @@ static int Open( vlc_object_t *p_this )
             switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
                 case 1:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('u','8',' ',' ');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_U8;
                     break;
                 case 2:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','l');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S16L;
                     break;
                 case 3:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','l');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
                     break;
                 case 4:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','l');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
                     break;
                 default:
                     msg_Err( p_dec, "unknown raw audio sample size" );
@@ -190,16 +190,16 @@ static int Open( vlc_object_t *p_this )
             switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
                 case 1:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S8;
                     break;
                 case 2:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
                     break;
                 case 3:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
                     break;
                 case 4:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','b');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S32B;
                     break;
                 default:
                     msg_Err( p_dec, "unknown raw audio sample size" );
@@ -211,16 +211,16 @@ static int Open( vlc_object_t *p_this )
             switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
                 case 1:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S8;
                     break;
                 case 2:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','l');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S16L;
                     break;
                 case 3:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','l');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
                     break;
                 case 4:
-                    p_dec->fmt_out.i_codec = VLC_FOURCC('s','3','2','l');
+                    p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
                     break;
                 default:
                     msg_Err( p_dec, "unknown raw audio sample size" );

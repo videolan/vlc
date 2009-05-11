@@ -318,9 +318,9 @@ static int Init( vout_thread_t *p_vout )
         fmt.i_y_offset = fmt.i_y_offset * p_sys->f_scale;
 
         if (p_sys->i_internal_chroma == GREY)
-            fmt.i_chroma = VLC_FOURCC('I','4','2','0');
+            fmt.i_chroma = VLC_CODEC_I420;
         else if (p_sys->i_internal_chroma == RGB)
-            fmt.i_chroma = VLC_FOURCC('R','V','3','2');
+            fmt.i_chroma = VLC_CODEC_RGB32;
     }
 
     /* Load the internal opencv filter */
@@ -463,13 +463,13 @@ static void VlcPictureToIplImage( vout_thread_t *p_vout, picture_t *p_in )
             //rgb2 gives 3 separate planes, this gives 1 interleaved plane
             //rv24 gives is about 20% faster but gives r&b the wrong way round
             //and I cant think of an easy way to fix this
-            fmt_out.i_chroma = VLC_FOURCC('R','V','3','2');
+            fmt_out.i_chroma = VLC_CODEC_RGB32;
         }
         else if (p_sys->i_internal_chroma == GREY)
         {
             //take the I (gray) plane (video seems to commonly be in this fmt so usually the
             //conversion does nothing)
-            fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
+            fmt_out.i_chroma = VLC_CODEC_I420;
         }
 
         //convert from the input image

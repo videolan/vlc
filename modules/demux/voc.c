@@ -196,7 +196,7 @@ static int ReadBlockHeader( demux_t *p_demux )
                 return VLC_EGENERIC;
             }
 
-            new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.i_codec = VLC_CODEC_U8;
             new_fmt.audio.i_rate = fix_voc_sr( 1000000L / (256L - buf[0]) );
             new_fmt.audio.i_bytes_per_frame = 1;
             new_fmt.audio.i_frame_length = 1;
@@ -221,7 +221,7 @@ static int ReadBlockHeader( demux_t *p_demux )
             i_block_size = 0;
             p_sys->i_silence_countdown = GetWLE( buf );
 
-            new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.i_codec = VLC_CODEC_U8;
             new_fmt.audio.i_rate = fix_voc_sr( 1000000L / (256L - buf[0]) );
             new_fmt.audio.i_bytes_per_frame = 1;
             new_fmt.audio.i_frame_length = 1;
@@ -272,7 +272,7 @@ static int ReadBlockHeader( demux_t *p_demux )
                 return VLC_EGENERIC;
             }
 
-            new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+            new_fmt.i_codec = VLC_CODEC_U8;
             new_fmt.audio.i_channels = buf[3] + 1; /* can't be nul */
             new_fmt.audio.i_rate = 256000000L /
                           ((65536L - GetWLE(buf)) * new_fmt.audio.i_channels);
@@ -323,11 +323,11 @@ static int ReadBlockHeader( demux_t *p_demux )
                     switch( new_fmt.audio.i_bitspersample )
                     {
                         case 8:
-                            new_fmt.i_codec = VLC_FOURCC('u','8',' ',' ');
+                            new_fmt.i_codec = VLC_CODEC_U8;
                             break;
 
                         case 16:
-                            new_fmt.i_codec = VLC_FOURCC('u','1','6','l');
+                            new_fmt.i_codec = VLC_CODEC_U16L;
                             break;
 
                         default:
@@ -341,11 +341,11 @@ static int ReadBlockHeader( demux_t *p_demux )
                     switch( new_fmt.audio.i_bitspersample )
                     {
                         case 8:
-                            new_fmt.i_codec = VLC_FOURCC('s','8',' ',' ');
+                            new_fmt.i_codec = VLC_CODEC_S8;
                             break;
 
                         case 16:
-                            new_fmt.i_codec = VLC_FOURCC('s','1','6','l');
+                            new_fmt.i_codec = VLC_CODEC_S16L;
                             break;
 
                         default:

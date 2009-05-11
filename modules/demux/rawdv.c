@@ -222,7 +222,7 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->i_bitrate = 0;
 
-    es_format_Init( &p_sys->fmt_video, VIDEO_ES, VLC_FOURCC('d','v','s','d') );
+    es_format_Init( &p_sys->fmt_video, VIDEO_ES, VLC_CODEC_DV );
     p_sys->fmt_video.video.i_width = 720;
     p_sys->fmt_video.video.i_height= dv_header.dsf ? 576 : 480;;
 
@@ -239,9 +239,10 @@ static int Open( vlc_object_t * p_this )
     p_peek = p_peek_backup + 80*6+80*16*3 + 3; /* beginning of AAUX pack */
     if( *p_peek == 0x50 )
     {
-        es_format_Init( &p_sys->fmt_audio, AUDIO_ES,
-                        VLC_FOURCC('a','r','a','w') );
+        /* 12 bits non-linear will be converted to 16 bits linear */
+        es_format_Init( &p_sys->fmt_audio, AUDIO_ES, VLC_CODEC_S16L );
 
+        p_sys->fmt_audio.audio.i_bitspersample = 16;
         p_sys->fmt_audio.audio.i_channels = 2;
         switch( (p_peek[4] >> 3) & 0x07 )
         {
@@ -256,9 +257,6 @@ static int Open( vlc_object_t * p_this )
             p_sys->fmt_audio.audio.i_rate = 32000;
             break;
         }
-
-        /* 12 bits non-linear will be converted to 16 bits linear */
-        p_sys->fmt_audio.audio.i_bitspersample = 16;
 
         p_sys->p_es_audio = es_out_Add( p_demux->out, &p_sys->fmt_audio );
     }

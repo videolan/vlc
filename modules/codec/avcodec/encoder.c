@@ -453,8 +453,8 @@ int OpenEncoder( vlc_object_t *p_this )
             __MAX( __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES ), 0 );
         p_context->b_frame_strategy = 0;
         if( !p_context->max_b_frames  &&
-            (  p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '2', 'v') ||
-               p_enc->fmt_out.i_codec == VLC_FOURCC('m', 'p', '1', 'v') ) )
+            (  p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ||
+               p_enc->fmt_out.i_codec == VLC_CODEC_MP1V ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 
         av_reduce( &i_aspect_num, &i_aspect_den,
@@ -470,7 +470,7 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
         p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
 
-        p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+        p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
         GetFfmpegChroma( &p_context->pix_fmt, p_enc->fmt_in.video );
 
@@ -587,7 +587,7 @@ int OpenEncoder( vlc_object_t *p_this )
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
 
-        if ( p_enc->fmt_out.i_codec == VLC_FOURCC('m','p','4','a') )
+        if ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4A )
         {
             /* XXX: FAAC does resample only when setting the INPUT samplerate
              * to the desired value (-R option of the faac frontend)
@@ -872,7 +872,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.top_field_first = !!p_pict->b_top_field_first;
 
     /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC( 'm', 'p', '4', 'v' ) )
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_MP4V )
     {
         frame.pts = p_pict->date ? p_pict->date : (int64_t)AV_NOPTS_VALUE;
 

@@ -592,13 +592,13 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8:
-            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+            p_vout->output.i_chroma = VLC_CODEC_RGB8;
             p_vout->p_sys->i_bytes_per_pixel = 1;
             p_vout->output.pf_setpalette = SetPalette;
             break;
 
         case 15:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
+            p_vout->output.i_chroma = VLC_CODEC_RGB15;
             p_vout->p_sys->i_bytes_per_pixel = 2;
             p_vout->output.i_rmask = 0x7c00;
             p_vout->output.i_gmask = 0x03e0;
@@ -606,7 +606,7 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
             break;
 
         case 16:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+            p_vout->output.i_chroma = VLC_CODEC_RGB16;
             p_vout->p_sys->i_bytes_per_pixel = 2;
             p_vout->output.i_rmask = 0xf800;
             p_vout->output.i_gmask = 0x07e0;
@@ -614,7 +614,7 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
             break;
 
         case 24:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+            p_vout->output.i_chroma = VLC_CODEC_RGB24;
             p_vout->p_sys->i_bytes_per_pixel = 3;
             p_vout->output.i_rmask = 0xff0000;
             p_vout->output.i_gmask = 0x00ff00;
@@ -623,7 +623,7 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
 
         case 32:
         default:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+            p_vout->output.i_chroma = VLC_CODEC_RGB32;
             p_vout->p_sys->i_bytes_per_pixel = 4;
             p_vout->output.i_rmask = 0xff0000;
             p_vout->output.i_gmask = 0x00ff00;
@@ -819,7 +819,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
         switch (p_vout->p_sys->i_vc_format)
         {
             case Pg_VIDEO_FORMAT_YUV420:
-                p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
+                p_vout->output.i_chroma = VLC_CODEC_I420;
 
                 p_pic->p_sys->p_buf[U_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[U_PLANE] );
                 p_pic->p_sys->p_buf[V_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[V_PLANE] );
@@ -856,7 +856,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 break;
 
             case Pg_VIDEO_FORMAT_YV12:
-                p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+                p_vout->output.i_chroma = VLC_CODEC_YV12;
 
                 p_pic->p_sys->p_buf[U_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[U_PLANE] );
                 p_pic->p_sys->p_buf[V_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[V_PLANE] );
@@ -896,11 +896,11 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
             case Pg_VIDEO_FORMAT_YUY2:
                 if (p_vout->p_sys->i_vc_format == Pg_VIDEO_FORMAT_UYVY)
                 {
-                    p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+                    p_vout->output.i_chroma = VLC_CODEC_UYVY;
                 }
                 else
                 {
-                    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+                    p_vout->output.i_chroma = VLC_CODEC_YUYV;
                 }
 
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
@@ -914,7 +914,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 break;
 
             case Pg_VIDEO_FORMAT_RGB555:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
+                p_vout->output.i_chroma = VLC_CODEC_RGB15;
                 p_vout->output.i_rmask = 0x001f;
                 p_vout->output.i_gmask = 0x03e0;
                 p_vout->output.i_bmask = 0x7c00;
@@ -930,7 +930,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 break;
 
             case Pg_VIDEO_FORMAT_RGB565:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+                p_vout->output.i_chroma = VLC_CODEC_RGB16;
                 p_vout->output.i_rmask = 0x001f;
                 p_vout->output.i_gmask = 0x07e0;
                 p_vout->output.i_bmask = 0xf800;
@@ -946,7 +946,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 break;
 
             case Pg_VIDEO_FORMAT_RGB8888:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+                p_vout->output.i_chroma = VLC_CODEC_RGB32;
                 p_vout->output.i_rmask = 0x000000ff;
                 p_vout->output.i_gmask = 0x0000ff00;
                 p_vout->output.i_bmask = 0x00ff0000;
@@ -966,7 +966,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
     switch( p_vout->output.i_chroma )
     {
 #ifdef MODULE_NAME_IS_xvideo
-        case VLC_FOURCC('Y','2','1','1'):
+        case VLC_CODEC_Y211:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->offsets[0];

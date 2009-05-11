@@ -159,7 +159,7 @@ static int CreatePicture( spu_t *p_spu, subpicture_t *p_subpic,
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt.i_chroma = VLC_CODEC_YUVA;
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;

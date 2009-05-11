@@ -383,7 +383,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_chroma = VLC_CODEC_TEXT;
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
@@ -488,7 +488,7 @@ static int ParseImageAttachments( decoder_t *p_dec )
                     memset( &fmt_out, 0, sizeof( video_format_t));
 
                     fmt_in.i_chroma  = type;
-                    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+                    fmt_out.i_chroma = VLC_CODEC_YUVA;
 
                     /* Find a suitable decoder module */
                     if( module_exists( "sdl_image" ) )
@@ -1167,7 +1167,7 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
     /* Display the feed's image */
     memset( &fmt_out, 0, sizeof( video_format_t));
 
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt_out.i_chroma = VLC_CODEC_YUVA;
     fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width =
@@ -1181,7 +1181,7 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         msg_Err( p_dec, "cannot allocate SPU region" );
         return NULL;
     }
-    assert( p_pic->format.i_chroma == VLC_FOURCC('Y','U','V','A') );
+    assert( p_pic->format.i_chroma == VLC_CODEC_YUVA );
     /* FIXME the copy is probably not needed anymore */
     picture_CopyPixels( p_region->p_picture, p_pic );
 
@@ -1201,7 +1201,7 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         int i_u =   ( ( -38 * i_r -  74 * i_g + 112 * i_b + 128 ) >> 8 ) + 128 ;
         int i_v =   ( ( 112 * i_r -  94 * i_g -  18 * i_b + 128 ) >> 8 ) + 128 ;
 
-        assert( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','A') );
+        assert( p_region->fmt.i_chroma == VLC_CODEC_YUVA );
         for( unsigned int y = 0; y < p_region->fmt.i_height; y++ )
         {
             for( unsigned int x = 0; x < p_region->fmt.i_width; x++ )

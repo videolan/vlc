@@ -114,16 +114,16 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 
     switch( p_dec->fmt_in.i_codec )
     {
-    case VLC_FOURCC('a','5','2',' '):
+    case VLC_CODEC_A52:
     case VLC_FOURCC('a','5','2','b'):
-        i_codec = VLC_FOURCC('a','5','2',' ');
+        i_codec = VLC_CODEC_A52;
         break;
-    case VLC_FOURCC('e','a','c','3'):
+    case VLC_CODEC_EAC3:
         /* XXX ugly hack, a52 does not support eac3 so no eac3 pass-through
          * support */
         if( !b_packetizer )
             return VLC_EGENERIC;
-        i_codec = VLC_FOURCC('e','a','c','3');
+        i_codec = VLC_CODEC_EAC3;
         break;
     default:
         return VLC_EGENERIC;

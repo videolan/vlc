@@ -135,7 +135,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','h','e','o') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_THEORA )
     {
         return VLC_EGENERIC;
     }
@@ -150,7 +150,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+    p_dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     /* Set callbacks */
     p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
@@ -176,7 +176,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     if( i_ret == VLC_SUCCESS )
     {
         p_dec->p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_FOURCC( 't', 'h', 'e', 'o' );
+        p_dec->fmt_out.i_codec = VLC_CODEC_THEORA;
     }
 
     return i_ret;
@@ -287,13 +287,13 @@ static int ProcessHeaders( decoder_t *p_dec )
     switch( p_sys->ti.pixelformat )
     {
       case OC_PF_420:
-        p_dec->fmt_out.i_codec = VLC_FOURCC( 'I','4','2','0' );
+        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
         break;
       case OC_PF_422:
-        p_dec->fmt_out.i_codec = VLC_FOURCC( 'I','4','2','2' );
+        p_dec->fmt_out.i_codec = VLC_CODEC_I422;
         break;
       case OC_PF_444:
-        p_dec->fmt_out.i_codec = VLC_FOURCC( 'I','4','4','4' );
+        p_dec->fmt_out.i_codec = VLC_CODEC_I444;
         break;
       case OC_PF_RSVD:
       default:
@@ -609,7 +609,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     vlc_value_t val;
     int i_quality, i;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('t','h','e','o') &&
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_THEORA &&
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
@@ -621,8 +621,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     p_enc->pf_encode_video = Encode;
-    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
-    p_enc->fmt_out.i_codec = VLC_FOURCC('t','h','e','o');
+    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
+    p_enc->fmt_out.i_codec = VLC_CODEC_THEORA;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 

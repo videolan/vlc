@@ -388,7 +388,7 @@ static int Demux( demux_t *p_demux )
             if( tk->b_seen && tk->es &&
                 (
 #ifdef ZVBI_COMPILED /* FIXME!! */
-                tk->fmt.i_codec == VLC_FOURCC('t','e','l','x') ||
+                tk->fmt.i_codec == VLC_CODEC_TELETEXT ||
 #endif
                 !ps_pkt_parse_pes( p_pkt, tk->i_skip ) ) )
             {

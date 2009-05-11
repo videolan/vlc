@@ -310,8 +310,8 @@ static int Open( vlc_object_t * p_this )
     case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
     case VLC_FOURCC( 'a', 'f', 'l', 't' ):
     case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
-    case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
-    case VLC_FOURCC( 'm', 'l', 'a', 'w' ):
+    case VLC_CODEC_ALAW:
+    case VLC_CODEC_MULAW:
     case VLC_FOURCC( 'p', 'c', 'm', ' ' ):
         if( FrameInfo_PCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                            &p_sys->fmt ) )
@@ -334,11 +334,11 @@ static int Open( vlc_object_t * p_this )
                                 &p_sys->fmt ) )
             goto error;
         break;
-    case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-    case VLC_FOURCC( 'a', '5', '2', ' ' ):
+    case VLC_CODEC_MPGA:
+    case VLC_CODEC_A52:
         /* FIXME set end of area FIXME */
         goto error;
-    case VLC_FOURCC( 'a', 'g', 's', 'm' ):
+    case VLC_CODEC_GSM_MS:
         if( FrameInfo_MSGSM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                              &p_sys->fmt ) )
             goto error;

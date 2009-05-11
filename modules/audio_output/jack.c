@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     aout_VolumeSoftInit( p_aout );
 
     /* JACK only supports fl32 format */
-    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    p_aout->output.output.i_format = VLC_CODEC_FL32;
     // TODO add buffer size callback
     p_aout->output.i_nb_samples = jack_get_buffer_size( p_sys->p_jack_client );
     p_aout->output.output.i_rate = jack_get_sample_rate( p_sys->p_jack_client );

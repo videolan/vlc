@@ -102,7 +102,7 @@ static int Create( vlc_object_t *p_this )
     csri_rend *p_render;
     struct csri_stream_ext *p_stream_ext;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_SSA )
         return VLC_EGENERIC;
 
     p_render = csri_renderer_default();
@@ -131,7 +131,7 @@ static int Create( vlc_object_t *p_this )
                                                    p_dec->fmt_in.p_extra ? strnlen( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra ) : 0,
                                                    NULL);
     p_dec->fmt_out.i_cat = SPU_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
 
     return VLC_SUCCESS;
 }
@@ -268,7 +268,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     /* XXX On x86 at least our RGBA is mapped to their BGRA
      * TODO confirm that is the same on big endian cpu */
     fmt = *p_fmt;
-    fmt.i_chroma = VLC_FOURCC('R','G','B','A');
+    fmt.i_chroma = VLC_CODEC_RGBA;
     fmt.i_width = fmt.i_visible_width;
     fmt.i_height = fmt.i_visible_height;
     fmt.i_bits_per_pixel = 0;

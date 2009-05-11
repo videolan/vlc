@@ -883,17 +883,15 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
     /* it sounds like vista does not support YUV surfaces at all */
         switch( i_chroma )
         {
-            case VLC_FOURCC('U','Y','V','Y'):
-            case VLC_FOURCC('U','Y','N','V'):
-            case VLC_FOURCC('Y','4','2','2'):
+            case VLC_CODEC_UYVY:
             {
                 static const D3DFORMAT formats[] =
                     { D3DFMT_UYVY, D3DFMT_YUY2, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
                 return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
             }
-            case VLC_FOURCC('I','4','2','0'):
-            case VLC_FOURCC('I','4','2','2'):
-            case VLC_FOURCC('Y','V','1','2'):
+            case VLC_CODEC_I420:
+            case VLC_CODEC_I422:
+            case VLC_CODEC_YV12:
             {
                 /* typically 3D textures don't support planar format
                 ** fallback to packed version and use CPU for the conversion
@@ -902,8 +900,7 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
                     { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
                 return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
             }
-            case VLC_FOURCC('Y','U','Y','2'):
-            case VLC_FOURCC('Y','U','N','V'):
+            case VLC_CODEC_YUYV:
             {
                 static const D3DFORMAT formats[] =
                     { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
@@ -914,25 +911,25 @@ static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3D
 
     switch( i_chroma )
     {
-        case VLC_FOURCC('R', 'V', '1', '5'):
+        case VLC_CODEC_RGB15:
         {
             static const D3DFORMAT formats[] =
                 { D3DFMT_X1R5G5B5 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
-        case VLC_FOURCC('R', 'V', '1', '6'):
+        case VLC_CODEC_RGB16:
         {
             static const D3DFORMAT formats[] =
                 { D3DFMT_R5G6B5 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
-        case VLC_FOURCC('R', 'V', '2', '4'):
+        case VLC_CODEC_RGB24:
         {
             static const D3DFORMAT formats[] =
                 { D3DFMT_R8G8B8, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8 };
             return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
         }
-        case VLC_FOURCC('R', 'V', '3', '2'):
+        case VLC_CODEC_RGB32:
         {
             static const D3DFORMAT formats[] =
                 { D3DFMT_A8R8G8B8, D3DFMT_X8R8G8B8 };
@@ -980,32 +977,32 @@ static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
     switch( format )
     {
         case D3DFMT_YUY2:
-            p_vout->output.i_chroma = VLC_FOURCC('Y', 'U', 'Y', '2');
+            p_vout->output.i_chroma = VLC_CODEC_YUYV;
             break;
         case D3DFMT_UYVY:
-            p_vout->output.i_chroma = VLC_FOURCC('U', 'Y', 'V', 'Y');
+            p_vout->output.i_chroma = VLC_CODEC_UYVY;
             break;
         case D3DFMT_R8G8B8:
-            p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '2', '4');
+            p_vout->output.i_chroma = VLC_CODEC_RGB24;
             p_vout->output.i_rmask = 0xff0000;
             p_vout->output.i_gmask = 0x00ff00;
             p_vout->output.i_bmask = 0x0000ff;
             break;
         case D3DFMT_X8R8G8B8:
         case D3DFMT_A8R8G8B8:
-            p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '3', '2');
+            p_vout->output.i_chroma = VLC_CODEC_RGB32;
             p_vout->output.i_rmask = 0x00ff0000;
             p_vout->output.i_gmask = 0x0000ff00;
             p_vout->output.i_bmask = 0x000000ff;
             break;
         case D3DFMT_R5G6B5:
-            p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '1', '6');
+            p_vout->output.i_chroma = VLC_CODEC_RGB16;
             p_vout->output.i_rmask = (0x1fL)<<11;
             p_vout->output.i_gmask = (0x3fL)<<5;
             p_vout->output.i_bmask = (0x1fL)<<0;
             break;
         case D3DFMT_X1R5G5B5:
-            p_vout->output.i_chroma = VLC_FOURCC('R', 'V', '1', '5');
+            p_vout->output.i_chroma = VLC_CODEC_RGB15;
             p_vout->output.i_rmask = (0x1fL)<<10;
             p_vout->output.i_gmask = (0x1fL)<<5;
             p_vout->output.i_bmask = (0x1fL)<<0;
@@ -1077,7 +1074,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
          * picture_t structures */
         switch( p_vout->output.i_chroma )
         {
-            case VLC_FOURCC('R','G','B','2'):
+            case VLC_CODEC_RGB8:
                 p_pic->p->i_lines = p_vout->output.i_height;
                 p_pic->p->i_visible_lines = p_vout->output.i_height;
                 p_pic->p->i_pixel_pitch = 1;
@@ -1085,8 +1082,8 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
                     p_pic->p->i_pixel_pitch;
                 p_pic->i_planes = 1;
             break;
-            case VLC_FOURCC('R','V','1','5'):
-            case VLC_FOURCC('R','V','1','6'):
+            case VLC_CODEC_RGB15:
+            case VLC_CODEC_RGB16:
                 p_pic->p->i_lines = p_vout->output.i_height;
                 p_pic->p->i_visible_lines = p_vout->output.i_height;
                 p_pic->p->i_pixel_pitch = 2;
@@ -1094,7 +1091,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
                     p_pic->p->i_pixel_pitch;
                 p_pic->i_planes = 1;
             break;
-            case VLC_FOURCC('R','V','2','4'):
+            case VLC_CODEC_RGB24:
                 p_pic->p->i_lines = p_vout->output.i_height;
                 p_pic->p->i_visible_lines = p_vout->output.i_height;
                 p_pic->p->i_pixel_pitch = 3;
@@ -1102,7 +1099,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
                     p_pic->p->i_pixel_pitch;
                 p_pic->i_planes = 1;
             break;
-            case VLC_FOURCC('R','V','3','2'):
+            case VLC_CODEC_RGB32:
                 p_pic->p->i_lines = p_vout->output.i_height;
                 p_pic->p->i_visible_lines = p_vout->output.i_height;
                 p_pic->p->i_pixel_pitch = 4;
@@ -1110,8 +1107,8 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
                     p_pic->p->i_pixel_pitch;
                 p_pic->i_planes = 1;
                 break;
-            case VLC_FOURCC('U','Y','V','Y'):
-            case VLC_FOURCC('Y','U','Y','2'):
+            case VLC_CODEC_UYVY:
+            case VLC_CODEC_YUYV:
                 p_pic->p->i_lines = p_vout->output.i_height;
                 p_pic->p->i_visible_lines = p_vout->output.i_height;
                 p_pic->p->i_pixel_pitch = 2;

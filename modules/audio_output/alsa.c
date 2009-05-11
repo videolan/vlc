@@ -360,7 +360,7 @@ static int Open( vlc_object_t *p_this )
        and float32) */
     if( vlc_CPU() & CPU_CAPABILITY_FPU )
     {
-        i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
+        i_vlc_pcm_format = VLC_CODEC_FL32;
         i_snd_pcm_format = SND_PCM_FORMAT_FLOAT;
     }
     else
@@ -442,7 +442,7 @@ static int Open( vlc_object_t *p_this )
         i_snd_pcm_format = SND_PCM_FORMAT_S16;
         i_channels = 2;
 
-        i_vlc_pcm_format = VLC_FOURCC('s','p','d','i');
+        i_vlc_pcm_format = VLC_CODEC_SPDIFL;
         p_aout->output.i_nb_samples = i_period_size = ALSA_SPDIF_PERIOD_SIZE;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
@@ -540,11 +540,11 @@ static int Open( vlc_object_t *p_this )
                 goto error;
             }
         }
-        if( i_vlc_pcm_format != VLC_FOURCC('s','p','d','i') )
+        if( i_vlc_pcm_format != VLC_CODEC_SPDIFL )
         switch( i_snd_pcm_format )
         {
         case SND_PCM_FORMAT_FLOAT:
-            i_vlc_pcm_format = VLC_FOURCC('f','l','3','2');
+            i_vlc_pcm_format = VLC_CODEC_FL32;
             break;
         case SND_PCM_FORMAT_S16:
             i_vlc_pcm_format = AOUT_FMT_S16_NE;
@@ -865,7 +865,7 @@ static void ALSAFill( aout_instance_t * p_aout )
     }
 
     p_buffer = aout_OutputNextBuffer( p_aout, next_date,
-           (p_aout->output.output.i_format ==  VLC_FOURCC('s','p','d','i')) );
+           (p_aout->output.output.i_format ==  VLC_CODEC_SPDIFL) );
 
     /* Audio output buffer shortage -> stop the fill process and wait */
     if( p_buffer == NULL )

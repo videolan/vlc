@@ -156,14 +156,14 @@ static int Open( vlc_object_t *p_this )
     switch( GetDWBE( &hdr[8] ) )
     {
         case AU_ALAW_8:        /* 8-bit ISDN A-law */
-            p_sys->fmt.i_codec               = VLC_FOURCC( 'a','l','a','w' );
+            p_sys->fmt.i_codec               = VLC_CODEC_ALAW;
             p_sys->fmt.audio.i_bitspersample = 8;
             p_sys->fmt.audio.i_blockalign    = 1 * p_sys->fmt.audio.i_channels;
             i_cat                    = AU_CAT_PCM;
             break;
 
         case AU_MULAW_8:       /* 8-bit ISDN u-law */
-            p_sys->fmt.i_codec               = VLC_FOURCC( 'u','l','a','w' );
+            p_sys->fmt.i_codec               = VLC_CODEC_MULAW;
             p_sys->fmt.audio.i_bitspersample = 8;
             p_sys->fmt.audio.i_blockalign    = 1 * p_sys->fmt.audio.i_channels;
             i_cat                    = AU_CAT_PCM;

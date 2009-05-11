@@ -372,12 +372,12 @@ static int Create( vlc_object_t *p_this )
         p_filter->input.i_original_channels =
                                         p_filter->output.i_original_channels;
     }
-    if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if( p_filter->input.i_format != VLC_CODEC_FL32
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
-        p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
+        p_filter->input.i_format = VLC_CODEC_FL32;
+        p_filter->output.i_format = VLC_CODEC_FL32;
     }
     if( p_filter->input.i_rate != p_filter->output.i_rate )
     {
@@ -580,12 +580,12 @@ static int OpenFilter( vlc_object_t *p_this )
         p_filter->fmt_in.audio.i_original_channels =
                                         p_filter->fmt_out.audio.i_original_channels;
     }
-    if( p_filter->fmt_in.audio.i_format != VLC_FOURCC('f','l','3','2')
-          || p_filter->fmt_out.audio.i_format != VLC_FOURCC('f','l','3','2') )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->fmt_in.audio.i_format = VLC_FOURCC('f','l','3','2');
-        p_filter->fmt_out.audio.i_format = VLC_FOURCC('f','l','3','2');
+        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
     }
     if( p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate )
     {

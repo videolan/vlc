@@ -367,7 +367,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, 0 );
-    p_sys->fmt.i_codec = VLC_FOURCC('m','j','p','g');
+    p_sys->fmt.i_codec = VLC_CODEC_MJPG;
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
     return VLC_SUCCESS;

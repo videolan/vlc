@@ -112,7 +112,7 @@ static int Create( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
-    if( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','A') )
+    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVA )
     {
         msg_Err( p_filter,
                  "Unsupported input chroma \"%4s\". "
@@ -174,7 +174,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     uint8_t *p_v = p_pic->p[ V_PLANE ].p_pixels;
     uint8_t umin, umax, vmin, vmax;
 
-    if( p_pic->format.i_chroma != VLC_FOURCC('Y','U','V','A') )
+    if( p_pic->format.i_chroma != VLC_CODEC_YUVA )
     {
         msg_Err( p_filter,
                  "Unsupported input chroma \"%4s\". "

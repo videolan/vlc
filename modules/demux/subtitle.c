@@ -518,11 +518,11 @@ static int Open ( vlc_object_t *p_this )
              p_sys->i_type == SUB_TYPE_SSA2_4 ||
              p_sys->i_type == SUB_TYPE_ASS )
     {
-        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','s','a',' ' ) );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_SSA );
     }
     else
     {
-        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','u','b','t' ) );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
     }
     if( p_sys->psz_header != NULL )
     {

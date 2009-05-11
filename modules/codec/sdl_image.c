@@ -70,17 +70,17 @@ static const struct supported_fmt_t
     const char *psz_sdl_type;
 } p_supported_fmt[] =
 {
-    { VLC_FOURCC('t','g','a',' '), "TGA" },
-    { VLC_FOURCC('b','m','p',' '), "BMP" },
-    { VLC_FOURCC('p','n','m',' '), "PNM" },
+    { VLC_CODEC_TARGA, "TGA" },
+    { VLC_CODEC_BMP, "BMP" },
+    { VLC_CODEC_PNM, "PNM" },
     { VLC_FOURCC('x','p','m',' '), "XPM" },
     { VLC_FOURCC('x','c','f',' '), "XCF" },
-    { VLC_FOURCC('p','c','x',' '), "PCX" },
-    { VLC_FOURCC('g','i','f',' '), "GIF" },
-    { VLC_FOURCC('j','p','e','g'), "JPG" },
-    { VLC_FOURCC('t','i','f','f'), "TIF" },
+    { VLC_CODEC_PCX, "PCX" },
+    { VLC_CODEC_GIF, "GIF" },
+    { VLC_CODEC_JPEG, "JPG" },
+    { VLC_CODEC_TIFF, "TIF" },
     { VLC_FOURCC('l','b','m',' '), "LBM" },
-    { VLC_FOURCC('p','n','g',' '), "PNG" }
+    { VLC_CODEC_PNG, "PNG" }
 };
 
 /*****************************************************************************
@@ -113,7 +113,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties - this is a decoy and isn't used anywhere */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','3','2');
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
 
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
@@ -157,14 +157,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     switch ( p_surface->format->BitsPerPixel )
     {
     case 16:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','1','6');
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGB16;
         break;
     case 8:
     case 24:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','2','4');
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
         break;
     case 32:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','3','2');
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGB32;
         break;
     default:
         msg_Warn( p_dec, "unknown bits/pixel format (%d)",

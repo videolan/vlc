@@ -513,7 +513,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
     DeviceFormat.mFormatID = kAudioFormatLinearPCM;
 
     /* We use float 32. It's the best supported format by both VLC and Coreaudio */
-    p_aout->output.output.i_format = VLC_FOURCC( 'f','l','3','2');
+    p_aout->output.output.i_format = VLC_CODEC_FL32;
     DeviceFormat.mFormatFlags = kAudioFormatFlagsNativeFloatPacked;
     DeviceFormat.mBitsPerChannel = 32;
     DeviceFormat.mChannelsPerFrame = aout_FormatNbChannels( &p_aout->output.output );
@@ -768,9 +768,9 @@ static int OpenSPDIF( aout_instance_t * p_aout )
 
     /* Set the format flags */
     if( p_sys->stream_format.mFormatFlags & kAudioFormatFlagIsBigEndian )
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','b');
+        p_aout->output.output.i_format = VLC_CODEC_SPDIFB;
     else
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
     p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
     p_aout->output.output.i_frame_length = A52_FRAME_NB;
     p_aout->output.i_nb_samples = p_aout->output.output.i_frame_length;

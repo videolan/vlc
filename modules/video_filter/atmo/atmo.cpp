@@ -1192,11 +1192,8 @@ static void Atmo_SetupParameters(filter_t *p_filter)
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-    case VLC_FOURCC('I','4','2','0'):
-    case VLC_FOURCC('I','Y','U','V'):
-    case VLC_FOURCC('Y','V','1','2'):
-    case VLC_FOURCC('Y','V','1','6'):
-    case VLC_FOURCC('Y','V','U','9'):
+    case VLC_CODEC_I420:
+    case VLC_CODEC_YV12:
         // simple enough? Dionoea?
         p_sys->pf_extract_mini_image = ExtractMiniImage_YUV;
         break;

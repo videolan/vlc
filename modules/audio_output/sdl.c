@@ -151,17 +151,17 @@ static int Open ( vlc_object_t *p_this )
     switch ( obtained.format )
     {
     case AUDIO_S16LSB:
-        p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l'); break;
+        p_aout->output.output.i_format = VLC_CODEC_S16L; break;
     case AUDIO_S16MSB:
-        p_aout->output.output.i_format = VLC_FOURCC('s','1','6','b'); break;
+        p_aout->output.output.i_format = VLC_CODEC_S16B; break;
     case AUDIO_U16LSB:
-        p_aout->output.output.i_format = VLC_FOURCC('u','1','6','l'); break;
+        p_aout->output.output.i_format = VLC_CODEC_U16L; break;
     case AUDIO_U16MSB:
-        p_aout->output.output.i_format = VLC_FOURCC('u','1','6','b'); break;
+        p_aout->output.output.i_format = VLC_CODEC_U16B; break;
     case AUDIO_S8:
-        p_aout->output.output.i_format = VLC_FOURCC('s','8',' ',' '); break;
+        p_aout->output.output.i_format = VLC_CODEC_S8; break;
     case AUDIO_U8:
-        p_aout->output.output.i_format = VLC_FOURCC('u','8',' ',' '); break;
+        p_aout->output.output.i_format = VLC_CODEC_U8; break;
     }
     /* Volume is entirely done in software. */
     aout_VolumeSoftInit( p_aout );

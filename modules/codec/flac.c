@@ -210,7 +210,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('f','l','a','c') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_FLAC )
     {
         return VLC_EGENERIC;
     }
@@ -270,7 +270,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+    p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 
     /* Set callbacks */
 #ifdef USE_LIBFLAC
@@ -294,7 +294,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     p_dec->pf_packetize    = PacketizeBlock;
 
     /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
+    p_dec->fmt_out.i_codec = VLC_CODEC_FLAC;
 
     if( i_ret != VLC_SUCCESS )
     {
@@ -359,7 +359,7 @@ static void ProcessHeader( decoder_t *p_dec )
 
     if( !p_sys->b_stream_info ) return;
 
-    if( p_dec->fmt_out.i_codec == VLC_FOURCC('f','l','a','c') )
+    if( p_dec->fmt_out.i_codec == VLC_CODEC_FLAC )
     {
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra =
@@ -685,7 +685,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
         switch( metadata->data.stream_info.bits_per_sample )
         {
         case 8:
-            p_dec->fmt_out.i_codec = VLC_FOURCC('s','8',' ',' ');
+            p_dec->fmt_out.i_codec = VLC_CODEC_S8;
             break;
         case 16:
             p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
@@ -696,7 +696,7 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
         default:
             msg_Dbg( p_dec, "strange bit/sample value: %d",
                      metadata->data.stream_info.bits_per_sample );
-            p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+            p_dec->fmt_out.i_codec = VLC_CODEC_FI32;
             break;
         }
     }
@@ -1284,7 +1284,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('f','l','a','c') &&
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_FLAC &&
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
@@ -1295,7 +1295,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
     p_enc->pf_encode_audio = Encode;
-    p_enc->fmt_out.i_codec = VLC_FOURCC('f','l','a','c');
+    p_enc->fmt_out.i_codec = VLC_CODEC_FLAC;
 
     p_sys->i_headers = 0;
     p_sys->p_buffer = 0;

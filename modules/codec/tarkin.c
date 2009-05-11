@@ -93,7 +93,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','a','r','k') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_TARKIN )
     {
         return VLC_EGENERIC;
     }
@@ -240,19 +240,19 @@ static picture_t *DecodePacket( decoder_t *p_dec, block_t **pp_block,
         switch( p_sys->tarkin_stream->layer->desc.format )
         {
         case TARKIN_RGB24:
-            i_chroma = VLC_FOURCC('R','V','2','4');
+            i_chroma = VLC_CODEC_RGB24;
             i_stride = i_width * 3;
             break;
         case TARKIN_RGB32:
-            i_chroma = VLC_FOURCC('R','V','3','2');
+            i_chroma = VLC_CODEC_RGB32;
             i_stride = i_width * 4;
             break;
         case TARKIN_RGBA:
-            i_chroma = VLC_FOURCC('R','G','B','A');
+            i_chroma = VLC_CODEC_RGBA;
             i_stride = i_width * 4;
             break;
         default:
-            i_chroma = VLC_FOURCC('I','4','2','0');
+            i_chroma = VLC_CODEC_I420;
             i_stride = i_width;
             break;
         }

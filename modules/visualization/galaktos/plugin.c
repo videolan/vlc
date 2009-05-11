@@ -79,8 +79,8 @@ static int Open( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys;
     galaktos_thread_t *p_thread;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
-         || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
+        p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         msg_Warn( p_filter, "bad input or output format" );
         return VLC_EGENERIC;
@@ -211,8 +211,7 @@ static void* Thread( vlc_object_t *p_this )
 
     /* Initialize vout parameters */
     vout_InitFormat( &p_thread->p_opengl->fmt_in,
-                     VLC_FOURCC('R','V','3','2'),
-                     p_thread->i_width, p_thread->i_height, 1 );
+                     VLC_CODEC_RGB32, p_thread->i_width, p_thread->i_height, 1 );
     p_thread->p_opengl->i_window_width = p_thread->i_width;
     p_thread->p_opengl->i_window_height = p_thread->i_height;
     p_thread->p_opengl->render.i_width = p_thread->i_width;

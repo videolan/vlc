@@ -210,7 +210,7 @@ static int Open( vlc_object_t *p_this )
     Eia608Init( &p_sys->eia608 );
 
     p_dec->fmt_out.i_cat = SPU_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('T','E','X','T');
+    p_dec->fmt_out.i_codec = VLC_CODEC_TEXT;
 
     return VLC_SUCCESS;
 }
@@ -340,7 +340,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_chroma = VLC_CODEC_TEXT;
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;

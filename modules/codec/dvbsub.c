@@ -296,7 +296,7 @@ static int Open( vlc_object_t *p_this )
     vlc_value_t    val;
     int i_posx, i_posy;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('d','v','b','s') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_DVBS )
     {
         return VLC_EGENERIC;
     }
@@ -1542,7 +1542,7 @@ static subpicture_t *render( decoder_t *p_dec )
 
         /* Create new SPU region */
         memset( &fmt, 0, sizeof(video_format_t) );
-        fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
+        fmt.i_chroma = VLC_CODEC_YUVP;
         fmt.i_aspect = 0; /* 0 means use aspect ratio of background video */
         fmt.i_width = fmt.i_visible_width = p_region->i_width;
         fmt.i_height = fmt.i_visible_height = p_region->i_height;
@@ -1595,7 +1595,7 @@ static subpicture_t *render( decoder_t *p_dec )
 
             /* Create new SPU region */
             memset( &fmt, 0, sizeof(video_format_t) );
-            fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+            fmt.i_chroma = VLC_CODEC_TEXT;
             fmt.i_aspect = VOUT_ASPECT_FACTOR;
             fmt.i_width = fmt.i_visible_width = p_region->i_width;
             fmt.i_height = fmt.i_visible_height = p_region->i_height;
@@ -1659,7 +1659,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     vlc_value_t val;
 
-    if( ( p_enc->fmt_out.i_codec != VLC_FOURCC('d','v','b','s') ) &&
+    if( ( p_enc->fmt_out.i_codec != VLC_CODEC_DVBS ) &&
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
@@ -1671,7 +1671,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     p_enc->pf_encode_sub = Encode;
-    p_enc->fmt_out.i_codec = VLC_FOURCC('d','v','b','s');
+    p_enc->fmt_out.i_codec = VLC_CODEC_DVBS;
     p_enc->fmt_out.subs.dvb.i_id  = 1 << 16 | 1;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
@@ -1692,8 +1692,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-/* FIXME: this routine is a hack to convert VLC_FOURCC('Y','U','V','A')
- *        into VLC_FOURCC('Y','U','V','P')
+/* FIXME: this routine is a hack to convert VLC_CODEC_YUVA
+ *        into VLC_CODEC_YUVP
  */
 static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 {
@@ -1722,7 +1722,7 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
 #endif
-        p_fmt->i_chroma = VLC_FOURCC('Y','U','V','P');
+        p_fmt->i_chroma = VLC_CODEC_YUVP;
         p_fmt->p_palette = (video_palette_t *) malloc( sizeof( video_palette_t ) );
         if( !p_fmt->p_palette ) break;
         p_fmt->p_palette->i_entries = 0;
@@ -1909,11 +1909,11 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
 
     if( !p_subpic || !p_subpic->p_region ) return NULL;
 
-    /* FIXME: this is a hack to convert VLC_FOURCC('Y','U','V','A') into
-     *  VLC_FOURCC('Y','U','V','P')
+    /* FIXME: this is a hack to convert VLC_CODEC_YUVA into
+     *  VLC_CODEC_YUVP
      */
     p_region = p_subpic->p_region;
-    if( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    if( p_region->fmt.i_chroma == VLC_CODEC_YUVA )
     {
         p_temp = YuvaYuvp( p_subpic );
         if( !p_temp )
@@ -1927,8 +1927,8 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     /* Sanity check */
     if( !p_region ) return NULL;
 
-    if( ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') ) &&
-        ( p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') ) )
+    if( ( p_region->fmt.i_chroma != VLC_CODEC_TEXT ) &&
+        ( p_region->fmt.i_chroma != VLC_CODEC_YUVP ) )
     {
         char psz_fourcc[5];
         memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
@@ -2113,7 +2113,7 @@ static void encode_clut( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
     /* Sanity check */
     if( !p_region ) return;
 
-    if( p_region->fmt.i_chroma == VLC_FOURCC('Y','U','V','P') )
+    if( p_region->fmt.i_chroma == VLC_CODEC_YUVP )
     {
         p_pal = p_region->fmt.p_palette;
     }
@@ -2167,7 +2167,7 @@ static void encode_region_composition( encoder_t *p_enc, bs_t *s,
     {
         int i_entries = 4, i_depth = 0x1, i_bg = 0;
         bool b_text =
-            ( p_region->fmt.i_chroma == VLC_FOURCC('T','E','X','T') );
+            ( p_region->fmt.i_chroma == VLC_CODEC_TEXT );
 
         if( !b_text )
         {
@@ -2253,10 +2253,10 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         /* object coding method */
         switch( p_region->fmt.i_chroma )
         {
-        case VLC_FOURCC( 'Y','U','V','P' ):
+        case VLC_CODEC_YUVP:
             bs_write( s, 2, 0 );
             break;
-        case VLC_FOURCC( 'T','E','X','T' ):
+        case VLC_CODEC_TEXT:
             bs_write( s, 2, 1 );
             break;
         default:
@@ -2267,7 +2267,7 @@ static void encode_object( encoder_t *p_enc, bs_t *s, subpicture_t *p_subpic )
         bs_write( s, 1, 0 ); /* non modifying color flag */
         bs_write( s, 1, 0 ); /* Reserved */
 
-        if( p_region->fmt.i_chroma == VLC_FOURCC( 'T','E','X','T' ) )
+        if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
         {
             int i_size, i;
 
@@ -2326,7 +2326,7 @@ static void encode_pixel_data( encoder_t *p_enc, bs_t *s,
     unsigned int i_line;
 
     /* Sanity check */
-    if( p_region->fmt.i_chroma != VLC_FOURCC('Y','U','V','P') ) return;
+    if( p_region->fmt.i_chroma != VLC_CODEC_YUVP ) return;
 
     /* Encode line by line */
     for( i_line = !b_top; i_line < p_region->fmt.i_visible_height;

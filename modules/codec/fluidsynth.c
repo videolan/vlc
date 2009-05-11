@@ -66,7 +66,7 @@ static int Open (vlc_object_t *p_this)
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys;
 
-    if (p_dec->fmt_in.i_codec != VLC_FOURCC ('M', 'I', 'D', 'I'))
+    if (p_dec->fmt_in.i_codec != VLC_CODEC_MIDI)
         return VLC_EGENERIC;
 
     char *font_path = var_CreateGetNonEmptyString (p_this, "soundfont");
@@ -82,7 +82,7 @@ static int Open (vlc_object_t *p_this)
     p_dec->fmt_out.audio.i_original_channels =
     p_dec->fmt_out.audio.i_physical_channels =
         AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f', 'l', '3', '2');
+    p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     p_dec->fmt_out.audio.i_bitspersample = 32;
 
     p_dec->pf_decode_audio = DecodeBlock;

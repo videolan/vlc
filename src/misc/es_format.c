@@ -92,24 +92,24 @@ void video_format_FixRgb( video_format_t *p_fmt )
     {
         switch( p_fmt->i_chroma )
         {
-        case VLC_FOURCC('R','V','1','5'):
+        case VLC_CODEC_RGB15:
             p_fmt->i_rmask = 0x7c00;
             p_fmt->i_gmask = 0x03e0;
             p_fmt->i_bmask = 0x001f;
             break;
 
-        case VLC_FOURCC('R','V','1','6'):
+        case VLC_CODEC_RGB16:
             p_fmt->i_rmask = 0xf800;
             p_fmt->i_gmask = 0x07e0;
             p_fmt->i_bmask = 0x001f;
             break;
 
-        case VLC_FOURCC('R','V','2','4'):
+        case VLC_CODEC_RGB24:
             p_fmt->i_rmask = 0xff0000;
             p_fmt->i_gmask = 0x00ff00;
             p_fmt->i_bmask = 0x0000ff;
             break;
-        case VLC_FOURCC('R','V','3','2'):
+        case VLC_CODEC_RGB32:
             p_fmt->i_rmask = 0x00ff0000;
             p_fmt->i_gmask = 0x0000ff00;
             p_fmt->i_bmask = 0x000000ff;

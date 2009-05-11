@@ -132,7 +132,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     vlc_value_t val;
     int i_frequency;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','g','a') &&
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_MPGA &&
         p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','2','a') &&
         p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','2',' ') &&
         !p_enc->b_force )
@@ -167,7 +167,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
 
     p_enc->fmt_out.i_cat = AUDIO_ES;
-    p_enc->fmt_out.i_codec = VLC_FOURCC('m','p','g','a');
+    p_enc->fmt_out.i_codec = VLC_CODEC_MPGA;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 

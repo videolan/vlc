@@ -619,62 +619,60 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
         p_format->i_aspect = 0;
 #endif
 
-    switch( i_chroma )
+    switch( vlc_fourcc_GetCodec( VIDEO_ES, i_chroma ) )
     {
-        case FOURCC_YUVA:
+        case VLC_CODEC_YUVA:
             p_format->i_bits_per_pixel = 32;
             break;
-        case FOURCC_I444:
-        case FOURCC_J444:
+        case VLC_CODEC_I444:
+        case VLC_CODEC_J444:
             p_format->i_bits_per_pixel = 24;
             break;
-        case FOURCC_I422:
-        case FOURCC_YUY2:
-        case FOURCC_UYVY:
-        case FOURCC_J422:
+        case VLC_CODEC_I422:
+        case VLC_CODEC_YUYV:
+        case VLC_CODEC_YVYU:
+        case VLC_CODEC_UYVY:
+        case VLC_CODEC_VYUY:
+        case VLC_CODEC_J422:
             p_format->i_bits_per_pixel = 16;
             break;
-        case FOURCC_I440:
-        case FOURCC_J440:
+        case VLC_CODEC_I440:
+        case VLC_CODEC_J440:
             p_format->i_bits_per_pixel = 16;
             break;
-        case FOURCC_I411:
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_J420:
-        case FOURCC_IYUV:
+        case VLC_CODEC_I411:
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
             p_format->i_bits_per_pixel = 12;
             break;
-        case FOURCC_I410:
-        case FOURCC_YVU9:
+        case VLC_CODEC_I410:
             p_format->i_bits_per_pixel = 9;
             break;
-        case FOURCC_Y211:
+        case VLC_CODEC_Y211:
             p_format->i_bits_per_pixel = 8;
             break;
-        case FOURCC_YUVP:
+        case VLC_CODEC_YUVP:
             p_format->i_bits_per_pixel = 8;
             break;
 
-        case FOURCC_RV32:
-        case FOURCC_RGBA:
+        case VLC_CODEC_RGB32:
+        case VLC_CODEC_RGBA:
             p_format->i_bits_per_pixel = 32;
             break;
-        case FOURCC_RV24:
+        case VLC_CODEC_RGB24:
             p_format->i_bits_per_pixel = 24;
             break;
-        case FOURCC_RV15:
-        case FOURCC_RV16:
+        case VLC_CODEC_RGB15:
+        case VLC_CODEC_RGB16:
             p_format->i_bits_per_pixel = 16;
             break;
-        case FOURCC_RGB2:
+        case VLC_CODEC_RGB8:
             p_format->i_bits_per_pixel = 8;
             break;
 
-        case FOURCC_GREY:
-        case FOURCC_Y800:
-        case FOURCC_Y8:
-        case FOURCC_RGBP:
+        case VLC_CODEC_GREY:
+        case VLC_CODEC_RGBP:
             p_format->i_bits_per_pixel = 8;
             break;
 
@@ -725,9 +723,9 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
     i_height_aligned = (i_height + 15) >> 4 << 4;
 
     /* Calculate coordinates */
-    switch( i_chroma )
+    switch( vlc_fourcc_GetCodec( VIDEO_ES, i_chroma ) )
     {
-        case FOURCC_I411:
+        case VLC_CODEC_I411:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -743,8 +741,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_I410:
-        case FOURCC_YVU9:
+        case VLC_CODEC_I410:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -760,10 +757,9 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_J420:
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -779,8 +775,8 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_I422:
-        case FOURCC_J422:
+        case VLC_CODEC_I422:
+        case VLC_CODEC_J422:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -796,8 +792,8 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_I440:
-        case FOURCC_J440:
+        case VLC_CODEC_I440:
+        case VLC_CODEC_J440:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -813,8 +809,8 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_I444:
-        case FOURCC_J444:
+        case VLC_CODEC_I444:
+        case VLC_CODEC_J444:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -830,7 +826,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_YUVA:
+        case VLC_CODEC_YUVA:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -850,7 +846,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 4;
             break;
 
-        case FOURCC_YUVP:
+        case VLC_CODEC_YUVP:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
@@ -859,7 +855,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_Y211:
+        case VLC_CODEC_Y211:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
@@ -868,8 +864,10 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_UYVY:
-        case FOURCC_YUY2:
+        case VLC_CODEC_UYVY:
+        case VLC_CODEC_VYUY:
+        case VLC_CODEC_YUYV:
+        case VLC_CODEC_YVYU:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 2;
@@ -878,7 +876,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_RGB2:
+        case VLC_CODEC_RGB8:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
@@ -887,7 +885,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_RV15:
+        case VLC_CODEC_RGB15:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 2;
@@ -896,7 +894,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_RV16:
+        case VLC_CODEC_RGB16:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 2;
@@ -905,7 +903,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_RV24:
+        case VLC_CODEC_RGB24:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 3;
@@ -914,8 +912,8 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_RV32:
-        case FOURCC_RGBA:
+        case VLC_CODEC_RGB32:
+        case VLC_CODEC_RGBA:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned * 4;
@@ -924,10 +922,8 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             p_pic->i_planes = 1;
             break;
 
-        case FOURCC_GREY:
-        case FOURCC_Y800:
-        case FOURCC_Y8:
-        case FOURCC_RGBP:
+        case VLC_CODEC_GREY:
+        case VLC_CODEC_RGBP:
             p_pic->p->i_lines = i_height_aligned;
             p_pic->p->i_visible_lines = i_height;
             p_pic->p->i_pitch = i_width_aligned;
@@ -956,29 +952,24 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
 int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
 {
     static const vlc_fourcc_t p_I420[] = {
-        FOURCC_I420, FOURCC_IYUV, FOURCC_YV12, FOURCC_J420, 0
+        VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_J420, 0
     };
     static const vlc_fourcc_t p_I422[] = {
-        FOURCC_I422, FOURCC_J422, 0
+        VLC_CODEC_I422, VLC_CODEC_J422, 0
     };
     static const vlc_fourcc_t p_I440[] = {
-        FOURCC_I440, FOURCC_J440, 0
+        VLC_CODEC_I440, VLC_CODEC_J440, 0
     };
     static const vlc_fourcc_t p_I444[] = {
-        FOURCC_I444, FOURCC_J444, 0
-    };
-    static const vlc_fourcc_t p_UYVY[] = {
-        FOURCC_UYVY, FOURCC_UYNV, FOURCC_Y422, 0
-    };
-    static const vlc_fourcc_t p_YUYV[] = {
-        FOURCC_YUY2, FOURCC_YUNV, 0
-    };
-    static const vlc_fourcc_t p_GREY[] = {
-        FOURCC_GREY, FOURCC_Y800, FOURCC_Y8, 0
+        VLC_CODEC_I444, VLC_CODEC_J444, 0
     };
     static const vlc_fourcc_t *pp_fcc[] = {
-        p_I420, p_I422, p_I440, p_I444, p_UYVY, p_YUYV, p_GREY, NULL
+        p_I420, p_I422, p_I440, p_I444, NULL
     };
+
+    /* */
+    i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, i_chroma );
+    i_amorhc = vlc_fourcc_GetCodec( VIDEO_ES, i_amorhc );
 
     /* If they are the same, they are the same ! */
     if( i_chroma == i_amorhc )

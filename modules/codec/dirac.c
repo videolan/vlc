@@ -443,7 +443,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     float f_tmp;
     char *psz_tmp;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('d','r','a','c') &&
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_DIRAC &&
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
@@ -462,7 +462,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_enc->p_sys = p_sys;
     p_enc->pf_encode_video = Encode;
-    p_enc->fmt_out.i_codec = VLC_FOURCC('d','r','a','c');
+    p_enc->fmt_out.i_codec = VLC_CODEC_DIRAC;
     p_enc->fmt_out.i_cat = VIDEO_ES;
 
     if( ( p_sys->p_dts_fifo = block_FifoNew() ) == NULL )
@@ -519,19 +519,19 @@ static int OpenEncoder( vlc_object_t *p_this )
     if( !psz_tmp )
         goto error;
     else if( !strcmp( psz_tmp, "420" ) ) {
-        p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+        p_enc->fmt_in.i_codec = VLC_CODEC_I420;
         p_enc->fmt_in.video.i_bits_per_pixel = 12;
         p_sys->ctx.src_params.chroma = format420;
         p_sys->i_buffer_in = p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height * 3 / 2;
     }
     else if( !strcmp( psz_tmp, "422" ) ) {
-        p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','2');
+        p_enc->fmt_in.i_codec = VLC_CODEC_I422;
         p_enc->fmt_in.video.i_bits_per_pixel = 16;
         p_sys->ctx.src_params.chroma = format422;
         p_sys->i_buffer_in = p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height * 2;
     }
     else if( !strcmp( psz_tmp, "444" ) ) {
-        p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','4','4');
+        p_enc->fmt_in.i_codec = VLC_CODEC_I444;
         p_enc->fmt_in.video.i_bits_per_pixel = 24;
         p_sys->ctx.src_params.chroma = format444;
         p_sys->i_buffer_in = p_enc->fmt_in.video.i_width * p_enc->fmt_in.video.i_height * 3;

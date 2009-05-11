@@ -177,8 +177,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
         p_aout->mixer.mixer.i_format
                      = (vlc_CPU() & CPU_CAPABILITY_FPU) ?
-                        VLC_FOURCC('f','l','3','2') :
-                        VLC_FOURCC('f','i','3','2');
+                        VLC_CODEC_FL32 : VLC_CODEC_FI32;
         aout_FormatPrepare( &p_aout->mixer.mixer );
     }
     else

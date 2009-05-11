@@ -179,7 +179,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
     memset( &fmt_in, 0, sizeof(video_format_t) );
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt_out.i_chroma = VLC_CODEC_YUVA;
     p_image = image_HandlerCreate( p_this );
     p_pic = image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
     image_HandlerDelete( p_image );
@@ -392,7 +392,7 @@ static int Init( vout_thread_t *p_vout )
         p_sys->p_blend->fmt_in.video.i_y_offset = 0;
     p_sys->p_blend->fmt_out.video.i_aspect = p_vout->render.i_aspect;
     p_sys->p_blend->fmt_out.video.i_chroma = p_vout->output.i_chroma;
-    p_sys->p_blend->fmt_in.video.i_chroma = VLC_FOURCC('Y','U','V','A');
+    p_sys->p_blend->fmt_in.video.i_chroma = VLC_CODEC_YUVA;
     p_sys->p_blend->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR;
     p_sys->i_width =
         p_sys->p_blend->fmt_in.video.i_width =
@@ -821,7 +821,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt.i_chroma = VLC_CODEC_YUVA;
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;

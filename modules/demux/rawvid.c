@@ -113,12 +113,12 @@ struct preset_t
 
 static const struct preset_t p_presets[] =
 {
-    { "sqcif", 128, 96, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
-    { "qcif", 176, 144, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
-    { "cif", 352, 288, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
-    { "4cif", 704, 576, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
-    { "16cif", 1408, 1152, 30000, 1001, 4,3, VLC_FOURCC('Y','V','1','2') },
-    { "yuv", 176, 144, 25, 1, 4,3, VLC_FOURCC('Y','V','1','2') },
+    { "sqcif", 128, 96, 30000, 1001, 4,3, VLC_CODEC_YV12 },
+    { "qcif", 176, 144, 30000, 1001, 4,3, VLC_CODEC_YV12 },
+    { "cif", 352, 288, 30000, 1001, 4,3, VLC_CODEC_YV12 },
+    { "4cif", 704, 576, 30000, 1001, 4,3, VLC_CODEC_YV12 },
+    { "16cif", 1408, 1152, 30000, 1001, 4,3, VLC_CODEC_YV12 },
+    { "yuv", 176, 144, 25, 1, 4,3, VLC_CODEC_YV12 },
     { NULL, 0, 0, 0, 0, 0,0, 0 }
 };
 
@@ -238,12 +238,12 @@ static int Open( vlc_object_t * p_this )
         {
             static const struct { const char *psz_name; vlc_fourcc_t i_fcc; } formats[] =
             {
-                { "420jpeg",    VLC_FOURCC('I','4','2','0') },
-                { "420paldv",   VLC_FOURCC('I','4','2','0') },
-                { "420",        VLC_FOURCC('I','4','2','0') },
-                { "422",        VLC_FOURCC('I','4','2','2') },
-                { "444",        VLC_FOURCC('I','4','4','4') },
-                { "mono",       VLC_FOURCC('G','R','E','Y') },
+                { "420jpeg",    VLC_CODEC_I420 },
+                { "420paldv",   VLC_CODEC_I420 },
+                { "420",        VLC_CODEC_I420 },
+                { "422",        VLC_CODEC_I422 },
+                { "444",        VLC_CODEC_I444 },
+                { "mono",       VLC_CODEC_GREY },
                 { NULL, 0 }
             };
             bool b_found = false;

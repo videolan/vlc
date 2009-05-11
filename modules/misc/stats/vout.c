@@ -109,7 +109,7 @@ static int Init( vout_thread_t *p_vout )
         msg_Dbg( p_vout, "forcing chroma 0x%.8x (%4.4s)",
                          i_chroma, (char*)&i_chroma );
         p_vout->output.i_chroma = i_chroma;
-        if ( i_chroma == VLC_FOURCC( 'R', 'G', 'B', '2' ) )
+        if ( i_chroma == VLC_CODEC_RGB8 )
         {
             p_vout->output.pf_setpalette = SetPalette;
         }

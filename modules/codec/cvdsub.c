@@ -129,7 +129,7 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_dec->pf_packetize  = Packetize;
 
     p_dec->fmt_out.i_cat = SPU_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('Y','U','V','P');
+    p_dec->fmt_out.i_codec = VLC_CODEC_YUVP;
 
     return VLC_SUCCESS;
 }
@@ -512,7 +512,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
 
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
+    fmt.i_chroma = VLC_CODEC_YUVP;
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_sys->i_height;

@@ -155,12 +155,12 @@ static int Open( vlc_object_t *p_this )
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'm', 'p', 'g', '1' ) &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'm', 'p', 'g', '2' ) &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'm', 'p', 'g', 'v' ) )
+        p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
     {
         return VLC_EGENERIC;
     }
 
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC('m','p','g','v') );
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_MPGV );
     p_dec->pf_packetize = Packetize;
     p_dec->pf_get_cc = GetCc;
 

@@ -98,10 +98,10 @@ static int Open( vlc_object_t *p_this )
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
 
     /* Register one audio and one video stream */
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_MPGA );
     p_sys->p_audio = es_out_Add( p_demux->out, &fmt );
 
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
     p_sys->p_video = es_out_Add( p_demux->out, &fmt );
 
     p_sys->i_vc    = -1;

@@ -140,22 +140,21 @@ static int OpenPostproc( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_FOURCC('I','4','4','4'):
-        case VLC_FOURCC('J','4','4','4'):
-        /* case VLC_FOURCC('Y','U','V','A'): FIXME Should work but alpha plane needs to be copied manually and I'm kind of feeling too lazy to write the code to do that ATM (i_pitch vs i_visible_pitch...). */
+        case VLC_CODEC_I444:
+        case VLC_CODEC_J444:
+        /* case VLC_CODEC_YUVA: FIXME Should work but alpha plane needs to be copied manually and I'm kind of feeling too lazy to write the code to do that ATM (i_pitch vs i_visible_pitch...). */
             i_flags |= PP_FORMAT_444;
             break;
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
+        case VLC_CODEC_I422:
+        case VLC_CODEC_J422:
             i_flags |= PP_FORMAT_422;
             break;
-        case VLC_FOURCC('I','4','1','1'):
+        case VLC_CODEC_I411:
             i_flags |= PP_FORMAT_411;
             break;
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('J','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
+        case VLC_CODEC_YV12:
             i_flags |= PP_FORMAT_420;
             break;
         default:

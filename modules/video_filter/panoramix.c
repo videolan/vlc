@@ -307,43 +307,38 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_manage = NULL;
 /* Color Format not supported
 // Planar Y, packed UV
-case VLC_FOURCC('Y','M','G','A'):
+case VLC_CODEC_YMGA:
 // Packed YUV 4:2:2, U:Y:V:Y, interlaced
 case VLC_FOURCC('I','U','Y','V'):    // packed by 2
 // Packed YUV 2:1:1, Y:U:Y:V
-case VLC_FOURCC('Y','2','1','1'):     // packed by 4
+case VLC_CODEC_Y211:     // packed by 4
 // Packed YUV Reverted
-case VLC_FOURCC('c','y','u','v'):    // packed by 2
+case VLC_CODEC_CYUV:    // packed by 2
 */
     switch (p_vout->render.i_chroma)
     {
     // planar YUV
-        case VLC_FOURCC('I','4','4','4'):
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('I','4','1','1'):
-        case VLC_FOURCC('I','4','1','0'):
-        case VLC_FOURCC('Y','V','U','9'):
-        case VLC_FOURCC('Y','U','V','A'):
+        case VLC_CODEC_I444:
+        case VLC_CODEC_I422:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I411:
+        case VLC_CODEC_I410:
+        case VLC_CODEC_YUVA:
             p_vout->pf_render = RenderPlanarYUV;
             break;
     // packed RGB
-        case VLC_FOURCC('R','G','B','2'):    // packed by 1
-        case VLC_FOURCC('R','V','1','5'):    // packed by 2
-        case VLC_FOURCC('R','V','1','6'):    // packed by 2
-        case VLC_FOURCC('R','V','2','4'):    // packed by 3
-        case VLC_FOURCC('R','V','3','2'):    // packed by 4
+        case VLC_CODEC_RGB8:    // packed by 1
+        case VLC_CODEC_RGB15:    // packed by 2
+        case VLC_CODEC_RGB16:    // packed by 2
+        case VLC_CODEC_RGB24:    // packed by 3
+        case VLC_CODEC_RGB32:    // packed by 4
             p_vout->pf_render = RenderPackedRGB;
             break;
 #ifdef PACKED_YUV
     // packed YUV
-        case VLC_FOURCC('Y','U','Y','2'):    // packed by 2
-        case VLC_FOURCC('Y','U','N','V'):    // packed by 2
-        case VLC_FOURCC('U','Y','V','Y'):    // packed by 2
-        case VLC_FOURCC('U','Y','N','V'):    // packed by 2
-        case VLC_FOURCC('Y','4','2','2'):    // packed by 2
+        case VLC_CODEC_YUYV:    // packed by 2
+        case VLC_CODEC_UYVY:    // packed by 2
             p_vout->pf_render = RenderPackedYUV;
             break;
 #endif
@@ -700,29 +695,24 @@ static int Init( vout_thread_t *p_vout )
         switch (p_vout->render.i_chroma)
         {
         // planar YVU
-            case VLC_FOURCC('Y','V','1','2'):
-            case VLC_FOURCC('Y','V','U','9'):
+            case VLC_CODEC_YV12:
         // packed UYV
-            case VLC_FOURCC('U','Y','V','Y'):    // packed by 2
-            case VLC_FOURCC('U','Y','N','V'):    // packed by 2
-            case VLC_FOURCC('Y','4','2','2'):    // packed by 2
-    //        case VLC_FOURCC('c','y','u','v'):    // packed by 2
+            case VLC_CODEC_UYVY:    // packed by 2
+    //        case VLC_CODEC_CYUV:    // packed by 2
                 VLC_XCHG( float, p_vout->p_sys->f_gamma[1], p_vout->p_sys->f_gamma[2] );
                 VLC_XCHG( float, f_BlackCrush[1], f_BlackCrush[2] );
                 VLC_XCHG( float, f_WhiteCrush[1], f_WhiteCrush[2] );
                 VLC_XCHG( float, f_BlackLevel[1], f_BlackLevel[2] );
                 VLC_XCHG( float, f_WhiteLevel[1], f_WhiteLevel[2] );
         // planar YUV
-            case VLC_FOURCC('I','4','4','4'):
-            case VLC_FOURCC('I','4','2','2'):
-            case VLC_FOURCC('I','4','2','0'):
-            case VLC_FOURCC('I','4','1','1'):
-            case VLC_FOURCC('I','4','1','0'):
-            case VLC_FOURCC('I','Y','U','V'):
-            case VLC_FOURCC('Y','U','V','A'):
+            case VLC_CODEC_I444:
+            case VLC_CODEC_I422:
+            case VLC_CODEC_I420:
+            case VLC_CODEC_I411:
+            case VLC_CODEC_I410:
+            case VLC_CODEC_YUVA:
         // packed YUV
-            case VLC_FOURCC('Y','U','Y','2'):    // packed by 2
-            case VLC_FOURCC('Y','U','N','V'):    // packed by 2
+            case VLC_CODEC_YUYV:    // packed by 2
                 for (i_index = 0; i_index < 256; i_index++)
                     for (i_index2 = 0; i_index2 <= ACCURACY; i_index2++)
                         for (i_plane = 0; i_plane < VOUT_MAX_PLANES; i_plane++)
@@ -735,11 +725,11 @@ static int Init( vout_thread_t *p_vout )
                         }
                 break;
         // packed RGB
-            case VLC_FOURCC('R','G','B','2'):    // packed by 1
-            case VLC_FOURCC('R','V','1','5'):    // packed by 2
-            case VLC_FOURCC('R','V','1','6'):    // packed by 2
-            case VLC_FOURCC('R','V','2','4'):    // packed by 3
-            case VLC_FOURCC('R','V','3','2'):    // packed by 4
+            case VLC_CODEC_RGB8:    // packed by 1
+            case VLC_CODEC_RGB15:    // packed by 2
+            case VLC_CODEC_RGB16:    // packed by 2
+            case VLC_CODEC_RGB24:    // packed by 3
+            case VLC_CODEC_RGB32:    // packed by 4
             for (i_index = 0; i_index < 256; i_index++)
                     for (i_index2 = 0; i_index2 <= ACCURACY; i_index2++)
                         for (i_plane = 0; i_plane < VOUT_MAX_PLANES; i_plane++)
@@ -1651,8 +1641,7 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
             switch (p_vout->output.i_chroma)
                 {
-                    case VLC_FOURCC('Y','U','Y','2'):    // packed by 2
-                    case VLC_FOURCC('Y','U','N','V'):    // packed by 2
+                    case VLC_CODEC_YUYV:    // packed by 2
                         Denom = F2(length / p_pic->p->i_pixel_pitch);
                         a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
                         a_1 = p_vout->p_sys->a_1 * 2 * p_vout->p_sys->i_halfLength * (ACCURACY / 100);
@@ -1672,9 +1661,7 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
                                 p_vout->p_sys->cstYUV[i_col][1][i_index + 1] = p_vout->p_sys->cstYUV[i_col][1][i_index];
                         }
                         break;
-                    case VLC_FOURCC('U','Y','V','Y'):    // packed by 2
-                    case VLC_FOURCC('U','Y','N','V'):    // packed by 2
-                    case VLC_FOURCC('Y','4','2','2'):    // packed by 2
+                    case VLC_CODEC_UYVY:    // packed by 2
                         Denom = F2(length / p_pic->p->i_pixel_pitch);
                         a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
                         a_1 = p_vout->p_sys->a_1 * 2 * p_vout->p_sys->i_halfLength * (ACCURACY / 100);
@@ -1740,8 +1727,7 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
                                 switch (p_vout->output.i_chroma)
                                 {
-                                    case VLC_FOURCC('Y','U','Y','2'):    // packed by 2
-                                    case VLC_FOURCC('Y','U','N','V'):    // packed by 2
+                                    case VLC_CODEC_YUYV:    // packed by 2
                                         Denom = F2(length / p_pic->p->i_pixel_pitch);
                                         a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
                                         a_1 = p_vout->p_sys->a_1 * 2 * p_vout->p_sys->i_halfHeight * (ACCURACY / 100);
@@ -1761,9 +1747,7 @@ static void RenderPackedYUV( vout_thread_t *p_vout, picture_t *p_pic )
                                                 p_vout->p_sys->cstYUV2[i_row][1][i_index + 1] = p_vout->p_sys->cstYUV2[i_row][1][i_index];
                                         }
                                         break;
-                                    case VLC_FOURCC('U','Y','V','Y'):    // packed by 2
-                                    case VLC_FOURCC('U','Y','N','V'):    // packed by 2
-                                    case VLC_FOURCC('Y','4','2','2'):    // packed by 2
+                                    case VLC_CODEC_UYVY:    // packed by 2
                                         Denom = F2(length / p_pic->p->i_pixel_pitch);
                                         a_2 = p_vout->p_sys->a_2 * (ACCURACY / 100);
                                         a_1 = p_vout->p_sys->a_1 * 2 * p_vout->p_sys->i_halfHeight * (ACCURACY / 100);

@@ -121,7 +121,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 #ifdef __GLIBC__
     mtrace();
 #endif
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','v') &&
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','1') &&
         /* Pinnacle hardware-mpeg1 */
         p_dec->fmt_in.i_codec != VLC_FOURCC('P','I','M','1') &&
@@ -693,7 +693,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     p_dec->fmt_out.i_codec =
         ( p_sys->p_info->sequence->chroma_height <
           p_sys->p_info->sequence->height ) ?
-        VLC_FOURCC('I','4','2','0') : VLC_FOURCC('I','4','2','2');
+        VLC_CODEC_I420 : VLC_CODEC_I422;
 
 #if 0
     p_sys->f_wd_nb = fopen("/vlc/dec_nb", "w");

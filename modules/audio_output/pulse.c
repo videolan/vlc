@@ -169,7 +169,7 @@ static int Open ( vlc_object_t *p_this )
 
     ss.rate = p_aout->output.output.i_rate;
     ss.format = PA_SAMPLE_FLOAT32NE;
-    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    p_aout->output.output.i_format = VLC_CODEC_FL32;
 
     if (!pa_sample_spec_valid(&ss)) {
         msg_Err(p_aout,"Invalid sample spec");

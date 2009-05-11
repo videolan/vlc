@@ -379,29 +379,29 @@ static int Init( vout_thread_t *p_vout )
     switch( p_vout->p_sys->i_depth )
     {
     case 8:
-        p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+        p_vout->output.i_chroma = VLC_CODEC_RGB8;
         p_vout->output.pf_setpalette = SetPalette;
         break;
     case 15:
-        p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
+        p_vout->output.i_chroma = VLC_CODEC_RGB15;
         p_vout->output.i_rmask  = 0x7c00;
         p_vout->output.i_gmask  = 0x03e0;
         p_vout->output.i_bmask  = 0x001f;
         break;
     case 16:
-        p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+        p_vout->output.i_chroma = VLC_CODEC_RGB16;
         p_vout->output.i_rmask  = 0xf800;
         p_vout->output.i_gmask  = 0x07e0;
         p_vout->output.i_bmask  = 0x001f;
         break;
     case 24:
-        p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+        p_vout->output.i_chroma = VLC_CODEC_RGB24;
         p_vout->output.i_rmask  = 0x00ff0000;
         p_vout->output.i_gmask  = 0x0000ff00;
         p_vout->output.i_bmask  = 0x000000ff;
         break;
     case 32:
-        p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+        p_vout->output.i_chroma = VLC_CODEC_RGB32;
         p_vout->output.i_rmask  = 0x00ff0000;
         p_vout->output.i_gmask  = 0x0000ff00;
         p_vout->output.i_bmask  = 0x000000ff;

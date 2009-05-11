@@ -78,15 +78,13 @@ static int Activate( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_FOURCC('Y','8','0','0'):
-            p_filter->fmt_in.video.i_chroma = VLC_FOURCC('G','R','E','Y');
-        case VLC_FOURCC('G','R','E','Y'):
+        case VLC_CODEC_GREY:
             switch( p_filter->fmt_out.video.i_chroma )
             {
-                case VLC_FOURCC('I','4','2','0'):
+                case VLC_CODEC_I420:
                     p_filter->pf_video_filter = GREY_I420_Filter;
                     break;
-                case VLC_FOURCC('Y','U','Y','2'):
+                case VLC_CODEC_YUYV:
                     p_filter->pf_video_filter = GREY_YUY2_Filter;
                     break;
                 default:

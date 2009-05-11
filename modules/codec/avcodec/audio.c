@@ -120,12 +120,12 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         int i_offset;
         int i_size;
 
-        if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
+        if( p_dec->fmt_in.i_codec == VLC_CODEC_FLAC )
         {
             i_offset = 8;
             i_size = p_dec->fmt_in.i_extra - 8;
         }
-        else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'l', 'a', 'c' ) )
+        else if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAC )
         {
             static const uint8_t p_pattern[] = { 0, 0, 0, 36, 'a', 'l', 'a', 'c' };
             /* Find alac atom XXX it is a bit ugly */
@@ -454,7 +454,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     switch( p_sys->p_context->sample_fmt )
     {
     case SAMPLE_FMT_U8:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('u','8',' ',' ');
+        p_dec->fmt_out.i_codec = VLC_CODEC_U8;
         p_dec->fmt_out.audio.i_bitspersample = 8;
         break;
     case SAMPLE_FMT_S32:
@@ -462,11 +462,11 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         p_dec->fmt_out.audio.i_bitspersample = 32;
         break;
     case SAMPLE_FMT_FLT:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
         p_dec->fmt_out.audio.i_bitspersample = 32;
         break;
     case SAMPLE_FMT_DBL:
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','6','4');
+        p_dec->fmt_out.i_codec = VLC_CODEC_FL64;
         p_dec->fmt_out.audio.i_bitspersample = 64;
         break;
 

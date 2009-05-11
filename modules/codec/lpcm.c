@@ -131,12 +131,12 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     switch( p_dec->fmt_in.i_codec )
     {
     /* DVD LPCM */
-    case VLC_FOURCC('l','p','c','m'):
+    case VLC_CODEC_DVD_LPCM:
     case VLC_FOURCC('l','p','c','b'):
         b_dvd = true;
         break;
     /* BD LPCM */
-    case VLC_FOURCC('b','p','c','m'):
+    case VLC_CODEC_BD_LPCM:
         b_dvd = false;
         break;
     default:
@@ -158,7 +158,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 
     if( b_packetizer )
     {
-        p_dec->fmt_out.i_codec = b_dvd ? VLC_FOURCC('l','p','c','m') : VLC_FOURCC('b','p','c','m');
+        p_dec->fmt_out.i_codec = b_dvd ? VLC_CODEC_DVD_LPCM : VLC_CODEC_BD_LPCM;
     }
     else
     {
@@ -166,11 +166,11 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
         {
         case 24:
         case 20:
-            p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+            p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
             p_dec->fmt_out.audio.i_bitspersample = 24;
             break;
         default:
-            p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+            p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
             p_dec->fmt_out.audio.i_bitspersample = 16;
             break;
         }
@@ -274,12 +274,12 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         /* */
         if( i_bits == 16 )
         {
-            p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+            p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
             p_dec->fmt_out.audio.i_bitspersample = 16;
         }
         else
         {
-            p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+            p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
             p_dec->fmt_out.audio.i_bitspersample = 24;
         }
 

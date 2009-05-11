@@ -47,11 +47,6 @@
 /* Number of simultaneous subpictures */
 #define VOUT_MAX_SUBPICTURES (VOUT_MAX_PICTURES)
 
-#define VLC_FOURCC_YUVP VLC_FOURCC('Y','U','V','P')
-#define VLC_FOURCC_YUVA VLC_FOURCC('Y','U','V','A')
-#define VLC_FOURCC_RGBA VLC_FOURCC('R','G','B','A')
-#define VLC_FOURCC_TEXT VLC_FOURCC('T','E','X','T')
-
 /* */
 typedef struct
 {
@@ -735,7 +730,7 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
 
     p_region->fmt = *p_fmt;
     p_region->fmt.p_palette = NULL;
-    if( p_fmt->i_chroma == VLC_FOURCC_YUVP )
+    if( p_fmt->i_chroma == VLC_CODEC_YUVP )
     {
         p_region->fmt.p_palette = calloc( 1, sizeof(*p_region->fmt.p_palette) );
         if( p_fmt->p_palette )
@@ -748,7 +743,7 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     p_region->p_style = NULL;
     p_region->p_picture = NULL;
 
-    if( p_fmt->i_chroma == VLC_FOURCC_TEXT )
+    if( p_fmt->i_chroma == VLC_CODEC_TEXT )
         return p_region;
 
     p_region->p_picture = picture_New( p_fmt->i_chroma, p_fmt->i_width, p_fmt->i_height,
@@ -1036,11 +1031,11 @@ static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
     /* XXX p_spu->p_scale is used for all conversion/scaling except yuvp to
      * yuva/rgba */
     p_spu->p->p_scale = CreateAndLoadScale( VLC_OBJECT(p_spu),
-                                            VLC_FOURCC_YUVA, VLC_FOURCC_YUVA, true );
+                                            VLC_CODEC_YUVA, VLC_CODEC_YUVA, true );
     /* This one is used for YUVP to YUVA/RGBA without scaling
      * FIXME rename it */
     p_spu->p->p_scale_yuvp = CreateAndLoadScale( VLC_OBJECT(p_spu),
-                                                 VLC_FOURCC_YUVP, VLC_FOURCC_YUVA, false );
+                                                 VLC_CODEC_YUVP, VLC_CODEC_YUVA, false );
 }
 
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
@@ -1049,7 +1044,7 @@ static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
 {
     filter_t *p_text = p_spu->p->p_text;
 
-    assert( p_region->fmt.i_chroma == VLC_FOURCC_TEXT );
+    assert( p_region->fmt.i_chroma == VLC_CODEC_TEXT );
 
     if( !p_text || !p_text->p_module )
         goto exit;
@@ -1354,14 +1349,14 @@ static void SpuRenderRegion( spu_t *p_spu,
     *p_area = spu_area_create( 0,0, 0,0, scale_size );
 
     /* Render text region */
-    if( p_region->fmt.i_chroma == VLC_FOURCC_TEXT )
+    if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
     {
         const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
         SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, i_min_scale_ratio );
         b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */
-        if( p_region->fmt.i_chroma == VLC_FOURCC_TEXT )
+        if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
             goto exit;
     }
 
@@ -1369,7 +1364,7 @@ static void SpuRenderRegion( spu_t *p_spu,
      * FIXME b_force_palette and b_force_crop are applied to all subpictures using palette
      * instead of only the right one (being the dvd spu).
      */
-    const bool b_using_palette = p_region->fmt.i_chroma == VLC_FOURCC_YUVP;
+    const bool b_using_palette = p_region->fmt.i_chroma == VLC_CODEC_YUVP;
     const bool b_force_palette = b_using_palette && p_sys->b_force_palette;
     const bool b_force_crop    = b_force_palette && p_sys->b_force_crop;
     bool b_changed_palette     = false;
@@ -1484,7 +1479,7 @@ static void SpuRenderRegion( spu_t *p_spu,
 
                 /* TODO converting to RGBA for RGB video output is better */
                 p_scale_yuvp->fmt_out.video = p_region->fmt;
-                p_scale_yuvp->fmt_out.video.i_chroma = VLC_FOURCC_YUVA;
+                p_scale_yuvp->fmt_out.video.i_chroma = VLC_CODEC_YUVA;
 
                 p_picture = p_scale_yuvp->pf_video_filter( p_scale_yuvp, p_picture );
                 if( !p_picture )

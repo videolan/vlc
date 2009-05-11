@@ -277,7 +277,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof( video_format_t ) );
-    fmt.i_chroma = VLC_FOURCC( 'Y','U','V','A' );
+    fmt.i_chroma = VLC_CODEC_YUVA;
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
@@ -481,7 +481,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     }
     p_svg->i_width = p_sys->i_width;
     p_svg->i_height = p_sys->i_height;
-    p_svg->i_chroma = VLC_FOURCC( 'Y','U','V','A' );
+    p_svg->i_chroma = VLC_CODEC_YUVA;
 
     /* Render the SVG.
        The input data is stored in the p_string structure,

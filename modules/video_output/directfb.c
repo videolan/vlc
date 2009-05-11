@@ -140,7 +140,7 @@ static int Init( vout_thread_t *p_vout )
             i_goffset = 2;
             i_blength = 2;
             i_boffset = 0;
-            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+            p_vout->output.i_chroma = VLC_CODEC_RGB8;
             break;
 
         case DSPF_RGB16:
@@ -152,7 +152,7 @@ static int Init( vout_thread_t *p_vout )
             i_goffset = 5;
             i_blength = 5;
             i_boffset = 0;
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+            p_vout->output.i_chroma = VLC_CODEC_RGB16
             break;
 
         case DSPF_RGB24:
@@ -164,7 +164,7 @@ static int Init( vout_thread_t *p_vout )
             i_goffset = 8;
             i_blength = 8;
             i_boffset = 0;
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+            p_vout->output.i_chroma = VLC_CODEC_RGB24;
             break;
 
         case DSPF_RGB32:
@@ -176,7 +176,7 @@ static int Init( vout_thread_t *p_vout )
             i_goffset = 8;
             i_blength = 8;
             i_boffset = 0;
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+            p_vout->output.i_chroma = VLC_CODEC_RGB32;
             break;
 
         default:

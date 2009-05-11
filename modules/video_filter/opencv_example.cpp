@@ -174,7 +174,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         msg_Err( p_filter, "no image" );
         return NULL;
     }
-    if ((p_pic->format.i_chroma != VLC_FOURCC('I','4','2','0')))
+    if ((p_pic->format.i_chroma != VLC_CODEC_I420))
     {
         msg_Err( p_filter, "wrong chroma - use I420" );
         return NULL;

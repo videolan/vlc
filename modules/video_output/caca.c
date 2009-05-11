@@ -215,7 +215,7 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-    p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+    p_vout->output.i_chroma = VLC_CODEC_RGB32;
     p_vout->output.i_width = p_vout->render.i_width;
     p_vout->output.i_height = p_vout->render.i_height;
     p_vout->output.i_aspect = p_vout->render.i_aspect;

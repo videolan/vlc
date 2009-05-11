@@ -106,13 +106,12 @@ static int Create( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('J','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
+        case VLC_CODEC_YV12:
 
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
+        case VLC_CODEC_I422:
+        case VLC_CODEC_J422:
 
         CASE_PACKED_YUV_422
             break;
@@ -181,10 +180,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     switch( p_pic->format.i_chroma )
     {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('J','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
+        case VLC_CODEC_YV12:
             switch( p_filter->p_sys->i_color )
             {
                 case RED:
@@ -207,8 +205,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             }
             break;
 
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
+        case VLC_CODEC_I422:
+        case VLC_CODEC_J422:
             switch( p_filter->p_sys->i_color )
             {
                 case RED:

@@ -229,7 +229,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('v','o','r','b') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_VORBIS )
     {
         return VLC_EGENERIC;
     }
@@ -251,9 +251,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
 #ifdef MODULE_NAME_IS_tremor
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+    p_dec->fmt_out.i_codec = VLC_CODEC_FI32;
 #else
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+    p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 #endif
 
     /* Set callbacks */
@@ -274,7 +274,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     if( i_ret == VLC_SUCCESS )
     {
         p_dec->p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
+        p_dec->fmt_out.i_codec = VLC_CODEC_VORBIS;
     }
 
     return i_ret;
@@ -794,7 +794,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     vlc_value_t val;
     uint8_t *p_extra;
 
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('v','o','r','b') &&
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_VORBIS &&
         !p_enc->b_force )
     {
         return VLC_EGENERIC;
@@ -806,8 +806,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->p_sys = p_sys;
 
     p_enc->pf_encode_audio = Encode;
-    p_enc->fmt_in.i_codec = VLC_FOURCC('f','l','3','2');
-    p_enc->fmt_out.i_codec = VLC_FOURCC('v','o','r','b');
+    p_enc->fmt_in.i_codec = VLC_CODEC_FL32;
+    p_enc->fmt_out.i_codec = VLC_CODEC_VORBIS;
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 

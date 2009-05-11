@@ -39,7 +39,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     video_format_t fmt_in = {0}, fmt_out = {0};
     picture_t *pPic;
 
-    fmt_out.i_chroma = VLC_FOURCC('R','G','B','A');
+    fmt_out.i_chroma = VLC_CODEC_RGBA;
 
     pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_in, &fmt_out );
     if( !pPic ) return;

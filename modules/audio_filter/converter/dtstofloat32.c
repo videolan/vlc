@@ -112,8 +112,8 @@ static int Create( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('d','t','s',' ')
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if ( p_filter->input.i_format != VLC_CODEC_DTS
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }
@@ -385,13 +385,13 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret;
 
-    if( p_filter->fmt_in.i_codec != VLC_FOURCC('d','t','s',' ')  )
+    if( p_filter->fmt_in.i_codec != VLC_CODEC_DTS  )
     {
         return VLC_EGENERIC;
     }
 
     p_filter->fmt_out.audio.i_format =
-        p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_filter->fmt_out.i_codec = VLC_CODEC_FL32;
     p_filter->fmt_out.audio.i_bitspersample =
         aout_BitsPerSample( p_filter->fmt_out.i_codec );
 

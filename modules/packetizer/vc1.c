@@ -130,7 +130,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec !=  VLC_FOURCC( 'W', 'V', 'C', '1' ) )
+    if( p_dec->fmt_in.i_codec !=  VLC_CODEC_VC1 )
         return VLC_EGENERIC;
 
     p_dec->pf_packetize = Packetize;

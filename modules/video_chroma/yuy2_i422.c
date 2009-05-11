@@ -81,25 +81,22 @@ static int Activate( vlc_object_t *p_this )
 
     switch( p_filter->fmt_out.video.i_chroma )
     {
-        case VLC_FOURCC('I','4','2','2'):
+        case VLC_CODEC_I422:
             switch( p_filter->fmt_in.video.i_chroma )
             {
-                case VLC_FOURCC('Y','U','Y','2'):
-                case VLC_FOURCC('Y','U','N','V'):
+                case VLC_CODEC_YUYV:
                     p_filter->pf_video_filter = YUY2_I422_Filter;
                     break;
 
-                case VLC_FOURCC('Y','V','Y','U'):
+                case VLC_CODEC_YVYU:
                     p_filter->pf_video_filter = YVYU_I422_Filter;
                     break;
 
-                case VLC_FOURCC('U','Y','V','Y'):
-                case VLC_FOURCC('U','Y','N','V'):
-                case VLC_FOURCC('Y','4','2','2'):
+                case VLC_CODEC_UYVY:
                     p_filter->pf_video_filter = UYVY_I422_Filter;
                     break;
 
-                case VLC_FOURCC('c','y','u','v'):
+                case VLC_CODEC_CYUV:
                     p_filter->pf_video_filter = cyuv_I422_Filter;
                     break;
 

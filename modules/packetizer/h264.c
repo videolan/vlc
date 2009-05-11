@@ -183,7 +183,7 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int i;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'h', '2', '6', '4') &&
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_H264 &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'V', 'S', 'S', 'H') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'v', 's', 's', 'h') &&
@@ -233,7 +233,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
-    p_dec->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+    p_dec->fmt_out.i_codec = VLC_CODEC_H264;
 
     if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
     {

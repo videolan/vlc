@@ -137,13 +137,13 @@ static int Open( vlc_object_t *p_this )
     video_format_t     fmt;
 
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' )
-         || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
+         p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         msg_Warn( p_filter, "bad input or output format" );
         return VLC_EGENERIC;
     }
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
         msg_Warn( p_filter, "input and output formats are not similar" );
         return VLC_EGENERIC;
@@ -167,7 +167,7 @@ static int Open( vlc_object_t *p_this )
 
     fmt.i_width = fmt.i_visible_width = width;
     fmt.i_height = fmt.i_visible_height = height;
-    fmt.i_chroma = VLC_FOURCC('R','V','3','2');
+    fmt.i_chroma = VLC_CODEC_RGB32;
     fmt.i_aspect = VOUT_ASPECT_FACTOR * width/height;
     fmt.i_sar_num = fmt.i_sar_den = 1;
 

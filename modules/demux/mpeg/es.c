@@ -133,12 +133,12 @@ static int MlpProbe( demux_t *p_demux, int64_t *pi_offset );
 static int MlpInit( demux_t *p_demux );
 
 static const codec_t p_codec[] = {
-    { VLC_FOURCC( 'm', 'p', '4', 'a' ), false, "mp4 audio",  AacProbe,  AacInit },
-    { VLC_FOURCC( 'm', 'p', 'g', 'a' ), false, "mpeg audio", MpgaProbe, MpgaInit },
-    { VLC_FOURCC( 'a', '5', '2', ' ' ), true,  "a52 audio",  A52Probe,  A52Init },
-    { VLC_FOURCC( 'e', 'a', 'c', '3' ), true,  "eac3 audio", EA52Probe, A52Init },
-    { VLC_FOURCC( 'd', 't', 's', ' ' ), false, "dts audio",  DtsProbe,  DtsInit },
-    { VLC_FOURCC( 'm', 'l', 'p', ' ' ), false, "mlp audio",  MlpProbe,  MlpInit },
+    { VLC_CODEC_MP4A, false, "mp4 audio",  AacProbe,  AacInit },
+    { VLC_CODEC_MPGA, false, "mpeg audio", MpgaProbe, MpgaInit },
+    { VLC_CODEC_A52, true,  "a52 audio",  A52Probe,  A52Init },
+    { VLC_CODEC_EAC3, true,  "eac3 audio", EA52Probe, A52Init },
+    { VLC_CODEC_DTS, false, "dts audio",  DtsProbe,  DtsInit },
+    { VLC_CODEC_MLP, false, "mlp audio",  MlpProbe,  MlpInit },
 
     { 0, false, NULL, NULL, NULL }
 };

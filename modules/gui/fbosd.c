@@ -537,10 +537,10 @@ static int OpenBlending( intf_thread_t *p_intf )
             p_intf->p_sys->fmt_out.i_chroma;
     if( config_GetInt( p_intf, "freetype-yuvp" ) )
         p_intf->p_sys->p_blend->fmt_in.video.i_chroma =
-                VLC_FOURCC('Y','U','V','P');
+                VLC_CODEC_YUVP;
     else
         p_intf->p_sys->p_blend->fmt_in.video.i_chroma =
-                VLC_FOURCC('Y','U','V','A');
+                VLC_CODEC_YUVA;
 
     p_intf->p_sys->p_blend->p_module =
         module_need( p_intf->p_sys->p_blend, "video blending", NULL, false );
@@ -628,7 +628,7 @@ static picture_t *AllocatePicture( video_format_t *p_fmt )
         return NULL;
 
     if( !p_fmt->p_palette &&
-        ( p_fmt->i_chroma == VLC_FOURCC('Y','U','V','P') ) )
+        ( p_fmt->i_chroma == VLC_CODEC_YUVP ) )
     {
         p_fmt->p_palette = malloc( sizeof(video_palette_t) );
         if( !p_fmt->p_palette )
@@ -737,13 +737,13 @@ static int InvertAlpha( intf_thread_t *p_intf, picture_t **p_pic, video_format_t
 
     switch( fmt.i_chroma )
     {
-        case VLC_FOURCC('R','V','2','4'):
+        case VLC_CODEC_RGB24:
             p_begin = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels;
             p_end   = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels +
                       ( fmt.i_height * (*p_pic)->p[Y_PLANE].i_pitch );
             i_skip = 3;
             break;
-        case VLC_FOURCC('R','V','3','2'):
+        case VLC_CODEC_RGB32:
             p_begin = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels;
             p_end   = (uint8_t *)(*p_pic)->p[Y_PLANE].p_pixels +
                       ( fmt.i_height * (*p_pic)->p[Y_PLANE].i_pitch );
@@ -845,7 +845,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
         video_format_t fmt;
 
         memset( &fmt, 0, sizeof(fmt) );
-        fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+        fmt.i_chroma = VLC_CODEC_TEXT;
         fmt.i_aspect = 0;
         fmt.i_width  = fmt.i_visible_width = 0;
         fmt.i_height = fmt.i_visible_height = 0;
@@ -960,15 +960,15 @@ static int Init( intf_thread_t *p_intf )
     switch( p_sys->var_info.bits_per_pixel )
     {
     case 8: /* FIXME: set the palette */
-        p_sys->fmt_out.i_chroma = VLC_FOURCC('R','G','B','2'); break;
+        p_sys->fmt_out.i_chroma = VLC_CODEC_RGB8; break;
     case 15:
-        p_sys->fmt_out.i_chroma = VLC_FOURCC('R','V','1','5'); break;
+        p_sys->fmt_out.i_chroma = VLC_CODEC_RGB15; break;
     case 16:
-        p_sys->fmt_out.i_chroma = VLC_FOURCC('R','V','1','6'); break;
+        p_sys->fmt_out.i_chroma = VLC_CODEC_RGB16; break;
     case 24:
-        p_sys->fmt_out.i_chroma = VLC_FOURCC('R','V','2','4'); break;
+        p_sys->fmt_out.i_chroma = VLC_CODEC_RGB24; break;
     case 32:
-        p_sys->fmt_out.i_chroma = VLC_FOURCC('R','V','3','2'); break;
+        p_sys->fmt_out.i_chroma = VLC_CODEC_RGB32; break;
     default:
         msg_Err( p_intf, "unknown screen depth %i",
                  p_sys->var_info.bits_per_pixel );

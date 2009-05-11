@@ -144,29 +144,29 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
 {
     switch( i_format )
     {
-    case VLC_FOURCC('u','8',' ',' '):
-    case VLC_FOURCC('s','8',' ',' '):
+    case VLC_CODEC_U8:
+    case VLC_CODEC_S8:
         return 8;
 
-    case VLC_FOURCC('u','1','6','l'):
-    case VLC_FOURCC('s','1','6','l'):
-    case VLC_FOURCC('u','1','6','b'):
-    case VLC_FOURCC('s','1','6','b'):
+    case VLC_CODEC_U16L:
+    case VLC_CODEC_S16L:
+    case VLC_CODEC_U16B:
+    case VLC_CODEC_S16B:
         return 16;
 
-    case VLC_FOURCC('u','2','4','l'):
-    case VLC_FOURCC('s','2','4','l'):
-    case VLC_FOURCC('u','2','4','b'):
-    case VLC_FOURCC('s','2','4','b'):
+    case VLC_CODEC_U24L:
+    case VLC_CODEC_S24L:
+    case VLC_CODEC_U24B:
+    case VLC_CODEC_S24B:
         return 24;
 
-    case VLC_FOURCC('s','3','2','l'):
-    case VLC_FOURCC('s','3','2','b'):
-    case VLC_FOURCC('f','l','3','2'):
-    case VLC_FOURCC('f','i','3','2'):
+    case VLC_CODEC_S32L:
+    case VLC_CODEC_S32B:
+    case VLC_CODEC_FL32:
+    case VLC_CODEC_FI32:
         return 32;
 
-    case VLC_FOURCC('f','l','6','4'):
+    case VLC_CODEC_FL64:
         return 64;
 
     default:

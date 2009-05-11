@@ -110,7 +110,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_dtsoffset = var_CreateGetInteger( p_demux, DEMUX_CFG_PREFIX DEMUX_DTSOFFSET );
 
     /* Load the packetizer */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'd','r','a','c' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_DIRAC );
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "dirac" );
     if( !p_sys->p_packetizer )
     {

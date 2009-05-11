@@ -313,11 +313,11 @@ static int Open( vlc_object_t *p_this )
     /* Open the device */
     if( val.i_int == AOUT_VAR_SPDIF )
     {
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
 
         if( OpenWaveOut( p_aout,
                          p_aout->output.p_sys->i_wave_device_id,
-                         VLC_FOURCC('s','p','d','i'),
+                         VLC_CODEC_SPDIFL,
                          p_aout->output.output.i_physical_channels,
                          aout_FormatNbChannels( &p_aout->output.output ),
                          p_aout->output.output.i_rate, false )
@@ -539,7 +539,7 @@ static void Probe( aout_instance_t * p_aout )
     {
         if( OpenWaveOut( p_aout,
                          p_aout->output.p_sys->i_wave_device_id,
-                         VLC_FOURCC('s','p','d','i'),
+                         VLC_CODEC_SPDIFL,
                          p_aout->output.output.i_physical_channels,
                          aout_FormatNbChannels( &p_aout->output.output ),
                          p_aout->output.output.i_rate, true )
@@ -692,7 +692,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
 
     switch( i_format )
     {
-    case VLC_FOURCC('s','p','d','i'):
+    case VLC_CODEC_SPDIFL:
         i_nb_channels = 2;
         /* To prevent channel re-ordering */
         waveformat.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
@@ -703,7 +703,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
         waveformat.SubFormat = __KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
         break;
 
-    case VLC_FOURCC('f','l','3','2'):
+    case VLC_CODEC_FL32:
         waveformat.Format.wBitsPerSample = sizeof(float) * 8;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
@@ -711,7 +711,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
         waveformat.SubFormat = __KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
         break;
 
-    case VLC_FOURCC('s','1','6','l'):
+    case VLC_CODEC_S16L:
         waveformat.Format.wBitsPerSample = 16;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
@@ -809,11 +809,11 @@ static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id, int *i
 {
     bool b_use_float32 = var_CreateGetBool( p_aout, "waveout-float32");
 
-    if( !b_use_float32 || OpenWaveOut( p_aout, i_device_id, VLC_FOURCC('f','l','3','2'),
+    if( !b_use_float32 || OpenWaveOut( p_aout, i_device_id, VLC_CODEC_FL32,
                                    i_channels, i_nb_channels, i_rate, b_probe )
         != VLC_SUCCESS )
     {
-        if ( OpenWaveOut( p_aout, i_device_id, VLC_FOURCC('s','1','6','l'),
+        if ( OpenWaveOut( p_aout, i_device_id, VLC_CODEC_S16L,
                           i_channels, i_nb_channels, i_rate, b_probe )
              != VLC_SUCCESS )
         {
@@ -821,13 +821,13 @@ static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id, int *i
         }
         else
         {
-            *i_format = VLC_FOURCC('s','1','6','l');
+            *i_format = VLC_CODEC_S16L;
             return VLC_SUCCESS;
         }
     }
     else
     {
-        *i_format = VLC_FOURCC('f','l','3','2');
+        *i_format = VLC_CODEC_FL32;
         return VLC_SUCCESS;
     }
 }
@@ -982,7 +982,7 @@ static void* WaveOutThread( vlc_object_t *p_this )
     int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF */
-    b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
+    b_sleek = p_aout->output.output.i_format == VLC_CODEC_SPDIFL;
 
     // wait for first call to "play()"
     while( !p_sys->start_date && vlc_object_alive (p_aout) )

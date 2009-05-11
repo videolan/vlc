@@ -554,15 +554,13 @@ static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
     switch(i_chroma)
     {
     // planar YUV
-        case VLC_FOURCC('I','4','4','4'):
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('I','4','1','1'):
-        case VLC_FOURCC('I','4','1','0'):
-        case VLC_FOURCC('Y','V','U','9'):
-        case VLC_FOURCC('Y','U','V','A'):
+        case VLC_CODEC_I444:
+        case VLC_CODEC_I422:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I411:
+        case VLC_CODEC_I410:
+        case VLC_CODEC_YUVA:
             i_skipCount = (i_pitch * i_skipCountPercent) / 100;
             for (i_index = i_col/2 + i_skipCount/2;
                  i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2;
@@ -573,7 +571,7 @@ static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
             }
             break;
     // packed RGB
-        case VLC_FOURCC('R','G','B','2'):    // packed by 1
+        case VLC_CODEC_RGB8:    // packed by 1
             i_skipCount = (i_pitch * i_skipCountPercent) / 100;
             for (i_index = i_col/2 + i_skipCount/2;
                  i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2;
@@ -583,8 +581,8 @@ static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
             if (i_count > i_nonBlackPixel) break;
             }
             break;
-        case VLC_FOURCC('R','V','1','5'):    // packed by 2
-        case VLC_FOURCC('R','V','1','6'):    // packed by 2
+        case VLC_CODEC_RGB15:    // packed by 2
+        case VLC_CODEC_RGB16:    // packed by 2
             i_skipCount = (i_pitch * i_skipCountPercent) / 100;
             for (i_index = i_col/2 + i_skipCount/2 -
                                 (i_col/2 + i_skipCount/2) % 2;
@@ -596,7 +594,7 @@ static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
             if (i_count > i_nonBlackPixel) break;
             }
             break;
-        case VLC_FOURCC('R','V','2','4'):    // packed by 3
+        case VLC_CODEC_RGB24:    // packed by 3
             i_skipCount = (i_pitch * i_skipCountPercent) / 100;
             for (i_index = i_col/2 + i_skipCount/2 - (i_col/2 + i_skipCount/2) % 3; i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2; i_index+=3)
             {
@@ -606,7 +604,7 @@ static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
             if (i_count > i_nonBlackPixel) break;
             }
             break;
-        case VLC_FOURCC('R','V','3','2'):    // packed by 4
+        case VLC_CODEC_RGB32:    // packed by 4
             i_skipCount = (i_pitch * i_skipCountPercent) / 100;
             for (i_index = i_col/2 + i_skipCount/2 - (i_col/2 + i_skipCount/2) % 4; i_index <= i_visible_pitch/2 + i_col/2 - i_skipCount/2; i_index+=4)
             {
@@ -615,11 +613,8 @@ static bool NonBlackLine(uint8_t *p_in, int i_line, int i_pitch,
             }
             break;
     // packed YUV
-        case VLC_FOURCC('Y','U','Y','2'):    // packed by 2
-        case VLC_FOURCC('Y','U','N','V'):    // packed by 2
-        case VLC_FOURCC('U','Y','V','Y'):    // packed by 2
-        case VLC_FOURCC('U','Y','N','V'):    // packed by 2
-        case VLC_FOURCC('Y','4','2','2'):    // packed by 2
+        case VLC_CODEC_YUYV:    // packed by 2
+        case VLC_CODEC_UYVY:    // packed by 2
             i_skipCount = (i_pitch * i_skipCountPercent) / 100;
             for (i_index = (i_col/2 + i_skipCount/2) -
                            (i_col/2 + i_skipCount/2) % 2;
@@ -736,7 +731,7 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
     /* Determine where black borders are */
     switch( p_vout->output.i_chroma )
     {
-    case VLC_FOURCC('I','4','2','0'):
+    case VLC_CODEC_I420:
         /* XXX: Do not laugh ! I know this is very naive. But it's just a
          *      proof of concept code snippet... */
         for( i = i_lines ; i-- ; )

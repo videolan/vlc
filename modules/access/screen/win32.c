@@ -81,14 +81,14 @@ int screen_InitCapture( demux_t *p_demux )
     switch( i_bits_per_pixel )
     {
     case 8: /* FIXME: set the palette */
-        i_chroma = VLC_FOURCC('R','G','B','2'); break;
+        i_chroma = VLC_CODEC_RGB8; break;
     case 15:
     case 16:    /* Yes it is really 15 bits (when using BI_RGB) */
-        i_chroma = VLC_FOURCC('R','V','1','5'); break;
+        i_chroma = VLC_CODEC_RGB15; break;
     case 24:
-        i_chroma = VLC_FOURCC('R','V','2','4'); break;
+        i_chroma = VLC_CODEC_RGB24; break;
     case 32:
-        i_chroma = VLC_FOURCC('R','V','3','2'); break;
+        i_chroma = VLC_CODEC_RGB32; break;
     default:
         msg_Err( p_demux, "unknown screen depth %i",
                  p_sys->fmt.video.i_bits_per_pixel );
@@ -108,17 +108,17 @@ int screen_InitCapture( demux_t *p_demux )
 
     switch( i_chroma )
     {
-    case VLC_FOURCC('R','V','1','5'):
+    case VLC_CODEC_RGB15:
         p_sys->fmt.video.i_rmask = 0x7c00;
         p_sys->fmt.video.i_gmask = 0x03e0;
         p_sys->fmt.video.i_bmask = 0x001f;
         break;
-    case VLC_FOURCC('R','V','2','4'):
+    case VLC_CODEC_RGB24:
         p_sys->fmt.video.i_rmask = 0x00ff0000;
         p_sys->fmt.video.i_gmask = 0x0000ff00;
         p_sys->fmt.video.i_bmask = 0x000000ff;
         break;
-    case VLC_FOURCC('R','V','3','2'):
+    case VLC_CODEC_RGB32:
         p_sys->fmt.video.i_rmask = 0x00ff0000;
         p_sys->fmt.video.i_gmask = 0x0000ff00;
         p_sys->fmt.video.i_bmask = 0x000000ff;

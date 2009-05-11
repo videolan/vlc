@@ -66,52 +66,52 @@ static const struct
 } chroma_table[] =
 {
     /* Planar YUV formats */
-    {VLC_FOURCC('I','4','4','4'), PIX_FMT_YUV444P, 0, 0, 0 },
-    {VLC_FOURCC('J','4','4','4'), PIX_FMT_YUVJ444P, 0, 0, 0 },
+    {VLC_CODEC_I444, PIX_FMT_YUV444P, 0, 0, 0 },
+    {VLC_CODEC_J444, PIX_FMT_YUVJ444P, 0, 0, 0 },
 
 #if LIBAVUTIL_VERSION_INT >= ((49<<16)+(5<<8)+0)
-    {VLC_FOURCC('I','4','4','0'), PIX_FMT_YUV440P, 0, 0, 0 },
-    {VLC_FOURCC('J','4','4','0'), PIX_FMT_YUVJ440P, 0, 0, 0 },
+    {VLC_CODEC_I440, PIX_FMT_YUV440P, 0, 0, 0 },
+    {VLC_CODEC_J440, PIX_FMT_YUVJ440P, 0, 0, 0 },
 #endif
 
-    {VLC_FOURCC('I','4','2','2'), PIX_FMT_YUV422P, 0, 0, 0 },
-    {VLC_FOURCC('J','4','2','2'), PIX_FMT_YUVJ422P, 0, 0, 0 },
+    {VLC_CODEC_I422, PIX_FMT_YUV422P, 0, 0, 0 },
+    {VLC_CODEC_J422, PIX_FMT_YUVJ422P, 0, 0, 0 },
 
-    {VLC_FOURCC('I','4','2','0'), PIX_FMT_YUV420P, 0, 0, 0 },
-    {VLC_FOURCC('Y','V','1','2'), PIX_FMT_YUV420P, 0, 0, 0 },
+    {VLC_CODEC_I420, PIX_FMT_YUV420P, 0, 0, 0 },
+    {VLC_CODEC_YV12, PIX_FMT_YUV420P, 0, 0, 0 },
     {VLC_FOURCC('I','Y','U','V'), PIX_FMT_YUV420P, 0, 0, 0 },
-    {VLC_FOURCC('J','4','2','0'), PIX_FMT_YUVJ420P, 0, 0, 0 },
-    {VLC_FOURCC('I','4','1','1'), PIX_FMT_YUV411P, 0, 0, 0 },
-    {VLC_FOURCC('I','4','1','0'), PIX_FMT_YUV410P, 0, 0, 0 },
+    {VLC_CODEC_J420, PIX_FMT_YUVJ420P, 0, 0, 0 },
+    {VLC_CODEC_I411, PIX_FMT_YUV411P, 0, 0, 0 },
+    {VLC_CODEC_I410, PIX_FMT_YUV410P, 0, 0, 0 },
     {VLC_FOURCC('Y','V','U','9'), PIX_FMT_YUV410P, 0, 0, 0 },
 
     {VLC_FOURCC('N','V','1','2'), PIX_FMT_NV12, 0, 0, 0 },
     {VLC_FOURCC('N','V','2','1'), PIX_FMT_NV21, 0, 0, 0 },
 
     /* Packed YUV formats */
-    {VLC_FOURCC('Y','U','Y','2'), PIX_FMT_YUYV422, 0, 0, 0 },
+    {VLC_CODEC_YUYV, PIX_FMT_YUYV422, 0, 0, 0 },
     {VLC_FOURCC('Y','U','Y','V'), PIX_FMT_YUYV422, 0, 0, 0 },
-    {VLC_FOURCC('U','Y','V','Y'), PIX_FMT_UYVY422, 0, 0, 0 },
+    {VLC_CODEC_UYVY, PIX_FMT_UYVY422, 0, 0, 0 },
     {VLC_FOURCC('Y','4','1','1'), PIX_FMT_UYYVYY411, 0, 0, 0 },
 
     /* Packed RGB formats */
     VLC_RGB( VLC_FOURCC('R','G','B','4'), PIX_FMT_RGB4, PIX_FMT_BGR4, 0x10, 0x06, 0x01 )
     VLC_RGB( VLC_FOURCC('R','G','B','8'), PIX_FMT_RGB8, PIX_FMT_BGR8, 0xC0, 0x38, 0x07 )
 
-    VLC_RGB( VLC_FOURCC('R','V','1','5'), PIX_FMT_BGR555, PIX_FMT_RGB555, 0x7c00, 0x03e0, 0x001f )
-    VLC_RGB( VLC_FOURCC('R','V','1','6'), PIX_FMT_BGR565, PIX_FMT_RGB565, 0xf800, 0x07e0, 0x001f )
-    VLC_RGB( VLC_FOURCC('R','V','2','4'), PIX_FMT_BGR24, PIX_FMT_RGB24, 0xff0000, 0x00ff00, 0x0000ff )
+    VLC_RGB( VLC_CODEC_RGB15, PIX_FMT_BGR555, PIX_FMT_RGB555, 0x7c00, 0x03e0, 0x001f )
+    VLC_RGB( VLC_CODEC_RGB16, PIX_FMT_BGR565, PIX_FMT_RGB565, 0xf800, 0x07e0, 0x001f )
+    VLC_RGB( VLC_CODEC_RGB24, PIX_FMT_BGR24, PIX_FMT_RGB24, 0xff0000, 0x00ff00, 0x0000ff )
 
-    VLC_RGB( VLC_FOURCC('R','V','3','2'), PIX_FMT_RGB32, PIX_FMT_BGR32, 0x00ff0000, 0x0000ff00, 0x000000ff )
-    VLC_RGB( VLC_FOURCC('R','V','3','2'), PIX_FMT_RGB32_1, PIX_FMT_BGR32_1, 0xff000000, 0x00ff0000, 0x0000ff00 )
+    VLC_RGB( VLC_CODEC_RGB32, PIX_FMT_RGB32, PIX_FMT_BGR32, 0x00ff0000, 0x0000ff00, 0x000000ff )
+    VLC_RGB( VLC_CODEC_RGB32, PIX_FMT_RGB32_1, PIX_FMT_BGR32_1, 0xff000000, 0x00ff0000, 0x0000ff00 )
 
 #if defined(PIX_FMT_RGBA)
-    {VLC_FOURCC('R','G','B','A'), PIX_FMT_RGBA, 0xff000000, 0x00ff0000, 0x0000ff00},
+    {VLC_CODEC_RGBA, PIX_FMT_RGBA, 0xff000000, 0x00ff0000, 0x0000ff00},
 #endif
-    {VLC_FOURCC('G','R','E','Y'), PIX_FMT_GRAY8, 0, 0, 0},
+    {VLC_CODEC_GREY, PIX_FMT_GRAY8, 0, 0, 0},
 
      /* Paletized RGB */
-    {VLC_FOURCC('R','G','B','P'), PIX_FMT_PAL8, 0, 0, 0},
+    {VLC_CODEC_RGBP, PIX_FMT_PAL8, 0, 0, 0},
 
 
     { 0, 0, 0, 0, 0 }

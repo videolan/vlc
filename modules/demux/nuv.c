@@ -314,7 +314,7 @@ static int Open( vlc_object_t * p_this )
     {
         es_format_t fmt;
 
-        es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
+        es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_MPGA );
         fmt.audio.i_rate = p_sys->exh.i_audio_sample_rate;
         fmt.audio.i_bitspersample = p_sys->exh.i_audio_bits_per_sample;
 

@@ -480,7 +480,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
 
     /* Create new subtitle region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
+    fmt.i_chroma = VLC_CODEC_YUVP;
 
     /**
        The video on which the subtitle sits, is scaled, probably

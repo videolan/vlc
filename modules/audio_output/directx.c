@@ -331,7 +331,7 @@ static int OpenAudio( vlc_object_t *p_this )
     /* Open the device */
     if( val.i_int == AOUT_VAR_SPDIF )
     {
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
 
         /* Calculate the frame size in bytes */
         p_aout->output.i_nb_samples = A52_FRAME_NB;
@@ -340,7 +340,7 @@ static int OpenAudio( vlc_object_t *p_this )
         p_aout->output.p_sys->i_frame_size =
             p_aout->output.output.i_bytes_per_frame;
 
-        if( CreateDSBuffer( p_aout, VLC_FOURCC('s','p','d','i'),
+        if( CreateDSBuffer( p_aout, VLC_CODEC_SPDIFL,
                             p_aout->output.output.i_physical_channels,
                             aout_FormatNbChannels( &p_aout->output.output ),
                             p_aout->output.output.i_rate,
@@ -647,7 +647,7 @@ static void Probe( aout_instance_t * p_aout )
     /* Test for SPDIF support */
     if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
     {
-        if( CreateDSBuffer( p_aout, VLC_FOURCC('s','p','d','i'),
+        if( CreateDSBuffer( p_aout, VLC_CODEC_SPDIFL,
                             p_aout->output.output.i_physical_channels,
                             aout_FormatNbChannels( &p_aout->output.output ),
                             p_aout->output.output.i_rate,
@@ -870,7 +870,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
 
     switch( i_format )
     {
-    case VLC_FOURCC('s','p','d','i'):
+    case VLC_CODEC_SPDIFL:
         i_nb_channels = 2;
         /* To prevent channel re-ordering */
         waveformat.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
@@ -881,7 +881,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
         waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
         break;
 
-    case VLC_FOURCC('f','l','3','2'):
+    case VLC_CODEC_FL32:
         waveformat.Format.wBitsPerSample = sizeof(float) * 8;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
@@ -889,7 +889,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
         waveformat.SubFormat = _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
         break;
 
-    case VLC_FOURCC('s','1','6','l'):
+    case VLC_CODEC_S16L:
         waveformat.Format.wBitsPerSample = 16;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
@@ -991,12 +991,12 @@ static int CreateDSBufferPCM( aout_instance_t *p_aout, int *i_format,
     /* Float32 audio samples are not supported for 5.1 output on the emu101k */
     if( !var_GetBool( p_aout, "directx-audio-float32" ) ||
         i_nb_channels > 2 ||
-        CreateDSBuffer( p_aout, VLC_FOURCC('f','l','3','2'),
+        CreateDSBuffer( p_aout, VLC_CODEC_FL32,
                         i_channels, i_nb_channels, i_rate,
                         FRAME_SIZE * 4 * i_nb_channels, b_probe )
         != VLC_SUCCESS )
     {
-        if ( CreateDSBuffer( p_aout, VLC_FOURCC('s','1','6','l'),
+        if ( CreateDSBuffer( p_aout, VLC_CODEC_S16L,
                              i_channels, i_nb_channels, i_rate,
                              FRAME_SIZE * 2 * i_nb_channels, b_probe )
              != VLC_SUCCESS )
@@ -1005,13 +1005,13 @@ static int CreateDSBufferPCM( aout_instance_t *p_aout, int *i_format,
         }
         else
         {
-            *i_format = VLC_FOURCC('s','1','6','l');
+            *i_format = VLC_CODEC_S16L;
             return VLC_SUCCESS;
         }
     }
     else
     {
-        *i_format = VLC_FOURCC('f','l','3','2');
+        *i_format = VLC_CODEC_FL32;
         return VLC_SUCCESS;
     }
 }
@@ -1117,7 +1117,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF output */
-    b_sleek = p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i');
+    b_sleek = p_aout->output.output.i_format == VLC_CODEC_SPDIFL;
 
     msg_Dbg( p_notif, "DirectSoundThread ready" );
 

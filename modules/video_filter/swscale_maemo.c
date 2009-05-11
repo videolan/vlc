@@ -138,9 +138,8 @@ static int Init( filter_t *p_filter )
         return VLC_SUCCESS;
     }
 
-    if( ( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0') &&
-          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V') &&
-          p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2') ) ||
+    if( ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420 &&
+          p_filter->fmt_in.video.i_chroma != VLC_CODEC_YV12 ) ||
           p_filter->fmt_out.video.i_chroma != VLC_FOURCC('Y','4','2','0') )
     {
         msg_Err( p_filter, "format not supported" );

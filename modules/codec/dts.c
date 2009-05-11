@@ -140,7 +140,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('d','t','s',' ') &&
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_DTS &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('d','t','s','b') )
     {
         return VLC_EGENERIC;
@@ -160,7 +160,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('d','t','s',' ');
+    p_dec->fmt_out.i_codec = VLC_CODEC_DTS;
     p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */

@@ -270,7 +270,7 @@ static void* QNXaoutThread( vlc_object_t *p_this )
         int i_tmp, i_size;
         uint8_t * p_bytes;
 
-        if ( p_aout->output.output.i_format != VLC_FOURCC('s','p','d','i') )
+        if ( p_aout->output.output.i_format != VLC_CODEC_SPDIFL )
         {
             mtime_t next_date = 0;
 

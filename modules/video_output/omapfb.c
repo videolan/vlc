@@ -185,9 +185,8 @@ static int Create( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t    *p_sys;
 
-    if( p_vout->fmt_in.i_chroma != VLC_FOURCC('I','4','2','0') &&
-        p_vout->fmt_in.i_chroma != VLC_FOURCC('I','Y','U','V') &&
-        p_vout->fmt_in.i_chroma != VLC_FOURCC('Y','V','1','2') )
+    if( p_vout->fmt_in.i_chroma != VLC_CODEC_I420 &&
+        p_vout->fmt_in.i_chroma != VLC_CODEC_YV12 )
         return VLC_EGENERIC;
 
     /* Allocate instance and initialize some members */
@@ -308,7 +307,7 @@ static int Init( vout_thread_t *p_vout )
     }
 
     p_vout->output.i_chroma =
-    p_vout->fmt_out.i_chroma = VLC_FOURCC( 'Y','4','2','0' );
+    p_vout->fmt_out.i_chroma = VLC_CODEC_I420;
     p_sys->i_color_format = OMAPFB_COLOR_YUV420;
 
     // place in the framebuffer where we have to write

@@ -100,7 +100,7 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
     picture_t *p_old_mask = p_filter->p_sys->p_mask;
     memset( &fmt_in, 0, sizeof( video_format_t ) );
     memset( &fmt_out, 0, sizeof( video_format_t ) );
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt_out.i_chroma = VLC_CODEC_YUVA;
     p_image = image_HandlerCreate( p_filter );
     p_filter->p_sys->p_mask =
         image_ReadUrl( p_image, psz_filename, &fmt_in, &fmt_out );
@@ -128,13 +128,12 @@ static int Create( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('J','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
+        case VLC_CODEC_YV12:
 
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('J','4','2','2'):
+        case VLC_CODEC_I422:
+        case VLC_CODEC_J422:
             break;
 
         default:
@@ -248,8 +247,8 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         int i_width  = i_mask_visible_pitch;
 
         const bool b_line_factor = ( i_plane /* U_PLANE or V_PLANE */ &&
-            !( p_inpic->format.i_chroma == VLC_FOURCC('I','4','2','2')
-            || p_inpic->format.i_chroma == VLC_FOURCC('J','4','2','2') ) );
+            !( p_inpic->format.i_chroma == VLC_CODEC_I422
+            || p_inpic->format.i_chroma == VLC_CODEC_J422 ) );
 
         if( i_plane ) /* U_PLANE or V_PLANE */
         {

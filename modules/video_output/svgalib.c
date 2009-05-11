@@ -155,7 +155,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* Initialize the output structure: RGB with square pixels, whatever
      * the input format is, since it's the only format we know */
-    p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+    p_vout->output.i_chroma = VLC_CODEC_RGB8;
     p_vout->output.pf_setpalette = SetPalette;
     p_vout->output.i_width = vga_getxdim();
     p_vout->output.i_height = vga_getydim();

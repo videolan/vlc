@@ -45,11 +45,11 @@ typedef struct colorcombo
 
 colorcombo colspace[]=
 {
-    {B_YCbCr420, "B_YCbCr420", VLC_FOURCC('I','4','2','0'), 3, 2},
+    {B_YCbCr420, "B_YCbCr420", VLC_CODEC_I420, 3, 2},
     {B_YUV422,   "B_YUV422",   VLC_FOURCC('Y','4','2','2'), 3, 2},
-    {B_YCbCr422, "B_YCbCr422", VLC_FOURCC('Y','U','Y','2'), 3, 2},
-    {B_RGB32,    "B_RGB32",    VLC_FOURCC('R','V','3','2'), 1, 4},
-    {B_RGB16,    "B_RGB16",    VLC_FOURCC('R','V','1','6'), 1, 2}
+    {B_YCbCr422, "B_YCbCr422", VLC_CODEC_YUYV, 3, 2},
+    {B_RGB32,    "B_RGB32",    VLC_CODEC_RGB32, 1, 4},
+    {B_RGB16,    "B_RGB16",    VLC_CODEC_RGB16, 1, 2}
 };
 
 #define COLOR_COUNT 5

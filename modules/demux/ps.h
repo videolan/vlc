@@ -70,28 +70,28 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
     {
         if( ( i_id&0xf8 ) == 0x88 || (i_id&0xf8) == 0x98 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('d','t','s',' ') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_DTS );
             tk->i_skip = 4;
         }
         else if( ( i_id&0xf0 ) == 0x80
                ||  (i_id&0xf0) == 0xc0 ) /* AC-3, Can also be used for DD+/E-AC-3 */
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('a','5','2',' ') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_A52 );
             tk->i_skip = 4;
         }
         else if( (i_id&0xf0) == 0xb0 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','l','p',' ') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MLP );
             /* FIXME / untested ... no known decoder (at least not in VLC/ffmpeg) */
         }
         else if( ( i_id&0xe0 ) == 0x20 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('s','p','u',' ') );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_SPU );
             tk->i_skip = 1;
         }
         else if( ( i_id&0xf0 ) == 0xa0 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('l','p','c','m') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_DVD_LPCM );
             tk->i_skip = 1;
         }
         else if( ( i_id&0xff ) == 0x70 )
@@ -104,7 +104,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         }
         else if( ( i_id&0xff ) == 0x10 )
         {
-            es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('t','e','l','x') );
+            es_format_Init( &tk->fmt, SPU_ES, VLC_CODEC_TELETEXT );
         }
         else
         {
@@ -117,7 +117,7 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
         uint8_t i_sub_id = i_id & 0xff;
         if( i_sub_id >= 0x55 && i_sub_id <= 0x5f )
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('W','V','C','1') );
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_VC1 );
         }
         else
         {
@@ -133,36 +133,36 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
 
         if( (i_id&0xf0) == 0xe0 && i_type == 0x1b )
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('h','2','6','4') );
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_H264 );
         }
         else if( (i_id&0xf0) == 0xe0 && i_type == 0x10 )
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','4','v') );
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MP4V );
         }
         else if( (i_id&0xf0) == 0xe0 && i_type == 0x02 )
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','g','v') );
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
         }
         else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x0f )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','4','a') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
         }
         else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x11 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','4','a') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MP4A );
         }
         else if( ( i_id&0xe0 ) == 0xc0 && i_type == 0x03 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
         }
 
         if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xf0 ) == 0xe0 )
         {
-            es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('m','p','g','v') );
+            es_format_Init( &tk->fmt, VIDEO_ES, VLC_CODEC_MPGV );
         }
         else if( tk->fmt.i_cat == UNKNOWN_ES && ( i_id&0xe0 ) == 0xc0 )
         {
-            es_format_Init( &tk->fmt, AUDIO_ES, VLC_FOURCC('m','p','g','a') );
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MPGA );
         }
         else if( tk->fmt.i_cat == UNKNOWN_ES ) return VLC_EGENERIC;
     }

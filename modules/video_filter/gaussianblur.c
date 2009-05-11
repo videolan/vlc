@@ -123,13 +123,12 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
 
-    if(   p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','0')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','Y','U','V')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','0')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','V','1','2')
+    if(   p_filter->fmt_in.video.i_chroma != VLC_CODEC_I420
+       && p_filter->fmt_in.video.i_chroma != VLC_CODEC_J420
+       && p_filter->fmt_in.video.i_chroma != VLC_CODEC_YV12
 
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('I','4','2','2')
-       && p_filter->fmt_in.video.i_chroma != VLC_FOURCC('J','4','2','2')
+       && p_filter->fmt_in.video.i_chroma != VLC_CODEC_I422
+       && p_filter->fmt_in.video.i_chroma != VLC_CODEC_J422
       )
     {
         /* We only want planar YUV 4:2:0 or 4:2:2 */

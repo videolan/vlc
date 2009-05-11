@@ -52,7 +52,7 @@ int OpenAudio ( vlc_object_t * p_this )
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
 
-    if ( p_aout->output.output.i_format == VLC_FOURCC('s','p','d','i') )
+    if ( p_aout->output.output.i_format == VLC_CODEC_SPDIFL )
     {
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;

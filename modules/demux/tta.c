@@ -117,7 +117,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->pi_seektable = NULL;
 
     /* Read the metadata */
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'T', 'T', 'A', '1' ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_TTA );
     fmt.audio.i_channels = GetWLE( &p_header[6] );
     fmt.audio.i_bitspersample = GetWLE( &p_header[8] );
     fmt.audio.i_rate = GetDWLE( &p_header[10] );

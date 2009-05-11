@@ -110,12 +110,12 @@ static int Open( vlc_object_t *p_this )
     bool         b_fit = true;
     int                i_samplerate;
 
-    if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
-        p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
+        p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->input.i_format = VLC_FOURCC('f','l','3','2');
-        p_filter->output.i_format = VLC_FOURCC('f','l','3','2');
+        p_filter->input.i_format = VLC_CODEC_FL32;
+        p_filter->output.i_format = VLC_CODEC_FL32;
         msg_Warn( p_filter, "bad input or output format" );
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )

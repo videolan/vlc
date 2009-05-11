@@ -923,7 +923,7 @@ static int DemuxInit( demux_t *p_demux )
                 es_format_Init( &fmt, AUDIO_ES, 0 );
                 i_format = GetWLE( &p_data[0] );
                 if( i_format == 0 )
-                    fmt.i_codec = VLC_FOURCC( 'a','5','2',' ');
+                    fmt.i_codec = VLC_CODEC_A52;
                 else
                     wf_tag_to_fourcc( i_format, &fmt.i_codec, NULL );
                 fmt.audio.i_channels        = GetWLE(  &p_data[2] );

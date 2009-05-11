@@ -99,13 +99,8 @@ struct audio_format_t
     uint8_t      i_flavor;
 };
 
-#ifdef WORDS_BIGENDIAN
-#   define AUDIO_FMT_S16_NE VLC_FOURCC('s','1','6','b')
-#   define AUDIO_FMT_U16_NE VLC_FOURCC('u','1','6','b')
-#else
-#   define AUDIO_FMT_S16_NE VLC_FOURCC('s','1','6','l')
-#   define AUDIO_FMT_U16_NE VLC_FOURCC('u','1','6','l')
-#endif
+#define AUDIO_FMT_S16_NE VLC_CODEC_S16N
+#define AUDIO_FMT_U16_NE VLC_CODEC_U16N
 
 /**
  * video format description

@@ -452,7 +452,7 @@ static void *pcmu_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('u', 'l', 'a', 'w'));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MULAW);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
@@ -465,7 +465,7 @@ static void *gsm_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('g', 's', 'm', ' '));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_GSM);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
@@ -478,7 +478,7 @@ static void *pcma_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('a', 'l', 'a', 'w'));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_ALAW);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
@@ -491,7 +491,7 @@ static void *l16s_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('s', '1', '6', 'b'));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = 44100;
     fmt.audio.i_channels = 2;
     return codec_init (demux, &fmt);
@@ -501,7 +501,7 @@ static void *l16m_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('s', '1', '6', 'b'));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_S16B);
     fmt.audio.i_rate = 44100;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
@@ -514,7 +514,7 @@ static void *qcelp_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('Q', 'c', 'l', 'p'));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_QCELP);
     fmt.audio.i_rate = 8000;
     fmt.audio.i_channels = 1;
     return codec_init (demux, &fmt);
@@ -527,7 +527,7 @@ static void *mpa_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('m', 'p', 'g', 'a'));
+    es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_MPGA);
     fmt.audio.i_channels = 2;
     fmt.b_packetized = false;
     return codec_init (demux, &fmt);
@@ -555,7 +555,7 @@ static void *mpv_init (demux_t *demux)
 {
     es_format_t fmt;
 
-    es_format_Init (&fmt, VIDEO_ES, VLC_FOURCC ('m', 'p', 'g', 'v'));
+    es_format_Init (&fmt, VIDEO_ES, VLC_CODEC_MPGV);
     fmt.b_packetized = false;
     return codec_init (demux, &fmt);
 }

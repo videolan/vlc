@@ -108,7 +108,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_es        = NULL;
 
     /* Load the mpegvideo packetizer */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "mpeg video" );
     if( !p_sys->p_packetizer )
     {
@@ -117,7 +117,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* create the output */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
     return VLC_SUCCESS;

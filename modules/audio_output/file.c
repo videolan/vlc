@@ -95,16 +95,16 @@ static void    Play        ( aout_instance_t * );
 static const char *const format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
                                      "s16_le", "u16_be", "s16_be", "fixed32",
                                      "float32", "spdif" };
-static const int format_int[] = { VLC_FOURCC('u','8',' ',' '),
-                                  VLC_FOURCC('s','8',' ',' '),
+static const int format_int[] = { VLC_CODEC_U8,
+                                  VLC_CODEC_S8,
                                   AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
-                                  VLC_FOURCC('u','1','6','l'),
-                                  VLC_FOURCC('s','1','6','l'),
-                                  VLC_FOURCC('u','1','6','b'),
-                                  VLC_FOURCC('s','1','6','b'),
-                                  VLC_FOURCC('f','i','3','2'),
-                                  VLC_FOURCC('f','l','3','2'),
-                                  VLC_FOURCC('s','p','i','f') };
+                                  VLC_CODEC_U16L,
+                                  VLC_CODEC_S16L,
+                                  VLC_CODEC_U16B,
+                                  VLC_CODEC_S16B,
+                                  VLC_CODEC_FI32,
+                                  VLC_CODEC_FL32,
+                                  VLC_CODEC_SPDIFL };
 
 #define FILE_TEXT N_("Output file")
 #define FILE_LONGTEXT N_("File to which the audio samples will be written to. (\"-\" for stdout")
@@ -227,15 +227,15 @@ static int Open( vlc_object_t * p_this )
 
         switch( p_aout->output.output.i_format )
         {
-        case VLC_FOURCC('f','l','3','2'):
+        case VLC_CODEC_FL32:
             wh->Format     = WAVE_FORMAT_IEEE_FLOAT;
             wh->BitsPerSample = sizeof(float) * 8;
             break;
-        case VLC_FOURCC('u','8',' ',' '):
+        case VLC_CODEC_U8:
             wh->Format     = WAVE_FORMAT_PCM;
             wh->BitsPerSample = 8;
             break;
-        case VLC_FOURCC('s','1','6','l'):
+        case VLC_CODEC_S16L:
         default:
             wh->Format     = WAVE_FORMAT_PCM;
             wh->BitsPerSample = 16;

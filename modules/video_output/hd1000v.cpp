@@ -171,7 +171,7 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-    p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+    p_vout->output.i_chroma = VLC_CODEC_RGB8;
     p_vout->output.i_width = p_vout->p_sys->i_width;
     p_vout->output.i_height = p_vout->p_sys->i_height;
     p_vout->output.i_aspect = p_vout->p_sys->i_width
@@ -181,15 +181,15 @@ static int Init( vout_thread_t *p_vout )
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB8; break;
         case 15:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB15; break;
         case 16:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB16; break;
         case 24:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB24; break;
         case 32:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB32; break;
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->i_screen_depth );

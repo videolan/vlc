@@ -121,7 +121,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    if( p_pic->format.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    if( p_pic->format.i_chroma == VLC_CODEC_YUVA )
     {
         /* We don't want to invert the alpha plane */
         i_planes = p_pic->i_planes - 1;

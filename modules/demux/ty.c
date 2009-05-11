@@ -352,15 +352,15 @@ static int Open(vlc_object_t *p_this)
 
     /* register the proper audio codec */
     if (p_sys->audio_type == TIVO_AUDIO_MPEG) {
-        es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'm', 'p', 'g', 'a' ) );
+        es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_MPGA );
     } else {
-        es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
+        es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_A52 );
     }
     fmt.i_group = TY_ES_GROUP;
     p_sys->p_audio = es_out_Add( p_demux->out, &fmt );
 
     /* register the video stream */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'm', 'p', 'g', 'v' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_MPGV );
     fmt.i_group = TY_ES_GROUP;
     p_sys->p_video = es_out_Add( p_demux->out, &fmt );
 

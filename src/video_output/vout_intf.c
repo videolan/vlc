@@ -469,7 +469,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
     /* */
     memset( &fmt_out, 0, sizeof(fmt_out) );
     fmt_out = fmt_in;
-    fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt_out.i_chroma = VLC_CODEC_YUVA;
 
     /* */
     image_handler_t *p_image = image_HandlerCreate( p_vout );
@@ -752,7 +752,7 @@ int vout_GetSnapshot( vout_thread_t *p_vout,
 
     if( pp_image )
     {
-        vlc_fourcc_t i_format = VLC_FOURCC('p','n','g',' ');
+        vlc_fourcc_t i_format = VLC_CODEC_PNG;
         if( psz_format && image_Type2Fourcc( psz_format ) )
             i_format = image_Type2Fourcc( psz_format );
 

@@ -59,8 +59,8 @@ static int Create( vlc_object_t *p_this )
 {
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
-    if ( p_aout->mixer.mixer.i_format != VLC_FOURCC('f','l','3','2')
-          && p_aout->mixer.mixer.i_format != VLC_FOURCC('f','i','3','2') )
+    if ( p_aout->mixer.mixer.i_format != VLC_CODEC_FL32
+          && p_aout->mixer.mixer.i_format != VLC_CODEC_FI32 )
     {
         return -1;
     }

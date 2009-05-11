@@ -434,7 +434,7 @@ static int PAOpenDevice( aout_instance_t *p_aout )
     }
 
     /* Audio format is paFloat32 (always supported by portaudio v19) */
-    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    p_aout->output.output.i_format = VLC_CODEC_FL32;
 
     return VLC_SUCCESS;
 

@@ -157,6 +157,8 @@
 #define VLC_CODEC_GREY      VLC_FOURCC('G','R','E','Y')
 /* Packed YUV 4:2:2, U:Y:V:Y */
 #define VLC_CODEC_UYVY      VLC_FOURCC('U','Y','V','Y')
+/* Packed YUV 4:2:2, V:Y:U:Y */
+#define VLC_CODEC_VYUY      VLC_FOURCC('V','Y','U','Y')
 /* Packed YUV 4:2:2, Y:U:Y:V */
 #define VLC_CODEC_YUYV      VLC_FOURCC('Y','U','Y','2')
 /* Packed YUV 4:2:2, Y:V:Y:U */

@@ -151,8 +151,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Set output properties */
-    //p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
-    p_dec->fmt_out.i_codec = VLC_FOURCC('R','V','2','4');
+    //p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
     p_dec->fmt_out.video.i_width = p_dec->p_sys->i_width;
     p_dec->fmt_out.video.i_height = p_dec->p_sys->i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->p_sys->i_width / p_dec->p_sys->i_height;

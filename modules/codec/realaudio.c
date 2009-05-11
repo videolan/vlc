@@ -182,8 +182,8 @@ static int Open( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
-    case VLC_FOURCC('c','o','o','k'):
-    case VLC_FOURCC('a','t','r','c'):
+    case VLC_CODEC_COOK:
+    case VLC_CODEC_ATRAC3:
     case VLC_FOURCC('s','i','p','r'):
         break;
 

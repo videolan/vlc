@@ -242,67 +242,67 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
             else if( media_type.subtype == MEDIASUBTYPE_RGB8 )
                i_fourcc = VLC_FOURCC( 'R', 'G', 'B', '8' );
             else if( media_type.subtype == MEDIASUBTYPE_RGB555 )
-               i_fourcc = VLC_FOURCC( 'R', 'V', '1', '5' );
+               i_fourcc = VLC_CODEC_RGB15;
             else if( media_type.subtype == MEDIASUBTYPE_RGB565 )
-               i_fourcc = VLC_FOURCC( 'R', 'V', '1', '6' );
+               i_fourcc = VLC_CODEC_RGB16;
             else if( media_type.subtype == MEDIASUBTYPE_RGB24 )
-               i_fourcc = VLC_FOURCC( 'R', 'V', '2', '4' );
+               i_fourcc = VLC_CODEC_RGB24;
             else if( media_type.subtype == MEDIASUBTYPE_RGB32 )
-               i_fourcc = VLC_FOURCC( 'R', 'V', '3', '2' );
+               i_fourcc = VLC_CODEC_RGB32;
             else if( media_type.subtype == MEDIASUBTYPE_ARGB32 )
-               i_fourcc = VLC_FOURCC( 'R', 'G', 'B', 'A' );
+               i_fourcc = VLC_CODEC_RGBA;
 
             /* Planar YUV formats */
             else if( media_type.subtype == MEDIASUBTYPE_I420 )
-               i_fourcc = VLC_FOURCC( 'I', '4', '2', '0' );
+               i_fourcc = VLC_CODEC_I420;
             else if( media_type.subtype == MEDIASUBTYPE_Y41P )
-               i_fourcc = VLC_FOURCC( 'I', '4', '1', '1' );
+               i_fourcc = VLC_CODEC_I411;
             else if( media_type.subtype == MEDIASUBTYPE_YV12 )
-               i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
+               i_fourcc = VLC_CODEC_YV12;
             else if( media_type.subtype == MEDIASUBTYPE_IYUV )
-               i_fourcc = VLC_FOURCC( 'Y', 'V', '1', '2' );
+               i_fourcc = VLC_CODEC_YV12;
             else if( media_type.subtype == MEDIASUBTYPE_YVU9 )
-               i_fourcc = VLC_FOURCC( 'Y', 'V', 'U', '9' );
+               i_fourcc = VLC_CODEC_I410;
 
             /* Packed YUV formats */
             else if( media_type.subtype == MEDIASUBTYPE_YVYU )
-               i_fourcc = VLC_FOURCC( 'Y', 'V', 'Y', 'U' );
+               i_fourcc = VLC_CODEC_YVYU;
             else if( media_type.subtype == MEDIASUBTYPE_YUYV )
-               i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+               i_fourcc = VLC_CODEC_YUYV;
             else if( media_type.subtype == MEDIASUBTYPE_Y411 )
                i_fourcc = VLC_FOURCC( 'I', '4', '1', 'N' );
             else if( media_type.subtype == MEDIASUBTYPE_Y211 )
-               i_fourcc = VLC_FOURCC( 'Y', '2', '1', '1' );
+               i_fourcc = VLC_CODEC_Y211;
             else if( media_type.subtype == MEDIASUBTYPE_YUY2 )
-               i_fourcc = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
+               i_fourcc = VLC_CODEC_YUYV;
             else if( media_type.subtype == MEDIASUBTYPE_UYVY )
-               i_fourcc = VLC_FOURCC( 'U', 'Y', 'V', 'Y' );
+               i_fourcc = VLC_CODEC_UYVY;
             /* HDYC uses UYVY sample positions but Rec709 colourimetry */
             /* FIXME: When VLC understands colourspace, something will need
              * to be added / changed here. Until then, just make it behave
              * like UYVY */
             else if( media_type.subtype == MEDIASUBTYPE_HDYC )
-                i_fourcc = VLC_FOURCC( 'U', 'Y', 'V', 'Y');
+                i_fourcc = VLC_CODEC_UYVY;
 
             /* MPEG2 video elementary stream */
             else if( media_type.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
-               i_fourcc = VLC_FOURCC( 'm', 'p', '2', 'v' );
+               i_fourcc = VLC_CODEC_MP2V;
 
-        /* DivX video */
+            /* DivX video */
             else if( media_type.subtype == MEDIASUBTYPE_DIVX )
-               i_fourcc = VLC_FOURCC( 'D', 'I', 'V', 'X' );
+               i_fourcc = VLC_CODEC_MP4V;
 
             /* DV formats */
             else if( media_type.subtype == MEDIASUBTYPE_dvsl )
-               i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
+               i_fourcc = VLC_CODEC_DV;
             else if( media_type.subtype == MEDIASUBTYPE_dvsd )
-               i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'd' );
+               i_fourcc = VLC_CODEC_DV;
             else if( media_type.subtype == MEDIASUBTYPE_dvhd )
-               i_fourcc = VLC_FOURCC( 'd', 'v', 'h', 'd' );
+               i_fourcc = VLC_CODEC_DV;
 
             /* MJPEG format */
             else if( media_type.subtype == MEDIASUBTYPE_MJPG )
-                i_fourcc = VLC_FOURCC( 'M', 'J', 'P', 'G' );
+                i_fourcc = VLC_CODEC_MJPG;
 
         }
     }
@@ -314,7 +314,7 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
             if( media_type.subtype == MEDIASUBTYPE_PCM )
                 i_fourcc = VLC_FOURCC( 'a', 'r', 'a', 'w' );
             else if( media_type.subtype == MEDIASUBTYPE_IEEE_FLOAT )
-                i_fourcc = VLC_FOURCC( 'f', 'l', '3', '2' );
+                i_fourcc = VLC_CODEC_FL32;
         }
     }
     else if( media_type.majortype == MEDIATYPE_Stream )

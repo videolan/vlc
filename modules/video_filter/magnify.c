@@ -114,7 +114,7 @@ static int Create( vlc_object_t *p_this )
     switch( p_vout->fmt_in.i_chroma )
     {
         CASE_PLANAR_YUV
-        case VLC_FOURCC('G','R','E','Y'):
+        case VLC_CODEC_GREY:
             break;
         default:
             msg_Err( p_vout, "Unsupported chroma" );

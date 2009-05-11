@@ -799,6 +799,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         if( strlen( psz_chroma ) >= 4 )
         {
             memcpy(&i_chroma, psz_chroma, 4);
+            i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, i_chroma );
             msg_Dbg( p_vout, "Forcing chroma to 0x%.8x (%4.4s)", i_chroma, (char*)&i_chroma );
         }
         else
@@ -816,26 +817,22 @@ static int OpenDisplay( vout_thread_t *p_vout )
             if( !psz_chroma ) i_chroma = 0;
             switch( i_chroma ? i_chroma : p_vout->render.i_chroma )
             {
-                case VLC_FOURCC('Y','U','Y','2'):
-                case VLC_FOURCC('Y','U','N','V'):
-                    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+                case VLC_CODEC_YUYV:
+                    p_vout->output.i_chroma = VLC_CODEC_YUYV;
                     i_sdl_chroma = SDL_YUY2_OVERLAY;
                     break;
-                case VLC_FOURCC('U','Y','V','Y'):
-                case VLC_FOURCC('U','Y','N','V'):
-                case VLC_FOURCC('Y','4','2','2'):
-                    p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+                case VLC_CODEC_UYVY:
+                    p_vout->output.i_chroma = VLC_CODEC_UYVY;
                     i_sdl_chroma = SDL_UYVY_OVERLAY;
                     break;
-                case VLC_FOURCC('Y','V','Y','U'):
-                    p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
+                case VLC_CODEC_YVYU:
+                    p_vout->output.i_chroma = VLC_CODEC_YVYU;
                     i_sdl_chroma = SDL_YVYU_OVERLAY;
                     break;
-                case VLC_FOURCC('Y','V','1','2'):
-                case VLC_FOURCC('I','4','2','0'):
-                case VLC_FOURCC('I','Y','U','V'):
+                case VLC_CODEC_YV12:
+                case VLC_CODEC_I420:
                 default:
-                    p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+                    p_vout->output.i_chroma = VLC_CODEC_YV12;
                     i_sdl_chroma = SDL_YV12_OVERLAY;
                     break;
             }
@@ -853,7 +850,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         /* If this best choice failed, fall back to other chromas */
         if( p_vout->p_sys->p_overlay == NULL )
         {
-            p_vout->output.i_chroma = VLC_FOURCC('I','Y','U','V');
+            p_vout->output.i_chroma = VLC_CODEC_I420;
             p_vout->p_sys->p_overlay =
                 SDL_CreateYUVOverlay( 32, 32, SDL_IYUV_OVERLAY,
                                       p_vout->p_sys->p_display );
@@ -861,7 +858,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
         if( p_vout->p_sys->p_overlay == NULL )
         {
-            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+            p_vout->output.i_chroma = VLC_CODEC_YV12;
             p_vout->p_sys->p_overlay =
                 SDL_CreateYUVOverlay( 32, 32, SDL_YV12_OVERLAY,
                                       p_vout->p_sys->p_display );
@@ -869,7 +866,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
         if( p_vout->p_sys->p_overlay == NULL )
         {
-            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+            p_vout->output.i_chroma = VLC_CODEC_YUYV;
             p_vout->p_sys->p_overlay =
                 SDL_CreateYUVOverlay( 32, 32, SDL_YUY2_OVERLAY,
                                       p_vout->p_sys->p_display );
@@ -888,20 +885,20 @@ static int OpenDisplay( vout_thread_t *p_vout )
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
         {
             case 8:
-                p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+                p_vout->output.i_chroma = VLC_CODEC_RGB8;
                 p_vout->output.pf_setpalette = SetPalette;
                 break;
             case 15:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
+                p_vout->output.i_chroma = VLC_CODEC_RGB15;
                 break;
             case 16:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+                p_vout->output.i_chroma = VLC_CODEC_RGB16;
                 break;
             case 24:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+                p_vout->output.i_chroma = VLC_CODEC_RGB24;
                 break;
             case 32:
-                p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+                p_vout->output.i_chroma = VLC_CODEC_RGB32;
                 break;
             default:
                 msg_Err( p_vout, "unknown screen depth %i",

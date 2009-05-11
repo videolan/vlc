@@ -252,11 +252,11 @@ static int Open ( vlc_object_t *p_this )
     /* *** add subtitle ES *** */
     if( p_detect->fmt->target == ASAI_TARGET_SSA )
     {
-        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','s','a',' ' ) );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_SSA );
     }
     else
     {
-        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','u','b','t' ) );
+        es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
     }
     p_sys->es = es_out_Add( p_demux->out, &fmt );
 

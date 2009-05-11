@@ -203,7 +203,7 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys = NULL;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('t','e','l','x') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT )
         return VLC_EGENERIC;
 
     p_dec->pf_decode_sub = Decode;
@@ -271,11 +271,11 @@ static int Open( vlc_object_t *p_this )
     /* Listen for keys */
     var_AddCallback( p_dec->p_libvlc, "key-pressed", EventKey, p_dec );
 
-    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
+    es_format_Init( &p_dec->fmt_out, SPU_ES, VLC_CODEC_SPU );
     if( p_sys->b_text )
-        p_dec->fmt_out.video.i_chroma = VLC_FOURCC('T','E','X','T');
+        p_dec->fmt_out.video.i_chroma = VLC_CODEC_TEXT;
     else
-        p_dec->fmt_out.video.i_chroma = VLC_FOURCC('R','G','B','A');
+        p_dec->fmt_out.video.i_chroma = VLC_CODEC_RGBA;
     return VLC_SUCCESS;
 }
 
@@ -466,8 +466,8 @@ static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
     }
 
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = b_text ? VLC_FOURCC('T','E','X','T') :
-                                   VLC_FOURCC('R','G','B','A');
+    fmt.i_chroma = b_text ? VLC_CODEC_TEXT :
+                                   VLC_CODEC_RGBA;
     fmt.i_aspect = b_text ? 0 : VOUT_ASPECT_FACTOR;
     if( b_text )
     {
@@ -556,7 +556,7 @@ static int OpaquePage( picture_t *p_src, const vbi_page p_page,
 {
     unsigned int    x, y;
 
-    assert( fmt.i_chroma == VLC_FOURCC('R','G','B','A' ) );
+    assert( fmt.i_chroma == VLC_CODEC_RGBA );
 
     /* Kludge since zvbi doesn't provide an option to specify opacity. */
     for( y = 0; y < fmt.i_height; y++ )

@@ -137,7 +137,7 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'M', '4', 'S', '2'):
         case VLC_FOURCC( 'm', 'p', '4', 's'):
         case VLC_FOURCC( 'M', 'P', '4', 'S'):
-        case VLC_FOURCC( 'm', 'p', '4', 'v'):
+        case VLC_CODEC_MP4V:
         case VLC_FOURCC( 'M', 'P', '4', 'V'):
         case VLC_FOURCC( 'D', 'I', 'V', 'X'):
         case VLC_FOURCC( 'd', 'i', 'v', 'x'):
@@ -172,7 +172,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
-    p_dec->fmt_out.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
+    p_dec->fmt_out.i_codec = VLC_CODEC_MP4V;
 
     if( p_dec->fmt_in.i_extra )
     {

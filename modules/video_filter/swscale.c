@@ -272,30 +272,30 @@ static int GetParameters( ScalerConfiguration *p_cfg,
 
     if( p_fmti->i_chroma == p_fmto->i_chroma )
     {
-        if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'P' ) && ALLOW_YUVP )
+        if( p_fmti->i_chroma == VLC_CODEC_YUVP && ALLOW_YUVP )
         {
             i_fmti = i_fmto = PIX_FMT_GRAY8;
             i_sws_flags = SWS_POINT;
         }
     }
 
-    if( p_fmti->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'A' ) )
+    if( p_fmti->i_chroma == VLC_CODEC_YUVA )
     {
         i_fmti = PIX_FMT_YUV444P;
         b_has_ai = true;
     }
-    else if( p_fmti->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+    else if( p_fmti->i_chroma == VLC_CODEC_RGBA )
     {
         i_fmti = PIX_FMT_BGR32;
         b_has_ai = true;
     }
 
-    if( p_fmto->i_chroma == VLC_FOURCC( 'Y', 'U', 'V', 'A' ) )
+    if( p_fmto->i_chroma == VLC_CODEC_YUVA )
     {
         i_fmto = PIX_FMT_YUV444P;
         b_has_ao = true;
     }
-    else if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+    else if( p_fmto->i_chroma == VLC_CODEC_RGBA )
     {
         i_fmto = PIX_FMT_BGR32;
         b_has_ao = true;
@@ -379,8 +379,8 @@ static int Init( filter_t *p_filter )
     }
     if( p_sys->ctxA )
     {
-        p_sys->p_src_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), i_fmti_width, p_fmti->i_height, 0 );
-        p_sys->p_dst_a = picture_New( VLC_FOURCC( 'G', 'R', 'E', 'Y' ), i_fmto_width, p_fmto->i_height, 0 );
+        p_sys->p_src_a = picture_New( VLC_CODEC_GREY, i_fmti_width, p_fmti->i_height, 0 );
+        p_sys->p_dst_a = picture_New( VLC_CODEC_GREY, i_fmto_width, p_fmto->i_height, 0 );
     }
     if( p_sys->i_extend_factor != 1 )
     {
@@ -509,7 +509,7 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
     uint8_t *dst[3]; int dst_stride[3];
 
     GetPixels( src, src_stride, p_src, i_plane_start, i_plane_count );
-    if( p_filter->fmt_in.video.i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'P' ) )
+    if( p_filter->fmt_in.video.i_chroma == VLC_CODEC_RGBP )
     {
         memset( palette, 0, sizeof(palette) );
         if( p_filter->fmt_in.video.p_palette )
@@ -575,13 +575,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_sys->ctxA )
     {
         /* We extract the A plane to rescale it, and then we reinject it. */
-        if( p_fmti->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+        if( p_fmti->i_chroma == VLC_CODEC_RGBA )
             ExtractA( p_sys->p_src_a, p_src, p_fmti->i_width * p_sys->i_extend_factor, p_fmti->i_height );
         else
             plane_CopyPixels( p_sys->p_src_a->p, p_src->p+A_PLANE );
 
         Convert( p_filter, p_sys->ctxA, p_sys->p_dst_a, p_sys->p_src_a, p_fmti->i_height, 0, 1 );
-        if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+        if( p_fmto->i_chroma == VLC_CODEC_RGBA )
             InjectA( p_dst, p_sys->p_dst_a, p_fmto->i_width * p_sys->i_extend_factor, p_fmto->i_height );
         else
             plane_CopyPixels( p_dst->p+A_PLANE, p_sys->p_dst_a->p );
@@ -589,7 +589,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else if( p_sys->b_add_a )
     {
         /* We inject a complete opaque alpha plane */
-        if( p_fmto->i_chroma == VLC_FOURCC( 'R', 'G', 'B', 'A' ) )
+        if( p_fmto->i_chroma == VLC_CODEC_RGBA )
             FillA( &p_dst->p[0], OFFSET_A );
         else
             FillA( &p_dst->p[A_PLANE], 0 );

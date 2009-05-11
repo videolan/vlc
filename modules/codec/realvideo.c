@@ -327,7 +327,7 @@ static int InitVideo(decoder_t *p_dec)
     }
 
     /* setup rv30 codec (codec sub-type and image dimensions): */
-    /*if ( p_dec->fmt_in.i_codec == VLC_FOURCC('R','V','3','0') )*/
+    /*if ( p_dec->fmt_in.i_codec == VLC_CODEC_RV30 )*/
     if (p_vide[1]>=0x20200002)
     {
         int i, cmsg_cnt;
@@ -347,10 +347,10 @@ static int InitVideo(decoder_t *p_dec)
             (*rvyuv_custom_message)(&cmsg_data,p_sys->handle);
     }
     /*
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC( 'Y','V','1','2' ));
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC( 'Y','U','Y','2' ));
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_YV12);
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_YUYV);
      */
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC( 'I', '4', '2', '0'));
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_I420);
      
     p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
     p_dec->fmt_out.video.i_height= p_dec->fmt_in.video.i_height;
@@ -376,10 +376,10 @@ static int Open( vlc_object_t *p_this )
 
     switch ( p_dec->fmt_in.i_codec )
     {
-    case VLC_FOURCC('R','V','1','0'): 
-    case VLC_FOURCC('R','V','2','0'): 
-    case VLC_FOURCC('R','V','3','0'):
-    case VLC_FOURCC('R','V','4','0'): 
+    case VLC_CODEC_RV10: 
+    case VLC_CODEC_RV20: 
+    case VLC_CODEC_RV30:
+    case VLC_CODEC_RV40: 
         p_dec->p_sys = NULL;
         p_dec->pf_decode_video = DecodeVideo;
         return InitVideo(p_dec);

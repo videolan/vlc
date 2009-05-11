@@ -120,9 +120,9 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC('w','m','a','1') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('W','M','A','1') &&
+        p_dec->fmt_in.i_codec != VLC_CODEC_WMA1 &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('w','m','a','2') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('W','M','A','2') )
+        p_dec->fmt_in.i_codec != VLC_CODEC_WMA2 )
     {
         return VLC_EGENERIC;
     }
@@ -139,7 +139,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+    p_dec->fmt_out.i_codec = VLC_CODEC_FI32;
     p_dec->fmt_out.audio.i_bitspersample = p_dec->fmt_in.audio.i_bitspersample;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
 
@@ -167,9 +167,9 @@ static int OpenDecoder( vlc_object_t *p_this )
         wfx.bitspersample );
 
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('w','m','a','1')
-        || p_dec->fmt_in.i_codec == VLC_FOURCC('W','M','A','1') )
+        || p_dec->fmt_in.i_codec == VLC_CODEC_WMA1 )
         wfx.codec_id = ASF_CODEC_ID_WMAV1;
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC('W','M','A','2')
+    else if( p_dec->fmt_in.i_codec == VLC_CODEC_WMA2
         || p_dec->fmt_in.i_codec == VLC_FOURCC('w','m','a','2') )
         wfx.codec_id = ASF_CODEC_ID_WMAV2;
 

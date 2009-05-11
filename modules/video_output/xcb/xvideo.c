@@ -249,21 +249,21 @@ static vlc_fourcc_t ParseFormat (vout_thread_t *vout,
             {
               case 32:
                 if (f->depth == 24)
-                    return VLC_FOURCC ('R', 'V', '3', '2');
+                    return VLC_CODEC_RGB32;
                 break;
               case 24:
                 if (f->depth == 24)
-                    return VLC_FOURCC ('R', 'V', '2', '4');
+                    return VLC_CODEC_RGB24;
                 break;
               case 16:
                 if (f->depth == 16)
-                    return VLC_FOURCC ('R', 'V', '1', '6');
+                    return VLC_CODEC_RGB16;
                 if (f->depth == 15)
-                    return VLC_FOURCC ('R', 'V', '1', '5');
+                    return VLC_CODEC_RGB15;
                 break;
               case 8:
                 if (f->depth == 8)
-                    return VLC_FOURCC ('R', 'G', 'B', '2');
+                    return VLC_CODEC_RGB8;
                 break;
             }
             break;
@@ -288,15 +288,15 @@ static vlc_fourcc_t ParseFormat (vout_thread_t *vout,
             {
               /*untested: case 24:
                 if (f->vhorz_u_period == 1 && f->vvert_u_period == 1)
-                    return VLC_FOURCC ('I', '4', '4', '4');
+                    return VLC_CODEC_I444;
                 break;*/
               case 16:
                 if (f->vhorz_u_period == 2 && f->vvert_u_period == 1)
                 {
                     if (!strcmp ((const char *)f->vcomp_order, "YUYV"))
-                        return VLC_FOURCC ('Y', 'U', 'Y', '2');
+                        return VLC_CODEC_YUYV;
                     if (!strcmp ((const char *)f->vcomp_order, "UYVY"))
-                        return VLC_FOURCC ('U', 'Y', 'V', 'Y');
+                        return VLC_CODEC_UYVY;
                 }
                 break;
             }
@@ -308,9 +308,9 @@ static vlc_fourcc_t ParseFormat (vout_thread_t *vout,
                 if (f->vhorz_u_period == 2 && f->vvert_u_period == 2)
                 {
                     if (!strcmp ((const char *)f->vcomp_order, "YVU"))
-                        return VLC_FOURCC ('Y', 'V', '1', '2');
+                        return VLC_CODEC_YV12;
                     if (!strcmp ((const char *)f->vcomp_order, "YUV"))
-                        return VLC_FOURCC ('I', '4', '2', '0');
+                        return VLC_CODEC_I420;
                 }
             }
             break;
@@ -401,9 +401,9 @@ static int Init (vout_thread_t *vout)
         /* Video chroma in preference order */
         const vlc_fourcc_t chromas[] = {
             vout->fmt_in.i_chroma,
-            VLC_FOURCC ('Y', 'U', 'Y', '2'),
-            VLC_FOURCC ('R', 'V', '2', '4'),
-            VLC_FOURCC ('R', 'V', '1', '5'),
+            VLC_CODEC_YUYV,
+            VLC_CODEC_RGB24,
+            VLC_CODEC_RGB15,
         };
         for (size_t i = 0; i < sizeof (chromas) / sizeof (chromas[0]); i++)
         {

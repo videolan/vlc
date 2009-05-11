@@ -323,7 +323,7 @@ static int CreateFilter ( vlc_object_t *p_this )
                          KeyEvent, p_this );
     }
 
-    es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
+    es_format_Init( &p_filter->fmt_out, SPU_ES, VLC_CODEC_SPU );
     p_filter->fmt_out.i_priority = 0;
 
     vlc_gcrypt_init();
@@ -697,7 +697,7 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
 
     /* Create an empty picture for VNC the data */
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->p_pic = picture_New( VLC_FOURCC('Y','U','V','A'),
+    p_sys->p_pic = picture_New( VLC_CODEC_YUVA,
                                 p_sys->i_vnc_width, p_sys->i_vnc_height, VOUT_ASPECT_FACTOR );
     if( !p_sys->p_pic )
     {
@@ -1154,7 +1154,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('Y','U','V','A');
+    fmt.i_chroma = VLC_CODEC_YUVA;
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_pic->p[Y_PLANE].i_visible_pitch;

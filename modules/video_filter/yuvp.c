@@ -65,9 +65,9 @@ static int Open( vlc_object_t *p_this )
 
     /* It only supports YUVP to YUVA/RGBA without scaling
      * (if scaling is required another filter can do it) */
-    if( p_filter->fmt_in.video.i_chroma != VLC_FOURCC('Y','U','V','P') ||
-        ( p_filter->fmt_out.video.i_chroma != VLC_FOURCC('Y','U','V','A') &&
-          p_filter->fmt_out.video.i_chroma != VLC_FOURCC('R','G','B','A') ) ||
+    if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP ||
+        ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_YUVA &&
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA ) ||
         p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
     {
@@ -103,7 +103,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     const video_palette_t *p_yuvp = p_filter->fmt_in.video.p_palette;
 
     assert( p_yuvp != NULL );
-    assert( p_filter->fmt_in.video.i_chroma == VLC_FOURCC('Y','U','V','P') );
+    assert( p_filter->fmt_in.video.i_chroma == VLC_CODEC_YUVP );
     assert( p_filter->fmt_in.video.i_width == p_filter->fmt_out.video.i_width );
     assert( p_filter->fmt_in.video.i_height == p_filter->fmt_out.video.i_height );
 
@@ -115,7 +115,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    if( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('Y','U','V','A') )
+    if( p_filter->fmt_out.video.i_chroma == VLC_CODEC_YUVA )
     {
         for( unsigned int y = 0; y < p_filter->fmt_in.video.i_height; y++ )
         {
@@ -141,7 +141,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     else
     {
-        assert( p_filter->fmt_out.video.i_chroma == VLC_FOURCC('R','G','B','A') );
+        assert( p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGBA );
 
         /* Create a RGBA palette */
         video_palette_t rgbp;

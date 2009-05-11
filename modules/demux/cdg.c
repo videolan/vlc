@@ -94,7 +94,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
 
     /* */
-    es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_FOURCC('C','D','G', ' ' ) );
+    es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_CDG );
     p_sys->fmt.video.i_width  = 300-2*6;
     p_sys->fmt.video.i_height = 216-2*12 ;
 

@@ -286,7 +286,7 @@ int Activate ( vlc_object_t *p_this )
             }
         }
     }
-    p_vout->output.i_chroma = X112VLC_FOURCC(p_vout->output.i_chroma);
+    p_vout->output.i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, X112VLC_FOURCC(p_vout->output.i_chroma) );
 #elif defined(MODULE_NAME_IS_glx)
     {
         int i_opcode, i_evt, i_err = 0;
@@ -812,7 +812,7 @@ static int InitVideo( vout_thread_t *p_vout )
 #if XvVersion < 2 || ( XvVersion == 2 && XvRevision < 2 )
     switch( p_vout->output.i_chroma )
     {
-        case VLC_FOURCC('R','V','1','6'):
+        case VLC_CODEC_RGB16:
 #if defined( WORDS_BIGENDIAN )
             p_vout->output.i_rmask = 0xf800;
             p_vout->output.i_gmask = 0x07e0;
@@ -823,7 +823,7 @@ static int InitVideo( vout_thread_t *p_vout )
             p_vout->output.i_bmask = 0xf800;
 #endif
             break;
-        case VLC_FOURCC('R','V','1','5'):
+        case VLC_CODEC_RGB15:
 #if defined( WORDS_BIGENDIAN )
             p_vout->output.i_rmask = 0x7c00;
             p_vout->output.i_gmask = 0x03e0;
@@ -843,14 +843,14 @@ static int InitVideo( vout_thread_t *p_vout )
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB8; break;
         case 15:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB15; break;
         case 16:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB16; break;
         case 24:
         case 32:
-            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2'); break;
+            p_vout->output.i_chroma = VLC_CODEC_RGB32; break;
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->i_screen_depth );
@@ -926,12 +926,12 @@ static int InitVideo( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    if( p_vout->output.i_chroma == VLC_FOURCC('Y','V','1','2') )
+    if( p_vout->output.i_chroma == VLC_CODEC_YV12 )
     {
         /* U and V inverted compared to I420
          * Fixme: this should be handled by the vout core */
-        p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
-        p_vout->fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
+        p_vout->output.i_chroma = VLC_CODEC_I420;
+        p_vout->fmt_out.i_chroma = VLC_CODEC_I420;
     }
 
     return VLC_SUCCESS;
@@ -1958,15 +1958,15 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     switch( p_vout->output.i_chroma )
     {
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
-        case VLC_FOURCC('Y','2','1','1'):
-        case VLC_FOURCC('Y','U','Y','2'):
-        case VLC_FOURCC('U','Y','V','Y'):
-        case VLC_FOURCC('R','V','1','5'):
-        case VLC_FOURCC('R','V','1','6'):
-        case VLC_FOURCC('R','V','2','4'): /* Fixme: pixel pitch == 4 ? */
-        case VLC_FOURCC('R','V','3','2'):
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_Y211:
+        case VLC_CODEC_YUYV:
+        case VLC_CODEC_UYVY:
+        case VLC_CODEC_RGB15:
+        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB24: /* Fixme: pixel pitch == 4 ? */
+        case VLC_CODEC_RGB32:
 
             for( i_plane = 0; i_plane < p_pic->p_sys->p_image->num_planes;
                  i_plane++ )
@@ -1976,7 +1976,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 p_pic->p[i_plane].i_pitch =
                     p_pic->p_sys->p_image->pitches[i_plane];
             }
-            if( p_vout->output.i_chroma == VLC_FOURCC('Y','V','1','2') )
+            if( p_vout->output.i_chroma == VLC_CODEC_YV12 )
             {
                 /* U and V inverted compared to I420
                  * Fixme: this should be handled by the vout core */
@@ -1989,11 +1989,11 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             break;
 
 #else
-        case VLC_FOURCC('R','G','B','2'):
-        case VLC_FOURCC('R','V','1','6'):
-        case VLC_FOURCC('R','V','1','5'):
-        case VLC_FOURCC('R','V','2','4'):
-        case VLC_FOURCC('R','V','3','2'):
+        case VLC_CODEC_RGB8:
+        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB15:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_RGB32:
 
             p_pic->p->i_lines = p_pic->p_sys->p_image->height;
             p_pic->p->i_visible_lines = p_pic->p_sys->p_image->height;

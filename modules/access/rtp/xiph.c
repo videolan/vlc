@@ -250,7 +250,7 @@ static void vorbis_decode (demux_t *demux, void *data, block_t *block)
                     break;
 
                 es_format_t fmt;
-                es_format_Init (&fmt, AUDIO_ES, VLC_FOURCC ('v','o','r','b'));
+                es_format_Init (&fmt, AUDIO_ES, VLC_CODEC_VORBIS);
                 fmt.p_extra = extv;
                 fmt.i_extra = extc;
                 codec_destroy (demux, self->id);

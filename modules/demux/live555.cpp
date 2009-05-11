@@ -808,12 +808,12 @@ static int SessionsSetup( demux_t *p_demux )
                     !strcmp( sub->codecName(), "MPA-ROBUST" ) ||
                     !strcmp( sub->codecName(), "X-MP3-DRAFT-00" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'a' );
+                    tk->fmt.i_codec = VLC_CODEC_MPGA;
                     tk->fmt.audio.i_rate = 0;
                 }
                 else if( !strcmp( sub->codecName(), "AC3" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'a', '5', '2', ' ' );
+                    tk->fmt.i_codec = VLC_CODEC_A52;
                     tk->fmt.audio.i_rate = 0;
                 }
                 else if( !strcmp( sub->codecName(), "L16" ) )
@@ -828,15 +828,15 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "PCMU" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'u', 'l', 'a', 'w' );
+                    tk->fmt.i_codec = VLC_CODEC_MULAW;
                 }
                 else if( !strcmp( sub->codecName(), "PCMA" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'a', 'l', 'a', 'w' );
+                    tk->fmt.i_codec = VLC_CODEC_ALAW;
                 }
                 else if( !strncmp( sub->codecName(), "G726", 4 ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'g', '7', '2', '6' );
+                    tk->fmt.i_codec = VLC_CODEC_ADPCM_G726;
                     tk->fmt.audio.i_rate = 8000;
                     tk->fmt.audio.i_channels = 1;
                     if( !strcmp( sub->codecName()+5, "40" ) )
@@ -850,18 +850,18 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "AMR" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 's', 'a', 'm', 'r' );
+                    tk->fmt.i_codec = VLC_CODEC_AMR_NB;
                 }
                 else if( !strcmp( sub->codecName(), "AMR-WB" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 's', 'a', 'w', 'b' );
+                    tk->fmt.i_codec = VLC_CODEC_AMR_WB;
                 }
                 else if( !strcmp( sub->codecName(), "MP4A-LATM" ) )
                 {
                     unsigned int i_extra;
                     uint8_t      *p_extra;
 
-                    tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
+                    tk->fmt.i_codec = VLC_CODEC_MP4A;
 
                     if( ( p_extra = parseStreamMuxConfigStr( sub->fmtp_config(),
                                                              i_extra ) ) )
@@ -880,7 +880,7 @@ static int SessionsSetup( demux_t *p_demux )
                     unsigned int i_extra;
                     uint8_t      *p_extra;
 
-                    tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'a' );
+                    tk->fmt.i_codec = VLC_CODEC_MP4A;
 
                     if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(),
                                                            i_extra ) ) )
@@ -920,24 +920,24 @@ static int SessionsSetup( demux_t *p_demux )
                 es_format_Init( &tk->fmt, VIDEO_ES, VLC_FOURCC('u','n','d','f') );
                 if( !strcmp( sub->codecName(), "MPV" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', 'g', 'v' );
+                    tk->fmt.i_codec = VLC_CODEC_MPGV;
                 }
                 else if( !strcmp( sub->codecName(), "H263" ) ||
                          !strcmp( sub->codecName(), "H263-1998" ) ||
                          !strcmp( sub->codecName(), "H263-2000" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '3' );
+                    tk->fmt.i_codec = VLC_CODEC_H263;
                 }
                 else if( !strcmp( sub->codecName(), "H261" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'H', '2', '6', '1' );
+                    tk->fmt.i_codec = VLC_CODEC_H261;
                 }
                 else if( !strcmp( sub->codecName(), "H264" ) )
                 {
                     unsigned int i_extra = 0;
                     uint8_t      *p_extra = NULL;
 
-                    tk->fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+                    tk->fmt.i_codec = VLC_CODEC_H264;
                     tk->fmt.b_packetized = false;
 
                     if((p_extra=parseH264ConfigStr( sub->fmtp_spropparametersets(),
@@ -952,14 +952,14 @@ static int SessionsSetup( demux_t *p_demux )
                 }
                 else if( !strcmp( sub->codecName(), "JPEG" ) )
                 {
-                    tk->fmt.i_codec = VLC_FOURCC( 'M', 'J', 'P', 'G' );
+                    tk->fmt.i_codec = VLC_CODEC_MJPG;
                 }
                 else if( !strcmp( sub->codecName(), "MP4V-ES" ) )
                 {
                     unsigned int i_extra;
                     uint8_t      *p_extra;
 
-                    tk->fmt.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
+                    tk->fmt.i_codec = VLC_CODEC_MP4V;
 
                     if( ( p_extra = parseGeneralConfigStr( sub->fmtp_config(),
                                                            i_extra ) ) )
@@ -1631,8 +1631,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
         msg_Warn( p_demux, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
-    if( tk->fmt.i_codec == VLC_FOURCC('s','a','m','r') ||
-        tk->fmt.i_codec == VLC_FOURCC('s','a','w','b') )
+    if( tk->fmt.i_codec == VLC_CODEC_AMR_NB ||
+        tk->fmt.i_codec == VLC_CODEC_AMR_WB )
     {
         AMRAudioSource *amrSource = (AMRAudioSource*)tk->sub->readSource();
 
@@ -1640,7 +1640,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         p_block->p_buffer[0] = amrSource->lastFrameHeader();
         memcpy( p_block->p_buffer + 1, tk->p_buffer, i_size );
     }
-    else if( tk->fmt.i_codec == VLC_FOURCC('H','2','6','1') )
+    else if( tk->fmt.i_codec == VLC_CODEC_H261 )
     {
         H261VideoRTPSource *h261Source = (H261VideoRTPSource*)tk->sub->rtpSource();
         uint32_t header = h261Source->lastSpecialHeader();
@@ -1651,7 +1651,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         if( tk->sub->rtpSource()->curPacketMarkerBit() )
             p_block->i_flags |= BLOCK_FLAG_END_OF_FRAME;
     }
-    else if( tk->fmt.i_codec == VLC_FOURCC('h','2','6','4') )
+    else if( tk->fmt.i_codec == VLC_CODEC_H264 )
     {
         if( (tk->p_buffer[0] & 0x1f) >= 24 )
             msg_Warn( p_demux, "unsupported NAL type for H264" );
@@ -1694,7 +1694,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     if( !tk->b_muxed )
     {
         /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
-        p_block->i_dts = ( tk->fmt.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ) ? 0 : i_pts;
+        p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? 0 : i_pts;
     }
 
     if( tk->b_muxed )

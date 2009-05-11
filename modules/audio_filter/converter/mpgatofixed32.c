@@ -87,10 +87,10 @@ static int Create( vlc_object_t *p_this )
     aout_filter_t *p_filter = (aout_filter_t *)p_this;
     struct filter_sys_t *p_sys;
 
-    if ( (p_filter->input.i_format != VLC_FOURCC('m','p','g','a')
+    if ( (p_filter->input.i_format != VLC_CODEC_MPGA
            && p_filter->input.i_format != VLC_FOURCC('m','p','g','3'))
-            || (p_filter->output.i_format != VLC_FOURCC('f','l','3','2')
-                 && p_filter->output.i_format != VLC_FOURCC('f','i','3','2')) )
+            || (p_filter->output.i_format != VLC_CODEC_FL32
+                 && p_filter->output.i_format != VLC_CODEC_FI32) )
     {
         return -1;
     }
@@ -147,7 +147,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     if( p_sys->i_reject_count > 0 )
     {
-        if( p_filter->output.i_format == VLC_FOURCC('f','l','3','2') )
+        if( p_filter->output.i_format == VLC_CODEC_FL32 )
         {
             int i;
             int i_size = p_out_buf->i_nb_bytes / sizeof(float);
@@ -167,7 +167,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 
-    if ( p_filter->output.i_format == VLC_FOURCC('f','i','3','2') )
+    if ( p_filter->output.i_format == VLC_CODEC_FI32 )
     {
         /* Interleave and keep buffers in mad_fixed_t format */
         mad_fixed_t * p_samples = (mad_fixed_t *)p_out_buf->p_buffer;
@@ -304,7 +304,7 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
 
-    if( p_filter->fmt_in.i_codec != VLC_FOURCC('m','p','g','a') &&
+    if( p_filter->fmt_in.i_codec != VLC_CODEC_MPGA &&
         p_filter->fmt_in.i_codec != VLC_FOURCC('m','p','g','3') )
     {
         return VLC_EGENERIC;
@@ -325,9 +325,9 @@ static int OpenFilter( vlc_object_t *p_this )
     mad_stream_options( &p_sys->mad_stream, MAD_OPTION_IGNORECRC );
 
     if( vlc_CPU() & CPU_CAPABILITY_FPU )
-        p_filter->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_filter->fmt_out.i_codec = VLC_CODEC_FL32;
     else
-        p_filter->fmt_out.i_codec = VLC_FOURCC('f','i','3','2');
+        p_filter->fmt_out.i_codec = VLC_CODEC_FI32;
     p_filter->fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
     p_filter->fmt_out.audio.i_bitspersample =
         aout_BitsPerSample( p_filter->fmt_out.i_codec );

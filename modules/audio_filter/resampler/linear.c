@@ -90,7 +90,7 @@ static int Create( vlc_object_t *p_this )
               != p_filter->output.i_physical_channels
           || p_filter->input.i_original_channels
               != p_filter->output.i_original_channels
-          || p_filter->input.i_format != VLC_FOURCC('f','l','3','2') )
+          || p_filter->input.i_format != VLC_CODEC_FL32 )
     {
         return VLC_EGENERIC;
     }
@@ -248,7 +248,7 @@ static int OpenFilter( vlc_object_t *p_this )
     int i_out_rate  = p_filter->fmt_out.audio.i_rate;
 
     if( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate ||
-        p_filter->fmt_in.i_codec != VLC_FOURCC('f','l','3','2') )
+        p_filter->fmt_in.i_codec != VLC_CODEC_FL32 )
     {
         return VLC_EGENERIC;
     }

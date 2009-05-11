@@ -150,12 +150,12 @@ static int Open( vlc_object_t * p_this )
 
     /* */
 #ifndef MPC_FIXED_POINT
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'f', 'l', '3', '2' ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_FL32 );
 #else
 #   ifdef WORDS_BIGENDIAN
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 's', '3', '2', 'b' ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_S32B );
 #   else
-    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 's', '3', '2', 'l' ) );
+    es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_S32L );
 #   endif
 #endif
     fmt.audio.i_channels = p_sys->info.channels;

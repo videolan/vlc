@@ -290,7 +290,7 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
  *****************************************************************************/
 static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output )
 {
-    if( p_input->i_format != VLC_FOURCC('f','l','3','2') ||
+    if( p_input->i_format != VLC_CODEC_FL32 ||
           p_input->i_format != p_output->i_format ||
           p_input->i_rate != p_output->i_rate )
         return false;

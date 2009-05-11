@@ -97,8 +97,8 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if ( p_filter->input.i_format != VLC_CODEC_FL32
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         return VLC_EGENERIC;
     }

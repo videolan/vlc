@@ -326,7 +326,7 @@ static int Open( vlc_object_t *p_this )
 
     if ( val.i_int == AOUT_VAR_SPDIF )
     {
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
     }
     else if ( val.i_int == AOUT_VAR_5_1 )
     {
@@ -388,7 +388,7 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.output.i_format = VLC_CODEC_SPDIFL;
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
@@ -415,22 +415,22 @@ static int Open( vlc_object_t *p_this )
         switch ( i_format )
         {
         case AFMT_U8:
-            p_aout->output.output.i_format = VLC_FOURCC('u','8',' ',' ');
+            p_aout->output.output.i_format = VLC_CODEC_U8;
             break;
         case AFMT_S8:
-            p_aout->output.output.i_format = VLC_FOURCC('s','8',' ',' ');
+            p_aout->output.output.i_format = VLC_CODEC_S8;
             break;
         case AFMT_U16_LE:
-            p_aout->output.output.i_format = VLC_FOURCC('u','1','6','l');
+            p_aout->output.output.i_format = VLC_CODEC_U16L;
             break;
         case AFMT_S16_LE:
-            p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l');
+            p_aout->output.output.i_format = VLC_CODEC_S16L;
             break;
         case AFMT_U16_BE:
-            p_aout->output.output.i_format = VLC_FOURCC('u','1','6','b');
+            p_aout->output.output.i_format = VLC_CODEC_U16B;
             break;
         case AFMT_S16_BE:
-            p_aout->output.output.i_format = VLC_FOURCC('s','1','6','b');
+            p_aout->output.output.i_format = VLC_CODEC_S16B;
             break;
         default:
             msg_Err( p_aout, "OSS fell back to an unknown format (%d)",
@@ -598,7 +598,7 @@ static void* OSSThread( vlc_object_t *p_this )
         int i_tmp, i_size;
         uint8_t * p_bytes;
 
-        if ( p_aout->output.output.i_format != VLC_FOURCC('s','p','d','i') )
+        if ( p_aout->output.output.i_format != VLC_CODEC_SPDIFL )
         {
             mtime_t buffered = BufferDuration( p_aout );
 

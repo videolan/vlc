@@ -187,15 +187,15 @@ static const codec_dll decoders_table[] =
     { VLC_FOURCC('W','V','C','1'), "wvc1dmod.dll", &guid_wvc1 },
     { VLC_FOURCC('w','v','c','1'), "wvc1dmod.dll", &guid_wvc1 },
     /* WMV3 */
-    { VLC_FOURCC('W','M','V','3'), "wmv9dmod.dll", &guid_wmv9 },
+    { VLC_CODEC_WMV3, "wmv9dmod.dll", &guid_wmv9 },
     { VLC_FOURCC('w','m','v','3'), "wmv9dmod.dll", &guid_wmv9 },
     { VLC_FOURCC('W','M','V','P'), "wmv9dmod.dll", &guid_wmv9 },
     { VLC_FOURCC('w','m','v','p'), "wmv9dmod.dll", &guid_wmv9 },
     /* WMV2 */
-    { VLC_FOURCC('W','M','V','2'), "wmvdmod.dll", &guid_wmv },
+    { VLC_CODEC_WMV2, "wmvdmod.dll", &guid_wmv },
     { VLC_FOURCC('w','m','v','2'), "wmvdmod.dll", &guid_wmv },
     /* WMV1 */
-    { VLC_FOURCC('W','M','V','1'), "wmvdmod.dll", &guid_wmv },
+    { VLC_CODEC_WMV1, "wmvdmod.dll", &guid_wmv },
     { VLC_FOURCC('w','m','v','1'), "wmvdmod.dll", &guid_wmv },
     /* Screen codecs */
     { VLC_FOURCC('M','S','S','2'), "wmsdmod.dll", &guid_wms },
@@ -211,14 +211,14 @@ static const codec_dll decoders_table[] =
     /* WMA 3 */
     { VLC_FOURCC('W','M','A','3'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','3'), "wma9dmod.dll", &guid_wma9 },
-    { VLC_FOURCC('W','M','A','P'), "wma9dmod.dll", &guid_wma9 },
+    { VLC_CODEC_WMAP, "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','p'), "wma9dmod.dll", &guid_wma9 },
     /* WMA 2 */
-    { VLC_FOURCC('W','M','A','2'), "wma9dmod.dll", &guid_wma9 },
+    { VLC_CODEC_WMA2, "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','2'), "wma9dmod.dll", &guid_wma9 },
 
     /* WMA Speech */
-    { VLC_FOURCC('W','M','A','S'), "wmspdmod.dll", &guid_wma },
+    { VLC_CODEC_WMAS, "wmspdmod.dll", &guid_wma },
     { VLC_FOURCC('w','m','a','s'), "wmspdmod.dll", &guid_wma },
 
     /* */
@@ -228,20 +228,20 @@ static const codec_dll decoders_table[] =
 static const codec_dll encoders_table[] =
 {
     /* WMV3 */
-    { VLC_FOURCC('W','M','V','3'), "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_CODEC_WMV3, "wmvdmoe2.dll", &guid_wmv_enc2 },
     { VLC_FOURCC('w','m','v','3'), "wmvdmoe2.dll", &guid_wmv_enc2 },
     /* WMV2 */
-    { VLC_FOURCC('W','M','V','2'), "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_CODEC_WMV2, "wmvdmoe2.dll", &guid_wmv_enc2 },
     { VLC_FOURCC('w','m','v','2'), "wmvdmoe2.dll", &guid_wmv_enc2 },
     /* WMV1 */
-    { VLC_FOURCC('W','M','V','1'), "wmvdmoe2.dll", &guid_wmv_enc2 },
+    { VLC_CODEC_WMV1, "wmvdmoe2.dll", &guid_wmv_enc2 },
     { VLC_FOURCC('w','m','v','1'), "wmvdmoe2.dll", &guid_wmv_enc2 },
 
     /* WMA 3 */
     { VLC_FOURCC('W','M','A','3'), "wmadmoe.dll", &guid_wma_enc },
     { VLC_FOURCC('w','m','a','3'), "wmadmoe.dll", &guid_wma_enc },
     /* WMA 2 */
-    { VLC_FOURCC('W','M','A','2'), "wmadmoe.dll", &guid_wma_enc },
+    { VLC_CODEC_WMA2, "wmadmoe.dll", &guid_wma_enc },
     { VLC_FOURCC('w','m','a','2'), "wmadmoe.dll", &guid_wma_enc },
 
     /* */
@@ -502,14 +502,14 @@ static int DecOpen( decoder_t *p_dec )
     {
         BITMAPINFOHEADER *p_bih;
         DMO_MEDIA_TYPE mt;
-        unsigned i_chroma = VLC_FOURCC('Y','U','Y','2');
+        unsigned i_chroma = VLC_CODEC_YUYV;
         int i_planes = 1, i_bpp = 16;
         int i = 0;
 
         /* Find out which chroma to use */
         while( !p_dmo->vt->GetOutputType( p_dmo, 0, i++, &mt ) )
         {
-            if( mt.subtype.Data1 == VLC_FOURCC('Y','V','1','2') )
+            if( mt.subtype.Data1 == VLC_CODEC_YV12 )
             {
                 i_chroma = mt.subtype.Data1;
                 i_planes = 3; i_bpp = 12;
@@ -518,8 +518,8 @@ static int DecOpen( decoder_t *p_dec )
             DMOFreeMediaType( &mt );
         }
 
-        p_dec->fmt_out.i_codec = i_chroma == VLC_FOURCC('Y','V','1','2') ?
-            VLC_FOURCC('I','4','2','0') : i_chroma;
+        p_dec->fmt_out.i_codec = i_chroma == VLC_CODEC_YV12 ?
+            VLC_CODEC_I420 : i_chroma;
         p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
         p_dec->fmt_out.video.i_height = p_dec->fmt_in.video.i_height;
         p_dec->fmt_out.video.i_bits_per_pixel = i_bpp;
@@ -1122,7 +1122,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     memset( &vih, 0, sizeof(VIDEOINFOHEADER) );
 
     p_bih = &vih.bmiHeader;
-    p_bih->biCompression = VLC_FOURCC('I','4','2','0');
+    p_bih->biCompression = VLC_CODEC_I420;
     p_bih->biWidth = p_enc->fmt_in.video.i_width;
     p_bih->biHeight = p_enc->fmt_in.video.i_height;
     p_bih->biBitCount = p_enc->fmt_in.video.i_bits_per_pixel;
@@ -1237,7 +1237,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     i_err = p_dmo->vt->SetOutputType( p_dmo, 0, &dmo_type, 0 );
 
     p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
-    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
+    p_enc->fmt_in.i_codec = VLC_CODEC_I420;
 
     DMOFreeMediaType( &dmo_type );
     if( i_err )

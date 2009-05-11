@@ -49,7 +49,7 @@ static int Open( vlc_object_t *p_this )
 
     switch( p_enc->fmt_out.i_codec )
     {
-        case VLC_FOURCC('s','u','b','t'):
+        case VLC_CODEC_SUBT:
             if( ( p_enc->fmt_out.subs.psz_encoding != NULL )
              && strcasecmp( p_enc->fmt_out.subs.psz_encoding, "utf8" )
              && strcasecmp( p_enc->fmt_out.subs.psz_encoding, "UTF-8" ) )
@@ -92,7 +92,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
 
     p_region = p_spu->p_region;
     if( ( p_region == NULL )
-     || ( p_region->fmt.i_chroma != VLC_FOURCC('T','E','X','T') )
+     || ( p_region->fmt.i_chroma != VLC_CODEC_TEXT )
      || ( p_region->psz_text == NULL ) )
         return NULL;
 

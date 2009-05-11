@@ -86,7 +86,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         /* Planar YUV */
-        case VLC_FOURCC('h','2','6','1'):
+        case VLC_CODEC_H261:
         case VLC_FOURCC('H','2','6','1'):
             break;
 
@@ -105,7 +105,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('I','4','2','0');
+    p_dec->fmt_out.i_codec = VLC_CODEC_I420;
 
     /* Set callbacks */
     p_dec->pf_decode_video = (picture_t *(*)(decoder_t *, block_t **))
@@ -192,7 +192,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Dbg( p_dec, "video size is perhaps %dx%d", i_width,
                   i_height);
-        vout_InitFormat( &p_dec->fmt_out.video, VLC_FOURCC('I','4','2','0'),
+        vout_InitFormat( &p_dec->fmt_out.video, VLC_CODEC_I420,
                          i_width, i_height,
                          VOUT_ASPECT_FACTOR * i_width / i_height );
         p_sys->b_inited = true;

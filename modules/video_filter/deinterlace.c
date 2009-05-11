@@ -310,7 +310,7 @@ static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
     }
     else
     {
-        const bool b_i422 = p_vout->render.i_chroma == VLC_FOURCC('I','4','2','2');
+        const bool b_i422 = p_vout->render.i_chroma == VLC_CODEC_I422;
         if( strcmp( psz_method, "discard" ) )
             msg_Err( p_vout, "no valid deinterlace mode provided, "
                      "using \"discard\"" );
@@ -336,17 +336,17 @@ static void GetOutputFormat( vout_thread_t *p_vout,
         p_dst->i_sar_den *= 2;
     }
 
-    if( p_src->i_chroma == VLC_FOURCC('I','4','2','2') )
+    if( p_src->i_chroma == VLC_CODEC_I422 )
     {
         switch( p_vout->p_sys->i_mode )
         {
         case DEINTERLACE_MEAN:
         case DEINTERLACE_LINEAR:
         case DEINTERLACE_X:
-            p_dst->i_chroma = VLC_FOURCC('I','4','2','2');
+            p_dst->i_chroma = VLC_CODEC_I422;
             break;
         default:
-            p_dst->i_chroma = VLC_FOURCC('I','4','2','0');
+            p_dst->i_chroma = VLC_CODEC_I420;
             break;
         }
     }
@@ -354,10 +354,9 @@ static void GetOutputFormat( vout_thread_t *p_vout,
 
 static bool IsChromaSupported( vlc_fourcc_t i_chroma )
 {
-    return i_chroma == VLC_FOURCC('I','4','2','0') ||
-           i_chroma == VLC_FOURCC('I','Y','U','V') ||
-           i_chroma == VLC_FOURCC('Y','V','1','2') ||
-           i_chroma == VLC_FOURCC('I','4','2','2');
+    return i_chroma == VLC_CODEC_I420 ||
+           i_chroma == VLC_CODEC_YV12 ||
+           i_chroma == VLC_CODEC_I422;
 }
 
 /*****************************************************************************
@@ -608,9 +607,8 @@ static void RenderDiscard( vout_thread_t *p_vout,
 
         switch( p_vout->render.i_chroma )
         {
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
 
             for( ; p_out < p_out_end ; )
             {
@@ -621,7 +619,7 @@ static void RenderDiscard( vout_thread_t *p_vout,
             }
             break;
 
-        case VLC_FOURCC('I','4','2','2'):
+        case VLC_CODEC_I422:
 
             i_increment = 2 * p_pic->p[i_plane].i_pitch;
 
@@ -673,9 +671,8 @@ static void RenderBob( vout_thread_t *p_vout,
 
         switch( p_vout->render.i_chroma )
         {
-            case VLC_FOURCC('I','4','2','0'):
-            case VLC_FOURCC('I','Y','U','V'):
-            case VLC_FOURCC('Y','V','1','2'):
+            case VLC_CODEC_I420:
+            case VLC_CODEC_YV12:
                 /* For BOTTOM field we need to add the first line */
                 if( i_field == 1 )
                 {
@@ -709,7 +706,7 @@ static void RenderBob( vout_thread_t *p_vout,
                 }
                 break;
 
-            case VLC_FOURCC('I','4','2','2'):
+            case VLC_CODEC_I422:
                 /* For BOTTOM field we need to add the first line */
                 if( i_field == 1 )
                 {
@@ -863,9 +860,8 @@ static void RenderBlend( vout_thread_t *p_vout,
 
         switch( p_vout->render.i_chroma )
         {
-            case VLC_FOURCC('I','4','2','0'):
-            case VLC_FOURCC('I','Y','U','V'):
-            case VLC_FOURCC('Y','V','1','2'):
+            case VLC_CODEC_I420:
+            case VLC_CODEC_YV12:
                 /* First line: simple copy */
                 vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                 p_out += p_outpic->p[i_plane].i_pitch;
@@ -881,7 +877,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                 }
                 break;
 
-            case VLC_FOURCC('I','4','2','2'):
+            case VLC_CODEC_I422:
                 /* First line: simple copy */
                 vlc_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
                 p_out += p_outpic->p[i_plane].i_pitch;

@@ -172,14 +172,15 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( strlen( psz_chroma ) != 4 )
     {
         msg_Warn( p_dec, "Invalid chroma (%s). Using I420.", psz_chroma );
-        fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
+        fmt_out.i_chroma = VLC_CODEC_I420;
     }
     else
     {
-        fmt_out.i_chroma = VLC_FOURCC( psz_chroma[0],
-                                       psz_chroma[1],
-                                       psz_chroma[2],
-                                       psz_chroma[3] );
+        fmt_out.i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
+                                                VLC_FOURCC( psz_chroma[0],
+                                                            psz_chroma[1],
+                                                            psz_chroma[2],
+                                                            psz_chroma[3] ) );
     }
     free( psz_chroma );
 

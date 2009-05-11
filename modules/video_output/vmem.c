@@ -148,8 +148,9 @@ static int Init( vout_thread_t *p_vout )
             free( psz_chroma );
             return VLC_EGENERIC;
         }
-        i_chroma = VLC_FOURCC( psz_chroma[0], psz_chroma[1],
-                               psz_chroma[2], psz_chroma[3] );
+        i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
+                                        VLC_FOURCC( psz_chroma[0], psz_chroma[1],
+                                                    psz_chroma[2], psz_chroma[3] ) );
         free( psz_chroma );
     }
     else
@@ -189,25 +190,25 @@ static int Init( vout_thread_t *p_vout )
     /* Define the bitmasks */
     switch( i_chroma )
     {
-      case VLC_FOURCC( 'R','V','1','5' ):
+      case VLC_CODEC_RGB15:
         p_vout->output.i_rmask = 0x001f;
         p_vout->output.i_gmask = 0x03e0;
         p_vout->output.i_bmask = 0x7c00;
         break;
 
-      case VLC_FOURCC( 'R','V','1','6' ):
+      case VLC_CODEC_RGB16:
         p_vout->output.i_rmask = 0x001f;
         p_vout->output.i_gmask = 0x07e0;
         p_vout->output.i_bmask = 0xf800;
         break;
 
-      case VLC_FOURCC( 'R','V','2','4' ):
+      case VLC_CODEC_RGB24:
         p_vout->output.i_rmask = 0xff0000;
         p_vout->output.i_gmask = 0x00ff00;
         p_vout->output.i_bmask = 0x0000ff;
         break;
 
-      case VLC_FOURCC( 'R','V','3','2' ):
+      case VLC_CODEC_RGB32:
         p_vout->output.i_rmask = 0xff0000;
         p_vout->output.i_gmask = 0x00ff00;
         p_vout->output.i_bmask = 0x0000ff;

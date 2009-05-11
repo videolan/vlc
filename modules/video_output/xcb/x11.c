@@ -148,26 +148,26 @@ static int Open (vlc_object_t *obj)
         {
           case 24:
             if (fmt->bits_per_pixel == 32)
-                chroma = VLC_FOURCC ('R', 'V', '3', '2');
+                chroma = VLC_CODEC_RGB32;
             else if (fmt->bits_per_pixel == 24)
-                chroma = VLC_FOURCC ('R', 'V', '2', '4');
+                chroma = VLC_CODEC_RGB24;
             else
                 continue;
             break;
           case 16:
             if (fmt->bits_per_pixel != 16)
                 continue;
-            chroma = VLC_FOURCC ('R', 'V', '1', '6');
+            chroma = VLC_CODEC_RGB16;
             break;
           case 15:
             if (fmt->bits_per_pixel != 16)
                 continue;
-            chroma = VLC_FOURCC ('R', 'V', '1', '5');
+            chroma = VLC_CODEC_RGB15;
             break;
           case 8:
             if (fmt->bits_per_pixel != 8)
                 continue;
-            chroma = VLC_FOURCC ('R', 'G', 'B', '2');
+            chroma = VLC_CODEC_RGB8;
             break;
           default:
             continue;
@@ -202,7 +202,7 @@ static int Open (vlc_object_t *obj)
                 if (!gray)
                     continue; /* Prefer color over gray scale */
                 vid = vt->visual_id;
-                chroma = VLC_FOURCC ('G', 'R', 'E', 'Y');
+                chroma = VLC_CODEC_GREY;
             }
         }
 

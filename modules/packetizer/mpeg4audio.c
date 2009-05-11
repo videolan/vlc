@@ -193,7 +193,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'm', 'p', '4', 'a' ) )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MP4A )
     {
         return VLC_EGENERIC;
     }
@@ -211,7 +211,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('m','p','4','a');
+    p_dec->fmt_out.i_codec = VLC_CODEC_MP4A;
 
     msg_Dbg( p_dec, "running MPEG4 audio packetizer" );
 

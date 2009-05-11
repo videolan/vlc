@@ -232,8 +232,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
-        case VLC_FOURCC('s','u','b','t'):
-        case VLC_FOURCC('s','s','a',' '):
+        case VLC_CODEC_SUBT:
+        case VLC_CODEC_SSA:
         case VLC_FOURCC('t','1','4','0'):
             break;
         default:
@@ -315,7 +315,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     var_Get( p_dec, "subsdec-align", &val );
     p_sys->i_align = val.i_int;
 
-    if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ')
+    if( p_dec->fmt_in.i_codec == VLC_CODEC_SSA
      && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
     {
         if( p_dec->fmt_in.i_extra > 0 )
@@ -492,7 +492,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_chroma = VLC_CODEC_TEXT;
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
@@ -506,7 +506,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Decode and format the subpicture unit */
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_SSA )
     {
         /* Normal text subs, easy markup */
         p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;

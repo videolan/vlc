@@ -345,7 +345,7 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     }
     else
     {
-        p_dec->fmt_out.i_codec = i_bits == 16 ? VLC_FOURCC('s','1','6','l') : VLC_FOURCC('s','2','4','l');
+        p_dec->fmt_out.i_codec = i_bits == 16 ? VLC_CODEC_S16L : VLC_CODEC_S24L;
         p_dec->fmt_out.audio.i_bitspersample = i_bits == 16 ? 16 : 24;
     }
 

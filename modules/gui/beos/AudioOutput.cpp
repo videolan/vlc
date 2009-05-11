@@ -97,7 +97,7 @@ int OpenAudio ( vlc_object_t * p_this )
 #endif
     p_format->buffer_size = 8192;
 
-    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    p_aout->output.output.i_format = VLC_CODEC_FL32;
     p_aout->output.i_nb_samples = 2048 / i_nb_channels;
     p_aout->output.pf_play = DoNothing;
 

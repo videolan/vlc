@@ -92,7 +92,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
 
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
-    fmt.i_chroma = VLC_FOURCC('T','E','X','T');
+    fmt.i_chroma = VLC_CODEC_TEXT;
     fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;

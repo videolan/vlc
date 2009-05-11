@@ -92,36 +92,36 @@ static int OpenDecoder( vlc_object_t *p_this )
     switch( p_dec->fmt_in.i_codec )
     {
         /* Planar YUV */
-        case VLC_FOURCC('I','4','4','4'):
-        case VLC_FOURCC('I','4','2','2'):
-        case VLC_FOURCC('I','4','2','0'):
-        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_CODEC_I444:
+        case VLC_CODEC_I422:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_YV12:
         case VLC_FOURCC('I','Y','U','V'):
-        case VLC_FOURCC('I','4','1','1'):
-        case VLC_FOURCC('I','4','1','0'):
+        case VLC_CODEC_I411:
+        case VLC_CODEC_I410:
         case VLC_FOURCC('Y','V','U','9'):
         case VLC_FOURCC('Y','4','2','B'):
         case VLC_FOURCC('Y','4','1','B'):
 
         /* Packed YUV */
-        case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_CODEC_YUYV:
         case VLC_FOURCC('Y','8','0','0'):
-        case VLC_FOURCC('U','Y','V','Y'):
+        case VLC_CODEC_UYVY:
         case VLC_FOURCC('H','D','Y','C'):
 
         /* RGB */
-        case VLC_FOURCC('R','V','3','2'):
-        case VLC_FOURCC('R','V','2','4'):
-        case VLC_FOURCC('R','V','1','6'):
-        case VLC_FOURCC('R','V','1','5'):
+        case VLC_CODEC_RGB32:
+        case VLC_CODEC_RGB24:
+        case VLC_CODEC_RGB16:
+        case VLC_CODEC_RGB15:
             break;
         case VLC_FOURCC('2','V','u','y'):
         case VLC_FOURCC('2','v','u','y'):
         case VLC_FOURCC('A','V','U','I'):
-            p_dec->fmt_in.i_codec = VLC_FOURCC('U','Y','V','Y');
+            p_dec->fmt_in.i_codec = VLC_CODEC_UYVY;
             break;
         case VLC_FOURCC('y','v','1','2'):
-            p_dec->fmt_in.i_codec = VLC_FOURCC('Y','V','1','2');
+            p_dec->fmt_in.i_codec = VLC_CODEC_YV12;
             break;
 
         default:

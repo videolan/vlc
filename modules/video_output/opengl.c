@@ -250,16 +250,16 @@ static int Init( vout_thread_t *p_vout )
 
 /* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
 #if ( defined( WORDS_BIGENDIAN ) && VLCGL_FORMAT == GL_YCBCR_422_APPLE ) || (VLCGL_FORMAT == YCBCR_MESA)
-    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+    p_vout->output.i_chroma = VLC_CODEC_YUYV;
     i_pixel_pitch = 2;
 
 #elif (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
-    p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+    p_vout->output.i_chroma = VLC_CODEC_UYVY;
     i_pixel_pitch = 2;
 
 #elif VLCGL_FORMAT == GL_RGB
 #   if VLCGL_TYPE == GL_UNSIGNED_BYTE
-    p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+    p_vout->output.i_chroma = VLC_CODEC_RGB24;
 #       if defined( WORDS_BIGENDIAN )
     p_vout->output.i_rmask = 0x00ff0000;
     p_vout->output.i_gmask = 0x0000ff00;
@@ -271,7 +271,7 @@ static int Init( vout_thread_t *p_vout )
 #       endif
     i_pixel_pitch = 3;
 #   else
-    p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+    p_vout->output.i_chroma = VLC_CODEC_RGB16;
 #       if defined( WORDS_BIGENDIAN )
     p_vout->output.i_rmask = 0x001f;
     p_vout->output.i_gmask = 0x07e0;
@@ -284,7 +284,7 @@ static int Init( vout_thread_t *p_vout )
     i_pixel_pitch = 2;
 #   endif
 #else
-    p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+    p_vout->output.i_chroma = VLC_CODEC_RGB32;
 #       if defined( WORDS_BIGENDIAN )
     p_vout->output.i_rmask = 0xff000000;
     p_vout->output.i_gmask = 0x00ff0000;

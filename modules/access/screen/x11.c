@@ -68,14 +68,14 @@ int screen_InitCapture( demux_t *p_demux )
     switch( win_info.depth )
     {
     case 8: /* FIXME: set the palette */
-        i_chroma = VLC_FOURCC('R','G','B','2'); break;
+        i_chroma = VLC_CODEC_RGB8; break;
     case 15:
-        i_chroma = VLC_FOURCC('R','V','1','5'); break;
+        i_chroma = VLC_CODEC_RGB15; break;
     case 16:
-        i_chroma = VLC_FOURCC('R','V','1','6'); break;
+        i_chroma = VLC_CODEC_RGB16; break;
     case 24:
     case 32:
-        i_chroma = VLC_FOURCC('R','V','3','2');
+        i_chroma = VLC_CODEC_RGB32;
         win_info.depth = 32;
         break;
     default:

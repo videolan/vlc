@@ -132,10 +132,10 @@ static int Create_F32ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if( ( p_filter->input.i_format != VLC_FOURCC('f','i','3','2')
-           || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
-      && ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
-            || p_filter->output.i_format != VLC_FOURCC('f','i','3','2') ) )
+    if( ( p_filter->input.i_format != VLC_CODEC_FI32
+           || p_filter->output.i_format != VLC_CODEC_FL32 )
+      && ( p_filter->input.i_format != VLC_CODEC_FL32
+            || p_filter->output.i_format != VLC_CODEC_FI32 ) )
     {
         return -1;
     }
@@ -145,7 +145,7 @@ static int Create_F32ToFL32( vlc_object_t *p_this )
         return -1;
     }
 
-    if( p_filter->input.i_format == VLC_FOURCC('f','i','3','2') )
+    if( p_filter->input.i_format == VLC_CODEC_FI32 )
     {
         p_filter->pf_do_work = Do_F32ToFL32;
     }
@@ -202,7 +202,7 @@ static int Create_FL32ToS16( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
+    if ( p_filter->input.i_format != VLC_CODEC_FL32
           || p_filter->output.i_format != AOUT_FMT_S16_NE )
     {
         return -1;
@@ -257,8 +257,8 @@ static int Create_FL32ToS8( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
-          || p_filter->output.i_format != VLC_FOURCC('s','8',' ',' ') )
+    if ( p_filter->input.i_format != VLC_CODEC_FL32
+          || p_filter->output.i_format != VLC_CODEC_S8 )
     {
         return -1;
     }
@@ -302,7 +302,7 @@ static int Create_FL32ToU16( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
+    if ( p_filter->input.i_format != VLC_CODEC_FL32
           || p_filter->output.i_format != AOUT_FMT_U16_NE )
     {
         return -1;
@@ -347,8 +347,8 @@ static int Create_FL32ToU8( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
-          || p_filter->output.i_format != VLC_FOURCC('u','8',' ',' ') )
+    if ( p_filter->input.i_format != VLC_CODEC_FL32
+          || p_filter->output.i_format != VLC_CODEC_U8 )
     {
         return -1;
     }
@@ -395,7 +395,7 @@ static int Create_S16ToFL32( vlc_object_t *p_this )
     if ( ( p_filter->input.i_format != AOUT_FMT_S16_NE &&
            p_filter->input.i_format != AOUT_FMT_S24_NE &&
            p_filter->input.i_format != AOUT_FMT_S32_NE )
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }
@@ -505,9 +505,9 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
         return -1;
     }
 
-    if ( (p_filter->input.i_format == VLC_FOURCC('s','1','6','l') ||
-         p_filter->input.i_format == VLC_FOURCC('s','1','6','b'))
-         && p_filter->output.i_format == VLC_FOURCC('f','l','3','2')
+    if ( (p_filter->input.i_format == VLC_CODEC_S16L ||
+         p_filter->input.i_format == VLC_CODEC_S16B)
+         && p_filter->output.i_format == VLC_CODEC_FL32
          && p_filter->input.i_format != AOUT_FMT_S16_NE )
     {
         p_filter->pf_do_work = Do_S16ToFL32_SW;
@@ -516,9 +516,9 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
         return 0;
     }
 
-    if ( (p_filter->input.i_format == VLC_FOURCC('s','2','4','l') ||
-         p_filter->input.i_format == VLC_FOURCC('s','2','4','b'))
-         && p_filter->output.i_format == VLC_FOURCC('f','l','3','2')
+    if ( (p_filter->input.i_format == VLC_CODEC_S24L ||
+         p_filter->input.i_format == VLC_CODEC_S24B)
+         && p_filter->output.i_format == VLC_CODEC_FL32
          && p_filter->input.i_format != AOUT_FMT_S24_NE )
     {
         p_filter->pf_do_work = Do_S24ToFL32_SW;
@@ -527,9 +527,9 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
         return 0;
     }
 
-    if ( (p_filter->input.i_format == VLC_FOURCC('s','3','2','l') ||
-         p_filter->input.i_format == VLC_FOURCC('s','3','2','b'))
-         && p_filter->output.i_format == VLC_FOURCC('f','l','3','2')
+    if ( (p_filter->input.i_format == VLC_CODEC_S32L ||
+         p_filter->input.i_format == VLC_CODEC_S32B)
+         && p_filter->output.i_format == VLC_CODEC_FL32
          && p_filter->input.i_format != AOUT_FMT_S32_NE )
     {
         p_filter->pf_do_work = Do_S32ToFL32_SW;
@@ -623,8 +623,8 @@ static int Create_S8ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('s','8',' ',' ')
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if ( p_filter->input.i_format != VLC_CODEC_S8
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }
@@ -667,8 +667,8 @@ static int Create_U8ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_FOURCC('u','8',' ',' ')
-          || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
+    if ( p_filter->input.i_format != VLC_CODEC_U8
+          || p_filter->output.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }

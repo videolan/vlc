@@ -136,7 +136,7 @@ static int Create( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     ass_track_t *p_track;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('s','s','a',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_SSA )
         return VLC_EGENERIC;
 
     p_dec->pf_decode_sub = DecodeBlock;
@@ -168,7 +168,7 @@ static int Create( vlc_object_t *p_this )
     vlc_mutex_unlock( &libass_lock );
 
     p_dec->fmt_out.i_cat = SPU_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('R','G','B','A');
+    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
 
     return VLC_SUCCESS;
 }
@@ -332,7 +332,7 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
 
     /* */
     fmt = *p_fmt;
-    fmt.i_chroma = VLC_FOURCC('R','G','B','A');
+    fmt.i_chroma = VLC_CODEC_RGBA;
     fmt.i_width = fmt.i_visible_width;
     fmt.i_height = fmt.i_visible_height;
     fmt.i_bits_per_pixel = 0;

@@ -557,7 +557,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 current_tk->i_track_id = i_track_id;
                 current_tk->i_delay = (int64_t)0;
 
-                es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
+                es_format_Init( &fmt, SPU_ES, VLC_CODEC_SPU );
                 fmt.subs.spu.i_original_frame_width = p_sys->i_original_frame_width;
                 fmt.subs.spu.i_original_frame_height = p_sys->i_original_frame_height;
                 fmt.psz_language = strdup( language );

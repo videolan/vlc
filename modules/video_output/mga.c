@@ -188,7 +188,7 @@ static int Init( vout_thread_t *p_vout )
 
     /* Assume we only do YMGA for the moment. XXX: mga_vid calls this
      * YV12, but it's actually some strange format with packed UV. */
-    p_vout->output.i_chroma = VLC_FOURCC('Y','M','G','A');
+    p_vout->output.i_chroma = VLC_CODEC_YMGA;
     p_vout->p_sys->mga.format = MGA_VID_FORMAT_YV12;
 
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, &p_vout->p_sys->mga) )

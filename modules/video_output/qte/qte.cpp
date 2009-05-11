@@ -218,7 +218,7 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-    p_vout->output.i_chroma = (dd == 16) ? VLC_FOURCC('R','V','1','6'): VLC_FOURCC('R','V','3','2');
+    p_vout->output.i_chroma = (dd == 16) ? VLC_CODEC_RGB16 : VLC_CODEC_RGB32;
     p_vout->output.i_rmask  = 0xf800;
     p_vout->output.i_gmask  = 0x07e0;
     p_vout->output.i_bmask  = 0x001f;

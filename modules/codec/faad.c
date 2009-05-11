@@ -117,7 +117,7 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys = p_dec->p_sys;
     faacDecConfiguration *cfg;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','4','a') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MP4A )
     {
         return VLC_EGENERIC;
     }
@@ -138,7 +138,7 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
     if (vlc_CPU() & CPU_CAPABILITY_FPU)
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
+        p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     else
         p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
     p_dec->pf_decode_audio = DecodeBlock;

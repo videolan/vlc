@@ -109,7 +109,7 @@ static int Open( vlc_object_t * p_this )
     msg_Dbg( p_demux, "using %.2f fps", p_sys->f_fps );
 
     /* Load the mpegvideo packetizer */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'h', '2', '6', '4' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "h264" );
     if( !p_sys->p_packetizer )
     {
