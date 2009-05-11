@@ -26,11 +26,7 @@
  *****************************************************************************/
 
 /* Packed RGB for 8bpp */
-#define FOURCC_BI_RGB       0x00000000
 #define FOURCC_RGB2         VLC_FOURCC('R','G','B','2')
-
-/* Packed RGB for 16, 24, 32bpp */
-#define FOURCC_BI_BITFIELDS 0x00000003
 
 /* Packed RGB 15bpp, usually 0x7c00, 0x03e0, 0x001f */
 #define FOURCC_RV15         VLC_FOURCC('R','V','1','5')
