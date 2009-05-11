@@ -760,7 +760,7 @@ void MainInterface::releaseVideoSlot( void )
     videoIsActive = false;
 
     /* Try to resize, except when you are in Fullscreen mode */
-    if( !isFullScreen() ) doComponentsUpdate();
+    doComponentsUpdate();
 }
 
 /* Call from WindowControl function */
