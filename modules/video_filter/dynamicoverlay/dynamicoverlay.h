@@ -122,7 +122,7 @@ typedef struct overlay_t
     bool b_active;
 
     video_format_t format;
-    struct text_style_t fontstyle;
+    struct text_style_t *p_fontstyle;
     union {
         picture_t *p_pic;
         char *p_text;

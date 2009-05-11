@@ -35,14 +35,14 @@
  * \param p_spu pointer to the subpicture queue the text is to be showed on
  * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info
+ * \param p_style Pointer to a struct with text style info (it is duplicated)
  * \param i_flags flags for alignment and such
  * \param i_hmargin horizontal margin in pixels
  * \param i_vmargin vertical margin in pixels
  * \param i_duration Amount of time the text is to be shown.
  */
 int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
-                           const char *psz_string, text_style_t *p_style,
+                           const char *psz_string, const text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_duration )
 {
@@ -58,7 +58,7 @@ int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
  * \param p_spu pointer to the subpicture queue the text is to be showed on
  * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info
+ * \param p_style Pointer to a struct with text style info (it is duplicated)
  * \param i_flags flags for alignment and such
  * \param i_hmargin horizontal margin in pixels
  * \param i_vmargin vertical margin in pixels
@@ -68,7 +68,7 @@ int osd_ShowTextRelative( spu_t *p_spu, int i_channel,
  *               is about to be shown
  */
 int osd_ShowTextAbsolute( spu_t *p_spu_channel, int i_channel,
-                           const char *psz_string, text_style_t *p_style,
+                           const char *psz_string, const text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {

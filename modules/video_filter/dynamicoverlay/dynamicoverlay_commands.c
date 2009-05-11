@@ -58,7 +58,7 @@ overlay_t *OverlayCreate( void )
     p_ovl->b_active = false;
     vout_InitFormat( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
                      VOUT_ASPECT_FACTOR );
-    memcpy( &p_ovl->fontstyle, &default_text_style, sizeof(struct text_style_t) );
+    p_ovl->p_fontstyle = text_style_New();
     p_ovl->data.p_text = NULL;
 
     return p_ovl;
@@ -68,6 +68,7 @@ int OverlayDestroy( overlay_t *p_ovl )
 {
     if( p_ovl->data.p_text != NULL )
         free( p_ovl->data.p_text );
+    text_style_Delete( p_ovl->p_fontstyle );
 
     return VLC_SUCCESS;
 }
@@ -636,7 +637,7 @@ static int exec_GetTextAlpha( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_results->fontstyle.i_font_alpha = p_ovl->fontstyle.i_font_alpha;
+    p_results->fontstyle.i_font_alpha = p_ovl->p_fontstyle->i_font_alpha;
     return VLC_SUCCESS;
 }
 
@@ -649,7 +650,7 @@ static int exec_GetTextColor( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_results->fontstyle.i_font_color = p_ovl->fontstyle.i_font_color;
+    p_results->fontstyle.i_font_color = p_ovl->p_fontstyle->i_font_color;
     return VLC_SUCCESS;
 }
 
@@ -662,7 +663,7 @@ static int exec_GetTextSize( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_results->fontstyle.i_font_size = p_ovl->fontstyle.i_font_size;
+    p_results->fontstyle.i_font_size = p_ovl->p_fontstyle->i_font_size;
     return VLC_SUCCESS;
 }
 
@@ -725,7 +726,7 @@ static int exec_SetTextAlpha( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_ovl->fontstyle.i_font_alpha = p_params->fontstyle.i_font_alpha;
+    p_ovl->p_fontstyle->i_font_alpha = p_params->fontstyle.i_font_alpha;
     p_sys->b_updated = p_ovl->b_active;
     return VLC_SUCCESS;
 }
@@ -741,7 +742,7 @@ static int exec_SetTextColor( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_ovl->fontstyle.i_font_color = p_params->fontstyle.i_font_color;
+    p_ovl->p_fontstyle->i_font_color = p_params->fontstyle.i_font_color;
     p_sys->b_updated = p_ovl->b_active;
     return VLC_SUCCESS;
 }
@@ -757,7 +758,7 @@ static int exec_SetTextSize( filter_t *p_filter,
     if( p_ovl == NULL )
         return VLC_EGENERIC;
 
-    p_ovl->fontstyle.i_font_size = p_params->fontstyle.i_font_size;
+    p_ovl->p_fontstyle->i_font_size = p_params->fontstyle.i_font_size;
     p_sys->b_updated = p_ovl->b_active;
     return VLC_SUCCESS;
 }

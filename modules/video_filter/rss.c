@@ -272,7 +272,7 @@ static int CreateFilter( vlc_object_t *p_this )
     }
     p_sys->psz_marquee[p_sys->i_length] = '\0';
 
-    p_sys->p_style = malloc( sizeof( text_style_t ));
+    p_sys->p_style = text_style_New();
     if( p_sys->p_style == NULL )
     {
         free( p_sys->psz_marquee );
@@ -282,7 +282,6 @@ static int CreateFilter( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-    memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ));
 
     p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
     p_sys->i_yoff = var_CreateGetInteger( p_filter, CFG_PREFIX "y" );
@@ -299,7 +298,7 @@ static int CreateFilter( vlc_object_t *p_this )
     if( FetchRSS( p_filter ) )
     {
         msg_Err( p_filter, "failed while fetching RSS ... too bad" );
-        free( p_sys->p_style );
+        text_style_Delete( p_sys->p_style );
         free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
@@ -311,7 +310,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     if( p_sys->i_feeds == 0 )
     {
-        free( p_sys->p_style );
+        text_style_Delete( p_sys->p_style );
         free( p_sys->psz_marquee );
         vlc_mutex_unlock( &p_sys->lock );
         vlc_mutex_destroy( &p_sys->lock );
@@ -323,7 +322,7 @@ static int CreateFilter( vlc_object_t *p_this )
     {
         if( p_sys->p_feeds[i_feed].i_items == 0 )
         {
-            free( p_sys->p_style );
+            text_style_Delete( p_sys->p_style );
             free( p_sys->psz_marquee );
             FreeRSS( p_filter );
             vlc_mutex_unlock( &p_sys->lock );
@@ -351,7 +350,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     vlc_mutex_lock( &p_sys->lock );
 
-    free( p_sys->p_style );
+    text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
     free( p_sys->psz_urls );
     FreeRSS( p_filter );
@@ -530,7 +529,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->b_absolute = false;
     }
 
-    p_spu->p_region->p_style = p_sys->p_style;
+    p_spu->p_region->p_style = text_style_Duplicate( p_sys->p_style );
 
     if( p_feed->p_pic )
     {

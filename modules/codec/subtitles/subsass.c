@@ -38,7 +38,7 @@ void ParseSSAString( decoder_t *p_dec,
      * MarginV, Effect, Text */
     decoder_sys_t   *p_sys = p_dec->p_sys;
     subpicture_t    *p_spu = p_spu_in;
-    ssa_style_t     *p_style = NULL;
+    ssa_style_t     *p_ssa_style = NULL;
     char            *psz_new_subtitle = NULL;
     char            *psz_buffer_sub = NULL;
     char            *psz_style = NULL;
@@ -118,12 +118,12 @@ void ParseSSAString( decoder_t *p_dec,
     for( i = 0; i < p_sys->i_ssa_styles; i++ )
     {
         if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
-            p_style = p_sys->pp_ssa_styles[i];
+            p_ssa_style = p_sys->pp_ssa_styles[i];
     }
     free( psz_style );
 
     p_spu->p_region->psz_text = psz_new_subtitle;
-    if( p_style == NULL )
+    if( p_ssa_style == NULL )
     {
         p_spu->p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
         p_spu->p_region->i_x = p_sys->i_align ? 20 : 0;
@@ -131,18 +131,18 @@ void ParseSSAString( decoder_t *p_dec,
     }
     else
     {
-        msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename);
-        p_spu->p_region->p_style = &p_style->font_style;
-        p_spu->p_region->i_align = p_style->i_align;
-        if( p_style->i_align & SUBPICTURE_ALIGN_LEFT )
+        msg_Dbg( p_dec, "style is: %s", p_ssa_style->psz_stylename );
+        p_spu->p_region->p_style = text_style_Duplicate( &p_ssa_style->font_style );
+        p_spu->p_region->i_align = p_ssa_style->i_align;
+        if( p_ssa_style->i_align & SUBPICTURE_ALIGN_LEFT )
         {
-            p_spu->p_region->i_x = (i_margin_l) ? i_margin_l : p_style->i_margin_h;
+            p_spu->p_region->i_x = (i_margin_l) ? i_margin_l : p_ssa_style->i_margin_h;
         }
-        else if( p_style->i_align & SUBPICTURE_ALIGN_RIGHT )
+        else if( p_ssa_style->i_align & SUBPICTURE_ALIGN_RIGHT )
         {
-            p_spu->p_region->i_x = (i_margin_r) ? i_margin_r : p_style->i_margin_h;
+            p_spu->p_region->i_x = (i_margin_r) ? i_margin_r : p_ssa_style->i_margin_h;
         }
-        p_spu->p_region->i_y = (i_margin_v) ? i_margin_v : p_style->i_margin_v;
+        p_spu->p_region->i_y = (i_margin_v) ? i_margin_v : p_ssa_style->i_margin_v;
     }
 }
 
@@ -233,52 +233,52 @@ void ParseSSAHeader( decoder_t *p_dec )
                     &i_border, &i_outline, &i_shadow, &i_align, &i_margin_l,
                     &i_margin_r, &i_margin_v ) == 16 )
                 {
-                    ssa_style_t *p_style = malloc( sizeof(ssa_style_t) );
+                    ssa_style_t *p_ssa_style = malloc( sizeof(ssa_style_t) );
 
-                    p_style->psz_stylename = strdup( psz_temp_stylename );
-                    p_style->font_style.psz_fontname = strdup( psz_temp_fontname );
-                    p_style->font_style.i_font_size = i_font_size;
+                    p_ssa_style->psz_stylename = strdup( psz_temp_stylename );
+                    p_ssa_style->font_style.psz_fontname = strdup( psz_temp_fontname );
+                    p_ssa_style->font_style.i_font_size = i_font_size;
 
-                    ParseColor( psz_temp_color1, &p_style->font_style.i_font_color, NULL );
-                    ParseColor( psz_temp_color4, &p_style->font_style.i_shadow_color, NULL );
-                    p_style->font_style.i_outline_color = p_style->font_style.i_shadow_color;
-                    p_style->font_style.i_font_alpha = p_style->font_style.i_outline_alpha
-                                                     = p_style->font_style.i_shadow_alpha = 0x00;
-                    p_style->font_style.i_style_flags = 0;
-                    if( i_bold ) p_style->font_style.i_style_flags |= STYLE_BOLD;
-                    if( i_italic ) p_style->font_style.i_style_flags |= STYLE_ITALIC;
+                    ParseColor( psz_temp_color1, &p_ssa_style->font_style.i_font_color, NULL );
+                    ParseColor( psz_temp_color4, &p_ssa_style->font_style.i_shadow_color, NULL );
+                    p_ssa_style->font_style.i_outline_color = p_ssa_style->font_style.i_shadow_color;
+                    p_ssa_style->font_style.i_font_alpha = p_ssa_style->font_style.i_outline_alpha
+                                                     = p_ssa_style->font_style.i_shadow_alpha = 0x00;
+                    p_ssa_style->font_style.i_style_flags = 0;
+                    if( i_bold ) p_ssa_style->font_style.i_style_flags |= STYLE_BOLD;
+                    if( i_italic ) p_ssa_style->font_style.i_style_flags |= STYLE_ITALIC;
 
                     if( i_border == 1 )
-                        p_style->font_style.i_style_flags |= (STYLE_ITALIC | STYLE_OUTLINE);
+                        p_ssa_style->font_style.i_style_flags |= (STYLE_ITALIC | STYLE_OUTLINE);
                     else if( i_border == 3 )
                     {
-                        p_style->font_style.i_style_flags |= STYLE_BACKGROUND;
-                        p_style->font_style.i_background_color = p_style->font_style.i_shadow_color;
-                        p_style->font_style.i_background_alpha = p_style->font_style.i_shadow_alpha;
+                        p_ssa_style->font_style.i_style_flags |= STYLE_BACKGROUND;
+                        p_ssa_style->font_style.i_background_color = p_ssa_style->font_style.i_shadow_color;
+                        p_ssa_style->font_style.i_background_alpha = p_ssa_style->font_style.i_shadow_alpha;
                     }
-                    p_style->font_style.i_shadow_width = i_shadow;
-                    p_style->font_style.i_outline_width = i_outline;
+                    p_ssa_style->font_style.i_shadow_width = i_shadow;
+                    p_ssa_style->font_style.i_outline_width = i_outline;
 
-                    p_style->i_align = 0;
+                    p_ssa_style->i_align = 0;
                     if( i_align == 1 || i_align == 5 || i_align == 9 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_LEFT;
                     if( i_align == 3 || i_align == 7 || i_align == 11 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
                     if( i_align < 4 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
                     else if( i_align < 8 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_TOP;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_TOP;
 
-                    p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ?
+                    p_ssa_style->i_margin_h = ( p_ssa_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ?
                                                         i_margin_r : i_margin_l;
-                    p_style->i_margin_v = i_margin_v;
-                    p_style->i_margin_percent_h = 0;
-                    p_style->i_margin_percent_v = 0;
+                    p_ssa_style->i_margin_v = i_margin_v;
+                    p_ssa_style->i_margin_percent_h = 0;
+                    p_ssa_style->i_margin_percent_v = 0;
 
-                    p_style->font_style.i_karaoke_background_color = 0xffffff;
-                    p_style->font_style.i_karaoke_background_alpha = 0xff;
+                    p_ssa_style->font_style.i_karaoke_background_color = 0xffffff;
+                    p_ssa_style->font_style.i_karaoke_background_alpha = 0xff;
 
-                    TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
+                    TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_ssa_style );
                 }
                 else msg_Warn( p_dec, "SSA v4 styleline parsing failed" );
             }
@@ -294,55 +294,55 @@ void ParseSSAHeader( decoder_t *p_dec )
                     &i_underline, &i_strikeout, &i_scale_x, &i_scale_y, &i_spacing, &i_border, &i_outline,
                     &i_shadow, &i_align, &i_margin_l, &i_margin_r, &i_margin_v ) == 21 )
                 {
-                    ssa_style_t *p_style = malloc( sizeof(ssa_style_t) );
+                    ssa_style_t *p_ssa_style = malloc( sizeof(ssa_style_t) );
 
-                    p_style->psz_stylename = strdup( psz_temp_stylename );
-                    p_style->font_style.psz_fontname = strdup( psz_temp_fontname );
-                    p_style->font_style.i_font_size = i_font_size;
-                    ParseColor( psz_temp_color1, &p_style->font_style.i_font_color,
-                                &p_style->font_style.i_font_alpha );
-                    ParseColor( psz_temp_color3, &p_style->font_style.i_outline_color,
-                                &p_style->font_style.i_outline_alpha );
-                    ParseColor( psz_temp_color4, &p_style->font_style.i_shadow_color,
-                                &p_style->font_style.i_shadow_alpha );
+                    p_ssa_style->psz_stylename = strdup( psz_temp_stylename );
+                    p_ssa_style->font_style.psz_fontname = strdup( psz_temp_fontname );
+                    p_ssa_style->font_style.i_font_size = i_font_size;
+                    ParseColor( psz_temp_color1, &p_ssa_style->font_style.i_font_color,
+                                &p_ssa_style->font_style.i_font_alpha );
+                    ParseColor( psz_temp_color3, &p_ssa_style->font_style.i_outline_color,
+                                &p_ssa_style->font_style.i_outline_alpha );
+                    ParseColor( psz_temp_color4, &p_ssa_style->font_style.i_shadow_color,
+                                &p_ssa_style->font_style.i_shadow_alpha );
 
-                    p_style->font_style.i_style_flags = 0;
-                    if( i_bold ) p_style->font_style.i_style_flags |= STYLE_BOLD;
-                    if( i_italic ) p_style->font_style.i_style_flags |= STYLE_ITALIC;
-                    if( i_underline ) p_style->font_style.i_style_flags |= STYLE_UNDERLINE;
-                    if( i_strikeout ) p_style->font_style.i_style_flags |= STYLE_STRIKEOUT;
-                    if( i_border == 1 ) p_style->font_style.i_style_flags |= (STYLE_ITALIC | STYLE_OUTLINE);
+                    p_ssa_style->font_style.i_style_flags = 0;
+                    if( i_bold ) p_ssa_style->font_style.i_style_flags |= STYLE_BOLD;
+                    if( i_italic ) p_ssa_style->font_style.i_style_flags |= STYLE_ITALIC;
+                    if( i_underline ) p_ssa_style->font_style.i_style_flags |= STYLE_UNDERLINE;
+                    if( i_strikeout ) p_ssa_style->font_style.i_style_flags |= STYLE_STRIKEOUT;
+                    if( i_border == 1 ) p_ssa_style->font_style.i_style_flags |= (STYLE_ITALIC | STYLE_OUTLINE);
                     else if( i_border == 3 )
                     {
-                        p_style->font_style.i_style_flags |= STYLE_BACKGROUND;
-                        p_style->font_style.i_background_color = p_style->font_style.i_shadow_color;
-                        p_style->font_style.i_background_alpha = p_style->font_style.i_shadow_alpha;
+                        p_ssa_style->font_style.i_style_flags |= STYLE_BACKGROUND;
+                        p_ssa_style->font_style.i_background_color = p_ssa_style->font_style.i_shadow_color;
+                        p_ssa_style->font_style.i_background_alpha = p_ssa_style->font_style.i_shadow_alpha;
                     }
-                    p_style->font_style.i_shadow_width  = ( i_border == 1 ) ? i_shadow : 0;
-                    p_style->font_style.i_outline_width = ( i_border == 1 ) ? i_outline : 0;
-                    p_style->font_style.i_spacing = i_spacing;
-                    //p_style->font_style.f_angle = f_angle;
+                    p_ssa_style->font_style.i_shadow_width  = ( i_border == 1 ) ? i_shadow : 0;
+                    p_ssa_style->font_style.i_outline_width = ( i_border == 1 ) ? i_outline : 0;
+                    p_ssa_style->font_style.i_spacing = i_spacing;
+                    //p_ssa_style->font_style.f_angle = f_angle;
 
-                    p_style->i_align = 0;
+                    p_ssa_style->i_align = 0;
                     if( i_align == 0x1 || i_align == 0x4 || i_align == 0x7 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_LEFT;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_LEFT;
                     if( i_align == 0x3 || i_align == 0x6 || i_align == 0x9 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_RIGHT;
                     if( i_align == 0x7 || i_align == 0x8 || i_align == 0x9 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_TOP;
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_TOP;
                     if( i_align == 0x1 || i_align == 0x2 || i_align == 0x3 )
-                        p_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
-                    p_style->i_margin_h = ( p_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ?
+                        p_ssa_style->i_align |= SUBPICTURE_ALIGN_BOTTOM;
+                    p_ssa_style->i_margin_h = ( p_ssa_style->i_align & SUBPICTURE_ALIGN_RIGHT ) ?
                                             i_margin_r : i_margin_l;
-                    p_style->i_margin_v = i_margin_v;
-                    p_style->i_margin_percent_h = 0;
-                    p_style->i_margin_percent_v = 0;
+                    p_ssa_style->i_margin_v = i_margin_v;
+                    p_ssa_style->i_margin_percent_h = 0;
+                    p_ssa_style->i_margin_percent_v = 0;
 
-                    p_style->font_style.i_karaoke_background_color = 0xffffff;
-                    p_style->font_style.i_karaoke_background_alpha = 0xff;
+                    p_ssa_style->font_style.i_karaoke_background_color = 0xffffff;
+                    p_ssa_style->font_style.i_karaoke_background_alpha = 0xff;
 
                     /*TODO: Ignored: angle i_scale_x|y (fontscaling), i_encoding */
-                    TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
+                    TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_ssa_style );
                 }
                 else msg_Dbg( p_dec, "SSA V4+ styleline parsing failed" );
             }

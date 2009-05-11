@@ -204,8 +204,7 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     vlc_mutex_init( &p_sys->lock );
-    p_sys->p_style = malloc( sizeof( text_style_t ) );
-    memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
+    p_sys->p_style = text_style_New();
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
@@ -242,7 +241,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    free( p_sys->p_style );
+    text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
 
     /* Delete the marquee variables */
@@ -323,7 +322,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->p_region->i_x = p_sys->i_xoff;
     p_spu->p_region->i_y = p_sys->i_yoff;
 
-    p_spu->p_region->p_style = p_sys->p_style;
+    p_spu->p_region->p_style = text_style_Duplicate( p_sys->p_style );
 
 out:
     vlc_mutex_unlock( &p_sys->lock );

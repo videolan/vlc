@@ -146,6 +146,7 @@ static void CloseDecoder( vlc_object_t *p_this )
                 continue;
 
             free( p_sys->pp_ssa_styles[i]->psz_stylename );
+            //FIXME: Make font_style a pointer and use text_style_* functions
             free( p_sys->pp_ssa_styles[i]->font_style.psz_fontname );
             free( p_sys->pp_ssa_styles[i] );
         }
@@ -261,7 +262,7 @@ static char *GrabAttributeValue( const char *psz_attribute,
 
 static ssa_style_t *ParseStyle( decoder_sys_t *p_sys, char *psz_subtitle )
 {
-    ssa_style_t *p_style   = NULL;
+    ssa_style_t *p_ssa_style = NULL;
     char        *psz_style = GrabAttributeValue( "style", psz_subtitle );
 
     if( psz_style )
@@ -271,11 +272,11 @@ static ssa_style_t *ParseStyle( decoder_sys_t *p_sys, char *psz_subtitle )
         for( i = 0; i < p_sys->i_ssa_styles; i++ )
         {
             if( !strcmp( p_sys->pp_ssa_styles[i]->psz_stylename, psz_style ) )
-                p_style = p_sys->pp_ssa_styles[i];
+                p_ssa_style = p_sys->pp_ssa_styles[i];
         }
         free( psz_style );
     }
-    return p_style;
+    return p_ssa_style;
 }
 
 static int ParsePositionAttributeList( char *psz_subtitle, int *i_align,
@@ -390,7 +391,7 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
 
     if( p_text_region != NULL )
     {
-        ssa_style_t  *p_style = NULL;
+        ssa_style_t  *p_ssa_style = NULL;
 
         p_text_region->psz_text = NULL;
         p_text_region->psz_html = strndup( psz_subtitle, i_len );
@@ -400,34 +401,34 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
             return NULL;
         }
 
-        p_style = ParseStyle( p_sys, p_text_region->psz_html );
-        if( !p_style )
+        p_ssa_style = ParseStyle( p_sys, p_text_region->psz_html );
+        if( !p_ssa_style )
         {
             int i;
 
             for( i = 0; i < p_sys->i_ssa_styles; i++ )
             {
                 if( !strcasecmp( p_sys->pp_ssa_styles[i]->psz_stylename, "Default" ) )
-                    p_style = p_sys->pp_ssa_styles[i];
+                    p_ssa_style = p_sys->pp_ssa_styles[i];
             }
         }
 
-        if( p_style )
+        if( p_ssa_style )
         {
-            msg_Dbg( p_dec, "style is: %s", p_style->psz_stylename );
+            msg_Dbg( p_dec, "style is: %s", p_ssa_style->psz_stylename );
 
-            p_text_region->p_style = &p_style->font_style;
-            p_text_region->i_align = p_style->i_align;
+            p_text_region->p_style = text_style_Duplicate( &p_ssa_style->font_style );
+            p_text_region->i_align = p_ssa_style->i_align;
 
             /* TODO: Setup % based offsets properly, without adversely affecting
              *       everything else in vlc. Will address with separate patch,
              *       to prevent this one being any more complicated.
 
-                     * p_style->i_margin_percent_h;
-                     * p_style->i_margin_percent_v;
+                     * p_ssa_style->i_margin_percent_h;
+                     * p_ssa_style->i_margin_percent_v;
              */
-            p_text_region->i_x         = p_style->i_margin_h;
-            p_text_region->i_y         = p_style->i_margin_v;
+            p_text_region->i_x         = p_ssa_style->i_margin_h;
+            p_text_region->i_y         = p_ssa_style->i_margin_v;
 
         }
         else
@@ -532,7 +533,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     char *psz_node;
-    ssa_style_t *p_style = NULL;
+    ssa_style_t *p_ssa_style = NULL;
     int i_style_level = 0;
     int i_metadata_level = 0;
 
@@ -565,9 +566,9 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                     case 2:
                         if( !strcasecmp( "style", psz_node ) )
                         {
-                            TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_style );
+                            TAB_APPEND( p_sys->i_ssa_styles, p_sys->pp_ssa_styles, p_ssa_style );
 
-                            p_style = NULL;
+                            p_ssa_style = NULL;
                             i_style_level--;
                         }
                         break;
@@ -612,8 +613,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                 {
                     i_style_level++;
 
-                    p_style = calloc( 1, sizeof(ssa_style_t) );
-                    if( ! p_style )
+                    p_ssa_style = calloc( 1, sizeof(ssa_style_t) );
+                    if( !p_ssa_style )
                     {
                         free( psz_node );
                         return;
@@ -630,9 +631,11 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         {
                             ssa_style_t *p_default_style = p_sys->pp_ssa_styles[i];
 
-                            memcpy( p_style, p_default_style, sizeof( ssa_style_t ) );
-                            p_style->font_style.psz_fontname = strdup( p_style->font_style.psz_fontname );
-                            p_style->psz_stylename = NULL;
+                            memcpy( p_ssa_style, p_default_style, sizeof( ssa_style_t ) );
+                            //FIXME: Make font_style a pointer. Actually we double copy some data here,
+                            //   we use text_style_Copy to avoid copying psz_fontname, though .
+                            text_style_Copy( &p_ssa_style->font_style, &p_default_style->font_style );
+                            p_ssa_style->psz_stylename = NULL;
                         }
                     }
 
@@ -644,7 +647,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         if( psz_name && psz_value )
                         {
                             if( !strcasecmp( "name", psz_name ) )
-                                p_style->psz_stylename = strdup( psz_value);
+                                p_ssa_style->psz_stylename = strdup( psz_value );
                         }
                         free( psz_name );
                         free( psz_value );
@@ -661,8 +664,8 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                         {
                             if( !strcasecmp( "face", psz_name ) )
                             {
-                                free( p_style->font_style.psz_fontname );
-                                p_style->font_style.psz_fontname = strdup( psz_value );
+                                free( p_ssa_style->font_style.psz_fontname );
+                                p_ssa_style->font_style.psz_fontname = strdup( psz_value );
                             }
                             else if( !strcasecmp( "size", psz_name ) )
                             {
@@ -671,44 +674,44 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                                     int i_value = atoi( psz_value );
 
                                     if( ( i_value >= -5 ) && ( i_value <= 5 ) )
-                                        p_style->font_style.i_font_size  +=
-                                            ( i_value * p_style->font_style.i_font_size ) / 10;
+                                        p_ssa_style->font_style.i_font_size  +=
+                                            ( i_value * p_ssa_style->font_style.i_font_size ) / 10;
                                     else if( i_value < -5 )
-                                        p_style->font_style.i_font_size  = - i_value;
+                                        p_ssa_style->font_style.i_font_size  = - i_value;
                                     else if( i_value > 5 )
-                                        p_style->font_style.i_font_size  = i_value;
+                                        p_ssa_style->font_style.i_font_size  = i_value;
                                 }
                                 else
-                                    p_style->font_style.i_font_size  = atoi( psz_value );
+                                    p_ssa_style->font_style.i_font_size  = atoi( psz_value );
                             }
                             else if( !strcasecmp( "italic", psz_name ) )
                             {
                                 if( !strcasecmp( "yes", psz_value ))
-                                    p_style->font_style.i_style_flags |= STYLE_ITALIC;
+                                    p_ssa_style->font_style.i_style_flags |= STYLE_ITALIC;
                                 else
-                                    p_style->font_style.i_style_flags &= ~STYLE_ITALIC;
+                                    p_ssa_style->font_style.i_style_flags &= ~STYLE_ITALIC;
                             }
                             else if( !strcasecmp( "weight", psz_name ) )
                             {
                                 if( !strcasecmp( "bold", psz_value ))
-                                    p_style->font_style.i_style_flags |= STYLE_BOLD;
+                                    p_ssa_style->font_style.i_style_flags |= STYLE_BOLD;
                                 else
-                                    p_style->font_style.i_style_flags &= ~STYLE_BOLD;
+                                    p_ssa_style->font_style.i_style_flags &= ~STYLE_BOLD;
                             }
                             else if( !strcasecmp( "underline", psz_name ) )
                             {
                                 if( !strcasecmp( "yes", psz_value ))
-                                    p_style->font_style.i_style_flags |= STYLE_UNDERLINE;
+                                    p_ssa_style->font_style.i_style_flags |= STYLE_UNDERLINE;
                                 else
-                                    p_style->font_style.i_style_flags &= ~STYLE_UNDERLINE;
+                                    p_ssa_style->font_style.i_style_flags &= ~STYLE_UNDERLINE;
                             }
                             else if( !strcasecmp( "color", psz_name ) )
                             {
                                 if( *psz_value == '#' )
                                 {
                                     unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_style->font_style.i_font_color = (col & 0x00ffffff);
-                                    p_style->font_style.i_font_alpha = (col >> 24) & 0xff;
+                                    p_ssa_style->font_style.i_font_color = (col & 0x00ffffff);
+                                    p_ssa_style->font_style.i_font_alpha = (col >> 24) & 0xff;
                                 }
                             }
                             else if( !strcasecmp( "outline-color", psz_name ) )
@@ -716,39 +719,39 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                                 if( *psz_value == '#' )
                                 {
                                     unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_style->font_style.i_outline_color = (col & 0x00ffffff);
-                                    p_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
+                                    p_ssa_style->font_style.i_outline_color = (col & 0x00ffffff);
+                                    p_ssa_style->font_style.i_outline_alpha = (col >> 24) & 0xff;
                                 }
                             }
                             else if( !strcasecmp( "outline-level", psz_name ) )
                             {
-                                p_style->font_style.i_outline_width = atoi( psz_value );
+                                p_ssa_style->font_style.i_outline_width = atoi( psz_value );
                             }
                             else if( !strcasecmp( "shadow-color", psz_name ) )
                             {
                                 if( *psz_value == '#' )
                                 {
                                     unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_style->font_style.i_shadow_color = (col & 0x00ffffff);
-                                    p_style->font_style.i_shadow_alpha = (col >> 24) & 0xff;
+                                    p_ssa_style->font_style.i_shadow_color = (col & 0x00ffffff);
+                                    p_ssa_style->font_style.i_shadow_alpha = (col >> 24) & 0xff;
                                 }
                             }
                             else if( !strcasecmp( "shadow-level", psz_name ) )
                             {
-                                p_style->font_style.i_shadow_width = atoi( psz_value );
+                                p_ssa_style->font_style.i_shadow_width = atoi( psz_value );
                             }
                             else if( !strcasecmp( "back-color", psz_name ) )
                             {
                                 if( *psz_value == '#' )
                                 {
                                     unsigned long col = strtol(psz_value+1, NULL, 16);
-                                    p_style->font_style.i_karaoke_background_color = (col & 0x00ffffff);
-                                    p_style->font_style.i_karaoke_background_alpha = (col >> 24) & 0xff;
+                                    p_ssa_style->font_style.i_karaoke_background_color = (col & 0x00ffffff);
+                                    p_ssa_style->font_style.i_karaoke_background_alpha = (col >> 24) & 0xff;
                                 }
                             }
                             else if( !strcasecmp( "spacing", psz_name ) )
                             {
-                                p_style->font_style.i_spacing = atoi( psz_value );
+                                p_ssa_style->font_style.i_spacing = atoi( psz_value );
                             }
                         }
                         free( psz_name );
@@ -767,48 +770,48 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                             if( !strcasecmp( "alignment", psz_name ) )
                             {
                                 if( !strcasecmp( "TopLeft", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
                                 else if( !strcasecmp( "TopCenter", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_TOP;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP;
                                 else if( !strcasecmp( "TopRight", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT;
                                 else if( !strcasecmp( "MiddleLeft", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_LEFT;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_LEFT;
                                 else if( !strcasecmp( "MiddleCenter", psz_value ) )
-                                    p_style->i_align = 0;
+                                    p_ssa_style->i_align = 0;
                                 else if( !strcasecmp( "MiddleRight", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_RIGHT;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_RIGHT;
                                 else if( !strcasecmp( "BottomLeft", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT;
                                 else if( !strcasecmp( "BottomCenter", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM;
                                 else if( !strcasecmp( "BottomRight", psz_value ) )
-                                    p_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
+                                    p_ssa_style->i_align = SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT;
                             }
                             else if( !strcasecmp( "horizontal-margin", psz_name ) )
                             {
                                 if( strchr( psz_value, '%' ) )
                                 {
-                                    p_style->i_margin_h = 0;
-                                    p_style->i_margin_percent_h = atoi( psz_value );
+                                    p_ssa_style->i_margin_h = 0;
+                                    p_ssa_style->i_margin_percent_h = atoi( psz_value );
                                 }
                                 else
                                 {
-                                    p_style->i_margin_h = atoi( psz_value );
-                                    p_style->i_margin_percent_h = 0;
+                                    p_ssa_style->i_margin_h = atoi( psz_value );
+                                    p_ssa_style->i_margin_percent_h = 0;
                                 }
                             }
                             else if( !strcasecmp( "vertical-margin", psz_name ) )
                             {
                                 if( strchr( psz_value, '%' ) )
                                 {
-                                    p_style->i_margin_v = 0;
-                                    p_style->i_margin_percent_v = atoi( psz_value );
+                                    p_ssa_style->i_margin_v = 0;
+                                    p_ssa_style->i_margin_percent_v = atoi( psz_value );
                                 }
                                 else
                                 {
-                                    p_style->i_margin_v = atoi( psz_value );
-                                    p_style->i_margin_percent_v = 0;
+                                    p_ssa_style->i_margin_v = atoi( psz_value );
+                                    p_ssa_style->i_margin_percent_v = 0;
                                 }
                             }
                         }
@@ -821,7 +824,7 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
                 break;
         }
     }
-    free( p_style );
+    free( p_ssa_style );
 }
 
 

@@ -779,7 +779,8 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
 
     free( p_region->psz_text );
     free( p_region->psz_html );
-    //free( p_region->p_style ); FIXME --fenrir plugin does not allocate the memory for it. I think it might lead to segfault, video renderer can live longer than the decoder
+    if( p_region->p_style )
+        text_style_Delete( p_region->p_style );
     free( p_region );
 }
 

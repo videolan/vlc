@@ -534,4 +534,8 @@ vout_ShowTextAbsolute
 vout_ShowTextRelative
 vout_UnlinkPicture
 __xml_Create
+text_style_Copy
+text_style_Delete
+text_style_Duplicate
+text_style_New
 xml_Delete

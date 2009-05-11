@@ -310,20 +310,19 @@ static int Create( vlc_object_t *p_this )
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
 
-    p_sys->p_style = malloc( sizeof( text_style_t ) );
+    p_sys->p_style = text_style_New();
     if( !p_sys->p_style )
     {
         free( p_intf->p_sys );
         return VLC_ENOMEM;
     }
-    vlc_memcpy( p_sys->p_style, &default_text_style, sizeof( text_style_t ) );
 
     p_intf->pf_run = Run;
 
     p_sys->p_image = image_HandlerCreate( p_this );
     if( !p_sys->p_image )
     {
-        free( p_sys->p_style );
+        text_style_Delete( p_sys->p_style );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -520,7 +519,7 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_overlay )
         picture_Release( p_sys->p_overlay );
 
-    free( p_sys->p_style );
+    text_style_Delete( p_sys->p_style );
     free( p_sys );
 }
 
@@ -865,7 +864,7 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
             subpicture_region_Delete( p_region );
             return NULL;
         }
-        p_region->p_style = p_style;
+        p_region->p_style = text_style_Duplicate( p_style );
         p_region->i_align = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
 
         if( p_sys->p_text->pf_render_text )

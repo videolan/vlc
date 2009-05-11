@@ -265,8 +265,25 @@ struct text_style_t
 #define STYLE_UNDERLINE   32
 #define STYLE_STRIKEOUT   64
 
-static const text_style_t default_text_style = { NULL, 22, 0xffffff, 0xff, STYLE_OUTLINE,
-                0x000000, 0xff, 0x000000, 0xff, 0xffffff, 0x80, 0xffffff, 0xff, 1, 0, -1 };
+/**
+ * Create a default text style
+ */
+VLC_EXPORT( text_style_t *, text_style_New, ( void ) );
+
+/**
+ * Copy a text style into another
+ */
+VLC_EXPORT( text_style_t *, text_style_Copy, ( text_style_t *, const text_style_t * ) );
+
+/**
+ * Duplicate a text style
+ */
+VLC_EXPORT( text_style_t *, text_style_Duplicate, ( const text_style_t * ) );
+
+/**
+ * Delete a text style created by text_style_New or text_style_Duplicate
+ */
+VLC_EXPORT( void, text_style_Delete, ( text_style_t * ) );
 
 /**
  * OSD menu button states
@@ -590,8 +607,8 @@ static inline void osd_SetMenuUpdate( osd_menu_t *p_osd, bool b_value )
  * object. The types are declared in the include file include/vlc_osd.h
  * @see vlc_osd.h
  */
-VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, const char *, text_style_t *, int, int, int, mtime_t ) );
-VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, const char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+VLC_EXPORT( int, osd_ShowTextRelative, ( spu_t *, int, const char *, const text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( int, osd_ShowTextAbsolute, ( spu_t *, int, const char *, const text_style_t *, int, int, int, mtime_t, mtime_t ) );
 VLC_EXPORT( void, osd_Message, ( spu_t *, int, char *, ... ) LIBVLC_FORMAT( 3, 4 ) );
 
 /**
@@ -611,34 +628,9 @@ VLC_EXPORT( int, osd_Icon, ( vlc_object_t *, spu_t *, int, int, int, int, int, s
  * Vout text and widget overlays
  **********************************************************************/
 
-/**
- * Show text on the video for some time
- * \param p_vout pointer to the vout the text is to be showed on
- * \param i_channel Subpicture channel
- * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info
- * \param i_flags flags for alignment and such
- * \param i_hmargin horizontal margin in pixels
- * \param i_vmargin vertical margin in pixels
- * \param i_duration Amount of time the text is to be shown.
- */
-VLC_EXPORT( int, vout_ShowTextRelative, ( vout_thread_t *, int, char *, text_style_t *, int, int, int, mtime_t ) );
+VLC_EXPORT( int, vout_ShowTextRelative, ( vout_thread_t *, int, char *, const text_style_t *, int, int, int, mtime_t ) );
 
-/**
- * Show text on the video from a given start date to a given end date
- * \param p_vout pointer to the vout the text is to be showed on
- * \param i_channel Subpicture channel
- * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info
- * \param i_flags flags for alignment and such
- * \param i_hmargin horizontal margin in pixels
- * \param i_vmargin vertical margin in pixels
- * \param i_start the time when this string is to appear on the video
- * \param i_stop the time when this string should stop to be displayed
- *               if this is 0 the string will be shown untill the next string
- *               is about to be shown
- */
-VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, const char *, text_style_t *, int, int, int, mtime_t, mtime_t ) );
+VLC_EXPORT( int, vout_ShowTextAbsolute, ( vout_thread_t *, int, const char *, const text_style_t *, int, int, int, mtime_t, mtime_t ) );
 
 /**
  * Write an informative message at the default location,

@@ -36,14 +36,14 @@
  * \param p_vout pointer to the vout the text is to be showed on
  * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info
+ * \param p_style Pointer to a struct with text style info (it is duplicated if non NULL)
  * \param i_flags flags for alignment and such
  * \param i_hmargin horizontal margin in pixels
  * \param i_vmargin vertical margin in pixels
  * \param i_duration Amount of time the text is to be shown.
  */
 int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
-                           char *psz_string, text_style_t *p_style,
+                           char *psz_string, const text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_duration )
 {
@@ -59,7 +59,7 @@ int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
  * \param p_vout pointer to the vout the text is to be showed on
  * \param i_channel Subpicture channel
  * \param psz_string The text to be shown
- * \param p_style Pointer to a struct with text style info
+ * \param p_style Pointer to a struct with text style info (it is duplicated if non NULL)
  * \param i_flags flags for alignment and such
  * \param i_hmargin horizontal margin in pixels
  * \param i_vmargin vertical margin in pixels
@@ -69,14 +69,12 @@ int vout_ShowTextRelative( vout_thread_t *p_vout, int i_channel,
  *               is about to be shown
  */
 int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
-                           const char *psz_string, text_style_t *p_style,
+                           const char *psz_string, const text_style_t *p_style,
                            int i_flags, int i_hmargin, int i_vmargin,
                            mtime_t i_start, mtime_t i_stop )
 {
-    (void)p_style;
     subpicture_t *p_spu;
     video_format_t fmt;
-    /* (void)p_style; FIXME: <-- why ask for this if it's unused?!? */
 
     if( !psz_string ) return VLC_EGENERIC;
 
@@ -110,6 +108,8 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     p_spu->p_region->i_align = i_flags & SUBPICTURE_ALIGN_MASK;
     p_spu->p_region->i_x = i_hmargin;
     p_spu->p_region->i_y = i_vmargin;
+    if( p_style )
+        p_spu->p_region->p_style = text_style_Duplicate( p_style );
 
     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
 
@@ -151,3 +151,69 @@ void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
         va_end( args );
     }
 }
+
+/* */
+text_style_t *text_style_New( void )
+{
+    text_style_t *p_style = calloc( 1, sizeof(*p_style) );
+    if( !p_style )
+        return NULL;
+
+    /* initialize to default text style */
+    p_style->psz_fontname = NULL;
+    p_style->i_font_size = 22;
+    p_style->i_font_color = 0xffffff;
+    p_style->i_font_alpha = 0xff;
+    p_style->i_style_flags = STYLE_OUTLINE;
+    p_style->i_outline_color = 0x000000;
+    p_style->i_outline_alpha = 0xff;
+    p_style->i_shadow_color = 0x000000;
+    p_style->i_shadow_alpha = 0xff;
+    p_style->i_background_color = 0xffffff;
+    p_style->i_background_alpha = 0x80;
+    p_style->i_karaoke_background_color = 0xffffff;
+    p_style->i_karaoke_background_alpha = 0xff;
+    p_style->i_outline_width = 1;
+    p_style->i_shadow_width = 0;
+    p_style->i_spacing = -1;
+
+    return p_style;
+}
+
+text_style_t *text_style_Copy( text_style_t *p_dst, const text_style_t *p_src )
+{
+    if( !p_src )
+        return p_dst;
+
+    /* */
+    if( p_dst->psz_fontname )
+        free( p_dst->psz_fontname );
+
+    /* */
+    *p_dst = *p_src;
+
+    /* */
+    if( p_dst->psz_fontname )
+        p_dst->psz_fontname = strdup( p_dst->psz_fontname );
+
+    return p_dst;
+}
+
+text_style_t *text_style_Duplicate( const text_style_t *p_src )
+{
+    if( !p_src )
+        return NULL;
+
+    text_style_t *p_dst = calloc( 1, sizeof(*p_dst) );
+    if( p_dst )
+        text_style_Copy( p_dst, p_src );
+    return p_dst;
+}
+
+void text_style_Delete( text_style_t *p_style )
+{
+    if( p_style )
+        free( p_style->psz_fontname );
+    free( p_style );
+}
+

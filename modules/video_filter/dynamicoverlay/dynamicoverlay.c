@@ -358,9 +358,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         if( p_overlay->format.i_chroma == VLC_FOURCC('T','E','X','T') )
         {
             p_region->psz_text = strdup( p_overlay->data.p_text );
-            p_region->p_style = malloc( sizeof(struct text_style_t) );
-            if( p_region->p_style )
-                *p_region->p_style = p_overlay->fontstyle;
+            p_region->p_style = text_style_Duplicate( p_overlay->p_fontstyle );
         }
         else
         {
