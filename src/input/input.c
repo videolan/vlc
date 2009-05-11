@@ -1205,7 +1205,9 @@ static int Init( input_thread_t * p_input )
         i_length = 0;
     if( i_length <= 0 )
         i_length = input_item_GetDuration( p_input->p->p_item );
-    input_SendEventTimes( p_input, 0.0, 0, i_length );
+    input_SendEventLength( p_input, i_length );
+
+    input_SendEventPosition( p_input, 0.0, 0 );
 
     if( !p_input->b_preparsing )
     {

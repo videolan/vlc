@@ -383,8 +383,11 @@ typedef enum input_event_type_e
     /* "rate" has changed */
     INPUT_EVENT_RATE,
 
-    /* At least one of "position" or "time" or "length" has changed */
-    INPUT_EVENT_TIMES,
+    /* At least one of "position" or "time" */
+    INPUT_EVENT_POSITION,
+
+    /* "length" has changed */
+    INPUT_EVENT_LENGTH,
 
     /* A title has been added or removed or selected.
      * It imply that chapter has changed (not chapter event is sent) */

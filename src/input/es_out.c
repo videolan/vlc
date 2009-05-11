@@ -2445,20 +2445,24 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             mtime_t i_time = (mtime_t)va_arg( args, mtime_t );
             mtime_t i_length = (mtime_t)va_arg( args, mtime_t );
 
-            /* Fix for buffering delay */
-            const mtime_t i_delay = EsOutGetBuffering( out );
-
-            i_time -= i_delay;
-            if( i_time < 0 )
-                i_time = 0;
-
-            if( i_length > 0 )
-                f_position -= (double)i_delay / i_length;
-            if( f_position < 0 )
-                f_position = 0;
+            input_SendEventLength( p_sys->p_input, i_length );
 
             if( !p_sys->b_buffering )
-                input_SendEventTimes( p_sys->p_input, f_position, i_time, i_length );
+            {
+                /* Fix for buffering delay */
+                const mtime_t i_delay = EsOutGetBuffering( out );
+
+                i_time -= i_delay;
+                if( i_time < 0 )
+                    i_time = 0;
+
+                if( i_length > 0 )
+                    f_position -= (double)i_delay / i_length;
+                if( f_position < 0 )
+                    f_position = 0;
+
+                input_SendEventPosition( p_sys->p_input, f_position, i_time );
+            }
             return VLC_SUCCESS;
         }
         case ES_OUT_SET_JITTER:

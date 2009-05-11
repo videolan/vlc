@@ -60,8 +60,7 @@ void input_SendEventAbort( input_thread_t *p_input )
     Trigger( p_input, INPUT_EVENT_ABORT );
 }
 
-void input_SendEventTimes( input_thread_t *p_input,
-                           double f_position, mtime_t i_time, mtime_t i_length )
+void input_SendEventPosition( input_thread_t *p_input, double f_position, mtime_t i_time )
 {
     vlc_value_t val;
 
@@ -73,13 +72,22 @@ void input_SendEventTimes( input_thread_t *p_input,
     val.i_time = i_time;
     var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
 
+    Trigger( p_input, INPUT_EVENT_POSITION );
+}
+void input_SendEventLength( input_thread_t *p_input, mtime_t i_length )
+{
+    vlc_value_t val;
+
 	/* FIXME ugly + what about meta change event ? */
-    if( var_GetTime( p_input, "length" ) != i_length )
-        input_item_SetDuration( p_input->p->p_item, i_length );
+    if( var_GetTime( p_input, "length" ) == i_length )
+        return;
+
+    input_item_SetDuration( p_input->p->p_item, i_length );
+
     val.i_time = i_length;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
-    Trigger( p_input, INPUT_EVENT_TIMES );
+    Trigger( p_input, INPUT_EVENT_LENGTH );
 }
 void input_SendEventStatistics( input_thread_t *p_input )
 {

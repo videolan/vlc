@@ -219,7 +219,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
-    else if( newval.i_int == INPUT_EVENT_TIMES )
+    else if( newval.i_int == INPUT_EVENT_POSITION )
     {
         if( var_GetInteger( p_input, "state" ) != PLAYING_S )
             return VLC_SUCCESS; /* Don't send the position while stopped */

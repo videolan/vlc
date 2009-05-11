@@ -275,7 +275,8 @@ static int InputEvent( vlc_object_t *p_this, const char *,
     case INPUT_EVENT_RATE:
         event = new IMEvent( ItemRateChanged_Type, 0 );
         break;
-    case INPUT_EVENT_TIMES:
+    case INPUT_EVENT_POSITION:
+    //case INPUT_EVENT_LENGTH:
         event = new IMEvent( PositionUpdate_Type, 0 );
         break;
 
