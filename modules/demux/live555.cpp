@@ -141,8 +141,10 @@ vlc_module_begin ()
             change_safe()
         add_string( "rtsp-user", NULL, NULL, USER_TEXT,
                     USER_LONGTEXT, true )
+            change_safe()
         add_password( "rtsp-pwd", NULL, NULL, PASS_TEXT,
                       PASS_LONGTEXT, true )
+            change_safe()
 vlc_module_end ()
 
 

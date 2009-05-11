@@ -63,6 +63,7 @@ vlc_module_begin ()
 
     add_bool( "ps-trust-timestamps", true, NULL, TIME_TEXT,
                  TIME_LONGTEXT, true )
+        change_safe ()
 
     add_submodule ()
     set_description( N_("MPEG-PS demuxer") )
