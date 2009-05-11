@@ -50,6 +50,10 @@
 #define GS_PATH      "/org/gnome/ScreenSaver"
 #define GS_INTERFACE "org.gnome.ScreenSaver"
 
+#define FDS_SERVICE   "org.freedesktop.ScreenSaver"
+#define FDS_PATH      "/ScreenSaver"
+#define FDS_INTERFACE "org.freedesktop.ScreenSaver"
+
 #endif
 
 /*****************************************************************************
@@ -67,8 +71,11 @@ static void poke_screensaver( intf_thread_t *p_intf,
                               DBusConnection *p_connection );
 static void screensaver_send_message_void ( intf_thread_t *p_intf,
                                        DBusConnection *p_connection,
+                                       const char *psz_service,
+                                       const char *psz_path,
+                                       const char *psz_interface,
                                        const char *psz_name );
-static bool screensaver_is_running( DBusConnection *p_connection );
+static bool screensaver_is_running( DBusConnection *p_connection, const char *psz_service );
 
 
 struct intf_sys_t
@@ -235,34 +242,47 @@ static DBusConnection * dbus_init( intf_thread_t *p_intf )
 static void poke_screensaver( intf_thread_t *p_intf,
                               DBusConnection *p_connection )
 {
-    if( screensaver_is_running( p_connection ) )
+    if( screensaver_is_running( p_connection, GS_SERVICE ) )
     {
 #   ifdef SCREENSAVER_DEBUG
         msg_Dbg( p_intf, "found a running gnome-screensaver instance" );
 #   endif
         /* gnome-screensaver changed it's D-Bus interface, so we need both */
-        screensaver_send_message_void( p_intf, p_connection, "Poke" );
-        screensaver_send_message_void( p_intf, p_connection,
-                "SimulateUserActivity" );
+        screensaver_send_message_void( p_intf, p_connection, GS_SERVICE, GS_PATH,
+                                       GS_INTERFACE, "Poke" );
+        screensaver_send_message_void( p_intf, p_connection, GS_SERVICE, GS_PATH,
+                                       GS_INTERFACE, "SimulateUserActivity" );
+    }
+    else if( screensaver_is_running( p_connection, FDS_SERVICE ) )
+    {
+#   ifdef SCREENSAVER_DEBUG
+        msg_Dbg( p_intf, "found a running freedesktop-screensaver instance" );
+#   endif
+        screensaver_send_message_void( p_intf, p_connection, FDS_SERVICE, FDS_PATH,
+                                       FDS_INTERFACE, "SimulateUserActivity" );
     }
 #   ifdef SCREENSAVER_DEBUG
     else
     {
-        msg_Dbg( p_intf, "found no running gnome-screensaver instance" );
+        msg_Dbg( p_intf, "found no running (gnome|freedesktop)-screensaver instance" );
     }
 #   endif
+
 }
 
 static void screensaver_send_message_void ( intf_thread_t *p_intf,
                                        DBusConnection *p_connection,
+                                       const char *psz_service,
+                                       const char *psz_path,
+                                       const char *psz_interface,
                                        const char *psz_name )
 {
     DBusMessage *p_message;
 
     if( !p_connection || !psz_name ) return;
 
-    p_message = dbus_message_new_method_call( GS_SERVICE, GS_PATH,
-                                              GS_INTERFACE, psz_name );
+    p_message = dbus_message_new_method_call( psz_service, psz_path,
+                                              psz_interface, psz_name );
     if( p_message == NULL )
     {
         msg_Err( p_intf, "DBUS initialization failed: message initialization" );
@@ -279,7 +299,7 @@ static void screensaver_send_message_void ( intf_thread_t *p_intf,
     dbus_message_unref( p_message );
 }
 
-static bool screensaver_is_running( DBusConnection *p_connection )
+static bool screensaver_is_running( DBusConnection *p_connection, const char *psz_service )
 {
     DBusError error;
     bool b_return;
@@ -287,7 +307,7 @@ static bool screensaver_is_running( DBusConnection *p_connection )
     if( !p_connection ) return false;
 
     dbus_error_init( &error );
-    b_return = dbus_bus_name_has_owner( p_connection, GS_SERVICE, &error );
+    b_return = dbus_bus_name_has_owner( p_connection, psz_service, &error );
     if( dbus_error_is_set( &error ) ) dbus_error_free (&error);
 
     return b_return;
