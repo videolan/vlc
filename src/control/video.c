@@ -104,7 +104,7 @@ void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
 }
 
 void
-libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, char *psz_filepath,
+libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, const char *psz_filepath,
         unsigned int i_width, unsigned int i_height, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
