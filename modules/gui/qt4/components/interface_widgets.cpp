@@ -121,7 +121,7 @@ WId VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
 
 /* Set the Widget to the correct Size */
 /* Function has to be called by the parent
-   Parent has to care about resizing himself*/
+   Parent has to care about resizing itself */
 void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
     msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
