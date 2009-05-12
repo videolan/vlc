@@ -172,6 +172,9 @@ int MMSHOpen( access_t *p_access )
 
         if( !p_input )
         {
+            vlc_UrlClean( &p_sys->proxy );
+            vlc_UrlClean( &p_sys->url );
+            free( p_sys );
             free( psz_location );
             return VLC_EGENERIC;
         }
