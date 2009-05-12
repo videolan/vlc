@@ -24610,13 +24610,11 @@ msgid "(Experimental) XCB video window"
 msgstr "(Kokeellinen) XCB videoulostulo"
 
 #: modules/video_output/xcb/window.c:165
-#, fuzzy
 msgctxt "ASCII"
 msgid "VLC media player"
 msgstr "VLC-mediasoitin"
 
 #: modules/video_output/xcb/window.c:167
-#, fuzzy
 msgctxt "ASCII"
 msgid "VLC"
 msgstr "VLC"

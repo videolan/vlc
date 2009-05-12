@@ -24171,16 +24171,14 @@ msgid "(Experimental) XCB video window"
 msgstr "Videoutmatning med DirectX"
 
 #: modules/video_output/xcb/window.c:165
-#, fuzzy
 msgctxt "ASCII"
 msgid "VLC media player"
 msgstr "Mediaspelaren VLC"
 
 #: modules/video_output/xcb/window.c:167
-#, fuzzy
 msgctxt "ASCII"
 msgid "VLC"
-msgstr "VLM"
+msgstr "VLC"
 
 #: modules/video_output/yuv.c:51
 msgid "device, fifo or filename"
