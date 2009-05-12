@@ -1035,6 +1035,7 @@ static int mms_CommandSend( access_t *p_access, int i_command,
     vlc_mutex_unlock( &p_sys->lock_netwrite );
     if( i_ret != buffer.i_data - ( 8 - ( i_data - i_data_old ) ) )
     {
+        var_buffer_free( &buffer );
         msg_Err( p_access, "failed to send command" );
         return VLC_EGENERIC;
     }
