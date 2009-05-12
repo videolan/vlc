@@ -208,7 +208,7 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
             free( psz_filter_chain );
         }
 
-        if( p_vout->fmt_render.i_chroma != p_fmt->i_chroma ||
+        if( p_vout->fmt_render.i_chroma != vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma ) ||
             p_vout->fmt_render.i_width != p_fmt->i_width ||
             p_vout->fmt_render.i_height != p_fmt->i_height ||
             p_vout->p->b_filter_change )
@@ -303,7 +303,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 
     unsigned int i_width = p_fmt->i_width;
     unsigned int i_height = p_fmt->i_height;
-    vlc_fourcc_t i_chroma = p_fmt->i_chroma;
+    vlc_fourcc_t i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma );
     unsigned int i_aspect = p_fmt->i_aspect;
 
     config_chain_t *p_cfg;
