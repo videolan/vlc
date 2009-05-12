@@ -96,7 +96,7 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
     closeButton->setDefault( true );
 
     QLabel *introduction = new QLabel(
-            qtr( "VLC media player" " " VERSION_MESSAGE ) );
+            qtr( "VLC media player" ) + qfu( " " VERSION_MESSAGE );
     QLabel *iconVLC = new QLabel;
     if( QDate::currentDate().dayOfYear() >= 354 )
         iconVLC->setPixmap( QPixmap( ":/vlc48-christmas.png" ) );
