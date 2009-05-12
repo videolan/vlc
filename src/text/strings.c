@@ -36,6 +36,7 @@
 
 /* Needed by str_format_time */
 #include <time.h>
+#include <limits.h>
 
 /* Needed by str_format_meta */
 #include <vlc_input.h>
