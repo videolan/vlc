@@ -276,50 +276,50 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* Init this new stream */
     switch( p_input->p_fmt->i_codec )
     {
-        case VLC_FOURCC( 'm', 'p', '1', 'v' ):
+        case VLC_CODEC_MP1V:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
             p_stream->i_stream_type = 0x01; /* ISO/IEC 11172 Video */
             break;
-        case VLC_FOURCC( 'm', 'p', '2', 'v' ):
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+        case VLC_CODEC_MP2V:
+        case VLC_CODEC_MPGV:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
             p_stream->i_stream_type = 0x02; /* ISO/IEC 13818 Video */
             break;
-        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+        case VLC_CODEC_MP4V:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
             p_stream->i_stream_type = 0x10;
             break;
-        case VLC_FOURCC( 'h', '2', '6', '4' ):
+        case VLC_CODEC_H264:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpgv, 0xe0, 0xef );
             p_stream->i_stream_type = 0x1b;
             break;
-        case VLC_FOURCC( 'l', 'p', 'c', 'm' ):
+        case VLC_CODEC_DVD_LPCM:
             p_stream->i_stream_id =
                 0xbd00 | StreamIdGet( p_sys->stream_id_lpcm, 0xa0, 0xaf );
             break;
-        case VLC_FOURCC( 'd', 't', 's', ' ' ):
+        case VLC_CODEC_DTS:
             p_stream->i_stream_id =
                 0xbd00 | StreamIdGet( p_sys->stream_id_dts, 0x88, 0x8f );
             break;
-        case VLC_FOURCC( 'a', '5', '2', ' ' ):
+        case VLC_CODEC_A52:
             p_stream->i_stream_id =
                 0xbd00 | StreamIdGet( p_sys->stream_id_a52, 0x80, 0x87 );
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_CODEC_MPGA:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
             p_stream->i_stream_type = 0x03; /* ISO/IEC 11172 Audio */
             break;
-        case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+        case VLC_CODEC_MP4A:
             p_stream->i_stream_id =
                 StreamIdGet( p_sys->stream_id_mpga, 0xc0, 0xcf );
             p_stream->i_stream_type = 0x0f;
             break;
-        case VLC_FOURCC( 's', 'p', 'u', ' ' ):
+        case VLC_CODEC_SPU:
             p_stream->i_stream_id =
                 0xbd00 | StreamIdGet( p_sys->stream_id_spu, 0x20, 0x3f );
             break;
@@ -399,27 +399,27 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     msg_Dbg( p_mux, "removing input" );
     switch( p_input->p_fmt->i_codec )
     {
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+        case VLC_CODEC_MPGV:
             StreamIdRelease( p_sys->stream_id_mpgv, 0xe0,
                              p_stream->i_stream_id );
             break;
-        case VLC_FOURCC( 'l', 'p', 'c', 'm' ):
+        case VLC_CODEC_DVD_LPCM:
             StreamIdRelease( p_sys->stream_id_lpcm, 0xa0,
                              p_stream->i_stream_id&0xff );
             break;
-        case VLC_FOURCC( 'd', 't', 's', ' ' ):
+        case VLC_CODEC_DTS:
             StreamIdRelease( p_sys->stream_id_dts, 0x88,
                              p_stream->i_stream_id&0xff );
             break;
-        case VLC_FOURCC( 'a', '5', '2', ' ' ):
+        case VLC_CODEC_A52:
             StreamIdRelease( p_sys->stream_id_a52, 0x80,
                              p_stream->i_stream_id&0xff );
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_CODEC_MPGA:
             StreamIdRelease( p_sys->stream_id_mpga, 0xc0,
                              p_stream->i_stream_id  );
             break;
-        case VLC_FOURCC( 's', 'p', 'u', ' ' ):
+        case VLC_CODEC_SPU:
             StreamIdRelease( p_sys->stream_id_spu, 0x20,
                              p_stream->i_stream_id&0xff );
             break;

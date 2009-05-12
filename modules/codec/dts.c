@@ -140,11 +140,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_DTS &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('d','t','s','b') )
-    {
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_DTS )
         return VLC_EGENERIC;
-    }
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )

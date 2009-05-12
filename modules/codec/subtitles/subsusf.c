@@ -68,7 +68,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('u','s','f',' ') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_USF )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */

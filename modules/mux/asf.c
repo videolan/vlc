@@ -374,17 +374,17 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
             switch( p_input->p_fmt->i_codec )
             {
-                case VLC_FOURCC( 'a', '5', '2', ' ' ):
+                case VLC_CODEC_A52:
                     tk->i_tag = WAVE_FORMAT_A52;
                     tk->psz_name = "A/52";
                     i_bitspersample = 0;
                     break;
-                case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+                case VLC_CODEC_MP4A:
                     tk->i_tag = WAVE_FORMAT_AAC;
                     tk->psz_name = "MPEG-4 Audio";
                     i_bitspersample = 0;
                     break;
-                case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+                case VLC_CODEC_MPGA:
 #if 1
                     tk->psz_name = "MPEG Audio Layer 3";
                     tk->i_tag = WAVE_FORMAT_MPEGLAYER3;
@@ -400,47 +400,46 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     i_extra = 22;
                     break;
 #endif
-                case VLC_FOURCC( 'w', 'm', 'a', '1' ):
+                case VLC_CODEC_WMA1:
                     tk->psz_name = "Windows Media Audio v1";
                     tk->i_tag = WAVE_FORMAT_WMA1;
                     tk->b_audio_correction = true;
                     break;
-                case VLC_FOURCC( 'w', 'm', 'a', ' ' ):
-                case VLC_FOURCC( 'w', 'm', 'a', '2' ):
+                case VLC_CODEC_WMA2:
                     tk->psz_name= "Windows Media Audio (v2) 7, 8 and 9 Series";
                     tk->i_tag = WAVE_FORMAT_WMA2;
                     tk->b_audio_correction = true;
                     break;
-                case VLC_FOURCC( 'w', 'm', 'a', 'p' ):
+                case VLC_CODEC_WMAP:
                     tk->psz_name = "Windows Media Audio 9 Professional";
                     tk->i_tag = WAVE_FORMAT_WMAP;
                     tk->b_audio_correction = true;
                     break;
-                case VLC_FOURCC( 'w', 'm', 'a', 'l' ):
+                case VLC_CODEC_WMAL:
                     tk->psz_name = "Windows Media Audio 9 Lossless";
                     tk->i_tag = WAVE_FORMAT_WMAL;
                     tk->b_audio_correction = true;
                     break;
                     /* raw codec */
-                case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+                case VLC_CODEC_U8:
                     tk->psz_name = "Raw audio 8bits";
                     tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= p_input->p_fmt->audio.i_channels;
                     i_bitspersample = 8;
                     break;
-                case VLC_FOURCC( 's', '1', '6', 'l' ):
+                case VLC_CODEC_S16L:
                     tk->psz_name = "Raw audio 16bits";
                     tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= 2 * p_input->p_fmt->audio.i_channels;
                     i_bitspersample = 16;
                     break;
-                case VLC_FOURCC( 's', '2', '4', 'l' ):
+                case VLC_CODEC_S24L:
                     tk->psz_name = "Raw audio 24bits";
                     tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= 3 * p_input->p_fmt->audio.i_channels;
                     i_bitspersample = 24;
                     break;
-                case VLC_FOURCC( 's', '3', '2', 'l' ):
+                case VLC_CODEC_S32L:
                     tk->psz_name = "Raw audio 32bits";
                     tk->i_tag = WAVE_FORMAT_PCM;
                     i_blockalign= 4 * p_input->p_fmt->audio.i_channels;
@@ -513,42 +512,42 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             uint8_t *p_codec_extra = NULL;
             int     i_codec_extra = 0;
 
-            if( p_input->p_fmt->i_codec == VLC_FOURCC('m','p','4','v') )
+            if( p_input->p_fmt->i_codec == VLC_CODEC_MP4V )
             {
                 tk->psz_name = "MPEG-4 Video";
                 tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', 'S' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('D','I','V','3') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_DIV3 )
             {
                 tk->psz_name = "MSMPEG-4 V3 Video";
                 tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', '3' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('D','I','V','2') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_DIV2 )
             {
                 tk->psz_name = "MSMPEG-4 V2 Video";
                 tk->i_fourcc = VLC_FOURCC( 'M', 'P', '4', '2' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('D','I','V','1') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_DIV2 )
             {
                 tk->psz_name = "MSMPEG-4 V1 Video";
                 tk->i_fourcc = VLC_FOURCC( 'M', 'P', 'G', '4' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('W','M','V','1') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_WMV1 )
             {
                 tk->psz_name = "Windows Media Video 7";
                 tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '1' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('W','M','V','2') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_WMV2 )
             {
                 tk->psz_name = "Windows Media Video 8";
                 tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '2' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('W','M','V','3') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_WMV3 )
             {
                 tk->psz_name = "Windows Media Video 9";
                 tk->i_fourcc = VLC_FOURCC( 'W', 'M', 'V', '3' );
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('W','V','C','1') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_VC1 )
             {
                 tk->psz_name = "Windows Media Video 9 Advanced Profile";
                 tk->i_fourcc = VLC_FOURCC( 'W', 'V', 'C', '1' );
@@ -565,7 +564,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     }
                 }
             }
-            else if( p_input->p_fmt->i_codec == VLC_FOURCC('h','2','6','4') )
+            else if( p_input->p_fmt->i_codec == VLC_CODEC_H264 )
             {
                 tk->psz_name = "H.264/MPEG-4 AVC";
                 tk->i_fourcc = VLC_FOURCC('h','2','6','4');
@@ -573,7 +572,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             else
             {
                 tk->psz_name = _("Unknown Video");
-                tk->i_fourcc = p_input->p_fmt->i_codec;
+                tk->i_fourcc = p_input->p_fmt->i_original_fourcc ?: p_input->p_fmt->i_codec;
             }
             if( !i_codec_extra && p_fmt->i_extra > 0 )
             {

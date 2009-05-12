@@ -278,7 +278,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     /* This is a hack */
     if( i_codec_id == CODEC_ID_MP2 )
         i_codec_id = CODEC_ID_MP3;
-    codec->codec_tag = p_input->p_fmt->i_codec;
+    codec->codec_tag = p_input->p_fmt->i_original_fourcc ?: p_input->p_fmt->i_codec;
 #endif
     codec->codec_id = i_codec_id;
 

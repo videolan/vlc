@@ -245,27 +245,21 @@ static int Open( vlc_object_t *p_this )
 
     switch( p_dec->fmt_in.i_codec )
     {
-        case VLC_CODEC_H264: /* H.264 */
-        case VLC_FOURCC('c','v','i','d'): /* Cinepak */
+        case VLC_CODEC_H264:
+        case VLC_CODEC_CINEPAK:
         case VLC_FOURCC('I','V','4','1'): /* Indeo Video IV */
         case VLC_FOURCC('i','v','4','1'): /* dto. */
 #ifdef __APPLE__
         case VLC_FOURCC('p','x','l','t'): /* Pixlet */
 #endif
-        case VLC_FOURCC('d','v','1','n'): /* DVC Pro 100 NTSC */
-        case VLC_FOURCC('d','v','1','p'): /* DVC Pro 100 PAL */
-        case VLC_FOURCC('d','v','h','p'): /* DVC PRO HD 720p */
-        case VLC_FOURCC('d','v','h','6'): /* DVC PRO HD 1080i 60 */
-        case VLC_FOURCC('d','v','h','5'): /* DVC PRO HD 1080i 50 */
-
+        case VLC_CODEC_DV:
         case VLC_CODEC_SVQ3: /* Sorenson v3 */
     /*    case VLC_CODEC_SVQ1:  Sorenson v1
         case VLC_FOURCC('Z','y','G','o'):
         case VLC_FOURCC('V','P','3','1'):
         case VLC_FOURCC('3','I','V','1'): */
-        case VLC_CODEC_QTRLE: /* QuickTime animation (RLE) */
-        case VLC_CODEC_RPZA: /* QuickTime Apple Video */
-        case VLC_FOURCC('a','z','p','r'): /* QuickTime animation (RLE) */
+        case VLC_CODEC_QTRLE:
+        case VLC_CODEC_RPZA:
 #ifdef LOADER
         p_dec->p_sys = NULL;
         p_dec->pf_decode_video = DecodeVideo;
@@ -394,7 +388,10 @@ static int OpenAudio( decoder_t *p_dec )
     p_dec->p_sys = p_sys;
     p_dec->pf_decode_audio = DecodeAudio;
 
-    memcpy( fcc, &p_dec->fmt_in.i_codec, 4 );
+    if( p_dec->fmt_in.i_original_fourcc )
+        memcpy( fcc, &p_dec->fmt_in.i_original_fourcc, 4 );
+    else
+        memcpy( fcc, &p_dec->fmt_in.i_codec, 4 );
 
 #ifdef __APPLE__
     EnterMovies();
@@ -694,7 +691,11 @@ static int OpenVideo( decoder_t *p_dec )
         return VLC_EGENERIC;
     }
 
-    memcpy( fcc, &p_dec->fmt_in.i_codec, 4 );
+    if( p_dec->fmt_in.i_original_fourcc )
+        memcpy( fcc, &p_dec->fmt_in.i_original_fourcc, 4 );
+    else
+        memcpy( fcc, &p_dec->fmt_in.i_codec, 4 );
+
     msg_Dbg( p_dec, "quicktime_video %4.4s %dx%d",
              fcc, p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
 

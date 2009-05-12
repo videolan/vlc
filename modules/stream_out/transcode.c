@@ -433,7 +433,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
-        if( p_sys->i_acodec == VLC_FOURCC('m','p','3',0) &&
+        if( p_sys->i_acodec == VLC_FOURCC('m','p','3',' ') &&
             p_sys->i_channels > 2 )
         {
             msg_Warn( p_stream, "%d channels invalid for mp3, forcing to 2",
@@ -598,7 +598,7 @@ static int Open( vlc_object_t *p_this )
                                    &p_sys->p_osd_cfg, strdup( "dvbsub") );
         free( psz_next );
 
-        p_sys->i_osdcodec = VLC_FOURCC('Y','U','V','P' );
+        p_sys->i_osdcodec = VLC_CODEC_YUVP;
 
         msg_Dbg( p_stream, "codec osd=%4.4s", (char *)&p_sys->i_osdcodec );
 
@@ -1082,11 +1082,11 @@ static int transcode_audio_filter_chain_build( sout_stream_t *p_stream, filter_c
          p_dst->audio.i_rate );
 
     /* If any filter is needed, convert to fl32 */
-    if( current.i_codec != VLC_FOURCC('f','l','3','2') )
+    if( current.i_codec != VLC_CODEC_FL32 )
     {
         /* First step, convert to fl32 */
         current.i_codec =
-        current.audio.i_format = VLC_FOURCC('f','l','3','2');
+        current.audio.i_format = VLC_CODEC_FL32;
 
         if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
         {
@@ -1182,7 +1182,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         aout_BitsPerSample( id->p_decoder->fmt_out.i_codec );
     fmt_last = id->p_decoder->fmt_out;
     /* Fix AAC SBR changing number of channels and sampling rate */
-    if( !(id->p_decoder->fmt_in.i_codec == VLC_FOURCC('m','p','4','a') &&
+    if( !(id->p_decoder->fmt_in.i_codec == VLC_CODEC_MP4A &&
         fmt_last.audio.i_rate != id->p_encoder->fmt_in.audio.i_rate &&
         fmt_last.audio.i_channels != id->p_encoder->fmt_in.audio.i_channels) )
         fmt_last.audio.i_rate = id->p_decoder->fmt_in.audio.i_rate;
@@ -1227,7 +1227,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     {
         es_format_t fmt_fl32 = fmt_last;
         fmt_fl32.i_codec =
-        fmt_fl32.audio.i_format = VLC_FOURCC('f','l','3','2');
+        fmt_fl32.audio.i_format = VLC_CODEC_FL32;
         if( transcode_audio_filter_chain_build( p_stream, id->p_uf_chain,
                                                 &fmt_fl32, &fmt_last ) )
         {
@@ -1256,9 +1256,9 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
     fmt_last = id->p_encoder->fmt_in;
 
-    /* FIXME: Hack for mp3 transcoding support */
-    if( id->p_encoder->fmt_out.i_codec == VLC_FOURCC( 'm','p','3',' ' ) )
-        id->p_encoder->fmt_out.i_codec = VLC_FOURCC( 'm','p','g','a' );
+    /* */
+    id->p_encoder->fmt_out.i_codec =
+        vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
 
     return VLC_SUCCESS;
 }
@@ -1735,12 +1735,9 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 
     id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
 
-    /* Hack for mp2v/mp1v transcoding support */
-    if( id->p_encoder->fmt_out.i_codec == VLC_FOURCC('m','p','1','v') ||
-        id->p_encoder->fmt_out.i_codec == VLC_FOURCC('m','p','2','v') )
-    {
-        id->p_encoder->fmt_out.i_codec = VLC_FOURCC('m','p','g','v');
-    }
+    /*  */
+    id->p_encoder->fmt_out.i_codec =
+        vlc_fourcc_GetCodec( VIDEO_ES, id->p_encoder->fmt_out.i_codec );
 
     id->id = sout_StreamIdAdd( p_stream->p_sys->p_out,
                                &id->p_encoder->fmt_out );
@@ -2402,7 +2399,7 @@ static int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
         /* Open encoder */
         es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
-                        VLC_FOURCC('Y','U','V','A') );
+                        VLC_CODEC_YUVA );
         id->p_encoder->fmt_in.psz_language = strdup( "osd" );
 
         id->p_encoder->p_cfg = p_sys->p_osd_cfg;

@@ -588,7 +588,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             if( p_sys->i_chroma )
                 fmt_out.i_chroma = p_sys->i_chroma;
             else
-                fmt_out.i_chroma = VLC_FOURCC('I','4','2','0');
+                fmt_out.i_chroma = VLC_CODEC_I420;
 
             if ( !p_sys->i_height )
             {

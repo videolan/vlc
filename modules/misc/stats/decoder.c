@@ -54,7 +54,7 @@ int OpenDecoder ( vlc_object_t *p_this )
     p_dec->pf_decode_sub = NULL;
 
     /* */
-    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_FOURCC('I','4','2','0') );
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_I420 );
     p_dec->fmt_out.video.i_width = 100;
     p_dec->fmt_out.video.i_height = 100;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;

@@ -132,7 +132,6 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     {
     /* DVD LPCM */
     case VLC_CODEC_DVD_LPCM:
-    case VLC_FOURCC('l','p','c','b'):
         b_dvd = true;
         break;
     /* BD LPCM */

@@ -116,39 +116,37 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->fmt.i_codec = VLC_FOURCC( psz_fourcc[0], psz_fourcc[1],
-                                     psz_fourcc[2], psz_fourcc[3] );
+    p_sys->fmt.i_codec = vlc_fourcc_GetCodec( AUDIO_ES,
+                                              VLC_FOURCC( psz_fourcc[0], psz_fourcc[1],
+                                                          psz_fourcc[2], psz_fourcc[3] ) );
 
     free( psz_fourcc );
     // get the bits per sample ratio based on codec
     switch( p_sys->fmt.i_codec )
     {
 
-        case VLC_FOURCC( 'f', 'l', '6', '4' ):
+        case VLC_CODEC_FL64:
             p_sys->fmt.audio.i_bitspersample = 64;
             break;
 
-        case VLC_FOURCC( 'f', 'l', '3', '2' ):
-        case VLC_FOURCC( 's', '3', '2', 'l' ):
-        case VLC_FOURCC( 's', '3', '2', 'b' ):
-        case VLC_FOURCC( 'i', 'n', '3', '2' ):
+        case VLC_CODEC_FL32:
+        case VLC_CODEC_S32L:
+        case VLC_CODEC_S32B:
             p_sys->fmt.audio.i_bitspersample = 32;
             break;
 
-        case VLC_FOURCC( 's', '2', '4', 'l' ):
-        case VLC_FOURCC( 's', '2', '4', 'b' ):
-        case VLC_FOURCC( 'i', 'n', '2', '4' ):
-        case VLC_FOURCC( '4', '2', 'n', 'i' ):
+        case VLC_CODEC_S24L:
+        case VLC_CODEC_S24B:
             p_sys->fmt.audio.i_bitspersample = 24;
             break;
 
-        case VLC_FOURCC( 's', '1', '6', 'l' ):
-        case VLC_FOURCC( 's', '1', '6', 'b' ):
+        case VLC_CODEC_S16L:
+        case VLC_CODEC_S16B:
             p_sys->fmt.audio.i_bitspersample = 16;
             break;
 
-        case VLC_FOURCC( 's', '8', ' ', ' ' ):
-        case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+        case VLC_CODEC_S8:
+        case VLC_CODEC_U8:
             p_sys->fmt.audio.i_bitspersample = 8;
             break;
 

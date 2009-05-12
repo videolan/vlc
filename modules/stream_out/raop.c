@@ -1404,7 +1404,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     switch ( id->fmt.i_cat )
     {
     case AUDIO_ES:
-        if ( id->fmt.i_codec == VLC_FOURCC('a', 'l', 'a', 'c') )
+        if ( id->fmt.i_codec == VLC_CODEC_ALAC )
         {
             if ( p_sys->p_audio_stream )
             {

@@ -121,17 +121,26 @@ static int OpenDecoder( vlc_object_t *p_this )
 #ifdef __GLIBC__
     mtrace();
 #endif
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','1') &&
-        /* Pinnacle hardware-mpeg1 */
-        p_dec->fmt_in.i_codec != VLC_FOURCC('P','I','M','1') &&
-        /* VIA hardware-mpeg2 */
-        p_dec->fmt_in.i_codec != VLC_FOURCC('X','x','M','C') &&
-        /* ATI Video */
-        p_dec->fmt_in.i_codec != VLC_FOURCC('V','C','R','2') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','2') )
-    {
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
         return VLC_EGENERIC;
+    /* Select onl recognized original format (standard mpeg video) */
+    switch( p_dec->fmt_in.i_original_fourcc )
+    {
+    case VLC_FOURCC('m','p','g','1'):
+    case VLC_FOURCC('m','p','g','2'):
+    case VLC_FOURCC('m','p','g','v'):
+    /* Pinnacle hardware-mpeg1 */
+    case VLC_FOURCC('P','I','M','1'):
+    /* VIA hardware-mpeg2 */
+    case VLC_FOURCC('X','x','M','C'):
+    /* ATI Video */
+    case VLC_FOURCC('V','C','R','2'):
+    case VLC_FOURCC('m','p','g','2'):
+        break;
+    default:
+        if( p_dec->fmt_in.i_original_fourcc )
+            return VLC_EGENERIC;
+        break;
     }
 
     msg_Dbg(p_dec, "OpenDecoder Entering");

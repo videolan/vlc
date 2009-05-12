@@ -93,7 +93,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     input_thread_t * p_input;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('c','m','m','l') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_CMML )
         return VLC_EGENERIC;
 
     p_dec->pf_decode_sub = DecodeBlock;

@@ -234,7 +234,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         case VLC_CODEC_SUBT:
         case VLC_CODEC_SSA:
-        case VLC_FOURCC('t','1','4','0'):
+        case VLC_CODEC_ITU_T140:
             break;
         default:
             return VLC_EGENERIC;
@@ -262,7 +262,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     char *psz_charset = NULL;
 
     /* First try demux-specified encoding */
-    if( p_dec->fmt_in.i_codec == VLC_FOURCC('t','1','4','0') )
+    if( p_dec->fmt_in.i_codec == VLC_CODEC_ITU_T140 )
         psz_charset = strdup( "UTF-8" ); /* IUT T.140 is always using UTF-8 */
     else
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )

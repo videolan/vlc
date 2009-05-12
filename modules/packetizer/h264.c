@@ -183,18 +183,11 @@ static int Open( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int i;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_H264 &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'V', 'S', 'S', 'H') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'v', 's', 's', 'h') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'D', 'A', 'V', 'C') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'x', '2', '6', '4') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 'X', '2', '6', '4') &&
-        ( p_dec->fmt_in.i_codec != VLC_FOURCC( 'a', 'v', 'c', '1') ||
-          p_dec->fmt_in.i_extra < 7 ) )
-    {
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_H264 )
         return VLC_EGENERIC;
-    }
+    if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1') &&
+        p_dec->fmt_in.i_extra < 7 )
+        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc( sizeof(decoder_sys_t) ) ) == NULL )
@@ -235,7 +228,7 @@ static int Open( vlc_object_t *p_this )
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_H264;
 
-    if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
+    if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
     {
         /* This type of stream is produced by mp4 and matroska
          * when we want to store it in another streamformat, you need to convert

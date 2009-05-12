@@ -205,11 +205,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_SPEEX 
-        && p_dec->fmt_in.i_codec != VLC_FOURCC('s', 'p', 'x', 'r') )
-    {
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_SPEEX )
         return VLC_EGENERIC;
-    }
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -231,7 +228,7 @@ static int OpenDecoder( vlc_object_t *p_this )
       being invoked on a Speex stream arriving via RTP. 
       A special decoder callback is used.
     */
-    if (p_dec->fmt_in.i_codec == VLC_FOURCC('s', 'p', 'x', 'r'))
+    if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC('s', 'p', 'x', 'r'))
     {
         msg_Dbg( p_dec, "Using RTP version of Speex decoder @ rate %d.", 
 	    p_dec->fmt_in.audio.i_rate );

@@ -267,38 +267,36 @@ typedef struct
  * Do not do non native and non standard association !
  * Muxer will be probe if no entry found */
 static const muxer_properties_t p_muxers[] = {
-    M( "raw", "mp3", 1,         VLC_FOURCC('m','p','g','a') ),
-    M( "raw", "a52", 1,         VLC_FOURCC('a','5','2',' ') ),
-    M( "raw", "dts", 1,         VLC_FOURCC('d','t','s',' ') ),
-    M( "raw", "mpc", 1,         VLC_FOURCC('m','p','c',' ') ),
-    M( "raw", "ape", 1,         VLC_FOURCC('A','P','E',' ') ),
+    M( "raw", "mp3", 1,         VLC_CODEC_MPGA ),
+    M( "raw", "a52", 1,         VLC_CODEC_A52 ),
+    M( "raw", "dts", 1,         VLC_CODEC_DTS ),
+    M( "raw", "mpc", 1,         VLC_CODEC_MUSEPACK7, VLC_CODEC_MUSEPACK8 ),
+    M( "raw", "ape", 1,         VLC_CODEC_APE ),
 
-    M( "wav", "wav", 1,         VLC_FOURCC('a','r','a','w'), VLC_FOURCC('u','8',' ',' '), VLC_FOURCC('s','1','6','l'),
-                                VLC_FOURCC('s','2','4','l'), VLC_FOURCC('s','3','2','l'), VLC_FOURCC('f','l','3','2') ),
+    M( "wav", "wav", 1,         VLC_FOURCC('a','r','a','w'), VLC_CODEC_U8, VLC_CODEC_S16L,
+                                VLC_CODEC_S24L, VLC_CODEC_S32L, VLC_CODEC_FL32 ),
 
-    //M( "ffmpeg{mux=flac}", "flac", 1, VLC_FOURCC('f','l','a','c') ), BROKEN
+    //M( "ffmpeg{mux=flac}", "flac", 1, VLC_CODEC_FLAC ), BROKEN
 
-    M( "ogg", "ogg", INT_MAX,   VLC_FOURCC('v','o','r','b'), VLC_FOURCC('s','p','x',' '), VLC_FOURCC('f','l','a','c'),
-                                VLC_FOURCC('s','u','b','t'), VLC_FOURCC('t','h','e','o'), VLC_FOURCC('d','r','a','c')  ),
+    M( "ogg", "ogg", INT_MAX,   VLC_CODEC_VORBIS, VLC_CODEC_SPEEX, VLC_CODEC_FLAC,
+                                VLC_CODEC_SUBT, VLC_CODEC_THEORA, VLC_CODEC_DIRAC  ),
 
-    M( "asf", "asf", 127,       VLC_FOURCC('w','m','a','1'), VLC_FOURCC('w','m','a','2'), VLC_FOURCC('w','m','a',' '),
-                                VLC_FOURCC('w','m','a','p'), VLC_FOURCC('w','m','a','l'),
-                                VLC_FOURCC('W','M','V','1'), VLC_FOURCC('W','M','V','2'), VLC_FOURCC('W','M','V','3'),
-                                VLC_FOURCC('W','V','C','1')),
+    M( "asf", "asf", 127,       VLC_CODEC_WMA1, VLC_CODEC_WMA2, VLC_CODEC_WMAP, VLC_CODEC_WMAL, VLC_CODEC_WMAS,
+                                VLC_CODEC_WMV1, VLC_CODEC_WMV2, VLC_CODEC_WMV3, VLC_CODEC_VC1 ),
 
-    M( "mp4", "mp4", INT_MAX,   VLC_FOURCC('m','p','4','a'), VLC_FOURCC('h','2','6','4'), VLC_FOURCC('m','p','4','v'),
-                                VLC_FOURCC('s','u','b','t') ),
+    M( "mp4", "mp4", INT_MAX,   VLC_CODEC_MP4A, VLC_CODEC_H264, VLC_CODEC_MP4V,
+                                VLC_CODEC_SUBT ),
 
-    M( "ps", "mpg", 16/* FIXME*/,VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'),
-                                VLC_FOURCC('m','p','g','a'), VLC_FOURCC('l','p','c','m'), VLC_FOURCC('a','5','2',' '),
-                                VLC_FOURCC('d','t','s',' '),
-                                VLC_FOURCC('s','p','u',' ') ),
+    M( "ps", "mpg", 16/* FIXME*/,VLC_CODEC_MPGV, VLC_CODEC_MP1V, VLC_CODEC_MP2V,
+                                VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
+                                VLC_CODEC_DTS,
+                                VLC_CODEC_SPU ),
 
-    M( "ts", "ts", 8000,        VLC_FOURCC('m','p','g','v'), VLC_FOURCC('m','p','1','v'), VLC_FOURCC('m','p','2','v'),
-                                VLC_FOURCC('h','2','6','4'),
-                                VLC_FOURCC('m','p','g','a'), VLC_FOURCC('l','p','c','m'), VLC_FOURCC('a','5','2',' '),
-                                VLC_FOURCC('d','t','s',' '), VLC_FOURCC('m','p','4','a'),
-                                VLC_FOURCC('d','v','b','s'), VLC_FOURCC('t','e','l','x') ),
+    M( "ts", "ts", 8000,        VLC_CODEC_MPGV, VLC_CODEC_MP1V, VLC_CODEC_MP2V,
+                                VLC_CODEC_H264,
+                                VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
+                                VLC_CODEC_DTS, VLC_CODEC_MP4A,
+                                VLC_CODEC_DVBS, VLC_CODEC_TELETEXT ),
 
     M( NULL, NULL, 0, 0 )
 };

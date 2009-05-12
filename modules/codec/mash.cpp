@@ -87,7 +87,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         /* Planar YUV */
         case VLC_CODEC_H261:
-        case VLC_FOURCC('H','2','6','1'):
             break;
 
         default:

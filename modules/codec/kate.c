@@ -346,7 +346,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     int            i_ret;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('k','a','t','e') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_KATE )
     {
         return VLC_EGENERIC;
     }
@@ -450,7 +450,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
     if( i_ret == VLC_SUCCESS )
     {
         p_dec->p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_FOURCC( 'k', 'a', 't', 'e' );
+        p_dec->fmt_out.i_codec = VLC_CODEC_KATE;
     }
 
     return i_ret;

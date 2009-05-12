@@ -1537,7 +1537,7 @@ static subpicture_t *render( decoder_t *p_dec )
             continue;
         }
 
-        /* FIXME: don't create a subpicture region with VLC_FOURCC YUVP 
+        /* FIXME: don't create a subpicture region with VLC CODEC YUVP 
          * when it actually is a TEXT region */
 
         /* Create new SPU region */

@@ -3463,7 +3463,7 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
     {
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->b_packetized = true;
-        p_fmt->i_codec = VLC_FOURCC('a','e','s','3');
+        p_fmt->i_codec = VLC_CODEC_302M;
     }
     else
     {

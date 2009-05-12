@@ -131,30 +131,8 @@ static int Open( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    switch( p_dec->fmt_in.i_codec )
-    {
-        case VLC_FOURCC( 'm', '4', 's', '2'):
-        case VLC_FOURCC( 'M', '4', 'S', '2'):
-        case VLC_FOURCC( 'm', 'p', '4', 's'):
-        case VLC_FOURCC( 'M', 'P', '4', 'S'):
-        case VLC_CODEC_MP4V:
-        case VLC_FOURCC( 'M', 'P', '4', 'V'):
-        case VLC_FOURCC( 'D', 'I', 'V', 'X'):
-        case VLC_FOURCC( 'd', 'i', 'v', 'x'):
-        case VLC_FOURCC( 'X', 'V', 'I', 'D'):
-        case VLC_FOURCC( 'X', 'v', 'i', 'D'):
-        case VLC_FOURCC( 'x', 'v', 'i', 'd'):
-        case VLC_FOURCC( 'D', 'X', '5', '0'):
-        case VLC_FOURCC( 'd', 'x', '5', '0'):
-        case VLC_FOURCC( 0x04, 0,   0,   0):
-        case VLC_FOURCC( '3', 'I', 'V', '2'):
-        case VLC_FOURCC( 'm', '4', 'c', 'c'):
-        case VLC_FOURCC( 'M', '4', 'C', 'C'):
-            break;
-
-        default:
-            return VLC_EGENERIC;
-    }
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MP4V )
+        return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc( sizeof(decoder_sys_t) ) ) == NULL )

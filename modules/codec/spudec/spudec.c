@@ -73,11 +73,8 @@ static int DecoderOpen( vlc_object_t *p_this )
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_SPU &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC( 's','p','u','b' ) )
-    {
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_SPU )
         return VLC_EGENERIC;
-    }
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
 

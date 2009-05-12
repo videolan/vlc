@@ -96,32 +96,24 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_CODEC_I422:
         case VLC_CODEC_I420:
         case VLC_CODEC_YV12:
-        case VLC_FOURCC('I','Y','U','V'):
         case VLC_CODEC_I411:
         case VLC_CODEC_I410:
-        case VLC_FOURCC('Y','V','U','9'):
-        case VLC_FOURCC('Y','4','2','B'):
-        case VLC_FOURCC('Y','4','1','B'):
+        case VLC_CODEC_GREY:
+        case VLC_CODEC_YUVP:
 
         /* Packed YUV */
         case VLC_CODEC_YUYV:
-        case VLC_FOURCC('Y','8','0','0'):
+        case VLC_CODEC_YVYU:
         case VLC_CODEC_UYVY:
-        case VLC_FOURCC('H','D','Y','C'):
+        case VLC_CODEC_VYUY:
 
         /* RGB */
         case VLC_CODEC_RGB32:
         case VLC_CODEC_RGB24:
         case VLC_CODEC_RGB16:
         case VLC_CODEC_RGB15:
-            break;
-        case VLC_FOURCC('2','V','u','y'):
-        case VLC_FOURCC('2','v','u','y'):
-        case VLC_FOURCC('A','V','U','I'):
-            p_dec->fmt_in.i_codec = VLC_CODEC_UYVY;
-            break;
-        case VLC_FOURCC('y','v','1','2'):
-            p_dec->fmt_in.i_codec = VLC_CODEC_YV12;
+        case VLC_CODEC_RGB8:
+        case VLC_CODEC_RGBP:
             break;
 
         default:

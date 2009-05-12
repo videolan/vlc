@@ -175,7 +175,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->id = NULL;
 
     if( p_fmt->i_cat == VIDEO_ES
-            && p_fmt->i_codec == VLC_FOURCC('m', 'p', 'g', 'v') )
+            && p_fmt->i_codec == VLC_CODEC_MPGV )
     {
         msg_Dbg( p_stream,
                  "creating video transrating for fcc=`%4.4s'",

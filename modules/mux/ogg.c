@@ -342,14 +342,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
         switch( p_stream->i_fourcc )
         {
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '3' ):
-        case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
-        case VLC_FOURCC( 'W', 'M', 'V', '1' ):
-        case VLC_FOURCC( 'W', 'M', 'V', '2' ):
-        case VLC_FOURCC( 'W', 'M', 'V', '3' ):
-        case VLC_FOURCC( 'S', 'N', 'O', 'W' ):
+        case VLC_CODEC_MP4V:
+        case VLC_CODEC_MPGV:
+        case VLC_CODEC_DIV3:
+        case VLC_CODEC_MJPG:
+        case VLC_CODEC_WMV1:
+        case VLC_CODEC_WMV2:
+        case VLC_CODEC_WMV3:
+        case VLC_CODEC_SNOW:
             p_stream->p_oggds_header = calloc( 1, sizeof(oggds_header_t) );
             if( !p_stream->p_oggds_header )
             {
@@ -359,11 +359,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
 
             memcpy( p_stream->p_oggds_header->stream_type, "video", 5 );
-            if( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) )
+            if( p_stream->i_fourcc == VLC_CODEC_MP4V )
             {
                 memcpy( p_stream->p_oggds_header->sub_type, "XVID", 4 );
             }
-            else if( p_stream->i_fourcc == VLC_FOURCC( 'D', 'I', 'V', '3' ) )
+            else if( p_stream->i_fourcc == VLC_CODEC_DIV3 )
             {
                 memcpy( p_stream->p_oggds_header->sub_type, "DIV3", 4 );
             }
@@ -388,11 +388,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             msg_Dbg( p_mux, "%4.4s stream", (char *)&p_stream->i_fourcc );
             break;
 
-        case VLC_FOURCC( 'd', 'r', 'a', 'c' ):
+        case VLC_CODEC_DIRAC:
             msg_Dbg( p_mux, "dirac stream" );
             break;
 
-        case VLC_FOURCC( 't', 'h', 'e', 'o' ):
+        case VLC_CODEC_THEORA:
             msg_Dbg( p_mux, "theora stream" );
             break;
 
@@ -405,15 +405,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case AUDIO_ES:
         switch( p_stream->i_fourcc )
         {
-        case VLC_FOURCC( 'v', 'o', 'r', 'b' ):
+        case VLC_CODEC_VORBIS:
             msg_Dbg( p_mux, "vorbis stream" );
             break;
 
-        case VLC_FOURCC( 's', 'p', 'x', ' ' ):
+        case VLC_CODEC_SPEEX:
             msg_Dbg( p_mux, "speex stream" );
             break;
 
-        case VLC_FOURCC( 'f', 'l', 'a', 'c' ):
+        case VLC_CODEC_FLAC:
             msg_Dbg( p_mux, "flac stream" );
             break;
 
@@ -470,7 +470,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     case SPU_ES:
         switch( p_stream->i_fourcc )
         {
-        case VLC_FOURCC( 's', 'u','b', 't' ):
+        case VLC_CODEC_SUBT:
             p_stream->p_oggds_header = calloc( 1, sizeof(oggds_header_t) );
             if( !p_stream->p_oggds_header )
             {
@@ -626,9 +626,9 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
         ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
         p_stream->i_packet_no = 0;
 
-        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
-            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) ||
-            p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+        if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
+            p_stream->i_fourcc == VLC_CODEC_SPEEX ||
+            p_stream->i_fourcc == VLC_CODEC_THEORA )
         {
             /* First packet in order: vorbis/speex/theora info */
             p_extra = p_input->p_fmt->p_extra;
@@ -652,7 +652,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
 
             /* Get keyframe_granule_shift for theora granulepos calculation */
-            if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+            if( p_stream->i_fourcc == VLC_CODEC_THEORA )
             {
                 int i_keyframe_frequency_force =
                       1 << ((op.packet[40] << 6 >> 3) | (op.packet[41] >> 5));
@@ -667,7 +667,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 }
             }
         }
-        else if( p_stream->i_fourcc == VLC_FOURCC( 'd', 'r', 'a', 'c' ) )
+        else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
         {
             op.packet = p_input->p_fmt->p_extra;
             op.bytes  = p_input->p_fmt->i_extra;
@@ -678,7 +678,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             ogg_stream_packetin( &p_stream->os, &op );
             p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
         }
-        else if( p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
+        else if( p_stream->i_fourcc == VLC_CODEC_FLAC )
         {
             /* flac stream marker (yeah, only that in the 1st packet) */
             op.packet = (unsigned char *)"fLaC";
@@ -712,15 +712,15 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
         sout_input_t *p_input = p_mux->pp_inputs[i];
         ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
 
-        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
-            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) ||
-            p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+        if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
+            p_stream->i_fourcc == VLC_CODEC_SPEEX ||
+            p_stream->i_fourcc == VLC_CODEC_THEORA )
         {
             /* Special case, headers are already there in the incoming stream.
              * We need to gather them an mark them as headers. */
             int j = 2;
 
-            if( p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) ) j = 1;
+            if( p_stream->i_fourcc == VLC_CODEC_SPEEX ) j = 1;
 
             p_extra = p_input->p_fmt->p_extra;
             i_extra = p_input->p_fmt->i_extra;
@@ -755,8 +755,8 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 block_ChainAppend( &p_hdr, p_og );
             }
         }
-        else if( p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) &&
-                 p_stream->i_fourcc != VLC_FOURCC( 'd', 'r', 'a', 'c' ) )
+        else if( p_stream->i_fourcc != VLC_CODEC_FLAC &&
+                 p_stream->i_fourcc != VLC_CODEC_DIRAC )
         {
             uint8_t com[128];
             int     i_com;
@@ -778,8 +778,8 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
         }
 
         /* Special case for mp4v and flac */
-        if( ( p_stream->i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) ||
-              p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) ) &&
+        if( ( p_stream->i_fourcc == VLC_CODEC_MP4V ||
+              p_stream->i_fourcc == VLC_CODEC_FLAC ) &&
             p_input->p_fmt->i_extra )
         {
             /* Send a packet with the VOL data for mp4v
@@ -787,7 +787,7 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
             msg_Dbg( p_mux, "writing extra data" );
             op.bytes  = p_input->p_fmt->i_extra;
             op.packet = p_input->p_fmt->p_extra;
-            if( p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) )
+            if( p_stream->i_fourcc == VLC_CODEC_FLAC )
             {
                 /* Skip the flac stream marker */
                 op.bytes -= 4;
@@ -964,11 +964,11 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     block_t *p_og = NULL;
     ogg_packet op;
 
-    if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 'f', 'l', 'a', 'c' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 's', 'p', 'x', ' ' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) &&
-        p_stream->i_fourcc != VLC_FOURCC( 'd', 'r', 'a', 'c' ) )
+    if( p_stream->i_fourcc != VLC_CODEC_VORBIS &&
+        p_stream->i_fourcc != VLC_CODEC_FLAC &&
+        p_stream->i_fourcc != VLC_CODEC_SPEEX &&
+        p_stream->i_fourcc != VLC_CODEC_THEORA &&
+        p_stream->i_fourcc != VLC_CODEC_DIRAC )
     {
         p_data = block_Realloc( p_data, 1, p_data->i_buffer );
         p_data->p_buffer[0] = PACKET_IS_SYNCPOINT;      // FIXME
@@ -982,9 +982,9 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if( p_stream->i_cat == AUDIO_ES )
     {
-        if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
-            p_stream->i_fourcc == VLC_FOURCC( 'f', 'l', 'a', 'c' ) ||
-            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
+        if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
+            p_stream->i_fourcc == VLC_CODEC_FLAC ||
+            p_stream->i_fourcc == VLC_CODEC_SPEEX )
         {
             /* number of sample from begining + current packet */
             op.granulepos =
@@ -1000,7 +1000,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     else if( p_stream->i_cat == VIDEO_ES )
     {
-        if( p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
+        if( p_stream->i_fourcc == VLC_CODEC_THEORA )
         {
             /* FIXME, we assume only keyframes */
             op.granulepos = ( ( p_data->i_dts - p_sys->i_start_dts ) *
@@ -1008,7 +1008,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_input->p_fmt->video.i_frame_rate_base /
                 INT64_C(1000000) ) << p_stream->i_keyframe_granule_shift;
         }
-        else if( p_stream->i_fourcc == VLC_FOURCC( 'd', 'r', 'a', 'c' ) )
+        else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
         {
             mtime_t dt = (p_data->i_dts - p_sys->i_start_dts + 1)
                        * p_input->p_fmt->video.i_frame_rate *2
@@ -1038,8 +1038,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     ogg_stream_packetin( &p_stream->os, &op );
 
     if( p_stream->i_cat == SPU_ES ||
-        p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) ||
-        p_stream->i_fourcc == VLC_FOURCC( 'd', 'r', 'a', 'c' ) )
+        p_stream->i_fourcc == VLC_CODEC_SPEEX ||
+        p_stream->i_fourcc == VLC_CODEC_DIRAC )
     {
         /* Subtitles or Speex packets are quite small so they
          * need to be flushed to be sent on time */

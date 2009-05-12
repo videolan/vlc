@@ -402,7 +402,7 @@ static int Open( vlc_object_t * p_this )
                     tk->i_samplesize = tk->i_blocksize;
                 }
 
-                if( tk->i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+                if( tk->i_codec == VLC_CODEC_VORBIS )
                 {
                     tk->i_blocksize = 0; /* fix vorbis VBR decoding */
                 }
@@ -445,7 +445,7 @@ static int Open( vlc_object_t * p_this )
                  *  - Size of the next packet, and so on ...
                  */
 
-                if( tk->i_codec == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+                if( tk->i_codec == VLC_CODEC_VORBIS )
                 {
                     uint8_t *p_extra = fmt.p_extra; 
                     size_t i_extra = fmt.i_extra;
@@ -511,33 +511,33 @@ static int Open( vlc_object_t * p_this )
                     switch( p_vids->p_bih->biBitCount )
                     {
                         case 32:
-                            tk->i_codec = VLC_FOURCC('R','V','3','2');
+                            tk->i_codec = VLC_CODEC_RGB32;
                             break;
                         case 24:
-                            tk->i_codec = VLC_FOURCC('R','V','2','4');
+                            tk->i_codec = VLC_CODEC_RGB24;
                             break;
                         case 16: /* Yes it is RV15 */
                         case 15:
-                            tk->i_codec = VLC_FOURCC('R','V','1','5');
+                            tk->i_codec = VLC_CODEC_RGB15;
                             break;
                         case 9: /* <- TODO check that */
-                            tk->i_codec = VLC_FOURCC( 'Y', 'V', 'U', '9' );
+                            tk->i_codec = VLC_CODEC_I410;
                             break;
                         case 8: /* <- TODO check that */
-                            tk->i_codec = VLC_FOURCC('Y','8','0','0');
+                            tk->i_codec = VLC_CODEC_GREY;
                             break;
                     }
                     es_format_Init( &fmt, VIDEO_ES, tk->i_codec );
 
                     switch( tk->i_codec )
                     {
-                    case VLC_FOURCC('R','V','2','4'):
-                    case VLC_FOURCC('R','V','3','2'):
+                    case VLC_CODEC_RGB24:
+                    case VLC_CODEC_RGB32:
                         fmt.video.i_rmask = 0x00ff0000;
                         fmt.video.i_gmask = 0x0000ff00;
                         fmt.video.i_bmask = 0x000000ff;
                         break;
-                    case VLC_FOURCC('R','V','1','5'):
+                    case VLC_CODEC_RGB15:
                         fmt.video.i_rmask = 0x7c00;
                         fmt.video.i_gmask = 0x03e0;
                         fmt.video.i_bmask = 0x001f;
@@ -552,7 +552,8 @@ static int Open( vlc_object_t * p_this )
                     if( tk->i_codec == VLC_CODEC_MP4V &&
                         !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
                     {
-                        fmt.i_codec = VLC_FOURCC( 'X', 'V', 'I', 'D' );
+                        fmt.i_codec           =
+                        fmt.i_original_fourcc = VLC_FOURCC( 'X', 'V', 'I', 'D' );
                     }
                 }
                 tk->i_samplesize = 0;
@@ -604,7 +605,7 @@ static int Open( vlc_object_t * p_this )
 
             case( AVIFOURCC_txts):
                 tk->i_cat   = SPU_ES;
-                tk->i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+                tk->i_codec = VLC_CODEC_SUBT;
                 msg_Dbg( p_demux, "stream[%d] subtitles", i );
                 es_format_Init( &fmt, SPU_ES, tk->i_codec );
                 break;

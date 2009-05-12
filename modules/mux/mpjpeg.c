@@ -131,16 +131,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     msg_Dbg( p_mux, "adding input" );
-    if( p_input->p_fmt->i_codec != VLC_FOURCC('M','J','P','G') &&
-        p_input->p_fmt->i_codec != VLC_FOURCC('m','j','p','g') &&
-        p_input->p_fmt->i_codec != VLC_FOURCC('j','p','e','g') &&
-        p_input->p_fmt->i_codec != VLC_FOURCC('J','P','E','G') &&
-        p_input->p_fmt->i_codec != VLC_FOURCC('J','F','I','F') &&
-        p_input->p_fmt->i_codec != VLC_FOURCC('J','P','G','L') &&
-        p_input->p_fmt->i_codec != VLC_FOURCC('m','j','p','a') )
-    {
+    if( p_input->p_fmt->i_codec != VLC_CODEC_MJPG )
         return VLC_EGENERIC;
-    }
 
     return VLC_SUCCESS;
 }

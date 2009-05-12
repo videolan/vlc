@@ -119,15 +119,21 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     uint32_t i_accel = 0;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','1') &&
-        /* Pinnacle hardware-mpeg1 */
-        p_dec->fmt_in.i_codec != VLC_FOURCC('P','I','M','1') &&
-        p_dec->fmt_in.i_codec != VLC_CODEC_MP2V &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('m','p','g','2') &&
-        p_dec->fmt_in.i_codec != VLC_FOURCC('h','d','v','2') )
-    {
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
         return VLC_EGENERIC;
+    /* Select onl recognized original format (standard mpeg video) */
+    switch( p_dec->fmt_in.i_original_fourcc )
+    {
+    case VLC_FOURCC('m','p','g','1'):
+    case VLC_FOURCC('m','p','g','2'):
+    case VLC_FOURCC('m','p','g','v'):
+    case VLC_FOURCC('P','I','M','1'):
+    case VLC_FOURCC('h','d','v','2'):
+        break;
+    default:
+        if( p_dec->fmt_in.i_original_fourcc )
+            return VLC_EGENERIC;
+        break;
     }
 
     /* Allocate the memory needed to store the decoder's structure */

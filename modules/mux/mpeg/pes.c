@@ -111,7 +111,7 @@ static inline int PESHeader( uint8_t *p_hdr, mtime_t i_pts, mtime_t i_dts,
 
                 if( i_pts > 0 && i_dts > 0 &&
                     ( i_pts != i_dts || ( p_fmt->i_cat == VIDEO_ES &&
-                      p_fmt->i_codec != VLC_FOURCC('m','p','g','v') ) ) )
+                      p_fmt->i_codec != VLC_CODEC_MPGV ) ) )
                 {
                     i_pts_dts = 0x03;
                     if ( !i_header_size ) i_header_size = 0xa;
@@ -341,7 +341,7 @@ int  EStoPES ( sout_instance_t *p_sout, block_t **pp_pes, block_t *p_es,
         i_max_pes_size = PES_PAYLOAD_SIZE_MAX;
     }
 
-    if( p_fmt->i_codec == VLC_FOURCC( 'm', 'p','4', 'v' ) &&
+    if( p_fmt->i_codec == VLC_CODEC_MP4V &&
         p_es->i_flags & BLOCK_FLAG_TYPE_I )
     {
         /* For MPEG4 video, add VOL before I-frames */

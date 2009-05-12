@@ -115,7 +115,6 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     switch( p_dec->fmt_in.i_codec )
     {
     case VLC_CODEC_A52:
-    case VLC_FOURCC('a','5','2','b'):
         i_codec = VLC_CODEC_A52;
         break;
     case VLC_CODEC_EAC3:

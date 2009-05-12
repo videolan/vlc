@@ -90,81 +90,6 @@ static int Open( vlc_object_t *p_this )
     /* Fix the value of the fourcc */
     switch( p_dec->fmt_in.i_codec )
     {
-        /* video */
-        case VLC_FOURCC( 'm', '4', 's', '2'):
-        case VLC_FOURCC( 'M', '4', 'S', '2'):
-        case VLC_FOURCC( 'm', 'p', '4', 's'):
-        case VLC_FOURCC( 'M', 'P', '4', 'S'):
-        case VLC_FOURCC( 'D', 'I', 'V', 'X'):
-        case VLC_FOURCC( 'd', 'i', 'v', 'x'):
-        case VLC_FOURCC( 'X', 'V', 'I', 'D'):
-        case VLC_FOURCC( 'X', 'v', 'i', 'D'):
-        case VLC_FOURCC( 'x', 'v', 'i', 'd'):
-        case VLC_FOURCC( 'D', 'X', '5', '0'):
-        case VLC_FOURCC( 0x04, 0,   0,   0):
-        case VLC_FOURCC( '3', 'I', 'V', '2'):
-            p_dec->fmt_out.i_codec = VLC_CODEC_MP4V;
-            break;
-
-        case VLC_FOURCC( 'm', 'p', 'g', '1' ):
-        case VLC_FOURCC( 'm', 'p', 'g', '2' ):
-        case VLC_CODEC_MP1V:
-        case VLC_CODEC_MP2V:
-            p_dec->fmt_out.i_codec = VLC_CODEC_MPGV;
-            break;
-
-        case VLC_FOURCC( 'd', 'i', 'v', '1' ):
-        case VLC_FOURCC( 'M', 'P', 'G', '4' ):
-        case VLC_FOURCC( 'm', 'p', 'g', '4' ):
-            p_dec->fmt_out.i_codec = VLC_CODEC_DIV1;
-            break;
-
-        case VLC_FOURCC( 'd', 'i', 'v', '2' ):
-        case VLC_FOURCC( 'M', 'P', '4', '2' ):
-        case VLC_FOURCC( 'm', 'p', '4', '2' ):
-            p_dec->fmt_out.i_codec = VLC_CODEC_DIV2;
-            break;
-
-        case VLC_FOURCC( 'd', 'i', 'v', '3' ):
-        case VLC_FOURCC( 'd', 'i', 'v', '4' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '4' ):
-        case VLC_FOURCC( 'd', 'i', 'v', '5' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '5' ):
-        case VLC_FOURCC( 'd', 'i', 'v', '6' ):
-        case VLC_FOURCC( 'D', 'I', 'V', '6' ):
-        case VLC_FOURCC( 'M', 'P', '4', '3' ):
-        case VLC_FOURCC( 'm', 'p', '4', '3' ):
-        case VLC_FOURCC( 'm', 'p', 'g', '3' ):
-        case VLC_FOURCC( 'M', 'P', 'G', '3' ):
-        case VLC_FOURCC( 'A', 'P', '4', '1' ):
-            p_dec->fmt_out.i_codec = VLC_CODEC_DIV3;
-            break;
-
-        case VLC_CODEC_H263:
-        case VLC_FOURCC( 'U', '2', '6', '3' ):
-        case VLC_FOURCC( 'u', '2', '6', '3' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'H', '2', '6', '3' );
-            break;
-
-        case VLC_FOURCC( 'i', '2', '6', '3' ):
-            p_dec->fmt_out.i_codec = VLC_CODEC_H263I;
-            break;
-
-        case VLC_FOURCC( 'm', 'j', 'p', 'g' ):
-        case VLC_FOURCC( 'm', 'j', 'p', 'a' ):
-        case VLC_CODEC_JPEG:
-        case VLC_FOURCC( 'J', 'P', 'E', 'G' ):
-        case VLC_FOURCC( 'J', 'F', 'I', 'F' ):
-            p_dec->fmt_out.i_codec = VLC_CODEC_MJPG;
-            break;
-
-        case VLC_FOURCC( 'd', 'v', 's', 'd' ):
-        case VLC_FOURCC( 'D', 'V', 'S', 'D' ):
-        case VLC_FOURCC( 'd', 'v', 'h', 'd' ):
-            p_dec->fmt_out.i_codec = VLC_FOURCC( 'd', 'v', 's', 'l' );
-            break;
-
-        /* audio */
         case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
             switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
             {
@@ -229,7 +154,7 @@ static int Open( vlc_object_t *p_this )
             break;
     }
 
-    p_dec->p_sys = p_sys = malloc( sizeof( block_t ) );
+    p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
     p_sys->p_block    = NULL;
 
     return VLC_SUCCESS;

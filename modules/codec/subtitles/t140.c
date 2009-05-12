@@ -57,14 +57,14 @@ static int Open( vlc_object_t *p_this )
                 msg_Err( p_this, "Only UTF-8 encoding supported" );
                 return VLC_EGENERIC;
             }
-        case VLC_FOURCC('t','1','4','0'):
+        case VLC_CODEC_ITU_T140:
             break;
 
         default:
             if( !p_enc->b_force )
                 return VLC_EGENERIC;
 
-            p_enc->fmt_out.i_codec = VLC_FOURCC('t','1','4','0');
+            p_enc->fmt_out.i_codec = VLC_CODEC_ITU_T140;
     }
 
     p_enc->p_sys = NULL;

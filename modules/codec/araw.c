@@ -189,7 +189,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_FOURCC('s','o','w','t'):
 
     case VLC_CODEC_ALAW:
-    case VLC_FOURCC('u','l','a','w'):
     case VLC_CODEC_MULAW:
 
     case VLC_CODEC_FL64:
@@ -202,9 +201,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_S16B:
     case VLC_CODEC_S8:
     case VLC_CODEC_U8:
-    case VLC_FOURCC('i','n','2','4'): /* Quicktime in24, bigendian int24 */
-    case VLC_FOURCC('4','2','n','i'): /* Quicktime in24, little-endian int24 */
-    case VLC_FOURCC('i','n','3','2'): /* Quicktime in32, bigendian int32 */
         break;
 
     default:
@@ -252,27 +248,10 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 32;
     }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'i', 'n', '3', '2' ) )
-    {
-        /* FIXME: mplayer uses bigendian for in24 .... but here it works
-         * with little endian ... weird */
-        p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
-        p_dec->fmt_in.audio.i_bitspersample = 32;
-    }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_S24L ||
              p_dec->fmt_in.i_codec == VLC_CODEC_S24B )
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
-        p_dec->fmt_in.audio.i_bitspersample = 24;
-    }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'i', 'n', '2', '4' ) )
-    {
-        p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
-        p_dec->fmt_in.audio.i_bitspersample = 24;
-    }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( '4', '2', 'n', 'i' ) )
-    {
-        p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
         p_dec->fmt_in.audio.i_bitspersample = 24;
     }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_S16L ||
@@ -372,8 +351,7 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_sys->p_logtos16  = alawtos16;
         p_dec->fmt_in.audio.i_bitspersample = 8;
     }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'u', 'l', 'a', 'w' ) ||
-             p_dec->fmt_in.i_codec == VLC_CODEC_MULAW )
+    else if( p_dec->fmt_in.i_codec == VLC_CODEC_MULAW )
     {
         p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
         p_sys->p_logtos16  = ulawtos16;
@@ -397,7 +375,6 @@ static int DecoderOpen( vlc_object_t *p_this )
             p_dec->fmt_in.audio.i_original_channels;
 
     if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAW ||
-        p_dec->fmt_in.i_codec == VLC_FOURCC( 'u', 'l', 'a', 'w' ) ||
         p_dec->fmt_in.i_codec == VLC_CODEC_MULAW )
     {
         p_dec->fmt_out.audio.i_bitspersample = 16;
@@ -1381,7 +1358,6 @@ static int EncoderOpen( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec == VLC_CODEC_U8 ||
         p_enc->fmt_out.i_codec == VLC_CODEC_S8 ||
         p_enc->fmt_out.i_codec == VLC_CODEC_ALAW ||
-        p_enc->fmt_out.i_codec == VLC_FOURCC('u','l','a','w') ||
         p_enc->fmt_out.i_codec == VLC_CODEC_MULAW)
     {
         p_enc->fmt_out.audio.i_bitspersample = 8;
@@ -1396,8 +1372,7 @@ static int EncoderOpen( vlc_object_t *p_this )
     else if( p_enc->fmt_out.i_codec == VLC_CODEC_U24L ||
              p_enc->fmt_out.i_codec == VLC_CODEC_U24B ||
              p_enc->fmt_out.i_codec == VLC_CODEC_S24L ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_S24B ||
-             p_enc->fmt_out.i_codec == VLC_FOURCC('i','n','2','4') )
+             p_enc->fmt_out.i_codec == VLC_CODEC_S24B )
     {
         p_enc->fmt_out.audio.i_bitspersample = 24;
     }
@@ -1405,7 +1380,6 @@ static int EncoderOpen( vlc_object_t *p_this )
              p_enc->fmt_out.i_codec == VLC_CODEC_U32B ||
              p_enc->fmt_out.i_codec == VLC_CODEC_S32L ||
              p_enc->fmt_out.i_codec == VLC_CODEC_S32B ||
-             p_enc->fmt_out.i_codec == VLC_FOURCC('i','n','3','2') ||
              p_enc->fmt_out.i_codec == VLC_CODEC_FI32 ||
              p_enc->fmt_out.i_codec == VLC_CODEC_FL32 )
     {
@@ -1435,8 +1409,7 @@ static int EncoderOpen( vlc_object_t *p_this )
         p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
         p_sys->i_s16tolog = ALAW;
     }
-    else if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'u', 'l', 'a', 'w' ) ||
-             p_enc->fmt_out.i_codec == VLC_CODEC_MULAW )
+    else if( p_enc->fmt_out.i_codec == VLC_CODEC_MULAW )
     {
         p_enc->fmt_in.audio.i_bitspersample = 16;
         p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;

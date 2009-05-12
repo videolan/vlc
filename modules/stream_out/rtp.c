@@ -1030,21 +1030,21 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     else
     switch( p_fmt->i_codec )
     {
-        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
+        case VLC_CODEC_MULAW:
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
                 id->i_payload_type = 0;
             id->psz_enc = "PCMU";
             id->pf_packetize = rtp_packetize_split;
             rtp_set_ptime (id, 20, 1);
             break;
-        case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
+        case VLC_CODEC_ALAW:
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 8000 )
                 id->i_payload_type = 8;
             id->psz_enc = "PCMA";
             id->pf_packetize = rtp_packetize_split;
             rtp_set_ptime (id, 20, 1);
             break;
-        case VLC_FOURCC( 's', '1', '6', 'b' ):
+        case VLC_CODEC_S16B:
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
             {
                 id->i_payload_type = 11;
@@ -1058,25 +1058,24 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             id->pf_packetize = rtp_packetize_split;
             rtp_set_ptime (id, 20, 2);
             break;
-        case VLC_FOURCC( 'u', '8', ' ', ' ' ):
+        case VLC_CODEC_U8:
             id->psz_enc = "L8";
             id->pf_packetize = rtp_packetize_split;
             rtp_set_ptime (id, 20, 1);
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_CODEC_MPGA:
         case VLC_FOURCC( 'm', 'p', '3', ' ' ):
             id->i_payload_type = 14;
             id->psz_enc = "MPA";
             id->i_clock_rate = 90000; /* not 44100 */
             id->pf_packetize = rtp_packetize_mpa;
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+        case VLC_CODEC_MPGV:
             id->i_payload_type = 32;
             id->psz_enc = "MPV";
             id->pf_packetize = rtp_packetize_mpv;
             break;
-        case VLC_FOURCC( 'G', '7', '2', '6' ):
-        case VLC_FOURCC( 'g', '7', '2', '6' ):
+        case VLC_CODEC_ADPCM_G726:
             switch( p_fmt->i_bitrate / 1000 )
             {
             case 16:
@@ -1097,15 +1096,15 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 break;
             }
             break;
-        case VLC_FOURCC( 'a', '5', '2', ' ' ):
+        case VLC_CODEC_A52:
             id->psz_enc = "ac3";
             id->pf_packetize = rtp_packetize_ac3;
             break;
-        case VLC_FOURCC( 'H', '2', '6', '3' ):
+        case VLC_CODEC_H263:
             id->psz_enc = "H263-1998";
             id->pf_packetize = rtp_packetize_h263;
             break;
-        case VLC_FOURCC( 'h', '2', '6', '4' ):
+        case VLC_CODEC_H264:
             id->psz_enc = "H264";
             id->pf_packetize = rtp_packetize_h264;
             id->psz_fmtp = NULL;
@@ -1164,7 +1163,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 id->psz_fmtp = strdup( "packetization-mode=1" );
             break;
 
-        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+        case VLC_CODEC_MP4V:
         {
             char hexa[2*p_fmt->i_extra +1];
 
@@ -1179,7 +1178,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             }
             break;
         }
-        case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+        case VLC_CODEC_MP4A:
         {
             if(!p_sys->b_latm)
             {
@@ -1224,21 +1223,21 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             }
             break;
         }
-        case VLC_FOURCC( 's', 'a', 'm', 'r' ):
+        case VLC_CODEC_AMR_NB:
             id->psz_enc = "AMR";
             id->psz_fmtp = strdup( "octet-align=1" );
             id->pf_packetize = rtp_packetize_amr;
             break;
-        case VLC_FOURCC( 's', 'a', 'w', 'b' ):
+        case VLC_CODEC_AMR_WB:
             id->psz_enc = "AMR-WB";
             id->psz_fmtp = strdup( "octet-align=1" );
             id->pf_packetize = rtp_packetize_amr;
             break;
-        case VLC_FOURCC( 's', 'p', 'x', ' ' ):
+        case VLC_CODEC_SPEEX:
             id->psz_enc = "SPEEX";
             id->pf_packetize = rtp_packetize_spx;
             break;
-        case VLC_FOURCC( 't', '1', '4', '0' ):
+        case VLC_CODEC_ITU_T140:
             id->psz_enc = "t140" ;
             id->i_clock_rate = 1000;
             id->pf_packetize = rtp_packetize_t140;

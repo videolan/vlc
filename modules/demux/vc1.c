@@ -106,7 +106,7 @@ static int Open( vlc_object_t * p_this )
         p_sys->f_fps = 0.0;
 
     /* Load the packetizer */
-    es_format_Init( &fmt, VIDEO_ES, VLC_FOURCC( 'W', 'V', 'C', '1' ) );
+    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_VC1 );
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, "VC-1" );
     if( !p_sys->p_packetizer )
     {

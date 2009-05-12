@@ -998,39 +998,39 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VIDEO_ES:
             switch( p_input->p_fmt->i_codec )
             {
-                case VLC_FOURCC( 'm', 'p','g', 'v' ):
+                case VLC_CODEC_MPGV:
                     /* TODO: do we need to check MPEG-I/II ? */
                     p_stream->i_stream_type = 0x02;
                     p_stream->i_stream_id = 0xe0;
                     break;
-                case VLC_FOURCC( 'm', 'p','4', 'v' ):
+                case VLC_CODEC_MP4V:
                     p_stream->i_stream_type = 0x10;
                     p_stream->i_stream_id = 0xe0;
                     p_stream->i_es_id = p_stream->i_pid;
                     break;
-                case VLC_FOURCC( 'h', '2','6', '4' ):
+                case VLC_CODEC_H264:
                     p_stream->i_stream_type = 0x1b;
                     p_stream->i_stream_id = 0xe0;
                     break;
                 /* XXX dirty dirty but somebody want that:
                  *     using crapy MS-codec XXX */
                 /* I didn't want to do that :P */
-                case VLC_FOURCC( 'H', '2', '6', '3' ):
-                case VLC_FOURCC( 'I', '2', '6', '3' ):
-                case VLC_FOURCC( 'W', 'M', 'V', '3' ):
-                case VLC_FOURCC( 'W', 'M', 'V', '2' ):
-                case VLC_FOURCC( 'W', 'M', 'V', '1' ):
-                case VLC_FOURCC( 'D', 'I', 'V', '3' ):
-                case VLC_FOURCC( 'D', 'I', 'V', '2' ):
-                case VLC_FOURCC( 'D', 'I', 'V', '1' ):
-                case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
+                case VLC_CODEC_H263I:
+                case VLC_CODEC_H263:
+                case VLC_CODEC_WMV3:
+                case VLC_CODEC_WMV2:
+                case VLC_CODEC_WMV1:
+                case VLC_CODEC_DIV3:
+                case VLC_CODEC_DIV2:
+                case VLC_CODEC_DIV1:
+                case VLC_CODEC_MJPG:
                     p_stream->i_stream_type = 0xa0; /* private */
                     p_stream->i_stream_id = 0xa0;   /* beurk */
                     p_stream->i_bih_codec  = p_input->p_fmt->i_codec;
                     p_stream->i_bih_width  = p_input->p_fmt->video.i_width;
                     p_stream->i_bih_height = p_input->p_fmt->video.i_height;
                     break;
-                case VLC_FOURCC( 'd', 'r', 'a', 'c' ):
+                case VLC_CODEC_DIRAC:
                     /* stream_id makes use of stream_id_extension */
                     p_stream->i_stream_id = (PES_EXTENDED_STREAM_ID << 8) | 0x60;
                     p_stream->i_stream_type = 0xd1;
@@ -1045,25 +1045,25 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case AUDIO_ES:
             switch( p_input->p_fmt->i_codec )
             {
-                case VLC_FOURCC( 'm', 'p','g', 'a' ):
+                case VLC_CODEC_MPGA:
                 case VLC_FOURCC( 'm', 'p', '3', ' ' ):
                     p_stream->i_stream_type =
                         p_input->p_fmt->audio.i_rate >= 32000 ? 0x03 : 0x04;
                     p_stream->i_stream_id = 0xc0;
                     break;
-                case VLC_FOURCC( 'a', '5','2', ' ' ):
+                case VLC_CODEC_A52:
                     p_stream->i_stream_type = 0x81;
                     p_stream->i_stream_id = 0xbd;
                     break;
-                case VLC_FOURCC( 'l', 'p','c', 'm' ):
+                case VLC_CODEC_DVD_LPCM:
                     p_stream->i_stream_type = 0x83;
                     p_stream->i_stream_id = 0xbd;
                     break;
-                case VLC_FOURCC( 'd', 't','s', ' ' ):
+                case VLC_CODEC_DTS:
                     p_stream->i_stream_type = 0x06;
                     p_stream->i_stream_id = 0xbd;
                     break;
-                case VLC_FOURCC( 'm', 'p','4', 'a' ):
+                case VLC_CODEC_MP4A:
                     /* XXX: make that configurable in some way when LOAS
                      * is implemented for AAC in TS */
                     //p_stream->i_stream_type = 0x11; /* LOAS/LATM */
@@ -1082,22 +1082,22 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case SPU_ES:
             switch( p_input->p_fmt->i_codec )
             {
-                case VLC_FOURCC( 's', 'p','u', ' ' ):
+                case VLC_CODEC_SPU:
                     p_stream->i_stream_type = 0x82;
                     p_stream->i_stream_id = 0xbd;
                     break;
-                case VLC_FOURCC( 's', 'u','b', 't' ):
+                case VLC_CODEC_SUBT:
                     p_stream->i_stream_type = 0x12;
                     p_stream->i_stream_id = 0xfa;
                     p_sys->i_mpeg4_streams++;
                     p_stream->i_es_id = p_stream->i_pid;
                     break;
-                case VLC_FOURCC('d','v','b','s'):
+                case VLC_CODEC_DVBS:
                     p_stream->i_stream_type = 0x06;
                     p_stream->i_es_id = p_input->p_fmt->subs.dvb.i_id;
                     p_stream->i_stream_id = 0xbd;
                     break;
-                case VLC_FOURCC('t','e','l','x'):
+                case VLC_CODEC_TELETEXT:
                     p_stream->i_stream_type = 0x06;
                     p_stream->i_stream_id = 0xbd; /* FIXME */
                     break;
@@ -1185,7 +1185,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     /* Create decoder specific info for subt */
-    if( p_stream->i_codec == VLC_FOURCC( 's', 'u','b', 't' ) )
+    if( p_stream->i_codec == VLC_CODEC_SUBT )
     {
         uint8_t *p;
 
@@ -1489,12 +1489,12 @@ static int Mux( sout_mux_t *p_mux )
 
                     if( p_stream == p_pcr_stream || p_sys->b_data_alignment
                          || p_input->p_fmt->i_codec !=
-                             VLC_FOURCC('m', 'p', 'g', 'a') )
+                             VLC_CODEC_MPGA )
                     {
                         p_data = block_FifoGet( p_input->p_fifo );
 
                         if( p_input->p_fmt->i_codec ==
-                                VLC_FOURCC('m', 'p', '4', 'a' ) )
+                                VLC_CODEC_MP4A )
                             p_data = Add_ADTS( p_data, p_input->p_fmt );
                     }
                     else
@@ -1507,7 +1507,7 @@ static int Mux( sout_mux_t *p_mux )
                         p_data->i_length = p_next->i_dts - p_data->i_dts;
                     }
                     else if( p_input->p_fmt->i_codec !=
-                               VLC_FOURCC('s', 'u', 'b', 't' ) )
+                               VLC_CODEC_SUBT )
                         p_data->i_length = 1000;
 
                     if( ( p_pcr_stream->i_pes_dts > 0 &&
@@ -1546,7 +1546,7 @@ static int Mux( sout_mux_t *p_mux )
                         if( p_input->p_fmt->i_cat == SPU_ES )
                         {
                             if( p_input->p_fmt->i_codec ==
-                                VLC_FOURCC('s','u','b','t') )
+                                VLC_CODEC_SUBT )
                             {
                                 /* Prepend header */
                                 p_data = block_Realloc( p_data, 2,
@@ -1585,14 +1585,14 @@ static int Mux( sout_mux_t *p_mux )
                                 }
                             }
                             else if( p_input->p_fmt->i_codec ==
-                                       VLC_FOURCC('t','e','l','x') )
+                                       VLC_CODEC_TELETEXT )
                             {
                                 /* EN 300 472 */
                                 i_header_size = 0x24;
                                 b_data_alignment = 1;
                             }
                             else if( p_input->p_fmt->i_codec ==
-                                       VLC_FOURCC('d','v','b','s') )
+                                       VLC_CODEC_DVBS )
                             {
                                 /* EN 300 743 */
                                 b_data_alignment = 1;
@@ -1622,7 +1622,7 @@ static int Mux( sout_mux_t *p_mux )
                         }
 
                         if( p_input->p_fmt->i_codec ==
-                                   VLC_FOURCC('d','r','a','c') )
+                                   VLC_CODEC_DIRAC )
                         {
                             b_data_alignment = 1;
                             /* dirac pes packets should be unbounded in
@@ -2545,7 +2545,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
                     bits_write( &bits, 6, 0x05 );   /* AudioStream */
                 }
                 else if( p_stream->i_stream_type == 0x12 &&
-                         p_stream->i_codec == VLC_FOURCC('s','u','b','t') )
+                         p_stream->i_codec == VLC_CODEC_SUBT )
                 {
                     bits_write( &bits, 8, 0x0B );   /* Text Stream */
                     bits_write( &bits, 6, 0x04 );   /* VisualStream */
@@ -2680,14 +2680,14 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             /* "registration" descriptor : "AC-3" */
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
         }
-        else if( p_stream->i_codec == VLC_FOURCC('d','r','a','c') )
+        else if( p_stream->i_codec == VLC_CODEC_DIRAC )
         {
             /* Dirac registration descriptor */
 
             uint8_t data[4] = { 'd', 'r', 'a', 'c' };
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
         }
-        else if( p_stream->i_codec == VLC_FOURCC('d','t','s',' ') )
+        else if( p_stream->i_codec == VLC_CODEC_DTS )
         {
             /* DTS registration descriptor (ETSI TS 101 154 Annex F) */
 
@@ -2695,7 +2695,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             uint8_t data[4] = { 0x44, 0x54, 0x53, 0x32 };
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
         }
-        else if( p_stream->i_codec == VLC_FOURCC('t','e','l','x') )
+        else if( p_stream->i_codec == VLC_CODEC_TELETEXT )
         {
             if( p_stream->i_decoder_specific_info )
             {
@@ -2705,7 +2705,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             }
             continue;
         }
-        else if( p_stream->i_codec == VLC_FOURCC('d','v','b','s') )
+        else if( p_stream->i_codec == VLC_CODEC_DVBS )
         {
             /* DVB subtitles */
             if( p_stream->i_decoder_specific_info )

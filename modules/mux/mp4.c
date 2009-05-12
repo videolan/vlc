@@ -397,22 +397,22 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     switch( p_input->p_fmt->i_codec )
     {
-        case VLC_FOURCC( 'm', 'p', '4', 'a' ):
-        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-        case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
-        case VLC_FOURCC( 'm', 'j', 'p', 'b' ):
-        case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
-        case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
-        case VLC_FOURCC( 'H', '2', '6', '3' ):
-        case VLC_FOURCC( 'h', '2', '6', '4' ):
-        case VLC_FOURCC( 's', 'a', 'm', 'r' ):
-        case VLC_FOURCC( 's', 'a', 'w', 'b' ):
-        case VLC_FOURCC( 'Y', 'V', '1', '2' ):
-        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
+        case VLC_CODEC_MP4A:
+        case VLC_CODEC_MP4V:
+        case VLC_CODEC_MPGA:
+        case VLC_CODEC_MPGV:
+        case VLC_CODEC_MJPG:
+        case VLC_CODEC_MJPGB:
+        case VLC_CODEC_SVQ1:
+        case VLC_CODEC_SVQ3:
+        case VLC_CODEC_H263:
+        case VLC_CODEC_H264:
+        case VLC_CODEC_AMR_NB:
+        case VLC_CODEC_AMR_WB:
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_YUYV:
             break;
-        case VLC_FOURCC( 's', 'u', 'b', 't' ):
+        case VLC_CODEC_SUBT:
             msg_Warn( p_mux, "subtitle track added like in .mov (even when creating .mp4)" );
             break;
         default:
@@ -515,11 +515,11 @@ static int Mux( sout_mux_t *p_mux )
 
 again:
         p_data  = block_FifoGet( p_input->p_fifo );
-        if( p_stream->fmt.i_codec == VLC_FOURCC( 'h', '2', '6', '4' ) )
+        if( p_stream->fmt.i_codec == VLC_CODEC_H264 )
         {
             p_data = ConvertAVC1( p_data );
         }
-        else if( p_stream->fmt.i_codec == VLC_FOURCC( 's', 'u', 'b', 't' ) )
+        else if( p_stream->fmt.i_codec == VLC_CODEC_SUBT )
         {
             p_data = ConvertSUBT( p_data );
         }
@@ -781,18 +781,18 @@ static bo_t *GetESDS( mp4_stream_t *p_stream )
 
     switch( p_stream->fmt.i_codec )
     {
-        case VLC_FOURCC( 'm', 'p', '4', 'v' ):
+        case VLC_CODEC_MP4V:
             i_object_type_indication = 0x20;
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
+        case VLC_CODEC_MPGV:
             /* FIXME MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
             i_object_type_indication = 0x60;
             break;
-        case VLC_FOURCC( 'm', 'p', '4', 'a' ):
+        case VLC_CODEC_MP4A:
             /* FIXME for mpeg2-aac == 0x66->0x68 */
             i_object_type_indication = 0x40;
             break;
-        case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+        case VLC_CODEC_MPGA:
             i_object_type_indication =
                 p_stream->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
             break;
@@ -874,7 +874,7 @@ static bo_t *GetDamrTag( mp4_stream_t *p_stream )
     bo_add_fourcc( damr, "REFC" );
     bo_add_8( damr, 0 );
 
-    if( p_stream->fmt.i_codec == VLC_FOURCC( 's', 'a', 'm', 'r' ) )
+    if( p_stream->fmt.i_codec == VLC_CODEC_AMR_NB )
         bo_add_16be( damr, 0x81ff ); /* Mode set (all modes for AMR_NB) */
     else
         bo_add_16be( damr, 0x83ff ); /* Mode set (all modes for AMR_WB) */
@@ -1026,8 +1026,8 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
     {
         mp4_stream_t *p_stream = p_sys->pp_streams[i_track];
 
-        if( p_stream->fmt.i_codec == VLC_FOURCC('m','p','4','v') ||
-            p_stream->fmt.i_codec == VLC_FOURCC('m','p','4','a') )
+        if( p_stream->fmt.i_codec == VLC_CODEC_MP4V ||
+            p_stream->fmt.i_codec == VLC_CODEC_MP4A )
         {
             bo_t *box = box_new( "\251req" );
             /* String length */
@@ -1093,18 +1093,18 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
     switch( p_stream->fmt.i_codec )
     {
-    case VLC_FOURCC('m','p','4','a'):
+    case VLC_CODEC_MP4A:
         memcpy( fcc, "mp4a", 4 );
         b_descr = true;
         break;
 
-    case VLC_FOURCC('s','a','m','r'):
-    case VLC_FOURCC('s','a','w','b'):
+    case VLC_CODEC_AMR_NB:
+    case VLC_CODEC_AMR_WB:
         memcpy( fcc, (char*)&p_stream->fmt.i_codec, 4 );
         b_descr = true;
         break;
 
-    case VLC_FOURCC('m','p','g','a'):
+    case VLC_CODEC_MPGA:
         if( p_sys->b_mov )
             memcpy( fcc, ".mp3", 4 );
         else
@@ -1128,7 +1128,7 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
     /* SoundDescription */
     if( p_sys->b_mov &&
-        p_stream->fmt.i_codec == VLC_FOURCC('m','p','4','a') )
+        p_stream->fmt.i_codec == VLC_CODEC_MP4A )
     {
         bo_add_16be( soun, 1 );     // version 1;
     }
@@ -1150,7 +1150,7 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
     /* Extended data for SoundDescription V1 */
     if( p_sys->b_mov &&
-        p_stream->fmt.i_codec == VLC_FOURCC('m','p','4','a') )
+        p_stream->fmt.i_codec == VLC_CODEC_MP4A )
     {
         /* samples per packet */
         bo_add_32be( soun, p_stream->fmt.audio.i_frame_length );
@@ -1166,11 +1166,11 @@ static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
         bo_t *box;
 
         if( p_sys->b_mov &&
-            p_stream->fmt.i_codec == VLC_FOURCC('m','p','4','a') )
+            p_stream->fmt.i_codec == VLC_CODEC_MP4A )
         {
             box = GetWaveTag( p_stream );
         }
-        else if( p_stream->fmt.i_codec == VLC_FOURCC('s','a','m','r') )
+        else if( p_stream->fmt.i_codec == VLC_CODEC_AMR_NB )
         {
             box = GetDamrTag( p_stream );
         }
@@ -1196,36 +1196,36 @@ static bo_t *GetVideBox( mp4_stream_t *p_stream )
 
     switch( p_stream->fmt.i_codec )
     {
-    case VLC_FOURCC('m','p','4','v'):
-    case VLC_FOURCC('m','p','g','v'):
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_MPGV:
         memcpy( fcc, "mp4v", 4 );
         break;
 
-    case VLC_FOURCC('M','J','P','G'):
+    case VLC_CODEC_MJPG:
         memcpy( fcc, "mjpa", 4 );
         break;
 
-    case VLC_FOURCC('S','V','Q','1'):
+    case VLC_CODEC_SVQ1:
         memcpy( fcc, "SVQ1", 4 );
         break;
 
-    case VLC_FOURCC('S','V','Q','3'):
+    case VLC_CODEC_SVQ3:
         memcpy( fcc, "SVQ3", 4 );
         break;
 
-    case VLC_FOURCC('H','2','6','3'):
+    case VLC_CODEC_H263:
         memcpy( fcc, "s263", 4 );
         break;
 
-    case VLC_FOURCC('h','2','6','4'):
+    case VLC_CODEC_H264:
         memcpy( fcc, "avc1", 4 );
         break;
 
-    case VLC_FOURCC('Y','V','1','2'):
+    case VLC_CODEC_YV12:
         memcpy( fcc, "yv12", 4 );
         break;
 
-    case VLC_FOURCC('Y','U','Y','2'):
+    case VLC_CODEC_YUYV:
         memcpy( fcc, "yuy2", 4 );
         break;
 
@@ -1269,8 +1269,8 @@ static bo_t *GetVideBox( mp4_stream_t *p_stream )
     /* add an ES Descriptor */
     switch( p_stream->fmt.i_codec )
     {
-    case VLC_FOURCC('m','p','4','v'):
-    case VLC_FOURCC('m','p','g','v'):
+    case VLC_CODEC_MP4V:
+    case VLC_CODEC_MPGV:
         {
             bo_t *esds = GetESDS( p_stream );
 
@@ -1279,7 +1279,7 @@ static bo_t *GetVideBox( mp4_stream_t *p_stream )
         }
         break;
 
-    case VLC_FOURCC('H','2','6','3'):
+    case VLC_CODEC_H263:
         {
             bo_t *d263 = GetD263Tag();
 
@@ -1288,7 +1288,7 @@ static bo_t *GetVideBox( mp4_stream_t *p_stream )
         }
         break;
 
-    case VLC_FOURCC('S','V','Q','3'):
+    case VLC_CODEC_SVQ3:
         {
             bo_t *esds = GetSVQ3Tag( p_stream );
 
@@ -1297,7 +1297,7 @@ static bo_t *GetVideBox( mp4_stream_t *p_stream )
         }
         break;
 
-    case VLC_FOURCC('h','2','6','4'):
+    case VLC_CODEC_H264:
         box_gather( vide, GetAvcCTag( p_stream ) );
         break;
 

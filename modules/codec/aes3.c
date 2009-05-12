@@ -233,7 +233,7 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
 {
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_FOURCC('a','e','s','3') )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_302M )
         return VLC_EGENERIC;
 
     /* Allocate the memory needed to store the decoder's structure */
@@ -253,7 +253,7 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
     /* Set callback */
     if( b_packetizer )
     {
-        p_dec->fmt_out.i_codec = VLC_FOURCC('a','e','s','3');
+        p_dec->fmt_out.i_codec = VLC_CODEC_302M;
 
         p_dec->pf_decode_audio = NULL;
         p_dec->pf_packetize    = Packetize;
