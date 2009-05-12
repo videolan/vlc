@@ -47,25 +47,24 @@ extern "C" {
       && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
       && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
 
+#define AOUT_FMT_S16_NE VLC_CODEC_S16N
+#define AOUT_FMT_U16_NE VLC_CODEC_U16N
+#define AOUT_FMT_S24_NE VLC_CODEC_S24N
+#define AOUT_FMT_S32_NE VLC_CODEC_S32N
+
+#define VLC_CODEC_SPDIFL VLC_FOURCC('s','p','d','i')
+#define VLC_CODEC_SPDIFB VLC_FOURCC('s','p','d','b')
 #ifdef WORDS_BIGENDIAN
-#   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','b')
-#   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','b')
-#   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','b')
-#   define AOUT_FMT_S32_NE VLC_FOURCC('s','3','2','b')
-#   define AOUT_FMT_SPDIF_NE VLC_FOURCC('s','p','d','b')
+#   define AOUT_FMT_SPDIF_NE VLC_CODEC_SPDIFB
 #else
-#   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','l')
-#   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','l')
-#   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','l')
-#   define AOUT_FMT_S32_NE VLC_FOURCC('s','3','2','l')
-#   define AOUT_FMT_SPDIF_NE VLC_FOURCC('s','p','d','i')
+#   define AOUT_FMT_SPDIF_NE VLC_CODEC_SPDIFL
 #endif
 
-#define AOUT_FMT_NON_LINEAR( p_format )                                    \
-    ( ((p_format)->i_format == VLC_FOURCC('s','p','d','i'))                \
-       || ((p_format)->i_format == VLC_FOURCC('s','p','d','b'))            \
-       || ((p_format)->i_format == VLC_FOURCC('a','5','2',' '))            \
-       || ((p_format)->i_format == VLC_FOURCC('d','t','s',' ')) )
+#define AOUT_FMT_NON_LINEAR( p_format )                 \
+    ( ((p_format)->i_format == VLC_CODEC_SPDIFL)       \
+       || ((p_format)->i_format == VLC_CODEC_SPDIFB)   \
+       || ((p_format)->i_format == VLC_CODEC_A52)       \
+       || ((p_format)->i_format == VLC_CODEC_DTS) )
 
 /* This is heavily borrowed from libmad, by Robert Leslie <rob@mars.org> */
 /*
