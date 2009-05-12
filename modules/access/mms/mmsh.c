@@ -463,17 +463,17 @@ static int Reset( access_t *p_access )
     if( p_sys->i_header <= 0 )
         return VLC_EGENERIC;
 
-     asf_HeaderParse ( &p_sys->asfh,
-                           p_sys->p_header, p_sys->i_header );
+    asf_HeaderParse ( &p_sys->asfh,
+                       p_sys->p_header, p_sys->i_header );
     msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
 
-     asf_StreamSelect( &p_sys->asfh,
-                           var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                           var_CreateGetInteger( p_access, "mms-all" ),
-                           var_CreateGetInteger( p_access, "audio" ),
-                           var_CreateGetInteger( p_access, "video" ) );
+    asf_StreamSelect( &p_sys->asfh,
+                       var_CreateGetInteger( p_access, "mms-maxbitrate" ),
+                       var_CreateGetInteger( p_access, "mms-all" ),
+                       var_CreateGetInteger( p_access, "audio" ),
+                       var_CreateGetInteger( p_access, "video" ) );
 
     /* Check we have comptible asfh */
     for( i = 1; i < 128; i++ )
@@ -566,7 +566,8 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     p_sys->i_packet_used = 0;
     p_sys->i_packet_length = 0;
     p_sys->p_packet = NULL;
-     GenerateGuid ( &p_sys->guid );
+
+    GenerateGuid ( &p_sys->guid );
 
     if( OpenConnection( p_access ) )
         return VLC_EGENERIC;
@@ -695,8 +696,8 @@ static int Describe( access_t  *p_access, char **ppsz_location )
      *
      * TODO : stream bitrates properties(optional)
      *        and bitrate mutual exclusion(optional) */
-     asf_HeaderParse ( &p_sys->asfh,
-                           p_sys->p_header, p_sys->i_header );
+    asf_HeaderParse ( &p_sys->asfh,
+                       p_sys->p_header, p_sys->i_header );
     msg_Dbg( p_access, "packet count=%"PRId64" packet size=%d",
              p_sys->asfh.i_data_packets_count,
              p_sys->asfh.i_min_data_packet_size );
@@ -704,11 +705,11 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     if( p_sys->asfh.i_min_data_packet_size <= 0 )
         goto error;
 
-     asf_StreamSelect( &p_sys->asfh,
-                           var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                           var_CreateGetInteger( p_access, "mms-all" ),
-                           var_CreateGetInteger( p_access, "audio" ),
-                           var_CreateGetInteger( p_access, "video" ) );
+    asf_StreamSelect( &p_sys->asfh,
+                       var_CreateGetInteger( p_access, "mms-maxbitrate" ),
+                       var_CreateGetInteger( p_access, "mms-all" ),
+                       var_CreateGetInteger( p_access, "audio" ),
+                       var_CreateGetInteger( p_access, "video" ) );
     return VLC_SUCCESS;
 
 error:
