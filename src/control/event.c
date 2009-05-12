@@ -93,8 +93,8 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
     libvlc_event_listeners_group_t * p_lg;
     int i,j ;
 
-    vlc_mutex_destroy( &p_em->event_sending_lock );
-    vlc_mutex_destroy( &p_em->object_lock );
+    vlc_mutex_lock( &p_em->event_sending_lock );
+    vlc_mutex_lock( &p_em->object_lock );
 
     for( i = 0; i < vlc_array_count(&p_em->listeners_groups); i++)
     {
@@ -107,7 +107,15 @@ void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
         free( p_lg );
     }
     vlc_array_clear( &p_em->listeners_groups );
+
+    vlc_mutex_unlock( &p_em->object_lock );
+    vlc_mutex_unlock( &p_em->event_sending_lock );
+
     libvlc_release( p_em->p_libvlc_instance );
+
+    vlc_mutex_destroy( &p_em->event_sending_lock );
+    vlc_mutex_destroy( &p_em->object_lock );
+
     free( p_em );
 }
 
@@ -122,9 +130,14 @@ void libvlc_event_manager_register_event_type(
         libvlc_exception_t * p_e )
 {
     libvlc_event_listeners_group_t * listeners_group;
+
+    vlc_mutex_lock( &p_em->object_lock );
+
     listeners_group = malloc(sizeof(libvlc_event_listeners_group_t));
     if( !listeners_group )
     {
+        vlc_mutex_unlock( &p_em->object_lock );
+
         libvlc_exception_raise( p_e, "No Memory left" );
         return;
     }
@@ -132,7 +145,6 @@ void libvlc_event_manager_register_event_type(
     listeners_group->event_type = event_type;
     vlc_array_init( &listeners_group->listeners );
 
-    vlc_mutex_lock( &p_em->object_lock );
     vlc_array_append( &p_em->listeners_groups, listeners_group );
     vlc_mutex_unlock( &p_em->object_lock );
 }
@@ -171,6 +183,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             if( !array_listeners_cached )
             {
                 fprintf(stderr, "Can't alloc memory in libvlc_event_send" );
+                vlc_mutex_unlock( &p_em->object_lock );
                 return;
             }
 
@@ -187,6 +200,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
 
     if( !listeners_group )
     {
+        vlc_mutex_unlock( &p_em->object_lock );
         free( array_listeners_cached );
         return;
     }
@@ -215,9 +229,10 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
         listener_cached->pf_callback( p_event, listener_cached->p_user_data );
         listener_cached++;
     }
-    vlc_mutex_unlock( &p_em->event_sending_lock );
 
     free( array_listeners_cached );
+
+    vlc_mutex_unlock( &p_em->event_sending_lock );
 }
 
 /*
@@ -299,9 +314,13 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
     libvlc_event_listener_t * listener;
     int i;
 
+    vlc_mutex_lock( &p_event_manager->object_lock );
+
     listener = malloc(sizeof(libvlc_event_listener_t));
     if( !listener )
     {
+        vlc_mutex_unlock( &p_event_manager->object_lock );
+
         libvlc_exception_raise( p_e, "No Memory left" );
         return;
     }
@@ -310,7 +329,6 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
     listener->p_user_data = p_user_data;
     listener->pf_callback = pf_callback;
 
-    vlc_mutex_lock( &p_event_manager->object_lock );
     for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++ )
     {
         listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
@@ -321,9 +339,11 @@ void libvlc_event_attach( libvlc_event_manager_t * p_event_manager,
             return;
         }
     }
-    vlc_mutex_unlock( &p_event_manager->object_lock );
 
     free(listener);
+
+    vlc_mutex_unlock( &p_event_manager->object_lock );
+
     libvlc_exception_raise( p_e,
             "This object event manager doesn't know about '%s' events",
             libvlc_event_type_name(event_type));
@@ -344,8 +364,8 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
     libvlc_event_listener_t * listener;
     int i, j;
 
-    vlc_mutex_lock( &p_event_manager->event_sending_lock );
     vlc_mutex_lock( &p_event_manager->object_lock );
+
     for( i = 0; i < vlc_array_count(&p_event_manager->listeners_groups); i++)
     {
         listeners_group = vlc_array_item_at_index(&p_event_manager->listeners_groups, i);
@@ -367,14 +387,13 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                     free( listener );
                     vlc_array_remove( &listeners_group->listeners, j );
                     vlc_mutex_unlock( &p_event_manager->object_lock );
-                    vlc_mutex_unlock( &p_event_manager->event_sending_lock );
                     return;
                 }
             }
         }
     }
+
     vlc_mutex_unlock( &p_event_manager->object_lock );
-    vlc_mutex_unlock( &p_event_manager->event_sending_lock );
 
     libvlc_exception_raise( p_e,
             "This object event manager doesn't know about '%s,%p,%p' event observer",
