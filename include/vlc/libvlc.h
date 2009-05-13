@@ -1067,40 +1067,6 @@ VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc
  */
 VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, const char *,unsigned int, unsigned int, libvlc_exception_t * );
 
-/**
- * Resize the current video output window.
- *
- * \param p_mi media player instance
- * \param width new width for video output window
- * \param height new height for video output window
- * \param p_e an initialized exception pointer
- * \return the success status (boolean)
- */
-VLC_PUBLIC_API void libvlc_video_resize( libvlc_media_player_t *, int, int, libvlc_exception_t *);
-
-/**
- * Tell windowless video output to redraw rectangular area (MacOS X only).
- *
- * \param p_mi media player instance
- * \param area coordinates within video drawable
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_video_redraw_rectangle( libvlc_media_player_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
-
-/**
- * Set the default video output viewport for a windowless video output
- * (MacOS X only).
- *
- * This setting will be used as default for all video outputs.
- *
- * \param p_instance libvlc instance
- * \param p_mi media player instance
- * \param view coordinates within video drawable
- * \param clip coordinates within video drawable
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_video_set_viewport( libvlc_instance_t *, libvlc_media_player_t *, const libvlc_rectangle_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
-
 /** @} video */
 
 /** \defgroup libvlc_audio libvlc_audio
