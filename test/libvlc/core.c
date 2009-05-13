@@ -34,16 +34,6 @@ static void test_core (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv, &ex);
     catch ();
 
-    libvlc_playlist_clear (vlc, &ex);
-    catch ();
-
-    id = libvlc_playlist_add_extended (vlc, "/dev/null", "Test", 0, NULL,
-                                       &ex);
-    catch ();
-
-    libvlc_playlist_clear (vlc, &ex);
-    catch ();
-
     libvlc_retain (vlc);
     libvlc_release (vlc);
     libvlc_release (vlc);

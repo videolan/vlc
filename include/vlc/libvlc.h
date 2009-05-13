@@ -1088,18 +1088,6 @@ VLC_PUBLIC_API void libvlc_video_resize( libvlc_media_player_t *, int, int, libv
 VLC_PUBLIC_API void libvlc_video_redraw_rectangle( libvlc_media_player_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
 
 /**
- * Set the default video output size.
- *
- * This setting will be used as default for all video outputs.
- *
- * \param p_instance libvlc instance
- * \param width new width for video drawable
- * \param height new height for video drawable
- * \param p_e an initialized exception pointer
- */
-VLC_PUBLIC_API void libvlc_video_set_size( libvlc_instance_t *, int, int, libvlc_exception_t * );
-
-/**
  * Set the default video output viewport for a windowless video output
  * (MacOS X only).
  *

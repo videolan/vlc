@@ -161,8 +161,6 @@ struct libvlc_media_player_t
         uint32_t xid;
         uint32_t agl;
     } drawable;
-
-    bool        b_own_its_input_thread;
 };
 
 struct libvlc_media_list_player_t

@@ -187,14 +187,6 @@ int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
     return has_vout;
 }
 
-int libvlc_video_reparent( libvlc_media_player_t *p_mi, libvlc_drawable_t d,
-                           libvlc_exception_t *p_e )
-{
-    (void) p_mi; (void) d;
-    libvlc_exception_raise(p_e, "Reparenting not supported");
-    return -1;
-}
-
 void libvlc_video_resize( libvlc_media_player_t *p_mi, int width, int height, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
@@ -229,72 +221,6 @@ void libvlc_video_redraw_rectangle( libvlc_media_player_t *p_mi,
 }
 
 /* global video settings */
-
-/* Deprecated use libvlc_media_player_set_drawable() */
-void libvlc_video_set_parent( libvlc_instance_t *p_instance, libvlc_drawable_t d,
-                              libvlc_exception_t *p_e )
-{
-    /* set as default for future vout instances */
-#ifdef WIN32
-    vlc_value_t val;
-
-    if( sizeof(HWND) > sizeof(libvlc_drawable_t) )
-        return; /* BOOM! we told you not to use this function! */
-    val.p_address = (void *)(uintptr_t)d;
-    var_Set( p_instance->p_libvlc_int, "drawable-hwnd", val );
-#elif defined(__APPLE__)
-    var_SetInteger( p_instance->p_libvlc_int, "drawable-agl", d );
-#else
-    var_SetInteger( p_instance->p_libvlc_int, "drawable-xid", d );
-#endif
-
-    libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
-    if( p_mi )
-    {
-        libvlc_media_player_set_drawable( p_mi, d, p_e );
-        libvlc_media_player_release(p_mi);
-    }
-}
-
-/* Deprecated use libvlc_media_player_get_drawable() */
-libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
-{
-    VLC_UNUSED(p_e);
-
-#ifdef WIN32
-    vlc_value_t val;
-
-    if( sizeof(HWND) > sizeof(libvlc_drawable_t) )
-        return 0;
-    var_Get( p_instance->p_libvlc_int, "drawable-hwnd", &val );
-    return (uintptr_t)val.p_address;
-#elif defined(__APPLE__)
-    return var_GetInteger( p_instance->p_libvlc_int, "drawable-agl" );
-#else
-    return var_GetInteger( p_instance->p_libvlc_int, "drawable-xid" );
-#endif
-}
-
-void libvlc_video_set_size( libvlc_instance_t *p_instance, int width, int height,
-                           libvlc_exception_t *p_e )
-{
-    /* set as default for future vout instances */
-    config_PutInt(p_instance->p_libvlc_int, "width", width);
-    config_PutInt(p_instance->p_libvlc_int, "height", height);
-
-    libvlc_media_player_t *p_mi = libvlc_playlist_get_media_player(p_instance, p_e);
-    if( p_mi )
-    {
-        vout_thread_t *p_vout = GetVout( p_mi, p_e );
-        if( p_vout )
-        {
-            /* tell running vout to re-size */
-            vout_Control( p_vout , VOUT_SET_SIZE, width, height);
-            vlc_object_release( p_vout );
-        }
-        libvlc_media_player_release(p_mi);
-    }
-}
 
 void libvlc_video_set_viewport( libvlc_instance_t *p_instance, libvlc_media_player_t *p_mi,
                             const libvlc_rectangle_t *view, const libvlc_rectangle_t *clip,
@@ -334,7 +260,7 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance, libvlc_media_play
         }
     }
 #else
-    (void) p_instance; (void) view; (void) clip; (void) p_e;
+    (void) p_instance; (void) view; (void) clip; (void) p_e; (void) p_mi;
 #endif
 }
 
@@ -703,15 +629,4 @@ void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
     }
     libvlc_exception_raise( p_e, "Video track out of range" );
     vlc_object_release( p_input_thread );
-}
-
-int libvlc_video_destroy( libvlc_media_player_t *p_mi,
-                          libvlc_exception_t *p_e )
-{
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    vlc_object_detach( p_vout );
-    vlc_object_release( p_vout );
-    vlc_object_release( p_vout );
-
-    return 0;
 }

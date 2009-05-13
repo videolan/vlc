@@ -78,24 +78,20 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
 
     p_input_thread = p_mi->p_input_thread;
 
-    /* No one is tracking this input_thread apart from us. Destroy it. */
-    if( p_mi->b_own_its_input_thread )
-    {
-        var_DelCallback( p_input_thread, "can-seek",
-                         input_seekable_changed, p_mi );
-        var_DelCallback( p_input_thread, "can-pause",
-                         input_pausable_changed, p_mi );
-        var_DelCallback( p_input_thread, "intf-event",
-                         input_event_changed, p_mi );
+    var_DelCallback( p_input_thread, "can-seek",
+                     input_seekable_changed, p_mi );
+    var_DelCallback( p_input_thread, "can-pause",
+                    input_pausable_changed, p_mi );
+    var_DelCallback( p_input_thread, "intf-event",
+                     input_event_changed, p_mi );
 
-        /* We owned this one */
-        input_Stop( p_input_thread, b_input_abort );
-        vlc_thread_join( p_input_thread );
+    /* We owned this one */
+    input_Stop( p_input_thread, b_input_abort );
+    vlc_thread_join( p_input_thread );
 
-        var_Destroy( p_input_thread, "drawable-hwnd" );
-        var_Destroy( p_input_thread, "drawable-xid" );
-        var_Destroy( p_input_thread, "drawable-agl" );
-    }
+    var_Destroy( p_input_thread, "drawable-hwnd" );
+    var_Destroy( p_input_thread, "drawable-xid" );
+    var_Destroy( p_input_thread, "drawable-agl" );
 
     vlc_object_release( p_input_thread );
 
@@ -280,7 +276,6 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->p_input_thread = NULL;
     p_mi->i_refcount = 1;
-    p_mi->b_own_its_input_thread = true;
     vlc_mutex_init( &p_mi->object_lock );
     p_mi->p_event_manager = libvlc_event_manager_new( p_mi,
             p_libvlc_instance, p_e );
@@ -355,44 +350,6 @@ libvlc_media_player_new_from_media(
 
     libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
-
-    return p_mi;
-}
-
-/**************************************************************************
- * Create a new media instance object from an input_thread (Libvlc Internal).
- **************************************************************************/
-libvlc_media_player_t * libvlc_media_player_new_from_input_thread(
-                                   struct libvlc_instance_t *p_libvlc_instance,
-                                   input_thread_t *p_input,
-                                   libvlc_exception_t *p_e )
-{
-    libvlc_media_player_t * p_mi;
-
-    if( !p_input )
-    {
-        libvlc_exception_raise( p_e, "invalid input thread" );
-        return NULL;
-    }
-
-    p_mi = libvlc_media_player_new( p_libvlc_instance, p_e );
-    if( !p_mi )
-        return NULL;
-
-    p_mi->p_md = libvlc_media_new_from_input_item(
-                    p_libvlc_instance,
-                    input_GetItem( p_input ), p_e );
-    if( !p_mi->p_md )
-    {
-        libvlc_media_player_destroy( p_mi );
-        return NULL;
-    }
-
-    /* will be released in media_player_release() */
-    vlc_object_hold( p_input );
-
-    p_mi->p_input_thread = p_input;
-    p_mi->b_own_its_input_thread = false;
 
     return p_mi;
 }
@@ -714,22 +671,9 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
 
-    if( p_mi->b_own_its_input_thread )
-    {
-        vlc_mutex_lock( &p_mi->object_lock );
-        release_input_thread( p_mi, true ); /* This will stop the input thread */
-        vlc_mutex_unlock( &p_mi->object_lock );
-    }
-    else
-    {
-        input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-        if( !p_input_thread )
-            return;
-
-        input_Stop( p_input_thread, true );
-        vlc_object_release( p_input_thread );
-        p_mi->p_input_thread = NULL;
-    }
+    vlc_mutex_lock( &p_mi->object_lock );
+    release_input_thread( p_mi, true ); /* This will stop the input thread */
+    vlc_mutex_unlock( &p_mi->object_lock );
 }
 
 /**************************************************************************
