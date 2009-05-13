@@ -193,6 +193,8 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->b_autoscale = p_vout->b_autoscale;
     p_sys->p_vout->i_zoom = p_vout->i_zoom;
     p_sys->p_vout->i_alignment = p_vout->i_alignment;
+    var_Create( p_sys->p_vout, "video-deco",
+                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     psz = var_CreateGetString( p_vout, "opengl-provider" );
     p_sys->p_vout->p_module =
