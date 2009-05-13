@@ -463,7 +463,15 @@ int utf8_rename (const char *oldpath, const char *newpath)
 #if defined (WIN32)
     CONVERT_PATH (oldpath, wold, -1);
     CONVERT_PATH (newpath, wnew, -1);
+# ifdef UNDER_CE
+    /* FIXME: errno support */
+    if (MoveFileW (wold, wnew))
+        return 0;
+    else
+        return -1;
+#else
     return _wrename (wold, wnew);
+#endif
 
 #endif
     const char *lo = ToLocale (oldpath);
