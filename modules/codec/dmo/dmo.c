@@ -200,7 +200,6 @@ static const codec_dll decoders_table[] =
     { VLC_CODEC_WMVA,   "wmvadvd.dll", &guid_wmva },
 
     /* WMA 3 */
-    { VLC_CODEC_WMA3,   "wma9dmod.dll", &guid_wma9 },
     { VLC_CODEC_WMAP,   "wma9dmod.dll", &guid_wma9 },
     /* WMA 2 */
     { VLC_CODEC_WMA2,   "wma9dmod.dll", &guid_wma9 },
@@ -222,7 +221,7 @@ static const codec_dll encoders_table[] =
     { VLC_CODEC_WMV1, "wmvdmoe2.dll", &guid_wmv_enc2 },
 
     /* WMA 3 */
-    { VLC_CODEC_WMA3, "wmadmoe.dll", &guid_wma_enc },
+    { VLC_CODEC_WMAP, "wmadmoe.dll", &guid_wma_enc },
     /* WMA 2 */
     { VLC_CODEC_WMA2, "wmadmoe.dll", &guid_wma_enc },
 
@@ -431,7 +430,7 @@ static int DecOpen( decoder_t *p_dec )
 
         dmo_input_type.majortype  = MEDIATYPE_Video;
         dmo_input_type.subtype    = dmo_input_type.majortype;
-        dmo_input_type.subtype.Data1 = p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec
+        dmo_input_type.subtype.Data1 = p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec;
         dmo_input_type.formattype = FORMAT_VideoInfo;
         dmo_input_type.bFixedSizeSamples = 0;
         dmo_input_type.bTemporalCompression = 1;
