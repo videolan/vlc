@@ -167,6 +167,8 @@
 #define VLC_CODEC_YMGA      VLC_FOURCC('Y','M','G','A')
 /* Packed YUV 4:2:2, U:Y:V:Y, reverted */
 #define VLC_CODEC_CYUV      VLC_FOURCC('c','y','u','v')
+/* 10-bit 4:2:2 Component YCbCr */
+#define VLC_CODEC_V210      VLC_FOURCC('v','2','1','0')
 
 /* Image codec (video) */
 #define VLC_CODEC_PNG       VLC_FOURCC('p','n','g',' ')

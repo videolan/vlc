@@ -208,6 +208,10 @@ static const struct
     { VLC_CODEC_MIMIC, CODEC_ID_MIMIC, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 29, 0 )
+    { VLC_CODEC_V210, CODEC_ID_V210, VIDEO_ES },
+#endif
+
     /* Videogames Codecs */
 
     { VLC_CODEC_INTERPLAY, CODEC_ID_INTERPLAY_VIDEO, VIDEO_ES },

@@ -685,6 +685,9 @@ static const entry_t p_list_video[] = {
         A("cyuv"),
         A("CYUV"),
 
+    B(VLC_CODEC_V210, "10-bit 4:2:2 Component YCbCr"),
+        A("v210"),
+
     /* Videogames Codecs */
 
     /* Interplay MVE */
