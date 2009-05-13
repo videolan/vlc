@@ -1611,6 +1611,8 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     {
         p_win->owner_window = vout_RequestXWindow( p_vout, &p_win->i_x,
                               &p_win->i_y, &p_win->i_width, &p_win->i_height );
+        if( !p_win->owner_window )
+            return VLC_EGENERIC;
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
         xsize_hints.base_height = xsize_hints.height = p_win->i_height;
         xsize_hints.flags       = PSize | PMinSize;
@@ -1621,6 +1623,30 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             xsize_hints.y = p_win->i_y;
             xsize_hints.flags |= PPosition;
         }
+
+        /* Select events we are interested in. */
+        XSelectInput( p_vout->p_sys->p_display,
+                      p_win->owner_window->handle.xid, StructureNotifyMask );
+
+        /* Get the parent window's geometry information */
+        XGetGeometry( p_vout->p_sys->p_display,
+                      p_win->owner_window->handle.xid,
+                      &(Window){ 0 }, &(int){ 0 }, &(int){ 0 },
+                      &p_win->i_width,
+                      &p_win->i_height,
+                      &(unsigned){ 0 }, &(unsigned){ 0 } );
+
+        /* From man XSelectInput: only one client at a time can select a
+         * ButtonPress event, so we need to open a new window anyway. */
+        p_win->base_window =
+            XCreateWindow( p_vout->p_sys->p_display,
+                           p_win->owner_window->handle.xid,
+                           0, 0,
+                           p_win->i_width, p_win->i_height,
+                           0,
+                           0, CopyFromParent, 0,
+                           CWBackingStore | CWBackPixel | CWEventMask,
+                           &xwindow_attributes );
     }
     else
     {
@@ -1631,10 +1657,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
             DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
         p_win->i_height =
             DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-    }
 
-    if( !p_win->owner_window )
-    {
         /* Create the window and set hints - the window must receive
          * ConfigureNotify events, and until it is displayed, Expose and
          * MapNotify events. */
@@ -1668,66 +1691,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                         p_win->base_window, val.psz_string );
         }
         free( val.psz_string );
-
-        if( !p_vout->b_fullscreen )
-        {
-            const char *argv[] = { "vlc", NULL };
-
-            /* Set window manager hints and properties: size hints, command,
-             * window's name, and accepted protocols */
-            XSetWMNormalHints( p_vout->p_sys->p_display,
-                               p_win->base_window, &xsize_hints );
-            XSetCommand( p_vout->p_sys->p_display, p_win->base_window,
-                         (char**)argv, 1 );
-
-            if( !var_GetBool( p_vout, "video-deco") )
-            {
-                Atom prop;
-                mwmhints_t mwmhints;
-
-                mwmhints.flags = MWM_HINTS_DECORATIONS;
-                mwmhints.decorations = False;
-
-                prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
-                                    False );
-
-                XChangeProperty( p_vout->p_sys->p_display,
-                                 p_win->base_window,
-                                 prop, prop, 32, PropModeReplace,
-                                 (unsigned char *)&mwmhints,
-                                 PROP_MWM_HINTS_ELEMENTS );
-            }
-        }
-    }
-    else
-    {
-        Window dummy1;
-        int dummy2, dummy3;
-        unsigned int dummy4, dummy5;
-
-        /* Select events we are interested in. */
-        XSelectInput( p_vout->p_sys->p_display,
-                      p_win->owner_window->handle.xid, StructureNotifyMask );
-
-        /* Get the parent window's geometry information */
-        XGetGeometry( p_vout->p_sys->p_display,
-                      p_win->owner_window->handle.xid,
-                      &dummy1, &dummy2, &dummy3,
-                      &p_win->i_width,
-                      &p_win->i_height,
-                      &dummy4, &dummy5 );
-
-        /* From man XSelectInput: only one client at a time can select a
-         * ButtonPress event, so we need to open a new window anyway. */
-        p_win->base_window =
-            XCreateWindow( p_vout->p_sys->p_display,
-                           p_win->owner_window->handle.xid,
-                           0, 0,
-                           p_win->i_width, p_win->i_height,
-                           0,
-                           0, CopyFromParent, 0,
-                           CWBackingStore | CWBackPixel | CWEventMask,
-                           &xwindow_attributes );
     }
 
     if( (p_win->wm_protocols == None)        /* use WM_DELETE_WINDOW */
