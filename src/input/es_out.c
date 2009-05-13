@@ -1389,7 +1389,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
         es->fmt.i_id = out->p_sys->i_id;
     if( !es->fmt.i_original_fourcc )
         es->fmt.i_original_fourcc = es->fmt.i_codec;
-    es->fmt.i_codec = es_fourcc_GetCodec( es->fmt.i_cat, es->fmt.i_codec );
+    es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat, es->fmt.i_codec );
 
     es->i_id = es->fmt.i_id;
     es->i_meta_id = out->p_sys->i_id;
