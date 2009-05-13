@@ -973,14 +973,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
-    /*
-     * FIXME: kludge to use a p_libvlc-local variable for the Mozilla plugin
-     */
-    var_Create( p_libvlc, "drawable-xid", VLC_VAR_DOINHERIT|VLC_VAR_INTEGER );
-    var_Create( p_libvlc, "drawable-hwnd", VLC_VAR_ADDRESS );
-    var_Create( p_libvlc, "drawable-agl", VLC_VAR_INTEGER );
-    var_Create( p_libvlc, "drawable-gl", VLC_VAR_INTEGER );
-
     var_Create( p_libvlc, "drawable-view-top", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-view-left", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-view-bottom", VLC_VAR_INTEGER );
