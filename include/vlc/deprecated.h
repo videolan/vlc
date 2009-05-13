@@ -58,7 +58,7 @@ extern "C" {
  *        should render its video
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_drawable ( libvlc_media_player_t *, libvlc_drawable_t, libvlc_exception_t * );
+VLC_DEPRECATED_API void libvlc_media_player_set_drawable ( libvlc_media_player_t *, libvlc_drawable_t, libvlc_exception_t * );
 
 /**
  * Get the drawable where the media player should render its video output
@@ -68,7 +68,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_drawable ( libvlc_media_player_t *, 
  * \return the libvlc_drawable_t where the media player
  *         should render its video
  */
-VLC_PUBLIC_API libvlc_drawable_t
+VLC_DEPRECATED_API libvlc_drawable_t
                     libvlc_media_player_get_drawable ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /*****************************************************************************

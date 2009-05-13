@@ -887,6 +887,31 @@ VLC_PUBLIC_API int libvlc_video_get_height( libvlc_media_player_t *, libvlc_exce
 VLC_PUBLIC_API int libvlc_video_get_width( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
+ * Get the current video scaling factor.
+ * See also libvlc_video_set_scale().
+ *
+ * \param p_mediaplayer the media player
+ * \return the currently configured zoom factor, or 0. if the video is set
+ * to fit to the output window/drawable automatically.
+ */
+VLC_PUBLIC_API float libvlc_video_get_scale( libvlc_media_player_t *,
+                                             libvlc_exception_t *p_e );
+
+/**
+ * Set the video scaling factor. That is the ratio of the number of pixels on
+ * screen to the number of pixels in the original decoded video in each
+ * dimension. Zero is a special value; it will adjust the video to the output
+ * window/drawable (in windowed mode) or the entire screen.
+ *
+ * Note that not all video outputs support scaling.
+ *
+ * \param p_mediaplayer the media player
+ * \param i_factor the scaling factor, or zero
+ */
+VLC_PUBLIC_API void libvlc_video_set_scale( libvlc_media_player_t *, float,
+                                            libvlc_exception_t *p_e );
+
+/**
  * Get current video aspect ratio.
  *
  * \param p_mediaplayer the media player
