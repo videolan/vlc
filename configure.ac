@@ -3898,7 +3898,7 @@ dnl
 
 AC_PATH_XTRA()
 AC_ARG_ENABLE(x11,
-  [  --enable-x11            X11 support (default enabled)],, [
+  [  --enable-x11            X11 support with Xlib (default enabled)],, [
   AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
     enable_x11="yes"
   ], [
@@ -4067,17 +4067,23 @@ CPPFLAGS="${CPPFLAGS_save}"
 
 dnl
 dnl  X C Bindings modules
-dnl  (work in progress)
 dnl
 AC_ARG_ENABLE(xcb,
-  [  --enable-xcb            X C Bindings work-in-progress (default disabled)],
-  ,[enable_xcb="no"])
+  [  --enable-xcb            X11 support with XCB (default enabled)],, [
+  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
+    enable_xcb="yes"
+  ], [
+    enable_xcb="no"
+  ])
+])
+
 AS_IF([test "${enable_xcb}" != "no"], [
   PKG_CHECK_MODULES(XPROTO, [xproto])
 
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
+  VLC_ADD_PLUGIN([xcb])
 
   AS_IF([test "${enable_xvideo}" != "no"], [
     PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [
@@ -4088,9 +4094,12 @@ AS_IF([test "${enable_xcb}" != "no"], [
   dnl xcb-utils
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])
 
-  VLC_ADD_PLUGIN([xcb])
   VLC_ADD_PLUGIN([xcb_window])
+  VLC_ADD_PLUGIN([globalhotkeys])
+  VLC_ADD_CFLAGS([globalhotkeys],[${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}] )
+  VLC_ADD_LIBS([globalhotkeys],[${XCB_KEYSYMS_LIBS} ${XCB_LIBS}] )
 ])
+
 
 dnl
 dnl  OpenGL module
@@ -5281,18 +5290,6 @@ then
   fi
 fi
 
-dnl
-dnl Global hotkeys using XCB
-dnl
-PKG_CHECK_MODULES(XCB, [xcb], [
-  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms], [
-    PKG_CHECK_MODULES(XPROTO, [xproto], [
-      VLC_ADD_PLUGIN([globalhotkeys])
-      VLC_ADD_CFLAGS([globalhotkeys],[${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}] )
-      VLC_ADD_LIBS([globalhotkeys],[${XCB_KEYSYMS_LIBS} ${XCB_LIBS}] )
-    ], [ AC_MSG_WARN( [Xproto not found] ) ])
-  ], [ AC_MSG_WARN( [XCB keysyms was not found]) ])
-], [ AC_MSG_WARN( [XCB was not found]) ])
 
 AC_ARG_WITH(,[Misc options:])
 
