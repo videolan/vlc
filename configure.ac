@@ -4014,12 +4014,14 @@ AS_IF([test "$enable_xinerama" != "no"], [
       VLC_ADD_LIBS([xvideo],[-lXinerama_pic])
       VLC_ADD_LIBS([x11],[-lXinerama_pic])
       VLC_ADD_LIBS([glx],[-lXinerama_pic])
+      VLC_ADD_LIBS([xvmc],[-lXinerama_pic])
       ac_cv_have_xinerama="yes"
     ],[
       AC_CHECK_LIB(Xinerama, XineramaQueryExtension,[
         VLC_ADD_LIBS([xvideo],[-lXinerama])
         VLC_ADD_LIBS([x11],[-lXinerama])
         VLC_ADD_LIBS([glx],[-lXinerama])
+        VLC_ADD_LIBS([xvmc],[-lXinerama])
         ac_cv_have_xinerama="yes"
       ])
     ])
