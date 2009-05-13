@@ -193,19 +193,19 @@ static int Init( vout_thread_t *p_vout )
     /* Define the bitmasks */
     switch( i_chroma )
     {
-      case VLC_CODEC_RGB15;
+      case VLC_CODEC_RGB15:
         p_vout->output.i_rmask = 0x001f;
         p_vout->output.i_gmask = 0x03e0;
         p_vout->output.i_bmask = 0x7c00;
         break;
 
-      case VLC_CODEC_RGB16;
+      case VLC_CODEC_RGB16:
         p_vout->output.i_rmask = 0x001f;
         p_vout->output.i_gmask = 0x07e0;
         p_vout->output.i_bmask = 0xf800;
         break;
 
-      case VLC_CODEC_RGB24;
+      case VLC_CODEC_RGB24:
         p_vout->output.i_rmask = 0xff0000;
         p_vout->output.i_gmask = 0x00ff00;
         p_vout->output.i_bmask = 0x0000ff;
