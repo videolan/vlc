@@ -4176,7 +4176,6 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ])
 
   dnl xcb-utils
-  PKG_CHECK_MODULES(XCB_AUX, [xcb-aux])
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])
 
   VLC_ADD_PLUGIN([xcb])
