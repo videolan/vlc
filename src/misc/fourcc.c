@@ -140,7 +140,10 @@ static const entry_t p_list_video[] = {
         E("FVFW", "FFmpeg MPEG-4"),
         E("FFDS", "FFDShow MPEG-4"),
         E("VIDM", "vidm 4.01 codec"),
-
+        /* 3ivx delta 3.5 Unsupported
+         * putting it here gives extreme distorted images */
+        //E("3IV1", "3ivx delta 3.5 MPEG-4 Video"),
+        //E("3iv1", "3ivx delta 3.5 MPEG-4 Video"),
 
     /* MSMPEG4 v1 */
     B(VLC_CODEC_DIV1, "MS MPEG-4 Video v1"),
@@ -714,12 +717,6 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_PCX, "Personal Computer Exchange Image"),
         A("pcx "),
 
-    /* 3ivx delta 3.5 Unsupported
-     * putting it here gives extreme distorted images
-    { VLC_FOURCC('3','I','V','1'), CODEC_ID_MPEG4,
-      VIDEO_ES, "MPEG-4 Video" },
-    { VLC_FOURCC('3','i','v','1'), CODEC_ID_MPEG4,
-      VIDEO_ES, "MPEG-4 Video" }, */
     B(0, "")
 };
 static const entry_t p_list_audio[] = {
