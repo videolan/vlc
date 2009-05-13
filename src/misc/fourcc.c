@@ -82,8 +82,39 @@ static const entry_t p_list_video[] = {
         E("mx4p", "MPEG2 IMX PAL 625/50 40mb/s (FCP)"),
         E("mx3n", "MPEG2 IMX NTSC 525/60 30mb/s (FCP)"),
         E("mx3p", "MPEG2 IMX NTSC 625/50 30mb/s (FCP)"),
-        E("xdv2", "XDCAM HD 1080i60"),
+
+        E("xdv1", "XDCAM HD"),
+        E("xdv2", "XDCAM HD 1080i60 35mb/s"),
+        E("xdv3", "XDCAM HD 1080i50 35mb/s"),
+        E("xdv4", "XDCAM HD"),
+        E("xdv5", "XDCAM HD"),
+        E("xdv6", "XDCAM HD 1080p24 35mb/s"),
+        E("xdv7", "XDCAM HD 1080p25 35mb/s"),
+        E("xdv8", "XDCAM HD 1080p30 35mb/s"),
+        E("xdv9", "XDCAM HD"),
+
+        E("xdva", "XDCAM"),
+        E("xdvb", "XDCAM"),
+        E("xdvc", "XDCAM"),
+        E("xdvd", "XDCAM"),
+        E("xdve", "XDCAM"),
+        E("xdvf", "XDCAM"),
+
+        E("xd5a", "XDCAM"),
+        E("xd5b", "XDCAM"),
+        E("xd5c", "XDCAM"),
+        E("xd5d", "XDCAM"),
+        E("xd5e", "XDCAM"),
+        E("xd5f", "XDCAM"),
+        E("xd59", "XDCAM"),
+
         E("AVmp", "AVID IMX PAL"),
+        E("MMES", "Matrox MPEG-2"),
+        E("mmes", "Matrox MPEG-2"),
+        E("PIM2", "Pinnacle MPEG-2"),
+        E("LMP2", "Lead MPEG-2"),
+
+        E("VCR2", "ATI VCR-2"),
 
     B(VLC_CODEC_MP4V, "MPEG-4 Video"),
         A("mp4v"),
@@ -93,7 +124,6 @@ static const entry_t p_list_video[] = {
         A("mp4s"),
         A("M4S2"),
         A("m4s2"),
-        A("mp4v"),
         A("MP4V"),
         A("\x04\x00\x00\x00"),
         A("m4cc"),
@@ -101,10 +131,8 @@ static const entry_t p_list_video[] = {
         A("FMP4"),
         A("fmp4"),
         A("DCOD"),
-        A("fmp4"),
         A("MVXM"),
         A("PM4V"),
-        A("fmp4"),
         A("M4T3"),
         A("GEOX"),
         A("DMK2"),
@@ -174,6 +202,8 @@ static const entry_t p_list_video[] = {
         A("div5"),
         A("DIV6"),
         A("div6"),
+        E("divf", "DivX 4.12"),
+        E("DIVF", "DivX 4.12"),
         /* Cool Codec */
         A("COL1"),
         A("col1"),
@@ -187,6 +217,7 @@ static const entry_t p_list_video[] = {
         /* who knows? */
         A("3VID"),
         A("3vid"),
+        A("DVX3"),
 
     /* Sorenson v1 */
     B(VLC_CODEC_SVQ1, "SVQ-1 (Sorenson Video v1)"),
@@ -248,6 +279,7 @@ static const entry_t p_list_video[] = {
     /* Flash (H263) variant */
     B(VLC_CODEC_FLV1, "Flash Video"),
         A("FLV1"),
+        A("flv "),
 
     /* H261 */
     B(VLC_CODEC_H261, "H.261"),
@@ -267,12 +299,17 @@ static const entry_t p_list_video[] = {
         A("JFIF"),
         A("JPGL"),
         A("AVDJ"),
+        A("MMJP"),
+        A("QIVG"),
         /* AVID MJPEG */
         E("AVRn", "Avid Motion JPEG"),
+        E("AVDJ", "Avid Motion JPEG"),
         E("ADJV", "Avid Motion JPEG"),
         E("dmb1", "Motion JPEG OpenDML Video"),
+        E("ijpg", "Intergraph JPEG Video"),
         E("IJPG", "Intergraph JPEG Video"),
         E("ACDV", "ACD Systems Digital"),
+        E("SLMJ", "SL M-JPEG"),
 
     B(VLC_CODEC_MJPGB, "Motion JPEG B Video"),
         A("mjpb"),
@@ -296,9 +333,11 @@ static const entry_t p_list_video[] = {
     /* DV */
     B(VLC_CODEC_DV, "DV Video"),
         A("dv  "),
-        A("dvsd"),
         A("dvsl"),
         A("DVSD"),
+        A("dvsd"),
+        A("DVCS"),
+        A("dvcs"),
         A("dvhd"),
         A("dvhp"),
         A("dvhq"),
@@ -310,9 +349,11 @@ static const entry_t p_list_video[] = {
         A("dvc "),
         A("dv25"),
         A("dvh1"),
+        A("dvs1"),
         E("dvcp", "DV Video PAL"),
         E("dvp ", "DV Video Pro"),
         E("dvpp", "DV Video Pro PAL"),
+        E("dv50", "DV Video C Pro 50"),
         E("dv5p", "DV Video C Pro 50 PAL"),
         E("dv5n", "DV Video C Pro 50 NTSC"),
         E("AVdv", "AVID DV"),
@@ -320,6 +361,7 @@ static const entry_t p_list_video[] = {
         E("CDVC", "Canopus DV Video"),
         E("cdvc", "Canopus DV Video"),
         E("CDVH", "Canopus DV Video"),
+        E("cdvh", "Canopus DV Video"),
 
     /* Windows Media Video */
     B(VLC_CODEC_WMV1, "Windows Media Video 7"),
@@ -383,6 +425,7 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_VP3, "On2's VP3 Video"),
         A("VP3 "),
         A("VP30"),
+        A("vp30"),
         A("VP31"),
         A("vp31"),
 
@@ -455,6 +498,8 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_RPZA, "Apple Video"),
         A("rpza"),
         A("azpr"),
+        A("RPZA"),
+        A("AZPR"),
 
     B(VLC_CODEC_SMC, "Apple graphics"),
         A("smc "),
@@ -484,6 +529,7 @@ static const entry_t p_list_video[] = {
     /* Duck TrueMotion */
     B(VLC_CODEC_TRUEMOTION1, "Duck TrueMotion v1 Video"),
         A("DUCK"),
+        A("PVEZ"),
     B(VLC_CODEC_TRUEMOTION2, "Duck TrueMotion v2.0 Video"),
         A("TM20"),
 
@@ -508,6 +554,7 @@ static const entry_t p_list_video[] = {
 
     B(VLC_CODEC_VIXL, "Miro/Pinnacle VideoXL Video"),
         A("VIXL"),
+        A("XIXL"),
         E("PIXL", "Pinnacle VideoXL Video"),
 
     B(VLC_CODEC_LOCO, "LOCO Video"),
@@ -542,6 +589,7 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_CAVS, "Chinese AVS"),
         A("CAVS"),
         A("AVs2"),
+        A("avs2"),
 
     /* */
     B(VLC_CODEC_DNXHD, "DNxHD"),
