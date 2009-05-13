@@ -31,7 +31,6 @@
 #include <limits.h> /* HOST_NAME_MAX */
 
 #include <xcb/xcb.h>
-#include <xcb/xcb_aux.h>
 typedef xcb_atom_t Atom;
 #include <X11/Xatom.h> /* XA_WM_NAME */
 
@@ -140,8 +139,26 @@ static int Open (vlc_object_t *obj)
     if (xcb_connection_has_error (conn) /*== NULL*/)
         goto error;
 
+    /* Find configured screen */
+    const xcb_setup_t *setup = xcb_get_setup (conn);
+    xcb_screen_t *scr = NULL;
+    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
+         i.rem > 0; xcb_screen_next (&i))
+    {
+        if (snum == 0)
+        {
+            scr = i.data;
+            break;
+        }
+        snum--;
+    }
+    if (scr == NULL)
+    {
+        msg_Err (wnd, "bad X11 screen number");
+        goto error;
+    }
+
     /* Create window */
-    xcb_screen_t *scr = xcb_aux_get_screen (conn, snum);
     const uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     uint32_t values[2] = {
         /* XCB_CW_BACK_PIXEL */
