@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fourcc.c: fourcc helpers functions
  *****************************************************************************
- * Copyright (C) 2003-2004 the VideoLAN team
+ * Copyright (C) 2009 Laurent Aimar
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
