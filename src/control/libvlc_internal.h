@@ -263,15 +263,6 @@ input_thread_t *libvlc_get_input_thread(
      libvlc_media_player_t *,
     libvlc_exception_t * );
 
-/* Media instance */
-libvlc_media_player_t *
-libvlc_media_player_new_from_input_thread( libvlc_instance_t *,
-                                           input_thread_t *,
-                                           libvlc_exception_t * );
-
-void libvlc_media_player_destroy(
-        libvlc_media_player_t * );
-
 /* Media Descriptor */
 libvlc_media_t * libvlc_media_new_from_input_item(
         libvlc_instance_t *, input_item_t *,

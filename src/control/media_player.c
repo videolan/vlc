@@ -237,6 +237,8 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
 }
 
+static void libvlc_media_player_destroy( libvlc_media_player_t * );
+
 /**************************************************************************
  * Create a Media Instance object.
  *
@@ -359,35 +361,30 @@ libvlc_media_player_new_from_media(
  *
  * Warning: No lock held here, but hey, this is internal. Caller must lock.
  **************************************************************************/
-void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
+static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     libvlc_exception_t p_e;
 
-    if( !p_mi )
-        return;
+    assert( p_mi );
 
-    libvlc_exception_init( &p_e );
-
-	/* Detach Callback from the main libvlc object */
+    /* Detach Callback from the main libvlc object */
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
                      "vout-snapshottaken", SnapshotTakenCallback, p_mi );
 
+    libvlc_exception_init( &p_e );
     p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
 
     if( libvlc_exception_raised( &p_e ) )
-    {
-        libvlc_event_manager_release( p_mi->p_event_manager );
+        /* no need to worry about no input thread */
         libvlc_exception_clear( &p_e );
-        free( p_mi );
-        return; /* no need to worry about no input thread */
-    }
+    else
+        release_input_thread( p_mi, true );
+
+    libvlc_event_manager_release( p_mi->p_event_manager );
+    if( p_mi->p_md )
+        libvlc_media_release( p_mi->p_md );
     vlc_mutex_destroy( &p_mi->object_lock );
-
-    vlc_object_release( p_input_thread );
-
-    libvlc_media_release( p_mi->p_md );
-
     free( p_mi );
 }
 
@@ -398,33 +395,15 @@ void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
  **************************************************************************/
 void libvlc_media_player_release( libvlc_media_player_t *p_mi )
 {
-    if( !p_mi )
-        return;
+    bool destroy;
 
+    assert( p_mi );
     vlc_mutex_lock( &p_mi->object_lock );
-
-    p_mi->i_refcount--;
-
-    if( p_mi->i_refcount > 0 )
-    {
-        vlc_mutex_unlock( &p_mi->object_lock );
-        return;
-    }
+    destroy = !--p_mi->i_refcount;
     vlc_mutex_unlock( &p_mi->object_lock );
 
-    /* Detach Callback from the main libvlc object */
-    var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
-                     "vout-snapshottaken", SnapshotTakenCallback, p_mi );
-
-    vlc_mutex_destroy( &p_mi->object_lock );
-
-    release_input_thread( p_mi, true );
-
-    libvlc_event_manager_release( p_mi->p_event_manager );
-
-    libvlc_media_release( p_mi->p_md );
-
-    free( p_mi );
+    if( destroy )
+        libvlc_media_player_destroy( p_mi );
 }
 
 /**************************************************************************

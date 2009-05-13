@@ -119,7 +119,6 @@ libvlc_media_new
 libvlc_media_new_as_node
 libvlc_media_new_from_input_item
 libvlc_media_player_can_pause
-libvlc_media_player_destroy
 libvlc_media_player_event_manager
 libvlc_media_player_get_agl
 libvlc_media_player_get_chapter
