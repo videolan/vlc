@@ -453,7 +453,8 @@ int OpenEncoder( vlc_object_t *p_this )
             __MAX( __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES ), 0 );
         p_context->b_frame_strategy = 0;
         if( !p_context->max_b_frames  &&
-            (  p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ||
+            (  p_enc->fmt_out.i_codec == VLC_CODEC_MPGV ||
+               p_enc->fmt_out.i_codec == VLC_CODEC_MP2V ||
                p_enc->fmt_out.i_codec == VLC_CODEC_MP1V ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 

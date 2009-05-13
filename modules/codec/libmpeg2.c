@@ -119,9 +119,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_sys_t *p_sys;
     uint32_t i_accel = 0;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_MP1V &&
-        p_dec->fmt_in.i_codec != VLC_CODEC_MP2V &&
-        p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MPGV )
         return VLC_EGENERIC;
 
     /* Select onl recognized original format (standard mpeg video) */

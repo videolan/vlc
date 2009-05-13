@@ -491,7 +491,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
             if( /* Raw DV stream */
                 p_stream->i_fourcc == VLC_CODEC_DV ||
                 /* Raw MPEG video stream */
-                p_stream->i_fourcc == VLC_CODEC_MP2V )
+                p_stream->i_fourcc == VLC_CODEC_MPGV )
             {
                 b_use_audio = false;
 
@@ -729,7 +729,7 @@ static int AccessOpen( vlc_object_t *p_this )
             free( p_access->psz_demux );
             p_access->psz_demux = strdup( "rawdv" );
         }
-        else if( p_stream->i_fourcc == VLC_CODEC_MP2V )
+        else if( p_stream->i_fourcc == VLC_CODEC_MPGV )
         {
             free( p_access->psz_demux );
             p_access->psz_demux = strdup( "mpgv" );

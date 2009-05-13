@@ -56,16 +56,18 @@ typedef struct
 
 /* */
 static const entry_t p_list_video[] = {
-    B(VLC_CODEC_MP1V, "MPEG-1 Video"),
+
+    B(VLC_CODEC_MPGV, "MPEG-1/2 Video"),
+        A("mpgv"),
         A("mp1v"),
         A("mpeg"),
         A("mpg1"),
-        E("PIM1", "Pinnacle DC1000 (MPEG-1 Video)"),
-
-    B(VLC_CODEC_MP2V, "MPEG-2 Video"),
         A("mp2v"),
         A("MPEG"),
         A("mpg2"),
+
+        E("PIM1", "Pinnacle DC1000 (MPEG-1 Video)"),
+
         E("hdv1", "HDV 720p30 (MPEG-2 Video)"),
         E("hdv2", "Sony HDV (MPEG-2 Video)"),
         E("hdv3", "FCP HDV (MPEG-2 Video)"),
@@ -82,9 +84,6 @@ static const entry_t p_list_video[] = {
         E("mx3p", "MPEG2 IMX NTSC 625/50 30mb/s (FCP)"),
         E("xdv2", "XDCAM HD 1080i60"),
         E("AVmp", "AVID IMX PAL"),
-
-    B(VLC_CODEC_MPGV, "MPEG-1/2 Video"),
-        A("mpgv"),
 
     B(VLC_CODEC_MP4V, "MPEG-4 Video"),
         A("mp4v"),

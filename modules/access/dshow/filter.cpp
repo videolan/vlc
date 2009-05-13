@@ -286,7 +286,7 @@ int GetFourCCFromMediaType( const AM_MEDIA_TYPE &media_type )
 
             /* MPEG2 video elementary stream */
             else if( media_type.subtype == MEDIASUBTYPE_MPEG2_VIDEO )
-               i_fourcc = VLC_CODEC_MP2V;
+               i_fourcc = VLC_CODEC_MPGV;
 
             /* DivX video */
             else if( media_type.subtype == MEDIASUBTYPE_DIVX )

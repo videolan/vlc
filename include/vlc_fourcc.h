@@ -29,8 +29,6 @@
 
 /* Video codec */
 #define VLC_CODEC_MPGV      VLC_FOURCC('m','p','g','v')
-#define VLC_CODEC_MP1V      VLC_FOURCC('m','p','1','v')
-#define VLC_CODEC_MP2V      VLC_FOURCC('m','p','2','v')
 #define VLC_CODEC_MP4V      VLC_FOURCC('m','p','4','v')
 #define VLC_CODEC_DIV1      VLC_FOURCC('D','I','V','1')
 #define VLC_CODEC_DIV2      VLC_FOURCC('D','I','V','2')
@@ -291,6 +289,10 @@
 #   define VLC_CODEC_S24N VLC_CODEC_S24L
 #   define VLC_CODEC_S32N VLC_CODEC_S32L
 #endif
+
+/* Non official codecs, used to force a profile in an encoder */
+#define VLC_CODEC_MP1V      VLC_FOURCC('m','p','1','v')
+#define VLC_CODEC_MP2V      VLC_FOURCC('m','p','2','v')
 
 /**
  * It returns the codec associatedto a fourcc within a ES category.

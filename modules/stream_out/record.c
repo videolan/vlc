@@ -287,12 +287,12 @@ static const muxer_properties_t p_muxers[] = {
     M( "mp4", "mp4", INT_MAX,   VLC_CODEC_MP4A, VLC_CODEC_H264, VLC_CODEC_MP4V,
                                 VLC_CODEC_SUBT ),
 
-    M( "ps", "mpg", 16/* FIXME*/,VLC_CODEC_MPGV, VLC_CODEC_MP1V, VLC_CODEC_MP2V,
+    M( "ps", "mpg", 16/* FIXME*/,VLC_CODEC_MPGV,
                                 VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
                                 VLC_CODEC_DTS,
                                 VLC_CODEC_SPU ),
 
-    M( "ts", "ts", 8000,        VLC_CODEC_MPGV, VLC_CODEC_MP1V, VLC_CODEC_MP2V,
+    M( "ts", "ts", 8000,        VLC_CODEC_MPGV,
                                 VLC_CODEC_H264,
                                 VLC_CODEC_MPGA, VLC_CODEC_DVD_LPCM, VLC_CODEC_A52,
                                 VLC_CODEC_DTS, VLC_CODEC_MP4A,

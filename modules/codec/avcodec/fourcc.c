@@ -52,9 +52,7 @@ static const struct
      * Video Codecs
      */
 
-    { VLC_CODEC_MP1V, CODEC_ID_MPEG1VIDEO, VIDEO_ES },
-
-    { VLC_CODEC_MP2V, CODEC_ID_MPEG2VIDEO, VIDEO_ES },
+    { VLC_CODEC_MPGV, CODEC_ID_MPEG2VIDEO, VIDEO_ES },
 
     { VLC_CODEC_MP4V, CODEC_ID_MPEG4, VIDEO_ES },
     /* 3ivx delta 3.5 Unsupported
