@@ -452,9 +452,9 @@ vlc_event_manager_register_event_type
 vlc_event_send
 __vlc_execve
 vlc_fastmem_register
-vlc_freeaddrinfo
 vlc_fourcc_GetCodec
 vlc_fourcc_GetDescription
+vlc_freeaddrinfo
 vlc_gai_strerror
 vlc_gc_init
 vlc_getaddrinfo
