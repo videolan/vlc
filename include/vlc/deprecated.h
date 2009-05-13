@@ -97,14 +97,56 @@ VLC_DEPRECATED_API void libvlc_video_set_parent( libvlc_instance_t *, libvlc_dra
 VLC_DEPRECATED_API libvlc_drawable_t libvlc_video_get_parent( libvlc_instance_t *, libvlc_exception_t * );
 
 /**
- * Change the parent for the current the video output.
+ * Does nothing. Do not use this function.
+ */
+VLC_DEPRECATED_API int libvlc_video_reparent( libvlc_media_player_t *, libvlc_drawable_t, libvlc_exception_t * );
+
+/**
+ * Resize the current video output window.
+ * This might crash. Please use libvlc_video_set_scale() instead.
  *
- * \param p_instance libvlc instance
- * \param drawable the new parent window (Drawable on X11, CGrafPort on MacOSX, HWND on Win32)
+ * \param p_mi media player instance
+ * \param width new width for video output window
+ * \param height new height for video output window
  * \param p_e an initialized exception pointer
  * \return the success status (boolean)
  */
-VLC_PUBLIC_API int libvlc_video_reparent( libvlc_media_player_t *, libvlc_drawable_t, libvlc_exception_t * );
+VLC_DEPRECATED_API void libvlc_video_resize( libvlc_media_player_t *, int, int, libvlc_exception_t *);
+
+/**
+ * Tell windowless video output to redraw rectangular area (MacOS X only).
+ * This might crash. Do not use this function.
+ *
+ * \param p_mi media player instance
+ * \param area coordinates within video drawable
+ * \param p_e an initialized exception pointer
+ */
+VLC_DEPRECATED_API void libvlc_video_redraw_rectangle( libvlc_media_player_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
+
+/**
+ * Set the default video output size.
+ * This setting will be used as default for all video outputs.
+ *
+ * \param p_instance libvlc instance
+ * \param width new width for video drawable
+ * \param height new height for video drawable
+ * \param p_e an initialized exception pointer
+ */
+VLC_DEPRECATED_API void libvlc_video_set_size( libvlc_instance_t *, int, int, libvlc_exception_t * );
+
+/**
+ * Set the default video output viewport for a windowless video output
+ * (MacOS X only). This might crash. Do not use this function.
+ *
+ * This setting will be used as default for all video outputs.
+ *
+ * \param p_instance libvlc instance
+ * \param p_mi media player instance
+ * \param view coordinates within video drawable
+ * \param clip coordinates within video drawable
+ * \param p_e an initialized exception pointer
+ */
+VLC_DEPRECATED_API void libvlc_video_set_viewport( libvlc_instance_t *, libvlc_media_player_t *, const libvlc_rectangle_t *, const libvlc_rectangle_t *, libvlc_exception_t * );
 
 /*
  * This function shall not be used at all. It may lead to crash and race condition.
