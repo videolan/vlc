@@ -234,7 +234,7 @@ struct fbosd_render_t
     int             i_state;
 
     /* Font style */
-    text_style_t    text_style;                              /* font control */
+    text_style_t*   p_text_style;                            /* font control */
     char            *psz_string;
 
     /* Position */
@@ -394,10 +394,7 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_intf, "fbosd-font-opacity", OverlayCallback, NULL );
 
     for( i = 0; i < FBOSD_RENDER_MAX; i++ )
-    {
-        vlc_memcpy( &p_sys->render[i].text_style, &default_text_style,
-                    sizeof( text_style_t ) );
-    }
+        p_sys->render[i].p_text_style = text_style_New();
 
     p_sys->b_clear = var_CreateGetBoolCommand( p_intf, "fbosd-clear" );
     p_sys->b_render = var_CreateGetBoolCommand( p_intf, "fbosd-render" );
@@ -507,6 +504,7 @@ static void Destroy( vlc_object_t *p_this )
     {
         free( p_sys->render[i].psz_string );
         p_sys->render[i].i_state = FBOSD_STATE_FREE;
+        text_style_Delete( p_sys->render[i].p_text_style );
     }
 
 #if defined(FBOSD_BLENDING)
@@ -1193,7 +1191,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
 #if defined(FBOSD_BLENDING)
         video_format_t fmt_in;
         memset( &fmt_in, 0, sizeof(video_format_t) );
-        p_text = RenderText( p_intf, render->psz_string, &render->text_style,
+        p_text = RenderText( p_intf, render->psz_string, render->p_text_style,
                              &fmt_in );
         if( p_text )
         {
@@ -1203,7 +1201,7 @@ static void Render( intf_thread_t *p_intf, struct fbosd_render_t *render )
             DeAllocatePicture( p_text, &fmt_in );
         }
 #else
-        p_text = RenderText( p_intf, render->psz_string, &render->text_style,
+        p_text = RenderText( p_intf, render->psz_string, render->p_text_style,
                              &p_sys->fmt_out );
         if( p_text )
         {
@@ -1219,8 +1217,8 @@ static void RenderClear( intf_thread_t *p_intf, struct fbosd_render_t *render )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_memcpy( &render->text_style, &default_text_style,
-                sizeof( text_style_t ) );
+    text_style_Delete( render->p_text_style );
+    render->p_text_style = text_style_New();
     free( render->psz_string );
     render->psz_string = NULL;
 
@@ -1398,15 +1396,15 @@ static int OverlayCallback( vlc_object_t *p_this, char const *psz_cmd,
         }
         else if( !strncmp( psz_cmd, "fbosd-font-size", 15 ) )
         {
-            p_sys->render[i].text_style.i_font_size = newval.i_int;
+            p_sys->render[i].p_text_style->i_font_size = newval.i_int;
         }
         else if( !strncmp( psz_cmd, "fbosd-font-color", 16 ) )
         {
-            p_sys->render[i].text_style.i_font_color = newval.i_int;
+            p_sys->render[i].p_text_style->i_font_color = newval.i_int;
         }
         else if( !strncmp( psz_cmd, "fbosd-font-opacity", 18 ) )
         {
-            p_sys->render[i].text_style.i_font_alpha = 255 - newval.i_int;
+            p_sys->render[i].p_text_style->i_font_alpha = 255 - newval.i_int;
         }
         else if( !strncmp( psz_cmd, "fbosd-alpha", 11 ) )
         {
