@@ -473,10 +473,11 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
  **************************************************************************/
 void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 {
-    if( !p_mi )
-        return;
+    assert( p_mi );
 
+    vlc_mutex_lock( &p_mi->object_lock );
     p_mi->i_refcount++;
+    vlc_mutex_unlock( &p_mi->object_lock );
 }
 
 /**************************************************************************
