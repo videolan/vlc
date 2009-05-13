@@ -114,6 +114,10 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
     return atom;
 }
 
+#define NET_WM_STATE_REMOVE 0
+#define NET_WM_STATE_ADD    1
+#define NET_WM_STATE_TOGGLE 2
+
 /**
  * Create an X11 window.
  */
@@ -181,7 +185,7 @@ static int Open (vlc_object_t *obj)
     xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck;
 
     wm_state_ck = xcb_intern_atom (conn, 0, 13, "_NET_WM_STATE");
-    wm_state_above_ck = xcb_intern_atom (conn, 0, 18, "_NET_WM_STATE_ABOVE");
+    wm_state_above_ck = xcb_intern_atom (conn, 0, 19, "_NET_WM_STATE_ABOVE");
 
     p_sys->wm_state = get_atom (conn, wm_state_ck);
     p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
@@ -289,16 +293,16 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
         case VOUT_SET_STAY_ON_TOP:
         {   /* From EWMH "_WM_STATE" */
             xcb_client_message_event_t ev = {
-                .response_type = 0x80 | XCB_CLIENT_MESSAGE,
+                .response_type = XCB_CLIENT_MESSAGE,
                 .format = 32,
                 .window = wnd->handle.xid,
                 .type = p_sys->wm_state,
             };
             bool on = va_arg (ap, int);
 
-            ev.data.data32[0] = on;
+            ev.data.data32[0] = on ? NET_WM_STATE_ADD : NET_WM_STATE_REMOVE;
             ev.data.data32[1] = p_sys->wm_state_above;
-            ev.data.data32[1] = 289;
+            ev.data.data32[2] = 0;
             ev.data.data32[3] = 1;
 
             /* From ICCCM "Changing Window State" */
