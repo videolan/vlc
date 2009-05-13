@@ -3986,7 +3986,7 @@ dnl  XVMC module
 dnl  (disabled by default except on win32)
 dnl
 AC_ARG_ENABLE(xvmc,
-  [  --enable-xvmc           XVMC support (default disabled)],, [
+  [  --enable-xvmc           XvMC support (default disabled)],, [
   enable_xvmc="no"
 ])
 AS_IF([test "${enable_xvmc}" != "no"], [
