@@ -135,7 +135,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     case VLC_FOURCC('X','x','M','C'):
     /* ATI Video */
     case VLC_FOURCC('V','C','R','2'):
-    case VLC_FOURCC('m','p','g','2'):
         break;
     default:
         if( p_dec->fmt_in.i_original_fourcc )

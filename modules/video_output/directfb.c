@@ -152,7 +152,7 @@ static int Init( vout_thread_t *p_vout )
             i_goffset = 5;
             i_blength = 5;
             i_boffset = 0;
-            p_vout->output.i_chroma = VLC_CODEC_RGB16
+            p_vout->output.i_chroma = VLC_CODEC_RGB16;
             break;
 
         case DSPF_RGB24:
