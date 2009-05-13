@@ -338,6 +338,33 @@ void libvlc_video_set_viewport( libvlc_instance_t *p_instance, libvlc_media_play
 #endif
 }
 
+float libvlc_video_get_scale( libvlc_media_player_t *p_mp,
+                              libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_mp, p_e );
+    if( !p_vout )
+        return 0.;
+
+    float f_scale = var_GetFloat( p_vout, "scale" );
+    if( var_GetBool( p_vout, "autoscale" ) )
+        f_scale = 0.;
+    vlc_object_release( p_vout );
+    return f_scale;
+}
+
+void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale,
+                             libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_mp, p_e );
+    if( !p_vout )
+        return;
+
+    if( f_scale != 0. )
+        var_SetFloat( p_vout, "scale", f_scale );
+    var_SetBool( p_vout, "autoscale", f_scale != 0. );
+    vlc_object_release( p_vout );
+}
+
 char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
