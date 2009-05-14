@@ -350,17 +350,6 @@ static void *Thread( void *obj )
 
     Q_INIT_RESOURCE( vlc );
 
-#if !defined(WIN32) && !defined(__APPLE__)
-    /* KLUDGE:
-     * disables icon theme use because that makes Cleanlooks style bug
-     * because it asks gconf for some settings that timeout because of threads
-     * see commits 21610 21622 21654 for reference */
-
-    /* If you don't have a gconftool-2 binary, you should comment this line */
-    if( strcmp( qVersion(), "4.4.0" ) < 0 ) /* fixed in Qt 4.4.0 */
-        QApplication::setDesktopSettingsAware( false );
-#endif
-
     /* Start the QApplication here */
 #ifdef Q_WS_X11
     char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
