@@ -47,6 +47,7 @@
 
 #include "../../codec/avcodec/avcodec.h"
 #include "avformat.h"
+#include "../vobsub.h"
 
 //#define AVFORMAT_DEBUG 1
 
@@ -271,6 +272,48 @@ int OpenDemux( vlc_object_t *p_this )
 
         case CODEC_TYPE_SUBTITLE:
             es_format_Init( &fmt, SPU_ES, fcc );
+            if( strncmp( p_sys->ic->iformat->name, "matroska", 8 ) == 0 &&
+                cc->codec_id == CODEC_ID_DVD_SUBTITLE &&
+                cc->extradata != NULL &&
+                cc->extradata_size > 0 )
+            {
+                char *psz_start;
+                char *psz_buf = malloc( cc->extradata_size + 1);
+                if( psz_buf != NULL )
+                {
+                    memcpy( psz_buf, cc->extradata , cc->extradata_size );
+                    psz_buf[cc->extradata_size] = '\0';
+
+                    psz_start = strstr( psz_buf, "size:" );
+                    if( psz_start &&
+                        vobsub_size_parse( psz_start,
+                                           &fmt.subs.spu.i_original_frame_width,
+                                           &fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
+                    {
+                        msg_Dbg( p_demux, "original frame size: %dx%d",
+                                 fmt.subs.spu.i_original_frame_width,
+                                 fmt.subs.spu.i_original_frame_height );
+                    }
+                    else
+                    {
+                        msg_Warn( p_demux, "reading original frame size failed" );
+                    }
+
+                    psz_start = strstr( psz_buf, "palette:" );
+                    if( psz_start &&
+                        vobsub_palette_parse( psz_start, &fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
+                    {
+                        fmt.subs.spu.palette[0] =  0xBeef;
+                        msg_Dbg( p_demux, "vobsub palette read" );
+                    }
+                    else
+                    {
+                        msg_Warn( p_demux, "reading original palette failed" );
+                    }
+                    free( psz_buf );
+                }
+            }
+
             psz_type = "subtitle";
             break;
 

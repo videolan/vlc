@@ -28,6 +28,10 @@
 
 #include "demux.hpp"
 
+extern "C" {
+#include "../vobsub.h"
+}
+
 /* GetFourCC helper */
 #define GetFOURCC( p )  __GetFOURCC( (uint8_t*)p )
 static vlc_fourcc_t __GetFOURCC( uint8_t *p )
@@ -1095,22 +1099,41 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             tracks[i_track]->fmt.i_codec = VLC_CODEC_SPU;
             if( tracks[i_track]->i_extra_data )
             {
-                char *p_start;
-                char *p_buf = (char *)malloc( tracks[i_track]->i_extra_data + 1);
-                memcpy( p_buf, tracks[i_track]->p_extra_data , tracks[i_track]->i_extra_data );
-                p_buf[tracks[i_track]->i_extra_data] = '\0';
- 
-                p_start = strstr( p_buf, "size:" );
-                if( sscanf( p_start, "size: %dx%d",
-                        &tracks[i_track]->fmt.subs.spu.i_original_frame_width, &tracks[i_track]->fmt.subs.spu.i_original_frame_height ) == 2 )
+                char *psz_start;
+                char *psz_buf = (char *)malloc( tracks[i_track]->i_extra_data + 1);
+                if( psz_buf != NULL )
                 {
-                    msg_Dbg( &sys.demuxer, "original frame size vobsubs: %dx%d", tracks[i_track]->fmt.subs.spu.i_original_frame_width, tracks[i_track]->fmt.subs.spu.i_original_frame_height );
+                    memcpy( psz_buf, tracks[i_track]->p_extra_data , tracks[i_track]->i_extra_data );
+                    psz_buf[tracks[i_track]->i_extra_data] = '\0';
+
+                    psz_start = strstr( psz_buf, "size:" );
+                    if( psz_start &&
+                        vobsub_size_parse( psz_start,
+                                           &tracks[i_track]->fmt.subs.spu.i_original_frame_width,
+                                           &tracks[i_track]->fmt.subs.spu.i_original_frame_height ) == VLC_SUCCESS )
+                    {
+                        msg_Dbg( &sys.demuxer, "original frame size vobsubs: %dx%d",
+                                 tracks[i_track]->fmt.subs.spu.i_original_frame_width,
+                                 tracks[i_track]->fmt.subs.spu.i_original_frame_height );
+                    }
+                    else
+                    {
+                        msg_Warn( &sys.demuxer, "reading original frame size for vobsub failed" );
+                    }
+
+                    psz_start = strstr( psz_buf, "palette:" );
+                    if( psz_start &&
+                        vobsub_palette_parse( psz_start, &tracks[i_track]->fmt.subs.spu.palette[1] ) == VLC_SUCCESS )
+                    {
+                        tracks[i_track]->fmt.subs.spu.palette[0] =  0xBeef;
+                        msg_Dbg( &sys.demuxer, "vobsub palette read" );
+                    }
+                    else
+                    {
+                        msg_Warn( &sys.demuxer, "reading original palette failed" );
+                    }
+                    free( psz_buf );
                 }
-                else
-                {
-                    msg_Warn( &sys.demuxer, "reading original frame size for vobsub failed" );
-                }
-                free( p_buf );
             }
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "B_VOBBTN" ) )
