@@ -365,7 +365,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        i_vlc_pcm_format = AOUT_FMT_S16_NE;
+        i_vlc_pcm_format = VLC_CODEC_S16N;
         i_snd_pcm_format = SND_PCM_FORMAT_S16;
     }
 
@@ -547,7 +547,7 @@ static int Open( vlc_object_t *p_this )
             i_vlc_pcm_format = VLC_CODEC_FL32;
             break;
         case SND_PCM_FORMAT_S16:
-            i_vlc_pcm_format = AOUT_FMT_S16_NE;
+            i_vlc_pcm_format = VLC_CODEC_S16N;
             break;
         }
         p_aout->output.output.i_format = i_vlc_pcm_format;
@@ -624,7 +624,7 @@ static int Open( vlc_object_t *p_this )
             {
                 b_retry = true;
                 i_snd_pcm_format = SND_PCM_FORMAT_S16;
-                p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+                p_aout->output.output.i_format = VLC_CODEC_S16N;
                 msg_Warn( p_aout, "unable to commit hardware configuration "
                                   "with fl32 samples. Retrying with s16l (%s)",                                     snd_strerror( i_snd_rc ) );
             }

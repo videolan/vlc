@@ -97,7 +97,7 @@ static const char *const format_list[] = { "u8", "s8", "u16", "s16", "u16_le",
                                      "float32", "spdif" };
 static const int format_int[] = { VLC_CODEC_U8,
                                   VLC_CODEC_S8,
-                                  AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
+                                  VLC_CODEC_U16N, VLC_CODEC_S16N,
                                   VLC_CODEC_U16L,
                                   VLC_CODEC_S16L,
                                   VLC_CODEC_U16B,

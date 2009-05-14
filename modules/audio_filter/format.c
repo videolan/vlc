@@ -36,17 +36,6 @@
 #include <vlc_block.h>
 #include "vlc_filter.h"
 
-#ifdef WORDS_BIGENDIAN
-#   define AOUT_FMT_S24_IE VLC_CODEC_S24L
-#   define AOUT_FMT_S16_IE VLC_CODEC_S16L
-#   define AOUT_FMT_U16_IE VLC_CODEC_U16L
-#else
-#   define AOUT_FMT_S24_IE VLC_CODEC_S24B
-#   define AOUT_FMT_S16_IE VLC_CODEC_S16B
-#   define AOUT_FMT_U16_IE VLC_CODEC_U16B
-#endif
-
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -125,74 +114,74 @@ static const struct
 } ConvertTable[] =
 {
     /* From fl32 */
-    { VLC_CODEC_FL32, AOUT_FMT_S24_NE, Float32toS24 },
-    { VLC_CODEC_FL32, AOUT_FMT_S16_NE, Float32toS16 },
-    { VLC_CODEC_FL32, AOUT_FMT_U16_NE, Float32toU16 },
-    { VLC_CODEC_FL32, AOUT_FMT_S24_IE, Float32toS24Invert },
-    { VLC_CODEC_FL32, AOUT_FMT_S16_IE, Float32toS16Invert },
-    { VLC_CODEC_FL32, AOUT_FMT_U16_IE, Float32toU16Invert },
+    { VLC_CODEC_FL32, VLC_CODEC_S24N, Float32toS24 },
+    { VLC_CODEC_FL32, VLC_CODEC_S16N, Float32toS16 },
+    { VLC_CODEC_FL32, VLC_CODEC_U16N, Float32toU16 },
+    { VLC_CODEC_FL32, VLC_CODEC_S24I, Float32toS24Invert },
+    { VLC_CODEC_FL32, VLC_CODEC_S16I, Float32toS16Invert },
+    { VLC_CODEC_FL32, VLC_CODEC_U16I, Float32toU16Invert },
     { VLC_CODEC_FL32, VLC_CODEC_S8, Float32toS8 },
     { VLC_CODEC_FL32, VLC_CODEC_U8, Float32toU8 },
 
     /* From s24 invert */
-    { AOUT_FMT_S24_NE, VLC_CODEC_FL32, S24toFloat32 },
-    { AOUT_FMT_S24_NE, AOUT_FMT_S24_IE,             Swap24 },
-    { AOUT_FMT_S24_NE, AOUT_FMT_S16_NE,             S24toS16 },
-    { AOUT_FMT_S24_NE, AOUT_FMT_S16_IE,             S24toS16Invert },
+    { VLC_CODEC_S24N, VLC_CODEC_FL32, S24toFloat32 },
+    { VLC_CODEC_S24N, VLC_CODEC_S24I,             Swap24 },
+    { VLC_CODEC_S24N, VLC_CODEC_S16N,             S24toS16 },
+    { VLC_CODEC_S24N, VLC_CODEC_S16I,             S24toS16Invert },
 
     /* From s16 */
-    { AOUT_FMT_S16_NE, VLC_CODEC_FL32, S16toFloat32 },
-    { AOUT_FMT_S16_NE, AOUT_FMT_S24_NE,             S16toS24 },
-    { AOUT_FMT_S16_NE, AOUT_FMT_S24_IE,             S16toS24Invert },
-    { AOUT_FMT_S16_NE, AOUT_FMT_S16_IE,             Swap16 },
-    { AOUT_FMT_S16_NE, AOUT_FMT_U16_IE,             S16toU16 },
-    { AOUT_FMT_S16_NE, VLC_CODEC_S8, S16toS8 },
-    { AOUT_FMT_S16_NE, VLC_CODEC_U8, S16toU8 },
+    { VLC_CODEC_S16N, VLC_CODEC_FL32, S16toFloat32 },
+    { VLC_CODEC_S16N, VLC_CODEC_S24N,             S16toS24 },
+    { VLC_CODEC_S16N, VLC_CODEC_S24I,             S16toS24Invert },
+    { VLC_CODEC_S16N, VLC_CODEC_S16I,             Swap16 },
+    { VLC_CODEC_S16N, VLC_CODEC_U16I,             S16toU16 },
+    { VLC_CODEC_S16N, VLC_CODEC_S8, S16toS8 },
+    { VLC_CODEC_S16N, VLC_CODEC_U8, S16toU8 },
 
     /* From u16 */
-    { AOUT_FMT_U16_NE, VLC_CODEC_FL32, U16toFloat32 },
-    { AOUT_FMT_U16_NE, AOUT_FMT_U16_IE,             Swap16 },
-    { AOUT_FMT_U16_NE, AOUT_FMT_S16_IE,             U16toS16 },
-    { AOUT_FMT_U16_NE, VLC_CODEC_S8, U16toS8 },
-    { AOUT_FMT_U16_NE, VLC_CODEC_U8, U16toU8 },
+    { VLC_CODEC_U16N, VLC_CODEC_FL32, U16toFloat32 },
+    { VLC_CODEC_U16N, VLC_CODEC_U16I,             Swap16 },
+    { VLC_CODEC_U16N, VLC_CODEC_S16I,             U16toS16 },
+    { VLC_CODEC_U16N, VLC_CODEC_S8, U16toS8 },
+    { VLC_CODEC_U16N, VLC_CODEC_U8, U16toU8 },
 
     /* From s8 */
     { VLC_CODEC_S8, VLC_CODEC_FL32, S8toFloat32 },
-    { VLC_CODEC_S8, AOUT_FMT_S16_NE,             S8toS16 },
-    { VLC_CODEC_S8, AOUT_FMT_S16_IE,             S8toS16Invert },
-    { VLC_CODEC_S8, AOUT_FMT_U16_NE,             S8toU16 },
-    { VLC_CODEC_S8, AOUT_FMT_U16_IE,             S8toU16Invert },
+    { VLC_CODEC_S8, VLC_CODEC_S16N,             S8toS16 },
+    { VLC_CODEC_S8, VLC_CODEC_S16I,             S8toS16Invert },
+    { VLC_CODEC_S8, VLC_CODEC_U16N,             S8toU16 },
+    { VLC_CODEC_S8, VLC_CODEC_U16I,             S8toU16Invert },
     { VLC_CODEC_S8, VLC_CODEC_U8, S8toU8 },
  
     /* From u8 */
     { VLC_CODEC_U8, VLC_CODEC_FL32, U8toFloat32 },
-    { VLC_CODEC_U8, AOUT_FMT_S16_NE,             U8toS16 },
-    { VLC_CODEC_U8, AOUT_FMT_S16_IE,             U8toS16Invert },
-    { VLC_CODEC_U8, AOUT_FMT_U16_NE,             U8toU16 },
-    { VLC_CODEC_U8, AOUT_FMT_U16_IE,             U8toU16Invert },
+    { VLC_CODEC_U8, VLC_CODEC_S16N,             U8toS16 },
+    { VLC_CODEC_U8, VLC_CODEC_S16I,             U8toS16Invert },
+    { VLC_CODEC_U8, VLC_CODEC_U16N,             U8toU16 },
+    { VLC_CODEC_U8, VLC_CODEC_U16I,             U8toU16Invert },
     { VLC_CODEC_U8, VLC_CODEC_S8, U8toS8 },
 
     /* From s24 invert */
-    { AOUT_FMT_S24_IE, VLC_CODEC_FL32, S24InverttoFloat32 },
-    { AOUT_FMT_S24_IE, AOUT_FMT_S24_NE,             Swap24 },
-    { AOUT_FMT_S24_IE, AOUT_FMT_S16_NE,             S24InverttoS16 },
-    { AOUT_FMT_S24_IE, AOUT_FMT_S16_IE,             S24InverttoS16Invert },
+    { VLC_CODEC_S24I, VLC_CODEC_FL32, S24InverttoFloat32 },
+    { VLC_CODEC_S24I, VLC_CODEC_S24N,             Swap24 },
+    { VLC_CODEC_S24I, VLC_CODEC_S16N,             S24InverttoS16 },
+    { VLC_CODEC_S24I, VLC_CODEC_S16I,             S24InverttoS16Invert },
 
     /* From s16 invert */
-    { AOUT_FMT_S16_IE, VLC_CODEC_FL32, S16InverttoFloat32 },
-    { AOUT_FMT_S16_IE, AOUT_FMT_S24_NE,             S16InverttoS24 },
-    { AOUT_FMT_S16_IE, AOUT_FMT_S24_IE,             S16InverttoS24Invert },
-    { AOUT_FMT_S16_IE, AOUT_FMT_S16_NE,             Swap16 },
-    { AOUT_FMT_S16_IE, AOUT_FMT_U16_NE,             S16InverttoU16 },
-    { AOUT_FMT_S16_IE, VLC_CODEC_S8, S16InverttoS8 },
-    { AOUT_FMT_S16_IE, VLC_CODEC_U8, S16InverttoU8 },
+    { VLC_CODEC_S16I, VLC_CODEC_FL32, S16InverttoFloat32 },
+    { VLC_CODEC_S16I, VLC_CODEC_S24N,             S16InverttoS24 },
+    { VLC_CODEC_S16I, VLC_CODEC_S24I,             S16InverttoS24Invert },
+    { VLC_CODEC_S16I, VLC_CODEC_S16N,             Swap16 },
+    { VLC_CODEC_S16I, VLC_CODEC_U16N,             S16InverttoU16 },
+    { VLC_CODEC_S16I, VLC_CODEC_S8, S16InverttoS8 },
+    { VLC_CODEC_S16I, VLC_CODEC_U8, S16InverttoU8 },
 
     /* From u16 invert */
-    { AOUT_FMT_U16_IE, VLC_CODEC_FL32, U16InverttoFloat32 },
-    { AOUT_FMT_U16_IE, AOUT_FMT_U16_NE,             Swap16 },
-    { AOUT_FMT_U16_IE, AOUT_FMT_S16_NE,             U16InverttoS16 },
-    { AOUT_FMT_U16_IE, VLC_CODEC_S8, U16InverttoS8 },
-    { AOUT_FMT_U16_IE, VLC_CODEC_U8, U16InverttoU8 },
+    { VLC_CODEC_U16I, VLC_CODEC_FL32, U16InverttoFloat32 },
+    { VLC_CODEC_U16I, VLC_CODEC_U16N,             Swap16 },
+    { VLC_CODEC_U16I, VLC_CODEC_S16N,             U16InverttoS16 },
+    { VLC_CODEC_U16I, VLC_CODEC_S8, U16InverttoS8 },
+    { VLC_CODEC_U16I, VLC_CODEC_U8, U16InverttoU8 },
 
     { 0, 0, NULL },
 };

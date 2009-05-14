@@ -452,7 +452,7 @@ static int DecOpen( decoder_t *p_dec )
     if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
         /* Setup the format */
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_dec->fmt_out.audio.i_rate     = p_dec->fmt_in.audio.i_rate;
         p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
         p_dec->fmt_out.audio.i_bitspersample = 16;//p_dec->fmt_in.audio.i_bitspersample; We request 16
@@ -1246,7 +1246,7 @@ static int EncoderSetAudioType( encoder_t *p_enc, IMediaObject *p_dmo )
     fourcc_to_wf_tag( p_enc->fmt_out.i_codec, &i_tag );
     if( i_tag == 0 ) return VLC_EGENERIC;
 
-    p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+    p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
     p_enc->fmt_in.audio.i_bitspersample = 16;
 
     /* We first need to choose an output type from the predefined

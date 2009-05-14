@@ -156,7 +156,7 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+    p_aout->output.output.i_format = VLC_CODEC_S16N;
     p_aout->output.i_nb_samples = FRAME_SIZE;
     p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;

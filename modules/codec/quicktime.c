@@ -486,7 +486,7 @@ static int OpenAudio( decoder_t *p_dec )
     }
 
 
-    es_format_Init( &p_dec->fmt_out, AUDIO_ES, AOUT_FMT_S16_NE );
+    es_format_Init( &p_dec->fmt_out, AUDIO_ES, VLC_CODEC_S16N );
     p_dec->fmt_out.audio.i_rate = p_sys->OutputFormatInfo.sampleRate;
     p_dec->fmt_out.audio.i_channels = p_sys->OutputFormatInfo.numChannels;
     p_dec->fmt_out.audio.i_physical_channels =

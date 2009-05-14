@@ -584,7 +584,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if( i_codec_id == CODEC_ID_MP3 && p_enc->fmt_in.audio.i_channels > 2 )
             p_enc->fmt_in.audio.i_channels = 2;
 
-        p_enc->fmt_in.i_codec  = AOUT_FMT_S16_NE;
+        p_enc->fmt_in.i_codec  = VLC_CODEC_S16N;
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
 

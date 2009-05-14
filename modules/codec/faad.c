@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
     if (vlc_CPU() & CPU_CAPABILITY_FPU)
         p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     else
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
     p_dec->pf_decode_audio = DecodeBlock;
 
     p_dec->fmt_out.audio.i_physical_channels =

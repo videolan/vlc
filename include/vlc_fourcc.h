@@ -279,17 +279,29 @@
 #define VLC_CODEC_CVD       VLC_FOURCC('c','v','d',' ')
 
 
-/* Special endian dependant values */
+/* Special endian dependant values
+ * The suffic N means Native
+ * The suffix I means Inverted (ie non native) */
 #ifdef WORDS_BIGENDIAN
 #   define VLC_CODEC_S16N VLC_CODEC_S16B
 #   define VLC_CODEC_U16N VLC_CODEC_U16B
 #   define VLC_CODEC_S24N VLC_CODEC_S24B
 #   define VLC_CODEC_S32N VLC_CODEC_S32B
+
+#   define VLC_CODEC_S16I VLC_CODEC_S16L
+#   define VLC_CODEC_U16I VLC_CODEC_U16L
+#   define VLC_CODEC_S24I VLC_CODEC_S24L
+#   define VLC_CODEC_S32I VLC_CODEC_S32L
 #else
 #   define VLC_CODEC_S16N VLC_CODEC_S16L
 #   define VLC_CODEC_U16N VLC_CODEC_U16L
 #   define VLC_CODEC_S24N VLC_CODEC_S24L
 #   define VLC_CODEC_S32N VLC_CODEC_S32L
+
+#   define VLC_CODEC_S16I VLC_CODEC_S16B
+#   define VLC_CODEC_U16I VLC_CODEC_U16B
+#   define VLC_CODEC_S24I VLC_CODEC_S24B
+#   define VLC_CODEC_S32I VLC_CODEC_S32B
 #endif
 
 /* Non official codecs, used to force a profile in an encoder */

@@ -330,7 +330,7 @@ static int Open( vlc_object_t *p_this )
     }
     else if ( val.i_int == AOUT_VAR_5_1 )
     {
-        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_format = VLC_CODEC_S16N;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
@@ -338,20 +338,20 @@ static int Open( vlc_object_t *p_this )
     }
     else if ( val.i_int == AOUT_VAR_2F2R )
     {
-        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_format = VLC_CODEC_S16N;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
     }
     else if ( val.i_int == AOUT_VAR_STEREO )
     {
-        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_format = VLC_CODEC_S16N;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
     else if ( val.i_int == AOUT_VAR_MONO )
     {
-        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_format = VLC_CODEC_S16N;
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
     }
     else

@@ -47,18 +47,8 @@ extern "C" {
       && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
       && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
 
-#define AOUT_FMT_S16_NE VLC_CODEC_S16N
-#define AOUT_FMT_U16_NE VLC_CODEC_U16N
-#define AOUT_FMT_S24_NE VLC_CODEC_S24N
-#define AOUT_FMT_S32_NE VLC_CODEC_S32N
-
 #define VLC_CODEC_SPDIFL VLC_FOURCC('s','p','d','i')
 #define VLC_CODEC_SPDIFB VLC_FOURCC('s','p','d','b')
-#ifdef WORDS_BIGENDIAN
-#   define AOUT_FMT_SPDIF_NE VLC_CODEC_SPDIFB
-#else
-#   define AOUT_FMT_SPDIF_NE VLC_CODEC_SPDIFL
-#endif
 
 #define AOUT_FMT_NON_LINEAR( p_format )                 \
     ( ((p_format)->i_format == VLC_CODEC_SPDIFL)       \

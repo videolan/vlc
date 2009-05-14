@@ -688,10 +688,10 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
             p_dec->fmt_out.i_codec = VLC_CODEC_S8;
             break;
         case 16:
-            p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+            p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
             break;
         case 24:
-            p_dec->fmt_out.i_codec = AOUT_FMT_S24_NE;
+            p_dec->fmt_out.i_codec = VLC_CODEC_S24N;
             break;
         default:
             msg_Dbg( p_dec, "strange bit/sample value: %d",
@@ -1316,7 +1316,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     FLAC__stream_encoder_set_sample_rate( p_sys->p_flac,
                                           p_enc->fmt_in.audio.i_rate );
     FLAC__stream_encoder_set_bits_per_sample( p_sys->p_flac, 16 );
-    p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+    p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
 
     /* Get and store the STREAMINFO metadata block as a p_extra */
     p_sys->p_chain = 0;

@@ -358,8 +358,8 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( (p_filter->fmt_in.i_codec != AOUT_FMT_S16_NE) ||
-        (p_filter->fmt_out.i_codec != AOUT_FMT_S16_NE) )
+    if( (p_filter->fmt_in.i_codec != VLC_CODEC_S16N) ||
+        (p_filter->fmt_out.i_codec != VLC_CODEC_S16N) )
     {
         /*msg_Err( p_this, "filter discarded (invalid format)" );*/
         return VLC_EGENERIC;
@@ -367,8 +367,8 @@ static int OpenFilter( vlc_object_t *p_this )
 
     if( (p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format) &&
         (p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate) &&
-        (p_filter->fmt_in.audio.i_format != AOUT_FMT_S16_NE) &&
-        (p_filter->fmt_out.audio.i_format != AOUT_FMT_S16_NE) &&
+        (p_filter->fmt_in.audio.i_format != VLC_CODEC_S16N) &&
+        (p_filter->fmt_out.audio.i_format != VLC_CODEC_S16N) &&
         (p_filter->fmt_in.audio.i_bitspersample !=
                                     p_filter->fmt_out.audio.i_bitspersample))
     {

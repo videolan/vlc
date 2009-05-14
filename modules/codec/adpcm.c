@@ -247,7 +247,7 @@ static int OpenDecoder( vlc_object_t *p_this )
              p_sys->i_samplesperblock );
 
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+    p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
     p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     p_dec->fmt_out.audio.i_channels = p_dec->fmt_in.audio.i_channels;
     p_dec->fmt_out.audio.i_physical_channels =

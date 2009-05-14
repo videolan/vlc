@@ -220,7 +220,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+    p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
 
     /*
       Set callbacks
@@ -940,7 +940,7 @@ static int OpenEncoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_enc->p_sys = p_sys;
     p_enc->pf_encode_audio = Encode;
-    p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+    p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
     p_enc->fmt_out.i_codec = VLC_CODEC_SPEEX;
 
     speex_init_header( &p_sys->header, p_enc->fmt_in.audio.i_rate,

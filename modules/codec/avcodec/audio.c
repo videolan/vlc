@@ -458,7 +458,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         p_dec->fmt_out.audio.i_bitspersample = 8;
         break;
     case SAMPLE_FMT_S32:
-        p_dec->fmt_out.i_codec = AOUT_FMT_S32_NE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
         p_dec->fmt_out.audio.i_bitspersample = 32;
         break;
     case SAMPLE_FMT_FLT:
@@ -472,12 +472,12 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
     case SAMPLE_FMT_S16:
     default:
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_dec->fmt_out.audio.i_bitspersample = 16;
         break;
     }
 #else
-    p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+    p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
     p_dec->fmt_out.audio.i_bitspersample = 16;
 #endif
     p_dec->fmt_out.audio.i_rate     = p_sys->p_context->sample_rate;

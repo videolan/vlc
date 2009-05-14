@@ -347,13 +347,13 @@ static int DecoderOpen( vlc_object_t *p_this )
     }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAW )
     {
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_sys->p_logtos16  = alawtos16;
         p_dec->fmt_in.audio.i_bitspersample = 8;
     }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_MULAW )
     {
-        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
         p_sys->p_logtos16  = ulawtos16;
         p_dec->fmt_in.audio.i_bitspersample = 8;
     }
@@ -1406,13 +1406,13 @@ static int EncoderOpen( vlc_object_t *p_this )
     if( p_enc->fmt_out.i_codec == VLC_CODEC_ALAW)
     {
         p_enc->fmt_in.audio.i_bitspersample = 16;
-        p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
         p_sys->i_s16tolog = ALAW;
     }
     else if( p_enc->fmt_out.i_codec == VLC_CODEC_MULAW )
     {
         p_enc->fmt_in.audio.i_bitspersample = 16;
-        p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+        p_enc->fmt_in.i_codec = VLC_CODEC_S16N;
         p_sys->i_s16tolog = ULAW;
     }
 
