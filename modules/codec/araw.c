@@ -266,85 +266,6 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 8;
     }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'f', 'l', 't' ) )
-    {
-        switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-        {
-        case 4:
-            p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
-            break;
-        case 8:
-            p_dec->fmt_out.i_codec = VLC_CODEC_FL64;
-            break;
-        default:
-            msg_Err( p_dec, "bad parameters(bits/sample)" );
-            return VLC_EGENERIC;
-        }
-    }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'r', 'a', 'w' ) ||
-             p_dec->fmt_in.i_codec == VLC_FOURCC( 'p', 'c', 'm', ' ' ) )
-    {
-        switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-        {
-        case 1:
-            p_dec->fmt_out.i_codec = VLC_CODEC_U8;
-            break;
-        case 2:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S16L;
-            break;
-        case 3:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
-            break;
-        case 4:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
-            break;
-        default:
-            msg_Err( p_dec, "bad parameters(bits/sample)" );
-            return VLC_EGENERIC;
-        }
-    }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 't', 'w', 'o', 's' ) )
-    {
-        switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-        {
-        case 1:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S8;
-            break;
-        case 2:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
-            break;
-        case 3:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
-            break;
-        case 4:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S32B;
-            break;
-        default:
-            msg_Err( p_dec, "bad parameters(bits/sample)" );
-            return VLC_EGENERIC;
-        }
-    }
-    else if( p_dec->fmt_in.i_codec == VLC_FOURCC( 's', 'o', 'w', 't' ) )
-    {
-        switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-        {
-        case 1:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S8;
-            break;
-        case 2:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S16L;
-            break;
-        case 3:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
-            break;
-        case 4:
-            p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
-            break;
-        default:
-            msg_Err( p_dec, "bad parameters(bits/sample)" );
-            return VLC_EGENERIC;
-        }
-    }
     else if( p_dec->fmt_in.i_codec == VLC_CODEC_ALAW )
     {
         p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
@@ -357,7 +278,17 @@ static int DecoderOpen( vlc_object_t *p_this )
         p_sys->p_logtos16  = ulawtos16;
         p_dec->fmt_in.audio.i_bitspersample = 8;
     }
-    else return VLC_EGENERIC;
+    else
+    {
+        p_dec->fmt_out.i_codec =
+            vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
+                                      p_dec->fmt_in.audio.i_bitspersample );
+        if( !p_dec->fmt_out.i_codec )
+        {
+            msg_Err( p_dec, "bad parameters(bits/sample)" );
+            return VLC_EGENERIC;
+        }
+    }
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;

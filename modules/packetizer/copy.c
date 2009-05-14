@@ -87,71 +87,16 @@ static int Open( vlc_object_t *p_this )
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
-    /* Fix the value of the fourcc */
-    switch( p_dec->fmt_in.i_codec )
+    /* Fix the value of the fourcc for audio */
+    if( p_dec->fmt_in.i_cat == AUDIO_ES )
     {
-        case VLC_FOURCC( 'a', 'r', 'a', 'w' ):
-            switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-            {
-                case 1:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_U8;
-                    break;
-                case 2:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S16L;
-                    break;
-                case 3:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
-                    break;
-                case 4:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
-                    break;
-                default:
-                    msg_Err( p_dec, "unknown raw audio sample size" );
-                    return VLC_EGENERIC;
-            }
-            break;
-
-        case VLC_FOURCC( 't', 'w', 'o', 's' ):
-            switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-            {
-                case 1:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S8;
-                    break;
-                case 2:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S16B;
-                    break;
-                case 3:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S24B;
-                    break;
-                case 4:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S32B;
-                    break;
-                default:
-                    msg_Err( p_dec, "unknown raw audio sample size" );
-                    return VLC_EGENERIC;
-            }
-            break;
-
-        case VLC_FOURCC( 's', 'o', 'w', 't' ):
-            switch( ( p_dec->fmt_in.audio.i_bitspersample + 7 ) / 8 )
-            {
-                case 1:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S8;
-                    break;
-                case 2:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S16L;
-                    break;
-                case 3:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S24L;
-                    break;
-                case 4:
-                    p_dec->fmt_out.i_codec = VLC_CODEC_S32L;
-                    break;
-                default:
-                    msg_Err( p_dec, "unknown raw audio sample size" );
-                    return VLC_EGENERIC;
-            }
-            break;
+        p_dec->fmt_out.i_codec = vlc_fourcc_GetCodecAudio( p_dec->fmt_in.i_codec,
+                                                           p_dec->fmt_in.audio.i_bitspersample );
+        if( !p_dec->fmt_out.i_codec )
+        {
+            msg_Err( p_dec, "unknown raw audio sample size" );
+            return VLC_EGENERIC;
+        }
     }
 
     p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
