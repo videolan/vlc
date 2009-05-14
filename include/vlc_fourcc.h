@@ -313,7 +313,7 @@
 #define VLC_CODEC_MP3       VLC_FOURCC('m','p','3',' ')
 
 /**
- * It returns the codec associatedto a fourcc within a ES category.
+ * It returns the codec associated to a fourcc within a ES category.
  *
  * If not found, it will return the given fourcc.
  * If found, it will allways be one of the VLC_CODEC_ defined above.
@@ -321,6 +321,17 @@
  * You may use UNKNOWN_ES for the ES category if you don't have the information.
  */
 VLC_EXPORT( vlc_fourcc_t, vlc_fourcc_GetCodec, ( int i_cat, vlc_fourcc_t i_fourcc ) );
+
+/**
+ * It returns the codec associated to a fourcc store in a zero terminated
+ * string.
+ *
+ * If the string is NULL or does not have exactly 4 charateres, it will
+ * return 0, otherwise it behaves like vlc_fourcc_GetCodec.
+ *
+ * Provided for convenience.
+ */
+VLC_EXPORT( vlc_fourcc_t, vlc_fourcc_GetCodecFromString, ( int i_cat, const char * ) );
 
 /**
  * It returns the description of the given fourcc or NULL if not found.
