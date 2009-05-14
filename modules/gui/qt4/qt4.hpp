@@ -40,7 +40,7 @@
 # error Update your Qt version
 #endif
 #if QT_VERSION == 0x040500
-# warning Please update Qt version to 4.5.1. This warning will become an error.
+# error Please update Qt version to 4.5.1.
 #endif
 
 enum {
