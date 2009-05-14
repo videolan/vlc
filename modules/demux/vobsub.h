@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vobsub.h: Vobsub support
  *****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
+ * Copyright (C) 2009 the VideoLAN team
  * $Id$
  *
  * Authors: John Stebbins
@@ -40,8 +40,10 @@ static inline void vobsub_palette_rgb2yuv( uint32_t *pu_palette )
 static inline int vobsub_palette_parse( const char *psz_buf, uint32_t *pu_palette )
 {
     if( sscanf( psz_buf, "palette: "
-                "%"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", "
-                "%"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32"",
+                "%"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", "
+                "%"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", "
+                "%"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32", "
+                "%"PRIx32", %"PRIx32", %"PRIx32", %"PRIx32"",
                 &pu_palette[0], &pu_palette[1], &pu_palette[2], &pu_palette[3],
                 &pu_palette[4], &pu_palette[5], &pu_palette[6], &pu_palette[7],
                 &pu_palette[8], &pu_palette[9], &pu_palette[10], &pu_palette[11],
@@ -56,7 +58,9 @@ static inline int vobsub_palette_parse( const char *psz_buf, uint32_t *pu_palett
     }
 }
 
-static inline int vobsub_size_parse( const char *psz_buf, int *pi_original_frame_width, int *pi_original_frame_height )
+static inline int vobsub_size_parse( const char *psz_buf,
+                                     int *pi_original_frame_width,
+                                     int *pi_original_frame_height )
 {
     if( sscanf( psz_buf, "size: %dx%d",
                 pi_original_frame_width, pi_original_frame_height ) == 2 )
