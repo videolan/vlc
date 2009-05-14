@@ -88,6 +88,7 @@ typedef enum libvlc_event_type_t {
 
     libvlc_MediaPlayerTitleChanged,
     libvlc_MediaPlayerSnapshotTaken,
+    libvlc_MediaPlayerLengthChanged,
     /* New event types HERE */
 } libvlc_event_type_t;
 
@@ -202,6 +203,11 @@ typedef struct libvlc_event_t
              char* psz_filename ;
         } media_player_snapshot_taken ;
 
+        /* Length changed */
+        struct
+        {
+            libvlc_time_t   new_length;
+        } media_player_length_changed;
     } u;
 } libvlc_event_t;
 

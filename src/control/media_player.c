@@ -232,6 +232,13 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                                                var_GetTime( p_input, "time" );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
+    else if( newval.i_int == INPUT_EVENT_LENGTH )
+    {
+        event.type = libvlc_MediaPlayerLengthChanged;
+        event.u.media_player_length_changed.new_length =
+                                               var_GetTime( p_input, "length" );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
 
     return VLC_SUCCESS;
 
@@ -313,6 +320,8 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
             libvlc_MediaPlayerPositionChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerTimeChanged, p_e );
+    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
+            libvlc_MediaPlayerLengthChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
             libvlc_MediaPlayerTitleChanged, p_e );
     libvlc_event_manager_register_event_type( p_mi->p_event_manager,
