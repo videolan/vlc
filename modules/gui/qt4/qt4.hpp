@@ -36,7 +36,7 @@
 #include <QEvent>
 #include <QString>
 
-#if ( QT_VERSION < 0x040300 )
+#if ( QT_VERSION < 0x040400 )
 # error Update your Qt version
 #endif
 #if QT_VERSION == 0x040500

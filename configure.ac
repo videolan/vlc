@@ -4941,7 +4941,7 @@ then
     VLC_ADD_LIBS([maemo],[${HILDON_LIBS}])
     VLC_ADD_PLUGIN([maemo])
     VLC_ADD_PLUGIN([swscale_maemo])
-    AC_DEFINE([BUILD_MAEMO], 1, [Define if you're using Maemo interfaces])
+    AC_DEFINE([BUILD_MAEMO], 1, [Define if you are using Maemo interfaces])
     ALIASES="${ALIASES} mvlc"
   ], [
     AS_IF([test "${enable_maemo}" = "yes"],[
@@ -4960,7 +4960,7 @@ AC_ARG_ENABLE(qt4,
   AS_IF([test "${SYS}" = "darwin"], [enable_qt4=no])
 ])
 AS_IF([test "${enable_qt4}" != "no"], [
-  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.3.0], [
+  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.4.2], [
     VLC_ADD_PLUGIN([qt4])
     AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
     ALIASES="${ALIASES} qvlc"
