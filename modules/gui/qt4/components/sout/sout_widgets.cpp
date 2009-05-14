@@ -144,6 +144,7 @@ HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     layout->addWidget(HTTPPortLabel, 2, 0, 1, 1);
 
     HTTPEdit = new QLineEdit(this);
+    HTTPEdit->setText( "0.0.0.0" );
 
     HTTPPort = new QSpinBox(this);
     HTTPPort->setMaximumSize(QSize(90, 16777215));
@@ -188,6 +189,7 @@ MMSHDestBox::MMSHDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     layout->addWidget(MMSHPortLabel, 2, 0, 1, 1);
 
     MMSHEdit = new QLineEdit(this);
+    MMSHEdit->setText( "0.0.0.0" );
 
     MMSHPort = new QSpinBox(this);
     MMSHPort->setMaximumSize(QSize(90, 16777215));

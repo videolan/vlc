@@ -32,6 +32,7 @@
 #include <xcb/xcb.h>
 #include <xcb/xcb_keysyms.h>
 #include <X11/keysym.h>
+#include <X11/XF86keysym.h>
 
 #include <vlc_common.h>
 #include <vlc_keys.h>
@@ -135,24 +136,25 @@ static int ConvertKeySym (xcb_keysym_t sym)
         { XK_F11,           KEY_F11, },
         { XK_F12,           KEY_F12, },
         { XK_Delete,        KEY_DELETE, },
+
+        /* XFree86 extensions */
+        { XF86XK_AudioLowerVolume, KEY_VOLUME_DOWN, },
+        { XF86XK_AudioMute,        KEY_VOLUME_MUTE, },
+        { XF86XK_AudioRaiseVolume, KEY_VOLUME_UP, },
+        { XF86XK_AudioPlay,        KEY_MEDIA_PLAY_PAUSE, },
+        { XF86XK_AudioStop,        KEY_MEDIA_STOP, },
+        { XF86XK_AudioPrev,        KEY_MEDIA_PREV_TRACK, },
+        { XF86XK_AudioNext,        KEY_MEDIA_NEXT_TRACK, },
+        { XF86XK_HomePage,         KEY_BROWSER_HOME, },
+        { XF86XK_Search,           KEY_BROWSER_SEARCH, },
+        { XF86XK_Back,             KEY_BROWSER_BACK, },
+        { XF86XK_Forward,          KEY_BROWSER_FORWARD, },
+        { XF86XK_Stop,             KEY_BROWSER_STOP, },
+        { XF86XK_Refresh,          KEY_BROWSER_REFRESH, },
+        { XF86XK_Favorites,        KEY_BROWSER_FAVORITES, },
+        { XF86XK_AudioPause,       KEY_MEDIA_PLAY_PAUSE, },
+        { XF86XK_Reload,           KEY_BROWSER_REFRESH, },
     };
-    /* TODO: add XF86 extensions */
-#if 0
-    KEY_BROWSER_BACK
-    KEY_BROWSER_FORWARD
-    KEY_BROWSER_REFRESH
-    KEY_BROWSER_STOP
-    KEY_BROWSER_SEARCH
-    KEY_BROWSER_FAVORITES
-    KEY_BROWSER_HOME
-    KEY_VOLUME_MUTE
-    KEY_VOLUME_DOWN
-    KEY_VOLUME_UP
-    KEY_MEDIA_NEXT_TRACK
-    KEY_MEDIA_PREV_TRACK
-    KEY_MEDIA_STOP
-    KEY_MEDIA_PLAY_PAUSE
-#endif
 
     /* X11 and VLC both use the ASCII code for printable ASCII characters,
      * except for space (only X11). */
