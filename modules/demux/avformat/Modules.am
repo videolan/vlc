@@ -4,6 +4,7 @@ SOURCES_avformat = \
     demux.c \
     ../../codec/avcodec/fourcc.c \
     ../../codec/avcodec/chroma.c \
+	../vobsub.h \
     $(NULL)
 if ENABLE_SOUT
 SOURCES_avformat += mux.c
