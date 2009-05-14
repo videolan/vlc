@@ -273,7 +273,7 @@ static const muxer_properties_t p_muxers[] = {
     M( "raw", "mpc", 1,         VLC_CODEC_MUSEPACK7, VLC_CODEC_MUSEPACK8 ),
     M( "raw", "ape", 1,         VLC_CODEC_APE ),
 
-    M( "wav", "wav", 1,         VLC_FOURCC('a','r','a','w'), VLC_CODEC_U8, VLC_CODEC_S16L,
+    M( "wav", "wav", 1,         VLC_CODEC_U8, VLC_CODEC_S16L,
                                 VLC_CODEC_S24L, VLC_CODEC_S32L, VLC_CODEC_FL32 ),
 
     //M( "ffmpeg{mux=flac}", "flac", 1, VLC_CODEC_FLAC ), BROKEN
