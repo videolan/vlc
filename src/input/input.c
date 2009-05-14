@@ -1107,13 +1107,11 @@ static void InitPrograms( input_thread_t * p_input )
     /* Set up es_out */
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, true );
     i_es_out_mode = ES_OUT_MODE_AUTO;
-    val.p_list = NULL;
     if( p_input->p->p_sout )
     {
         if( var_GetBool( p_input, "sout-all" ) )
         {
             i_es_out_mode = ES_OUT_MODE_ALL;
-            val.p_list = NULL;
         }
         else
         {
@@ -1125,8 +1123,7 @@ static void InitPrograms( input_thread_t * p_input )
             }
             else
             {
-                var_Change( p_input, "programs", VLC_VAR_FREELIST, &val,
-                            NULL );
+                var_Change( p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
             }
         }
     }
@@ -1141,6 +1138,7 @@ static void InitPrograms( input_thread_t * p_input )
     {
         demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
                         val.p_list );
+        var_Change( p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
     }
     else
     {
