@@ -169,18 +169,11 @@ static int OpenDecoder( vlc_object_t *p_this )
     var_AddCallback( p_dec, "fake-file-reload", FakeCallback , p_dec );
 
     psz_chroma = var_CreateGetString( p_dec, "fake-chroma" );
-    if( strlen( psz_chroma ) != 4 )
+    fmt_out.i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
+    if( !fmt_out.i_chroma )
     {
         msg_Warn( p_dec, "Invalid chroma (%s). Using I420.", psz_chroma );
         fmt_out.i_chroma = VLC_CODEC_I420;
-    }
-    else
-    {
-        fmt_out.i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                                VLC_FOURCC( psz_chroma[0],
-                                                            psz_chroma[1],
-                                                            psz_chroma[2],
-                                                            psz_chroma[3] ) );
     }
     free( psz_chroma );
 

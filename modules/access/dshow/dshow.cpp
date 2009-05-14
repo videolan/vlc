@@ -349,7 +349,8 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     /* Get/parse options and open device(s) */
     string vdevname, adevname;
-    int i_width = 0, i_height = 0, i_chroma = 0;
+    int i_width = 0, i_height = 0;
+    vlc_fourcc_t i_chroma = 0;
     bool b_use_audio = true;
     bool b_use_video = true;
 
@@ -419,13 +420,9 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     p_sys->b_chroma = false;
     var_Create( p_this, "dshow-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_this, "dshow-chroma", &val );
-    if( val.psz_string && strlen( val.psz_string ) >= 4 )
-    {
-        i_chroma = vlc_fourcc_GetCodec( UNKNOWN_ES,
-                                        VLC_FOURCC( val.psz_string[0], val.psz_string[1],
-                                                    val.psz_string[2], val.psz_string[3] ) );
-        p_sys->b_chroma = true;
-    }
+
+    i_chroma = vlc_fourcc_GetCodecFromString( UNKNOWN_ES, val.psz_string );
+    p_sys->b_chroma = i_chroma != 0;
     free( val.psz_string );
 
     var_Create( p_this, "dshow-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );

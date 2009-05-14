@@ -134,12 +134,10 @@ static int Create( vlc_object_t *p_this )
     }
 
     psz_fcc = var_CreateGetNonEmptyString( p_this, CFG_PREFIX "chroma" );
-    if( psz_fcc && (strlen( psz_fcc ) == 4) )
-    {
-        p_sys->i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                               VLC_FOURCC( psz_fcc[0], psz_fcc[1],
-                                                           psz_fcc[2], psz_fcc[3] ) );
-    }
+    const vlc_fourcc_t i_requested_chroma =
+        vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_fcc );
+    if( i_requested_chroma )
+        p_sys->i_chroma = i_requested_chroma;
     free( psz_fcc );
 
     if( p_sys->b_yuv4mpeg2 )

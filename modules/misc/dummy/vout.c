@@ -89,18 +89,9 @@ static int Init( vout_thread_t *p_vout )
     bool b_chroma = 0;
 
     psz_chroma = config_GetPsz( p_vout, "dummy-chroma" );
-    if( psz_chroma )
-    {
-        if( strlen( psz_chroma ) >= 4 )
-        {
-            i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                            VLC_FOURCC( psz_chroma[0], psz_chroma[1],
-                                                        psz_chroma[2], psz_chroma[3] ) );
-            b_chroma = 1;
-        }
-
-        free( psz_chroma );
-    }
+    i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
+    b_chroma = i_chroma != 0;
+    free( psz_chroma );
 
     I_OUTPUTPICTURES = 0;
 

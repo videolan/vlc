@@ -133,29 +133,26 @@ static int Init( vout_thread_t *p_vout )
     int i_index;
     picture_t *p_pic;
     char *psz_chroma, *psz_tmp;
-    int i_width, i_height, i_pitch, i_chroma;
+    int i_width, i_height, i_pitch;
+    vlc_fourcc_t i_chroma;
 
     i_width = var_CreateGetInteger( p_vout, "vmem-width" );
     i_height = var_CreateGetInteger( p_vout, "vmem-height" );
     i_pitch = var_CreateGetInteger( p_vout, "vmem-pitch" );
 
     psz_chroma = var_CreateGetString( p_vout, "vmem-chroma" );
-    if( psz_chroma )
-    {
-        if( strlen( psz_chroma ) < 4 )
-        {
-            msg_Err( p_vout, "vmem-chroma should be 4 characters long" );
-            free( psz_chroma );
-            return VLC_EGENERIC;
-        }
-        i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                        VLC_FOURCC( psz_chroma[0], psz_chroma[1],
-                                                    psz_chroma[2], psz_chroma[3] ) );
-        free( psz_chroma );
-    }
-    else
+    if( !psz_chroma )
     {
         msg_Err( p_vout, "Cannot find chroma information." );
+        return VLC_EGENERIC;
+    }
+
+    i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
+    free( psz_chroma );
+
+    if( !i_chroma )
+    {
+        msg_Err( p_vout, "vmem-chroma should be 4 characters long" );
         return VLC_EGENERIC;
     }
 

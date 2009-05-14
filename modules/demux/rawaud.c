@@ -106,21 +106,17 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
 
     char *psz_fourcc = var_CreateGetString( p_demux, "rawaud-fourcc" );
+    p_sys->fmt.i_codec = vlc_fourcc_GetCodecFromString( AUDIO_ES, psz_fourcc );
+    free( psz_fourcc );
 
-    if( ( psz_fourcc == NULL ?  0 : strlen( psz_fourcc ) ) != 4  )
+    if( !p_sys->fmt.i_codec )
     {
         msg_Err( p_demux, "rawaud-fourcc must be a 4 character string");
-        free( psz_fourcc );
         es_format_Clean( &p_sys->fmt );
         free( p_sys );
         return VLC_EGENERIC;
     }
 
-    p_sys->fmt.i_codec = vlc_fourcc_GetCodec( AUDIO_ES,
-                                              VLC_FOURCC( psz_fourcc[0], psz_fourcc[1],
-                                                          psz_fourcc[2], psz_fourcc[3] ) );
-
-    free( psz_fourcc );
     // get the bits per sample ratio based on codec
     switch( p_sys->fmt.i_codec )
     {

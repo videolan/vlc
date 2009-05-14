@@ -393,7 +393,7 @@ static int AccessControlResetCallback( vlc_object_t *p_this,
 static const struct
 {
     unsigned int i_v4l2;
-    int i_fourcc;
+    vlc_fourcc_t i_fourcc;
     int i_rmask;
     int i_gmask;
     int i_bmask;
@@ -1945,22 +1945,18 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
     /* Test and set Chroma */
     fmt.fmt.pix.pixelformat = 0;
-    if( p_sys->psz_requested_chroma && strlen( p_sys->psz_requested_chroma ) > 0 )
+    if( p_sys->psz_requested_chroma && *p_sys->psz_requested_chroma )
     {
         /* User specified chroma */
-        if( strlen( p_sys->psz_requested_chroma ) >= 4 )
+        const vlc_fourcc_t i_requested_fourcc =
+            vlc_fourcc_GetCodecFromString( VIDEO_ES, p_sys->psz_requested_chroma );
+
+        for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
         {
-            int i_requested_fourcc = vlc_fourcc_GetCodec( VIDEO_ES,
-                                                          VLC_FOURCC(
-                p_sys->psz_requested_chroma[0], p_sys->psz_requested_chroma[1],
-                p_sys->psz_requested_chroma[2], p_sys->psz_requested_chroma[3] ) );
-            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
+            if( v4l2chroma_to_fourcc[i].i_fourcc == i_requested_fourcc )
             {
-                if( v4l2chroma_to_fourcc[i].i_fourcc == i_requested_fourcc )
-                {
-                    fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
-                    break;
-                }
+                fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
+                break;
             }
         }
         /* Try and set user chroma */

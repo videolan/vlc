@@ -753,7 +753,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     /* SDL fucked up fourcc definitions on bigendian machines */
     uint32_t i_sdl_chroma;
     char *psz_chroma = NULL;
-    uint32_t i_chroma = 0;
+    vlc_fourcc_t i_chroma = 0;
 
     bool b_overlay = config_GetInt( p_vout, "overlay" );
 
@@ -796,10 +796,9 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( ( psz_chroma = config_GetPsz( p_vout, "sdl-chroma" ) ) )
     {
-        if( strlen( psz_chroma ) >= 4 )
+        i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
+        if( i_chroma )
         {
-            memcpy(&i_chroma, psz_chroma, 4);
-            i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, i_chroma );
             msg_Dbg( p_vout, "Forcing chroma to 0x%.8x (%4.4s)", i_chroma, (char*)&i_chroma );
         }
         else

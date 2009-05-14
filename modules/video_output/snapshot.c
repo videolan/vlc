@@ -152,7 +152,7 @@ static int Init( vout_thread_t *p_vout )
     picture_t *p_pic;
     vlc_value_t val;
     char* psz_chroma;
-    int i_chroma;
+    vlc_fourcc_t i_chroma;
     int i_width;
     int i_height;
     int i_datasize;
@@ -161,21 +161,18 @@ static int Init( vout_thread_t *p_vout )
     i_height = config_GetInt( p_vout, "snapshot-height" );
 
     psz_chroma = config_GetPsz( p_vout, "snapshot-chroma" );
-    if( psz_chroma )
-    {
-        if( strlen( psz_chroma ) < 4 )
-        {
-            msg_Err( p_vout, "snapshot-chroma should be 4 characters long" );
-            return VLC_EGENERIC;
-        }
-        i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                        VLC_FOURCC( psz_chroma[0], psz_chroma[1],
-                                                    psz_chroma[2], psz_chroma[3] ) );
-        free( psz_chroma );
-    }
-    else
+    if( !psz_chroma )
     {
         msg_Err( p_vout, "Cannot find chroma information." );
+        return VLC_EGENERIC;
+    }
+
+    i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
+    free( psz_chroma );
+
+    if( !i_chroma )
+    {
+        msg_Err( p_vout, "snapshot-chroma should be 4 characters long" );
         return VLC_EGENERIC;
     }
 

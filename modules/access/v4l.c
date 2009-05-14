@@ -212,7 +212,7 @@ struct quicktime_mjpeg_app1
 static const struct
 {
     int i_v4l;
-    int i_fourcc;
+    vlc_fourcc_t i_fourcc;
 
 } v4lchroma_to_fourcc[] =
 {
@@ -975,11 +975,12 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             p_sys->i_fourcc = 0;
 
             psz = var_CreateGetString( p_demux, "v4l-chroma" );
-            if( strlen( psz ) >= 4 )
+
+            const vlc_fourcc_t i_chroma =
+                vlc_fourcc_GetCodecFromString( VIDEO_ES, psz );
+            if( i_chroma )
             {
                 vid_picture.palette = 0;
-                int i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                                    VLC_FOURCC( psz[0], psz[1], psz[2], psz[3] ) );
 
                 /* Find out v4l chroma code */
                 for( i = 0; v4lchroma_to_fourcc[i].i_v4l != 0; i++ )

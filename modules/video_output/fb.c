@@ -225,13 +225,12 @@ static int Create( vlc_object_t *p_this )
     psz_chroma = var_CreateGetNonEmptyString( p_vout, "fb-chroma" );
     if( psz_chroma )
     {
-        if( strlen( psz_chroma ) == 4 )
+        const vlc_fourcc_t i_chroma =
+            vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
+
+        if( i_chroma )
         {
-            p_sys->i_chroma = vlc_fourcc_GetCodec( VIDEO_ES,
-                                                   VLC_FOURCC( psz_chroma[0],
-                                                               psz_chroma[1],
-                                                               psz_chroma[2],
-                                                               psz_chroma[3] ) );
+            p_sys->i_chroma = i_chroma;
             msg_Dbg( p_vout, "forcing chroma '%s'", psz_chroma );
         }
         else
