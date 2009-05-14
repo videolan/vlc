@@ -334,6 +334,15 @@ VLC_EXPORT( vlc_fourcc_t, vlc_fourcc_GetCodec, ( int i_cat, vlc_fourcc_t i_fourc
 VLC_EXPORT( vlc_fourcc_t, vlc_fourcc_GetCodecFromString, ( int i_cat, const char * ) );
 
 /**
+ * It convert the gives fourcc to an audio codec when possible.
+ *
+ * The fourcc converted are aflt, araw/pcm , twos, sowt. When an incompatible i_bits
+ * is detected, 0 is returned.
+ * The other fourcc goes through vlc_fourcc_GetCodec and i_bits is not checked.
+ */
+VLC_EXPORT( vlc_fourcc_t, vlc_fourcc_GetCodecAudio, ( vlc_fourcc_t i_fourcc, int i_bits ) );
+
+/**
  * It returns the description of the given fourcc or NULL if not found.
  *
  * You may use UNKNOWN_ES for the ES category if you don't have the information.
