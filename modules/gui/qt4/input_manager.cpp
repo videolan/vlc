@@ -395,12 +395,11 @@ void InputManager::UpdateNavigation()
 void InputManager::UpdateStatus()
 {
     /* Update playing status */
-    vlc_value_t val; val.i_int = 0;
-    var_Get( p_input, "state", &val );
-    if( i_old_playing_status != val.i_int )
+    int state = var_GetInteger( p_input, "state" );
+    if( i_old_playing_status != state )
     {
-        i_old_playing_status = val.i_int;
-        emit statusChanged( val.i_int );
+        i_old_playing_status = state;
+        emit statusChanged( state );
     }
 }
 
