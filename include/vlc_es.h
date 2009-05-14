@@ -99,9 +99,6 @@ struct audio_format_t
     uint8_t      i_flavor;
 };
 
-#define AUDIO_FMT_S16_NE VLC_CODEC_S16N
-#define AUDIO_FMT_U16_NE VLC_CODEC_U16N
-
 /**
  * video format description
  */
