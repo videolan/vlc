@@ -725,16 +725,6 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
         if( FAILED(result) )
             return result;
 
-        /* set internal video width and height */
-        libvlc_video_set_size(p_libvlc,
-            lprcPosRect->right-lprcPosRect->left,
-            lprcPosRect->bottom-lprcPosRect->top,
-            NULL );
-
-        /* set internal video parent window */
-        libvlc_video_set_parent(p_libvlc,
-            reinterpret_cast<libvlc_drawable_t>(_inplacewnd), NULL);
-
         if( _b_autoplay && playlist_select(0,NULL) )
         {
             libvlc_media_player_play(_p_mplayer,NULL);
@@ -995,13 +985,6 @@ void VLCPlugin::onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect)
     SetWindowRgn(_inplacewnd, clipRgn, FALSE);
 
     //RedrawWindow(_videownd, &posRect, NULL, RDW_INVALIDATE|RDW_ERASE|RDW_ALLCHILDREN);
-    if( isRunning() )
-    {
-        libvlc_video_set_size(_p_libvlc,
-            lprcPosRect->right-lprcPosRect->left,
-            lprcPosRect->bottom-lprcPosRect->top,
-            NULL );
-    }
 };
 
 void VLCPlugin::freezeEvents(BOOL freeze)
@@ -1103,5 +1086,3 @@ int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const
 
     return item;
 }
-
-
