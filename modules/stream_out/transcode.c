@@ -433,8 +433,8 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_acodec )
     {
-        if( p_sys->i_acodec == VLC_FOURCC('m','p','3',' ') &&
-            p_sys->i_channels > 2 )
+        if( ( p_sys->i_acodec == VLC_CODEC_MP3 ||
+              p_sys->i_acodec == VLC_CODEC_MPGA ) && p_sys->i_channels > 2 )
         {
             msg_Warn( p_stream, "%d channels invalid for mp3, forcing to 2",
                       p_sys->i_channels );

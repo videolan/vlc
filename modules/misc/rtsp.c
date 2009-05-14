@@ -542,7 +542,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                 p_es->psz_rtpmap = NULL;
             break;
         case VLC_CODEC_MPGA:
-        case VLC_FOURCC( 'm', 'p', '3', ' ' ):
             p_es->i_payload_type = 14;
             p_es->psz_rtpmap = strdup( "MPA/90000" );
             break;

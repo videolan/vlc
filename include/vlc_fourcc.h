@@ -293,8 +293,12 @@
 #endif
 
 /* Non official codecs, used to force a profile in an encoder */
+/* MPEG-1 video */
 #define VLC_CODEC_MP1V      VLC_FOURCC('m','p','1','v')
+/* MPEG-2 video */
 #define VLC_CODEC_MP2V      VLC_FOURCC('m','p','2','v')
+/* MPEG-I/II layer 3 audio */
+#define VLC_CODEC_MP3       VLC_FOURCC('m','p','3',' ')
 
 /**
  * It returns the codec associatedto a fourcc within a ES category.

@@ -74,7 +74,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
 
     /* FIXME: what about layers 1 and 2 ? shine is an 'MP3' encoder */
-    if( p_enc->fmt_out.i_codec != VLC_FOURCC('m','p','3',' ') ||
+    if( p_enc->fmt_out.i_codec != VLC_CODEC_MP3 ||
         p_enc->fmt_out.audio.i_channels > 2 )
         return VLC_EGENERIC;
 
