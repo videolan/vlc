@@ -79,11 +79,18 @@ struct vout_window_sys_t
 };
 
 static inline
+void set_string (xcb_connection_t *conn, xcb_window_t window,
+                 xcb_atom_t type, xcb_atom_t atom, const char *str)
+{
+    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, atom, type,
+                         /* format */ 8, strlen (str), str);
+}
+
+static inline
 void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
                      xcb_atom_t atom, const char *value)
 {
-    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, atom,
-                         XA_STRING, 8, strlen (value), value);
+    set_string (conn, window, atom, XA_STRING, value);
 }
 
 static inline
@@ -96,6 +103,12 @@ void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
         hostname[sizeof (hostname) - 1] = '\0';
         set_ascii_prop (conn, window, XA_WM_CLIENT_MACHINE, hostname);
     }
+}
+
+static inline
+xcb_intern_atom_cookie_t intern_string (xcb_connection_t *c, const char *s)
+{
+    return xcb_intern_atom (c, 0, strlen (s), s);
 }
 
 static
@@ -179,6 +192,14 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
+    wnd->handle.xid = window;
+    wnd->p_sys = p_sys;
+    wnd->control = Control;
+
+    p_sys->conn = conn;
+    p_sys->keys = CreateKeyHandler (obj, conn);
+    p_sys->root = scr->root;
+
     /* ICCCM
      * No cut&paste nor drag&drop, only Window Manager communication. */
     /* Plain ASCII localization of VLC for ICCCM window name */
@@ -190,19 +211,34 @@ static int Open (vlc_object_t *obj)
                          XA_STRING, 8, 8, "vlc\0Vlc");
     set_hostname_prop (conn, window);
 
-    wnd->handle.xid = window;
-    wnd->p_sys = p_sys;
-    wnd->control = Control;
+    /* EWMH */
+    xcb_intern_atom_cookie_t utf8_string_ck
+        = intern_string (conn, "UTF8_STRING");;
+    xcb_intern_atom_cookie_t net_wm_name_ck
+        = intern_string (conn, "_NET_WM_NAME");
+    xcb_intern_atom_cookie_t net_wm_icon_name_ck
+        = intern_string (conn, "_NET_WM_ICON_NAME");
 
-    p_sys->conn = conn;
-    p_sys->keys = CreateKeyHandler (obj, conn);
-    p_sys->root = scr->root;
+    xcb_atom_t utf8 = get_atom (conn, utf8_string_ck);
+
+    xcb_atom_t net_wm_name = get_atom (conn, net_wm_name_ck);
+    char *title = var_CreateGetNonEmptyString (wnd, "video-title");
+    if (title)
+    {
+        set_string (conn, window, utf8, net_wm_name, title);
+        free (title);
+    }
+    else
+        set_string (conn, window, utf8, net_wm_name, _("VLC media player"));
+
+    xcb_atom_t net_wm_icon_name = get_atom (conn, net_wm_icon_name_ck);
+    set_string (conn, window, utf8, net_wm_icon_name, _("VLC"));
 
     /* Cache any EWMH atom we may need later */
     xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck;
 
-    wm_state_ck = xcb_intern_atom (conn, 0, 13, "_NET_WM_STATE");
-    wm_state_above_ck = xcb_intern_atom (conn, 0, 19, "_NET_WM_STATE_ABOVE");
+    wm_state_ck = intern_string (conn, "_NET_WM_STATE");
+    wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
 
     p_sys->wm_state = get_atom (conn, wm_state_ck);
     p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
