@@ -141,7 +141,9 @@ struct decoder_sys_t
     vlc_cond_t   wait_input, wait_output;
     bool         b_ready, b_works;
     block_t    **pp_input;
-    void        *p_output;
+
+    int          i_output;
+    void       **pp_output;
 };
 
 const GUID IID_IWMCodecPrivateData = {0x73f0be8e, 0x57f7, 0x4f01, {0xaa, 0x66, 0x9f, 0x57, 0x34, 0xc, 0xfe, 0xe}};
@@ -300,7 +302,7 @@ found:
     p_sys->b_works =
     p_sys->b_ready = false;
     p_sys->pp_input = NULL;
-    p_sys->p_output = NULL;
+    TAB_INIT( p_sys->i_output, p_sys->pp_output );
 
     if( vlc_clone( &p_sys->thread, DecoderThread, p_dec,
                    VLC_THREAD_PRIORITY_INPUT ) )
@@ -337,6 +339,7 @@ static void DecoderClose( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_sys->lock );
 
     vlc_join( p_sys->thread, NULL );
+    TAB_CLEAN( p_sys->i_output, p_sys->pp_output );
     vlc_cond_destroy( &p_sys->wait_input );
     vlc_cond_destroy( &p_sys->wait_output );
     vlc_mutex_destroy( &p_sys->lock );
@@ -349,12 +352,22 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     void *p_ret;
 
     vlc_mutex_lock( &p_sys->lock );
-    p_sys->pp_input = pp_block;
-    vlc_cond_signal( &p_sys->wait_input );
+    if( p_sys->i_output <= 0 )
+    {
+        p_sys->pp_input = pp_block;
+        vlc_cond_signal( &p_sys->wait_input );
 
-    while( p_sys->pp_input )
-        vlc_cond_wait( &p_sys->wait_output, &p_sys->lock );
-    p_ret = p_sys->p_output;
+        while( p_sys->pp_input )
+            vlc_cond_wait( &p_sys->wait_output, &p_sys->lock );
+    }
+
+    p_ret = NULL;
+    if( p_sys->i_output > 0 )
+    {
+        p_ret = p_sys->pp_output[0];
+        TAB_REMOVE( p_sys->i_output, p_sys->pp_output, p_ret );
+    }
+
     vlc_mutex_unlock( &p_sys->lock );
 
     return p_ret;
@@ -1042,7 +1055,13 @@ static void *DecoderThread( void *data )
         if( !p_sys->b_ready )
             break;
 
-        p_sys->p_output = DecBlock( p_dec, p_sys->pp_input );
+        for( ;; )
+        {
+            void *p_output = DecBlock( p_dec, p_sys->pp_input );
+            if( !p_output )
+                break;
+            TAB_APPEND( p_sys->i_output, p_sys->pp_output, p_output );
+        }
         p_sys->pp_input = NULL;
         vlc_cond_signal( &p_sys->wait_output );
     }
