@@ -471,7 +471,7 @@ VLC_ADD_CFLAGS([libvlccore],[${INCICONV}])
 VLC_ADD_LIBS([libvlccore],[${LTLIBICONV}])
 
 dnl Check for broken versions of mingw-runtime compatability library
-AS_IF([test "${SYS}" = "mingw32"], [
+AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"], [
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([
 #include <_mingw.h>
