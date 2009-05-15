@@ -201,6 +201,7 @@ static const codec_dll decoders_table[] =
 
     /* WMA 3 */
     { VLC_CODEC_WMAP,   "wma9dmod.dll", &guid_wma9 },
+    { VLC_CODEC_WMAL,   "wma9dmod.dll", &guid_wma9 },
     /* WMA 2 */
     { VLC_CODEC_WMA2,   "wma9dmod.dll", &guid_wma9 },
 
