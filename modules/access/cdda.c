@@ -604,6 +604,9 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 #ifdef HAVE_LIBCDDB
 static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sectors )
 {
+    if( var_CreateGetInteger( p_access, "album-art" ) == ALBUM_ART_WHEN_ASKED )
+        return NULL;
+
     /* */
     cddb_conn_t *p_cddb = cddb_new();
     if( !p_cddb )

@@ -644,6 +644,7 @@ int CDDAOpen( vlc_object_t *p_this )
     cddb_log_set_handler ( cddb_log_handler );
     p_cdda->cddb.disc = NULL;
     p_cdda->b_cddb_enabled =
+        var_CreateGetInteger( p_access, "album-art" ) != ALBUM_ART_WHEN_ASKED &&
         config_GetInt( p_access, MODULE_STRING "-cddb-enabled" );
 #endif
     p_cdda->b_cdtext =
