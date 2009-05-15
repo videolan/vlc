@@ -421,7 +421,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     addAction( action );
     CONNECT( action, triggered(), this, doUpdate() );
 
-    doUpdate();
+    doUpdate( "" );
 }
 
 CoverArtLabel::~CoverArtLabel()
