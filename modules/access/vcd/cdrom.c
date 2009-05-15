@@ -1330,7 +1330,8 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
         for( int i = 0; i <= i_track_last; i++ )
         {
             /* */
-            EnsureUTF8( pppsz_info[i][j] );
+            if( pppsz_info[i][j] )
+                EnsureUTF8( pppsz_info[i][j] );
 
             /* */
             const char *psz_default = pppsz_info[0][j];
