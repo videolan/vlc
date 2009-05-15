@@ -37,6 +37,7 @@ protected:
     audioObj(NULL),
     inputObj(NULL),
     playlistObj(NULL),
+    subtitleObj(NULL),
     videoObj(NULL) {};
 
     virtual ~LibvlcRootNPObject();
@@ -55,6 +56,7 @@ private:
     NPObject *audioObj;
     NPObject *inputObj;
     NPObject *playlistObj;
+    NPObject *subtitleObj;
     NPObject *videoObj;
 };
 
@@ -146,6 +148,28 @@ protected:
 private:
     NPObject*  playlistItemsObj;
 };
+
+class LibvlcSubtitleNPObject: public RuntimeNPObject
+{
+protected:
+    friend class RuntimeNPClass<LibvlcSubtitleNPObject>;
+
+    LibvlcSubtitleNPObject(NPP instance, const NPClass *aClass) :
+        RuntimeNPObject(instance, aClass) {};
+    virtual ~LibvlcSubtitleNPObject() {};
+
+    static const int propertyCount;
+    static const NPUTF8 * const propertyNames[];
+
+    InvokeResult getProperty(int index, NPVariant &result);
+    InvokeResult setProperty(int index, const NPVariant &value);
+
+    static const int methodCount;
+    static const NPUTF8 * const methodNames[];
+
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+};
+
 
 class LibvlcVideoNPObject: public RuntimeNPObject
 {

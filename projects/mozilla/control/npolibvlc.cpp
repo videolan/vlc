@@ -75,6 +75,7 @@ const NPUTF8 * const LibvlcRootNPObject::propertyNames[] =
     "audio",
     "input",
     "playlist",
+    "subtitle",
     "video",
     "VersionInfo",
 };
@@ -85,6 +86,7 @@ enum LibvlcRootNPObjectPropertyIds
     ID_root_audio = 0,
     ID_root_input,
     ID_root_playlist,
+    ID_root_subtitle,
     ID_root_video,
     ID_root_VersionInfo,
 };
@@ -120,6 +122,14 @@ LibvlcRootNPObject::getProperty(int index, NPVariant &result)
                     playlistObj = NPN_CreateObject(_instance,
                           RuntimeNPClass<LibvlcPlaylistNPObject>::getClass());
                 OBJECT_TO_NPVARIANT(NPN_RetainObject(playlistObj), result);
+                return INVOKERESULT_NO_ERROR;
+            case ID_root_subtitle:
+                // create child object in lazyman fashion to avoid
+                // ownership problem with firefox
+                if( ! subtitleObj )
+                    subtitleObj = NPN_CreateObject(_instance,
+                             RuntimeNPClass<LibvlcSubtitleNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(subtitleObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_video:
                 // create child object in lazyman fashion to avoid
@@ -180,6 +190,7 @@ const NPUTF8 * const LibvlcAudioNPObject::propertyNames[] =
     "mute",
     "volume",
     "track",
+    "count",
     "channel",
 };
 COUNTNAMES(LibvlcAudioNPObject,propertyCount,propertyNames);
@@ -189,6 +200,7 @@ enum LibvlcAudioNPObjectPropertyIds
     ID_audio_mute,
     ID_audio_volume,
     ID_audio_track,
+    ID_audio_count,
     ID_audio_channel,
 };
 
@@ -225,6 +237,17 @@ LibvlcAudioNPObject::getProperty(int index, NPVariant &result)
                 int track = libvlc_audio_get_track(p_md, &ex);
                 RETURN_ON_EXCEPTION(this,ex);
                 INT32_TO_NPVARIANT(track, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_audio_count:
+            {
+                libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                // get the number of audio track available
+                int i_track = libvlc_audio_get_track_count(p_md, &ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                // return it
+                INT32_TO_NPVARIANT(i_track, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_audio_channel:
@@ -300,12 +323,14 @@ LibvlcAudioNPObject::setProperty(int index, const NPVariant &value)
 const NPUTF8 * const LibvlcAudioNPObject::methodNames[] =
 {
     "toggleMute",
+    "description",
 };
 COUNTNAMES(LibvlcAudioNPObject,methodCount,methodNames);
 
 enum LibvlcAudioNPObjectMethodIds
 {
     ID_audio_togglemute,
+    ID_audio_description,
 };
 
 RuntimeNPObject::InvokeResult
@@ -330,6 +355,50 @@ LibvlcAudioNPObject::invoke(int index, const NPVariant *args,
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
+            case ID_audio_description:
+            {
+                if( argCount == 1)
+                {
+                    char *psz_name;
+                    int i_trackID, i_limit, i;
+                    libvlc_track_description_t *p_trackDesc;
+
+                    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+
+                    /* get tracks description */
+                    p_trackDesc = libvlc_audio_get_track_description(p_md, &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+                    if( !p_trackDesc )
+                        return INVOKERESULT_GENERIC_ERROR;
+
+                    /* get the number of track available */
+                    i_limit = libvlc_audio_get_track_count(p_md, &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+
+                    /* check if a number is given by the user
+                     * and get the track number */
+                    if( isNumberValue(args[0]) )
+                        i_trackID = numberValue(args[0]);
+                    else
+                        return INVOKERESULT_INVALID_VALUE;
+
+                    /* if bad number is given return invalid value */
+                    if ( ( i_trackID > ( i_limit - 1 ) ) || ( i_trackID < 0 ) )
+                        return INVOKERESULT_INVALID_VALUE;
+
+                    /* get the good trackDesc */
+                    for( i = 0 ; i < i_trackID ; i++ )
+                    {
+                        p_trackDesc = p_trackDesc->p_next;
+                    }
+                    psz_name = p_trackDesc->psz_name;
+
+                    /* display the name of the track chosen */
+                    return invokeResultString( psz_name, result );
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
             default:
                 ;
         }
@@ -1029,6 +1098,168 @@ void LibvlcPlaylistNPObject::parseOptions(NPObject *obj, int *i_options,
             }
         }
     }
+}
+
+/*
+** implementation of libvlc subtitle object
+*/
+
+const NPUTF8 * const LibvlcSubtitleNPObject::propertyNames[] =
+{
+    "track",
+    "count",
+};
+
+enum LibvlcSubtitleNPObjectPropertyIds
+{
+    ID_subtitle_track,
+    ID_subtitle_count,
+};
+COUNTNAMES(LibvlcSubtitleNPObject,propertyCount,propertyNames);
+
+RuntimeNPObject::InvokeResult
+LibvlcSubtitleNPObject::getProperty(int index, NPVariant &result)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+        RETURN_ON_EXCEPTION(this,ex);
+
+        switch( index )
+        {
+            case ID_subtitle_track:
+            {
+                /* get the current subtitle ID */
+                int i_spu = libvlc_video_get_spu(p_md, &ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                /* return it */
+                INT32_TO_NPVARIANT(i_spu, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_subtitle_count:
+            {
+                /* get the number of subtitles available */
+                int i_spu = libvlc_video_get_spu_count(p_md, &ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                /* return it */
+                INT32_TO_NPVARIANT(i_spu, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcSubtitleNPObject::setProperty(int index, const NPVariant &value)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+        RETURN_ON_EXCEPTION(this,ex);
+
+        switch( index )
+        {
+            case ID_subtitle_track:
+            {
+                if( isNumberValue(value) )
+                {
+                    /* set the new subtitle track to show */
+                    libvlc_video_set_spu(p_md, numberValue(value), &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+
+                    return INVOKERESULT_NO_ERROR;
+                }
+                return INVOKERESULT_INVALID_VALUE;
+            }
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+const NPUTF8 * const LibvlcSubtitleNPObject::methodNames[] =
+{
+    "description"
+};
+COUNTNAMES(LibvlcSubtitleNPObject,methodCount,methodNames);
+
+enum LibvlcSubtitleNPObjectMethodIds
+{
+    ID_subtitle_description
+};
+
+RuntimeNPObject::InvokeResult
+LibvlcSubtitleNPObject::invoke(int index, const NPVariant *args,
+                            uint32_t argCount, NPVariant &result)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+        RETURN_ON_EXCEPTION(this,ex);
+
+        switch( index )
+        {
+            case ID_subtitle_description:
+            {
+                if( argCount == 1)
+                {
+                    char *psz_name;
+                    int i_spuID, i_limit, i;
+                    libvlc_track_description_t *p_spuDesc;
+
+                    /* get subtitles description */
+                    p_spuDesc = libvlc_video_get_spu_description(p_md, &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+                    if( !p_spuDesc )
+                        return INVOKERESULT_GENERIC_ERROR;
+
+                    /* get the number of subtitle available */
+                    i_limit = libvlc_video_get_spu_count(p_md, &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+
+                    /* check if a number is given by the user
+                     * and get the subtitle number */
+                    if( isNumberValue(args[0]) )
+                        i_spuID = numberValue(args[0]);
+                    else
+                        return INVOKERESULT_INVALID_VALUE;
+
+                    /* if bad number is given return invalid value */
+                    if ( ( i_spuID > ( i_limit -1 ) ) || ( i_spuID < 0 ) )
+                        return INVOKERESULT_INVALID_VALUE;
+
+                    /* get the good spuDesc */
+                    for( i = 0 ; i < i_spuID ; i++ )
+                    {
+                        p_spuDesc = p_spuDesc->p_next;
+                    }
+                    psz_name = p_spuDesc->psz_name;
+
+                    /* return the name of the track chosen */
+                    return invokeResultString(psz_name, result);
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            default:
+                return INVOKERESULT_NO_SUCH_METHOD;
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
 }
 
 /*
