@@ -213,6 +213,8 @@ static const codec_dll decoders_table[] =
     { VLC_FOURCC('w','m','a','3'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('W','M','A','P'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','p'), "wma9dmod.dll", &guid_wma9 },
+    { VLC_FOURCC('W','M','A','L'), "wma9dmod.dll", &guid_wma9 },
+    { VLC_FOURCC('w','m','a','l'), "wma9dmod.dll", &guid_wma9 },
     /* WMA 2 */
     { VLC_FOURCC('W','M','A','2'), "wma9dmod.dll", &guid_wma9 },
     { VLC_FOURCC('w','m','a','2'), "wma9dmod.dll", &guid_wma9 },
