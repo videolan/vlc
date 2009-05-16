@@ -404,24 +404,25 @@ void SpeedControlWidget::resetRate()
 }
 
 CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
-        : QLabel( parent ), p_intf( _p_i )
+              : QLabel( parent ), p_intf( _p_i )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
-    CONNECT( this, updateRequested(), this, doUpdate() );
+    CONNECT( this, updateRequested(), this, askForUpdate() );
     CONNECT( THEMIM->getIM(), artChanged( QString ),
-             this, doUpdate( const QString& ) );
+             this, showArtUpdate( const QString& ) );
 
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
     setMaximumHeight( 128 );
     setMaximumWidth( 128 );
     setScaledContents( true );
+
     QList< QAction* > artActions = actions();
     QAction *action = new QAction( qtr( "Download cover art" ), this );
+    CONNECT( action, triggered(), this, askForUpdate() );
     addAction( action );
-    CONNECT( action, triggered(), this, doUpdate() );
 
-    doUpdate( "" );
+    showArtUpdate( "" );
 }
 
 CoverArtLabel::~CoverArtLabel()
@@ -431,7 +432,7 @@ CoverArtLabel::~CoverArtLabel()
         removeAction( act );
 }
 
-void CoverArtLabel::doUpdate( const QString& url )
+void CoverArtLabel::showArtUpdate( const QString& url )
 {
     QPixmap pix;
     if( !url.isEmpty()  && pix.load( url ) )
@@ -444,7 +445,7 @@ void CoverArtLabel::doUpdate( const QString& url )
     }
 }
 
-void CoverArtLabel::doUpdate()
+void CoverArtLabel::askForUpdate()
 {
     THEMIM->getIM()->requestArtUpdate();
 }

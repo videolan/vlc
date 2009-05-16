@@ -207,8 +207,8 @@ public slots:
     }
 
 private slots:
-    void doUpdate();
-    void doUpdate( const QString& );
+    void askForUpdate();
+    void showArtUpdate( const QString& );
 
 signals:
     void updateRequested();
