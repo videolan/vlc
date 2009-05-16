@@ -91,7 +91,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     playlist_t    *p_playlist;
-    int           i_id , i_pos=0;
+    int           i_pos=0;
     GtkTreeView   *p_tvplaylist = NULL;
 
     p_playlist = pl_Hold( p_intf );
@@ -132,7 +132,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
             else
 #endif
             {
-                i_id = playlist_AddExt( p_playlist, (const char*)name,
+                playlist_AddExt( p_playlist, (const char*)name,
                               (const char*)name,
                               PLAYLIST_APPEND, PLAYLIST_END,
                               (mtime_t) 0,
