@@ -410,11 +410,11 @@ int VlcProc::onIntfShow( vlc_object_t *pObj, const char *pVariable,
 
 
 int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
-                           vlc_value_t oldVal, vlc_value_t newVal,
+                           vlc_value_t oldval, vlc_value_t newval,
                            void *pParam )
 {
     VlcProc *pThis = (VlcProc*)pParam;
-    input_item_t *p_item = newval.p_address;
+    input_item_t *p_item = static_cast<input_item_t*>(newval.p_address);
 
     // Update the stream variable
     pThis->updateStreamName();
@@ -475,11 +475,11 @@ int VlcProc::onItemDelete( vlc_object_t *pObj, const char *pVariable,
 
 
 int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
-                               vlc_value_t oldVal, vlc_value_t newVal,
+                               vlc_value_t oldval, vlc_value_t newval,
                                void *pParam )
 {
     VlcProc *pThis = (VlcProc*)pParam;
-    input_item_t *p_item = newval.p_address;
+    input_item_t *p_item = static_cast<input_item_t*>(newval.p_address);
 
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
 
@@ -493,7 +493,7 @@ int VlcProc::onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
                                                          oldVal.i_int );
     pQueue->push( CmdGenericPtr( pCmdTree ) , true );
 #endif
-    pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(), p_item->i_id );
+    CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(), p_item->i_id );
     pQueue->push( CmdGenericPtr( pCmdTree ) , true );
 
     return VLC_SUCCESS;
