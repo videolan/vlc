@@ -71,6 +71,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_modules.h \
 	../include/vlc_mtime.h \
 	../include/vlc_objects.h \
+	../include/vlc_picture.h \
 	../include/vlc_playlist.h \
 	../include/vlc_plugin.h \
 	../include/vlc_rand.h \
@@ -78,6 +79,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_sout.h \
 	../include/vlc_stream.h \
 	../include/vlc_strings.h \
+	../include/vlc_subpicture.h \
 	../include/vlc_threads.h \
 	../include/vlc_url.h \
 	../include/vlc_variables.h \
