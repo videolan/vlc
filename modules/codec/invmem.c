@@ -189,7 +189,6 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->p_pic != NULL )
         picture_Release( p_sys->p_pic );
     p_sys->p_pic = decoder_NewPicture( p_dec );
-    p_sys->p_pic = p_dec->pf_vout_buffer_new( p_dec );
     p_sys->p_pic->b_force = true;
     p_sys->p_pic->p->i_pitch = p_dec->p_sys->i_pitch;
     p_sys->p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;

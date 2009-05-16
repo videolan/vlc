@@ -285,13 +285,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
  *****************************************************************************/
 static picture_t *video_new( filter_t *p_filter )
 {
-    return ((filter_t*)p_filter->p_owner)->pf_vout_buffer_new( (filter_t*)p_filter->p_owner );
+    return filter_NewPicture( (filter_t*)p_filter->p_owner );
 }
 
 static void video_del( filter_t *p_filter, picture_t *p_pic )
 {
-    if( ((filter_t*)p_filter->p_owner)->pf_vout_buffer_del )
-        ((filter_t*)p_filter->p_owner)->pf_vout_buffer_del( (filter_t*)p_filter->p_owner, p_pic );
+    return filter_DeletePicture( (filter_t*)p_filter->p_owner, p_pic );
 }
 
 static int alloc_init( filter_t *p_filter, void *p_data )
