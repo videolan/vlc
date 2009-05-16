@@ -481,8 +481,8 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     }
     for( i_top = 0 ; i_top < p_playlist->p_root_onelevel->i_children; i_top++ )
     {
-        if( p_playlist->p_root_onelevel->pp_children[i_top]->p_input->i_id ==
-                             p_up->p_input->i_id )
+        if( p_playlist->p_root_onelevel->pp_children[i_top]->p_input ==
+                             p_up->p_input )
         {
             AddItem( p_playlist, p_item_one,
                      p_playlist->p_root_onelevel->pp_children[i_top],

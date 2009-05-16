@@ -311,8 +311,8 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
             return p_node;
         for( i = 0 ; i< p_playlist->p_root_onelevel->i_children; i++ )
         {
-            if( p_playlist->p_root_onelevel->pp_children[i]->p_input->i_id ==
-                    p_node->p_input->i_id )
+            if( p_playlist->p_root_onelevel->pp_children[i]->p_input ==
+                    p_node->p_input )
                 return p_playlist->p_root_onelevel->pp_children[i];
         }
     }
@@ -322,8 +322,8 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
             return p_node;
         for( i = 0 ; i< p_playlist->p_root_category->i_children; i++ )
         {
-            if( p_playlist->p_root_category->pp_children[i]->p_input->i_id ==
-                    p_node->p_input->i_id )
+            if( p_playlist->p_root_category->pp_children[i]->p_input ==
+                    p_node->p_input )
                 return p_playlist->p_root_category->pp_children[i];
         }
     }

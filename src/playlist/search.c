@@ -71,7 +71,7 @@ playlist_item_t* playlist_ItemGetByInput( playlist_t * p_playlist,
     /** \todo Check if this is always incremental and whether we can bsearch */
     for( i =  0 ; i < p_playlist->all_items.i_size; i++ )
     {
-        if( ARRAY_VAL(p_playlist->all_items, i)->p_input->i_id == p_item->i_id )
+        if( ARRAY_VAL(p_playlist->all_items, i)->p_input == p_item )
         {
             return ARRAY_VAL(p_playlist->all_items, i);
         }
