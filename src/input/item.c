@@ -788,10 +788,12 @@ static void GuessType( input_item_t *p_item)
         { "dvb", ITEM_TYPE_CARD },
         { "qpsk", ITEM_TYPE_CARD },
         { "sdp", ITEM_TYPE_NET },
+        { "ftp", ITEM_TYPE_NET },
+        { "smb", ITEM_TYPE_NET },
         { NULL, 0 }
     };
 
-    if( !p_item->psz_uri )
+    if( !p_item->psz_uri || !strstr( p_item->psz_uri, "://" ) )
     {
         p_item->i_type = ITEM_TYPE_FILE;
         return;
