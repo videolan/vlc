@@ -71,12 +71,20 @@ class IMEvent : public QEvent
 {
 friend class InputManager;
     public:
-    IMEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
-    { i_id = id ; }
-    virtual ~IMEvent() {}
+    IMEvent( int type, input_item_t *p_input = NULL )
+        : QEvent( (QEvent::Type)(type) )
+    {
+        if( (p_item = p_input) != NULL )
+            vlc_gc_incref( p_item );
+    }
+    virtual ~IMEvent()
+    {
+        if( p_item )
+            vlc_gc_decref( p_item );
+    }
 
 private:
-    int i_id;
+    input_item_t *p_item;
 };
 
 class InputManager : public QObject

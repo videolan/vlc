@@ -170,14 +170,14 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemChanged_Type:
         /* Ignore ItemChanged_Type event that does not apply to our input */
-        if( p_item->i_id == ple->i_id )
+        if( p_item == ple->p_item )
         {
             UpdateStatus();
             // UpdateName();
             UpdateArt();
             /* Update duration of file */
         }
-        UpdateMeta( ple->i_id );
+        UpdateMeta( ple->p_item->i_id );
         break;
     case ItemStateChanged_Type:
         // TODO: Fusion with above state
@@ -257,7 +257,7 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
     InputManager *im = (InputManager*)param;
     input_item_t *p_item = static_cast<input_item_t *>(newval.p_address);
 
-    IMEvent *event = new IMEvent( ItemChanged_Type, p_item->i_id );
+    IMEvent *event = new IMEvent( ItemChanged_Type, p_item );
     QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
@@ -271,74 +271,74 @@ static int InputEvent( vlc_object_t *p_this, const char *,
     switch( newval.i_int )
     {
     case INPUT_EVENT_STATE:
-        event = new IMEvent( ItemStateChanged_Type, 0 );
+        event = new IMEvent( ItemStateChanged_Type );
         break;
     case INPUT_EVENT_RATE:
-        event = new IMEvent( ItemRateChanged_Type, 0 );
+        event = new IMEvent( ItemRateChanged_Type );
         break;
     case INPUT_EVENT_POSITION:
     //case INPUT_EVENT_LENGTH:
-        event = new IMEvent( PositionUpdate_Type, 0 );
+        event = new IMEvent( PositionUpdate_Type );
         break;
 
     case INPUT_EVENT_TITLE:
     case INPUT_EVENT_CHAPTER:
-        event = new IMEvent( ItemTitleChanged_Type, 0 );
+        event = new IMEvent( ItemTitleChanged_Type );
         break;
 
     case INPUT_EVENT_ES:
-        event = new IMEvent( ItemEsChanged_Type, 0 );
+        event = new IMEvent( ItemEsChanged_Type );
         break;
     case INPUT_EVENT_TELETEXT:
-        event = new IMEvent( ItemTeletextChanged_Type, 0 );
+        event = new IMEvent( ItemTeletextChanged_Type );
         break;
 
     case INPUT_EVENT_STATISTICS:
-        event = new IMEvent( StatisticsUpdate_Type, 0 );
+        event = new IMEvent( StatisticsUpdate_Type );
         break;
 
     case INPUT_EVENT_VOUT:
-        event = new IMEvent( InterfaceVoutUpdate_Type, 0 );
+        event = new IMEvent( InterfaceVoutUpdate_Type );
         break;
     case INPUT_EVENT_AOUT:
-        event = new IMEvent( InterfaceAoutUpdate_Type, 0 );
+        event = new IMEvent( InterfaceAoutUpdate_Type );
         break;
 
     case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
-        event = new IMEvent( MetaChanged_Type, 0 );
+        event = new IMEvent( MetaChanged_Type );
         break;
     case INPUT_EVENT_ITEM_INFO: /* Codec Info */
-        event = new IMEvent( InfoChanged_Type, 0 );
+        event = new IMEvent( InfoChanged_Type );
         break;
     case INPUT_EVENT_ITEM_NAME:
-        event = new IMEvent( NameChanged_Type, 0 );
+        event = new IMEvent( NameChanged_Type );
         break;
 
     case INPUT_EVENT_AUDIO_DELAY:
     case INPUT_EVENT_SUBTITLE_DELAY:
-        event = new IMEvent( SynchroChanged_Type, 0 );
+        event = new IMEvent( SynchroChanged_Type );
         break;
 
     case INPUT_EVENT_CACHE:
-        event = new IMEvent( CachingEvent_Type, 0 );
+        event = new IMEvent( CachingEvent_Type );
         break;
 
     case INPUT_EVENT_BOOKMARK:
-        event = new IMEvent( BookmarksChanged_Type, 0 );
+        event = new IMEvent( BookmarksChanged_Type );
         break;
 
     case INPUT_EVENT_RECORD:
-        event = new IMEvent( RecordingEvent_Type, 0 );
+        event = new IMEvent( RecordingEvent_Type );
         break;
 
     case INPUT_EVENT_PROGRAM:
         /* This is for PID changes */
-        event = new IMEvent( ProgramChanged_Type, 0 );
+        event = new IMEvent( ProgramChanged_Type );
         break;
 
     case INPUT_EVENT_SIGNAL:
         /* This is for capture-card signals */
-        /* event = new IMEvent( SignalChanged_Type, 0 );
+        /* event = new IMEvent( SignalChanged_Type );
         break; */
     default:
         event = NULL;
@@ -354,7 +354,7 @@ static int VbiEvent( vlc_object_t *, const char *,
                      vlc_value_t, vlc_value_t, void *param )
 {
     InputManager *im = (InputManager*)param;
-    IMEvent *event = new IMEvent( ItemTeletextChanged_Type, 0 );
+    IMEvent *event = new IMEvent( ItemTeletextChanged_Type );
 
     QApplication::postEvent( im, event );
     return VLC_SUCCESS;
@@ -891,7 +891,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
         input_item_t *p_item = input_GetItem( p_input );
         if( p_item )
         {
-            IMEvent *event = new IMEvent( ItemChanged_Type, p_item->i_id );
+            IMEvent *event = new IMEvent( ItemChanged_Type, p_item );
             customEvent( event );
             delete event;
         }
@@ -1016,7 +1016,7 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
 {
     MainInputManager *mim = (MainInputManager*)param;
 
-    IMEvent *event = new IMEvent( ItemChanged_Type, 0 );
+    IMEvent *event = new IMEvent( ItemChanged_Type );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
@@ -1026,7 +1026,7 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
 {
     MainInputManager *mim = (MainInputManager*)param;
 
-    IMEvent *event = new IMEvent( VolumeChanged_Type, newval.i_int );
+    IMEvent *event = new IMEvent( VolumeChanged_Type );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
