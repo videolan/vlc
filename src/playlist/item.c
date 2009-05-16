@@ -338,7 +338,7 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
  *        regardless of its size
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \param b_locked TRUE if the playlist is locked
- * \return The id of the playlist item
+ * \return VLC_SUCCESS or a VLC error code
  */
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
                   const char *psz_name, int i_mode, int i_pos,
@@ -364,26 +364,27 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri,
  * \param i_option_flags options flags
  * \param b_playlist TRUE for playlist, FALSE for media library
  * \param b_locked TRUE if the playlist is locked
- * \return The id of the playlist item
+ * \return VLC_SUCCESS or a VLC error code
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, int i_mode, int i_pos,
                      mtime_t i_duration,
-                     int i_options, const char *const *ppsz_options, unsigned i_option_flags,
+                     int i_options, const char *const *ppsz_options,
+                     unsigned i_option_flags,
                      bool b_playlist, bool b_locked )
 {
     int i_ret;
-    input_item_t *p_input = input_item_NewExt( p_playlist, psz_uri, psz_name,
-                                              i_options, ppsz_options, i_option_flags,
-                                              i_duration );
+    input_item_t *p_input;
 
+    p_input = input_item_NewExt( p_playlist, psz_uri, psz_name,
+                                 i_options, ppsz_options, i_option_flags,
+                                 i_duration );
+    if( p_input == NULL )
+        return VLC_ENOMEM;
     i_ret = playlist_AddInput( p_playlist, p_input, i_mode, i_pos, b_playlist,
                                b_locked );
-    int i_id = (i_ret == VLC_SUCCESS) ? p_input->i_id : -1;
-
     vlc_gc_decref( p_input );
-
-    return i_id;
+    return i_ret;
 }
 
 /**
