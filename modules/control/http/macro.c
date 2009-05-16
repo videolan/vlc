@@ -353,7 +353,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 }
                 case MVLC_DEL:
                 {
-                    int i_item, *p_items = NULL, i_nb_items = 0;
+                    int *p_items = NULL;
+                    size_t i_nb_items = 0;
                     char item[512];
                     const char *p_parser = p_request;
 
@@ -363,24 +364,25 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         if( !*item ) continue;
 
-                        i_item = atoi( item );
+                        int i_item = atoi( item );
                         p_items = realloc( p_items, (i_nb_items + 1) *
-                                           sizeof(int) );
+                                           sizeof(*p_items) );
                         p_items[i_nb_items] = i_item;
                         i_nb_items++;
                     }
 
-                    if( i_nb_items )
+                    for( size_t i = 0; i < i_nb_items; i++ )
                     {
-                        int i;
-                        for( i = 0; i < i_nb_items; i++ )
-                        {
+                        playlist_item_t *p_item;
+
+                        msg_Dbg( p_intf, "requested playlist delete: %d",
+                                 p_items[i] );
+                        p_item = playlist_ItemGetById( p_sys->p_playlist,
+                                                       p_items[i] );
+                        if( p_item )
                             playlist_DeleteFromInput( p_sys->p_playlist,
-                                                      p_items[i], false );
-                            msg_Dbg( p_intf, "requested playlist delete: %d",
-                                     p_items[i] );
-                            p_items[i] = -1;
-                        }
+                                                      p_item->p_input->i_id,
+                                                      false );
                     }
 
                     free( p_items );
@@ -388,10 +390,10 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 }
                 case MVLC_KEEP:
                 {
-                    int i_item, *p_items = NULL, i_nb_items = 0;
+                    int *p_items = NULL;
+                    size_t i_nb_items = 0, i;
                     char item[512];
                     const char *p_parser = p_request;
-                    int i,j;
 
                     /* Get the list of items to keep */
                     while( (p_parser =
@@ -399,30 +401,31 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     {
                         if( !*item ) continue;
 
-                        i_item = atoi( item );
+                        int i_item = atoi( item );
                         p_items = realloc( p_items, (i_nb_items + 1) *
-                                           sizeof(int) );
+                                           sizeof(*p_items) );
                         p_items[i_nb_items] = i_item;
                         i_nb_items++;
                     }
 
-                    for( i = p_sys->p_playlist->items.i_size - 1 ; i >= 0; i-- )
+                    for( i = 0; i < p_sys->p_playlist->items.i_size; i++ )
                     {
+                        size_t j;
+
                         /* Check if the item is in the keep list */
                         for( j = 0 ; j < i_nb_items ; j++ )
                         {
                             if( p_items[j] ==
-                                 ARRAY_VAL(p_sys->p_playlist->items,i)
-                                                ->i_id)
+                                ARRAY_VAL(p_sys->p_playlist->items,i)->i_id)
                                 break;
                         }
                         if( j == i_nb_items )
                         {
-                            playlist_DeleteFromInput( p_sys->p_playlist,
-                                     p_sys->p_playlist->items.p_elems[i]->i_id,
-                                                      false );
                             msg_Dbg( p_intf, "requested playlist delete: %d",
-                                     i );
+                                   p_sys->p_playlist->items.p_elems[i]->i_id );
+                            playlist_DeleteFromInput( p_sys->p_playlist,
+                                p_sys->p_playlist->items.p_elems[i]->p_input->i_id,
+                                                      false );
                         }
                     }
 
