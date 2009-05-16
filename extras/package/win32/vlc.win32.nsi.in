@@ -140,9 +140,9 @@ NoBackup:
   WriteRegStr HKCR "$R0" "" "VLC$R0"
   ReadRegStr $0 HKCR "VLC$R0" ""
   WriteRegStr HKCR "VLC$R0" "" "VLC media file ($R0)"
-  WriteRegStr HKCR "VLC$R0\shell" "" "Play"
-  WriteRegStr HKCR "VLC$R0\shell\Play" "" $ShellAssociation_Play
-  WriteRegStr HKCR "VLC$R0\shell\Play\command" "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
+  WriteRegStr HKCR "VLC$R0\shell" "" "Open"
+  WriteRegStr HKCR "VLC$R0\shell\Open" "" $ShellAssociation_Play
+  WriteRegStr HKCR "VLC$R0\shell\Open\command" "" '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 ;;; Vista Only part
@@ -438,8 +438,8 @@ Section $Name_Section01 SEC01
   ; Add VLC to "recomended programs" for the following extensions
   WriteRegStr HKCR Applications\vlc.exe "" ""
   WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
-  WriteRegStr HKCR Applications\vlc.exe\shell\Play "" $ContextMenuEntry_PlayWith
-  WriteRegStr HKCR Applications\vlc.exe\shell\Play\command "" \
+  WriteRegStr HKCR Applications\vlc.exe\shell\Open "" $ContextMenuEntry_PlayWith
+  WriteRegStr HKCR Applications\vlc.exe\shell\Open\command "" \
     '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
 
@@ -584,13 +584,13 @@ Section $Name_Section05 SEC05
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "InvokeVerb" "play"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival" "Provider" "VideoLAN VLC media player"
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
-  WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
-  WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
+  WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Open"
+  WriteRegStr HKCR "VLC.DVDMovie\shell\Open\command" "" \
     '"$INSTDIR\vlc.exe" --started-from-file dvd://%1'
   WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
-  WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
-  WriteRegStr HKCR "VLC.CDAudio\shell\Play\command" "" \
+  WriteRegStr HKCR "VLC.CDAudio\shell" "" "Open"
+  WriteRegStr HKCR "VLC.CDAudio\shell\Open\command" "" \
     '"$INSTDIR\vlc.exe" --started-from-file cdda://%1'
   WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
