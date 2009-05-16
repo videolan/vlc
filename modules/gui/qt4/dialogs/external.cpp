@@ -1,5 +1,5 @@
 /*****************************************************************************
- * external.hpp : Dialogs from other LibVLC core and other plugins
+ * external.cpp : Dialogs from other LibVLC core and other plugins
  ****************************************************************************
  * Copyright (C) 2009 Rémi Denis-Courmont
  * Copyright (C) 2006 the VideoLAN team
