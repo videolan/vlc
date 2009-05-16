@@ -183,7 +183,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
     else
     {
-        if( newval.i_int != p_intf->p_sys->i_id ) /* "item-change" */
+        input_item_t *p_item = newval.p_address;
+
+        if( p_item->i_id != p_intf->p_sys->i_id ) /* "item-change" */
             return VLC_SUCCESS;
         /* Some variable bitrate inputs call "item-change callbacks each time
          * their length is updated, that is several times per second.

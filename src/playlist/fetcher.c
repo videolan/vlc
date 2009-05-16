@@ -419,7 +419,7 @@ static void *Thread( void *p_data )
         {
             PL_DEBUG( "found art for %s in cache", psz_name );
             input_item_SetArtFetched( p_item, true );
-            var_SetInteger( p_playlist, "item-change", p_item->i_id );
+            var_SetAddress( p_playlist, "item-change", p_item );
         }
         else
         {

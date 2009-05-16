@@ -130,7 +130,7 @@ static void Preparse( playlist_t *p_playlist, input_item_t *p_item )
         input_Preparse( VLC_OBJECT(p_playlist), p_item );
         input_item_SetPreparsed( p_item, true );
 
-        var_SetInteger( p_playlist, "item-change", p_item->i_id );
+        var_SetAddress( p_playlist, "item-change", p_item );
     }
 
     stats_TimerStop( p_playlist, STATS_TIMER_PREPARSE );

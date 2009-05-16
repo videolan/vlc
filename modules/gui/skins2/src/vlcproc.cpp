@@ -414,13 +414,14 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
                            void *pParam )
 {
     VlcProc *pThis = (VlcProc*)pParam;
+    input_item_t *p_item = newval.p_address;
 
     // Update the stream variable
     pThis->updateStreamName();
 
     // Create a playtree notify command
     CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
-                                                         newVal.i_int );
+                                                         p_item->i_id );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
