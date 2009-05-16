@@ -34,8 +34,6 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_interface.h>
-#include <vlc_aout.h>
-#include <vlc_vout.h>
 
 #include <sys/types.h>
 #include <sys/wait.h>
