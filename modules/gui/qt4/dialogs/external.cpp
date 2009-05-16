@@ -36,29 +36,6 @@
 #include <QProgressDialog>
 #include <QMutex>
 
-QVLCVariable::QVLCVariable (vlc_object_t *obj, const char *varname, int type)
-    : object (obj), name (qfu(varname))
-{
-    var_Create (object, qtu(name), type);
-    var_AddCallback (object, qtu(name), callback, this);
-}
-
-QVLCVariable::~QVLCVariable (void)
-{
-    var_DelCallback (object, qtu(name), callback, this);
-    var_Destroy (object, qtu(name));
-}
-
-int QVLCVariable::callback (vlc_object_t *object, const char *,
-                            vlc_value_t, vlc_value_t cur, void *data)
-{
-    QVLCVariable *self = (QVLCVariable *)data;
-
-    emit self->pointerChanged (object, cur.p_address);
-    return VLC_SUCCESS;
-}
-
-
 DialogHandler::DialogHandler (intf_thread_t *intf)
     : intf (intf),
       message (VLC_OBJECT(intf), "dialog-fatal", VLC_VAR_ADDRESS),
