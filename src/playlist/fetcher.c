@@ -81,7 +81,7 @@ playlist_fetcher_t *playlist_fetcher_New( playlist_t *p_playlist )
                    VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_fetcher, "cannot spawn secondary preparse thread" );
-        free( p_fetcher );
+        vlc_object_release( p_fetcher );
         return NULL;
     }
 
