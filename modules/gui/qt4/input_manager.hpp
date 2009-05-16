@@ -185,7 +185,7 @@ signals:
     /// Statistics are updated
     void statisticsUpdated( input_item_t* );
     void infoChanged( input_item_t* );
-    void metaChanged( input_item_t* );
+    void currentMetaChanged( input_item_t* );
     void metaChanged( int );
     void artChanged( QString );
     /// Play/pause status

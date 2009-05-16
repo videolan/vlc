@@ -103,9 +103,9 @@ MediaInfoDialog::MediaInfoDialog( intf_thread_t *_p_intf,
          **/
         CONNECT( THEMIM->getIM(), infoChanged( input_item_t* ),
                  IP, update( input_item_t* ) );
-        CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
+        CONNECT( THEMIM->getIM(), currentMetaChanged( input_item_t* ),
                  MP, update( input_item_t* ) );
-        CONNECT( THEMIM->getIM(), metaChanged( input_item_t* ),
+        CONNECT( THEMIM->getIM(), currentMetaChanged( input_item_t* ),
                  EMP, update( input_item_t* ) );
         CONNECT( THEMIM->getIM(), statisticsUpdated( input_item_t* ),
                  ISP, update( input_item_t* ) );

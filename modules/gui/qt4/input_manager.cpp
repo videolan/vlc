@@ -137,7 +137,7 @@ void InputManager::delInput()
     /* Reset all InfoPanels but stats */
     emit artChanged( NULL );
     emit infoChanged( NULL );
-    emit metaChanged( (input_item_t *)NULL );
+    emit currentMetaChanged( (input_item_t *)NULL );
 
     emit encryptionChanged( false );
     emit recordingStateChanged( false );
@@ -612,7 +612,7 @@ inline void InputManager::UpdateMeta( int id )
 
 inline void InputManager::UpdateMeta()
 {
-    emit metaChanged( input_GetItem( p_input ) );
+    emit currentMetaChanged( input_GetItem( p_input ) );
 }
 
 inline void InputManager::UpdateInfo()
