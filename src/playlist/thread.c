@@ -297,7 +297,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     }
 
     PL_UNLOCK;
-    var_SetInteger( p_playlist, "item-current", p_input->i_id );
+    var_SetAddress( p_playlist, "item-current", p_input );
     PL_LOCK;
 
     return VLC_SUCCESS;

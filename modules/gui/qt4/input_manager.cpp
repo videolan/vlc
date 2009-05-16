@@ -255,8 +255,9 @@ static int ItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     InputManager *im = (InputManager*)param;
+    input_item_t *p_item = static_cast<input_item_t *>(newval.p_address);
 
-    IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
+    IMEvent *event = new IMEvent( ItemChanged_Type, p_item->i_id );
     QApplication::postEvent( im, event );
     return VLC_SUCCESS;
 }
@@ -884,10 +885,18 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
              im, setInput( input_thread_t * ) );
 
     /* emit check if playlist has already started playing */
-    IMEvent *event = new IMEvent( ItemChanged_Type,
-                                  var_GetInteger( THEPL, "item-current" ) );
-    customEvent( event );
-    delete event;
+    input_thread_t *p_input = playlist_CurrentInput( THEPL );
+    if( p_input )
+    {
+        input_item_t *p_item = input_GetItem( p_input );
+        if( p_item )
+        {
+            IMEvent *event = new IMEvent( ItemChanged_Type, p_item->i_id );
+            customEvent( event );
+            delete event;
+        }
+        vlc_object_release( p_input );
+    }
 }
 
 MainInputManager::~MainInputManager()
@@ -1003,11 +1012,11 @@ void MainInputManager::activatePlayQuit( bool b_exit )
 
 /* Static callbacks for MIM */
 static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
-                        vlc_value_t oldval, vlc_value_t newval, void *param )
+                        vlc_value_t oldval, vlc_value_t, void *param )
 {
     MainInputManager *mim = (MainInputManager*)param;
 
-    IMEvent *event = new IMEvent( ItemChanged_Type, newval.i_int );
+    IMEvent *event = new IMEvent( ItemChanged_Type, 0 );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }

@@ -173,17 +173,17 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     playlist_t* p_playlist = (playlist_t*) p_this;
     char *psz_buf = NULL;
     input_thread_t *p_input;
+    input_item_t *p_item = newval.p_address;
     bool b_is_item_current = !strcmp( "item-current", psz_var );
 
     /* Don't update Telepathy presence each time an item has been preparsed */
     if( b_is_item_current )
     { /* stores the current input item id */
-        p_intf->p_sys->i_id = newval.i_int;
+        p_intf->p_sys->i_id = p_item->i_id;
         p_intf->p_sys->i_item_changes = 0;
     }
     else
     {
-        input_item_t *p_item = newval.p_address;
 
         if( p_item->i_id != p_intf->p_sys->i_id ) /* "item-change" */
             return VLC_SUCCESS;
