@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_vout.h>
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor

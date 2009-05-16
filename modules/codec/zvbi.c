@@ -46,7 +46,6 @@
 #include <assert.h>
 #include <libzvbi.h>
 
-#include <vlc_vout.h>
 #include <vlc_codec.h>
 #include <vlc_osd.h>
 
