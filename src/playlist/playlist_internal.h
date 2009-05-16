@@ -135,8 +135,8 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *,
 
 /* Tree walking */
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
-                                   int i_input_id, playlist_item_t *p_root,
-                                   bool );
+                                input_item_t *p_input, playlist_item_t *p_root,
+                                bool );
 
 int playlist_DeleteFromInputInParent( playlist_t *, input_item_t *,
                                       playlist_item_t *, bool );

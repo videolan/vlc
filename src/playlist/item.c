@@ -64,7 +64,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
      * listening using the onelevel and the category representent
      * (Because of the playlist design) */
     p_child_in_category = playlist_ItemFindFromInputAndRoot(
-                            p_playlist, p_child->i_id,
+                            p_playlist, p_child,
                             p_playlist->p_root_category,
                             false /* Only non-node */ );
 
@@ -72,7 +72,7 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
     {
         /* Then, transform to a node if needed */
         p_item_in_category = playlist_ItemFindFromInputAndRoot(
-                                p_playlist, p_parent->i_id,
+                                p_playlist, p_parent,
                                 p_playlist->p_root_category,
                                 false /* Only non-node */ );
         if( !p_item_in_category )
@@ -580,14 +580,14 @@ static playlist_item_t *ItemToNode( playlist_t *p_playlist,
 
     /** \todo First look if we don't already have it */
     p_item_in_category = playlist_ItemFindFromInputAndRoot(
-                                            p_playlist, p_item->p_input->i_id,
+                                            p_playlist, p_item->p_input,
                                             p_playlist->p_root_category,
                                             true );
 
     if( p_item_in_category )
     {
         playlist_item_t *p_item_in_one = playlist_ItemFindFromInputAndRoot(
-                                            p_playlist, p_item->p_input->i_id,
+                                            p_playlist, p_item->p_input,
                                             p_playlist->p_root_onelevel,
                                             true );
         assert( p_item_in_one );
@@ -641,13 +641,13 @@ static playlist_item_t *ItemToNode( playlist_t *p_playlist,
  * Find an item within a root, given its input id.
  *
  * \param p_playlist the playlist object
- * \param i_input_id id of the input
+ * \param p_item the input item
  * \param p_root root playlist item
  * \param b_items_only TRUE if we want the item himself
  * \return the first found item, or NULL if not found
  */
 playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
-                                                    int i_input_id,
+                                                    input_item_t *p_item,
                                                     playlist_item_t *p_root,
                                                     bool b_items_only )
 {
@@ -655,14 +655,14 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
     for( i = 0 ; i< p_root->i_children ; i++ )
     {
         if( ( b_items_only ? p_root->pp_children[i]->i_children == -1 : 1 ) &&
-            p_root->pp_children[i]->p_input->i_id == i_input_id )
+            p_root->pp_children[i]->p_input == p_item )
         {
             return p_root->pp_children[i];
         }
         else if( p_root->pp_children[i]->i_children >= 0 )
         {
             playlist_item_t *p_search =
-                 playlist_ItemFindFromInputAndRoot( p_playlist, i_input_id,
+                 playlist_ItemFindFromInputAndRoot( p_playlist, p_item,
                                                     p_root->pp_children[i],
                                                     b_items_only );
             if( p_search ) return p_search;
@@ -731,11 +731,11 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
             playlist_item_t *p_node_onelevel;
             playlist_item_t *p_item_onelevel;
             p_node_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_node->p_input->i_id,
+                                                p_node->p_input,
                                                 p_playlist->p_root_onelevel,
                                                 false );
             p_item_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_item->p_input->i_id,
+                                                p_item->p_input,
                                                 p_playlist->p_root_onelevel,
                                                 false );
             if( p_node_onelevel && p_item_onelevel )
@@ -745,11 +745,11 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
             playlist_item_t *p_node_category;
             playlist_item_t *p_item_category;
             p_node_category = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_node->p_input->i_id,
+                                                p_node->p_input,
                                                 p_playlist->p_root_category,
                                                 false );
             p_item_category = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_item->p_input->i_id,
+                                                p_item->p_input,
                                                 p_playlist->p_root_category,
                                                 false );
             if( p_node_category && p_item_category )

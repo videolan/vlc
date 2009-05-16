@@ -213,7 +213,7 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
      * XXX: Why don't we have a function to ensure that in the playlist code ? */
     playlist_Lock( p_parent->p_playlist );
     p_pl_item = playlist_ItemFindFromInputAndRoot( p_parent->p_playlist,
-            p_input->i_id, p_parent, false );
+            p_input, p_parent, false );
 
     if( p_pl_item && p_pl_item->i_children > -1 )
         playlist_NodeDelete( p_parent->p_playlist, p_pl_item, true, false );
