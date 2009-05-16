@@ -27,6 +27,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_url.h>
 #include "vlc_playlist.h"
 #include "vlc_interface.h"
 
@@ -367,8 +368,33 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
             p_i->psz_name = strdup( psz_filename );
     }
 
+    /* The name is NULL: fill it with everything except login and password */
     if( !p_i->psz_name )
-        p_i->psz_name = strdup( p_i->psz_uri );
+    {
+        vlc_url_t url;
+        vlc_UrlParse( &url, psz_uri, 0 );
+        if( url.psz_protocol )
+        {
+            if( url.i_port > 0 )
+                asprintf( &p_i->psz_name, "%s://%s:%d%s", url.psz_protocol,
+                          url.psz_host, url.i_port,
+                          url.psz_path ? url.psz_path : "" );
+            else
+                asprintf( &p_i->psz_name, "%s://%s%s", url.psz_protocol,
+                          url.psz_host ? url.psz_host : "",
+                          url.psz_path ? url.psz_path : "" );
+        }
+        else
+        {
+            if( url.i_port > 0 )
+                asprintf( &p_i->psz_name, "%s:%d%s", url.psz_host, url.i_port,
+                          url.psz_path ? url.psz_path : "" );
+            else
+                asprintf( &p_i->psz_name, "%s%s", url.psz_host,
+                          url.psz_path ? url.psz_path : "" );
+        }
+        vlc_UrlClean( &url );
+    }
 
     vlc_mutex_unlock( &p_i->lock );
 }
