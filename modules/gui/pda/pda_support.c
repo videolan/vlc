@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <gtk/gtk.h>
 
@@ -75,6 +76,7 @@ GtkWidget*
 create_pixmap                          (GtkWidget       *widget,
                                         const gchar     *filename)
 {
+  VLC_UNUSED( widget );
   gchar *pathname = NULL;
   GtkWidget *pixmap;
 
