@@ -66,6 +66,15 @@ static inline void test_path (const char *in, const char *out)
     test (make_URI, in, out);
 }
 
+static inline void test_current_directory_path (const char *in, const char *cwd, const char *out)
+{
+    char * expected_result = NULL;
+    int val = asprintf(&expected_result, "file://%s/%s", cwd, out);
+    assert (val != -1);
+    
+    test (make_URI, in, expected_result);
+}
+
 int main (void)
 {
     int val;
@@ -114,9 +123,16 @@ int main (void)
     assert (fd != -1);*/
     val = chdir ("/tmp");
     assert (val != -1);
-    test_path ("movie.ogg", "file:///tmp/movie.ogg");
-    test_path (".", "file:///tmp/.");
-    test_path ("", "file:///tmp/");
+
+    char buf[256];
+    char * tmpdir;
+    tmpdir = getcwd(buf, sizeof(buf)/sizeof(*buf));
+    assert (tmpdir);
+
+    test_current_directory_path ("movie.ogg", tmpdir, "movie.ogg");
+    test_current_directory_path (".", tmpdir, ".");
+    test_current_directory_path ("", tmpdir, "");
+
     /*val = fchdir (fd);
     assert (val != -1);*/
 
