@@ -883,11 +883,9 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     CONNECT( this, inputChanged( input_thread_t * ),
              im, setInput( input_thread_t * ) );
 
-    /* emit check if playlist has allready started playing */
-    vlc_value_t val;
-    var_Change( THEPL, "item-current", VLC_VAR_CHOICESCOUNT, &val, NULL );
-
-    IMEvent *event = new IMEvent( ItemChanged_Type, val.i_int);
+    /* emit check if playlist has already started playing */
+    IMEvent *event = new IMEvent( ItemChanged_Type,
+                                  var_GetInteger( THEPL, "item-current" ) );
     customEvent( event );
     delete event;
 }
