@@ -136,7 +136,7 @@ static void PlaylistAddItem(GtkWidget *widget, gchar *name, char **ppsz_options,
                               (const char*)name,
                               PLAYLIST_APPEND, PLAYLIST_END,
                               (mtime_t) 0,
-                              i_options, (const char **) ppsz_options, VLC_INPUT_OPTION_TRUSTED,
+                              i_size, (const char **) ppsz_options, VLC_INPUT_OPTION_TRUSTED,
                               true, pl_Unlocked );
             }
 
