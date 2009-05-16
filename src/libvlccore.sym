@@ -279,6 +279,7 @@ picture_CopyPixels
 picture_Delete
 picture_Export
 picture_New
+picture_Setup
 plane_CopyPixels
 playlist_Add
 playlist_AddExt

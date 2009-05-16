@@ -221,6 +221,19 @@ static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
  */
 VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height ) );
 
+/**
+ * This function will setup all fields of a picture_t without allocating any
+ * memory.
+ * XXX The memory must already be initialized.
+ * It does not need to be released.
+ *
+ * It will return VLC_EGENERIC if the core does not understand the requested
+ * format.
+ *
+ * It can be usefull to get the properties of planes.
+ */
+VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
+
 /*****************************************************************************
  * Flags used to describe the status of a picture
  *****************************************************************************/
