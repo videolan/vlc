@@ -30,7 +30,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_vout.h>
 
 #ifndef _MSC_VER
     /* Work-around a bug in w32api-2.5 */
