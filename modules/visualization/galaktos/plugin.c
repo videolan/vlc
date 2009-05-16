@@ -210,8 +210,8 @@ static void* Thread( vlc_object_t *p_this )
     vlc_object_attach( p_thread->p_opengl, p_this );
 
     /* Initialize vout parameters */
-    vout_InitFormat( &p_thread->p_opengl->fmt_in,
-                     VLC_CODEC_RGB32, p_thread->i_width, p_thread->i_height, 1 );
+    video_format_Setup( &p_thread->p_opengl->fmt_in,
+                        VLC_CODEC_RGB32, p_thread->i_width, p_thread->i_height, 1 );
     p_thread->p_opengl->i_window_width = p_thread->i_width;
     p_thread->p_opengl->i_window_height = p_thread->i_height;
     p_thread->p_opengl->render.i_width = p_thread->i_width;

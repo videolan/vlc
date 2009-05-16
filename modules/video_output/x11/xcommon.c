@@ -1865,9 +1865,10 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
 
     /* Fill in picture_t fields */
-    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
-                      p_vout->output.i_width, p_vout->output.i_height,
-                      p_vout->output.i_aspect );
+    if( picture_Setup( p_pic, p_vout->output.i_chroma,
+                       p_vout->output.i_width, p_vout->output.i_height,
+                       p_vout->output.i_aspect ) )
+        return -1;
 
 #ifdef HAVE_SYS_SHM_H
     if( p_vout->p_sys->i_shm_opcode )
@@ -1965,7 +1966,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
 
             /* p_pic->p->i_pixel_pitch = 4 for RV24 but this should be set
-             * properly by vout_InitPicture() */
+             * properly by picture_Setup() */
             p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch
                                          * p_pic->p_sys->p_image->width;
             break;

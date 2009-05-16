@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
-#include <vlc_vout.h>
 
 /*****************************************************************************
  * decoder_sys_t : raw video decoder descriptor
@@ -157,10 +156,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Find out p_vdec->i_raw_size */
-    vout_InitFormat( &p_dec->fmt_out.video, p_dec->fmt_in.i_codec,
-                     p_dec->fmt_in.video.i_width,
-                     p_dec->fmt_in.video.i_height,
-                     p_dec->fmt_in.video.i_aspect );
+    video_format_Setup( &p_dec->fmt_out.video, p_dec->fmt_in.i_codec,
+                        p_dec->fmt_in.video.i_width,
+                        p_dec->fmt_in.video.i_height,
+                        p_dec->fmt_in.video.i_aspect );
     p_sys->i_raw_size = p_dec->fmt_out.video.i_bits_per_pixel *
         p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height / 8;
 
@@ -321,9 +320,9 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
         int i, j;
 
         /* Fill in picture_t fields */
-        vout_InitPicture( VLC_OBJECT(p_dec), &pic, p_dec->fmt_out.i_codec,
-                          p_dec->fmt_out.video.i_width,
-                          p_dec->fmt_out.video.i_height, VOUT_ASPECT_FACTOR );
+        picture_Setup( &pic, p_dec->fmt_out.i_codec,
+                       p_dec->fmt_out.video.i_width,
+                       p_dec->fmt_out.video.i_height, VOUT_ASPECT_FACTOR );
 
         if( !pic.i_planes )
         {

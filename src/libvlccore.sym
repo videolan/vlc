@@ -529,8 +529,6 @@ vout_DestroyPicture
 vout_DisplayPicture
 vout_EnableFilter
 vout_GetSnapshot
-vout_InitFormat
-__vout_InitPicture
 vout_LinkPicture
 vout_OSDIcon
 __vout_OSDMessage

@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_vout.h>                                     /* vout_InitFormat */
 #include <assert.h>
 
 /*****************************************************************************
@@ -357,8 +356,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     es_format_Init( &p_sys->fmt_video, VIDEO_ES, i_chroma );
-    vout_InitFormat( &p_sys->fmt_video.video, i_chroma, i_width, i_height,
-                     i_aspect );
+    video_format_Setup( &p_sys->fmt_video.video,
+                        i_chroma, i_width, i_height, i_aspect );
 
     vlc_ureduce( &p_sys->fmt_video.video.i_frame_rate,
                  &p_sys->fmt_video.video.i_frame_rate_base,

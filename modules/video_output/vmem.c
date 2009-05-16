@@ -231,9 +231,13 @@ static int Init( vout_thread_t *p_vout )
         return VLC_SUCCESS;
     }
 
-    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
-                      p_vout->output.i_width, p_vout->output.i_height,
-                      p_vout->output.i_aspect );
+    if( picture_Setup( p_pic, p_vout->output.i_chroma,
+                       p_vout->output.i_width, p_vout->output.i_height,
+                       p_vout->output.i_aspect ) )
+    {
+        free( p_pic );
+        return VLC_EGENERIC;
+    }
 
     p_pic->p->i_pitch = i_pitch;
 

@@ -37,7 +37,7 @@
 #include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_access.h>
-#include <vlc_vout.h>
+#include <vlc_picture.h>
 
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -1072,10 +1072,9 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     else
     {
         /* Fill in picture_t fields */
-        vout_InitPicture( VLC_OBJECT(p_demux), &p_sys->pic, p_sys->i_fourcc,
-                          p_sys->i_width, p_sys->i_height, p_sys->i_width *
-                          VOUT_ASPECT_FACTOR / p_sys->i_height );
-        if( !p_sys->pic.i_planes )
+        if( picture_Setup( &p_sys->pic, p_sys->i_fourcc,
+                           p_sys->i_width, p_sys->i_height, p_sys->i_width *
+                           VOUT_ASPECT_FACTOR / p_sys->i_height ) )
         {
             msg_Err( p_demux, "unsupported chroma" );
             goto vdev_failed;

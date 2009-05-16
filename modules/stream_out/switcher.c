@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
-#include <vlc_vout.h>
 #include <vlc_avcodec.h>
 
 #include <vlc_block.h>
@@ -613,9 +612,13 @@ static int UnpackFromFile( sout_stream_t *p_stream, const char *psz_file,
         return -1;
     }
 
-    vout_InitPicture( VLC_OBJECT(p_stream), p_pic, VLC_CODEC_I420,
-                      i_width, i_height,
-                      i_width * VOUT_ASPECT_FACTOR / i_height );
+    if( picture_Setup( p_pic, VLC_CODEC_I420,
+                       i_width, i_height,
+                       i_width * VOUT_ASPECT_FACTOR / i_height ) )
+    {
+        msg_Err( p_stream, "unknown chroma" );
+        return -1;
+    }
     for ( i = 0; i < p_pic->i_planes; i++ )
     {
         p_pic->p[i].p_pixels = malloc( p_pic->p[i].i_lines *

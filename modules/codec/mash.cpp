@@ -190,9 +190,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Dbg( p_dec, "video size is perhaps %dx%d", i_width,
                   i_height);
-        vout_InitFormat( &p_dec->fmt_out.video, VLC_CODEC_I420,
-                         i_width, i_height,
-                         VOUT_ASPECT_FACTOR * i_width / i_height );
+        video_format_Setup( &p_dec->fmt_out.video, VLC_CODEC_I420,
+                            i_width, i_height,
+                            VOUT_ASPECT_FACTOR * i_width / i_height );
         p_sys->b_inited = true;
     }
     p_pic = NULL;

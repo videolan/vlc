@@ -456,9 +456,9 @@ found_adaptor:
         if (pic->i_status != FREE_PICTURE)
             continue;
 
-        vout_InitPicture (vout, pic, vout->output.i_chroma,
-                          att->width, att->height,
-                          vout->fmt_in.i_aspect);
+        picture_Setup (pic, vout->output.i_chroma,
+                       att->width, att->height,
+                       vout->fmt_in.i_aspect);
         if (PictureAlloc (vout, pic, att->data_size,
                           p_sys->shm ? p_sys->conn : NULL))
             break;

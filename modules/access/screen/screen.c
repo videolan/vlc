@@ -336,11 +336,11 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     if( !p_sys->dst.i_planes )
-        vout_InitPicture( p_demux, &p_sys->dst,
-                          p_sys->fmt.video.i_chroma,
-                          p_sys->fmt.video.i_width,
-                          p_sys->fmt.video.i_height,
-                          p_sys->fmt.video.i_aspect );
+        picture_Setup( &p_sys->dst,
+                       p_sys->fmt.video.i_chroma,
+                       p_sys->fmt.video.i_width,
+                       p_sys->fmt.video.i_height,
+                       p_sys->fmt.video.i_aspect );
     if( !p_sys->p_blend )
     {
         p_sys->p_blend = vlc_object_create( p_demux, sizeof(filter_t) );

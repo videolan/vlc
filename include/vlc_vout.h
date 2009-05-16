@@ -75,19 +75,6 @@ struct picture_heap_t
  *****************************************************************************/
 
 /**
- * Initialise different fields of a picture_t (but does not allocate memory).
- * \param p_this a vlc object
- * \param p_pic pointer to the picture structure.
- * \param i_chroma the wanted chroma for the picture.
- * \param i_width the wanted width for the picture.
- * \param i_height the wanted height for the picture.
- * \param i_aspect the wanted aspect ratio for the picture.
- */
-#define vout_InitPicture(a,b,c,d,e,f) \
-        __vout_InitPicture(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( int, __vout_InitPicture, ( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect ) );
-
-/**
  * Initialise different fields of a picture_t and allocates the picture buffer.
  * \param p_this a vlc object
  * \param p_pic pointer to the picture structure.
@@ -317,7 +304,6 @@ VLC_EXPORT( int, vout_GetSnapshot, ( vout_thread_t *p_vout,
 VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 
 VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, bool, bool, unsigned int ) );
-VLC_EXPORT( void,            vout_InitFormat,     ( video_frame_format_t *, uint32_t, int, int, int ) );
 VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t * ) );

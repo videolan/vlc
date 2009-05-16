@@ -346,9 +346,9 @@ static int Init (vout_thread_t *vout)
         if (pic->i_status != FREE_PICTURE)
             continue;
 
-        vout_InitPicture (vout, pic, vout->output.i_chroma,
-                          vout->output.i_width, vout->output.i_height,
-                          vout->output.i_aspect);
+        picture_Setup (pic, vout->output.i_chroma,
+                       vout->output.i_width, vout->output.i_height,
+                       vout->output.i_aspect);
         if (PictureAlloc (vout, pic, pic->p->i_pitch * pic->p->i_lines,
                           p_sys->shm ? p_sys->conn : NULL))
             break;

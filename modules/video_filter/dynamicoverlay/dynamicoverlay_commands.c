@@ -56,8 +56,8 @@ overlay_t *OverlayCreate( void )
     p_ovl->i_x = p_ovl->i_y = 0;
     p_ovl->i_alpha = 0xFF;
     p_ovl->b_active = false;
-    vout_InitFormat( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
-                     VOUT_ASPECT_FACTOR );
+    video_format_Setup( &p_ovl->format, VLC_FOURCC( '\0','\0','\0','\0') , 0, 0,
+                        VOUT_ASPECT_FACTOR );
     p_ovl->p_fontstyle = text_style_New();
     p_ovl->data.p_text = NULL;
 
@@ -465,8 +465,8 @@ static int exec_DataSharedMem( filter_t *p_filter,
             return VLC_ENOMEM;
         }
 
-        vout_InitFormat( &p_ovl->format, VLC_CODEC_TEXT,
-                         0, 0, 0 );
+        video_format_Setup( &p_ovl->format, VLC_CODEC_TEXT,
+                            0, 0, 0 );
 
         p_data = shmat( p_params->i_shmid, NULL, SHM_RDONLY );
         if( p_data == NULL )
@@ -489,9 +489,9 @@ static int exec_DataSharedMem( filter_t *p_filter,
         if( p_ovl->data.p_pic == NULL )
             return VLC_ENOMEM;
 
-        vout_InitFormat( &p_ovl->format, p_params->fourcc,
-                         p_params->i_width, p_params->i_height,
-                         VOUT_ASPECT_FACTOR );
+        video_format_Setup( &p_ovl->format, p_params->fourcc,
+                            p_params->i_width, p_params->i_height,
+                            VOUT_ASPECT_FACTOR );
         if( vout_AllocatePicture( p_filter, p_ovl->data.p_pic,
                                   p_ovl->format.i_chroma, p_params->i_width,
                                   p_params->i_height, p_ovl->format.i_aspect ) )
