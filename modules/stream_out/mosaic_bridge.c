@@ -625,21 +625,12 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
         {
             /* TODO: chroma conversion if needed */
 
-            p_new_pic = (picture_t*)malloc( sizeof(picture_t) );
-            if( p_new_pic == NULL )
-            {
-                msg_Err( p_stream, "image conversion failed" );
-                continue;
-            }
-
-            if( vout_AllocatePicture(
-                                  p_stream, p_new_pic, p_pic->format.i_chroma,
-                                  p_pic->format.i_width, p_pic->format.i_height,
-                                  p_sys->p_decoder->fmt_out.video.i_aspect )
-                != VLC_SUCCESS )
+            p_new_pic = picture_New( p_pic->format.i_chroma,
+                                     p_pic->format.i_width, p_pic->format.i_height,
+                                     p_sys->p_decoder->fmt_out.video.i_aspect );
+            if( !p_new_pic )
             {
                 picture_Release( p_pic );
-                free( p_new_pic );
                 msg_Err( p_stream, "image allocation failed" );
                 continue;
             }
@@ -796,31 +787,21 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
         i = 0;
     }
 
-    p_pic = malloc( sizeof(picture_t) );
-    if( !p_pic ) return NULL;
     fmt_out->video.i_chroma = fmt_out->i_codec;
-    if( vout_AllocatePicture( p_this, p_pic,
-                          fmt_out->video.i_chroma,
-                          fmt_out->video.i_width,
-                          fmt_out->video.i_height,
-                          fmt_out->video.i_aspect ) != VLC_SUCCESS )
-    {
-        free( p_pic );
-        return NULL;
-    }
 
-    if( !p_pic->i_planes )
-    {
-        free( p_pic );
+    p_pic = picture_New( fmt_out->video.i_chroma,
+                         fmt_out->video.i_width,
+                         fmt_out->video.i_height,
+                         fmt_out->video.i_aspect );
+    if( !p_pic )
         return NULL;
-    }
 
+    p_pic->i_status = RESERVED_PICTURE;
     p_pic->pf_release = pf_release;
     p_pic->i_refcount = 1;
     p_pic->p_sys = malloc( sizeof(picture_sys_t) );
     p_pic->p_sys->p_owner = p_this;
     p_pic->p_sys->b_dead = false;
-    p_pic->i_status = RESERVED_PICTURE;
 
     pp_ring[i] = p_pic;
 
