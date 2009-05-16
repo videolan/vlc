@@ -34,7 +34,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-#include <vlc_vout.h>
 
 #define SRC_FOURCC  "I420,IYUV,YV12"
 #define DEST_FOURCC "YMGA"

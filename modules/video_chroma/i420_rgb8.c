@@ -31,7 +31,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_filter.h>
-#include <vlc_vout.h>
 
 #include "i420_rgb.h"
 #include "i420_rgb_c.h"

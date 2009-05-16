@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-#include <vlc_vout.h>
 
 #define SRC_FOURCC  "GREY"
 #define DEST_FOURCC "I420,YUY2"

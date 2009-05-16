@@ -32,7 +32,6 @@
 
 #include <vlc/vlc.h>
 #include <vlc_filter.h>
-#include <vlc_vout.h>
 
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_i420_rgb)
