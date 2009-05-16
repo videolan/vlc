@@ -65,3 +65,15 @@ void QVLCPointer::trigger (vlc_object_t *obj, vlc_value_t old, vlc_value_t cur)
     emit pointerChanged (obj, old.p_address, cur.p_address);
     emit pointerChanged (obj, cur.p_address);
 }
+
+
+QVLCInteger::QVLCInteger (vlc_object_t *obj, const char *varname, bool inherit)
+    : QVLCVariable (obj, varname, VLC_VAR_INTEGER, inherit)
+{
+}
+
+void QVLCInteger::trigger (vlc_object_t *obj, vlc_value_t old, vlc_value_t cur)
+{
+    emit integerChanged (obj, old.i_int, cur.i_int);
+    emit integerChanged (obj, cur.i_int);
+}

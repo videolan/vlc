@@ -53,4 +53,18 @@ signals:
     void pointerChanged (vlc_object_t *, void *);
 };
 
+class QVLCInteger : public QVLCVariable
+{
+    Q_OBJECT
+private:
+    virtual void trigger (vlc_object_t *, vlc_value_t, vlc_value_t);
+
+public:
+    QVLCInteger (vlc_object_t *, const char *, bool inherit = false);
+
+signals:
+    void integerChanged (vlc_object_t *, int, int);
+    void integerChanged (vlc_object_t *, int);
+};
+
 #endif
