@@ -31,7 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
 
 #include "vlc_filter.h"
 #include "filter_picture.h"
@@ -58,7 +57,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
- * vout_sys_t: Invert video output method descriptor
+ * filter_sys_t: Invert video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
  * It describes the Invert specific properties of an output thread.
