@@ -26,6 +26,8 @@
 #define VLC_FILTER_H 1
 
 #include <vlc_es.h>
+#include <vlc_picture.h>
+#include <vlc_subpicture.h>
 
 /**
  * \file
