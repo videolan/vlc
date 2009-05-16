@@ -62,7 +62,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     artUrl       = "";
     p_input      = NULL;
     i_rate       = 0;
-    i_input_id   = 0;
+    p_item       = NULL;
     b_video      = false;
     timeA        = 0;
     timeB        = 0;
@@ -92,12 +92,12 @@ void InputManager::setInput( input_thread_t *_p_input )
         UpdateNavigation();
         UpdateVout();
         addCallbacks();
-        i_input_id = input_GetItem( p_input )->i_id;
+        p_item = input_GetItem( p_input );
     }
     else
     {
         p_input = NULL;
-        i_input_id = 0;
+        p_item = NULL;
         emit rateChanged( INPUT_RATE_DEFAULT );
     }
 }
@@ -112,7 +112,7 @@ void InputManager::delInput()
 
     delCallbacks();
     i_old_playing_status = END_S;
-    i_input_id           = 0;
+    p_item               = NULL;
     oldName              = "";
     artUrl               = "";
     b_video              = false;
@@ -170,7 +170,7 @@ void InputManager::customEvent( QEvent *event )
         break;
     case ItemChanged_Type:
         /* Ignore ItemChanged_Type event that does not apply to our input */
-        if( i_input_id == ple->i_id )
+        if( p_item->i_id == ple->i_id )
         {
             UpdateStatus();
             // UpdateName();

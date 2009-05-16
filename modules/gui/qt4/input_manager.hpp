@@ -106,7 +106,7 @@ public:
 private:
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
-    int             i_input_id;
+    input_item_t   *p_item;
     int             i_old_playing_status;
     QString         oldName;
     QString         artUrl;
