@@ -94,7 +94,7 @@ static int Open( vlc_object_t *p_this )
     if( i_refcount > 0 )
     {
         i_refcount++;
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &gtk_lock );
 
         return VLC_SUCCESS;
     }
@@ -110,11 +110,11 @@ static int Open( vlc_object_t *p_this )
     /* Launch the gtk_main() thread. It will not return until it has
      * called gdk_threads_enter(), which ensures us thread safety. */
     if( vlc_thread_create( p_gtk_main, "gtk_main", GtkMain,
-                           VLC_THREAD_PRIORITY_LOW, true ) )
+                           VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_object_release( p_gtk_main );
         i_refcount--;
-        vlc_mutex_unlock( lock );
+        vlc_mutex_unlock( &gtk_lock );
         return VLC_ETHREAD;
     }
 
