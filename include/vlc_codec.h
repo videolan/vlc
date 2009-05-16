@@ -26,6 +26,8 @@
 
 #include <vlc_block.h>
 #include <vlc_es.h>
+#include <vlc_picture.h>
+#include <vlc_subpicture.h>
 
 /**
  * \file
