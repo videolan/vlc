@@ -238,22 +238,28 @@ endif
 endif
 
 SOURCES_libvlc_beos = \
+	misc/pthread.c \
 	$(NULL)
 
 SOURCES_libvlc_darwin = \
+	misc/pthread.c \
 	misc/darwin_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_linux = \
+	misc/pthread.c \
 	misc/linux_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
+	misc/w32thread.c \
 	misc/win32_specific.c \
 	network/winsock.c \
 	$(NULL)
 
-SOURCES_libvlc_other = misc/not_specific.c
+SOURCES_libvlc_other = \
+	misc/pthread.c \
+	misc/not_specific.c
 
 SOURCES_libvlc_dirent = \
 	extras/dirent.c \
