@@ -381,7 +381,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                                        p_items[i] );
                         if( p_item )
                             playlist_DeleteFromInput( p_sys->p_playlist,
-                                                      p_item->p_input->i_id,
+                                                      p_item->p_input,
                                                       false );
                     }
 
@@ -424,7 +424,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             msg_Dbg( p_intf, "requested playlist delete: %d",
                                    p_sys->p_playlist->items.p_elems[i]->i_id );
                             playlist_DeleteFromInput( p_sys->p_playlist,
-                                p_sys->p_playlist->items.p_elems[i]->p_input->i_id,
+                                p_sys->p_playlist->items.p_elems[i]->p_input,
                                                       false );
                         }
                     }

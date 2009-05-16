@@ -968,7 +968,7 @@
             playlist_NodeDelete( p_playlist, p_item, true, false );
         }
         else
-            playlist_DeleteFromInput( p_playlist, p_item->p_input->i_id, pl_Locked );
+            playlist_DeleteFromInput( p_playlist, p_item->p_input, pl_Locked );
     }
     PL_UNLOCK;
 

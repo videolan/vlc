@@ -74,7 +74,7 @@ void Playtree::delSelected()
             if( p_item->i_children == -1 )
             {
                 playlist_DeleteFromInput( getIntf()->p_sys->p_playlist,
-                                          p_item->p_input->i_id, pl_Locked );
+                                          p_item->p_input, pl_Locked );
                 it2 = getNextVisibleItem( it ) ;
                 it->parent()->removeChild( it );
                 it = it2;

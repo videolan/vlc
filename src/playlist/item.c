@@ -218,12 +218,12 @@ int playlist_ItemRelease( playlist_item_t *p_item )
  *
  * Remove an input item when it appears from a root playlist item
  * \param p_playlist playlist object
- * \param i_input_id id of the input to delete
+ * \param p_input the input to delete
  * \param p_root root playlist item
  * \param b_do_stop must stop or not the playlist
  * \return VLC_SUCCESS or VLC_EGENERIC
 */
-static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
+static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
                             playlist_item_t *p_root, bool b_do_stop )
 {
     int i;
@@ -231,14 +231,14 @@ static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
     for( i = 0 ; i< p_root->i_children ; i++ )
     {
         if( p_root->pp_children[i]->i_children == -1 &&
-            p_root->pp_children[i]->p_input->i_id == i_input_id )
+            p_root->pp_children[i]->p_input == p_input )
         {
             DeleteInner( p_playlist, p_root->pp_children[i], b_do_stop );
             return VLC_SUCCESS;
         }
         else if( p_root->pp_children[i]->i_children >= 0 )
         {
-            int i_ret = DeleteFromInput( p_playlist, i_input_id,
+            int i_ret = DeleteFromInput( p_playlist, p_input,
                                          p_root->pp_children[i], b_do_stop );
             if( i_ret == VLC_SUCCESS ) return VLC_SUCCESS;
         }
@@ -251,18 +251,18 @@ static int DeleteFromInput( playlist_t *p_playlist, int i_input_id,
  *
  * Remove an input item when it appears from a root playlist item
  * \param p_playlist playlist object
- * \param i_input_id id of the input to delete
+ * \param p_input the input to delete
  * \param p_root root playlist item
  * \param b_locked TRUE if the playlist is locked
  * \return VLC_SUCCESS or VLC_EGENERIC
  */
-int playlist_DeleteFromInputInParent( playlist_t *p_playlist, int i_input_id,
+int playlist_DeleteFromInputInParent( playlist_t *p_playlist,
+                                      input_item_t *p_item,
                                       playlist_item_t *p_root, bool b_locked )
 {
     int i_ret;
     PL_LOCK_IF( !b_locked );
-    i_ret = DeleteFromInput( p_playlist, i_input_id,
-                             p_root, true );
+    i_ret = DeleteFromInput( p_playlist, p_item, p_root, true );
     PL_UNLOCK_IF( !b_locked );
     return i_ret;
 }
@@ -272,18 +272,18 @@ int playlist_DeleteFromInputInParent( playlist_t *p_playlist, int i_input_id,
  *
  * Remove an input item from ONELEVEL and CATEGORY
  * \param p_playlist playlist object
- * \param i_input_id id of the input to delete
+ * \param p_input the input to delete
  * \param b_locked TRUE if the playlist is locked
  * \return VLC_SUCCESS or VLC_ENOITEM
  */
-int playlist_DeleteFromInput( playlist_t *p_playlist, int i_input_id,
+int playlist_DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
                               bool b_locked )
 {
     int i_ret1, i_ret2;
     PL_LOCK_IF( !b_locked );
-    i_ret1 = DeleteFromInput( p_playlist, i_input_id,
+    i_ret1 = DeleteFromInput( p_playlist, p_input,
                              p_playlist->p_root_category, true );
-    i_ret2 = DeleteFromInput( p_playlist, i_input_id,
+    i_ret2 = DeleteFromInput( p_playlist, p_input,
                      p_playlist->p_root_onelevel, true );
     PL_UNLOCK_IF( !b_locked );
     return ( i_ret1 == VLC_SUCCESS || i_ret2 == VLC_SUCCESS ) ?
@@ -620,7 +620,7 @@ static playlist_item_t *ItemToNode( playlist_t *p_playlist,
                 if( p_prev_status_item )
                     set_current_status_item( p_playlist, p_prev_status_item );
             }
-            DeleteFromInput( p_playlist, p_item_in_one->p_input->i_id,
+            DeleteFromInput( p_playlist, p_item_in_one->p_input,
                              p_playlist->p_root_onelevel, false );
         }
         pl_priv(p_playlist)->b_reset_currently_playing = true;

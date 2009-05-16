@@ -875,7 +875,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             if( p_item )
             {
                 playlist_DeleteFromInput( p_sys->p_playlist,
-                                          p_item->p_input->i_id, pl_Locked );
+                                          p_item->p_input, pl_Locked );
                 msg_Dbg( p_intf, "requested playlist delete: %d", i_id );
             }
             else

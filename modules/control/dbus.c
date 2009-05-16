@@ -514,7 +514,7 @@ DBUS_METHOD( DelTrack )
     if( i_position < p_playlist->current.i_size )
     {
         playlist_DeleteFromInput( p_playlist,
-            p_playlist->current.p_elems[i_position]->p_input->i_id,
+            p_playlist->current.p_elems[i_position]->p_input,
             pl_Locked );
     }
     PL_UNLOCK;

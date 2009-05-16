@@ -111,7 +111,7 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
  * Generally speaking, playlist_NodeAddInput should not be used in newer code, it
  * will maybe become useful again when we merge VLM;
  *
- * To delete an item, use playlist_DeleteFromInput( input_id ) which will
+ * To delete an item, use playlist_DeleteFromInput( p_item ) which will
  * remove all occurrences of the input in both trees
  *
  *
@@ -322,7 +322,7 @@ VLC_EXPORT( bool, playlist_IsServicesDiscoveryLoaded, ( playlist_t *,const char 
  ********************************************************/
 
 /*************************** Item deletion **************************/
-VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, int, bool ) );
+VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, input_item_t *, bool ) );
 
 /******************** Item addition ********************/
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, bool, bool ) );

@@ -700,7 +700,7 @@ void Playlist::UpdateItem( int i )
 /**********************************************************************
  * Private functions
  **********************************************************************/
-void Playlist::DeleteItem( int item )
+void Playlist::DeleteItem( input_item_t *item )
 {
     playlist_t *p_playlist = pl_Hold( p_intf );
     if( p_playlist == NULL ) return;
