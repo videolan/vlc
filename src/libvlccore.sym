@@ -301,7 +301,6 @@ playlist_Import
 playlist_IsServicesDiscoveryLoaded
 playlist_ItemGetById
 playlist_ItemGetByInput
-playlist_ItemGetByInputId
 playlist_LiveSearchUpdate
 playlist_Lock
 playlist_NodeAppend
