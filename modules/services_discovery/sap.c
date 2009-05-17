@@ -918,9 +918,11 @@ static const char *FindAttribute (const sdp_t *sdp, unsigned media,
                                   const char *name)
 {
     /* Look for media attribute, and fallback to session */
-    return GetAttribute (sdp->mediav[media].pp_attributes,
-                         sdp->mediav[media].i_attributes, name)
-        ?: GetAttribute (sdp->pp_attributes, sdp->i_attributes, name);
+    const char *attr = GetAttribute (sdp->mediav[media].pp_attributes,
+                                     sdp->mediav[media].i_attributes, name);
+    if (attr == NULL)
+        attr = GetAttribute (sdp->pp_attributes, sdp->i_attributes, name);
+    return attr;
 }
 
 

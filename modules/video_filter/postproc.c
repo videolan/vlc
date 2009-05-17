@@ -197,7 +197,8 @@ static int OpenPostproc( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
     if( val_orig.i_int )
     {
-        p_sys->pp_mode = pp_get_mode_by_name_and_quality( val.psz_string?:
+        p_sys->pp_mode = pp_get_mode_by_name_and_quality( val.psz_string ?
+                                                          val.psz_string :
                                                           "default",
                                                           val_orig.i_int );
 
@@ -328,7 +329,8 @@ static void PPChangeMode( filter_t *p_filter, const char *psz_name,
     vlc_mutex_lock( &p_sys->lock );
     if( i_quality > 0 )
     {
-        pp_mode_t *pp_mode = pp_get_mode_by_name_and_quality( psz_name?:
+        pp_mode_t *pp_mode = pp_get_mode_by_name_and_quality( psz_name ?
+                                                              psz_name :
                                                               "default",
                                                               i_quality );
         if( pp_mode )

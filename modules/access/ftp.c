@@ -334,12 +334,14 @@ static int InOpen( vlc_object_t *p_this )
         goto exit_error;
 
     /* get size */
-    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path ? : "" ) < 0 ||
-        ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
+    if( ftp_SendCommand( p_this, p_sys, "SIZE %s", p_sys->url.psz_path
+                                               ? p_sys->url.psz_path : "" ) < 0
+     || ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
     {
         msg_Dbg( p_access, "cannot get file size" );
         msg_Dbg( p_access, "will try to get directory contents" );
-        if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path ?: "" ) < 0 ||
+        if( ftp_SendCommand( p_this, p_sys, "CWD %s", p_sys->url.psz_path
+                             ? p_sys->url.psz_path : "" ) < 0 ||
         ftp_ReadCommand( p_this, p_sys, NULL, &psz_arg ) != 2 )
         {
             msg_Err( p_access, "file or directory doesn't exist" );
@@ -799,8 +801,8 @@ static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
         /* "1xx" message */
         if( ftp_SendCommand( p_access, p_sys, "%s %s",
                              p_sys->out ? "STOR" : "RETR",
-                             p_sys->url.psz_path ?: "" ) < 0 ||
-            ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
+                           p_sys->url.psz_path ? p_sys->url.psz_path : "" ) < 0
+         || ftp_ReadCommand( p_access, p_sys, &i_answer, NULL ) > 2 )
         {
             msg_Err( p_access, "cannot retrieve file" );
             return VLC_EGENERIC;

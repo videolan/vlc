@@ -1362,13 +1362,16 @@ static int CdTextParse( vlc_meta_t ***ppp_tracks, int *pi_tracks,
                 }
                 break;
             case 0x01: /* Performer */
-                vlc_meta_SetArtist( p_track, psz_value ?: psz_default );
+                vlc_meta_SetArtist( p_track,
+                                    psz_value ? psz_value : psz_default );
                 break;
             case 0x05: /* Messages */
-                vlc_meta_SetDescription( p_track, psz_value ?: psz_default );
+                vlc_meta_SetDescription( p_track,
+                                         psz_value ? psz_value : psz_default );
                 break;
             case 0x07: /* Genre */
-                vlc_meta_SetGenre( p_track, psz_value ?: psz_default );
+                vlc_meta_SetGenre( p_track,
+                                   psz_value ? psz_value : psz_default );
                 break;
             /* FIXME unsupported:
              * 0x02: songwriter

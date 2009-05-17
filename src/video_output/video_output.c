@@ -1927,7 +1927,8 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     const deinterlace_mode_t *p_mode;
     for( p_mode = &p_deinterlace_mode[0]; p_mode->psz_mode; p_mode++ )
     {
-        if( !strcmp( p_mode->psz_mode, newval.psz_string ?: "" ) )
+        if( !strcmp( p_mode->psz_mode,
+                     newval.psz_string ? newval.psz_string : "" ) )
             break;
     }
     if( !p_mode->psz_mode )
@@ -2023,7 +2024,7 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
         else if( DeinterlaceIsPresent( p_vout, false ) )
             psz_mode = var_CreateGetNonEmptyString( p_vout, "sout-deinterlace-mode" );
     }
-    var_SetString( p_vout, "deinterlace", psz_mode ?: "" );
+    var_SetString( p_vout, "deinterlace", psz_mode ? psz_mode : "" );
     free( psz_mode );
 }
 

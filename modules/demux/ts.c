@@ -3217,7 +3217,8 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
             ts_teletext_page_t *p_dst = &p_page[i_page++];
 
             p_dst->i_type = p_src->i_teletext_type;
-            p_dst->i_magazine = p_src->i_teletext_magazine_number ? : 8;
+            p_dst->i_magazine = p_src->i_teletext_magazine_number
+                ? p_src->i_teletext_magazine_number : 8;
             p_dst->i_page = p_src->i_teletext_page_number;
             memcpy( p_dst->p_iso639, p_src->i_iso6392_language_code, 3 );
         }
@@ -3250,7 +3251,8 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
                 break;
             }
             /* FIXME check if it is the right split */
-            p_dst->i_magazine = (p_src->i_composition_page_id >> 8) ? : 8;
+            p_dst->i_magazine = (p_src->i_composition_page_id >> 8)
+                ? (p_src->i_composition_page_id >> 8) : 8;
             p_dst->i_page = p_src->i_composition_page_id & 0xff;
             memcpy( p_dst->p_iso639, p_src->i_iso6392_language_code, 3 );
         }
