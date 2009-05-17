@@ -166,7 +166,8 @@ void FileOpenPanel::browseFile()
     QStringList files = QFileDialog::getOpenFileNames( this );
     foreach( const QString &file, files)
     {
-        QListWidgetItem *item = new QListWidgetItem( toNativeSeparators( file ), ui.fileListWidg );
+        QListWidgetItem *item =
+            new QListWidgetItem( toNativeSeparators( file ), ui.fileListWidg );
         item->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled );
         ui.fileListWidg->addItem( item );
     }
