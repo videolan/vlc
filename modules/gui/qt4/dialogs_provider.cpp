@@ -400,7 +400,7 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
 {
     QStringList files = DialogsProvider::showSimpleOpen();
     int i = 0;
-	files.sort();
+    files.sort();
     foreach( const QString &file, files )
     {
         playlist_Add( THEPL, qtu( toNativeSeparators( file ) ), NULL,

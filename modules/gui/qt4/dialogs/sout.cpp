@@ -249,7 +249,7 @@ void SoutDialog::updateMRL()
 
     mrl = smrl.getMrl();
 
-    /* FIXME, deal with SAP 
+    /* FIXME, deal with SAP
     sout.b_sap = ui.sap->isChecked();
     sout.psz_group = strdup( qtu( ui.sapGroup->text() ) );
     sout.psz_name = strdup( qtu( ui.sapName->text() ) ); */
