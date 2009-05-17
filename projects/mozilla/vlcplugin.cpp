@@ -476,7 +476,7 @@ relativeurl:
             if( href )
             {
                 /* prepend base URL */
-                strcpy(href, psz_baseURL);
+                memcpy(href, psz_baseURL, baseLen+1);
 
                 /*
                 ** relative url could be empty,
@@ -491,7 +491,7 @@ relativeurl:
 
                 /* skip over protocol part  */
                 char *pathstart = strchr(href, ':');
-                char *pathend;
+                char *pathend = href+baseLen;
                 if( pathstart )
                 {
                     if( '/' == *(++pathstart) )
@@ -503,7 +503,6 @@ relativeurl:
                     }
                     /* skip over host part */
                     pathstart = strchr(pathstart, '/');
-                    pathend = href+baseLen;
                     if( ! pathstart )
                     {
                         // no path, add a / past end of url (over '\0')
@@ -521,7 +520,6 @@ relativeurl:
                         return NULL;
                     }
                     pathstart = href;
-                    pathend = href+baseLen;
                 }
 
                 /* relative URL made of an absolute path ? */
