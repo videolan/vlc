@@ -334,12 +334,14 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
         "Ctrl+Y" );
     menu->addSeparator();
 
+#ifdef ENABLE_SOUT
     addDPStaticEntry( menu, qtr( "Conve&rt / Save..." ), "",
         SLOT( openAndTranscodingDialogs() ), "Ctrl+R" );
     addDPStaticEntry( menu, qtr( "&Streaming..." ),
         ":/stream", SLOT( openAndStreamingDialogs() ),
         "Ctrl+S" );
     menu->addSeparator();
+#endif
 
     addDPStaticEntry( menu, qtr( "&Quit" ) ,
         ":/quit", SLOT( quit() ), "Ctrl+Q" );
