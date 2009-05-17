@@ -347,7 +347,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
 }
 
 /**
- * Tools, like Media Information, Preferences or Messages 
+ * Tools, like Media Information, Preferences or Messages
  **/
 QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
 {

@@ -224,7 +224,7 @@ void PLModel::addCallbacks()
 {
     /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
-    /* We went to the next item 
+    /* We went to the next item
     var_AddCallback( p_playlist, "item-current", PlaylistNext, this );
     */
     /* One item has been updated */
