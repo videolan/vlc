@@ -32,6 +32,7 @@
 #ifdef ENABLE_VLM
 #include "dialogs/open.hpp"
 #include "dialogs/sout.hpp"
+#include "util/qt_dirs.hpp"
 
 #include <QString>
 #include <QComboBox>
@@ -349,7 +350,7 @@ void VLMDialog::mediasPopulator()
 
 bool VLMDialog::importVLMConf()
 {
-    QString openVLMConfFileName = toNativeSeparator(
+    QString openVLMConfFileName = toNativeSeparators(
             QFileDialog::getOpenFileName(
             this, qtr( "Open VLM configuration..." ),
             qfu( config_GetHomeDir() ),
