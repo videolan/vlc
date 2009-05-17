@@ -902,7 +902,9 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
         }
         else
         {
-            //msg_Dbg( p_dec, "ProcessInput(): successful" );
+#ifdef DMO_DEBUG
+            msg_Dbg( p_dec, "ProcessInput(): successful" );
+#endif
             *pp_block = NULL;
         }
     }
