@@ -4,7 +4,7 @@
  * Copyright (C) 2002-2009 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
- *          Jan Paul Dinger <jpd@m2x.nl>
+ *          JP Dinger <jpd@m2x.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,17 +141,7 @@ LibvlcRootNPObject::getProperty(int index, NPVariant &result)
                 OBJECT_TO_NPVARIANT(NPN_RetainObject(videoObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_VersionInfo:
-            {
-                const char *s = libvlc_get_version();
-                int len = strlen(s);
-                NPUTF8 *retval =(NPUTF8*)NPN_MemAlloc(len);
-                if( !retval )
-                    return INVOKERESULT_OUT_OF_MEMORY;
-
-                memcpy(retval, s, len);
-                STRINGN_TO_NPVARIANT(retval, len, result);
-                return INVOKERESULT_NO_ERROR;
-            }
+                return invokeResultString(libvlc_get_version(),result);
             default:
                 ;
         }
@@ -182,18 +172,9 @@ RuntimeNPObject::InvokeResult LibvlcRootNPObject::invoke(int index,
         switch( index )
         {
             case ID_root_versionInfo:
-                if( argCount == 0 )
-                {
-                    const char *s = libvlc_get_version();
-                    int len = strlen(s);
-                    NPUTF8 *retval =(NPUTF8*)NPN_MemAlloc(len);
-                    if( !retval )
-                        return INVOKERESULT_OUT_OF_MEMORY;
-                    memcpy(retval, s, len);
-                    STRINGN_TO_NPVARIANT(retval, len, result);
-                    return INVOKERESULT_NO_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
+                if( 0 != argCount )
+                    return INVOKERESULT_NO_SUCH_METHOD;
+                return invokeResultString(libvlc_get_version(),result);
             default:
                 ;
         }
@@ -590,77 +571,13 @@ LibvlcMessageNPObject::getProperty(int index, NPVariant &result)
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_message_type:
-            {
-                if( _msg.psz_type )
-                {
-                    int len = strlen(_msg.psz_type);
-                    NPUTF8* retval = (NPUTF8*)NPN_MemAlloc(len);
-                    if( retval )
-                    {
-                        memcpy(retval, _msg.psz_type, len);
-                        STRINGN_TO_NPVARIANT(retval, len, result);
-                    }
-                }
-                else
-                {
-                    NULL_TO_NPVARIANT(result);
-                }
-                return INVOKERESULT_NO_ERROR;
-            }
+                return invokeResultString(_msg.psz_type,result);
             case ID_message_name:
-            {
-                if( _msg.psz_name )
-                {
-                    int len = strlen(_msg.psz_name);
-                    NPUTF8* retval = (NPUTF8*)NPN_MemAlloc(len);
-                    if( retval )
-                    {
-                        memcpy(retval, _msg.psz_name, len);
-                        STRINGN_TO_NPVARIANT(retval, len, result);
-                    }
-                }
-                else
-                {
-                    NULL_TO_NPVARIANT(result);
-                }
-                return INVOKERESULT_NO_ERROR;
-            }
+                return invokeResultString(_msg.psz_name,result);
             case ID_message_header:
-            {
-                if( _msg.psz_header )
-                {
-                    int len = strlen(_msg.psz_header);
-                    NPUTF8* retval = (NPUTF8*)NPN_MemAlloc(len);
-                    if( retval )
-                    {
-                        memcpy(retval, _msg.psz_header, len);
-                        STRINGN_TO_NPVARIANT(retval, len, result);
-                    }
-                }
-                else
-                {
-                    NULL_TO_NPVARIANT(result);
-                }
-                return INVOKERESULT_NO_ERROR;
-            }
+                return invokeResultString(_msg.psz_header,result);
             case ID_message_message:
-            {
-                if( _msg.psz_message )
-                {
-                    int len = strlen(_msg.psz_message);
-                    NPUTF8* retval = (NPUTF8*)NPN_MemAlloc(len);
-                    if( retval )
-                    {
-                        memcpy(retval, _msg.psz_message, len);
-                        STRINGN_TO_NPVARIANT(retval, len, result);
-                    }
-                }
-                else
-                {
-                    NULL_TO_NPVARIANT(result);
-                }
-                return INVOKERESULT_NO_ERROR;
-            }
+                return invokeResultString(_msg.psz_message,result);
             default:
                 ;
         }
@@ -1134,10 +1051,9 @@ LibvlcPlaylistItemsNPObject::invoke(int index, const NPVariant *args,
 
 LibvlcPlaylistNPObject::~LibvlcPlaylistNPObject()
 {
-    if( isValid() )
-    {
-        if( playlistItemsObj ) NPN_ReleaseObject(playlistItemsObj);
-    }
+    // Why the isValid()?
+    if( isValid() && playlistItemsObj )
+        NPN_ReleaseObject(playlistItemsObj);
 };
 
 const NPUTF8 * const LibvlcPlaylistNPObject::propertyNames[] =
@@ -1315,8 +1231,8 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
                     }
                 }
 
-                int item = p_plugin->playlist_add_extended_untrusted(url, name, i_options,
-                               const_cast<const char **>(ppsz_options), &ex);
+                int item = p_plugin->playlist_add_extended_untrusted(url, name,
+                      i_options, const_cast<const char **>(ppsz_options), &ex);
                 free(url);
                 free(name);
                 for( int i=0; i< i_options; ++i )

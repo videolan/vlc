@@ -110,3 +110,24 @@ bool RuntimeNPObject::returnInvokeResult(RuntimeNPObject::InvokeResult result)
     }
     return false;
 }
+
+RuntimeNPObject::InvokeResult
+RuntimeNPObject::invokeResultString(const char *psz, NPVariant &result)
+{
+    if( !psz )
+        NULL_TO_NPVARIANT(result);
+    else
+    {
+        size_t len = strlen(psz);
+        NPUTF8* retval = (NPUTF8*)NPN_MemAlloc(len);
+        if( !retval )
+            return INVOKERESULT_OUT_OF_MEMORY;
+        else
+        {
+            memcpy(retval, psz, len);
+            STRINGN_TO_NPVARIANT(retval, len, result);
+        }
+    }
+    return INVOKERESULT_NO_ERROR;
+}
+

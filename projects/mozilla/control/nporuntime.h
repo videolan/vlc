@@ -127,6 +127,8 @@ protected:
 
     bool returnInvokeResult(InvokeResult result);
 
+    static InvokeResult invokeResultString(const char *,NPVariant &);
+
     bool isPluginRunning()
     {
         return _instance->pdata;
