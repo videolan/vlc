@@ -48,10 +48,16 @@ static void Close( vlc_object_t * );
 
 #define FOURCC_TEXT N_("FOURCC code of raw input format")
 #define FOURCC_LONGTEXT N_( \
-    "FOURCC code of the raw input format. This is a four character string. Default is s16l." )
+    "FOURCC code of the raw input format. This is a four character string." )
 
 #define LANG_TEXT N_("Forces the audio language.")
 #define LANG_LONGTEXT N_("Forces the audio language for the output mux. Three letter ISO639 code. Default is 'eng'. ")
+
+#ifdef WORDS_BIGENDIAN
+# define FOURCC_DEFAULT "s16b"
+#else
+# define FOURCC_DEFAULT "s16l"
+#endif
 
 vlc_module_begin();
     set_shortname( "Raw Audio" );
@@ -63,7 +69,8 @@ vlc_module_begin();
     add_shortcut( "rawaud" );
     add_integer( "rawaud-channels", 2, 0, CHANNELS_TEXT, CHANNELS_LONGTEXT, false );
     add_integer( "rawaud-samplerate", 48000, 0, SAMPLERATE_TEXT, SAMPLERATE_LONGTEXT, false );
-    add_string( "rawaud-fourcc", "s16l", NULL, FOURCC_TEXT, FOURCC_LONGTEXT, false );
+    add_string( "rawaud-fourcc", FOURCC_DEFAULT, NULL,
+                FOURCC_TEXT, FOURCC_LONGTEXT, false );
     add_string( "rawaud-lang", "eng", NULL, LANG_TEXT, LANG_LONGTEXT, false);
 vlc_module_end();
 
