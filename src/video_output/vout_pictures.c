@@ -38,6 +38,7 @@
 #include <vlc_filter.h>
 #include <vlc_image.h>
 #include <vlc_block.h>
+#include <vlc_picture_pool.h>
 
 #include "vout_pictures.h"
 #include "vout_internal.h"
@@ -664,6 +665,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int
     }
 
     p_picture->pf_release = NULL;
+    p_picture->p_release_sys = NULL;
     p_picture->pf_lock = NULL;
     p_picture->pf_unlock = NULL;
     p_picture->i_refcount = 0;
@@ -925,6 +927,7 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
 void picture_Delete( picture_t *p_picture )
 {
     assert( p_picture && p_picture->i_refcount == 0 );
+    assert( p_picture->p_release_sys == NULL );
 
     free( p_picture->p_q );
     free( p_picture->p_data_orig );
@@ -1047,4 +1050,3 @@ int picture_Export( vlc_object_t *p_obj,
 /*****************************************************************************
  *
  *****************************************************************************/
-

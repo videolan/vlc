@@ -52,6 +52,11 @@ typedef struct plane_t
 } plane_t;
 
 /**
+ * A private definition to help overloading picture release
+ */
+typedef struct picture_release_sys_t picture_release_sys_t;
+
+/**
  * Video picture
  *
  * Any picture destined to be displayed by a video output thread should be
@@ -113,6 +118,7 @@ struct picture_t
 
     /** This way the picture_Release can be overloaded */
     void (*pf_release)( picture_t * );
+    picture_release_sys_t *p_release_sys;
 
     /** Next picture in a FIFO a pictures */
     struct picture_t *p_next;
@@ -122,7 +128,7 @@ struct picture_t
  * This function will create a new picture.
  * The picture created will implement a default release management compatible
  * with picture_Hold and picture_Release. This default management will release
- * picture_sys_t *p_sys field if non NULL.
+ * p_sys, p_q, p_data_orig fields if non NULL.
  */
 VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
 
@@ -153,6 +159,17 @@ static inline void picture_Release( picture_t *p_picture )
     /* FIXME why do we let pf_release handle the i_refcount ? */
     if( p_picture->pf_release )
         p_picture->pf_release( p_picture );
+}
+
+/**
+ * This function will return true if you are not the only owner of the
+ * picture.
+ *
+ * It is only valid if it is created using picture_New.
+ */
+static inline bool picture_IsReferenced( picture_t *p_picture )
+{
+    return p_picture->i_refcount > 1;
 }
 
 /**
