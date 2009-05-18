@@ -93,6 +93,12 @@ enum libvlc_event_type_t {
     libvlc_MediaPlayerTitleChanged,
     libvlc_MediaPlayerSnapshotTaken,
     libvlc_MediaPlayerLengthChanged,
+
+    libvlc_VlmMediaAdded,
+    libvlc_VlmMediaRemoved,
+    libvlc_VlmMediaChanged,
+    libvlc_VlmMediaInstanceStarted,
+    libvlc_VlmMediaInstanceStopped,
     /* New event types HERE */
 };
 
@@ -212,6 +218,13 @@ struct libvlc_event_t
         {
             libvlc_time_t   new_length;
         } media_player_length_changed;
+
+        /* VLM media */
+        struct
+        {
+            const char * psz_media_name;
+        } vlm_media_event;
+
     } u;
 };
 

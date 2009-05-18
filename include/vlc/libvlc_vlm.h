@@ -333,6 +333,19 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *,
                                                            const char *, int,
                                                            libvlc_exception_t * );
 
+/**
+ * Get libvlc_event_manager from a vlm media.
+ * The p_event_manager is immutable, so you don't have to hold the lock
+ *
+ * \param p_instance a libvlc instance
+ * \param psz_name name of vlm media instance
+ * \param p_exception an initialized exception pointer
+ * \return libvlc_event_manager
+ */
+VLC_PUBLIC_API libvlc_event_manager_t *
+    libvlc_vlm_get_event_manager( libvlc_instance_t *,
+                                  libvlc_exception_t * );
+
 /** @} */
 
 # ifdef __cplusplus

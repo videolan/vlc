@@ -105,13 +105,63 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance,
 }
 
 #endif /* 0 */
+/* VLM events callback. Transmit to libvlc */
+static int VlmEvent( vlc_object_t *p_this, const char * name,
+                     vlc_value_t old_val, vlc_value_t newval, void *param )
+{
+    vlm_event_t *event = (vlm_event_t*)newval.p_address;
+    libvlc_event_manager_t *p_event_manager = (libvlc_event_manager_t *) param;
+    libvlc_event_t libvlc_event;
+
+    libvlc_event.u.vlm_media_event.psz_media_name = event->psz_name;
+
+    switch( event->i_type )
+    {
+    case VLM_EVENT_MEDIA_ADDED:
+        libvlc_event.type = libvlc_VlmMediaAdded;
+        break;
+    case VLM_EVENT_MEDIA_REMOVED:
+        libvlc_event.type = libvlc_VlmMediaRemoved;
+        break;
+    case VLM_EVENT_MEDIA_CHANGED:
+        libvlc_event.type = libvlc_VlmMediaChanged;
+        break;
+    case VLM_EVENT_MEDIA_INSTANCE_STARTED:
+        libvlc_event.type = libvlc_VlmMediaInstanceStarted;
+        break;
+    case VLM_EVENT_MEDIA_INSTANCE_STOPPED:
+        libvlc_event.type = libvlc_VlmMediaInstanceStopped;
+        break;
+    }
+    libvlc_event_send( p_event_manager, &libvlc_event );
+    return 0;
+}
 
 static int libvlc_vlm_init( libvlc_instance_t *p_instance,
                             libvlc_exception_t *p_exception )
 {
-    if( !p_instance->p_vlm )
-        p_instance->p_vlm = vlm_New( p_instance->p_libvlc_int );
+    if( !p_instance->p_event_manager )
+    {
+        p_instance->p_event_manager = libvlc_event_manager_new( p_instance->p_vlm,
+                                                                p_instance, p_exception );
+        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+                                                  libvlc_VlmMediaAdded, NULL );
+        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+                                                  libvlc_VlmMediaRemoved, NULL );
+        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+                                                  libvlc_VlmMediaChanged, NULL );
+        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+                                                  libvlc_VlmMediaInstanceStarted, NULL );
+        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+                                                  libvlc_VlmMediaInstanceStopped, NULL );
+    }
 
+    if( !p_instance->p_vlm )
+    {
+        p_instance->p_vlm = vlm_New( p_instance->p_libvlc_int );
+        var_AddCallback( (vlc_object_t *)p_instance->p_vlm, "intf-event", VlmEvent,
+                         p_instance->p_event_manager );
+    }
     if( !p_instance->p_vlm )
     {
         libvlc_exception_raise( p_exception,
@@ -529,4 +579,12 @@ int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
     if( p_mi )
         vlm_media_instance_Delete( p_mi );
     return p_mi ? 0 : -1;
+}
+
+libvlc_event_manager_t * libvlc_vlm_get_event_manager( libvlc_instance_t *p_instance,
+                                                       libvlc_exception_t *p_exception )
+{
+    vlm_t *p_vlm;
+    VLM_RET( p_vlm, NULL);
+    return p_instance->p_event_manager;
 }

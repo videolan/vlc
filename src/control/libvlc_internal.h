@@ -61,6 +61,7 @@ struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
     vlm_t        *p_vlm;
+    libvlc_event_manager_t *p_event_manager;
     int           b_playlist_locked;
     unsigned      ref_count;
     int           verbosity;
