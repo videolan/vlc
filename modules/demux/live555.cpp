@@ -18,9 +18,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -79,16 +79,16 @@ static void Close( vlc_object_t * );
     "value should be set in millisecond units." )
 
 #define KASENNA_TEXT N_( "Kasenna RTSP dialect")
-#define KASENNA_LONGTEXT N_( "Kasenna servers use an old and unstandard " \
-    "dialect of RTSP. When you set this parameter, VLC will try this dialect "\
-    "for communication. In this mode you cannot connect to normal RTSP servers." )
+#define KASENNA_LONGTEXT N_( "Kasenna servers use an old and nonstandard " \
+    "dialect of RTSP. With this parameter VLC will try this dialect, but "\
+    "then it cannot connect to normal RTSP servers." )
 
 #define USER_TEXT N_("RTSP user name")
-#define USER_LONGTEXT N_("Allows you to modify the user name that will " \
-    "be used for authenticating the connection.")
+#define USER_LONGTEXT N_("Sets the username for the connection, " \
+    "if no username or password are set in the url.")
 #define PASS_TEXT N_("RTSP password")
-#define PASS_LONGTEXT N_("Allows you to modify the password that will be " \
-    "used for the connection.")
+#define PASS_LONGTEXT N_("Sets the password for the connection, " \
+    "if no username or password are set in the url.")
 
 vlc_module_begin ()
     set_description( N_("RTP/RTSP/SDP demuxer (using Live555)" ) )
@@ -1348,11 +1348,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
 
             /* According to RFC 2326 p56 chapter 12.35 a RTSP server that
-             * supports Scale should:
+             * supports Scale:
              *
-             * "The server should try to approximate the viewing rate, but may
-             *  restrict the range of scale values that it supports. The response
-             *  MUST contain the actual scale value chosen by the server."
+             * "[...] should try to approximate the viewing rate, but
+             *  may restrict the range of scale values that it supports.
+             *  The response MUST contain the actual scale value chosen
+             *  by the server."
              *
              * Scale = 1 indicates normal play
              * Scale > 1 indicates fast forward
