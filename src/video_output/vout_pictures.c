@@ -38,7 +38,6 @@
 #include <vlc_filter.h>
 #include <vlc_image.h>
 #include <vlc_block.h>
-#include <vlc_picture_pool.h>
 
 #include "vout_pictures.h"
 #include "vout_internal.h"
