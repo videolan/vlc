@@ -268,7 +268,6 @@ static int  transcode_video_encoder_open( sout_stream_t *, sout_stream_id_t *);
 static int  transcode_video_process( sout_stream_t *, sout_stream_id_t *,
                                      block_t *, block_t ** );
 
-static void video_del_buffer( vlc_object_t *, picture_t * );
 static picture_t *video_new_buffer_decoder( decoder_t * );
 static void video_del_buffer_decoder( decoder_t *, picture_t * );
 static void video_link_picture_decoder( decoder_t *, picture_t * );
@@ -1434,8 +1433,7 @@ static void transcode_video_filter_allocation_clear( filter_t *p_filter )
     for( j = 0; j < PICTURE_RING_SIZE; j++ )
     {
         if( p_filter->p_owner->pp_pics[j] )
-            video_del_buffer( VLC_OBJECT(p_filter),
-                              p_filter->p_owner->pp_pics[j] );
+            picture_Delete( p_filter->p_owner->pp_pics[j] );
     }
     free( p_filter->p_owner );
 }
@@ -1780,8 +1778,7 @@ static void transcode_video_close( sout_stream_t *p_stream,
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
         {
             if( id->p_decoder->p_owner->pp_pics[i] )
-                video_del_buffer( VLC_OBJECT(id->p_decoder),
-                                  id->p_decoder->p_owner->pp_pics[i] );
+                picture_Delete( id->p_decoder->p_owner->pp_pics[i] );
         }
         free( id->p_decoder->p_owner );
     }
@@ -1819,7 +1816,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 msg_Dbg( p_stream, "late picture skipped (%"PRId64")",
                          current_date + 50000 - p_pic->date );
-                p_pic->pf_release( p_pic );
+                picture_Release( p_pic );
                 continue;
             }
         }
@@ -1850,7 +1847,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 msg_Dbg( p_stream, "dropping frame (%i)",
                          (int)(i_video_drift - i_master_drift) );
 #endif
-                p_pic->pf_release( p_pic );
+                picture_Release( p_pic );
                 continue;
             }
             else if( i_video_drift > (i_master_drift + 50000) )
@@ -1920,7 +1917,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
             {
-                p_pic->pf_release( p_pic );
+                picture_Release( p_pic );
                 transcode_video_close( p_stream, id );
                 id->b_transcode = false;
                 return VLC_EGENERIC;
@@ -1955,7 +1952,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 if( p_tmp )
                 {
                     picture_Copy( p_tmp, p_pic );
-                    p_pic->pf_release( p_pic );
+                    picture_Release( p_pic );
                     p_pic = p_tmp;
                 }
             }
@@ -2036,7 +2033,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
         if( p_sys->i_threads == 0 )
         {
-            p_pic->pf_release( p_pic );
+            picture_Release( p_pic );
         }
         else
         {
@@ -2093,14 +2090,14 @@ static void* EncoderThread( vlc_object_t* p_this )
         block_ChainAppend( &p_sys->p_buffers, p_block );
 
         vlc_mutex_unlock( &p_sys->lock_out );
-        p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
     }
 
     while( p_sys->i_last_pic != p_sys->i_first_pic )
     {
         p_pic = p_sys->pp_pics[p_sys->i_first_pic++];
         p_sys->i_first_pic %= PICTURE_RING_SIZE;
-        p_pic->pf_release( p_pic );
+        picture_Release( p_pic );
     }
     block_ChainRelease( p_sys->p_buffers );
 
@@ -2175,9 +2172,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this, picture_t **pp_ring,
                  "resetting its ring buffer" );
 
         for( i = 0; i < PICTURE_RING_SIZE; i++ )
-        {
-            pp_ring[i]->pf_release( pp_ring[i] );
-        }
+            picture_Release( pp_ring[i] );
 
         i = 0;
     }
@@ -2210,20 +2205,7 @@ static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
 static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
     return video_new_buffer( VLC_OBJECT(p_filter),
-                             p_filter->p_owner->pp_pics,
-                             p_filter->p_owner->p_sys );
-}
-
-static void video_del_buffer( vlc_object_t *p_this, picture_t *p_pic )
-{
-    VLC_UNUSED(p_this);
-    if( p_pic )
-    {
-        free( p_pic->p_q );
-        free( p_pic->p_data_orig );
-        free( p_pic->p_sys );
-        free( p_pic );
-    }
+                             p_filter->p_owner->pp_pics, p_filter->p_owner->p_sys );
 }
 
 static void video_del_buffer_decoder( decoder_t *p_decoder, picture_t *p_pic )
@@ -2245,13 +2227,13 @@ static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 static void video_link_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
     VLC_UNUSED(p_dec);
-    p_pic->i_refcount++;
+    picture_Hold( p_pic );
 }
 
 static void video_unlink_picture_decoder( decoder_t *p_dec, picture_t *p_pic )
 {
     VLC_UNUSED(p_dec);
-    video_release_buffer( p_pic );
+    picture_Release( p_pic );
 }
 
 /*
