@@ -238,6 +238,90 @@ STDMETHODIMP VLCAudio::put_track(long track)
     return hr;
 };
 
+STDMETHODIMP VLCAudio::get_count(long* trackNumber)
+{
+    if( NULL == trackNumber )
+        return E_POINTER;
+
+    libvlc_media_player_t* p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        // get the number of audio track available and return it
+        *trackNumber = libvlc_audio_get_track_count(p_md, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCAudio,
+                         libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+
+STDMETHODIMP VLCAudio::description(long trackID, BSTR* name)
+{
+    if( NULL == name )
+        return E_POINTER;
+
+    libvlc_media_player_t* p_md;
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        int i, i_limit;
+        const char *psz_name;
+        libvlc_track_description_t *p_trackDesc;
+
+        // get tracks description
+        p_trackDesc = libvlc_audio_get_track_description(p_md, &ex);
+        if(  libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+
+        //get the number of available track
+        i_limit = libvlc_audio_get_track_count(p_md, &ex);
+        if(  libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+
+        // check if the number given is a good one
+        if ( ( trackID > ( i_limit -1 ) ) || ( trackID < 0 ) )
+                return E_FAIL;
+
+        // get the good trackDesc
+        for( i = 0 ; i < trackID ; i++ )
+        {
+            p_trackDesc = p_trackDesc->p_next;
+        }
+        // get the track name
+        psz_name = p_trackDesc->psz_name;
+
+        // return it
+        if( psz_name != NULL )
+        {
+            *name = BSTRFromCStr(CP_UTF8, psz_name);
+            return (NULL == *name) ? E_OUTOFMEMORY : NOERROR;
+        }
+        *name = NULL;
+        return E_FAIL;
+    }
+    return hr;
+};
+
 STDMETHODIMP VLCAudio::get_channel(long *channel)
 {
     if( NULL == channel )
@@ -1645,6 +1729,213 @@ STDMETHODIMP VLCPlaylist::get_items(IVLCPlaylistItems** obj)
 
 /*******************************************************************************/
 
+VLCSubtitle::~VLCSubtitle()
+{
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCSubtitle::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCSubtitle, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCSubtitle::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCSubtitle::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCSubtitle::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCSubtitle::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCSubtitle::get_track(long* spu)
+{
+    if( NULL == spu )
+        return E_POINTER;
+
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        *spu = libvlc_video_get_spu(p_md, &ex);
+        if( ! libvlc_exception_raised(&ex) )
+        {
+            return NOERROR;
+        }
+        _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
+        libvlc_exception_clear(&ex);
+        return E_FAIL;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCSubtitle::put_track(long spu)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_spu(p_md, spu, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCSubtitle::get_count(long* spuNumber)
+{
+    if( NULL == spuNumber )
+        return E_POINTER;
+
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        // get the number of video subtitle available and return it
+        *spuNumber = libvlc_video_get_spu_count(p_md, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+           _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+        return NOERROR;
+    }
+    return hr;
+};
+
+
+STDMETHODIMP VLCSubtitle::description(long nameID, BSTR* name)
+{
+    if( NULL == name )
+       return E_POINTER;
+
+    libvlc_media_player_t* p_md;
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        int i, i_limit;
+        const char *psz_name;
+        libvlc_track_description_t *p_spuDesc;
+
+        // get subtitles description
+        p_spuDesc = libvlc_video_get_spu_description(p_md, &ex);
+        if(  libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+
+        // get the number of available subtitle
+        i_limit = libvlc_video_get_spu_count(p_md, &ex);
+        if( libvlc_exception_raised(&ex) )
+        {
+            _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
+            libvlc_exception_clear(&ex);
+            return E_FAIL;
+        }
+
+        // check if the number given is a good one
+        if ( ( nameID > ( i_limit -1 ) ) || ( nameID < 0 ) )
+            return E_FAIL;
+
+        // get the good spuDesc
+        for( i = 0 ; i < nameID ; i++ )
+        {
+            p_spuDesc = p_spuDesc->p_next;
+        }
+        // get the subtitle name
+        psz_name = p_spuDesc->psz_name;
+
+        // return it
+        if( psz_name != NULL )
+        {
+            *name = BSTRFromCStr(CP_UTF8, psz_name);
+            return (NULL == *name) ? E_OUTOFMEMORY : NOERROR;
+        }
+        *name = NULL;
+        return E_FAIL;
+    }
+    return hr;
+};
+
+/*******************************************************************************/
+
 VLCVideo::~VLCVideo()
 {
     if( _p_typeinfo )
@@ -2104,18 +2395,21 @@ VLCControl2::VLCControl2(VLCPlugin *p_instance) :
     _p_vlcaudio(NULL),
     _p_vlcinput(NULL),
     _p_vlcplaylist(NULL),
+    _p_vlcsubtitle(NULL),
     _p_vlcvideo(NULL)
 {
     _p_vlcaudio     = new VLCAudio(p_instance);
     _p_vlcinput     = new VLCInput(p_instance);
     _p_vlclog       = new VLCLog(p_instance);
     _p_vlcplaylist  = new VLCPlaylist(p_instance);
+    _p_vlcsubtitle  = new VLCSubtitle(p_instance);
     _p_vlcvideo     = new VLCVideo(p_instance);
 };
 
 VLCControl2::~VLCControl2()
 {
     delete _p_vlcvideo;
+    delete _p_vlcsubtitle;
     delete _p_vlcplaylist;
     delete _p_vlclog;
     delete _p_vlcinput;
@@ -2422,6 +2716,20 @@ STDMETHODIMP VLCControl2::get_playlist(IVLCPlaylist** obj)
     if( NULL != _p_vlcplaylist )
     {
         _p_vlcplaylist->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
+};
+
+STDMETHODIMP VLCControl2::get_subtitle(IVLCSubtitle** obj)
+{
+    if( NULL == obj )
+        return E_POINTER;
+
+    *obj = _p_vlcsubtitle;
+    if( NULL != _p_vlcsubtitle )
+    {
+        _p_vlcsubtitle->AddRef();
         return NOERROR;
     }
     return E_OUTOFMEMORY;
