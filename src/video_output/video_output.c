@@ -983,17 +983,6 @@ static int InitThread( vout_thread_t *p_vout )
         }
     }
 
-    /* Link pictures back to their heap */
-    for( i = 0 ; i < I_RENDERPICTURES ; i++ )
-    {
-        PP_RENDERPICTURE[ i ]->p_heap = &p_vout->render;
-    }
-
-    for( i = 0 ; i < I_OUTPUTPICTURES ; i++ )
-    {
-        PP_OUTPUTPICTURE[ i ]->p_heap = &p_vout->output;
-    }
-
     return VLC_SUCCESS;
 }
 

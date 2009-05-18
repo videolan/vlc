@@ -408,8 +408,6 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                   p_vout->fmt_out.i_aspect );
             p_tmp_pic->i_type = MEMORY_PICTURE;
             p_tmp_pic->i_status = RESERVED_PICTURE;
-            /* some modules (such as blend)  needs to know the extra information in picture heap */
-            p_tmp_pic->p_heap = &p_vout->output;
         }
 
         /* Convert image to the first direct buffer */

@@ -103,9 +103,6 @@ struct picture_t
     int             i_qtype;                       /**< quantification style */
     /**@}*/
 
-    /** The picture heap we are attached to */
-    picture_heap_t* p_heap;
-
     /* Some vouts require the picture to be locked before it can be modified */
     int (* pf_lock) ( vout_thread_t *, picture_t * );
     int (* pf_unlock) ( vout_thread_t *, picture_t * );
