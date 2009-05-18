@@ -45,6 +45,7 @@
 #include <vlc_dialog.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
+#include <vlc_strings.h>
 
 #include <iostream>
 #include <limits.h>
@@ -1781,8 +1782,6 @@ static void* TimeoutPrevention( void *p_data )
 /*****************************************************************************
  *
  *****************************************************************************/
-static int b64_decode( char *dest, char *src );
-
 static int ParseASF( demux_t *p_demux )
 {
     demux_sys_t    *p_sys = p_demux->p_sys;
@@ -1811,7 +1810,8 @@ static int ParseASF( demux_t *p_demux )
 
     /* Always smaller */
     p_header = block_New( p_demux, psz_end - psz_asf );
-    p_header->i_buffer = b64_decode( (char*)p_header->p_buffer, psz_asf );
+    p_header->i_buffer = vlc_b64_decode_binary_to_buffer( p_header->p_buffer,
+                                               p_header->i_buffer, psz_asf );
     //msg_Dbg( p_demux, "Size=%d Hdrb64=%s", p_header->i_buffer, psz_asf );
     if( p_header->i_buffer <= 0 )
     {
@@ -1834,9 +1834,8 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
                                           unsigned int& configSize )
 {
     char *dup, *psz;
-    int i, i_records = 1;
+    size_t i_records = 1;
 
-    if( configSize )
     configSize = 0;
 
     if( configStr == NULL || *configStr == '\0' )
@@ -1844,7 +1843,7 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
 
     psz = dup = strdup( configStr );
 
-    /* Count the number of comma's */
+    /* Count the number of commas */
     for( psz = dup; *psz != '\0'; ++psz )
     {
         if( *psz == ',')
@@ -1854,79 +1853,21 @@ static unsigned char* parseH264ConfigStr( char const* configStr,
         }
     }
 
-    unsigned char *cfg = new unsigned char[5 * strlen(dup)];
+    size_t configMax = 5*strlen(dup);
+    unsigned char *cfg = new unsigned char[configMax];
     psz = dup;
-    for( i = 0; i < i_records; i++ )
+    for( size_t i = 0; i < i_records; ++i )
     {
         cfg[configSize++] = 0x00;
         cfg[configSize++] = 0x00;
         cfg[configSize++] = 0x00;
         cfg[configSize++] = 0x01;
 
-        configSize += b64_decode( (char*)&cfg[configSize], psz );
+        configSize += vlc_b64_decode_binary_to_buffer( cfg+configSize,
+                                          configMax-configSize, psz );
         psz += strlen(psz)+1;
     }
 
     free( dup );
     return cfg;
-}
-
-/*char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";*/
-static int b64_decode( char *dest, char *src )
-{
-    const char *dest_start = dest;
-    int  i_level;
-    int  last = 0;
-    int  b64[256] = {
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 00-0F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 10-1F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,  /* 20-2F */
-        52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,  /* 30-3F */
-        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,  /* 40-4F */
-        15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,  /* 50-5F */
-        -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,  /* 60-6F */
-        41,42,43,44,45,46,47,48,49,50,51,-1,-1,-1,-1,-1,  /* 70-7F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 80-8F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 90-9F */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* A0-AF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* B0-BF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* C0-CF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* D0-DF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* E0-EF */
-        -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1   /* F0-FF */
-        };
-
-    for( i_level = 0; *src != '\0'; src++ )
-    {
-        int  c;
-
-        c = b64[(unsigned int)*src];
-        if( c == -1 )
-        {
-            continue;
-        }
-
-        switch( i_level )
-        {
-            case 0:
-                i_level++;
-                break;
-            case 1:
-                *dest++ = ( last << 2 ) | ( ( c >> 4)&0x03 );
-                i_level++;
-                break;
-            case 2:
-                *dest++ = ( ( last << 4 )&0xf0 ) | ( ( c >> 2 )&0x0f );
-                i_level++;
-                break;
-            case 3:
-                *dest++ = ( ( last &0x03 ) << 6 ) | c;
-                i_level = 0;
-        }
-        last = c;
-    }
-
-    *dest = '\0';
-
-    return dest - dest_start;
 }
