@@ -1916,7 +1916,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
         {
             video_format_t fmt;
 
-            if( p_pic->i_refcount > 1 && !filter_chain_GetLength( id->p_f_chain ) )
+            if( picture_IsReferenced( p_pic ) && !filter_chain_GetLength( id->p_f_chain ) )
             {
                 /* We can't modify the picture, we need to duplicate it */
                 picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
