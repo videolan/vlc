@@ -13,7 +13,25 @@
 -	  "-DPACKAGE_VERSION_MAJOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_major"` \
 -	  "-DPACKAGE_VERSION_MINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_minor"` \
 -	  "-DPACKAGE_VERSION_SUBMINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_subminor"` \
-+	$(WINDRES) `$(top_srcdir)/../windows/windres-options --escape $(VERSION)`\
++	$(WINDRES) --use-temp-file `$(top_srcdir)/../windows/windres-options --escape $(VERSION)`\
  	  -i $(srcdir)/libintl.rc -o libintl.res --output-format=coff
  
  ref-add.sed: $(srcdir)/ref-add.sin
+--- gettext-0.17/gettext-runtime/intl/libintl.rc        2007-05-27 21:46:52.000000000 +0000
++++ gettext/gettext-runtime/intl/libintl.rc     2009-05-18 18:09:12.000000000 +0000
+@@ -22,13 +22,13 @@
+             VALUE "Comments", "This library is free software; you can redistribute it and/or modify it under the terms of the GNU Library General Public License. You should have received a copy of the GNU Library General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA\0"
+             VALUE "CompanyName", "Free Software Foundation\0"
+             VALUE "FileDescription", "LGPLed libintl for Windows NT/2000/XP/Vista and Windows 95/98/ME\0"
+-            VALUE "FileVersion", PACKAGE_VERSION_STRING "\0"
++            VALUE "FileVersion", "\0"
+             VALUE "InternalName", "intl.dll\0"
+             VALUE "LegalCopyright", "Copyright (C) 1995-2007\0"
+             VALUE "LegalTrademarks", "\0"
+             VALUE "OriginalFilename", "intl.dll\0"
+             VALUE "ProductName", "libintl: accessing NLS message catalogs\0"
+-            VALUE "ProductVersion", PACKAGE_VERSION_STRING "\0"
++            VALUE "ProductVersion", "\0"
+         END
+     END
+     BLOCK "VarFileInfo"
