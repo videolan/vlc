@@ -624,7 +624,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             if( p_val && p_val->psz_string )
                 p_var->psz_text = strdup( p_val->psz_string );
             else
-                p_val->psz_text = NULL;
+                p_var->psz_text = NULL;
             break;
         case VLC_VAR_GETTEXT:
             p_val->psz_string = NULL;
