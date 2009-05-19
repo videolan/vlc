@@ -50,8 +50,6 @@ typedef struct
 
 typedef struct
 {
-    mtime_t i_pts;                                 /* presentation timestamp */
-
     int   pi_offset[2];                              /* byte offsets to data */
     uint16_t *p_data;
 
@@ -68,7 +66,7 @@ typedef struct
 } subpicture_data_t;
 
 static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *,
-                             spu_properties_t * );
+                             spu_properties_t *, mtime_t i_pts );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
                              const spu_properties_t * );
 static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *,
@@ -78,7 +76,7 @@ static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *,
  * AddNibble: read a nibble from a source packet and add it to our integer.
  *****************************************************************************/
 static inline unsigned int AddNibble( unsigned int i_code,
-                                      uint8_t *p_src, unsigned int *pi_index )
+                                      const uint8_t *p_src, unsigned int *pi_index )
 {
     if( *pi_index & 0x1 )
     {
@@ -107,30 +105,13 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
     p_spu = decoder_NewSubpicture( p_dec );
     if( !p_spu ) return NULL;
 
-    /* */
-    spu_data.p_data = NULL;
-    spu_data.b_palette = false;
-    spu_data.b_auto_crop = false;
-    spu_data.i_y_top_offset = 0;
-    spu_data.i_y_bottom_offset = 0;
-
-    spu_data.pi_alpha[0] = 0x00;
-    spu_data.pi_alpha[1] = 0x0f;
-    spu_data.pi_alpha[2] = 0x0f;
-    spu_data.pi_alpha[3] = 0x0f;
-
-    /* Get display time now. If we do it later, we may miss the PTS. */
-    spu_data.i_pts = p_sys->i_pts;
-
     p_spu->i_original_picture_width =
         p_dec->fmt_in.subs.spu.i_original_frame_width;
     p_spu->i_original_picture_height =
         p_dec->fmt_in.subs.spu.i_original_frame_height;
 
-    memset( &spu_properties, 0, sizeof(spu_properties) );
-
     /* Getting the control part */
-    if( ParseControlSeq( p_dec, p_spu, &spu_data, &spu_properties ) )
+    if( ParseControlSeq( p_dec, p_spu, &spu_data, &spu_properties, p_sys->i_pts ) )
     {
         /* There was a parse error, delete the subpicture */
         decoder_DeleteSubpicture( p_dec, p_spu );
@@ -176,7 +157,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
 static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
-                            subpicture_data_t *p_spu_data, spu_properties_t *p_spu_properties )
+                            subpicture_data_t *p_spu_data, spu_properties_t *p_spu_properties, mtime_t i_pts )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -196,6 +177,20 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     /* Initialize the structure */
     p_spu->i_start = p_spu->i_stop = 0;
     p_spu->b_ephemer = false;
+
+    memset( p_spu_properties, 0, sizeof(*p_spu_properties) );
+
+    /* */
+    p_spu_data->p_data = NULL;
+    p_spu_data->b_palette = false;
+    p_spu_data->b_auto_crop = false;
+    p_spu_data->i_y_top_offset = 0;
+    p_spu_data->i_y_bottom_offset = 0;
+
+    p_spu_data->pi_alpha[0] = 0x00;
+    p_spu_data->pi_alpha[1] = 0x0f;
+    p_spu_data->pi_alpha[2] = 0x0f;
+    p_spu_data->pi_alpha[3] = 0x0f;
 
     for( i_index = 4 + p_sys->i_rle_size; i_index < p_sys->i_spu_size ; )
     {
@@ -231,19 +226,19 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
         switch( i_command )
         {
         case SPU_CMD_FORCE_DISPLAY: /* 00 (force displaying) */
-            p_spu->i_start = p_spu_data->i_pts + date;
+            p_spu->i_start = i_pts + date;
             p_spu->b_ephemer = true;
             i_index += 1;
             break;
 
         /* Convert the dates in seconds to PTS values */
         case SPU_CMD_START_DISPLAY: /* 01 (start displaying) */
-            p_spu->i_start = p_spu_data->i_pts + date;
+            p_spu->i_start = i_pts + date;
             i_index += 1;
             break;
 
         case SPU_CMD_STOP_DISPLAY: /* 02 (stop displaying) */
-            p_spu->i_stop = p_spu_data->i_pts + date;
+            p_spu->i_stop = i_pts + date;
             i_index += 1;
             break;
 
@@ -428,9 +423,7 @@ static int ParseRLE( decoder_t *p_dec,
                      const spu_properties_t *p_spu_properties )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint8_t       *p_src = &p_sys->buffer[4];
-
-    unsigned int i_code;
+    const uint8_t *p_src = &p_sys->buffer[4];
 
     unsigned int i_width = p_spu_properties->i_width;
     unsigned int i_height = p_spu_properties->i_height;
@@ -457,42 +450,19 @@ static int ParseRLE( decoder_t *p_dec,
 
     for( i_y = 0 ; i_y < i_height ; i_y++ )
     {
+        unsigned int i_code;
         pi_offset = pi_table + i_id;
 
         for( i_x = 0 ; i_x < i_width ; i_x += i_code >> 2 )
         {
-            i_code = AddNibble( 0, p_src, pi_offset );
-
-            if( i_code < 0x04 )
-            {
+            i_code = 0;
+            for( unsigned int i_min = 1; i_min <= 0x40 && i_code < i_min; i_min <<= 2 )
                 i_code = AddNibble( i_code, p_src, pi_offset );
-
-                if( i_code < 0x10 )
-                {
-                    i_code = AddNibble( i_code, p_src, pi_offset );
-
-                    if( i_code < 0x040 )
-                    {
-                        i_code = AddNibble( i_code, p_src, pi_offset );
-
-                        if( i_code < 0x0100 )
-                        {
-                            /* If the 14 first bits are set to 0, then it's a
-                             * new line. We emulate it. */
-                            if( i_code < 0x0004 )
-                            {
-                                i_code |= ( i_width - i_x ) << 2;
-                            }
-                            else
-                            {
-                                /* We have a boo boo ! */
-                                msg_Err( p_dec, "unknown RLE code "
-                                         "0x%.4x", i_code );
-                                return VLC_EGENERIC;
-                            }
-                        }
-                    }
-                }
+            if( i_code < 0x0004 )
+            {
+                /* If the 14 first bits are set to 0, then it's a
+                 * new line. We emulate it. */
+                i_code |= ( i_width - i_x ) << 2;
             }
 
             if( ( (i_code >> 2) + i_x + i_y * i_width ) > i_height * i_width )
