@@ -171,14 +171,11 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
                                     int * py_pos )
   : ConfigControl( p_this, p_item, parent, hInst )
 {
-    // Number of keys descriptions
-    unsigned int i_keys = sizeof(vlc_keys)/sizeof(key_descriptor_t);
-
     // Init the keys decriptions array
     if( m_keysList == NULL )
     {
-        m_keysList = new string[i_keys];
-        for( unsigned int i = 0; i < i_keys; i++ )
+        m_keysList = new string[vlc_num_keys];
+        for( size_t i = 0; i < vlc_num_keys; ++i )
         {
             m_keysList[i] = vlc_keys[i].psz_key_string;
         }
@@ -233,7 +230,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
 
     *py_pos += 15 + 10;
 
-    for( unsigned int i = 0; i < i_keys ; i++ )
+    for( size_t i = 0; i < vlc_num_keys ; ++i )
     {
         ComboBox_AddString( combo, _FROMMB(m_keysList[i].c_str()) );
         ComboBox_SetItemData( combo, i, (void*)vlc_keys[i].i_key_code );

@@ -108,6 +108,8 @@ static const struct key_descriptor_s vlc_modifiers[] =
     { "Meta", KEY_MODIFIER_META },
     { "Command", KEY_MODIFIER_COMMAND }
 };
+enum { vlc_num_modifiers=sizeof(vlc_modifiers)
+                        /sizeof(struct key_descriptor_s) };
 
 static const struct key_descriptor_s vlc_keys[] =
 {
@@ -221,11 +223,12 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Media Stop", KEY_MEDIA_STOP },
     { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE }
 };
+enum { vlc_num_keys=sizeof(vlc_keys)/sizeof(struct key_descriptor_s) };
 
 static inline const char *KeyToString( int i_key )
 {
-    unsigned int i = 0;
-    for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++ )
+    size_t i;
+    for ( i = 0; i < vlc_num_keys; ++i )
     {
         if ( vlc_keys[i].i_key_code == i_key )
         {
@@ -237,8 +240,8 @@ static inline const char *KeyToString( int i_key )
 
 static inline int StringToKey( char *psz_key )
 {
-    unsigned int i = 0;
-    for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++ )
+    size_t i;
+    for ( i = 0; i < vlc_num_keys; ++i )
     {
         if ( !strcmp( vlc_keys[i].psz_key_string, psz_key ))
         {
