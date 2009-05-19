@@ -103,6 +103,7 @@ static const char *const ppsz_filter_options[] = {
 
 struct filter_sys_t
 {
+    vlc_mutex_t lock;
     int i_u, i_v, i_ut, i_vt;
     uint8_t *p_at;
 };
@@ -131,6 +132,7 @@ static int Create( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
     int val;
+    vlc_mutex_init( &p_sys->lock );
 #define GET_VAR( name, min, max )                                           \
     val = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name );        \
     p_sys->i_##name = __MIN( max, __MAX( min, val ) );                      \
@@ -159,6 +161,7 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, CFG_PREFIX "vt", BluescreenCallback, p_sys );
 
     free( p_sys->p_at );
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -187,10 +190,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_sys->p_at = realloc( p_sys->p_at, i_lines * i_pitch * sizeof( uint8_t ) );
     p_at = p_sys->p_at;
 
+    vlc_mutex_lock( &p_sys->lock );
     umin = p_sys->i_u - p_sys->i_ut >= 0x00 ? p_sys->i_u - p_sys->i_ut : 0x00;
     umax = p_sys->i_u + p_sys->i_ut <= 0xff ? p_sys->i_u + p_sys->i_ut : 0xff;
     vmin = p_sys->i_v - p_sys->i_vt >= 0x00 ? p_sys->i_v - p_sys->i_vt : 0x00;
     vmax = p_sys->i_v + p_sys->i_vt <= 0xff ? p_sys->i_v + p_sys->i_vt : 0xff;
+    vlc_mutex_unlock( &p_sys->lock );
 
     for( i = 0; i < i_lines*i_pitch; i++ )
     {
@@ -260,23 +265,17 @@ static int BluescreenCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *) p_data;
 
+    vlc_mutex_lock( &p_sys->lock );
 #define VAR_IS( a ) !strcmp( psz_var, CFG_PREFIX a )
     if( VAR_IS( "u" ) )
-    {
         p_sys->i_u = __MAX( 0, __MIN( 255, newval.i_int ) );
-    }
     else if( VAR_IS( "v" ) )
-    {
         p_sys->i_v = __MAX( 0, __MIN( 255, newval.i_int ) );
-    }
     else if( VAR_IS( "ut" ) )
-    {
         p_sys->i_ut = __MAX( 0, __MIN( 255, newval.i_int ) );
-    }
     else if( VAR_IS( "vt" ) )
-    {
         p_sys->i_vt = __MAX( 0, __MIN( 255, newval.i_int ) );
-    }
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
