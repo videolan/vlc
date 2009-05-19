@@ -107,7 +107,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     if( b_special )
         subLayout->addWidget( volumeSlider );
     else
-        layout->addWidget( volumeSlider );
+        layout->addWidget( volumeSlider, 0, Qt::AlignBottom  );
 
     /* Set the volume from the config */
     volumeSlider->setValue( ( config_GetInt( p_intf, "volume" ) ) *
