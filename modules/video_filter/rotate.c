@@ -86,8 +86,9 @@ static const char *const ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
-    int     i_cos;
-    int     i_sin;
+    vlc_spinlock_t lock;
+    int            i_cos;
+    int            i_sin;
 };
 
 static inline void cache_trigo( int i_angle, int *i_sin, int *i_cos )
@@ -141,6 +142,7 @@ static int Create( vlc_object_t *p_this )
     cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
     var_Create( p_filter, FILTER_PREFIX "deciangle",
                 VLC_VAR_INTEGER|VLC_VAR_ISCOMMAND );
+    vlc_spin_init( &p_sys->lock );
     var_AddCallback( p_filter, FILTER_PREFIX "angle", RotateCallback, p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "deciangle",
                      PreciseRotateCallback, p_sys );
@@ -159,7 +161,7 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, FILTER_PREFIX "angle", RotateCallback, p_filter->p_sys );
     var_DelCallback( p_filter, FILTER_PREFIX "deciangle",
                      PreciseRotateCallback, p_filter->p_sys );
-
+    vlc_spin_destroy( &p_filter->p_sys->lock );
     free( p_filter->p_sys );
 }
 
@@ -170,8 +172,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i_plane;
-    const int i_sin = p_sys->i_sin, i_cos = p_sys->i_cos;
+    int i_sin, i_cos;
 
     if( !p_pic ) return NULL;
 
@@ -182,7 +183,12 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+    vlc_spin_lock( &p_sys->lock );
+    i_sin = p_sys->i_sin;
+    i_cos = p_sys->i_cos;
+    vlc_spin_unlock( &p_sys->lock );
+
+    for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
         const int i_visible_lines = p_pic->p[i_plane].i_visible_lines;
         const int i_visible_pitch = p_pic->p[i_plane].i_visible_pitch;
@@ -390,11 +396,9 @@ static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
-    filter_sys_t *p_sys = (filter_sys_t *)p_data;
-
-    cache_trigo( newval.i_int * 10, &p_sys->i_sin, &p_sys->i_cos );
-    return VLC_SUCCESS;
+    oldval.i_int *= 10;
+    newval.i_int *= 10;
+    return PreciseRotateCallback( p_this, psz_var, oldval, newval, p_data );
 }
 
 static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
@@ -403,7 +407,12 @@ static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
+    int i_sin, i_cos;
 
-    cache_trigo( newval.i_int, &p_sys->i_sin, &p_sys->i_cos );
+    cache_trigo( newval.i_int, &i_sin, &i_cos );
+    vlc_spin_lock( &p_sys->lock );
+    p_sys->i_sin = i_sin;
+    p_sys->i_cos = i_cos;
+    vlc_spin_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
