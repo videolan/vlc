@@ -2913,6 +2913,7 @@ static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
                 Control( p_obj, p_sys, i_fd, psz_name, i_cid,
                          strtol( ++psz_assign, &psz_parser, 0) );
             }
+            free( name.psz_string );
         }
 
         if( psz_parser < psz_assign )
@@ -2923,6 +2924,7 @@ static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
             psz_parser = ( *psz_delim ) ? ( psz_delim + 1 ) : psz_delim;
         }
     }
+    var_Change( p_obj, "allcontrols", VLC_VAR_FREELIST, &val, &text );
 }
 
 /*****************************************************************************
