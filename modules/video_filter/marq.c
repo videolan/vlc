@@ -210,27 +210,30 @@ static int CreateFilter( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
+
 #define CREATE_VAR( stor, type, var ) \
     p_sys->stor = var_CreateGet##type##Command( p_filter, var ); \
     var_AddCallback( p_filter, var, MarqueeCallback, p_sys );
 
+    p_sys->b_need_update = true;
     CREATE_VAR( i_xoff, Integer, "marq-x" );
     CREATE_VAR( i_yoff, Integer, "marq-y" );
     CREATE_VAR( i_timeout,Integer, "marq-timeout" );
-    CREATE_VAR( i_refresh,Integer, "marq-refresh" );
-    p_sys->i_refresh *= 1000;
+    p_sys->i_refresh = 1000 * var_CreateGetIntegerCommand( p_filter,
+                                                           "marq-refresh" );
+    var_AddCallback( p_filter, "marq-refresh", MarqueeCallback, p_sys );
     CREATE_VAR( i_pos, Integer, "marq-position" );
     CREATE_VAR( psz_marquee, String, "marq-marquee" );
     CREATE_VAR( p_style->i_font_alpha, Integer, "marq-opacity" );
+    p_sys->p_style->i_font_alpha =
+         255 - var_CreateGetIntegerCommand( p_filter, "marq-opacity" );
+    var_AddCallback( p_filter, "marq-opacity", MarqueeCallback, p_sys );
     CREATE_VAR( p_style->i_font_color, Integer, "marq-color" );
     CREATE_VAR( p_style->i_font_size, Integer, "marq-size" );
-
-    p_sys->p_style->i_font_alpha = 255 - p_sys->p_style->i_font_alpha ;
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
     p_sys->last_time = 0;
-    p_sys->b_need_update = true;
 
     return VLC_SUCCESS;
 }
@@ -241,9 +244,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    free( p_sys->p_style );
-    free( p_sys->psz_marquee );
 
     /* Delete the marquee variables */
 #define DEL_VAR(var) \
@@ -259,6 +259,8 @@ static void DestroyFilter( vlc_object_t *p_this )
     DEL_VAR( "marq-size" );
 
     vlc_mutex_destroy( &p_sys->lock );
+    free( p_sys->p_style );
+    free( p_sys->psz_marquee );
     free( p_sys );
 }
 
