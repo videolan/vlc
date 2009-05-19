@@ -218,6 +218,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     if( p_sys->p_menu == NULL )
         goto error;
 
+    /* FIXME: this plugin is not at all thread-safe w.r.t. callbacks */
     p_sys->p_menu->i_position = p_sys->i_position;
 
     /* Check if menu position was overridden */
@@ -289,7 +290,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_DelCallback( p_filter, OSD_CFG "update", OSDMenuCallback, p_sys );
     var_DelCallback( p_filter, OSD_CFG "alpha", OSDMenuCallback, p_sys );
 
-    if( p_sys )
+    if( p_sys ) /* FIXME: <-- WTF??? what about the 4 ones above? */
     {
         var_DelCallback( p_sys->p_menu, "osd-menu-update",
                          OSDMenuUpdateEvent, p_filter );

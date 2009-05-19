@@ -239,7 +239,7 @@ static int OpenPostproc( vlc_object_t *p_this )
                     &val, text.psz_string?&text:NULL );
     }
 
-    vlc_mutex_init( &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock ); /* FIXME: too late w.r.t. callback */
 
     p_filter->pf_video_filter = PostprocPict;
     p_sys->b_had_matrix = true;
@@ -254,6 +254,8 @@ static void ClosePostproc( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    /* FIXME: delete callbacks before mutex */
     vlc_mutex_destroy( &p_sys->lock );
     pp_free_context( p_sys->pp_context );
     if( p_sys->pp_mode ) pp_free_mode( p_sys->pp_mode );
