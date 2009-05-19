@@ -33,6 +33,10 @@
 #include <QRegExp>
 #include <QSignalMapper>
 
+#ifdef WIN32
+#include <shlobj.h>
+#endif
+
 RecentsMRL* RecentsMRL::instance = NULL;
 
 RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
@@ -66,7 +70,9 @@ void RecentsMRL::addRecent( const QString &mrl )
 {
     if ( !isActive || ( filter && filter->indexIn( mrl ) >= 0 ) )
         return;
-
+#ifdef WIN32
+    SHAddToRecentDocs( 0x00000002 , qtu( mrl ) );
+#endif
     msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
     int i_index = stack->indexOf( mrl );
     if( 0 <= i_index )
@@ -82,6 +88,7 @@ void RecentsMRL::addRecent( const QString &mrl )
     }
     QVLCMenu::updateRecents( p_intf );
     save();
+
 }
 
 void RecentsMRL::clear()
