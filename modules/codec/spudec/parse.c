@@ -181,6 +181,8 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     memset( p_spu_properties, 0, sizeof(*p_spu_properties) );
 
     /* */
+    p_spu_data->pi_offset[0] = -1;
+    p_spu_data->pi_offset[1] = -1;
     p_spu_data->p_data = NULL;
     p_spu_data->b_palette = false;
     p_spu_data->b_auto_crop = false;
@@ -384,6 +386,14 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
         return VLC_EGENERIC;
     }
 
+    const int i_spu_size = p_sys->i_spu - 4;
+    if( p_spu_data->pi_offset[0] < 0 || p_spu_data->pi_offset[0] >= i_spu_size ||
+        p_spu_data->pi_offset[1] < 0 || p_spu_data->pi_offset[1] >= i_spu_size )
+    {
+        msg_Err( p_dec, "invalid offset values" );
+        return VLC_EGENERIC;
+    }
+
     if( !p_spu->i_start )
     {
         msg_Err( p_dec, "no `start display' command" );
@@ -423,10 +433,9 @@ static int ParseRLE( decoder_t *p_dec,
                      const spu_properties_t *p_spu_properties )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    const uint8_t *p_src = &p_sys->buffer[4];
 
-    unsigned int i_width = p_spu_properties->i_width;
-    unsigned int i_height = p_spu_properties->i_height;
+    const unsigned int i_width = p_spu_properties->i_width;
+    const unsigned int i_height = p_spu_properties->i_height;
     unsigned int i_x, i_y;
 
     uint16_t *p_dest = p_spu_data->p_data;
@@ -457,7 +466,14 @@ static int ParseRLE( decoder_t *p_dec,
         {
             i_code = 0;
             for( unsigned int i_min = 1; i_min <= 0x40 && i_code < i_min; i_min <<= 2 )
-                i_code = AddNibble( i_code, p_src, pi_offset );
+            {
+                if( (*pi_offset >> 1) >= p_sys->i_spu_size )
+                {
+                    msg_Err( p_dec, "out of bounds while reading rle" );
+                    return VLC_EGENERIC;
+                }
+                i_code = AddNibble( i_code, &p_sys->buffer[4], pi_offset );
+            }
             if( i_code < 0x0004 )
             {
                 /* If the 14 first bits are set to 0, then it's a
