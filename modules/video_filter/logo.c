@@ -704,19 +704,15 @@ static int CreateFilter( vlc_object_t *p_this )
     p_logo_list->i_repeat =
         var_CreateGetIntegerCommand( p_filter, "logo-repeat" );
 
+    vlc_mutex_init( &p_logo_list->lock );
+    LoadLogoList( p_this, p_logo_list );
+
     var_AddCallback( p_filter, "logo-file", LogoCallback, p_sys );
     var_AddCallback( p_filter, "logo-x", LogoCallback, p_sys );
     var_AddCallback( p_filter, "logo-y", LogoCallback, p_sys );
     var_AddCallback( p_filter, "logo-position", LogoCallback, p_sys );
     var_AddCallback( p_filter, "logo-transparency", LogoCallback, p_sys );
     var_AddCallback( p_filter, "logo-repeat", LogoCallback, p_sys );
-
-    vlc_mutex_init( &p_logo_list->lock );
-    vlc_mutex_lock( &p_logo_list->lock );
-
-    LoadLogoList( p_this, p_logo_list );
-
-    vlc_mutex_unlock( &p_logo_list->lock );
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
