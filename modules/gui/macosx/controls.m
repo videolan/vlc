@@ -861,7 +861,7 @@
 
     /* clean up everything */
     if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
-    var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
+    var_FreeList( &val_list, &text_list );
 }
 
 - (IBAction)toggleVar:(id)sender

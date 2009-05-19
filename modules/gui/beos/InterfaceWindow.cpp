@@ -671,13 +671,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                                 &val_list, NULL );
                     if( val_list.p_list->i_count > val.i_int )
                     {
-                        var_Change( p_input, "chapter", VLC_VAR_FREELIST,
-                                    &val_list, NULL );
+                        var_FreeList( &val_list, NULL );
                         var_SetVoid( p_input, "next-chapter" );
                         break;
                     }
-                    var_Change( p_input, "chapter", VLC_VAR_FREELIST,
-                                &val_list, NULL );
+                    var_FreeList( &val_list, NULL );
                 }
 
                 /* Try to go to next title */
@@ -687,13 +685,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                                 &val_list, NULL );
                     if( val_list.p_list->i_count > val.i_int )
                     {
-                        var_Change( p_input, "title", VLC_VAR_FREELIST,
-                                    &val_list, NULL );
+                        var_FreeList( &val_list, NULL );
                         var_SetVoid( p_input, "next-title" );
                         break;
                     }
-                    var_Change( p_input, "title", VLC_VAR_FREELIST,
-                                &val_list, NULL );
+                    var_FreeList( &val_list, NULL );
                 }
 
                 /* Try to go to next file */
@@ -1264,7 +1260,7 @@ void LanguageMenu::AttachedToWindow()
         }
         AddItem( item );
     }
-    var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list );
+    var_FreeList( &val_list, &text_list );
 
     vlc_object_release( p_input );
 
@@ -1327,8 +1323,7 @@ void TitleMenu::AttachedToWindow()
             AddItem( item );
         }
 
-        var_Change( p_input, "title", VLC_VAR_FREELIST,
-                    &val_list, &text_list );
+        var_FreeList( &val_list, &text_list );
     }
     vlc_object_release( p_input );
     BMenu::AttachedToWindow();
@@ -1391,8 +1386,7 @@ void ChapterMenu::AttachedToWindow()
             AddItem( item );
         }
 
-        var_Change( p_input, "chapter", VLC_VAR_FREELIST,
-                    &val_list, &text_list );
+        var_FreeList( &val_list, &text_list );
     }
     vlc_object_release( p_input );
     BMenu::AttachedToWindow();

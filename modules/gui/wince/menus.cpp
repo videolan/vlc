@@ -688,7 +688,7 @@ HMENU CreateChoicesMenu( intf_thread_t *p_intf,
 
     /* Clean up everything */
     if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
-    var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
+    var_FreeList( &val_list, &text_list );
 
     return hSubMenu;
 }

@@ -450,8 +450,7 @@ mvar_t *mvar_InputVarSetNew( intf_thread_t *p_intf, char *name,
     }
     /* clean up everything */
     if( (i_type & VLC_VAR_TYPE) == VLC_VAR_STRING ) free( val.psz_string );
-    var_Change( p_sys->p_input, psz_variable, VLC_VAR_FREELIST, &val_list,
-                &text_list );
+    var_FreeList( &val_list, &text_list );
     return s;
 }
 

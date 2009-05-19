@@ -380,7 +380,7 @@ int libvlc_audio_get_track_count( libvlc_media_player_t *p_mi,
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     i_track_count = val_list.p_list->i_count;
-    var_Change( p_input_thread, "audio-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
 
     vlc_object_release( p_input_thread );
     return i_track_count;
@@ -429,7 +429,7 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi,
             break;
         }
     }
-    var_Change( p_input_thread, "audio-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
     return i_track;
 }
@@ -461,7 +461,7 @@ void libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track,
         libvlc_exception_raise( p_e, "Setting audio track failed" );
 
 end:
-    var_Change( p_input_thread, "audio-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
 }
 

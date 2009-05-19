@@ -2920,7 +2920,7 @@ static void SetAvailControlsByString( vlc_object_t *p_obj, demux_sys_t *p_sys,
             psz_parser = ( *psz_delim ) ? ( psz_delim + 1 ) : psz_delim;
         }
     }
-    var_Change( p_obj, "allcontrols", VLC_VAR_FREELIST, &val, &text );
+    var_FreeList( &val, &text );
 }
 
 /*****************************************************************************

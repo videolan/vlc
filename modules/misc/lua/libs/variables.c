@@ -200,7 +200,7 @@ static int vlclua_var_get_list( lua_State *L )
     if( i_ret < 0 ) return vlclua_push_ret( L, i_ret );
     vlclua_pushvalue( L, VLC_VAR_LIST, val );
     vlclua_pushvalue( L, VLC_VAR_LIST, text );
-    var_Change( *pp_obj, psz_var, VLC_VAR_FREELIST, &val, &text );
+    var_FreeList( &val, &text );
     return 2;
 }
 

@@ -416,6 +416,7 @@ __var_Command
 __var_Create
 __var_DelCallback
 __var_Destroy
+var_FreeList
 __var_Get
 var_GetChecked
 __var_Set

@@ -1123,7 +1123,7 @@ static void InitPrograms( input_thread_t * p_input )
             }
             else
             {
-                var_Change( p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
+                var_FreeList( &val, NULL );
             }
         }
     }
@@ -1138,7 +1138,7 @@ static void InitPrograms( input_thread_t * p_input )
     {
         demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
                         val.p_list );
-        var_Change( p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
+        var_FreeList( &val, NULL );
     }
     else
     {
@@ -3228,7 +3228,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
             es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
             es_out_Control( p_input->p->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
         }
-        var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list, NULL );
+        var_FreeList( &list, NULL );
     }
 }
 

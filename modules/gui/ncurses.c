@@ -1559,7 +1559,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 {
                     mvnprintw( y++, 0, COLS, _(" Title    : %d/%d"), val.i_int, val_list.p_list->i_count );
                 }
-                var_Change( p_input, "title", VLC_VAR_FREELIST, &val_list, NULL );
+                var_FreeList( &val_list, NULL );
             }
 
             /* Chapter */
@@ -1570,7 +1570,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
                 {
                     mvnprintw( y++, 0, COLS, _(" Chapter  : %d/%d"), val.i_int, val_list.p_list->i_count );
                 }
-                var_Change( p_input, "chapter", VLC_VAR_FREELIST, &val_list, NULL );
+                var_FreeList( &val_list, NULL );
             }
         }
         else

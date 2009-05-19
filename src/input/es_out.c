@@ -1689,7 +1689,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
                 break;
             }
         }
-        var_Change( p_sys->p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
+        var_FreeList( &val, NULL );
     }
     else if( p_sys->i_mode == ES_OUT_MODE_AUTO )
     {

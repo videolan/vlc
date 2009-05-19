@@ -692,7 +692,7 @@ void InputManager::sectionMenu()
             if( !strcmp( text.p_list->p_values[i].psz_string, "Title" ) )
                 root = i;
         }
-        var_Change( p_input, "title  0", VLC_VAR_FREELIST, &val, &text );
+        var_FreeList( &val, &text );
 
         var_SetInteger( p_input, "title  0", root );
     }
@@ -760,7 +760,7 @@ void InputManager::activateTeletext( bool b_enable )
                 i = 0;
             var_SetInteger( p_input, "spu-es", b_enable ? list.p_list->p_values[i].i_int : -1 );
         }
-        var_Change( p_input, "teletext-es", VLC_VAR_FREELIST, &list, &text );
+        var_FreeList( &list, &text );
     }
 }
 

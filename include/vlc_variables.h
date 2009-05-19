@@ -109,8 +109,7 @@
 #define VLC_VAR_GETCHOICES          0x0024
 #define VLC_VAR_FREECHOICES         0x0025
 #define VLC_VAR_GETLIST             0x0026
-#define VLC_VAR_FREELIST            0x0027
-#define VLC_VAR_CHOICESCOUNT        0x0028
+#define VLC_VAR_CHOICESCOUNT        0x0027
 
 #define VLC_VAR_INHERITVALUE        0x0030
 
@@ -133,6 +132,8 @@ VLC_EXPORT( int, var_GetChecked, ( vlc_object_t *, const char *, int, vlc_value_
 
 #define var_Command(a,b,c,d,e) __var_Command( VLC_OBJECT( a ), b, c, d, e )
 VLC_EXPORT( int, __var_Command, ( vlc_object_t *, const char *, const char *, const char *, char ** ) );
+
+VLC_EXPORT( void, var_FreeList, ( vlc_value_t *, vlc_value_t * ) );
 
 /**
  * __var_Create() with automatic casting.

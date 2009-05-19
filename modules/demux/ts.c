@@ -843,7 +843,7 @@ static void Close( vlc_object_t *p_this )
     {
         vlc_value_t val;
         val.p_list = p_sys->p_programs_list;
-        var_Change( p_demux, "programs", VLC_VAR_FREELIST, &val, NULL );
+        var_FreeList( &val, NULL );
     }
 
     /* If in dump mode, then close the file */

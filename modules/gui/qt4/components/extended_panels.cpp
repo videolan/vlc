@@ -692,8 +692,7 @@ void ExtV4l2::Refresh( void )
                             if( i_val == val2.p_list->p_values[j].i_int )
                                 combobox->setCurrentIndex( j );
                         }
-                        var_Change( p_obj, psz_var, VLC_VAR_FREELIST,
-                                    &val2, &text2 );
+                        var_FreeList( &val2, &text2 );
 
                         CONNECT( combobox, currentIndexChanged( int ), this,
                                  ValueChange( int ) );
@@ -758,7 +757,7 @@ void ExtV4l2::Refresh( void )
             }
             free( name.psz_string );
         }
-        var_Change( p_obj, "controls", VLC_VAR_FREELIST, &val, &text );
+        var_FreeList( &val, &text );
         vlc_object_release( p_obj );
     }
     else

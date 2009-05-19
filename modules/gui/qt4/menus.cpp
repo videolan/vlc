@@ -1129,7 +1129,7 @@ static bool IsMenuEmpty( const char *psz_var,
     }
 
     /* clean up everything */
-    var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
 
     return i_result;
 }
@@ -1344,7 +1344,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     currentGroup = NULL;
 
     /* clean up everything */
-    var_Change( p_object, psz_var, VLC_VAR_FREELIST, &val_list, &text_list );
+    var_FreeList( &val_list, &text_list );
 
 #undef CURVAL
 #undef CURTEXT

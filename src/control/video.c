@@ -272,7 +272,7 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
             break;
         }
     }
-    var_Change( p_input_thread, "spu-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
     return i_spu;
 }
@@ -289,7 +289,7 @@ int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi,
 
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     i_spu_count = val_list.p_list->i_count;
-    var_Change( p_input_thread, "spu-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
 
     vlc_object_release( p_input_thread );
     return i_spu_count;
@@ -334,7 +334,7 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     }
 
 end:
-    var_Change( p_input_thread, "spu-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
 }
 
@@ -496,7 +496,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
             if( list.p_list->i_count > 0 )
                 var_SetInteger( p_input_thread, "spu-es", list.p_list->p_values[0].i_int );
 
-            var_Change( p_input_thread, "teletext-es", VLC_VAR_FREELIST, &list, NULL );
+            var_FreeList( &list, NULL );
         }
     }
     vlc_object_release( p_input_thread );
@@ -514,7 +514,7 @@ int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
 
     var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     i_track_count = val_list.p_list->i_count;
-    var_Change( p_input_thread, "video-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
 
     vlc_object_release( p_input_thread );
     return i_track_count;
@@ -557,7 +557,7 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi,
             break;
         }
     }
-    var_Change( p_input_thread, "video-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
     return i_track;
 }
@@ -588,6 +588,6 @@ void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
     libvlc_exception_raise( p_e, "Video track out of range" );
 
 end:
-    var_Change( p_input_thread, "video-es", VLC_VAR_FREELIST, &val_list, NULL );
+    var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
 }

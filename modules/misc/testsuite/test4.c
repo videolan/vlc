@@ -123,7 +123,7 @@ static int Foo( vlc_object_t *p_this, char const *psz_cmd,
     {
         printf( "value %i: %s\n", i, val.p_list->p_values[i].psz_string );
     }
-    var_Change( p_this, "honk", VLC_VAR_FREELIST, &val, NULL );
+    var_FreeList( &val, NULL );
 
     var_Destroy( p_this, "honk" );
 
