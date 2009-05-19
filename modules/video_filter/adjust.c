@@ -113,6 +113,7 @@ static const char *const ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
+    vlc_mutex_t lock;
     double     f_contrast;
     double     f_brightness;
     int        i_hue;
@@ -172,6 +173,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->b_brightness_threshold =
         var_CreateGetBoolCommand( p_filter, "brightness-threshold" );
 
+    vlc_mutex_init( &p_sys->lock );
     var_AddCallback( p_filter, "contrast",   AdjustCallback, p_sys );
     var_AddCallback( p_filter, "brightness", AdjustCallback, p_sys );
     var_AddCallback( p_filter, "hue",        AdjustCallback, p_sys );
@@ -199,6 +201,7 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, "brightness-threshold",
                                              AdjustCallback, p_sys );
 
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -232,13 +235,15 @@ static picture_t *FilterPlanar( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    /* Getvariables */
+    /* Get variables */
+    vlc_mutex_lock( &p_sys->lock );
     i_cont = (int)( p_sys->f_contrast * 255 );
     i_lum = (int)( (p_sys->f_brightness - 1.0)*255 );
     f_hue = (float)( p_sys->i_hue * M_PI / 180 );
     i_sat = (int)( p_sys->f_saturation * 256 );
     f_gamma = 1.0 / p_sys->f_gamma;
     b_thres = p_sys->b_brightness_threshold;
+    vlc_mutex_unlock( &p_sys->lock );
 
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
@@ -469,13 +474,15 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    /* Getvariables */
+    /* Get variables */
+    vlc_mutex_lock( &p_sys->lock );
     i_cont = (int)( p_sys->f_contrast * 255 );
     i_lum = (int)( (p_sys->f_brightness - 1.0)*255 );
     f_hue = (float)( p_sys->i_hue * M_PI / 180 );
     i_sat = (int)( p_sys->f_saturation * 256 );
     f_gamma = 1.0 / p_sys->f_gamma;
     b_thres = p_sys->b_brightness_threshold;
+    vlc_mutex_unlock( &p_sys->lock );
 
     /*
      * Threshold mode drops out everything about luma, contrast and gamma.
@@ -659,6 +666,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
 
+    vlc_mutex_lock( &p_sys->lock );
     if( !strcmp( psz_var, "contrast" ) )
         p_sys->f_contrast = newval.f_float;
     else if( !strcmp( psz_var, "brightness" ) )
@@ -671,7 +679,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
         p_sys->f_gamma = newval.f_float;
     else if( !strcmp( psz_var, "brightness-threshold" ) )
         p_sys->b_brightness_threshold = newval.b_bool;
-    else
-        return VLC_EGENERIC;
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
