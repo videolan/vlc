@@ -86,7 +86,6 @@ static const char *const ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
-    int     i_angle;
     int     i_cos;
     int     i_sin;
 };
@@ -137,15 +136,15 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_sys->i_angle = var_CreateGetIntegerCommand( p_filter,
-                                                  FILTER_PREFIX "angle" ) * 10;
+    int i_angle = var_CreateGetIntegerCommand( p_filter,
+                                               FILTER_PREFIX "angle" ) * 10;
+    cache_trigo( i_angle, &p_sys->i_sin, &p_sys->i_cos );
     var_Create( p_filter, FILTER_PREFIX "deciangle",
                 VLC_VAR_INTEGER|VLC_VAR_ISCOMMAND );
     var_AddCallback( p_filter, FILTER_PREFIX "angle", RotateCallback, p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "deciangle",
                      PreciseRotateCallback, p_sys );
 
-    cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
 
     return VLC_SUCCESS;
 }
@@ -393,8 +392,8 @@ static int RotateCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
-    p_sys->i_angle = newval.i_int*10;
-    cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
+
+    cache_trigo( newval.i_int * 10, &p_sys->i_sin, &p_sys->i_cos );
     return VLC_SUCCESS;
 }
 
@@ -404,7 +403,7 @@ static int PreciseRotateCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
-    p_sys->i_angle = newval.i_int;
-    cache_trigo( p_sys->i_angle, &p_sys->i_sin, &p_sys->i_cos );
+
+    cache_trigo( newval.i_int, &p_sys->i_sin, &p_sys->i_cos );
     return VLC_SUCCESS;
 }
