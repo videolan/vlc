@@ -130,9 +130,10 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
+    int val;
 #define GET_VAR( name, min, max )                                           \
-    p_sys->i_##name = __MIN( max, __MAX( min,                               \
-        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name ) ) );      \
+    val = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX #name );        \
+    p_sys->i_##name = __MIN( max, __MAX( min, val ) );                      \
     var_AddCallback( p_filter, CFG_PREFIX #name, BluescreenCallback, p_sys );
 
     GET_VAR( u, 0x00, 0xff );
