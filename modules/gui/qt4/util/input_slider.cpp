@@ -168,7 +168,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
 
 #define c(i) colorList.at(i).toInt()
     gradient.setColorAt( 0.0, QColor( c(0), c(1), c(2) ) );
-    gradient.setColorAt( 0.2, QColor( c(3), c(4), c(5) ) );
+    gradient.setColorAt( 0.22, QColor( c(3), c(4), c(5) ) );
     gradient.setColorAt( 0.5, QColor( c(6), c(7), c(8) ) );
     gradient.setColorAt( 1.0, QColor( c(9), c(10), c(11) ) );
 
