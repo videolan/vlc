@@ -169,9 +169,26 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     /* Command and date */
     uint8_t i_command = SPU_CMD_END;
     mtime_t date = 0;
+    bool b_cmd_offset = false;
+    bool b_cmd_alpha = false;
+    subpicture_data_t spu_data_cmd;
 
     if( !p_spu || !p_spu_data )
         return VLC_EGENERIC;
+
+    /* Create working space for spu data */
+    memset( &spu_data_cmd, 0, sizeof(spu_data_cmd) );
+    spu_data_cmd.pi_offset[0] = -1;
+    spu_data_cmd.pi_offset[1] = -1;
+    spu_data_cmd.p_data = NULL;
+    spu_data_cmd.b_palette = false;
+    spu_data_cmd.b_auto_crop = false;
+    spu_data_cmd.i_y_top_offset = 0;
+    spu_data_cmd.i_y_bottom_offset = 0;
+    spu_data_cmd.pi_alpha[0] = 0x00;
+    spu_data_cmd.pi_alpha[1] = 0x0f;
+    spu_data_cmd.pi_alpha[2] = 0x0f;
+    spu_data_cmd.pi_alpha[3] = 0x0f;
 
     /* Initialize the structure */
     p_spu->i_start = p_spu->i_stop = 0;
@@ -180,18 +197,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     memset( p_spu_properties, 0, sizeof(*p_spu_properties) );
 
     /* */
-    p_spu_data->pi_offset[0] = -1;
-    p_spu_data->pi_offset[1] = -1;
-    p_spu_data->p_data = NULL;
-    p_spu_data->b_palette = false;
-    p_spu_data->b_auto_crop = false;
-    p_spu_data->i_y_top_offset = 0;
-    p_spu_data->i_y_bottom_offset = 0;
-
-    p_spu_data->pi_alpha[0] = 0x00;
-    p_spu_data->pi_alpha[1] = 0x0f;
-    p_spu_data->pi_alpha[2] = 0x0f;
-    p_spu_data->pi_alpha[3] = 0x0f;
+    *p_spu_data = spu_data_cmd;
 
     for( i_index = 4 + p_sys->i_rle_size; i_index < p_sys->i_spu_size ; )
     {
@@ -205,6 +211,9 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
+            /* */
+            b_cmd_offset = false;
+            b_cmd_alpha = false;
             /* Get the control sequence date */
             date = (mtime_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
 
@@ -256,7 +265,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 unsigned int idx[4];
                 int i;
 
-                p_spu_data->b_palette = true;
+                spu_data_cmd.b_palette = true;
 
                 idx[0] = (p_sys->buffer[i_index+1]>>4)&0x0f;
                 idx[1] = (p_sys->buffer[i_index+1])&0x0f;
@@ -268,9 +277,9 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                     uint32_t i_color = p_dec->fmt_in.subs.spu.palette[1+idx[i]];
 
                     /* FIXME: this job should be done sooner */
-                    p_spu_data->pi_yuv[3-i][0] = (i_color>>16) & 0xff;
-                    p_spu_data->pi_yuv[3-i][1] = (i_color>>0) & 0xff;
-                    p_spu_data->pi_yuv[3-i][2] = (i_color>>8) & 0xff;
+                    spu_data_cmd.pi_yuv[3-i][0] = (i_color>>16) & 0xff;
+                    spu_data_cmd.pi_yuv[3-i][1] = (i_color>>0) & 0xff;
+                    spu_data_cmd.pi_yuv[3-i][2] = (i_color>>8) & 0xff;
                 }
             }
 
@@ -284,10 +293,11 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
-            p_spu_data->pi_alpha[3] = (p_sys->buffer[i_index+1]>>4)&0x0f;
-            p_spu_data->pi_alpha[2] = (p_sys->buffer[i_index+1])&0x0f;
-            p_spu_data->pi_alpha[1] = (p_sys->buffer[i_index+2]>>4)&0x0f;
-            p_spu_data->pi_alpha[0] = (p_sys->buffer[i_index+2])&0x0f;
+            b_cmd_alpha = true;
+            spu_data_cmd.pi_alpha[3] = (p_sys->buffer[i_index+1]>>4)&0x0f;
+            spu_data_cmd.pi_alpha[2] = (p_sys->buffer[i_index+1])&0x0f;
+            spu_data_cmd.pi_alpha[1] = (p_sys->buffer[i_index+2]>>4)&0x0f;
+            spu_data_cmd.pi_alpha[0] = (p_sys->buffer[i_index+2])&0x0f;
 
             i_index += 3;
             break;
@@ -323,12 +333,25 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
+            b_cmd_offset = true;
             p_spu_data->pi_offset[0] = GetWBE(&p_sys->buffer[i_index+1]) - 4;
             p_spu_data->pi_offset[1] = GetWBE(&p_sys->buffer[i_index+3]) - 4;
             i_index += 5;
             break;
 
         case SPU_CMD_END: /* ff (end) */
+            if( b_cmd_offset )
+            {
+                /* It seems that palette and alpha from the block having
+                 * the cmd offset have to be used
+                 * XXX is it all ? */
+                p_spu_data->b_palette = spu_data_cmd.b_palette;
+                if( spu_data_cmd.b_palette )
+                    memcpy( p_spu_data->pi_yuv, spu_data_cmd.pi_yuv, sizeof(spu_data_cmd.pi_yuv) );
+                if( b_cmd_alpha )
+                    memcpy( p_spu_data->pi_alpha, spu_data_cmd.pi_alpha, sizeof(spu_data_cmd.pi_alpha) );
+            }
+
             i_index += 1;
             break;
 
@@ -358,16 +381,9 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
             }
         }
 
-        /* We need to check for quit commands here */
-        if( !vlc_object_alive (p_dec) )
-        {
-            return VLC_EGENERIC;
-        }
-
+        /* */
         if( i_command == SPU_CMD_END && i_index != i_next_seq )
-        {
             break;
-        }
     }
 
     /* Check that the next sequence index matches the current one */
