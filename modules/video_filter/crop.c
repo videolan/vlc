@@ -228,10 +228,7 @@ static int Init( vout_thread_t *p_vout )
                     config_GetInt( p_vout, "autocrop-non-black-pixels" );
     p_vout->p_sys->i_diff = config_GetInt( p_vout, "autocrop-diff" );
     p_vout->p_sys->i_time = config_GetInt( p_vout, "autocrop-time" );
-    vlc_value_t val={0};
-    var_Get( p_vout, "ratio-crop", &val );
-    val.psz_string = "0";
-    var_SetString( p_vout, "ratio-crop", val.psz_string);
+    var_SetString( p_vout, "ratio-crop", "0" );
 
     if (p_vout->p_sys->b_autocrop)
         p_vout->p_sys->i_ratio = 0;
