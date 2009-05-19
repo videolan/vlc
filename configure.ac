@@ -4960,7 +4960,7 @@ AC_ARG_ENABLE(qt4,
   AS_IF([test "${SYS}" = "darwin"], [enable_qt4=no])
 ])
 AS_IF([test "${enable_qt4}" != "no"], [
-  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.4.2], [
+  PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.4.0], [
     VLC_ADD_PLUGIN([qt4])
     AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
     ALIASES="${ALIASES} qvlc"
