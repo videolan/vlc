@@ -289,6 +289,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     p_sds->p_sd = p_sd;
     p_sds->p_one = p_one;
     p_sds->p_cat = p_cat;
+    p_sds->psz_name = strdup( psz_module );
 
     PL_LOCK;
     TAB_APPEND( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds, p_sds );
@@ -357,6 +358,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     PL_UNLOCK;
 
     vlc_sd_Destroy( p_sd );
+    free( p_sds->psz_name );
     free( p_sds );
 
     return VLC_SUCCESS;
