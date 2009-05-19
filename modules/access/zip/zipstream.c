@@ -488,8 +488,8 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
     /* Root node */
     node *playlist = new_node( psz_zip );
 
-    /* Web-Encode the URI and append '|' */
-    char *psz_pathtozip = make_URI( psz_zippath );
+    /* Web-Encode the URI and append '!' */
+    char *psz_pathtozip = vlc_UrlEncode( psz_zippath );
     if( astrcatf( &psz_pathtozip, ZIP_SEP ) < 0 ) return -1;
 
     int i_track = 0;
@@ -515,6 +515,11 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
             /* Build full MRL */
             char *psz_path = strdup( psz_pathtozip );
             if( astrcatf( &psz_path, psz_name ) < 0 ) return -1;
+
+            /* Double url-encode */
+            char *psz_tmp = psz_path;
+            psz_path = vlc_UrlEncode( psz_tmp );
+            free( psz_tmp );
 
             /* Track information */
             if( astrcatf( pp_buffer,
@@ -566,6 +571,8 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
 
     /* Close extension and playlist */
     if( astrcatf( pp_buffer, " </extension>\n</playlist>\n" ) < 0 ) return -1;
+
+    /* printf( "%s", *pp_buffer ); */
 
     free_all_node( playlist );
 

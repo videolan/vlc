@@ -64,7 +64,7 @@ int AccessOpen( vlc_object_t *p_this )
     int i_ret              = VLC_EGENERIC;
     unzFile file           = 0;
 
-    char *psz_path = NULL, *psz_sep = NULL;
+    char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
 
     p_access->p_sys = p_sys = (access_sys_t*)
             calloc( 1, sizeof( access_sys_t ) );
@@ -78,6 +78,7 @@ int AccessOpen( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     *psz_sep = '\0';
+    psz_pathToZip = unescape_URI_duplicate( psz_path );
     p_sys->psz_fileInzip = strdup( psz_sep + 1 );
 
     /* Define IO functions */
@@ -93,10 +94,10 @@ int AccessOpen( vlc_object_t *p_this )
     p_func->opaque       = p_access;
 
     /* Open zip archive */
-    file = p_access->p_sys->zipFile = unzOpen2( psz_path, p_func );
+    file = p_access->p_sys->zipFile = unzOpen2( psz_pathToZip, p_func );
     if( !file )
     {
-        msg_Err( p_access, "not a valid zip archive: '%s'", psz_path );
+        msg_Err( p_access, "not a valid zip archive: '%s'", psz_pathToZip );
         goto exit;
     }
 
@@ -130,6 +131,7 @@ exit:
         free( p_sys );
     }
 
+    free( psz_pathToZip );
     free( psz_path );
     return i_ret;
 }
