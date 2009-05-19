@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /** @todo:
- * - implement crypto (using url zip://user:password@path-to-archive|file
+ * - implement crypto (using url zip://user:password@path-to-archive!/file)
  * - read files in zip with long name (use unz_file_info.size_filename)
  * - multi-volume archive support ?
  */
@@ -112,9 +112,12 @@ int AccessOpen( vlc_object_t *p_this )
 
     /* Split the MRL */
     psz_path = strdup( p_access->psz_path );
-    psz_sep = strchr( psz_path, ZIP_SEP_CHAR );
+    psz_sep = strstr( psz_path, ZIP_SEP );
     if( !psz_sep )
+    {
+        msg_Dbg( p_access, "path does not contain separator " ZIP_SEP );
         return VLC_EGENERIC;
+    }
 
     *psz_sep = '\0';
     psz_pathToZip = unescapeXml( psz_path );
@@ -125,10 +128,10 @@ int AccessOpen( vlc_object_t *p_this )
                  psz_path );
         psz_pathToZip = strdup( psz_path );
     }
-    p_sys->psz_fileInzip = unescapeXml( psz_sep + 1 );
+    p_sys->psz_fileInzip = unescapeXml( psz_sep + ZIP_SEP_LEN );
     if( !p_sys->psz_fileInzip )
     {
-        p_sys->psz_fileInzip = strdup( psz_sep + 1 );
+        p_sys->psz_fileInzip = strdup( psz_sep + ZIP_SEP_LEN );
     }
 
     /* Define IO functions */

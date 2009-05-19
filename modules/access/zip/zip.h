@@ -42,8 +42,8 @@
 
 #define ZIP_FILENAME_LEN 512
 #define ZIP_BUFFER_LEN 32768
-#define ZIP_SEP      "|"
-#define ZIP_SEP_CHAR '|'
+#define ZIP_SEP      "!/"
+#define ZIP_SEP_LEN  2
 
 
 /** **************************************************************************
