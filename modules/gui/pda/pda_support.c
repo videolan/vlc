@@ -76,7 +76,7 @@ GtkWidget*
 create_pixmap                          (GtkWidget       *widget,
                                         const gchar     *filename)
 {
-  VLC_UNUSED( widget );
+  (void) widget;
   gchar *pathname = NULL;
   GtkWidget *pixmap;
 
