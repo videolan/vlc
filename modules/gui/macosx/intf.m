@@ -1572,8 +1572,10 @@ static void manage_cleanup( void * args )
         {
             playlist_t * p_playlist = pl_Hold( p_intf );
             PL_LOCK;
-            [[self info] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
+            playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
             PL_UNLOCK;
+            if( p_item )
+                [[self info] updatePanelWithItem: p_item->p_input];
             pl_Release( p_intf );
         }
     }
