@@ -49,7 +49,7 @@
 static libvlc_exception_t ex;
 
 static const char * test_defaults_args[] = {
-    "-vvv",
+    "-v",
     "--ignore-config",
     "-I",
     "dummy",
