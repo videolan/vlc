@@ -1241,7 +1241,10 @@ libvlc_track_description_t *
     var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list);
 
     if( val_list.p_list->i_count <= 0 ) /* no tracks */
+    {
+        var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list);
         return NULL;
+    }
 
     libvlc_track_description_t *p_track_description, *p_actual, *p_previous;
     p_track_description = ( libvlc_track_description_t * )
