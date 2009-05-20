@@ -145,6 +145,7 @@ vlc_module_end ()
  *****************************************************************************/
 struct vout_sys_t
 {
+    vlc_mutex_t lock;
     vout_thread_t *p_vout;
 
     unsigned int i_x, i_y;
@@ -228,10 +229,7 @@ static int Init( vout_thread_t *p_vout )
                     config_GetInt( p_vout, "autocrop-non-black-pixels" );
     p_vout->p_sys->i_diff = config_GetInt( p_vout, "autocrop-diff" );
     p_vout->p_sys->i_time = config_GetInt( p_vout, "autocrop-time" );
-    vlc_value_t val={0};
-    var_Get( p_vout, "ratio-crop", &val );
-    val.psz_string = "0";
-    var_SetString( p_vout, "ratio-crop", val.psz_string);
+    var_SetString( p_vout, "ratio-crop", "0" );
 
     if (p_vout->p_sys->b_autocrop)
         p_vout->p_sys->i_ratio = 0;
@@ -379,6 +377,7 @@ static int Init( vout_thread_t *p_vout )
     }
 
 #ifdef BEST_AUTOCROP
+    vlc_mutex_init( &p_vout->p_sys->lock );
     var_AddCallback( p_vout, "ratio-crop", FilterCallback, NULL );
 #endif
 
@@ -403,6 +402,8 @@ static void End( vout_thread_t *p_vout )
     }
 
     vout_filter_ReleaseDirectBuffers( p_vout );
+    var_DelCallback( p_vout, "ratio-crop", FilterCallback, NULL );
+    vlc_mutex_destroy( &p_sys->lock );
 }
 
 /*****************************************************************************
@@ -435,6 +436,7 @@ static int Manage( vout_thread_t *p_vout )
     memset( &fmt, 0, sizeof(video_format_t) );
 
 #ifdef BEST_AUTOCROP
+    /* XXX: not thread-safe with FilterCallback */
     msg_Dbg( p_vout, "cropping at %ix%i+%i+%i, %sautocropping",
                      p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                      p_vout->p_sys->i_x, p_vout->p_sys->i_y,
@@ -468,7 +470,9 @@ static int Manage( vout_thread_t *p_vout )
     vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
     p_vout->p_sys->b_changed = false;
+    vlc_mutex_lock( &p_vout->p_sys->lock );
     p_vout->p_sys->i_lastchange = 0;
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -535,10 +539,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     vout_DisplayPicture( p_vout->p_sys->p_vout, p_outpic );
 
     /* The source image may still be in the cache ... parse it! */
+    vlc_mutex_lock( &p_vout->p_sys->lock );
     if( p_vout->p_sys->b_autocrop )
-    {
         UpdateStats( p_vout, p_pic );
-    }
+    vlc_mutex_unlock( &p_vout->p_sys->lock );
 }
 
 #ifdef BEST_AUTOCROP
@@ -846,6 +850,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_var,
 
     if( !strcmp( psz_var, "ratio-crop" ) )
     {
+        vlc_mutex_lock( &p_vout->p_sys->lock );
         if ( !strcmp( newval.psz_string, "Auto" ) )
             p_vout->p_sys->i_ratio = 0;
         else
@@ -863,6 +868,7 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_var,
             if (p_vout->p_sys->i_ratio < p_vout->output.i_aspect / 432)
                 p_vout->p_sys->i_ratio = p_vout->output.i_aspect / 432;
         }
+        vlc_mutex_unlock( &p_vout->p_sys->lock );
      }
     return VLC_SUCCESS;
 }

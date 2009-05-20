@@ -221,6 +221,17 @@ typedef enum
     RTSP_CMD_TYPE_FORWARD,
 } rtsp_cmd_type_t;
 
+/* */
+typedef struct
+{
+    int i_type;
+    int i_media_id;
+    //vod_media_t *p_media;
+    char *psz_session;
+    char *psz_arg;
+    double f_arg;
+} rtsp_cmd_t;
+
 static vod_media_t *MediaNew( vod_t *, const char *, input_item_t * );
 static void         MediaDel( vod_t *, vod_media_t * );
 static int          MediaAddES( vod_t *, vod_media_t *, es_format_t * );
@@ -337,12 +348,22 @@ static void Close( vlc_object_t * p_this )
 {
     vod_t *p_vod = (vod_t *)p_this;
     vod_sys_t *p_sys = p_vod->p_sys;
+    block_t *p_block_cmd;
+    rtsp_cmd_t cmd;
 
     /* Stop command thread */
     vlc_object_kill( p_vod );
     CommandPush( p_vod, RTSP_CMD_TYPE_NONE, NULL, NULL, 0.0, NULL );
     vlc_thread_join( p_vod );
 
+    while( block_FifoCount( p_sys->p_fifo_cmd ) > 0 )
+    {
+         p_block_cmd = block_FifoGet( p_sys->p_fifo_cmd );
+         memcpy( &cmd, p_block_cmd->p_buffer, sizeof(cmd) );
+         block_Release( p_block_cmd );
+         free( cmd.psz_session );
+         free( cmd.psz_arg );
+    }
     block_FifoRelease( p_sys->p_fifo_cmd );
 
     httpd_HostDelete( p_sys->p_rtsp_host );
@@ -778,17 +799,6 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
     es_format_Clean( &p_es->fmt );
     free( p_es );
 }
-
-/* */
-typedef struct
-{
-    int i_type;
-    int i_media_id;
-    //vod_media_t *p_media;
-    char *psz_session;
-    char *psz_arg;
-    double f_arg;
-} rtsp_cmd_t;
 
 static void CommandPush( vod_t *p_vod, rtsp_cmd_type_t i_type, vod_media_t *p_media, const char *psz_session,
                          double f_arg, const char *psz_arg )

@@ -107,6 +107,7 @@ static const char *const ppsz_filter_options[] = {
  *****************************************************************************/
 struct filter_sys_t
 {
+    vlc_mutex_t lock;
     int i_mode;
 
     /* For the gradient mode */
@@ -188,6 +189,7 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys->b_cartoon =
         var_CreateGetBoolCommand( p_filter, FILTER_PREFIX "cartoon" );
 
+    vlc_mutex_init( &p_filter->p_sys->lock );
     var_AddCallback( p_filter, FILTER_PREFIX "mode",
                      GradientCallback, p_filter->p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "type",
@@ -210,13 +212,22 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    free( p_filter->p_sys->p_buf32 );
-    free( p_filter->p_sys->p_buf32_bis );
-    free( p_filter->p_sys->p_buf8 );
-    free( p_filter->p_sys->p_pre_hough );
+    var_DelCallback( p_filter, FILTER_PREFIX "mode",
+                     GradientCallback, p_sys );
+    var_DelCallback( p_filter, FILTER_PREFIX "type",
+                     GradientCallback, p_sys );
+    var_DelCallback( p_filter, FILTER_PREFIX "cartoon",
+                     GradientCallback, p_sys );
+    vlc_mutex_destroy( &p_sys->lock );
 
-    free( p_filter->p_sys );
+    free( p_sys->p_buf32 );
+    free( p_sys->p_buf32_bis );
+    free( p_sys->p_buf8 );
+    free( p_sys->p_pre_hough );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -239,6 +250,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
+    vlc_mutex_lock( &p_filter->p_sys->lock );
     switch( p_filter->p_sys->i_mode )
     {
         case EDGE:
@@ -256,6 +268,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         default:
             break;
     }
+    vlc_mutex_unlock( &p_filter->p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
@@ -756,6 +769,8 @@ static int GradientCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(oldval);
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
+
+    vlc_mutex_lock( &p_sys->lock );
     if( !strcmp( psz_var, FILTER_PREFIX "mode" ) )
     {
         if( !strcmp( newval.psz_string, "gradient" ) )
@@ -784,5 +799,7 @@ static int GradientCallback( vlc_object_t *p_this, char const *psz_var,
     {
         p_sys->b_cartoon = newval.b_bool;
     }
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }

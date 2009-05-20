@@ -223,7 +223,7 @@ vlc_module_begin ()
                  UPDATER_DAYS_TEXT, false )
 #endif
     add_string( "qt-slider-colours",
-                "255;255;255;20;226;20;255;176;15;235;30;20",
+                "255;255;255;20;210;20;255;199;15;245;39;29",
                 NULL, SLIDERCOL_TEXT, SLIDERCOL_LONGTEXT, false )
 
     add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,

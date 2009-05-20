@@ -360,8 +360,6 @@ static int CreatePlaylist( stream_t *s, char **pp_buffer )
         goto exit;
     }
 
-    // msg_Dbg( s, "%d files in Zip", vlc_array_count( p_filenames ) );
-
     /* Close archive */
     unzClose( file );
     s->p_sys->zipFile = NULL;
@@ -470,6 +468,81 @@ static int GetFilesInZip( stream_t *p_this, unzFile file,
  *****************************************************************************/
 
 /** **************************************************************************
+ * \brief Check a character for allowance in the Xml.
+ * Allowed chars are: a-z, A-Z, 0-9, \, /, ., ' ', _ and :
+ *****************************************************************************/
+bool isAllowedChar( char c )
+{
+    return ( c >= 'a' && c <= 'z' )
+           || ( c >= 'A' && c <= 'Z' )
+           || ( c >= '0' && c <= '9' )
+           || ( c == ':' ) || ( c == '/' )
+           || ( c == '\\' ) || ( c == '.' )
+           || ( c == ' ' ) || ( c == '_' );
+}
+
+/** **************************************************************************
+ * \brief Escape string to be XML valid
+ * Allowed chars are defined by the above function isAllowedChar()
+ * Invalid chars are escaped using non standard '?XX' notation.
+ * NOTE: We cannot trust VLC internal Web encoding functions
+ *       because they are not able to encode and decode some rare utf-8
+ *       characters properly. Also, we don't control exactly when they are
+ *       called (from this module).
+ *****************************************************************************/
+static int escapeToXml( char **ppsz_encoded, const char *psz_url )
+{
+    char *psz_iter, *psz_tmp;
+
+    /* Count number of unallowed characters in psz_url */
+    size_t i_num = 0, i_len = 0;
+    for( psz_iter = (char*) psz_url; *psz_iter; ++psz_iter )
+    {
+        if( isAllowedChar( *psz_iter ) )
+        {
+            i_len++;
+        }
+        else
+        {
+            i_len++;
+            i_num++;
+        }
+    }
+
+    /* Special case */
+    if( i_num == 0 )
+    {
+        *ppsz_encoded = malloc( i_len + 1 );
+        memcpy( *ppsz_encoded, psz_url, i_len + 1 );
+        return VLC_SUCCESS;
+    }
+
+    /* Copy string, replacing invalid characters */
+    char *psz_ret = malloc( i_len + 3*i_num + 2 );
+    if( !psz_ret ) return VLC_ENOMEM;
+
+    for( psz_iter = (char*) psz_url, psz_tmp = psz_ret;
+         *psz_iter; ++psz_iter, ++psz_tmp )
+    {
+        if( isAllowedChar( *psz_iter ) )
+        {
+            *psz_tmp = *psz_iter;
+        }
+        else
+        {
+            *(psz_tmp++) = '?';
+            snprintf( psz_tmp, 3, "%02x", ( *psz_iter & 0x000000FF ) );
+            psz_tmp++;
+        }
+    }
+    *psz_tmp = '\0';
+
+    /* Return success */
+    *ppsz_encoded = psz_ret;
+    return VLC_SUCCESS;
+}
+
+/** **************************************************************************
  * \brief Write the XSPF playlist given the list of files
  *****************************************************************************/
 static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
@@ -488,9 +561,10 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
     /* Root node */
     node *playlist = new_node( psz_zip );
 
-    /* Web-Encode the URI and append '!' */
-    char *psz_pathtozip = vlc_UrlEncode( psz_zippath );
-    if( astrcatf( &psz_pathtozip, ZIP_SEP ) < 0 ) return -1;
+    /* Encode the URI and append ZIP_SEP */
+    char *psz_pathtozip;
+    escapeToXml( &psz_pathtozip, psz_zippath );
+    if( astrcatf( &psz_pathtozip, "%s", ZIP_SEP ) < 0 ) return -1;
 
     int i_track = 0;
     for( int i = 0; i < vlc_array_count( p_filenames ); ++i )
@@ -514,12 +588,9 @@ static int WriteXSPF( char **pp_buffer, vlc_array_t *p_filenames,
 
             /* Build full MRL */
             char *psz_path = strdup( psz_pathtozip );
-            if( astrcatf( &psz_path, psz_name ) < 0 ) return -1;
-
-            /* Double url-encode */
-            char *psz_tmp = psz_path;
-            psz_path = vlc_UrlEncode( psz_tmp );
-            free( psz_tmp );
+            char *psz_escapedName;
+            escapeToXml( &psz_escapedName, psz_name );
+            if( astrcatf( &psz_path, "%s", psz_escapedName ) < 0 ) return -1;
 
             /* Track information */
             if( astrcatf( pp_buffer,
@@ -771,7 +842,6 @@ static int ZCALLBACK ZipIO_Error( void* opaque, void* stream )
 {
     (void)opaque;
     (void)stream;
-    //msg_Dbg( p_access, "error" );
     return 0;
 }
 

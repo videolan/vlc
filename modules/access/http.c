@@ -248,7 +248,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
     char         *psz, *p;
     /* Only forward an store cookies if the corresponding option is activated */
     bool   b_forward_cookies = var_CreateGetBool( p_access, "http-forward-cookies" );
-    vlc_array_t * saved_cookies = b_forward_cookies ? (cookies ?: vlc_array_new()) : NULL;
+    vlc_array_t * saved_cookies = b_forward_cookies ? (cookies ? cookies : vlc_array_new()) : NULL;
 
     /* Set up p_access */
     STANDARD_READ_ACCESS_INIT;
@@ -850,7 +850,10 @@ static int ReadICYMeta( access_t *p_access )
             strcmp( p_sys->psz_icy_title, &p[1] ) )
         {
             free( p_sys->psz_icy_title );
-            p_sys->psz_icy_title = EnsureUTF8( strdup( &p[1] ));
+            char *psz_tmp = strdup( &p[1] );
+            p_sys->psz_icy_title = EnsureUTF8( psz_tmp );
+            if( !p_sys->psz_icy_title )
+                free( psz_tmp );
             p_access->info.i_update |= INPUT_UPDATE_META;
 
             msg_Dbg( p_access, "New Title=%s", p_sys->psz_icy_title );
@@ -1432,7 +1435,10 @@ static int Request( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Icy-Name" ) )
         {
             free( p_sys->psz_icy_name );
-            p_sys->psz_icy_name = EnsureUTF8( strdup( p ));
+            char *psz_tmp = strdup( p );
+            p_sys->psz_icy_name = EnsureUTF8( psz_tmp );
+            if( !p_sys->psz_icy_name )
+                free( psz_tmp );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
 
             p_sys->b_icecast = true; /* be on the safeside. set it here as well. */
@@ -1442,7 +1448,10 @@ static int Request( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Icy-Genre" ) )
         {
             free( p_sys->psz_icy_genre );
-            p_sys->psz_icy_genre = EnsureUTF8( strdup( p ));
+            char *psz_tmp = strdup( p );
+            p_sys->psz_icy_genre = EnsureUTF8( psz_tmp );
+            if( !p_sys->psz_icy_genre )
+                free( psz_tmp );
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
         }
         else if( !strncasecmp( psz, "Icy-Notice", 10 ) )
@@ -1735,8 +1744,8 @@ static char *AuthDigest( access_t *p_access, vlc_url_t *p_url,
                          http_auth_t *p_auth, const char *psz_method )
 {
     (void)p_access;
-    const char *psz_username = p_url->psz_username ?: "";
-    const char *psz_password = p_url->psz_password ?: "";
+    const char *psz_username = p_url->psz_username ? p_url->psz_username : "";
+    const char *psz_password = p_url->psz_password ? p_url->psz_password : "";
 
     char *psz_HA1 = NULL;
     char *psz_HA2 = NULL;
@@ -1843,8 +1852,8 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
     access_sys_t *p_sys = p_access->p_sys;
     v_socket_t     *pvs = p_sys->p_vs;
 
-    const char *psz_username = p_url->psz_username ?: "";
-    const char *psz_password = p_url->psz_password ?: "";
+    const char *psz_username = p_url->psz_username ? p_url->psz_username : "";
+    const char *psz_password = p_url->psz_password ? p_url->psz_password : "";
 
     if( p_auth->psz_nonce )
     {
@@ -1892,20 +1901,20 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
                     psz_username,
                     p_auth->psz_realm,
                     p_auth->psz_nonce,
-                    p_url->psz_path ?: "/",
+                    p_url->psz_path ? p_url->psz_path : "/",
                     psz_response,
                     /* Optional parameters */
                     p_auth->psz_algorithm ? "algorithm=\"" : "",
-                    p_auth->psz_algorithm ?: "",
+                    p_auth->psz_algorithm ? p_auth->psz_algorithm : "",
                     p_auth->psz_algorithm ? "\", " : "",
                     p_auth->psz_cnonce ? "cnonce=\"" : "",
-                    p_auth->psz_cnonce ?: "",
+                    p_auth->psz_cnonce ? p_auth->psz_cnonce : "",
                     p_auth->psz_cnonce ? "\", " : "",
                     p_auth->psz_opaque ? "opaque=\"" : "",
-                    p_auth->psz_opaque ?: "",
+                    p_auth->psz_opaque ? p_auth->psz_opaque : "",
                     p_auth->psz_opaque ? "\", " : "",
                     p_auth->psz_qop ? "qop=\"" : "",
-                    p_auth->psz_qop ?: "",
+                    p_auth->psz_qop ? p_auth->psz_qop : "",
                     p_auth->psz_qop ? "\", " : "",
                     p_auth->i_nonce ? "nc=\"" : "uglyhack=\"", /* Will be parsed as an unhandled extension */
                     p_auth->i_nonce,

@@ -518,6 +518,8 @@ static int PuzzleCallback( vlc_object_t *p_this, char const *psz_var,
 {
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     vout_sys_t *p_sys = (vout_sys_t *)p_data;
+
+    /* FIXME: thread safety */
     if( !strcmp( psz_var, CFG_PREFIX "rows" ) )
     {
         p_sys->i_rows = __MAX( 1, newval.i_int );

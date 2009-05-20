@@ -107,10 +107,6 @@ public:
     NPClass*            getScriptClass()
                             { return p_scriptClass; };
 
-    void                setLog(libvlc_log_t *log)
-                            { libvlc_log = log; };
-    libvlc_log_t*       getLog()
-                            { return libvlc_log; };
 #if XP_WIN
     WNDPROC             getWindowProc()
                             { return pf_wndproc; };
@@ -208,7 +204,6 @@ private:
     libvlc_instance_t   *libvlc_instance;
     libvlc_media_list_t *libvlc_media_list;
     libvlc_media_player_t *libvlc_media_player;
-    libvlc_log_t        *libvlc_log;
     NPClass             *p_scriptClass;
 
     /* browser reference */

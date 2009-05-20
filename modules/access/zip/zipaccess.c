@@ -22,7 +22,7 @@
  *****************************************************************************/
 
 /** @todo:
- * - implement crypto (using url zip://user:password@path-to-archive#ZIP#file
+ * - implement crypto (using url zip://user:password@path-to-archive!/file)
  * - read files in zip with long name (use unz_file_info.size_filename)
  * - multi-volume archive support ?
  */
@@ -30,8 +30,6 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#ifdef HAVE_ZLIB_H
 
 #include "zip.h"
 #include <vlc_access.h>
@@ -53,6 +51,47 @@ static int AccessControl( access_t *p_access, int i_query, va_list args );
 static ssize_t AccessRead( access_t *, uint8_t *, size_t );
 static int AccessSeek( access_t *, int64_t );
 static int OpenFileInZip( access_t *p_access, int i_pos );
+static char *unescapeXml( const char *psz_text );
+
+/** **************************************************************************
+ * \brief Unescape valid XML string
+ * The exact reverse of escapeToXml (zipstream.c)
+ *****************************************************************************/
+static char *unescapeXml( const char *psz_text )
+{
+    char *psz_ret = malloc( strlen( psz_text ) + 1 );
+    if( !psz_ret ) return NULL;
+
+    char *psz_tmp = psz_ret;
+    for( char *psz_iter = (char*) psz_text; *psz_iter; ++psz_iter, ++psz_tmp )
+    {
+        if( *psz_iter == '?' )
+        {
+            int i_value;
+            if( !sscanf( ++psz_iter, "%02x", &i_value ) )
+            {
+                /* Invalid number: URL incorrectly encoded */
+                free( psz_ret );
+                return NULL;
+            }
+            *psz_tmp = (char) i_value;
+            psz_iter++;
+        }
+        else if( isAllowedChar( *psz_iter ) )
+        {
+            *psz_tmp = *psz_iter;
+        }
+        else
+        {
+            /* Invalid character encoding for the URL */
+            free( psz_ret );
+            return NULL;
+        }
+    }
+    *psz_tmp = '\0';
+
+    return psz_ret;
+}
 
 /** **************************************************************************
  * \brief Open access
@@ -73,13 +112,27 @@ int AccessOpen( vlc_object_t *p_this )
 
     /* Split the MRL */
     psz_path = strdup( p_access->psz_path );
-    psz_sep = strchr( psz_path, ZIP_SEP_CHAR );
+    psz_sep = strstr( psz_path, ZIP_SEP );
     if( !psz_sep )
+    {
+        msg_Dbg( p_access, "path does not contain separator " ZIP_SEP );
         return VLC_EGENERIC;
+    }
 
     *psz_sep = '\0';
-    psz_pathToZip = unescape_URI_duplicate( psz_path );
-    p_sys->psz_fileInzip = strdup( psz_sep + 1 );
+    psz_pathToZip = unescapeXml( psz_path );
+    if( !psz_pathToZip )
+    {
+        /* Maybe this was not an encoded string */
+        msg_Dbg( p_access, "this is not an encoded url. Trying file '%s'",
+                 psz_path );
+        psz_pathToZip = strdup( psz_path );
+    }
+    p_sys->psz_fileInzip = unescapeXml( psz_sep + ZIP_SEP_LEN );
+    if( !p_sys->psz_fileInzip )
+    {
+        p_sys->psz_fileInzip = strdup( psz_sep + ZIP_SEP_LEN );
+    }
 
     /* Define IO functions */
     zlib_filefunc_def *p_func = (zlib_filefunc_def*)
@@ -409,9 +462,3 @@ static int ZCALLBACK ZipIO_Error( void* opaque, void* stream )
     //msg_Dbg( p_access, "error" );
     return 0;
 }
-
-
-
-#else
-# error Can not compile zip demuxer without zlib support
-#endif

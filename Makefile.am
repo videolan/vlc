@@ -313,7 +313,8 @@ vlc-config.in: vlc-config.in.in
 	touch $@
 
 CLEANFILES = $(BUILT_SOURCES_clean)
-DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile ChangeLog
+DISTCLEANFILES = $(BUILT_SOURCES_distclean) vlc-config.in compile
+MAINTAINERCLEANFILES = ChangeLog
 
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.

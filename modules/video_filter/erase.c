@@ -167,11 +167,10 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_x = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "x" );
     p_sys->i_y = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "y" );
 
+    vlc_mutex_init( &p_sys->lock );
     var_AddCallback( p_filter, CFG_PREFIX "x", EraseCallback, p_sys );
     var_AddCallback( p_filter, CFG_PREFIX "y", EraseCallback, p_sys );
     var_AddCallback( p_filter, CFG_PREFIX "mask", EraseCallback, p_sys );
-
-    vlc_mutex_init( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -186,6 +185,9 @@ static void Destroy( vlc_object_t *p_this )
     if( p_sys->p_mask )
         picture_Release( p_sys->p_mask );
 
+    var_DelCallback( p_filter, CFG_PREFIX "x", EraseCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "y", EraseCallback, p_sys );
+    var_DelCallback( p_filter, CFG_PREFIX "mask", EraseCallback, p_sys );
     vlc_mutex_destroy( &p_sys->lock );
 
     free( p_filter->p_sys );
@@ -221,13 +223,12 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    int i_plane;
-
+    vlc_mutex_lock( &p_sys->lock );
     const int i_mask_pitch = p_sys->p_mask->A_PITCH;
     const int i_mask_visible_pitch = p_sys->p_mask->p[A_PLANE].i_visible_pitch;
     const int i_mask_visible_lines = p_sys->p_mask->p[A_PLANE].i_visible_lines;
 
-    for( i_plane = 0; i_plane < p_inpic->i_planes; i_plane++ )
+    for( int i_plane = 0; i_plane < p_inpic->i_planes; i_plane++ )
     {
         const int i_pitch = p_inpic->p[i_plane].i_pitch;
         const int i_2pitch = i_pitch<<1;
@@ -238,9 +239,8 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
         uint8_t *p_inpix = p_inpic->p[i_plane].p_pixels;
         uint8_t *p_outpix = p_outpic->p[i_plane].p_pixels;
         uint8_t *p_mask = p_sys->p_mask->A_PIXELS;
+        int i_x = p_sys->i_x, i_y = p_sys->i_y;
 
-        int i_x = p_sys->i_x,
-            i_y = p_sys->i_y;
         int x, y;
         int i_height = i_mask_visible_lines;
         int i_width  = i_mask_visible_pitch;
@@ -392,6 +392,7 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
             }
         }
     }
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
 static int EraseCallback( vlc_object_t *p_this, char const *psz_var,

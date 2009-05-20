@@ -13,7 +13,7 @@
       --enable-mpc \
       --enable-libass \
       --enable-x264 \
-      --enable-schroedinger --enable-dirac \
+      --enable-schroedinger \
       --enable-realrtsp \
       --enable-live555 --with-live555-tree=/usr/win32/live.com \
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \

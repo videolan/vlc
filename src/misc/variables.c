@@ -68,7 +68,10 @@ static int CmpAddress( vlc_value_t v, vlc_value_t w ) { return v.p_address == w.
  * Local duplication functions, and local deallocation functions
  *****************************************************************************/
 static void DupDummy( vlc_value_t *p_val ) { (void)p_val; /* unused */ }
-static void DupString( vlc_value_t *p_val ) { p_val->psz_string = strdup( p_val->psz_string ?: ""); }
+static void DupString( vlc_value_t *p_val )
+{
+    p_val->psz_string = strdup( p_val->psz_string ? p_val->psz_string :  "" );
+}
 
 static void DupList( vlc_value_t *p_val )
 {
@@ -620,6 +623,8 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             free( p_var->psz_text );
             if( p_val && p_val->psz_string )
                 p_var->psz_text = strdup( p_val->psz_string );
+            else
+                p_var->psz_text = NULL;
             break;
         case VLC_VAR_GETTEXT:
             p_val->psz_string = NULL;
@@ -1407,8 +1412,9 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             p_var->ops->pf_dup( p_val );
 
             /*msg_Dbg( p_this, "Inherited value for var %s from object %s",
-                     psz_name ? : "(null)",
-                     p_this->psz_object_name ? : "(Unknown)" );*/
+                     psz_name ? psz_name : "(null)",
+                     p_this->psz_object_name
+                         ? p_this->psz_object_name : "(Unknown)" );*/
             return VLC_SUCCESS;
         }
         else if ( p_this->p_parent ) /* We are still not there */

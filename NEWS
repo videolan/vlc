@@ -53,7 +53,7 @@ Access:
    OSS or Alsa audio input. Use --input-slave alsa:// or oss:// if needed.
  * DVB scanning on linux
  * EXPERIMENTAL Blu-Ray Disc and AVCHD Folders support
- * On-the-fly zip file decompression and browsing (MRL of the form zip://file.zip|file.avi to specify the file)
+ * On-the-fly zip file decompression and browsing (MRL of the form zip://file.zip!/file.avi to specify the file - the development form of zip://file.zip|file.avi is not supported anymore)
  * Opening of any file descriptor using 'fd://'
  * MTP device access on Unix
  * CD-Text support on the cdda module (CD-Audio)

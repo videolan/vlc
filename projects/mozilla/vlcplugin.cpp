@@ -50,7 +50,6 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     libvlc_instance(NULL),
     libvlc_media_list(NULL),
     libvlc_media_player(NULL),
-    libvlc_log(NULL),
     p_scriptClass(NULL),
     p_browser(instance),
     psz_baseURL(NULL)
@@ -267,8 +266,6 @@ VlcPlugin::~VlcPlugin()
 {
     free(psz_baseURL);
     free(psz_target);
-    if( libvlc_log )
-        libvlc_log_close(libvlc_log, NULL);
     if( libvlc_media_player )
         libvlc_media_player_release( libvlc_media_player );
     if( libvlc_media_list )

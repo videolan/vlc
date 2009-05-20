@@ -51,7 +51,8 @@ EXTRA_DIST = \
 	demo.sh \
 	$(NULL)
 
-DISTCLEANFILES = $(CHANGELOGS) Doxyfile
+DISTCLEANFILES = Doxyfile
+MAINTAINERCLEANFILES = $(CHANGELOGS)
 
 Doxyfile: Doxyfile.in $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status --file=$(subdir)/$@

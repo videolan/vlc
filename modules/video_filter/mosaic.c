@@ -321,7 +321,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     GET_VAR( align, 0, 10 );
     if( p_sys->i_align == 3 || p_sys->i_align == 7 )
-        p_sys->i_align = 5;
+        p_sys->i_align = 5; /* FIXME: NOT THREAD SAFE w.r.t. callback */
 
     GET_VAR( borderw, 0, INT_MAX );
     GET_VAR( borderh, 0, INT_MAX );
@@ -331,7 +331,7 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( position, 0, 2 );
     GET_VAR( delay, 100, INT_MAX );
 #undef GET_VAR
-    p_sys->i_delay *= 1000;
+    p_sys->i_delay *= 1000; /* FIXME: NOT THREAD SAFE w.r.t. callback */
 
     p_sys->b_ar = var_CreateGetBoolCommand( p_filter,
                                             CFG_PREFIX "keep-aspect-ratio" );
@@ -391,9 +391,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i_index;
 
-    vlc_mutex_lock( &p_sys->lock );
+    /* FIXME: destroy callbacks first! */
 
     if( !p_sys->b_keep )
     {
@@ -402,7 +401,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     if( p_sys->i_order_length )
     {
-        for( i_index = 0; i_index < p_sys->i_order_length; i_index++ )
+        for( int i_index = 0; i_index < p_sys->i_order_length; i_index++ )
         {
             free( p_sys->ppsz_order[i_index] );
         }
@@ -415,7 +414,6 @@ static void DestroyFilter( vlc_object_t *p_this )
         p_sys->i_offsets_length = 0;
     }
 
-    vlc_mutex_unlock( &p_sys->lock );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }

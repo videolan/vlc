@@ -54,6 +54,34 @@ static int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
 }
 
 /**
+ * Sort a node recursively
+ * \param p_playlist the playlist
+ * \param p_node the node to sort
+ * \param i_mode: SORT_ID, SORT_TITLE, SORT_ARTIST, SORT_ALBUM, SORT_RANDOM
+ * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
+ * \return VLC_SUCCESS on success
+ */
+static int recursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
+                              int i_mode, int i_type )
+{
+    int i;
+    /* Sort the current node */
+    playlist_NodeSort( p_playlist, p_node, i_mode, i_type );
+
+    /* And all the children */
+    for( i = 0 ; i< p_node->i_children; i++ )
+    {
+        if( p_node->pp_children[i]->i_children != -1 )
+        {
+            recursiveNodeSort( p_playlist, p_node->pp_children[i],
+                               i_mode, i_type );
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+
+/**
  * Sort a node recursively.
  *
  * This function must be entered with the playlist lock !
@@ -67,17 +95,11 @@ static int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
 int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
                                 int i_mode, int i_type )
 {
-    int i;
-    playlist_NodeSort( p_playlist, p_node, i_mode, i_type );
-    for( i = 0 ; i< p_node->i_children; i++ )
-    {
-        if( p_node->pp_children[i]->i_children != -1 )
-        {
-            playlist_RecursiveNodeSort( p_playlist, p_node->pp_children[i],
-                                        i_mode,i_type );
-        }
-    }
-    return VLC_SUCCESS;
+    /* Ask the playlist to reset as we are changing the order */
+    pl_priv(p_playlist)->b_reset_currently_playing = true;
+
+    /* Do the real job recursively */
+    return recursiveNodeSort( p_playlist, p_node, i_mode, i_type );
 }
 
 static int sort_mode = 0;

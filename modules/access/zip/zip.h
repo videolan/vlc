@@ -42,8 +42,8 @@
 
 #define ZIP_FILENAME_LEN 512
 #define ZIP_BUFFER_LEN 32768
-#define ZIP_SEP      "|"
-#define ZIP_SEP_CHAR '|'
+#define ZIP_SEP      "!/"
+#define ZIP_SEP_LEN  2
 
 
 /** **************************************************************************
@@ -57,6 +57,9 @@ void StreamClose( vlc_object_t* );
  *****************************************************************************/
 int AccessOpen( vlc_object_t *p_this );
 void AccessClose( vlc_object_t *p_this );
+
+/** Common function */
+bool isAllowedChar( char c );
 
 /** **************************************************************************
  * zipIO function headers : how to use vlc_stream to read the zip

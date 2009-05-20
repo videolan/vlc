@@ -1028,7 +1028,8 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     HRESULT hr;
     size_t c;
     // if vout is already running, use current chroma, otherwise choose from upstream
-    int i_chroma = p_vout->output.i_chroma ? : p_vout->render.i_chroma;
+    int i_chroma = p_vout->output.i_chroma ? p_vout->output.i_chroma
+                                           : p_vout->render.i_chroma;
 
     I_OUTPUTPICTURES = 0;
 

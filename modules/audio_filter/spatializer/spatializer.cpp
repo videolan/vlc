@@ -103,7 +103,8 @@ private:
 
 static const char *psz_control_names[] =
 {
-    "Roomsize", "Width" , "Wet", "Dry", "Damp"
+    "spatializer-roomsize", "spatializer-width" ,
+    "spatializer-wet", "spatializer-dry", "spatializer-damp"
 };
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );

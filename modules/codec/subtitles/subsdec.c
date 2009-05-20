@@ -269,7 +269,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         psz_charset = strdup (p_dec->fmt_in.subs.psz_encoding);
         msg_Dbg (p_dec, "trying demuxer-specified character encoding: %s",
-                 p_dec->fmt_in.subs.psz_encoding ?: "not specified");
+                 p_dec->fmt_in.subs.psz_encoding ?
+                 p_dec->fmt_in.subs.psz_encoding : "not specified");
     }
 
     /* Second, try configured encoding */
@@ -277,7 +278,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         psz_charset = var_CreateGetNonEmptyString (p_dec, "subsdec-encoding");
         msg_Dbg (p_dec, "trying configured character encoding: %s",
-                 psz_charset ?: "not specified");
+                 psz_charset ? psz_charset : "not specified");
     }
 
     /* Third, try "local" encoding with optional UTF-8 autodetection */
@@ -285,7 +286,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         psz_charset = strdup (GetFallbackEncoding ());
         msg_Dbg (p_dec, "trying default character encoding: %s",
-                 psz_charset ?: "not specified");
+                 psz_charset ? psz_charset : "not specified");
 
         if (var_CreateGetBool (p_dec, "subsdec-autodetect-utf8"))
         {

@@ -84,6 +84,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     cryptedLabel         = NULL;
     controls             = NULL;
     inputC               = NULL;
+    b_shouldHide         = false;
 
     bgWasVisible         = false;
     i_bg_height          = 0;
@@ -265,7 +266,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Final sizing and showing */
     setMinimumWidth( __MAX( controls->sizeHint().width(),
                             menuBar()->sizeHint().width() ) );
-    show();
+    setVisible( !b_shouldHide );
 
     /* And switch to minimal view if needed
        Must be called after the show() */
@@ -462,7 +463,7 @@ inline void MainInterface::initSystray()
         if( b_systrayAvailable )
         {
             b_systrayWanted = true;
-            hide();
+            b_shouldHide = true;
         }
         else
             msg_Err( p_intf, "cannot start minimized without system tray bar" );

@@ -153,8 +153,9 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
-        int fd = net_Socket( p_this, ptr->ai_family, type ?: ptr->ai_socktype,
-                             proto ?: ptr->ai_protocol );
+        int fd = net_Socket( p_this, ptr->ai_family,
+                             type ? type : ptr->ai_socktype,
+                             proto ? proto : ptr->ai_protocol );
         if( fd == -1 )
         {
             msg_Dbg( p_this, "socket error: %m" );

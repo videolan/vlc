@@ -107,27 +107,27 @@ void
 libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, const char *psz_filepath,
         unsigned int i_width, unsigned int i_height, libvlc_exception_t *p_e )
 {
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    input_thread_t *p_input_thread;
+    vout_thread_t *p_vout;
 
-    /* GetVout will raise the exception for us */
-    if( !p_vout ) return;
-
+    /* The filepath must be not NULL */
     if( !psz_filepath )
     {
         libvlc_exception_raise( p_e, "filepath is null" );
         return;
     }
-
-    var_SetInteger( p_vout, "snapshot-width", i_width );
-    var_SetInteger( p_vout, "snapshot-height", i_height );
-
-    p_input_thread = p_mi->p_input_thread;
+    /* We must have an input */
     if( !p_mi->p_input_thread )
     {
         libvlc_exception_raise( p_e, "Input does not exist" );
         return;
     }
+
+    /* GetVout will raise the exception for us */
+    p_vout = GetVout( p_mi, p_e );
+    if( !p_vout ) return;
+
+    var_SetInteger( p_vout, "snapshot-width", i_width );
+    var_SetInteger( p_vout, "snapshot-height", i_height );
 
     var_SetString( p_vout, "snapshot-path", psz_filepath );
     var_SetString( p_vout, "snapshot-format", "png" );
@@ -266,13 +266,13 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
-        vlc_value_t spu_val = val_list.p_list->p_values[i];
-        if( val.i_int == spu_val.i_int )
+        if( val.i_int == val_list.p_list->p_values[i].i_int )
         {
             i_spu = i;
             break;
         }
     }
+    var_Change( p_input_thread, "spu-es", VLC_VAR_FREELIST, &val_list, NULL );
     vlc_object_release( p_input_thread );
     return i_spu;
 }
@@ -282,13 +282,17 @@ int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi,
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
     vlc_value_t val_list;
+    int i_spu_count;
 
     if( !p_input_thread )
         return -1;
 
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    i_spu_count = val_list.p_list->i_count;
+    var_Change( p_input_thread, "spu-es", VLC_VAR_FREELIST, &val_list, NULL );
+
     vlc_object_release( p_input_thread );
-    return val_list.p_list->i_count;
+    return i_spu_count;
 }
 
 libvlc_track_description_t *
@@ -313,15 +317,13 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     if( val_list.p_list->i_count == 0 )
     {
         libvlc_exception_raise( p_e, "Subtitle value out of range" );
-        vlc_object_release( p_input_thread );
-        return;
+        goto end;
     }
 
     if( (i_spu < 0) && (i_spu > val_list.p_list->i_count) )
     {
         libvlc_exception_raise( p_e, "Subtitle value out of range" );
-        vlc_object_release( p_input_thread );
-        return;
+        goto end;
     }
 
     newval = val_list.p_list->p_values[i_spu];
@@ -330,6 +332,9 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     {
         libvlc_exception_raise( p_e, "Setting subtitle value failed" );
     }
+
+end:
+    var_Change( p_input_thread, "spu-es", VLC_VAR_FREELIST, &val_list, NULL );
     vlc_object_release( p_input_thread );
 }
 
@@ -502,13 +507,17 @@ int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
     vlc_value_t val_list;
+    int i_track_count;
 
     if( !p_input_thread )
         return -1;
 
     var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
+    i_track_count = val_list.p_list->i_count;
+    var_Change( p_input_thread, "video-es", VLC_VAR_FREELIST, &val_list, NULL );
+
     vlc_object_release( p_input_thread );
-    return val_list.p_list->i_count;
+    return i_track_count;
 }
 
 libvlc_track_description_t *
@@ -542,13 +551,13 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi,
     var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
-        vlc_value_t track_val = val_list.p_list->p_values[i];
-        if( track_val.i_int == val.i_int )
+        if( val_list.p_list->p_values[i].i_int == val.i_int )
         {
             i_track = i;
             break;
-       }
+        }
     }
+    var_Change( p_input_thread, "video-es", VLC_VAR_FREELIST, &val_list, NULL );
     vlc_object_release( p_input_thread );
     return i_track;
 }
@@ -573,10 +582,12 @@ void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
             i_ret = var_Set( p_input_thread, "audio-es", val );
             if( i_ret < 0 )
                 libvlc_exception_raise( p_e, "Setting video track failed" );
-            vlc_object_release( p_input_thread );
-            return;
+            goto end;
         }
     }
     libvlc_exception_raise( p_e, "Video track out of range" );
+
+end:
+    var_Change( p_input_thread, "video-es", VLC_VAR_FREELIST, &val_list, NULL );
     vlc_object_release( p_input_thread );
 }

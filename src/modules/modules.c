@@ -292,7 +292,7 @@ const char *module_get_name( const module_t *m, bool long_name )
     if( long_name && ( m->psz_longname != NULL) )
         return m->psz_longname;
 
-    return m->psz_shortname ?: m->psz_object_name;
+    return m->psz_shortname ? m->psz_shortname : m->psz_object_name;
 }
 
 /**
