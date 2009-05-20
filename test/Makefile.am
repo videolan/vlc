@@ -12,11 +12,15 @@ check_PROGRAMS = \
 	test_libvlc_events \
 	test_libvlc_media_list \
 	test_libvlc_media_list_player \
-	$(NULL)
-EXTRA_PROGRAMS = \
 	test_libvlc_media_player \
+        $(NULL)
+
+# Disabled test:
+# meta: No suitable test file
+EXTRA_PROGRAMS = \
 	test_libvlc_meta \
 	$(NULL)
+
 #check_DATA = samples/test.sample samples/meta.sample
 EXTRA_DIST = samples/empty.voc
 
