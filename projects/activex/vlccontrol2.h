@@ -586,6 +586,8 @@ public:
     STDMETHODIMP put_crop(BSTR);
     STDMETHODIMP get_teletext(long*);
     STDMETHODIMP put_teletext(long);
+    STDMETHODIMP deinterlaceDisable();
+    STDMETHODIMP deinterlaceEnable(BSTR);
     STDMETHODIMP takeSnapshot(LPPICTUREDISP*);
     STDMETHODIMP toggleFullscreen();
     STDMETHODIMP toggleTeletext();

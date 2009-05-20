@@ -2220,6 +2220,39 @@ STDMETHODIMP VLCVideo::put_teletext(long page)
     return hr;
 };
 
+STDMETHODIMP VLCVideo::deinterlaceDisable()
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_deinterlace(p_md, 0, "", &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCVideo::deinterlaceEnable(BSTR mode)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        /* get deinterlace mode from the user */
+        char *psz_mode = CStrFromBSTR(CP_UTF8, mode);
+        /* enable deinterlace filter if possible */
+        libvlc_video_set_deinterlace(p_md, 1, psz_mode, &ex);
+        hr = exception_bridge(&ex);
+        CoTaskMemFree(psz_mode);
+    }
+    return hr;
+};
+
 STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
 {
     if( NULL == picture )

@@ -467,6 +467,11 @@ library AXVLC
         [propput, helpstring("Sets teletext page to use.")]
         HRESULT teletext([in] long page);
 
+        [helpstring("Enable deinterlace filter.")]
+        HRESULT deinterlaceEnable([in] BSTR mode);
+        [helpstring("Disable deinterlace filter.")]
+        HRESULT deinterlaceDisable();
+
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
 
