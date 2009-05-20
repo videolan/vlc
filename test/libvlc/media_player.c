@@ -104,6 +104,15 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     assert( state == libvlc_Playing || state == libvlc_MediaPlayerEndReached );
 
     libvlc_media_player_pause (mi, &ex);
+
+    /* Wait a correct state */
+    do {
+        state = libvlc_media_player_get_state (mi, &ex);
+        catch ();
+    } while( state != libvlc_Paused &&
+            state != libvlc_Error &&
+            state != libvlc_MediaPlayerEndReached );
+
     assert( libvlc_media_player_get_state (mi, &ex) == libvlc_Paused );
     catch();
 
