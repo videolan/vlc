@@ -107,27 +107,27 @@ void
 libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, const char *psz_filepath,
         unsigned int i_width, unsigned int i_height, libvlc_exception_t *p_e )
 {
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    input_thread_t *p_input_thread;
+    vout_thread_t *p_vout;
 
-    /* GetVout will raise the exception for us */
-    if( !p_vout ) return;
-
+    /* The filepath must be not NULL */
     if( !psz_filepath )
     {
         libvlc_exception_raise( p_e, "filepath is null" );
         return;
     }
-
-    var_SetInteger( p_vout, "snapshot-width", i_width );
-    var_SetInteger( p_vout, "snapshot-height", i_height );
-
-    p_input_thread = p_mi->p_input_thread;
+    /* We must have an input */
     if( !p_mi->p_input_thread )
     {
         libvlc_exception_raise( p_e, "Input does not exist" );
         return;
     }
+
+    /* GetVout will raise the exception for us */
+    p_vout = GetVout( p_mi, p_e );
+    if( !p_vout ) return;
+
+    var_SetInteger( p_vout, "snapshot-width", i_width );
+    var_SetInteger( p_vout, "snapshot-height", i_height );
 
     var_SetString( p_vout, "snapshot-path", psz_filepath );
     var_SetString( p_vout, "snapshot-format", "png" );
