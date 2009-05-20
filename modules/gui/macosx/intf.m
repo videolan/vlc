@@ -1565,6 +1565,17 @@ static void manage_cleanup( void * args )
         p_intf->p_sys->b_intf_update = true;
         p_intf->p_sys->b_input_update = false;
         [self setupMenus]; /* Make sure input menu is up to date */
+
+        /* update our info-panel to reflect the new item, if we don't show
+         * the playlist or the selection is empty */
+        if( [self isPlaylistCollapsed] == YES )
+        {
+            playlist_t * p_playlist = pl_Hold( p_intf );
+            PL_LOCK;
+            [[self info] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
+            PL_UNLOCK;
+            pl_Release( p_intf );
+        }
     }
     if( p_intf->p_sys->b_intf_update )
     {
@@ -1592,15 +1603,6 @@ static void manage_cleanup( void * args )
                  cachedInputState == OPENING_S )
             {
                 b_buffering = YES;
-            }
-
-            /* update our info-panel to reflect the new item, if we don't show
-             * the playlist or the selection is empty */
-            if( [self isPlaylistCollapsed] == YES )
-            {
-                PL_LOCK;
-                [[self info] updatePanelWithItem: playlist_CurrentPlayingItem( p_playlist )->p_input];
-                PL_UNLOCK;
             }
 
             /* seekable streams */
@@ -1696,6 +1698,7 @@ static void manage_cleanup( void * args )
             [[o_controls voutView] updateTitle];
  
             [o_playlist updateRowSelection];
+
             p_intf->p_sys->b_current_title_update = FALSE;
         }
 
