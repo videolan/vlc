@@ -36,7 +36,6 @@ protected:
         RuntimeNPObject(instance, aClass),
     audioObj(NULL),
     inputObj(NULL),
-    logObj(NULL),
     playlistObj(NULL),
     videoObj(NULL) {};
 
@@ -55,7 +54,6 @@ protected:
 private:
     NPObject *audioObj;
     NPObject *inputObj;
-    NPObject *logObj;
     NPObject *playlistObj;
     NPObject *videoObj;
 };
@@ -99,103 +97,6 @@ protected:
 
     static const int methodCount;
     static const NPUTF8 * const methodNames[];
-};
-
-class LibvlcMessageNPObject: public RuntimeNPObject
-{
-public:
-    void setMessage(struct libvlc_log_message_t &msg)
-    {
-        _msg = msg;
-    };
-
-protected:
-    friend class RuntimeNPClass<LibvlcMessageNPObject>;
-
-    LibvlcMessageNPObject(NPP instance, const NPClass *aClass) :
-        RuntimeNPObject(instance, aClass) {};
-
-    virtual ~LibvlcMessageNPObject() {};
-
-    static const int propertyCount;
-    static const NPUTF8 * const propertyNames[];
-
-    InvokeResult getProperty(int index, NPVariant &result);
-
-    static const int methodCount;
-    static const NPUTF8 * const methodNames[];
-
-private:
-    struct libvlc_log_message_t _msg;
-};
-
-class LibvlcLogNPObject;
-
-class LibvlcMessageIteratorNPObject: public RuntimeNPObject
-{
-protected:
-    friend class RuntimeNPClass<LibvlcMessageIteratorNPObject>;
-
-    LibvlcMessageIteratorNPObject(NPP instance, const NPClass *aClass);
-    virtual ~LibvlcMessageIteratorNPObject();
-
-    static const int propertyCount;
-    static const NPUTF8 * const propertyNames[];
-
-    InvokeResult getProperty(int index, NPVariant &result);
-
-    static const int methodCount;
-    static const NPUTF8 * const methodNames[];
-
-    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
-
-private:
-    libvlc_log_iterator_t*  _p_iter;
-};
-
-class LibvlcMessagesNPObject: public RuntimeNPObject
-{
-protected:
-    friend class RuntimeNPClass<LibvlcMessagesNPObject>;
-
-    LibvlcMessagesNPObject(NPP instance, const NPClass *aClass) :
-        RuntimeNPObject(instance, aClass) {};
-
-    virtual ~LibvlcMessagesNPObject() {};
-
-    static const int propertyCount;
-    static const NPUTF8 * const propertyNames[];
-
-    InvokeResult getProperty(int index, NPVariant &result);
-
-    static const int methodCount;
-    static const NPUTF8 * const methodNames[];
-
-    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
-};
-
-class LibvlcLogNPObject: public RuntimeNPObject
-{
-protected:
-    friend class RuntimeNPClass<LibvlcLogNPObject>;
-
-    LibvlcLogNPObject(NPP instance, const NPClass *aClass) :
-    RuntimeNPObject(instance, aClass),
-    messagesObj(NULL) {};
-
-    virtual ~LibvlcLogNPObject();
-
-    static const int propertyCount;
-    static const NPUTF8 * const propertyNames[];
-
-    InvokeResult getProperty(int index, NPVariant &result);
-    InvokeResult setProperty(int index, const NPVariant &value);
-
-    static const int methodCount;
-    static const NPUTF8 * const methodNames[];
-
-private:
-    NPObject* messagesObj;
 };
 
 class LibvlcPlaylistItemsNPObject: public RuntimeNPObject
