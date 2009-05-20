@@ -31,6 +31,9 @@
 
 #import <Cocoa/Cocoa.h>
 
+/* SetSystemUIMode, ... */
+#import <Carbon/Carbon.h>
+
 @implementation VLCMinimalVoutWindow
 - (id)initWithContentRect:(NSRect)contentRect
 {
@@ -64,14 +67,14 @@
 {
     fullscreen = YES;
     initialFrame = [self frame];
-    [NSMenu setMenuBarVisible:NO];
+    SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
     [self setFrame:[[self screen] frame] display:YES animate:YES];
 }
 
 - (void)leaveFullscreen
 {
     fullscreen = NO;
-    [NSMenu setMenuBarVisible:YES];
+    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
     [self setFrame:initialFrame display:YES animate:YES];
 }
 

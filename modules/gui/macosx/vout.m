@@ -36,6 +36,13 @@
 
 /* prevent system sleep */
 #import <CoreServices/CoreServices.h>
+/* FIXME: HACK!! */
+#ifdef __x86_64__
+#import <CoreServices/../Frameworks/OSServices.framework/Headers/Power.h>
+#endif
+
+/* SystemUIMode */
+#import <Carbon/Carbon.h>
 
 #include <vlc_keys.h>
 
@@ -1113,7 +1120,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [self setMovableByWindowBackground: NO];
 
     if( [screen isMainScreen] )
-        [NSMenu setMenuBarVisible:NO];
+        SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
 
     initialFrame = [self frame];
     [self setFrame:[screen frame] display:YES animate:YES];
@@ -1134,7 +1141,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     [NSScreen unblackoutScreens];
 
     [[[[VLCMain sharedInstance] controls] fspanel] setNonActive: nil];
-    [NSMenu setMenuBarVisible:YES];
+    SetSystemUIMode( kUIModeNormal, kUIOptionAutoShowMenuBar);
 
     [self setFrame:initialFrame display:YES animate:YES];
     [self setMovableByWindowBackground: YES];
