@@ -201,8 +201,7 @@ void libvlc_media_list_release( libvlc_media_list_t * p_mlist )
 
     libvlc_event_manager_release( p_mlist->p_event_manager );
 
-    if( p_mlist->p_md )
-        libvlc_media_release( p_mlist->p_md );
+    libvlc_media_release( p_mlist->p_md );
 
     for ( i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
     {
@@ -279,8 +278,7 @@ void libvlc_media_list_set_media( libvlc_media_list_t * p_mlist,
 {
     VLC_UNUSED(p_e);
     vlc_mutex_lock( &p_mlist->object_lock );
-    if( p_mlist->p_md )
-        libvlc_media_release( p_mlist->p_md );
+    libvlc_media_release( p_mlist->p_md );
     libvlc_media_retain( p_md );
     p_mlist->p_md = p_md;
     vlc_mutex_unlock( &p_mlist->object_lock );

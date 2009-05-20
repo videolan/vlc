@@ -391,8 +391,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
         release_input_thread( p_mi, true );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
-    if( p_mi->p_md )
-        libvlc_media_release( p_mi->p_md );
+    libvlc_media_release( p_mi->p_md );
     vlc_mutex_destroy( &p_mi->object_lock );
     free( p_mi );
 }
