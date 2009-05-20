@@ -1167,6 +1167,8 @@ libvlc_track_description_t *
                                       libvlc_exception_t *p_e )
 {
     input_thread_t *p_input = libvlc_get_input_thread( p_mi, p_e );
+    libvlc_track_description_t *p_track_description = NULL,
+                               *p_actual, *p_previous;
 
     if( !p_input )
         return NULL;
@@ -1174,22 +1176,16 @@ libvlc_track_description_t *
     vlc_value_t val_list, text_list;
     var_Change( p_input, psz_variable, VLC_VAR_GETLIST, &val_list, &text_list);
 
-    if( val_list.p_list->i_count <= 0 ) /* no tracks */
-    {
-        var_FreeList( &val_list, &text_list);
-        vlc_object_release( p_input );
-        return NULL;
-    }
+    /* no tracks */
+    if( val_list.p_list->i_count <= 0 )
+        goto end;
 
-    libvlc_track_description_t *p_track_description, *p_actual, *p_previous;
     p_track_description = ( libvlc_track_description_t * )
         malloc( sizeof( libvlc_track_description_t ) );
     if ( !p_track_description )
     {
-        var_FreeList( &val_list, &text_list);
-        vlc_object_release( p_input );
         libvlc_exception_raise( p_e, "no enough memory" );
-        return NULL;
+        goto end;
     }
     p_actual = p_track_description;
     p_previous = NULL;
@@ -1202,10 +1198,8 @@ libvlc_track_description_t *
             if ( !p_actual )
             {
                 libvlc_track_description_release( p_track_description );
-                var_FreeList( &val_list, &text_list);
-                vlc_object_release( p_input );
                 libvlc_exception_raise( p_e, "no enough memory" );
-                return NULL;
+                goto end;
             }
         }
         p_actual->i_id = val_list.p_list->p_values[i].i_int;
@@ -1216,7 +1210,9 @@ libvlc_track_description_t *
         p_previous = p_actual;
         p_actual =  NULL;
     }
-    var_FreeList( &val_list, &text_list);
+
+end:
+    var_FreeList( &val_list, &text_list );
     vlc_object_release( p_input );
 
     return p_track_description;
