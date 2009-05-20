@@ -1512,7 +1512,6 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
         char buf1[MSTRTIME_MAX_SIZE];
         char buf2[MSTRTIME_MAX_SIZE];
         vlc_value_t val;
-        vlc_value_t val_list;
 
         /* Source */
         char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
@@ -1554,23 +1553,17 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             /* Title */
             if( !var_Get( p_input, "title", &val ) )
             {
-                var_Change( p_input, "title", VLC_VAR_GETCHOICES, &val_list, NULL );
-                if( val_list.p_list->i_count > 0 )
-                {
-                    mvnprintw( y++, 0, COLS, _(" Title    : %d/%d"), val.i_int, val_list.p_list->i_count );
-                }
-                var_FreeList( &val_list, NULL );
+                int i_title_count = var_CountChoices( p_input, "title" );
+                if( i_title_count > 0 )
+                    mvnprintw( y++, 0, COLS, _(" Title    : %d/%d"), val.i_int, i_title_count );
             }
 
             /* Chapter */
             if( !var_Get( p_input, "chapter", &val ) )
             {
-                var_Change( p_input, "chapter", VLC_VAR_GETCHOICES, &val_list, NULL );
-                if( val_list.p_list->i_count > 0 )
-                {
-                    mvnprintw( y++, 0, COLS, _(" Chapter  : %d/%d"), val.i_int, val_list.p_list->i_count );
-                }
-                var_FreeList( &val_list, NULL );
+                int i_chapter_count = var_CountChoices( p_input, "chapter" );
+                if( i_chapter_count > 0 )
+                    mvnprintw( y++, 0, COLS, _(" Chapter  : %d/%d"), val.i_int, i_chapter_count );
             }
         }
         else

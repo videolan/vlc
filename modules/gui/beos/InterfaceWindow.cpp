@@ -662,34 +662,26 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case NAVIGATE_NEXT:
             if( p_input )
             {
-                vlc_value_t val, val_list;
-
                 /* First try to go to next chapter */
                 if( !var_Get( p_input, "chapter", &val ) )
                 {
-                    var_Change( p_input, "chapter", VLC_VAR_GETCHOICES,
-                                &val_list, NULL );
-                    if( val_list.p_list->i_count > val.i_int )
+                    int i_chapter_count = var_CountChoices( p_input, "chapter" );
+                    if( i_chapter_count > val.i_int )
                     {
-                        var_FreeList( &val_list, NULL );
                         var_SetVoid( p_input, "next-chapter" );
                         break;
                     }
-                    var_FreeList( &val_list, NULL );
                 }
 
                 /* Try to go to next title */
                 if( !var_Get( p_input, "title", &val ) )
                 {
-                    var_Change( p_input, "title", VLC_VAR_GETCHOICES,
-                                &val_list, NULL );
-                    if( val_list.p_list->i_count > val.i_int )
+                    int i_title_count = var_CountChoices( p_input, "title" );
+                    if( i_title_count > val.i_int )
                     {
-                        var_FreeList( &val_list, NULL );
                         var_SetVoid( p_input, "next-title" );
                         break;
                     }
-                    var_FreeList( &val_list, NULL );
                 }
 
                 /* Try to go to next file */

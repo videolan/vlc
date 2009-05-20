@@ -1145,15 +1145,11 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
             else
             {
-                vlc_value_t val_list;
-
                 /* Get. */
                 var_Get( p_input, "chapter", &val );
-                var_Change( p_input, "chapter", VLC_VAR_GETCHOICES,
-                            &val_list, NULL );
-                msg_rc( "Currently playing chapter %d/%d.",
-                        val.i_int, val_list.p_list->i_count );
-                var_FreeList( &val_list, NULL );
+                int i_chapter_count = var_CountChoices( p_input, "chapter" );
+                msg_rc( "Currently playing chapter %d/%d.", val.i_int,
+                        i_chapter_count );
             }
         }
         else if( !strcmp( psz_cmd, "chapter_n" ) )
@@ -1177,15 +1173,11 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
             else
             {
-                vlc_value_t val_list;
-
                 /* Get. */
                 var_Get( p_input, "title", &val );
-                var_Change( p_input, "title", VLC_VAR_GETCHOICES,
-                            &val_list, NULL );
-                msg_rc( "Currently playing title %d/%d.",
-                        val.i_int, val_list.p_list->i_count );
-                var_FreeList( &val_list, NULL );
+                int i_title_count = var_CountChoices( p_input, "title" );
+                msg_rc( "Currently playing title %d/%d.", val.i_int,
+                        i_title_count );
             }
         }
         else if( !strcmp( psz_cmd, "title_n" ) )

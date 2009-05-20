@@ -281,15 +281,12 @@ int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi,
                                 libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-    vlc_value_t val_list;
     int i_spu_count;
 
     if( !p_input_thread )
         return -1;
 
-    var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
-    i_spu_count = val_list.p_list->i_count;
-    var_FreeList( &val_list, NULL );
+    i_spu_count = var_CountChoices( p_input_thread, "spu-es" );
 
     vlc_object_release( p_input_thread );
     return i_spu_count;
@@ -506,15 +503,12 @@ int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
                                   libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
-    vlc_value_t val_list;
     int i_track_count;
 
     if( !p_input_thread )
         return -1;
 
-    var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
-    i_track_count = val_list.p_list->i_count;
-    var_FreeList( &val_list, NULL );
+    i_track_count = var_CountChoices( p_input_thread, "video-es" );
 
     vlc_object_release( p_input_thread );
     return i_track_count;
