@@ -1072,6 +1072,9 @@ void CaptureOpenPanel::initialize()
     screenFPS->setAlignment( Qt::AlignRight );
     screenPropLayout->addWidget( screenFPS, 0, 1 );
 
+    /* Screen connect */
+    CuMRL( screenFPS, valueChanged( int ) );
+
     /* General connects */
     CONNECT( ui.deviceCombo, activated( int ) ,
              stackedDevLayout, setCurrentIndex( int ) );
