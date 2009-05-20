@@ -265,6 +265,8 @@ case "${host_os}" in
         echo "  Assuming --disable-skins2"
         enable_x11="no"
         echo "  Assuming --disable-x11"
+        enable_xcb="no"
+        echo "  Assuming --disable-xcb"
         enable_glx="no"
         echo "  Assuming --disable-glx"
         enable_xvideo="no"
