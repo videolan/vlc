@@ -12553,7 +12553,7 @@ msgstr ""
 "Este archivo AVI está roto. La búsqueda no funcionará correctamente.\n"
 "¿Desea intentar repararlo?\n"
 "\n"
-"\vEsto puede tardar mucho."
+"Esto puede tardar mucho."
 
 #: modules/demux/avi/avi.c:688
 msgid "Repair"
