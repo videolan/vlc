@@ -1243,6 +1243,7 @@ libvlc_track_description_t *
     if( val_list.p_list->i_count <= 0 ) /* no tracks */
     {
         var_Change( p_input, psz_variable, VLC_VAR_FREELIST, &val_list, &text_list);
+        vlc_object_release( p_input );
         return NULL;
     }
 
