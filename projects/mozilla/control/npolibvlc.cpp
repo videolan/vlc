@@ -1456,14 +1456,18 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
 const NPUTF8 * const LibvlcVideoNPObject::methodNames[] =
 {
     "toggleFullscreen",
-    "toggleTeletext"
+    "toggleTeletext",
+    "deinterlaceEnable",
+    "deinterlaceDisable"
 };
 COUNTNAMES(LibvlcVideoNPObject,methodCount,methodNames);
 
 enum LibvlcVideoNPObjectMethodIds
 {
     ID_video_togglefullscreen,
-    ID_video_toggleteletext
+    ID_video_toggleteletext,
+    ID_video_deinterlaceenable,
+    ID_video_deinterlacedisable
 };
 
 RuntimeNPObject::InvokeResult
@@ -1483,6 +1487,7 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
         switch( index )
         {
             case ID_video_togglefullscreen:
+            {
                 if( argCount == 0 )
                 {
                     p_plugin->toggle_fullscreen(&ex);
@@ -1491,7 +1496,9 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
+            }
             case ID_video_toggleteletext:
+            {
                 if( argCount == 0 )
                 {
                     libvlc_toggle_teletext(p_md, &ex);
@@ -1500,6 +1507,33 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_video_deinterlacedisable:
+            {
+                libvlc_video_set_deinterlace(p_md, 0, "", &ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_deinterlaceenable:
+            {
+                if(argCount == 1)
+                {
+                    if( NPVARIANT_IS_STRING( args[0] ) )
+                    {
+                        /* get deinterlace mode from the user */
+                        char *psz_mode = stringValue( NPVARIANT_TO_STRING( args[0] ) );
+                        /* enable deinterlace filter if possible */
+                        libvlc_video_set_deinterlace(p_md, 1, psz_mode, &ex);
+                        free(psz_mode);
+                        RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                    {
+                        return INVOKERESULT_INVALID_VALUE;
+                    }
+                }
+            }
             default:
                 return INVOKERESULT_NO_SUCH_METHOD;
         }
