@@ -299,18 +299,8 @@ void libvlc_audio_output_set_device_type( libvlc_instance_t *p_instance,
     aout_instance_t *p_aout = GetAOut( p_instance, p_e );
     if( p_aout )
     {
-        vlc_value_t val;
-        int i_ret = -1;
-
-        val.i_int = (int) device_type;
-        i_ret = var_Set( p_aout, "audio-device", val );
-        if( i_ret < 0 )
-        {
+        if( var_SetInteger( p_aout, "audio-device", device_type ) < 0 )
             libvlc_exception_raise( p_e, "Failed setting audio device" );
-            vlc_object_release( p_aout );
-            return;
-        }
-
         vlc_object_release( p_aout );
     }
 }
@@ -329,15 +319,7 @@ void libvlc_audio_toggle_mute( libvlc_instance_t *p_instance,
 int libvlc_audio_get_mute( libvlc_instance_t *p_instance,
                            libvlc_exception_t *p_e )
 {
-    /*
-     * If the volume level is 0, then the channel is muted
-     */
-    audio_volume_t i_volume;
-
-    i_volume = libvlc_audio_get_volume(p_instance, p_e);
-    if ( i_volume == 0 )
-        return true;
-    return false;
+    return (libvlc_audio_get_volume(p_instance, p_e) == 0);
 }
 
 void libvlc_audio_set_mute( libvlc_instance_t *p_instance, int mute,
