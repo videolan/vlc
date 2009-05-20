@@ -441,13 +441,13 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi,
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
-        vlc_value_t track_val = val_list.p_list->p_values[i];
-        if( track_val.i_int == val.i_int )
+        if( val_list.p_list->p_values[i].i_int == val.i_int )
         {
             i_track = i;
             break;
-       }
+        }
     }
+    var_Change( p_input_thread, "audio-es", VLC_VAR_FREELIST, &val_list, NULL );
     vlc_object_release( p_input_thread );
     return i_track;
 }
@@ -470,16 +470,16 @@ void libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track,
     if( (i_track < 0) && (i_track > val_list.p_list->i_count) )
     {
         libvlc_exception_raise( p_e, "Audio track out of range" );
-        vlc_object_release( p_input_thread );
-        return;
+        goto end;
     }
 
     newval = val_list.p_list->p_values[i_track];
     i_ret = var_Set( p_input_thread, "audio-es", newval );
     if( i_ret < 0 )
-    {
         libvlc_exception_raise( p_e, "Setting audio track failed" );
-    }
+
+end:
+    var_Change( p_input_thread, "audio-es", VLC_VAR_FREELIST, &val_list, NULL );
     vlc_object_release( p_input_thread );
 }
 
