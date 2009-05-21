@@ -4,6 +4,7 @@ check_PROGRAMS = \
 	test_block \
 	test_dictionary \
 	test_i18n_atof \
+	test_keys \
 	test_url \
 	test_utf8 \
 	test_xmlent \
@@ -18,6 +19,7 @@ LDADD = ../libvlccore.la
 test_block_SOURCES = test_block.c ../misc/block.c
 test_dictionary_SOURCES = dictionary.c
 test_i18n_atof_SOURCES = i18n_atof.c
+test_keys_SOURCES = keys.c
 test_url_SOURCES = url.c
 test_utf8_SOURCES = utf8.c
 test_xmlent_SOURCES = xmlent.c
