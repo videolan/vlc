@@ -90,6 +90,7 @@ struct libvlc_media_list_t
     libvlc_instance_t *         p_libvlc_instance;
     int                         i_refcount;
     vlc_mutex_t                 object_lock;
+    vlc_mutex_t                 refcount_lock;
     libvlc_media_t * p_md; /* The media from which the
                                        * mlist comes, if any. */
     vlc_array_t                items;
