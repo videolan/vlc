@@ -93,15 +93,18 @@ public:
     void mouseReleaseEvent( QMouseEvent* e )
     {
         if( e->button() & Qt::RightButton )
-        {
-            emit rightClicked( indexAt( QPoint( e->x(), e->y() ) ),
-                               QCursor::pos() );
-        }
+            return; /* Do NOT forward to QTreeView!! */
         QTreeView::mouseReleaseEvent( e );
     }
 
     void mousePressEvent( QMouseEvent* e )
     {
+        if( e->button() & Qt::RightButton )
+        {
+            emit rightClicked( indexAt( QPoint( e->x(), e->y() ) ),
+                               QCursor::pos() );
+            return;
+        }
         if( e->button() & Qt::LeftButton )
         {
             if( !indexAt( QPoint( e->x(), e->y() ) ).isValid() )
