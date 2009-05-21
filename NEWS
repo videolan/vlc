@@ -9,6 +9,7 @@ Important notes:
 ----------------
  * Alsa and OSS audio capture has been removed from the v4l and v4l2 accesses.
    See 'Access:' for more info.
+ * Support for Mac OS X 10.4.x was dropped due to its technical limitations
 
 Playback:
  * Instantaneous pausing
@@ -105,8 +106,8 @@ Windows CE Port:
  EXPERIMENTAL work for the winCE port has been done.
 
 Mac OS X Port:
- * Support for Mac OS X 10.4.x was dropped due to its technical limitations
  * Speed improvements by using llvm-gcc
+ * New Document icons by Dominic Spitaler
 
 Audio output:
  * Removed obsolete Esound and aRts plugins
