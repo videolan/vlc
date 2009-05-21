@@ -69,23 +69,28 @@
     IBOutlet id o_auth_win;
 
     /* progress dialogue */
-    IBOutlet id o_prog_bar;
+    IBOutlet NSProgressIndicator * o_prog_bar;
     IBOutlet id o_prog_cancel_btn;
     IBOutlet id o_prog_description_txt;
     IBOutlet id o_prog_title_txt;
     IBOutlet id o_prog_win;
+    BOOL b_progress_cancelled;
 }
 + (VLCCoreDialogProvider *)sharedInstance;
 
 -(void)performDialogEvent: (NSNotification *)o_notification;
--(void)performProgressBarEvent: (NSNotification *)o_notification;
 
 -(void)showFatalDialog: (NSValue *)o_value;
 -(void)showQuestionDialog: (NSValue *)o_value;
+
 -(void)showLoginDialog: (NSValue *)o_value;
 -(IBAction)loginDialogAction:(id)sender;
+
 -(void)showProgressDialog: (NSValue *)o_value;
 -(IBAction)progDialogAction:(id)sender;
+-(BOOL)progressCancelled;
+-(void)updateProgressPanelWithText: (NSString *)string andNumber: (double)d_number;
+-(void)destroyProgressPanel;
 
 -(id)errorPanel;
 
