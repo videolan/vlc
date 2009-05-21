@@ -22,6 +22,8 @@
  *  http://www.gnu.org/copyleft/gpl.html                              *
  **********************************************************************/
 
+#include <strings.h>
+
 #include "test.h"
 
 static void test_meta (const char ** argv, int argc)
@@ -51,7 +53,7 @@ static void test_meta (const char ** argv, int argc)
     while (!libvlc_media_is_preparsed (media, &ex))
     {
         catch ();
-        msleep (10000);
+        usleep (10000);
     }
 
     artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
