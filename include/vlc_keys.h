@@ -90,7 +90,7 @@
 typedef struct key_descriptor_s
 {
     const char *psz_key_string;
-    int i_key_code;
+    uint32_t i_key_code;
 } key_descriptor_t;
 
 #define ADD_KEY(a) { a, *a }
@@ -220,17 +220,21 @@ static const struct key_descriptor_s vlc_keys[] =
 };
 enum { vlc_num_keys=sizeof(vlc_keys)/sizeof(struct key_descriptor_s) };
 
-static inline const char *KeyToString( int i_key )
+#include <stdlib.h>
+
+static inline int cmpkey (const void *key, const void *elem)
 {
-    size_t i;
-    for ( i = 0; i < vlc_num_keys; ++i )
-    {
-        if ( vlc_keys[i].i_key_code == i_key )
-        {
-            return vlc_keys[i].psz_key_string;
-        }
-    }
-    return NULL;
+    return ((uintptr_t)key) - ((key_descriptor_t *)elem)->i_key_code;
+}
+
+static inline const char *KeyToString( uint32_t i_key )
+{
+    key_descriptor_t *d;
+
+    d = (key_descriptor_t *)
+        bsearch ((void *)(uintptr_t)i_key, vlc_keys, vlc_num_keys,
+                 sizeof (vlc_keys[0]), cmpkey);
+    return d ? d->psz_key_string : NULL;
 }
 
 static inline int StringToKey( char *psz_key )
