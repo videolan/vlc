@@ -243,6 +243,28 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/skip_previous_graphite.png \
 	extras/package/macosx/Resources/stop_graphite.png \
 	extras/package/macosx/Resources/volumeslider_graphite.png \
+	extras/package/macosx/Resources/backward_big_down.png \
+	extras/package/macosx/Resources/backward_big.png \
+	extras/package/macosx/Resources/eq_sm.pdf \
+	extras/package/macosx/Resources/forward_big_down.png \
+	extras/package/macosx/Resources/forward_big.png \
+	extras/package/macosx/Resources/fs_sm.pdf \
+	extras/package/macosx/Resources/list_sm.pdf \
+	extras/package/macosx/Resources/next_sm.pdf \
+	extras/package/macosx/Resources/pause_big_down.png \
+	extras/package/macosx/Resources/pause_big.png \
+	extras/package/macosx/Resources/play_big_down.png \
+	extras/package/macosx/Resources/play_big.png \
+	extras/package/macosx/Resources/prev_sm.pdf \
+	extras/package/macosx/Resources/sidebarAdd.png \
+	extras/package/macosx/Resources/sidebarRepeat.png \
+	extras/package/macosx/Resources/sidebarRepeatOn.png \
+	extras/package/macosx/Resources/sidebarRepeatOneOn.png \
+	extras/package/macosx/Resources/sidebarResizeWidget.png \
+	extras/package/macosx/Resources/sidebarShuffle.png \
+	extras/package/macosx/Resources/sidebarShuffleOn.png \
+	extras/package/macosx/Resources/sidebarStatusAreaBackground.png \
+	extras/package/macosx/Resources/stop_sm.pdf \
 	extras/package/macosx/Resources/noart.png \
 	extras/package/macosx/Resources/spref_cone_Audio_64.png \
 	extras/package/macosx/Resources/spref_cone_Hotkeys_64.png \
