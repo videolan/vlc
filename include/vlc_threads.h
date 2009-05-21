@@ -139,13 +139,13 @@ typedef DWORD   vlc_threadvar_t;
 /*****************************************************************************
  * Function definitions
  *****************************************************************************/
-VLC_EXPORT( int,  vlc_mutex_init,    ( vlc_mutex_t * ) );
-VLC_EXPORT( int,  vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
+VLC_EXPORT( void, vlc_mutex_init,    ( vlc_mutex_t * ) );
+VLC_EXPORT( void, vlc_mutex_init_recursive, ( vlc_mutex_t * ) );
 VLC_EXPORT( void, vlc_mutex_destroy, ( vlc_mutex_t * ) );
 VLC_EXPORT( void, vlc_mutex_lock, ( vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_mutex_trylock, ( vlc_mutex_t * ) LIBVLC_USED );
 VLC_EXPORT( void, vlc_mutex_unlock, ( vlc_mutex_t * ) );
-VLC_EXPORT( int,  vlc_cond_init,     ( vlc_cond_t * ) );
+VLC_EXPORT( void, vlc_cond_init,     ( vlc_cond_t * ) );
 VLC_EXPORT( void, vlc_cond_destroy,  ( vlc_cond_t * ) );
 VLC_EXPORT( void, vlc_cond_signal, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );
@@ -242,9 +242,10 @@ typedef pthread_spinlock_t vlc_spinlock_t;
 /**
  * Initializes a spinlock.
  */
-static inline int vlc_spin_init (vlc_spinlock_t *spin)
+static inline void vlc_spin_init (vlc_spinlock_t *spin)
 {
-    return pthread_spin_init (spin, PTHREAD_PROCESS_PRIVATE);
+    if (pthread_spin_init (spin, PTHREAD_PROCESS_PRIVATE))
+        abort ();
 }
 
 /**
@@ -278,9 +279,10 @@ typedef CRITICAL_SECTION vlc_spinlock_t;
 /**
  * Initializes a spinlock.
  */
-static inline int vlc_spin_init (vlc_spinlock_t *spin)
+static inline void vlc_spin_init (vlc_spinlock_t *spin)
 {
-    return !InitializeCriticalSectionAndSpinCount(spin, 4000);
+    if (!InitializeCriticalSectionAndSpinCount(spin, 4000))
+        abort ();
 }
 
 /**
@@ -312,9 +314,9 @@ static inline void vlc_spin_destroy (vlc_spinlock_t *spin)
 /* Fallback to plain mutexes if spinlocks are not available */
 typedef vlc_mutex_t vlc_spinlock_t;
 
-static inline int vlc_spin_init (vlc_spinlock_t *spin)
+static inline void vlc_spin_init (vlc_spinlock_t *spin)
 {
-    return vlc_mutex_init (spin);
+    vlc_mutex_init (spin);
 }
 
 # define vlc_spin_lock    vlc_mutex_lock

@@ -135,13 +135,12 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
-int vlc_mutex_init( vlc_mutex_t *p_mutex )
+void vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
     pthread_mutexattr_t attr;
-    int                 i_result;
 
-    pthread_mutexattr_init( &attr );
-
+    if( pthread_mutexattr_init( &attr ) )
+        abort();
 #ifndef NDEBUG
     /* Create error-checking mutex to detect problems more easily. */
 # if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
@@ -150,18 +149,17 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
 # endif
 #endif
-    i_result = pthread_mutex_init( p_mutex, &attr );
+    if( pthread_mutex_init( p_mutex, &attr ) )
+        abort();
     pthread_mutexattr_destroy( &attr );
-    return i_result;
 }
 
 /*****************************************************************************
  * vlc_mutex_init: initialize a recursive mutex (Do not use)
  *****************************************************************************/
-int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
+void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
     pthread_mutexattr_t attr;
-    int                 i_result;
 
     pthread_mutexattr_init( &attr );
 #if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
@@ -169,9 +167,9 @@ int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 #else
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
 #endif
-    i_result = pthread_mutex_init( p_mutex, &attr );
+    if( pthread_mutex_init( p_mutex, &attr ) )
+        abort();
     pthread_mutexattr_destroy( &attr );
-    return( i_result );
 }
 
 
@@ -254,15 +252,12 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 /*****************************************************************************
  * vlc_cond_init: initialize a condition variable
  *****************************************************************************/
-int vlc_cond_init( vlc_cond_t *p_condvar )
+void vlc_cond_init( vlc_cond_t *p_condvar )
 {
     pthread_condattr_t attr;
-    int ret;
 
-    ret = pthread_condattr_init (&attr);
-    if (ret)
-        return ret;
-
+    if (pthread_condattr_init (&attr))
+        abort ();
 #if !defined (_POSIX_CLOCK_SELECTION)
    /* Fairly outdated POSIX support (that was defined in 2001) */
 # define _POSIX_CLOCK_SELECTION (-1)
@@ -272,9 +267,9 @@ int vlc_cond_init( vlc_cond_t *p_condvar )
     pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
 #endif
 
-    ret = pthread_cond_init (p_condvar, &attr);
+    if (pthread_cond_init (p_condvar, &attr))
+        abort ();
     pthread_condattr_destroy (&attr);
-    return ret;
 }
 
 /**

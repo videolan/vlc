@@ -158,7 +158,7 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 }
 
 /*** Mutexes ***/
-int vlc_mutex_init( vlc_mutex_t *p_mutex )
+void vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
     /* This creates a recursive mutex. This is OK as fast mutexes have
      * no defined behavior in case of recursive locking. */
@@ -167,7 +167,7 @@ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     return 0;
 }
 
-int vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
+void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
     InitializeCriticalSection( &p_mutex->mutex );
     p_mutex->initialized = 1;
@@ -220,11 +220,12 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 }
 
 /*** Condition variables ***/
-int vlc_cond_init( vlc_cond_t *p_condvar )
+void vlc_cond_init( vlc_cond_t *p_condvar )
 {
     /* Create a manual-reset event (manual reset is needed for broadcast). */
     *p_condvar = CreateEvent (NULL, TRUE, FALSE, NULL);
-    return *p_condvar ? 0 : ENOMEM;
+    if (!*p_condvar)
+        abort();
 }
 
 void vlc_cond_destroy (vlc_cond_t *p_condvar)
