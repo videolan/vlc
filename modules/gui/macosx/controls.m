@@ -423,12 +423,10 @@
 
 - (IBAction)showPosition: (id)sender
 {
-    vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
-                                             FIND_ANYWHERE );
+    vout_thread_t *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
     if( p_vout != NULL )
     {
-        intf_thread_t * p_intf = VLCIntf;
-        var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_POSITION );
+        var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_POSITION );
         vlc_object_release( (vlc_object_t *)p_vout );
     }
 }
@@ -451,8 +449,7 @@
 {
     NSString *o_title = [sender title];
 
-    vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
-                                              FIND_ANYWHERE );
+    vout_thread_t *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
     if( p_vout != NULL )
     {
         id o_vout_view = [self voutView];
@@ -615,8 +612,8 @@
 
     if( key )
     {
-        vout_thread_t *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
-                                              FIND_ANYWHERE );
+        vout_thread_t *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
+
         if( p_vout != NULL )
         {
             /* Escape */
@@ -1044,8 +1041,7 @@
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
  
-        vout_thread_t   *p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                              FIND_ANYWHERE );
+        vout_thread_t   *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
         if( p_vout != NULL )
         {
             if( [[o_mi title] isEqualToString: _NS("Float on Top")] )

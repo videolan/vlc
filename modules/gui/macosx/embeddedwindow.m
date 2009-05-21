@@ -26,15 +26,15 @@
  * Preamble
  *****************************************************************************/
 
-/* DisableScreenUpdates, SetSystemUIMode, ... */
-#import <QuickTime/QuickTime.h>
-
 #import "intf.h"
 #import "controls.h"
 #import "vout.h"
 #import "embeddedwindow.h"
 #import "fspanel.h"
 #import "playlist.h"
+
+/* SetSystemUIMode, ... */
+#import <Carbon/Carbon.h>
 
 /*****************************************************************************
  * extension to NSWindow's interface to fix compilation warnings
@@ -52,6 +52,22 @@
  *****************************************************************************/
 
 @implementation VLCEmbeddedWindow
+
+- (id)initWithContentRect:(NSRect)contentRect styleMask: (NSUInteger)windowStyle backing:(NSBackingStoreType)bufferingType defer:(BOOL)deferCreation
+{
+    BOOL b_useTextured = YES;
+    if( [[NSWindow class] instancesRespondToSelector:@selector(setContentBorderThickness:forEdge:)] )
+    {
+        b_useTextured = NO;
+        windowStyle ^= NSTexturedBackgroundWindowMask;
+    }
+    self = [super initWithContentRect:contentRect styleMask:windowStyle backing:bufferingType defer:deferCreation];
+    if(! b_useTextured )
+    {
+        [self setContentBorderThickness:28.0 forEdge:NSMinYEdge];
+    }
+    return self;
+}
 
 - (void)awakeFromNib
 {
@@ -71,15 +87,9 @@
     [o_btn_playlist setToolTip: _NS("Playlist")];
     [self setTitle: _NS("VLC media player")];
 
-    if(MACOS_VERSION < 10.5f) {
-        o_img_play = [NSImage imageNamed: @"play"];
-        o_img_pause = [NSImage imageNamed: @"pause"];
-        [o_btn_play setImage: [NSImage imageNamed: @"play"]];
-    }
-    else {
-        o_img_play = [NSImage imageNamed: @"play_big"];
-        o_img_pause = [NSImage imageNamed: @"pause_big"];
-    }
+    o_img_play = [NSImage imageNamed: @"play_big"];
+    o_img_pause = [NSImage imageNamed: @"pause_big"];
+
     [self controlTintChanged];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector( controlTintChanged )
@@ -118,30 +128,8 @@
     if( [o_btn_play alternateImage] == o_img_play_pressed )
         b_playing = YES;
     
-    if (MACOS_VERSION < 10.5f) {
-        /* System is running Tiger and should use aqua buttons */
-        [o_btn_backward setImage: [NSImage imageNamed: @"skip_previous_active"]];
-        [o_btn_forward setImage: [NSImage imageNamed: @"skip_forward_active"]];
-        if( [NSColor currentControlTint] == NSGraphiteControlTint )
-        {
-            o_img_play_pressed = [NSImage imageNamed: @"play_graphite"];
-            o_img_pause_pressed = [NSImage imageNamed: @"pause_graphite"];
-            [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_graphite"]];
-            [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_graphite"]];
-        }
-        else
-        {
-            o_img_play_pressed = [NSImage imageNamed: @"play_blue"];
-            o_img_pause_pressed = [NSImage imageNamed: @"pause_blue"];
-            [o_btn_backward setAlternateImage: [NSImage imageNamed: @"skip_previous_blue"]];
-            [o_btn_forward setAlternateImage: [NSImage imageNamed: @"skip_forward_blue"]];
-        }
-    }
-    else{
-        /* System is running Leopard or later and should use metal buttons */
-        o_img_play_pressed = [NSImage imageNamed: @"play_big_down"];
-        o_img_pause_pressed = [NSImage imageNamed: @"pause_big_down"];
-    }
+    o_img_play_pressed = [NSImage imageNamed: @"play_big_down"];
+    o_img_pause_pressed = [NSImage imageNamed: @"pause_big_down"];
     
     if( b_playing )
         [o_btn_play setAlternateImage: o_img_play_pressed];
@@ -461,10 +449,9 @@
         [o_fullscreen_window setBackgroundColor: [NSColor blackColor]];
         [o_fullscreen_window setCanBecomeKeyWindow: YES];
 
-        if (![self isVisible] || [self alphaValue] == 0.0 || MACOS_VERSION < 10.4f)
+        if (![self isVisible] || [self alphaValue] == 0.0)
         {
-            /* We don't animate if we are not visible or if we are running on
-             * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+            /* We don't animate if we are not visible, instead we
              * simply fade the display */
             CGDisplayFadeReservationToken token;
  
@@ -495,20 +482,12 @@
         }
  
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
-        DisableScreenUpdates();
+        NSDisableScreenUpdates();
         [[self contentView] replaceSubview:o_view with:o_temp_view];
         [o_temp_view setFrame:[o_view frame]];
         [o_fullscreen_window setContentView:o_view];
         [o_fullscreen_window makeKeyAndOrderFront:self];
-        EnableScreenUpdates();
-    }
-
-    if (MACOS_VERSION < 10.4f)
-    {
-        /* We were already fullscreen nothing to do when NSAnimation
-         * is not supported */
-        [self unlockFullscreenAnimation];
-        return;
+        NSEnableScreenUpdates();
     }
 
     /* We are in fullscreen (and no animation is running) */
@@ -612,10 +591,9 @@
         return;
     }
 
-    if (fadeout || MACOS_VERSION < 10.4f)
+    if (fadeout)
     {
-        /* We don't animate if we are not visible or if we are running on
-        * Mac OS X <10.4 which doesn't support NSAnimation, instead we
+        /* We don't animate if we are not visible, instead we
         * simply fade the display */
         CGDisplayFadeReservationToken token;
 
@@ -696,7 +674,7 @@
 {
     /* This function is private and should be only triggered at the end of the fullscreen change animation */
     /* Make sure we don't see the o_view disappearing of the screen during this operation */
-    DisableScreenUpdates();
+    NSDisableScreenUpdates();
     [o_view retain];
     [o_view removeFromSuperviewWithoutNeedingDisplay];
     [[self contentView] replaceSubview:o_temp_view with:o_view];
@@ -706,7 +684,7 @@
     if ([self isVisible])
         [super makeKeyAndOrderFront:self]; /* our version contains a workaround */
     [o_fullscreen_window orderOut: self];
-    EnableScreenUpdates();
+    NSEnableScreenUpdates();
 
     [o_fullscreen_window release];
     o_fullscreen_window = nil;

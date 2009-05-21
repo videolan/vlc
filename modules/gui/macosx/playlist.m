@@ -1551,10 +1551,12 @@
     playlist_t *p_playlist = pl_Hold( VLCIntf );
     
     id o_playing_item;
-    
+
+    PL_LOCK;
     o_playing_item = [o_outline_dict objectForKey:
                       [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
-    
+    PL_UNLOCK;
+
     pl_Release( VLCIntf );
     
     return o_playing_item;
