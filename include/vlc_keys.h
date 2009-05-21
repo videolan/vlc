@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlc_keys.h: keycode defines
  *****************************************************************************
- * Copyright (C) 2003 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -23,6 +23,10 @@
 
 #ifndef VLC_KEYS_H
 #define VLC_KEYS_H 1
+
+#ifdef __APPLE__
+#include <stdint.h>
+#endif
 
 /**
  * \file
