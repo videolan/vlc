@@ -570,7 +570,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     /********************
      * hotkeys settings *
      ********************/
-    struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
+    const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
     o_hotkeySettings = [[NSMutableArray alloc] init];
     NSMutableArray *o_tempArray_desc = [[NSMutableArray alloc] init];
     i = 1;
@@ -931,7 +931,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
      ********************/
     if( b_hotkeyChanged )
     {
-        struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
+        const struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
         i = 1;
         while( i < [o_hotkeySettings count] )
         {
