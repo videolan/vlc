@@ -162,8 +162,6 @@ static int ConvertKeySym (xcb_keysym_t sym)
         return KEY_SPACE;
     if (isascii(sym))
         return sym;
-    if (sym > XK_Delete)
-        return KEY_UNSET;
 
     /* Special keys */
     res = bsearch (&sym, tab, sizeof (tab) / sizeof (tab[0]), sizeof (tab[0]),
