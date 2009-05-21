@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -37,23 +37,8 @@
 #include <vlc_plugin.h>
 #include <vlc_charset.h>
 
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-int  VCDOpen       ( vlc_object_t * );
-void VCDClose      ( vlc_object_t * );
-int  VCDOpenIntf   ( vlc_object_t * );
-void VCDCloseIntf  ( vlc_object_t * );
-int  VCDInit   ( vlc_object_t * );
-void VCDEnd    ( vlc_object_t * );
-
-int  DebugCallback ( vlc_object_t *p_this, const char *psz_name,
-                         vlc_value_t oldval, vlc_value_t val,
-                         void *p_data );
-
-int  BlocksPerReadCallback ( vlc_object_t *p_this, const char *psz_name,
-                 vlc_value_t oldval, vlc_value_t val,
-                 void *p_data );
+#include "vcd.h"
+#include "access.h"
 
 /*****************************************************************************
  * Option help text

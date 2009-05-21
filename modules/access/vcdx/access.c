@@ -48,10 +48,7 @@
 #include <libvcd/logging.h>
 #include "vcd.h"
 #include "info.h"
-#include "intf.h"
-
-extern void VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
-                          const vcdinfo_itemid_t *p_itemid );
+#include "access.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -1039,12 +1036,12 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
          */
         case ACCESS_GET_META:
         {
-            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-
             dbg_print( INPUT_DBG_EVENT, "get meta info" );
 #if 0
             if( p_vcdplayer->p_meta )
             {
+                vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg(args,vlc_meta_t**);
+
                 *pp_meta = vlc_meta_Duplicate( p_vcdplayer->p_meta );
                 dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
             }

@@ -39,15 +39,11 @@
 
 #include "vcd.h"
 #include "vcdplayer.h"
-#include "intf.h"
-
+#include "access.h"
 
 #include <cdio/cdio.h>
 #include <cdio/util.h>
 #include <libvcd/info.h>
-
-extern void VCDSetOrigin ( access_t *p_access, lsn_t i_lsn, track_t i_track,
-               const vcdinfo_itemid_t * p_itemid );
 
 /*!
   Return true if playback control (PBC) is on
@@ -112,7 +108,7 @@ vcdplayer_update_entry( access_t * p_access, uint16_t ofs,
 
    return true if the caller should return.
 */
-vcdplayer_read_status_t
+static vcdplayer_read_status_t
 vcdplayer_non_pbc_nav ( access_t *p_access, uint8_t *wait_time )
 {
   vcdplayer_t *p_vcdplayer= (vcdplayer_t *)p_access->p_sys;
@@ -122,9 +118,7 @@ vcdplayer_non_pbc_nav ( access_t *p_access, uint8_t *wait_time )
   case VCDINFO_ITEM_TYPE_TRACK:
   case VCDINFO_ITEM_TYPE_ENTRY: {
     if ( ! vcdplayer_play_next( p_access ) )
-    {
-    return READ_END;
-    }
+      return READ_END;
     break;
   }
   case VCDINFO_ITEM_TYPE_SPAREID2:
@@ -338,8 +332,8 @@ vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
 
   if( VCDINFO_NULL_LSN == i_lsn )
   {
-      LOG_ERR("%s %d", "Invalid LSN for track", i_track);
-      return;
+    LOG_ERR("%s %d", "Invalid LSN for track", i_track);
+    return;
   }
 
   p_vcdplayer->play_item.num  = p_itemid->num;
@@ -368,36 +362,35 @@ vcdplayer_set_origin(access_t *p_access, lsn_t i_lsn, track_t i_track,
 static bool
 vcdplayer_inc_play_item(access_t *p_access)
 {
-
   vcdplayer_t *p_vcdplayer = (vcdplayer_t *)p_access->p_sys;
   int noi;
 
   dbg_print(INPUT_DBG_CALL, "called pli: %d", p_vcdplayer->pdi);
 
-  if ( NULL == p_vcdplayer || NULL == p_vcdplayer->pxd.pld  ) return false;
+  if ( NULL == p_vcdplayer || NULL == p_vcdplayer->pxd.pld  )
+    return false;
 
   noi = vcdinf_pld_get_noi(p_vcdplayer->pxd.pld);
- 
-  if ( noi <= 0 ) return false;
+  if ( noi <= 0 )
+    return false;
  
   /* Handle delays like autowait or wait here? */
 
   p_vcdplayer->pdi++;
 
-  if ( p_vcdplayer->pdi < 0 || p_vcdplayer->pdi >= noi ) return false;
+  if ( p_vcdplayer->pdi < 0 || p_vcdplayer->pdi >= noi )
+    return false;
 
-  else {
-    uint16_t trans_itemid_num=vcdinf_pld_get_play_item(p_vcdplayer->pxd.pld,
-                                                       p_vcdplayer->pdi);
-    vcdinfo_itemid_t trans_itemid;
+  uint16_t trans_itemid_num=vcdinf_pld_get_play_item(p_vcdplayer->pxd.pld,
+                                                     p_vcdplayer->pdi);
+  vcdinfo_itemid_t trans_itemid;
 
-    if (VCDINFO_INVALID_ITEMID == trans_itemid_num) return false;
+  if (VCDINFO_INVALID_ITEMID == trans_itemid_num) return false;
  
-    vcdinfo_classify_itemid(trans_itemid_num, &trans_itemid);
-    dbg_print(INPUT_DBG_PBC, "  play-item[%d]: %s",
-              p_vcdplayer->pdi, vcdinfo_pin2str (trans_itemid_num));
-    return vcdplayer_play_single_item(p_access, trans_itemid);
-  }
+  vcdinfo_classify_itemid(trans_itemid_num, &trans_itemid);
+  dbg_print(INPUT_DBG_PBC, "  play-item[%d]: %s",
+            p_vcdplayer->pdi, vcdinfo_pin2str (trans_itemid_num));
+  return vcdplayer_play_single_item(p_access, trans_itemid);
 }
 
 void
@@ -415,7 +408,8 @@ vcdplayer_play(access_t *p_access, vcdinfo_itemid_t itemid)
 
     vcdinfo_obj_t *p_vcdinfo = p_vcdplayer->vcd;
 
-    if (p_vcdinfo == NULL) return;
+    if (p_vcdinfo == NULL)
+      return;
 
     p_vcdplayer->i_lid = itemid.num;
     vcdinfo_lid_get_pxd(p_vcdinfo, &(p_vcdplayer->pxd), itemid.num);
@@ -453,7 +447,7 @@ vcdplayer_play(access_t *p_access, vcdinfo_itemid_t itemid)
 }
 
 /* Handles PBC navigation when reaching the end of a play item. */
-vcdplayer_read_status_t
+static vcdplayer_read_status_t
 vcdplayer_pbc_nav ( access_t * p_access, uint8_t *wait_time )
 {
   vcdplayer_t *p_vcdplayer= (vcdplayer_t *)p_access->p_sys;
@@ -512,10 +506,10 @@ vcdplayer_pbc_nav ( access_t * p_access, uint8_t *wait_time )
  
       /* Set up for caller process wait time given. */
       if (p_vcdplayer->i_still) {
-    *wait_time = vcdinf_get_timeout_time(p_vcdplayer->pxd.psd);
-    dbg_print((INPUT_DBG_PBC|INPUT_DBG_STILL),
-          "playlist wait_time: %d", *wait_time);
-    return READ_STILL_FRAME;
+        *wait_time = vcdinf_get_timeout_time(p_vcdplayer->pxd.psd);
+        dbg_print((INPUT_DBG_PBC|INPUT_DBG_STILL),
+                  "playlist wait_time: %d", *wait_time);
+        return READ_STILL_FRAME;
       }
  
       /* Wait time has been processed; continue with next entry. */
@@ -592,7 +586,7 @@ vcdplayer_read (access_t * p_access, uint8_t *p_buf)
 {
 
   /* p_access->handle_events (); */
-  uint8_t wait_time;
+  uint8_t wait_time=0;
 
   vcdplayer_t *p_vcdplayer= (vcdplayer_t *)p_access->p_sys;
   if ( p_vcdplayer->i_lsn > p_vcdplayer->end_lsn ) {
@@ -600,7 +594,8 @@ vcdplayer_read (access_t * p_access, uint8_t *p_buf)
  
     /* We've run off of the end of this entry. Do we continue or stop? */
     dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC),
-              "end reached, cur: %u, end: %u\n", p_vcdplayer->i_lsn, p_vcdplayer->end_lsn);
+              "end reached, cur: %u, end: %u\n",
+              p_vcdplayer->i_lsn, p_vcdplayer->end_lsn);
 
   handle_item_continuation:
     read_status = vcdplayer_pbc_is_on( p_vcdplayer )
@@ -635,9 +630,9 @@ vcdplayer_read (access_t * p_access, uint8_t *p_buf)
 
     do {
       if (cdio_read_mode2_sector(p_img, &vcd_sector,
-                 p_vcdplayer->i_lsn, true)!=0) {
+                                 p_vcdplayer->i_lsn, true)!=0) {
         dbg_print(INPUT_DBG_LSN, "read error\n");
-    p_vcdplayer->i_lsn++;
+        p_vcdplayer->i_lsn++;
         return READ_ERROR;
       }
       p_vcdplayer->i_lsn++;
@@ -689,7 +684,7 @@ vcdplayer_play_default( access_t * p_access )
 
   itemid.type = p_vcdplayer->play_item.type;
 
-  if  (vcdplayer_pbc_is_on(p_vcdplayer)) {
+  if (vcdplayer_pbc_is_on(p_vcdplayer)) {
 
 #if defined(LIBVCD_VERSION)
     lid_t lid=vcdinfo_get_multi_default_lid(p_vcdplayer->vcd, p_vcdplayer->i_lid,
@@ -705,16 +700,17 @@ vcdplayer_play_default( access_t * p_access )
     }
 
 #else
-    vcdinfo_lid_get_pxd(p_vcdplayer->vcd, &(p_vcdplayer->pxd), p_vcdplayer->i_lid);
+    vcdinfo_lid_get_pxd(p_vcdplayer->vcd, &(p_vcdplayer->pxd),
+                        p_vcdplayer->i_lid);
  
     switch (p_vcdplayer->pxd.descriptor_type) {
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
       if (p_vcdplayer->pxd.psd == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinfo_get_default_offset(p_vcdplayer->vcd,
-                             p_vcdplayer->i_lid),
-                  &itemid.num, "default");
+      vcdplayer_update_entry(p_access,
+                             vcdinfo_get_default_offset(p_vcdplayer->vcd,
+                                                        p_vcdplayer->i_lid),
+                             &itemid.num, "default");
       break;
 
     case PSD_TYPE_PLAY_LIST:
@@ -771,17 +767,17 @@ vcdplayer_play_next( access_t * p_access )
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
       if (p_vcdplayer->pxd.psd == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinf_psd_get_next_offset(p_vcdplayer->pxd.psd),
-                  &itemid.num, "next");
+      vcdplayer_update_entry(p_access,
+                             vcdinf_psd_get_next_offset(p_vcdplayer->pxd.psd),
+                             &itemid.num, "next");
       itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
 
     case PSD_TYPE_PLAY_LIST:
       if (p_vcdplayer->pxd.pld == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinf_pld_get_next_offset(p_vcdplayer->pxd.pld),
-                  &itemid.num, "next");
+      vcdplayer_update_entry(p_access,
+                             vcdinf_pld_get_next_offset(p_vcdplayer->pxd.pld),
+                             &itemid.num, "next");
       itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
  
@@ -803,32 +799,30 @@ vcdplayer_play_next( access_t * p_access )
  
       switch (p_vcdplayer->play_item.type) {
       case VCDINFO_ITEM_TYPE_ENTRY:
-    max_entry = p_vcdplayer->i_entries;
-    break;
+        max_entry = p_vcdplayer->i_entries;
+        break;
       case VCDINFO_ITEM_TYPE_SEGMENT:
-    max_entry = p_vcdplayer->i_segments;
-    break;
+        max_entry = p_vcdplayer->i_segments;
+        break;
       case VCDINFO_ITEM_TYPE_TRACK:
-    max_entry = p_vcdplayer->i_tracks;
-    break;
+        max_entry = p_vcdplayer->i_tracks;
+        break;
       default: ; /* Handle exceptional cases below */
       }
  
       if (p_vcdplayer->play_item.num+1 < max_entry) {
-    itemid.num = p_vcdplayer->play_item.num+1;
+        itemid.num = p_vcdplayer->play_item.num+1;
       } else {
-    LOG_WARN( "At the end - non-PBC 'next' not possible here" );
-    return false;
+        LOG_WARN( "At the end - non-PBC 'next' not possible here" );
+        return false;
       }
  
       break;
  
     case VCDINFO_ITEM_TYPE_LID:
-      {
-    /* Should have handled above. */
-    LOG_WARN( "Internal inconsistency - should not have gotten here." );
-    return false;
-      }
+      /* Should have handled above. */
+      LOG_WARN( "Internal inconsistency - should not have gotten here." );
+      return false;
     default:
       return false;
     }
@@ -857,7 +851,7 @@ vcdplayer_play_prev( access_t * p_access )
 
   itemid = p_vcdplayer->play_item;
 
-  if  (vcdplayer_pbc_is_on(p_vcdplayer)) {
+  if (vcdplayer_pbc_is_on(p_vcdplayer)) {
 
     vcdinfo_lid_get_pxd(p_vcdinfo, &(p_vcdplayer->pxd), p_vcdplayer->i_lid);
  
@@ -865,17 +859,17 @@ vcdplayer_play_prev( access_t * p_access )
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
       if (p_vcdplayer->pxd.psd == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinf_psd_get_prev_offset(p_vcdplayer->pxd.psd),
-                  &itemid.num, "prev");
+      vcdplayer_update_entry(p_access,
+                             vcdinf_psd_get_prev_offset(p_vcdplayer->pxd.psd),
+                             &itemid.num, "prev");
       itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
 
     case PSD_TYPE_PLAY_LIST:
       if (p_vcdplayer->pxd.pld == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinf_pld_get_prev_offset(p_vcdplayer->pxd.pld),
-                  &itemid.num, "prev");
+      vcdplayer_update_entry(p_access,
+                             vcdinf_pld_get_prev_offset(p_vcdplayer->pxd.pld),
+                             &itemid.num, "prev");
       itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
  
@@ -889,7 +883,7 @@ vcdplayer_play_prev( access_t * p_access )
     /* PBC is not on. "Prev" selection is play_item.num-1 if possible. */
  
     int min_entry = (VCDINFO_ITEM_TYPE_ENTRY == p_vcdplayer->play_item.type)
-      ? 0 : 1;
+                    ? 0 : 1;
  
     if (p_vcdplayer->play_item.num > min_entry) {
       itemid.num = p_vcdplayer->play_item.num-1;
@@ -919,11 +913,11 @@ vcdplayer_play_return( access_t * p_access )
   vcdinfo_itemid_t  itemid;
 
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_PBC),
-         "current: %d" , p_vcdplayer->play_item.num);
+             "current: %d" , p_vcdplayer->play_item.num);
 
   itemid = p_vcdplayer->play_item;
 
-  if  (vcdplayer_pbc_is_on(p_vcdplayer)) {
+  if (vcdplayer_pbc_is_on(p_vcdplayer)) {
 
     vcdinfo_lid_get_pxd(p_vcdinfo, &(p_vcdplayer->pxd), p_vcdplayer->i_lid);
  
@@ -931,17 +925,17 @@ vcdplayer_play_return( access_t * p_access )
     case PSD_TYPE_SELECTION_LIST:
     case PSD_TYPE_EXT_SELECTION_LIST:
       if (p_vcdplayer->pxd.psd == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinf_psd_get_return_offset(p_vcdplayer->pxd.psd),
-                  &itemid.num, "return");
+      vcdplayer_update_entry(p_access,
+                             vcdinf_psd_get_return_offset(p_vcdplayer->pxd.psd),
+                             &itemid.num, "return");
       itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
 
     case PSD_TYPE_PLAY_LIST:
       if (p_vcdplayer->pxd.pld == NULL) return false;
-      vcdplayer_update_entry( p_access,
-                  vcdinf_pld_get_return_offset(p_vcdplayer->pxd.pld),
-                  &itemid.num, "return");
+      vcdplayer_update_entry(p_access,
+                             vcdinf_pld_get_return_offset(p_vcdplayer->pxd.pld),
+                             &itemid.num, "return");
       itemid.type = VCDINFO_ITEM_TYPE_LID;
       break;
  
@@ -965,11 +959,3 @@ vcdplayer_play_return( access_t * p_access )
   return VLC_SUCCESS;
 
 }
-
-/*
- * Local variables:
- *  c-file-style: "gnu"
- *  tab-width: 8
- *  indent-tabs-mode: nil
- * End:
- */
