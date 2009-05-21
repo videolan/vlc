@@ -180,7 +180,7 @@
     int i_return = 0;
     playlist_item_t *p_item = NULL;
     playlist_t * p_playlist = pl_Hold( VLCIntf );
-    assert( outlineView == o_outline_view );
+    //assert( outlineView == o_outline_view );
 
     if( !item )
         p_item = p_playlist->p_root_category;

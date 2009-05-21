@@ -1311,7 +1311,7 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     unichar key = 0;
     vlc_value_t val;
     unsigned int i_pressed_modifiers = 0;
-    struct hotkey *p_hotkeys;
+    const struct hotkey *p_hotkeys;
     int i;
 
     val.i_int = 0;
