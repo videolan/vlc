@@ -11,7 +11,6 @@
 
 CThread::CThread(vlc_object_t *pOwner)
 {
-    int err;
     m_pAtmoThread = (atmo_thread_t *)vlc_object_create( pOwner,
                                                         sizeof(atmo_thread_t) );
     if(m_pAtmoThread)
@@ -22,10 +21,7 @@ CThread::CThread(vlc_object_t *pOwner)
         vlc_object_attach( m_pAtmoThread, m_pOwner);
 
         vlc_mutex_init( &m_TerminateLock );
-        err = vlc_cond_init( &m_TerminateCond );
-        if(err) {
-           msg_Err( m_pAtmoThread, "vlc_cond_init failed %d",err);
-        }
+        vlc_cond_init( &m_TerminateCond );
     }
 }
 
