@@ -202,8 +202,6 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Page Down", KEY_PAGEDOWN },
     { "Tab", KEY_TAB },
     { "Backspace", KEY_BACKSPACE },
-    { "Mouse Wheel Up", KEY_MOUSEWHEELUP },
-    { "Mouse Wheel Down", KEY_MOUSEWHEELDOWN },
     { "Browser Back", KEY_BROWSER_BACK },
     { "Browser Forward", KEY_BROWSER_FORWARD },
     { "Browser Refresh", KEY_BROWSER_REFRESH },
@@ -217,7 +215,11 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Media Next Track", KEY_MEDIA_NEXT_TRACK },
     { "Media Prev Track", KEY_MEDIA_PREV_TRACK },
     { "Media Stop", KEY_MEDIA_STOP },
-    { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE }
+    { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE },
+    { "Mouse Wheel Up", KEY_MOUSEWHEELUP },
+    { "Mouse Wheel Down", KEY_MOUSEWHEELDOWN },
+    { "Mouse Wheel Left", KEY_MOUSEWHEELLEFT },
+    { "Mouse Wheel Right", KEY_MOUSEWHEELRIGHT },
 };
 enum { vlc_num_keys=sizeof(vlc_keys)/sizeof(struct key_descriptor_s) };
 
