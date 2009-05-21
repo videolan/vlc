@@ -70,9 +70,6 @@
 #define KEY_MOUSEWHEELLEFT   0x001F0000
 #define KEY_MOUSEWHEELRIGHT  0x00200000
 
-/* TODO:
- * The media keys are only used in win32. Support for other OSes needs to
- * be added */
 #define KEY_BROWSER_BACK     0x001F0000
 #define KEY_BROWSER_FORWARD  0x00200000
 #define KEY_BROWSER_REFRESH  0x00210000
