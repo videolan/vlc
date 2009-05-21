@@ -105,6 +105,9 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 
     assert( state == libvlc_Playing || state == libvlc_Ended );
 
+#if 0
+    /* This can't work because under some condition (short file, this is the case) this will be
+     * equivalent to a play() */
     libvlc_media_player_pause (mi, &ex);
     catch();
 
@@ -120,7 +123,8 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 
     assert( state == libvlc_Paused || state == libvlc_Ended );
     catch();
-
+#endif
+    
     libvlc_media_player_stop (mi, &ex);
     catch ();
 
