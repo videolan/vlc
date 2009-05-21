@@ -168,7 +168,7 @@ struct libvlc_media_list_player_t
 {
     libvlc_event_manager_t *    p_event_manager;
     libvlc_instance_t *         p_libvlc_instance;
-    int                         i_refcount;
+    unsigned                    i_refcount;
     vlc_mutex_t                 object_lock;
     libvlc_media_list_path_t    current_playing_item_path;
     libvlc_media_t *            p_current_playing_item;
