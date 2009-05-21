@@ -15,9 +15,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "plugin.h"
@@ -27,24 +27,24 @@
 
 using namespace std;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 static const FORMATETC _metaFileFormatEtc =
-    {
-        CF_METAFILEPICT,
-        NULL,
-        DVASPECT_CONTENT,
-        -1,
-        TYMED_MFPICT,
-    };
+{
+    CF_METAFILEPICT,
+    NULL,
+    DVASPECT_CONTENT,
+    -1,
+    TYMED_MFPICT,
+};
 static const FORMATETC _enhMetaFileFormatEtc =
-    {
-        CF_ENHMETAFILE,
-        NULL,
-        DVASPECT_CONTENT,
-        -1,
-        TYMED_ENHMF,
-    };
+{
+    CF_ENHMETAFILE,
+    NULL,
+    DVASPECT_CONTENT,
+    -1,
+    TYMED_ENHMF,
+};
 
 class VLCEnumFORMATETC : public VLCEnumIterator<IID_IEnumFORMATETC,
     IEnumFORMATETC,
@@ -60,7 +60,7 @@ public:
     {};
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 VLCDataObject::VLCDataObject(VLCPlugin *p_instance) : _p_instance(p_instance)
 {
@@ -74,9 +74,10 @@ VLCDataObject::~VLCDataObject()
     _p_adviseHolder->Release();
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
-STDMETHODIMP VLCDataObject::DAdvise(LPFORMATETC pFormatEtc, DWORD padvf, LPADVISESINK pAdviseSink, LPDWORD pdwConnection)
+STDMETHODIMP VLCDataObject::DAdvise(LPFORMATETC pFormatEtc, DWORD padvf,
+                              LPADVISESINK pAdviseSink, LPDWORD pdwConnection)
 {
     return _p_adviseHolder->Advise(this,
             pFormatEtc, padvf,pAdviseSink, pdwConnection);
@@ -92,17 +93,19 @@ STDMETHODIMP VLCDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
     return _p_adviseHolder->EnumAdvise(ppenumAdvise);
 };
 
-STDMETHODIMP VLCDataObject::EnumFormatEtc(DWORD dwDirection, IEnumFORMATETC **ppEnum)
+STDMETHODIMP VLCDataObject::EnumFormatEtc(DWORD dwDirection,
+                                          IEnumFORMATETC **ppEnum)
 {
     if( NULL == ppEnum )
         return E_POINTER;
 
-    *ppEnum = dynamic_cast<IEnumFORMATETC *>(new VLCEnumFORMATETC(_v_formatEtc));
+    *ppEnum = new VLCEnumFORMATETC(_v_formatEtc);
 
     return (NULL != *ppEnum ) ? S_OK : E_OUTOFMEMORY;
 };
 
-STDMETHODIMP VLCDataObject::GetCanonicalFormatEtc(LPFORMATETC pFormatEtcIn, LPFORMATETC pFormatEtcOut)
+STDMETHODIMP VLCDataObject::GetCanonicalFormatEtc(LPFORMATETC pFormatEtcIn,
+                                                  LPFORMATETC pFormatEtcOut)
 {
     HRESULT result = QueryGetData(pFormatEtcIn);
     if( FAILED(result) )
@@ -146,7 +149,8 @@ STDMETHODIMP VLCDataObject::GetData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium)
     return result;
 };
 
-STDMETHODIMP VLCDataObject::GetDataHere(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium)
+STDMETHODIMP VLCDataObject::GetDataHere(LPFORMATETC pFormatEtc,
+                                        LPSTGMEDIUM pMedium)
 {
     if( NULL == pMedium )
         return E_POINTER;
@@ -154,9 +158,10 @@ STDMETHODIMP VLCDataObject::GetDataHere(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMed
     return E_NOTIMPL;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
-HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium)
+HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc,
+                                       LPSTGMEDIUM pMedium)
 {
     HDC hicTargetDev = CreateDevDC(pFormatEtc->ptd);
     if( NULL == hicTargetDev )
@@ -165,7 +170,8 @@ HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedi
     HDC hdcMeta = CreateMetaFile(NULL);
     if( NULL != hdcMeta )
     {
-        LPMETAFILEPICT pMetaFilePict = (LPMETAFILEPICT)CoTaskMemAlloc(sizeof(METAFILEPICT));
+        LPMETAFILEPICT pMetaFilePict =
+                         (LPMETAFILEPICT)CoTaskMemAlloc(sizeof(METAFILEPICT));
         if( NULL != pMetaFilePict )
         {
             SIZEL size = _p_instance->getExtent();
@@ -182,7 +188,8 @@ HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedi
 
             RECTL bounds = { 0L, 0L, size.cx, size.cy };
 
-            _p_instance->onDraw(pFormatEtc->ptd, hicTargetDev, hdcMeta, &bounds, &wBounds);
+            _p_instance->onDraw(pFormatEtc->ptd, hicTargetDev, hdcMeta,
+                                &bounds, &wBounds);
             pMetaFilePict->hMF = CloseMetaFile(hdcMeta);
             if( NULL != pMetaFilePict->hMF )
                 pMedium->hMetaFilePict = pMetaFilePict;
@@ -194,7 +201,8 @@ HRESULT VLCDataObject::getMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedi
     return (NULL != pMedium->hMetaFilePict) ? S_OK : E_FAIL;
 };
 
-HRESULT VLCDataObject::getEnhMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium)
+HRESULT VLCDataObject::getEnhMetaFileData(LPFORMATETC pFormatEtc,
+                                          LPSTGMEDIUM pMedium)
 {
     HDC hicTargetDev = CreateDevDC(pFormatEtc->ptd);
     if( NULL == hicTargetDev )
@@ -211,7 +219,8 @@ HRESULT VLCDataObject::getEnhMetaFileData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pM
 
         RECTL bounds = { 0L, 0L, size.cx, size.cy };
 
-        _p_instance->onDraw(pFormatEtc->ptd, hicTargetDev, hdcMeta, &bounds, &wBounds);
+        _p_instance->onDraw(pFormatEtc->ptd, hicTargetDev,
+                            hdcMeta, &bounds, &wBounds);
         pMedium->hEnhMetaFile = CloseEnhMetaFile(hdcMeta);
     }
     DeleteDC(hicTargetDev);
@@ -250,7 +259,8 @@ STDMETHODIMP VLCDataObject::QueryGetData(LPFORMATETC pFormatEtc)
     return S_OK;
 };
 
-STDMETHODIMP VLCDataObject::SetData(LPFORMATETC pFormatEtc, LPSTGMEDIUM pMedium, BOOL fRelease)
+STDMETHODIMP VLCDataObject::SetData(LPFORMATETC pFormatEtc,
+                                    LPSTGMEDIUM pMedium, BOOL fRelease)
 {
     return E_NOTIMPL;
 };
