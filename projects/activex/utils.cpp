@@ -111,37 +111,25 @@ HRESULT GetObjectProperty(LPUNKNOWN object, DISPID dispID, VARIANT& v)
 
 HDC CreateDevDC(DVTARGETDEVICE *ptd)
 {
-    HDC hdc=NULL;
+    HDC hdc;
     if( NULL == ptd )
     {
         hdc = CreateDC(TEXT("DISPLAY"), NULL, NULL, NULL);
     }
     else
     {
-        LPDEVNAMES lpDevNames;
-        LPDEVMODE lpDevMode;
-        LPTSTR lpszDriverName;
-        LPTSTR lpszDeviceName;
-        LPTSTR lpszPortName;
+        LPDEVNAMES lpDevNames = (LPDEVNAMES) ptd; // offset for size field
+        LPDEVMODE  lpDevMode  = NULL;
 
-        lpDevNames = (LPDEVNAMES) ptd; // offset for size field
-
-        if (ptd->tdExtDevmodeOffset == 0)
-        {
-            lpDevMode = NULL;
-        }
-        else
-        {
+        if (ptd->tdExtDevmodeOffset != 0)
             lpDevMode  = (LPDEVMODE) ((LPTSTR)ptd + ptd->tdExtDevmodeOffset);
-        }
 
-        lpszDriverName = (LPTSTR) lpDevNames + ptd->tdDriverNameOffset;
-        lpszDeviceName = (LPTSTR) lpDevNames + ptd->tdDeviceNameOffset;
-        lpszPortName   = (LPTSTR) lpDevNames + ptd->tdPortNameOffset;
-
-        hdc = CreateDC(lpszDriverName, lpszDeviceName, lpszPortName, lpDevMode);
+        hdc = CreateDC( (LPTSTR) lpDevNames + ptd->tdDriverNameOffset,
+                        (LPTSTR) lpDevNames + ptd->tdDeviceNameOffset,
+                        (LPTSTR) lpDevNames + ptd->tdPortNameOffset,
+                        lpDevMode );
     }
-        return hdc;
+    return hdc;
 };
 
 #define HIMETRIC_PER_INCH 2540
