@@ -49,6 +49,7 @@
 #import "controls.h"
 #import "vlc_osd.h"
 #import "misc.h"
+#import "sidebarview.h"
 #import <vlc_interface.h>
 #import <vlc_services_discovery.h>
 
@@ -119,6 +120,11 @@
     [o_outline_view setAllowsEmptySelection: NO];
     [o_outline_view expandItem: [o_outline_view itemAtRow:0]];
 
+	[o_outline_view_other setTarget: self];
+    [o_outline_view_other setDelegate: self];
+    [o_outline_view_other setDataSource: self];
+    [o_outline_view_other setAllowsEmptySelection: NO];
+
     pl_Release( VLCIntf );
     [self initStrings];
 }
@@ -128,6 +134,29 @@
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];
     [[o_tc_duration headerCell] setStringValue:_NS("Duration")];
+
+	[[o_tc_name_other headerCell] setStringValue:_NS("Name")];
+    [[o_tc_author_other headerCell] setStringValue:_NS("Author")];
+    [[o_tc_duration_other headerCell] setStringValue:_NS("Duration")];
+}
+
+- (void)swapPlaylists:(id)newList
+{
+	if(newList != o_outline_view)
+	{
+		id o_outline_view_temp = o_outline_view;
+		id o_tc_author_temp = o_tc_author;
+		id o_tc_duration_temp = o_tc_duration;
+		id o_tc_name_temp = o_tc_name;
+		o_outline_view = o_outline_view_other;
+		o_tc_author = o_tc_author_other;
+		o_tc_duration = o_tc_duration_other;
+		o_tc_name = o_tc_name_other;
+		o_outline_view_other = o_outline_view_temp;
+		o_tc_author_other = o_tc_author_temp;
+		o_tc_duration_other = o_tc_duration_temp;
+		o_tc_name_other = o_tc_name_temp;
+	}
 }
 
 - (NSOutlineView *)outlineView
@@ -365,11 +394,17 @@
     [super awakeFromNib];
 
     [o_outline_view setDoubleAction: @selector(playItem:)];
+    [o_outline_view_other setDoubleAction: @selector(playItem:)];
 
     [o_outline_view registerForDraggedTypes:
         [NSArray arrayWithObjects: NSFilenamesPboardType,
         @"VLCPlaylistItemPboardType", nil]];
     [o_outline_view setIntercellSpacing: NSMakeSize (0.0, 1.0)];
+
+    [o_outline_view_other registerForDraggedTypes:
+     [NSArray arrayWithObjects: NSFilenamesPboardType,
+      @"VLCPlaylistItemPboardType", nil]];
+    [o_outline_view_other setIntercellSpacing: NSMakeSize (0.0, 1.0)];
 
     /* This uses private Apple API which works fine until 10.5.
      * We need to keep checking in the future!
@@ -448,14 +483,28 @@
     [o_mi_services setTitle: _NS("Services discovery")];
     [o_mm_mi_services setTitle: _NS("Services discovery")];
     [o_status_field setStringValue: _NS("No items in the playlist")];
+    [o_status_field_embed setStringValue: _NS("No items in the playlist")];
 
     [o_search_field setToolTip: _NS("Search in Playlist")];
+    [o_search_field_other setToolTip: _NS("Search in Playlist")];
     [o_mi_addNode setTitle: _NS("Add Folder to Playlist")];
 
     [o_save_accessory_text setStringValue: _NS("File Format:")];
     [[o_save_accessory_popup itemAtIndex:0] setTitle: _NS("Extended M3U")];
     [[o_save_accessory_popup itemAtIndex:1] setTitle: _NS("XML Shareable Playlist Format (XSPF)")];
     [[o_save_accessory_popup itemAtIndex:2] setTitle: _NS("HTML Playlist")];
+}
+
+- (void)swapPlaylists:(id)newList
+{
+	if(newList != o_outline_view)
+	{
+		id o_search_field_temp = o_search_field;
+		o_search_field = o_search_field_other;
+		o_search_field_other = o_search_field_temp;
+		[super swapPlaylists:newList];
+		[self playlistUpdated];
+	}
 }
 
 - (void)playlistUpdated
@@ -472,6 +521,7 @@
     // TODO Find a way to keep the dict size to a minimum
     //[o_outline_dict removeAllObjects];
     [o_outline_view reloadData];
+    [o_sidebar updateSidebar:[self playingItem]];
     [[[[VLCMain sharedInstance] wizard] playlistWizard] reloadOutlineView];
     [[[[VLCMain sharedInstance] bookmarks] dataTable] reloadData];
 
@@ -483,13 +533,22 @@
         [o_status_field setStringValue: [NSString stringWithFormat:
                     _NS("%i items"),
                 playlist_CurrentSize( p_playlist )]];
+        [o_status_field_embed setStringValue: [NSString stringWithFormat:
+                                               _NS("%i items"),
+                                               playlist_CurrentSize( p_playlist )]];        
     }
     else
     {
         if( playlist_IsEmpty( p_playlist ) )
+        {
             [o_status_field setStringValue: _NS("No items in the playlist")];
+            [o_status_field_embed setStringValue: _NS("No items in the playlist")];
+        }
         else
+        {
             [o_status_field setStringValue: _NS("1 item")];
+            [o_status_field_embed setStringValue: _NS("1 item")];
+        }
     }
     PL_UNLOCK;
     pl_Release( VLCIntf );
@@ -795,6 +854,40 @@
         {
             p_node = p_item->p_parent;
 
+        }
+        else
+        {
+            p_node = p_item;
+            if( p_node->i_children > 0 && p_node->pp_children[0]->i_children == -1 )
+            {
+                p_item = p_node->pp_children[0];
+            }
+            else
+            {
+                p_item = NULL;
+            }
+        }
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, pl_Unlocked, p_node, p_item );
+    }
+    pl_Release( p_intf );
+}
+
+- (void)playSidebarItem:(id)item
+{
+    intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Hold( p_intf );
+    
+    playlist_item_t *p_item;
+    playlist_item_t *p_node = NULL;
+    
+    p_item = [item pointerValue];
+    
+    if( p_item )
+    {
+        if( p_item->i_children == -1 )
+        {
+            p_node = p_item->p_parent;
+            
         }
         else
         {
@@ -1453,6 +1546,20 @@
     pl_Release( VLCIntf );
 }
 
+- (id)playingItem
+{
+    playlist_t *p_playlist = pl_Hold( VLCIntf );
+    
+    id o_playing_item;
+    
+    o_playing_item = [o_outline_dict objectForKey:
+                      [NSString stringWithFormat:@"%p",  playlist_CurrentPlayingItem( p_playlist )]];
+    
+    pl_Release( VLCIntf );
+    
+    return o_playing_item;
+}
+
 - (IBAction)addNode:(id)sender
 {
     playlist_t * p_playlist = pl_Hold( VLCIntf );
@@ -1482,16 +1589,21 @@
         [o_status_field setStringValue: [NSString stringWithFormat:
                     _NS("%i items"),
              playlist_CurrentSize( p_playlist )]];
+        [o_status_field_embed setStringValue: [NSString stringWithFormat:
+                                               _NS("%i items"),
+                                               playlist_CurrentSize( p_playlist )]];
     }
     else
     {
         if( playlist_IsEmpty( p_playlist ) )
         {
             [o_status_field setStringValue: _NS("No items in the playlist")];
+            [o_status_field_embed setStringValue: _NS("No items in the playlist")];
         }
         else
         {
             [o_status_field setStringValue: _NS("1 item")];
+            [o_status_field_embed setStringValue: _NS("1 item")];
         }
     }
     PL_UNLOCK;

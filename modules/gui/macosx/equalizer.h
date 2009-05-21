@@ -27,6 +27,7 @@
 @interface VLCEqualizer : NSObject
 {
     IBOutlet id o_btn_equalizer;
+    IBOutlet id o_btn_equalizer_embedded;
     IBOutlet id o_ckb_2pass;
     IBOutlet id o_ckb_enable;
     IBOutlet id o_fld_preamp;

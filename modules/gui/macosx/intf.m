@@ -698,6 +698,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mu_window setTitle: _NS("Window")];
     [o_mi_minimize setTitle: _NS("Minimize Window")];
     [o_mi_close_window setTitle: _NS("Close Window")];
+    [o_mi_player setTitle: _NS("Player...")];
     [o_mi_controller setTitle: _NS("Controller...")];
     [o_mi_equalizer setTitle: _NS("Equalizer...")];
     [o_mi_extended setTitle: _NS("Extended Controls...")];
@@ -1675,10 +1676,13 @@ static void manage_cleanup( void * args )
         }
 
         [o_btn_stop setEnabled: b_input];
+        [o_embedded_window setStop: b_input];
         [o_btn_ff setEnabled: b_seekable];
         [o_btn_rewind setEnabled: b_seekable];
         [o_btn_prev setEnabled: (b_plmul || b_chapters)];
+        [o_embedded_window setPrev: (b_plmul || b_chapters)];
         [o_btn_next setEnabled: (b_plmul || b_chapters)];
+        [o_embedded_window setNext: (b_plmul || b_chapters)];
 
         [o_timeslider setFloatValue: 0.0];
         [o_timeslider setEnabled: b_seekable];
@@ -1687,6 +1691,7 @@ static void manage_cleanup( void * args )
         [[[self controls] fspanel] setSeekable: b_seekable];
 
         [o_embedded_window setSeekable: b_seekable];
+        [o_embedded_window setTime:@"00:00" position:0.0];
 
         p_intf->p_sys->b_current_title_update = true;
         
@@ -1807,6 +1812,8 @@ static void manage_cleanup( void * args )
         i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
         [o_volumeslider setFloatValue: (float)i_lastShownVolume / i_volume_step];
         [o_volumeslider setEnabled: TRUE];
+        [o_embedded_window setVolumeSlider: (float)i_lastShownVolume / i_volume_step];
+        [o_embedded_window setVolumeEnabled: TRUE];
         [[[self controls] fspanel] setVolumeLevel: (float)i_lastShownVolume / i_volume_step];
         p_intf->p_sys->b_mute = ( i_lastShownVolume == 0 );
         p_intf->p_sys->b_volume_update = FALSE;

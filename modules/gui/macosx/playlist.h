@@ -41,13 +41,18 @@
     IBOutlet id o_tc_duration;
     IBOutlet id o_outline_view;
 
+    IBOutlet id o_tc_name_other;
+    IBOutlet id o_tc_author_other;
+    IBOutlet id o_tc_duration_other;
+    IBOutlet id o_outline_view_other;
+
     NSMutableDictionary *o_outline_dict;
 }
 
 - (void)initStrings;
 - (playlist_item_t *)selectedPlaylistItem;
 - (NSOutlineView *)outlineView;
-
+- (void)swapPlaylists:(id)newList;
 @end
 
 /*****************************************************************************
@@ -71,8 +76,11 @@
 
     IBOutlet id o_btn_playlist;
     IBOutlet id o_playlist_view;
+    IBOutlet id o_sidebar;
     IBOutlet id o_status_field;
+    IBOutlet id o_status_field_embed;
     IBOutlet id o_search_field;
+    IBOutlet id o_search_field_other;
     IBOutlet id o_mi_save_playlist;
     IBOutlet id o_ctx_menu;
 
@@ -141,6 +149,9 @@
 - (IBAction)recursiveExpandNode:(id)sender;
 
 - (IBAction)addNode:(id)sender;
+
+- (void)playSidebarItem:(id)item;
+- (id)playingItem;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
 - (void)appendNodeArray:(NSArray*)o_array inNode:(playlist_item_t *)p_node atPos:(int)i_position enqueue:(BOOL)b_enqueue;

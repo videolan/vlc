@@ -32,10 +32,31 @@
     IBOutlet id o_btn_backward;
     IBOutlet id o_btn_forward;
     IBOutlet id o_btn_fullscreen;
+    IBOutlet id o_btn_equalizer;
+    IBOutlet id o_btn_playlist;
     IBOutlet id o_btn_play;
-    IBOutlet id o_slider;
+    IBOutlet id o_btn_prev;
+    IBOutlet id o_btn_stop;
+    IBOutlet id o_btn_next;
+    IBOutlet id o_btn_volume_down;
+    IBOutlet id o_volumeslider;
+    IBOutlet id o_btn_volume_up;
+    IBOutlet id o_timeslider;
+    IBOutlet id o_main_pgbar;
     IBOutlet id o_time;
+    IBOutlet id o_scrollfield;
+    IBOutlet id o_horizontal_split;
+    IBOutlet id o_vertical_split;
+    IBOutlet id o_videosubview;
+    IBOutlet id o_sidebar_list;
     IBOutlet id o_view;
+    IBOutlet id o_background_view;
+	IBOutlet id o_searchfield;
+	IBOutlet id o_status;
+	IBOutlet id o_playlist;
+	IBOutlet id o_playlist_view;
+	IBOutlet id o_playlist_table;
+	IBOutlet id o_vlc_main;
 
     NSImage * o_img_play;
     NSImage * o_img_play_pressed;
@@ -53,18 +74,29 @@
     BOOL              b_window_is_invisible;
 
     NSSize videoRatio;
-    int originalLevel;
+    NSInteger originalLevel;
 }
 
 - (void)controlTintChanged;
 
 - (void)setTime: (NSString *)o_arg_ime position: (float)f_position;
+- (id)getPgbar;
 - (void)playStatusUpdated: (int)i_status;
 - (void)setSeekable: (BOOL)b_seekable;
+- (void)setStop:(BOOL)b_input;
+- (void)setPrev:(BOOL)b_input;
+- (void)setNext:(BOOL)b_input;
+- (void)setVolumeEnabled:(BOOL)b_input;
+
+- (void)setScrollString:(NSString *)o_string;
+
+- (void)setVolumeSlider:(float)f_level;
 
 - (void)setVideoRatio:(NSSize)ratio;
 
 - (NSView *)mainView;
+
+- (IBAction)togglePlaylist:(id)sender;
 
 - (BOOL)isFullscreen;
 
@@ -83,3 +115,47 @@
 - (void)setFrameOnMainThread:(NSData*)packedargs;
 @end
 
+/*****************************************************************************
+ * embeddedbackground
+ *****************************************************************************/
+
+
+@interface embeddedbackground : NSView
+{
+    IBOutlet id o_window;
+    IBOutlet id o_timeslider;
+    IBOutlet id o_main_pgbar;
+    IBOutlet id o_time;
+    IBOutlet id o_scrollfield;
+    IBOutlet id o_searchfield;
+    IBOutlet id o_btn_backward;
+    IBOutlet id o_btn_forward;
+    IBOutlet id o_btn_fullscreen;
+    IBOutlet id o_btn_equalizer;
+    IBOutlet id o_btn_playlist;
+    IBOutlet id o_btn_play;
+    IBOutlet id o_btn_prev;
+    IBOutlet id o_btn_stop;
+    IBOutlet id o_btn_next;
+    IBOutlet id o_btn_volume_down;
+    IBOutlet id o_volumeslider;
+    IBOutlet id o_btn_volume_up;
+    
+    NSPoint dragStart;
+}
+
+@end
+
+/*****************************************************************************
+ * statusbar
+ *****************************************************************************/
+
+
+@interface statusbar : NSView
+{
+    IBOutlet id o_text;
+	
+	BOOL mainwindow;
+}
+
+@end

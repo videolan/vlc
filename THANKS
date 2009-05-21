@@ -93,6 +93,7 @@ Dugal Harris - DirectShow fixes and MJPEG patches
 Dylan Aïssi <aissi dot dylan at free dot fr> - French translation
 Dylan Yudaken <dyudaken -- gmail # com> - hotkeys patch
 Emmanuel Blindauer <manu at agat.net> - aRts audio output
+Eric Dudiak <dudiak at gmail dot com> - Mac OS X Interface rework (GSoC 2008)
 Enrico Gueli <e_gueli at yahoo.it> - Brightness threshold in adjust video filter
 Enrique Osuna <enrique.osuna at gmail.com> - Various bug fixes in libvlc. Major Mac OS X Framework improvements.
 Eren Türkay <turkay dot eren \a/ gmail point com> - Speex boundary checks and security fix

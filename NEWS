@@ -1,6 +1,9 @@
 Changes between 1.0.0-rc1 and 1.1.0-git:
 ----------------------------------------
 
+Mac OS X Interface:
+ * Completely reworked user interface (based upon works from GSoC 2008)
+
 
 Changes between 0.9.9a and 1.0.0-rc1:
 ------------------------------------
