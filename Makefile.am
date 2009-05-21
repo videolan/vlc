@@ -127,33 +127,25 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
-	extras/package/macosx/Resources/a52.icns \
-	extras/package/macosx/Resources/aac.icns \
-	extras/package/macosx/Resources/asf.icns \
-	extras/package/macosx/Resources/asx.icns \
+	extras/package/macosx/Resources/aiff.icns \
+	extras/package/macosx/Resources/audio.icns \
 	extras/package/macosx/Resources/avi.icns \
-	extras/package/macosx/Resources/bin.icns \
-	extras/package/macosx/Resources/cue.icns \
-	extras/package/macosx/Resources/dat.icns \
-	extras/package/macosx/Resources/divx.icns \
-	extras/package/macosx/Resources/dv.icns \
+	extras/package/macosx/Resources/flv.icns \
 	extras/package/macosx/Resources/generic.icns \
-	extras/package/macosx/Resources/m3u.icns \
+	extras/package/macosx/Resources/m4a.icns \
+	extras/package/macosx/Resources/m4v.icns \
+	extras/package/macosx/Resources/mkv.icns \
 	extras/package/macosx/Resources/mov.icns \
+	extras/package/macosx/Resources/movie.icns \
 	extras/package/macosx/Resources/mp3.icns \
-	extras/package/macosx/Resources/mp4.icns \
 	extras/package/macosx/Resources/mpeg.icns \
-	extras/package/macosx/Resources/mpeg1.icns \
-	extras/package/macosx/Resources/mpeg2.icns \
-	extras/package/macosx/Resources/mpeg4.icns \
-	extras/package/macosx/Resources/mpg.icns \
 	extras/package/macosx/Resources/ogg.icns \
-	extras/package/macosx/Resources/ogm.icns \
-	extras/package/macosx/Resources/pls.icns \
-	extras/package/macosx/Resources/srt.icns \
-	extras/package/macosx/Resources/sub.icns \
-	extras/package/macosx/Resources/vlc.icns \
+	extras/package/macosx/Resources/playlist.icns \
+	extras/package/macosx/Resources/rm.icns \
+	extras/package/macosx/Resources/subtitle.icns \
 	extras/package/macosx/Resources/vob.icns \
+	extras/package/macosx/Resources/wav.icns \
+	extras/package/macosx/Resources/vlc.icns \
 	extras/package/macosx/Resources/wma.icns \
 	extras/package/macosx/Resources/wmv.icns \
 	extras/package/macosx/Resources/pause.png \
