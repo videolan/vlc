@@ -78,7 +78,7 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
 
     const char * file = test_default_sample;
 
-    log ("Testing play and pause of %s using the media list.\n", file);
+    log ("Testing play_item_at_index of %s using the media list.\n", file);
 
     libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv, &ex);
