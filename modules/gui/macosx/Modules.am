@@ -48,6 +48,10 @@ SOURCES_macosx = \
 	bookmarks.m \
 	embeddedwindow.h \
 	embeddedwindow.m \
+	sidebarview.h \
+	sidebarview.m \
+	sidestatusview.h \
+	sidestatusview.m \
 	fspanel.m \
 	fspanel.h \
 	eyetv.h \

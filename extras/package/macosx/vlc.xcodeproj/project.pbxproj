@@ -285,6 +285,10 @@
 		CC62B8CD0FC5787D0077BB8C /* rm.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = rm.icns; path = Resources/rm.icns; sourceTree = "<group>"; };
 		CC62B8CE0FC5787D0077BB8C /* subtitle.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = subtitle.icns; path = Resources/subtitle.icns; sourceTree = "<group>"; };
 		CC62B8CF0FC5787D0077BB8C /* wav.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = wav.icns; path = Resources/wav.icns; sourceTree = "<group>"; };
+		CC62B9080FC5DB9D0077BB8C /* sidebarview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sidebarview.h; path = ../../../modules/gui/macosx/sidebarview.h; sourceTree = SOURCE_ROOT; };
+		CC62B9090FC5DB9D0077BB8C /* sidebarview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = sidebarview.m; path = ../../../modules/gui/macosx/sidebarview.m; sourceTree = SOURCE_ROOT; };
+		CC62B90A0FC5DB9D0077BB8C /* sidestatusview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sidestatusview.h; path = ../../../modules/gui/macosx/sidestatusview.h; sourceTree = SOURCE_ROOT; };
+		CC62B90B0FC5DB9D0077BB8C /* sidestatusview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = sidestatusview.m; path = ../../../modules/gui/macosx/sidestatusview.m; sourceTree = SOURCE_ROOT; };
 		CC6C01A90DDF3E9200C7D754 /* intf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = intf.h; path = ../../../modules/gui/minimal_macosx/intf.h; sourceTree = SOURCE_ROOT; };
 		CC6C01AA0DDF3E9200C7D754 /* intf.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = intf.m; path = ../../../modules/gui/minimal_macosx/intf.m; sourceTree = SOURCE_ROOT; };
 		CC6C01AB0DDF3E9200C7D754 /* macosx.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = macosx.c; path = ../../../modules/gui/minimal_macosx/macosx.c; sourceTree = SOURCE_ROOT; };
@@ -480,6 +484,10 @@
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
 				CCB60A3F0E6E5DD900407004 /* vlm.h */,
 				CCB60A3E0E6E5DD900407004 /* vlm.m */,
+				CC62B9080FC5DB9D0077BB8C /* sidebarview.h */,
+				CC62B9090FC5DB9D0077BB8C /* sidebarview.m */,
+				CC62B90A0FC5DB9D0077BB8C /* sidestatusview.h */,
+				CC62B90B0FC5DB9D0077BB8C /* sidestatusview.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
