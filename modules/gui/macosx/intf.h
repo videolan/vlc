@@ -83,8 +83,6 @@ struct intf_sys_t
     msg_subscription_t * p_sub;
 };
 
-static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
-
 /*****************************************************************************
  * VLCMain interface
  *****************************************************************************/

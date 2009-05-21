@@ -29,16 +29,6 @@
 /* for the icon in our custom error panel */
 #import <ApplicationServices/ApplicationServices.h>
 
-
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-
-bool b_progress_cancelled;
-static void updateProgressPanel (void *, const char *, float);
-static bool checkProgressPanel (void *);
-static void destroyProgressPanel (void *);
-
 /*****************************************************************************
  * VLCCoreDialogProvider implementation
  *****************************************************************************/
@@ -62,14 +52,6 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
                                                  selector:@selector(performDialogEvent:)
                                                      name: @"VLCNewCoreDialogEventNotification"
                                                    object:self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
-                                                 selector:@selector(performProgressBarEvent:)
-                                                     name:@"VLCCoreDialogProgressBarUpdateNotification" 
-                                                   object: self];
-        [[NSNotificationCenter defaultCenter] addObserver: self
-                                                 selector:@selector(performProgressBarEvent:)
-                                                     name:@"VLCCoreDialogProgressBarDestroyNotification" 
-                                                   object: self];
         o_error_panel = [[VLCErrorPanel alloc] init];
         b_progress_cancelled = NO;
     }
@@ -205,57 +187,31 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
     else
         [o_prog_description_txt setStringValue: @""];
     [o_prog_bar setDoubleValue: 0];
+    [o_prog_bar startAnimation: self];
 
-    p_dialog->pf_update = updateProgressPanel;
-    p_dialog->pf_check = checkProgressPanel;
-    p_dialog->pf_destroy = destroyProgressPanel;
-    p_dialog->p_sys = self;
-
-    [NSApp runModalForWindow: o_prog_win];
+    [o_prog_win makeKeyAndOrderFront: self];
 }
 
--(void)performProgressBarEvent: (NSNotification *)o_notification
+-(void)updateProgressPanelWithText: (NSString *)string andNumber: (double)d_number
 {
-    NSLog( @"%@ received", [o_notification name] );
-    if( [[o_notification name] isEqualToString: @"VLCCoreDialogProgressBarUpdateNotification"] )
-    {
-        NSNumber *o_number = [[o_notification userInfo] objectForKey:@"IntValue"];
-        NSString *o_text = [[o_notification userInfo] objectForKey:@"Text"];
-        [o_prog_description_txt setStringValue: o_text];
-        [o_prog_bar setDoubleValue: [o_number doubleValue]];
-    }
-    if( [[o_notification name] isEqualToString: @"VLCCoreDialogProgressBarDestroyNotification"] )
-    {
-        [NSApp stopModalWithCode: 0];
-        [o_prog_win close];
-    }
+    [o_prog_description_txt setStringValue: string];
+    [o_prog_bar setDoubleValue: d_number];
 }
 
-void updateProgressPanel (void *priv, const char *text, float value)
+-(void)destroyProgressPanel
 {
-    NSLog( @"we were updated with %s (%f)", text, value );
-    NSString *o_txt;
-    if( text != NULL )
-        o_txt = [NSString stringWithUTF8String: text];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarUpdateNotification" object:[[VLCMain sharedInstance] coreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_txt, @"Text", [NSNumber numberWithInt: ((int)(value * 1000.))], @"IntValue", nil]];
-}
-
-void destroyProgressPanel (void *priv)
-{
-    NSLog( @"we should destroy" );
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCCoreDialogProgressBarDestroyNotification" object:[[VLCMain sharedInstance] coreDialogProvider] userInfo: nil];
-}
-
-bool checkProgressPanel (void *priv)
-{
-    NSLog( @"we were checked" );
-    return b_progress_cancelled;
+    [o_prog_bar stopAnimation: self];
+    [o_prog_win close];
 }
 
 -(IBAction)progDialogAction:(id)sender
 {
-    NSLog( @"buttonAction!" );
     b_progress_cancelled = YES;
+}
+
+-(BOOL)progressCancelled
+{
+    return b_progress_cancelled;
 }
 
 -(id)errorPanel

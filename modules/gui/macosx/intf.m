@@ -69,6 +69,12 @@ static void * ManageThread( void *user_data );
 static unichar VLCKeyToCocoa( unsigned int i_key );
 static unsigned int VLCModifiersToCocoa( unsigned int i_key );
 
+static void updateProgressPanel (void *, const char *, float);
+static bool checkProgressPanel (void *);
+static void destroyProgressPanel (void *);
+
+static void MsgCallback( msg_cb_data_t *, msg_item_t *, unsigned );
+
 #pragma mark -
 #pragma mark VLC Interface Object Callbacks
 
@@ -176,7 +182,6 @@ static void MsgCallback( msg_cb_data_t *data, msg_item_t *item, unsigned int i )
     vlc_restorecancel( canc );
 }
 
-
 /*****************************************************************************
  * playlistChanged: Callback triggered by the intf-change playlist
  * variable, to let the intf update the playlist.
@@ -231,13 +236,51 @@ static int DialogCallback( vlc_object_t *p_this, const char *type, vlc_value_t p
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     VLCMain *interface = (VLCMain *)data;
 
-    const dialog_fatal_t *p_dialog = (const dialog_fatal_t *)value.p_address;
+    if( [[NSString stringWithUTF8String: type] isEqualToString: @"dialog-progress-bar"] )
+    {
+        /* the progress panel needs to update itself and therefore wants special treatment within this context */
+        dialog_progress_bar_t *p_dialog = (dialog_progress_bar_t *)value.p_address;
 
-    NSValue *o_value = [NSValue valueWithPointer:p_dialog];
+        p_dialog->pf_update = updateProgressPanel;
+        p_dialog->pf_check = checkProgressPanel;
+        p_dialog->pf_destroy = destroyProgressPanel;
+        p_dialog->p_sys = VLCIntf->p_libvlc;
+    }
+
+    NSValue *o_value = [NSValue valueWithPointer:value.p_address];
     [[NSNotificationCenter defaultCenter] postNotificationName: @"VLCNewCoreDialogEventNotification" object:[interface coreDialogProvider] userInfo:[NSDictionary dictionaryWithObjectsAndKeys: o_value, @"VLCDialogPointer", [NSString stringWithUTF8String: type], @"VLCDialogType", nil]];
 
     [o_pool release];
     return VLC_SUCCESS;
+}
+
+void updateProgressPanel (void *priv, const char *text, float value)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+
+    NSString *o_txt;
+    if( text != NULL )
+        o_txt = [NSString stringWithUTF8String: text];
+    else
+        o_txt = @"";
+
+    [[[VLCMain sharedInstance] coreDialogProvider] updateProgressPanelWithText: o_txt andNumber: (double)(value * 1000.)];
+
+    [o_pool release];
+}
+
+void destroyProgressPanel (void *priv)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    [[[VLCMain sharedInstance] coreDialogProvider] destroyProgressPanel];
+    [o_pool release];
+}
+
+bool checkProgressPanel (void *priv)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    return [[[VLCMain sharedInstance] coreDialogProvider] progressCancelled];
+    [o_pool release];
 }
 
 #pragma mark -
