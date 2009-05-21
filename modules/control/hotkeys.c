@@ -942,7 +942,7 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
     /* Special action for mouse event */
     /* FIXME: rework hotkeys handling to allow more than 1 event
      * to trigger one same action */
-    switch (newval.i_int & KEY_SPECIAL)
+    switch (newval.i_int & ~KEY_MODIFIER)
     {
         case KEY_MOUSEWHEELUP:
             i_action = (i_mode == MOUSEWHEEL_VOLUME ) ? ACTIONID_VOL_UP
@@ -963,8 +963,6 @@ static int SpecialKeyEvent( vlc_object_t *libvlc, char const *psz_var,
         case KEY_MENU:
             var_SetBool( libvlc, "intf-popupmenu", true );
             break;
-        default:
-          return VLC_SUCCESS;
     }
 
     if( i_mode == NO_MOUSEWHEEL ) return VLC_SUCCESS;

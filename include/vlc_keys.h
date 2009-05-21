@@ -37,7 +37,6 @@
 #define KEY_MODIFIER_META    0x08000000
 #define KEY_MODIFIER_COMMAND 0x10000000
 
-#define KEY_SPECIAL          0x00FF0000
 #define KEY_LEFT             0x00010000
 #define KEY_RIGHT            0x00020000
 #define KEY_UP               0x00030000
@@ -89,7 +88,6 @@
 #define KEY_MEDIA_STOP       0x002b0000
 #define KEY_MEDIA_PLAY_PAUSE 0x002c0000
 
-#define KEY_ASCII            0x0000007F
 #define KEY_UNSET            0
 
 typedef struct key_descriptor_s
