@@ -1211,3 +1211,116 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
     /* Update the object variable and trigger callback */
     var_SetBool( p_vout, "fullscreen", p_vout->b_fullscreen );
 }
+
+void DisableScreensaver( vout_thread_t *p_vout )
+{
+    /* disable screensaver by temporarily changing system settings */
+    p_vout->p_sys->i_spi_lowpowertimeout = 0;
+    p_vout->p_sys->i_spi_powerofftimeout = 0;
+    p_vout->p_sys->i_spi_screensavetimeout = 0;
+    if( var_GetBool( p_vout, "disable-screensaver" ) )
+    {
+        msg_Dbg(p_vout, "disabling screen saver");
+        SystemParametersInfo(SPI_GETLOWPOWERTIMEOUT,
+            0, &(p_vout->p_sys->i_spi_lowpowertimeout), 0);
+        if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
+            SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT, 0, NULL, 0);
+        }
+        SystemParametersInfo(SPI_GETPOWEROFFTIMEOUT, 0,
+            &(p_vout->p_sys->i_spi_powerofftimeout), 0);
+        if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
+            SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT, 0, NULL, 0);
+        }
+        SystemParametersInfo(SPI_GETSCREENSAVETIMEOUT, 0,
+            &(p_vout->p_sys->i_spi_screensavetimeout), 0);
+        if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
+            SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT, 0, NULL, 0);
+        }
+    }
+}
+
+void RestoreScreensaver( vout_thread_t *p_vout )
+{
+    /* restore screensaver system settings */
+    if( 0 != p_vout->p_sys->i_spi_lowpowertimeout ) {
+        SystemParametersInfo(SPI_SETLOWPOWERTIMEOUT,
+            p_vout->p_sys->i_spi_lowpowertimeout, NULL, 0);
+    }
+    if( 0 != p_vout->p_sys->i_spi_powerofftimeout ) {
+        SystemParametersInfo(SPI_SETPOWEROFFTIMEOUT,
+            p_vout->p_sys->i_spi_powerofftimeout, NULL, 0);
+    }
+    if( 0 != p_vout->p_sys->i_spi_screensavetimeout ) {
+        SystemParametersInfo(SPI_SETSCREENSAVETIMEOUT,
+            p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
+    }
+}
+
+int CreateEventThread( vout_thread_t *p_vout )
+{
+    /* Create the Vout EventThread, this thread is created by us to isolate
+     * the Win32 PeekMessage function calls. We want to do this because
+     * Windows can stay blocked inside this call for a long time, and when
+     * this happens it thus blocks vlc's video_output thread.
+     * Vout EventThread will take care of the creation of the video
+     * window (because PeekMessage has to be called from the same thread which
+     * created the window). */
+    msg_Dbg( p_vout, "creating Vout EventThread" );
+    p_vout->p_sys->p_event =
+        vlc_object_create( p_vout, sizeof(event_thread_t) );
+    p_vout->p_sys->p_event->p_vout = p_vout;
+    p_vout->p_sys->p_event->window_ready = CreateEvent( NULL, TRUE, FALSE, NULL );
+    if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
+                           EventThread, 0 ) )
+    {
+        msg_Err( p_vout, "cannot create Vout EventThread" );
+        CloseHandle( p_vout->p_sys->p_event->window_ready );
+        vlc_object_release( p_vout->p_sys->p_event );
+        p_vout->p_sys->p_event = NULL;
+        return 0;
+    }
+    WaitForSingleObject( p_vout->p_sys->p_event->window_ready, INFINITE );
+    CloseHandle( p_vout->p_sys->p_event->window_ready );
+
+    if( p_vout->p_sys->p_event->b_error )
+    {
+        msg_Err( p_vout, "Vout EventThread failed" );
+        return 0;
+    }
+
+    vlc_object_attach( p_vout->p_sys->p_event, p_vout );
+
+    msg_Dbg( p_vout, "Vout EventThread running" );
+    return 1;
+}
+
+void StopEventThread( vout_thread_t *p_vout )
+{
+    if( p_vout->b_fullscreen )
+    {
+        msg_Dbg( p_vout, "Quitting fullscreen" );
+        Win32ToggleFullscreen( p_vout );
+        /* Force fullscreen in the core for the next video */
+        var_SetBool( p_vout, "fullscreen", true );
+    }
+
+    if( p_vout->p_sys->p_event )
+    {
+        vlc_object_detach( p_vout->p_sys->p_event );
+
+        /* Kill Vout EventThread */
+        vlc_object_kill( p_vout->p_sys->p_event );
+
+        /* we need to be sure Vout EventThread won't stay stuck in
+         * GetMessage, so we send a fake message */
+        if( p_vout->p_sys->hwnd )
+        {
+            PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
+        }
+
+        vlc_thread_join( p_vout->p_sys->p_event );
+        vlc_object_release( p_vout->p_sys->p_event );
+    }
+
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
+}

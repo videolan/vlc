@@ -121,49 +121,19 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->i_window_width = p_vout->i_window_width;
     p_vout->p_sys->i_window_height = p_vout->i_window_height;
 
-    /* Create the Vout EventThread, this thread is created by us to isolate
-     * the Win32 PeekMessage function calls. We want to do this because
-     * Windows can stay blocked inside this call for a long time, and when
-     * this happens it thus blocks vlc's video_output thread.
-     * Vout EventThread will take care of the creation of the video
-     * window (because PeekMessage has to be called from the same thread which
-     * created the window). */
-    msg_Dbg( p_vout, "creating Vout EventThread" );
-    p_vout->p_sys->p_event =
-        vlc_object_create( p_vout, sizeof(event_thread_t) );
-    p_vout->p_sys->p_event->p_vout = p_vout;
-    p_vout->p_sys->p_event->window_ready = CreateEvent( NULL, TRUE, FALSE, NULL );
-    if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
-                           EventThread, 0 ) )
+    if ( CreateEventThread( p_vout ) )
     {
-        msg_Err( p_vout, "cannot create Vout EventThread" );
-        CloseHandle( p_vout->p_sys->p_event->window_ready );
-        vlc_object_release( p_vout->p_sys->p_event );
-        p_vout->p_sys->p_event = NULL;
-        goto error;
-    }
-    WaitForSingleObject( p_vout->p_sys->p_event->window_ready, INFINITE );
-    CloseHandle( p_vout->p_sys->p_event->window_ready );
+        /* Variable to indicate if the window should be on top of others */
+        /* Trigger a callback right now */
+        var_TriggerCallback( p_vout, "video-on-top" );
 
-    if( p_vout->p_sys->p_event->b_error )
+        return VLC_SUCCESS;
+    }
+    else
     {
-        msg_Err( p_vout, "Vout EventThread failed" );
-        goto error;
+        CloseVideo( VLC_OBJECT(p_vout) );
+        return VLC_EGENERIC;
     }
-
-    vlc_object_attach( p_vout->p_sys->p_event, p_vout );
-
-    msg_Dbg( p_vout, "Vout EventThread running" );
-
-    /* Variable to indicate if the window should be on top of others */
-    /* Trigger a callback right now */
-    var_TriggerCallback( p_vout, "video-on-top" );
-
-    return VLC_SUCCESS;
-
- error:
-    CloseVideo( VLC_OBJECT(p_vout) );
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -221,33 +191,7 @@ static void CloseVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    if( p_vout->b_fullscreen )
-    {
-        msg_Dbg( p_vout, "Quitting fullscreen" );
-        Win32ToggleFullscreen( p_vout );
-        /* Force fullscreen in the core for the next video */
-        var_SetBool( p_vout, "fullscreen", true );
-    }
-
-    if( p_vout->p_sys->p_event )
-    {
-        vlc_object_detach( p_vout->p_sys->p_event );
-
-        /* Kill Vout EventThread */
-        vlc_object_kill( p_vout->p_sys->p_event );
-
-        /* we need to be sure Vout EventThread won't stay stuck in
-         * GetMessage, so we send a fake message */
-        if( p_vout->p_sys->hwnd )
-        {
-            PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
-        }
-
-        vlc_thread_join( p_vout->p_sys->p_event );
-        vlc_object_release( p_vout->p_sys->p_event );
-    }
-
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
+    StopEventThread( p_vout );
 
     free( p_vout->p_sys );
     p_vout->p_sys = NULL;
