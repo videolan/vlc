@@ -198,11 +198,14 @@
     if( videoRatio.height == 0. || videoRatio.width == 0. )
         return proposedFrameSize;
 
-    NSRect viewRect = [o_view convertRect:[o_view bounds] toView: nil];
-    NSRect contentRect = [self contentRectForFrameRect:[self frame]];
-    float marginy = viewRect.origin.y + [self frame].size.height - contentRect.size.height;
-    float marginx = contentRect.size.width - viewRect.size.width;
-    proposedFrameSize.height = (proposedFrameSize.width - marginx) * videoRatio.height / videoRatio.width + marginy;
+    if( [[[VLCMain sharedInstance] controls] aspectRatioIsLocked] )
+    {
+        NSRect viewRect = [o_view convertRect:[o_view bounds] toView: nil];
+        NSRect contentRect = [self contentRectForFrameRect:[self frame]];
+        float marginy = viewRect.origin.y + [self frame].size.height - contentRect.size.height;
+        float marginx = contentRect.size.width - viewRect.size.width;
+        proposedFrameSize.height = (proposedFrameSize.width - marginx) * videoRatio.height / videoRatio.width + marginy;
+    }
 
     return proposedFrameSize;
 }

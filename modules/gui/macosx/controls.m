@@ -74,6 +74,7 @@
 {
     [super init];
     o_fs_panel = [[VLCFSPanel alloc] init];
+    b_lockAspectRatio = YES;
     return self;
 }
 
@@ -178,6 +179,11 @@
         }
     }
     return [[voutView retain] autorelease];
+}
+
+- (BOOL)aspectRatioIsLocked
+{
+    return b_lockAspectRatio;
 }
 
 - (IBAction)stop:(id)sender
@@ -559,6 +565,16 @@
     }
 }
 
+- (IBAction)lockVideosAspectRatio:(id)sender
+{
+    if( [sender state] == NSOffState )
+        [sender setState: NSOnState];
+    else
+        [sender setState: NSOffState];
+
+    b_lockAspectRatio = !b_lockAspectRatio;
+}
+
 - (IBAction)addSubtitleFile:(id)sender
 {
     NSInteger i_returnValue = 0;
@@ -591,7 +607,6 @@
             if( input_AddSubtitle( p_input, [[[openPanel filenames] objectAtIndex: i] UTF8String], TRUE ) )
                 msg_Warn( VLCIntf, "unable to load subtitles from '%s'",
                          [[[openPanel filenames] objectAtIndex: i] UTF8String] );
-            i++;
         }
     }
 }
@@ -790,6 +805,18 @@
 
     /* make (un)sensitive */
     [o_parent setEnabled: ( val_list.p_list->i_count > 1 )];
+
+    /* Aspect Ratio */
+    if( [[o_parent title] isEqualToString: _NS("Aspect-ratio")] == YES )
+    {
+        NSMenuItem *o_lmi_tmp2;
+        o_lmi_tmp2 = [o_menu addItemWithTitle: _NS("Lock Aspect Ratio") action: @selector(lockVideosAspectRatio:) keyEquivalent: @""];
+        [o_lmi_tmp2 setTarget: self];
+        [o_lmi_tmp2 setEnabled: YES];
+        [o_lmi_tmp2 setState: b_lockAspectRatio];
+        [o_parent setEnabled: YES];
+        [o_menu addItem: [NSMenuItem separatorItem]];
+    }
 
     /* special case for the subtitles items */
     if( [[o_parent title] isEqualToString: _NS("Subtitles Track")] == YES )
