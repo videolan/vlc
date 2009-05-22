@@ -234,7 +234,7 @@ int demux_vaControlHelper( stream_t *s,
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( i_bitrate > 0 && i_end > i_start )
+            if( i_bitrate > 0 && i_tell >= i_start )
             {
                 *pi64 = INT64_C(8000000) * (i_tell - i_start) / i_bitrate;
                 return VLC_SUCCESS;
