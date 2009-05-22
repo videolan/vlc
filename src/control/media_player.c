@@ -286,7 +286,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     p_mi = malloc( sizeof(libvlc_media_player_t) );
     if( !p_mi )
     {
-        libvlc_exception_raise( p_e, "Not enough memory" );
+        libvlc_exception_raise( p_e, "not enough memory" );
         return NULL;
     }
     p_mi->p_md = NULL;
@@ -1196,7 +1196,7 @@ libvlc_track_description_t *
         malloc( sizeof( libvlc_track_description_t ) );
     if ( !p_track_description )
     {
-        libvlc_exception_raise( p_e, "no enough memory" );
+        libvlc_exception_raise( p_e, "not enough memory" );
         goto end;
     }
     p_actual = p_track_description;
@@ -1210,7 +1210,7 @@ libvlc_track_description_t *
             if ( !p_actual )
             {
                 libvlc_track_description_release( p_track_description );
-                libvlc_exception_raise( p_e, "no enough memory" );
+                libvlc_exception_raise( p_e, "not enough memory" );
                 goto end;
             }
         }
