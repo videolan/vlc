@@ -423,11 +423,16 @@
 
 - (IBAction)showPosition: (id)sender
 {
-    vout_thread_t *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
-    if( p_vout != NULL )
+    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+    if( p_input != NULL )
     {
-        var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_POSITION );
-        vlc_object_release( (vlc_object_t *)p_vout );
+        vout_thread_t *p_vout = input_GetVout( p_input );
+        if( p_vout != NULL )
+        {
+            var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_POSITION );
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
+        vlc_object_release( p_input );
     }
 }
 
@@ -448,54 +453,58 @@
 - (IBAction)windowAction:(id)sender
 {
     NSString *o_title = [sender title];
+    input_thread_t * p_input = pl_CurrentInput( VLCIntf );
 
-    vout_thread_t *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
-    if( p_vout != NULL )
+    if( p_input != NULL )
     {
-        id o_vout_view = [self voutView];
-        if( o_vout_view )
+        vout_thread_t *p_vout = input_GetVout( p_input );
+        if( p_vout != NULL )
         {
-            if( [o_title isEqualToString: _NS("Half Size") ] )
-                [o_vout_view scaleWindowWithFactor: 0.5 animate: YES];
-            else if( [o_title isEqualToString: _NS("Normal Size") ] )
-                [o_vout_view scaleWindowWithFactor: 1.0 animate: YES];
-            else if( [o_title isEqualToString: _NS("Double Size") ] )
-                [o_vout_view scaleWindowWithFactor: 2.0 animate: YES];
-            else if( [o_title isEqualToString: _NS("Float on Top") ] )
-                [o_vout_view toggleFloatOnTop];
-            else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
+            id o_vout_view = [self voutView];
+            if( o_vout_view )
             {
-                id o_window = [o_vout_view voutWindow];
-                if( ![o_window isZoomed] )
-                    [o_window performZoom:self];
+                if( [o_title isEqualToString: _NS("Half Size") ] )
+                    [o_vout_view scaleWindowWithFactor: 0.5 animate: YES];
+                else if( [o_title isEqualToString: _NS("Normal Size") ] )
+                    [o_vout_view scaleWindowWithFactor: 1.0 animate: YES];
+                else if( [o_title isEqualToString: _NS("Double Size") ] )
+                    [o_vout_view scaleWindowWithFactor: 2.0 animate: YES];
+                else if( [o_title isEqualToString: _NS("Float on Top") ] )
+                    [o_vout_view toggleFloatOnTop];
+                else if( [o_title isEqualToString: _NS("Fit to Screen") ] )
+                {
+                    id o_window = [o_vout_view voutWindow];
+                    if( ![o_window isZoomed] )
+                        [o_window performZoom:self];
+                }
+                else if( [o_title isEqualToString: _NS("Snapshot") ] )
+                {
+                    [o_vout_view snapshot];
+                }
+                else
+                {
+                    /* Fullscreen state for next time will be saved here too */
+                    [o_vout_view toggleFullscreen];
+                }
             }
-            else if( [o_title isEqualToString: _NS("Snapshot") ] )
-            {
-                [o_vout_view snapshot];
-            }
-            else
-            {
-                /* Fullscreen state for next time will be saved here too */
-                [o_vout_view toggleFullscreen];
-            }
+            vlc_object_release( (vlc_object_t *)p_vout );
         }
-        vlc_object_release( (vlc_object_t *)p_vout );
-    }
-    else
-    {
-        playlist_t * p_playlist = pl_Hold( VLCIntf );
-
-        if( [o_title isEqualToString: _NS("Fullscreen")] ||
-            [sender isKindOfClass:[NSButton class]] )
+        else
         {
-            vlc_value_t val;
-            var_Get( p_playlist, "fullscreen", &val );
-            var_Set( p_playlist, "fullscreen", (vlc_value_t)!val.b_bool );
+            playlist_t * p_playlist = pl_Hold( VLCIntf );
+
+            if( [o_title isEqualToString: _NS("Fullscreen")] ||
+                [sender isKindOfClass:[NSButton class]] )
+            {
+                vlc_value_t val;
+                var_Get( p_playlist, "fullscreen", &val );
+                var_Set( p_playlist, "fullscreen", (vlc_value_t)!val.b_bool );
+            }
+
+            pl_Release( VLCIntf );
         }
-
-        pl_Release( VLCIntf );
+        vlc_object_release( p_input );
     }
-
 }
 
 - (IBAction)telxTransparent:(id)sender
@@ -612,26 +621,31 @@
 
     if( key )
     {
-        vout_thread_t *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
-
-        if( p_vout != NULL )
+        input_thread_t * p_input = pl_CurrentInput( VLCIntf );
+        if( p_input != NULL )
         {
-            /* Escape */
-            if( key == (unichar) 0x1b )
+            vout_thread_t *p_vout = input_GetVout( p_input );
+
+            if( p_vout != NULL )
             {
-                id o_vout_view = [self voutView];
-                if( o_vout_view && [o_vout_view isFullscreen] )
+                /* Escape */
+                if( key == (unichar) 0x1b )
                 {
-                    [o_vout_view toggleFullscreen];
+                    id o_vout_view = [self voutView];
+                    if( o_vout_view && [o_vout_view isFullscreen] )
+                    {
+                        [o_vout_view toggleFullscreen];
+                        eventHandled = YES;
+                    }
+                }
+                else if( key == ' ' )
+                {
+                    [self play:self];
                     eventHandled = YES;
                 }
+                vlc_object_release( (vlc_object_t *)p_vout );
             }
-            else if( key == ' ' )
-            {
-                [self play:self];
-                eventHandled = YES;
-            }
-            vlc_object_release( (vlc_object_t *)p_vout );
+            vlc_object_release( p_input );
         }
     }
     return eventHandled;
@@ -986,9 +1000,8 @@
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
     {
-        /** \todo fix i_size use */
         PL_LOCK;
-        bEnabled = p_playlist->items.i_size > 1;
+        bEnabled = playlist_CurrentSize( p_playlist ) > 1;
         PL_UNLOCK;
     }
     else if( [[o_mi title] isEqualToString: _NS("Random")] )
@@ -1041,27 +1054,31 @@
         NSEnumerator *o_enumerator = [o_windows objectEnumerator];
         bEnabled = FALSE;
  
-        vout_thread_t   *p_vout = input_GetVout( pl_CurrentInput( VLCIntf ));
-        if( p_vout != NULL )
+        if( p_input != NULL )
         {
-            if( [[o_mi title] isEqualToString: _NS("Float on Top")] )
+            vout_thread_t *p_vout = input_GetVout( p_input );
+            if( p_vout != NULL )
             {
-                var_Get( p_vout, "video-on-top", &val );
-                [o_mi setState: val.b_bool ?  NSOnState : NSOffState];
-            }
-
-            while( (o_window = [o_enumerator nextObject]))
-            {
-                if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
-                            [[[VLCMain sharedInstance] embeddedList]
-                            windowContainsEmbedded: o_window])
+                if( [[o_mi title] isEqualToString: _NS("Float on Top")] )
                 {
-                    bEnabled = TRUE;
-                    break;
+                    var_Get( p_vout, "video-on-top", &val );
+                    [o_mi setState: val.b_bool ?  NSOnState : NSOffState];
                 }
+    
+                while( (o_window = [o_enumerator nextObject]))
+                {
+                    if( [[o_window className] isEqualToString: @"VLCVoutWindow"] ||
+                                [[[VLCMain sharedInstance] embeddedList]
+                                windowContainsEmbedded: o_window])
+                    {
+                        bEnabled = TRUE;
+                        break;
+                    }
+                }
+    
+                vlc_object_release( (vlc_object_t *)p_vout );
             }
-
-            vlc_object_release( (vlc_object_t *)p_vout );
+            vlc_object_release( p_input );
         }
         if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )
         {
