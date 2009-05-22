@@ -87,7 +87,7 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    char *psz_string;
+    char *psz_string = NULL;
 
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVA )
     {
@@ -108,6 +108,7 @@ static int Create( vlc_object_t *p_this )
                        p_filter->p_cfg );
 
     p_sys->p_mask = NULL;
+#if 0 /* This appears to be dead code. Where is psz_string initialized? */
     if( psz_string && *psz_string )
     {
         LoadMask( p_filter, psz_string );
@@ -116,6 +117,7 @@ static int Create( vlc_object_t *p_this )
                      psz_string );
     }
     free( psz_string );
+#endif
 
     vlc_mutex_init( &p_sys->mask_lock );
     psz_string =
