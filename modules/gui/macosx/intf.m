@@ -1951,6 +1951,7 @@ end:
     else
         i_end_scroll = -1;
     [o_scrollfield setStringValue: o_string];
+    [o_embedded_window setScrollString: o_string];
 }
 
 - (void)resetScrollField
