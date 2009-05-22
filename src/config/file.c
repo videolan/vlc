@@ -16,19 +16,14 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#include <vlc_common.h>
-#include "../libvlc.h"
-#include "vlc_charset.h"
-#include "vlc_keys.h"
 
 #include <errno.h>                                                  /* errno */
 #include <assert.h>
@@ -40,6 +35,11 @@
 #else
 #include <locale.h>
 #endif
+
+#include <vlc_common.h>
+#include "../libvlc.h"
+#include "vlc_charset.h"
+#include "vlc_keys.h"
 
 #include "configuration.h"
 #include "modules/modules.h"
