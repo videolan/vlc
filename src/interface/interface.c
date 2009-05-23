@@ -58,20 +58,6 @@ static void * MonitorLibVLCDeath( vlc_object_t *p_this );
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
-/**
- * Destroy the interface after the main loop endeed.
- *
- * @param p_obj: the interface thread
- */
-static void intf_Destroy( vlc_object_t *obj )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)obj;
-
-    free( p_intf->psz_intf );
-    config_ChainDestroy( p_intf->p_cfg );
-}
-
-
 #undef intf_Create
 /**
  * Create and start an interface.
@@ -116,7 +102,6 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
 
     /* Attach interface to its parent object */
     vlc_object_attach( p_intf, p_this );
-    vlc_object_set_destructor( p_intf, intf_Destroy );
 #if defined( __APPLE__ ) || defined( WIN32 )
     p_intf->b_should_run_on_first_thread = false;
 #endif
@@ -134,8 +119,7 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
     if( p_intf->p_module == NULL )
     {
         msg_Err( p_intf, "no suitable interface module" );
-        vlc_object_release( p_intf );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     if( p_intf->pf_run == NULL )
@@ -150,19 +134,12 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
                                VLC_THREAD_PRIORITY_LOW ) )
         {
             msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
-            vlc_object_release( p_intf );
-            return VLC_ENOMEM;
+            goto error;
         }
         p_intf->pf_run( p_intf );
 
-        /* Make sure our MonitorLibVLCDeath thread exit */
-        vlc_object_kill( p_intf );
         /* It is monitoring libvlc, not the p_intf */
         vlc_object_kill( p_intf->p_libvlc );
-        vlc_thread_join( p_intf );
-
-        vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
     }
     else
 #endif
@@ -171,28 +148,49 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
                            VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_intf, "cannot spawn interface thread" );
-        vlc_object_release( p_intf );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     return VLC_SUCCESS;
+
+error:
+    if( p_intf->p_module )
+        module_unneed( p_intf, p_intf->p_module );
+    config_ChainDestroy( p_intf->p_cfg );
+    free( p_intf->psz_intf );
+    vlc_object_release( p_intf );
+    return VLC_EGENERIC;
 }
 
 
 /**
- * Stops the interface thread
- *
- * This function asks the interface thread to stop
- * @param p_intf the interface thread
+ * Stops and destroys all interfaces
+ * @param p_libvlc the LibVLC instance
  */
-void intf_StopThread( intf_thread_t *p_intf )
+void intf_DestroyAll( libvlc_int_t *p_libvlc )
 {
-    /* Tell the interface to die */
-    vlc_object_kill( p_intf );
-    if( p_intf->pf_run )
-        vlc_thread_join( p_intf );
+    vlc_list_t *l = vlc_list_find( VLC_OBJECT(p_libvlc), VLC_OBJECT_INTF, FIND_CHILD );
 
-    module_unneed( p_intf, p_intf->p_module );
+    /* Tell the interfaces to die */
+    for( int i = 0; i < l->i_count; i++ )
+        vlc_object_kill( l->p_values[i].p_object );
+
+    /* Cleanup the interfaces */
+    for( int i = 0; i < l->i_count; i++ )
+    {
+        intf_thread_t *p_intf = (intf_thread_t *)l->p_values[i].p_object;
+
+        if( p_intf->pf_run )
+            vlc_thread_join( p_intf );
+        module_unneed( p_intf, p_intf->p_module );
+        free( p_intf->psz_intf );
+        config_ChainDestroy( p_intf->p_cfg );
+    }
+
+    /* Destroy objects */
+    for( int i = 0; i < l->i_count; i++ )
+        vlc_object_release( l->p_values[i].p_object ); /* for intf_Create() */
+    vlc_list_release( l );
 }
 
 /* Following functions are local */

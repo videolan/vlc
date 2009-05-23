@@ -233,6 +233,7 @@ static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
 }
 
 void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
+void intf_DestroyAll( libvlc_int_t * );
 
 #define libvlc_stats( o ) (libvlc_priv((VLC_OBJECT(o))->p_libvlc)->b_stats)
 

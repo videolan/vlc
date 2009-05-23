@@ -205,7 +205,6 @@ input_Stop
 input_vaControl
 intf_Create
 __intf_Eject
-intf_StopThread
 IsUTF8
 libvlc_InternalAddIntf
 libvlc_InternalCleanup
