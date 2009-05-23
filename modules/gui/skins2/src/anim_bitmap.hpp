@@ -59,6 +59,8 @@ class AnimBitmap: public SkinObject, public Box,
         virtual int getHeight() const;
 
     private:
+        /// Bitmap stored
+        const GenericBitmap &m_rBitmap;
         /// Graphics to store the bitmap
         OSGraphics *m_pImage;
         /// Number of frames
