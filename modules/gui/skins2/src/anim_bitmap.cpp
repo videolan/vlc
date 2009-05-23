@@ -30,7 +30,7 @@
 
 AnimBitmap::AnimBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap ):
     SkinObject( pIntf ), m_pImage( NULL ), m_curFrame( 0 ), m_pTimer( NULL ),
-    m_cmdNextFrame( this )
+    m_cmdNextFrame( this ), m_rBitmap( rBitmap )
 {
     // Build the graphics
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -73,8 +73,14 @@ void AnimBitmap::draw( OSGraphics &rImage, int xDest, int yDest )
     // Draw the current frame
     int height = m_pImage->getHeight() / m_nbFrames;
     int ySrc = height * m_curFrame;
-    rImage.drawGraphics( *m_pImage, 0, ySrc, xDest, yDest,
-                         m_pImage->getWidth(), height );
+
+    // The old way .... transparency was not taken care of
+    // rImage.drawGraphics( *m_pImage, 0, ySrc, xDest, yDest,
+    //                      m_pImage->getWidth(), height );
+
+    // A new way .... needs to be tested thoroughly
+    rImage.drawBitmap( m_rBitmap, 0, ySrc, xDest, yDest,
+                       m_pImage->getWidth(), height, true );
 }
 
 
