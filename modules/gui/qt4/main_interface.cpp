@@ -206,8 +206,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* END CONNECTS ON IM */
 
-    dialogHandler = new DialogHandler (p_intf);
-
     /************
      * Callbacks
      ************/
@@ -283,8 +281,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 MainInterface::~MainInterface()
 {
     msg_Dbg( p_intf, "Destroying the main interface" );
-
-    delete dialogHandler;
 
     /* Unsure we hide the videoWidget before destroying it */
     if( videoIsActive ) videoWidget->hide();

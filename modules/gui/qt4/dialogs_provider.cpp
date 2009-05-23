@@ -52,6 +52,7 @@
 #include "dialogs/podcast_configuration.hpp"
 #include "dialogs/toolbar.hpp"
 #include "dialogs/plugins.hpp"
+#include "dialogs/external.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -76,6 +77,8 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
 
     SDMapper = new QSignalMapper();
     CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
+
+    DialogHandler *dialogHandler = new DialogHandler (p_intf, this );
 }
 
 DialogsProvider::~DialogsProvider()
