@@ -224,6 +224,11 @@ typedef struct libvlc_priv_t
 #ifdef ENABLE_SOUT
     sap_handler_t     *p_sap; ///< SAP SDP advertiser
 #endif
+
+    /* Interfaces */
+    struct intf_thread_t *p_intf; ///< Interfaces linked-list
+
+    /* Objects tree */
     vlc_mutex_t        structure_lock;
 } libvlc_priv_t;
 

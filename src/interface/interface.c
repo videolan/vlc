@@ -37,6 +37,7 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
 #include <vlc_common.h>
 
 #include <vlc_aout.h>
@@ -58,6 +59,8 @@ static void * MonitorLibVLCDeath( vlc_object_t *p_this );
 static int AddIntfCallback( vlc_object_t *, char const *,
                             vlc_value_t , vlc_value_t , void * );
 
+static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+
 #undef intf_Create
 /**
  * Create and start an interface.
@@ -68,10 +71,11 @@ static int AddIntfCallback( vlc_object_t *, char const *,
  */
 int intf_Create( vlc_object_t *p_this, const char *psz_module )
 {
+    libvlc_int_t *p_libvlc = p_this->p_libvlc;
     intf_thread_t * p_intf;
 
     /* Allocate structure */
-    p_intf = vlc_object_create( p_this, VLC_OBJECT_INTF );
+    p_intf = vlc_object_create( p_libvlc, VLC_OBJECT_INTF );
     if( !p_intf )
         return VLC_ENOMEM;
 
@@ -100,8 +104,8 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
 
-    /* Attach interface to its parent object */
-    vlc_object_attach( p_intf, p_this );
+    /* Attach interface to LibVLC */
+    vlc_object_attach( p_intf, p_libvlc );
 #if defined( __APPLE__ ) || defined( WIN32 )
     p_intf->b_should_run_on_first_thread = false;
 #endif
@@ -122,9 +126,12 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
         goto error;
     }
 
-    if( p_intf->pf_run == NULL )
-        return VLC_SUCCESS;
-
+    vlc_mutex_lock( &lock );
+    if( !vlc_object_alive( p_libvlc ) )
+    {
+        vlc_mutex_unlock( &lock );
+        goto error; /* Too late! */
+    }
 #if defined( __APPLE__ ) || defined( WIN32 )
     /* Hack to get Mac OS X Cocoa runtime running
      * (it needs access to the main thread) */
@@ -134,8 +141,10 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
                                VLC_THREAD_PRIORITY_LOW ) )
         {
             msg_Err( p_intf, "cannot spawn libvlc death monitoring thread" );
+            vlc_mutex_unlock( &lock );
             goto error;
         }
+        assert( p_intf->pf_run );
         p_intf->pf_run( p_intf );
 
         /* It is monitoring libvlc, not the p_intf */
@@ -144,12 +153,18 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
     else
 #endif
     /* Run the interface in a separate thread */
-    if( vlc_thread_create( p_intf, "interface", RunInterface,
+    if( p_intf->pf_run
+     && vlc_thread_create( p_intf, "interface", RunInterface,
                            VLC_THREAD_PRIORITY_LOW ) )
     {
         msg_Err( p_intf, "cannot spawn interface thread" );
+        vlc_mutex_unlock( &lock );
         goto error;
     }
+
+    p_intf->p_next = libvlc_priv( p_libvlc )->p_intf;
+    libvlc_priv( p_libvlc )->p_intf = p_intf;
+    vlc_mutex_unlock( &lock );
 
     return VLC_SUCCESS;
 
@@ -169,28 +184,35 @@ error:
  */
 void intf_DestroyAll( libvlc_int_t *p_libvlc )
 {
-    vlc_list_t *l = vlc_list_find( VLC_OBJECT(p_libvlc), VLC_OBJECT_INTF, FIND_CHILD );
+    intf_thread_t *p_first;
+
+    assert( !vlc_object_alive( p_libvlc ) );
+
+    vlc_mutex_lock( &lock );
+    p_first = libvlc_priv( p_libvlc )->p_intf;
+#ifndef NDEBUG
+    libvlc_priv( p_libvlc )->p_intf = NULL;
+#endif
+    vlc_mutex_unlock( &lock );
 
     /* Tell the interfaces to die */
-    for( int i = 0; i < l->i_count; i++ )
-        vlc_object_kill( l->p_values[i].p_object );
+    for( intf_thread_t *p_intf = p_first; p_intf; p_intf = p_intf->p_next )
+        vlc_object_kill( p_intf );
 
     /* Cleanup the interfaces */
-    for( int i = 0; i < l->i_count; i++ )
+    for( intf_thread_t *p_intf = p_first; p_intf != NULL; )
     {
-        intf_thread_t *p_intf = (intf_thread_t *)l->p_values[i].p_object;
+        intf_thread_t *p_next = p_intf->p_next;
 
         if( p_intf->pf_run )
             vlc_thread_join( p_intf );
         module_unneed( p_intf, p_intf->p_module );
         free( p_intf->psz_intf );
         config_ChainDestroy( p_intf->p_cfg );
-    }
+        vlc_object_release( p_intf );
 
-    /* Destroy objects */
-    for( int i = 0; i < l->i_count; i++ )
-        vlc_object_release( l->p_values[i].p_object ); /* for intf_Create() */
-    vlc_list_release( l );
+        p_intf = p_next;
+    }
 }
 
 /* Following functions are local */

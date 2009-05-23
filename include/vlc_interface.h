@@ -51,6 +51,7 @@ typedef struct intf_thread_t
 {
     VLC_COMMON_MEMBERS
 
+    struct intf_thread_t *p_next; /** LibVLC interfaces book keeping */
     /* Thread properties and locks */
 #if defined( __APPLE__ ) || defined( WIN32 )
     bool          b_should_run_on_first_thread;
