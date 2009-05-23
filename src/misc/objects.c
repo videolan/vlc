@@ -205,10 +205,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     switch( i_type )
     {
-        case VLC_OBJECT_INTF:
-            i_size = sizeof(intf_thread_t);
-            psz_type = "interface";
-            break;
         case VLC_OBJECT_DECODER:
             i_size = sizeof(decoder_t);
             psz_type = "decoder";

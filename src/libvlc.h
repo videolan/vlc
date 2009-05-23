@@ -53,7 +53,6 @@ void system_End       ( libvlc_int_t * );
 #define vlc_object_signal_unlocked( obj )
 
 vlc_list_t *vlc_list_find( vlc_object_t *, int, int );
-#define VLC_OBJECT_INTF        (-4)
 
 /*
  * Threads subsystem
