@@ -115,7 +115,10 @@ static int Open (vlc_object_t *obj)
     /* Connect to X */
     p_sys->conn = Connect (obj);
     if (p_sys->conn == NULL)
+    {
+        free (p_sys);
         return VLC_EGENERIC;
+    }
 
     /* Get window */
     const xcb_screen_t *scr;
@@ -123,6 +126,7 @@ static int Open (vlc_object_t *obj)
     if (p_sys->embed == NULL)
     {
         xcb_disconnect (p_sys->conn);
+        free (p_sys);
         return VLC_EGENERIC;
     }
 
