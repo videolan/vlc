@@ -159,12 +159,16 @@ static int Open (vlc_object_t *obj)
     /* Connect to X */
     p_sys->conn = Connect (obj);
     if (p_sys->conn == NULL)
+    {
+        free (p_sys);
         return VLC_EGENERIC;
+    }
 
     if (!CheckXVideo (vout, p_sys->conn))
     {
         msg_Warn (vout, "Please enable XVideo 2.2 for faster video display");
         xcb_disconnect (p_sys->conn);
+        free (p_sys);
         return VLC_EGENERIC;
     }
 
@@ -173,6 +177,7 @@ static int Open (vlc_object_t *obj)
     if (p_sys->embed == NULL)
     {
         xcb_disconnect (p_sys->conn);
+        free (p_sys);
         return VLC_EGENERIC;
     }
 
