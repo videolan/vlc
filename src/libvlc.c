@@ -908,7 +908,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Prevents the power management daemon from suspending the system
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
-        interface_Create( p_libvlc, "inhibit,none" );
+        intf_Create( p_libvlc, "inhibit,none" );
 #endif
 
     /*
