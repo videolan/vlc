@@ -1032,6 +1032,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
+    libvlc_Quit( p_libvlc );
     intf_DestroyAll( p_libvlc );
 
 #ifdef ENABLE_VLM
