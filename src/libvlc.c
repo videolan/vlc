@@ -1131,8 +1131,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
  */
 int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
 {
-    intf_thread_t *p_intf = NULL;
-
     if( !p_libvlc )
         return VLC_EGENERIC;
 
