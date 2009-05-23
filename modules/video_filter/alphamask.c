@@ -107,7 +107,8 @@ static int Create( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_sys->p_mask = NULL;
+    psz_string =
+        var_CreateGetStringCommand( p_filter, CFG_PREFIX "mask" );
     if( psz_string && *psz_string )
     {
         LoadMask( p_filter, psz_string );
@@ -115,11 +116,11 @@ static int Create( vlc_object_t *p_this )
             msg_Err( p_filter, "Error while loading mask (%s).",
                      psz_string );
     }
+    else
+       p_sys->p_mask = NULL;
     free( psz_string );
 
     vlc_mutex_init( &p_sys->mask_lock );
-    psz_string =
-        var_CreateGetStringCommand( p_filter, CFG_PREFIX "mask" );
     var_AddCallback( p_filter, CFG_PREFIX "mask", MaskCallback,
                      p_filter );
     p_filter->pf_video_filter = Filter;

@@ -55,10 +55,12 @@
     IBOutlet id o_specificTime_mi;
 
     VLCFSPanel *o_fs_panel;
+    BOOL b_lockAspectRatio;
 }
 - (void)controlTintChanged;
 
 - (id)voutView;
+- (BOOL)aspectRatioIsLocked;
 
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
@@ -93,6 +95,7 @@
 
 - (IBAction)telxTransparent:(id)sender;
 - (IBAction)telxNavLink:(id)sender;
+- (IBAction)lockVideosAspectRatio:(id)sender;
 - (IBAction)addSubtitleFile:(id)sender;
 
 - (BOOL)keyEvent:(NSEvent *)o_event;

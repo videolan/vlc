@@ -230,6 +230,7 @@ $Id$
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
  * packetizer_copy: Simple copy packetizer
+ * packetizer_dirac: Dirac video packetizer
  * packetizer_h264: H264 video packetizer
  * packetizer_mlp: MLP/TrueHD audio packetizer
  * packetizer_mpeg4audio: MPEG4 audio packetizer

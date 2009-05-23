@@ -282,6 +282,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     p_mi->drawable.agl = 0;
     p_mi->drawable.xid = 0;
     p_mi->drawable.hwnd = NULL;
+    p_mi->drawable.nsobject = NULL;
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->p_input_thread = NULL;
     p_mi->i_refcount = 1;
