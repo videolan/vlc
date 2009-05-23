@@ -179,8 +179,6 @@ typedef struct config_category_t config_category_t;
 /* Interface */
 typedef struct intf_thread_t intf_thread_t;
 typedef struct intf_sys_t intf_sys_t;
-typedef struct intf_msg_t intf_msg_t;
-typedef struct user_widget_t user_widget_t;
 
 /* Input */
 typedef struct input_thread_t input_thread_t;
