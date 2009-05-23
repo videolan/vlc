@@ -64,59 +64,80 @@ vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
 
+/* TODO: move to vlc_variables.h */
+static inline void *var_GetAddress (vlc_object_t *o, const char *name)
+{
+    vlc_value_t val;
+    return var_Get (o, name, &val) ? NULL : val.p_address;
+}
+
+static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
+
 /**
  * Find the drawable set by libvlc application.
  */
 static int Open (vlc_object_t *obj, const char *varname, bool ptr)
 {
-    static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
     vout_window_t *wnd = (vout_window_t *)obj;
-    vlc_value_t val, globval;
+    void **used, *val;
+    size_t n = 0;
 
-    if (var_Create (obj->p_libvlc, "drawable-busy", VLC_VAR_BOOL)
+    if (var_Create (obj->p_libvlc, "drawables-in-use", VLC_VAR_ADDRESS)
      || var_Create (obj, varname, VLC_VAR_DOINHERIT
                                   | (ptr ? VLC_VAR_ADDRESS : VLC_VAR_INTEGER)))
         return VLC_ENOMEM;
-    var_Get (obj, varname, &val);
-
-    vlc_mutex_lock (&serializer);
-    /* Note: We cannot simply clear the drawable variable.
-     * It would break libvlc_video_get_parent(). */
-    var_Get (obj->p_libvlc, varname, &globval);
-    if (ptr ? (val.p_address == globval.p_address)
-            : (val.i_int == globval.i_int))
-    {
-        if (var_GetBool (obj->p_libvlc, "drawable-busy"))
-        {   /* LibVLC-wide drawable already in use */
-            if (ptr)
-                val.p_address = NULL;
-            else
-                val.i_int = 0;
-        }
-        else
-            var_SetBool (obj->p_libvlc, "drawable-busy", true);
-    }
-    /* If we got a drawable _not_ from the root object (from the input?),
-     * We assume it is not busy. This is a bug. */
-    vlc_mutex_unlock (&serializer);
-
-    var_Destroy (obj, varname);
-
-    if (ptr ? (val.p_address == NULL) : (val.i_int == 0))
-    {
-        var_Destroy (obj->p_libvlc, "drawable-busy");
-        return VLC_EGENERIC;
-    }
 
     if (ptr)
-        wnd->handle.hwnd = val.p_address;
+        val = var_GetAddress (obj, varname);
     else
-        wnd->handle.xid = val.i_int;
+        val = (void *)(uintptr_t)var_GetInteger (obj, varname);
+    var_Destroy (obj, varname);
+    msg_Err (wnd, "%zu, %p", n, val);
+
+    /* Keep a list of busy drawables, so we don't overlap videos if there are
+     * more than one video track in the stream. */
+    vlc_mutex_lock (&serializer);
+    /* TODO: per-type list of busy drawables */
+    used = var_GetAddress (VLC_OBJECT (obj->p_libvlc), "drawables-in-use");
+    if (used != NULL)
+    {
+        while (used[n] != NULL)
+        {
+            if (used[n] == val)
+                goto skip;
+            n++;
+        }
+    }
+
+    used = realloc (used, sizeof (*used) * (n + 2));
+    if (used != NULL)
+    {
+        used[n] = val;
+        used[n + 1] = NULL;
+        var_SetAddress (obj->p_libvlc, "drawables-in-use", used);
+    }
+    else
+    {
+skip:
+        msg_Warn (wnd, "drawable %p is busy", val);
+        val = NULL;
+    }
+    vlc_mutex_unlock (&serializer);
+    msg_Err (wnd, "%zu, %p", n, val);
+
+    if (val == NULL)
+        return VLC_EGENERIC;
+
+    if (ptr)
+        wnd->handle.hwnd = val;
+    else
+        wnd->handle.xid = (uintptr_t)val;
 
     /* FIXME: check that X server matches --x11-display (if specified) */
     /* FIXME: get window size (in platform-dependent ways) */
 
     wnd->control = Control;
+    wnd->p_sys = val;
     return VLC_SUCCESS;
 }
 
@@ -136,11 +157,32 @@ static int  OpenHWND (vlc_object_t *obj)
  */
 static void Close (vlc_object_t *obj)
 {
-    /* This is atomic with regards to var_GetBool() in Open(): */
-    var_SetBool (obj->p_libvlc, "drawable-busy", false);
+    vout_window_t *wnd = (vout_window_t *)obj;
+    void **used, *val = wnd->p_sys;
+    size_t n = 0;
 
+    /* Remove this drawable from the list of busy ones */
+    vlc_mutex_lock (&serializer);
+    used = var_GetAddress (VLC_OBJECT (obj->p_libvlc), "drawables-in-use");
+    assert (used);
+    while (used[n] != val)
+    {
+        assert (used[n]);
+        n++;
+    }
+    do
+        used[n] = used[n + 1];
+    while (used[n + 1] != NULL);
+
+    if (n == 0)
+      /* should not be needed (var_Destroy...) but better safe than sorry: */
+         var_SetAddress (obj->p_libvlc, "drawables-in-use", NULL);
+    vlc_mutex_unlock (&serializer);
+
+    if (n == 0)
+        free (used);
     /* Variables are reference-counted... */
-    var_Destroy (obj->p_libvlc, "drawable-busy");
+    var_Destroy (obj->p_libvlc, "drawables-in-use");
 }
 
 
