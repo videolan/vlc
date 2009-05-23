@@ -980,7 +980,7 @@ msgid ""
 "VLC does not support the audio or video format \"%4.4s\". Unfortunately "
 "there is no way for you to fix this."
 msgstr ""
-"VLC ne supporte probablement pas le format audio ou vidéo « %4.4s »."
+"VLC ne supporte probablement pas le format audio ou vidéo « %4.4s ». "
 "Malheureusement il n’y a rien à faire."
 
 #: src/input/es_out.c:911 src/input/es_out.c:916 src/libvlc-module.c:346
