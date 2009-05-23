@@ -54,7 +54,6 @@ void system_End       ( libvlc_int_t * );
 
 vlc_list_t *vlc_list_find( vlc_object_t *, int, int );
 #define VLC_OBJECT_INTF        (-4)
-#define VLC_OBJECT_PACKETIZER  (-13)
 
 /*
  * Threads subsystem

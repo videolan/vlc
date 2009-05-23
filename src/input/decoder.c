@@ -52,7 +52,8 @@
 
 #include "../video_output/vout_control.h"
 
-static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, int, sout_instance_t *p_sout );
+static decoder_t *CreateDecoder( input_thread_t *, es_format_t *, bool,
+                                 sout_instance_t *p_sout );
 static void       DeleteDecoder( decoder_t * );
 
 static void      *DecoderThread( vlc_object_t * );
@@ -94,6 +95,7 @@ struct decoder_owner_sys_t
 
     /* Some decoders require already packetized data (ie. not truncated) */
     decoder_t *p_packetizer;
+    bool b_packetizer;
 
     /* Current format in use by the output */
     video_format_t video;
@@ -261,37 +263,22 @@ int decoder_GetDisplayRate( decoder_t *p_dec )
  * \return the spawned decoder object
  */
 decoder_t *input_DecoderNew( input_thread_t *p_input,
-                             es_format_t *fmt, input_clock_t *p_clock, sout_instance_t *p_sout  )
+                             es_format_t *fmt, input_clock_t *p_clock,
+                             sout_instance_t *p_sout  )
 {
     decoder_t *p_dec = NULL;
+    const char *psz_type = p_sout ? N_("packetizer") : N_("decoder");
     int i_priority;
 
-#ifdef ENABLE_SOUT
-    /* If we are in sout mode, search for packetizer module */
-    if( p_sout )
+    /* Create the decoder configuration structure */
+    p_dec = CreateDecoder( p_input, fmt, p_sout != NULL, p_sout );
+    if( p_dec == NULL )
     {
-        /* Create the decoder configuration structure */
-        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_PACKETIZER, p_sout );
-        if( p_dec == NULL )
-        {
-            msg_Err( p_input, "could not create packetizer" );
-            dialog_Fatal( p_input, _("Streaming / Transcoding failed"), "%s",
-                          _("VLC could not open the packetizer module.") );
-            return NULL;
-        }
-    }
-    else
-#endif
-    {
-        /* Create the decoder configuration structure */
-        p_dec = CreateDecoder( p_input, fmt, VLC_OBJECT_DECODER, p_sout );
-        if( p_dec == NULL )
-        {
-            msg_Err( p_input, "could not create decoder" );
-            dialog_Fatal( p_input, _("Streaming / Transcoding failed"), "%s",
-                          _("VLC could not open the decoder module.") );
-            return NULL;
-        }
+        msg_Err( p_input, "could not create %s", psz_type );
+        dialog_Fatal( p_input, _("Streaming / Transcoding failed"),
+                      _("VLC could not open the %s module."),
+                      vlc_gettext( psz_type ) );
+        return NULL;
     }
 
     if( !p_dec->p_module )
@@ -437,7 +424,7 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         es_format_t fmt;
 
         es_format_Init( &fmt, SPU_ES, fcc[i_channel] );
-        p_cc = CreateDecoder( p_owner->p_input, &fmt, VLC_OBJECT_DECODER, p_owner->p_sout );
+        p_cc = CreateDecoder( p_owner->p_input, &fmt, false, p_owner->p_sout );
         if( !p_cc )
         {
             msg_Err( p_dec, "could not create decoder" );
@@ -687,19 +674,18 @@ static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
  *
  * \param p_input the input thread
  * \param p_es the es descriptor
- * \param i_object_type Object type as define in include/vlc_objects.h
+ * \param b_packetizer instead of a decoder
  * \return the decoder object
  */
 static decoder_t * CreateDecoder( input_thread_t *p_input,
-                                  es_format_t *fmt, int i_object_type, sout_instance_t *p_sout )
+                                  es_format_t *fmt, bool b_packetizer,
+                                  sout_instance_t *p_sout )
 {
     decoder_t *p_dec;
     decoder_owner_sys_t *p_owner;
     es_format_t null_es_format;
 
-    int i;
-
-    p_dec = vlc_object_create( p_input, i_object_type );
+    p_dec = vlc_object_create( p_input, VLC_OBJECT_DECODER );
     if( p_dec == NULL )
         return NULL;
 
@@ -737,6 +723,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     p_dec->p_owner->p_sout = p_sout;
     p_dec->p_owner->p_sout_input = NULL;
     p_dec->p_owner->p_packetizer = NULL;
+    p_dec->p_owner->b_packetizer = b_packetizer;
 
     /* decoder fifo */
     if( ( p_dec->p_owner->p_fifo = block_FifoNew() ) == NULL )
@@ -763,17 +750,17 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     vlc_object_attach( p_dec, p_input );
 
     /* Find a suitable decoder/packetizer module */
-    if( i_object_type == VLC_OBJECT_DECODER )
+    if( !b_packetizer )
         p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
     else
         p_dec->p_module = module_need( p_dec, "packetizer", "$packetizer", false );
 
     /* Check if decoder requires already packetized data */
-    if( i_object_type == VLC_OBJECT_DECODER &&
+    if( !b_packetizer &&
         p_dec->b_need_packetized && !p_dec->fmt_in.b_packetized )
     {
         p_dec->p_owner->p_packetizer =
-            vlc_object_create( p_input, VLC_OBJECT_PACKETIZER );
+            vlc_object_create( p_input, VLC_OBJECT_DECODER );
         if( p_dec->p_owner->p_packetizer )
         {
             es_format_Copy( &p_dec->p_owner->p_packetizer->fmt_in,
@@ -800,7 +787,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
     /* Copy ourself the input replay gain */
     if( fmt->i_cat == AUDIO_ES )
     {
-        for( i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
+        for( unsigned i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
         {
             if( !p_dec->fmt_out.audio_replay_gain.pb_peak[i] )
             {
@@ -841,7 +828,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
 
     /* */
     p_owner->cc.b_supported = false;
-    if( i_object_type == VLC_OBJECT_DECODER )
+    if( !b_packetizer )
     {
         if( p_owner->p_packetizer && p_owner->p_packetizer->pf_get_cc )
             p_owner->cc.b_supported = true;
@@ -849,7 +836,7 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             p_owner->cc.b_supported = true;
     }
 
-    for( i = 0; i < 4; i++ )
+    for( unsigned i = 0; i < 4; i++ )
     {
         p_owner->cc.pb_present[i] = false;
         p_owner->cc.pp_decoder[i] = NULL;
@@ -1934,7 +1921,7 @@ static void DecoderProcess( decoder_t *p_dec, block_t *p_block )
     }
 
 #ifdef ENABLE_SOUT
-    if( vlc_internals( p_dec )->i_object_type == VLC_OBJECT_PACKETIZER )
+    if( p_owner->b_packetizer )
     {
         if( p_block )
             p_block->i_flags &= ~BLOCK_FLAG_CORE_PRIVATE_MASK;

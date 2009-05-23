@@ -213,10 +213,6 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(decoder_t);
             psz_type = "decoder";
             break;
-        case VLC_OBJECT_PACKETIZER:
-            i_size = sizeof(decoder_t);
-            psz_type = "packetizer";
-            break;
         case VLC_OBJECT_AOUT:
             i_size = sizeof(aout_instance_t);
             psz_type = "audio output";
