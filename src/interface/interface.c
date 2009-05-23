@@ -89,6 +89,31 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
     if( !p_intf )
         return VLC_ENOMEM;
 
+    /* Variable used for interface spawning */
+    vlc_value_t val, text;
+    var_Create( p_intf, "intf-add", VLC_VAR_STRING |
+                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Add Interface");
+    var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
+
+    val.psz_string = (char *)"rc";
+    text.psz_string = (char *)_("Console");
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = (char *)"telnet";
+    text.psz_string = (char *)_("Telnet Interface");
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = (char *)"http";
+    text.psz_string = (char *)_("Web Interface");
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = (char *)"logger";
+    text.psz_string = (char *)_("Debug logging");
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = (char *)"gestures";
+    text.psz_string = (char *)_("Mouse Gestures");
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+
+    var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
+
     /* Attach interface to its parent object */
     vlc_object_attach( p_intf, p_this );
     vlc_object_set_destructor( p_intf, intf_Destroy );
@@ -178,33 +203,6 @@ void intf_StopThread( intf_thread_t *p_intf )
 static void* RunInterface( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    vlc_value_t val, text;
-    int canc = vlc_savecancel ();
-
-    /* Variable used for interface spawning */
-    var_Create( p_intf, "intf-add", VLC_VAR_STRING |
-                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Add Interface");
-    var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
-
-    val.psz_string = (char *)"rc";
-    text.psz_string = (char *)_("Console");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"telnet";
-    text.psz_string = (char *)_("Telnet Interface");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"http";
-    text.psz_string = (char *)_("Web Interface");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"logger";
-    text.psz_string = (char *)_("Debug logging");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = (char *)"gestures";
-    text.psz_string = (char *)_("Mouse Gestures");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-
-    var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
-    vlc_restorecancel (canc);
 
     /* Give control to the interface */
     if( p_intf->pf_run )
