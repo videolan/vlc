@@ -171,8 +171,6 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
             fluid_synth_pitch_bend (p_sys->synth, channel, (p1 << 7) | p2);
             break;
     }
-    p_block->p_buffer += p_block->i_buffer;
-    p_block->i_buffer = 0;
 
     unsigned samples =
         (p_block->i_pts - aout_DateGet (&p_sys->end_date)) * 441 / 10000;
