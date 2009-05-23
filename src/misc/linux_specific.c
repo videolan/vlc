@@ -91,7 +91,7 @@ void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
                "Please update to version 2.8 or newer.\n", stderr);
         fflush (stderr);
 #ifndef DISABLE_BUGGY_GLIBC_CHECK
-        abort ();
+        //abort ();
 #endif
     }
 #endif
