@@ -49,7 +49,6 @@ class FullscreenControllerWidget;
 class SpeedControlWidget;
 class QMenu;
 class QSize;
-class DialogHandler;
 
 enum {
     CONTROLS_VISIBLE = 0x1,
@@ -110,7 +109,6 @@ private:
     ControlsWidget      *controls;
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
-    DialogHandler       *dialogHandler;
 
     void createMainWidget( QSettings* );
     void createStatusBar();

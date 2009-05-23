@@ -51,7 +51,7 @@ class DialogHandler : public QObject
     friend class QVLCProgressDialog;
 
 public:
-    DialogHandler (intf_thread_t *);
+    DialogHandler (intf_thread_t *, QObject *parent);
     ~DialogHandler (void);
 
 private:
