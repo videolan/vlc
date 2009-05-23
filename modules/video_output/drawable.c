@@ -92,7 +92,6 @@ static int Open (vlc_object_t *obj, const char *varname, bool ptr)
     else
         val = (void *)(uintptr_t)var_GetInteger (obj, varname);
     var_Destroy (obj, varname);
-    msg_Err (wnd, "%zu, %p", n, val);
 
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
@@ -123,7 +122,6 @@ skip:
         val = NULL;
     }
     vlc_mutex_unlock (&serializer);
-    msg_Err (wnd, "%zu, %p", n, val);
 
     if (val == NULL)
         return VLC_EGENERIC;
