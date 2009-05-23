@@ -241,7 +241,7 @@ static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( asprintf( &psz_intf, "%s,none", newval.psz_string ) == -1 )
         return VLC_ENOMEM;
 
-    int ret = intf_Create( p_this->p_libvlc, psz_intf );
+    int ret = intf_Create( VLC_OBJECT(p_this->p_libvlc), psz_intf );
     free( psz_intf );
     if( ret )
         msg_Err( p_this, "interface \"%s\" initialization failed",
