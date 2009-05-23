@@ -138,6 +138,9 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
         return VLC_EGENERIC;
     }
 
+    if( p_intf->pf_run == NULL )
+        return VLC_SUCCESS;
+
 #if defined( __APPLE__ ) || defined( WIN32 )
     /* Hack to get Mac OS X Cocoa runtime running
      * (it needs access to the main thread) */
@@ -150,7 +153,7 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
             vlc_object_release( p_intf );
             return VLC_ENOMEM;
         }
-        RunInterface( VLC_OBJECT(p_intf) );
+        p_intf->pf_run( p_intf );
 
         /* Make sure our MonitorLibVLCDeath thread exit */
         vlc_object_kill( p_intf );
@@ -160,8 +163,8 @@ int intf_Create( vlc_object_t *p_this, const char *psz_module )
 
         vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
-        return VLC_SUCCESS;
     }
+    else
 #endif
     /* Run the interface in a separate thread */
     if( vlc_thread_create( p_intf, "interface", RunInterface,
@@ -186,12 +189,11 @@ void intf_StopThread( intf_thread_t *p_intf )
 {
     /* Tell the interface to die */
     vlc_object_kill( p_intf );
-    vlc_thread_join( p_intf );
+    if( p_intf->pf_run )
+        vlc_thread_join( p_intf );
 
     module_unneed( p_intf, p_intf->p_module );
 }
-
-
 
 /* Following functions are local */
 
@@ -204,10 +206,7 @@ static void* RunInterface( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    /* Give control to the interface */
-    if( p_intf->pf_run )
-        p_intf->pf_run( p_intf );
-
+    p_intf->pf_run( p_intf );
     return NULL;
 }
 
