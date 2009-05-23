@@ -332,7 +332,10 @@ MAINTAINERCLEANFILES = ChangeLog
 # Shortcut for developpers to rebuild the core (libvlc + vlc)
 # Don't use it if you don't know what it is about.
 # Don't complain if it doesn't work. -- Courmisch
-libvlc:
+libcompat:
+	cd compat && $(MAKE) $(AM_MAKEFLAGS)
+
+libvlc: libcompat
 	cd src && $(MAKE) $(AM_MAKEFLAGS) libvlc.la
 
 core: libvlc
