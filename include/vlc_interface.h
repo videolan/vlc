@@ -44,8 +44,10 @@ typedef struct intf_dialog_args_t intf_dialog_args_t;
  * @{
  */
 
+typedef struct intf_sys_t intf_sys_t;
+
 /** Describe all interface-specific data of the interface thread */
-struct intf_thread_t
+typedef struct intf_thread_t
 {
     VLC_COMMON_MEMBERS
 
@@ -60,14 +62,14 @@ struct intf_thread_t
 
     /** Interface module */
     module_t *   p_module;
-    void      ( *pf_run )    ( intf_thread_t * ); /** Run function */
+    void      ( *pf_run )    ( struct intf_thread_t * ); /** Run function */
 
     /** Specific for dialogs providers */
-    void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
+    void ( *pf_show_dialog ) ( struct intf_thread_t *, int, int,
                                intf_dialog_args_t * );
 
     config_chain_t *p_cfg;
-};
+} intf_thread_t;
 
 /** \brief Arguments passed to a dialogs provider
  *  This describes the arguments passed to the dialogs provider. They are

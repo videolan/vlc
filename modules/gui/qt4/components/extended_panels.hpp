@@ -48,7 +48,7 @@ class ExtVideo: public QObject
     Q_OBJECT
     friend class ExtendedDialog;
 public:
-    ExtVideo( intf_thread_t *, QTabWidget * );
+    ExtVideo( struct intf_thread_t *, QTabWidget * );
     virtual ~ExtVideo();
     /*void gotoConf( QObject* );*/
 private:
