@@ -40,7 +40,6 @@
 #endif
 
 #include <vlc_codec.h>
-#include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_osd.h>
 
@@ -59,14 +58,16 @@
 /*****************************************************************************
  * intf_sys_t: description and status of interface
  *****************************************************************************/
-struct intf_sys_t
+typedef struct decoder_sys_t
 {
+    VLC_COMMON_MEMBERS
+
     vlc_mutex_t         lock;
     decoder_t *         p_cmml_decoder;
     input_thread_t *    p_input;
 
     int                 i_key_action;
-};
+} intf_thread_t;
 
 struct navigation_history_t
 {
@@ -78,8 +79,8 @@ struct navigation_history_t
  * Local prototypes.
  *****************************************************************************/
 
-int          OpenIntf               ( vlc_object_t * );
-void         CloseIntf              ( vlc_object_t * );
+decoder_sys_t *OpenIntf                 ( vlc_object_t * );
+void         CloseIntf                  ( decoder_sys_t * );
 
 static int   InitThread                 ( intf_thread_t * );
 static int   MouseEvent                 ( vlc_object_t *, char const *,
@@ -109,22 +110,18 @@ static int   DisplayPendingAnchor       ( intf_thread_t *, vout_thread_t * );
 static history_t * GetHistory           ( playlist_t * );
 static void  ReplacePlaylistItem        ( playlist_t *, char * );
 
-/* Exported functions */
-static void RunIntf        ( intf_thread_t *p_intf );
+static void *RunIntf        ( vlc_object_t * );
 
 /*****************************************************************************
  * OpenIntf: initialize CMML interface
  *****************************************************************************/
-int OpenIntf ( vlc_object_t *p_this )
+decoder_sys_t *OpenIntf ( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    decoder_sys_t *p_intf = vlc_object_create( p_this, sizeof( *p_intf ) );
+    if( p_intf == NULL )
+        return NULL;
 
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-        return VLC_ENOMEM;
-
-    p_intf->pf_run = RunIntf;
-    vlc_mutex_init( &p_intf->p_sys->lock );
+    vlc_mutex_init( &p_intf->lock );
 
     var_AddCallback( p_intf->p_libvlc, "key-action", KeyEvent, p_intf );
     /* we also need to add the callback for "mouse-clicked", but do that later
@@ -140,15 +137,15 @@ int OpenIntf ( vlc_object_t *p_this )
     var_AddCallback( p_intf->p_libvlc, "browse-follow-anchor",
                      FollowAnchorCallback, p_intf );
 
-    return VLC_SUCCESS;
+    vlc_thread_create( p_intf, "cmml", RunIntf, VLC_THREAD_PRIORITY_LOW );
+    return p_intf;
 }
 
 /*****************************************************************************
  * CloseIntf: destroy dummy interface
  *****************************************************************************/
-void CloseIntf ( vlc_object_t *p_this )
+void CloseIntf ( decoder_sys_t *p_intf )
 {
-    intf_thread_t * p_intf = (intf_thread_t *)p_this;
     vout_thread_t * p_vout;
 
 #ifdef CMML_INTF_DEBUG
@@ -165,26 +162,29 @@ void CloseIntf ( vlc_object_t *p_this )
     }
 
     var_DelCallback( p_intf->p_libvlc, "key-action", KeyEvent, p_intf );
+    vlc_object_kill( p_intf );
+    vlc_thread_join( p_intf );
 
-    vlc_object_release( p_intf->p_sys->p_cmml_decoder );
+    vlc_object_release( p_intf->p_cmml_decoder );
 
-    vlc_mutex_destroy( &p_intf->p_sys->lock );
-    free( p_intf->p_sys );
+    vlc_mutex_destroy( &p_intf->lock );
+    vlc_object_release( p_intf );
 }
 
 
 /*****************************************************************************
  * RunIntf: main loop
  *****************************************************************************/
-static void RunIntf( intf_thread_t *p_intf )
+static void *RunIntf( vlc_object_t *p_obj )
 {
+    decoder_sys_t *p_intf = (decoder_sys_t *)p_obj;
     int canc = vlc_savecancel();
     vout_thread_t * p_vout = NULL;
 
     if( InitThread( p_intf ) < 0 )
     {
         msg_Err( p_intf, "can't initialize CMML interface" );
-        return;
+        return NULL;
     }
 #ifdef CMML_INTF_DEBUG
     msg_Dbg( p_intf, "CMML intf initialized" );
@@ -204,7 +204,7 @@ static void RunIntf( intf_thread_t *p_intf )
         /* find a video output if we currently don't have one */
         if( p_vout == NULL )
         {
-            p_vout = vlc_object_find( p_intf->p_sys->p_input,
+            p_vout = vlc_object_find( p_intf->p_input,
                                       VLC_OBJECT_VOUT, FIND_CHILD );
             if( p_vout )
             {
@@ -215,12 +215,12 @@ static void RunIntf( intf_thread_t *p_intf )
             }
         }
 
-        vlc_mutex_lock( &p_intf->p_sys->lock );
+        vlc_mutex_lock( &p_intf->lock );
 
         /*
          * keyboard event
          */
-        switch( p_intf->p_sys->i_key_action )
+        switch( p_intf->i_key_action )
         {
             case ACTIONID_NAV_ACTIVATE:
                 FollowAnchor( p_intf );
@@ -234,8 +234,8 @@ static void RunIntf( intf_thread_t *p_intf )
             default:
                 break;
         }
-        p_intf->p_sys->i_key_action = 0;
-        vlc_mutex_unlock( &p_intf->p_sys->lock );
+        p_intf->i_key_action = 0;
+        vlc_mutex_unlock( &p_intf->lock );
 
         (void) DisplayPendingAnchor( p_intf, p_vout );
 
@@ -251,8 +251,9 @@ static void RunIntf( intf_thread_t *p_intf )
         vlc_object_release( p_vout );
     }
 
-    vlc_object_release( p_intf->p_sys->p_input );
+    vlc_object_release( p_intf->p_input );
     vlc_restorecancel( canc );
+    return NULL;
 }
 
 /*****************************************************************************
@@ -265,10 +266,9 @@ static int DisplayPendingAnchor( intf_thread_t *p_intf, vout_thread_t *p_vout )
     char *psz_description = NULL;
     char *psz_url = NULL;
 
-    intf_thread_t *p_primary_intf;
     vlc_value_t val;
 
-    p_cmml_decoder = p_intf->p_sys->p_cmml_decoder;
+    p_cmml_decoder = p_intf->p_cmml_decoder;
     if( var_Get( p_cmml_decoder, "psz-current-anchor-description", &val )
             != VLC_SUCCESS )
     {
@@ -337,14 +337,14 @@ static int InitThread( intf_thread_t * p_intf )
             return VLC_EGENERIC;
         }
 
-        vlc_mutex_lock( &p_intf->p_sys->lock );
+        vlc_mutex_lock( &p_intf->lock );
 
-        p_intf->p_sys->p_input = p_input;
-        p_intf->p_sys->p_cmml_decoder = p_cmml_decoder;
+        p_intf->p_input = p_input;
+        p_intf->p_cmml_decoder = p_cmml_decoder;
 
-        p_intf->p_sys->i_key_action = 0;
+        p_intf->i_key_action = 0;
 
-        vlc_mutex_unlock( &p_intf->p_sys->lock );
+        vlc_mutex_unlock( &p_intf->lock );
 
         return VLC_SUCCESS;
     }
@@ -379,11 +379,11 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
 
 
-    vlc_mutex_lock( &p_intf->p_sys->lock );
+    vlc_mutex_lock( &p_intf->lock );
     /* FIXME: key presses might get lost here... */
-    p_intf->p_sys->i_key_action = newval.i_int;
+    p_intf->i_key_action = newval.i_int;
 
-    vlc_mutex_unlock( &p_intf->p_sys->lock );
+    vlc_mutex_unlock( &p_intf->lock );
 
     return VLC_SUCCESS;
 }
@@ -393,15 +393,13 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
  *****************************************************************************/
 static void FollowAnchor ( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys;
     decoder_t *p_cmml_decoder;
     char *psz_url = NULL;
     vlc_value_t val;
 
     msg_Dbg( p_intf, "User followed anchor" );
 
-    p_sys = p_intf->p_sys;
-    p_cmml_decoder = p_sys->p_cmml_decoder;
+    p_cmml_decoder = p_intf->p_cmml_decoder;
 
     if( var_Get( p_cmml_decoder, "psz-current-anchor-url", &val ) ==
             VLC_SUCCESS )
@@ -437,7 +435,7 @@ static void FollowAnchor ( intf_thread_t *p_intf )
         msg_Dbg( p_intf, "URL to load is \"%s\"", psz_uri_to_load );
 #endif
 
-        if( var_Get( p_intf->p_sys->p_input, "time", &time ) )
+        if( var_Get( p_intf->p_input, "time", &time ) )
         {
             msg_Dbg( p_intf, "couldn't get time from current clip" );
             time.i_time = 0;
@@ -526,7 +524,7 @@ char *GetTimedURLFromPlaylistItem( intf_thread_t *p_intf,
         psz_url = xstrcat( psz_url, "?" );
 
     /* jump back to 2 seconds before where we are now */
-    i_seconds = GetCurrentTimeInSeconds( p_intf->p_sys->p_input ) - 2;
+    i_seconds = GetCurrentTimeInSeconds( p_intf->p_input ) - 2;
     psz_seconds = GetTimedURIFragmentForTime( i_seconds < 0 ? 0 : i_seconds );
     if( psz_seconds )
     {

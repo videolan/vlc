@@ -43,14 +43,6 @@
 #undef  CMML_DEBUG
 
 /*****************************************************************************
- * decoder_sys_t : decoder descriptor
- *****************************************************************************/
-struct decoder_sys_t
-{
-    intf_thread_t *     p_intf;
-};
-
-/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int           OpenDecoder   ( vlc_object_t * );
@@ -63,8 +55,8 @@ static void          ParseText     ( decoder_t *, block_t * );
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-int  OpenIntf  ( vlc_object_t * );
-void CloseIntf ( vlc_object_t * );
+decoder_sys_t *OpenIntf( vlc_object_t * );
+void CloseIntf( decoder_sys_t * );
 
 /*****************************************************************************
  * Module descriptor.
@@ -91,16 +83,11 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     input_thread_t * p_input;
-    decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_CMML )
         return VLC_EGENERIC;
 
     p_dec->pf_decode_sub = DecodeBlock;
-
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) ) ) == NULL )
-        return VLC_ENOMEM;
 
     /* Let other interested modules know that we're a CMML decoder
      * We have to set this variable on the input thread, because there's
@@ -125,10 +112,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* initialise the CMML responder interface */
-    p_sys->p_intf = intf_Create( p_dec, "cmml" );
-    if( p_sys->p_intf )
-        intf_RunThread( p_sys->p_intf );
-
+    p_dec->p_sys = OpenIntf( p_dec );
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 
@@ -174,18 +158,8 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* Destroy the interface object/thread */
-    if( p_sys->p_intf != NULL )
-    {
-        intf_thread_t *p_intf = p_sys->p_intf;
-        intf_StopThread( p_intf );
-        vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
-    }
-
-    free( p_sys );
+    CloseIntf( p_dec->p_sys );
 }
 
 /*****************************************************************************
