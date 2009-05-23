@@ -98,9 +98,8 @@ struct intf_dialog_args_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-#define intf_Create(a,b) __intf_Create(VLC_OBJECT(a),b)
-VLC_EXPORT( intf_thread_t *, __intf_Create,     ( vlc_object_t *, const char * ) );
-VLC_EXPORT( int,               intf_RunThread,  ( intf_thread_t * ) );
+VLC_EXPORT( int, intf_Create, ( vlc_object_t *, const char * ) );
+#define intf_Create(a,b) intf_Create(VLC_OBJECT(a),b)
 VLC_EXPORT( void,              intf_StopThread, ( intf_thread_t * ) );
 
 #define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)

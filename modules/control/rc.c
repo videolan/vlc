@@ -1525,19 +1525,8 @@ static int Intf( vlc_object_t *p_this, char const *psz_cmd,
                  vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
-    intf_thread_t *p_newintf = NULL;
 
-    p_newintf = intf_Create( p_this->p_libvlc, newval.psz_string );
-    if( p_newintf )
-    {
-        if( intf_RunThread( p_newintf ) )
-        {
-            vlc_object_detach( p_newintf );
-            vlc_object_release( p_newintf );
-        }
-    }
-
-    return VLC_SUCCESS;
+    return intf_Create( p_this->p_libvlc, newval.psz_string );
 }
 
 static int Volume( vlc_object_t *p_this, char const *psz_cmd,

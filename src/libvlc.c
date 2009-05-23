@@ -1138,7 +1138,6 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
  */
 int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
 {
-    int i_err;
     intf_thread_t *p_intf = NULL;
 
     if( !p_libvlc )
@@ -1164,25 +1163,14 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     }
 
     /* Try to create the interface */
-    p_intf = intf_Create( p_libvlc, psz_module ? psz_module : "$intf" );
-    if( p_intf == NULL )
+    if( intf_Create( p_libvlc, psz_module ? psz_module : "$intf" ) )
     {
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
                  psz_module );
         return VLC_EGENERIC;
     }
-
-    /* Try to run the interface */
-    i_err = intf_RunThread( p_intf );
-    if( i_err )
-    {
-        vlc_object_detach( p_intf );
-        vlc_object_release( p_intf );
-        return i_err;
-    }
-
     return VLC_SUCCESS;
-};
+}
 
 static vlc_mutex_t exit_lock = VLC_STATIC_MUTEX;
 

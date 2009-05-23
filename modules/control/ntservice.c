@@ -309,26 +309,14 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
 
         if( asprintf( &psz_temp, "%s,none", psz_module ) != -1 )
         {
-            intf_thread_t *p_new_intf;
-
             /* Try to create the interface */
-            p_new_intf = intf_Create( p_intf, psz_temp );
-            if( p_new_intf == NULL )
+            if( intf_Create( p_intf, psz_temp ) )
             {
                 msg_Err( p_intf, "interface \"%s\" initialization failed",
                          psz_temp );
                 free( psz_temp );
                 continue;
             }
-
-            /* Try to run the interface */
-            if( intf_RunThread( p_new_intf ) )
-            {
-                vlc_object_detach( p_new_intf );
-                vlc_object_release( p_new_intf );
-                msg_Err( p_intf, "interface \"%s\" cannot run", psz_temp );
-            }
-
             free( psz_temp );
         }
     }

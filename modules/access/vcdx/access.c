@@ -967,10 +967,6 @@ VCDOpen ( vlc_object_t *p_this )
 #endif
     p_vcdplayer->p_access = p_access;
 
-#ifdef FIXED
-    intf_RunThread( p_vcdplayer->p_intf );
-#endif
-
     free( psz_source );
 
     return VLC_SUCCESS;

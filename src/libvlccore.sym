@@ -203,9 +203,8 @@ input_SplitMRL
 input_Start
 input_Stop
 input_vaControl
-__intf_Create
+intf_Create
 __intf_Eject
-intf_RunThread
 intf_StopThread
 IsUTF8
 libvlc_InternalAddIntf
