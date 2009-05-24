@@ -1617,8 +1617,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         void *p_tmp;
         msg_Dbg( p_demux, "lost %d bytes", i_truncated_bytes );
         msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer * 2 );
-        tk->i_buffer *= 2;
-        p_tmp = realloc( tk->p_buffer, tk->i_buffer );
+        p_tmp = realloc( tk->p_buffer, tk->i_buffer * 2 );
         if( p_tmp == NULL )
         {
             msg_Warn( p_demux, "realloc failed" );
@@ -1626,13 +1625,12 @@ static void StreamRead( void *p_private, unsigned int i_size,
         else
         {
             tk->p_buffer = (uint8_t*)p_tmp;
+            tk->i_buffer *= 2;
         }
     }
-    if( i_size > tk->i_buffer )
-    {
-        msg_Warn( p_demux, "buffer overflow" );
-    }
-    /* FIXME could i_size be > buffer size ? */
+
+    assert( i_size <= tk->i_buffer );
+
     if( tk->fmt.i_codec == VLC_CODEC_AMR_NB ||
         tk->fmt.i_codec == VLC_CODEC_AMR_WB )
     {
