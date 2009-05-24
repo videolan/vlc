@@ -23,14 +23,14 @@
  *****************************************************************************/
 
 #include <libvcd/info.h>
+#include <vlc_interface.h>
 
 #define VCD_MRL_PREFIX "vcdx://"
 
 /*****************************************************************************
  * vcd_data_t: structure for communication between access and intf.
  *****************************************************************************/
-typedef struct
-{
+typedef struct {
 #ifdef FINISHED
     vcdplay_ptr             vmg;
 #endif
