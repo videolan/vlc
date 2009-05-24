@@ -661,7 +661,11 @@ static inline void save_string_list( intf_thread_t * p_intf, id object, const ch
     p_item = config_FindConfig( VLC_OBJECT(p_intf), name );
     p_stringobject = (NSString *)[[object selectedItem] representedObject];
     assert([p_stringobject isKindOfClass:[NSString class]]);
-    if( p_stringobject ) config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
+    if( p_stringobject )
+    {
+        config_PutPsz( p_intf, name, [p_stringobject UTF8String] );
+        [p_stringobject release];
+    }
 }
 
 static inline void save_module_list( intf_thread_t * p_intf, id object, const char * name )
@@ -694,7 +698,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 {
     char *psz_tmp;
     int i;
-    NSString *p_stringobject;
     
 #define SaveIntList( object, name ) save_int_list( p_intf, object, name )
                     
