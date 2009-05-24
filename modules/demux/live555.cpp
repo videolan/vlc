@@ -998,6 +998,12 @@ static int SessionsSetup( demux_t *p_demux )
                         p_sys->p_out_asf = stream_DemuxNew( p_demux, "asf",
                                                             p_demux->out );;
                 }
+                else if( !strcmp( sub->codecName(), "DV" ) )
+                {
+                    tk->b_muxed = true;
+                    tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv",
+                                                       p_demux->out );
+                }
             }
 
             if( !tk->b_quicktime && !tk->b_muxed && !tk->b_asf )
