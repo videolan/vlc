@@ -1217,8 +1217,11 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
             return 0;
 
         /* Add entry to cache */
-        p_bank->pp_cache =
-            realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
+        module_cache_t *p_tmp;
+        p_tmp = realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
+        if( !p_tmp )
+            return -1;
+        *p_bank->pp_cache = p_tmp;
         p_bank->pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
         if( !p_bank->pp_cache[p_bank->i_cache] )
             return -1;

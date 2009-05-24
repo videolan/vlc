@@ -278,15 +278,17 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     int i_data = 0;
     for( ;; )
     {
+        uint8_t *p_tmp;
         int i_read = 65536;
 
         if( i_data >= INT_MAX - i_read )
             break;
 
-        p_data = realloc( p_data, i_data + i_read );
-        if( !p_data )
+        p_tmp = realloc( p_data, i_data + i_read );
+        if( !p_tmp )
             break;
 
+        p_data = p_tmp;
         i_read = stream_Read( p_stream, &p_data[i_data], i_read );
         if( i_read <= 0 )
             break;

@@ -142,7 +142,7 @@ static module_config_t *vlc_config_create (module_t *module, int type)
 
     if ((confsize & 0xf) == 0)
     {
-        tab = realloc (tab, (confsize + 17) * sizeof (*tab));
+        tab = realloc (module->p_config, (confsize + 17) * sizeof (*tab));
         if (tab == NULL)
             return NULL;
 

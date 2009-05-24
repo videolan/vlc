@@ -571,7 +571,9 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
               || i_read == 0 )
             break;
         *pi_data += i_read;
-        *pp_data = realloc( *pp_data, *pi_data + 1025 );
+        char *p_tmp = realloc( *pp_data, *pi_data + 1025 );
+        if( p_tmp )
+            *pp_data = p_tmp;
     }
 
     while ( !p_object->b_die

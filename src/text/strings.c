@@ -699,11 +699,16 @@ char *str_format_time( const char *tformat )
 #define INSERT_STRING( string )                                     \
                     if( string != NULL )                            \
                     {                                               \
+                        char *tmp;                                  \
                         int len = strlen( string );                 \
-                        dst = realloc( dst, i_size = i_size + len );\
-                        memcpy( (dst+d), string, len );             \
-                        d += len;                                   \
-                        free( string );                             \
+                        tmp = realloc( dst, i_size = i_size + len );\
+                        if( tmp )                                   \
+                        {                                           \
+                            dst = tmp;                              \
+                            memcpy( (dst+d), string, len );         \
+                            d += len;                               \
+                            free( string );                         \
+                        }                                           \
                     }                                               \
                     else if( !b_empty_if_na )                       \
                     {                                               \
@@ -714,10 +719,15 @@ char *str_format_time( const char *tformat )
 /* same than INSERT_STRING, except that string won't be freed */
 #define INSERT_STRING_NO_FREE( string )                             \
                     {                                               \
+                        char *tmp;                                  \
                         int len = strlen( string );                 \
-                        dst = realloc( dst, i_size = i_size + len );\
-                        memcpy( dst+d, string, len );               \
-                        d += len;                                   \
+                        tmp = realloc( dst, i_size = i_size + len );\
+                        if( tmp )                                   \
+                        {                                           \
+                            dst = tmp;                              \
+                            memcpy( dst+d, string, len );           \
+                            d += len;                               \
+                        }                                           \
                     }
 char *__str_format_meta( vlc_object_t *p_object, const char *string )
 {

@@ -2913,19 +2913,23 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
                               int i_new, input_attachment_t **pp_new )
 {
     int i_attachment = *pi_attachment;
-    input_attachment_t **attachment = *ppp_attachment;
+    input_attachment_t **attachment;
     int i;
 
-    attachment = realloc( attachment,
+    attachment = realloc( *ppp_attachment,
                           sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
-    for( i = 0; i < i_new; i++ )
-        attachment[i_attachment++] = pp_new[i];
-    free( pp_new );
+    if( attachment )
+    {
+        for( i = 0; i < i_new; i++ )
+            attachment[i_attachment++] = pp_new[i];
+        free( pp_new );
 
-    /* */
-    *pi_attachment = i_attachment;
-    *ppp_attachment = attachment;
+        /* */
+        *pi_attachment = i_attachment;
+        *ppp_attachment = attachment;
+    }
 }
+
 /*****************************************************************************
  * InputGetExtraFiles
  *  Autodetect extra input list
