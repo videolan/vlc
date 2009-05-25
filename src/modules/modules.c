@@ -1171,66 +1171,65 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         p_module = AllocatePlugin( p_this, psz_file );
     }
     else
+    /* If junk dll, don't try to load it */
+    if( p_cache_entry->b_junk )
+        return -1;
+    else
     {
-        /* If junk dll, don't try to load it */
-        if( p_cache_entry->b_junk )
-        {
-            p_module = NULL;
-        }
-        else
-        {
-            module_config_t *p_item = NULL, *p_end = NULL;
+        module_config_t *p_item = NULL, *p_end = NULL;
 
-            p_module = p_cache_entry->p_module;
-            p_module->b_loaded = false;
+        p_module = p_cache_entry->p_module;
+        p_module->b_loaded = false;
 
-            /* For now we force loading if the module's config contains
-             * callbacks or actions.
-             * Could be optimized by adding an API call.*/
-            for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
-                 p_item < p_end; p_item++ )
+        /* For now we force loading if the module's config contains
+         * callbacks or actions.
+         * Could be optimized by adding an API call.*/
+        for( p_item = p_module->p_config, p_end = p_item + p_module->confsize;
+             p_item < p_end; p_item++ )
+        {
+            if( p_item->pf_callback || p_item->i_action )
             {
-                if( p_item->pf_callback || p_item->i_action )
-                {
-                    p_module = AllocatePlugin( p_this, psz_file );
-                    break;
-                }
+                p_module = AllocatePlugin( p_this, psz_file );
+                break;
             }
-            if( p_module == p_cache_entry->p_module )
-                p_cache_entry->b_used = true;
         }
+        if( p_module == p_cache_entry->p_module )
+            p_cache_entry->b_used = true;
     }
 
-    if( p_module )
-    {
-        /* Everything worked fine !
-         * The module is ready to be added to the list. */
-        p_module->b_builtin = false;
+    if( p_module == NULL )
+        return -1;
 
-        /* msg_Dbg( p_this, "plugin \"%s\", %s",
-                    p_module->psz_object_name, p_module->psz_longname ); */
-        p_module->next = p_bank->head;
-        p_bank->head = p_module;
+    /* Everything worked fine !
+     * The module is ready to be added to the list. */
+    p_module->b_builtin = false;
 
-        if( !p_module_bank->b_cache )
-            return 0;
+    /* msg_Dbg( p_this, "plugin \"%s\", %s",
+                p_module->psz_object_name, p_module->psz_longname ); */
+    p_module->next = p_bank->head;
+    p_bank->head = p_module;
 
-        /* Add entry to cache */
-        p_bank->pp_cache =
-            realloc( p_bank->pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
-        p_bank->pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
-        if( !p_bank->pp_cache[p_bank->i_cache] )
-            return -1;
-        p_bank->pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
-        p_bank->pp_cache[p_bank->i_cache]->i_time = i_file_time;
-        p_bank->pp_cache[p_bank->i_cache]->i_size = i_file_size;
-        p_bank->pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
-        p_bank->pp_cache[p_bank->i_cache]->b_used = true;
-        p_bank->pp_cache[p_bank->i_cache]->p_module = p_module;
-        p_bank->i_cache++;
-    }
+    if( !p_module_bank->b_cache )
+        return 0;
 
-    return p_module ? 0 : -1;
+    /* Add entry to cache */
+    module_cache_t **pp_cache = p_bank->pp_cache;
+
+    pp_cache = realloc( pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
+    if( pp_cache == NULL )
+        return -1;
+    pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );
+    if( pp_cache[p_bank->i_cache] == NULL )
+        return -1;
+    pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
+    pp_cache[p_bank->i_cache]->i_time = i_file_time;
+    pp_cache[p_bank->i_cache]->i_size = i_file_size;
+    pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
+    pp_cache[p_bank->i_cache]->b_used = true;
+    pp_cache[p_bank->i_cache]->p_module = p_module;
+    p_bank->pp_cache = pp_cache;
+    p_bank->i_cache++;
+    return  0;
 }
 
 /*****************************************************************************
