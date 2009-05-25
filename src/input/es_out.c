@@ -2277,14 +2277,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
             if( p_fmt->i_extra )
             {
-                void *p_tmp;
-                p_tmp =  realloc( es->fmt.p_extra, p_fmt->i_extra );
-                if( p_tmp )
-                {
-                    es->fmt.i_extra = p_fmt->i_extra;
-                    es->fmt.p_extra = p_tmp;
-                    memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
-                }
+                es->fmt.i_extra = p_fmt->i_extra;
+                es->fmt.p_extra = realloc( es->fmt.p_extra, p_fmt->i_extra );
+                memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
+
                 if( !es->p_dec )
                     return VLC_SUCCESS;
 #if 1
@@ -2292,14 +2288,11 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
                 EsCreateDecoder( out, es );
 #else
-                p_tmp = realloc( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
-                if( p_tmp )
-                {
-                    es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
-                    es->p_dec->fmt_in.p_extra = p_tmp;
-                    memcpy( es->p_dec->fmt_in.p_extra,
-                            p_fmt->p_extra, p_fmt->i_extra );
-                }
+                es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
+                es->p_dec->fmt_in.p_extra =
+                    realloc( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
+                memcpy( es->p_dec->fmt_in.p_extra,
+                        p_fmt->p_extra, p_fmt->i_extra );
 #endif
             }
 

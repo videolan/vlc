@@ -796,14 +796,12 @@ static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, unsigned int 
     /* We need to create a local copy */
     if( p_sys->i_peek < i_read )
     {
-        uint8_t *p_tmp;
-        p_tmp = realloc( p_sys->p_peek, i_read );
-        if( !p_tmp )
+        p_sys->p_peek = realloc( p_sys->p_peek, i_read );
+        if( !p_sys->p_peek )
         {
             p_sys->i_peek = 0;
             return 0;
         }
-        p_sys->p_peek = p_tmp;
         p_sys->i_peek = i_read;
     }
 
@@ -1172,15 +1170,13 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
 
     if( p_sys->i_peek < i_read )
     {
-        uint8_t *p_tmp;
-        p_tmp = realloc( p_sys->p_peek, i_read );
-        if( !p_tmp )
+        p_sys->p_peek = realloc( p_sys->p_peek, i_read );
+        if( !p_sys->p_peek )
         {
             p_sys->i_peek = 0;
             return 0;
         }
         p_sys->i_peek = i_read;
-        p_sys->p_peek = p_tmp;
     }
 
     memcpy( p_sys->p_peek, &tk->p_buffer[i_off],
@@ -1591,12 +1587,10 @@ char *stream_ReadLine( stream_t *s )
 
         if( psz_eol )
         {
-            char *p_tmp;
             i_data = (psz_eol - (char *)p_data) + 1;
-            p_tmp = realloc( p_line, i_line + i_data + s->p_text->i_char_width ); /* add \0 */
-            if( !p_tmp )
+            p_line = realloc( p_line, i_line + i_data + s->p_text->i_char_width ); /* add \0 */
+            if( !p_line )
                 goto error;
-            p_line = p_tmp;
             i_data = stream_Read( s, &p_line[i_line], i_data );
             if( i_data <= 0 ) break; /* Hmmm */
             i_line += i_data - s->p_text->i_char_width; /* skip \n */;
@@ -1607,11 +1601,9 @@ char *stream_ReadLine( stream_t *s )
         }
 
         /* Read data (+1 for easy \0 append) */
-        char *p_tmp;
-        p_tmp = realloc( p_line, i_line + STREAM_PROBE_LINE + s->p_text->i_char_width );
-        if( !p_tmp )
+        p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + s->p_text->i_char_width );
+        if( !p_line )
             goto error;
-        p_line = p_tmp;
         i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );
         if( i_data <= 0 ) break; /* Hmmm */
         i_line += i_data;

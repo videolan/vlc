@@ -507,15 +507,8 @@ char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
     {
         if( i_line == i_max )
         {
-            char *psz_tmp;
             i_max += 1024;
-            psz_tmp = realloc( psz_line, i_max );
-            if( !psz_tmp )
-            {
-                free( psz_line );
-                return NULL;
-            }
-            psz_line = psz_tmp;
+            psz_line = realloc( psz_line, i_max );
             ptr = psz_line + i_line;
         }
 

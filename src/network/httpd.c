@@ -561,14 +561,9 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
 
         if( p != NULL )
         {
-            httpd_message_t *p_msg;
             p[4] = '\0';
-            p_msg = realloc( answer->p_body, strlen((char*)answer->p_body) + 1 );
-            if( p_msg )
-            {
-                answer->i_body = strlen((char*)answer->p_body) + 1;
-                answer->p_body = p_msg;
-            }
+            answer->i_body = strlen((char*)answer->p_body) + 1;
+            answer->p_body = realloc( answer->p_body, answer->i_body );
         }
     }
 

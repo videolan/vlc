@@ -163,12 +163,11 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
 
     i_size = p_acl->i_size;
     p_ent = (vlc_acl_entry_t *)realloc( p_acl->p_entries,
-                                        (p_acl->i_size+1) * sizeof( *p_ent ) );
+                                        ++p_acl->i_size * sizeof( *p_ent ) );
 
     if( p_ent == NULL )
         return -1;
 
-    p_acl->i_size++;
     p_acl->p_entries = p_ent;
     p_ent += i_size;
 

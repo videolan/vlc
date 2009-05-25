@@ -61,15 +61,10 @@ static inline int libvlc_media_list_path_deepness( libvlc_media_list_path_t path
  **************************************************************************/
 static inline void libvlc_media_list_path_append( libvlc_media_list_path_t * p_path, int index )
 {
-    libvlc_media_list_path_t *p_tmp;
     int old_deepness = libvlc_media_list_path_deepness( *p_path );
-    *p_tmp = realloc( *p_path, sizeof(int)*(old_deepness+2));
-    if( *p_tmp )
-    {
-        *p_tmp = *p_path;
-        *p_path[old_deepness] = index;
-        *p_path[old_deepness+1] = -1;
-    }
+    *p_path = realloc( *p_path, sizeof(int)*(old_deepness+2));
+    *p_path[old_deepness] = index;
+    *p_path[old_deepness+1] = -1;
 }
 
 /**************************************************************************
