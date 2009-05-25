@@ -26,11 +26,13 @@
 #endif
 #include "mediacontrol_internal.h"
 #include "libvlc_internal.h"
+#include "media_player_internal.h"
 
 #include <vlc/mediacontrol.h>
 #include <vlc/libvlc.h>
 
 #include <vlc_vout.h>
+#include <vlc_input.h>
 #include <vlc_osd.h>
 #include <vlc_block.h>
 

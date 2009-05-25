@@ -21,14 +21,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "libvlc_internal.h"
+#include <assert.h>
 
 #include <vlc/libvlc.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_events.h>
+
 #include <vlc_demux.h>
 #include <vlc_input.h>
 #include <vlc_vout.h>
+
 #include "libvlc.h"
-#include <assert.h>
+
+#include "libvlc_internal.h"
+#include "media_internal.h" // libvlc_media_set_state()
+#include "media_player_internal.h"
 
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,

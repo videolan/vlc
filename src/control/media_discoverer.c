@@ -21,10 +21,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "libvlc_internal.h"
-#include <vlc/libvlc.h>
 #include <assert.h>
-#include "vlc_services_discovery.h"
+
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_media_list.h>
+#include <vlc/libvlc_media_discoverer.h>
+#include <vlc/libvlc_events.h>
+
+#include <vlc_services_discovery.h>
+
+#include "libvlc_internal.h"
+#include "media_internal.h" // libvlc_media_new_from_input_item()
+#include "media_list_internal.h" // _libvlc_media_list_add_media()
+
+struct libvlc_media_discoverer_t
+{
+    libvlc_event_manager_t * p_event_manager;
+    libvlc_instance_t *      p_libvlc_instance;
+    services_discovery_t *   p_sd;
+    libvlc_media_list_t *    p_mlist;
+    bool                     running;
+    vlc_dictionary_t         catname_to_submedialist;
+};
 
 /*
  * Private functions

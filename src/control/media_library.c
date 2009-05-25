@@ -21,10 +21,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include "libvlc_internal.h"
+
 #include <vlc/libvlc.h>
-#include "libvlc.h"
-#include "vlc_arrays.h"
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_media_list.h>
+#include <vlc/libvlc_media_library.h>
+#include <vlc/libvlc_events.h>
+
+#include <vlc_common.h>
+
+#include "libvlc_internal.h"
+
+struct libvlc_media_library_t
+{
+    libvlc_event_manager_t * p_event_manager;
+    libvlc_instance_t *      p_libvlc_instance;
+    int                      i_refcount;
+    libvlc_media_list_t *    p_mlist;
+};
+
 
 /*
  * Private functions

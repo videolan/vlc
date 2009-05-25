@@ -1,0 +1,62 @@
+/*****************************************************************************
+ * libvlc_internal.h : Definition of opaque structures for libvlc exported API
+ * Also contains some internal utility functions
+ *****************************************************************************
+ * Copyright (C) 2005-2009 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Clément Stenac <zorglub@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+#ifndef _LIBVLC_MEDIA_PLAYER_INTERNAL_H
+#define _LIBVLC_MEDIA_PLAYER_INTERNAL_H 1
+
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc/vlc.h>
+#include <vlc/libvlc_structures.h>
+#include <vlc/libvlc_media.h>
+
+struct libvlc_media_player_t
+{
+    int                i_refcount;
+    vlc_mutex_t        object_lock;
+    input_thread_t *   p_input_thread;
+    struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
+    libvlc_media_t * p_md; /* current media descriptor */
+    libvlc_event_manager_t * p_event_manager;
+    struct
+    {
+        void *hwnd;
+        void *nsobject;
+        uint32_t xid;
+        uint32_t agl;
+    } drawable;
+};
+
+/* Media player - audio, video */
+input_thread_t *libvlc_get_input_thread(libvlc_media_player_t *, libvlc_exception_t * );
+
+
+libvlc_track_description_t * libvlc_get_track_description(
+        libvlc_media_player_t *p_mi,
+        const char *psz_variable,
+        libvlc_exception_t *p_e );
+
+#endif

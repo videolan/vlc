@@ -21,12 +21,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "libvlc_internal.h"
-
 #include <vlc/libvlc.h>
+#include <vlc/libvlc_vlm.h>
 #include <vlc_es.h>
 #include <vlc_input.h>
 #include <vlc_vlm.h>
+
+#include "libvlc_internal.h"
 
 #if 0
 /* local function to be used in libvlc_vlm_show_media only */

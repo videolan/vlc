@@ -25,6 +25,8 @@
 #ifndef _LIBVLC_MEDIA_LIST_PATH_H
 #define _LIBVLC_MEDIA_LIST_PATH_H 1
 
+typedef int * libvlc_media_list_path_t; /* (Media List Player Internal) */
+
 /**************************************************************************
  *       path_empty (Media List Player Internal)
  **************************************************************************/
