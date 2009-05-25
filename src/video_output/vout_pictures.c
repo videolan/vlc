@@ -1114,30 +1114,37 @@ int picture_Export( vlc_object_t *p_obj,
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 1;
     fmt_out.i_chroma  = i_format;
-    fmt_out.i_width   = i_override_width;
-    fmt_out.i_height  = i_override_height;
 
-    if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
+    /* compute original width/height */
+    unsigned int i_original_width;
+    unsigned int i_original_height;
+    if( fmt_in.i_sar_num >= fmt_in.i_sar_den )
     {
-        fmt_out.i_height = fmt_in.i_height * fmt_out.i_width / fmt_in.i_width;
-        const int i_height = fmt_out.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
-        if( i_height > 0 )
-            fmt_out.i_height = i_height;
+        i_original_width = fmt_in.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
+        i_original_height = fmt_in.i_height;
     }
     else
     {
-        if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
-        {
-            fmt_out.i_width = fmt_in.i_width * fmt_out.i_height / fmt_in.i_height;
-        }
-        else
-        {
-            fmt_out.i_width = fmt_in.i_width;
-            fmt_out.i_height = fmt_in.i_height;
-        }
-        const int i_width = fmt_out.i_width * fmt_in.i_sar_num / fmt_in.i_sar_den;
-        if( i_width > 0 )
-            fmt_out.i_width = i_width;
+        i_original_width =  fmt_in.i_width;
+        i_original_height = fmt_in.i_height * fmt_in.i_sar_den / fmt_in.i_sar_num;
+    }
+
+    /* */
+    fmt_out.i_width  = ( i_override_width < 0 ) ?
+                       i_original_width : i_override_width;
+    fmt_out.i_height = ( i_override_height < 0 ) ?
+                       i_original_height : i_override_height;
+
+    /* scale if only one direction is provided */
+    if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )
+    {
+        fmt_out.i_height = fmt_in.i_height * fmt_out.i_width
+                     * fmt_in.i_sar_den / fmt_in.i_width / fmt_in.i_sar_num;
+    }
+    else if( fmt_out.i_width == 0 && fmt_out.i_height > 0 )
+    {
+        fmt_out.i_width  = fmt_in.i_width * fmt_out.i_height
+                     * fmt_in.i_sar_num / fmt_in.i_height / fmt_in.i_sar_den;
     }
 
     image_handler_t *p_image = image_HandlerCreate( p_obj );

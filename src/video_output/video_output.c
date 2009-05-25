@@ -1213,6 +1213,9 @@ static void* RunThread( void *p_this )
 
                 picture_Copy( p_pic, p_directbuffer );
 
+                p_pic->format.i_sar_num = p_vout->fmt_out.i_sar_num;
+                p_pic->format.i_sar_den = p_vout->fmt_out.i_sar_den;
+
                 p_pic->p_next = p_vout->p->snapshot.p_picture;
                 p_vout->p->snapshot.p_picture = p_pic;
                 p_vout->p->snapshot.i_request--;
