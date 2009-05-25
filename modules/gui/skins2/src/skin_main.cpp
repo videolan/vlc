@@ -131,7 +131,7 @@ static int Open( vlc_object_t *p_this )
     if( OSFactory::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot initialize OSFactory" );
-        vlc_object_release( p_intf->p_sys->p_playlist );
+        pl_Release( p_intf );
 #if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
@@ -140,7 +140,7 @@ static int Open( vlc_object_t *p_this )
     if( AsyncQueue::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot initialize AsyncQueue" );
-        vlc_object_release( p_intf->p_sys->p_playlist );
+        pl_Release( p_intf );
 #if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
@@ -149,7 +149,7 @@ static int Open( vlc_object_t *p_this )
     if( Interpreter::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot instanciate Interpreter" );
-        vlc_object_release( p_intf->p_sys->p_playlist );
+        pl_Release( p_intf );
 #if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
@@ -158,7 +158,7 @@ static int Open( vlc_object_t *p_this )
     if( VarManager::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot instanciate VarManager" );
-        vlc_object_release( p_intf->p_sys->p_playlist );
+        pl_Release( p_intf );
 #if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
@@ -167,7 +167,7 @@ static int Open( vlc_object_t *p_this )
     if( VlcProc::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot initialize VLCProc" );
-        vlc_object_release( p_intf->p_sys->p_playlist );
+        pl_Release( p_intf );
 #if 0
         msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
@@ -176,7 +176,7 @@ static int Open( vlc_object_t *p_this )
     if( VoutManager::instance( p_intf ) == NULL )
     {
         msg_Err( p_intf, "cannot instanciate VoutManager" );
-        vlc_object_release( p_intf->p_sys->p_playlist );
+        pl_Release( p_intf );
         return VLC_EGENERIC;
     }
     vlc_mutex_lock( &skin_load.mutex );
@@ -378,7 +378,7 @@ static int DemuxOpen( vlc_object_t *p_this )
         // Make sure the item is deleted afterwards
         /// \bug does not always work
         playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
-        vlc_object_release( p_playlist );
+        pl_Release( p_this );
 
         var_SetString( p_intf, "skin-to-load", p_demux->psz_path );
         vlc_object_release( p_intf );
