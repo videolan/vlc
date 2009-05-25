@@ -274,7 +274,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         else
             extensions.replace( i, 1, "(" );
     }
-    extensions.replace(QString(";*"), QString(" *"));
+    extensions.replace( ";*", " *" );
     extensions.append( ")" );
 
     /* Save */
@@ -386,7 +386,7 @@ QStringList DialogsProvider::showSimpleOpen( QString help,
         ADD_FILTER_SUBTITLE( fileTypes );
     }
     ADD_FILTER_ALL( fileTypes );
-    fileTypes.replace(QString(";*"), QString(" *"));
+    fileTypes.replace( ";*", " *");
 
     return QFileDialog::getOpenFileNames( NULL,
         help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
