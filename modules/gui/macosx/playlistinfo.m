@@ -252,9 +252,7 @@ static VLCInfo *_o_sharedInstance = nil;
         if( !input_item_IsPreparsed( p_item ) )
         {
             playlist_t * p_playlist = pl_Hold( VLCIntf );
-            PL_LOCK;
-            playlist_PreparseEnqueue( p_playlist, p_item, pl_Locked );
-            PL_UNLOCK;
+            playlist_PreparseEnqueue( p_playlist, p_item, pl_Unlocked );
             pl_Release( VLCIntf );
         }
 
@@ -368,7 +366,6 @@ static VLCInfo *_o_sharedInstance = nil;
 - (IBAction)saveMetaData:(id)sender
 {
     playlist_t * p_playlist = pl_Hold( VLCIntf );
-    vlc_value_t val;
 
     if( !p_item ) goto error;
 
@@ -414,8 +411,7 @@ static VLCInfo *_o_sharedInstance = nil;
         module_unneed( p_playlist, p_mod );
     PL_UNLOCK;
 
-    val.b_bool = true;
-    var_Set( p_playlist, "intf-change", val );
+    var_SetBool( p_playlist, "intf-change", true );
     [self updatePanelWithItem: p_item];
 
     pl_Release( VLCIntf );
