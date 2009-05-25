@@ -323,8 +323,6 @@
 		CC965D5F0DA5880F0088F222 /* display_right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_right.png; path = Resources/display_right.png; sourceTree = "<group>"; };
 		CCB24D5D0D54BBAE004D780C /* simple_prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = simple_prefs.m; path = ../../../modules/gui/macosx/simple_prefs.m; sourceTree = SOURCE_ROOT; };
 		CCB24D5E0D54BBAE004D780C /* simple_prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = simple_prefs.h; path = ../../../modules/gui/macosx/simple_prefs.h; sourceTree = SOURCE_ROOT; };
-		CCB60A3E0E6E5DD900407004 /* vlm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vlm.m; path = ../../../modules/gui/macosx/vlm.m; sourceTree = SOURCE_ROOT; };
-		CCB60A3F0E6E5DD900407004 /* vlm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vlm.h; path = ../../../modules/gui/macosx/vlm.h; sourceTree = SOURCE_ROOT; };
 		CCB60A410E6E5E3F00407004 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/VLM.nib; sourceTree = "<group>"; };
 		CCBE999E0F922C51000705F8 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = embeddedwindow.h; path = ../../../modules/gui/macosx/embeddedwindow.h; sourceTree = SOURCE_ROOT; };
@@ -494,8 +492,6 @@
 				CC6EDD500B9CA2140096068A /* eyetv.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
-				CCB60A3F0E6E5DD900407004 /* vlm.h */,
-				CCB60A3E0E6E5DD900407004 /* vlm.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
