@@ -99,8 +99,4 @@ VLC_PUBLIC_API int
 
 /**@} */
 
-# ifdef __cplusplus
-}
-# endif
-
 #endif /* <vlc/libvlc.h> */
