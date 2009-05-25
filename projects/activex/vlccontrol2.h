@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef _VLCCONTROL2_H_
@@ -74,6 +74,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*      _p_instance;
@@ -129,6 +130,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*      _p_instance;
@@ -251,6 +253,7 @@ public:
  
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*      _p_instance;
@@ -305,6 +308,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
     VLCLog*     _p_vlclog;
 
@@ -363,6 +367,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
     libvlc_log_t    *_p_log;
 
@@ -413,6 +418,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*  _p_instance;
@@ -474,6 +480,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*  _p_instance;
@@ -534,6 +541,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*      _p_instance;
