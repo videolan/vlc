@@ -99,8 +99,5 @@ VLC_PUBLIC_API libvlc_media_list_t *
 
 
 /** @} */
-# ifdef __cplusplus
-}
-# endif
 
 #endif /* VLC_LIBVLC_MEDIA_LIBRARY_H */
