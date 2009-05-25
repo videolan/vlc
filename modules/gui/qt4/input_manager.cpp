@@ -592,10 +592,12 @@ void InputManager::UpdateArt()
         char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
         url = qfu( psz_art );
         free( psz_art );
+
+        url = url.replace( "file://", "" );
+        /* Taglib seems to define a attachment://, It won't work yet */
+        url = url.replace( "attachment://", "" );
     }
-    url = url.replace( "file://", QString("" ) );
-    /* Taglib seems to define a attachment://, It won't work yet */
-    url = url.replace( "attachment://", QString("" ) );
+
     /* Update Art meta */
     emit artChanged( url );
 }
