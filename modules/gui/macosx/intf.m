@@ -54,7 +54,6 @@
 #import "AppleRemote.h"
 #import "eyetv.h"
 #import "simple_prefs.h"
-#import "vlm.h"
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <IOKit/hidsystem/ev_keymap.h>         /* for the media key support */
@@ -324,7 +323,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_prefs = nil;
     o_open = [[VLCOpen alloc] init];
     o_wizard = [[VLCWizard alloc] init];
-    o_vlm = [[VLCVLMController alloc] init];
     o_extended = nil;
     o_bookmarks = [[VLCBookmarks alloc] init];
     o_embedded_list = [[VLCEmbeddedList alloc] init];
@@ -1421,11 +1419,6 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
     return nil;
 }
 
-- (id)vlm
-{
-    return o_vlm;
-}
-
 - (id)bookmarks
 {
     if( o_bookmarks )
@@ -2166,14 +2159,6 @@ end:
         [o_wizard resetWizard];
         [o_wizard showWizard];
     }
-}
-
-- (IBAction)showVLM:(id)sender
-{
-    if( !nib_vlm_loaded )
-        nib_vlm_loaded = [NSBundle loadNibNamed:@"VLM" owner: NSApp];
-
-    [o_vlm showVLMWindow];
 }
 
 - (IBAction)showExtended:(id)sender
