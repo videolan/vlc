@@ -91,7 +91,7 @@
 
 @implementation NSAnimation (VLCAdditions)
 /* fake class attributes  */
-static NSMapTable *VLCAdditions_userInfo = nil;
+static NSMapTable *VLCAdditions_userInfo = NULL;
 
 + (void)load
 {
@@ -124,18 +124,12 @@ static NSMapTable *VLCAdditions_userInfo = nil;
 
 @implementation NSScreen (VLCAdditions)
 
-static NSMutableArray *blackoutWindows = nil;
+static NSMutableArray *blackoutWindows = NULL;
 
 + (void)load
 {
     /* init our fake object attribute */
     blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
-}
-
-- (void)dealloc
-{
-    [blackoutWindows release];
-    [super dealloc];
 }
 
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID

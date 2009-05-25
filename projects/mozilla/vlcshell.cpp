@@ -387,12 +387,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     {
         /* check if plugin has a new parent window */
         CGrafPtr drawable = (((NP_Port*) (window->window))->port);
-        if( !curwin.window || drawable != (((NP_Port*) (curwin.window))->port) )
-        {
-            /* set/change parent window */
-            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, &ex);
-            libvlc_exception_clear(&ex);
-        }
 
         /* as MacOS X video output is windowless, set viewport */
         libvlc_rectangle_t view, clip;
@@ -422,9 +416,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     else if( curwin.window )
     {
         /* change/set parent */
-        libvlc_video_set_parent(p_vlc, 0, &ex);
-        libvlc_exception_clear(&ex);
-
         curwin.window = NULL;
     }
 #endif /* XP_MACOSX */
@@ -457,10 +448,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             style |= WS_CLIPCHILDREN|WS_CLIPSIBLINGS;
             SetWindowLong((HWND)drawable, GWL_STYLE, style);
 
-            /* change/set parent */
-            libvlc_video_set_parent(p_vlc, (libvlc_drawable_t)drawable, &ex);
-            libvlc_exception_clear(&ex);
-
             /* remember new window */
             p_plugin->setWindow(*window);
 
@@ -475,10 +462,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         HWND oldwin = (HWND)curwin.window;
         SetWindowLong( oldwin, GWL_WNDPROC, (LONG)(p_plugin->getWindowProc()) );
         p_plugin->setWindowProc(NULL);
-
-        /* change/set parent */
-        libvlc_video_set_parent(p_vlc, 0, &ex);
-        libvlc_exception_clear(&ex);
 
         curwin.window = NULL;
     }
@@ -529,10 +512,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             XtAddEventHandler( w, ButtonReleaseMask, FALSE,
                                (XtEventHandler)ControlHandler, p_plugin );
 
-            /* set/change parent window */
-            libvlc_video_set_parent( p_vlc, (libvlc_drawable_t) video, &ex );
-            libvlc_exception_clear(&ex);
-
             /* remember window */
             p_plugin->setWindow( *window );
             p_plugin->setVideoWindow( video );
@@ -553,9 +532,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     }
     else if( curwin.window )
     {
-        /* change/set parent */
-        libvlc_video_set_parent(p_vlc, 0, &ex);
-        libvlc_exception_clear(&ex);
         curwin.window = NULL;
     }
 #endif /* XP_UNIX */
