@@ -59,8 +59,6 @@ struct intf_sys_t
     int                 i_size;        /* number of events in buffer */
     int                 p_channels[ CHANNELS_NUMBER ]; /* contains registered
                                                         * channel IDs */
-    input_thread_t *    p_input;       /* pointer to input */
-    vout_thread_t *     p_vout;        /* pointer to vout object */
     vlc_mutex_t         lock; /* callback lock */
     vlc_cond_t          wait; /* callback event */
     int                 i_mousewheel_mode;
