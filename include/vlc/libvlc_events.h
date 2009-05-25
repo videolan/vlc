@@ -44,7 +44,7 @@ extern "C" {
  * @{
  */
 
-typedef enum libvlc_event_type_t {
+enum libvlc_event_type_t {
     /* Append new event types at the end.
      * Do not remove, insert or re-order any entry. */
     libvlc_MediaMetaChanged,
@@ -90,7 +90,7 @@ typedef enum libvlc_event_type_t {
     libvlc_MediaPlayerSnapshotTaken,
     libvlc_MediaPlayerLengthChanged,
     /* New event types HERE */
-} libvlc_event_type_t;
+};
 
 /**
  * An Event
@@ -99,7 +99,7 @@ typedef enum libvlc_event_type_t {
  * \param u Event dependent content
  */
 
-typedef struct libvlc_event_t
+struct libvlc_event_t
 {
     libvlc_event_type_t type;
     void * p_obj;
@@ -209,21 +209,8 @@ typedef struct libvlc_event_t
             libvlc_time_t   new_length;
         } media_player_length_changed;
     } u;
-} libvlc_event_t;
+};
 
-/**
- * Event manager that belongs to a libvlc object, and from whom events can
- * be received.
- */
-
-typedef struct libvlc_event_manager_t libvlc_event_manager_t;
-
-/**
- * Callback function notification
- * \param p_event the event triggering the callback
- */
-
-typedef void ( *libvlc_callback_t )( const libvlc_event_t *, void * );
 
 /**@} */
 
