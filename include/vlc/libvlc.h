@@ -251,7 +251,7 @@ VLC_PUBLIC_API void libvlc_free( void *ptr );
 
 typedef struct libvlc_event_manager_t libvlc_event_manager_t;
 typedef struct libvlc_event_t libvlc_event_t;
-typedef enum libvlc_event_type_t libvlc_event_type_t;
+typedef uint32_t libvlc_event_type_t;
     
 /**
  * Callback function notification
