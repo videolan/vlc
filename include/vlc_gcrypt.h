@@ -38,18 +38,13 @@ GCRY_THREAD_OPTION_PTHREAD_IMPL;
 
 static int gcry_vlc_mutex_init( void **p_sys )
 {
-    int i_val;
     vlc_mutex_t *p_lock = (vlc_mutex_t *)malloc( sizeof( vlc_mutex_t ) );
-
     if( p_lock == NULL)
         return ENOMEM;
 
-    i_val = vlc_mutex_init( p_lock );
-    if( i_val )
-        free( p_lock );
-    else
-        *p_sys = p_lock;
-    return i_val;
+    vlc_mutex_init( p_lock );
+    *p_sys = p_lock;
+    return VLC_SUCCESS;
 }
 
 static int gcry_vlc_mutex_destroy( void **p_sys )
