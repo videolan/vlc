@@ -191,7 +191,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_
  *
  * \return the agl handler or 0 if none where set
  */
-VLC_PUBLIC_API uint32_t libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
+VLC_PUBLIC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
 	
 /**
  * Set the agl handler where the media player should render its video output.

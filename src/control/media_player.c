@@ -686,7 +686,7 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
 /**************************************************************************
  * get_nsobject
  **************************************************************************/
-uint32_t libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
+void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 {
     return p_mi->drawable.nsobject;
 }
