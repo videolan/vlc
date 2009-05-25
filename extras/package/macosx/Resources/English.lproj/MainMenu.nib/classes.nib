@@ -175,7 +175,6 @@
                 showInformationPanel = id;
                 showLicense = id;
                 showMessagesPanel = id;
-                showVLM = id;
                 showWizard = id;
                 timeFieldWasClicked = id;
                 timesliderUpdate = id;
@@ -345,7 +344,6 @@
                 "o_timefield" = NSTextField;
                 "o_timeslider" = NSSlider;
                 "o_update" = id;
-                "o_vlm" = id;
                 "o_vmi_fullscreen" = NSMenuItem;
                 "o_vmi_mute" = NSMenuItem;
                 "o_vmi_next" = NSMenuItem;
