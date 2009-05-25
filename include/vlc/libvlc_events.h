@@ -48,7 +48,7 @@ extern "C" {
 enum libvlc_event_type_e {
 #else
 enum libvlc_event_type_t {
-#else
+#endif
     /* Append new event types at the end.
      * Do not remove, insert or re-order any entry. */
     libvlc_MediaMetaChanged,
