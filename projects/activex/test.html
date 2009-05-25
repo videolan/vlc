@@ -196,6 +196,8 @@ Verbosity:
 <INPUT type=button value=" + " onClick='doAudioTrack(1);'>
 <SPAN id="trackTextField" style="text-align:center">--</SPAN>
 <INPUT type=button value=" - " onClick='doAudioTrack(-1);'>
+<INPUT type=button value="current track" onClick='alert(getVLC("vlc").audio.description(vlc.audio.track));'>
+<INPUT type=button value="number of track" onClick='alert(getVLC("vlc").audio.count);'>
 </TD>
 <TD>
 <INPUT type=button value="set slider" onClick='doSetSlider();'>
@@ -207,6 +209,8 @@ Verbosity:
     <INPUT type=button value=" + " onClick='doSubtitle(1);'>
     <SPAN id="spuTextField" style="text-align:center">--</SPAN>
     <INPUT type=button value=" - " onClick='doSubtitle(-1);'>
+    <INPUT type=button value="current subtitle" onClick='alert(getVLC("vlc").subtitle.description(vlc.subtitle.track));'>
+    <INPUT type=button value="number of subtitle" onClick='alert(getVLC("vlc").subtitle.count);'>
 </TD>
 </TR>
 <TR>
@@ -292,8 +296,8 @@ function doSubtitle(value)
     var vlc = getVLC("vlc");
     if( vlc )
     {
-        vlc.video.subtitle = vlc.video.subtitle + value;
-        document.getElementById("spuTextField").innerHTML = vlc.video.subtitle;
+        vlc.subtitle.track = vlc.subtitle.track + value;
+        document.getElementById("spuTextField").innerHTML = vlc.subtitle.track;
     }
 }
 
