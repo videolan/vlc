@@ -77,6 +77,7 @@ static int GetOrientation( intf_thread_t *p_intf );
 vlc_module_begin ()
     set_shortname( N_("motion"))
     set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
     set_description( N_("motion control interface") )
     set_help( N_("Use HDAPS, AMS, APPLESMC or UNIMOTION motion sensors " \
                  "to rotate the video") )

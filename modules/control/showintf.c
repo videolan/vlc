@@ -68,11 +68,15 @@ static int  MouseEvent( vlc_object_t *, char const *,
 
 vlc_module_begin ()
     set_shortname( "Showintf" )
-    add_integer( "showintf-threshold", 10, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
     set_description( N_("Show interface with mouse") )
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
+
+    set_category( CAT_INTERFACE )
+    set_subcategory( SUBCAT_INTERFACE_CONTROL )
+
+    add_integer( "showintf-threshold", 10, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
 vlc_module_end ()
 
 /*****************************************************************************

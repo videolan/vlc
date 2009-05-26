@@ -113,6 +113,16 @@ static int MouseEvent( vlc_object_t *, char const *,
 #define OSD_UPDATE_MAX     1000
 
 vlc_module_begin ()
+    set_capability( "sub filter", 100 )
+    set_description( N_("On Screen Display menu") )
+    set_shortname( N_("OSD menu") )
+    add_shortcut( "osdmenu" )
+
+    set_category( CAT_VIDEO )
+    set_subcategory( SUBCAT_VIDEO_SUBPIC )
+
+    set_callbacks( CreateFilter, DestroyFilter )
+
     add_integer( OSD_CFG "x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, false )
     add_integer( OSD_CFG "y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, false )
     add_integer( OSD_CFG "position", 8, NULL, POS_TEXT, POS_LONGTEXT,
@@ -130,15 +140,6 @@ vlc_module_begin ()
     add_integer_with_range( OSD_CFG "alpha", 255, 0, 255, NULL,
         OSD_ALPHA_TEXT, OSD_ALPHA_LONGTEXT, true )
 
-    set_capability( "sub filter", 100 )
-    set_description( N_("On Screen Display menu") )
-    set_shortname( N_("OSD menu") )
-    add_shortcut( "osdmenu" )
-
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_SUBPIC )
-
-    set_callbacks( CreateFilter, DestroyFilter )
 vlc_module_end ()
 
 /*****************************************************************************

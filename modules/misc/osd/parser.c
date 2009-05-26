@@ -47,9 +47,6 @@ static void osd_parser_Close( vlc_object_t *p_this );
  *****************************************************************************/
 vlc_module_begin ()
 
-    set_category( CAT_OSD )
-    set_subcategory( SUBCAT_OSD_IMPORT )
-
     add_submodule ()
         set_description( N_("OSD configuration importer") )
         add_shortcut( "import-osd" )
