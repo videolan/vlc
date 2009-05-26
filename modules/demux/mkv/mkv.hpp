@@ -119,16 +119,6 @@ extern "C" {
 
 #define MKVD_TIMECODESCALE 1000000
 
-/**
- * What's between a directory and a filename?
- */
-#if defined( WIN32 )
-    #define DIRECTORY_SEPARATOR '\\'
-#else
-    #define DIRECTORY_SEPARATOR '/'
-#endif
-
-
 #define MKV_IS_ID( el, C ) ( EbmlId( (*el) ) == C::ClassInfos.GlobalId )
 
 

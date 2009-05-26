@@ -145,15 +145,15 @@ static int Open( vlc_object_t * p_this )
             // assume it's a regular file
             // get the directory path
             s_path = p_demux->psz_path;
-            if (s_path.at(s_path.length() - 1) == DIRECTORY_SEPARATOR)
+            if (s_path.at(s_path.length() - 1) == DIR_SEP_CHAR)
             {
                 s_path = s_path.substr(0,s_path.length()-1);
             }
             else
             {
-                if (s_path.find_last_of(DIRECTORY_SEPARATOR) > 0)
+                if (s_path.find_last_of(DIR_SEP_CHAR) > 0)
                 {
-                    s_path = s_path.substr(0,s_path.find_last_of(DIRECTORY_SEPARATOR));
+                    s_path = s_path.substr(0,s_path.find_last_of(DIR_SEP_CHAR));
                 }
             }
 
@@ -166,7 +166,7 @@ static int Open( vlc_object_t * p_this )
                 {
                     if (strlen(psz_file) > 4)
                     {
-                        s_filename = s_path + DIRECTORY_SEPARATOR + psz_file;
+                        s_filename = s_path + DIR_SEP_CHAR + psz_file;
 
 #ifdef WIN32
                         if (!strcasecmp(s_filename.c_str(), p_demux->psz_path))
