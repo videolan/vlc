@@ -2,7 +2,6 @@
  * zpl.c : ZPL playlist format import
  *****************************************************************************
  * Copyright (C) 2009 the VideoLAN team
-
  *
  * Authors: Su Heaven <suheaven@gmail.com>
  *
@@ -65,39 +64,6 @@ int Import_ZPL( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static bool ContainsURL( demux_t *p_demux )
-{
-    const uint8_t *p_peek, *p_peek_end;
-    int i_peek;
-
-    i_peek = stream_Peek( p_demux->s, &p_peek, 1024 );
-    if( i_peek <= 0 ) return false;
-    p_peek_end = p_peek + i_peek;
-
-    while( p_peek + sizeof( "https://" ) < p_peek_end )
-    {
-        /* One line starting with an URL is enough */
-        if( !strncasecmp( (const char *)p_peek, "http://", 7 ) ||
-            !strncasecmp( (const char *)p_peek, "mms://", 6 ) ||
-            !strncasecmp( (const char *)p_peek, "rtsp://", 7 ) ||
-            !strncasecmp( (const char *)p_peek, "https://", 8 ) ||
-            !strncasecmp( (const char *)p_peek, "ftp://", 6 ) )
-        {
-            return true;
-        }
-        /* Comments and blank lines are ignored */
-        else if( *p_peek != '#' && *p_peek != '\n' && *p_peek != '\r')
-        {
-            return false;
-        }
-
-        while( p_peek < p_peek_end && *p_peek != '\n' )
-            p_peek++;
-        if ( *p_peek == '\n' )
-            p_peek++;
-    }
-    return false;
-}
 
 /*****************************************************************************
  * Deactivate: frees unused data
@@ -124,8 +90,6 @@ static inline void MaybeFromLocaleRep (char **str)
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
-    char       *psz_name = NULL;
-    char       *psz_artist = NULL;
     char       *psz_tabvalue = NULL;
     int        i_parsed_duration = 0;
     mtime_t    i_duration = -1;
@@ -137,9 +101,12 @@ static int Demux( demux_t *p_demux )
     char *psz_parse = psz_line;
 
     /* Skip leading tabs and spaces */
-    while( *psz_parse == ' ' || *psz_parse == '\t' ||
-        *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
-    if( !strncasecmp( psz_parse, "AC", sizeof( "AC" ) - 1 ) )/*if the 1st line is "AC"*/
+    while( *psz_parse == ' '  || *psz_parse == '\t' ||
+           *psz_parse == '\n' || *psz_parse == '\r' )
+        psz_parse++;
+
+    /* if the 1st line is "AC", skip it */
+    if( !strncasecmp( psz_parse, "AC", strlen( "AC" ) ) )
     {
         free( psz_line );
         psz_line = stream_ReadLine( p_demux->s );
@@ -150,177 +117,173 @@ static int Demux( demux_t *p_demux )
         psz_parse = psz_line;
 
         /* Skip leading tabs and spaces */
-        while( *psz_parse == ' ' || *psz_parse == '\t' ||
-        *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
+        while( *psz_parse == ' '  || *psz_parse == '\t' ||
+               *psz_parse == '\n' || *psz_parse == '\r' )
+            psz_parse++;
 
-        if( !strncasecmp( psz_parse, "NM", sizeof( "NM" ) - 1 ) )/*if the  line is "NM"*/
+        if( !strncasecmp( psz_parse, "NM", strlen( "NM" ) ) )
         {
-
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
-                psz_tabvalue = ProcessMRL( psz_tabvalue, p_demux->p_sys->psz_prefix );
-                MaybeFromLocaleRep( &psz_tabvalue );
-                p_input = input_item_NewExt( p_demux, psz_tabvalue, psz_tabvalue,
-                                        0, NULL, 0, i_duration );
+                char *psz_mrl = ProcessMRL( psz_tabvalue, p_demux->p_sys->psz_prefix );
+                if( psz_mrl )
+                {
+                    MaybeFromLocaleRep( &psz_mrl );
+                    p_input = input_item_NewExt( p_demux, psz_mrl, psz_tabvalue,
+                                                 0, NULL, 0, i_duration );
+                    free( psz_mrl );
+                }
             }
-
         }
 
-        else if( !strncasecmp( psz_parse, "DR", sizeof( "DR" ) - 1 ) )/*if the  line is "DR"*/
+        else if( !strncasecmp( psz_parse, "DR", strlen( "DR" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 i_parsed_duration = atoi( psz_tabvalue );
                 if( i_parsed_duration >= 0 )
                 {
                     i_duration = i_parsed_duration * INT64_C(1000);
                     if( p_input )
-                        input_item_SetDuration(p_input, i_duration);
+                        input_item_SetDuration( p_input, i_duration );
                 }
             }
         }
 
-       else if( !strncasecmp( psz_parse, "TT", sizeof( "TT" ) - 1 ) )/*if the  line is "TT"*/
+       else if( !strncasecmp( psz_parse, "TT", strlen( "TT" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetTitle( p_input, psz_tabvalue );
             }
         }
 
-       else if( !strncasecmp( psz_parse, "TG", sizeof( "TG" ) - 1 ) )/*if the  line is "TG"*/
+       else if( !strncasecmp( psz_parse, "TG", strlen( "TG" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetGenre( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TR", sizeof( "TR" ) - 1 ) )/*if the  line is "TR"*/
+        else if( !strncasecmp( psz_parse, "TR", strlen( "TR" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
-                int tracNum = atoi(psz_tabvalue);
                 if( p_input )
-                    input_item_SetTrackNum(p_input, tracNum);
+                    input_item_SetTrackNum( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TL", sizeof( "TL" ) - 1 ) )/*if the  line is "TL"*/
+        else if( !strncasecmp( psz_parse, "TL", strlen( "TL" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetLanguage( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TA", sizeof( "TA" ) - 1 ) )/*if the  line is "TA"*/
+        else if( !strncasecmp( psz_parse, "TA", strlen( "TA" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetArtist( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TB", sizeof( "TB" ) - 1 ) )/*if the  line is "TB"*/
+        else if( !strncasecmp( psz_parse, "TB", strlen( "TB" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetAlbum( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TY", sizeof( "TY" ) - 1 ) )/*if the  line is "TY"*/
+        else if( !strncasecmp( psz_parse, "TY", strlen( "TY" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetDate( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TH", sizeof( "TH" ) - 1 ) )/*if the  line is "TH"*/
+        else if( !strncasecmp( psz_parse, "TH", strlen( "TH" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetPublisher( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TE", sizeof( "TE" ) - 1 ) )/*if the  line is "TE"*/
+        else if( !strncasecmp( psz_parse, "TE", strlen( "TE" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetEncodedBy( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TC", sizeof( "TC" ) - 1 ) )/*if the  line is "TC"*/
+        else if( !strncasecmp( psz_parse, "TC", strlen( "TC" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetDescription( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TU", sizeof( "TU" ) - 1 ) )/*if the  line is "TU"*/
+        else if( !strncasecmp( psz_parse, "TU", strlen( "TU" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetURL( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "TO", sizeof( "TO" ) - 1 ) )/*if the  line is "TO"*/
+        else if( !strncasecmp( psz_parse, "TO", strlen( "TO" ) ) )
         {
             psz_tabvalue = ParseTabValue( psz_parse );
-            if( psz_tabvalue && *psz_tabvalue )
+            if( !EMPTY_STR(psz_tabvalue) )
             {
                 if( p_input )
                     input_item_SetCopyright( p_input, psz_tabvalue );
             }
         }
 
-        else if( !strncasecmp( psz_parse, "FD", sizeof( "FD" ) - 1 ) )/*if the  line is "FD"*/
-        {
+        else if( !strncasecmp( psz_parse, "FD", strlen( "FD" ) ) )
+        {}
 
-        }
-
-        else if( !strncasecmp( psz_parse, "BR!", sizeof( "BR!" ) - 1 ) )/*if the  line is "BR!"*/
+        else if( !strncasecmp( psz_parse, "BR!", strlen( "BR!" ) ) )
         {
             input_item_AddSubItem( p_current_input, p_input );
             p_input = NULL;
         }
 
-        if( psz_tabvalue )
-            free( psz_tabvalue );
-        psz_tabvalue = NULL;
-        free( psz_line );
-        psz_line = NULL;
-
         /* Fetch another line */
+        FREENULL( psz_tabvalue );
+        free( psz_line );
         psz_line = stream_ReadLine( p_demux->s );
 
         i_parsed_duration = 0;
@@ -343,16 +306,13 @@ static char* ParseTabValue(char* psz_string)
     int i_len = strlen( psz_string );
     if(i_len <= 3 )
         return NULL;
-    char* psz_value = (char *)malloc( i_len );
+    char* psz_value = calloc( i_len, 1 );
     if( ! psz_value )
         return NULL;
-    memset( psz_value, 0, i_len );
-    sscanf( psz_string,"%*[^=]=%[^\0\r\t\n]", psz_value );
 
-    if( strlen( psz_value ) )
-        return psz_value;
-    free( psz_value );
-    return NULL;
+    sscanf( psz_string,"%*[^=]=%[^\r\t\n]", psz_value );
+
+    return psz_value;
 }
 
 

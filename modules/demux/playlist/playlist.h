@@ -76,6 +76,12 @@ void Close_VideoPortal ( vlc_object_t * );
 int Import_iTML ( vlc_object_t * );
 void Close_iTML ( vlc_object_t * );
 
+int Import_WPL ( vlc_object_t * );
+void Close_WPL ( vlc_object_t * );
+
+int Import_ZPL ( vlc_object_t * );
+void Close_ZPL ( vlc_object_t * );
+
 #define INIT_PLAYLIST_STUFF \
     input_thread_t *p_input_thread = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT ); \
     input_item_t *p_current_input = input_GetItem( p_input_thread );

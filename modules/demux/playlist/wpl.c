@@ -101,31 +101,28 @@ static int Demux( demux_t *p_demux )
     while( psz_line )
     {
         psz_parse = psz_line;
-
         /* Skip leading tabs and spaces */
-        while( *psz_parse == ' ' || *psz_parse == '\t' ||
-        *psz_parse == '\n' || *psz_parse == '\r' ) psz_parse++;
+        while( *psz_parse == ' '  || *psz_parse == '\t' ||
+               *psz_parse == '\n' || *psz_parse == '\r' )
+            psz_parse++;
 
-        if( !strncasecmp( psz_parse, "<media src=\"", sizeof( "<media src=\"" ) - 1 ) )/*if the  line is uri of media item*/
+        /* if the line is the uri of the media item */
+        if( !strncasecmp( psz_parse, "<media src=\"", strlen( "<media src=\"" ) ) )
         {
-
             psz_uri = ParseUriValue( psz_parse );
-            if( psz_uri && *psz_uri )
+            if( !EMPTY_STR(psz_uri) )
             {
                 psz_uri = ProcessMRL( psz_uri, p_demux->p_sys->psz_prefix );
                 MaybeFromLocaleRep( &psz_uri );
                 p_input = input_item_NewExt( p_demux, psz_uri, psz_uri,
                                         0, NULL, 0, -1 );
                 input_item_AddSubItem( p_current_input, p_input );
-                p_input = NULL;
-                free( psz_uri );
             }
+            free( psz_uri );
         }
 
-        free( psz_line );
-        psz_line = NULL;
-
         /* Fetch another line */
+        free( psz_line );
         psz_line = stream_ReadLine( p_demux->s );
 
     }
@@ -140,21 +137,18 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-static char* ParseUriValue(char* psz_string)
+static char* ParseUriValue( char* psz_string )
 {
     int i_len = strlen( psz_string );
-    if(i_len <= 3 )
+    if( i_len <= 3 )
         return NULL;
-    char* psz_value = (char *)malloc( i_len );
-    if( ! psz_value )
+    char* psz_value = calloc( i_len, 1 );
+    if( !psz_value )
         return NULL;
-    memset( psz_value, 0, i_len );
-    sscanf( psz_string,"%*[^=]=\"%[^\0\r\t\n\"]", psz_value );
 
-    if( strlen( psz_value ) )
-        return psz_value;
-    free( psz_value );
-    return NULL;
+    sscanf( psz_string, "%*[^=]=\"%[^\r\t\n\"]", psz_value );
+
+    return psz_value;
 }
 
 
