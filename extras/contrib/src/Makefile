@@ -133,7 +133,8 @@ endif
 FFMPEGCONF+= --enable-small --disable-debug --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
-FFMPEGCONF+= --enable-libmp3lame --enable-libfaac --enable-libgsm
+FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
+#--enable-libfaac
 endif
 
 ifdef HAVE_BEOS
