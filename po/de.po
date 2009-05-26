@@ -1120,7 +1120,7 @@ msgstr "Standard-Verstärkungstyp"
 #: src/input/es_out.c:2733
 #, c-format
 msgid "%.2f dB"
-msgstr ""
+msgstr "%.2f dB"
 
 #: src/input/es_out.c:2743 modules/gui/qt4/ui/profiles.h:476
 msgid "Resolution"
@@ -1357,12 +1357,15 @@ msgstr ""
 msgid ""
 "%d module(s) were not displayed because they only have advanced options.\n"
 msgstr ""
+"%d Modul(e) wurden nicht angezeigt, da sie nur erweiterte Optionen enthalten.\n" 
 
 #: src/libvlc.c:1877 src/libvlc.c:1881
 msgid ""
 "No matching module found. Use --list or--list-verbose to list available "
 "modules."
 msgstr ""
+"Kein passendes Modul gefunden. Benutzen Sie --list oder --list-verbose, um "
+"alle verfügbaren Module aufzulisten."
 
 #: src/libvlc.c:1981
 #, c-format
@@ -1478,7 +1481,7 @@ msgstr ""
 
 #: src/libvlc-module.c:179
 msgid "Choose which objects should print debug message"
-msgstr ""
+msgstr "Wählen Sie, welche Objekte Debug-Nachrichten ausgeben sollen"
 
 #: src/libvlc-module.c:182
 msgid ""
@@ -1797,6 +1800,8 @@ msgid ""
 "This allows to play audio at lower or higher speed withoutaffecting the "
 "audio pitch"
 msgstr ""
+"Dies erlaubt Audio schneller oder langsamer wiederzugeben, ohne die Tonhöhe "
+"zu verändern"
 
 #: src/libvlc-module.c:346 src/libvlc-module.c:578
 #: modules/access/dshow/dshow.cpp:82 modules/access/dshow/dshow.cpp:84
@@ -2123,7 +2128,7 @@ msgstr "Videoausgabe-Filtermodul"
 
 #: src/libvlc-module.c:468
 msgid "This adds video output filters like clone or wall"
-msgstr ""
+msgstr "Dies fügt Videooutput-Filter wie 'clone' oder 'wall' hinzu"
 
 #: src/libvlc-module.c:470
 msgid "Video filter module"
@@ -2235,16 +2240,14 @@ msgstr ""
 "Pixelbreite auszudrücken."
 
 #: src/libvlc-module.c:523
-#, fuzzy
 msgid "Video Auto Scaling"
-msgstr "Videoskalierung"
+msgstr "Automatische Videoskalierung"
 
 #: src/libvlc-module.c:525
 msgid "Let the video scale to fit a given window or fullscreen."
-msgstr ""
+msgstr "Skaliert das Video auf die Größe eines Fensters oder auf Vollbild."
 
 #: src/libvlc-module.c:527
-#, fuzzy
 msgid "Video scaling factor"
 msgstr "Videoskalierungsfilter"
 
@@ -2253,6 +2256,8 @@ msgid ""
 "Scaling factor used when Auto Scaling is disabled.\n"
 "Default value is 1.0 (original video size)."
 msgstr ""
+"Skalierungsfaktor, wenn automatische Skalierung deaktiviert ist.\n"
+"Standardwert ist 1.0 (Originalgröße)."
 
 #: src/libvlc-module.c:532
 msgid "Custom crop ratios list"
@@ -2608,13 +2613,12 @@ msgid "The stream will run this duration (in seconds)."
 msgstr "Der Stream wird für diese Zeit laufen (in Sekunden)."
 
 #: src/libvlc-module.c:700
-#, fuzzy
 msgid "Fast seek"
-msgstr "Schneller"
+msgstr "Schnelles Durchsuchen"
 
 #: src/libvlc-module.c:702
 msgid "Favor speed over precision while seeking"
-msgstr ""
+msgstr "Schnelligkeit der Präzision beim Durchsuchen vorziehen"
 
 #: src/libvlc-module.c:704
 msgid "Input list"
@@ -2676,6 +2680,7 @@ msgid ""
 "When possible, the input stream will be recorded instead of usingthe stream "
 "output module"
 msgstr ""
+"Wenn möglich, wird der Inputstream aufgenommen statt das Streamausgabemodul zu durchlaufen."
 
 #: src/libvlc-module.c:730
 msgid "Timeshift directory"
@@ -4270,29 +4275,28 @@ msgid "Cycle through a predefined list of crop formats."
 msgstr "Durch eine vorgegebene Liste von Beschneidungsformaten wechseln."
 
 #: src/libvlc-module.c:1372
-#, fuzzy
 msgid "Toggle autoscaling"
-msgstr "&Vollbild an/aus"
+msgstr "Automatische Skalierung an/aus"
 
 #: src/libvlc-module.c:1373
 msgid "Activate or deactivate autoscaling."
-msgstr ""
+msgstr "Automatische Skalierung de-/aktivieren."
 
 #: src/libvlc-module.c:1374
 msgid "Increase scale factor"
-msgstr ""
+msgstr "Skalierungsfaktor erhöhen"
 
 #: src/libvlc-module.c:1375
 msgid "Increase scale factor."
-msgstr ""
+msgstr "Skalierungsfaktor erhöhen"
 
 #: src/libvlc-module.c:1376
 msgid "Decrease scale factor"
-msgstr ""
+msgstr "Skalierungsfaktor verringern"
 
 #: src/libvlc-module.c:1377
 msgid "Decrease scale factor."
-msgstr ""
+msgstr "Skalierungsfaktor verringern"
 
 #: src/libvlc-module.c:1378
 msgid "Cycle deinterlace modes"
@@ -14191,13 +14195,15 @@ msgstr "(es wird nichts abgespielt)"
 
 #: modules/gui/macosx/intf.m:337
 msgid "VLC's last release for your OS is the 0.9 series."
-msgstr ""
+msgstr "VLC's letzte Version für Ihr OS ist die 0.9-Serie."
 
 #: modules/gui/macosx/intf.m:339
 msgid ""
 "VLC's last release for your OS is VLC 0.8.6i, which is prone to known "
 "security issues."
 msgstr ""
+"VLC's letzte Version für Ihr OS ist VLC 0.8.6i, welches anfällig für "
+"bekannte Sicherheitsprobleme ist."
 
 #: modules/gui/macosx/intf.m:341
 msgid ""
@@ -14205,28 +14211,30 @@ msgid ""
 "prone to known security issues. We recommend you to update your Mac to a "
 "modern version of Mac OS X."
 msgstr ""
+"VLC's letzte Version für Ihr OS ist VLC 0.7.2, welches hochgradig veraltet "
+"und anfällig für bekannte Sicherheitsprobleme ist. Wir empfehlen Ihnen die "
+"Aktualisierung Ihres Macs auf eine moderne Version von Mac OS X."
 
 #: modules/gui/macosx/intf.m:343
-#, fuzzy
 msgid "Your version of Mac OS X is no longer supported"
-msgstr "Ihre Mac OS X-Version wird nicht unterstützt."
+msgstr "Ihre Version von Mac OS X wird nicht länger unterstützt."
 
 #: modules/gui/macosx/intf.m:347
-#, fuzzy
 msgid ""
 "VLC media player %s requires Mac OS X 10.5 or higher.\n"
 "\n"
 "%@"
-msgstr "VLC media player benötigt Mac OS X 10.4 oder neuer."
+msgstr "VLC media player benötigt Mac OS X 10.5 oder neuer.\n"
+"\n"
+"%@"
 
 #: modules/gui/macosx/intf.m:558
 msgid "Open CrashLog..."
 msgstr "CrashLog öffnen..."
 
 #: modules/gui/macosx/intf.m:559
-#, fuzzy
 msgid "Save this Log..."
-msgstr "&Speichern als..."
+msgstr "Protokoll speichern..."
 
 #: modules/gui/macosx/intf.m:564
 msgid "Check for Update..."
@@ -14261,9 +14269,8 @@ msgid "1:File"
 msgstr "1:Ablage"
 
 #: modules/gui/macosx/intf.m:575 modules/gui/qt4/menus.cpp:308
-#, fuzzy
 msgid "Advanced Open File..."
-msgstr "&Erweitertes Öffnen..."
+msgstr "Erweitertes Datei-Öffnen..."
 
 #: modules/gui/macosx/intf.m:577
 msgid "Open Disc..."
@@ -14306,14 +14313,12 @@ msgid "Playback"
 msgstr "Wiedergabe"
 
 #: modules/gui/macosx/intf.m:612 modules/gui/qt4/menus.cpp:503
-#, fuzzy
 msgid "Increase Volume"
-msgstr "Standardlautstärke"
+msgstr "Lauter"
 
 #: modules/gui/macosx/intf.m:613 modules/gui/qt4/menus.cpp:506
-#, fuzzy
 msgid "Decrease Volume"
-msgstr "Standardlautstärke"
+msgstr "Leiser"
 
 #: modules/gui/macosx/intf.m:638 modules/gui/macosx/intf.m:639
 #: modules/gui/macosx/simple_prefs.m:280 modules/gui/macosx/vout.m:202
@@ -14439,13 +14444,14 @@ msgstr ""
 
 #: modules/gui/macosx/intf.m:702
 msgid "I agree to be possibly contacted about this bugreport."
-msgstr ""
+msgstr "Ich stimme zu, möglicherweise zu diesen Bericht kontaktiert zu werden."
 
 #: modules/gui/macosx/intf.m:703
 msgid ""
 "Only your default E-Mail address will be submitted, including no further "
 "information."
 msgstr ""
+"Nur Ihre Standard-E-Mail-Adresse wird ohne weitere Informationen übermittelt."
 
 #: modules/gui/macosx/intf.m:1756
 #, c-format
@@ -14486,22 +14492,21 @@ msgid "Couldn't find any trace of a previous crash."
 msgstr "Konnte keine Spuren eines vorherigen Absturzes finden."
 
 #: modules/gui/macosx/intf.m:2406
-#, fuzzy
 msgid "Remove old preferences?"
-msgstr "Einstellungen zurücksetzen"
+msgstr "Alte Einstellungen entfernen?"
 
 #: modules/gui/macosx/intf.m:2407
 msgid "We just found an older version of VLC's preferences files."
-msgstr ""
+msgstr "Wir haben gerade eine alte Version von VLC's Einstellungsdatei gefunden."
 
 #: modules/gui/macosx/intf.m:2408
 msgid "Move To Trash and Relaunch VLC"
-msgstr ""
+msgstr "In den Papierkorb legen und VLC neustarten"
 
 #: modules/gui/macosx/intf.m:2542
 #, c-format
 msgid "VLC Debug Log (%s).rtfd"
-msgstr ""
+msgstr "VLC Debug-Protokoll (%s).rtfd"
 
 #: modules/gui/macosx/macosx.m:52
 msgid "Video device"
@@ -14675,9 +14680,8 @@ msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/macosx/open.m:189
-#, fuzzy
 msgid "IP Address"
-msgstr "Adresse"
+msgstr "IP Adresse"
 
 #: modules/gui/macosx/open.m:192
 msgid ""
@@ -14685,6 +14689,9 @@ msgid ""
 "URL in the field above. If you want to open a RTP or UDP stream, press the "
 "button below."
 msgstr ""
+"Um einen typischen Netzwerkstream zu öffnen (HTTP, RTSP, MMS, FTP, usw.), "
+"geben Sie die URL in das obige Feld ein. Wenn Sie einen RTP oder UDP Stream "
+"öffnen möchten, klicken Sie auf den unteren Button."
 
 #: modules/gui/macosx/open.m:193
 msgid ""
@@ -14695,11 +14702,16 @@ msgid ""
 "To open a stream using a different protocol, just press Cancel to close this "
 "sheet."
 msgstr ""
+"Wenn Sie einen Multicast-Stream öffnen möchten, geben Sie die IP-Adresse "
+"Ihres Stream-Anbieters ein. Im Unicast-Modus wird VLC automatisch die "
+"IP-Adresse Ihres Geräts verwenden.\n"
+"\n"
+"Um einen Stream mittels eines anderen Protokolls zu öffnen, klicken Sie auf "
+"Abbrechen, um dieses Fenster zu schließen."
 
 #: modules/gui/macosx/open.m:196
-#, fuzzy
 msgid "Open RTP/UDP Stream"
-msgstr "Stream öffnen"
+msgstr "RTP/UDP Stream öffnen"
 
 #: modules/gui/macosx/open.m:198 modules/gui/qt4/ui/open_net.h:121
 msgid "Protocol"
@@ -14972,7 +14984,7 @@ msgstr "Metadaten abrufen"
 
 #: modules/gui/macosx/playlist.m:443 modules/gui/macosx/playlist.m:444
 msgid "Reveal in Finder"
-msgstr ""
+msgstr "Im Finden anzeigen"
 
 #: modules/gui/macosx/playlist.m:446
 msgid "Sort Node by Name"
@@ -17964,7 +17976,7 @@ msgstr "Einstellungen zu&rücksetzen"
 
 #: modules/gui/qt4/dialogs/preferences.cpp:310
 msgid "Are you sure you want to reset your VLC media player preferences?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie VLC media player's Einstellungen zurücksetzen möchten?"
 
 #: modules/gui/qt4/dialogs/sout.cpp:41 modules/gui/qt4/ui/sout.h:332
 msgid "Stream Output"
@@ -18115,7 +18127,7 @@ msgstr "Erweiterte Optionen"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:77
 msgid "Video On Demand ( VOD )"
-msgstr ""
+msgstr "Video On Demand (VOD)"
 
 #: modules/gui/qt4/dialogs/vlm.cpp:82
 msgid "Hours / Minutes / Seconds:"
@@ -18309,12 +18321,11 @@ msgstr "Aufnahmegerät öffnen..."
 
 #: modules/gui/qt4/menus.cpp:321
 msgid "Open &Location from clipboard"
-msgstr ""
+msgstr "URL aus Zwischenablage öffnen"
 
 #: modules/gui/qt4/menus.cpp:326
-#, fuzzy
 msgid "&Recent Media"
-msgstr "V&olume öffnen"
+msgstr "Benutzte Medien"
 
 #: modules/gui/qt4/menus.cpp:337
 msgid "Conve&rt / Save..."
@@ -18698,9 +18709,8 @@ msgid "Ask for network policy at start"
 msgstr "Beim Start nach Netzwerkpolicy fragen"
 
 #: modules/gui/qt4/qt4.cpp:133
-#, fuzzy
 msgid "Save the recently played items in the menu"
-msgstr "Die aktuellen Befehlszeilenoptionen in den Einstellungen speichern"
+msgstr "Die zuletzt gespielten Objekte im Menü speichern"
 
 #: modules/gui/qt4/qt4.cpp:135
 msgid "List of words separated by | to filter"
@@ -18877,7 +18887,7 @@ msgstr "Volumeauswahl"
 
 #: modules/gui/qt4/ui/open_disk.h:294
 msgid "SVCD/VCD"
-msgstr ""
+msgstr "SVCD/VCD"
 
 #: modules/gui/qt4/ui/open_disk.h:296
 msgid "Disable DVD Menus (for compatibility)"
@@ -18952,32 +18962,28 @@ msgid "Podcast URLs list"
 msgstr "Liste der Podcast-URLs"
 
 #: modules/gui/qt4/ui/profiles.h:456
-#, fuzzy
 msgid "MPEG-TS"
-msgstr "MJPEG"
+msgstr "MPEG-TS"
 
 #: modules/gui/qt4/ui/profiles.h:457
-#, fuzzy
 msgid "MPEG-PS"
-msgstr "MJPEG"
+msgstr "MPEG-PS"
 
 #: modules/gui/qt4/ui/profiles.h:458
 msgid "WAV"
 msgstr "WAV"
 
 #: modules/gui/qt4/ui/profiles.h:459
-#, fuzzy
 msgid "ASF/WMV"
-msgstr "ASF"
+msgstr "ASF/WMV"
 
 #: modules/gui/qt4/ui/profiles.h:460
-#, fuzzy
 msgid "Ogg/Ogm"
-msgstr "Ogg/OGM-Muxer"
+msgstr "Ogg/Ogm"
 
 #: modules/gui/qt4/ui/profiles.h:461
 msgid "RAW"
-msgstr ""
+msgstr "RAW"
 
 #: modules/gui/qt4/ui/profiles.h:462
 msgid "MPEG 1"
@@ -18985,36 +18991,31 @@ msgstr "MPEG 1"
 
 #: modules/gui/qt4/ui/profiles.h:463
 msgid "FLV"
-msgstr ""
+msgstr "FLV"
 
 #: modules/gui/qt4/ui/profiles.h:465
-#, fuzzy
 msgid "MP4/MOV"
-msgstr "MP4/MOV-Muxer"
+msgstr "MP4/MOV"
 
 #: modules/gui/qt4/ui/profiles.h:467
-#, fuzzy
 msgid "MKV"
-msgstr "MOV"
+msgstr "MKV"
 
 #: modules/gui/qt4/ui/profiles.h:468
 msgid "Encapsulation"
 msgstr "Verkapselung"
 
 #: modules/gui/qt4/ui/profiles.h:472 modules/gui/qt4/ui/profiles.h:491
-#, fuzzy
 msgid " kb/s"
-msgstr "%u kb/s"
+msgstr "kb/s"
 
 #: modules/gui/qt4/ui/profiles.h:473
-#, fuzzy
 msgid "Frame Rate"
 msgstr "Framerate"
 
 #: modules/gui/qt4/ui/profiles.h:475
-#, fuzzy
 msgid " fps"
-msgstr "fps"
+msgstr " fps"
 
 #: modules/gui/qt4/ui/profiles.h:477
 msgid ""
@@ -19023,14 +19024,12 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/ui/profiles.h:480 modules/gui/qt4/ui/profiles.h:483
-#, fuzzy
 msgid "00000; "
-msgstr "00:00:00"
+msgstr "00000; "
 
 #: modules/gui/qt4/ui/profiles.h:485
-#, fuzzy
 msgid "Keep original video track"
-msgstr "Originalgröße beibehalten"
+msgstr "Originalvideospur beibehalten"
 
 #: modules/gui/qt4/ui/profiles.h:486
 msgid "Video codec"
@@ -19055,14 +19054,12 @@ msgid "Overlay subtitles on the video"
 msgstr "Untertitel im Video einblenden"
 
 #: modules/gui/qt4/ui/sout.h:335 modules/gui/qt4/ui/sout.h:345
-#, fuzzy
 msgid "Destinations"
-msgstr "Ziel"
+msgstr "Ziele"
 
 #: modules/gui/qt4/ui/sout.h:336
-#, fuzzy
 msgid "New destination"
-msgstr "Ziel"
+msgstr "Neues Ziel"
 
 #: modules/gui/qt4/ui/sout.h:338
 msgid ""
@@ -19071,19 +19068,16 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt4/ui/sout.h:339
-#, fuzzy
 msgid "Display locally"
 msgstr "Lokal wiedergeben"
 
 #: modules/gui/qt4/ui/sout.h:342
-#, fuzzy
 msgid "Activate Transcoding"
-msgstr "Transkodieren"
+msgstr "Transkodierung aktivieren"
 
 #: modules/gui/qt4/ui/sout.h:346
-#, fuzzy
 msgid "Miscellaneous Options"
-msgstr "Vermischte Optionen"
+msgstr "Verschiedene Optionen"
 
 #: modules/gui/qt4/ui/sout.h:347
 msgid "Stream all elementary streams"
@@ -19186,18 +19180,16 @@ msgid "Activate update notifier"
 msgstr "Automatisch nach Updates suchen"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:324
-#, fuzzy
 msgid "Save recently played items"
-msgstr "Die aktuellen Befehlszeilenoptionen in den Einstellungen speichern"
+msgstr "Letzte Wiedergabeobjekte speichern"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:325
-#, fuzzy
 msgid "Filter"
 msgstr "Filter"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:327
 msgid "Separate words by | (without space)"
-msgstr ""
+msgstr "Wörter durch | trennen (ohne Leerzeichen)"
 
 #: modules/gui/qt4/ui/sprefs_interface.h:329
 msgid "Interface Type"
@@ -19263,12 +19255,11 @@ msgstr "Schriftfarbe"
 #: modules/gui/qt4/ui/video_effects.h:888
 #: modules/gui/qt4/ui/video_effects.h:890
 msgid " px"
-msgstr ""
+msgstr " px"
 
 #: modules/gui/qt4/ui/sprefs_video.h:285
-#, fuzzy
 msgid "Accelerated video output (Overlay)"
-msgstr "Beschleunigte Videoausgabe"
+msgstr "Beschleunigte Videoausgabe (Overlay)"
 
 #: modules/gui/qt4/ui/sprefs_video.h:287
 #: modules/video_output/msw/directx.c:132
@@ -19288,23 +19279,20 @@ msgid "Enable wallpaper mode"
 msgstr "Wallpapermodus aktivieren"
 
 #: modules/gui/qt4/ui/sprefs_video.h:292
-#, fuzzy
 msgid "Deinterlacing Mode"
-msgstr "Deinterlace-Modus"
+msgstr "Deinterlacing-Modus"
 
 #: modules/gui/qt4/ui/sprefs_video.h:293
-#, fuzzy
 msgid "Force Aspect Ratio"
-msgstr "Korrektes Seitenverhältnis"
+msgstr "Seitenverhältnis erzwingen"
 
 #: modules/gui/qt4/ui/sprefs_video.h:298
 msgid "vlc-snap"
-msgstr ""
+msgstr "vlc-snap"
 
 #: modules/gui/qt4/ui/streampanel.h:172
-#, fuzzy
 msgid "Stuff"
-msgstr "Zufällig"
+msgstr "Zeug"
 
 #: modules/gui/qt4/ui/streampanel.h:174
 msgid "Edit settings"
@@ -19351,13 +19339,12 @@ msgid "Clear List"
 msgstr "Liste löschen"
 
 #: modules/gui/qt4/ui/v4l2.h:59
-#, fuzzy
 msgid "Refresh"
-msgstr "Liste aktualisieren"
+msgstr "Aktualisieren"
 
 #: modules/gui/qt4/ui/v4l2.h:60
 msgid "No v4l2 instance found. Press the refresh button to try again."
-msgstr ""
+msgstr "Keine v4l2-Instanz gefunden. Aktualisieren drücken, um es erneut zu probieren."
 
 #: modules/gui/qt4/ui/video_effects.h:872
 msgid "Transform"
@@ -19431,7 +19418,7 @@ msgstr "Farbextrahierung"
 #: modules/gui/qt4/ui/video_effects.h:904
 #: modules/gui/qt4/ui/video_effects.h:910
 msgid ">HHHHHH;#"
-msgstr ""
+msgstr ">HHHHHH;#"
 
 #: modules/gui/qt4/ui/video_effects.h:906 modules/video_filter/colorthres.c:69
 msgid "Color threshold"
@@ -19579,12 +19566,11 @@ msgstr "Mux-Steuerung"
 
 #: modules/gui/qt4/ui/vlm.h:298
 msgid "AAAA; "
-msgstr ""
+msgstr "AAAA; "
 
 #: modules/gui/qt4/ui/vlm.h:299
-#, fuzzy
 msgid "Loop"
-msgstr "[In Schleife]"
+msgstr "Wiederholen"
 
 #: modules/gui/qt4/ui/vlm.h:303
 msgid "Media Manager List"
@@ -20056,11 +20042,11 @@ msgstr "Passwort des last.fm-Kontos"
 
 #: modules/misc/audioscrobbler.c:137
 msgid "Scrobbler URL"
-msgstr ""
+msgstr "Scrobbler URL"
 
 #: modules/misc/audioscrobbler.c:138
 msgid "The URL set for an alternative scrobbler engine"
-msgstr ""
+msgstr "Die URL für eine alternative Scrobbler-Engine"
 
 #: modules/misc/audioscrobbler.c:162
 msgid "Audioscrobbler"
@@ -21625,11 +21611,11 @@ msgstr ""
 
 #: modules/stream_out/raop.c:148
 msgid "RAOP"
-msgstr ""
+msgstr "RAOP"
 
 #: modules/stream_out/raop.c:149
 msgid "Remote Audio Output Protocol stream output"
-msgstr ""
+msgstr "Streamausgabe für Remote Audio Output Protocol"
 
 #: modules/stream_out/record.c:50
 #, fuzzy
@@ -24432,15 +24418,16 @@ msgstr ""
 "die Form \"präfixNUMMER.format\" haben."
 
 #: modules/video_filter/scene.c:79
-#, fuzzy
 msgid "Directory path prefix"
-msgstr "Verzeichnis"
+msgstr "Verzeichnispfad-Prefix"
 
 #: modules/video_filter/scene.c:80
 msgid ""
 "Directory path where images files should be saved.If not set, then images "
 "will be automatically saved in users homedir."
 msgstr ""
+"Verzeichnispfad, unterdem die Bilddateien gespeichert werden sollen. Wenn "
+"nicht gesetzt, werden sie automatisch im Benutzerordner gespeichert."
 
 #: modules/video_filter/scene.c:84
 msgid "Always write to the same file"
@@ -24633,15 +24620,16 @@ msgid "DirectFB video output http://www.directfb.org/"
 msgstr "DirectFB-Videoausgabe http://www.directfb.org/"
 
 #: modules/video_output/drawable.c:39
-#, fuzzy
 msgid "ID of the video output X window"
-msgstr "Erzeugt mehrere Kopien des Videoausgabefensters"
+msgstr "ID des X-Videoausgabefensters"
 
 #: modules/video_output/drawable.c:41
 msgid ""
 "VLC can embed its video output in an existing X11 window. This is the X "
 "identifier of that window (0 means none)."
 msgstr ""
+"VLC kann die Videoausgabe in ein existierendes X11 Fenster integrieren. "
+"Dies ist der X-Identifier dieses Fensters (0 bedeutet keins)."
 
 #: modules/video_output/drawable.c:48
 #, fuzzy
@@ -24649,14 +24637,12 @@ msgid "Drawable"
 msgstr "Deaktivieren"
 
 #: modules/video_output/drawable.c:49
-#, fuzzy
 msgid "Embedded X window video"
-msgstr "Eingebettetes Video"
+msgstr "Eingebettetes X-Fenster-Video"
 
 #: modules/video_output/drawable.c:59
-#, fuzzy
 msgid "Embedded Windows video"
-msgstr "Eingebettetes Video"
+msgstr "Eingebettetes Windows-Video"
 
 #: modules/video_output/fb.c:83
 msgid "Run fb on current tty."
@@ -25119,12 +25105,11 @@ msgstr "XVMC-Extension-Videoausgabe"
 
 #: modules/video_output/xcb/x11.c:56
 msgid "XCB"
-msgstr ""
+msgstr "XCB"
 
 #: modules/video_output/xcb/x11.c:57
-#, fuzzy
 msgid "(Experimental) XCB video output"
-msgstr "DirectX-Videoausgabe"
+msgstr "(Experimentelle) XCB-Videoausgabe"
 
 #: modules/video_output/xcb/window.c:56
 #, fuzzy
