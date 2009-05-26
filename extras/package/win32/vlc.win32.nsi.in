@@ -40,8 +40,6 @@ SetCompressor lzma
 SetCompressor /SOLID lzma
 !endif
 
-;ShowInstDetails show
-;ShowUnInstDetails show
 SetOverwrite ifnewer
 CRCCheck on
 BrandingText "${PRODUCT_GROUP} ${PRODUCT_NAME}"
@@ -399,7 +397,7 @@ FunctionEnd
 ; The CORE of the    ;
 ; installer          ;
 ;;;;;;;;;;;;;;;;;;;;;;
-  
+
 Section $Name_Section01 SEC01
   SectionIn 1 2 3 RO
   SetShellVarContext all
@@ -891,7 +889,7 @@ SectionEnd
 
 Function un.onInit
   !insertmacro MUI_UNGETLANGUAGE
-  
+
   !include "languages\english.nsh"
   StrCmp $LANGUAGE ${LANG_FRENCH} French 0
   StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
@@ -941,5 +939,5 @@ Function un.onInit
   Brazilian:
   !include "languages\brazilian_portuguese.nsh"
   EndLanguageCmp:
-  
+
 FunctionEnd
