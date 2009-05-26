@@ -449,13 +449,11 @@ static int Manage( vout_thread_t *p_vout )
      */
     if( p_vout->p_sys->b_on_top_change )
     {
-        vlc_value_t val;
         HMENU hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
-
-        var_Get( p_vout, "video-on-top", &val );
+        bool b = var_GetBool( p_vout, "video-on-top" );
 
         /* Set the window on top if necessary */
-        if( val.b_bool && !( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
+        if( b && !( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
                            & WS_EX_TOPMOST ) )
         {
             CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
@@ -465,7 +463,7 @@ static int Manage( vout_thread_t *p_vout )
         }
         else
         /* The window shouldn't be on top */
-        if( !val.b_bool && ( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
+        if( !b && ( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
                            & WS_EX_TOPMOST ) )
         {
             CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
