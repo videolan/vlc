@@ -1,11 +1,12 @@
 /*****************************************************************************
  * sort.c : Playlist sorting functions
  *****************************************************************************
- * Copyright (C) 1999-2007 the VideoLAN team
+ * Copyright (C) 1999-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Ilkka Ollakka <ileoo@videolan.org>
+ *          Rémi Duraffort <ivoire@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,45 +31,47 @@
 #include "playlist_internal.h"
 
 
-static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
-                                   playlist_item_t **pp_items, int i_mode,
-                                   int i_type );
-static int playlist_cmp(const void *, const void *);
+static void playlist_ItemArraySort( int i_items, playlist_item_t **pp_items,
+                                    int i_mode, int i_type );
+static int playlist_cmp( const void *, const void * );
+
+/* Comparaison functions */
+static int playlist_cmp_album( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_artist( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_desc( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_duration( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_genre( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_id( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_rating( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_title( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_title_nodes_first( const playlist_item_t *,
+                                          const playlist_item_t *);
+static int playlist_cmp_title_num( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_track_num( const playlist_item_t *, const playlist_item_t *);
+static int playlist_cmp_uri( const playlist_item_t *, const playlist_item_t *);
+
+/* General comaraison functions */
+static inline int meta_strcasecmp_title( const playlist_item_t *,
+                                  const playlist_item_t *);
+static inline int meta_sort( const playlist_item_t *, const playlist_item_t *,
+                      vlc_meta_type_t, bool );
+
 
 /**
- * Sort a node.
+ * Sort a node recursively.
  * This function must be entered with the playlist lock !
- *
- * \param p_playlist the playlist
- * \param p_node the node to sort
- * \param i_mode: SORT_ID, SORT_TITLE, SORT_ARTIST, SORT_ALBUM, SORT_RANDOM
- * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
- * \return VLC_SUCCESS on success
- */
-static int playlist_NodeSort( playlist_t * p_playlist , playlist_item_t *p_node,
-                              int i_mode, int i_type )
-{
-    playlist_ItemArraySort( p_playlist,p_node->i_children,
-                            p_node->pp_children, i_mode, i_type );
-    return VLC_SUCCESS;
-}
-
-/**
- * Sort a node recursively
- * \param p_playlist the playlist
- * \param p_node the node to sort
- * \param i_mode: SORT_ID, SORT_TITLE, SORT_ARTIST, SORT_ALBUM, SORT_RANDOM
- * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
- * \return VLC_SUCCESS on success
+ * @param p_playlist the playlist
+ * @param p_node the node to sort
+ * @param i_mode: SORT_ID, SORT_TITLE, SORT_ARTIST, SORT_ALBUM, SORT_RANDOM
+ * @param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
+ * @return VLC_SUCCESS on success
  */
 static int recursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
                               int i_mode, int i_type )
 {
     int i;
-    /* Sort the current node */
-    playlist_NodeSort( p_playlist, p_node, i_mode, i_type );
-
-    /* And all the children */
+    playlist_ItemArraySort( p_node->i_children, p_node->pp_children,
+                            i_mode, i_type );
     for( i = 0 ; i< p_node->i_children; i++ )
     {
         if( p_node->pp_children[i]->i_children != -1 )
@@ -79,7 +82,6 @@ static int recursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
     }
     return VLC_SUCCESS;
 }
-
 
 /**
  * Sort a node recursively.
@@ -102,23 +104,29 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
     return recursiveNodeSort( p_playlist, p_node, i_mode, i_type );
 }
 
-static int sort_mode = 0;
-static int sort_type = 0;
 
-static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
-                                   playlist_item_t **pp_items, int i_mode,
-                                   int i_type )
+static int (*sort_function)(const playlist_item_t *, const playlist_item_t *);
+static int sort_order = 1;
+
+
+/**
+ * Sort an array of items recursively
+ * @param i_items: number of items
+ * @param pp_items: the array of items
+ * @param i_mode: the criterias for the comparisons
+ * @param i_type: ORDER_NORMAL or ORDER_REVERSE
+ * @return nothing
+ */
+static void playlist_ItemArraySort( int i_items, playlist_item_t **pp_items,
+                                   int i_mode, int i_type )
 {
     int i_position;
     playlist_item_t *p_temp;
-    sort_mode = i_mode;
-    sort_type = i_type;
 
-    (void)p_playlist; // a bit surprising we don't need p_playlist!
-
+    /* Random sort */
     if( i_mode == SORT_RANDOM )
     {
-        for( i_position = 0; i_position < i_items ; i_position ++ )
+        for( i_position = 0; i_position < i_items ; i_position++ )
         {
             int i_new;
 
@@ -130,149 +138,349 @@ static int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             pp_items[i_position] = pp_items[i_new];
             pp_items[i_new] = p_temp;
         }
-
-        return VLC_SUCCESS;
     }
-    qsort(pp_items,i_items,sizeof(pp_items[0]),playlist_cmp);
-    return VLC_SUCCESS;
+    else
+    {
+        /* Choose the funtion to compare two items */
+        switch( i_mode )
+        {
+        case SORT_ALBUM:
+            sort_function = playlist_cmp_album;
+            break;
+        case SORT_ARTIST:
+            sort_function = playlist_cmp_artist;
+            break;
+        case SORT_DESCRIPTION:
+            sort_function = playlist_cmp_desc;
+            break;
+        case SORT_DURATION:
+            sort_function = playlist_cmp_duration;
+            break;
+        case SORT_GENRE:
+            sort_function = playlist_cmp_genre;
+            break;
+        case SORT_ID:
+            sort_function = playlist_cmp_id;
+            break;
+        case SORT_TITLE:
+            sort_function = playlist_cmp_title;
+            break;
+        case SORT_TITLE_NODES_FIRST:
+            sort_function = playlist_cmp_title_nodes_first;
+            break;
+        case SORT_TITLE_NUMERIC:
+            sort_function = playlist_cmp_title_num;
+            break;
+        case SORT_TRACK_NUMBER:
+            sort_function = playlist_cmp_track_num;
+            break;
+        case SORT_RATING:
+            sort_function = playlist_cmp_rating;
+            break;
+        case SORT_URI:
+            sort_function = playlist_cmp_uri;
+            break;
+        default:
+            assert(0);
+        }
+        sort_order = i_type == ORDER_REVERSE ? -1 : 1;
+        qsort( pp_items, i_items, sizeof( pp_items[0] ), playlist_cmp );
+    }
 }
 
-static int playlist_cmp(const void *first, const void *second)
+
+/**
+ * Wrapper around playlist_cmp_* function
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp( const void *first, const void *second )
 {
-
-#define META_STRCASECMP_NAME( ) { \
-    char *psz_i = input_item_GetTitleFbName( (*(playlist_item_t **)first)->p_input ); \
-    char *psz_ismall = input_item_GetTitleFbName( (*(playlist_item_t **)second)->p_input ); \
-    if( psz_i != NULL && psz_ismall != NULL ) i_test = strcasecmp( psz_i, psz_ismall ); \
-    else if ( psz_i == NULL && psz_ismall != NULL ) i_test = 1; \
-    else if ( psz_ismall == NULL && psz_i != NULL ) i_test = -1; \
-    else i_test = 0; \
-    free( psz_i ); \
-    free( psz_ismall ); \
+    if( sort_order == -1 )
+        return -1 * sort_function( *(playlist_item_t **)first,
+                                   *(playlist_item_t **)second );
+    else
+        return sort_function( *(playlist_item_t **)first,
+                              *(playlist_item_t **)second );
 }
 
 
-#define DO_META_SORT_ADV( node, integer ) { \
-    char *psz_a = input_item_GetMeta( (*(playlist_item_t **)first)->p_input, vlc_meta_##node ); \
-    char *psz_b = input_item_GetMeta( (*(playlist_item_t **)second)->p_input, vlc_meta_##node ); \
-    /* Nodes go first */ \
-    if( (*(playlist_item_t **)first)->i_children == -1 && (*(playlist_item_t **)second)->i_children >= 0 ) \
-        i_test = 1;\
-    else if( (*(playlist_item_t **)first)->i_children >= 0 &&\
-             (*(playlist_item_t **)second)->i_children == -1 ) \
-       i_test = -1; \
-    /* Both are nodes, sort by name */ \
-    else if( (*(playlist_item_t **)first)->i_children >= 0 && \
-               (*(playlist_item_t **)second)->i_children >= 0 ) \
-    { \
-        META_STRCASECMP_NAME( ) \
-    } \
-    /* Both are items */ \
-    else if( psz_a == NULL && psz_b != NULL ) \
-        i_test = 1; \
-    else if( psz_a != NULL && psz_b == NULL ) \
-        i_test = -1;\
-    /* No meta, sort by name */ \
-    else if( psz_a == NULL && psz_b == NULL ) \
-    { \
-        META_STRCASECMP_NAME( ); \
-    } \
-    else \
-    { \
-        if( !integer ) i_test = strcasecmp( psz_a, psz_b ); \
-        else           i_test = atoi( psz_a ) - atoi( psz_b ); \
-    } \
-    free( psz_a ); \
-    free( psz_b ); \
+/**
+ * Compare two items according to the title
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_album( const playlist_item_t *first,
+                               const playlist_item_t *second )
+{
+    int i_ret = meta_sort( first, second, vlc_meta_Album, false );
+    /* Items came from the same album: compare the track numbers */
+    if( i_ret == 0 )
+        i_ret = meta_sort( first, second, vlc_meta_TrackNumber, true );
+
+    return i_ret;
 }
-#define DO_META_SORT( node ) DO_META_SORT_ADV( node, false )
 
-    int i_test = 0;
 
-    if( sort_mode == SORT_TITLE )
-    {
-        META_STRCASECMP_NAME( );
-    }
-    else if( sort_mode == SORT_TITLE_NUMERIC )
-    {
-        char *psz_i = input_item_GetTitleFbName(
-                                (*(playlist_item_t **)first)->p_input );
-        char *psz_ismall = input_item_GetTitleFbName(
-                                (*(playlist_item_t **)second)->p_input );
-        i_test = atoi( psz_i ) - atoi( psz_ismall );
-        free( psz_i );
-        free( psz_ismall );
-    }
-    else if( sort_mode == SORT_DURATION )
-    {
-        i_test = input_item_GetDuration( (*(playlist_item_t **)first)->p_input ) -
-                 input_item_GetDuration( (*(playlist_item_t **)second)->p_input );
-    }
-    else if( sort_mode == SORT_ARTIST )
-    {
-        DO_META_SORT( Artist );
-        /* sort by artist, album, tracknumber */
-        if( i_test == 0 )
-            DO_META_SORT( Album );
-        if( i_test == 0 )
-            DO_META_SORT_ADV( TrackNumber, true );
-    }
-    else if( sort_mode == SORT_GENRE )
-    {
-        DO_META_SORT( Genre );
-    }
-    else if( sort_mode == SORT_ALBUM )
-    {
-        DO_META_SORT( Album );
-        /* Sort by tracknumber if albums are the same */
-        if( i_test == 0 )
-            DO_META_SORT_ADV( TrackNumber, true );
-    }
-    else if( sort_mode == SORT_TRACK_NUMBER )
-    {
-        DO_META_SORT_ADV( TrackNumber, true );
-    }
-    else if( sort_mode == SORT_DESCRIPTION )
-    {
-        DO_META_SORT( Description );
-    }
-    else if( sort_mode == SORT_ID )
-    {
-        i_test = (*(playlist_item_t **)first)->i_id - (*(playlist_item_t **)second)->i_id;
-    }
-    else if( sort_mode == SORT_TITLE_NODES_FIRST )
-    {
-        /* Alphabetic sort, all nodes first */
+/**
+ * Compare two items according to the artist
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_artist( const playlist_item_t *first,
+                                const playlist_item_t *second )
+{
+    int i_ret = meta_sort( first, second, vlc_meta_Artist, false );
+    /* Items came from the same artist: compare the albums */
+    if( i_ret == 0 )
+        i_ret = playlist_cmp_album( first, second );
 
-        if( (*(playlist_item_t **)first)->i_children == -1 &&
-            (*(playlist_item_t **)second)->i_children >= 0 )
-        {
-            i_test = 1;
-        }
-        else if( (*(playlist_item_t **)first)->i_children >= 0 &&
-                 (*(playlist_item_t **)second)->i_children == -1 )
-        {
-            i_test = -1;
-        }
+    return i_ret;
+}
+
+
+/**
+ * Compare two items according to the description
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_desc( const playlist_item_t *first,
+                              const playlist_item_t *second )
+{
+    return meta_sort( first, second, vlc_meta_Description, false );
+}
+
+
+/**
+ * Compare two items according to the duration
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_duration( const playlist_item_t *first,
+                                  const playlist_item_t *second )
+{
+    return input_item_GetDuration( first->p_input ) -
+           input_item_GetDuration( second->p_input );
+}
+
+
+/**
+ * Compare two items according to the genre
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_genre( const playlist_item_t *first,
+                               const playlist_item_t *second )
+{
+    return meta_sort( first, second, vlc_meta_Genre, false );
+}
+
+
+/**
+ * Compare two items according to the ID
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_id( const playlist_item_t *first,
+                            const playlist_item_t *second )
+{
+    return first->i_id - second->i_id;
+}
+
+
+/**
+ * Compare two items according to the rating
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_rating( const playlist_item_t *first,
+                                const playlist_item_t *second )
+{
+    return meta_sort( first, second, vlc_meta_Rating, true );
+}
+
+
+/**
+ * Compare two items according to the title
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_title( const playlist_item_t *first,
+                               const playlist_item_t *second )
+{
+    return meta_strcasecmp_title( first, second );
+}
+
+
+/**
+ * Compare two items according to the title, with the nodes first in the list
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_title_nodes_first( const playlist_item_t *first,
+                                           const playlist_item_t *second )
+{
+    /* If first is a node but not second */
+    if( first->i_children == -1 && second->i_children >= 0 )
+        return -1;
+    /* If second is a node but not first */
+    else if( first->i_children >= 0 && second->i_children == -1 )
+        return 1;
+    /* Both are nodes or both are not nodes */
+    else
+        return meta_strcasecmp_title( first, second );
+}
+
+
+/**
+ * Compare two item according to the title as a numeric value
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_title_num( const playlist_item_t *first,
+                                   const playlist_item_t *second )
+{
+    int i_ret;
+    char *psz_first = input_item_GetTitleFbName( first->p_input );
+    char *psz_second = input_item_GetTitleFbName( second->p_input );
+
+    if( psz_first && psz_second )
+        i_ret = atoi( psz_first ) - atoi( psz_second );
+    else if( !psz_first && psz_second )
+        i_ret = 1;
+    else if( psz_first && !psz_second )
+        i_ret = -1;
+    else
+        i_ret = 0;
+
+    free( psz_first );
+    free( psz_second );
+    return i_ret;
+}
+
+
+/**
+ * Compare two item according to the track number
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_track_num( const playlist_item_t *first,
+                                   const playlist_item_t *second )
+{
+    return meta_sort( first, second, vlc_meta_TrackNumber, true );
+}
+
+
+/**
+ * Compare two item according to the URI
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static int playlist_cmp_uri( const playlist_item_t *first,
+                             const playlist_item_t *second )
+{
+    int i_ret;
+    char *psz_first = input_item_GetURI( first->p_input );
+    char *psz_second = input_item_GetURI( second->p_input );
+
+    if( psz_first && psz_second )
+        i_ret = strcasecmp( psz_first, psz_second );
+    else if( !psz_first && psz_second )
+        i_ret = 1;
+    else if( psz_first && !psz_second )
+        i_ret = -1;
+    else
+        i_ret = 0;
+
+    free( psz_first );
+    free( psz_second );
+    return i_ret;
+}
+
+
+/**
+ * Compare two items using their title or name
+ * @param first: the first item
+ * @param second: the second item
+ * @return -1, 0 or 1 like strcmp
+ */
+static inline int meta_strcasecmp_title( const playlist_item_t *first,
+                              const playlist_item_t *second )
+{
+    int i_ret;
+    char *psz_first = input_item_GetTitleFbName( first->p_input );
+    char *psz_second = input_item_GetTitleFbName( second->p_input );
+
+    if( psz_first && psz_second )
+        i_ret = strcasecmp( psz_first, psz_second );
+    else if( !psz_first && psz_second )
+        i_ret = 1;
+    else if( psz_first && !psz_second )
+        i_ret = -1;
+    else
+        i_ret = 0;
+    free( psz_first );
+    free( psz_second );
+
+    return i_ret;
+}
+
+
+/**
+ * Compare two intems accoring to the given meta type
+ * @param first: the first item
+ * @param second: the second item
+ * @param meta: the meta type to use to sort the items
+ * @param b_integer: true if the meta are integers
+ * @return -1, 0 or 1 like strcmp
+ */
+static inline int meta_sort( const playlist_item_t *first,
+                             const playlist_item_t *second,
+                             vlc_meta_type_t meta, bool b_integer )
+{
+    int i_ret;
+    char *psz_first = input_item_GetMeta( first->p_input, meta );
+    char *psz_second = input_item_GetMeta( second->p_input, meta );
+
+    /* Nodes go first */
+    if( first->i_children == -1 && second->i_children >= 0 )
+        i_ret = 1;
+    else if( first->i_children >= 0 && second->i_children == -1 )
+       i_ret = -1;
+    /* Both are nodes, sort by name */
+    else if( first->i_children >= 0 && second->i_children >= 0 )
+        i_ret = meta_strcasecmp_title( first, second );
+    /* Both are items */
+    else if( !psz_first && psz_second )
+        i_ret = 1;
+    else if( psz_first && !psz_second )
+        i_ret = -1;
+    /* No meta, sort by name */
+    else if( !psz_first && !psz_second )
+        i_ret = meta_strcasecmp_title( first, second );
+    else
+    {
+        if( b_integer )
+            i_ret = atoi( psz_first ) - atoi( psz_second );
         else
-        {
-            META_STRCASECMP_NAME();
-        }
-    }
-    else if( sort_mode == SORT_URI )
-    {
-        char *psz_i = input_item_GetURI( (*(playlist_item_t **)first)->p_input );
-        char *psz_ismall =
-                input_item_GetURI( (*(playlist_item_t **)second)->p_input );
-        i_test = strcasecmp( psz_i, psz_ismall );
-        free( psz_i );
-        free( psz_ismall );
+            i_ret = strcasecmp( psz_first, psz_second );
     }
 
-    if ( sort_type == ORDER_REVERSE )
-        i_test = i_test * -1;
-#undef DO_META_SORT
-#undef DO_META_SORT_ADV
-
-    return i_test;
+    free( psz_first );
+    free( psz_second );
+    return i_ret;
 }
+
