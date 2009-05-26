@@ -656,6 +656,7 @@ ifdef HAVE_WIN32
 	(cd $<; $(HOSTCC) make $(LUA_MAKEPLATEFORM); cd src; $(HOSTCC) make liblua.a; cd ..;$(HOSTCC) make install INSTALL_TOP=$(PREFIX); $(RANLIB) $(PREFIX)/lib/liblua.a)
 	(cd $<; sed -i.orig 's@prefix= /usr/local@prefix= $(PREFIX)@' etc/lua.pc; mkdir -p $(PREFIX)/lib/pkgconfig; cp etc/lua.pc $(PREFIX)/lib/pkgconfig)
 else
+	(cd $<; patch -p1) < Patches/lua-noreadline.patch
 	(cd $<; $(HOSTCC) make $(LUA_MAKEPLATEFORM) && make install INSTALL_TOP=$(PREFIX))
 endif
 	touch $@
