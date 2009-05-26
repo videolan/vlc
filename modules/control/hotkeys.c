@@ -207,13 +207,7 @@ static void Run( intf_thread_t *p_intf )
 
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
-            if( p_aout )
-                vlc_object_release( p_aout );
-            if( p_vout )
-                vlc_object_release( p_vout );
-            if( p_input )
-                vlc_object_release( p_input );
-            continue;
+            goto cleanup_and_continue;
         }
         /* Volume and audio actions */
         else if( i_action == ACTIONID_VOL_UP )
@@ -498,7 +492,7 @@ static void Run( intf_thread_t *p_intf )
                                      _("Subtitle track: %s"), _("N/A") );
                     var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list,
                                 &list2 );
-                    continue;
+                    goto cleanup_and_continue;
                 }
                 for( i = 0; i < i_count; i++ )
                 {
@@ -883,6 +877,7 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
+cleanup_and_continue:
         if( p_aout )
             vlc_object_release( p_aout );
         if( p_vout )
