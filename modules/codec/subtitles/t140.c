@@ -32,7 +32,6 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin ()
-    add_submodule ()
     set_description( N_("T.140 text encoder") )
     set_capability( "encoder", 100 )
     set_callbacks( Open, Close )
