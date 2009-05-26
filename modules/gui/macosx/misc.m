@@ -132,6 +132,12 @@ static NSMutableArray *blackoutWindows = NULL;
     blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
 }
 
+- (void)dealloc
+{
+    [blackoutWindows release];
+    [super dealloc];
+}
+
 + (NSScreen *)screenWithDisplayID: (CGDirectDisplayID)displayID
 {
     int i;

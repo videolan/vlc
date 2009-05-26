@@ -296,6 +296,8 @@
 		CC4ED9B00ABE07C800CA4CC5 /* repeat_single_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = repeat_single_embedded_blue.png; path = Resources/repeat_single_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9B10ABE07C800CA4CC5 /* shuffle_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded_blue.png; path = Resources/shuffle_embedded_blue.png; sourceTree = "<group>"; };
 		CC4ED9B20ABE07C800CA4CC5 /* shuffle_embedded.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = shuffle_embedded.png; path = Resources/shuffle_embedded.png; sourceTree = "<group>"; };
+		CC61608A0FCC2FDF00D71FB1 /* vlm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vlm.h; path = ../../../modules/gui/macosx/vlm.h; sourceTree = SOURCE_ROOT; };
+		CC61608B0FCC2FDF00D71FB1 /* vlm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vlm.m; path = ../../../modules/gui/macosx/vlm.m; sourceTree = SOURCE_ROOT; };
 		CC62B8C50FC5787D0077BB8C /* aiff.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = aiff.icns; path = Resources/aiff.icns; sourceTree = "<group>"; };
 		CC62B8C60FC5787D0077BB8C /* audio.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = audio.icns; path = Resources/audio.icns; sourceTree = "<group>"; };
 		CC62B8C70FC5787D0077BB8C /* flv.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = flv.icns; path = Resources/flv.icns; sourceTree = "<group>"; };
@@ -520,12 +522,12 @@
 				CCC593790AB4A9FB0004FF52 /* embeddedwindow.m */,
 				2AEF857609A5FEC900130822 /* fspanel.h */,
 				2AEF857709A5FEC900130822 /* fspanel.m */,
+				CC61608A0FCC2FDF00D71FB1 /* vlm.h */,
+				CC61608B0FCC2FDF00D71FB1 /* vlm.m */,
 				CC6EDD4F0B9CA2140096068A /* eyetv.h */,
 				CC6EDD500B9CA2140096068A /* eyetv.m */,
 				CCB24D5E0D54BBAE004D780C /* simple_prefs.h */,
 				CCB24D5D0D54BBAE004D780C /* simple_prefs.m */,
-				CCB60A3F0E6E5DD900407004 /* vlm.h */,
-				CCB60A3E0E6E5DD900407004 /* vlm.m */,
 				CC62B9080FC5DB9D0077BB8C /* sidebarview.h */,
 				CC62B9090FC5DB9D0077BB8C /* sidebarview.m */,
 				CC62B90A0FC5DB9D0077BB8C /* sidestatusview.h */,
