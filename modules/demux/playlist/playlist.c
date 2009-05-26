@@ -172,19 +172,22 @@ vlc_module_end ()
  */
 char *FindPrefix( demux_t *p_demux )
 {
-    char *psz_name;
-    char *psz_path = strdup( p_demux->psz_path );
+    char *psz_file;
+    char *psz_prefix;
+    const char *psz_path = p_demux->psz_path;
 
 #ifndef WIN32
-    psz_name = strrchr( psz_path, '/' );
+    psz_file = strrchr( psz_path, '/' );
 #else
-    psz_name = strrchr( psz_path, '\\' );
-    if( !psz_name ) psz_name = strrchr( psz_path, '/' );
+    psz_file = strrchr( psz_path, '\\' );
+    if( !psz_file ) psz_name = strrchr( psz_path, '/' );
 #endif
-    if( psz_name ) psz_name[1] = '\0';
-    else *psz_path = '\0';
+    if( psz_file )
+        psz_prefix = strndup( psz_path, psz_file - psz_path + 1 );
+    else
+        psz_prefix = strdup( "" );
 
-    return psz_path;
+    return psz_prefix;
 }
 
 /**
