@@ -1138,7 +1138,6 @@ static void InitPrograms( input_thread_t * p_input )
     {
         demux_Control( p_input->p->input.p_demux, DEMUX_SET_GROUP, -1,
                         val.p_list );
-        var_Change( p_input, "programs", VLC_VAR_FREELIST, &val, NULL );
     }
     else
     {
