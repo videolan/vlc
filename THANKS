@@ -121,6 +121,7 @@ Greg Farrell <greg at gregfarell dot org> - rc interface "enqueue" command
 Gregory Hazel <ghazel at gmail dot com> - wxWidgets fixes and improvements
 Haakon Meland Eriksen - Norwegian translation
 Han HoJoong <0demon0 at paran dot com> - Korean translation
+Hang Su <suheaven at gmail.com> wpl and zpl support
 Hans Lambermont <hans dot lambermont at newtec dot eu> - Syslog improvements
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
 Hannes Domani <ssbssa at yahoo dot de> - Qt4 interfaces patches
