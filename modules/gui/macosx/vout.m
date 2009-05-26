@@ -458,7 +458,6 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
     if( !VLCIntf || !VLCIntf->p_sys )
         return;
 
-    UInt8 UsrActivity;
     if( VLCIntf->p_sys->i_play_status == PLAYING_S )
         UpdateSystemActivity( UsrActivity );
 }
