@@ -68,6 +68,7 @@ Christophe Burgalat <c.burgalat _at_ broadcastavenue _dot_ com> - XVMC (cle266) 
 Christopher Johnson <cjohnson at mint.net> - Qt fix in vlc.spec
 Cian Duffy <cian at rapturetv.com> - BeOS builds and maintener
 Colin Simmonds <colin_simmonds at Mac.lover.org> - compile fix for Mac OS X
+Cyril Mathé <cmathe at actech-innovation dot com> - WebPlugin features and improvements
 Damian Ivereigh <damian at cisco.com> - ac3dec uninitialized data structure fix
 Damien Fouilleul <damien.fouilleul at laposte.net> - DirectShow input improvements
 Daniel Dreibrodt, aka aLtgLasS <daniel d.t dreibrodt -@t- gmx d0t de> - VLC 0.8.5 default skin, skins, design and help on the forum and the wiki
@@ -123,6 +124,7 @@ Han HoJoong <0demon0 at paran dot com> - Korean translation
 Hans Lambermont <hans dot lambermont at newtec dot eu> - Syslog improvements
 Hans-Peter Jansen <hpj at urpla.net> - patch for module options handling
 Hannes Domani <ssbssa at yahoo dot de> - Qt4 interfaces patches
+Harris Dugal <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
 Harry Sintonen <sintonen at iki.fi> - fix for MKV demuxer
 Igor Helman - VLM msecseek command
 Ilkka Ollakka - SDP bitrate patch, various VLM fixes, transcode afilter/vfilter fix, qt4 interface patches
@@ -137,7 +139,6 @@ Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
 Jean-Baptiste Le Stang <jp.lestand at lestang.org> - Equalizer-GUI-fixes (OSX), Universal Binary Script
 Jean-Philippe André <jpeg at via.ecp.fr> - Qt bugs and improvements, various bugfixes, Zip access module
 Jean-Philippe Grimaldi <jeanphi at via.ecp.fr> - bug fixes
-Dugal Harris <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
 Jean-Pierre Kuypers <Kuypers at sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker at acm.org> - port of the ALSA plugin to the ALSA 1.0 API
 Jeroen Massar <jeroen at unfix dot org> - IPv6 hostname resolution fix
@@ -165,6 +166,7 @@ Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation
 kty0ne - WinAmp 5 skin for VLC
 K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 Koehler, Vitally <vkoehler AT telekom de> -  solves the problem of audio packet losses by the playback of MPEG2 transport stream.
+Konstanty Bialkowski <konstanty -|- ieee [] org> - improvements on mod files support
 Lahiru Lakmal Priyadarshana <llahiru at gmail # com> - Qt4 patch
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
