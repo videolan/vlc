@@ -387,6 +387,8 @@ static void Run( intf_thread_t *p_intf )
                         _("Audio Device: %s"),
                         list2.p_list->p_values[i].psz_string);
             }
+            var_Change( p_aout, "audio-device", VLC_VAR_FREELIST, &list,
+                        &list2 );
         }
         /* Input options */
         else if( p_input )
@@ -478,6 +480,8 @@ static void Run( intf_thread_t *p_intf )
                                      _("Audio track: %s"),
                                      list2.p_list->p_values[i].psz_string );
                 }
+                var_Change( p_input, "audio-es", VLC_VAR_FREELIST, &list,
+                            &list2 );
             }
             else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
@@ -492,6 +496,8 @@ static void Run( intf_thread_t *p_intf )
                 {
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Subtitle track: %s"), _("N/A") );
+                    var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list,
+                                &list2 );
                     continue;
                 }
                 for( i = 0; i < i_count; i++ )
@@ -516,6 +522,8 @@ static void Run( intf_thread_t *p_intf )
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  _("Subtitle track: %s"),
                                  list2.p_list->p_values[i].psz_string );
+                var_Change( p_input, "spu-es", VLC_VAR_FREELIST, &list,
+                            &list2 );
             }
             else if( i_action == ACTIONID_ASPECT_RATIO && p_vout )
             {
