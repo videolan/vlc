@@ -120,15 +120,16 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
     // get parametrs
     p_sys->i_width = var_CreateGetInteger( p_this, "invmem-width" );
     p_sys->i_height = var_CreateGetInteger( p_this, "invmem-height" );
-    if (p_sys->i_width == 0 || p_sys->i_height == 0) {
+    if( p_sys->i_width == 0 || p_sys->i_height == 0 )
+    {
         msg_Err( p_dec, "--vmem-width and --vmem-height must be > 0" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -147,6 +148,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( !p_sys->pf_lock || !p_sys->pf_unlock )
     {
         msg_Err( p_dec, "Invalid lock or unlock callbacks" );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
