@@ -667,7 +667,7 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     p_dec->p_module = module_need( p_dec, "decoder", "$codec", false );
     if( !p_dec->p_module )
     {
-        msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
+        msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'. "
                  "VLC probably does not support this image format.",
                  (char*)&p_dec->fmt_in.i_codec );
 

@@ -659,7 +659,7 @@ static int DecoderGetDisplayRate( decoder_t *p_dec )
 /* */
 static void DecoderUnsupportedCodec( decoder_t *p_dec, vlc_fourcc_t codec )
 {
-    msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'.\n"
+    msg_Err( p_dec, "no suitable decoder module for fourcc `%4.4s'. "
              "VLC probably does not support this sound or video format.",
              (char*)&codec );
     dialog_Fatal( p_dec, _("No suitable decoder module"),
