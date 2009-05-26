@@ -207,13 +207,7 @@ static void Run( intf_thread_t *p_intf )
 
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
-            if( p_aout )
-                vlc_object_release( p_aout );
-            if( p_vout )
-                vlc_object_release( p_vout );
-            if( p_input )
-                vlc_object_release( p_input );
-            continue;
+            goto cleanup_and_continue;
         }
         /* Volume and audio actions */
         else if( i_action == ACTIONID_VOL_UP )
@@ -387,6 +381,7 @@ static void Run( intf_thread_t *p_intf )
                         _("Audio Device: %s"),
                         list2.p_list->p_values[i].psz_string);
             }
+            var_FreeList( &list, &list2 );
         }
         /* Input options */
         else if( p_input )
@@ -478,6 +473,7 @@ static void Run( intf_thread_t *p_intf )
                                      _("Audio track: %s"),
                                      list2.p_list->p_values[i].psz_string );
                 }
+                var_FreeList( &list, &list2 );
             }
             else if( i_action == ACTIONID_SUBTITLE_TRACK )
             {
@@ -492,7 +488,8 @@ static void Run( intf_thread_t *p_intf )
                 {
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Subtitle track: %s"), _("N/A") );
-                    continue;
+                    var_FreeList( &list, &list2 );
+                    goto cleanup_and_continue;
                 }
                 for( i = 0; i < i_count; i++ )
                 {
@@ -516,6 +513,7 @@ static void Run( intf_thread_t *p_intf )
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  _("Subtitle track: %s"),
                                  list2.p_list->p_values[i].psz_string );
+                var_FreeList( &list, &list2 );
             }
             else if( i_action == ACTIONID_ASPECT_RATIO && p_vout )
             {
@@ -875,6 +873,7 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
+cleanup_and_continue:
         if( p_aout )
             vlc_object_release( p_aout );
         if( p_vout )

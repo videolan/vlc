@@ -306,8 +306,8 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case GESTURE(UP,RIGHT,NONE,NONE):
                 {
-                   vlc_value_t val, list, list2;
-                   int i_count, i;
+                    vlc_value_t val, list, list2;
+                    int i_count, i;
 
                     p_playlist = pl_Hold( p_intf );
                     p_input = playlist_CurrentInput( p_playlist );
@@ -316,20 +316,21 @@ static void RunIntf( intf_thread_t *p_intf )
                     if( !p_input )
                         break;
 
-                   var_Get( p_input, "audio-es", &val );
-                   var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
-                               &list, &list2 );
-                   i_count = list.p_list->i_count;
-                   if( i_count <= 1 )
-                   {
-                       vlc_object_release( p_input );
-                       break;
-                   }
-                   for( i = 0; i < i_count; i++ )
-                   {
-                       if( val.i_int == list.p_list->p_values[i].i_int )
-                           break;
-                   }
+                    var_Get( p_input, "audio-es", &val );
+                    var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
+                                &list, &list2 );
+                    i_count = list.p_list->i_count;
+                    if( i_count <= 1 )
+                    {
+                        var_FreeList( &list, &list2 );
+                        vlc_object_release( p_input );
+                        break;
+                    }
+                    for( i = 0; i < i_count; i++ )
+                    {
+                        if( val.i_int == list.p_list->p_values[i].i_int )
+                            break;
+                    }
                     /* value of audio-es was not in choices list */
                     if( i == i_count )
                     {
@@ -342,6 +343,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     else
                         i++;
                     var_Set( p_input, "audio-es", list.p_list->p_values[i] );
+                    var_FreeList( &list, &list2 );
                     vlc_object_release( p_input );
                 }
                 break;
@@ -365,6 +367,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     if( i_count <= 1 )
                     {
                         vlc_object_release( p_input );
+                        var_FreeList( &list, &list2 );
                         break;
                     }
                     for( i = 0; i < i_count; i++ )
@@ -386,6 +389,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     else
                         i++;
                     var_Set( p_input, "spu-es", list.p_list->p_values[i] );
+                    var_FreeList( &list, &list2 );
                     vlc_object_release( p_input );
                 }
                 break;
