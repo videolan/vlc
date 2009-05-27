@@ -45,8 +45,6 @@ struct vlc_url_t
     char *psz_buffer; /* to be freed */
 };
 
-VLC_EXPORT( char *, unescape_URI_duplicate, ( const char *psz ) );
-VLC_EXPORT( void, unescape_URI, ( char *psz ) );
 VLC_EXPORT( char *, decode_URI_duplicate, ( const char *psz ) );
 VLC_EXPORT( char *, decode_URI, ( char *psz ) );
 VLC_EXPORT( char *, encode_URI_component, ( const char *psz ) );
