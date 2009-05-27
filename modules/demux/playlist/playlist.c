@@ -176,12 +176,12 @@ char *FindPrefix( demux_t *p_demux )
     char *psz_prefix;
     const char *psz_path = p_demux->psz_path;
 
-#ifndef WIN32
-    psz_file = strrchr( psz_path, '/' );
-#else
+#ifdef WIN32
     psz_file = strrchr( psz_path, '\\' );
-    if( !psz_file ) psz_name = strrchr( psz_path, '/' );
+    if( !psz_file )
 #endif
+    psz_file = strrchr( psz_path, '/' );
+
     if( psz_file )
         psz_prefix = strndup( psz_path, psz_file - psz_path + 1 );
     else
