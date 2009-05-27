@@ -5562,8 +5562,8 @@ then
           [
             AC_PATH_PROGS(MOZILLA_CONFIG,
 	    [mozilla-config seamonkey-config xulrunner-config],
-            AC_MSG_ERROR([Please install the Mozilla development tools. mozilla-config was not found.])
-		  )
+        [no])
+            test "${MOZILLA_CONFIG}" = "no" && AC_MSG_ERROR([Please install the Mozilla development tools. mozilla-config was not found.])
           ]
         )
     dnl pkg-config failed but we might have found a mozilla-config
