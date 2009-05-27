@@ -203,6 +203,13 @@ Insert Slider widget
 </TD>
 </TR>
 <TR>
+<TD>Deinterlacing:
+    <INPUT type=button value="BLEND" onClick='getVLC("vlc").video.deinterlaceEnable("blend");'>
+    <INPUT type=button value="  X  " onClick='getVLC("vlc").video.deinterlaceEnable("x");'>
+    <INPUT type=button value="Disable" onClick='getVLC("vlc").video.deinterlaceDisable();'>
+</TD>
+</TR>
+<TR>
 <TD>
     <INPUT type=button id="telx" value="Teletext off" onClick='doToggleTeletext();'>
     Teletext page:
