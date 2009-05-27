@@ -172,6 +172,7 @@ static int qtchroma_to_fourcc( int i_qt )
         /* Raw data types */
         { k422YpCbCr8CodecType,    VLC_CODEC_UYVY },
         { kComponentVideoCodecType,VLC_CODEC_YUYV },
+        { kComponentVideoUnsigned, VLC_CODEC_YUYV },
         { 0, 0 }
     };
     int i;
