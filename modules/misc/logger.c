@@ -129,6 +129,16 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
   "\"text\" (default) and \"html\".")
 #endif
 
+#ifdef HAVE_SYSLOG_H
+static const char *const facility_list[] = { "daemon", "user", "local0",
+    "local1", "local2", "local3", "local4", "local5", "local6", "local7" };
+
+#define SYSLOG_FACILITY_TEXT N_("Syslog facility")
+#define SYSLOG_FACILITY_LONGTEXT N_("Select the syslog facility where logs " \
+  "will be forwarded. Available choices are \"daemon\" (default), \"user\", " \
+  "and \"local0\" through \"local7\".")
+#endif
+
 vlc_module_begin ()
     set_shortname( N_( "Logging" ) )
     set_description( N_("File logging") )
@@ -141,6 +151,11 @@ vlc_module_begin ()
     add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,
                 false )
         change_string_list( mode_list, mode_list_text, 0 )
+#ifdef HAVE_SYSLOG_H
+    add_string( "syslog-facility", "daemon", NULL, SYSLOG_FACILITY_TEXT,
+                SYSLOG_FACILITY_LONGTEXT, true )
+        change_string_list( facility_list, facility_list, 0 )
+#endif
 
     add_obsolete_string( "rrd-file" )
 
@@ -250,7 +265,42 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->msg.p_file = NULL;
 #ifdef HAVE_SYSLOG_H
-        openlog( "vlc", LOG_PID|LOG_NDELAY, LOG_DAEMON );
+        int i_facility = LOG_DAEMON;
+        char *psz_facility = var_CreateGetString( p_intf, "syslog-facility" );
+        if( psz_facility )
+        {
+            bool b_valid = 0;
+            static const struct { const char *psz_name; int i_value; }
+            p_facility[10] = {
+                { "daemon", LOG_DAEMON }, { "user", LOG_USER },
+                { "local0", LOG_LOCAL0 }, { "local1", LOG_LOCAL1 },
+                { "local2", LOG_LOCAL2 }, { "local3", LOG_LOCAL3 },
+                { "local4", LOG_LOCAL4 }, { "local5", LOG_LOCAL5 },
+                { "local6", LOG_LOCAL6 }, { "local7", LOG_LOCAL7 }
+            };
+            for( size_t i = 0;
+                 i < sizeof( p_facility ) / sizeof( p_facility[0] );
+                 i++ )
+            {
+                if( !strcmp( psz_facility, p_facility[i].psz_name ) )
+                {
+                    i_facility = p_facility[i].i_value;
+                    b_valid = 1;
+                    break;
+                }
+            }
+            if( !b_valid )
+            {
+                msg_Warn( p_intf, "invalid syslog facility `%s', using `daemon'", psz_facility );
+            }
+            free( psz_facility );
+        }
+        else
+        {
+            msg_Warn( p_intf, "no syslog facility specified, using `daemon'" );
+        }
+
+        openlog( "vlc", LOG_PID|LOG_NDELAY, i_facility );
 #endif
     }
 
