@@ -39,6 +39,7 @@ STDMETHODIMP VLCSupportErrorInfo::InterfaceSupportsErrorInfo(REFIID  riid)
      || (riid == IID_IVLCPlaylist)
      || (riid == IID_IVLCPlaylistItems)
      || (riid == IID_IVLCVideo)
+     || (riid == IID_IVLCSubtitle)
      || (riid == IID_IVLCControl2) )
     {
         return S_OK;
