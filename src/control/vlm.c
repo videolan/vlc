@@ -218,6 +218,7 @@ void libvlc_vlm_release( libvlc_instance_t *p_instance,
     VLM(p_vlm);
 
     vlm_Delete( p_vlm );
+    p_instance->p_vlm = NULL;
 }
 
 void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance,

@@ -176,6 +176,8 @@ void libvlc_release( libvlc_instance_t *p_instance )
         vlc_mutex_destroy( &p_instance->event_callback_lock );
         if( p_instance->p_event_manager )
             libvlc_event_manager_release( p_instance->p_event_manager );
+        if( p_instance->p_vlm )
+            vlm_Delete( p_instance->p_vlm );
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );
         free( p_instance );
