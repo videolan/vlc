@@ -601,6 +601,7 @@
                 [o_mi_revealInFinder setEnabled: YES];
                 [o_mm_mi_revealInFinder setEnabled: YES];
             }
+            free( psz_uri );
         }
 
         if( [[VLCMain sharedInstance] isPlaylistCollapsed] == NO )

@@ -389,6 +389,13 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [object setToolTip: _NS(p_item->psz_longtext)];
 }
 
+- (void)setupField:(NSTextField *)o_object forOption:(const char *)psz_option
+{
+    char *psz_tmp = config_GetPsz( p_intf, psz_option );
+    [o_object setStringValue: [NSString stringWithUTF8String: psz_tmp ?: ""]];
+    free( psz_tmp );
+}
+
 - (void)resetControls
 {
     module_config_t *p_item;
@@ -417,8 +424,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_audio_spdif_ckb setState: config_GetInt( p_intf, "spdif" )];
 
     [self setupButton: o_audio_dolby_pop forIntList: "force-dolby-surround"];
-
-    [o_audio_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "audio-language" ) ?: ""]];
+    [self setupField: o_audio_lang_fld forOption: "audio-language"];
 
     [o_audio_headphone_ckb setState: config_GetInt( p_intf, "headphone-dolby" )];
     
@@ -428,6 +434,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
         [o_audio_norm_ckb setState: (NSInteger)strstr( psz_tmp, "volnorm" )];
         [o_audio_norm_fld setEnabled: [o_audio_norm_ckb state]];
         [o_audio_norm_stepper setEnabled: [o_audio_norm_ckb state]];
+        free( psz_tmp );
     }
     [o_audio_norm_fld setFloatValue: config_GetFloat( p_intf, "norm-max-level" )];
 
@@ -436,8 +443,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     /* Last.FM is optional */
     if( module_exists( "audioscrobbler" ) )
     {
-        [o_audio_lastuser_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-username" ) ?: ""]];
-        [o_audio_lastpwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "lastfm-password" ) ?: ""]];
+        [self setupField: o_audio_lastuser_fld forOption:"lastfm-username"];
+        [self setupField: o_audio_lastpwd_sfld forOption:"lastfm-password"];
 
         if( config_ExistIntf( VLC_OBJECT( p_intf ), "audioscrobbler" ) )
         {
@@ -483,8 +490,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_video_device_pop selectItemAtIndex: 0];
     [o_video_device_pop selectItemWithTag: config_GetInt( p_intf, "macosx-vdev" )];
 
-    [o_video_snap_folder_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-path" ) ?: ""]];
-    [o_video_snap_prefix_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "snapshot-prefix" ) ?: ""]];
+    [self setupField:o_video_snap_folder_fld forOption:"snapshot-path"];
+    [self setupField:o_video_snap_prefix_fld forOption:"snapshot-prefix"];
     [o_video_snap_seqnum_ckb setState: config_GetInt( p_intf, "snapshot-sequential" )];
     [self setupButton: o_video_snap_format_pop forStringList: "snapshot-format"];
 
@@ -492,10 +499,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
      * input & codecs settings *
      ***************************/
     [o_input_serverport_fld setIntValue: config_GetInt( p_intf, "server-port" )];
-    if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
-        [o_input_httpproxy_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy" ) ?: ""]];
-    if( config_GetPsz( p_intf, "http-proxy" ) != NULL )
-        [o_input_httpproxypwd_sfld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "http-proxy-pwd" ) ?: ""]];
+    [self setupField:o_input_httpproxy_fld forOption:"http-proxy"];
+    [self setupField:o_input_httpproxypwd_sfld forOption:"http-proxy-pwd"];
     [o_input_postproc_fld setIntValue: config_GetInt( p_intf, "postproc-q" )];
 
     [self setupButton: o_input_avi_pop forIntList: "avi-index"];
@@ -559,10 +564,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_osd_osd_ckb setState: config_GetInt( p_intf, "osd" )];
     
     [self setupButton: o_osd_encoding_pop forStringList: "subsdec-encoding"];
-    
-    [o_osd_lang_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "sub-language" ) ?: ""]];
-    if( config_GetPsz( p_intf, "quartztext-font" ) != NULL )
-        [o_osd_font_fld setStringValue: [NSString stringWithUTF8String: config_GetPsz( p_intf, "quartztext-font" ) ?: ""]];
+    [self setupField: o_osd_lang_fld forOption: "sub-language" ];
+    [self setupField: o_osd_font_fld forOption: "quartztext-font"];
 
     [self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
     [self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
@@ -755,6 +758,7 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
                 /* work-around a GCC 4.0.1 bug */
                 psz_tmp = (char *)[[NSString stringWithFormat: @"%s:volnorm", psz_tmp] UTF8String];
                 config_PutPsz( p_intf, "audio-filter", psz_tmp );
+                free( psz_tmp );
             }
         }
         else
@@ -762,10 +766,11 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             psz_tmp = config_GetPsz( p_intf, "audio-filter" );
             if( psz_tmp )
             {
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
-                psz_tmp = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
+                char *psz_tmp2 = (char *)[[[NSString stringWithUTF8String: psz_tmp] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@":volnorm"]] UTF8String];
+                psz_tmp2 = (char *)[[[NSString stringWithUTF8String: psz_tmp2] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm:"]] UTF8String];
+                psz_tmp2 = (char *)[[[NSString stringWithUTF8String: psz_tmp2] stringByTrimmingCharactersInSet: [NSCharacterSet characterSetWithCharactersInString:@"volnorm"]] UTF8String];
                 config_PutPsz( p_intf, "audio-filter", psz_tmp );
+                free( psz_tmp );
             }
         }
         config_PutFloat( p_intf, "norm-max-level", [o_audio_norm_fld floatValue] );
