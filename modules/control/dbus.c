@@ -839,7 +839,9 @@ static void Run          ( intf_thread_t *p_intf )
 {
     for( ;; )
     {
-        msleep( INTF_IDLE_SLEEP );
+        if( dbus_connection_get_dispatch_status(p_intf->p_sys->p_conn)
+                                             == DBUS_DISPATCH_COMPLETE )
+            msleep( INTF_IDLE_SLEEP );
         int canc = vlc_savecancel();
         dbus_connection_read_write_dispatch( p_intf->p_sys->p_conn, 0 );
 
