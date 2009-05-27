@@ -48,9 +48,12 @@ using namespace std;
 /*
 ** MingW headers & libs do not declare those
 */
-static DEFINE_GUID(_CATID_InternetAware,       0x0DE86A58, 0x2BAA, 0x11CF, 0xA2, 0x29, 0x00,0xAA,0x00,0x3D,0x73,0x52);
-static DEFINE_GUID(_CATID_SafeForInitializing, 0x7DD95802, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
-static DEFINE_GUID(_CATID_SafeForScripting,    0x7DD95801, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
+static DEFINE_GUID(_CATID_InternetAware, \
+	0x0DE86A58, 0x2BAA, 0x11CF, 0xA2, 0x29, 0x00,0xAA,0x00,0x3D,0x73,0x52);
+static DEFINE_GUID(_CATID_SafeForInitializing, \
+	0x7DD95802, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
+static DEFINE_GUID(_CATID_SafeForScripting, \
+	0x7DD95801, 0x9882, 0x11CF, 0x9F, 0xA9, 0x00,0xAA,0x00,0x6C,0x42,0xC4);
 
 static LONG i_class_ref= 0;
 static HINSTANCE h_instance= 0;
@@ -66,10 +69,10 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, LPVOID *ppv)
 
     *ppv = NULL;
 
-    if( (CLSID_VLCPlugin == rclsid )
-     || ( CLSID_VLCPlugin2 == rclsid) )
+    if( (CLSID_VLCPlugin == rclsid) || (CLSID_VLCPlugin2 == rclsid) )
     {
-        VLCPluginClass *plugin = new VLCPluginClass(&i_class_ref, h_instance, rclsid);
+        VLCPluginClass *plugin =
+            new VLCPluginClass(&i_class_ref, h_instance, rclsid);
         hr = plugin->QueryInterface(riid, ppv);
         plugin->Release();
     }
@@ -85,24 +88,25 @@ static inline HKEY keyCreate(HKEY parentKey, LPCTSTR keyName)
 {
     HKEY childKey;
     if( ERROR_SUCCESS == RegCreateKeyEx(parentKey, keyName, 0, NULL,
-                REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &childKey, NULL) )
+             REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &childKey, NULL) )
     {
         return childKey;
     }
     return NULL;
 };
 
-static inline HKEY keySet(HKEY hKey, LPCTSTR valueName, const void *s, size_t len, DWORD dwType = REG_SZ)
+static inline HKEY keySet(HKEY hKey, LPCTSTR valueName,
+                          const void *s, size_t len, DWORD dwType = REG_SZ)
 {
     if( NULL != hKey )
     {
-        RegSetValueEx(hKey, valueName, 0, dwType,
-            (const BYTE*)s, len);
+        RegSetValueEx(hKey, valueName, 0, dwType, (const BYTE*)s, len);
     }
     return hKey;
 };
 
-static inline HKEY keySetDef(HKEY hKey, const void *s, size_t len, DWORD dwType = REG_SZ)
+static inline HKEY keySetDef(HKEY hKey,
+                             const void *s, size_t len, DWORD dwType = REG_SZ)
 {
     return keySet(hKey, NULL, s, len, dwType);
 };
@@ -193,8 +197,7 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
             keySetDef(hProgKey, description);
 
             keyClose(keySetDef(keyCreate(hProgKey, TEXT("CLSID")),
-                szCLSID,
-                sizeof(szCLSID)));
+                               szCLSID, sizeof(szCLSID)));
 
             //hSubKey = keyClose(keyCreate(hBaseKey, "Insertable"));
  
@@ -209,11 +212,10 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
                 keySetDef(hProgKey, description);
 
                 keyClose(keySetDef(keyCreate(hProgKey, TEXT("CLSID")),
-                    szCLSID,
-                    sizeof(szCLSID)));
+                                   szCLSID, sizeof(szCLSID)));
 
                 keyClose(keySetDef(keyCreate(hProgKey, TEXT("CurVer")),
-                    progId));
+                                   progId));
             }
         }
         hClassKey = keyCreate(hParent, szCLSID);
@@ -257,36 +259,30 @@ static HRESULT RegisterClassID(HKEY hParent, REFCLSID rclsid, unsigned int versi
 #endif
 
         // MiscStatus key value
-        keyClose(keySetDef(keyCreate(hClassKey,
-            TEXT("MiscStatus\\1")),
-            TEXT(MISC_STATUS), sizeof(TEXT(MISC_STATUS))));
+        keyClose(keySetDef(keyCreate(hClassKey,TEXT("MiscStatus\\1")),
+                           TEXT(MISC_STATUS), sizeof(TEXT(MISC_STATUS))));
 
         // Programmable key value
         keyClose(keyCreate(hClassKey, TEXT("Programmable")));
 
         // ProgID key value
-        keyClose(keySetDef(keyCreate(hClassKey,
-            TEXT("ProgID")),
-            progId));
+        keyClose(keySetDef(keyCreate(hClassKey,TEXT("ProgID")),progId));
 
         // VersionIndependentProgID key value
         keyClose(keySetDef(keyCreate(hClassKey,
-            TEXT("VersionIndependentProgID")),
-            TEXT(PROGID_STR), sizeof(TEXT(PROGID_STR))));
+                                     TEXT("VersionIndependentProgID")),
+                           TEXT(PROGID_STR), sizeof(TEXT(PROGID_STR))));
 
         // Version key value
-        keyClose(keySetDef(keyCreate(hClassKey,
-            TEXT("Version")),
-            TEXT("1.0")));
+        keyClose(keySetDef(keyCreate(hClassKey,TEXT("Version")),TEXT("1.0")));
 
         // TypeLib key value
         OLECHAR szLIBID[GUID_STRLEN];
 
         StringFromGUID2(LIBID_AXVLC, szLIBID, GUID_STRLEN);
 
-        keyClose(keySetDef(keyCreate(hClassKey,
-                TEXT("TypeLib")),
-                szLIBID, sizeof(szLIBID)));
+        keyClose(keySetDef(keyCreate(hClassKey,TEXT("TypeLib")),
+                           szLIBID, sizeof(szLIBID)));
  
         RegCloseKey(hClassKey);
     }
@@ -304,7 +300,8 @@ STDAPI DllRegisterServer(VOID)
 
     HKEY hBaseKey;
 
-    if( ERROR_SUCCESS != RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"), 0, KEY_CREATE_SUB_KEY, &hBaseKey) )
+    if( ERROR_SUCCESS != RegOpenKeyEx(HKEY_CLASSES_ROOT, TEXT("CLSID"),
+                                      0, KEY_CREATE_SUB_KEY, &hBaseKey) )
         return SELFREG_E_CLASS;
 
     RegisterClassID(hBaseKey, CLSID_VLCPlugin, 1, FALSE, DllPath, DllPathLen);
@@ -373,7 +370,8 @@ STDAPI_(int) WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
 
     IUnknown *classProc = NULL;
 
-    if( FAILED(DllGetClassObject(CLSID_VLCPlugin, IID_IUnknown, (LPVOID *)&classProc)) )
+    if( FAILED(DllGetClassObject(CLSID_VLCPlugin, IID_IUnknown,
+                                 (LPVOID *)&classProc)) )
         return 0;
  
     DWORD dwRegisterClassObject;
