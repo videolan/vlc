@@ -27,6 +27,7 @@
 
 #include "http.h"
 #include <vlc_plugin.h>
+#include <vlc_url.h>
 
 #include <assert.h>
 
@@ -787,7 +788,8 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
         psz_art = input_item_GetArtURL( p_item );
     }
 
-    if( psz_art && !strncmp( psz_art, "file://", strlen( "file://" ) ) )
+    if( psz_art && !strncmp( psz_art, "file://", strlen( "file://" ) ) &&
+        decode_URI( psz_art + 7 ) )
     {
         FILE *f;
         char *psz_ext;

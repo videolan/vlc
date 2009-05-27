@@ -44,9 +44,5 @@ function fetch_art()
     page = fd:read( 65653 )
     fd = nil
     _, _, arturl = string.find( page, "imgurl=([^&]+)" )
-    if arturl then
-        return vlc.strings.decode_uri(arturl)
-    else
-        return nil
-    end
+    return arturl
 end

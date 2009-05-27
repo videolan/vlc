@@ -29,6 +29,7 @@
 
 #include "input_manager.hpp"
 #include <vlc_keys.h>
+#include <vlc_url.h>
 
 #include <QApplication>
 
@@ -590,7 +591,9 @@ void InputManager::UpdateArt()
     if( hasInput() )
     {
         char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
-        url = qfu( psz_art );
+        if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
+                decode_URI( psz_art + 7 ) )
+            url = qfu( psz_art + 7);
         free( psz_art );
 
         url = url.replace( "file://", "" );

@@ -546,32 +546,31 @@ static bool parse_track_node COMPLEX_INTERFACE
                 /* special case: location */
                 if( !strcmp( p_handler->name, "location" ) )
                 {
-                    char *psz_uri = NULL;
-                    psz_uri = decode_URI_duplicate( psz_value );
+                    char *psz_location = psz_value;
+                    if( !strncmp( psz_value, "file://", 7 ) )
+                        psz_location = decode_URI( psz_value + 7 );
 
-                    if( !psz_uri )
+                    if( !psz_location )
                     {
                         FREE_ATT();
                         return false;
                     }
 
-                    if( p_demux->p_sys->psz_base && !strstr( psz_uri, "://" ) )
+                    if( p_demux->p_sys->psz_base && !strstr( psz_value, "://" ) )
                     {
                         char* psz_tmp;
                         if( asprintf( &psz_tmp, "%s%s", p_demux->p_sys->psz_base,
-                                      psz_uri ) == -1 )
+                                      psz_location ) == -1 )
                         {
-                            free( psz_uri );
                             FREE_ATT();
                             return NULL;
                         }
-                        free( psz_uri );
-                        psz_uri = psz_tmp;
+                        input_item_SetURI( p_new_input, psz_tmp );
+                        free( psz_tmp );
                     }
-                    input_item_SetURI( p_new_input, psz_uri );
-                    free( psz_uri );
+                    else
+                        input_item_SetURI( p_new_input, psz_location );
                     input_item_CopyOptions( p_input_item, p_new_input );
-                    psz_uri = NULL;
                     FREE_ATT();
                     p_handler = NULL;
                 }
@@ -652,9 +651,7 @@ static bool set_item_info SIMPLE_INTERFACE
     }
     else if( !strcmp( psz_name, "image" ) )
     {
-        char *psz_uri = decode_URI_duplicate( psz_value );
-        input_item_SetArtURL( p_input, psz_uri );
-        free( psz_uri );
+        input_item_SetArtURL( p_input, psz_value );
     }
     return true;
 }
