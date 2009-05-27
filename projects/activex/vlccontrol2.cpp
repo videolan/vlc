@@ -57,6 +57,7 @@ EMIT_EXCEPTION_BRIDGE( VLCLog )
 EMIT_EXCEPTION_BRIDGE( VLCPlaylistItems )
 EMIT_EXCEPTION_BRIDGE( VLCPlaylist )
 EMIT_EXCEPTION_BRIDGE( VLCVideo )
+EMIT_EXCEPTION_BRIDGE( VLCSubtitle )
 
 #undef  EMIT_EXCEPTION_BRIDGE
 
@@ -251,14 +252,7 @@ STDMETHODIMP VLCAudio::get_count(long* trackNumber)
         libvlc_exception_init(&ex);
         // get the number of audio track available and return it
         *trackNumber = libvlc_audio_get_track_count(p_md, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCAudio,
-                         libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+        hr = exception_bridge(&ex);
     }
     return hr;
 };
@@ -282,21 +276,15 @@ STDMETHODIMP VLCAudio::description(long trackID, BSTR* name)
 
         // get tracks description
         p_trackDesc = libvlc_audio_get_track_description(p_md, &ex);
-        if(  libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
+        hr = exception_bridge(&ex);
+        if( FAILED(hr) )
+            return hr;
 
         //get the number of available track
         i_limit = libvlc_audio_get_track_count(p_md, &ex);
-        if(  libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCAudio, libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
+        hr = exception_bridge(&ex);
+        if( FAILED(hr) )
+            return hr;
 
         // check if the number given is a good one
         if ( ( trackID > ( i_limit -1 ) ) || ( trackID < 0 ) )
@@ -548,14 +536,12 @@ STDMETHODIMP VLCInput::get_state(long* state)
         libvlc_exception_init(&ex);
 
         *state = libvlc_media_player_get_state(p_md, &ex);
-        if( ! libvlc_exception_raised(&ex) )
+        if( libvlc_exception_raised(&ex) )
         {
-            return NOERROR;
+            // don't fail, just return the idle state
+            *state = 0;
+            libvlc_exception_clear(&ex);
         }
-        libvlc_exception_clear(&ex);
-        // don't fail, just return the idle state
-        *state = 0;
-        return NOERROR;
     }
     return hr;
 };
@@ -1819,13 +1805,7 @@ STDMETHODIMP VLCSubtitle::get_track(long* spu)
         libvlc_exception_init(&ex);
 
         *spu = libvlc_video_get_spu(p_md, &ex);
-        if( ! libvlc_exception_raised(&ex) )
-        {
-            return NOERROR;
-        }
-        _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
-        libvlc_exception_clear(&ex);
-        return E_FAIL;
+        hr = exception_bridge(&ex);
     }
     return hr;
 };
@@ -1840,13 +1820,7 @@ STDMETHODIMP VLCSubtitle::put_track(long spu)
         libvlc_exception_init(&ex);
 
         libvlc_video_set_spu(p_md, spu, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+        hr = exception_bridge(&ex);
     }
     return hr;
 };
@@ -1864,13 +1838,7 @@ STDMETHODIMP VLCSubtitle::get_count(long* spuNumber)
         libvlc_exception_init(&ex);
         // get the number of video subtitle available and return it
         *spuNumber = libvlc_video_get_spu_count(p_md, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-           _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
-        return NOERROR;
+        hr = exception_bridge(&ex);
     }
     return hr;
 };
@@ -1894,21 +1862,15 @@ STDMETHODIMP VLCSubtitle::description(long nameID, BSTR* name)
 
         // get subtitles description
         p_spuDesc = libvlc_video_get_spu_description(p_md, &ex);
-        if(  libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
+        hr = exception_bridge(&ex);
+        if( FAILED(hr) )
+            return hr;
 
         // get the number of available subtitle
         i_limit = libvlc_video_get_spu_count(p_md, &ex);
-        if( libvlc_exception_raised(&ex) )
-        {
-            _p_instance->setErrorInfo(IID_IVLCSubtitle, libvlc_exception_get_message(&ex));
-            libvlc_exception_clear(&ex);
-            return E_FAIL;
-        }
+        hr = exception_bridge(&ex);
+        if( FAILED(hr) )
+            return hr;
 
         // check if the number given is a good one
         if ( ( nameID > ( i_limit -1 ) ) || ( nameID < 0 ) )
@@ -2315,22 +2277,27 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
         char *psz_filepath = path;
         /* first convert to unicode using current code page */
         WCHAR wpath[MAX_PATH+1];
-        if( 0 == MultiByteToWideChar(CP_ACP, 0, filepath, -1, wpath, sizeof(wpath)/sizeof(WCHAR)) )
+        if( 0 == MultiByteToWideChar(CP_ACP, 0, filepath, -1,
+                                     wpath, sizeof(wpath)/sizeof(WCHAR)) )
             return E_FAIL;
 #endif
         /* convert to UTF8 */
-        pathlen = WideCharToMultiByte(CP_UTF8, 0, wpath, -1, psz_filepath, sizeof(path), NULL, NULL);
-        // fail if path is 0 or too short (i.e pathlen is the same as storage size)
+        pathlen = WideCharToMultiByte(CP_UTF8, 0, wpath, -1,
+                                      psz_filepath, sizeof(path), NULL, NULL);
+        // fail if path is 0 or too short (i.e pathlen is the same as
+        // storage size)
+
         if( (0 == pathlen) || (sizeof(path) == pathlen) )
             return E_FAIL;
 
         /* take snapshot into file */
         libvlc_video_take_snapshot(p_md, psz_filepath, 0, 0, &ex);
-        if( ! libvlc_exception_raised(&ex) )
+        hr = exception_bridge(&ex);
+        if( SUCCEEDED(hr) )
         {
-            hr = E_FAIL;
             /* open snapshot file */
-            HANDLE snapPic = LoadImage(NULL, filepath, IMAGE_BITMAP,0, 0, LR_CREATEDIBSECTION|LR_LOADFROMFILE);
+            HANDLE snapPic = LoadImage(NULL, filepath, IMAGE_BITMAP, 0, 0,
+                                       LR_CREATEDIBSECTION|LR_LOADFROMFILE);
             if( snapPic )
             {
                 PICTDESC snapDesc;
@@ -2340,7 +2307,8 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
                 snapDesc.bmp.hbitmap    = (HBITMAP)snapPic;
                 snapDesc.bmp.hpal       = NULL;
 
-                hr = OleCreatePictureIndirect(&snapDesc, IID_IPictureDisp, TRUE, (LPVOID*)picture);
+                hr = OleCreatePictureIndirect(&snapDesc, IID_IPictureDisp,
+                                              TRUE, (LPVOID*)picture);
                 if( FAILED(hr) )
                 {
                     *picture = NULL;
@@ -2348,11 +2316,7 @@ STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
                 }
             }
             DeleteFile(filepath);
-            return hr;
         }
-        _p_instance->setErrorInfo(IID_IVLCVideo, libvlc_exception_get_message(&ex));
-        libvlc_exception_clear(&ex);
-        return E_FAIL;
     }
     return hr;
 };

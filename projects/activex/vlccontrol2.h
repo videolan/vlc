@@ -532,6 +532,7 @@ public:
 
 protected:
     HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
 
 private:
     VLCPlugin*      _p_instance;
