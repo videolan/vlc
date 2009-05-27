@@ -217,6 +217,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_screen_top_lbl setStringValue: _NS("Subscreen top:")];
     [o_screen_width_lbl setStringValue: _NS("Subscreen width:")];
     [o_screen_height_lbl setStringValue: _NS("Subscreen height:")];
+    [o_screen_follow_mouse_ckb setTitle: _NS("Follow the mouse")];
     [o_eyetv_currentChannel_lbl setStringValue: _NS("Current channel:")];
     [o_eyetv_previousProgram_btn setTitle: _NS("Previous Channel")];
     [o_eyetv_nextProgram_btn setTitle: _NS("Next Channel")];

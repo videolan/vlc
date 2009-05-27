@@ -1,11 +1,11 @@
 # German translation of VLC
-# (c) 2002-2006 the VideoLAN team
+# (c) 2002-2009 the VideoLAN team
 # $Id$
 #
 # Thanks to Thomas Graf <tgr at reeler.org> for starting a translation in 2002.
 # Thanks to Philipp Weissenbacher <philippweissenbacher _at_ aon.at> for various fixes in 2004.
 # Thanks to Jens Seidel <jensseidel _at_ users.sf.net> for some minor fixes in 2005.
-# Felix Kühne <fkuehne at users.sf.net>, 2003-2006.
+# Felix Kühne <fkuehne at users.sf.net>, 2003-2009.
 # Mathias C. Berens | welcome-soft <berens at welcome-soft.de>, 2006.
 #
 #
@@ -9059,7 +9059,7 @@ msgstr ""
 #: modules/codec/avcodec/avcodec.h:125 modules/gui/macosx/simple_prefs.m:256
 #: modules/gui/qt4/ui/sprefs_input.h:250
 msgid "Skip the loop filter for H.264 decoding"
-msgstr "Loop-Filter für das Verarbeiten von H.264 überspringen"
+msgstr "Loop-Filter für H.264-Dekodierung auslassen"
 
 #: modules/codec/avcodec/avcodec.h:126
 msgid ""
@@ -14152,11 +14152,11 @@ msgstr "Maximales Level"
 
 #: modules/gui/macosx/extended.m:95
 msgid "Restore Defaults"
-msgstr "Standardwerte wiederherstellen"
+msgstr "Standards wiederherstellen"
 
 #: modules/gui/macosx/extended.m:102 modules/gui/macosx/macosx.m:57
 msgid "Opaqueness"
-msgstr "Undurchsichtigkeit"
+msgstr "Transparenz"
 
 #: modules/gui/macosx/extended.m:172 modules/gui/macosx/extended.m:234
 msgid "Adjust Image"
@@ -14974,9 +14974,8 @@ msgid "Expand Node"
 msgstr "Knoten ausklappen"
 
 #: modules/gui/macosx/playlist.m:441
-#, fuzzy
 msgid "Download Cover Art"
-msgstr "Jetzt herunterladen"
+msgstr "Cover herunterladen"
 
 #: modules/gui/macosx/playlist.m:442
 msgid "Fetch Meta Data"
@@ -14984,7 +14983,7 @@ msgstr "Metadaten abrufen"
 
 #: modules/gui/macosx/playlist.m:443 modules/gui/macosx/playlist.m:444
 msgid "Reveal in Finder"
-msgstr "Im Finden anzeigen"
+msgstr "Im Finder anzeigen"
 
 #: modules/gui/macosx/playlist.m:446
 msgid "Sort Node by Name"
@@ -15370,7 +15369,7 @@ msgstr "OSD aktivieren"
 
 #: modules/gui/macosx/simple_prefs.m:279
 msgid "Black screens in Fullscreen mode"
-msgstr "Im Vollbildmodus andere Bildschirme schwärzen"
+msgstr "Bei Vollbild Bildschirme schwärzen"
 
 #: modules/gui/macosx/simple_prefs.m:281 modules/gui/qt4/ui/sprefs_video.h:280
 #: modules/stream_out/display.c:54 modules/video_filter/deinterlace.c:132

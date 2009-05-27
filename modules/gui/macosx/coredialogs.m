@@ -234,12 +234,15 @@ static VLCCoreDialogProvider *_o_sharedInstance = nil;
 {
     [super init];
 
-    nib_loaded = [NSBundle loadNibNamed:@"InteractionErrorPanel" owner:self];
-
-    /* init strings */
-    [o_window setTitle: _NS("Errors and Warnings")];
-    [o_cleanup_button setTitle: _NS("Clean up")];
-    [o_messages_btn setTitle: _NS("Show Details")];
+    if( !b_nib_loaded )
+    {
+        b_nib_loaded = [NSBundle loadNibNamed:@"ErrorPanel" owner:self];
+    
+        /* init strings */
+        [o_window setTitle: _NS("Errors and Warnings")];
+        [o_cleanup_button setTitle: _NS("Clean up")];
+        [o_messages_btn setTitle: _NS("Show Details")];
+    }
 
     /* init data sources */
     o_errors = [[NSMutableArray alloc] init];

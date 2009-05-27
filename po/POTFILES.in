@@ -591,6 +591,8 @@ modules/gui/macosx/bookmarks.h
 modules/gui/macosx/bookmarks.m
 modules/gui/macosx/controls.h
 modules/gui/macosx/controls.m
+modules/gui/macosx/coredialogs.h
+modules/gui/macosx/coredialogs.m
 modules/gui/macosx/embeddedwindow.h
 modules/gui/macosx/embeddedwindow.m
 modules/gui/macosx/equalizer.h

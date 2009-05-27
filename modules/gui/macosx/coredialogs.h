@@ -40,7 +40,7 @@
     NSMutableArray * o_errors;
     NSMutableArray * o_icons;
     
-    BOOL nib_loaded;
+    BOOL b_nib_loaded;
 }
 - (IBAction)cleanupTable:(id)sender;
 - (IBAction)showMessages:(id)sender;
