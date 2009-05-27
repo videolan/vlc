@@ -853,10 +853,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
      * mux (TS/PS), then p_fmt is NULL. */
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
-    int               i_port, cscov = -1;
+    int               cscov = -1;
     char              *psz_sdp;
-    int               i_port_audio_option = var_GetInteger( p_stream, "port-audio" );
-    int               i_port_video_option = var_GetInteger( p_stream, "port-video" );
 
     if (0xffffffff == p_sys->payload_bitmap)
     {
@@ -864,37 +862,40 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
     }
 
-    id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
-    if( id == NULL )
-        return NULL;
-    vlc_object_attach( id, p_stream );
-
     /* Choose the port */
-    i_port = 0;
+    uint16_t i_port = 0;
     if( p_fmt == NULL )
         ;
     else
     if( p_fmt->i_cat == AUDIO_ES && p_sys->i_port_audio > 0 )
-    {
         i_port = p_sys->i_port_audio;
-        p_sys->i_port_audio = 0;
-    }
     else
     if( p_fmt->i_cat == VIDEO_ES && p_sys->i_port_video > 0 )
-    {
         i_port = p_sys->i_port_video;
-        p_sys->i_port_video = 0;
+
+    /* We do not need the ES lock (p_sys->lock_es) here, because this is the
+     * only one thread that can *modify* the ES table. The ES lock protects
+     * the other threads from our modifications (TAB_APPEND, TAB_REMOVE). */
+    for (int i = 0; i_port && (i < p_sys->i_es); i++)
+         if (i_port == p_sys->es[i]->i_port)
+             i_port = 0; /* Port already in use! */
+    for (uint16_t p = p_sys->i_port; i_port == 0; p += 2)
+    {
+        if (p == 0)
+        {
+            msg_Err (p_stream, "too many RTP elementary streams");
+            return NULL;
+        }
+        i_port = p;
+        for (int i = 0; i_port && (i < p_sys->i_es); i++)
+             if (p == p_sys->es[i]->i_port)
+                 i_port = 0;
     }
 
-    while( i_port == 0 )
-    {
-        if( p_sys->i_port != i_port_audio_option
-         && p_sys->i_port != i_port_video_option )
-        {
-            i_port = p_sys->i_port;
-        }
-        p_sys->i_port += 2;
-    }
+    id = vlc_object_create( p_stream, sizeof( sout_stream_id_t ) );
+    if( id == NULL )
+        return NULL;
+    vlc_object_attach( id, p_stream );
 
     id->p_stream   = p_stream;
 
@@ -1311,11 +1312,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
     vlc_mutex_unlock( &p_sys->lock_es );
 
-    /* Release port */
-    if( id->i_port == var_GetInteger( p_stream, "port-audio" ) )
-        p_sys->i_port_audio = id->i_port;
-    if( id->i_port == var_GetInteger( p_stream, "port-video" ) )
-        p_sys->i_port_video = id->i_port;
     /* Release dynamic payload type */
     if (id->i_payload_type >= 96)
         p_sys->payload_bitmap &= ~(1 << (id->i_payload_type - 96));
