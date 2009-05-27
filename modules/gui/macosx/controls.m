@@ -699,7 +699,7 @@
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
     [o_mi setTitle: [[VLCMain sharedInstance] localizedString: text.psz_string ?
-                                        text.psz_string : strdup( psz_variable ) ]];
+                                        text.psz_string : psz_variable ]];
 
     var_Get( p_object, psz_variable, &val );
     if( i_type & VLC_VAR_HASCHOICE )
