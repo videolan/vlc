@@ -29,6 +29,7 @@
 #include "intf.h"
 #include "playlistinfo.h"
 #include "playlist.h"
+#include <vlc_url.h>
 
 /*****************************************************************************
  * VLCPlaylistInfo Implementation
@@ -292,7 +293,7 @@ static VLCInfo *_o_sharedInstance = nil;
         char *psz_meta;
         NSImage *o_image;
         psz_meta = input_item_GetArtURL( p_item );
-        if( psz_meta && !strncmp( psz_meta, "file://", 7 ) )
+        if( psz_meta && !strncmp( psz_meta, "file://", 7 ) && decode_URI( psz_meta + 7 ) )
             o_image = [[NSImage alloc] initWithContentsOfFile: [NSString stringWithUTF8String: psz_meta+7]];
         else
             o_image = [[NSImage imageNamed: @"noart.png"] retain];

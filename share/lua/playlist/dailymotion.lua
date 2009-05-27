@@ -41,7 +41,7 @@ function parse()
         if not line then break end
         if string.match( line, "param name=\"flashvars\" value=\".*video=" )
         then
-            arturl = vlc.strings.decode_uri( find( line, "param name=\"flashvars\" value=\".*preview=([^&]*)" ) )
+            arturl = find( line, "param name=\"flashvars\" value=\".*preview=([^&]*)" )
             videos = vlc.strings.decode_uri( find( line, "param name=\"flashvars\" value=\".*video=([^&]*)" ) )
        --[[ we get a list of different streams available, at various codecs
             and resolutions:

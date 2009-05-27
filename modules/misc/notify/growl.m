@@ -58,6 +58,7 @@
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_interface.h>
+#include <vlc_url.h>
 
 
 /*****************************************************************************
@@ -210,7 +211,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     char *psz_arturl = input_item_GetArtURL( p_item );
     CFDataRef art = NULL;
     if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
-                    strlen( psz_arturl ) > 7 )
+                    decode_URI( psz_arturl + 7 ) )
         art = (CFDataRef) readFile( psz_arturl + 7 );
 
     free( psz_title );

@@ -212,9 +212,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     if( psz == NULL ) psz = strdup( "" );
     if( !EMPTY_STR( psz ) )
     {
-        psz_uri = make_URI( psz );
-        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz_uri );
-        free( psz_uri );
+        fprintf( p_file, "\t\t\t<image>%s</image>\n", psz );
     }
     free( psz );
 

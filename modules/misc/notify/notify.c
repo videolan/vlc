@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+#include <vlc_url.h>
 
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <libnotify/notify.h>
@@ -221,12 +222,11 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     vlc_object_release( p_input );
 
     if( psz_arturl && !strncmp( psz_arturl, "file://", 7 ) &&
-                strlen( psz_arturl ) > 7 )
+                decode_URI( psz_arturl + 7 ) )
     { /* scale the art to show it in notify popup */
         GError *p_error = NULL;
         pix = gdk_pixbuf_new_from_file_at_scale( &psz_arturl[7],
                                                  72, 72, TRUE, &p_error );
-        free( psz_arturl );
     }
     else /* else we show state-of-the art logo */
     {
@@ -238,6 +238,8 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
             free( psz_pixbuf );
         }
     }
+
+    free( psz_arturl );
 
     /* we need to replace '&' with '&amp;' because '&' is a keyword of
      * notification-daemon parser */

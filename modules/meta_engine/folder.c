@@ -98,26 +98,31 @@ static int FindMeta( vlc_object_t *p_this )
             case 0:
             /* Windows Folder.jpg */
             snprintf( psz_filename, MAX_PATH,
-                      "file://%sFolder.jpg", psz_path );
+                      "%sFolder.jpg", psz_path );
             break;
 
             case 1:
             /* Windows AlbumArtSmall.jpg == small version of Folder.jpg */
             snprintf( psz_filename, MAX_PATH,
-                  "file://%sAlbumArtSmall.jpg", psz_path );
+                  "%sAlbumArtSmall.jpg", psz_path );
             break;
 
             case 2:
             /* KDE (?) .folder.png */
             snprintf( psz_filename, MAX_PATH,
-                  "file://%s.folder.png", psz_path );
+                  "%s.folder.png", psz_path );
             break;
         }
 
-        if( utf8_stat( psz_filename+7, &a ) != -1 )
+        if( utf8_stat( psz_filename, &a ) != -1 )
         {
-            input_item_SetArtURL( p_item, psz_filename );
-            b_have_art = true;
+            char *psz_uri = make_URI( psz_filename );
+            if( psz_uri )
+            {
+                input_item_SetArtURL( p_item, psz_uri );
+                free( psz_uri );
+                b_have_art = true;
+            }
         }
     }
 
