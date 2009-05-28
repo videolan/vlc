@@ -1303,6 +1303,12 @@ static int  Open ( vlc_object_t *p_this )
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
+    if( p_sys->h == NULL )
+    {
+        msg_Err( p_enc, "cannot open x264 encoder" );
+        return VLC_EGENERIC;
+    }
+
     /* alloc mem */
     p_sys->i_buffer = 4 * p_enc->fmt_in.video.i_width *
         p_enc->fmt_in.video.i_height + 1000;
