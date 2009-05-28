@@ -673,13 +673,13 @@ void CaptureOpenPanel::initialize()
     ui.optionsBox->setLayout( stackedPropLayout );
 
     /* Creation and connections of the WIdgets in the stacked layout */
-#define addModuleAndLayouts( number, name, label )                    \
+#define addModuleAndLayouts( number, name, label, layout )            \
     QWidget * name ## DevPage = new QWidget( this );                  \
     QWidget * name ## PropPage = new QWidget( this );                 \
     stackedDevLayout->addWidget( name ## DevPage );        \
     stackedPropLayout->addWidget( name ## PropPage );      \
-    QGridLayout * name ## DevLayout = new QGridLayout;                \
-    QGridLayout * name ## PropLayout = new QGridLayout;               \
+    layout * name ## DevLayout = new layout;                \
+    layout * name ## PropLayout = new layout;               \
     name ## DevPage->setLayout( name ## DevLayout );                  \
     name ## PropPage->setLayout( name ## PropLayout );                \
     ui.deviceCombo->addItem( qtr( label ), QVariant( number ) );
@@ -691,7 +691,7 @@ void CaptureOpenPanel::initialize()
      * DirectShow Stuffs *
      *********************/
     if( module_exists( "dshow" ) ){
-    addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow" );
+    addModuleAndLayouts( DSHOW_DEVICE, dshow, "DirectShow", QGridLayout );
 
     /* dshow Main */
     int line = 0;
@@ -725,7 +725,7 @@ void CaptureOpenPanel::initialize()
      * BDA Stuffs *
      **************/
     if( module_exists( "bda" ) ){
-    addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow" );
+    addModuleAndLayouts( BDA_DEVICE, bda, "DVB DirectShow", QGridLayout );
 
     /* bda Main */
     QLabel *bdaTypeLabel = new QLabel( qtr( "DVB Type:" ) );
@@ -794,7 +794,7 @@ void CaptureOpenPanel::initialize()
      * V4L2*
      *******/
     if( module_exists( "v4l2" ) ){
-    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2" );
+    addModuleAndLayouts( V4L2_DEVICE, v4l2, "Video for Linux 2", QGridLayout );
 
     /* V4l Main panel */
     QLabel *v4l2VideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
@@ -829,7 +829,7 @@ void CaptureOpenPanel::initialize()
      * V4L *
      *******/
     if( module_exists( "v4l" ) ){
-    addModuleAndLayouts( V4L_DEVICE, v4l, "Video for Linux" );
+    addModuleAndLayouts( V4L_DEVICE, v4l, "Video for Linux", QGridLayout );
 
     /* V4l Main panel */
     QLabel *v4lVideoDeviceLabel = new QLabel( qtr( "Video device name" ) );
@@ -874,7 +874,8 @@ void CaptureOpenPanel::initialize()
      * JACK *
      *******/
     if( module_exists( "jack" ) ){
-    addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit" );
+    addModuleAndLayouts( JACK_DEVICE, jack, "JACK Audio Connection Kit",
+                         QGridLayout);
 
     /* Jack Main panel */
     /* Channels */
@@ -928,7 +929,7 @@ void CaptureOpenPanel::initialize()
      * PVR      *
      ************/
     if( module_exists( "pvr" ) ){
-    addModuleAndLayouts( PVR_DEVICE, pvr, "PVR" );
+    addModuleAndLayouts( PVR_DEVICE, pvr, "PVR", QGridLayout );
 
     /* PVR Main panel */
     QLabel *pvrDeviceLabel = new QLabel( qtr( "Device name" ) );
@@ -984,7 +985,7 @@ void CaptureOpenPanel::initialize()
      * DVB Stuffs *
      **************/
     if( module_exists( "dvb" ) ){
-    addModuleAndLayouts( DVB_DEVICE, dvb, "DVB" );
+    addModuleAndLayouts( DVB_DEVICE, dvb, "DVB", QGridLayout );
 
     /* DVB Main */
     QLabel *dvbDeviceLabel = new QLabel( qtr( "Adapter card to tune" ) );
@@ -1068,7 +1069,7 @@ void CaptureOpenPanel::initialize()
     /**********
      * Screen *
      **********/
-    addModuleAndLayouts( SCREEN_DEVICE, screen, "Desktop" );
+    addModuleAndLayouts( SCREEN_DEVICE, screen, "Desktop", QGridLayout );
     QLabel *screenLabel = new QLabel( qtr( "Your display will be "
             "opened and played in order to stream or save it." ) );
     screenLabel->setWordWrap( true );
