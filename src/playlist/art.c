@@ -32,6 +32,8 @@
 #include <vlc_charset.h>
 #include <vlc_strings.h>
 #include <vlc_stream.h>
+#include <vlc_url.h>
+
 #include <limits.h>                                             /* PATH_MAX */
 
 #ifdef HAVE_SYS_STAT_H
