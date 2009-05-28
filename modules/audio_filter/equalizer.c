@@ -531,6 +531,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                     free( psz_newbands );
                     return VLC_ENOMEM;
                 }
+                free( psz_newbands );
                 psz_newbands = psz;
             }
             if( p_sys->b_first == false )

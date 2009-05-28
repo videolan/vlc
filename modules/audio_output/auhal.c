@@ -993,6 +993,7 @@ static void Probe( aout_instance_t * p_aout )
         if( !AudioDeviceHasOutput( p_devices[i]) )
         {
             msg_Dbg( p_aout, "this device is INPUT only. skipping..." );
+            free( psz_name );
             continue;
         }
 
