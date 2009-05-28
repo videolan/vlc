@@ -331,7 +331,7 @@ void VLCProfileEditor::fillProfile( const QString& qs )
     CHECKMUX( FLVMux, "flv" )
     CHECKMUX( MKVMux, "mkv" )
     CHECKMUX( AVIMux, "avi" )
-    CHECKMUX( MJPEGMux, "mjpg" ){}
+    CHECKMUX( MJPEGMux, "mpjpeg" ){}
 #undef CHECKMUX
 
     ui.keepVideo->setChecked( !options[1].toInt() );
@@ -420,7 +420,7 @@ QString VLCProfileEditor::transcodeValue()
     SMUX( FLVMux, "flv" )
     SMUX( MKVMux, "mkv" )
     SMUX( AVIMux, "avi" )
-    SMUX( MJPEGMux, "mjpg" ){}
+    SMUX( MJPEGMux, "mpjpeg" ){}
 #undef SMUX
 
 #define currentData( box ) box->itemData( box->currentIndex() )
