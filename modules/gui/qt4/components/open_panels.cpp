@@ -93,7 +93,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
 
     /* Connects  */
     BUTTONACT( ui.fileBrowseButton, browseFile() );
-    BUTTONACT( ui.delFileButton, deleteFile() );
+    BUTTONACT( ui.removeFileButton, removeFile() );
 
     BUTTONACT( ui.subBrowseButton, browseFileSub() );
     CONNECT( ui.subCheckBox, toggled( bool ), this, toggleSubtitleFrame( bool ) );
@@ -102,6 +102,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     CONNECT( ui.subInput, textChanged( const QString& ), this, updateMRL() );
     CONNECT( ui.alignSubComboBox, currentIndexChanged( int ), this, updateMRL() );
     CONNECT( ui.sizeSubComboBox, currentIndexChanged( int ), this, updateMRL() );
+    updateButtons();
 }
 
 inline void FileOpenPanel::BuildOldPanel()
@@ -171,10 +172,11 @@ void FileOpenPanel::browseFile()
         item->setFlags( Qt::ItemIsEditable | Qt::ItemIsEnabled );
         ui.fileListWidg->addItem( item );
     }
+    updateButtons();
     updateMRL();
 }
 
-void FileOpenPanel::deleteFile()
+void FileOpenPanel::removeFile()
 {
     int i = ui.fileListWidg->currentRow();
     if( i != -1 )
@@ -184,6 +186,7 @@ void FileOpenPanel::deleteFile()
     }
 
     updateMRL();
+    updateButtons();
 }
 
 /* Show a fileBrowser to select a subtitle */
@@ -250,6 +253,14 @@ void FileOpenPanel::clear()
 {
     ui.fileListWidg->clear();
     ui.subInput->clear();
+}
+
+/* Update buttons depending on current selection */
+void FileOpenPanel::updateButtons()
+{
+    bool b_has_files = ( ui.fileListWidg->count() > 0 );
+    ui.removeFileButton->setEnabled( b_has_files );
+    ui.subCheckBox->setEnabled( b_has_files );
 }
 
 /**************************************************************************

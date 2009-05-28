@@ -67,10 +67,21 @@
         <property name="text">
          <string>Add...</string>
         </property>
+	<property name="icon">
+         <iconset>
+          <normaloff>:/playlist_add</normaloff>:/playlist_add</iconset>
+        </property>	
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QPushButton" name="delFileButton">
+       <widget class="QPushButton" name="removeFileButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+	<property name="icon">
+         <iconset>
+          <normaloff>:/playlist_remove</normaloff>:/playlist_remove</iconset>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -78,7 +89,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Delete</string>
+         <string>Remove</string>
         </property>
        </widget>
       </item>
@@ -87,6 +98,9 @@
    </item>
    <item row="1" column="0">
     <widget class="QCheckBox" name="subCheckBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="toolTip">
       <string>Add a subtitles file</string>
      </property>
@@ -106,115 +120,110 @@
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout2">
-      <item row="1" column="0">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>16</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="3">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>30</width>
-          <height>26</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="7">
-       <spacer>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>16</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLabel" name="sizeSubLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Size:</string>
-        </property>
-        <property name="buddy">
-         <cstring>sizeSubComboBox</cstring>
-        </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="subInput"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="subBrowseButton">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Select the subtitles file</string>
+           </property>
+           <property name="text">
+            <string>Browse...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="sizeSubComboBox">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLabel" name="alignSubLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Alignment:</string>
-        </property>
-        <property name="buddy">
-         <cstring>alignSubComboBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5" colspan="2">
-       <widget class="QComboBox" name="alignSubComboBox">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="6">
-       <widget class="QLineEdit" name="subInput"/>
-      </item>
-      <item row="0" column="6" colspan="2">
-       <widget class="QPushButton" name="subBrowseButton">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>Select the subtitles file</string>
-        </property>
-        <property name="text">
-         <string>Browse...</string>
-        </property>
+      <item>
+       <widget class="QWidget" name="widget_2" native="true">
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="sizeSubLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Font size:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="buddy">
+            <cstring>sizeSubComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="alignSubLabel">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Text alignment:</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="buddy">
+            <cstring>alignSubComboBox</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="alignSubComboBox">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="sizeSubComboBox">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>
@@ -241,12 +250,8 @@
  <tabstops>
   <tabstop>fileListWidg</tabstop>
   <tabstop>fileBrowseButton</tabstop>
-  <tabstop>delFileButton</tabstop>
+  <tabstop>removeFileButton</tabstop>
   <tabstop>subCheckBox</tabstop>
-  <tabstop>subInput</tabstop>
-  <tabstop>subBrowseButton</tabstop>
-  <tabstop>sizeSubComboBox</tabstop>
-  <tabstop>alignSubComboBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
