@@ -307,6 +307,7 @@ static block_t *Block (access_t *p_access)
     {   /* End of directory, go back to parent */
         closedir (current->handle);
         p_sys->current = current->parent;
+        free (current->uri);
         free (current);
 
         if (p_sys->current == NULL)
@@ -346,14 +347,20 @@ static block_t *Block (access_t *p_access)
 
     /* Skip current, parent and hidden directories */
     if (entry[0] == '.')
+    {
+        free (entry);
         return NULL;
+    }
     /* Handle recursion */
     if (p_sys->mode != MODE_COLLAPSE)
     {
         directory_t *sub = malloc (sizeof (*sub) + strlen (current->path) + 1
                                                  + strlen (entry));
         if (sub == NULL)
+        {
+            free (entry);
             return NULL;
+        }
         sprintf (sub->path, "%s/%s", current->path, entry);
 
         DIR *handle = utf8_opendir (sub->path);
@@ -373,7 +380,9 @@ static block_t *Block (access_t *p_access)
              || has_inode_loop (sub)
              || (sub->uri == NULL))
             {
+                free (entry);
                 closedir (handle);
+                free (sub->uri);
                 free (sub);
                 return NULL;
             }
@@ -382,9 +391,13 @@ static block_t *Block (access_t *p_access)
             /* Add node to xspf extension */
             char *old_xspf_extension = p_sys->psz_xspf_extension;
             if (old_xspf_extension == NULL)
+            {
+                free (entry);
                 goto fatal;
+            }
 
             char *title = convert_xml_special_chars (entry);
+            free (entry);
             if (title == NULL
              || asprintf (&p_sys->psz_xspf_extension, "%s"
                           "  <vlc:node title=\"%s\">\n", old_xspf_extension,
@@ -417,7 +430,10 @@ static block_t *Block (access_t *p_access)
 
                 if (type + extlen == end
                  && !strncasecmp (ext, type, extlen))
+                {
+                    free (entry);
                     return NULL;
+                }
 
                 if (*end == '\0')
                     break;
