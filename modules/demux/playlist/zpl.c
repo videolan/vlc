@@ -4,20 +4,21 @@
  * Copyright (C) 2009 the VideoLAN team
  *
  * Authors: Su Heaven <suheaven@gmail.com>
+ *          Rémi Duraffort <ivoire@videolan.org>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -90,10 +91,13 @@ static inline void MaybeFromLocaleRep (char **str)
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
-    char       *psz_tabvalue = NULL;
-    int        i_parsed_duration = 0;
-    mtime_t    i_duration = -1;
-    input_item_t *p_input;
+
+    mtime_t i_duration = -1;
+    char *psz_title = NULL,       *psz_genre = NULL,      *psz_tracknum = NULL,
+         *psz_language = NULL,    *psz_artist = NULL,     *psz_album = NULL,
+         *psz_date = NULL,        *psz_publicher = NULL,  *psz_encodedby = NULL,
+         *psz_description = NULL, *psz_url = NULL,        *psz_copyright = NULL,
+         *psz_mrl = NULL;
 
     INIT_PLAYLIST_STUFF;
 
@@ -106,12 +110,14 @@ static int Demux( demux_t *p_demux )
         psz_parse++;
 
     /* if the 1st line is "AC", skip it */
+    /* TODO: using this information ? */
     if( !strncasecmp( psz_parse, "AC", strlen( "AC" ) ) )
     {
         free( psz_line );
         psz_line = stream_ReadLine( p_demux->s );
     }
 
+    /* Loop on all lines */
     while( psz_line )
     {
         psz_parse = psz_line;
@@ -121,175 +127,93 @@ static int Demux( demux_t *p_demux )
                *psz_parse == '\n' || *psz_parse == '\r' )
             psz_parse++;
 
+        /* filename */
         if( !strncasecmp( psz_parse, "NM", strlen( "NM" ) ) )
         {
-            psz_tabvalue = ParseTabValue( psz_parse );
+            char *psz_tabvalue = ParseTabValue( psz_parse );
             if( !EMPTY_STR(psz_tabvalue) )
             {
-                char *psz_mrl = ProcessMRL( psz_tabvalue, p_demux->p_sys->psz_prefix );
+                psz_mrl = ProcessMRL( psz_tabvalue, p_demux->p_sys->psz_prefix );
                 if( psz_mrl )
-                {
                     MaybeFromLocaleRep( &psz_mrl );
-                    p_input = input_item_NewExt( p_demux, psz_mrl, psz_tabvalue,
-                                                 0, NULL, 0, i_duration );
-                    free( psz_mrl );
-                }
             }
+            free( psz_tabvalue );
         }
 
+        /* duration */
         else if( !strncasecmp( psz_parse, "DR", strlen( "DR" ) ) )
         {
-            psz_tabvalue = ParseTabValue( psz_parse );
+            char *psz_tabvalue = ParseTabValue( psz_parse );
             if( !EMPTY_STR(psz_tabvalue) )
             {
-                i_parsed_duration = atoi( psz_tabvalue );
+                int i_parsed_duration = atoi( psz_tabvalue );
                 if( i_parsed_duration >= 0 )
-                {
                     i_duration = i_parsed_duration * INT64_C(1000);
-                    if( p_input )
-                        input_item_SetDuration( p_input, i_duration );
-                }
             }
+            free( psz_tabvalue );
         }
 
-       else if( !strncasecmp( psz_parse, "TT", strlen( "TT" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetTitle( p_input, psz_tabvalue );
-            }
-        }
+#define PARSE(tag,variable)                                     \
+    else if( !strncasecmp( psz_parse, tag, strlen( tag ) ) )    \
+        variable = ParseTabValue( psz_parse );
 
-       else if( !strncasecmp( psz_parse, "TG", strlen( "TG" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetGenre( p_input, psz_tabvalue );
-            }
-        }
+        PARSE( "TT", psz_title )
+        PARSE( "TG", psz_genre )
+        PARSE( "TR", psz_tracknum )
+        PARSE( "TL", psz_language )
+        PARSE( "TA", psz_artist )
+        PARSE( "TB", psz_album )
+        PARSE( "TY", psz_date )
+        PARSE( "TH", psz_publicher )
+        PARSE( "TE", psz_encodedby )
+        PARSE( "TC", psz_description )
+        PARSE( "TU", psz_url )
+        PARSE( "TO", psz_copyright )
 
-        else if( !strncasecmp( psz_parse, "TR", strlen( "TR" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetTrackNum( p_input, psz_tabvalue );
-            }
-        }
+#undef PARSE
 
-        else if( !strncasecmp( psz_parse, "TL", strlen( "TL" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetLanguage( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TA", strlen( "TA" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetArtist( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TB", strlen( "TB" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetAlbum( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TY", strlen( "TY" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetDate( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TH", strlen( "TH" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetPublisher( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TE", strlen( "TE" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetEncodedBy( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TC", strlen( "TC" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetDescription( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TU", strlen( "TU" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetURL( p_input, psz_tabvalue );
-            }
-        }
-
-        else if( !strncasecmp( psz_parse, "TO", strlen( "TO" ) ) )
-        {
-            psz_tabvalue = ParseTabValue( psz_parse );
-            if( !EMPTY_STR(psz_tabvalue) )
-            {
-                if( p_input )
-                    input_item_SetCopyright( p_input, psz_tabvalue );
-            }
-        }
-
+        /* force a duration ? */
         else if( !strncasecmp( psz_parse, "FD", strlen( "FD" ) ) )
         {}
 
+        /* end of file entry */
         else if( !strncasecmp( psz_parse, "BR!", strlen( "BR!" ) ) )
         {
+            /* create the input item */
+            input_item_t *p_input = input_item_NewExt( p_demux, psz_mrl,
+                                        psz_title, 0, NULL, 0, i_duration );
             input_item_AddSubItem( p_current_input, p_input );
-            p_input = NULL;
+            FREENULL( psz_mrl );
+            FREENULL( psz_title );
+            i_duration = -1;
+
+#define SET(variable, type)                             \
+    if( !EMPTY_STR(variable) )                          \
+    {                                                   \
+        input_item_Set##type( p_input, variable );      \
+        FREENULL( variable );                           \
+    }
+            /* set the meta */
+            SET( psz_genre, Genre );
+            SET( psz_tracknum, TrackNum );
+            SET( psz_language, Language );
+            SET( psz_artist, Artist );
+            SET( psz_album, Album );
+            SET( psz_date, Date );
+            SET( psz_encodedby, EncodedBy );
+            SET( psz_description, Description );
+            SET( psz_copyright, Copyright );
+#undef SET
+
         }
+        else
+            msg_Warn( p_demux, "invalid line '%s'", psz_parse );
 
         /* Fetch another line */
-        FREENULL( psz_tabvalue );
         free( psz_line );
         psz_line = stream_ReadLine( p_demux->s );
-
-        i_parsed_duration = 0;
-        i_duration = -1;
-
     }
+
     HANDLE_PLAY_AND_RELEASE;
     var_Destroy( p_demux, "zpl-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
