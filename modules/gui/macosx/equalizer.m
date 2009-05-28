@@ -240,23 +240,20 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
-    char psz_values[102];
-    memset( psz_values, 0, 102 );
+    NSString *preset;
+    const char *psz_values;
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band1 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band2 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band3 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band4 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band5 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band6 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band7 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band8 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band9 floatValue] ];
+    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band10 floatValue] ];
 
-    /* Write the new bands values */
-    /* TODO: write a generic code instead of ten times the same thing */
-
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band1 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band2 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band3 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band4 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band5 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band6 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band7 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band8 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band9 floatValue] );
-    sprintf( psz_values, "%s %.1f", psz_values, [o_slider_band10 floatValue] );
-
+    psz_values = [preset UTF8String];
     var_SetString( p_object, "equalizer-bands", psz_values );
 
     if( (BOOL)config_GetInt( p_intf, "macosx-eq-keep" ) == YES )
@@ -280,13 +277,15 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
-    char psz_values[102];
-    memset( psz_values, 0, 102 );
-
     var_SetString( p_object , "equalizer-preset" , preset_list[[sender indexOfSelectedItem]] );
 
+    NSString *preset;
+    const char *psz_values;
     for( i = 0; i < 10; i++ )
-        sprintf( psz_values, "%s %.1f", psz_values, eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] );
+    {
+        preset = [NSString stringWithFormat:@"%@ %.1f", preset, eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] ];
+    }
+    psz_values = [preset UTF8String];
     var_SetString( p_object, "equalizer-bands", psz_values );
     var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp);
 
