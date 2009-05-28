@@ -853,7 +853,7 @@
         case VLC_VAR_INTEGER:
 
              o_title = text_list.p_list->p_values[i].psz_string ?
-                                 [[VLCMain sharedInstance] localizedString: strdup( text_list.p_list->p_values[i].psz_string )] :
+                                 [[VLCMain sharedInstance] localizedString: text_list.p_list->p_values[i].psz_string] :
                                  [NSString stringWithFormat: @"%d",
                                  val_list.p_list->p_values[i].i_int];
 
