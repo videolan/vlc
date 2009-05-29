@@ -802,6 +802,7 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->i_interpolated_dts = 0;
     p_sys->psz_stat_name = NULL;
+    p_sys->p_buffer = NULL;
 
     x264_param_default( &p_sys->param );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
@@ -1306,6 +1307,7 @@ static int  Open ( vlc_object_t *p_this )
     if( p_sys->h == NULL )
     {
         msg_Err( p_enc, "cannot open x264 encoder" );
+        Close( VLC_OBJECT(p_enc) );
         return VLC_EGENERIC;
     }
 
@@ -1445,7 +1447,8 @@ static void Close( vlc_object_t *p_this )
 
     free( p_sys->psz_stat_name );
 
-    x264_encoder_close( p_sys->h );
+    if( p_sys->h )
+        x264_encoder_close( p_sys->h );
 
 #ifdef PTW32_STATIC_LIB
     vlc_value_t lock, count;
