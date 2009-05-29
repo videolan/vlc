@@ -84,10 +84,7 @@ static int Open( vlc_object_t *p_this )
     /* Allocate instance and initialize some members */
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-    {
-        msg_Err( p_intf, "out of memory" );
         return VLC_ENOMEM;
-    }
 
     p_intf->pf_run = Run;
 
