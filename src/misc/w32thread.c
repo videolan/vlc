@@ -53,7 +53,7 @@ typedef struct vlc_cancel_t
 #ifndef UNDER_CE
 # define VLC_CANCEL_INIT { NULL, true, false }
 #else
-# define VLC_CANCEL_INIT { NULL, NULL; true, false }
+# define VLC_CANCEL_INIT { NULL, NULL, true, false }
 #endif
 
 #ifdef UNDER_CE
