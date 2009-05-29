@@ -590,6 +590,7 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 
         i++;
     }
+    [o_hotkeyDescriptions release];
     o_hotkeyDescriptions = [[NSArray alloc] initWithArray: o_tempArray_desc copyItems: YES];
     [o_tempArray_desc release];
     [o_hotkeys_listbox reloadData];
