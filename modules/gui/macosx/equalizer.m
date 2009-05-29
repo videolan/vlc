@@ -240,18 +240,17 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
-    NSString *preset;
     const char *psz_values;
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band1 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band2 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band3 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band4 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band5 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band6 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band7 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band8 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band9 floatValue] ];
-    preset = [NSString stringWithFormat:@"%@ %.1f", preset, [o_slider_band10 floatValue] ];
+    NSString *preset = [NSString stringWithFormat:@"%.1f", [o_slider_band1 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band2 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band3 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band4 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band5 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band6 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band7 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band8 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f ", [o_slider_band9 floatValue] ];
+    preset = [preset stringByAppendingFormat:@"%.1f", [o_slider_band10 floatValue] ];
 
     psz_values = [preset UTF8String];
     var_SetString( p_object, "equalizer-bands", psz_values );
@@ -279,11 +278,11 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 
     var_SetString( p_object , "equalizer-preset" , preset_list[[sender indexOfSelectedItem]] );
 
-    NSString *preset;
+    NSString *preset = @"";
     const char *psz_values;
     for( i = 0; i < 10; i++ )
     {
-        preset = [NSString stringWithFormat:@"%@ %.1f", preset, eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] ];
+        preset = [preset stringByAppendingFormat:@"%.1f ", eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] ];
     }
     psz_values = [preset UTF8String];
     var_SetString( p_object, "equalizer-bands", psz_values );
