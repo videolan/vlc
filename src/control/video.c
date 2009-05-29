@@ -589,3 +589,42 @@ end:
     var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
 }
+
+/******************************************************************************
+ * libvlc_video_set_deinterlace : enable deinterlace
+ *****************************************************************************/
+void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
+                                   const char *psz_mode,
+                                   libvlc_exception_t *p_e )
+{
+    vout_thread_t *p_vout = GetVout( p_mi, p_e );
+
+    if( p_vout )
+    {
+        libvlc_exception_raise( p_e, "Unable to get video output" );
+        return;
+    }
+
+    if( b_enable )
+    {
+        /* be sure that the filter name given is supported */
+        if( !strcmp(psz_mode, "blend")   || !strcmp(psz_mode, "bob")
+         || !strcmp(psz_mode, "discard") || !strcmp(psz_mode, "linear")
+         || !strcmp(psz_mode, "mean")    || !strcmp(psz_mode, "x") )
+        {
+            /* set deinterlace filter chosen */
+            var_SetString( p_vout, "deinterlace", psz_mode );
+        }
+        else
+        {
+            libvlc_exception_raise( p_e, "Unsuported or bad deinterlace filter name" );
+        }
+    }
+    else
+    {
+        /* disable deinterlace filter */
+        var_SetString( p_vout, "deinterlace", "" );
+    }
+
+    vlc_object_release( p_vout );
+}

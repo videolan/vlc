@@ -714,6 +714,18 @@ VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc
  */
 VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, const char *,unsigned int, unsigned int, libvlc_exception_t * );
 
+/**
+ * Enable or disable deinterlace filter
+ *
+ * \param p_mi libvlc media player
+ * \param b_enable boolean to enable or disable deinterlace filter
+ * \param psz_mode type of deinterlace filter to use
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *,
+                                                  int , const char *,
+                                                  libvlc_exception_t *);
+
 /** @} video */
 
 /** \defgroup libvlc_audio libvlc_audio
