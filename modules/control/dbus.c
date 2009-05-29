@@ -222,7 +222,7 @@ DBUS_METHOD( PositionSet )
 
     if( p_input )
     {
-        position.i_time = i_pos * 1000;
+        position.i_time = ((mtime_t)i_pos) * 1000;
         var_Set( p_input, "time", position );
         vlc_object_release( p_input );
     }
