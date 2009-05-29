@@ -1017,8 +1017,8 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
 - (char *)stringValue
 {
-    return strdup( [[VLCMain sharedInstance] delocalizeString:
-                        [o_textfield stringValue]] );
+    return [[VLCMain sharedInstance] delocalizeString:
+                        [o_textfield stringValue]];
 }
 @end
 
@@ -1282,10 +1282,10 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                     continue;
                 unsigned int confsize;
                 unsigned int unused;
-                module_config_get( p_parser, &confsize );
+                module_config_t *p_configlist = module_config_get( p_parser, &confsize );
                 for ( i = 0; i < confsize; i++ )
                 {
-                    module_config_t *p_config = module_config_get( p_parser, &unused ) + i;
+                    module_config_t *p_config = &p_configlist[i];
                     /* Hack: required subcategory is stored in i_min */
                     if( p_config->i_type == CONFIG_SUBCATEGORY &&
                         p_config->value.i == p_item->min.i )
@@ -1299,6 +1299,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
                             [o_popup selectItem:[o_popup lastItem]];
                     }
                 }
+                module_config_free( p_configlist );
             }
         }
         module_list_free( p_list );
@@ -2033,12 +2034,12 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
             continue;
 
         unsigned int confsize;
-        module_config_get( p_parser, &confsize );
+        module_config_t *p_configlist = module_config_get( p_parser, &confsize );
 
         for ( i = 0; i < confsize; i++ )
         {
             unsigned int unused;
-            module_config_t *p_config = module_config_get( p_parser, &unused ) + i;
+            module_config_t *p_config = &p_configlist[i];
             NSString *o_modulelongname, *o_modulename;
             NSNumber *o_moduleenabled = nil;
 
@@ -2062,6 +2063,7 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
                     o_moduleenabled, nil]];
             }
         }
+        module_config_free( p_configlist );
     }
     module_list_free( p_list );
 
