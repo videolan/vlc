@@ -127,19 +127,16 @@ static inline sortfn_t find_sorting_fn( unsigned i_mode, unsigned i_type )
  * Sort an array of items recursively
  * @param i_items: number of items
  * @param pp_items: the array of items
- * @param i_mode: a SORT_* enum indicating the field to sort on
- * @param i_type: ORDER_NORMAL or ORDER_REVERSE
+ * @param p_sortfn: the sorting function
  * @return nothing
  */
 static inline
 void playlist_ItemArraySort( unsigned i_items, playlist_item_t **pp_items,
-                             unsigned i_mode, unsigned i_type )
+                             sortfn_t p_sortfn )
 {
-    sortfn_t sortfn = find_sorting_fn(i_mode, i_type);
-
-    if( sortfn )
+    if( p_sortfn )
     {
-        qsort( pp_items, i_items, sizeof( pp_items[0] ), sortfn );
+        qsort( pp_items, i_items, sizeof( pp_items[0] ), p_sortfn );
     }
     else /* Randomise */
     {
@@ -167,22 +164,19 @@ void playlist_ItemArraySort( unsigned i_items, playlist_item_t **pp_items,
  * This function must be entered with the playlist lock !
  * @param p_playlist the playlist
  * @param p_node the node to sort
- * @param i_mode: SORT_ID, SORT_TITLE, SORT_ARTIST, SORT_ALBUM, SORT_RANDOM
- * @param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
+ * @param p_sortfn the sorting function
  * @return VLC_SUCCESS on success
  */
 static int recursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
-                              int i_mode, int i_type )
+                              sortfn_t p_sortfn )
 {
     int i;
-    playlist_ItemArraySort( p_node->i_children, p_node->pp_children,
-                            i_mode, i_type );
+    playlist_ItemArraySort(p_node->i_children,p_node->pp_children,p_sortfn);
     for( i = 0 ; i< p_node->i_children; i++ )
     {
         if( p_node->pp_children[i]->i_children != -1 )
         {
-            recursiveNodeSort( p_playlist, p_node->pp_children[i],
-                               i_mode, i_type );
+            recursiveNodeSort( p_playlist, p_node->pp_children[i], p_sortfn );
         }
     }
     return VLC_SUCCESS;
@@ -195,7 +189,7 @@ static int recursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
  *
  * \param p_playlist the playlist
  * \param p_node the node to sort
- * \param i_mode: SORT_ID, SORT_TITLE, SORT_ARTIST, SORT_ALBUM, SORT_RANDOM
+ * \param i_mode: a SORT_* constant indicating the field to sort on
  * \param i_type: ORDER_NORMAL or ORDER_REVERSE (reversed order)
  * \return VLC_SUCCESS on success
  */
@@ -206,7 +200,7 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
     pl_priv(p_playlist)->b_reset_currently_playing = true;
 
     /* Do the real job recursively */
-    return recursiveNodeSort( p_playlist, p_node, i_mode, i_type );
+    return recursiveNodeSort(p_playlist,p_node,find_sorting_fn(i_mode,i_type));
 }
 
 
@@ -214,7 +208,7 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
  * functions are wrapped in cmp_a_## and cmp_d_## functions that do
  * void * to const playlist_item_t * casting and dereferencing and
  * cmp_d_## inverts the result, too. proto_## are static inline,
- * cmp_[ad]_## are merely inline as they're the target of pointers.
+ * cmp_[ad]_## are merely static as they're the target of pointers.
  *
  * In any case, each SORT_## constant (except SORT_RANDOM) must have
  * a matching SORTFN( )-declared function here.
