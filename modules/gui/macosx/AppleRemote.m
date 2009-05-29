@@ -231,6 +231,11 @@ cleanup:
 }
 
 - (IBAction) stopListening: (id) sender {
+    if (eventSource != NULL) {
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), eventSource, kCFRunLoopDefaultMode);
+        CFRelease(eventSource);
+        eventSource = NULL;
+    }
     if (queue != NULL) {
         (*queue)->stop(queue);
 
@@ -619,7 +624,6 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
             }
 
             // add callback for async events
-            CFRunLoopSourceRef eventSource;
             ioReturnValue = (*queue)->createAsyncEventSource(queue, &eventSource);
             if (ioReturnValue == KERN_SUCCESS) {
                 ioReturnValue = (*queue)->setEventCallout(queue,QueueCallbackFunction, self, NULL);

@@ -86,6 +86,7 @@ The class is not thread safe
     IOHIDQueueInterface**  queue;
     NSMutableArray*        allCookies;
     NSMutableDictionary*   cookieToButtonMapping;
+    CFRunLoopSourceRef     eventSource;
 
     BOOL openInExclusiveMode;
     BOOL simulatePlusMinusHold;
