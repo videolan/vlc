@@ -41,7 +41,8 @@
 #define ELIST_TEXT N_( "Effects list" )
 #define ELIST_LONGTEXT N_( \
       "A list of visual effect, separated by commas.\n"  \
-      "Current effects include: dummy, scope, spectrum." )
+      "Current effects include: dummy, scope, spectrum, "\
+      "spectrometer and vuMeter." )
 
 #define WIDTH_TEXT N_( "Video width" )
 #define WIDTH_LONGTEXT N_( \
