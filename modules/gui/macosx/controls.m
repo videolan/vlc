@@ -589,8 +589,8 @@
         if( !p_input ) return;
         
         c = [[openPanel filenames] count];
-        NSLog( @"count: %i", c );
-        for (int i = 0; [[openPanel filenames] count] > i ; i++)
+
+        for (int i = 0; i < [[openPanel filenames] count] ; i++)
         {
             msg_Dbg( VLCIntf, "loading subs from %s", [[[openPanel filenames] objectAtIndex: i] UTF8String] );
             if( input_AddSubtitle( p_input, [[[openPanel filenames] objectAtIndex: i] UTF8String], TRUE ) )
