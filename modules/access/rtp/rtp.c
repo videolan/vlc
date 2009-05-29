@@ -372,7 +372,7 @@ static int Control (demux_t *demux, int i_query, va_list args)
         case DEMUX_GET_PTS_DELAY:
         {
             int64_t *v = va_arg (args, int64_t *);
-            *v = p_sys->caching * 1000;
+            *v = (int64_t)p_sys->caching * 1000;
             return VLC_SUCCESS;
         }
 
