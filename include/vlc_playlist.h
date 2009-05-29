@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VLC_PLAYLIST_H_
@@ -192,22 +192,36 @@ struct playlist_add_t
     int i_item; /**< Playist id of the playlist_item_t */
 };
 
+/* A bit of macro magic to generate an enum out of the following list,
+ * and later, to generate a list of static functions out of the same list.
+ * There is also SORT_RANDOM, which is always last and handled specially.
+ */
+#define VLC_DEFINE_SORT_FUNCTIONS \
+    DEF( SORT_ID )\
+    DEF( SORT_TITLE )\
+    DEF( SORT_TITLE_NODES_FIRST )\
+    DEF( SORT_ARTIST )\
+    DEF( SORT_GENRE )\
+    DEF( SORT_DURATION )\
+    DEF( SORT_TITLE_NUMERIC )\
+    DEF( SORT_ALBUM )\
+    DEF( SORT_TRACK_NUMBER )\
+    DEF( SORT_DESCRIPTION )\
+    DEF( SORT_RATING )\
+    DEF( SORT_URI )
+
+#define DEF( s ) s,
 enum
 {
-    SORT_ID = 0,
-    SORT_TITLE = 1,
-    SORT_TITLE_NODES_FIRST = 2,
-    SORT_ARTIST = 3,
-    SORT_GENRE = 4,
-    SORT_RANDOM = 5,
-    SORT_DURATION = 6,
-    SORT_TITLE_NUMERIC = 7,
-    SORT_ALBUM = 8,
-    SORT_TRACK_NUMBER = 9,
-    SORT_DESCRIPTION = 10,
-    SORT_RATING = 11,
-    SORT_URI = 12,
+    VLC_DEFINE_SORT_FUNCTIONS
+    SORT_RANDOM,
+    NUM_SORT_FNS=SORT_RANDOM
 };
+#undef  DEF
+#ifndef VLC_INTERNAL_PLAYLIST_SORT_FUNCTIONS
+#undef  VLC_DEFINE_SORT_FUNCTIONS
+#endif
+
 enum
 {
     ORDER_NORMAL = 0,

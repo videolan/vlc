@@ -18,37 +18,19 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
+#define  VLC_INTERNAL_PLAYLIST_SORT_FUNCTIONS
 #include "vlc_playlist.h"
 #include "playlist_internal.h"
 
-
-static void playlist_ItemArraySort( int i_items, playlist_item_t **pp_items,
-                                    int i_mode, int i_type );
-static int playlist_cmp( const void *, const void * );
-
-/* Comparison functions */
-static int playlist_cmp_album( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_artist( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_desc( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_duration( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_genre( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_id( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_rating( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_title( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_title_nodes_first( const playlist_item_t *,
-                                          const playlist_item_t *);
-static int playlist_cmp_title_num( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_track_num( const playlist_item_t *, const playlist_item_t *);
-static int playlist_cmp_uri( const playlist_item_t *, const playlist_item_t *);
 
 /* General comparison functions */
 /**
@@ -123,6 +105,62 @@ static inline int meta_sort( const playlist_item_t *first,
     return i_ret;
 }
 
+/* Comparison functions */
+
+/**
+ * Return the comparison function appropriate for the SORT_* and ORDER_*
+ * arguments given, or NULL for SORT_RANDOM.
+ * @param i_mode: a SORT_* enum indicating the field to sort on
+ * @param i_type: ORDER_NORMAL or ORDER_REVERSE
+ * @return function pointer, or NULL for SORT_RANDOM or invalid input
+ */
+typedef int (*sortfn_t)(const void *,const void *);
+static const sortfn_t sorting_fns[NUM_SORT_FNS][2];
+static inline sortfn_t find_sorting_fn( unsigned i_mode, unsigned i_type )
+{
+  if( i_mode>=NUM_SORT_FNS || i_type>1 )
+      return 0;
+  return sorting_fns[i_mode][i_type];
+}
+
+/**
+ * Sort an array of items recursively
+ * @param i_items: number of items
+ * @param pp_items: the array of items
+ * @param i_mode: a SORT_* enum indicating the field to sort on
+ * @param i_type: ORDER_NORMAL or ORDER_REVERSE
+ * @return nothing
+ */
+static inline
+void playlist_ItemArraySort( unsigned i_items, playlist_item_t **pp_items,
+                             unsigned i_mode, unsigned i_type )
+{
+    sortfn_t sortfn = find_sorting_fn(i_mode, i_type);
+
+    if( sortfn )
+    {
+        qsort( pp_items, i_items, sizeof( pp_items[0] ), sortfn );
+    }
+    else /* Randomise */
+    {
+        int i_position;
+        playlist_item_t *p_temp;
+
+        for( i_position = 0; i_position < i_items ; i_position++ )
+        {
+            int i_new;
+
+            if( i_items > 1 )
+                i_new = rand() % (i_items - 1);
+            else
+                i_new = 0;
+            p_temp = pp_items[i_position];
+            pp_items[i_position] = pp_items[i_new];
+            pp_items[i_new] = p_temp;
+        }
+    }
+}
+
 
 /**
  * Sort a node recursively.
@@ -172,115 +210,20 @@ int playlist_RecursiveNodeSort( playlist_t *p_playlist, playlist_item_t *p_node,
 }
 
 
-static int (*sort_function)(const playlist_item_t *, const playlist_item_t *);
-static int sort_order = 1;
-
-
-/**
- * Sort an array of items recursively
- * @param i_items: number of items
- * @param pp_items: the array of items
- * @param i_mode: the criterias for the comparisons
- * @param i_type: ORDER_NORMAL or ORDER_REVERSE
- * @return nothing
+/* This is the stuff the sorting functions are made of. The proto_##
+ * functions are wrapped in cmp_a_## and cmp_d_## functions that do
+ * void * to const playlist_item_t * casting and dereferencing and
+ * cmp_d_## inverts the result, too. proto_## are static inline,
+ * cmp_[ad]_## are merely inline as they're the target of pointers.
+ *
+ * In any case, each SORT_## constant (except SORT_RANDOM) must have
+ * a matching SORTFN( )-declared function here.
  */
-static void playlist_ItemArraySort( int i_items, playlist_item_t **pp_items,
-                                   int i_mode, int i_type )
-{
-    int i_position;
-    playlist_item_t *p_temp;
 
-    /* Random sort */
-    if( i_mode == SORT_RANDOM )
-    {
-        for( i_position = 0; i_position < i_items ; i_position++ )
-        {
-            int i_new;
+#define SORTFN( SORT, first, second ) static inline int proto_##SORT \
+	( const playlist_item_t *first, const playlist_item_t *second )
 
-            if( i_items > 1 )
-                i_new = rand() % (i_items - 1);
-            else
-                i_new = 0;
-            p_temp = pp_items[i_position];
-            pp_items[i_position] = pp_items[i_new];
-            pp_items[i_new] = p_temp;
-        }
-    }
-    else
-    {
-        /* Choose the funtion to compare two items */
-        switch( i_mode )
-        {
-        case SORT_ALBUM:
-            sort_function = playlist_cmp_album;
-            break;
-        case SORT_ARTIST:
-            sort_function = playlist_cmp_artist;
-            break;
-        case SORT_DESCRIPTION:
-            sort_function = playlist_cmp_desc;
-            break;
-        case SORT_DURATION:
-            sort_function = playlist_cmp_duration;
-            break;
-        case SORT_GENRE:
-            sort_function = playlist_cmp_genre;
-            break;
-        case SORT_ID:
-            sort_function = playlist_cmp_id;
-            break;
-        case SORT_TITLE:
-            sort_function = playlist_cmp_title;
-            break;
-        case SORT_TITLE_NODES_FIRST:
-            sort_function = playlist_cmp_title_nodes_first;
-            break;
-        case SORT_TITLE_NUMERIC:
-            sort_function = playlist_cmp_title_num;
-            break;
-        case SORT_TRACK_NUMBER:
-            sort_function = playlist_cmp_track_num;
-            break;
-        case SORT_RATING:
-            sort_function = playlist_cmp_rating;
-            break;
-        case SORT_URI:
-            sort_function = playlist_cmp_uri;
-            break;
-        default:
-            assert(0);
-        }
-        sort_order = i_type == ORDER_REVERSE ? -1 : 1;
-        qsort( pp_items, i_items, sizeof( pp_items[0] ), playlist_cmp );
-    }
-}
-
-
-/**
- * Wrapper around playlist_cmp_* function
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp( const void *first, const void *second )
-{
-    if( sort_order == -1 )
-        return -1 * sort_function( *(playlist_item_t **)first,
-                                   *(playlist_item_t **)second );
-    else
-        return sort_function( *(playlist_item_t **)first,
-                              *(playlist_item_t **)second );
-}
-
-
-/**
- * Compare two items according to the title
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_album( const playlist_item_t *first,
-                               const playlist_item_t *second )
+SORTFN( SORT_ALBUM, first, second )
 {
     int i_ret = meta_sort( first, second, vlc_meta_Album, false );
     /* Items came from the same album: compare the track numbers */
@@ -290,112 +233,48 @@ static int playlist_cmp_album( const playlist_item_t *first,
     return i_ret;
 }
 
-
-/**
- * Compare two items according to the artist
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_artist( const playlist_item_t *first,
-                                const playlist_item_t *second )
+SORTFN( SORT_ARTIST, first, second )
 {
     int i_ret = meta_sort( first, second, vlc_meta_Artist, false );
     /* Items came from the same artist: compare the albums */
     if( i_ret == 0 )
-        i_ret = playlist_cmp_album( first, second );
+        i_ret = proto_SORT_ALBUM( first, second );
 
     return i_ret;
 }
 
-
-/**
- * Compare two items according to the description
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_desc( const playlist_item_t *first,
-                              const playlist_item_t *second )
+SORTFN( SORT_DESCRIPTION, first, second )
 {
     return meta_sort( first, second, vlc_meta_Description, false );
 }
 
-
-/**
- * Compare two items according to the duration
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_duration( const playlist_item_t *first,
-                                  const playlist_item_t *second )
+SORTFN( SORT_DURATION, first, second )
 {
     return input_item_GetDuration( first->p_input ) -
            input_item_GetDuration( second->p_input );
 }
 
-
-/**
- * Compare two items according to the genre
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_genre( const playlist_item_t *first,
-                               const playlist_item_t *second )
+SORTFN( SORT_GENRE, first, second )
 {
     return meta_sort( first, second, vlc_meta_Genre, false );
 }
 
-
-/**
- * Compare two items according to the ID
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_id( const playlist_item_t *first,
-                            const playlist_item_t *second )
+SORTFN( SORT_ID, first, second )
 {
     return first->i_id - second->i_id;
 }
 
-
-/**
- * Compare two items according to the rating
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_rating( const playlist_item_t *first,
-                                const playlist_item_t *second )
+SORTFN( SORT_RATING, first, second )
 {
     return meta_sort( first, second, vlc_meta_Rating, true );
 }
 
-
-/**
- * Compare two items according to the title
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_title( const playlist_item_t *first,
-                               const playlist_item_t *second )
+SORTFN( SORT_TITLE, first, second )
 {
     return meta_strcasecmp_title( first, second );
 }
 
-
-/**
- * Compare two items according to the title, with the nodes first in the list
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_title_nodes_first( const playlist_item_t *first,
-                                           const playlist_item_t *second )
+SORTFN( SORT_TITLE_NODES_FIRST, first, second )
 {
     /* If first is a node but not second */
     if( first->i_children == -1 && second->i_children >= 0 )
@@ -408,15 +287,7 @@ static int playlist_cmp_title_nodes_first( const playlist_item_t *first,
         return meta_strcasecmp_title( first, second );
 }
 
-
-/**
- * Compare two item according to the title as a numeric value
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_title_num( const playlist_item_t *first,
-                                   const playlist_item_t *second )
+SORTFN( SORT_TITLE_NUMERIC, first, second )
 {
     int i_ret;
     char *psz_first = input_item_GetTitleFbName( first->p_input );
@@ -436,28 +307,12 @@ static int playlist_cmp_title_num( const playlist_item_t *first,
     return i_ret;
 }
 
-
-/**
- * Compare two item according to the track number
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_track_num( const playlist_item_t *first,
-                                   const playlist_item_t *second )
+SORTFN( SORT_TRACK_NUMBER, first, second )
 {
     return meta_sort( first, second, vlc_meta_TrackNumber, true );
 }
 
-
-/**
- * Compare two item according to the URI
- * @param first: the first item
- * @param second: the second item
- * @return -1, 0 or 1 like strcmp
- */
-static int playlist_cmp_uri( const playlist_item_t *first,
-                             const playlist_item_t *second )
+SORTFN( SORT_URI, first, second )
 {
     int i_ret;
     char *psz_first = input_item_GetURI( first->p_input );
@@ -477,4 +332,32 @@ static int playlist_cmp_uri( const playlist_item_t *first,
     return i_ret;
 }
 
+#undef  SORTFN
+
+/* Generate stubs around the proto_## sorting functions, ascending and
+ * descending both. Preprocessor magic up ahead. Brace yourself.
+ */
+
+#ifndef VLC_DEFINE_SORT_FUNCTIONS
+#error  Where is VLC_DEFINE_SORT_FUNCTIONS?
+#endif
+
+#define DEF( s ) \
+	static int cmp_a_##s(const void *l,const void *r) \
+	{ return proto_##s(*(const playlist_item_t *const *)l, \
+                           *(const playlist_item_t *const *)r); } \
+	static int cmp_d_##s(const void *l,const void *r) \
+	{ return -1*proto_##s(*(const playlist_item_t * const *)l, \
+                              *(const playlist_item_t * const *)r); }
+
+	VLC_DEFINE_SORT_FUNCTIONS
+
+#undef  DEF
+
+/* And populate an array with the addresses */
+
+static const sortfn_t sorting_fns[NUM_SORT_FNS][2] =
+#define DEF( a ) { cmp_a_##a, cmp_d_##a },
+{ VLC_DEFINE_SORT_FUNCTIONS };
+#undef  DEF
 
