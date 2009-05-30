@@ -199,6 +199,12 @@ static inline void picture_CopyProperties( picture_t *p_dst, const picture_t *p_
 }
 
 /**
+ * This function will reset a picture informations (properties and quantizers).
+ * It is sometimes usefull for reusing pictures (like from a pool).
+ */
+VLC_EXPORT( void, picture_Reset, ( picture_t * ) );
+
+/**
  * This function will copy the picture pixels.
  * You can safely copy between pictures that do not have the same size,
  * only the compatible(smaller) part will be copied.

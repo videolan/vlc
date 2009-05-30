@@ -652,6 +652,20 @@ static void PictureReleaseCallback( picture_t *p_picture )
 /*****************************************************************************
  *
  *****************************************************************************/
+void picture_Reset( picture_t *p_picture )
+{
+    /* */
+    p_picture->date = VLC_TS_INVALID;
+    p_picture->b_force = false;
+    p_picture->b_progressive = false;
+    p_picture->i_nb_fields = 0;
+    p_picture->b_top_field_first = false;
+    picture_CleanupQuant( p_picture );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
 int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
 {
     int i_index, i_width_aligned, i_height_aligned;
