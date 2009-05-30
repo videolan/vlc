@@ -45,16 +45,12 @@
 static void osd_UpdateState( osd_menu_state_t *, int, int, int, int, picture_t * );
 static inline osd_state_t *osd_VolumeStateChange( osd_state_t *, int );
 static int osd_VolumeStep( vlc_object_t *, int, int );
-static bool osd_isVisible( osd_menu_t *p_osd );
 static bool osd_ParserLoad( osd_menu_t *, const char * );
 static void osd_ParserUnload( osd_menu_t * );
 
-static bool osd_isVisible( osd_menu_t *p_osd )
+static inline bool osd_isVisible( osd_menu_t *p_osd )
 {
-    vlc_value_t val;
-
-    var_Get( p_osd, "osd-menu-visible", &val );
-    return val.b_bool;
+    return var_GetBool( p_osd, "osd-menu-visible" );
 }
 
 static vlc_mutex_t *osd_GetMutex( vlc_object_t *p_this )
@@ -81,13 +77,13 @@ static bool osd_ParserLoad( osd_menu_t *p_menu, const char *psz_file )
     }
     else
     {
-        char *psz_type;
-        char *psz_ext = strrchr( p_menu->psz_file, '.' );
+        const char *psz_type;
+        const char *psz_ext = strrchr( p_menu->psz_file, '.' );
 
         if( psz_ext && !strcmp( psz_ext, ".cfg") )
-            psz_type = (char*)"import-osd";
+            psz_type = "import-osd";
         else
-            psz_type = (char*)"import-osd-xml";
+            psz_type = "import-osd-xml";
 
         p_menu->p_parser = module_need( p_menu, "osd parser",
                                         psz_type, true );
