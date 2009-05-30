@@ -276,6 +276,13 @@ path_sanitize
 picture_CopyPixels
 picture_Delete
 picture_Export
+picture_fifo_Delete
+picture_fifo_Flush
+picture_fifo_New
+picture_fifo_OffsetDate
+picture_fifo_Peek
+picture_fifo_Pop
+picture_fifo_Push
 picture_New
 picture_Reset
 picture_Setup
