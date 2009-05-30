@@ -916,24 +916,64 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int
 /*****************************************************************************
  *
  *****************************************************************************/
-picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
+picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_resource_t *p_resource )
 {
+    video_format_t fmt = *p_fmt;
+
+    /* It is needed to be sure all informations are filled */
+    video_format_Setup( &fmt, p_fmt->i_chroma,
+                              p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
+
+    /* */
     picture_t *p_picture = calloc( 1, sizeof(*p_picture) );
     if( !p_picture )
         return NULL;
 
-    if( __vout_AllocatePicture( NULL, p_picture,
-                                i_chroma, i_width, i_height, i_aspect ) )
+    if( p_resource )
     {
-        free( p_picture );
-        return NULL;
-    }
+        if( picture_Setup( p_picture, fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect ) )
+        {
+            free( p_picture );
+            return NULL;
+        }
+        p_picture->p_sys = p_resource->p_sys;
 
+        for( int i = 0; i < p_picture->i_planes; i++ )
+        {
+            p_picture->p[i].p_pixels = p_resource->p[i].p_pixels;
+            p_picture->p[i].i_lines  = p_resource->p[i].i_lines;
+            p_picture->p[i].i_pitch  = p_resource->p[i].i_pitch;
+        }
+    }
+    else
+    {
+        if( __vout_AllocatePicture( NULL, p_picture,
+                                    fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect ) )
+        {
+            free( p_picture );
+            return NULL;
+        }
+    }
+    /* */
+    p_picture->format = fmt;
     p_picture->i_refcount = 1;
     p_picture->pf_release = PictureReleaseCallback;
     p_picture->i_status = RESERVED_PICTURE;
 
     return p_picture;
+}
+picture_t *picture_NewFromFormat( const video_format_t *p_fmt )
+{
+    return picture_NewFromResource( p_fmt, NULL );
+}
+picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
+{
+    video_format_t fmt;
+
+    memset( &fmt, 0, sizeof(fmt) );
+    video_format_Setup( &fmt, i_chroma, i_width, i_height, i_aspect );
+
+    return picture_NewFromFormat( &fmt );
 }
 
 /*****************************************************************************

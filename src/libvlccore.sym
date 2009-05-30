@@ -284,6 +284,8 @@ picture_fifo_Peek
 picture_fifo_Pop
 picture_fifo_Push
 picture_New
+picture_NewFromFormat
+picture_NewFromResource
 picture_pool_Delete
 picture_pool_Get
 picture_pool_New

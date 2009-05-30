@@ -52,6 +52,11 @@ typedef struct plane_t
 } plane_t;
 
 /**
+ * Maximum number of plane for a picture
+ */
+#define PICTURE_PLANE_MAX (VOUT_MAX_PLANES)
+
+/**
  * A private definition to help overloading picture release
  */
 typedef struct picture_release_sys_t picture_release_sys_t;
@@ -76,7 +81,7 @@ struct picture_t
      * wishes, it can even swap p_pixels buffers. */
     uint8_t        *p_data;
     void           *p_data_orig;                /**< pointer before memalign */
-    plane_t         p[ VOUT_MAX_PLANES ];     /**< description of the planes */
+    plane_t         p[PICTURE_PLANE_MAX];     /**< description of the planes */
     int             i_planes;                /**< number of allocated planes */
 
     /** \name Type and flags
@@ -131,6 +136,40 @@ struct picture_t
  * p_sys, p_q, p_data_orig fields if non NULL.
  */
 VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
+
+/**
+ * This function will create a new picture using the given format.
+ *
+ * When possible, it is prefered to use this function over picture_New
+ * as more information about the format is kept.
+ */
+VLC_EXPORT( picture_t *, picture_NewFromFormat, ( const video_format_t *p_fmt ) );
+
+/**
+ * Resource for a picture.
+ */
+typedef struct
+{
+    picture_sys_t *p_sys;
+
+    /* Plane resources
+     * XXX all fields MUST be set to the right value.
+     */
+    struct
+    {
+        uint8_t *p_pixels;  /**< Start of the plane's data */
+        int i_lines;        /**< Number of lines, including margins */
+        int i_pitch;        /**< Number of bytes in a line, including margins */
+    } p[PICTURE_PLANE_MAX];
+
+} picture_resource_t;
+
+/**
+ * This function will create a new picture using the provided resource.
+ *
+ * If the resource is NULL then a plain picture_NewFromFormat is returned.
+ */
+VLC_EXPORT( picture_t *, picture_NewFromResource, ( const video_format_t *, const picture_resource_t * ) );
 
 /**
  * This function will force the destruction a picture.
