@@ -156,6 +156,10 @@ endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
+X264CC+= CC="/Developer/usr/bin/gcc-4.2"
+X264CC+= CXX="/Developer/usr/bin/g++-4.2"
+else
+X264CC+= $(HOSTCC)
 endif
 
 ifdef HAVE_AMR
@@ -1435,10 +1439,10 @@ ifdef HAVE_WIN32
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
   .x264: x264 .yasm
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(X264CC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
   .x264: x264
-	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(X264CC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 endif
 endif
 	touch $@
