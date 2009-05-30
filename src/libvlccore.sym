@@ -284,6 +284,11 @@ picture_fifo_Peek
 picture_fifo_Pop
 picture_fifo_Push
 picture_New
+picture_pool_Delete
+picture_pool_Get
+picture_pool_New
+picture_pool_NewFromFormat
+picture_pool_NonEmpty
 picture_Reset
 picture_Setup
 plane_CopyPixels

@@ -39,6 +39,7 @@
 #include <vlc_image.h>
 #include <vlc_block.h>
 #include <vlc_picture_fifo.h>
+#include <vlc_picture_pool.h>
 
 #include "vout_pictures.h"
 #include "vout_internal.h"
@@ -1185,5 +1186,155 @@ void picture_fifo_Delete( picture_fifo_t *p_fifo )
 {
     picture_fifo_Flush( p_fifo, INT64_MAX, true );
     vlc_mutex_destroy( &p_fifo->lock );
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+struct picture_release_sys_t
+{
+    /* Saved release */
+    void (*pf_release)( picture_t * );
+    picture_release_sys_t *p_release_sys;
+
+    /* */
+    int64_t i_tick;
+};
+
+struct picture_pool_t
+{
+    int64_t i_tick;
+
+    int i_picture;
+    picture_t **pp_picture;
+};
+
+static void PicturePoolPictureRelease( picture_t * );
+
+picture_pool_t *picture_pool_New( int i_picture, picture_t *pp_picture[] )
+{
+    picture_pool_t *p_pool = calloc( 1, sizeof(*p_pool) );
+    if( !p_pool )
+        return NULL;
+
+    p_pool->i_tick = 1;
+    p_pool->i_picture = i_picture;
+    p_pool->pp_picture = calloc( p_pool->i_picture, sizeof(*p_pool->pp_picture) );
+
+    for( int i = 0; i < i_picture; i++ )
+    {
+        picture_t *p_picture = pp_picture[i];
+
+        /* The pool must be the only owner of the picture */
+        assert( p_picture->i_refcount == 1 );
+
+        /* Install the new release callback */
+        picture_release_sys_t *p_release_sys = malloc( sizeof(*p_release_sys) );
+        p_release_sys->pf_release = p_picture->pf_release;
+        p_release_sys->p_release_sys = p_picture->p_release_sys;
+        p_release_sys->i_tick = 0;
+
+        p_picture->i_refcount = 0;
+        p_picture->pf_release = PicturePoolPictureRelease;
+        p_picture->p_release_sys = p_release_sys;
+
+        /* */
+        p_pool->pp_picture[i] = p_picture;
+    }
+    return p_pool;
+}
+
+picture_pool_t *picture_pool_NewFromFormat( const video_format_t *p_fmt, int i_picture )
+{
+    picture_t *pp_picture[i_picture];
+
+    for( int i = 0; i < i_picture; i++ )
+    {
+        pp_picture[i] = picture_New( p_fmt->i_chroma,
+                                     p_fmt->i_width, p_fmt->i_height,
+                                     p_fmt->i_aspect );
+        if( !pp_picture[i] )
+            goto error;
+    }
+    picture_pool_t *p_pool = picture_pool_New( i_picture, pp_picture );
+    if( !p_pool )
+        goto error;
+
+    return p_pool;
+
+error:
+    for( int i = 0; i < i_picture; i++ )
+    {
+        if( !pp_picture[i] )
+            break;
+        picture_Release( pp_picture[i] );
+    }
+    return NULL;
+}
+
+void picture_pool_Delete( picture_pool_t *p_pool )
+{
+    for( int i = 0; i < p_pool->i_picture; i++ )
+    {
+        picture_t *p_picture = p_pool->pp_picture[i];
+        picture_release_sys_t *p_release_sys = p_picture->p_release_sys;
+
+        assert( p_picture->i_refcount == 0 );
+
+        /* Restore old release callback */
+        p_picture->i_refcount = 1;
+        p_picture->pf_release = p_release_sys->pf_release;
+        p_picture->p_release_sys = p_release_sys->p_release_sys;
+
+        picture_Release( p_picture );
+
+        free( p_release_sys );
+    }
+    free( p_pool );
+}
+
+picture_t *picture_pool_Get( picture_pool_t *p_pool )
+{
+    for( int i = 0; i < p_pool->i_picture; i++ )
+    {
+        picture_t *p_picture = p_pool->pp_picture[i];
+
+        if( p_picture->i_refcount <= 0 )
+        {
+            p_picture->p_release_sys->i_tick = p_pool->i_tick++;
+            picture_Hold( p_picture );
+            return p_picture;
+        }
+    }
+    return NULL;
+}
+
+void picture_pool_NonEmpty( picture_pool_t *p_pool, bool b_reset )
+{
+    picture_t *p_old = NULL;
+
+    for( int i = 0; i < p_pool->i_picture; i++ )
+    {
+        picture_t *p_picture = p_pool->pp_picture[i];
+
+        if( b_reset )
+            p_picture->i_refcount = 0;
+        else if( p_picture->i_refcount == 0 )
+            return;
+        else if( !p_old || p_picture->p_release_sys->i_tick < p_old->p_release_sys->i_tick )
+            p_old = p_picture;
+    }
+    if( !b_reset && p_old )
+        p_old->i_refcount = 0;
+}
+
+static void PicturePoolPictureRelease( picture_t *p_picture )
+{
+    assert( p_picture->i_refcount > 0 );
+
+    if( --p_picture->i_refcount > 0 )
+        return;
+
+    /* Nothing to do for the moment */
 }
 
