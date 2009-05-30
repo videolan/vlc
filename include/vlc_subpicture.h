@@ -176,6 +176,15 @@ VLC_EXPORT( subpicture_t *, subpicture_New, ( void ) );
  */
 VLC_EXPORT( void,  subpicture_Delete, ( subpicture_t *p_subpic ) );
 
+/**
+ * This function will create a subpicture having one region in the requested
+ * chroma showing the given picture.
+ *
+ * The picture_t given is not released nor used inside the
+ * returned subpicture_t.
+ */
+VLC_EXPORT( subpicture_t *, subpicture_NewFromPicture, ( vlc_object_t *, picture_t *, vlc_fourcc_t i_chroma ) );
+
 /**@}*/
 
 #endif /* _VLC_VIDEO_H */
