@@ -799,27 +799,20 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
             {
                 if( (argCount < 1) || (argCount > 3) )
                     return INVOKERESULT_NO_SUCH_METHOD;
-
-                char *url = NULL;
+                if( !NPVARIANT_IS_STRING(args[0]) )
+                    return INVOKERESULT_NO_SUCH_METHOD;
 
                 // grab URL
-                if( NPVARIANT_IS_STRING(args[0]) )
-                {
-                    char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
-                    if( s )
-                    {
-                        url = p_plugin->getAbsoluteURL(s);
-                        if( url )
-                            free(s);
-                        else
-                            // problem with combining url, use argument
-                            url = s;
-                    }
-                    else
-                        return INVOKERESULT_OUT_OF_MEMORY;
-                }
+                char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
+                if( !s )
+                    return INVOKERESULT_OUT_OF_MEMORY;
+
+                char *url = p_plugin->getAbsoluteURL(s);
+                if( url )
+                    free(s);
                 else
-                    return INVOKERESULT_NO_SUCH_METHOD;
+                    // problem with combining url, use argument
+                    url = s;
 
                 char *name = NULL;
 
