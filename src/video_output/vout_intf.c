@@ -461,56 +461,22 @@ void vout_IntfInit( vout_thread_t *p_vout )
  */
 static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    video_format_t fmt_in = p_pic->format;
-    video_format_t fmt_out;
-    picture_t *p_pip;
-    subpicture_t *p_subpic;
-
-    /* */
-    memset( &fmt_out, 0, sizeof(fmt_out) );
-    fmt_out = fmt_in;
-    fmt_out.i_chroma = VLC_CODEC_YUVA;
-
-    /* */
-    image_handler_t *p_image = image_HandlerCreate( p_vout );
-    if( !p_image )
-        return VLC_EGENERIC;
-
-    p_pip = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
-
-    image_HandlerDelete( p_image );
-
-    if( !p_pip )
-        return VLC_EGENERIC;
-
-    p_subpic = subpicture_New();
+    subpicture_t *p_subpic = subpicture_NewFromPicture( VLC_OBJECT(p_vout),
+                                                        p_pic, VLC_CODEC_YUVA );
     if( !p_subpic )
-    {
-         picture_Release( p_pip );
-         return VLC_EGENERIC;
-    }
+        return VLC_EGENERIC;
 
+    /* FIXME DEFAULT_CHAN is not good (used by the text) but
+     * hardcoded 0 doesn't seem right */
     p_subpic->i_channel = 0;
     p_subpic->i_start = mdate();
-    p_subpic->i_stop = mdate() + 4000000;
+    p_subpic->i_stop  = p_subpic->i_start + 4000000;
     p_subpic->b_ephemer = true;
     p_subpic->b_fade = true;
-    p_subpic->i_original_picture_width = fmt_out.i_width * 4;
-    p_subpic->i_original_picture_height = fmt_out.i_height * 4;
-    fmt_out.i_aspect = 0;
-    fmt_out.i_sar_num =
-    fmt_out.i_sar_den = 0;
 
-    p_subpic->p_region = subpicture_region_New( &fmt_out );
-    if( p_subpic->p_region )
-    {
-        picture_Release( p_subpic->p_region->p_picture );
-        p_subpic->p_region->p_picture = p_pip;
-    }
-    else
-    {
-        picture_Release( p_pip );
-    }
+    /* Reduce the picture to 1/4^2 of the screen */
+    p_subpic->i_original_picture_width  *= 4;
+    p_subpic->i_original_picture_height *= 4;
 
     spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
     return VLC_SUCCESS;
