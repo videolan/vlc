@@ -1,7 +1,7 @@
 /*****************************************************************************
  * visual.h : Header for the visualisation system
  *****************************************************************************
- * Copyright (C) 2002 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
@@ -23,10 +23,10 @@
 
 typedef struct visual_effect_t
 {
-    char *     psz_name;    /* Filter name*/
+    const char *psz_name;    /* Filter name*/
 
-    int         (*pf_run)( struct visual_effect_t * , aout_instance_t *,
-                           aout_buffer_t *, picture_t *);
+    int        (*pf_run)( struct visual_effect_t * , aout_instance_t *,
+                          aout_buffer_t *, picture_t *);
     void *     p_data; /* The effect stores whatever it wants here */
     int        i_width;
     int        i_height;

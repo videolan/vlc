@@ -1,7 +1,7 @@
 /*****************************************************************************
  * visual.c : Visualisation system
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
@@ -243,7 +243,7 @@ static int Open( vlc_object_t *p_this )
                               strlen( pf_effect_run[i].psz_name ) ) )
             {
                 p_effect->pf_run = pf_effect_run[i].pf_run;
-                p_effect->psz_name = strdup( pf_effect_run[i].psz_name );
+                p_effect->psz_name = pf_effect_run[i].psz_name;
                 break;
             }
         }
@@ -261,7 +261,6 @@ static int Open( vlc_object_t *p_this )
                 if( ( psz_eoa = strchr( psz_parser, '}') ) == NULL )
                 {
                    msg_Err( p_filter, "unable to parse effect list. Aborting");
-                   free( p_effect->psz_name );
                    free( p_effect );
                    break;
                 }
@@ -314,7 +313,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_filter, "no suitable vout module" );
         for( int i = 0; i < p_sys->i_effect; i++ )
         {
-            free( p_sys->effect[i]->psz_name );
             free( p_sys->effect[i]->psz_args );
             free( p_sys->effect[i] );
         }
@@ -404,7 +402,6 @@ static void Close( vlc_object_t *p_this )
             free( ( ( spectrum_data * )p_effect->p_data )->prev_heights );
         }
         free( p_effect->p_data );
-        free( p_effect->psz_name );
         free( p_effect->psz_args );
         free( p_effect );
 #undef p_effect
