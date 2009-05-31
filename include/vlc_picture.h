@@ -183,11 +183,14 @@ VLC_EXPORT( void, picture_Delete, ( picture_t * ) );
 /**
  * This function will increase the picture reference count.
  * It will not have any effect on picture obtained from vout
+ *
+ * It returns the given picture for convenience.
  */
-static inline void picture_Hold( picture_t *p_picture )
+static inline picture_t *picture_Hold( picture_t *p_picture )
 {
     if( p_picture->pf_release )
         p_picture->i_refcount++;
+    return p_picture;
 }
 /**
  * This function will release a picture.
