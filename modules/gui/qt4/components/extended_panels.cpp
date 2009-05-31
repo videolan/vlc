@@ -347,7 +347,7 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     if( p_vout )
     {
         if( !strcmp( psz_filter_type, "sub-filter" ) )
-            var_SetString( p_vout->p_spu, psz_filter_type, psz_string );
+            var_SetString( vout_GetSpu( p_vout ), psz_filter_type, psz_string );
         else
             var_SetString( p_vout, psz_filter_type, psz_string );
         vlc_object_release( p_vout );

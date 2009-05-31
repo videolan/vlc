@@ -344,7 +344,7 @@ void VlcProc::refreshInput()
         pVarHasVout->set( pVout != NULL );
         if( pVout )
         {
-            pVarFullscreen->set( pVout->b_fullscreen );
+            pVarFullscreen->set( var_GetBool( pVout, "fullscreen" ) );
             vlc_object_release( pVout );
         }
 

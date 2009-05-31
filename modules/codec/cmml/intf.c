@@ -157,7 +157,7 @@ void CloseIntf ( decoder_sys_t *p_intf )
     if( p_vout )
     {
         /* enable CMML as a subtitle track */
-        spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR, DEFAULT_CHAN );
+        spu_Control( vout_GetSpu( p_vout ), SPU_CHANNEL_CLEAR, DEFAULT_CHAN );
         vlc_object_release( p_vout );
     }
 
