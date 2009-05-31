@@ -58,7 +58,7 @@ int OpenIntf ( vlc_object_t *p_this )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        return( 1 );
+        return VLC_ENOMEM;
     }
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
