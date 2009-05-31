@@ -416,7 +416,8 @@ config_chain_t *config_ChainDuplicate( const config_chain_t *p_src )
 {
     config_chain_t *p_dst = NULL;
     config_chain_t **pp_last = &p_dst;
-    while( p_src )
+
+    for( ; p_src != NULL; p_src = p_src->p_next )
     {
         config_chain_t *p = malloc( sizeof(*p) );
         if( !p )
