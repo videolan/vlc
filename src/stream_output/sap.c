@@ -214,12 +214,7 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
     bool b_ipv6 = false, b_ssm = false;
     sap_session_t *p_sap_session;
     mtime_t i_hash;
-    union
-    {
-        struct sockaddr     a;
-        struct sockaddr_in  in;
-        struct sockaddr_in6 in6;
-    } addr;
+    struct sockaddr_storage addr;
     socklen_t addrlen;
 
     addrlen = p_session->addrlen;
@@ -232,13 +227,13 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
     /* Determine SAP multicast address automatically */
     memcpy (&addr, &p_session->addr, addrlen);
 
-    switch (addr.a.sa_family)
+    switch( p_session->addr.ss_family )
     {
 #if defined (HAVE_INET_PTON) || defined (WIN32)
         case AF_INET6:
         {
             /* See RFC3513 for list of valid IPv6 scopes */
-            struct in6_addr *a6 = &addr.in6.sin6_addr;
+            struct in6_addr *a6 = &((struct sockaddr_in6 *)&addr)->sin6_addr;
 
             memcpy( a6->s6_addr + 2, "\x00\x00\x00\x00\x00\x00"
                    "\x00\x00\x00\x00\x00\x02\x7f\xfe", 14 );
@@ -262,28 +257,29 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
         case AF_INET:
         {
             /* See RFC2365 for IPv4 scopes */
-            uint32_t ipv4 = addr.in.sin_addr.s_addr;
+            uint32_t ipv4;
 
+            ipv4 = ntohl( ((struct sockaddr_in *)&addr)->sin_addr.s_addr );
             /* 224.0.0.0/24 => 224.0.0.255 */
-            if ((ipv4 & htonl (0xffffff00)) == htonl (0xe0000000))
-                ipv4 =  htonl (0xe00000ff);
+            if ((ipv4 & 0xffffff00) == 0xe0000000)
+                ipv4 =  0xe00000ff;
             else
             /* 239.255.0.0/16 => 239.255.255.255 */
-            if ((ipv4 & htonl (0xffff0000)) == htonl (0xefff0000))
-                ipv4 =  htonl (0xefffffff);
+            if ((ipv4 & 0xffff0000) == 0xefff0000)
+                ipv4 =  0xefffffff;
             else
             /* 239.192.0.0/14 => 239.195.255.255 */
-            if ((ipv4 & htonl (0xfffc0000)) == htonl (0xefc00000))
-                ipv4 =  htonl (0xefc3ffff);
+            if ((ipv4 & 0xfffc0000) == 0xefc00000)
+                ipv4 =  0xefc3ffff;
             else
-            if ((ipv4 & htonl (0xff000000)) == htonl (0xef000000))
+            if ((ipv4 & 0xff000000) == 0xef000000)
                 ipv4 = 0;
             else
             /* other addresses => 224.2.127.254 */
             {
                 /* SSM: 232.0.0.0/8 */
-                b_ssm = (ipv4 & htonl (255 << 24)) == htonl (232 << 24);
-                ipv4 = htonl (0xe0027ffe);
+                b_ssm = (ipv4 >> 24) == 232;
+                ipv4 = 0xe0027ffe;
             }
 
             if( ipv4 == 0 )
@@ -293,17 +289,17 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
                 return VLC_EGENERIC;
             }
 
-            addr.in.sin_addr.s_addr = ipv4;
+            ((struct sockaddr_in *)&addr)->sin_addr.s_addr = htonl( ipv4 );
             break;
         }
 
         default:
             msg_Err( p_sap, "Address family %d not supported by SAP",
-                     addr.a.sa_family );
+                     addr.ss_family );
             return VLC_EGENERIC;
     }
 
-    i = vlc_getnameinfo( &addr.a, addrlen,
+    i = vlc_getnameinfo( (struct sockaddr *)&addr, addrlen,
                          psz_addr, sizeof( psz_addr ), NULL, NI_NUMERICHOST );
 
     if( i )
