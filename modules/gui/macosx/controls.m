@@ -110,6 +110,7 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     
+    [o_fs_panel release];
     [o_repeat_single release];
     [o_repeat_all release];
     [o_repeat_off release];
