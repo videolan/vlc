@@ -50,6 +50,7 @@ static inline void *realloc_down( void *ptr, size_t size )
     {                                                                         \
         if( !i_oldsize ) (p_ar) = NULL;                                       \
         (p_ar) = VLCCVP realloc( p_ar, ((i_oldsize) + 1) * sizeof(*(p_ar)) ); \
+        if( !(p_ar) ) abort();                                                \
         if( (i_oldsize) - (i_pos) )                                           \
         {                                                                     \
             memmove( (p_ar) + (i_pos) + 1, (p_ar) + (i_pos),                  \
@@ -99,6 +100,7 @@ static inline void *realloc_down( void *ptr, size_t size )
         (tab) = cast realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
     else                                        \
         (tab) = cast malloc( sizeof( void ** ) );    \
+    if( !(tab) ) abort();                       \
     (tab)[count] = (p);                         \
     (count)++;                                  \
   } while(0)
@@ -149,6 +151,7 @@ static inline void *realloc_down( void *ptr, size_t size )
         (tab) = cast realloc( tab, sizeof( void ** ) * ( (count) + 1 ) ); \
     else                                        \
         (tab) = cast malloc( sizeof( void ** ) );       \
+    if( !(tab) ) abort();                       \
     if( (count) - (index) > 0 )                 \
         memmove( (void**)(tab) + (index) + 1,   \
                  (void**)(tab) + (index),       \
@@ -197,6 +200,7 @@ static inline void *realloc_down( void *ptr, size_t size )
     (array).i_alloc = newsize;                                              \
     (array).p_elems = VLCCVP realloc( (array).p_elems, (array).i_alloc *    \
                                     sizeof(*(array).p_elems) );             \
+    if( !(array).p_elems ) abort();                                         \
 }
 
 #define _ARRAY_GROW1(array) {                                               \
