@@ -93,6 +93,7 @@ David Thiel - security audit and report
 David Weber <david_weber at gmx.de> - Mac OS X interface design & graphics (v0.5.0)
 Davor Orel <syntheticamac at yahoo.it> - Mac OS X icons
 Dennis Lou <dlou99 at yahoo dot com> - ATSC support in the DVB module, MPEG2 support in the v4l2 module
+Dennis Perov - Hardware donation
 Dennis van Amerongen <Dennis dot vanAmerongen at nob dot nl> - x264 options unification
 Dermot McGahon <dermot at dspsrv dot com> - Bug fixes, RC interface loop and repeat
 Diego Petteno <flameeyes at gentoo dot org> - remove usage of internal ffmpeg symbols, configure fixes
