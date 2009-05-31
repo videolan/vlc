@@ -79,6 +79,8 @@ pluginsinclude_HEADERS = \
 	../include/vlc_mtime.h \
 	../include/vlc_objects.h \
 	../include/vlc_picture.h \
+	../include/vlc_picture_fifo.h \
+	../include/vlc_picture_pool.h \
 	../include/vlc_playlist.h \
 	../include/vlc_plugin.h \
 	../include/vlc_rand.h \
