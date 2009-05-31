@@ -154,6 +154,7 @@ typedef struct
     bool            b_muxed;
     bool            b_quicktime;
     bool            b_asf;
+    bool            b_discard_trunc;
     stream_t        *p_out_muxed;    /* for muxed stream */
 
     uint8_t         *p_buffer;
@@ -784,6 +785,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->b_quicktime = false;
             tk->b_asf       = false;
             tk->b_muxed     = false;
+            tk->b_discard_trunc = false;
             tk->p_out_muxed = NULL;
             tk->waiting     = 0;
             tk->b_rtcp_sync = false;
@@ -1001,6 +1003,7 @@ static int SessionsSetup( demux_t *p_demux )
                 else if( !strcmp( sub->codecName(), "DV" ) )
                 {
                     tk->b_muxed = true;
+                    tk->b_discard_trunc = true;
                     tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv",
                                                        p_demux->out );
                 }
@@ -1618,20 +1621,30 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     /* grow buffer if it looks like buffer is too small, but don't eat
      * up all the memory on strange streams */
-    if( i_truncated_bytes > 0 && tk->i_buffer < 2000000 )
+    if( i_truncated_bytes > 0 )
     {
-        void *p_tmp;
-        msg_Dbg( p_demux, "lost %d bytes", i_truncated_bytes );
-        msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer * 2 );
-        p_tmp = realloc( tk->p_buffer, tk->i_buffer * 2 );
-        if( p_tmp == NULL )
+        if( tk->i_buffer < 2000000 )
         {
-            msg_Warn( p_demux, "realloc failed" );
+            void *p_tmp;
+            msg_Dbg( p_demux, "lost %d bytes", i_truncated_bytes );
+            msg_Dbg( p_demux, "increasing buffer size to %d", tk->i_buffer * 2 );
+            p_tmp = realloc( tk->p_buffer, tk->i_buffer * 2 );
+            if( p_tmp == NULL )
+            {
+                msg_Warn( p_demux, "realloc failed" );
+            }
+            else
+            {
+                tk->p_buffer = (uint8_t*)p_tmp;
+                tk->i_buffer *= 2;
+            }
         }
-        else
+
+        if( tk->b_discard_trunc )
         {
-            tk->p_buffer = (uint8_t*)p_tmp;
-            tk->i_buffer *= 2;
+            p_sys->event = 0xff;
+            tk->waiting = 0;
+            return;
         }
     }
 
