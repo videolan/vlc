@@ -542,6 +542,7 @@ vout_DestroyPicture
 vout_DisplayPicture
 vout_EnableFilter
 vout_GetSnapshot
+vout_GetSpu
 vout_LinkPicture
 vout_OSDIcon
 __vout_OSDMessage

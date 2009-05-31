@@ -800,6 +800,11 @@ void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title )
     vlc_mutex_unlock( &p_vout->change_lock );
 }
 
+spu_t *vout_GetSpu( vout_thread_t *p_vout )
+{
+    return p_vout->p_spu;
+}
+
 /*****************************************************************************
  * InitThread: initialize video output thread
  *****************************************************************************

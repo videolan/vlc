@@ -310,6 +310,15 @@ VLC_EXPORT( void,            vout_LinkPicture,    ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_PlacePicture,   ( const vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 
+/**
+ * Return the spu_t object associated to a vout_thread_t.
+ *
+ * The return object is valid only as long as the vout is. You must not
+ * release the spu_t object returned.
+ * It cannot return NULL so no need to check.
+ */
+VLC_EXPORT( spu_t *, vout_GetSpu, ( vout_thread_t * ) );
+
 void vout_IntfInit( vout_thread_t * );
 VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,bool , bool  ) );
 
