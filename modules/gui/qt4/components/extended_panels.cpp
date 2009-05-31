@@ -1339,7 +1339,7 @@ SyncControls::SyncControls( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     QLabel *subSpeedLabel = new QLabel;
     subSpeedLabel->setText( qtr( "Speed of the subtitles:" ) );
-    subsLayout->addWidget( subSpeedLabel, 1, 0, 1, 3 );
+    subsLayout->addWidget( subSpeedLabel, 1, 0, 1, 1 );
 
     subSpeedSpin = new QDoubleSpinBox;
     subSpeedSpin->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
