@@ -279,6 +279,11 @@ VLC_EXPORT( char *, config_ChainCreate, ( char **ppsz_name, config_chain_t **pp_
 VLC_EXPORT( void, config_ChainDestroy, ( config_chain_t * ) );
 
 /**
+ * This function will duplicate a linked list of config_chain_t
+ */
+VLC_EXPORT( config_chain_t *, config_ChainDuplicate, ( const config_chain_t * ) );
+
+/**
  * This function will unescape a string in place and will return a pointer on
  * the given string.
  * No memory is allocated by it (unlike config_StringEscape).

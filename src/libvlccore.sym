@@ -51,6 +51,7 @@ block_Realloc
 __config_AddIntf
 config_ChainCreate
 config_ChainDestroy
+config_ChainDuplicate
 __config_ChainParse
 __config_ExistIntf
 config_FindConfig

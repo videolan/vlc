@@ -412,6 +412,25 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
     }
 }
 
+config_chain_t *config_ChainDuplicate( const config_chain_t *p_src )
+{
+    config_chain_t *p_dst = NULL;
+    config_chain_t **pp_last = &p_dst;
+    while( p_src )
+    {
+        config_chain_t *p = malloc( sizeof(*p) );
+        if( !p )
+            break;
+        p->p_next    = NULL;
+        p->psz_name  = p_src->psz_name  ? strdup( p_src->psz_name )  : NULL;
+        p->psz_value = p_src->psz_value ? strdup( p_src->psz_value ) : NULL;
+
+        *pp_last = p;
+        pp_last = &p->p_next;
+    }
+    return p_dst;
+}
+
 char *config_StringUnescape( char *psz_string )
 {
     char *psz_src = psz_string;
