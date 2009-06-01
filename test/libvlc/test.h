@@ -100,7 +100,7 @@ static inline void catch (void)
 static inline void test_init (void)
 {
     (void)test_default_sample; /* This one may not be used */
-    alarm (50); /* Make sure "make check" does not get stuck */
+    alarm (10); /* Make sure "make check" does not get stuck */
 }
 
 #endif /* TEST_H */
