@@ -933,6 +933,8 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_sys->p_va )
     {
+#ifdef HAVE_AVCODEC_VAAPI
+        /* hwaccel_context is not present in old fffmpeg version */
         if( VaSetup( p_sys->p_va,
                      &p_sys->p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
                      p_sys->p_context->width, p_sys->p_context->height ) )
@@ -940,6 +942,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
             msg_Err( p_dec, "VaSetup failed" );
             return -1;
         }
+#else
+        assert(0);
+#endif
 
         /* */
         p_ff_pic->type = FF_BUFFER_TYPE_USER;
