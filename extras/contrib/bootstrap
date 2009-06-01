@@ -77,6 +77,9 @@ case $HOST in
     *darwin10*)
          echo "ARCH=x86_64" >> config.mak
      ;;
+    *86_64*)
+          echo "ARCH=x86_64" >> config.mak
+     ;;
     *86*)
           echo "ARCH=i386" >> config.mak
      ;;
@@ -253,6 +256,15 @@ case $HOST in
         else
             cat src/Distributions/unix.mak >> distro.mak
         fi
+    ;;
+    *86_64*linux*)
+        EXTRA_CFLAGS=" -fPIC"
+        EXTRA_CPPFLAGS=" -fPIC"
+        EXTRA_LDFLAGS=" -L/usr/lib64"
+        echo "LIBRARY_PATH = /usr/lib64" >> config.mak
+        echo "PKG_CONFIG_PATH = /usr/lib64/pkgconfig" >> config.mak
+        echo "PKG_CONFIG_LIBDIR = /usr/lib64/pkgconfig" >> config.mak
+        cat src/Distributions/unix.mak >> distro.mak
     ;;
     *)
         if test "$HOST" = "$BUILD"; then
