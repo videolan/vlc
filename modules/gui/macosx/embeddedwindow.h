@@ -66,6 +66,7 @@
     VLCWindow       * o_fullscreen_window;
     NSViewAnimation * o_fullscreen_anim1;
     NSViewAnimation * o_fullscreen_anim2;
+    NSViewAnimation * o_makekey_anim;
     NSView          * o_temp_view;
     /* set to yes if we are fullscreen and all animations are over */
     BOOL              b_fullscreen;
