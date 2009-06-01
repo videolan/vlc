@@ -1128,7 +1128,7 @@ package-macosx: VLC-release.app ChangeLog
 # Note: We can't directly create a read only dmg as we do the bless stuff
 	echo "Make the disk image read-only"
 	mv "$(top_builddir)/vlc-$(VERSION).dmg" "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
-	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDZO -o "$(top_builddir)/vlc-$(VERSION).dmg"
+	hdiutil convert "$(top_builddir)/vlc-$(VERSION)-rw.dmg" -format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
 	rm "$(top_builddir)/vlc-$(VERSION)-rw.dmg"
 
 # We are done
