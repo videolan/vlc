@@ -108,9 +108,10 @@ static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_NextPts( decoder_t * );
 
+#ifdef HAVE_AVCODEC_VAAPI
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
-
+#endif
 
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
@@ -331,8 +332,10 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
     p_sys->p_context->opaque = p_dec;
 
+#ifdef HAVE_AVCODEC_VAAPI
     if( var_CreateGetBool( p_dec, "ffmpeg-hw" ) )
         p_sys->p_context->get_format = ffmpeg_GetFormat;
+#endif
 
     /* ***** misc init ***** */
     p_sys->input_pts = p_sys->input_dts = 0;
@@ -1120,6 +1123,7 @@ static void ffmpeg_NextPts( decoder_t *p_dec )
     }
 }
 
+#ifdef HAVE_AVCODEC_VAAPI
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
                                           const enum PixelFormat *pi_fmt )
 {
@@ -1168,4 +1172,5 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
     /* Fallback to default behaviour */
     return avcodec_default_get_format( p_codec, pi_fmt );
 }
+#endif
 
