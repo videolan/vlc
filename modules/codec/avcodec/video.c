@@ -731,6 +731,8 @@ void EndVideoDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    avcodec_flush_buffers( p_sys->p_context );
+
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
     free( p_sys->p_buffer_orig );
 }
