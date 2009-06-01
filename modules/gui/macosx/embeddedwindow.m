@@ -94,7 +94,7 @@
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
     o_fullscreen_window = nil;
-    o_fullscreen_anim1 = o_fullscreen_anim2 = nil;
+    o_makekey_anim = o_fullscreen_anim1 = o_fullscreen_anim2 = nil;
 
     /* Not fullscreen when we wake up */
     [o_btn_fullscreen setState: NO];
@@ -511,8 +511,8 @@
         - Keep at most 2 animation at a time
         - leaveFullscreen/enterFullscreen are the only responsible for releasing and alloc-ing
     */
-    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict1, nil]];
-    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict2, nil]];
+    o_fullscreen_anim1 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict1]];
+    o_fullscreen_anim2 = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict2]];
 
     [dict1 release];
     [dict2 release];
@@ -680,7 +680,11 @@
 - (void)animationDidEnd:(NSAnimation*)animation
 {
     NSArray *viewAnimations;
-
+    if( o_makekey_anim == animation )
+    {
+        [o_makekey_anim release];
+        return;
+    }
     if ([animation currentValue] < 1.0)
         return;
 
@@ -724,17 +728,19 @@
     [super setAlphaValue:0.0f];
     [super makeKeyAndOrderFront: sender];
 
-    NSMutableDictionary * dict = [[[NSMutableDictionary alloc] initWithCapacity:2] autorelease];
+    NSMutableDictionary * dict = [[NSMutableDictionary alloc] initWithCapacity:2];
     [dict setObject:self forKey:NSViewAnimationTargetKey];
     [dict setObject:NSViewAnimationFadeInEffect forKey:NSViewAnimationEffectKey];
 
-    NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
+    o_makekey_anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
+    [dict release];
 
-    [anim setAnimationBlockingMode: NSAnimationNonblocking];
-    [anim setDuration: 0.1];
-    [anim setFrameRate: 30];
+    [o_makekey_anim setAnimationBlockingMode: NSAnimationNonblocking];
+    [o_makekey_anim setDuration: 0.1];
+    [o_makekey_anim setFrameRate: 30];
+    [o_makekey_anim setDelegate: self];
 
-    [anim startAnimation];
+    [o_makekey_anim startAnimation];
     b_window_is_invisible = NO;
 
     /* fullscreenAnimation will be unlocked when animation ends */
@@ -771,7 +777,8 @@
             [NSValue valueWithRect:[self frame]], NSViewAnimationStartFrameKey,
             [NSValue valueWithRect:args->frame], NSViewAnimationEndFrameKey, nil];
 
-        NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObjects:dict, nil]];
+        NSViewAnimation * anim = [[NSViewAnimation alloc] initWithViewAnimations:[NSArray arrayWithObject:dict]];
+        [dict release];
 
         [anim setAnimationBlockingMode: NSAnimationNonblocking];
         [anim setDuration: 0.4];
