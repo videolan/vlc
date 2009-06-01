@@ -56,7 +56,7 @@
 #   include <sys/time.h>
 #endif
 
-#if defines(__APPLE__) && && !defined(__powerpc__) && !defined(__ppc__) && !defined(__ppc64__)
+#if defined(__APPLE__) && !defined(__powerpc__) && !defined(__ppc__) && !defined(__ppc64__)
 #define USE_APPLE_MACH 1
 #   include <mach/mach.h>
 #   include <mach/mach_time.h>
