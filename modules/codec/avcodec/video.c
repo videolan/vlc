@@ -33,10 +33,14 @@
 #include <vlc_codec.h>
 #include <vlc_codecs.h>                               /* BITMAPINFOHEADER */
 #include <vlc_avcodec.h>
+#include <assert.h>
 
 /* ffmpeg header */
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
 #   include <libavcodec/avcodec.h>
+#   ifdef HAVE_AVCODEC_VAAPI
+#       include <libavcodec/vaapi.h>
+#   endif
 #elif defined(HAVE_FFMPEG_AVCODEC_H)
 #   include <ffmpeg/avcodec.h>
 #else
@@ -44,6 +48,7 @@
 #endif
 
 #include "avcodec.h"
+#include "vaapi.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -84,6 +89,9 @@ struct decoder_sys_t
 
     /* */
     bool b_flush;
+
+    /* VA API */
+    vlc_va_t *p_va;
 };
 
 /* FIXME (dummy palette for now) */
@@ -100,6 +108,10 @@ static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_NextPts( decoder_t * );
 
+static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
+                                          const enum PixelFormat * );
+
+
 static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 {
     uint8_t *p = (uint8_t*)&fcc;
@@ -114,7 +126,7 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
                                             AVCodecContext *p_context )
 {
-    picture_t *p_pic;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_dec->fmt_out.video.i_width = p_context->width;
     p_dec->fmt_out.video.i_height = p_context->height;
@@ -124,10 +136,12 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         return NULL; /* invalid display size */
     }
 
-    if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
+    if( !p_sys->p_va && GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) )
     {
-        /* we are doomed, but not really, because most codecs set their pix_fmt much later */
-        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
+        /* we are doomed, but not really, because most codecs set their pix_fmt
+         * much later
+         * FIXME does it make sense here ? */
+        p_dec->fmt_out.video.i_chroma = VLC_CODEC_I420;
     }
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
@@ -165,9 +179,7 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_frame_rate_base = p_context->time_base.num;
     }
 
-    p_pic = decoder_NewPicture( p_dec );
-
-    return p_pic;
+    return decoder_NewPicture( p_dec );
 }
 
 /*****************************************************************************
@@ -192,6 +204,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->psz_namecodec = psz_namecodec;
     p_sys->p_ff_pic = avcodec_alloc_frame();
     p_sys->b_delayed_open = true;
+    p_sys->p_va = NULL;
 
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_original_fourcc ?: p_dec->fmt_in.i_codec );
@@ -317,6 +330,9 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->reget_buffer = ffmpeg_ReGetFrameBuf;
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
     p_sys->p_context->opaque = p_dec;
+
+    if( var_CreateGetBool( p_dec, "ffmpeg-hw" ) )
+        p_sys->p_context->get_format = ffmpeg_GetFormat;
 
     /* ***** misc init ***** */
     p_sys->input_pts = p_sys->input_dts = 0;
@@ -618,7 +634,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_late_frames = 0;
         }
 
-        if( !b_drawpicture || !p_sys->p_ff_pic->linesize[0] )
+        if( !b_drawpicture || ( !p_sys->p_va && !p_sys->p_ff_pic->linesize[0] ) )
         {
             /* Do not display the picture */
             p_pic = (picture_t *)p_sys->p_ff_pic->opaque;
@@ -735,6 +751,9 @@ void EndVideoDec( decoder_t *p_dec )
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
     free( p_sys->p_buffer_orig );
+
+    if( p_sys->p_va )
+        VaDelete( p_sys->p_va );
 }
 
 /*****************************************************************************
@@ -837,6 +856,14 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     p_sys->b_delayed_open = false;
 
+    if( p_sys->p_va )
+    {
+        char psz_version[128];
+
+        VaVersion( p_sys->p_va, psz_version, sizeof(psz_version) );
+        msg_Info( p_dec, "Using VA API version %s for hardware decoding.", psz_version );
+    }
+
     return VLC_SUCCESS;
 }
 /*****************************************************************************
@@ -848,7 +875,11 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) == VLC_SUCCESS )
+    if( p_sys->p_va )
+    {
+        VaExtract( p_sys->p_va, p_pic, p_ff_pic );
+    }
+    else if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) == VLC_SUCCESS )
     {
         int i_plane, i_size, i_line;
         uint8_t *p_dst, *p_src;
@@ -898,11 +929,33 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     ffmpeg_SetFrameBufferPts( p_dec, p_ff_pic );
 
     /* */
-    p_ff_pic->opaque = 0;
+    p_ff_pic->opaque = NULL;
 
-    /* Not much to do in indirect rendering mode */
-    if( !p_sys->b_direct_rendering )
+    if( p_sys->p_va )
     {
+        if( VaSetup( p_sys->p_va,
+                     &p_sys->p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
+                     p_sys->p_context->width, p_sys->p_context->height ) )
+        {
+            msg_Err( p_dec, "VaSetup failed" );
+            return -1;
+        }
+
+        /* */
+        p_ff_pic->type = FF_BUFFER_TYPE_USER;
+        /* FIXME what is that, should give good value */
+        p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
+
+        if( VaGrabSurface( p_sys->p_va, p_ff_pic ) )
+        {
+            msg_Err( p_dec, "VaGrabSurface failed" );
+            return -1;
+        }
+        return 0;
+    }
+    else if( !p_sys->b_direct_rendering )
+    {
+        /* Not much to do in indirect rendering mode */
         return avcodec_default_get_buffer( p_context, p_ff_pic );
     }
 
@@ -1011,20 +1064,30 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
                                     AVFrame *p_ff_pic )
 {
     decoder_t *p_dec = (decoder_t *)p_context->opaque;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( !p_ff_pic->opaque )
+    if( p_sys->p_va )
+    {
+        VaUngrabSurface( p_sys->p_va, p_ff_pic );
+
+        /* */
+        for( int i = 0; i < 4; i++ )
+            p_ff_pic->data[i] = NULL;
+    }
+    else if( !p_ff_pic->opaque )
     {
         avcodec_default_release_buffer( p_context, p_ff_pic );
-        return;
     }
+    else
+    {
+        picture_t *p_pic = (picture_t*)p_ff_pic->opaque;
 
-    picture_t *p_pic = (picture_t*)p_ff_pic->opaque;
-    decoder_UnlinkPicture( p_dec, p_pic );
+        decoder_UnlinkPicture( p_dec, p_pic );
 
-    p_ff_pic->data[0] = NULL;
-    p_ff_pic->data[1] = NULL;
-    p_ff_pic->data[2] = NULL;
-    p_ff_pic->data[3] = NULL;
+        /* */
+        for( int i = 0; i < 4; i++ )
+            p_ff_pic->data[i] = NULL;
+    }
 }
 
 static void ffmpeg_NextPts( decoder_t *p_dec )
@@ -1051,3 +1114,53 @@ static void ffmpeg_NextPts( decoder_t *p_dec )
             (2 * p_sys->p_context->time_base.den);
     }
 }
+
+static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
+                                          const enum PixelFormat *pi_fmt )
+{
+    decoder_t *p_dec = p_codec->opaque;
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    if( p_sys->p_va )
+    {
+        VaDelete( p_sys->p_va );
+        p_sys->p_va = NULL;
+    }
+
+    /* Try too look for a supported hw acceleration */
+    for( int i = 0; pi_fmt[i] != PIX_FMT_NONE; i++ )
+    {
+        static const char *ppsz_name[PIX_FMT_NB] = {
+            [PIX_FMT_VDPAU_H264] = "PIX_FMT_VDPAU_H264",
+            [PIX_FMT_VAAPI_IDCT] = "PIX_FMT_VAAPI_IDCT",
+            [PIX_FMT_VAAPI_VLD] = "PIX_FMT_VAAPI_VLD",
+            [PIX_FMT_VAAPI_MOCO] = "PIX_FMT_VAAPI_MOCO",
+            [PIX_FMT_YUYV422] = "PIX_FMT_YUYV422",
+            [PIX_FMT_YUV420P] = "PIX_FMT_YUV420P",
+        };
+        msg_Dbg( p_dec, "Available decoder output format %d (%s)", pi_fmt[i], ppsz_name[pi_fmt[i]] ?: "Unknown" );
+
+        /* Only VLD supported */
+        if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
+        {
+            msg_Dbg( p_dec, "Trying VA API" );
+            p_sys->p_va = VaNew( p_sys->i_codec_id );
+            if( p_sys->p_va )
+            {
+                /* FIXME this will disabled direct rendering
+                 * even if a new pixel format is renegociated
+                 *
+                 * FIXME Try to call VaSetup when possible
+                 * to detect errors when possible (later is too late) */
+                p_sys->b_direct_rendering = false;
+                p_sys->p_context->draw_horiz_band = NULL;
+                return pi_fmt[i];
+            }
+            msg_Warn( p_dec, "Failed to open VA API" );
+        }
+    }
+
+    /* Fallback to default behaviour */
+    return avcodec_default_get_format( p_codec, pi_fmt );
+}
+

@@ -129,6 +129,9 @@ vlc_module_begin ()
 
     add_integer( "ffmpeg-debug", 0, NULL, DEBUG_TEXT, DEBUG_LONGTEXT,
                  true )
+#ifdef HAVE_AVCODEC_VAAPI
+    add_bool( "ffmpeg-hw", true, NULL, HW_TEXT, HW_LONGTEXT, true )
+#endif
 
 #ifdef ENABLE_SOUT
     /* encoder submodule */

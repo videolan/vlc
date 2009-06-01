@@ -127,6 +127,9 @@ void EndAudioDec( decoder_t *p_dec );
     "usually has a detrimental effect on quality. However it provides a big " \
     "speedup for high definition streams." )
 
+#define HW_TEXT N_("Hardware decoding")
+#define HW_LONGTEXT N_("This allows hardware decoding when available.")
+
 /*
  * Encoder options
  */
@@ -257,3 +260,6 @@ void EndAudioDec( decoder_t *p_dec );
 #   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
 #endif
 
+/* Uncomment it to enable compilation with vaapi (you also must change the build
+ * system) */
+//#define HAVE_AVCODEC_VAAPI 1
