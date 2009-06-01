@@ -156,10 +156,10 @@ endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
-X264CC+= CC="/Developer/usr/bin/gcc-4.2"
-X264CC+= CXX="/Developer/usr/bin/g++-4.2"
+NONLLVMCC+= CC="/Developer/usr/bin/gcc-4.2"
+NONLLVMCC+= CXX="/Developer/usr/bin/g++-4.2"
 else
-X264CC+= $(HOSTCC)
+NONLLVMCC+= $(HOSTCC)
 endif
 
 ifdef HAVE_AMR
@@ -1328,15 +1328,13 @@ ifdef HAVE_WIN32
 	(cd $@; dos2unix configure.in)
 	patch -p0 < Patches/goom2k4-0-win32.patch
 else
-ifndef HAVE_DARWIN_OS
 	patch -p0 < Patches/goom2k4-0-mmx.patch
-endif
 endif
 	patch -p0 < Patches/goom2k4-0-memleaks.patch
 
 .goom2k4: goom
 ifdef HAVE_DARWIN_OS
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd $<; $(NONLLVMCC) ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 else
 	(cd $< && rm -f configure; aclocal -I m4/ && automake --add-missing && autoconf configure.in > configure && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
 endif
@@ -1439,10 +1437,10 @@ ifdef HAVE_WIN32
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
   .x264: x264 .yasm
-	(cd $<; $(X264CC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(NONLLVMCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
   .x264: x264
-	(cd $<; $(X264CC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(NONLLVMCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 endif
 endif
 	touch $@
