@@ -56,7 +56,8 @@
 #   include <sys/time.h>
 #endif
 
-#ifdef __APPLE__
+#ifdef __APPLE__ && && !defined(__powerpc__) && !defined(__ppc__) && !defined(__ppc64__)
+#define USE_APPLE_MACH 1
 #   include <mach/mach.h>
 #   include <mach/mach_time.h>
 #endif
@@ -173,7 +174,7 @@ static inline unsigned mprec( void )
 #endif
 }
 
-#ifdef __APPLE__
+#ifdef USE_APPLE_MACH
 static mach_timebase_info_data_t mtime_timebase_info;
 static pthread_once_t mtime_timebase_info_once = PTHREAD_ONCE_INIT;
 static void mtime_init_timebase(void)
@@ -207,7 +208,7 @@ mtime_t mdate( void )
 #elif defined( HAVE_KERNEL_OS_H )
     res = real_time_clock_usecs();
 
-#elif defined( __APPLE__ )
+#elif defined( USE_APPLE_MACH )
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
     uint64_t date = mach_absolute_time();
 
@@ -323,7 +324,7 @@ mtime_t mdate( void )
         i_previous_time = res;
         LeaveCriticalSection( &date_lock );
     }
-#elif defined( __APPLE__ ) /* The version that should be used, if it was cancelable */
+#elif USE_APPLE_MACH /* The version that should be used, if it was cancelable */
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
     uint64_t mach_time = date * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
     mach_wait_until(mach_time);
@@ -424,7 +425,7 @@ void msleep( mtime_t delay )
 
     while( nanosleep( &ts_delay, &ts_delay ) && ( errno == EINTR ) );
 
-#elif defined( __APPLE__ ) /* The version that should be used, if it was cancelable */
+#elif USE_APPLE_MACH /* The version that should be used, if it was cancelable */
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
     uint64_t mach_time = delay * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
     mach_wait_until(mach_time + mach_absolute_time());

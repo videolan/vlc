@@ -356,7 +356,7 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
                         mtime_t deadline)
 {
-#ifdef __APPLE__
+#if defined(__APPLE__) && !defined(__powerpc__) && !defined( __ppc__ ) && !defined( __ppc64__ )
     /* mdate() is mac_absolute_time on OSX, which we must convert to do
      * the same base than gettimeofday() which pthread_cond_timedwait
      * relies on. */
