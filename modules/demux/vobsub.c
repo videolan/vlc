@@ -513,7 +513,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
         }
         else if( !strncmp( "id:", line, 3 ) )
         {
-            char language[20];
+            char language[3];
             int i_track_id;
             es_format_t fmt;
 
@@ -523,6 +523,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             {
                 p_sys->i_tracks++;
                 p_sys->track = realloc( p_sys->track, sizeof( vobsub_track_t ) * (p_sys->i_tracks + 1 ) );
+                language[2] = '\0';
 
                 /* Init the track */
                 current_tk = &p_sys->track[p_sys->i_tracks - 1];
@@ -536,7 +537,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 es_format_Init( &fmt, SPU_ES, VLC_CODEC_SPU );
                 fmt.subs.spu.i_original_frame_width = p_sys->i_original_frame_width;
                 fmt.subs.spu.i_original_frame_height = p_sys->i_original_frame_height;
-                fmt.psz_language = strdup( language );
+                fmt.psz_language = language;
                 if( p_sys->b_palette )
                 {
                     fmt.subs.spu.palette[0] = 0xBeef;
