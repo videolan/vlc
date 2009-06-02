@@ -33,6 +33,7 @@
 #include "media_internal.h" // Abuse, could and should be removed
 #include "media_list_path.h"
 
+//#define DEBUG_MEDIA_LIST_PLAYER
 
 struct libvlc_media_list_player_t
 {
@@ -92,6 +93,9 @@ get_next_path( libvlc_media_list_player_t * p_mlp )
 
     ret = libvlc_media_list_path_copy( p_mlp->current_playing_item_path );
 
+    ret[depth-1]++; // Play next element
+
+    /* If this goes beyong the end of the list */
     while( ret[depth-1] >= libvlc_media_list_count( p_parent_of_playing_item, NULL ) )
     {
         depth--;
@@ -137,7 +141,10 @@ media_player_reached_end( const libvlc_event_t * p_event,
     }
     libvlc_media_release( p_md );
     libvlc_media_release( p_current_md );
-    libvlc_media_list_player_next( p_mlp, NULL );
+    libvlc_exception_t e;
+    libvlc_exception_init(&e);
+    libvlc_media_list_player_next(p_mlp, &e);
+    libvlc_exception_clear(&e); // Don't worry if there was an error
 }
 
 /**************************************************************************
@@ -193,7 +200,7 @@ uninstall_playlist_observer( libvlc_media_list_player_t * p_mlp )
 static void
 install_media_player_observer( libvlc_media_list_player_t * p_mlp )
 {
-    libvlc_event_attach( libvlc_media_player_event_manager( p_mlp->p_mi, NULL ),
+    libvlc_event_attach_async( libvlc_media_player_event_manager( p_mlp->p_mi, NULL ),
                          libvlc_MediaPlayerEndReached,
                           media_player_reached_end, p_mlp, NULL );
 }
@@ -206,9 +213,7 @@ static void
 uninstall_media_player_observer( libvlc_media_list_player_t * p_mlp )
 {
     if ( !p_mlp->p_mi )
-    {
         return;
-    }
 
     libvlc_event_detach( libvlc_media_player_event_manager( p_mlp->p_mi, NULL ),
                          libvlc_MediaPlayerEndReached,
@@ -370,6 +375,12 @@ void libvlc_media_list_player_set_media_list(
 {
     vlc_mutex_lock( &p_mlp->object_lock );
 
+    if(!p_mlist)
+    {
+        libvlc_exception_raise( p_e, "No media list provided");
+        return;
+    }
+
     if( libvlc_media_list_player_is_playing( p_mlp, p_e ) )
     {
         libvlc_media_player_stop( p_mlp->p_mi, p_e );
@@ -522,6 +533,11 @@ void libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
 
     path = get_next_path( p_mlp );
 
+#ifdef DEBUG_MEDIA_LIST_PLAYER
+    printf("Playing:");
+    libvlc_media_list_path_dump(path);
+#endif
+    
     if( !path )
     {
         libvlc_media_list_unlock( p_mlp->p_mlist );

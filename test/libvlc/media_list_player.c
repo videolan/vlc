@@ -198,8 +198,7 @@ int main (void)
 
     test_media_list_player_pause_stop (test_defaults_args, test_defaults_nargs);
     test_media_list_player_play_item_at_index (test_defaults_args, test_defaults_nargs);
-    if(0) // Core hangs here, because it doesn't support callback removal from callbacks (variable)
-        test_media_list_player_next (test_defaults_args, test_defaults_nargs);
+    test_media_list_player_next (test_defaults_args, test_defaults_nargs);
 
     return 0;
 }

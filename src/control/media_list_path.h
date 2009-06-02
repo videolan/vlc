@@ -28,6 +28,23 @@
 typedef int * libvlc_media_list_path_t; /* (Media List Player Internal) */
 
 /**************************************************************************
+ *       path_dump (Media List Player Internal)
+ **************************************************************************/
+static inline void libvlc_media_list_path_dump( libvlc_media_list_path_t path )
+{
+    if(!path)
+    {
+        printf("NULL path\n");
+        return;
+    }
+
+    int i;
+    for(i = 0; path[i] != -1; i++)
+        printf("%s%d", i > 0 ? "/" : "", path[i]);
+    printf("\n");
+}
+
+/**************************************************************************
  *       path_empty (Media List Player Internal)
  **************************************************************************/
 static inline libvlc_media_list_path_t libvlc_media_list_path_empty( void )
@@ -187,7 +204,10 @@ libvlc_media_list_parentlist_at_path( libvlc_media_list_t * p_mlist, libvlc_medi
             libvlc_media_list_release( p_current_mlist );
 
         if( path[i+1] == -1 )
+        {
+            libvlc_media_list_retain(p_current_mlist);
             return p_current_mlist;
+        }
 
         p_md = libvlc_media_list_item_at_index( p_current_mlist, path[i], NULL );
 
