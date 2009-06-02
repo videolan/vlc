@@ -71,69 +71,6 @@ struct libvlc_instance_t
 };
 
 
-/*
- * Event Handling
- */
-/* Example usage
- *
- * struct libvlc_cool_object_t
- * {
- *        ...
- *        libvlc_event_manager_t * p_event_manager;
- *        ...
- * }
- *
- * libvlc_my_cool_object_new()
- * {
- *        ...
- *        p_self->p_event_manager = libvlc_event_manager_new( p_self,
- *                                                   p_self->p_libvlc_instance, p_e);
- *        libvlc_event_manager_register_event_type(p_self->p_event_manager,
- *                libvlc_MyCoolObjectDidSomething, p_e)
- *        ...
- * }
- *
- * libvlc_my_cool_object_release()
- * {
- *         ...
- *         libvlc_event_manager_release( p_self->p_event_manager );
- *         ...
- * }
- *
- * libvlc_my_cool_object_do_something()
- * {
- *        ...
- *        libvlc_event_t event;
- *        event.type = libvlc_MyCoolObjectDidSomething;
- *        event.u.my_cool_object_did_something.what_it_did = kSomething;
- *        libvlc_event_send( p_self->p_event_manager, &event );
- * }
- * */
-
-typedef struct libvlc_event_listener_t
-{
-    libvlc_event_type_t event_type;
-    void *              p_user_data;
-    libvlc_callback_t   pf_callback;
-} libvlc_event_listener_t;
-
-typedef struct libvlc_event_listeners_group_t
-{
-    libvlc_event_type_t event_type;
-    vlc_array_t listeners;
-    bool b_sublistener_removed;
-} libvlc_event_listeners_group_t;
-
-typedef struct libvlc_event_manager_t
-{
-    void * p_obj;
-    struct libvlc_instance_t * p_libvlc_instance;
-    vlc_array_t listeners_groups;
-    vlc_mutex_t object_lock;
-    vlc_mutex_t event_sending_lock;
-} libvlc_event_sender_t;
-
-
 /***************************************************************************
  * Other internal functions
  ***************************************************************************/
@@ -155,6 +92,11 @@ void libvlc_event_send(
         libvlc_event_manager_t * p_em,
         libvlc_event_t * p_event );
 
+void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
+                               libvlc_event_type_t event_type,
+                               libvlc_callback_t pf_callback,
+                               void *p_user_data,
+                               libvlc_exception_t *p_e );
 
 /* Exception shorcuts */
 

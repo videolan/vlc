@@ -439,6 +439,7 @@ SOURCES_libvlc = \
 
 SOURCES_libvlc_control = \
 	control/libvlc_internal.h \
+	control/event_internal.h \
 	control/media_internal.h \
 	control/media_list_internal.h \
 	control/media_list_view_internal.h \
@@ -450,6 +451,7 @@ SOURCES_libvlc_control = \
 	control/video.c \
 	control/audio.c \
 	control/event.c \
+	control/event_async.c \
 	control/flat_media_list_view.c \
 	control/hierarchical_media_list_view.c \
 	control/hierarchical_node_media_list_view.c \
