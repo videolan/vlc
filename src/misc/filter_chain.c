@@ -60,6 +60,7 @@ struct filter_chain_t
 
     /* List of filters */
     vlc_array_t filters;
+    vlc_array_t mouses;
 
     /* Capability of all the filters in the chain */
     char *psz_capability;
@@ -106,9 +107,11 @@ filter_chain_t *__filter_chain_New( vlc_object_t *p_this,
 
     p_chain->p_this = p_this;
     vlc_array_init( &p_chain->filters );
+    vlc_array_init( &p_chain->mouses );
     p_chain->psz_capability = strdup( psz_capability );
     if( !p_chain->psz_capability )
     {
+        vlc_array_clear( &p_chain->mouses );
         vlc_array_clear( &p_chain->filters );
         free( p_chain );
         return NULL;
@@ -135,6 +138,7 @@ void filter_chain_Delete( filter_chain_t *p_chain )
     es_format_Clean( &p_chain->fmt_out );
 
     free( p_chain->psz_capability );
+    vlc_array_clear( &p_chain->mouses );
     vlc_array_clear( &p_chain->filters );
     free( p_chain );
 }
@@ -290,6 +294,31 @@ void filter_chain_SubFilter( filter_chain_t *p_chain,
     }
 }
 
+int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const vlc_mouse_t *p_src )
+{
+    vlc_mouse_t current = *p_src;
+
+    for( int i = vlc_array_count( &p_chain->filters ) - 1; i >= 0; i-- )
+    {
+        filter_t *p_filter = vlc_array_item_at_index( &p_chain->filters, i );
+        vlc_mouse_t *p_mouse = vlc_array_item_at_index( &p_chain->mouses, i );
+
+        if( p_filter->pf_mouse && p_mouse )
+        {
+            vlc_mouse_t old = *p_mouse;
+            vlc_mouse_t filtered;
+
+            *p_mouse = current;
+            if( p_filter->pf_mouse( p_filter, &filtered, &old, &current ) )
+                return VLC_EGENERIC;
+            current = filtered;
+        }
+    }
+
+    *p_dst = current;
+    return VLC_SUCCESS;
+}
+
 
 /* Helpers */
 static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
@@ -342,6 +371,11 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
         goto error;
 
     vlc_array_append( &p_chain->filters, p_filter );
+
+    vlc_mouse_t *p_mouse = malloc( sizeof(*p_mouse) );
+    if( p_mouse )
+        vlc_mouse_Init( p_mouse );
+    vlc_array_append( &p_chain->mouses, p_mouse );
 
     msg_Dbg( p_chain->p_this, "Filter '%s' (%p) appended to chain",
              psz_name ? psz_name : p_filter->psz_object_name, p_filter );
@@ -416,6 +450,7 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
 
     /* Remove it from the chain */
     vlc_array_remove( &p_chain->filters, i_filter_idx );
+
     msg_Dbg( p_chain->p_this, "Filter '%s' (%p) removed from chain",
              p_filter->psz_object_name, p_filter );
 
@@ -429,6 +464,11 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
     if( p_filter->p_module )
         module_unneed( p_filter, p_filter->p_module );
     vlc_object_release( p_filter );
+
+    vlc_mouse_t *p_mouse = vlc_array_item_at_index( &p_chain->mouses, i_filter_idx );
+    if( p_mouse )
+        free( p_mouse );
+    vlc_array_remove( &p_chain->mouses, i_filter_idx );
 
     /* FIXME: check fmt_in/fmt_out consitency */
     return VLC_SUCCESS;

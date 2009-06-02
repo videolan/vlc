@@ -28,6 +28,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_subpicture.h>
+#include <vlc_mouse.h>
 
 /**
  * \file
@@ -71,6 +72,18 @@ struct filter_t
     int                 ( *pf_render_html ) ( filter_t *, subpicture_region_t *,
                                               subpicture_region_t * );
 
+    /* Filter mouse state.
+     *
+     * If non NULL, you must convert from output format to input format,
+     * if VLC_SUCCESS is returned, the mouse state is then propagated.
+     * If NULL, the mouse state is considered unchanged and will be
+     * propagated.
+     *
+     * If VLC_SUCCESS is not returned, the mouse changes are not propagated.
+     */
+    int                 ( *pf_mouse )( filter_t *, vlc_mouse_t *,
+                                       const vlc_mouse_t *p_old,
+                                       const vlc_mouse_t *p_new );
     /*
      * Buffers allocation
      */
@@ -311,6 +324,16 @@ VLC_EXPORT( block_t *, filter_chain_AudioFilter, ( filter_chain_t *, block_t * )
  * \param display_date of subpictures
  */
 VLC_EXPORT( void, filter_chain_SubFilter, ( filter_chain_t *, mtime_t ) );
+
+/**
+ * Apply the filter chain to a mouse state.
+ *
+ * It will be applied from the output to the input. It makes sense only
+ * for a video filter chain.
+ *
+ * The vlc_mouse_t* pointers may be the same.
+ */
+VLC_EXPORT( int, filter_chain_MouseFilter, ( filter_chain_t *, vlc_mouse_t *, const vlc_mouse_t * ) );
 
 #endif /* _VLC_FILTER_H */
 
