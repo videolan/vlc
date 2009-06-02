@@ -522,6 +522,10 @@ vlc_threadvar_create
 vlc_threadvar_delete
 vlc_threadvar_get
 vlc_threadvar_set
+vlc_timer_create
+vlc_timer_destroy
+vlc_timer_getoverrun
+vlc_timer_schedule
 vlc_ureduce
 VLC_Version
 vlc_wclosedir

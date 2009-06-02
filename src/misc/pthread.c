@@ -583,3 +583,110 @@ void vlc_control_cancel (int cmd, ...)
     (void) cmd;
     assert (0);
 }
+
+
+static void vlc_timer_do (union sigval val)
+{
+    vlc_timer_t *id = val.sival_ptr;
+    id->func (id, id->data);
+}
+
+/**
+ * Initializes an asynchronous timer.
+ * @warning Asynchronous timers are processed from an unspecified thread, and
+ * a timer is only serialized against itself.
+ *
+ * @param id pointer to timer to be initialized
+ * @param func function that the timer will call
+ * @param data parameter for the timer function
+ * @return 0 on success, a system error code otherwise.
+ */
+int vlc_timer_create (vlc_timer_t *id, void (*func) (vlc_timer_t *, void *),
+                      void *data)
+{
+    struct sigevent ev;
+
+    memset (&ev, 0, sizeof (ev));
+    ev.sigev_notify = SIGEV_THREAD;
+    ev.sigev_value.sival_ptr = id;
+    ev.sigev_notify_function = vlc_timer_do;
+    ev.sigev_notify_attributes = NULL;
+    id->func = func;
+    id->data = data;
+
+    if (timer_create (CLOCK_MONOTONIC, &ev, &id->handle))
+        return errno;
+    return 0;
+}
+
+/**
+ * Destroys an initialized timer. If needed, the timer is first disarmed.
+ * This function is undefined if the specified timer is not initialized.
+ *
+ * @warning This function <b>must</b> be called before the timer data can be
+ * freed and before the timer callback function can be unloaded.
+ *
+ * @param timer to destroy
+ */
+void vlc_timer_destroy (vlc_timer_t *id)
+{
+    int val = timer_delete (id->handle);
+    VLC_THREAD_ASSERT ("deleting timer");
+}
+
+/**
+ * Arm or disarm an initialized timer.
+ * This functions overrides any previous call to itself.
+ *
+ * @note A timer can fire later than requested due to system scheduling
+ * limitations. An interval timer can fail to trigger sometimes, either because
+ * the system is busy or suspended, or because a previous iteration of the
+ * timer is still running. See also vlc_timer_getoverrun().
+ *
+ * @param id initialized timer pointer
+ * @param absolute the timer value origin is the same as mdate() if true,
+ *                 the timer value is relative to now if false.
+ * @param value zero to disarm the timer, otherwise the initial time to wait
+ *              before firing the timer.
+ * @param interval zero to fire the timer just once, otherwise the timer
+ *                 repetition interval.
+ */
+void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
+                         mtime_t value, mtime_t interval)
+{
+    lldiv_t vad = lldiv (value, CLOCK_FREQ);
+    lldiv_t itd = lldiv (interval, CLOCK_FREQ);
+    struct itimerspec it = {
+        .it_interval = {
+            .tv_sec = itd.quot,
+            .tv_nsec = (1000000000 / CLOCK_FREQ) * itd.rem,
+        },
+        .it_value = {
+            .tv_sec = vad.quot,
+            .tv_nsec = (1000000000 / CLOCK_FREQ) * vad.rem,
+        },
+    };
+    int flags = absolute ? TIMER_ABSTIME : 0;
+
+    int val = timer_settime (id->handle, flags, &it, NULL);
+    VLC_THREAD_ASSERT ("scheduling timer");
+}
+
+/**
+ * @param id initialized timer pointer
+ * @return the timer overrun counter, i.e. the number of times that the timer
+ * should have run but did not since the last actual run. If all is well, this
+ * is zero.
+ */
+unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
+{
+    int val = timer_getoverrun (id->handle);
+#ifndef NDEBUG
+    if (val == -1)
+    {
+        val = errno;
+        VLC_THREAD_ASSERT ("fetching timer overrun counter");
+    }
+#endif
+    return val;
+}

@@ -510,3 +510,63 @@ void vlc_control_cancel (int cmd, ...)
     }
     va_end (ap);
 }
+
+
+/*** Timers ***/
+static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
+{
+    vlc_timer_t *id = val;
+
+    assert (timeout);
+    if (TryEnterCriticalSection (&id->serializer))
+    {
+        id->overrun = InterlockedExchange (&id->counter, 0);
+        id->func (id, id->data);
+        LeaveCriticalSection (&id->serializer);
+    }
+    else /* Overrun */
+        InterlockedIncrement (&id->counter);
+}
+
+int vlc_timer_create (vlc_timer_t *id, void (*func) (vlc_timer_t *, void *),
+                      void *data)
+{
+    id->func = func;
+    id->data = data;
+    id->overrun = 0;
+    id->handle = INVALID_HANDLE_VALUE;
+    InitializeCriticalSection (&id->serializer);
+    return 0;
+}
+
+void vlc_timer_destroy (vlc_timer_t *id)
+{
+    if (id->handle != INVALID_HANDLE_VALUE)
+        DeleteTimerQueueTimer (NULL, id->handle, NULL);
+    DeleteCriticalSection (&id->serializer);
+}
+
+void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
+                         mtime_t value, mtime_t interval)
+{
+    if (id->handle != INVALID_HANDLE_VALUE)
+    {
+        DeleteTimerQueueTimer (NULL, id->handle, NULL);
+        id->handle = INVALID_HANDLE_VALUE;
+    }
+    if (value == 0)
+        return; /* Disarm */
+
+    if (absolute)
+        value -= mdate ();
+    value = (value + 999) / 1000;
+    interval = (interval + 999) / 1000;
+    if (!CreateTimerQueueTimer (&id->handle, NULL, vlc_timer_do, id, value,
+                                interval, WT_EXECUTEDEFAULT))
+        abort ();
+}
+
+unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
+{
+    return id->overrun;
+}
