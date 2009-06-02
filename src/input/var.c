@@ -711,6 +711,16 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
+        val.i_int = newval.i_int;
+    }
+
+    /* Actualize "title %2i" variable */
+    if( val.i_int >= 0 && val.i_int < count.i_int )
+    {
+        int i_title = var_GetInteger( p_input, "title" );
+        char psz_titlevar[10] = {0};
+        snprintf( psz_titlevar, 10, "title %2i", i_title );
+        var_Change( p_input, psz_titlevar, VLC_VAR_SETVALUE, &val, NULL );
     }
 
     return VLC_SUCCESS;
