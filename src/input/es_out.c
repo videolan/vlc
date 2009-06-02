@@ -1030,8 +1030,9 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
         free( p_pgrm );
         return NULL;
     }
+    if( p_sys->b_paused )
+        input_clock_ChangePause( p_pgrm->p_clock, p_sys->b_paused, p_sys->i_pause_date );
     input_clock_SetJitter( p_pgrm->p_clock, p_sys->i_pts_delay, p_sys->i_cr_average );
-
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
