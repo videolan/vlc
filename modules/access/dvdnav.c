@@ -119,10 +119,8 @@ struct demux_sys_t
     {
         bool         b_created;
         bool         b_enabled;
-        mtime_t      i_end;
         vlc_mutex_t  lock;
-        vlc_cond_t   wait;
-        vlc_thread_t thread;
+        vlc_timer_t  timer;
     } still;
 
     /* track */
@@ -165,7 +163,7 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 
 static int ControlInternal( demux_t *, int, ... );
 
-static void* StillThread( void * );
+static void StillTimer( vlc_timer_t *, void * );
 
 static int EventKey( vlc_object_t *, char const *,
                      vlc_value_t, vlc_value_t, void * );
@@ -358,6 +356,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->still.b_enabled = false;
     vlc_mutex_init( &p_sys->still.lock );
+    if( !vlc_timer_create( &p_sys->still.timer, StillTimer, p_sys ) )
+        p_sys->still.b_created = true;
+
     return VLC_SUCCESS;
 }
 
@@ -384,11 +385,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Stop still image handler */
     if( p_sys->still.b_created )
-    {
-        vlc_cancel( p_sys->still.thread );
-        vlc_join( p_sys->still.thread, NULL );
-        vlc_cond_destroy( &p_sys->still.wait );
-    }
+        vlc_timer_destroy( &p_sys->still.timer );
     vlc_mutex_destroy( &p_sys->still.lock );
 
     var_Destroy( p_sys->p_input, "highlight-mutex" );
@@ -665,24 +662,15 @@ static int Demux( demux_t *p_demux )
         {
             msg_Dbg( p_demux, "DVDNAV_STILL_FRAME" );
             msg_Dbg( p_demux, "     - length=0x%x", event->length );
-            /* FIXME: use vlc_timer_create() if it is ever invented */
             p_sys->still.b_enabled = true;
 
-            if( !p_sys->still.b_created )
+            if( event->length != 0xff && p_sys->still.b_created )
             {
-                vlc_cond_init( &p_sys->still.wait );
-                p_sys->still.b_created =
-                    !vlc_clone( &p_sys->still.thread, StillThread, p_sys,
-                                VLC_THREAD_PRIORITY_LOW );
+                mtime_t delay = event->length * INT64_C(1) * CLOCK_FREQ;
+                vlc_timer_schedule( &p_sys->still.timer, false, delay, 0 );
             }
 
             b_still_init = true;
-            if( event->length == 0xff )
-                p_sys->still.i_end = 0;
-            else
-                p_sys->still.i_end = mdate() +
-                                     event->length * INT64_C(1000000);
-            vlc_cond_signal( &p_sys->still.wait );
         }
         vlc_mutex_unlock( &p_sys->still.lock );
 
@@ -1310,33 +1298,19 @@ static void ESNew( demux_t *p_demux, int i_id )
 }
 
 /*****************************************************************************
- * Event handler code
+ * Still image end
  *****************************************************************************/
-static void* StillThread( void *p_data )
+static void StillTimer( vlc_timer_t *id, void *p_data )
 {
     demux_sys_t    *p_sys = p_data;
 
     vlc_mutex_lock( &p_sys->still.lock );
-    mutex_cleanup_push( &p_sys->still.lock );
-    for( ;; )
-    {
-        if( p_sys->still.b_enabled && p_sys->still.i_end )
-        {
-            if( vlc_cond_timedwait( &p_sys->still.wait, &p_sys->still.lock,
-                                    p_sys->still.i_end ) )
-            {   /* Still image time out */
-                int canc = vlc_savecancel();
-                p_sys->still.b_enabled = false;
-                dvdnav_still_skip( p_sys->dvdnav );
-                vlc_restorecancel( canc );
-            }
-        }
-        else
-            vlc_cond_wait( &p_sys->still.wait, &p_sys->still.lock );
-    }
-    vlc_cleanup_pop(  );
+    assert( p_sys->still.b_enabled );
+    p_sys->still.b_enabled = false;
+    dvdnav_still_skip( p_sys->dvdnav );
+    vlc_mutex_unlock( &p_sys->still.lock );
 
-    assert( 0 );
+    (void) id;
 }
 
 static int EventMouse( vlc_object_t *p_vout, char const *psz_var,
