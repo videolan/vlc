@@ -418,8 +418,9 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
      * audio settings *
      ******************/
     [o_audio_enable_ckb setState: config_GetInt( p_intf, "audio" )];
-    [o_audio_vol_fld setIntValue: config_GetInt( p_intf, "volume" )];
-    [o_audio_vol_sld setIntValue: config_GetInt( p_intf, "volume" )];
+    i = (config_GetInt( p_intf, "volume" ) * 0.390625);
+    [o_audio_vol_fld setIntValue: i];
+    [o_audio_vol_sld setIntValue: i];
 
     [o_audio_spdif_ckb setState: config_GetInt( p_intf, "spdif" )];
 
@@ -742,7 +743,8 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
     if( b_audioSettingChanged )
     {
         config_PutInt( p_intf, "audio", [o_audio_enable_ckb state] );
-        config_PutInt( p_intf, "volume", [o_audio_vol_sld intValue] );
+        config_PutInt( p_intf, "volume", ([o_audio_vol_sld intValue] * 2.56));
+        NSLog( @"slider=%i, pref=%i", [o_audio_vol_sld intValue], config_GetInt( p_intf, "volume" ));
         config_PutInt( p_intf, "spdif", [o_audio_spdif_ckb state] );
 
         SaveIntList( o_audio_dolby_pop, "force-dolby-surround" );
