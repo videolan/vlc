@@ -170,6 +170,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
             array_listeners_cached = malloc(sizeof(libvlc_event_listener_t)*(i_cached_listeners));
             if( !array_listeners_cached )
             {
+                vlc_mutex_unlock( &p_em->object_lock );
                 fprintf(stderr, "Can't alloc memory in libvlc_event_send" );
                 return;
             }
@@ -188,6 +189,7 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
     if( !listeners_group )
     {
         free( array_listeners_cached );
+        vlc_mutex_unlock( &p_em->object_lock );
         return;
     }
 
