@@ -52,13 +52,18 @@
 static int  Activate     ( vlc_object_t * );
 static void Deactivate   ( vlc_object_t * );
 
-static void Run          ( intf_thread_t *p_intf );
-
 static int Inhibit( intf_thread_t *p_intf );
 static int UnInhibit( intf_thread_t *p_intf );
 
+static int InputChange( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
+static int StateChange( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
+
 struct intf_sys_t
 {
+    playlist_t      *p_playlist;
+    vlc_object_t    *p_input;
     DBusConnection  *p_conn;
     dbus_uint32_t   i_cookie;
 };
@@ -78,26 +83,29 @@ vlc_module_end ()
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys;
     DBusError     error;
 
-    p_intf->pf_run = Run;
-    p_intf->p_sys = (intf_sys_t *) calloc( 1, sizeof( intf_sys_t ) );
-    if( !p_intf->p_sys )
+    p_sys = p_intf->p_sys = (intf_sys_t *) calloc( 1, sizeof( intf_sys_t ) );
+    if( !p_sys )
         return VLC_ENOMEM;
 
-    p_intf->p_sys->i_cookie = 0;
+    p_sys->i_cookie = 0;
+    p_sys->p_input = NULL;
 
     dbus_error_init( &error );
-    p_intf->p_sys->p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
-    if( !p_intf->p_sys->p_conn )
+    p_sys->p_conn = dbus_bus_get( DBUS_BUS_SESSION, &error );
+    if( !p_sys->p_conn )
     {
         msg_Err( p_this, "Failed to connect to the D-Bus session daemon: %s",
                 error.message );
         dbus_error_free( &error );
-        free( p_intf->p_sys );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
+    p_sys->p_playlist = pl_Hold( p_intf );
+    var_AddCallback( p_sys->p_playlist, "item-current", InputChange, p_intf );
     return VLC_SUCCESS;
 }
 
@@ -107,11 +115,22 @@ static int Activate( vlc_object_t *p_this )
 static void Deactivate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
-    if( p_intf->p_sys->i_cookie )
-        UnInhibit( p_intf );
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    dbus_connection_unref( p_intf->p_sys->p_conn );
-    free( p_intf->p_sys );
+    var_DelCallback( p_sys->p_playlist, "item-current", InputChange, p_intf );
+    pl_Release( p_intf );
+
+    if( p_sys->p_input ) /* Do delete "state" after "item-changed"! */
+    {
+        var_DelCallback( p_sys->p_input, "state", StateChange, p_intf );
+        vlc_object_release( p_sys->p_input );
+    }
+
+    if( p_sys->i_cookie )
+        UnInhibit( p_intf );
+    dbus_connection_unref( p_sys->p_conn );
+
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -221,60 +240,43 @@ static int UnInhibit( intf_thread_t *p_intf )
     return true;
 }
 
-/*****************************************************************************
- * Run: main thread
- *****************************************************************************/
-static void vlc_cleanup_playlist( void *p_playlist )
+
+static int StateChange( vlc_object_t *p_input, const char *var,
+                        vlc_value_t prev, vlc_value_t value, void *data )
 {
-    pl_Release( (playlist_t*)p_playlist );
+    intf_thread_t *p_intf = data;
+    const int old = prev.i_int, cur = value.i_int;
+
+    if( ( old == PLAYING_S ) == ( cur == PLAYING_S ) )
+        return VLC_SUCCESS; /* No interesting change */
+
+    if( ( p_intf->p_sys->i_cookie != 0 ) == ( cur == PLAYING_S ) )
+        return VLC_SUCCESS; /* Already in correct state */
+
+    if( cur == PLAYING_S )
+        Inhibit( p_intf );
+    else
+        UnInhibit( p_intf );
+
+    (void)p_input; (void)var; (void)prev;
+    return VLC_SUCCESS;
 }
-static void Run( intf_thread_t *p_intf )
+
+static int InputChange( vlc_object_t *p_playlist, const char *var,
+                        vlc_value_t prev, vlc_value_t value, void *data )
 {
-    int canc = vlc_savecancel();
+    intf_thread_t *p_intf = data;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
-
-    vlc_cleanup_push( vlc_cleanup_playlist, p_intf );
-
-    for( ;; )
+    if( p_sys->p_input )
     {
-        vlc_restorecancel( canc );
-
-        /* FIXME wake up on playlist event instead ?
-         * Check playing state every 30 seconds */
-        msleep( 30 * CLOCK_FREQ );
-
-        canc = vlc_savecancel();
-
-        /* */
-        input_thread_t *p_input = playlist_CurrentInput( p_playlist );
-        if( p_input )
-        {
-            const int i_state = var_GetInteger( p_input, "state" );
-            vlc_object_release( p_input );
-
-            if( PLAYING_S == i_state )
-            {
-               if( !p_intf->p_sys->i_cookie )
-               {
-                   if( !Inhibit( p_intf ) )
-                       break;
-               }
-            }
-            else if( p_intf->p_sys->i_cookie )
-            {
-                if( !UnInhibit( p_intf ) )
-                    break;
-            }
-        }
-        else if( p_intf->p_sys->i_cookie )
-        {
-            if( !UnInhibit( p_intf ) )
-                break;
-        }
+        var_DelCallback( p_sys->p_input, "state", StateChange, p_intf );
+        vlc_object_release( p_sys->p_input );
     }
+    p_sys->p_input = VLC_OBJECT(playlist_CurrentInput( p_sys->p_playlist ));
+    if( p_sys->p_input )
+        var_AddCallback( p_sys->p_input, "state", StateChange, p_intf );
 
-    /* */
-    vlc_cleanup_run();
-    vlc_restorecancel( canc );
+    (void)var; (void)prev; (void)value; (void)p_playlist;
+    return VLC_SUCCESS;
 }
