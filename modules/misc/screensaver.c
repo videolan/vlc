@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
+#include <vlc_playlist.h>
 #include <vlc_interface.h>
 
 #include <sys/types.h>
@@ -60,7 +61,7 @@
 static int  Activate     ( vlc_object_t * );
 static void  Deactivate   ( vlc_object_t * );
 
-static void Run          ( intf_thread_t *p_intf );
+static void Timer( vlc_timer_t *, void * );
 
 #ifdef HAVE_DBUS
 
@@ -74,14 +75,16 @@ static void screensaver_send_message_void ( intf_thread_t *p_intf,
                                        const char *psz_interface,
                                        const char *psz_name );
 static bool screensaver_is_running( DBusConnection *p_connection, const char *psz_service );
-
+#endif
 
 struct intf_sys_t
 {
+#ifdef HAVE_DBUS
     DBusConnection *p_connection;
+#endif
+    vlc_timer_t timer;
 };
 
-#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -98,14 +101,22 @@ vlc_module_end ()
 static int Activate( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys;
 
-    p_intf->pf_run = Run;
+    p_sys = p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
+
+    if( vlc_timer_create( &p_sys->timer, Timer, p_intf ) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+    vlc_timer_schedule( &p_sys->timer, false, 30*CLOCK_FREQ, 30*CLOCK_FREQ );
 
 #ifdef HAVE_DBUS
-    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
-    if( !p_intf->p_sys ) return VLC_ENOMEM;
+    p_sys->p_connection = dbus_init( p_intf );
 #endif
-
     return VLC_SUCCESS;
 }
 
@@ -114,17 +125,16 @@ static int Activate( vlc_object_t *p_this )
  *****************************************************************************/
 static void Deactivate( vlc_object_t *p_this )
 {
-#ifdef HAVE_DBUS
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
 
-    if( p_intf->p_sys->p_connection )
-    {
-        dbus_connection_unref( p_intf->p_sys->p_connection );
-    }
-
-    free( p_intf->p_sys );
-    p_intf->p_sys = NULL;
+    vlc_timer_destroy( &p_sys->timer );
+#ifdef HAVE_DBUS
+    if( p_sys->p_connection )
+        dbus_connection_unref( p_sys->p_connection );
 #endif
+
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -166,55 +176,43 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
  * This part of the module is in a separate thread so that we do not have
  * too much system() overhead.
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void Timer( vlc_timer_t *id, void *data )
 {
-    int canc = vlc_savecancel();
+    intf_thread_t *p_intf = data;
+    playlist_t *p_playlist = pl_Hold( p_intf );
+    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+    pl_Release( p_intf );
+    if( !p_input )
+        return;
+
+    vlc_object_t *p_vout;
+    if( var_GetInteger( p_input, "state" ) == PLAYING_S )
+        p_vout = (vlc_object_t *)input_GetVout( p_input );
+    else
+        p_vout = NULL;
+    vlc_object_release( p_input );
+    if( !p_vout )
+        return;
+    vlc_object_release( p_vout );
+
+    /* If there is a playing video output, disable xscreensaver */
+    /* http://www.jwz.org/xscreensaver/faq.html#dvd */
+    const char *const ppsz_xsargs[] = { "/bin/sh", "-c",
+        "xscreensaver-command -deactivate &", (char*)NULL };
+    Execute( p_intf, ppsz_xsargs );
+
+    /* If we have dbus support, let's communicate directly with
+     * gnome-screensave else, run gnome-screensaver-command */
 #ifdef HAVE_DBUS
-    p_intf->p_sys->p_connection = dbus_init( p_intf );
-#endif
-
-    for( ;; )
-    {
-        vlc_object_t *p_vout;
-
-        p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-
-        /* If there is a video output, disable xscreensaver */
-        if( p_vout )
-        {
-            input_thread_t *p_input;
-            p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
-            vlc_object_release( p_vout );
-            if( p_input )
-            {
-                if( PLAYING_S == var_GetInteger( p_input, "state" ) )
-                {
-                    /* http://www.jwz.org/xscreensaver/faq.html#dvd */
-                    const char *const ppsz_xsargs[] = { "/bin/sh", "-c",
-                            "xscreensaver-command -deactivate &", (char*)NULL };
-                    Execute( p_intf, ppsz_xsargs );
-
-                    /* If we have dbus support, let's communicate directly
-                       with gnome-screensave else, run
-                       gnome-screensaver-command */
-#ifdef HAVE_DBUS
-                    poke_screensaver( p_intf, p_intf->p_sys->p_connection );
+    poke_screensaver( p_intf, p_intf->p_sys->p_connection );
 #else
-                    const char *const ppsz_gsargs[] = { "/bin/sh", "-c",
-                            "gnome-screensaver-command --poke &", (char*)NULL };
-                    Execute( p_intf, ppsz_gsargs );
+    const char *const ppsz_gsargs[] = { "/bin/sh", "-c",
+        "gnome-screensaver-command --poke &", (char*)NULL };
+    Execute( p_intf, ppsz_gsargs );
 #endif
-                    /* FIXME: add support for other screensavers */
-                }
-                vlc_object_release( p_input );
-            }
-        }
+    /* FIXME: add support for other screensavers */
 
-        vlc_restorecancel( canc );
-        /* Check screensaver every 30 seconds */
-        msleep( 30 * CLOCK_FREQ );
-        canc = vlc_savecancel( );
-    }
+    (void)id;
 }
 
 #ifdef HAVE_DBUS
