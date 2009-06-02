@@ -164,14 +164,12 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
      * no defined behavior in case of recursive locking. */
     InitializeCriticalSection (&p_mutex->mutex);
     p_mutex->initialized = 1;
-    return 0;
 }
 
 void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
     InitializeCriticalSection( &p_mutex->mutex );
     p_mutex->initialized = 1;
-    return 0;
 }
 
 
