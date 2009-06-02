@@ -614,8 +614,13 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (vlc_timer_t *, void *),
     id->func = func;
     id->data = data;
 
+#if (_POSIX_CLOCK_SELECTION >= 0)
     if (timer_create (CLOCK_MONOTONIC, &ev, &id->handle))
+#else
+    if (timer_create (CLOCK_REALTIME, &ev, &id->handle))
+#endif
         return errno;
+
     return 0;
 }
 
