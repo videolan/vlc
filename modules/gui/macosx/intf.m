@@ -1895,20 +1895,11 @@ end:
             [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
                 var: "deinterlace" selector: @selector(toggleVar:)];
 
-#if 0
-/* FIXME Post processing. */
-            p_dec_obj = (vlc_object_t *)vlc_object_find(
-                                                 (vlc_object_t *)p_vout,
-                                                 VLC_OBJECT_DECODER,
-                                                 FIND_PARENT );
-            if( p_dec_obj != NULL )
-            {
-               [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:
-                    (vlc_object_t *)p_dec_obj var:"ffmpeg-pp-q" selector:
+#if 1
+           [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:
+                    (vlc_object_t *)p_vout var:"postprocess" selector:
                     @selector(toggleVar:)];
 
-                vlc_object_release(p_dec_obj);
-            }
 #endif
             vlc_object_release( (vlc_object_t *)p_vout );
         }
@@ -2562,9 +2553,9 @@ end:
 
     if( [o_msg_arr count] + 2 > 600 )
     {
-		[o_msg_arr removeObjectAtIndex: 0];
+        [o_msg_arr removeObjectAtIndex: 0];
         [o_msg_arr removeObjectAtIndex: 1];
-   }
+    }
 
     o_attr = [NSDictionary dictionaryWithObject: o_gray
                                          forKey: NSForegroundColorAttributeName];
