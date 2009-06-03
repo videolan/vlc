@@ -184,7 +184,7 @@ VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
 VLC_EXPORT( int, vlc_timer_create, (vlc_timer_t *, void (*) (vlc_timer_t *, void *), void *) LIBVLC_USED );
 VLC_EXPORT( void, vlc_timer_destroy, (vlc_timer_t *) );
 VLC_EXPORT( void, vlc_timer_schedule, (vlc_timer_t *, bool, mtime_t, mtime_t) );
-VLC_EXPORT( unsigned, vlc_timer_getoverrun, (const vlc_timer_t *) );
+VLC_EXPORT( unsigned, vlc_timer_getoverrun, (const vlc_timer_t *) LIBVLC_USED );
 
 #ifndef LIBVLC_USE_PTHREAD_CANCEL
 enum {
