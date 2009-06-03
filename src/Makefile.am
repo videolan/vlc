@@ -488,7 +488,8 @@ revision.txt:
 
 stamp-revision:
 	rm -f -- revision.tmp
-	git describe --tags --long --always > revision.tmp
+	(git --git-dir="$(top_srcdir)/.git/" describe --tags --long \
+		--always || echo exported) > revision.tmp
 	diff revision.tmp revision.txt >/dev/null 2>&1 || \
 	mv -f -- revision.tmp revision.txt
 
