@@ -1,7 +1,7 @@
 /*****************************************************************************
  * magnify.c : Magnify/Zoom interactive effect
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -28,18 +28,14 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_vout.h>
-
 #include <math.h>
 #include <assert.h>
 
-#include "filter_common.h"
+#include <vlc_common.h>
+#include <vlc_plugin.h>
+#include <vlc_image.h>
+#include <vlc_filter.h>
 #include "filter_picture.h"
-
-#include "vlc_image.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -50,7 +46,7 @@ static void Destroy   ( vlc_object_t * );
 vlc_module_begin ()
     set_description( N_("Magnify/Zoom interactive video filter") )
     set_shortname( N_( "Magnify" ))
-    set_capability( "video filter", 0 )
+    set_capability( "video filter2", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -61,30 +57,22 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
+static picture_t *Filter( filter_t *, picture_t * );
+static int Mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t *, const vlc_mouse_t * );
 
-static int  MouseEvent( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
-
+/* */
 static void DrawZoomStatus( uint8_t *, int i_pitch, int i_width, int i_height,
                             int i_offset_x, int i_offset_y, bool b_visible );
 static void DrawRectangle( uint8_t *, int i_pitch, int i_width, int i_height,
                            int x, int y, int i_w, int i_h );
 
-/*****************************************************************************
- * vout_sys_t: Magnify video output method descriptor
- *****************************************************************************/
-struct vout_sys_t
+/* */
+struct filter_sys_t
 {
-    vout_thread_t *p_vout;
-
     image_handler_t *p_image;
 
     int64_t i_hide_timeout;
 
-    vlc_mutex_t lock;
     int i_zoom; /* zoom level in percent */
     int i_x, i_y; /* top left corner coordinates in original image */
 
@@ -97,128 +85,73 @@ struct vout_sys_t
 #define ZOOM_FACTOR 8
 
 /*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
- *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
-{
-    return vout_vaControl( p_vout->p_sys->p_vout, i_query, args );
-}
-
-/*****************************************************************************
- * Create: allocates Magnify video thread output method
+ * Create:
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
-    switch( p_vout->fmt_in.i_chroma )
+    /* */
+    switch( p_filter->fmt_in.i_codec )
     {
-        CASE_PLANAR_YUV
-        case VLC_CODEC_GREY:
-            break;
-        default:
-            msg_Err( p_vout, "Unsupported chroma" );
-            return VLC_EGENERIC;
+    CASE_PLANAR_YUV
+    case VLC_CODEC_GREY:
+        break;
+    default:
+        msg_Err( p_filter, "Unsupported chroma" );
+        return VLC_EGENERIC;
     }
-
-    /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
-        return VLC_ENOMEM;
-
-    p_vout->p_sys->p_image = image_HandlerCreate( p_vout );
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize Magnify video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    video_format_t fmt;
-
-    I_OUTPUTPICTURES = 0;
-
-    memset( &fmt, 0, sizeof(video_format_t) );
-
-    /* Initialize the output structure */
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-
-    p_vout->fmt_out = p_vout->fmt_in;
-    fmt = p_vout->fmt_out;
-
-    /* Try to open the real video output */
-    msg_Dbg( p_vout, "spawning the real video output" );
-
-    p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
-
-    /* Everything failed */
-    if( p_vout->p_sys->p_vout == NULL )
+    if( memcmp( &p_filter->fmt_in, &p_filter->fmt_out, sizeof(p_filter->fmt_in) ) )
     {
-        msg_Err( p_vout, "cannot open vout, aborting" );
+        msg_Err( p_filter, "Input and output format does not match" );
         return VLC_EGENERIC;
     }
 
-    vlc_mutex_init( &p_vout->p_sys->lock );
-    p_vout->p_sys->i_x = 0;
-    p_vout->p_sys->i_y = 0;
-    p_vout->p_sys->i_zoom = 2*ZOOM_FACTOR;
-    p_vout->p_sys->b_visible = true;
-    p_vout->p_sys->i_last_activity = mdate();
-    p_vout->p_sys->i_hide_timeout = 1000 * var_GetInteger( p_vout, "mouse-hide-timeout" );
+    /* Allocate structure */
+    p_filter->p_sys = p_sys = malloc( sizeof( *p_sys ) );
+    if( !p_filter->p_sys )
+        return VLC_ENOMEM;
 
-    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
+    p_sys->p_image = image_HandlerCreate( p_filter );
+    if( !p_sys->p_image )
+    {
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
-    vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
+    p_sys->i_x = 0;
+    p_sys->i_y = 0;
+    p_sys->i_zoom = 2*ZOOM_FACTOR;
+    p_sys->b_visible = true;
+    p_sys->i_last_activity = mdate();
+    p_sys->i_hide_timeout = 1000 * var_CreateGetInteger( p_filter, "mouse-hide-timeout" ); /* FIXME */
 
+    /* */
+    p_filter->pf_video_filter = Filter;
+    p_filter->pf_mouse = Mouse;
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * End: terminate Magnify video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-
-    vout_filter_DelChild( p_vout, p_sys->p_vout, MouseEvent );
-    vout_CloseAndRelease( p_sys->p_vout );
-
-    vout_filter_ReleaseDirectBuffers( p_vout );
-
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
-}
-
-/*****************************************************************************
- * Destroy: destroy Magnify video thread output method
+ * Destroy:
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    image_HandlerDelete( p_vout->p_sys->p_image );
+    image_HandlerDelete( p_sys->p_image );
 
-
-    free( p_vout->p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************
  * Render: displays previously rendered output
  *****************************************************************************/
-static void Render( vout_thread_t *p_vout, picture_t *p_pic )
+static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
-    vout_sys_t *p_sys = p_vout->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_outpic;
 
     int v_w, v_h;
@@ -226,26 +159,18 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     plane_t *p_oyp;
     int i_plane;
 
-    /* This is a new frame. Get a structure from the video_output. */
-    while( ( p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) )
-              == NULL )
+    p_outpic = filter_NewPicture( p_filter );
+    if( !p_outpic )
     {
-        if( !vlc_object_alive (p_vout) || p_vout->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
+        picture_Release( p_pic );
+        return NULL;
     }
 
-    p_outpic->date = p_pic->date;
-
-    vlc_mutex_lock( &p_sys->lock );
+    /* */
     const bool b_visible = p_sys->b_visible;
     const int o_x = p_sys->i_x;
     const int o_y = p_sys->i_y;
     const int o_zoom = p_sys->i_zoom;
-    const int64_t i_last_activity = p_sys->i_last_activity;
-    vlc_mutex_unlock( &p_sys->lock );
 
     /* background magnified image */
     if( o_zoom != ZOOM_FACTOR )
@@ -264,12 +189,12 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         }
 
         /* */
-        fmt_in = p_vout->fmt_out;
+        fmt_in = p_filter->fmt_in.video;
         fmt_in.i_width  = (fmt_in.i_width  * ZOOM_FACTOR / o_zoom) & ~1;
         fmt_in.i_height = (fmt_in.i_height * ZOOM_FACTOR / o_zoom) & ~1;
 
         /* */
-        fmt_out = p_vout->fmt_out;
+        fmt_out = p_filter->fmt_out.video;
 
         p_converted = image_Convert( p_sys->p_image, &crop, &fmt_in, &fmt_out );
 
@@ -289,22 +214,15 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
         video_format_t fmt_out;
 
         /* image visualization */
-        fmt_out = p_vout->fmt_out;
-        fmt_out.i_width  = (p_vout->render.i_width/VIS_ZOOM ) & ~1;
-        fmt_out.i_height = (p_vout->render.i_height/VIS_ZOOM) & ~1;
+        fmt_out = p_filter->fmt_out.video;
+        fmt_out.i_width  = (fmt_out.i_width /VIS_ZOOM) & ~1;
+        fmt_out.i_height = (fmt_out.i_height/VIS_ZOOM) & ~1;
         p_converted = image_Convert( p_sys->p_image, p_pic,
                                      &p_pic->format, &fmt_out );
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-        {
-            int y;
-            for( y = 0; y < p_converted->p[i_plane].i_visible_lines; y++)
-            {
-                vlc_memcpy(
-                    &p_outpic->p[i_plane].p_pixels[y*p_outpic->p[i_plane].i_pitch],
-                    p_converted->p[i_plane].p_pixels+y*p_converted->p[i_plane].i_pitch,
-                    p_converted->p[i_plane].i_visible_pitch );
-            }
-        }
+
+        /* It will put only what can be copied at the top left */
+        picture_CopyPixels( p_outpic, p_converted );
+
         picture_Release( p_converted );
 
         /* white rectangle on visualization */
@@ -325,33 +243,32 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* print a small "VLC ZOOM" */
-    if( b_visible || i_last_activity + p_sys->i_hide_timeout > mdate() )
+
+    if( b_visible || p_sys->i_last_activity + p_sys->i_hide_timeout > mdate() )
         DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_pitch, p_oyp->i_pitch, p_oyp->i_lines,
                         1, v_h, b_visible );
 
     if( b_visible )
     {
-        int y;
-
         /* zoom gauge */
-        vlc_memset( p_oyp->p_pixels + (v_h+9)*p_oyp->i_pitch, 0xff, 41 );
-        for( y = v_h + 10; y < v_h + 90; y++ )
+        memset( p_oyp->p_pixels + (v_h+9)*p_oyp->i_pitch, 0xff, 41 );
+        for( int y = v_h + 10; y < v_h + 90; y++ )
         {
-            int width = v_h + 90 - y;
-            width = (width*width)/160;
+            int i_width = v_h + 90 - y;
+            i_width = i_width * i_width / 160;
             if( (80 - y + v_h)*ZOOM_FACTOR/10 < o_zoom )
             {
-                vlc_memset( p_oyp->p_pixels + y*p_oyp->i_pitch, 0xff, width );
+                memset( p_oyp->p_pixels + y*p_oyp->i_pitch, 0xff, i_width );
             }
             else
             {
                 p_oyp->p_pixels[y*p_oyp->i_pitch] = 0xff;
-                p_oyp->p_pixels[y*p_oyp->i_pitch + width - 1] = 0xff;
+                p_oyp->p_pixels[y*p_oyp->i_pitch + i_width - 1] = 0xff;
             }
         }
     }
 
-    vout_DisplayPicture( p_sys->p_vout, p_outpic );
+    return CopyInfoAndRelease( p_outpic, p_pic );
 }
 
 static void DrawZoomStatus( uint8_t *pb_dst, int i_pitch, int i_width, int i_height,
@@ -413,118 +330,97 @@ static void DrawRectangle( uint8_t *pb_dst, int i_pitch, int i_width, int i_heig
     vlc_memset( &pb_dst[(y+i_h-1) * i_pitch + x], 0xff, i_w );
 }
 
-/*****************************************************************************
- * MouseEvent: callback for mouse events
- *****************************************************************************/
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
 {
-    vout_thread_t *p_vout = p_data;
-    vlc_value_t vald,valx,valy;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    const video_format_t *p_fmt = &p_filter->fmt_in.video;
 
-    assert( p_this == VLC_OBJECT(p_vout->p_sys->p_vout) );
+    /* */
+    const bool b_click = vlc_mouse_HasPressed( p_old, p_new, MOUSE_BUTTON_LEFT );
+    const bool b_pressed = vlc_mouse_IsLeftPressed( p_new );
 
-#define MOUSE_DOWN    1
-#define MOUSE_CLICKED 2
-#define MOUSE_MOVE_X  4
-#define MOUSE_MOVE_Y  8
-#define MOUSE_MOVE    12
-    uint8_t mouse= 0;
+    bool b_grab = false;
 
-    if( psz_var[6] == 'x' ) mouse |= MOUSE_MOVE_X;
-    if( psz_var[6] == 'y' ) mouse |= MOUSE_MOVE_Y;
-    if( psz_var[6] == 'c' ) mouse |= MOUSE_CLICKED;
-
-    var_Get( p_vout->p_sys->p_vout, "mouse-button-down", &vald );
-    if( vald.i_int & 0x1 ) mouse |= MOUSE_DOWN;
-    var_Get( p_vout->p_sys->p_vout, "mouse-y", &valy );
-    var_Get( p_vout->p_sys->p_vout, "mouse-x", &valx );
-
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-
-    const int v_h = p_vout->output.i_height*ZOOM_FACTOR/p_vout->p_sys->i_zoom;
-    const int v_w = p_vout->output.i_width*ZOOM_FACTOR/p_vout->p_sys->i_zoom;
-
-    if( ( mouse&MOUSE_MOVE && mouse&MOUSE_DOWN)
-        || mouse&MOUSE_CLICKED )
+    /* Find the mouse position */
+    if( p_sys->b_visible )
     {
-    /* (mouse moved and mouse button is down) or (mouse clicked) */
-        if( p_vout->p_sys->b_visible )
+        const int i_visu_width  = p_fmt->i_width  / VIS_ZOOM;
+        const int i_visu_height = p_fmt->i_height / VIS_ZOOM;
+
+        if( p_new->i_x >= 0 && p_new->i_x < i_visu_width &&
+            p_new->i_y >= 0 && p_new->i_y < i_visu_height )
         {
-            if(    0 <= valy.i_int
-                && valy.i_int < (int)p_vout->output.i_height/VIS_ZOOM
-                && 0 <= valx.i_int
-                && valx.i_int < (int)p_vout->output.i_width/VIS_ZOOM )
+            /* Visualization */
+            if( b_pressed )
             {
-            /* mouse is over visualisation */
-                p_vout->p_sys->i_x = __MIN( __MAX( valx.i_int*VIS_ZOOM - v_w/2, 0 ),
-                                            p_vout->output.i_width - v_w - 1);
-                p_vout->p_sys->i_y = __MIN( __MAX( valy.i_int * VIS_ZOOM - v_h/2,
-                                        0 ), p_vout->output.i_height - v_h - 1);
-            }
-            else if( valx.i_int >= 0 && valx.i_int < 80
-                && valy.i_int >= (int)p_vout->output.i_height/VIS_ZOOM
-                && valy.i_int < (int)p_vout->output.i_height/VIS_ZOOM + 9
-                && mouse&MOUSE_CLICKED )
-            {
-            /* mouse is over the "VLC ZOOM HIDE" text */
-                p_vout->p_sys->b_visible = false;
-            }
-            else if(    (int)p_vout->output.i_height/VIS_ZOOM + 9 <= valy.i_int
-                     && valy.i_int <= (int)p_vout->output.i_height/VIS_ZOOM + 90
-                     && 0 <= valx.i_int
-                     && valx.i_int <=
-                     (( (int)p_vout->output.i_height/VIS_ZOOM + 90 -  valy.i_int)
-               *( (int)p_vout->output.i_height/VIS_ZOOM + 90 -  valy.i_int))/160 )
-            {
-            /* mouse is over zoom gauge */
-                p_vout->p_sys->i_zoom = __MAX( ZOOM_FACTOR,
-                                ( 80 + (int)p_vout->output.i_height/VIS_ZOOM
-                                   - valy.i_int + 2) * ZOOM_FACTOR/10 );
-            }
-            else if( mouse&MOUSE_MOVE_X && !(mouse&MOUSE_CLICKED) )
-            {
-                p_vout->p_sys->i_x -= (newval.i_int - oldval.i_int)
-                                      *ZOOM_FACTOR/p_vout->p_sys->i_zoom;
-            }
-            else if( mouse&MOUSE_MOVE_Y && !(mouse&MOUSE_CLICKED) )
-            {
-                p_vout->p_sys->i_y -= (newval.i_int - oldval.i_int)
-                                      *ZOOM_FACTOR/p_vout->p_sys->i_zoom;
+                const int v_w = p_fmt->i_width  * ZOOM_FACTOR / p_sys->i_zoom;
+                const int v_h = p_fmt->i_height * ZOOM_FACTOR / p_sys->i_zoom;
+
+                p_sys->i_x = __MIN( __MAX( p_new->i_x * VIS_ZOOM - v_w/2, 0 ),
+                                           (int)p_fmt->i_width  - v_w - 1);
+                p_sys->i_y = __MIN( __MAX( p_new->i_y * VIS_ZOOM - v_h/2, 0 ),
+                                           (int)p_fmt->i_height - v_h - 1);
+
+                b_grab = true;
             }
         }
-        else
+        else if( p_new->i_x >= 0 && p_new->i_x < 80 &&
+                 p_new->i_y >= i_visu_height &&
+                 p_new->i_y <  i_visu_height + 9 )
         {
-            if( valx.i_int >= 0 && valx.i_int < 80 && valy.i_int >= 0
-                && valy.i_int <= 10 && mouse&MOUSE_CLICKED )
+            /* Hide text */
+            if( b_click )
             {
-            /* mouse is over the "VLC ZOOM SHOW" text */
-                p_vout->p_sys->b_visible = true;
+                p_sys->b_visible = false;
+                b_grab = true;
             }
-            else if( mouse&MOUSE_MOVE_X && !(mouse&MOUSE_CLICKED) )
+        }
+        else if( p_new->i_x >= 0 &&
+                 p_new->i_x <= ( i_visu_height + 90 - p_new->i_y ) *
+                               ( i_visu_height + 90 - p_new->i_y ) / 160 &&
+                 p_new->i_y >= i_visu_height + 9 &&
+                 p_new->i_y <= i_visu_height + 90 )
+        {
+            /* Zoom gauge */
+            if( b_pressed )
             {
-                p_vout->p_sys->i_x -= (newval.i_int - oldval.i_int)
-                                      *ZOOM_FACTOR/p_vout->p_sys->i_zoom;
+                p_sys->i_zoom = __MAX( ZOOM_FACTOR,
+                                       (80 + i_visu_height - p_new->i_y + 2) *
+                                           ZOOM_FACTOR / 10 );
+
+                const int v_w = p_fmt->i_width  * ZOOM_FACTOR / p_sys->i_zoom;
+                const int v_h = p_fmt->i_height * ZOOM_FACTOR / p_sys->i_zoom;
+                p_sys->i_x = __MAX( __MIN( p_sys->i_x, (int)p_fmt->i_width  - v_w - 1 ), 0 );
+                p_sys->i_y = __MAX( __MIN( p_sys->i_y, (int)p_fmt->i_height - v_h - 1 ), 0 );
+
+                b_grab = true;
             }
-            else if( mouse&MOUSE_MOVE_Y && !(mouse&MOUSE_CLICKED) )
+        }
+    }
+    else
+    {
+        if( p_new->i_x >= 0 && p_new->i_x <  80 &&
+            p_new->i_y >= 0 && p_new->i_y <= 10 )
+        {
+            /* Show text */
+            if( b_click )
             {
-                p_vout->p_sys->i_y -= (newval.i_int - oldval.i_int)
-                                      *ZOOM_FACTOR/p_vout->p_sys->i_zoom;
+                p_sys->b_visible = true;
+                b_grab = true;
             }
         }
     }
 
-    p_vout->p_sys->i_x =
-         __MAX( 0, __MIN( p_vout->p_sys->i_x, (int)p_vout->output.i_width
-         - (int)p_vout->output.i_width*ZOOM_FACTOR/p_vout->p_sys->i_zoom - 1 ));
-    p_vout->p_sys->i_y =
-         __MAX( 0, __MIN( p_vout->p_sys->i_y, (int)p_vout->output.i_height
-        - (int)p_vout->output.i_height*ZOOM_FACTOR/p_vout->p_sys->i_zoom - 1 ));
+    if( vlc_mouse_HasMoved( p_old, p_new ) )
+        p_sys->i_last_activity = mdate();
 
-    p_vout->p_sys->i_last_activity = mdate();
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
+    if( b_grab )
+        return VLC_EGENERIC;
 
-    /* FIXME forward event when not grabbed */
-
+    /* */
+    *p_mouse = *p_new;
+    p_mouse->i_x = p_sys->i_x + p_new->i_x * ZOOM_FACTOR / p_sys->i_zoom;
+    p_mouse->i_y = p_sys->i_y + p_new->i_y * ZOOM_FACTOR / p_sys->i_zoom;
     return VLC_SUCCESS;
 }
+
