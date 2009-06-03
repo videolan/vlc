@@ -319,11 +319,11 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    playlist_fetcher_t *p_fetcher = p_data;
+    vlc_cond_t *p_cond = p_data;
 
     if( newval.i_int == INPUT_EVENT_ITEM_META ||
         newval.i_int == INPUT_EVENT_DEAD )
-        vlc_cond_signal( &p_fetcher->wait );
+        vlc_cond_signal( p_cond );
 
     return VLC_SUCCESS;
 }
@@ -346,22 +346,26 @@ static void WaitPreparsed( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     if( input_GetItem( p_input ) != p_item )
         goto exit;
 
-    var_AddCallback( p_input, "intf-event", InputEvent, p_fetcher );
+    vlc_cond_t cond;
+    vlc_cond_init( &cond );
+    var_AddCallback( p_input, "intf-event", InputEvent, &cond );
 
     const mtime_t i_deadline = mdate() + 500*1000;
+    bool b_timeout = false;
 
-    while( !p_input->b_eof && !p_input->b_error && !input_item_IsPreparsed( p_item ) )
+    while( !p_input->b_eof && !p_input->b_error
+        && !input_item_IsPreparsed( p_item ) && !b_timeout )
     {
-        /* A bit weird, but input_item_IsPreparsed does held the protected value */
+        /* A bit weird, but input_item_IsPreparsed holds the protected value */
+        /* FIXME: locking looks wrong here */
         vlc_mutex_lock( &p_fetcher->lock );
-        vlc_cond_timedwait( &p_fetcher->wait, &p_fetcher->lock, i_deadline );
+        if( vlc_cond_timedwait( &cond, &p_fetcher->lock, i_deadline ) )
+            b_timeout = true;
         vlc_mutex_unlock( &p_fetcher->lock );
-
-        if( i_deadline <= mdate() )
-            break;
     }
 
     var_DelCallback( p_input, "intf-event", InputEvent, p_fetcher );
+    vlc_cond_destroy( &cond );
 
 exit:
     vlc_object_release( p_input );
