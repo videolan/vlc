@@ -521,15 +521,14 @@ static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
     if (TryEnterCriticalSection (&id->serializer))
     {
         id->overrun = InterlockedExchange (&id->counter, 0);
-        id->func (id, id->data);
+        id->func (id->data);
         LeaveCriticalSection (&id->serializer);
     }
     else /* Overrun */
         InterlockedIncrement (&id->counter);
 }
 
-int vlc_timer_create (vlc_timer_t *id, void (*func) (vlc_timer_t *, void *),
-                      void *data)
+int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
     id->func = func;
     id->data = data;

@@ -61,7 +61,7 @@
 static int  Activate     ( vlc_object_t * );
 static void  Deactivate   ( vlc_object_t * );
 
-static void Timer( vlc_timer_t *, void * );
+static void Timer( void * );
 
 #ifdef HAVE_DBUS
 
@@ -176,7 +176,7 @@ static void Execute( intf_thread_t *p_this, const char *const *ppsz_args )
  * This part of the module is in a separate thread so that we do not have
  * too much system() overhead.
  *****************************************************************************/
-static void Timer( vlc_timer_t *id, void *data )
+static void Timer( void *data )
 {
     intf_thread_t *p_intf = data;
     playlist_t *p_playlist = pl_Hold( p_intf );
@@ -211,8 +211,6 @@ static void Timer( vlc_timer_t *id, void *data )
     Execute( p_intf, ppsz_gsargs );
 #endif
     /* FIXME: add support for other screensavers */
-
-    (void)id;
 }
 
 #ifdef HAVE_DBUS

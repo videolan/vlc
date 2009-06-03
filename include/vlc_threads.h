@@ -112,7 +112,7 @@ typedef struct vlc_timer_t vlc_timer_t;
 struct vlc_timer_t
 {
     timer_t handle;
-    void (*func) (vlc_timer_t *, void *);
+    void (*func) (void *);
     void *data;
 };
 
@@ -181,7 +181,7 @@ VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
 VLC_EXPORT( void, vlc_join, (vlc_thread_t, void **) );
 VLC_EXPORT (void, vlc_control_cancel, (int cmd, ...));
 
-VLC_EXPORT( int, vlc_timer_create, (vlc_timer_t *, void (*) (vlc_timer_t *, void *), void *) LIBVLC_USED );
+VLC_EXPORT( int, vlc_timer_create, (vlc_timer_t *, void (*) (void *), void *) LIBVLC_USED );
 VLC_EXPORT( void, vlc_timer_destroy, (vlc_timer_t *) );
 VLC_EXPORT( void, vlc_timer_schedule, (vlc_timer_t *, bool, mtime_t, mtime_t) );
 VLC_EXPORT( unsigned, vlc_timer_getoverrun, (const vlc_timer_t *) LIBVLC_USED );

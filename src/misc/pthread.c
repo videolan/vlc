@@ -588,7 +588,7 @@ void vlc_control_cancel (int cmd, ...)
 static void vlc_timer_do (union sigval val)
 {
     vlc_timer_t *id = val.sival_ptr;
-    id->func (id, id->data);
+    id->func (id->data);
 }
 
 /**
@@ -601,8 +601,7 @@ static void vlc_timer_do (union sigval val)
  * @param data parameter for the timer function
  * @return 0 on success, a system error code otherwise.
  */
-int vlc_timer_create (vlc_timer_t *id, void (*func) (vlc_timer_t *, void *),
-                      void *data)
+int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
     struct sigevent ev;
 

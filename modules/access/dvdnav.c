@@ -163,7 +163,7 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var );
 
 static int ControlInternal( demux_t *, int, ... );
 
-static void StillTimer( vlc_timer_t *, void * );
+static void StillTimer( void * );
 
 static int EventKey( vlc_object_t *, char const *,
                      vlc_value_t, vlc_value_t, void * );
@@ -1300,7 +1300,7 @@ static void ESNew( demux_t *p_demux, int i_id )
 /*****************************************************************************
  * Still image end
  *****************************************************************************/
-static void StillTimer( vlc_timer_t *id, void *p_data )
+static void StillTimer( void *p_data )
 {
     demux_sys_t    *p_sys = p_data;
 
@@ -1309,8 +1309,6 @@ static void StillTimer( vlc_timer_t *id, void *p_data )
     p_sys->still.b_enabled = false;
     dvdnav_still_skip( p_sys->dvdnav );
     vlc_mutex_unlock( &p_sys->still.lock );
-
-    (void) id;
 }
 
 static int EventMouse( vlc_object_t *p_vout, char const *psz_var,
