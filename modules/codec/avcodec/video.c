@@ -349,6 +349,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_buffer_orig = p_sys->p_buffer = malloc( p_sys->i_buffer_orig );
     if( !p_sys->p_buffer_orig )
     {
+        av_free( p_sys->p_ff_pic );
         free( p_sys );
         return VLC_ENOMEM;
     }
@@ -399,6 +400,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( ffmpeg_OpenCodec( p_dec ) < 0 )
     {
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
+        av_free( p_sys->p_ff_pic );
         free( p_sys->p_buffer_orig );
         free( p_sys );
         return VLC_EGENERIC;
