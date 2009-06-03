@@ -378,6 +378,7 @@ void libvlc_media_list_player_set_media_list(
     if(!p_mlist)
     {
         libvlc_exception_raise( p_e, "No media list provided");
+        vlc_mutex_unlock( &p_mlp->object_lock );
         return;
     }
 
