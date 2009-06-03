@@ -46,7 +46,7 @@ struct playlist_fetcher_t
 
     vlc_thread_t    thread;
     vlc_mutex_t     lock;
-    vlc_cond_t      wait;
+    bool            b_live, b_zombie;
     int             i_art_policy;
     int             i_waiting;
     input_item_t    **pp_waiting;
@@ -72,19 +72,12 @@ playlist_fetcher_t *playlist_fetcher_New( playlist_t *p_playlist )
     vlc_object_attach( p_fetcher, p_playlist );
     p_fetcher->p_playlist = p_playlist;
     vlc_mutex_init( &p_fetcher->lock );
-    vlc_cond_init( &p_fetcher->wait );
+    p_fetcher->b_live = false;
+    p_fetcher->b_zombie = false;
     p_fetcher->i_waiting = 0;
     p_fetcher->pp_waiting = NULL;
     p_fetcher->i_art_policy = var_GetInteger( p_playlist, "album-art" );
     ARRAY_INIT( p_fetcher->albums );
-
-    if( vlc_clone( &p_fetcher->thread, Thread, p_fetcher,
-                   VLC_THREAD_PRIORITY_LOW ) )
-    {
-        msg_Err( p_fetcher, "cannot spawn secondary preparse thread" );
-        vlc_object_release( p_fetcher );
-        return NULL;
-    }
 
     return p_fetcher;
 }
@@ -94,27 +87,45 @@ void playlist_fetcher_Push( playlist_fetcher_t *p_fetcher, input_item_t *p_item 
     vlc_gc_incref( p_item );
 
     vlc_mutex_lock( &p_fetcher->lock );
+    if( p_fetcher->b_zombie ) /* FIXME: detach the thread */
+    {
+        vlc_join( p_fetcher->thread, NULL );
+        p_fetcher->b_zombie = false;
+    }
+
     INSERT_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting,
                  p_fetcher->i_waiting, p_item );
-    vlc_cond_signal( &p_fetcher->wait );
+    if( !p_fetcher->b_live )
+    {
+        if( vlc_clone( &p_fetcher->thread, Thread, p_fetcher,
+                       VLC_THREAD_PRIORITY_LOW ) )
+            msg_Err( p_fetcher, "cannot spawn secondary preparse thread" );
+        else
+            p_fetcher->b_live = true;
+    }
     vlc_mutex_unlock( &p_fetcher->lock );
 }
 
 void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
 {
-    /* */
-    vlc_object_kill( p_fetcher );
-
+    bool b_join;
     /* Destroy the item meta-infos fetcher */
-    vlc_cancel( p_fetcher->thread );
-    vlc_join( p_fetcher->thread, NULL );
+    vlc_mutex_lock( &p_fetcher->lock );
+    if( p_fetcher->b_live )
+    {
+        vlc_object_kill( p_fetcher );
+        vlc_cancel( p_fetcher->thread );
+    }
+    b_join = p_fetcher->b_live || p_fetcher->b_zombie;
+    vlc_mutex_unlock( &p_fetcher->lock );
+    if( b_join )
+        vlc_join( p_fetcher->thread, NULL );
 
     while( p_fetcher->i_waiting > 0 )
     {   /* Any left-over unparsed item? */
         vlc_gc_decref( p_fetcher->pp_waiting[0] );
         REMOVE_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting, 0 );
     }
-    vlc_cond_destroy( &p_fetcher->wait );
     vlc_mutex_destroy( &p_fetcher->lock );
     vlc_object_release( p_fetcher );
 }
@@ -378,24 +389,23 @@ static void *Thread( void *p_data )
 
     for( ;; )
     {
-        input_item_t *p_item;
+        input_item_t *p_item = NULL;
 
-        /* Be sure to be cancellable before our queue is empty */
-        vlc_testcancel();
-
-        /* */
         vlc_mutex_lock( &p_fetcher->lock );
-        mutex_cleanup_push( &p_fetcher->lock );
-
-        while( p_fetcher->i_waiting == 0 )
-            vlc_cond_wait( &p_fetcher->wait, &p_fetcher->lock );
-
-        p_item = p_fetcher->pp_waiting[0];
-        REMOVE_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting, 0 );
-        vlc_cleanup_run( );
+        if( p_fetcher->i_waiting != 0 )
+        {
+            p_item = p_fetcher->pp_waiting[0];
+            REMOVE_ELEM( p_fetcher->pp_waiting, p_fetcher->i_waiting, 0 );
+        }
+        else
+        {
+            p_fetcher->b_live = false;
+            p_fetcher->b_zombie = true;
+        }
+        vlc_mutex_unlock( &p_fetcher->lock );
 
         if( !p_item )
-            continue;
+            break;
 
         /* */
         int canc = vlc_savecancel();
@@ -439,10 +449,8 @@ static void *Thread( void *p_data )
 
         int i_activity = var_GetInteger( p_playlist, "activity" );
         if( i_activity < 0 ) i_activity = 0;
-        /* Sleep at least 1ms */
+        /* Sleep at least 1ms and handle potential thread cancellation */
         msleep( (i_activity+1) * 1000 );
     }
     return NULL;
 }
-
-
