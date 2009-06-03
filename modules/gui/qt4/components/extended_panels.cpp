@@ -255,20 +255,25 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     char *psz_parser, *psz_string;
     const char *psz_filter_type;
 
-    module_t *p_obj = module_find( psz_name );
+    /* FIXME temporary hack */
+    const char *psz_module_name = psz_name;
+    if( !strcmp( psz_name, "magnify" ) )
+        psz_module_name = "video_filter_wrapper";
+
+    module_t *p_obj = module_find( psz_module_name );
     if( !p_obj )
     {
         msg_Err( p_intf, "Unable to find filter module \"%s\".", psz_name );
         return;
     }
 
-    if( module_provides( p_obj, "video filter2" ) )
-    {
-        psz_filter_type = "video-filter";
-    }
-    else if( module_provides( p_obj, "video filter" ) )
+    if( module_provides( p_obj, "video filter" ) )
     {
         psz_filter_type = "vout-filter";
+    }
+    else if( module_provides( p_obj, "video filter2" ) )
+    {
+        psz_filter_type = "video-filter";
     }
     else if( module_provides( p_obj, "sub filter" ) )
     {
