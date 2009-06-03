@@ -45,4 +45,8 @@ SOURCES_swscale = swscale.c ../codec/avcodec/chroma.c
 SOURCES_swscale_maemo = swscale_maemo.c libswscale_nokia770/arm_jit_swscale.c libswscale_nokia770/arm_colorconv.S libswscale_nokia770/arm_jit_swscale.h libswscale_nokia770/arm_colorconv.h
 SOURCES_scene = scene.c
 SOURCES_yuvp = yuvp.c
+SOURCES_video_filter_wrapper = wrapper.c
 noinst_HEADERS = filter_common.h filter_picture.h
+
+libvlc_LTLIBRARIES += \
+    libvideo_filter_wrapper_plugin.la
