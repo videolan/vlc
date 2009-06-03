@@ -1946,11 +1946,13 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
  *****************************************************************************/
 static void Version( void )
 {
+    extern const char psz_vlc_changeset[];
 #ifdef WIN32
     ShowConsole( true );
 #endif
 
-    utf8_fprintf( stdout, _("VLC version %s\n"), VLC_Version() );
+    utf8_fprintf( stdout, _("VLC version %s (%s)\n"), VLC_Version(),
+                  psz_vlc_changeset );
     utf8_fprintf( stdout, _("Compiled by %s@%s.%s\n"),
              VLC_CompileBy(), VLC_CompileHost(), VLC_CompileDomain() );
     utf8_fprintf( stdout, _("Compiler: %s\n"), VLC_Compiler() );
