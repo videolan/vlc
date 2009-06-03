@@ -213,7 +213,8 @@ const char * libvlc_get_compiler(void)
 
 const char * libvlc_get_changeset(void)
 {
-    return "exported";
+    extern const char psz_vlc_changeset[];
+    return psz_vlc_changeset;
 }
 
 /* export internal libvlc_instance for ugly hacks with libvlccore */
