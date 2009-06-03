@@ -1739,8 +1739,12 @@ static int PostProcessCallback( vlc_object_t *p_this, char const *psz_cmd,
 }
 static void PostProcessEnable( vout_thread_t *p_vout )
 {
+    vlc_value_t text;
     msg_Dbg( p_vout, "Post-processing available" );
     var_Create( p_vout, "postprocess", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
+    text.psz_string = _("Post processing");
+    var_Change( p_vout, "postprocess", VLC_VAR_SETTEXT, &text, NULL );
+
     for( int i = 0; i <= 6; i++ )
     {
         vlc_value_t val;
