@@ -270,7 +270,7 @@ static int Open( vlc_object_t *p_this )
         if( psz_facility )
         {
             bool b_valid = 0;
-            static const struct { const char *psz_name; int i_value; }
+            static const struct { const char psz_name[7]; int i_value; }
             p_facility[10] = {
                 { "daemon", LOG_DAEMON }, { "user", LOG_USER },
                 { "local0", LOG_LOCAL0 }, { "local1", LOG_LOCAL1 },
