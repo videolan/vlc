@@ -223,15 +223,18 @@ static void * event_async_loop(void * arg)
     libvlc_event_t event;
 
     vlc_mutex_lock(&queue(p_em)->lock);
-    vlc_cleanup_push(vlc_cleanup_lock, &queue(p_em)->lock);
     while (true) {
         int has_listener = pop(p_em, &listener, &event);
+
+        mutex_cleanup_push(&queue(p_em)->lock);
+
         if (has_listener)
             listener.pf_callback( &event, listener.p_user_data ); // This might edit the queue, ->lock is recursive
         else
             vlc_cond_wait(&queue(p_em)->signal, &queue(p_em)->lock);
+
+        vlc_cleanup_pop();
     }
-    vlc_cleanup_pop();
     vlc_mutex_unlock(&queue(p_em)->lock);
     return NULL;
 }
