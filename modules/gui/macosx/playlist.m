@@ -1037,19 +1037,20 @@
 
     p_playlist = pl_Hold( p_intf );
 
-    PL_LOCK;
     for( int i = 0; i < i_count; i++ )
     {
         o_number = [o_to_delete lastObject];
         i_row = [o_number intValue];
         id o_item = [o_outline_view itemAtRow: i_row];
+        [o_outline_view deselectRow: i_row];
+
+        PL_LOCK;
         playlist_item_t *p_item = [o_item pointerValue];
 #ifndef NDEBUG
         msg_Dbg( p_intf, "deleting item %i (of %i) with id \"%i\", pointerValue \"%p\" and %i children", i+1, i_count, 
                 p_item->p_input->i_id, [o_item pointerValue], p_item->i_children +1 );
 #endif
         [o_to_delete removeObject: o_number];
-        [o_outline_view deselectRow: i_row];
 
         if( p_item->i_children != -1 )
         //is a node and not an item
@@ -1065,8 +1066,12 @@
         }
         else
             playlist_DeleteFromInput( p_playlist, p_item->p_input, pl_Locked );
+
+        PL_UNLOCK;
+        [o_outline_dict removeObjectForKey:[NSString stringWithFormat:@"%p",
+                                                     [o_item pointerValue]]];
+        [o_item release];
     }
-    PL_UNLOCK;
 
     [self playlistUpdated];
     pl_Release( p_intf );
@@ -1097,19 +1102,17 @@
         p_item = p_playlist->p_root_category;
     }
 
+    PL_LOCK;
     if( p_item->i_children > -1 ) // the item is a node
     {
-        PL_LOCK;
         playlist_RecursiveNodeSort( p_playlist, p_item, i_mode, ORDER_NORMAL );
-        PL_UNLOCK;
     }
     else
     {
-        PL_LOCK;
         playlist_RecursiveNodeSort( p_playlist,
                 p_item->p_parent, i_mode, ORDER_NORMAL );
-        PL_UNLOCK;
     }
+    PL_UNLOCK;
     pl_Release( VLCIntf );
     [self playlistUpdated];
 }
