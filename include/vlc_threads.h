@@ -109,9 +109,17 @@ typedef pthread_mutex_t vlc_mutex_t;
 typedef pthread_cond_t  vlc_cond_t;
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer_t vlc_timer_t;
+
+#ifndef __APPLE__
+/* There is no POSIX timer on Mac OS X. Move that to configure eventually. */
+#define HAVE_POSIX_TIMER 1
+#endif
+
 struct vlc_timer_t
 {
+#ifdef HAVE_POSIX_TIMER
     timer_t handle;
+#endif
     void (*func) (void *);
     void *data;
 };

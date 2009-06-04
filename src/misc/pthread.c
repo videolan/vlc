@@ -584,6 +584,14 @@ void vlc_control_cancel (int cmd, ...)
     assert (0);
 }
 
+#ifndef HAVE_POSIX_TIMER
+/* We have no fallback currently. We'll just crash on timer API usage. */
+static void timer_not_supported(void)
+{
+    fprintf(stderr, "*** Error: Timer API is not supported on this platform.\n");
+    abort();
+}
+#endif
 
 static void vlc_timer_do (union sigval val)
 {
@@ -603,6 +611,7 @@ static void vlc_timer_do (union sigval val)
  */
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
+#ifdef HAVE_POSIX_TIMER
     struct sigevent ev;
 
     memset (&ev, 0, sizeof (ev));
@@ -621,6 +630,10 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
         return errno;
 
     return 0;
+#else
+    timer_not_supported();
+    return 0;
+#endif
 }
 
 /**
@@ -634,8 +647,12 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
  */
 void vlc_timer_destroy (vlc_timer_t *id)
 {
+#ifdef HAVE_POSIX_TIMER
     int val = timer_delete (id->handle);
     VLC_THREAD_ASSERT ("deleting timer");
+#else
+    timer_not_supported();
+#endif
 }
 
 /**
@@ -658,6 +675,7 @@ void vlc_timer_destroy (vlc_timer_t *id)
 void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
                          mtime_t value, mtime_t interval)
 {
+#ifdef HAVE_POSIX_TIMER
     lldiv_t vad = lldiv (value, CLOCK_FREQ);
     lldiv_t itd = lldiv (interval, CLOCK_FREQ);
     struct itimerspec it = {
@@ -674,6 +692,9 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
 
     int val = timer_settime (id->handle, flags, &it, NULL);
     VLC_THREAD_ASSERT ("scheduling timer");
+#else
+    timer_not_supported();
+#endif
 }
 
 /**
@@ -684,6 +705,7 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
  */
 unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
 {
+#ifdef HAVE_POSIX_TIMER
     int val = timer_getoverrun (id->handle);
 #ifndef NDEBUG
     if (val == -1)
@@ -693,4 +715,8 @@ unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
     }
 #endif
     return val;
+#else
+    timer_not_supported();
+    return 0;
+#endif
 }
