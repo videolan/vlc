@@ -122,6 +122,7 @@ es_format_Clean
 es_format_Copy
 es_format_Init
 filename_sanitize
+filter_Blend
 filter_chain_AppendFilter
 filter_chain_AppendFromString
 filter_chain_AudioFilter
@@ -135,6 +136,9 @@ __filter_chain_New
 filter_chain_Reset
 filter_chain_SubFilter
 filter_chain_VideoFilter
+filter_ConfigureBlend
+filter_DeleteBlend
+filter_NewBlend
 FromLocale
 FromLocaleDup
 GetFallbackEncoding

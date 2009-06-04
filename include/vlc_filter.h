@@ -182,6 +182,29 @@ static inline block_t *filter_NewAudioBuffer( filter_t *p_filter, int i_size )
 }
 
 /**
+ * It creates a blend filter
+ */
+VLC_EXPORT( filter_t *, filter_NewBlend, ( vlc_object_t *, vlc_fourcc_t i_chroma_dst ) );
+
+/**
+ * It configures blend filter parameters that are allowed to changed
+ * after the creation.
+ */
+VLC_EXPORT( int, filter_ConfigureBlend, ( filter_t *, int i_dst_width, int i_dst_height, const video_format_t *p_src ) );
+
+/**
+ * It blends a picture into another one.
+ *
+ * The input picture is not modified and not released.
+ */
+VLC_EXPORT( int, filter_Blend, ( filter_t *, picture_t *p_dst, int i_dst_x, int i_dst_y, picture_t *p_src, int i_alpha ) );
+
+/**
+ * It destroys a blend filter created by filter_NewBlend.
+ */
+VLC_EXPORT( void, filter_DeleteBlend, ( filter_t * ) );
+
+/**
  * Create a picture_t *(*)( filter_t *, picture_t * ) compatible wrapper
  * using a void (*)( filter_t *, picture_t *, picture_t * ) function
  *
