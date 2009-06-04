@@ -479,7 +479,7 @@ CLEANFILES += revision.txt revision.c
 
 revision.c: revision.txt
 	rm -f -- revision.c
-	echo -n "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
+	echo "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
 		> revision.c
 
 revision.txt:
