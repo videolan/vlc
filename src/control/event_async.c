@@ -90,6 +90,16 @@ static void push(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listen
     iter->next = elmt;
 }
 
+static inline void queue_lock(libvlc_event_manager_t * p_em)
+{
+    vlc_mutex_lock(&queue(p_em)->lock);
+}
+
+static inline void queue_unlock(libvlc_event_manager_t * p_em)
+{
+    vlc_mutex_unlock(&queue(p_em)->lock);
+}
+
 /* Lock must be held */
 static bool pop(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listener, libvlc_event_t * event)
 {
@@ -172,7 +182,7 @@ libvlc_event_async_init(libvlc_event_manager_t * p_em)
         return;
     }
 
-    vlc_mutex_init_recursive(&queue(p_em)->lock); // Beware, this is re-entrant
+    vlc_mutex_init(&queue(p_em)->lock);
     vlc_cond_init(&queue(p_em)->signal);
 }
 
@@ -186,9 +196,9 @@ libvlc_event_async_ensure_listener_removal(libvlc_event_manager_t * p_em, libvlc
 {
     if(!is_queue_initialized(p_em)) return;
 
-    vlc_mutex_lock(&queue(p_em)->lock);
+    queue_lock(p_em);
     pop_listener(p_em, listener);
-    vlc_mutex_unlock(&queue(p_em)->lock);
+    queue_unlock(p_em);
 }
 
 /**************************************************************************
@@ -205,10 +215,10 @@ libvlc_event_async_dispatch(libvlc_event_manager_t * p_em, libvlc_event_listener
         libvlc_event_async_init(p_em);
     vlc_mutex_unlock(&p_em->object_lock);
 
-    vlc_mutex_lock(&queue(p_em)->lock);
+    queue_lock(p_em);
     push(p_em, listener, event);
     vlc_cond_signal(&queue(p_em)->signal);
-    vlc_mutex_unlock(&queue(p_em)->lock);
+    queue_unlock(p_em);
 }
 
 /**************************************************************************
@@ -222,19 +232,23 @@ static void * event_async_loop(void * arg)
     libvlc_event_listener_t listener;
     libvlc_event_t event;
 
-    vlc_mutex_lock(&queue(p_em)->lock);
+    queue_lock(p_em);
     while (true) {
         int has_listener = pop(p_em, &listener, &event);
 
-        mutex_cleanup_push(&queue(p_em)->lock);
-
         if (has_listener)
-            listener.pf_callback( &event, listener.p_user_data ); // This might edit the queue, ->lock is recursive
+        {
+            queue_unlock(p_em);
+            listener.pf_callback(&event, listener.p_user_data); // This might edit the queue
+            queue_lock(p_em);
+        }
         else
+        {
+            mutex_cleanup_push(&queue(p_em)->lock);
             vlc_cond_wait(&queue(p_em)->signal, &queue(p_em)->lock);
-
-        vlc_cleanup_pop();
+            vlc_cleanup_pop();
+        }
     }
-    vlc_mutex_unlock(&queue(p_em)->lock);
+    queue_unlock(p_em);
     return NULL;
 }
