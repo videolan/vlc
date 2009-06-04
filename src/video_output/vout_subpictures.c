@@ -175,7 +175,6 @@ static void SubFilterAllocationClean( filter_t * );
 /* */
 static void SpuRenderCreateAndLoadText( spu_t * );
 static void SpuRenderCreateAndLoadScale( spu_t * );
-static void SpuRenderCreateBlend( spu_t *, vlc_fourcc_t i_chroma, int i_aspect );
 static void FilterRelease( filter_t *p_filter );
 
 /*****************************************************************************
@@ -263,7 +262,7 @@ void spu_Destroy( spu_t *p_spu )
     var_DelCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
 
     if( p_sys->p_blend )
-        FilterRelease( p_sys->p_blend );
+        filter_DeleteBlend( p_sys->p_blend );
 
     if( p_sys->p_text )
         FilterRelease( p_sys->p_text );
@@ -421,7 +420,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
     /* Create the blending module */
     if( !p_sys->p_blend )
-        SpuRenderCreateBlend( p_spu, p_fmt_dst->i_chroma, p_fmt_dst->i_aspect );
+        p_spu->p->p_blend = filter_NewBlend( VLC_OBJECT(p_spu), p_fmt_dst->i_chroma );
 
     /* Process all subpictures and regions (in the right order) */
     for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
@@ -945,62 +944,6 @@ static void FilterRelease( filter_t *p_filter )
     vlc_object_release( p_filter );
 }
 
-static void SpuRenderCreateBlend( spu_t *p_spu, vlc_fourcc_t i_chroma, int i_aspect )
-{
-    filter_t *p_blend;
-
-    assert( !p_spu->p->p_blend );
-
-    p_spu->p->p_blend =
-    p_blend        = vlc_custom_create( p_spu, sizeof(filter_t),
-                                        VLC_OBJECT_GENERIC, "blend" );
-    if( !p_blend )
-        return;
-
-    es_format_Init( &p_blend->fmt_in, VIDEO_ES, 0 );
-
-    es_format_Init( &p_blend->fmt_out, VIDEO_ES, 0 );
-    p_blend->fmt_out.video.i_x_offset = 0;
-    p_blend->fmt_out.video.i_y_offset = 0;
-    p_blend->fmt_out.video.i_chroma = i_chroma;
-    p_blend->fmt_out.video.i_aspect = i_aspect;
-
-    /* The blend module will be loaded when needed with the real
-    * input format */
-    p_blend->p_module = NULL;
-
-    /* */
-    vlc_object_attach( p_blend, p_spu );
-}
-static void SpuRenderUpdateBlend( spu_t *p_spu, int i_out_width, int i_out_height,
-                                  const video_format_t *p_in_fmt )
-{
-    filter_t *p_blend = p_spu->p->p_blend;
-
-    assert( p_blend );
-
-    /* */
-    if( p_blend->p_module && p_blend->fmt_in.video.i_chroma != p_in_fmt->i_chroma )
-    {
-        /* The chroma is not the same, we need to reload the blend module
-         * XXX to match the old behaviour just test !p_blend->fmt_in.video.i_chroma */
-        module_unneed( p_blend, p_blend->p_module );
-        p_blend->p_module = NULL;
-    }
-
-    /* */
-    p_blend->fmt_in.video = *p_in_fmt;
-
-    /* */
-    p_blend->fmt_out.video.i_width =
-    p_blend->fmt_out.video.i_visible_width = i_out_width;
-    p_blend->fmt_out.video.i_height =
-    p_blend->fmt_out.video.i_visible_height = i_out_height;
-
-    /* */
-    if( !p_blend->p_module )
-        p_blend->p_module = module_need( p_blend, "video blending", NULL, false );
-}
 static void SpuRenderCreateAndLoadText( spu_t *p_spu )
 {
     filter_t *p_text;
@@ -1630,16 +1573,12 @@ static void SpuRenderRegion( spu_t *p_spu,
     }
 
     /* Update the blender */
-    SpuRenderUpdateBlend( p_spu, p_fmt->i_width, p_fmt->i_height, &region_fmt );
-
-    if( p_sys->p_blend->p_module )
-    {
-        const int i_alpha = SpuRegionAlpha( p_subpic, p_region );
-
-        p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_pic_dst,
-            p_region_picture, i_x_offset, i_y_offset, i_alpha );
-    }
-    else
+    if( filter_ConfigureBlend( p_spu->p->p_blend,
+                               p_fmt->i_width, p_fmt->i_height,
+                               &region_fmt ) ||
+        filter_Blend( p_spu->p->p_blend,
+                      p_pic_dst, i_x_offset, i_y_offset,
+                      p_region_picture, SpuRegionAlpha( p_subpic, p_region ) ) )
     {
         msg_Err( p_spu, "blending %4.4s to %4.4s failed",
                  (char *)&p_sys->p_blend->fmt_out.video.i_chroma,
