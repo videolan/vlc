@@ -86,6 +86,7 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
     static const uint8_t p_cc_replaytv5a[2] = { 0x99, 0x02 };
     static const uint8_t p_cc_replaytv5b[2] = { 0xaa, 0x02 };
     static const uint8_t p_cc_scte20[2] = { 0x03, 0x81 };
+    static const uint8_t p_cc_scte20_old[2] = { 0x03, 0x01 };
     //static const uint8_t p_afd_start[4] = { 0x44, 0x54, 0x47, 0x31 };
 
     if( i_src < 4 )
@@ -190,7 +191,8 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
         }
         c->b_reorder = false;
     }
-    else if( !memcmp( p_cc_scte20, p_src, 2 ) && i_src > 2 )
+    else if( ( !memcmp( p_cc_scte20, p_src, 2 ) ||
+               !memcmp( p_cc_scte20_old, p_src, 2 ) ) && i_src > 2 )
     {
         /* SCTE-20 CC */
         bs_t s;
