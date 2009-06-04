@@ -63,7 +63,7 @@ struct filter_t
     picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
     block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );
     void                ( * pf_video_blend )  ( filter_t *,
-                                                picture_t *, picture_t *,
+                                                picture_t *, const picture_t *,
                                                 int, int, int );
 
     subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
