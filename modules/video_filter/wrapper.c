@@ -47,6 +47,7 @@ static void Close( vlc_object_t * );
     static int  Open##name ( vlc_object_t *p_this ) { return Open( p_this, #name ); }
 
 DECLARE_OPEN(magnify)
+DECLARE_OPEN(puzzle)
 
 #undef DECLARE_OPEN
 
@@ -62,7 +63,10 @@ vlc_module_begin()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     DECLARE_MODULE(magnify)
-    //add_submodule()
+
+    add_submodule()
+    DECLARE_MODULE(puzzle)
+
 vlc_module_end()
 
 #undef DECLARE_MODULE
@@ -118,7 +122,7 @@ static int Open( vlc_object_t *p_this, const char *psz_name )
     filter_chain_Reset( p_chain, &fmt, &fmt );
 
     filter_t *p_filter =
-        filter_chain_AppendFilter( p_chain, psz_name, NULL, &fmt, &fmt );
+        filter_chain_AppendFilter( p_chain, psz_name, p_vout->p_cfg, &fmt, &fmt );
 
     if( !p_filter )
     {
