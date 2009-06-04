@@ -585,12 +585,11 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "position-offset" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION_OFFSET, &newval );
-
         val.f_float = var_GetFloat( p_input, "position" ) + newval.f_float;
         if( val.f_float < 0.0 ) val.f_float = 0.0;
         if( val.f_float > 1.0 ) val.f_float = 1.0;
-        var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+
+        input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION_OFFSET, &newval );
     }
     else
     {
@@ -618,11 +617,9 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "time-offset" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TIME_OFFSET, &newval );
         val.i_time = var_GetTime( p_input, "time" ) + newval.i_time;
         if( val.i_time < 0 ) val.i_time = 0;
-        /* TODO maybe test against i_length ? */
-        var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
+        input_ControlPush( p_input, INPUT_CONTROL_SET_TIME_OFFSET, &newval );
     }
     else
     {
