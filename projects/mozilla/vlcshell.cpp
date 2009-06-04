@@ -208,12 +208,16 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                     hasVout = p_plugin->player_has_vout(NULL);
                     if( hasVout )
                     {
+#ifdef NOT_WORKING
                         libvlc_rectangle_t area;
                         area.left = 0;
                         area.top = 0;
                         area.right = npwindow.width;
                         area.bottom = npwindow.height;
                         libvlc_video_redraw_rectangle(p_plugin->getMD(&ex), &area, NULL);
+#else
+#warning disabled code
+#endif
                     }
                 }
                 libvlc_exception_clear(&ex);
@@ -406,10 +410,12 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         clip.left    = window->clipRect.left;
         clip.bottom  = window->clipRect.bottom;
         clip.right   = window->clipRect.right;
-
+#ifdef NOT_WORKING
         libvlc_video_set_viewport(p_vlc, p_plugin->getMD(&ex), &view, &clip, &ex);
         libvlc_exception_clear(&ex);
-
+#else
+#warning disabled code
+#endif        
         /* remember new window */
         p_plugin->setWindow(*window);
     }
