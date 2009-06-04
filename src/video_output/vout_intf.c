@@ -700,7 +700,7 @@ int vout_GetSnapshot( vout_thread_t *p_vout,
            mdate() < i_deadline )
     {
         vlc_cond_timedwait( &p_sys->snapshot.wait, &p_sys->snapshot.lock,
-                            i_timeout );
+                            i_deadline );
     }
 
     picture_t *p_picture = p_sys->snapshot.p_picture;
