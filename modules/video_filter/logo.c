@@ -376,6 +376,9 @@ static int Init( vout_thread_t *p_vout )
                         ( p_logo_list->i_counter + 1 )%p_logo_list->i_count;
 
     p_pic = p_logo_list->p_logo[p_logo_list->i_counter].p_pic;
+    p_sys->i_width  = p_pic ? p_pic->p[Y_PLANE].i_visible_pitch : 0;
+    p_sys->i_height = p_pic ? p_pic->p[Y_PLANE].i_visible_lines : 0;
+
     /* Initialize the output structure */
     p_vout->output.i_chroma = p_vout->render.i_chroma;
     p_vout->output.i_width  = p_vout->render.i_width;
@@ -385,38 +388,20 @@ static int Init( vout_thread_t *p_vout )
     fmt = p_vout->fmt_out;
 
     /* Load the video blending filter */
-    p_sys->p_blend = vlc_object_create( p_vout, sizeof(filter_t) );
-    vlc_object_attach( p_sys->p_blend, p_vout );
-    p_sys->p_blend->fmt_out.video.i_x_offset =
-        p_sys->p_blend->fmt_out.video.i_y_offset = 0;
-    p_sys->p_blend->fmt_in.video.i_x_offset =
-        p_sys->p_blend->fmt_in.video.i_y_offset = 0;
-    p_sys->p_blend->fmt_out.video.i_aspect = p_vout->render.i_aspect;
-    p_sys->p_blend->fmt_out.video.i_chroma = p_vout->output.i_chroma;
-    p_sys->p_blend->fmt_in.video.i_chroma = VLC_CODEC_YUVA;
-    p_sys->p_blend->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR;
-    p_sys->i_width =
-        p_sys->p_blend->fmt_in.video.i_width =
-            p_sys->p_blend->fmt_in.video.i_visible_width =
-                p_pic ? p_pic->p[Y_PLANE].i_visible_pitch : 0;
-    p_sys->i_height =
-        p_sys->p_blend->fmt_in.video.i_height =
-            p_sys->p_blend->fmt_in.video.i_visible_height =
-                p_pic ? p_pic->p[Y_PLANE].i_visible_lines : 0;
-    p_sys->p_blend->fmt_out.video.i_width =
-        p_sys->p_blend->fmt_out.video.i_visible_width =
-           p_vout->output.i_width;
-    p_sys->p_blend->fmt_out.video.i_height =
-        p_sys->p_blend->fmt_out.video.i_visible_height =
-            p_vout->output.i_height;
+    p_sys->p_blend = filter_NewBlend( VLC_OBJECT(p_vout), p_vout->output.i_chroma );
+    if( !p_sys->p_blend )
+        return VLC_EGENERIC;
 
-    p_sys->p_blend->p_module =
-        module_need( p_sys->p_blend, "video blending", NULL, false );
-    if( !p_sys->p_blend->p_module )
+    video_format_t fmt_blend;
+    video_format_Setup( &fmt_blend, VLC_CODEC_YUVA,
+                        p_sys->i_width, p_sys->i_height, 0 );
+
+    if( filter_ConfigureBlend( p_sys->p_blend,
+                               p_vout->output.i_width, p_vout->output.i_height,
+                               &fmt_blend ) )
     {
-        msg_Err( p_vout, "can't open blending filter, aborting" );
-        vlc_object_detach( p_sys->p_blend );
-        vlc_object_release( p_sys->p_blend );
+        msg_Err( p_vout, "can't configure blending filter, aborting" );
+        filter_DeleteBlend( p_sys->p_blend );
         return VLC_EGENERIC;
     }
 
@@ -478,10 +463,7 @@ static void End( vout_thread_t *p_vout )
 
     vout_filter_ReleaseDirectBuffers( p_vout );
 
-    if( p_sys->p_blend->p_module )
-        module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
-    vlc_object_detach( p_sys->p_blend );
-    vlc_object_release( p_sys->p_blend );
+    filter_DeleteBlend( p_sys->p_blend );
 }
 
 /*****************************************************************************
@@ -571,10 +553,13 @@ static void Render( vout_thread_t *p_vout, picture_t *p_inpic )
     picture_Copy( p_outpic, p_inpic );
 
     if( p_pic )
-        p_sys->p_blend->pf_video_blend( p_sys->p_blend, p_outpic,
-                                        p_pic, p_sys->posx, p_sys->posy,
-                                        p_logo->i_alpha != -1 ? p_logo->i_alpha
-                                        : p_logo_list->i_alpha );
+    {
+        const int i_alpha = p_logo->i_alpha != -1 ? p_logo->i_alpha : p_logo_list->i_alpha;
+
+        filter_Blend( p_sys->p_blend,
+                      p_outpic, p_sys->posx, p_sys->posy,
+                      p_pic, i_alpha );
+    }
 
     vout_DisplayPicture( p_sys->p_vout, p_outpic );
 }
