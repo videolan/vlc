@@ -651,7 +651,6 @@ struct filter_sys_t
     int pos, posx, posy;
 
     bool b_absolute;
-    mtime_t i_last_date;
 
     /* On the fly control variable */
     bool b_need_update;
@@ -718,8 +717,6 @@ static int CreateFilter( vlc_object_t *p_this )
     p_filter->pf_sub_filter = Filter;
     p_sys->b_need_update = true;
 
-    p_sys->i_last_date = 0;
-
     return VLC_SUCCESS;
 }
 
@@ -772,7 +769,6 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         vlc_mutex_unlock( &p_logo_list->lock );
         return 0;
     }
-    /* prior code tested on && p_sys->i_last_date +5000000 > date ) return 0; */
 
     /* adjust index to the next logo */
     p_logo_list->i_counter =
@@ -790,7 +786,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     }
 
     p_spu->b_absolute = p_sys->b_absolute;
-    p_spu->i_start = p_sys->i_last_date = date;
+    p_spu->i_start = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
 
