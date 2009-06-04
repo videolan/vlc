@@ -2117,15 +2117,10 @@ vlc_module_begin ()
  *  open network                  KEY_MODIFIER_COMMAND|'n'
  *  open capture                  KEY_MODIFIER_COMMAND|'r'
  *  save playlist                 KEY_MODIFIER_COMMAND|'s'
- *  playlist random               KEY_MODIFIER_COMMAND|'z'
  *  playlist repeat all           KEY_MODIFIER_COMMAND|'l'
  *  playlist repeat               KEY_MODIFIER_COMMAND|'r'
- *  video half size               KEY_MODIFIER_COMMAND|'0'
- *  video normal size             KEY_MODIFIER_COMMAND|'1'
- *  video double size             KEY_MODIFIER_COMMAND|'2'
  *  video fit to screen           KEY_MODIFIER_COMMAND|'3'
  *  minimize window               KEY_MODIFIER_COMMAND|'m'
- *  quit application              KEY_MODIFIER_COMMAND|'q'
  *  close window                  KEY_MODIFIER_COMMAND|'w'
  *  streaming wizard              KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'w'
  *  show controller               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'c'
@@ -2193,7 +2188,7 @@ vlc_module_begin ()
 #   define KEY_SNAPSHOT           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'s'
 #   define KEY_ZOOM               'z'
 #   define KEY_UNZOOM             KEY_MODIFIER_SHIFT|'z'
-#   define KEY_RANDOM             'r'
+#   define KEY_RANDOM             KEY_MODIFIER_COMMAND|'z'
 #   define KEY_LOOP               KEY_MODIFIER_SHIFT|'l'
 
 #   define KEY_CROP_TOP           KEY_MODIFIER_ALT|'i'
@@ -2207,9 +2202,9 @@ vlc_module_begin ()
 
 /* the macosx-interface already has bindings */
 #   define KEY_ZOOM_QUARTER       KEY_UNSET
-#   define KEY_ZOOM_HALF          KEY_UNSET
-#   define KEY_ZOOM_ORIGINAL      KEY_UNSET
-#   define KEY_ZOOM_DOUBLE        KEY_UNSET
+#   define KEY_ZOOM_HALF          KEY_MODIFIER_COMMAND|'0'
+#   define KEY_ZOOM_ORIGINAL      KEY_MODIFIER_COMMAND|'1'
+#   define KEY_ZOOM_DOUBLE        KEY_MODIFIER_COMMAND|'2'
 
 #   define KEY_SET_BOOKMARK1      KEY_MODIFIER_COMMAND|KEY_F1
 #   define KEY_SET_BOOKMARK2      KEY_MODIFIER_COMMAND|KEY_F2

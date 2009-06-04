@@ -463,6 +463,18 @@ static VLCMain *_o_sharedMainInstance = nil;
     i_key = config_GetInt( p_intf, "key-snapshot" );
     [o_mi_snapshot setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
     [o_mi_snapshot setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-random" );
+    [o_mi_random setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_random setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-zoom-half" );
+    [o_mi_half_window setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_half_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-zoom-original" );
+    [o_mi_normal_window setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_normal_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
+    i_key = config_GetInt( p_intf, "key-zoom-double" );
+    [o_mi_double_window setKeyEquivalent: [NSString stringWithFormat:@"%C", VLCKeyToCocoa( i_key )]];
+    [o_mi_double_window setKeyEquivalentModifierMask: VLCModifiersToCocoa(i_key)];
 
     var_Create( p_intf, "intf-change", VLC_VAR_BOOL );
 
