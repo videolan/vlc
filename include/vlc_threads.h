@@ -148,7 +148,7 @@ typedef struct vlc_timer_t vlc_timer_t;
 struct vlc_timer_t
 {
     HANDLE handle;
-    void (*func) (vlc_timer_t *, void *);
+    void (*func) (void *);
     void *data;
     unsigned overrun;
     CRITICAL_SECTION serializer;
