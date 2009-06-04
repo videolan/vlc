@@ -102,7 +102,6 @@ demux_t *__demux_New( vlc_object_t *p_obj,
             { "m3u",  "playlist" },
             { "mkv",  "mkv" }, { "mka",  "mkv" }, { "mks",  "mkv" },
             { "mp4",  "mp4" }, { "m4a",  "mp4" }, { "mov",  "mp4" }, { "moov", "mp4" },
-            { "mod",  "mod" }, { "it",  "mod" }, { "s3m",  "mod" }, { "xm",   "mod" },
             { "nsv",  "nsv" },
             { "ogg",  "ogg" }, { "ogm",  "ogg" }, /* legacy Ogg */
             { "oga",  "ogg" }, { "spx",  "ogg" }, { "ogv", "ogg" },
