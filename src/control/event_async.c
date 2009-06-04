@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <assert.h>
+
 #include <vlc/libvlc.h>
 
 #include "libvlc_internal.h"
@@ -38,6 +40,9 @@ struct libvlc_event_async_queue {
     vlc_mutex_t lock;
     vlc_cond_t signal;
     vlc_thread_t thread;
+    bool is_idle;
+    vlc_cond_t signal_idle;
+    vlc_threadvar_t is_asynch_dispatch_thread_var;
 };
 
 /*
@@ -153,6 +158,8 @@ libvlc_event_async_fini(libvlc_event_manager_t * p_em)
 
     vlc_mutex_destroy(&queue(p_em)->lock);
     vlc_cond_destroy(&queue(p_em)->signal);
+    vlc_cond_destroy(&queue(p_em)->signal_idle);
+    vlc_threadvar_delete(&queue(p_em)->is_asynch_dispatch_thread_var);
 
     struct queue_elmt * iter = queue(p_em)->elements;
     while (iter) {
@@ -184,6 +191,9 @@ libvlc_event_async_init(libvlc_event_manager_t * p_em)
 
     vlc_mutex_init(&queue(p_em)->lock);
     vlc_cond_init(&queue(p_em)->signal);
+    vlc_cond_init(&queue(p_em)->signal_idle);
+    error = vlc_threadvar_create(&queue(p_em)->is_asynch_dispatch_thread_var, NULL);
+    assert(!error);
 }
 
 /**************************************************************************
@@ -198,6 +208,15 @@ libvlc_event_async_ensure_listener_removal(libvlc_event_manager_t * p_em, libvlc
 
     queue_lock(p_em);
     pop_listener(p_em, listener);
+    
+    bool is_asynch_dispatch_thread = vlc_threadvar_get(queue(p_em)->is_asynch_dispatch_thread_var);
+
+    // Wait for the asynch_loop to have processed all events.
+    if(!queue(p_em)->is_idle && !is_asynch_dispatch_thread)
+    {
+        vlc_cond_wait(&queue(p_em)->signal_idle, &queue(p_em)->lock);
+        assert(queue(p_em)->is_idle);
+    }
     queue_unlock(p_em);
 }
 
@@ -232,6 +251,8 @@ static void * event_async_loop(void * arg)
     libvlc_event_listener_t listener;
     libvlc_event_t event;
 
+    vlc_threadvar_set(queue(p_em)->is_asynch_dispatch_thread_var, (void*)true);
+
     queue_lock(p_em);
     while (true) {
         int has_listener = pop(p_em, &listener, &event);
@@ -244,9 +265,14 @@ static void * event_async_loop(void * arg)
         }
         else
         {
+            queue(p_em)->is_idle = true;
+
             mutex_cleanup_push(&queue(p_em)->lock);
+            vlc_cond_broadcast(&queue(p_em)->signal_idle); // We'll be idle
             vlc_cond_wait(&queue(p_em)->signal, &queue(p_em)->lock);
             vlc_cleanup_pop();
+            
+            queue(p_em)->is_idle = false;
         }
     }
     queue_unlock(p_em);
