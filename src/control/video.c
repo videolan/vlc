@@ -599,7 +599,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
 
-    if( p_vout )
+    if( !p_vout )
     {
         libvlc_exception_raise( p_e, "Unable to get video output" );
         return;
