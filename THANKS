@@ -178,6 +178,7 @@ Ludovic Fauvet <etix # l0cal dot com> - Qt4 patch
 Lukas Durfina <lukas.durfina at gmail.com> - Qt4: full screen controller. Teletext button fix. Various fixes.
 Luqman Hakim <ovdl qt rocketmail dot com> - Indonesian translation
 Mahrazi Mohd Kamal <mahrazi at gmail.com> - Malay Translation
+Malte Tancred <malte at frontbase dot com> - VLCKit patch for URLs
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Marco Munderloh <Marco.Munderloh at web.de> - HTTP fix for Win32 to URL filenames
 Marián Hikaník <podnety _at_ mojepreklady _dot_ net> - Slovak localisation

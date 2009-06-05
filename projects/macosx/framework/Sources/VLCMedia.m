@@ -168,12 +168,12 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     return [[[VLCMedia alloc] initAsNodeWithName:aName] autorelease];
 }
 
-- (id)initWithURL:(NSURL *)anURL
+- (id)initWithPath:(NSString *)aPath
 {
-    return [self initWithPath:[anURL path]];
+    return [self initWithURL:[NSURL fileURLWithPath:aPath isDirectory:NO]];
 }
 
-- (id)initWithPath:(NSString *)aPath
+- (id)initWithURL:(NSURL *)anURL
 {        
     if (self = [super init])
     {
@@ -181,7 +181,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         libvlc_exception_init(&ex);
         
         p_md = libvlc_media_new([VLCLibrary sharedInstance],
-                                           [aPath UTF8String],
+                                           [[anURL absoluteString] UTF8String],
                                            &ex);
         catch_exception(&ex);
         
