@@ -197,7 +197,7 @@ VLC_EXPORT( int, filter_ConfigureBlend, ( filter_t *, int i_dst_width, int i_dst
  *
  * The input picture is not modified and not released.
  */
-VLC_EXPORT( int, filter_Blend, ( filter_t *, picture_t *p_dst, int i_dst_x, int i_dst_y, picture_t *p_src, int i_alpha ) );
+VLC_EXPORT( int, filter_Blend, ( filter_t *, picture_t *p_dst, int i_dst_x, int i_dst_y, const picture_t *p_src, int i_alpha ) );
 
 /**
  * It destroys a blend filter created by filter_NewBlend.

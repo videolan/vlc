@@ -88,7 +88,7 @@ int filter_ConfigureBlend( filter_t *p_blend,
 
 int filter_Blend( filter_t *p_blend,
                   picture_t *p_dst, int i_dst_x, int i_dst_y,
-                  picture_t *p_src, int i_alpha )
+                  const picture_t *p_src, int i_alpha )
 {
     if( !p_blend->p_module )
         return VLC_EGENERIC;
