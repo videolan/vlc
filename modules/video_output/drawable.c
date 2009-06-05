@@ -170,7 +170,7 @@ static void Close (vlc_object_t *obj)
     }
     do
         used[n] = used[n + 1];
-    while (used[n + 1] != NULL);
+    while (used[++n] != NULL);
 
     if (n == 0)
       /* should not be needed (var_Destroy...) but better safe than sorry: */
