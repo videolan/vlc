@@ -134,7 +134,7 @@ static int Open( vlc_object_t *p_this )
     filter_sys_t *p_sys;
 
     /* */
-    if( memcmp( &p_filter->fmt_in, &p_filter->fmt_out, sizeof(p_filter->fmt_in) ) )
+    if( !es_format_IsSimilar( &p_filter->fmt_in, &p_filter->fmt_out ) )
     {
         msg_Err( p_filter, "Input and output format does not match" );
         return VLC_EGENERIC;
