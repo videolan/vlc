@@ -46,7 +46,7 @@ ifdef HAVE_DARWIN_OS
 
 CONTRIBREV=8
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
-	$(WGET) ftp://ftp.videolan.org/pub/videolan/testing/contrib/$@
+	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/$@
 
 using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 	@if test -d tmp; then \
