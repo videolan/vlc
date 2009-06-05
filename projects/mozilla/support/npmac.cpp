@@ -1017,6 +1017,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         //
         pluginFuncs->version        = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
         pluginFuncs->size           = sizeof(NPPluginFuncs);
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
         pluginFuncs->newp           = NewNPP_NewProc(PLUGIN_TO_HOST_GLUE(newp, Private_New));
         pluginFuncs->destroy        = NewNPP_DestroyProc(PLUGIN_TO_HOST_GLUE(destroy, Private_Destroy));
         pluginFuncs->setwindow      = NewNPP_SetWindowProc(PLUGIN_TO_HOST_GLUE(setwindow, Private_SetWindow));
@@ -1028,9 +1029,26 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
         pluginFuncs->print          = NewNPP_PrintProc(PLUGIN_TO_HOST_GLUE(print, Private_Print));
         pluginFuncs->event          = NewNPP_HandleEventProc(PLUGIN_TO_HOST_GLUE(event, Private_HandleEvent));
         pluginFuncs->getvalue       = NewNPP_GetValueProc(PLUGIN_TO_HOST_GLUE(getvalue, Private_GetValue));
+#else
+        pluginFuncs->newp           = (NPP_NewProcPtr)(PLUGIN_TO_HOST_GLUE(newp, Private_New));
+        pluginFuncs->destroy        = (NPP_DestroyProcPtr)(PLUGIN_TO_HOST_GLUE(destroy, Private_Destroy));
+        pluginFuncs->setwindow      = (NPP_SetWindowProcPtr)(PLUGIN_TO_HOST_GLUE(setwindow, Private_SetWindow));
+        pluginFuncs->newstream      = (NPP_NewStreamProcPtr)(PLUGIN_TO_HOST_GLUE(newstream, Private_NewStream));
+        pluginFuncs->destroystream  = (NPP_DestroyStreamProcPtr)(PLUGIN_TO_HOST_GLUE(destroystream, Private_DestroyStream));
+        pluginFuncs->asfile         = (NPP_StreamAsFileProcPtr)(PLUGIN_TO_HOST_GLUE(asfile, Private_StreamAsFile));
+        pluginFuncs->writeready     = (NPP_WriteReadyProcPtr)(PLUGIN_TO_HOST_GLUE(writeready, Private_WriteReady));
+        pluginFuncs->write          = (NPP_WriteProcPtr)(PLUGIN_TO_HOST_GLUE(write, Private_Write));
+        pluginFuncs->print          = (NPP_PrintProcPtr)(PLUGIN_TO_HOST_GLUE(print, Private_Print));
+        pluginFuncs->event          = (NPP_HandleEventProcPtr)(PLUGIN_TO_HOST_GLUE(event, Private_HandleEvent));
+        pluginFuncs->getvalue       = (NPP_GetValueProcPtr)(PLUGIN_TO_HOST_GLUE(getvalue, Private_GetValue));
+#endif
         if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
         {
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
             pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));
+#else
+            pluginFuncs->urlnotify = (NPP_URLNotifyProcPtr)(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));
+#endif
         }
 #ifdef OJI
         if( navMinorVers >= NPVERS_HAS_LIVECONNECT )
@@ -1040,8 +1058,11 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
 #else
         pluginFuncs->javaClass = NULL;
 #endif
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
         *unloadUpp = NewNPP_ShutdownProc(PLUGIN_TO_HOST_GLUE(shutdown, Private_Shutdown));
-
+#else
+        *unloadUpp = (NPP_ShutdownProcPtr)(PLUGIN_TO_HOST_GLUE(shutdown, Private_Shutdown));
+#endif
         SetUpQD();
         err = Private_Initialize();
     }
@@ -1176,6 +1197,7 @@ NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs)
 
     pluginFuncs->version    = (NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR;
     pluginFuncs->size       = sizeof(NPPluginFuncs);
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) < 20)
     pluginFuncs->newp       = NewNPP_NewProc(Private_New);
     pluginFuncs->destroy    = NewNPP_DestroyProc(Private_Destroy);
     pluginFuncs->setwindow  = NewNPP_SetWindowProc(Private_SetWindow);
@@ -1188,6 +1210,20 @@ NPError NP_GetEntryPoints(NPPluginFuncs* pluginFuncs)
     pluginFuncs->event      = NewNPP_HandleEventProc(Private_HandleEvent);
     pluginFuncs->getvalue   = NewNPP_GetValueProc(Private_GetValue);
     pluginFuncs->setvalue   = NewNPP_SetValueProc(Private_SetValue);
+#else
+    pluginFuncs->newp       = (NPP_NewProcPtr)(Private_New);
+    pluginFuncs->destroy    = (NPP_DestroyProcPtr)(Private_Destroy);
+    pluginFuncs->setwindow  = (NPP_SetWindowProcPtr)(Private_SetWindow);
+    pluginFuncs->newstream  = (NPP_NewStreamProcPtr)(Private_NewStream);
+    pluginFuncs->destroystream = (NPP_DestroyStreamProcPtr)(Private_DestroyStream);
+    pluginFuncs->asfile     = (NPP_StreamAsFileProcPtr)(Private_StreamAsFile);
+    pluginFuncs->writeready = (NPP_WriteReadyProcPtr)(Private_WriteReady);
+    pluginFuncs->write      = (NPP_WriteProcPtr)(Private_Write);
+    pluginFuncs->print      = (NPP_PrintProcPtr)(Private_Print);
+    pluginFuncs->event      = (NPP_HandleEventProcPtr)(Private_HandleEvent);
+    pluginFuncs->getvalue   = (NPP_GetValueProcPtr)(Private_GetValue);
+    pluginFuncs->setvalue   = (NPP_SetValueProcPtr)(Private_SetValue);
+#endif
     if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
     {
         pluginFuncs->urlnotify = Private_URLNotify;
