@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_es.h>
+#include <vlc_aout.h>
 
 
 /*****************************************************************************
@@ -201,6 +202,35 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma, int i_wid
         break;
     }
 }
+bool video_format_IsSimilar( const video_format_t *p_fmt1, const video_format_t *p_fmt2 )
+{
+    video_format_t v1 = *p_fmt1;
+    video_format_t v2 = *p_fmt2;
+
+    if( v1.i_chroma != v2.i_chroma )
+        return false;
+
+    if( v1.i_width != v2.i_width || v1.i_height != v2.i_height ||
+        v1.i_visible_width != v2.i_visible_width ||
+        v1.i_visible_height != v2.i_visible_height ||
+        v1.i_x_offset != v2.i_x_offset || v1.i_y_offset != v2.i_y_offset )
+        return false;
+
+    if( v1.i_chroma == VLC_CODEC_RGB15 ||
+        v1.i_chroma == VLC_CODEC_RGB16 ||
+        v1.i_chroma == VLC_CODEC_RGB24 ||
+        v1.i_chroma == VLC_CODEC_RGB32 )
+    {
+        video_format_FixRgb( &v1 );
+        video_format_FixRgb( &v2 );
+
+        if( v1.i_rmask != v2.i_rmask ||
+            v1.i_gmask != v2.i_gmask ||
+            v1.i_bmask != v2.i_bmask )
+            return false;
+    }
+    return true;
+}
 
 void es_format_Init( es_format_t *fmt,
                      int i_cat, vlc_fourcc_t i_codec )
@@ -311,5 +341,45 @@ void es_format_Clean( es_format_t *fmt )
 
     /* es_format_Clean can be called multiple times */
     memset( fmt, 0, sizeof(*fmt) );
+}
+
+bool es_format_IsSimilar( const es_format_t *p_fmt1, const es_format_t *p_fmt2 )
+{
+    if( p_fmt1->i_cat != p_fmt2->i_cat ||
+        vlc_fourcc_GetCodec( p_fmt1->i_cat, p_fmt1->i_codec ) !=
+        vlc_fourcc_GetCodec( p_fmt2->i_cat, p_fmt2->i_codec ) )
+        return false;
+
+    switch( p_fmt1->i_cat )
+    {
+    case AUDIO_ES:
+    {
+        audio_format_t a1 = p_fmt1->audio;
+        audio_format_t a2 = p_fmt2->audio;
+
+        if( a1.i_format && a2.i_format && a1.i_format != a2.i_format )
+            return false;
+        if( a1.i_rate != a2.i_rate ||
+            a1.i_physical_channels != a2.i_physical_channels ||
+            a1.i_original_channels != a2.i_original_channels )
+            return false;
+        return true;
+    }
+
+    case VIDEO_ES:
+    {
+        video_format_t v1 = p_fmt1->video;
+        video_format_t v2 = p_fmt2->video;
+        if( !v1.i_chroma )
+            v1.i_chroma = vlc_fourcc_GetCodec( p_fmt1->i_cat, p_fmt1->i_codec );
+        if( !v2.i_chroma )
+            v2.i_chroma = vlc_fourcc_GetCodec( p_fmt1->i_cat, p_fmt2->i_codec );
+        return video_format_IsSimilar( &p_fmt1->video, &p_fmt2->video );
+    }
+
+    case SPU_ES:
+    default:
+        return true;
+    }
 }
 

@@ -178,6 +178,12 @@ static inline void video_format_Clean( video_format_t *p_src )
 VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
 
 /**
+ * This function will check if the first video format is similar
+ * to the second one.
+ */
+VLC_EXPORT( bool, video_format_IsSimilar, ( const video_format_t *, const video_format_t * ) );
+
+/**
  * subtitles format description
  */
 struct subs_format_t
@@ -292,5 +298,13 @@ VLC_EXPORT( int, es_format_Copy, ( es_format_t *p_dst, const es_format_t *p_src 
  * You can call it multiple times on the same structure.
  */
 VLC_EXPORT( void, es_format_Clean, ( es_format_t *fmt ) );
+
+/**
+ * This function will check if the first ES format is similar
+ * to the second one.
+ *
+ * All descriptive fields are ignored.
+ */
+VLC_EXPORT( bool, es_format_IsSimilar, ( const es_format_t *, const es_format_t * ) );
 
 #endif

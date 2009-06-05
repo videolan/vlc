@@ -121,6 +121,7 @@ EnsureUTF8
 es_format_Clean
 es_format_Copy
 es_format_Init
+es_format_IsSimilar
 filename_sanitize
 filter_Blend
 filter_chain_AppendFilter
@@ -442,6 +443,7 @@ var_SetChecked
 __var_TriggerCallback
 __var_Type
 video_format_FixRgb
+video_format_IsSimilar
 video_format_Setup
 vlc_avcodec_mutex
 vlc_b64_decode
