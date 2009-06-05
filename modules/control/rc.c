@@ -43,6 +43,7 @@
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
+#include <vlc_keys.h>
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
