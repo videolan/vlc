@@ -61,6 +61,11 @@ static inline bool is_queue_initialized(libvlc_event_manager_t * p_em)
     return queue(p_em) != NULL;
 }
 
+static inline bool current_thread_is_asynch_thread(libvlc_event_manager_t * p_em)
+{
+    return vlc_threadvar_get(queue(p_em)->is_asynch_dispatch_thread_var);
+}
+
 /* Lock must be held */
 static void push(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listener, libvlc_event_t * event)
 {
@@ -209,13 +214,11 @@ libvlc_event_async_ensure_listener_removal(libvlc_event_manager_t * p_em, libvlc
     queue_lock(p_em);
     pop_listener(p_em, listener);
     
-    bool is_asynch_dispatch_thread = vlc_threadvar_get(queue(p_em)->is_asynch_dispatch_thread_var);
-
     // Wait for the asynch_loop to have processed all events.
-    if(!queue(p_em)->is_idle && !is_asynch_dispatch_thread)
+    if(!current_thread_is_asynch_thread(p_em))
     {
-        vlc_cond_wait(&queue(p_em)->signal_idle, &queue(p_em)->lock);
-        assert(queue(p_em)->is_idle);
+        while(!queue(p_em)->is_idle)
+            vlc_cond_wait(&queue(p_em)->signal_idle, &queue(p_em)->lock);
     }
     queue_unlock(p_em);
 }
