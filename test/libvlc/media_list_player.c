@@ -23,6 +23,10 @@
 
 #include "test.h"
 
+ // For msleep
+#include <vlc_common.h>
+#include <vlc_mtime.h>
+
 static void media_list_add_file_path(libvlc_instance_t *vlc, libvlc_media_list_t *ml, const char * file_path)
 {
     libvlc_media_t *md = libvlc_media_new (vlc, file_path, &ex);
@@ -73,7 +77,7 @@ static void test_media_list_player_next(const char** argv, int argc)
 
     libvlc_media_release (md);
 
-    usleep(100000);
+    msleep(100000);
     
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
@@ -81,7 +85,7 @@ static void test_media_list_player_next(const char** argv, int argc)
     libvlc_media_list_player_pause (mlp, &ex);
     catch();
 
-    usleep(100000);
+    msleep(100000);
     
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
@@ -89,7 +93,7 @@ static void test_media_list_player_next(const char** argv, int argc)
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
 
-    usleep(100000);
+    msleep(100000);
     
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
