@@ -157,6 +157,12 @@ void
 libvlc_event_async_fini(libvlc_event_manager_t * p_em)
 {    
     if(!is_queue_initialized(p_em)) return;
+
+    if(current_thread_is_asynch_thread(p_em))
+    {
+        fprintf(stderr, "*** Error: releasing the last reference of the observed object from its callback thread is not (yet!) supported\n");
+        abort();
+    }
     
     vlc_thread_t thread = queue(p_em)->thread;
     if(thread)
@@ -214,12 +220,6 @@ void
 libvlc_event_async_ensure_listener_removal(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listener)
 {
     if(!is_queue_initialized(p_em)) return;
-
-    if(current_thread_is_asynch_thread(p_em))
-    {
-        fprintf(stderr, "*** Error: releasing the last reference of the observed object from its callback thread is not (yet!) supported\n");
-        abort();
-    }
 
     queue_lock(p_em);
     pop_listener(p_em, listener);
