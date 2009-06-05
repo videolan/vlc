@@ -1020,9 +1020,7 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
     /* Pause */
     if( p_intf->p_sys->i_play_status == PLAYING_S )
     {
-        vlc_value_t val;
-        val.i_int = config_GetInt( p_intf, "key-play-pause" );
-        var_Set( p_intf->p_libvlc, "key-pressed", val );
+        var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
     }
 }
 

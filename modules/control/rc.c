@@ -1059,8 +1059,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     /* Parse commands that only require an input */
     if( !strcmp( psz_cmd, "pause" ) )
     {
-        val.i_int = config_GetInt( p_intf, "key-play-pause" );
-        var_Set( p_intf->p_libvlc, "key-pressed", val );
+        var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
@@ -1090,8 +1089,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            val.i_int = config_GetInt( p_intf, "key-jump+extrashort" );
-            var_Set( p_intf->p_libvlc, "key-pressed", val );
+            var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_EXTRASHORT );
         }
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -1106,8 +1104,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            val.i_int = config_GetInt( p_intf, "key-jump-extrashort" );
-            var_Set( p_intf->p_libvlc, "key-pressed", val );
+            var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_EXTRASHORT );
         }
         vlc_object_release( p_input );
         return VLC_SUCCESS;
@@ -1569,10 +1566,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         {
             if( i_volume == AOUT_VOLUME_MIN )
             {
-                vlc_value_t keyval;
-
-                keyval.i_int = config_GetInt( p_intf, "key-vol-mute" );
-                var_Set( p_intf->p_libvlc, "key-pressed", keyval );
+                var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_VOL_MUTE );
             }
             i_error = aout_VolumeSet( p_this, i_volume );
             osd_Volume( p_this );
