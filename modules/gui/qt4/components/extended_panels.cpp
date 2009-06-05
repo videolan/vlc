@@ -258,7 +258,8 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
     /* FIXME temporary hack */
     const char *psz_module_name = psz_name;
     if( !strcmp( psz_name, "magnify" ) ||
-        !strcmp( psz_name, "puzzle" ) )
+        !strcmp( psz_name, "puzzle" ) ||
+        !strcmp( psz_name, "logo" ) )
         psz_module_name = "video_filter_wrapper";
 
     module_t *p_obj = module_find( psz_module_name );
