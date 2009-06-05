@@ -166,6 +166,10 @@ ifdef HAVE_AMR
 FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
 endif
 
+ifdef HAVE_LINUX
+X264CONF += --enable-pic
+endif
+
 DATE=`date +%Y-%m-%d`
 
 # ***************************************************************************
@@ -1292,6 +1296,7 @@ ifdef HAVE_BIGENDIAN
 	(cd $<; ./genMakefiles armeb-uclibc && make $(HOSTCC))
 endif
 else
+	(cd $<; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux)
 	(cd $<; ./genMakefiles linux && make $(HOSTCC))
 endif
 endif
