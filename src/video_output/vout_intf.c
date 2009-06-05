@@ -696,11 +696,11 @@ int vout_GetSnapshot( vout_thread_t *p_vout,
     p_sys->snapshot.i_request++;
 
     const mtime_t i_deadline = mdate() + i_timeout;
-    while( p_sys->snapshot.b_available && !p_sys->snapshot.p_picture &&
-           mdate() < i_deadline )
+    while( p_sys->snapshot.b_available && !p_sys->snapshot.p_picture )
     {
-        vlc_cond_timedwait( &p_sys->snapshot.wait, &p_sys->snapshot.lock,
-                            i_deadline );
+        if( vlc_cond_timedwait( &p_sys->snapshot.wait, &p_sys->snapshot.lock,
+                                i_deadline ) )
+            break;
     }
 
     picture_t *p_picture = p_sys->snapshot.p_picture;
