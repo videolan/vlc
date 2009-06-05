@@ -73,7 +73,7 @@ static void test_media_list_player_next(const char** argv, int argc)
 
     libvlc_media_release (md);
 
-    usleep(500000);
+    usleep(100000);
     
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
@@ -81,7 +81,7 @@ static void test_media_list_player_next(const char** argv, int argc)
     libvlc_media_list_player_pause (mlp, &ex);
     catch();
 
-    usleep(500000);
+    usleep(100000);
     
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
@@ -89,7 +89,7 @@ static void test_media_list_player_next(const char** argv, int argc)
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
 
-    usleep(500000);
+    usleep(100000);
     
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
