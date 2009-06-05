@@ -530,13 +530,10 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
         else if( vlc_mouse_HasReleased( p_old, p_new, MOUSE_BUTTON_LEFT ) )
             p_sys->b_mouse_grab = false;
 
-    msg_Err( p_filter, "Mouse: %d G: %d", b_over, p_sys->b_mouse_grab );
-
         if( p_sys->b_mouse_grab )
         {
             int i_dx, i_dy;
             vlc_mouse_GetMotion( &i_dx, &i_dy, p_old, p_new );
-            msg_Err( p_filter, "Mouse: d=%d:%d", i_dx, i_dy );
             p_sys->i_pos_x = __MIN( __MAX( p_sys->i_pos_x + i_dx, 0 ),
                                     p_filter->fmt_in.video.i_width  - i_logo_w );
             p_sys->i_pos_y = __MIN( __MAX( p_sys->i_pos_y + i_dy, 0 ),
