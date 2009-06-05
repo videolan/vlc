@@ -133,14 +133,18 @@ static void pop_listener(libvlc_event_manager_t * p_em, libvlc_event_listener_t 
     while (iter) {
         if(listeners_are_equal(&iter->listener, listener))
         {
+            struct queue_elmt * to_delete = iter;
             if(!prev)
-                queue(p_em)->elements = iter->next;
+                queue(p_em)->elements = to_delete->next;
             else
-                prev->next = iter->next;
-            free(iter);
+                prev->next = to_delete->next;
+            iter = to_delete->next;
+            free(to_delete);
         }
-        prev = iter;
-        iter = iter->next;
+        else {
+            prev = iter;
+            iter = iter->next;
+        }
     }
 }
 
