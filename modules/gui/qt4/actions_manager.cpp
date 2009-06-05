@@ -80,11 +80,11 @@ void ActionsManager::doAction( int id_action )
         case REVERSE_ACTION:
             THEMIM->getIM()->reverse(); break;
         case SKIP_BACK_ACTION:
-            var_SetInteger( p_intf->p_libvlc, "key-pressed",
+            var_SetInteger( p_intf->p_libvlc, "key-action",
                     ACTIONID_JUMP_BACKWARD_SHORT );
             break;
         case SKIP_FW_ACTION:
-            var_SetInteger( p_intf->p_libvlc, "key-pressed",
+            var_SetInteger( p_intf->p_libvlc, "key-action",
                     ACTIONID_JUMP_FORWARD_SHORT );
             break;
         case QUIT_ACTION:
