@@ -1386,6 +1386,10 @@ void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
 
     MenuItemData *itemData = new MenuItemData( THEDP->menusMapper, p_obj, i_val_type,
             val, psz_var );
+
+    /* remove previous signal-slot connection(s) if any */
+    action->disconnect( );
+
     CONNECT( action, triggered(), THEDP->menusMapper, map() );
     THEDP->menusMapper->setMapping( action, itemData );
 
