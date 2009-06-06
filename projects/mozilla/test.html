@@ -504,8 +504,9 @@ function doGo(targetURL)
             // clear() may return before the playlist has actually been cleared
             // just wait for it to finish its job
         }
-        var options = new Array(":rtsp-tcp");
+        var options = [":rtsp-tcp"];
         var itemId = vlc.playlist.add(targetURL,"",options);
+        options = [];
         if( itemId != -1 )
         {
             // play MRL
@@ -526,10 +527,11 @@ function doGo(targetURL)
 function doAdd(targetURL)
 {
     var vlc = getVLC("vlc");
-    var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
+    var options = [":vout-filter=deinterlace", ":deinterlace-mode=linear"];
     if( vlc )
     {
         vlc.playlist.add(targetURL, "", options);
+        options = [];
         doItemCount();
     }
 }
@@ -612,7 +614,7 @@ function onEnd()
     doStop();
 }
 
-var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
+var liveFeedText = ["Live", "((Live))", "(( Live ))", "((  Live  ))"];
 var liveFeedRoll = 0;
 
 function onPlaying()

@@ -168,17 +168,6 @@ Insert Slider widget
 <INPUT size=4 value="" id="removeid"><INPUT type=submit value="Delete" onClick="doRemoveItem(document.getElementById('removeid').value);">
 </TD>
 </TR>
-<TR><TD>Messages:
-<INPUT type=button value="Messages" onClick='doMessages();'>
-Verbosity:
-<INPUT size=2 value="1" id="verbosity" onClick="doVerbosity(document.getElementById('verbosity').value);">
-<INPUT type=button value=" + " onClick='doVerbosity(1);'>
-<INPUT type=button value=" - " onClick='doVerbosity(-1);'>
-</TD>
-<TD>
-<DIV id="message" style="text-align:center">no message</DIV>
-</TD>
-</TR>
 <TR><TD>Audio Channel:
   <SELECT readonly onClick='doAudioChannel(this.value);'>
     <OPTION value=1>Stereo</OPTION>
@@ -262,16 +251,6 @@ function doReverse(rate)
     var vlc = getVLC("vlc");
     if( vlc )
         vlc.input.rate = -1.0 * vlc.input.rate;
-}
-
-function doVerbosity(value)
-{
-    var vlc = getVLC("vlc");
-    if( vlc )
-    {
-        vlc.log.verbosity = vlc.log.verbosity + value;
-        document.getElementById("verbosity").value = vlc.log.verbosity;
-    }
 }
 
 function doAudioChannel(value)
@@ -366,30 +345,6 @@ function doPlaylistClearAll()
     }
 }
 
-function doMessages()
-{
-    var vlc = getVLC("vlc");
-
-    if( vlc )
-    {
-        if( vlc.log.messages.count > 0 )
-        {
-            // there is one or more messages in the log
-            var iter = vlc.log.messages.iterator();
-            while( iter.hasNext )
-            {
-                var msg = iter.next();
-                if( msg.severity <= 1 )
-                {
-                    document.getElementById("message").innerHTML = msg.message;
-                }
-            }
-            // clear the log once finished to avoid clogging
-            vlc.log.messages.clear();
-        }
-    }
-}
-
 function updateVolume(deltaVol)
 {
     var vlc = getVLC("vlc");
@@ -478,23 +433,6 @@ function monitor()
     if( vlc )
     {
         newState = vlc.input.state;
-
-        if( vlc.log.messages.count > 0 )
-        {
-            // there is one or more messages in the log
-            var iter = vlc.log.messages.iterator();
-            while( iter.hasNext )
-            {
-                var msg = iter.next();
-                if( msg.severity == 1 )
-                {
-                    alert( msg.message );
-                }
-                document.getElementById("message").innerHTML = msg.message;
-            }
-            // clear the log once finished to avoid clogging
-            vlc.log.messages.clear();
-        }
     }
 
     if( prevState != newState )
@@ -566,13 +504,11 @@ function doGo(targetURL)
             // clear() may return before the playlist has actually been cleared
             // just wait for it to finish its job
         }
-        var options = new Array(":rtsp-tcp");
+        var options = [":rtsp-tcp"];
         var itemId = vlc.playlist.add(targetURL,"",options);
+        options = [];
         if( itemId != -1 )
         {
-            // clear the message log and enable error logging
-            vlc.log.verbosity = 1;
-            vlc.log.messages.clear();
             // play MRL
             vlc.playlist.playItem(itemId);
             if( monitorTimerId == 0 )
@@ -582,8 +518,6 @@ function doGo(targetURL)
         }
         else
         {
-            // disable log
-            vlc.log.verbosity = -1;
             alert("cannot play at the moment !");
         }
         doItemCount();
@@ -593,10 +527,11 @@ function doGo(targetURL)
 function doAdd(targetURL)
 {
     var vlc = getVLC("vlc");
-    var options = new Array(":vout-filter=deinterlace", ":deinterlace-mode=linear");
+    var options = [":vout-filter=deinterlace", ":deinterlace-mode=linear"];
     if( vlc )
     {
         vlc.playlist.add(targetURL, "", options);
+        options = [];
         doItemCount();
     }
 }
@@ -613,16 +548,11 @@ function doPlayOrPause()
         }
         else if( vlc.playlist.items.count > 0 )
         {
-            // clear the message log and enable error logging
-            vlc.log.verbosity = 1;
-            vlc.log.messages.clear();
             vlc.playlist.play();
             monitor();
         }
         else
         {
-            // disable log
-            vlc.log.verbosity = -1;
             alert('nothing to play !');
         }
     }
@@ -681,9 +611,10 @@ function onPlay()
 function onEnd()
 {
     document.getElementById("state").innerHTML = "End...";
+    doStop();
 }
 
-var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
+var liveFeedText = ["Live", "((Live))", "(( Live ))", "((  Live  ))"];
 var liveFeedRoll = 0;
 
 function onPlaying()
@@ -738,10 +669,7 @@ function onPause()
 
 function onStop()
 {
-    // disable logging
     var vlc = getVLC("vlc");
-    if( vlc )
-        vlc.log.verbosity = -1;
 
     if( inputTracker )
     {
@@ -762,25 +690,6 @@ function onError()
     var vlc = getVLC("vlc");
 
     document.getElementById("state").innerHTML = "Error...";
-    if( vlc )
-    {
-        if( vlc.log.messages.count > 0 )
-        {
-            // there is one or more messages in the log
-            var iter = vlc.log.messages.iterator();
-            while( iter.hasNext )
-            {
-                var msg = iter.next();
-                if( msg.severity <= 1 )
-                {
-                    alert( msg.message );
-                }
-                document.getElementById("message").innerHTML = msg.message;
-            }
-            // clear the log once finished to avoid clogging
-            vlc.log.messages.clear();
-        }
-    }
 }
 
 function onInputTrackerScrollStart()
