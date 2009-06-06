@@ -147,15 +147,15 @@ static inline void video_format_Init( video_format_t *p_src, vlc_fourcc_t i_chro
  * \param p_dst video_format_t to copy to
  * \param p_src video_format_t to copy from
  */
-static inline int video_format_Copy( video_format_t *p_dst, video_format_t *p_src )
+static inline int video_format_Copy( video_format_t *p_dst, const video_format_t *p_src )
 {
-    memcpy( p_dst, p_src, sizeof( video_format_t ) );
+    memcpy( p_dst, p_src, sizeof( *p_dst ) );
     if( p_src->p_palette )
     {
         p_dst->p_palette = (video_palette_t *) malloc( sizeof( video_palette_t ) );
         if( !p_dst->p_palette )
             return VLC_ENOMEM;
-        memcpy( p_dst->p_palette, p_src->p_palette, sizeof( video_palette_t ) );
+        memcpy( p_dst->p_palette, p_src->p_palette, sizeof( *p_dst->p_palette ) );
     }
     return VLC_SUCCESS;
 };
