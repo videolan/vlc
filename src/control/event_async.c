@@ -264,7 +264,7 @@ static void * event_async_loop(void * arg)
     libvlc_event_listener_t listener;
     libvlc_event_t event;
 
-    vlc_threadvar_set(queue(p_em)->is_asynch_dispatch_thread_var, (void*)true);
+    vlc_threadvar_set(queue(p_em)->is_asynch_dispatch_thread_var, p_em);
 
     queue_lock(p_em);
     while (true) {
