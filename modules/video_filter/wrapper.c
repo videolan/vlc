@@ -428,6 +428,7 @@ static int VoutsNewPicture( vout_thread_t *p_vout, picture_t *pp_dst[] )
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
     vout_thread_t *p_vout = p_data;
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_index;
@@ -589,6 +590,7 @@ static int  SplitterPictureNew( video_splitter_t *p_splitter, picture_t *pp_pict
 }
 static void SplitterPictureDel( video_splitter_t *p_splitter, picture_t *pp_picture[] )
 {
+    VLC_UNUSED(p_splitter); VLC_UNUSED(pp_picture);
     /* FIXME is there anything to do ? */
 }
 
