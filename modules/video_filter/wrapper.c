@@ -50,6 +50,7 @@ static void Close( vlc_object_t * );
 DECLARE_OPEN(magnify, true)
 DECLARE_OPEN(puzzle, true)
 DECLARE_OPEN(logo, true)
+DECLARE_OPEN(clone, false)
 
 #undef DECLARE_OPEN
 
@@ -71,6 +72,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(logo)
+
+    add_submodule()
+    DECLARE_MODULE(clone)
 
 vlc_module_end()
 
