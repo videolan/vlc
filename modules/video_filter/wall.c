@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001, 2002, 2003 the VideoLAN team
+ * Copyright (C) 2000-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -28,32 +28,14 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include "vlc_video_splitter.h"
+
+/* FIXME it is needed for VOUT_ALIGN_* only */
 #include <vlc_vout.h>
-#include <assert.h>
-
-#include "filter_common.h"
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static void Render    ( vout_thread_t *, picture_t * );
-
-static void RemoveAllVout  ( vout_thread_t *p_vout );
-
-static int  MouseEvent( vlc_object_t *, char const *,
-                        vlc_value_t, vlc_value_t, void * );
-static int  FullscreenEventUp( vlc_object_t *, char const *,
-                               vlc_value_t, vlc_value_t, void * );
-static int  FullscreenEventDown( vlc_object_t *, char const *,
-                                 vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -76,10 +58,13 @@ static int  FullscreenEventDown( vlc_object_t *, char const *,
 
 #define CFG_PREFIX "wall-"
 
-vlc_module_begin ()
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+vlc_module_begin()
     set_description( N_("Wall video filter") )
     set_shortname( N_("Image wall" ))
-    set_capability( "video filter", 0 )
+    set_capability( "video splitter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
@@ -90,575 +75,365 @@ vlc_module_begin ()
     add_string( CFG_PREFIX "element-aspect", "4:3", NULL, ASPECT_TEXT, ASPECT_LONGTEXT, false )
 
     add_shortcut( "wall" )
-    set_callbacks( Create, Destroy )
-vlc_module_end ()
+    set_callbacks( Open, Close )
+vlc_module_end()
 
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 static const char *const ppsz_filter_options[] = {
     "cols", "rows", "active", "element-aspect", NULL
 };
 
-/*****************************************************************************
- * vout_sys_t: Wall video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Wall specific properties of an output thread.
- *****************************************************************************/
-struct vout_sys_t
+/* */
+typedef struct
 {
-    int    i_col;
-    int    i_row;
-    int    i_vout;
-    struct vout_list_t
-    {
-        bool b_active;
-        int i_width;
-        int i_height;
-        int i_left;
-        int i_top;
-        vout_thread_t *p_vout;
-    } *pp_vout;
+    bool b_active;
+    int  i_output;
+    int  i_width;
+    int  i_height;
+    int  i_align;
+    int  i_left;
+    int  i_top;
+} wall_output_t;
+
+#define ROW_MAX (15)
+#define COL_MAX (15)
+struct video_splitter_sys_t
+{
+    int           i_col;
+    int           i_row;
+    int           i_output;
+    wall_output_t pp_output[ROW_MAX][COL_MAX]; /* [x][y] */
 };
 
-/*****************************************************************************
- * Control: control facility for the vout (forwards to child vout)
- *****************************************************************************/
-static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
+static int Mouse( video_splitter_t *, vlc_mouse_t *,
+                  int i_index,
+                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
+
+/**
+ * This function allocates and initializes a Wall splitter module.
+ */
+static int Open( vlc_object_t *p_this )
 {
-    int i_row, i_col, i_vout = 0;
+    video_splitter_t *p_splitter = (video_splitter_t*)p_this;
+    video_splitter_sys_t *p_sys;
 
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
-    {
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
-        {
-            vout_vaControl( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                            i_query, args );
-            i_vout++;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Create: allocates Wall video thread output method
- *****************************************************************************
- * This function allocates and initializes a Wall vout method.
- *****************************************************************************/
-static int Create( vlc_object_t *p_this )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    char *psz_method, *psz_tmp, *psz_method_tmp;
-    int i_vout;
-
-    /* Allocate structure */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_splitter->p_sys = p_sys = malloc( sizeof(*p_sys) );
+    if( !p_sys )
         return VLC_ENOMEM;
 
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = NULL;
-    p_vout->pf_control = Control;
+    config_ChainParse( p_splitter, CFG_PREFIX, ppsz_filter_options,
+                       p_splitter->p_cfg );
 
-    config_ChainParse( p_vout, CFG_PREFIX, ppsz_filter_options,
-                       p_vout->p_cfg );
+    /* */
+    p_sys->i_col = var_CreateGetInteger( p_splitter, CFG_PREFIX "cols" );
+    p_sys->i_col = __MAX( 1, __MIN( COL_MAX, p_sys->i_col ) );
 
-    /* Look what method was requested */
-    p_vout->p_sys->i_col = var_CreateGetInteger( p_vout, CFG_PREFIX "cols" );
-    p_vout->p_sys->i_row = var_CreateGetInteger( p_vout, CFG_PREFIX "rows" );
+    p_sys->i_row = var_CreateGetInteger( p_splitter, CFG_PREFIX "rows" );
+    p_sys->i_row = __MAX( 1, __MIN( ROW_MAX, p_sys->i_row ) );
 
-    p_vout->p_sys->i_col = __MAX( 1, __MIN( 15, p_vout->p_sys->i_col ) );
-    p_vout->p_sys->i_row = __MAX( 1, __MIN( 15, p_vout->p_sys->i_row ) );
+    msg_Dbg( p_splitter, "opening a %i x %i wall",
+             p_sys->i_col, p_sys->i_row );
 
-    msg_Dbg( p_vout, "opening a %i x %i wall",
-             p_vout->p_sys->i_col, p_vout->p_sys->i_row );
+    /* */
+    char *psz_state = var_CreateGetNonEmptyString( p_splitter, CFG_PREFIX "active" );
 
-    p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
-                                     p_vout->p_sys->i_col *
-                                     sizeof(struct vout_list_t) );
-    if( p_vout->p_sys->pp_vout == NULL )
+    /* */
+    bool pb_active[COL_MAX*ROW_MAX];
+    for( int i = 0; i < COL_MAX*ROW_MAX; i++ )
+        pb_active[i] = psz_state == NULL;
+
+    /* Parse active list if provided */
+    char *psz_tmp = psz_state;
+    while( psz_tmp && *psz_tmp )
     {
-        free( p_vout->p_sys );
-        return VLC_ENOMEM;
+        char *psz_next = strchr( psz_tmp, ',' );
+        if( psz_next )
+            *psz_next++ = '\0';
+
+        const int i_index = atoi( psz_tmp );
+        if( i_index >= 0 && i_index < COL_MAX*ROW_MAX )
+            pb_active[i_index] = true;
     }
+    free( psz_state );
 
-    psz_method_tmp =
-    psz_method = var_CreateGetNonEmptyString( p_vout, CFG_PREFIX "active" );
-
-    /* If no trailing vout are specified, take them all */
-    if( psz_method == NULL )
+    /* Parse aspect ratio if provided */
+    int i_aspect = 0;
+    char *psz_aspect = var_CreateGetNonEmptyString( p_splitter,
+                                                    CFG_PREFIX "element-aspect" );
+    if( psz_aspect )
     {
-        for( i_vout = p_vout->p_sys->i_row * p_vout->p_sys->i_col;
-             i_vout--; )
+        int i_ar_num, i_ar_den;
+        if( sscanf( psz_aspect, "%d:%d", &i_ar_num, &i_ar_den ) == 2 &&
+            i_ar_num > 0 && i_ar_den > 0 )
         {
-            p_vout->p_sys->pp_vout[i_vout].b_active = 1;
-        }
-    }
-    /* If trailing vout are specified, activate only the requested ones */
-    else
-    {
-        for( i_vout = p_vout->p_sys->i_row * p_vout->p_sys->i_col;
-             i_vout--; )
-        {
-            p_vout->p_sys->pp_vout[i_vout].b_active = 0;
-        }
-
-        while( *psz_method )
-        {
-            psz_tmp = psz_method;
-            while( *psz_tmp && *psz_tmp != ',' )
-            {
-                psz_tmp++;
-            }
-
-            if( *psz_tmp )
-            {
-                *psz_tmp = '\0';
-                i_vout = atoi( psz_method );
-                psz_method = psz_tmp + 1;
-            }
-            else
-            {
-                i_vout = atoi( psz_method );
-                psz_method = psz_tmp;
-            }
-
-            if( i_vout >= 0 &&
-                i_vout < p_vout->p_sys->i_row * p_vout->p_sys->i_col )
-            {
-                p_vout->p_sys->pp_vout[i_vout].b_active = 1;
-            }
-        }
-    }
-
-    free( psz_method_tmp );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize Wall video thread output method
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    int i_row, i_col, i_width, i_height, i_left, i_top;
-    unsigned int i_target_width,i_target_height;
-    video_format_t fmt;
-    int i_aspect = 4*VOUT_ASPECT_FACTOR/3;
-    int i_align = 0;
-    unsigned int i_hstart, i_hend, i_vstart, i_vend;
-    unsigned int w1,h1,w2,h2;
-    int i_xpos, i_ypos;
-    int i_vstart_rounded = 0, i_hstart_rounded = 0;
-    char *psz_aspect;
-
-    memset( &fmt, 0, sizeof(video_format_t) );
-
-    psz_aspect = var_CreateGetNonEmptyString( p_vout,
-                                              CFG_PREFIX "element-aspect" );
-    if( psz_aspect && *psz_aspect )
-    {
-        char *psz_parser = strchr( psz_aspect, ':' );
-        if( psz_parser )
-        {
-            *psz_parser++ = '\0';
-            i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR
-                / atoi( psz_parser );
+            i_aspect = i_ar_num * VOUT_ASPECT_FACTOR / i_ar_den;
         }
         else
         {
-            msg_Warn( p_vout, "invalid aspect ratio specification" );
+            msg_Warn( p_splitter, "invalid aspect ratio specification" );
         }
+        free( psz_aspect );
     }
-    free( psz_aspect );
+    if( i_aspect <= 0 )
+        i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
 
-    i_xpos = var_CreateGetInteger( p_vout, "video-x" );
-    i_ypos = var_CreateGetInteger( p_vout, "video-y" );
-    if( i_xpos < 0 ) i_xpos = 0;
-    if( i_ypos < 0 ) i_ypos = 0;
+    /* Compute placements/size of the windows */
+    const unsigned w1 = ( p_splitter->fmt.i_width / p_sys->i_col ) & ~1;
+    const unsigned h1 = ( w1 * VOUT_ASPECT_FACTOR / i_aspect ) & ~1;
 
-    I_OUTPUTPICTURES = 0;
+    const unsigned h2 = ( p_splitter->fmt.i_height / p_sys->i_row ) & ~1;
+    const unsigned w2 = ( h2 * i_aspect / VOUT_ASPECT_FACTOR ) & ~1;
 
-    /* Initialize the output structure */
-    p_vout->output.i_chroma = p_vout->render.i_chroma;
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-    var_Create( p_vout, "align", VLC_VAR_INTEGER );
+    unsigned i_target_width;
+    unsigned i_target_height;
+    unsigned i_hstart, i_hend;
+    unsigned i_vstart, i_vend;
+    bool b_vstart_rounded;
+    bool b_hstart_rounded;
 
-    fmt.i_width = fmt.i_visible_width = p_vout->render.i_width;
-    fmt.i_height = fmt.i_visible_height = p_vout->render.i_height;
-    fmt.i_x_offset = fmt.i_y_offset = 0;
-    fmt.i_chroma = p_vout->render.i_chroma;
-    fmt.i_aspect = p_vout->render.i_aspect;
-    fmt.i_sar_num = p_vout->render.i_aspect * fmt.i_height / fmt.i_width;
-    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
-
-    w1 = p_vout->output.i_width / p_vout->p_sys->i_col;
-    w1 &= ~1;
-    h1 = w1 * VOUT_ASPECT_FACTOR / i_aspect&~1;
-    h1 &= ~1;
-
-    h2 = p_vout->output.i_height / p_vout->p_sys->i_row&~1;
-    h2 &= ~1;
-    w2 = h2 * i_aspect / VOUT_ASPECT_FACTOR&~1;
-    w2 &= ~1;
-
-    if ( h1 * p_vout->p_sys->i_row < p_vout->output.i_height )
+    if( h1 * p_sys->i_row < p_splitter->fmt.i_height )
     {
-        unsigned int i_tmp;
         i_target_width = w2;
         i_target_height = h2;
+
         i_vstart = 0;
-        i_vend = p_vout->output.i_height;
-        i_tmp = i_target_width * p_vout->p_sys->i_col;
-        while( i_tmp < p_vout->output.i_width ) i_tmp += p_vout->p_sys->i_col;
-        i_hstart = (( i_tmp - p_vout->output.i_width ) / 2)&~1;
-        i_hstart_rounded  = ( ( i_tmp - p_vout->output.i_width ) % 2 ) ||
-            ( ( ( i_tmp - p_vout->output.i_width ) / 2 ) & 1 );
-        i_hend = i_hstart + p_vout->output.i_width;
+        b_vstart_rounded = false;
+        i_vend = p_splitter->fmt.i_height;
+
+        unsigned i_tmp = i_target_width * p_sys->i_col;
+        while( i_tmp < p_splitter->fmt.i_width )
+            i_tmp += p_sys->i_col;
+
+        i_hstart = (( i_tmp - p_splitter->fmt.i_width ) / 2)&~1;
+        b_hstart_rounded  = ( ( i_tmp - p_splitter->fmt.i_width ) % 2 ) ||
+            ( ( ( i_tmp - p_splitter->fmt.i_width ) / 2 ) & 1 );
+        i_hend = i_hstart + p_splitter->fmt.i_width;
     }
     else
     {
-        unsigned int i_tmp;
         i_target_height = h1;
         i_target_width = w1;
+
         i_hstart = 0;
-        i_hend = p_vout->output.i_width;
-        i_tmp = i_target_height * p_vout->p_sys->i_row;
-        while( i_tmp < p_vout->output.i_height ) i_tmp += p_vout->p_sys->i_row;
-        i_vstart = ( ( i_tmp - p_vout->output.i_height ) / 2 ) & ~1;
-        i_vstart_rounded  = ( ( i_tmp - p_vout->output.i_height ) % 2 ) ||
-            ( ( ( i_tmp - p_vout->output.i_height ) / 2 ) & 1 );
-        i_vend = i_vstart + p_vout->output.i_height;
+        b_hstart_rounded = false;
+        i_hend = p_splitter->fmt.i_width;
+
+        unsigned i_tmp = i_target_height * p_sys->i_row;
+        while( i_tmp < p_splitter->fmt.i_height )
+            i_tmp += p_sys->i_row;
+
+        i_vstart = ( ( i_tmp - p_splitter->fmt.i_height ) / 2 ) & ~1;
+        b_vstart_rounded  = ( ( i_tmp - p_splitter->fmt.i_height ) % 2 ) ||
+            ( ( ( i_tmp - p_splitter->fmt.i_height ) / 2 ) & 1 );
+        i_vend = i_vstart + p_splitter->fmt.i_height;
     }
-    msg_Dbg( p_vout, "target resolution %dx%d", i_target_width, i_target_height );
+    msg_Dbg( p_splitter, "target resolution %dx%d", i_target_width, i_target_height );
+    msg_Dbg( p_splitter, "target window (%d,%d)-(%d,%d)", i_hstart,i_vstart,i_hend,i_vend );
 
-    /* Try to open the real video output */
-    msg_Dbg( p_vout, "spawning the real video outputs" );
-
-    p_vout->p_sys->i_vout = 0;
-    msg_Dbg( p_vout, "target window (%d,%d)-(%d,%d)", i_hstart,i_vstart,i_hend,i_vend );
-
-
-    i_top = 0;
-    i_height = 0;
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
+    int i_active = 0;
+    for( int y = 0, i_top = 0; y < p_sys->i_row; y++ )
     {
-        i_left = 0;
-        i_top += i_height;
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
+        /* */
+        int i_height = 0;
+        int i_halign = 0;
+        if( y * i_target_height >= i_vstart &&
+            ( y + 1 ) * i_target_height <= i_vend )
         {
-            i_align = 0;
+            i_height = i_target_height;
+        }
+        else if( ( y + 1 ) * i_target_height < i_vstart ||
+                 ( y * i_target_height ) > i_vend )
+        {
+            i_height = 0;
+        }
+        else
+        {
+            i_height = ( i_target_height -
+                         i_vstart%i_target_height );
+            if(  y >= ( p_sys->i_row / 2 ) )
+            {
+                i_halign = VOUT_ALIGN_TOP;
+                i_height -= b_vstart_rounded ? 2: 0;
+            }
+            else
+            {
+                i_halign = VOUT_ALIGN_BOTTOM;
+            }
+        }
 
-            if( i_col*i_target_width >= i_hstart &&
-                (i_col+1)*i_target_width <= i_hend )
+        /* */
+        for( int x = 0, i_left = 0; x < p_sys->i_col; x++ )
+        {
+            wall_output_t *p_output = &p_sys->pp_output[x][y];
+
+            /* */
+            int i_width;
+            int i_valign = 0;
+            if( x*i_target_width >= i_hstart &&
+                (x+1)*i_target_width <= i_hend )
             {
                 i_width = i_target_width;
             }
-            else if( ( i_col + 1 ) * i_target_width < i_hstart ||
-                     ( i_col * i_target_width ) > i_hend )
+            else if( ( x + 1 ) * i_target_width < i_hstart ||
+                     ( x * i_target_width ) > i_hend )
             {
                 i_width = 0;
             }
             else
             {
                 i_width = ( i_target_width - i_hstart % i_target_width );
-                if( i_col >= ( p_vout->p_sys->i_col / 2 ) )
+                if( x >= ( p_sys->i_col / 2 ) )
                 {
-                    i_align |= VOUT_ALIGN_LEFT;
-                    i_width -= i_hstart_rounded ? 2: 0;
+                    i_valign = VOUT_ALIGN_LEFT;
+                    i_width -= b_hstart_rounded ? 2: 0;
                 }
                 else
                 {
-                    i_align |= VOUT_ALIGN_RIGHT;
+                    i_valign = VOUT_ALIGN_RIGHT;
                 }
             }
 
-            if( i_row * i_target_height >= i_vstart &&
-                ( i_row + 1 ) * i_target_height <= i_vend )
-            {
-                i_height = i_target_height;
-            }
-            else if( ( i_row + 1 ) * i_target_height < i_vstart ||
-                     ( i_row * i_target_height ) > i_vend )
-            {
-                i_height = 0;
-            }
-            else
-            {
-                i_height = ( i_target_height -
-                             i_vstart%i_target_height );
-                if(  i_row >= ( p_vout->p_sys->i_row / 2 ) )
-                {
-                    i_align |= VOUT_ALIGN_TOP;
-                    i_height -= i_vstart_rounded ? 2: 0;
-                }
-                else
-                {
-                    i_align |= VOUT_ALIGN_BOTTOM;
-                }
-            }
-            if( i_height == 0 || i_width == 0 )
-            {
-                p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active = false;
-            }
+            /* */
+            p_output->b_active = pb_active[y * p_sys->i_col + x] &&
+                                 i_height > 0 && i_width > 0;
+            p_output->i_output = -1;
+            p_output->i_align = i_valign | i_halign;
+            p_output->i_width = i_width;
+            p_output->i_height = i_height;
+            p_output->i_left = i_left;
+            p_output->i_top = i_top;
 
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_width = i_width;
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_height = i_height;
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_left = i_left;
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_top = i_top;
+            msg_Dbg( p_splitter, "window %dx%d at %d:%d size %dx%d", 
+                     x, y, i_left, i_top, i_width, i_height );
+
+            if( p_output->b_active )
+                i_active++;
+
             i_left += i_width;
+        }
+        i_top += i_height;
+    }
+    if( i_active <= 0 )
+    {
+        msg_Err( p_splitter, "No active video output" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
-            if( !p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
-            {
-                p_vout->p_sys->i_vout++;
+    /* Setup output configuration */
+    p_splitter->i_output = i_active;
+    p_splitter->p_output = calloc( p_splitter->i_output,
+                                   sizeof(*p_splitter->p_output) );
+    if( !p_splitter->p_output )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+    for( int y = 0, i_output = 0; y < p_sys->i_row; y++ )
+    {
+        for( int x = 0; x < p_sys->i_col; x++ )
+        {
+            wall_output_t *p_output = &p_sys->pp_output[x][y];
+            if( !p_output->b_active )
                 continue;
-            }
-            var_SetInteger( p_vout, "align", i_align );
-            var_SetInteger( p_vout, "video-x", i_left + i_xpos - i_width);
-            var_SetInteger( p_vout, "video-y", i_top + i_ypos );
 
-            fmt.i_width = fmt.i_visible_width = i_width;
-            fmt.i_height = fmt.i_visible_height = i_height;
-            fmt.i_aspect = i_aspect * i_target_height / i_height *
-                i_width / i_target_width;
+            p_output->i_output = i_output++;
 
-            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
-                vout_Create( p_vout, &fmt );
-            if( !p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout )
-            {
-                msg_Err( p_vout, "failed to get %ix%i vout threads",
-                                 p_vout->p_sys->i_col, p_vout->p_sys->i_row );
-                RemoveAllVout( p_vout );
-                return VLC_EGENERIC;
-            }
-            vout_filter_SetupChild( p_vout, p_vout->p_sys->pp_vout[p_vout->p_sys->i_vout].p_vout,
-                                    MouseEvent, FullscreenEventUp, FullscreenEventDown, true );
-            p_vout->p_sys->i_vout++;
+            video_splitter_output_t *p_cfg = &p_splitter->p_output[p_output->i_output];
+
+            video_format_Copy( &p_cfg->fmt, &p_splitter->fmt );
+            p_cfg->fmt.i_visible_width  =
+            p_cfg->fmt.i_width          = p_output->i_width;
+            p_cfg->fmt.i_visible_height =
+            p_cfg->fmt.i_height         = p_output->i_height;
+            p_cfg->fmt.i_aspect         = (int64_t)i_aspect * i_target_height * p_output->i_width / i_target_width / p_output->i_height;
+
+            p_cfg->window.i_x     = p_output->i_left; /* FIXME relative to video-x/y (TODO in wrapper.c) ? */
+            p_cfg->window.i_y     = p_output->i_top;
+            p_cfg->window.i_align = p_output->i_align;
+            p_cfg->psz_module = NULL;
         }
     }
 
-    vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
+    /* */
+    p_splitter->pf_filter = Filter;
+    p_splitter->pf_mouse = Mouse;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * End: terminate Wall video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
-{
-    RemoveAllVout( p_vout );
-
-    vout_filter_ReleaseDirectBuffers( p_vout );
-}
-
-/*****************************************************************************
- * Destroy: destroy Wall video thread output method
- *****************************************************************************
- * Terminate an output method created by WallCreateOutputMethod
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
-
-    free( p_vout->p_sys->pp_vout );
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * Render: displays previously rendered output
- *****************************************************************************
- * This function send the currently rendered image to Wall image, waits
- * until it is displayed and switch the two rendering buffers, preparing next
- * frame.
- *****************************************************************************/
-static void Render( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    picture_t *p_outpic = NULL;
-    int i_col, i_row, i_vout, i_plane;
-    int pi_left_skip[VOUT_MAX_PLANES], pi_top_skip[VOUT_MAX_PLANES];
-
-    i_vout = 0;
-
-    for( i_row = 0; i_row < p_vout->p_sys->i_row; i_row++ )
-    {
-        for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
-        {
-            for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-            {
-                pi_left_skip[i_plane] = p_vout->p_sys->pp_vout[ i_vout ].i_left * p_pic->p[ i_plane ].i_pitch / p_vout->output.i_width;
-                pi_top_skip[i_plane] = (p_vout->p_sys->pp_vout[ i_vout ].i_top * p_pic->p[ i_plane ].i_lines / p_vout->output.i_height)*p_pic->p[i_plane].i_pitch;
-            }
-
-            if( !p_vout->p_sys->pp_vout[ i_vout ].b_active )
-            {
-                i_vout++;
-                continue;
-            }
-
-            while( ( p_outpic =
-                vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                                    0, 0, 0 )
-                   ) == NULL )
-            {
-                if( !vlc_object_alive (p_vout) || p_vout->b_error )
-                {
-                    vout_DestroyPicture(
-                        p_vout->p_sys->pp_vout[ i_vout ].p_vout, p_outpic );
-                    return;
-                }
-
-                msleep( VOUT_OUTMEM_SLEEP );
-            }
-            p_outpic->date = p_pic->date;
-
-            vout_LinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                              p_outpic );
-
-            for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
-            {
-                uint8_t *p_in, *p_in_end, *p_out;
-                int i_in_pitch = p_pic->p[i_plane].i_pitch;
-                int i_out_pitch = p_outpic->p[i_plane].i_pitch;
-                int i_copy_pitch = p_outpic->p[i_plane].i_visible_pitch;
-
-                p_in = p_pic->p[i_plane].p_pixels
-                        + pi_top_skip[i_plane] + pi_left_skip[i_plane];
-
-                p_in_end = p_in + p_outpic->p[i_plane].i_visible_lines
-                                   * p_pic->p[i_plane].i_pitch;
-
-                p_out = p_outpic->p[i_plane].p_pixels;
-
-                while( p_in < p_in_end )
-                {
-                    vlc_memcpy( p_out, p_in, i_copy_pitch );
-                    p_in += i_in_pitch;
-                    p_out += i_out_pitch;
-                }
-
-//                pi_left_skip[i_plane] += i_copy_pitch;
-            }
-
-            vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                                p_outpic );
-            vout_DisplayPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
-                                 p_outpic );
-
-            i_vout++;
-        }
-
-/*         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ ) */
-/*         { */
-/*             pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height */
-/*                                      * p_pic->p[i_plane].i_visible_lines */
-/*                                      / p_vout->output.i_height */
-/*                                      * p_pic->p[i_plane].i_pitch; */
-/*         } */
-    }
-}
-
-/*****************************************************************************
- * RemoveAllVout: destroy all the child video output threads
- *****************************************************************************/
-static void RemoveAllVout( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-
-    while( p_sys->i_vout )
-    {
-        p_sys->i_vout--;
-        if( p_sys->pp_vout[p_sys->i_vout ].b_active )
-        {
-            vout_filter_SetupChild( p_vout, p_sys->pp_vout[p_sys->i_vout].p_vout,
-                                    MouseEvent, FullscreenEventUp, FullscreenEventDown, false );
-            vout_CloseAndRelease( p_sys->pp_vout[p_sys->i_vout].p_vout );
-        }
-    }
 }
 
 /**
- * Forward mouse event with proper conversion.
+ * Terminate a splitter module.
  */
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static void Close( vlc_object_t *p_this )
 {
-    vout_thread_t *p_vout = p_data;
-    vout_sys_t *p_sys = p_vout->p_sys;
-    VLC_UNUSED(oldval);
-    int i_vout;
+    video_splitter_t *p_splitter = (video_splitter_t*)p_this;
+    video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
-    /* Find the video output index */
-    for( i_vout = 0; i_vout < p_sys->i_vout; i_vout++ )
-    {
-        if( p_sys->pp_vout[i_vout].b_active &&
-            p_this == VLC_OBJECT(p_sys->pp_vout[i_vout].p_vout) )
-            break;
-    }
-    assert( i_vout < p_vout->p_sys->i_vout );
-
-    /* Translate the mouse coordinates */
-    if( !strcmp( psz_var, "mouse-x" ) )
-        newval.i_int += p_vout->output.i_width * (i_vout % p_sys->i_col) / p_sys->i_col;
-    else if( !strcmp( psz_var, "mouse-y" ) )
-        newval.i_int += p_vout->output.i_height * (i_vout / p_sys->i_row) / p_sys->i_row;
-
-    return var_Set( p_vout, psz_var, newval );
+    free( p_splitter->p_output );
+    free( p_sys );
 }
 
-/**
- * Forward fullscreen event to/from the childrens.
- */
-static bool IsFullscreenActive( vout_thread_t *p_vout )
+static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t *p_src )
 {
-    vout_sys_t *p_sys = p_vout->p_sys;
-    for( int i = 0; i < p_sys->i_vout; i++ )
-    {
-        if( p_sys->pp_vout[i].b_active &&
-            var_GetBool( p_sys->pp_vout[i].p_vout, "fullscreen" ) )
-            return true;
-    }
-    return false;
-}
-static int FullscreenEventUp( vlc_object_t *p_this, char const *psz_var,
-                              vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = p_data;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(newval);
+    video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
-    const bool b_fullscreen = IsFullscreenActive( p_vout );
-    if( !var_GetBool( p_vout, "fullscreen" ) != !b_fullscreen )
-        return var_SetBool( p_vout, "fullscreen", b_fullscreen );
-    return VLC_SUCCESS;
-}
-static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
-                                vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t*)p_this;
-    vout_sys_t *p_sys = p_vout->p_sys;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(psz_var);
+    if( video_splitter_NewPicture( p_splitter, pp_dst ) )
+        return VLC_EGENERIC;
 
-    const bool b_fullscreen = IsFullscreenActive( p_vout );
-    if( !b_fullscreen != !newval.b_bool )
+    for( int y = 0; y < p_sys->i_row; y++ )
     {
-        for( int i = 0; i < p_sys->i_vout; i++ )
+        for( int x = 0; x < p_sys->i_col; x++ )
         {
-            if( !p_sys->pp_vout[i].b_active )
+            wall_output_t *p_output = &p_sys->pp_output[x][y];
+            if( !p_output->b_active )
                 continue;
 
-            vout_thread_t *p_child = p_sys->pp_vout[i].p_vout;
-            if( !var_GetBool( p_child, "fullscreen" ) != !newval.b_bool )
+            video_splitter_output_t *p_cfg = &p_splitter->p_output[p_output->i_output];
+            picture_t *p_dst = pp_dst[p_output->i_output];
+
+            /* */
+            picture_t tmp = *p_src;
+            for( int i = 0; i < tmp.i_planes; i++ )
             {
-                var_SetBool( p_child, "fullscreen", newval.b_bool );
-                if( newval.b_bool )
-                    return VLC_SUCCESS;
+                plane_t *p0 = &tmp.p[0];
+                plane_t *p = &tmp.p[i];
+                const int i_y = p_output->i_top  * p->i_visible_pitch / p0->i_visible_pitch;
+                const int i_x = p_output->i_left * p->i_visible_lines / p0->i_visible_lines;
+
+                p->p_pixels += i_y * p->i_pitch + ( i_x - (i_x % p->i_pixel_pitch));
+            }
+            picture_Copy( p_dst, &tmp );
+        }
+    }
+
+    picture_Release( p_src );
+    return VLC_SUCCESS;
+}
+static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
+                  int i_index,
+                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+{
+    video_splitter_sys_t *p_sys = p_splitter->p_sys;
+
+    for( int y = 0; y < p_sys->i_row; y++ )
+    {
+        for( int x = 0; x < p_sys->i_col; x++ )
+        {
+            wall_output_t *p_output = p_output = &p_sys->pp_output[x][y];
+            if( p_output->b_active && p_output->i_output == i_index )
+            {
+                *p_mouse = *p_new;
+                p_mouse->i_x += p_output->i_left;
+                p_mouse->i_y += p_output->i_top;
+                return VLC_SUCCESS;
             }
         }
     }
-    return VLC_SUCCESS;
+    assert(0);
+    return VLC_EGENERIC;
 }
 
