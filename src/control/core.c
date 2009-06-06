@@ -165,9 +165,8 @@ void libvlc_release( libvlc_instance_t *p_instance )
     vlc_mutex_t *lock = &p_instance->instance_lock;
     int refs;
 
-    assert( p_instance->ref_count > 0 );
-
     vlc_mutex_lock( lock );
+    assert( p_instance->ref_count > 0 );
     refs = --p_instance->ref_count;
     vlc_mutex_unlock( lock );
 
