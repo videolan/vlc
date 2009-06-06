@@ -260,16 +260,16 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
 
     p_list->psz_filename =
         var_CreateGetStringCommand( p_filter, "logo-file" );
-    if( !p_list->psz_filename || *p_list->psz_filename == '\0' )
+    if( !p_list->psz_filename )
     {
-        msg_Err( p_this, "logo file not specified" );
-
         if( p_sys->p_blend )
             filter_DeleteBlend( p_sys->p_blend );
-        free( p_list->psz_filename );
         free( p_sys );
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
+    if( *p_list->psz_filename == '\0' )
+        msg_Warn( p_this, "no logo file specified" );
+
     p_list->i_alpha = var_CreateGetIntegerCommand( p_filter,
                                                         "logo-transparency");
     p_list->i_alpha = __MAX( __MIN( p_list->i_alpha, 255 ), 0 );
@@ -552,63 +552,6 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
     return VLC_SUCCESS;
 }
 
-
-#if 0
-/*****************************************************************************
- * MouseEvent: callback for mouse events
- *****************************************************************************/
-static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = p_data;
-    assert( p_this == VLC_OBJECT(p_vout->p_sys->p_vout) );
-    VLC_UNUSED(oldval);
-
-    vout_sys_t *p_sys = p_vout->p_sys;
-    const int i_delta = newval.i_int - oldval.i_int;
-    const int i_bdown = var_GetInteger( p_sys->p_vout, "mouse-button-down" );
-
-    if( (i_bdown & 0x1) == 0 )
-        goto forward;
-
-    int i_x, i_y;
-    int i_dx = 0;
-    int i_dy = 0;
-    if( psz_var[6] == 'x' )
-    {
-        i_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
-        i_x = newval.i_int;
-        i_dx = i_delta;
-    }
-    else if( psz_var[6] == 'y' )
-    {
-        i_y = newval.i_int;
-        i_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
-        i_dy = i_delta;
-    }
-    else
-    {
-        goto forward;
-    }
-
-    /* FIXME missing lock */
-    if( i_x < (int)p_sys->i_pos_x ||
-        i_y < (int)p_sys->i_pos_y ||
-        i_x > (int)(p_sys->i_pos_x + p_sys->i_width) ||
-        i_y > (int)(p_sys->i_pos_y + p_sys->i_height) )
-        goto forward;
-
-    p_sys->i_pos_x = __MIN( __MAX( p_sys->i_pos_x + i_dx, 0 ),
-                         p_vout->output.i_width - p_sys->i_width );
-    p_sys->i_pos_y = __MIN( __MAX( p_sys->i_pos_y + i_dy, 0 ),
-                         p_vout->output.i_height - p_sys->i_height );
-    return VLC_SUCCESS;
-
-forward:
-    return var_Set( p_vout, psz_var, newval );
-}
-#endif
-
 /*****************************************************************************
  * Callback to update params on the fly
  *****************************************************************************/
@@ -624,6 +567,8 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     {
         LogoListUnload( p_list );
         p_list->psz_filename = strdup( newval.psz_string );
+        if( !p_list->psz_filename )
+            abort();
         LogoListLoad( p_this, p_list );
     }
     else if ( !strcmp( psz_var, "logo-x" ) )
@@ -657,6 +602,9 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
  */
 static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
 {
+    if( !psz_filename )
+        return NULL;
+
     video_format_t fmt_in;
     video_format_Init( &fmt_in, 0 );
 
@@ -691,6 +639,8 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list )
     p_logo_list->i_next_pic = 0;
 
     psz_list = strdup( p_logo_list->psz_filename );
+    if( !psz_list )
+        abort();
 
     /* Count the number logos == number of ';' + 1 */
     p_logo_list->i_count = 1;
@@ -702,6 +652,8 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list )
 
     p_logo_list->p_logo =
     p_logo              = calloc( p_logo_list->i_count, sizeof(*p_logo) );
+    if( !p_logo )
+        abort();
 
     /* Fill the data */
     for( i = 0; i < p_logo_list->i_count; i++ )
