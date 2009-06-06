@@ -172,6 +172,7 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
         msg_Err( p_libvlc, "stale interface subscribers (VLC might crash)" );
 
     vlc_mutex_lock( &msg_stack_lock );
+    assert(banks > 0);
     if( --banks == 0 )
         vlc_threadvar_delete( &msg_context );
     vlc_mutex_unlock( &msg_stack_lock );
