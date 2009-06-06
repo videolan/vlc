@@ -445,6 +445,8 @@ __var_Type
 video_format_FixRgb
 video_format_IsSimilar
 video_format_Setup
+video_splitter_Delete
+video_splitter_New
 vlc_avcodec_mutex
 vlc_b64_decode
 vlc_b64_decode_binary

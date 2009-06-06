@@ -93,6 +93,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_url.h \
 	../include/vlc_variables.h \
 	../include/vlc_vlm.h \
+	../include/vlc_video_splitter.h \
 	../include/vlc_vout.h \
 	../include/vlc_window.h \
 	../include/vlc_xml.h \
