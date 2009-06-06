@@ -5,3 +5,7 @@ SOURCES_audio_format = format.c
 SOURCES_param_eq = param_eq.c
 SOURCES_scaletempo = scaletempo.c
 SOURCES_chorus_flanger = chorus_flanger.c
+
+libvlc_LTLIBRARIES += \
+	libchorus_flanger_plugin.la \
+	$(NULL)
