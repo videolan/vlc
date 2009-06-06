@@ -305,11 +305,13 @@ static int Init( vout_thread_t *p_vout )
                 VoutsClean( p_vout, i );
                 return VLC_EGENERIC;
             }
+        }
 
+        /* Attach once pp_vout is completly field to avoid race conditions */
+        for( int i = 0; i < p_splitter->i_output; i++ )
             vout_filter_SetupChild( p_vout, p_sys->pp_vout[i],
                                     MouseEvent,
                                     FullscreenEventUp, FullscreenEventDown, true );
-        }
     }
 
     vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
@@ -380,21 +382,19 @@ static void VoutsClean( vout_thread_t *p_vout, int i_count )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
+    /* Detach all vouts before destroying them */
     for( int i = 0; i < i_count; i++ )
     {
         if( p_sys->p_chain )
-        {
-            assert( i == 0 );
             vout_filter_DelChild( p_vout, p_sys->pp_vout[i], MouseEvent );
-        }
         else
-        {
              vout_filter_SetupChild( p_vout, p_sys->pp_vout[i],
                                      MouseEvent,
                                      FullscreenEventUp, FullscreenEventDown, false );
-        }
-        vout_CloseAndRelease( p_sys->pp_vout[i] );
     }
+
+    for( int i = 0; i < i_count; i++ )
+        vout_CloseAndRelease( p_sys->pp_vout[i] );
 }
 static int VoutsNewPicture( vout_thread_t *p_vout, picture_t *pp_dst[] )
 {
