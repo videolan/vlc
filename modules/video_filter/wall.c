@@ -104,7 +104,7 @@ struct video_splitter_sys_t
     int           i_col;
     int           i_row;
     int           i_output;
-    wall_output_t pp_output[ROW_MAX][COL_MAX]; /* [x][y] */
+    wall_output_t pp_output[COL_MAX][ROW_MAX]; /* [x][y] */
 };
 
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
@@ -156,6 +156,8 @@ static int Open( vlc_object_t *p_this )
         const int i_index = atoi( psz_tmp );
         if( i_index >= 0 && i_index < COL_MAX*ROW_MAX )
             pb_active[i_index] = true;
+
+        psz_tmp = psz_next;
     }
     free( psz_state );
 
