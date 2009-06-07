@@ -32,7 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include "vlc_video_splitter.h"
+#include <vlc_video_splitter.h>
 
 /* FIXME it is needed for VOUT_ALIGN_* only */
 #include <vlc_vout.h>
@@ -384,7 +384,10 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
     if( video_splitter_NewPicture( p_splitter, pp_dst ) )
+    {
+        picture_Release( p_src );
         return VLC_EGENERIC;
+    }
 
     for( int y = 0; y < p_sys->i_row; y++ )
     {
