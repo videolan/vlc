@@ -114,6 +114,7 @@ static int Open (vlc_object_t *obj)
 
     if (p_sys == NULL)
         return VLC_ENOMEM;
+    demux->p_sys      = p_sys;
 
     /* Connect to X server */
     char *display = var_CreateGetNonEmptyString (obj, "x11-display");
@@ -259,7 +260,6 @@ static int Open (vlc_object_t *obj)
     /* Initializes demux */
     demux->pf_demux   = Demux;
     demux->pf_control = Control;
-    demux->p_sys      = p_sys;
     return VLC_SUCCESS;
 
 error:
