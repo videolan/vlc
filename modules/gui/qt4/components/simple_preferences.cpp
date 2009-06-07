@@ -473,10 +473,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "language", StringList, ui.languageLabel, language );
             BUTTONACT( ui.assoButton, assoDialog() );
 #else
-            ui.language->hide();
-            ui.languageLabel->hide();
-            ui.assoName->hide();
-            ui.assoButton->hide();
+            ui.languageBox->hide();
+            ui.assoBox->hide();
 #endif
 
             /* interface */
@@ -485,14 +483,27 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             {
                 if( strstr( psz_intf, "skin" ) )
                     ui.skins->setChecked( true );
-                else if( strstr( psz_intf, "qt" ) )
-                    ui.qt4->setChecked( true );
+            } else {
+                /* defaults to qt */
+                ui.qt4->setChecked( true );
             }
             free( psz_intf );
 
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
 
+            ui.skins_zone->setEnabled( ui.skins->isChecked() );
+            CONNECT( ui.skins, toggled( bool ), ui.skins_zone, setEnabled( bool ) );
+
+            ui.native_zone->setEnabled( ui.qt4->isChecked() );
+            CONNECT( ui.qt4, toggled( bool ), ui.native_zone, setEnabled( bool ) );
+
+            InterfacePreviewWidget *preview = new InterfacePreviewWidget( this );
+            ( (QGridLayout *) ui.LooknfeelBox->layout() )->
+                    addWidget( preview, 1, 0, 1, 2 );
+            CONNECT( ui.displayModeBox, currentIndexChanged( int ),
+                     preview, setPreview( int ) );
+            
             CONFIG_GENERIC( "qt-display-mode", IntegerList, ui.displayLabel,
                             displayModeBox );
             CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
@@ -510,17 +521,21 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, updatesBox );
             CONFIG_GENERIC_NO_BOOL( "qt-updates-days", Integer, NULL,
                     updatesDays );
+            ui.updatenotifier_zone->setEnabled( ui.updatesBox->isChecked() );
             CONNECT( ui.updatesBox, toggled( bool ),
-                     ui.updatesDays, setEnabled( bool ) );
+                     ui.updatenotifier_zone, setEnabled( bool ) );
 #else
             ui.updatesBox->hide();
-            ui.updatesDays->hide();
+            ui.updatenotifier_zone->hide();
 #endif
             /* ONE INSTANCE options */
 #if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
                     EnqueueOneInterfaceMode );
+            ui.EnqueueOneInterfaceMode->setEnabled( ui.OneInterfaceMode->isChecked() );
+            CONNECT( ui.OneInterfaceMode, toggled( bool ),
+                     ui.EnqueueOneInterfaceMode, setEnabled( bool ) );
 #else
             ui.OneInterfaceBox->hide();
 #endif
@@ -612,6 +627,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 #undef CONFIG_GENERIC2
 #undef CONFIG_GENERIC
 }
+
 
 void SPrefsPanel::updateAudioOptions( int number)
 {

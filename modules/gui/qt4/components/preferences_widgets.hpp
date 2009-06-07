@@ -53,6 +53,23 @@ class QGridLayout;
 class QDialogButtonBox;
 class QVBoxLayout;
 
+/*******************************************************
+ * Simple widgets
+ *******************************************************/
+
+class InterfacePreviewWidget : public QLabel
+{
+    Q_OBJECT
+public:
+    InterfacePreviewWidget( QWidget * );
+public slots:
+    void setPreview( int );
+};
+
+/*******************************************************
+ * Variable controls
+ *******************************************************/
+
 class ConfigControl : public QObject
 {
     Q_OBJECT

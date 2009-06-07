@@ -149,9 +149,9 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                                   "as lyrics, album arts...\n" \
                              " - minimal mode with limited controls" )
 
-#define QT_NORMAL_MODE_TEXT N_( "Classic look" )
-#define QT_ALWAYS_VIDEO_MODE_TEXT N_( "Complete look with information area" )
-#define QT_MINIMAL_MODE_TEXT N_( "Minimal look with no menus" )
+#define QT_NORMAL_MODE_TEXT N_( "Classic" )
+#define QT_ALWAYS_VIDEO_MODE_TEXT N_( "Complete (with information area)" )
+#define QT_MINIMAL_MODE_TEXT N_( "Minimal (without menu)" )
 
 #define QT_FULLSCREEN_TEXT N_( "Show a controller in fullscreen mode" )
 #define QT_NATIVEOPEN_TEXT N_( "Embed the file browser in open dialog" )

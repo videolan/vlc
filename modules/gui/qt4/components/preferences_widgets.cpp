@@ -199,6 +199,29 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
     }
 }
 
+/*******************************************************
+ * Simple widgets
+ *******************************************************/
+InterfacePreviewWidget::InterfacePreviewWidget
+        ( QWidget *parent ) : QLabel( parent, 0 )
+{
+    setGeometry( 0, 0, 128, 100 );
+    setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+}
+
+void InterfacePreviewWidget::setPreview( int comboid )
+{
+    /* Need to move resources references as soon as qt4.cpp
+       local defines has been moved somewhere else
+    */
+    char * pixmaps[] = { ":/prefsmenu/sample_classic",
+                         ":/prefsmenu/sample_complete",
+                         ":/prefsmenu/sample_minimal" };
+    setPixmap( QPixmap( pixmaps[ comboid ] ) );
+}
+
+
+
 /**************************************************************************
  * String-based controls
  *************************************************************************/
