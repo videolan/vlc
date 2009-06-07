@@ -157,6 +157,7 @@ static inline void block_Release( block_t *p_block )
     p_block->pf_release( p_block );
 }
 
+VLC_EXPORT( block_t *, block_heap_Alloc, (void *, void *, size_t) LIBVLC_USED );
 VLC_EXPORT( block_t *, block_mmap_Alloc, (void *addr, size_t length) LIBVLC_USED );
 VLC_EXPORT( block_t *, block_File, (int fd) LIBVLC_USED );
 

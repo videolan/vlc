@@ -194,6 +194,49 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     return p_block;
 }
 
+
+typedef struct
+{
+    block_t  self;
+    void    *mem;
+} block_heap_t;
+
+static void block_heap_Release (block_t *self)
+{
+    block_heap_t *block = (block_heap_t *)self;
+
+    free (block->mem);
+    free (block);
+}
+
+/**
+ * Creates a block from a heap allocation.
+ * This is provided by LibVLC so that manually heap-allocated blocks can safely
+ * be deallocated even after the origin plugin has been unloaded from memory.
+ *
+ * When block_Release() is called, VLC will free() the specified pointer.
+ *
+ * @param ptr base address of the heap allocation (will be free()'d)
+ * @param addr base address of the useful buffer data
+ * @param length bytes length of the useful buffer datan
+ * @return NULL in case of error (ptr free()'d in that case), or a valid
+ * block_t pointer.
+ */
+block_t *block_heap_Alloc (void *ptr, void *addr, size_t length)
+{
+    block_heap_t *block = malloc (sizeof (*block));
+    if (block == NULL)
+    {
+        free (addr);
+        return NULL;
+    }
+
+    block_Init (&block->self, (uint8_t *)addr, length);
+    block->self.pf_release = block_heap_Release;
+    block->mem = ptr;
+    return &block->self;
+}
+
 #ifdef HAVE_MMAP
 # include <sys/mman.h>
 
