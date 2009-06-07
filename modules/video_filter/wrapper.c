@@ -279,22 +279,25 @@ static int Init( vout_thread_t *p_vout )
     {
         video_splitter_t *p_splitter = p_sys->p_splitter;
 
+        /* */
+        const int i_org_align = var_CreateGetInteger( p_vout, "align" );
+        const int i_org_x = var_CreateGetInteger( p_vout, "video-x" );
+        const int i_org_y = var_CreateGetInteger( p_vout, "video-y" );
+        const char *psz_org_vout = var_CreateGetNonEmptyString( p_vout, "vout" );
+
+        /* */
         for( int i = 0; i < p_splitter->i_output; i++ )
         {
             const video_splitter_output_t *p_cfg = &p_splitter->p_output[i];
 
             /* */
-            var_Create( p_vout, "align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
             var_SetInteger( p_vout, "align", p_cfg->window.i_align);
 
-            var_Create( p_vout, "video-x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_SetInteger( p_vout, "video-x", p_cfg->window.i_x );
+            var_SetInteger( p_vout, "video-x", i_org_x + p_cfg->window.i_x );
+            var_SetInteger( p_vout, "video-y", i_org_y + p_cfg->window.i_y );
 
-            var_Create( p_vout, "video-y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-            var_SetInteger( p_vout, "video-y", p_cfg->window.i_y );
-
-            var_Create( p_vout, "vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-            var_SetString( p_vout, "vout", p_cfg->psz_module ? p_cfg->psz_module : "" );
+            if( p_cfg->psz_module )
+                var_SetString( p_vout, "vout", p_cfg->psz_module );
 
             /* */
             video_format_t fmt = p_cfg->fmt;
@@ -312,6 +315,11 @@ static int Init( vout_thread_t *p_vout )
             vout_filter_SetupChild( p_vout, p_sys->pp_vout[i],
                                     MouseEvent,
                                     FullscreenEventUp, FullscreenEventDown, true );
+        /* Restore settings */
+        var_SetInteger( p_vout, "align", i_org_align );
+        var_SetInteger( p_vout, "video-x", i_org_x );
+        var_SetInteger( p_vout, "video-y", i_org_y );
+        var_SetString( p_vout, "vout", psz_org_vout ? psz_org_vout : "" );
     }
 
     vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
