@@ -1181,8 +1181,8 @@ if BUILD_MOZILLA
 	fi; \
 	$${PACKAGEMAKER} -build -ds -p "$(top_builddir)/VLC Internet Plug-In.pkg" \
 	-f "$(top_builddir)/macosx-plugin-instdata" \
-	-i "$(srcdir)/extras/package/macosx/plugin/InstallerInfo.plist" \
-	-d "$(srcdir)/extras/package/macosx/plugin/InstallerDescription.plist"; true
+	-i "$(top_builddir)/extras/package/macosx/plugin/InstallerInfo.plist" \
+	-d "$(top_srcdir)/extras/package/macosx/plugin/InstallerDescription.plist"; true
 	rm -rf "$(top_builddir)/macosx-plugin-instdata/"
 
 # Create disk image 
@@ -1191,7 +1191,7 @@ if BUILD_MOZILLA
 	mkdir -p "$(top_builddir)/vlc-plugin-$(VERSION)/"
 	mv "$(top_builddir)/VLC Internet Plug-In.pkg" "$(top_builddir)/vlc-plugin-$(VERSION)/"
 	hdiutil create -srcfolder "$(top_builddir)/vlc-plugin-$(VERSION)" \
-	  "$(top_builddir)/vlc-plugin-$(VERSION).dmg" -format UDZO \
+	  "$(top_builddir)/vlc-plugin-$(VERSION).dmg" -format UDBZ \
 	  -scrub -imagekey zlib-level=9
 	echo "Disk image creation completed:"
 	rm -rf "$(top_builddir)/vlc-plugin-$(VERSION)"
