@@ -286,6 +286,8 @@ static void Close (vlc_object_t *obj)
  */
 static int Control (demux_t *demux, int query, va_list args)
 {
+    demux_sys_t *p_sys = demux->p_sys;
+
     switch (query)
     {
         case DEMUX_GET_POSITION:
@@ -313,7 +315,6 @@ static int Control (demux_t *demux, int query, va_list args)
         }
 
         case DEMUX_CAN_PAUSE:
-        case DEMUX_CAN_CONTROL_PACE:
         {
             bool *v = (bool*)va_arg( args, bool * );
             *v = true;
@@ -321,9 +322,17 @@ static int Control (demux_t *demux, int query, va_list args)
         }
 
         case DEMUX_SET_PAUSE_STATE:
-            es_out_Control (demux->out, ES_OUT_RESET_PCR);
+        {
+            bool pausing = va_arg (args, int);
+            if (!pausing)
+            {
+                p_sys->pts = VLC_TS_INVALID;
+                es_out_Control (demux->out, ES_OUT_RESET_PCR);
+            }
             return VLC_SUCCESS;
+        }
 
+        case DEMUX_CAN_CONTROL_PACE:
         case DEMUX_CAN_CONTROL_RATE:
         case DEMUX_CAN_SEEK:
         {
@@ -344,6 +353,12 @@ static int Demux (demux_t *demux)
 {
     demux_sys_t *p_sys = demux->p_sys;
     xcb_get_image_reply_t *img;
+    mtime_t now = mdate ();
+
+    if (p_sys->pts != VLC_TS_INVALID)
+        mwait (p_sys->pts);
+    else
+        p_sys->pts = now;
 
     /* Capture screen */
     img = xcb_get_image_reply (p_sys->conn,
@@ -356,7 +371,6 @@ static int Demux (demux_t *demux)
     }
 
     /* Send block - zero copy */
-    mtime_t now = mdate ();
     block_t *block = block_heap_Alloc (img, xcb_get_image_data (img),
                                        xcb_get_image_data_length (img));
     if (block == NULL)
@@ -365,5 +379,6 @@ static int Demux (demux_t *demux)
 
     es_out_Control (demux->out, ES_OUT_SET_PCR, now);
     es_out_Send (demux->out, p_sys->es, block);
+    p_sys->pts += p_sys->interval;
     return 1;
 }
