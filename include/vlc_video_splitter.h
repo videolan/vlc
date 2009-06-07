@@ -47,14 +47,13 @@ typedef struct
     /* Window hints */
     struct
     {
-        /* Position
-         * Use (-1,-1) if you do not wish to force a position.
+        /* Relative position.
+         * (0,0) is equal to the default position.
          */
         int i_x;
         int i_y;
 
         /* Alignment inside the window
-         * Use 0 for default.
          */
         int i_align;
     } window;
