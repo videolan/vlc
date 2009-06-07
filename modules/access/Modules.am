@@ -59,3 +59,4 @@ libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS)
 libxcb_screen_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += libxcb_screen_plugin.la
+libvlc_LTLIBRARIES += $(LTLIBxcb_screen)
