@@ -51,3 +51,11 @@ libvlc_LTLIBRARIES += \
 	libaccess_ftp_plugin.la \
 	libaccess_fake_plugin.la \
 	$(NULL)
+
+libxcb_screen_plugin_la_SOURCES = screen/xcb.c
+libxcb_screen_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XCB_CFLAGS)
+libxcb_screen_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(XCB_LIBS)
+libxcb_screen_plugin_la_DEPENDENCIES =
+EXTRA_LTLIBRARIES += libxcb_screen_plugin.la
