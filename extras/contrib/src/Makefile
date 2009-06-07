@@ -1548,26 +1548,6 @@ CLEAN_PKG += libcdio
 DISTCLEAN_PKG += libcdio-$(CDIO_VERSION).tar.gz
 
 # ***************************************************************************
-# wxWidgets
-# ***************************************************************************
-
-wxWidgets-$(WXWIDGETS_VERSION).tar.gz:
-	$(WGET) $(WXWIDGETS_URL)
-
-wxwidgets: wxWidgets-$(WXWIDGETS_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	(cd wxwidgets; patch -p0 < ../Patches/wxwidgets_uri.patch)
-
-.wxwidgets: wxwidgets
-	(cd wxwidgets; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-optimise --disable-debug --enable-unicode --disable-threads --disable-gif --disable-pcx --disable-iff --disable-pnm --without-zlib  --without-libpng --without-libjpeg --without-libtiff --without-regex  --disable-zipstream --disable-fs_zip --enable-no_rtti  --enable-no_exceptions --disable-exceptions --disable-stl --disable-html --without-expat --disable-protocols --disable-protocol --disable-xrc --disable-sound --disable-dialupman --disable-mediactrl  --disable-joystick --disable-grid --disable-datepick --disable-postscript--disable-filesystem --disable-fileproto --disable-ipc --disable-sockets --disable-precomp-headers && make && make install)
-	$(INSTALL_NAME)
-	touch $@
-
-CLEAN_FILE += .wxwidgets
-CLEAN_PKG += wxwidgets
-DISTCLEAN_PKG += wxWidgets-$(WXWIDGETS_VERSION).tar.gz
-
-# ***************************************************************************
 # qt4 (win32 binary)
 # ***************************************************************************
 
