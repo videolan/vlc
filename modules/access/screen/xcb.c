@@ -157,7 +157,7 @@ static int Open (vlc_object_t *obj)
         unsigned long ul = strtoul (demux->psz_path, &end, 0);
         if (*end || ul > 0xffffffff)
         {
-            msg_Err (obj, "bad X11 window %s", demux->psz_path);
+            msg_Err (obj, "bad X11 drawable %s", demux->psz_path);
             goto error;
         }
         p_sys->window = ul;
@@ -186,14 +186,15 @@ static int Open (vlc_object_t *obj)
         p_sys->h = geo->height - p_sys->y;
 
     uint32_t chroma = 0;
-    uint8_t bpp = geo->depth;
+    uint8_t bpp;
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
          fmt < end; fmt++)
     {
         if (fmt->depth != geo->depth)
             continue;
-        switch (geo->depth)
+        bpp = fmt->depth;
+        switch (fmt->depth)
         {
             case 32:
                 if (fmt->bits_per_pixel == 32)
