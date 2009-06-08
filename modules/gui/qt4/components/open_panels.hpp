@@ -122,7 +122,6 @@ protected:
         if( event->type() == QEvent::Hide ||
             event->type() == QEvent::HideToParent )
         {
-            msg_Warn( p_intf, "here" );
             event->accept();
             return true;
         }
