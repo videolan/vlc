@@ -53,6 +53,7 @@ DECLARE_OPEN(logo, true)
 
 DECLARE_OPEN(clone, false)
 DECLARE_OPEN(wall, false)
+DECLARE_OPEN(panoramix, false)
 
 #undef DECLARE_OPEN
 
@@ -80,6 +81,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(wall)
+
+    add_submodule()
+    DECLARE_MODULE(panoramix)
 
 vlc_module_end()
 
