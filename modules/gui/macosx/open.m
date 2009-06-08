@@ -584,7 +584,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
  
     o_type = [[o_disc_type selectedCell] title];
 
-    if ( [o_type isEqualToString: _NS("VIDEO_TS directory")] )
+    if ( [o_type isEqualToString: _NS("VIDEO_TS folder")] )
     {
         b_device = NO; b_no_menus = YES;
     }
