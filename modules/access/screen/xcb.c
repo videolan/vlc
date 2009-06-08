@@ -98,6 +98,7 @@ struct demux_sys_t
 {
     xcb_connection_t *conn;
     es_out_id_t      *es;
+    es_format_t       fmt;
     mtime_t           pts, interval;
     xcb_window_t      window;
     int16_t           x, y;
@@ -166,24 +167,10 @@ static int Open (vlc_object_t *obj)
         goto error;
 
     /* Window properties */
-    xcb_get_geometry_reply_t *geo;
-    geo = xcb_get_geometry_reply (conn,
-                                  xcb_get_geometry (conn, p_sys->window),
-                                  NULL);
-    if (geo == NULL)
-    {
-        msg_Err (obj, "bad X11 window 0x%08"PRIx32, p_sys->window);
-        goto error;
-    }
-
     p_sys->x = var_CreateGetInteger (obj, "screen-left");
     p_sys->y = var_CreateGetInteger (obj, "screen-top");
     p_sys->w = var_CreateGetInteger (obj, "screen-width");
-    if (p_sys->w == 0)
-        p_sys->w = geo->width - p_sys->x;
     p_sys->h = var_CreateGetInteger (obj, "screen-height");
-    if (p_sys->h == 0)
-        p_sys->h = geo->height - p_sys->y;
 
     uint32_t chroma = 0;
     uint8_t bpp;
@@ -225,7 +212,6 @@ static int Open (vlc_object_t *obj)
         if (chroma != 0)
             break;
     }
-    free (geo);
 
     if (!chroma)
     {
@@ -242,20 +228,13 @@ static int Open (vlc_object_t *obj)
         goto error;
     var_Create (obj, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
 
-    es_format_t fmt;
-    es_format_Init (&fmt, VIDEO_ES, chroma);
-    fmt.video.i_chroma = chroma;
-    fmt.video.i_visible_width =
-    fmt.video.i_width = p_sys->w;
-    fmt.video.i_visible_height =
-    fmt.video.i_height = p_sys->h;
-    fmt.video.i_bits_per_pixel = bpp;
-    fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
-    fmt.video.i_frame_rate = 1000 * rate;
-    fmt.video.i_frame_rate_base = 1000;
-    p_sys->es = es_out_Add (demux->out, &fmt);
-    if (p_sys->es == NULL)
-        goto error;
+    es_format_Init (&p_sys->fmt, VIDEO_ES, chroma);
+    p_sys->fmt.video.i_chroma = chroma;
+    p_sys->fmt.video.i_bits_per_pixel = bpp;
+    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
+    p_sys->fmt.video.i_frame_rate = 1000 * rate;
+    p_sys->fmt.video.i_frame_rate_base = 1000;
+    p_sys->es = NULL;
     p_sys->pts = VLC_TS_INVALID;
 
     /* Initializes demux */
@@ -353,7 +332,7 @@ static int Control (demux_t *demux, int query, va_list args)
 static int Demux (demux_t *demux)
 {
     demux_sys_t *p_sys = demux->p_sys;
-    xcb_get_image_reply_t *img;
+    xcb_connection_t *conn = p_sys->conn;
     mtime_t now = mdate ();
 
     if (p_sys->pts != VLC_TS_INVALID)
@@ -361,14 +340,46 @@ static int Demux (demux_t *demux)
     else
         p_sys->pts = now;
 
+    /* Update capture size (if needed) */
+    xcb_get_geometry_reply_t *geo;
+    geo = xcb_get_geometry_reply (conn,
+                                  xcb_get_geometry (conn, p_sys->window),
+                                  NULL);
+    if (geo == NULL)
+    {
+        msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, p_sys->window);
+        return 0;
+    }
+
+    uint16_t w = geo->width - p_sys->x;
+    uint16_t h = geo->height - p_sys->y;
+    if (p_sys->w > 0 && p_sys->w < w)
+        w = p_sys->w;
+    if (p_sys->h > 0 && p_sys->h < h)
+        h = p_sys->h;
+
+    if (w != p_sys->fmt.video.i_visible_width
+     || h != p_sys->fmt.video.i_visible_height)
+    {
+        if (p_sys->es != NULL)
+            es_out_Del (demux->out, p_sys->es);
+        p_sys->fmt.video.i_visible_width = p_sys->fmt.video.i_width = w;
+        p_sys->fmt.video.i_visible_height = p_sys->fmt.video.i_height = h;
+        p_sys->es = es_out_Add (demux->out, &p_sys->fmt);
+    }
+    free (geo);
+    if (p_sys->es == NULL)
+        return 1;
+
     /* Capture screen */
-    img = xcb_get_image_reply (p_sys->conn,
-        xcb_get_image (p_sys->conn, XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->window,
-                       p_sys->x, p_sys->y, p_sys->w, p_sys->h, ~0), NULL);
+    xcb_get_image_reply_t *img;
+    img = xcb_get_image_reply (conn,
+        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->window,
+                       p_sys->x, p_sys->y, w, h, ~0), NULL);
     if (img == NULL)
     {
-        msg_Warn (demux, "no image - halting capture");
-        return 0;
+        msg_Warn (demux, "no image");
+        return 1;
     }
 
     /* Send block - zero copy */
