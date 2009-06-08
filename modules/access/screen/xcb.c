@@ -180,10 +180,10 @@ static int Open (vlc_object_t *obj)
     p_sys->y = var_CreateGetInteger (obj, "screen-top");
     p_sys->w = var_CreateGetInteger (obj, "screen-width");
     if (p_sys->w == 0)
-        p_sys->w = geo->width;
+        p_sys->w = geo->width - p_sys->x;
     p_sys->h = var_CreateGetInteger (obj, "screen-height");
     if (p_sys->h == 0)
-        p_sys->h = geo->height;
+        p_sys->h = geo->height - p_sys->y;
 
     uint32_t chroma = 0;
     uint8_t bpp = geo->depth;
