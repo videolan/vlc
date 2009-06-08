@@ -100,7 +100,7 @@ struct demux_sys_t
     es_out_id_t      *es;
     es_format_t       fmt;
     mtime_t           pts, interval;
-    xcb_window_t      window;
+    xcb_window_t      root, window;
     int16_t           x, y;
     uint16_t          w, h;
 };
@@ -149,8 +149,9 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Determine capture window */
+    p_sys->root = scr->root;
     if (!strcmp (demux->psz_access, "screen"))
-        p_sys->window = scr->root;
+        p_sys->window = p_sys->root;
     else
     if (!strcmp (demux->psz_access, "window"))
     {
@@ -178,7 +179,7 @@ static int Open (vlc_object_t *obj)
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
          fmt < end; fmt++)
     {
-        if (fmt->depth != geo->depth)
+        if (fmt->depth != scr->root_depth)
             continue;
         bpp = fmt->depth;
         switch (fmt->depth)
@@ -340,19 +341,24 @@ static int Demux (demux_t *demux)
     else
         p_sys->pts = now;
 
-    /* Update capture size (if needed) */
-    xcb_get_geometry_reply_t *geo;
-    geo = xcb_get_geometry_reply (conn,
-                                  xcb_get_geometry (conn, p_sys->window),
-                                  NULL);
+    /* Update capture region (if needed) */
+    xcb_get_geometry_cookie_t gc = xcb_get_geometry (conn, p_sys->window);
+    int16_t x = p_sys->x, y = p_sys->y;
+    xcb_translate_coordinates_cookie_t tc;
+
+    if (p_sys->window != p_sys->root)
+        tc = xcb_translate_coordinates (conn, p_sys->window, p_sys->root,
+                                        x, y);
+
+    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, gc, NULL);
     if (geo == NULL)
     {
         msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, p_sys->window);
         return 0;
     }
 
-    uint16_t w = geo->width - p_sys->x;
-    uint16_t h = geo->height - p_sys->y;
+    uint16_t w = geo->width - x;
+    uint16_t h = geo->height - y;
     if (p_sys->w > 0 && p_sys->w < w)
         w = p_sys->w;
     if (p_sys->h > 0 && p_sys->h < h)
@@ -368,19 +374,28 @@ static int Demux (demux_t *demux)
         p_sys->es = es_out_Add (demux->out, &p_sys->fmt);
     }
     free (geo);
+
+    if (p_sys->window != p_sys->root)
+    {
+        xcb_translate_coordinates_reply_t *coords =
+             xcb_translate_coordinates_reply (conn, tc, NULL);
+        if (coords == NULL)
+            return 1;
+        x = coords->dst_x;
+        y = coords->dst_y;
+        free (coords);
+    }
+
+    /* Capture screen */
     if (p_sys->es == NULL)
         return 1;
 
-    /* Capture screen */
     xcb_get_image_reply_t *img;
     img = xcb_get_image_reply (conn,
-        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->window,
-                       p_sys->x, p_sys->y, w, h, ~0), NULL);
+        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->root,
+                       x, y, w, h, ~0), NULL);
     if (img == NULL)
-    {
-        msg_Warn (demux, "no image");
         return 1;
-    }
 
     /* Send block - zero copy */
     block_t *block = block_heap_Alloc (img, xcb_get_image_data (img),
