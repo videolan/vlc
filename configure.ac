@@ -3915,10 +3915,6 @@ CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
 
 AS_IF([test "${enable_x11}" != "no"], [
   AC_CHECK_HEADERS(X11/Xlib.h, [
-    VLC_ADD_PLUGIN([x11_screen])
-    VLC_ADD_CPPFLAGS([x11_screen],[${X_CFLAGS}])
-    VLC_ADD_LIBS([x11_screen],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-
     VLC_ADD_PLUGIN([panoramix])
     VLC_ADD_LIBS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
