@@ -592,14 +592,14 @@ exit:
  * MainLoopDemux
  * It asks the demuxer to demux some data
  */
-static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *pi_start_mdate )
+static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t i_start_mdate )
 {
     int i_ret;
 
     *pb_changed = false;
 
     if( ( p_input->p->i_stop > 0 && p_input->p->i_time >= p_input->p->i_stop ) ||
-        ( p_input->p->i_run > 0 && *pi_start_mdate+p_input->p->i_run < mdate() ) )
+        ( p_input->p->i_run > 0 && i_start_mdate+p_input->p->i_run < mdate() ) )
         i_ret = 0; /* EOF */
     else
         i_ret = demux_Demux( p_input->p->input.p_demux );
@@ -629,56 +629,8 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
 
     if( i_ret == 0 )    /* EOF */
     {
-        int i_repeat = var_GetInteger( p_input, "input-repeat" );
-        if( i_repeat == 0 )
-        {
-            /* End of file - we do not set b_die because only the
-             * playlist is allowed to do so. */
-            msg_Dbg( p_input, "EOF reached" );
-            p_input->p->input.b_eof = true;
-        }
-        else
-        {
-            vlc_value_t val;
-
-            msg_Dbg( p_input, "repeating the same input (%d)", i_repeat );
-            if( i_repeat > 0 )
-            {
-                i_repeat--;
-                var_SetInteger( p_input, "input-repeat", i_repeat );
-            }
-
-            /* Seek to start title/seekpoint */
-            val.i_int = p_input->p->input.i_title_start -
-                p_input->p->input.i_title_offset;
-            if( val.i_int < 0 || val.i_int >= p_input->p->input.i_title )
-                val.i_int = 0;
-            input_ControlPush( p_input,
-                               INPUT_CONTROL_SET_TITLE, &val );
-
-            val.i_int = p_input->p->input.i_seekpoint_start -
-                p_input->p->input.i_seekpoint_offset;
-            if( val.i_int > 0 /* TODO: check upper boundary */ )
-                input_ControlPush( p_input,
-                                   INPUT_CONTROL_SET_SEEKPOINT, &val );
-
-            /* Seek to start position */
-            if( p_input->p->i_start > 0 )
-            {
-                val.i_time = p_input->p->i_start;
-                input_ControlPush( p_input, INPUT_CONTROL_SET_TIME,
-                                   &val );
-            }
-            else
-            {
-                val.f_float = 0.0;
-                input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION,
-                                   &val );
-            }
-
-            /* */
-            *pi_start_mdate = mdate();
-        }
+        msg_Dbg( p_input, "EOF reached" );
+        p_input->p->input.b_eof = true;
     }
     else if( i_ret < 0 )
     {
@@ -689,6 +641,52 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t *p
     {
         SlaveDemux( p_input );
     }
+}
+
+static int MainLoopTryRepeat( input_thread_t *p_input, mtime_t *pi_start_mdate )
+{
+    int i_repeat = var_GetInteger( p_input, "input-repeat" );
+    if( i_repeat == 0 )
+        return VLC_EGENERIC;
+
+    vlc_value_t val;
+
+    msg_Dbg( p_input, "repeating the same input (%d)", i_repeat );
+    if( i_repeat > 0 )
+    {
+        i_repeat--;
+        var_SetInteger( p_input, "input-repeat", i_repeat );
+    }
+
+    /* Seek to start title/seekpoint */
+    val.i_int = p_input->p->input.i_title_start -
+        p_input->p->input.i_title_offset;
+    if( val.i_int < 0 || val.i_int >= p_input->p->input.i_title )
+        val.i_int = 0;
+    input_ControlPush( p_input,
+                       INPUT_CONTROL_SET_TITLE, &val );
+
+    val.i_int = p_input->p->input.i_seekpoint_start -
+        p_input->p->input.i_seekpoint_offset;
+    if( val.i_int > 0 /* TODO: check upper boundary */ )
+        input_ControlPush( p_input,
+                           INPUT_CONTROL_SET_SEEKPOINT, &val );
+
+    /* Seek to start position */
+    if( p_input->p->i_start > 0 )
+    {
+        val.i_time = p_input->p->i_start;
+        input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &val );
+    }
+    else
+    {
+        val.f_float = 0.0;
+        input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &val );
+    }
+
+    /* */
+    *pi_start_mdate = mdate();
+    return VLC_SUCCESS;
 }
 
 /**
@@ -771,7 +769,7 @@ static void MainLoop( input_thread_t *p_input )
         {
             if( !p_input->p->input.b_eof )
             {
-                MainLoopDemux( p_input, &b_force_update, &i_start_mdate );
+                MainLoopDemux( p_input, &b_force_update, i_start_mdate );
 
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
             }
@@ -782,7 +780,8 @@ static void MainLoop( input_thread_t *p_input )
             }
             else
             {
-                break;
+                if( MainLoopTryRepeat( p_input, &i_start_mdate ) )
+                    break;
             }
         }
 
