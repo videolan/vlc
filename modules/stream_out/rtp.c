@@ -1631,7 +1631,7 @@ unsigned rtp_get_num( const sout_stream_id_t *id )
 void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
                            int b_marker, int64_t i_pts )
 {
-    uint32_t i_timestamp = i_pts * (int64_t)id->i_clock_rate / INT64_C(1000000);
+    uint32_t i_timestamp = i_pts * (int64_t)id->i_clock_rate / INT64_C(CLOCK_FREQ);
 
     out->p_buffer[0] = 0x80;
     out->p_buffer[1] = (b_marker?0x80:0x00)|id->i_payload_type;
