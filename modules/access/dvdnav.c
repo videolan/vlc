@@ -666,7 +666,7 @@ static int Demux( demux_t *p_demux )
 
             if( event->length != 0xff && p_sys->still.b_created )
             {
-                mtime_t delay = event->length * INT64_C(1) * CLOCK_FREQ;
+                mtime_t delay = event->length * CLOCK_FREQ;
                 vlc_timer_schedule( &p_sys->still.timer, false, delay, 0 );
             }
 
