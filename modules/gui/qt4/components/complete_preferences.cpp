@@ -62,13 +62,13 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
 
     /* Nice icons */
 #define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
-    BI( audio, ":/advprefs_audio" );
-    BI( video, ":/advprefs_video" );
-    BI( input, ":/advprefs_codec" );
-    BI( sout, ":/advprefs_sout" );
-    BI( advanced, ":/advprefs_extended" );
-    BI( playlist, ":/advprefs_playlist" );
-    BI( interface, ":/advprefs_intf" );
+    BI( audio, ":/prefsmenu/advanced/audio" );
+    BI( video, ":/prefsmenu/advanced/video" );
+    BI( input, ":/prefsmenu/advanced/codec" );
+    BI( sout, ":/prefsmenu/advanced/sout" );
+    BI( advanced, ":/prefsmenu/advanced/extended" );
+    BI( playlist, ":/prefsmenu/advanced/playlist" );
+    BI( interface, ":/prefsmenu/advanced/intf" );
 #undef BI
 
     /* Build the tree for the main module */

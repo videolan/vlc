@@ -63,7 +63,7 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
 
 #define ADD_CATEGORY( button, label, icon, numb )                           \
     QToolButton * button = new QToolButton( this );                         \
-    button->setIcon( QIcon( ":/pixmaps/prefs/" #icon ) );                   \
+    button->setIcon( QIcon( ":/prefsmenu/" #icon ) );                   \
     button->setText( label );                                               \
     button->setToolButtonStyle( Qt::ToolButtonTextUnderIcon );              \
     button->setIconSize( QSize( icon_height, icon_height ) );               \
@@ -75,14 +75,17 @@ SPrefsCatList::SPrefsCatList( intf_thread_t *_p_intf, QWidget *_parent, bool sma
     layout->addWidget( button );
 
     ADD_CATEGORY( SPrefsInterface, qtr("Interface"),
-                  spref_cone_Interface_64.png, 0 );
-    ADD_CATEGORY( SPrefsAudio, qtr("Audio"), spref_cone_Audio_64.png, 1 );
-    ADD_CATEGORY( SPrefsVideo, qtr("Video"), spref_cone_Video_64.png, 2 );
+                  cone_interface_64, 0 );
+    ADD_CATEGORY( SPrefsAudio, qtr("Audio"),
+                  cone_audio_64, 1 );
+    ADD_CATEGORY( SPrefsVideo, qtr("Video"),
+                  cone_video_64, 2 );
     ADD_CATEGORY( SPrefsSubtitles, qtr("Subtitles && OSD"),
-                  spref_cone_Subtitles_64.png, 3 );
+                  cone_subtitles_64, 3 );
     ADD_CATEGORY( SPrefsInputAndCodecs, qtr("Input && Codecs"),
-                  spref_cone_Input_64.png, 4 );
-    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"), spref_cone_Hotkeys_64.png, 5 );
+                  cone_input_64, 4 );
+    ADD_CATEGORY( SPrefsHotkeys, qtr("Hotkeys"),
+                  cone_hotkeys_64, 5 );
 
 #undef ADD_CATEGORY
 

@@ -51,7 +51,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 
     /* We need a Label for the pix */
     volMuteLabel = new QLabel;
-    volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
+    volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-medium" ) );
 
     /* We might need a subLayout too */
     QVBoxLayout *subLayout;
@@ -130,16 +130,16 @@ void SoundWidget::updateVolume( int i_sliderVolume )
     }
     if( i_sliderVolume == 0 )
     {
-        volMuteLabel->setPixmap( QPixmap(":/volume-muted" ) );
+        volMuteLabel->setPixmap( QPixmap(":/toolbar/volume-muted" ) );
         volMuteLabel->setToolTip( qtr( "Unmute" ) );
         return;
     }
 
     if( i_sliderVolume < VOLUME_MAX / 3 )
-        volMuteLabel->setPixmap( QPixmap( ":/volume-low" ) );
+        volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-low" ) );
     else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
-        volMuteLabel->setPixmap( QPixmap( ":/volume-high" ) );
-    else volMuteLabel->setPixmap( QPixmap( ":/volume-medium" ) );
+        volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-high" ) );
+    else volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-medium" ) );
     volMuteLabel->setToolTip( qtr( "Mute" ) );
 }
 
@@ -194,7 +194,7 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
  **/
 void PlayButton::updateButton( bool b_playing )
 {
-    setIcon( b_playing ? QIcon( ":/pause_b" ) : QIcon( ":/play_b" ) );
+    setIcon( b_playing ? QIcon( ":/toolbar/pause_b" ) : QIcon( ":/toolbar/play_b" ) );
     setToolTip( b_playing ? qtr( "Pause the playback" )
                           : qtr( I_PLAY_TOOLTIP ) );
 }
@@ -203,18 +203,18 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
 {
     if( !timeA && !timeB)
     {
-        setIcon( QIcon( ":/atob_nob" ) );
+        setIcon( QIcon( ":/toolbar/atob_nob" ) );
         setToolTip( qtr( "Loop from point A to point B continuously\n"
                          "Click to set point A" ) );
     }
     else if( timeA && !timeB )
     {
-        setIcon( QIcon( ":/atob_noa" ) );
+        setIcon( QIcon( ":/toolbar/atob_noa" ) );
         setToolTip( qtr( "Click to set point B" ) );
     }
     else if( timeA && timeB )
     {
-        setIcon( QIcon( ":/atob" ) );
+        setIcon( QIcon( ":/toolbar/atob" ) );
         setToolTip( qtr( "Stop the A to B loop" ) );
     }
 }

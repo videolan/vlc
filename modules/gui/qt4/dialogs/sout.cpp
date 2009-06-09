@@ -63,11 +63,11 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
     ui.destTab->setCornerWidget( closeTabButton );
     closeTabButton->hide();
     closeTabButton->setAutoRaise( true );
-    closeTabButton->setIcon( QIcon( ":/clear" ) );
+    closeTabButton->setIcon( QIcon( ":/toolbar/clear" ) );
     BUTTONACT( closeTabButton, closeTab() );
 #endif
     CONNECT( ui.destTab, currentChanged( int ), this, tabChanged( int ) );
-    ui.destTab->setTabIcon( 0, QIcon( ":/playlist_add" ) );
+    ui.destTab->setTabIcon( 0, QIcon( ":/buttons/playlist/playlist_add" ) );
 
     ui.destBox->addItem( qtr( "File" ) );
     ui.destBox->addItem( "HTTP" );

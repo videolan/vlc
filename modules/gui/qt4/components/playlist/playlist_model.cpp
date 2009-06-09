@@ -83,14 +83,14 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
-    ADD_ICON( FILE, ":/type_file" );
-    ADD_ICON( DIRECTORY, ":/type_directory" );
-    ADD_ICON( DISC, ":/disc" );
-    ADD_ICON( CDDA, ":/cdda" );
-    ADD_ICON( CARD, ":/capture-card" );
-    ADD_ICON( NET, ":/type_net" );
-    ADD_ICON( PLAYLIST, ":/type_playlist" );
-    ADD_ICON( NODE, ":/type_node" );
+    ADD_ICON( FILE, ":/type/file" );
+    ADD_ICON( DIRECTORY, ":/type/directory" );
+    ADD_ICON( DISC, ":/type/disc" );
+    ADD_ICON( CDDA, ":/type/cdda" );
+    ADD_ICON( CARD, ":/type/capture-card" );
+    ADD_ICON( NET, ":/type/net" );
+    ADD_ICON( PLAYLIST, ":/type/playlist" );
+    ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
     rebuild( p_root );

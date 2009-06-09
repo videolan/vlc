@@ -45,12 +45,12 @@ VLCProfileSelector::VLCProfileSelector( QWidget *_parent ): QWidget( _parent )
     layout->addWidget( profileBox );
 
     QToolButton *editButton = new QToolButton( this );
-    editButton->setIcon( QIcon( ":/preferences" ) );
+    editButton->setIcon( QIcon( ":/menu/preferences" ) );
     editButton->setToolTip( qtr( "Edit selected profile" ) );
     layout->addWidget( editButton );
 
     QToolButton *deleteButton = new QToolButton( this );
-    deleteButton->setIcon( QIcon( ":/clear" ) );
+    deleteButton->setIcon( QIcon( ":/toolbar/clear" ) );
     deleteButton->setToolTip( qtr( "Delete selected profile" ) );
     layout->addWidget( deleteButton );
 

@@ -99,9 +99,9 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             qtr( "VLC media player" ) + qfu( " " VERSION_MESSAGE ) );
     QLabel *iconVLC = new QLabel;
     if( QDate::currentDate().dayOfYear() >= 354 )
-        iconVLC->setPixmap( QPixmap( ":/vlc48-christmas.png" ) );
+        iconVLC->setPixmap( QPixmap( ":/logo/vlc48-christmas.png" ) );
     else
-        iconVLC->setPixmap( QPixmap( ":/vlc48.png" ) );
+        iconVLC->setPixmap( QPixmap( ":/logo/vlc48.png" ) );
     layout->addWidget( iconVLC, 0, 0, 1, 1 );
     layout->addWidget( introduction, 0, 1, 1, 7 );
     layout->addWidget( tab, 1, 0, 1, 8 );
@@ -128,9 +128,9 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
 
     QLabel *iconVLC2 = new QLabel;
     if( QDate::currentDate().dayOfYear() >= 354 )
-        iconVLC2->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+        iconVLC2->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
     else
-        iconVLC2->setPixmap( QPixmap( ":/vlc128.png" ) );
+        iconVLC2->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
     infoLayout->addWidget( iconVLC2 );
     infoLayout->addWidget( infoLabel );
 

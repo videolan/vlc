@@ -109,14 +109,14 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Add item to the playlist button */
     addButton = new QPushButton;
-    addButton->setIcon( QIcon( ":/playlist_add" ) );
+    addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
     addButton->setMaximumWidth( 30 );
     BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
     /* Random 2-state button */
     randomButton = new QPushButton( this );
-    randomButton->setIcon( QIcon( ":/shuffle_on" ));
+    randomButton->setIcon( QIcon( ":/buttons/playlist/shuffle_on" ));
     randomButton->setToolTip( qtr( I_PL_RANDOM ));
     randomButton->setCheckable( true );
     randomButton->setChecked( model->hasRandom() );
@@ -130,17 +130,17 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     if( model->hasRepeat() )
     {
-        repeatButton->setIcon( QIcon( ":/repeat_one" ) );
+        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
         repeatButton->setChecked( true );
     }
     else if( model->hasLoop() )
     {
-        repeatButton->setIcon( QIcon( ":/repeat_all" ) );
+        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_all" ) );
         repeatButton->setChecked( true );
     }
     else
     {
-        repeatButton->setIcon( QIcon( ":/repeat_one" ) );
+        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
         repeatButton->setChecked( false );
     }
     BUTTONACT( repeatButton, toggleRepeat() );
@@ -148,7 +148,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Goto */
     gotoPlayingButton = new QPushButton;
-    BUTTON_SET_ACT_I( gotoPlayingButton, "", jump_to,
+    BUTTON_SET_ACT_I( gotoPlayingButton, "", buttons/playlist/jump_to,
             qtr( "Show the current item" ), gotoPlayingItem() );
     buttons->addWidget( gotoPlayingButton );
 
@@ -177,20 +177,20 @@ void StandardPLPanel::toggleRepeat()
     if( model->hasRepeat() )
     {
         model->setRepeat( false ); model->setLoop( true );
-        repeatButton->setIcon( QIcon( ":/repeat_all" ) );
+        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_all" ) );
         repeatButton->setChecked( true );
     }
     else if( model->hasLoop() )
     {
         model->setRepeat( false ) ; model->setLoop( false );
         repeatButton->setChecked( false );
-        repeatButton->setIcon( QIcon( ":/repeat_one" ) );
+        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
     }
     else
     {
         model->setRepeat( true ); model->setLoop( false );
         repeatButton->setChecked( true );
-        repeatButton->setIcon( QIcon( ":/repeat_one" ) );
+        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
     }
 }
 

@@ -146,9 +146,9 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     b_isSliding = false;
     b_mouseOutside = true;
 
-    pixOutside = QPixmap( ":/volslide-outside" );
+    pixOutside = QPixmap( ":/toolbar/volslide-outside" );
 
-    const QPixmap temp( ":/volslide-inside" );
+    const QPixmap temp( ":/toolbar/volslide-inside" );
     const QBitmap mask( temp.createHeuristicMask() );
 
     setMinimumSize( pixOutside.size() );

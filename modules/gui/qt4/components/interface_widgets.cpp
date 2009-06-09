@@ -175,9 +175,9 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     label->setMinimumHeight( MIN_BG_SIZE );
     label->setMinimumWidth( MIN_BG_SIZE );
     if( QDate::currentDate().dayOfYear() >= 354 )
-        label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+        label->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
     else
-        label->setPixmap( QPixmap( ":/vlc128.png" ) );
+        label->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
 
     QGridLayout *backgroundLayout = new QGridLayout( this );
     backgroundLayout->addWidget( label, 0, 1 );
@@ -204,9 +204,9 @@ void BackgroundWidget::updateArt( const QString& url )
     if( url.isEmpty() )
     {
         if( QDate::currentDate().dayOfYear() >= 354 )
-            label->setPixmap( QPixmap( ":/vlc128-christmas.png" ) );
+            label->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
         else
-            label->setPixmap( QPixmap( ":/vlc128.png" ) );
+            label->setPixmap( QPixmap( ":/logo/vlc128.png" ) );
     }
     else
     {

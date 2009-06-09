@@ -112,11 +112,13 @@ static const char* tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_( "Take a snapshot" ), N_( "Record" ),
     N_( "Loop from point A to point B continuously." ), N_("Frame by frame"),
     N_("Reverse"), N_("Step backward"), N_("Step forward"), N_("Quit") };
-static const QString iconL[BUTTON_MAX] ={ ":/play_b", ":/stop_b", ":/eject",
-    ":/previous_b", ":/next_b", ":/slower", ":/faster", ":/fullscreen",
-    ":/defullscreen", ":/extended", ":/playlist", ":/snapshot", ":/record",
-    ":/atob_nob", ":/frame", ":/reverse", ":/skip_back", ":/skip_fw",
-    ":/clear" };
+static const QString iconL[BUTTON_MAX] ={ ":/toolbar/play_b", ":/toolbar/stop_b",
+    ":/toolbar/eject", ":/toolbar/previous_b", ":/toolbar/next_b",
+    ":/toolbar/slower", ":/toolbar/faster", ":/toolbar/fullscreen",
+    ":/toolbar/defullscreen", ":/toolbar/extended", ":/toolbar/playlist",
+    ":/toolbar/snapshot", ":/toolbar/record", ":/toolbar/atob_nob",
+    ":/toolbar/frame", ":/toolbar/reverse", ":/toolbar/skip_back",
+    ":/toolbar/skip_fw", ":/toolbar/clear" };
 
 enum
 {

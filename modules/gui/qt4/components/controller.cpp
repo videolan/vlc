@@ -467,19 +467,19 @@ QFrame *AbstractController::discFrame()
 
     QToolButton *prevSectionButton = new QToolButton( discFrame );
     setupButton( prevSectionButton );
-    BUTTON_SET_BAR2( prevSectionButton, dvd_prev,
+    BUTTON_SET_BAR2( prevSectionButton, toolbar/dvd_prev,
             qtr("Previous Chapter/Title" ) );
     discLayout->addWidget( prevSectionButton );
 
     QToolButton *menuButton = new QToolButton( discFrame );
     setupButton( menuButton );
     discLayout->addWidget( menuButton );
-    BUTTON_SET_BAR2( menuButton, dvd_menu, qtr( "Menu" ) );
+    BUTTON_SET_BAR2( menuButton, toolbar/dvd_menu, qtr( "Menu" ) );
 
     QToolButton *nextSectionButton = new QToolButton( discFrame );
     setupButton( nextSectionButton );
     discLayout->addWidget( nextSectionButton );
-    BUTTON_SET_BAR2( nextSectionButton, dvd_next,
+    BUTTON_SET_BAR2( nextSectionButton, toolbar/dvd_next,
             qtr("Next Chapter/Title" ) );
 
     /* Change the navigation button display when the IM
@@ -517,7 +517,7 @@ QFrame *AbstractController::telexFrame()
     /* On/Off button */
     QToolButton *telexOn = new QToolButton;
     setupButton( telexOn );
-    BUTTON_SET_BAR2( telexOn, tv, qtr( "Teletext Activation" ) );
+    BUTTON_SET_BAR2( telexOn, toolbar/tv, qtr( "Teletext Activation" ) );
     telexOn->setEnabled( false );
     telexOn->setCheckable( true );
 
@@ -532,7 +532,7 @@ QFrame *AbstractController::telexFrame()
     /* Transparency button */
     QToolButton *telexTransparent = new QToolButton;
     setupButton( telexTransparent );
-    BUTTON_SET_BAR2( telexTransparent, tvtelx,
+    BUTTON_SET_BAR2( telexTransparent, toolbar/tvtelx,
                      qtr( "Toggle Transparency " ) );
     telexTransparent->setEnabled( false );
     telexTransparent->setCheckable( true );

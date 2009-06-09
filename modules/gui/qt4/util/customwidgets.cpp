@@ -132,7 +132,7 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QFrame( parent )
     clearButton = new QToolButton;
     clearButton->setAutoRaise( true );
     clearButton->setMaximumWidth( 30 );
-    clearButton->setIcon( QIcon( ":/clear" ) );
+    clearButton->setIcon( QIcon( ":/toolbar/clear" ) );
     clearButton->setToolTip( qtr( "Clear" ) );
     clearButton->hide();
 

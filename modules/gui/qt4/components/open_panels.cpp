@@ -313,7 +313,7 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     BUTTONACT( ui.audioCDRadioButton, updateButtons() );
     BUTTONACT( ui.dvdsimple, updateButtons() );
     BUTTONACT( ui.browseDiscButton, browseDevice() );
-    BUTTON_SET_ACT_I( ui.ejectButton, "", eject, qtr( "Eject the disc" ),
+    BUTTON_SET_ACT_I( ui.ejectButton, "", toolbar/eject, qtr( "Eject the disc" ),
             eject() );
 
     CONNECT( ui.deviceCombo, editTextChanged( QString ), this, updateMRL());
