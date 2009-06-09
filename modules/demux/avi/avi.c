@@ -2461,7 +2461,6 @@ static int AVI_TrackStopFinishedStreams( demux_t *p_demux )
         if( tk->i_idxposc >= tk->i_idxnb )
         {
             tk->b_activated = false;
-            if( tk->p_es ) es_out_Control( p_demux->out, ES_OUT_SET_ES_STATE, tk->p_es, false );
         }
         else
         {
