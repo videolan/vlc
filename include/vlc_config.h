@@ -42,7 +42,7 @@
  * XXX the numerical value is 0 because of historical reason and will change.*/
 #define VLC_TS_INVALID (0)
 
-#define CLOCK_FREQ 1000000
+#define CLOCK_FREQ INT64_C(1000000)
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
  * status */
