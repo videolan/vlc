@@ -114,7 +114,7 @@ static const char *const ppsz_language_text[] =
     "Italiano",
     "日本語",
     "한국어",
-    "Монгол хэл"
+    "Монгол хэл",
     "Melayu",
     "ភាសាខ្មែរ",
     "Occitan",
