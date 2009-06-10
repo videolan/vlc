@@ -251,8 +251,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
             pts = decoder_GetDisplayDate( p_synchro->p_dec, S.current_pts ) + period * (S.i_n_b + 2);
         }
 
-        if( (1 + S.i_n_p * (S.i_n_b + 1)) * period >
-                S.p_tau[I_CODING_TYPE] )
+        if( (1 + S.i_n_p * (S.i_n_b + 1)) * period > S.p_tau[I_CODING_TYPE] )
         {
             b_decode = 1;
         }
@@ -260,6 +259,9 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         {
             b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
         }
+        if( pts <= VLC_TS_INVALID )
+            b_decode = 1;
+
         if( !b_decode && !p_synchro->b_quiet )
         {
             msg_Warn( p_synchro->p_dec,
@@ -308,6 +310,8 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         {
             b_decode = 0;
         }
+        if( p_synchro->i_nb_ref >= 1 && pts <= VLC_TS_INVALID )
+            b_decode = 1;
         break;
 
     case B_CODING_TYPE:
@@ -325,6 +329,9 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         {
             b_decode = 0;
         }
+        if( p_synchro->i_nb_ref >= 2 && pts <= VLC_TS_INVALID )
+            b_decode = 1;
+        break;
     }
 
     if( !b_decode )
