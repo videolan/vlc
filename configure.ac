@@ -3915,10 +3915,6 @@ CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
 
 AS_IF([test "${enable_x11}" != "no"], [
   AC_CHECK_HEADERS(X11/Xlib.h, [
-    VLC_ADD_PLUGIN([panoramix])
-    VLC_ADD_LIBS([panoramix],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_CPPFLAGS([panoramix],[${X_CFLAGS}])
-
     VLC_ADD_PLUGIN([x11])
     VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
@@ -4097,6 +4093,12 @@ AS_IF([test "${enable_xcb}" != "no"], [
       ])
     ])
   ])
+
+  PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr], [
+    VLC_ADD_PLUGIN([panoramix])
+    VLC_ADD_LIBS([panoramix],[${XCB_RANDR_LIBS} ${XCB_LIBS}])
+    VLC_ADD_CFLAGS([panoramix],[${XCB_RANDR_CFLAGS} ${XCB_CFLAGS}])
+  ], [true])
 
   dnl xcb-utils
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])

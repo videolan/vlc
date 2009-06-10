@@ -46,7 +46,8 @@
 #   ifdef WIN32
 #       include <windows.h>
 #   else
-#       include <X11/Xlib.h>
+#       include <xcb/xcb.h>
+#       include <xcb/randr.h>
 #   endif
 #endif
 
@@ -336,6 +337,71 @@ static const panoramix_chroma_t p_chroma_array[] = {
     { 0, {0, }, { 0, }, { 0, 0, 0 }, false }
 };
 
+#ifndef WIN32
+/* Get the number of outputs */
+static unsigned CountMonitors (vlc_object_t *obj)
+{
+    char *psz_display = var_CreateGetNonEmptyString( obj, "x11-display" );
+    int snum;
+    xcb_connection_t *conn = xcb_connect( psz_display, &snum );
+    if( xcb_connection_has_error( conn ) )
+        return 0;
+
+    const xcb_setup_t *setup = xcb_get_setup( conn );
+    xcb_screen_t *scr = NULL;
+    for( xcb_screen_iterator_t i = xcb_setup_roots_iterator( setup );
+         i.rem > 0; xcb_screen_next( &i ) )
+    {
+         if (snum == 0)
+         {
+             scr = i.data;
+             break;
+         }
+         snum--;
+    }
+
+    unsigned n = 0;
+    if( scr == NULL )
+        goto error;
+
+    xcb_randr_query_version_reply_t *v =
+        xcb_randr_query_version_reply( conn,
+            xcb_randr_query_version( conn, 1, 2 ), NULL );
+    if( v == NULL )
+        goto error;
+    msg_Dbg( obj, "using X RandR extension v%"PRIu32".%"PRIu32,
+             v->major_version, v->minor_version );
+    free( v );
+
+    xcb_randr_get_screen_resources_reply_t *r =
+        xcb_randr_get_screen_resources_reply( conn,
+            xcb_randr_get_screen_resources( conn, scr->root ), NULL );
+    if( r == NULL )
+        goto error;
+
+    const xcb_randr_output_t *outputs =
+        xcb_randr_get_screen_resources_outputs( r );
+    for( unsigned i = 0; i < r->num_outputs; i++ )
+    {
+        xcb_randr_get_output_info_reply_t *output =
+            xcb_randr_get_output_info_reply( conn,
+                xcb_randr_get_output_info( conn, outputs[i], 0 ), NULL );
+        if( output == NULL )
+            continue;
+        /* FIXME: do not count cloned outputs multiple times */
+        /* XXX: what to do with UNKNOWN state connections? */
+        n += output->connection == XCB_RANDR_CONNECTION_CONNECTED;
+        free( output );
+    }
+    free( r );
+    msg_Dbg( obj, "X randr has %u outputs", n );
+
+error:
+    xcb_disconnect( conn );
+    return n;
+}
+#endif
+
 /*****************************************************************************
  * Open: allocates Wall video thread output method
  *****************************************************************************
@@ -394,14 +460,21 @@ static int Open( vlc_object_t *p_this )
             }
         }
 #else
-        /* TODO linux */
+        const unsigned i_monitors = CountMonitors( p_this );
+        if( i_monitors > 1 ) /* Find closest to square */
+            for( unsigned w = 1; (i_monitors / w) >= w ; w++ )
+            {
+                if( i_monitors % w )
+                    continue;
+                p_sys->i_row = w;
+                p_sys->i_col = i_monitors / w;
+            }
 #endif
         /* By default do 2x1 */
-        if( p_sys->i_col < 0 || p_sys->i_row < 0 )
-        {
-            p_sys->i_col = 2;
+        if( p_sys->i_row < 0 )
             p_sys->i_row = 1;
-        }
+        if( p_sys->i_col < 0 )
+            p_sys->i_col = 2;
         var_SetInteger( p_splitter, CFG_PREFIX "cols", p_sys->i_col);
         var_SetInteger( p_splitter, CFG_PREFIX "rows", p_sys->i_row);
     }
