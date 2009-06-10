@@ -952,6 +952,7 @@ void FullscreenControllerWidget::enterEvent( QEvent *event )
     p_hideTimer->stop();
 #if HAVE_TRANSPARENCY
     p_slowHideTimer->stop();
+    setWindowOpacity( DEFAULT_OPACITY );
 #endif
     event->accept();
 }
