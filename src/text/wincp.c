@@ -143,7 +143,7 @@ static const char *FindFallbackEncoding (const char *locale)
 
     // Korean
     if (!locale_match ("ko", locale))
-        return "EUC-KR";
+        return "CP949"; // Microsoft non-standard superset of EUC-KR
 
     // Thai
     if (!locale_match ("th", locale))
