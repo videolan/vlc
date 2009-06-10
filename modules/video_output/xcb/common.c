@@ -99,7 +99,7 @@ vout_window_t *GetWindow (vout_thread_t *obj,
 
     /* Find the selected screen */
     const xcb_setup_t *setup = xcb_get_setup (conn);
-    xcb_screen_t *screen = NULL;
+    const xcb_screen_t *screen = NULL;
     for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
          i.rem > 0 && screen == NULL; xcb_screen_next (&i))
     {

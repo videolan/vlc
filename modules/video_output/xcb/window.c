@@ -154,7 +154,7 @@ static int Open (vlc_object_t *obj)
 
     /* Find configured screen */
     const xcb_setup_t *setup = xcb_get_setup (conn);
-    xcb_screen_t *scr = NULL;
+    const xcb_screen_t *scr = NULL;
     for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
          i.rem > 0; xcb_screen_next (&i))
     {
