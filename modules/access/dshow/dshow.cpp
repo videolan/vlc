@@ -2001,20 +2001,25 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 {
     module_config_t *p_item;
     bool b_audio = false;
+    char *psz_device = NULL;
+
+    if( !EMPTY_STR( newval.psz_string ) )
+        psz_device = strdup( newval.psz_string );
 
     /* Initialize OLE/COM */
     CoInitialize( 0 );
 
     p_item = config_FindConfig( p_this, psz_name );
+
     if( !p_item ) return VLC_SUCCESS;
 
     if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = true;
 
     string devicename;
 
-    if( newval.psz_string && *newval.psz_string )
+    if( psz_device )
     {
-        devicename = newval.psz_string;
+        devicename = psz_device ;
     }
     else
     {
@@ -2040,12 +2045,14 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
         CoUninitialize();
 
         msg_Err( p_this, "didn't find device: %s", devicename.c_str() );
+        free( psz_device );
         return VLC_EGENERIC;
     }
 
     /* Uninitialize OLE/COM */
     CoUninitialize();
 
+    free( psz_device );
     return VLC_SUCCESS;
 }
 
