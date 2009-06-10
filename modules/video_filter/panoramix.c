@@ -339,7 +339,7 @@ static const panoramix_chroma_t p_chroma_array[] = {
 
 #ifndef WIN32
 /* Get the number of outputs */
-static unsigned CountMonitors (vlc_object_t *obj)
+static unsigned CountMonitors( vlc_object_t *obj )
 {
     char *psz_display = var_CreateGetNonEmptyString( obj, "x11-display" );
     int snum;
@@ -352,7 +352,7 @@ static unsigned CountMonitors (vlc_object_t *obj)
     for( xcb_screen_iterator_t i = xcb_setup_roots_iterator( setup );
          i.rem > 0; xcb_screen_next( &i ) )
     {
-         if (snum == 0)
+         if( snum == 0 )
          {
              scr = i.data;
              break;
