@@ -143,7 +143,7 @@ static void    Close  ( vlc_object_t * );
   "of the shaping algorithm, since I frames are usually the biggest " \
   "frames in the stream.")
 
-#define PCR_TEXT N_("PCR delay (ms)")
+#define PCR_TEXT N_("PCR interval (ms)")
 #define PCR_LONGTEXT N_("Set at which interval " \
   "PCRs (Program Clock Reference) will be sent (in milliseconds). " \
   "This value should be below 100ms. (default is 70ms).")
