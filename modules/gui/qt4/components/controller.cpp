@@ -706,13 +706,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
 
     adjustSize ();  /* need to get real width and height for moving */
 
-#ifdef WIN32TRICK
-    setWindowOpacity( 0.0 );
-    b_fscHidden = true;
-    adjustSize();
-    show();
-#endif
-
     vlc_mutex_init_recursive( &lock );
 
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
@@ -765,18 +758,8 @@ void FullscreenControllerWidget::showFSC()
     {
         centerFSC( number );
     }
-#ifdef WIN32TRICK
-    // after quiting and going to fs, we need to call show()
-    if( isHidden() )
-        show();
-    if( b_fscHidden )
-    {
-        b_fscHidden = false;
-        setWindowOpacity( 1.0 );
-    }
-#else
+
     show();
-#endif
 
 #if HAVE_TRANSPARENCY
     setWindowOpacity( DEFAULT_OPACITY );
@@ -790,12 +773,7 @@ void FullscreenControllerWidget::showFSC()
  */
 void FullscreenControllerWidget::hideFSC()
 {
-#ifdef WIN32TRICK
-    b_fscHidden = true;
-    setWindowOpacity( 0.0 );    // simulate hidding
-#else
     hide();
-#endif
 }
 
 /**
@@ -835,11 +813,7 @@ void FullscreenControllerWidget::slowHideFSC()
     }
     else
     {
-#ifdef WIN32TRICK
-         if ( windowOpacity() > 0.0 && !b_fscHidden )
-#else
          if ( windowOpacity() > 0.0 )
-#endif
          {
              /* we should use 0.01 because of 100 pieces ^^^
                 but than it cannt be done in time */
@@ -868,11 +842,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             vlc_mutex_unlock( &lock );
             if( b_fs )
             {
-#ifdef WIN32TRICK
-                if( b_fscHidden )
-#else
                 if( isHidden() )
-#endif
                 {
                     p_hideTimer->stop();
                     showFSC();
@@ -886,11 +856,7 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
 
-#ifdef WIN32TRICK
-            if( b_fs && b_fscHidden )
-#else
             if( b_fs && !isVisible() )
-#endif
                 showFSC();
             break;
         case FullscreenControlHide_Type:

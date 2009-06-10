@@ -206,23 +206,14 @@ signals:
     void advancedControlsToggled( bool );
 };
 
-/* on WIN32 hide() for fullscreen controller doesnt work, so it have to be
-   done by trick with setting the opacity of window */
-#ifdef WIN32
-    #define WIN32TRICK
-#endif
 
 /* to trying transparency with fullscreen controller on windows enable that */
 /* it can be enabled on-non windows systems,
    but it will be transparent only with composite manager */
-#ifndef WIN32
-    #define HAVE_TRANSPARENCY 1
-#else
-    #define HAVE_TRANSPARENCY 0
-#endif
+#define HAVE_TRANSPARENCY 1
 
 /* Default value of opacity for FS controller */
-#define DEFAULT_OPACITY 0.75
+#define DEFAULT_OPACITY 0.70
 
 /***********************************
  * Fullscreen controller
@@ -272,10 +263,6 @@ private:
     bool b_mouse_over;
     int i_screennumber;
     QRect screenRes;
-
-#ifdef WIN32TRICK
-    bool b_fscHidden;
-#endif
 
     /* List of vouts currently tracked */
     QList<vout_thread_t *> vout;
