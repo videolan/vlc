@@ -704,8 +704,6 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
     CONNECT( p_slowHideTimer, timeout(), this, slowHideFSC() );
 #endif
 
-    adjustSize ();  /* need to get real width and height for moving */
-
     vlc_mutex_init_recursive( &lock );
 
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
@@ -737,10 +735,12 @@ FullscreenControllerWidget::~FullscreenControllerWidget()
 void FullscreenControllerWidget::centerFSC( int number )
 {
     screenRes = QApplication::desktop()->screenGeometry(number);
+
     /* screen has changed, calculate new position */
-    QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (width() / 2),
-            screenRes.y() + screenRes.height() - height());
+    QPoint pos = QPoint( screenRes.x() + (screenRes.width() / 2) - (sizeHint().width() / 2),
+            screenRes.y() + screenRes.height() - sizeHint().height());
     move( pos );
+
     i_screennumber = number;
 }
 
