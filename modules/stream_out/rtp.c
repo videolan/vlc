@@ -1094,6 +1094,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 id->psz_enc = "G726-40";
                 id->pf_packetize = rtp_packetize_g726_40;
                 break;
+            default:
+                msg_Err( p_stream, "cannot add this stream (unsupported "
+                         "G.726 bit rate: %u)", p_fmt->i_bitrate );
+                goto error;
             }
             break;
         case VLC_CODEC_A52:
@@ -1245,7 +1249,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         default:
             msg_Err( p_stream, "cannot add this stream (unsupported "
-                     "codec:%4.4s)", (char*)&p_fmt->i_codec );
+                     "codec: %4.4s)", (char*)&p_fmt->i_codec );
             goto error;
     }
     if (id->i_payload_type >= 96)
