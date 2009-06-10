@@ -805,7 +805,40 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
                         bool b_add, bool b_setconfig )
 {
     char *psz_parser;
-    char *psz_string = config_GetPsz( p_vout, "vout-filter" );
+    char *psz_string;
+    const char *psz_filter_type;
+
+    module_t *p_obj = module_find( psz_name );
+    if( !p_obj )
+    {
+        msg_Err( p_vout, "Unable to find filter module \"%s\".", psz_name );
+        return;
+    }
+
+    if( module_provides( p_obj, "video filter" ) )
+    {
+        psz_filter_type = "vout-filter";
+    }
+    else if( module_provides( p_obj, "video filter2" ) )
+    {
+        psz_filter_type = "video-filter";
+    }
+    else if( module_provides( p_obj, "sub filter" ) )
+    {
+        psz_filter_type = "sub-filter";
+    }
+    else
+    {
+        module_release( p_obj );
+        msg_Err( p_vout, "Unknown video filter type." );
+        return;
+    }
+    module_release( p_obj );
+
+    if( !strcmp( psz_filter_type, "sub-filter") )
+        psz_string = var_GetString( vout_GetSpu( p_vout ), psz_filter_type );
+    else
+        psz_string = var_GetString( p_vout, psz_filter_type );
 
     /* Todo : Use some generic chain manipulation functions */
     if( !psz_string ) psz_string = strdup("");
@@ -847,10 +880,20 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
              return;
          }
     }
-    if( b_setconfig )
-        config_PutPsz( p_vout, "vout-filter", psz_string );
 
-    var_SetString( p_vout, "vout-filter", psz_string );
+    if( b_setconfig )
+    {
+        if( !strcmp( psz_filter_type, "sub-filter") )
+            config_PutPsz( vout_GetSpu( p_vout ), psz_filter_type, psz_string );
+        else
+            config_PutPsz( p_vout, psz_filter_type, psz_string );
+    }
+
+    if( !strcmp( psz_filter_type, "sub-filter") )
+        var_SetString( vout_GetSpu( p_vout ), psz_filter_type, psz_string );
+    else
+        var_SetString( p_vout, psz_filter_type, psz_string );
+
     free( psz_string );
 }
 
