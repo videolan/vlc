@@ -149,7 +149,7 @@ AC_DEFUN([VLC_LIBRARY_SUFFIX], [
     darwin*)
       LIBEXT=".dylib"
       ;;
-    *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
+    *mingw32* | *cygwin* | *wince* | *mingwce*)
       LIBEXT=".dll"
       ;;
     hpux*)
