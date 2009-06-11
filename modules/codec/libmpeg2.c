@@ -28,6 +28,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -42,6 +43,14 @@
 /*****************************************************************************
  * decoder_sys_t : libmpeg2 decoder descriptor
  *****************************************************************************/
+#define DPB_COUNT (3+1)
+typedef struct
+{
+    picture_t *p_picture;
+    bool      b_linked;
+    bool      b_displayed;
+} picture_dpb_t;
+
 struct decoder_sys_t
 {
     /*
@@ -58,7 +67,6 @@ struct decoder_sys_t
     mtime_t          i_current_pts;
     mtime_t          i_previous_dts;
     mtime_t          i_current_dts;
-    picture_t *      p_picture_to_destroy;
     bool             b_garbage_pic;
     bool             b_after_sequence_header; /* is it the next frame after
                                                * the sequence header ?    */
@@ -66,6 +74,9 @@ struct decoder_sys_t
     bool             b_second_field;
 
     bool             b_preroll;
+
+    /* */
+    picture_dpb_t        p_dpb[DPB_COUNT];
 
     /*
      * Output properties
@@ -94,8 +105,17 @@ static void CloseDecoder( vlc_object_t * );
 static picture_t *DecodeBlock( decoder_t *, block_t ** );
 static block_t   *GetCc( decoder_t *p_dec, bool pb_present[4] );
 
-static picture_t *GetNewPicture( decoder_t *, uint8_t ** );
+static picture_t *GetNewPicture( decoder_t * );
+static void PutPicture( decoder_t *, picture_t * );
+
 static void GetAR( decoder_t *p_dec );
+
+/* */
+static void DpbInit( decoder_t * );
+static void DpbClean( decoder_t * );
+static picture_t *DpbNewPicture( decoder_t * );
+static void DpbUnlinkPicture( decoder_t *, picture_t * );
+static void DpbDisplayPicture( decoder_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -148,12 +168,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_previous_pts = 0;
     p_sys->i_current_dts  = 0;
     p_sys->i_previous_dts = 0;
-    p_sys->p_picture_to_destroy = NULL;
-    p_sys->b_garbage_pic = 0;
-    p_sys->b_slice_i  = 0;
-    p_sys->b_second_field = 0;
-    p_sys->b_skip     = 0;
+    p_sys->b_garbage_pic = false;
+    p_sys->b_slice_i  = false;
+    p_sys->b_second_field = false;
+    p_sys->b_skip     = false;
     p_sys->b_preroll = false;
+    DpbInit( p_dec );
 
     p_sys->i_cc_pts = 0;
     p_sys->i_cc_dts = 0;
@@ -225,9 +245,16 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     block_t *p_block;
 
-    if( !pp_block || !*pp_block ) return NULL;
+    if( !pp_block || !*pp_block )
+        return NULL;
 
     p_block = *pp_block;
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
+    {
+        cc_Flush( &p_sys->cc );
+        mpeg2_reset( p_sys->p_mpeg2dec, p_sys->p_info->sequence != NULL );
+        DpbClean( p_dec );
+    }
 
     while( 1 )
     {
@@ -235,15 +262,190 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         switch( state )
         {
+        case STATE_SEQUENCE:
+        {
+            /* */
+            DpbClean( p_dec );
+
+            /* */
+            mpeg2_custom_fbuf( p_sys->p_mpeg2dec, 1 );
+
+            /* Set the first 2 reference frames */
+            GetAR( p_dec );
+            for( int i = 0; i < 2; i++ )
+            {
+                picture_t *p_picture = DpbNewPicture( p_dec );
+                if( !p_picture )
+                {
+                    /* Is it ok ? or do we need a reset ? */
+                    block_Release( p_block );
+                    return NULL;
+                }
+                PutPicture( p_dec, p_picture );
+            }
+
+            if( p_sys->p_synchro )
+                decoder_SynchroRelease( p_sys->p_synchro );
+
+            p_sys->p_synchro =
+                decoder_SynchroInit( p_dec, (uint32_t)((uint64_t)1001000000 * 27 /
+                                     p_sys->p_info->sequence->frame_period) );
+            p_sys->b_after_sequence_header = true;
+            break;
+        }
+
+        case STATE_GOP:
+            /* There can be userdata in a GOP. It needs to be remembered for the next picture. */
+            if( p_sys->p_info->user_data_len > 2 )
+            {
+                free( p_sys->p_gop_user_data );
+                p_sys->p_gop_user_data = calloc( p_sys->p_info->user_data_len, sizeof(uint8_t) );
+                if( p_sys->p_gop_user_data )
+                {
+                    p_sys->i_gop_user_data = p_sys->p_info->user_data_len;
+                    memcpy( p_sys->p_gop_user_data, p_sys->p_info->user_data, p_sys->p_info->user_data_len );
+                }
+            }
+            break;
+
+        case STATE_PICTURE:
+        {
+            const mpeg2_info_t *p_info = p_sys->p_info;
+            const mpeg2_picture_t *p_current = p_info->current_picture;
+
+            mtime_t i_pts, i_dts;
+
+            if( p_sys->b_after_sequence_header &&
+                (p_current->flags &
+                    PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P )
+            {
+                /* Intra-slice refresh. Simulate a blank I picture. */
+                msg_Dbg( p_dec, "intra-slice refresh stream" );
+                decoder_SynchroNewPicture( p_sys->p_synchro,
+                                           I_CODING_TYPE, 2, 0, 0,
+                                           p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
+                decoder_SynchroDecode( p_sys->p_synchro );
+                decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
+                p_sys->b_slice_i = true;
+            }
+            p_sys->b_after_sequence_header = false;
+
+#ifdef PIC_FLAG_PTS
+            i_pts = p_current->flags & PIC_FLAG_PTS ?
+                ( ( p_current->pts ==
+                    (uint32_t)p_sys->i_current_pts ) ?
+                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
+            i_dts = 0;
+
+            /* Hack to handle demuxers which only have DTS timestamps */
+            if( !i_pts && !p_block->i_pts && p_block->i_dts > 0 )
+            {
+                if( p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ||
+                    (p_current->flags &
+                      PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
+                {
+                    i_pts = p_block->i_dts;
+                }
+            }
+            p_block->i_pts = p_block->i_dts = 0;
+            /* End hack */
+
+#else /* New interface */
+
+            i_pts = p_current->flags & PIC_FLAG_TAGS ?
+                ( ( p_current->tag == (uint32_t)p_sys->i_current_pts ) ?
+                            p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
+            i_dts = p_current->flags & PIC_FLAG_TAGS ?
+                ( ( p_current->tag2 == (uint32_t)p_sys->i_current_dts ) ?
+                            p_sys->i_current_dts : p_sys->i_previous_dts ) : 0;
+#endif
+
+            /* If nb_fields == 1, it is a field picture, and it will be
+             * followed by another field picture for which we won't call
+             * decoder_SynchroNewPicture() because this would have other
+             * problems, so we take it into account here.
+             * This kind of sucks, but I didn't think better. --Meuuh
+             */
+            decoder_SynchroNewPicture( p_sys->p_synchro,
+                                       p_current->flags & PIC_MASK_CODING_TYPE,
+                                       p_current->nb_fields == 1 ? 2 :
+                                       p_current->nb_fields, i_pts, i_dts,
+                                       p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
+
+
+            bool b_skip = false;
+            if( !p_dec->b_pace_control && !p_sys->b_preroll &&
+                !(p_sys->b_slice_i
+                   && ((p_current->flags
+                         & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P))
+                   && !decoder_SynchroChoose( p_sys->p_synchro,
+                              p_current->flags
+                                & PIC_MASK_CODING_TYPE,
+                              /*p_sys->p_vout->render_time*/ 0 /*FIXME*/,
+                              p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ) )
+            {
+                b_skip = true;
+            }
+
+            p_pic = NULL;
+            if( !b_skip )
+                p_pic = DpbNewPicture( p_dec );
+
+            if( b_skip || !p_pic )
+            {
+                mpeg2_skip( p_sys->p_mpeg2dec, 1 );
+                p_sys->b_skip = true;
+                decoder_SynchroTrash( p_sys->p_synchro );
+
+                PutPicture( p_dec, NULL );
+
+                if( !b_skip )
+                {
+                    block_Release( p_block );
+                    return NULL;
+                }
+            }
+            else
+            {
+                mpeg2_skip( p_sys->p_mpeg2dec, 0 );
+                p_sys->b_skip = false;
+                decoder_SynchroDecode( p_sys->p_synchro );
+
+                PutPicture( p_dec, p_pic );
+            }
+            if( p_info->user_data_len > 2 || p_sys->i_gop_user_data > 2 )
+            {
+                p_sys->i_cc_pts = i_pts;
+                p_sys->i_cc_dts = i_dts;
+                if( (p_current->flags
+                             & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P )
+                    p_sys->i_cc_flags = BLOCK_FLAG_TYPE_P;
+                else if( (p_current->flags
+                             & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
+                    p_sys->i_cc_flags = BLOCK_FLAG_TYPE_B;
+                else p_sys->i_cc_flags = BLOCK_FLAG_TYPE_I;
+
+                if( p_sys->i_gop_user_data > 2 )
+                {
+                    /* We now have picture info for any cached user_data out of the gop */
+                    cc_Extract( &p_sys->cc, &p_sys->p_gop_user_data[0], p_sys->i_gop_user_data );
+                    p_sys->i_gop_user_data = 0;
+                }
+
+                /* Extract the CC from the user_data of the picture */
+                if( p_info->user_data_len > 2 )
+                    cc_Extract( &p_sys->cc, &p_info->user_data[0], p_info->user_data_len );
+            }
+        }
+        break;
+
+
         case STATE_BUFFER:
             if( !p_block->i_buffer )
             {
                 block_Release( p_block );
                 return NULL;
             }
-            if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY
-                                      | BLOCK_FLAG_CORRUPTED))
-                cc_Flush( &p_sys->cc );
 
             if( (p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY
                                       | BLOCK_FLAG_CORRUPTED)) &&
@@ -252,31 +454,17 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->p_info->sequence->width != (unsigned)-1 )
             {
                 decoder_SynchroReset( p_sys->p_synchro );
-                if( p_sys->p_info->current_fbuf != NULL
-                    && p_sys->p_info->current_fbuf->id != NULL )
+                if( p_sys->p_info->current_fbuf != NULL &&
+                    p_sys->p_info->current_fbuf->id != NULL )
                 {
-                    p_sys->b_garbage_pic = 1;
-                    p_pic = p_sys->p_info->current_fbuf->id;
+                    p_sys->b_garbage_pic = true;
                 }
-                else
-                {
-                    uint8_t *buf[3];
-                    buf[0] = buf[1] = buf[2] = NULL;
-                    if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-                    {
-                        p_block->i_buffer = 0;
-                        break;
-                    }
-                    mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-                    mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
-                }
-                p_sys->p_picture_to_destroy = p_pic;
-
-                if ( p_sys->b_slice_i )
+                if( p_sys->b_slice_i )
                 {
                     decoder_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0,
-                        p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
+                                               I_CODING_TYPE, 2, 0, 0,
+                                               p_sys->p_info->sequence->flags &
+                                                            SEQ_FLAG_LOW_DELAY );
                     decoder_SynchroDecode( p_sys->p_synchro );
                     decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
                 }
@@ -289,8 +477,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             else if( p_sys->b_preroll )
             {
                 p_sys->b_preroll = false;
-                /* Reset synchro */
-                decoder_SynchroReset( p_sys->p_synchro );
+                if( p_sys->p_synchro )
+                    decoder_SynchroReset( p_sys->p_synchro );
             }
 
 #ifdef PIC_FLAG_PTS
@@ -323,296 +511,57 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             GetAR( p_dec );
             break;
 #endif
-
-        case STATE_SEQUENCE:
-        {
-            /* Initialize video output */
-            uint8_t *buf[3];
-            buf[0] = buf[1] = buf[2] = NULL;
-
-            GetAR( p_dec );
-
-            mpeg2_custom_fbuf( p_sys->p_mpeg2dec, 1 );
-
-            /* Set the first 2 reference frames */
-            mpeg2_set_buf( p_sys->p_mpeg2dec, buf, NULL );
-
-            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-            {
-                block_Release( p_block );
-                return NULL;
-            }
-
-            mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-            mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
-
-            /* This picture will never go through display_picture. */
-            p_pic->date = 0;
-
-            /* For some reason, libmpeg2 will put this pic twice in
-             * discard_picture. This can be considered a bug in libmpeg2. */
-            decoder_LinkPicture( p_dec, p_pic );
-
-            if( p_sys->p_synchro )
-            {
-                decoder_SynchroRelease( p_sys->p_synchro );
-            }
-            p_sys->p_synchro = decoder_SynchroInit( p_dec,
-                (uint32_t)((uint64_t)1001000000 * 27 /
-                p_sys->p_info->sequence->frame_period) );
-            p_sys->b_after_sequence_header = 1;
-        }
-        break;
-
         case STATE_PICTURE_2ND:
-            p_sys->b_second_field = 1;
+            p_sys->b_second_field = true;
             break;
 
-        case STATE_PICTURE:
-        {
-            uint8_t *buf[3];
-            mtime_t i_pts, i_dts;
-            buf[0] = buf[1] = buf[2] = NULL;
 
-            if ( p_sys->b_after_sequence_header &&
-                 ((p_sys->p_info->current_picture->flags &
-                       PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P) )
-            {
-                /* Intra-slice refresh. Simulate a blank I picture. */
-                msg_Dbg( p_dec, "intra-slice refresh stream" );
-                decoder_SynchroNewPicture( p_sys->p_synchro,
-                    I_CODING_TYPE, 2, 0, 0,
-                    p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-                decoder_SynchroDecode( p_sys->p_synchro );
-                decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
-                p_sys->b_slice_i = 1;
-            }
-            p_sys->b_after_sequence_header = 0;
-
-#ifdef PIC_FLAG_PTS
-            i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_PTS ?
-                ( ( p_sys->p_info->current_picture->pts ==
-                    (uint32_t)p_sys->i_current_pts ) ?
-                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
-            i_dts = 0;
-
-            /* Hack to handle demuxers which only have DTS timestamps */
-            if( !i_pts && !p_block->i_pts && p_block->i_dts > 0 )
-            {
-                if( p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ||
-                    (p_sys->p_info->current_picture->flags &
-                      PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
-                {
-                    i_pts = p_block->i_dts;
-                }
-            }
-            p_block->i_pts = p_block->i_dts = 0;
-            /* End hack */
-
-#else /* New interface */
-
-            i_pts = p_sys->p_info->current_picture->flags & PIC_FLAG_TAGS ?
-                ( ( p_sys->p_info->current_picture->tag ==
-                    (uint32_t)p_sys->i_current_pts ) ?
-                  p_sys->i_current_pts : p_sys->i_previous_pts ) : 0;
-            i_dts = p_sys->p_info->current_picture->flags & PIC_FLAG_TAGS ?
-                ( ( p_sys->p_info->current_picture->tag2 ==
-                    (uint32_t)p_sys->i_current_dts ) ?
-                  p_sys->i_current_dts : p_sys->i_previous_dts ) : 0;
-#endif
-
-            /* If nb_fields == 1, it is a field picture, and it will be
-             * followed by another field picture for which we won't call
-             * decoder_SynchroNewPicture() because this would have other
-             * problems, so we take it into account here.
-             * This kind of sucks, but I didn't think better. --Meuuh
-             */
-            decoder_SynchroNewPicture( p_sys->p_synchro,
-                p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
-                p_sys->p_info->current_picture->nb_fields == 1 ? 2 :
-                p_sys->p_info->current_picture->nb_fields, i_pts, i_dts,
-                p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-
-
-            bool b_skip = false;
-            if( !p_dec->b_pace_control && !p_sys->b_preroll &&
-                !(p_sys->b_slice_i
-                   && ((p_sys->p_info->current_picture->flags
-                         & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P))
-                   && !decoder_SynchroChoose( p_sys->p_synchro,
-                              p_sys->p_info->current_picture->flags
-                                & PIC_MASK_CODING_TYPE,
-                              /*p_sys->p_vout->render_time*/ 0 /*FIXME*/,
-                              p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY ) )
-            {
-                b_skip = true;
-            }
-
-            p_pic = NULL;
-            if( !b_skip )
-                p_pic = GetNewPicture( p_dec, buf );
-
-            if( b_skip || !p_pic )
-            {
-                mpeg2_skip( p_sys->p_mpeg2dec, 1 );
-                p_sys->b_skip = 1;
-                decoder_SynchroTrash( p_sys->p_synchro );
-                mpeg2_set_buf( p_sys->p_mpeg2dec, buf, NULL );
-
-                if( !b_skip )
-                {
-                    block_Release( p_block );
-                    return NULL;
-                }
-            }
-            else
-            {
-                mpeg2_skip( p_sys->p_mpeg2dec, 0 );
-                p_sys->b_skip = 0;
-                decoder_SynchroDecode( p_sys->p_synchro );
-
-                mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-                mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
-            }
-            if( p_sys->p_info->user_data_len > 2 || p_sys->i_gop_user_data > 2 )
-            {
-                p_sys->i_cc_pts = i_pts;
-                p_sys->i_cc_dts = i_dts;
-                if( (p_sys->p_info->current_picture->flags
-                             & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_P )
-                    p_sys->i_cc_flags = BLOCK_FLAG_TYPE_P;
-                else if( (p_sys->p_info->current_picture->flags
-                             & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
-                    p_sys->i_cc_flags = BLOCK_FLAG_TYPE_B;
-                else p_sys->i_cc_flags = BLOCK_FLAG_TYPE_I;
-
-                if( p_sys->i_gop_user_data > 2 )
-                {
-                    /* We now have picture info for any cached user_data out of the gop */
-                    cc_Extract( &p_sys->cc, &p_sys->p_gop_user_data[0], p_sys->i_gop_user_data );
-                    p_sys->i_gop_user_data = 0;
-                }
-
-                /* Extract the CC from the user_data of the picture */
-                if( p_sys->p_info->user_data_len > 2 )
-                    cc_Extract( &p_sys->cc, &p_sys->p_info->user_data[0], p_sys->p_info->user_data_len );
-            }
-        }
-        break;
-
-        case STATE_GOP:
-            /* There can be userdata in a GOP. It needs to be remembered for the next picture. */
-            if( p_sys->p_info->user_data_len > 2 )
-            {
-                free( p_sys->p_gop_user_data );
-                p_sys->p_gop_user_data = calloc( p_sys->p_info->user_data_len, sizeof(uint8_t) );
-                if( p_sys->p_gop_user_data )
-                {
-                    p_sys->i_gop_user_data = p_sys->p_info->user_data_len;
-                    memcpy( p_sys->p_gop_user_data, p_sys->p_info->user_data, p_sys->p_info->user_data_len );
-                }
-            }
-            break;
-
+        case STATE_INVALID_END:
         case STATE_END:
         case STATE_SLICE:
             p_pic = NULL;
-            if( p_sys->p_info->display_fbuf
-                && p_sys->p_info->display_fbuf->id )
+            if( p_sys->p_info->display_fbuf &&
+                p_sys->p_info->display_fbuf->id )
             {
-                p_pic = (picture_t *)p_sys->p_info->display_fbuf->id;
+                p_pic = p_sys->p_info->display_fbuf->id;
+                DpbDisplayPicture( p_dec, p_pic );
 
                 decoder_SynchroEnd( p_sys->p_synchro,
-                            p_sys->p_info->display_picture->flags
-                             & PIC_MASK_CODING_TYPE,
-                            p_sys->b_garbage_pic );
-                p_sys->b_garbage_pic = 0;
+                                    p_sys->p_info->display_picture->flags & PIC_MASK_CODING_TYPE,
+                                    p_sys->b_garbage_pic );
 
-                if( p_sys->p_picture_to_destroy != p_pic )
-                {
-                    p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
-                }
-                else
-                {
-                    p_sys->p_picture_to_destroy = NULL;
-                    p_pic->date = 0;
-                }
+                p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
+                if( p_sys->b_garbage_pic )
+                    p_pic->date = 0; /* ??? */
+                p_sys->b_garbage_pic = false;
             }
 
             if( p_sys->p_info->discard_fbuf &&
                 p_sys->p_info->discard_fbuf->id )
             {
-                decoder_UnlinkPicture( p_dec,
-                                       p_sys->p_info->discard_fbuf->id );
+                DpbUnlinkPicture( p_dec, p_sys->p_info->discard_fbuf->id );
             }
 
             /* For still frames */
-            if( state == STATE_END && p_pic ) p_pic->b_force = true;
+            if( state == STATE_END && p_pic )
+                p_pic->b_force = true;
 
             if( p_pic )
             {
                 /* Avoid frames with identical timestamps.
                  * Especially needed for still frames in DVD menus. */
-                if( p_sys->i_last_frame_pts == p_pic->date ) p_pic->date++;
+                if( p_sys->i_last_frame_pts == p_pic->date )
+                    p_pic->date++;
                 p_sys->i_last_frame_pts = p_pic->date;
-
                 return p_pic;
             }
             break;
 
         case STATE_INVALID:
         {
-            uint8_t *buf[3];
-            buf[0] = buf[1] = buf[2] = NULL;
-
-            msg_Warn( p_dec, "invalid picture encountered" );
-            if ( ( p_sys->p_info->current_picture == NULL ) ||
-               ( ( p_sys->p_info->current_picture->flags &
-                   PIC_MASK_CODING_TYPE) != PIC_FLAG_CODING_TYPE_B ) )
-            {
-                if( p_sys->p_synchro ) decoder_SynchroReset( p_sys->p_synchro );
-            }
-            mpeg2_skip( p_sys->p_mpeg2dec, 1 );
-            p_sys->b_skip = 1;
-            cc_Flush( &p_sys->cc );
-
-            if( p_sys->p_info->current_fbuf &&
-                p_sys->p_info->current_fbuf->id )
-            {
-                p_sys->b_garbage_pic = 1;
-                p_pic = p_sys->p_info->current_fbuf->id;
-            }
-            else if( !p_sys->p_info->sequence )
-            {
-                break;
-            }
-            else
-            {
-                if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-                    break;
-                mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-                mpeg2_stride( p_sys->p_mpeg2dec, p_pic->p[Y_PLANE].i_pitch );
-            }
-            p_sys->p_picture_to_destroy = p_pic;
-
-            memset( p_pic->p[0].p_pixels, 0,
-                    p_sys->p_info->sequence->width
-                     * p_sys->p_info->sequence->height );
-            memset( p_pic->p[1].p_pixels, 0x80,
-                    p_sys->p_info->sequence->width
-                     * p_sys->p_info->sequence->height / 4 );
-            memset( p_pic->p[2].p_pixels, 0x80,
-                    p_sys->p_info->sequence->width
-                     * p_sys->p_info->sequence->height / 4 );
-
-            if( p_sys->b_slice_i )
-            {
-                decoder_SynchroNewPicture( p_sys->p_synchro,
-                        I_CODING_TYPE, 2, 0, 0,
-                        p_sys->p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
-                decoder_SynchroDecode( p_sys->p_synchro );
-                decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
-            }
+            msg_Err( p_dec, "invalid picture encountered" );
+            /* I don't think we have anything to do, but well without
+             * docs ... */
             break;
         }
 
@@ -633,6 +582,8 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
+    DpbClean( p_dec );
+
     free( p_sys->p_gop_user_data );
 
     if( p_sys->p_synchro ) decoder_SynchroRelease( p_sys->p_synchro );
@@ -645,7 +596,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * GetNewPicture: Get a new picture from the vout and set the buf struct
  *****************************************************************************/
-static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
+static picture_t *GetNewPicture( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     picture_t *p_pic;
@@ -676,7 +627,8 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     /* Get a new picture */
     p_pic = decoder_NewPicture( p_dec );
 
-    if( p_pic == NULL ) return NULL;
+    if( p_pic == NULL )
+        return NULL;
 
     p_pic->b_progressive = p_sys->p_info->current_picture != NULL ?
         p_sys->p_info->current_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME : 1;
@@ -684,12 +636,6 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
         p_sys->p_info->current_picture->flags & PIC_FLAG_TOP_FIELD_FIRST : 1;
     p_pic->i_nb_fields = p_sys->p_info->current_picture != NULL ?
         p_sys->p_info->current_picture->nb_fields : 2;
-
-    decoder_LinkPicture( p_dec, p_pic );
-
-    pp_buf[0] = p_pic->p[0].p_pixels;
-    pp_buf[1] = p_pic->p[1].p_pixels;
-    pp_buf[2] = p_pic->p[2].p_pixels;
 
     return p_pic;
 }
@@ -769,3 +715,128 @@ static void GetAR( decoder_t *p_dec )
              (uint32_t)((uint64_t)1001000000 * 27 /
                  p_sys->p_info->sequence->frame_period % 1001) );
 }
+
+/*****************************************************************************
+ * PutPicture: Put a picture_t in mpeg2 context
+ *****************************************************************************/
+static void PutPicture( decoder_t *p_dec, picture_t *p_picture )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* */
+    uint8_t *pp_buf[3];
+    for( int j = 0; j < 3; j++ )
+        pp_buf[j] = p_picture ? p_picture->p[j].p_pixels : NULL;
+    mpeg2_set_buf( p_sys->p_mpeg2dec, pp_buf, p_picture );
+
+    /* Completly broken API, why the hell does it suppose
+     * the stride of the chroma planes ! */
+    if( p_picture )
+        mpeg2_stride( p_sys->p_mpeg2dec, p_picture->p[Y_PLANE].i_pitch );
+}
+
+
+/**
+ * Initialize a virtual Decoded Picture Buffer to workaround
+ * libmpeg2 deficient API
+ */
+static void DpbInit( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    for( int i = 0; i < DPB_COUNT; i++ )
+        p_sys->p_dpb[i].p_picture = NULL;
+}
+/**
+ * Empty and reset the current DPB
+ */
+static void DpbClean( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    for( int i = 0; i < DPB_COUNT; i++ )
+    {
+        picture_dpb_t *p = &p_sys->p_dpb[i];
+        if( !p->p_picture )
+            continue;
+        if( p->b_linked )
+            decoder_UnlinkPicture( p_dec, p->p_picture );
+        if( !p->b_displayed )
+            decoder_DeletePicture( p_dec, p->p_picture );
+
+        p->p_picture = NULL;
+    }
+}
+/**
+ * Retreive a picture and reserve a place in the DPB
+ */
+static picture_t *DpbNewPicture( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    picture_dpb_t *p;
+    int i;
+
+    for( i = 0; i < DPB_COUNT; i++ )
+    {
+        p = &p_sys->p_dpb[i];
+        if( !p->p_picture )
+            break;
+    }
+    if( i >= DPB_COUNT )
+    {
+        msg_Err( p_dec, "Leaking picture" );
+        return NULL;
+    }
+
+    p->p_picture = GetNewPicture( p_dec );
+    if( p->p_picture )
+    {
+        decoder_LinkPicture( p_dec, p->p_picture );
+        p->b_linked = true;
+        p->b_displayed = false;
+
+        p->p_picture->date = 0;
+    }
+    return p->p_picture;
+}
+static picture_dpb_t *DpbFindPicture( decoder_t *p_dec, picture_t *p_picture )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    for( int i = 0; i < DPB_COUNT; i++ )
+    {
+        picture_dpb_t *p = &p_sys->p_dpb[i];
+        if( p->p_picture == p_picture )
+            return p;
+    }
+    return NULL;
+}
+/**
+ * Unlink the provided picture and ensure that the decoder
+ * does not own it anymore.
+ */
+static void DpbUnlinkPicture( decoder_t *p_dec, picture_t *p_picture )
+{
+    picture_dpb_t *p = DpbFindPicture( p_dec, p_picture );
+    assert( p && p->b_linked );
+
+    decoder_UnlinkPicture( p_dec, p->p_picture );
+    p->b_linked = false;
+
+    if( !p->b_displayed )
+        decoder_DeletePicture( p_dec, p->p_picture );
+    p->p_picture = NULL;
+}
+/**
+ * Mark the provided picture as displayed.
+ */
+static void DpbDisplayPicture( decoder_t *p_dec, picture_t *p_picture )
+{
+    picture_dpb_t *p = DpbFindPicture( p_dec, p_picture );
+    assert( p && !p->b_displayed && p->b_linked );
+
+    p->b_displayed = true;
+}
+
+
