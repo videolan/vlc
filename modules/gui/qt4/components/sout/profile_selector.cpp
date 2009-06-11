@@ -285,7 +285,7 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_ACODEC( "Flac", "flac" )
     ADD_ACODEC( "Speex", "spx" )
     ADD_ACODEC( "WAV", "s16l" )
-    ADD_ACODEC( "WMA", "wma" )
+    ADD_ACODEC( "WMA2", "wma2" )
 #undef ADD_ACODEC
 
 #define ADD_SCALING( factor ) ui.vScaleBox->addItem( factor );
