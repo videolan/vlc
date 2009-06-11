@@ -335,12 +335,12 @@ case "${host_os}" in
         fi
     fi
     ;;
-  *mingw32* | *cygwin* | *wince* | *mingwce* | *pe*)
+  *mingw32* | *cygwin* | *wince* | *mingwce*)
     AC_CHECK_TOOL(WINDRES, windres, :)
     AC_CHECK_TOOL(OBJCOPY, objcopy, :)
 
     case "${host_os}" in
-      *wince* | *mingwce* | *mingw32ce* | *pe*)
+      *wince* | *mingwce* | *mingw32ce*)
         SYS=mingwce
         dnl Sadly CeGCC still needs non-wince macros
         AC_DEFINE([_WIN32_WINNT], 0x0501, [Define to '0x0500' for Windows 2000 APIs.])
