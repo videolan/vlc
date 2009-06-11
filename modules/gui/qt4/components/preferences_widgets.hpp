@@ -201,14 +201,14 @@ public:
     BoolConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                        QGridLayout *, int& );
     BoolConfigControl( vlc_object_t *, module_config_t *,
-                       QLabel *, QCheckBox*, bool );
+                       QLabel *, QAbstractButton*, bool );
     virtual ~BoolConfigControl() {};
     virtual int getValue();
     virtual void show() { checkbox->show(); }
     virtual void hide() { checkbox->hide(); }
     virtual int getType() { return CONFIG_ITEM_BOOL; }
-private:
-    QCheckBox *checkbox;
+private:    
+    QAbstractButton *checkbox;
     void finish();
 };
 

@@ -75,6 +75,7 @@ enum {
        normalizerChB,
        volLW,
        headphoneB,
+       spdifChB,
 };
 enum { inputLE, cachingCoB };
 enum { skinRB, qtRB };

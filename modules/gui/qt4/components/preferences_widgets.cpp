@@ -1037,7 +1037,7 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
                                       module_config_t *_p_item,
                                       QLabel *_label,
-                                      QCheckBox *_checkbox,
+                                      QAbstractButton *_checkbox,
                                       bool bycat ) :
                    VIntConfigControl( _p_this, _p_item )
 {
@@ -1048,14 +1048,13 @@ BoolConfigControl::BoolConfigControl( vlc_object_t *_p_this,
 
 void BoolConfigControl::finish()
 {
-    checkbox->setCheckState( p_item->value.i == true ? Qt::Checked
-                                                        : Qt::Unchecked );
+    checkbox->setChecked( p_item->value.i == true );
     checkbox->setToolTip( formatTooltip(qtr(p_item->psz_longtext)) );
 }
 
 int BoolConfigControl::getValue()
 {
-    return checkbox->checkState() == Qt::Checked ? true : false;
+    return checkbox->isChecked();
 }
 
 /**************************************************************************

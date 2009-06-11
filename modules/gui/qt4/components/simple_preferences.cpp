@@ -223,6 +223,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
         START_SPREFS_CAT( Audio, qtr("Audio Settings") );
 
             CONFIG_GENERIC( "audio", Bool, NULL, enableAudio );
+            ui.SPrefsAudio_zone->setEnabled( ui.enableAudio->isChecked() );
+            CONNECT( ui.enableAudio, toggled( bool ),
+                     ui.SPrefsAudio_zone, setEnabled( bool ) );
 
 #define audioCommon( name ) \
             QWidget * name ## Control = new QWidget( ui.outputAudioBox ); \
@@ -230,7 +233,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             name ## Layout->setMargin( 0 ); \
             name ## Layout->setSpacing( 0 ); \
             QLabel * name ## Label = new QLabel( qtr( "Device:" ), name ## Control ); \
-            name ## Label->setMinimumSize(QSize(100, 0)); \
+            name ## Label->setMinimumSize(QSize(250, 0)); \
             name ## Layout->addWidget( name ## Label ); \
 
 #define audioControl( name) \
@@ -248,12 +251,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             QPushButton * name ## Browse = new QPushButton( qtr( "Browse..." ), name ## Control); \
             name ## Layout->addWidget( name ## Browse ); \
             outputAudioLayout->addWidget( name ## Control, outputAudioLayout->rowCount(), 0, 1, -1 );
-
-            /* hide if necessary */
-            ui.lastfm_user_edit->hide();
-            ui.lastfm_user_label->hide();
-            ui.lastfm_pass_edit->hide();
-            ui.lastfm_pass_label->hide();
 
             /* Build if necessary */
             QGridLayout * outputAudioLayout = qobject_cast<QGridLayout *>(ui.outputAudioBox->layout());
@@ -292,13 +289,17 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_NO_BOOL( "volume" , IntegerRangeSlider, NULL,
                                      defaultVolume );
             CONNECT( ui.defaultVolume, valueChanged( int ),
-                    this, updateAudioVolume( int ) );
+                     this, updateAudioVolume( int ) );
+
+            CONFIG_GENERIC( "qt-autosave-volume", Bool, NULL, keepVolumeRadio );
+            ui.defaultVolume_zone->setEnabled( ui.resetVolumeRadio->isChecked() );
+            CONNECT( ui.resetVolumeRadio, toggled( bool ),
+                     ui.defaultVolume_zone, setEnabled( bool ) );
 
             CONFIG_GENERIC( "audio-language" , String , ui.langLabel,
                             preferredAudioLanguage );
 
             CONFIG_GENERIC( "spdif", Bool, NULL, spdifBox );
-            CONFIG_GENERIC( "qt-autosave-volume", Bool, NULL, saveVolBox );
             CONFIG_GENERIC( "force-dolby-surround", IntegerList, ui.dolbyLabel,
                             detectionDolby );
 
@@ -326,6 +327,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.volumeValue->setButtonSymbols(QAbstractSpinBox::NoButtons);
             optionWidgets.append( ui.volumeValue );
             optionWidgets.append( ui.headphoneEffect );
+            optionWidgets.append( ui.spdifBox );
             updateAudioOptions( ui.outputModule->currentIndex() );
 
             /* LastFM */
@@ -340,11 +342,19 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     ui.lastfm->setChecked( true );
                 else
                     ui.lastfm->setChecked( false );
+
+                ui.lastfm_zone->setEnabled( ui.lastfm->isChecked() );
+
+                CONNECT( ui.lastfm, toggled( bool ),
+                         ui.lastfm_zone, setEnabled( bool ) );
                 CONNECT( ui.lastfm, stateChanged( int ),
                          this, lastfm_Changed( int ) );
             }
             else
+            {
                 ui.lastfm->hide();
+                ui.lastfm_zone->hide();
+            }
 
             /* Normalizer */
             CONNECT( ui.volNormBox, toggled( bool ), ui.volNormSpin,
@@ -647,6 +657,8 @@ void SPrefsPanel::updateAudioOptions( int number)
         optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
 #endif
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
+    optionWidgets[spdifChB]->setVisible( ( value != "aout_file"
+                                           && value != "dummy" ) );
 }
 
 
