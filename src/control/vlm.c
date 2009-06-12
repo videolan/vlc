@@ -159,15 +159,16 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance,
     if( !p_instance->p_vlm )
     {
         p_instance->p_vlm = vlm_New( p_instance->p_libvlc_int );
+        if( !p_instance->p_vlm )
+        {
+            libvlc_exception_raise( p_exception,
+                                    "Unable to create VLM." );
+            return VLC_EGENERIC;
+        }
         var_AddCallback( (vlc_object_t *)p_instance->p_vlm, "intf-event", VlmEvent,
                          p_instance->p_event_manager );
     }
-    if( !p_instance->p_vlm )
-    {
-        libvlc_exception_raise( p_exception,
-                                "Unable to create VLM." );
-        return VLC_EGENERIC;
-    }
+
     return VLC_SUCCESS;
 }
 #define VLM_RET(p,ret) do {                                     \
