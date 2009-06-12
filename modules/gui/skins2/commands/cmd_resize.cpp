@@ -46,9 +46,9 @@ void CmdResize::execute()
 }
 
 
-CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, void *pWindow, int width,
-                              int height ):
-    CmdGeneric( pIntf ), m_pWindow( pWindow ), m_width( width ),
+CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, VoutWindow *pVoutWindow,
+                              int width, int height ):
+    CmdGeneric( pIntf ), m_pVoutWindow( pVoutWindow ), m_width( width ),
     m_height( height )
 {
 }
@@ -56,8 +56,17 @@ CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, void *pWindow, int width,
 
 void CmdResizeVout::execute()
 {
-    VarBox &rVoutSize = VlcProc::instance( getIntf() )->getVoutSizeVar();
-    rVoutSize.setSize( m_width, m_height );
+    if( m_pVoutWindow )
+    {
+        m_pVoutWindow->setOriginalWidth( m_width );
+        m_pVoutWindow->setOriginalHeight( m_height );
+
+        CtrlVideo* pCtrlVideo = m_pVoutWindow->getCtrlVideo();
+        if( pCtrlVideo )
+        {
+            pCtrlVideo->resizeControl( m_width, m_height );
+        }
+    }
 }
 
 

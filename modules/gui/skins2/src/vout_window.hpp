@@ -59,12 +59,17 @@ class VoutWindow: private GenericWindow
         /// Refresh an area of the window
         virtual void refresh( int left, int top, int width, int height );
 
-        /// set Video Control for VoutWindow
+        /// set and get Video Control for VoutWindow
         virtual void setCtrlVideo( CtrlVideo* pCtrlVideo );
+        virtual CtrlVideo* getCtrlVideo( ) { return m_pCtrlVideo; }
 
         /// get original size of vout
         virtual int getOriginalWidth( ) { return original_width; }
         virtual int getOriginalHeight( ) { return original_height; }
+
+        /// set original size of vout
+        virtual void setOriginalWidth( int width ) { original_width = width; }
+        virtual void setOriginalHeight( int height ) { original_height = height; }
 
         virtual string getType() const { return "Vout"; }
 

@@ -61,8 +61,8 @@ class CmdResizeVout: public CmdGeneric
 {
     public:
         /// Resize the given layout
-        CmdResizeVout( intf_thread_t *pIntf, void *pWindow, int width,
-                       int height );
+        CmdResizeVout( intf_thread_t *pIntf, VoutWindow *pVoutWindow,
+                       int width, int height );
         virtual ~CmdResizeVout() {}
 
         /// This method does the real job of the command
@@ -72,7 +72,7 @@ class CmdResizeVout: public CmdGeneric
         virtual string getType() const { return "resize vout"; }
 
     private:
-        void *m_pWindow;
+        VoutWindow *m_pVoutWindow;
         int m_width, m_height;
 };
 

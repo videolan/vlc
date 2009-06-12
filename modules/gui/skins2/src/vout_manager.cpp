@@ -154,7 +154,8 @@ void VoutManager::requestVout( CtrlVideo* pCtrlVideo )
     {
         if( (*it).pCtrlVideo == NULL )
         {
-            pCtrlVideo->attachVoutWindow( (*it).pVoutWindow );
+            pCtrlVideo->attachVoutWindow( (*it).pVoutWindow,
+                                          (*it).width, (*it).height );
             (*it).pCtrlVideo = pCtrlVideo;
             break;
         }
@@ -274,6 +275,7 @@ int VoutManager::controlWindow( struct vout_window_t *pWnd,
 {
     intf_thread_t *pIntf = (intf_thread_t *)pWnd->p_private;
     VoutManager *pThis = pIntf->p_sys->p_voutManager;
+    vout_thread_t* pVout = pWnd->vout;
 
     switch( query )
     {
@@ -284,12 +286,27 @@ int VoutManager::controlWindow( struct vout_window_t *pWnd,
 
             if( i_width && i_height )
             {
-                // Post a resize vout command
-                CmdResizeVout *pCmd =
-                    new CmdResizeVout( pThis->getIntf(), pWnd->handle.hwnd,
-                                       i_width, i_height );
-                AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-                pQueue->push( CmdGenericPtr( pCmd ) );
+                pThis->lockVout();
+
+                vector<SavedVout>::iterator it;
+                for( it = pThis->m_SavedVoutVec.begin();
+                     it != pThis->m_SavedVoutVec.end(); it++ )
+                {
+                    if( (*it).pVout == pVout )
+                    {
+                        // Post a vout resize command
+                        CmdResizeVout *pCmd =
+                            new CmdResizeVout( pThis->getIntf(),
+                                               (*it).pVoutWindow,
+                                               (int)i_width, (int)i_height );
+                        AsyncQueue *pQueue =
+                            AsyncQueue::instance( pThis->getIntf() );
+                        pQueue->push( CmdGenericPtr( pCmd ) );
+                        break;
+                    }
+                }
+
+                pThis->unlockVout();
             }
         }
 

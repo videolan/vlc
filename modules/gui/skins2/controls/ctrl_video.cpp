@@ -187,10 +187,10 @@ void CtrlVideo::onUpdate( Subject<VarBool> &rVariable, void *arg  )
     }
 }
 
-void CtrlVideo::attachVoutWindow( VoutWindow* pVoutWindow )
+void CtrlVideo::attachVoutWindow( VoutWindow* pVoutWindow, int width, int height )
 {
-    int width = pVoutWindow->getOriginalWidth();
-    int height = pVoutWindow->getOriginalHeight();
+    width = ( width < 0 ) ? pVoutWindow->getOriginalWidth() : width;
+    height = ( height < 0 ) ? pVoutWindow->getOriginalHeight() : height;
 
     WindowManager &rWindowManager =
         getIntf()->p_sys->p_theme->getWindowManager();

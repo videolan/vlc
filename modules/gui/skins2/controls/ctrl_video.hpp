@@ -63,7 +63,8 @@ class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
         virtual void onUpdate( Subject<VarBool> &rVariable , void* );
 
         // Attach a voutWindow to a Video Control
-        void attachVoutWindow( VoutWindow* pVoutWindow );
+        void attachVoutWindow( VoutWindow* pVoutWindow,
+                               int width = -1, int height = -1 );
 
         // Detach a voutWindow from a Video Control
         void detachVoutWindow( );
