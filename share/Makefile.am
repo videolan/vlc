@@ -178,21 +178,6 @@ DIST_http = \
 	http/js/mosaic.js \
 	http/js/vlm.js \
 	http/mosaic.html \
-	http/old/.hosts \
-	http/old/admin/.access \
-	http/old/admin/browse.html \
-	http/old/admin/dboxfiles.html \
-	http/old/admin/index.html \
-	http/old/cone_minus.png \
-	http/old/cone_plus.png \
-	http/old/index.html \
-	http/old/info.html \
-	http/old/style.css \
-	http/old/vlm/edit.html \
-	http/old/vlm/index.html \
-	http/old/vlm/new.html \
-	http/old/vlm/show.html \
-	http/old/webcam.html \
 	http/requests/browse.xml \
 	http/requests/playlist.xml \
 	http/requests/status.xml \

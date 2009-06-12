@@ -543,13 +543,9 @@ VLC-release.app: vlc
 	$(INSTALL) -m 644 $(srcdir)/share/lua/http/requests/readme $(top_builddir)/VLC-release.app/Contents/MacOS/share/lua/http/requests/readme.txt
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/dialogs
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/admin
-	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/vlm
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/requests
 	$(INSTALL) -m 644 $(srcdir)/share/http/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/.hosts
-	$(INSTALL) -m 644 $(srcdir)/share/http/old/.hosts $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/.hosts
 	for i in $(srcdir)/share/http/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/`basename $${i}` ; \
 	done
@@ -558,15 +554,6 @@ VLC-release.app: vlc
 	done
 	for i in $(srcdir)/share/http/js/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/js/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/old/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/old/admin/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/admin/`basename $${i}` ; \
-	done
-	for i in $(srcdir)/share/http/old/vlm/*.* ; do \
-	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/old/vlm/`basename $${i}` ; \
 	done
 	for i in $(srcdir)/share/http/images/*.* ; do \
 	  $(INSTALL) -m 644 $${i} $(top_builddir)/VLC-release.app/Contents/MacOS/share/http/images/`basename $${i}` ; \
@@ -839,9 +826,6 @@ if BUILD_HTTPD
 	mkdir -p "$(win32_http_destdir)/requests"
 	mkdir -p "$(win32_http_destdir)/js"
 	mkdir -p "$(win32_http_destdir)/dialogs"
-	mkdir -p "$(win32_http_destdir)/old"
-	mkdir -p "$(win32_http_destdir)/old/vlm"
-	mkdir -p "$(win32_http_destdir)/old/admin"
 	cp $(srcdir)/share/http/*.html $(win32_http_destdir)/
 	unix2dos $(win32_http_destdir)/*.html
 	cp $(srcdir)/share/http/.hosts $(win32_http_destdir)/
@@ -861,16 +845,6 @@ if BUILD_HTTPD
 	cp $(srcdir)/share/http/requests/readme $(win32_http_destdir)/requests/readme.txt
 	unix2dos $(win32_http_destdir)/requests/readme.txt
 
-	cp $(srcdir)/share/http/old/*.html $(win32_http_destdir)/old/
-	unix2dos $(win32_http_destdir)/old/*.html
-	cp $(srcdir)/share/http/old/*.css $(win32_http_destdir)/old/
-	cp $(srcdir)/share/http/old/.hosts $(win32_http_destdir)/old/
-	cp $(srcdir)/share/http/old/*.png $(win32_http_destdir)/old/
-	cp $(srcdir)/share/http/old/vlm/*.html $(win32_http_destdir)/old/vlm/
-	unix2dos $(win32_http_destdir)/old/vlm/*.html
-	cp $(srcdir)/share/http/old/admin/*.html $(win32_http_destdir)/old/admin/
-	unix2dos $(win32_http_destdir)/old/admin/*.html
-	cp $(srcdir)/share/http/old/admin/.access $(win32_http_destdir)/old/admin/
 endif
 
 if BUILD_SKINS
