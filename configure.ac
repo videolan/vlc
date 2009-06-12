@@ -1625,7 +1625,7 @@ if test -n "${with_tuning}"; then
     fi
 else
     if test "${SYS}" = "darwin" -a "${host_cpu}" != "powerpc"; then
-        CFLAGS_TUNING="-march=pentium-m -mtune=prescott"
+        CFLAGS_TUNING="-march=prescott -mtune=generic"
     elif test "${host_cpu}" = "i686" -o "${host_cpu}" = "i586" -o "${host_cpu}" = "i486" -o "${host_cpu}" = "i386"; then
         CFLAGS_TUNING="-mtune=pentium2"
     elif test "${host_cpu}" = "x86_64"; then

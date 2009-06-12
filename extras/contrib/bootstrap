@@ -158,7 +158,7 @@ case $HOST in
         fi
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
-        CFLAGS_TUNING=" -march=pentium-m -mtune=prescott -arch i386"
+        CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -arch i386 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         CC="/Developer/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
@@ -181,7 +181,7 @@ case $HOST in
         HAVE_DARWIN_10=1
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk" >> config.mak
-        CFLAGS_TUNING=" -march=core2"
+        CFLAGS_TUNING=" -march=prescott -mtune=core2"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
