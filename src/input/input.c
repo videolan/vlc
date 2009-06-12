@@ -2345,6 +2345,36 @@ static int InputSourceInit( input_thread_t *p_input,
     /* Split uri */
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
+    /* FIXME: file:// handling plugins do not support URIs properly...
+     * So we pre-decoded the URI to a path for them. Note that we do not do it
+     * for non-standard VLC-specific schemes. */
+    if( !strcmp( psz_access, "file" ) )
+    {
+        if( psz_path[0] != '/' )
+        {   /* host specified -> not supported currently */
+            msg_Err( p_input, "cannot open remote file `%s://%s'",
+                     psz_access, psz_path );
+            msg_Info( p_input, "Did you mean `%s:///%s'?",
+                      psz_access, psz_path );
+            goto error;
+        }
+        /* Remove HTML anchor if present (not supported). */
+        char *p = strchr( psz_path, '#' );
+        if( p )
+            *p = '\0';
+        /* Then URI-decode the path. */
+        decode_URI( psz_path );
+#ifdef WIN32
+        /* Strip leading slash in front of the drive letter */
+        psz_path++;
+#endif
+#if (DIR_SEP_CHAR != '/')
+        /* Turn slashes into anti-slashes */
+        for( char *s = strchr( psz_path, '/' ); s; s = strchr( s + 1, '/' ) )
+            *s = DIR_SEP_CHAR;
+#endif
+    }
+
     msg_Dbg( p_input, "`%s' gives access `%s' demux `%s' path `%s'",
              psz_mrl, psz_access, psz_demux, psz_path );
     if( !p_input->b_preparsing )
@@ -2444,18 +2474,6 @@ static int InputSourceInit( input_thread_t *p_input,
     {
         /* Now try a real access */
         in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
-
-        /* Access failed, URL encoded ? */
-        if( in->p_access == NULL && strchr( psz_path, '%' ) )
-        {
-            decode_URI( psz_path );
-
-            msg_Dbg( p_input, "retrying with access `%s' demux `%s' path `%s'",
-                     psz_access, psz_demux, psz_path );
-
-            in->p_access = access_New( p_input,
-                                        psz_access, psz_demux, psz_path );
-        }
         if( in->p_access == NULL )
         {
             msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
