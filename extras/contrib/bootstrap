@@ -73,15 +73,19 @@ fi
 case $HOST in
     *powerpc*|*ppc*)
          echo "ARCH=ppc" >> config.mak
+         ARCH="ppc"
      ;;
     *darwin10*)
          echo "ARCH=x86_64" >> config.mak
+         ARCH="x86_64"
      ;;
     *86_64*)
           echo "ARCH=x86_64" >> config.mak
+          ARCH="x86_64"
      ;;
     *86*)
           echo "ARCH=i386" >> config.mak
+          ARCH="i386"
      ;;
 esac
 
@@ -181,7 +185,11 @@ case $HOST in
         HAVE_DARWIN_10=1
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk" >> config.mak
-        CFLAGS_TUNING=" -march=prescott -mtune=core2"
+        if test $ARCH = "x86_64"; then
+            CFLAGS_TUNING=" -march=core2 -mtune=core2"
+        else
+            CFLAGS_TUNING=" -march=prescott -mtune=core2"
+        fi
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
