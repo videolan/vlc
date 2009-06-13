@@ -337,9 +337,6 @@ static void Close( vlc_object_t *p_this )
     delete p_sys;
 }
 
-static QMutex windowLock;
-static QWaitCondition windowWait;
-
 static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
