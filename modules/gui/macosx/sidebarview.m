@@ -131,7 +131,7 @@
     i_row = [o_outline_view rowForItem:item];
     if( i_row > -1 )
     {
-        [o_outline_view selectRow:i_row byExtendingSelection: NO];
+		[o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
         [o_outline_view scrollRowToVisible: i_row];
     }
 }
@@ -162,7 +162,7 @@
     i_row = [o_outline_view rowForItem:[o_playlist playingItem]];
     if( i_row > -1 )
     {
-        [o_outline_view selectRow:i_row byExtendingSelection: NO];
+		[o_outline_view selectRowIndexes:[NSIndexSet indexSetWithIndex:i_row] byExtendingSelection:NO];
         [o_outline_view scrollRowToVisible: i_row];
     }
 }

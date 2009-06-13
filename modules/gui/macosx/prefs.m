@@ -179,7 +179,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [o_prefs_view setHasVerticalScroller: YES];
     [o_prefs_view setDrawsBackground: NO];
     [o_prefs_view setDocumentView: o_empty_view];
-    [o_tree selectRow:0 byExtendingSelection:NO];
+	[o_tree selectRowIndexes: [NSIndexSet indexSetWithIndex: 0] byExtendingSelection: NO];
 }
 
 - (void)setTitle: (NSString *) o_title_name
