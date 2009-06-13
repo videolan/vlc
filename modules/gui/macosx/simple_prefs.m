@@ -566,10 +566,24 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     
     [self setupButton: o_osd_encoding_pop forStringList: "subsdec-encoding"];
     [self setupField: o_osd_lang_fld forOption: "sub-language" ];
-    [self setupField: o_osd_font_fld forOption: "quartztext-font"];
+	
+	if( module_exists( "quartztext" ) )
+	{
+		[self setupField: o_osd_font_fld forOption: "quartztext-font"];
 
-    [self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
-    [self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
+		[self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
+		[self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
+	}
+	else 
+	{
+		[o_osd_font_fld setEnabled: NO];
+		[o_osd_font_color_pop setEnabled: NO];
+		[o_osd_font_size_pop setEnabled: NO];
+		[o_osd_font_color_pop removeAllItems];
+		[o_osd_font_size_pop removeAllItems];
+		[o_osd_font_btn setEnabled: NO];
+	}
+
 
     /********************
      * hotkeys settings *
@@ -921,10 +935,13 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
             config_PutPsz( p_intf, "subsdec-encoding", [[[o_osd_encoding_pop selectedItem] title] UTF8String] );
 
         config_PutPsz( p_intf, "sub-language", [[o_osd_lang_fld stringValue] UTF8String] );
-        config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
-
-        SaveIntList( o_osd_font_color_pop, "quartztext-color" );
-        SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
+        
+		if( module_exists( "quartztext" ) )
+		{
+			config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
+			SaveIntList( o_osd_font_color_pop, "quartztext-color" );
+			SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
+		}
 
         i = config_SaveConfigFile( p_intf, NULL );
 
@@ -1098,17 +1115,24 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
 - (IBAction)showFontPicker:(id)sender
 {
-    char * font = config_GetPsz( p_intf, "quartztext-font" );
-    NSString * fontFamilyName = font ? [NSString stringWithUTF8String: font] : nil;
-    free(font);
-    if( fontFamilyName )
-    {
-        NSFontDescriptor * fd = [NSFontDescriptor fontDescriptorWithFontAttributes:nil];
-        NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
-        [[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
-    }
-    [[NSFontManager sharedFontManager] setTarget: self];
-    [[NSFontPanel sharedFontPanel] orderFront:self];
+	if( module_exists( "quartztext" ) )
+	{
+		char * font = config_GetPsz( p_intf, "quartztext-font" );
+		NSString * fontFamilyName = font ? [NSString stringWithUTF8String: font] : nil;
+		free(font);
+		if( fontFamilyName )
+		{
+			NSFontDescriptor * fd = [NSFontDescriptor fontDescriptorWithFontAttributes:nil];
+			NSFont * font = [NSFont fontWithDescriptor:[fd fontDescriptorWithFamily:fontFamilyName] textTransform:nil];
+			[[NSFontManager sharedFontManager] setSelectedFont:font isMultiple:NO];
+		}
+		[[NSFontManager sharedFontManager] setTarget: self];
+		[[NSFontPanel sharedFontPanel] orderFront:self];
+	}
+	else 
+	{
+		[sender setEnabled: NO];
+	}
 }
 
 - (void)changeFont:(id)sender

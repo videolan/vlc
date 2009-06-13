@@ -71,7 +71,7 @@
 - (id)initWithName:(NSString*)name;
 
 - (int)numberOfChildren;
-- (VLCTreeItem *)childAtIndex:(int)i_index;
+- (VLCTreeItem *)childAtIndex:(NSInteger)i_index;
 
 - (NSString *)name;
 - (NSMutableArray *)children;
@@ -556,7 +556,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     [super dealloc];
 }
 
-- (VLCTreeItem *)childAtIndex:(int)i_index
+- (VLCTreeItem *)childAtIndex:(NSInteger)i_index
 {
     return [[self children] objectAtIndex:i_index];
 }

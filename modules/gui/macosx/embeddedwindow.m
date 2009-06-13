@@ -271,7 +271,7 @@
     [super resignMainWindow];
 }
 
-- (float)splitView:(NSSplitView *) splitView constrainSplitPosition:(float) proposedPosition ofSubviewAt:(int) index
+- (CGFloat)splitView:(NSSplitView *) splitView constrainSplitPosition:(CGFloat) proposedPosition ofSubviewAt:(NSInteger) index
 {
 	if([splitView isVertical])
 		return proposedPosition;
@@ -299,7 +299,7 @@
 
 }
 
-- (float)splitView:(NSSplitView *) splitView constrainMinCoordinate:(float) proposedMin ofSubviewAt:(int) offset
+- (CGFloat)splitView:(NSSplitView *) splitView constrainMinCoordinate:(CGFloat) proposedMin ofSubviewAt:(NSInteger) offset
 {
 	if([splitView isVertical])
 		return 125.;
@@ -307,7 +307,7 @@
 		return 0.;
 }
 
-- (float)splitView:(NSSplitView *) splitView constrainMaxCoordinate:(float) proposedMax ofSubviewAt:(int) offset
+- (CGFloat)splitView:(NSSplitView *) splitView constrainMaxCoordinate:(CGFloat) proposedMax ofSubviewAt:(NSInteger) offset
 {
     if([splitView isVertical])
 		return MIN([self frame].size.width - 551, 300);

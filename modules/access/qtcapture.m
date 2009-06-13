@@ -233,7 +233,7 @@ static int Open( vlc_object_t *p_this )
 
     if( ![p_sys->device open: &o_returnedError] )
     {
-        msg_Err( p_demux, "Unable to open the capture device (%i)", [o_returnedError code] );
+        msg_Err( p_demux, "Unable to open the capture device (%ld)", [o_returnedError code] );
         goto error;
     }
 
@@ -303,14 +303,14 @@ static int Open( vlc_object_t *p_this )
     bool ret = [p_sys->session addInput:input error: &o_returnedError];
     if( !ret )
     {
-        msg_Err( p_demux, "default video capture device could not be added to capture session (%i)", [o_returnedError code] );
+        msg_Err( p_demux, "default video capture device could not be added to capture session (%ld)", [o_returnedError code] );
         goto error;
     }
 
     ret = [p_sys->session addOutput:p_sys->output error: &o_returnedError];
     if( !ret )
     {
-        msg_Err( p_demux, "output could not be added to capture session (%i)", [o_returnedError code] );
+        msg_Err( p_demux, "output could not be added to capture session (%ld)", [o_returnedError code] );
         goto error;
     }
 

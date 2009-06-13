@@ -39,7 +39,7 @@
 	return self;
 }
 
-- (float) dividerThickness
+- (CGFloat) dividerThickness
 {
 	return 1.0;
 }
@@ -172,13 +172,13 @@
 @implementation VLCSidebar (NSOutlineViewDataSource)
 
 /* return the number of children for Obj-C pointer item */ /* DONE */
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     return [o_playlist outlineView:outlineView numberOfChildrenOfItem:item];
 }
 
 /* return the child at index for the Obj-C pointer item */ /* DONE */
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
     return [o_playlist outlineView:outlineView child:index ofItem:item];
 }

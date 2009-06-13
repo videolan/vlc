@@ -156,8 +156,12 @@ endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
+ifndef HAVE_DARWIN_10
 NONLLVMCC+= CC="/Developer/usr/bin/gcc-4.2"
 NONLLVMCC+= CXX="/Developer/usr/bin/g++-4.2"
+else
+NONLLVMCC+= $(HOSTCC)
+endif
 else
 NONLLVMCC+= $(HOSTCC)
 endif

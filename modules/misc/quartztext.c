@@ -25,6 +25,13 @@
 // Preamble
 //////////////////////////////////////////////////////////////////////////////
 
+#ifdef __x86_64__
+
+#warning "No text renderer build! Quartztext isn't 64bit compatible!"
+#warning "RE-WRITE ME!"
+
+#else
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -887,3 +894,5 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
 
     return VLC_SUCCESS;
 }
+
+#endif
