@@ -66,6 +66,7 @@ vlc_module_begin ()
     add_shortcut( "dts" )
 
     add_shortcut( "mlp" )
+    add_shortcut( "thd" )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -138,7 +139,7 @@ static const codec_t p_codec[] = {
     { VLC_CODEC_A52, true,  "a52 audio",  A52Probe,  A52Init },
     { VLC_CODEC_EAC3, true,  "eac3 audio", EA52Probe, A52Init },
     { VLC_CODEC_DTS, false, "dts audio",  DtsProbe,  DtsInit },
-    { VLC_CODEC_MLP, false, "mlp audio",  MlpProbe,  MlpInit },
+    { VLC_CODEC_TRUEHD, false, "mlp audio",  MlpProbe,  MlpInit },
 
     { 0, false, NULL, NULL, NULL }
 };
@@ -835,7 +836,7 @@ static int MlpCheckSync( const uint8_t *p_peek )
 }
 static int MlpProbe( demux_t *p_demux, int64_t *pi_offset )
 {
-    const char *ppsz_name[] = { "mlp", NULL };
+    const char *ppsz_name[] = { "mlp", "thd", NULL };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, MlpCheckSync, 4+28+16*4 );
 }
