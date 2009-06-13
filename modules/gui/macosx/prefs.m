@@ -194,6 +194,7 @@ static VLCPrefs *_o_sharedMainInstance = nil;
     
     [o_prefs_window center];
     [o_prefs_window makeKeyAndOrderFront:self];
+    [_rootTreeItem resetView];
 }
 
 - (void)initStrings
@@ -233,11 +234,8 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 {
     if( i_return == NSAlertAlternateReturn )
     {
-        [o_prefs_view setDocumentView: o_empty_view];
         config_ResetAll( p_intf );
         [_rootTreeItem resetView];
-        [[o_tree itemAtRow:[o_tree selectedRow]]
-            showView:o_prefs_view];
     }
 }
 
@@ -649,12 +647,16 @@ static VLCPrefs *_o_sharedMainInstance = nil;
 
 - (void)resetView
 {
-    [_subviews release];
-    _subviews = nil;
-
     unsigned int i;
+    for( i = 0 ; i < [_subviews count] ; i++ )
+        [[_subviews objectAtIndex:i] resetValues];
+
+    for( i = 0 ; i < [_options count] ; i++ )
+        [[_options objectAtIndex:i] resetView];
+
     for( i = 0 ; i < [_children count] ; i++ )
         [[_children objectAtIndex:i] resetView];
+
 }
 
 - (NSMutableArray *)children

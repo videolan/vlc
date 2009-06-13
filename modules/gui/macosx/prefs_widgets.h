@@ -51,6 +51,7 @@ static NSMenu   *o_keys_menu = nil;
 - (float)floatValue;
 - (char *)stringValue;
 - (void)applyChanges;
+- (void)resetValues;
 - (int)labelSize;
 - (void) alignWithXPosition:(int)i_xPos;
 

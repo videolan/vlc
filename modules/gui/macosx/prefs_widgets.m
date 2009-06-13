@@ -926,6 +926,10 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     }
 }
 
+- (void)resetValues
+{
+}
+
 - (int)labelSize
 {
     return [o_label frame].size.width;
@@ -1020,6 +1024,19 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     return [[VLCMain sharedInstance] delocalizeString:
                         [o_textfield stringValue]];
 }
+
+- (void)resetValues
+{
+    NSString *o_textfieldString;
+    char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
+    if( psz_value )
+        o_textfieldString = [[VLCMain sharedInstance]
+                                localizedString: psz_value];
+    else
+        o_textfieldString = [NSString stringWithString: @""];
+    free( psz_value );
+    [super resetValues];
+}
 @end
 
 @implementation StringListConfigControl
@@ -1092,6 +1109,21 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     else
         return strdup( [[VLCMain sharedInstance]
                             delocalizeString: [o_combo stringValue]] );
+}
+
+- (void)resetValues
+{
+    int i_index;
+    [o_combo reloadData];
+    char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
+
+    for( i_index = 0; i_index < p_item->i_list; i_index++ )
+        if( psz_value &&
+            !strcmp( psz_value, p_item->ppsz_list[i_index] ) )
+            [o_combo selectItemAtIndex: i_index];
+
+    free( psz_value );
+    [super resetValues];
 }
 @end
 
@@ -1214,6 +1246,19 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     else
         return NULL;
 }
+
+-(void)resetValues
+{
+    NSString *o_textfieldString;
+    char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
+    if( psz_value )
+        o_textfieldString = [NSString stringWithFormat: @"%s", psz_value];
+    else
+        o_textfieldString = [NSString stringWithString: @""];
+
+    free(psz_value);
+    [super resetValues];
+}
 @end
 
 @implementation ModuleConfigControl
@@ -1229,8 +1274,6 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 
     if( [super initWithFrame: mainFrame item: _p_item] != nil )
     {
-        size_t i_index;
-        module_t *p_parser, **p_list;
         i_view_type = CONFIG_ITEM_MODULE;
 
         o_popupTooltip = [[VLCMain sharedInstance] wrapString:
@@ -1255,54 +1298,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         [[o_popup lastItem] setTag: -1];
         [o_popup selectItem: [o_popup lastItem]];
 
-        /* build a list of available modules */
-        p_list = module_list_get( NULL );
-        for( i_index = 0; p_list[i_index]; i_index++ )
-        {
-            p_parser = p_list[i_index];
-
-            if( p_item->i_type == CONFIG_ITEM_MODULE )
-            {
-                if( module_provides( p_parser, p_item->psz_type ) )
-                {
-                    NSString *o_description = [[VLCMain sharedInstance]
-                        localizedString: module_GetLongName( p_parser )];
-                    [o_popup addItemWithTitle: o_description];
-
-                    if( p_item->value.psz &&
-                !strcmp( p_item->value.psz, module_get_object( p_parser ) ) )
-                        [o_popup selectItem:[o_popup lastItem]];
-                }
-            }
-            else
-            {
-                int i;
-
-                if( module_is_main( p_parser ) )
-                    continue;
-                unsigned int confsize;
-                unsigned int unused;
-                module_config_t *p_configlist = module_config_get( p_parser, &confsize );
-                for ( i = 0; i < confsize; i++ )
-                {
-                    module_config_t *p_config = &p_configlist[i];
-                    /* Hack: required subcategory is stored in i_min */
-                    if( p_config->i_type == CONFIG_SUBCATEGORY &&
-                        p_config->value.i == p_item->min.i )
-                    {
-                        NSString *o_description = [[VLCMain sharedInstance]
-                            localizedString: module_GetLongName( p_parser )];
-                        [o_popup addItemWithTitle: o_description];
-
-                        if( p_item->value.psz && !strcmp(p_item->value.psz,
-                                                module_get_object( p_parser )) )
-                            [o_popup selectItem:[o_popup lastItem]];
-                    }
-                }
-                module_config_free( p_configlist );
-            }
-        }
-        module_list_free( p_list );
+        [self resetValues];
         [self addSubview: o_popup];
     }
     return self;
@@ -1381,6 +1377,68 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     }
     module_list_free( p_list );
     return returnval;
+}
+
+-(void)resetValues
+{
+    /* build a list of available modules */
+    size_t i_index;
+    module_t *p_parser, **p_list;
+
+    p_list = module_list_get( NULL );
+    for( i_index = 0; p_list[i_index]; i_index++ )
+    {
+        p_parser = p_list[i_index];
+
+        if( p_item->i_type == CONFIG_ITEM_MODULE )
+        {
+            if( module_provides( p_parser, p_item->psz_type ) )
+            {
+                NSString *o_description = [[VLCMain sharedInstance]
+                    localizedString: module_GetLongName( p_parser )];
+                [o_popup addItemWithTitle: o_description];
+                char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
+
+                if( psz_value &&
+                    !strcmp( psz_value, module_get_object( p_parser ) ) )
+                    [o_popup selectItem:[o_popup lastItem]];
+
+                free(psz_value);
+            }
+        }
+        else
+        {
+            int i;
+
+            if( module_is_main( p_parser ) )
+                continue;
+            unsigned int confsize;
+            unsigned int unused;
+            module_config_t *p_configlist = module_config_get( p_parser, &confsize );
+            for ( i = 0; i < confsize; i++ )
+            {
+                module_config_t *p_config = &p_configlist[i];
+                /* Hack: required subcategory is stored in i_min */
+                if( p_config->i_type == CONFIG_SUBCATEGORY &&
+                    config_GetInt( VLCIntf, p_item->psz_name) == p_item->min.i )
+                {
+                    NSString *o_description = [[VLCMain sharedInstance]
+                        localizedString: module_GetLongName( p_parser )];
+                    [o_popup addItemWithTitle: o_description];
+                    char *psz_value = config_GetPsz( VLCIntf, p_item->psz_name );
+
+                    if( psz_value && !strcmp(psz_value,
+                                            module_get_object( p_parser )) )
+                        [o_popup selectItem:[o_popup lastItem]];
+
+                    free( psz_value );
+                }
+            }
+            module_config_free( p_configlist );
+        }
+    }
+    module_list_free( p_list );
+    [super resetValues];
 }
 @end
 
@@ -1472,6 +1530,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     return [o_textfield intValue];
 }
 
+-(void)resetValues
+{
+    [o_textfield setIntValue: config_GetInt(VLCIntf, p_item->psz_name)];
+    [super resetValues];
+}
+
 @end
 
 @implementation IntegerListConfigControl
@@ -1547,6 +1611,20 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         return p_item->pi_list[[o_combo indexOfSelectedItem]];
     else
         return [o_combo intValue];
+}
+
+-(void)resetValues
+{
+    int i_index;
+    [o_combo reloadData];
+    for( i_index = 0; i_index < p_item->i_list; i_index++ )
+    {
+        if( config_GetInt( VLCIntf, p_item->psz_name) == p_item->pi_list[i_index] )
+        {
+            [o_combo selectItemAtIndex: i_index];
+        }
+    }
+
 }
 @end
 
@@ -1675,6 +1753,14 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 {
     return [o_slider intValue];
 }
+
+- (void)resetValues
+{
+    int value = config_GetInt( VLCIntf, p_item->psz_name );
+    [o_textfield setIntValue:value];
+    [o_slider setIntValue:value];
+    [super resetValues];
+}
 @end
 
 @implementation FloatConfigControl
@@ -1764,6 +1850,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 - (float)floatValue
 {
     return [o_stepper floatValue];
+}
+
+- (void)resetValues
+{
+    [o_textfield setFloatValue: config_GetFloat( VLCIntf, p_item->psz_name)];
+    [super resetValues];
 }
 @end
 
@@ -1877,6 +1969,12 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     return [o_slider floatValue];
 }
 
+- (void)resetValues
+{
+    [o_textfield setFloatValue: config_GetFloat(VLCIntf, p_item->psz_name)];
+    [o_slider setFloatValue: config_GetFloat(VLCIntf, p_item->psz_name)];
+    [super resetValues];
+}
 @end
 
 @implementation BoolConfigControl
@@ -1927,6 +2025,11 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
     return [o_checkbox intValue];
 }
 
+- (void)resetValues
+{
+    [o_checkbox setState: config_GetInt( VLCIntf, p_item->psz_name)];
+    [super resetValues];
+}
 @end
 
 @implementation KeyConfigControl
@@ -2006,13 +2109,19 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
 {
     return [o_popup selectedTag];
 }
+
+- (void)resetValues
+{
+    [o_popup selectItem:[[o_popup menu] itemWithTag:config_GetInt( VLCIntf, p_item->psz_name )]];
+    [super resetValues];
+}
 @end
 
 @implementation ModuleListConfigControl
 - (id) initWithItem: (module_config_t *)_p_item
            withView: (NSView *)o_parent_view
 {
-if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
+    if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 //TODO....
         return nil;
 
@@ -2192,6 +2301,13 @@ if( _p_item->i_type == CONFIG_ITEM_MODULE_LIST )
 - (char *)stringValue
 {
     return strdup( [[o_textfield stringValue] UTF8String] );
+}
+
+-(void)resetValues
+{
+#warning Reset prefs of the module selector is broken atm. 
+    NSLog( @"don't forget about modulelistconfig" );
+    [super resetValues];
 }
 
 @end
