@@ -233,7 +233,8 @@ int aglManage( vout_thread_t * p_vout )
             aglSetViewport(p_vout, viewBounds, clipBounds);
 
             /* Most Carbon APIs are not thread-safe, therefore delagate some GUI visibilty update to the main thread */
-            sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow), kEventClassVLCPlugin, kEventVLCPluginHideFullscreen);
+            if( p_vout->p_sys->theWindow )
+                sendEventToMainThread(GetWindowEventTarget(p_vout->p_sys->theWindow), kEventClassVLCPlugin, kEventVLCPluginHideFullscreen);
         }
         else
         {
