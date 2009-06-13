@@ -588,9 +588,32 @@ LibvlcInputNPObject::setProperty(int index, const NPVariant &value)
 const NPUTF8 * const LibvlcInputNPObject::methodNames[] =
 {
     /* no methods */
+    "none",
+};
+COUNTNAMES(LibvlcInputNPObject,methodCount,methodNames);
+
+enum LibvlcInputNPObjectMethodIds
+{
+    ID_none,
 };
 
-COUNTNAMES(LibvlcInputNPObject,methodCount,methodNames);
+RuntimeNPObject::InvokeResult
+LibvlcInputNPObject::invoke(int index, const NPVariant *args,
+                                    uint32_t argCount, NPVariant &result)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        switch( index )
+        {
+            case ID_none:
+                return INVOKERESULT_NO_SUCH_METHOD;
+            default:
+                ;
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
 
 /*
 ** implementation of libvlc playlist items object
@@ -803,6 +826,9 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
                     return INVOKERESULT_NO_SUCH_METHOD;
 
                 // grab URL
+                if( NPVARIANT_IS_NULL(args[0]) )
+                    return INVOKERESULT_NO_SUCH_METHOD;
+
                 char *s = stringValue(NPVARIANT_TO_STRING(args[0]));
                 if( !s )
                     return INVOKERESULT_OUT_OF_MEMORY;
