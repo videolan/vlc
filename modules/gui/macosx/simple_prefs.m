@@ -570,18 +570,15 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 	if( module_exists( "quartztext" ) )
 	{
 		[self setupField: o_osd_font_fld forOption: "quartztext-font"];
-
 		[self setupButton: o_osd_font_color_pop forIntList: "quartztext-color"];
 		[self setupButton: o_osd_font_size_pop forIntList: "quartztext-rel-fontsize"];
 	}
 	else 
 	{
-		[o_osd_font_fld setEnabled: NO];
-		[o_osd_font_color_pop setEnabled: NO];
-		[o_osd_font_size_pop setEnabled: NO];
-		[o_osd_font_color_pop removeAllItems];
-		[o_osd_font_size_pop removeAllItems];
-		[o_osd_font_btn setEnabled: NO];
+        /* fallback on freetype */
+		[self setupField: o_osd_font_fld forOption: "freetype-font"];
+		[self setupButton: o_osd_font_color_pop forIntList: "freetype-color"];
+		[self setupButton: o_osd_font_size_pop forIntList: "freetype-rel-fontsize"];
 	}
 
 
@@ -941,6 +938,13 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 			config_PutPsz( p_intf, "quartztext-font", [[o_osd_font_fld stringValue] UTF8String] );
 			SaveIntList( o_osd_font_color_pop, "quartztext-color" );
 			SaveIntList( o_osd_font_size_pop, "quartztext-rel-fontsize" );
+		}
+		else
+		{
+            /* fallback on freetype */
+			config_PutPsz( p_intf, "freetype-font", [[o_osd_font_fld stringValue] UTF8String] );
+			SaveIntList( o_osd_font_color_pop, "freetype-color" );
+			SaveIntList( o_osd_font_size_pop, "freetype-rel-fontsize" );                
 		}
 
         i = config_SaveConfigFile( p_intf, NULL );
