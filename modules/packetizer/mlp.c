@@ -120,7 +120,8 @@ static int Open( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
 
-    if( p_dec->fmt_in.i_codec != VLC_CODEC_MLP )
+    if( p_dec->fmt_in.i_codec != VLC_CODEC_MLP &&
+        p_dec->fmt_in.i_codec != VLC_CODEC_TRUEHD )
         return VLC_EGENERIC;
 
     /* */
@@ -137,7 +138,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_CODEC_MLP;
+    p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
     p_dec->fmt_out.audio.i_rate = 0;
 
     /* Set callback */
