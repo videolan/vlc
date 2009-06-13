@@ -50,14 +50,13 @@
 void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
     VLC_UNUSED(p_this);
-    char i_dummy;
+    char i_dummy = '\0';
     char *p_char = NULL;
     char *p_oldchar = &i_dummy;
     unsigned int i;
     (void)pi_argc;
 
     /* Get the full program path and name */
-
     /* First try to see if we are linked to the framework */
     for (i = 0; i < _dyld_image_count(); i++)
     {
@@ -96,6 +95,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         p_char = strdup( ppsz_argv[ 0 ] );
     }
 
+    free(psz_vlcpath);
     psz_vlcpath = p_char;
 
     /* Remove trailing program name */
@@ -107,12 +107,11 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
             *p_char = '\0';
             p_oldchar = p_char;
         }
-
         p_char++;
     }
 
     /* Check if $LANG is set. */
-    if ( (p_char = getenv("LANG")) == NULL )
+    if( NULL == getenv("LANG") )
     {
         /*
            Retrieve the preferred language as chosen in  System Preferences.app
