@@ -3627,7 +3627,7 @@ static void PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
 
     case 0x83: /* TrueHD AC3 */
         p_fmt->i_cat = AUDIO_ES;
-        p_fmt->i_codec = VLC_CODEC_MLP;
+        p_fmt->i_codec = VLC_CODEC_TRUEHD;
         break;
 
     case 0x84: /* E-AC3 */
