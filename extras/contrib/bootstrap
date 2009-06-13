@@ -72,22 +72,19 @@ fi
 
 case $HOST in
     *powerpc*|*ppc*)
-         echo "ARCH=ppc" >> config.mak
          ARCH="ppc"
      ;;
     *darwin10*)
-         echo "ARCH=x86_64" >> config.mak
          ARCH="x86_64"
      ;;
     *86_64*)
-          echo "ARCH=x86_64" >> config.mak
           ARCH="x86_64"
      ;;
     *86*)
-          echo "ARCH=i386" >> config.mak
           ARCH="i386"
      ;;
 esac
+echo "ARCH = $ARCH" >> config.mak
 
 # Check the HAVE_{OS}
 case $HOST in
