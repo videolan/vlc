@@ -243,7 +243,7 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     else
         memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );
 
-    p_sys->p_samples += p_buffer->i_nb_bytes;
+    p_sys->p_samples += i_samples * p_sys->p_context->channels * ( p_dec->fmt_out.audio.i_bitspersample / 8 );
     p_sys->i_samples -= i_samples;
 
     return p_buffer;
@@ -481,7 +481,6 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     p_dec->fmt_out.audio.i_bitspersample = 16;
 #endif
     p_dec->fmt_out.audio.i_rate     = p_sys->p_context->sample_rate;
-    p_dec->fmt_out.audio.i_channels = p_sys->p_context->channels;
 
     /* */
 #if defined(LIBAVCODEC_AUDIO_LAYOUT)
