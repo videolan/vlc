@@ -284,20 +284,6 @@ case "${host_os}" in
         OBJC="${OBJC} -isysroot ${with_macosx_sdk}"
         LD="${LD} -syslibroot ${with_macosx_sdk}"
     fi
-    if test "${host_cpu}" = "powerpc"; then
-        CPP="${CPP} -arch ppc"
-        CC="${CC} -arch ppc"
-        CXX="${CXX} -arch ppc"
-        OBJC="${OBJC} -arch ppc"
-        LD="${LD} -arch ppc"
-    fi    
-    if test "${host_cpu}" = "i386"; then
-        CPP="${CPP} -arch i386"
-        CC="${CC} -arch i386"
-        CXX="${CXX} -arch i386"
-        OBJC="${OBJC} -arch i386"
-        LD="${LD} -arch i386"
-    fi
     AC_ARG_WITH(macosx-version-min,
        [  --with-macosx-version-min=VERSION  compile for MacOSX VERSION and above])
     if test "${with_macosx_version_min}" != "" ; then
