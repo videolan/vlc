@@ -808,7 +808,16 @@ void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
     char *psz_string;
     const char *psz_filter_type;
 
-    module_t *p_obj = module_find( psz_name );
+    /* FIXME temporary hack */
+    const char *psz_module_name = psz_name;
+    if( !strcmp( psz_name, "magnify" ) ||
+        !strcmp( psz_name, "puzzle" ) ||
+        !strcmp( psz_name, "logo" ) ||
+        !strcmp( psz_name, "wall" ) ||
+        !strcmp( psz_name, "clone" ) )
+        psz_module_name = "video_filter_wrapper";
+
+    module_t *p_obj = module_find( psz_module_name );
     if( !p_obj )
     {
         msg_Err( p_vout, "Unable to find filter module \"%s\".", psz_name );
