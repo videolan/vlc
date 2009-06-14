@@ -214,9 +214,9 @@ void InterfacePreviewWidget::setPreview( int comboid )
     /* Need to move resources references as soon as qt4.cpp
        local defines has been moved somewhere else
     */
-    char * pixmaps[] = { ":/prefsmenu/sample_classic",
-                         ":/prefsmenu/sample_complete",
-                         ":/prefsmenu/sample_minimal" };
+    const char * pixmaps[] = { ":/prefsmenu/sample_classic",
+                               ":/prefsmenu/sample_complete",
+                               ":/prefsmenu/sample_minimal" };
     setPixmap( QPixmap( pixmaps[ comboid ] ) );
 }
 
