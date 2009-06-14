@@ -167,9 +167,7 @@ int playlist_FindArtInCache( input_item_t *p_item )
         {
             char *psz_file;
             if( asprintf( &psz_file, "%s" DIR_SEP "%s",
-                          psz_path, psz_filename ) < 0 )
-                psz_file = NULL;
-            if( psz_file )
+                          psz_path, psz_filename ) != -1 )
             {
                 char *psz_uri = make_URI( psz_file );
                 if( psz_uri )
