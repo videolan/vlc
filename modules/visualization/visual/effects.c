@@ -100,9 +100,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     int16_t  *p_buffs;                    /* int16_t converted buffer */
     int16_t  *p_s16_buff;                 /* int16_t converted buffer */
 
-    p_s16_buff = malloc(
-              p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
-
+    p_s16_buff = malloc( p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
     if( !p_s16_buff )
         return -1;
 
@@ -174,7 +172,11 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     {
         p_output[i]  = 0;
         p_buffer1[i] = *p_buffs;
-        p_buffs      = p_buffs + p_effect->i_nb_chans;
+
+        p_buffs += p_effect->i_nb_chans;
+        if( p_buffs >= &p_s16_buff[p_buffer->i_nb_samples * p_effect->i_nb_chans] )
+            p_buffs = p_s16_buff;
+
     }
     fft_perform( p_buffer1, p_output, p_state);
     for( i = 0; i< FFT_BUFFER_SIZE ; i++ )
@@ -393,13 +395,11 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             (float*)p_buffer->p_buffer;
 
     int16_t  *p_buffs;                    /* int16_t converted buffer */
-    int16_t  *p_s16_buff = NULL;                /* int16_t converted buffer */
+    int16_t  *p_s16_buff;                /* int16_t converted buffer */
 
     i_line = 0;
 
-    p_s16_buff = (int16_t*)malloc(
-              p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
-
+    p_s16_buff = malloc( p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t) );
     if( !p_s16_buff )
         return -1;
 
@@ -477,11 +477,14 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         return -1;
     }
     p_buffs = p_s16_buff;
-    for ( i = 0 ; i < FFT_BUFFER_SIZE ; i++)
+    for ( i = 0 ; i < FFT_BUFFER_SIZE; i++)
     {
         p_output[i]    = 0;
         p_buffer1[i] = *p_buffs;
-        p_buffs      = p_buffs + p_effect->i_nb_chans;
+
+        p_buffs += p_effect->i_nb_chans;
+        if( p_buffs >= &p_s16_buff[p_buffer->i_nb_samples * p_effect->i_nb_chans] )
+            p_buffs = p_s16_buff;
     }
     fft_perform( p_buffer1, p_output, p_state);
     for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
@@ -809,13 +812,13 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         }
 
         for( i_index = 0, p_sample = (float *)p_buffer->p_buffer;
-             i_index < p_effect->i_width;
+             i_index < __MIN( p_effect->i_width, p_buffer->i_nb_samples );
              i_index++ )
         {
             uint8_t i_value;
 
             /* Left channel */
-            i_value =  (*p_sample++ +1) * 127;
+            i_value =  p_sample[p_effect->i_idx_left] * 127;
             *(ppp_area[0][0]
                + p_picture->p[0].i_pitch * i_index / p_effect->i_width
                + p_picture->p[0].i_lines * i_value / 512
@@ -827,7 +830,7 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
 
            /* Right channel */
-           i_value = ( *p_sample++ +1 ) * 127;
+           i_value = p_sample[p_effect->i_idx_right] * 127;
            *(ppp_area[1][0]
               + p_picture->p[0].i_pitch * i_index / p_effect->i_width
               + p_picture->p[0].i_lines * i_value / 512
@@ -836,6 +839,8 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               + p_picture->p[2].i_pitch * i_index / p_effect->i_width
               + p_picture->p[2].i_lines * i_value / 512
                 * p_picture->p[2].i_pitch) = 0xdd;
+
+           p_sample += p_effect->i_nb_chans;
         }
         return 0;
 }
@@ -849,21 +854,24 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 {
         VLC_UNUSED(p_aout);
         int i, j;
-        float *p_sample = (float *)p_buffer->p_buffer;
         float i_value_l = 0;
         float i_value_r = 0;
-        float ch;
 
         /* Compute the peack values */
-        for ( i = 0 ; i < 1024; i++ )
+        for ( i = 0 ; i < p_buffer->i_nb_samples; i++ )
         {
-                ch = (*p_sample++) * 256;
+                const float *p_sample = (float *)p_buffer->p_buffer;
+                float ch;
+
+                ch = p_sample[p_effect->i_idx_left] * 256;
                 if (ch > i_value_l)
                         i_value_l = ch;
 
-                ch = (*p_sample++) * 256;
+                ch = p_sample[p_effect->i_idx_right] * 256;
                 if (ch > i_value_r)
                         i_value_r = ch;
+
+                p_sample += p_effect->i_nb_chans;
         }
 
         i_value_l = abs(i_value_l);

@@ -230,6 +230,9 @@ static int Open( vlc_object_t *p_this )
         p_effect->i_width = p_sys->i_width;
         p_effect->i_height= p_sys->i_height;
         p_effect->i_nb_chans = aout_FormatNbChannels( &p_filter->input);
+        p_effect->i_idx_left  = 0;
+        p_effect->i_idx_right = __MIN( 1, p_effect->i_nb_chans-1 );
+
         p_effect->psz_args = NULL;
         p_effect->p_data = NULL;
 
