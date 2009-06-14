@@ -50,7 +50,7 @@
 void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
     VLC_UNUSED(p_this);
-    char i_dummy = '\0';
+    char i_dummy;
     char *p_char = NULL;
     char *p_oldchar = &i_dummy;
     unsigned int i;
