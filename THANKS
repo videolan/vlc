@@ -11,6 +11,8 @@ The VideoLAN team would like to thank the following contributors:
 
 Adam Sampson <ats @t offog d0t org> - libFLAC >= 1.1.3 API support
 Adem Gunes aka Yuksel Yildirim <xleopar at yahoo d0t com> - Turkish localisation 
+Adrien Grand <jpountz -at- jpountz 0 net> - Java and VLM corrections
+Adrien Maglo - VU meter and various fixes
 Alan Wright <the dot smoothness at gmail d0t com> - Forum help and support
 Alex Antropoff <alant at transtelecom dot md> - RFC3016 (LATM) RTP packetizer extension, MMS fixes
 Alex Izvorski <aizvorski at gmail dot com> - some more x264 options
@@ -19,6 +21,7 @@ Alexander Gall <gall at switch dot ch> - Solaris fixes and CDDB fixes
 Alexey Lugin <alex at ukrlocal dot info> - Ukrainian translation
 Alexey Salmin <alexey dot salmin at gmail dot com> - Russian localisation
 Alexis Ballier <aballlier at gentoo dot org> - Additional options in configure
+Alexis de Lattre <alexis at videolan dot org> - Documentation, packaging, IGMPv3 support and various fixes
 Amanpreet Singh Alam <aalam at users dot sf dot net> - Punjabi translation
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
@@ -29,6 +32,7 @@ Andrew Zaikin <andrew dot zaikin at gmail dot com> - Config saving fixes
 Andrey Brilevskiy <director at macwest.ru> - Russian translation
 Andrey Wolk <andywolk at  gmail . com> - Russian translation
 Andy Lindsay <andy_vl at ananam.com> - fixes in the TS demux
+Animesh Swar <animesh_swar@hotmail.co.uk> - Nepalese translation
 Anthony Loiseau <anthony.loiseau at gmail dot com> - Various fixes
 Antoine Lejeune - Maemo port
 arai/Fujisawa Tooru <arai_a at mac dot com> - OpenGL-based Screen Input Module for Mac OS X
@@ -48,8 +52,10 @@ Benoit Steiner <benny at via.ecp.fr> - MPEG system input, network input
 Bernie Purcell <b dot purcell at adbglobal dot com> - MKV USF subtitles support,HTML tags for subtitles and subtitles renderer enhancements
 Bill <wenwuangel at hotmail .com> - memleak fixes
 Bill Eldridge <bill at rfa.org> - documentation
-Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
+Bill C. Riemers <briemers+git@redhat.com> - http access fixes
+Bob Maguire <maguirer at rjmaguire dot com> - addition of some coontrols to the OSX interface
 Brian C. Wiles - vlm schedule date fix
+Brian Johnson <brijohn@gmail.com> - interface fix
 Brian Robb <vascy at hotmail dot com> - win32 CD/DVD drive detection in wx, bug fixes
 Brian Raymond <braymond at echostorm dot net> - Quicktime 404 error on RTSP SETUP fix
 Brieuc Jeunhomme <bbp at via.ecp.fr> - bug fixes
