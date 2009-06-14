@@ -757,13 +757,14 @@ void FullscreenControllerWidget::showFSC()
         screenRes != QApplication::desktop()->screenGeometry(number) )
     {
         centerFSC( number );
+        msg_Dbg( p_intf, "Recentering the Fullscreen Controller" );
     }
-
-    show();
 
 #if HAVE_TRANSPARENCY
     setWindowOpacity( DEFAULT_OPACITY );
 #endif
+
+    show();
 }
 
 /**
@@ -836,10 +837,12 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
 
     switch( event->type() )
     {
+        /* This is used when the 'i' hotkey is used, to force quick toggle */
         case FullscreenControlToggle_Type:
             vlc_mutex_lock( &lock );
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
+
             if( b_fs )
             {
                 if( isHidden() )
@@ -851,20 +854,24 @@ void FullscreenControllerWidget::customEvent( QEvent *event )
                     hideFSC();
             }
             break;
+        /* Event called to Show the FSC on mouseChanged() */
         case FullscreenControlShow_Type:
             vlc_mutex_lock( &lock );
             b_fs = b_fullscreen;
             vlc_mutex_unlock( &lock );
 
-            if( b_fs && !isVisible() )
+            if( b_fs )
                 showFSC();
+
             break;
-        case FullscreenControlHide_Type:
-            hideFSC();
-            break;
+        /* Start the timer to hide later, called usually with above case */
         case FullscreenControlPlanHide_Type:
             if( !b_mouse_over ) // Only if the mouse is not over FSC
                 planHideFSC();
+            break;
+        /* Hide */
+        case FullscreenControlHide_Type:
+            hideFSC();
             break;
         default:
             break;
