@@ -59,8 +59,6 @@ unsigned int CocoaKeyToVLC( unichar i_key );
  *****************************************************************************/
 struct intf_sys_t
 {
-    NSAutoreleasePool * o_pool;
-
     /* special actions */
     bool b_mute;
     int i_play_status;

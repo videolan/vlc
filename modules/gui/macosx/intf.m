@@ -91,8 +91,6 @@ int OpenIntf ( vlc_object_t *p_this )
 
     memset( p_intf->p_sys, 0, sizeof( *p_intf->p_sys ) );
 
-    p_intf->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
-
     /* subscribe to LibVLCCore's messages */
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf->p_libvlc, MsgCallback, NULL );
     p_intf->pf_run = Run;
@@ -107,8 +105,6 @@ int OpenIntf ( vlc_object_t *p_this )
 void CloseIntf ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-
-    [p_intf->p_sys->o_pool release];
 
     free( p_intf->p_sys );
 }
