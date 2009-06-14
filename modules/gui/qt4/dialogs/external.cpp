@@ -38,10 +38,10 @@
 
 DialogHandler::DialogHandler (intf_thread_t *intf, QObject *_parent)
     : intf (intf), QObject( _parent ),
-      message (VLC_OBJECT(intf), "dialog-fatal", VLC_VAR_ADDRESS),
-      login (VLC_OBJECT(intf), "dialog-login", VLC_VAR_ADDRESS),
-      question (VLC_OBJECT(intf), "dialog-question", VLC_VAR_ADDRESS),
-      progressBar (VLC_OBJECT(intf), "dialog-progress-bar", VLC_VAR_ADDRESS)
+      message (VLC_OBJECT(intf), "dialog-fatal"),
+      login (VLC_OBJECT(intf), "dialog-login"),
+      question (VLC_OBJECT(intf), "dialog-question"),
+      progressBar (VLC_OBJECT(intf), "dialog-progress-bar")
 {
     connect (&message, SIGNAL(pointerChanged(vlc_object_t *, void *)),
              SLOT(displayMessage(vlc_object_t *, void *)),
