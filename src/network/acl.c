@@ -280,9 +280,7 @@ void ACL_Destroy( vlc_acl_t *p_acl )
 {
     if( p_acl != NULL )
     {
-        if( p_acl->p_entries != NULL )
-            free( p_acl->p_entries );
-
+        free( p_acl->p_entries );
         vlc_object_release( p_acl->p_owner );
         free( p_acl );
     }
