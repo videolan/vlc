@@ -349,17 +349,17 @@ void DialogsProvider::openCaptureDialog()
 }
 
 /* Same as the open one, but force the enqueue */
-void DialogsProvider::PLAppendDialog()
+void DialogsProvider::PLAppendDialog( int tab )
 {
     OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false,
-                             OPEN_AND_ENQUEUE )->showTab( OPEN_FILE_TAB );
+                             OPEN_AND_ENQUEUE )->showTab( tab );
 }
 
-void DialogsProvider::MLAppendDialog()
+void DialogsProvider::MLAppendDialog( int tab )
 {
     OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false,
                             OPEN_AND_ENQUEUE, false, false )
-                                    ->showTab( OPEN_FILE_TAB );
+                                    ->showTab( tab );
 }
 
 /**

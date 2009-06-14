@@ -33,7 +33,9 @@
 
 #include "qt4.hpp"
 
+#include "dialogs/open.hpp"
 #include <QObject>
+#include <QStringList>
 
 #define ADD_FILTER_MEDIA( string )     \
     string += qtr( "Media Files" );    \
@@ -82,7 +84,6 @@ enum {
 class QEvent;
 class QSignalMapper;
 class QVLCMenu;
-#include <QStringList>
 
 class DialogsProvider : public QObject
 {
@@ -171,8 +172,8 @@ public slots:
     void openNetDialog();
     void openCaptureDialog();
 
-    void PLAppendDialog();
-    void MLAppendDialog();
+    void PLAppendDialog( int tab = OPEN_FILE_TAB );
+    void MLAppendDialog( int tab = OPEN_FILE_TAB );
 
     void PLOpenDir();
     void PLAppendDir();

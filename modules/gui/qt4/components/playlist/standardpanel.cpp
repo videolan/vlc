@@ -251,6 +251,7 @@ void StandardPLPanel::popupAdd()
         popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT( MLAppendDialog() ) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
     }
+
     popup.exec( QCursor::pos() - addButton->mapFromGlobal( QCursor::pos() )
                         + QPoint( 0, addButton->height() ) );
 }
