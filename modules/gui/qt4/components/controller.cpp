@@ -768,16 +768,6 @@ void FullscreenControllerWidget::showFSC()
 }
 
 /**
- * Hide fullscreen controller
- * FIXME: under windows it have to be done by moving out of screen
- *        because hide() doesnt work
- */
-void FullscreenControllerWidget::hideFSC()
-{
-    hide();
-}
-
-/**
  * Plane to hide fullscreen controller
  */
 void FullscreenControllerWidget::planHideFSC()
