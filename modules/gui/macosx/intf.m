@@ -315,6 +315,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     else
         _o_sharedMainInstance = [super init];
 
+    p_intf = NULL;
+
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
     /* subscribe to LibVLC's debug messages as early as possible (for us) */
@@ -367,7 +369,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     playlist_t *p_playlist;
     vlc_value_t val;
 
-    /* Check if we already did this once. Opening the other nibs calls it too, because VLCMain is the owner */
+    if( !p_intf ) return;
+
+    /* Check if we already did this once. Opening the other nibs calls it too,
+       because VLCMain is the owner */
     if( nib_main_loaded ) return;
 
     /* check whether the user runs a valid version of OS X */
@@ -557,6 +562,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
 {
+    if( !p_intf ) return;
+
     /* FIXME: don't poll */
     interfaceTimer = [[NSTimer scheduledTimerWithTimeInterval: 0.5
                                      target: self selector: @selector(manageIntf:)
@@ -573,6 +580,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    if( !p_intf ) return;
+
     [self _removeOldPreferences];
 
 #ifdef UPDATE_CHECK
@@ -593,6 +602,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)initStrings
 {
+    if( !p_intf ) return;
+
     [o_window setTitle: _NS("VLC media player")];
     [self setScrollField:_NS("VLC media player") stopAfter:-1];
 
@@ -764,6 +775,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (void)releaseRepresentedObjects:(NSMenu *)the_menu
 {
+    if( !p_intf ) return;
+
     NSArray *menuitems_array = [the_menu itemArray];
     for( int i=0; i<[menuitems_array count]; i++ )
     {
@@ -781,6 +794,8 @@ static VLCMain *_o_sharedMainInstance = nil;
     vout_thread_t * p_vout;
     int returnedValue = 0;
  
+    if( !p_intf ) return;
+
     msg_Dbg( p_intf, "Terminating" );
 
     /* Make sure the manage_thread won't call -terminate: again */
@@ -921,7 +936,6 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 {
     NSToolbarItem *toolbarItem = [[[NSToolbarItem alloc] initWithItemIdentifier: itemIdentifier] autorelease];
 
- 
     if( [itemIdentifier isEqual: VLCToolbarMediaControl] )
     {
         [toolbarItem setLabel:@"Media Controls"];
@@ -1003,12 +1017,14 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
    application */
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
+    if( !p_intf ) return;
 #ifndef __x86_64__
     [o_remote startListening: self];
 #endif
 }
 - (void)applicationDidResignActive:(NSNotification *)aNotification
 {
+    if( !p_intf ) return;
 #ifndef __x86_64__
     [o_remote stopListening: self];
 #endif
@@ -1018,7 +1034,7 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 - (void)computerWillSleep: (NSNotification *)notification
 {
     /* Pause */
-    if( p_intf->p_sys->i_play_status == PLAYING_S )
+    if( p_intf && p_intf->p_sys->i_play_status == PLAYING_S )
     {
         var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
     }
@@ -1518,11 +1534,11 @@ static void manage_cleanup( void * args )
     id self = manage_cleanup_stack->self;
     playlist_t * p_playlist = manage_cleanup_stack->p_playlist;
 
-    var_AddCallback( p_playlist, "item-current", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "item-change", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "playlist-item-append", PlaylistChanged, self );
-    var_AddCallback( p_playlist, "playlist-item-deleted", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "item-current", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "item-change", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "playlist-item-append", PlaylistChanged, self );
+    var_DelCallback( p_playlist, "playlist-item-deleted", PlaylistChanged, self );
 
     pl_Release( p_intf );
 
