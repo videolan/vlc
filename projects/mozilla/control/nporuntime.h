@@ -131,7 +131,7 @@ protected:
 
     bool isPluginRunning()
     {
-        return _instance->pdata;
+        return (_instance->pdata != NULL);
     }
     template<class T> T *getPrivate()
     {

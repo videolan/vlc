@@ -194,7 +194,7 @@ public:
     void set_fullscreen( int, libvlc_exception_t * );
     int  get_fullscreen( libvlc_exception_t * );
 
-    int  player_has_vout( libvlc_exception_t * );
+    bool  player_has_vout( libvlc_exception_t * );
 
 private:
     bool playlist_select(int,libvlc_exception_t *);

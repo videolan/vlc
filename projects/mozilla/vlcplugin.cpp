@@ -221,7 +221,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     ** this URL is used for making absolute URL from relative URL that may be
     ** passed as an MRL argument
     */
-    NPObject *plugin;
+    NPObject *plugin = NULL;
 
     if( NPERR_NO_ERROR == NPN_GetValue(p_browser, NPNVWindowNPObject, &plugin) )
     {
@@ -241,7 +241,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
             {
                 NPString &location = NPVARIANT_TO_STRING(result);
 
-                psz_baseURL = static_cast<char*>(malloc(location.utf8length+1));
+                psz_baseURL = (char *) malloc(location.utf8length+1);
                 if( psz_baseURL )
                 {
                     strncpy(psz_baseURL, location.utf8characters, location.utf8length);
@@ -272,6 +272,7 @@ VlcPlugin::~VlcPlugin()
     free(psz_baseURL);
     free(psz_target);
     free(psz_text);
+
     if( libvlc_media_player )
         libvlc_media_player_release( libvlc_media_player );
     if( libvlc_media_list )
@@ -426,9 +427,9 @@ int  VlcPlugin::get_fullscreen( libvlc_exception_t *ex )
     return r;
 }
 
-int  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
+bool  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
 {
-    int r = 0;
+    bool r = false;
     if( playlist_isplaying(ex) )
         r = libvlc_media_player_has_vout(libvlc_media_player, ex);
     return r;
@@ -475,7 +476,7 @@ relativeurl:
         if( psz_baseURL )
         {
             size_t baseLen = strlen(psz_baseURL);
-            char *href = static_cast<char*>(malloc(baseLen+strlen(url)+1));
+            char *href = (char *) malloc(baseLen+strlen(url)+1);
             if( href )
             {
                 /* prepend base URL */
@@ -519,7 +520,7 @@ relativeurl:
                     if( '/' != *href )
                     {
                         /* baseURL is not an absolute path */
-		        free(href);
+                        free(href);
                         return NULL;
                     }
                     pathstart = href;
