@@ -55,6 +55,7 @@ DIST_misc = \
     README.TXT \
     axvlc.inf.in \
     axvlc.def \
+    axvlc.dll.manifest \
     axvlc.idl \
     axvlc.tlb \
     inplace.bmp \

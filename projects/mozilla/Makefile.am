@@ -4,7 +4,7 @@
 
 MOSTLYCLEANFILES = 
 CLEANFILES = $(BUILT_SOURCES)
-EXTRA_DIST = $(DIST_sources) npvlc_rc.rc.in COPYING
+EXTRA_DIST = $(DIST_sources) npvlc_rc.rc.in COPYING npvlc.dll.manifest
 
 SOURCES_mozilla_common = \
 	vlcshell.cpp \
