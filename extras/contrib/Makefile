@@ -87,6 +87,8 @@ package-macosx:
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
 	rm -rf tmp
+	rm -f contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
+	mv contrib-macosx.tar.bz2 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 
 DISTDIR = usr/win32
 
