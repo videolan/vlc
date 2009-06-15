@@ -288,7 +288,7 @@ modules/access/screen/mac.c
 modules/access/screen/screen.c
 modules/access/screen/screen.h
 modules/access/screen/win32.c
-modules/access/screen/x11.c
+modules/access/screen/xcb.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
@@ -299,11 +299,8 @@ modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
 modules/access/vcd/vcd.c
 modules/access/vcdx/access.c
-modules/access/vcdx/demux.c
 modules/access/vcdx/info.c
 modules/access/vcdx/info.h
-modules/access/vcdx/intf.c
-modules/access/vcdx/intf.h
 modules/access/vcdx/vcd.c
 modules/access/vcdx/vcd.h
 modules/access/vcdx/vcdplayer.c
@@ -323,6 +320,7 @@ modules/audio_filter/channel_mixer/headphone.c
 modules/audio_filter/channel_mixer/mono.c
 modules/audio_filter/channel_mixer/simple.c
 modules/audio_filter/channel_mixer/trivial.c
+modules/audio_filter/chorus_flanger.c
 modules/audio_filter/converter/a52tofloat32.c
 modules/audio_filter/converter/a52tospdif.c
 modules/audio_filter/converter/dtstofloat32.c
@@ -483,6 +481,7 @@ modules/demux/avi/libavi.c
 modules/demux/avi/libavi.h
 modules/demux/cdg.c
 modules/demux/demuxdump.c
+modules/demux/dirac.c
 modules/demux/flac.c
 modules/demux/gme.cpp
 modules/demux/kate_categories.c
@@ -543,6 +542,7 @@ modules/demux/playlist/xspf.h
 modules/demux/ps.c
 modules/demux/ps.h
 modules/demux/pva.c
+modules/demux/rawaud.c
 modules/demux/rawdv.c
 modules/demux/rawvid.c
 modules/demux/real.c
@@ -694,8 +694,8 @@ modules/gui/qt4/dialogs/errors.cpp
 modules/gui/qt4/dialogs/errors.hpp
 modules/gui/qt4/dialogs/extended.cpp
 modules/gui/qt4/dialogs/extended.hpp
-modules/gui/qt4/dialogs/external.hpp
 modules/gui/qt4/dialogs/external.cpp
+modules/gui/qt4/dialogs/external.hpp
 modules/gui/qt4/dialogs/gototime.cpp
 modules/gui/qt4/dialogs/gototime.hpp
 modules/gui/qt4/dialogs/help.cpp
@@ -1105,6 +1105,7 @@ modules/mux/mpjpeg.c
 modules/mux/ogg.c
 modules/mux/wav.c
 modules/packetizer/copy.c
+modules/packetizer/dirac.c
 modules/packetizer/h264.c
 modules/packetizer/mlp.c
 modules/packetizer/mpeg4audio.c
@@ -1273,8 +1274,9 @@ modules/video_output/x11/xcommon.c
 modules/video_output/x11/xcommon.h
 modules/video_output/x11/xvideo.c
 modules/video_output/x11/xvmc.c
-modules/video_output/xcb/x11.c
 modules/video_output/xcb/window.c
+modules/video_output/xcb/x11.c
+modules/video_output/xcb/xvideo.c
 modules/video_output/yuv.c
 modules/visualization/galaktos/PCM.c
 modules/visualization/galaktos/PCM.h
