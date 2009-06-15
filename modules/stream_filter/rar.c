@@ -147,7 +147,7 @@ static int Open ( vlc_object_t *p_this )
 
     /* */
     const rar_file_t *p_file = p_sys->p_file;
-    msg_Dbg( s, "Using RAR stream filter for '%s' %lld(expected %lld) bytes in %d chunks",
+    msg_Dbg( s, "Using RAR stream filter for '%s' %"PRId64"(expected %"PRId64") bytes in %d chunks",
              p_file->psz_name, p_file->i_real_size, p_file->i_size, p_file->i_chunk );
 
     return VLC_SUCCESS;

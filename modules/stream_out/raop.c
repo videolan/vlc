@@ -1293,7 +1293,7 @@ static int Open( vlc_object_t *p_this )
     /* Random client instance */
     gcry_randomize( &i_client_instance, sizeof( i_client_instance ),
                     GCRY_STRONG_RANDOM );
-    if ( asprintf( &p_sys->psz_client_instance, "%016llX",
+    if ( asprintf( &p_sys->psz_client_instance, "%016"PRIX64,
                    i_client_instance ) < 0 )
     {
         i_err = VLC_ENOMEM;

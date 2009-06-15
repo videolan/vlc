@@ -320,7 +320,7 @@ static void WriteYUV( vout_thread_t *p_vout, video_format_t fmt,
         i_written = fwrite( p_pic->p_data, 1, i_bytes, p_sys->p_fd );
         if( i_written != i_bytes )
         {
-            msg_Warn( p_vout, "only %d of %d bytes written",
+            msg_Warn( p_vout, "only %zd of %zd bytes written",
                       i_written, i_bytes );
         }
     }
