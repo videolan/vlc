@@ -579,6 +579,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 		[self setupField: o_osd_font_fld forOption: "freetype-font"];
 		[self setupButton: o_osd_font_color_pop forIntList: "freetype-color"];
 		[self setupButton: o_osd_font_size_pop forIntList: "freetype-rel-fontsize"];
+		/* selector button is useless in this case */
+		[o_osd_font_btn setEnabled: NO];
 	}
 
 
@@ -1132,10 +1134,6 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 		}
 		[[NSFontManager sharedFontManager] setTarget: self];
 		[[NSFontPanel sharedFontPanel] orderFront:self];
-	}
-	else 
-	{
-		[sender setEnabled: NO];
 	}
 }
 
