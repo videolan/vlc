@@ -53,7 +53,7 @@ Bernie Purcell <b dot purcell at adbglobal dot com> - MKV USF subtitles support,
 Bill <wenwuangel at hotmail .com> - memleak fixes
 Bill Eldridge <bill at rfa.org> - documentation
 Bill C. Riemers <briemers+git@redhat.com> - http access fixes
-Bob Maguire <maguirer at rjmaguire dot com> - addition of some coontrols to the OSX interface
+Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
 Brian C. Wiles - vlm schedule date fix
 Brian Johnson <brijohn@gmail.com> - interface fix
 Brian Raymond <braymond at echostorm dot net> - Quicktime 404 error on RTSP SETUP fix
@@ -166,13 +166,14 @@ Julien Blache <jb at technologeek.org> - disc ejection code
 Julien Bouquillon <julien -- bouquillon ## com> - Forum support and a VLC JS library
 Julien Plissonneau Duquène - JACK audio input module 
 Julien Robert <jul at mac.com> - DTS to SPDIF fixes.
+K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
+Kai Hermann <kai.uwe.hermann@gmail.com> - German translation
 Kang Jeong-Hee <keizie at gmail dot com> - Korean translation
 Kenneth Ostby <kenneo -at- idi -dot- ntnu -dot- no> - Audioscrobbler plugin
 Kenneth Self <kens at campoz DoT. fslife _dOt co dOT- uk> - BDA capture plugin
 Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation 
 Koehler, Vitally <vkoehler AT telekom de> -  solves the problem of audio packet losses by the playback of MPEG2 transport stream.
 Konstanty Bialkowski <konstanty -|- ieee [] org> - improvements on mod files support
-K. Staring <qdk at quickdekay dot net> - RTSP rewind and fast-forward support
 kty0ne - WinAmp 5 skin for VLC
 Lahiru Lakmal Priyadarshana <llahiru at gmail # com> - Qt4 patch
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
