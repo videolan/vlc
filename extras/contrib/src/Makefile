@@ -160,6 +160,7 @@ ifndef HAVE_DARWIN_10
 NONLLVMCC+= CC="/Developer/usr/bin/gcc-4.2"
 NONLLVMCC+= CXX="/Developer/usr/bin/g++-4.2"
 else
+X264CONF+=--host=x86_64-apple-darwin10
 NONLLVMCC+= $(HOSTCC)
 endif
 else
