@@ -104,7 +104,7 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
     if( !vlc_object_alive( p_playlist ) )
         return VLC_EGENERIC;
 
-    if( playlist_IsEmpty( p_playlist ) )
+    if( playlist_IsEmpty( p_playlist ) && i_query != PLAYLIST_STOP )
         return VLC_EGENERIC;
 
     switch( i_query )
