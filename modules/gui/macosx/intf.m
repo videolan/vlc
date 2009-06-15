@@ -334,11 +334,9 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     i_lastShownVolume = -1;
 
-#ifndef __x86_64__
     o_remote = [[AppleRemote alloc] init];
     [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
     [o_remote setDelegate: _o_sharedMainInstance];
-#endif
 
     o_eyetv = [[VLCEyeTVController alloc] init];
 
@@ -1014,16 +1012,12 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
     if( !p_intf ) return;
-#ifndef __x86_64__
     [o_remote startListening: self];
-#endif
 }
 - (void)applicationDidResignActive:(NSNotification *)aNotification
 {
     if( !p_intf ) return;
-#ifndef __x86_64__
     [o_remote stopListening: self];
-#endif
 }
 
 /* Triggered when the computer goes to sleep */
