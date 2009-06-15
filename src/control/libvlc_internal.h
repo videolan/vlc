@@ -47,6 +47,8 @@ VLC_EXPORT (void, libvlc_InternalDestroy, ( libvlc_int_t * ) );
 VLC_EXPORT (int, libvlc_InternalAddIntf, ( libvlc_int_t *, const char * ) );
 VLC_EXPORT (void, libvlc_InternalWait, ( libvlc_int_t * ) );
 
+typedef void (*libvlc_vlm_release_func_t)( libvlc_instance_t * ) ;
+
 /***************************************************************************
  * Opaque structures for libvlc API
  ***************************************************************************/
@@ -57,11 +59,17 @@ typedef enum libvlc_lock_state_t
     libvlc_UnLocked
 } libvlc_lock_state_t;
 
+typedef struct libvlc_vlm_t
+{
+    vlm_t                  *p_vlm;
+    libvlc_event_manager_t *p_event_manager;
+    libvlc_vlm_release_func_t pf_release;
+} libvlc_vlm_t;
+
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
-    vlm_t        *p_vlm;
-    libvlc_event_manager_t *p_event_manager;
+    libvlc_vlm_t  libvlc_vlm;
     int           b_playlist_locked;
     unsigned      ref_count;
     int           verbosity;

@@ -76,7 +76,7 @@ char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
     CHECK_VLM;
     asprintf( &psz_message, "show %s", psz_name );
     asprintf( &psz_response, "", psz_name );
-    vlm_ExecuteCommand( p_instance->p_vlm, psz_message, &answer );
+    vlm_ExecuteCommand( p_instance->libvlc_vlm.p_vlm, psz_message, &answer );
     if( answer->psz_value )
     {
         libvlc_exception_raise( p_exception, "Unable to call show %s: %s",
@@ -113,6 +113,10 @@ static int VlmEvent( vlc_object_t *p_this, const char * name,
     libvlc_event_manager_t *p_event_manager = (libvlc_event_manager_t *) param;
     libvlc_event_t libvlc_event;
 
+    VLC_UNUSED( p_this );
+    VLC_UNUSED( name );
+    VLC_UNUSED( old_val );
+
     libvlc_event.u.vlm_media_event.psz_media_name = event->psz_name;
 
     switch( event->i_type )
@@ -137,43 +141,69 @@ static int VlmEvent( vlc_object_t *p_this, const char * name,
     return 0;
 }
 
+static void libvlc_vlm_release_internal( libvlc_instance_t *p_instance )
+{
+    vlm_t *p_vlm = p_instance->libvlc_vlm.p_vlm;
+    if( !p_instance->libvlc_vlm.p_vlm )
+        return;
+    /* We need to remove medias in order to receive events */
+    vlm_Control( p_vlm, VLM_CLEAR_MEDIAS );
+    vlm_Control( p_vlm, VLM_CLEAR_SCHEDULES );
+
+    var_DelCallback( (vlc_object_t *)p_vlm, "intf-event", VlmEvent,
+                     p_instance->libvlc_vlm.p_event_manager );
+    p_instance->libvlc_vlm.pf_release = NULL;
+    libvlc_event_manager_release( p_instance->libvlc_vlm.p_event_manager );
+    p_instance->libvlc_vlm.p_event_manager = NULL;
+    vlm_Delete( p_vlm );
+    p_instance->libvlc_vlm.p_vlm = NULL;
+}
+
 static int libvlc_vlm_init( libvlc_instance_t *p_instance,
                             libvlc_exception_t *p_exception )
 {
-    if( !p_instance->p_event_manager )
+    if( !p_instance->libvlc_vlm.p_event_manager )
     {
-        p_instance->p_event_manager = libvlc_event_manager_new( p_instance->p_vlm,
+        p_instance->libvlc_vlm.p_event_manager = libvlc_event_manager_new( p_instance->libvlc_vlm.p_vlm,
                                                                 p_instance, p_exception );
-        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+        libvlc_event_manager_register_event_type( p_instance->libvlc_vlm.p_event_manager,
                                                   libvlc_VlmMediaAdded, NULL );
-        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+        libvlc_event_manager_register_event_type( p_instance->libvlc_vlm.p_event_manager,
                                                   libvlc_VlmMediaRemoved, NULL );
-        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+        libvlc_event_manager_register_event_type( p_instance->libvlc_vlm.p_event_manager,
                                                   libvlc_VlmMediaChanged, NULL );
-        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+        libvlc_event_manager_register_event_type( p_instance->libvlc_vlm.p_event_manager,
                                                   libvlc_VlmMediaInstanceStarted, NULL );
-        libvlc_event_manager_register_event_type( p_instance->p_event_manager,
+        libvlc_event_manager_register_event_type( p_instance->libvlc_vlm.p_event_manager,
                                                   libvlc_VlmMediaInstanceStopped, NULL );
     }
 
-    if( !p_instance->p_vlm )
+    if( !p_instance->libvlc_vlm.p_vlm )
     {
-        p_instance->p_vlm = vlm_New( p_instance->p_libvlc_int );
-        if( !p_instance->p_vlm )
+        p_instance->libvlc_vlm.p_vlm = vlm_New( p_instance->p_libvlc_int );
+        if( !p_instance->libvlc_vlm.p_vlm )
         {
             libvlc_exception_raise( p_exception,
                                     "Unable to create VLM." );
             return VLC_EGENERIC;
         }
-        var_AddCallback( (vlc_object_t *)p_instance->p_vlm, "intf-event", VlmEvent,
-                         p_instance->p_event_manager );
+        var_AddCallback( (vlc_object_t *)p_instance->libvlc_vlm.p_vlm, "intf-event", VlmEvent,
+                         p_instance->libvlc_vlm.p_event_manager );
+        p_instance->libvlc_vlm.pf_release = libvlc_vlm_release_internal;
     }
 
     return VLC_SUCCESS;
 }
+
+void libvlc_vlm_release( libvlc_instance_t *p_instance,
+                         libvlc_exception_t *p_exception)
+{
+    libvlc_vlm_release_internal( p_instance );
+}
+
 #define VLM_RET(p,ret) do {                                     \
     if( libvlc_vlm_init( p_instance, p_exception ) ) return ret;\
-    (p) = p_instance->p_vlm;                                    \
+    (p) = p_instance->libvlc_vlm.p_vlm;                                    \
   } while(0)
 #define VLM(p) VLM_RET(p,)
 
@@ -208,18 +238,6 @@ libvlc_vlm_get_media_instance( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( pp_minstance[--i_minstance] );
     TAB_CLEAN( i_minstance, pp_minstance );
     return p_minstance;
-}
-
-
-void libvlc_vlm_release( libvlc_instance_t *p_instance,
-                         libvlc_exception_t *p_exception)
-{
-    vlm_t *p_vlm;
-
-    VLM(p_vlm);
-
-    vlm_Delete( p_vlm );
-    p_instance->p_vlm = NULL;
 }
 
 void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance,
@@ -588,5 +606,5 @@ libvlc_event_manager_t * libvlc_vlm_get_event_manager( libvlc_instance_t *p_inst
 {
     vlm_t *p_vlm;
     VLM_RET( p_vlm, NULL);
-    return p_instance->p_event_manager;
+    return p_instance->libvlc_vlm.p_event_manager;
 }
