@@ -181,7 +181,7 @@ static int Open ( vlc_object_t *p_this )
      */
     a.tlength = pa_bytes_per_second(&ss)/5;
     a.maxlength = a.tlength * 2;
-    a.prebuf = a.tlength;
+    a.prebuf = a.tlength / 2;
     a.minreq = a.tlength / 10;
 
     /* Buffer size is 20mS */
