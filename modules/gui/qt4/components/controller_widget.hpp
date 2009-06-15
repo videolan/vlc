@@ -68,11 +68,13 @@ class SoundWidget : public QWidget
 public:
     SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool,
                  bool b_special = false );
+    virtual ~SoundWidget();
 
 private:
     intf_thread_t       *p_intf;
     QLabel              *volMuteLabel;
     QAbstractSlider     *volumeSlider;
+    QFrame              *volumeControlWidget;
     bool                 b_my_volume;
     QMenu               *volumeMenu;
     virtual bool eventFilter( QObject *obj, QEvent *e );
