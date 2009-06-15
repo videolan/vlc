@@ -239,6 +239,7 @@ Philippe Van Hecke <philippe at belnet dot be> - SAP header hash patch
 Pierre d'Herbemont <pdherbemont at free dot fr> - Compile fix
 Pierre-Luc Beaudoin - Vorbis 9 channels patch, Jack input fixes.
 Pierre Marc Dumuid <pierre.dumuid at adelaide dot edu dot au> - Playlist patches
+Pierre Ynard <linkfanel at yahoo dot fr> - WinCE and win32 fixes
 Pittayakom Saingtong <develop5 qt datawiz dot co dot th> - Thai localisation
 Przemyslaw Fiala <bl4 a playker dot info> - MMS/TCP fix
 Régis Duchesne <regis at via.ecp.fr> - original VLC code
