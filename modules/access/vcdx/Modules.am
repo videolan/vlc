@@ -8,5 +8,3 @@ SOURCES_vcdx = \
 	info.c \
 	info.h \
 	$(NULL)
-
-EXTRA_DIST += demux.c
