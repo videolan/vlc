@@ -250,8 +250,8 @@ vlc_module_begin ()
                 true )
     add_string( "dvb-http-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
                 true )
-    add_string( "dvb-http-password", NULL, NULL, PASSWORD_TEXT,
-                PASSWORD_LONGTEXT, true )
+    add_password( "dvb-http-password", NULL, NULL, PASSWORD_TEXT,
+                  PASSWORD_LONGTEXT, true )
     add_string( "dvb-http-acl", NULL, NULL, ACL_TEXT, ACL_LONGTEXT,
                 true )
     add_string( "dvb-http-intf-cert", NULL, NULL, CERT_TEXT, CERT_LONGTEXT,

@@ -86,8 +86,8 @@ vlc_module_begin ()
         change_safe()
     add_string( "smb-user", NULL, NULL, USER_TEXT, USER_LONGTEXT,
                 false )
-    add_string( "smb-pwd", NULL, NULL, PASS_TEXT,
-                PASS_LONGTEXT, false )
+    add_password( "smb-pwd", NULL, NULL, PASS_TEXT,
+                  PASS_LONGTEXT, false )
     add_string( "smb-domain", NULL, NULL, DOMAIN_TEXT,
                 DOMAIN_LONGTEXT, false )
     add_shortcut( "smb" )

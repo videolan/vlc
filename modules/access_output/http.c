@@ -102,8 +102,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_SOUT_ACO )
     add_string( SOUT_CFG_PREFIX "user", "", NULL,
                 USER_TEXT, USER_LONGTEXT, true )
-    add_string( SOUT_CFG_PREFIX "pwd", "", NULL,
-                PASS_TEXT, PASS_LONGTEXT, true )
+    add_password( SOUT_CFG_PREFIX "pwd", "", NULL,
+                  PASS_TEXT, PASS_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "mime", "", NULL,
                 MIME_TEXT, MIME_LONGTEXT, true )
     add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL,
