@@ -228,8 +228,7 @@ Otto Kekäläinen <otto 4t sange d0t fi> - Finnish translation
 Øyvind Kolbu <oyvindk at world-online.no> - FreeBSD patches
 Patrick Horn <patrickd0thorn at mindspring d0t com> - DirectShow patch
 Patrick McLean <chutzpah at gentoo d0t org> - Libcdio update patch
-Paul Corke <paul.corke at datatote dot co do uk> - dv patch to keep up with the hardware
-Paul Corke <paul.corke at datatote dot co do uk> - pvr patch for newer ivtv drivers
+Paul Corke <paul.corke at datatote dot co do uk> - pvr and dv patches for newer drivers and hardware
 Pauline Castets <pcastets at actech-innovation dot com> - NSIS fixes and i18n
 Paul Mackerras <paulus at linuxcare.com.au> - AltiVec IDCT and motion
 Petr Vacek - FTP cleartext authentication
