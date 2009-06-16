@@ -1,273 +1,1189 @@
-diff -ruN libass-0.9.5/libass/ass.c libass-0.9.5-patched/libass/ass.c
---- libass/libass/ass.c	2008-05-22 20:01:18.000000000 +0200
-+++ libass-0.9.5-patched/libass/ass.c	2008-08-08 23:59:21.000000000 +0200
-@@ -846,16 +846,22 @@
- 		char* ip;
- 		char* op;
- 		size_t rc;
-+                int clear = 0;
- 		
--		outbuf = malloc(size);
-+		outbuf = malloc(osize);
- 		ip = data;
- 		op = outbuf;
- 		
--		while (ileft) {
-+		while (1) {
-+                        if(ileft)
- 			rc = iconv(icdsc, &ip, &ileft, &op, &oleft);
-+                        else {// clear the conversion state and leave
-+                            clear = 1;
-+                            rc = iconv(icdsc, NULL, NULL, &op, &oleft);
-+                        }
- 			if (rc == (size_t)(-1)) {
- 				if (errno == E2BIG) {
--					int offset = op - outbuf;
-+					size_t offset = op - outbuf;
- 					outbuf = (char*)realloc(outbuf, osize + size);
- 					op = outbuf + offset;
- 					osize += size;
-@@ -864,7 +870,9 @@
- 					mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorRecodingFile);
- 					return NULL;
- 				}
--			}
-+			} else
-+                            if( clear )
-+                                break;
- 		}
- 		outbuf[osize - oleft - 1] = 0;
+diff -ruN libass-0.9.6-orig/libass/ass.c libass-0.9.6/libass/ass.c
+--- libass-0.9.6-orig/libass/ass.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass.c	2009-06-16 15:40:50.000000000 +0200
+@@ -56,7 +56,7 @@
+ 
+ void ass_free_track(ass_track_t* track) {
+ 	int i;
+-	
++
+ 	if (track->parser_priv) {
+ 		if (track->parser_priv->fontname)
+ 			free(track->parser_priv->fontname);
+@@ -85,14 +85,14 @@
+ /// \return style id
+ int ass_alloc_style(ass_track_t* track) {
+ 	int sid;
+-	
++
+ 	assert(track->n_styles <= track->max_styles);
+ 
+ 	if (track->n_styles == track->max_styles) {
+ 		track->max_styles += ASS_STYLES_ALLOC;
+ 		track->styles = (ass_style_t*)realloc(track->styles, sizeof(ass_style_t)*track->max_styles);
  	}
-diff -ruN libass-0.9.5/libass/ass_bitmap.c libass-0.9.5-patched/libass/ass_bitmap.c
---- libass/libass/ass_bitmap.c	2008-05-22 20:01:18.000000000 +0200
-+++ libass-0.9.5-patched/libass/ass_bitmap.c	2008-08-09 00:04:36.000000000 +0200
-@@ -274,9 +274,10 @@
- 	resize_tmp(priv, (*bm_g)->w, (*bm_g)->h);
- 	
- 	if (be) {
--		blur((*bm_g)->buffer, priv->tmp, (*bm_g)->w, (*bm_g)->h, (*bm_g)->w, (int*)priv->gt2, priv->g_r, priv->g_w);
- 		if (*bm_o)
- 			blur((*bm_o)->buffer, priv->tmp, (*bm_o)->w, (*bm_o)->h, (*bm_o)->w, (int*)priv->gt2, priv->g_r, priv->g_w);
-+		else
-+			blur((*bm_g)->buffer, priv->tmp, (*bm_g)->w, (*bm_g)->h, (*bm_g)->w, (int*)priv->gt2, priv->g_r, priv->g_w);
+-	
++
+ 	sid = track->n_styles++;
+ 	memset(track->styles + sid, 0, sizeof(ass_style_t));
+ 	return sid;
+@@ -103,14 +103,14 @@
+ /// \return event id
+ int ass_alloc_event(ass_track_t* track) {
+ 	int eid;
+-	
++
+ 	assert(track->n_events <= track->max_events);
+ 
+ 	if (track->n_events == track->max_events) {
+ 		track->max_events += ASS_EVENTS_ALLOC;
+ 		track->events = (ass_event_t*)realloc(track->events, sizeof(ass_event_t)*track->max_events);
+ 	}
+-	
++
+ 	eid = track->n_events++;
+ 	memset(track->events + eid, 0, sizeof(ass_event_t));
+ 	return eid;
+@@ -217,7 +217,7 @@
+ 		if (target->name != NULL) free(target->name); \
+ 		target->name = strdup(token); \
+ 		mp_msg(MSGT_ASS, MSGL_DBG2, "%s = %s\n", #name, token);
+-		
++
+ #define COLORVAL(name) ANYVAL(name,string2color)
+ #define INTVAL(name) ANYVAL(name,atoi)
+ #define FPVAL(name) ANYVAL(name,atof)
+@@ -261,7 +261,7 @@
+  * \param event parsed data goes here
+  * \param str string to parse, zero-terminated
+  * \param n_ignored number of format options to skip at the beginning
+-*/ 
++*/
+ static int process_event_tail(ass_track_t* track, ass_event_t* event, char* str, int n_ignored)
+ {
+ 	char* token;
+@@ -329,9 +329,9 @@
+ 	ass_style_t* target;
+ 	int sid;
+ 	char** list = track->library->style_overrides;
+-	
++
+ 	if (!list) return;
+-	
++
+ 	for (fs = list; *fs; ++fs) {
+ 		eq = strrchr(*fs, '=');
+ 		if (!eq)
+@@ -398,7 +398,7 @@
+  * \param track track
+  * \param str string to parse, zero-terminated
+  * Allocates a new style struct.
+-*/ 
++*/
+ static int process_style(ass_track_t* track, char *str)
+ {
+ 
+@@ -426,9 +426,9 @@
  	}
  
- 	if (*bm_o)
-diff -ruN libass-0.9.5/libass/ass_fontconfig.c libass-0.9.5-patched/libass/ass_fontconfig.c
---- libass/libass/ass_fontconfig.c	2008-05-22 20:01:18.000000000 +0200
-+++ libass-0.9.5-patched/libass/ass_fontconfig.c	2008-08-08 23:59:21.000000000 +0200
-@@ -129,6 +129,8 @@
- 		goto error;
+ 	q = format = strdup(track->style_format);
+-	
++
+ 	mp_msg(MSGT_ASS, MSGL_V, "[%p] Style: %s\n", track, str);
+-	
++
+ 	sid = ass_alloc_style(track);
  
- 	fset = FcFontSort(priv->config, pat, FcTrue, NULL, &result);
-+        if(!fset)
-+            goto error;
+ 	style = track->styles + sid;
+@@ -436,13 +436,13 @@
+ // fill style with some default values
+ 	style->ScaleX = 100.;
+ 	style->ScaleY = 100.;
+-	
++
+ 	while (1) {
+ 		NEXT(q, tname);
+ 		NEXT(p, token);
+-		
++
+ //		ALIAS(TertiaryColour,OutlineColour) // ignore TertiaryColour; it appears only in SSA, and is overridden by BackColour
+-			
++
+ 		if (0) { // cool ;)
+ 			STRVAL(Name)
+ 				if ((strcmp(target->Name, "Default")==0) || (strcmp(target->Name, "*Default")==0))
+@@ -494,7 +494,7 @@
+ 	}
+ 	free(format);
+ 	return 0;
+-	
++
+ }
  
- 	for (curf = 0; curf < fset->nfont; ++curf) {
- 		FcPattern* curp = fset->fonts[curf];
-@@ -351,12 +353,15 @@
- 	FcPattern* pattern;
- 	FcFontSet* fset;
- 	FcBool res;
-+        int face_index, num_faces = 1;
+ static int process_styles_line(ass_track_t* track, char *str)
+@@ -541,7 +541,7 @@
+ 		// called directly from demuxer
+ 		int eid;
+ 		ass_event_t* event;
+-		
++
+ 		str += 9;
+ 		skip_spaces(&str);
  
--	rc = FT_New_Memory_Face(ftlibrary, (unsigned char*)data, data_size, 0, &face);
-+	for (face_index = 0; face_index < num_faces; ++face_index) {
-+        rc = FT_New_Memory_Face(ftlibrary, (unsigned char*)data, data_size, 0, &face);
- 	if (rc) {
- 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorOpeningMemoryFont, name);
+@@ -600,7 +600,7 @@
+ 	}
+ 	dsize = q - buf;
+ 	assert(dsize <= size / 4 * 3 + 2);
+-	
++
+ 	if (track->library->extract_fonts) {
+ 		ass_add_font(track->library, track->parser_priv->fontname, (char*)buf, dsize);
+ 		buf = 0;
+@@ -631,7 +631,7 @@
+ 		mp_msg(MSGT_ASS, MSGL_V, "fontname: %s\n", track->parser_priv->fontname);
+ 		return 0;
+ 	}
+-	
++
+ 	if (!track->parser_priv->fontname) {
+ 		mp_msg(MSGT_ASS, MSGL_V, "Not understood: %s  \n", str);
+ 		return 0;
+@@ -648,7 +648,7 @@
+ 	}
+ 	memcpy(track->parser_priv->fontdata + track->parser_priv->fontdata_used, str, len);
+ 	track->parser_priv->fontdata_used += len;
+-	
++
+ 	return 0;
+ }
+ 
+@@ -656,7 +656,7 @@
+  * \brief Parse a header line
+  * \param track track
+  * \param str string to parse, zero-terminated
+-*/ 
++*/
+ static int process_line(ass_track_t* track, char *str)
+ {
+ 	if (!strncasecmp(str, "[Script Info]", 13)) {
+@@ -778,7 +778,7 @@
+  * \param size length of data
+  * \param timecode starting time of the event (milliseconds)
+  * \param duration duration of the event (milliseconds)
+-*/ 
++*/
+ void ass_process_chunk(ass_track_t* track, char *data, int size, long long timecode, long long duration)
+ {
+ 	char* str;
+@@ -791,7 +791,7 @@
+ 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_EventFormatHeaderMissing);
  		return;
  	}
-+        num_faces = face->num_faces;
+-	
++
+ 	str = malloc(size + 1);
+ 	memcpy(str, data, size);
+ 	str[size] = '\0';
+@@ -801,8 +801,8 @@
+ 	event = track->events + eid;
  
- 	pattern = FcFreeTypeQueryFace(face, (unsigned char*)name, 0, FcConfigGetBlanks(priv->config));
- 	if (!pattern) {
-@@ -380,6 +385,7 @@
+ 	p = str;
+-	
+-	do { 
++
++	do {
+ 		NEXT(p, token);
+ 		event->ReadOrder = atoi(token);
+ 		if (check_duplicate_event(track, event->ReadOrder))
+@@ -815,7 +815,7 @@
+ 
+ 		event->Start = timecode;
+ 		event->Duration = duration;
+-		
++
+ 		free(str);
+ 		return;
+ //		dump_events(tid);
+@@ -863,11 +863,11 @@
+ 		char* op;
+ 		size_t rc;
+ 		int clear = 0;
+-		
++
+ 		outbuf = malloc(osize);
+ 		ip = data;
+ 		op = outbuf;
+-		
++
+ 		while (1) {
+ 			if (ileft)
+ 				rc = iconv(icdsc, &ip, &ileft, &op, &oleft);
+@@ -898,7 +898,7 @@
+ 		icdsc = (iconv_t)(-1);
+ 		mp_msg(MSGT_ASS,MSGL_V,"LIBSUB: closed iconv descriptor.\n");
  	}
- 
- 	FT_Done_Face(face);
-+        }
- #endif
+-	
++
+ 	return outbuf;
  }
- 
-@@ -419,7 +425,8 @@
- 	for (i = 0; i < library->num_fontdata; ++i)
- 		process_fontdata(priv, library, ftlibrary, i);
- 
--	if (FcDirCacheValid((const FcChar8 *)dir) == FcFalse)
-+	if(dir) {
-+        if (FcDirCacheValid((const FcChar8 *)dir) == FcFalse)
- 	{
- 		mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_UpdatingFontCache);
- 		if (FcGetVersion() >= 20390 && FcGetVersion() < 20400)
-@@ -457,6 +464,7 @@
- 	if (!rc) {
- 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FcConfigAppFontAddDirFailed);
+ #endif // ICONV
+@@ -927,7 +927,7 @@
+ 		fclose(fp);
+ 		return 0;
  	}
-+        }
+-	
++
+ 	sz = ftell(fp);
+ 	rewind(fp);
  
- 	priv->family_default = family ? strdup(family) : 0;
- 	priv->path_default = path ? strdup(path) : 0;
-diff -ruN libass-0.9.5/libass/ass_render.c libass-0.9.5-patched/libass/ass_render.c
---- libass/libass/ass_render.c	2008-05-22 20:01:18.000000000 +0200
-+++ libass-0.9.5-patched/libass/ass_render.c	2008-08-09 00:04:28.000000000 +0200
-@@ -149,8 +149,8 @@
- 		EVENT_HSCROLL, // "Banner" transition effect, text_width is unlimited
- 		EVENT_VSCROLL // "Scroll up", "Scroll down" transition effects
- 		} evt_type;
--	int pos_x, pos_y; // position
--	int org_x, org_y; // origin
-+	double pos_x, pos_y; // position
-+	double org_x, org_y; // origin
- 	char have_origin; // origin is explicitly defined; if 0, get_base_point() is used
- 	double scale_x, scale_y;
- 	double hspacing; // distance between letters, in pixels
-@@ -161,6 +161,7 @@
- 	uint32_t fade; // alpha from \fad
- 	char be; // blur edges
- 	int shadow;
-+	int drawing_mode; // not implemented; when != 0 text is discarded, except for style override tags
+@@ -936,9 +936,9 @@
+ 		fclose(fp);
+ 		return 0;
+ 	}
+-	
++
+ 	mp_msg(MSGT_ASS, MSGL_V, "file size: %ld\n", sz);
+-	
++
+ 	buf = malloc(sz + 1);
+ 	assert(buf);
+ 	bytes_read = 0;
+@@ -954,7 +954,7 @@
+ 	} while (sz - bytes_read > 0);
+ 	buf[sz] = '\0';
+ 	fclose(fp);
+-	
++
+ 	if (bufsize)
+ 		*bufsize = sz;
+ 	return buf;
+@@ -967,9 +967,9 @@
+ {
+ 	ass_track_t* track;
+ 	int i;
+-	
++
+ 	track = ass_new_track(library);
+-	
++
+ 	// process header
+ 	process_text(track, buf);
  
- 	effect_t effect_type;
- 	int effect_timing;
-@@ -456,19 +457,19 @@
- /**
-  * \brief Mapping between script and screen coordinates
-  */
--static int x2scr(int x) {
-+static int x2scr(double x) {
- 	return x*frame_context.orig_width_nocrop / frame_context.track->PlayResX +
- 		FFMAX(global_settings->left_margin, 0);
+@@ -998,15 +998,15 @@
+  * \param bufsize size of buffer
+  * \param codepage recode buffer contents from given codepage
+  * \return newly allocated track
+-*/ 
++*/
+ ass_track_t* ass_read_memory(ass_library_t* library, char* buf, size_t bufsize, char* codepage)
+ {
+ 	ass_track_t* track;
+ 	int need_free = 0;
+-	
++
+ 	if (!buf)
+ 		return 0;
+-	
++
+ #ifdef CONFIG_ICONV
+ 	if (codepage)
+ 		buf = sub_recode(buf, bufsize, codepage);
+@@ -1029,7 +1029,7 @@
+ {
+ 	char* buf;
+ 	size_t bufsize;
+-	
++
+ 	buf = read_file(fname, &bufsize);
+ 	if (!buf)
+ 		return 0;
+@@ -1052,7 +1052,7 @@
+  * \param fname file name
+  * \param codepage recode buffer contents from given codepage
+  * \return newly allocated track
+-*/ 
++*/
+ ass_track_t* ass_read_file(ass_library_t* library, char* fname, char* codepage)
+ {
+ 	char* buf;
+@@ -1066,11 +1066,11 @@
+ 	free(buf);
+ 	if (!track)
+ 		return 0;
+-	
++
+ 	track->name = strdup(fname);
+ 
+ 	mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_AddedSubtitleFileFname, fname, track->n_styles, track->n_events);
+-	
++
+ //	dump_events(forced_tid);
+ 	return track;
  }
- /**
-  * \brief Mapping between script and screen coordinates
-  */
--static int y2scr(int y) {
-+static int y2scr(double y) {
- 	return y * frame_context.orig_height_nocrop / frame_context.track->PlayResY +
- 		FFMAX(global_settings->top_margin, 0);
- }
- // the same for toptitles
--static int y2scr_top(int y) {
-+static int y2scr_top(double y) {
- 	if (global_settings->use_margins)
- 		return y * frame_context.orig_height_nocrop / frame_context.track->PlayResY;
+@@ -1111,12 +1111,12 @@
+ 
+ 	if (movement == 0) return 0;
+ 	if (track->n_events == 0) return 0;
+-	
++
+ 	if (movement < 0)
+ 		for (i = 0; (i < track->n_events) && ((long long)(track->events[i].Start + track->events[i].Duration) <= now); ++i) {}
  	else
-@@ -476,7 +477,7 @@
- 			FFMAX(global_settings->top_margin, 0);
- }
- // the same for subtitles
--static int y2scr_sub(int y) {
-+static int y2scr_sub(double y) {
- 	if (global_settings->use_margins)
- 		return y * frame_context.orig_height_nocrop / frame_context.track->PlayResY +
- 			FFMAX(global_settings->top_margin, 0) +
-@@ -679,11 +680,11 @@
-  * \param pwr multiplier for some tag effects (comes from \t tags)
-  */
- static char* parse_tag(char* p, double pwr) {
--#define skip_all(x) if (*p == (x)) ++p; else { \
--	while ((*p != (x)) && (*p != '}') && (*p != 0)) {++p;} }
-+#define skip_to(x) while ((*p != (x)) && (*p != '}') && (*p != 0)) { ++p;}
- #define skip(x) if (*p == (x)) ++p; else { return p; }
- 	
--	skip_all('\\');
-+	skip_to('\\');
-+	skip('\\');
- 	if ((*p == '}') || (*p == 0))
- 		return p;
+ 		for (i = track->n_events - 1; (i >= 0) && ((long long)(track->events[i].Start) > now); --i) {}
+-	
++
+ 	// -1 and n_events are ok
+ 	assert(i >= -1); assert(i <= track->n_events);
+ 	i += movement;
+diff -ruN libass-0.9.6-orig/libass/ass.h libass-0.9.6/libass/ass.h
+--- libass-0.9.6-orig/libass/ass.h	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass.h	2009-06-16 15:40:50.000000000 +0200
+@@ -195,7 +195,7 @@
+  * \param bufsize size of buffer
+  * \param codepage recode buffer contents from given codepage
+  * \return newly allocated track
+-*/ 
++*/
+ ass_track_t* ass_read_memory(ass_library_t* library, char* buf, size_t bufsize, char* codepage);
+ /**
+  * \brief read styles from file into already initialized track
+diff -ruN libass-0.9.6-orig/libass/ass_bitmap.c libass-0.9.6/libass/ass_bitmap.c
+--- libass-0.9.6-orig/libass/ass_bitmap.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_bitmap.c	2009-06-16 15:39:33.000000000 +0200
+@@ -237,7 +237,7 @@
+ 	unsigned char* g = bm_g->buffer + (t - bm_g->top) * bm_g->w + (l - bm_g->left);
+ 	unsigned char* o = bm_o->buffer + (t - bm_o->top) * bm_o->w + (l - bm_o->left);
+ 	unsigned char* s = bm_s->buffer + (t - bm_s->top) * bm_s->w + (l - bm_s->left);
+-	
++
+ 	for (y = 0; y < b - t; ++y) {
+ 		for (x = 0; x < r - l; ++x) {
+ 			unsigned char c_g, c_o;
+@@ -309,7 +309,7 @@
+ 	if (*bm_o)
+ 		resize_tmp(priv_blur, (*bm_o)->w, (*bm_o)->h);
+ 	resize_tmp(priv_blur, (*bm_g)->w, (*bm_g)->h);
+-	
++
+ 	if (be) {
+ 		while (be--) {
+ 			if (*bm_o)
+diff -ruN libass-0.9.6-orig/libass/ass_cache.c libass-0.9.6/libass/ass_cache.c
+--- libass-0.9.6-orig/libass/ass_cache.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_cache.c	2009-06-16 15:39:33.000000000 +0200
+@@ -117,7 +117,7 @@
+ 	if (map->count > 0 || map->hit_count + map->miss_count > 0)
+ 		mp_msg(MSGT_ASS, MSGL_V, "cache statistics: \n  total accesses: %d\n  hits: %d\n  misses: %d\n  object count: %d\n",
+ 		       map->hit_count + map->miss_count, map->hit_count, map->miss_count, map->count);
+-	
++
+ 	for (i = 0; i < map->nbuckets; ++i) {
+ 		hashmap_item_t* item = map->root[i];
+ 		while (item) {
+@@ -254,7 +254,7 @@
+  * \brief Get a bitmap from bitmap cache.
+  * \param key hash key
+  * \return requested hash val or 0 if not found
+-*/ 
++*/
+ bitmap_hash_val_t* cache_find_bitmap(bitmap_hash_key_t* key)
+ {
+ 	return hashmap_find(bitmap_cache, key);
+@@ -302,7 +302,7 @@
+  * \brief Get a glyph from glyph cache.
+  * \param key hash key
+  * \return requested hash val or 0 if not found
+-*/ 
++*/
+ glyph_hash_val_t* cache_find_glyph(glyph_hash_key_t* key)
+ {
+ 	return hashmap_find(glyph_cache, key);
+diff -ruN libass-0.9.6-orig/libass/ass_cache.h libass-0.9.6/libass/ass_cache.h
+--- libass-0.9.6-orig/libass/ass_cache.h	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_cache.h	2009-06-16 15:39:33.000000000 +0200
+@@ -49,7 +49,7 @@
+ 	int shift_x, shift_y; // shift vector that was added to glyph before applying rotation
+ 	                      // = 0, if frx = fry = frx = 0
+ 	                      // = (glyph base point) - (rotation origin), otherwise
+-	
++
+ 	FT_Vector advance; // subpixel shift vector
+ } bitmap_hash_key_t;
  
-@@ -727,7 +728,7 @@
- 	} else if (mystrcmp(&p, "move")) {
- 		int x1, x2, y1, y2;
- 		long long t1, t2, delta_t, t;
--		int x, y;
-+		double x, y;
- 		double k;
- 		skip('(');
- 		x1 = strtol(p, &p, 10);
-@@ -787,7 +788,7 @@
- 	} else if (mystrcmp(&p, "fn")) {
- 		char* start = p;
- 		char* family;
--		skip_all('\\');
-+		skip_to('\\');
- 		if (p > start) {
- 			family = malloc(p - start + 1);
- 			strncpy(family, start, p - start);
-@@ -888,6 +889,7 @@
- 		render_context.org_x = v1;
- 		render_context.org_y = v2;
- 		render_context.have_origin = 1;
-+		render_context.detect_collisions = 0;
- 	} else if (mystrcmp(&p, "t")) {
- 		double v[3];
- 		int v1, v2;
-@@ -928,7 +930,8 @@
+@@ -110,7 +110,7 @@
+ void ass_glyph_cache_reset(void);
+ void ass_glyph_cache_done(void);
+ 
+-typedef struct hashmap_s hashmap_t; 
++typedef struct hashmap_s hashmap_t;
+ typedef void (*hashmap_item_dtor_t)(void* key, size_t key_size, void* value, size_t value_size);
+ typedef int (*hashmap_key_compare_t)(void* key1, void* key2, size_t key_size);
+ typedef unsigned (*hashmap_hash_t)(void* key, size_t key_size);
+diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
+--- libass-0.9.6-orig/libass/ass_font.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_font.c	2009-06-16 15:39:33.000000000 +0200
+@@ -121,10 +121,10 @@
+ 	FT_Face face;
+ 	int error;
+ 	int mem_idx;
+-	
++
+ 	if (font->n_faces == ASS_FONT_MAX_FACES)
+ 		return -1;
+-	
++
+ 	path = fontconfig_select(fc_priv, font->desc.family, font->desc.treat_family_as_pattern, font->desc.bold,
+ 					      font->desc.italic, &index, ch);
+ 
+@@ -145,7 +145,7 @@
+ 	}
+ 	charmap_magic(face);
+ 	buggy_font_workaround(face);
+-	
++
+ 	font->faces[font->n_faces++] = face;
+ 	update_transform(font);
+ 	face_set_size(face, font->size);
+@@ -164,7 +164,7 @@
+ 	fontp = ass_font_cache_find(desc);
+ 	if (fontp)
+ 		return fontp;
+-	
++
+ 	font.library = library;
+ 	font.ftlibrary = ftlibrary;
+ 	font.n_faces = 0;
+@@ -256,7 +256,7 @@
+ 			return;
+ 		}
+ 	}
+-	
++
+ 	*asc = *desc = 0;
+ }
+ 
+@@ -308,18 +308,18 @@
+ 	case ASS_HINTING_NORMAL: flags = FT_LOAD_FORCE_AUTOHINT; break;
+ 	case ASS_HINTING_NATIVE: flags = 0; break;
+ 	}
+-	
++
+ 	error = FT_Load_Glyph(face, index, FT_LOAD_NO_BITMAP | flags);
+ 	if (error) {
+ 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorLoadingGlyph);
+ 		return 0;
+ 	}
+-	
++
+ #if (FREETYPE_MAJOR > 2) || \
+     ((FREETYPE_MAJOR == 2) && (FREETYPE_MINOR >= 2)) || \
+     ((FREETYPE_MAJOR == 2) && (FREETYPE_MINOR == 1) && (FREETYPE_PATCH >= 10))
+ // FreeType >= 2.1.10 required
+-	if (!(face->style_flags & FT_STYLE_FLAG_ITALIC) && 
++	if (!(face->style_flags & FT_STYLE_FLAG_ITALIC) &&
+ 			(font->desc.italic > 55)) {
+ 		FT_GlyphSlot_Oblique(face->glyph);
+ 	}
+@@ -329,7 +329,7 @@
+ 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorLoadingGlyph);
+ 		return 0;
+ 	}
+-	
++
+ 	return glyph;
+ }
+ 
+diff -ruN libass-0.9.6-orig/libass/ass_fontconfig.c libass-0.9.6/libass/ass_fontconfig.c
+--- libass-0.9.6-orig/libass/ass_fontconfig.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_fontconfig.c	2009-06-16 15:39:33.000000000 +0200
+@@ -72,7 +72,7 @@
+  * \param index out: font index inside a file
+  * \param code: the character that should be present in the font, can be 0
+  * \return font file path
+-*/ 
++*/
+ static char* _select_font(fc_instance_t* priv, const char* family, int treat_family_as_pattern,
+ 			  unsigned bold, unsigned italic, int* index, uint32_t code)
+ {
+@@ -87,7 +87,7 @@
+ 	int curf;
+ 	char* retval = NULL;
+ 	int family_cnt;
+-	
++
+ 	*index = 0;
+ 
+ 	if (treat_family_as_pattern)
+@@ -97,7 +97,7 @@
+ 
+ 	if (!pat)
+ 		goto error;
+-	
++
+ 	if (!treat_family_as_pattern) {
+ 		FcPatternAddString(pat, FC_FAMILY, (const FcChar8*)family);
+ 
+@@ -130,7 +130,7 @@
+ 	FcPatternAddInteger(pat, FC_WEIGHT, bold);
+ 
+ 	FcDefaultSubstitute(pat);
+-	
++
+ 	rc = FcConfigSubstitute(priv->config, pat, FcMatchPattern);
+ 	if (!rc)
+ 		goto error;
+@@ -160,11 +160,13 @@
+ 		goto error;
+ 
+ #if (FC_VERSION >= 20297)
+-	// Remove all extra family names from original pattern.
+-	// After this, FcFontRenderPrepare will select the most relevant family
+-	// name in case there are more than one of them.
+-	for (; family_cnt > 1; --family_cnt)
+-		FcPatternRemove(pat, FC_FAMILY, family_cnt - 1);
++	if (!treat_family_as_pattern) {
++		// Remove all extra family names from original pattern.
++		// After this, FcFontRenderPrepare will select the most relevant family
++		// name in case there are more than one of them.
++		for (; family_cnt > 1; --family_cnt)
++			FcPatternRemove(pat, FC_FAMILY, family_cnt - 1);
++	}
+ #endif
+ 
+ 	rpat = FcFontRenderPrepare(priv->config, pat, fset->fonts[curf]);
+@@ -233,7 +235,7 @@
+  * \param index out: font index inside a file
+  * \param code: the character that should be present in the font, can be 0
+  * \return font file path
+-*/ 
++*/
+ char* fontconfig_select(fc_instance_t* priv, const char* family, int treat_family_as_pattern,
+ 			unsigned bold, unsigned italic, int* index, uint32_t code)
+ {
+@@ -247,23 +249,23 @@
+ 	if (!res && priv->family_default) {
+ 		res = _select_font(priv, priv->family_default, 0, bold, italic, index, code);
+ 		if (res)
+-			mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UsingDefaultFontFamily, 
++			mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UsingDefaultFontFamily,
+ 					family, bold, italic, res, *index);
+ 	}
+ 	if (!res && priv->path_default) {
+ 		res = priv->path_default;
+ 		*index = priv->index_default;
+-		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UsingDefaultFont, 
++		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UsingDefaultFont,
+ 		       family, bold, italic, res, *index);
+ 	}
+ 	if (!res) {
+ 		res = _select_font(priv, "Arial", 0, bold, italic, index, code);
+ 		if (res)
+-			mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UsingArialFontFamily, 
++			mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_UsingArialFontFamily,
+ 					family, bold, italic, res, *index);
+ 	}
+ 	if (res)
+-		mp_msg(MSGT_ASS, MSGL_V, "fontconfig_select: (%s, %d, %d) -> %s, %d\n", 
++		mp_msg(MSGT_ASS, MSGL_V, "fontconfig_select: (%s, %d, %d) -> %s, %d\n",
+ 				family, bold, italic, res, *index);
+ 	return res;
+ }
+@@ -314,7 +316,7 @@
+  * \param idx index of the processed font in library->fontdata
+  * With FontConfig >= 2.4.2, builds a font pattern in memory via FT_New_Memory_Face/FcFreeTypeQueryFace.
+  * With older FontConfig versions, save the font to ~/.mplayer/fonts.
+-*/ 
++*/
+ static void process_fontdata(fc_instance_t* priv, ass_library_t* library, FT_Library ftlibrary, int idx)
+ {
+ 	int rc;
+@@ -345,7 +347,7 @@
+ 	} else if (!S_ISDIR(st.st_mode)) {
+ 		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_NotADirectory, fonts_dir);
+ 	}
+-	
++
+ 	fname = validate_fname((char*)name);
+ 
+ 	snprintf(buf, 1000, "%s/%s", fonts_dir, fname);
+@@ -405,14 +407,14 @@
+  * \param family default font family
+  * \param path default font path
+  * \return pointer to fontconfig private data
+-*/ 
++*/
+ fc_instance_t* fontconfig_init(ass_library_t* library, FT_Library ftlibrary, const char* family, const char* path, int fc)
+ {
+ 	int rc;
+ 	fc_instance_t* priv = calloc(1, sizeof(fc_instance_t));
+ 	const char* dir = library->fonts_dir;
+ 	int i;
+-	
++
+ 	if (!fc) {
+ 		mp_msg(MSGT_ASS, MSGL_WARN,
+ 		       MSGTR_LIBASS_FontconfigDisabledDefaultFontWillBeUsed);
+@@ -495,9 +497,9 @@
+ 	fc_instance_t* priv;
+ 
+ 	mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_FontconfigDisabledDefaultFontWillBeUsed);
+-	
++
+ 	priv = calloc(1, sizeof(fc_instance_t));
+-	
++
+ 	priv->path_default = strdup(path);
+ 	priv->index_default = 0;
+ 	return priv;
+diff -ruN libass-0.9.6-orig/libass/ass_library.c libass-0.9.6/libass/ass_library.c
+--- libass-0.9.6-orig/libass/ass_library.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_library.c	2009-06-16 15:39:33.000000000 +0200
+@@ -62,13 +62,13 @@
+ 	char** p;
+ 	char** q;
+ 	int cnt;
+-	
++
+ 	if (priv->style_overrides) {
+ 		for (p = priv->style_overrides; *p; ++p)
+ 			free(*p);
+ 		free(priv->style_overrides);
+ 	}
+-	
++
+ 	if (!list) return;
+ 
+ 	for (p = list, cnt = 0; *p; ++p, ++cnt) {}
+@@ -91,14 +91,14 @@
+ 	if (!name || !data || !size)
+ 		return;
+ 	grow_array((void**)&priv->fontdata, priv->num_fontdata, sizeof(*priv->fontdata));
+-	
++
+ 	priv->fontdata[idx].name = strdup(name);
+-	
++
+ 	priv->fontdata[idx].data = malloc(size);
+ 	memcpy(priv->fontdata[idx].data, data, size);
+-	
++
+ 	priv->fontdata[idx].size = size;
+-	
++
+ 	priv->num_fontdata ++;
+ }
+ 
+diff -ruN libass-0.9.6-orig/libass/ass_render.c libass-0.9.6/libass/ass_render.c
+--- libass-0.9.6-orig/libass/ass_render.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_render.c	2009-06-16 15:40:50.000000000 +0200
+@@ -119,7 +119,7 @@
+ 	double blur; // gaussian blur
+ 	double shadow;
+ 	double frx, fry, frz; // rotation
+-	
++
+ 	bitmap_hash_key_t hash_key;
+ } glyph_info_t;
+ 
+@@ -141,11 +141,11 @@
+ typedef struct render_context_s {
+ 	ass_event_t* event;
+ 	ass_style_t* style;
+-	
++
+ 	ass_font_t* font;
+ 	char* font_path;
+ 	double font_size;
+-	
++
+ 	FT_Stroker stroker;
+ 	int alignment; // alignment overrides go here; if zero, style value will be used
+ 	double frx, fry, frz;
+@@ -185,7 +185,7 @@
+ 	unsigned bold;
+ 	unsigned italic;
+ 	int treat_family_as_pattern;
+-	
++
+ } render_context_t;
+ 
+ // frame-global data
+@@ -248,13 +248,13 @@
+ 	FT_Library ft;
+ 	ass_renderer_t* priv = 0;
+ 	int vmajor, vminor, vpatch;
+-	
++
+ 	memset(&render_context, 0, sizeof(render_context));
+ 	memset(&frame_context, 0, sizeof(frame_context));
+ 	memset(&text_info, 0, sizeof(text_info));
+ 
+ 	error = FT_Init_FreeType( &ft );
+-	if ( error ) { 
++	if ( error ) {
+ 		mp_msg(MSGT_ASS, MSGL_FATAL, MSGTR_LIBASS_FT_Init_FreeTypeFailed);
+ 		goto ass_init_exit;
+ 	}
+@@ -276,14 +276,14 @@
+ 	priv->library = library;
+ 	priv->ftlibrary = ft;
+ 	// images_root and related stuff is zero-filled in calloc
+-	
++
+ 	ass_font_cache_init();
+ 	ass_bitmap_cache_init();
+ 	ass_composite_cache_init();
+ 	ass_glyph_cache_init();
+ 
+ 	text_info.glyphs = calloc(MAX_GLYPHS, sizeof(glyph_info_t));
+-	
++
+ ass_init_exit:
+ 	if (priv) mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_Init);
+ 	else mp_msg(MSGT_ASS, MSGL_ERR, MSGTR_LIBASS_InitFailed);
+@@ -316,7 +316,7 @@
+ static ass_image_t* my_draw_bitmap(unsigned char* bitmap, int bitmap_w, int bitmap_h, int stride, int dst_x, int dst_y, uint32_t color)
+ {
+ 	ass_image_t* img = calloc(1, sizeof(ass_image_t));
+-	
++
+ 	img->w = bitmap_w;
+ 	img->h = bitmap_h;
+ 	img->stride = stride;
+@@ -353,7 +353,7 @@
+ 	dst_x += bm->left;
+ 	dst_y += bm->top;
+ 	brk -= bm->left;
+-	
++
+ 	// clipping
+ 	clip_x0 = render_context.clip_x0;
+ 	clip_y0 = render_context.clip_y0;
+@@ -363,7 +363,7 @@
+ 	b_y0 = 0;
+ 	b_x1 = bm->w;
+ 	b_y1 = bm->h;
+-	
++
+ 	tmp = dst_x - clip_x0;
+ 	if (tmp < 0) {
+ 		mp_msg(MSGT_ASS, MSGL_DBG2, "clip left\n");
+@@ -384,13 +384,13 @@
+ 		mp_msg(MSGT_ASS, MSGL_DBG2, "clip bottom\n");
+ 		b_y1 = bm->h + tmp;
+ 	}
+-	
++
+ 	if ((b_y0 >= b_y1) || (b_x0 >= b_x1))
+ 		return tail;
+ 
+ 	if (brk > b_x0) { // draw left part
+ 		if (brk > b_x1) brk = b_x1;
+-		img = my_draw_bitmap(bm->buffer + bm->w * b_y0 + b_x0, 
++		img = my_draw_bitmap(bm->buffer + bm->w * b_y0 + b_x0,
+ 			brk - b_x0, b_y1 - b_y0, bm->w,
+ 			dst_x + b_x0, dst_y + b_y0, color);
+ 		*tail = img;
+@@ -398,7 +398,7 @@
+ 	}
+ 	if (brk < b_x1) { // draw right part
+ 		if (brk < b_x0) brk = b_x0;
+-		img = my_draw_bitmap(bm->buffer + bm->w * b_y0 + brk, 
++		img = my_draw_bitmap(bm->buffer + bm->w * b_y0 + brk,
+ 			b_x1 - brk, b_y1 - b_y0, bm->w,
+ 			dst_x + brk, dst_y + b_y0, color2);
+ 		*tail = img;
+@@ -455,6 +455,7 @@
+ 	cur_top = top-by;
+ 
+ 	// Query cache
++	memset(&hk, 0, sizeof(hk));
+ 	memcpy(&hk.a, last_hash, sizeof(*last_hash));
+ 	memcpy(&hk.b, hash, sizeof(*hash));
+ 	hk.aw = aw;
+@@ -540,7 +541,7 @@
+ 		pen_x = dst_x + info->pos.x;
+ 		pen_y = dst_y + info->pos.y;
+ 		bm = info->bm_o;
+-		
++
+ 		if ((info->effect_type == EF_KARAOKE_KO) && (info->effect_timing <= info->bbox.xMax)) {
+ 			// do nothing
+ 		} else {
+@@ -621,7 +622,7 @@
+ static void compute_string_bbox( text_info_t* info, FT_BBox *abbox ) {
+ 	FT_BBox bbox;
+ 	int i;
+-	
++
+ 	if (text_info.length > 0) {
+ 		bbox.xMin = 32000;
+ 		bbox.xMax = -32000;
+@@ -692,7 +693,7 @@
+ 
+ 	render_context.font = ass_font_new(priv->library, priv->ftlibrary, priv->fontconfig_priv, &desc);
+ 	free(desc.family);
+-	
++
+ 	if (render_context.font)
+ 		change_font_size(render_context.font_size);
+ }
+@@ -778,7 +779,7 @@
+  * \brief Calculate alpha value by piecewise linear function
+  * Used for \fad, \fade implementation.
+  */
+-static unsigned interpolate_alpha(long long now, 
++static unsigned interpolate_alpha(long long now,
+ 		long long t1, long long t2, long long t3, long long t4,
+ 		unsigned a1, unsigned a2, unsigned a3)
+ {
+@@ -811,7 +812,7 @@
+ static char* parse_tag(char* p, double pwr) {
+ #define skip_to(x) while ((*p != (x)) && (*p != '}') && (*p != 0)) { ++p;}
+ #define skip(x) if (*p == (x)) ++p; else { return p; }
+-	
++
+ 	skip_to('\\');
+ 	skip('\\');
+ 	if ((*p == '}') || (*p == 0))
+@@ -919,7 +920,7 @@
+ 			mystrtoll(&p, &t1);
+ 			skip(',');
+ 			mystrtoll(&p, &t2);
+-			mp_msg(MSGT_ASS, MSGL_DBG2, "movement6: (%f, %f) -> (%f, %f), (%" PRId64 " .. %" PRId64 ")\n", 
++			mp_msg(MSGT_ASS, MSGL_DBG2, "movement6: (%f, %f) -> (%f, %f), (%" PRId64 " .. %" PRId64 ")\n",
+ 				x1, y1, x2, y2, (int64_t)t1, (int64_t)t2);
+ 		} else {
+ 			t1 = 0;
+@@ -1111,7 +1112,7 @@
+ 			k = pow(((double)(t - t1)) / delta_t, v3);
  		}
  		while (*p == '\\')
- 			p = parse_tag(p, k); // maybe k*pwr ? no, specs forbid nested \t's 
--		skip_all(')'); // FIXME: better skip(')'), but much more tags support required
-+		skip_to(')'); // in case there is some unknown tag or a comment
-+		skip(')');
+-			p = parse_tag(p, k); // maybe k*pwr ? no, specs forbid nested \t's 
++			p = parse_tag(p, k); // maybe k*pwr ? no, specs forbid nested \t's
+ 		skip_to(')'); // in case there is some unknown tag or a comment
+ 		skip(')');
  	} else if (mystrcmp(&p, "clip")) {
- 		int x0, y0, x1, y1;
- 		int res = 1;
-@@ -1026,12 +1029,19 @@
- 			render_context.shadow = val;
- 		else
- 			render_context.shadow = render_context.style->Shadow;
-+	} else if (mystrcmp(&p, "pbo")) {
-+		(void)strtol(p, &p, 10); // ignored
-+	} else if (mystrcmp(&p, "p")) {
-+		int val;
-+		if (!mystrtoi(&p, 10, &val))
-+			val = 0;
-+		render_context.drawing_mode = !!val;
+@@ -1293,7 +1294,7 @@
+ 	while (cnt < 4 && (p = strchr(p, ';'))) {
+ 		v[cnt++] = atoi(++p);
  	}
- 
- 	return p;
- 
- #undef skip
--#undef skip_all
-+#undef skip_to
- }
- 
- /**
-@@ -1071,7 +1081,7 @@
- 			p += 2;
- 			*str = p;
- 			return '\n';
--		} else if (*(p+1) == 'n') {
-+		} else if ((*(p+1) == 'n') || (*(p+1) == 'h')) {
- 			p += 2;
- 			*str = p;
- 			return ' ';
-@@ -1201,6 +1211,7 @@
- 	render_context.clip_y1 = frame_context.track->PlayResY;
- 	render_context.detect_collisions = 1;
- 	render_context.fade = 0;
-+	render_context.drawing_mode = 0;
+-	
++
+ 	if (strncmp(event->Effect, "Banner;", 7) == 0) {
+ 		int delay;
+ 		if (cnt < 1) {
+@@ -1406,7 +1407,7 @@
  	render_context.effect_type = EF_NONE;
  	render_context.effect_timing = 0;
  	render_context.effect_skip_timing = 0;
-@@ -1748,7 +1759,9 @@
- 	while (1) {
- 		// get next char, executing style override
- 		// this affects render_context
--		code = get_next_char(&p);
-+		do {
-+			code = get_next_char(&p);
-+		} while (code && render_context.drawing_mode); // skip everything in drawing mode
- 		
+-	
++
+ 	apply_transition_effects(event);
+ }
+ 
+@@ -1429,6 +1430,7 @@
+ 	int error;
+ 	glyph_hash_val_t* val;
+ 	glyph_hash_key_t key;
++	memset(&key, 0, sizeof(key));
+ 	key.font = render_context.font;
+ 	key.size = render_context.font_size;
+ 	key.ch = symbol;
+@@ -1490,10 +1492,10 @@
+ {
+ 	bitmap_hash_val_t* val;
+ 	bitmap_hash_key_t* key = &info->hash_key;
+-	
++
+ 	val = cache_find_bitmap(key);
+ /* 	val = 0; */
+-	
++
+ 	if (val) {
+ 		info->bm = val->bm;
+ 		info->bm_o = val->bm_o;
+@@ -1600,8 +1602,8 @@
+ 			break_at = i;
+ 			mp_msg(MSGT_ASS, MSGL_DBG2, "forced line break at %d\n", break_at);
+ 		}
+-		
+-		if (len >= max_text_width) {
++
++		if ((len >= max_text_width) && (frame_context.track->WrapStyle != 2)) {
+ 			break_type = 1;
+ 			break_at = last_space;
+ 			if (break_at == -1)
+@@ -1617,7 +1619,7 @@
+ 			// marking break_at+1 as start of a new line
+ 			int lead = break_at + 1; // the first symbol of the new line
+ 			if (text_info.n_lines >= MAX_LINES) {
+-				// to many lines ! 
++				// to many lines !
+ 				// no more linebreaks
+ 				for (j = lead; j < text_info.length; ++j)
+ 					text_info.glyphs[j].linebreak = 0;
+@@ -1630,7 +1632,7 @@
+ 			s_offset = s1->bbox.xMin + s1->pos.x;
+ 			text_info.n_lines ++;
+ 		}
+-		
++
+ 		if (cur->symbol == ' ')
+ 			last_space = i;
+ 
+@@ -1676,11 +1678,11 @@
+ 			if (i == text_info.length)
+ 				break;
+ 		}
+-		
++
+ 	}
+ 	assert(text_info.n_lines >= 1);
+ #undef DIFF
+-	
++
+ 	measure_text();
+ 
+ 	pen_shift_x = 0;
+@@ -1704,7 +1706,7 @@
+  * \brief determine karaoke effects
+  * Karaoke effects cannot be calculated during parse stage (get_next_char()),
+  * so they are done in a separate step.
+- * Parse stage: when karaoke style override is found, its parameters are stored in the next glyph's 
++ * Parse stage: when karaoke style override is found, its parameters are stored in the next glyph's
+  * (the first glyph of the karaoke word)'s effect_type and effect_timing.
+  * This function:
+  * 1. sets effect_type for all glyphs in the word (_karaoke_ word)
+@@ -1873,12 +1875,13 @@
+ /**
+  * \brief Main ass rendering function, glues everything together
+  * \param event event to render
++ * \param event_images struct containing resulting images, will also be initialized
+  * Process event, appending resulting ass_image_t's to images_root.
+  */
+ static int ass_render_event(ass_event_t* event, event_images_t* event_images)
+ {
+ 	char* p;
+-	FT_UInt previous; 
++	FT_UInt previous;
+ 	FT_UInt num_glyphs;
+ 	FT_Vector pen;
+ 	unsigned code;
+@@ -1914,7 +1917,7 @@
+ 		do {
+ 			code = get_next_char(&p);
+ 		} while (code && render_context.drawing_mode); // skip everything in drawing mode
+-		
++
  		// face could have been changed in get_next_char
  		if (!render_context.font) {
-@@ -1934,7 +1947,7 @@
- 	if (render_context.evt_type == EVENT_POSITIONED) {
- 		int base_x = 0;
- 		int base_y = 0;
--		mp_msg(MSGT_ASS, MSGL_DBG2, "positioned event at %d, %d\n", render_context.pos_x, render_context.pos_y);
-+		mp_msg(MSGT_ASS, MSGL_DBG2, "positioned event at %f, %f\n", render_context.pos_x, render_context.pos_y);
- 		get_base_point(bbox, alignment, &base_x, &base_y);
- 		device_x = x2scr(render_context.pos_x) - base_x;
- 		device_y = y2scr(render_context.pos_y) - base_y;
+ 			free_render_context();
+@@ -1925,7 +1928,7 @@
+ 			break;
+ 
+ 		if (text_info.length >= MAX_GLYPHS) {
+-			mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_MAX_GLYPHS_Reached, 
++			mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_MAX_GLYPHS_Reached,
+ 					(int)(event - frame_context.track->events), event->Start, event->Duration, event->Text);
+ 			break;
+ 		}
+@@ -1951,14 +1954,14 @@
+ 				       &shift );
+ 
+ 		get_outline_glyph(code, text_info.glyphs + text_info.length, &shift);
+-		
++
+ 		text_info.glyphs[text_info.length].pos.x = pen.x >> 6;
+ 		text_info.glyphs[text_info.length].pos.y = pen.y >> 6;
+-		
++
+ 		pen.x += text_info.glyphs[text_info.length].advance.x;
+ 		pen.x += double_to_d6(render_context.hspacing);
+ 		pen.y += text_info.glyphs[text_info.length].advance.y;
+-		
++
+ 		previous = code;
+ 
+ 		text_info.glyphs[text_info.length].symbol = code;
+@@ -2005,23 +2008,23 @@
+ 		render_context.effect_timing = 0;
+ 		render_context.effect_skip_timing = 0;
+ 	}
+-	
++
+ 	if (text_info.length == 0) {
+ 		// no valid symbols in the event; this can be smth like {comment}
+ 		free_render_context();
+ 		return 1;
+ 	}
+-	
++
+ 	// depends on glyph x coordinates being monotonous, so it should be done before line wrap
+ 	process_karaoke_effects();
+-	
++
+ 	// alignments
+ 	alignment = render_context.alignment;
+ 	halign = alignment & 3;
+ 	valign = alignment & 12;
+ 
+-	MarginL = (event->MarginL) ? event->MarginL : render_context.style->MarginL; 
+-	MarginR = (event->MarginR) ? event->MarginR : render_context.style->MarginR; 
++	MarginL = (event->MarginL) ? event->MarginL : render_context.style->MarginL;
++	MarginR = (event->MarginR) ? event->MarginR : render_context.style->MarginR;
+ 	MarginV = (event->MarginV) ? event->MarginV : render_context.style->MarginV;
+ 
+ 	if (render_context.evt_type != EVENT_HSCROLL) {
+@@ -2061,12 +2064,12 @@
+ 	} else { // render_context.evt_type == EVENT_HSCROLL
+ 		measure_text();
+ 	}
+-	
++
+ 	// determing text bounding box
+ 	compute_string_bbox(&text_info, &bbox);
+-	
++
+ 	// determine device coordinates for text
+-	
++
+ 	// x coordinate for everything except positioned events
+ 	if (render_context.evt_type == EVENT_NORMAL ||
+ 	    render_context.evt_type == EVENT_VSCROLL) {
+@@ -2111,7 +2114,7 @@
+ 		device_x = x2scr_pos(render_context.pos_x) - base_x;
+ 		device_y = y2scr_pos(render_context.pos_y) - base_y;
+ 	}
+-	
++
+ 	// fix clip coordinates (they depend on alignment)
+ 	if (render_context.evt_type == EVENT_NORMAL ||
+ 	    render_context.evt_type == EVENT_HSCROLL ||
+@@ -2138,7 +2141,7 @@
+ 	// calculate rotation parameters
+ 	{
+ 		FT_Vector center;
+-		
++
+ 		if (render_context.have_origin) {
+ 			center.x = x2scr(render_context.org_x);
+ 			center.y = y2scr(render_context.org_y);
+@@ -2166,6 +2169,7 @@
+ 	for (i = 0; i < text_info.length; ++i)
+ 		get_bitmap_glyph(text_info.glyphs + i);
+ 
++	memset(event_images, 0, sizeof(*event_images));
+ 	event_images->top = device_y - d6_to_int(text_info.lines[0].asc);
+ 	event_images->height = d6_to_int(text_info.height);
+ 	event_images->detect_collisions = render_context.detect_collisions;
+@@ -2174,7 +2178,7 @@
+ 	event_images->imgs = render_text(&text_info, device_x, device_y);
+ 
+ 	free_render_context();
+-	
++
+ 	return 0;
+ }
+ 
+@@ -2300,7 +2304,7 @@
+ 
+ 	if (track->n_events == 0)
+ 		return 1; // nothing to do
+-	
++
+ 	frame_context.ass_priv = priv;
+ 	frame_context.width = global_settings->frame_width;
+ 	frame_context.height = global_settings->frame_height;
+@@ -2316,7 +2320,7 @@
+ 	frame_context.time = now;
+ 
+ 	ass_lazy_track_init();
+-	
++
+ 	frame_context.font_scale = global_settings->font_size_coeff *
+ 	                           frame_context.orig_height / frame_context.track->PlayResY;
+ 	if (frame_context.track->ScaledBorderAndShadow)
+@@ -2426,7 +2430,7 @@
+ 	fixed[*cnt].b = s->b + shift;
+ 	(*cnt)++;
+ 	qsort(fixed, *cnt, sizeof(segment_t), cmp_segment);
+-	
++
+ 	return shift;
+ }
+ 
+@@ -2481,7 +2485,7 @@
+ 			priv->top = imgs[i].top;
+ 			priv->height = imgs[i].height;
+ 		}
+-		
++
+ 	}
+ }
+ 
+@@ -2554,7 +2558,7 @@
+ 	int i, cnt, rc;
+ 	event_images_t* last;
+ 	ass_image_t** tail;
+-	
++
+ 	// init frame
+ 	rc = ass_start_frame(priv, track, now);
+ 	if (rc != 0)
+@@ -2600,7 +2604,7 @@
+ 
+ 	if (detect_change)
+ 		*detect_change = ass_detect_change(priv);
+-	
++
+ 	// free the previous image list
+ 	ass_free_images(priv->prev_images_root);
+ 	priv->prev_images_root = 0;
+diff -ruN libass-0.9.6-orig/libass/ass_types.h libass-0.9.6/libass/ass_types.h
+--- libass-0.9.6-orig/libass/ass_types.h	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_types.h	2009-06-16 15:39:33.000000000 +0200
+@@ -100,7 +100,7 @@
+ 	char* event_format; // event format line
+ 
+ 	enum {TRACK_TYPE_UNKNOWN = 0, TRACK_TYPE_ASS, TRACK_TYPE_SSA} track_type;
+-	
++
+ 	// script header fields
+ 	int PlayResX;
+ 	int PlayResY;
+@@ -108,7 +108,7 @@
+ 	int WrapStyle;
+ 	char ScaledBorderAndShadow;
+ 
+-	
++
+ 	int default_style; // index of default style
+ 	char* name; // file name in case of external subs, 0 for streams
+ 
+diff -ruN libass-0.9.6-orig/libass/ass_utils.c libass-0.9.6/libass/ass_utils.c
+--- libass-0.9.6-orig/libass/ass_utils.c	2009-03-13 18:37:09.000000000 +0100
++++ libass-0.9.6/libass/ass_utils.c	2009-06-16 15:39:33.000000000 +0200
+@@ -72,17 +72,17 @@
+ 	uint32_t color = 0;
+ 	int result;
+ 	char* p = *q;
+-	
+-	if (*p == '&') ++p; 
++
++	if (*p == '&') ++p;
+ 	else mp_msg(MSGT_ASS, MSGL_DBG2, "suspicious color format: \"%s\"\n", p);
+-	
+-	if (*p == 'H' || *p == 'h') { 
++
++	if (*p == 'H' || *p == 'h') {
+ 		++p;
+ 		result = mystrtou32(&p, 16, &color);
+ 	} else {
+ 		result = mystrtou32(&p, 0, &color);
+ 	}
+-	
++
+ 	{
+ 		unsigned char* tmp = (unsigned char*)(&color);
+ 		unsigned char b;
