@@ -112,7 +112,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* initialise the CMML responder interface */
-    p_dec->p_sys = OpenIntf( p_dec );
+    p_dec->p_sys = OpenIntf( VLC_OBJECT(p_dec) );
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = 0;
 
