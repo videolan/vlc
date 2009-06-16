@@ -2364,7 +2364,7 @@ static int InputSourceInit( input_thread_t *p_input,
             *p = '\0';
         /* Then URI-decode the path. */
         decode_URI( psz_path );
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
         /* Strip leading slash in front of the drive letter */
         psz_path++;
 #endif
