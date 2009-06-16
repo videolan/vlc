@@ -307,6 +307,9 @@ static void Run( intf_thread_t *p_intf )
     // cannot be called in "Close", because it refcounts skins2
     Dialogs::destroy( p_intf );
 
+    // save config file
+    config_SaveConfigFile( p_intf, NULL );
+
     vlc_restorecancel(canc);
 }
 
@@ -509,9 +512,11 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_file( "skins2-last", "", NULL, SKINS2_LAST, SKINS2_LAST_LONG,
               true )
+        change_safe ()
         change_autosave ()
     add_string( "skins2-config", "", NULL, SKINS2_CONFIG, SKINS2_CONFIG_LONG,
                 true )
+        change_safe ()
         change_autosave ()
         change_internal ()
 #ifdef WIN32
