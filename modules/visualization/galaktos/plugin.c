@@ -44,11 +44,23 @@
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
+
+#define WIDTH_TEXT N_("Video width")
+#define WIDTH_LONGTEXT N_("The width of the video window, in pixels.")
+
+#define HEIGHT_TEXT N_("Video height")
+#define HEIGHT_LONGTEXT N_("The height of the video window, in pixels.")
+
+
 vlc_module_begin ()
     set_description( N_("GaLaktos visualization") )
     set_capability( "visualization", 0 )
     set_callbacks( Open, Close )
     add_shortcut( "galaktos" )
+    add_integer( "galaktos-width", 640, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,
+                 false )
+    add_integer( "galaktos-height", 480, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
+                 false )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -102,17 +114,11 @@ static int Open( vlc_object_t *p_this )
         vlc_object_create( p_filter, sizeof( galaktos_thread_t ) );
     vlc_object_attach( p_thread, p_this );
 
-/*
-    var_Create( p_thread, "galaktos-width", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_thread, "galaktos-width", &width );
-    var_Create( p_thread, "galaktos-height", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_thread, "galaktos-height", &height );
-*/
     p_thread->i_cur_sample = 0;
     bzero( p_thread->p_data, 2*2*512 );
 
-    p_thread->i_width = 600;
-    p_thread->i_height = 600;
+    p_thread->i_width = var_CreateGetInteger( p_thread, "galaktos-width" );
+    p_thread->i_height = var_CreateGetInteger( p_thread, "galaktos-height" );
     p_thread->b_fullscreen = 0;
     galaktos_init( p_thread );
 
