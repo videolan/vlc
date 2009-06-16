@@ -826,9 +826,6 @@ if test "${THREAD_LIB}" = "error"; then
   AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
 fi
 if test "${THREAD_LIB}" = "error"; then
-  AC_CHECK_LIB(pthread,main,THREAD_LIB="-pthread")
-fi
-if test "${THREAD_LIB}" = "error"; then
   AC_CHECK_FUNCS(pthread_mutex_lock)
   THREAD_LIB=""
 fi
