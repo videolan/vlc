@@ -68,7 +68,12 @@ struct demux_sys_t
     mtime_t i_pts_offset_lowtide;
     es_out_id_t *p_es;
 
-    bool b_first;
+    enum {
+        /* demuxer states, do not reorder (++ is used) */
+        DIRAC_DEMUX_DISCONT = 0, /* signal a discontinuity to packetizer */
+        DIRAC_DEMUX_FIRST, /* provide an origin timestamp for the packetizer */
+        DIRAC_DEMUX_STEADY, /* normal operation */
+    } i_state;
 
     decoder_t *p_packetizer;
 };
@@ -105,7 +110,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys ) return VLC_ENOMEM;
 
     p_sys->i_pts_offset_lowtide = INT64_MAX;
-    p_sys->b_first = true;
+    p_sys->i_state = DIRAC_DEMUX_FIRST;
 
     p_sys->i_dtsoffset = var_CreateGetInteger( p_demux, DEMUX_CFG_PREFIX DEMUX_DTSOFFSET );
 
@@ -150,30 +155,34 @@ static int Demux( demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block_in, *p_block_out;
 
-    if( ( p_block_in = stream_Block( p_demux->s, DIRAC_PACKET_SIZE ) ) == NULL )
+    if( p_sys->i_state == DIRAC_DEMUX_DISCONT )
     {
-        return 0;
-    }
-
-    if( p_sys->b_first )
-    {
-        p_sys->b_first = false;
-        /* by default, timestamps are invalid.
-         * Except when we need an anchor point */
-#if VLC_TS_INVALID == 0
-        /* xxx: to be removed in 1.1 */
-        p_block_in->i_dts = 1;
-#else
-        p_block_in->i_dts = 0;
-#endif
-
-        block_t *p_null = block_Alloc( 128 );
-        if( p_null )
+        p_sys->i_state++;
+        p_block_in = block_Alloc( 128 );
+        if( p_block_in )
         {
-            p_null->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
-            p_null->p_next = p_block_in;
+            p_block_in->i_flags = BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED;
         }
-        p_block_in = p_null;
+    }
+    else
+    {
+        p_block_in = stream_Block( p_demux->s, DIRAC_PACKET_SIZE );
+        if( !p_block_in )
+        {
+            return 0;
+        }
+        if ( p_sys->i_state == DIRAC_DEMUX_FIRST)
+        {
+            p_sys->i_state++;
+            /* by default, timestamps are invalid.
+             * Except when we need an anchor point */
+#if VLC_TS_INVALID == 0
+            /* xxx: to be removed in 1.1 */
+            p_block_in->i_dts = 1;
+#else
+            p_block_in->i_dts = 0;
+#endif
+        }
     }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in )) )
@@ -233,7 +242,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         if( DEMUX_SET_POSITION == i_query || DEMUX_SET_TIME == i_query )
         {
-            p_sys->b_first = true;
+            p_sys->i_state = DIRAC_DEMUX_DISCONT;
         }
         return demux_vaControlHelper( p_demux->s, 0, -1, 0, 1, i_query, args );
     }
