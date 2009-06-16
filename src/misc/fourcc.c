@@ -965,6 +965,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_MLP, "MLP/TrueHD Audio"),
         A("mlp "),
 
+    B(VLC_CODEC_TRUEHD, "TrueHD Audio"),
+        A("trhd"),
+
     B(VLC_CODEC_QCELP, "QCELP Audio"),
         A("Qclp"),
 
