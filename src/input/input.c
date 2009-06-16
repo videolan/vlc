@@ -2350,7 +2350,12 @@ static int InputSourceInit( input_thread_t *p_input,
      * for non-standard VLC-specific schemes. */
     if( !strcmp( psz_access, "file" ) )
     {
-        if( psz_path[0] != '/' )
+        if( psz_path[0] != '/'
+#if (DIR_SEP_CHAR != '/')
+            /* We accept invalid URIs too. */
+            && psz_path[0] != DIR_SEP_CHAR
+#endif
+          )
         {   /* host specified -> not supported currently */
             msg_Err( p_input, "cannot open remote file `%s://%s'",
                      psz_access, psz_path );
