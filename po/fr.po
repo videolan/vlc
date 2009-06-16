@@ -12195,22 +12195,22 @@ msgstr "+-[Entrée]"
 #: modules/control/rc.c:2006 modules/gui/ncurses.c:2001
 #, c-format
 msgid "| input bytes read : %8.0f kB"
-msgstr "| octets lus en entrée : %8.0f kO"
+msgstr "| octets lus en entrée : %8.0f ko"
 
 #: modules/control/rc.c:2008 modules/gui/ncurses.c:2004
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
-msgstr "| débit en entrée      : %6.0f kO/s"
+msgstr "| débit en entrée      : %6.0f kb/s"
 
 #: modules/control/rc.c:2010 modules/gui/ncurses.c:2006
 #, c-format
 msgid "| demux bytes read : %8.0f kB"
-msgstr "| octets lus en demux  : %8.0f kO"
+msgstr "| octets lus en demux  : %8.0f ko"
 
 #: modules/control/rc.c:2012 modules/gui/ncurses.c:2009
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
-msgstr "| debit en demux       : %6.0f kO/s"
+msgstr "| debit en demux       : %6.0f kb/s"
 
 #: modules/control/rc.c:2016 modules/gui/ncurses.c:2019
 msgid "+-[Video Decoding]"
@@ -12262,12 +12262,12 @@ msgstr "| paquets envoyés      : %5i"
 #: modules/control/rc.c:2036 modules/gui/ncurses.c:2060
 #, c-format
 msgid "| bytes sent       : %8.0f kB"
-msgstr "| octets envoyés       : %8.0f kO"
+msgstr "| octets envoyés       : %8.0f ko"
 
 #: modules/control/rc.c:2038
 #, c-format
 msgid "| sending bitrate  :   %6.0f kb/s"
-msgstr "| débit émission       : %6.0f kO/s"
+msgstr "| débit émission       : %6.0f kb/s"
 
 #: modules/control/showintf.c:66
 msgid "Threshold"
