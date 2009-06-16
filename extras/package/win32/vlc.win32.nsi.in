@@ -577,10 +577,10 @@ Section $Name_Section05 SEC06
   SectionIn 1 2 3
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
-    '"$INSTDIR\vlc.exe" --started-from-file "cdda://%1"'
+    '"$INSTDIR\vlc.exe" --started-from-file cdda://%1'
   WriteRegStr HKCR "DVD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR "DVD\shell\PlayWithVLC\command" "" \
-    '"$INSTDIR\vlc.exe" --started-from-file "dvd://%1"'
+    '"$INSTDIR\vlc.exe" --started-from-file dvd://%1'
 
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayDVDMovieOnArrival" "VLCPlayDVDMovieOnArrival" ""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayDVDMovieOnArrival" "Action" $Action_OnArrivalDVD
@@ -598,12 +598,12 @@ Section $Name_Section05 SEC06
   WriteRegStr HKCR "VLC.DVDMovie" "" "VLC DVD Movie"
   WriteRegStr HKCR "VLC.DVDMovie\shell" "" "Play"
   WriteRegStr HKCR "VLC.DVDMovie\shell\Play\command" "" \
-    '"$INSTDIR\vlc.exe" --started-from-file "dvd://%1"'
+    '"$INSTDIR\vlc.exe" --started-from-file dvd://%1'
   WriteRegStr HKCR "VLC.DVDMovie\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
   WriteRegStr HKCR "VLC.CDAudio" "" "VLC CD Audio"
   WriteRegStr HKCR "VLC.CDAudio\shell" "" "Play"
   WriteRegStr HKCR "VLC.CDAudio\shell\Play\command" "" \
-    '"$INSTDIR\vlc.exe" --started-from-file "cdda://%1"'
+    '"$INSTDIR\vlc.exe" --started-from-file cdda://%1'
   WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 SectionEnd
