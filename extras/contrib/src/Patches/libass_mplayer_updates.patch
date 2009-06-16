@@ -1,6 +1,6 @@
 diff -ruN libass-0.9.6-orig/libass/ass.c libass-0.9.6/libass/ass.c
 --- libass-0.9.6-orig/libass/ass.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass.c	2009-06-16 15:40:50.000000000 +0200
++++ libass-0.9.6/libass/ass.c	2009-06-16 20:08:04.000000000 +0200
 @@ -56,7 +56,7 @@
  
  void ass_free_track(ass_track_t* track) {
@@ -337,7 +337,7 @@ diff -ruN libass-0.9.6-orig/libass/ass.c libass-0.9.6/libass/ass.c
  	i += movement;
 diff -ruN libass-0.9.6-orig/libass/ass.h libass-0.9.6/libass/ass.h
 --- libass-0.9.6-orig/libass/ass.h	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass.h	2009-06-16 15:40:50.000000000 +0200
++++ libass-0.9.6/libass/ass.h	2009-06-16 20:08:04.000000000 +0200
 @@ -195,7 +195,7 @@
   * \param bufsize size of buffer
   * \param codepage recode buffer contents from given codepage
@@ -349,7 +349,7 @@ diff -ruN libass-0.9.6-orig/libass/ass.h libass-0.9.6/libass/ass.h
   * \brief read styles from file into already initialized track
 diff -ruN libass-0.9.6-orig/libass/ass_bitmap.c libass-0.9.6/libass/ass_bitmap.c
 --- libass-0.9.6-orig/libass/ass_bitmap.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_bitmap.c	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_bitmap.c	2009-06-16 20:08:04.000000000 +0200
 @@ -237,7 +237,7 @@
  	unsigned char* g = bm_g->buffer + (t - bm_g->top) * bm_g->w + (l - bm_g->left);
  	unsigned char* o = bm_o->buffer + (t - bm_o->top) * bm_o->w + (l - bm_o->left);
@@ -370,7 +370,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_bitmap.c libass-0.9.6/libass/ass_bitmap.c
  			if (*bm_o)
 diff -ruN libass-0.9.6-orig/libass/ass_cache.c libass-0.9.6/libass/ass_cache.c
 --- libass-0.9.6-orig/libass/ass_cache.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_cache.c	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_cache.c	2009-06-16 20:08:04.000000000 +0200
 @@ -117,7 +117,7 @@
  	if (map->count > 0 || map->hit_count + map->miss_count > 0)
  		mp_msg(MSGT_ASS, MSGL_V, "cache statistics: \n  total accesses: %d\n  hits: %d\n  misses: %d\n  object count: %d\n",
@@ -400,7 +400,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_cache.c libass-0.9.6/libass/ass_cache.c
  	return hashmap_find(glyph_cache, key);
 diff -ruN libass-0.9.6-orig/libass/ass_cache.h libass-0.9.6/libass/ass_cache.h
 --- libass-0.9.6-orig/libass/ass_cache.h	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_cache.h	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_cache.h	2009-06-16 20:08:04.000000000 +0200
 @@ -49,7 +49,7 @@
  	int shift_x, shift_y; // shift vector that was added to glyph before applying rotation
  	                      // = 0, if frx = fry = frx = 0
@@ -421,8 +421,8 @@ diff -ruN libass-0.9.6-orig/libass/ass_cache.h libass-0.9.6/libass/ass_cache.h
  typedef unsigned (*hashmap_hash_t)(void* key, size_t key_size);
 diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
 --- libass-0.9.6-orig/libass/ass_font.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_font.c	2009-06-16 15:39:33.000000000 +0200
-@@ -121,10 +121,10 @@
++++ libass-0.9.6/libass/ass_font.c	2009-06-16 20:10:45.000000000 +0200
+@@ -121,12 +121,14 @@
  	FT_Face face;
  	int error;
  	int mem_idx;
@@ -434,8 +434,12 @@ diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
 +
  	path = fontconfig_select(fc_priv, font->desc.family, font->desc.treat_family_as_pattern, font->desc.bold,
  					      font->desc.italic, &index, ch);
++	if (!path)
++		return -1;
  
-@@ -145,7 +145,7 @@
+ 	mem_idx = find_font(font->library, path);
+ 	if (mem_idx >= 0) {
+@@ -145,7 +147,7 @@
  	}
  	charmap_magic(face);
  	buggy_font_workaround(face);
@@ -444,7 +448,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
  	font->faces[font->n_faces++] = face;
  	update_transform(font);
  	face_set_size(face, font->size);
-@@ -164,7 +164,7 @@
+@@ -164,7 +166,7 @@
  	fontp = ass_font_cache_find(desc);
  	if (fontp)
  		return fontp;
@@ -453,7 +457,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
  	font.library = library;
  	font.ftlibrary = ftlibrary;
  	font.n_faces = 0;
-@@ -256,7 +256,7 @@
+@@ -256,7 +258,7 @@
  			return;
  		}
  	}
@@ -462,7 +466,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
  	*asc = *desc = 0;
  }
  
-@@ -308,18 +308,18 @@
+@@ -308,18 +310,18 @@
  	case ASS_HINTING_NORMAL: flags = FT_LOAD_FORCE_AUTOHINT; break;
  	case ASS_HINTING_NATIVE: flags = 0; break;
  	}
@@ -484,7 +488,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
  			(font->desc.italic > 55)) {
  		FT_GlyphSlot_Oblique(face->glyph);
  	}
-@@ -329,7 +329,7 @@
+@@ -329,7 +331,7 @@
  		mp_msg(MSGT_ASS, MSGL_WARN, MSGTR_LIBASS_ErrorLoadingGlyph);
  		return 0;
  	}
@@ -495,7 +499,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_font.c libass-0.9.6/libass/ass_font.c
  
 diff -ruN libass-0.9.6-orig/libass/ass_fontconfig.c libass-0.9.6/libass/ass_fontconfig.c
 --- libass-0.9.6-orig/libass/ass_fontconfig.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_fontconfig.c	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_fontconfig.c	2009-06-16 20:08:04.000000000 +0200
 @@ -72,7 +72,7 @@
   * \param index out: font index inside a file
   * \param code: the character that should be present in the font, can be 0
@@ -637,7 +641,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_fontconfig.c libass-0.9.6/libass/ass_font
  	return priv;
 diff -ruN libass-0.9.6-orig/libass/ass_library.c libass-0.9.6/libass/ass_library.c
 --- libass-0.9.6-orig/libass/ass_library.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_library.c	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_library.c	2009-06-16 20:08:04.000000000 +0200
 @@ -62,13 +62,13 @@
  	char** p;
  	char** q;
@@ -675,7 +679,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_library.c libass-0.9.6/libass/ass_library
  
 diff -ruN libass-0.9.6-orig/libass/ass_render.c libass-0.9.6/libass/ass_render.c
 --- libass-0.9.6-orig/libass/ass_render.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_render.c	2009-06-16 15:40:50.000000000 +0200
++++ libass-0.9.6/libass/ass_render.c	2009-06-16 20:08:04.000000000 +0200
 @@ -119,7 +119,7 @@
  	double blur; // gaussian blur
  	double shadow;
@@ -1142,7 +1146,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_render.c libass-0.9.6/libass/ass_render.c
  	priv->prev_images_root = 0;
 diff -ruN libass-0.9.6-orig/libass/ass_types.h libass-0.9.6/libass/ass_types.h
 --- libass-0.9.6-orig/libass/ass_types.h	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_types.h	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_types.h	2009-06-16 20:08:04.000000000 +0200
 @@ -100,7 +100,7 @@
  	char* event_format; // event format line
  
@@ -1163,7 +1167,7 @@ diff -ruN libass-0.9.6-orig/libass/ass_types.h libass-0.9.6/libass/ass_types.h
  
 diff -ruN libass-0.9.6-orig/libass/ass_utils.c libass-0.9.6/libass/ass_utils.c
 --- libass-0.9.6-orig/libass/ass_utils.c	2009-03-13 18:37:09.000000000 +0100
-+++ libass-0.9.6/libass/ass_utils.c	2009-06-16 15:39:33.000000000 +0200
++++ libass-0.9.6/libass/ass_utils.c	2009-06-16 20:08:04.000000000 +0200
 @@ -72,17 +72,17 @@
  	uint32_t color = 0;
  	int result;
