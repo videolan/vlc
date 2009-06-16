@@ -2530,7 +2530,7 @@ libass-$(ASS_VERSION).tar.bz2:
 # mplayer patches up to August 8, 2008 are included
 libass: libass-$(ASS_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p0 < Patches/libass_mplayer_updates.patch
+	(cd $@; patch -p1 < ../Patches/libass_mplayer_updates.patch)
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
 	(cd $@; autoreconf; automake)
