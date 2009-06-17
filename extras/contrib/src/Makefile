@@ -2317,7 +2317,7 @@ yasm: yasm-$(YASM_VERSION).tar.gz
 
 CLEAN_FILE += .yasm
 CLEAN_PKG += yasm
-DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.bz2
+DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.gz
 
 # ***************************************************************************
 # kate
