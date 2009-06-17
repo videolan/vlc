@@ -152,19 +152,11 @@ FFMPEGCONF += --arch=$(ARCH)
 FFMPEGCONF += --disable-libfaac
 ifdef HAVE_DARWIN_10
 FFMPEGCONF += --cpu=core2
+X264CONF+=--host=x86_64-apple-darwin10
 endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEG_CFLAGS += -DHAVE_LRINTF
 endif
-ifndef HAVE_DARWIN_10
-NONLLVMCC+= CC="/Developer/usr/bin/gcc-4.2"
-NONLLVMCC+= CXX="/Developer/usr/bin/g++-4.2"
-else
-X264CONF+=--host=x86_64-apple-darwin10
-NONLLVMCC+= $(HOSTCC)
-endif
-else
-NONLLVMCC+= $(HOSTCC)
 endif
 
 ifdef HAVE_AMR
@@ -1343,7 +1335,7 @@ endif
 
 .goom2k4: goom
 ifdef HAVE_DARWIN_OS
-	(cd $<; $(NONLLVMCC) ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 else
 	(cd $< && rm -f configure; aclocal -I m4/ && automake --add-missing && autoconf configure.in > configure && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
 endif
@@ -1446,10 +1438,10 @@ ifdef HAVE_WIN32
 else
 ifdef HAVE_DARWIN_OS_ON_INTEL
   .x264: x264 .yasm
-	(cd $<; $(NONLLVMCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 else
   .x264: x264
-	(cd $<; $(NONLLVMCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(X264CONF) --prefix="$(PREFIX)" && make && make install)
 endif
 endif
 	touch $@

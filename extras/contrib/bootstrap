@@ -134,8 +134,8 @@ case $HOST in
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -arch ppc -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET} -Wl,-syslibroot,\${MACOSX_SDK}"
-        CC="/Developer/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
-        CXX="/Developer/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
+        CC="/Developer/usr/bin/gcc-4.2"
+        CXX="/Developer/usr/bin/g++-4.2"
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin:" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
@@ -162,8 +162,8 @@ case $HOST in
         CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -arch i386 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        CC="/Developer/usr/llvm-gcc-4.2/bin/llvm-gcc-4.2"
-        CXX="/Developer/usr/llvm-gcc-4.2/bin/llvm-g++-4.2"
+        CC="/Developer/usr/bin/gcc-4.2"
+        CXX="/Developer/usr/bin/g++-4.2"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         cat src/Distributions/darwin.mak >> distro.mak
         if test -e /Developer/SDKs; then
@@ -352,8 +352,8 @@ if test $HAVE_DARWIN_9; then
     set +x
     echo
     echo "*****************************************************************"
-    echo "* We are using both the llvm-gcc-4.2 and the gcc-4.2 compilers  *"
-    echo "* on OS X, so compilation will fail if these are not installed. *"
+    echo "* We are using GCC-4.2 on OS X, so compilation WILL FAIL if it  *"
+    echo "* is NOT installed. *"
     echo "*****************************************************************"
 fi
 
@@ -362,10 +362,8 @@ if test $HAVE_DARWIN_10; then
     echo
     echo "*****************************************************************"
     echo "* You are running Darwin 10.                                    *"
-    echo "* For testing purposes, VLC will be compiled in 64bit mode.     *"
-    echo "* While doing so, for the time being, the 10.5 SDK is used.     *"
-    echo "* Note that in contrast to our Darwin 9 builds, we are not      *"
-    echo "* using the llvm compiler, but GCC 4.2.                         *"
+    echo "* For testing purposes, VLC will be compiled in 64bit mode      *"
+    echo "* using the 10.5 SDK for backward-compatibility.                *"
     echo "*****************************************************************"
     set -x
 fi
