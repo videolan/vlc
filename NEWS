@@ -8,6 +8,9 @@ Playlist:
  * WPL playlist support
  * ZPL playlist support
 
+Audio filters:
+ * Chorus/Flanger audio filter
+
 
 Changes between 0.9.9a and 1.0.0:
 ---------------------------------
