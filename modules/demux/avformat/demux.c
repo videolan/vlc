@@ -535,7 +535,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = (double) va_arg( args, double );
-            i64 = stream_Tell( p_demux->s );
             if( p_sys->i_pcr > 0 )
             {
                 i64 = p_sys->ic->duration * f;
@@ -550,12 +549,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     (av_seek_frame( p_sys->ic, -1, i64, 0 ) < 0) )
                 {
                     int64_t i_size = stream_Size( p_demux->s );
+                    i64 = (i_size * f);
 
                     msg_Warn( p_demux, "DEMUX_SET_BYTE_POSITION: %"PRId64, i64 );
-                    if( av_seek_frame( p_sys->ic, -1, (i_size * f), AVSEEK_FLAG_BYTE ) < 0 )
+                    if( av_seek_frame( p_sys->ic, -1, i64, AVSEEK_FLAG_BYTE ) < 0 )
                         return VLC_EGENERIC;
                 }
-                UpdateSeekPoint( p_demux, i64 );
+                else
+                {
+                    UpdateSeekPoint( p_demux, i64 );
+                }
                 p_sys->i_pcr = -1; /* Invalidate time display */
             }
             return VLC_SUCCESS;
