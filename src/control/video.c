@@ -577,7 +577,7 @@ void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
         vlc_value_t val = val_list.p_list->p_values[i];
         if( i_track == val.i_int )
         {
-            i_ret = var_Set( p_input_thread, "audio-es", val );
+            i_ret = var_Set( p_input_thread, "video-es", val );
             if( i_ret < 0 )
                 libvlc_exception_raise( p_e, "Setting video track failed" );
             goto end;
