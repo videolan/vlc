@@ -656,8 +656,8 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
 /**********************************************************************
  * Fullscrenn control widget
  **********************************************************************/
-FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i )
-                           : AbstractController( _p_i )
+FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWidget *_parent )
+                           : AbstractController( _p_i, _parent )
 {
     i_mouse_last_x      = -1;
     i_mouse_last_y      = -1;
@@ -897,12 +897,14 @@ void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 {
     i_mouse_last_x = event->globalX();
     i_mouse_last_y = event->globalY();
+    event->accept();
 }
 
 void FullscreenControllerWidget::mouseReleaseEvent( QMouseEvent *event )
 {
     i_mouse_last_x = -1;
     i_mouse_last_y = -1;
+    event->accept();
 }
 
 /**
