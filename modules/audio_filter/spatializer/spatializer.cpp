@@ -34,6 +34,9 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <math.h>
 
+#include <new>
+using std::nothrow;
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -87,7 +90,6 @@ struct aout_filter_sys_t
 {
     vlc_mutex_t lock;
     revmodel *p_reverbm;
-
 };
 
 class CLocker
@@ -134,9 +136,6 @@ enum { num_callbacks=sizeof(callbacks)/sizeof(callback_s) };
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
-static void SpatFilter( aout_instance_t *,aout_filter_t *, float *, float *,
-                        int, int );
-
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -179,8 +178,11 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_sys->lock );
 
-    /* Init the variables *//* Add the callbacks */
-    p_sys->p_reverbm = new revmodel();
+    /* Force new to return 0 on failure instead of throwing, since we don't
+       want an exception to leak back to C code. Bad things would happen. */
+    p_sys->p_reverbm = new (nothrow) revmodel;
+    if( !p_sys->p_reverbm )
+        return VLC_ENOMEM;
 
     for(unsigned i=0;i<num_callbacks;++i)
     {
@@ -217,22 +219,13 @@ static void Close( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * DoWork: process samples buffer
+ * SpatFilter: process samples buffer
+ * DoWork: call SpatFilter
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
-{
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
-    SpatFilter( p_aout, p_filter, (float*)p_out_buf->p_buffer,
-               (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
-               aout_FormatNbChannels( &p_filter->input ) );
-}
-
-static void SpatFilter( aout_instance_t *p_aout,
-                       aout_filter_t *p_filter, float *out, float *in,
-                       int i_samples, int i_channels )
+static inline
+void SpatFilter( aout_instance_t *p_aout, aout_filter_t *p_filter,
+                 float *out, float *in, int i_samples, int i_channels )
 {
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     CLocker locker( &p_sys->lock );
@@ -248,6 +241,17 @@ static void SpatFilter( aout_instance_t *p_aout,
         in  += i_channels;
         out += i_channels;
     }
+}
+
+static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+{
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+
+    SpatFilter( p_aout, p_filter, (float*)p_out_buf->p_buffer,
+               (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
+               aout_FormatNbChannels( &p_filter->input ) );
 }
 
 
