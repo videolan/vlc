@@ -95,8 +95,6 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define TITLE_LONGTEXT N_( "Show the name of the song or video in the " \
                            "controler window title." )
 
-#define FILEDIALOG_PATH_TEXT N_( "Path to use in openfile dialog" )
-
 #define NOTIFICATION_TEXT N_( "Show notification popup on track change" )
 #define NOTIFICATION_LONGTEXT N_( \
     "Show a notification popup with the artist and track name when " \
@@ -198,10 +196,6 @@ vlc_module_begin ()
               COMPLETEVOL_LONGTEXT, true )
     add_bool( "qt-autosave-volume", false, NULL, SAVEVOL_TEXT,
               SAVEVOL_TEXT, true )
-    add_string( "qt-filedialog-path", NULL, NULL, FILEDIALOG_PATH_TEXT,
-                FILEDIALOG_PATH_TEXT, true )
-        change_autosave ()
-        change_internal ()
 
     add_bool( "qt-embedded-open", false, NULL, QT_NATIVEOPEN_TEXT,
                QT_NATIVEOPEN_TEXT, false )
@@ -446,12 +440,8 @@ static void *Thread( void *obj )
     app.setQuitOnLastWindowClosed( false );
 
     /* Retrieve last known path used in file browsing */
-    {
-        char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
-        p_intf->p_sys->filepath =
-            EMPTY_STR( psz_path ) ? config_GetHomeDir() : qfu( psz_path );
-        free( psz_path );
-    }
+    p_intf->p_sys->filepath =
+         getSettings()->value( "filedialog-path", config_GetHomeDir() ).toString();
 
     /* Launch */
     app.exec();
@@ -482,6 +472,9 @@ static void *Thread( void *obj )
     /* Delete the recentsMRL object before the configuration */
     RecentsMRL::killInstance();
 
+    /* Save the path */
+    getSettings()->setValue( "filedialog-path", p_intf->p_sys->filepath );
+
     /* Delete the configuration. Application has to be deleted after that. */
     delete p_intf->p_sys->mainSettings;
 
@@ -489,10 +482,6 @@ static void *Thread( void *obj )
     MainInputManager::killInstance();
 
 
-    /* Save the path */
-    config_PutPsz( p_intf->p_libvlc, "qt-filedialog-path",
-                   qtu( p_intf->p_sys->filepath ) );
-    msg_Dbg( p_intf, "%s", qtu( p_intf->p_sys->filepath ) );
 
     /* Delete the application automatically */
 #ifdef Q_WS_X11
