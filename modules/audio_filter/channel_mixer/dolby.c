@@ -1,24 +1,24 @@
 /*****************************************************************************
  * dolby.c : simple decoder for dolby surround encoded streams
  *****************************************************************************
- * Copyright (C) 2005, 2006 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -81,6 +81,7 @@ static int Create( vlc_object_t *p_this )
     int i = 0;
     int i_offset = 0;
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    aout_filter_sys_t *p_sys;
 
     /* Validate audio filter format */
     if ( p_filter->input.i_physical_channels != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
@@ -104,15 +105,15 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
-    if ( p_filter->p_sys == NULL )
+    p_sys = p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
-    p_filter->p_sys->i_left = -1;
-    p_filter->p_sys->i_center = -1;
-    p_filter->p_sys->i_right = -1;
-    p_filter->p_sys->i_rear_left = -1;
-    p_filter->p_sys->i_rear_center = -1;
-    p_filter->p_sys->i_rear_right = -1;
+    p_sys->i_left = -1;
+    p_sys->i_center = -1;
+    p_sys->i_right = -1;
+    p_sys->i_rear_left = -1;
+    p_sys->i_rear_center = -1;
+    p_sys->i_rear_right = -1;
 
     while ( pi_channels[i] )
     {
@@ -121,22 +122,22 @@ static int Create( vlc_object_t *p_this )
             switch ( pi_channels[i] )
             {
                 case AOUT_CHAN_LEFT:
-                    p_filter->p_sys->i_left = i_offset;
+                    p_sys->i_left = i_offset;
                     break;
                 case AOUT_CHAN_CENTER:
-                    p_filter->p_sys->i_center = i_offset;
+                    p_sys->i_center = i_offset;
                     break;
                 case AOUT_CHAN_RIGHT:
-                    p_filter->p_sys->i_right = i_offset;
+                    p_sys->i_right = i_offset;
                     break;
                 case AOUT_CHAN_REARLEFT:
-                    p_filter->p_sys->i_rear_left = i_offset;
+                    p_sys->i_rear_left = i_offset;
                     break;
                 case AOUT_CHAN_REARCENTER:
-                    p_filter->p_sys->i_rear_center = i_offset;
+                    p_sys->i_rear_center = i_offset;
                     break;
                 case AOUT_CHAN_REARRIGHT:
-                    p_filter->p_sys->i_rear_right = i_offset;
+                    p_sys->i_rear_right = i_offset;
                     break;
             }
             ++i_offset;
