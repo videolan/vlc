@@ -67,6 +67,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     view->setIconSize( QSize( 20, 20 ) );
     view->setAlternatingRowColors( true );
     view->setAnimated( true );
+    view->setSelectionBehavior( QAbstractItemView::SelectRows );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
     view->setDragEnabled( true );
     view->setAcceptDrops( true );
@@ -240,7 +241,10 @@ void StandardPLPanel::popupAdd()
     if( currentRootId == THEPL->p_local_category->i_id ||
         currentRootId == THEPL->p_local_onelevel->i_id )
     {
-        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(PLAppendDialog()) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(PLAppendDialog( OPEN_FILE_TAB )) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(PLAppendDialog( OPEN_DISC_TAB )) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(PLAppendDialog( OPEN_NETWORK_TAB )) );
+        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT(PLAppendDialog( OPEN_FILE_TAB )) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
     }
     else if( ( THEPL->p_ml_category &&

@@ -101,8 +101,10 @@ public:
     {
         if( e->button() & Qt::RightButton )
         {
-            emit rightClicked( indexAt( QPoint( e->x(), e->y() ) ),
-                               QCursor::pos() );
+            QModelIndex index = indexAt( QPoint( e->x(), e->y() ) );
+            if( index.isValid() )
+                setSelection( visualRect( index ), QItemSelectionModel::ClearAndSelect );
+            emit rightClicked( index, QCursor::pos() );
             return;
         }
         if( e->button() & Qt::LeftButton )
