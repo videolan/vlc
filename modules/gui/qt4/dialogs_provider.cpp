@@ -301,6 +301,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         i = 0;
         foreach( const QString &file, files )
             p_arg->psz_results[i++] = strdup( qtu( toNativeSepNoSlash( file ) ) );
+        p_intf->p_sys->filepath = qfu( p_arg->psz_results[i] );
     }
 
     /* Callback */

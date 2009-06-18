@@ -490,8 +490,9 @@ static void *Thread( void *obj )
 
 
     /* Save the path */
-    config_PutPsz( p_intf, "qt-filedialog-path",
+    config_PutPsz( p_intf->p_libvlc, "qt-filedialog-path",
                    qtu( p_intf->p_sys->filepath ) );
+    msg_Dbg( p_intf, "%s", qtu( p_intf->p_sys->filepath ) );
 
     /* Delete the application automatically */
 #ifdef Q_WS_X11
