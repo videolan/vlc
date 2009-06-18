@@ -136,6 +136,7 @@ Harris Dugal <dugalh at protoclea dot. co dot za > - ActiveX bug fixes
 Harry Sintonen <sintonen at iki.fi> - fix for MKV demuxer
 Igor Helman - VLM msecseek command
 Ilkka Ollakka - SDP bitrate patch, various VLM fixes, transcode afilter/vfilter fix, qt4 interface patches
+Isaac Osunkunle - <osunkunle - at - gmail d0t com> - Spatializer (GSoc 2007)
 Ivo Ivanov <bestran at mail dot bg> - Bulgarian translation
 Jamil Ahmed <itsjamil at gmail dot com> - Bengali translation
 Jan David Mol <jjdmol at gmail.com> - Suggested some flags for ffmpeg building
