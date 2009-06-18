@@ -2481,11 +2481,14 @@ static int InputSourceInit( input_thread_t *p_input,
         in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
         if( in->p_access == NULL )
         {
-            msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
-                                                         msg_StackMsg() );
-            dialog_Fatal( p_input, _("Your input can't be opened"),
-                          _("VLC is unable to open the MRL '%s'."
-                            " Check the log for details."), psz_mrl );
+            if( vlc_object_alive( p_input ) )
+            {
+                msg_Err( p_input, "open of `%s' failed: %s", psz_mrl,
+                                                             msg_StackMsg() );
+                dialog_Fatal( p_input, _("Your input can't be opened"),
+                              _("VLC is unable to open the MRL '%s'."
+                                " Check the log for details."), psz_mrl );
+            }
             goto error;
         }
 
@@ -2612,12 +2615,15 @@ static int InputSourceInit( input_thread_t *p_input,
 
         if( in->p_demux == NULL )
         {
-            msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
-                     psz_access, psz_demux, psz_path );
-            dialog_Fatal( VLC_OBJECT( p_input ),
-                          _("VLC can't recognize the input's format"),
-                          _("The format of '%s' cannot be detected. "
-                            "Have a look at the log for details."), psz_mrl );
+            if( vlc_object_alive( p_input ) )
+            {
+                msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
+                         psz_access, psz_demux, psz_path );
+                dialog_Fatal( VLC_OBJECT( p_input ),
+                              _("VLC can't recognize the input's format"),
+                              _("The format of '%s' cannot be detected. "
+                                "Have a look at the log for details."), psz_mrl );
+            }
             goto error;
         }
 
