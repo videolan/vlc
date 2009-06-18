@@ -489,11 +489,7 @@ aout_instance_t *input_resource_RequestAout( input_resource_t *p_resource, aout_
 }
 aout_instance_t *input_resource_HoldAout( input_resource_t *p_resource )
 {
-    vlc_mutex_lock( &p_resource->lock );
-    aout_instance_t *p_ret = HoldAout( p_resource );
-    vlc_mutex_unlock( &p_resource->lock );
-
-    return p_ret;
+    return HoldAout( p_resource );
 }
 /* */
 sout_instance_t *input_resource_RequestSout( input_resource_t *p_resource, sout_instance_t *p_sout, const char *psz_sout )
