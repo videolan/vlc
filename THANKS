@@ -45,6 +45,7 @@ Arwed v. Merkatz <v.merkatz at gmx dot net> - Gamma correction for adjust filter
 Audrey Prevost <fee . clochette007 at wanadoo dot fr> - Help on french translation
 Aurélien Nephtali <aurelien at sitadelle dot com> - Patch for modules/stream_output/rtp.c proper test for NULL. Fix crash in video filters error handling code in transcode. Fix telnet crash.
 Barak Ori <barakori at gmail dot com> - Bidi fixes
+Barry Wardell <barry 0 wardell - gmail dot com> - Qt4 patch.
 Basil Achermann <vlc at acherma dot com> - Patch to handle esc and space key events from VLCControl (OSX)
 Bayarsaikhan Enkhtaivan Баярсайхан Энхтайван <ebayaraa qt gmail d0t com> - Mongolian translation
 Benjamin Mironer <bmironer at noos.fr> - Mac OS X fixes
