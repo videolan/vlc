@@ -438,6 +438,8 @@ static int Demux( demux_t *p_demux )
         av_free_packet( &pkt );
         return 1;
     }
+    const AVStream *p_stream = p_sys->ic->streams[pkt.stream_index];
+
     if( ( p_frame = block_New( p_demux, pkt.size ) ) == NULL )
     {
         return 0;
@@ -453,17 +455,24 @@ static int Demux( demux_t *p_demux )
 
     p_frame->i_dts = ( pkt.dts == (int64_t)AV_NOPTS_VALUE ) ?
         0 : (pkt.dts) * 1000000 *
-        p_sys->ic->streams[pkt.stream_index]->time_base.num /
-        p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
+        p_stream->time_base.num /
+        p_stream->time_base.den - i_start_time;
     p_frame->i_pts = ( pkt.pts == (int64_t)AV_NOPTS_VALUE ) ?
         0 : (pkt.pts) * 1000000 *
-        p_sys->ic->streams[pkt.stream_index]->time_base.num /
-        p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
+        p_stream->time_base.num /
+        p_stream->time_base.den - i_start_time;
     if( pkt.duration > 0 )
         p_frame->i_length = pkt.duration * 1000000 *
-            p_sys->ic->streams[pkt.stream_index]->time_base.num /
-            p_sys->ic->streams[pkt.stream_index]->time_base.den - i_start_time;
+            p_stream->time_base.num /
+            p_stream->time_base.den - i_start_time;
 
+    if( pkt.dts != AV_NOPTS_VALUE && pkt.dts == pkt.pts &&
+        p_stream->codec->codec_type == CODEC_TYPE_VIDEO )
+    {
+        /* Add here notoriously bugged file formats/samples regarding PTS */
+        if( !strcmp( p_sys->fmt->name, "flv" ) )
+            p_frame->i_pts = 0;
+    }
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
