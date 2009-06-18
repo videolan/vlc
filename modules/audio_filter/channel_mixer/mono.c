@@ -37,7 +37,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_es.h>
 #include <vlc_block.h>
 #include <vlc_filter.h>
 #include <vlc_aout.h>
@@ -381,14 +380,9 @@ static int OpenFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
-    var_Create( p_this, MONO_CFG "downmix",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    p_sys->b_downmix = var_GetBool( p_this, MONO_CFG "downmix" );
-
-    var_Create( p_this, MONO_CFG "channel",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    p_sys->b_downmix = var_CreateGetBool( p_this, MONO_CFG "downmix" );
     p_sys->i_channel_selected =
-            (unsigned int) var_GetInteger( p_this, MONO_CFG "channel" );
+            (unsigned int) var_CreateGetInteger( p_this, MONO_CFG "channel" );
 
     if( p_sys->b_downmix )
     {
