@@ -142,6 +142,7 @@ Jamil Ahmed <itsjamil at gmail dot com> - Bengali translation
 Jan David Mol <jjdmol at gmail.com> - Suggested some flags for ffmpeg building
 Jan Gerber <j at v2v dot org> - patch theora decoding aspect ratio
 Jan Van Boghout <vlc at macrabbit.com> - iTunes like slider for OSX intf
+Jarmo Torvinen <jarmo dot torvinen -at- jutel (.) fi> - rawaudio demuxer
 Jasper Alias <j.alias at student.hhs.nl>- Mozilla plugin toolbar
 Javier Varela <tonxabar at hotmail.com> - Spanish translation
 Jean-Alexis Montignies <ja at sente.ch> - coreaudio multiple streams fix
