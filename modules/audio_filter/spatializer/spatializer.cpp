@@ -109,10 +109,8 @@ static const char *psz_control_names[] =
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
-static int  SpatInit( aout_filter_t *);
 static void SpatFilter( aout_instance_t *,aout_filter_t *, float *, float *,
                         int, int );
-static void SpatClean( aout_filter_t * );
 static int RoomCallback ( vlc_object_t *, char const *,
                                            vlc_value_t, vlc_value_t, void * );
 static int WetCallback ( vlc_object_t *, char const *,
@@ -131,6 +129,7 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
+    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
     bool         b_fit = true;
     msg_Dbg(p_this, "Opening filter spatializer %s %s %d", __FILE__,__func__,__LINE__);
 
@@ -164,13 +163,21 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     vlc_mutex_init( &p_sys->lock );
+
+    /* Init the variables */
     p_sys->p_reverbm = new revmodel();
-    p_sys->p_reverbm->setroomsize(1.05);
-    p_sys->p_reverbm->setwet(10.0f);
-    p_sys->p_reverbm->setdry(1.0f);
-    p_sys->p_reverbm->setdamp(0.3);
-    p_sys->p_reverbm->setwidth(0.9);
-    SpatInit( p_filter);
+    p_sys->p_reverbm->setroomsize( var_CreateGetFloatCommand( p_aout, psz_control_names[0] ) );
+    p_sys->p_reverbm->setwidth( var_CreateGetFloatCommand( p_aout, psz_control_names[1] ) );
+    p_sys->p_reverbm->setwet( var_CreateGetFloatCommand( p_aout, psz_control_names[2] ) );
+    p_sys->p_reverbm->setdry( var_CreateGetFloatCommand( p_aout, psz_control_names[3] ) );
+    p_sys->p_reverbm->setdamp( var_CreateGetFloatCommand( p_aout, psz_control_names[4] ));
+
+    /* Add the callbacks */
+    var_AddCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
+    var_AddCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
+    var_AddCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
+    var_AddCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
+    var_AddCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
 
     return VLC_SUCCESS;
 }
@@ -182,7 +189,15 @@ static void Close( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys = p_filter->p_sys;
-    SpatClean( p_filter );
+    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
+
+    /* Delete the callbacks */
+    var_DelCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
+    var_DelCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
+
     delete p_sys->p_reverbm;
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
@@ -203,41 +218,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                aout_FormatNbChannels( &p_filter->input ) );
 }
 
-static int SpatInit( aout_filter_t *p_filter )
-{
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
-    int i, ch;
-    vlc_value_t val1, val2, val3, val4, val5;
-    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
-
-    for( i = 0; i < 5 ; i ++ )
-        var_Create( p_aout, psz_control_names[i], VLC_VAR_FLOAT
-                            | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-
-    /* Get initial values */
-    var_Get( p_aout, psz_control_names[0], &val1 );
-    var_Get( p_aout, psz_control_names[1], &val2 );
-    var_Get( p_aout, psz_control_names[2], &val3 );
-    var_Get( p_aout, psz_control_names[3], &val4 );
-    var_Get( p_aout, psz_control_names[4], &val5);
-
-    RoomCallback( VLC_OBJECT( p_aout ), NULL, val1, val1, p_sys );
-    WidthCallback( VLC_OBJECT( p_aout ), NULL, val2, val2, p_sys );
-    WetCallback( VLC_OBJECT( p_aout ), NULL, val3, val3, p_sys );
-    DryCallback( VLC_OBJECT( p_aout ), NULL, val4, val4, p_sys );
-    DampCallback( VLC_OBJECT( p_aout ), NULL, val5, val5, p_sys );
-
-    msg_Dbg( p_filter, "%f", val1.f_float );
-    /* Add our own callbacks */
-    var_AddCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
-
-    return VLC_SUCCESS;
-}
-
 static void SpatFilter( aout_instance_t *p_aout,
                        aout_filter_t *p_filter, float *out, float *in,
                        int i_samples, int i_channels )
@@ -245,7 +225,7 @@ static void SpatFilter( aout_instance_t *p_aout,
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     CLocker locker( &p_sys->lock );
 
-    int i, ch, j;
+    int i, ch;
     for( i = 0; i < i_samples; i++ )
     {
         for( ch = 0 ; ch < 2; ch++)
@@ -258,17 +238,6 @@ static void SpatFilter( aout_instance_t *p_aout,
     }
 }
 
-static void SpatClean( aout_filter_t *p_filter )
-{
-    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
-
-    var_DelCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
-}
 
 /*****************************************************************************
  * Variables callbacks
