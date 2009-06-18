@@ -93,6 +93,12 @@ typedef enum libvlc_state_t
     libvlc_Error
 } libvlc_state_t;
 
+typedef enum libvlc_media_option_t
+{
+    libvlc_media_option_trusted = 0x2,
+    libvlc_media_option_unique = 0x100
+} libvlc_media_option_t;
+
 /**
  * Create a media with the given MRL.
  *
@@ -137,7 +143,7 @@ VLC_PUBLIC_API void libvlc_media_add_option(
                                    const char * ppsz_options,
                                    libvlc_exception_t * p_e );
 /**
- * Add an option to the media from an untrusted source.
+ * Add an option to the media with configurable flags.
  *
  * This option will be used to determine how the media_player will
  * read the media. This allows to use VLC's advanced
@@ -147,11 +153,13 @@ VLC_PUBLIC_API void libvlc_media_add_option(
  *
  * \param p_instance the instance
  * \param ppsz_options the options (as a string)
+ * \param i_flags the flags for this option
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_add_option_untrusted(
+VLC_PUBLIC_API void libvlc_media_add_option_flag(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_options,
+                                   libvlc_media_option_t i_flags,
                                    libvlc_exception_t * p_e );
 
 

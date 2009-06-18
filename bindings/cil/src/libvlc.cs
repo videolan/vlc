@@ -34,6 +34,12 @@ namespace VideoLAN.LibVLC
      * @brief Native: unmanaged LibVLC APIs
      * @ingroup Internals
      */
+    internal enum MediaOptionFlag
+    {
+        OptionTrusted = 0x2,
+	OptionUnique = 0x100,
+    };
+
     internal static class LibVLC
     {
         /* Where is the run-time?
@@ -101,9 +107,10 @@ namespace VideoLAN.LibVLC
                              NativeException ex);
 
         [DllImport (lib,
-                    EntryPoint="libvlc_media_add_option_untrusted")]
+                    EntryPoint="libvlc_media_add_option_flag")]
         public static extern
-        void MediaAddUntrustedOption (MediaHandle media, U8String options,
+        void MediaAddOptionWithFlag (MediaHandle media, U8String options,
+                                      MediaOptionFlag flag,
                                       NativeException ex);
 
         [DllImport (lib, EntryPoint="libvlc_media_release")]
