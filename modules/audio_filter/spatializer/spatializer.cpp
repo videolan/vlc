@@ -176,13 +176,16 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    vlc_mutex_init( &p_sys->lock );
-
     /* Force new to return 0 on failure instead of throwing, since we don't
        want an exception to leak back to C code. Bad things would happen. */
     p_sys->p_reverbm = new (nothrow) revmodel;
     if( !p_sys->p_reverbm )
+    {
+        free( p_sys );
         return VLC_ENOMEM;
+    }
+
+    vlc_mutex_init( &p_sys->lock );
 
     for(unsigned i=0;i<num_callbacks;++i)
     {
