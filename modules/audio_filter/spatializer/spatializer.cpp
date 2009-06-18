@@ -36,9 +36,11 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include "vlc_aout.h"
+#include <vlc_aout.h>
+
 #include "revmodel.hpp"
 #define SPAT_AMP 0.3
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -91,10 +93,12 @@ struct aout_filter_sys_t
 class CLocker
 {
 public:
-    CLocker( vlc_mutex_t *p_lock ) : p_lock(p_lock) {
+    CLocker( vlc_mutex_t *p_lock_to_manage ) : p_lock(p_lock_to_manage)
+    {
         vlc_mutex_lock( p_lock );
     }
-    virtual ~CLocker() {
+    virtual ~CLocker()
+    {
         vlc_mutex_unlock( p_lock );
     }
 private:
@@ -106,6 +110,8 @@ static const char *psz_control_names[] =
     "spatializer-roomsize", "spatializer-width" ,
     "spatializer-wet", "spatializer-dry", "spatializer-damp"
 };
+
+
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
@@ -131,7 +137,7 @@ static int Open( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys;
     aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
     bool         b_fit = true;
-    msg_Dbg(p_this, "Opening filter spatializer %s %s %d", __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "Opening filter spatializer" );
 
     if( p_filter->input.i_format != VLC_CODEC_FL32 ||
         p_filter->output.i_format != VLC_CODEC_FL32 )
@@ -201,7 +207,7 @@ static void Close( vlc_object_t *p_this )
     delete p_sys->p_reverbm;
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
-    msg_Dbg(p_this, "Closing filter spatializer %s %s %d", __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "Closing filter spatializer" );
 }
 
 /*****************************************************************************
@@ -246,52 +252,57 @@ static void SpatFilter( aout_instance_t *p_aout,
 static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setroomsize(newval.f_float);
-    msg_Dbg (p_this,"room callback %3.1f %s %s %d", newval.f_float, __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "room size is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
 
 static int WidthCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setwidth(newval.f_float);
-    msg_Dbg (p_this,"width callback %3.1f %s %s %d", newval.f_float,  __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "width is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
 static int WetCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setwet(newval.f_float);
-    msg_Dbg (p_this,"wet callback %3.1f %s %s %d", newval.f_float,  __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "'wet' value is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
 static int DryCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setdry(newval.f_float);
-    msg_Dbg (p_this,"dry callback %3.1f %s %s %d", newval.f_float, __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "'dry' value is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
 static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
     CLocker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setdamp(newval.f_float);
-    msg_Dbg (p_this, "damp callback %3.1f %s %s %d", newval.f_float, __FILE__,__func__,__LINE__);
+    msg_Dbg( p_this, "'damp' value is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
 
