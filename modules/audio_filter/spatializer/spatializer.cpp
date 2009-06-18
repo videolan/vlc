@@ -9,19 +9,19 @@
  *
  * Mentor : Jean-Baptiste Kempf <jb@videolan.org>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -49,7 +49,7 @@ static void Close( vlc_object_t * );
 
 #define ROOMSIZE_TEXT N_("Room size")
 #define ROOMSIZE_LONGTEXT N_("Defines the virtual surface of the room" \
-                                "emulated by the filter." )
+                             "emulated by the filter." )
 
 #define WIDTH_TEXT N_("Room width")
 #define WIDTH_LONGTEXT N_("Width of the virtual room")
@@ -88,21 +88,6 @@ struct aout_filter_sys_t
     vlc_mutex_t lock;
     revmodel *p_reverbm;
 
-};
-
-class CLocker
-{
-public:
-    CLocker( vlc_mutex_t *p_lock_to_manage ) : p_lock(p_lock_to_manage)
-    {
-        vlc_mutex_lock( p_lock );
-    }
-    virtual ~CLocker()
-    {
-        vlc_mutex_unlock( p_lock );
-    }
-private:
-    vlc_mutex_t *p_lock;
 };
 
 static const char *psz_control_names[] =
@@ -173,10 +158,10 @@ static int Open( vlc_object_t *p_this )
     /* Init the variables */
     p_sys->p_reverbm = new revmodel();
     p_sys->p_reverbm->setroomsize( var_CreateGetFloatCommand( p_aout, psz_control_names[0] ) );
-    p_sys->p_reverbm->setwidth( var_CreateGetFloatCommand( p_aout, psz_control_names[1] ) );
-    p_sys->p_reverbm->setwet( var_CreateGetFloatCommand( p_aout, psz_control_names[2] ) );
-    p_sys->p_reverbm->setdry( var_CreateGetFloatCommand( p_aout, psz_control_names[3] ) );
-    p_sys->p_reverbm->setdamp( var_CreateGetFloatCommand( p_aout, psz_control_names[4] ));
+    p_sys->p_reverbm->setwidth   ( var_CreateGetFloatCommand( p_aout, psz_control_names[1] ) );
+    p_sys->p_reverbm->setwet     ( var_CreateGetFloatCommand( p_aout, psz_control_names[2] ) );
+    p_sys->p_reverbm->setdry     ( var_CreateGetFloatCommand( p_aout, psz_control_names[3] ) );
+    p_sys->p_reverbm->setdamp    ( var_CreateGetFloatCommand( p_aout, psz_control_names[4] ));
 
     /* Add the callbacks */
     var_AddCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
@@ -225,16 +210,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 }
 
 static void SpatFilter( aout_instance_t *p_aout,
-                       aout_filter_t *p_filter, float *out, float *in,
-                       int i_samples, int i_channels )
+                        aout_filter_t *p_filter, float *out, float *in,
+                        int i_samples, int i_channels )
 {
+    (void)p_aout;
     aout_filter_sys_t *p_sys = p_filter->p_sys;
-    CLocker locker( &p_sys->lock );
 
-    int i, ch;
-    for( i = 0; i < i_samples; i++ )
+    vlc_mutex_lock( &p_sys->lock );
+    for( int i = 0; i < i_samples; i++ )
     {
-        for( ch = 0 ; ch < 2; ch++)
+        for( int ch = 0 ; ch < 2; ch++)
         {
             in[ch] = in[ch] * SPAT_AMP;
         }
@@ -242,56 +227,68 @@ static void SpatFilter( aout_instance_t *p_aout,
         in  += i_channels;
         out += i_channels;
     }
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
 
 /*****************************************************************************
  * Variables callbacks
  *****************************************************************************/
-
 static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
-    CLocker locker( &p_sys->lock );
 
-    p_sys->p_reverbm->setroomsize(newval.f_float);
     msg_Dbg( p_this, "room size is now %3.1f", newval.f_float );
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->p_reverbm->setroomsize( newval.f_float );
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 
 static int WidthCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
-    CLocker locker( &p_sys->lock );
 
-    p_sys->p_reverbm->setwidth(newval.f_float);
     msg_Dbg( p_this, "width is now %3.1f", newval.f_float );
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->p_reverbm->setwidth( newval.f_float );
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 static int WetCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
-    CLocker locker( &p_sys->lock );
 
-    p_sys->p_reverbm->setwet(newval.f_float);
     msg_Dbg( p_this, "'wet' value is now %3.1f", newval.f_float );
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->p_reverbm->setwet( newval.f_float );
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 static int DryCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
-    CLocker locker( &p_sys->lock );
 
-    p_sys->p_reverbm->setdry(newval.f_float);
     msg_Dbg( p_this, "'dry' value is now %3.1f", newval.f_float );
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->p_reverbm->setdry( newval.f_float );
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -299,10 +296,13 @@ static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     (void)psz_cmd;    (void)oldval;
     aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
-    CLocker locker( &p_sys->lock );
 
-    p_sys->p_reverbm->setdamp(newval.f_float);
     msg_Dbg( p_this, "'damp' value is now %3.1f", newval.f_float );
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->p_reverbm->setdamp( newval.f_float );
+    vlc_mutex_unlock( &p_sys->lock );
+
     return VLC_SUCCESS;
 }
 
