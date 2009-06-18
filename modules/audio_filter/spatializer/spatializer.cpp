@@ -19,9 +19,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -49,7 +49,7 @@ static void Close( vlc_object_t * );
 
 #define ROOMSIZE_TEXT N_("Room size")
 #define ROOMSIZE_LONGTEXT N_("Defines the virtual surface of the room" \
-                                "emulated by the filter." )
+                             " emulated by the filter." )
 
 #define WIDTH_TEXT N_("Room width")
 #define WIDTH_LONGTEXT N_("Width of the virtual room")
@@ -97,7 +97,7 @@ public:
     {
         vlc_mutex_lock( p_lock );
     }
-    virtual ~CLocker()
+    ~CLocker()
     {
         vlc_mutex_unlock( p_lock );
     }
@@ -105,28 +105,37 @@ private:
     vlc_mutex_t *p_lock;
 };
 
-static const char *psz_control_names[] =
-{
-    "spatializer-roomsize", "spatializer-width" ,
-    "spatializer-wet", "spatializer-dry", "spatializer-damp"
+#define DECLARECB(fn) static int fn (vlc_object_t *,char const *, \
+                                     vlc_value_t, vlc_value_t, void *)
+DECLARECB( RoomCallback  );
+DECLARECB( WetCallback   );
+DECLARECB( DryCallback   );
+DECLARECB( DampCallback  );
+DECLARECB( WidthCallback );
+
+#undef  DECLARECB
+
+struct callback_s {
+  const char *psz_name;
+  int (*fp_callback)(vlc_object_t *,const char *,
+                     vlc_value_t,vlc_value_t,void *);
+  void (revmodel::* fp_set)(float);
 };
 
+static const callback_s callbacks[] = {
+    { "spatializer-roomsize", RoomCallback,  &revmodel::setroomsize },
+    { "spatializer-width",    WidthCallback, &revmodel::setwidth },
+    { "spatializer-wet",      WetCallback,   &revmodel::setwet },
+    { "spatializer-dry",      DryCallback,   &revmodel::setdry },
+    { "spatializer-damp",     DampCallback,  &revmodel::setdamp }
+};
+enum { num_callbacks=sizeof(callbacks)/sizeof(callback_s) };
 
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
 static void SpatFilter( aout_instance_t *,aout_filter_t *, float *, float *,
                         int, int );
-static int RoomCallback ( vlc_object_t *, char const *,
-                                           vlc_value_t, vlc_value_t, void * );
-static int WetCallback ( vlc_object_t *, char const *,
-                                           vlc_value_t, vlc_value_t, void * );
-static int DryCallback ( vlc_object_t *, char const *,
-                                           vlc_value_t, vlc_value_t, void * );
-static int DampCallback ( vlc_object_t *, char const *,
-                                           vlc_value_t, vlc_value_t, void * );
-static int WidthCallback ( vlc_object_t *, char const *,
-                                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Open:
@@ -135,8 +144,8 @@ static int Open( vlc_object_t *p_this )
 {
     aout_filter_t     *p_filter = (aout_filter_t *)p_this;
     aout_filter_sys_t *p_sys;
-    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
-    bool         b_fit = true;
+    aout_instance_t   *p_aout = (aout_instance_t *)p_filter->p_parent;
+    bool               b_fit = true;
     msg_Dbg( p_this, "Opening filter spatializer" );
 
     if( p_filter->input.i_format != VLC_CODEC_FL32 ||
@@ -170,20 +179,17 @@ static int Open( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_sys->lock );
 
-    /* Init the variables */
+    /* Init the variables *//* Add the callbacks */
     p_sys->p_reverbm = new revmodel();
-    p_sys->p_reverbm->setroomsize( var_CreateGetFloatCommand( p_aout, psz_control_names[0] ) );
-    p_sys->p_reverbm->setwidth( var_CreateGetFloatCommand( p_aout, psz_control_names[1] ) );
-    p_sys->p_reverbm->setwet( var_CreateGetFloatCommand( p_aout, psz_control_names[2] ) );
-    p_sys->p_reverbm->setdry( var_CreateGetFloatCommand( p_aout, psz_control_names[3] ) );
-    p_sys->p_reverbm->setdamp( var_CreateGetFloatCommand( p_aout, psz_control_names[4] ));
 
-    /* Add the callbacks */
-    var_AddCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
-    var_AddCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
+    for(unsigned i=0;i<num_callbacks;++i)
+    {
+        /* NOTE: C++ pointer-to-member function call from table lookup. */
+        (p_sys->p_reverbm->*(callbacks[i].fp_set))
+            (var_CreateGetFloatCommand(p_aout,callbacks[i].psz_name));
+        var_AddCallback( p_aout, callbacks[i].psz_name,
+                         callbacks[i].fp_callback, p_sys );
+    }
 
     return VLC_SUCCESS;
 }
@@ -198,11 +204,11 @@ static void Close( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
 
     /* Delete the callbacks */
-    var_DelCallback( p_aout, psz_control_names[0], RoomCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[1], WidthCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[2], WetCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[3], DryCallback, p_sys );
-    var_DelCallback( p_aout, psz_control_names[4], DampCallback, p_sys );
+    for(unsigned i=0;i<num_callbacks;++i)
+    {
+        var_DelCallback( p_aout, callbacks[i].psz_name,
+                         callbacks[i].fp_callback, p_sys );
+    }
 
     delete p_sys->p_reverbm;
     vlc_mutex_destroy( &p_sys->lock );
