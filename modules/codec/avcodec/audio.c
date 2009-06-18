@@ -197,7 +197,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     if( p_sys->i_output_max < AVCODEC_MAX_AUDIO_FRAME_SIZE )
         p_sys->i_output_max = AVCODEC_MAX_AUDIO_FRAME_SIZE;
     msg_Dbg( p_dec, "Using %d bytes output buffer", p_sys->i_output_max );
-    p_sys->p_output = malloc( p_sys->i_output_max );
+    p_sys->p_output = av_malloc( p_sys->i_output_max );
 
     p_sys->p_samples = NULL;
     p_sys->i_samples = 0;
@@ -300,7 +300,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     if( i_output > p_sys->i_output_max )
     {
         /* Grow output buffer if necessary (eg. for PCM data) */
-        p_sys->p_output = realloc( p_sys->p_output, i_output );
+        p_sys->p_output = av_realloc( p_sys->p_output, i_output );
     }
 
     *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
@@ -384,7 +384,7 @@ void EndAudioDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    free( p_sys->p_output );
+    av_free( p_sys->p_output );
 }
 
 /*****************************************************************************
