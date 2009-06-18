@@ -7,19 +7,19 @@
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -354,6 +354,7 @@ static int Init( vlc_object_t *p_this, struct aout_filter_sys_t * p_data
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    aout_filter_sys_t *p_sys;
     bool b_fit = true;
 
     /* Activate this filter only with stereo devices */
@@ -402,20 +403,20 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
-    if( p_filter->p_sys == NULL )
+    p_sys = p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
-    p_filter->p_sys->i_overflow_buffer_size = 0;
-    p_filter->p_sys->p_overflow_buffer = NULL;
-    p_filter->p_sys->i_nb_atomic_operations = 0;
-    p_filter->p_sys->p_atomic_operations = NULL;
+    p_sys->i_overflow_buffer_size = 0;
+    p_sys->p_overflow_buffer = NULL;
+    p_sys->i_nb_atomic_operations = 0;
+    p_sys->p_atomic_operations = NULL;
 
-    if( Init( VLC_OBJECT(p_filter), p_filter->p_sys
+    if( Init( VLC_OBJECT(p_filter), p_sys
                 , aout_FormatNbChannels ( &p_filter->input )
                 , p_filter->input.i_physical_channels
                 , p_filter->input.i_rate ) < 0 )
     {
-        free( p_filter->p_sys );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -432,13 +433,9 @@ static void Destroy( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if( p_filter->p_sys != NULL )
-    {
-        free( p_filter->p_sys->p_overflow_buffer );
-        free( p_filter->p_sys->p_atomic_operations );
-        free( p_filter->p_sys );
-        p_filter->p_sys = NULL;
-    }
+    free( p_filter->p_sys->p_overflow_buffer );
+    free( p_filter->p_sys->p_atomic_operations );
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -448,6 +445,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
+    aout_filter_sys_t *p_sys = p_filter->p_sys;
     int i_input_nb = aout_FormatNbChannels( &p_filter->input );
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
 
@@ -472,11 +470,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out = p_out_buf->p_buffer;
     i_out_size = p_out_buf->i_nb_bytes;
 
-    if( p_filter->p_sys != NULL )
+    if( p_sys != NULL )
     {
         /* Slide the overflow buffer */
-        p_overflow = p_filter->p_sys->p_overflow_buffer;
-        i_overflow_size = p_filter->p_sys->i_overflow_buffer_size;
+        p_overflow = p_sys->p_overflow_buffer;
+        i_overflow_size = p_sys->i_overflow_buffer_size;
 
         memset( p_out, 0, i_out_size );
         if ( i_out_size > i_overflow_size )
@@ -484,7 +482,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         else
             memcpy( p_out, p_overflow, i_out_size );
 
-        p_slide = p_filter->p_sys->p_overflow_buffer;
+        p_slide = p_sys->p_overflow_buffer;
         while( p_slide < p_overflow + i_overflow_size )
         {
             if( p_slide + i_out_size < p_overflow + i_overflow_size )
@@ -504,16 +502,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
 
         /* apply the atomic operations */
-        for( i = 0; i < p_filter->p_sys->i_nb_atomic_operations; i++ )
+        for( i = 0; i < p_sys->i_nb_atomic_operations; i++ )
         {
             /* shorter variable names */
             i_source_channel_offset
-                = p_filter->p_sys->p_atomic_operations[i].i_source_channel_offset;
+                = p_sys->p_atomic_operations[i].i_source_channel_offset;
             i_dest_channel_offset
-                = p_filter->p_sys->p_atomic_operations[i].i_dest_channel_offset;
-            i_delay = p_filter->p_sys->p_atomic_operations[i].i_delay;
+                = p_sys->p_atomic_operations[i].i_dest_channel_offset;
+            i_delay = p_sys->p_atomic_operations[i].i_delay;
             d_amplitude_factor
-                = p_filter->p_sys->p_atomic_operations[i].d_amplitude_factor;
+                = p_sys->p_atomic_operations[i].d_amplitude_factor;
 
             if( p_out_buf->i_nb_samples > i_delay )
             {
@@ -562,6 +560,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 static int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
     bool b_fit = true;
 
     /* Activate this filter only with stereo devices */
@@ -609,20 +608,20 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_filter->p_sys = malloc( sizeof(struct filter_sys_t) );
-    if( p_filter->p_sys == NULL )
+    p_sys = p_filter->p_sys = malloc( sizeof(struct filter_sys_t) );
+    if( p_sys == NULL )
         return VLC_ENOMEM;
-    p_filter->p_sys->i_overflow_buffer_size = 0;
-    p_filter->p_sys->p_overflow_buffer = NULL;
-    p_filter->p_sys->i_nb_atomic_operations = 0;
-    p_filter->p_sys->p_atomic_operations = NULL;
+    p_sys->i_overflow_buffer_size = 0;
+    p_sys->p_overflow_buffer = NULL;
+    p_sys->i_nb_atomic_operations = 0;
+    p_sys->p_atomic_operations = NULL;
 
-    if( Init( VLC_OBJECT(p_filter), (struct aout_filter_sys_t *)p_filter->p_sys
+    if( Init( VLC_OBJECT(p_filter), (struct aout_filter_sys_t *)p_sys
                 , aout_FormatNbChannels ( &(p_filter->fmt_in.audio) )
                 , p_filter->fmt_in.audio.i_physical_channels
                 , p_filter->fmt_in.audio.i_rate ) < 0 )
     {
-        free( p_filter->p_sys );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
