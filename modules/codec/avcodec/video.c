@@ -1119,7 +1119,7 @@ static void ffmpeg_NextPts( decoder_t *p_dec )
     else if( p_sys->p_context->time_base.den > 0 )
     {
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(52,20,0)
-        int i_tick = i_tick = p_sys->p_context->ticks_per_frame;
+        int i_tick = p_sys->p_context->ticks_per_frame;
         if( i_tick <= 0 )
             i_tick = 1;
 #else
