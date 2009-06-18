@@ -162,7 +162,7 @@ public:
         if( NULL != _p_pict )
             _p_pict->Release();
         if( NULL != pict )
-            _p_pict->AddRef();
+            pict->AddRef();
         _p_pict = pict;
     };
 
