@@ -677,6 +677,9 @@ aviindex:
                           (mtime_t)p_avih->i_microsecperframe /
                           (mtime_t)1000000 )
     {
+        if( !vlc_object_alive( p_demux) )
+            goto error;
+
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
                            "approximative or will exhibit strange behavior" );
         if( i_do_index == 0 && !b_index )
