@@ -165,7 +165,7 @@ FileOpenPanel::~FileOpenPanel()
 void FileOpenPanel::browseFile()
 {
     QStringList files = QFileDialog::getOpenFileNames( this );
-    foreach( const QString &file, files)
+    foreach( const QString &file, files )
     {
         QListWidgetItem *item =
             new QListWidgetItem( toNativeSeparators( file ), ui.fileListWidg );
@@ -244,7 +244,8 @@ void FileOpenPanel::updateMRL()
 /* Function called by Open Dialog when clicke on Play/Enqueue */
 void FileOpenPanel::accept()
 {
-    p_intf->p_sys->filepath = dialogBox->directory().absolutePath();
+    if( dialogBox )
+        p_intf->p_sys->filepath = dialogBox->directory().absolutePath();
     ui.fileListWidg->clear();
 }
 

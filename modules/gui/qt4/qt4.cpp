@@ -449,7 +449,7 @@ static void *Thread( void *obj )
     {
         char *psz_path = config_GetPsz( p_intf, "qt-filedialog-path" );
         p_intf->p_sys->filepath =
-            EMPTY_STR(psz_path) ? config_GetHomeDir() : qfu(psz_path);
+            EMPTY_STR( psz_path ) ? config_GetHomeDir() : qfu( psz_path );
         free( psz_path );
     }
 
@@ -491,7 +491,7 @@ static void *Thread( void *obj )
 
     /* Save the path */
     config_PutPsz( p_intf, "qt-filedialog-path",
-                   qtu(p_intf->p_sys->filepath) );
+                   qtu( p_intf->p_sys->filepath ) );
 
     /* Delete the application automatically */
 #ifdef Q_WS_X11

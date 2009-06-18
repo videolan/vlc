@@ -70,10 +70,14 @@ void RecentsMRL::addRecent( const QString &mrl )
 {
     if ( !isActive || ( filter && filter->indexIn( mrl ) >= 0 ) )
         return;
+
+    msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
+
 #ifdef WIN32
+    /* Add to the Windows 7 default list in taskbar */
     SHAddToRecentDocs( 0x00000002 , qtu( mrl ) );
 #endif
-    msg_Dbg( p_intf, "Adding a new MRL to recent ones: %s", qtu( mrl ) );
+
     int i_index = stack->indexOf( mrl );
     if( 0 <= i_index )
     {
@@ -88,7 +92,6 @@ void RecentsMRL::addRecent( const QString &mrl )
     }
     QVLCMenu::updateRecents( p_intf );
     save();
-
 }
 
 void RecentsMRL::clear()
