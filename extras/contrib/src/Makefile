@@ -475,7 +475,7 @@ fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/fontconfig.patch
 	patch -p0 < Patches/fontconfig-nodocs.patch
-	(cd $@; autoreconf)
+	(cd $@; autoreconf -ivf)
 
 .fontconfig: fontconfig .xml .freetype
 ifdef HAVE_WIN32
@@ -1337,7 +1337,7 @@ endif
 ifdef HAVE_DARWIN_OS
 	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 else
-	(cd $< && rm -f configure; aclocal -I m4/ && automake --add-missing && autoconf configure.in > configure && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
+	(cd $< && rm -f configure; ACLOCAL="aclocal -I m4/" autoreconf -ivf && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
 endif
 	touch $@
 
@@ -1468,7 +1468,7 @@ libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/libmodplug-win32.patch
-	(cd $@; autoreconf)
+	(cd $@; autoreconf -ivf )
 endif
 
 .mod: libmodplug
@@ -1765,7 +1765,7 @@ zvbi-$(ZVBI_VERSION).tar.bz2:
 zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 ifdef HAVE_WIN32
-	(cd $@; patch -p1 < ../Patches/zvbi-win32.patch; patch -p1 < ../Patches/zvbi-makefile.patch; autoreconf)
+	(cd $@; patch -p1 < ../Patches/zvbi-win32.patch; patch -p1 < ../Patches/zvbi-makefile.patch; autoreconf -ivf)
 endif
 
 ifdef HAVE_WIN32
@@ -2166,7 +2166,7 @@ libmpcdec-$(MUSE_VERSION).tar.bz2:
 mpcdec: libmpcdec-$(MUSE_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	patch -p0 < Patches/mpcdec.patch
-	(cd $@; autoreconf)
+	(cd $@; autoreconf -ivf)
 
 .mpcdec: mpcdec
 ifdef HAVE_WIN32
@@ -2525,7 +2525,7 @@ libass: libass-$(ASS_VERSION).tar.bz2
 	(cd $@; patch -p1 < ../Patches/libass_mplayer_updates.patch)
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
-	(cd $@; autoreconf; automake)
+	(cd $@; autoreconf -ivf)
 endif
 
 .libass: libass .png
