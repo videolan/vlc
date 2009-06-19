@@ -620,8 +620,7 @@ describe:
                         _("Please enter a valid login name and a password.") );
             if( psz_user != NULL && psz_pwd != NULL )
             {
-                msg_Dbg( p_demux, "retrying with user=%s, pwd=%s",
-                         psz_user, psz_pwd );
+                msg_Dbg( p_demux, "retrying with user=%s", psz_user );
                 goto describe;
             }
         }

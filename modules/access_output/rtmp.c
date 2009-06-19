@@ -136,8 +136,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->p_thread->url.psz_username && *p_sys->p_thread->url.psz_username )
     {
-        msg_Dbg( p_access, "      user='%s', pwd='%s'",
-                 p_sys->p_thread->url.psz_username, p_sys->p_thread->url.psz_password );
+        msg_Dbg( p_access, "      user='%s'", p_sys->p_thread->url.psz_username );
     }
 
     /* Initialize thread variables */
