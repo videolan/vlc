@@ -384,51 +384,67 @@ void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
 
         psz = input_item_GetTitle( p_node->p_input );
         mvar_AppendNewVar( itm, "title", psz );
+        free( psz );
 
         psz = input_item_GetArtist( p_node->p_input );
         mvar_AppendNewVar( itm, "artist", psz );
+        free( psz );
 
         psz = input_item_GetGenre( p_node->p_input );
         mvar_AppendNewVar( itm, "genre", psz );
+        free( psz );
 
         psz = input_item_GetCopyright( p_node->p_input );
         mvar_AppendNewVar( itm, "copyright", psz );
+        free( psz );
 
         psz = input_item_GetAlbum( p_node->p_input );
         mvar_AppendNewVar( itm, "album", psz );
+        free( psz );
 
         psz = input_item_GetTrackNum( p_node->p_input );
         mvar_AppendNewVar( itm, "track", psz );
+        free( psz );
 
         psz = input_item_GetDescription( p_node->p_input );
         mvar_AppendNewVar( itm, "description", psz );
+        free( psz );
 
         psz = input_item_GetRating( p_node->p_input );
         mvar_AppendNewVar( itm, "rating", psz );
+        free( psz );
 
         psz = input_item_GetDate( p_node->p_input );
         mvar_AppendNewVar( itm, "date", psz );
+        free( psz );
 
         psz = input_item_GetURL( p_node->p_input );
         mvar_AppendNewVar( itm, "url", psz );
+        free( psz );
 
         psz = input_item_GetLanguage( p_node->p_input );
         mvar_AppendNewVar( itm, "language", psz );
+        free( psz );
 
         psz = input_item_GetNowPlaying( p_node->p_input );
         mvar_AppendNewVar( itm, "now_playing", psz );
+        free( psz );
 
         psz = input_item_GetPublisher( p_node->p_input );
         mvar_AppendNewVar( itm, "publisher", psz );
+        free( psz );
 
         psz = input_item_GetEncodedBy( p_node->p_input );
         mvar_AppendNewVar( itm, "encoded_by", psz );
+        free( psz );
 
         psz = input_item_GetArtURL( p_node->p_input );
         mvar_AppendNewVar( itm, "art_url", psz );
+        free( psz );
 
         psz = input_item_GetTrackID( p_node->p_input );
         mvar_AppendNewVar( itm, "track_id", psz );
+        free( psz );
 
         mvar_AppendVar( s, itm );
     }
