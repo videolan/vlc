@@ -49,7 +49,7 @@ struct services_discovery_sys_t
 {
     UpnpClient_Handle clientHandle;
     MediaServerList* serverList;
-    Lockable* callbackLock;
+    vlc_mutex_t callbackLock;
 };
 
 // VLC callback prototypes
@@ -99,7 +99,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_sys->serverList = new MediaServerList( p_sd );
-    p_sys->callbackLock = new Lockable();
+    vlc_mutex_init( &p_sys->callbackLock );
 
     res = UpnpRegisterClient( Callback, p_sd, &p_sys->clientHandle );
     if( res != UPNP_E_SUCCESS )
@@ -111,7 +111,7 @@ static int Open( vlc_object_t *p_this )
 
     res = UpnpSearchAsync( p_sys->clientHandle, 5,
             MEDIA_SERVER_DEVICE_TYPE, p_sd );
-    
+
     if( res != UPNP_E_SUCCESS )
     {
         msg_Err( p_sd, "%s", UpnpGetErrorMessage( res ) );
@@ -128,7 +128,7 @@ static void Close( vlc_object_t *p_this )
 
     UpnpFinish();
     delete p_sd->p_sys->serverList;
-    delete p_sd->p_sys->callbackLock;
+    vlc_mutex_destroy( &p_sd->p_sys->callbackLock );
 
     free( p_sd->p_sys );
 }
@@ -194,7 +194,7 @@ static int Callback( Upnp_EventType eventType, void* event, void* user_data )
 {
     services_discovery_t *p_sd = ( services_discovery_t* ) user_data;
     services_discovery_sys_t* p_sys = p_sd->p_sys;
-    Locker locker( p_sys->callbackLock );
+    vlc_mutex_locker locker( &p_sys->callbackLock );
 
     switch( eventType ) {
 

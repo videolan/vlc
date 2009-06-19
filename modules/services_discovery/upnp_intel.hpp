@@ -36,49 +36,6 @@
 // Classes
 class Container;
 
-
-class Lockable
-{
-public:
-
-    Lockable()
-    {
-        vlc_mutex_init( &_mutex );
-    }
-
-    ~Lockable()
-    {
-        vlc_mutex_destroy( &_mutex );
-    }
-
-    void lock() { vlc_mutex_lock( &_mutex ); }
-    void unlock() { vlc_mutex_unlock( &_mutex ); }
-
-private:
-
-    vlc_mutex_t _mutex;
-};
-
-
-class Locker
-{
-public:
-    Locker( Lockable* l )
-    {
-        _lockable = l;
-        _lockable->lock();
-    }
-
-    ~Locker()
-    {
-        _lockable->unlock();
-    }
-
-private:
-    Lockable* _lockable;
-};
-
-
 class MediaServer
 {
 public:
