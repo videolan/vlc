@@ -603,7 +603,7 @@ static void Eia608RollUp( eia608_t *h )
     /* Reset current row */
     Eia608ClearScreenRow( h, i_screen, h->cursor.i_row );
 }
-static void Eia608ParseChannel( eia608_t *h, uint8_t d[2] )
+static void Eia608ParseChannel( eia608_t *h, const uint8_t d[2] )
 {
     /* Check odd parity */
     static const int p4[16] = {
