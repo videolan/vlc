@@ -157,12 +157,7 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
-
-    if ( p_filter->p_sys != NULL )
-    {
-        free ( p_filter->p_sys );
-        p_filter->p_sys = NULL;
-    }
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -172,70 +167,67 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
+    aout_filter_sys_t * p_sys = p_filter->p_sys;
     float * p_in = (float*) p_in_buf->p_buffer;
     float * p_out = (float*) p_out_buf->p_buffer;
     size_t i_nb_samples = p_in_buf->i_nb_samples;
     size_t i_nb_channels = aout_FormatNbChannels( &p_filter->output );
+    size_t i_nb_rear = 0;
+    size_t i;
 
     p_out_buf->i_nb_samples = i_nb_samples;
     p_out_buf->i_nb_bytes = sizeof(float) * i_nb_samples
                             * aout_FormatNbChannels( &p_filter->output );
-    memset ( p_out , 0 , p_out_buf->i_nb_bytes );
+    memset( p_out, 0, p_out_buf->i_nb_bytes );
 
-    if ( p_filter->p_sys != NULL )
+
+    if( p_sys->i_rear_left >= 0 )
     {
-        struct aout_filter_sys_t * p_sys = p_filter->p_sys;
-        size_t i_nb_rear = 0;
-        size_t i;
+        ++i_nb_rear;
+    }
+    if( p_sys->i_rear_center >= 0 )
+    {
+        ++i_nb_rear;
+    }
+    if( p_sys->i_rear_right >= 0 )
+    {
+        ++i_nb_rear;
+    }
 
-        if ( p_sys->i_rear_left >= 0 )
+    for( i = 0; i < i_nb_samples; ++i )
+    {
+        float f_left = p_in[ i * 2 ];
+        float f_right = p_in[ i * 2 + 1 ];
+        float f_rear = ( f_left - f_right ) / i_nb_rear;
+
+        if( p_sys->i_center >= 0 )
         {
-            ++i_nb_rear;
+            float f_center = f_left + f_right;
+            f_left -= f_center / 2;
+            f_right -= f_center / 2;
+
+            p_out[ i * i_nb_channels + p_sys->i_center ] = f_center;
         }
-        if ( p_sys->i_rear_center >= 0 )
+
+        if( p_sys->i_left >= 0 )
         {
-            ++i_nb_rear;
+            p_out[ i * i_nb_channels + p_sys->i_left ] = f_left;
         }
-        if ( p_sys->i_rear_right >= 0 )
+        if( p_sys->i_right >= 0 )
         {
-            ++i_nb_rear;
+            p_out[ i * i_nb_channels + p_sys->i_right ] = f_right;
         }
-
-        for ( i = 0; i < i_nb_samples; ++i )
+        if( p_sys->i_rear_left >= 0 )
         {
-            float f_left = p_in[ i * 2 ];
-            float f_right = p_in[ i * 2 + 1 ];
-            float f_rear = ( f_left - f_right ) / i_nb_rear;
-
-            if ( p_sys->i_center >= 0 )
-            {
-                float f_center = f_left + f_right;
-                f_left -= f_center / 2;
-                f_right -= f_center / 2;
-
-                p_out[ i * i_nb_channels + p_sys->i_center ] = f_center;
-            }
-
-            if ( p_sys->i_left >= 0 )
-            {
-                p_out[ i * i_nb_channels + p_sys->i_left ] = f_left;
-            }
-            if ( p_sys->i_right >= 0 )
-            {
-                p_out[ i * i_nb_channels + p_sys->i_right ] = f_right;
-            }
-            if ( p_sys->i_rear_left >= 0 )
-            {
-                p_out[ i * i_nb_channels + p_sys->i_rear_left ] = f_rear;
-            }
-            if ( p_sys->i_rear_center >= 0 )
-            {
-                p_out[ i * i_nb_channels + p_sys->i_rear_center ] = f_rear;
-            }
-            if ( p_sys->i_rear_right >= 0 )
-            {
-                p_out[ i * i_nb_channels + p_sys->i_rear_right ] = f_rear;
-            }
+            p_out[ i * i_nb_channels + p_sys->i_rear_left ] = f_rear;
+        }
+        if( p_sys->i_rear_center >= 0 )
+        {
+            p_out[ i * i_nb_channels + p_sys->i_rear_center ] = f_rear;
+        }
+        if( p_sys->i_rear_right >= 0 )
+        {
+            p_out[ i * i_nb_channels + p_sys->i_rear_right ] = f_rear;
         }
     }
 }
