@@ -907,7 +907,7 @@ static char * copy_next_paths_token( char * paths, char ** remaining_paths )
         else
             path[done++] = paths[i];
     }
-    path[done++] = 0;
+    path[done] = 0;
 
     /* Return the remaining paths */
     if( remaining_paths ) {
