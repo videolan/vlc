@@ -3,7 +3,7 @@
  *   This plugin makes use of liba52 to decode A/52 audio
  *   (http://liba52.sf.net/).
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -119,7 +119,7 @@ vlc_module_end ()
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t *p_filter = (aout_filter_t *)p_this;
-    filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
+    filter_sys_t *p_sys;
     int i_ret;
 
     if ( p_filter->input.i_format != VLC_CODEC_A52

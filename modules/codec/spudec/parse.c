@@ -161,7 +161,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Our current index in the SPU packet */
-    unsigned int i_index = p_sys->i_rle_size + 4;
+    unsigned int i_index;
 
     /* The next start-of-control-sequence index and the previous one */
     unsigned int i_next_seq = 0, i_cur_seq = 0;

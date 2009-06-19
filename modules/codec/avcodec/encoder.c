@@ -200,7 +200,7 @@ static const uint16_t mpeg4_default_non_intra_matrix[64] = {
 int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
-    encoder_sys_t *p_sys = p_enc->p_sys;
+    encoder_sys_t *p_sys;
     AVCodecContext *p_context;
     AVCodec *p_codec;
     int i_codec_id, i_cat;
