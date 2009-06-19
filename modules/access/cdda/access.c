@@ -318,16 +318,13 @@ static block_t * CDDAReadBlocks( access_t * p_access )
             }
         }
         else
-        {
             rc = cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
                                           p_cdda->i_lsn, i_blocks );
 #else
 #define DRIVER_OP_SUCCESS 0
-            int rc;
-            rc = cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
+        int rc = cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
                                           p_cdda->i_lsn, i_blocks);
 #endif
-        }
         if( rc != DRIVER_OP_SUCCESS )
         {
             msg_Err( p_access, "could not read %d sectors starting from %lu",
