@@ -1,7 +1,7 @@
 /*****************************************************************************
  * avi.c
  *****************************************************************************
- * Copyright (C) 2001, 2002 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -138,7 +138,7 @@ static void SetFCC( uint8_t *p, char *fcc )
 static int Open( vlc_object_t *p_this )
 {
     sout_mux_t      *p_mux = (sout_mux_t*)p_this;
-    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    sout_mux_sys_t  *p_sys;
 
     msg_Dbg( p_mux, "AVI muxer opened" );
 

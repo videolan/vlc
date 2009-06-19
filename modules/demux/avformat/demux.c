@@ -1,7 +1,7 @@
 /*****************************************************************************
  * demux.c: demuxer using ffmpeg (libavformat).
  *****************************************************************************
- * Copyright (C) 2004-2007 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -718,7 +718,7 @@ static int64_t IOSeek( void *opaque, int64_t offset, int whence )
 {
     URLContext *p_url = opaque;
     demux_t *p_demux = p_url->priv_data;
-    int64_t i_absolute = (int64_t)offset;
+    int64_t i_absolute;
     int64_t i_size = stream_Size( p_demux->s );
 
 #ifdef AVFORMAT_DEBUG

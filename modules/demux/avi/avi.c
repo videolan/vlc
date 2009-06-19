@@ -1,7 +1,7 @@
 /*****************************************************************************
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -222,8 +222,7 @@ static int Open( vlc_object_t * p_this )
     bool       b_index = false;
     int              i_do_index;
 
-    avi_chunk_t         ck_riff;
-    avi_chunk_list_t    *p_riff = (avi_chunk_list_t*)&ck_riff;
+    avi_chunk_list_t    *p_riff;
     avi_chunk_list_t    *p_hdrl, *p_movi;
     avi_chunk_avih_t    *p_avih;
 
