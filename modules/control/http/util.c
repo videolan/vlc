@@ -179,6 +179,8 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         struct stat st;
         if( stat( dir, &st ) == 0 )
         {
+            free( user );
+            free( password );
             closedir( p_dir );
             return VLC_EGENERIC;
         }
