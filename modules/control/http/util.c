@@ -165,8 +165,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                 password = strdup( p );
             }
         }
-        msg_Dbg( p_intf, "using user=%s password=%s (read=%d)",
-                 user, password, i_size );
+        msg_Dbg( p_intf, "using user=%s (read=%d)", user, i_size );
 
         fclose( file );
     }
