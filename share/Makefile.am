@@ -92,34 +92,16 @@ DIST_skins2 = \
 	skins2/winamp2.xml
 
 skins2_default_vlt_FILES = \
-	skins2/default/main/pause_over.png \
-	skins2/default/main/main_up.png \
-	skins2/default/main/timeslider.png \
-	skins2/default/main/main_down.png \
-	skins2/default/main/main.png \
-	skins2/default/main/dvd_prevtitle.png \
-	skins2/default/main/dvd_nexttitle.png \
-	skins2/default/main/dvd_nextchapter.png \
-	skins2/default/main/pause_up.png \
-	skins2/default/main/main_over.png \
-	skins2/default/main/pause_down.png \
-	skins2/default/main/dvd_prevchapter.png \
-	skins2/default/main/vol_bg.png \
-	skins2/default/main/vol_mask.png \
-	skins2/default/main/vol_slider.png \
-	skins2/default/main/dvd_menu.png \
-	skins2/default/switch.png \
-	skins2/default/font.otf \
-	skins2/default/credits.png \
-	skins2/default/theme.xml \
-	skins2/default/playlist/plscroller.png \
-	skins2/default/playlist/playlist_down.png \
-	skins2/default/playlist/playtreeglyphs.png \
-	skins2/default/playlist/playlist_up.png \
-	skins2/default/playlist/playlist_over.png \
-	skins2/default/playlist/playlist.png \
-	skins2/default/minimal.png \
-	skins2/default/equalizer.png
+        skins2/default/theme.xml \
+	skins2/default/subX/about.png \
+	skins2/default/subX/eq.png \
+	skins2/default/subX/font.otf \
+	skins2/default/subX/main.png \
+	skins2/default/subX/playtreeglyphs.png \
+	skins2/default/subX/pl.png \
+	skins2/default/subX/sysbuttons.png \
+	skins2/default/subX/vol_anim.png \
+	skins2/default/subX/vol_slider.png
 
 skins2/default.vlt: $(skins2_default_vlt_FILES)
 	mkdir -p skins2
