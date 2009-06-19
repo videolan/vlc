@@ -2076,9 +2076,6 @@ STDMETHODIMP VLCVideo::put_aspectRatio(BSTR aspect)
     if( NULL == aspect )
         return E_POINTER;
 
-    if( 0 == SysStringLen(aspect) )
-        return E_INVALIDARG;
-
     libvlc_media_player_t *p_md;
     HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
