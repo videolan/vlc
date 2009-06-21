@@ -864,10 +864,10 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
     p_dst_a = p_region->p_picture->A_PIXELS;
     i_pitch = p_region->p_picture->A_PITCH;
 
-    i_offset = VERTICAL_MARGIN *i_pitch;
-    for( y=0; y<i_textblock_height; y++)
+    i_offset = (i_height+VERTICAL_MARGIN < fmt.i_height) ? VERTICAL_MARGIN *i_pitch : 0 ;
+    for( y=0; y<fmt.i_height; y++)
     {
-        for( x=0; x<i_width; x++)
+        for( x=0; x<fmt.i_width; x++)
         {
             int i_alpha = p_offScreen->p_data[ y * p_offScreen->i_bytesPerRow + x * p_offScreen->i_bytesPerPixel     ];
             int i_red   = p_offScreen->p_data[ y * p_offScreen->i_bytesPerRow + x * p_offScreen->i_bytesPerPixel + 1 ];
