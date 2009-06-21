@@ -515,58 +515,37 @@ void DialogsProvider::openAPlaylist()
 
 void DialogsProvider::saveAPlaylist()
 {
-    QFileDialog *qfd = new QFileDialog( NULL,
-                                   qtr( "Save playlist as..." ),
-                                   p_intf->p_sys->filepath,
-                                   qtr( "XSPF playlist (*.xspf);; " ) +
-                                   qtr( "M3U playlist (*.m3u);; " ) +
-                                   qtr( "HTML playlist (*.html)" ) );
-    qfd->setFileMode( QFileDialog::AnyFile );
-    qfd->setAcceptMode( QFileDialog::AcceptSave );
-    qfd->setConfirmOverwrite( true );
+    QString file = QFileDialog::getSaveFileName( NULL,
+                                  qtr( "Save playlist as..." ),
+                                  p_intf->p_sys->filepath,
+                                  qtr( "XSPF playlist (*.xspf);; " ) +
+                                  qtr( "M3U playlist (*.m3u);; " ) +
+                                  qtr( "HTML playlist (*.html)" ) );
 
-    if( qfd->exec() == QDialog::Accepted )
+    if( !file.isEmpty() )
     {
-        if( qfd->selectedFiles().count() > 0 )
+        static const char psz_xspf[] = "export-xspf",
+                          psz_m3u[] = "export-m3u",
+                          psz_html[] = "export-html";
+        const char *psz_module;
+
+        if( file.contains( ".xsp" ) )
+            psz_module = psz_xspf;
+        else if( file.contains( ".m3u" ) )
+            psz_module = psz_m3u;
+        else if( file.contains(".html" ) )
+            psz_module = psz_html;
+        else
         {
-            static const char psz_xspf[] = "export-xspf",
-                              psz_m3u[] = "export-m3u",
-                              psz_html[] = "export-html";
-            const char *psz_module;
-
-            QString file = qfd->selectedFiles().first();
-            QString filter = qfd->selectedFilter();
-
-            if( file.contains( ".xsp" ) || filter.contains( "XSPF" ) )
-            {
-                psz_module = psz_xspf;
-                if( !file.contains( ".xsp" ) )
-                    file.append( ".xspf" );
-            }
-            else if( file.contains( ".m3u" )  || filter.contains( "M3U" ) )
-            {
-                psz_module = psz_m3u;
-                if( !file.contains( ".m3u" ) )
-                    file.append( ".m3u" );
-            }
-            else if( file.contains(".html" ) || filter.contains( "HTML" ) )
-            {
-                psz_module = psz_html;
-                if( !file.contains( "html" ) )
-                    file.append( ".html" );
-            }
-            else
-            {
-                msg_Err( p_intf, "Impossible to recognise the file type" );
-                delete qfd;
-                return;
-            }
-
-            playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
-                        THEPL->p_local_category, psz_module);
+            msg_Warn( p_intf, "Impossible to recognise the file type. "
+                    "Defaulting to XSPF" );
+            psz_module = psz_xspf;
+            file.append( ".xpsf" );
         }
+
+        playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
+                THEPL->p_local_category, psz_module);
     }
-    delete qfd;
 }
 
 /****************************************************************************
