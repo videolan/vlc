@@ -99,7 +99,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     /* locate VLC module path */
 #ifdef XP_MACOSX
     ppsz_argv[ppsz_argc++] = "--plugin-path=/Library/Internet\\ Plug-Ins/VLC\\ Plugin.plugin/Contents/MacOS/modules";
-    ppsz_argv[ppsz_argc++] = "--vout=macosx";
+    ppsz_argv[ppsz_argc++] = "--vout=minimal_macosx";
 #elif defined(XP_WIN)
     HKEY h_key;
     DWORD i_type, i_data = MAX_PATH + 1;
