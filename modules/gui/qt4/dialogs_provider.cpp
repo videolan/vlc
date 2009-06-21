@@ -466,7 +466,7 @@ void DialogsProvider::openUrlDialog()
  **/
 static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 {
-    QString dir = QFileDialog::getExistingDirectory( NULL, qtr("Open Directory") );
+    QString dir = QFileDialog::getExistingDirectory( NULL, qtr("Open Directory"), p_intf->p_sys->filepath );
 
     if (!dir.isEmpty() )
     {

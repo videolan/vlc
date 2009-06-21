@@ -164,7 +164,7 @@ FileOpenPanel::~FileOpenPanel()
 
 void FileOpenPanel::browseFile()
 {
-    QStringList files = QFileDialog::getOpenFileNames( this );
+    QStringList files = QFileDialog::getOpenFileNames( this, qtr( "Select one or multiple files" ), p_intf->p_sys->filepath) ;
     foreach( const QString &file, files )
     {
         QListWidgetItem *item =
