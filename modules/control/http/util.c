@@ -366,8 +366,7 @@ void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
         mvar_AppendNewVar( itm, "uri", psz );
         free( psz );
 
-        sprintf( value, "Item");
-        mvar_AppendNewVar( itm, "type", value );
+        mvar_AppendNewVar( itm, "type", "Item" );
 
         sprintf( value, "%d", i_depth );
         mvar_AppendNewVar( itm, "depth", value );
@@ -457,8 +456,7 @@ void PlaylistListNode( intf_thread_t *p_intf, playlist_t *p_pl,
         mvar_AppendNewVar( itm, "name", p_node->p_input->psz_name );
         mvar_AppendNewVar( itm, "uri", p_node->p_input->psz_name );
 
-        sprintf( value, "Node" );
-        mvar_AppendNewVar( itm, "type", value );
+        mvar_AppendNewVar( itm, "type", "Node" );
 
         sprintf( value, "%d", p_node->i_id );
         mvar_AppendNewVar( itm, "index", value );
