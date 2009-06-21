@@ -2012,7 +2012,11 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     p_item = config_FindConfig( p_this, psz_name );
 
-    if( !p_item ) return VLC_SUCCESS;
+    if( !p_item )
+    {
+        free( psz_device );
+        return VLC_SUCCESS;
+    }
 
     if( !strcmp( psz_name, "dshow-adev" ) ) b_audio = true;
 
