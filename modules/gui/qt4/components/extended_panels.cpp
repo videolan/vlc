@@ -1045,7 +1045,6 @@ void Equalizer::updateUISliderValues( int i_preset )
 
 char * Equalizer::createValuesFromPreset( int i_preset )
 {
-    char *psz_values;
     QString values;
 
     /* Create the QString in Qt */
@@ -1053,10 +1052,7 @@ char * Equalizer::createValuesFromPreset( int i_preset )
         values += QString( " %1" ).arg( eqz_preset_10b[i_preset]->f_amp[i] );
 
     /* Convert it to char * */
-    if( !asprintf( &psz_values, "%s", values.toAscii().constData() ) )
-        return NULL;
-
-    return psz_values;
+    return strdup( values.toAscii().constData() );
 }
 
 void Equalizer::setCorePreset( int i_preset )
