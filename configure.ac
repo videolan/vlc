@@ -4064,7 +4064,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   PKG_CHECK_MODULES(XPROTO, [xproto])
 
   dnl libxcb
-  PKG_CHECK_MODULES(XCB, [xcb >= 1.3])
+  PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
   VLC_ADD_PLUGIN([xcb])
   VLC_ADD_PLUGIN([xcb_screen])
