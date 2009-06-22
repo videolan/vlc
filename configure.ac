@@ -4080,7 +4080,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
     ])
   ])
 
-  PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr], [
+  PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr >= 1.3], [
     VLC_ADD_PLUGIN([panoramix])
     VLC_ADD_LIBS([panoramix],[${XCB_RANDR_LIBS} ${XCB_LIBS}])
     VLC_ADD_CFLAGS([panoramix],[${XCB_RANDR_CFLAGS} ${XCB_CFLAGS}])
