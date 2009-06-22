@@ -547,8 +547,10 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( !strcmp( p_handler->name, "location" ) )
                 {
                     char *psz_location = psz_value;
-                    if( !strncmp( psz_value, "file://", 7 ) )
+                    if( !strncmp( psz_value, "file://", 7 ) )   /* file path */
                         psz_location = decode_URI( psz_value + 7 );
+                    else if( !strstr( psz_value, "://" ) )  /* relative path */
+                        psz_location = decode_URI( psz_value );
 
                     if( !psz_location )
                     {
