@@ -489,7 +489,7 @@ static int Connect( demux_t *p_demux )
     int  i_ret        = VLC_SUCCESS;
 
     if( p_sys->url.i_port == 0 ) p_sys->url.i_port = 554;
-    if( p_sys->url.psz_username || p_sys->url.psz_password )
+    if( p_sys->url.psz_username && p_sys->url.psz_password )
     {
         int err;
         err = asprintf( &psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
