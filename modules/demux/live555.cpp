@@ -459,23 +459,28 @@ static int Connect( demux_t *p_demux )
     int  i_http_port  = 0;
     int  i_ret        = VLC_SUCCESS;
 
-    if( p_sys->url.i_port == 0 ) p_sys->url.i_port = 554;
+    /* Create the url using the port number if available */
+    if( p_sys->url.i_port == 0 )
+    {
+        p_sys->url.i_port = 554;
+        if( asprintf( &psz_url, "rtsp://%s", p_sys->psz_path ) == -1 )
+            return VLC_ENOMEM;
+    }
+    else
+    {
+        if( asprintf( &psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
+                      p_sys->url.i_port, p_sys->url.psz_path ) == -1 )
+            return VLC_ENOMEM;
+    }
+
+    /* Get the user name and password */
     if( p_sys->url.psz_username || p_sys->url.psz_password )
     {
-        int err;
-        err = asprintf( &psz_url, "rtsp://%s:%d%s", p_sys->url.psz_host,
-                        p_sys->url.i_port, p_sys->url.psz_path );
-        if( err == -1 ) return VLC_ENOMEM;
-
         psz_user = strdup( p_sys->url.psz_username ? p_sys->url.psz_username : "" );
         psz_pwd  = strdup( p_sys->url.psz_password ? p_sys->url.psz_password : "");
     }
     else
     {
-        int err;
-        err = asprintf( &psz_url, "rtsp://%s", p_sys->psz_path );
-        if( err == -1 ) return VLC_ENOMEM;
-
         psz_user = var_CreateGetString( p_demux, "rtsp-user" );
         psz_pwd  = var_CreateGetString( p_demux, "rtsp-pwd" );
     }
