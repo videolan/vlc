@@ -243,7 +243,7 @@ static int  Open ( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = NULL;
 
-    int i, i_return;
+    int i_return;
     int i_error = VLC_EGENERIC;
 
     if( p_demux->s )
@@ -518,13 +518,11 @@ createnew:
     }
 
 describe:
-    authenticator.setUsernameAndPassword( (const char*)psz_user,
-                                          (const char*)psz_pwd );
+    authenticator.setUsernameAndPassword( psz_user, psz_pwd );
 
     /* */
-    const int i_timeout = var_CreateGetInteger(p_demux, "ipv4-timeout") / 1000;
-
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
+    const int i_timeout = var_CreateGetInteger(p_demux, "ipv4-timeout") / 1000;
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
                                                &authenticator, i_timeout );
 #else
@@ -599,10 +597,8 @@ describe:
         else if( (i_code != 0) && !var_GetBool( p_demux, "rtsp-http" ) )
         {
             /* Perhaps a firewall is being annoying. Try HTTP tunneling mode */
-            vlc_value_t val;
-            val.b_bool = true;
             msg_Dbg( p_demux, "we will now try HTTP tunneling mode" );
-            var_Set( p_demux, "rtsp-http", val );
+            var_SetBool( p_demux, "rtsp-http", true );
             if( p_sys->rtsp ) RTSPClient::close( p_sys->rtsp );
             p_sys->rtsp = NULL;
             goto createnew;
