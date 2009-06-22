@@ -43,7 +43,6 @@
 #include <vlc_input.h>
 #include <vlc_demux.h>
 #include <vlc_dialog.h>
-#include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 
@@ -56,10 +55,10 @@
 #   include <winsock2.h>
 #endif
 
-#include "UsageEnvironment.hh"
-#include "BasicUsageEnvironment.hh"
-#include "GroupsockHelper.hh"
-#include "liveMedia.hh"
+#include <UsageEnvironment.hh>
+#include <BasicUsageEnvironment.hh>
+#include <GroupsockHelper.hh>
+#include <liveMedia.hh>
 
 extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
