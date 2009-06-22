@@ -360,7 +360,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
         else if( !strcmp( s, "url_encode" ) )
         {
             char *url = SSPop( st );
-            char *value = vlc_UrlEncode( url );
+            char *value = encode_URI_component( url );
             free( url );
             SSPush( st, value );
             free( value );

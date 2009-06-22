@@ -193,12 +193,6 @@ static inline void vlc_UrlClean( vlc_url_t *url )
     url->psz_buffer   = NULL;
 }
 
-static inline char *vlc_UrlEncode( const char *psz_url )
-{
-    /* FIXME: do not encode / : ? and & _when_ not needed */
-    return encode_URI_component( psz_url );
-}
-
 #include <ctype.h>
 
 /** Check whether a given string is not a valid URL and must hence be
