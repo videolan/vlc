@@ -43,14 +43,12 @@
 
 #if !defined(HAVE_DYNAMIC_PLUGINS)
     /* no support for plugins */
-#elif defined(HAVE_DL_DYLD)
-#   if defined(HAVE_MACH_O_DYLD_H)
-#       include <mach-o/dyld.h>
-#   endif
 #elif defined(HAVE_DL_BEOS)
 #   if defined(HAVE_IMAGE_H)
 #       include <image.h>
 #   endif
+#elif defined(__APPLE__)
+#   include <dlfcn.h>
 #elif defined(HAVE_DL_WINDOWS)
 #   include <windows.h>
 #elif defined(HAVE_DL_DLOPEN)
@@ -98,7 +96,7 @@ int module_Call( vlc_object_t *obj, module_t *p_module )
 
     if( pf_symbol == NULL )
     {
-#if defined(HAVE_DL_DYLD) || defined(HAVE_DL_BEOS)
+#if defined(HAVE_DL_BEOS)
         msg_Warn( obj, "cannot find symbol \"%s\" in file `%s'",
                   psz_name, p_module->psz_filename );
 #elif defined(HAVE_DL_WINDOWS)
@@ -145,37 +143,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
 {
     module_handle_t handle;
 
-#if defined(HAVE_DL_DYLD)
-    NSObjectFileImage image;
-    NSObjectFileImageReturnCode ret;
-
-    ret = NSCreateObjectFileImageFromFile( psz_file, &image );
-
-    if( ret != NSObjectFileImageSuccess )
-    {
-        msg_Warn( p_this, "cannot create image from `%s'", psz_file );
-        return -1;
-    }
-
-    /* Open the dynamic module */
-    handle = NSLinkModule( image, psz_file,
-                           NSLINKMODULE_OPTION_RETURN_ON_ERROR );
-
-    if( !handle )
-    {
-        NSLinkEditErrors errors;
-        const char *psz_file, *psz_err;
-        int i_errnum;
-        NSLinkEditError( &errors, &i_errnum, &psz_file, &psz_err );
-        msg_Warn( p_this, "cannot link module `%s' (%s)", psz_file, psz_err );
-        NSDestroyObjectFileImage( image );
-        return -1;
-    }
-
-    /* Destroy our image, we won't need it */
-    NSDestroyObjectFileImage( image );
-
-#elif defined(HAVE_DL_BEOS)
+#if defined(HAVE_DL_BEOS)
     handle = load_add_on( psz_file );
     if( handle < 0 )
     {
@@ -253,10 +221,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
  */
 void module_Unload( module_handle_t handle )
 {
-#if defined(HAVE_DL_DYLD)
-    NSUnLinkModule( handle, FALSE );
-
-#elif defined(HAVE_DL_BEOS)
+#if defined(HAVE_DL_BEOS)
     unload_add_on( handle );
 
 #elif defined(HAVE_DL_WINDOWS)
@@ -289,15 +254,7 @@ void module_Unload( module_handle_t handle )
  */
 static void *module_Lookup( module_handle_t handle, const char *psz_function )
 {
-#if defined(HAVE_DL_DYLD)
-    char psz_call[strlen( psz_function ) + 2];
-    psz_call[0] = '_';
-    memcpy( psz_call + 1, psz_function, sizeof( psz_call ) - 1 );
-
-    NSSymbol sym = NSLookupSymbolInModule( handle, psz_call );
-    return NSAddressOfSymbol( sym );
-
-#elif defined(HAVE_DL_BEOS)
+#if defined(HAVE_DL_BEOS)
     void * p_symbol;
     if( B_OK == get_image_symbol( handle, psz_function,
                                   B_SYMBOL_TYPE_TEXT, &p_symbol ) )

@@ -32,12 +32,10 @@
 #include <dirent.h>                                                /* *dir() */
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <mach-o/dyld.h>
 
 #ifdef HAVE_LOCALE_H
 #   include <locale.h>
-#endif
-#ifdef HAVE_MACH_O_DYLD_H
-#   include <mach-o/dyld.h>
 #endif
 
 #ifndef MAXPATHLEN

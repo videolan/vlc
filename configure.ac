@@ -740,12 +740,6 @@ fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 dnl Check for dynamic plugins
 ac_cv_have_plugins=no
 
-# OS X style
-AC_CHECK_HEADERS(mach-o/dyld.h,
-  [AC_CHECK_FUNCS(NSLinkModule,
-    [AC_DEFINE(HAVE_DL_DYLD, 1, [Define if you have the Darwin dyld API])
-     ac_cv_have_plugins=yes])])
-
 # HP-UX style
 if test "${ac_cv_have_plugins}" = "no"; then
   AC_CHECK_HEADERS(dl.h)
