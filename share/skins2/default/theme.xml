@@ -233,7 +233,7 @@
         <Panel id="main.normal.display" width="0" height="0" rightbottom="righttop">
           <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time" x="325" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive"/>
           <Text text="$N" font="defaultfont" color="#CCCCCC" id="songticker" x="26" y="7" width="300" rightbottom="righttop" visible="dvd.isActive"/>
-          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time" x="390" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="notdvd.isActive"/>
+          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time" x="390" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="not dvd.isActive"/>
           <Text text="$N" font="defaultfont" color="#CCCCCC" id="songticker" x="26" y="7" width="365" rightbottom="righttop" visible="not dvd.isActive"/>
           <Button up="main.png.dbuttons.info.normal" down="main.png.dbuttons.info.down" over="main.png.dbuttons.info.hover" action="dialogs.fileInfo()" id="main.normal.dbuttons.info" x="9" y="7" tooltiptext="Show File Information"/>
           <Button up="main.png.dbuttons.ptitle.normal" down="main.png.dbuttons.ptitle.down" over="main.png.dbuttons.ptitle.hover" action="dvd.previousTitle()" id="main.normal.dbuttons.ptitle" x="431" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Play Previous Title on DVD"/>
