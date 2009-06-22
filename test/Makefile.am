@@ -75,11 +75,6 @@ test_libvlc_meta_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_meta_CFLAGS = $(CFLAGS_tests)
 test_libvlc_meta_LDFLAGS = $(LDFLAGS_tests)
 
-test_dummy_SOURCES = libvlc/test.c
-test_dummy_LDADD = $(top_builddir)/src/libvlc.la
-test_dummy_CFLAGS = $(CFLAGS_tests)
-test_dummy_LDFLAGS = $(LDFLAGS_tests)
-
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
 
