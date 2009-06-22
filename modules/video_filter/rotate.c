@@ -194,7 +194,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         const int i_pitch         = p_pic->p[i_plane].i_pitch;
         const int i_hidden_pitch  = i_pitch - i_visible_pitch;
 
-        const int i_aspect = ( i_visible_lines * p_pic->p[Y_PLANE].i_visible_pitch ) / ( p_pic->p[Y_PLANE].i_visible_lines * i_visible_pitch );
+        const int i_aspect = __MAX( 1, ( i_visible_lines * p_pic->p[Y_PLANE].i_visible_pitch ) / ( p_pic->p[Y_PLANE].i_visible_lines * i_visible_pitch ));
         /* = 2 for U and V planes in YUV 4:2:2, = 1 otherwise */
 
         const int i_line_center = i_visible_lines>>1;
