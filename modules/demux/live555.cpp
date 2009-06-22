@@ -443,6 +443,9 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static inline const char *strempty( const char *s ) { return s?s:""; }
+static inline Boolean toBool( bool b ) { return b?True:False; } // silly, no?
+
 /*****************************************************************************
  * Connect: connects to the RTSP server to setup the session DESCRIBE
  *****************************************************************************/
@@ -476,8 +479,8 @@ static int Connect( demux_t *p_demux )
     /* Get the user name and password */
     if( p_sys->url.psz_username || p_sys->url.psz_password )
     {
-        psz_user = strdup( p_sys->url.psz_username ? p_sys->url.psz_username : "" );
-        psz_pwd  = strdup( p_sys->url.psz_password ? p_sys->url.psz_password : "");
+        psz_user = strdup( strempty( p_sys->url.psz_username ) );
+        psz_pwd  = strdup( strempty( p_sys->url.psz_password ) );
     }
     else
     {
@@ -488,10 +491,8 @@ static int Connect( demux_t *p_demux )
 createnew:
     if( !vlc_object_alive (p_demux) || p_demux->b_error )
     {
-        free( psz_user );
-        free( psz_pwd );
-        free( psz_url );
-        return VLC_EGENERIC;
+        i_ret = VLC_EGENERIC;
+        goto bailout;
     }
 
     if( var_CreateGetBool( p_demux, "rtsp-http" ) )
@@ -503,10 +504,8 @@ createnew:
     {
         msg_Err( p_demux, "RTSPClient::createNew failed (%s)",
                  p_sys->env->getResultMsg() );
-        free( psz_user );
-        free( psz_pwd );
-        free( psz_url );
-        return VLC_EGENERIC;
+        i_ret = VLC_EGENERIC;
+        goto bailout;
     }
 
     /* Kasenna enables KeepAlive by analysing the User-Agent string.
@@ -525,6 +524,7 @@ describe:
     authenticator.setUsernameAndPassword( psz_user, psz_pwd );
 
     /* */
+    { /* i_timeout hack scope */
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
     const int i_timeout = var_CreateGetInteger(p_demux, "ipv4-timeout") / 1000;
     psz_options = p_sys->rtsp->sendOptionsCmd( psz_url, psz_user, psz_pwd,
@@ -545,16 +545,17 @@ describe:
 #endif
     }
     if( psz_options )
-        p_sys->b_get_param = strstr( psz_options, "GET_PARAMETER" ) ? true : false ;
+        p_sys->b_get_param = (bool)strstr( psz_options, "GET_PARAMETER" );
     delete [] psz_options;
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
-    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
-                                          var_GetBool( p_demux, "rtsp-kasenna" ), i_timeout );
+    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, psz_user, psz_pwd,
+                          var_GetBool( p_demux, "rtsp-kasenna" ), i_timeout );
 #else
-    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, (const char*)psz_user, (const char*)psz_pwd,
-                                          var_GetBool( p_demux, "rtsp-kasenna" ) );
+    p_sdp = p_sys->rtsp->describeWithPassword( psz_url, psz_user, psz_pwd,
+                                     var_GetBool( p_demux, "rtsp-kasenna" ) );
 #endif
+    } /* i_timeout scope end */
 
     if( p_sdp == NULL )
     {
@@ -616,15 +617,16 @@ describe:
         i_ret = VLC_EGENERIC;
     }
 
-    /* malloc-ated copy */
-    free( psz_url );
-    free( psz_user );
-    free( psz_pwd );
-
     free( p_sys->p_sdp );
     p_sys->p_sdp = NULL;
     if( p_sdp ) p_sys->p_sdp = strdup( (char*)p_sdp );
     delete[] p_sdp;
+
+bailout:
+    /* malloc-ated copy */
+    free( psz_url );
+    free( psz_user );
+    free( psz_pwd );
 
     return i_ret;
 }
@@ -720,27 +722,30 @@ static int SessionsSetup( demux_t *p_demux )
             if( p_sys->rtsp )
             {
                 if( !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                           b_rtsp_tcp ? True : False,
-                                           ( p_sys->b_force_mcast && !b_rtsp_tcp ) ? True : False ) )
+                                                        toBool( b_rtsp_tcp ),
+                             toBool( p_sys->b_force_mcast && !b_rtsp_tcp ) ) )
                 {
-                    /* if we get an unsupported transport error, toggle TCP use and try again */
-                    if( !strstr(p_sys->env->getResultMsg(), "461 Unsupported Transport")
-                     || !p_sys->rtsp->setupMediaSubsession( *sub, False,
-                                           b_rtsp_tcp ? False : True,
-                                           False ) )
+                    /* if we get an unsupported transport error, toggle TCP
+                     * use and try again */
+                    if( !strstr(p_sys->env->getResultMsg(),
+                                "461 Unsupported Transport")
+                        || !p_sys->rtsp->setupMediaSubsession( *sub, False,
+                                               toBool( b_rtsp_tcp ), False ) )
                     {
-                        msg_Err( p_demux, "SETUP of'%s/%s' failed %s", sub->mediumName(),
-                                 sub->codecName(), p_sys->env->getResultMsg() );
+                        msg_Err( p_demux, "SETUP of'%s/%s' failed %s",
+                                 sub->mediumName(), sub->codecName(),
+                                 p_sys->env->getResultMsg() );
                         continue;
                     }
                 }
             }
 
-            /* Check if we will receive data from this subsession for this track */
+            /* Check if we will receive data from this subsession for
+             * this track */
             if( sub->readSource() == NULL ) continue;
             if( !p_sys->b_multicast )
             {
-                /* Check, because we need diff. rollover behaviour for multicast */
+                /* We need different rollover behaviour for multicast */
                 p_sys->b_multicast = IsMulticastAddress( sub->connectionEndpointAddress() );
             }
 
@@ -845,8 +850,9 @@ static int SessionsSetup( demux_t *p_demux )
                         memcpy( tk->fmt.p_extra, p_extra, i_extra );
                         delete[] p_extra;
                     }
-                    /* Because the "faad" decoder does not handle the LATM data length field
-                       at the start of each returned LATM frame, tell the RTP source to omit it. */
+                    /* Because the "faad" decoder does not handle the LATM
+                     * data length field at the start of each returned LATM
+                     * frame, tell the RTP source to omit it. */
                     ((MPEG4LATMAudioRTPSource*)sub->rtpSource())->omitLATMDataLengthField();
                 }
                 else if( !strcmp( sub->codecName(), "MPEG4-GENERIC" ) )
