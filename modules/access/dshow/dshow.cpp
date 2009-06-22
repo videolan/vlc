@@ -2016,6 +2016,7 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     if( !p_item )
     {
         free( psz_device );
+        CoUninitialize();
         return VLC_SUCCESS;
     }
 
@@ -2034,7 +2035,11 @@ static int ConfigDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
         /* Enumerate devices */
         FindCaptureDevice( p_this, NULL, &list_devices, b_audio );
-        if( !list_devices.size() ) return VLC_EGENERIC;
+        if( !list_devices.size() )
+        {
+            CoUninitialize();
+            return VLC_EGENERIC;
+        }
         devicename = *list_devices.begin();
     }
 
