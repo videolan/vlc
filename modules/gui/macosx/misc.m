@@ -129,13 +129,14 @@ static NSMutableArray *blackoutWindows = NULL;
 + (void)load
 {
     /* init our fake object attribute */
-    blackoutWindows = [[NSMutableArray alloc] initWithCapacity:1];
+    if( !blackoutWindows )
+        blackoutWindows = [NSMutableArray arrayWithCapacity:1];
 }
 
 - (void)dealloc
 {
+    [blackoutWindows makeObjectsPerformSelector:@selector(close)];
     [blackoutWindows removeAllObjects];
-    [blackoutWindows release];
     [super dealloc];
 }
 
