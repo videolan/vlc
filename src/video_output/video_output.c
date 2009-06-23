@@ -1793,7 +1793,7 @@ static void DisplayTitleOnOSD( vout_thread_t *p_vout )
     const mtime_t i_stop = i_start + INT64_C(1000) * p_vout->p->i_title_timeout;
 
     if( i_stop <= i_start )
-        return
+        return;
 
     vlc_assert_locked( &p_vout->change_lock );
 
