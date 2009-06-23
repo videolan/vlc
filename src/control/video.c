@@ -34,6 +34,7 @@
 #include <vlc_vout.h>
 
 #include "media_player_internal.h"
+#include <vlc_osd.h>
 
 /*
  * Remember to release the returned vout_thread_t.
@@ -627,4 +628,177 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
     }
 
     vlc_object_release( p_vout );
+}
+
+/*****************************************************************************
+ * Marquee: FIXME: That implementation has not persistent state and requires
+ * a vout
+ *****************************************************************************/
+
+static inline const char * get_marquee_int_option_identifier(unsigned option)
+{
+    static const char * marquee_table[] =
+    {
+        "marq",
+        "marq-color",
+        "marq-opacity",
+        "marq-position",
+        "marq-refresh",
+        "marq-size",
+        "marq-timeout",
+        "marq-x",
+        "marq-y"
+    };
+    static const unsigned marquee_table_size = sizeof(marquee_table)/sizeof(*marquee_table);
+    if( option >= marquee_table_size )
+        return NULL;
+    return marquee_table[option];
+}
+
+static inline const char * get_marquee_string_option_identifier(unsigned option)
+{
+    static const char * marquee_table[] =
+    {
+        "marq-marquee"
+    };
+    static const unsigned marquee_table_size = sizeof(marquee_table)/sizeof(*marquee_table);
+    if( option >= marquee_table_size )
+        return NULL;
+    return marquee_table[option];
+}
+
+
+static inline vlc_object_t * get_marquee_object( libvlc_media_player_t * p_mi )
+{
+    libvlc_exception_t e;
+    libvlc_exception_init(&e);
+    vout_thread_t * vout = GetVout( p_mi, &e );
+    libvlc_exception_clear(&e);
+    if( !vout )
+        return NULL;
+    vlc_object_t * object = vlc_object_find_name( vout, "marq", FIND_CHILD );
+    vlc_object_release(vout);
+    return object;
+}
+
+/*****************************************************************************
+ * libvlc_video_get_marquee_option_as_int : get a marq option value
+ *****************************************************************************/
+int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
+                                            libvlc_video_marquee_int_option_t option,
+                                            libvlc_exception_t *p_e )
+{
+    const char * identifier = get_marquee_int_option_identifier(option);
+    if(!identifier)
+    {
+        libvlc_exception_raise( p_e, "This option is not available" );
+        return 0;
+    }
+    vlc_object_t * marquee = get_marquee_object(p_mi);
+
+    /* Handle the libvlc_marquee_Enabled separately */
+    if(option == libvlc_marquee_Enabled)
+    {
+        bool isEnabled = marquee != NULL;
+        vlc_object_release(marquee);
+        return isEnabled;
+    }
+    
+    /* Generic case */
+    if(!identifier)
+    {
+        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        return 0;
+    }
+    int ret = var_GetInteger(marquee, identifier);
+    vlc_object_release(marquee);
+    return ret;
+}
+
+/*****************************************************************************
+ * libvlc_video_get_marquee_option_as_string : get a marq option value
+ *****************************************************************************/
+char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
+                                                  libvlc_video_marquee_string_option_t option,
+                                                  libvlc_exception_t *p_e )
+{
+    const char * identifier = get_marquee_string_option_identifier(option);
+    if(!identifier)
+    {
+        libvlc_exception_raise( p_e, "This option is not available" );
+        return 0;
+    }
+    
+    vlc_object_t * marquee = get_marquee_object(p_mi);
+    if(!marquee)
+    {
+        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        return 0;
+    }
+    char *ret = var_GetString(marquee, identifier);
+    vlc_object_release(marquee);
+    return ret;
+}
+
+/*****************************************************************************
+ * libvlc_video_set_marquee_option_as_int: enable, disable or set an int option
+ *****************************************************************************/
+void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
+                                          libvlc_video_marquee_int_option_t option,
+                                          int value, libvlc_exception_t *p_e )
+{
+    const char * identifier = get_marquee_string_option_identifier(option);
+    if(!identifier)
+    {
+        libvlc_exception_raise( p_e, "This option is not available" );
+        return;
+    }
+
+    /* Handle the libvlc_marquee_Enabled separately */
+    if(option == libvlc_marquee_Enabled)
+    {
+        libvlc_exception_t e;
+        libvlc_exception_init(&e);
+        vout_thread_t * vout = GetVout( p_mi, &e );
+        libvlc_exception_clear(&e);
+        if (vout)
+            vout_EnableFilter(vout, identifier, value, false);
+        else
+            libvlc_exception_raise( p_e, "No Vout" );
+        vlc_object_release(vout);
+        return;
+    }
+    
+    vlc_object_t * marquee = get_marquee_object(p_mi);
+    if(!marquee)
+    {
+        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        return;
+    }
+    var_SetInteger(marquee, identifier, value);
+    vlc_object_release(marquee);
+}
+
+/*****************************************************************************
+ * libvlc_video_set_marquee_option_as_string: set a string option
+ *****************************************************************************/
+void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *p_mi,
+                                             libvlc_video_marquee_string_option_t option,
+                                             const char * value,
+                                             libvlc_exception_t *p_e )
+{
+    const char * identifier = get_marquee_string_option_identifier(option);
+    if(!identifier)
+    {
+        libvlc_exception_raise( p_e, "This option is not available" );
+        return;
+    }
+    vlc_object_t * marquee = get_marquee_object(p_mi);
+    if(!marquee)
+    {
+        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        return;
+    }
+    var_SetString(marquee, identifier, value);
+    vlc_object_release(marquee);
 }

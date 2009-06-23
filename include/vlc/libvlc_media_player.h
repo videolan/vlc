@@ -76,6 +76,28 @@ typedef struct libvlc_rectangle_t
     int bottom, right;
 } libvlc_rectangle_t;
 
+/**
+ * Marq int options definition
+ */
+typedef enum libvlc_video_marquee_int_option_t {
+    libvlc_marquee_Enabled = 0,
+    libvlc_marquee_Color,
+    libvlc_marquee_Opacity,
+    libvlc_marquee_Position,
+    libvlc_marquee_Refresh,
+    libvlc_marquee_Size,
+    libvlc_marquee_Timeout,
+    libvlc_marquee_X,
+    libvlc_marquee_Y
+} libvlc_video_marquee_int_option_t;
+
+/**
+ * Marq string options definition
+ */
+typedef enum libvlc_video_marquee_string_option_t {
+    libvlc_marquee_Text = 0
+} libvlc_video_marquee_string_option_t;
+
 
 /**
  * Create an empty Media Player object
@@ -725,6 +747,53 @@ VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, const c
 VLC_PUBLIC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *,
                                                   int , const char *,
                                                   libvlc_exception_t *);
+
+/**
+ * Get an option value (option which return an int)
+ *
+ * \param p_mi libvlc media player
+ * \param option marq option to get
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *,
+                                                        libvlc_video_marquee_int_option_t,
+                                                        libvlc_exception_t * );
+
+/**
+ * Get an option value (option which return a string)
+ *
+ * \param p_mi libvlc media player
+ * \param option marq option to get
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API char *libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *,
+                                                             libvlc_video_marquee_string_option_t,
+                                                             libvlc_exception_t * );
+
+/**
+ * Enable, disable or set a marq option (only int)
+ *
+ * \param p_mi libvlc media player
+ * \param option marq option to set
+ * \param i_val marq option value
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *,
+                                                         libvlc_video_marquee_int_option_t,
+                                                         int, libvlc_exception_t * );
+
+/**
+ * Set a marq option (only string)
+ *
+ * \param p_mi libvlc media player
+ * \param option marq option to set
+ * \param psz_text marq option value
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *,
+                                                            libvlc_video_marquee_string_option_t,
+                                                            const char *,
+                                                            libvlc_exception_t * );
 
 /** @} video */
 
