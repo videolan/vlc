@@ -1846,11 +1846,11 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
     {
         if( b_color )
             utf8_fprintf( stdout, "\n" WHITE "%s" GRAY "\n",
-                       _( "No matching module found. Use --list or" \
+                       _( "No matching module found. Use --list or " \
                           "--list-verbose to list available modules." ) );
         else
             utf8_fprintf( stdout, "\n%s\n",
-                       _( "No matching module found. Use --list or" \
+                       _( "No matching module found. Use --list or " \
                           "--list-verbose to list available modules." ) );
     }
 
