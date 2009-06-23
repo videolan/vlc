@@ -210,7 +210,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
             ;
         else if( !strcmp( psz_name, "xml:base" ) )
         {
-            p_demux->p_sys->psz_base = decode_URI_duplicate( psz_value );
+            p_demux->p_sys->psz_base = strdup( psz_value );
         }
         /* unknown attribute */
         else
@@ -546,6 +546,13 @@ static bool parse_track_node COMPLEX_INTERFACE
                 /* special case: location */
                 if( !strcmp( p_handler->name, "location" ) )
                 {
+                    /* FIXME: This is broken. Scheme-relative (//...) locations
+                     * and anchors (#...) are not resolved correctly. Also,
+                     * host-relative (/...) and directory-relative locations
+                     * ("relative path" in vernacular) should be resolved.
+                     * Last, psz_base should default to the XSPF resource
+                     * location if missing (not the current working directory).
+                     * -- Courmisch */
                     if( p_demux->p_sys->psz_base && !strstr( psz_value, "://" ) )
                     {
                         char* psz_tmp;
