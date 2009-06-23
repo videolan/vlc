@@ -35,18 +35,19 @@ VarManager::VarManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
 VarManager::~VarManager()
 {
-    // Delete the anonymous variables
-    while( !m_anonVarList.empty() )
-    {
-        m_anonVarList.pop_back();
-    }
-
     // Delete the variables in the reverse order they were added
     list<string>::const_iterator it1;
     for( it1 = m_varList.begin(); it1 != m_varList.end(); it1++ )
     {
         m_varMap.erase(*it1);
     }
+
+    // Delete the anonymous variables
+    while( !m_anonVarList.empty() )
+    {
+        m_anonVarList.pop_back();
+    }
+
 
     delete m_pTooltipText;
 
@@ -85,6 +86,8 @@ void VarManager::registerVar( const VariablePtr &rcVar, const string &rName )
 {
     m_varMap[rName] = rcVar;
     m_varList.push_front( rName );
+
+    m_anonVarList.push_back( rcVar );
 }
 
 
