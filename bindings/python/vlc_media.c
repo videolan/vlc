@@ -4,7 +4,7 @@
  * Copyright (C) 2007 the VideoLAN team
  * $Id$
  *
- * Authors: Olivier Aubert <oaubert at liris.cnrs.fr>
+ * Authors: Olivier Aubert <olivier.aubert at liris.cnrs.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

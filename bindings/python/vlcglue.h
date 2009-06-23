@@ -4,7 +4,7 @@
  * Copyright (C) 1998-2004 the VideoLAN team
  * $Id$
  *
- * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
+ * Authors: Olivier Aubert <olivier.aubert at liris.cnrs.fr>
  *          Clément Stenac <zorglub@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify

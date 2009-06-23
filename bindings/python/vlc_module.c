@@ -1,10 +1,10 @@
 /*****************************************************************************
  * vlc_module.c: vlc python binding module
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006,2007,2008,2009 the VideoLAN team
  * $Id$
  *
- * Authors: Olivier Aubert <oaubert at bat710.univ-lyon1.fr>
+ * Authors: Olivier Aubert <olivier.aubert at liris.cnrs.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
