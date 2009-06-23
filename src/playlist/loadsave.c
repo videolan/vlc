@@ -148,18 +148,19 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( psz_datadir == NULL )
         return VLC_EGENERIC;
 
-    if( asprintf( &psz_uri, "%s/ml.xspf", psz_datadir ) == -1 )
+    /* Force XSPF demux (psz_datadir was a path, now it is a file URI) */
+    if( asprintf( &psz_uri, "file/xspf-open%s/ml.xspf", psz_datadir+4 ) == -1 )
         psz_uri = NULL;
     free( psz_datadir );
     psz_datadir = NULL;
     if( psz_uri == NULL )
         return VLC_ENOMEM;
 
-    const char *const options[] = { "meta-file", "demux=xspf-open" };
+    const char *const options[1] = { "meta-file", };
     /* that option has to be cleaned in input_item_subitem_added() */
     /* vlc_gc_decref() in the same function */
     p_input = input_item_NewExt( p_playlist, psz_uri, _("Media Library"),
-                                 2, options, VLC_INPUT_OPTION_TRUSTED, -1 );
+                                 1, options, VLC_INPUT_OPTION_TRUSTED, -1 );
     free( psz_uri );
     if( p_input == NULL )
         return VLC_EGENERIC;
