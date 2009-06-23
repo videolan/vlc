@@ -30,6 +30,7 @@
 #include "playlist_internal.h"
 #include "config/configuration.h"
 #include <vlc_charset.h>
+#include <vlc_url.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -82,10 +83,10 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename ,
 int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 {
     input_item_t *p_input;
-    char *psz_uri;
     const char *const psz_option = "meta-file";
+    char *psz_uri = make_URI( psz_file );
 
-    if( asprintf( &psz_uri, "file/://%s", psz_file ) < 0 )
+    if( psz_uri == NULL )
         return VLC_EGENERIC;
 
     p_input = input_item_NewExt( p_playlist, psz_uri, psz_file,
