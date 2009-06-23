@@ -546,23 +546,11 @@ static bool parse_track_node COMPLEX_INTERFACE
                 /* special case: location */
                 if( !strcmp( p_handler->name, "location" ) )
                 {
-                    char *psz_location = psz_value;
-                    if( !strncmp( psz_value, "file://", 7 ) )   /* file path */
-                        psz_location = decode_URI( psz_value + 7 );
-                    else if( !strstr( psz_value, "://" ) )  /* relative path */
-                        psz_location = decode_URI( psz_value );
-
-                    if( !psz_location )
-                    {
-                        FREE_ATT();
-                        return false;
-                    }
-
                     if( p_demux->p_sys->psz_base && !strstr( psz_value, "://" ) )
                     {
                         char* psz_tmp;
-                        if( asprintf( &psz_tmp, "%s%s", p_demux->p_sys->psz_base,
-                                      psz_location ) == -1 )
+                        if( asprintf( &psz_tmp, "%s%s",
+                                p_demux->p_sys->psz_base, psz_value ) == -1 )
                         {
                             FREE_ATT();
                             return NULL;
@@ -571,7 +559,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                         free( psz_tmp );
                     }
                     else
-                        input_item_SetURI( p_new_input, psz_location );
+                        input_item_SetURI( p_new_input, psz_value );
                     input_item_CopyOptions( p_input_item, p_new_input );
                     FREE_ATT();
                     p_handler = NULL;

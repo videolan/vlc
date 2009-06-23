@@ -141,11 +141,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
     char *psz_uri = input_item_GetURI( p_item->p_input );
 
     if( psz_uri && *psz_uri )
-    {
-        psz = make_URI( psz_uri );
-        fprintf( p_file, "\t\t\t<location>%s</location>\n", psz );
-        free( psz );
-    }
+        fprintf( p_file, "\t\t\t<location>%s</location>\n", psz_uri );
 
     /* -> the name/title (only if different from uri)*/
     char *psz_name = input_item_GetTitle( p_item->p_input );
