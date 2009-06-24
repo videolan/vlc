@@ -221,27 +221,6 @@ static void Close( vlc_object_t * p_this )
     free (p_sys);
 }
 
-/**
- * URI-encodes a file path. The only reserved characters is slash.
- */
-static char *encode_path (const char *path)
-{
-    static const char sep[]= "%2F";
-    char *enc = encode_URI_component (path), *ptr = enc;
-
-    if (enc == NULL)
-        return NULL;
-
-    /* Replace '%2F' with '/'. TODO: extend encode_URI*() */
-    /* (On Windows, both ':' and '\\' will be encoded) */
-    while ((ptr = strstr (ptr, sep)) != NULL)
-    {
-        *ptr++ = '/';
-        memmove (ptr, ptr + 2, strlen (ptr) - 1);
-    }
-    return enc;
-}
-
 /* Detect directories that recurse into themselves. */
 static bool has_inode_loop (const directory_t *dir)
 {
@@ -287,7 +266,7 @@ static block_t *Block (access_t *p_access)
         current->parent = NULL;
         current->handle = p_sys->handle;
         strcpy (current->path, p_access->psz_path);
-        current->uri = encode_path (current->path);
+        current->uri = make_URI (current->path);
         if ((current->uri == NULL)
          || fstat (dirfd (current->handle), &current->st))
         {
@@ -446,7 +425,7 @@ static block_t *Block (access_t *p_access)
     if (encoded == NULL)
         goto fatal;
     int len = asprintf (&entry,
-                        "  <track><location>file://%s/%s</location>\n" \
+                        "  <track><location>%s/%s</location>\n" \
                         "   <extension application=\"http://www.videolan.org/vlc/playlist/0\">\n" \
                         "    <vlc:id>%d</vlc:id>\n" \
                         "   </extension>\n" \
