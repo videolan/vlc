@@ -353,6 +353,10 @@ char *input_item_GetURI( input_item_t *p_i )
 void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 {
     vlc_mutex_lock( &p_i->lock );
+#ifndef NDEBUG
+    if( !strstr( psz_uri, "://" || strstr( psz_uri, " " ) || strstr( psz_uri, "\") ))
+        fprintf( stderr, "input_item_SetURI() was likely called with a path. FIXME\n" );
+#endif
 
     free( p_i->psz_uri );
     p_i->psz_uri = strdup( psz_uri );
