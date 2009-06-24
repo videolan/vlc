@@ -668,6 +668,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
         if( psz_url[0] == '/' && psz_url[1] == '/' )
             psz_url += 2;
         p_sys->psz_sdp_file = strdup( psz_url );
+        FileSetup( p_stream );
     }
     else
     {
