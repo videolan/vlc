@@ -291,8 +291,8 @@ static VLCInfo *_o_sharedInstance = nil;
         char *psz_meta;
         NSImage *o_image;
         psz_meta = input_item_GetArtURL( p_item );
-        if( psz_meta && !strncmp( psz_meta, "file://", 7 ) && decode_URI( psz_meta + 7 ) )
-            o_image = [[NSImage alloc] initWithContentsOfFile: [NSString stringWithUTF8String: psz_meta+7]];
+        if( psz_meta )
+            o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:[NSString stringWithUTF8String: psz_meta]]];
         else
             o_image = [[NSImage imageNamed: @"noart.png"] retain];
         [o_image_well setImage: o_image];
