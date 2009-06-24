@@ -566,10 +566,11 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_mux )
     {
         assert( p_sys->i_es == 1 );
-        Del( p_stream, p_sys->es[0] );
 
         sout_MuxDelete( p_sys->p_mux );
+        Del( p_stream, p_sys->es[0] );
         sout_AccessOutDelete( p_sys->p_grab );
+
         if( p_sys->packet )
         {
             block_Release( p_sys->packet );
