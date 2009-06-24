@@ -389,10 +389,14 @@ QStringList DialogsProvider::showSimpleOpen( QString help,
     ADD_FILTER_ALL( fileTypes );
     fileTypes.replace( ";*", " *");
 
-    return QFileDialog::getOpenFileNames( NULL,
+    QStringList files = QFileDialog::getOpenFileNames( NULL,
         help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
         path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
+
+    if( !files.isEmpty() ) savedirpathFromFile( files.last() );
+
+    return files;
 }
 
 /**
