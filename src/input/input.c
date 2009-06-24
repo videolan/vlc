@@ -2335,6 +2335,7 @@ static int InputSourceInit( input_thread_t *p_input,
     const char *psz_access;
     const char *psz_demux;
     char *psz_path;
+    char *psz_var_demux = NULL;
     double f_fps;
 
     char *psz_dup = strdup( psz_mrl );
@@ -2402,7 +2403,7 @@ static int InputSourceInit( input_thread_t *p_input,
         {
             /* special hack for forcing a demuxer with --demux=module
              * (and do nothing with a list) */
-            char *psz_var_demux = var_GetNonEmptyString( p_input, "demux" );
+            psz_var_demux = var_GetNonEmptyString( p_input, "demux" );
 
             if( psz_var_demux != NULL &&
                 !strchr(psz_var_demux, ',' ) &&
@@ -2643,6 +2644,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
     }
 
+    free( psz_var_demux );
     free( psz_dup );
 
     /* Set record capabilities */
@@ -2692,6 +2694,8 @@ error:
 
     if( in->p_access )
         access_Delete( in->p_access );
+
+    free( psz_var_demux );
     free( psz_dup );
 
     return VLC_EGENERIC;
