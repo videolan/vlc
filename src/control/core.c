@@ -71,6 +71,7 @@ static void libvlc_exception_not_handled( const char *psz )
 {
     fprintf( stderr, "*** LibVLC Exception not handled: %s\nSet a breakpoint in '%s' to debug.\n",
              psz, __func__ );
+    abort();
 }
 
 void libvlc_exception_raise( libvlc_exception_t *p_exception,
