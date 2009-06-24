@@ -473,7 +473,7 @@ static void Win32AddConnection( access_t *p_access, char *psz_path,
             strlcpy( psz_share, psz_parser, sizeof( psz_share ) );
    }
 
-    sprintf( psz_remote, "\\\\%s\\%s", psz_server, psz_share );
+    snprintf( psz_remote, sizeof( psz_remote ), "\\\\%s\\%s", psz_server, psz_share );
     net_resource.lpRemoteName = psz_remote;
 
     i_result = OurWNetAddConnection2( &net_resource, psz_pwd, psz_user, 0 );
