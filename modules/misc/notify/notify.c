@@ -55,7 +55,7 @@ vlc_module_begin ()
     set_description( N_("LibNotify Notification Plugin") )
 
     add_integer( "notify-timeout", 4000, NULL,
-                TIMEOUT_TEXT, TIMEOUT_LONGTEXT, true )
+                 TIMEOUT_TEXT, TIMEOUT_LONGTEXT, true )
 
     set_capability( "interface", 0 )
     set_callbacks( Open, Close )
@@ -263,8 +263,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+/* libnotify callback, called when the "Next" button is pressed */
 static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
-{ /* libnotify callback, called when the "Next" button is pressed */
+{
     vlc_object_t *p_object = (vlc_object_t*)p;
 
     VLC_UNUSED(psz);
@@ -274,8 +275,9 @@ static void Next( NotifyNotification *notification, gchar *psz, gpointer p )
     pl_Release( p_object );
 }
 
+/* libnotify callback, called when the "Previous" button is pressed */
 static void Prev( NotifyNotification *notification, gchar *psz, gpointer p )
-{ /* libnotify callback, called when the "Previous" button is pressed */
+{
     vlc_object_t *p_object = (vlc_object_t*)p;
 
     VLC_UNUSED(psz);
@@ -315,9 +317,9 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     if( p_sys->b_has_actions )
     {
       notify_notification_add_action( notification, "previous", _("Previous"), Prev,
-				                      (gpointer*)p_intf, NULL );
+                                      (gpointer*)p_intf, NULL );
       notify_notification_add_action( notification, "next", _("Next"), Next,
-				                      (gpointer*)p_intf, NULL );
+                                      (gpointer*)p_intf, NULL );
     }
 
     notify_notification_show( notification, NULL);
