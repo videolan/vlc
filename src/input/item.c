@@ -361,8 +361,9 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 
     if( !p_i->psz_name && p_i->i_type == ITEM_TYPE_FILE )
     {
-        const char *psz_filename = strrchr( p_i->psz_uri, DIR_SEP_CHAR );
-        if( psz_filename && *psz_filename == DIR_SEP_CHAR )
+        const char *psz_filename = strrchr( p_i->psz_uri, '/' );
+
+        if( psz_filename && *psz_filename == '/' )
             psz_filename++;
         if( psz_filename && *psz_filename )
             p_i->psz_name = strdup( psz_filename );
