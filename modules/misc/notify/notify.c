@@ -154,16 +154,15 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     VLC_UNUSED(psz_var); VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    char                psz_tmp[MAX_LENGTH];
-    char                psz_notify[MAX_LENGTH];
-    char                *psz_title      = NULL;
-    char                *psz_artist     = NULL;
-    char                *psz_album      = NULL;
-    char                *psz_arturl     = NULL;
-    input_thread_t      *p_input        =  playlist_CurrentInput(
-                                                    (playlist_t*) p_this );
-    intf_thread_t       *p_intf         = param;
-    intf_sys_t          *p_sys          = p_intf->p_sys;
+    char           psz_tmp[MAX_LENGTH];
+    char           psz_notify[MAX_LENGTH];
+    char           *psz_title;
+    char           *psz_artist;
+    char           *psz_album;
+    char           *psz_arturl;
+    input_thread_t *p_input = playlist_CurrentInput( (playlist_t*)p_this );
+    intf_thread_t  *p_intf  = param;
+    intf_sys_t     *p_sys   = p_intf->p_sys;
 
     if( !p_input )
         return VLC_SUCCESS;
@@ -181,35 +180,28 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     /* Playing something ... */
     input_item_t *p_input_item = input_GetItem( p_input );
-    psz_artist = input_item_GetArtist( p_input_item );
-    psz_album = input_item_GetAlbum( p_input_item );
     psz_title = input_item_GetTitleFbName( p_input_item );
 
+    /* We need at least a title */
     if( EMPTY_STR( psz_title ) )
-    {  /* Not enough metadata ... */
+    {
         free( psz_title );
-        free( psz_artist );
-        free( psz_album );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
-    if( EMPTY_STR( psz_artist ) )
-    {
-        free( psz_artist );
-        psz_artist = NULL;
-    }
-    if( EMPTY_STR( psz_album ) )
-    {
-        free( psz_album );
-        psz_album = NULL;
-    }
 
-    if( psz_artist && psz_album )
-        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s\n[%s]",
-                  psz_title, psz_artist, psz_album );
-    else if( psz_artist )
-        snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s",
-                  psz_title, psz_artist );
+    psz_artist = input_item_GetArtist( p_input_item );
+    psz_album = input_item_GetAlbum( p_input_item );
+
+    if( !EMPTY_STR( psz_artist ) )
+    {
+        if( !EMPTY_STR( psz_album ) )
+            snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s\n[%s]",
+                      psz_title, psz_artist, psz_album );
+        else
+            snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>\n%s",
+                      psz_title, psz_artist );
+    }
     else
         snprintf( psz_tmp, MAX_LENGTH, "<b>%s</b>", psz_title );
 
