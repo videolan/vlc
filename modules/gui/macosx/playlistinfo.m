@@ -291,7 +291,9 @@ static VLCInfo *_o_sharedInstance = nil;
         char *psz_meta;
         NSImage *o_image;
         psz_meta = input_item_GetArtURL( p_item );
-        if( psz_meta )
+
+        /* FIXME Can also be attachment:// */
+        if( psz_meta && strncmp( psz_meta, "attachment://", 13 ) )
             o_image = [[NSImage alloc] initWithContentsOfURL: [NSURL URLWithString:[NSString stringWithUTF8String: psz_meta]]];
         else
             o_image = [[NSImage imageNamed: @"noart.png"] retain];
