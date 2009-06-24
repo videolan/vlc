@@ -2062,7 +2062,7 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
         Window parent_win;
         Window child_win;
         XWindowAttributes win_attr;
-        int screen_x,screen_y;
+        int screen_x,screen_y,win_width,win_height;
 
         XGetWindowAttributes(
                 p_vout->p_sys->p_display,
@@ -2085,7 +2085,10 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                 &screen_x,&screen_y,
                 &child_win);
 
-        msg_Dbg( p_vout, "X %d/%d Y %d/%d", win_attr.x,screen_x,win_attr.y,screen_y);
+        win_width = p_vout->p_sys->p_win->i_width;
+        win_height = p_vout->p_sys->p_win->i_height;
+        msg_Dbg( p_vout, "X %d/%d Y %d/%d",
+            win_width, screen_x, win_height, screen_y );
         /* screen_x and screen_y are current position */
 
         p_vout->p_sys->b_altfullscreen =
@@ -2203,18 +2206,44 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
              * otherwise use that screen where window is */
             if( SCREEN >= i_num_screens || SCREEN < 0 )
             {
+                int overlapping=0;
+                int rightmost_left=0;
+                int leftmost_right=0;
+                int bottommost_top=0;
+                int topmost_bottom=0;
+                int best_screen=0;
+                int best_overlapping=0;
+                int dx,dy;
                 msg_Dbg( p_vout, "requested screen number invalid (%d/%d)", SCREEN, i_num_screens );
-#define left screens[SCREEN].x_org
-#define right left + screens[SCREEN].width
+#define left ( screens[SCREEN].x_org )
+#define right ( left + screens[SCREEN].width )
 #define top screens[SCREEN].y_org
-#define bottom top + screens[SCREEN].height
+#define bottom ( top + screens[SCREEN].height )
 
-                 for( SCREEN = i_num_screens-1; SCREEN > 0; SCREEN--)
+                /* Code mostly same as http://superswitcher.googlecode.com/svn/trunk/src/xinerama.c
+                 * by Nigel Tao, as it was pretty clean implemention what's needed here. Checks what display
+                 * contains most of the window, and use that as fullscreen screen instead screen what
+                 * contains videowindows 0.0 */
+                 for( SCREEN = i_num_screens-1; SCREEN >= 0; SCREEN--)
                  {
-                     if( left <= screen_x && screen_x <= right &&
-                             top <= screen_y && screen_y <= bottom )
-                         break;
+                     rightmost_left = __MAX( left, screen_x );
+                     leftmost_right = __MIN( right, screen_x + win_width );
+                     bottommost_top = __MAX( top, screen_y );
+                     topmost_bottom = __MIN( bottom , screen_y + win_height );
+                     dx = leftmost_right - rightmost_left;
+                     dy = topmost_bottom - bottommost_top;
+                     overlapping=0;
+                     if ( dx > 0 && dy > 0 )
+                         overlapping = dx*dy;
+                     if( SCREEN == (i_num_screens-1) ||
+                             overlapping > best_overlapping )
+                     {
+                         best_overlapping = overlapping;
+                         best_screen = SCREEN;
+                     }
                  }
+                 msg_Dbg( p_vout, "setting best screen to %d", best_screen );
+                 SCREEN = best_screen;
 #undef bottom
 #undef top
 #undef right
