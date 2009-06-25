@@ -416,7 +416,7 @@ static bool parse_track_node COMPLEX_INTERFACE
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
 
-    input_item_t *p_new_input = input_item_New( p_demux, "vlc://nop", NULL );
+    input_item_t *p_new_input = input_item_New( p_demux, NULL, NULL );
 
     if( !p_new_input )
     {
@@ -503,10 +503,19 @@ static bool parse_track_node COMPLEX_INTERFACE
                     FREE_ATT();
                     return false;
                 }
+
                 /* leave if the current parent node <track> is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
                     FREE_ATT();
+
+                    /* Make sure we have a URI */
+                    char *psz_uri = input_item_GetURI( p_new_input );
+                    if( !psz_uri )
+                    {
+                        input_item_SetURI( p_new_input, "vlc://nop" );
+                    }
+                    free( psz_uri );
 
                     if( p_demux->p_sys->i_track_id < 0 )
                     {
