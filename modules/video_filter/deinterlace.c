@@ -388,11 +388,11 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    var_AddCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
-
     vout_filter_AllocateDirectBuffers( p_vout, VOUT_MAX_PICTURES );
 
     vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
+
+    var_AddCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
 
     return VLC_SUCCESS;
 }
@@ -416,6 +416,8 @@ static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout )
 static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
+
+    var_DelCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
 
     if( p_sys->p_vout )
     {
