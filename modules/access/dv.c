@@ -148,7 +148,6 @@ static int Open( vlc_object_t *p_this )
     char *psz_name = strdup( p_access->psz_path );
 
     struct raw1394_portinfo port_inf[ 16 ];
-    raw1394_iso_recv_handler_t handler;
 
     msg_Dbg( p_access, "opening device %s", psz_name );
 
@@ -403,6 +402,8 @@ Raw1394Handler(raw1394handle_t handle, unsigned char *data,
     access_t *p_access = NULL;
     access_sys_t *p_sys = NULL;
     block_t *p_block = NULL;
+    VLC_UNUSED(channel); VLC_UNUSED(tag);
+    VLC_UNUSED(sy); VLC_UNUSED(cycle); VLC_UNUSED(dropped);
 
     p_access = (access_t *) raw1394_get_userdata( handle );
     if( !p_access ) return 0;
