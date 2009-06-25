@@ -195,7 +195,6 @@ static int OpenPostproc( vlc_object_t *p_this )
     /* For some obscure reason the VLC_VAR_ISCOMMAND isn't taken into account
        in during var_Create */
     var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETISCOMMAND, NULL, NULL );
-    var_AddCallback( p_filter, FILTER_PREFIX "q", PPQCallback, NULL );
 
     text.psz_string = _("Post processing");
     var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETTEXT, &text, NULL );
@@ -205,7 +204,6 @@ static int OpenPostproc( vlc_object_t *p_this )
 
     val.psz_string = var_CreateGetNonEmptyStringCommand(
                                             p_filter, FILTER_PREFIX "name" );
-    var_AddCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
     if( val_orig.i_int )
     {
         p_sys->pp_mode = pp_get_mode_by_name_and_quality( val.psz_string ?
@@ -250,7 +248,11 @@ static int OpenPostproc( vlc_object_t *p_this )
                     &val, text.psz_string?&text:NULL );
     }
 
-    vlc_mutex_init( &p_sys->lock ); /* FIXME: too late w.r.t. callback */
+    vlc_mutex_init( &p_sys->lock );
+
+    /* Add the callback at the end to prevent crashes */
+    var_AddCallback( p_filter, FILTER_PREFIX "q", PPQCallback, NULL );
+    var_AddCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
 
     p_filter->pf_video_filter = PostprocPict;
     p_sys->b_had_matrix = true;
@@ -266,7 +268,11 @@ static void ClosePostproc( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    /* FIXME: delete callbacks before mutex */
+    /* delete the callback before destroying the mutex */
+    var_DelCallback( p_filter, FILTER_PREFIX "q", PPQCallback, NULL );
+    var_DelCallback( p_filter, FILTER_PREFIX "name", PPNameCallback, NULL );
+
+    /* Destroy the resources */
     vlc_mutex_destroy( &p_sys->lock );
     pp_free_context( p_sys->pp_context );
     if( p_sys->pp_mode ) pp_free_mode( p_sys->pp_mode );
