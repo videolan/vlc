@@ -54,6 +54,7 @@
 # define DIR_SHARE "share"
 #endif
 
+
 /**
  * config_GetDataDir: find directory where shared data is installed
  *
@@ -232,5 +233,15 @@ char *config_GetUserDataDir( void )
  */
 char *config_GetCacheDir( void )
 {
+#if defined(__APPLE__)
+    char *psz_dir;
+    const char *psz_parent = GetDir (true, false);
+
+    if( asprintf( &psz_dir, "%s" DIR_SEP CACHES_DIR, psz_parent ) == -1 )
+        psz_dir = NULL;
+
+    return psz_dir;
+#else
     return config_GetFooDir ("CACHE", ".cache");
+#endif
 }

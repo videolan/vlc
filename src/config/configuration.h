@@ -59,12 +59,15 @@ int ConfigStringToKey( const char * );
 #  define CONFIG_DIR                    "config/settings/VideoLAN Client"
 #elif defined (__APPLE__)
 #  define CONFIG_DIR                    "Library/Preferences/VLC"
+#  define CACHES_DIR                    "Library/Caches/VLC"
 #elif defined( WIN32 ) || defined( UNDER_CE )
 #  define CONFIG_DIR                    "vlc"
 #else
 #  define CONFIG_DIR                    ".vlc"
 #endif
 #define CONFIG_FILE                     "vlcrc"
+
+
 
 # ifdef __cplusplus
 }
