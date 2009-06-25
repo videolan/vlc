@@ -51,14 +51,11 @@ OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
     else if( !b_rawInstance )
     {
         /* Request the instance but change small details:
-           - Button menu
-           - Modality on top of the parent dialog */
+           - Button menu */
         if( b_selectMode )
-        {
-            instance->setWindowModality( Qt::WindowModal );
             _action_flag = SELECT; /* This should be useless, but we never know
                                       if the call is correct */
-        }
+        instance->setWindowModality( Qt::WindowModal );
         instance->i_action_flag = _action_flag;
         instance->b_pl = _b_pl;
         instance->setMenuAction();
@@ -76,14 +73,12 @@ OpenDialog::OpenDialog( QWidget *parent,
     b_pl =_b_pl;
 
     if( b_selectMode ) /* Select mode */
-    {
         i_action_flag = SELECT;
-        setWindowModality( Qt::WindowModal );
-    }
 
     /* Basic Creation of the Window */
     ui.setupUi( this );
     setWindowTitle( qtr( "Open Media" ) );
+    setWindowModality( Qt::WindowModal );
 
     /* Tab definition and creation */
     fileOpenPanel    = new FileOpenPanel( this, p_intf );
