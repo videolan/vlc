@@ -2338,6 +2338,7 @@ static int InputSourceInit( input_thread_t *p_input,
     char *psz_var_demux = NULL;
     double f_fps;
 
+    assert( psz_mrl );
     char *psz_dup = strdup( psz_mrl );
 
     if( psz_dup == NULL )
