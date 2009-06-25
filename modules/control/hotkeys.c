@@ -41,8 +41,6 @@
 #include "vlc_keys.h"
 #include "math.h"
 
-#define BUFFER_SIZE 10
-
 #define CHANNELS_NUMBER 4
 #define VOLUME_TEXT_CHAN     p_intf->p_sys->p_channels[ 0 ]
 #define VOLUME_WIDGET_CHAN   p_intf->p_sys->p_channels[ 1 ]
@@ -54,13 +52,9 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    int                 p_actions[ BUFFER_SIZE ]; /* buffer that contains
-                                                   * action events */
-    int                 i_size;        /* number of events in buffer */
+    vout_thread_t      *p_last_vout;
     int                 p_channels[ CHANNELS_NUMBER ]; /* contains registered
                                                         * channel IDs */
-    vlc_mutex_t         lock; /* callback lock */
-    vlc_cond_t          wait; /* callback event */
     int                 i_mousewheel_mode;
 };
 
@@ -69,8 +63,6 @@ struct intf_sys_t
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Run     ( intf_thread_t * );
-static int  GetAction( intf_thread_t *);
 static int  ActionEvent( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int  SpecialKeyEvent( vlc_object_t *, char const *,
@@ -125,11 +117,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_intf->p_sys = p_sys;
-    p_intf->pf_run = Run;
+    p_intf->pf_run = NULL;
 
-    p_sys->i_size = 0;
-    vlc_mutex_init( &p_sys->lock );
-    vlc_cond_init( &p_sys->wait );
+    p_sys->p_last_vout = NULL;
     p_intf->p_sys->i_mousewheel_mode =
         config_GetInt( p_intf, "hotkeys-mousewheel-mode" );
 
@@ -149,80 +139,62 @@ static void Close( vlc_object_t *p_this )
     var_DelCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
     var_DelCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
 
-    vlc_cond_destroy( &p_sys->wait );
-    vlc_mutex_destroy( &p_sys->lock );
-
     /* Destroy structure */
-    free( p_intf->p_sys );
+    free( p_sys );
 }
 
-/*****************************************************************************
- * Run: main loop
- *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static int PutAction( intf_thread_t *p_intf, int i_action )
 {
-    vout_thread_t *p_vout = NULL;
-    aout_instance_t *p_aout = NULL;
+    intf_sys_t *p_sys = p_intf->p_sys;
     playlist_t *p_playlist = pl_Hold( p_intf );
-    int canc = vlc_savecancel();
 
-    vlc_cleanup_push( __pl_Release, p_intf );
+    /* Update the input */
+    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
 
-    for( ;; )
+    /* Update the vout */
+    vout_thread_t *p_vout = p_input ? input_GetVout( p_input ) : NULL;
+
+    /* Update the aout */
+    aout_instance_t *p_aout = p_input ? input_GetAout( p_input ) : NULL;
+
+    /* Register OSD channels */
+    /* FIXME: this check can fail if the new vout is reallocated at the same
+     * address as the old one... We should rather listen to vout events.
+     * Alternatively, we should keep a reference to the vout thread. */
+    if( p_vout && p_vout != p_sys->p_last_vout )
+        for( unsigned i = 0; i < CHANNELS_NUMBER; i++ )
+             spu_Control( vout_GetSpu( p_vout ), SPU_CHANNEL_REGISTER,
+                          &p_intf->p_sys->p_channels[ i ] );
+    p_sys->p_last_vout = p_vout;
+
+    /* Quit */
+    switch( i_action )
     {
-        input_thread_t *p_input;
-        vout_thread_t *p_last_vout;
-        int i_action;
-
-        vlc_restorecancel( canc );
-        i_action = GetAction( p_intf );
-
-        canc = vlc_savecancel();
-
-        /* Update the input */
-        p_input = playlist_CurrentInput( p_playlist );
-
-        /* Update the vout */
-        p_last_vout = p_vout;
-        p_vout = p_input ? input_GetVout( p_input ) : NULL;
-
-        /* Update the aout */
-        p_aout = p_input ? input_GetAout( p_input ) : NULL;
-
-        /* Register OSD channels */
-        if( p_vout && p_vout != p_last_vout )
-        {
-            int i;
-            for( i = 0; i < CHANNELS_NUMBER; i++ )
-            {
-                spu_Control( vout_GetSpu( p_vout ), SPU_CHANNEL_REGISTER,
-                             &p_intf->p_sys->p_channels[ i ] );
-            }
-        }
-
-        /* Quit */
-        if( i_action == ACTIONID_QUIT )
-        {
+        case ACTIONID_QUIT:
             libvlc_Quit( p_intf->p_libvlc );
 
             ClearChannels( p_intf, p_vout );
             vout_OSDMessage( p_intf, DEFAULT_CHAN, _( "Quit" ) );
-            goto cleanup_and_continue;
-        }
+            break;
+
         /* Volume and audio actions */
-        else if( i_action == ACTIONID_VOL_UP )
+        case ACTIONID_VOL_UP:
         {
             audio_volume_t i_newvol;
             aout_VolumeUp( p_intf, 1, &i_newvol );
             DisplayVolume( p_intf, p_vout, i_newvol );
+            break;
         }
-        else if( i_action == ACTIONID_VOL_DOWN )
+
+        case ACTIONID_VOL_DOWN:
         {
             audio_volume_t i_newvol;
             aout_VolumeDown( p_intf, 1, &i_newvol );
             DisplayVolume( p_intf, p_vout, i_newvol );
+            break;
         }
-        else if( i_action == ACTIONID_VOL_MUTE )
+
+        case ACTIONID_VOL_MUTE:
         {
             audio_volume_t i_newvol = -1;
             aout_VolumeMute( p_intf, &i_newvol );
@@ -235,40 +207,44 @@ static void Run( intf_thread_t *p_intf )
                                   OSD_MUTE_ICON );
                 }
                 else
-                {
                     DisplayVolume( p_intf, p_vout, i_newvol );
-                }
             }
+            break;
         }
+
         /* Interface showing */
-        else if( i_action == ACTIONID_INTF_SHOW )
+        case ACTIONID_INTF_SHOW:
             var_SetBool( p_intf->p_libvlc, "intf-show", true );
-        else if( i_action == ACTIONID_INTF_HIDE )
+            break;
+
+        case ACTIONID_INTF_HIDE:
             var_SetBool( p_intf->p_libvlc, "intf-show", false );
+            break;
+
         /* Video Output actions */
-        else if( i_action == ACTIONID_SNAPSHOT )
-        {
-            if( p_vout ) var_TriggerCallback( p_vout, "video-snapshot" );
-        }
-        else if( i_action == ACTIONID_TOGGLE_FULLSCREEN )
+        case ACTIONID_SNAPSHOT:
+            if( p_vout )
+                var_TriggerCallback( p_vout, "video-snapshot" );
+            break;
+
+        case ACTIONID_TOGGLE_FULLSCREEN:
         {
             vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
                                        : VLC_OBJECT(p_playlist);
             bool b = var_GetBool( obj, "fullscreen" );
             var_SetBool( obj, "fullscreen", !b );
+            break;
         }
-        else if( i_action == ACTIONID_LEAVE_FULLSCREEN )
-        {
+
+        case ACTIONID_LEAVE_FULLSCREEN:
             if( p_vout && var_GetBool( p_vout, "fullscreen" ) )
-            {
                 var_SetBool( p_vout, "fullscreen", false );
-            }
-        }
-        else if( i_action == ACTIONID_ZOOM_QUARTER ||
-                 i_action == ACTIONID_ZOOM_HALF ||
-                 i_action == ACTIONID_ZOOM_ORIGINAL ||
-                 i_action == ACTIONID_ZOOM_DOUBLE )
-        {
+            break;
+
+        case ACTIONID_ZOOM_QUARTER:
+        case ACTIONID_ZOOM_HALF:
+        case ACTIONID_ZOOM_ORIGINAL:
+        case ACTIONID_ZOOM_DOUBLE:
             if( p_vout )
             {
                 float f;
@@ -282,9 +258,10 @@ static void Run( intf_thread_t *p_intf )
                 }
                 var_SetFloat( p_vout, "zoom", f );
             }
-        }
+            break;
+
 #ifdef WIN32
-        else if( i_action == ACTIONID_WALLPAPER )
+        case ACTIONID_WALLPAPER:
         {   /* FIXME: this is invalid if not using DirectX output!!! */
             vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
                                        : VLC_OBJECT(p_playlist);
@@ -292,9 +269,9 @@ static void Run( intf_thread_t *p_intf )
             var_SetBool( obj, "directx-wallpaper", !b );
         }
 #endif
+
         /* Playlist actions */
-        else if( i_action == ACTIONID_LOOP )
-        {
+        case ACTIONID_LOOP:
             /* Toggle Normal -> Loop -> Repeat -> Normal ... */
             if( var_GetBool( p_playlist, "repeat" ) )
                 var_SetBool( p_playlist, "repeat", false );
@@ -306,14 +283,15 @@ static void Run( intf_thread_t *p_intf )
             }
             else
                 var_SetBool( p_playlist, "loop", true );
-        }
-        else if( i_action == ACTIONID_RANDOM )
+            break;
+
+        case ACTIONID_RANDOM:
         {
             bool b = var_GetBool( p_playlist, "random" );
             var_SetBool( p_playlist, "random", !b );
         }
-        else if( i_action == ACTIONID_PLAY_PAUSE )
-        {
+
+        case ACTIONID_PLAY_PAUSE:
             if( p_input )
             {
                 ClearChannels( p_intf, p_vout );
@@ -334,12 +312,14 @@ static void Run( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "state", state );
             }
             else
-            {
                 playlist_Play( p_playlist );
-            }
-        }
-        else if( ( i_action == ACTIONID_AUDIODEVICE_CYCLE ) && p_aout )
+            break;
+
+        case ACTIONID_AUDIODEVICE_CYCLE:
         {
+            if( !p_aout )
+                break;
+
             vlc_value_t val, list, list2;
             int i_count, i;
 
@@ -382,10 +362,15 @@ static void Run( intf_thread_t *p_intf )
                         list2.p_list->p_values[i].psz_string);
             }
             var_FreeList( &list, &list2 );
+            break;
         }
+
         /* Input options */
-        else if( p_input )
+        default:
         {
+            if( !p_input )
+                break;
+
             bool b_seekable = var_GetBool( p_input, "can-seek" );
             int i_interval =0;
 
@@ -638,7 +623,8 @@ static void Run( intf_thread_t *p_intf )
                 }
                 free( val.psz_string );
             }
-            else if( ( i_action == ACTIONID_ZOOM || i_action == ACTIONID_UNZOOM ) && p_vout )
+            else if( ( i_action == ACTIONID_ZOOM ||
+                       i_action == ACTIONID_UNZOOM ) && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
                 var_Get( p_vout, "zoom", &val );
@@ -873,54 +859,16 @@ static void Run( intf_thread_t *p_intf )
                 }
             }
         }
-cleanup_and_continue:
-        if( p_aout )
-            vlc_object_release( p_aout );
-        if( p_vout )
-            vlc_object_release( p_vout );
-        if( p_input )
-            vlc_object_release( p_input );
     }
-
-    /* dead code */
-    abort();
-    vlc_cleanup_pop();
-}
-
-static int GetAction( intf_thread_t *p_intf )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i_ret;
-
-    vlc_mutex_lock( &p_sys->lock );
-    mutex_cleanup_push( &p_sys->lock );
-
-    while( p_sys->i_size == 0 )
-        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-
-    i_ret = p_sys->p_actions[ 0 ];
-    p_sys->i_size--;
-    for( int i = 0; i < p_sys->i_size; i++ )
-        p_sys->p_actions[i] = p_sys->p_actions[i + 1];
-
-    vlc_cleanup_run();
-    return i_ret;
-}
-
-static int PutAction( intf_thread_t *p_intf, int i_action )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-    int i_ret = VLC_EGENERIC;
-
-    vlc_mutex_lock( &p_sys->lock );
-    if ( p_sys->i_size >= BUFFER_SIZE )
-        msg_Warn( p_intf, "event buffer full, dropping key actions" );
-    else
-        p_sys->p_actions[p_sys->i_size++] = i_action;
-
-    vlc_cond_signal( &p_sys->wait );
-    vlc_mutex_unlock( &p_sys->lock );
-    return i_ret;
+cleanup_and_continue:
+    if( p_aout )
+        vlc_object_release( p_aout );
+    if( p_vout )
+        vlc_object_release( p_vout );
+    if( p_input )
+        vlc_object_release( p_input );
+    pl_Release( p_intf );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
