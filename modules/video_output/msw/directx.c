@@ -433,6 +433,7 @@ static void CloseVideo( vlc_object_t *p_this )
     StopEventThread( p_vout );
 
     /* Make sure the wallpaper is restored */
+    var_DelCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
     SwitchWallpaperMode( p_vout, false );
 
     RestoreScreensaver( p_vout );
