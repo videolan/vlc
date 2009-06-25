@@ -339,6 +339,7 @@ static int Open( vlc_object_t * p_this )
         /* FIXME set end of area FIXME */
         goto error;
     case VLC_CODEC_GSM_MS:
+    case VLC_CODEC_ADPCM_G726:
         if( FrameInfo_MSGSM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                              &p_sys->fmt ) )
             goto error;
@@ -351,12 +352,13 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->i_frame_size <= 0 || p_sys->i_frame_samples <= 0 )
     {
-        msg_Dbg( p_demux, "invalid frame size" );
+        msg_Dbg( p_demux, "invalid frame size: %i %i", p_sys->i_frame_size,
+                                                       p_sys->i_frame_samples );
         goto error;
     }
     if( p_sys->fmt.audio.i_rate <= 0 )
     {
-        msg_Dbg( p_demux, "invalid sample rate" );
+        msg_Dbg( p_demux, "invalid sample rate: %i", p_sys->fmt.audio.i_rate );
         goto error;
     }
 
@@ -385,6 +387,7 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
+    msg_Err( p_demux, "An error occured during wav demuxing" );
     free( p_wf );
     free( p_sys );
     return VLC_EGENERIC;
