@@ -275,17 +275,15 @@ static void Close( vlc_object_t *p_this )
         if( p_sys->p_raw1394 )
             raw1394_iso_shutdown( p_sys->p_raw1394 );
 
-        vlc_mutex_destroy( &p_sys->p_ev->lock );
         vlc_thread_join( p_sys->p_ev );
+        vlc_mutex_destroy( &p_sys->p_ev->lock );
 
         /* Cleanup frame data */
         if( p_sys->p_ev->p_frame )
         {
-            vlc_mutex_lock( &p_sys->p_ev->lock );
             block_ChainRelease( p_sys->p_ev->p_frame );
             p_sys->p_ev->p_frame = NULL;
             p_sys->p_ev->pp_last = &p_sys->p_frame;
-            vlc_mutex_unlock( &p_sys->p_ev->lock );
         }
         vlc_object_release( p_sys->p_ev );
     }
