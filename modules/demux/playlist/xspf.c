@@ -416,7 +416,7 @@ static bool parse_track_node COMPLEX_INTERFACE
           {NULL,           UNKNOWN_CONTENT, {NULL} }
         };
 
-    input_item_t *p_new_input = input_item_New( p_demux, NULL, NULL );
+    input_item_t *p_new_input = input_item_New( p_demux, "vlc://nop", NULL );
 
     if( !p_new_input )
     {
