@@ -47,8 +47,13 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
-#if HAVE_SYS_MOUNT_H
-#include <sys/mount.h>
+#if defined (__linux__)
+#   include <sys/vfs.h>
+#   include <linux/magic.h>
+#   define HAVE_FSTATFS 1
+#elif defined (HAVE_SYS_MOUNT_H)
+#   include <sys/mount.h>
+#   define HAVE_FSTATFS 1
 #endif
 
 #if defined( WIN32 )
@@ -118,6 +123,38 @@ struct access_sys_t
     bool b_pace_control;
 };
 
+static bool IsRemote (int fd)
+{
+#ifdef HAVE_FSTATFS
+    struct statfs stf;
+
+    if (fstatfs (fd, &stf))
+        return false;
+
+#if defined(MNT_LOCAL)
+    return !(stf.f_flags & MNT_LOCAL);
+
+#elif defined (__linux__)
+    switch (stf.f_type)
+    {
+        case AFS_SUPER_MAGIC:
+        case CODA_SUPER_MAGIC:
+        case NCP_SUPER_MAGIC:
+        case NFS_SUPER_MAGIC:
+        case SMB_SUPER_MAGIC:
+        case 0xFF534D42 /*CIFS_MAGIC_NUMBER*/:
+            return true;
+    }
+    return false;
+
+#endif
+#else /* !HAVE_FSTATFS */
+    return false;
+
+#endif
+}
+
+
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -174,14 +211,13 @@ static int Open( vlc_object_t *p_this )
 # warning File size not known!
 #endif
 
-#if defined(HAVE_SYS_MOUNT_H) && defined(MNT_LOCAL)
-    struct statfs stat;
-    if ((fstatfs (fd, &stat) == 0) && !(stat.f_flags & MNT_LOCAL) ) {
+    if (IsRemote(fd))
+    {
         int i_cache = var_GetInteger (p_access, "file-caching") + 700;
         var_SetInteger (p_access, "file-caching", i_cache);
-        msg_Warn (p_access, "Opening non-local file, use more caching: %d", i_cache);
+        msg_Warn (p_access, "Opening remote file, increasing cache: %d",
+                  i_cache);
     }
-#endif
 
     p_sys->fd = fd;
     return VLC_SUCCESS;
