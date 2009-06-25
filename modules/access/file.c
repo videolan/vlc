@@ -47,6 +47,9 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
+#if HAVE_SYS_MOUNT_H
+#include <sys/mount.h>
+#endif
 
 #if defined( WIN32 )
 #   include <io.h>
@@ -169,6 +172,15 @@ static int Open( vlc_object_t *p_this )
     }
 #else
 # warning File size not known!
+#endif
+
+#if defined(HAVE_SYS_MOUNT_H) && defined(MNT_LOCAL)
+    struct statfs stat;
+    if ((fstatfs (fd, &stat) == 0) && !(stat.f_flags & MNT_LOCAL) ) {
+        int i_cache = var_GetInteger (p_access, "file-caching") + 700;
+        var_SetInteger (p_access, "file-caching", i_cache);
+        msg_Warn (p_access, "Opening non-local file, use more caching: %d", i_cache);
+    }
 #endif
 
     p_sys->fd = fd;
