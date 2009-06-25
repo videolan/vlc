@@ -618,8 +618,9 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip )
     if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
         return VLC_EGENERIC;
     int i_format = GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ );
-    if( i_format != WAVE_FORMAT_PCM && /* WAVE_FORMAT_PCM */
-        i_format != WAVE_FORMAT_A52 /* WAVE_FORMAT_A52 */ )
+    if( i_format != WAVE_FORMAT_PCM &&
+        i_format != WAVE_FORMAT_A52 &&
+        i_format != WAVE_FORMAT_DTS )
         return VLC_EGENERIC;
     if( GetWLE( p_peek + i_peek - i_len - 6 /* nChannels */ ) != 2 )
         return VLC_EGENERIC;
