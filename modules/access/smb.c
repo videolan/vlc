@@ -258,8 +258,6 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     smbc_close( p_sys->i_smb );
-    smbc_free_context( smbc_set_context(NULL), 1 );
-
     free( p_sys );
 }
 
