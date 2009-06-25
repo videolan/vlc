@@ -1,7 +1,7 @@
 /*****************************************************************************
  * smb.c: SMB input module
  *****************************************************************************
- * Copyright (C) 2001-2004 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -50,7 +50,6 @@
 #   define smbc_close close
 #else
 #   include <libsmbclient.h>
-#   define USE_CTX 1
 #endif
 
 #include <errno.h>
@@ -103,12 +102,7 @@ static int Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
-#ifdef USE_CTX
-    SMBCCTX *p_smb;
-    SMBCFILE *p_file;
-#else
     int i_smb;
-#endif
 };
 
 #ifdef WIN32
@@ -132,17 +126,10 @@ static int Open( vlc_object_t *p_this )
     char         *psz_path, *psz_uri;
     char         *psz_user = NULL, *psz_pwd = NULL, *psz_domain = NULL;
     int          i_ret;
-
-#ifdef USE_CTX
-    SMBCCTX      *p_smb;
-    SMBCFILE     *p_file;
-#else
     int          i_smb;
-#endif
 
     /* Parse input URI
      * [[[domain;]user[:password@]]server[/share[/path[/file]]]] */
-
     psz_path = strchr( p_access->psz_path, '/' );
     if( !psz_path )
     {
@@ -217,42 +204,8 @@ static int Open( vlc_object_t *p_this )
     if( i_ret == -1 )
         return VLC_ENOMEM;
 
-#ifdef USE_CTX
-    if( !(p_smb = smbc_new_context()) )
-    {
-        free( psz_uri );
-        return VLC_ENOMEM;
-    }
-    p_smb->debug = 1;
-    p_smb->callbacks.auth_fn = smb_auth;
-
-    if( !smbc_init_context( p_smb ) )
-    {
-        msg_Err( p_access, "cannot initialize context (%m)" );
-        smbc_free_context( p_smb, 1 );
-        free( psz_uri );
-        return VLC_EGENERIC;
-    }
-
-    if( !(p_file = (p_smb->open)( p_smb, psz_uri, O_RDONLY, 0 )) )
-    {
-        msg_Err( p_access, "open failed for '%s' (%m)",
-                 p_access->psz_path );
-        smbc_free_context( p_smb, 1 );
-        free( psz_uri );
-        return VLC_EGENERIC;
-    }
-
-    /* Init p_access */
-    STANDARD_READ_ACCESS_INIT;
-
-    i_ret = p_smb->fstat( p_smb, p_file, &filestat );
-    if( i_ret ) msg_Err( p_access, "stat failed (%m)" );
-    else p_access->info.i_size = filestat.st_size;
-#else
-
 #ifndef WIN32
-    if( smbc_init( smb_auth, 1 ) )
+    if( smbc_init( smb_auth, 0 ) )
     {
         free( psz_uri );
         return VLC_EGENERIC;
@@ -269,8 +222,7 @@ static int Open( vlc_object_t *p_this )
 #endif
     if( (i_smb = smbc_open( psz_uri, O_RDONLY, 0 )) < 0 )
     {
-        msg_Err( p_access, "open failed for '%s' (%m)",
-                 p_access->psz_path );
+        msg_Err( p_access, "open failed for '%s' (%m)", p_access->psz_path );
         free( psz_uri );
         return VLC_EGENERIC;
     }
@@ -284,17 +236,12 @@ static int Open( vlc_object_t *p_this )
         errno = i_ret;
         msg_Err( p_access, "stat failed (%m)" );
     }
-    else p_access->info.i_size = filestat.st_size;
-#endif
+    else
+        p_access->info.i_size = filestat.st_size;
 
     free( psz_uri );
 
-#ifdef USE_CTX
-    p_sys->p_smb = p_smb;
-    p_sys->p_file = p_file;
-#else
     p_sys->i_smb = i_smb;
-#endif
 
     /* Update default_pts to a suitable value for smb access */
     var_Create( p_access, "smb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -310,16 +257,8 @@ static void Close( vlc_object_t *p_this )
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
 
-#ifdef USE_CTX
-#  ifndef HAVE__SMBCCTX_CLOSE_FN
-    p_sys->p_smb->close( p_sys->p_smb, p_sys->p_file );
-#  else
-    p_sys->p_smb->close_fn( p_sys->p_smb, p_sys->p_file );
-#  endif
-    smbc_free_context( p_sys->p_smb, 1 );
-#else
     smbc_close( p_sys->i_smb );
-#endif
+    smbc_free_context( smbc_set_context(NULL), 1 );
 
     free( p_sys );
 }
@@ -336,11 +275,7 @@ static int Seek( access_t *p_access, int64_t i_pos )
 
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
-#ifdef USE_CTX
-    i_ret = p_sys->p_smb->lseek(p_sys->p_smb, p_sys->p_file, i_pos, SEEK_SET);
-#else
     i_ret = smbc_lseek( p_sys->i_smb, i_pos, SEEK_SET );
-#endif
     if( i_ret == -1 )
     {
         msg_Err( p_access, "seek failed (%m)" );
@@ -363,11 +298,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     if( p_access->info.b_eof ) return 0;
 
-#ifdef USE_CTX
-    i_read = p_sys->p_smb->read(p_sys->p_smb, p_sys->p_file, p_buffer, i_len);
-#else
     i_read = smbc_read( p_sys->i_smb, p_buffer, i_len );
-#endif
     if( i_read < 0 )
     {
         msg_Err( p_access, "read failed (%m)" );
