@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_codec.h>
+#include <vlc_codecs.h>
 #include <vlc_input.h>
 
 #include "../../codec/a52.h"
@@ -616,8 +617,9 @@ static int WavSkipHeader( demux_t *p_demux, int *pi_skip )
     i_peek += i_len + 8;
     if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
         return VLC_EGENERIC;
-    if( GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ ) !=
-        1 /* WAVE_FORMAT_PCM */ )
+    int i_format = GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ );
+    if( i_format != WAVE_FORMAT_PCM && /* WAVE_FORMAT_PCM */
+        i_format != WAVE_FORMAT_A52 /* WAVE_FORMAT_A52 */ )
         return VLC_EGENERIC;
     if( GetWLE( p_peek + i_peek - i_len - 6 /* nChannels */ ) != 2 )
         return VLC_EGENERIC;
