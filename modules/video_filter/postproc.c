@@ -202,8 +202,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     var_Get( p_filter, FILTER_PREFIX "q", &val_orig );
     var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_DELCHOICE, &val_orig, NULL );
 
-    val.psz_string = var_CreateGetNonEmptyStringCommand(
-                                            p_filter, FILTER_PREFIX "name" );
+    val.psz_string = var_GetNonEmptyString( p_filter, FILTER_PREFIX "name" );
     if( val_orig.i_int )
     {
         p_sys->pp_mode = pp_get_mode_by_name_and_quality( val.psz_string ?
