@@ -35,9 +35,9 @@
 #include <vlc_access.h>
 
 #ifdef WIN32
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
+#   ifdef HAVE_FCNTL_H
+#       include <fcntl.h>
+#   endif
 #   ifdef HAVE_SYS_STAT_H
 #       include <sys/stat.h>
 #   endif
@@ -320,17 +320,8 @@ static int Control( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
     case ACCESS_CAN_SEEK:
-        pb_bool = (bool*)va_arg( args, bool* );
-        *pb_bool = true;
-        break;
     case ACCESS_CAN_FASTSEEK:
-        pb_bool = (bool*)va_arg( args, bool* );
-        *pb_bool = true;
-        break;
     case ACCESS_CAN_PAUSE:
-        pb_bool = (bool*)va_arg( args, bool* );
-        *pb_bool = true;
-        break;
     case ACCESS_CAN_CONTROL_PACE:
         pb_bool = (bool*)va_arg( args, bool* );
         *pb_bool = true;
