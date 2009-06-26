@@ -154,7 +154,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         free( p_dec->p_sys );
         return VLC_EGENERIC;
     }
-    var_AddCallback( p_dec, "fake-file", FakeCallback, p_dec );
 
     memset( &fmt_in, 0, sizeof(fmt_in) );
     memset( &fmt_out, 0, sizeof(fmt_out) );
@@ -166,7 +165,6 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->p_sys->i_reload = (mtime_t)(val.i_int * 1000000);
         p_dec->p_sys->i_next   = (mtime_t)(p_dec->p_sys->i_reload + mdate());
     }
-    var_AddCallback( p_dec, "fake-file-reload", FakeCallback , p_dec );
 
     psz_chroma = var_CreateGetString( p_dec, "fake-chroma" );
     fmt_out.i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
@@ -324,6 +322,10 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->p_sys->p_image = p_image;
     vlc_mutex_init( &p_dec->p_sys->lock );
 
+    /* Add the callback when every variables are available */
+    var_AddCallback( p_dec, "fake-file", FakeCallback, p_dec );
+    var_AddCallback( p_dec, "fake-file-reload", FakeCallback , p_dec );
+
     return VLC_SUCCESS;
 }
 
@@ -369,6 +371,9 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     picture_t *p_image = p_dec->p_sys->p_image;
+
+    var_DelCallback( p_dec, "fake-file", FakeCallback, p_dec );
+    var_DelCallback( p_dec, "fake-file-reload", FakeCallback , p_dec );
 
     if( p_image != NULL )
         picture_Release( p_image );
