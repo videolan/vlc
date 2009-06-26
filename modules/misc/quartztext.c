@@ -423,6 +423,15 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     if( !i_font_alpha ) i_font_alpha = 255 - p_sys->i_font_opacity;
 
+    if( i_font_size <= 0 )
+    {
+        msg_Warn( p_filter, "invalid fontsize, using 12" );
+        if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+            i_font_size = 12 * val.i_int / 1000;
+        else
+            i_font_size = 12;
+    }
+
     ConvertToUTF16( EliminateCRLF( psz_string ), &i_string_length, &psz_utf16_str );
 
     p_region_out->i_x = p_region_in->i_x;
