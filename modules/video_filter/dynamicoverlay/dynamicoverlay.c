@@ -144,6 +144,9 @@ static void Destroy( vlc_object_t *p_this )
     ListDestroy( &p_sys->overlays );
     UnregisterCommand( p_filter );
 
+    var_DelCallback( p_filter, "overlay-input", AdjustCallback, p_sys );
+    var_DelCallback( p_filter, "overlay-output", AdjustCallback, p_sys );
+
     free( p_sys->psz_inputfile );
     free( p_sys->psz_outputfile );
     free( p_sys );
