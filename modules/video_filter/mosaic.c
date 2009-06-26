@@ -392,7 +392,26 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t*)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    /* FIXME: destroy callbacks first! */
+#define DEL_CB( name ) \
+    var_DelCallback( p_filter, CFG_PREFIX #name, MosaicCallback, p_sys )
+    DEL_CB( width );
+    DEL_CB( height );
+    DEL_CB( xoffset );
+    DEL_CB( yoffset );
+
+    DEL_CB( align );
+
+    DEL_CB( borderw );
+    DEL_CB( borderh );
+    DEL_CB( rows );
+    DEL_CB( cols );
+    DEL_CB( alpha );
+    DEL_CB( position );
+    DEL_CB( delay );
+
+    DEL_CB( keep-aspect-ratio );
+    DEL_CB( order );
+#undef DEL_CB
 
     if( !p_sys->b_keep )
     {
