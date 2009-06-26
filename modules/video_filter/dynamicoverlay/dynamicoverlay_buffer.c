@@ -1,10 +1,10 @@
 /*****************************************************************************
  * dynamicoverlay_buffer.h : dynamic overlay buffer
  *****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
+ * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$
  *
- * Author: SÃ¸ren BÃ¸g <avacore@videolan.org>
+ * Author: Søren Bøg <avacore@videolan.org>
  *         Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
