@@ -1970,18 +1970,17 @@ DISTCLEAN_PKG += libopendaap-$(DAAP_VERSION).tar.bz2
 # glib
 # ***************************************************************************
 
-glib-$(GLIB_VERSION).tar.gz:
+glib-$(GLIB_VERSION).tar.bz2:
 	$(WGET) $(GLIB_URL)
 
-glib: glib-$(GLIB_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p0 < Patches/glib.patch
+glib: glib-$(GLIB_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 
 .glib: glib
-	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --host=$(HOST) && make && make install)
 	touch $@
 
-CLEAN_FILE += .glibl
+CLEAN_FILE += .glib
 CLEAN_PKG += glib
 DISTCLEAN_PKG += glib-$(GLIB_VERSION).tar.gz
 
@@ -1989,14 +1988,14 @@ DISTCLEAN_PKG += glib-$(GLIB_VERSION).tar.gz
 # libIDL
 # ***************************************************************************
 
-libIDL-$(LIBIDL_VERSION).tar.gz:
+libIDL-$(LIBIDL_VERSION).tar.bz2:
 	$(WGET) $(LIBIDL_URL)
 
-libIDL: libIDL-$(LIBIDL_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libIDL: libIDL-$(LIBIDL_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 
 .IDL: libIDL
-	(cd $<; ./configure --prefix=$(PREFIX) --host=powerpc-apple-macos && make && make install )
+	(cd $<; ./configure --prefix=$(PREFIX) --host=$(HOST) && make && make install )
 	touch $@
 
 CLEAN_FILE += .IDL
@@ -2054,14 +2053,14 @@ DISTCLEAN_PKG += gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip gli
 # mozilla-macosx
 # ***************************************************************************
 
-mozilla-source-$(MOZILLA_VERSION).tar.bz2:
+firefox-$(MOZILLA_VERSION)-source.tar.bz2:
 	$(WGET) $(MOZILLA_URL)
 
-mozilla: mozilla-source-$(MOZILLA_VERSION).tar.bz2
+mozilla: firefox-$(MOZILLA_VERSION)-source.tar.bz2
 	$(EXTRACT_BZ2)
 
 .mozilla-macosx: mozilla
-	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=mac --enable-standalone-modules=xpcom,plugin && make && make install)
+	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=cairo-cocoa --enable-standalone-modules=xpcom,plugin  --enable-application=xulrunner && make && make install)
 	touch $@
 
 CLEAN_FILE += .mozilla-macosx
