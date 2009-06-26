@@ -385,9 +385,15 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
     if( !strncmp( psz_var, "overlay-input", 13 ) )
-        p_sys->psz_inputfile = newval.psz_string;
+    {
+        free( p_sys->psz_inputfile );
+        p_sys->psz_inputfile = strdup( newval.psz_string );
+    }
     else if( !strncmp( psz_var, "overlay-output", 14 ) )
-        p_sys->psz_outputfile = newval.psz_string;
+    {
+        free( p_sys->psz_outputfile );
+        p_sys->psz_outputfile = strdup( newval.psz_string );
+    }
 
     return VLC_EGENERIC;
 }
