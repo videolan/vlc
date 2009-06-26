@@ -1153,14 +1153,14 @@ void CaptureOpenPanel::updateMRL()
     case V4L_DEVICE:
         fileList << "v4l://";
         mrl += " :v4l-vdev=" + v4lVideoDevice->text();
-        mrl += " :v4l-adev=" + v4lAudioDevice->text();
+        mrl += " :input-slave=alsa://" + v4lAudioDevice->text();
         mrl += " :v4l-norm=" + QString::number( v4lNormBox->currentIndex() );
         mrl += " :v4l-frequency=" + QString::number( v4lFreq->value() );
         break;
     case V4L2_DEVICE:
         fileList << "v4l2://";
         mrl += " :v4l2-dev=" + v4l2VideoDevice->text();
-        mrl += " :v4l2-adev=" + v4l2AudioDevice->text();
+        mrl += " :input-slave=alsa://" + v4l2AudioDevice->text();
         mrl += " :v4l2-standard=" + QString::number( v4l2StdBox->currentIndex() );
         break;
     case JACK_DEVICE:
