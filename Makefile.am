@@ -104,8 +104,7 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Open.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/Open.nib/info.nib \
 	extras/package/macosx/Resources/English.lproj/Open.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Preferences.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Preferences.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Preferences.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Preferences.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/Wizard.nib/classes.nib \
 	extras/package/macosx/Resources/English.lproj/Wizard.nib/info.nib \
