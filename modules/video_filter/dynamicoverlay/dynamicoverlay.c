@@ -108,6 +108,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_outputfd = -1;
     p_sys->b_updated = true;
     p_sys->b_atomic = false;
+    vlc_mutex_init( &p_sys->lock );
 
     p_filter->pf_sub_filter = Filter;
 
@@ -147,6 +148,7 @@ static void Destroy( vlc_object_t *p_this )
     var_DelCallback( p_filter, "overlay-input", AdjustCallback, p_sys );
     var_DelCallback( p_filter, "overlay-output", AdjustCallback, p_sys );
 
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_inputfile );
     free( p_sys->psz_outputfile );
     free( p_sys );
@@ -164,6 +166,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* We might need to open these at any time. */
+    vlc_mutex_lock( &p_sys->lock );
     if( p_sys->i_inputfd == -1 )
     {
         p_sys->i_inputfd = open( p_sys->psz_inputfile, O_RDONLY | O_NONBLOCK );
@@ -197,6 +200,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                       p_sys->psz_outputfile );
         }
     }
+    vlc_mutex_unlock( &p_sys->lock );
 
     /* Read any waiting commands */
     if( p_sys->i_inputfd != -1 )
@@ -387,6 +391,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
     filter_sys_t *p_sys = (filter_sys_t *)p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
+    vlc_mutex_lock( &p_sys->lock );
     if( !strncmp( psz_var, "overlay-input", 13 ) )
     {
         free( p_sys->psz_inputfile );
@@ -397,6 +402,7 @@ static int AdjustCallback( vlc_object_t *p_this, char const *psz_var,
         free( p_sys->psz_outputfile );
         p_sys->psz_outputfile = strdup( newval.psz_string );
     }
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_EGENERIC;
 }

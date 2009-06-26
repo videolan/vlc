@@ -165,6 +165,8 @@ struct filter_sys_t
     bool b_updated, b_atomic;
     queue_t atomic, pending, processed;
     list_t overlays;
+
+    vlc_mutex_t lock;   /* lock to protect psz_inputfile and psz_outputfile */
 };
 
 #endif
