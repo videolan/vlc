@@ -134,18 +134,19 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    BufferDestroy( &p_filter->p_sys->input );
-    BufferDestroy( &p_filter->p_sys->output );
-    QueueDestroy( &p_filter->p_sys->atomic );
-    QueueDestroy( &p_filter->p_sys->pending );
-    QueueDestroy( &p_filter->p_sys->processed );
-    ListDestroy( &p_filter->p_sys->overlays );
+    BufferDestroy( &p_sys->input );
+    BufferDestroy( &p_sys->output );
+    QueueDestroy( &p_sys->atomic );
+    QueueDestroy( &p_sys->pending );
+    QueueDestroy( &p_sys->processed );
+    ListDestroy( &p_sys->overlays );
     UnregisterCommand( p_filter );
 
-    free( p_filter->p_sys->psz_inputfile );
-    free( p_filter->p_sys->psz_outputfile );
-    free( p_filter->p_sys );
+    free( p_sys->psz_inputfile );
+    free( p_sys->psz_outputfile );
+    free( p_sys );
 }
 
 /*****************************************************************************
