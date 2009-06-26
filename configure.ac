@@ -2250,15 +2250,10 @@ dnl
 AC_ARG_ENABLE(smb,
   [  --enable-smb            smb input module (default enabled)])
 if test "${enable_smb}" != "no"; then
-  AC_CHECK_HEADERS(libsmbclient.h,
-    [ VLC_ADD_PLUGIN([access_smb])
-      VLC_ADD_LIBS([access_smb],[-lsmbclient]) ],
-    [ if test -n "${enable_smb}"; then
-        AC_MSG_ERROR([cannot find libsmbclient headers])
-     fi ])
-  AC_CHECK_MEMBER([struct _SMBCCTX.close_fn],
-    AC_DEFINE([HAVE__SMBCCTX_CLOSE_FN], 1, [Define if samba has _SMBCCTX.close_fn]),,
-    [#include <libsmbclient.h>])
+  AC_CHECK_HEADERS(libsmbclient.h, [
+    VLC_ADD_PLUGIN([access_smb])
+    VLC_ADD_LIBS([access_smb],[-lsmbclient])
+  ],[AC_MSG_ERROR([cannot find libsmbclient headers])])
 fi
 
 dnl
