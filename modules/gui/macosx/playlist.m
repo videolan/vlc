@@ -1157,8 +1157,6 @@
             }
         }
     }
-    /* If no name, then make a guess */
-    if( !o_name) o_name = [[NSFileManager defaultManager] displayNameAtPath: o_uri];
 
     if( [[NSFileManager defaultManager] fileExistsAtPath:o_uri isDirectory:&b_dir] && b_dir &&
         [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath: o_uri isRemovable: &b_rem
@@ -1180,7 +1178,7 @@
         o_uri = o_temp;
     }
 
-    p_input = input_item_New( p_playlist, [o_uri fileSystemRepresentation], [o_name UTF8String] );
+    p_input = input_item_New( p_playlist, [o_uri fileSystemRepresentation], o_name ? [o_name UTF8String] : NULL );
     if( !p_input )
     {
         pl_Release( p_intf );
