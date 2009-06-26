@@ -590,7 +590,7 @@ error:
     o_children = nil;
 }
 
-- (VLCInfoTreeItem *)childAtIndex:(int)i_index {
+- (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index {
     return [[self children] objectAtIndex:i_index];
 }
 

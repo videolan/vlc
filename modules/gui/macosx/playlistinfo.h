@@ -127,7 +127,7 @@
 }
 
 - (int)numberOfChildren;
-- (VLCInfoTreeItem *)childAtIndex:(int)i_index;
+- (VLCInfoTreeItem *)childAtIndex:(NSUInteger)i_index;
 - (NSString *)name;
 - (NSString *)value;
 - (void)refresh;
