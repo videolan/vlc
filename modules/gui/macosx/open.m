@@ -45,6 +45,8 @@
 #import "output.h"
 #import "eyetv.h"
 
+#include <vlc_url.h>
+
 #define setEyeTVUnconnected \
 [o_capture_lbl setStringValue: _NS("No device connected")]; \
 [o_capture_long_lbl setStringValue: _NS("VLC could not detect any EyeTV compatible device.\n\nCheck the device's connection, make sure that the latest EyeTV software is installed and try again.")]; \
@@ -511,30 +513,26 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
 - (void)openFilePathChanged:(NSNotification *)o_notification
 {
-    NSString *o_mrl_string;
     NSString *o_filename = [o_file_path stringValue];
-    NSString *o_ext = [o_filename pathExtension];
     bool b_stream = [o_file_stream state];
     BOOL b_dir = NO;
- 
+
     [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];
+
+    char *psz_uri = make_URI([o_filename UTF8String]);
+    if( !psz_uri ) return;
+
+    NSMutableString *o_mrl_string = [NSMutableString stringWithUTF8String: psz_uri ];
+    NSRange offile = [o_mrl_string rangeOfString:@"file"];
+    free( psz_uri );
 
     if( b_dir )
     {
-        o_mrl_string = [NSString stringWithFormat: @"directory://%@/", o_filename];
+        [o_mrl_string replaceCharactersInRange:offile withString: @"directory"];
     }
-    else if( [o_ext isEqualToString: @"bin"] ||
-        [o_ext isEqualToString: @"cue"] ||
-        [o_ext isEqualToString: @"vob"] ||
-        [o_ext isEqualToString: @"iso"] )
+    else if( b_stream )
     {
-        o_mrl_string = o_filename;
-    }
-    else
-    {
-        o_mrl_string = [NSString stringWithFormat: @"%s://%@",
-                        b_stream ? "stream" : "file",
-                        o_filename];
+        [o_mrl_string replaceCharactersInRange:offile withString: @"stream"];
     }
     [o_mrl setStringValue: o_mrl_string];
 }
