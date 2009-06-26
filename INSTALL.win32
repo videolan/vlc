@@ -1,21 +1,21 @@
-INSTALL file for the Windows 2k/XP/Vista version of the VLC media player
+INSTALL file for the Windows 2k/XP/Vista/Seven version of the VLC media player
 
 
 Running VLC
 ===========
 
-If you have already built VLC (see below) or are using a binary release,
-just run 'vlc.exe'.
+If you are using a binary release from videolan.org or if you have already built
+VLC (see below), just run 'vlc.exe'.
 
 You can also run VLC from a dos command box, in which case you'll be able
 to use the command line arguments. You can obtain a list of these command
 line arguments by typing 'vlc --help' or 'vlc --help --advanced'.
 
 To store a debug log of the current VLC session, you can use
-'vlc -vv --extraintf=logger'. You will end-up with a vlc-log.txt file in
+'vlc -vvv --extraintf=logger'. You will end-up with a vlc-log.txt file in
 your current directory.
 
-Additional documentation is available at http://www.videolan.org/doc/
+Additional documentation is available at http://www.videolan.org/doc/ and http://wiki.videolan.org/.
 
 
 Building VLC from the source code
@@ -23,21 +23,21 @@ Building VLC from the source code
 
 If you want to build VLC from sources, you can do it in several ways:
 
-- natively on Windows, using cygwin (www.cygwin.com) with or without the
-  POSIX emulation layer. This is the preferred way to compile vlc if you want
-  to do it on Windows.
-  Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
-
 - On GNU/Linux, using the mingw32 cross-compiler.
   This method is preferred over all the others.
 
-UNSUPPORTED METHODS
--------------------
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
   (MSYS is a minimal build environment to compile Unixish projects under
   windoze. It provides all the common Unix tools like sh, gmake...)
   Please note that the gettext utilities are not included in the default
   MSYS/MINGW packages so you won't be able to build VLC with i18n support.
+
+UNSUPPORTED METHODS
+-------------------
+- natively on Windows, using cygwin (www.cygwin.com) with or without the
+  POSIX emulation layer. This is the preferred way to compile vlc if you want
+  to do it on Windows.
+  Read http://wiki.videolan.org/Win32CompileCygwinNew to have a complete HOWTO
 
 - natively on Windows, using Microsoft Visual Studio. This will not work.
 
@@ -51,36 +51,21 @@ For Debian GNU/Linux users, you can use the mingw32, mingw32-binutils and
 mingw32-runtime packages.
 For Fedora users, you can use mingw-binutils, mingw-gcc-core, mingw-gcc-g++
 
-- compiling natively on Windows with cygwin:
-You will need to download and run the setup.exe app from cygwin's web site
-(www.cygwin.com). You will also need to make sure you install at least the
-gcc-g++, gcc-mingw, mingw-runtime and win32-api packages.
-
-- compiling natively on Windows with MSYS+MINGW:
-You will need to download and install the latest MSYS, MSYS-DTK and MINGW.
-The installation is really easy. Begin with the MSYS auto-installer and once
-this is done, extract MINGW into c:\msys\1.0\mingw. You also have to remember
-to remove the make utility included with MINGW as it conflicts with the one
-from MSYS (just rename or remove c:\msys\1.0\mingw\bin\make.exe).
-
-http://www.mingw.org/download.shtml
-http://prdownloads.sf.net/mingw/MSYS-1.0.9.exe
-http://prdownloads.sf.net/mingw/MinGW-3.1.0-1.exe
-http://prdownloads.sf.net/mingw/msysDTK-1.0.1.exe
+For MingW and Cygwin, please refer to our Wiki:
+- http://wiki.videolan.org/Win32CompileMSYS
+- http://wiki.videolan.org/Win32CompileCygwin
 
 Getting the additional libraries
 =================================
 
-VLC depends on other libraries to provide some features like ac3 audio decoding
-or mpeg4 video decoding, etc...
+VLC depends on many other libraries to provide some features like most of the codecs.
 
-Depending on your needs you will have to compile/install some or all of these
-external libraries.
+Usually, you don't want to compile those by yourself, so use pre-compiled ones.
 
 * We also provide a package with all the libraries already compiled so it is
   actually really easy to compile a full-featured version of vlc (these compiled
   libraries will only work with mingw or cygwin):
-  http://download.videolan.org/pub/testing/win32/contrib-20060330-win32-bin-gcc-3.4.5-only.tar.bz2
+  http://download.videolan.org/pub/testing/win32/contrib-200xxxxx-win32-bin-gcc-x.x.x-only.tar.bz2
   (Check out for more recent versions at the same location). 
 
   All you need to do is extract it in your root directory (the include files
@@ -89,17 +74,12 @@ external libraries.
 
     tar xjvf contrib-20060330-win32-bin-gcc-3.4.5-only.tar.bz2 -C /
 
-  Please note the "-C /". 
-
-* They can also be found here (source code):
-  http://download.videolan.org/pub/testing/contrib/
+  Please note the "-C /".
 
 * An automated way of building the contrib libraries is provided in 
   extra/contrib. It will download, configure and build the libraries.
   See the extras/contrib/README for more info.
 
-A complete list of the libraries on which we depend can be found here:
-http://developers.videolan.org/vlc/
 
 Configuring the build
 =====================
@@ -110,98 +90,23 @@ build with the `./configure' script.
 I'll assume that you are using the pre-compiled 3rd party libraries we are
 providing and that they are in /usr/win32.
 
-If you are cross-compiling from Debian, you can use something
-along those lines:
+If you are cross-compiling from Debian, you can use this:
 
-  ./bootstrap && \
-  PATH=/usr/win32/bin:$PATH \
-  PKG_CONFIG_LIBDIR=/usr/win32/lib/pkgconfig \
-  CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
-  LDFLAGS=-L/usr/win32/lib \
-  CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
-  ./configure --host=i586-mingw32msvc --build=i386-linux \
-      --disable-gtk \
-      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
-      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
-      --with-wx-config-path=/usr/win32/bin \
-      --with-freetype-config-path=/usr/win32/bin \
-      --with-fribidi-config-path=/usr/win32/bin \
-      --enable-live555 --with-live555-tree=/usr/win32/live.com \
-      --enable-caca --with-caca-config-path=/usr/win32/bin \
-      --with-xml2-config-path=/usr/win32/bin \
-      --with-dvdnav-config-path=/usr/win32/bin \
-      --disable-cddax --disable-vcdx --enable-goom \
-      --enable-twolame --enable-dvdread \
-      --enable-debug
+  sh extras/package/win32/configure-mingw.sh
 
-If you are using cygwin, you can build VLC with or without the POSIX
-emulation layer. Without is usually better and with POSIX emulation
-hasn't been tested in about a year or so. So to build without the
-emulation layer, use something like this:
 
-  ./bootstrap && \
-  PATH=/usr/win32/bin:$PATH \
-  PKG_CONFIG_PATH=/usr/win32/lib/pkgconfig \
-  CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
-  LDFLAGS=-L/usr/win32/lib \
-  CC="gcc -mno-cygwin" CXX="g++ -mno-cygwin" \
-  ./configure \
-      --disable-gtk \
-      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
-      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
-      --with-wx-config-path=/usr/win32/bin \
-      --with-freetype-config-path=/usr/win32/bin \
-      --with-fribidi-config-path=/usr/win32/bin \
-      --enable-live555 --with-live555-tree=/usr/win32/live.com \
-      --enable-caca --with-caca-config-path=/usr/win32/bin \
-      --with-xml2-config-path=/usr/win32/bin \
-      --with-dvdnav-config-path=/usr/win32/bin \
-      --disable-cddax --disable-vcdx --enable-goom \
-      --enable-twolame --enable-dvdread \
-      --enable-debug
+If you are compiling with MSYS/MINGW, then you can use this:
 
-If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
-CXX="g++ -mno-cygwin" line. You're on your own though.
+  sh extras/package/win32/configure-msys.sh
 
-If you are compiling with MSYS/MINGW, then you can use something along those
-lines:
-  ./bootstrap && \
-  PKG_CONFIG_PATH=/usr/win32/lib/pkgconfig \
-  PATH=/usr/win32/bin:$PATH \
-  CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
-  LDFLAGS=-L/usr/win32/lib \
-  ./configure \
-      --disable-gtk \
-      --enable-nls --enable-sdl --with-sdl-config-path=/usr/win32/bin \
-      --enable-ffmpeg --with-ffmpeg-mp3lame --with-ffmpeg-faac \
-      --with-ffmpeg-zlib --enable-faad --enable-flac --enable-theora \
-      --with-wx-config-path=/usr/win32/bin \
-      --with-freetype-config-path=/usr/win32/bin \
-      --with-fribidi-config-path=/usr/win32/bin \
-      --enable-caca --with-caca-config-path=/usr/win32/bin \
-      --with-xml2-config-path=/usr/win32/bin \
-      --with-dvdnav-config-path=/usr/win32/bin \
-      --disable-cddax --disable-vcdx --enable-goom \
-      --enable-twolame --enable-dvdread \
-      --disable-mkv \
-      --enable-debug
 
-If you have used the "extras/contrib" way, you don't need to precise 
-the CFLAGS, LDFLAGS and --with-foo-config-path=.
- ./bootstrap && \
-  ./configure \
-      --disable-gtk \
-      --enable-nls --enable-sdl \
-      --enable-ffmpeg --enable-faad --enable-flac --enable-theora \
-      --disable-cddax --disable-vcdx --enable-goom \
-      --enable-twolame --enable-dvdread \
-      --enable-mkv --enable-caca --enable-live555\
-      --enable-debug
+If you are using cygwin, you should build VLC without the POSIX emulation layer.
+Use this:
 
+  sh extras/package/win32/configure-cygwin.sh
 
 See `./configure --help' for more information.
+
 
 Actually Compiling the VLC source
 =================================
