@@ -1012,7 +1012,8 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
     if( !p_intf ) return;
-    [o_remote startListening: self];
+	if( config_GetInt( p_intf, "macosx-appleremote" ) == YES )
+		[o_remote startListening: self];
 }
 - (void)applicationDidResignActive:(NSNotification *)aNotification
 {
@@ -1492,6 +1493,11 @@ static unsigned int VLCModifiersToCocoa( unsigned int i_key )
         return o_eyetv;
 
     return nil;
+}
+
+- (id)appleRemoteController
+{
+	return o_remote;
 }
 
 #pragma mark -
@@ -2848,49 +2854,62 @@ end:
 
 @implementation VLCApplication
 
+- (void)awakeFromNib
+{
+	b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
+}
+
+- (void)enableMediaKeySupport:(BOOL)b_value
+{
+	b_mediaKeySupport = b_value;
+}
+
 - (void)sendEvent: (NSEvent*)event
 {
-    if( [event type] == NSSystemDefined && [event subtype] == 8 )
+	if( b_mediaKeySupport )
 	{
-		int keyCode = (([event data1] & 0xFFFF0000) >> 16);
-		int keyFlags = ([event data1] & 0x0000FFFF);
-		int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
-        int keyRepeat = (keyFlags & 0x1);
+		if( [event type] == NSSystemDefined && [event subtype] == 8 )
+		{
+			int keyCode = (([event data1] & 0xFFFF0000) >> 16);
+			int keyFlags = ([event data1] & 0x0000FFFF);
+			int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
+			int keyRepeat = (keyFlags & 0x1);
 
-        if( keyCode == NX_KEYTYPE_PLAY && keyState == 0 )
-            var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
+			if( keyCode == NX_KEYTYPE_PLAY && keyState == 0 )
+				var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PLAY_PAUSE );
 
-        if( keyCode == NX_KEYTYPE_FAST && !b_justJumped )
-        {
-            if( keyState == 0 && keyRepeat == 0 )
-            {
-                    var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_NEXT );
-            }
-            else if( keyRepeat == 1 )
-            {
-                var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
-                b_justJumped = YES;
-                [self performSelector:@selector(resetJump)
-                           withObject: NULL
-                           afterDelay:0.25];
-            }
-        }
+			if( keyCode == NX_KEYTYPE_FAST && !b_justJumped )
+			{
+				if( keyState == 0 && keyRepeat == 0 )
+				{
+						var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_NEXT );
+				}
+				else if( keyRepeat == 1 )
+				{
+					var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_FORWARD_SHORT );
+					b_justJumped = YES;
+					[self performSelector:@selector(resetJump)
+							   withObject: NULL
+							   afterDelay:0.25];
+				}
+			}
 
-        if( keyCode == NX_KEYTYPE_REWIND && !b_justJumped )
-        {
-            if( keyState == 0 && keyRepeat == 0 )
-            {
-                var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PREV );
-            }
-            else if( keyRepeat == 1 )
-            {
-                var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
-                b_justJumped = YES;
-                [self performSelector:@selector(resetJump)
-                           withObject: NULL
-                           afterDelay:0.25];
-            }
-        }
+			if( keyCode == NX_KEYTYPE_REWIND && !b_justJumped )
+			{
+				if( keyState == 0 && keyRepeat == 0 )
+				{
+					var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_PREV );
+				}
+				else if( keyRepeat == 1 )
+				{
+					var_SetInteger( VLCIntf->p_libvlc, "key-action", ACTIONID_JUMP_BACKWARD_SHORT );
+					b_justJumped = YES;
+					[self performSelector:@selector(resetJump)
+							   withObject: NULL
+							   afterDelay:0.25];
+				}
+			}
+		}
 	}
 	[super sendEvent: event];
 }

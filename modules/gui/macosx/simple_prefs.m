@@ -1,7 +1,7 @@
 /*****************************************************************************
 * simple_prefs.m: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008 the VideoLAN team
+* Copyright (C) 2008-2009 the VideoLAN team
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -27,6 +27,8 @@
 #import <vlc_interface.h>
 #import <vlc_dialog.h>
 #import "misc.h"
+#import "intf.h"
+#import "AppleRemote.h"
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";
@@ -262,6 +264,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_lang_txt setStringValue: _NS("Language")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
+	[o_intf_appleremote_ckb setTitle: _NS("Allow playback control with the Apple Remote")];
+	[o_intf_mediakeys_ckb setTitle: _NS("Allow playback control with the media keys")];
     
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
@@ -413,6 +417,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
 
     [o_intf_fspanel_ckb setState: config_GetInt( p_intf, "macosx-fspanel" )];
     [o_intf_embedded_ckb setState: config_GetInt( p_intf, "embedded-video" )];
+	[o_intf_appleremote_ckb setState: config_GetInt( p_intf, "macosx-appleremote" )];
+	[o_intf_mediakeys_ckb setState: config_GetInt( p_intf, "macosx-mediakeys" )];
 
     /******************
      * audio settings *
@@ -734,6 +740,14 @@ static inline void save_module_list( intf_thread_t * p_intf, id object, const ch
 
         config_PutInt( p_intf, "macosx-fspanel", [o_intf_fspanel_ckb state] );
         config_PutInt( p_intf, "embedded-video", [o_intf_embedded_ckb state] );
+		config_PutInt( p_intf, "macosx-appleremote", [o_intf_appleremote_ckb state] );
+		config_PutInt( p_intf, "macosx-mediakeys", [o_intf_mediakeys_ckb state] );
+
+		/* activate stuff without restart */
+		if( [o_intf_appleremote_ckb state] == YES )
+			[[[VLCMain sharedInstance] appleRemoteController] startListening: [VLCMain sharedInstance]];
+		else
+			[[[VLCMain sharedInstance] appleRemoteController] stopListening: [VLCMain sharedInstance]];
 
         /* okay, let's save our changes to vlcrc */
         i = config_SaveConfigFile( p_intf, "main" );

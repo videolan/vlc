@@ -357,6 +357,7 @@ struct intf_sys_t
 - (id)controllerWindow;
 - (id)voutMenu;
 - (id)eyeTVController;
+- (id)appleRemoteController;
 - (void)applicationWillTerminate:(NSNotification *)notification;
 - (NSString *)localizedString:(const char *)psz;
 - (char *)delocalizeString:(NSString *)psz;
@@ -429,8 +430,10 @@ struct intf_sys_t
 @interface VLCApplication : NSApplication
 {
     BOOL b_justJumped;
+	BOOL b_mediaKeySupport;
 }
 
+- (void)enableMediaKeySupport:(BOOL)b_value;
 - (void)sendEvent: (NSEvent*)event;
 - (void)resetJump;
 
