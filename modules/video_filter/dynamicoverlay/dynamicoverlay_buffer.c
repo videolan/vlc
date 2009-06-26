@@ -49,10 +49,7 @@ int BufferInit( buffer_t *p_buffer )
 
 int BufferDestroy( buffer_t *p_buffer )
 {
-    if( p_buffer->p_memory != NULL )
-    {
-        free( p_buffer->p_memory );
-    }
+    free( p_buffer->p_memory );
     p_buffer->p_memory = NULL;
     p_buffer->p_begin = NULL;
 

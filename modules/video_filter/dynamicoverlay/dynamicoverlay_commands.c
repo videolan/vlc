@@ -48,10 +48,9 @@
 
 overlay_t *OverlayCreate( void )
 {
-    overlay_t *p_ovl = malloc( sizeof( overlay_t ) );
+    overlay_t *p_ovl = calloc( 1, sizeof( overlay_t ) );
     if( p_ovl == NULL )
        return NULL;
-    memset( p_ovl, 0, sizeof( overlay_t ) );
 
     p_ovl->i_x = p_ovl->i_y = 0;
     p_ovl->i_alpha = 0xFF;
@@ -66,8 +65,7 @@ overlay_t *OverlayCreate( void )
 
 int OverlayDestroy( overlay_t *p_ovl )
 {
-    if( p_ovl->data.p_text != NULL )
-        free( p_ovl->data.p_text );
+    free( p_ovl->data.p_text );
     text_style_Delete( p_ovl->p_fontstyle );
 
     return VLC_SUCCESS;
