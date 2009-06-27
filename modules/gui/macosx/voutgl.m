@@ -103,7 +103,6 @@ static void aglUnlock ( vout_thread_t * p_vout );
 int OpenVideoGL  ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
-    vlc_value_t value_drawable;
 
     if( !CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay ) )
     {
@@ -119,8 +118,9 @@ int OpenVideoGL  ( vlc_object_t * p_this )
     memset( p_vout->p_sys, 0, sizeof( vout_sys_t ) );
 
 #ifndef __x86_64__
-    var_Get( p_vout->p_libvlc, "drawable-agl", &value_drawable );
-    if( value_drawable.i_int != 0 )
+    int i_drawable_agl;
+    i_drawable_agl = var_GetInteger( p_vout->p_libvlc, "drawable-agl" );
+    if( i_drawable_agl > 0 )
     {
         static const GLint ATTRIBUTES[] = {
             AGL_WINDOW,
@@ -208,7 +208,6 @@ void CloseVideoGL ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
 
-    msg_Dbg( p_this, "Closing" );
 
 #ifndef __x86_64__
     if( p_vout->p_sys->b_embedded )
