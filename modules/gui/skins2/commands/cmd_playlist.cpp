@@ -120,3 +120,12 @@ void CmdPlaylistSave::execute()
         playlist_Export( pPlaylist, m_file.c_str(), pPlaylist->p_local_category, psz_module );
     }
 }
+
+void CmdPlaylistFirst::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+
+    playlist_Lock( pPlaylist );
+    playlist_Control( pPlaylist, PLAYLIST_PLAY, pl_Locked );
+    playlist_Unlock( pPlaylist );
+}

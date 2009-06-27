@@ -58,6 +58,9 @@ DEFINE_COMMAND( PlaylistNext, "playlist next" )
 /// Command to jump to the previous item
 DEFINE_COMMAND( PlaylistPrevious, "playlist previous" )
 
+/// Command to start the playlist
+DEFINE_COMMAND( PlaylistFirst, "playlist first" )
+
 
 /// Command to set the random state
 class CmdPlaylistRandom: public CmdGeneric
