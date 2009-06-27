@@ -110,12 +110,14 @@ static void PutPicture( decoder_t *, picture_t * );
 
 static void GetAR( decoder_t *p_dec );
 
+static void Reset( decoder_t *p_dec );
+
 /* */
 static void DpbInit( decoder_t * );
 static void DpbClean( decoder_t * );
 static picture_t *DpbNewPicture( decoder_t * );
 static void DpbUnlinkPicture( decoder_t *, picture_t * );
-static void DpbDisplayPicture( decoder_t *, picture_t * );
+static int DpbDisplayPicture( decoder_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -250,11 +252,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY | BLOCK_FLAG_CORRUPTED) )
-    {
-        cc_Flush( &p_sys->cc );
-        mpeg2_reset( p_sys->p_mpeg2dec, p_sys->p_info->sequence != NULL );
-        DpbClean( p_dec );
-    }
+        Reset( p_dec );
 
     while( 1 )
     {
@@ -389,7 +387,15 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             p_pic = NULL;
             if( !b_skip )
+            {
                 p_pic = DpbNewPicture( p_dec );
+                if( !p_pic )
+                {
+                    Reset( p_dec );
+                    block_Release( p_block );
+                    return NULL;
+                }
+            }
 
             if( b_skip || !p_pic )
             {
@@ -524,16 +530,20 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->p_info->display_fbuf->id )
             {
                 p_pic = p_sys->p_info->display_fbuf->id;
-                DpbDisplayPicture( p_dec, p_pic );
+                if( DpbDisplayPicture( p_dec, p_pic ) )
+                    p_pic = NULL;
 
                 decoder_SynchroEnd( p_sys->p_synchro,
                                     p_sys->p_info->display_picture->flags & PIC_MASK_CODING_TYPE,
                                     p_sys->b_garbage_pic );
 
-                p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
-                if( p_sys->b_garbage_pic )
-                    p_pic->date = 0; /* ??? */
-                p_sys->b_garbage_pic = false;
+                if( p_pic )
+                {
+                    p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
+                    if( p_sys->b_garbage_pic )
+                        p_pic->date = 0; /* ??? */
+                    p_sys->b_garbage_pic = false;
+                }
             }
 
             if( p_sys->p_info->discard_fbuf &&
@@ -591,6 +601,18 @@ static void CloseDecoder( vlc_object_t *p_this )
     if( p_sys->p_mpeg2dec ) mpeg2_close( p_sys->p_mpeg2dec );
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * Reset: reset the decoder state
+ *****************************************************************************/
+static void Reset( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    cc_Flush( &p_sys->cc );
+    mpeg2_reset( p_sys->p_mpeg2dec, p_sys->p_info->sequence != NULL );
+    DpbClean( p_dec );
 }
 
 /*****************************************************************************
@@ -819,6 +841,14 @@ static picture_dpb_t *DpbFindPicture( decoder_t *p_dec, picture_t *p_picture )
 static void DpbUnlinkPicture( decoder_t *p_dec, picture_t *p_picture )
 {
     picture_dpb_t *p = DpbFindPicture( p_dec, p_picture );
+
+    /* XXX it is needed to workaround libmpeg2 bugs */
+    if( !p || !p->b_linked )
+    {
+        msg_Err( p_dec, "DpbUnlinkPicture called on an invalid picture" );
+        return;
+    }
+
     assert( p && p->b_linked );
 
     decoder_UnlinkPicture( p_dec, p->p_picture );
@@ -831,12 +861,21 @@ static void DpbUnlinkPicture( decoder_t *p_dec, picture_t *p_picture )
 /**
  * Mark the provided picture as displayed.
  */
-static void DpbDisplayPicture( decoder_t *p_dec, picture_t *p_picture )
+static int DpbDisplayPicture( decoder_t *p_dec, picture_t *p_picture )
 {
     picture_dpb_t *p = DpbFindPicture( p_dec, p_picture );
+
+    /* XXX it is needed to workaround libmpeg2 bugs */
+    if( !p || p->b_displayed || !p->b_linked )
+    {
+        msg_Err( p_dec, "DpbDisplayPicture called on an invalid picture" );
+        return VLC_EGENERIC;
+    }
+
     assert( p && !p->b_displayed && p->b_linked );
 
     p->b_displayed = true;
+    return VLC_SUCCESS;
 }
 
 
