@@ -591,7 +591,7 @@ describe:
             free( psz_user );
             free( psz_pwd );
             dialog_Login( p_demux, &psz_user, &psz_pwd,
-                          _("RTSP authentication"),
+                          _("RTSP authentication"), "%s",
                         _("Please enter a valid login name and a password.") );
             if( psz_user != NULL && psz_pwd != NULL )
             {

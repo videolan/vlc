@@ -937,7 +937,7 @@ static int ParseMRL( access_t *p_access )
     {
         msg_Err( p_access, "the DVB input old syntax is deprecated, use vlc "
                           "-p dvb to see an explanation of the new syntax" );
-        dialog_FatalWait( p_access, _("Input syntax is deprecated"),
+        dialog_FatalWait( p_access, _("Input syntax is deprecated"), "%s",
             _("The given syntax is deprecated. Run \"vlc -p dvb\" to see an " \
                 "explanation of the new syntax.") );
         free( psz_dup );

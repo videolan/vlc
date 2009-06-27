@@ -678,7 +678,7 @@ int OpenEncoder( vlc_object_t *p_this )
                 msg_Err( p_enc, "cannot open encoder" );
                 dialog_Fatal( p_enc,
                                 _("Streaming / Transcoding failed"),
-                                _("VLC could not open the encoder.") );
+                                "%s", _("VLC could not open the encoder.") );
                 free( p_sys );
                 return VLC_EGENERIC;
             }
@@ -687,7 +687,7 @@ int OpenEncoder( vlc_object_t *p_this )
         {
             msg_Err( p_enc, "cannot open encoder" );
             dialog_Fatal( p_enc, _("Streaming / Transcoding failed"),
-                            _("VLC could not open the encoder.") );
+                            "%s", _("VLC could not open the encoder.") );
             free( p_sys );
             return VLC_EGENERIC;
         }

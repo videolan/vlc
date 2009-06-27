@@ -312,7 +312,7 @@ static int Open( vlc_object_t *p_this )
         if( dvdnav_title_play( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
         {
             msg_Err( p_demux, "cannot set title (can't decrypt DVD?)" );
-            dialog_Fatal( p_demux, _("Playback failure"),
+            dialog_Fatal( p_demux, _("Playback failure"), "%s",
                             _("VLC cannot set the DVD's title. It possibly "
                               "cannot decrypt the entire disc.") );
             dvdnav_close( p_sys->dvdnav );

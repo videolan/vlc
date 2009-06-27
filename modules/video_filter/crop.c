@@ -371,7 +371,7 @@ static int Init( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        dialog_Fatal( p_vout, _("Cropping failed"),
+        dialog_Fatal( p_vout, _("Cropping failed"), "%s",
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }
@@ -463,7 +463,7 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_vout == NULL )
     {
         msg_Err( p_vout, "failed to create vout" );
-        dialog_Fatal( p_vout, _("Cropping failed"),
+        dialog_Fatal( p_vout, _("Cropping failed"), "%s",
                         _("VLC could not open the video output module.") );
         return VLC_EGENERIC;
     }

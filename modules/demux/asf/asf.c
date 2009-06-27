@@ -175,7 +175,7 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
-                    dialog_Fatal( p_demux, _("Could not demux ASF stream"),
+                    dialog_Fatal( p_demux, _("Could not demux ASF stream"), "%s",
                                     _("VLC failed to load the ASF header.") );
                     return 0;
                 }

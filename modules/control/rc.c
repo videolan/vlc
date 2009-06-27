@@ -341,7 +341,7 @@ static int Activate( vlc_object_t *p_this )
     CONSOLE_INTRO_MSG;
 #endif
 
-    msg_rc( _("Remote control interface initialized. Type `help' for help.") );
+    msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
     return VLC_SUCCESS;
 }
 
@@ -848,98 +848,98 @@ static void Run( intf_thread_t *p_intf )
 
 static void Help( intf_thread_t *p_intf, bool b_longhelp)
 {
-    msg_rc(_("+----[ Remote control commands ]"));
+    msg_rc("%s", _("+----[ Remote control commands ]"));
     msg_rc(  "| ");
-    msg_rc(_("| add XYZ  . . . . . . . . . . . . add XYZ to playlist"));
-    msg_rc(_("| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"));
-    msg_rc(_("| playlist . . . . .  show items currently in playlist"));
-    msg_rc(_("| play . . . . . . . . . . . . . . . . . . play stream"));
-    msg_rc(_("| stop . . . . . . . . . . . . . . . . . . stop stream"));
-    msg_rc(_("| next . . . . . . . . . . . . . .  next playlist item"));
-    msg_rc(_("| prev . . . . . . . . . . . .  previous playlist item"));
-    msg_rc(_("| goto . . . . . . . . . . . . . .  goto item at index"));
-    msg_rc(_("| repeat [on|off] . . . .  toggle playlist item repeat"));
-    msg_rc(_("| loop [on|off] . . . . . . . . . toggle playlist loop"));
-    msg_rc(_("| random [on|off] . . . . . . .  toggle random jumping"));
-    msg_rc(_("| clear . . . . . . . . . . . . . . clear the playlist"));
-    msg_rc(_("| status . . . . . . . . . . . current playlist status"));
-    msg_rc(_("| title [X]  . . . . . . set/get title in current item"));
-    msg_rc(_("| title_n  . . . . . . . .  next title in current item"));
-    msg_rc(_("| title_p  . . . . . .  previous title in current item"));
-    msg_rc(_("| chapter [X]  . . . . set/get chapter in current item"));
-    msg_rc(_("| chapter_n  . . . . . .  next chapter in current item"));
-    msg_rc(_("| chapter_p  . . . .  previous chapter in current item"));
+    msg_rc("%s", _("| add XYZ  . . . . . . . . . . . . add XYZ to playlist"));
+    msg_rc("%s", _("| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"));
+    msg_rc("%s", _("| playlist . . . . .  show items currently in playlist"));
+    msg_rc("%s", _("| play . . . . . . . . . . . . . . . . . . play stream"));
+    msg_rc("%s", _("| stop . . . . . . . . . . . . . . . . . . stop stream"));
+    msg_rc("%s", _("| next . . . . . . . . . . . . . .  next playlist item"));
+    msg_rc("%s", _("| prev . . . . . . . . . . . .  previous playlist item"));
+    msg_rc("%s", _("| goto . . . . . . . . . . . . . .  goto item at index"));
+    msg_rc("%s", _("| repeat [on|off] . . . .  toggle playlist item repeat"));
+    msg_rc("%s", _("| loop [on|off] . . . . . . . . . toggle playlist loop"));
+    msg_rc("%s", _("| random [on|off] . . . . . . .  toggle random jumping"));
+    msg_rc("%s", _("| clear . . . . . . . . . . . . . . clear the playlist"));
+    msg_rc("%s", _("| status . . . . . . . . . . . current playlist status"));
+    msg_rc("%s", _("| title [X]  . . . . . . set/get title in current item"));
+    msg_rc("%s", _("| title_n  . . . . . . . .  next title in current item"));
+    msg_rc("%s", _("| title_p  . . . . . .  previous title in current item"));
+    msg_rc("%s", _("| chapter [X]  . . . . set/get chapter in current item"));
+    msg_rc("%s", _("| chapter_n  . . . . . .  next chapter in current item"));
+    msg_rc("%s", _("| chapter_p  . . . .  previous chapter in current item"));
     msg_rc(  "| ");
-    msg_rc(_("| seek X . . . seek in seconds, for instance `seek 12'"));
-    msg_rc(_("| pause  . . . . . . . . . . . . . . . .  toggle pause"));
-    msg_rc(_("| fastforward  . . . . . . . .  .  set to maximum rate"));
-    msg_rc(_("| rewind  . . . . . . . . . . . .  set to minimum rate"));
-    msg_rc(_("| faster . . . . . . . . . .  faster playing of stream"));
-    msg_rc(_("| slower . . . . . . . . . .  slower playing of stream"));
-    msg_rc(_("| normal . . . . . . . . . .  normal playing of stream"));
-    msg_rc(_("| f [on|off] . . . . . . . . . . . . toggle fullscreen"));
-    msg_rc(_("| info . . . . .  information about the current stream"));
-    msg_rc(_("| stats  . . . . . . . .  show statistical information"));
-    msg_rc(_("| get_time . . seconds elapsed since stream's beginning"));
-    msg_rc(_("| is_playing . . . .  1 if a stream plays, 0 otherwise"));
-    msg_rc(_("| get_title . . . . .  the title of the current stream"));
-    msg_rc(_("| get_length . . . .  the length of the current stream"));
+    msg_rc("%s", _("| seek X . . . seek in seconds, for instance `seek 12'"));
+    msg_rc("%s", _("| pause  . . . . . . . . . . . . . . . .  toggle pause"));
+    msg_rc("%s", _("| fastforward  . . . . . . . .  .  set to maximum rate"));
+    msg_rc("%s", _("| rewind  . . . . . . . . . . . .  set to minimum rate"));
+    msg_rc("%s", _("| faster . . . . . . . . . .  faster playing of stream"));
+    msg_rc("%s", _("| slower . . . . . . . . . .  slower playing of stream"));
+    msg_rc("%s", _("| normal . . . . . . . . . .  normal playing of stream"));
+    msg_rc("%s", _("| f [on|off] . . . . . . . . . . . . toggle fullscreen"));
+    msg_rc("%s", _("| info . . . . .  information about the current stream"));
+    msg_rc("%s", _("| stats  . . . . . . . .  show statistical information"));
+    msg_rc("%s", _("| get_time . . seconds elapsed since stream's beginning"));
+    msg_rc("%s", _("| is_playing . . . .  1 if a stream plays, 0 otherwise"));
+    msg_rc("%s", _("| get_title . . . . .  the title of the current stream"));
+    msg_rc("%s", _("| get_length . . . .  the length of the current stream"));
     msg_rc(  "| ");
-    msg_rc(_("| volume [X] . . . . . . . . . .  set/get audio volume"));
-    msg_rc(_("| volup [X]  . . . . . . .  raise audio volume X steps"));
-    msg_rc(_("| voldown [X]  . . . . . .  lower audio volume X steps"));
-    msg_rc(_("| adev [X] . . . . . . . . . . .  set/get audio device"));
-    msg_rc(_("| achan [X]. . . . . . . . . .  set/get audio channels"));
-    msg_rc(_("| atrack [X] . . . . . . . . . . . set/get audio track"));
-    msg_rc(_("| vtrack [X] . . . . . . . . . . . set/get video track"));
-    msg_rc(_("| vratio [X]  . . . . . . . set/get video aspect ratio"));
-    msg_rc(_("| vcrop [X]  . . . . . . . . . . .  set/get video crop"));
-    msg_rc(_("| vzoom [X]  . . . . . . . . . . .  set/get video zoom"));
-    msg_rc(_("| snapshot . . . . . . . . . . . . take video snapshot"));
-    msg_rc(_("| strack [X] . . . . . . . . . set/get subtitles track"));
-    msg_rc(_("| key [hotkey name] . . . . . .  simulate hotkey press"));
-    msg_rc(_("| menu . . [on|off|up|down|left|right|select] use menu"));
+    msg_rc("%s", _("| volume [X] . . . . . . . . . .  set/get audio volume"));
+    msg_rc("%s", _("| volup [X]  . . . . . . .  raise audio volume X steps"));
+    msg_rc("%s", _("| voldown [X]  . . . . . .  lower audio volume X steps"));
+    msg_rc("%s", _("| adev [X] . . . . . . . . . . .  set/get audio device"));
+    msg_rc("%s", _("| achan [X]. . . . . . . . . .  set/get audio channels"));
+    msg_rc("%s", _("| atrack [X] . . . . . . . . . . . set/get audio track"));
+    msg_rc("%s", _("| vtrack [X] . . . . . . . . . . . set/get video track"));
+    msg_rc("%s", _("| vratio [X]  . . . . . . . set/get video aspect ratio"));
+    msg_rc("%s", _("| vcrop [X]  . . . . . . . . . . .  set/get video crop"));
+    msg_rc("%s", _("| vzoom [X]  . . . . . . . . . . .  set/get video zoom"));
+    msg_rc("%s", _("| snapshot . . . . . . . . . . . . take video snapshot"));
+    msg_rc("%s", _("| strack [X] . . . . . . . . . set/get subtitles track"));
+    msg_rc("%s", _("| key [hotkey name] . . . . . .  simulate hotkey press"));
+    msg_rc("%s", _("| menu . . [on|off|up|down|left|right|select] use menu"));
     msg_rc(  "| ");
 
     if (b_longhelp)
     {
-        msg_rc(_("| @name marq-marquee  STRING  . . overlay STRING in video"));
-        msg_rc(_("| @name marq-x X . . . . . . . . . . . .offset from left"));
-        msg_rc(_("| @name marq-y Y . . . . . . . . . . . . offset from top"));
-        msg_rc(_("| @name marq-position #. . .  .relative position control"));
-        msg_rc(_("| @name marq-color # . . . . . . . . . . font color, RGB"));
-        msg_rc(_("| @name marq-opacity # . . . . . . . . . . . . . opacity"));
-        msg_rc(_("| @name marq-timeout T. . . . . . . . . . timeout, in ms"));
-        msg_rc(_("| @name marq-size # . . . . . . . . font size, in pixels"));
+        msg_rc("%s", _("| @name marq-marquee  STRING  . . overlay STRING in video"));
+        msg_rc("%s", _("| @name marq-x X . . . . . . . . . . . .offset from left"));
+        msg_rc("%s", _("| @name marq-y Y . . . . . . . . . . . . offset from top"));
+        msg_rc("%s", _("| @name marq-position #. . .  .relative position control"));
+        msg_rc("%s", _("| @name marq-color # . . . . . . . . . . font color, RGB"));
+        msg_rc("%s", _("| @name marq-opacity # . . . . . . . . . . . . . opacity"));
+        msg_rc("%s", _("| @name marq-timeout T. . . . . . . . . . timeout, in ms"));
+        msg_rc("%s", _("| @name marq-size # . . . . . . . . font size, in pixels"));
         msg_rc(  "| ");
-        msg_rc(_("| @name logo-file STRING . . .the overlay file path/name"));
-        msg_rc(_("| @name logo-x X . . . . . . . . . . . .offset from left"));
-        msg_rc(_("| @name logo-y Y . . . . . . . . . . . . offset from top"));
-        msg_rc(_("| @name logo-position #. . . . . . . . relative position"));
-        msg_rc(_("| @name logo-transparency #. . . . . . . . .transparency"));
+        msg_rc("%s", _("| @name logo-file STRING . . .the overlay file path/name"));
+        msg_rc("%s", _("| @name logo-x X . . . . . . . . . . . .offset from left"));
+        msg_rc("%s", _("| @name logo-y Y . . . . . . . . . . . . offset from top"));
+        msg_rc("%s", _("| @name logo-position #. . . . . . . . relative position"));
+        msg_rc("%s", _("| @name logo-transparency #. . . . . . . . .transparency"));
         msg_rc(  "| ");
-        msg_rc(_("| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"));
-        msg_rc(_("| @name mosaic-height #. . . . . . . . . . . . . .height"));
-        msg_rc(_("| @name mosaic-width # . . . . . . . . . . . . . . width"));
-        msg_rc(_("| @name mosaic-xoffset # . . . .top left corner position"));
-        msg_rc(_("| @name mosaic-yoffset # . . . .top left corner position"));
-        msg_rc(_("| @name mosaic-offsets x,y(,x,y)*. . . . list of offsets"));
-        msg_rc(_("| @name mosaic-align 0..2,4..6,8..10. . .mosaic alignment"));
-        msg_rc(_("| @name mosaic-vborder # . . . . . . . . vertical border"));
-        msg_rc(_("| @name mosaic-hborder # . . . . . . . horizontal border"));
-        msg_rc(_("| @name mosaic-position {0=auto,1=fixed} . . . .position"));
-        msg_rc(_("| @name mosaic-rows #. . . . . . . . . . .number of rows"));
-        msg_rc(_("| @name mosaic-cols #. . . . . . . . . . .number of cols"));
-        msg_rc(_("| @name mosaic-order id(,id)* . . . . order of pictures "));
-        msg_rc(_("| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
+        msg_rc("%s", _("| @name mosaic-alpha # . . . . . . . . . . . . . . alpha"));
+        msg_rc("%s", _("| @name mosaic-height #. . . . . . . . . . . . . .height"));
+        msg_rc("%s", _("| @name mosaic-width # . . . . . . . . . . . . . . width"));
+        msg_rc("%s", _("| @name mosaic-xoffset # . . . .top left corner position"));
+        msg_rc("%s", _("| @name mosaic-yoffset # . . . .top left corner position"));
+        msg_rc("%s", _("| @name mosaic-offsets x,y(,x,y)*. . . . list of offsets"));
+        msg_rc("%s", _("| @name mosaic-align 0..2,4..6,8..10. . .mosaic alignment"));
+        msg_rc("%s", _("| @name mosaic-vborder # . . . . . . . . vertical border"));
+        msg_rc("%s", _("| @name mosaic-hborder # . . . . . . . horizontal border"));
+        msg_rc("%s", _("| @name mosaic-position {0=auto,1=fixed} . . . .position"));
+        msg_rc("%s", _("| @name mosaic-rows #. . . . . . . . . . .number of rows"));
+        msg_rc("%s", _("| @name mosaic-cols #. . . . . . . . . . .number of cols"));
+        msg_rc("%s", _("| @name mosaic-order id(,id)* . . . . order of pictures "));
+        msg_rc("%s", _("| @name mosaic-keep-aspect-ratio {0,1} . . .aspect ratio"));
         msg_rc(  "| ");
     }
-    msg_rc(_("| help . . . . . . . . . . . . . . . this help message"));
-    msg_rc(_("| longhelp . . . . . . . . . . . a longer help message"));
-    msg_rc(_("| logout . . . . . . .  exit (if in socket connection)"));
-    msg_rc(_("| quit . . . . . . . . . . . . . . . . . . .  quit vlc"));
+    msg_rc("%s", _("| help . . . . . . . . . . . . . . . this help message"));
+    msg_rc("%s", _("| longhelp . . . . . . . . . . . a longer help message"));
+    msg_rc("%s", _("| logout . . . . . . .  exit (if in socket connection)"));
+    msg_rc("%s", _("| quit . . . . . . . . . . . . . . . . . . .  quit vlc"));
     msg_rc(  "| ");
-    msg_rc(_("+----[ end of help ]"));
+    msg_rc("%s", _("+----[ end of help ]"));
 }
 
 /********************************************************************
@@ -1052,7 +1052,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     if( ( val.i_int == PAUSE_S ) &&
         ( strcmp( psz_cmd, "pause" ) != 0 ) )
     {
-        msg_rc( _("Press menu select or pause to continue.") );
+        msg_rc( "%s", _("Press menu select or pause to continue.") );
         vlc_object_release( p_input );
         return VLC_EGENERIC;
     }
@@ -1302,7 +1302,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 
         if( val.i_int == PAUSE_S )
         {
-            msg_rc( _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
             pl_Release( p_this );
             return VLC_EGENERIC;
         }
@@ -1395,7 +1395,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
         int i_size = p_playlist->items.i_size / 2;
 
         if( i_pos <= 0 )
-            msg_rc( _("Error: `goto' needs an argument greater than zero.") );
+            msg_rc( "%s", _("Error: `goto' needs an argument greater than zero.") );
         else if( i_pos <= i_size )
         {
             playlist_item_t *p_item, *p_parent;
@@ -1546,7 +1546,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
         var_Get( p_input, "state", &val );
         if( val.i_int == PAUSE_S )
         {
-            msg_rc( _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_input );
             return VLC_EGENERIC;
         }
@@ -1614,7 +1614,7 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
         var_Get( p_input, "state", &val );
         if( val.i_int == PAUSE_S )
         {
-            msg_rc( _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_input );
             return VLC_EGENERIC;
         }
@@ -1798,7 +1798,7 @@ static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
         var_Get( p_input, "state", &val );
         if( val.i_int == PAUSE_S )
         {
-            msg_rc( _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
             vlc_object_release( p_input );
             return VLC_EGENERIC;
         }
@@ -1882,7 +1882,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
 
     if ( !*newval.psz_string )
     {
-        msg_rc( _("Please provide one of the following parameters:") );
+        msg_rc( "%s", _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
         return VLC_EGENERIC;
     }
@@ -1898,7 +1898,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         if( ( val.i_int == PAUSE_S ) &&
             ( strcmp( newval.psz_string, "select" ) != 0 ) )
         {
-            msg_rc( _("Type 'menu select' or 'pause' to continue.") );
+            msg_rc( "%s", _("Type 'menu select' or 'pause' to continue.") );
             pl_Release( p_this );
             return VLC_EGENERIC;
         }
@@ -1925,7 +1925,7 @@ static int Menu( vlc_object_t *p_this, char const *psz_cmd,
         osd_MenuActivate( p_this );
     else
     {
-        msg_rc( _("Please provide one of the following parameters:") );
+        msg_rc( "%s", _("Please provide one of the following parameters:") );
         msg_rc( "[on|off|up|down|left|right|select]" );
         i_error = VLC_EGENERIC;
     }
@@ -1957,7 +1957,7 @@ static int Statistics ( vlc_object_t *p_this, char const *psz_cmd,
      */
     else
     {
-        msg_rc(_("Unknown command!") );
+        msg_rc("%s", _("Unknown command!") );
     }
 
     vlc_object_release( p_input );
@@ -1973,7 +1973,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
     msg_rc( "+----[ begin of statistical info ]" );
 
     /* Input */
-    msg_rc(_("+-[Incoming]"));
+    msg_rc("%s", _("+-[Incoming]"));
     msg_rc(_("| input bytes read : %8.0f kB"),
             (float)(p_item->p_stats->i_read_bytes)/1000 );
     msg_rc(_("| input bitrate    :   %6.0f kb/s"),
@@ -1984,7 +1984,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
             (float)(p_item->p_stats->f_demux_bitrate)*8000 );
     msg_rc("|");
     /* Video */
-    msg_rc(_("+-[Video Decoding]"));
+    msg_rc("%s", _("+-[Video Decoding]"));
     msg_rc(_("| video decoded    :    %5i"),
             p_item->p_stats->i_decoded_video );
     msg_rc(_("| frames displayed :    %5i"),
@@ -1993,7 +1993,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
             p_item->p_stats->i_lost_pictures );
     msg_rc("|");
     /* Audio*/
-    msg_rc(_("+-[Audio Decoding]"));
+    msg_rc("%s", _("+-[Audio Decoding]"));
     msg_rc(_("| audio decoded    :    %5i"),
             p_item->p_stats->i_decoded_audio );
     msg_rc(_("| buffers played   :    %5i"),
@@ -2002,7 +2002,7 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
             p_item->p_stats->i_lost_abuffers );
     msg_rc("|");
     /* Sout */
-    msg_rc(_("+-[Streaming]"));
+    msg_rc("%s", _("+-[Streaming]"));
     msg_rc(_("| packets sent     :    %5i"), p_item->p_stats->i_sent_packets );
     msg_rc(_("| bytes sent       : %8.0f kB"),
             (float)(p_item->p_stats->i_sent_bytes)/1000 );

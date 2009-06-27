@@ -323,7 +323,7 @@ static int Open( vlc_object_t *p_this )
     if( (psz_device = config_GetPsz( p_aout, "alsa-audio-device" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
-        dialog_Fatal( p_aout, _("No Audio Device"),
+        dialog_Fatal( p_aout, _("No Audio Device"), "%s",
                         _("No audio device name was given. You might want to " \
                           "enter \"default\".") );
         free( p_sys );
