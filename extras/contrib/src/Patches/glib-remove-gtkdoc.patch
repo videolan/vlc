@@ -1,0 +1,96 @@
+diff -ru configure.in configure.in
+--- configure.in   2009-06-27 05:34:30.000000000 +0200
++++ configure.in     2009-06-27 12:45:40.000000000 +0200
+@@ -2600,8 +2600,6 @@
+ dnl *** Checks for gtk-doc ***
+ dnl **************************
+ 
+-GTK_DOC_CHECK([1.11])
+-
+ AC_ARG_ENABLE(man,
+               [AC_HELP_STRING([--enable-man],
+                               [regenerate man pages from Docbook [default=no]])],enable_man=yes,
+diff -ru Makefile.am Makefile.am
+--- Makefile.am	2009-05-08 01:57:50.000000000 +0200
++++ Makefile.am	2009-06-27 12:43:41.000000000 +0200
+@@ -3,7 +3,7 @@
+ 
+ AUTOMAKE_OPTIONS = 1.7
+ 
+-SUBDIRS = . m4macros glib gmodule gthread gobject gio tests po docs
++SUBDIRS = . m4macros glib gmodule gthread gobject gio tests po
+ DIST_SUBDIRS = $(SUBDIRS) build
+ 
+ bin_SCRIPTS = glib-gettextize
+@@ -68,8 +68,7 @@
+ 	INSTALL			\
+ 	ChangeLog		\
+ 	glibconfig.h.win32	\
+-	config.h.win32		\
+-	gtk-doc.make
++	config.h.win32
+ 
+ configexecincludedir = $(libdir)/glib-2.0/include
+ configexecinclude_DATA = glibconfig.h
+diff -ru autogen.sh autogen.sh
+--- autogen.sh	2009-06-27 03:57:54.000000000 +0200
++++ autogen.sh	2009-06-27 12:32:21.000000000 +0200
+@@ -29,14 +29,6 @@
+ 	DIE=1
+ fi
+ 
+-(gtkdocize --version) < /dev/null > /dev/null 2>&1 || {
+-	echo
+-	echo "You must have gtk-doc installed to compile $PROJECT."
+-	echo "Install the appropriate package for your distribution,"
+-	echo "or get the source tarball at ftp://ftp.gnome.org/pub/GNOME/sources/gtk-doc/"
+-	DIE=1
+-}
+-
+ (autoconf --version) < /dev/null > /dev/null 2>&1 || {
+ 	echo
+ 	echo "You must have autoconf installed to compile $PROJECT."
+@@ -107,7 +99,6 @@
+ $ACLOCAL $ACLOCAL_FLAGS || exit $?
+ 
+ libtoolize --force || exit $?
+-gtkdocize || exit $?
+ 
+ autoheader || exit $?
+ 
+diff -ru docs/reference/gio/Makefile.am docs/reference/gio/Makefile.am
+--- docs/reference/gio/Makefile.am	2009-06-27 05:34:30.000000000 +0200
++++ docs/reference/gio/Makefile.am	2009-06-27 12:37:01.000000000 +0200
+@@ -104,7 +104,6 @@
+ 	version.xml.in		\
+ 	gvfs-overview.odg
+ 
+-include $(top_srcdir)/gtk-doc.make
+ 
+ EXTRA_DIST +=				\
+ 	version.xml.in
+diff -ru docs/reference/glib/Makefile.am docs/reference/glib/Makefile.am
+--- docs/reference/glib/Makefile.am	2009-04-01 01:04:20.000000000 +0200
++++ docs/reference/glib/Makefile.am	2009-06-27 12:39:09.000000000 +0200
+@@ -69,9 +69,6 @@
+ # Extra options to supply to gtkdoc-fixref
+ FIXXREF_OPTIONS=
+ 
+-# include common portion ...
+-include $(top_srcdir)/gtk-doc.make
+-
+ # Other files to distribute
+ EXTRA_DIST +=				\
+ 	file-name-encodings.png		\
+diff -ru docs/reference/gobject/Makefile.am docs/reference/gobject/Makefile.am
+--- docs/reference/gobject/Makefile.am	2009-04-01 01:04:20.000000000 +0200
++++ docs/reference/gobject/Makefile.am	2009-06-27 12:40:34.000000000 +0200
+@@ -58,8 +58,6 @@
+ # Extra options to supply to gtkdoc-fixref
+ FIXXREF_OPTIONS=--extra-dir=$(srcdir)/../glib/html
+ 
+-include $(top_srcdir)/gtk-doc.make
+-
+ # Other files to distribute
+ EXTRA_DIST += 		\
+ 	gobject.cI	\

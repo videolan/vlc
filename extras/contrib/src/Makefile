@@ -1975,9 +1975,10 @@ glib-$(GLIB_VERSION).tar.bz2:
 
 glib: glib-$(GLIB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	(cd $@; patch -p0 < ../Patches/glib-remove-gtkdoc.patch)
 
 .glib: glib
-	(cd $<; ./configure --prefix=$(PREFIX) --host=$(HOST) && make && make install)
+	(cd $<; sh autogen.sh --prefix=$(PREFIX) --host=$(HOST) && make && make install)
 	touch $@
 
 CLEAN_FILE += .glib
