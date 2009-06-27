@@ -195,6 +195,7 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
                      onItemChange, this );
     var_DelCallback( getIntf(), "skin-to-load", onSkinToLoad, this );
+    var_DelCallback( getIntf(), "interaction", onInteraction, this );
 }
 
 void VlcProc::manage()
