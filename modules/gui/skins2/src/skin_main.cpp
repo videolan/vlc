@@ -49,6 +49,7 @@
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_minimize.hpp"
+#include "../commands/cmd_playlist.hpp"
 
 //---------------------------------------------------------------------------
 // Exported interface functions.
@@ -233,7 +234,14 @@ static int Open( vlc_object_t *p_this )
     free( skin_last );
 
 #ifdef WIN32
+
     p_intf->b_should_run_on_first_thread = true;
+
+    // enqueue a command to automatically start the first playlist item
+    AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
+    CmdPlaylistFirst *pCmd = new CmdPlaylistFirst( p_intf );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+
 #endif
 
     return( VLC_SUCCESS );
