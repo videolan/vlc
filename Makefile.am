@@ -95,34 +95,25 @@ ChangeLog: Makefile.am
 EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/MainMenu.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/MainMenu.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/MediaInfo.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/About.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/About.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/About.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/About.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Open.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Open.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Open.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Open.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/Preferences.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Preferences.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Wizard.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Wizard.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Wizard.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Wizard.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Extended.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Extended.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Extended.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Extended.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Update.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/Update.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/Update.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Update.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/classes.nib \
-	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/info.nib \
+	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
 	extras/package/macosx/Resources/aiff.icns \
@@ -572,8 +563,6 @@ VLC-release.app: vlc
 	      $(top_builddir)/VLC-release.app/Contents/Resources/$${i}.lproj ; \
 	done
 	printf "APPLVLC#" >| $(top_builddir)/VLC-release.app/Contents/PkgInfo
-	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name classes.nib -delete;
-	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name info.nib -delete;
 	find $(top_builddir)/VLC-release.app/Contents/Resources/English.lproj -name designable.nib -delete;
 	find $(top_builddir)/VLC-release.app -type d -exec chmod ugo+rx '{}' \;
 	find $(top_builddir)/VLC-release.app -type f -exec chmod ugo+r '{}' \;
