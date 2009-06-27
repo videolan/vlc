@@ -45,10 +45,6 @@ CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
         VarBox &rVoutSize = VlcProc::instance( pIntf )->getVoutSizeVar();
         rVoutSize.addObserver( this );
     }
-
-    // observe visibility variable
-    if( m_pVisible )
-        m_pVisible->addObserver( this );
 }
 
 
@@ -58,9 +54,6 @@ CtrlVideo::~CtrlVideo()
     rVoutSize.delObserver( this );
 
     //m_pLayout->getActiveVar().delObserver( this );
-
-    if( m_pVisible )
-        m_pVisible->delObserver( this );
 }
 
 
