@@ -1,0 +1,62 @@
+--- xpcom/typelib/xpidl/Makefile.in	2009-06-27 21:34:20.000000000 +0200
++++ xpcom/typelib/xpidl/Makefile.in	2009-06-27 21:34:20.000000000 +0200
+@@ -77,59 +77,6 @@
+ USE_STATIC_LIBS = 1
+ endif
+ 
+-ifeq ($(OS_ARCH),Darwin)
+-# The only reason to not always strip the SDK out is that the libraries
+-# in / on ppc currently aren't fat, preventing the target xpidl from linking
+-# on a ppc->x86 build.  The SDK, presumably 10.4u, must be included in that
+-# case in order to successfully link.  Because the target xpidl isn't
+-# currently built in a cross compile, though, this point is moot for the
+-# time being.
+-
+-ifndef CROSS_COMPILE
+-# When doing a native build, don't build xpidl against the SDK.  libIDL
+-# was most likely configured for the system headers, and bringing in the
+-# SDK's headers instead will cause problems.
+-_STRIP_SDK = 1
+-else
+-
+-# Cross-compiling
+-
+-# Don't build xpidl for the target.  This is not intended to be a permanent
+-# solution.  It's necessary because it is presently difficult to build
+-# xpidl's prerequisites (libIDL and glib) as fat and suitable for a cross.
+-# This will be fixed.  -mm
+-PROGRAM=
+-
+-# Since only host_xpidl will be built for now, always strip out the SDK
+-# (as above).
+-_STRIP_SDK=1
+-
+-# When fat xpidl prerequisites are available, the PROGRAM= and _STRIP_SDK=1
+-# above are expected to disappear, and be replaced with the following
+-# conditonal.
+-
+-# ifeq (86_powerpc,$(findstring 86,$(host_cpu))_$(TARGET_CPU))
+-# # When cross-compiling from x86 to ppc, an old (10.2-ish) SDK might be in
+-# # use, and libIDL will have been configured for new (10.4-ish) headers.
+-# _STRIP_SDK = 1
+-# endif
+-
+-endif # CROSS_COMPILE
+-
+-ifneq (,$(_STRIP_SDK)$(MACOS_SDK_DIR))
+-# libIDL is configured for the system's headers, with no SDK involved.
+-# There may be header conflicts if the SDK used for the Mozilla build
+-# is used here.  There are very few specific cases where the SDK needs to
+-# remain set to build xpidl.
+-NEXT_ROOT=
+-OS_CFLAGS := $(shell echo $(OS_CFLAGS)|sed -E -e "s%((-I|-isystem )$(MACOS_SDK_DIR)/usr/(include|lib/gcc)[^ ]*)|-F$(MACOS_SDK_DIR)(/System)?/Library/Frameworks[^ ]*|-nostdinc[^ ]*|-isysroot $(MACOS_SDK_DIR)%%g")
+-OS_CFLAGS := $(patsubst -I$(MACOS_SDK_DIR)%,-I%,$(OS_CFLAGS))
+-OS_LIBS := $(patsubst -L$(MACOS_SDK_DIR)/usr/lib%,,$(OS_LIBS))
+-LDFLAGS := $(shell echo $(LDFLAGS)|sed -E -e "s%-Wl,-syslibroot,$(MACOS_SDK_DIR)%%g")
+-endif # _STRIP_SDK
+-
+-endif # Darwin
+-
+ include $(topsrcdir)/config/rules.mk
+ 
+ CFLAGS		+= $(LIBIDL_CFLAGS)

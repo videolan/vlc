@@ -2052,6 +2052,10 @@ DISTCLEAN_PKG += gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip gli
 
 # ***************************************************************************
 # mozilla-macosx
+#
+# Note that this dependency needs to be compiled against the 10.4u SDK using
+# using GCC-4.0. Using newer releases of one of these won't lead to a 
+# successful compilation! Adapt the respective variables in ../config.mak!
 # ***************************************************************************
 
 firefox-$(MOZILLA_VERSION)-source.tar.bz2:
@@ -2059,14 +2063,19 @@ firefox-$(MOZILLA_VERSION)-source.tar.bz2:
 
 mozilla: firefox-$(MOZILLA_VERSION)-source.tar.bz2
 	$(EXTRACT_BZ2)
+	(cd $@; patch -p0 < ../Patches/firefox-darwin.patch)
 
-.mozilla-macosx: mozilla
-	(cd $<; ./configure --prefix=$(PREFIX) --enable-default-toolkit=cairo-cocoa --enable-standalone-modules=xpcom,plugin  --enable-application=xulrunner && make && make install)
+.mozilla-macosx: mozilla .glib .IDL
+	ifneq($(SDK_TARGET),"10.4")
+	echo "Compiling the mozilla target requires the 10.4 SDK!"
+	exit -1
+	endif
+	(cd $<; ./configure --prefix=$(PREFIX)/gecko-sdk-new --enable-default-toolkit=cairo-cocoa --enable-standalone-modules=xpcom,plugin  --enable-application=xulrunner && make && make install)
 	touch $@
 
 CLEAN_FILE += .mozilla-macosx
-CLEAN_PKG += mozilla-macosx
-DISTCLEAN_PKG += mozilla-source-$(MOZILLA_VERSION).tar.bz2
+CLEAN_PKG += mozilla
+DISTCLEAN_PKG += firefox-source-$(MOZILLA_VERSION).tar.bz2
 
 # ***************************************************************************
 # libjpeg
