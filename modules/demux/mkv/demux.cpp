@@ -160,7 +160,9 @@ matroska_stream_c *demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, EbmlS
             p_l0 = p_estream->FindNextID(KaxSegment::ClassInfos, 0xFFFFFFFFL);
         }
         else
-            p_l0 = p_l0->SkipData(*p_estream, KaxSegment_Context);
+        {
+            p_l0 = NULL;
+        }
     }
 
     if ( !b_keep_stream )
