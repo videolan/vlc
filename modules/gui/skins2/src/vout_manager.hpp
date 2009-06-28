@@ -113,6 +113,9 @@ class VoutManager: public SkinObject
         // get the VoutMainWindow
         VoutMainWindow* getVoutMainWindow() { return m_pVoutMainWindow; }
 
+        // test if vout are running
+        bool hasVout() { return ( m_SavedVoutVec.size() != 0 ) ; }
+
         // (un)lock functions to protect vout sets
         void lockVout( ) { vlc_mutex_lock( &vout_lock ); }
         void unlockVout( ) { vlc_mutex_unlock( &vout_lock ); }

@@ -212,6 +212,12 @@ void* VoutManager::acceptVout( vout_thread_t* pVout, int width, int height )
 
 void *VoutManager::getWindow( intf_thread_t *pIntf, vout_window_t *pWnd )
 {
+
+#ifdef WIN32
+    if( pIntf->p_sys->b_exitRequested )
+        return NULL;
+#endif
+
     // Theme may have been destroyed
     if( !pIntf->p_sys->p_theme )
         return NULL;
@@ -265,6 +271,12 @@ void VoutManager::releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd )
             break;
         }
     }
+
+#ifdef WIN32
+    if( pIntf->p_sys->b_exitRequested )
+        pIntf->p_sys->b_exitOK = ( pThis->m_SavedVoutVec.size() == 0 );
+#endif
+
 
     pThis->unlockVout();
 }

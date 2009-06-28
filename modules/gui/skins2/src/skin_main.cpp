@@ -122,6 +122,11 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_vlcProc = NULL;
     p_intf->p_sys->p_repository = NULL;
 
+#ifdef WIN32
+    p_intf->p_sys->b_exitRequested = false;
+    p_intf->p_sys->b_exitOK = false;
+#endif
+
     // No theme yet
     p_intf->p_sys->p_theme = NULL;
 

@@ -113,6 +113,12 @@ struct intf_sys_t
     /// The playlist thread
     playlist_t *p_playlist;
 
+#ifdef WIN32
+    /// flags in order to terminate properly
+    bool b_exitRequested;
+    bool b_exitOK;
+#endif
+
     /// Message bank subscription
     msg_subscription_t *p_sub;
 
