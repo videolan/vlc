@@ -187,6 +187,11 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         p_sys->i_output_max = 8 * sizeof(int32_t) * 131072;
         break;
 #endif
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 4, 0 )
+    case CODEC_ID_TTA:
+        p_sys->i_output_max = p_sys->p_context->channels * sizeof(int32_t) * p_sys->p_context->sample_rate * 2;
+        break;
+#endif
     case CODEC_ID_FLAC:
         p_sys->i_output_max = 8 * sizeof(int32_t) * 65535;
         break;
