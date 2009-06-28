@@ -25,13 +25,6 @@
 // Preamble
 //////////////////////////////////////////////////////////////////////////////
 
-#ifdef __x86_64__
-
-#warning "No text renderer build! Quartztext isn't 64bit compatible!"
-#warning "RE-WRITE ME!"
-
-#else
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -73,22 +66,19 @@ static int RenderHtml( filter_t *, subpicture_region_t *,
 
 static int GetFontSize( filter_t *p_filter );
 static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
-                       UniChar *psz_utfString, uint32_t i_text_len,
-                       uint32_t i_runs, uint32_t *pi_run_lengths,
-                       ATSUStyle *pp_styles );
-static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size,
-                              uint32_t i_font_color,
-                              bool b_bold, bool b_italic,
-                              bool b_uline );
+                       CFMutableAttributedStringRef p_attrString  );
+
+static void setFontAttibutes( char *psz_fontname, int i_font_size, uint32_t i_font_color,
+                              bool b_bold, bool b_italic, bool b_underline,
+                              CFRange p_range, CFMutableAttributedStringRef p_attrString );
+
 //////////////////////////////////////////////////////////////////////////////
 // Module descriptor
 //////////////////////////////////////////////////////////////////////////////
 
 // The preferred way to set font style information is for it to come from the
 // subtitle file, and for it to be rendered with RenderHtml instead of
-// RenderText. This module, unlike Freetype, doesn't provide any options to
-// override the fallback font selection used when this style information is
-// absent.
+// RenderText.
 #define FONT_TEXT N_("Font")
 #define FONT_LONGTEXT N_("Name for the font you want to use")
 #define FONTSIZER_TEXT N_("Relative font size")
@@ -134,6 +124,26 @@ vlc_module_begin ()
     set_callbacks( Create, Destroy )
 vlc_module_end ()
 
+typedef struct font_stack_t font_stack_t;
+struct font_stack_t
+{
+    char          *psz_name;
+    int            i_size;
+    uint32_t       i_color;            // ARGB
+
+    font_stack_t  *p_next;
+};
+
+typedef struct
+{
+    int         i_font_size;
+    uint32_t    i_font_color;         /* ARGB */
+    bool  b_italic;
+    bool  b_bold;
+    bool  b_underline;
+    char       *psz_fontname;
+} ft_style_t;
+
 typedef struct offscreen_bitmap_t offscreen_bitmap_t;
 struct offscreen_bitmap_t
 {
@@ -160,12 +170,6 @@ struct filter_sys_t
     ATSFontContainerRef    *p_fonts;
     int                     i_fonts;
 };
-
-#define UCHAR UniChar
-#define TR_DEFAULT_FONT p_sys->psz_font_name
-#define TR_FONT_STYLE_PTR ATSUStyle
-
-#include "text_renderer.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // Create: allocates osd-text video thread output method
@@ -285,63 +289,6 @@ static int LoadFontsFromAttachments( filter_t *p_filter )
     return rv;
 }
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_4
-// Original version of these functions available on:
-// http://developer.apple.com/documentation/Carbon/Conceptual/QuickDrawToQuartz2D/tq_color/chapter_4_section_3.html
-
-#define kGenericRGBProfilePathStr "/System/Library/ColorSync/Profiles/Generic RGB Profile.icc"
-
-static CMProfileRef OpenGenericProfile( void )
-{
-    static CMProfileRef cached_rgb_prof = NULL;
-
-    // Create the profile reference only once
-    if( cached_rgb_prof == NULL )
-    {
-        OSStatus            err;
-        CMProfileLocation   loc;
-
-        loc.locType = cmPathBasedProfile;
-        strcpy( loc.u.pathLoc.path, kGenericRGBProfilePathStr );
-
-        err = CMOpenProfile( &cached_rgb_prof, &loc );
-
-        if( err != noErr )
-        {
-            cached_rgb_prof = NULL;
-        }
-    }
-
-    if( cached_rgb_prof )
-    {
-        // Clone the profile reference so that the caller has
-        // their own reference, not our cached one.
-        CMCloneProfileRef( cached_rgb_prof );
-    }
-
-    return cached_rgb_prof;
-}
-
-static CGColorSpaceRef CreateGenericRGBColorSpace( void )
-{
-    static CGColorSpaceRef p_generic_rgb_cs = NULL;
-
-    if( p_generic_rgb_cs == NULL )
-    {
-        CMProfileRef generic_rgb_prof = OpenGenericProfile();
-
-        if( generic_rgb_prof )
-        {
-            p_generic_rgb_cs = CGColorSpaceCreateWithPlatformColorSpace( generic_rgb_prof );
-
-            CMCloseProfile( generic_rgb_prof );
-        }
-    }
-
-    return p_generic_rgb_cs;
-}
-#endif
-
 static char *EliminateCRLF( char *psz_string )
 {
     char *p;
@@ -360,41 +307,15 @@ static char *EliminateCRLF( char *psz_string )
     return psz_string;
 }
 
-// Convert UTF-8 string to UTF-16 character array -- internal Mac Endian-ness ;
-// we don't need to worry about bidirectional text conversion as ATSUI should
-// handle that for us automatically
-static void ConvertToUTF16( const char *psz_utf8_str, uint32_t *pi_strlen, UniChar **ppsz_utf16_str )
-{
-    CFStringRef   p_cfString;
-    int           i_string_length;
-
-    p_cfString = CFStringCreateWithCString( NULL, psz_utf8_str, kCFStringEncodingUTF8 );
-    if( !p_cfString )
-        return;
-
-    i_string_length = CFStringGetLength( p_cfString );
-
-    if( pi_strlen )
-        *pi_strlen = i_string_length;
-
-    if( !*ppsz_utf16_str )
-        *ppsz_utf16_str = (UniChar *) calloc( i_string_length, sizeof( UniChar ) );
-
-    CFStringGetCharacters( p_cfString, CFRangeMake( 0, i_string_length ), *ppsz_utf16_str );
-
-    CFRelease( p_cfString );
-}
-
 // Renders a text subpicture region into another one.
 // It is used as pf_add_string callback in the vout method by this module
 static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                        subpicture_region_t *p_region_in )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    UniChar      *psz_utf16_str = NULL;
-    uint32_t      i_string_length;
     char         *psz_string;
-    int           i_font_color, i_font_alpha, i_font_size;
+    int           i_font_alpha, i_font_size;
+    uint32_t      i_font_color;
     vlc_value_t val;
     int i_scale = 1000;
 
@@ -432,131 +353,437 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
             i_font_size = 12;
     }
 
-    ConvertToUTF16( EliminateCRLF( psz_string ), &i_string_length, &psz_utf16_str );
-
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
 
-    if( psz_utf16_str != NULL )
-    {
-        ATSUStyle p_style = CreateStyle( p_sys->psz_font_name, i_font_size,
-                                         (i_font_color & 0xffffff) |
-                                         ((i_font_alpha & 0xff) << 24),
-                                         false, false, false );
-        if( p_style )
-        {
-            RenderYUVA( p_filter, p_region_out, psz_utf16_str, i_string_length,
-                        1, &i_string_length, &p_style );
-        }
+    CFMutableAttributedStringRef p_attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
 
-        ATSUDisposeStyle( p_style );
-        free( psz_utf16_str );
+    if( p_attrString )
+    {
+        CFStringRef   p_cfString;
+        int           len;
+
+        EliminateCRLF( psz_string);
+        p_cfString = CFStringCreateWithCString( NULL, psz_string, kCFStringEncodingUTF8 );
+        CFAttributedStringReplaceString( p_attrString, CFRangeMake(0, 0), p_cfString );
+        CFRelease( p_cfString );
+        len = CFAttributedStringGetLength( p_attrString );
+
+        setFontAttibutes( p_sys->psz_font_name, i_font_size, i_font_color, FALSE, FALSE, FALSE,
+                                             CFRangeMake( 0, len ), p_attrString);
+
+        RenderYUVA( p_filter, p_region_out, p_attrString );
     }
+    CFRelease(p_attrString);
 
     return VLC_SUCCESS;
 }
 
 
-static ATSUStyle CreateStyle( char *psz_fontname, int i_font_size, uint32_t i_font_color,
-                              bool b_bold, bool b_italic, bool b_uline )
+static int PushFont( font_stack_t **p_font, const char *psz_name, int i_size,
+                     uint32_t i_color )
 {
-    ATSUStyle   p_style;
-    OSStatus    status;
-    uint32_t    i_tag_cnt;
+    font_stack_t *p_new;
 
-    float f_red   = (float)(( i_font_color & 0x00FF0000 ) >> 16) / 255.0;
-    float f_green = (float)(( i_font_color & 0x0000FF00 ) >>  8) / 255.0;
-    float f_blue  = (float)(  i_font_color & 0x000000FF        ) / 255.0;
-    float f_alpha = ( 255.0 - (float)(( i_font_color & 0xFF000000 ) >> 24)) / 255.0;
+    if( !p_font )
+        return VLC_EGENERIC;
 
-    ATSUFontID           font;
-    Fixed                font_size  = IntToFixed( i_font_size );
-    ATSURGBAlphaColor    font_color = { f_red, f_green, f_blue, f_alpha };
-    Boolean              bold       = b_bold;
-    Boolean              italic     = b_italic;
-    Boolean              uline      = b_uline;
+    p_new = malloc( sizeof( font_stack_t ) );
+    if( ! p_new )
+        return VLC_ENOMEM;
 
-    ATSUAttributeTag tags[]        = { kATSUSizeTag, kATSURGBAlphaColorTag, kATSUQDItalicTag,
-                                       kATSUQDBoldfaceTag, kATSUQDUnderlineTag, kATSUFontTag };
-    ByteCount sizes[]              = { sizeof( Fixed ), sizeof( ATSURGBAlphaColor ), sizeof( Boolean ),
-                                       sizeof( Boolean ), sizeof( Boolean ), sizeof( ATSUFontID )};
-    ATSUAttributeValuePtr values[] = { &font_size, &font_color, &italic, &bold, &uline, &font };
+    p_new->p_next = NULL;
 
-    i_tag_cnt = sizeof( tags ) / sizeof( ATSUAttributeTag );
+    if( psz_name )
+        p_new->psz_name = strdup( psz_name );
+    else
+        p_new->psz_name = NULL;
 
-    status = ATSUFindFontFromName( psz_fontname,
-                                   strlen( psz_fontname ),
-                                   kFontFullName,
-                                   kFontNoPlatform,
-                                   kFontNoScript,
-                                   kFontNoLanguageCode,
-                                   &font );
+    p_new->i_size   = i_size;
+    p_new->i_color  = i_color;
 
-    if( status != noErr )
+    if( !*p_font )
     {
-        // If we can't find a suitable font, just do everything else
-        i_tag_cnt--;
+        *p_font = p_new;
     }
-
-    if( noErr == ATSUCreateStyle( &p_style ) )
+    else
     {
-        if( noErr == ATSUSetAttributes( p_style, i_tag_cnt, tags, sizes, values ) )
-        {
-            return p_style;
-        }
-        ATSUDisposeStyle( p_style );
+        font_stack_t *p_last;
+
+        for( p_last = *p_font;
+             p_last->p_next;
+             p_last = p_last->p_next )
+        ;
+
+        p_last->p_next = p_new;
     }
-    return NULL;
+    return VLC_SUCCESS;
 }
 
-static ATSUStyle GetStyleFromFontStack( filter_sys_t *p_sys,
-        font_stack_t **p_fonts, bool b_bold, bool b_italic,
-        bool b_uline )
+static int PopFont( font_stack_t **p_font )
 {
-    ATSUStyle   p_style = NULL;
+    font_stack_t *p_last, *p_next_to_last;
 
-    char     *psz_fontname = NULL;
-    uint32_t  i_font_color = p_sys->i_font_color;
-    uint32_t  i_karaoke_bg_color = i_font_color; /* Use it */
-    int       i_font_size  = p_sys->i_font_size;
+    if( !p_font || !*p_font )
+        return VLC_EGENERIC;
+
+    p_next_to_last = NULL;
+    for( p_last = *p_font;
+         p_last->p_next;
+         p_last = p_last->p_next )
+    {
+        p_next_to_last = p_last;
+    }
+
+    if( p_next_to_last )
+        p_next_to_last->p_next = NULL;
+    else
+        *p_font = NULL;
+
+    free( p_last->psz_name );
+    free( p_last );
+
+    return VLC_SUCCESS;
+}
+
+static int PeekFont( font_stack_t **p_font, char **psz_name, int *i_size,
+                     uint32_t *i_color )
+{
+    font_stack_t *p_last;
+
+    if( !p_font || !*p_font )
+        return VLC_EGENERIC;
+
+    for( p_last=*p_font;
+         p_last->p_next;
+         p_last=p_last->p_next )
+    ;
+
+    *psz_name = p_last->psz_name;
+    *i_size   = p_last->i_size;
+    *i_color  = p_last->i_color;
+
+    return VLC_SUCCESS;
+}
+
+static int HandleFontAttributes( xml_reader_t *p_xml_reader,
+                                  font_stack_t **p_fonts, int i_scale )
+{
+    int        rv;
+    char      *psz_fontname = NULL;
+    uint32_t   i_font_color = 0xffffff;
+    int        i_font_alpha = 0;
+    int        i_font_size  = 24;
+
+    // Default all attributes to the top font in the stack -- in case not
+    // all attributes are specified in the sub-font
+    if( VLC_SUCCESS == PeekFont( p_fonts,
+                                 &psz_fontname,
+                                 &i_font_size,
+                                 &i_font_color ))
+    {
+        psz_fontname = strdup( psz_fontname );
+        i_font_size = i_font_size * 1000 / i_scale;
+    }
+    i_font_alpha = (i_font_color >> 24) & 0xff;
+    i_font_color &= 0x00ffffff;
+
+    while ( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+    {
+        char *psz_name = xml_ReaderName( p_xml_reader );
+        char *psz_value = xml_ReaderValue( p_xml_reader );
+
+        if( psz_name && psz_value )
+        {
+            if( !strcasecmp( "face", psz_name ) )
+            {
+                if( psz_fontname ) free( psz_fontname );
+                psz_fontname = strdup( psz_value );
+            }
+            else if( !strcasecmp( "size", psz_name ) )
+            {
+                if( ( *psz_value == '+' ) || ( *psz_value == '-' ) )
+                {
+                    int i_value = atoi( psz_value );
+
+                    if( ( i_value >= -5 ) && ( i_value <= 5 ) )
+                        i_font_size += ( i_value * i_font_size ) / 10;
+                    else if( i_value < -5 )
+                        i_font_size = - i_value;
+                    else if( i_value > 5 )
+                        i_font_size = i_value;
+                }
+                else
+                    i_font_size = atoi( psz_value );
+            }
+            else if( !strcasecmp( "color", psz_name )  &&
+                     ( psz_value[0] == '#' ) )
+            {
+                i_font_color = strtol( psz_value + 1, NULL, 16 );
+                i_font_color &= 0x00ffffff;
+            }
+            else if( !strcasecmp( "alpha", psz_name ) &&
+                     ( psz_value[0] == '#' ) )
+            {
+                i_font_alpha = strtol( psz_value + 1, NULL, 16 );
+                i_font_alpha &= 0xff;
+            }
+            free( psz_name );
+            free( psz_value );
+        }
+    }
+    rv = PushFont( p_fonts,
+                   psz_fontname,
+                   i_font_size * i_scale / 1000,
+                   (i_font_color & 0xffffff) | ((i_font_alpha & 0xff) << 24) );
+
+    free( psz_fontname );
+
+    return rv;
+}
+
+static void setFontAttibutes( char *psz_fontname, int i_font_size, uint32_t i_font_color,
+        bool b_bold, bool b_italic, bool b_underline,
+        CFRange p_range, CFMutableAttributedStringRef p_attrString )
+{
+    CFStringRef p_cfString;
+    CTFontRef   p_font;
+
+    // Handle font name and size
+    p_cfString = CFStringCreateWithCString( NULL,
+                                            psz_fontname,
+                                            kCFStringEncodingUTF8 );
+    p_font     = CTFontCreateWithName( p_cfString,
+                                       (float)i_font_size,
+                                       NULL );
+    CFRelease( p_cfString );
+    CFAttributedStringSetAttribute( p_attrString,
+                                    p_range,
+                                    kCTFontAttributeName,
+                                    p_font );
+    CFRelease( p_font );
+
+    // Handle Underline
+    SInt32 _uline;
+    if( b_underline )
+        _uline = kCTUnderlineStyleSingle;
+    else
+        _uline = kCTUnderlineStyleNone;
+
+    CFNumberRef underline = CFNumberCreate(NULL, kCFNumberSInt32Type, &_uline);
+    CFAttributedStringSetAttribute( p_attrString,
+                                    p_range,
+                                    kCTUnderlineStyleAttributeName,
+                                    underline );
+    CFRelease( underline );
+
+    // Handle Bold
+    float _weight;
+    if( b_bold )
+        _weight = 0.5;
+    else
+        _weight = 0.0;
+
+    CFNumberRef weight = CFNumberCreate(NULL, kCFNumberFloatType, &_weight);
+    CFAttributedStringSetAttribute( p_attrString,
+                                    p_range,
+                                    kCTFontWeightTrait,
+                                    weight );
+    CFRelease( weight );
+
+    // Handle Italic
+    float _slant;
+    if( b_italic )
+        _slant = 1.0;
+    else
+        _slant = 0.0;
+
+    CFNumberRef slant = CFNumberCreate(NULL, kCFNumberFloatType, &_slant);
+    CFAttributedStringSetAttribute( p_attrString,
+                                    p_range,
+                                    kCTFontSlantTrait,
+                                    slant );
+    CFRelease( slant );
+
+    // Handle foreground colour
+    CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
+    CGFloat components[] = { (float)((i_font_color & 0x00ff0000) >> 16) / 255.0,
+                             (float)((i_font_color & 0x0000ff00) >>  8) / 255.0,
+                             (float)((i_font_color & 0x000000ff)      ) / 255.0,
+                             (float)(255-((i_font_color & 0xff000000) >> 24)) / 255.0 };
+    CGColorRef fg_text = CGColorCreate(rgbColorSpace, components);
+    CGColorSpaceRelease(rgbColorSpace);
+
+    CFAttributedStringSetAttribute( p_attrString,
+                                    p_range,
+                                    kCTForegroundColorAttributeName,
+                                    fg_text );
+    CFRelease( fg_text );
+
+}
+
+static void GetAttrStrFromFontStack( font_stack_t **p_fonts,
+        bool b_bold, bool b_italic, bool b_uline,
+        CFRange p_range, CFMutableAttributedStringRef p_attrString )
+{
+    char       *psz_fontname = NULL;
+    int         i_font_size  = 0;
+    uint32_t    i_font_color = 0;
 
     if( VLC_SUCCESS == PeekFont( p_fonts, &psz_fontname, &i_font_size,
-                                 &i_font_color, &i_karaoke_bg_color ))
+                                 &i_font_color ))
     {
-        p_style = CreateStyle( psz_fontname, i_font_size, i_font_color,
-                               b_bold, b_italic, b_uline );
+        setFontAttibutes( psz_fontname,
+                          i_font_size,
+                          i_font_color,
+                          b_bold, b_italic, b_uline,
+                          p_range,
+                          p_attrString );
     }
-    return p_style;
 }
 
-static void SetupLine( filter_t *p_filter, const char *psz_text_in,
-                       UniChar **psz_text_out, uint32_t *pi_runs,
-                       uint32_t **ppi_run_lengths, ATSUStyle **ppp_styles,
-                       ATSUStyle p_style )
+static int ProcessNodes( filter_t *p_filter,
+                         xml_reader_t *p_xml_reader,
+                         text_style_t *p_font_style,
+                         CFMutableAttributedStringRef p_attrString )
 {
-    uint32_t i_string_length = 0;
+    int           rv             = VLC_SUCCESS;
+    filter_sys_t *p_sys          = p_filter->p_sys;
+    font_stack_t *p_fonts        = NULL;
+    vlc_value_t   val;
+    int           i_scale        = 1000;
 
-    ConvertToUTF16( psz_text_in, &i_string_length, psz_text_out );
-    *psz_text_out += i_string_length;
+    char *psz_node  = NULL;
 
-    if( ppp_styles && ppi_run_lengths )
+    bool b_italic = false;
+    bool b_bold   = false;
+    bool b_uline  = false;
+
+    if( VLC_SUCCESS == var_Get( p_filter, "scale", &val ))
+        i_scale = val.i_int;
+
+    if( p_font_style )
     {
-        (*pi_runs)++;
+        rv = PushFont( &p_fonts,
+               p_font_style->psz_fontname,
+               p_font_style->i_font_size * i_scale / 1000,
+               (p_font_style->i_font_color & 0xffffff) |
+                   ((p_font_style->i_font_alpha & 0xff) << 24) );
 
-        if( *ppp_styles )
-            *ppp_styles = (ATSUStyle *) realloc( *ppp_styles, *pi_runs * sizeof( ATSUStyle ) );
-        else
-            *ppp_styles = (ATSUStyle *) malloc( *pi_runs * sizeof( ATSUStyle ) );
-
-        (*ppp_styles)[ *pi_runs - 1 ] = p_style;
-
-        if( *ppi_run_lengths )
-            *ppi_run_lengths = (uint32_t *) realloc( *ppi_run_lengths, *pi_runs * sizeof( uint32_t ) );
-        else
-            *ppi_run_lengths = (uint32_t *) malloc( *pi_runs * sizeof( uint32_t ) );
-
-        (*ppi_run_lengths)[ *pi_runs - 1 ] = i_string_length;
+        if( p_font_style->i_style_flags & STYLE_BOLD )
+            b_bold = true;
+        if( p_font_style->i_style_flags & STYLE_ITALIC )
+            b_italic = true;
+        if( p_font_style->i_style_flags & STYLE_UNDERLINE )
+            b_uline = true;
     }
+    else
+    {
+        rv = PushFont( &p_fonts,
+                       p_sys->psz_font_name,
+                       p_sys->i_font_size,
+                       p_sys->i_font_color );
+    }
+    if( rv != VLC_SUCCESS )
+        return rv;
+
+    while ( ( xml_ReaderRead( p_xml_reader ) == 1 ) )
+    {
+        switch ( xml_ReaderNodeType( p_xml_reader ) )
+        {
+            case XML_READER_NONE:
+                break;
+            case XML_READER_ENDELEM:
+                psz_node = xml_ReaderName( p_xml_reader );
+
+                if( psz_node )
+                {
+                    if( !strcasecmp( "font", psz_node ) )
+                        PopFont( &p_fonts );
+                    else if( !strcasecmp( "b", psz_node ) )
+                        b_bold   = false;
+                    else if( !strcasecmp( "i", psz_node ) )
+                        b_italic = false;
+                    else if( !strcasecmp( "u", psz_node ) )
+                        b_uline  = false;
+
+                    free( psz_node );
+                }
+                break;
+            case XML_READER_STARTELEM:
+                psz_node = xml_ReaderName( p_xml_reader );
+                if( psz_node )
+                {
+                    if( !strcasecmp( "font", psz_node ) )
+                        rv = HandleFontAttributes( p_xml_reader, &p_fonts, i_scale );
+                    else if( !strcasecmp( "b", psz_node ) )
+                        b_bold = true;
+                    else if( !strcasecmp( "i", psz_node ) )
+                        b_italic = true;
+                    else if( !strcasecmp( "u", psz_node ) )
+                        b_uline = true;
+                    else if( !strcasecmp( "br", psz_node ) )
+                    {
+                        CFMutableAttributedStringRef p_attrnode = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
+                        CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), CFSTR("\n") );
+
+                        GetAttrStrFromFontStack( &p_fonts, b_bold, b_italic, b_uline,
+                                                 CFRangeMake( 0, 1 ),
+                                                 p_attrnode );
+                        CFAttributedStringReplaceAttributedString( p_attrString,
+                                        CFRangeMake(CFAttributedStringGetLength(p_attrString), 0),
+                                        p_attrnode);
+                        CFRelease( p_attrnode );
+                    }
+                    free( psz_node );
+                }
+                break;
+            case XML_READER_TEXT:
+                psz_node = xml_ReaderValue( p_xml_reader );
+                if( psz_node )
+                {
+                    CFStringRef   p_cfString;
+                    int           len;
+
+                    // Turn any multiple-whitespaces into single spaces
+                    char *s = strpbrk( psz_node, "\t\r\n " );
+                    while( s )
+                    {
+                        int i_whitespace = strspn( s, "\t\r\n " );
+
+                        if( i_whitespace > 1 )
+                            memmove( &s[1],
+                                     &s[i_whitespace],
+                                     strlen( s ) - i_whitespace + 1 );
+                        *s++ = ' ';
+
+                        s = strpbrk( s, "\t\r\n " );
+                    }
+
+
+                    CFMutableAttributedStringRef p_attrnode = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
+                    p_cfString = CFStringCreateWithCString( NULL, psz_node, kCFStringEncodingUTF8 );
+                    CFAttributedStringReplaceString( p_attrnode, CFRangeMake(0, 0), p_cfString );
+                    CFRelease( p_cfString );
+                    len = CFAttributedStringGetLength( p_attrnode );
+
+                    GetAttrStrFromFontStack( &p_fonts, b_bold, b_italic, b_uline,
+                                             CFRangeMake( 0, len ),
+                                             p_attrnode );
+
+                    CFAttributedStringReplaceAttributedString( p_attrString,
+                                    CFRangeMake(CFAttributedStringGetLength(p_attrString), 0),
+                                    p_attrnode);
+                    CFRelease( p_attrnode );
+                    free( psz_node );
+                }
+                break;
+        }
+    }
+
+    while( VLC_SUCCESS == PopFont( &p_fonts ) );
+
+    return rv;
 }
 
 static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
@@ -618,44 +845,22 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
 
             if( p_xml_reader )
             {
-                UniChar    *psz_text;
-                int         i_len = 0;
-                uint32_t    i_runs = 0;
-                uint32_t    i_k_runs = 0;
-                uint32_t   *pi_run_lengths = NULL;
-                uint32_t   *pi_k_run_lengths = NULL;
-                uint32_t   *pi_k_durations = NULL;
-                ATSUStyle  *pp_styles = NULL;
+                int         i_len;
 
-                psz_text = (UniChar *) malloc( strlen( p_region_in->psz_html ) *
-                                                sizeof( UniChar ) );
-                if( psz_text )
+                CFMutableAttributedStringRef p_attrString = CFAttributedStringCreateMutable(kCFAllocatorDefault, 0);
+                rv = ProcessNodes( p_filter, p_xml_reader,
+                              p_region_in->p_style, p_attrString );
+
+                i_len = CFAttributedStringGetLength( p_attrString );
+
+                p_region_out->i_x = p_region_in->i_x;
+                p_region_out->i_y = p_region_in->i_y;
+
+                if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
                 {
-                    uint32_t k;
-
-                    rv = ProcessNodes( p_filter, p_xml_reader,
-                                  p_region_in->p_style, psz_text, &i_len,
-                                  &i_runs, &pi_run_lengths, &pp_styles,
-                                  /* No karaoke support */
-                                  false, &i_k_runs, &pi_k_run_lengths, &pi_k_durations );
-
-                    assert( pi_k_run_lengths == NULL && pi_k_durations == NULL );
-
-                    p_region_out->i_x = p_region_in->i_x;
-                    p_region_out->i_y = p_region_in->i_y;
-
-                    if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
-                    {
-                        RenderYUVA( p_filter, p_region_out, psz_text, i_len, i_runs,
-                             pi_run_lengths, pp_styles);
-                    }
-
-                    for( k=0; k<i_runs; k++)
-                        ATSUDisposeStyle( pp_styles[k] );
-                    free( pp_styles );
-                    free( pi_run_lengths );
-                    free( psz_text );
+                    RenderYUVA( p_filter, p_region_out, p_attrString );
                 }
+                CFRelease(p_attrString);
 
                 xml_ReaderDelete( p_xml, p_xml_reader );
             }
@@ -704,9 +909,11 @@ static CGContextRef CreateOffScreenContext( int i_width, int i_height,
     return p_context;
 }
 
-static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, uint32_t i_text_len,
-                                    uint32_t i_runs, uint32_t *pi_run_lengths, ATSUStyle *pp_styles,
-                                    int i_width, int i_height, int *pi_textblock_height )
+static offscreen_bitmap_t *Compose( int i_text_align,
+                                    CFMutableAttributedStringRef p_attrString,
+                                    int i_width,
+                                    int i_height,
+                                    int *pi_textblock_height )
 {
     offscreen_bitmap_t  *p_offScreen  = NULL;
     CGColorSpaceRef      p_colorSpace = NULL;
@@ -714,103 +921,75 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
 
     p_context = CreateOffScreenContext( i_width, i_height, &p_offScreen, &p_colorSpace );
 
+    *pi_textblock_height = 0;
     if( p_context )
     {
-        ATSUTextLayout p_textLayout;
-        OSStatus status = noErr;
+        float horiz_flush;
 
-        status = ATSUCreateTextLayoutWithTextPtr( psz_utf16_str, 0, i_text_len, i_text_len,
-                                                  i_runs,
-                                                  (const UniCharCount *) pi_run_lengths,
-                                                  pp_styles,
-                                                  &p_textLayout );
-        if( status == noErr )
+        CGContextSetTextMatrix( p_context, CGAffineTransformIdentity );
+
+        if( i_text_align == SUBPICTURE_ALIGN_RIGHT )
+            horiz_flush = 1.0;
+        else if( i_text_align != SUBPICTURE_ALIGN_LEFT )
+            horiz_flush = 0.5;
+        else
+            horiz_flush = 0.0;
+
+        // Create the framesetter with the attributed string.
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString(p_attrString);
+        if( framesetter )
         {
-            // Attach our offscreen Image Graphics Context to the text style
-            // and setup the line alignment (have to specify the line width
-            // also in order for our chosen alignment to work)
+            CTFrameRef frame;
+            CGMutablePathRef p_path = CGPathCreateMutable();
+            CGRect p_bounds = CGRectMake( (float)HORIZONTAL_MARGIN,
+                                          (float)VERTICAL_MARGIN,
+                                          (float)(i_width  - HORIZONTAL_MARGIN*2),
+                                          (float)(i_height - VERTICAL_MARGIN  *2));
+            CGPathAddRect( p_path, NULL, p_bounds );
 
-            Fract   alignment  = kATSUStartAlignment;
-            Fixed   line_width = Long2Fix( i_width - HORIZONTAL_MARGIN * 2 );
+            // Create the frame and draw it into the graphics context
+            frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), p_path, NULL);
 
-            ATSUAttributeTag tags[]        = { kATSUCGContextTag, kATSULineFlushFactorTag, kATSULineWidthTag };
-            ByteCount sizes[]              = { sizeof( CGContextRef ), sizeof( Fract ), sizeof( Fixed ) };
-            ATSUAttributeValuePtr values[] = { &p_context, &alignment, &line_width };
-
-            int i_tag_cnt = sizeof( tags ) / sizeof( ATSUAttributeTag );
-
-            if( i_text_align == SUBPICTURE_ALIGN_RIGHT )
-            {
-                alignment = kATSUEndAlignment;
-            }
-            else if( i_text_align != SUBPICTURE_ALIGN_LEFT )
-            {
-                alignment = kATSUCenterAlignment;
-            }
-
-            ATSUSetLayoutControls( p_textLayout, i_tag_cnt, tags, sizes, values );
-
-            // let ATSUI deal with characters not-in-our-specified-font
-            ATSUSetTransientFontMatching( p_textLayout, true );
-
-            Fixed x = Long2Fix( HORIZONTAL_MARGIN );
-            Fixed y = Long2Fix( i_height );
-
-            // Set the line-breaks and draw individual lines
-            uint32_t i_start = 0;
-            uint32_t i_end = i_text_len;
+            CGPathRelease(p_path);
 
             // Set up black outlining of the text --
             CGContextSetRGBStrokeColor( p_context, 0, 0, 0, 0.5 );
             CGContextSetTextDrawingMode( p_context, kCGTextFillStroke );
-            CGContextSetShadow( p_context, CGSizeMake( 0, 0 ), 5 );
-            float black_components[4] = {0, 0, 0, 1};
-            CGColorRef outlinecolor = CGColorCreate( CGColorSpaceCreateWithName( kCGColorSpaceGenericRGB ), black_components );
-            CGContextSetShadowWithColor (p_context, CGSizeMake( 0, 0 ), 5, outlinecolor);
-            CGColorRelease( outlinecolor );
-            do
+
+            if( frame != NULL )
             {
-                // ATSUBreakLine will automatically pick up any manual '\n's also
-                status = ATSUBreakLine( p_textLayout, i_start, line_width, true, (UniCharArrayOffset *) &i_end );
-                if( ( status == noErr ) || ( status == kATSULineBreakInWord ) )
+                CFArrayRef lines;
+                CGPoint    penPosition;
+
+                lines = CTFrameGetLines( frame );
+                penPosition.y = i_height;
+                for (int i=0; i<CFArrayGetCount( lines ); i++)
                 {
-                    Fixed     ascent;
-                    Fixed     descent;
-                    uint32_t  i_actualSize;
+                    CGFloat  ascent, descent, leading;
 
-                    // Come down far enough to fit the height of this line --
-                    ATSUGetLineControl( p_textLayout, i_start, kATSULineAscentTag,
-                                    sizeof( Fixed ), &ascent, (ByteCount *) &i_actualSize );
+                    CTLineRef line = (CTLineRef)CFArrayGetValueAtIndex(lines, i);
+                    CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
 
-                    // Quartz uses an upside-down co-ordinate space -> y values decrease as
-                    // you move down the page
-                    y -= ascent;
-
-                    // Set the outlining for this line to be dependent on the size of the line -
+                    // Set the outlining for this line to be dependant on the size of the line -
                     // make it about 5% of the ascent, with a minimum at 1.0
-                    float f_thickness = FixedToFloat( ascent ) * 0.05;
-                    CGContextSetLineWidth( p_context, (( f_thickness < 1.0 ) ? 1.0 : f_thickness ));
-                    ATSUDrawText( p_textLayout, i_start, i_end - i_start, x, y );
+                    float f_thickness = ascent * 0.05;
+                    CGContextSetLineWidth( p_context, (( f_thickness > 1.0 ) ? 1.0 : f_thickness ));
 
-                    // and now prepare for the next line by coming down far enough for our
-                    // descent
-                    ATSUGetLineControl( p_textLayout, i_start, kATSULineDescentTag,
-                                    sizeof( Fixed ), &descent, (ByteCount *) &i_actualSize );
-                    y -= descent;
+                    double penOffset = CTLineGetPenOffsetForFlush(line, horiz_flush, (i_width  - HORIZONTAL_MARGIN*2));
+                    penPosition.x = HORIZONTAL_MARGIN + penOffset;
+                    penPosition.y -= ascent;
+                    CGContextSetTextPosition( p_context, penPosition.x, penPosition.y );
+                    CTLineDraw( line, p_context );
+                    penPosition.y -= descent + leading;
 
-                    i_start = i_end;
                 }
-                else
-                    break;
+                *pi_textblock_height = i_height - penPosition.y;
+
+                CFRelease(frame);
             }
-            while( i_end < i_text_len );
-
-            *pi_textblock_height = i_height - Fix2Long( y );
-            CGContextFlush( p_context );
-
-            ATSUDisposeTextLayout( p_textLayout );
+            CFRelease(framesetter);
         }
-
+        CGContextFlush( p_context );
         CGContextRelease( p_context );
     }
     if( p_colorSpace ) CGColorSpaceRelease( p_colorSpace );
@@ -820,11 +999,11 @@ static offscreen_bitmap_t *Compose( int i_text_align, UniChar *psz_utf16_str, ui
 
 static int GetFontSize( filter_t *p_filter )
 {
-    return p_filter->fmt_out.video.i_height / __MAX(1, var_CreateGetInteger( p_filter, "quartztext-rel-fontsize" ));
+    return p_filter->fmt_out.video.i_height / DEFAULT_REL_FONT_SIZE;
 }
 
-static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniChar *psz_utf16_str,
-                       uint32_t i_text_len, uint32_t i_runs, uint32_t *pi_run_lengths, ATSUStyle *pp_styles )
+static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
+                       CFMutableAttributedStringRef p_attrString )
 {
     offscreen_bitmap_t *p_offScreen = NULL;
     int      i_textblock_height = 0;
@@ -833,14 +1012,13 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
     int i_height = p_filter->fmt_out.video.i_visible_height;
     int i_text_align = p_region->i_align & 0x3;
 
-    if( !psz_utf16_str )
+    if( !p_attrString )
     {
         msg_Err( p_filter, "Invalid argument to RenderYUVA" );
         return VLC_EGENERIC;
     }
 
-    p_offScreen = Compose( i_text_align, psz_utf16_str, i_text_len,
-                           i_runs, pi_run_lengths, pp_styles,
+    p_offScreen = Compose( i_text_align, p_attrString,
                            i_width, i_height, &i_textblock_height );
 
     if( !p_offScreen )
@@ -903,5 +1081,3 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region, UniCha
 
     return VLC_SUCCESS;
 }
-
-#endif
