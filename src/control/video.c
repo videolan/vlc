@@ -631,7 +631,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
 }
 
 /*****************************************************************************
- * Marquee: FIXME: That implementation has not persistent state and requires
+ * Marquee: FIXME: That implementation has no persistent state and requires
  * a vout
  *****************************************************************************/
 
