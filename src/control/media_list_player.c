@@ -502,6 +502,8 @@ void libvlc_media_list_player_play_item(
 void libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
                                     libvlc_exception_t * p_e )
 {
+    vlc_mutex_lock( &p_mlp->object_lock );
+
     if ( p_mlp->p_mi )
     {
         /* We are not interested in getting media stop event now */
@@ -510,7 +512,6 @@ void libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
         install_media_player_observer( p_mlp );
     }
 
-    vlc_mutex_lock( &p_mlp->object_lock );
     free( p_mlp->current_playing_item_path );
     p_mlp->current_playing_item_path = NULL;
     vlc_mutex_unlock( &p_mlp->object_lock );
