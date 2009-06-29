@@ -376,8 +376,8 @@ static int Init( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-#ifdef BEST_AUTOCROP
     vlc_mutex_init( &p_vout->p_sys->lock );
+#ifdef BEST_AUTOCROP
     var_AddCallback( p_vout, "ratio-crop", FilterCallback, NULL );
 #endif
 
