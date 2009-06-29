@@ -234,7 +234,6 @@ static int ParseTime( const char *s, size_t i_strlen)
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
-    char       *psz_name = NULL;
     char       *psz_artist = NULL, *psz_album = NULL, *psz_genre = NULL, *psz_year = NULL;
     char       *psz_author = NULL, *psz_title = NULL, *psz_copyright = NULL, *psz_cdnum = NULL, *psz_comments = NULL;
     int        i_parsed_duration = 0;
@@ -263,12 +262,6 @@ static int Demux( demux_t *p_demux )
         {
             char *psz_mrl, *psz_option_start, *psz_option_next, *psz_temp_mrl, *psz_option;
             char *psz_param, *psz_value;
-            if( !psz_name || !*psz_name )
-            {
-                /* Default filename as name for relative entries
-                   TODO: Currently not used. Either remove or use */
-                psz_name = MaybeFromLocaleDup( psz_parse );
-            }
 
             /* Get the MRL from the file. Note that this might contain parameters of form ?param1=value1&param2=value2 in a RAM file */
             psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
@@ -390,7 +383,6 @@ static int Demux( demux_t *p_demux )
             /* Cleanup state */
             while( i_options-- ) free( (char*)ppsz_options[i_options] );
             FREENULL( ppsz_options );
-            FREENULL( psz_name );
             FREENULL( psz_artist );
             FREENULL( psz_title );
             FREENULL( psz_author );
