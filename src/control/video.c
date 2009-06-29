@@ -635,7 +635,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
  * a vout
  *****************************************************************************/
 
-static inline const char * get_marquee_int_option_identifier(unsigned option)
+static const char *get_marquee_int_option_identifier(unsigned option)
 {
     static const char * marquee_table[] =
     {
@@ -655,7 +655,7 @@ static inline const char * get_marquee_int_option_identifier(unsigned option)
     return marquee_table[option];
 }
 
-static inline const char * get_marquee_string_option_identifier(unsigned option)
+static const char *get_marquee_string_option_identifier(unsigned option)
 {
     static const char * marquee_table[] =
     {
@@ -668,7 +668,7 @@ static inline const char * get_marquee_string_option_identifier(unsigned option)
 }
 
 
-static inline vlc_object_t * get_marquee_object( libvlc_media_player_t * p_mi )
+static vlc_object_t *get_marquee_object( libvlc_media_player_t * p_mi )
 {
     libvlc_exception_t e;
     libvlc_exception_init(&e);
