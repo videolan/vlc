@@ -39,7 +39,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_sout.h>
-#include "vlc_filter.h"
+#include <vlc_filter.h>
 
 #ifdef CAN_COMPILE_MMXEXT
 #   include "mmx.h"

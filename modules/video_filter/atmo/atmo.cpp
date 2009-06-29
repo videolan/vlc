@@ -39,7 +39,7 @@
 #include <vlc_vout.h>
 
 #include <vlc_playlist.h>
-#include "vlc_filter.h"
+#include <vlc_filter.h>
 
 #include "AtmoDefs.h"
 #include "AtmoDynData.h"

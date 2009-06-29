@@ -54,11 +54,11 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 
-#include "vlc_filter.h"
+#include <vlc_filter.h>
 #include "filter_common.h"
-#include "vlc_image.h"
-#include "vlc_osd.h"
-#include "vlc_keys.h"
+#include <vlc_image.h>
+#include <vlc_osd.h>
+#include <vlc_keys.h>
 
 #include <vlc_network.h>
 #include <gcrypt.h>              /* to encrypt password */

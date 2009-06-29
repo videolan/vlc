@@ -31,8 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
-#include "vlc_filter.h"
+#include <vlc_filter.h>
 
 #define BLUESCREEN_HELP N_( \
     "This effect, also known as \"greenscreen\" or \"chroma key\" blends " \
