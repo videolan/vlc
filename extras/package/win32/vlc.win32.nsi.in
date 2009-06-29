@@ -560,20 +560,8 @@ Section $Name_Section04 SEC04
   RegDLL "$INSTDIR\axvlc.dll"
 SectionEnd
 
-SectionGroup /e !$Name_Section06 SEC05
-  SectionGroup $Name_SectionGroupAudio
-    !insertmacro MacroAudioExtensions RegisterExtensionSection
-  SectionGroupEnd
-  SectionGroup $Name_SectionGroupVideo
-    !insertmacro MacroVideoExtensions RegisterExtensionSection
-  SectionGroupEnd
-  SectionGroup $Name_SectionGroupOther
-    !insertmacro MacroOtherExtensions RegisterExtensionSection
-  SectionGroupEnd
-SectionGroupEnd
 
-
-Section $Name_Section05 SEC06
+Section $Name_Section05 SEC05
   SectionIn 1 2 3
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC" "" $ContextMenuEntry_PlayWith
   WriteRegStr HKCR "AudioCD\shell\PlayWithVLC\command" "" \
@@ -607,6 +595,19 @@ Section $Name_Section05 SEC06
   WriteRegStr HKCR "VLC.CDAudio\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 SectionEnd
+
+
+SectionGroup /e !$Name_Section06 SEC06
+  SectionGroup $Name_SectionGroupAudio
+    !insertmacro MacroAudioExtensions RegisterExtensionSection
+  SectionGroupEnd
+  SectionGroup $Name_SectionGroupVideo
+    !insertmacro MacroVideoExtensions RegisterExtensionSection
+  SectionGroupEnd
+  SectionGroup $Name_SectionGroupOther
+    !insertmacro MacroOtherExtensions RegisterExtensionSection
+  SectionGroupEnd
+SectionGroupEnd
 
 Section $Name_Section07 SEC07
   SectionIn 1 3
