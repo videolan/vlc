@@ -637,7 +637,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
 
 static const char *get_marquee_int_option_identifier(unsigned option)
 {
-    static const char * marquee_table[] =
+    static const char tab[][16] =
     {
         "marq",
         "marq-color",
@@ -647,24 +647,22 @@ static const char *get_marquee_int_option_identifier(unsigned option)
         "marq-size",
         "marq-timeout",
         "marq-x",
-        "marq-y"
+        "marq-y",
     };
-    static const unsigned marquee_table_size = sizeof(marquee_table)/sizeof(*marquee_table);
-    if( option >= marquee_table_size )
+    if( option >= sizeof( tab ) / sizeof( tab[0] ) )
         return NULL;
-    return marquee_table[option];
+    return tab[option];
 }
 
 static const char *get_marquee_string_option_identifier(unsigned option)
 {
-    static const char * marquee_table[] =
+    static const char tab[][16] =
     {
-        "marq-marquee"
+        "marq-marquee",
     };
-    static const unsigned marquee_table_size = sizeof(marquee_table)/sizeof(*marquee_table);
-    if( option >= marquee_table_size )
+    if( option >= sizeof( tab ) / sizeof( tab[0] ) )
         return NULL;
-    return marquee_table[option];
+    return tab[option];
 }
 
 
