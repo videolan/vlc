@@ -801,7 +801,7 @@ exit:
  * Handle filters
  *****************************************************************************/
 
-void vout_EnableFilter( vout_thread_t *p_vout, char *psz_name,
+void vout_EnableFilter( vout_thread_t *p_vout, const char *psz_name,
                         bool b_add, bool b_setconfig )
 {
     char *psz_parser;

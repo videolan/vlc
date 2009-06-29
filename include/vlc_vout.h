@@ -320,7 +320,7 @@ VLC_EXPORT( void,            vout_PlacePicture,   ( const vout_thread_t *, unsig
 VLC_EXPORT( spu_t *, vout_GetSpu, ( vout_thread_t * ) );
 
 void vout_IntfInit( vout_thread_t * );
-VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, char *,bool , bool  ) );
+VLC_EXPORT( void, vout_EnableFilter, ( vout_thread_t *, const char *,bool , bool  ) );
 
 
 static inline int vout_vaControl( vout_thread_t *p_vout, int i_query,
