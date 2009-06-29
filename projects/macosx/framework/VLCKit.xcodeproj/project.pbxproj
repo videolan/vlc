@@ -579,9 +579,6 @@
 					"-read_only_relocs",
 					suppress,
 					"-lvlc",
-					"$(LD_FLAGS_LIBINTL)",
-					"$(LD_FLAGS_LIBVLC)",
-					"$(LD_FLAGS_LIBVLC_CONTROL)",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				PRODUCT_NAME = VLCKit;

@@ -153,10 +153,7 @@ if test "${ACTION}" = "build"; then
         esac
     done
 
-    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.2.dylib" "${target_lib}" "library"
-    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlccore.2.dylib" "${target_lib}" "library"
-    ln -sf ${target_lib}/libvlc.2.dylib ${target_lib}/libvlc.dylib
-    ln -sf ${target_lib}/libvlccore.2.dylib ${target_lib}/libvlccore.dylib
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" "${target_lib}" "library"
 
     ##########################
     # Build the share folder
