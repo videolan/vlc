@@ -177,8 +177,33 @@ protected:
     friend class RuntimeNPClass<LibvlcVideoNPObject>;
 
     LibvlcVideoNPObject(NPP instance, const NPClass *aClass) :
-        RuntimeNPObject(instance, aClass) {};
+        RuntimeNPObject(instance, aClass),
+        marqueeObj(NULL) {};
     virtual ~LibvlcVideoNPObject() {};
+
+    static const int propertyCount;
+    static const NPUTF8 * const propertyNames[];
+
+    InvokeResult getProperty(int index, NPVariant &result);
+    InvokeResult setProperty(int index, const NPVariant &value);
+
+    static const int methodCount;
+    static const NPUTF8 * const methodNames[];
+
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+
+private:
+    NPObject *marqueeObj;
+};
+
+class LibvlcMarqueeNPObject: public RuntimeNPObject
+{
+protected:
+    friend class RuntimeNPClass<LibvlcMarqueeNPObject>;
+
+    LibvlcMarqueeNPObject(NPP instance, const NPClass *aClass) :
+        RuntimeNPObject(instance, aClass) {};
+    virtual ~LibvlcMarqueeNPObject() {};
 
     static const int propertyCount;
     static const NPUTF8 * const propertyNames[];

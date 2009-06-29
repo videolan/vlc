@@ -1267,7 +1267,8 @@ const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
     "aspectRatio",
     "subtitle",
     "crop",
-    "teletext"
+    "teletext",
+    "marquee"
 };
 
 enum LibvlcVideoNPObjectPropertyIds
@@ -1278,7 +1279,8 @@ enum LibvlcVideoNPObjectPropertyIds
     ID_video_aspectratio,
     ID_video_subtitle,
     ID_video_crop,
-    ID_video_teletext
+    ID_video_teletext,
+    ID_video_marquee
 };
 COUNTNAMES(LibvlcVideoNPObject,propertyCount,propertyNames);
 
@@ -1350,6 +1352,14 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
                 int i_page = libvlc_video_get_teletext(p_md, &ex);
                 RETURN_ON_EXCEPTION(this,ex);
                 INT32_TO_NPVARIANT(i_page, result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_marquee:
+            {
+                if( ! marqueeObj )
+                    marqueeObj = NPN_CreateObject(_instance,
+                             RuntimeNPClass<LibvlcMarqueeNPObject>::getClass());
+               OBJECT_TO_NPVARIANT(NPN_RetainObject(marqueeObj), result);
                 return INVOKERESULT_NO_ERROR;
             }
         }
@@ -1533,6 +1543,270 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
                         return INVOKERESULT_INVALID_VALUE;
                     }
                 }
+            }
+            default:
+                return INVOKERESULT_NO_SUCH_METHOD;
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+/*
+** implementation of libvlc marquee object
+*/
+
+const NPUTF8 * const LibvlcMarqueeNPObject::propertyNames[] =
+{
+};
+
+enum LibvlcMarqueeNPObjectPropertyIds
+{
+};
+COUNTNAMES(LibvlcMarqueeNPObject,propertyCount,propertyNames);
+
+RuntimeNPObject::InvokeResult
+LibvlcMarqueeNPObject::getProperty(int index, NPVariant &result)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+        RETURN_ON_EXCEPTION(this,ex);
+
+        switch( index )
+        {
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcMarqueeNPObject::setProperty(int index, const NPVariant &value)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+        RETURN_ON_EXCEPTION(this,ex);
+
+        switch( index )
+        {
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+const NPUTF8 * const LibvlcMarqueeNPObject::methodNames[] =
+{
+    "enable",
+    "disable",
+    "color",
+    "opacity",
+    "position",
+    "refresh",
+    "size",
+    "text",
+    "timeout",
+    "x",
+    "y"
+};
+COUNTNAMES(LibvlcMarqueeNPObject,methodCount,methodNames);
+
+enum LibvlcMarqueeNPObjectMethodIds
+{
+    ID_marquee_enable,
+    ID_marquee_disable,
+    ID_marquee_color,
+    ID_marquee_opacity,
+    ID_marquee_position,
+    ID_marquee_refresh,
+    ID_marquee_size,
+    ID_marquee_text,
+    ID_marquee_timeout,
+    ID_marquee_x,
+    ID_marquee_y
+};
+
+RuntimeNPObject::InvokeResult
+LibvlcMarqueeNPObject::invoke(int index, const NPVariant *args,
+                            uint32_t argCount, NPVariant &result)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+        RETURN_ON_EXCEPTION(this,ex);
+
+        switch( index )
+        {
+            case ID_marquee_enable:
+            {
+                libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, true, &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_marquee_disable:
+            {
+                libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, false, &ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_marquee_color:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_color = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Color, i_color, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_opacity:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_opacity = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Opacity, i_opacity, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_position:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_position = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Position, i_position, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_refresh:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_refresh = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Refresh, i_refresh, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_size:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_size = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Size, i_size, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_text:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_STRING( args[0] ) )
+                    {
+                        char *psz_text = stringValue( NPVARIANT_TO_STRING( args[0] ) );
+                        libvlc_video_set_marquee_option_as_string(p_md, libvlc_marquee_Text, psz_text, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        free(psz_text);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_timeout:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_timeout = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Timeout, i_timeout, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_x:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_x = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_X, i_x, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+            }
+            case ID_marquee_y:
+            {
+                if( argCount == 1)
+                {
+                    if( NPVARIANT_IS_INT32( args[0] ) )
+                    {
+                        int i_y = NPVARIANT_TO_INT32( args[0] );
+                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Y, i_y, &ex);
+                            RETURN_ON_EXCEPTION(this,ex);
+                        return INVOKERESULT_NO_ERROR;
+                    }
+                    else
+                        return INVOKERESULT_GENERIC_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
             }
             default:
                 return INVOKERESULT_NO_SUCH_METHOD;
