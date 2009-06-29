@@ -2358,12 +2358,18 @@ static int InputSourceInit( input_thread_t *p_input,
             && psz_path[0] != DIR_SEP_CHAR
 #endif
           )
-        {   /* host specified -> not supported currently */
-            msg_Err( p_input, "cannot open remote file `%s://%s'",
-                     psz_access, psz_path );
-            msg_Info( p_input, "Did you mean `%s:///%s'?",
-                      psz_access, psz_path );
-            goto error;
+        {   /* host specified -> only localhost is supported */
+            static const unsigned localhostLen = 9; /* strlen("localhost") */
+            if (!strncmp( psz_path, "localhost" DIR_SEP, localhostLen + 1))
+                psz_path += localhostLen;
+            else
+            {
+                msg_Err( p_input, "cannot open remote file `%s://%s'",
+                        psz_access, psz_path );
+                msg_Info( p_input, "Did you mean `%s:///%s'?",
+                         psz_access, psz_path );
+                goto error;
+            }
         }
         /* Remove HTML anchor if present (not supported). */
         char *p = strchr( psz_path, '#' );
