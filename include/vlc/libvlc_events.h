@@ -111,14 +111,14 @@ enum libvlc_event_type_t {
 
 struct libvlc_event_t
 {
-    libvlc_event_type_t type;
+    unsigned type;
     void * p_obj;
     union event_type_specific
     {
         /* media descriptor */
         struct
         {
-            libvlc_meta_t meta_type;
+            unsigned meta_type;
         } media_meta_changed;
         struct
         {
@@ -138,7 +138,7 @@ struct libvlc_event_t
         } media_freed;
         struct
         {
-            libvlc_state_t new_state;
+            unsigned new_state;
         } media_state_changed;
 
         /* media instance */

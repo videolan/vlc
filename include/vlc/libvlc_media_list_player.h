@@ -121,7 +121,7 @@ VLC_PUBLIC_API int
  * \param p_e initialized exception instance
  * \return libvlc_state_t for media list player
  */
-VLC_PUBLIC_API libvlc_state_t
+VLC_PUBLIC_API unsigned
     libvlc_media_list_player_get_state( libvlc_media_list_player_t * p_mlp,
                                         libvlc_exception_t * p_e );
 

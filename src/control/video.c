@@ -683,7 +683,7 @@ static vlc_object_t *get_marquee_object( libvlc_media_player_t * p_mi )
  * libvlc_video_get_marquee_option_as_int : get a marq option value
  *****************************************************************************/
 int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
-                                            libvlc_video_marquee_int_option_t option,
+                                            unsigned option,
                                             libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_int_option_identifier(option);
@@ -717,7 +717,7 @@ int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
  * libvlc_video_get_marquee_option_as_string : get a marq option value
  *****************************************************************************/
 char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
-                                                  libvlc_video_marquee_string_option_t option,
+                                                  unsigned option,
                                                   libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_string_option_identifier(option);
@@ -742,7 +742,7 @@ char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
  * libvlc_video_set_marquee_option_as_int: enable, disable or set an int option
  *****************************************************************************/
 void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
-                                          libvlc_video_marquee_int_option_t option,
+                                             unsigned option,
                                           int value, libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_int_option_identifier(option);
@@ -781,7 +781,7 @@ void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
  * libvlc_video_set_marquee_option_as_string: set a string option
  *****************************************************************************/
 void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *p_mi,
-                                             libvlc_video_marquee_string_option_t option,
+                                                unsigned option,
                                              const char * value,
                                              libvlc_exception_t *p_e )
 {

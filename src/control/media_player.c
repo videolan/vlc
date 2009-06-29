@@ -57,7 +57,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-static const libvlc_state_t vlc_to_libvlc_state_array[] =
+static const enum libvlc_state_t vlc_to_libvlc_state_array[] =
 {
     [INIT_S]        = libvlc_NothingSpecial,
     [OPENING_S]     = libvlc_Opening,
@@ -67,7 +67,7 @@ static const libvlc_state_t vlc_to_libvlc_state_array[] =
     [ERROR_S]       = libvlc_Error,
 };
 
-static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
+static enum libvlc_state_t vlc_to_libvlc_state( int vlc_state )
 {
     if( vlc_state < 0 || vlc_state > 6 )
         return libvlc_Ended;
@@ -190,7 +190,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
     if( newval.i_int == INPUT_EVENT_STATE )
     {
-        libvlc_state_t libvlc_state;
+        enum libvlc_state_t libvlc_state;
 
         switch ( var_GetInteger( p_input, "state" ) )
         {
@@ -623,7 +623,7 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
     if( !p_input_thread )
         return;
 
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+    enum libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
     if( state == libvlc_Playing || state == libvlc_Buffering )
     {
         if( libvlc_media_player_can_pause( p_mi, p_e ) )
@@ -645,7 +645,7 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
 int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+    enum libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
     return (libvlc_Playing == state) || (libvlc_Buffering == state);
 }
 
@@ -655,7 +655,7 @@ int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
 void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+    enum libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
 
     if( state == libvlc_Playing ||
         state == libvlc_Paused ||
@@ -1121,12 +1121,12 @@ float libvlc_media_player_get_rate(
     return (float)1000.0f/val.i_int;
 }
 
-libvlc_state_t libvlc_media_player_get_state(
+enum libvlc_state_t libvlc_media_player_get_state(
                                  libvlc_media_player_t *p_mi,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    libvlc_state_t state = libvlc_Ended;
+    enum libvlc_state_t state;
     vlc_value_t val;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
@@ -1135,7 +1135,7 @@ libvlc_state_t libvlc_media_player_get_state(
         /* We do return the right value, no need to throw an exception */
         if( libvlc_exception_raised( p_e ) )
             libvlc_exception_clear( p_e );
-        return state;
+        return libvlc_Ended;
     }
 
     var_Get( p_input_thread, "state", &val );
