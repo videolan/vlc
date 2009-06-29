@@ -747,7 +747,7 @@ void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
                                           libvlc_video_marquee_int_option_t option,
                                           int value, libvlc_exception_t *p_e )
 {
-    const char * identifier = get_marquee_string_option_identifier(option);
+    const char * identifier = get_marquee_int_option_identifier(option);
     if(!identifier)
     {
         libvlc_exception_raise( p_e, "This option is not available" );
