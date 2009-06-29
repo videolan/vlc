@@ -529,7 +529,7 @@ void libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
 
     if (! p_mlp->p_mlist )
     {
-        libvlc_exception_raise( p_e, "No more element to play" );
+        libvlc_exception_raise( p_e, "No media list" );
         return;
     }
 
