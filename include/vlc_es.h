@@ -288,6 +288,11 @@ VLC_EXPORT( void, video_format_FixRgb, ( video_format_t * ) );
 VLC_EXPORT( void, es_format_Init, ( es_format_t *, int i_cat, vlc_fourcc_t i_codec ) );
 
 /**
+ * This function will initialize a es_format_t structure from a video_format_t.
+ */
+VLC_EXPORT( void, es_format_InitFromVideo, ( es_format_t *, const video_format_t * ) );
+
+/**
  * This functions will copy a es_format_t.
  */
 VLC_EXPORT( int, es_format_Copy, ( es_format_t *p_dst, const es_format_t *p_src ) );
