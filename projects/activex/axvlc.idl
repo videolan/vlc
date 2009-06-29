@@ -38,6 +38,7 @@ library AXVLC
     interface IVLCAudio;
     interface IVLCInput;
     interface IVLCLog;
+    interface IVLCMarquee;
     interface IVLCMessage;
     interface IVLCMessageIterator;
     interface IVLCMessages;
@@ -428,6 +429,42 @@ library AXVLC
 
     [
       odl,
+      uuid(8D076AD6-9B6F-4150-A0FD-5D7E8C8CB02C),
+      helpstring("VLC Marquee Filter"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCMarquee : IDispatch
+    {
+        [helpstring("enable Marquee Filter.")]
+        HRESULT enable();
+
+        [helpstring("disable Marquee Filter.")]
+        HRESULT disable();
+
+        [helpstring("set text to Marquee Filter.")]
+        HRESULT text([in] BSTR text);
+
+        [helpstring("change text color.")]
+        HRESULT color ([in] long val);
+        [helpstring("change  text opacity.")]
+        HRESULT opacity ([in] long val);
+        [helpstring("change text position.")]
+        HRESULT position ([in] long val);
+        [helpstring("change refresh time.")]
+        HRESULT refresh ([in] long val);
+        [helpstring("change text size.")]
+        HRESULT size ([in] long val);
+        [helpstring("change timeout.")]
+        HRESULT timeout ([in] long val);
+        [helpstring("change text abcissa.")]
+        HRESULT x ([in] long val);
+        [helpstring("change text ordinate.")]
+        HRESULT y ([in] long val);
+    };
+
+    [
+      odl,
       uuid(0AAEDF0B-D333-4B27-A0C6-BBF31413A42E),
       helpstring("VLC Video APIs"),
       dual,
@@ -480,6 +517,9 @@ library AXVLC
 
         [helpstring("toggle teletext transparent state.")]
         HRESULT toggleTeletext();
+
+        [propget, helpstring("Returns the marquee object.")]
+        HRESULT marquee([out, retval] IVLCMarquee** obj);
     };
 
     [

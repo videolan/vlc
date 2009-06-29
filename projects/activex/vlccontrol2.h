@@ -380,6 +380,62 @@ private:
     VLCMessages*    _p_vlcmessages;
 };
 
+class VLCMarquee : public IVLCMarquee
+{
+public:
+    VLCMarquee(VLCPlugin *p_instance) :
+        _p_instance(p_instance), _p_typeinfo(NULL) {};
+    virtual ~VLCMarquee();
+
+    // IUnknown methods
+    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
+    {
+        if( NULL == ppv )
+          return E_POINTER;
+        if( (IID_IUnknown == riid)
+         || (IID_IDispatch == riid)
+         || (IID_IVLCMarquee == riid) )
+        {
+            AddRef();
+            *ppv = reinterpret_cast<LPVOID>(this);
+           return NOERROR;
+        }
+        // behaves as a standalone object
+        return E_NOINTERFACE;
+    };
+
+    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
+    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
+
+    // IDispatch methods
+    STDMETHODIMP GetTypeInfoCount(UINT*);
+    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
+    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
+    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+
+    // IVLCMarquee methods
+    STDMETHODIMP enable();
+    STDMETHODIMP disable();
+    STDMETHODIMP text(BSTR);
+    STDMETHODIMP color(long);
+    STDMETHODIMP opacity(long);
+    STDMETHODIMP position(long);
+    STDMETHODIMP refresh(long);
+    STDMETHODIMP size(long);
+    STDMETHODIMP timeout(long);
+    STDMETHODIMP x(long);
+    STDMETHODIMP y(long);
+
+protected:
+    HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
+
+private:
+    VLCPlugin*      _p_instance;
+    ITypeInfo*      _p_typeinfo;
+
+};
+
 class VLCPlaylistItems : public IVLCPlaylistItems
 {
 public:
@@ -544,7 +600,12 @@ class VLCVideo : public IVLCVideo
 {
 public:
     VLCVideo(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
+        _p_instance(p_instance),
+        _p_typeinfo(NULL),
+        _p_vlcmarquee(NULL)
+    {
+        _p_vlcmarquee = new VLCMarquee(p_instance);
+    };
     virtual ~VLCVideo();
 
     // IUnknown methods
@@ -586,6 +647,7 @@ public:
     STDMETHODIMP put_crop(BSTR);
     STDMETHODIMP get_teletext(long*);
     STDMETHODIMP put_teletext(long);
+    STDMETHODIMP get_marquee(IVLCMarquee**);
     STDMETHODIMP deinterlaceDisable();
     STDMETHODIMP deinterlaceEnable(BSTR);
     STDMETHODIMP takeSnapshot(LPPICTUREDISP*);
@@ -599,6 +661,7 @@ protected:
 private:
     VLCPlugin*      _p_instance;
     ITypeInfo*      _p_typeinfo;
+    VLCMarquee*     _p_vlcmarquee;
 
 };
 

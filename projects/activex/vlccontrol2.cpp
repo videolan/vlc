@@ -51,6 +51,7 @@ HRESULT _exception_bridge(VLCPlugin *p,REFIID riid, libvlc_exception_t *ex)
 
 EMIT_EXCEPTION_BRIDGE( VLCAudio )
 EMIT_EXCEPTION_BRIDGE( VLCInput )
+EMIT_EXCEPTION_BRIDGE( VLCMarquee )
 EMIT_EXCEPTION_BRIDGE( VLCMessageIterator )
 EMIT_EXCEPTION_BRIDGE( VLCMessages )
 EMIT_EXCEPTION_BRIDGE( VLCLog )
@@ -766,6 +767,252 @@ STDMETHODIMP VLCLog::put_verbosity(long verbosity)
             libvlc_log_close(_p_log, &ex);
             _p_log = NULL;
         }
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+/*******************************************************************************/
+
+VLCMarquee::~VLCMarquee()
+{
+    if( _p_typeinfo )
+        _p_typeinfo->Release();
+};
+
+HRESULT VLCMarquee::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCMarquee, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+};
+
+STDMETHODIMP VLCMarquee::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMarquee::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMarquee::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags, pDispParams,
+                pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+};
+
+STDMETHODIMP VLCMarquee::enable()
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, true, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::disable()
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, false, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::color(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Color, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::opacity(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Opacity, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::position(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Position, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::refresh(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Refresh, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::size(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Size, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::text(BSTR text)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        char *psz_text = CStrFromBSTR(CP_UTF8, text);
+        libvlc_video_set_marquee_option_as_string(p_md, libvlc_marquee_Text, psz_text, &ex);
+        hr = exception_bridge(&ex);
+        CoTaskMemFree(psz_text);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::timeout(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Timeout, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::x(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_X, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+};
+
+STDMETHODIMP VLCMarquee::y(long val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Y, val, &ex);
         hr = exception_bridge(&ex);
     }
     return hr;
@@ -1900,6 +2147,7 @@ STDMETHODIMP VLCSubtitle::description(long nameID, BSTR* name)
 
 VLCVideo::~VLCVideo()
 {
+    delete _p_vlcmarquee;
     if( _p_typeinfo )
         _p_typeinfo->Release();
 };
@@ -2379,6 +2627,20 @@ STDMETHODIMP VLCVideo::toggleTeletext()
         hr = exception_bridge(&ex);
     }
     return hr;
+};
+
+STDMETHODIMP VLCVideo::get_marquee(IVLCMarquee** obj)
+{
+    if( NULL == obj )
+        return E_POINTER;
+
+    *obj = _p_vlcmarquee;
+    if( NULL != _p_vlcmarquee )
+    {
+        _p_vlcmarquee->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
 };
 
 /*******************************************************************************/
