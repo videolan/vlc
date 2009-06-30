@@ -168,6 +168,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_mask = NULL;
     LoadMask( p_filter, psz_filename );
     free( psz_filename );
+
     p_sys->i_x = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "x" );
     p_sys->i_y = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "y" );
 
@@ -207,24 +208,19 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if( !p_pic ) return NULL;
 
-    /* If the mask if empty return the picture */
-    vlc_mutex_lock( &p_sys->lock );
-    if( !p_sys->p_mask )
-    {
-        vlc_mutex_unlock( &p_sys->lock );
-        return p_pic;
-    }
-
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
         picture_Release( p_pic );
-        vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
 
-    /* Here */
-    FilterErase( p_filter, p_pic, p_outpic );
+    /* If the mask is empty: just copy the image */
+    vlc_mutex_lock( &p_sys->lock );
+    if( p_sys->p_mask )
+        FilterErase( p_filter, p_pic, p_outpic );
+    else
+        picture_CopyPixels( p_outpic, p_pic );
     vlc_mutex_unlock( &p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
