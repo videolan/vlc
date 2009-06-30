@@ -1,7 +1,7 @@
 /*****************************************************************************
  * colorthres.c: Theshold color based on similarity to reference color
  *****************************************************************************
- * Copyright (C) 2000-2006 the VideoLAN team
+ * Copyright (C) 2000-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal <dnumgis@videolan.org>
@@ -84,10 +84,21 @@ static const char *const ppsz_filter_options[] = {
 };
 
 /*****************************************************************************
+ * callback prototypes
+ *****************************************************************************/
+static int FilterCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+
+
+/*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
  *****************************************************************************/
 struct filter_sys_t
 {
+    int i_simthres;
+    int i_satthres;
+    int i_color;
+    vlc_mutex_t lock;
 };
 
 /*****************************************************************************
@@ -98,6 +109,7 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
@@ -116,16 +128,24 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
-                       p_filter->p_cfg );
-    var_Create( p_filter, CFG_PREFIX "color", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Create( p_filter, CFG_PREFIX "similaritythres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    var_Create( p_filter, CFG_PREFIX "saturationthres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-
     /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
+    p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
+
+    config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
+                       p_filter->p_cfg );
+    p_sys->i_color = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "color" );
+    p_sys->i_simthres = var_CreateGetIntegerCommand( p_filter,
+                                                     CFG_PREFIX "similaritythres" );
+    p_sys->i_satthres = var_CreateGetIntegerCommand( p_filter,
+                                                     CFG_PREFIX "saturationthres" );
+
+    vlc_mutex_init( &p_sys->lock );
+
+    var_AddCallback( p_filter, CFG_PREFIX "color", FilterCallback, NULL );
+    var_AddCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
+    var_AddCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, NULL );
 
     p_filter->pf_video_filter = Filter;
 
@@ -140,6 +160,12 @@ static int Create( vlc_object_t *p_this )
 static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
+
+    var_DelCallback( p_filter, CFG_PREFIX "color", FilterCallback, NULL );
+    var_DelCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
+    var_DelCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, NULL );
+
+    vlc_mutex_destroy( &p_filter->p_sys->lock );
     free( p_filter->p_sys );
 }
 
@@ -153,11 +179,15 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
+    filter_sys_t *p_sys = p_filter->p_sys;
     uint8_t *p_in_y, *p_in_u, *p_in_v, *p_in_end_u;
     uint8_t *p_out_y, *p_out_u, *p_out_v;
-    int i_simthres = var_GetInteger( p_filter, "colorthres-similaritythres" );
-    int i_satthres = var_GetInteger( p_filter, "colorthres-saturationthres" );
-    int i_color = var_GetInteger( p_filter, "colorthres-color" );
+
+    vlc_mutex_lock( &p_sys->lock );
+    int i_simthres = p_sys->i_simthres;
+    int i_satthres = p_sys->i_satthres;
+    int i_color = p_sys->i_color;
+    vlc_mutex_unlock( &p_sys->lock );
 
     if( !p_pic ) return NULL;
 
@@ -224,4 +254,33 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     return CopyInfoAndRelease( p_outpic, p_pic );
+}
+
+static int FilterCallback ( vlc_object_t *p_this, char const *psz_var,
+                            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    (void)oldval;    (void)p_data;
+    filter_t *p_filter = (filter_t*)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    if( !strcmp( psz_var, CFG_PREFIX "color" ) )
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        p_sys->i_color = newval.i_int;
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+    else if( !strcmp( psz_var, CFG_PREFIX "similaritythres" ) )
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        p_sys->i_simthres = newval.i_int;
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+    else /* CFG_PREFIX "saturationthres" */
+    {
+        vlc_mutex_lock( &p_sys->lock );
+        p_sys->i_satthres = newval.i_int;
+        vlc_mutex_unlock( &p_sys->lock );
+    }
+
+    return VLC_SUCCESS;
 }
