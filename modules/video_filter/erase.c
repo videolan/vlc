@@ -113,6 +113,9 @@ static void LoadMask( filter_t *p_filter, const char *psz_filename )
         p_filter->p_sys->p_mask = p_old_mask;
         msg_Err( p_filter, "Error while loading new mask. Keeping old mask." );
     }
+    else
+        msg_Err( p_filter, "Error while loading new mask. No mask available." );
+
     image_HandlerDelete( p_image );
 }
 
@@ -199,18 +202,29 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     if( !p_pic ) return NULL;
+
+    /* If the mask if empty return the picture */
+    vlc_mutex_lock( &p_sys->lock );
+    if( !p_sys->p_mask )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
+        return p_pic;
+    }
 
     p_outpic = filter_NewPicture( p_filter );
     if( !p_outpic )
     {
         picture_Release( p_pic );
+        vlc_mutex_unlock( &p_sys->lock );
         return NULL;
     }
 
     /* Here */
     FilterErase( p_filter, p_pic, p_outpic );
+    vlc_mutex_unlock( &p_sys->lock );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
@@ -223,7 +237,6 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock );
     const int i_mask_pitch = p_sys->p_mask->A_PITCH;
     const int i_mask_visible_pitch = p_sys->p_mask->p[A_PLANE].i_visible_pitch;
     const int i_mask_visible_lines = p_sys->p_mask->p[A_PLANE].i_visible_lines;
@@ -392,7 +405,6 @@ static void FilterErase( filter_t *p_filter, picture_t *p_inpic,
             }
         }
     }
-    vlc_mutex_unlock( &p_sys->lock );
 }
 
 static int EraseCallback( vlc_object_t *p_this, char const *psz_var,
