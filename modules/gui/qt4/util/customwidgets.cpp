@@ -241,6 +241,6 @@ QString VLCKeyToString( int val )
     if( val & KEY_MODIFIER_SHIFT )
         r+= "Shift+";
 
-    return r + (base ? base : "Unset");
+    return r + (base ? base : qtr( "Unset" ) );
 }
 
