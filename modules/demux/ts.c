@@ -3501,7 +3501,8 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
                     PMTSetupEsDvbSubtitle( p_demux, pid, p_es );
                     break;
                 default:
-                    msg_Err( p_demux, "Unrecognized DVB subtitle type" );
+                    msg_Err( p_demux, "Unrecognized DVB subtitle type (0x%x)",
+                             p_sub->p_subtitle[i].i_subtitling_type );
                     break;
                 }
             }
