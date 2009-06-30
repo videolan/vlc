@@ -48,6 +48,9 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
+#ifdef HAVE_ARPA_INET_H
+#   include <arpa/inet.h>
+#endif
 
 #if defined( SYS_BSDI )
 #   include <dvd.h>
