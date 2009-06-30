@@ -290,21 +290,22 @@ static picture_t *PostprocPict( filter_t *p_filter, picture_t *p_pic )
     int i_plane;
     int i_src_stride[3], i_dst_stride[3];
 
+    picture_t *p_outpic = filter_NewPicture( p_filter );
+    if( !p_outpic )
+    {
+        picture_Release( p_pic );
+        return NULL;
+    }
+
     /* Lock to prevent issues if pp_mode is changed */
     vlc_mutex_lock( &p_sys->lock );
     if( !p_sys->pp_mode )
     {
         vlc_mutex_unlock( &p_sys->lock );
-        return p_pic;
+        picture_CopyPixels( p_outpic, p_pic );
+        return CopyInfoAndRelease( p_outpic, p_pic );
     }
 
-    picture_t *p_outpic = filter_NewPicture( p_filter );
-    if( !p_outpic )
-    {
-        picture_Release( p_pic );
-        vlc_mutex_unlock( &p_sys->lock );
-        return NULL;
-    }
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
