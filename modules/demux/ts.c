@@ -3492,10 +3492,12 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_pid_t *pid,
                 case 0x11: /*                 ...   on 4:3 AR monitor */
                 case 0x12: /*                 ...   on 16:9 AR monitor */
                 case 0x13: /*                 ...   on 2.21:1 AR monitor */
+                case 0x14: /*                 ...   for display on a high definition monitor */
                 case 0x20: /* DVB Subtitle (impaired) with no monitor AR critical */
                 case 0x21: /*                 ...   on 4:3 AR monitor */
                 case 0x22: /*                 ...   on 16:9 AR monitor */
                 case 0x23: /*                 ...   on 2.21:1 AR monitor */
+                case 0x24: /*                 ...   for display on a high definition monitor */
                     PMTSetupEsDvbSubtitle( p_demux, pid, p_es );
                     break;
                 default:
