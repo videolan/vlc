@@ -1,7 +1,7 @@
 /*****************************************************************************
  * blend.c: alpha blend 2 pictures together
  *****************************************************************************
- * Copyright (C) 2003-2008 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -45,15 +45,6 @@ vlc_module_begin ()
     set_capability( "video blending", 100 )
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
-
-
-/*****************************************************************************
- * filter_sys_t : filter descriptor
- *****************************************************************************/
-struct filter_sys_t
-{
-    int i_dummy;
-};
 
 #define FCC_YUVA VLC_CODEC_YUVA
 #define FCC_YUVP VLC_CODEC_YUVP
@@ -122,7 +113,6 @@ static void BlendRGBAR24( filter_t *, picture_t *, const picture_t *,
 static int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys;
 
     /* Check if we can handle that format.
      * We could try to use a chroma filter if we can't. */
@@ -140,11 +130,6 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Allocate the memory needed to store the decoder's structure */
-    p_filter->p_sys = p_sys = malloc(sizeof(filter_sys_t));
-    if( !p_sys )
-        return VLC_ENOMEM;
-
     /* Misc init */
     p_filter->pf_video_blend = Blend;
 
@@ -160,10 +145,7 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static void CloseFilter( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    free( p_sys );
+    (void)p_this;
 }
 
 /****************************************************************************
