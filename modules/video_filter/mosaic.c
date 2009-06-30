@@ -321,7 +321,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     GET_VAR( align, 0, 10 );
     if( p_sys->i_align == 3 || p_sys->i_align == 7 )
-        p_sys->i_align = 5; /* FIXME: NOT THREAD SAFE w.r.t. callback */
+        p_sys->i_align = 5;
 
     GET_VAR( borderw, 0, INT_MAX );
     GET_VAR( borderh, 0, INT_MAX );
@@ -331,7 +331,7 @@ static int CreateFilter( vlc_object_t *p_this )
     GET_VAR( position, 0, 2 );
     GET_VAR( delay, 100, INT_MAX );
 #undef GET_VAR
-    p_sys->i_delay *= 1000; /* FIXME: NOT THREAD SAFE w.r.t. callback */
+    p_sys->i_delay *= 1000;
 
     p_sys->b_ar = var_CreateGetBoolCommand( p_filter,
                                             CFG_PREFIX "keep-aspect-ratio" );
