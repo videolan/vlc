@@ -180,12 +180,20 @@ void DialogsProvider::prefsDialog()
 
 void DialogsProvider::extendedDialog()
 {
-    ExtendedDialog::getInstance( p_intf )->showTab( 0 );
+    if( !ExtendedDialog::getInstance( p_intf )->isVisible() || /* Hidden */
+        ExtendedDialog::getInstance( p_intf )->currentTab() != 0 )  /* wrong tab */
+        ExtendedDialog::getInstance( p_intf )->showTab( 0 );
+    else
+        ExtendedDialog::getInstance( p_intf )->hide();
 }
 
 void DialogsProvider::synchroDialog()
 {
-    ExtendedDialog::getInstance( p_intf )->showTab( 2 );
+    if( !ExtendedDialog::getInstance( p_intf )->isVisible() || /* Hidden */
+        ExtendedDialog::getInstance( p_intf )->currentTab() != 2 )  /* wrong tab */
+        ExtendedDialog::getInstance( p_intf )->showTab( 2 );
+    else
+        ExtendedDialog::getInstance( p_intf )->hide();
 }
 
 void DialogsProvider::messagesDialog()

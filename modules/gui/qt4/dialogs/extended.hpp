@@ -46,6 +46,7 @@ public:
         instance = NULL;
     }
     void showTab( int i );
+    int currentTab();
 private:
     ExtendedDialog( intf_thread_t * );
     virtual ~ExtendedDialog();

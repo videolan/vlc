@@ -113,6 +113,11 @@ void ExtendedDialog::showTab( int i )
     show();
 }
 
+int ExtendedDialog::currentTab()
+{
+    return mainTabW->currentIndex();
+}
+
 void ExtendedDialog::changedItem( int i_status )
 {
     if( i_status != END_S ) return;
