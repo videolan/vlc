@@ -42,7 +42,7 @@
 #       include <sys/stat.h>
 #   endif
 #   include <io.h>
-#   define smbc_open(a,b,c) open(a,b,c)
+#   define smbc_open(a,b,c) utf8_open(a,b,c)
 #   define stat _stati64
 #   define smbc_fstat(a,b) _fstati64(a,b)
 #   define smbc_read read
