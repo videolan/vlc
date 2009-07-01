@@ -760,13 +760,17 @@ void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
         vout_thread_t * vout = GetVout( p_mi, &e );
         libvlc_exception_clear(&e);
         if (vout)
+        {
             vout_EnableFilter(vout, identifier, value, false);
+            vlc_object_release(vout);
+        }
         else
+        {
             libvlc_exception_raise( p_e, "No Vout" );
-        vlc_object_release(vout);
+        }
         return;
     }
-    
+
     vlc_object_t * marquee = get_marquee_object(p_mi);
     if(!marquee)
     {
