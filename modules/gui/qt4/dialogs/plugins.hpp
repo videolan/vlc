@@ -34,11 +34,23 @@ class PluginDialog : public QVLCFrame
 {
     Q_OBJECT;
 public:
-    PluginDialog( intf_thread_t * );
+    static PluginDialog * getInstance( intf_thread_t *p_intf )
+    {
+        if( !instance)
+            instance = new PluginDialog( p_intf );
+        return instance;
+    }
+    static void killInstance()
+    {
+        delete instance;
+        instance = NULL;
+    }
 private:
-    void FillTree();
+    PluginDialog( intf_thread_t * );
     virtual ~PluginDialog();
+    static PluginDialog *instance;
 
+    void FillTree();
     QTreeWidget *treePlugins;
     SearchLineEdit *edit;
 private slots:

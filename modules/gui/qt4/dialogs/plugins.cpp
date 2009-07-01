@@ -38,6 +38,8 @@
 #include <QLineEdit>
 #include <QLabel>
 
+PluginDialog *PluginDialog::instance = NULL;
+
 PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setAttribute( Qt::WA_DeleteOnClose );

@@ -259,8 +259,7 @@ void DialogsProvider::toolbarDialog()
 
 void DialogsProvider::pluginDialog()
 {
-    PluginDialog *diag = new PluginDialog( p_intf );
-    diag->show();
+    PluginDialog::getInstance( p_intf )->toggleVisible();
 }
 
 /* Generic open file */
