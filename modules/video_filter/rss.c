@@ -236,6 +236,7 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     int i_feed;
+    int i_ret = VLC_ENOMEM;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -257,23 +258,14 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
     p_sys->b_images = var_CreateGetBool( p_filter, CFG_PREFIX "images" );
 
-    p_sys->psz_marquee = (char *)malloc( p_sys->i_length + 1 );
+    p_sys->psz_marquee = malloc( p_sys->i_length + 1 );
     if( p_sys->psz_marquee == NULL )
-    {
-        free( p_sys->psz_urls );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+        goto error;
     p_sys->psz_marquee[p_sys->i_length] = '\0';
 
     p_sys->p_style = text_style_New();
     if( p_sys->p_style == NULL )
-    {
-        free( p_sys->psz_marquee );
-        free( p_sys->psz_urls );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+        goto error;
 
     p_sys->i_xoff = var_CreateGetInteger( p_filter, CFG_PREFIX "x" );
     p_sys->i_yoff = var_CreateGetInteger( p_filter, CFG_PREFIX "y" );
@@ -291,39 +283,38 @@ static int CreateFilter( vlc_object_t *p_this )
     {
         msg_Err( p_filter, "failed while fetching RSS ... too bad" );
         text_style_Delete( p_sys->p_style );
-        free( p_sys->psz_marquee );
-        free( p_sys->psz_urls );
-        free( p_sys );
-        return VLC_EGENERIC;
+        i_ret = VLC_EGENERIC;
+        goto error;
     }
     p_sys->t_last_update = time( NULL );
 
     if( p_sys->i_feeds == 0 )
     {
         text_style_Delete( p_sys->p_style );
-        free( p_sys->psz_marquee );
-        free( p_sys->psz_urls );
-        free( p_sys );
-        return VLC_EGENERIC;
+        i_ret = VLC_EGENERIC;
+        goto error;
     }
     for( i_feed=0; i_feed < p_sys->i_feeds; i_feed ++ )
     {
         if( p_sys->p_feeds[i_feed].i_items == 0 )
         {
-            text_style_Delete( p_sys->p_style );
-            free( p_sys->psz_marquee );
-            FreeRSS( p_filter );
-            free( p_sys->psz_urls );
-            free( p_sys );
+            DestroyFilter( p_this );
             return VLC_EGENERIC;
         }
     }
+
     /* Misc init */
     vlc_mutex_init( &p_sys->lock );
     p_filter->pf_sub_filter = Filter;
     p_sys->last_date = (mtime_t)0;
 
     return VLC_SUCCESS;
+
+error:
+    free( p_sys->psz_marquee );
+    free( p_sys->psz_urls );
+    free( p_sys );
+    return i_ret;
 }
 /*****************************************************************************
  * DestroyFilter: destroy RSS video filter
