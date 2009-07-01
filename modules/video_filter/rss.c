@@ -242,9 +242,6 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    vlc_mutex_init( &p_sys->lock );
-    vlc_mutex_lock( &p_sys->lock );
-
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
@@ -263,8 +260,6 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->psz_marquee = (char *)malloc( p_sys->i_length + 1 );
     if( p_sys->psz_marquee == NULL )
     {
-        vlc_mutex_unlock( &p_sys->lock );
-        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys->psz_urls );
         free( p_sys );
         return VLC_ENOMEM;
@@ -275,8 +270,6 @@ static int CreateFilter( vlc_object_t *p_this )
     if( p_sys->p_style == NULL )
     {
         free( p_sys->psz_marquee );
-        vlc_mutex_unlock( &p_sys->lock );
-        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys->psz_urls );
         free( p_sys );
         return VLC_ENOMEM;
@@ -299,8 +292,6 @@ static int CreateFilter( vlc_object_t *p_this )
         msg_Err( p_filter, "failed while fetching RSS ... too bad" );
         text_style_Delete( p_sys->p_style );
         free( p_sys->psz_marquee );
-        vlc_mutex_unlock( &p_sys->lock );
-        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys->psz_urls );
         free( p_sys );
         return VLC_EGENERIC;
@@ -311,8 +302,6 @@ static int CreateFilter( vlc_object_t *p_this )
     {
         text_style_Delete( p_sys->p_style );
         free( p_sys->psz_marquee );
-        vlc_mutex_unlock( &p_sys->lock );
-        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys->psz_urls );
         free( p_sys );
         return VLC_EGENERIC;
@@ -324,18 +313,15 @@ static int CreateFilter( vlc_object_t *p_this )
             text_style_Delete( p_sys->p_style );
             free( p_sys->psz_marquee );
             FreeRSS( p_filter );
-            vlc_mutex_unlock( &p_sys->lock );
-            vlc_mutex_destroy( &p_sys->lock );
             free( p_sys->psz_urls );
             free( p_sys );
             return VLC_EGENERIC;
         }
     }
     /* Misc init */
+    vlc_mutex_init( &p_sys->lock );
     p_filter->pf_sub_filter = Filter;
     p_sys->last_date = (mtime_t)0;
-
-    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -347,29 +333,11 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock );
-
     text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
     free( p_sys->psz_urls );
     FreeRSS( p_filter );
-    vlc_mutex_unlock( &p_sys->lock );
-    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
-
-    /* Delete the RSS variables */
-    var_Destroy( p_filter, CFG_PREFIX "urls" );
-    var_Destroy( p_filter, CFG_PREFIX "speed" );
-    var_Destroy( p_filter, CFG_PREFIX "length" );
-    var_Destroy( p_filter, CFG_PREFIX "ttl" );
-    var_Destroy( p_filter, CFG_PREFIX "images" );
-    var_Destroy( p_filter, CFG_PREFIX "x" );
-    var_Destroy( p_filter, CFG_PREFIX "y" );
-    var_Destroy( p_filter, CFG_PREFIX "position" );
-    var_Destroy( p_filter, CFG_PREFIX "color");
-    var_Destroy( p_filter, CFG_PREFIX "opacity");
-    var_Destroy( p_filter, CFG_PREFIX "size");
-    var_Destroy( p_filter, CFG_PREFIX "title" );
 }
 
 /****************************************************************************
