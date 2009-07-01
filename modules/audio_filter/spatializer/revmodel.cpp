@@ -254,12 +254,4 @@ void revmodel::setmode(float value)
     update();
 }
 
-float revmodel::getmode()
-{
-    if (mode >= freezemode)
-        return 1;
-    else
-        return 0;
-}
-
 //ends

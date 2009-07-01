@@ -33,7 +33,6 @@ public:
     void    setwidth(float value);
     float    getwidth();
     void    setmode(float value);
-    float    getmode();
 private:
     void    update();
 private:
