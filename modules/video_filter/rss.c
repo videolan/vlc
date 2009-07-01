@@ -630,12 +630,12 @@ static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
  * remove all ' ' '\t' '\n' '\r' characters from the begining and end of the
  * string.
  ***************************************************************************/
-static char *removeWhiteChars( char *psz_src )
+static char *removeWhiteChars( const char *psz_src )
 {
-    char *psz_src2 = strdup( psz_src );
-    char *psz_clean = strdup( psz_src2 );
-    char *psz_clean2;
+    char *psz_src2,*psz_clean, *psz_clean2;
+    psz_src2 = psz_clean = strdup( psz_src );
     int i;
+
     while( ( *psz_clean == ' ' || *psz_clean == '\t'
            || *psz_clean == '\n' || *psz_clean == '\r' )
            && *psz_clean != '\0' )
