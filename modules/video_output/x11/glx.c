@@ -234,7 +234,7 @@ int InitGLX13( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_nb, ret = VLC_EGENERIC;
-    GLXFBConfig *p_fbconfs = NULL, fbconf;
+    GLXFBConfig *p_fbconfs = NULL, fbconf = NULL;
     XWindowAttributes att;
     static const int p_attr[] = {
         GLX_RED_SIZE, 5, GLX_GREEN_SIZE, 5, GLX_BLUE_SIZE, 5,
