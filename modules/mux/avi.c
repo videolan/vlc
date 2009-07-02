@@ -806,7 +806,6 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     block_t       *p_hdr;
     int                 i_stream;
-    int                 i_maxbytespersec;
     int                 i_junk;
     buffer_out_t        bo;
 
@@ -824,7 +823,7 @@ static block_t *avi_HeaderCreateRIFF( sout_mux_t *p_mux )
     bo_AddFCC( &bo, "hdrl" );
 
     avi_HeaderAdd_avih( p_mux, &bo );
-    for( i_stream = 0,i_maxbytespersec = 0; i_stream < p_sys->i_streams; i_stream++ )
+    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         avi_HeaderAdd_strl( &bo, &p_sys->stream[i_stream] );
     }
