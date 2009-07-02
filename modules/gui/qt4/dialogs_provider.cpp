@@ -657,7 +657,7 @@ void DialogsProvider::loadSubtitlesFile()
 
     QStringList qsl = showSimpleOpen( qtr( "Open subtitles..." ),
                                       EXT_FILTER_SUBTITLE,
-                                      path );
+                                      qfu( path ) );
     free( path );
     foreach( const QString &qsFile, qsl )
     {
