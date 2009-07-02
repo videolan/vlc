@@ -285,9 +285,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->p_synchro )
                 decoder_SynchroRelease( p_sys->p_synchro );
 
-            p_sys->p_synchro =
-                decoder_SynchroInit( p_dec, (uint32_t)((uint64_t)1001000000 * 27 /
-                                     p_sys->p_info->sequence->frame_period) );
+            if( p_sys->p_info->sequence->frame_period <= 0 )
+                p_sys->p_synchro = NULL;
+            else
+                p_sys->p_synchro =
+                decoder_SynchroInit( p_dec, (uint32_t)(UINT64_C(1001000000) *
+                                27 / p_sys->p_info->sequence->frame_period) );
             p_sys->b_after_sequence_header = true;
             break;
         }
@@ -726,16 +729,20 @@ static void GetAR( decoder_t *p_dec )
         }
     }
 
-    msg_Dbg( p_dec, "%dx%d (display %d,%d), aspect %d, sar %i:%i, %u.%03u fps",
-             p_sys->p_info->sequence->picture_width,
-             p_sys->p_info->sequence->picture_height,
-             p_sys->p_info->sequence->display_width,
-             p_sys->p_info->sequence->display_height,
-             p_sys->i_aspect, p_sys->i_sar_num, p_sys->i_sar_den,
-             (uint32_t)((uint64_t)1001000000 * 27 /
-                 p_sys->p_info->sequence->frame_period / 1001),
-             (uint32_t)((uint64_t)1001000000 * 27 /
-                 p_sys->p_info->sequence->frame_period % 1001) );
+    if( p_sys->p_info->sequence->frame_period > 0 )
+        msg_Dbg( p_dec,
+                 "%dx%d (display %d,%d), aspect %d, sar %i:%i, %u.%03u fps",
+                 p_sys->p_info->sequence->picture_width,
+                 p_sys->p_info->sequence->picture_height,
+                 p_sys->p_info->sequence->display_width,
+                 p_sys->p_info->sequence->display_height,
+                 p_sys->i_aspect, p_sys->i_sar_num, p_sys->i_sar_den,
+                 (uint32_t)((uint64_t)1001000000 * 27 /
+                     p_sys->p_info->sequence->frame_period / 1001),
+                 (uint32_t)((uint64_t)1001000000 * 27 /
+                     p_sys->p_info->sequence->frame_period % 1001) );
+    else
+        msg_Dbg( p_dec, "bad frame period" );
 }
 
 /*****************************************************************************
