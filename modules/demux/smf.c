@@ -512,6 +512,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
                     datalen = 0;
                     break;
             }
+            break;
         case 0xC0:
         case 0xD0:
             datalen = 1;
