@@ -42,8 +42,6 @@ ErrorsDialog::ErrorsDialog( QWidget *parent, intf_thread_t *_p_intf )
     setWindowTitle( qtr( "Errors" ) );
     resize( 500 , 300 );
 
-    setWindowModality( Qt::ApplicationModal );
-
     QGridLayout *layout = new QGridLayout( this );
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox;
