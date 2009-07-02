@@ -341,6 +341,16 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
     }
 #endif
 
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    int val = p_plugin->playlist_isplaying(&ex);
+    libvlc_exception_clear(&ex);
+    if(val)
+    {
+        p_plugin->playlist_stop(&ex);
+        libvlc_exception_clear(&ex);
+    }
+
     delete p_plugin;
 
     return NPERR_NO_ERROR;
