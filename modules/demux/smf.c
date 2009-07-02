@@ -449,7 +449,7 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
     }
 
     free (payload);
-    return 0;
+    return ret;
 }
 
 
