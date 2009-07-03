@@ -39,6 +39,7 @@
 #include <vlc_codec.h>
 #include <vlc_osd.h>
 #include <vlc_input.h>
+#include <vlc_dialog.h>
 
 #include <ass/ass.h>
 
@@ -684,7 +685,12 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
     char *psz_font_dir = NULL;
 
+
 #if defined(WIN32)
+    dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_dec,
+        _("Building font cache"),
+        _( "Please wait while your font cache is rebuild.\n"
+        "This should take less than a minute." ), NULL );
     /* This makes Windows build of VLC hang */
     const UINT uPath = GetSystemWindowsDirectoryW( NULL, 0 );
     if( uPath > 0 )
@@ -704,7 +710,6 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
         }
     }
 #endif
-
     if( !psz_font_dir )
         psz_font_dir = config_GetCacheDir();
 
@@ -713,6 +718,9 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     msg_Dbg( p_dec, "Setting libass fontdir: %s", psz_font_dir );
     ass_set_fonts_dir( p_library, psz_font_dir );
     free( psz_font_dir );
+#ifdef WIN32
+    dialog_ProgressSet( p_dialog, NULL, 0.1 );
+#endif
 
     ass_set_extract_fonts( p_library, true );
     ass_set_style_overrides( p_library, NULL );
@@ -731,8 +739,15 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
     const char *psz_font = NULL; /* We don't ship a default font with VLC */
     const char *psz_family = "Arial"; /* Use Arial if we can't find anything more suitable */
+
 #ifdef HAVE_FONTCONFIG
+#ifdef WIN32
+    dialog_ProgressSet( p_dialog, NULL, 0.2 );
+#endif
     ass_set_fonts( p_renderer, psz_font, psz_family );  // setup default font/family
+#ifdef WIN32
+    dialog_ProgressSet( p_dialog, NULL, 1.0 );
+#endif
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
     ass_set_fonts_nofc( p_renderer, psz_font, psz_family );
@@ -745,6 +760,9 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
     /* */
     vlc_mutex_unlock( &libass_lock );
+#ifdef WIN32
+    dialog_ProgressDestroy( p_dialog );
+#endif
     return p_ass;
 
 error:
