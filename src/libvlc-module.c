@@ -87,6 +87,7 @@ static const char *const ppsz_language[] =
     "sv",
     "tr",
     "uk",
+    "vi",
 };
 
 static const char *const ppsz_language_text[] =
@@ -133,6 +134,7 @@ static const char *const ppsz_language_text[] =
     "Svenska",
     "Türkçe",
     "украї́нська мо́ва",
+    "tiếng Việt",
 };
 #endif
 
