@@ -1111,6 +1111,7 @@ ifdef NO_TEXT_RELOCATION
 	echo "Broken LD. Fix your tools."
 	exit -1
 endif
+	patch -p0 < Patches/eac3_spectral.patch
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	echo "ffmpeg snapshot is too old, you MUST use subversion !"
