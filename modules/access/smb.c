@@ -24,8 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -44,7 +42,6 @@
 #   endif
 #   include <io.h>
 #   define smbc_open(a,b,c) utf8_open(a,b,c)
-#   define stat _stati64
 #   define smbc_fstat(a,b) _fstati64(a,b)
 #   define smbc_read read
 #   define smbc_lseek _lseeki64
