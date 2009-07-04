@@ -222,6 +222,10 @@ static int Open( vlc_object_t *p_this )
         if( rtmp_connect_active( p_sys->p_thread ) < 0 )
         {
             msg_Err( p_access, "connect active failed");
+            /* Kill the running thread */
+            vlc_object_kill( p_sys->p_thread );
+            block_FifoWake( p_sys->p_thread->p_fifo_input );
+            vlc_thread_join( p_sys->p_thread );
             goto error2;
         }
     }
