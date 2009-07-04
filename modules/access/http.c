@@ -205,7 +205,8 @@ struct access_sys_t
 };
 
 /* */
-static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies );
+static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
+                            vlc_array_t *cookies );
 
 /* */
 static ssize_t Read( access_t *, uint8_t *, size_t );
@@ -238,10 +239,20 @@ static void AuthReset( http_auth_t *p_auth );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    return OpenWithCookies( p_this, NULL );
+    access_t *p_access = (access_t*)p_this;
+    return OpenWithCookies( p_this, p_access->psz_access, NULL );
 }
 
-static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
+/**
+ * Open the given url using the given cookies
+ * @param p_this: the vlc object
+ * @psz_access: the acces to use (http, https, ...) (this value must be used
+ *              instead of p_access->psz_access)
+ * @cookies: the available cookies
+ * @return vlc error codes
+ */
+static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
+                            vlc_array_t *cookies )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
@@ -305,7 +316,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
         msg_Warn( p_access, "invalid host" );
         goto error;
     }
-    if( !strncmp( p_access->psz_access, "https", 5 ) )
+    if( !strncmp( psz_access, "https", 5 ) )
     {
         /* HTTP over SSL */
         p_sys->b_ssl = true;
@@ -337,7 +348,7 @@ static int OpenWithCookies( vlc_object_t *p_this, vlc_array_t *cookies )
         {
             char *buf;
             int i;
-            i=asprintf(&buf, "%s://%s", p_access->psz_access, p_access->psz_path);
+            i=asprintf(&buf, "%s://%s", psz_access, p_access->psz_path);
             if (i >= 0)
             {
                 msg_Dbg(p_access, "asking libproxy about url '%s'", buf);
@@ -473,9 +484,12 @@ connect:
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
         /* Do not accept redirection outside of HTTP works */
-        if( strncmp( p_sys->psz_location, "http", 4 )
-         || ( ( p_sys->psz_location[4] != ':' ) /* HTTP */
-           && strncmp( p_sys->psz_location + 4, "s:", 2 ) /* HTTP/SSL */ ) )
+        const char *psz_protocol;
+        if( !strncmp( p_sys->psz_location, "http:", 5 ) )
+            psz_protocol = "http";
+        else if( !strncmp( p_sys->psz_location, "https:", 6 ) )
+            psz_protocol = "https";
+        else
         {
             msg_Err( p_access, "insecure redirection ignored" );
             goto error;
@@ -501,7 +515,7 @@ connect:
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return OpenWithCookies( p_this, cookies );
+        return OpenWithCookies( p_this, psz_protocol, cookies );
     }
 
     if( p_sys->b_mms )
@@ -549,7 +563,7 @@ connect:
         }
         /* else probably Ogg Vorbis */
     }
-    else if( !strcasecmp( p_access->psz_access, "unsv" ) &&
+    else if( !strcasecmp( psz_access, "unsv" ) &&
              p_sys->psz_mime &&
              !strcasecmp( p_sys->psz_mime, "misc/ultravox" ) )
     {
@@ -557,7 +571,7 @@ connect:
         /* Grrrr! detect ultravox server and force NSV demuxer */
         p_access->psz_demux = strdup( "nsv" );
     }
-    else if( !strcmp( p_access->psz_access, "itpc" ) )
+    else if( !strcmp( psz_access, "itpc" ) )
     {
         free( p_access->psz_demux );
         p_access->psz_demux = strdup( "podcast" );
