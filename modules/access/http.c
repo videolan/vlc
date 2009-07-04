@@ -812,7 +812,10 @@ static int ReadICYMeta( access_t *p_access )
     psz_meta = malloc( i_read + 1 );
     if( net_Read( p_access, p_sys->fd, p_sys->p_vs,
                   (uint8_t *)psz_meta, i_read, true ) != i_read )
+    {
+        free( psz_meta );
         return VLC_EGENERIC;
+    }
 
     psz_meta[i_read] = '\0'; /* Just in case */
 
