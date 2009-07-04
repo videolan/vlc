@@ -35,7 +35,6 @@ typedef struct dialog_fatal_t
 {
     const char *title;
     const char *message;
-    bool modal;
 } dialog_fatal_t;
 
 VLC_EXPORT( void, dialog_VFatal, (vlc_object_t *, bool, const char *, const char *, va_list) );

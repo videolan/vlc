@@ -119,8 +119,9 @@ void dialog_VFatal (vlc_object_t *obj, bool modal, const char *title,
 
     if (vasprintf (&text, fmt, ap) != -1)
     {
-        dialog_fatal_t dialog = { title, text, modal, };
-        var_SetAddress (provider, "dialog-fatal", &dialog);
+        dialog_fatal_t dialog = { title, text, };
+        var_SetAddress (provider,
+                        modal ? "dialog-critical" : "dialog-error", &dialog);
         free (text);
     }
     vlc_object_release (provider);
