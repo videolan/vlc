@@ -95,6 +95,9 @@ static void Close( vlc_object_t * );
 #define FORWARD_COOKIES_TEXT N_("Forward Cookies")
 #define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections.")
 
+#define MAX_REDIRECT_TEXT N_("Max number of redirection")
+#define MAX_REDIRECT_LONGTEXT N_("Limit the number of redirection to follow.")
+
 vlc_module_begin ()
     set_description( N_("HTTP input") )
     set_capability( "access", 0 )
@@ -118,6 +121,8 @@ vlc_module_begin ()
         change_safe()
     add_bool( "http-forward-cookies", true, NULL, FORWARD_COOKIES_TEXT,
               FORWARD_COOKIES_LONGTEXT, true )
+    add_integer( "http-max-redirect", 5, NULL, MAX_REDIRECT_TEXT,
+                 MAX_REDIRECT_LONGTEXT, true )
     add_obsolete_string("http-user")
     add_obsolete_string("http-pwd")
     add_shortcut( "http" )
@@ -206,6 +211,7 @@ struct access_sys_t
 
 /* */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
+                            int i_nb_redirect, int i_max_redirect,
                             vlc_array_t *cookies );
 
 /* */
@@ -240,7 +246,8 @@ static void AuthReset( http_auth_t *p_auth );
 static int Open( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    return OpenWithCookies( p_this, p_access->psz_access, NULL );
+    return OpenWithCookies( p_this, p_access->psz_access, 0,
+                var_CreateGetInteger( p_access, "http-max-redirect" ), NULL );
 }
 
 /**
@@ -248,15 +255,19 @@ static int Open( vlc_object_t *p_this )
  * @param p_this: the vlc object
  * @psz_access: the acces to use (http, https, ...) (this value must be used
  *              instead of p_access->psz_access)
+ * @i_nb_redirect: the number of redirection already done
+ * @i_max_redirect: limit to the number of redirection to follow
  * @cookies: the available cookies
  * @return vlc error codes
  */
 static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
+                            int i_nb_redirect, int i_max_redirect,
                             vlc_array_t *cookies )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
     char         *psz, *p;
+
     /* Only forward an store cookies if the corresponding option is activated */
     bool   b_forward_cookies = var_CreateGetBool( p_access, "http-forward-cookies" );
     vlc_array_t * saved_cookies = b_forward_cookies ? (cookies ? cookies : vlc_array_new()) : NULL;
@@ -483,6 +494,15 @@ connect:
     {
         msg_Dbg( p_access, "redirection to %s", p_sys->psz_location );
 
+        /* Check the number of redirection already done */
+        if( i_nb_redirect >= i_max_redirect )
+        {
+            msg_Err( p_access, "Too many redirection: break potential infinite"
+                     "loop" );
+            goto error;
+        }
+
+
         /* Do not accept redirection outside of HTTP works */
         const char *psz_protocol;
         if( !strncmp( p_sys->psz_location, "http:", 5 ) )
@@ -515,7 +535,8 @@ connect:
         free( p_sys );
 
         /* Do new Open() run with new data */
-        return OpenWithCookies( p_this, psz_protocol, cookies );
+        return OpenWithCookies( p_this, psz_protocol, i_nb_redirect + 1,
+                                i_max_redirect, cookies );
     }
 
     if( p_sys->b_mms )
