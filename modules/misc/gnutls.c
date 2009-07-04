@@ -563,7 +563,10 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
             break;
 
         if ((strcmp (ent, ".") == 0) || (strcmp (ent, "..") == 0))
+        {
+            free( ent );
             continue;
+        }
 
         char path[strlen (psz_dirname) + strlen (ent) + 2];
         sprintf (path, "%s"DIR_SEP"%s", psz_dirname, ent);
