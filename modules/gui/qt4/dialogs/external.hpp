@@ -40,15 +40,19 @@ public:
 
 private:
     intf_thread_t *intf;
-    QVLCPointer message;
+    static int error (vlc_object_t *, const char *, vlc_value_t, vlc_value_t,
+                      void *);
+    QVLCPointer critical;
     QVLCPointer login;
     QVLCPointer question;
     QVLCPointer progressBar;
 signals:
     void progressBarDestroyed (QWidget *);
+    void error (const QString&, const QString&);
 
 private slots:
-    void displayMessage (vlc_object_t *, void *);
+    void displayError (const QString&, const QString&);
+    void displayCritical (vlc_object_t *, void *);
     void requestLogin (vlc_object_t *, void *);
     void requestAnswer (vlc_object_t *, void *);
     void startProgressBar (vlc_object_t *, void *);
