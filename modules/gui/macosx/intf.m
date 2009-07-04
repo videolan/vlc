@@ -523,8 +523,10 @@ static VLCMain *_o_sharedMainInstance = nil;
     nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
     
     /* subscribe to various interactive dialogues */
-    var_Create( p_intf, "dialog-fatal", VLC_VAR_ADDRESS );
-    var_AddCallback( p_intf, "dialog-fatal", DialogCallback, self );
+    var_Create( p_intf, "dialog-error", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-error", DialogCallback, self );
+    var_Create( p_intf, "dialog-critical", VLC_VAR_ADDRESS );
+    var_AddCallback( p_intf, "dialog-critical", DialogCallback, self );
     var_Create( p_intf, "dialog-login", VLC_VAR_ADDRESS );
     var_AddCallback( p_intf, "dialog-login", DialogCallback, self );
     var_Create( p_intf, "dialog-question", VLC_VAR_ADDRESS );
@@ -817,7 +819,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister( p_intf );
-    var_DelCallback( p_intf, "dialog-fatal", DialogCallback, self );
+    var_DelCallback( p_intf, "dialog-error", DialogCallback, self );
+    var_DelCallback( p_intf, "dialog-critical", DialogCallback, self );
     var_DelCallback( p_intf, "dialog-login", DialogCallback, self );
     var_DelCallback( p_intf, "dialog-question", DialogCallback, self );
     var_DelCallback( p_intf, "dialog-progress-bar", DialogCallback, self );

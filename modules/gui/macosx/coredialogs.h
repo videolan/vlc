@@ -81,6 +81,7 @@
 -(void)performDialogEvent: (NSNotification *)o_notification;
 
 -(void)showFatalDialog: (NSValue *)o_value;
+-(void)showFatalWaitDialog: (NSValue *)o_value;
 -(void)showQuestionDialog: (NSValue *)o_value;
 
 -(void)showLoginDialog: (NSValue *)o_value;
