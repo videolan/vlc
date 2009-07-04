@@ -239,6 +239,9 @@ error2:
     vlc_cond_destroy( &p_sys->p_thread->wait );
     vlc_mutex_destroy( &p_sys->p_thread->lock );
 
+    block_FifoRelease( p_sys->p_thread->p_fifo_input );
+    block_FifoRelease( p_sys->p_thread->p_empty_blocks );
+
     free( p_sys->p_thread->psz_application );
     free( p_sys->p_thread->psz_media );
 
