@@ -495,6 +495,9 @@ connect:
 
         Disconnect( p_access );
         cookies = p_sys->cookies;
+#ifdef HAVE_ZLIB_H
+        inflateEnd( &p_sys->inflate.stream );
+#endif
         free( p_sys );
 
         /* Do new Open() run with new data */
