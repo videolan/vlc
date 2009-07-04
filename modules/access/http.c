@@ -93,7 +93,7 @@ static void Close( vlc_object_t * );
     "types of HTTP streams." )
 
 #define FORWARD_COOKIES_TEXT N_("Forward Cookies")
-#define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections ")
+#define FORWARD_COOKIES_LONGTEXT N_("Forward Cookies across http redirections.")
 
 vlc_module_begin ()
     set_description( N_("HTTP input") )
