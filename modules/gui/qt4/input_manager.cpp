@@ -593,7 +593,11 @@ void InputManager::UpdateArt()
         char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
         if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
                 decode_URI( psz_art + 7 ) )
-            url = qfu( psz_art + 7);
+#ifdef WIN32
+            url = qfu( psz_art + 8 ); // Remove extra / starting on Win32.
+#else
+            url = qfu( psz_art + 7 );
+#endif
         free( psz_art );
 
         url = url.replace( "file://", "" );
