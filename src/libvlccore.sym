@@ -519,6 +519,11 @@ vlc_poll
 vlc_rand_bytes
 vlc_release
 vlc_restorecancel
+vlc_rwlock_destroy
+vlc_rwlock_init
+vlc_rwlock_rdlock
+vlc_rwlock_unlock
+vlc_rwlock_wrlock
 vlc_savecancel
 vlc_sd_Create
 vlc_sd_GetNames

@@ -376,6 +376,51 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 }
 
 /**
+ * Initializes a read/write lock.
+ */
+void vlc_rwlock_init (vlc_rwlock_t *lock)
+{
+    if (pthread_rwlock_init (lock, NULL))
+        abort ();
+}
+
+/**
+ * Destroys an initialized unused read/write lock.
+ */
+void vlc_rwlock_destroy (vlc_rwlock_t *lock)
+{
+    int val = pthread_rwlock_destroy (lock);
+    VLC_THREAD_ASSERT ("destroying R/W lock");
+}
+
+/**
+ * Acquires a read/write lock for reading. Recursion is allowed.
+ */
+void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
+{
+    int val = pthread_rwlock_rdlock (lock);
+    VLC_THREAD_ASSERT ("acquiring R/W lock for reading");
+}
+
+/**
+ * Acquires a read/write lock for writing. Recursion is not allowed.
+ */
+void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
+{
+    int val = pthread_rwlock_wrlock (lock);
+    VLC_THREAD_ASSERT ("acquiring R/W lock for writing");
+}
+
+/**
+ * Releases a read/write lock.
+ */
+void vlc_rwlock_unlock (vlc_rwlock_t *lock)
+{
+    int val = pthread_rwlock_unlock (lock);
+    VLC_THREAD_ASSERT ("releasing R/W lock");
+}
+
+/**
  * Allocates a thread-specific variable.
  * @param key where to store the thread-specific variable handle
  * @param destr a destruction callback. It is called whenever a thread exits

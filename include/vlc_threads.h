@@ -107,6 +107,7 @@ typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef pthread_cond_t  vlc_cond_t;
+typedef pthread_rwlock_t vlc_rwlock_t;
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer_t vlc_timer_t;
 
@@ -143,6 +144,17 @@ typedef struct
 #define VLC_STATIC_MUTEX { 0, }
 
 typedef HANDLE  vlc_cond_t;
+
+typedef struct
+{
+    vlc_mutex_t   mutex;
+    vlc_cond_t    read_wait;
+    vlc_cond_t    write_wait;
+    unsigned long readers;
+    unsigned long writers;
+    DWORD         writer;
+} vlc_rwlock_t;
+
 typedef DWORD   vlc_threadvar_t;
 typedef struct vlc_timer_t vlc_timer_t;
 struct vlc_timer_t
@@ -176,6 +188,11 @@ VLC_EXPORT( void, vlc_cond_signal, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_wait, (vlc_cond_t *, vlc_mutex_t *) );
 VLC_EXPORT( int, vlc_cond_timedwait, (vlc_cond_t *, vlc_mutex_t *, mtime_t) );
+VLC_EXPORT( void, vlc_rwlock_init, (vlc_rwlock_t *) );
+VLC_EXPORT( void, vlc_rwlock_destroy, (vlc_rwlock_t *) );
+VLC_EXPORT( void, vlc_rwlock_rdlock, (vlc_rwlock_t *) );
+VLC_EXPORT( void, vlc_rwlock_wrlock, (vlc_rwlock_t *) );
+VLC_EXPORT( void, vlc_rwlock_unlock, (vlc_rwlock_t *) );
 VLC_EXPORT( int, vlc_threadvar_create, (vlc_threadvar_t * , void (*) (void *) ) );
 VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int, vlc_threadvar_set, (vlc_threadvar_t, void *) );

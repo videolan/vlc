@@ -34,6 +34,7 @@
 #include "libvlc.h"
 #include <stdarg.h>
 #include <assert.h>
+#include <limits.h>
 
 static vlc_threadvar_t cancel_key;
 
@@ -289,6 +290,82 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     ResetEvent (*p_condvar);
 
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
+}
+
+/*** Read/write locks */
+/* SRW (Slim Read Write) locks are available in Vista+ only */
+void vlc_rwlock_init (vlc_rwlock_t *lock)
+{
+    vlc_mutex_init (&lock->mutex);
+    vlc_cond_init (&lock->read_wait);
+    vlc_cond_init (&lock->write_wait);
+    lock->readers = 0; /* active readers */
+    lock->writers = 0; /* waiting or active writers */
+    lock->writer = 0; /* ID of active writer */
+}
+
+/**
+ * Destroys an initialized unused read/write lock.
+ */
+void vlc_rwlock_destroy (vlc_rwlock_t *lock)
+{
+    vlc_cond_destroy (&lock->read_wait);
+    vlc_cond_destroy (&lock->write_wait);
+    vlc_mutex_destroy (&lock->mutex);
+}
+
+/**
+ * Acquires a read/write lock for reading. Recursion is allowed.
+ */
+void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
+{
+    vlc_mutex_lock (&lock->mutex);
+    while (lock->writers > 0) /* Favor writers to avoid starving */
+        vlc_cond_wait (&lock->read_wait, &lock->mutex);
+    if (lock->readers == ULONG_MAX)
+        abort ();
+    lock->readers++;
+    vlc_mutex_unlock (&lock->mutex);
+}
+
+/**
+ * Acquires a read/write lock for writing. Recursion is not allowed.
+ */
+void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
+{
+    vlc_mutex_lock (&lock->mutex);
+    if (lock->writers == ULONG_MAX)
+        abort ();
+    lock->writers++;
+    while ((lock->readers > 0) || (lock->writer != 0))
+        vlc_cond_wait (&lock->write_wait, &lock->mutex);
+    lock->writer = GetCurrentThreadId ();
+    vlc_mutex_unlock (&lock->mutex);
+}
+
+/**
+ * Releases a read/write lock.
+ */
+void vlc_rwlock_unlock (vlc_rwlock_t *lock)
+{
+    vlc_mutex_lock (&lock->mutex);
+    if (lock->readers > 0)
+        lock->readers--; /* Read unlock */
+    else
+    {
+        lock->writer = 0; /* Write unlock */
+        assert (lock->writers > 0);
+        lock->writers--;
+    }
+
+    if (lock->writers > 0)
+    {
+        if (lock->readers == 0)
+            vlc_cond_signal (&lock->write_wait);
+    }
+    else
+        vlc_cond_broadcast (&lock->read_wait);
+    vlc_mutex_unlock (&lock->mutex);
 }
 
 /*** Thread-specific variables (TLS) ***/
