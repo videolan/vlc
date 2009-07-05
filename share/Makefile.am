@@ -316,13 +316,7 @@ DIST_maemo = \
 	maemo/vlc_intf.rc \
 	maemo/vlc_left_tab_active.png \
 	maemo/vlc_left_tab_passive.png \
-	maemo/playlist.png \
-	maemo/play.png \
-	maemo/pause.png \
-	maemo/stop.png \
-	maemo/previous.png \
-	maemo/next.png \
-	maemo/vlc32x32.png
+	maemo/playlist.png
 
 maemo_FILES = \
 	../modules/gui/qt4/pixmaps/play.png \
@@ -331,7 +325,3 @@ maemo_FILES = \
 	../modules/gui/qt4/pixmaps/previous.png \
 	../modules/gui/qt4/pixmaps/next.png \
 	vlc32x32.png
-
-$(DIST_maemo): $(maemo_FILES)
-	mkdir -p maemo
-	cp -r $+ maemo
