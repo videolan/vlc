@@ -363,7 +363,7 @@ static int Open( vlc_object_t *p_this )
 
     for( int i = 0; i < i_param_count; i++ )
     {
-        snprintf( psz_full_name, 128, "%s-%s\0", psz_module,
+        snprintf( psz_full_name, 128, "%s-%s", psz_module,
                   psz_param[i] );
         var_Create( p_access, psz_full_name, i_type[i] | VLC_VAR_DOINHERIT );
     }
@@ -509,7 +509,7 @@ static int ParsePath( access_t *p_access, const char* psz_module,
              v_value.psz_string = strdup( psz_value );
         if( i_type[i_this_param] == VLC_VAR_INTEGER )
              v_value.i_int = atol( psz_value );
-        snprintf( psz_full_name, 128, "%s-%s\0", psz_module,
+        snprintf( psz_full_name, 128, "%s-%s", psz_module,
             psz_param[i_this_param] );
         var_Set( p_access, psz_full_name, v_value );
 
