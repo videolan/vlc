@@ -14,7 +14,7 @@ nobase_dist_vlcdata_SCRIPTS = \
 	utils/video-vlc-default.sh \
 	$(NULL)
 
-nobase_dist_vlcdata_DATA = $(NULL)
+nobase_vlcdata_DATA = $(NULL)
 
 EXTRA_DIST = \
 	$(DIST_rsrc) \
@@ -29,31 +29,31 @@ EXTRA_DIST = \
 	$(DIST_maemo)
 
 if BUILD_SKINS
-nobase_vlcdata_DATA = skins2/default.vlt
-nobase_dist_vlcdata_DATA += $(DIST_skins2)
+nobase_vlcdata_DATA += skins2/default.vlt
+nobase_vlcdata_DATA += $(DIST_skins2)
 endif
 if BUILD_PDA
-nobase_dist_vlcdata_DATA += $(DIST_pda)
+nobase_vlcdata_DATA += $(DIST_pda)
 endif
 if BUILD_HTTPD
-nobase_dist_vlcdata_DATA += $(DIST_http)
+nobase_vlcdata_DATA += $(DIST_http)
 endif
 if BUILD_OSDMENU
-nobase_dist_vlcdata_DATA += \
+nobase_vlcdata_DATA += \
 	$(DIST_osdmenu_default)
 endif
 if BUILD_LUA
-nobase_dist_vlcdata_DATA += $(DIST_lua)
+nobase_vlcdata_DATA += $(DIST_lua)
 if BUILD_HTTPD
-nobase_dist_vlcdata_DATA += $(DIST_http_lua)
+nobase_vlcdata_DATA += $(DIST_http_lua)
 endif
 endif
 if BUILD_MOZILLA
 # TODO: move to the mozilla directory
-nobase_dist_vlcdata_DATA += $(DIST_mozilla)
+nobase_vlcdata_DATA += $(DIST_mozilla)
 endif
 if BUILD_MAEMO
-nobase_dist_vlcdata_DATA += $(DIST_maemo)
+nobase_vlcdata_DATA += $(DIST_maemo) $(maemo_FILES)
 endif
 
 DIST_rsrc = \
