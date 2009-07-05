@@ -106,8 +106,7 @@ void msg_Create (libvlc_int_t *p_libvlc)
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
     msg_bank_t *bank = libvlc_bank (p_libvlc);
 
-    vlc_mutex_init (&bank->lock);
-    vlc_cond_init (&bank->wait);
+    vlc_rwlock_init (&bank->lock);
     vlc_dictionary_init( &priv->msg_enabled_objects, 0 );
     priv->msg_all_objects_enabled = true;
 
@@ -137,23 +136,23 @@ static void const * kObjectPrintingDisabled = &kObjectPrintingDisabled;
 void __msg_EnableObjectPrinting (vlc_object_t *p_this, char * psz_object)
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    vlc_mutex_lock( &QUEUE.lock );
+    vlc_rwlock_wrlock( &QUEUE.lock );
     if( !strcmp(psz_object, "all") )
         priv->msg_all_objects_enabled = true;
     else
         vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, (void *)kObjectPrintingEnabled );
-    vlc_mutex_unlock( &QUEUE.lock );
+    vlc_rwlock_unlock( &QUEUE.lock );
 }
 
 void __msg_DisableObjectPrinting (vlc_object_t *p_this, char * psz_object)
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    vlc_mutex_lock( &QUEUE.lock );
+    vlc_rwlock_wrlock( &QUEUE.lock );
     if( !strcmp(psz_object, "all") )
         priv->msg_all_objects_enabled = false;
     else
         vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, (void *)kObjectPrintingDisabled );
-    vlc_mutex_unlock( &QUEUE.lock );
+    vlc_rwlock_unlock( &QUEUE.lock );
 }
 
 /**
@@ -183,8 +182,7 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
 
     vlc_dictionary_clear( &priv->msg_enabled_objects, NULL, NULL );
 
-    vlc_cond_destroy (&bank->wait);
-    vlc_mutex_destroy (&bank->lock);
+    vlc_rwlock_destroy (&bank->lock);
 }
 
 struct msg_subscription_t
@@ -193,44 +191,7 @@ struct msg_subscription_t
     libvlc_int_t   *instance;
     msg_callback_t  func;
     msg_cb_data_t  *opaque;
-    msg_item_t     *items[VLC_MSG_QSIZE];
-    unsigned        begin, end;
-    unsigned        overruns;
 };
-
-static void *msg_thread (void *data)
-{
-    msg_subscription_t *sub = data;
-    msg_bank_t *bank = libvlc_bank (sub->instance);
-
-    vlc_mutex_lock (&bank->lock);
-    for (;;)
-    {
-        /* Wait for messages */
-        assert (sub->begin < VLC_MSG_QSIZE);
-        assert (sub->end < VLC_MSG_QSIZE);
-        while (sub->begin != sub->end)
-        {
-            msg_item_t *msg = sub->items[sub->begin];
-            unsigned overruns = sub->overruns;
-
-            if (++sub->begin == VLC_MSG_QSIZE)
-                sub->begin = 0;
-            sub->overruns = 0;
-            vlc_mutex_unlock (&bank->lock);
-
-            sub->func (sub->opaque, msg, overruns);
-            msg_Release (msg);
-
-            vlc_mutex_lock (&bank->lock);
-        }
-
-        mutex_cleanup_push (&bank->lock);
-        vlc_cond_wait (&bank->wait, &bank->lock);
-        vlc_cleanup_pop ();
-    }
-    assert (0);
-}
 
 /**
  * Subscribe to the message queue.
@@ -252,18 +213,11 @@ msg_subscription_t *msg_Subscribe (libvlc_int_t *instance, msg_callback_t cb,
     sub->instance = instance;
     sub->func = cb;
     sub->opaque = opaque;
-    sub->begin = sub->end = sub->overruns = 0;
-
-    if (vlc_clone (&sub->thread, msg_thread, sub, VLC_THREAD_PRIORITY_LOW))
-    {
-        free (sub);
-        return NULL;
-    }
 
     msg_bank_t *bank = libvlc_bank (instance);
-    vlc_mutex_lock (&bank->lock);
+    vlc_rwlock_wrlock (&bank->lock);
     TAB_APPEND (bank->i_sub, bank->pp_sub, sub);
-    vlc_mutex_unlock (&bank->lock);
+    vlc_rwlock_unlock (&bank->lock);
 
     return sub;
 }
@@ -276,22 +230,9 @@ void msg_Unsubscribe (msg_subscription_t *sub)
 {
     msg_bank_t *bank = libvlc_bank (sub->instance);
 
-    /* TODO: flush support? */
-    vlc_cancel (sub->thread);
-    vlc_mutex_lock (&bank->lock);
+    vlc_rwlock_wrlock (&bank->lock);
     TAB_REMOVE (bank->i_sub, bank->pp_sub, sub);
-    vlc_mutex_unlock (&bank->lock);
-
-    vlc_join (sub->thread, NULL);
-
-    /* Free dangling (not flushed) messages. */
-    /* NOTE: no locking, only this thread can refer to the subscription now. */
-    while (sub->begin != sub->end)
-    {
-        msg_Release (sub->items[sub->begin]);
-        if (++sub->begin == VLC_MSG_QSIZE)
-            sub->begin = 0;
-    }
+    vlc_rwlock_unlock (&bank->lock);
     free (sub);
 }
 
@@ -486,23 +427,14 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     PrintMsg( p_this, p_item );
 
-    msg_bank_t *p_queue = &QUEUE;
-    vlc_mutex_lock( &p_queue->lock );
-#define bank p_queue
+    msg_bank_t *bank = &QUEUE;
+    vlc_rwlock_rdlock (&bank->lock);
     for (int i = 0; i < bank->i_sub; i++)
     {
         msg_subscription_t *sub = bank->pp_sub[i];
-        if ((sub->end + 1 - sub->begin) % VLC_MSG_QSIZE)
-        {
-            sub->items[sub->end++] = msg_Hold (p_item);
-            if (sub->end == VLC_MSG_QSIZE)
-                sub->end = 0;
-        }
-        else
-            sub->overruns++;
+        sub->func (sub->opaque, p_item, 0);
     }
-    vlc_cond_broadcast (&bank->wait);
-    vlc_mutex_unlock (&bank->lock);
+    vlc_rwlock_unlock (&bank->lock);
     msg_Release (p_item);
 }
 

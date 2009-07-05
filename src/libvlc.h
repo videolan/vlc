@@ -87,8 +87,7 @@ uint32_t CPUCapabilities( void );
 typedef struct msg_bank_t
 {
     /** Message queue lock */
-    vlc_mutex_t lock;
-    vlc_cond_t  wait;
+    vlc_rwlock_t lock;
 
     /* Subscribers */
     int i_sub;
