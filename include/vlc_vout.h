@@ -67,9 +67,6 @@ struct picture_heap_t
     void (* pf_setpalette) ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 };
 
-/* Default subpicture channel ID */
-#define DEFAULT_CHAN           1
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
