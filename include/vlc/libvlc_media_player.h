@@ -79,7 +79,7 @@ typedef struct libvlc_rectangle_t
 /**
  * Marq int options definition
  */
-enum libvlc_video_marquee_int_option_t {
+typedef enum libvlc_video_marquee_int_option_t {
     libvlc_marquee_Enabled = 0,
     libvlc_marquee_Color,
     libvlc_marquee_Opacity,
@@ -88,15 +88,15 @@ enum libvlc_video_marquee_int_option_t {
     libvlc_marquee_Size,
     libvlc_marquee_Timeout,
     libvlc_marquee_X,
-    libvlc_marquee_Y,
-};
+    libvlc_marquee_Y
+} libvlc_video_marquee_int_option_t;
 
 /**
  * Marq string options definition
  */
-enum libvlc_video_marquee_string_option_t {
-    libvlc_marquee_Text = 0,
-};
+typedef enum libvlc_video_marquee_string_option_t {
+    libvlc_marquee_Text = 0
+} libvlc_video_marquee_string_option_t;
 
 
 /**
@@ -436,7 +436,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_rate( libvlc_media_player_t *, float
  * \param p_e an initialized exception pointer
  * \return current movie state as libvlc_state_t
  */
-VLC_PUBLIC_API unsigned libvlc_media_player_get_state( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *, libvlc_exception_t *);
 
 /**
  * Get movie fps rate
@@ -756,7 +756,7 @@ VLC_PUBLIC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *,
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *,
-                                                        unsigned,
+                                                        libvlc_video_marquee_int_option_t,
                                                         libvlc_exception_t * );
 
 /**
@@ -767,7 +767,7 @@ VLC_PUBLIC_API int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API char *libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *,
-                                                             unsigned,
+                                                             libvlc_video_marquee_string_option_t,
                                                              libvlc_exception_t * );
 
 /**
@@ -779,7 +779,7 @@ VLC_PUBLIC_API char *libvlc_video_get_marquee_option_as_string( libvlc_media_pla
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *,
-                                                         unsigned,
+                                                         libvlc_video_marquee_int_option_t,
                                                          int, libvlc_exception_t * );
 
 /**
@@ -791,7 +791,7 @@ VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_int( libvlc_media_player_
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *,
-                                                            unsigned,
+                                                            libvlc_video_marquee_string_option_t,
                                                             const char *,
                                                             libvlc_exception_t * );
 
@@ -806,7 +806,7 @@ VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_string( libvlc_media_play
 /**
  * Audio device types
  */
-enum libvlc_audio_output_device_types_t {
+typedef enum libvlc_audio_output_device_types_t {
     libvlc_AudioOutputDevice_Error  = -1,
     libvlc_AudioOutputDevice_Mono   =  1,
     libvlc_AudioOutputDevice_Stereo =  2,
@@ -815,20 +815,20 @@ enum libvlc_audio_output_device_types_t {
     libvlc_AudioOutputDevice_5_1    =  6,
     libvlc_AudioOutputDevice_6_1    =  7,
     libvlc_AudioOutputDevice_7_1    =  8,
-    libvlc_AudioOutputDevice_SPDIF  = 10,
-};
+    libvlc_AudioOutputDevice_SPDIF  = 10
+} libvlc_audio_output_device_types_t;
 
 /**
  * Audio channels
  */
-enum libvlc_audio_output_channel_t {
+typedef enum libvlc_audio_output_channel_t {
     libvlc_AudioChannel_Error   = -1,
     libvlc_AudioChannel_Stereo  =  1,
     libvlc_AudioChannel_RStereo =  2,
     libvlc_AudioChannel_Left    =  3,
     libvlc_AudioChannel_Right   =  4,
-    libvlc_AudioChannel_Dolbys  =  5,
-};
+    libvlc_AudioChannel_Dolbys  =  5
+} libvlc_audio_output_channel_t;
 
 
 /**

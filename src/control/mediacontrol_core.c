@@ -365,7 +365,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     }
     else
     {
-        enum libvlc_state_t state;
+        libvlc_state_t state;
 
         state = libvlc_media_player_get_state( self->p_media_player, &ex );
         if( libvlc_exception_raised( &ex ) )

@@ -61,7 +61,7 @@ static const vlc_meta_type_t libvlc_to_vlc_meta[] =
     [libvlc_meta_TrackID]      = vlc_meta_TrackID
 };
 
-static const enum libvlc_meta_t vlc_to_libvlc_meta[] =
+static const libvlc_meta_t vlc_to_libvlc_meta[] =
 {
     [vlc_meta_Title]        = libvlc_meta_Title,
     [vlc_meta_Artist]       = libvlc_meta_Artist,
@@ -366,7 +366,7 @@ void libvlc_media_add_option(
 void libvlc_media_add_option_flag(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_option,
-                                   unsigned i_flags,
+                                   libvlc_media_option_t i_flags,
                                    libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
@@ -442,7 +442,8 @@ libvlc_media_get_mrl( libvlc_media_t * p_md,
  * Getter for meta information
  **************************************************************************/
 
-char * libvlc_media_get_meta( libvlc_media_t *p_md, unsigned e_meta,
+char * libvlc_media_get_meta( libvlc_media_t *p_md,
+                                         libvlc_meta_t e_meta,
                                          libvlc_exception_t *p_e )
 {
     char * psz_meta;
@@ -477,7 +478,7 @@ char * libvlc_media_get_meta( libvlc_media_t *p_md, unsigned e_meta,
  * Can be error, playing, buffering, NothingSpecial.
  **************************************************************************/
 
-unsigned
+libvlc_state_t
 libvlc_media_get_state( libvlc_media_t *p_md,
                                    libvlc_exception_t *p_e )
 {
@@ -490,7 +491,8 @@ libvlc_media_get_state( libvlc_media_t *p_md,
  **************************************************************************/
 
 void
-libvlc_media_set_state( libvlc_media_t *p_md, enum libvlc_state_t state,
+libvlc_media_set_state( libvlc_media_t *p_md,
+                                   libvlc_state_t state,
                                    libvlc_exception_t *p_e )
 {
     libvlc_event_t event;

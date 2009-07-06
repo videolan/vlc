@@ -38,7 +38,7 @@ struct libvlc_media_t
     input_item_t      *p_input_item;
     int                i_refcount;
     libvlc_instance_t *p_libvlc_instance;
-    enum libvlc_state_t state;
+    libvlc_state_t     state;
     VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t*) p_subitems; /* A media descriptor can have Sub items. This is the only dependancy we really have on media_list */
     void *p_user_data;
 };
@@ -49,7 +49,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         libvlc_exception_t * );
 
 void libvlc_media_set_state(
-        libvlc_media_t *, enum libvlc_state_t,
+        libvlc_media_t *, libvlc_state_t,
         libvlc_exception_t * );
 
 #endif

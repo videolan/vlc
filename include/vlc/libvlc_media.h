@@ -49,7 +49,7 @@ typedef struct libvlc_media_t libvlc_media_t;
  * @{
  */
 
-enum libvlc_meta_t {
+typedef enum libvlc_meta_t {
     libvlc_meta_Title,
     libvlc_meta_Artist,
     libvlc_meta_Genre,
@@ -68,7 +68,7 @@ enum libvlc_meta_t {
     libvlc_meta_ArtworkURL,
     libvlc_meta_TrackID,
     /* Add new meta types HERE */
-};
+} libvlc_meta_t;
 
 /** @}*/
 
@@ -81,7 +81,7 @@ enum libvlc_meta_t {
  * IDLE/CLOSE=0, OPENING=1, BUFFERING=2, PLAYING=3, PAUSED=4,
  * STOPPING=5, ENDED=6, ERROR=7
  */
-enum libvlc_state_t
+typedef enum libvlc_state_t
 {
     libvlc_NothingSpecial=0,
     libvlc_Opening,
@@ -91,13 +91,13 @@ enum libvlc_state_t
     libvlc_Stopped,
     libvlc_Ended,
     libvlc_Error
-};
+} libvlc_state_t;
 
-enum libvlc_media_option_t
+typedef enum libvlc_media_option_t
 {
     libvlc_media_option_trusted = 0x2,
     libvlc_media_option_unique = 0x100
-};
+} libvlc_media_option_t;
 
 /**
  * Create a media with the given MRL.
@@ -159,7 +159,7 @@ VLC_PUBLIC_API void libvlc_media_add_option(
 VLC_PUBLIC_API void libvlc_media_add_option_flag(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_options,
-                                   unsigned i_flags,
+                                   libvlc_media_option_t i_flags,
                                    libvlc_exception_t * p_e );
 
 
@@ -213,7 +213,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t * );
  */
 VLC_PUBLIC_API char * libvlc_media_get_meta(
                                    libvlc_media_t *p_meta_desc,
-                                   unsigned e_meta,
+                                   libvlc_meta_t e_meta,
                                    libvlc_exception_t *p_e );
 /**
  * Get current state of media descriptor object. Possible media states
@@ -227,7 +227,7 @@ VLC_PUBLIC_API char * libvlc_media_get_meta(
  * \param p_e an initialized exception object
  * \return state of media descriptor object
  */
-VLC_PUBLIC_API unsigned libvlc_media_get_state(
+VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
                                    libvlc_media_t *p_meta_desc,
                                    libvlc_exception_t *p_e );
 

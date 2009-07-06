@@ -436,9 +436,7 @@ int
 libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
                                      libvlc_exception_t * p_e )
 {
-    enum libvlc_state_t state;
-
-    state = libvlc_media_player_get_state( p_mlp->p_mi, p_e );
+    libvlc_state_t state = libvlc_media_player_get_state( p_mlp->p_mi, p_e );
     return (state == libvlc_Opening) || (state == libvlc_Buffering) ||
            (state == libvlc_Playing);
 }
@@ -446,7 +444,7 @@ libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
 /**************************************************************************
  *        State (Public)
  **************************************************************************/
-enum libvlc_state_t
+libvlc_state_t
 libvlc_media_list_player_get_state( libvlc_media_list_player_t * p_mlp,
                                     libvlc_exception_t * p_e )
 {
