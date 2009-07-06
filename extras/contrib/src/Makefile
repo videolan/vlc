@@ -134,7 +134,6 @@ FFMPEGCONF+= --enable-small --disable-debug --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
-#--enable-libfaac
 endif
 
 ifdef HAVE_BEOS
@@ -474,6 +473,9 @@ fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/fontconfig-nodocs.patch
+ifdef HAVE_WIN32
+	patch -p0 < Patches/fontconfig.patch
+endif
 	(cd $@; autoreconf -ivf)
 
 .fontconfig: fontconfig .xml .freetype

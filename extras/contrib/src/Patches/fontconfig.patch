@@ -1,173 +1,54 @@
---- fontconfig/src/Makefile.am	Mon Sep 18 07:06:41 2006
-+++ fontconfig/src/Makefile.am	Sat Aug 18 20:48:45 2007
-***************
-*** 31,35 ****
-  
-  install-libtool-import-lib: 
-- 	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
-  	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
-  
---- 31,34 ----
---- fontconfig/src/Makefile.in	Sun Dec  3 10:27:33 2006
-+++ fontconfig/src/Makefile.in	Sat Aug 18 20:53:40 2007
-***************
-*** 614,618 ****
-  
-  @OS_WIN32_TRUE@install-libtool-import-lib: 
-- @OS_WIN32_TRUE@	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
-  @OS_WIN32_TRUE@	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
-  
---- 614,617 ----
---- fontconfig/src/fcinit.c	Sun Dec  3 07:10:30 2006
-+++ fontconfig/src/fcinit.c	Sun Aug 19 00:52:07 2007
-***************
-*** 26,32 ****
---- 26,94 ----
-  #include <stdlib.h>
-  
-+ #ifdef _WIN32
-+ #define STRICT
-+ #include <windows.h>
-+ #undef STRICT
-+ 
-+ static char *IsWindowsDir(char *p_dir_in, char **p_dir_out)
-+ {
-+     *p_dir_out = NULL;
-+ 
-+     if( ! strcmp( p_dir_in, "WINDOWSFONTDIR" ))
-+     {
-+         int rc;
-+ 
-+         *p_dir_out = malloc( 1000 );
-+         if( !*p_dir_out )
-+         {
-+             fprintf( stderr, "Fontconfig error: out of memory" );
-+             return p_dir_in;
-+         }
-+         rc = GetWindowsDirectory( *p_dir_out, 800 );
-+         if( rc == 0 || rc > 800 )
-+         {
-+             fprintf( stderr, "Fontconfig error: GetWindowsDirectory failed" );
-+             free( *p_dir_out );
-+             *p_dir_out = NULL;
-+      
-+             return p_dir_in;
-+         }
-+         if( (*p_dir_out)[ rc - 1 ] != '\\' )
-+             strcpy( (*p_dir_out)+rc, "\\" );
-+         strcat( *p_dir_out, "fonts" );
-+  
-+         return *p_dir_out;
-+     }
-+     else if( ! strcmp( p_dir_in, "WINDOWSTEMPDIR" ))
-+     {
-+         int rc;
-+ 
-+         *p_dir_out = malloc( 1000 );
-+         if( !*p_dir_out )
-+         {
-+             fprintf( stderr, "Fontconfig error: out of memory" );
-+             return p_dir_in;
-+         }
-+         rc = GetTempPath( 800, *p_dir_out );
-+         if( rc == 0 || rc > 800 )
-+         {
-+             fprintf( stderr, "Fontconfig error: GetTempPath failed" );
-+             free( *p_dir_out );
-+             *p_dir_out = NULL;
-+      
-+             return p_dir_in;
-+         }
-+         return *p_dir_out;
-+     }
-+     return p_dir_in;
-+ }
-+ #else
-+   #define IsWindowsDir(A, B)   A
-+ #endif
-+ 
-  static FcConfig *
-  FcInitFallbackConfig (void)
-  {
-+     char        *p_dir_out = NULL;
-      FcConfig	*config;
-  
-***************
-*** 34,40 ****
-      if (!config)
-  	goto bail0;
-!     if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
-  	goto bail1;
-!     if (!FcConfigAddCacheDir (config, (FcChar8 *) FC_CACHEDIR))
-  	goto bail1;
-      return config;
---- 96,106 ----
-      if (!config)
-  	goto bail0;
-!     if (!FcConfigAddDir (config, (FcChar8 *) IsWindowsDir(FC_DEFAULT_FONTS, &p_dir_out)))
-  	goto bail1;
-!     if (p_dir_out)
-!         free(p_dir_out);
-!     p_dir_out = NULL;
-! 
-!     if (!FcConfigAddCacheDir (config, (FcChar8 *) IsWindowsDir(FC_CACHEDIR, &p_dir_out)))
-  	goto bail1;
-      return config;
-***************
-*** 43,46 ****
---- 109,114 ----
-      FcConfigDestroy (config);
-  bail0:
-+     if (p_dir_out)
-+         free(p_dir_out);
-      return 0;
-  }
-***************
-*** 73,84 ****
-      if (config->cacheDirs && config->cacheDirs->num == 0)
-      {
-  	fprintf (stderr,
-  		 "Fontconfig warning: no <cachedir> elements found. Check configuration.\n");
-  	fprintf (stderr,
-  		 "Fontconfig warning: adding <cachedir>%s</cachedir>\n",
-! 		 FC_CACHEDIR);
-  	fprintf (stderr,
-  		 "Fontconfig warning: adding <cachedir>~/.fontconfig</cachedir>\n");
-! 	if (!FcConfigAddCacheDir (config, (FcChar8 *) FC_CACHEDIR) ||
-  	    !FcConfigAddCacheDir (config, (FcChar8 *) "~/.fontconfig"))
-  	{
---- 141,158 ----
-      if (config->cacheDirs && config->cacheDirs->num == 0)
-      {
-+         char *p_dir_out = NULL;
-+ 
-  	fprintf (stderr,
-  		 "Fontconfig warning: no <cachedir> elements found. Check configuration.\n");
-  	fprintf (stderr,
-  		 "Fontconfig warning: adding <cachedir>%s</cachedir>\n",
-! 		 IsWindowsDir(FC_CACHEDIR, &p_dir_out));
-  	fprintf (stderr,
-  		 "Fontconfig warning: adding <cachedir>~/.fontconfig</cachedir>\n");
-!         if (p_dir_out)
-!             free(p_dir_out);
-!         p_dir_out = NULL;
-! 
-!         if (!FcConfigAddCacheDir (config, (FcChar8 *) IsWindowsDir(FC_CACHEDIR, &p_dir_out)) ||
-  	    !FcConfigAddCacheDir (config, (FcChar8 *) "~/.fontconfig"))
-  	{
-***************
-*** 86,91 ****
---- 160,172 ----
-  		     "Fontconfig error: out of memory");
-  	    FcConfigDestroy (config);
-+ 
-+             if (p_dir_out)
-+                 free(p_dir_out);
-+             p_dir_out = NULL;
-+ 
-  	    return FcInitFallbackConfig ();
-  	}
-+         if (p_dir_out)
-+             free(p_dir_out);
-      }
-  
+diff -ruN fontconfig/src/fcinit.c fontconfig.good/src/fcinit.c
+--- fontconfig/src/fcinit.c	2009-06-06 00:59:27.000000000 +0200
++++ fontconfig.good/src/fcinit.c	2009-07-07 01:33:48.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include "fcint.h"
+ #include <stdlib.h>
++# include <shlobj.h>
+ 
+ static FcConfig *
+ FcInitFallbackConfig (void)
+@@ -35,7 +36,9 @@
+ 	goto bail0;
+     if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
+ 	goto bail1;
+-    if (!FcConfigAddCacheDir (config, (FcChar8 *) FC_CACHEDIR))
++    char dir[MAX_PATH];
++    SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
++    if (!FcConfigAddCacheDir (config, (FcChar8 *)dir))
+ 	goto bail1;
+     return config;
+ 
+diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
+--- fontconfig/src/fcint.h	2009-06-24 19:52:13.000000000 +0200
++++ fontconfig.good/src/fcint.h	2009-07-03 00:13:56.000000000 +0200
+@@ -538,7 +538,7 @@
+ 
+ #ifdef _WIN32
+ FcPrivate int
+-FcStat (const char *file, struct stat *statb)
++FcStat (const char *file, struct stat *statb);
+ #else
+ #define FcStat stat
+ #endif
+--- fontconfig/src/Makefile.in	2009-06-24 21:05:27.000000000 +0200
++++ fontconfig.good/src/Makefile.in	2009-07-03 00:13:38.000000000 +0200
+@@ -664,7 +664,6 @@
+ # gcc import library install/uninstall
+ 
+ @OS_WIN32_TRUE@install-libtool-import-lib: 
+-@OS_WIN32_TRUE@	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
+ @OS_WIN32_TRUE@	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
+ 
+ @OS_WIN32_TRUE@uninstall-libtool-import-lib:
+--- fontconfig/src/Makefile.am	2009-03-18 22:02:22.000000000 +0100
++++ fontconfig.good/src/Makefile.am	2009-07-03 00:12:50.000000000 +0200
+@@ -30,7 +30,6 @@
+ # gcc import library install/uninstall
+ 
+ install-libtool-import-lib: 
+-	$(INSTALL) .libs/libfontconfig.dll.a $(DESTDIR)$(libdir)
+ 	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
+ 
+ uninstall-libtool-import-lib:
