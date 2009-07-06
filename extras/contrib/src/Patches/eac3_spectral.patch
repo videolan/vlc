@@ -1,7 +1,7 @@
-Index: ac3dec.c
+Index: ffmpeg/libavcodec/ac3dec.c
 ===================================================================
---- ac3dec.c	(revision 19357)
-+++ ac3dec.c	(working copy)
+--- ffmpeg/libavcodec/ac3dec.c	(revision 19357)
++++ ffmpeg/libavcodec/ac3dec.c	(working copy)
 @@ -819,15 +819,100 @@
  
      /* spectral extension strategy */
@@ -159,10 +159,10 @@ Index: ac3dec.c
      /* downmix and MDCT. order depends on whether block switching is used for
         any channel in this block. this is because coefficients for the long
         and short transforms cannot be mixed. */
-Index: ac3dec.h
+Index: ffmpeg/libavcodec/ac3dec.h
 ===================================================================
---- ac3dec.h	(revision 19357)
-+++ ac3dec.h	(working copy)
+--- ffmpeg/libavcodec/ac3dec.h	(revision 19357)
++++ ffmpeg/libavcodec/ac3dec.h	(working copy)
 @@ -42,6 +42,7 @@
  #define AC3_MAX_COEFS   256
  #define AC3_BLOCK_SIZE  256
@@ -207,10 +207,10 @@ Index: ac3dec.h
 +void ff_eac3_apply_spectral_extension(AC3DecodeContext *s);
 +
  #endif /* AVCODEC_AC3DEC_H */
-Index: eac3dec.c
+Index: ffmpeg/libavcodec/eac3dec.c
 ===================================================================
---- eac3dec.c	(revision 19357)
-+++ eac3dec.c	(working copy)
+--- ffmpeg/libavcodec/eac3dec.c	(revision 19357)
++++ ffmpeg/libavcodec/eac3dec.c	(working copy)
 @@ -23,10 +23,6 @@
  /*
   * There are several features of E-AC-3 that this decoder does not yet support.
@@ -340,10 +340,10 @@ Index: eac3dec.c
          s->first_cpl_coords[ch] = 1;
      }
      s->first_cpl_leak = 1;
-Index: ac3dec_data.c
+Index: ffmpeg/libavcodec/ac3dec_data.c
 ===================================================================
---- ac3dec_data.c	(revision 19357)
-+++ ac3dec_data.c	(working copy)
+--- ffmpeg/libavcodec/ac3dec_data.c	(revision 19357)
++++ ffmpeg/libavcodec/ac3dec_data.c	(working copy)
 @@ -1127,6 +1127,51 @@
  { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1 };
  
@@ -396,10 +396,10 @@ Index: ac3dec_data.c
   * Table of bin locations for rematrixing bands
   * reference: Section 7.5.2 Rematrixing : Frequency Band Definitions
   */
-Index: ac3dec_data.h
+Index: ffmpeg/libavcodec/ac3dec_data.h
 ===================================================================
---- ac3dec_data.h	(revision 19357)
-+++ ac3dec_data.h	(working copy)
+--- ffmpeg/libavcodec/ac3dec_data.h	(revision 19357)
++++ ffmpeg/libavcodec/ac3dec_data.h	(working copy)
 @@ -34,6 +34,8 @@
  extern const int16_t (* const ff_eac3_mantissa_vq[8])[6];
  extern const uint8_t ff_eac3_frm_expstr[32][6];
